@@ -16,17 +16,15 @@ function getMidiNote(step: string, octave: number, alter: number = 0): number {
 
 /**
  * Map a chord of MNX notes to fret/string positions.
- * Uses `_x.guitar.{string,fret}` when annotated; otherwise picks the lowest
+ * Uses `_x.tab.position` when annotated; otherwise picks the lowest
  * playable fret per pitch, avoiding string collisions within the chord.
  */
 export function resolveEventPositions(notes: MnxNote[]): { str: number; fret: number }[] {
-  const allAnnotated = notes.every(
-    n => n._x?.guitar?.string !== undefined && n._x?.guitar?.fret !== undefined
-  );
+  const allAnnotated = notes.every(n => n._x?.tab?.position !== undefined);
   if (allAnnotated) {
     return notes.map(n => ({
-      str: n._x!.guitar!.string!,
-      fret: n._x!.guitar!.fret!
+      str: n._x!.tab!.position!.string,
+      fret: n._x!.tab!.position!.fret
     }));
   }
 
@@ -44,16 +42,15 @@ export function resolveEventPositions(notes: MnxNote[]): { str: number; fret: nu
   notesWithMidi.sort((a, b) => b.midi - a.midi);
 
   for (const item of notesWithMidi) {
-    if (item.note._x?.guitar?.string !== undefined && item.note._x?.guitar?.fret !== undefined) {
-      const s = item.note._x.guitar.string;
-      const f = item.note._x.guitar.fret;
-      resolved.push({ str: s, fret: f });
-      usedStrings.add(s);
+    const pos = item.note._x?.tab?.position;
+    if (pos) {
+      resolved.push({ str: pos.string, fret: pos.fret });
+      usedStrings.add(pos.string);
     }
   }
 
   for (const item of notesWithMidi) {
-    if (item.note._x?.guitar?.string !== undefined && item.note._x?.guitar?.fret !== undefined) {
+    if (item.note._x?.tab?.position) {
       continue;
     }
 

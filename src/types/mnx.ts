@@ -4,23 +4,45 @@ export interface MnxPitch {
   alter?: number;
 }
 
+// ---- Tablature extension v2 (`_x.tab`) — see docs/tab-extension-spec.md ----
+
+export interface MnxTabPosition {
+  /** String number; 1 = highest-pitched string. */
+  string: number;
+  /** Fret number; 0 = open string. */
+  fret: number;
+}
+
+export interface MnxTabTechnique {
+  bend?: {
+    type: 'bend' | 'pre-bend';
+    amount: number;
+    release?: boolean;
+  };
+  slide?: {
+    type: 'shift' | 'legato' | 'slide-in' | 'slide-out';
+    direction?: 'up' | 'down';
+    target?: string;
+  };
+  hammerOn?: { target: string };
+  pullOff?: { target: string };
+  vibrato?: boolean;
+}
+
+export interface MnxTabNoteExtension {
+  position?: MnxTabPosition;
+  technique?: MnxTabTechnique;
+  fingering?: {
+    hand: 'left' | 'right';
+    finger: string;
+  };
+}
+
 export interface MnxNote {
   id?: string;
   pitch: MnxPitch;
   _x?: {
-    guitar?: {
-      string?: number;
-      fret?: number;
-      fingering?: {
-        hand?: 'left' | 'right';
-        finger?: string;
-      };
-      bend?: {
-        type?: string;
-        amount?: number;
-        release?: boolean;
-      };
-    };
+    tab?: MnxTabNoteExtension;
   };
 }
 
@@ -52,15 +74,25 @@ export interface MnxPartMeasure {
   sequences: MnxSequence[];
 }
 
+export interface MnxTuningEntry {
+  /** Explicit string number — array order carries no meaning. */
+  string: number;
+  pitch: MnxPitch;
+}
+
+export interface MnxTabPartExtension {
+  tuning?: MnxTuningEntry[];
+  capo?: number;
+  /** The part's preferred presentation; tab-ness is a view, not content. */
+  staffKind?: 'notation' | 'tab' | 'both';
+}
+
 export interface MnxPart {
   id: string;
   name: string;
   measures: MnxPartMeasure[];
   _x?: {
-    guitar?: {
-      tuning?: { strings: MnxPitch[] };
-      capo?: number;
-    };
+    tab?: MnxTabPartExtension;
   };
 }
 

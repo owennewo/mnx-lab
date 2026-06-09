@@ -2,6 +2,7 @@ import { ReactiveController, ReactiveControllerHost } from 'lit';
 import { MnxDocument, MnxStructure } from '../types/mnx.ts';
 import { documentRepository } from '../utils/indexedDbRepository.ts';
 import { defaultScore } from '../utils/defaultScore.ts';
+import { upgradeTabExtension } from '../utils/upgradeTabExtension.ts';
 import houseOfRisingSunJson from '../../server/scores/House-of-the-Rising-Sun.json';
 
 export class DocumentController implements ReactiveController {
@@ -72,6 +73,7 @@ export class DocumentController implements ReactiveController {
         }
         this.currentDocument = loadedDoc || await documentRepository.load(list[0].id);
         if (this.currentDocument) {
+          this.currentDocument = this.upgraded(this.currentDocument);
           localStorage.setItem('last-opened-score-id', this.currentDocument.id);
         }
       }
@@ -81,6 +83,22 @@ export class DocumentController implements ReactiveController {
       this.isLoading = false;
       this.host.requestUpdate();
     }
+  }
+
+  /**
+   * Upgrades documents saved with the deprecated v1 guitar extension
+   * (_x.guitar / TAB clefs / duplicated tab staff) to the v2 single-source
+   * _x.tab form on load, and persists the upgrade so it runs once per doc.
+   */
+  private upgraded(doc: MnxDocument): MnxDocument {
+    const upgradedJson = upgradeTabExtension(doc.mnxJson);
+    if (upgradedJson === doc.mnxJson) return doc;
+    console.log(`Upgraded document "${doc.name}" to tab extension v2`);
+    const upgradedDoc = { ...doc, mnxJson: upgradedJson };
+    documentRepository.save(upgradedDoc).catch(e =>
+      console.error('Failed to persist tab extension upgrade', e)
+    );
+    return upgradedDoc;
   }
 
   async resetToDefaultScale() {
@@ -95,7 +113,7 @@ export class DocumentController implements ReactiveController {
     try {
       const doc = await documentRepository.load(id);
       if (doc) {
-        this.currentDocument = doc;
+        this.currentDocument = this.upgraded(doc);
         localStorage.setItem('last-opened-score-id', id);
       }
     } catch (e) {
@@ -149,18 +167,16 @@ export class DocumentController implements ReactiveController {
               id: 'part-1',
               name: 'Guitar',
               _x: {
-                guitar: {
-                  tuning: {
-                    strings: [
-                      { step: 'E', octave: 4 },
-                      { step: 'B', octave: 3 },
-                      { step: 'G', octave: 3 },
-                      { step: 'D', octave: 3 },
-                      { step: 'A', octave: 2 },
-                      { step: 'E', octave: 2 }
-                    ]
-                  },
-                  capo: 0
+                tab: {
+                  tuning: [
+                    { string: 1, pitch: { step: 'E', octave: 4 } },
+                    { string: 2, pitch: { step: 'B', octave: 3 } },
+                    { string: 3, pitch: { step: 'G', octave: 3 } },
+                    { string: 4, pitch: { step: 'D', octave: 3 } },
+                    { string: 5, pitch: { step: 'A', octave: 2 } },
+                    { string: 6, pitch: { step: 'E', octave: 2 } }
+                  ],
+                  staffKind: 'both'
                 }
               },
               measures: [
