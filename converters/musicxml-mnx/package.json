@@ -1,0 +1,26 @@
+{
+  "name": "@mnx-editor/musicxml-mnx",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Bi-directional MusicXML <-> MNX converter CLI and library",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "bin": {
+    "musicxml-mnx": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.10"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}
