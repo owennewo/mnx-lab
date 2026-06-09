@@ -1,23 +1,30 @@
 {
-  "name": "mnx-editor",
+  "name": "mnx-lab",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "npm run compile-validator && tsc && tsc -p worker && vite build",
+    "preview": "vite preview",
+    "compile-validator": "node scripts/compile-validator.mjs",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@awesome.me/webawesome": "^3.7.0",
     "@lit/context": "^1.1.3",
+    "hono": "^4.12.25",
     "idb-keyval": "^6.2.4",
     "lit": "^3.3.3",
     "tone": "^15.1.22",
     "vexflow": "^5.0.0"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.40.1",
+    "@cloudflare/workers-types": "^4.20260609.1",
+    "ajv": "^8.20.0",
     "typescript": "^5.4.5",
-    "vite": "^8.0.14"
+    "vite": "^8.0.14",
+    "wrangler": "^4.99.0"
   }
 }

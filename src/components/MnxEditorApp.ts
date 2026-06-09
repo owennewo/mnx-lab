@@ -360,7 +360,7 @@ export class MnxEditorApp extends LitElement {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/edit-notation', {
+      const response = await fetch('/api/edit-notation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -329,7 +329,7 @@ export class ChatPanel extends LitElement {
     const savedTranscribeModel = localStorage.getItem('last-transcribe-model');
     if (savedTranscribeModel) this.selectedTranscribeModel = savedTranscribeModel;
     try {
-      const response = await fetch('http://localhost:3000/api/models');
+      const response = await fetch('/api/models');
       if (response.ok) {
         const data = await response.json();
         this.textModels = data.text || [];
@@ -660,7 +660,7 @@ export class ChatPanel extends LitElement {
       formData.append('file', blob, 'voice.webm');
       formData.append('model', this.selectedTranscribeModel);
 
-      const response = await fetch('http://localhost:3000/api/voice-transcribe', {
+      const response = await fetch('/api/voice-transcribe', {
         method: 'POST',
         body: formData
       });

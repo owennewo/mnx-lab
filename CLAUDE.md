@@ -4,18 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-AI-first music notation editor for the W3C MNX format, with VexFlow rendering, Tone.js playback, and an LLM-powered "chat-to-edit" workflow that routes through OpenRouter. The app is a single Lit web component (`<mnx-editor-app>`) — the architectural goal is that the compiled bundle can be embedded anywhere via one script tag, so do **not** introduce React/Vue/state libraries (see `research/tech_stack.md`).
+**MNX Lab** (package `mnx-lab`) — a test bench for the developing W3C MNX format with emphasis on guitar tab, evolving from an AI-first notation editor. Custom SMuFL/SVG rendering (plus a VexFlow fallback), Tone.js playback, and an LLM-powered "chat-to-edit" workflow that routes through OpenRouter. The app is a single Lit web component (`<mnx-editor-app>`) — the architectural goal is that the compiled bundle can be embedded anywhere via one script tag, so do **not** introduce React/Vue/state libraries (see `research/tech_stack.md`). The pivot plan (scenario library + gallery) lives in `clean_room_impl/`.
 
 ## Running the project
 
 ```bash
-./start.sh                  # starts both Vite (5173) and the Express proxy (3000)
-npm run dev                 # frontend only (Vite)
-npm run build               # tsc + vite build
-cd server && npm start      # backend proxy only
+npm run dev                 # everything: Vite dev server + Worker API (via @cloudflare/vite-plugin)
+npm run build               # validator codegen + tsc (app + worker) + vite build
+npm run deploy              # build + wrangler deploy (mnx-lab.totai.uk)
+npm run compile-validator   # regenerate worker/generated/validate-mnx.mjs after a schema bump
 ```
 
-The Vite dev server proxies `/api/*` to `localhost:3000`, but the frontend currently calls `http://localhost:3000/api/edit-notation` directly (CORS-enabled on the server) — both servers must be running for the AI chat to work. `OPENROUTER_API_KEY` is read from `.env` at the repo root by `server/index.js`; if missing or placeholder, `/api/edit-notation` falls back to a regex-based mock in `handleMockCommand` (transpose / "whole note ending" / "double octave") so the UI stays demoable offline.
+The `/api/*` routes are a **Cloudflare Worker** ([worker/index.ts](worker/index.ts), Hono), served inside the Vite dev server by `@cloudflare/vite-plugin` — there is no separate backend process. `OPENROUTER_API_KEY` comes from `.dev.vars`/`.env` locally (both gitignored) and from a Worker secret (`wrangler secret put OPENROUTER_API_KEY`) in production. If the key is missing or a placeholder, `/api/edit-notation` falls back to a regex-based mock in `handleMockCommand` (transpose / "whole note ending" / "double octave") so the UI stays demoable offline.
+
+**Workers can't run `ajv.compile()`** (no runtime code generation), so the schema validator is precompiled by [scripts/compile-validator.mjs](scripts/compile-validator.mjs) into `worker/generated/validate-mnx.mjs` (committed; regenerated automatically by `npm run build`). The legacy Express server in `server/` is retained for its prompt module (`server/prompts/editNotation.js`) and `server/models.json`, which the Worker imports directly — but it is no longer run.
 
 ### MusicXML converter sub-package
 
@@ -52,11 +54,11 @@ Child-to-parent communication uses bubbling DOM `CustomEvent`s with `composed: t
 The chat endpoint is a **self-correcting NDJSON stream**, not a simple proxy:
 
 1. Frontend POSTs `{ userPrompt, mnxJson, selectionContext, model }` and reads `application/x-ndjson` line-by-line. Each line is either `{type: 'progress', tokens, status}` or `{type: 'done', success, updatedMnxJson | error, explanation}`.
-2. Server calls OpenRouter with a forced `tool_choice: update_document` function call, streams the response, accumulates `function.arguments`, parses, then validates against `schemas/mnx-schema.json` via Ajv 2020.
-3. **On validation failure**: the server appends the assistant's failed `tool_calls` message plus a synthetic `role: 'tool'` error response back into `messages` and re-calls OpenRouter — up to `maxAttempts = 3`. Throughout, NDJSON `progress` frames keep the client UI alive.
+2. The Worker calls OpenRouter with a forced `tool_choice: update_document` function call, streams the response, accumulates `function.arguments`, parses, then validates against `schemas/mnx-schema.json` via the precompiled Ajv validator.
+3. **On validation failure**: the Worker appends the assistant's failed `tool_calls` message plus a synthetic `role: 'tool'` error response back into `messages` and re-calls OpenRouter — up to `maxAttempts = 3`. Throughout, NDJSON `progress` frames keep the client UI alive.
 4. `formatValidationErrors` deliberately filters out `anyOf`/`oneOf`/`allOf` noise and only the first `sequence-content/items/anyOf/0` branch (the `event` shape) so the LLM gets actionable feedback. Don't "fix" this by re-enabling all branches — it makes errors unusable.
 
-When modifying the system prompt or tool schema in `server/index.js`, mirror any structural requirements (e.g. plural `notes` array vs singular `note`) — these LLM-facing rules are the project's primary defense against schema drift.
+When modifying the system prompt (`server/prompts/editNotation.js`) or the tool schema in `worker/index.ts`, mirror any structural requirements (e.g. plural `notes` array vs singular `note`) — these LLM-facing rules are the project's primary defense against schema drift.
 
 ### MNX <-> VexFlow rendering
 
@@ -71,5 +73,5 @@ Project-internal MNX types live in [src/types/mnx.ts](src/types/mnx.ts). The W3C
 - **Web Awesome (`wa-*`) components** are the UI kit — see `src/main.ts` for which are registered. `wa-icon` is wired to Bootstrap Icons via CDN. Don't introduce a different UI library.
 - **`.ts` extensions in imports are required** (`allowImportingTsExtensions: true` in tsconfig, `moduleResolution: bundler`).
 - **Decorator metadata is enabled** (`experimentalDecorators`, `emitDecoratorMetadata`) for Lit decorators. Do not flip these to standard decorators without testing the whole component tree.
-- **No tests** exist for the frontend or the Express server — only the converter sub-package has vitest tests. Treat the converter as the closest thing to a reference for "correct" MNX shapes.
-- The frontend `dist/` directory is checked in; treat it as a build artifact, not source.
+- **No tests** exist for the frontend or the Worker — only the converter sub-package has vitest tests. Treat the converter as the closest thing to a reference for "correct" MNX shapes.
+- `dist/` is a build artifact and is gitignored (it contains both the client build and the Worker bundle).
