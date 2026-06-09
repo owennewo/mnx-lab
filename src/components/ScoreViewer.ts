@@ -5,7 +5,6 @@ import { consume } from '@lit/context';
 import { mnxDocumentContext, playbackStateContext, selectionContext } from '../contexts/mnxContext.ts';
 import type { PlaybackState, SelectionContext } from '../contexts/mnxContext.ts';
 import { MnxDocument } from '../types/mnx.ts';
-import { renderMnxToVexflow } from '../utils/mnxToVexflow.ts';
 import { renderMnxToSvgTab } from '../tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../notation/notationRenderer.ts';
 
@@ -26,7 +25,7 @@ export class ScoreViewer extends LitElement {
   @property({ type: String })
   viewMode: 'notation' | 'tab' | 'both' | 'json' = 'notation';
 
-  @query('#vexflow-container')
+  @query('#score-container')
   container!: HTMLElement;
 
   static styles = css`
@@ -54,7 +53,7 @@ export class ScoreViewer extends LitElement {
       border: 1px dashed rgba(255, 255, 255, 0.08);
     }
 
-    #vexflow-container {
+    #score-container {
       width: 100%;
     }
 
@@ -67,68 +66,41 @@ export class ScoreViewer extends LitElement {
       font-size: 1.1rem;
     }
 
-    /* Make VexFlow SVG fit the dark mode.
-       Notice we do NOT use !important on fills/strokes,
-       so Vexflow's inline highlighted colors can override this.
-       Scoped with :not(.mnx-tab-svg) so the new tab renderer drives its own colors. */
-    #vexflow-container svg:not(.mnx-tab-svg):not(.mnx-notation-svg) {
-      fill: var(--text-primary);
-    }
-
-    #vexflow-container svg:not(.mnx-tab-svg):not(.mnx-notation-svg) path,
-    #vexflow-container svg:not(.mnx-tab-svg):not(.mnx-notation-svg) rect:not([fill="white"]) {
-      fill: var(--text-primary);
-      stroke: var(--text-primary);
-    }
-
-    #vexflow-container svg:not(.mnx-tab-svg):not(.mnx-notation-svg) rect[fill="white"] {
-      fill: oklch(0.18 0.02 256) !important;
-      stroke: none !important;
-    }
-
-    #vexflow-container svg:not(.mnx-tab-svg):not(.mnx-notation-svg) text {
-      fill: inherit;
-    }
-
-    /* But we can override line drawing details to match the grid theme */
-    #vexflow-container svg:not(.mnx-tab-svg):not(.mnx-notation-svg) path.vf-stave {
-      stroke: oklch(0.4 0.02 256) !important;
-    }
-
-    #vexflow-container svg {
+    #score-container svg {
       pointer-events: auto !important;
     }
 
-    #vexflow-container svg g {
-      pointer-events: auto !important;
-    }
-
-    /* New MNX-native tab renderer styles */
-    #vexflow-container svg.mnx-tab-svg {
+    /* MNX-native tab renderer styles */
+    #score-container svg.mnx-tab-svg {
       color: var(--text-primary);
       display: block;
     }
 
-    #vexflow-container svg.mnx-tab-svg .staff-line {
+    #score-container svg.mnx-tab-svg .staff-line {
       stroke: oklch(0.45 0.02 256);
     }
 
-    #vexflow-container svg.mnx-tab-svg .tab-event:hover .fret-number {
+    #score-container svg.mnx-tab-svg .tab-event:hover .fret-number {
       fill: var(--primary-glow);
     }
 
-    /* New MNX-native notation renderer styles */
-    #vexflow-container svg.mnx-notation-svg {
+    /* MNX-native notation renderer styles */
+    #score-container svg.mnx-notation-svg {
       color: var(--text-primary);
       display: block;
     }
 
-    #vexflow-container svg.mnx-notation-svg .staff-line {
+    #score-container svg.mnx-notation-svg .staff-line {
       stroke: oklch(0.45 0.02 256);
     }
 
-    #vexflow-container svg.mnx-notation-svg .notehead {
+    #score-container svg.mnx-notation-svg .notehead {
       cursor: pointer;
+    }
+
+    /* In 'both' mode the two views stack with a small gap */
+    #score-container .both-view-pane + .both-view-pane {
+      margin-top: 16px;
     }
 
     #json-wrapper {
@@ -205,46 +177,34 @@ export class ScoreViewer extends LitElement {
       }));
     };
 
+    const commonOpts = {
+      mnx: this.mnxDoc.mnxJson,
+      width,
+      activeNoteIds: this.playbackState?.activeNoteIds ?? [],
+      selectedNoteIds: this.selection?.selectedNoteIds ?? [],
+      onNoteClick
+    };
+
     if (this.viewMode === 'tab') {
-      renderMnxToSvgTab({
-        container: this.container,
-        mnx: this.mnxDoc.mnxJson,
-        width,
-        activeNoteIds: this.playbackState?.activeNoteIds ?? [],
-        selectedNoteIds: this.selection?.selectedNoteIds ?? [],
-        onNoteClick
-      });
+      renderMnxToSvgTab({ container: this.container, ...commonOpts });
       return;
     }
 
     if (this.viewMode === 'notation') {
-      renderMnxToSvgNotation({
-        container: this.container,
-        mnx: this.mnxDoc.mnxJson,
-        width,
-        activeNoteIds: this.playbackState?.activeNoteIds ?? [],
-        selectedNoteIds: this.selection?.selectedNoteIds ?? [],
-        onNoteClick
-      });
+      renderMnxToSvgNotation({ container: this.container, ...commonOpts });
       return;
     }
 
-    const numMeasures = this.mnxDoc.mnxJson.parts?.[0]?.measures?.length ?? 0;
-    const measuresPerRow = width > 800 ? 4 : 2;
-    const rows = Math.ceil(numMeasures / measuresPerRow);
-    const rowHeight = this.viewMode === 'both' ? 220 : 130;
-    const calculatedHeight = Math.max(300, rows * rowHeight + 40);
-
-    renderMnxToVexflow({
-      container: this.container,
-      mnx: this.mnxDoc.mnxJson,
-      width: width,
-      height: calculatedHeight,
-      activeNoteIds: this.playbackState?.activeNoteIds ?? [],
-      selectedNoteIds: this.selection?.selectedNoteIds ?? [],
-      viewMode: this.viewMode,
-      onNoteClick
-    });
+    // 'both': notation above tab, each renderer owning its own pane
+    // (renderSvg clears whatever container it's given).
+    this.container.innerHTML = '';
+    const notationPane = document.createElement('div');
+    notationPane.className = 'both-view-pane';
+    const tabPane = document.createElement('div');
+    tabPane.className = 'both-view-pane';
+    this.container.append(notationPane, tabPane);
+    renderMnxToSvgNotation({ container: notationPane, ...commonOpts });
+    renderMnxToSvgTab({ container: tabPane, ...commonOpts });
   }
 
   render() {
@@ -263,7 +223,7 @@ export class ScoreViewer extends LitElement {
 
     return html`
       <div id="score-wrapper">
-        <div id="vexflow-container"></div>
+        <div id="score-container"></div>
       </div>
     `;
   }

@@ -16,8 +16,7 @@
     "hono": "^4.12.25",
     "idb-keyval": "^6.2.4",
     "lit": "^3.3.3",
-    "tone": "^15.1.22",
-    "vexflow": "^5.0.0"
+    "tone": "^15.1.22"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.40.1",

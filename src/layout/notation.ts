@@ -6,7 +6,7 @@ import { glyphAnchor } from '../smufl/smufl.ts';
  * Pure layout for standard 5-line notation. Working in staff spaces, returns
  * primitives for the renderer + a sourceId → location index.
  *
- * Scope (parity with the current VexFlow output, no extras):
+ * Scope:
  *   - 5-line staff with treble/bass clefs, 8vb octave marker
  *   - Time signatures (digits via SMuFL)
  *   - Notes: noteheads (whole/half/black), stems, flags, accidentals, dots, chords, ledger lines
@@ -232,8 +232,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   const measureAllocatedWidth = (widthSp - 2 * MARGIN_SP) / measuresPerRow;
   const isGuitarPart = part.name.toLowerCase().includes('guitar');
 
-  // Initial active state. Guitar parts default to treble 8vb (matches current
-  // VexFlow rendering pathway).
+  // Initial active state. Guitar parts default to treble 8vb.
   let activeClef: ActiveClef = { sign: 'G', octave: isGuitarPart ? -1 : 0 };
   let activeTimeSig = { count: 4, unit: 4 };
 
