@@ -6,6 +6,7 @@ import { Hono } from 'hono';
 import { buildEditSystemPrompt } from '../server/prompts/editNotation.js';
 import models from '../server/models.json';
 import validateMnx from './generated/validate-mnx.mjs';
+import { validateTabNote, validateTabPart } from './generated/validate-tab.mjs';
 
 interface Env {
   OPENROUTER_API_KEY?: string;
@@ -59,6 +60,43 @@ function formatValidationErrors(errors: any[]): string {
   }
 
   return formatted.slice(0, 5).join('\n');
+}
+
+/**
+ * Second validation verdict: every `_x.tab` object in the document against
+ * the tab extension v2 schema (docs/tab-extension-spec.md). Standard MNX
+ * validity is deliberately blind to `_x` content, so this is a separate walk.
+ * Returns formatted error strings (empty array = extension-valid).
+ */
+function validateTabExtensions(doc: any): string[] {
+  const errors: string[] = [];
+  const report = (path: string, subErrors: any[] | null) => {
+    for (const err of subErrors ?? []) {
+      errors.push(`Tab extension: path "${path}${err.instancePath}" ${err.message}.`);
+    }
+  };
+
+  (doc?.parts ?? []).forEach((part: any, pIdx: number) => {
+    if (part?._x?.tab !== undefined && !validateTabPart(part._x.tab)) {
+      report(`/parts/${pIdx}/_x/tab`, validateTabPart.errors);
+    }
+    (part?.measures ?? []).forEach((measure: any, mIdx: number) => {
+      (measure?.sequences ?? []).forEach((seq: any, sIdx: number) => {
+        (seq?.content ?? []).forEach((event: any, eIdx: number) => {
+          (event?.notes ?? []).forEach((note: any, nIdx: number) => {
+            if (note?._x?.tab !== undefined && !validateTabNote(note._x.tab)) {
+              report(
+                `/parts/${pIdx}/measures/${mIdx}/sequences/${sIdx}/content/${eIdx}/notes/${nIdx}/_x/tab`,
+                validateTabNote.errors
+              );
+            }
+          });
+        });
+      });
+    });
+  });
+
+  return errors.slice(0, 5);
 }
 
 function arrayBufferToBase64(buf: ArrayBuffer): string {
@@ -384,9 +422,16 @@ app.post('/api/edit-notation', async (c) => {
               if (!updatedMnxJson || !updatedMnxJson.parts || updatedMnxJson.parts.length === 0) {
                 validationErrors = 'JSON structure is missing required root properties "mnx" or "parts".';
               } else {
+                // Two verdicts: standard MNX schema, then the tab extension
+                // schema over every _x.tab object. Both gate the retry loop.
                 const isValid = validateMnx(updatedMnxJson);
                 if (!isValid) {
                   validationErrors = formatValidationErrors(validateMnx.errors || []);
+                } else {
+                  const tabErrors = validateTabExtensions(updatedMnxJson);
+                  if (tabErrors.length > 0) {
+                    validationErrors = tabErrors.join('\n');
+                  }
                 }
               }
             }

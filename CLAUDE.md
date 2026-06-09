@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-**MNX Lab** (package `mnx-lab`) — a test bench for the developing W3C MNX format with emphasis on guitar tab, evolving from an AI-first notation editor. Custom SMuFL/SVG rendering (plus a VexFlow fallback), Tone.js playback, and an LLM-powered "chat-to-edit" workflow that routes through OpenRouter. The app is a single Lit web component (`<mnx-editor-app>`) — the architectural goal is that the compiled bundle can be embedded anywhere via one script tag, so do **not** introduce React/Vue/state libraries (see `research/tech_stack.md`). The pivot plan (scenario library + gallery) lives in `clean_room_impl/`.
+**MNX Lab** (package `mnx-lab`) — a test bench for the developing W3C MNX format with emphasis on guitar tab, evolving from an AI-first notation editor. Custom SMuFL/SVG rendering engine (no third-party notation libraries), Tone.js playback, and an LLM-powered "chat-to-edit" workflow that routes through OpenRouter. The app is a single Lit web component (`<mnx-editor-app>`) — the architectural goal is that the compiled bundle can be embedded anywhere via one script tag, so do **not** introduce React/Vue/state libraries (see `research/tech_stack.md`). The pivot plan (scenario library + gallery) lives in `clean_room_impl/`.
 
 ## Running the project
 
@@ -54,19 +54,19 @@ Child-to-parent communication uses bubbling DOM `CustomEvent`s with `composed: t
 The chat endpoint is a **self-correcting NDJSON stream**, not a simple proxy:
 
 1. Frontend POSTs `{ userPrompt, mnxJson, selectionContext, model }` and reads `application/x-ndjson` line-by-line. Each line is either `{type: 'progress', tokens, status}` or `{type: 'done', success, updatedMnxJson | error, explanation}`.
-2. The Worker calls OpenRouter with a forced `tool_choice: update_document` function call, streams the response, accumulates `function.arguments`, parses, then validates against `schemas/mnx-schema.json` via the precompiled Ajv validator.
+2. The Worker calls OpenRouter with a forced `tool_choice: update_document` function call, streams the response, accumulates `function.arguments`, parses, then validates **twice** via precompiled Ajv validators: against the official `schemas/mnx-schema.json`, and every `_x.tab` object against `schemas/mnx-tab-extension.schema.json`. Both verdicts gate the retry loop.
 3. **On validation failure**: the Worker appends the assistant's failed `tool_calls` message plus a synthetic `role: 'tool'` error response back into `messages` and re-calls OpenRouter — up to `maxAttempts = 3`. Throughout, NDJSON `progress` frames keep the client UI alive.
 4. `formatValidationErrors` deliberately filters out `anyOf`/`oneOf`/`allOf` noise and only the first `sequence-content/items/anyOf/0` branch (the `event` shape) so the LLM gets actionable feedback. Don't "fix" this by re-enabling all branches — it makes errors unusable.
 
 When modifying the system prompt (`server/prompts/editNotation.js`) or the tool schema in `worker/index.ts`, mirror any structural requirements (e.g. plural `notes` array vs singular `note`) — these LLM-facing rules are the project's primary defense against schema drift.
 
-### MNX <-> VexFlow rendering
+### Rendering (custom SMuFL/SVG engine)
 
-[src/utils/mnxToVexflow.ts](src/utils/mnxToVexflow.ts) is the bridge. Guitar fret/string assignment uses the `_x.guitar` vendor extension if all notes are annotated, otherwise falls back to a "lowest reasonable position" heuristic over `GUITAR_TUNING` (standard tuning, string 1 = high E). The viewer supports four `viewMode`s: `notation` / `tab` / `both` / `json`. VexFlow renders into a `<div>` inside the component's shadow root — the shadow boundary is what isolates VexFlow's SVG from host-page CSS, which is part of the embeddability story.
+The pipeline is layout → primitives → SVG (see `SVG_RENDERING_ENGING.md`): [src/layout/notation.ts](src/layout/notation.ts) and [src/layout/tab.ts](src/layout/tab.ts) are pure functions emitting staff-space primitives; [src/render/svg.ts](src/render/svg.ts) is the dumb emitter. The viewer supports four `viewMode`s: `notation` / `tab` / `both` / `json` — `both` stacks the two renderers. Fret/string assignment uses `_x.tab.position` if all notes are annotated, otherwise a "lowest reasonable position" heuristic over `GUITAR_TUNING` ([src/tab/guitarPositions.ts](src/tab/guitarPositions.ts)). Everything renders into the component's shadow root — the shadow boundary is the embeddability story. Do **not** reintroduce VexFlow or any notation library.
 
-### MNX types and the `_x` extension
+### MNX types and the `_x.tab` extension (v2)
 
-Project-internal MNX types live in [src/types/mnx.ts](src/types/mnx.ts). The W3C MNX schema does **not** include guitar tab data; this project uses the `_x` namespace as a vendor extension (formalized in [schemas/guitar-tab-extension.schema.json](schemas/guitar-tab-extension.schema.json)). When adding new tab/guitar features, extend `_x.guitar`, don't add fields at the standard MNX level — the official schema validator will reject them.
+Project-internal MNX types live in [src/types/mnx.ts](src/types/mnx.ts). The W3C MNX schema does **not** include tab data; this project's tablature extension lives under `_x.tab` — **v2, single-source**: music is encoded once, notes carry `_x.tab.position` (string/fret), and tab-ness is the part-level `_x.tab.staffKind` view flag. There are **no TAB clefs** (invalid MNX) and **no duplicated tab staves**. Schema: [schemas/mnx-tab-extension.schema.json](schemas/mnx-tab-extension.schema.json); rationale and MusicXML mapping: [docs/tab-extension-spec.md](docs/tab-extension-spec.md). The v1 `_x.guitar` form is deprecated; saved documents are upgraded on load by [src/utils/upgradeTabExtension.ts](src/utils/upgradeTabExtension.ts). When adding tab features, extend `_x.tab` (and its schema), never standard MNX fields.
 
 ## Conventions worth knowing
 
