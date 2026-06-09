@@ -105,7 +105,8 @@ export interface MnxGlobalMeasure {
     unit: number;
   };
   barline?: {
-    type?: 'regular' | 'light-heavy' | 'dotted' | 'dashed';
+    type?: 'regular' | 'dotted' | 'dashed' | 'heavy' | 'double' | 'final'
+      | 'heavyLight' | 'heavyHeavy' | 'tick' | 'short' | 'noBarline';
   };
 }
 

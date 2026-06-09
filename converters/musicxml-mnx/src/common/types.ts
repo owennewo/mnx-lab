@@ -126,7 +126,8 @@ export interface MnxGlobalMeasure {
     unit: number;
   };
   barline?: {
-    type?: 'regular' | 'light-heavy' | 'dotted' | 'dashed' | 'double' | 'final';
+    type?: 'regular' | 'dotted' | 'dashed' | 'heavy' | 'double' | 'final'
+      | 'heavyLight' | 'heavyHeavy' | 'tick' | 'short' | 'noBarline';
   };
 }
 

@@ -269,14 +269,20 @@ export function exportMusicXML(
   return serializeXML(doc);
 }
 
+/** MNX barline type → MusicXML bar-style (inverse of the importer's mapping). */
 function mapBarlineStyleToXml(type?: string): string {
   switch (type) {
     case 'regular': return 'regular';
     case 'dotted': return 'dotted';
     case 'dashed': return 'dashed';
-    case 'double': return 'double';
-    case 'light-heavy': return 'light-heavy';
-    case 'final': return 'final';
+    case 'heavy': return 'heavy';
+    case 'double': return 'light-light';
+    case 'final': return 'light-heavy';
+    case 'heavyLight': return 'heavy-light';
+    case 'heavyHeavy': return 'heavy-heavy';
+    case 'tick': return 'tick';
+    case 'short': return 'short';
+    case 'noBarline': return 'none';
     default: return 'regular';
   }
 }

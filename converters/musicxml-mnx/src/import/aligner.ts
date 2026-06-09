@@ -60,6 +60,14 @@ export class Aligner {
       tuning: null
     };
 
+    // MNX attributes persist until changed, so key/time/clef are emitted
+    // change-only (including their first appearance) — re-declaring an
+    // unchanged signature every measure is redundant and can read as a
+    // courtesy-signature display request.
+    let lastEmittedFifths: number | null = null;
+    let lastEmittedTime: string | null = null;
+    let lastEmittedClef: string | null = null;
+
     for (let mIdx = 0; mIdx < measureEls.length; mIdx++) {
       const mEl = measureEls[mIdx];
       const measureNum = parseInt(mEl.getAttribute('number') || `${mIdx + 1}`, 10);
@@ -119,27 +127,37 @@ export class Aligner {
         }
       }
 
-      // Update Global Measures details
+      // Update Global Measures details (change-only)
       if (!globalMeasures[mIdx]) {
         globalMeasures[mIdx] = {};
       }
       const globalM = globalMeasures[mIdx];
-      
-      if (state.fifths !== null && globalM.key === undefined) {
-        globalM.key = { fifths: state.fifths };
+
+      if (state.fifths !== null && state.fifths !== lastEmittedFifths) {
+        if (globalM.key === undefined) {
+          globalM.key = { fifths: state.fifths };
+        }
+        lastEmittedFifths = state.fifths;
       }
-      if (state.beats !== null && state.beatType !== null && globalM.time === undefined) {
-        globalM.time = { count: state.beats, unit: state.beatType };
+      const timeKey = state.beats !== null && state.beatType !== null
+        ? `${state.beats}/${state.beatType}`
+        : null;
+      if (timeKey !== null && timeKey !== lastEmittedTime) {
+        if (globalM.time === undefined) {
+          globalM.time = { count: state.beats!, unit: state.beatType! };
+        }
+        lastEmittedTime = timeKey;
       }
 
-      // Check barline style
+      // Check barline style ('regular' is the default — omit it)
       const barlineEls = findDirectChildren(mEl, 'barline');
       for (const bar of barlineEls) {
         const style = getChildText(bar, 'bar-style');
         if (style) {
-          globalM.barline = {
-            type: this.mapBarlineStyle(style)
-          };
+          const mapped = this.mapBarlineStyle(style);
+          if (mapped !== 'regular') {
+            globalM.barline = { type: mapped };
+          }
         }
       }
 
@@ -149,14 +167,19 @@ export class Aligner {
       // TAB "clefs" are not emitted: the MNX schema's clef-sign enum is C|F|G,
       // and in the tab extension tab-ness is a part-level view declaration
       // (_x.tab.staffKind), not a clef. See docs/tab-extension-spec.md.
+      // Real clefs are emitted change-only (first appearance + changes).
       const clefsList: any[] = [];
-      if (state.clefSign && state.clefSign !== 'TAB') {
+      const clefKey = state.clefSign ? `${state.clefSign}/${state.clefLine}` : null;
+      if (state.clefSign && state.clefSign !== 'TAB' && clefKey !== lastEmittedClef) {
         clefsList.push({
           clef: {
             sign: state.clefSign,
             staffPosition: state.clefLine ? -(state.clefLine) : undefined
           }
         });
+      }
+      if (clefKey !== null) {
+        lastEmittedClef = clefKey;
       }
 
       measures.push({
@@ -201,14 +224,20 @@ export class Aligner {
     };
   }
 
-  private mapBarlineStyle(style: string): 'regular' | 'light-heavy' | 'dotted' | 'dashed' | 'double' | 'final' {
+  /** MusicXML bar-style → MNX barline type (per the MNX barline-type enum). */
+  private mapBarlineStyle(style: string): NonNullable<NonNullable<MnxGlobalMeasure['barline']>['type']> {
     switch (style.toLowerCase()) {
       case 'regular': return 'regular';
       case 'dotted': return 'dotted';
       case 'dashed': return 'dashed';
-      case 'double': return 'double';
-      case 'light-heavy': return 'light-heavy';
-      case 'final': return 'final';
+      case 'heavy': return 'heavy';
+      case 'light-light': return 'double';
+      case 'light-heavy': return 'final';
+      case 'heavy-light': return 'heavyLight';
+      case 'heavy-heavy': return 'heavyHeavy';
+      case 'tick': return 'tick';
+      case 'short': return 'short';
+      case 'none': return 'noBarline';
       default: return 'regular';
     }
   }
