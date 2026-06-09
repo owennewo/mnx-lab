@@ -2,36 +2,32 @@ import { MnxPart, MnxPartMeasure, MnxSequence, MnxNote } from '../common/types.j
 import { addIdSuffix } from '../common/utils.js';
 
 /**
- * Splits a unified 2-staff MNX part back into a standard notation part
- * and a guitar tablature part, applying transpositions and ID suffixes.
+ * Synthesizes the MusicXML notation+TAB pair from a SINGLE-SOURCE MNX part
+ * (one note stream annotated with `_x.tab` positions — see
+ * docs/tab-extension-spec.md). The duplicated two-staff form exists only at
+ * the MusicXML boundary; it never appears in MNX documents.
+ *
+ * The transient tab part DOES carry a `{sign: 'TAB'}` clef — that is the
+ * exporter's trigger for writing MusicXML's <clef> and <staff-details>
+ * elements, which legitimately use TAB. These structures are export-internal.
  */
 export function splitPart(part: MnxPart): { standardPart: MnxPart; tabPart: MnxPart } {
   const standardMeasures: MnxPartMeasure[] = [];
   const tabMeasures: MnxPartMeasure[] = [];
 
   for (const measure of part.measures) {
-    // standard staff sequences (staff === 1 or undefined)
-    const stdSeqs = measure.sequences
-      .filter(seq => seq.staff === 1 || seq.staff === undefined)
-      .map(seq => copySequenceStd(seq));
-
-    // tab staff sequences (staff === 2)
-    const tabSeqs = measure.sequences
-      .filter(seq => seq.staff === 2)
-      .map(seq => copySequenceWithTabProperties(seq));
-
     standardMeasures.push({
       clefs: [{ clef: { sign: 'G', staffPosition: -2 } }],
-      sequences: stdSeqs
+      sequences: measure.sequences.map(seq => copySequenceStd(seq))
     });
 
     tabMeasures.push({
       clefs: [{ clef: { sign: 'TAB' } }],
-      sequences: tabSeqs
+      sequences: measure.sequences.map(seq => copySequenceTab(seq))
     });
   }
 
-  // Carry transposition from the merged part. If absent, fall back to guitar standard (-12 chromatic, -7 diatonic).
+  // Carry transposition from the source part. If absent, fall back to guitar standard (-12 chromatic, -7 diatonic).
   const transposition = part.transposition ?? {
     interval: {
       halfSteps: -12,
@@ -60,9 +56,10 @@ export function splitPart(part: MnxPart): { standardPart: MnxPart; tabPart: MnxP
 }
 
 /**
- * Copies a standard-staff sequence preserving IDs and stripping guitar fret/string annotations.
- * NOTE: Pitches are stored as sounding pitches in MNX. The exporter (mnx.ts) is responsible
- * for converting them back to written pitches using part.transposition when writing XML.
+ * Copies a sequence for the notation staff: IDs suffixed `_std`, tab
+ * annotations stripped so the treble staff stays clean.
+ * NOTE: Pitches are stored as sounding pitches in MNX. The exporter (mnx.ts)
+ * converts them back to written pitches using part.transposition.
  */
 function copySequenceStd(seq: MnxSequence): MnxSequence {
   return {
@@ -78,10 +75,11 @@ function copySequenceStd(seq: MnxSequence): MnxSequence {
         if (note.id) {
           copyNote.id = addIdSuffix(note.id, 'std');
         }
-        // Strip _x guitar fret/string annotations to keep treble notation clean
-        if (copyNote._x?.guitar) {
-          delete copyNote._x.guitar;
-          if (Object.keys(copyNote._x).length === 0) {
+        if (copyNote._x?.tab) {
+          const { tab: _tab, ...restX } = copyNote._x;
+          if (Object.keys(restX).length > 0) {
+            copyNote._x = restX;
+          } else {
             delete copyNote._x;
           }
         }
@@ -91,7 +89,11 @@ function copySequenceStd(seq: MnxSequence): MnxSequence {
   };
 }
 
-function copySequenceWithTabProperties(seq: MnxSequence): MnxSequence {
+/**
+ * Copies a sequence for the TAB staff: IDs suffixed `_tab`, tab annotations
+ * (positions) kept so the exporter writes <technical><string>/<fret>.
+ */
+function copySequenceTab(seq: MnxSequence): MnxSequence {
   return {
     ...seq,
     staff: undefined,
@@ -110,6 +112,13 @@ function copySequenceWithTabProperties(seq: MnxSequence): MnxSequence {
     }))
   };
 }
-export function isMergedPart(part: MnxPart): boolean {
-  return part.staves === 2;
+
+/**
+ * A part should be exported as a notation+TAB pair when it declares tab
+ * content (the single-source form with a part-level `_x.tab` extension whose
+ * staffKind asks for a tab view).
+ */
+export function hasTabContent(part: MnxPart): boolean {
+  const kind = part._x?.tab?.staffKind;
+  return kind === 'tab' || kind === 'both';
 }

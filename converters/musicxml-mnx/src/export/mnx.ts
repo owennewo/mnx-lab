@@ -1,7 +1,7 @@
 import { DOMParser } from '@xmldom/xmldom';
 import { MnxStructure, MnxPart, MnxPartMeasure, MnxGlobalMeasure, MnxPitch, MnxNote } from '../common/types.js';
 import { serializeXML } from '../common/xml.js';
-import { splitPart, isMergedPart } from './splitter.js';
+import { splitPart, hasTabContent } from './splitter.js';
 import { flattenSequences, FlatXmlNode } from './flattener.js';
 import { getXmlNoteType } from '../common/utils.js';
 
@@ -90,7 +90,7 @@ export function exportMusicXML(
   const partMap = new Map<string, string>(); // partId -> partName
 
   for (const part of mnxJson.parts) {
-    if (splitNotationAndTab && isMergedPart(part)) {
+    if (splitNotationAndTab && hasTabContent(part)) {
       const { standardPart, tabPart } = splitPart(part);
       finalParts.push(standardPart, tabPart);
       partMap.set(standardPart.id, `${part.name}`);
@@ -205,25 +205,29 @@ export function exportMusicXML(
 
       // Staff details (tuning) for TAB clefs
       if (m === 0 && activeClefSign === 'TAB') {
+        const tuning = part._x?.tab?.tuning;
+        const numStrings = tuning?.length || 6;
+
         const staffDetailsEl = doc.createElement('staff-details');
         const staffLinesEl = doc.createElement('staff-lines');
-        staffLinesEl.textContent = '6';
+        staffLinesEl.textContent = `${numStrings}`;
         staffDetailsEl.appendChild(staffLinesEl);
 
-        const tuning = part._x?.guitar?.tuning;
-        if (tuning && tuning.strings) {
-          const strings = tuning.strings;
-          // MusicXML strings are 1-indexed, E2 is string 6, E4 is string 1
-          for (let i = 0; i < strings.length; i++) {
-            const pitch = strings[i];
+        if (tuning) {
+          // MusicXML staff-tuning is keyed by visual line (1 = bottom line =
+          // lowest-pitched string); extension entries carry explicit string
+          // numbers (1 = highest-pitched). line = numStrings - string + 1.
+          const ordered = [...tuning].sort((a, b) => b.string - a.string);
+          for (const entry of ordered) {
+            const pitch = entry.pitch;
             const staffTuningEl = doc.createElement('staff-tuning');
-            staffTuningEl.setAttribute('line', `${i + 1}`);
-            
+            staffTuningEl.setAttribute('line', `${numStrings - entry.string + 1}`);
+
             const stepEl = doc.createElement('tuning-step');
             stepEl.textContent = pitch.step;
             const octaveEl = doc.createElement('tuning-octave');
             octaveEl.textContent = `${pitch.octave}`;
-            
+
             staffTuningEl.appendChild(stepEl);
             staffTuningEl.appendChild(octaveEl);
             if (pitch.alter !== undefined) {
@@ -339,17 +343,17 @@ function buildXmlNode(
       noteEl.appendChild(accEl);
     }
 
-    // Technical (guitar frets, strings)
-    if (node.note._x?.guitar) {
-      const guitar = node.note._x.guitar;
+    // Technical (fingerboard position: fret, string)
+    const position = node.note._x?.tab?.position;
+    if (position) {
       const notationsEl = doc.createElement('notations');
       const techEl = doc.createElement('technical');
-      
+
       const fretEl = doc.createElement('fret');
-      fretEl.textContent = `${guitar.fret}`;
+      fretEl.textContent = `${position.fret}`;
       const stringEl = doc.createElement('string');
-      stringEl.textContent = `${guitar.string}`;
-      
+      stringEl.textContent = `${position.string}`;
+
       techEl.appendChild(fretEl);
       techEl.appendChild(stringEl);
       notationsEl.appendChild(techEl);

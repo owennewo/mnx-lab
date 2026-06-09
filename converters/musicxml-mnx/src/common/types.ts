@@ -4,13 +4,15 @@ export interface MnxPitch {
   alter?: number;
 }
 
+// ---- Tablature extension v2 (`_x.tab`) — see docs/tab-extension-spec.md ----
+
 export interface MnxFingering {
   hand: 'left' | 'right';
   finger: string;
 }
 
 export interface MnxBend {
-  type: string;
+  type: 'bend' | 'pre-bend';
   amount: number;
   release?: boolean;
 }
@@ -18,22 +20,28 @@ export interface MnxBend {
 export interface MnxSlide {
   type: 'shift' | 'legato' | 'slide-in' | 'slide-out';
   direction?: 'up' | 'down';
-  targetNote?: string;
+  target?: string;
 }
 
-export interface MnxHammerOnPullOff {
-  type: 'hammer-on' | 'pull-off';
-  targetNote: string;
-}
-
-export interface MnxGuitarNoteExtension {
-  fret: number;
+export interface MnxTabPosition {
+  /** String number; 1 = highest-pitched string. */
   string: number;
-  fingering?: MnxFingering;
+  /** Fret number; 0 = open string. */
+  fret: number;
+}
+
+export interface MnxTabTechnique {
   bend?: MnxBend;
   slide?: MnxSlide;
-  hammerOnPullOff?: MnxHammerOnPullOff;
+  hammerOn?: { target: string };
+  pullOff?: { target: string };
   vibrato?: boolean;
+}
+
+export interface MnxTabNoteExtension {
+  position?: MnxTabPosition;
+  technique?: MnxTabTechnique;
+  fingering?: MnxFingering;
 }
 
 export interface MnxNote {
@@ -46,7 +54,7 @@ export interface MnxNote {
     };
   };
   _x?: {
-    guitar?: MnxGuitarNoteExtension;
+    tab?: MnxTabNoteExtension;
   };
 }
 
@@ -80,11 +88,17 @@ export interface MnxPartMeasure {
   sequences: MnxSequence[];
 }
 
-export interface MnxGuitarPartExtension {
-  tuning?: {
-    strings: MnxPitch[];
-  };
+export interface MnxTuningEntry {
+  /** Explicit string number — array order carries no meaning. */
+  string: number;
+  pitch: MnxPitch;
+}
+
+export interface MnxTabPartExtension {
+  tuning?: MnxTuningEntry[];
   capo?: number;
+  /** The part's preferred presentation; tab-ness is a view, not content. */
+  staffKind?: 'notation' | 'tab' | 'both';
 }
 
 export interface MnxPart {
@@ -99,7 +113,7 @@ export interface MnxPart {
     };
   };
   _x?: {
-    guitar?: MnxGuitarPartExtension;
+    tab?: MnxTabPartExtension;
   };
 }
 

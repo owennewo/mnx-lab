@@ -4,7 +4,7 @@ import * as path from 'path';
 import { importMusicXML } from '../src/index.js';
 
 describe('MusicXML -> MNX Import Pipeline', () => {
-  it('should parse House-of-the-Rising-Sun.xml and merge notation & TAB staves', async () => {
+  it('should parse House-of-the-Rising-Sun.xml into a single-source part with _x.tab annotations', async () => {
     const xmlPath = path.resolve(__dirname, '../../../server/scores/House-of-the-Rising-Sun.xml');
     const xmlContent = await fs.readFile(xmlPath, 'utf-8');
 
@@ -17,43 +17,48 @@ describe('MusicXML -> MNX Import Pipeline', () => {
 
     const guitarPart = mnx.parts[0];
     expect(guitarPart.name).toBe('Guitar');
-    expect(guitarPart.staves).toBe(2);
 
     // Verify global key and time signature inherit correctly
     expect(mnx.global.measures[0].key?.fifths).toBe(0);
     expect(mnx.global.measures[1].time?.count).toBe(4);
     expect(mnx.global.measures[1].time?.unit).toBe(4);
 
-    // Verify first measure clefs
+    // Single-source: ONE staff, ONE clef (treble), and never a TAB clef —
+    // tab-ness is the part-level view declaration.
     const firstMeasure = guitarPart.measures[0];
     expect(firstMeasure.clefs).toBeDefined();
-    expect(firstMeasure.clefs!.length).toBe(2);
+    expect(firstMeasure.clefs!.length).toBe(1);
     expect(firstMeasure.clefs![0].clef.sign).toBe('G');
-    expect(firstMeasure.clefs![1].clef.sign).toBe('TAB');
+    for (const measure of guitarPart.measures) {
+      for (const c of measure.clefs ?? []) {
+        expect(c.clef.sign).not.toBe('TAB');
+      }
+    }
+    expect(guitarPart._x?.tab?.staffKind).toBe('both');
 
-    // Verify note ID alignment and transposition in measure 2 (index 1)
+    // Part-level tuning: explicit string numbers, standard guitar tuning
+    const tuning = guitarPart._x?.tab?.tuning;
+    expect(tuning).toBeDefined();
+    expect(tuning!.length).toBe(6);
+    const byString = new Map(tuning!.map(t => [t.string, t.pitch]));
+    expect(byString.get(1)).toMatchObject({ step: 'E', octave: 4 }); // string 1 = highest
+    expect(byString.get(6)).toMatchObject({ step: 'E', octave: 2 }); // string 6 = lowest
+
+    // Verify measure 2 (index 1): one staff, two voices
     const secondMeasure = guitarPart.measures[1];
-    expect(secondMeasure.sequences.length).toBe(4); // 2 staves * 2 voices = 4 sequences
+    expect(secondMeasure.sequences.length).toBe(2); // 2 voices, single staff
 
-    const trebleVoice1 = secondMeasure.sequences.find(s => s.staff === 1 && s.voice === 'v1');
-    const tabVoice1 = secondMeasure.sequences.find(s => s.staff === 2 && s.voice === 'v1');
+    const voice1 = secondMeasure.sequences.find(s => s.voice === 'v1');
+    expect(voice1).toBeDefined();
 
-    expect(trebleVoice1).toBeDefined();
-    expect(tabVoice1).toBeDefined();
-
-    // Treble voice 1 note 1 should be A2 (sounding pitch of written A3 transposed down by 12 semitones)
-    const trebleNote1 = trebleVoice1!.content[0].notes?.[0];
-    expect(trebleNote1).toBeDefined();
-    expect(trebleNote1!.pitch.step).toBe('A');
-    expect(trebleNote1!.pitch.octave).toBe(2); // sounding pitch (originally octave 3 in standard written notation)
-
-    // TAB voice 1 note 1 should have fret 0 and string 5
-    const tabNote1 = tabVoice1!.content[0].notes?.[0];
-    expect(tabNote1).toBeDefined();
-    expect(tabNote1!._x?.guitar?.fret).toBe(0);
-    expect(tabNote1!._x?.guitar?.string).toBe(5);
-
-    // They should share the exact same ID
-    expect(trebleNote1!.id).toBe(tabNote1!.id);
+    // Voice 1 note 1: sounding pitch A2 (written A3 transposed down an octave)
+    // carrying its fingerboard position on the SAME note.
+    const note1 = voice1!.content[0].notes?.[0];
+    expect(note1).toBeDefined();
+    expect(note1!.pitch.step).toBe('A');
+    expect(note1!.pitch.octave).toBe(2);
+    expect(note1!._x?.tab?.position?.fret).toBe(0);
+    expect(note1!._x?.tab?.position?.string).toBe(5);
+    expect(note1!.id).toBeDefined();
   });
 });

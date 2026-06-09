@@ -8,15 +8,17 @@ describe('Bi-directional Roundtrip Pipeline', () => {
     const xmlPath = path.resolve(__dirname, '../../../server/scores/House-of-the-Rising-Sun.xml');
     const originalXml = await fs.readFile(xmlPath, 'utf-8');
 
-    // 1. Initial Import (MusicXML -> MNX)
+    // 1. Initial Import (MusicXML -> single-source MNX)
     const mnx1 = importMusicXML(originalXml, { mergeNotationAndTab: true });
     expect(mnx1.parts.length).toBe(1);
-    expect(mnx1.parts[0].staves).toBe(2);
+    expect(mnx1.parts[0]._x?.tab?.staffKind).toBe('both');
 
-    // 2. Export back to MusicXML (MNX -> MusicXML)
+    // 2. Export back to MusicXML (MNX -> MusicXML). The notation+TAB staff
+    // pair is synthesized at the MusicXML boundary from the single source.
     const exportedXml = exportMusicXML(mnx1, { splitNotationAndTab: true, divisions: 8 });
     expect(exportedXml).toContain('<score-partwise');
     expect(exportedXml).toContain('Guitar (TAB)');
+    expect(exportedXml).toContain('<sign>TAB</sign>');
 
     // 3. Second Import (Exported MusicXML -> MNX)
     const mnx2 = importMusicXML(exportedXml, { mergeNotationAndTab: true });
@@ -29,16 +31,25 @@ describe('Bi-directional Roundtrip Pipeline', () => {
     const part1 = mnx1.parts[0];
     const part2 = mnx2.parts[0];
     expect(part2.name).toBe(part1.name);
-    expect(part2.staves).toBe(part1.staves);
     expect(part2.measures.length).toBe(part1.measures.length);
+    expect(part2._x?.tab?.staffKind).toBe('both');
 
-    // Verify tuning was preserved in _x
-    expect(part2._x?.guitar?.tuning?.strings).toBeDefined();
-    expect(part2._x?.guitar?.tuning?.strings.length).toBe(6);
-    expect(part2._x?.guitar?.tuning?.strings[0].step).toBe('E');
-    expect(part2._x?.guitar?.tuning?.strings[0].octave).toBe(2); // E2 (string 6 in MusicXML, line 1 / bottom line)
-    expect(part2._x?.guitar?.tuning?.strings[5].step).toBe('E');
-    expect(part2._x?.guitar?.tuning?.strings[5].octave).toBe(4); // E4 (string 1 in MusicXML, line 6 / top line)
+    // Verify tuning roundtripped (explicit string numbers)
+    const tuning2 = part2._x?.tab?.tuning;
+    expect(tuning2).toBeDefined();
+    expect(tuning2!.length).toBe(6);
+    const byString = new Map(tuning2!.map(t => [t.string, t.pitch]));
+    expect(byString.get(1)).toMatchObject({ step: 'E', octave: 4 });
+    expect(byString.get(6)).toMatchObject({ step: 'E', octave: 2 });
+
+    // No TAB clefs anywhere in either MNX document
+    for (const part of [part1, part2]) {
+      for (const measure of part.measures) {
+        for (const c of measure.clefs ?? []) {
+          expect(c.clef.sign).not.toBe('TAB');
+        }
+      }
+    }
 
     // Deep verify notes in measure 2 (index 1)
     const m2_seqs1 = part1.measures[1].sequences;
@@ -46,28 +57,21 @@ describe('Bi-directional Roundtrip Pipeline', () => {
 
     expect(m2_seqs2.length).toBe(m2_seqs1.length);
 
-    const stdSeq1 = m2_seqs1.find(s => s.staff === 1 && s.voice === 'v1')!;
-    const stdSeq2 = m2_seqs2.find(s => s.staff === 1 && s.voice === 'v1')!;
-    const tabSeq1 = m2_seqs1.find(s => s.staff === 2 && s.voice === 'v1')!;
-    const tabSeq2 = m2_seqs2.find(s => s.staff === 2 && s.voice === 'v1')!;
+    const seq1 = m2_seqs1.find(s => s.voice === 'v1')!;
+    const seq2 = m2_seqs2.find(s => s.voice === 'v1')!;
 
-    // Check notes count
-    expect(stdSeq2.content.length).toBe(stdSeq1.content.length);
-    expect(tabSeq2.content.length).toBe(tabSeq1.content.length);
+    expect(seq2.content.length).toBe(seq1.content.length);
 
-    // Verify pitches, frets, strings match
-    const note1_1 = stdSeq1.content[0].notes?.[0]!;
-    const note1_2 = stdSeq2.content[0].notes?.[0]!;
+    // Pitches and fingerboard positions match on the same (single) note
+    const note1_1 = seq1.content[0].notes?.[0]!;
+    const note1_2 = seq2.content[0].notes?.[0]!;
     expect(note1_2.pitch.step).toBe(note1_1.pitch.step);
     expect(note1_2.pitch.octave).toBe(note1_1.pitch.octave);
+    expect(note1_2._x?.tab?.position?.fret).toBe(note1_1._x?.tab?.position?.fret);
+    expect(note1_2._x?.tab?.position?.string).toBe(note1_1._x?.tab?.position?.string);
 
-    const tabNote1_1 = tabSeq1.content[0].notes?.[0]!;
-    const tabNote1_2 = tabSeq2.content[0].notes?.[0]!;
-    expect(tabNote1_2._x?.guitar?.fret).toBe(tabNote1_1._x?.guitar?.fret);
-    expect(tabNote1_2._x?.guitar?.string).toBe(tabNote1_1._x?.guitar?.string);
-
-    // Verify IDs roundtripped perfectly (stripped back standard/tab suffixes)
+    // IDs roundtripped perfectly (regenerated deterministically; _std/_tab
+    // suffixes only ever exist inside the exported MusicXML)
     expect(note1_2.id).toBe(note1_1.id);
-    expect(tabNote1_2.id).toBe(tabNote1_1.id);
   });
 });

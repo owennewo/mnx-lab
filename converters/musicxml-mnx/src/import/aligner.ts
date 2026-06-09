@@ -145,9 +145,12 @@ export class Aligner {
 
       // 2. Parse child elements chronologically to handle backup/forward
       const sequences = this.parseMeasureEvents(mEl, state, mIdx);
-      
+
+      // TAB "clefs" are not emitted: the MNX schema's clef-sign enum is C|F|G,
+      // and in the tab extension tab-ness is a part-level view declaration
+      // (_x.tab.staffKind), not a clef. See docs/tab-extension-spec.md.
       const clefsList: any[] = [];
-      if (state.clefSign) {
+      if (state.clefSign && state.clefSign !== 'TAB') {
         clefsList.push({
           clef: {
             sign: state.clefSign,
@@ -162,9 +165,19 @@ export class Aligner {
       });
     }
 
-    const guitarPartExtension: any = {};
+    const tabPartExtension: any = {};
     if (state.tuning) {
-      guitarPartExtension.tuning = { strings: state.tuning };
+      // state.tuning is indexed by MusicXML staff-tuning line (line 1 = bottom
+      // visual line = lowest-pitched string). Convert to explicit string
+      // numbers: string 1 = highest-pitched string.
+      const numStrings = state.tuning.length;
+      tabPartExtension.tuning = state.tuning.map((pitch, idx) => ({
+        string: numStrings - idx,
+        pitch
+      }));
+    }
+    if (state.clefSign === 'TAB') {
+      tabPartExtension.staffKind = 'tab';
     }
 
     // Build W3C MNX transposition metadata block (top-level on the part, not in _x)
@@ -182,10 +195,9 @@ export class Aligner {
     return {
       id: partId,
       name: partName,
-      staves: state.clefSign === 'TAB' ? 1 : 1, // Will be set to 2 when merged
       measures,
       ...transpositionBlock,
-      ...(Object.keys(guitarPartExtension).length > 0 ? { _x: { guitar: guitarPartExtension } } : {})
+      ...(Object.keys(tabPartExtension).length > 0 ? { _x: { tab: tabPartExtension } } : {})
     };
   }
 
@@ -256,22 +268,21 @@ export class Aligner {
           }
 
           // Parse Notations
-          const guitarExt: any = {};
+          let tabPosition: { string: number; fret: number } | undefined;
           const notationsEl = findDirectChild(el, 'notations');
           let accidentalDisplay: any;
-          
+
           if (notationsEl) {
             const techEl = findDirectChild(notationsEl, 'technical');
             if (techEl) {
               const fret = getChildInt(techEl, 'fret');
               const str = getChildInt(techEl, 'string');
               if (fret !== null && str !== null) {
-                guitarExt.fret = fret;
-                guitarExt.string = str;
+                tabPosition = { string: str, fret };
               }
-              // Fingers / bends can be parsed here as well
+              // Techniques (bend, hammer-on, slide…) can be parsed here as well
             }
-            
+
             const accEl = findDirectChild(el, 'accidental');
             if (accEl) {
               accidentalDisplay = { show: true };
@@ -283,7 +294,7 @@ export class Aligner {
 
           const mnxNote: MnxNote = {
             pitch: mnxPitch || { step: 'C', octave: 4 },
-            ...(Object.keys(guitarExt).length > 0 ? { _x: { guitar: guitarExt } } : {}),
+            ...(tabPosition ? { _x: { tab: { position: tabPosition } } } : {}),
             ...(accidentalDisplay ? { accidentalDisplay } : {})
           };
 
@@ -404,76 +415,49 @@ export class Aligner {
   }
 
   /**
-   * Helper to check if a part represents guitar tablature
+   * Helper to check if a part represents guitar tablature.
+   * (Tab parts no longer carry TAB clefs; tab-ness is the part-level
+   * `_x.tab.staffKind` view declaration.)
    */
   public isTabPart(part: MnxPart): boolean {
-    for (const measure of part.measures) {
-      if (measure.clefs) {
-        for (const c of measure.clefs) {
-          if (c.clef.sign === 'TAB') return true;
-        }
-      }
-    }
-    return false;
+    return part._x?.tab?.staffKind === 'tab';
   }
 
   /**
-   * Merges a standard notation part and a tab part into a unified multi-staff part.
+   * Merges a standard notation part and a TAB part into a SINGLE-SOURCE part:
+   * the music is encoded once (the standard part's sequences), each note
+   * annotated with its fingerboard position from the aligned TAB note. The
+   * TAB staff itself is discarded — notation and tab are derived views
+   * (part._x.tab.staffKind = 'both'). See docs/tab-extension-spec.md.
    */
   public mergeParts(standardPart: MnxPart, tabPart: MnxPart): MnxPart {
-    const mergedMeasures: MnxPartMeasure[] = [];
     const numMeasures = Math.min(standardPart.measures.length, tabPart.measures.length);
 
     for (let m = 0; m < numMeasures; m++) {
-      const stdM = standardPart.measures[m];
-      const tabM = tabPart.measures[m];
-
-      // Standard sequences belong to staff 1
-      const stdSequences = stdM.sequences.map(seq => ({
-        ...seq,
-        staff: 1
-      }));
-
-      // TAB sequences belong to staff 2
-      const tabSequences = tabM.sequences.map(seq => ({
-        ...seq,
-        staff: 2
-      }));
-
-      // Assign matching IDs to notes aligned at the same chronological onset time
-      this.alignNoteIds(stdSequences, tabSequences, m);
-
-      // Merged clefs: Treble on staff 1, TAB on staff 2
-      const clefs = [
-        { clef: { sign: 'G', staffPosition: -2 }, staff: 1 },
-        { clef: { sign: 'TAB' }, staff: 2 }
-      ];
-
-      mergedMeasures.push({
-        clefs: clefs as any,
-        sequences: [...stdSequences, ...tabSequences]
-      });
+      // Assign matching IDs to notes aligned at the same chronological onset
+      // time, copying each TAB note's position onto the standard note.
+      this.alignNoteIds(standardPart.measures[m].sequences, tabPart.measures[m].sequences, m);
     }
 
     return {
       id: standardPart.id,
       name: standardPart.name,
-      staves: 2,
-      measures: mergedMeasures,
+      measures: standardPart.measures.slice(0, numMeasures),
       // Preserve transposition from the standard part (TAB parts don't carry transposition)
       ...(standardPart.transposition ? { transposition: standardPart.transposition } : {}),
       _x: {
-        guitar: {
-          ...standardPart._x?.guitar,
-          ...tabPart._x?.guitar
+        tab: {
+          ...(tabPart._x?.tab?.tuning ? { tuning: tabPart._x.tab.tuning } : {}),
+          ...(tabPart._x?.tab?.capo !== undefined ? { capo: tabPart._x.tab.capo } : {}),
+          staffKind: 'both'
         }
       }
     };
   }
 
   private alignNoteIds(stdSeqs: MnxSequence[], tabSeqs: MnxSequence[], measureIdx: number) {
-    // Generate aligned IDs for standard notes, and copy fret/string info to them
-    // so standard notes also hold _x.guitar metadata, ensuring lossless edit and playback.
+    // Generate aligned IDs for standard notes, and copy fingerboard positions
+    // to them so the single remaining note stream carries the tab data.
     for (const stdSeq of stdSeqs) {
       const voice = stdSeq.voice || 'v1';
       const correspondingTabSeq = tabSeqs.find(s => s.voice === voice);
@@ -506,12 +490,12 @@ export class Aligner {
               const tabNote = matchingTabEv.notes[nIdx];
               tabNote.id = noteId; // share same note ID
 
-              // Copy the fret/string annotations to standard staff note
-              if (tabNote._x?.guitar) {
+              // Copy the fingerboard position to the standard note
+              if (tabNote._x?.tab?.position) {
                 stdNote._x = {
-                  guitar: {
-                    ...stdNote._x?.guitar,
-                    ...tabNote._x.guitar
+                  tab: {
+                    ...stdNote._x?.tab,
+                    position: tabNote._x.tab.position
                   }
                 };
               }
