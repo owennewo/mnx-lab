@@ -16,7 +16,8 @@
     "noFallthroughCasesInSwitch": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["vite/client"]
   },
   "include": ["src"]
 }

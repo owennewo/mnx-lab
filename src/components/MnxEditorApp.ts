@@ -16,6 +16,7 @@ import { PlaybackController } from '../controllers/PlaybackController.ts';
 import './PlaybackBar.ts';
 import './ScoreViewer.ts';
 import './ChatPanel.ts';
+import './ScenarioGallery.ts';
 
 @customElement('mnx-editor-app')
 export class MnxEditorApp extends LitElement {
@@ -46,6 +47,16 @@ export class MnxEditorApp extends LitElement {
 
   @state()
   viewMode: 'notation' | 'tab' | 'both' | 'json' = 'notation';
+
+  // Library (scenario corpus) browsing. While a scenario is active the score
+  // viewer shows it as a TRANSIENT document — saved scores are untouched.
+  // Closing the library clears the scenario, so the chat panel (and its
+  // updateScore path) can never operate on corpus documents.
+  @state()
+  showLibrary = false;
+
+  @state()
+  activeScenario: { id: string; meta: any; mnxJson: any } | null = null;
 
   // Instantiated controllers
   private documentController = new DocumentController(this);
@@ -130,6 +141,36 @@ export class MnxEditorApp extends LitElement {
       font-weight: 600;
     }
 
+    .scenario-badges {
+      margin-left: 10px;
+      display: inline-flex;
+      gap: 6px;
+      vertical-align: middle;
+    }
+
+    .badge {
+      font-size: 0.66rem;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+    .badge.mono {
+      font-family: var(--font-family-mono);
+    }
+
+    .badge.ok {
+      color: oklch(0.8 0.13 150);
+      border-color: oklch(0.5 0.1 150);
+    }
+
+    .badge.bad {
+      color: oklch(0.75 0.16 25);
+      border-color: oklch(0.5 0.13 25);
+    }
+
     .status-bar {
       height: 32px;
       display: flex;
@@ -161,8 +202,17 @@ export class MnxEditorApp extends LitElement {
   `;
 
   willUpdate() {
-    // Keep provider states synchronized with underlying controllers
-    this.documentState = this.documentController.currentDocument;
+    // Keep provider states synchronized with underlying controllers.
+    // An active library scenario overrides the saved document as a
+    // transient, never-persisted view.
+    this.documentState = this.activeScenario
+      ? {
+          id: `scenario:${this.activeScenario.id}`,
+          name: this.activeScenario.meta.title,
+          lastUpdated: 0,
+          mnxJson: this.activeScenario.mnxJson
+        }
+      : this.documentController.currentDocument;
 
     this.playbackState = {
       playing: this.playbackController.isPlaying,
@@ -187,7 +237,7 @@ export class MnxEditorApp extends LitElement {
           <span>MNX Notation Editor</span>
         </div>
 
-        <div>
+        <div style="display: flex; align-items: center; gap: 8px;">
           <wa-dropdown @wa-select=${this.handleScoreSelect}>
             <wa-button slot="trigger" caret size="small" variant="neutral">
               ${this.documentController.isLoading ? 'Loading...' : (this.documentState?.name || 'Select Score')}
@@ -200,6 +250,14 @@ export class MnxEditorApp extends LitElement {
               `
             )}
           </wa-dropdown>
+          <wa-button
+            size="small"
+            variant=${this.showLibrary ? 'brand' : 'neutral'}
+            @click=${this.handleLibraryToggle}
+          >
+            <wa-icon name="collection" style="margin-right: 4px;"></wa-icon>
+            Library
+          </wa-button>
         </div>
 
         <mnx-playback-bar
@@ -214,13 +272,34 @@ export class MnxEditorApp extends LitElement {
       <main class="workspace">
         <wa-split-panel position="35">
           <div slot="start" style="height: 100%; overflow: hidden; display: flex; flex-direction: column;">
-            <mnx-chat-panel
-              @chat-command-submitted=${this.handleChatCommand}
-            ></mnx-chat-panel>
+            ${this.showLibrary
+              ? html`<mnx-scenario-gallery
+                  .selectedId=${this.activeScenario?.id ?? null}
+                  @scenario-selected=${this.handleScenarioSelected}
+                ></mnx-scenario-gallery>`
+              : html`<mnx-chat-panel
+                  @chat-command-submitted=${this.handleChatCommand}
+                ></mnx-chat-panel>`}
           </div>
           <div slot="end" class="editor-pane">
             <div class="editor-header">
-              <span class="score-title">${this.documentState?.name || 'Blank Score'}</span>
+              <span class="score-title">
+                ${this.documentState?.name || 'Blank Score'}
+                ${this.activeScenario
+                  ? html`<span class="scenario-badges">
+                      <span class="badge mono">${this.activeScenario.id}</span>
+                      <span class="badge ${this.activeScenario.meta.expect?.standard === 'valid' ? 'ok' : 'bad'}">
+                        MNX ${this.activeScenario.meta.expect?.standard}
+                      </span>
+                      ${this.activeScenario.meta.expect?.extension !== 'n/a'
+                        ? html`<span class="badge ${this.activeScenario.meta.expect?.extension === 'valid' ? 'ok' : 'bad'}">
+                            _x.tab ${this.activeScenario.meta.expect?.extension}
+                          </span>`
+                        : ''}
+                      <span class="badge">${this.activeScenario.meta.status}</span>
+                    </span>`
+                  : ''}
+              </span>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <wa-button
                   circle
@@ -301,8 +380,31 @@ export class MnxEditorApp extends LitElement {
     this.playbackController.setVolume(e.detail.volume);
   }
 
+  private handleLibraryToggle() {
+    this.showLibrary = !this.showLibrary;
+    if (!this.showLibrary) {
+      // Leaving the library returns to the saved document, so chat edits can
+      // never target a corpus scenario.
+      this.activeScenario = null;
+      this.playbackController.stop();
+    }
+  }
+
+  private handleScenarioSelected(e: CustomEvent) {
+    this.activeScenario = e.detail;
+    this.playbackController.stop();
+    this.selectionState = {
+      activePartId: null,
+      activeMeasureIndex: null,
+      activeVoiceIndex: null,
+      activeEventIndex: null,
+      selectedNoteIds: []
+    };
+  }
+
   private handleScoreSelect(e: any) {
     const value = e.detail.item.value;
+    this.activeScenario = null;
     if (value === 'new-score') {
       this.documentController.createNewScore('Untitled');
     } else {

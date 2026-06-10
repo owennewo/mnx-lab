@@ -103,6 +103,14 @@ export class ScoreViewer extends LitElement {
       margin-top: 16px;
     }
 
+    #score-container .render-error {
+      padding: 16px;
+      border: 1px dashed oklch(0.6 0.15 25);
+      border-radius: 8px;
+      color: oklch(0.78 0.13 25);
+      font-size: 0.88rem;
+    }
+
     #json-wrapper {
       position: relative;
       width: 100%;
@@ -185,13 +193,31 @@ export class ScoreViewer extends LitElement {
       onNoteClick
     };
 
+    // The layout engine throws on documents using features it doesn't support
+    // yet (e.g. tuplets, grace notes — several library scenarios exercise
+    // exactly these). Show the failure instead of dying.
+    const guarded = (target: HTMLElement, label: string, fn: () => void) => {
+      try {
+        fn();
+      } catch (err) {
+        console.warn(`Render failed (${label}):`, err);
+        target.innerHTML = '';
+        const box = document.createElement('div');
+        box.className = 'render-error';
+        box.textContent = `⚠ ${label} rendering failed: ${(err as Error).message}`;
+        target.appendChild(box);
+      }
+    };
+
     if (this.viewMode === 'tab') {
-      renderMnxToSvgTab({ container: this.container, ...commonOpts });
+      guarded(this.container, 'tab', () =>
+        renderMnxToSvgTab({ container: this.container, ...commonOpts }));
       return;
     }
 
     if (this.viewMode === 'notation') {
-      renderMnxToSvgNotation({ container: this.container, ...commonOpts });
+      guarded(this.container, 'notation', () =>
+        renderMnxToSvgNotation({ container: this.container, ...commonOpts }));
       return;
     }
 
@@ -203,8 +229,10 @@ export class ScoreViewer extends LitElement {
     const tabPane = document.createElement('div');
     tabPane.className = 'both-view-pane';
     this.container.append(notationPane, tabPane);
-    renderMnxToSvgNotation({ container: notationPane, ...commonOpts });
-    renderMnxToSvgTab({ container: tabPane, ...commonOpts });
+    guarded(notationPane, 'notation', () =>
+      renderMnxToSvgNotation({ container: notationPane, ...commonOpts }));
+    guarded(tabPane, 'tab', () =>
+      renderMnxToSvgTab({ container: tabPane, ...commonOpts }));
   }
 
   render() {
