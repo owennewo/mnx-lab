@@ -1,0 +1,31 @@
+{
+  "title": "All six open strings as one chord",
+  "description": "A single whole-note event whose six notes are the open strings of a standard-tuned guitar, each carrying _x.tab.position with fret 0 and a distinct string. Exercises the single-source model (pitch and position on the same note), the chord rule that no two notes share a string, and omitted part tuning (consumers assume standard).",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:position",
+    "chords",
+    "open-strings"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "vendor-extensions"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-positions"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "valid"
+}

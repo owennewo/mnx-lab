@@ -1,0 +1,30 @@
+{
+  "title": "TAB clef is rejected by the clef-sign enum",
+  "description": "What every MusicXML tab staff carries — a clef with sign \"TAB\" — is unrepresentable in MNX v17: the clef-sign enum is C|F|G only. This document is otherwise minimal and valid; the single pinned error is the enum rejection. This is the founding exhibit for the _x.tab extension's design decision that tab-ness is a part-level view declaration, not a clef.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "spec-gap",
+    "clef"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/clef/",
+    "https://github.com/w3c-cg/mnx/issues/63"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "positioned-clef"
+  ],
+  "expect": {
+    "standard": "invalid",
+    "extension": "n/a",
+    "errors": [
+      "clef-sign/enum"
+    ]
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "valid"
+}
