@@ -8,6 +8,8 @@
     "build": "npm run compile-validator && tsc && tsc -p worker && vite build",
     "preview": "vite preview",
     "compile-validator": "node scripts/compile-validator.mjs",
+    "check:scenarios": "node scripts/check-scenarios.mjs",
+    "test": "vitest run",
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
@@ -24,6 +26,7 @@
     "ajv": "^8.20.0",
     "typescript": "^5.4.5",
     "vite": "^8.0.14",
+    "vitest": "^4.1.8",
     "wrangler": "^4.99.0"
   }
 }
