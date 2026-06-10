@@ -158,6 +158,12 @@ export function checkScenario(scenario, ctx) {
     doc = checkJsonFile(scorePath, 'score.mnx.json', fail);
   }
 
+  // expected.primitives.json (generated, but still kept canonical)
+  const primsPath = path.join(scenario.dir, 'expected.primitives.json');
+  if (fs.existsSync(primsPath)) {
+    checkJsonFile(primsPath, 'expected.primitives.json', fail);
+  }
+
   if (!meta || !doc) return { errors, warnings, meta };
 
   // coversDefs typo check

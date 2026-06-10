@@ -88,8 +88,9 @@ export interface MnxTabPartExtension {
 }
 
 export interface MnxPart {
-  id: string;
-  name: string;
+  // Optional per the MNX schema — `part` requires only `measures`.
+  id?: string;
+  name?: string;
   measures: MnxPartMeasure[];
   _x?: {
     tab?: MnxTabPartExtension;

@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "compile-validator": "node scripts/compile-validator.mjs",
     "check:scenarios": "node scripts/check-scenarios.mjs",
+    "update:primitives": "UPDATE_PRIMITIVES=1 vitest run tests/primitives.test.ts",
     "test": "vitest run",
     "deploy": "npm run build && wrangler deploy"
   },

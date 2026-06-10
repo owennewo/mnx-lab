@@ -55,6 +55,17 @@ export function isSmuflLoaded(): boolean {
 }
 
 /**
+ * Injects preloaded SMuFL metadata directly, bypassing fetch. For non-browser
+ * consumers (Node test runners, snapshot generation) that read the JSON files
+ * from disk.
+ */
+export function setSmuflData(gn: unknown, md: unknown): void {
+  glyphnames = gn as Record<string, GlyphnameEntry>;
+  metadata = md as BravuraMetadata;
+  loadPromise = Promise.resolve();
+}
+
+/**
  * Resolve a canonical SMuFL glyph name (e.g. "gClef", "6stringTabClef")
  * to the Unicode character to put inside a <text> element.
  *

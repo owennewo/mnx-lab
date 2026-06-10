@@ -230,7 +230,9 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   const numMeasures = part.measures.length;
   const measuresPerRow = widthSp > 80 ? 4 : 2;
   const measureAllocatedWidth = (widthSp - 2 * MARGIN_SP) / measuresPerRow;
-  const isGuitarPart = part.name.toLowerCase().includes('guitar');
+  // part.name is optional in the MNX schema (the corpus's minimal-single-note
+  // scenario pins this) — guard before sniffing for the guitar default.
+  const isGuitarPart = (part.name ?? '').toLowerCase().includes('guitar');
 
   // Initial active state. Guitar parts default to treble 8vb.
   let activeClef: ActiveClef = { sign: 'G', octave: isGuitarPart ? -1 : 0 };
