@@ -10,7 +10,7 @@
 |---------|----------------|-----------|
 | `mnx-core` | The MNX document model: types, schema, validation, `_x` extension. The lingua franca. | (nothing) |
 | `mnx-render` | Layout engine (document → primitives) + SVG renderer (primitives → SVG). Notation + tab. | `mnx-core` (types only) |
-| `mnx-scenarios` | The scenario library (folders of valid MNX) + a loader API. See `04-scenario-library.md`. | `mnx-core` (types only) |
+| `mnx-scenarios` | The scenario library (`spec/` mirror of the CG's worked examples + `lab/` hand-authored scenarios, incl. invalid-by-design). Starts as a plain `scenarios/` directory in-repo; promoted to a package only when something external needs to install it. See `04-scenario-library.md`. | `mnx-core` (types only) |
 | `gallery` | The browse app: enumerate the library, show JSON + validation status + rendered output. Read-only. | `mnx-core`, `mnx-render`, `mnx-scenarios` |
 
 **Dependency rule (P2):** arrows point one way. `mnx-core` imports nothing internal. Nothing
@@ -57,14 +57,17 @@ draw(primitives: Primitive[], opts): SVGElement // SVG-aware, no music
 canvas/PDF later. `RenderOptions` carries `viewMode: 'notation' | 'tab' | 'both'`, sizing,
 and SMuFL font resolution. Getting this right *is* the project right now.
 
-### C6 — Scenario loader (`mnx-scenarios`) — *settled in intent*
+### C6 — Scenario loader (`mnx-scenarios`) — *settled*
 ```
-listScenarios(): ScenarioMeta[]                       // from generated catalog
-loadScenario(id): { meta, doc: MnxDocument, expectedSvg?: string }
+listScenarios(): ScenarioMeta[]                       // ids derived from paths
+loadScenario(id): { meta, doc: MnxDocument, expectedPrimitives?: Primitive[] }
 ```
-Consumed by `mnx-core` tests (validate every doc), `mnx-render` tests (snapshot vs
-`expectedSvg`), and `gallery` (render the tree). One corpus, three consumers — see
-`04-scenario-library.md` for the folder layout and `scenario.json` schema.
+Consumed by corpus tests (assert `validate(doc)` matches each scenario's declared `expect`,
+both standard and `_x.tab` verdicts; snapshot `layout(doc)` vs `expectedPrimitives`) and by
+`gallery` (facet-driven browsing, live render). The committed reference artifact is the
+primitive list, not SVG. One corpus, multiple consumers — and no loader package yet: the
+gallery uses `import.meta.glob`, scripts walk the filesystem. See `04-scenario-library.md`
+for the layout and `meta.json` schema.
 
 ## Deferred contracts (reserved, defined when their phase arrives)
 - **C3 — Audio:** `toSchedule(doc) → PlaybackSchedule`; `createPlayer(schedule)` with a
@@ -77,7 +80,8 @@ Consumed by `mnx-core` tests (validate every doc), `mnx-render` tests (snapshot 
 
 ## Cross-cutting (introduced with the editing phase, not v1)
 - **Storage — `DocumentRepository`** (IndexedDB via `idb-keyval`, key prefix `mnx-doc:`).
-- **`_x.guitar` extension schema**, owned by `mnx-core` (P7).
+- **`_x.tab` extension schema (v2, single-source)**, owned by `mnx-core` (P7) — see
+  `../docs/tab-extension-spec.md`.
 - **Component events:** child→parent via bubbling `CustomEvent` with `composed: true`.
 
 ## Intentionally NOT in v1

@@ -8,11 +8,14 @@
 ---
 
 ## Phase 0 — Skeleton + document model + first scenarios
-**Ship:** the monorepo builds; `mnx-core` exists (`MnxDocument` types, MNX + `_x.guitar`
-schemas, `validate()`); `mnx-scenarios` seeded with categories **00–03** (document, pitches,
-durations, rhythm), every scenario at status `valid`.
-**Done when:** `mnx-core` tests iterate the whole library and every `score.mnx.json` validates.
-**Not yet:** any rendering, any UI.
+**Ship:** the document model exists (`MnxDocument` types, MNX + `_x.tab` schemas,
+`validate()`); the `scenarios/` corpus seeded with the **`spec/` mirror** (the CG's ~49
+worked examples, via `sync-spec-examples.mjs`) plus `lab/` categories **00–02 + 20–21 + 24**
+(document/pitches/durations, tab part & positions, and the invalid-by-design spec-gap
+exhibits).
+**Done when:** `check-scenarios.mjs` passes — every scenario's actual verdicts (standard +
+extension) match its declared `expect`, in both directions.
+**Not yet:** any rendering in the gallery, any UI.
 
 ## Phase 1 — The gallery (browse + validate), no rendering yet
 **Ship:** the `gallery` app enumerates `mnx-scenarios`, shows the category tree, and for each
@@ -22,11 +25,13 @@ output reads "pending."
 **Not yet:** rendering — but the app is already useful as a corpus browser.
 
 ## Phase 2 — Beachhead: rendering ⭐
-**Ship:** `mnx-render` (layout → `Primitive[]` → SVG) wired into the gallery so every scenario
-shows a **live render**; `expected.svg` committed per scenario; snapshot tests in `mnx-render`
-over the library. Categories 00–03 reach status `verified`.
+**Ship:** the render pipeline (layout → `Primitive[]` → SVG) wired into the gallery so every
+scenario shows a **live render**; `expected.primitives.json` committed per renderable
+scenario; snapshot tests over the library. The seeded `lab/` categories reach `verified`;
+the `spec/` mirror reports its honest render rate ("N of 49 of the spec's own examples").
 **Done when:** the seeded scenarios render correctly (notation + tab where relevant), snapshots
-pass, and the gallery shows the coverage dashboard (counts per status per category).
+pass, and the gallery shows the coverage dashboard (counts per status per category, plus the
+`$defs` coverage report).
 *This is the milestone the whole plan is organized around. If only one phase ever ships, it's this.*
 
 ## Phase 3 — Broaden spec coverage
@@ -38,9 +43,12 @@ scenarios (category 09 + the `idRefs` facet) all pass.
 **Not yet:** guitar specifics, audio, editing.
 
 ## Phase 4 — Guitar (the proving ground)
-**Ship:** categories **20–24** — tab staves, fret/string, fingerings, techniques, the
-`_x.guitar` extension — to `verified`. Tab rendering matures here.
-**Done when:** guitar notation + tab render correctly across the guitar scenarios.
+**Ship:** categories **20–24** — tab part config (tunings/capo/`staffKind` views),
+positions, fingerings, techniques, and the spec-gap exhibits — to `verified` (the
+invalid-by-design ones are "verified" when their pinned errors match). Tab rendering matures
+here: technique glyphs (bends, slides, hammer-ons), rhythm on the tab view.
+**Done when:** notation + tab render correctly across the tab scenarios, and category 24
+is presentable enough to anchor the w3c-cg/mnx#63 post.
 
 ## Phase 5 — Playback
 **Ship:** `mnx-audio` (C3) + a minimal transport in the gallery; playhead highlighting driven
