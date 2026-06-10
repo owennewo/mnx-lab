@@ -1,0 +1,43 @@
+{
+  "title": "Tremolos (single-note)",
+  "description": "Single-note tremolos live on an event. They&#x27;re encoded in the event&#x27;s \"markings\" object. Each tremolo must encode the number of visible marks — 1, 2 and 3 in this example.",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/single-note-tremolos/"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "event",
+    "event-markings",
+    "global",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "root",
+    "sequence",
+    "staff-position",
+    "step",
+    "time",
+    "time-signature-unit",
+    "tremolo-single",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "rendered"
+}

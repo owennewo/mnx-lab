@@ -84,12 +84,12 @@ function makeScenario(ns, categoryDir, dirName) {
 }
 
 /** Formats an Ajv error so pinned fragments can match path, schema location, or message. */
-function formatError(err) {
+export function formatError(err) {
   return `${err.instancePath || '/'} [${err.schemaPath}] ${err.message}`;
 }
 
 /** Computes the _x.tab verdict: 'n/a' when nothing carries _x.tab, else valid/invalid + errors. */
-function computeExtensionVerdict(doc, ctx) {
+export function computeExtensionVerdict(doc, ctx) {
   const errors = [];
   let sawTab = false;
   for (const part of doc?.parts ?? []) {

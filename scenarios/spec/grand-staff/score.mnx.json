@@ -1,0 +1,437 @@
+{
+  "mnx": {
+    "support": {
+      "useBeams": true
+    },
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      },
+      {}
+    ]
+  },
+  "parts": [
+    {
+      "measures": [
+        {
+          "beams": [
+            {
+              "events": [
+                "ev4",
+                "ev5",
+                "ev6",
+                "ev7"
+              ]
+            },
+            {
+              "events": [
+                "ev8",
+                "ev9",
+                "ev10",
+                "ev11"
+              ]
+            }
+          ],
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              },
+              "staff": 1
+            },
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              },
+              "staff": 2
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 5,
+                        "step": "C"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 5,
+                        "step": "E"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 5,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "staff": 1
+            },
+            {
+              "content": [
+                {
+                  "id": "ev4",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "C"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev5",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev6",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "E"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev7",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev8",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "C"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev9",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev10",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "E"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev11",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "staff": 2
+            }
+          ]
+        },
+        {
+          "beams": [
+            {
+              "events": [
+                "ev13",
+                "ev14"
+              ]
+            },
+            {
+              "events": [
+                "ev17",
+                "ev18",
+                "ev19",
+                "ev20"
+              ]
+            },
+            {
+              "events": [
+                "ev21",
+                "ev22",
+                "ev23",
+                "ev24"
+              ]
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter",
+                    "dots": 1
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "B"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev13",
+                  "duration": {
+                    "base": "16th"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 5,
+                        "step": "C"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev14",
+                  "duration": {
+                    "base": "16th"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 5,
+                        "step": "D"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 5,
+                        "step": "C"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "rest": {}
+                }
+              ],
+              "staff": 1
+            },
+            {
+              "content": [
+                {
+                  "id": "ev17",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "D"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev18",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev19",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "F"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev20",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev21",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "C"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev22",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev23",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "E"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ev24",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "staff": 2
+            }
+          ]
+        }
+      ],
+      "name": "Piano",
+      "staves": 2
+    }
+  ]
+}

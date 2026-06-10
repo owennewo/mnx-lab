@@ -1,0 +1,45 @@
+{
+  "title": "Repeats (with alternate endings, advanced)",
+  "description": "MNX spec example \"repeats-alternate-endings-advanced\".",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/repeats-alternate-endings-advanced/"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "ending",
+    "ending-duration",
+    "ending-number",
+    "ending-open",
+    "event",
+    "global",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "root",
+    "sequence",
+    "staff-position",
+    "step",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "rendered"
+}

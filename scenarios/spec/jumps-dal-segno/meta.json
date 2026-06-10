@@ -1,0 +1,46 @@
+{
+  "title": "Jumps (Dal Segno)",
+  "description": "In this example, the bars are to be performed in this order: 1, 2, 3, 4, 5, 2, 3, 4, 5.",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/jumps-dal-segno/"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "integer-unsigned",
+    "jump",
+    "jump-type",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rhythmic-position",
+    "root",
+    "segno",
+    "sequence",
+    "staff-position",
+    "step",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "rendered"
+}

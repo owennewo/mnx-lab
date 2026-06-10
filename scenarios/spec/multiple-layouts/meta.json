@@ -1,0 +1,62 @@
+{
+  "title": "Multiple layouts",
+  "description": "In this image, you see three different representations of the same underlying SATB music — one with four separate staves, one with two staves (using multiple voices) and one with two staves (using notes combined into chords).This can be encoded entirely within a single MNX document. The underlying music (the notes, barlines, etc.) is encoded only once, within the \"global\" and \"part\" objects. But there are three separate score objects — one for each visual representation of the music.A score references a particular layout. The layout object is where the style information is contained: which parts, in which order.",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/multiple-layouts/"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "id",
+    "integer-unsigned",
+    "layout-change",
+    "measure-global",
+    "measure-rhythmic-position",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "ottava-amount-or-zero",
+    "page",
+    "part",
+    "part-measure",
+    "part-name",
+    "part-short-name",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rhythmic-position",
+    "root",
+    "score",
+    "score-name",
+    "sequence",
+    "staff",
+    "staff-group",
+    "staff-group-barline-style",
+    "staff-label",
+    "staff-labelref",
+    "staff-position",
+    "staff-source",
+    "staff-symbol",
+    "stem-direction",
+    "step",
+    "system",
+    "system-layout",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "rendered"
+}

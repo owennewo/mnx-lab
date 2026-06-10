@@ -1,0 +1,44 @@
+{
+  "title": "Beams (secondary beam breaks implied)",
+  "description": "MNX spec example \"beams-secondary-beam-breaks-implied\".",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/beams-secondary-beam-breaks-implied/"
+  ],
+  "coversDefs": [
+    "beam",
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "id",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "root",
+    "sequence",
+    "staff-position",
+    "step",
+    "support",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "rendered"
+}

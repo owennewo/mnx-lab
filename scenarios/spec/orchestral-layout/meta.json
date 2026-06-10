@@ -1,0 +1,40 @@
+{
+  "title": "Orchestral layout",
+  "description": "MNX spec example \"orchestral-layout\".",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/orchestral-layout/"
+  ],
+  "coversDefs": [
+    "global",
+    "id",
+    "mnx",
+    "page",
+    "part",
+    "root",
+    "score",
+    "score-name",
+    "staff",
+    "staff-count",
+    "staff-group",
+    "staff-group-barline-style",
+    "staff-label",
+    "staff-number",
+    "staff-source",
+    "staff-symbol",
+    "stem-direction",
+    "system",
+    "system-layout",
+    "version-number",
+    "voice-name"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "rendered"
+}

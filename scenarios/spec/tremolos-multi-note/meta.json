@@ -1,0 +1,43 @@
+{
+  "title": "Tremolos (multi-note)",
+  "description": "MNX spec example \"tremolos-multi-note\".",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/tremolos-multi-note/"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "measure-global",
+    "mnx",
+    "multi-note-tremolo",
+    "note",
+    "note-value",
+    "note-value-base",
+    "note-value-quantity",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "root",
+    "sequence",
+    "staff-position",
+    "step",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "valid"
+}
