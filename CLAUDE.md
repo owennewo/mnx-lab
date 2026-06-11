@@ -34,11 +34,17 @@ npx musicxml-mnx --export in.json --output out.xml
 
 ## Architecture
 
+### The "reading room" UI (2026-06 redesign)
+
+The front-end follows the design handoff in `claude_design/design_handoff_mnx_lab_redesign/` (rationale: its `DIRECTION.md`). The scenario library is permanent navigation (`mnx-library-rail`, faceted: category/status/source/$def), the scenario page is the main surface (`mnx-scenario-header` + `mnx-score-toolbar` + paper `mnx-score-viewer` + `mnx-document-pane`), the **coverage dashboard is the empty state** (`mnx-coverage-dashboard`), and AI chat is demoted to an Assist drawer (`mnx-assist-drawer`) that only ever edits transient **sketches** (fork-to-sketch), never corpus documents. Design tokens live on the app's `:host` ([src/styles/tokens.ts](src/styles/tokens.ts)) — light/dark chrome, but **score paper never inverts**. The note↔JSON cross-highlight depends on stable note keys: layouts synthesize positional keys for id-less documents ([src/utils/noteKeys.ts](src/utils/noteKeys.ts)) and [src/utils/jsonView.ts](src/utils/jsonView.ts) mirrors the same traversal to anchor document lines — keep these two in lockstep.
+
+`<mnx-editor-app>` is also the embed: `mode="viewer"` (one-scenario card) and `mode="gallery"` (host-sized library), themed via `--mnx-*` custom properties; see `embed.html` for the demo host page and the attribute reference. Compact embed chrome is a named container query (`mnx-embed`) — no ResizeObserver.
+
 ### Lit + context + ReactiveController pattern
 
 State lives in two places and is mirrored, not unified:
 
-1. **ReactiveControllers** (`src/controllers/`) own the canonical mutable state and side effects — `DocumentController` holds the active `MnxDocument` and debounces saves to IndexedDB; `PlaybackController` owns the Tone.js transport, synth, and playhead tracker.
+1. **ReactiveControllers** (`src/controllers/`) own the canonical mutable state and side effects — `ScenarioLibraryController` owns corpus browsing (facet/filter/query/selection, lazy score+notes loading); `PlaybackController` owns the Tone.js transport, synth, and playhead tracker; `DocumentController` (IndexedDB saved scores) is retained but no longer surfaced by the shell.
 2. **`@lit/context` providers** on `MnxEditorApp` (`mnxDocumentContext`, `playbackStateContext`, `selectionContext`) expose plain-data snapshots to descendants.
 
 `MnxEditorApp.willUpdate()` copies controller fields into the `@provide`d `@state` properties every render cycle — this is the seam that fans controller mutations out to consumers. When adding new shared state, follow this pattern: mutate on the controller, mirror in `willUpdate`, consume via `@consume({ subscribe: true })`. Don't try to put a controller instance directly into context.
@@ -62,7 +68,7 @@ When modifying the system prompt (`server/prompts/editNotation.js`) or the tool 
 
 ### Rendering (custom SMuFL/SVG engine)
 
-The pipeline is layout → primitives → SVG (see `SVG_RENDERING_ENGING.md`): [src/layout/notation.ts](src/layout/notation.ts) and [src/layout/tab.ts](src/layout/tab.ts) are pure functions emitting staff-space primitives; [src/render/svg.ts](src/render/svg.ts) is the dumb emitter. The viewer supports four `viewMode`s: `notation` / `tab` / `both` / `json` — `both` stacks the two renderers. Fret/string assignment uses `_x.tab.position` if all notes are annotated, otherwise a "lowest reasonable position" heuristic over `GUITAR_TUNING` ([src/tab/guitarPositions.ts](src/tab/guitarPositions.ts)). Everything renders into the component's shadow root — the shadow boundary is the embeddability story. Do **not** reintroduce VexFlow or any notation library.
+The pipeline is layout → primitives → SVG (see `SVG_RENDERING_ENGING.md`): [src/layout/notation.ts](src/layout/notation.ts) and [src/layout/tab.ts](src/layout/tab.ts) are pure functions emitting staff-space primitives; [src/render/svg.ts](src/render/svg.ts) is the dumb emitter. The viewer's `viewMode`s are `notation` / `tab` / `both` (`both` stacks the two renderers); **JSON is not a view mode** — the document pane is an independent split pane. Fret/string assignment uses `_x.tab.position` if all notes are annotated, otherwise a "lowest reasonable position" heuristic over `GUITAR_TUNING` ([src/tab/guitarPositions.ts](src/tab/guitarPositions.ts)). Everything renders into the component's shadow root — the shadow boundary is the embeddability story. Do **not** reintroduce VexFlow or any notation library.
 
 ### MNX types and the `_x.tab` extension (v2)
 
@@ -73,5 +79,5 @@ Project-internal MNX types live in [src/types/mnx.ts](src/types/mnx.ts). The W3C
 - **Web Awesome (`wa-*`) components** are the UI kit — see `src/main.ts` for which are registered. `wa-icon` is wired to Bootstrap Icons via CDN. Don't introduce a different UI library.
 - **`.ts` extensions in imports are required** (`allowImportingTsExtensions: true` in tsconfig, `moduleResolution: bundler`).
 - **Decorator metadata is enabled** (`experimentalDecorators`, `emitDecoratorMetadata`) for Lit decorators. Do not flip these to standard decorators without testing the whole component tree.
-- **No tests** exist for the frontend or the Worker — only the converter sub-package has vitest tests. Treat the converter as the closest thing to a reference for "correct" MNX shapes.
+- **Tests**: root vitest (`npm test`) checks the scenario corpus (`tests/scenarios.test.ts`) and layout snapshots over it (`tests/primitives.test.ts` — regenerate with `npm run update:primitives` when layout output legitimately changes). The Worker and UI components have no tests; the converter sub-package has its own vitest suite and is the closest reference for "correct" MNX shapes.
 - `dist/` is a build artifact and is gitignored (it contains both the client build and the Worker bundle).
