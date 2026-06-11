@@ -1,15 +1,11 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state, query } from 'lit/decorators.js';
+import { sharedChrome, scrollbars } from '../styles/tokens.ts';
 
 export interface ChatMessage {
   sender: 'user' | 'assistant' | 'system';
   text: string;
 }
-
-const WELCOME_MESSAGE: ChatMessage = {
-  sender: 'system',
-  text: 'Welcome to MNX Editor AI Assistant. Ask me to edit notes, transpose, add chords, or transform notation.'
-};
 
 // Substring patterns matching model ids that are likely to support image inputs.
 // Used only as a warning hint — OpenRouter is the source of truth.
@@ -40,7 +36,7 @@ export class ChatPanel extends LitElement {
   statusMessage = '';
 
   @state()
-  private messages: ChatMessage[] = [WELCOME_MESSAGE];
+  private messages: ChatMessage[] = [];
 
   @state()
   private transcripts: any[] = [];
@@ -75,252 +71,300 @@ export class ChatPanel extends LitElement {
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
 
-  static styles = css`
-    :host {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      background: var(--bg-sidebar);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border-right: 1px solid var(--border-color);
-      padding: 16px;
-      gap: 16px;
-    }
+  static styles = [
+    sharedChrome,
+    scrollbars,
+    css`
+      :host {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 12px;
+        gap: 10px;
+        background: var(--surface);
+      }
 
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 12px;
-    }
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: flex-end;
+      }
 
-    .header wa-icon {
-      color: var(--primary-glow);
-    }
+      .message-log {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
 
-    .message-log {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
+      .message {
+        max-width: 88%;
+        border-radius: 10px;
+        padding: 9px 12px;
+        font-size: 12.5px;
+        line-height: 1.55;
+        white-space: pre-wrap;
+      }
 
-    .message {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-width: 85%;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      line-height: 1.4;
-      animation: fadeIn 0.25s ease-out;
-    }
+      .message.user {
+        align-self: flex-end;
+        background: var(--accent);
+        color: oklch(0.98 0 0);
+        border-bottom-right-radius: 3px;
+      }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+      .message.assistant {
+        align-self: flex-start;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-bottom-left-radius: 3px;
+        color: var(--ink-2);
+      }
 
-    .message.user {
-      align-self: flex-end;
-      background: var(--primary-glow);
-      color: oklch(0.98 0 0);
-      border-bottom-right-radius: 2px;
-    }
+      .message.system {
+        align-self: flex-start;
+        background: var(--bg);
+        border: 1px dashed var(--line);
+        color: var(--ink-3);
+        max-width: 95%;
+      }
 
-    .message.assistant {
-      align-self: flex-start;
-      background: oklch(0.22 0.02 256);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-      border-bottom-left-radius: 2px;
-    }
+      .progress {
+        align-self: flex-start;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--ink-3);
+        padding: 4px 2px;
+      }
 
-    .message.system {
-      align-self: center;
-      background: oklch(0.18 0.02 256 / 0.4);
-      color: var(--text-muted);
-      border: 1px dashed var(--border-color);
-      font-style: italic;
-      text-align: center;
-      max-width: 95%;
-    }
+      .suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
 
-    .suggestions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
+      .sugg {
+        font-size: 11px;
+        color: var(--accent-fg);
+        border: 1px solid color-mix(in oklab, var(--accent-fg), transparent 60%);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
 
-    .suggestions wa-button {
-      --wa-button-font-size-small: 0.76rem;
-      --wa-button-padding-small: 4px 10px;
-    }
+      .sugg:hover {
+        background: color-mix(in oklab, var(--accent), transparent 90%);
+      }
 
-    .input-area {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      background: oklch(0.18 0.02 256 / 0.6);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 8px;
-    }
+      .input-area {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        border-top: 1px solid var(--line);
+        padding-top: 10px;
+      }
 
-    .input-row {
-      display: flex;
-      gap: 8px;
-      align-items: flex-end;
-    }
+      .input-row {
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+      }
 
-    textarea {
-      flex: 1;
-      height: 60px;
-      background: transparent;
-      border: none;
-      color: var(--text-primary);
-      font-family: var(--font-family-sans);
-      font-size: 0.9rem;
-      resize: none;
-      outline: none;
-      padding: 4px;
-    }
+      textarea {
+        flex: 1;
+        resize: none;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--bg);
+        padding: 8px 10px;
+        font-size: 12.5px;
+        outline: none;
+        min-height: 36px;
+        max-height: 110px;
+        line-height: 1.4;
+      }
 
-    textarea::placeholder {
-      color: var(--text-muted);
-    }
+      textarea:focus {
+        border-color: var(--accent-fg);
+      }
 
-    .attachments {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      padding-bottom: 4px;
-    }
+      textarea::placeholder {
+        color: var(--ink-3);
+      }
 
-    .attachment-thumb {
-      position: relative;
-      width: 56px;
-      height: 56px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      overflow: hidden;
-      background: oklch(0.22 0.02 256 / 0.6);
-    }
+      .icon-btn {
+        height: 34px;
+        width: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        color: var(--ink-2);
+        background: var(--surface);
+        flex-shrink: 0;
+      }
 
-    .attachment-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
+      .icon-btn:hover:not(:disabled) {
+        background: var(--hover);
+        color: var(--ink);
+      }
 
-    .attachment-thumb .remove-btn {
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: oklch(0.10 0.02 256 / 0.9);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      font-size: 12px;
-      line-height: 1;
-      padding: 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+      .icon-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
 
-    .attachment-thumb .remove-btn:hover {
-      background: oklch(0.6 0.18 20);
-    }
+      .send-btn {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 7px;
+        background: var(--accent);
+        color: oklch(0.99 0 0);
+        font-size: 12.5px;
+        flex-shrink: 0;
+      }
 
-    .vision-warning {
-      font-size: 0.72rem;
-      color: oklch(0.78 0.14 60);
-      background: oklch(0.25 0.06 60 / 0.35);
-      border: 1px solid oklch(0.45 0.10 60 / 0.5);
-      padding: 4px 8px;
-      border-radius: 4px;
-      margin-top: 6px;
-    }
+      .send-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
 
-    .message {
-      white-space: pre-wrap;
-    }
+      .attachments {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        padding-bottom: 4px;
+      }
 
-    .input-footer {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      border-top: 1px solid var(--border-color);
-      padding-top: 8px;
-    }
+      .attachment-thumb {
+        position: relative;
+        width: 56px;
+        height: 56px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        overflow: hidden;
+        background: var(--bg);
+      }
 
-    .model-selectors {
-      display: flex;
-      gap: 12px;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
+      .attachment-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
 
-    .model-select-group {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      background: oklch(0.22 0.02 256 / 0.5);
-      padding: 4px 8px;
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-      flex: 1;
-      min-width: 100px;
-    }
+      .attachment-thumb .remove-btn {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        color: var(--ink);
+        font-size: 12px;
+        line-height: 1;
+        padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-    .model-select-label {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      white-space: nowrap;
-    }
+      .attachment-thumb .remove-btn:hover {
+        color: var(--st-gap);
+        border-color: var(--st-gap);
+      }
 
-    .model-selector {
-      font-size: 0.72rem;
-      color: var(--text-primary);
-      background: transparent;
-      border: none;
-      outline: none;
-      cursor: pointer;
-      width: 100%;
-      text-overflow: ellipsis;
-    }
+      .vision-warning {
+        font-size: 11px;
+        color: var(--st-valid);
+        border: 1px solid color-mix(in oklab, var(--st-valid), transparent 50%);
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
 
-    .model-selector option {
-      background: var(--bg-app);
-      color: var(--text-primary);
-    }
+      .input-footer {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
-    .recording-pulse {
-      animation: record-pulse-glow 1.5s infinite;
-      color: oklch(0.6 0.18 20) !important;
-    }
+      .model-selectors {
+        display: flex;
+        gap: 8px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
 
-    @keyframes record-pulse-glow {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.15); opacity: 0.75; }
-    }
-  `;
+      .model-select-group {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--bg);
+        padding: 4px 8px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        flex: 1;
+        min-width: 100px;
+      }
+
+      .model-select-label {
+        font-family: var(--mono);
+        font-size: 9.5px;
+        color: var(--ink-3);
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+      }
+
+      .model-selector {
+        font-size: 11px;
+        color: var(--ink);
+        background: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        width: 100%;
+        text-overflow: ellipsis;
+      }
+
+      .model-selector option {
+        background: var(--surface);
+        color: var(--ink);
+      }
+
+      .recording-pulse {
+        animation: record-pulse 1.5s infinite;
+        color: var(--st-gap) !important;
+      }
+
+      @keyframes record-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.15);
+          opacity: 0.75;
+        }
+      }
+
+      .status-indicators {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        font-family: var(--mono);
+        font-size: 10.5px;
+      }
+    `
+  ];
 
   async connectedCallback() {
     super.connectedCallback();
@@ -357,7 +401,7 @@ export class ChatPanel extends LitElement {
   }
 
   private clearHistory() {
-    this.messages = [WELCOME_MESSAGE];
+    this.messages = [];
     this.transcripts = [];
   }
 
@@ -397,29 +441,22 @@ export class ChatPanel extends LitElement {
   render() {
     return html`
       <div class="header">
-        <wa-icon name="chat-square-dots-fill"></wa-icon>
-        <span>AI Music Assistant</span>
-        <wa-button
-          circle
-          size="small"
-          variant="neutral"
-          style="margin-left: auto;"
+        <button
+          class="tb-btn"
           title="Copy conversation JSON (raw LLM messages)"
           ?disabled=${this.transcripts.length === 0}
           @click=${this.copyConversation}
         >
-          <wa-icon name="clipboard"></wa-icon>
-        </wa-button>
-        <wa-button
-          circle
-          size="small"
-          variant="neutral"
+          copy transcript
+        </button>
+        <button
+          class="tb-btn"
           title="Clear conversation"
-          ?disabled=${this.messages.length <= 1 || this.isProcessing}
+          ?disabled=${this.messages.length === 0 || this.isProcessing}
           @click=${this.clearHistory}
         >
-          <wa-icon name="arrow-counterclockwise"></wa-icon>
-        </wa-button>
+          clear
+        </button>
       </div>
 
       <div class="message-log">
@@ -431,31 +468,19 @@ export class ChatPanel extends LitElement {
           `
         )}
         ${this.isProcessing
-          ? html`
-              <div class="message assistant" style="display: flex; align-items: center; gap: 8px;">
-                <wa-spinner style="font-size: 1rem;"></wa-spinner>
-                <span>
-                  Editing notation...
-                  <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: 4px;">
-                    ${this.formatProgressLabel()}
-                  </span>
-                </span>
-              </div>
-            `
+          ? html`<div class="progress">editing document ${this.formatProgressLabel()}</div>`
           : ''}
       </div>
 
-      <div class="suggestions">
-        <wa-button size="small" variant="neutral" pill @click=${() => this.applySuggestion('Transpose up 2 semitones')}>
-          Transpose Up Step
-        </wa-button>
-        <wa-button size="small" variant="neutral" pill @click=${() => this.applySuggestion('Make the last measure a whole note E3')}>
-          Set E3 Ending
-        </wa-button>
-        <wa-button size="small" variant="neutral" pill @click=${() => this.applySuggestion('Double the length of the scale by appending octave 4 scale')}>
-          Add Octave
-        </wa-button>
-      </div>
+      ${!this.isProcessing && this.messages.length < 2
+        ? html`
+            <div class="suggestions">
+              ${['raise everything a step', 'make the last note flat', 'lower it a third'].map(
+                s => html`<button class="sugg" @click=${() => this.applySuggestion(s)}>${s}</button>`
+              )}
+            </div>
+          `
+        : ''}
 
       <div class="input-area">
         ${this.attachedImages.length > 0 ? html`
@@ -474,7 +499,8 @@ export class ChatPanel extends LitElement {
         ` : ''}
         <div class="input-row">
           <textarea
-            placeholder=${this.isTranscribing ? 'Transcribing...' : 'Ask AI to edit notation... (paste images to attach)'}
+            rows="1"
+            placeholder=${this.isTranscribing ? 'Transcribing…' : 'Describe an edit to the sketch…'}
             .value=${this.chatInputValue}
             @input=${(e: any) => this.chatInputValue = e.target.value}
             @keydown=${this.handleKeyDown}
@@ -482,28 +508,25 @@ export class ChatPanel extends LitElement {
             ?disabled=${this.isProcessing || this.isTranscribing}
           ></textarea>
 
-          <wa-button
-            circle
-            size="small"
-            variant="neutral"
+          <button
+            class="icon-btn"
+            title="Dictate an edit"
             @click=${this.toggleRecording}
             ?disabled=${this.isProcessing || this.isTranscribing}
           >
-            <wa-icon 
-              name="mic-fill" 
+            <wa-icon
+              name="mic-fill"
               class=${this.isRecording ? 'recording-pulse' : ''}
             ></wa-icon>
-          </wa-button>
+          </button>
 
-          <wa-button
-            circle
-            size="small"
-            variant="brand"
+          <button
+            class="send-btn"
             @click=${this.handleSubmit}
             ?disabled=${(!this.chatInputValue.trim() && this.attachedImages.length === 0) || this.isProcessing || this.isTranscribing}
           >
-            <wa-icon name="send-fill"></wa-icon>
-          </wa-button>
+            Send
+          </button>
         </div>
 
         <div class="input-footer">
@@ -545,9 +568,9 @@ export class ChatPanel extends LitElement {
           ` : ''}
 
           ${this.isRecording || this.isTranscribing ? html`
-            <div class="status-indicators" style="display: flex; gap: 8px; justify-content: flex-end; font-size: 0.72rem; margin-top: 4px;">
-              ${this.isRecording ? html`<span style="color: oklch(0.6 0.18 20);">Recording...</span>` : ''}
-              ${this.isTranscribing ? html`<span style="color: var(--primary-glow);">Transcribing...</span>` : ''}
+            <div class="status-indicators">
+              ${this.isRecording ? html`<span style="color: var(--st-gap);">recording…</span>` : ''}
+              ${this.isTranscribing ? html`<span style="color: var(--accent-fg);">transcribing…</span>` : ''}
             </div>
           ` : ''}
         </div>

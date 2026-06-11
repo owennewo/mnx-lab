@@ -1,13 +1,27 @@
-import { LitElement, html, css } from 'lit';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { customElement, property, query } from 'lit/decorators.js';
+import { LitElement, html, css, nothing } from 'lit';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { consume } from '@lit/context';
-import { mnxDocumentContext, playbackStateContext, selectionContext } from '../contexts/mnxContext.ts';
+import {
+  mnxDocumentContext,
+  playbackStateContext,
+  selectionContext
+} from '../contexts/mnxContext.ts';
 import type { PlaybackState, SelectionContext } from '../contexts/mnxContext.ts';
 import { MnxDocument } from '../types/mnx.ts';
 import { renderMnxToSvgTab } from '../tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../notation/notationRenderer.ts';
+import type { PinnedError } from '../utils/pinnedErrors.ts';
+import type { ViewMode } from './ScoreToolbar.ts';
+import { sharedChrome, scrollbars } from '../styles/tokens.ts';
 
+/**
+ * The score area: a scrollable bench with a warm PAPER card at its centre.
+ * The paper carries the engraved SVG (the rendering engine is a black box
+ * here), or one of two honest state panels:
+ *  - invalid-by-design → the spec-gap exhibit (oxide, pinned-error table)
+ *  - valid-but-unrendered → the "validates, doesn't render yet" panel
+ * Paper never inverts with the theme (DIRECTION.md §4).
+ */
 @customElement('mnx-score-viewer')
 export class ScoreViewer extends LitElement {
   @consume({ context: mnxDocumentContext, subscribe: true })
@@ -22,167 +36,251 @@ export class ScoreViewer extends LitElement {
   @property({ attribute: false })
   selection!: SelectionContext;
 
-  @property({ type: String })
-  viewMode: 'notation' | 'tab' | 'both' | 'json' = 'notation';
+  @property({ type: String }) viewMode: ViewMode = 'notation';
+  @property({ type: Number }) zoom = 1;
+  @property({ type: Boolean }) hasTab = false;
+  @property({ type: Boolean }) invalidByDesign = false;
+  @property({ attribute: false }) pinnedErrors: PinnedError[] = [];
+  /** Pointer of the pinned error currently highlighted in the document pane. */
+  @property({ type: String }) errorPointer: string | null = null;
+  /** Embed trim: tighter paper margins. */
+  @property({ type: Boolean, reflect: true }) compact = false;
 
   @query('#score-container')
   container!: HTMLElement;
 
-  static styles = css`
-    :host {
-      display: block;
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 20px;
-      background: oklch(0.18 0.02 256 / 0.5);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-premium);
-      backdrop-filter: var(--glass-blur);
-    }
+  @state() private renderErrors: { pane: string; message: string }[] = [];
 
-    #score-wrapper {
-      position: relative;
-      width: 100%;
-      min-height: 400px;
-      background: rgba(255, 255, 255, 0.015);
-      border-radius: 8px;
-      padding: 12px;
-      border: 1px dashed rgba(255, 255, 255, 0.08);
-    }
+  private resizeHandler = () => this.renderScore();
 
-    #score-container {
-      width: 100%;
-    }
+  static styles = [
+    sharedChrome,
+    scrollbars,
+    css`
+      :host {
+        display: block;
+        height: 100%;
+        overflow: auto;
+        padding: 26px;
+        min-width: 0;
+        background: var(--bg);
+      }
 
-    .no-doc {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 300px;
-      color: var(--text-muted);
-      font-size: 1.1rem;
-    }
+      :host([compact]) {
+        padding: 16px;
+      }
 
-    #score-container svg {
-      pointer-events: auto !important;
-    }
+      .paper {
+        background: var(--paper);
+        color: var(--paper-ink);
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        border: 1px solid oklch(0.85 0.01 85 / 0.6);
+        padding: 30px 26px;
+        margin: 0 auto;
+        transition: width 0.15s ease;
+      }
 
-    /* MNX-native tab renderer styles */
-    #score-container svg.mnx-tab-svg {
-      color: var(--text-primary);
-      display: block;
-    }
+      :host([compact]) .paper {
+        padding: 16px 14px;
+        border-radius: 8px;
+      }
 
-    #score-container svg.mnx-tab-svg .staff-line {
-      stroke: oklch(0.45 0.02 256);
-    }
+      .pane-cap {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--paper-line);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 0 0 4px 4px;
+      }
 
-    #score-container svg.mnx-tab-svg .tab-event:hover .fret-number {
-      fill: var(--primary-glow);
-    }
+      .both-gap {
+        height: 26px;
+      }
 
-    /* MNX-native notation renderer styles */
-    #score-container svg.mnx-notation-svg {
-      color: var(--text-primary);
-      display: block;
-    }
+      #score-container svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        pointer-events: auto;
+        color: var(--paper-ink);
+      }
 
-    #score-container svg.mnx-notation-svg .staff-line {
-      stroke: oklch(0.45 0.02 256);
-    }
+      #score-container svg .staff-line {
+        stroke: var(--paper-line);
+      }
 
-    #score-container svg.mnx-notation-svg .notehead {
-      cursor: pointer;
-    }
+      #score-container svg .notehead {
+        cursor: pointer;
+        transition: fill 0.12s;
+      }
 
-    /* In 'both' mode the two views stack with a small gap */
-    #score-container .both-view-pane + .both-view-pane {
-      margin-top: 16px;
-    }
+      /* Selection/active recolor to the accent — overrides the engine's
+         presentation attributes (CSS wins over attributes). */
+      #score-container svg .notehead.selected,
+      #score-container svg .notehead.active,
+      #score-container svg .accidental.selected,
+      #score-container svg .accidental.active {
+        fill: var(--accent) !important;
+      }
 
-    #score-container .render-error {
-      padding: 16px;
-      border: 1px dashed oklch(0.6 0.15 25);
-      border-radius: 8px;
-      color: oklch(0.78 0.13 25);
-      font-size: 0.88rem;
-    }
+      #score-container svg .fret-number {
+        cursor: pointer;
+      }
 
-    #json-wrapper {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      min-height: 400px;
-      background: oklch(0.12 0.02 256 / 0.8);
-      border-radius: 8px;
-      padding: 20px;
-      border: 1px solid var(--border-color);
-      overflow: auto;
-      box-sizing: border-box;
-    }
+      #score-container svg .fret-number.selected,
+      #score-container svg .fret-number.active {
+        fill: var(--accent) !important;
+      }
 
-    #json-wrapper pre {
-      margin: 0;
-      font-family: var(--font-family-mono);
-      font-size: 0.88rem;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+      /* The tab fret knock-out must match the paper, not the app bg. */
+      #score-container svg .fret-bg {
+        fill: var(--paper) !important;
+      }
 
-    .json-key {
-      color: oklch(0.75 0.15 190); /* Electric cyan */
-      font-weight: 600;
-    }
+      .no-doc {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+        color: var(--paper-line);
+        font-size: 13px;
+      }
 
-    .json-string {
-      color: oklch(0.8 0.12 120); /* Soft lime green */
-    }
+      /* ── state panels (on paper — warm fixed colors, never themed) ── */
+      .state-panel {
+        max-width: 60ch;
+        margin: 8px auto;
+        padding: 8px 4px;
+      }
 
-    .json-number {
-      color: oklch(0.75 0.16 40); /* Soft amber/orange */
-    }
+      .state-panel h3 {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-family: var(--serif);
+        font-size: 17px;
+        font-weight: 500;
+        margin: 0 0 8px;
+      }
 
-    .json-boolean {
-      color: oklch(0.65 0.22 274); /* Vibrant violet */
-      font-weight: bold;
-    }
+      .state-panel .sp-dia {
+        width: 10px;
+        height: 10px;
+        background: oklch(0.55 0.125 42);
+        transform: rotate(45deg);
+        border-radius: 2px;
+        flex-shrink: 0;
+      }
 
-    .json-null {
-      color: var(--text-muted);
-      font-style: italic;
-    }
-  `;
+      .state-panel .sp-warn {
+        width: 10px;
+        height: 10px;
+        background: oklch(0.66 0.105 78);
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
 
-  firstUpdated() {
-    this.renderScore();
-    window.addEventListener('resize', () => this.renderScore());
+      .state-panel p {
+        font-size: 12.5px;
+        line-height: 1.6;
+        color: oklch(0.4 0.012 80);
+        margin: 0 0 10px;
+        text-wrap: pretty;
+      }
+
+      .err-table {
+        border: 1px solid oklch(0.85 0.02 60);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 12px;
+      }
+
+      .err-row {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding: 10px 14px;
+        background: oklch(0.97 0.012 60);
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+      }
+
+      .err-row:hover {
+        background: oklch(0.95 0.018 60);
+      }
+
+      .err-row .er-rule {
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 600;
+        color: oklch(0.55 0.125 42);
+      }
+
+      .err-row .er-msg {
+        font-size: 12px;
+        color: oklch(0.38 0.012 80);
+      }
+
+      .err-row .er-path {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: oklch(0.55 0.012 80);
+      }
+
+      .fail-code {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: oklch(0.55 0.125 42);
+        background: oklch(0.96 0.01 60);
+        border: 1px solid oklch(0.88 0.015 60);
+        border-radius: 6px;
+        padding: 9px 12px;
+        margin-top: 8px;
+        display: block;
+      }
+    `
+  ];
+
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener('resize', this.resizeHandler);
   }
 
-  updated(changedProperties: Map<string | number | symbol, unknown>) {
-    if (changedProperties.has('mnxDoc') || 
-        changedProperties.has('playbackState') || 
-        changedProperties.has('selection') ||
-        changedProperties.has('viewMode')) {
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('resize', this.resizeHandler);
+  }
+
+  updated(changed: Map<string | number | symbol, unknown>) {
+    if (
+      changed.has('mnxDoc') ||
+      changed.has('playbackState') ||
+      changed.has('selection') ||
+      changed.has('viewMode') ||
+      changed.has('zoom') ||
+      changed.has('invalidByDesign')
+    ) {
       this.renderScore();
     }
   }
 
   renderScore() {
-    if (this.viewMode === 'json') return;
-    if (!this.container || !this.mnxDoc) return;
+    if (!this.container || !this.mnxDoc || this.invalidByDesign) return;
 
     const width = this.container.getBoundingClientRect().width || 600;
+    const failures: { pane: string; message: string }[] = [];
 
     const onNoteClick = (noteId: string, measureIdx: number, noteIdx: number) => {
-      this.dispatchEvent(new CustomEvent('note-selected', {
-        detail: { noteId, measureIdx, noteIdx },
-        bubbles: true,
-        composed: true
-      }));
+      this.dispatchEvent(
+        new CustomEvent('note-selected', {
+          detail: { noteId, measureIdx, noteIdx },
+          bubbles: true,
+          composed: true
+        })
+      );
     };
 
     const commonOpts = {
@@ -194,94 +292,132 @@ export class ScoreViewer extends LitElement {
     };
 
     // The layout engine throws on documents using features it doesn't support
-    // yet (e.g. tuplets, grace notes — several library scenarios exercise
-    // exactly these). Show the failure instead of dying.
+    // yet — that's the honest "validates, doesn't render" state, not a crash.
     const guarded = (target: HTMLElement, label: string, fn: () => void) => {
       try {
         fn();
       } catch (err) {
-        console.warn(`Render failed (${label}):`, err);
         target.innerHTML = '';
-        const box = document.createElement('div');
-        box.className = 'render-error';
-        box.textContent = `⚠ ${label} rendering failed: ${(err as Error).message}`;
-        target.appendChild(box);
+        failures.push({ pane: label, message: (err as Error).message });
       }
     };
 
-    if (this.viewMode === 'tab') {
-      guarded(this.container, 'tab', () =>
-        renderMnxToSvgTab({ container: this.container, ...commonOpts }));
-      return;
-    }
-
-    if (this.viewMode === 'notation') {
-      guarded(this.container, 'notation', () =>
-        renderMnxToSvgNotation({ container: this.container, ...commonOpts }));
-      return;
-    }
-
-    // 'both': notation above tab, each renderer owning its own pane
-    // (renderSvg clears whatever container it's given).
     this.container.innerHTML = '';
-    const notationPane = document.createElement('div');
-    notationPane.className = 'both-view-pane';
-    const tabPane = document.createElement('div');
-    tabPane.className = 'both-view-pane';
-    this.container.append(notationPane, tabPane);
-    guarded(notationPane, 'notation', () =>
-      renderMnxToSvgNotation({ container: notationPane, ...commonOpts }));
-    guarded(tabPane, 'tab', () =>
-      renderMnxToSvgTab({ container: tabPane, ...commonOpts }));
+    if (this.viewMode === 'tab') {
+      const pane = this.appendPane(this.hasTab ? 'tab · _x.tab' : null);
+      guarded(pane, 'tab', () => renderMnxToSvgTab({ container: pane, ...commonOpts }));
+    } else if (this.viewMode === 'notation') {
+      const pane = this.appendPane(this.hasTab ? 'notation' : null);
+      guarded(pane, 'notation', () =>
+        renderMnxToSvgNotation({ container: pane, ...commonOpts })
+      );
+    } else {
+      const notationPane = this.appendPane('notation');
+      const gap = document.createElement('div');
+      gap.className = 'both-gap';
+      this.container.appendChild(gap);
+      const tabPane = this.appendPane('tab · _x.tab');
+      guarded(notationPane, 'notation', () =>
+        renderMnxToSvgNotation({ container: notationPane, ...commonOpts })
+      );
+      guarded(tabPane, 'tab', () => renderMnxToSvgTab({ container: tabPane, ...commonOpts }));
+    }
+
+    // Only update state when it changed, to avoid a render loop.
+    if (JSON.stringify(failures) !== JSON.stringify(this.renderErrors)) {
+      this.renderErrors = failures;
+    }
+  }
+
+  private appendPane(caption: string | null): HTMLElement {
+    if (caption) {
+      const cap = document.createElement('p');
+      cap.className = 'pane-cap';
+      cap.textContent = caption;
+      this.container.appendChild(cap);
+    }
+    const pane = document.createElement('div');
+    this.container.appendChild(pane);
+    return pane;
   }
 
   render() {
+    const paperWidth = `min(100%, ${Math.round(820 * this.zoom)}px)`;
+
     if (!this.mnxDoc) {
-      return html`<div class="no-doc">No score loaded</div>`;
+      return html`
+        <div class="paper" style="width: ${paperWidth}">
+          <div class="no-doc">No document loaded</div>
+        </div>
+      `;
     }
 
-    if (this.viewMode === 'json') {
-      const highlighted = syntaxHighlight(this.mnxDoc.mnxJson);
+    if (this.invalidByDesign) {
       return html`
-        <div id="json-wrapper">
-          <pre><code>${unsafeHTML(highlighted)}</code></pre>
+        <div class="paper" style="width: ${paperWidth}">
+          <div class="state-panel">
+            <h3><span class="sp-dia"></span>Invalid by design — a spec-gap exhibit</h3>
+            <p>
+              This document is deliberately rejected by the official MNX schema. The validation
+              errors below are pinned: if a schema bump makes this document start passing, the
+              corpus tests flag it as a spec-evolution signal. Rendering is skipped — the document
+              itself is the exhibit.
+            </p>
+            <div class="err-table">
+              ${this.pinnedErrors.map(
+                err => html`
+                  <button
+                    class="err-row"
+                    title="Click to locate the offending value in the document"
+                    @click=${() => this.emitError(err)}
+                  >
+                    <span class="er-rule"
+                      >${err.rule}${this.errorPointer != null && this.errorPointer === err.pointer
+                        ? ' · highlighted in document →'
+                        : ''}</span
+                    >
+                    <span class="er-msg">${err.msg}</span>
+                    ${err.path ? html`<span class="er-path">${err.path}</span>` : nothing}
+                  </button>
+                `
+              )}
+            </div>
+          </div>
         </div>
       `;
     }
 
     return html`
-      <div id="score-wrapper">
+      <div class="paper" style="width: ${paperWidth}">
+        ${this.renderErrors.length
+          ? html`
+              <div class="state-panel">
+                <h3><span class="sp-warn"></span>Validates, doesn’t render yet</h3>
+                <p>
+                  The document passes both verdicts, but the layout engine doesn’t support a
+                  feature it uses. That’s an honest gap, not an error — the uncovered def sits on
+                  the coverage backlog, and this scenario is its test fixture-in-waiting.
+                </p>
+                ${this.renderErrors.map(
+                  f => html`<code class="fail-code">layout (${f.pane}): ${f.message}</code>`
+                )}
+              </div>
+            `
+          : nothing}
         <div id="score-container"></div>
       </div>
     `;
   }
-}
 
-function syntaxHighlight(jsonObj: any): string {
-  const json = JSON.stringify(jsonObj, null, 2);
-  const escaped = json
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-  
-  return escaped.replace(
-    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
-    (match) => {
-      let cls = 'number';
-      if (/^"/.test(match)) {
-        if (/:$/.test(match)) {
-          cls = 'key';
-        } else {
-          cls = 'string';
-        }
-      } else if (/true|false/.test(match)) {
-        cls = 'boolean';
-      } else if (/null/.test(match)) {
-        cls = 'null';
-      }
-      return `<span class="json-${cls}">${match}</span>`;
-    }
-  );
+  private emitError(err: PinnedError) {
+    this.dispatchEvent(
+      new CustomEvent('error-row-selected', {
+        detail: { pointer: err.pointer },
+        bubbles: true,
+        composed: true
+      })
+    );
+  }
 }
 
 export default ScoreViewer;

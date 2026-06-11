@@ -1,26 +1,55 @@
-import { LitElement, html, css } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { LitElement, html, css, nothing } from 'lit';
+import { customElement, state, property, query } from 'lit/decorators.js';
 import { provide } from '@lit/context';
 import {
   mnxDocumentContext,
   playbackStateContext,
   selectionContext
 } from '../contexts/mnxContext.ts';
-import type {
-  PlaybackState,
-  SelectionContext
-} from '../contexts/mnxContext.ts';
-import { MnxDocument } from '../types/mnx.ts';
-import { DocumentController } from '../controllers/DocumentController.ts';
+import type { PlaybackState, SelectionContext } from '../contexts/mnxContext.ts';
+import { MnxDocument, MnxStructure } from '../types/mnx.ts';
 import { PlaybackController } from '../controllers/PlaybackController.ts';
-import './PlaybackBar.ts';
+import { ScenarioLibraryController } from '../controllers/ScenarioLibraryController.ts';
+import { corpus, corpusManifest, coverage, type ScenarioEntry } from '../library/corpus.ts';
+import { describeNote } from '../utils/jsonView.ts';
+import { resolvePinnedErrors, type PinnedError } from '../utils/pinnedErrors.ts';
+import { designTokens, sharedChrome } from '../styles/tokens.ts';
+import { brandMark } from './marks.ts';
+import type { ViewMode } from './ScoreToolbar.ts';
+import type { AssistDrawer } from './AssistDrawer.ts';
+import './LibraryRail.ts';
+import './CoverageDashboard.ts';
+import './ScenarioHeader.ts';
+import './ScoreToolbar.ts';
 import './ScoreViewer.ts';
-import './ChatPanel.ts';
-import './ScenarioGallery.ts';
+import './DocumentPane.ts';
+import './AssistDrawer.ts';
 
+type Theme = 'light' | 'dark' | 'auto';
+
+interface Sketch {
+  /** The corpus entry the sketch was forked from (never mutated). */
+  base: ScenarioEntry;
+  mnxJson: MnxStructure;
+}
+
+const EMPTY_SELECTION: SelectionContext = {
+  activePartId: null,
+  activeMeasureIndex: null,
+  activeVoiceIndex: null,
+  activeEventIndex: null,
+  selectedNoteIds: []
+};
+
+/**
+ * MNX Lab — "the reading room" (claude_design/…/DIRECTION.md). The scenario
+ * library is permanent navigation, the scenario page is the main surface,
+ * the coverage dashboard is the empty state, and editing/AI are demoted to
+ * the Assist drawer, which only ever operates on transient sketches.
+ */
 @customElement('mnx-editor-app')
 export class MnxEditorApp extends LitElement {
-  // Setup providers
+  // ── context providers (mirrored from controllers in willUpdate) ──
   @provide({ context: mnxDocumentContext })
   @state()
   documentState: MnxDocument | null = null;
@@ -29,7 +58,7 @@ export class MnxEditorApp extends LitElement {
   @state()
   playbackState: PlaybackState = {
     playing: false,
-    tempo: 120,
+    tempo: 96,
     volume: -10,
     playheadTime: 0,
     activeNoteIds: []
@@ -37,182 +66,336 @@ export class MnxEditorApp extends LitElement {
 
   @provide({ context: selectionContext })
   @state()
-  selectionState: SelectionContext = {
-    activePartId: null,
-    activeMeasureIndex: null,
-    activeVoiceIndex: null,
-    activeEventIndex: null,
-    selectedNoteIds: []
-  };
+  selectionState: SelectionContext = EMPTY_SELECTION;
 
-  @state()
-  viewMode: 'notation' | 'tab' | 'both' | 'json' = 'notation';
+  // ── public attribute API (embedders) ──
+  @property({ type: String, reflect: true }) theme: Theme = 'light';
 
-  // Library (scenario corpus) browsing. While a scenario is active the score
-  // viewer shows it as a TRANSIENT document — saved scores are untouched.
-  // Closing the library clears the scenario, so the chat panel (and its
-  // updateScore path) can never operate on corpus documents.
-  @state()
-  showLibrary = false;
+  // ── shell state ──
+  @state() private viewMode: ViewMode = 'notation';
+  @state() private showDocumentPane = true;
+  @state() private zoom = 1;
+  @state() private assistOpen = false;
+  @state() private railOpen = false;
+  @state() private sketch: Sketch | null = null;
+  @state() private pinnedErrors: PinnedError[] = [];
+  @state() private errorPointer: string | null = null;
 
-  @state()
-  activeScenario: { id: string; meta: any; mnxJson: any } | null = null;
-
-  // Instantiated controllers
-  private documentController = new DocumentController(this);
   private playbackController = new PlaybackController(this);
+  library = new ScenarioLibraryController(this);
 
-  static styles = css`
-    :host {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      width: 100vw;
-      background: var(--bg-app);
-      font-family: var(--font-family-sans);
-      color: var(--text-primary);
-    }
+  @query('.hdr-search input')
+  private headerSearch?: HTMLInputElement;
 
-    .toolbar {
-      height: 64px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border-bottom: 1px solid var(--border-color);
-      z-index: 10;
-    }
+  private keyHandler = (e: KeyboardEvent) => this.handleKeydown(e);
+  private mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  private mediaHandler = () => this.applyResolvedTheme();
 
-    .logo-section {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, var(--text-primary) 30%, var(--primary-glow));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+  static styles = [
+    designTokens,
+    sharedChrome,
+    css`
+      :host {
+        display: grid;
+        grid-template-rows: var(--header-h) 1fr var(--footer-h);
+        height: 100%;
+        background: var(--bg);
+      }
 
-    .logo-section wa-icon {
-      color: var(--primary-glow);
-      -webkit-text-fill-color: initial;
-    }
+      /* ── header ── */
+      .hdr {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 16px 0 14px;
+        border-bottom: 1px solid var(--line);
+        background: var(--bg);
+        min-width: 0;
+      }
 
-    .workspace {
-      flex: 1;
-      height: calc(100vh - 64px - 32px);
-    }
+      .hdr-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 30px;
+        padding: 0 11px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font-size: 12.5px;
+        color: var(--ink-2);
+        background: var(--surface);
+        white-space: nowrap;
+      }
 
-    wa-split-panel {
-      height: 100%;
-    }
+      .hdr-btn:hover {
+        background: var(--hover);
+        color: var(--ink);
+      }
 
-    .editor-pane {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      padding: 16px;
-      gap: 12px;
-      overflow: hidden;
-    }
+      .hdr-btn.on {
+        border-color: var(--accent-fg);
+        color: var(--accent-fg);
+      }
 
-    .editor-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+      .hdr-btn.icon {
+        width: 30px;
+        padding: 0;
+        justify-content: center;
+      }
 
-    .view-toggle-group {
-      display: flex;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 8px;
-      padding: 2px;
-      border: 1px solid var(--border-color);
-      gap: 4px;
-    }
+      .hdr-btn.burger {
+        display: none;
+      }
 
-    .score-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
+      .wordmark {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
 
-    .scenario-badges {
-      margin-left: 10px;
-      display: inline-flex;
-      gap: 6px;
-      vertical-align: middle;
-    }
+      .wordmark .mark line {
+        stroke: var(--ink);
+        stroke-width: 1.1;
+      }
 
-    .badge {
-      font-size: 0.66rem;
-      font-weight: 500;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border-color);
-      color: var(--text-muted);
-    }
+      .wordmark .mark ellipse {
+        fill: var(--accent-fg);
+      }
 
-    .badge.mono {
-      font-family: var(--font-family-mono);
-    }
+      .wordmark .wm-t {
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+      }
 
-    .badge.ok {
-      color: oklch(0.8 0.13 150);
-      border-color: oklch(0.5 0.1 150);
-    }
+      .wordmark .wm-t em {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 500;
+        color: var(--ink-2);
+        margin-left: 1px;
+      }
 
-    .badge.bad {
-      color: oklch(0.75 0.16 25);
-      border-color: oklch(0.5 0.13 25);
-    }
+      .env-chip {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--ink-3);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 2px 7px;
+        white-space: nowrap;
+      }
 
-    .status-bar {
-      height: 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 16px;
-      font-size: 0.76rem;
-      color: var(--text-muted);
-      background: oklch(0.12 0.02 256);
-      border-top: 1px solid var(--border-color);
-    }
+      .hdr-spacer {
+        flex: 1;
+      }
 
-    .status-group {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+      .metric-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--ink-2);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 4px 10px;
+        white-space: nowrap;
+      }
 
-    .status-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+      .metric-chip:hover {
+        background: var(--hover);
+      }
 
-    .status-item span.highlight {
-      color: var(--text-secondary);
-      font-family: var(--font-family-mono);
-    }
-  `;
+      .metric-chip .mdot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--st-rendered);
+      }
 
-  willUpdate() {
-    // Keep provider states synchronized with underlying controllers.
-    // An active library scenario overrides the saved document as a
-    // transient, never-persisted view.
-    this.documentState = this.activeScenario
-      ? {
-          id: `scenario:${this.activeScenario.id}`,
-          name: this.activeScenario.meta.title,
-          lastUpdated: 0,
-          mnxJson: this.activeScenario.mnxJson
+      .hdr-search {
+        position: relative;
+        width: 230px;
+      }
+
+      .hdr-search input {
+        width: 100%;
+        height: 30px;
+        padding: 0 28px 0 10px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--surface);
+        font-size: 12.5px;
+        outline: none;
+      }
+
+      .hdr-search input:focus {
+        border-color: var(--accent-fg);
+      }
+
+      .hdr-search kbd {
+        position: absolute;
+        right: 7px;
+        top: 6px;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--ink-3);
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        padding: 0 5px;
+        line-height: 16px;
+        background: var(--bg);
+      }
+
+      /* ── middle ── */
+      .mid {
+        display: grid;
+        grid-template-columns: var(--rail-w) 1fr;
+        min-height: 0;
+      }
+
+      .main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        min-height: 0;
+      }
+
+      .score-area {
+        flex: 1;
+        display: flex;
+        min-height: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      mnx-score-viewer {
+        flex: 1;
+        min-width: 0;
+      }
+
+      mnx-document-pane {
+        width: 400px;
+        flex-shrink: 0;
+      }
+
+      /* ── footer ── */
+      .ftr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 16px;
+        border-top: 1px solid var(--line);
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--ink-3);
+        background: var(--bg);
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .ftr .sel-info {
+        color: var(--ink-2);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .ftr .sel-info b {
+        color: var(--accent-fg);
+        font-weight: 500;
+      }
+
+      /* ── responsive ── */
+      @media (max-width: 1240px) {
+        mnx-document-pane {
+          width: 340px;
         }
-      : this.documentController.currentDocument;
+      }
+
+      @media (max-width: 980px) {
+        .mid {
+          grid-template-columns: 1fr;
+        }
+
+        mnx-library-rail {
+          position: fixed;
+          top: var(--header-h);
+          bottom: var(--footer-h);
+          left: 0;
+          width: var(--rail-w);
+          z-index: 25;
+          transform: translateX(-103%);
+          transition: transform 0.18s ease;
+          box-shadow: 8px 0 28px -10px oklch(0 0 0 / 0.25);
+        }
+
+        mnx-library-rail[open] {
+          transform: none;
+        }
+
+        .hdr-btn.burger {
+          display: flex;
+        }
+
+        .hdr-search {
+          width: 150px;
+        }
+
+        .env-chip,
+        .metric-chip {
+          display: none;
+        }
+
+        mnx-document-pane {
+          width: 300px;
+        }
+      }
+    `
+  ];
+
+  connectedCallback() {
+    super.connectedCallback();
+    const saved = localStorage.getItem('mnx-theme') as Theme | null;
+    if (saved === 'light' || saved === 'dark' || saved === 'auto') this.theme = saved;
+    this.applyResolvedTheme();
+    window.addEventListener('keydown', this.keyHandler);
+    this.mediaQuery.addEventListener('change', this.mediaHandler);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('keydown', this.keyHandler);
+    this.mediaQuery.removeEventListener('change', this.mediaHandler);
+  }
+
+  private applyResolvedTheme() {
+    const resolved =
+      this.theme === 'auto' ? (this.mediaQuery.matches ? 'dark' : 'light') : this.theme;
+    this.setAttribute('resolved-theme', resolved);
+  }
+
+  willUpdate(changed: Map<string, unknown>) {
+    if (changed.has('theme')) this.applyResolvedTheme();
+
+    // The viewed document: a sketch, else the selected scenario — transient
+    // either way; saved scores are untouched.
+    const active = this.library.active;
+    this.documentState = this.sketch
+      ? {
+          id: `sketch:${this.sketch.base.id}`,
+          name: `${this.sketch.base.meta.title} — sketch`,
+          lastUpdated: 0,
+          mnxJson: this.sketch.mnxJson
+        }
+      : active
+        ? {
+            id: `scenario:${active.entry.id}`,
+            name: active.entry.meta.title,
+            lastUpdated: 0,
+            mnxJson: active.mnxJson as MnxStructure
+          }
+        : null;
 
     this.playbackState = {
       playing: this.playbackController.isPlaying,
@@ -224,200 +407,309 @@ export class MnxEditorApp extends LitElement {
   }
 
   render() {
-    const isPlaying = this.playbackState.playing;
-    const selectedNoteText = this.selectionState.selectedNoteIds.length > 0 
-      ? `Selected: Note ID [${this.selectionState.selectedNoteIds[0]}] (Measure ${Number(this.selectionState.activeMeasureIndex) + 1})`
-      : 'No selection';
+    const active = this.library.active;
+    const entry = active?.entry ?? null;
+    const isSketch = this.sketch !== null;
+    const hasPage = isSketch || entry !== null;
+    const invalid = !isSketch && (entry?.invalidByDesign ?? false);
+    const hasTab = isSketch ? this.sketch!.base.hasTab : (entry?.hasTab ?? false);
+    const canRender =
+      isSketch ||
+      (!!entry && !invalid && (entry.meta.status === 'rendered' || entry.meta.status === 'verified'));
+    const rendered = corpus.filter(
+      e => e.meta.status === 'rendered' || e.meta.status === 'verified'
+    ).length;
 
     return html`
-      <!-- Header Toolbar -->
-      <header class="toolbar">
-        <div class="logo-section">
-          <wa-icon name="music-note-beamed"></wa-icon>
-          <span>MNX Notation Editor</span>
+      <header class="hdr">
+        <button
+          class="hdr-btn icon burger"
+          aria-label="Toggle library"
+          @click=${() => (this.railOpen = !this.railOpen)}
+        >
+          <svg width="13" height="11" viewBox="0 0 13 11">
+            <line x1="0" y1="1.5" x2="13" y2="1.5" stroke="currentColor" stroke-width="1.4"></line>
+            <line x1="0" y1="5.5" x2="13" y2="5.5" stroke="currentColor" stroke-width="1.4"></line>
+            <line x1="0" y1="9.5" x2="13" y2="9.5" stroke="currentColor" stroke-width="1.4"></line>
+          </svg>
+        </button>
+        <button class="wordmark" title="Coverage dashboard" @click=${this.goHome}>
+          ${brandMark(20)}
+          <span class="wm-t">MNX <em>Lab</em></span>
+        </button>
+        <span class="env-chip">MNX v${corpusManifest.mnxVersion} · _x.tab v${corpusManifest.tabVersion}</span>
+        <div class="hdr-spacer"></div>
+        <button class="metric-chip" title="Open the coverage dashboard" @click=${this.goHome}>
+          <span class="mdot"></span>
+          ${rendered}/${corpus.length} rendered
+          <span style="opacity: 0.45">·</span>
+          ${coverage.covered}/${coverage.total} defs
+        </button>
+        <div class="hdr-search">
+          <input
+            .value=${this.library.query}
+            placeholder="Filter scenarios…"
+            @input=${(e: Event) => this.library.setQuery((e.target as HTMLInputElement).value)}
+            @keydown=${(e: KeyboardEvent) => {
+              if (e.key === 'Escape') (e.target as HTMLInputElement).blur();
+            }}
+          />
+          <kbd>/</kbd>
         </div>
-
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <wa-dropdown @wa-select=${this.handleScoreSelect}>
-            <wa-button slot="trigger" caret size="small" variant="neutral">
-              ${this.documentController.isLoading ? 'Loading...' : (this.documentState?.name || 'Select Score')}
-            </wa-button>
-            <wa-dropdown-item value="new-score">New Score</wa-dropdown-item>
-            <wa-divider></wa-divider>
-            ${this.documentController.documentsList.map(
-              doc => html`
-                <wa-dropdown-item value=${doc.id}>${doc.name}</wa-dropdown-item>
-              `
-            )}
-          </wa-dropdown>
-          <wa-button
-            size="small"
-            variant=${this.showLibrary ? 'brand' : 'neutral'}
-            @click=${this.handleLibraryToggle}
-          >
-            <wa-icon name="collection" style="margin-right: 4px;"></wa-icon>
-            Library
-          </wa-button>
-        </div>
-
-        <mnx-playback-bar
-          @play-toggled=${this.handlePlayToggle}
-          @stop-requested=${this.handleStopRequest}
-          @tempo-changed=${this.handleTempoChange}
-          @volume-changed=${this.handleVolumeChange}
-        ></mnx-playback-bar>
+        <button
+          class="hdr-btn ${this.assistOpen ? 'on' : ''}"
+          title="AI editing — downstream; operates on sketches only"
+          @click=${() => (this.assistOpen = !this.assistOpen)}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12">
+            <circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.2"></circle>
+            <circle cx="6" cy="6" r="1.4" fill="currentColor"></circle>
+          </svg>
+          Assist
+        </button>
+        <button class="hdr-btn icon" title="Toggle theme" aria-label="Toggle theme" @click=${this.toggleTheme}>
+          <svg width="13" height="13" viewBox="0 0 14 14">
+            <circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.2"></circle>
+            <path d="M7 1.5 a5.5 5.5 0 0 0 0 11 z" fill="currentColor"></path>
+          </svg>
+        </button>
       </header>
 
-      <!-- Main Split Workspace -->
-      <main class="workspace">
-        <wa-split-panel position="35">
-          <div slot="start" style="height: 100%; overflow: hidden; display: flex; flex-direction: column;">
-            ${this.showLibrary
-              ? html`<mnx-scenario-gallery
-                  .selectedId=${this.activeScenario?.id ?? null}
-                  @scenario-selected=${this.handleScenarioSelected}
-                ></mnx-scenario-gallery>`
-              : html`<mnx-chat-panel
-                  @chat-command-submitted=${this.handleChatCommand}
-                ></mnx-chat-panel>`}
-          </div>
-          <div slot="end" class="editor-pane">
-            <div class="editor-header">
-              <span class="score-title">
-                ${this.documentState?.name || 'Blank Score'}
-                ${this.activeScenario
-                  ? html`<span class="scenario-badges">
-                      <span class="badge mono">${this.activeScenario.id}</span>
-                      <span class="badge ${this.activeScenario.meta.expect?.standard === 'valid' ? 'ok' : 'bad'}">
-                        MNX ${this.activeScenario.meta.expect?.standard}
-                      </span>
-                      ${this.activeScenario.meta.expect?.extension !== 'n/a'
-                        ? html`<span class="badge ${this.activeScenario.meta.expect?.extension === 'valid' ? 'ok' : 'bad'}">
-                            _x.tab ${this.activeScenario.meta.expect?.extension}
-                          </span>`
-                        : ''}
-                      <span class="badge">${this.activeScenario.meta.status}</span>
-                    </span>`
-                  : ''}
-              </span>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <wa-button
-                  circle
-                  size="small"
-                  variant="neutral"
-                  title="Copy score JSON"
-                  ?disabled=${!this.documentState}
-                  @click=${this.handleCopyScoreJson}
-                >
-                  <wa-icon name="clipboard"></wa-icon>
-                </wa-button>
-                <div class="view-toggle-group">
-                  <wa-button
-                    size="small"
-                    variant=${this.viewMode === 'notation' ? 'brand' : 'neutral'}
-                    @click=${() => this.viewMode = 'notation'}
-                  >Notation</wa-button>
-                  <wa-button
-                    size="small"
-                    variant=${this.viewMode === 'tab' ? 'brand' : 'neutral'}
-                    @click=${() => this.viewMode = 'tab'}
-                  >Tab</wa-button>
-                  <wa-button
-                    size="small"
-                    variant=${this.viewMode === 'both' ? 'brand' : 'neutral'}
-                    @click=${() => this.viewMode = 'both'}
-                  >Both</wa-button>
-                  <wa-button
-                    size="small"
-                    variant=${this.viewMode === 'json' ? 'brand' : 'neutral'}
-                    @click=${() => this.viewMode = 'json'}
-                  >JSON</wa-button>
+      <div class="mid">
+        <mnx-library-rail
+          .selectedId=${isSketch ? null : (entry?.id ?? null)}
+          .facet=${this.library.facet}
+          .status=${this.library.status}
+          .query=${this.library.query}
+          .idRefsOnly=${this.library.idRefsOnly}
+          ?open=${this.railOpen}
+          @scenario-selected=${this.handleScenarioSelected}
+          @dashboard-requested=${this.goHome}
+          @library-filter-changed=${this.handleFilterChanged}
+        ></mnx-library-rail>
+
+        ${hasPage
+          ? html`
+              <div class="main">
+                <mnx-scenario-header
+                  .entry=${isSketch ? this.sketch!.base : entry}
+                  .notes=${isSketch ? null : (active?.notes ?? null)}
+                  ?isSketch=${isSketch}
+                  @def-facet-requested=${this.handleDefFacet}
+                  @sketch-discarded=${this.discardSketch}
+                ></mnx-scenario-header>
+                <mnx-score-toolbar
+                  .view=${this.viewMode}
+                  ?hasTab=${hasTab}
+                  ?canRender=${canRender}
+                  .zoom=${this.zoom}
+                  ?playing=${this.playbackState.playing}
+                  .bpm=${this.playbackState.tempo}
+                  ?showJson=${this.showDocumentPane}
+                  @view-changed=${(e: CustomEvent) => (this.viewMode = e.detail.view)}
+                  @zoom-changed=${(e: CustomEvent) => (this.zoom = e.detail.zoom)}
+                  @play-toggled=${this.handlePlayToggle}
+                  @tempo-changed=${(e: CustomEvent) => this.playbackController.setTempo(e.detail.bpm)}
+                  @copy-json-requested=${this.handleCopyScoreJson}
+                  @json-toggled=${() => (this.showDocumentPane = !this.showDocumentPane)}
+                ></mnx-score-toolbar>
+                <div class="score-area">
+                  <mnx-score-viewer
+                    .viewMode=${this.viewMode}
+                    .zoom=${this.zoom}
+                    ?hasTab=${hasTab}
+                    ?invalidByDesign=${invalid}
+                    .pinnedErrors=${this.pinnedErrors}
+                    .errorPointer=${this.errorPointer}
+                    @note-selected=${this.handleNoteSelect}
+                    @error-row-selected=${this.handleErrorRow}
+                  ></mnx-score-viewer>
+                  ${this.showDocumentPane
+                    ? html`
+                        <mnx-document-pane
+                          .doc=${this.documentState?.mnxJson ?? null}
+                          .selectedKey=${this.selectionState.selectedNoteIds[0] ?? null}
+                          .errorPointer=${this.errorPointer}
+                          @document-line-selected=${this.handleDocumentLine}
+                          @document-pane-closed=${() => (this.showDocumentPane = false)}
+                        ></mnx-document-pane>
+                      `
+                    : nothing}
                 </div>
               </div>
-            </div>
-            <mnx-score-viewer
-              .viewMode=${this.viewMode}
-              @note-selected=${this.handleNoteSelect}
-            ></mnx-score-viewer>
-          </div>
-        </wa-split-panel>
-      </main>
+            `
+          : html`
+              <div class="main">
+                <mnx-coverage-dashboard
+                  @scenario-selected=${this.handleScenarioSelected}
+                ></mnx-coverage-dashboard>
+              </div>
+            `}
+      </div>
 
-      <!-- Footer Status Bar -->
-      <footer class="status-bar">
-        <div class="status-group">
-          <div class="status-item">
-            <span>DB Status:</span>
-            <span class="highlight">Synced</span>
-          </div>
-          <div class="status-item">
-            <span>Audio context:</span>
-            <span class="highlight">${isPlaying ? 'Active' : 'Ready'}</span>
-          </div>
-        </div>
-        <div class="status-group">
-          <span>${selectedNoteText}</span>
-        </div>
+      ${this.assistOpen
+        ? html`
+            <mnx-assist-drawer
+              .scenarioTitle=${isSketch
+                ? `${this.sketch!.base.meta.title} — sketch`
+                : (entry?.meta.title ?? null)}
+              ?canFork=${canRender && !isSketch}
+              ?isSketch=${isSketch}
+              @fork-requested=${this.handleFork}
+              @drawer-closed=${() => (this.assistOpen = false)}
+              @chat-command-submitted=${this.handleChatCommand}
+            ></mnx-assist-drawer>
+          `
+        : nothing}
+
+      <footer class="ftr">
+        <span>
+          MNX v${corpusManifest.mnxVersion} · _x.tab v${corpusManifest.tabVersion} ·
+          ${corpus.length} scenarios · spec/ synced ${corpusManifest.specSynced}
+        </span>
+        <span class="sel-info">${this.renderSelectionInfo(hasPage, canRender)}</span>
       </footer>
     `;
   }
 
+  private renderSelectionInfo(hasPage: boolean, canRender: boolean) {
+    const key = this.selectionState.selectedNoteIds[0];
+    if (hasPage && key && this.documentState) {
+      const desc = describeNote(this.documentState.mnxJson, key);
+      if (desc) {
+        return html`selected <b>${desc.label}</b> · measure ${desc.measure} · highlighted in document`;
+      }
+    }
+    if (hasPage && canRender) {
+      return 'click a notehead — or a note line in the JSON — to cross-locate it';
+    }
+    return 'no selection';
+  }
+
+  // ── navigation ──
+
+  private goHome = () => {
+    this.sketch = null;
+    this.errorPointer = null;
+    this.selectionState = EMPTY_SELECTION;
+    this.playbackController.stop();
+    this.library.select(null);
+  };
+
+  private async handleScenarioSelected(e: CustomEvent) {
+    const id: string = e.detail.id;
+    this.sketch = null;
+    this.errorPointer = null;
+    this.pinnedErrors = [];
+    this.selectionState = EMPTY_SELECTION;
+    this.railOpen = false;
+    this.playbackController.stop();
+    await this.library.select(id);
+    const entry = this.library.active?.entry;
+    if (!entry) return;
+    this.viewMode = entry.hasTab ? 'both' : 'notation';
+    if (entry.invalidByDesign) {
+      this.pinnedErrors = await resolvePinnedErrors(
+        this.library.active?.mnxJson,
+        entry.meta.expect.errors ?? []
+      );
+    }
+  }
+
+  private handleFilterChanged(e: CustomEvent) {
+    const d = e.detail;
+    if (d.status !== undefined) this.library.setStatus(d.status);
+    if (d.query !== undefined) this.library.setQuery(d.query);
+    if (d.idRefsOnly !== undefined) this.library.idRefsOnly = d.idRefsOnly;
+    if (d.facet !== undefined) this.library.setFacet(d.facet);
+    this.requestUpdate();
+  }
+
+  private handleDefFacet(e: CustomEvent) {
+    this.library.shelveByDef(e.detail.def);
+    this.railOpen = true;
+  }
+
+  // ── theming / keyboard ──
+
+  private toggleTheme = () => {
+    const resolved = this.getAttribute('resolved-theme');
+    this.theme = resolved === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('mnx-theme', this.theme);
+  };
+
+  private handleKeydown(e: KeyboardEvent) {
+    const target = e.composedPath()[0] as HTMLElement;
+    const tag = (target?.tagName ?? '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+    if (e.key === '/') {
+      e.preventDefault();
+      this.headerSearch?.focus();
+      return;
+    }
+    if (e.key === 'Escape') {
+      if (this.assistOpen) this.assistOpen = false;
+      else {
+        this.selectionState = EMPTY_SELECTION;
+        this.errorPointer = null;
+      }
+      return;
+    }
+    if (['ArrowDown', 'ArrowUp', 'j', 'k'].includes(e.key)) {
+      e.preventDefault();
+      const dir = e.key === 'ArrowDown' || e.key === 'j' ? 1 : -1;
+      const next = this.library.step(dir);
+      if (next) {
+        this.handleScenarioSelected(
+          new CustomEvent('scenario-selected', { detail: { id: next } })
+        );
+      }
+    }
+  }
+
+  // ── playback ──
+
   private handlePlayToggle() {
-    if (this.documentState) {
+    if (this.playbackController.isPlaying) {
+      this.playbackController.stop();
+    } else if (this.documentState) {
       this.playbackController.play(this.documentState.mnxJson);
     }
   }
 
-  private handleStopRequest() {
-    this.playbackController.stop();
-  }
+  // ── selection / cross-highlight ──
 
-  private handleTempoChange(e: CustomEvent) {
-    this.playbackController.setTempo(e.detail.bpm);
-  }
-
-  private handleVolumeChange(e: CustomEvent) {
-    this.playbackController.setVolume(e.detail.volume);
-  }
-
-  private handleLibraryToggle() {
-    this.showLibrary = !this.showLibrary;
-    if (!this.showLibrary) {
-      // Leaving the library returns to the saved document, so chat edits can
-      // never target a corpus scenario.
-      this.activeScenario = null;
-      this.playbackController.stop();
-    }
-  }
-
-  private handleScenarioSelected(e: CustomEvent) {
-    this.activeScenario = e.detail;
-    this.playbackController.stop();
-    this.selectionState = {
-      activePartId: null,
-      activeMeasureIndex: null,
-      activeVoiceIndex: null,
-      activeEventIndex: null,
-      selectedNoteIds: []
-    };
-  }
-
-  private handleScoreSelect(e: any) {
-    const value = e.detail.item.value;
-    this.activeScenario = null;
-    if (value === 'new-score') {
-      this.documentController.createNewScore('Untitled');
+  private handleNoteSelect(e: CustomEvent) {
+    const { noteId, measureIdx, noteIdx } = e.detail;
+    this.errorPointer = null;
+    if (this.selectionState.selectedNoteIds.includes(noteId)) {
+      this.selectionState = EMPTY_SELECTION;
     } else {
-      this.documentController.loadDocument(value);
+      this.selectionState = {
+        activePartId: this.documentState?.mnxJson?.parts?.[0]?.id ?? null,
+        activeMeasureIndex: measureIdx,
+        activeVoiceIndex: 0,
+        activeEventIndex: noteIdx,
+        selectedNoteIds: [noteId]
+      };
+      // The renderer-proving gesture costs one click: selecting a note opens
+      // the document beside it (DIRECTION.md §3).
+      this.showDocumentPane = true;
     }
-    this.playbackController.stop();
-    this.selectionState = {
-      activePartId: null,
-      activeMeasureIndex: null,
-      activeVoiceIndex: null,
-      activeEventIndex: null,
-      selectedNoteIds: []
-    };
+  }
+
+  private handleDocumentLine(e: CustomEvent) {
+    const key: string = e.detail.key;
+    this.errorPointer = null;
+    this.selectionState = this.selectionState.selectedNoteIds.includes(key)
+      ? EMPTY_SELECTION
+      : { ...EMPTY_SELECTION, selectedNoteIds: [key] };
+  }
+
+  private handleErrorRow(e: CustomEvent) {
+    this.errorPointer = e.detail.pointer;
+    this.selectionState = EMPTY_SELECTION;
+    this.showDocumentPane = true;
   }
 
   private async handleCopyScoreJson() {
@@ -425,48 +717,51 @@ export class MnxEditorApp extends LitElement {
     await navigator.clipboard.writeText(JSON.stringify(this.documentState.mnxJson, null, 2));
   }
 
-  private handleNoteSelect(e: CustomEvent) {
-    const { noteId, measureIdx, noteIdx } = e.detail;
-    
-    // Toggle note selection
-    if (this.selectionState.selectedNoteIds.includes(noteId)) {
-      this.selectionState = {
-        activePartId: null,
-        activeMeasureIndex: null,
-        activeVoiceIndex: null,
-        activeEventIndex: null,
-        selectedNoteIds: []
-      };
-    } else {
-      this.selectionState = {
-        activePartId: 'guitar-part',
-        activeMeasureIndex: measureIdx,
-        activeVoiceIndex: 0,
-        activeEventIndex: noteIdx,
-        selectedNoteIds: [noteId]
-      };
-    }
-    
-    this.requestUpdate();
+  // ── sketch / assist ──
+
+  private get drawer(): AssistDrawer | null {
+    return this.shadowRoot?.querySelector('mnx-assist-drawer') ?? null;
   }
+
+  private async handleFork() {
+    const active = this.library.active;
+    if (!active) return;
+    this.sketch = {
+      base: active.entry,
+      mnxJson: JSON.parse(JSON.stringify(active.mnxJson))
+    };
+    this.selectionState = EMPTY_SELECTION;
+    this.playbackController.stop();
+    await this.updateComplete;
+    this.drawer?.chatPanel?.appendMessage(
+      'assistant',
+      `Forked ${active.entry.id} into a transient sketch. The corpus scenario is untouched. ` +
+        'Tell me an edit — I modify the document, and notation, tab, and JSON all re-derive from it.'
+    );
+  }
+
+  private discardSketch = () => {
+    this.sketch = null;
+    this.playbackController.stop();
+    this.selectionState = EMPTY_SELECTION;
+  };
 
   private async handleChatCommand(e: CustomEvent) {
     const { prompt, model, attachedImages = [] } = e.detail;
-    if (!this.documentState) return;
+    // Chat only ever edits a sketch — the corpus invariant.
+    if (!this.sketch || !this.documentState) return;
 
-    const chatPanel = this.shadowRoot?.querySelector('mnx-chat-panel');
+    const chatPanel = this.drawer?.chatPanel as any;
     if (chatPanel) {
-      (chatPanel as any).isProcessing = true;
-      (chatPanel as any).tokensCount = 0;
-      (chatPanel as any).statusMessage = '';
+      chatPanel.isProcessing = true;
+      chatPanel.tokensCount = 0;
+      chatPanel.statusMessage = '';
     }
 
     try {
       const response = await fetch('/api/edit-notation', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userPrompt: prompt,
           mnxJson: this.documentState.mnxJson,
@@ -478,8 +773,8 @@ export class MnxEditorApp extends LitElement {
             selectedNoteIds: this.selectionState.selectedNoteIds,
             playerPlayheadTime: this.playbackController.playheadBeat
           },
-          model: model,
-          attachedImages: attachedImages
+          model,
+          attachedImages
         })
       });
 
@@ -513,23 +808,23 @@ export class MnxEditorApp extends LitElement {
               const chunk = JSON.parse(trimmed);
               if (chunk.type === 'progress') {
                 if (chatPanel) {
-                  (chatPanel as any).tokensCount = chunk.tokens;
+                  chatPanel.tokensCount = chunk.tokens;
                   if (chunk.status !== undefined) {
-                    (chatPanel as any).statusMessage = chunk.status;
+                    chatPanel.statusMessage = chunk.status;
                   }
                 }
               } else if (chunk.type === 'done') {
                 doneData = chunk;
               }
-            } catch (e) {
-              console.error('Failed to parse NDJSON line:', trimmed, e);
+            } catch (err) {
+              console.error('Failed to parse NDJSON line:', trimmed, err);
             }
           }
         }
       }
 
       if (chatPanel && doneData) {
-        (chatPanel as any).appendTranscript({
+        chatPanel.appendTranscript({
           timestamp: Date.now(),
           userPrompt: prompt,
           model,
@@ -549,23 +844,25 @@ export class MnxEditorApp extends LitElement {
       const noEdits = doneData?.explanation === 'Completed instruction (no edits made).';
 
       if (doneData && doneData.success && doneData.updatedMnxJson && !noEdits) {
-        await this.documentController.updateScore(doneData.updatedMnxJson);
+        // Apply to the sketch only; everything re-derives from the document.
+        if (this.sketch) {
+          this.sketch = { ...this.sketch, mnxJson: doneData.updatedMnxJson };
+        }
         if (chatPanel) {
           const parts: string[] = [];
           if (modelSaid) parts.push(modelSaid);
-          parts.push(doneData.explanation || 'Score updated.');
-          (chatPanel as any).appendMessage('assistant', parts.join('\n\n'));
+          parts.push(doneData.explanation || 'Sketch updated.');
+          chatPanel.appendMessage('assistant', parts.join('\n\n'));
         }
       } else if (doneData && doneData.success && noEdits) {
-        // Model went through cleanly but emitted no tool call — usually because it
-        // refused, spoke instead of tool-calling, or (with image input) the model
-        // wasn't actually multimodal. Surface whatever it said, fall back to a
-        // clearer label than the canned server message.
+        // Model went through cleanly but emitted no tool call — usually because
+        // it refused, spoke instead of tool-calling, or (with image input) the
+        // model wasn't actually multimodal.
         if (chatPanel) {
           const msg = modelSaid
-            ? `Model didn't edit the score. It said:\n\n${modelSaid}`
+            ? `Model didn't edit the sketch. It said:\n\n${modelSaid}`
             : 'Model returned no tool call and no text. This usually means the selected model declined to call the edit tool — try a different model, especially if you attached an image to a non-vision model.';
-          (chatPanel as any).appendMessage('assistant', msg);
+          chatPanel.appendMessage('assistant', msg);
         }
       } else {
         const errMsg = doneData?.error || 'Failed to modify notation.';
@@ -573,18 +870,19 @@ export class MnxEditorApp extends LitElement {
           const fullMsg = modelSaid
             ? `Error: ${errMsg}\n\nModel said:\n${modelSaid}`
             : 'Error: ' + errMsg;
-          (chatPanel as any).appendMessage('assistant', fullMsg);
+          chatPanel.appendMessage('assistant', fullMsg);
         }
       }
     } catch (err: any) {
       if (chatPanel) {
-        (chatPanel as any).appendMessage('assistant', 'Network Error: ' + err.message);
+        chatPanel.appendMessage('assistant', 'Network Error: ' + err.message);
       }
     } finally {
       if (chatPanel) {
-        (chatPanel as any).isProcessing = false;
+        chatPanel.isProcessing = false;
       }
     }
   }
 }
+
 export default MnxEditorApp;
