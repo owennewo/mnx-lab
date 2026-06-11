@@ -86,7 +86,8 @@
         "glyph": "noteheadBlack",
         "x": 9.81,
         "y": 9.5,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e0.n0"
       },
       {
         "kind": "line",
@@ -102,7 +103,8 @@
         "glyph": "noteheadBlack",
         "x": 12.51,
         "y": 9,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e1.n0"
       },
       {
         "kind": "line",
@@ -125,7 +127,8 @@
         "glyph": "noteheadBlack",
         "x": 15.21,
         "y": 9.5,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e2.n0"
       },
       {
         "kind": "line",
@@ -141,7 +144,8 @@
         "glyph": "noteheadBlack",
         "x": 18.81,
         "y": 8.5,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e3.n0"
       },
       {
         "kind": "line",
@@ -157,7 +161,8 @@
         "glyph": "noteheadBlack",
         "x": 21.51,
         "y": 8,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e4.n0"
       },
       {
         "kind": "line",
@@ -180,7 +185,8 @@
         "glyph": "noteheadBlack",
         "x": 24.21,
         "y": 8.5,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e5.n0"
       },
       {
         "kind": "line",
@@ -196,7 +202,8 @@
         "glyph": "noteheadBlack",
         "x": 27.81,
         "y": 7.5,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e6.n0"
       },
       {
         "kind": "line",
@@ -221,7 +228,8 @@
         "glyph": "noteheadBlack",
         "x": 30.51,
         "y": 7,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e7.n0"
       },
       {
         "kind": "line",
@@ -244,7 +252,8 @@
         "glyph": "noteheadBlack",
         "x": 33.21,
         "y": 7.5,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e8.n0"
       },
       {
         "kind": "line",
@@ -278,7 +287,8 @@
         "glyph": "noteheadBlack",
         "x": 36.81,
         "y": 6,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e9.n0"
       },
       {
         "kind": "line",

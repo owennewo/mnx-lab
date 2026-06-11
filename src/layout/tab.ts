@@ -1,6 +1,7 @@
 import { MnxStructure } from '../types/mnx.ts';
 import { resolveEventPositions } from '../tab/guitarPositions.ts';
 import { Primitive, LayoutResult, SpatialIndex } from '../primitives.ts';
+import { syntheticNoteKey } from '../utils/noteKeys.ts';
 
 /**
  * Pure layout function for guitar tab. Takes parsed MNX + viewport width
@@ -220,9 +221,11 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
           // drawn. (When tab pairs with a notation staff, rests live there.)
         } else if (event.notes && event.notes.length > 0) {
           const positions = resolveEventPositions(event.notes);
-          const noteIds = event.notes
-            .map(n => n.id)
-            .filter((id): id is string => !!id);
+          // Per-note selection keys: real ids, or synthesized positional keys
+          // for id-less documents (see src/utils/noteKeys.ts).
+          const noteIds = event.notes.map(
+            (n, idx) => n.id ?? syntheticNoteKey(i, voiceIndex, eventIndex, idx)
+          );
           const primaryNoteId = noteIds[0];
 
           const isActive = noteIds.some(id => activeNoteIds.includes(id));
@@ -231,7 +234,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
 
           for (let k = 0; k < positions.length; k++) {
             const pos = positions[k];
-            const noteId = event.notes[k]?.id ?? primaryNoteId;
+            const noteId = noteIds[k] ?? primaryNoteId;
             const stringY = staffTop + (pos.str - 1);
             const fretStr = String(pos.fret);
             const charWidthSp = FRET_FONT_SIZE_SP * 0.6 * Math.max(1, fretStr.length);

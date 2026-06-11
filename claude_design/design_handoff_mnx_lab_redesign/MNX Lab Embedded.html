@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"></meta>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+  <title>Embedding MNX Lab — host page mock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"></link>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"></link>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400;1,500&amp;display=swap" rel="stylesheet"></link>
+  <link rel="stylesheet" href="mnx-lab-redesign/tokens.css"></link>
+  <link rel="stylesheet" href="mnx-lab-redesign/embed.css"></link>
+  <style>
+    /* ───── HOST PAGE styles — deliberately NOT MNX Lab's design language.
+       Everything outside .mnx-embed is "someone else's docs site" (Georgia,
+       cool grays). In the real build the boundary is a shadow root; here it
+       mocks what an embedder sees: their styles, our component, no bleed. */
+    html { overflow-y: auto; }
+    body {
+      overflow: auto; height: auto;
+      background: #fcfcfd; color: #1f2430;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 16px; line-height: 1.65;
+      margin: 0;
+    }
+    .host-header {
+      border-bottom: 1px solid #e4e6ea; background: #fff;
+      padding: 14px 28px; display: flex; align-items: baseline; gap: 14px;
+      font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    }
+    .host-header .hh-logo { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+    .host-header .hh-crumb { font-size: 12.5px; color: #7a8194; }
+    article { max-width: 880px; margin: 0 auto; padding: 44px 28px 90px; }
+    article h1 {
+      font-family: -apple-system, 'Helvetica Neue', sans-serif;
+      font-size: 34px; letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 14px;
+    }
+    article h2 {
+      font-family: -apple-system, 'Helvetica Neue', sans-serif;
+      font-size: 21px; letter-spacing: -0.01em; margin: 56px 0 10px;
+    }
+    article p { margin: 0 0 14px; max-width: 72ch; }
+    article p.lede { font-size: 18.5px; color: #4a5163; }
+    article code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.86em; background: #f0f1f4; border-radius: 4px; padding: 1px 5px; }
+    pre.snippet {
+      background: #14161c; color: #d9dde6; border-radius: 10px;
+      padding: 18px 20px; overflow-x: auto;
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 13px; line-height: 1.6;
+      margin: 18px 0 26px;
+    }
+    pre.snippet .c { color: #6b7387; }
+    pre.snippet .t { color: #8ab4f8; }
+    pre.snippet .a { color: #b5cea8; }
+    .embed-row { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; margin: 22px 0 8px; }
+    .embed-col { min-width: 0; }
+    .figcap {
+      font-family: -apple-system, 'Helvetica Neue', sans-serif;
+      font-size: 12px; color: #7a8194; margin: 8px 2px 0;
+    }
+    .resizable {
+      resize: horizontal; overflow: auto;
+      min-width: 300px; max-width: 832px; width: 540px;
+      padding: 0 0 4px; border-right: 2px dashed #c9cdd6; border-radius: 2px;
+    }
+    .attr-table {
+      width: 100%; border-collapse: collapse; margin: 18px 0 8px;
+      font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 13.5px;
+    }
+    .attr-table th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #7a8194; border-bottom: 2px solid #e4e6ea; padding: 8px 10px; }
+    .attr-table td { border-bottom: 1px solid #edeef2; padding: 9px 10px; vertical-align: top; }
+    .attr-table td:first-child { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; white-space: nowrap; }
+    .attr-table td:nth-child(2) { color: #4a5163; }
+    .callout {
+      border: 1px solid #dfe2e8; border-left: 3px solid #5b6ee1; border-radius: 8px;
+      background: #f7f8fb; padding: 14px 18px; margin: 18px 0;
+      font-family: -apple-system, 'Helvetica Neue', sans-serif; font-size: 14px; color: #3a4154;
+    }
+    .host-footer { border-top: 1px solid #e4e6ea; padding: 22px 28px; font-family: -apple-system, sans-serif; font-size: 12.5px; color: #7a8194; }
+    a.hostlink { color: #4150c9; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="host-header">
+    <span class="hh-logo">fretwork.dev</span>
+    <span class="hh-crumb">guides / embedding notation</span>
+  </div>
+
+  <article>
+    <h1>Embedding the MNX Lab viewer</h1>
+    <p class="lede">
+      This page is a mock of <em>someone else's site</em> — a third-party docs page that drops
+      the MNX Lab component in with one script tag. Everything inside the rounded frames below
+      is the component; everything outside is the host's own (deliberately different) design.
+    </p>
+
+<pre class="snippet"><span class="c">&lt;!-- one script tag; no server, no framework, assets resolve relative to the component --&gt;</span>
+&lt;<span class="t">script</span> <span class="a">type</span>=<span class="a">"module"</span> <span class="a">src</span>=<span class="a">"https://unpkg.com/mnx-lab/dist/mnx-editor-app.js"</span>&gt;&lt;/<span class="t">script</span>&gt;
+
+&lt;<span class="t">mnx-editor-app</span> <span class="a">mode</span>=<span class="a">"viewer"</span> <span class="a">scenario</span>=<span class="a">"spec/accidentals"</span> <span class="a">json</span>&gt;&lt;/<span class="t">mnx-editor-app</span>&gt;</pre>
+
+    <h2>Viewer mode</h2>
+    <p>
+      <code>mode="viewer"</code> renders one document: score on paper, the view toggle when the
+      part declares <code>_x.tab</code>, and the document pane a click away. Note selection and
+      JSON cross-highlighting work exactly as in the full app.
+    </p>
+    <div data-embed='{"mode":"viewer","scenario":"spec/accidentals","json":false}'></div>
+    <p class="figcap">⌄ The component is sized by its container, not the viewport — drag the dashed right edge.</p>
+    <div class="resizable">
+      <div data-embed='{"mode":"viewer","scenario":"lab/tab-part/standard-tuning-both","view":"both"}'></div>
+    </div>
+    <p class="figcap">Below ~420px the chrome compacts: the id and version line drop, controls tighten, the brand reduces to the mark.</p>
+
+    <h2>Guitar: notation + tab inline in prose</h2>
+    <p>
+      The proving-ground case — a lesson page interleaving text with small live examples.
+      Chrome stays quiet so the music reads like a figure, with provenance one glance away.
+    </p>
+    <div class="embed-row">
+      <div class="embed-col" style="flex: 1 1 380px;">
+        <div data-embed='{"mode":"viewer","scenario":"lab/tab-positions/open-strings-chord","view":"tab","controls":false}'></div>
+        <p class="figcap">controls=false — a bare figure: all six open strings.</p>
+      </div>
+      <div class="embed-col" style="width: 330px;">
+        <div data-embed='{"mode":"viewer","scenario":"spec/rests","controls":false}'></div>
+        <p class="figcap">A 330px sidebar slot.</p>
+      </div>
+    </div>
+
+    <h2>Gallery mode</h2>
+    <p>
+      <code>mode="gallery"</code> embeds the whole library — rail, facets, score, document pane —
+      inside whatever box the host gives it. Same component, one attribute.
+    </p>
+    <div data-embed='{"mode":"gallery","height":620,"initial":"spec/accidentals"}'></div>
+
+    <h2>Theming</h2>
+    <p>
+      The component is themed entirely through CSS custom properties on the element —
+      the host never reaches inside. The score paper stays paper in both themes;
+      the document, not the chrome, is the constant.
+    </p>
+<pre class="snippet">mnx-editor-app { <span class="a">--mnx-accent</span>: #9C4F33; } <span class="c">/* or theme="dark" */</span></pre>
+    <div class="embed-row">
+      <div class="embed-col" style="flex: 1 1 360px;">
+        <div data-embed='{"mode":"viewer","scenario":"spec/dotted-notes","theme":"dark"}'></div>
+        <p class="figcap">theme="dark" — chrome inverts, paper doesn't.</p>
+      </div>
+      <div class="embed-col" style="flex: 1 1 360px;">
+        <div data-embed='{"mode":"viewer","scenario":"spec/beams","accent":"#9C4F33"}'></div>
+        <p class="figcap">--mnx-accent: oxide — selection, chips, and controls follow.</p>
+      </div>
+    </div>
+
+    <h2>Attribute reference</h2>
+    <table class="attr-table">
+      <thead>
+        <tr><th>attribute</th><th>what it does</th><th>values · default</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>mode</td><td>Whole library with rail and facets, or a single-document viewer.</td><td>gallery | viewer · gallery</td></tr>
+        <tr><td>scenario</td><td>Document to show (viewer) or preselect (gallery). Path-derived id, so gallery permalinks survive renumbering.</td><td>e.g. spec/accidentals</td></tr>
+        <tr><td>view</td><td>Which derivation of the part to draw. tab/both require an <code>_x.tab</code> part declaration.</td><td>notation | tab | both · notation</td></tr>
+        <tr><td>json</td><td>Open the document pane initially. Clicking a notehead opens it regardless.</td><td>boolean · false</td></tr>
+        <tr><td>controls</td><td>Show the view toggle and json button. Off = a bare figure.</td><td>boolean · true</td></tr>
+        <tr><td>theme</td><td>Chrome theme. Score paper is unaffected by design.</td><td>light | dark | auto · light</td></tr>
+        <tr><td>--mnx-accent, --mnx-paper, …</td><td>CSS custom properties on the element; the full token set is public API.</td><td>any CSS color</td></tr>
+        <tr><td>events</td><td>Composed <code>scenario-selected</code> and <code>note-selected</code> CustomEvents cross the shadow boundary for host integration.</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>Isolation, mocked.</strong> This host page sets Georgia on <code>body</code>, its own
+      link colors, and its own resets — none of it reaches the frames above, and nothing leaks out.
+      In the real build that boundary is a shadow root (principle P4): no global styles, fonts and
+      SMuFL metadata fetched relative to the component, read-only path needs no server.
+    </div>
+  </article>
+
+  <div class="host-footer">
+    fretwork.dev — a fictional host site. Component mock: <a class="hostlink" href="MNX Lab Redesign.html">MNX Lab redesign prototype</a>.
+  </div>
+
+  <script src="mnx-lab-redesign/data.js"></script>
+  <script type="text/babel" src="mnx-lab-redesign/engrave.jsx"></script>
+  <script type="text/babel" src="mnx-lab-redesign/sidebar.jsx"></script>
+  <script type="text/babel" src="mnx-lab-redesign/score-pane.jsx"></script>
+  <script type="text/babel" src="mnx-lab-redesign/embed.jsx"></script>
+</body>
+</html>

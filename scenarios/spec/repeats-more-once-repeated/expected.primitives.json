@@ -86,7 +86,8 @@
         "glyph": "noteheadWhole",
         "x": 23.31,
         "y": 9.5,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e0.n0"
       },
       {
         "kind": "line",

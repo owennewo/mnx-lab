@@ -95,21 +95,24 @@
         "glyph": "noteheadHalf",
         "x": 15.66,
         "y": 13,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e0.n0"
       },
       {
         "kind": "glyph",
         "glyph": "noteheadHalf",
         "x": 15.66,
         "y": 12,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e0.n1"
       },
       {
         "kind": "glyph",
         "glyph": "noteheadHalf",
         "x": 15.66,
         "y": 11,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.v0.e0.n2"
       },
       {
         "kind": "line",

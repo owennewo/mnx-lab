@@ -1,5 +1,18 @@
 // Import Web Awesome styles
 import '@awesome.me/webawesome/dist/styles/themes/default.css';
+
+// IBM Plex (bundled — no font CDN): Sans for UI, Mono for ids/JSON/numbers,
+// Serif for scenario titles and the dashboard headline (see DIRECTION.md).
+import '@fontsource/ibm-plex-sans/400.css';
+import '@fontsource/ibm-plex-sans/500.css';
+import '@fontsource/ibm-plex-sans/600.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource/ibm-plex-mono/600.css';
+import '@fontsource/ibm-plex-serif/400.css';
+import '@fontsource/ibm-plex-serif/500.css';
+import '@fontsource/ibm-plex-serif/500-italic.css';
+
 import './index.css';
 
 // Import Web Awesome custom elements

@@ -1,6 +1,7 @@
 import { MnxStructure, MnxEvent } from '../types/mnx.ts';
 import { Primitive, LayoutResult, SpatialIndex } from '../primitives.ts';
 import { glyphAnchor } from '../smufl/smufl.ts';
+import { syntheticNoteKey } from '../utils/noteKeys.ts';
 
 /**
  * Pure layout for standard 5-line notation. Working in staff spaces, returns
@@ -483,7 +484,12 @@ function emitEvent(args: EmitEventArgs): void {
 
   const notes = event.notes;
   const noteheadGlyph = NOTEHEAD_GLYPH_BY_BASE[base] ?? 'noteheadBlack';
-  const noteIds = notes.map(n => n.id).filter((id): id is string => !!id);
+  // Per-note selection keys: the note's id, or a synthesized positional key
+  // for id-less documents (see src/utils/noteKeys.ts) so selection and the
+  // note↔document cross-highlight work across the whole corpus.
+  const noteIds = notes.map(
+    (n, idx) => n.id ?? syntheticNoteKey(measureIndex, voiceIndex, eventIndex, idx)
+  );
   const primaryNoteId = noteIds[0];
 
   // Pitch → staff y for each chord member
@@ -541,7 +547,7 @@ function emitEvent(args: EmitEventArgs): void {
   });
 
   // Noteheads
-  notes.forEach((n, idx) => {
+  notes.forEach((_n, idx) => {
     const y = staffTop + staffYs[idx];
     primitives.push({
       kind: 'glyph',
@@ -550,7 +556,7 @@ function emitEvent(args: EmitEventArgs): void {
       y,
       fill,
       className: 'notehead' + colorClass,
-      sourceId: n.id ?? primaryNoteId
+      sourceId: noteIds[idx]
     });
   });
 
