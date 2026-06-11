@@ -69,6 +69,20 @@ export class MnxEditorApp extends LitElement {
   selectionState: SelectionContext = EMPTY_SELECTION;
 
   // ── public attribute API (embedders) ──
+  /** 'app' (default, full shell), 'viewer' (one-scenario card), 'gallery' (host-sized library box). */
+  @property({ type: String, reflect: true }) mode: 'app' | 'viewer' | 'gallery' = 'app';
+  /** Scenario id to open initially (required for mode="viewer"). */
+  @property({ type: String }) scenario: string | null = null;
+  /** Initial view mode override (notation | tab | both). */
+  @property({ type: String }) view: ViewMode | null = null;
+  /** Open the document (JSON) pane initially. */
+  @property({ type: Boolean }) json = false;
+  /** Show the view-mode controls row in mode="viewer" (controls="false" for a bare figure). */
+  @property({
+    attribute: 'controls',
+    converter: { fromAttribute: (v: string | null) => v !== 'false' }
+  })
+  showControls = true;
   @property({ type: String, reflect: true }) theme: Theme = 'light';
 
   // ── shell state ──
@@ -269,12 +283,12 @@ export class MnxEditorApp extends LitElement {
         border-top: 1px solid var(--line);
       }
 
-      mnx-score-viewer {
+      .score-area mnx-score-viewer {
         flex: 1;
         min-width: 0;
       }
 
-      mnx-document-pane {
+      .score-area mnx-document-pane {
         width: 400px;
         flex-shrink: 0;
       }
@@ -306,9 +320,9 @@ export class MnxEditorApp extends LitElement {
         font-weight: 500;
       }
 
-      /* ── responsive ── */
+      /* ── responsive (app mode only — embeds are container-driven) ── */
       @media (max-width: 1240px) {
-        mnx-document-pane {
+        .mid .score-area mnx-document-pane {
           width: 340px;
         }
       }
@@ -318,7 +332,7 @@ export class MnxEditorApp extends LitElement {
           grid-template-columns: 1fr;
         }
 
-        mnx-library-rail {
+        .mid mnx-library-rail {
           position: fixed;
           top: var(--header-h);
           bottom: var(--footer-h);
@@ -330,7 +344,7 @@ export class MnxEditorApp extends LitElement {
           box-shadow: 8px 0 28px -10px oklch(0 0 0 / 0.25);
         }
 
-        mnx-library-rail[open] {
+        .mid mnx-library-rail[open] {
           transform: none;
         }
 
@@ -347,8 +361,203 @@ export class MnxEditorApp extends LitElement {
           display: none;
         }
 
-        mnx-document-pane {
+        .mid .score-area mnx-document-pane {
           width: 300px;
+        }
+      }
+
+      /* ── embeds (mode="viewer" / mode="gallery") ── */
+      :host([mode='viewer']) {
+        display: block;
+        height: auto;
+        background: none;
+      }
+
+      :host([mode='gallery']) {
+        display: block;
+        height: 100%;
+        background: none;
+      }
+
+      .mnx-embed {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg);
+        color: var(--ink);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow:
+          0 1px 2px oklch(0 0 0 / 0.04),
+          0 8px 28px -14px oklch(0.3 0.02 80 / 0.25);
+        text-align: left;
+      }
+
+      .mnx-embed.viewer {
+        container: mnx-embed / inline-size;
+      }
+
+      .mnx-embed.pad {
+        padding: 12px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--ink-3);
+      }
+
+      .mnx-embed.gallery {
+        height: 100%;
+        min-height: 0;
+      }
+
+      .emb-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--line);
+        min-width: 0;
+      }
+
+      .emb-title {
+        font-weight: 600;
+        font-size: 12.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .emb-id {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--ink-3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .emb-brand {
+        margin-left: auto;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        color: var(--ink-3);
+        white-space: nowrap;
+        text-decoration: none;
+      }
+
+      .emb-brand:hover {
+        color: var(--accent-fg);
+        text-decoration: none;
+      }
+
+      .emb-brand .mark line {
+        stroke: currentColor;
+        stroke-width: 1.1;
+      }
+
+      .emb-brand .mark ellipse {
+        fill: var(--accent-fg);
+      }
+
+      .emb-brand.brand-main {
+        margin-left: 0;
+        font-size: 11px;
+        color: var(--ink);
+      }
+
+      .emb-counts {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--ink-3);
+        white-space: nowrap;
+      }
+
+      .emb-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px 0;
+      }
+
+      .emb-spacer {
+        flex: 1;
+      }
+
+      .mnx-embed .seg.mini button {
+        padding: 2.5px 10px;
+        font-size: 11.5px;
+      }
+
+      .mnx-embed .tb-btn {
+        height: 25px;
+        font-size: 11px;
+      }
+
+      .emb-foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 6px 12px;
+        border-top: 1px solid var(--line);
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--ink-3);
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .emb-foot a {
+        color: var(--accent-fg);
+        white-space: nowrap;
+      }
+
+      .mnx-embed.viewer mnx-score-viewer {
+        height: auto;
+        overflow: visible;
+      }
+
+      .mnx-embed.viewer mnx-document-pane {
+        width: auto;
+        border-left: none;
+        border-top: 1px solid var(--line);
+        max-height: 232px;
+        flex: none;
+      }
+
+      .emb-mid {
+        display: grid;
+        grid-template-columns: 252px 1fr;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .mnx-embed.gallery .score-area mnx-document-pane {
+        width: 280px;
+      }
+
+      /* compact chrome — pure CSS, container-driven (no JS measurement) */
+      @container mnx-embed (max-width: 419px) {
+        .emb-id,
+        .emb-brand-t,
+        .emb-foot .emb-ver {
+          display: none;
+        }
+
+        .emb-controls {
+          padding: 8px 8px 0;
+        }
+
+        .mnx-embed .seg.mini button {
+          padding: 2px 7px;
+          font-size: 10.5px;
+        }
+
+        .mnx-embed mnx-score-viewer {
+          padding: 8px;
         }
       }
     `
@@ -356,10 +565,16 @@ export class MnxEditorApp extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    const saved = localStorage.getItem('mnx-theme') as Theme | null;
-    if (saved === 'light' || saved === 'dark' || saved === 'auto') this.theme = saved;
+    if (this.mode === 'app') {
+      // Embeds are themed by the host via the theme attribute; only the full
+      // app persists a preference. Global keyboard capture is app-only too.
+      const saved = localStorage.getItem('mnx-theme') as Theme | null;
+      if (saved === 'light' || saved === 'dark' || saved === 'auto') this.theme = saved;
+      window.addEventListener('keydown', this.keyHandler);
+    } else {
+      this.showDocumentPane = this.json;
+    }
     this.applyResolvedTheme();
-    window.addEventListener('keydown', this.keyHandler);
     this.mediaQuery.addEventListener('change', this.mediaHandler);
   }
 
@@ -367,6 +582,12 @@ export class MnxEditorApp extends LitElement {
     super.disconnectedCallback();
     window.removeEventListener('keydown', this.keyHandler);
     this.mediaQuery.removeEventListener('change', this.mediaHandler);
+  }
+
+  firstUpdated() {
+    if (this.scenario) {
+      this.openScenario(this.scenario, this.view);
+    }
   }
 
   private applyResolvedTheme() {
@@ -406,16 +627,35 @@ export class MnxEditorApp extends LitElement {
     };
   }
 
-  render() {
+  /** Derived display context for the open scenario or sketch. */
+  private get pageCtx() {
     const active = this.library.active;
     const entry = active?.entry ?? null;
     const isSketch = this.sketch !== null;
-    const hasPage = isSketch || entry !== null;
     const invalid = !isSketch && (entry?.invalidByDesign ?? false);
-    const hasTab = isSketch ? this.sketch!.base.hasTab : (entry?.hasTab ?? false);
-    const canRender =
-      isSketch ||
-      (!!entry && !invalid && (entry.meta.status === 'rendered' || entry.meta.status === 'verified'));
+    return {
+      active,
+      entry,
+      isSketch,
+      hasPage: isSketch || entry !== null,
+      invalid,
+      hasTab: isSketch ? this.sketch!.base.hasTab : (entry?.hasTab ?? false),
+      canRender:
+        isSketch ||
+        (!!entry &&
+          !invalid &&
+          (entry.meta.status === 'rendered' || entry.meta.status === 'verified'))
+    };
+  }
+
+  render() {
+    if (this.mode === 'viewer') return this.renderViewerEmbed();
+    if (this.mode === 'gallery') return this.renderGalleryEmbed();
+    return this.renderApp();
+  }
+
+  private renderApp() {
+    const { entry, isSketch, hasPage, canRender } = this.pageCtx;
     const rendered = corpus.filter(
       e => e.meta.status === 'rendered' || e.meta.status === 'verified'
     ).length;
@@ -489,55 +729,7 @@ export class MnxEditorApp extends LitElement {
         ></mnx-library-rail>
 
         ${hasPage
-          ? html`
-              <div class="main">
-                <mnx-scenario-header
-                  .entry=${isSketch ? this.sketch!.base : entry}
-                  .notes=${isSketch ? null : (active?.notes ?? null)}
-                  ?isSketch=${isSketch}
-                  @def-facet-requested=${this.handleDefFacet}
-                  @sketch-discarded=${this.discardSketch}
-                ></mnx-scenario-header>
-                <mnx-score-toolbar
-                  .view=${this.viewMode}
-                  ?hasTab=${hasTab}
-                  ?canRender=${canRender}
-                  .zoom=${this.zoom}
-                  ?playing=${this.playbackState.playing}
-                  .bpm=${this.playbackState.tempo}
-                  ?showJson=${this.showDocumentPane}
-                  @view-changed=${(e: CustomEvent) => (this.viewMode = e.detail.view)}
-                  @zoom-changed=${(e: CustomEvent) => (this.zoom = e.detail.zoom)}
-                  @play-toggled=${this.handlePlayToggle}
-                  @tempo-changed=${(e: CustomEvent) => this.playbackController.setTempo(e.detail.bpm)}
-                  @copy-json-requested=${this.handleCopyScoreJson}
-                  @json-toggled=${() => (this.showDocumentPane = !this.showDocumentPane)}
-                ></mnx-score-toolbar>
-                <div class="score-area">
-                  <mnx-score-viewer
-                    .viewMode=${this.viewMode}
-                    .zoom=${this.zoom}
-                    ?hasTab=${hasTab}
-                    ?invalidByDesign=${invalid}
-                    .pinnedErrors=${this.pinnedErrors}
-                    .errorPointer=${this.errorPointer}
-                    @note-selected=${this.handleNoteSelect}
-                    @error-row-selected=${this.handleErrorRow}
-                  ></mnx-score-viewer>
-                  ${this.showDocumentPane
-                    ? html`
-                        <mnx-document-pane
-                          .doc=${this.documentState?.mnxJson ?? null}
-                          .selectedKey=${this.selectionState.selectedNoteIds[0] ?? null}
-                          .errorPointer=${this.errorPointer}
-                          @document-line-selected=${this.handleDocumentLine}
-                          @document-pane-closed=${() => (this.showDocumentPane = false)}
-                        ></mnx-document-pane>
-                      `
-                    : nothing}
-                </div>
-              </div>
-            `
+          ? html`<div class="main">${this.renderScenarioPage(false)}</div>`
           : html`
               <div class="main">
                 <mnx-coverage-dashboard
@@ -572,6 +764,186 @@ export class MnxEditorApp extends LitElement {
     `;
   }
 
+  /** The scenario page (header + toolbar + score area), shared by app and gallery embed. */
+  private renderScenarioPage(compact: boolean) {
+    const { active, entry, isSketch, invalid, hasTab, canRender } = this.pageCtx;
+    return html`
+      <mnx-scenario-header
+        .entry=${isSketch ? this.sketch!.base : entry}
+        .notes=${isSketch ? null : (active?.notes ?? null)}
+        ?isSketch=${isSketch}
+        ?compact=${compact}
+        @def-facet-requested=${this.handleDefFacet}
+        @sketch-discarded=${this.discardSketch}
+      ></mnx-scenario-header>
+      <mnx-score-toolbar
+        .view=${this.viewMode}
+        ?hasTab=${hasTab}
+        ?canRender=${canRender}
+        .zoom=${this.zoom}
+        ?playing=${this.playbackState.playing}
+        .bpm=${this.playbackState.tempo}
+        ?showJson=${this.showDocumentPane}
+        @view-changed=${(e: CustomEvent) => (this.viewMode = e.detail.view)}
+        @zoom-changed=${(e: CustomEvent) => (this.zoom = e.detail.zoom)}
+        @play-toggled=${this.handlePlayToggle}
+        @tempo-changed=${(e: CustomEvent) => this.playbackController.setTempo(e.detail.bpm)}
+        @copy-json-requested=${this.handleCopyScoreJson}
+        @json-toggled=${() => (this.showDocumentPane = !this.showDocumentPane)}
+      ></mnx-score-toolbar>
+      <div class="score-area">
+        <mnx-score-viewer
+          .viewMode=${this.viewMode}
+          .zoom=${this.zoom}
+          ?hasTab=${hasTab}
+          ?invalidByDesign=${invalid}
+          ?compact=${compact}
+          .pinnedErrors=${this.pinnedErrors}
+          .errorPointer=${this.errorPointer}
+          @note-selected=${this.handleNoteSelect}
+          @error-row-selected=${this.handleErrorRow}
+        ></mnx-score-viewer>
+        ${this.showDocumentPane ? this.renderDocumentPane() : nothing}
+      </div>
+    `;
+  }
+
+  private renderDocumentPane() {
+    return html`
+      <mnx-document-pane
+        .doc=${this.documentState?.mnxJson ?? null}
+        .selectedKey=${this.selectionState.selectedNoteIds[0] ?? null}
+        .errorPointer=${this.errorPointer}
+        @document-line-selected=${this.handleDocumentLine}
+        @document-pane-closed=${() => (this.showDocumentPane = false)}
+      ></mnx-document-pane>
+    `;
+  }
+
+  /** mode="viewer": one scenario in an embeddable card (compact via container query). */
+  private renderViewerEmbed() {
+    const { entry, hasTab, invalid, canRender } = this.pageCtx;
+    if (!entry) {
+      return html`<div class="mnx-embed viewer pad">unknown scenario: ${this.scenario ?? '(none)'}</div>`;
+    }
+    return html`
+      <div class="mnx-embed viewer">
+        <div class="emb-bar">
+          ${invalid
+            ? html`<span class="gapdia"></span>`
+            : html`<span class="pip" data-st=${entry.meta.status}></span>`}
+          <span class="emb-title">${entry.meta.title}</span>
+          <span class="emb-id">${entry.id}</span>
+          <a class="emb-brand" href="/" target="_blank" rel="noopener" title="Rendered by MNX Lab">
+            ${brandMark(14)}<span class="emb-brand-t">MNX Lab</span>
+          </a>
+        </div>
+        ${this.showControls
+          ? html`
+              <div class="emb-controls">
+                <div class="seg mini" role="group" aria-label="View mode">
+                  <button
+                    class=${this.viewMode === 'notation' ? 'on' : ''}
+                    ?disabled=${!canRender}
+                    @click=${() => (this.viewMode = 'notation')}
+                  >
+                    Notation
+                  </button>
+                  <button
+                    class=${this.viewMode === 'tab' ? 'on' : ''}
+                    ?disabled=${!hasTab || !canRender}
+                    @click=${() => (this.viewMode = 'tab')}
+                  >
+                    Tab
+                  </button>
+                  <button
+                    class=${this.viewMode === 'both' ? 'on' : ''}
+                    ?disabled=${!hasTab || !canRender}
+                    @click=${() => (this.viewMode = 'both')}
+                  >
+                    Both
+                  </button>
+                </div>
+                <span class="emb-spacer"></span>
+                <button
+                  class="tb-btn ${this.showDocumentPane ? 'on' : ''}"
+                  @click=${() => (this.showDocumentPane = !this.showDocumentPane)}
+                >
+                  json
+                </button>
+              </div>
+            `
+          : nothing}
+        <mnx-score-viewer
+          .viewMode=${this.viewMode}
+          .zoom=${1}
+          ?hasTab=${hasTab}
+          ?invalidByDesign=${invalid}
+          compact
+          .pinnedErrors=${this.pinnedErrors}
+          .errorPointer=${this.errorPointer}
+          @note-selected=${this.handleNoteSelect}
+          @error-row-selected=${this.handleErrorRow}
+        ></mnx-score-viewer>
+        ${this.showDocumentPane ? this.renderDocumentPane() : nothing}
+        <div class="emb-foot">
+          <span class="emb-ver">
+            MNX v${corpusManifest.mnxVersion}${entry.hasTab
+              ? ` · _x.tab v${corpusManifest.tabVersion}`
+              : ''}
+          </span>
+          <a href="/" target="_blank" rel="noopener">open in MNX Lab ↗</a>
+        </div>
+      </div>
+    `;
+  }
+
+  /** mode="gallery": the full library in a host-sized box. */
+  private renderGalleryEmbed() {
+    const { entry, isSketch, hasPage } = this.pageCtx;
+    const rendered = corpus.filter(
+      e => e.meta.status === 'rendered' || e.meta.status === 'verified'
+    ).length;
+    return html`
+      <div class="mnx-embed gallery">
+        <div class="emb-bar">
+          <a class="emb-brand brand-main" href="/" target="_blank" rel="noopener">
+            ${brandMark(14)}MNX Lab
+          </a>
+          <span class="emb-counts">
+            ${corpus.length} scenarios · ${rendered} rendered · ${coverage.covered}/${coverage.total}
+            defs
+          </span>
+          <span class="emb-spacer"></span>
+          <span class="emb-id">MNX v${corpusManifest.mnxVersion} · _x.tab v${corpusManifest.tabVersion}</span>
+        </div>
+        <div class="emb-mid">
+          <mnx-library-rail
+            compact
+            .selectedId=${isSketch ? null : (entry?.id ?? null)}
+            .facet=${this.library.facet}
+            .status=${this.library.status}
+            .query=${this.library.query}
+            .idRefsOnly=${this.library.idRefsOnly}
+            open
+            @scenario-selected=${this.handleScenarioSelected}
+            @dashboard-requested=${this.goHome}
+            @library-filter-changed=${this.handleFilterChanged}
+          ></mnx-library-rail>
+          ${hasPage
+            ? html`<div class="main">${this.renderScenarioPage(true)}</div>`
+            : html`
+                <div class="main">
+                  <mnx-coverage-dashboard
+                    @scenario-selected=${this.handleScenarioSelected}
+                  ></mnx-coverage-dashboard>
+                </div>
+              `}
+        </div>
+      </div>
+    `;
+  }
+
   private renderSelectionInfo(hasPage: boolean, canRender: boolean) {
     const key = this.selectionState.selectedNoteIds[0];
     if (hasPage && key && this.documentState) {
@@ -596,8 +968,11 @@ export class MnxEditorApp extends LitElement {
     this.library.select(null);
   };
 
-  private async handleScenarioSelected(e: CustomEvent) {
-    const id: string = e.detail.id;
+  private handleScenarioSelected(e: CustomEvent) {
+    this.openScenario(e.detail.id);
+  }
+
+  private async openScenario(id: string, initialView: ViewMode | null = null) {
     this.sketch = null;
     this.errorPointer = null;
     this.pinnedErrors = [];
@@ -607,7 +982,7 @@ export class MnxEditorApp extends LitElement {
     await this.library.select(id);
     const entry = this.library.active?.entry;
     if (!entry) return;
-    this.viewMode = entry.hasTab ? 'both' : 'notation';
+    this.viewMode = initialView ?? (entry.hasTab ? 'both' : 'notation');
     if (entry.invalidByDesign) {
       this.pinnedErrors = await resolvePinnedErrors(
         this.library.active?.mnxJson,

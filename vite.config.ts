@@ -12,6 +12,20 @@ export default defineConfig({
     target: 'es2022',
     sourcemap: true
   },
+  environments: {
+    // Scoped to the client build only — the Worker has its own entry.
+    client: {
+      build: {
+        rollupOptions: {
+          input: {
+            main: 'index.html',
+            // The embeddability demo (a mock third-party host page).
+            embed: 'embed.html'
+          }
+        }
+      }
+    }
+  },
   server: {
     port: 5173,
     host: true

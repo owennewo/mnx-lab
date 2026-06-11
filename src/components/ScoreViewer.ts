@@ -10,6 +10,7 @@ import type { PlaybackState, SelectionContext } from '../contexts/mnxContext.ts'
 import { MnxDocument } from '../types/mnx.ts';
 import { renderMnxToSvgTab } from '../tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../notation/notationRenderer.ts';
+import { isSmuflLoaded, loadSmufl } from '../smufl/smufl.ts';
 import type { PinnedError } from '../utils/pinnedErrors.ts';
 import type { ViewMode } from './ScoreToolbar.ts';
 import { sharedChrome, scrollbars } from '../styles/tokens.ts';
@@ -97,6 +98,13 @@ export class ScoreViewer extends LitElement {
 
       .both-gap {
         height: 26px;
+      }
+
+      /* Compact embed chrome (the container lives on the host card). */
+      @container mnx-embed (max-width: 419px) {
+        .pane-cap {
+          display: none;
+        }
       }
 
       #score-container svg {
@@ -269,6 +277,13 @@ export class ScoreViewer extends LitElement {
 
   renderScore() {
     if (!this.container || !this.mnxDoc || this.invalidByDesign) return;
+
+    // Embeds can reach here before the SMuFL metadata fetch resolves (the
+    // full app usually renders after a user gesture). Defer one round trip.
+    if (!isSmuflLoaded()) {
+      loadSmufl().then(() => this.renderScore());
+      return;
+    }
 
     const width = this.container.getBoundingClientRect().width || 600;
     const failures: { pane: string; message: string }[] = [];
