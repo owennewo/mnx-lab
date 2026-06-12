@@ -1,4 +1,4 @@
-import { MnxStructure } from '../types/mnx.ts';
+import { MnxStructure, isTimedEvent } from '../types/mnx.ts';
 
 export interface PlayableAudioEvent {
   beatTime: number; // offset in beats from start
@@ -12,8 +12,8 @@ const BASE_BEATS: Record<string, number> = {
   'half': 2,
   'quarter': 1,
   'eighth': 0.5,
-  'sixteenth': 0.25,
-  'thirty-second': 0.125
+  '16th': 0.25,
+  '32nd': 0.125
 };
 
 export function mnxToAudioEvents(mnx: MnxStructure): PlayableAudioEvent[] {
@@ -38,6 +38,9 @@ export function mnxToAudioEvents(mnx: MnxStructure): PlayableAudioEvent[] {
         let currentBeat = voiceBeatPositions[seqIdx];
 
         for (const ev of sequence.content) {
+          // Grace containers are un-timed and unknown item kinds (tuplet,
+          // tremolo, …) aren't modelled; playback skips both for now.
+          if (!isTimedEvent(ev)) continue;
           const base = ev.duration.base;
           let durationBeats = BASE_BEATS[base] || 1;
           

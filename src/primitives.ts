@@ -29,6 +29,8 @@ export interface PrimitiveBase {
   className?: string;
   /** MNX id of the source element, surfaced as `data-source-id` on the DOM node. */
   sourceId?: string;
+  /** Plain-text tooltip, emitted as an SVG `<title>` child (native hover). */
+  title?: string;
 }
 
 export interface GlyphPrim extends PrimitiveBase {
@@ -62,6 +64,12 @@ export interface CurvePrim extends PrimitiveBase {
   /** Cubic Bezier control points: [P0, P1, P2, P3]. */
   points: [Point, Point, Point, Point];
   thickness: number;
+  /**
+   * Slur/tie engraving: drawn as a filled body that is `thickness` wide at
+   * mid-curve and thins toward the endpoints (no SMuFL glyph exists for
+   * arbitrary-length curves). Without it, a constant-width stroke.
+   */
+  taper?: boolean;
   stroke?: string;
 }
 
@@ -108,11 +116,32 @@ export interface SourceLocation {
 }
 
 /** Output of every layout module. */
+/**
+ * `validation` — the document is musically wrong in a way the user can and
+ * should fix (e.g. bar duration arithmetic). `render` — content this renderer
+ * doesn't support yet, or an error it swallowed (forgiving render).
+ */
+export type DiagnosticKind = 'validation' | 'render';
+
+/** One per-measure problem, also drawn into the score as a warning marker. */
+export interface LayoutDiagnostic {
+  measureIndex: number;
+  message: string;
+  kind: DiagnosticKind;
+}
+
 export interface LayoutResult {
   primitives: Primitive[];
   /** Total layout width in staff spaces. */
   widthSp: number;
   /** Total layout height in staff spaces. */
   heightSp: number;
+  /**
+   * Width actually occupied by content (widest system + margins), ≤ widthSp.
+   * Lets the renderer scale short scores up to fill the viewport.
+   */
+  usedWidthSp: number;
   index: SpatialIndex;
+  /** Non-fatal problems encountered while laying out (forgiving render). */
+  diagnostics: LayoutDiagnostic[];
 }

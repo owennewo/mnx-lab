@@ -1,6 +1,6 @@
 {
   "title": "Tremolos (single-note)",
-  "description": "Single-note tremolos live on an event. They&#x27;re encoded in the event&#x27;s \"markings\" object. Each tremolo must encode the number of visible marks — 1, 2 and 3 in this example.",
+  "description": "Single-note tremolos live on an event. They're encoded in the event's \"markings\" object. Each tremolo must encode the number of visible marks — 1, 2 and 3 in this example.",
   "tags": [
     "spec-example"
   ],
@@ -39,5 +39,5 @@
   },
   "requires": [],
   "source": "spec-example",
-  "status": "rendered"
+  "status": "verified"
 }

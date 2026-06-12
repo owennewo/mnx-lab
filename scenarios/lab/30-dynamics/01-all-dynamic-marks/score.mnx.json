@@ -1,0 +1,712 @@
+{
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      },
+      {},
+      {},
+      {},
+      {},
+      {},
+      {}
+    ]
+  },
+  "mnx": {
+    "version": 1
+  },
+  "parts": [
+    {
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  4
+                ]
+              },
+              "value": "pppppp"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "value": "ppppp"
+            },
+            {
+              "position": {
+                "fraction": [
+                  2,
+                  4
+                ]
+              },
+              "value": "pppp"
+            },
+            {
+              "position": {
+                "fraction": [
+                  3,
+                  4
+                ]
+              },
+              "value": "ppp"
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  4
+                ]
+              },
+              "value": "pp"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "value": "p"
+            },
+            {
+              "position": {
+                "fraction": [
+                  2,
+                  4
+                ]
+              },
+              "value": "mp"
+            },
+            {
+              "position": {
+                "fraction": [
+                  3,
+                  4
+                ]
+              },
+              "value": "mf"
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  4
+                ]
+              },
+              "value": "f"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "value": "ff"
+            },
+            {
+              "position": {
+                "fraction": [
+                  2,
+                  4
+                ]
+              },
+              "value": "fff"
+            },
+            {
+              "position": {
+                "fraction": [
+                  3,
+                  4
+                ]
+              },
+              "value": "ffff"
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  4
+                ]
+              },
+              "value": "fffff"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "value": "ffffff"
+            },
+            {
+              "position": {
+                "fraction": [
+                  2,
+                  4
+                ]
+              },
+              "value": "pf"
+            },
+            {
+              "position": {
+                "fraction": [
+                  3,
+                  4
+                ]
+              },
+              "value": "fp"
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  4
+                ]
+              },
+              "value": "fz"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "value": "sf"
+            },
+            {
+              "position": {
+                "fraction": [
+                  2,
+                  4
+                ]
+              },
+              "value": "sfp"
+            },
+            {
+              "position": {
+                "fraction": [
+                  3,
+                  4
+                ]
+              },
+              "value": "sfpp"
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  4
+                ]
+              },
+              "value": "sfz"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "value": "sfzp"
+            },
+            {
+              "position": {
+                "fraction": [
+                  2,
+                  4
+                ]
+              },
+              "value": "sffz"
+            },
+            {
+              "position": {
+                "fraction": [
+                  3,
+                  4
+                ]
+              },
+              "value": "rf"
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  4
+                ]
+              },
+              "value": "rfz"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "value": "n"
+            },
+            {
+              "position": {
+                "fraction": [
+                  2,
+                  4
+                ]
+              },
+              "value": "z"
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "octave": 4,
+                        "step": "G"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

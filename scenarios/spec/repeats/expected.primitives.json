@@ -8,7 +8,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 8,
-        "x2": 40,
+        "x2": 24.3,
         "y2": 8,
         "thickness": 0.13,
         "className": "staff-line"
@@ -17,7 +17,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 9,
-        "x2": 40,
+        "x2": 24.3,
         "y2": 9,
         "thickness": 0.13,
         "className": "staff-line"
@@ -26,7 +26,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 10,
-        "x2": 40,
+        "x2": 24.3,
         "y2": 10,
         "thickness": 0.13,
         "className": "staff-line"
@@ -35,7 +35,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 11,
-        "x2": 40,
+        "x2": 24.3,
         "y2": 11,
         "thickness": 0.13,
         "className": "staff-line"
@@ -44,7 +44,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 12,
-        "x2": 40,
+        "x2": 24.3,
         "y2": 12,
         "thickness": 0.13,
         "className": "staff-line"
@@ -66,6 +66,40 @@
         "className": "clef"
       },
       {
+        "kind": "rect",
+        "x": 8.6,
+        "y": 8,
+        "w": 0.5,
+        "h": 4,
+        "fill": "currentColor",
+        "className": "barline repeat-start"
+      },
+      {
+        "kind": "line",
+        "x1": 9.4,
+        "y1": 8,
+        "x2": 9.4,
+        "y2": 12,
+        "thickness": 0.16,
+        "className": "barline repeat-start"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "augmentationDot",
+        "x": 9.8,
+        "y": 9.5,
+        "scale": 1.2,
+        "className": "repeat-dot"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "augmentationDot",
+        "x": 9.8,
+        "y": 10.5,
+        "scale": 1.2,
+        "className": "repeat-dot"
+      },
+      {
         "kind": "glyph",
         "glyph": "timeSig4",
         "x": 7.35,
@@ -84,28 +118,44 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 23.31,
+        "x": 16.26,
         "y": 9.5,
         "className": "notehead",
         "sourceId": "@m0.v0.e0.n0"
       },
       {
-        "kind": "line",
-        "x1": 39.2,
-        "y1": 8,
-        "x2": 39.2,
-        "y2": 12,
-        "thickness": 0.16,
-        "className": "barline barline-final-thin"
-      },
-      {
         "kind": "rect",
-        "x": 39.5,
+        "x": 23.8,
         "y": 8,
         "w": 0.5,
         "h": 4,
         "fill": "currentColor",
-        "className": "barline barline-final-thick"
+        "className": "barline repeat-end"
+      },
+      {
+        "kind": "line",
+        "x1": 23.5,
+        "y1": 8,
+        "x2": 23.5,
+        "y2": 12,
+        "thickness": 0.16,
+        "className": "barline repeat-end"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "augmentationDot",
+        "x": 22.65,
+        "y": 9.5,
+        "scale": 1.2,
+        "className": "repeat-dot"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "augmentationDot",
+        "x": 22.65,
+        "y": 10.5,
+        "scale": 1.2,
+        "className": "repeat-dot"
       }
     ]
   }

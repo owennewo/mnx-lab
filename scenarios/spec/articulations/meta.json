@@ -1,6 +1,6 @@
 {
   "title": "Articulations",
-  "description": "Articulations live on an event. They&#x27;re encoded in the event&#x27;s \"markings\" object.",
+  "description": "Articulations live on an event. They're encoded in the event's \"markings\" object.",
   "tags": [
     "spec-example"
   ],
@@ -38,5 +38,5 @@
   },
   "requires": [],
   "source": "spec-example",
-  "status": "rendered"
+  "status": "verified"
 }

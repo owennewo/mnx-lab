@@ -1,5 +1,39 @@
-import { MnxStructure, MnxEvent } from '../types/mnx.ts';
-import { Primitive, LayoutResult, SpatialIndex } from '../primitives.ts';
+import { MnxStructure, MnxEvent, MnxEventMarkings, MnxGlobalMeasure, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../types/mnx.ts';
+import { emitMeasureDiagnostics, MeasureIssue } from './diagnostics.ts';
+import { validateDocument } from './validate.ts';
+import { dynamicGlyph } from './dynamics.ts';
+import {
+  planHorizontal,
+  resolveStaffVoices,
+  PlanStaff,
+  StaffSource,
+  ResolvedVoice,
+  noteAccidentalGlyph,
+  durationValue,
+  ActiveClef,
+  ClefAt,
+  HorizontalPlan,
+  ACCIDENTAL_SLOT_WIDTH_SP,
+  ACCIDENTAL_RIGHT_PAD_SP,
+  KEY_SIG_GLYPH_ADVANCE_SP,
+  GRACE_NOTE_ADVANCE_SP,
+  TREMOLO_NOTE_ADVANCE_SP,
+  CORE_SP,
+  tremoloDuration,
+  tupletDuration,
+  tupletColumns
+} from './spacing.ts';
+import {
+  resolveBeamGroups,
+  impliedBeamGroup,
+  BEAM_LEVELS_BY_BASE,
+  WHOLE_NOTE_TICKS,
+  BeamEventInfo,
+  BeamGroupSpec,
+  BeamSegmentSpec,
+  BeamHookSpec
+} from './beams.ts';
+import { Primitive, LayoutResult, LayoutDiagnostic, SpatialIndex } from '../primitives.ts';
 import { glyphAnchor } from '../smufl/smufl.ts';
 import { syntheticNoteKey } from '../utils/noteKeys.ts';
 
@@ -14,8 +48,12 @@ import { syntheticNoteKey } from '../utils/noteKeys.ts';
  *   - Rests by duration
  *   - Barlines (regular, final, system-start), mid-system clef/time changes
  *   - Multi-voice with auto stem direction (v1 down, v2 up; single-voice by position)
+ *   - Beams: primary + secondary levels and hooks (explicit nested `beams` or
+ *     implied from durations), cross-barline groups, split at system breaks
+ *   - Slurs & ties: cubic curves between recorded event anchors, split at
+ *     system breaks; laissez-vibrer hooks
  *
- * Out of scope (deferred): key signatures, beams, slurs, ties, dynamics, tuplets.
+ * Out of scope (deferred): tuplets, ottava lines.
  */
 
 // ---------- Layout constants (staff spaces) ----------
@@ -27,6 +65,8 @@ const STAFF_MIDDLE_Y = STAFF_HEIGHT_SP / 2; // 2 sp from top
 const ROW_PAD_TOP_SP = 6;    // extra room for ledger lines / stems above
 const ROW_PAD_BOTTOM_SP = 6;
 const ROW_HEIGHT_SP = STAFF_HEIGHT_SP + ROW_PAD_TOP_SP + ROW_PAD_BOTTOM_SP;
+const INTER_STAFF_GAP_SP = 6; // between staves of a multi-staff part (grand staff)
+const BRACE_DESIGN_HEIGHT_SP = 3.988; // Bravura `brace` bbox height at scale 1
 const MARGIN_SP = 2;
 
 const STAFF_LINE_THICKNESS_SP = 0.13;
@@ -37,79 +77,138 @@ const FINAL_BARLINE_THICK_SP = 0.5;
 const FINAL_BARLINE_GAP_SP = 0.3;
 
 const STEM_LENGTH_SP = 3.5;
+const BEAM_THICKNESS_SP = 0.5;
+const BEAM_GAP_SP = 0.25;          // clear space between beam levels
+const BEAM_MAX_SLANT_SP = 1;       // total rise/fall cap across a group
+const BEAM_HOOK_LENGTH_SP = 1;
 const NOTEHEAD_WIDTH_SP = 1.18;
 const LEDGER_OVERHANG_SP = 0.4; // ledger extends this much beyond notehead each side
 
-const ACCIDENTAL_RIGHT_PAD_SP = 0.15;
-const DOT_RIGHT_PAD_SP = 0.35;
+const GRACE_SCALE = 0.6;             // grace glyphs relative to full-size
+const GRACE_STEM_LENGTH_SP = 2.5;    // shorter than STEM_LENGTH_SP, always up
+const GRACE_SLASH_THICKNESS_SP = 0.12;
 
-const START_BARLINE_PAD_SP = 0.5;
-const CLEF_WIDTH_SP = 3;
-const TIME_SIG_WIDTH_SP = 2.5;
-const CONTENT_LEFT_PAD_SP = 0.6;
-const CONTENT_RIGHT_PAD_SP = 0.8;
+// Multi-note tremolos: beams floating between the two written notes.
+const TREMOLO_BEAM_THICKNESS_SP = 0.45;
+const TREMOLO_BEAM_GAP_SP = 0.3;
+
+const DOT_RIGHT_PAD_SP = 0.35;
 
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
-
-// ---------- Duration arithmetic ----------
-
-const DURATION_BASE_VALUE: Record<string, number> = {
-  whole: 1,
-  half: 0.5,
-  quarter: 0.25,
-  eighth: 0.125,
-  sixteenth: 0.0625,
-  'thirty-second': 0.03125
-};
-
-function durationValue(d: { base: string; dots?: number }): number {
-  const base = DURATION_BASE_VALUE[d.base] ?? 0.25;
-  const dots = d.dots ?? 0;
-  if (dots === 0) return base;
-  return base * (2 - 1 / Math.pow(2, dots));
-}
 
 const NOTEHEAD_GLYPH_BY_BASE: Record<string, string> = {
   whole: 'noteheadWhole',
   half: 'noteheadHalf',
   quarter: 'noteheadBlack',
   eighth: 'noteheadBlack',
-  sixteenth: 'noteheadBlack',
-  'thirty-second': 'noteheadBlack'
+  '16th':'noteheadBlack',
+  '32nd':'noteheadBlack'
 };
 
 // flags only on unbeamed durations shorter than quarter
 const FLAG_GLYPH_BY_BASE_UP: Record<string, string | null> = {
   whole: null, half: null, quarter: null,
   eighth: 'flag8thUp',
-  sixteenth: 'flag16thUp',
-  'thirty-second': 'flag32ndUp'
+  '16th':'flag16thUp',
+  '32nd':'flag32ndUp',
+  '64th':'flag64thUp',
+  '128th':'flag128thUp',
+  '256th':'flag256thUp',
+  '512th':'flag512thUp',
+  '1024th':'flag1024thUp'
 };
 const FLAG_GLYPH_BY_BASE_DOWN: Record<string, string | null> = {
   whole: null, half: null, quarter: null,
   eighth: 'flag8thDown',
-  sixteenth: 'flag16thDown',
-  'thirty-second': 'flag32ndDown'
+  '16th':'flag16thDown',
+  '32nd':'flag32ndDown',
+  '64th':'flag64thDown',
+  '128th':'flag128thDown',
+  '256th':'flag256thDown',
+  '512th':'flag512thDown',
+  '1024th':'flag1024thDown'
 };
 
+// The full Bravura rest family (duplexMaxima and 2048th+ have no glyph and
+// fall back to restQuarter at emit time).
 const REST_GLYPH_BY_BASE: Record<string, string> = {
+  maxima: 'restMaxima',
+  longa: 'restLonga',
+  breve: 'restDoubleWhole',
   whole: 'restWhole',
   half: 'restHalf',
   quarter: 'restQuarter',
   eighth: 'rest8th',
-  sixteenth: 'rest16th',
-  'thirty-second': 'rest32nd'
+  '16th':'rest16th',
+  '32nd':'rest32nd',
+  '64th':'rest64th',
+  '128th':'rest128th',
+  '256th':'rest256th',
+  '512th':'rest512th',
+  '1024th':'rest1024th'
 };
 
 // Rest y-positions (alphabetic baseline = SMuFL origin) relative to staffTop
+// Articulations (MNX event.markings → SMuFL), in stacking order from the
+// notehead outward. `tremolo` is a stem decoration, not an articulation, and
+// is not handled yet; `spiccato` has no glyph in the bundled Bravura subset.
+const ARTICULATIONS: { key: keyof MnxEventMarkings; above: string; below: string; forceAbove?: boolean }[] = [
+  { key: 'staccato', above: 'articStaccatoAbove', below: 'articStaccatoBelow' },
+  { key: 'staccatissimo', above: 'articStaccatissimoAbove', below: 'articStaccatissimoBelow' },
+  { key: 'tenuto', above: 'articTenutoAbove', below: 'articTenutoBelow' },
+  { key: 'stress', above: 'articStressAbove', below: 'articStressBelow' },
+  { key: 'unstress', above: 'articUnstressAbove', below: 'articUnstressBelow' },
+  { key: 'accent', above: 'articAccentAbove', below: 'articAccentBelow' },
+  { key: 'softAccent', above: 'articSoftAccentAbove', below: 'articSoftAccentBelow' },
+  { key: 'strongAccent', above: 'articMarcatoAbove', below: 'articMarcatoBelow', forceAbove: true }
+];
+
+const DYNAMIC_BASELINE_DROP_SP = 3.5; // glyph baseline below the bottom staff line
+
+// Metronome marks ("note = bpm") above the start of the measure.
+const METRONOME_GLYPH_BY_BASE: Record<string, string> = {
+  breve: 'metNoteDoubleWhole',
+  whole: 'metNoteWhole',
+  half: 'metNoteHalfUp',
+  quarter: 'metNoteQuarterUp',
+  eighth: 'metNote8thUp',
+  '16th': 'metNote16thUp',
+  '32nd': 'metNote32ndUp',
+  '64th': 'metNote64thUp',
+  '128th': 'metNote128thUp'
+};
+const TEMPO_BASELINE_RISE_SP = 2.7; // above the top staff line
+
+// Repeat barlines and volta brackets.
+const REPEAT_DOT_SCALE = 1.2;
+const VOLTA_RISE_SP = 3.4;  // bracket line above the top staff line
+const VOLTA_HOOK_SP = 1.3;
+const VOLTA_THICKNESS_SP = 0.13;
+
+// Slur & tie curves (tapered fills; thickness = mid-curve width).
+const SLUR_THICKNESS_SP = 0.22;
+const TIE_THICKNESS_SP = 0.2;
+const SLUR_END_PAD_SP = 0.8;   // vertical clearance between notehead and slur end
+const TIE_END_PAD_SP = 0.55;   // ties hug the noteheads more closely
+const TIE_END_GAP_SP = 0.85;   // tie endpoints sit just outside the noteheads
+const LV_TIE_LENGTH_SP = 1.3;  // laissez-vibrer hook length
+
 const REST_Y_BY_BASE: Record<string, number> = {
+  maxima: 2,      // spans a line either side of the middle line (glyph y ±1)
+  longa: 2,       // same vertical span as maxima
+  breve: 2,       // sits on the middle line, filling the space above
   whole: 1,       // hangs from line 2 from top (4th line from bottom)
   half: 2,        // sits on middle line
   quarter: 2,    // centred on middle line
   eighth: 2,
-  sixteenth: 2,
-  'thirty-second': 2
+  '16th':2,
+  '32nd':2,
+  '64th':2,
+  '128th':2,
+  '256th':2,
+  '512th':2,
+  '1024th':2
 };
 
 // ---------- Pitch → staff y ----------
@@ -118,11 +217,6 @@ const STEP_ORDER: Record<string, number> = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5,
 
 function diatonicStepIndex(step: string, octave: number): number {
   return octave * 7 + (STEP_ORDER[step.toUpperCase()] ?? 0);
-}
-
-interface ActiveClef {
-  sign: 'G' | 'F' | 'C';
-  octave: number;   // MNX clef.octave: -1 = sounds 8vb, +1 = sounds 8va
 }
 
 /**
@@ -158,6 +252,39 @@ function clefY(clef: ActiveClef, staffTop: number): number {
   return staffTop + 3;
 }
 
+/** Convention: clef changes are drawn smaller than the system-start clef. */
+const CLEF_CHANGE_SCALE = 0.66;
+
+/** The clef in effect at metric onset `t` (whole-note fraction into the bar). */
+function clefAt(timeline: readonly ClefAt[], t: number): ActiveClef {
+  let active = timeline[0]?.clef ?? { sign: 'G' as const, octave: 0 };
+  for (const entry of timeline) {
+    if (entry.t <= t + 1e-6) active = entry.clef;
+  }
+  return active;
+}
+
+// ---------- Key signatures ----------
+
+// Vertical positions (sp from staffTop) of the conventional accidental columns
+// on a treble staff, in signature order. Other clefs shift the whole pattern.
+const SHARP_YS_TREBLE = [0, 1.5, -0.5, 1, 2.5, 0.5, 2]; // F C G D A E B
+const FLAT_YS_TREBLE = [2, 0.5, 2.5, 1, 3, 1.5, 3.5];   // B E A D G C F
+const KEY_SIG_CLEF_OFFSET: Record<ActiveClef['sign'], number> = { G: 0, F: 1, C: 0.5 };
+
+/**
+ * Glyph column for a key signature: |fifths| sharps or flats. A change to C
+ * (fifths 0) cancels the outgoing key with naturals at its positions —
+ * otherwise the change would be invisible.
+ */
+function keySignatureGlyphs(fifths: number, cancelFifths: number): { glyph: string; y: number }[] {
+  const pattern = fifths !== 0 ? fifths : cancelFifths;
+  const ys = pattern > 0 ? SHARP_YS_TREBLE : FLAT_YS_TREBLE;
+  const glyph =
+    fifths === 0 ? 'accidentalNatural' : fifths > 0 ? 'accidentalSharp' : 'accidentalFlat';
+  return ys.slice(0, Math.min(Math.abs(pattern), 7)).map(y => ({ glyph, y }));
+}
+
 // ---------- Stem direction ----------
 
 function autoStemDir(staffYs: number[]): 1 | -1 {
@@ -173,6 +300,29 @@ function autoStemDir(staffYs: number[]): 1 | -1 {
     }
   }
   return dir;
+}
+
+/**
+ * Default stem directions for the voices sharing a staff: when none carry a
+ * forced direction and there are at least two, the voice with the highest
+ * mean pitch stems up and the others down — the engraving convention.
+ * Sequence order is NOT reliable for this: spec/multiple-voices lists the
+ * lower voice first, spec/tie-targets the upper.
+ */
+function rankVoiceStems(voices: ResolvedVoice[], clef: ActiveClef): (1 | -1 | null)[] {
+  if (voices.length < 2 || voices.some(v => v.stem !== null)) {
+    return voices.map(v => v.stem);
+  }
+  const meanYs = voices.map(({ seq }) => {
+    const ys: number[] = [];
+    for (const item of seq.content) {
+      if (!isTimedEvent(item)) continue;
+      for (const n of item.notes ?? []) ys.push(pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
+    }
+    return ys.length ? ys.reduce((a, b) => a + b, 0) / ys.length : Infinity;
+  });
+  const top = meanYs.indexOf(Math.min(...meanYs));
+  return meanYs.map((_, vi) => (vi === top ? 1 : -1));
 }
 
 // ---------- Ledger lines ----------
@@ -195,17 +345,6 @@ function unionLedgerLines(staffYs: number[]): Set<number> {
   return set;
 }
 
-// ---------- Accidental glyph ----------
-
-function accidentalGlyph(alter: number | undefined): string | null {
-  if (alter === undefined || alter === 0) return null;
-  if (alter === 1) return 'accidentalSharp';
-  if (alter === -1) return 'accidentalFlat';
-  if (alter === 2) return 'accidentalDoubleSharp';
-  if (alter === -2) return 'accidentalDoubleFlat';
-  return null;
-}
-
 // ---------- Public API ----------
 
 export interface LayoutNotationOptions {
@@ -215,6 +354,293 @@ export interface LayoutNotationOptions {
   selectedNoteIds?: readonly string[];
 }
 
+const TITLE_SIZE_SP = 2.4;
+const TITLE_GAP_SP = 1.2;
+
+// Lyrics: verse rows stacked below the staff.
+const LYRIC_FIRST_BASELINE_DROP_SP = 4.5; // first verse baseline below bottom line
+const LYRIC_LINE_SPACING_SP = 2.2;
+const LYRIC_SIZE_SP = 1.7;
+const LYRIC_DESCENDER_PAD_SP = 0.8;
+
+/** All lyric line ids a segment's parts use, in global lineOrder (then sorted). */
+function collectLyricLineIds(mnx: MnxStructure, segment: JobSegment): string[] {
+  const used = new Set<string>();
+  for (const spec of segment.staves) {
+    for (const src of spec.sources) {
+      for (const pm of src.part.measures) {
+        for (const seq of pm.sequences ?? []) {
+          for (const item of seq.content) {
+            if (!isTimedEvent(item)) continue;
+            for (const id of Object.keys(item.lyrics?.lines ?? {})) used.add(id);
+          }
+        }
+      }
+    }
+  }
+  const order = mnx.global.lyrics?.lineOrder ?? [];
+  const ordered = order.filter(id => used.has(id));
+  const rest = [...used].filter(id => !order.includes(id)).sort();
+  return [...ordered, ...rest];
+}
+
+/** A run of staves decorated together: bracket/brace + barline style. */
+interface JobGroup {
+  start: number;
+  count: number;
+  symbol: 'brace' | 'bracket' | null;
+  /** Barlines drawn per staff rather than spanning the group. */
+  individualBarlines: boolean;
+  /** Decorated ancestors — nested decorations step left of their parents'. */
+  depth: number;
+  /** Group label ("Flutes"), centred on the group's vertical span. */
+  label: string | null;
+}
+
+/** One staff arrangement applied to a measure range — a score renders one
+ *  segment per run of consecutive systems sharing a layout. */
+interface JobSegment {
+  staves: PlanStaff[];
+  labels: (string | null)[];
+  /** Per staff: labels of its merged sources (the stacked "1"/"2"). */
+  sourceLabels: (string[] | null)[];
+  groups: JobGroup[];
+  forcedBreaks: Set<number>;
+  /** Measures this segment covers (inclusive); null = the whole document. */
+  range: { from: number; to: number } | null;
+  /** Plan at least this many measures — set for structure-only documents
+   *  whose systems reference measures that don't exist. */
+  minMeasures?: number;
+}
+
+/** One renderable presentation of the document (an MNX `score`, or the whole
+ *  document when none are declared). */
+interface ScoreJob {
+  title: string | null;
+  segments: JobSegment[];
+  collapse: { startIndex: number; count: number }[];
+  /** Draw doc-level validation badges on this job only (first job). */
+  drawValidation: boolean;
+}
+
+type StaffLayout = Pick<JobSegment, 'staves' | 'labels' | 'sourceLabels' | 'groups'>;
+
+/** Expands parts into one staff spec per part-staff, grouped per part
+ *  (multi-staff parts get a brace) — the no-layout presentation. */
+function defaultStaffLayout(parts: MnxPart[]): StaffLayout {
+  const staves: PlanStaff[] = [];
+  const labels: (string | null)[] = [];
+  const sourceLabels: (string[] | null)[] = [];
+  const groups: JobGroup[] = [];
+  for (const part of parts) {
+    let n = Math.max(1, part.staves ?? 1);
+    for (const pm of part.measures) {
+      for (const seq of pm.sequences ?? []) n = Math.max(n, seq.staff ?? 1);
+    }
+    groups.push({
+      start: staves.length,
+      count: n,
+      symbol: n > 1 ? 'brace' : null,
+      individualBarlines: false,
+      depth: 0,
+      label: null
+    });
+    for (let s = 1; s <= n; s++) {
+      staves.push({ sources: [{ part, staff: s }] });
+      labels.push(null);
+      sourceLabels.push(null);
+    }
+  }
+  return { staves, labels, sourceLabels, groups };
+}
+
+/** A node's label: explicit `label`, or `labelref` resolved on `part`. */
+function resolveLabel(
+  node: { label?: string; labelref?: string },
+  part: MnxPart | undefined
+): string | null {
+  if (node.label) return node.label;
+  if (node.labelref && part) {
+    const v = (part as unknown as Record<string, unknown>)[node.labelref];
+    return typeof v === 'string' ? v : part.name ?? null;
+  }
+  return null;
+}
+
+/** Resolves a layout's content tree into staff specs, labels and groups. */
+function resolveLayoutTree(
+  content: readonly MnxLayoutContent[] | undefined,
+  partById: Map<string, MnxPart>,
+  out: StaffLayout,
+  decorDepth = 0
+): void {
+  for (const node of content ?? []) {
+    if (node.type === 'group') {
+      const symbol =
+        node.symbol === 'brace' ? 'brace' : node.symbol === 'none' ? null : 'bracket';
+      const start = out.staves.length;
+      resolveLayoutTree(node.content, partById, out, decorDepth + (symbol ? 1 : 0));
+      const count = out.staves.length - start;
+      if (count > 0) {
+        out.groups.push({
+          start,
+          count,
+          symbol,
+          individualBarlines: node.barlineStyle === 'individual',
+          depth: decorDepth,
+          label: node.label ?? null
+        });
+      }
+      continue;
+    }
+    const sources: StaffSource[] = [];
+    const srcLabels: (string | null)[] = [];
+    for (const src of node.sources ?? []) {
+      const part = partById.get(src.part);
+      if (!part) continue;
+      sources.push({ part, staff: src.staff ?? 1, stem: src.stem });
+      srcLabels.push(resolveLabel(src, part));
+    }
+    if (sources.length === 0) continue;
+    let label = resolveLabel(node, sources[0].part);
+    // A lone source's label serves as the staff label; merged staves keep
+    // per-source labels (the stacked "1"/"2" of shared wind staves).
+    let perSource: string[] | null = null;
+    if (sources.length === 1) {
+      label = label ?? srcLabels[0];
+    } else if (srcLabels.some(l => l !== null)) {
+      perSource = srcLabels.map(l => l ?? '');
+    }
+    out.staves.push({ sources });
+    out.labels.push(label);
+    out.sourceLabels.push(perSource);
+  }
+}
+
+function buildScoreJobs(mnx: MnxStructure): ScoreJob[] {
+  const allParts = mnx.parts ?? [];
+  if (allParts.length === 0) return [];
+  const scores = mnx.scores ?? [];
+  if (scores.length === 0) {
+    return [{
+      title: null,
+      segments: [{ ...defaultStaffLayout(allParts), forcedBreaks: new Set(), range: null }],
+      collapse: [],
+      drawValidation: true
+    }];
+  }
+
+  const measureIndexById = new Map<string, number>();
+  mnx.global.measures.forEach((gm, i) => {
+    if (gm?.id) measureIndexById.set(gm.id, i);
+  });
+  const partById = new Map(allParts.filter(p => p.id).map(p => [p.id!, p]));
+  const layoutById = new Map((mnx.layouts ?? []).map(l => [l.id, l]));
+
+  /** Staff arrangement for a layout id (all parts when unknown/absent). */
+  const staffLayoutFor = (layoutId: string | undefined): StaffLayout => {
+    const layout = layoutId ? layoutById.get(layoutId) : undefined;
+    if (!layout) return defaultStaffLayout(allParts);
+    const resolved: StaffLayout = { staves: [], labels: [], sourceLabels: [], groups: [] };
+    resolveLayoutTree(layout.content, partById, resolved);
+    if (!resolved.staves.length) return defaultStaffLayout(allParts);
+    // Staves outside any group still need barlines: singleton groups.
+    const covered = new Set<number>();
+    for (const g of resolved.groups) {
+      for (let k = g.start; k < g.start + g.count; k++) covered.add(k);
+    }
+    for (let s = 0; s < resolved.staves.length; s++) {
+      if (!covered.has(s)) {
+        resolved.groups.push({
+          start: s, count: 1, symbol: null, individualBarlines: false, depth: 0, label: null
+        });
+      }
+    }
+    return resolved;
+  };
+
+  return scores.map((score, scoreIndex) => {
+    // Each system names its layout (falling back to the score's); a run of
+    // consecutive systems sharing a layout renders as one segment with its
+    // own staves over its measure range. The common single-layout case is
+    // one segment over the whole document.
+    const rawSystems = (score.pages ?? [])
+      .flatMap(p => p.systems ?? [])
+      .map(sys => ({
+        layoutId: sys.layout ?? score.layout,
+        index: measureIndexById.get(sys.measure)
+      }));
+    let systems = rawSystems.filter(
+      (s): s is { layoutId: string | undefined; index: number } => s.index !== undefined
+    );
+    // Structure-only documents (spec/orchestral-layout): systems reference
+    // measures that don't exist and no part has content. Give each system one
+    // synthetic empty measure so its staff arrangement still draws.
+    let minMeasures: number | undefined;
+    if (systems.length === 0 && rawSystems.length > 0 && mnx.global.measures.length === 0) {
+      systems = rawSystems.map((s, k) => ({ layoutId: s.layoutId, index: k }));
+      minMeasures = rawSystems.length;
+    }
+
+    const segments: JobSegment[] = [];
+    if (new Set(systems.map(s => s.layoutId)).size <= 1) {
+      segments.push({
+        ...staffLayoutFor(systems[0]?.layoutId ?? score.layout),
+        forcedBreaks: new Set(systems.map(s => s.index).filter(i => i > 0)),
+        range: null,
+        minMeasures
+      });
+    } else {
+      for (let k = 0; k < systems.length; ) {
+        let end = k + 1;
+        while (end < systems.length && systems[end].layoutId === systems[k].layoutId) end++;
+        const from = k === 0 ? 0 : systems[k].index;
+        const to = end < systems.length ? systems[end].index - 1 : Number.MAX_SAFE_INTEGER;
+        segments.push({
+          ...staffLayoutFor(systems[k].layoutId),
+          forcedBreaks: new Set(
+            systems.slice(k, end).map(s => s.index).filter(i => i > from)
+          ),
+          range: { from, to },
+          minMeasures
+        });
+        k = end;
+      }
+    }
+
+    const collapse = (score.multimeasureRests ?? [])
+      .map(r => ({
+        startIndex: measureIndexById.get(r.start) ?? -1,
+        count: Math.max(1, r.duration ?? 1)
+      }))
+      .filter(c => c.startIndex >= 0);
+    return {
+      title: score.name ?? null,
+      segments,
+      collapse,
+      drawValidation: scoreIndex === 0
+    };
+  });
+}
+
+/** Shifts a primitive vertically in place (score stacking). */
+function translatePrimitiveY(p: Primitive, dy: number): void {
+  switch (p.kind) {
+    case 'glyph':
+    case 'text':
+    case 'rect':
+      p.y += dy;
+      break;
+    case 'line':
+      p.y1 += dy;
+      p.y2 += dy;
+      break;
+    case 'curve':
+      for (const pt of p.points) pt.y += dy;
+      break;
+  }
+}
+
 export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   const { mnx, widthSp } = opts;
   const activeNoteIds = opts.activeNoteIds ?? [];
@@ -222,209 +648,2005 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
 
   const primitives: Primitive[] = [];
   const index: SpatialIndex = new Map();
+  const diagnostics: LayoutDiagnostic[] = [];
 
-  const part = mnx.parts?.[0];
-  if (!part) {
-    return { primitives, widthSp, heightSp: ROW_HEIGHT_SP + 2 * MARGIN_SP, index };
+  const jobs = buildScoreJobs(mnx);
+  if (jobs.length === 0) {
+    return { primitives, widthSp, heightSp: ROW_HEIGHT_SP + 2 * MARGIN_SP, usedWidthSp: widthSp, index, diagnostics };
   }
 
-  const numMeasures = part.measures.length;
-  const measuresPerRow = widthSp > 80 ? 4 : 2;
-  const measureAllocatedWidth = (widthSp - 2 * MARGIN_SP) / measuresPerRow;
-  // part.name is optional in the MNX schema (the corpus's minimal-single-note
-  // scenario pins this) — guard before sniffing for the guitar default.
-  const isGuitarPart = (part.name ?? '').toLowerCase().includes('guitar');
+  // Each score renders as its own block (title + segments), stacked
+  // vertically; a segment is one staff arrangement over a measure range
+  // (per-system layouts give a score several). The single-untitled-job case
+  // translates by 0 — byte-identical output.
+  let cursorY = 0;
+  let usedWidthSp = 0;
+  for (const job of jobs) {
+    const rs = job.segments.map(segment =>
+      renderSegment({
+        mnx,
+        segment,
+        collapse: job.collapse,
+        drawValidation: job.drawValidation,
+        widthSp,
+        activeNoteIds,
+        selectedNoteIds,
+        index,
+        diagnostics
+      })
+    );
+    const jobUsed = Math.max(...rs.map(r => r.usedWidthSp));
+    if (job.title !== null) {
+      cursorY += TITLE_SIZE_SP + 1;
+      primitives.push({
+        kind: 'text',
+        text: job.title,
+        x: jobUsed / 2,
+        y: cursorY,
+        font: 'body',
+        size: TITLE_SIZE_SP,
+        anchor: 'middle',
+        className: 'score-title'
+      });
+      cursorY += TITLE_GAP_SP;
+    }
+    for (const r of rs) {
+      if (cursorY !== 0) {
+        for (const p of r.primitives) translatePrimitiveY(p, cursorY);
+      }
+      primitives.push(...r.primitives);
+      cursorY += r.heightSp;
+    }
+    usedWidthSp = Math.max(usedWidthSp, jobUsed);
+  }
 
-  // Initial active state. Guitar parts default to treble 8vb.
-  let activeClef: ActiveClef = { sign: 'G', octave: isGuitarPart ? -1 : 0 };
-  let activeTimeSig = { count: 4, unit: 4 };
+  return { primitives, widthSp, heightSp: cursorY, usedWidthSp, index, diagnostics };
+}
+
+interface RenderSegmentArgs {
+  mnx: MnxStructure;
+  segment: JobSegment;
+  collapse: { startIndex: number; count: number }[];
+  drawValidation: boolean;
+  widthSp: number;
+  activeNoteIds: readonly string[];
+  selectedNoteIds: readonly string[];
+  index: SpatialIndex;
+  diagnostics: LayoutDiagnostic[];
+}
+
+// Left-of-system geometry: nested decorations step left of their parents,
+// staff/source labels sit left of all decorations, group labels leftmost.
+const DECOR_BASE_SP = 1.2;
+const DECOR_STEP_SP = 1.6;
+const LABEL_CHAR_SP = 1.0;
+const LABEL_PAD_SP = 0.6;
+
+function renderSegment(args: RenderSegmentArgs): {
+  primitives: Primitive[];
+  heightSp: number;
+  usedWidthSp: number;
+} {
+  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics } = args;
+  const primitives: Primitive[] = [];
+
+  const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
+  // Staff/source labels, group labels and (nested) group decorations sit left
+  // of the system inside an extra inset, so the music shifts right for them.
+  // Per staff, source labels ("1"/"2") stack right-aligned at the label edge
+  // and the staff label sits left of them.
+  const srcLabelW = (s: number) => {
+    const src = segment.sourceLabels[s];
+    return src ? Math.max(0, ...src.map(l => l.length)) * LABEL_CHAR_SP : 0;
+  };
+  const staffLabelSpan = (s: number) => {
+    const labW = (segment.labels[s]?.length ?? 0) * LABEL_CHAR_SP;
+    const srcW = srcLabelW(s);
+    return labW && srcW ? labW + 0.4 + srcW : labW || srcW;
+  };
+  const maxStaffSpan = Math.max(0, ...segment.staves.map((_, s) => staffLabelSpan(s)));
+  const groupLabelLen = Math.max(
+    0,
+    ...segment.groups.map(g => g.label?.length ?? 0)
+  );
+  const decorated = segment.groups.filter(g => g.symbol !== null);
+  const decorWidthSp = decorated.length
+    ? DECOR_BASE_SP + Math.max(...decorated.map(g => g.depth)) * DECOR_STEP_SP + 0.5
+    : 0;
+  const staffLabelW = maxStaffSpan ? maxStaffSpan + LABEL_PAD_SP : 0;
+  const groupLabelW = groupLabelLen ? groupLabelLen * LABEL_CHAR_SP + LABEL_PAD_SP : 0;
+  const leftInsetSp = decorWidthSp + staffLabelW + groupLabelW;
+
+  // All horizontal decisions (system packing, bar widths, event x positions)
+  // come from the shared plan — layoutTab consumes the same one, which is what
+  // keeps notation and tab column-aligned in the "both" view.
+  const plan = planHorizontal(mnx, widthSp, {
+    staves: segment.staves,
+    leftInsetSp,
+    collapse,
+    forcedBreaks: segment.forcedBreaks,
+    measureRange: segment.range ?? undefined,
+    minMeasures: segment.minMeasures
+  });
+  const numMeasures = plan.measures.length;
+
+  // Beams are resolved part-wide (groups may reference events in a later
+  // measure) and split at system breaks. Beamed events defer their stems —
+  // collected per run during emission, drawn against the beam line after.
+  const beams = buildBeamRuns(mnx, segment, plan);
+
+  // Slur/tie endpoints can live anywhere in the document (later measures,
+  // other voices), so emission records every note-carrying event's geometry
+  // here and a post-pass draws the curves once all anchors exist.
+  const curveAnchors: CurveAnchors = {
+    byKey: new Map(),
+    byEventId: new Map(),
+    byNoteId: new Map()
+  };
+
+  // Synthetic note keys encode the staff-1-of-first-part traversal jsonView
+  // mirrors — only a staff showing exactly that may synthesize them.
+  const primaryStaff = segment.staves[0];
+  const synthesizeKeysForStaff0 =
+    primaryStaff.sources.length === 1 &&
+    primaryStaff.sources[0].part === mnx.parts?.[0] &&
+    primaryStaff.sources[0].staff === 1;
+
+  // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
+  // into each measure's diagnostic markers alongside renderer-gap issues.
+  // Drawn on the first job only, so stacked scores don't repeat the badges.
+  const validationByMeasure = new Map<number, string[]>();
+  if (drawValidation) {
+    for (const v of validateDocument(mnx)) {
+      const list = validationByMeasure.get(v.measureIndex) ?? [];
+      list.push(v.message);
+      validationByMeasure.set(v.measureIndex, list);
+    }
+  }
+
+  const numStaves = plan.numStaves;
+  // Verse rows below the staff push the system's bottom padding out when they
+  // need more room than the standard pad provides.
+  const lyricLineIds = collectLyricLineIds(mnx, segment);
+  const lyricExtraSp = lyricLineIds.length
+    ? Math.max(
+        0,
+        LYRIC_FIRST_BASELINE_DROP_SP +
+          (lyricLineIds.length - 1) * LYRIC_LINE_SPACING_SP +
+          LYRIC_DESCENDER_PAD_SP -
+          ROW_PAD_BOTTOM_SP
+      )
+    : 0;
+  const systemHeightSp =
+    ROW_PAD_TOP_SP +
+    numStaves * STAFF_HEIGHT_SP +
+    (numStaves - 1) * INTER_STAFF_GAP_SP +
+    ROW_PAD_BOTTOM_SP +
+    lyricExtraSp;
+  const staffTopOf = (row: number, s: number) =>
+    MARGIN_SP + row * systemHeightSp + ROW_PAD_TOP_SP + s * (STAFF_HEIGHT_SP + INTER_STAFF_GAP_SP);
+
+  // Lyric syllables collected per (staff, line) in document order; hyphens
+  // join start/middle syllables to their successor after the loop.
+  interface LyricSyllable {
+    x: number;
+    y: number;
+    text: string;
+    continues: boolean;
+  }
+  const lyricRuns = new Map<string, LyricSyllable[]>();
 
   for (let i = 0; i < numMeasures; i++) {
-    const globalMeasure = mnx.global.measures[i] ?? {};
-    const partMeasure = part.measures[i] ?? { sequences: [] };
+    const m = plan.measures[i];
+    if (m.hidden) continue;
+    const staffTops = Array.from({ length: numStaves }, (_, s) => staffTopOf(m.row, s));
+    const staffBottoms = staffTops.map(t => t + STAFF_HEIGHT_SP);
+    // The system's top staff / overall bottom — barlines span the lot.
+    const staffTop = staffTops[0];
+    const sysBottom = staffBottoms[numStaves - 1];
 
-    // Detect changes — show indicator if changed mid-system
-    let clefChanged = false;
-    let timeSigChanged = false;
-    if (partMeasure.clefs) {
-      const staff1Clef = partMeasure.clefs.find((c: any) => !c.staff || c.staff === 1);
-      if (staff1Clef && staff1Clef.clef) {
-        const sign = (staff1Clef.clef.sign ?? 'G').toUpperCase() as 'G' | 'F' | 'C';
-        // If MNX omits octave, preserve the current octave when sign matches
-        // (so the guitar 8vb default isn't lost to a declaration of plain G).
-        const oct = staff1Clef.clef.octave ?? (sign === activeClef.sign ? activeClef.octave : 0);
-        if (sign !== activeClef.sign || oct !== activeClef.octave) {
-          activeClef = { sign, octave: oct };
-          if (i > 0) clefChanged = true;
-        }
-      }
-    }
-    if (globalMeasure.time) {
-      const { count, unit } = globalMeasure.time;
-      if (i === 0 || count !== activeTimeSig.count || unit !== activeTimeSig.unit) {
-        activeTimeSig = { count, unit };
-        if (i > 0) timeSigChanged = true;
+    // Staff lines, per staff
+    for (const top of staffTops) {
+      for (let s = 0; s < STAFF_LINES; s++) {
+        const lineY = top + s;
+        primitives.push({
+          kind: 'line',
+          x1: m.x, y1: lineY, x2: m.x + m.width, y2: lineY,
+          thickness: STAFF_LINE_THICKNESS_SP,
+          className: 'staff-line'
+        });
       }
     }
 
-    const row = Math.floor(i / measuresPerRow);
-    const col = i % measuresPerRow;
-    const x = MARGIN_SP + col * measureAllocatedWidth;
-    const staffTop = MARGIN_SP + row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP;
-    const staffBottom = staffTop + STAFF_HEIGHT_SP;
-
-    const isFirstInSystem = col === 0;
-    const showStartBarline = isFirstInSystem;
-    const showClef = isFirstInSystem || clefChanged;
-    const showTimeSig = i === 0 || timeSigChanged;
-
-    const startBarlinePad = showStartBarline ? START_BARLINE_PAD_SP : 0;
-    const clefSpace = showClef ? CLEF_WIDTH_SP : 0;
-    const timeSigSpace = showTimeSig ? TIME_SIG_WIDTH_SP : 0;
-    const contentStartX =
-      x + CONTENT_LEFT_PAD_SP + startBarlinePad + clefSpace + timeSigSpace;
-    const contentWidth =
-      x + measureAllocatedWidth - CONTENT_RIGHT_PAD_SP - contentStartX;
-
-    // Staff lines
-    for (let s = 0; s < STAFF_LINES; s++) {
-      const lineY = staffTop + s;
+    if (m.firstInSystem) {
       primitives.push({
         kind: 'line',
-        x1: x, y1: lineY, x2: x + measureAllocatedWidth, y2: lineY,
-        thickness: STAFF_LINE_THICKNESS_SP,
-        className: 'staff-line'
-      });
-    }
-
-    if (showStartBarline) {
-      primitives.push({
-        kind: 'line',
-        x1: x, y1: staffTop, x2: x, y2: staffBottom,
+        x1: m.x, y1: staffTop, x2: m.x, y2: sysBottom,
         thickness: BARLINE_THICKNESS_SP,
         className: 'barline barline-start'
       });
+      // Group decorations (brace / bracket) left of the start barline; nested
+      // decorations step further left of their parent's, per the reference
+      // engravings (the flutes sub-brace sits left of the winds bracket).
+      for (const g of segment.groups) {
+        if (!g.symbol) continue;
+        const top = staffTops[g.start];
+        const bottom = staffBottoms[g.start + g.count - 1];
+        const gx = m.x - DECOR_BASE_SP - g.depth * DECOR_STEP_SP;
+        if (g.symbol === 'brace') {
+          primitives.push({
+            kind: 'glyph',
+            glyph: 'brace',
+            x: gx,
+            y: bottom,
+            scale: (bottom - top) / BRACE_DESIGN_HEIGHT_SP,
+            className: 'brace'
+          });
+        } else {
+          const bx = gx - 0.2;
+          primitives.push({
+            kind: 'rect',
+            x: bx, y: top - 0.1, w: 0.5, h: bottom - top + 0.2,
+            fill: 'currentColor',
+            className: 'bracket'
+          });
+          primitives.push({ kind: 'glyph', glyph: 'bracketTop', x: bx, y: top - 0.1, className: 'bracket' });
+          primitives.push({ kind: 'glyph', glyph: 'bracketBottom', x: bx, y: bottom + 0.1, className: 'bracket' });
+        }
+      }
+
+      // Staff labels (and stacked per-source labels for merged staves),
+      // right-aligned left of all decorations; a staff carrying both puts
+      // its label left of the source-label stack ("Oboes 1/2").
+      const labelX = m.x - decorWidthSp - LABEL_PAD_SP;
+      segment.labels.forEach((label, s) => {
+        if (!label) return;
+        const srcW = srcLabelW(s);
+        primitives.push({
+          kind: 'text',
+          text: label,
+          x: labelX - (srcW ? srcW + 0.4 : 0),
+          y: staffTops[s] + STAFF_MIDDLE_Y + 0.6,
+          font: 'body',
+          size: 1.6,
+          anchor: 'end',
+          className: 'staff-label'
+        });
+      });
+      segment.sourceLabels.forEach((srcLabels, s) => {
+        if (!srcLabels) return;
+        srcLabels.forEach((text, k) => {
+          if (!text) return;
+          // Stack within the staff: source k of n centres on its band.
+          const y = staffTops[s] + ((k + 0.5) / srcLabels.length) * STAFF_HEIGHT_SP;
+          primitives.push({
+            kind: 'text',
+            text,
+            x: labelX,
+            y: y + 0.5,
+            font: 'body',
+            size: 1.4,
+            anchor: 'end',
+            className: 'source-label'
+          });
+        });
+      });
+
+      // Group labels, leftmost, centred on the group's vertical span.
+      const groupLabelX = labelX - staffLabelW;
+      for (const g of segment.groups) {
+        if (!g.label) continue;
+        primitives.push({
+          kind: 'text',
+          text: g.label,
+          x: groupLabelX,
+          y: (staffTops[g.start] + staffBottoms[g.start + g.count - 1]) / 2 + 0.6,
+          font: 'body',
+          size: 1.6,
+          anchor: 'end',
+          className: 'group-label'
+        });
+      }
     }
 
-    if (showClef) {
+    if (m.showClef) {
+      for (let s = 0; s < numStaves; s++) {
+        const staffClef = m.clefTimelines[s][0].clef;
+        primitives.push({
+          kind: 'glyph',
+          glyph: clefGlyph(staffClef),
+          x: m.clefX,
+          y: clefY(staffClef, staffTops[s]),
+          className: 'clef'
+        });
+      }
+    }
+
+    // Spans a group's barlines: one run for the whole group, or one per staff
+    // when the layout asks for individual barlines.
+    const groupSpans = (g: JobGroup): [number, number][] =>
+      g.individualBarlines
+        ? Array.from({ length: g.count }, (_, k): [number, number] => [
+            staffTops[g.start + k],
+            staffBottoms[g.start + k]
+          ])
+        : [[staffTops[g.start], staffBottoms[g.start + g.count - 1]]];
+
+    // Forward repeat |: — thick + thin per group span, dots per staff.
+    if (m.repeatStart) {
+      const thinX = m.repeatStartX + FINAL_BARLINE_THICK_SP + FINAL_BARLINE_GAP_SP;
+      for (const g of segment.groups) {
+        for (const [gTop, gBottom] of groupSpans(g)) {
+          primitives.push({
+            kind: 'rect',
+            x: m.repeatStartX, y: gTop,
+            w: FINAL_BARLINE_THICK_SP, h: gBottom - gTop,
+            fill: 'currentColor',
+            className: 'barline repeat-start'
+          });
+          primitives.push({
+            kind: 'line',
+            x1: thinX, y1: gTop, x2: thinX, y2: gBottom,
+            thickness: BARLINE_THICKNESS_SP,
+            className: 'barline repeat-start'
+          });
+        }
+      }
+      for (const top of staffTops) {
+        for (const dotY of [1.5, 2.5]) {
+          primitives.push({
+            kind: 'glyph',
+            glyph: 'augmentationDot',
+            x: thinX + 0.4,
+            y: top + dotY,
+            scale: REPEAT_DOT_SCALE,
+            className: 'repeat-dot'
+          });
+        }
+      }
+    }
+
+    // Metronome mark above the bar's prefix ("quarter = 200").
+    const tempo = (mnx.global.measures[i]?.tempos ?? [])[0];
+    if (tempo) {
+      const x0 = m.showTimeSig ? m.timeSigCentreX - 1.25 : m.contentStartX - 1.5;
+      const y = staffTop - TEMPO_BASELINE_RISE_SP;
       primitives.push({
         kind: 'glyph',
-        glyph: clefGlyph(activeClef),
-        x: x + CONTENT_LEFT_PAD_SP + startBarlinePad,
-        y: clefY(activeClef, staffTop),
-        className: 'clef'
+        glyph: METRONOME_GLYPH_BY_BASE[tempo.value.base] ?? 'metNoteQuarterUp',
+        x: x0,
+        y,
+        className: 'tempo'
+      });
+      let textX = x0 + 1.3;
+      for (let d = 0; d < (tempo.value.dots ?? 0); d++) {
+        primitives.push({
+          kind: 'glyph',
+          glyph: 'metAugmentationDot',
+          x: x0 + 1.0 + d * 0.45,
+          y,
+          className: 'tempo'
+        });
+        textX += 0.45;
+      }
+      primitives.push({
+        kind: 'text',
+        text: `= ${tempo.bpm}`,
+        x: textX,
+        y,
+        font: 'body',
+        size: 1.6,
+        className: 'tempo'
       });
     }
 
-    if (showTimeSig) {
-      const tsX = x + CONTENT_LEFT_PAD_SP + startBarlinePad + clefSpace + TIME_SIG_WIDTH_SP / 2;
-      const numY = staffTop + 1; // visual centre of upper half (line 2 from top)
-      const denY = staffTop + 3; // visual centre of lower half
-      for (const digit of String(activeTimeSig.count)) {
-        primitives.push({
-          kind: 'glyph', glyph: 'timeSig' + digit,
-          x: tsX, y: numY, anchor: 'middle',
-          className: 'time-sig-num'
-        });
-      }
-      for (const digit of String(activeTimeSig.unit)) {
-        primitives.push({
-          kind: 'glyph', glyph: 'timeSig' + digit,
-          x: tsX, y: denY, anchor: 'middle',
-          className: 'time-sig-den'
+    // Mid-measure clef changes, at the column the plan reserved for them.
+    for (const cc of m.clefChanges) {
+      primitives.push({
+        kind: 'glyph',
+        glyph: clefGlyph(cc.clef),
+        x: cc.x,
+        y: clefY(cc.clef, staffTops[cc.staff - 1] ?? staffTop),
+        scale: CLEF_CHANGE_SCALE,
+        className: 'clef clef-change'
+      });
+    }
+
+    if (m.showKeySig) {
+      for (let s = 0; s < numStaves; s++) {
+        const clefShift = KEY_SIG_CLEF_OFFSET[m.clefTimelines[s][0].clef.sign];
+        keySignatureGlyphs(m.keyFifths, m.cancelledKeyFifths).forEach((g, idx) => {
+          primitives.push({
+            kind: 'glyph',
+            glyph: g.glyph,
+            x: m.keySigX + idx * KEY_SIG_GLYPH_ADVANCE_SP,
+            y: staffTops[s] + g.y + clefShift,
+            className: 'key-sig'
+          });
         });
       }
     }
 
-    // Events per voice (staff 1 only)
-    const stdSequences = (partMeasure.sequences ?? []).filter(
-      seq => seq.staff === 1 || seq.staff === undefined
-    );
-    const measureDuration = activeTimeSig.count / activeTimeSig.unit;
-    const voiceStemOverride: (1 | -1 | null)[] =
-      stdSequences.length > 1
-        ? stdSequences.map((_, idx) => (idx === 0 ? -1 : 1))
-        : stdSequences.map(() => null);
-
-    // Some MNX data has voices whose event durations sum to more than the
-    // declared time signature allows (MusicXML conversion artifacts). To keep
-    // every glyph inside its measure we scale by the longest voice's actual
-    // duration when it exceeds the measure duration. Both voices share the
-    // same denominator so they stay aligned to each other.
-    const voiceTotals = stdSequences.map(seq =>
-      seq.content.reduce((sum, ev) => sum + durationValue(ev.duration), 0)
-    );
-    const effectiveDuration = Math.max(measureDuration, ...voiceTotals);
-    if (effectiveDuration > measureDuration) {
-      console.warn(
-        `[notation] measure ${i}: voice durations exceed time signature ` +
-        `(max=${effectiveDuration} vs ${measureDuration}). Squeezing to fit.`
-      );
+    if (m.showTimeSig) {
+      for (const top of staffTops) {
+        const numY = top + 1; // visual centre of upper half (line 2 from top)
+        const denY = top + 3; // visual centre of lower half
+        for (const digit of String(m.timeSig.count)) {
+          primitives.push({
+            kind: 'glyph', glyph: 'timeSig' + digit,
+            x: m.timeSigCentreX, y: numY, anchor: 'middle',
+            className: 'time-sig-num'
+          });
+        }
+        for (const digit of String(m.timeSig.unit)) {
+          primitives.push({
+            kind: 'glyph', glyph: 'timeSig' + digit,
+            x: m.timeSigCentreX, y: denY, anchor: 'middle',
+            className: 'time-sig-den'
+          });
+        }
+      }
     }
 
-    stdSequences.forEach((sequence, voiceIndex) => {
-      let cumDuration = 0;
-      sequence.content.forEach((event, eventIndex) => {
-        const eventDur = durationValue(event.duration);
-        // Zone-based (centre-of-slot) positioning: each event occupies a zone
-        // of width = duration / effectiveDuration; the glyph sits at the
-        // centre of its zone.
-        const centreFraction = effectiveDuration > 0
-          ? (cumDuration + eventDur / 2) / effectiveDuration
-          : 0;
-        const eventX = contentStartX + centreFraction * contentWidth;
+    // Voices per staff — the SAME resolution the plan used (multi-source
+    // staves merge/split here too). Multimeasure-rest stand-ins carry none.
+    const resolvedByStaff: ResolvedVoice[][] = segment.staves.map(spec =>
+      m.multiRest ? [] : resolveStaffVoices(spec, i)
+    );
+    const stdSequences = resolvedByStaff[0].map(v => v.seq);
 
-        emitEvent({
-          event,
-          eventX,
-          staffTop,
-          clef: activeClef,
-          stemOverride: voiceStemOverride[voiceIndex],
-          activeNoteIds,
-          selectedNoteIds,
-          primitives,
-          index,
-          measureIndex: i,
-          voiceIndex,
-          eventIndex
+    // The H-bar multimeasure rest: thick bar with end caps on every staff,
+    // count in time-signature digits above.
+    if (m.multiRest) {
+      const x1 = m.contentStartX + 0.6;
+      const x2 = m.x + m.width - 1.0;
+      for (const top of staffTops) {
+        primitives.push({
+          kind: 'rect',
+          x: x1, y: top + 1.5, w: x2 - x1, h: 1,
+          fill: 'currentColor',
+          className: 'multirest-bar'
         });
+        for (const xe of [x1, x2]) {
+          primitives.push({
+            kind: 'line',
+            x1: xe, y1: top + 1, x2: xe, y2: top + 3,
+            thickness: 0.25,
+            className: 'multirest-cap'
+          });
+        }
+        const digits = String(m.multiRest).split('');
+        digits.forEach((d, di) => {
+          primitives.push({
+            kind: 'glyph',
+            glyph: 'timeSig' + d,
+            x: (x1 + x2) / 2 + (di - (digits.length - 1) / 2) * 1.9,
+            y: top - 0.8,
+            anchor: 'middle',
+            className: 'multirest-count'
+          });
+        });
+      }
+    }
 
-        cumDuration += eventDur;
+    // Validation issues (user-fixable), the plan's issues (unsupported items),
+    // plus anything an individual event throws (forgiving render) — one bad
+    // event must not take down the bar.
+    const measureIssues: MeasureIssue[] = [
+      ...(validationByMeasure.get(i) ?? []).map(message => ({ kind: 'validation' as const, message })),
+      ...m.issues.map(message => ({ kind: 'render' as const, message }))
+    ];
+    resolvedByStaff.forEach((staffVoices, s) => {
+      // Forced stems (layout sources) win; multiple stem-less voices rank by
+      // pitch (upper voice up, rest down); lone voices auto-stem per event.
+      const defaultStems = rankVoiceStems(staffVoices, m.clefTimelines[s][0].clef);
+      staffVoices.forEach(({ seq: sequence }, voiceIndex) => {
+        const stemOverride: 1 | -1 | null = defaultStems[voiceIndex];
+        let onset = 0; // metric position within the bar, in whole-note fractions
+        sequence.content.forEach((event, eventIndex) => {
+          const slot = m.staves[s]?.[voiceIndex]?.[eventIndex];
+          if (!slot) return;
+          // Pitch math follows the clef in effect at this event's onset (the
+          // staff's timeline includes mid-measure changes).
+          const eventClef = clefAt(m.clefTimelines[s], onset);
+          onset += isGrace(event) ? 0 : isTremolo(event) ? tremoloDuration(event) : isTuplet(event) ? tupletDuration(event) : isTimedEvent(event) ? durationValue(event.duration) : 0.25;
+          try {
+            if (isGrace(event)) {
+              emitGraceGroup({
+                grace: event,
+                firstX: slot.x,
+                staffTop: staffTops[s],
+                clef: eventClef,
+                useAccidentalDisplay,
+                keyFifths: m.keyFifths,
+                primitives
+              });
+              return;
+            }
+            if (isTremolo(event)) {
+              emitTremoloGroup({
+                tremolo: event,
+                firstX: slot.x,
+                staffTop: staffTops[s],
+                clef: eventClef,
+                useAccidentalDisplay,
+                keyFifths: m.keyFifths,
+                primitives
+              });
+              return;
+            }
+            if (isTuplet(event)) {
+              emitTupletGroup({
+                tuplet: event,
+                firstX: slot.x,
+                staffTop: staffTops[s],
+                clef: eventClef,
+                useAccidentalDisplay,
+                keyFifths: m.keyFifths,
+                primitives
+              });
+              return;
+            }
+            if (sequenceItemKind(event) === 'unknown') return; // plan already recorded it
+            const beamRun = beams.byEventKey.get(`${i}:${s}:${voiceIndex}:${eventIndex}`) ?? null;
+            const stem = emitEvent({
+              event,
+              eventX: slot.x,
+              staffTop: staffTops[s],
+              clef: eventClef,
+              stemOverride,
+              beamDir: beamRun?.dir ?? null,
+              useAccidentalDisplay,
+              keyFifths: m.keyFifths,
+              activeNoteIds,
+              selectedNoteIds,
+              primitives,
+              index,
+              measureIndex: i,
+              voiceIndex,
+              eventIndex,
+              row: m.row,
+              curveKey: `${i}:${s}:${voiceIndex}:${eventIndex}`,
+              curveAnchors,
+              // Synthetic keys encode the staff-1 traversal that jsonView
+              // mirrors; other staves use real ids only.
+              synthesizeKeys: s === 0 && synthesizeKeysForStaff0
+            });
+            if (beamRun && stem && event.id) beamRun.stems.set(event.id, stem);
+            const lyricLines = event.lyrics?.lines;
+            if (lyricLines) {
+              for (const [lineId, line] of Object.entries(lyricLines)) {
+                const verse = lyricLineIds.indexOf(lineId);
+                if (verse < 0) continue;
+                const key = `${s}:${lineId}`;
+                const run = lyricRuns.get(key) ?? [];
+                run.push({
+                  x: slot.x,
+                  y: staffBottoms[s] + LYRIC_FIRST_BASELINE_DROP_SP + verse * LYRIC_LINE_SPACING_SP,
+                  text: line.text,
+                  continues: line.type === 'start' || line.type === 'middle'
+                });
+                lyricRuns.set(key, run);
+              }
+            }
+          } catch (e) {
+            measureIssues.push({ kind: 'render', message: (e as Error).message });
+          }
+        });
       });
     });
 
-    // End barline
-    const isLast = i === numMeasures - 1;
-    const barX = x + measureAllocatedWidth;
-    if (isLast) {
-      const thinX = barX - FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP;
+    // End barline — drawn per part group: internal barlines don't bridge the
+    // gap between parts (only the system-start barline joins them).
+    const isLast = i === numMeasures - 1 || plan.measures.slice(i + 1).every(n => n.hidden);
+    const barX = m.x + m.width;
+    for (const g of segment.groups) {
+      for (const [gTop, gBottom] of groupSpans(g)) {
+        if (m.repeatEnd) {
+          // Backward repeat :| — dots + thin + thick (doubles as a final barline).
+          primitives.push({
+            kind: 'rect',
+            x: barX - FINAL_BARLINE_THICK_SP, y: gTop,
+            w: FINAL_BARLINE_THICK_SP, h: gBottom - gTop,
+            fill: 'currentColor',
+            className: 'barline repeat-end'
+          });
+          primitives.push({
+            kind: 'line',
+            x1: barX - FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP,
+            y1: gTop,
+            x2: barX - FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP,
+            y2: gBottom,
+            thickness: BARLINE_THICKNESS_SP,
+            className: 'barline repeat-end'
+          });
+        } else if (isLast) {
+          const thinX = barX - FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP;
+          primitives.push({
+            kind: 'line',
+            x1: thinX, y1: gTop, x2: thinX, y2: gBottom,
+            thickness: BARLINE_THICKNESS_SP,
+            className: 'barline barline-final-thin'
+          });
+          primitives.push({
+            kind: 'rect',
+            x: barX - FINAL_BARLINE_THICK_SP, y: gTop,
+            w: FINAL_BARLINE_THICK_SP, h: gBottom - gTop,
+            fill: 'currentColor',
+            className: 'barline barline-final-thick'
+          });
+        } else {
+          primitives.push({
+            kind: 'line',
+            x1: barX, y1: gTop, x2: barX, y2: gBottom,
+            thickness: BARLINE_THICKNESS_SP,
+            className: 'barline'
+          });
+        }
+      }
+    }
+    if (m.repeatEnd) {
+      const dotX = barX - FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP - 0.85;
+      for (const top of staffTops) {
+        for (const dotY of [1.5, 2.5]) {
+          primitives.push({
+            kind: 'glyph',
+            glyph: 'augmentationDot',
+            x: dotX,
+            y: top + dotY,
+            scale: REPEAT_DOT_SCALE,
+            className: 'repeat-dot'
+          });
+        }
+      }
+    }
+    // Unconventional play counts print above the barline ("4x").
+    if (m.repeatEnd) {
+      const times = m.repeatEnd.times;
+      if (times !== undefined && times !== 2) {
+        primitives.push({
+          kind: 'text',
+          text: `${times}x`,
+          x: barX,
+          y: staffTop - 1.2,
+          font: 'body',
+          size: 1.4,
+          weight: 'bold',
+          anchor: 'end',
+          className: 'repeat-times'
+        });
+      }
+    }
+
+    // Full-measure rests (sequence.fullMeasure with empty content): one rest
+    // centred in the bar's content span, on the sequence's staff.
+    resolvedByStaff.forEach((staffVoices, s) => {
+      for (const { seq: sequence } of staffVoices) {
+        const fm = sequence.fullMeasure;
+        if (!fm || sequence.content.length > 0) continue;
+        const base = fm.visualDuration?.base ?? 'whole';
+        const y =
+          fm.staffPosition !== undefined
+            ? STAFF_MIDDLE_Y - fm.staffPosition / 2
+            : REST_Y_BY_BASE[base] ?? 1;
+        primitives.push({
+          kind: 'glyph',
+          glyph: REST_GLYPH_BY_BASE[base] ?? 'restWhole',
+          x: (m.contentStartX + m.x + m.width) / 2,
+          y: staffTops[s] + y,
+          anchor: 'middle',
+          className: 'rest rest-full-measure'
+        });
+      }
+    });
+
+    // Dynamics, per group (anchored via the group's lead part).
+    if (!m.multiRest) {
+      for (const g of segment.groups) {
+        const pm = segment.staves[g.start].sources[0].part.measures[i];
+        if (!pm) continue;
+        emitDynamics({
+          partMeasure: pm,
+          m: { x: m.x, width: m.width, staves: m.staves.slice(g.start, g.start + g.count) },
+          sequencesByStaff: resolvedByStaff
+            .slice(g.start, g.start + g.count)
+            .map(voices => voices.map(v => v.seq)),
+          staffBottoms: staffBottoms.slice(g.start, g.start + g.count),
+          primitives
+        });
+      }
+    }
+    emitNavigationMarkers({
+      gm: mnx.global.measures[i] ?? {},
+      m,
+      stdSequences,
+      staffTop,
+      primitives
+    });
+
+    if (measureIssues.length) {
+      emitMeasureDiagnostics(m.x, sysBottom, measureIssues, primitives);
+      for (const issue of measureIssues) diagnostics.push({ measureIndex: i, ...issue });
+    }
+  }
+
+  for (const run of beams.runs) emitBeamRun(run, primitives);
+
+  emitSlursAndTies(segment, plan, curveAnchors, primitives);
+
+  // Lyrics: syllables centred under their columns, hyphens joining
+  // start/middle syllables to the next one on the same row.
+  for (const run of lyricRuns.values()) {
+    run.forEach((syl, k) => {
       primitives.push({
-        kind: 'line',
-        x1: thinX, y1: staffTop, x2: thinX, y2: staffBottom,
-        thickness: BARLINE_THICKNESS_SP,
-        className: 'barline barline-final-thin'
+        kind: 'text',
+        text: syl.text,
+        x: syl.x,
+        y: syl.y,
+        font: 'body',
+        size: LYRIC_SIZE_SP,
+        anchor: 'middle',
+        className: 'lyric'
       });
-      primitives.push({
-        kind: 'rect',
-        x: barX - FINAL_BARLINE_THICK_SP, y: staffTop,
-        w: FINAL_BARLINE_THICK_SP, h: STAFF_HEIGHT_SP,
-        fill: 'currentColor',
-        className: 'barline barline-final-thick'
+      const next = run[k + 1];
+      if (syl.continues && next && next.y === syl.y && next.x > syl.x) {
+        primitives.push({
+          kind: 'text',
+          text: '-',
+          x: (syl.x + next.x) / 2,
+          y: syl.y,
+          font: 'body',
+          size: LYRIC_SIZE_SP,
+          anchor: 'middle',
+          className: 'lyric-hyphen'
+        });
+      }
+    });
+  }
+
+  emitEndings(mnx, plan, systemHeightSp, primitives);
+
+  const heightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * systemHeightSp;
+
+  return { primitives, heightSp, usedWidthSp: plan.usedWidthSp };
+}
+
+// ---------- Beams ----------
+
+/** Deferred stem of a beamed event, recorded during emission. */
+interface BeamedStem {
+  stemX: number;
+  /** Notehead end of the stem (absolute y, anchor-corrected). */
+  attachY: number;
+  /** Extreme notehead centre on the tip side — the ideal tip extends from here. */
+  baseTipY: number;
+  fill?: string;
+  colorClass: string;
+}
+
+/** One drawable beam: a group (or the part of it on one system row). */
+interface BeamRun {
+  dir: 1 | -1;
+  /** Member event ids in document order. */
+  memberIds: string[];
+  segments: BeamSegmentSpec[];
+  hooks: BeamHookSpec[];
+  /** Filled during event emission. */
+  stems: Map<string, BeamedStem>;
+}
+
+function buildBeamRuns(
+  mnx: MnxStructure,
+  segment: JobSegment,
+  plan: HorizontalPlan
+): { runs: BeamRun[]; byEventKey: Map<string, BeamRun> } {
+  const runs: BeamRun[] = [];
+  const byEventKey = new Map<string, BeamRun>();
+
+  interface Loc {
+    mi: number;
+    si: number;
+    vi: number;
+    ei: number;
+    event: MnxEvent;
+    /** Forced or pitch-ranked voice stem; null = decide from the run. */
+    stem: 1 | -1 | null;
+  }
+
+  // Locate events through the SAME voice resolution emission uses (merged
+  // chord staves keep the first source's event ids).
+  const locById = new Map<string, Loc>();
+  const info = new Map<string, BeamEventInfo>();
+  const partsSeen = new Set<MnxPart>();
+  segment.staves.forEach((spec, si) => {
+    for (const src of spec.sources) partsSeen.add(src.part);
+    for (let mi = 0; mi < plan.measures.length; mi++) {
+      const pm = plan.measures[mi];
+      if (!pm || pm.hidden || pm.multiRest) continue;
+      const voices = resolveStaffVoices(spec, mi);
+      const defaultStems = rankVoiceStems(voices, pm.clefTimelines[si][0].clef);
+      voices.forEach((rv, vi) => {
+        rv.seq.content.forEach((event, ei) => {
+          // Grace containers don't join measure-level beam groups: their inner
+          // notes beam among themselves (emitGraceGroup), as in the spec's
+          // beams-inner-grace-notes example where the grace sits out the beam.
+          // Unknown item kinds (tuplet, tremolo, …) can't carry beams either.
+          if (!isTimedEvent(event) || !event.id) return;
+          locById.set(event.id, { mi, si, vi, ei, event, stem: defaultStems[vi] });
+          info.set(event.id, {
+            levels: BEAM_LEVELS_BY_BASE[event.duration.base] ?? 0,
+            ticks: Math.round(durationValue(event.duration) * WHOLE_NOTE_TICKS)
+          });
+        });
       });
-    } else {
-      primitives.push({
-        kind: 'line',
-        x1: barX, y1: staffTop, x2: barX, y2: staffBottom,
-        thickness: BARLINE_THICKNESS_SP,
-        className: 'barline'
+    }
+  });
+
+  const groups: BeamGroupSpec[] = [];
+  for (const part of partsSeen) groups.push(...resolveBeamGroups(part.measures, info));
+
+  // Documents that don't declare support.useBeams leave beaming to the
+  // renderer: consecutive beamable note events of a sequence beam together
+  // within the conventional metric unit — the half-bar in even simple meters
+  // (pairs the spec's reference engravings group eighths into), the beat in
+  // odd ones, the dotted quarter in compound time. Measures carrying explicit
+  // `beams` stay as encoded, as do events some other measure already beamed.
+  if (mnx.mnx?.support?.useBeams !== true) {
+    const explicitIds = new Set(groups.flatMap(g => g.eventIds));
+    for (const part of partsSeen) {
+      part.measures.forEach((pm, mi) => {
+        if (pm.beams?.length) return;
+        const ts = plan.measures[mi]?.timeSig ?? { count: 4, unit: 4 };
+        const beatTicks =
+          ts.unit === 8 && ts.count % 3 === 0
+            ? (3 * WHOLE_NOTE_TICKS) / 8
+            : ts.count % 3 === 0
+            ? ts.count * (WHOLE_NOTE_TICKS / ts.unit) // simple triple: whole bar
+            : (WHOLE_NOTE_TICKS / ts.unit) * (ts.count % 2 === 0 ? 2 : 1);
+        for (const seq of pm.sequences ?? []) {
+          let t = 0; // onset in ticks
+          let run: string[] = [];
+          const flush = () => {
+            if (run.length >= 2) groups.push(impliedBeamGroup(run, info));
+            run = [];
+          };
+          for (const item of seq.content) {
+            if (isGrace(item)) continue; // graces sit out beams without breaking the run
+            if (isTremolo(item) || isTuplet(item)) {
+              flush();
+              t += Math.round(
+                (isTremolo(item) ? tremoloDuration(item) : tupletDuration(item)) * WHOLE_NOTE_TICKS
+              );
+              continue;
+            }
+            if (!isTimedEvent(item)) {
+              flush();
+              continue;
+            }
+            const beamable =
+              !item.rest &&
+              (item.notes?.length ?? 0) > 0 &&
+              (BEAM_LEVELS_BY_BASE[item.duration.base] ?? 0) >= 1 &&
+              !!item.id &&
+              !explicitIds.has(item.id);
+            if (!beamable) {
+              flush();
+            } else {
+              if (run.length > 0 && t % beatTicks === 0) flush();
+              run.push(item.id!);
+            }
+            t += Math.round(durationValue(item.duration) * WHOLE_NOTE_TICKS);
+          }
+          flush();
+        }
       });
     }
   }
 
-  const totalRows = Math.ceil(numMeasures / measuresPerRow);
-  const heightSp = 2 * MARGIN_SP + totalRows * ROW_HEIGHT_SP;
+  for (const group of groups) {
+    // Members that exist, carry notes, and can hold a beam.
+    const members = group.eventIds.filter(id => {
+      const loc = locById.get(id);
+      return (
+        !!loc &&
+        !loc.event.rest &&
+        (loc.event.notes?.length ?? 0) > 0 &&
+        (BEAM_LEVELS_BY_BASE[loc.event.duration.base] ?? 0) >= 1
+      );
+    });
 
-  return { primitives, widthSp, heightSp, index };
+    // A beam can't span a system break — split and re-beam each side.
+    const rowOf = (id: string) => plan.measures[locById.get(id)!.mi].row;
+    const rowRuns: string[][] = [];
+    let current: string[] = [];
+    for (const id of members) {
+      if (current.length && rowOf(id) !== rowOf(current[current.length - 1])) {
+        rowRuns.push(current);
+        current = [];
+      }
+      current.push(id);
+    }
+    if (current.length) rowRuns.push(current);
+
+    for (const ids of rowRuns) {
+      if (ids.length < 2) continue; // a lone survivor keeps its flag
+
+      // Stem direction: a forced or pitch-ranked voice stem wins; otherwise
+      // the note furthest from the middle line across the whole run decides.
+      const firstLoc = locById.get(ids[0])!;
+      let dir: 1 | -1;
+      if (firstLoc.stem !== null) {
+        dir = firstLoc.stem;
+      } else {
+        const ys: number[] = [];
+        for (const id of ids) {
+          const loc = locById.get(id)!;
+          const clef = plan.measures[loc.mi].clefTimelines[loc.si][0].clef;
+          for (const n of loc.event.notes ?? []) {
+            ys.push(pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
+          }
+        }
+        dir = autoStemDir(ys);
+      }
+
+      // Clip secondary segments/hooks to this run; a segment cut down to a
+      // single member degrades to a hook pointing back into the group.
+      const inRun = new Set(ids);
+      const segments: BeamSegmentSpec[] = [];
+      const hooks: BeamHookSpec[] = group.hooks.filter(h => inRun.has(h.eventId));
+      for (const seg of group.segments) {
+        const clipped = seg.eventIds.filter(id => inRun.has(id));
+        if (clipped.length >= 2) {
+          segments.push({ level: seg.level, eventIds: clipped });
+        } else if (clipped.length === 1) {
+          hooks.push({
+            level: seg.level,
+            eventId: clipped[0],
+            direction: ids.indexOf(clipped[0]) > 0 ? 'left' : 'right'
+          });
+        }
+      }
+
+      const run: BeamRun = { dir, memberIds: ids, segments, hooks, stems: new Map() };
+      runs.push(run);
+      for (const id of ids) {
+        const loc = locById.get(id)!;
+        byEventKey.set(`${loc.mi}:${loc.si}:${loc.vi}:${loc.ei}`, run);
+      }
+    }
+  }
+
+  return { runs, byEventKey };
+}
+
+
+function emitBeamRun(run: BeamRun, primitives: Primitive[]): void {
+  const stems = run.memberIds
+    .map(id => run.stems.get(id))
+    .filter((s): s is BeamedStem => s !== undefined);
+  if (stems.length < 2) return;
+
+  const dir = run.dir;
+  const idealTip = (s: BeamedStem) => s.baseTipY - dir * STEM_LENGTH_SP;
+  const first = stems[0];
+  const last = stems[stems.length - 1];
+  const span = last.stemX - first.stemX || 1;
+
+  // Beam line: slant follows the outer noteheads (capped), then slides
+  // outward until every stem reaches at least full length.
+  const slant = Math.max(
+    -BEAM_MAX_SLANT_SP,
+    Math.min(BEAM_MAX_SLANT_SP, idealTip(last) - idealTip(first))
+  );
+  const base = (x: number) => idealTip(first) + (slant * (x - first.stemX)) / span;
+  const deltas = stems.map(s => idealTip(s) - base(s.stemX));
+  const shift = dir === 1 ? Math.min(...deltas) : Math.max(...deltas);
+  const lineY = (x: number) => base(x) + shift;
+  // Deeper levels stack toward the noteheads.
+  const levelY = (x: number, level: number) =>
+    lineY(x) + dir * (level - 1) * (BEAM_THICKNESS_SP + BEAM_GAP_SP);
+
+  for (const s of stems) {
+    primitives.push({
+      kind: 'line',
+      x1: s.stemX, y1: s.attachY,
+      x2: s.stemX, y2: lineY(s.stemX),
+      thickness: STEM_THICKNESS_SP,
+      stroke: s.fill,
+      className: 'stem' + s.colorClass
+    });
+  }
+
+  const bar = (xa: number, xb: number, level: number) => {
+    primitives.push({
+      kind: 'line',
+      x1: xa - STEM_THICKNESS_SP / 2, y1: levelY(xa, level),
+      x2: xb + STEM_THICKNESS_SP / 2, y2: levelY(xb, level),
+      thickness: BEAM_THICKNESS_SP,
+      className: 'beam'
+    });
+  };
+
+  bar(first.stemX, last.stemX, 1);
+
+  const stemXOf = (id: string) => run.stems.get(id)?.stemX;
+  for (const seg of run.segments) {
+    const xs = seg.eventIds
+      .map(stemXOf)
+      .filter((x): x is number => x !== undefined);
+    if (xs.length >= 2) bar(Math.min(...xs), Math.max(...xs), seg.level);
+  }
+  for (const hook of run.hooks) {
+    const x = stemXOf(hook.eventId);
+    if (x === undefined) continue;
+    if (hook.direction === 'right') bar(x, x + BEAM_HOOK_LENGTH_SP, hook.level);
+    else bar(x - BEAM_HOOK_LENGTH_SP, x, hook.level);
+  }
+}
+
+// ---------- Slurs & ties ----------
+
+/** Geometry of one emitted note-carrying event, for curve endpoints. */
+interface EventCurveAnchor {
+  x: number;
+  row: number;
+  stemDir: 1 | -1;
+  /** Absolute notehead-centre y per chord member, in document order. */
+  headYs: number[];
+}
+
+interface CurveAnchors {
+  /** Keyed `${measure}:${staff}:${voice}:${event}` — the emission traversal. */
+  byKey: Map<string, EventCurveAnchor>;
+  byEventId: Map<string, EventCurveAnchor>;
+  byNoteId: Map<string, { anchor: EventCurveAnchor; noteIndex: number }>;
+}
+
+/**
+ * Draws slur and tie curves between recorded anchors. Slurs live on events
+ * (`slurs[].target` = event id, optionally pinned to chord members via
+ * `startNote`/`endNote`); ties live on notes (`ties[].target` = note id; `lv`
+ * with no target draws a short laissez-vibrer hook). Curve side defaults to
+ * opposite the start event's stem. A curve whose endpoints land on different
+ * system rows splits at the break: the first half runs out to the end of the
+ * start row, the second resumes at the target row's left edge.
+ */
+function emitSlursAndTies(
+  segment: JobSegment,
+  plan: HorizontalPlan,
+  anchors: CurveAnchors,
+  primitives: Primitive[]
+): void {
+  // Row edges, for curves split at system breaks.
+  const rowRight = new Map<number, number>();
+  const rowLeft = new Map<number, number>();
+  for (const m of plan.measures) {
+    if (m.hidden) continue;
+    rowRight.set(m.row, Math.max(rowRight.get(m.row) ?? -Infinity, m.x + m.width));
+    rowLeft.set(m.row, Math.min(rowLeft.get(m.row) ?? Infinity, m.contentStartX));
+  }
+
+  const curve = (
+    x0: number, y0: number, x1: number, y1: number,
+    dir: 1 | -1, // -1 bulges up (y grows downward), 1 bulges down
+    kind: 'slur' | 'tie'
+  ) => {
+    const span = Math.max(x1 - x0, 0.8);
+    const h = kind === 'slur'
+      ? Math.min(0.9 + span * 0.08, 2.2)
+      : Math.min(0.45 + span * 0.05, 1.1);
+    primitives.push({
+      kind: 'curve',
+      points: [
+        { x: x0, y: y0 },
+        { x: x0 + span * 0.3, y: y0 + dir * h },
+        { x: x1 - span * 0.3, y: y1 + dir * h },
+        { x: x1, y: y1 }
+      ],
+      thickness: kind === 'slur' ? SLUR_THICKNESS_SP : TIE_THICKNESS_SP,
+      taper: true,
+      className: kind
+    });
+  };
+
+  /** One curve, or two halves when the endpoints sit on different rows. */
+  const draw = (
+    x0: number, y0: number, row0: number,
+    x1: number, y1: number, row1: number,
+    dir: 1 | -1,
+    kind: 'slur' | 'tie'
+  ) => {
+    if (row0 !== row1) {
+      const cutX = Math.max((rowRight.get(row0) ?? x0) - 0.4, x0 + 1.5);
+      const resumeX = Math.min((rowLeft.get(row1) ?? x1) + 0.2, x1 - 1.5);
+      curve(x0, y0, cutX, y0, dir, kind);
+      curve(resumeX, y1, x1, y1, dir, kind);
+      return;
+    }
+    curve(x0, y0, x1, y1, dir, kind);
+  };
+
+  segment.staves.forEach((spec, si) => {
+    for (let mi = 0; mi < plan.measures.length; mi++) {
+      const pm = plan.measures[mi];
+      if (!pm || pm.hidden || pm.multiRest) continue;
+      resolveStaffVoices(spec, mi).forEach((rv, vi) => {
+        rv.seq.content.forEach((item, ei) => {
+          if (!isTimedEvent(item)) return;
+          const start = anchors.byKey.get(`${mi}:${si}:${vi}:${ei}`);
+          if (!start) return;
+
+          for (const slur of item.slurs ?? []) {
+            const end = anchors.byEventId.get(slur.target);
+            if (!end) continue;
+            const side: 'up' | 'down' = slur.side ?? (start.stemDir === 1 ? 'down' : 'up');
+            const dir = side === 'up' ? -1 : 1;
+            const pad = dir * SLUR_END_PAD_SP;
+            // A pinned endpoint (startNote/endNote) anchors at that chord
+            // member; otherwise at the outermost notehead on the curve side.
+            const headY = (a: EventCurveAnchor, noteId?: string) => {
+              const pinned = noteId ? anchors.byNoteId.get(noteId) : undefined;
+              if (pinned) return pinned.anchor.headYs[pinned.noteIndex];
+              return side === 'up' ? Math.min(...a.headYs) : Math.max(...a.headYs);
+            };
+            draw(
+              start.x + 0.2, headY(start, slur.startNote) + pad, start.row,
+              end.x - 0.2, headY(end, slur.endNote) + pad, end.row,
+              dir, 'slur'
+            );
+          }
+
+          (item.notes ?? []).forEach((note, ni) => {
+            for (const tie of note.ties ?? []) {
+              const noteY = start.headYs[ni];
+              if (noteY === undefined) continue;
+              const side: 'up' | 'down' = tie.side ?? (start.stemDir === 1 ? 'down' : 'up');
+              const dir = side === 'up' ? -1 : 1;
+              const pad = dir * TIE_END_PAD_SP;
+              if (!tie.target) {
+                if (tie.lv) {
+                  const x0 = start.x + TIE_END_GAP_SP;
+                  curve(x0, noteY + pad, x0 + LV_TIE_LENGTH_SP, noteY + pad, dir, 'tie');
+                }
+                continue;
+              }
+              const target = anchors.byNoteId.get(tie.target);
+              if (!target) {
+                // The tie is encoded but its target isn't renderable (e.g.
+                // organ-layout's pedal tie into a never-encoded next bar) —
+                // draw the outgoing stub rather than dropping the tie.
+                const x0 = start.x + TIE_END_GAP_SP;
+                curve(x0, noteY + pad, x0 + LV_TIE_LENGTH_SP, noteY + pad, dir, 'tie');
+                continue;
+              }
+              const targetY = target.anchor.headYs[target.noteIndex] + pad;
+              if (tie.targetType === 'crossJump') {
+                // A tie across a jump (e.g. into a second ending) draws only
+                // the incoming stub at its target — drawing the full curve
+                // would span the music skipped by the jump, and the source
+                // side already carries the first-time tie.
+                const x1 = target.anchor.x - TIE_END_GAP_SP;
+                curve(x1 - LV_TIE_LENGTH_SP, targetY, x1, targetY, dir, 'tie');
+                continue;
+              }
+              draw(
+                start.x + TIE_END_GAP_SP, noteY + pad, start.row,
+                target.anchor.x - TIE_END_GAP_SP, targetY, target.anchor.row,
+                dir, 'tie'
+              );
+            }
+          });
+        });
+      });
+    }
+  });
+}
+
+// ---------- Volta brackets (endings) ----------
+
+/**
+ * Draws each global-measure `ending` as a volta bracket: a line above the
+ * staff spanning `duration` measures, hooked down at the start (and at the end
+ * unless `open`), labelled with its numbers ("1." / "1. 2."). Brackets split
+ * at system breaks; only the first segment carries the hook and label.
+ */
+function emitEndings(
+  mnx: MnxStructure,
+  plan: HorizontalPlan,
+  systemHeightSp: number,
+  primitives: Primitive[]
+): void {
+  (mnx.global.measures ?? []).forEach((gm, i) => {
+    const ending = gm?.ending;
+    if (!ending || !plan.measures[i]) return;
+    const last = Math.min(i + Math.max(1, ending.duration ?? 1) - 1, plan.measures.length - 1);
+
+    let a = i;
+    while (a <= last) {
+      const row = plan.measures[a].row;
+      let b = a;
+      while (b + 1 <= last && plan.measures[b + 1].row === row) b++;
+      const staffTop = MARGIN_SP + row * systemHeightSp + ROW_PAD_TOP_SP;
+      const y = staffTop - VOLTA_RISE_SP;
+      const x1 = plan.measures[a].x + 0.1;
+      const x2 = plan.measures[b].x + plan.measures[b].width - 0.1;
+      primitives.push({
+        kind: 'line',
+        x1, y1: y, x2, y2: y,
+        thickness: VOLTA_THICKNESS_SP,
+        className: 'ending'
+      });
+      if (a === i) {
+        primitives.push({
+          kind: 'line',
+          x1, y1: y, x2: x1, y2: y + VOLTA_HOOK_SP,
+          thickness: VOLTA_THICKNESS_SP,
+          className: 'ending'
+        });
+        primitives.push({
+          kind: 'text',
+          text: (ending.numbers ?? []).map(n => `${n}.`).join(' '),
+          x: x1 + 0.5,
+          y: y + 1.4,
+          font: 'body',
+          size: 1.4,
+          weight: 'bold',
+          className: 'ending-label'
+        });
+      }
+      if (!ending.open && b === last) {
+        primitives.push({
+          kind: 'line',
+          x1: x2, y1: y, x2, y2: y + VOLTA_HOOK_SP,
+          thickness: VOLTA_THICKNESS_SP,
+          className: 'ending'
+        });
+      }
+      a = b + 1;
+    }
+  });
+}
+
+// ---------- Metric-position anchoring (dynamics, segno/fine/jump) ----------
+
+interface OnsetX {
+  t: number;
+  x: number;
+}
+
+/** Onset → column x for the first staff-1 voice — the anchor map for
+ *  measure-attached markings with a `position`/`location`. */
+function measureOnsetXs(seq: MnxSequence | undefined, slots: { x: number }[]): OnsetX[] {
+  const onsetXs: OnsetX[] = [];
+  let t = 0;
+  (seq?.content ?? []).forEach((item, idx) => {
+    const slot = slots[idx];
+    if (slot) onsetXs.push({ t, x: slot.x });
+    t += isGrace(item) ? 0 : isTremolo(item) ? tremoloDuration(item) : isTuplet(item) ? tupletDuration(item) : isTimedEvent(item) ? durationValue(item.duration) : 0.25;
+  });
+  return onsetXs;
+}
+
+/** The column at (or first after) a metric position; positions past the last
+ *  event anchor at the end barline (right-aligned). */
+function anchorAt(
+  onsetXs: OnsetX[],
+  t: number,
+  m: { x: number; width: number }
+): { x: number; anchor: 'middle' | 'end' } {
+  const hit = onsetXs.find(o => o.t >= t - 1e-6);
+  if (hit) return { x: hit.x, anchor: 'middle' };
+  return { x: m.x + m.width, anchor: 'end' };
+}
+
+// ---------- Dynamics ----------
+
+interface EmitDynamicsArgs {
+  partMeasure: MnxPartMeasure;
+  m: { staves: { x: number }[][][]; x: number; width: number };
+  /** Staff-1-first sequence groups (same filter the plan used). */
+  sequencesByStaff: MnxSequence[][];
+  staffBottoms: number[];
+  primitives: Primitive[];
+}
+
+/**
+ * Draws the measure's dynamic markings below their staff, each centred on the
+ * event column at (or after) its metric position. Mapped values use the SMuFL
+ * composite glyphs; anything else renders as italic text so a novel marking
+ * still shows up.
+ */
+function emitDynamics(args: EmitDynamicsArgs): void {
+  const { partMeasure, m, sequencesByStaff, staffBottoms, primitives } = args;
+  const dynamics = partMeasure.dynamics ?? [];
+  if (dynamics.length === 0) return;
+
+  // Onset → column x per staff, from its first voice; built lazily.
+  const onsetXsByStaff = new Map<number, OnsetX[]>();
+  const onsetXsFor = (s: number) => {
+    let xs = onsetXsByStaff.get(s);
+    if (!xs) {
+      xs = measureOnsetXs(sequencesByStaff[s]?.[0], m.staves[s]?.[0] ?? []);
+      onsetXsByStaff.set(s, xs);
+    }
+    return xs;
+  };
+
+  for (const dyn of dynamics) {
+    const s = Math.min(Math.max((dyn.staff ?? 1) - 1, 0), staffBottoms.length - 1);
+    const f = dyn.position?.fraction;
+    if (!Array.isArray(f) || !f[1]) continue;
+    const target = f[0] / f[1];
+    const onsetXs = onsetXsFor(s);
+    // The column at (or first after) the marked position; past the last
+    // event, fall back to the end of the measure's content.
+    const x =
+      onsetXs.find(o => o.t >= target - 1e-6)?.x ??
+      (onsetXs.length ? m.x + m.width - 2 : m.x + 2);
+    const y = staffBottoms[s] + DYNAMIC_BASELINE_DROP_SP;
+    const glyph = dynamicGlyph(dyn.value, dyn.glyph);
+    if (glyph) {
+      primitives.push({
+        kind: 'glyph',
+        glyph,
+        x,
+        y,
+        anchor: 'middle',
+        className: 'dynamic'
+      });
+    } else {
+      primitives.push({
+        kind: 'text',
+        text: dyn.value,
+        x,
+        y,
+        font: 'bodyItalic',
+        size: 1.8,
+        weight: 'bold',
+        anchor: 'middle',
+        className: 'dynamic'
+      });
+    }
+  }
+}
+
+// ---------- Navigation markers (segno / fine / jump) ----------
+
+const NAV_MARKER_RISE_SP = 2.5; // baseline above the top staff line
+
+const JUMP_TEXT: Record<string, string> = {
+  segno: 'D.S.',
+  dsalfine: 'D.S. al Fine'
+};
+
+interface EmitNavigationMarkersArgs {
+  gm: MnxGlobalMeasure;
+  m: { voices: { x: number }[][]; x: number; width: number };
+  stdSequences: MnxSequence[];
+  staffTop: number;
+  primitives: Primitive[];
+}
+
+/** Segno sign, "fine" and jump text ("D.S." / "D.S. al Fine") above the staff
+ *  at their metric location — end-of-bar locations right-align at the barline,
+ *  as in the spec's reference engravings. */
+function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
+  const { gm, m, stdSequences, staffTop, primitives } = args;
+  if (!gm.segno && !gm.fine && !gm.jump) return;
+
+  const onsetXs = measureOnsetXs(stdSequences[0], m.voices[0] ?? []);
+  const y = staffTop - NAV_MARKER_RISE_SP;
+  const place = (loc?: { fraction: [number, number] }) => {
+    const f = loc?.fraction;
+    const t = Array.isArray(f) && f[1] ? f[0] / f[1] : 0;
+    return anchorAt(onsetXs, t, m);
+  };
+
+  if (gm.segno) {
+    const p = place(gm.segno.location);
+    primitives.push({
+      kind: 'glyph',
+      glyph: gm.segno.glyph ?? 'segno',
+      x: p.x,
+      y,
+      anchor: p.anchor,
+      className: 'segno'
+    });
+  }
+  if (gm.fine) {
+    const p = place(gm.fine.location);
+    primitives.push({
+      kind: 'text',
+      text: 'fine',
+      x: p.x,
+      y,
+      font: 'bodyItalic',
+      size: 1.6,
+      anchor: p.anchor,
+      className: 'fine'
+    });
+  }
+  if (gm.jump) {
+    const p = place(gm.jump.location);
+    primitives.push({
+      kind: 'text',
+      text: JUMP_TEXT[gm.jump.type] ?? gm.jump.type,
+      x: p.x,
+      y,
+      font: 'body',
+      size: 1.6,
+      anchor: p.anchor,
+      className: 'jump'
+    });
+  }
+}
+
+// ---------- Grace notes ----------
+
+interface EmitGraceGroupArgs {
+  grace: MnxGrace;
+  /** Centre of the first grace-note column (the plan reserves
+   *  GRACE_NOTE_ADVANCE_SP per inner note). */
+  firstX: number;
+  staffTop: number;
+  clef: ActiveClef;
+  useAccidentalDisplay: boolean;
+  keyFifths: number;
+  primitives: Primitive[];
+}
+
+/**
+ * Draws an MNX grace container: small noteheads (GRACE_SCALE). A single grace
+ * note keeps the traditional always-up stem with flag + acciaccatura slash;
+ * a beamed group follows the normal pitch-based stem rule and is slashed
+ * through its first stem — both defaults mirror the spec's own reference
+ * engravings (grace-note / beams-inner-grace-notes vs beams-grace-notes),
+ * and `slash: false` opts out. Groups beam their own notes, never the
+ * principal.
+ */
+function emitGraceGroup(args: EmitGraceGroupArgs): void {
+  const { grace, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives } = args;
+  const inner = grace.content.filter(e => !e.rest && (e.notes?.length ?? 0) > 0);
+  if (inner.length === 0) return;
+
+  const beamed = inner.length >= 2;
+  const headW = NOTEHEAD_WIDTH_SP * GRACE_SCALE;
+
+  // Stem direction: groups by the pitch rule (note furthest from the middle
+  // line decides), single graces always up — matching the spec engravings.
+  const allYs = inner.flatMap(e =>
+    (e.notes ?? []).map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef))
+  );
+  const dir: 1 | -1 = beamed ? autoStemDir(allYs) : 1;
+
+  interface GraceStem {
+    x: number;
+    attachY: number;
+    /** Extreme notehead centre on the tip side. */
+    tipBaseY: number;
+    levels: number;
+  }
+  const stems: GraceStem[] = [];
+
+  inner.forEach((event, j) => {
+    const x = firstX + j * GRACE_NOTE_ADVANCE_SP;
+    const notes = event.notes!;
+    const staffYs = notes.map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
+    const headGlyph = NOTEHEAD_GLYPH_BY_BASE[event.duration.base] ?? 'noteheadBlack';
+
+    for (const ly of unionLedgerLines(staffYs)) {
+      primitives.push({
+        kind: 'line',
+        x1: x - headW / 2 - LEDGER_OVERHANG_SP * GRACE_SCALE,
+        y1: staffTop + ly,
+        x2: x + headW / 2 + LEDGER_OVERHANG_SP * GRACE_SCALE,
+        y2: staffTop + ly,
+        thickness: LEDGER_LINE_THICKNESS_SP,
+        className: 'ledger-line grace'
+      });
+    }
+
+    notes.forEach((n, idx) => {
+      const accGlyph = noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths);
+      if (accGlyph) {
+        primitives.push({
+          kind: 'glyph',
+          glyph: accGlyph,
+          x: x - headW / 2 - ACCIDENTAL_SLOT_WIDTH_SP * GRACE_SCALE,
+          y: staffTop + staffYs[idx],
+          scale: GRACE_SCALE,
+          className: 'accidental grace'
+        });
+      }
+      primitives.push({
+        kind: 'glyph',
+        glyph: headGlyph,
+        x: x - headW / 2,
+        y: staffTop + staffYs[idx],
+        scale: GRACE_SCALE,
+        className: 'notehead grace'
+      });
+    });
+
+    const anchor =
+      dir === 1
+        ? glyphAnchor(headGlyph, 'stemUpSE') ?? { x: NOTEHEAD_WIDTH_SP, y: 0.168 }
+        : glyphAnchor(headGlyph, 'stemDownNW') ?? { x: 0, y: -0.168 };
+    const stemX = x - headW / 2 + anchor.x * GRACE_SCALE;
+    const attachY =
+      staffTop + (dir === 1 ? Math.max(...staffYs) : Math.min(...staffYs)) - anchor.y * GRACE_SCALE;
+    const tipBaseY = staffTop + (dir === 1 ? Math.min(...staffYs) : Math.max(...staffYs));
+
+    if (beamed) {
+      stems.push({
+        x: stemX,
+        attachY,
+        tipBaseY,
+        levels: BEAM_LEVELS_BY_BASE[event.duration.base] ?? 1
+      });
+      return;
+    }
+
+    const tipY = tipBaseY - dir * GRACE_STEM_LENGTH_SP;
+    primitives.push({
+      kind: 'line',
+      x1: stemX, y1: tipY, x2: stemX, y2: attachY,
+      thickness: STEM_THICKNESS_SP,
+      className: 'stem grace'
+    });
+    const flagGlyph = FLAG_GLYPH_BY_BASE_UP[event.duration.base];
+    if (flagGlyph) {
+      primitives.push({
+        kind: 'glyph',
+        glyph: flagGlyph,
+        x: stemX,
+        y: tipY,
+        scale: GRACE_SCALE,
+        className: 'flag grace'
+      });
+    }
+    if (grace.slash !== false) {
+      const midY = tipY + 1.1; // crossing the stem through the flag
+      primitives.push({
+        kind: 'line',
+        x1: stemX - 0.45, y1: midY + 0.55,
+        x2: stemX + 0.85, y2: midY - 0.55,
+        thickness: GRACE_SLASH_THICKNESS_SP,
+        className: 'grace-slash'
+      });
+    }
+  });
+
+  if (!beamed || stems.length < 2) return;
+
+  // Mini beam for the group — same shape as emitBeamRun, in the group's dir.
+  const idealTip = (s: GraceStem) => s.tipBaseY - dir * GRACE_STEM_LENGTH_SP;
+  const first = stems[0];
+  const last = stems[stems.length - 1];
+  const span = last.x - first.x || 1;
+  const maxSlant = BEAM_MAX_SLANT_SP * GRACE_SCALE;
+  const slant = Math.max(-maxSlant, Math.min(maxSlant, idealTip(last) - idealTip(first)));
+  const base = (x: number) => idealTip(first) + (slant * (x - first.x)) / span;
+  const deltas = stems.map(s => idealTip(s) - base(s.x));
+  const shift = dir === 1 ? Math.min(...deltas) : Math.max(...deltas);
+  const lineY = (x: number) => base(x) + shift;
+  const beamThickness = BEAM_THICKNESS_SP * GRACE_SCALE;
+  const levelY = (x: number, level: number) =>
+    lineY(x) + dir * (level - 1) * (beamThickness + BEAM_GAP_SP * GRACE_SCALE);
+
+  for (const s of stems) {
+    primitives.push({
+      kind: 'line',
+      x1: s.x, y1: s.attachY,
+      x2: s.x, y2: lineY(s.x),
+      thickness: STEM_THICKNESS_SP,
+      className: 'stem grace'
+    });
+  }
+
+  const bar = (xa: number, xb: number, level: number) => {
+    primitives.push({
+      kind: 'line',
+      x1: xa - STEM_THICKNESS_SP / 2, y1: levelY(xa, level),
+      x2: xb + STEM_THICKNESS_SP / 2, y2: levelY(xb, level),
+      thickness: beamThickness,
+      className: 'beam grace'
+    });
+  };
+  bar(first.x, last.x, 1);
+  const maxLevels = Math.max(...stems.map(s => s.levels));
+  for (let level = 2; level <= maxLevels; level++) {
+    for (let j = 0; j < stems.length - 1; j++) {
+      if (stems[j].levels >= level && stems[j + 1].levels >= level) {
+        bar(stems[j].x, stems[j + 1].x, level);
+      }
+    }
+  }
+
+  // The spec's reference engravings slash beamed groups through the first
+  // stem (acciaccatura by default); `slash: false` opts out.
+  if (grace.slash !== false) {
+    const midY = (lineY(first.x) + first.attachY) / 2;
+    primitives.push({
+      kind: 'line',
+      x1: first.x - 0.55, y1: midY + 0.7,
+      x2: first.x + 0.75, y2: midY - 0.7,
+      thickness: GRACE_SLASH_THICKNESS_SP,
+      className: 'grace-slash'
+    });
+  }
+}
+
+// ---------- Multi-note tremolos ----------
+
+interface EmitTremoloGroupArgs {
+  tremolo: MnxTremolo;
+  /** Centre of the first written note's column (the plan reserves
+   *  TREMOLO_NOTE_ADVANCE_SP between the pair). */
+  firstX: number;
+  staffTop: number;
+  clef: ActiveClef;
+  useAccidentalDisplay: boolean;
+  keyFifths: number;
+  primitives: Primitive[];
+}
+
+/**
+ * Draws an MNX multi-note tremolo: its two written notes (each carrying the
+ * tremolo's total duration) with `marks` beams floating between them —
+ * between the stems when the notes are stemmed, between the noteheads for
+ * whole notes. Stem direction follows the pair's combined pitches.
+ */
+function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
+  const { tremolo, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives } = args;
+  const inner = tremolo.content.filter(e => (e.notes?.length ?? 0) > 0).slice(0, 2);
+  if (inner.length === 0) return;
+
+  const allYs = inner.flatMap(e =>
+    (e.notes ?? []).map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef))
+  );
+  const dir = autoStemDir(allYs);
+
+  interface WrittenNote {
+    x: number;
+    stemX: number | null;
+    /** Outermost notehead centre on the stems' side — the beam channel
+     *  runs parallel to the line through these. */
+    headY: number;
+  }
+  const written: WrittenNote[] = [];
+
+  inner.forEach((event, j) => {
+    const x = firstX + j * TREMOLO_NOTE_ADVANCE_SP;
+    const notes = event.notes!;
+    const staffYs = notes.map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
+    const headGlyph = NOTEHEAD_GLYPH_BY_BASE[event.duration.base] ?? 'noteheadBlack';
+    const hasStem = headGlyph !== 'noteheadWhole';
+
+    for (const ly of unionLedgerLines(staffYs)) {
+      primitives.push({
+        kind: 'line',
+        x1: x - NOTEHEAD_WIDTH_SP / 2 - LEDGER_OVERHANG_SP,
+        y1: staffTop + ly,
+        x2: x + NOTEHEAD_WIDTH_SP / 2 + LEDGER_OVERHANG_SP,
+        y2: staffTop + ly,
+        thickness: LEDGER_LINE_THICKNESS_SP,
+        className: 'ledger-line'
+      });
+    }
+
+    notes.forEach((n, idx) => {
+      const accGlyph = noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths);
+      if (accGlyph) {
+        primitives.push({
+          kind: 'glyph',
+          glyph: accGlyph,
+          x: x - NOTEHEAD_WIDTH_SP / 2 - ACCIDENTAL_SLOT_WIDTH_SP,
+          y: staffTop + staffYs[idx],
+          className: 'accidental'
+        });
+      }
+      primitives.push({
+        kind: 'glyph',
+        glyph: headGlyph,
+        x: x - NOTEHEAD_WIDTH_SP / 2,
+        y: staffTop + staffYs[idx],
+        className: 'notehead'
+      });
+    });
+
+    const outerHeadY =
+      staffTop + (dir === 1 ? Math.min(...staffYs) : Math.max(...staffYs));
+    if (!hasStem) {
+      written.push({ x, stemX: null, headY: outerHeadY });
+      return;
+    }
+    const anchor =
+      dir === 1
+        ? glyphAnchor(headGlyph, 'stemUpSE') ?? { x: NOTEHEAD_WIDTH_SP, y: 0.168 }
+        : glyphAnchor(headGlyph, 'stemDownNW') ?? { x: 0, y: -0.168 };
+    const stemX = x - NOTEHEAD_WIDTH_SP / 2 + anchor.x;
+    const attachY =
+      staffTop + (dir === 1 ? Math.max(...staffYs) : Math.min(...staffYs)) - anchor.y;
+    const tipY =
+      staffTop + (dir === 1 ? Math.min(...staffYs) : Math.max(...staffYs)) - dir * STEM_LENGTH_SP;
+    primitives.push({
+      kind: 'line',
+      x1: stemX, y1: Math.min(attachY, tipY), x2: stemX, y2: Math.max(attachY, tipY),
+      thickness: STEM_THICKNESS_SP,
+      className: 'stem'
+    });
+    written.push({ x, stemX, headY: outerHeadY });
+  });
+
+  if (written.length < 2) return;
+
+  const marks = Math.min(5, Math.max(1, tremolo.marks ?? 3));
+  const [a, b] = written;
+  const stemmed = a.stemX !== null && b.stemX !== null;
+  // The beams run between the two written notes at the FULL slope of the
+  // line through their noteheads, inset clear of heads and stems, and (when
+  // stemmed) nudged toward the stems' side of that line.
+  const inset = stemmed ? 1.2 : 1.6;
+  const xA = stemmed ? Math.max(a.x + inset, a.stemX! + 0.4) : a.x + inset;
+  const xB = stemmed ? Math.min(b.x - inset, b.stemX! - 0.4) : b.x - inset;
+  const lineY = (x: number) =>
+    a.headY + ((b.headY - a.headY) * (x - a.x)) / (b.x - a.x || 1);
+  const nudge = stemmed ? -dir * 0.6 : 0;
+  for (let k = 0; k < marks; k++) {
+    const off = (k - (marks - 1) / 2) * (TREMOLO_BEAM_THICKNESS_SP + TREMOLO_BEAM_GAP_SP);
+    primitives.push({
+      kind: 'line',
+      x1: xA, y1: lineY(xA) + nudge + off,
+      x2: xB, y2: lineY(xB) + nudge + off,
+      thickness: TREMOLO_BEAM_THICKNESS_SP,
+      className: 'tremolo-beam'
+    });
+  }
+}
+
+// ---------- Tuplets ----------
+
+const TUPLET_BRACKET_THICKNESS_SP = 0.13;
+const TUPLET_HOOK_SP = 0.8;        // bracket end hooks, pointing at the staff
+const TUPLET_NUMBER_SIZE_SP = 1.7;
+const TUPLET_NUMBER_GAP_SP = 1.1;  // bracket gap either side of the number
+
+interface EmitTupletGroupArgs {
+  tuplet: MnxTuplet;
+  /** Centre of the first inner column's core (the plan reserved
+   *  tupletColumns() widths for the whole group). */
+  firstX: number;
+  staffTop: number;
+  clef: ActiveClef;
+  useAccidentalDisplay: boolean;
+  keyFifths: number;
+  primitives: Primitive[];
+}
+
+/**
+ * Draws an MNX tuplet: its inner events at the plan's pre-scaled columns,
+ * beamed among themselves when every member is beamable (eighths or shorter)
+ * — in which case the number sits on the beam and no bracket draws — else
+ * flagged individually under a hooked bracket below the group with the
+ * `inner.multiple` number in a gap, as in the spec's reference engraving.
+ */
+function emitTupletGroup(args: EmitTupletGroupArgs): void {
+  const { tuplet, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives } = args;
+  const cols = tupletColumns(tuplet, useAccidentalDisplay, keyFifths);
+  const events = tuplet.content;
+  if (events.length === 0) return;
+
+  const fullyBeamed =
+    events.length >= 2 &&
+    events.every(
+      e =>
+        isTimedEvent(e) &&
+        !e.rest &&
+        (e.notes?.length ?? 0) > 0 &&
+        (BEAM_LEVELS_BY_BASE[e.duration.base] ?? 0) >= 1
+    );
+  const groupYs = events.flatMap(e =>
+    isTimedEvent(e) ? (e.notes ?? []).map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef)) : []
+  );
+  const groupDir = autoStemDir(groupYs);
+
+  interface InnerStem {
+    x: number;
+    attachY: number;
+    baseTipY: number;
+  }
+  const beamStems: InnerStem[] = [];
+  let lowestY = staffTop + STAFF_HEIGHT_SP; // bracket clearance (max y seen)
+  let colStart = firstX - CORE_SP / 2;
+  let lastX = firstX;
+
+  events.forEach((event, j) => {
+    const col = cols[j] ?? { leading: 0, advance: CORE_SP };
+    const x = colStart + col.leading + CORE_SP / 2;
+    colStart += col.advance;
+    lastX = x;
+    if (!isTimedEvent(event)) return;
+
+    const base = event.duration.base;
+    if (event.rest) {
+      primitives.push({
+        kind: 'glyph',
+        glyph: REST_GLYPH_BY_BASE[base] ?? 'restQuarter',
+        x,
+        y: staffTop + (REST_Y_BY_BASE[base] ?? 2),
+        anchor: 'middle',
+        className: 'rest'
+      });
+      return;
+    }
+    const notes = event.notes ?? [];
+    if (notes.length === 0) return;
+    const staffYs = notes.map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
+    const headGlyph = NOTEHEAD_GLYPH_BY_BASE[base] ?? 'noteheadBlack';
+    const hasStem = headGlyph !== 'noteheadWhole';
+    const dir = fullyBeamed ? groupDir : autoStemDir(staffYs);
+
+    for (const ly of unionLedgerLines(staffYs)) {
+      primitives.push({
+        kind: 'line',
+        x1: x - NOTEHEAD_WIDTH_SP / 2 - LEDGER_OVERHANG_SP,
+        y1: staffTop + ly,
+        x2: x + NOTEHEAD_WIDTH_SP / 2 + LEDGER_OVERHANG_SP,
+        y2: staffTop + ly,
+        thickness: LEDGER_LINE_THICKNESS_SP,
+        className: 'ledger-line'
+      });
+    }
+    notes.forEach((n, idx) => {
+      const accGlyph = noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths);
+      if (accGlyph) {
+        primitives.push({
+          kind: 'glyph',
+          glyph: accGlyph,
+          x: x - NOTEHEAD_WIDTH_SP / 2 - ACCIDENTAL_SLOT_WIDTH_SP,
+          y: staffTop + staffYs[idx],
+          className: 'accidental'
+        });
+      }
+      primitives.push({
+        kind: 'glyph',
+        glyph: headGlyph,
+        x: x - NOTEHEAD_WIDTH_SP / 2,
+        y: staffTop + staffYs[idx],
+        className: 'notehead'
+      });
+      for (let d = 0; d < (event.duration.dots ?? 0); d++) {
+        const yDot = Math.round(staffYs[idx]) === staffYs[idx] ? staffYs[idx] - 0.5 : staffYs[idx];
+        primitives.push({
+          kind: 'glyph',
+          glyph: 'augmentationDot',
+          x: x + NOTEHEAD_WIDTH_SP / 2 + DOT_RIGHT_PAD_SP + d * 0.4,
+          y: staffTop + yDot,
+          className: 'dot'
+        });
+      }
+    });
+    lowestY = Math.max(lowestY, staffTop + Math.max(...staffYs));
+
+    if (!hasStem) return;
+    const anchor =
+      dir === 1
+        ? glyphAnchor(headGlyph, 'stemUpSE') ?? { x: NOTEHEAD_WIDTH_SP, y: 0.168 }
+        : glyphAnchor(headGlyph, 'stemDownNW') ?? { x: 0, y: -0.168 };
+    const stemX = x - NOTEHEAD_WIDTH_SP / 2 + anchor.x;
+    const attachY =
+      staffTop + (dir === 1 ? Math.max(...staffYs) : Math.min(...staffYs)) - anchor.y;
+    const baseTipY = staffTop + (dir === 1 ? Math.min(...staffYs) : Math.max(...staffYs));
+    if (fullyBeamed) {
+      beamStems.push({ x: stemX, attachY, baseTipY });
+      return;
+    }
+    const tipY = baseTipY - dir * STEM_LENGTH_SP;
+    primitives.push({
+      kind: 'line',
+      x1: stemX, y1: Math.min(attachY, tipY), x2: stemX, y2: Math.max(attachY, tipY),
+      thickness: STEM_THICKNESS_SP,
+      className: 'stem'
+    });
+    lowestY = Math.max(lowestY, Math.max(attachY, tipY));
+    const flagGlyph = dir === 1 ? FLAG_GLYPH_BY_BASE_UP[base] : FLAG_GLYPH_BY_BASE_DOWN[base];
+    if (flagGlyph) {
+      primitives.push({ kind: 'glyph', glyph: flagGlyph, x: stemX, y: tipY, className: 'flag' });
+    }
+  });
+
+  const number = tuplet.showNumber === 'noNumber' ? null : String(tuplet.inner.multiple);
+
+  // Fully-beamed group: mini beam over its own stems; the number rides the
+  // beam and no bracket draws (the beam plays that role).
+  if (fullyBeamed && beamStems.length >= 2) {
+    const dir = groupDir;
+    const idealTip = (st: InnerStem) => st.baseTipY - dir * STEM_LENGTH_SP;
+    const first = beamStems[0];
+    const last = beamStems[beamStems.length - 1];
+    const span = last.x - first.x || 1;
+    const slant = Math.max(
+      -BEAM_MAX_SLANT_SP,
+      Math.min(BEAM_MAX_SLANT_SP, idealTip(last) - idealTip(first))
+    );
+    const base = (x: number) => idealTip(first) + (slant * (x - first.x)) / span;
+    const deltas = beamStems.map(st => idealTip(st) - base(st.x));
+    const shift = dir === 1 ? Math.min(...deltas) : Math.max(...deltas);
+    const lineY = (x: number) => base(x) + shift;
+    for (const st of beamStems) {
+      primitives.push({
+        kind: 'line',
+        x1: st.x, y1: st.attachY, x2: st.x, y2: lineY(st.x),
+        thickness: STEM_THICKNESS_SP,
+        className: 'stem'
+      });
+    }
+    primitives.push({
+      kind: 'line',
+      x1: first.x - STEM_THICKNESS_SP / 2, y1: lineY(first.x),
+      x2: last.x + STEM_THICKNESS_SP / 2, y2: lineY(last.x),
+      thickness: BEAM_THICKNESS_SP,
+      className: 'beam'
+    });
+    if (number) {
+      const midX = (first.x + last.x) / 2;
+      primitives.push({
+        kind: 'text',
+        text: number,
+        x: midX,
+        y: lineY(midX) + (dir === 1 ? -0.8 : 2.2),
+        font: 'bodyItalic',
+        size: TUPLET_NUMBER_SIZE_SP,
+        weight: 'bold',
+        anchor: 'middle',
+        className: 'tuplet-number'
+      });
+    }
+    return;
+  }
+
+  // Bracketed group: hooked bracket below (clear of noteheads and stems),
+  // number in a gap at its centre — per the reference engraving.
+  if (tuplet.bracket === 'no') return;
+  const x1 = firstX - 1.0;
+  const x2 = lastX + 1.0;
+  const y = lowestY + 1.4;
+  const midX = (x1 + x2) / 2;
+  for (const [xa, xb] of [
+    [x1, midX - TUPLET_NUMBER_GAP_SP],
+    [midX + TUPLET_NUMBER_GAP_SP, x2]
+  ]) {
+    if (xb > xa) {
+      primitives.push({
+        kind: 'line',
+        x1: xa, y1: y, x2: xb, y2: y,
+        thickness: TUPLET_BRACKET_THICKNESS_SP,
+        className: 'tuplet-bracket'
+      });
+    }
+  }
+  for (const xe of [x1, x2]) {
+    primitives.push({
+      kind: 'line',
+      x1: xe, y1: y, x2: xe, y2: y - TUPLET_HOOK_SP,
+      thickness: TUPLET_BRACKET_THICKNESS_SP,
+      className: 'tuplet-bracket'
+    });
+  }
+  if (number) {
+    primitives.push({
+      kind: 'text',
+      text: number,
+      x: midX,
+      y: y + 0.55,
+      font: 'bodyItalic',
+      size: TUPLET_NUMBER_SIZE_SP,
+      weight: 'bold',
+      anchor: 'middle',
+      className: 'tuplet-number'
+    });
+  }
 }
 
 // ---------- Event emission ----------
@@ -435,6 +2657,11 @@ interface EmitEventArgs {
   staffTop: number;
   clef: ActiveClef;
   stemOverride: 1 | -1 | null;
+  /** Set when the event is in a beam run: forces stem direction and defers
+   *  the stem (returned, not emitted) so it can be drawn to the beam line. */
+  beamDir: 1 | -1 | null;
+  useAccidentalDisplay: boolean;
+  keyFifths: number;
   activeNoteIds: readonly string[];
   selectedNoteIds: readonly string[];
   primitives: Primitive[];
@@ -442,13 +2669,23 @@ interface EmitEventArgs {
   measureIndex: number;
   voiceIndex: number;
   eventIndex: number;
+  /** System row, recorded on curve anchors (curves split between rows). */
+  row: number;
+  /** This event's key in the curve-anchor registry. */
+  curveKey: string;
+  curveAnchors: CurveAnchors;
+  /** Staff-1 events synthesize positional note keys (the traversal jsonView
+   *  mirrors); other staves use real note ids only. */
+  synthesizeKeys: boolean;
 }
 
-function emitEvent(args: EmitEventArgs): void {
+/** Returns the deferred stem when the event is beamed, else null. */
+function emitEvent(args: EmitEventArgs): BeamedStem | null {
   const {
-    event, eventX, staffTop, clef, stemOverride,
+    event, eventX, staffTop, clef, stemOverride, beamDir, useAccidentalDisplay, keyFifths,
     activeNoteIds, selectedNoteIds,
-    primitives, index, measureIndex, voiceIndex, eventIndex
+    primitives, index, measureIndex, voiceIndex, eventIndex,
+    row, curveKey, curveAnchors, synthesizeKeys
   } = args;
 
   const base = event.duration.base;
@@ -476,39 +2713,54 @@ function emitEvent(args: EmitEventArgs): void {
         className: 'dot'
       });
     }
-    return;
+    return null;
   }
 
   // ---- Notes ----
-  if (!event.notes || event.notes.length === 0) return;
+  if (!event.notes || event.notes.length === 0) return null;
 
   const notes = event.notes;
   const noteheadGlyph = NOTEHEAD_GLYPH_BY_BASE[base] ?? 'noteheadBlack';
   // Per-note selection keys: the note's id, or a synthesized positional key
   // for id-less documents (see src/utils/noteKeys.ts) so selection and the
   // note↔document cross-highlight work across the whole corpus.
-  const noteIds = notes.map(
-    (n, idx) => n.id ?? syntheticNoteKey(measureIndex, voiceIndex, eventIndex, idx)
+  const noteIds = notes.map((n, idx) =>
+    n.id ?? (synthesizeKeys ? syntheticNoteKey(measureIndex, voiceIndex, eventIndex, idx) : undefined)
   );
-  const primaryNoteId = noteIds[0];
+  const primaryNoteId = noteIds.find((id): id is string => id !== undefined);
 
   // Pitch → staff y for each chord member
   const staffYs = notes.map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
 
   // Highlight color (whole event highlights if any member is active/selected)
-  const isActive = noteIds.some(id => activeNoteIds.includes(id));
-  const isSelected = noteIds.some(id => selectedNoteIds.includes(id));
+  const isActive = noteIds.some(id => id !== undefined && activeNoteIds.includes(id));
+  const isSelected = noteIds.some(id => id !== undefined && selectedNoteIds.includes(id));
   const fill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : undefined;
   const colorClass = isActive ? ' active' : isSelected ? ' selected' : '';
 
-  // Stem direction
+  // Stem direction — a beam run's shared direction trumps everything.
   const eventStemDir = (event as { stemDirection?: 'up' | 'down' }).stemDirection;
-  const stemDir: 1 | -1 = stemOverride !== null
+  const stemDir: 1 | -1 = beamDir !== null
+    ? beamDir
+    : stemOverride !== null
     ? stemOverride
     : eventStemDir === 'up' ? 1
     : eventStemDir === 'down' ? -1
     : autoStemDir(staffYs);
   const hasStem = noteheadGlyph !== 'noteheadWhole';
+
+  // Record this event's geometry for the slur/tie post-pass.
+  const curveAnchor: EventCurveAnchor = {
+    x: eventX,
+    row,
+    stemDir,
+    headYs: staffYs.map(y => staffTop + y)
+  };
+  curveAnchors.byKey.set(curveKey, curveAnchor);
+  if (event.id) curveAnchors.byEventId.set(event.id, curveAnchor);
+  notes.forEach((n, idx) => {
+    if (n.id) curveAnchors.byNoteId.set(n.id, { anchor: curveAnchor, noteIndex: idx });
+  });
 
   // Ledger lines
   const ledgerYs = unionLedgerLines(staffYs);
@@ -528,14 +2780,13 @@ function emitEvent(args: EmitEventArgs): void {
   // Accidentals (left of the notehead column)
   const accidentalEntries = notes
     .map((n, idx) => ({
-      glyph: accidentalGlyph(n.pitch.alter),
+      glyph: noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths),
       staffY: staffYs[idx]
     }))
     .filter(e => e.glyph);
   const accidentalsToLeft = accidentalEntries.length;
-  const accidentalSlotWidth = 1.0; // sp per accidental column (simple stacking)
   accidentalEntries.forEach((acc, idx) => {
-    const offset = (accidentalsToLeft - idx) * accidentalSlotWidth + ACCIDENTAL_RIGHT_PAD_SP;
+    const offset = (accidentalsToLeft - idx) * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP;
     primitives.push({
       kind: 'glyph',
       glyph: acc.glyph!,
@@ -561,49 +2812,91 @@ function emitEvent(args: EmitEventArgs): void {
   });
 
   // Stem
-  let stemTopY: number | undefined;
-  let stemBottomY: number | undefined;
-  let stemX: number | undefined;
+  let deferredStem: BeamedStem | null = null;
   if (hasStem) {
     const minStaffY = Math.min(...staffYs);
     const maxStaffY = Math.max(...staffYs);
+    // SMuFL anchors are y-positive-UP relative to the glyph origin; our staff
+    // coords are y-positive-down, so anchor.y is subtracted. The rotated-oval
+    // noteheads attach below centre on the NW side and above centre on the SE
+    // side — applying the sign wrong leaves the stem poking past the head.
+    let stemX: number;
+    let attachY: number;  // notehead end of the stem
+    let baseTipY: number; // extreme notehead centre on the tip side
     if (stemDir === 1) {
       // up: from right of lowest notehead (highest y in our coords) upward
       const anchor = glyphAnchor(noteheadGlyph, 'stemUpSE') ?? { x: NOTEHEAD_WIDTH_SP, y: 0.168 };
       stemX = eventX - NOTEHEAD_WIDTH_SP / 2 + anchor.x;
-      stemBottomY = staffTop + maxStaffY + anchor.y;
-      stemTopY = staffTop + minStaffY - STEM_LENGTH_SP;
+      attachY = staffTop + maxStaffY - anchor.y;
+      baseTipY = staffTop + minStaffY;
     } else {
       // down: from left of highest notehead downward
       const anchor = glyphAnchor(noteheadGlyph, 'stemDownNW') ?? { x: 0, y: -0.168 };
       stemX = eventX - NOTEHEAD_WIDTH_SP / 2 + anchor.x;
-      stemTopY = staffTop + minStaffY + anchor.y;
-      stemBottomY = staffTop + maxStaffY + STEM_LENGTH_SP;
+      attachY = staffTop + minStaffY - anchor.y;
+      baseTipY = staffTop + maxStaffY;
     }
-    primitives.push({
-      kind: 'line',
-      x1: stemX, y1: stemTopY,
-      x2: stemX, y2: stemBottomY,
-      thickness: STEM_THICKNESS_SP,
-      stroke: fill,
-      className: 'stem' + colorClass
-    });
+    const tipY = baseTipY - stemDir * STEM_LENGTH_SP;
 
-    // Flag (only on unbeamed flagged durations)
-    const flagGlyph = stemDir === 1
-      ? FLAG_GLYPH_BY_BASE_UP[base]
-      : FLAG_GLYPH_BY_BASE_DOWN[base];
-    if (flagGlyph) {
-      const flagY = stemDir === 1 ? stemTopY : stemBottomY;
+    // Single-note tremolo: `marks` slashes through the stem (the SMuFL
+    // combining glyphs are designed centred on the stem).
+    const tremoloMarks = event.markings?.tremolo
+      ? Math.min(5, Math.max(1, event.markings.tremolo.marks ?? 3))
+      : 0;
+    if (tremoloMarks) {
+      // Bravura's tremolo glyphs are ink-centred on their origin — drawing
+      // at the stem x with the default anchor centres them on the stem.
       primitives.push({
         kind: 'glyph',
-        glyph: flagGlyph,
+        glyph: `tremolo${tremoloMarks}`,
         x: stemX,
-        y: flagY,
+        y: (attachY + tipY) / 2,
         fill,
-        className: 'flag' + colorClass
+        className: 'tremolo' + colorClass
       });
     }
+
+    if (beamDir !== null) {
+      // Beamed: the run draws the stem out to the shared beam line.
+      deferredStem = { stemX, attachY, baseTipY, fill, colorClass };
+    } else {
+      primitives.push({
+        kind: 'line',
+        x1: stemX, y1: stemDir === 1 ? tipY : attachY,
+        x2: stemX, y2: stemDir === 1 ? attachY : tipY,
+        thickness: STEM_THICKNESS_SP,
+        stroke: fill,
+        className: 'stem' + colorClass
+      });
+
+      // Flag (only on unbeamed flagged durations)
+      const flagGlyph = stemDir === 1
+        ? FLAG_GLYPH_BY_BASE_UP[base]
+        : FLAG_GLYPH_BY_BASE_DOWN[base];
+      if (flagGlyph) {
+        primitives.push({
+          kind: 'glyph',
+          glyph: flagGlyph,
+          x: stemX,
+          y: tipY,
+          fill,
+          className: 'flag' + colorClass
+        });
+      }
+    }
+  }
+
+  // A stemless note (whole) carries its tremolo slashes above the notehead.
+  if (!hasStem && event.markings?.tremolo) {
+    const marks = Math.min(5, Math.max(1, event.markings.tremolo.marks ?? 3));
+    primitives.push({
+      kind: 'glyph',
+      glyph: `tremolo${marks}`,
+      x: eventX,
+      y: staffTop + Math.min(...staffYs) - 1.8,
+      fill,
+      className: 'tremolo' + colorClass
+    });
   }
 
   // Augmentation dots (one per dot, in the space adjacent to each notehead)
@@ -626,11 +2919,41 @@ function emitEvent(args: EmitEventArgs): void {
     });
   }
 
+  // Articulations — on the side opposite the stem, stacking outward from the
+  // extreme notehead, snapped off staff lines; strongAccent always sits above.
+  if (event.markings) {
+    let yAbove = Math.min(...staffYs) - 1;
+    let yBelow = Math.max(...staffYs) + 1;
+    for (const art of ARTICULATIONS) {
+      if (!event.markings[art.key]) continue;
+      const above = art.forceAbove || stemDir === -1;
+      let y = above ? yAbove : yBelow;
+      if (y >= 0 && y <= STAFF_HEIGHT_SP && Number.isInteger(y)) {
+        y += above ? -0.5 : 0.5;
+      }
+      primitives.push({
+        kind: 'glyph',
+        glyph: above ? art.above : art.below,
+        x: eventX,
+        y: staffTop + y,
+        anchor: 'middle',
+        fill,
+        className: 'articulation' + colorClass
+      });
+      if (above) yAbove = y - 1;
+      else yBelow = y + 1;
+    }
+  }
+
   // Index
   if (primaryNoteId) {
     index.set(primaryNoteId, { measureIndex, voiceIndex, eventIndex });
     for (const id of noteIds) {
-      if (!index.has(id)) index.set(id, { measureIndex, voiceIndex, eventIndex });
+      if (id !== undefined && !index.has(id)) {
+        index.set(id, { measureIndex, voiceIndex, eventIndex });
+      }
     }
   }
+
+  return deferredStem;
 }

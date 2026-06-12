@@ -8,7 +8,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 8,
-        "x2": 40,
+        "x2": 18.4,
         "y2": 8,
         "thickness": 0.13,
         "className": "staff-line"
@@ -17,7 +17,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 9,
-        "x2": 40,
+        "x2": 18.4,
         "y2": 9,
         "thickness": 0.13,
         "className": "staff-line"
@@ -26,7 +26,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 10,
-        "x2": 40,
+        "x2": 18.4,
         "y2": 10,
         "thickness": 0.13,
         "className": "staff-line"
@@ -35,7 +35,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 11,
-        "x2": 40,
+        "x2": 18.4,
         "y2": 11,
         "thickness": 0.13,
         "className": "staff-line"
@@ -44,7 +44,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 12,
-        "x2": 40,
+        "x2": 18.4,
         "y2": 12,
         "thickness": 0.13,
         "className": "staff-line"
@@ -66,26 +66,10 @@
         "className": "clef"
       },
       {
-        "kind": "glyph",
-        "glyph": "timeSig4",
-        "x": 7.35,
-        "y": 9,
-        "anchor": "middle",
-        "className": "time-sig-num"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "timeSig4",
-        "x": 7.35,
-        "y": 11,
-        "anchor": "middle",
-        "className": "time-sig-den"
-      },
-      {
         "kind": "line",
-        "x1": 22.91,
+        "x1": 11.36,
         "y1": 13,
-        "x2": 24.89,
+        "x2": 13.34,
         "y2": 13,
         "thickness": 0.16,
         "className": "ledger-line"
@@ -93,23 +77,23 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 23.31,
+        "x": 11.76,
         "y": 13,
         "className": "notehead",
         "sourceId": "@m0.v0.e0.n0"
       },
       {
         "kind": "line",
-        "x1": 39.2,
+        "x1": 17.6,
         "y1": 8,
-        "x2": 39.2,
+        "x2": 17.6,
         "y2": 12,
         "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
-        "x": 39.5,
+        "x": 17.9,
         "y": 8,
         "w": 0.5,
         "h": 4,

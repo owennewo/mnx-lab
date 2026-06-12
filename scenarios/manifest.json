@@ -5,6 +5,8 @@
     "lab/document": "Document basics",
     "lab/pitches": "Pitches and accidentals",
     "lab/durations": "Durations and rests",
+    "lab/dynamics": "Dynamics and expression",
+    "lab/navigation": "Repeats, jumps and navigation",
     "lab/tab-part": "Tab part configuration (tuning, capo, staffKind)",
     "lab/tab-positions": "Fingerboard positions",
     "lab/tab-fingering": "Fingering",

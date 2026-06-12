@@ -1,6 +1,6 @@
 {
   "title": "Lyrics (multi-line)",
-  "description": "To accommodate lyrics with multiple lines (i.e., multiple verses), lyric lines are encoded as structured objects. Each event&#x27;s \"lyrics\" object has a \"lines\" array, with each line representing a vertical column within that syllable. Each line is identified by an ID string, which is user-defined within the document. By default, lyric lines are ordered alphabetically by the ID string.",
+  "description": "To accommodate lyrics with multiple lines (i.e., multiple verses), lyric lines are encoded as structured objects. Each event's \"lyrics\" object has a \"lines\" array, with each line representing a vertical column within that syllable. Each line is identified by an ID string, which is user-defined within the document. By default, lyric lines are ordered alphabetically by the ID string.",
   "tags": [
     "spec-example"
   ],

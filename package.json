@@ -10,6 +10,8 @@
     "compile-validator": "node scripts/compile-validator.mjs",
     "check:scenarios": "node scripts/check-scenarios.mjs",
     "update:primitives": "UPDATE_PRIMITIVES=1 vitest run tests/primitives.test.ts",
+    "preview:scenarios": "PREVIEW_SCENARIOS=1 vitest run tests/preview.test.ts",
+    "verify:scenarios": "node scripts/verify-scenarios.mjs",
     "test": "vitest run",
     "deploy": "npm run build && wrangler deploy"
   },

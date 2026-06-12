@@ -1,7 +1,10 @@
-import { MnxStructure } from '../types/mnx.ts';
+import { MnxStructure, isTimedEvent } from '../types/mnx.ts';
 import { resolveEventPositions } from '../tab/guitarPositions.ts';
-import { Primitive, LayoutResult, SpatialIndex } from '../primitives.ts';
+import { Primitive, LayoutResult, LayoutDiagnostic, SpatialIndex } from '../primitives.ts';
 import { syntheticNoteKey } from '../utils/noteKeys.ts';
+import { planHorizontal, staffOneSequences } from './spacing.ts';
+import { emitMeasureDiagnostics, MeasureIssue } from './diagnostics.ts';
+import { validateDocument } from './validate.ts';
 
 /**
  * Pure layout function for guitar tab. Takes parsed MNX + viewport width
@@ -28,35 +31,11 @@ const BARLINE_THICKNESS_SP = 0.1;
 const FINAL_BARLINE_THICK_WIDTH_SP = 0.4;
 const FINAL_BARLINE_GAP_SP = 0.3;
 
-const START_BARLINE_PAD_SP = 0.5;
-const CLEF_WIDTH_SP = 3.5;
-const TIME_SIG_WIDTH_SP = 2.5;
-const CONTENT_LEFT_PAD_SP = 0.5;
-const CONTENT_RIGHT_PAD_SP = 0.6;
-
 const FRET_FONT_SIZE_SP = 1.1;
 
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
 const FRET_BG_FILL = 'var(--bg-app)';
-
-// ---------- Duration arithmetic ----------
-
-const DURATION_BASE_VALUE: Record<string, number> = {
-  whole: 1,
-  half: 0.5,
-  quarter: 0.25,
-  eighth: 0.125,
-  sixteenth: 0.0625,
-  'thirty-second': 0.03125
-};
-
-function durationValue(d: { base: string; dots?: number }): number {
-  const base = DURATION_BASE_VALUE[d.base] ?? 0.25;
-  const dots = d.dots ?? 0;
-  if (dots === 0) return base;
-  return base * (2 - 1 / Math.pow(2, dots));
-}
 
 // ---------- Public API ----------
 
@@ -76,105 +55,88 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   const primitives: Primitive[] = [];
   const index: SpatialIndex = new Map();
 
+  const diagnostics: LayoutDiagnostic[] = [];
+
   const part = mnx.parts?.[0];
   if (!part) {
-    return { primitives, widthSp, heightSp: ROW_HEIGHT_SP + 2 * MARGIN_SP, index };
+    return { primitives, widthSp, heightSp: ROW_HEIGHT_SP + 2 * MARGIN_SP, usedWidthSp: widthSp, index, diagnostics };
   }
 
   const numMeasures = part.measures.length;
-  const measuresPerRow = widthSp > 80 ? 4 : 2;
-  const measureAllocatedWidth = (widthSp - 2 * MARGIN_SP) / measuresPerRow;
+  // All horizontal decisions (system packing, bar widths, event x positions)
+  // come from the shared plan — layoutNotation consumes the same one, which is
+  // what keeps notation and tab column-aligned in the "both" view.
+  const plan = planHorizontal(mnx, widthSp);
 
-  let activeTimeSig = { count: 4, unit: 4 };
+  // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
+  // into each measure's diagnostic markers alongside renderer-gap issues.
+  const validationByMeasure = new Map<number, string[]>();
+  for (const v of validateDocument(mnx)) {
+    const list = validationByMeasure.get(v.measureIndex) ?? [];
+    list.push(v.message);
+    validationByMeasure.set(v.measureIndex, list);
+  }
 
   for (let i = 0; i < numMeasures; i++) {
-    const globalMeasure = mnx.global.measures[i] ?? {};
     const partMeasure = part.measures[i] ?? { sequences: [] };
-
-    let timeSigChanged = false;
-    if (globalMeasure.time) {
-      const { count, unit } = globalMeasure.time;
-      if (i === 0 || count !== activeTimeSig.count || unit !== activeTimeSig.unit) {
-        activeTimeSig = { count, unit };
-        if (i > 0) timeSigChanged = true;
-      }
-    }
-
-    const row = Math.floor(i / measuresPerRow);
-    const col = i % measuresPerRow;
-    const x = MARGIN_SP + col * measureAllocatedWidth;
-    const staffTop = MARGIN_SP + row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP;
+    const m = plan.measures[i];
+    const staffTop = MARGIN_SP + m.row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP;
     const staffBottom = staffTop + STAFF_HEIGHT_SP;
-
-    const isFirstInSystem = col === 0;
-    const showStartBarline = isFirstInSystem;
-    const showClef = isFirstInSystem;
-    const showTimeSig = i === 0 || timeSigChanged;
-
-    const startBarlinePad = showStartBarline ? START_BARLINE_PAD_SP : 0;
-    const clefSpace = showClef ? CLEF_WIDTH_SP : 0;
-    const timeSigSpace = showTimeSig ? TIME_SIG_WIDTH_SP : 0;
-    const contentStartX =
-      x + CONTENT_LEFT_PAD_SP + startBarlinePad + clefSpace + timeSigSpace;
-    const contentWidth = x + measureAllocatedWidth - CONTENT_RIGHT_PAD_SP - contentStartX;
 
     // Staff lines (drawn as primitives — per SMuFL guidance, don't use staff6Lines glyph)
     for (let s = 0; s < STAFF_LINES; s++) {
       const lineY = staffTop + s;
       primitives.push({
         kind: 'line',
-        x1: x, y1: lineY, x2: x + measureAllocatedWidth, y2: lineY,
+        x1: m.x, y1: lineY, x2: m.x + m.width, y2: lineY,
         thickness: STAFF_LINE_THICKNESS_SP,
         className: 'staff-line'
       });
     }
 
     // System-start barline
-    if (showStartBarline) {
+    if (m.firstInSystem) {
       primitives.push({
         kind: 'line',
-        x1: x, y1: staffTop, x2: x, y2: staffBottom,
+        x1: m.x, y1: staffTop, x2: m.x, y2: staffBottom,
         thickness: BARLINE_THICKNESS_SP,
         className: 'barline barline-start'
       });
     }
 
-    // Tab clef
-    if (showClef) {
+    // Tab clef (the notation clef's slot in the shared plan keeps both views aligned)
+    if (m.firstInSystem) {
       primitives.push({
         kind: 'glyph',
         glyph: '6stringTabClef',
-        x: x + CONTENT_LEFT_PAD_SP + startBarlinePad,
+        x: m.clefX,
         y: staffTop + STAFF_HEIGHT_SP / 2,
         className: 'tab-clef'
       });
     }
 
     // Time signature (digits centred in upper and lower halves of the staff)
-    if (showTimeSig) {
-      const tsX =
-        x + CONTENT_LEFT_PAD_SP + startBarlinePad + clefSpace +
-        TIME_SIG_WIDTH_SP / 2;
+    if (m.showTimeSig) {
       const numCenterY = staffTop + STAFF_HEIGHT_SP / 4;
       const denCenterY = staffTop + (3 * STAFF_HEIGHT_SP) / 4;
 
       // SMuFL time-sig digits have their alphabetic baseline at the visual
       // centre of the digit, so y = centre directly.
-      for (const digit of String(activeTimeSig.count)) {
+      for (const digit of String(m.timeSig.count)) {
         primitives.push({
           kind: 'glyph',
           glyph: 'timeSig' + digit,
-          x: tsX,
+          x: m.timeSigCentreX,
           y: numCenterY,
           anchor: 'middle',
           className: 'time-sig-num'
         });
       }
-      for (const digit of String(activeTimeSig.unit)) {
+      for (const digit of String(m.timeSig.unit)) {
         primitives.push({
           kind: 'glyph',
           glyph: 'timeSig' + digit,
-          x: tsX,
+          x: m.timeSigCentreX,
           y: denCenterY,
           anchor: 'middle',
           className: 'time-sig-den'
@@ -182,41 +144,29 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       }
     }
 
-    // Events per voice (staff 1 only — matches current behaviour for merged
-    // notation+tab parts where staff 2 is a duplicate)
-    const stdSequences = (partMeasure.sequences ?? []).filter(
-      seq => seq.staff === 1 || seq.staff === undefined
-    );
-    const measureDuration = activeTimeSig.count / activeTimeSig.unit;
-    // Some MNX data has voices whose event durations sum to more than the
-    // declared time signature allows (MusicXML conversion artifacts). To keep
-    // every glyph inside its measure we scale by the longest voice's actual
-    // duration when it exceeds the measure duration. Both voices share the
-    // same denominator so they stay aligned to each other.
-    const voiceTotals = stdSequences.map(seq =>
-      seq.content.reduce((sum, ev) => sum + durationValue(ev.duration), 0)
-    );
-    const effectiveDuration = Math.max(measureDuration, ...voiceTotals);
-    if (effectiveDuration > measureDuration) {
-      console.warn(
-        `[tab] measure ${i}: voice durations exceed time signature ` +
-        `(max=${effectiveDuration} vs ${measureDuration}). Squeezing to fit.`
-      );
-    }
+    // Events per voice (staff 1 only — the same filter the plan was built from)
+    const stdSequences = staffOneSequences(partMeasure.sequences);
 
+    // Validation issues (user-fixable), the plan's issues (unsupported items),
+    // plus anything an individual event throws (forgiving render) — one bad
+    // event must not take down the bar.
+    const measureIssues: MeasureIssue[] = [
+      ...(validationByMeasure.get(i) ?? []).map(message => ({ kind: 'validation' as const, message })),
+      ...m.issues.map(message => ({ kind: 'render' as const, message }))
+    ];
     stdSequences.forEach((sequence, voiceIndex) => {
-      let cumDuration = 0;
       sequence.content.forEach((event, eventIndex) => {
-        const eventDur = durationValue(event.duration);
-        // Zone-based (centre-of-slot) positioning: each event occupies a zone
-        // of width = duration / effectiveDuration; the glyph sits at the
-        // centre of its zone.
-        const centreFraction = effectiveDuration > 0
-          ? (cumDuration + eventDur / 2) / effectiveDuration
-          : 0;
-        const eventX = contentStartX + centreFraction * contentWidth;
+        const slot = m.voices[voiceIndex]?.[eventIndex];
+        if (!slot) return;
+        const eventX = slot.x;
 
-        if (event.rest) {
+        try {
+        // Grace notes and tremolos aren't drawn on tab yet — the plan still
+        // reserves their columns, so the staves stay aligned in the "both"
+        // view. Unknown item kinds (tuplet, …) were recorded by the plan.
+        if (!isTimedEvent(event)) {
+          // skip
+        } else if (event.rest) {
           // Tab convention: rests in tab-only view consume time but aren't
           // drawn. (When tab pairs with a notation staff, rests live there.)
         } else if (event.notes && event.notes.length > 0) {
@@ -282,14 +232,15 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
             }
           }
         }
-
-        cumDuration += eventDur;
+        } catch (e) {
+          measureIssues.push({ kind: 'render', message: (e as Error).message });
+        }
       });
     });
 
     // End barline
     const isLast = i === numMeasures - 1;
-    const barX = x + measureAllocatedWidth;
+    const barX = m.x + m.width;
     if (isLast) {
       const thinX = barX - FINAL_BARLINE_THICK_WIDTH_SP - FINAL_BARLINE_GAP_SP;
       primitives.push({
@@ -313,10 +264,14 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
         className: 'barline'
       });
     }
+
+    if (measureIssues.length) {
+      emitMeasureDiagnostics(m.x, staffBottom, measureIssues, primitives);
+      for (const issue of measureIssues) diagnostics.push({ measureIndex: i, ...issue });
+    }
   }
 
-  const totalRows = Math.ceil(numMeasures / measuresPerRow);
-  const heightSp = 2 * MARGIN_SP + totalRows * ROW_HEIGHT_SP;
+  const heightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * ROW_HEIGHT_SP;
 
-  return { primitives, widthSp, heightSp, index };
+  return { primitives, widthSp, heightSp, usedWidthSp: plan.usedWidthSp, index, diagnostics };
 }

@@ -1,6 +1,6 @@
 {
   "title": "Lyrics (basic)",
-  "description": "Lyric syllables are encoded for each event. For lyrics that are split across multiple syllables (typically connected via a hyphen), we use \"type\" to encode each syllable&#x27;s position in the word.",
+  "description": "Lyric syllables are encoded for each event. For lyrics that are split across multiple syllables (typically connected via a hyphen), we use \"type\" to encode each syllable's position in the word.",
   "tags": [
     "spec-example"
   ],

@@ -1,6 +1,6 @@
 {
   "title": "Clef changes",
-  "description": "Each measure can encode a list of clefs. For an inner-bar clef change, the \"position\" attribute describes the clef&#x27;s position in the bar. If \"position\" isn&#x27;t provided, the clef is interpreted to be the start of the bar.",
+  "description": "Each measure can encode a list of clefs. For an inner-bar clef change, the \"position\" attribute describes the clef's position in the bar. If \"position\" isn't provided, the clef is interpreted to be the start of the bar.",
   "tags": [
     "spec-example"
   ],
@@ -39,5 +39,5 @@
   },
   "requires": [],
   "source": "spec-example",
-  "status": "rendered"
+  "status": "verified"
 }
