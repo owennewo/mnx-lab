@@ -38,7 +38,10 @@
                   4
                 ]
               },
-              "value": "pppppp"
+              "type": "immediate",
+              "glyphs": [
+                "dynamicPPPPPP"
+              ]
             },
             {
               "position": {
@@ -47,7 +50,10 @@
                   4
                 ]
               },
-              "value": "ppppp"
+              "type": "immediate",
+              "glyphs": [
+                "dynamicPPPPP"
+              ]
             },
             {
               "position": {
@@ -56,7 +62,10 @@
                   4
                 ]
               },
-              "value": "pppp"
+              "type": "immediate",
+              "glyphs": [
+                "dynamicPPPP"
+              ]
             },
             {
               "position": {
@@ -65,6 +74,7 @@
                   4
                 ]
               },
+              "type": "immediate",
               "value": "ppp"
             }
           ],
@@ -136,6 +146,7 @@
                   4
                 ]
               },
+              "type": "immediate",
               "value": "pp"
             },
             {
@@ -145,6 +156,7 @@
                   4
                 ]
               },
+              "type": "immediate",
               "value": "p"
             },
             {
@@ -154,6 +166,7 @@
                   4
                 ]
               },
+              "type": "immediate",
               "value": "mp"
             },
             {
@@ -163,6 +176,7 @@
                   4
                 ]
               },
+              "type": "immediate",
               "value": "mf"
             }
           ],
@@ -234,6 +248,7 @@
                   4
                 ]
               },
+              "type": "immediate",
               "value": "f"
             },
             {
@@ -243,6 +258,7 @@
                   4
                 ]
               },
+              "type": "immediate",
               "value": "ff"
             },
             {
@@ -252,6 +268,7 @@
                   4
                 ]
               },
+              "type": "immediate",
               "value": "fff"
             },
             {
@@ -261,7 +278,10 @@
                   4
                 ]
               },
-              "value": "ffff"
+              "type": "immediate",
+              "glyphs": [
+                "dynamicFFFF"
+              ]
             }
           ],
           "sequences": [
@@ -332,7 +352,10 @@
                   4
                 ]
               },
-              "value": "fffff"
+              "type": "immediate",
+              "glyphs": [
+                "dynamicFFFFF"
+              ]
             },
             {
               "position": {
@@ -341,7 +364,10 @@
                   4
                 ]
               },
-              "value": "ffffff"
+              "type": "immediate",
+              "glyphs": [
+                "dynamicFFFFFF"
+              ]
             },
             {
               "position": {
@@ -350,7 +376,10 @@
                   4
                 ]
               },
-              "value": "pf"
+              "type": "immediate",
+              "glyphs": [
+                "dynamicPF"
+              ]
             },
             {
               "position": {
@@ -359,7 +388,10 @@
                   4
                 ]
               },
-              "value": "fp"
+              "type": "immediate",
+              "glyphs": [
+                "dynamicFortePiano"
+              ]
             }
           ],
           "sequences": [
@@ -430,7 +462,10 @@
                   4
                 ]
               },
-              "value": "fz"
+              "type": "accent",
+              "glyphs": [
+                "dynamicForzando"
+              ]
             },
             {
               "position": {
@@ -439,7 +474,10 @@
                   4
                 ]
               },
-              "value": "sf"
+              "type": "accent",
+              "glyphs": [
+                "dynamicSforzando1"
+              ]
             },
             {
               "position": {
@@ -448,7 +486,10 @@
                   4
                 ]
               },
-              "value": "sfp"
+              "type": "accent",
+              "glyphs": [
+                "dynamicSforzandoPiano"
+              ]
             },
             {
               "position": {
@@ -457,7 +498,10 @@
                   4
                 ]
               },
-              "value": "sfpp"
+              "type": "accent",
+              "glyphs": [
+                "dynamicSforzandoPianissimo"
+              ]
             }
           ],
           "sequences": [
@@ -528,7 +572,10 @@
                   4
                 ]
               },
-              "value": "sfz"
+              "type": "accent",
+              "glyphs": [
+                "dynamicSforzato"
+              ]
             },
             {
               "position": {
@@ -537,7 +584,10 @@
                   4
                 ]
               },
-              "value": "sfzp"
+              "type": "accent",
+              "glyphs": [
+                "dynamicSforzatoPiano"
+              ]
             },
             {
               "position": {
@@ -546,7 +596,10 @@
                   4
                 ]
               },
-              "value": "sffz"
+              "type": "accent",
+              "glyphs": [
+                "dynamicSforzatoFF"
+              ]
             },
             {
               "position": {
@@ -555,7 +608,10 @@
                   4
                 ]
               },
-              "value": "rf"
+              "type": "accent",
+              "glyphs": [
+                "dynamicRinforzando1"
+              ]
             }
           ],
           "sequences": [
@@ -626,7 +682,10 @@
                   4
                 ]
               },
-              "value": "rfz"
+              "type": "accent",
+              "glyphs": [
+                "dynamicRinforzando2"
+              ]
             },
             {
               "position": {
@@ -635,6 +694,7 @@
                   4
                 ]
               },
+              "type": "immediate",
               "value": "n"
             },
             {
@@ -644,7 +704,10 @@
                   4
                 ]
               },
-              "value": "z"
+              "type": "immediate",
+              "glyphs": [
+                "dynamicZ"
+              ]
             }
           ],
           "sequences": [

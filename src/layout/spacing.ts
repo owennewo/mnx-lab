@@ -626,7 +626,7 @@ export function planHorizontal(
         const f = d.position?.fraction;
         return {
           t: Array.isArray(f) && f[1] ? f[0] / f[1] : 0,
-          w: dynamicWidthSp(d.value, d.glyph) + 2 * DYNAMIC_SIDE_PAD_SP
+          w: dynamicWidthSp(d) + 2 * DYNAMIC_SIDE_PAD_SP
         };
       })
       .sort((a, b) => a.t - b.t);

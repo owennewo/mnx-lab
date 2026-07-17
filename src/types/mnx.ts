@@ -239,14 +239,43 @@ export interface MnxBeam {
   direction?: 'left' | 'right';
 }
 
-/** A dynamic marking (MNX `dynamic`): conventional value string ("p", "ff",
- *  "sfz", …) at a metric position; `glyph` may force a specific SMuFL glyph. */
+/** Standard dynamic values (MNX v19 `dynamic-value`, a closed enum). Extended
+ *  marks (pppppp, sfz, fp, z, …) no longer fit here and travel in `glyphs`. */
+export type MnxDynamicValue =
+  | 'ppp'
+  | 'pp'
+  | 'p'
+  | 'mp'
+  | 'mf'
+  | 'f'
+  | 'ff'
+  | 'fff'
+  | 'n';
+
+/** A dynamic marking (MNX v19 `dynamic-group`) at a metric position. `type` is
+ *  required. A plain dynamic carries a `value` (enum) and/or `glyphs` (explicit
+ *  SMuFL names for marks outside the enum). `wedgeType`/`end` describe a hairpin
+ *  (crescendo/diminuendo) — not yet rendered; see the renderer gap in
+ *  roadmap/inprogress/SPEC_APPROVAL.md. */
 export interface MnxDynamic {
   position: {
     fraction: [number, number];
   };
-  value: string;
-  glyph?: string;
+  type: 'immediate' | 'gradual' | 'relative' | 'accent';
+  value?: MnxDynamicValue;
+  /** Explicit SMuFL glyph names (MNX v19 `smufl-glyph-list`) — used for marks
+   *  outside the `value` enum, e.g. ["dynamicSforzato"]. */
+  glyphs?: string[];
+  /** Hairpin direction; paired with `end`. Renderer gap: not drawn yet. */
+  wedgeType?: 'increasing' | 'decreasing';
+  end?: {
+    fraction: [number, number];
+  };
+  relativeValue?: 'louder' | 'softer';
+  attackValue?: MnxDynamicValue;
+  prefix?: string;
+  suffix?: string;
+  orient?: 'above' | 'auto' | 'below' | 'between';
   staff?: number;
   voice?: string;
 }

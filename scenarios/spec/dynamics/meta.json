@@ -10,8 +10,9 @@
   "coversDefs": [
     "clef",
     "clef-sign",
-    "dynamic",
-    "dynamic-type",
+    "dynamic-group",
+    "dynamic-group-type",
+    "dynamic-value",
     "event",
     "global",
     "integer-unsigned",

@@ -1,7 +1,7 @@
 import { MnxStructure, MnxEvent, MnxEventMarkings, MnxGlobalMeasure, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../types/mnx.ts';
 import { emitMeasureDiagnostics, MeasureIssue } from './diagnostics.ts';
 import { validateDocument } from './validate.ts';
-import { dynamicGlyph } from './dynamics.ts';
+import { dynamicGlyph, dynamicLabel } from './dynamics.ts';
 import {
   planHorizontal,
   resolveStaffVoices,
@@ -1984,7 +1984,7 @@ function emitDynamics(args: EmitDynamicsArgs): void {
       onsetXs.find(o => o.t >= target - 1e-6)?.x ??
       (onsetXs.length ? m.x + m.width - 2 : m.x + 2);
     const y = staffBottoms[s] + DYNAMIC_BASELINE_DROP_SP;
-    const glyph = dynamicGlyph(dyn.value, dyn.glyph);
+    const glyph = dynamicGlyph(dyn);
     if (glyph) {
       primitives.push({
         kind: 'glyph',
@@ -1995,9 +1995,11 @@ function emitDynamics(args: EmitDynamicsArgs): void {
         className: 'dynamic'
       });
     } else {
+      const label = dynamicLabel(dyn);
+      if (!label) continue;
       primitives.push({
         kind: 'text',
-        text: dyn.value,
+        text: label,
         x,
         y,
         font: 'bodyItalic',
