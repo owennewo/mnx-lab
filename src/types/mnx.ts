@@ -260,7 +260,7 @@ export type MnxDynamicValue =
  *  required. A plain dynamic carries a `value` (enum) and/or `glyphs` (explicit
  *  SMuFL names for marks outside the enum). `wedgeType`/`end` describe a hairpin
  *  (crescendo/diminuendo) — not yet rendered; see the renderer gap in
- *  roadmap/inprogress/SPEC_APPROVAL.md. */
+ *  roadmap/complete/SPEC_APPROVAL.md. */
 export interface MnxDynamic {
   position: {
     fraction: [number, number];

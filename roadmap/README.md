@@ -1,8 +1,9 @@
 # Roadmap
 
 Planning docs for MNX Lab, filed by their status **relative to the current codebase**. This
-is an archive of intent, not a live task board — the one genuinely live tracker is
-[inprogress/SPEC_APPROVAL.md](inprogress/SPEC_APPROVAL.md).
+is an archive of intent, not a live task board. The recent driver — the spec-approval sweep —
+is now complete ([complete/SPEC_APPROVAL.md](complete/SPEC_APPROVAL.md), 57/57 verified); the
+living corpus contract is [inprogress/04-scenario-library.md](inprogress/04-scenario-library.md).
 
 The big picture: the `clean_room_impl/` **pivot plan** (library-first: scenarios → gallery →
 render → tab → playback → editing → AI-last) was **executed by refactoring the existing app
@@ -31,16 +32,16 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   **voice/transcription stage was never built**. What's left here is the voice half.
 
 ### inprogress/
-- **[SPEC_APPROVAL.md](inprogress/SPEC_APPROVAL.md)** — the live renderer-verification roadmap:
-  per-scenario scoreboard (**28/49 spec examples verified**), the approval bar, known renderer
-  gaps, and the "how to add a renderer feature" recipe. Read this before touching renderer
-  correctness.
 - **[04-scenario-library.md](inprogress/04-scenario-library.md)** — the scenario corpus
   structure (`spec/` + `lab/`, path-derived ids, `meta.json`, `expected.primitives.json`,
   `check-scenarios.mjs`). The one clean-room doc that describes *current* reality; the corpus
   keeps growing, so it stays "in progress."
 
 ### complete/
+- **[SPEC_APPROVAL.md](complete/SPEC_APPROVAL.md)** — the spec-by-spec renderer verification
+  sweep, **complete (57/57 verified: 49/49 spec + 8/8 lab)**. The per-scenario scoreboard, the
+  approval bar, the renderer's capability list + deferred-polish backlog, and the "how to add a
+  renderer feature" recipe — still the process for verifying any newly-added scenario.
 - **[clean-room-plan.md](complete/clean-room-plan.md)** — index/methodology for the pivot plan
   (was `clean_room_impl/README.md`).
 - **[00-vision.md](complete/00-vision.md)** — goals 1–8; all realized (AI demoted to the

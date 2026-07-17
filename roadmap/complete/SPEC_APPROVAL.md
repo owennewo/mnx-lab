@@ -14,9 +14,9 @@ both the process definition and the live scoreboard. Update the table as you go.
 > **All 49 spec examples and all 8 lab scenarios are `verified`.** The metric
 > above is met (49/49). The scoreboard below is now the record of what was done;
 > the remaining work is **deferred engraving polish** (see that section) and
-> verifying *new* scenarios as they're added. This doc could move from
-> `roadmap/inprogress/` to `roadmap/complete/` once the polish backlog is split
-> out — see the note at the end.
+> verifying *new* scenarios as they're added. This doc now lives in
+> `roadmap/complete/` (moved 2026-07-17); the deferred-polish backlog is kept
+> here rather than split into `roadmap/proposed/`.
 
 ---
 
