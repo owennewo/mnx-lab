@@ -2972,6 +2972,10 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
 
   const notes = event.notes;
   const noteheadGlyph = NOTEHEAD_GLYPH_BY_BASE[base] ?? 'noteheadBlack';
+  // Centre by the glyph's real width — the whole note (1.688) is wider than the
+  // black/half notehead (NOTEHEAD_WIDTH_SP), so a fixed offset would shift it off
+  // its column and its ledger line.
+  const headW = glyphBBox(noteheadGlyph)?.w ?? NOTEHEAD_WIDTH_SP;
   // Per-note selection keys: the note's id, or a synthesized positional key
   // for id-less documents (see src/utils/noteKeys.ts) so selection and the
   // note↔document cross-highlight work across the whole corpus.
@@ -3018,9 +3022,9 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   for (const ly of ledgerYs) {
     primitives.push({
       kind: 'line',
-      x1: eventX - NOTEHEAD_WIDTH_SP / 2 - LEDGER_OVERHANG_SP,
+      x1: eventX - headW / 2 - LEDGER_OVERHANG_SP,
       y1: staffTop + ly,
-      x2: eventX + NOTEHEAD_WIDTH_SP / 2 + LEDGER_OVERHANG_SP,
+      x2: eventX + headW / 2 + LEDGER_OVERHANG_SP,
       y2: staffTop + ly,
       thickness: LEDGER_LINE_THICKNESS_SP,
       stroke: fill,
@@ -3054,7 +3058,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
     primitives.push({
       kind: 'glyph',
       glyph: noteheadGlyph,
-      x: eventX - NOTEHEAD_WIDTH_SP / 2,
+      x: eventX - headW / 2,
       y,
       fill,
       className: 'notehead' + colorClass,

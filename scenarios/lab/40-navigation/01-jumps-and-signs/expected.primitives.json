@@ -75,7 +75,7 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 13.0267,
+        "x": 12.7727,
         "y": 9.5,
         "className": "notehead",
         "sourceId": "@m0.v0.e0.n0"
@@ -137,7 +137,7 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 24.6933,
+        "x": 24.4393,
         "y": 9.5,
         "className": "notehead",
         "sourceId": "@m1.v0.e0.n0"
@@ -207,7 +207,7 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 36.36,
+        "x": 36.106,
         "y": 9.5,
         "className": "notehead",
         "sourceId": "@m2.v0.e0.n0"
@@ -277,7 +277,7 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 48.0267,
+        "x": 47.7727,
         "y": 9.5,
         "className": "notehead",
         "sourceId": "@m3.v0.e0.n0"
@@ -349,7 +349,7 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 59.6933,
+        "x": 59.4393,
         "y": 9.5,
         "className": "notehead",
         "sourceId": "@m4.v0.e0.n0"
@@ -421,7 +421,7 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 71.36,
+        "x": 71.106,
         "y": 9.5,
         "className": "notehead",
         "sourceId": "@m5.v0.e0.n0"

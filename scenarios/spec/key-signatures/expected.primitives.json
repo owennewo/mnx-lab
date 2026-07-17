@@ -225,7 +225,7 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 36.36,
+        "x": 36.106,
         "y": 7.5,
         "className": "notehead",
         "sourceId": "@m1.v0.e0.n0"
@@ -437,7 +437,7 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 71.36,
+        "x": 71.106,
         "y": 9.5,
         "className": "notehead",
         "sourceId": "@m3.v0.e0.n0"

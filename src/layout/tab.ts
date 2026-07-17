@@ -35,7 +35,12 @@ const FRET_FONT_SIZE_SP = 1.1;
 
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
-const FRET_BG_FILL = 'var(--bg-app)';
+// The fret digit's backing rect masks the string line under it, so it must be
+// the SCORE PAPER colour — which never inverts with the theme — not the app
+// chrome (`--bg-app`, which is dark in dark mode and undefined in the standalone
+// preview/embed, where it falls back to black and hides the digit). Carries the
+// paper token's own fallback so it resolves even where `--paper` isn't defined.
+const FRET_BG_FILL = 'var(--paper, oklch(0.985 0.006 85))';
 
 // ---------- Public API ----------
 
