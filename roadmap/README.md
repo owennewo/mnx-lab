@@ -22,6 +22,10 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
 ## Contents
 
 ### proposed/
+- **[render-density-zoom.md](proposed/render-density-zoom.md)** — configurable horizontal +
+  vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
+  in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
+  vertical density = layout gap/padding constants. Not started.
 - **[open_router.md](proposed/open_router.md)** — two-stage **voice** input + structured edit.
   The *text* edit path shipped (worker `/api/edit-notation` NDJSON self-correcting loop); the
   **voice/transcription stage was never built**. What's left here is the voice half.

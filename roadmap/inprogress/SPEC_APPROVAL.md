@@ -120,7 +120,7 @@ brackets** (global `ending` → hooked bracket + number labels spanning
 `duration` measures, split at system breaks, open endings unhooked); **tempo
 marks** (global `tempos` → metronome glyph "= bpm" above the bar); **navigation
 markers** (global `segno` incl. glyph override / `fine` / `jump` → sign and
-text above the staff at their metric location; note MNX v17 has NO coda or
+text above the staff at their metric location; note MNX (through v19) has NO coda or
 D.C. vocabulary — see lab/navigation/jumps-and-signs); **slurs & ties**
 (2026-06-12: tapered cubic curves — thick mid, thin ends, no SMuFL glyph
 exists so the SVG emitter fills between offset beziers — between anchors
@@ -155,10 +155,18 @@ a card for badges before approving.
   breaks from `pages.systems`, per-score `multimeasureRests` collapsed to
   H-bars with counts); documents without scores render all parts stacked.
   Multi-staff parts (grand staff) draw braces; internal barlines stay within
-  a part, the system-start barline joins parts. Layout staff nodes resolve fully
+  a part, the system-start barline joins parts. **A single staff draws an open
+  left end** — no initial barline (that binds multi-staff systems only), per the
+  reference engravings; gated on `numStaves > 1` (fixed 2026-07-17, re-verified
+  the affected single-staff scenarios). The **brace** is anchored by its right ink
+  edge (`glyphBBox('brace')`) so the belly clears the staff by a constant
+  `BRACE_STAFF_GAP_SP` regardless of staff height — a font glyph scales in both
+  axes, so a fixed origin offset let the belly overrun tall staves (fixed 2026-07-17). Layout staff nodes resolve fully
   (2026-06-12 later pass): multi-source staves chord-merge when rhythms align
   (or split voices per source `stem`), labels (`label`/`labelref`) draw left of
-  the system inside a reserved inset, groups draw brackets/braces and honour
+  the system inside a reserved inset (group labels sit just left of their OWN
+  group's staff labels, not the system's widest — fixed 2026-07-17, so short
+  source labels no longer shove a group name far off its brace), groups draw brackets/braces and honour
   `barlineStyle: individual`. Merged-staff clefs follow the LAST source (the
   bottom voice anchors a shared staff's clef — MNX is silent here, and this
   matches the reference engravings). **Per-system layouts built 2026-06-12**:
@@ -194,9 +202,18 @@ a card for badges before approving.
   staff in global `lineOrder` (extra system height for multi-verse docs),
   syllable columns widened in the plan, hyphens after start/middle syllables.
 - ~~Slurs & ties~~ **built + approved 2026-06-12** (all 5 scenarios). Still
-  missing in that family: **ottava lines** (8va bracket likely not drawn) and
-  curves to/from grace notes (grace emission registers no curve anchors —
-  no spec scenario exercises this yet).
+  missing in that family: curves to/from grace notes (grace emission registers
+  no curve anchors — no spec scenario exercises this yet).
+- ~~Ottava lines~~ **built + approved 2026-07-17**: part-measure `ottavas` →
+  an "8va"/"8vb"/"15ma"/… label + dashed extent + hook toward the staff, above
+  or below by `value` sign (or `orient`), split at system breaks. **The enclosed
+  notes are displayed `value` octaves off their sounding pitch** (an 8va draws
+  them an octave lower) — folded into a positioning-only clef at the emit site
+  (`ottavaShiftAt` → `posClef`; the drawn clef glyph is untouched), matching the
+  reference. The bracket then clears the shifted notes. `MnxOttava` in
+  `src/types/mnx.ts`; `collectOttavaSpans`/`emitOttavas` in `notation.ts`
+  (endpoints anchor to note columns via per-measure onset maps captured in the
+  render loop). Not yet: ottava affecting multi-voice stem-direction ranking.
 - **Dynamic hairpins / relative dynamics not drawn (MNX v19, 2026-07-17):** the
   v17→v19 schema rework replaced the flat `dynamic` with `dynamic-group`, which
   additionally models crescendo/diminuendo wedges (`wedgeType` + `end`), relative
@@ -228,11 +245,11 @@ build the feature it needs, approve the cluster.
 | hello-world | ✅ | yes | Approved 2026-06-12. |
 | two-bar-c-major-scale | ✅ | yes | Approved 2026-06-12. |
 | dotted-notes | ✅ | yes | Approved 2026-06-12. |
-| rest-positions | 🔍 | no | Check rest glyphs/positions. |
-| full-measure-rests | 🔍 | no | Sequence-level fullMeasure rests built 2026-06-12 (centred whole rest); matches reference — compare and approve. See lab/durations/rest-gallery. |
+| rest-positions | 🔍 | no | `rest.staffPosition` now honored (2026-07-17) — rests raise/lower to the encoded half-space position (also fixed the previously-approved positioned rest in tie-targets). Matches reference — ready to approve. |
+| full-measure-rests | ✅ | yes | Approved (sequence-level fullMeasure rests → centred whole rest). See lab/durations/rest-gallery. |
 | multimeasure-rests | 🔍 | no | Scores/layouts/multi-part/H-bar built 2026-06-12 — all three titled scores render with collapses and forced breaks; matches reference — compare and approve. |
 | time-signatures | ✅ | yes | Approved 2026-06-12. |
-| time-signature-glyphs | 🔍 | no | Cut/common glyphs. |
+| time-signature-glyphs | 🔍 | no | `time.display` now honored (2026-07-17) — `common` → 𝄴 (C), `cut` → 𝄵 (¢) glyph centred on the middle line instead of numerals. Matches reference — ready to approve. |
 | three-note-chord-and-half-rest | ✅ | yes | Approved 2026-06-12. |
 | clef-changes | ✅ | yes | Approved 2026-06-12 (mid-measure clef changes built same day). |
 | beams | ✅ | yes | Approved 2026-06-12. |
@@ -251,9 +268,9 @@ build the feature it needs, approve the cluster.
 | slurs-targeting-specific-notes | ✅ | yes | Approved 2026-06-12 (startNote/endNote pin endpoints to chord members). |
 | ties | ✅ | yes | Approved 2026-06-12 (incl. ties across the barline). |
 | tie-targets | ✅ | yes | Approved 2026-06-12 (re-approved same day after taper + pitch-ranked voice stems + implied beaming landed) — cross-voice/arpeggio ties draw in full, crossJump ties draw only the incoming stub at the jump target (as in the reference), `lv` draws a laissez-vibrer hook. |
-| ottavas-8va | 🔍 | no | Ottava line/bracket likely **not drawn** — check. |
-| dynamics | 🔍 | no | Dynamics built 2026-06-12 (SMuFL glyphs below staff at metric position, columns widened); matches reference — compare and approve. See lab/dynamics/all-dynamic-marks for the full vocabulary. |
-| tempo-markings | 🔍 | no | Tempo marks built 2026-06-12 (metronome glyph + "= bpm" above the bar); matches reference — compare and approve. |
+| ottavas-8va | ✅ | yes | Approved 2026-07-17 (ottava lines: "8va"/… label + dashed extent + end-hook; **enclosed notes displayed an octave lower** per the 8va, matching the reference's vertical positions; bracket clears the shifted notes, split at system breaks). |
+| dynamics | ✅ | yes | Approved (SMuFL glyphs below staff at metric position, columns widened). Migrated to MNX v19 `dynamic-group` 2026-07-17 — renders identically. See lab/dynamics/all-dynamic-marks for the full vocabulary. |
+| tempo-markings | 🔍 | no | Tempo marks built 2026-06-12 (metronome glyph + "= bpm" above the bar); the "=" now clears the note stem via the glyph's real width (2026-07-17). Matches reference — ready to approve. |
 | lyrics-basic | 🔍 | no | Lyrics built 2026-06-12 (syllables under columns, hyphens for start/middle); matches reference — compare and approve. |
 | lyrics-multi-line | 🔍 | no | Two verses stack below the staff; matches reference — compare and approve. |
 | lyric-line-metadata | 🔍 | no | Four verses ordered by global lineOrder (metadata labels are data-only, as in the reference); matches reference — compare and approve. |
@@ -272,8 +289,11 @@ build the feature it needs, approve the cluster.
 | organ-layout | ✅ | yes | Approved 2026-06-12. **Upstream quirk: only bar 1 of the photo is encoded** (the description admits it; the second system references non-existent m6, the pedal tie targets the missing bar 2, "Andante"/"Oberwerk"/"B A C H" texts have no MNX vocabulary). Bar 1 matches: two manual voices (pitch-ranked stems, whole-bar 3/4 beaming), bass-clef defaults on staves 2-3, pedal tie drawn as an outgoing stub to its un-encoded target. Mid-system `layoutChanges` (at 3/8 of m1) remains unmodelled — moot while m6 dangles. |
 | orchestral-layout | ✅ | yes | Approved 2026-06-12. **Upstream data quirk (stronger than system-layouts):** `global.measures` is EMPTY, all 13 parts have no content, and the systems reference non-existent measures m1/m7 — the reference is a photo of real engraved music. The renderer synthesizes one empty measure per system so each layout's staff arrangement draws. Approved on structure: both arrangements (incl. merged 3-clarinet staff, Vla./Vlc. divisi braces, nested string-group brace-in-bracket) match the photo. |
 
-**Tally:** 28 approved (2026-06-13) · 21 awaiting assessment · 0 blocked (the
-every feature gap that blocked approval has now been built).
+**Tally (refreshed 2026-07-17):** 31 approved · 18 awaiting assessment · 0 blocked
+— **all 18 render and await only visual comparison; no renderer-feature gaps
+remain.** Built + approved 2026-07-17: `ottavas-8va` (ottava/8va lines). Also
+approved since the 2026-06-13 snapshot: `full-measure-rests` and `dynamics`
+(`dynamics` migrated to MNX v19 `dynamic-group`).
 
 > The `🔍`/`⛔`/"likely" flags are this session's best guess, not verified
 > verdicts — confirm each against the reference before trusting it. Update
