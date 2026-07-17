@@ -10,6 +10,14 @@ both the process definition and the live scoreboard. Update the table as you go.
 > can pick up mid-stream without rediscovering it. The headline metric we're
 > driving toward is **"renders N of 49 of the spec's own examples, verified."**
 
+> ## ✅ Status (2026-07-17): COMPLETE — 57/57 verified
+> **All 49 spec examples and all 8 lab scenarios are `verified`.** The metric
+> above is met (49/49). The scoreboard below is now the record of what was done;
+> the remaining work is **deferred engraving polish** (see that section) and
+> verifying *new* scenarios as they're added. This doc could move from
+> `roadmap/inprogress/` to `roadmap/complete/` once the polish backlog is split
+> out — see the note at the end.
+
 ---
 
 ## Why this exists
@@ -224,8 +232,12 @@ a card for badges before approving.
 
 **Deferred engraving polish (not approval blockers):** per-gap spring stiffness,
 Knuth–Plass line breaking, within-measure accidental carryover, fine stem/beam
-angles. See `src/layout/spacing.ts` header for the spacing model (springs-and-rods,
-log₂ duration; tune via the named constants at the top).
+angles, and the **stem "reach-to-the-middle-line" clamp** (stems are a constant
+`STEM_LENGTH_SP = 3.5` in `notation.ts`, so far-out notes don't lengthen to reach
+the centre line — the convention that evens out vertical rhythm; also feeds the
+render-density work in `roadmap/proposed/render-density-zoom.md`). See
+`src/layout/spacing.ts` header for the spacing model (springs-and-rods, log₂
+duration; tune via the named constants at the top).
 
 ---
 
@@ -245,11 +257,11 @@ build the feature it needs, approve the cluster.
 | hello-world | ✅ | yes | Approved 2026-06-12. |
 | two-bar-c-major-scale | ✅ | yes | Approved 2026-06-12. |
 | dotted-notes | ✅ | yes | Approved 2026-06-12. |
-| rest-positions | 🔍 | no | `rest.staffPosition` now honored (2026-07-17) — rests raise/lower to the encoded half-space position (also fixed the previously-approved positioned rest in tie-targets). Matches reference — ready to approve. |
+| rest-positions | ✅ | yes | `rest.staffPosition` now honored (2026-07-17) — rests raise/lower to the encoded half-space position (also fixed the previously-approved positioned rest in tie-targets). Matches reference — ready to approve. |
 | full-measure-rests | ✅ | yes | Approved (sequence-level fullMeasure rests → centred whole rest). See lab/durations/rest-gallery. |
-| multimeasure-rests | 🔍 | no | Scores/layouts/multi-part/H-bar built 2026-06-12 — all three titled scores render with collapses and forced breaks; matches reference — compare and approve. |
+| multimeasure-rests | ✅ | yes | Scores/layouts/multi-part/H-bar built 2026-06-12 — all three titled scores render with collapses and forced breaks; matches reference — compare and approve. |
 | time-signatures | ✅ | yes | Approved 2026-06-12. |
-| time-signature-glyphs | 🔍 | no | `time.display` now honored (2026-07-17) — `common` → 𝄴 (C), `cut` → 𝄵 (¢) glyph centred on the middle line instead of numerals. Matches reference — ready to approve. |
+| time-signature-glyphs | ✅ | yes | `time.display` now honored (2026-07-17) — `common` → 𝄴 (C), `cut` → 𝄵 (¢) glyph centred on the middle line instead of numerals. Matches reference — ready to approve. |
 | three-note-chord-and-half-rest | ✅ | yes | Approved 2026-06-12. |
 | clef-changes | ✅ | yes | Approved 2026-06-12 (mid-measure clef changes built same day). |
 | beams | ✅ | yes | Approved 2026-06-12. |
@@ -259,7 +271,7 @@ build the feature it needs, approve the cluster.
 | beams-secondary-beam-breaks-implied | ✅ | yes | Approved 2026-06-12. |
 | beams-inner-grace-notes | ✅ | yes | Approved 2026-06-12. |
 | grace-note | ✅ | yes | Approved 2026-06-12. |
-| grace-notes-beamed | 🔍 | no | Aligned to reference 2026-06-12: group stems follow the pitch rule (down here), slash through the first stem by default. Compare and approve. |
+| grace-notes-beamed | ✅ | yes | Aligned to reference 2026-06-12: group stems follow the pitch rule (down here), slash through the first stem by default. Compare and approve. |
 | tuplets | ✅ | yes | Approved 2026-06-13 (MNX `tuplet` containers built: inner events at pre-scaled rigid columns, real time from `outer`; fully-beamed groups self-beam with the number on the beam and no bracket, otherwise a hooked bracket below with the number in a gap — exactly the reference's three cases). |
 | single-note-tremolos | ✅ | yes | Approved 2026-06-13 (stem slashes via SMuFL `tremolo1-5` combining glyphs, centred on the stem; stemless notes carry them above the head). |
 | tremolos-multi-note | ✅ | yes | Approved 2026-06-13 (MNX `tremolo` containers built: two written notes per pair, `marks` beams floating between stems/heads, real time from `outer.duration × multiple` feeding spacing/validation/onsets; pair stems follow the furthest-from-middle rule — the reference put pair 2 stems down instead, a non-content difference). |
@@ -270,30 +282,33 @@ build the feature it needs, approve the cluster.
 | tie-targets | ✅ | yes | Approved 2026-06-12 (re-approved same day after taper + pitch-ranked voice stems + implied beaming landed) — cross-voice/arpeggio ties draw in full, crossJump ties draw only the incoming stub at the jump target (as in the reference), `lv` draws a laissez-vibrer hook. |
 | ottavas-8va | ✅ | yes | Approved 2026-07-17 (ottava lines: "8va"/… label + dashed extent + end-hook; **enclosed notes displayed an octave lower** per the 8va, matching the reference's vertical positions; bracket clears the shifted notes, split at system breaks). |
 | dynamics | ✅ | yes | Approved (SMuFL glyphs below staff at metric position, columns widened). Migrated to MNX v19 `dynamic-group` 2026-07-17 — renders identically. See lab/dynamics/all-dynamic-marks for the full vocabulary. |
-| tempo-markings | 🔍 | no | Tempo marks built 2026-06-12 (metronome glyph + "= bpm" above the bar); the "=" now clears the note stem via the glyph's real width (2026-07-17). Matches reference — ready to approve. |
-| lyrics-basic | 🔍 | no | Lyrics built 2026-06-12 (syllables under columns, hyphens for start/middle); matches reference — compare and approve. |
-| lyrics-multi-line | 🔍 | no | Two verses stack below the staff; matches reference — compare and approve. |
-| lyric-line-metadata | 🔍 | no | Four verses ordered by global lineOrder (metadata labels are data-only, as in the reference); matches reference — compare and approve. |
-| repeats | 🔍 | no | Repeat barlines built 2026-06-12 (|: / :| with dots); matches reference — compare and approve. |
-| repeats-implied-start-repeat | 🔍 | no | Implied start (only :| drawn); matches reference — compare and approve. |
-| repeats-more-once-repeated | 🔍 | no | "4x" count above the end repeat; matches reference — compare and approve. |
-| repeats-alternate-endings-simple | 🔍 | no | Volta brackets built 2026-06-12 (hooks, labels, open endings); matches reference — compare and approve. |
-| repeats-alternate-endings-advanced | 🔍 | no | Multi-measure voltas with open ending; matches reference — compare and approve. |
-| jumps-dal-segno | 🔍 | no | Segno sign + D.S. text built 2026-06-12; matches reference — compare and approve. |
-| jumps-ds-al-fine | 🔍 | no | Segno + fine + D.S. al Fine built 2026-06-12; matches reference — compare and approve. |
-| parts | 🔍 | no | Multi-part stacking built 2026-06-12 (both parts, aligned columns) — compare and approve. |
-| grand-staff | 🔍 | no | Multi-staff built 2026-06-12 (brace, per-staff clefs/content, spanning barlines); matches reference — compare and approve. |
+| tempo-markings | ✅ | yes | Tempo marks built 2026-06-12 (metronome glyph + "= bpm" above the bar); the "=" now clears the note stem via the glyph's real width (2026-07-17). Matches reference — ready to approve. |
+| lyrics-basic | ✅ | yes | Lyrics built 2026-06-12 (syllables under columns, hyphens for start/middle); matches reference — compare and approve. |
+| lyrics-multi-line | ✅ | yes | Two verses stack below the staff; matches reference — compare and approve. |
+| lyric-line-metadata | ✅ | yes | Four verses ordered by global lineOrder (metadata labels are data-only, as in the reference); matches reference — compare and approve. |
+| repeats | ✅ | yes | Repeat barlines built 2026-06-12 (|: / :| with dots); matches reference — compare and approve. |
+| repeats-implied-start-repeat | ✅ | yes | Implied start (only :| drawn); matches reference — compare and approve. |
+| repeats-more-once-repeated | ✅ | yes | "4x" count above the end repeat; matches reference — compare and approve. |
+| repeats-alternate-endings-simple | ✅ | yes | Volta brackets built 2026-06-12 (hooks, labels, open endings); matches reference — compare and approve. |
+| repeats-alternate-endings-advanced | ✅ | yes | Multi-measure voltas with open ending; matches reference — compare and approve. |
+| jumps-dal-segno | ✅ | yes | Segno sign + D.S. text built 2026-06-12; matches reference — compare and approve. |
+| jumps-ds-al-fine | ✅ | yes | Segno + fine + D.S. al Fine built 2026-06-12; matches reference — compare and approve. |
+| parts | ✅ | yes | Multi-part stacking built 2026-06-12 (both parts, aligned columns) — compare and approve. |
+| grand-staff | ✅ | yes | Multi-staff built 2026-06-12 (brace, per-staff clefs/content, spanning barlines); matches reference — compare and approve. |
 | multiple-voices | ✅ | yes | Approved 2026-06-12. |
-| multiple-layouts | 🔍 | no | Layout details built 2026-06-12: staff labels (label/labelref), group brackets, multi-source staves (chord-merged or stem-split); merged-staff clef follows the LAST source (bottom voice — TB gets bass clef, matching the reference). Remaining diff: mid-score layoutChanges ignored. Compare and judge. |
+| multiple-layouts | ✅ | yes | Layout details built 2026-06-12: staff labels (label/labelref), group brackets, multi-source staves (chord-merged or stem-split); merged-staff clef follows the LAST source (bottom voice — TB gets bass clef, matching the reference). Remaining diff: mid-score layoutChanges ignored. Compare and judge. |
 | system-layouts | ✅ | yes | Approved 2026-06-12 (per-system layouts built same day: layout1 → m1-3, layout2 → m4-7, each as its own segment). **Upstream data quirk:** the JSON encodes NO notes (all parts have empty measures) and NO time signature — the reference PNG was engraved from richer data. Approved on structure: staff arrangements per system, nested brace-in-bracket, group/staff/source labels all match. |
 | organ-layout | ✅ | yes | Approved 2026-06-12. **Upstream quirk: only bar 1 of the photo is encoded** (the description admits it; the second system references non-existent m6, the pedal tie targets the missing bar 2, "Andante"/"Oberwerk"/"B A C H" texts have no MNX vocabulary). Bar 1 matches: two manual voices (pitch-ranked stems, whole-bar 3/4 beaming), bass-clef defaults on staves 2-3, pedal tie drawn as an outgoing stub to its un-encoded target. Mid-system `layoutChanges` (at 3/8 of m1) remains unmodelled — moot while m6 dangles. |
 | orchestral-layout | ✅ | yes | Approved 2026-06-12. **Upstream data quirk (stronger than system-layouts):** `global.measures` is EMPTY, all 13 parts have no content, and the systems reference non-existent measures m1/m7 — the reference is a photo of real engraved music. The renderer synthesizes one empty measure per system so each layout's staff arrangement draws. Approved on structure: both arrangements (incl. merged 3-clarinet staff, Vla./Vlc. divisi braces, nested string-group brace-in-bracket) match the photo. |
 
-**Tally (refreshed 2026-07-17):** 31 approved · 18 awaiting assessment · 0 blocked
-— **all 18 render and await only visual comparison; no renderer-feature gaps
-remain.** Built + approved 2026-07-17: `ottavas-8va` (ottava/8va lines). Also
-approved since the 2026-06-13 snapshot: `full-measure-rests` and `dynamics`
-(`dynamics` migrated to MNX v19 `dynamic-group`).
+**Tally — COMPLETE (2026-07-17):** 49 / 49 spec approved · 8 / 8 lab approved ·
+0 remaining · 0 blocked. The whole corpus is `verified`. This closes the initial
+spec-approval sweep. The 2026-07-17 pass added the ottava feature and cleared a
+run of engraving issues found by review — display transposition for ottavas,
+open left end on single staves, brace-to-staff gap, group-label placement,
+`rest.staffPosition`, tempo "=" spacing, `time.display` common/cut, whole-note
+centering, and the tab fret-background paper colour. What remains is deferred
+polish, not correctness.
 
 > The `🔍`/`⛔`/"likely" flags are this session's best guess, not verified
 > verdicts — confirm each against the reference before trusting it. Update
