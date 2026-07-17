@@ -110,8 +110,10 @@ changes** (positioned clefs become a per-measure clef timeline in the spacing
 plan — each event's pitch math follows the clef at its onset, and the change
 draws small at its reserved column); **dynamics** (part-measure `dynamics` →
 SMuFL composite glyphs below the staff at their metric position, host columns
-widened to the mark — vocabulary in `src/layout/dynamics.ts`, unmapped values
-fall back to italic text; full set exercised by lab/dynamics/all-dynamic-marks);
+widened to the mark — MNX v19 `dynamic-group`: the standard `value` enum maps
+via the table in `src/layout/dynamics.ts`, marks outside the enum carry an
+explicit `glyphs` list, unmapped values fall back to italic text; full set
+exercised by lab/dynamics/all-dynamic-marks);
 **repeats** (global `repeatStart`/`repeatEnd` → |:/:| barlines with dots, room
 reserved in the plan, "Nx" counts above unconventional play counts); **volta
 brackets** (global `ending` → hooked bracket + number labels spanning
@@ -195,6 +197,13 @@ a card for badges before approving.
   missing in that family: **ottava lines** (8va bracket likely not drawn) and
   curves to/from grace notes (grace emission registers no curve anchors —
   no spec scenario exercises this yet).
+- **Dynamic hairpins / relative dynamics not drawn (MNX v19, 2026-07-17):** the
+  v17→v19 schema rework replaced the flat `dynamic` with `dynamic-group`, which
+  additionally models crescendo/diminuendo wedges (`wedgeType` + `end`), relative
+  dynamics (`relativeValue`: louder/softer), and `prefix`/`suffix` text. The
+  renderer engraves only the point marks (enum `value` / explicit `glyphs`);
+  wedges and relatives round-trip through `MnxDynamic` but are not drawn. No spec
+  scenario exercises them yet — build when one lands.
 
 **Deferred engraving polish (not approval blockers):** per-gap spring stiffness,
 Knuth–Plass line breaking, within-measure accidental carryover, fine stem/beam

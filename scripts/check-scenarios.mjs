@@ -1,4 +1,4 @@
-// Corpus police for scenarios/ (see clean_room_impl/04-scenario-library.md).
+// Corpus police for scenarios/ (see roadmap/inprogress/04-scenario-library.md).
 // Checks, per scenario: metadata validates against meta.schema.json, JSON files
 // are canonically formatted, actual validation verdicts (standard MNX + _x.tab
 // extension) match the declared `expect` in both directions, pinned error

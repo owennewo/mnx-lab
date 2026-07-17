@@ -10,7 +10,7 @@
 |---------|----------------|-----------|
 | `mnx-core` | The MNX document model: types, schema, validation, `_x` extension. The lingua franca. | (nothing) |
 | `mnx-render` | Layout engine (document → primitives) + SVG renderer (primitives → SVG). Notation + tab. | `mnx-core` (types only) |
-| `mnx-scenarios` | The scenario library (`spec/` mirror of the CG's worked examples + `lab/` hand-authored scenarios, incl. invalid-by-design). Starts as a plain `scenarios/` directory in-repo; promoted to a package only when something external needs to install it. See `04-scenario-library.md`. | `mnx-core` (types only) |
+| `mnx-scenarios` | The scenario library (`spec/` mirror of the CG's worked examples + `lab/` hand-authored scenarios, incl. invalid-by-design). Starts as a plain `scenarios/` directory in-repo; promoted to a package only when something external needs to install it. See `../inprogress/04-scenario-library.md`. | `mnx-core` (types only) |
 | `gallery` | The browse app: enumerate the library, show JSON + validation status + rendered output. Read-only. | `mnx-core`, `mnx-render`, `mnx-scenarios` |
 
 **Dependency rule (P2):** arrows point one way. `mnx-core` imports nothing internal. Nothing
@@ -66,22 +66,22 @@ Consumed by corpus tests (assert `validate(doc)` matches each scenario's declare
 both standard and `_x.tab` verdicts; snapshot `layout(doc)` vs `expectedPrimitives`) and by
 `gallery` (facet-driven browsing, live render). The committed reference artifact is the
 primitive list, not SVG. One corpus, multiple consumers — and no loader package yet: the
-gallery uses `import.meta.glob`, scripts walk the filesystem. See `04-scenario-library.md`
+gallery uses `import.meta.glob`, scripts walk the filesystem. See `../inprogress/04-scenario-library.md`
 for the layout and `meta.json` schema.
 
 ## Deferred contracts (reserved, defined when their phase arrives)
 - **C3 — Audio:** `toSchedule(doc) → PlaybackSchedule`; `createPlayer(schedule)` with a
   playhead reported in document coordinates (so render can highlight without audio knowing SVG).
 - **C4 — Convert:** `importMusicXml(xml) → MnxDocument`; `exportMnx(doc) → string`. Round-trip
-  is the test surface (seed: `../MUSICXML.md`, `../converters/musicxml-mnx/`).
+  is the test surface (seed: `../complete/MUSICXML.md`, `../../converters/musicxml-mnx/`).
 - **C5 — AI edit:** an `AsyncIterable<EditFrame>` NDJSON stream (`progress` / `done`), server
   forces a `tool_choice` function call, validates against `mnx-core`, self-corrects ≤3 attempts
-  (seed: `../research/open_router.md`).
+  (seed: `../proposed/open_router.md`).
 
 ## Cross-cutting (introduced with the editing phase, not v1)
 - **Storage — `DocumentRepository`** (IndexedDB via `idb-keyval`, key prefix `mnx-doc:`).
 - **`_x.tab` extension schema (v2, single-source)**, owned by `mnx-core` (P7) — see
-  `../docs/tab-extension-spec.md`.
+  `../../docs/tab-extension-spec.md`.
 - **Component events:** child→parent via bubbling `CustomEvent` with `composed: true`.
 
 ## Intentionally NOT in v1

@@ -28,7 +28,7 @@ being genuinely good.
 
 1. **A spec-coverage scenario library.** Small, valid, readable MNX docs (mostly 1–2 bars),
    categorised hierarchically, each with metadata and a rendered reference. See
-   `04-scenario-library.md`. *This is the first deliverable.*
+   `../inprogress/04-scenario-library.md`. *This is the first deliverable.*
 2. **A reusable rendering core.** Document-agnostic layout engine → primitive shapes → dumb
    SVG renderer. Proven correct against the library.
 3. **A gallery app.** Browse the library, see each document's JSON, validation status, and

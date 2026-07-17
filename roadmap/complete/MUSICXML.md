@@ -2,7 +2,7 @@
 
 This document assesses the feasibility, mappings, and challenges of bi-directional conversion between guitar-oriented MusicXML files (specifically based on the analysis of [House-of-the-Rising-Sun.xml](file:///home/williao/dev/mnx-editor/server/scores/House-of-the-Rising-Sun.xml)) and the W3C MNX format.
 
-The goal of this assessment is to prepare for the development of a TypeScript-based internal package (`packages/musicxml-mnx`) that performs import (MusicXML $\rightarrow$ MNX) and export (MNX $\rightarrow$ MusicXML).
+The goal of this assessment is to prepare for the development of a TypeScript-based internal package (`converters/musicxml-mnx`) that performs import (MusicXML $\rightarrow$ MNX) and export (MNX $\rightarrow$ MusicXML).
 
 ---
 
