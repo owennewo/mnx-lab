@@ -34,7 +34,7 @@ import {
   BeamHookSpec
 } from './beams.ts';
 import { Primitive, LayoutResult, LayoutDiagnostic, SpatialIndex } from '../primitives.ts';
-import { glyphAnchor } from '../smufl/smufl.ts';
+import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
 import { syntheticNoteKey } from '../utils/noteKeys.ts';
 
 /**
@@ -185,6 +185,16 @@ const REPEAT_DOT_SCALE = 1.2;
 const VOLTA_RISE_SP = 3.4;  // bracket line above the top staff line
 const VOLTA_HOOK_SP = 1.3;
 const VOLTA_THICKNESS_SP = 0.13;
+
+// Ottava (octave-shift) lines: "8va"/"8vb"/… label + dashed extent + end hook.
+const OTTAVA_THICKNESS_SP = 0.11;
+const OTTAVA_DASH_SP = 0.5;       // dash on-length (equal gap)
+const OTTAVA_HOOK_SP = 0.9;       // end hook toward the staff
+const OTTAVA_CLEARANCE_SP = 1.2;  // gap above the highest note in the span
+const OTTAVA_MIN_RISE_SP = 2.0;   // minimum clearance from the staff edge
+const OTTAVA_LABEL_SIZE_SP = 1.8;
+const OTTAVA_LABEL_GAP_SP = 2.4;  // dashes begin this far past the label
+const OTTAVA_END_EXTEND_SP = 1.0; // line runs a touch past the last note
 
 // Slur & tie curves (tapered fills; thickness = mid-curve width).
 const SLUR_THICKNESS_SP = 0.22;
@@ -719,6 +729,7 @@ interface RenderSegmentArgs {
 // staff/source labels sit left of all decorations, group labels leftmost.
 const DECOR_BASE_SP = 1.2;
 const DECOR_STEP_SP = 1.6;
+const BRACE_STAFF_GAP_SP = 0.4; // gap between the brace's belly and the staff/start barline
 const LABEL_CHAR_SP = 1.0;
 const LABEL_PAD_SP = 0.6;
 
@@ -836,6 +847,15 @@ function renderSegment(args: RenderSegmentArgs): {
   }
   const lyricRuns = new Map<string, LyricSyllable[]>();
 
+  // Ottava lines are a post-pass (they cross measures/system breaks), but their
+  // endpoints anchor to note columns — so capture each measure's onset→x maps
+  // during the loop when the document has any ottava. Keyed by measure index,
+  // one OnsetX[] per staff.
+  const ottavaSpans = (mnx.parts ?? []).some(p => (p.measures ?? []).some(pm => pm?.ottavas?.length))
+    ? collectOttavaSpans(mnx, segment)
+    : [];
+  const ottavaOnsets = ottavaSpans.length ? new Map<number, OnsetX[][]>() : null;
+
   for (let i = 0; i < numMeasures; i++) {
     const m = plan.measures[i];
     if (m.hidden) continue;
@@ -859,12 +879,17 @@ function renderSegment(args: RenderSegmentArgs): {
     }
 
     if (m.firstInSystem) {
-      primitives.push({
-        kind: 'line',
-        x1: m.x, y1: staffTop, x2: m.x, y2: sysBottom,
-        thickness: BARLINE_THICKNESS_SP,
-        className: 'barline barline-start'
-      });
+      // A system-start barline binds MULTIPLE staves into a system; a single
+      // staff conventionally has an open left end (as the reference engravings
+      // do), so only draw it for grand-staff / multi-part systems.
+      if (numStaves > 1) {
+        primitives.push({
+          kind: 'line',
+          x1: m.x, y1: staffTop, x2: m.x, y2: sysBottom,
+          thickness: BARLINE_THICKNESS_SP,
+          className: 'barline barline-start'
+        });
+      }
       // Group decorations (brace / bracket) left of the start barline; nested
       // decorations step further left of their parent's, per the reference
       // engravings (the flutes sub-brace sits left of the winds bracket).
@@ -874,12 +899,19 @@ function renderSegment(args: RenderSegmentArgs): {
         const bottom = staffBottoms[g.start + g.count - 1];
         const gx = m.x - DECOR_BASE_SP - g.depth * DECOR_STEP_SP;
         if (g.symbol === 'brace') {
+          // The brace is a font glyph, so it scales in BOTH axes; its belly
+          // widens with the staff span. Anchor by the glyph's right ink edge so
+          // the gap to the staff stays constant (otherwise a tall grand/organ
+          // staff's belly overruns the staff). `bb.x + bb.w` = east ink extent.
+          const braceScale = (bottom - top) / BRACE_DESIGN_HEIGHT_SP;
+          const bb = glyphBBox('brace');
+          const braceRightInk = ((bb?.x ?? 0) + (bb?.w ?? 0.33)) * braceScale;
           primitives.push({
             kind: 'glyph',
             glyph: 'brace',
-            x: gx,
+            x: m.x - g.depth * DECOR_STEP_SP - BRACE_STAFF_GAP_SP - braceRightInk,
             y: bottom,
-            scale: (bottom - top) / BRACE_DESIGN_HEIGHT_SP,
+            scale: braceScale,
             className: 'brace'
           });
         } else {
@@ -932,10 +964,17 @@ function renderSegment(args: RenderSegmentArgs): {
         });
       });
 
-      // Group labels, leftmost, centred on the group's vertical span.
-      const groupLabelX = labelX - staffLabelW;
+      // Group labels sit just left of their OWN group's staff labels — not the
+      // system's widest (a group whose staves carry short source labels like
+      // "2." would otherwise be shoved far left of its brace) — centred on the
+      // group's vertical span.
       for (const g of segment.groups) {
         if (!g.label) continue;
+        let ownStaffSpan = 0;
+        for (let s = g.start; s < g.start + g.count; s++) {
+          ownStaffSpan = Math.max(ownStaffSpan, staffLabelSpan(s));
+        }
+        const groupLabelX = labelX - (ownStaffSpan ? ownStaffSpan + LABEL_PAD_SP : 0);
         primitives.push({
           kind: 'text',
           text: g.label,
@@ -1011,28 +1050,19 @@ function renderSegment(args: RenderSegmentArgs): {
     if (tempo) {
       const x0 = m.showTimeSig ? m.timeSigCentreX - 1.25 : m.contentStartX - 1.5;
       const y = staffTop - TEMPO_BASELINE_RISE_SP;
-      primitives.push({
-        kind: 'glyph',
-        glyph: METRONOME_GLYPH_BY_BASE[tempo.value.base] ?? 'metNoteQuarterUp',
-        x: x0,
-        y,
-        className: 'tempo'
-      });
-      let textX = x0 + 1.3;
+      const metGlyph = METRONOME_GLYPH_BY_BASE[tempo.value.base] ?? 'metNoteQuarterUp';
+      primitives.push({ kind: 'glyph', glyph: metGlyph, x: x0, y, className: 'tempo' });
+      // Advance past the note glyph's actual right edge (incl. its stem) so the
+      // augmentation dots and the "=" never collide with the stem.
+      let cursor = x0 + (glyphBBox(metGlyph)?.w ?? 1.33) + 0.4;
       for (let d = 0; d < (tempo.value.dots ?? 0); d++) {
-        primitives.push({
-          kind: 'glyph',
-          glyph: 'metAugmentationDot',
-          x: x0 + 1.0 + d * 0.45,
-          y,
-          className: 'tempo'
-        });
-        textX += 0.45;
+        primitives.push({ kind: 'glyph', glyph: 'metAugmentationDot', x: cursor, y, className: 'tempo' });
+        cursor += 0.45;
       }
       primitives.push({
         kind: 'text',
         text: `= ${tempo.bpm}`,
-        x: textX,
+        x: cursor,
         y,
         font: 'body',
         size: 1.6,
@@ -1069,6 +1099,19 @@ function renderSegment(args: RenderSegmentArgs): {
 
     if (m.showTimeSig) {
       for (const top of staffTops) {
+        // `display: common/cut` → a single symbol glyph centred on the middle
+        // line, instead of the count/unit numerals.
+        if (m.timeSig.display === 'common' || m.timeSig.display === 'cut') {
+          primitives.push({
+            kind: 'glyph',
+            glyph: m.timeSig.display === 'cut' ? 'timeSigCutCommon' : 'timeSigCommon',
+            x: m.timeSigCentreX,
+            y: top + STAFF_MIDDLE_Y,
+            anchor: 'middle',
+            className: 'time-sig'
+          });
+          continue;
+        }
         const numY = top + 1; // visual centre of upper half (line 2 from top)
         const denY = top + 3; // visual centre of lower half
         for (const digit of String(m.timeSig.count)) {
@@ -1149,6 +1192,13 @@ function renderSegment(args: RenderSegmentArgs): {
           // Pitch math follows the clef in effect at this event's onset (the
           // staff's timeline includes mid-measure changes).
           const eventClef = clefAt(m.clefTimelines[s], onset);
+          // Notes under an ottava are written `value` octaves off their sounding
+          // pitch. Fold that into a positioning-only clef (the drawn clef glyph
+          // is untouched); the bracket itself is drawn by emitOttavas.
+          const ottavaShift = ottavaSpans.length ? ottavaShiftAt(ottavaSpans, s, i, onset) : 0;
+          const posClef = ottavaShift
+            ? { ...eventClef, octave: eventClef.octave + ottavaShift }
+            : eventClef;
           onset += isGrace(event) ? 0 : isTremolo(event) ? tremoloDuration(event) : isTuplet(event) ? tupletDuration(event) : isTimedEvent(event) ? durationValue(event.duration) : 0.25;
           try {
             if (isGrace(event)) {
@@ -1156,7 +1206,7 @@ function renderSegment(args: RenderSegmentArgs): {
                 grace: event,
                 firstX: slot.x,
                 staffTop: staffTops[s],
-                clef: eventClef,
+                clef: posClef,
                 useAccidentalDisplay,
                 keyFifths: m.keyFifths,
                 primitives
@@ -1168,7 +1218,7 @@ function renderSegment(args: RenderSegmentArgs): {
                 tremolo: event,
                 firstX: slot.x,
                 staffTop: staffTops[s],
-                clef: eventClef,
+                clef: posClef,
                 useAccidentalDisplay,
                 keyFifths: m.keyFifths,
                 primitives
@@ -1180,7 +1230,7 @@ function renderSegment(args: RenderSegmentArgs): {
                 tuplet: event,
                 firstX: slot.x,
                 staffTop: staffTops[s],
-                clef: eventClef,
+                clef: posClef,
                 useAccidentalDisplay,
                 keyFifths: m.keyFifths,
                 primitives
@@ -1193,7 +1243,7 @@ function renderSegment(args: RenderSegmentArgs): {
               event,
               eventX: slot.x,
               staffTop: staffTops[s],
-              clef: eventClef,
+              clef: posClef,
               stemOverride,
               beamDir: beamRun?.dir ?? null,
               useAccidentalDisplay,
@@ -1340,6 +1390,14 @@ function renderSegment(args: RenderSegmentArgs): {
       }
     });
 
+    if (ottavaOnsets) {
+      ottavaOnsets.set(
+        i,
+        resolvedByStaff.map((voices, s) =>
+          measureOnsetXs(voices[0]?.seq, m.staves[s]?.[0] ?? []))
+      );
+    }
+
     // Dynamics, per group (anchored via the group's lead part).
     if (!m.multiRest) {
       for (const g of segment.groups) {
@@ -1405,6 +1463,7 @@ function renderSegment(args: RenderSegmentArgs): {
   }
 
   emitEndings(mnx, plan, systemHeightSp, primitives);
+  if (ottavaOnsets && ottavaSpans.length) emitOttavas(ottavaSpans, plan, staffTopOf, ottavaOnsets, primitives);
 
   const heightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * systemHeightSp;
 
@@ -1905,6 +1964,185 @@ function emitEndings(
       a = b + 1;
     }
   });
+}
+
+// ---------- Ottava (octave-shift) lines ----------
+
+/** Topmost y among noteheads drawn in [x1,x2]; falls back to `ceil`. Lets an
+ *  8va line clear high ledger notes instead of cutting through them. */
+function spanCeiling(primitives: Primitive[], x1: number, x2: number, ceil: number): number {
+  let top = ceil;
+  for (const p of primitives) {
+    if (p.kind === 'glyph' && p.glyph.startsWith('notehead') && p.x >= x1 - 0.5 && p.x <= x2 + 0.5 && p.y < top) {
+      top = p.y;
+    }
+  }
+  return top;
+}
+
+/** Bottommost y among noteheads in [x1,x2]; falls back to `floor`. */
+function spanFloor(primitives: Primitive[], x1: number, x2: number, floor: number): number {
+  let bot = floor;
+  for (const p of primitives) {
+    if (p.kind === 'glyph' && p.glyph.startsWith('notehead') && p.x >= x1 - 0.5 && p.x <= x2 + 0.5 && p.y > bot) {
+      bot = p.y;
+    }
+  }
+  return bot;
+}
+
+/** "8va" / "8vb" / "15ma" / … for an ottava amount (±1/±2/±3). */
+function ottavaLabel(value: number): string {
+  const n = [8, 15, 22][Math.abs(value) - 1] ?? 8;
+  const suffix = value > 0 ? (Math.abs(value) === 1 ? 'va' : 'ma') : Math.abs(value) === 1 ? 'vb' : 'mb';
+  return `${n}${suffix}`;
+}
+
+interface OttavaSpan {
+  /** Plan staff index. */
+  staff: number;
+  startIdx: number;
+  startT: number;
+  endIdx: number;
+  endT: number;
+  value: number;
+  orient?: 'above' | 'below' | 'auto';
+}
+
+/** Resolve each part-measure `ottava` to a span keyed by plan staff index and
+ *  measure index — the shared source for both the note transposition (in the
+ *  render loop) and the bracket overlay (emitOttavas). */
+function collectOttavaSpans(
+  mnx: MnxStructure,
+  segment: { staves: { sources: { part: MnxPart; staff: number }[] }[] }
+): OttavaSpan[] {
+  const indexById = new Map<string, number>();
+  (mnx.global.measures ?? []).forEach((gm, i) => {
+    if (gm?.id) indexById.set(gm.id, i);
+  });
+  // (part, staff) → plan staff index (first staff node that carries it).
+  const staffIndexOf = new Map<MnxPart, Map<number, number>>();
+  segment.staves.forEach((st, s) => {
+    for (const src of st.sources) {
+      let byStaff = staffIndexOf.get(src.part);
+      if (!byStaff) { byStaff = new Map(); staffIndexOf.set(src.part, byStaff); }
+      if (!byStaff.has(src.staff)) byStaff.set(src.staff, s);
+    }
+  });
+  const frac = (f?: [number, number]) => (Array.isArray(f) && f[1] ? f[0] / f[1] : null);
+
+  const spans: OttavaSpan[] = [];
+  for (const part of mnx.parts ?? []) {
+    const byStaff = staffIndexOf.get(part);
+    if (!byStaff) continue; // part not in this segment
+    (part.measures ?? []).forEach((pm, startIdx) => {
+      for (const ott of pm?.ottavas ?? []) {
+        const startT = frac(ott.position?.fraction);
+        const endT = frac(ott.end?.position?.fraction);
+        if (startT === null || endT === null) continue;
+        spans.push({
+          staff: byStaff.get(ott.staff ?? 1) ?? 0,
+          startIdx,
+          startT,
+          endIdx: indexById.get(ott.end?.measure ?? '') ?? startIdx,
+          endT,
+          value: ott.value,
+          orient: ott.orient
+        });
+      }
+    });
+  }
+  return spans;
+}
+
+/** The ottava octave shift covering (`staff`, measure `mi`, onset `t`), else 0.
+ *  Positive = sounds higher (8va): the written position drops by `value`. */
+function ottavaShiftAt(spans: OttavaSpan[], staff: number, mi: number, t: number): number {
+  for (const sp of spans) {
+    if (sp.staff !== staff) continue;
+    const afterStart = mi > sp.startIdx || (mi === sp.startIdx && t >= sp.startT - 1e-6);
+    const beforeEnd = mi < sp.endIdx || (mi === sp.endIdx && t <= sp.endT + 1e-6);
+    if (afterStart && beforeEnd) return sp.value;
+  }
+  return 0;
+}
+
+/**
+ * Draws each ottava span as a labelled dashed octave line: the "8va"/… label at
+ * the start position, a dashed extent to the end position (which may be in a
+ * later measure), and a hook toward the staff at the end. Above the staff for a
+ * positive `value` (or `orient: above`), below for negative; the line clears the
+ * highest/lowest note in its span (which the render loop has already shifted).
+ * Splits at system breaks, with the label on the first segment, hook on the last.
+ */
+function emitOttavas(
+  spans: OttavaSpan[],
+  plan: HorizontalPlan,
+  staffTopOf: (row: number, s: number) => number,
+  onsets: Map<number, OnsetX[][]>,
+  primitives: Primitive[]
+): void {
+  for (const sp of spans) {
+    const s = sp.staff;
+    const { startIdx, endIdx, value } = sp;
+    if (!plan.measures[startIdx] || !plan.measures[endIdx]) continue;
+    const startX = anchorAt(onsets.get(startIdx)?.[s] ?? [], sp.startT, plan.measures[startIdx]).x;
+    const endX =
+      anchorAt(onsets.get(endIdx)?.[s] ?? [], sp.endT, plan.measures[endIdx]).x + OTTAVA_END_EXTEND_SP;
+    const above = sp.orient === 'above' ? true : sp.orient === 'below' ? false : value > 0;
+
+    // Walk the measure span, splitting at system breaks.
+    let a = startIdx;
+    let first = true;
+    while (a <= endIdx) {
+      const row = plan.measures[a].row;
+      let b = a;
+      while (b + 1 <= endIdx && plan.measures[b + 1].row === row) b++;
+      const last = b === endIdx;
+      const x1 = first ? startX : plan.measures[a].x + 0.1;
+      const x2 = last ? endX : plan.measures[b].x + plan.measures[b].width - 0.1;
+      const staffTop = staffTopOf(row, s);
+      const staffBottom = staffTop + STAFF_HEIGHT_SP;
+      const y = above
+        ? Math.min(staffTop - OTTAVA_MIN_RISE_SP, spanCeiling(primitives, x1, x2, staffTop) - OTTAVA_CLEARANCE_SP)
+        : Math.max(staffBottom + OTTAVA_MIN_RISE_SP, spanFloor(primitives, x1, x2, staffBottom) + OTTAVA_CLEARANCE_SP);
+
+      let lineStart = x1;
+      if (first) {
+        primitives.push({
+          kind: 'text',
+          text: ottavaLabel(value),
+          x: x1,
+          y: above ? y + 0.5 : y + OTTAVA_LABEL_SIZE_SP,
+          font: 'bodyItalic',
+          size: OTTAVA_LABEL_SIZE_SP,
+          weight: 'bold',
+          anchor: 'start',
+          className: 'ottava-label'
+        });
+        lineStart = x1 + OTTAVA_LABEL_GAP_SP;
+      }
+      if (x2 > lineStart) {
+        primitives.push({
+          kind: 'line',
+          x1: lineStart, y1: y, x2, y2: y,
+          thickness: OTTAVA_THICKNESS_SP,
+          dash: OTTAVA_DASH_SP,
+          className: 'ottava'
+        });
+      }
+      if (last) {
+        primitives.push({
+          kind: 'line',
+          x1: x2, y1: y, x2, y2: y + (above ? OTTAVA_HOOK_SP : -OTTAVA_HOOK_SP),
+          thickness: OTTAVA_THICKNESS_SP,
+          className: 'ottava'
+        });
+      }
+      first = false;
+      a = b + 1;
+    }
+  }
 }
 
 // ---------- Metric-position anchoring (dynamics, segno/fine/jump) ----------
@@ -2472,11 +2710,17 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
 
     const base = event.duration.base;
     if (event.rest) {
+      // `rest.staffPosition` (half-spaces from the middle line, +up) overrides
+      // the value's default resting place — same convention as full-measure rests.
+      const restY =
+        event.rest.staffPosition !== undefined
+          ? STAFF_MIDDLE_Y - event.rest.staffPosition / 2
+          : REST_Y_BY_BASE[base] ?? 2;
       primitives.push({
         kind: 'glyph',
         glyph: REST_GLYPH_BY_BASE[base] ?? 'restQuarter',
         x,
-        y: staffTop + (REST_Y_BY_BASE[base] ?? 2),
+        y: staffTop + restY,
         anchor: 'middle',
         className: 'rest'
       });
@@ -2696,7 +2940,12 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   // ---- Rest ----
   if (event.rest) {
     const glyph = REST_GLYPH_BY_BASE[base] ?? 'restQuarter';
-    const yOffset = REST_Y_BY_BASE[base] ?? 2;
+    // `rest.staffPosition` (half-spaces from the middle line, +up) overrides the
+    // value's default resting place — same convention as full-measure rests.
+    const positioned = event.rest.staffPosition !== undefined;
+    const yOffset = positioned
+      ? STAFF_MIDDLE_Y - event.rest.staffPosition! / 2
+      : REST_Y_BY_BASE[base] ?? 2;
     primitives.push({
       kind: 'glyph',
       glyph,
@@ -2705,13 +2954,13 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       anchor: 'middle',
       className: 'rest'
     });
-    // Augmentation dots for rests
+    // Augmentation dots for rests (just above the rest's centre)
     for (let d = 0; d < dots; d++) {
       primitives.push({
         kind: 'glyph',
         glyph: 'augmentationDot',
         x: eventX + 0.7 + d * 0.3,
-        y: staffTop + (base === 'whole' ? 1 : 1.5),
+        y: staffTop + (positioned ? yOffset - 0.5 : base === 'whole' ? 1 : 1.5),
         className: 'dot'
       });
     }

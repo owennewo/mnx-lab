@@ -251,7 +251,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 16.1,
+        "x": 15.7485,
         "y": 26.6,
         "scale": 3.5105,
         "className": "brace"
@@ -282,7 +282,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 17.7,
+        "x": 17.3485,
         "y": 56.6,
         "scale": 3.5105,
         "className": "brace"
@@ -350,7 +350,7 @@
       {
         "kind": "text",
         "text": "Flutes",
-        "x": 8,
+        "x": 13.4,
         "y": 20.2,
         "font": "body",
         "size": 1.6,
@@ -360,7 +360,7 @@
       {
         "kind": "text",
         "text": "Piano",
-        "x": 8,
+        "x": 15,
         "y": 50.2,
         "font": "body",
         "size": 1.6,
@@ -1242,7 +1242,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 13.1,
+        "x": 11.9261,
         "y": 96.6,
         "scale": 6.0181,
         "className": "brace"
@@ -1273,7 +1273,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 14.7,
+        "x": 14.3485,
         "y": 126.6,
         "scale": 3.5105,
         "className": "brace"
@@ -1341,7 +1341,7 @@
       {
         "kind": "text",
         "text": "Fl.",
-        "x": 7,
+        "x": 10.4,
         "y": 85.2,
         "font": "body",
         "size": 1.6,
@@ -1351,7 +1351,7 @@
       {
         "kind": "text",
         "text": "Piano",
-        "x": 7,
+        "x": 12,
         "y": 120.2,
         "font": "body",
         "size": 1.6,

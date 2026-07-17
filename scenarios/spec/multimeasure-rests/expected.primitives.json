@@ -1285,15 +1285,6 @@
         "className": "staff-line"
       },
       {
-        "kind": "line",
-        "x1": 2,
-        "y1": 73.2,
-        "x2": 2,
-        "y2": 77.2,
-        "thickness": 0.16,
-        "className": "barline barline-start"
-      },
-      {
         "kind": "glyph",
         "glyph": "gClef",
         "x": 3.1,
@@ -1826,15 +1817,6 @@
         "className": "staff-line"
       },
       {
-        "kind": "line",
-        "x1": 2,
-        "y1": 89.2,
-        "x2": 2,
-        "y2": 93.2,
-        "thickness": 0.16,
-        "className": "barline barline-start"
-      },
-      {
         "kind": "glyph",
         "glyph": "gClef",
         "x": 3.1,
@@ -1921,15 +1903,6 @@
         "y2": 117.8,
         "thickness": 0.13,
         "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 2,
-        "y1": 113.8,
-        "x2": 2,
-        "y2": 117.8,
-        "thickness": 0.16,
-        "className": "barline barline-start"
       },
       {
         "kind": "glyph",

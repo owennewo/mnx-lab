@@ -50,15 +50,6 @@
         "className": "staff-line"
       },
       {
-        "kind": "line",
-        "x1": 2,
-        "y1": 8,
-        "x2": 2,
-        "y2": 12,
-        "thickness": 0.16,
-        "className": "barline barline-start"
-      },
-      {
         "kind": "glyph",
         "glyph": "gClef",
         "x": 3.1,
@@ -102,7 +93,7 @@
         "kind": "glyph",
         "glyph": "restQuarter",
         "x": 19.1,
-        "y": 10,
+        "y": 9,
         "anchor": "middle",
         "className": "rest"
       },
@@ -126,7 +117,7 @@
         "kind": "glyph",
         "glyph": "restQuarter",
         "x": 34.6,
-        "y": 10,
+        "y": 9,
         "anchor": "middle",
         "className": "rest"
       },

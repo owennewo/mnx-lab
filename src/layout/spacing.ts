@@ -257,7 +257,7 @@ export interface MeasurePlan {
   contentStartX: number;
   clef: ActiveClef;
   showClef: boolean;
-  timeSig: { count: number; unit: number };
+  timeSig: { count: number; unit: number; display?: 'common' | 'cut' };
   showTimeSig: boolean;
   keyFifths: number;
   cancelledKeyFifths: number;
@@ -422,7 +422,7 @@ interface EventMetrics {
 interface MeasureMetrics {
   clef: ActiveClef;
   clefChanged: boolean;
-  timeSig: { count: number; unit: number };
+  timeSig: { count: number; unit: number; display?: 'common' | 'cut' };
   timeSigShow: boolean;
   keyFifths: number;
   cancelledKeyFifths: number;
@@ -538,7 +538,7 @@ export function planHorizontal(
     if (src.staff >= 2) return { sign: 'F' as const, octave: 0 };
     return { sign: 'G' as const, octave: 0 };
   });
-  let timeSig = { count: 4, unit: 4 };
+  let timeSig: { count: number; unit: number; display?: 'common' | 'cut' } = { count: 4, unit: 4 };
   let timeDeclared = false;
   let keyFifths = 0;
   const metrics: MeasureMetrics[] = Array.from({ length: numMeasures }, (_, i) => {
@@ -589,9 +589,9 @@ export function planHorizontal(
     // visually, it is unmarked (e.g. spec/system-layouts encodes none).
     let timeSigChanged = false;
     if (globalMeasure.time) {
-      const { count, unit } = globalMeasure.time;
-      if (!timeDeclared || count !== timeSig.count || unit !== timeSig.unit) {
-        timeSig = { count, unit };
+      const { count, unit, display } = globalMeasure.time;
+      if (!timeDeclared || count !== timeSig.count || unit !== timeSig.unit || display !== timeSig.display) {
+        timeSig = { count, unit, display };
         if (i > 0) timeSigChanged = true;
       }
       timeDeclared = true;

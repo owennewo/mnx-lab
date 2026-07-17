@@ -50,15 +50,6 @@
         "className": "staff-line"
       },
       {
-        "kind": "line",
-        "x1": 2,
-        "y1": 8,
-        "x2": 2,
-        "y2": 12,
-        "thickness": 0.16,
-        "className": "barline barline-start"
-      },
-      {
         "kind": "glyph",
         "glyph": "gClef",
         "x": 3.1,
@@ -67,19 +58,11 @@
       },
       {
         "kind": "glyph",
-        "glyph": "timeSig4",
+        "glyph": "timeSigCommon",
         "x": 7.35,
-        "y": 9,
+        "y": 10,
         "anchor": "middle",
-        "className": "time-sig-num"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "timeSig4",
-        "x": 7.35,
-        "y": 11,
-        "anchor": "middle",
-        "className": "time-sig-den"
+        "className": "time-sig"
       },
       {
         "kind": "glyph",
@@ -205,19 +188,11 @@
       },
       {
         "kind": "glyph",
-        "glyph": "timeSig2",
+        "glyph": "timeSigCutCommon",
         "x": 39.25,
-        "y": 9,
+        "y": 10,
         "anchor": "middle",
-        "className": "time-sig-num"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "timeSig2",
-        "x": 39.25,
-        "y": 11,
-        "anchor": "middle",
-        "className": "time-sig-den"
+        "className": "time-sig"
       },
       {
         "kind": "glyph",

@@ -431,7 +431,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 25.7,
+        "x": 25.3485,
         "y": 26.6,
         "scale": 3.5105,
         "className": "brace"
@@ -462,7 +462,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 27.3,
+        "x": 26.9485,
         "y": 46.6,
         "scale": 3.5105,
         "className": "brace"
@@ -470,7 +470,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 25.7,
+        "x": 25.3485,
         "y": 66.6,
         "scale": 3.5105,
         "className": "brace"
@@ -571,7 +571,7 @@
       {
         "kind": "text",
         "text": "Horns in F.",
-        "x": 13,
+        "x": 22,
         "y": 20.2,
         "font": "body",
         "size": 1.6,
@@ -581,7 +581,7 @@
       {
         "kind": "text",
         "text": "1. Harfe.",
-        "x": 13,
+        "x": 24.6,
         "y": 40.2,
         "font": "body",
         "size": 1.6,
@@ -1248,7 +1248,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 33.3,
+        "x": 33.771,
         "y": 116.6,
         "scale": 1.003,
         "className": "brace"
@@ -1279,7 +1279,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 33.3,
+        "x": 32.9485,
         "y": 146.6,
         "scale": 3.5105,
         "className": "brace"
@@ -1287,7 +1287,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 31.7,
+        "x": 31.3485,
         "y": 166.6,
         "scale": 3.5105,
         "className": "brace"
@@ -1295,7 +1295,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 31.7,
+        "x": 31.3485,
         "y": 186.6,
         "scale": 3.5105,
         "className": "brace"
@@ -1303,7 +1303,7 @@
       {
         "kind": "glyph",
         "glyph": "brace",
-        "x": 31.7,
+        "x": 31.3485,
         "y": 206.6,
         "scale": 3.5105,
         "className": "brace"
@@ -1384,7 +1384,7 @@
       {
         "kind": "text",
         "text": "1. Harfe.",
-        "x": 13,
+        "x": 30.6,
         "y": 140.2,
         "font": "body",
         "size": 1.6,
@@ -1394,7 +1394,7 @@
       {
         "kind": "text",
         "text": "Vla. (get.)",
-        "x": 13,
+        "x": 30.6,
         "y": 180.2,
         "font": "body",
         "size": 1.6,
@@ -1404,7 +1404,7 @@
       {
         "kind": "text",
         "text": "Vlc. (get.)",
-        "x": 13,
+        "x": 30.6,
         "y": 200.2,
         "font": "body",
         "size": 1.6,

@@ -57,6 +57,8 @@ export interface LinePrim extends PrimitiveBase {
   /** Thickness in staff spaces. */
   thickness: number;
   stroke?: string;
+  /** Dash on-length in staff spaces (equal gap); solid when omitted. */
+  dash?: number;
 }
 
 export interface CurvePrim extends PrimitiveBase {

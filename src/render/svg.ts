@@ -126,6 +126,7 @@ function emitLine(p: LinePrim, k: number): SVGElement {
     stroke: p.stroke ?? 'currentColor',
     'stroke-width': p.thickness * k
   });
+  if (p.dash) node.setAttribute('stroke-dasharray', `${p.dash * k},${p.dash * k}`);
   if (p.className) node.setAttribute('class', p.className);
   if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
   return node;

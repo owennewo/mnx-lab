@@ -50,15 +50,6 @@
         "className": "staff-line"
       },
       {
-        "kind": "line",
-        "x1": 2,
-        "y1": 8,
-        "x2": 2,
-        "y2": 12,
-        "thickness": 0.16,
-        "className": "barline barline-start"
-      },
-      {
         "kind": "glyph",
         "glyph": "gClef8vb",
         "x": 3.1,

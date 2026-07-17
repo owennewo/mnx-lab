@@ -62,7 +62,11 @@ export interface MnxNote {
   };
 }
 
-export interface MnxRest {}
+export interface MnxRest {
+  /** Vertical position in half-staff-spaces from the middle line, positive up
+   *  (MNX `rest.staffPosition`); absent = the value's default resting place. */
+  staffPosition?: number;
+}
 
 /** Event-level markings (MNX `event-markings`): articulations + single-note tremolo. */
 export interface MnxEventMarkings {
@@ -280,9 +284,30 @@ export interface MnxDynamic {
   voice?: string;
 }
 
+/** An octave-shift line (MNX `ottava`, part-measure `ottavas`): the notes from
+ *  `position` in this measure through `end` (a measure id + metric position)
+ *  sound `value` octaves off the written pitch — +1/+2/+3 = 8va/15ma/22ma above,
+ *  −1/−2/−3 = below. `orient` overrides the above/below default. */
+export interface MnxOttava {
+  position: {
+    fraction: [number, number];
+  };
+  end: {
+    measure: string;
+    position: {
+      fraction: [number, number];
+    };
+  };
+  value: 1 | 2 | 3 | -1 | -2 | -3;
+  orient?: 'above' | 'below' | 'auto';
+  staff?: number;
+  voice?: string;
+}
+
 export interface MnxPartMeasure {
   beams?: MnxBeam[];
   dynamics?: MnxDynamic[];
+  ottavas?: MnxOttava[];
   clefs?: {
     clef: {
       sign: string;
@@ -333,6 +358,8 @@ export interface MnxGlobalMeasure {
   time?: {
     count: number;
     unit: number;
+    /** Render as a symbol instead of numerals: `common` = 𝄴 (C), `cut` = 𝄵 (¢). */
+    display?: 'common' | 'cut';
   };
   barline?: {
     type?: 'regular' | 'dotted' | 'dashed' | 'heavy' | 'double' | 'final'
