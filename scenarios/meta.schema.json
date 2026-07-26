@@ -39,7 +39,7 @@
         "standard": { "enum": ["valid", "invalid"] },
         "extension": {
           "enum": ["valid", "invalid", "n/a"],
-          "description": "Verdict against the _x.tab extension schema; n/a when the document carries no _x.tab."
+          "description": "Verdict against the _x.mnxLab extension schema; n/a when the document carries no _x.mnxLab."
         },
         "errors": {
           "type": "array",

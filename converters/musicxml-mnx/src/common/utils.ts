@@ -124,3 +124,22 @@ export function createPitchKey(pitch: MnxPitch): string {
   const alterStr = pitch.alter === 1 ? '#' : pitch.alter === -1 ? 'b' : '';
   return `${pitch.step.toLowerCase()}${alterStr}/${pitch.octave}`;
 }
+
+/**
+ * A position expressed in some unit → a reduced MNX `rhythmic-position`
+ * fraction.
+ *
+ * MNX measures metric positions as a fraction OF A WHOLE NOTE, so a MusicXML
+ * position in divisions converts with `denominator = divisions * 4` (divisions
+ * count per quarter). This is the unit `harmony.location`, `tempo.location` and
+ * `segno.location` all share.
+ */
+export function reduceFraction(numerator: number, denominator: number): [number, number] {
+  const divisor = gcd(Math.abs(Math.round(numerator)), Math.round(denominator)) || 1;
+  return [Math.round(numerator) / divisor, Math.round(denominator) / divisor];
+}
+
+function gcd(a: number, b: number): number {
+  while (b) [a, b] = [b, a % b];
+  return a;
+}

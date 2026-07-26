@@ -75,7 +75,7 @@ export class ScoreToolbar extends LitElement {
   ];
 
   render() {
-    const tabTitle = this.hasTab ? undefined : 'No _x.tab part in this document';
+    const tabTitle = this.hasTab ? undefined : 'No _x.mnxLab.tab part in this document';
     return html`
       <div class="seg" role="group" aria-label="View mode">
         <button

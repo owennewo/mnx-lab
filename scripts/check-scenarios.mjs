@@ -1,6 +1,6 @@
 // Corpus police for scenarios/ (see roadmap/inprogress/04-scenario-library.md).
 // Checks, per scenario: metadata validates against meta.schema.json, JSON files
-// are canonically formatted, actual validation verdicts (standard MNX + _x.tab
+// are canonically formatted, actual validation verdicts (standard MNX + _x.mnxLab
 // extension) match the declared `expect` in both directions, pinned error
 // fragments match for invalid-by-design scenarios, claimed status isn't ahead
 // of reality, and coversDefs entries actually exist in the schema.
@@ -31,16 +31,17 @@ function stripPrefix(segment) {
 export function createContext() {
   const ajv = new Ajv2020.default({ allErrors: true, validateFormats: false });
   const mnxSchema = readJson(path.join(ROOT, 'schemas', 'mnx-schema.json'));
-  const tabSchema = readJson(path.join(ROOT, 'schemas', 'mnx-tab-extension.schema.json'));
+  const extSchema = readJson(path.join(ROOT, 'schemas', 'mnx-lab-extensions.schema.json'));
   const metaSchema = readJson(path.join(SCENARIOS_DIR, 'meta.schema.json'));
-  ajv.addSchema(tabSchema);
+  ajv.addSchema(extSchema);
   return {
     manifest: readJson(path.join(SCENARIOS_DIR, 'manifest.json')),
     mnxDefs: new Set(Object.keys(mnxSchema.$defs ?? {})),
     validateMnx: ajv.compile(mnxSchema),
     validateMeta: ajv.compile(metaSchema),
-    validateTabNote: ajv.getSchema(`${tabSchema.$id}#/$defs/note-tab`),
-    validateTabPart: ajv.getSchema(`${tabSchema.$id}#/$defs/part-tab`)
+    validateNoteExt: ajv.getSchema(`${extSchema.$id}#/$defs/note-ext`),
+    validatePartExt: ajv.getSchema(`${extSchema.$id}#/$defs/part-ext`),
+    validateGlobalMeasureExt: ajv.getSchema(`${extSchema.$id}#/$defs/global-measure-ext`)
   };
 }
 
@@ -88,33 +89,33 @@ export function formatError(err) {
   return `${err.instancePath || '/'} [${err.schemaPath}] ${err.message}`;
 }
 
-/** Computes the _x.tab verdict: 'n/a' when nothing carries _x.tab, else valid/invalid + errors. */
+/** Computes the `_x.mnxLab` verdict: 'n/a' when nothing carries one, else valid/invalid + errors. */
 export function computeExtensionVerdict(doc, ctx) {
   const errors = [];
-  let sawTab = false;
-  for (const part of doc?.parts ?? []) {
-    if (part?._x?.tab !== undefined) {
-      sawTab = true;
-      if (!ctx.validateTabPart(part._x.tab)) {
-        errors.push(...(ctx.validateTabPart.errors ?? []).map(formatError));
-      }
+  let sawExtension = false;
+  const check = (validator, value) => {
+    sawExtension = true;
+    if (!validator(value)) errors.push(...(validator.errors ?? []).map(formatError));
+  };
+
+  for (const measure of doc?.global?.measures ?? []) {
+    if (measure?._x?.mnxLab !== undefined) {
+      check(ctx.validateGlobalMeasureExt, measure._x.mnxLab);
     }
+  }
+  for (const part of doc?.parts ?? []) {
+    if (part?._x?.mnxLab !== undefined) check(ctx.validatePartExt, part._x.mnxLab);
     for (const measure of part?.measures ?? []) {
       for (const seq of measure?.sequences ?? []) {
         for (const event of seq?.content ?? []) {
           for (const note of event?.notes ?? []) {
-            if (note?._x?.tab !== undefined) {
-              sawTab = true;
-              if (!ctx.validateTabNote(note._x.tab)) {
-                errors.push(...(ctx.validateTabNote.errors ?? []).map(formatError));
-              }
-            }
+            if (note?._x?.mnxLab !== undefined) check(ctx.validateNoteExt, note._x.mnxLab);
           }
         }
       }
     }
   }
-  if (!sawTab) return { verdict: 'n/a', errors: [] };
+  if (!sawExtension) return { verdict: 'n/a', errors: [] };
   return { verdict: errors.length === 0 ? 'valid' : 'invalid', errors };
 }
 

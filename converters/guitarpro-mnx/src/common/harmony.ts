@@ -1,0 +1,243 @@
+/**
+ * Chord-symbol text ⇄ structure.
+ *
+ * MNX Lab's `_x.mnxLab.harmonies` is structured *and* literal: the `quality`
+ * enum carries the semantics (so a chord can transpose and re-spell), while
+ * `text` is a display override kept ONLY when the source spells the symbol
+ * differently from what `renderChordSymbol` would produce. That is the pattern
+ * the MNX CG settled on for dynamics in w3c-cg/mnx#518 — a closed semantic enum
+ * with a display escape hatch — rather than picking one or the other.
+ *
+ * Guitar Pro stores chords as display strings (`beat.text`, `Chord.name`) with
+ * no structure at all, so parsing them is the only way to get semantics out of
+ * the corpus. Anything that does not parse becomes `quality: 'other'` plus the
+ * literal text, which round-trips exactly and loses nothing but transposability.
+ *
+ * MIRRORED in converters/musicxml-mnx/src/common/harmony.ts — keep the two
+ * copies identical (the packages are standalone; see the note in types.ts).
+ */
+import { MnxHarmony, MnxHarmonyQuality, MnxHarmonyStep, MnxPitch } from './types.js';
+
+type Step = MnxPitch['step'];
+
+/** Suffix (everything after the root, before any slash bass) → quality.
+ *  Longest match wins, so `m7` is not read as `m` followed by junk. */
+const SUFFIX_TO_QUALITY: Array<[string, MnxHarmonyQuality]> = [
+  ['', 'major'],
+  ['maj', 'major'],
+  ['M', 'major'],
+  ['m', 'minor'],
+  ['min', 'minor'],
+  ['-', 'minor'],
+  ['aug', 'augmented'],
+  ['+', 'augmented'],
+  ['dim', 'diminished'],
+  ['o', 'diminished'],
+  ['°', 'diminished'],
+  ['5', 'power'],
+  ['6', 'majorSixth'],
+  ['m6', 'minorSixth'],
+  ['min6', 'minorSixth'],
+  ['-6', 'minorSixth'],
+  ['7', 'dominantSeventh'],
+  ['maj7', 'majorSeventh'],
+  ['M7', 'majorSeventh'],
+  ['ma7', 'majorSeventh'],
+  ['Δ', 'majorSeventh'],
+  ['Δ7', 'majorSeventh'],
+  ['m7', 'minorSeventh'],
+  ['min7', 'minorSeventh'],
+  ['-7', 'minorSeventh'],
+  ['dim7', 'diminishedSeventh'],
+  ['o7', 'diminishedSeventh'],
+  ['°7', 'diminishedSeventh'],
+  ['m7b5', 'halfDiminished'],
+  ['m7♭5', 'halfDiminished'],
+  ['min7b5', 'halfDiminished'],
+  ['ø', 'halfDiminished'],
+  ['ø7', 'halfDiminished'],
+  ['aug7', 'augmentedSeventh'],
+  ['+7', 'augmentedSeventh'],
+  ['7#5', 'augmentedSeventh'],
+  ['mMaj7', 'majorMinor'],
+  ['mM7', 'majorMinor'],
+  ['minMaj7', 'majorMinor'],
+  ['9', 'dominantNinth'],
+  ['maj9', 'majorNinth'],
+  ['M9', 'majorNinth'],
+  ['m9', 'minorNinth'],
+  ['min9', 'minorNinth'],
+  ['-9', 'minorNinth'],
+  ['11', 'dominantEleventh'],
+  ['maj11', 'majorEleventh'],
+  ['M11', 'majorEleventh'],
+  ['m11', 'minorEleventh'],
+  ['min11', 'minorEleventh'],
+  ['-11', 'minorEleventh'],
+  ['13', 'dominantThirteenth'],
+  ['maj13', 'majorThirteenth'],
+  ['M13', 'majorThirteenth'],
+  ['m13', 'minorThirteenth'],
+  ['min13', 'minorThirteenth'],
+  ['-13', 'minorThirteenth'],
+  ['sus', 'suspendedFourth'],
+  ['sus4', 'suspendedFourth'],
+  ['sus2', 'suspendedSecond']
+];
+
+/** The spelling a consumer renders when a harmony carries no `text` override. */
+const QUALITY_TO_SUFFIX: Record<MnxHarmonyQuality, string> = {
+  major: '',
+  minor: 'm',
+  augmented: 'aug',
+  diminished: 'dim',
+  dominantSeventh: '7',
+  majorSeventh: 'maj7',
+  minorSeventh: 'm7',
+  diminishedSeventh: 'dim7',
+  augmentedSeventh: 'aug7',
+  halfDiminished: 'm7b5',
+  majorMinor: 'mMaj7',
+  majorSixth: '6',
+  minorSixth: 'm6',
+  dominantNinth: '9',
+  majorNinth: 'maj9',
+  minorNinth: 'm9',
+  dominantEleventh: '11',
+  majorEleventh: 'maj11',
+  minorEleventh: 'm11',
+  dominantThirteenth: '13',
+  majorThirteenth: 'maj13',
+  minorThirteenth: 'm13',
+  suspendedSecond: 'sus2',
+  suspendedFourth: 'sus4',
+  neapolitan: 'N',
+  italian: 'It',
+  french: 'Fr',
+  german: 'Ger',
+  pedal: 'ped',
+  power: '5',
+  tristan: 'Tr',
+  other: '',
+  none: ''
+};
+
+const SUFFIX_LOOKUP = new Map(SUFFIX_TO_QUALITY);
+
+/** `C`, `Bb`, `F♯` → a root/bass step. Case-insensitive on the letter: Guitar
+ *  Pro files in the wild carry lowercase roots (`c/G`), and lowercase does NOT
+ *  reliably mean minor — the literal spelling is preserved in `text` instead. */
+function parseStep(raw: string): MnxHarmonyStep | null {
+  const match = /^([A-Ga-g])([#♯b♭x]{0,2})$/.exec(raw.trim());
+  if (!match) return null;
+  const step = match[1].toUpperCase() as Step;
+  let alter = 0;
+  for (const char of match[2]) {
+    if (char === '#' || char === '♯') alter += 1;
+    else if (char === 'b' || char === '♭') alter -= 1;
+    else if (char === 'x') alter += 2;
+  }
+  return alter === 0 ? { step } : { step, alter };
+}
+
+function renderStep(step: MnxHarmonyStep): string {
+  const alter = step.alter ?? 0;
+  const accidental = alter > 0 ? '#'.repeat(alter) : alter < 0 ? 'b'.repeat(-alter) : '';
+  return `${step.step}${accidental}`;
+}
+
+/** The canonical display spelling of a harmony, ignoring any `text` override.
+ *  `other` has no canonical spelling by definition — its text IS the symbol. */
+export function renderChordSymbol(harmony: Omit<MnxHarmony, 'location'>): string {
+  if (harmony.quality === 'none') return 'N.C.';
+  if (harmony.quality === 'other') return harmony.text ?? '';
+  if (!harmony.root) return harmony.text ?? '';
+  const bass = harmony.bass ? `/${renderStep(harmony.bass)}` : '';
+  return `${renderStep(harmony.root)}${QUALITY_TO_SUFFIX[harmony.quality]}${bass}`;
+}
+
+/**
+ * A chord symbol as written → structure, with `text` set only when the source
+ * spelling is not what `renderChordSymbol` produces.
+ *
+ * Never returns null for non-empty input: an unrecognised symbol becomes
+ * `quality: 'other'` carrying the literal, so nothing in a source file is lost
+ * to a parser gap.
+ */
+export function parseChordSymbol(raw: string): Omit<MnxHarmony, 'location'> | null {
+  const text = raw.trim();
+  if (!text) return null;
+  if (/^(n\.?c\.?|no chord)$/i.test(text)) {
+    return text === 'N.C.' ? { quality: 'none' } : { quality: 'none', text };
+  }
+
+  const withText = (harmony: Omit<MnxHarmony, 'location'>) =>
+    renderChordSymbol(harmony) === text ? harmony : { ...harmony, text };
+
+  // The bass is after the LAST slash: `C/G`, and `Am7b5/G` too.
+  const slash = text.lastIndexOf('/');
+  const head = slash > 0 ? text.slice(0, slash) : text;
+  const bass = slash > 0 ? parseStep(text.slice(slash + 1)) : null;
+
+  const rootMatch = /^([A-Ga-g][#♯b♭x]{0,2})(.*)$/.exec(head);
+  const root = rootMatch ? parseStep(rootMatch[1]) : null;
+  const quality = rootMatch ? SUFFIX_LOOKUP.get(rootMatch[2]) : undefined;
+
+  // Anything the table cannot name is still carried, root included when one was
+  // found — `other` says "the text is the symbol", not "this was thrown away".
+  if (!root || quality === undefined || (slash > 0 && !bass)) {
+    return { ...(root ? { root } : {}), quality: 'other', text };
+  }
+
+  return withText({ root, quality, ...(bass ? { bass } : {}) });
+}
+
+/** The accidental-bearing name of a root/bass step: `F#`, `Bb`, `C`. */
+export function stepToText(step: MnxHarmonyStep): string {
+  return renderStep(step);
+}
+
+/**
+ * MusicXML `<kind>` ⇄ `quality`. Same vocabulary, different spelling
+ * convention: MusicXML hyphenates and title-cases the named chords, MNX is
+ * camelCase throughout.
+ */
+export const XML_KIND_TO_QUALITY: Record<string, MnxHarmonyQuality> = {
+  major: 'major',
+  minor: 'minor',
+  augmented: 'augmented',
+  diminished: 'diminished',
+  dominant: 'dominantSeventh',
+  'major-seventh': 'majorSeventh',
+  'minor-seventh': 'minorSeventh',
+  'diminished-seventh': 'diminishedSeventh',
+  'augmented-seventh': 'augmentedSeventh',
+  'half-diminished': 'halfDiminished',
+  'major-minor': 'majorMinor',
+  'major-sixth': 'majorSixth',
+  'minor-sixth': 'minorSixth',
+  'dominant-ninth': 'dominantNinth',
+  'major-ninth': 'majorNinth',
+  'minor-ninth': 'minorNinth',
+  'dominant-11th': 'dominantEleventh',
+  'major-11th': 'majorEleventh',
+  'minor-11th': 'minorEleventh',
+  'dominant-13th': 'dominantThirteenth',
+  'major-13th': 'majorThirteenth',
+  'minor-13th': 'minorThirteenth',
+  'suspended-second': 'suspendedSecond',
+  'suspended-fourth': 'suspendedFourth',
+  Neapolitan: 'neapolitan',
+  Italian: 'italian',
+  French: 'french',
+  German: 'german',
+  pedal: 'pedal',
+  power: 'power',
+  Tristan: 'tristan',
+  other: 'other',
+  none: 'none'
+};
+
+export const QUALITY_TO_XML_KIND: Record<MnxHarmonyQuality, string> = Object.fromEntries(
+  Object.entries(XML_KIND_TO_QUALITY).map(([kind, quality]) => [quality, kind])
+) as Record<MnxHarmonyQuality, string>;

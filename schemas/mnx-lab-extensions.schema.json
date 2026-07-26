@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mnx-lab.totai.uk/schemas/mnx-lab-extensions.schema.json/v3",
+  "title": "MNX Lab vendor extensions (`_x.mnxLab`) — v3",
+  "description": "Everything MNX Lab carries that W3C MNX v19 cannot express: fretted-instrument tablature, section/rehearsal labels, and chord symbols. All of it lives under the single vendor key `_x.mnxLab`, which is how the MNX spec says extensions are namespaced (w3c-cg/mnx#63/#429: the `_x` key identifies an agent, vendor or community). Documents using these extensions remain fully valid against the official MNX schema. Each block is shaped like the standard MNX object it is a draft of, so adopting any of them upstream means deleting the `_x.mnxLab` wrapper rather than rewriting the data. Rationale and the proposals these draft: docs/mnx-extensions.md.",
+  "type": "object",
+  "$defs": {
+    "pitch": {
+      "type": "object",
+      "description": "MNX `pitch`: a sounding pitch.",
+      "properties": {
+        "step": { "enum": ["C", "D", "E", "F", "G", "A", "B"] },
+        "octave": { "type": "integer" },
+        "alter": { "type": "integer" }
+      },
+      "required": ["step", "octave"],
+      "additionalProperties": false
+    },
+    "note-id": {
+      "type": "string",
+      "description": "ID of another note in the document (MNX id-reference idiom).",
+      "pattern": "^[\\x21-\\x7E]{1,256}$"
+    },
+    "rhythmic-position": {
+      "type": "object",
+      "description": "MNX `rhythmic-position`: a metric position within a measure, as a fraction of a whole note. Same shape and units as `tempo.location` and `segno.location`.",
+      "properties": {
+        "fraction": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "required": ["fraction"],
+      "additionalProperties": false
+    },
+
+    "position": {
+      "type": "object",
+      "description": "Where the note is played on the fingerboard. The only truly tab-specific data: notation rendering ignores it; tab rendering requires it (or falls back to a playability heuristic).",
+      "properties": {
+        "string": {
+          "type": "integer",
+          "description": "String number. String 1 is the highest-pitched string (E4 on a standard-tuned guitar).",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "fret": {
+          "type": "integer",
+          "description": "Fret number; 0 = open string.",
+          "minimum": 0,
+          "maximum": 36
+        }
+      },
+      "required": ["string", "fret"],
+      "additionalProperties": false
+    },
+    "bend-point": {
+      "type": "object",
+      "description": "One control point on a bend curve.",
+      "properties": {
+        "position": {
+          "type": "number",
+          "description": "Where in the note the point falls, as a fraction of the note's own duration (0 = onset, 1 = release).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "alter": {
+          "type": "number",
+          "description": "Pitch offset from the written note at this point, in SEMITONES — the unit of MNX `pitch.alter` (2 = a whole-step bend). Non-integers are legal: a quarter-tone curl is 0.5."
+        }
+      },
+      "required": ["position", "alter"],
+      "additionalProperties": false
+    },
+    "technique": {
+      "type": "object",
+      "description": "Playing techniques. Visible in both notation and tab views; none of them require a position, and none is specific to fretted instruments — this block is drafted for standard MNX, not for tab (see docs/mnx-extensions.md §technique).",
+      "properties": {
+        "bend": {
+          "type": "object",
+          "description": "A bend as a CURVE, not a single interval: an ordered list of control points across the note. A pre-bend is a first point at position 0 with a non-zero alter; a release is any later point whose alter decreases. This is how every guitar editor models bends, and it is the deficiency w3c-cg/mnx#63 opens with — MusicXML's single `<bend-alter>` cannot state a bend that rises, releases and rises again.",
+          "properties": {
+            "points": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/bend-point" },
+              "minItems": 2,
+              "description": "In ascending `position` order. The first point should be at position 0."
+            }
+          },
+          "required": ["points"],
+          "additionalProperties": false
+        },
+        "slide": {
+          "type": "object",
+          "properties": {
+            "type": { "enum": ["shift", "legato", "slideIn", "slideOut"] },
+            "direction": { "enum": ["up", "down"] },
+            "target": {
+              "$ref": "#/$defs/note-id",
+              "description": "Destination note for shift/legato slides. slideIn/slideOut have no target."
+            }
+          },
+          "required": ["type"],
+          "additionalProperties": false
+        },
+        "hammerOn": {
+          "type": "object",
+          "properties": {
+            "target": { "$ref": "#/$defs/note-id" }
+          },
+          "required": ["target"],
+          "additionalProperties": false
+        },
+        "pullOff": {
+          "type": "object",
+          "properties": {
+            "target": { "$ref": "#/$defs/note-id" }
+          },
+          "required": ["target"],
+          "additionalProperties": false
+        },
+        "vibrato": { "type": "boolean" },
+        "harmonic": {
+          "type": "object",
+          "description": "A harmonic. Identified by TOUCHING PITCH rather than touching fret: that is MusicXML's model, it covers fretless instruments, and it can state the between-fret nodes that w3c-cg/mnx#179 is about, which a fret integer cannot. The fret, when there is one, is already in `position`.",
+          "properties": {
+            "type": {
+              "enum": ["natural", "artificial", "pinch", "tap", "semi", "feedback"],
+              "description": "MusicXML models only natural/artificial; the rest are Guitar Pro's and have no MusicXML element."
+            },
+            "touchingPitch": {
+              "$ref": "#/$defs/pitch",
+              "description": "The pitch of the node touched to produce the harmonic. Absent = the consumer derives it from the string and the harmonic type."
+            }
+          },
+          "required": ["type"],
+          "additionalProperties": false
+        },
+        "palmMute": {
+          "type": "boolean",
+          "description": "Per-note, matching how Guitar Pro stores it. In standard MNX this should be a span on the part measure with `position` + `end`, like `ottava` — see docs/mnx-extensions.md."
+        }
+      },
+      "additionalProperties": false
+    },
+    "fingering": {
+      "type": "object",
+      "description": "Which finger plays the note. Not tab-specific (kept separable so it can migrate to standard MNX independently).",
+      "properties": {
+        "hand": { "enum": ["left", "right"] },
+        "finger": {
+          "type": "string",
+          "description": "Finger identifier: T, 1, 2, 3, 4 (left hand); p, i, m, a, c (right hand)."
+        }
+      },
+      "required": ["hand", "finger"],
+      "additionalProperties": false
+    },
+    "note-tab": {
+      "type": "object",
+      "description": "Stored under note._x.mnxLab.tab. All blocks optional and independent: a note may carry a technique or fingering without committing to a fingerboard position.",
+      "properties": {
+        "position": { "$ref": "#/$defs/position" },
+        "technique": { "$ref": "#/$defs/technique" },
+        "fingering": { "$ref": "#/$defs/fingering" }
+      },
+      "additionalProperties": false
+    },
+    "tuning-entry": {
+      "type": "object",
+      "description": "One string's tuning. The string number is explicit — array order carries no meaning.",
+      "properties": {
+        "string": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "pitch": { "$ref": "#/$defs/pitch" }
+      },
+      "required": ["string", "pitch"],
+      "additionalProperties": false
+    },
+    "part-tab": {
+      "type": "object",
+      "description": "Stored under part._x.mnxLab.tab. Declares the instrument's fingerboard configuration and the part's preferred staff presentation. Tab-ness is a VIEW declaration here — there is no tab clef and no duplicated tab staff; notation and tab are both derived from the same note stream.",
+      "properties": {
+        "tuning": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/tuning-entry" },
+          "minItems": 1,
+          "description": "Sounding pitch of each open string. If absent, consumers should assume standard guitar tuning (string 1 = E4 … string 6 = E2)."
+        },
+        "capo": {
+          "type": "integer",
+          "description": "Capo fret position (omit or 0 = no capo). A rendering/performance concern: fret numbers in positions are relative to the capo.",
+          "minimum": 0,
+          "maximum": 24
+        },
+        "staffKind": {
+          "enum": ["notation", "tab", "both"],
+          "description": "The part's preferred presentation. Consumers may override (e.g. an app's view toggle). If absent, defaults to notation."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "rehearsal": {
+      "type": "object",
+      "description": "A rehearsal mark: an INDEX into the score (\"A\", \"B\", \"12\"). Arbitrary and renumberable — changing every mark in a piece changes nothing musical. Score-wide by definition, hence its home on the global measure beside `segno`/`fine`/`jump`. Drafts w3c-cg/mnx#112 / discussion #377. Deliberately carries no auto-lettering `sequence`: that is the one point #112 has argued about since 2018, and bundling it would stall the rest.",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "What is drawn. Always explicit — never derived by the consumer (w3c-cg/mnx#112). A plain string for now; migrates to the formatted-text object of discussion #459 when that lands, exactly as `dynamic-group.prefix` did."
+        },
+        "location": {
+          "$ref": "#/$defs/rhythmic-position",
+          "description": "Optional; absent = the start of the measure, which is where all but a vanishing minority sit."
+        }
+      },
+      "required": ["label"],
+      "additionalProperties": false
+    },
+    "section": {
+      "type": "object",
+      "description": "A formal section name (\"Intro\", \"Verse 1\", \"Chorus\", \"Trio\"). A DIFFERENT concept from `rehearsal`: this names a unit of the piece, so renaming it changes what the piece is. The two co-occur — Broadway and guitar charts routinely print `[A] Verse` — which is why they are separate objects rather than Guitar Pro's conflated `Section{marker, text}`.",
+      "properties": {
+        "label": { "type": "string" },
+        "location": { "$ref": "#/$defs/rhythmic-position" }
+      },
+      "required": ["label"],
+      "additionalProperties": false
+    },
+
+    "harmony-step": {
+      "type": "object",
+      "description": "A chord root or bass note: an MNX `pitch` minus the octave, since a chord symbol names a pitch CLASS.",
+      "properties": {
+        "step": { "enum": ["C", "D", "E", "F", "G", "A", "B"] },
+        "alter": { "type": "integer", "minimum": -2, "maximum": 2 }
+      },
+      "required": ["step"],
+      "additionalProperties": false
+    },
+    "harmony-degree": {
+      "type": "object",
+      "description": "An added, altered or omitted extension — MusicXML's `<degree>` model, which is proven interchange and hard to improve on.",
+      "properties": {
+        "value": { "type": "integer", "minimum": 1, "maximum": 15 },
+        "alter": { "type": "integer", "minimum": -2, "maximum": 2 },
+        "type": { "enum": ["add", "alter", "subtract"] }
+      },
+      "required": ["value", "type"],
+      "additionalProperties": false
+    },
+    "harmony": {
+      "type": "object",
+      "description": "One chord symbol. Drafts w3c-cg/mnx#109. Structured AND literal: the enum carries the semantics (so it transposes and re-spells), `text` is the display escape hatch for anything the enum cannot say — the same pattern the CG settled on for dynamics in #518. Positioned by `location`, with no duration: a chord lasts until the next one (w3c-cg/mnx#110).",
+      "properties": {
+        "location": { "$ref": "#/$defs/rhythmic-position" },
+        "root": { "$ref": "#/$defs/harmony-step" },
+        "quality": {
+          "enum": [
+            "major", "minor", "augmented", "diminished",
+            "dominantSeventh", "majorSeventh", "minorSeventh", "diminishedSeventh",
+            "augmentedSeventh", "halfDiminished", "majorMinor",
+            "majorSixth", "minorSixth",
+            "dominantNinth", "majorNinth", "minorNinth",
+            "dominantEleventh", "majorEleventh", "minorEleventh",
+            "dominantThirteenth", "majorThirteenth", "minorThirteenth",
+            "suspendedSecond", "suspendedFourth",
+            "neapolitan", "italian", "french", "german", "pedal", "power", "tristan",
+            "other", "none"
+          ],
+          "description": "camelCase of MusicXML's `kind` vocabulary. `none` is N.C. (no chord); `other` means the symbol is carried only by `text`."
+        },
+        "bass": {
+          "$ref": "#/$defs/harmony-step",
+          "description": "Slash-chord bass note, when it is not the root."
+        },
+        "degrees": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/harmony-degree" },
+          "minItems": 1
+        },
+        "text": {
+          "type": "string",
+          "description": "Display override. Present ONLY when the source's literal spelling differs from what a consumer would render from the structure — so most chords carry none."
+        }
+      },
+      "required": ["location", "quality"],
+      "allOf": [
+        {
+          "if": {
+            "properties": { "quality": { "enum": ["none", "other"] } },
+            "required": ["quality"]
+          },
+          "else": { "required": ["root"] }
+        },
+        {
+          "if": {
+            "properties": { "quality": { "const": "other" } },
+            "required": ["quality"]
+          },
+          "then": { "required": ["text"] }
+        }
+      ],
+      "additionalProperties": false
+    },
+
+    "note-ext": {
+      "type": "object",
+      "description": "The whole vendor dict at note._x.mnxLab.",
+      "properties": { "tab": { "$ref": "#/$defs/note-tab" } },
+      "additionalProperties": false
+    },
+    "part-ext": {
+      "type": "object",
+      "description": "The whole vendor dict at part._x.mnxLab.",
+      "properties": { "tab": { "$ref": "#/$defs/part-tab" } },
+      "additionalProperties": false
+    },
+    "global-measure-ext": {
+      "type": "object",
+      "description": "The whole vendor dict at global.measures[i]._x.mnxLab. Harmony lives here — on the GLOBAL timeline beside `key` and `tempos` — because two parts cannot legitimately disagree about the chord on a beat, which is the test that put dynamics and ottavas in the part measure and key/time/tempo in the global one.",
+      "properties": {
+        "rehearsal": { "$ref": "#/$defs/rehearsal" },
+        "section": { "$ref": "#/$defs/section" },
+        "harmonies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/harmony" },
+          "minItems": 1,
+          "description": "Every chord symbol starting in this measure, in `location` order. An array parallel to `tempos` — the other repeatable, metrically-positioned global object."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

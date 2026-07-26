@@ -17,8 +17,10 @@
       "id": "guitar",
       "name": "Guitar",
       "_x": {
-        "tab": {
-          "staffKind": "both"
+        "mnxLab": {
+          "tab": {
+            "staffKind": "both"
+          }
         }
       },
       "measures": [
@@ -47,10 +49,12 @@
                         "octave": 2
                       },
                       "_x": {
-                        "tab": {
-                          "position": {
-                            "string": 6,
-                            "fret": 0
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 6,
+                              "fret": 0
+                            }
                           }
                         }
                       }
@@ -62,10 +66,12 @@
                         "octave": 2
                       },
                       "_x": {
-                        "tab": {
-                          "position": {
-                            "string": 5,
-                            "fret": 0
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 5,
+                              "fret": 0
+                            }
                           }
                         }
                       }
@@ -77,10 +83,12 @@
                         "octave": 3
                       },
                       "_x": {
-                        "tab": {
-                          "position": {
-                            "string": 4,
-                            "fret": 0
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 4,
+                              "fret": 0
+                            }
                           }
                         }
                       }
@@ -92,10 +100,12 @@
                         "octave": 3
                       },
                       "_x": {
-                        "tab": {
-                          "position": {
-                            "string": 3,
-                            "fret": 0
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 3,
+                              "fret": 0
+                            }
                           }
                         }
                       }
@@ -107,10 +117,12 @@
                         "octave": 3
                       },
                       "_x": {
-                        "tab": {
-                          "position": {
-                            "string": 2,
-                            "fret": 0
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 2,
+                              "fret": 0
+                            }
                           }
                         }
                       }
@@ -122,10 +134,12 @@
                         "octave": 4
                       },
                       "_x": {
-                        "tab": {
-                          "position": {
-                            "string": 1,
-                            "fret": 0
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 1,
+                              "fret": 0
+                            }
                           }
                         }
                       }

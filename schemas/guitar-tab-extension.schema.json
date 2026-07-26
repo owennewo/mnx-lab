@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mnx-editor.dev/schemas/guitar-tab-extension.schema.json",
   "title": "Guitar Tablature & Technical Extension for W3C MNX (v1, DEPRECATED)",
-  "description": "DEPRECATED: superseded by mnx-tab-extension.schema.json (v2, namespace _x.tab) — see docs/tab-extension-spec.md. Retained only to document the legacy _x.guitar shape that the app's load-time upgrade shim accepts.",
+  "description": "DEPRECATED: superseded by mnx-lab-extensions.schema.json (v3, namespace _x.mnxLab) — see docs/mnx-extensions.md. Retained only to document the legacy _x.guitar shape that the app's load-time upgrade shim accepts.",
   "deprecated": true,
   "type": "object",
   "$defs": {

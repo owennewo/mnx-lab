@@ -1,16 +1,29 @@
 import { MnxStructure, MnxTabNoteExtension, MnxTuningEntry } from '../types/mnx.ts';
 
 /**
- * Load-time upgrade shim: converts documents using the deprecated v1 guitar
- * extension (`_x.guitar`, TAB clefs, duplicated two-staff tab encoding) to
- * the v2 single-source `_x.tab` form (docs/tab-extension-spec.md). Saved
- * IndexedDB documents created before the migration pass through here once on
- * load; already-v2 documents come back unchanged.
+ * Load-time upgrade shim for saved documents, run once on load. Two hops:
+ *
+ *   v1 → v2  `_x.guitar` + TAB clefs + a duplicated tab staff → the
+ *            single-source `_x.tab` form.
+ *   v2 → v3  `_x.tab` → `_x.mnxLab.tab`, `_x.section {marker, text}` →
+ *            `_x.mnxLab.{rehearsal,section}.label`, hyphenated enum values →
+ *            camelCase, and the single-interval bend → a bend curve.
+ *
+ * The v3 hop exists because `_x` sub-keys name a VENDOR, not a feature
+ * (w3c-cg/mnx#429) — `_x.tab` squatted a generic token in a shared namespace.
+ * Already-v3 documents come back unchanged. See docs/mnx-extensions.md.
  */
 export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
-  if (!needsUpgrade(mnxJson)) return mnxJson;
+  if (!needsUpgrade(mnxJson) && !needsNamespaceUpgrade(mnxJson)) return mnxJson;
 
   const doc: any = JSON.parse(JSON.stringify(mnxJson));
+  upgradeV1(doc);
+  upgradeV2(doc);
+  return doc as MnxStructure;
+}
+
+function upgradeV1(doc: any): void {
+  if (!needsUpgrade(doc)) return;
 
   for (const part of doc.parts ?? []) {
     const hadTabClef = (part.measures ?? []).some((m: any) =>
@@ -117,8 +130,77 @@ export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
       part._x = { ...part._x, tab: tabPart };
     }
   }
+}
 
-  return doc as MnxStructure;
+/** v2 → v3: re-namespace under `mnxLab`, split the section label, camelCase the
+ *  enums, and turn a single-interval bend into a two-point curve. */
+function upgradeV2(doc: any): void {
+  const nest = (owner: any) => {
+    if (!owner?._x?.tab) return;
+    const { tab, ...rest } = owner._x;
+    owner._x = { ...rest, mnxLab: { ...owner._x.mnxLab, tab } };
+  };
+
+  for (const measure of doc.global?.measures ?? []) {
+    const section = measure._x?.section;
+    if (!section) continue;
+    const { section: _dropped, ...rest } = measure._x;
+    measure._x = {
+      ...rest,
+      mnxLab: {
+        ...measure._x.mnxLab,
+        ...(section.marker ? { rehearsal: { label: section.marker } } : {}),
+        ...(section.text ? { section: { label: section.text } } : {})
+      }
+    };
+  }
+
+  for (const part of doc.parts ?? []) {
+    nest(part);
+    forEachNote(part, (note: any) => {
+      nest(note);
+      const technique = note._x?.mnxLab?.tab?.technique;
+      if (!technique) return;
+
+      if (technique.slide?.type === 'slide-in') technique.slide.type = 'slideIn';
+      if (technique.slide?.type === 'slide-out') technique.slide.type = 'slideOut';
+
+      // v2 stated one interval in WHOLE STEPS plus flags; v3 states the curve
+      // in semitones, which is the unit of MNX's own `pitch.alter`. v2 carried
+      // no timing at all, so the reconstructed curve places the peak where the
+      // gesture implies: at the end, or mid-note when there is a release after.
+      if (technique.bend && technique.bend.points === undefined) {
+        const peak = (technique.bend.amount ?? 0) * 2;
+        const prebent = technique.bend.type === 'pre-bend';
+        const released = technique.bend.release === true;
+        const points = prebent
+          ? [{ position: 0, alter: peak }]
+          : [{ position: 0, alter: 0 }, { position: released ? 0.5 : 1, alter: peak }];
+        if (released) points.push({ position: 1, alter: 0 });
+        else if (prebent) points.push({ position: 1, alter: peak });
+        technique.bend = { points };
+      }
+    });
+  }
+}
+
+function needsNamespaceUpgrade(doc: any): boolean {
+  for (const measure of doc.global?.measures ?? []) {
+    if (measure._x?.section) return true;
+  }
+  for (const part of doc.parts ?? []) {
+    if (part._x?.tab) return true;
+    for (const measure of part.measures ?? []) {
+      for (const seq of measure.sequences ?? []) {
+        for (const event of seq.content ?? []) {
+          for (const note of event.notes ?? []) {
+            if (note._x?.tab) return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
 }
 
 function needsUpgrade(doc: MnxStructure): boolean {

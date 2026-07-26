@@ -21,16 +21,18 @@ export const defaultScore: MnxStructure = {
       id: "guitar-part",
       name: "Guitar",
       _x: {
-        tab: {
-          tuning: [
-            { string: 1, pitch: { step: "E", octave: 4 } },
-            { string: 2, pitch: { step: "B", octave: 3 } },
-            { string: 3, pitch: { step: "G", octave: 3 } },
-            { string: 4, pitch: { step: "D", octave: 3 } },
-            { string: 5, pitch: { step: "A", octave: 2 } },
-            { string: 6, pitch: { step: "E", octave: 2 } }
-          ],
-          staffKind: "both"
+        mnxLab: {
+          tab: {
+            tuning: [
+              { string: 1, pitch: { step: "E", octave: 4 } },
+              { string: 2, pitch: { step: "B", octave: 3 } },
+              { string: 3, pitch: { step: "G", octave: 3 } },
+              { string: 4, pitch: { step: "D", octave: 3 } },
+              { string: 5, pitch: { step: "A", octave: 2 } },
+              { string: 6, pitch: { step: "E", octave: 2 } }
+            ],
+            staffKind: "both"
+          }
         }
       },
       measures: [

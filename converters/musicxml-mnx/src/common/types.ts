@@ -4,23 +4,36 @@ export interface MnxPitch {
   alter?: number;
 }
 
-// ---- Tablature extension v2 (`_x.tab`) — see docs/tab-extension-spec.md ----
+// ---- MNX Lab extensions v3 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
 
 export interface MnxFingering {
   hand: 'left' | 'right';
   finger: string;
 }
 
+/** One control point on a bend curve. */
+export interface MnxBendPoint {
+  /** Fraction of the note's own duration: 0 = onset, 1 = release. */
+  position: number;
+  /** Offset from the written pitch in SEMITONES (MNX `pitch.alter` units). */
+  alter: number;
+}
+
+/** A bend as a curve. A pre-bend is a first point at 0 with a non-zero `alter`;
+ *  a release is any later point whose `alter` decreases. */
 export interface MnxBend {
-  type: 'bend' | 'pre-bend';
-  amount: number;
-  release?: boolean;
+  points: MnxBendPoint[];
 }
 
 export interface MnxSlide {
-  type: 'shift' | 'legato' | 'slide-in' | 'slide-out';
+  type: 'shift' | 'legato' | 'slideIn' | 'slideOut';
   direction?: 'up' | 'down';
   target?: string;
+}
+
+export interface MnxHarmonic {
+  type: 'natural' | 'artificial' | 'pinch' | 'tap' | 'semi' | 'feedback';
+  touchingPitch?: MnxPitch;
 }
 
 export interface MnxTabPosition {
@@ -36,12 +49,63 @@ export interface MnxTabTechnique {
   hammerOn?: { target: string };
   pullOff?: { target: string };
   vibrato?: boolean;
+  harmonic?: MnxHarmonic;
+  palmMute?: boolean;
 }
 
 export interface MnxTabNoteExtension {
   position?: MnxTabPosition;
   technique?: MnxTabTechnique;
   fingering?: MnxFingering;
+}
+
+/** A chord root or bass note: an MNX pitch minus the octave. */
+export interface MnxHarmonyStep {
+  step: MnxPitch['step'];
+  alter?: number;
+}
+
+export type MnxHarmonyQuality =
+  | 'major' | 'minor' | 'augmented' | 'diminished'
+  | 'dominantSeventh' | 'majorSeventh' | 'minorSeventh' | 'diminishedSeventh'
+  | 'augmentedSeventh' | 'halfDiminished' | 'majorMinor'
+  | 'majorSixth' | 'minorSixth'
+  | 'dominantNinth' | 'majorNinth' | 'minorNinth'
+  | 'dominantEleventh' | 'majorEleventh' | 'minorEleventh'
+  | 'dominantThirteenth' | 'majorThirteenth' | 'minorThirteenth'
+  | 'suspendedSecond' | 'suspendedFourth'
+  | 'neapolitan' | 'italian' | 'french' | 'german' | 'pedal' | 'power' | 'tristan'
+  | 'other' | 'none';
+
+export interface MnxHarmonyDegree {
+  value: number;
+  alter?: number;
+  type: 'add' | 'alter' | 'subtract';
+}
+
+/** One chord symbol on the global timeline. No duration — a chord lasts until
+ *  the next one. `text` appears only when the source's literal spelling differs
+ *  from what a consumer would render from the structure. */
+export interface MnxHarmony {
+  location: { fraction: [number, number] };
+  root?: MnxHarmonyStep;
+  quality: MnxHarmonyQuality;
+  bass?: MnxHarmonyStep;
+  degrees?: MnxHarmonyDegree[];
+  text?: string;
+}
+
+/** A label attached to the start of a measure: `rehearsal` is an index into the
+ *  score ("A"), `section` names a formal unit of the piece ("Verse 1"). */
+export interface MnxMeasureLabel {
+  label: string;
+  location?: { fraction: [number, number] };
+}
+
+export interface MnxGlobalMeasureExtension {
+  rehearsal?: MnxMeasureLabel;
+  section?: MnxMeasureLabel;
+  harmonies?: MnxHarmony[];
 }
 
 export interface MnxNote {
@@ -54,17 +118,31 @@ export interface MnxNote {
     };
   };
   _x?: {
-    tab?: MnxTabNoteExtension;
+    mnxLab?: { tab?: MnxTabNoteExtension };
   };
 }
 
 export interface MnxRest {}
 
+/** One syllable of one lyric line. `start`/`middle` continue into the next
+ *  syllable with a hyphen (MusicXML `<syllabic>begin|middle`). */
+export interface MnxEventLyricLine {
+  text: string;
+  type?: 'start' | 'middle' | 'end' | 'whole';
+}
+
+/** Lyrics on an event: line id → syllable. Verses stack below the staff. */
+export interface MnxEventLyrics {
+  lines?: Record<string, MnxEventLyricLine>;
+}
+
 export interface MnxEvent {
+  id?: string;
   duration: {
     base: string; // e.g. 'whole', 'half', 'quarter', 'eighth', '16th', '32nd'
     dots?: number;
   };
+  lyrics?: MnxEventLyrics;
   notes?: MnxNote[];
   rest?: MnxRest;
   stemDirection?: 'up' | 'down';
@@ -113,7 +191,7 @@ export interface MnxPart {
     };
   };
   _x?: {
-    tab?: MnxTabPartExtension;
+    mnxLab?: { tab?: MnxTabPartExtension };
   };
 }
 
@@ -129,6 +207,31 @@ export interface MnxGlobalMeasure {
     type?: 'regular' | 'dotted' | 'dashed' | 'heavy' | 'double' | 'final'
       | 'heavyLight' | 'heavyHeavy' | 'tick' | 'short' | 'noBarline';
   };
+  /** Forward repeat at the start of this measure (`|:`). */
+  repeatStart?: object;
+  /** Backward repeat at the end of this measure (`:|`); `times` = total plays. */
+  repeatEnd?: {
+    times?: number;
+  };
+  /** Volta bracket starting here, spanning `duration` measures (default 1);
+   *  `open` brackets have no closing hook (MusicXML `discontinue`). */
+  ending?: {
+    duration?: number;
+    numbers?: number[];
+    open?: boolean;
+  };
+  /** Metronome marks ("note = bpm"), drawn above the start of the measure. */
+  tempos?: {
+    bpm: number;
+    value: { base: string; dots?: number };
+    location?: { fraction: [number, number] };
+  }[];
+  /** Vendor extensions: rehearsal marks, section names and chord symbols, none
+   *  of which standard MNX has a field for. Schema-legal: `_x` is declared in
+   *  `global-attrs`. See docs/mnx-extensions.md. */
+  _x?: {
+    mnxLab?: MnxGlobalMeasureExtension;
+  };
 }
 
 export interface MnxStructure {
@@ -137,6 +240,11 @@ export interface MnxStructure {
   };
   global: {
     measures: MnxGlobalMeasure[];
+    /** Document-wide lyric line ordering and metadata (verse order, labels). */
+    lyrics?: {
+      lineOrder?: string[];
+      lineMetadata?: Record<string, { label?: string; lang?: string }>;
+    };
   };
   parts: MnxPart[];
 }

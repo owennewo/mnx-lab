@@ -299,10 +299,10 @@ Developers can run the converter directly against local file paths:
 
 ```bash
 # Convert MusicXML file to MNX JSON
-node converters/musicxml-mnx/src/cli.ts --import server/scores/House-of-the-Rising-Sun.xml --output scores/House-of-the-Rising-Sun.json
+node converters/musicxml-mnx/src/cli.ts --import server/scores/House-of-the-Rising-Sun.xml --output scores/House-of-the-Rising-Sun.mnx.json
 
 # Convert MNX JSON back to MusicXML
-node converters/musicxml-mnx/src/cli.ts --export scores/House-of-the-Rising-Sun.json --output exported.xml
+node converters/musicxml-mnx/src/cli.ts --export scores/House-of-the-Rising-Sun.mnx.json --output exported.xml
 ```
 
 ---

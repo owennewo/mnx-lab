@@ -806,11 +806,14 @@ function renderSegment(args: RenderSegmentArgs): {
   // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
   // into each measure's diagnostic markers alongside renderer-gap issues.
   // Drawn on the first job only, so stacked scores don't repeat the badges.
-  const validationByMeasure = new Map<number, string[]>();
+  const validationByMeasure = new Map<number, MeasureIssue[]>();
   if (drawValidation) {
     for (const v of validateDocument(mnx)) {
+      // `scope: 'tab'` issues are fingerboard constraints — the notation staff
+      // engraves those bars correctly, so a badge here would be noise.
+      if (v.scope === 'tab') continue;
       const list = validationByMeasure.get(v.measureIndex) ?? [];
-      list.push(v.message);
+      list.push({ kind: v.severity === 'warning' ? 'warning' : 'validation', message: v.message });
       validationByMeasure.set(v.measureIndex, list);
     }
   }
@@ -1176,7 +1179,7 @@ function renderSegment(args: RenderSegmentArgs): {
     // plus anything an individual event throws (forgiving render) — one bad
     // event must not take down the bar.
     const measureIssues: MeasureIssue[] = [
-      ...(validationByMeasure.get(i) ?? []).map(message => ({ kind: 'validation' as const, message })),
+      ...(validationByMeasure.get(i) ?? []),
       ...m.issues.map(message => ({ kind: 'render' as const, message }))
     ];
     resolvedByStaff.forEach((staffVoices, s) => {

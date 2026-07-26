@@ -19,6 +19,24 @@ The downloaded schema enforces the core concepts of the MNX format:
 4. **Semantic Event Model**: Events represent either chords/notes (with duration base, pitch structures, alterations) or rests.
 5. **Extensibility**: Allows custom properties under the `_x` namespaces (useful for proprietary editor features like custom guitar tablature bends or notes context).
 
+## Extension schema
+
+`mnx-lab-extensions.schema.json` (**v3**) holds everything this project carries that MNX cannot
+express, under the single vendor key `_x.mnxLab`. It is a `$defs` library, not a document schema:
+`scripts/compile-validator.mjs` compiles three sub-validators from it (`note-ext`, `part-ext`,
+`global-measure-ext`) and consumers walk the document. Register + rationale:
+[docs/mnx-extensions.md](../docs/mnx-extensions.md).
+
+- **v3 (2026-07-26)** — replaced `mnx-tab-extension.schema.json` (v2). The `_x` sub-key names a
+  *vendor*, not a feature ([w3c-cg/mnx#429](https://github.com/w3c-cg/mnx/issues/429)), so `_x.tab`
+  and `_x.section` moved under `_x.mnxLab`. Added `rehearsal`, `section`, `harmonies`,
+  `technique.harmonic`, `technique.palmMute`; bends became `points` curves in semitones; slide
+  enum values camelCased.
+- **v2** (`mnx-tab-extension.schema.json`, removed in v3 — in git history) — `_x.tab`,
+  single-source encoding, no TAB clefs.
+- **v1** (`guitar-tab-extension.schema.json`, retained) — the legacy `_x.guitar` shape the load-time
+  upgrade shim still accepts.
+
 ## Version History Log
 
 ### 2026-07-17 (Upgrade to version/19)

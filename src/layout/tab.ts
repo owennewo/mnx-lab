@@ -75,10 +75,12 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
 
   // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
   // into each measure's diagnostic markers alongside renderer-gap issues.
-  const validationByMeasure = new Map<number, string[]>();
+  // Unlike the notation staff, this one KEEPS `scope: 'tab'` issues — the
+  // fingerboard constraints they describe are exactly what this view draws.
+  const validationByMeasure = new Map<number, MeasureIssue[]>();
   for (const v of validateDocument(mnx)) {
     const list = validationByMeasure.get(v.measureIndex) ?? [];
-    list.push(v.message);
+    list.push({ kind: v.severity === 'warning' ? 'warning' : 'validation', message: v.message });
     validationByMeasure.set(v.measureIndex, list);
   }
 
@@ -156,9 +158,16 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     // plus anything an individual event throws (forgiving render) — one bad
     // event must not take down the bar.
     const measureIssues: MeasureIssue[] = [
-      ...(validationByMeasure.get(i) ?? []).map(message => ({ kind: 'validation' as const, message })),
+      ...(validationByMeasure.get(i) ?? []),
       ...m.issues.map(message => ({ kind: 'render' as const, message }))
     ];
+
+    // A note written in two voices at one fingerboard position is ONE note.
+    // Both copies land on the same digit, so drawing the second is redundant
+    // (and doubles the glyph's anti-aliasing). Keyed by column + string + fret,
+    // so a genuine conflict — different frets, one string — still draws both
+    // and stays visible next to its red badge.
+    const drawnFrets = new Set<string>();
     stdSequences.forEach((sequence, voiceIndex) => {
       sequence.content.forEach((event, eventIndex) => {
         const slot = m.voices[voiceIndex]?.[eventIndex];
@@ -190,6 +199,11 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
           for (let k = 0; k < positions.length; k++) {
             const pos = positions[k];
             const noteId = noteIds[k] ?? primaryNoteId;
+
+            const fretSlot = `${Math.round(eventX * 1e4)}:${pos.str}:${pos.fret}`;
+            if (drawnFrets.has(fretSlot)) continue;
+            drawnFrets.add(fretSlot);
+
             const stringY = staffTop + (pos.str - 1);
             const fretStr = String(pos.fret);
             const charWidthSp = FRET_FONT_SIZE_SP * 0.6 * Math.max(1, fretStr.length);

@@ -1,6 +1,6 @@
 {
   "title": "Standard tuning, staffKind both",
-  "description": "A one-note guitar part carrying the full part-level _x.tab extension: explicit standard tuning (six entries with explicit string numbers — array order carries no meaning) and staffKind \"both\", declaring that this part prefers notation + tab views derived from the single note stream. The note itself has no position annotation, so tab rendering exercises the playability heuristic.",
+  "description": "A one-note guitar part carrying the full part-level _x.mnxLab.tab extension: explicit standard tuning (six entries with explicit string numbers — array order carries no meaning) and staffKind \"both\", declaring that this part prefers notation + tab views derived from the single note stream. The note itself has no position annotation, so tab rendering exercises the playability heuristic.",
   "bars": 1,
   "tags": [
     "tab",

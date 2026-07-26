@@ -3,9 +3,9 @@
 // ajv.compile() relies on — so validators must be generated at build time.
 //
 // Outputs (committed; regenerate on schema bump):
-//   worker/generated/validate-mnx.mjs  — official MNX schema (default export)
-//   worker/generated/validate-tab.mjs  — tab extension v2 sub-validators
-//     (named exports: validateTabNote, validateTabPart)
+//   worker/generated/validate-mnx.mjs         — official MNX schema (default export)
+//   worker/generated/validate-extensions.mjs  — `_x.mnxLab` extension v3 sub-validators
+//     (named exports: validateNoteExt, validatePartExt, validateGlobalMeasureExt)
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,22 +36,25 @@ function writeModule(rel, code) {
   writeModule('validate-mnx.mjs', standaloneCode.default(ajv, validate));
 }
 
-// 2. Tab extension v2 → named-export sub-validators for the two placement
-//    points (note._x.tab and part._x.tab). The extension schema is a $defs
-//    library; the worker walks the document and validates each _x.tab object.
+// 2. `_x.mnxLab` extensions v3 → named-export sub-validators for the three
+//    placement points (note, part, global measure). The extension schema is a
+//    $defs library; the worker walks the document and validates each vendor
+//    dict. Validating the WHOLE dict rather than each feature block also
+//    catches a misspelled sibling key, which a per-block walk cannot.
 {
   const ajv = new Ajv2020.default({
     allErrors: true,
     code: { source: true, esm: true },
   });
-  const tabSchema = loadSchema('mnx-tab-extension.schema.json');
-  ajv.addSchema(tabSchema);
-  const base = tabSchema.$id;
+  const extSchema = loadSchema('mnx-lab-extensions.schema.json');
+  ajv.addSchema(extSchema);
+  const base = extSchema.$id;
   writeModule(
-    'validate-tab.mjs',
+    'validate-extensions.mjs',
     standaloneCode.default(ajv, {
-      validateTabNote: `${base}#/$defs/note-tab`,
-      validateTabPart: `${base}#/$defs/part-tab`,
+      validateNoteExt: `${base}#/$defs/note-ext`,
+      validatePartExt: `${base}#/$defs/part-ext`,
+      validateGlobalMeasureExt: `${base}#/$defs/global-measure-ext`,
     })
   );
 }

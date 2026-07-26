@@ -120,10 +120,13 @@ export interface SourceLocation {
 /** Output of every layout module. */
 /**
  * `validation` — the document is musically wrong in a way the user can and
- * should fix (e.g. bar duration arithmetic). `render` — content this renderer
- * doesn't support yet, or an error it swallowed (forgiving render).
+ * should fix (e.g. bar duration arithmetic). `warning` — the document is
+ * legal and may well be intentional, but is ambiguous enough that consumers
+ * disagree about it (e.g. two voices sharing one string in tab). `render` —
+ * content this renderer doesn't support yet, or an error it swallowed
+ * (forgiving render).
  */
-export type DiagnosticKind = 'validation' | 'render';
+export type DiagnosticKind = 'validation' | 'warning' | 'render';
 
 /** One per-measure problem, also drawn into the score as a warning marker. */
 export interface LayoutDiagnostic {

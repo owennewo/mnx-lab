@@ -3,14 +3,22 @@ import { addIdSuffix } from '../common/utils.js';
 
 /**
  * Synthesizes the MusicXML notation+TAB pair from a SINGLE-SOURCE MNX part
- * (one note stream annotated with `_x.tab` positions — see
- * docs/tab-extension-spec.md). The duplicated two-staff form exists only at
+ * (one note stream annotated with `_x.mnxLab.tab` positions — see
+ * docs/mnx-extensions.md). The duplicated two-staff form exists only at
  * the MusicXML boundary; it never appears in MNX documents.
  *
  * The transient tab part DOES carry a `{sign: 'TAB'}` clef — that is the
  * exporter's trigger for writing MusicXML's <clef> and <staff-details>
  * elements, which legitimately use TAB. These structures are export-internal.
  */
+/**
+ * Strips a `-std`/`-tab` suffix so splitting a part that CAME from a split does
+ * not compound into `P1-std-std`. Re-exporting a document must be idempotent.
+ */
+function basePartId(id: string): string {
+  return id.replace(/-(std|tab)$/, '');
+}
+
 export function splitPart(part: MnxPart): { standardPart: MnxPart; tabPart: MnxPart } {
   const standardMeasures: MnxPartMeasure[] = [];
   const tabMeasures: MnxPartMeasure[] = [];
@@ -36,7 +44,7 @@ export function splitPart(part: MnxPart): { standardPart: MnxPart; tabPart: MnxP
   };
 
   const standardPart: MnxPart = {
-    id: `${part.id}-std`,
+    id: `${basePartId(part.id)}-std`,
     name: part.name,
     staves: 1,
     measures: standardMeasures,
@@ -45,7 +53,7 @@ export function splitPart(part: MnxPart): { standardPart: MnxPart; tabPart: MnxP
   };
 
   const tabPart: MnxPart = {
-    id: `${part.id}-tab`,
+    id: `${basePartId(part.id)}-tab`,
     name: part.name,
     staves: 1,
     measures: tabMeasures,
@@ -75,10 +83,13 @@ function copySequenceStd(seq: MnxSequence): MnxSequence {
         if (note.id) {
           copyNote.id = addIdSuffix(note.id, 'std');
         }
-        if (copyNote._x?.tab) {
-          const { tab: _tab, ...restX } = copyNote._x;
-          if (Object.keys(restX).length > 0) {
-            copyNote._x = restX;
+        if (copyNote._x?.mnxLab?.tab) {
+          const { tab: _tab, ...restLab } = copyNote._x.mnxLab;
+          const { mnxLab: _lab, ...restX } = copyNote._x;
+          const mnxLab = Object.keys(restLab).length > 0 ? { mnxLab: restLab } : {};
+          const next = { ...restX, ...mnxLab };
+          if (Object.keys(next).length > 0) {
+            copyNote._x = next;
           } else {
             delete copyNote._x;
           }
@@ -115,10 +126,10 @@ function copySequenceTab(seq: MnxSequence): MnxSequence {
 
 /**
  * A part should be exported as a notation+TAB pair when it declares tab
- * content (the single-source form with a part-level `_x.tab` extension whose
+ * content (the single-source form with a part-level `_x.mnxLab.tab` extension whose
  * staffKind asks for a tab view).
  */
 export function hasTabContent(part: MnxPart): boolean {
-  const kind = part._x?.tab?.staffKind;
+  const kind = part._x?.mnxLab?.tab?.staffKind;
   return kind === 'tab' || kind === 'both';
 }

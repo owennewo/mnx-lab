@@ -155,7 +155,7 @@ defs coverage report — not the folder names — is what makes the "covers the 
 | 21 | tab-positions | single note with position; open strings; chords (distinct strings); annotated vs heuristic-fallback versions of the same bar |
 | 22 | tab-fingering | left hand 1–4/T; right hand p-i-m-a |
 | 23 | tab-techniques | bend / pre-bend / bend-release; shift & legato slides; hammer-on / pull-off chains; vibrato — all `idRefs: true` |
-| 24 | tab-spec-gaps | **invalid-by-design exhibits**: TAB clef rejection; what MusicXML can say that MNX cannot; the open questions from `../../docs/tab-extension-spec.md`. This category is the w3c-cg/mnx#63 post in executable form |
+| 24 | tab-spec-gaps | **invalid-by-design exhibits**: TAB clef rejection; what MusicXML can say that MNX cannot; the open questions from `../../docs/mnx-extensions.md`. This category is the w3c-cg/mnx#63 post in executable form |
 | 90 | edge-cases | regressions and pathological inputs: overfull measures, pickup bars, recovered double barlines (grows as findings surface) |
 
 Where `lab/` categories overlap the spec's own example clusters (beams, slurs, repeats,

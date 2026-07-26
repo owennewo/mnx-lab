@@ -100,7 +100,7 @@ export const corpus: ScenarioEntry[] = buildEntries();
 
 export const corpusManifest = {
   mnxVersion: manifest.mnxSchemaVersion,
-  tabVersion: manifest.tabExtensionVersion,
+  extensionVersion: manifest.extensionVersion,
   categories: manifest.categories as Record<string, string>,
   specSynced: (manifest.specExamples as { synced?: string }).synced ?? ''
 };

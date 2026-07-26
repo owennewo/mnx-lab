@@ -7,6 +7,17 @@ export interface FlatXmlNode {
   voice?: string;
   note?: MnxNote;
   isChord?: boolean;
+  /**
+   * The MNX duration base/dots this node came from. `<duration>` alone is not
+   * enough to write MusicXML: `<type>`/`<dot>` carry the *notated* symbol
+   * (note head + flag + beaming), so they must be derived from the MNX
+   * duration rather than guessed.
+   */
+  base?: string;
+  dots?: number;
+  /** Lyrics from the event this node came from (MusicXML hangs them off the
+   *  note, MNX off the event). Written on the principal note only. */
+  lyrics?: import('../common/types.js').MnxEventLyrics;
 }
 
 /**
@@ -82,11 +93,19 @@ export function flattenSequences(
         measureCursor = item.onset;
       }
 
+      const base = item.event.duration.base;
+      const dots = item.event.duration.dots || 0;
+
       if (item.event.rest) {
         result.push({
           type: 'rest',
           duration: item.duration,
-          voice: voiceName
+          voice: voiceName,
+          base,
+          dots,
+          // Rests carry lyrics too — MusicXML allows `<lyric>` on any `<note>`,
+          // and most of Sun-did-glide's syllables sit on rests.
+          ...(item.event.lyrics ? { lyrics: item.event.lyrics } : {})
         });
         measureCursor += item.duration;
       } else if (item.event.notes && item.event.notes.length > 0) {
@@ -99,7 +118,11 @@ export function flattenSequences(
             duration: item.duration,
             voice: voiceName,
             note,
-            isChord
+            isChord,
+            base,
+            dots,
+            // MusicXML puts the lyric on the chord's principal note only.
+            ...(!isChord && item.event.lyrics ? { lyrics: item.event.lyrics } : {})
           });
         }
         measureCursor += item.duration;

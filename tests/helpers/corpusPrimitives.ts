@@ -57,7 +57,7 @@ export function computePrimitives(doc: MnxStructure): ScenarioPrimitives {
     }
   };
   const wantsTab = (doc.parts ?? []).some(p => {
-    const kind = p?._x?.tab?.staffKind;
+    const kind = p?._x?.mnxLab?.tab?.staffKind;
     return kind === 'tab' || kind === 'both';
   });
   if (wantsTab) {

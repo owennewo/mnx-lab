@@ -81,7 +81,7 @@ for the layout and `meta.json` schema.
 ## Cross-cutting (introduced with the editing phase, not v1)
 - **Storage — `DocumentRepository`** (IndexedDB via `idb-keyval`, key prefix `mnx-doc:`).
 - **`_x.tab` extension schema (v2, single-source)**, owned by `mnx-core` (P7) — see
-  `../../docs/tab-extension-spec.md`.
+  `../../docs/mnx-extensions.md`.
 - **Component events:** child→parent via bubbling `CustomEvent` with `composed: true`.
 
 ## Intentionally NOT in v1

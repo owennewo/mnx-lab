@@ -258,7 +258,7 @@ export class ScenarioHeader extends LitElement {
                     ? 'var(--st-rendered)'
                     : 'var(--st-gap)'}"
                 ></span>
-                _x.tab ${meta.expect.extension}
+                _x.mnxLab ${meta.expect.extension}
               </span>
             `
           : nothing}

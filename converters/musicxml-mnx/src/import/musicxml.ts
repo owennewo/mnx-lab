@@ -41,6 +41,13 @@ export function getChildFloat(parent: Element, tagName: string): number | null {
 
 export interface ImportOptions {
   mergeNotationAndTab?: boolean;
+  /**
+   * Called with a human-readable message for each problem found in the source
+   * document. Import is forgiving by design — malformed input is repaired where
+   * possible rather than throwing — so this is the only signal that the output
+   * may not faithfully represent the input.
+   */
+  onWarning?: (message: string) => void;
 }
 
 export function importMusicXML(
@@ -114,12 +121,34 @@ export function importMusicXML(
     }
   }
 
+  // Technique targets are id references; resolve them once ids are final
+  // (after any notation/TAB merge has assigned them).
+  aligner.linkTechniqueTargets(finalParts);
+
+  // 5. Report source defects that were repaired (or could not be)
+  const { malformedPitches, recoveredPitches } = aligner.stats;
+  if (malformedPitches > 0 && options.onWarning) {
+    const unrecovered = malformedPitches - recoveredPitches;
+    options.onWarning(
+      `${malformedPitches} note(s) had an unusable <pitch> (missing or invalid <step>). ` +
+        `${recoveredPitches} were reconstructed from tablature string/fret + tuning` +
+        (unrecovered > 0
+          ? `; ${unrecovered} could not be recovered and fell back to C4.`
+          : '.')
+    );
+  }
+
   return {
     mnx: {
       version: 1
     },
     global: {
-      measures: globalMeasures
+      measures: globalMeasures,
+      // Verse order, so consumers stack lines in the order the source declared
+      // them rather than however the line-id keys happen to sort.
+      ...(aligner.lyricLines.length > 0
+        ? { lyrics: { lineOrder: [...aligner.lyricLines] } }
+        : {})
     },
     parts: finalParts
   };

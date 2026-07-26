@@ -4,10 +4,16 @@ import { Primitive, DiagnosticKind } from '../primitives.ts';
  * Per-measure diagnostic markers: when something is wrong with a bar, it gets
  * a small badge at its bottom-left per issue, message riding along as a native
  * SVG `<title>` tooltip (hover works in the app and in static contact sheets
- * alike). Two visually distinct kinds:
+ * alike). Three visually distinct kinds:
  *
  *   - validation (red circle)        — the user can and should fix the document
+ *   - warning    (blue circle)       — legal and possibly intentional, but
+ *                                      ambiguous: consumers will disagree
  *   - render     (amber rounded box) — this renderer's limitation, not theirs
+ *
+ * Warning shares the circle shape with validation (both are about the
+ * document, not the renderer) but not its colour — a warning must not read as
+ * "you made a mistake".
  */
 
 export interface MeasureIssue {
@@ -22,8 +28,12 @@ const MARKER_DROP_SP = 1.2;    // below the bottom staff line
 
 const STYLE: Record<DiagnosticKind, { fill: string; radius: number; titlePrefix: string }> = {
   validation: { fill: '#b91c1c', radius: MARKER_SIZE_SP / 2, titlePrefix: 'validation — ' },
+  warning: { fill: '#1d4ed8', radius: MARKER_SIZE_SP / 2, titlePrefix: 'warning — ' },
   render: { fill: '#b45309', radius: 0.3, titlePrefix: 'renderer — ' }
 };
+
+/** Leftmost first: errors, then warnings, then renderer gaps. */
+const ORDER: Record<DiagnosticKind, number> = { validation: 0, warning: 1, render: 2 };
 
 export function emitMeasureDiagnostics(
   measureX: number,
@@ -32,9 +42,7 @@ export function emitMeasureDiagnostics(
   primitives: Primitive[]
 ): void {
   // Validation first (leftmost): it's the user-actionable kind.
-  const ordered = [...issues].sort((a, b) =>
-    a.kind === b.kind ? 0 : a.kind === 'validation' ? -1 : 1
-  );
+  const ordered = [...issues].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
   ordered.forEach((issue, i) => {
     const style = STYLE[issue.kind];
     const title = style.titlePrefix + issue.message;

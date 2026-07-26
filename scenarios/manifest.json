@@ -1,6 +1,6 @@
 {
   "mnxSchemaVersion": 19,
-  "tabExtensionVersion": 2,
+  "extensionVersion": 3,
   "categories": {
     "lab/document": "Document basics",
     "lab/pitches": "Pitches and accidentals",

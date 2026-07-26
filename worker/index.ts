@@ -6,7 +6,11 @@ import { Hono } from 'hono';
 import { buildEditSystemPrompt } from '../server/prompts/editNotation.js';
 import models from '../server/models.json';
 import validateMnx from './generated/validate-mnx.mjs';
-import { validateTabNote, validateTabPart } from './generated/validate-tab.mjs';
+import {
+  validateNoteExt,
+  validatePartExt,
+  validateGlobalMeasureExt
+} from './generated/validate-extensions.mjs';
 
 interface Env {
   OPENROUTER_API_KEY?: string;
@@ -63,31 +67,37 @@ function formatValidationErrors(errors: any[]): string {
 }
 
 /**
- * Second validation verdict: every `_x.tab` object in the document against
- * the tab extension v2 schema (docs/tab-extension-spec.md). Standard MNX
+ * Second validation verdict: every `_x.mnxLab` vendor dict in the document
+ * against the extension v3 schema (docs/mnx-extensions.md). Standard MNX
  * validity is deliberately blind to `_x` content, so this is a separate walk.
  * Returns formatted error strings (empty array = extension-valid).
  */
-function validateTabExtensions(doc: any): string[] {
+function validateLabExtensions(doc: any): string[] {
   const errors: string[] = [];
   const report = (path: string, subErrors: any[] | null) => {
     for (const err of subErrors ?? []) {
-      errors.push(`Tab extension: path "${path}${err.instancePath}" ${err.message}.`);
+      errors.push(`MNX Lab extension: path "${path}${err.instancePath}" ${err.message}.`);
     }
   };
 
+  (doc?.global?.measures ?? []).forEach((measure: any, mIdx: number) => {
+    if (measure?._x?.mnxLab !== undefined && !validateGlobalMeasureExt(measure._x.mnxLab)) {
+      report(`/global/measures/${mIdx}/_x/mnxLab`, validateGlobalMeasureExt.errors);
+    }
+  });
+
   (doc?.parts ?? []).forEach((part: any, pIdx: number) => {
-    if (part?._x?.tab !== undefined && !validateTabPart(part._x.tab)) {
-      report(`/parts/${pIdx}/_x/tab`, validateTabPart.errors);
+    if (part?._x?.mnxLab !== undefined && !validatePartExt(part._x.mnxLab)) {
+      report(`/parts/${pIdx}/_x/mnxLab`, validatePartExt.errors);
     }
     (part?.measures ?? []).forEach((measure: any, mIdx: number) => {
       (measure?.sequences ?? []).forEach((seq: any, sIdx: number) => {
         (seq?.content ?? []).forEach((event: any, eIdx: number) => {
           (event?.notes ?? []).forEach((note: any, nIdx: number) => {
-            if (note?._x?.tab !== undefined && !validateTabNote(note._x.tab)) {
+            if (note?._x?.mnxLab !== undefined && !validateNoteExt(note._x.mnxLab)) {
               report(
-                `/parts/${pIdx}/measures/${mIdx}/sequences/${sIdx}/content/${eIdx}/notes/${nIdx}/_x/tab`,
-                validateTabNote.errors
+                `/parts/${pIdx}/measures/${mIdx}/sequences/${sIdx}/content/${eIdx}/notes/${nIdx}/_x/mnxLab`,
+                validateNoteExt.errors
               );
             }
           });
@@ -422,15 +432,15 @@ app.post('/api/edit-notation', async (c) => {
               if (!updatedMnxJson || !updatedMnxJson.parts || updatedMnxJson.parts.length === 0) {
                 validationErrors = 'JSON structure is missing required root properties "mnx" or "parts".';
               } else {
-                // Two verdicts: standard MNX schema, then the tab extension
-                // schema over every _x.tab object. Both gate the retry loop.
+                // Two verdicts: standard MNX schema, then the extension schema
+                // over every `_x.mnxLab` dict. Both gate the retry loop.
                 const isValid = validateMnx(updatedMnxJson);
                 if (!isValid) {
                   validationErrors = formatValidationErrors(validateMnx.errors || []);
                 } else {
-                  const tabErrors = validateTabExtensions(updatedMnxJson);
-                  if (tabErrors.length > 0) {
-                    validationErrors = tabErrors.join('\n');
+                  const extErrors = validateLabExtensions(updatedMnxJson);
+                  if (extErrors.length > 0) {
+                    validationErrors = extErrors.join('\n');
                   }
                 }
               }

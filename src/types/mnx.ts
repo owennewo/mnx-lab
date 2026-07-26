@@ -4,7 +4,13 @@ export interface MnxPitch {
   alter?: number;
 }
 
-// ---- Tablature extension v2 (`_x.tab`) — see docs/tab-extension-spec.md ----
+// ---- MNX Lab extensions v3 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
+//
+// Everything this project carries that W3C MNX v19 cannot express lives under
+// ONE vendor key, `mnxLab`. The `_x` sub-key names an agent/vendor/community
+// (w3c-cg/mnx#429), not a feature — `_x.tab` (v2) squatted a generic token in a
+// shared namespace, so another app writing `_x.tab` for something else would
+// have made our own validator reject a legal document.
 
 export interface MnxTabPosition {
   /** String number; 1 = highest-pitched string. */
@@ -13,20 +19,33 @@ export interface MnxTabPosition {
   fret: number;
 }
 
+/** One control point on a bend curve. */
+export interface MnxBendPoint {
+  /** Fraction of the note's own duration: 0 = onset, 1 = release. */
+  position: number;
+  /** Offset from the written pitch in SEMITONES (MNX `pitch.alter` units). */
+  alter: number;
+}
+
 export interface MnxTabTechnique {
-  bend?: {
-    type: 'bend' | 'pre-bend';
-    amount: number;
-    release?: boolean;
-  };
+  /** A bend as a curve. A pre-bend is a first point at 0 with a non-zero
+   *  `alter`; a release is any later point whose `alter` decreases. */
+  bend?: { points: MnxBendPoint[] };
   slide?: {
-    type: 'shift' | 'legato' | 'slide-in' | 'slide-out';
+    type: 'shift' | 'legato' | 'slideIn' | 'slideOut';
     direction?: 'up' | 'down';
     target?: string;
   };
   hammerOn?: { target: string };
   pullOff?: { target: string };
   vibrato?: boolean;
+  /** Identified by touching pitch, not touching fret — that covers fretless
+   *  instruments and between-fret nodes (w3c-cg/mnx#179). */
+  harmonic?: {
+    type: 'natural' | 'artificial' | 'pinch' | 'tap' | 'semi' | 'feedback';
+    touchingPitch?: MnxPitch;
+  };
+  palmMute?: boolean;
 }
 
 export interface MnxTabNoteExtension {
@@ -36,6 +55,45 @@ export interface MnxTabNoteExtension {
     hand: 'left' | 'right';
     finger: string;
   };
+}
+
+/** A chord root or bass note: an MNX pitch minus the octave. */
+export interface MnxHarmonyStep {
+  step: MnxPitch['step'];
+  alter?: number;
+}
+
+export type MnxHarmonyQuality =
+  | 'major' | 'minor' | 'augmented' | 'diminished'
+  | 'dominantSeventh' | 'majorSeventh' | 'minorSeventh' | 'diminishedSeventh'
+  | 'augmentedSeventh' | 'halfDiminished' | 'majorMinor'
+  | 'majorSixth' | 'minorSixth'
+  | 'dominantNinth' | 'majorNinth' | 'minorNinth'
+  | 'dominantEleventh' | 'majorEleventh' | 'minorEleventh'
+  | 'dominantThirteenth' | 'majorThirteenth' | 'minorThirteenth'
+  | 'suspendedSecond' | 'suspendedFourth'
+  | 'neapolitan' | 'italian' | 'french' | 'german' | 'pedal' | 'power' | 'tristan'
+  | 'other' | 'none';
+
+/** One chord symbol on the global timeline. Structured (so it transposes) and
+ *  literal (so odd spellings survive) — the pattern the CG settled on for
+ *  dynamics. No duration: a chord lasts until the next one. */
+export interface MnxHarmony {
+  location: { fraction: [number, number] };
+  root?: MnxHarmonyStep;
+  quality: MnxHarmonyQuality;
+  bass?: MnxHarmonyStep;
+  degrees?: { value: number; alter?: number; type: 'add' | 'alter' | 'subtract' }[];
+  /** Display override; present only when the source's literal spelling differs
+   *  from what a consumer would render from the structure. */
+  text?: string;
+}
+
+/** A label attached to the start of a measure: `rehearsal` is an index into the
+ *  score ("A"), `section` names a formal unit of the piece ("Verse 1"). */
+export interface MnxMeasureLabel {
+  label: string;
+  location?: { fraction: [number, number] };
 }
 
 export interface MnxAccidentalDisplay {
@@ -58,7 +116,7 @@ export interface MnxNote {
   accidentalDisplay?: MnxAccidentalDisplay;
   ties?: MnxTie[];
   _x?: {
-    tab?: MnxTabNoteExtension;
+    mnxLab?: { tab?: MnxTabNoteExtension };
   };
 }
 
@@ -345,7 +403,7 @@ export interface MnxPart {
   staves?: number;
   measures: MnxPartMeasure[];
   _x?: {
-    tab?: MnxTabPartExtension;
+    mnxLab?: { tab?: MnxTabPartExtension };
   };
 }
 
@@ -410,6 +468,17 @@ export interface MnxGlobalMeasure {
       fraction: [number, number];
     };
   }[];
+  /** Vendor extensions. `rehearsal` is an index into the score ("A"),
+   *  `section` names a formal unit of the piece ("Verse 1"), `harmonies` are
+   *  chord symbols. Standard MNX has no field for any of the three; `_x` is
+   *  declared in the schema's `global-attrs`. See docs/mnx-extensions.md. */
+  _x?: {
+    mnxLab?: {
+      rehearsal?: MnxMeasureLabel;
+      section?: MnxMeasureLabel;
+      harmonies?: MnxHarmony[];
+    };
+  };
 }
 
 /** One node of a layout's content tree: a staff drawing from part sources,

@@ -3,62 +3,72 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { importMusicXML } from '../src/index.js';
 
+/**
+ * MusicXML -> MNX import shape.
+ *
+ * The `.xml` fixtures are DERIVED: the corpus is authored as Guitar Pro (`.gpx`)
+ * and MusicXML is generated from the MNX. So these assert the invariants of the
+ * import pipeline — single-source part, no TAB clef, tab data on the notes —
+ * rather than counts that move whenever a fixture is re-exported.
+ */
 describe('MusicXML -> MNX Import Pipeline', () => {
-  it('should parse House-of-the-Rising-Sun.xml into a single-source part with _x.tab annotations', async () => {
+  it('parses a two-staff MusicXML file into a single-source part with _x.mnxLab.tab annotations', async () => {
     const xmlPath = path.resolve(__dirname, '../../../server/scores/House-of-the-Rising-Sun.xml');
     const xmlContent = await fs.readFile(xmlPath, 'utf-8');
 
     const mnx = importMusicXML(xmlContent, { mergeNotationAndTab: true });
 
-    // Assert overall structure
     expect(mnx.mnx.version).toBe(1);
     expect(mnx.global.measures.length).toBeGreaterThan(0);
-    expect(mnx.parts.length).toBe(1);
 
+    // The notation + TAB staff pair collapses to ONE part.
+    expect(mnx.parts.length).toBe(1);
     const guitarPart = mnx.parts[0];
     expect(guitarPart.name).toBe('Guitar');
+    // The `-std` suffix belongs to the split MusicXML, never to the MNX.
+    expect(guitarPart.id).not.toMatch(/-(std|tab)$/);
 
-    // Verify global key and time signature inherit correctly
+    // Key and time reach global.measures.
     expect(mnx.global.measures[0].key?.fifths).toBe(0);
-    expect(mnx.global.measures[1].time?.count).toBe(4);
-    expect(mnx.global.measures[1].time?.unit).toBe(4);
+    expect(mnx.global.measures.some(m => m.time)).toBe(true);
 
-    // Single-source: ONE staff, ONE clef (treble), and never a TAB clef —
-    // tab-ness is the part-level view declaration.
-    const firstMeasure = guitarPart.measures[0];
-    expect(firstMeasure.clefs).toBeDefined();
-    expect(firstMeasure.clefs!.length).toBe(1);
-    expect(firstMeasure.clefs![0].clef.sign).toBe('G');
+    // Single-source: real clefs only, and never a TAB clef (invalid MNX — tab
+    // is a part-level view declaration).
+    expect(guitarPart.measures[0].clefs?.[0].clef.sign).toBe('G');
     for (const measure of guitarPart.measures) {
-      for (const c of measure.clefs ?? []) {
-        expect(c.clef.sign).not.toBe('TAB');
-      }
+      for (const c of measure.clefs ?? []) expect(c.clef.sign).not.toBe('TAB');
     }
-    expect(guitarPart._x?.tab?.staffKind).toBe('both');
+    expect(guitarPart._x?.mnxLab?.tab?.staffKind).toBe('both');
 
-    // Part-level tuning: explicit string numbers, standard guitar tuning
-    const tuning = guitarPart._x?.tab?.tuning;
+    // Part-level tuning: explicit string numbers, standard guitar tuning.
+    const tuning = guitarPart._x?.mnxLab?.tab?.tuning;
     expect(tuning).toBeDefined();
     expect(tuning!.length).toBe(6);
     const byString = new Map(tuning!.map(t => [t.string, t.pitch]));
-    expect(byString.get(1)).toMatchObject({ step: 'E', octave: 4 }); // string 1 = highest
-    expect(byString.get(6)).toMatchObject({ step: 'E', octave: 2 }); // string 6 = lowest
+    expect(byString.get(1)).toMatchObject({ step: 'E', octave: 4 }); // 1 = highest
+    expect(byString.get(6)).toMatchObject({ step: 'E', octave: 2 }); // 6 = lowest
 
-    // Verify measure 2 (index 1): one staff, two voices
-    const secondMeasure = guitarPart.measures[1];
-    expect(secondMeasure.sequences.length).toBe(2); // 2 voices, single staff
+    // Every pitched note carries its fingerboard position on the SAME note.
+    let notes = 0;
+    let positioned = 0;
+    for (const measure of guitarPart.measures)
+      for (const sequence of measure.sequences)
+        for (const event of sequence.content)
+          for (const note of event.notes ?? []) {
+            notes++;
+            if (note._x?.mnxLab?.tab?.position) positioned++;
+          }
+    expect(notes).toBeGreaterThan(0);
+    expect(positioned).toBe(notes);
+  });
 
-    const voice1 = secondMeasure.sequences.find(s => s.voice === 'v1');
-    expect(voice1).toBeDefined();
+  it('keeps the notation and TAB parts separate when merging is disabled', async () => {
+    const xmlPath = path.resolve(__dirname, '../../../server/scores/House-of-the-Rising-Sun.xml');
+    const xmlContent = await fs.readFile(xmlPath, 'utf-8');
 
-    // Voice 1 note 1: sounding pitch A2 (written A3 transposed down an octave)
-    // carrying its fingerboard position on the SAME note.
-    const note1 = voice1!.content[0].notes?.[0];
-    expect(note1).toBeDefined();
-    expect(note1!.pitch.step).toBe('A');
-    expect(note1!.pitch.octave).toBe(2);
-    expect(note1!._x?.tab?.position?.fret).toBe(0);
-    expect(note1!._x?.tab?.position?.string).toBe(5);
-    expect(note1!.id).toBeDefined();
+    const mnx = importMusicXML(xmlContent, { mergeNotationAndTab: false });
+    expect(mnx.parts.length).toBe(2);
+    // Exactly one of them declares itself the tab staff.
+    expect(mnx.parts.filter(p => p._x?.mnxLab?.tab?.staffKind === 'tab').length).toBe(1);
   });
 });

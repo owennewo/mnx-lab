@@ -10,7 +10,7 @@ pitch-to-line mapping) makes no conceptual sense for a tab staff, which has no p
 axis. That second wrinkle is itself telling: the clef object's shape assumes pitched
 staves throughout.
 
-Our position (see [docs/tab-extension-spec.md](../../../../docs/tab-extension-spec.md)):
+Our position (see [docs/mnx-extensions.md](../../../../docs/mnx-extensions.md)):
 this is the *right* rejection for the wrong reason. Tab is a **view** of the same
 semantic content, not a different clef — so the fix is not adding `TAB` to the enum but
 giving MNX a way to declare staff presentation. Until the spec has one, the `_x.tab`

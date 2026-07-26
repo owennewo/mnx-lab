@@ -677,7 +677,7 @@ export class MnxEditorApp extends LitElement {
           ${brandMark(20)}
           <span class="wm-t">MNX <em>Lab</em></span>
         </button>
-        <span class="env-chip">MNX v${corpusManifest.mnxVersion} · _x.tab v${corpusManifest.tabVersion}</span>
+        <span class="env-chip">MNX v${corpusManifest.mnxVersion} · _x.mnxLab v${corpusManifest.extensionVersion}</span>
         <div class="hdr-spacer"></div>
         <button class="metric-chip" title="Open the coverage dashboard" @click=${this.goHome}>
           <span class="mdot"></span>
@@ -756,7 +756,7 @@ export class MnxEditorApp extends LitElement {
 
       <footer class="ftr">
         <span>
-          MNX v${corpusManifest.mnxVersion} · _x.tab v${corpusManifest.tabVersion} ·
+          MNX v${corpusManifest.mnxVersion} · _x.mnxLab v${corpusManifest.extensionVersion} ·
           ${corpus.length} scenarios · spec/ synced ${corpusManifest.specSynced}
         </span>
         <span class="sel-info">${this.renderSelectionInfo(hasPage, canRender)}</span>
@@ -889,7 +889,7 @@ export class MnxEditorApp extends LitElement {
         <div class="emb-foot">
           <span class="emb-ver">
             MNX v${corpusManifest.mnxVersion}${entry.hasTab
-              ? ` · _x.tab v${corpusManifest.tabVersion}`
+              ? ` · _x.mnxLab v${corpusManifest.extensionVersion}`
               : ''}
           </span>
           <a href="/" target="_blank" rel="noopener">open in MNX Lab ↗</a>
@@ -915,7 +915,7 @@ export class MnxEditorApp extends LitElement {
             defs
           </span>
           <span class="emb-spacer"></span>
-          <span class="emb-id">MNX v${corpusManifest.mnxVersion} · _x.tab v${corpusManifest.tabVersion}</span>
+          <span class="emb-id">MNX v${corpusManifest.mnxVersion} · _x.mnxLab v${corpusManifest.extensionVersion}</span>
         </div>
         <div class="emb-mid">
           <mnx-library-rail

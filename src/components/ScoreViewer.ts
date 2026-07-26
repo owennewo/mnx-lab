@@ -319,7 +319,7 @@ export class ScoreViewer extends LitElement {
 
     this.container.innerHTML = '';
     if (this.viewMode === 'tab') {
-      const pane = this.appendPane(this.hasTab ? 'tab · _x.tab' : null);
+      const pane = this.appendPane(this.hasTab ? 'tab · _x.mnxLab.tab' : null);
       guarded(pane, 'tab', () => renderMnxToSvgTab({ container: pane, ...commonOpts }));
     } else if (this.viewMode === 'notation') {
       const pane = this.appendPane(this.hasTab ? 'notation' : null);
@@ -331,7 +331,7 @@ export class ScoreViewer extends LitElement {
       const gap = document.createElement('div');
       gap.className = 'both-gap';
       this.container.appendChild(gap);
-      const tabPane = this.appendPane('tab · _x.tab');
+      const tabPane = this.appendPane('tab · _x.mnxLab.tab');
       guarded(notationPane, 'notation', () =>
         renderMnxToSvgNotation({ container: notationPane, ...commonOpts })
       );

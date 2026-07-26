@@ -3,7 +3,7 @@ import { MnxDocument, MnxStructure } from '../types/mnx.ts';
 import { documentRepository } from '../utils/indexedDbRepository.ts';
 import { defaultScore } from '../utils/defaultScore.ts';
 import { upgradeTabExtension } from '../utils/upgradeTabExtension.ts';
-import houseOfRisingSunJson from '../../server/scores/House-of-the-Rising-Sun.json';
+import houseOfRisingSunJson from '../../server/scores/House-of-the-Rising-Sun.mnx.json';
 
 export class DocumentController implements ReactiveController {
   host: ReactiveControllerHost;
@@ -86,14 +86,15 @@ export class DocumentController implements ReactiveController {
   }
 
   /**
-   * Upgrades documents saved with the deprecated v1 guitar extension
-   * (_x.guitar / TAB clefs / duplicated tab staff) to the v2 single-source
-   * _x.tab form on load, and persists the upgrade so it runs once per doc.
+   * Upgrades documents saved with an older extension version — v1
+   * (`_x.guitar` / TAB clefs / duplicated tab staff) or v2 (`_x.tab`,
+   * `_x.section`) — to the current `_x.mnxLab` form on load, and persists the
+   * upgrade so it runs once per doc.
    */
   private upgraded(doc: MnxDocument): MnxDocument {
     const upgradedJson = upgradeTabExtension(doc.mnxJson);
     if (upgradedJson === doc.mnxJson) return doc;
-    console.log(`Upgraded document "${doc.name}" to tab extension v2`);
+    console.log(`Upgraded document "${doc.name}" to extension v3`);
     const upgradedDoc = { ...doc, mnxJson: upgradedJson };
     documentRepository.save(upgradedDoc).catch(e =>
       console.error('Failed to persist tab extension upgrade', e)
@@ -167,16 +168,18 @@ export class DocumentController implements ReactiveController {
               id: 'part-1',
               name: 'Guitar',
               _x: {
-                tab: {
-                  tuning: [
-                    { string: 1, pitch: { step: 'E', octave: 4 } },
-                    { string: 2, pitch: { step: 'B', octave: 3 } },
-                    { string: 3, pitch: { step: 'G', octave: 3 } },
-                    { string: 4, pitch: { step: 'D', octave: 3 } },
-                    { string: 5, pitch: { step: 'A', octave: 2 } },
-                    { string: 6, pitch: { step: 'E', octave: 2 } }
-                  ],
-                  staffKind: 'both'
+                mnxLab: {
+                  tab: {
+                    tuning: [
+                      { string: 1, pitch: { step: 'E', octave: 4 } },
+                      { string: 2, pitch: { step: 'B', octave: 3 } },
+                      { string: 3, pitch: { step: 'G', octave: 3 } },
+                      { string: 4, pitch: { step: 'D', octave: 3 } },
+                      { string: 5, pitch: { step: 'A', octave: 2 } },
+                      { string: 6, pitch: { step: 'E', octave: 2 } }
+                    ],
+                    staffKind: 'both'
+                  }
                 }
               },
               measures: [

@@ -2,7 +2,7 @@
 
 A test bench for the developing [W3C MNX](https://w3c.github.io/mnx/docs/) music
 notation format, with a particular emphasis on guitar tab via the single-source
-`_x.tab` vendor extension ([spec](docs/tab-extension-spec.md)). Renders MNX JSON
+`_x.mnxLab` vendor extensions ([spec](docs/mnx-extensions.md)). Renders MNX JSON
 as standard notation and tab with a custom SMuFL/SVG engine, plays it back with
 Tone.js, and includes an LLM-powered chat-to-edit workflow with self-correcting
 dual schema validation (standard MNX + tab extension).

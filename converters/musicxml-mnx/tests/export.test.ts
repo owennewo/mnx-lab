@@ -11,7 +11,7 @@ describe('Bi-directional Roundtrip Pipeline', () => {
     // 1. Initial Import (MusicXML -> single-source MNX)
     const mnx1 = importMusicXML(originalXml, { mergeNotationAndTab: true });
     expect(mnx1.parts.length).toBe(1);
-    expect(mnx1.parts[0]._x?.tab?.staffKind).toBe('both');
+    expect(mnx1.parts[0]._x?.mnxLab?.tab?.staffKind).toBe('both');
 
     // 2. Export back to MusicXML (MNX -> MusicXML). The notation+TAB staff
     // pair is synthesized at the MusicXML boundary from the single source.
@@ -32,10 +32,10 @@ describe('Bi-directional Roundtrip Pipeline', () => {
     const part2 = mnx2.parts[0];
     expect(part2.name).toBe(part1.name);
     expect(part2.measures.length).toBe(part1.measures.length);
-    expect(part2._x?.tab?.staffKind).toBe('both');
+    expect(part2._x?.mnxLab?.tab?.staffKind).toBe('both');
 
     // Verify tuning roundtripped (explicit string numbers)
-    const tuning2 = part2._x?.tab?.tuning;
+    const tuning2 = part2._x?.mnxLab?.tab?.tuning;
     expect(tuning2).toBeDefined();
     expect(tuning2!.length).toBe(6);
     const byString = new Map(tuning2!.map(t => [t.string, t.pitch]));
@@ -67,8 +67,8 @@ describe('Bi-directional Roundtrip Pipeline', () => {
     const note1_2 = seq2.content[0].notes?.[0]!;
     expect(note1_2.pitch.step).toBe(note1_1.pitch.step);
     expect(note1_2.pitch.octave).toBe(note1_1.pitch.octave);
-    expect(note1_2._x?.tab?.position?.fret).toBe(note1_1._x?.tab?.position?.fret);
-    expect(note1_2._x?.tab?.position?.string).toBe(note1_1._x?.tab?.position?.string);
+    expect(note1_2._x?.mnxLab?.tab?.position?.fret).toBe(note1_1._x?.mnxLab?.tab?.position?.fret);
+    expect(note1_2._x?.mnxLab?.tab?.position?.string).toBe(note1_1._x?.mnxLab?.tab?.position?.string);
 
     // IDs roundtripped perfectly (regenerated deterministically; _std/_tab
     // suffixes only ever exist inside the exported MusicXML)

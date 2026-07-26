@@ -23,6 +23,24 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
 ## Contents
 
 ### proposed/
+- **[mnx-cg-proposals.md](proposed/mnx-cg-proposals.md)** — **where** chord symbols, section
+  labels and technique should live, designed to be adoptable by the MNX CG rather than to stay
+  private `_x` fields. Checked against the CG's live issues: #109 chord symbols, #112/#377
+  rehearsal marks (the spec editor asked for a proposal and nobody wrote one), #63 guitar tab,
+  #110 fretboard diagrams — all open, all unclaimed. Derives an acceptance template from the
+  dynamics rework (#518, proposed → merged in three weeks). **The designs are now built**
+  (`_x.mnxLab` v3 — see [docs/mnx-extensions.md](../docs/mnx-extensions.md)); what is left here
+  is the outward half: join the CG, sign the CLA, and post the three proposals.
+- **[chord-symbols.md](proposed/chord-symbols.md)** — chord symbols. **Data path shipped**
+  (2026-07-26) as `global.measures[i]._x.mnxLab.harmonies[]`: structured *and* literal, read
+  from Guitar Pro `beat.text` **and** `Chord` objects, written and read as MusicXML
+  `<harmony>`, lossless both ways (`Vestapol` 25, `House-of-the-Rising-Sun` 14). Remaining:
+  **rendering** — nothing draws a chord symbol yet.
+- **[guitar-technique.md](proposed/guitar-technique.md)** — playing technique. **Data path
+  complete** (2026-07-26): hammer-ons, pull-offs, slides, vibrato, **harmonics** and **palm
+  mute** all survive `MNX ⇄ .gp` and `MNX ⇄ MusicXML`, and bends are now **curves**
+  (`points: [{position, alter}]` in semitones) rather than a single interval that flattened
+  anything more elaborate. Remaining: **rendering** — nothing draws technique yet.
 - **[render-density-zoom.md](proposed/render-density-zoom.md)** — configurable horizontal +
   vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
   in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
@@ -32,6 +50,15 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   **voice/transcription stage was never built**. What's left here is the voice half.
 
 ### inprogress/
+- **[guitar-pro.md](inprogress/guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion, built at
+  `converters/guitarpro-mnx/` using **alphaTab** as a headless format codec (no binary parsing
+  hand-written). Reads gp3/gp4/gp5/gpx/gp, writes `.gp` (GP7 — the only format anything can
+  still write). The score corpus is now **authored as `.gpx`**, with `.mnx.json` and `.xml`
+  derived from it. `MNX → .gp → MNX` round-trips **all three reference scores with zero
+  differences** — notes, technique, lyrics, repeats, voltas, tuning, capo, key — schema-valid.
+  Harmonics, palm mute and chord symbols now travel too (v3 of the extension). Left:
+  tuplets/grace, ties/staccato, a third-party gp3/gp4/gp5 import fixture, and manual
+  acceptance in Guitar Pro.
 - **[04-scenario-library.md](inprogress/04-scenario-library.md)** — the scenario corpus
   structure (`spec/` + `lab/`, path-derived ids, `meta.json`, `expected.primitives.json`,
   `check-scenarios.mjs`). The one clean-room doc that describes *current* reality; the corpus
@@ -68,5 +95,5 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
 
 ## Not here (reference docs, left in place)
 
-`CLAUDE.md`, `README.md`, `SVG_RENDERING_ENGING.md`, `docs/tab-extension-spec.md`,
+`CLAUDE.md`, `README.md`, `SVG_RENDERING_ENGING.md`, `docs/mnx-extensions.md`,
 `schemas/HISTORY.md`, `research/mnx_format.md` — these are current reference, not plans.
