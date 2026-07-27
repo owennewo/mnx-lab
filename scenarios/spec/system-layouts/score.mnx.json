@@ -27,6 +27,44 @@
       }
     ]
   },
+  "parts": [
+    {
+      "name": "Flute 1",
+      "id": "fl1",
+      "shortName": "1",
+      "measures": []
+    },
+    {
+      "name": "Flute 2",
+      "id": "fl2",
+      "shortName": "2",
+      "measures": []
+    },
+    {
+      "name": "Flute 3",
+      "id": "fl3",
+      "shortName": "3",
+      "measures": []
+    },
+    {
+      "name": "Oboe 1",
+      "id": "ob1",
+      "shortName": "1",
+      "measures": []
+    },
+    {
+      "name": "Oboe 2",
+      "id": "ob2",
+      "shortName": "2",
+      "measures": []
+    },
+    {
+      "name": "Piano",
+      "id": "piano",
+      "staves": 2,
+      "measures": []
+    }
+  ],
   "layouts": [
     {
       "id": "layout1",
@@ -34,22 +72,25 @@
         {
           "type": "group",
           "barlineStyle": "unified",
+          "symbol": "bracket",
           "content": [
             {
               "type": "group",
+              "symbol": "brace",
+              "label": "Flutes",
               "content": [
                 {
                   "type": "staff",
                   "sources": [
                     {
-                      "labelref": "shortName",
                       "part": "fl1",
-                      "stem": "up"
+                      "stem": "up",
+                      "labelref": "shortName"
                     },
                     {
-                      "labelref": "shortName",
                       "part": "fl2",
-                      "stem": "down"
+                      "stem": "down",
+                      "labelref": "shortName"
                     }
                   ]
                 },
@@ -62,31 +103,30 @@
                     }
                   ]
                 }
-              ],
-              "label": "Flutes",
-              "symbol": "brace"
+              ]
             },
             {
               "type": "staff",
               "label": "Oboes",
               "sources": [
                 {
-                  "labelref": "shortName",
                   "part": "ob1",
-                  "stem": "up"
+                  "stem": "up",
+                  "labelref": "shortName"
                 },
                 {
-                  "labelref": "shortName",
                   "part": "ob2",
-                  "stem": "down"
+                  "stem": "down",
+                  "labelref": "shortName"
                 }
               ]
             }
-          ],
-          "symbol": "bracket"
+          ]
         },
         {
           "type": "group",
+          "symbol": "brace",
+          "label": "Piano",
           "content": [
             {
               "type": "staff",
@@ -106,9 +146,7 @@
                 }
               ]
             }
-          ],
-          "label": "Piano",
-          "symbol": "brace"
+          ]
         }
       ]
     },
@@ -118,9 +156,12 @@
         {
           "type": "group",
           "barlineStyle": "unified",
+          "symbol": "bracket",
           "content": [
             {
               "type": "group",
+              "symbol": "brace",
+              "label": "Fl.",
               "content": [
                 {
                   "type": "staff",
@@ -149,31 +190,30 @@
                     }
                   ]
                 }
-              ],
-              "label": "Fl.",
-              "symbol": "brace"
+              ]
             },
             {
               "type": "staff",
               "label": "Ob.",
               "sources": [
                 {
-                  "labelref": "shortName",
                   "part": "ob1",
-                  "stem": "up"
+                  "stem": "up",
+                  "labelref": "shortName"
                 },
                 {
-                  "labelref": "shortName",
                   "part": "ob2",
-                  "stem": "down"
+                  "stem": "down",
+                  "labelref": "shortName"
                 }
               ]
             }
-          ],
-          "symbol": "bracket"
+          ]
         },
         {
           "type": "group",
+          "symbol": "brace",
+          "label": "Piano",
           "content": [
             {
               "type": "staff",
@@ -193,49 +233,9 @@
                 }
               ]
             }
-          ],
-          "label": "Piano",
-          "symbol": "brace"
+          ]
         }
       ]
-    }
-  ],
-  "parts": [
-    {
-      "id": "fl1",
-      "measures": [],
-      "name": "Flute 1",
-      "shortName": "1"
-    },
-    {
-      "id": "fl2",
-      "measures": [],
-      "name": "Flute 2",
-      "shortName": "2"
-    },
-    {
-      "id": "fl3",
-      "measures": [],
-      "name": "Flute 3",
-      "shortName": "3"
-    },
-    {
-      "id": "ob1",
-      "measures": [],
-      "name": "Oboe 1",
-      "shortName": "1"
-    },
-    {
-      "id": "ob2",
-      "measures": [],
-      "name": "Oboe 2",
-      "shortName": "2"
-    },
-    {
-      "id": "piano",
-      "measures": [],
-      "name": "Piano",
-      "staves": 2
     }
   ],
   "scores": [
@@ -245,12 +245,12 @@
         {
           "systems": [
             {
-              "layout": "layout1",
-              "measure": "m1"
+              "measure": "m1",
+              "layout": "layout1"
             },
             {
-              "layout": "layout2",
-              "measure": "m4"
+              "measure": "m4",
+              "layout": "layout2"
             }
           ]
         }

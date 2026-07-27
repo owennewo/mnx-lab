@@ -37,6 +37,8 @@ export function createContext() {
   return {
     manifest: readJson(path.join(SCENARIOS_DIR, 'manifest.json')),
     mnxDefs: new Set(Object.keys(mnxSchema.$defs ?? {})),
+    // The trailing segment of the schema's $id: ".../mnx-schema.json/version/19".
+    mnxSchemaVersion: /\/version\/(\d+)$/.exec(mnxSchema.$id ?? '')?.[1] ?? null,
     validateMnx: ajv.compile(mnxSchema),
     validateMeta: ajv.compile(metaSchema),
     validateNoteExt: ajv.getSchema(`${extSchema.$id}#/$defs/note-ext`),

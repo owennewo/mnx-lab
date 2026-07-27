@@ -1,10 +1,4 @@
 {
-  "mnx": {
-    "support": {
-      "useAccidentalDisplay": true
-    },
-    "version": 1
-  },
   "global": {
     "measures": [
       {
@@ -17,6 +11,12 @@
       {},
       {}
     ]
+  },
+  "mnx": {
+    "support": {
+      "useAccidentalDisplay": true
+    },
+    "version": 1
   },
   "parts": [
     {

@@ -35,8 +35,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -48,8 +48,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       },
                       "ties": [
                         {
@@ -65,11 +65,11 @@
                   },
                   "notes": [
                     {
-                      "id": "note3",
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
-                      }
+                        "step": "E",
+                        "octave": 5
+                      },
+                      "id": "note3"
                     }
                   ]
                 },
@@ -80,8 +80,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       },
                       "ties": [
                         {
@@ -105,11 +105,11 @@
                   },
                   "notes": [
                     {
-                      "id": "note5",
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       },
+                      "id": "note5",
                       "ties": [
                         {
                           "target": "note6"
@@ -124,11 +124,11 @@
                   },
                   "notes": [
                     {
-                      "id": "note6",
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
-                      }
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "note6"
                     }
                   ]
                 }

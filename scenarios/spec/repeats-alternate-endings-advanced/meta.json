@@ -27,6 +27,8 @@
     "pitch",
     "positioned-clef",
     "positive-integer",
+    "repeat-end",
+    "repeat-start",
     "root",
     "sequence",
     "staff-position",

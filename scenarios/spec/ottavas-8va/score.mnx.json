@@ -30,6 +30,13 @@
           ],
           "ottavas": [
             {
+              "value": 1,
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
               "end": {
                 "measure": "m2",
                 "position": {
@@ -38,14 +45,7 @@
                     2
                   ]
                 }
-              },
-              "position": {
-                "fraction": [
-                  1,
-                  2
-                ]
-              },
-              "value": 1
+              }
             }
           ],
           "sequences": [
@@ -58,8 +58,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -71,8 +71,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -84,8 +84,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 7,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 7
                       }
                     }
                   ]
@@ -105,8 +105,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 7,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 7
                       }
                     }
                   ]
@@ -118,8 +118,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 7,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 7
                       }
                     }
                   ]
@@ -131,8 +131,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 6,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 6
                       }
                     }
                   ]

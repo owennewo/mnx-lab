@@ -1,9 +1,9 @@
 {
   "mnx": {
+    "version": 1,
     "support": {
       "useBeams": true
-    },
-    "version": 1
+    }
   },
   "global": {
     "measures": [
@@ -61,8 +61,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -75,8 +75,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -97,8 +97,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -111,8 +111,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "F"
+                        "step": "F",
+                        "octave": 5
                       }
                     }
                   ]

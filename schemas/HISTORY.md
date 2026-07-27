@@ -6,9 +6,24 @@ This file documents the version history, updates, and origins of the MNX JSON sc
 
 - **Schema Version:** `version/19` (per the schema's `$id`)
 - **Schema Source:** [W3C Music Notation Community Group - MNX GitHub Repository](https://github.com/w3c-cg/mnx)
-- **Direct Link:** `https://raw.githubusercontent.com/w3c-cg/mnx/main/docs/mnx-schema.json`
-- **Retrieved On:** 2026-07-17
+- **Upstream Revision:** [`e41322cb`](https://github.com/w3c-cg/mnx/commit/e41322cb9794d7e1dd5e25e9f4475a847d114f1b)
+  ("Expanded encoding for dynamics", 2026-06-16) — the commit the `vendor/mnx`
+  submodule is pinned to. `mnx-schema.json` here is **byte-identical** to that
+  commit's `docs/mnx-schema.json`, verified 2026-07-27.
 - **Format Standard:** JSON Schema Draft 2020-12
+
+> **Upstream is ahead: `version/24` as of 2026-07-21.** Versions 20–24 are all
+> dynamics work (expanded dynamics range, dynamic groups gaining
+> `visuallyContinues` / `accentPrefix` / `accentSuffix` / `staffEnd`, and
+> `type='accent'` moving to `residualValue`). Bumping means moving the submodule
+> pin, re-vendoring `docs/mnx-schema.json`, `npm run compile-validator` and
+> `npm run sync:spec` — deliberately, as one change.
+
+**The schema is generated, not authored.** Upstream keeps the spec in a Django
+database; `docs/mnx-schema.json` is emitted by `manage.py makesite` from those
+records, and its `$id` version comes from the `spectools.xmlschema.version`
+field. So a schema change upstream is a change to `doctools/data.json`, never a
+hand-edit of the JSON. See [docs/mnx-spec-submodule.md](../docs/mnx-spec-submodule.md).
 
 ## Key Architecture & Features
 

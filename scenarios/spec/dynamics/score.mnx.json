@@ -1,7 +1,4 @@
 {
-  "mnx": {
-    "version": 1
-  },
   "global": {
     "measures": [
       {
@@ -11,6 +8,9 @@
         }
       }
     ]
+  },
+  "mnx": {
+    "version": 1
   },
   "parts": [
     {

@@ -35,8 +35,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 4
                       }
                     }
                   ]
@@ -48,8 +48,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 3,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 3
                       }
                     }
                   ]
@@ -65,8 +65,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -78,8 +78,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "F"
+                        "step": "F",
+                        "octave": 5
                       }
                     }
                   ]
@@ -91,8 +91,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 5
                       }
                     }
                   ]
@@ -104,8 +104,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "B"
+                        "step": "B",
+                        "octave": 4
                       }
                     }
                   ]
@@ -125,8 +125,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 4
                       }
                     }
                   ]
@@ -142,8 +142,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -155,8 +155,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -168,8 +168,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 6,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 6
                       }
                     }
                   ]

@@ -1,9 +1,9 @@
 {
   "mnx": {
+    "version": 1,
     "support": {
       "useAccidentalDisplay": true
-    },
-    "version": 1
+    }
   },
   "global": {
     "measures": [
@@ -19,12 +19,203 @@
       }
     ]
   },
+  "parts": [
+    {
+      "id": "organ",
+      "staves": 3,
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "staff": 1,
+              "voice": "Main",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "rest": {}
+                },
+                {
+                  "id": "main1",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "main2",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 4,
+                        "alter": 1
+                      },
+                      "accidentalDisplay": {
+                        "show": true
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "main3",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 4
+                      },
+                      "accidentalDisplay": {
+                        "show": true
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "staff": 1,
+              "voice": "Oberwerk",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "rest": {}
+                },
+                {
+                  "id": "ober1",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "B",
+                        "octave": 3,
+                        "alter": -1
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ober2",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 3
+                      },
+                      "accidentalDisplay": {
+                        "show": true
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "ober3",
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "staff": 2,
+              "voice": "Hauptwerk",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half",
+                    "dots": 1
+                  },
+                  "rest": {}
+                }
+              ]
+            },
+            {
+              "staff": 3,
+              "voice": "Pedal",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half",
+                    "dots": 1
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 3,
+                        "alter": -1
+                      },
+                      "ties": [
+                        {
+                          "target": "pedNote2"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "layouts": [
     {
       "id": "organ3Staff",
       "content": [
         {
           "type": "group",
+          "symbol": "brace",
           "content": [
             {
               "type": "staff",
@@ -44,8 +235,7 @@
                 }
               ]
             }
-          ],
-          "symbol": "brace"
+          ]
         },
         {
           "type": "staff",
@@ -69,13 +259,13 @@
               "sources": [
                 {
                   "part": "organ",
-                  "stem": "up",
-                  "voice": "Main"
+                  "voice": "Main",
+                  "stem": "up"
                 },
                 {
                   "part": "organ",
-                  "stem": "down",
-                  "voice": "Oberwerk"
+                  "voice": "Oberwerk",
+                  "stem": "down"
                 }
               ]
             },
@@ -102,196 +292,6 @@
       ]
     }
   ],
-  "parts": [
-    {
-      "id": "organ",
-      "measures": [
-        {
-          "clefs": [
-            {
-              "clef": {
-                "sign": "G",
-                "staffPosition": -2
-              }
-            }
-          ],
-          "sequences": [
-            {
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                },
-                {
-                  "duration": {
-                    "base": "eighth"
-                  },
-                  "rest": {}
-                },
-                {
-                  "id": "main1",
-                  "duration": {
-                    "base": "eighth"
-                  },
-                  "notes": [
-                    {
-                      "pitch": {
-                        "octave": 4,
-                        "step": "G"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "id": "main2",
-                  "duration": {
-                    "base": "eighth"
-                  },
-                  "notes": [
-                    {
-                      "accidentalDisplay": {
-                        "show": true
-                      },
-                      "pitch": {
-                        "alter": 1,
-                        "octave": 4,
-                        "step": "F"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "id": "main3",
-                  "duration": {
-                    "base": "eighth"
-                  },
-                  "notes": [
-                    {
-                      "accidentalDisplay": {
-                        "show": true
-                      },
-                      "pitch": {
-                        "octave": 4,
-                        "step": "A"
-                      }
-                    }
-                  ]
-                }
-              ],
-              "staff": 1,
-              "voice": "Main"
-            },
-            {
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                },
-                {
-                  "duration": {
-                    "base": "eighth"
-                  },
-                  "rest": {}
-                },
-                {
-                  "id": "ober1",
-                  "duration": {
-                    "base": "eighth"
-                  },
-                  "notes": [
-                    {
-                      "pitch": {
-                        "alter": -1,
-                        "octave": 3,
-                        "step": "B"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "id": "ober2",
-                  "duration": {
-                    "base": "eighth"
-                  },
-                  "notes": [
-                    {
-                      "accidentalDisplay": {
-                        "show": true
-                      },
-                      "pitch": {
-                        "octave": 3,
-                        "step": "A"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "id": "ober3",
-                  "duration": {
-                    "base": "eighth"
-                  },
-                  "notes": [
-                    {
-                      "pitch": {
-                        "octave": 4,
-                        "step": "C"
-                      }
-                    }
-                  ]
-                }
-              ],
-              "staff": 1,
-              "voice": "Oberwerk"
-            },
-            {
-              "content": [
-                {
-                  "duration": {
-                    "base": "half",
-                    "dots": 1
-                  },
-                  "rest": {}
-                }
-              ],
-              "staff": 2,
-              "voice": "Hauptwerk"
-            },
-            {
-              "content": [
-                {
-                  "duration": {
-                    "base": "half",
-                    "dots": 1
-                  },
-                  "notes": [
-                    {
-                      "pitch": {
-                        "alter": -1,
-                        "octave": 3,
-                        "step": "E"
-                      },
-                      "ties": [
-                        {
-                          "target": "pedNote2"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "staff": 3,
-              "voice": "Pedal"
-            }
-          ]
-        }
-      ],
-      "staves": 3
-    }
-  ],
   "scores": [
     {
       "name": "defaultScore",
@@ -300,6 +300,7 @@
           "systems": [
             {
               "layout": "organ3Staff",
+              "measure": "m1",
               "layoutChanges": [
                 {
                   "layout": "organ3StaffSplitOber",
@@ -313,8 +314,7 @@
                     }
                   }
                 }
-              ],
-              "measure": "m1"
+              ]
             },
             {
               "layout": "organ3StaffSplitOber",

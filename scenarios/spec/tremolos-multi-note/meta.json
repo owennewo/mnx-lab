@@ -12,6 +12,7 @@
     "clef-sign",
     "event",
     "global",
+    "literal-string-tremolo",
     "measure-global",
     "mnx",
     "multi-note-tremolo",

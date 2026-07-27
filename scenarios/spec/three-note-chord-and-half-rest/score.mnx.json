@@ -37,20 +37,20 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 4
                       }
                     },
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 4
                       }
                     },
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 4
                       }
                     }
                   ]

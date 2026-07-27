@@ -10,7 +10,9 @@
   "coversDefs": [
     "global",
     "id",
-    "measure-global",
+    "literal-string-group",
+    "literal-string-staff",
+    "measure-number",
     "mnx",
     "page",
     "part",
@@ -22,7 +24,6 @@
     "staff",
     "staff-count",
     "staff-group",
-    "staff-group-barline-style",
     "staff-label",
     "staff-labelref",
     "staff-number",

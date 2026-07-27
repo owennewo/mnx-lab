@@ -1,0 +1,118 @@
+# The MNX spec submodule (`vendor/mnx`)
+
+The W3C Music Notation CG develops MNX at **[github.com/w3c-cg/mnx](https://github.com/w3c-cg/mnx)**
+(rendered at [w3c-cg.github.io/mnx/docs/](https://w3c-cg.github.io/mnx/docs/)). This repo
+carries it as a git submodule at `vendor/mnx`, pinned to a specific commit.
+
+```bash
+git submodule update --init vendor/mnx     # after a fresh clone
+```
+
+The submodule is **dev-time only**. `npm run build` and the Cloudflare deploy must
+never need it: `schemas/mnx-schema.json` stays vendored (the Worker's validator is
+compiled from it) and `scenarios/spec/` stays committed. The submodule is what those
+are *generated from*, not what they are read from at build time.
+
+## What we read out of it
+
+Upstream's docs are database-driven — `doctools/data.json` is a Django fixture
+(`freezedb` output) and everything under `docs/` is generated from it. So the sources
+are records, not files:
+
+| We want | Upstream source |
+|---|---|
+| Example documents (49) | `doctools/media/examples/json/*.json` via `exampledocument.document_path` |
+| Reference engravings | `doctools/media/examples/*.png` via `exampledocument.image_url` |
+| Titles + blurbs | `exampledocument.name` / `.blurb` |
+| `coversDefs` | the `exampledocumentobject` join |
+| Schema version | `xmlschema.version` — this is the number in `mnx-schema.json`'s `$id` |
+
+[scripts/specSource.mjs](../scripts/specSource.mjs) resolves all of it;
+[scripts/sync-spec-examples.mjs](../scripts/sync-spec-examples.mjs) (`npm run sync:spec`)
+writes `scenarios/spec/`, and [tests/preview.test.ts](../tests/preview.test.ts) reads the
+engravings straight off disk so the contact sheet works offline.
+
+Three things worth knowing, all learned the hard way when this replaced HTML scraping:
+
+- **Source documents carry `_x.mnxdocs`** — the doc generator's own vendor dict
+  (`{highlight: [...]}`), telling the spec site which keys to emphasise. 81 occurrences
+  across the 49 examples. It is presentation metadata, stripped on import by vendor key
+  (not by dropping `_x` wholesale — same `_x.<vendor>` convention as our `_x.mnxLab`).
+- **`blurb` is a string or an array of lines** — `freezedb` splits multi-line text
+  fields into line arrays. 33 of 49 examples have no blurb at all and get a synthetic
+  description.
+- **`coversDefs` is authoritative, not a guess.** `ExampleDocumentObject` is a derived
+  cache built by `accumulate_used_json_objects()`, which walks each example's JSON
+  against the schema's object graph. It is what drives the "examples using this object"
+  list on every object page upstream.
+
+## Moving the pin
+
+The pin is a statement about *which spec revision the corpus was generated from*, so it
+must always be an upstream commit. `npm run sync:spec` warns if `vendor/mnx` is on a
+commit unreachable from `origin/main` — that means a proposal branch got left checked
+out, and committing it would leave a submodule nobody else can fetch.
+
+```bash
+git -C vendor/mnx fetch origin
+git -C vendor/mnx checkout <sha>
+cp vendor/mnx/docs/mnx-schema.json schemas/mnx-schema.json   # if the version changed
+npm run compile-validator && npm run sync:spec && npm test
+git add vendor/mnx schemas/mnx-schema.json scenarios/spec
+```
+
+A schema bump can legitimately change render output, which demotes `verified` scenarios
+back into the approval queue — that is the mechanism working, see
+[roadmap/complete/SPEC_APPROVAL.md](../roadmap/complete/SPEC_APPROVAL.md).
+
+## Contributing upstream
+
+`.gitmodules` points at **upstream**, never at a fork — the pin has to be fetchable by
+everyone. Add your fork as a second remote inside the checkout instead:
+
+```bash
+gh repo fork w3c-cg/mnx --clone=false
+git -C vendor/mnx remote add fork git@github.com:<you>/mnx.git
+```
+
+Branch in the submodule, push to `fork`, PR fork → upstream, and leave the recorded pin
+on an upstream commit throughout.
+
+Process notes from their [CONTRIBUTING.md](https://github.com/w3c-cg/mnx/blob/main/CONTRIBUTING.md)
+and [doctools/README.md](https://github.com/w3c-cg/mnx/blob/main/doctools/README.md):
+
+- **Every PR needs an associated issue first.** Co-chairs triage and milestone it.
+  (Their CONTRIBUTING says Pages builds from `master`; the default branch is actually
+  `main`.)
+- **This is a W3C CG report repo** (`w3c.json`, group 81249). Contributions need CG
+  membership and a signed CLA — see
+  [roadmap/proposed/mnx-cg-proposals.md](../roadmap/proposed/mnx-cg-proposals.md) §6.
+- **You cannot hand-edit the spec.** Changes are made through the Django admin and
+  serialized with `freezedb`; the PR carries `doctools/data.json` (plus, for a new
+  example, its `.json` and `.png` — `freezedb` doesn't produce those). Don't regenerate
+  `docs/` in a PR; maintainers do that.
+
+### Local doctools setup with uv
+
+The generator is a separate package — **`spectools`**, from
+[w3c-cg/mnxdocgenerator](https://github.com/w3c-cg/mnxdocgenerator). It is not on PyPI
+and `doctools/requirements.txt` omits it deliberately, so it must be installed from git.
+No clone needed (the README's `pip install -e` is for people editing the generator):
+
+```bash
+cd vendor/mnx/doctools
+uv run --python 3.12 \
+  --with django==4.2.24 --with lxml \
+  --with git+https://github.com/w3c-cg/mnxdocgenerator.git \
+  python manage.py runserver          # site :8000, admin /admin/ (admin/admin)
+```
+
+First run needs `manage.py migrate` then `manage.py loaddb data.json`. Edit in the
+admin, then `manage.py freezedb data.json`.
+
+> If you prefer a persistent venv, name it **`venv`**, not `.venv` — upstream's
+> `.gitignore` covers `venv/` but not `.venv/`, and a stray `.venv` shows up as
+> untracked inside the submodule.
+
+`loaddb` → `freezedb` round-trips `data.json` byte-identically (verified 2026-07-27), so
+re-freezing before you commit is a cheap check: any hunk you didn't intend is a mistake.

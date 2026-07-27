@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "compile-validator": "node scripts/compile-validator.mjs",
     "check:scenarios": "node scripts/check-scenarios.mjs",
+    "sync:spec": "node scripts/sync-spec-examples.mjs",
     "update:primitives": "UPDATE_PRIMITIVES=1 vitest run tests/primitives.test.ts",
     "preview:scenarios": "PREVIEW_SCENARIOS=1 vitest run tests/preview.test.ts",
     "verify:scenarios": "node scripts/verify-scenarios.mjs",

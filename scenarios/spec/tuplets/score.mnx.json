@@ -1,9 +1,9 @@
 {
   "mnx": {
+    "version": 1,
     "support": {
       "useBeams": true
-    },
-    "version": 1
+    }
   },
   "global": {
     "measures": [
@@ -42,6 +42,18 @@
               "content": [
                 {
                   "type": "tuplet",
+                  "inner": {
+                    "multiple": 3,
+                    "duration": {
+                      "base": "eighth"
+                    }
+                  },
+                  "outer": {
+                    "multiple": 2,
+                    "duration": {
+                      "base": "eighth"
+                    }
+                  },
                   "content": [
                     {
                       "duration": {
@@ -50,8 +62,8 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 5,
-                            "step": "C"
+                            "step": "C",
+                            "octave": 5
                           }
                         }
                       ]
@@ -63,28 +75,28 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 4,
-                            "step": "G"
+                            "step": "G",
+                            "octave": 4
                           }
                         }
                       ]
                     }
-                  ],
-                  "inner": {
-                    "duration": {
-                      "base": "eighth"
-                    },
-                    "multiple": 3
-                  },
-                  "outer": {
-                    "duration": {
-                      "base": "eighth"
-                    },
-                    "multiple": 2
-                  }
+                  ]
                 },
                 {
                   "type": "tuplet",
+                  "inner": {
+                    "multiple": 3,
+                    "duration": {
+                      "base": "eighth"
+                    }
+                  },
+                  "outer": {
+                    "multiple": 2,
+                    "duration": {
+                      "base": "eighth"
+                    }
+                  },
                   "content": [
                     {
                       "id": "ev3",
@@ -94,8 +106,8 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 4,
-                            "step": "E"
+                            "step": "E",
+                            "octave": 4
                           }
                         }
                       ]
@@ -108,8 +120,8 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 4,
-                            "step": "F"
+                            "step": "F",
+                            "octave": 4
                           }
                         }
                       ]
@@ -122,25 +134,13 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 4,
-                            "step": "G"
+                            "step": "G",
+                            "octave": 4
                           }
                         }
                       ]
                     }
-                  ],
-                  "inner": {
-                    "duration": {
-                      "base": "eighth"
-                    },
-                    "multiple": 3
-                  },
-                  "outer": {
-                    "duration": {
-                      "base": "eighth"
-                    },
-                    "multiple": 2
-                  }
+                  ]
                 },
                 {
                   "duration": {
@@ -149,8 +149,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -162,8 +162,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -178,6 +178,18 @@
               "content": [
                 {
                   "type": "tuplet",
+                  "inner": {
+                    "multiple": 6,
+                    "duration": {
+                      "base": "quarter"
+                    }
+                  },
+                  "outer": {
+                    "multiple": 4,
+                    "duration": {
+                      "base": "quarter"
+                    }
+                  },
                   "content": [
                     {
                       "duration": {
@@ -186,8 +198,8 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 5,
-                            "step": "C"
+                            "step": "C",
+                            "octave": 5
                           }
                         }
                       ]
@@ -199,8 +211,8 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 5,
-                            "step": "D"
+                            "step": "D",
+                            "octave": 5
                           }
                         }
                       ]
@@ -212,8 +224,8 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 5,
-                            "step": "C"
+                            "step": "C",
+                            "octave": 5
                           }
                         }
                       ]
@@ -225,8 +237,8 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 4,
-                            "step": "G"
+                            "step": "G",
+                            "octave": 4
                           }
                         }
                       ]
@@ -238,8 +250,8 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 5,
-                            "step": "E"
+                            "step": "E",
+                            "octave": 5
                           }
                         }
                       ]
@@ -251,25 +263,13 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 5,
-                            "step": "C"
+                            "step": "C",
+                            "octave": 5
                           }
                         }
                       ]
                     }
-                  ],
-                  "inner": {
-                    "duration": {
-                      "base": "quarter"
-                    },
-                    "multiple": 6
-                  },
-                  "outer": {
-                    "duration": {
-                      "base": "quarter"
-                    },
-                    "multiple": 4
-                  }
+                  ]
                 }
               ]
             }

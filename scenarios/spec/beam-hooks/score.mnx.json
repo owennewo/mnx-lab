@@ -1,9 +1,9 @@
 {
   "mnx": {
+    "version": 1,
     "support": {
       "useBeams": true
-    },
-    "version": 1
+    }
   },
   "global": {
     "measures": [
@@ -21,66 +21,66 @@
         {
           "beams": [
             {
-              "beams": [
-                {
-                  "direction": "right",
-                  "events": [
-                    "ev1"
-                  ]
-                },
-                {
-                  "direction": "left",
-                  "events": [
-                    "ev3"
-                  ]
-                }
-              ],
               "events": [
                 "ev1",
                 "ev2",
                 "ev3"
+              ],
+              "beams": [
+                {
+                  "events": [
+                    "ev1"
+                  ],
+                  "direction": "right"
+                },
+                {
+                  "events": [
+                    "ev3"
+                  ],
+                  "direction": "left"
+                }
               ]
             },
             {
-              "beams": [
-                {
-                  "direction": "right",
-                  "events": [
-                    "ev4"
-                  ]
-                },
-                {
-                  "direction": "left",
-                  "events": [
-                    "ev6"
-                  ]
-                }
-              ],
               "events": [
                 "ev4",
                 "ev5",
                 "ev6"
+              ],
+              "beams": [
+                {
+                  "events": [
+                    "ev4"
+                  ],
+                  "direction": "right"
+                },
+                {
+                  "events": [
+                    "ev6"
+                  ],
+                  "direction": "left"
+                }
               ]
             },
             {
-              "beams": [
-                {
-                  "direction": "right",
-                  "events": [
-                    "ev7"
-                  ]
-                },
-                {
-                  "direction": "left",
-                  "events": [
-                    "ev9"
-                  ]
-                }
-              ],
               "events": [
                 "ev7",
                 "ev8",
                 "ev9"
+              ],
+              "beams": [
+                {
+                  "events": [
+                    "ev7"
+                  ],
+                  "direction": "right"
+                },
+                {
+                  "events": [
+                    "ev9"
+                  ],
+                  "direction": "left"
+                }
               ]
             }
           ],
@@ -103,8 +103,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -117,8 +117,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -131,8 +131,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -145,8 +145,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -159,8 +159,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "F"
+                        "step": "F",
+                        "octave": 5
                       }
                     }
                   ]
@@ -173,8 +173,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -187,8 +187,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 5
                       }
                     }
                   ]
@@ -201,8 +201,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "A"
+                        "step": "A",
+                        "octave": 5
                       }
                     }
                   ]
@@ -215,8 +215,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 5
                       }
                     }
                   ]
@@ -228,8 +228,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 6,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 6
                       }
                     }
                   ]

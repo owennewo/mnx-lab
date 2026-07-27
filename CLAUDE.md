@@ -16,11 +16,22 @@ Development is driven through the **`roadmap/`** folder (index: `roadmap/README.
 ## Running the project
 
 ```bash
+git submodule update --init vendor/mnx   # the MNX spec sources (dev-time only)
 npm run dev                 # everything: Vite dev server + Worker API (via @cloudflare/vite-plugin)
 npm run build               # validator codegen + tsc (app + worker) + vite build
 npm run deploy              # build + wrangler deploy (mnx-lab.totai.uk)
 npm run compile-validator   # regenerate worker/generated/validate-mnx.mjs after a schema bump
+npm run sync:spec           # regenerate scenarios/spec/ from the pinned spec submodule
 ```
+
+**`vendor/mnx` is the W3C MNX spec repo as a submodule**, pinned to the commit our
+`schemas/mnx-schema.json` was generated from. It is **dev-time only** — `npm run build`
+and the deploy must never depend on it, which is why the schema stays vendored and
+`scenarios/spec/` stays committed. Everything about reading it, moving the pin, and
+contributing PRs upstream (fork topology, the Django/`uv` doctools setup) is in
+**[docs/mnx-spec-submodule.md](docs/mnx-spec-submodule.md)**. Upstream is a *generated*
+site: the schema and docs are emitted from a Django fixture, so a spec change is a change
+to `doctools/data.json`, never a hand-edit of `mnx-schema.json`.
 
 The `/api/*` routes are a **Cloudflare Worker** ([worker/index.ts](worker/index.ts), Hono), served inside the Vite dev server by `@cloudflare/vite-plugin` — there is no separate backend process. `OPENROUTER_API_KEY` comes from `.dev.vars`/`.env` locally (both gitignored) and from a Worker secret (`wrangler secret put OPENROUTER_API_KEY`) in production. If the key is missing or a placeholder, `/api/edit-notation` falls back to a regex-based mock in `handleMockCommand` (transpose / "whole note ending" / "double octave") so the UI stays demoable offline.
 

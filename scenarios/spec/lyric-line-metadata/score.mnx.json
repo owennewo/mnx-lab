@@ -4,30 +4,30 @@
   },
   "global": {
     "lyrics": {
-      "lineMetadata": {
-        "1": {
-          "label": "English",
-          "lang": "en"
-        },
-        "2": {
-          "label": "Nederlands",
-          "lang": "nl"
-        },
-        "3": {
-          "label": "Українська",
-          "lang": "uk"
-        },
-        "4": {
-          "label": "Español",
-          "lang": "es"
-        }
-      },
       "lineOrder": [
         "1",
         "2",
         "3",
         "4"
-      ]
+      ],
+      "lineMetadata": {
+        "1": {
+          "lang": "en",
+          "label": "English"
+        },
+        "2": {
+          "lang": "nl",
+          "label": "Nederlands"
+        },
+        "3": {
+          "lang": "uk",
+          "label": "Українська"
+        },
+        "4": {
+          "lang": "es",
+          "label": "Español"
+        }
+      }
     },
     "measures": [
       {
@@ -96,8 +96,8 @@
                         "text": "ben"
                       },
                       "3": {
-                        "type": "start",
-                        "text": "І"
+                        "text": "І",
+                        "type": "start"
                       },
                       "4": {
                         "text": "soy"
@@ -134,8 +134,8 @@
                         "text": "Jan!"
                       },
                       "3": {
-                        "type": "end",
-                        "text": "ван!"
+                        "text": "ван!",
+                        "type": "end"
                       },
                       "4": {
                         "text": "Juan!"

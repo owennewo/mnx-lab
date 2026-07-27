@@ -74,8 +74,8 @@
                   "lyrics": {
                     "lines": {
                       "1": {
-                        "type": "start",
-                        "text": "sleep"
+                        "text": "sleep",
+                        "type": "start"
                       }
                     }
                   },
@@ -95,8 +95,8 @@
                   "lyrics": {
                     "lines": {
                       "1": {
-                        "type": "end",
-                        "text": "ing?"
+                        "text": "ing?",
+                        "type": "end"
                       }
                     }
                   },

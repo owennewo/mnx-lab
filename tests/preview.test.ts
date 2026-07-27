@@ -15,6 +15,8 @@ import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 // @ts-expect-error — plain .mjs module without type declarations
 import { loadCorpus, createContext, checkScenario, ROOT } from '../scripts/check-scenarios.mjs';
+// @ts-expect-error — plain .mjs module without type declarations
+import { loadSpecExamples } from '../scripts/specSource.mjs';
 import { computePrimitives, WIDTH_SP } from './helpers/corpusPrimitives.ts';
 import { renderSvgToString } from './helpers/svgString.ts';
 import { planHorizontal } from '../src/layout/spacing.ts';
@@ -26,25 +28,21 @@ const INCLUDE_VERIFIED = process.env.PREVIEW_ALL === '1';
 const PX_PER_SP = 8;
 const CROP_PAD_SP = 1; // breathing room around the tight content bounds
 const OUT_DIR = path.join(ROOT, 'scenarios', '.preview');
-const SPEC_IMAGE_BASE = 'https://w3c-cg.github.io/mnx/docs/static/examples';
 
-// The MNX docs don't follow a strict slug→filename convention; these examples'
-// reference engravings live under a different name (audited 2026-06-12 by
-// scraping each example page's <img src>). Some are renames, some underscore
-// styles, and beams-secondary-beam-breaks-implied legitimately SHARES the
-// explicit variant's engraving (the two encodings must engrave identically).
-const SPEC_IMAGE_ALIASES: Record<string, string> = {
-  'beams-secondary-beam-breaks-implied': 'beams-secondary-beam-breaks.png',
-  'grace-notes-beamed': 'beams-grace-notes.png',
-  'lyric-line-metadata': 'lyric_metadata.png',
-  'lyrics-basic': 'lyrics_basic.png',
-  'lyrics-multi-line': 'lyrics_multiline.png',
-  'ottavas-8va': 'octave-shifts-8va.png',
-  'single-note-tremolos': 'tremolos.png',
-  'tempo-markings': 'tempo-marking.png',
-  'tie-targets': 'tie-target-type.png',
-  'tremolos-multi-note': 'tremolos-multinote.png'
-};
+// Reference engravings come from the vendor/mnx submodule, so the contact sheet
+// works offline and always shows the engraving for the pinned spec revision.
+// Slug→filename is not a strict convention upstream (some examples' images are
+// renamed, some use underscores, and beams-secondary-beam-breaks-implied
+// legitimately SHARES the explicit variant's engraving) — the spec's own
+// image_url field is authoritative, so there is no mapping table to maintain.
+function specImageMap(mnxDefs: Set<string>): Map<string, string> {
+  return new Map(
+    loadSpecExamples(mnxDefs).examples.map((e: { slug: string; imagePath: string }) => [
+      e.slug,
+      path.relative(OUT_DIR, e.imagePath)
+    ])
+  );
+}
 
 function esc(s: string): string {
   return s.replace(/[&<>"]/g, ch =>
@@ -59,7 +57,7 @@ interface Card {
   approvable: boolean;
 }
 
-function buildCard(scenario: any, meta: any): Card {
+function buildCard(scenario: any, meta: any, specImages: Map<string, string>): Card {
   const group = scenario.category ?? 'spec';
   const id = scenario.id;
   const checkbox = (on: boolean) =>
@@ -105,9 +103,10 @@ function buildCard(scenario: any, meta: any): Card {
     scenario.ns === 'spec'
       ? (() => {
           const slug = scenario.segments[1];
-          const file = SPEC_IMAGE_ALIASES[slug] ?? `${slug}.png`;
+          const src = specImages.get(slug);
+          if (!src) return '';
           return `<figure><figcaption>spec reference engraving</figcaption>
-      <div class="paper"><img loading="lazy" src="${SPEC_IMAGE_BASE}/${esc(file)}" alt="spec reference for ${esc(slug)}"
+      <div class="paper"><img loading="lazy" src="${esc(src)}" alt="spec reference for ${esc(slug)}"
         onerror="this.outerHTML='<p class=noref>no reference image upstream</p>'"></div></figure>`;
         })()
       : '';
@@ -260,6 +259,7 @@ describe('scenario preview contact sheet', () => {
 
   it('writes scenarios/.preview/index.html', () => {
     const ctx = createContext();
+    const specImages = specImageMap(ctx.mnxDefs);
     const cards: Card[] = [];
     let skippedVerified = 0;
     for (const scenario of loadCorpus()) {
@@ -269,7 +269,7 @@ describe('scenario preview contact sheet', () => {
         skippedVerified++;
         continue;
       }
-      cards.push(buildCard(scenario, meta));
+      cards.push(buildCard(scenario, meta, specImages));
     }
     const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'scenarios/manifest.json'), 'utf8'));
     const font = fs.readFileSync(path.join(ROOT, 'public/smufl/Bravura.woff2')).toString('base64');

@@ -1,9 +1,9 @@
 {
   "mnx": {
+    "version": 1,
     "support": {
       "useBeams": true
-    },
-    "version": 1
+    }
   },
   "global": {
     "measures": [

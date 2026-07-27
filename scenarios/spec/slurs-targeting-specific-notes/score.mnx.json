@@ -34,45 +34,45 @@
                   },
                   "notes": [
                     {
-                      "id": "note1",
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
-                      }
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "note1"
                     },
                     {
-                      "id": "note2",
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
-                      }
+                        "step": "E",
+                        "octave": 5
+                      },
+                      "id": "note2"
                     },
                     {
-                      "id": "note3",
                       "pitch": {
-                        "octave": 5,
-                        "step": "G"
-                      }
+                        "step": "G",
+                        "octave": 5
+                      },
+                      "id": "note3"
                     }
                   ],
                   "slurs": [
                     {
-                      "endNote": "note4",
                       "side": "down",
+                      "target": "ev2",
                       "startNote": "note1",
-                      "target": "ev2"
+                      "endNote": "note4"
                     },
                     {
-                      "endNote": "note5",
                       "side": "up",
+                      "target": "ev2",
                       "startNote": "note2",
-                      "target": "ev2"
+                      "endNote": "note5"
                     },
                     {
-                      "endNote": "note6",
                       "side": "up",
+                      "target": "ev2",
                       "startNote": "note3",
-                      "target": "ev2"
+                      "endNote": "note6"
                     }
                   ]
                 },
@@ -83,25 +83,25 @@
                   },
                   "notes": [
                     {
-                      "id": "note4",
                       "pitch": {
-                        "octave": 4,
-                        "step": "B"
-                      }
+                        "step": "B",
+                        "octave": 4
+                      },
+                      "id": "note4"
                     },
                     {
-                      "id": "note5",
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
-                      }
+                        "step": "D",
+                        "octave": 5
+                      },
+                      "id": "note5"
                     },
                     {
-                      "id": "note6",
                       "pitch": {
-                        "octave": 5,
-                        "step": "F"
-                      }
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "note6"
                     }
                   ]
                 }

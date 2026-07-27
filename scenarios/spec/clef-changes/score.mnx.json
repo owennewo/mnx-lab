@@ -19,14 +19,14 @@
           "clefs": [
             {
               "clef": {
-                "sign": "G",
-                "staffPosition": -2
+                "staffPosition": -2,
+                "sign": "G"
               }
             },
             {
               "clef": {
-                "sign": "F",
-                "staffPosition": 2
+                "staffPosition": 2,
+                "sign": "F"
               },
               "position": {
                 "fraction": [

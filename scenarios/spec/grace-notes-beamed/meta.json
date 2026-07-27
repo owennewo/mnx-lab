@@ -15,6 +15,7 @@
     "global",
     "grace",
     "id",
+    "literal-string-grace",
     "measure-global",
     "mnx",
     "note",
@@ -30,7 +31,6 @@
     "sequence",
     "staff-position",
     "step",
-    "support",
     "time",
     "time-signature-unit",
     "version-number"

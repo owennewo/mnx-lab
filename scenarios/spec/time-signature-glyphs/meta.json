@@ -12,6 +12,7 @@
     "clef-sign",
     "event",
     "global",
+    "literal-string-event",
     "measure-global",
     "mnx",
     "note",

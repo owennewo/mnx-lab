@@ -33,9 +33,10 @@ Design rules:
 The corpus has two halves with opposite ownership models, and the path makes that explicit:
 
 - **`scenarios/spec/`** — a mirror of the MNX spec's own worked examples
-  (≈49 documents at `w3c-cg.github.io/mnx/docs/mnx-reference/examples/`). **Never hand-edited**;
-  `scripts/sync-spec-examples.mjs` fetches them, keeps upstream names verbatim, and
-  *generates* their `meta.json` (source, upstream URL, auto-tags). Mirroring the spec's own
+  (49 documents, read from the pinned `vendor/mnx` submodule — see
+  [docs/mnx-spec-submodule.md](../../docs/mnx-spec-submodule.md)). **Never hand-edited**;
+  `scripts/sync-spec-examples.mjs` (`npm run sync:spec`) reads them, keeps upstream names
+  verbatim, and *generates* their `meta.json` (source, upstream URL, auto-tags). Mirroring the spec's own
   examples buys instant breadth, the most credible renderer metric possible ("renders N/49 of
   the spec's own examples"), and a tripwire for upstream changes on every resync.
 - **`scenarios/lab/`** — ours, hand-authored: the tab-extension scenarios, the
@@ -195,9 +196,12 @@ One corpus, three consumers, no loader package yet:
   - `scripts/check-scenarios.mjs` — the corpus police: metadata validates against
     `meta.schema.json`, JSON is canonically formatted, claimed status ≤ computed reality,
     `expect` matches actual verdicts, snapshots aren't stale, defs-coverage report.
-  - `scripts/sync-spec-examples.mjs` — fetch/refresh `spec/`, regenerate its metadata,
-    diff against upstream. Doubles as the schema-drift tripwire alongside re-validating
-    the whole corpus after a schema bump.
+  - `scripts/sync-spec-examples.mjs` — refresh `spec/` from the `vendor/mnx` submodule,
+    regenerate its metadata, diff against upstream. Doubles as the schema-drift tripwire
+    alongside re-validating the whole corpus after a schema bump: it warns when the
+    vendored schema version and the pinned spec's version disagree.
+  - `scripts/specSource.mjs` — resolves the spec's Django fixture (`doctools/data.json`)
+    into examples, blurbs, `coversDefs` and reference-engraving paths.
 
 ## Build order
 

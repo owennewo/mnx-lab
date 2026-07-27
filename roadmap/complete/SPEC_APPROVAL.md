@@ -22,8 +22,9 @@ both the process definition and the live scoreboard. Update the table as you go.
 
 ## Why this exists
 
-`scenarios/spec/` mirrors the MNX Community Group's ~49 worked examples
-(synced verbatim by `scripts/sync-spec-examples.mjs` — never hand-edit them).
+`scenarios/spec/` mirrors the MNX Community Group's 49 worked examples
+(synced verbatim by `npm run sync:spec` from the pinned `vendor/mnx` submodule —
+never hand-edit them; see [docs/mnx-spec-submodule.md](../../docs/mnx-spec-submodule.md)).
 Each upstream example ships with a **reference engraving PNG**, which makes spec
 scenarios uniquely verifiable: we can put our render beside the spec's own and
 ask "same music?". That is the most credible renderer metric we have, and it

@@ -36,7 +36,6 @@
             {
               "content": [
                 {
-                  "type": "event",
                   "duration": {
                     "base": "quarter"
                   },
@@ -47,10 +46,10 @@
                         "step": "C"
                       }
                     }
-                  ]
+                  ],
+                  "type": "event"
                 },
                 {
-                  "type": "event",
                   "duration": {
                     "base": "quarter"
                   },
@@ -61,10 +60,10 @@
                         "step": "E"
                       }
                     }
-                  ]
+                  ],
+                  "type": "event"
                 },
                 {
-                  "type": "event",
                   "duration": {
                     "base": "quarter"
                   },
@@ -75,10 +74,10 @@
                         "step": "G"
                       }
                     }
-                  ]
+                  ],
+                  "type": "event"
                 },
                 {
-                  "type": "event",
                   "duration": {
                     "base": "quarter"
                   },
@@ -89,7 +88,8 @@
                         "step": "C"
                       }
                     }
-                  ]
+                  ],
+                  "type": "event"
                 }
               ]
             }
@@ -100,7 +100,6 @@
             {
               "content": [
                 {
-                  "type": "event",
                   "duration": {
                     "base": "half"
                   },
@@ -111,10 +110,10 @@
                         "step": "C"
                       }
                     }
-                  ]
+                  ],
+                  "type": "event"
                 },
                 {
-                  "type": "event",
                   "duration": {
                     "base": "half"
                   },
@@ -125,7 +124,8 @@
                         "step": "C"
                       }
                     }
-                  ]
+                  ],
+                  "type": "event"
                 }
               ]
             }

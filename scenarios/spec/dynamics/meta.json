@@ -10,8 +10,6 @@
   "coversDefs": [
     "clef",
     "clef-sign",
-    "dynamic-group",
-    "dynamic-group-type",
     "dynamic-value",
     "event",
     "global",

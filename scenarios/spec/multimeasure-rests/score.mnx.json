@@ -34,34 +34,6 @@
       }
     ]
   },
-  "layouts": [
-    {
-      "id": "PartAAlone",
-      "content": [
-        {
-          "type": "staff",
-          "sources": [
-            {
-              "part": "PartA"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "PartBAlone",
-      "content": [
-        {
-          "type": "staff",
-          "sources": [
-            {
-              "part": "PartB"
-            }
-          ]
-        }
-      ]
-    }
-  ],
   "parts": [
     {
       "id": "PartA",
@@ -85,8 +57,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -98,8 +70,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -111,8 +83,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 5
                       }
                     }
                   ]
@@ -132,8 +104,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -145,8 +117,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -158,8 +130,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 5
                       }
                     }
                   ]
@@ -207,8 +179,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -220,8 +192,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -233,8 +205,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 5
                       }
                     }
                   ]
@@ -254,8 +226,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -267,8 +239,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -280,8 +252,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 5
                       }
                     }
                   ]
@@ -301,8 +273,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -363,8 +335,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -376,8 +348,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -389,8 +361,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -410,8 +382,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -423,8 +395,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -436,8 +408,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -485,13 +457,41 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
                 }
               ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "layouts": [
+    {
+      "id": "PartAAlone",
+      "content": [
+        {
+          "type": "staff",
+          "sources": [
+            {
+              "part": "PartA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PartBAlone",
+      "content": [
+        {
+          "type": "staff",
+          "sources": [
+            {
+              "part": "PartB"
             }
           ]
         }
@@ -515,28 +515,28 @@
       ]
     },
     {
+      "name": "Part A",
       "layout": "PartAAlone",
       "multimeasureRests": [
         {
-          "duration": 2,
-          "start": "m3"
+          "start": "m3",
+          "duration": 2
         }
-      ],
-      "name": "Part A"
+      ]
     },
     {
+      "name": "Part B",
       "layout": "PartBAlone",
       "multimeasureRests": [
         {
-          "duration": 2,
-          "start": "m1"
+          "start": "m1",
+          "duration": 2
         },
         {
-          "duration": 2,
-          "start": "m5"
+          "start": "m5",
+          "duration": 2
         }
-      ],
-      "name": "Part B"
+      ]
     }
   ]
 }

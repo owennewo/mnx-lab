@@ -26,11 +26,11 @@
     "pitch",
     "positioned-clef",
     "positive-integer",
+    "rest",
     "root",
     "sequence",
     "staff-position",
     "step",
-    "support",
     "time",
     "time-signature-unit",
     "version-number"

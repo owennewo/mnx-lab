@@ -1,6 +1,6 @@
 {
   "title": "Multimeasure rests",
-  "description": "This example document contains three views of the same underlying music: a \"full score\" plus two parts as intended for individual musicians. In MNX, these are represented by three separate score objects.Multimeasure rests are tied to a particular score. They live within the \"multimeasureRests\" object, and each rest defines its starting measure number and how long the rest lasts.",
+  "description": "This example document contains three views of the same underlying music: a \"full score\" plus two parts as intended for individual musicians. In MNX, these are represented by three separate score objects.\n\nMultimeasure rests are tied to a particular score. They live within the \"multimeasureRests\" object, and each rest defines its starting measure number and how long the rest lasts.",
   "tags": [
     "spec-example"
   ],
@@ -15,8 +15,10 @@
     "event",
     "global",
     "id",
+    "literal-string-staff",
     "measure-count",
     "measure-global",
+    "measure-number",
     "mnx",
     "multimeasure-rest",
     "note",
@@ -29,6 +31,7 @@
     "pitch",
     "positioned-clef",
     "positive-integer",
+    "rest",
     "root",
     "score",
     "score-name",

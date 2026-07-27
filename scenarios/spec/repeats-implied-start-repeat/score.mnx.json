@@ -5,11 +5,11 @@
   "global": {
     "measures": [
       {
-        "repeatEnd": {},
         "time": {
           "count": 4,
           "unit": 4
-        }
+        },
+        "repeatEnd": {}
       }
     ]
   },
@@ -35,8 +35,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]

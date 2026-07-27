@@ -5,18 +5,18 @@
   "global": {
     "measures": [
       {
-        "tempos": [
-          {
-            "bpm": 200,
-            "value": {
-              "base": "quarter"
-            }
-          }
-        ],
         "time": {
           "count": 4,
           "unit": 4
-        }
+        },
+        "tempos": [
+          {
+            "value": {
+              "base": "quarter"
+            },
+            "bpm": 200
+          }
+        ]
       },
       {}
     ]
@@ -43,8 +43,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -56,8 +56,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -69,8 +69,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 4
                       }
                     }
                   ]
@@ -82,8 +82,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -103,8 +103,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -116,8 +116,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -129,8 +129,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 5
                       }
                     }
                   ]
@@ -142,8 +142,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 6,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 6
                       }
                     }
                   ]

@@ -1,6 +1,6 @@
 {
   "title": "Tie targets",
-  "description": "MNX supports various types of tie “targets,” and this data can be encoded in order to help programs parse a document (for example, ignoring ties that a program cannot internally model).This example also includes a laissez vibrer tie, encoded via \"lv\".",
+  "description": "MNX supports various types of tie “targets,” and this data can be encoded in order to help programs parse a document (for example, ignoring ties that a program cannot internally model).\n\nThis example also includes a laissez vibrer tie, encoded via \"lv\".",
   "tags": [
     "spec-example"
   ],
@@ -20,6 +20,7 @@
     "global",
     "id",
     "key",
+    "literal-string-event",
     "measure-global",
     "mnx",
     "note",
@@ -32,6 +33,7 @@
     "pitch",
     "positioned-clef",
     "positive-integer",
+    "repeat-end",
     "rest",
     "root",
     "sequence",

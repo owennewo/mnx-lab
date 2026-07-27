@@ -13,6 +13,7 @@
     "event",
     "global",
     "grace",
+    "literal-string-grace",
     "measure-global",
     "mnx",
     "note",

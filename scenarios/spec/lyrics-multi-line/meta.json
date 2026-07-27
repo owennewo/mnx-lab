@@ -12,7 +12,6 @@
     "clef-sign",
     "event",
     "event-lyric-line",
-    "event-lyric-line-type",
     "global",
     "lyrics",
     "measure-global",
@@ -30,7 +29,6 @@
     "sequence",
     "staff-position",
     "step",
-    "string",
     "time",
     "time-signature-unit",
     "version-number"

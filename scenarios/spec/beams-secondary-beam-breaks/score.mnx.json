@@ -1,9 +1,9 @@
 {
   "mnx": {
+    "version": 1,
     "support": {
       "useBeams": true
-    },
-    "version": 1
+    }
   },
   "global": {
     "measures": [
@@ -21,44 +21,6 @@
         {
           "beams": [
             {
-              "beams": [
-                {
-                  "beams": [
-                    {
-                      "events": [
-                        "ev1",
-                        "ev2",
-                        "ev3",
-                        "ev4"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    "ev1",
-                    "ev2",
-                    "ev3",
-                    "ev4"
-                  ]
-                },
-                {
-                  "beams": [
-                    {
-                      "events": [
-                        "ev5",
-                        "ev6",
-                        "ev7",
-                        "ev8"
-                      ]
-                    }
-                  ],
-                  "events": [
-                    "ev5",
-                    "ev6",
-                    "ev7",
-                    "ev8"
-                  ]
-                }
-              ],
               "events": [
                 "ev1",
                 "ev2",
@@ -68,11 +30,65 @@
                 "ev6",
                 "ev7",
                 "ev8"
+              ],
+              "beams": [
+                {
+                  "events": [
+                    "ev1",
+                    "ev2",
+                    "ev3",
+                    "ev4"
+                  ],
+                  "beams": [
+                    {
+                      "events": [
+                        "ev1",
+                        "ev2",
+                        "ev3",
+                        "ev4"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "events": [
+                    "ev5",
+                    "ev6",
+                    "ev7",
+                    "ev8"
+                  ],
+                  "beams": [
+                    {
+                      "events": [
+                        "ev5",
+                        "ev6",
+                        "ev7",
+                        "ev8"
+                      ]
+                    }
+                  ]
+                }
               ]
             },
             {
+              "events": [
+                "ev9",
+                "ev10",
+                "ev11",
+                "ev12",
+                "ev13",
+                "ev14",
+                "ev15",
+                "ev16"
+              ],
               "beams": [
                 {
+                  "events": [
+                    "ev9",
+                    "ev10",
+                    "ev11",
+                    "ev12"
+                  ],
                   "beams": [
                     {
                       "events": [
@@ -86,15 +102,15 @@
                         "ev12"
                       ]
                     }
-                  ],
-                  "events": [
-                    "ev9",
-                    "ev10",
-                    "ev11",
-                    "ev12"
                   ]
                 },
                 {
+                  "events": [
+                    "ev13",
+                    "ev14",
+                    "ev15",
+                    "ev16"
+                  ],
                   "beams": [
                     {
                       "events": [
@@ -108,24 +124,8 @@
                         "ev16"
                       ]
                     }
-                  ],
-                  "events": [
-                    "ev13",
-                    "ev14",
-                    "ev15",
-                    "ev16"
                   ]
                 }
-              ],
-              "events": [
-                "ev9",
-                "ev10",
-                "ev11",
-                "ev12",
-                "ev13",
-                "ev14",
-                "ev15",
-                "ev16"
               ]
             }
           ],
@@ -148,8 +148,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -162,8 +162,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -176,8 +176,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -190,8 +190,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "F"
+                        "step": "F",
+                        "octave": 5
                       }
                     }
                   ]
@@ -204,8 +204,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -218,8 +218,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -232,8 +232,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -246,8 +246,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "F"
+                        "step": "F",
+                        "octave": 5
                       }
                     }
                   ]
@@ -260,8 +260,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -274,8 +274,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -288,8 +288,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -302,8 +302,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "F"
+                        "step": "F",
+                        "octave": 5
                       }
                     }
                   ]
@@ -316,8 +316,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -330,8 +330,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -344,8 +344,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -358,8 +358,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "F"
+                        "step": "F",
+                        "octave": 5
                       }
                     }
                   ]

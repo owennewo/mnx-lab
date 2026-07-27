@@ -36,8 +36,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ],
@@ -56,8 +56,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "D"
+                        "step": "D",
+                        "octave": 5
                       }
                     }
                   ]
@@ -70,8 +70,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 5
                       }
                     }
                   ]
@@ -84,8 +84,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]
@@ -106,8 +106,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 4
                       }
                     }
                   ],
@@ -126,8 +126,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "A"
+                        "step": "A",
+                        "octave": 4
                       }
                     }
                   ]
@@ -140,8 +140,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "G"
+                        "step": "G",
+                        "octave": 4
                       }
                     }
                   ]
@@ -154,8 +154,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 4,
-                        "step": "E"
+                        "step": "E",
+                        "octave": 4
                       }
                     }
                   ]

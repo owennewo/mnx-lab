@@ -37,8 +37,8 @@
                       "notes": [
                         {
                           "pitch": {
-                            "octave": 4,
-                            "step": "B"
+                            "step": "B",
+                            "octave": 4
                           }
                         }
                       ]
@@ -52,8 +52,8 @@
                   "notes": [
                     {
                       "pitch": {
-                        "octave": 5,
-                        "step": "C"
+                        "step": "C",
+                        "octave": 5
                       }
                     }
                   ]

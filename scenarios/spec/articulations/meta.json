@@ -8,6 +8,7 @@
     "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/articulations/"
   ],
   "coversDefs": [
+    "accent",
     "clef",
     "clef-sign",
     "event",
@@ -26,8 +27,11 @@
     "positive-integer",
     "root",
     "sequence",
+    "staccato",
     "staff-position",
     "step",
+    "strong-accent",
+    "tenuto",
     "time",
     "time-signature-unit",
     "version-number"

@@ -1,7 +1,4 @@
 {
-  "mnx": {
-    "version": 1
-  },
   "global": {
     "measures": [
       {
@@ -12,6 +9,9 @@
       },
       {}
     ]
+  },
+  "mnx": {
+    "version": 1
   },
   "parts": [
     {
@@ -30,6 +30,13 @@
               "content": [
                 {
                   "type": "tremolo",
+                  "marks": 2,
+                  "outer": {
+                    "multiple": 2,
+                    "duration": {
+                      "base": "quarter"
+                    }
+                  },
                   "content": [
                     {
                       "duration": {
@@ -57,17 +64,17 @@
                         }
                       ]
                     }
-                  ],
-                  "marks": 2,
-                  "outer": {
-                    "duration": {
-                      "base": "quarter"
-                    },
-                    "multiple": 2
-                  }
+                  ]
                 },
                 {
                   "type": "tremolo",
+                  "marks": 2,
+                  "outer": {
+                    "multiple": 2,
+                    "duration": {
+                      "base": "quarter"
+                    }
+                  },
                   "content": [
                     {
                       "duration": {
@@ -95,14 +102,7 @@
                         }
                       ]
                     }
-                  ],
-                  "marks": 2,
-                  "outer": {
-                    "duration": {
-                      "base": "quarter"
-                    },
-                    "multiple": 2
-                  }
+                  ]
                 }
               ]
             }
@@ -114,6 +114,13 @@
               "content": [
                 {
                   "type": "tremolo",
+                  "marks": 3,
+                  "outer": {
+                    "multiple": 2,
+                    "duration": {
+                      "base": "half"
+                    }
+                  },
                   "content": [
                     {
                       "duration": {
@@ -141,14 +148,7 @@
                         }
                       ]
                     }
-                  ],
-                  "marks": 3,
-                  "outer": {
-                    "duration": {
-                      "base": "half"
-                    },
-                    "multiple": 2
-                  }
+                  ]
                 }
               ]
             }

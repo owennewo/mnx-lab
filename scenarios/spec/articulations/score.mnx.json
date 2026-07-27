@@ -1,7 +1,4 @@
 {
-  "mnx": {
-    "version": 1
-  },
   "global": {
     "measures": [
       {
@@ -12,6 +9,9 @@
       }
     ]
   },
+  "mnx": {
+    "version": 1
+  },
   "parts": [
     {
       "measures": [
@@ -19,8 +19,8 @@
           "clefs": [
             {
               "clef": {
-                "sign": "G",
-                "staffPosition": -2
+                "staffPosition": -2,
+                "sign": "G"
               }
             }
           ],
