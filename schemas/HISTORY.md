@@ -49,10 +49,13 @@ Two findings that a schema diff alone does **not** show:
   `{"attackValue": "f", "value": "p"}` at v19 and is `{"value": "f",
   "residualValue": "p"}` at v24. `value` changes meaning, so a v19 document
   still *validates* under v24 while denoting the opposite dynamic.
-- **`type: 'accent'` was legal but undocumented since v19.** The
-  `dynamic-group-type` enum is unchanged across the whole range; what v24 added
-  was the *description* finally listing `accent` alongside the other three. So
-  v23's accent prefix/suffix filled in a model that was already half-present.
+- **`type: 'accent'` predates v23's accent fields.** The `dynamic-group-type`
+  enum is unchanged across the whole range, and the value's own description
+  ("temporary accents on a single beat, such as sfz (sforzando)") is byte-identical
+  at v19 and v24. What v24 changed is the *parent field's* description, which had
+  listed only three of the four options and now names `accent` too. So v23's
+  accent prefix/suffix filled in a model that was already present — and the gap
+  was one level of prose disagreeing with another, which no schema diff can see.
 
 **Known bug in v24 (unreported upstream):** the `dynamic-prefix` and
 `dynamic-suffix` enums carry literal quote characters — `"\"s\""`, `"\"r\""`,
