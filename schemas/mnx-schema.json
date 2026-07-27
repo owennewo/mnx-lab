@@ -261,8 +261,11 @@
         }
       ],
       "properties": {
-        "attackValue": {
-          "$ref": "#/$defs/dynamic-value"
+        "accentPrefix": {
+          "$ref": "#/$defs/dynamic-prefix"
+        },
+        "accentSuffix": {
+          "$ref": "#/$defs/dynamic-suffix"
         },
         "end": {
           "$ref": "#/$defs/measure-rhythmic-position"
@@ -282,7 +285,13 @@
         "relativeValue": {
           "$ref": "#/$defs/relative-dynamic-value"
         },
+        "residualValue": {
+          "$ref": "#/$defs/dynamic-value"
+        },
         "staff": {
+          "$ref": "#/$defs/staff-number"
+        },
+        "staffEnd": {
           "$ref": "#/$defs/staff-number"
         },
         "suffix": {
@@ -293,6 +302,9 @@
         },
         "value": {
           "$ref": "#/$defs/dynamic-value"
+        },
+        "visuallyContinues": {
+          "$ref": "#/$defs/id"
         },
         "voice": {
           "$ref": "#/$defs/voice-name"
@@ -323,6 +335,21 @@
       ],
       "type": "string"
     },
+    "dynamic-prefix": {
+      "enum": [
+        "\"s\"",
+        "\"r\"",
+        "\"\""
+      ],
+      "type": "string"
+    },
+    "dynamic-suffix": {
+      "enum": [
+        "\"z\"",
+        "\"\""
+      ],
+      "type": "string"
+    },
     "dynamic-value": {
       "enum": [
         "ppp",
@@ -333,7 +360,11 @@
         "f",
         "ff",
         "fff",
-        "n"
+        "n",
+        "pppp",
+        "ppppp",
+        "ffff",
+        "fffff"
       ],
       "type": "string"
     },
@@ -2505,7 +2536,7 @@
       "type": "string"
     }
   },
-  "$id": "https://w3c-cg.github.io/mnx/docs/mnx-schema.json/version/19",
+  "$id": "https://w3c-cg.github.io/mnx/docs/mnx-schema.json/version/24",
   "$ref": "#/$defs/root",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "An encoding of Common Western Music Notation.",

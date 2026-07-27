@@ -301,9 +301,13 @@ export interface MnxBeam {
   direction?: 'left' | 'right';
 }
 
-/** Standard dynamic values (MNX v19 `dynamic-value`, a closed enum). Extended
- *  marks (pppppp, sfz, fp, z, …) no longer fit here and travel in `glyphs`. */
+/** Standard dynamic values (MNX v24 `dynamic-value`, a closed enum). v24 widened
+ *  the range by four (pppp…fffff); marks still outside it (pppppp, ffffff, fp,
+ *  fz, z, …) travel in `glyphs`, and sfz/rfz are now better expressed
+ *  structurally as `type: 'accent'` with `accentPrefix`/`accentSuffix`. */
 export type MnxDynamicValue =
+  | 'ppppp'
+  | 'pppp'
   | 'ppp'
   | 'pp'
   | 'p'
@@ -312,9 +316,11 @@ export type MnxDynamicValue =
   | 'f'
   | 'ff'
   | 'fff'
+  | 'ffff'
+  | 'fffff'
   | 'n';
 
-/** A dynamic marking (MNX v19 `dynamic-group`) at a metric position. `type` is
+/** A dynamic marking (MNX v24 `dynamic-group`) at a metric position. `type` is
  *  required. A plain dynamic carries a `value` (enum) and/or `glyphs` (explicit
  *  SMuFL names for marks outside the enum). `wedgeType`/`end` describe a hairpin
  *  (crescendo/diminuendo) — not yet rendered; see the renderer gap in
@@ -334,7 +340,25 @@ export interface MnxDynamic {
     fraction: [number, number];
   };
   relativeValue?: 'louder' | 'softer';
-  attackValue?: MnxDynamicValue;
+  /** The dynamic held *after* the accent's attack — only valid for
+   *  `type: 'accent'`. Replaced v19's `attackValue`, and the two are **not** a
+   *  rename: the roles of `value` and this field swapped. An "fp" was
+   *  `{attackValue: 'f', value: 'p'}` under v19 and is `{value: 'f',
+   *  residualValue: 'p'}` under v24 — so a v19 document still validates while
+   *  meaning the opposite dynamic. Anything reading `value` for an accent group
+   *  must know which version produced it. */
+  residualValue?: MnxDynamicValue;
+  /** Accent prefix/suffix (v24): "sfz" is prefix `s` + value `f` + suffix `z`,
+   *  "rfz" is prefix `r`. NOTE: the v24 schema's enums for these erroneously
+   *  carry literal quote characters, so it rejects `s` and accepts `"s"` —
+   *  see docs/mnx-spec-submodule.md. Typed here as the spec *intends*. */
+  accentPrefix?: 's' | 'r' | '';
+  accentSuffix?: 'z' | '';
+  /** Points at the id of the immediately preceding dynamic group, hinting that
+   *  the two should render as a single unit. */
+  visuallyContinues?: string;
+  /** For a hairpin angled across staves: the staff it ends on. */
+  staffEnd?: number;
   prefix?: string;
   suffix?: string;
   orient?: 'above' | 'auto' | 'below' | 'between';

@@ -4,26 +4,63 @@ This file documents the version history, updates, and origins of the MNX JSON sc
 
 ## Current Version Information
 
-- **Schema Version:** `version/19` (per the schema's `$id`)
+- **Schema Version:** `version/24` (per the schema's `$id`), 190 `$defs`
 - **Schema Source:** [W3C Music Notation Community Group - MNX GitHub Repository](https://github.com/w3c-cg/mnx)
-- **Upstream Revision:** [`e41322cb`](https://github.com/w3c-cg/mnx/commit/e41322cb9794d7e1dd5e25e9f4475a847d114f1b)
-  ("Expanded encoding for dynamics", 2026-06-16) — the commit the `vendor/mnx`
-  submodule is pinned to. `mnx-schema.json` here is **byte-identical** to that
-  commit's `docs/mnx-schema.json`, verified 2026-07-27.
+- **Upstream Revision:** [`09c65b01`](https://github.com/w3c-cg/mnx/commit/09c65b01f56c46cce514b267f83cbeef0b6973dc)
+  ("Added staffEnd to dynamic group", 2026-07-21) — the commit the `vendor/mnx`
+  submodule is pinned to, and `mnx-schema.json` here is a verbatim copy of its
+  `docs/mnx-schema.json`.
 - **Format Standard:** JSON Schema Draft 2020-12
-
-> **Upstream is ahead: `version/24` as of 2026-07-21.** Versions 20–24 are all
-> dynamics work (expanded dynamics range, dynamic groups gaining
-> `visuallyContinues` / `accentPrefix` / `accentSuffix` / `staffEnd`, and
-> `type='accent'` moving to `residualValue`). Bumping means moving the submodule
-> pin, re-vendoring `docs/mnx-schema.json`, `npm run compile-validator` and
-> `npm run sync:spec` — deliberately, as one change.
 
 **The schema is generated, not authored.** Upstream keeps the spec in a Django
 database; `docs/mnx-schema.json` is emitted by `manage.py makesite` from those
 records, and its `$id` version comes from the `spectools.xmlschema.version`
 field. So a schema change upstream is a change to `doctools/data.json`, never a
 hand-edit of the JSON. See [docs/mnx-spec-submodule.md](../docs/mnx-spec-submodule.md).
+
+**Descriptions are normative and the schema drops them.** `spec-prose.json` in
+this directory fingerprints every documented object, relationship and enum
+(651 items) so `npm run sync:spec` can report prose drift when the pin moves —
+the only tripwire that catches a field being *redefined* without its shape
+changing. See the v24 entry below for why that is not hypothetical.
+
+## v19 → v24 (2026-07-27)
+
+Five upstream commits, all dynamics; nothing else in the spec moved. Two added
+`$defs` (`dynamic-prefix`, `dynamic-suffix`), two changed (`dynamic-value`,
+`dynamic-group`), none removed.
+
+| | change |
+|---|---|
+| v20 | `dynamic-value` enum +`pppp` +`ppppp` +`ffff` +`fffff` |
+| v21 | `dynamic-group` +`visuallyContinues` (id ref: render with the previous group as one unit) |
+| v22 | `dynamic-group` +`residualValue` −`attackValue` |
+| v23 | +`dynamic-prefix`/`dynamic-suffix`; `dynamic-group` +`accentPrefix` +`accentSuffix` |
+| v24 | `dynamic-group` +`staffEnd` (cross-staff diagonal hairpins) |
+
+Corpus impact was nil: all 49 spec examples are byte-identical across the range,
+and all 57 scenarios still validate (the one v24 rejection is
+`lab/24-tab-spec-gaps/01-tab-clef-rejected`, which is invalid by design).
+
+Two findings that a schema diff alone does **not** show:
+
+- **`attackValue` → `residualValue` is a semantic inversion, not a rename.** The
+  spec states both encodings of the same marking: an "fp" was
+  `{"attackValue": "f", "value": "p"}` at v19 and is `{"value": "f",
+  "residualValue": "p"}` at v24. `value` changes meaning, so a v19 document
+  still *validates* under v24 while denoting the opposite dynamic.
+- **`type: 'accent'` was legal but undocumented since v19.** The
+  `dynamic-group-type` enum is unchanged across the whole range; what v24 added
+  was the *description* finally listing `accent` alongside the other three. So
+  v23's accent prefix/suffix filled in a model that was already half-present.
+
+**Known bug in v24 (unreported upstream):** the `dynamic-prefix` and
+`dynamic-suffix` enums carry literal quote characters — `"\"s\""`, `"\"r\""`,
+`"\"z\""` and two `"\"\""`. They are the only 5 of the spec's 155 enum rows
+stored that way, and they contradict the prose ("for a `sfz` dynamic, the prefix
+is `s`"). Consequence: `accentPrefix: "s"` is **rejected** and `accentPrefix:
+"\"s\""` is accepted. `MnxDynamic` in [src/types/mnx.ts](../src/types/mnx.ts)
+types these as the spec intends, not as it validates.
 
 ## Key Architecture & Features
 

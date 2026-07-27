@@ -46,6 +46,22 @@ Three things worth knowing, all learned the hard way when this replaced HTML scr
   against the schema's object graph. It is what drives the "examples using this object"
   list on every object page upstream.
 
+## Prose drift
+
+MNX's descriptions are **normative**, and `mnx-schema.json` drops all of them — so a
+field can be redefined with no schema change whatsoever. This is not hypothetical: v24
+reversed what `dynamic-group.value` means for an accent (see
+[schemas/HISTORY.md](../schemas/HISTORY.md)) and separately documented a `type: 'accent'`
+enum value that had been legal and unmentioned since v19. A schema diff shows neither.
+
+`schemas/spec-prose.json` fingerprints every documented object, relationship and enum
+(651 items, ~31 KB) — hashes, not text, so we report *which* items moved without copying
+upstream's documentation into this repo. `npm run sync:spec` diffs against it, prints
+what changed, and rewrites it, so the delta lands in the same commit as the pin move.
+
+**A reworded description deserves a read, not a shrug.** The report tells you what moved;
+the submodule has the wording.
+
 ## Moving the pin
 
 The pin is a statement about *which spec revision the corpus was generated from*, so it

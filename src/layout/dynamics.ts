@@ -3,9 +3,13 @@ import type { MnxDynamic } from '../types/mnx.ts';
 
 /**
  * Dynamics vocabulary shared by spacing (column widths) and notation (glyph
- * emission). MNX v19 constrains `dynamic-group.value` to a closed enum
- * (ppp…fff, n); marks outside it (pppppp, sfz, fp, z, …) carry an explicit
- * `glyphs` list instead. This table maps both the enum values and those
+ * emission). MNX v24 constrains `dynamic-group.value` to a closed enum
+ * (ppppp…fffff, n); marks outside it (pppppp, ffffff, fp, fz, z, …) carry an
+ * explicit `glyphs` list instead. v24 widened that enum by four and gave
+ * sfz/rfz a structural encoding (`type: 'accent'` plus accentPrefix/Suffix),
+ * so fewer marks need `glyphs` than before — but the table still covers both,
+ * because a document may legitimately use either route. This table maps both
+ * the enum values and those
  * conventional mnemonics to SMuFL glyphs (the mnemonic keys are what a
  * `glyphs` entry resolves to). The unsuffixed SMuFL dynamicSforzando/
  * dynamicRinforzando are bare letters; the "...1"/"...2" variants are the

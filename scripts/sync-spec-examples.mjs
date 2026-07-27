@@ -16,9 +16,60 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createContext, computeExtensionVerdict, formatError, ROOT } from './check-scenarios.mjs';
-import { loadSpecExamples, specRevision, pinIsUpstream } from './specSource.mjs';
+import { loadSpecExamples, loadSpecProse, specRevision, pinIsUpstream } from './specSource.mjs';
 
 const SPEC_DIR = path.join(ROOT, 'scenarios', 'spec');
+const PROSE_MANIFEST = path.join(ROOT, 'schemas', 'spec-prose.json');
+const PROSE_REPORT_LIMIT = 25;
+
+/**
+ * Reports changes to the spec's normative prose and refreshes the manifest.
+ *
+ * Descriptions live only in the fixture, so this is the only tripwire that
+ * catches them — moving the pin can restate what a field means with no schema
+ * change at all.
+ */
+function reportProseDrift(revision, schemaVersion) {
+  const current = loadSpecProse();
+  const previous = fs.existsSync(PROSE_MANIFEST)
+    ? JSON.parse(fs.readFileSync(PROSE_MANIFEST, 'utf8')).prose ?? {}
+    : null;
+
+  fs.writeFileSync(
+    PROSE_MANIFEST,
+    JSON.stringify({ specRevision: revision, schemaVersion, prose: current }, null, 2) + '\n'
+  );
+
+  if (!previous) {
+    console.log(`Prose manifest created: ${Object.keys(current).length} documented items.`);
+    return;
+  }
+
+  const added = Object.keys(current).filter(k => !(k in previous));
+  const removed = Object.keys(previous).filter(k => !(k in current));
+  const changed = Object.keys(current).filter(k => k in previous && current[k] !== previous[k]);
+
+  if (!added.length && !removed.length && !changed.length) {
+    console.log(`Prose unchanged (${Object.keys(current).length} documented items).`);
+    return;
+  }
+
+  console.log(
+    `\nProse drift: ${changed.length} reworded, ${added.length} added, ${removed.length} removed.` +
+      `\n  A reworded description can change what a field MEANS with no schema change —` +
+      `\n  read the new text in the submodule before assuming it is cosmetic.`
+  );
+  const show = (label, keys) => {
+    for (const k of keys.slice(0, PROSE_REPORT_LIMIT)) console.log(`  ${label} ${k}`);
+    if (keys.length > PROSE_REPORT_LIMIT) {
+      console.log(`  ${label} … and ${keys.length - PROSE_REPORT_LIMIT} more (see the manifest diff)`);
+    }
+  };
+  show('~', changed);
+  show('+', added);
+  show('-', removed);
+  console.log();
+}
 
 function main() {
   const ctx = createContext();
@@ -107,6 +158,7 @@ function main() {
   console.log(
     `\nSynced ${examples.length} examples (${updated} changed); ${invalidCount} fail schema validation.`
   );
+  reportProseDrift(specRevision(), schemaVersion);
   if (stale.length) process.exitCode = 1;
 }
 

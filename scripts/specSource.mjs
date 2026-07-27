@@ -15,6 +15,7 @@
 // Reading the fixture is both offline and more accurate — see coversDefs below.
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { ROOT } from './check-scenarios.mjs';
 
@@ -128,6 +129,43 @@ export function loadSpecExamples(mnxDefs) {
 
   examples.sort((a, b) => a.slug.localeCompare(b.slug));
   return { schemaVersion, examples };
+}
+
+/**
+ * Fingerprints the spec's normative prose, keyed by readable name.
+ *
+ * MNX's descriptions are normative but live *only* in the fixture — the
+ * generated mnx-schema.json drops them entirely, so a prose change has zero
+ * schema footprint and a schema diff cannot see it. Real example: v24's
+ * dynamic-group-type description gained "accent", a value that had been in the
+ * enum and undocumented since v19; and attackValue -> residualValue reversed
+ * which dynamic `value` holds for an "fp", which validates either way.
+ *
+ * We store hashes rather than the text: it says *which* items moved without
+ * copying upstream's documentation into this repo, and the manifest diff stays
+ * readable in review. Read the actual wording from the submodule.
+ */
+export function loadSpecProse() {
+  requireSubmodule();
+  const records = JSON.parse(fs.readFileSync(DATA_JSON, 'utf8'));
+  const of = model => records.filter(r => r.model === model);
+  const slug = new Map(of('spectools.jsonobject').map(r => [r.pk, r.fields.slug]));
+
+  // freezedb splits a multi-line text field into an array of lines.
+  const text = v => (Array.isArray(v) ? v.join('\n') : v ?? '');
+  const digest = v => createHash('sha256').update(text(v)).digest('hex').slice(0, 12);
+
+  const prose = {};
+  for (const { fields } of of('spectools.jsonobject')) {
+    prose[`object:${fields.slug}`] = digest(fields.description);
+  }
+  for (const { fields } of of('spectools.jsonobjectrelationship')) {
+    prose[`relationship:${slug.get(fields.parent)}.${fields.child_key}`] = digest(fields.description);
+  }
+  for (const { fields } of of('spectools.jsonobjectenum')) {
+    prose[`enum:${slug.get(fields.parent)}.${fields.name}`] = digest(fields.description);
+  }
+  return Object.fromEntries(Object.entries(prose).sort(([a], [b]) => a.localeCompare(b)));
 }
 
 /** The submodule's checked-out commit, for provenance in generated output. */
