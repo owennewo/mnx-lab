@@ -1,0 +1,53 @@
+{
+  "title": "Accent family via accentPrefix/accentSuffix (v24)",
+  "description": "MNX v24 encodes the sforzando family structurally rather than as opaque glyph names: accentPrefix + value + accentSuffix + residualValue concatenate to the conventional abbreviation, so s+f+z is sfz, r+f+z is rfz, \"\"+f+z is fz, s+f+\"\" is sf, \"\"+f+\"\"+p is fp and s+f+z+p is sfzp. This scenario engraves all six. It is invalid by design: the published v24 schema stores the dynamic-prefix and dynamic-suffix enum values with literal quote characters, so it rejects accentPrefix \"s\" and accepts only \"\\\"s\\\"\" — the pinned errors are that rejection. Every mark here validates against the corrected schema, so this exhibit retires when the fix lands upstream.",
+  "bars": 2,
+  "tags": [
+    "dynamics",
+    "spec-gap",
+    "accent"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/dynamic-group/",
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/dynamic-prefix/",
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/dynamic-suffix/"
+  ],
+  "coversDefs": [
+    "root",
+    "mnx",
+    "global",
+    "measure-global",
+    "time",
+    "time-signature-unit",
+    "part",
+    "part-measure",
+    "sequence",
+    "event",
+    "note",
+    "pitch",
+    "note-value",
+    "clef",
+    "clef-sign",
+    "positioned-clef",
+    "dynamic-group",
+    "dynamic-group-list",
+    "dynamic-group-type",
+    "dynamic-value",
+    "dynamic-prefix",
+    "dynamic-suffix",
+    "rhythmic-position",
+    "fraction"
+  ],
+  "expect": {
+    "standard": "invalid",
+    "extension": "n/a",
+    "errors": [
+      "dynamic-prefix/enum",
+      "dynamic-suffix/enum"
+    ]
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "draft"
+}

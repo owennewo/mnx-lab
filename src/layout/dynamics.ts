@@ -45,17 +45,50 @@ export const DYNAMIC_GLYPH_BY_VALUE: Record<string, string> = {
   z: 'dynamicZ'
 };
 
-type DynamicMark = Pick<MnxDynamic, 'value' | 'glyphs' | 'prefix' | 'suffix'>;
+type DynamicMark = Pick<
+  MnxDynamic,
+  'type' | 'value' | 'glyphs' | 'prefix' | 'suffix' | 'accentPrefix' | 'accentSuffix' | 'residualValue'
+>;
 
-/** The SMuFL glyph for a dynamic: an explicit `glyphs[0]` wins (MNX v19 routes
- *  marks outside the `value` enum through `glyphs`), else the `value` maps via
- *  the table. null = unmapped (renderers fall back to italic text). */
-export function dynamicGlyph(dyn: DynamicMark): string | null {
-  return dyn.glyphs?.[0] ?? (dyn.value ? DYNAMIC_GLYPH_BY_VALUE[dyn.value] : undefined) ?? null;
+/**
+ * The conventional mnemonic an `type: 'accent'` group spells out.
+ *
+ * v24 encodes the sforzando family structurally rather than as an opaque glyph
+ * name: `accentPrefix` + `value` + `accentSuffix` + `residualValue` concatenate
+ * to exactly the conventional abbreviation — s+f+z = "sfz", r+f+z = "rfz",
+ * ""+f+z = "fz", s+f+"" = "sf", ""+f+""+p = "fp", s+f+z+p = "sfzp",
+ * s+ff+z = "sffz". Those are keys in the table above, so composition and lookup
+ * are the same operation.
+ *
+ * The defaults are the spec's: "If not provided, the default is 's'" /
+ * "'z'". They are load-bearing — omitting both yields "sfz", so a plain "fz"
+ * or "fp" requires setting the empty string explicitly.
+ */
+function accentMnemonic(dyn: DynamicMark): string | null {
+  if (dyn.type !== 'accent') return null;
+  const prefix = dyn.accentPrefix ?? 's';
+  const suffix = dyn.accentSuffix ?? 'z';
+  const mnemonic = `${prefix}${dyn.value ?? ''}${suffix}${dyn.residualValue ?? ''}`;
+  return mnemonic || null;
 }
 
-/** The italic-text fallback for a dynamic that has no mapped glyph. */
+/** The SMuFL glyph for a dynamic: an explicit `glyphs[0]` wins (MNX routes
+ *  marks outside the `value` enum through `glyphs`), then an accent group's
+ *  composed mnemonic, else the `value` maps via the table. null = unmapped
+ *  (renderers fall back to italic text). */
+export function dynamicGlyph(dyn: DynamicMark): string | null {
+  if (dyn.glyphs?.[0]) return dyn.glyphs[0];
+  const accent = accentMnemonic(dyn);
+  if (accent && DYNAMIC_GLYPH_BY_VALUE[accent]) return DYNAMIC_GLYPH_BY_VALUE[accent];
+  return (dyn.value ? DYNAMIC_GLYPH_BY_VALUE[dyn.value] : undefined) ?? null;
+}
+
+/** The italic-text fallback for a dynamic that has no mapped glyph. An accent
+ *  group falls back to its own mnemonic, so an unmapped combination still
+ *  engraves as the letters it denotes rather than as a bare `value`. */
 export function dynamicLabel(dyn: DynamicMark): string {
+  const accent = accentMnemonic(dyn);
+  if (accent) return [dyn.prefix, accent, dyn.suffix].filter(Boolean).join('');
   return [dyn.prefix, dyn.value, dyn.suffix].filter(Boolean).join('');
 }
 
