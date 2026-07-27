@@ -29,16 +29,24 @@ const PROSE_REPORT_LIMIT = 25;
  * catches them — moving the pin can restate what a field means with no schema
  * change at all.
  */
-function reportProseDrift(revision, schemaVersion) {
+function reportProseDrift(revision, schemaVersion, upstream) {
   const current = loadSpecProse();
   const previous = fs.existsSync(PROSE_MANIFEST)
     ? JSON.parse(fs.readFileSync(PROSE_MANIFEST, 'utf8')).prose ?? {}
     : null;
 
-  fs.writeFileSync(
-    PROSE_MANIFEST,
-    JSON.stringify({ specRevision: revision, schemaVersion, prose: current }, null, 2) + '\n'
-  );
+  // Only persist for an upstream pin. Running this while a proposal branch is
+  // checked out should still *report* what that branch changes, but recording
+  // it would leave the committed manifest describing prose that only exists on
+  // a fork — disagreeing with the committed pin.
+  if (upstream) {
+    fs.writeFileSync(
+      PROSE_MANIFEST,
+      JSON.stringify({ specRevision: revision, schemaVersion, prose: current }, null, 2) + '\n'
+    );
+  } else {
+    console.log('(pin is not upstream — reporting prose drift without recording it)');
+  }
 
   if (!previous) {
     console.log(`Prose manifest created: ${Object.keys(current).length} documented items.`);
@@ -80,7 +88,8 @@ function main() {
       `revision ${specRevision().slice(0, 8)}.`
   );
 
-  if (!pinIsUpstream()) {
+  const upstream = pinIsUpstream();
+  if (!upstream) {
     console.warn(
       `\n  WARNING: vendor/mnx is on a commit that is not reachable from origin/main.\n` +
         `  .gitmodules points at w3c-cg/mnx, so committing this pin would leave a submodule\n` +
@@ -158,7 +167,7 @@ function main() {
   console.log(
     `\nSynced ${examples.length} examples (${updated} changed); ${invalidCount} fail schema validation.`
   );
-  reportProseDrift(specRevision(), schemaVersion);
+  reportProseDrift(specRevision(), schemaVersion, upstream);
   if (stale.length) process.exitCode = 1;
 }
 
