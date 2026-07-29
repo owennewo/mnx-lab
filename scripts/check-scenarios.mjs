@@ -34,7 +34,24 @@ export function createContext() {
   const extSchema = readJson(path.join(ROOT, 'schemas', 'mnx-lab-extensions.schema.json'));
   const metaSchema = readJson(path.join(SCENARIOS_DIR, 'meta.schema.json'));
   ajv.addSchema(extSchema);
+
+  // The proposed schema is optional and present only while a spec proposal is in
+  // flight. It is generated from our fork of the spec, so a scenario declaring
+  // `"schema": "proposed"` is asserting "this is what the document looks like IF
+  // the proposal is adopted" — see docs/mnx-spec-submodule.md.
+  const proposedPath = path.join(ROOT, 'schemas', 'mnx-schema.proposed.json');
+  const proposedSchema = fs.existsSync(proposedPath) ? readJson(proposedPath) : null;
+
   return {
+    proposedSchema: proposedSchema
+      ? {
+          version: /\/version\/(.+)$/.exec(proposedSchema.$id ?? '')?.[1] ?? null,
+          defs: new Set(Object.keys(proposedSchema.$defs ?? {})),
+          validate: new Ajv2020.default({ allErrors: true, validateFormats: false }).compile(
+            proposedSchema
+          )
+        }
+      : null,
     manifest: readJson(path.join(SCENARIOS_DIR, 'manifest.json')),
     mnxDefs: new Set(Object.keys(mnxSchema.$defs ?? {})),
     // The trailing segment of the schema's $id: ".../mnx-schema.json/version/19".
@@ -169,14 +186,29 @@ export function checkScenario(scenario, ctx) {
 
   if (!meta || !doc) return { errors, warnings, meta };
 
+  // Which MNX schema is this scenario written against? Default is the published
+  // one; `"schema": "proposed"` opts into a spec change we have drafted but the
+  // CG has not adopted, so the corpus can prove a proposal works.
+  const wantsProposed = meta.schema === 'proposed';
+  if (wantsProposed && !ctx.proposedSchema) {
+    fail(
+      'declares "schema": "proposed" but schemas/mnx-schema.proposed.json is absent — ' +
+        'generate it from the spec fork, or drop the declaration'
+    );
+    return { errors, warnings, meta };
+  }
+  const validateMnx = wantsProposed ? ctx.proposedSchema.validate : ctx.validateMnx;
+  const knownDefs = wantsProposed ? ctx.proposedSchema.defs : ctx.mnxDefs;
+  const schemaLabel = wantsProposed ? 'the PROPOSED MNX schema' : 'the MNX schema';
+
   // coversDefs typo check
   for (const def of meta.coversDefs ?? []) {
-    if (!ctx.mnxDefs.has(def)) fail(`coversDefs entry "${def}" is not a $def in the MNX schema`);
+    if (!knownDefs.has(def)) fail(`coversDefs entry "${def}" is not a $def in ${schemaLabel}`);
   }
 
   // Verdicts, both directions
-  const standardOk = ctx.validateMnx(doc);
-  const standardErrors = standardOk ? [] : (ctx.validateMnx.errors ?? []).map(formatError);
+  const standardOk = validateMnx(doc);
+  const standardErrors = standardOk ? [] : (validateMnx.errors ?? []).map(formatError);
   const standardVerdict = standardOk ? 'valid' : 'invalid';
   const ext = computeExtensionVerdict(doc, ctx);
 

@@ -33,6 +33,31 @@ contributing PRs upstream (fork topology, the Django/`uv` doctools setup) is in
 site: the schema and docs are emitted from a Django fixture, so a spec change is a change
 to `doctools/data.json`, never a hand-edit of `mnx-schema.json`.
 
+### Proposing spec changes upstream
+
+Contributing back to MNX is a **secondary goal of this repo** — the test bench exists partly
+to find gaps, and a found gap is worth more as a merged spec change than as a private
+workaround ([#529](https://github.com/w3c-cg/mnx/pull/529) is the worked precedent: bug →
+issue → PR → merged as schema v26, our render now ships as a reference engraving on the spec
+site). A proposal is *proved* rather than described:
+
+1. **Draft it in the fork.** Branch `vendor/mnx`, edit via the Django admin, `freezedb`. The
+   branch *is* the proposal.
+2. **Generate `schemas/mnx-schema.proposed.json`** from that branch (`manage.py makesite`,
+   then copy out `mnx-schema.json`). It sits *beside* the published schema, never replacing
+   it — `schemas/mnx-schema.json` always stays a verbatim copy of the pinned upstream release.
+3. **Write scenarios against it.** A scenario opts in with `"schema": "proposed"` in its
+   `meta.json`; `expect.standard` is then judged against the proposal. Everything else keeps
+   validating against the published spec, so a proposal can never quietly loosen the corpus.
+4. **Render it**, so the proposal ships with engravings from a real implementation.
+5. Then issue → PR upstream.
+
+**The proposed schema is dev-time only, like the submodule.** The Worker's precompiled
+validators and the `/api/edit-notation` retry loop use the **published** schema only — the
+LLM must never be taught to emit fields that don't exist yet. When a proposal is adopted,
+move the pin, re-vendor, and delete `mnx-schema.proposed.json` and the `"schema"`
+declarations along with it.
+
 The `/api/*` routes are a **Cloudflare Worker** ([worker/index.ts](worker/index.ts), Hono), served inside the Vite dev server by `@cloudflare/vite-plugin` — there is no separate backend process. `OPENROUTER_API_KEY` comes from `.dev.vars`/`.env` locally (both gitignored) and from a Worker secret (`wrangler secret put OPENROUTER_API_KEY`) in production. If the key is missing or a placeholder, `/api/edit-notation` falls back to a regex-based mock in `handleMockCommand` (transpose / "whole note ending" / "double octave") so the UI stays demoable offline.
 
 **Workers can't run `ajv.compile()`** (no runtime code generation), so the schema validator is precompiled by [scripts/compile-validator.mjs](scripts/compile-validator.mjs) into `worker/generated/validate-mnx.mjs` (committed; regenerated automatically by `npm run build`). The legacy Express server in `server/` is retained for its prompt module (`server/prompts/editNotation.js`) and `server/models.json`, which the Worker imports directly — but it is no longer run.

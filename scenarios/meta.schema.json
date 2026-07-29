@@ -19,40 +19,72 @@
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^[a-z0-9:-]+$" },
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9:-]+$"
+      },
       "uniqueItems": true
     },
     "specRefs": {
       "type": "array",
-      "items": { "type": "string", "format": "uri" },
+      "items": {
+        "type": "string",
+        "format": "uri"
+      },
       "description": "Pointers into the MNX spec (mnx-reference/objects/... pages)."
     },
     "coversDefs": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "uniqueItems": true,
-      "description": "Schema $defs this scenario exercises — drives the coverage report."
+      "description": "Schema $defs this scenario exercises \u2014 drives the coverage report."
+    },
+    "schema": {
+      "enum": [
+        "published",
+        "proposed"
+      ],
+      "description": "Which MNX schema `expect.standard` is judged against. Default \"published\" \u2014 the vendored spec release. \"proposed\" opts into schemas/mnx-schema.proposed.json, a spec change drafted in our fork but not adopted by the CG; use it so a proposal can be proved against the corpus instead of only described. See docs/mnx-spec-submodule.md."
     },
     "expect": {
       "type": "object",
       "properties": {
-        "standard": { "enum": ["valid", "invalid"] },
+        "standard": {
+          "enum": [
+            "valid",
+            "invalid"
+          ]
+        },
         "extension": {
-          "enum": ["valid", "invalid", "n/a"],
+          "enum": [
+            "valid",
+            "invalid",
+            "n/a"
+          ],
           "description": "Verdict against the _x.mnxLab extension schema; n/a when the document carries no _x.mnxLab."
         },
         "errors": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "description": "Required iff any verdict is 'invalid': fragments that must each match at least one actual validation error."
         }
       },
-      "required": ["standard", "extension"],
+      "required": [
+        "standard",
+        "extension"
+      ],
       "additionalProperties": false
     },
     "requires": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "uniqueItems": true,
       "description": "Renderer capabilities exercised (free-form for now)."
     },
@@ -65,9 +97,20 @@
       "pattern": "^(hand-written|spec-example|llm|converter:.+)$"
     },
     "status": {
-      "enum": ["draft", "valid", "rendered", "verified"]
+      "enum": [
+        "draft",
+        "valid",
+        "rendered",
+        "verified"
+      ]
     }
   },
-  "required": ["title", "description", "expect", "source", "status"],
+  "required": [
+    "title",
+    "description",
+    "expect",
+    "source",
+    "status"
+  ],
   "additionalProperties": false
 }

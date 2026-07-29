@@ -108,6 +108,54 @@ and [doctools/README.md](https://github.com/w3c-cg/mnx/blob/main/doctools/README
   example, its `.json` and `.png` — `freezedb` doesn't produce those). Don't regenerate
   `docs/` in a PR; maintainers do that.
 
+### Proposing a spec change: the proposed-schema pattern
+
+A bug fix can be described in an issue. A *design* proposal is only convincing if it has been
+built, so this repo carries a second schema while one is in flight.
+
+```
+schemas/mnx-schema.json            verbatim copy of the pinned upstream release — never edited
+schemas/mnx-schema.proposed.json   generated from our proposal branch — optional, transient
+```
+
+**Generating it**, from a proposal branch in the submodule:
+
+```bash
+git -C vendor/mnx checkout <proposal-branch>
+cd vendor/mnx/doctools
+uv run --python 3.12 --with django==4.2.24 --with lxml \
+  --with git+https://github.com/w3c-cg/mnxdocgenerator.git \
+  python manage.py makesite /tmp/proposed-site
+cp /tmp/proposed-site/mnx-schema.json ../../../schemas/mnx-schema.proposed.json
+git -C vendor/mnx checkout <the pinned upstream sha>      # leave the pin where it was
+```
+
+Bump `xmlschema.version` on the branch (e.g. to `28-proposed`) so the two `$id`s are never
+confusable.
+
+**Using it.** A scenario declares which schema judges it:
+
+```jsonc
+{ "schema": "proposed", "expect": { "standard": "valid", "extension": "n/a" } }
+```
+
+Default is `published`. `check-scenarios` picks the validator per scenario and checks
+`coversDefs` against that schema's `$defs`, so a proposal can introduce new objects without
+tripping the typo check. Declaring `proposed` with no such file on disk is an error rather
+than a silent fallback.
+
+**Boundaries that matter:**
+
+- `schemas/mnx-schema.json` stays a byte-for-byte copy of the pinned release. A proposal never
+  edits it — otherwise "does this validate against MNX?" stops having an answer.
+- The Worker's precompiled validators and the AI retry loop use the **published** schema only.
+  Teaching the LLM to emit unadopted fields would poison the primary defence against schema
+  drift.
+- `npm run build` and the deploy must not need the proposed schema, same rule as the submodule.
+- **On adoption:** move the pin, re-vendor `mnx-schema.json`, then delete
+  `mnx-schema.proposed.json` and every `"schema": "proposed"` declaration. The pattern is
+  scaffolding, not a permanent second spec.
+
 ### Local doctools setup with uv
 
 The generator is a separate package — **`spectools`**, from
