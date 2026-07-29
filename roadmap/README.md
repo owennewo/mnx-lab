@@ -31,6 +31,15 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   dynamics rework (#518, proposed → merged in three weeks). **The designs are now built**
   (`_x.mnxLab` v3 — see [docs/mnx-extensions.md](../docs/mnx-extensions.md)); what is left here
   is the outward half: join the CG, sign the CLA, and post the three proposals.
+- **[score-text.md](proposed/score-text.md)** — **where text belongs in MNX.** v27 allows free
+  text in seven places (lyrics, naming, two dynamics decorations) and a bar can carry no text
+  at all, so rehearsal marks, section names and performance directions have nowhere to go.
+  Proposes typed `rehearsal`/`section` on the global measure beside `segno`/`fine`/`jump`, plus
+  generic `directions[]` on the part measure shaped like `dynamic-group`. Key argument: typing
+  makes placement derivable, which is why Soundslice needs an inner/outer axis and MNX would
+  not. Includes a round-trip stress test — 3 of 4 directions are destroyed or misclassified
+  today, and the corpus never catches it. Supersedes the placement half of
+  [mnx-cg-proposals.md](proposed/mnx-cg-proposals.md) §3.
 - **[chord-symbols.md](proposed/chord-symbols.md)** — chord symbols. **Data path shipped**
   (2026-07-26) as `global.measures[i]._x.mnxLab.harmonies[]`: structured *and* literal, read
   from Guitar Pro `beat.text` **and** `Chord` objects, written and read as MusicXML
