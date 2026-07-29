@@ -4,12 +4,12 @@ This file documents the version history, updates, and origins of the MNX JSON sc
 
 ## Current Version Information
 
-- **Schema Version:** `version/24` (per the schema's `$id`), 190 `$defs`
+- **Schema Version:** `version/27` (per the schema's `$id`), 193 `$defs`
 - **Schema Source:** [W3C Music Notation Community Group - MNX GitHub Repository](https://github.com/w3c-cg/mnx)
-- **Upstream Revision:** [`09c65b01`](https://github.com/w3c-cg/mnx/commit/09c65b01f56c46cce514b267f83cbeef0b6973dc)
-  ("Added staffEnd to dynamic group", 2026-07-21) — the commit the `vendor/mnx`
-  submodule is pinned to, and `mnx-schema.json` here is a verbatim copy of its
-  `docs/mnx-schema.json`.
+- **Upstream Revision:** [`46fbe93`](https://github.com/w3c-cg/mnx/commit/46fbe93)
+  ("Updated notationref.json to include dynamics and hairpins as implemented",
+  2026-07-29) — the commit the `vendor/mnx` submodule is pinned to, and
+  `mnx-schema.json` here is a verbatim copy of its `docs/mnx-schema.json`.
 - **Format Standard:** JSON Schema Draft 2020-12
 
 **The schema is generated, not authored.** Upstream keeps the spec in a Django
@@ -20,9 +20,43 @@ hand-edit of the JSON. See [docs/mnx-spec-submodule.md](../docs/mnx-spec-submodu
 
 **Descriptions are normative and the schema drops them.** `spec-prose.json` in
 this directory fingerprints every documented object, relationship and enum
-(651 items) so `npm run sync:spec` can report prose drift when the pin moves —
+(663 items) so `npm run sync:spec` can report prose drift when the pin moves —
 the only tripwire that catches a field being *redefined* without its shape
-changing. See the v24 entry below for why that is not hypothetical.
+changing. The v24 → v27 entry below is a live example: three descriptions were
+rewritten with no version bump at all.
+
+## v24 → v27 (2026-07-29)
+
+Three versions, and **two of them are ours**:
+
+| | commit | change |
+|---|---|---|
+| v25 | `1db0757` | `dynamic-value` +`pppppp` +`ffffff` — the conventional ladder is now complete, so only `fp`/`fz`/`z`-style marks still need `glyphs` |
+| — | `94d0773` | our `dynamic-group` clarifications (`value` for accents; `prefix`/`suffix` vs `accentPrefix`/`accentSuffix`) — **prose only, no version bump** |
+| **v26** | `65d6ee3` | **our fix**: `dynamic-prefix`/`dynamic-suffix` enum values no longer carry literal quote characters |
+| — | `a2a3016` | our `dynamic-accents` worked example (slug `dynamic-accents`, files `dynamics-accents.*`) |
+| v27 | `bd9e611` | measure repeats: +`measure-repeat`, `measure-repeat-count`, `measure-repeat-counter` |
+
+Contributed via [w3c-cg/mnx#529](https://github.com/w3c-cg/mnx/pull/529), split
+into three commits upstream. The enum descriptions landed verbatim; the
+clarifications were lightly copy-edited; the example was renamed and rewritten to
+lean on the `accentPrefix`/`accentSuffix` defaults rather than stating them, and
+its reference engraving is this project's renderer output.
+
+`94d0773` is the case the prose manifest exists for: three field descriptions
+were rewritten and the schema version did not move, so nothing in
+`mnx-schema.json` records that anything changed.
+
+Corpus impact: three new spec examples (`dynamic-accents`, `measure-repeats`,
+`measure-repeats-with-counters`) and the retirement of
+`lab/dynamics/accent-prefix-suffix` as an invalid-by-design exhibit — it
+validates cleanly from v26 on.
+
+**Still open upstream:** `residualValue`'s description gives
+`{"value": "f", "residualValue": "p"}` as its worked example of an `fp`, but with
+the documented defaults that composes to `sfzp` — and since v26 the spec's own
+`dynamic-accents` example uses exactly that encoding for its `sfzp`. Unreported;
+a semantics question rather than a typo.
 
 ## v19 → v24 (2026-07-27)
 
@@ -57,8 +91,8 @@ Two findings that a schema diff alone does **not** show:
   accent prefix/suffix filled in a model that was already present — and the gap
   was one level of prose disagreeing with another, which no schema diff can see.
 
-**Known bug in v24 (unreported upstream):** the `dynamic-prefix` and
-`dynamic-suffix` enums carry literal quote characters — `"\"s\""`, `"\"r\""`,
+**Known bug in v24 (fixed upstream in v26 — see above):** the `dynamic-prefix` and
+`dynamic-suffix` enums carried literal quote characters — `"\"s\""`, `"\"r\""`,
 `"\"z\""` and two `"\"\""`. They are the only 5 of the spec's 155 enum rows
 stored that way, and they contradict the prose ("for a `sfz` dynamic, the prefix
 is `s`"). Consequence: `accentPrefix: "s"` is **rejected** and `accentPrefix:

@@ -1,0 +1,45 @@
+{
+  "title": "Measure repeats (with counters)",
+  "description": "Sometimes published music includes \"counters\" above measure repeats — numbers that help the musician keep track of how many times the repeat has happened. In MNX, these numbers are encoded via \"counter\" on the measure-repeat object.",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/measure-repeats-with-counters/"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "measure-global",
+    "measure-repeat",
+    "measure-repeat-count",
+    "measure-repeat-counter",
+    "mnx",
+    "multi-staff-orientation",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "root",
+    "sequence",
+    "staff-position",
+    "step",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "rendered"
+}

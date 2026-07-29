@@ -301,11 +301,13 @@ export interface MnxBeam {
   direction?: 'left' | 'right';
 }
 
-/** Standard dynamic values (MNX v24 `dynamic-value`, a closed enum). v24 widened
- *  the range by four (pppp…fffff); marks still outside it (pppppp, ffffff, fp,
- *  fz, z, …) travel in `glyphs`, and sfz/rfz are now better expressed
- *  structurally as `type: 'accent'` with `accentPrefix`/`accentSuffix`. */
+/** Standard dynamic values (MNX v27 `dynamic-value`, a closed enum). v24 widened
+ *  the range by four (pppp…fffff) and v25 added the extremes (pppppp, ffffff),
+ *  so the whole conventional ladder is now first-class. Marks still outside it
+ *  (fp, fz, z, …) travel in `glyphs`, and sfz/rfz are expressed structurally as
+ *  `type: 'accent'` with `accentPrefix`/`accentSuffix`. */
 export type MnxDynamicValue =
+  | 'pppppp'
   | 'ppppp'
   | 'pppp'
   | 'ppp'
@@ -318,6 +320,7 @@ export type MnxDynamicValue =
   | 'fff'
   | 'ffff'
   | 'fffff'
+  | 'ffffff'
   | 'n';
 
 /** A dynamic marking (MNX v24 `dynamic-group`) at a metric position. `type` is

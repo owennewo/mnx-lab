@@ -1,4 +1,4 @@
-# Accent dynamics: the v24 structural encoding, and why this is invalid
+# Accent dynamics: the structural encoding, written out in full
 
 MNX v23 added `accentPrefix` / `accentSuffix` to `dynamic-group`, so the
 sforzando family stops being an opaque SMuFL glyph name and becomes structure.
@@ -18,29 +18,38 @@ composition and glyph lookup end up being the same operation:
 string and looks it up in the table that already existed for `glyphs`-routed
 marks. All 10 accent marks in the table compose correctly.
 
-## Why `expect.standard` is `invalid`
+## Upstream history
 
-The published v24 schema stores the `dynamic-prefix` and `dynamic-suffix` enum
-values **with literal quote characters** — `"\"s\""`, `"\"r\""`, `"\"z\""` and two
-`"\"\""`. They are the only 5 of the spec's 155 enum values stored that way. So
-the schema rejects `accentPrefix: "s"` (what the docs prescribe) and accepts
-`accentPrefix: "\"s\""`. The pinned errors here are that rejection.
+This scenario was originally invalid by design. The published v24 schema stored
+the `dynamic-prefix` and `dynamic-suffix` enum values **with literal quote
+characters** — `"\"s\""`, `"\"r\""`, `"\"z\""` and two `"\"\""` — the only 5 of the
+spec's 155 enum values stored that way. So it rejected `accentPrefix: "s"` (what
+the docs prescribe) and accepted `accentPrefix: "\"s\""`. The docs also render
+enum values in quotes, so the published `dynamic-prefix` page showed doubled
+quotes.
 
-The docs also render enum values in quotes, so the published page for
-`dynamic-prefix` currently shows doubled quotes. One data fix corrects both.
+Reported and fixed via [w3c-cg/mnx#529](https://github.com/w3c-cg/mnx/pull/529),
+merged as `65d6ee3` — which cut schema **v26**. The document has validated
+cleanly since.
 
-Fix proposed upstream from `vendor/mnx` branch
-`fix-dynamic-prefix-suffix-enum-quoting`. **This exhibit retires when it lands** —
-every mark here validates against the corrected schema.
+The same PR contributed the descriptions for those five values, three
+`dynamic-group` clarifications, and the spec's own `dynamic-accents` example —
+whose reference engraving is this renderer's output.
 
-## Two related documentation gaps found alongside
+## Still open upstream: what `{"value": "f", "residualValue": "p"}` means
 
-- **`value` is undocumented for `type: "accent"`.** Its description covers
-  `immediate` and `gradual` only, yet `residualValue`'s own text shows
-  `{"value": "f", "residualValue": "p"}` — so an accent plainly uses `value`.
-- **The `fp` example contradicts the stated defaults.** `accentPrefix` defaults
-  to `s` and `accentSuffix` to `z`, so `{"value": "f", "residualValue": "p"}`
-  composes to `sfzp`, not `fp`. Getting `fp` needs both empty strings set
-  explicitly — which the quoting bug makes impossible. The defaults are what
-  make the empty value load-bearing, and that is why the quoting bug blocks
-  `fz`, `sf` and `fp` rather than being cosmetic.
+`accentPrefix` defaults to `s` and `accentSuffix` to `z`, so that object
+composes to **sfzp**, not `fp`. Getting `fp` needs both empty strings set
+explicitly, which is what this scenario and the spec's example both do.
+
+But `residualValue`'s own description still gives that exact object as its
+worked example of an **`fp`**. Since v26 the spec's `dynamic-accents` example
+uses the identical encoding for its **sfzp**, so the same JSON is now documented
+two ways in the same spec. Not yet reported — it is a semantics question rather
+than a typo, and worth raising with the related one: `residualValue` has no
+`end` and `accent` is documented as a single beat, so how long the residual
+dynamic lasts is unstated. That is inaudible in engraving and audible in
+playback.
+
+(The other gap found alongside — `value` never mentioning `type: "accent"` —
+was fixed by the same PR and is no longer open.)

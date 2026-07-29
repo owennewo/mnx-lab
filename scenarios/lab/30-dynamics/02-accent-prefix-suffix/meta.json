@@ -1,10 +1,9 @@
 {
-  "title": "Accent family via accentPrefix/accentSuffix (v24)",
-  "description": "MNX v24 encodes the sforzando family structurally rather than as opaque glyph names: accentPrefix + value + accentSuffix + residualValue concatenate to the conventional abbreviation, so s+f+z is sfz, r+f+z is rfz, \"\"+f+z is fz, s+f+\"\" is sf, \"\"+f+\"\"+p is fp and s+f+z+p is sfzp. This scenario engraves all six. It is invalid by design: the published v24 schema stores the dynamic-prefix and dynamic-suffix enum values with literal quote characters, so it rejects accentPrefix \"s\" and accepts only \"\\\"s\\\"\" — the pinned errors are that rejection. Every mark here validates against the corrected schema, so this exhibit retires when the fix lands upstream.",
+  "title": "Accent family via accentPrefix/accentSuffix, written out in full",
+  "description": "MNX encodes the sforzando family structurally rather than as opaque glyph names: accentPrefix + value + accentSuffix + residualValue concatenate to the conventional abbreviation, so s+f+z is sfz, r+f+z is rfz, \"\"+f+z is fz, s+f+\"\" is sf, \"\"+f+\"\"+p is fp and s+f+z+p is sfzp. This scenario engraves all six with every component stated explicitly. The spec's own dynamic-accents example is the complement: it writes the same markings idiomatically, leaning on the accentPrefix=\"s\" / accentSuffix=\"z\" defaults, so between them the two cover both spellings. Was invalid by design under v24, whose dynamic-prefix and dynamic-suffix enums held literal quote characters; fixed upstream in v26 (w3c-cg/mnx#529) and valid from then on.",
   "bars": 2,
   "tags": [
     "dynamics",
-    "spec-gap",
     "accent"
   ],
   "specRefs": [
@@ -39,15 +38,11 @@
     "fraction"
   ],
   "expect": {
-    "standard": "invalid",
-    "extension": "n/a",
-    "errors": [
-      "dynamic-prefix/enum",
-      "dynamic-suffix/enum"
-    ]
+    "standard": "valid",
+    "extension": "n/a"
   },
   "requires": [],
   "idRefs": false,
   "source": "hand-written",
-  "status": "draft"
+  "status": "rendered"
 }
