@@ -319,20 +319,9 @@
         "className": "direction"
       },
       {
-        "kind": "text",
-        "text": "Intro",
-        "x": 2.6,
-        "y": 2.508,
-        "font": "body",
-        "size": 1.8,
-        "weight": "bold",
-        "anchor": "start",
-        "className": "section-label"
-      },
-      {
         "kind": "rect",
         "x": 2.1,
-        "y": -1.784,
+        "y": 0.812,
         "w": 2.116,
         "h": 2.096,
         "stroke": "currentColor",
@@ -343,12 +332,23 @@
         "kind": "text",
         "text": "A",
         "x": 2.6,
-        "y": -0.088,
+        "y": 2.508,
         "font": "body",
         "size": 1.8,
         "weight": "bold",
         "anchor": "start",
         "className": "rehearsal-label"
+      },
+      {
+        "kind": "text",
+        "text": "Intro",
+        "x": 4.716,
+        "y": 2.508,
+        "font": "body",
+        "size": 1.8,
+        "weight": "bold",
+        "anchor": "start",
+        "className": "section-label"
       },
       {
         "kind": "line",

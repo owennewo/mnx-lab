@@ -2412,44 +2412,33 @@ function emitScoreLabels(args: EmitScoreLabelsArgs): void {
     if (px < m.x || px > m.x + m.width || py >= staffTop) continue;
     occupiedTop = Math.min(occupiedTop, py - capH);
   }
-  const rowH = capH + 2 * REHEARSAL_PAD_Y_SP + SCORE_LABEL_GAP_SP;
   const innerY =
     occupiedTop === staffTop
       ? staffTop - SCORE_LABEL_BASE_RISE_SP
       : occupiedTop - SCORE_LABEL_GAP_SP - capH;
 
-  // A rehearsal mark reads as the outermost index, so it goes above the section
-  // when both are present — and takes the inner row when it is alone, rather
-  // than leaving a gap where the section would have been.
-  const sectionY = innerY;
-  const rehearsalY = gm.section ? innerY - rowH : innerY;
+  // Both labels share one row. "[A] Verse" reads as a single statement — the
+  // mark indexes the bar and the name says what it is — and vertical space
+  // above the staff is the scarcest thing in an engraving, contested by tempo
+  // marks, directions, ottavas and voltas. Stacking them spends two rows to say
+  // one thing.
+  //
+  // Nothing in the document asks for this. Placement is derivable because the
+  // objects are typed, which is the whole argument for typing them; another
+  // renderer stacking them is equally conforming.
+  const rehearsalPos = gm.rehearsal ? place(gm.rehearsal.location) : null;
+  const sectionPos = gm.section ? place(gm.section.location) : null;
+  let boxRight: number | null = null;
 
-  if (gm.section) {
-    const p = place(gm.section.location);
-    primitives.push({
-      kind: 'text',
-      text: gm.section.label,
-      x: p.x,
-      y: sectionY,
-      font: 'body',
-      size: SCORE_LABEL_SIZE_SP,
-      weight: 'bold',
-      anchor: p.anchor,
-      ...(gm.section.color ? { fill: gm.section.color } : {}),
-      className: 'section-label'
-    });
-  }
-
-  if (gm.rehearsal) {
-    const p = place(gm.rehearsal.location);
+  if (gm.rehearsal && rehearsalPos) {
     const label = gm.rehearsal.label;
-    const y = rehearsalY;
     const w = label.length * SCORE_LABEL_SIZE_SP * DIRECTION_CHAR_SP + 2 * REHEARSAL_PAD_X_SP;
-    const left = p.anchor === 'middle' ? p.x - w / 2 : p.x - REHEARSAL_PAD_X_SP;
+    const left = rehearsalPos.anchor === 'middle' ? rehearsalPos.x - w / 2 : rehearsalPos.x - REHEARSAL_PAD_X_SP;
+    boxRight = left + w;
     primitives.push({
       kind: 'rect',
       x: left,
-      y: y - capH - REHEARSAL_PAD_Y_SP,
+      y: innerY - capH - REHEARSAL_PAD_Y_SP,
       w,
       h: capH + 2 * REHEARSAL_PAD_Y_SP,
       stroke: 'currentColor',
@@ -2459,14 +2448,35 @@ function emitScoreLabels(args: EmitScoreLabelsArgs): void {
     primitives.push({
       kind: 'text',
       text: label,
-      x: p.anchor === 'middle' ? p.x : left + REHEARSAL_PAD_X_SP,
-      y,
+      x: rehearsalPos.anchor === 'middle' ? rehearsalPos.x : left + REHEARSAL_PAD_X_SP,
+      y: innerY,
       font: 'body',
       size: SCORE_LABEL_SIZE_SP,
       weight: 'bold',
-      anchor: p.anchor === 'middle' ? 'middle' : 'start',
+      anchor: rehearsalPos.anchor === 'middle' ? 'middle' : 'start',
       ...(gm.rehearsal.color ? { fill: gm.rehearsal.color } : {}),
       className: 'rehearsal-label'
+    });
+  }
+
+  if (gm.section && sectionPos) {
+    // Beside the box when they mark the same point; at its own column otherwise,
+    // because then they are labelling different places in the bar.
+    const beside =
+      boxRight !== null && rehearsalPos !== null && Math.abs(rehearsalPos.x - sectionPos.x) < 1e-6;
+    // A long name simply overhangs, the way an engraver would set it. Changing
+    // layout shape based on string length surprises people more than it helps.
+    primitives.push({
+      kind: 'text',
+      text: gm.section.label,
+      x: beside ? boxRight! + SCORE_LABEL_GAP_SP : sectionPos.x,
+      y: innerY,
+      font: 'body',
+      size: SCORE_LABEL_SIZE_SP,
+      weight: 'bold',
+      anchor: beside ? 'start' : sectionPos.anchor,
+      ...(gm.section.color ? { fill: gm.section.color } : {}),
+      className: 'section-label'
     });
   }
 }
