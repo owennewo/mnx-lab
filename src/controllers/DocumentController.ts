@@ -3,7 +3,6 @@ import { MnxDocument, MnxStructure } from '../types/mnx.ts';
 import { documentRepository } from '../utils/indexedDbRepository.ts';
 import { defaultScore } from '../utils/defaultScore.ts';
 import { upgradeTabExtension } from '../utils/upgradeTabExtension.ts';
-import houseOfRisingSunJson from '../../server/scores/House-of-the-Rising-Sun.mnx.json';
 
 export class DocumentController implements ReactiveController {
   host: ReactiveControllerHost;
@@ -31,20 +30,12 @@ export class DocumentController implements ReactiveController {
     this.host.requestUpdate();
 
     try {
-      let list = await documentRepository.list();
-
-      // Seed House of the Rising Sun if not present
-      const hasHouse = list.some(doc => doc.id === 'house-of-the-rising-sun');
-      if (!hasHouse) {
-        const houseDoc: MnxDocument = {
-          id: 'house-of-the-rising-sun',
-          name: 'House of the Rising Sun',
-          lastUpdated: Date.now(),
-          mnxJson: houseOfRisingSunJson as any
-        };
-        await documentRepository.save(houseDoc);
-        list = await documentRepository.list();
-      }
+      // No corpus score is seeded here. Importing one as a JSON module coupled
+      // the client bundle to a path under server/ — the corpus is authored as
+      // Guitar Pro and its .mnx.json is a regenerated artifact, so the build
+      // must not depend on it. An empty repository falls through to
+      // `defaultScore` below.
+      const list = await documentRepository.list();
 
       this.documentsList = list;
 
