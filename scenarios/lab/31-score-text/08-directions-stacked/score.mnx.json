@@ -8,18 +8,8 @@
         "time": {
           "count": 4,
           "unit": 4
-        },
-        "section": {
-          "label": "Intro"
         }
-      },
-      {},
-      {
-        "section": {
-          "label": "Verse"
-        }
-      },
-      {}
+      }
     ]
   },
   "parts": [
@@ -34,80 +24,98 @@
               }
             }
           ],
+          "directions": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "text": "nearest above",
+              "orient": "above"
+            },
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "text": "furthest above",
+              "orient": "above"
+            },
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "text": "nearest below",
+              "orient": "below"
+            },
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "text": "furthest below",
+              "orient": "below"
+            }
+          ],
           "sequences": [
             {
               "content": [
                 {
                   "duration": {
-                    "base": "whole"
+                    "base": "quarter"
                   },
                   "notes": [
                     {
                       "pitch": {
                         "step": "C",
-                        "octave": 4
+                        "octave": 5
                       }
                     }
                   ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "sequences": [
-            {
-              "content": [
+                },
                 {
                   "duration": {
-                    "base": "whole"
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 5
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
                   },
                   "notes": [
                     {
                       "pitch": {
                         "step": "E",
-                        "octave": 4
+                        "octave": 5
                       }
                     }
                   ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "sequences": [
-            {
-              "content": [
+                },
                 {
                   "duration": {
-                    "base": "whole"
+                    "base": "quarter"
                   },
                   "notes": [
                     {
                       "pitch": {
-                        "step": "G",
-                        "octave": 4
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "sequences": [
-            {
-              "content": [
-                {
-                  "duration": {
-                    "base": "whole"
-                  },
-                  "notes": [
-                    {
-                      "pitch": {
-                        "step": "C",
+                        "step": "F",
                         "octave": 5
                       }
                     }

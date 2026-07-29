@@ -1451,13 +1451,6 @@ function renderSegment(args: RenderSegmentArgs): {
         });
       }
     }
-    emitScoreLabels({
-      gm: mnx.global.measures[i] ?? {},
-      m,
-      stdSequences,
-      staffTop,
-      primitives
-    });
     emitNavigationMarkers({
       gm: mnx.global.measures[i] ?? {},
       m,
@@ -1465,6 +1458,9 @@ function renderSegment(args: RenderSegmentArgs): {
       staffTop,
       primitives
     });
+    // Last for the measure: the label row is placed above whatever else already
+    // occupies the space over this staff — a tempo mark, a segno, a direction.
+    emitScoreLabels({ gm: mnx.global.measures[i] ?? {}, m, staffTop, primitives });
 
     if (measureIssues.length) {
       emitMeasureDiagnostics(m.x, sysBottom, measureIssues, primitives);
@@ -2369,8 +2365,7 @@ function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
 
 interface EmitScoreLabelsArgs {
   gm: MnxGlobalMeasure;
-  m: { voices: { x: number }[][]; x: number; width: number };
-  stdSequences: (MnxSequence | undefined)[];
+  m: { x: number; width: number };
   staffTop: number;
   primitives: Primitive[];
 }
@@ -2384,28 +2379,20 @@ interface EmitScoreLabelsArgs {
  * needs no typography at all.
  */
 function emitScoreLabels(args: EmitScoreLabelsArgs): void {
-  const { gm, m, stdSequences, staffTop, primitives } = args;
+  const { gm, m, staffTop, primitives } = args;
   if (!gm.rehearsal && !gm.section) return;
 
-  const onsetXs = measureOnsetXs(stdSequences[0], m.voices[0] ?? []);
-  // A label at the top of the bar aligns to the barline, not to the first
-  // notehead — that is where engravers put rehearsal marks and section names.
-  // A label placed anywhere else in the bar anchors to its column.
-  const place = (loc?: { fraction: [number, number] }) => {
-    const f = loc?.fraction;
-    const t = Array.isArray(f) && f[1] ? f[0] / f[1] : 0;
-    if (t <= 1e-6) return { x: m.x + SCORE_LABEL_INSET_SP, anchor: 'start' as const };
-    return anchorAt(onsetXs, t, m);
-  };
+  // Labels describe the measure rather than a moment in it, so they align to the
+  // barline — which is where engravers put them.
+  const labelX = m.x + SCORE_LABEL_INSET_SP;
 
   const capH = SCORE_LABEL_SIZE_SP * SCORE_LABEL_CAP_RATIO;
 
-  // Directions are emitted before this and sit closest to the staff, so a
-  // score-wide label starts above whatever is already drawn over this measure.
-  // With nothing there it takes the innermost row rather than floating.
+  // A score-wide label goes above everything else over this measure — tempo
+  // marks, navigation marks, part directions — because it labels the bar as a
+  // whole. With the space clear it takes the innermost row rather than floating.
   let occupiedTop = staffTop;
   for (const p of primitives) {
-    if (p.className !== 'direction') continue;
     const py = (p as { y?: number }).y;
     const px = (p as { x?: number }).x;
     if (py === undefined || px === undefined) continue;
@@ -2426,14 +2413,12 @@ function emitScoreLabels(args: EmitScoreLabelsArgs): void {
   // Nothing in the document asks for this. Placement is derivable because the
   // objects are typed, which is the whole argument for typing them; another
   // renderer stacking them is equally conforming.
-  const rehearsalPos = gm.rehearsal ? place(gm.rehearsal.location) : null;
-  const sectionPos = gm.section ? place(gm.section.location) : null;
   let boxRight: number | null = null;
 
-  if (gm.rehearsal && rehearsalPos) {
+  if (gm.rehearsal) {
     const label = gm.rehearsal.label;
     const w = label.length * SCORE_LABEL_SIZE_SP * DIRECTION_CHAR_SP + 2 * REHEARSAL_PAD_X_SP;
-    const left = rehearsalPos.anchor === 'middle' ? rehearsalPos.x - w / 2 : rehearsalPos.x - REHEARSAL_PAD_X_SP;
+    const left = labelX - REHEARSAL_PAD_X_SP;
     boxRight = left + w;
     primitives.push({
       kind: 'rect',
@@ -2448,33 +2433,30 @@ function emitScoreLabels(args: EmitScoreLabelsArgs): void {
     primitives.push({
       kind: 'text',
       text: label,
-      x: rehearsalPos.anchor === 'middle' ? rehearsalPos.x : left + REHEARSAL_PAD_X_SP,
+      x: labelX,
       y: innerY,
       font: 'body',
       size: SCORE_LABEL_SIZE_SP,
       weight: 'bold',
-      anchor: rehearsalPos.anchor === 'middle' ? 'middle' : 'start',
+      anchor: 'start',
       ...(gm.rehearsal.color ? { fill: gm.rehearsal.color } : {}),
       className: 'rehearsal-label'
     });
   }
 
-  if (gm.section && sectionPos) {
-    // Beside the box when they mark the same point; at its own column otherwise,
-    // because then they are labelling different places in the bar.
-    const beside =
-      boxRight !== null && rehearsalPos !== null && Math.abs(rehearsalPos.x - sectionPos.x) < 1e-6;
-    // A long name simply overhangs, the way an engraver would set it. Changing
-    // layout shape based on string length surprises people more than it helps.
+  if (gm.section) {
+    // "[A] Verse" reads as one statement, so the name follows the box. A long
+    // name simply overhangs, the way an engraver would set it — layout that
+    // changes shape based on string length surprises people more than it helps.
     primitives.push({
       kind: 'text',
       text: gm.section.label,
-      x: beside ? boxRight! + SCORE_LABEL_GAP_SP : sectionPos.x,
+      x: boxRight === null ? labelX : boxRight + SCORE_LABEL_GAP_SP,
       y: innerY,
       font: 'body',
       size: SCORE_LABEL_SIZE_SP,
       weight: 'bold',
-      anchor: beside ? 'start' : sectionPos.anchor,
+      anchor: 'start',
       ...(gm.section.color ? { fill: gm.section.color } : {}),
       className: 'section-label'
     });

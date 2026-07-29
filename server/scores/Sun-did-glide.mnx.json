@@ -13,12 +13,6 @@
           "unit": 4
         },
         "section": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "Intro"
         },
         "tempos": [
@@ -40,12 +34,6 @@
       {
         "repeatStart": {},
         "section": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "Pre-Verse"
         }
       },
@@ -62,12 +50,6 @@
       },
       {
         "section": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "Verse"
         }
       },
@@ -110,12 +92,6 @@
       },
       {
         "section": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "Interlude"
         },
         "ending": {
@@ -152,12 +128,6 @@
       },
       {
         "section": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "Outro"
         }
       },

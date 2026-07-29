@@ -10,24 +10,12 @@
           "unit": 4
         },
         "rehearsal": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "A"
         }
       },
       {},
       {
         "rehearsal": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "B"
         }
       },

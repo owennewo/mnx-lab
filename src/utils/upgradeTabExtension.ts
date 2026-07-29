@@ -33,18 +33,16 @@ export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
   return doc as MnxStructure;
 }
 
-/** v3 → v4: promote the two label objects out of the vendor dict. `location` is
- *  required on the standard objects and the extension never carried one, so the
- *  measure start is the only defensible reconstruction — which is where every
- *  label in the corpus sat anyway. */
+/** v3 → v4: promote the two label objects out of the vendor dict. Both are
+ *  properties of the measure in the standard shape, exactly as they were in the
+ *  extension, so this is a move rather than a translation. */
 function upgradeV3(doc: any): void {
   for (const measure of doc.global?.measures ?? []) {
     const lab = measure._x?.mnxLab;
     if (!lab?.rehearsal && !lab?.section) continue;
 
-    const at = { fraction: [0, 4] as [number, number] };
-    if (lab.rehearsal) measure.rehearsal = { location: at, label: lab.rehearsal.label };
-    if (lab.section) measure.section = { location: at, label: lab.section.label };
+    if (lab.rehearsal) measure.rehearsal = { label: lab.rehearsal.label };
+    if (lab.section) measure.section = { label: lab.section.label };
 
     const { rehearsal: _r, section: _s, ...restLab } = lab;
     const { mnxLab: _m, ...restX } = measure._x;

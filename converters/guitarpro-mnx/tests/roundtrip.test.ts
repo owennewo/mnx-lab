@@ -662,8 +662,8 @@ describe('section and rehearsal labels', () => {
         measures: [
           {
             time: { count: 4, unit: 4 },
-            rehearsal: { location: { fraction: [0, 4] }, label: 'A' },
-            section: { location: { fraction: [0, 4] }, label: 'Verse' }
+            rehearsal: { label: 'A' },
+            section: { label: 'Verse' }
           }
         ]
       },
@@ -677,9 +677,8 @@ describe('section and rehearsal labels', () => {
       ]
     };
     const back = importGuitarPro(exportGuitarPro(doc));
-    const at = { fraction: [0, 4] };
-    expect(back.global.measures[0].rehearsal).toEqual({ location: at, label: 'A' });
-    expect(back.global.measures[0].section).toEqual({ location: at, label: 'Verse' });
+    expect(back.global.measures[0].rehearsal).toEqual({ label: 'A' });
+    expect(back.global.measures[0].section).toEqual({ label: 'Verse' });
   });
 });
 

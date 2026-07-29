@@ -89,11 +89,11 @@ export interface MnxHarmony {
   text?: string;
 }
 
-/** A label positioned in a global measure: `rehearsal` is an index into the
- *  score ("A"), `section` names a formal unit of the piece ("Verse 1"). Shaped
- *  like `segno`/`fine` — `location` is required, as it is on those. */
+/** A label on a global measure: `rehearsal` is an index into the score ("A"),
+ *  `section` names a formal unit of the piece ("Verse 1"). A property OF the
+ *  measure, like `key` and `time` — not positioned within it, because a
+ *  rehearsal mark indexes a bar and a section begins at a barline. */
 export interface MnxMeasureLabel {
-  location: { fraction: [number, number] };
   label: string;
   color?: string;
 }

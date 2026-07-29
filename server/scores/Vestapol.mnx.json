@@ -24,12 +24,6 @@
       {},
       {
         "rehearsal": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "A"
         },
         "_x": {
@@ -190,12 +184,6 @@
       },
       {
         "rehearsal": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "B"
         },
         "_x": {
@@ -356,12 +344,6 @@
       },
       {
         "rehearsal": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "C"
         }
       },
@@ -504,12 +486,6 @@
       },
       {
         "rehearsal": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "A"
         },
         "_x": {

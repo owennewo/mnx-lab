@@ -145,10 +145,8 @@ function buildGlobalMeasures(
     // schemas/mnx-schema.proposed.json until the CG adopts them.
     const marker = masterBar.section?.marker?.trim();
     const sectionText = masterBar.section?.text?.trim();
-    // Guitar Pro attaches a section to the bar, not to a beat within it.
-    const at = { fraction: [0, 4] as [number, number] };
-    if (marker) measure.rehearsal = { location: at, label: marker };
-    if (sectionText) measure.section = { location: at, label: sectionText };
+    if (marker) measure.rehearsal = { label: marker };
+    if (sectionText) measure.section = { label: sectionText };
 
     for (const automation of masterBar.tempoAutomations ?? []) {
       measure.tempos = measure.tempos ?? [];

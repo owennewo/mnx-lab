@@ -89,15 +89,14 @@ describe('extension upgrade: v2 -> v3', () => {
 
   it('splits the conflated section label, then promotes both out of _x (v4)', () => {
     const doc: any = upgradeTabExtension(v2Document() as MnxStructure);
-    const at = { fraction: [0, 4] };
 
     // v2 conflated them in one `_x.section`; v3 split them under `_x.mnxLab`;
     // v4 promotes both to the standard objects and leaves no vendor dict behind.
-    expect(doc.global.measures[0].rehearsal).toEqual({ location: at, label: 'A' });
-    expect(doc.global.measures[0].section).toEqual({ location: at, label: 'Verse' });
+    expect(doc.global.measures[0].rehearsal).toEqual({ label: 'A' });
+    expect(doc.global.measures[0].section).toEqual({ label: 'Verse' });
     expect(doc.global.measures[0]._x).toBeUndefined();
     // A measure with only one of the two gets only that one.
-    expect(doc.global.measures[1].section).toEqual({ location: at, label: 'Chorus' });
+    expect(doc.global.measures[1].section).toEqual({ label: 'Chorus' });
     expect(doc.global.measures[1].rehearsal).toBeUndefined();
     expect(doc.global.measures[1]._x).toBeUndefined();
     expect(doc.global.measures[2]._x).toBeUndefined();
@@ -138,14 +137,14 @@ describe('extension upgrade: v2 -> v3', () => {
       parts: [{ measures: [{ sequences: [] }] }]
     };
     const out: any = upgradeTabExtension(v3 as MnxStructure);
-    expect(out.global.measures[0].rehearsal).toEqual({ location: { fraction: [0, 4] }, label: 'B' });
+    expect(out.global.measures[0].rehearsal).toEqual({ label: 'B' });
     expect(out.global.measures[0]._x).toBeUndefined();
   });
 
   it('leaves an already-v4 document untouched, by identity', () => {
     const doc = {
       mnx: { version: 1 },
-      global: { measures: [{ rehearsal: { location: { fraction: [0, 4] }, label: 'B' } }] },
+      global: { measures: [{ rehearsal: { label: 'B' } }] },
       parts: [
         {
           _x: { mnxLab: { tab: { staffKind: 'tab' } } },

@@ -10,42 +10,18 @@
           "unit": 4
         },
         "rehearsal": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "A"
         },
         "section": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "Intro"
         }
       },
       {},
       {
         "rehearsal": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "B"
         },
         "section": {
-          "location": {
-            "fraction": [
-              0,
-              4
-            ]
-          },
           "label": "Verse"
         }
       },

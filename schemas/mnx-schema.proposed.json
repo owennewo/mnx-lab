@@ -1723,14 +1723,10 @@
         },
         "label": {
           "$ref": "#/$defs/string"
-        },
-        "location": {
-          "$ref": "#/$defs/rhythmic-position"
         }
       },
       "required": [
-        "label",
-        "location"
+        "label"
       ],
       "type": "object",
       "unevaluatedProperties": false
@@ -1884,14 +1880,10 @@
         },
         "label": {
           "$ref": "#/$defs/string"
-        },
-        "location": {
-          "$ref": "#/$defs/rhythmic-position"
         }
       },
       "required": [
-        "label",
-        "location"
+        "label"
       ],
       "type": "object",
       "unevaluatedProperties": false

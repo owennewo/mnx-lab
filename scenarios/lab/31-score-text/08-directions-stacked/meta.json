@@ -1,10 +1,10 @@
 {
-  "title": "Symbolic directions",
-  "description": "A direction may carry SMuFL glyphs instead of text, for instructions that are symbolic rather than written out. Here the glyphs are the piano pedal marks; MNX has no pedal object, so a symbolic direction is how pedalling is encoded. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
-  "bars": 2,
+  "title": "Stacked directions",
+  "description": "Directions sharing a position and an orientation are displayed stacked outward from the staff, in the order they appear in the array — the first is nearest the notes. That ordering is all a renderer needs to place several instructions at one point. No direction says how far from the staff it belongs, and none needs to. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
+  "bars": 1,
   "tags": [
     "directions",
-    "smufl",
+    "stacking",
     "proposed"
   ],
   "specRefs": [
@@ -34,10 +34,9 @@
     "rhythmic-position",
     "root",
     "sequence",
-    "smufl-glyph",
-    "smufl-glyph-list",
     "staff-position",
     "step",
+    "string",
     "time",
     "time-signature-unit",
     "version-number"
@@ -50,5 +49,5 @@
   "requires": [],
   "idRefs": false,
   "source": "hand-written",
-  "status": "valid"
+  "status": "rendered"
 }
