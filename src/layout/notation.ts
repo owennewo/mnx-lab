@@ -178,10 +178,14 @@ const DYNAMIC_BASELINE_DROP_SP = 3.5; // glyph baseline below the bottom staff l
 // document says so.
 const SCORE_LABEL_SIZE_SP = 1.8;
 const SCORE_LABEL_INSET_SP = 0.6; // from the barline, for a label at the top of the bar
-const REHEARSAL_RISE_SP = 6.4; // baseline above the top staff line
-const SECTION_RISE_SP = 4.0;
+// Body text has no metrics in layout, so the box is drawn around an estimated
+// CAP HEIGHT, not the em. Sizing it to the em leaves the ascender/descender
+// space inside the box and the letter sits visibly low in it.
+const SCORE_LABEL_CAP_RATIO = 0.72;
+const SCORE_LABEL_BASE_RISE_SP = 2.8; // baseline of the innermost label, above the top staff line
+const SCORE_LABEL_GAP_SP = 0.5; // between stacked labels
 const REHEARSAL_PAD_X_SP = 0.5; // box padding around the label
-const REHEARSAL_PAD_Y_SP = 0.35;
+const REHEARSAL_PAD_Y_SP = 0.4;
 const REHEARSAL_BOX_THICKNESS_SP = 0.12;
 const DIRECTION_SIZE_SP = 1.5;
 const DIRECTION_RISE_SP = 2.4; // baseline above the staff's top line
@@ -2394,13 +2398,39 @@ function emitScoreLabels(args: EmitScoreLabelsArgs): void {
     return anchorAt(onsetXs, t, m);
   };
 
+  const capH = SCORE_LABEL_SIZE_SP * SCORE_LABEL_CAP_RATIO;
+
+  // Directions are emitted before this and sit closest to the staff, so a
+  // score-wide label starts above whatever is already drawn over this measure.
+  // With nothing there it takes the innermost row rather than floating.
+  let occupiedTop = staffTop;
+  for (const p of primitives) {
+    if (p.className !== 'direction') continue;
+    const py = (p as { y?: number }).y;
+    const px = (p as { x?: number }).x;
+    if (py === undefined || px === undefined) continue;
+    if (px < m.x || px > m.x + m.width || py >= staffTop) continue;
+    occupiedTop = Math.min(occupiedTop, py - capH);
+  }
+  const rowH = capH + 2 * REHEARSAL_PAD_Y_SP + SCORE_LABEL_GAP_SP;
+  const innerY =
+    occupiedTop === staffTop
+      ? staffTop - SCORE_LABEL_BASE_RISE_SP
+      : occupiedTop - SCORE_LABEL_GAP_SP - capH;
+
+  // A rehearsal mark reads as the outermost index, so it goes above the section
+  // when both are present — and takes the inner row when it is alone, rather
+  // than leaving a gap where the section would have been.
+  const sectionY = innerY;
+  const rehearsalY = gm.section ? innerY - rowH : innerY;
+
   if (gm.section) {
     const p = place(gm.section.location);
     primitives.push({
       kind: 'text',
       text: gm.section.label,
       x: p.x,
-      y: staffTop - SECTION_RISE_SP,
+      y: sectionY,
       font: 'body',
       size: SCORE_LABEL_SIZE_SP,
       weight: 'bold',
@@ -2413,16 +2443,15 @@ function emitScoreLabels(args: EmitScoreLabelsArgs): void {
   if (gm.rehearsal) {
     const p = place(gm.rehearsal.location);
     const label = gm.rehearsal.label;
-    const y = staffTop - REHEARSAL_RISE_SP;
+    const y = rehearsalY;
     const w = label.length * SCORE_LABEL_SIZE_SP * DIRECTION_CHAR_SP + 2 * REHEARSAL_PAD_X_SP;
-    // `anchorAt` may centre the text on its column; the box has to follow it.
     const left = p.anchor === 'middle' ? p.x - w / 2 : p.x - REHEARSAL_PAD_X_SP;
     primitives.push({
       kind: 'rect',
       x: left,
-      y: y - SCORE_LABEL_SIZE_SP - REHEARSAL_PAD_Y_SP,
+      y: y - capH - REHEARSAL_PAD_Y_SP,
       w,
-      h: SCORE_LABEL_SIZE_SP + 2 * REHEARSAL_PAD_Y_SP,
+      h: capH + 2 * REHEARSAL_PAD_Y_SP,
       stroke: 'currentColor',
       thickness: REHEARSAL_BOX_THICKNESS_SP,
       className: 'rehearsal-box'
