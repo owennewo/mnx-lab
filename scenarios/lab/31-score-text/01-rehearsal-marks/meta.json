@@ -1,0 +1,51 @@
+{
+  "title": "Rehearsal marks",
+  "description": "A rehearsal mark is an arbitrary index into the score, used to coordinate players in rehearsal. It carries no musical meaning of its own — renumbering every mark in a score changes nothing about the music. Rehearsal marks are conventionally drawn in a box. That follows from the object being a rehearsal mark, so the document does not encode it. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
+  "bars": 4,
+  "tags": [
+    "labels",
+    "rehearsal",
+    "proposed"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/112"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "event",
+    "fraction",
+    "global",
+    "integer-unsigned",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rehearsal",
+    "rhythmic-position",
+    "root",
+    "sequence",
+    "staff-position",
+    "step",
+    "string",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "schema": "proposed",
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "rendered"
+}

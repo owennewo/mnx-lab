@@ -1,0 +1,55 @@
+{
+  "title": "Directions on a multi-staff part",
+  "description": "On a part with more than one staff, a direction may name the staff it belongs to. An orientation of \"between\" places it between the staves, where it belongs to the part as a whole rather than to either staff — a placement a simple above/below cannot express. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
+  "bars": 2,
+  "tags": [
+    "directions",
+    "multi-staff",
+    "proposed"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/112"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "direction",
+    "direction-list",
+    "event",
+    "fraction",
+    "global",
+    "integer-unsigned",
+    "measure-global",
+    "mnx",
+    "multi-staff-orientation",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "part-name",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rhythmic-position",
+    "root",
+    "sequence",
+    "staff-number",
+    "staff-position",
+    "step",
+    "string",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "schema": "proposed",
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "rendered"
+}

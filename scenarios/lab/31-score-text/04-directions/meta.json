@@ -1,0 +1,52 @@
+{
+  "title": "Directions",
+  "description": "A direction is a textual instruction attached to a point in the music, for anything that has no more specific representation. Directions belong to a part rather than to the score, and several may occur in the same measure. A direction carries no typography. How it is set is the renderer's decision, as it is for every other object in MNX. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
+  "bars": 2,
+  "tags": [
+    "directions",
+    "proposed"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/112"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "direction",
+    "direction-list",
+    "event",
+    "fraction",
+    "global",
+    "integer-unsigned",
+    "measure-global",
+    "mnx",
+    "multi-staff-orientation",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rhythmic-position",
+    "root",
+    "sequence",
+    "staff-position",
+    "step",
+    "string",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "schema": "proposed",
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "rendered"
+}

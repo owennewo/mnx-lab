@@ -1,0 +1,57 @@
+{
+  "title": "Directions across parts",
+  "description": "Rehearsal marks and sections are score-wide: they live on the global measure and apply to every part, so they are stated once however many parts a score has. A direction is part-specific. Here only the first part is told to play the passage solo, while both parts share the rehearsal mark and the section name. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
+  "bars": 2,
+  "tags": [
+    "labels",
+    "directions",
+    "multi-part",
+    "proposed"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/112"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "direction",
+    "direction-list",
+    "event",
+    "fraction",
+    "global",
+    "integer-unsigned",
+    "measure-global",
+    "mnx",
+    "multi-staff-orientation",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "part-name",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rehearsal",
+    "rhythmic-position",
+    "root",
+    "section",
+    "sequence",
+    "staff-position",
+    "step",
+    "string",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "schema": "proposed",
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "rendered"
+}
