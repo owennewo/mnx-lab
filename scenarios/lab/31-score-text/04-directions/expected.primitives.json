@@ -159,6 +159,26 @@
         "className": "barline"
       },
       {
+        "kind": "text",
+        "text": "Play 8x",
+        "x": 12.1,
+        "y": 5.6,
+        "font": "bodyItalic",
+        "size": 1.5,
+        "anchor": "middle",
+        "className": "direction"
+      },
+      {
+        "kind": "text",
+        "text": "rit.",
+        "x": 26.1,
+        "y": 16.2,
+        "font": "bodyItalic",
+        "size": 1.5,
+        "anchor": "middle",
+        "className": "direction"
+      },
+      {
         "kind": "line",
         "x1": 37.4,
         "y1": 8,
@@ -288,6 +308,16 @@
         "h": 4,
         "fill": "currentColor",
         "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "text",
+        "text": "a tempo",
+        "x": 41.5,
+        "y": 5.6,
+        "font": "bodyItalic",
+        "size": 1.5,
+        "anchor": "middle",
+        "className": "direction"
       }
     ]
   }

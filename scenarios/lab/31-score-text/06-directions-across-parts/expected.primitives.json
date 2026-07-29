@@ -309,6 +309,48 @@
         "className": "barline"
       },
       {
+        "kind": "text",
+        "text": "solo",
+        "x": 12.1,
+        "y": 5.6,
+        "font": "bodyItalic",
+        "size": 1.5,
+        "anchor": "middle",
+        "className": "direction"
+      },
+      {
+        "kind": "text",
+        "text": "Intro",
+        "x": 2.6,
+        "y": 4,
+        "font": "body",
+        "size": 1.8,
+        "weight": "bold",
+        "anchor": "start",
+        "className": "section-label"
+      },
+      {
+        "kind": "rect",
+        "x": 2.1,
+        "y": -0.55,
+        "w": 2.116,
+        "h": 2.5,
+        "stroke": "currentColor",
+        "thickness": 0.12,
+        "className": "rehearsal-box"
+      },
+      {
+        "kind": "text",
+        "text": "A",
+        "x": 2.6,
+        "y": 1.6,
+        "font": "body",
+        "size": 1.8,
+        "weight": "bold",
+        "anchor": "start",
+        "className": "rehearsal-label"
+      },
+      {
         "kind": "line",
         "x1": 37.4,
         "y1": 8,

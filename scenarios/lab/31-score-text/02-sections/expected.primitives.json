@@ -99,6 +99,17 @@
         "className": "barline"
       },
       {
+        "kind": "text",
+        "text": "Intro",
+        "x": 2.6,
+        "y": 4,
+        "font": "body",
+        "size": 1.8,
+        "weight": "bold",
+        "anchor": "start",
+        "className": "section-label"
+      },
+      {
         "kind": "line",
         "x1": 20.9,
         "y1": 8,
@@ -221,6 +232,17 @@
         "y2": 12,
         "thickness": 0.16,
         "className": "barline"
+      },
+      {
+        "kind": "text",
+        "text": "Verse",
+        "x": 34.4,
+        "y": 4,
+        "font": "body",
+        "size": 1.8,
+        "weight": "bold",
+        "anchor": "start",
+        "className": "section-label"
       },
       {
         "kind": "line",

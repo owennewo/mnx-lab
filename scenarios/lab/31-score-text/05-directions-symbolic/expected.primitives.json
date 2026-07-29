@@ -159,6 +159,14 @@
         "className": "barline"
       },
       {
+        "kind": "glyph",
+        "glyph": "keyboardPedalPed",
+        "x": 12.1,
+        "y": 16.2,
+        "anchor": "middle",
+        "className": "direction"
+      },
+      {
         "kind": "line",
         "x1": 37.4,
         "y1": 8,
@@ -288,6 +296,14 @@
         "h": 4,
         "fill": "currentColor",
         "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "keyboardPedalUp",
+        "x": 41.5,
+        "y": 16.2,
+        "anchor": "middle",
+        "className": "direction"
       }
     ]
   }

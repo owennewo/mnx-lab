@@ -166,6 +166,31 @@ const ARTICULATIONS: { key: keyof MnxEventMarkings; above: string; below: string
 
 const DYNAMIC_BASELINE_DROP_SP = 3.5; // glyph baseline below the bottom staff line
 
+// ---------- Score text (proposed: roadmap/proposed/score-text.md) ----------
+//
+// Rehearsal marks and sections are score-wide, so they stack above the TOP
+// staff of the system, clear of the tempo row. Directions belong to a part and
+// sit just outside their own staff, above or below as `orient` says.
+//
+// The stacking order is fixed by what each object IS, which is the point of
+// typing them: a rehearsal mark reads as the outermost index, the section name
+// sits under it, and part-level text sits closest to the notes. Nothing in the
+// document says so.
+const SCORE_LABEL_SIZE_SP = 1.8;
+const SCORE_LABEL_INSET_SP = 0.6; // from the barline, for a label at the top of the bar
+const REHEARSAL_RISE_SP = 6.4; // baseline above the top staff line
+const SECTION_RISE_SP = 4.0;
+const REHEARSAL_PAD_X_SP = 0.5; // box padding around the label
+const REHEARSAL_PAD_Y_SP = 0.35;
+const REHEARSAL_BOX_THICKNESS_SP = 0.12;
+const DIRECTION_SIZE_SP = 1.5;
+const DIRECTION_RISE_SP = 2.4; // baseline above the staff's top line
+const DIRECTION_DROP_SP = 4.2; // baseline below the staff's bottom line, clearing a ledger note
+const DIRECTION_STACK_SP = 1.9; // extra offset per coincident direction
+// Body text has no metrics available in layout (no DOM), so widths are
+// estimated the same way lyric and staff labels are.
+const DIRECTION_CHAR_SP = 0.62;
+
 // Metronome marks ("note = bpm") above the start of the measure.
 const METRONOME_GLYPH_BY_BASE: Record<string, string> = {
   breve: 'metNoteDoubleWhole',
@@ -1406,7 +1431,7 @@ function renderSegment(args: RenderSegmentArgs): {
       for (const g of segment.groups) {
         const pm = segment.staves[g.start].sources[0].part.measures[i];
         if (!pm) continue;
-        emitDynamics({
+        const groupArgs = {
           partMeasure: pm,
           m: { x: m.x, width: m.width, staves: m.staves.slice(g.start, g.start + g.count) },
           sequencesByStaff: resolvedByStaff
@@ -1414,9 +1439,21 @@ function renderSegment(args: RenderSegmentArgs): {
             .map(voices => voices.map(v => v.seq)),
           staffBottoms: staffBottoms.slice(g.start, g.start + g.count),
           primitives
+        };
+        emitDynamics(groupArgs);
+        emitDirections({
+          ...groupArgs,
+          staffTops: staffTops.slice(g.start, g.start + g.count)
         });
       }
     }
+    emitScoreLabels({
+      gm: mnx.global.measures[i] ?? {},
+      m,
+      stdSequences,
+      staffTop,
+      primitives
+    });
     emitNavigationMarkers({
       gm: mnx.global.measures[i] ?? {},
       m,
@@ -2321,6 +2358,180 @@ function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
       anchor: p.anchor,
       className: 'jump'
     });
+  }
+}
+
+// ---------- Score text: rehearsal marks and sections ----------
+
+interface EmitScoreLabelsArgs {
+  gm: MnxGlobalMeasure;
+  m: { voices: { x: number }[][]; x: number; width: number };
+  stdSequences: (MnxSequence | undefined)[];
+  staffTop: number;
+  primitives: Primitive[];
+}
+
+/**
+ * Draws the measure's score-wide labels above the top staff: the rehearsal mark
+ * boxed, the section name plain beneath it.
+ *
+ * The box is not encoded — it is what a rehearsal mark looks like, and drawing
+ * it here rather than reading an `enclosure` attribute is why the document
+ * needs no typography at all.
+ */
+function emitScoreLabels(args: EmitScoreLabelsArgs): void {
+  const { gm, m, stdSequences, staffTop, primitives } = args;
+  if (!gm.rehearsal && !gm.section) return;
+
+  const onsetXs = measureOnsetXs(stdSequences[0], m.voices[0] ?? []);
+  // A label at the top of the bar aligns to the barline, not to the first
+  // notehead — that is where engravers put rehearsal marks and section names.
+  // A label placed anywhere else in the bar anchors to its column.
+  const place = (loc?: { fraction: [number, number] }) => {
+    const f = loc?.fraction;
+    const t = Array.isArray(f) && f[1] ? f[0] / f[1] : 0;
+    if (t <= 1e-6) return { x: m.x + SCORE_LABEL_INSET_SP, anchor: 'start' as const };
+    return anchorAt(onsetXs, t, m);
+  };
+
+  if (gm.section) {
+    const p = place(gm.section.location);
+    primitives.push({
+      kind: 'text',
+      text: gm.section.label,
+      x: p.x,
+      y: staffTop - SECTION_RISE_SP,
+      font: 'body',
+      size: SCORE_LABEL_SIZE_SP,
+      weight: 'bold',
+      anchor: p.anchor,
+      ...(gm.section.color ? { fill: gm.section.color } : {}),
+      className: 'section-label'
+    });
+  }
+
+  if (gm.rehearsal) {
+    const p = place(gm.rehearsal.location);
+    const label = gm.rehearsal.label;
+    const y = staffTop - REHEARSAL_RISE_SP;
+    const w = label.length * SCORE_LABEL_SIZE_SP * DIRECTION_CHAR_SP + 2 * REHEARSAL_PAD_X_SP;
+    // `anchorAt` may centre the text on its column; the box has to follow it.
+    const left = p.anchor === 'middle' ? p.x - w / 2 : p.x - REHEARSAL_PAD_X_SP;
+    primitives.push({
+      kind: 'rect',
+      x: left,
+      y: y - SCORE_LABEL_SIZE_SP - REHEARSAL_PAD_Y_SP,
+      w,
+      h: SCORE_LABEL_SIZE_SP + 2 * REHEARSAL_PAD_Y_SP,
+      stroke: 'currentColor',
+      thickness: REHEARSAL_BOX_THICKNESS_SP,
+      className: 'rehearsal-box'
+    });
+    primitives.push({
+      kind: 'text',
+      text: label,
+      x: p.anchor === 'middle' ? p.x : left + REHEARSAL_PAD_X_SP,
+      y,
+      font: 'body',
+      size: SCORE_LABEL_SIZE_SP,
+      weight: 'bold',
+      anchor: p.anchor === 'middle' ? 'middle' : 'start',
+      ...(gm.rehearsal.color ? { fill: gm.rehearsal.color } : {}),
+      className: 'rehearsal-label'
+    });
+  }
+}
+
+// ---------- Score text: part directions ----------
+
+interface EmitDirectionsArgs {
+  partMeasure: MnxPartMeasure;
+  m: { staves: { x: number }[][][]; x: number; width: number };
+  sequencesByStaff: MnxSequence[][];
+  staffTops: number[];
+  staffBottoms: number[];
+  primitives: Primitive[];
+}
+
+/**
+ * Draws a part's directions, each anchored to its column and placed by `orient`.
+ *
+ * `between` puts the text midway between this staff and the next, which is what
+ * a two-way above/below cannot express — it belongs to the part rather than to
+ * either staff. With one staff there is no "between", so it falls back to below.
+ */
+function emitDirections(args: EmitDirectionsArgs): void {
+  const { partMeasure, m, sequencesByStaff, staffTops, staffBottoms, primitives } = args;
+  const directions = partMeasure.directions ?? [];
+  if (directions.length === 0) return;
+
+  const onsetXsByStaff = new Map<number, OnsetX[]>();
+  const onsetXsFor = (s: number) => {
+    let xs = onsetXsByStaff.get(s);
+    if (!xs) {
+      xs = measureOnsetXs(sequencesByStaff[s]?.[0], m.staves[s]?.[0] ?? []);
+      onsetXsByStaff.set(s, xs);
+    }
+    return xs;
+  };
+
+  // Several directions may share a column; stack them outward from the staff so
+  // they cannot overprint. Counted per (staff, orient, column).
+  const stackCount = new Map<string, number>();
+
+  for (const dir of directions) {
+    const text = dir.text ?? '';
+    const glyph = dir.glyphs?.[0];
+    if (!text && !glyph) continue;
+
+    const lastStaff = staffBottoms.length - 1;
+    const s = Math.min(Math.max((dir.staff ?? 1) - 1, 0), lastStaff);
+    const f = dir.position?.fraction;
+    if (!Array.isArray(f) || !f[1]) continue;
+
+    const onsetXs = onsetXsFor(s);
+    const target = f[0] / f[1];
+    const x =
+      onsetXs.find(o => o.t >= target - 1e-6)?.x ??
+      (onsetXs.length ? m.x + m.width - 2 : m.x + 2);
+
+    const orient = dir.orient ?? 'below';
+    const between = orient === 'between' && s < lastStaff;
+    const above = orient === 'above';
+
+    const key = `${s}|${between ? 'between' : above ? 'above' : 'below'}|${x.toFixed(3)}`;
+    const depth = stackCount.get(key) ?? 0;
+    stackCount.set(key, depth + 1);
+
+    const y = between
+      ? (staffBottoms[s] + staffTops[s + 1]) / 2 + DIRECTION_SIZE_SP / 2 + depth * DIRECTION_STACK_SP
+      : above
+        ? staffTops[s] - DIRECTION_RISE_SP - depth * DIRECTION_STACK_SP
+        : staffBottoms[s] + DIRECTION_DROP_SP + depth * DIRECTION_STACK_SP;
+
+    primitives.push(
+      glyph
+        ? {
+            kind: 'glyph',
+            glyph,
+            x,
+            y,
+            anchor: 'middle',
+            ...(dir.color ? { fill: dir.color } : {}),
+            className: 'direction'
+          }
+        : {
+            kind: 'text',
+            text,
+            x,
+            y,
+            font: 'bodyItalic',
+            size: DIRECTION_SIZE_SP,
+            anchor: 'middle',
+            ...(dir.color ? { fill: dir.color } : {}),
+            className: 'direction'
+          }
+    );
   }
 }
 

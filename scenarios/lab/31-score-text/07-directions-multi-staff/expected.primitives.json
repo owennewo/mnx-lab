@@ -299,6 +299,36 @@
         "className": "barline"
       },
       {
+        "kind": "text",
+        "text": "R.H.",
+        "x": 13.8,
+        "y": 5.6,
+        "font": "bodyItalic",
+        "size": 1.5,
+        "anchor": "middle",
+        "className": "direction"
+      },
+      {
+        "kind": "text",
+        "text": "cantabile",
+        "x": 13.8,
+        "y": 15.75,
+        "font": "bodyItalic",
+        "size": 1.5,
+        "anchor": "middle",
+        "className": "direction"
+      },
+      {
+        "kind": "text",
+        "text": "L.H.",
+        "x": 13.8,
+        "y": 26.2,
+        "font": "bodyItalic",
+        "size": 1.5,
+        "anchor": "middle",
+        "className": "direction"
+      },
+      {
         "kind": "line",
         "x1": 39.1,
         "y1": 8,
