@@ -4,7 +4,7 @@ export interface MnxPitch {
   alter?: number;
 }
 
-// ---- MNX Lab extensions v3 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
+// ---- MNX Lab extensions v4 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
 
 export interface MnxFingering {
   hand: 'left' | 'right';
@@ -95,16 +95,29 @@ export interface MnxHarmony {
   text?: string;
 }
 
-/** A label attached to the start of a measure: `rehearsal` is an index into the
- *  score ("A"), `section` names a formal unit of the piece ("Verse 1"). */
+/** A label positioned in a global measure: `rehearsal` is an index into the
+ *  score ("A"), `section` names a formal unit of the piece ("Verse 1"). Shaped
+ *  like `segno`/`fine` — `location` is required, as it is on those.
+ *  **Proposed, not adopted** — see roadmap/proposed/score-text.md. */
 export interface MnxMeasureLabel {
+  location: { fraction: [number, number] };
   label: string;
-  location?: { fraction: [number, number] };
+  color?: string;
+}
+
+/** A textual or symbolic instruction at a point in a part's measure. Shaped like
+ *  `dynamic-group`. Carries no typography. **Proposed, not adopted.** */
+export interface MnxDirection {
+  position: { fraction: [number, number] };
+  text?: string;
+  glyphs?: string[];
+  orient?: 'above' | 'auto' | 'below' | 'between';
+  staff?: number;
+  voice?: string;
+  color?: string;
 }
 
 export interface MnxGlobalMeasureExtension {
-  rehearsal?: MnxMeasureLabel;
-  section?: MnxMeasureLabel;
   harmonies?: MnxHarmony[];
 }
 
@@ -156,6 +169,8 @@ export interface MnxSequence {
 }
 
 export interface MnxPartMeasure {
+  /** Free-text/symbolic instructions for this part. **Proposed**, not adopted. */
+  directions?: MnxDirection[];
   clefs?: {
     clef: {
       sign: string;
@@ -226,9 +241,12 @@ export interface MnxGlobalMeasure {
     value: { base: string; dots?: number };
     location?: { fraction: [number, number] };
   }[];
-  /** Vendor extensions: rehearsal marks, section names and chord symbols, none
-   *  of which standard MNX has a field for. Schema-legal: `_x` is declared in
-   *  `global-attrs`. See docs/mnx-extensions.md. */
+  /** Rehearsal mark and formal section name. **Proposed** standard MNX
+   *  objects, not yet adopted — see roadmap/proposed/score-text.md. */
+  rehearsal?: MnxMeasureLabel;
+  section?: MnxMeasureLabel;
+  /** Vendor extensions: chord symbols, which standard MNX has no concept of at
+   *  all. Schema-legal: `_x` is declared in `global-attrs`. */
   _x?: {
     mnxLab?: MnxGlobalMeasureExtension;
   };

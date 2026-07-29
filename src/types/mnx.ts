@@ -89,11 +89,28 @@ export interface MnxHarmony {
   text?: string;
 }
 
-/** A label attached to the start of a measure: `rehearsal` is an index into the
- *  score ("A"), `section` names a formal unit of the piece ("Verse 1"). */
+/** A label positioned in a global measure: `rehearsal` is an index into the
+ *  score ("A"), `section` names a formal unit of the piece ("Verse 1"). Shaped
+ *  like `segno`/`fine` — `location` is required, as it is on those. */
 export interface MnxMeasureLabel {
+  location: { fraction: [number, number] };
   label: string;
-  location?: { fraction: [number, number] };
+  color?: string;
+}
+
+/** A textual or symbolic instruction at a point in a part's measure ("Play 8x",
+ *  "let ring"). Shaped like `dynamic-group`: positioned, optionally scoped to a
+ *  staff and voice, oriented above/below/between. Carries no typography — how a
+ *  direction is set is the renderer's decision. Exactly one of `text`/`glyphs`.
+ *  **Proposed, not adopted** — see roadmap/proposed/score-text.md. */
+export interface MnxDirection {
+  position: { fraction: [number, number] };
+  text?: string;
+  glyphs?: string[];
+  orient?: 'above' | 'auto' | 'below' | 'between';
+  staff?: number;
+  voice?: string;
+  color?: string;
 }
 
 export interface MnxAccidentalDisplay {
@@ -392,6 +409,9 @@ export interface MnxOttava {
 export interface MnxPartMeasure {
   beams?: MnxBeam[];
   dynamics?: MnxDynamic[];
+  /** Free-text/symbolic instructions for this part. **Proposed, not adopted** —
+   *  see roadmap/proposed/score-text.md. */
+  directions?: MnxDirection[];
   ottavas?: MnxOttava[];
   clefs?: {
     clef: {
@@ -495,14 +515,20 @@ export interface MnxGlobalMeasure {
       fraction: [number, number];
     };
   }[];
-  /** Vendor extensions. `rehearsal` is an index into the score ("A"),
-   *  `section` names a formal unit of the piece ("Verse 1"), `harmonies` are
-   *  chord symbols. Standard MNX has no field for any of the three; `_x` is
-   *  declared in the schema's `global-attrs`. See docs/mnx-extensions.md. */
+  /** A rehearsal mark: an arbitrary index into the score ("A", "12"). Score-wide,
+   *  so it sits beside `segno`/`fine`/`jump` rather than in a part. **Proposed,
+   *  not adopted** — validates against `schemas/mnx-schema.proposed.json` only.
+   *  See roadmap/proposed/score-text.md. */
+  rehearsal?: MnxMeasureLabel;
+  /** The formal section beginning here ("Intro", "Verse 1"), extending until the
+   *  next one. Separate from `rehearsal` because it states what the music *is*
+   *  rather than indexing it. **Proposed, not adopted** — see `rehearsal`. */
+  section?: MnxMeasureLabel;
+  /** Vendor extensions. `harmonies` are chord symbols; standard MNX has no
+   *  harmony concept at all. `_x` is declared in the schema's `global-attrs`.
+   *  See docs/mnx-extensions.md. */
   _x?: {
     mnxLab?: {
-      rehearsal?: MnxMeasureLabel;
-      section?: MnxMeasureLabel;
       harmonies?: MnxHarmony[];
     };
   };

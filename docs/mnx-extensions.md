@@ -20,9 +20,15 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 | `tab.technique.harmonic` | nothing; MusicXML's `<harmonic>` is a redesign candidate | [#179](https://github.com/w3c-cg/mnx/issues/179) | ✅ both converters | ❌ |
 | `tab.technique.palmMute` | nothing; MusicXML smuggles it through generic elements | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ❌ |
 | `tab.fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
-| `rehearsal` | `measure-global` has segno/fine/jump but **no rehearsal mark** | [#112](https://github.com/w3c-cg/mnx/issues/112), [#377](https://github.com/w3c-cg/mnx/discussions/377) | ✅ both converters | ❌ |
-| `section` | no concept of musical form at all | [#112](https://github.com/w3c-cg/mnx/issues/112) | ✅ both converters | ❌ |
 | `harmonies` | **no harmony concept anywhere** — no `root`, no `kind`, no chord | [#109](https://github.com/w3c-cg/mnx/issues/109) | ✅ both converters | ❌ |
+
+**Graduated out of `_x` in v4:** `rehearsal` and `section`. They are no longer
+extensions — they are written as the *standard* MNX objects proposed in
+[roadmap/proposed/score-text.md](../roadmap/proposed/score-text.md), and validate
+against `schemas/mnx-schema.proposed.json` until the CG adopts them. An extension
+is supposed to be a draft of the standard object; keeping a private copy after
+drafting one would mean two spellings of the same fact. The same doc adds
+`directions` for ordinary annotations, which `_x` never covered at all.
 
 Not built, and deliberately: **fretboard diagrams** ([#110](https://github.com/w3c-cg/mnx/issues/110)).
 They belong on the *part*, referencing a harmony by id, because a diagram
@@ -177,8 +183,6 @@ only the first two; the other four are Guitar Pro's.
 {
   "_x": {
     "mnxLab": {
-      "rehearsal": { "label": "A" },
-      "section":   { "label": "Verse 1" },
       "harmonies": [
         {
           "location": { "fraction": [0, 4] },
@@ -194,25 +198,18 @@ only the first two; the other four are Guitar Pro's.
 }
 ```
 
-### `rehearsal` and `section` are two things, not one
+### `rehearsal` and `section` left in v4
 
-Guitar Pro conflates them into a single `Section{marker, text}` and v2 of this
-extension copied that. They are different concepts:
+Both moved out of the vendor dict and into standard MNX shape — see
+[roadmap/proposed/score-text.md](../roadmap/proposed/score-text.md) for the design
+and [schemas/HISTORY.md](../schemas/HISTORY.md) for the version history. The
+argument for keeping them *separate* still holds and now lives in the proposal:
+a rehearsal mark is an arbitrary index into the score, a section name states what
+the music is, and they co-occur (`[A] Verse`).
 
-- a **rehearsal mark** is an arbitrary *index* into the score. Renumbering every
-  mark in a piece changes nothing musical.
-- a **section name** states what the music *is*. Renaming "Chorus" to "Verse"
-  changes the piece.
-
-They co-occur — Broadway and guitar charts routinely print `[A] Verse` — they
-render differently, and each maps cleanly outward on its own (`<rehearsal>` and
-`<words>` in MusicXML). `label` is a plain string; `location` is optional and
-defaults to the start of the measure.
-
-Deliberately **not** included: auto-lettering (`sequence: letters | numbers | …`).
-It is the only point [#112](https://github.com/w3c-cg/mnx/issues/112) has ever
-argued about, and it is what left that issue open for eight years — bundling it
-would stall the uncontested 90%.
+Saved documents are migrated by the v3 → v4 hop in
+[src/utils/upgradeTabExtension.ts](../src/utils/upgradeTabExtension.ts), which
+promotes both and drops `_x` when nothing else is left in it.
 
 ### `harmonies` is on the global timeline
 
@@ -248,8 +245,8 @@ structure, so most chords carry none.
 | `<technical><harmonic>` | `Note.harmonicType` | `technique.harmonic` |
 | `<other-technical>palm-mute</other-technical>` | `Note.isPalmMute` | `technique.palmMute` |
 | `<technical><fingering>` | — | `fingering` |
-| `<direction-type><rehearsal>` | `MasterBar.section.marker` | `rehearsal.label` |
-| `<direction-type><words>` | `MasterBar.section.text` | `section.label` |
+| `<direction-type><rehearsal>` | `MasterBar.section.marker` | `rehearsal.label` (standard, proposed) |
+| `<direction-type><words>` | `MasterBar.section.text` | `section.label` (standard, proposed) |
 | `<harmony>` | `Beat.text` / `Beat.chord.name` | `harmonies[]` |
 
 Spanner-like techniques reference their destination by **note id** — the idiom
@@ -307,6 +304,11 @@ Cloudflare Workers cannot run `ajv.compile()`.
 
 ## History
 
+- **v4** (2026-07-29): `rehearsal` and `section` graduated out of `_x` into the
+  standard MNX objects proposed in
+  [roadmap/proposed/score-text.md](../roadmap/proposed/score-text.md); the vendor
+  dict on a global measure now holds `harmonies` only. Load-time migration is the
+  v3 → v4 hop in `upgradeTabExtension.ts`.
 - **v3** (2026-07-26): namespace `_x.tab` / `_x.section` → the single vendor key
   `_x.mnxLab`; `section{marker,text}` split into `rehearsal` + `section`, each
   with a `label`; added `harmonies`, `technique.harmonic`, `technique.palmMute`;

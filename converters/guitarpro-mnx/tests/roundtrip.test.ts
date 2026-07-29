@@ -168,9 +168,16 @@ describe.each(FIXTURES)('schema conformance: %s', name => {
   it('produces MNX that validates against the project schemas', async () => {
     // The local interfaces in src/common/types.ts mirror src/types/mnx.ts by
     // hand, so THIS is the guard that actually catches drift: the precompiled
-    // Ajv validators built from schemas/mnx-schema.json and
+    // Ajv validators built from the MNX schema and
     // schemas/mnx-lab-extensions.schema.json.
-    const validate = (await import('../../../worker/generated/validate-mnx.mjs')).default;
+    //
+    // Validated against the PROPOSED schema: the importer writes `rehearsal` and
+    // `section`, which are drafted in roadmap/proposed/score-text.md and not yet
+    // adopted, so the published schema rejects them by design. Swap this import
+    // back to validate-mnx.mjs the moment the CG adopts them — the published
+    // validator passing is the signal that the proposal has landed.
+    const validate = (await import('../../../worker/generated/validate-mnx-proposed.mjs'))
+      .default;
     const { validateNoteExt, validatePartExt, validateGlobalMeasureExt } = await import(
       '../../../worker/generated/validate-extensions.mjs'
     );
@@ -609,12 +616,11 @@ describe('section and rehearsal labels', () => {
   const labels = (m: MnxStructure) =>
     m.global.measures
       .map((g, i) => {
-        const ext = g._x?.mnxLab;
-        if (!ext?.rehearsal && !ext?.section) return null;
+        if (!g.rehearsal && !g.section) return null;
         return {
           measure: i + 1,
-          ...(ext.rehearsal ? { rehearsal: ext.rehearsal.label } : {}),
-          ...(ext.section ? { section: ext.section.label } : {})
+          ...(g.rehearsal ? { rehearsal: g.rehearsal.label } : {}),
+          ...(g.section ? { section: g.section.label } : {})
         };
       })
       .filter(Boolean);
@@ -656,7 +662,8 @@ describe('section and rehearsal labels', () => {
         measures: [
           {
             time: { count: 4, unit: 4 },
-            _x: { mnxLab: { rehearsal: { label: 'A' }, section: { label: 'Verse' } } }
+            rehearsal: { location: { fraction: [0, 4] }, label: 'A' },
+            section: { location: { fraction: [0, 4] }, label: 'Verse' }
           }
         ]
       },
@@ -670,10 +677,9 @@ describe('section and rehearsal labels', () => {
       ]
     };
     const back = importGuitarPro(exportGuitarPro(doc));
-    expect(back.global.measures[0]._x?.mnxLab).toEqual({
-      rehearsal: { label: 'A' },
-      section: { label: 'Verse' }
-    });
+    const at = { fraction: [0, 4] };
+    expect(back.global.measures[0].rehearsal).toEqual({ location: at, label: 'A' });
+    expect(back.global.measures[0].section).toEqual({ location: at, label: 'Verse' });
   });
 });
 

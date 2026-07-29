@@ -137,22 +137,18 @@ function buildGlobalMeasures(
     }
     if (masterBar.isDoubleBar) measure.barline = { type: 'double' };
 
-    // Section / rehearsal labels. MNX v19 has no field for either — it models
-    // segno/fine/jump but not rehearsal marks — so they live under `_x`, which
-    // the schema declares in `global-attrs`. Guitar Pro conflates the two into
-    // one `Section{marker, text}`; we split them, because a rehearsal mark is
-    // an arbitrary index into the score while a section name states what the
-    // music IS (docs/mnx-extensions.md §labels).
+    // Section / rehearsal labels. Guitar Pro conflates the two into one
+    // `Section{marker, text}`; we split them, because a rehearsal mark is an
+    // arbitrary index into the score while a section name states what the music
+    // IS. Written as the PROPOSED standard objects — see
+    // roadmap/proposed/score-text.md; they validate against
+    // schemas/mnx-schema.proposed.json until the CG adopts them.
     const marker = masterBar.section?.marker?.trim();
     const sectionText = masterBar.section?.text?.trim();
-    if (marker || sectionText) {
-      measure._x = {
-        mnxLab: {
-          ...(marker ? { rehearsal: { label: marker } } : {}),
-          ...(sectionText ? { section: { label: sectionText } } : {})
-        }
-      };
-    }
+    // Guitar Pro attaches a section to the bar, not to a beat within it.
+    const at = { fraction: [0, 4] as [number, number] };
+    if (marker) measure.rehearsal = { location: at, label: marker };
+    if (sectionText) measure.section = { location: at, label: sectionText };
 
     for (const automation of masterBar.tempoAutomations ?? []) {
       measure.tempos = measure.tempos ?? [];

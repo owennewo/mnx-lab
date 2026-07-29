@@ -12,12 +12,14 @@
           "count": 4,
           "unit": 4
         },
-        "_x": {
-          "mnxLab": {
-            "section": {
-              "label": "Intro"
-            }
-          }
+        "section": {
+          "location": {
+            "fraction": [
+              0,
+              4
+            ]
+          },
+          "label": "Intro"
         },
         "tempos": [
           {
@@ -37,12 +39,14 @@
       {},
       {
         "repeatStart": {},
-        "_x": {
-          "mnxLab": {
-            "section": {
-              "label": "Pre-Verse"
-            }
-          }
+        "section": {
+          "location": {
+            "fraction": [
+              0,
+              4
+            ]
+          },
+          "label": "Pre-Verse"
         }
       },
       {},
@@ -57,33 +61,17 @@
         }
       },
       {
-        "_x": {
-          "mnxLab": {
-            "section": {
-              "label": "Verse"
-            }
-          }
+        "section": {
+          "location": {
+            "fraction": [
+              0,
+              4
+            ]
+          },
+          "label": "Verse"
         }
       },
       {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {
-        "barline": {
-          "type": "double"
-        }
-      },
       {},
       {},
       {},
@@ -102,13 +90,33 @@
           "type": "double"
         }
       },
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
       {
-        "_x": {
-          "mnxLab": {
-            "section": {
-              "label": "Interlude"
-            }
-          }
+        "barline": {
+          "type": "double"
+        }
+      },
+      {
+        "section": {
+          "location": {
+            "fraction": [
+              0,
+              4
+            ]
+          },
+          "label": "Interlude"
         },
         "ending": {
           "numbers": [
@@ -143,12 +151,14 @@
         }
       },
       {
-        "_x": {
-          "mnxLab": {
-            "section": {
-              "label": "Outro"
-            }
-          }
+        "section": {
+          "location": {
+            "fraction": [
+              0,
+              4
+            ]
+          },
+          "label": "Outro"
         }
       },
       {},

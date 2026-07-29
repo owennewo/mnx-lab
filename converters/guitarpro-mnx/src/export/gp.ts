@@ -236,8 +236,8 @@ export function buildScore(
 
     // Guitar Pro has one `Section` holding both a short marker and a name; MNX
     // Lab keeps them as separate objects because they are separate concepts.
-    const rehearsal = global._x?.mnxLab?.rehearsal;
-    const section = global._x?.mnxLab?.section;
+    const rehearsal = global.rehearsal;
+    const section = global.section;
     if (rehearsal || section) {
       masterBar.section = new M.Section();
       masterBar.section.marker = rehearsal?.label ?? '';

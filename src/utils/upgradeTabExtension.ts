@@ -1,25 +1,65 @@
 import { MnxStructure, MnxTabNoteExtension, MnxTuningEntry } from '../types/mnx.ts';
 
 /**
- * Load-time upgrade shim for saved documents, run once on load. Two hops:
+ * Load-time upgrade shim for saved documents, run once on load. Three hops:
  *
  *   v1 → v2  `_x.guitar` + TAB clefs + a duplicated tab staff → the
  *            single-source `_x.tab` form.
  *   v2 → v3  `_x.tab` → `_x.mnxLab.tab`, `_x.section {marker, text}` →
  *            `_x.mnxLab.{rehearsal,section}.label`, hyphenated enum values →
  *            camelCase, and the single-interval bend → a bend curve.
+ *   v3 → v4  `_x.mnxLab.{rehearsal,section}` → the STANDARD `rehearsal` and
+ *            `section` objects on the global measure.
  *
  * The v3 hop exists because `_x` sub-keys name a VENDOR, not a feature
  * (w3c-cg/mnx#429) — `_x.tab` squatted a generic token in a shared namespace.
- * Already-v3 documents come back unchanged. See docs/mnx-extensions.md.
+ * The v4 hop exists because an extension is meant to be a *draft* of the
+ * standard object: once drafted and proposed, keeping a private copy would mean
+ * two spellings of the same fact. See roadmap/proposed/score-text.md, and note
+ * these fields validate only against `schemas/mnx-schema.proposed.json` until
+ * the CG adopts them.
+ *
+ * Already-v4 documents come back unchanged. See docs/mnx-extensions.md.
  */
 export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
-  if (!needsUpgrade(mnxJson) && !needsNamespaceUpgrade(mnxJson)) return mnxJson;
+  if (!needsUpgrade(mnxJson) && !needsNamespaceUpgrade(mnxJson) && !needsLabelUpgrade(mnxJson)) {
+    return mnxJson;
+  }
 
   const doc: any = JSON.parse(JSON.stringify(mnxJson));
   upgradeV1(doc);
   upgradeV2(doc);
+  upgradeV3(doc);
   return doc as MnxStructure;
+}
+
+/** v3 → v4: promote the two label objects out of the vendor dict. `location` is
+ *  required on the standard objects and the extension never carried one, so the
+ *  measure start is the only defensible reconstruction — which is where every
+ *  label in the corpus sat anyway. */
+function upgradeV3(doc: any): void {
+  for (const measure of doc.global?.measures ?? []) {
+    const lab = measure._x?.mnxLab;
+    if (!lab?.rehearsal && !lab?.section) continue;
+
+    const at = { fraction: [0, 4] as [number, number] };
+    if (lab.rehearsal) measure.rehearsal = { location: at, label: lab.rehearsal.label };
+    if (lab.section) measure.section = { location: at, label: lab.section.label };
+
+    const { rehearsal: _r, section: _s, ...restLab } = lab;
+    const { mnxLab: _m, ...restX } = measure._x;
+    // Drop `_x` entirely once nothing is left in it, rather than leaving an
+    // empty vendor dict behind.
+    const nextX = Object.keys(restLab).length ? { ...restX, mnxLab: restLab } : restX;
+    if (Object.keys(nextX).length) measure._x = nextX;
+    else delete measure._x;
+  }
+}
+
+function needsLabelUpgrade(doc: any): boolean {
+  return (doc.global?.measures ?? []).some(
+    (m: any) => m._x?.mnxLab?.rehearsal || m._x?.mnxLab?.section
+  );
 }
 
 function upgradeV1(doc: any): void {

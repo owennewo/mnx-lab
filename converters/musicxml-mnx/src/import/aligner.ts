@@ -642,15 +642,12 @@ export class Aligner {
         if (!typeEl) continue;
         const marker = getChildText(typeEl, 'rehearsal');
         const sectionText = getChildText(typeEl, 'words');
-        if (marker || sectionText) {
-          globalM._x = {
-            mnxLab: {
-              ...globalM._x?.mnxLab,
-              ...(marker ? { rehearsal: { label: marker } } : {}),
-              ...(sectionText ? { section: { label: sectionText } } : {})
-            }
-          };
-        }
+        // MusicXML places a direction in the measure's timeline rather than on
+        // the measure, but these are read only before the first note, so the
+        // measure start is the position by construction.
+        const at = { fraction: [0, 4] as [number, number] };
+        if (marker) globalM.rehearsal = { location: at, label: marker };
+        if (sectionText) globalM.section = { location: at, label: sectionText };
       }
 
       // Metronome marks: prefer the notated `<metronome>` (it carries the beat

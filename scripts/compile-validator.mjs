@@ -4,8 +4,13 @@
 //
 // Outputs (committed; regenerate on schema bump):
 //   worker/generated/validate-mnx.mjs         — official MNX schema (default export)
-//   worker/generated/validate-extensions.mjs  — `_x.mnxLab` extension v3 sub-validators
+//   worker/generated/validate-extensions.mjs  — `_x.mnxLab` extension v4 sub-validators
 //     (named exports: validateNoteExt, validatePartExt, validateGlobalMeasureExt)
+//   worker/generated/validate-mnx-proposed.mjs — ONLY while a spec proposal is in
+//     flight (schemas/mnx-schema.proposed.json present). For dev-time checks —
+//     tests and tooling — that a proposal-shaped document is well formed.
+//     **The Worker must never import it**: /api/edit-notation validates against
+//     the published spec, or the LLM learns to emit fields that do not exist.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,7 +41,21 @@ function writeModule(rel, code) {
   writeModule('validate-mnx.mjs', standaloneCode.default(ajv, validate));
 }
 
-// 2. `_x.mnxLab` extensions v3 → named-export sub-validators for the three
+// 1b. Proposed MNX schema, if a proposal is in flight. Optional by design: the
+//     file is absent between proposals, and its absence must never fail a build.
+{
+  const proposedPath = path.join(root, 'schemas', 'mnx-schema.proposed.json');
+  if (fs.existsSync(proposedPath)) {
+    const ajv = new Ajv2020.default({
+      allErrors: true,
+      code: { source: true, esm: true },
+    });
+    const validate = ajv.compile(JSON.parse(fs.readFileSync(proposedPath, 'utf8')));
+    writeModule('validate-mnx-proposed.mjs', standaloneCode.default(ajv, validate));
+  }
+}
+
+// 2. `_x.mnxLab` extensions v4 → named-export sub-validators for the three
 //    placement points (note, part, global measure). The extension schema is a
 //    $defs library; the worker walks the document and validates each vendor
 //    dict. Validating the WHOLE dict rather than each feature block also

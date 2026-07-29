@@ -288,8 +288,8 @@ export function exportMusicXML(
       // Rehearsal mark and section name. MusicXML has `<rehearsal>` for the
       // index; the formal section name has no element of its own and goes in
       // `<words>` of the same direction.
-      const rehearsal = globalM._x?.mnxLab?.rehearsal;
-      const section = globalM._x?.mnxLab?.section;
+      const rehearsal = globalM.rehearsal;
+      const section = globalM.section;
       if (rehearsal || section) {
         const directionEl = doc.createElement('direction');
         directionEl.setAttribute('placement', 'above');

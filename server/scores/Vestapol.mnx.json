@@ -23,11 +23,17 @@
       },
       {},
       {
+        "rehearsal": {
+          "location": {
+            "fraction": [
+              0,
+              4
+            ]
+          },
+          "label": "A"
+        },
         "_x": {
           "mnxLab": {
-            "rehearsal": {
-              "label": "A"
-            },
             "harmonies": [
               {
                 "location": {
@@ -183,11 +189,17 @@
         }
       },
       {
+        "rehearsal": {
+          "location": {
+            "fraction": [
+              0,
+              4
+            ]
+          },
+          "label": "B"
+        },
         "_x": {
           "mnxLab": {
-            "rehearsal": {
-              "label": "B"
-            },
             "harmonies": [
               {
                 "location": {
@@ -343,12 +355,14 @@
         }
       },
       {
-        "_x": {
-          "mnxLab": {
-            "rehearsal": {
-              "label": "C"
-            }
-          }
+        "rehearsal": {
+          "location": {
+            "fraction": [
+              0,
+              4
+            ]
+          },
+          "label": "C"
         }
       },
       {},
@@ -489,11 +503,17 @@
         }
       },
       {
+        "rehearsal": {
+          "location": {
+            "fraction": [
+              0,
+              4
+            ]
+          },
+          "label": "A"
+        },
         "_x": {
           "mnxLab": {
-            "rehearsal": {
-              "label": "A"
-            },
             "harmonies": [
               {
                 "location": {
