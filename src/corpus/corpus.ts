@@ -37,13 +37,17 @@ export interface ScenarioMeta {
    * workbench can tell stale (record present, status demoted) from
    * never-seen (no record). Display-only here: the workbench never writes it.
    */
-  verification?: { at: string; primitivesHash?: string };
+  verification?: { at: string; primitivesHash?: string; renderHash?: string };
 }
 
 export interface ScenarioEntry {
   id: string;
   ns: 'lab' | 'spec';
-  /** 'lab/document', …, or 'spec' for the W3C mirror. */
+  /**
+   * The authoring category — 'lab/document', …, or 'spec' for the W3C mirror.
+   * A property of where the scenario lives, NOT how the rail groups it: the
+   * rail groups by topic so lab and spec interleave (src/corpus/groups.ts).
+   */
   category: string;
   meta: ScenarioMeta;
   /** coversDefs minus plumbing — the coverage axis. */

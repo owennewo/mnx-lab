@@ -155,7 +155,20 @@ never a golden and never hashed.
 
 Home is the **attention queue** (blocked → stale → never-seen; current counted, not
 shown), derived from committed provenance in `src/ui/queue.ts`. Every scenario + view
-has a stable deep link: `#/scenario/<id>?view=notation|tab|both|compare|json`. The
+has a stable deep link: `#/scenario/<id>?view=notation|tab|both|compare|json`.
+
+The rail groups by **topic**, not by authoring category — `src/corpus/groups.ts`, an
+ordered name→regex table matched on the scenario id, **first match wins**. The spec has
+no taxonomy to inherit (its own index is a flat alphabetical list of 52 "example
+documents"), and our nine categories held one scenario each, so both halves read badly;
+topic groups interleave them instead. The grouping is OURS and display-only — never in
+`scenarios/spec/` or a meta.json. Order is load-bearing, so
+`harness/conformance/groups.test.ts` asserts nothing is ungrouped **and no group is
+empty** — an empty group is the signature of a broad rule above stealing a narrow rule's
+scenarios. A rail row carries two orthogonal signals: the **dot** is queue state via the
+shared `classify()` (shape as well as colour, so *stale* stops looking like *never
+seen*), and the **tags** are provenance — `spec` for mirrored (hand-edits forbidden),
+`proposed` for schema probes. The
 **compare** view shows our render beside the spec's reference engraving at
 `/spec-media/<slug>.png` — read-only from the pinned `vendor/mnx` by Vite middleware in
 dev, and copied into `dist/client/spec-media/` by the same plugin at build time. Built

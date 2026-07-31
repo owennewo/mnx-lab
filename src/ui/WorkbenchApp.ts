@@ -6,10 +6,11 @@
 // The workbench has NO backend: everything on screen is committed JSON
 // served statically; verification state is display-only (mutations happen
 // through the harness scripts, in git).
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { corpus, corpusManifest, coverage, type ScenarioEntry } from '../corpus/corpus.ts';
-import { buildQueue } from './queue.ts';
+import { groupScenarios } from '../corpus/groups.ts';
+import { buildQueue, classify } from './queue.ts';
 import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import './QueueHome.ts';
 import './ScenarioPage.ts';
@@ -163,30 +164,69 @@ export class WorkbenchApp extends LitElement {
         color: var(--accent);
       }
 
+      /* Queue state, by shape as well as colour. */
       .dot {
         width: 7px;
         height: 7px;
         border-radius: 50%;
         flex-shrink: 0;
+        box-sizing: border-box;
       }
 
-      .dot.verified {
+      /* Approved and still matching its goldens. */
+      .dot.current {
         background: var(--st-verified);
+        box-shadow: 0 0 0 2px color-mix(in oklab, var(--st-verified), transparent 78%);
       }
 
-      .dot.rendered {
+      /* Approved once, output has moved since — hollow: the ring is still
+         there, the substance isn't. */
+      .dot.stale {
+        background: transparent;
+        border: 2px solid var(--st-verified);
+      }
+
+      /* Renders, but no human has ever signed it off. */
+      .dot.never-seen {
         background: var(--st-rendered);
       }
 
-      .dot.valid,
-      .dot.draft {
-        background: var(--ink-3);
+      .dot.blocked {
+        background: var(--st-gap);
       }
 
-      .dot.invalid {
-        background: var(--st-gap);
+      /* Orthogonal to state: rejected by the schema on purpose. */
+      .dot.by-design {
         border-radius: 2px;
         transform: rotate(45deg);
+      }
+
+      .label {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .tag {
+        flex-shrink: 0;
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 0.04em;
+        color: var(--ink-3);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 0 4px;
+        line-height: 1.5;
+      }
+
+      .tag.proposed {
+        color: var(--st-gap);
+        border-color: color-mix(in oklab, var(--st-gap), transparent 55%);
+      }
+
+      .cat-n {
+        float: right;
+        color: var(--ink-3);
+        font-variant-numeric: tabular-nums;
       }
     `
   ];
@@ -203,22 +243,62 @@ export class WorkbenchApp extends LitElement {
 
   private grouped(): Map<string, ScenarioEntry[]> {
     const q = this.query.toLowerCase();
-    const groups = new Map<string, ScenarioEntry[]>();
-    for (const e of corpus) {
-      if (q && !e.id.toLowerCase().includes(q) && !e.meta.title.toLowerCase().includes(q)) {
-        continue;
-      }
-      const list = groups.get(e.category) ?? [];
-      list.push(e);
-      groups.set(e.category, list);
-    }
-    return groups;
+    const matches = corpus.filter(
+      e => !q || e.id.toLowerCase().includes(q) || e.meta.title.toLowerCase().includes(q)
+    );
+    // Topic groups, not the authoring category — see src/corpus/groups.ts.
+    // Lab and spec interleave here, which is the point; `origin` carries the
+    // provenance the old lab/spec headers used to imply.
+    return groupScenarios(matches, e => e.id);
+  }
+
+  /**
+   * One rail row, carrying two orthogonal signals.
+   *
+   * The DOT is the scenario's place in the attention queue — the same
+   * `classify()` the queue home and the scenario page use, so one vocabulary
+   * across the workbench. It used to show the raw `status`, which collapsed
+   * *stale* (approved once, output has since moved) and *never seen* into a
+   * single "rendered" dot: the exact distinction the provenance record exists
+   * to make. Shape carries it as well as colour, so it survives a colourblind
+   * reader and a greyscale screenshot.
+   *
+   * The TAGS are provenance. `spec` means mirrored from the pinned release by
+   * `sync:spec`, which owns that tree byte-for-byte — the strongest thing a
+   * reader can know about a scenario is whether hand-editing it is allowed.
+   * That used to be implied by the lab/… vs spec header; now that topic groups
+   * interleave the two, it has to be said explicitly. `proposed` means the
+   * scenario is judged by a proposed schema, so a validation verdict on it is
+   * evidence about the spec, not about us.
+   */
+  private railItem(e: ScenarioEntry, active: string | null) {
+    const { state, detail } = classify(e);
+    const record = e.meta.verification;
+    return html`
+      <a class="item" href=${scenarioHref(e.id)} aria-current=${e.id === active}>
+        <span
+          class="dot ${state}${e.invalidByDesign ? ' by-design' : ''}"
+          title=${`${detail}${e.invalidByDesign ? ' · invalid by design' : ''}${
+            record?.renderHash ? '' : record ? ' · no renderHash yet' : ''
+          }`}
+        ></span>
+        <span class="label">${e.meta.title}</span>
+        ${e.meta.schema === 'proposed'
+          ? html`<span class="tag proposed" title="judged by a proposed schema">proposed</span>`
+          : nothing}
+        ${e.ns === 'spec'
+          ? html`<span class="tag" title="mirrored from the pinned spec — sync:spec owns it"
+              >spec</span
+            >`
+          : nothing}
+      </a>
+    `;
   }
 
   render() {
     const queue = buildQueue(corpus);
     const attention = queue.blocked.length + queue.stale.length + queue.neverSeen.length;
-    const active = this.route.page === 'scenario' ? this.route.id : null;
+    const active = (this.route.page === 'scenario' ? this.route.id : null) ?? null;
 
     return html`
       <header>
@@ -243,19 +323,9 @@ export class WorkbenchApp extends LitElement {
           @input=${(e: InputEvent) => (this.query = (e.target as HTMLInputElement).value)}
         />
         ${[...this.grouped()].map(
-          ([category, entries]) => html`
-            <div class="cat">${category}</div>
-            ${entries.map(
-              e => html`
-                <a class="item" href=${scenarioHref(e.id)} aria-current=${e.id === active}>
-                  <span
-                    class="dot ${e.invalidByDesign ? 'invalid' : e.meta.status}"
-                    title=${e.invalidByDesign ? 'invalid by design' : e.meta.status}
-                  ></span>
-                  ${e.meta.title}
-                </a>
-              `
-            )}
+          ([group, entries]) => html`
+            <div class="cat">${group}<span class="cat-n">${entries.length}</span></div>
+            ${entries.map(e => this.railItem(e, active))}
           `
         )}
       </nav>

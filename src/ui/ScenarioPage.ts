@@ -100,6 +100,11 @@ export class ScenarioPage extends LitElement {
         border-color: currentColor;
       }
 
+      .badge.muted {
+        color: var(--ink-3);
+        border-style: dashed;
+      }
+
       .badge a {
         color: inherit;
         text-decoration: none;
@@ -323,9 +328,30 @@ export class ScenarioPage extends LitElement {
           <span class="badge ${item.state === 'current' ? 'verified' : 'attention'}">
             ${item.state === 'current' ? entry.meta.status : item.state} — ${item.detail}
           </span>
+          <!-- Two goldens, two hashes: say which code each one witnesses,
+               because a bare digest says neither. A verified scenario with no
+               renderHash was approved before the emitter golden existed — it
+               is current, not stale, and that distinction is the whole reason
+               the field is optional. -->
           ${verification?.primitivesHash
-            ? html`<span class="badge">${verification.primitivesHash}</span>`
+            ? html`<span class="badge" title="hash of expected.primitives.json — layout"
+                >layout ${verification.primitivesHash.replace('sha256:', '')}</span
+              >`
             : nothing}
+          ${verification?.renderHash
+            ? html`<span class="badge" title="hash of expected.svg — the SVG emitter's output"
+                >render ${verification.renderHash.replace('sha256:', '')}</span
+              >`
+            : verification?.primitivesHash
+              ? html`<span
+                  class="badge muted"
+                  title="approved before the SVG golden existed — run verify-scenarios --backfill-render to stamp one"
+                  >render not witnessed</span
+                >`
+              : nothing}
+          <span class="badge" title=${entry.ns === 'spec' ? 'mirrored by sync:spec — hand-edits forbidden' : 'ours, authored in scenarios/lab/'}>
+            ${entry.ns === 'spec' ? 'mirrored' : 'local'}
+          </span>
           <span class="badge">${entry.meta.source}</span>
           ${entry.meta.schema === 'proposed'
             ? html`<span class="badge attention">proposed schema</span>`
