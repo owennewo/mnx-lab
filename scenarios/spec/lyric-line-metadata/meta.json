@@ -1,0 +1,50 @@
+{
+  "title": "Lyric line metadata",
+  "description": "Each line of lyrics has its own optional metadata, including the language code and a label. This lives in the top-level \"global\" attribute, as a \"lyrics\" object.",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/lyric-line-metadata/"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "event",
+    "event-lyric-line",
+    "global",
+    "lyric-line-id",
+    "lyric-line-metadata",
+    "lyrics",
+    "lyrics-global",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "root",
+    "sequence",
+    "staff-position",
+    "step",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17",
+    "primitivesHash": "sha256:e0cdc4535f46cbb6"
+  }
+}

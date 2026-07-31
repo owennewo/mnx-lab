@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mnx-editor.dev/schemas/guitar-tab-extension.schema.json",
+  "title": "Guitar Tablature & Technical Extension for W3C MNX (v1, DEPRECATED)",
+  "description": "DEPRECATED: superseded by mnx-lab-extensions.schema.json (v3, namespace _x.mnxLab) — see docs/mnx-extensions.md. Retained only to document the legacy _x.guitar shape that the app's load-time upgrade shim accepts.",
+  "deprecated": true,
+  "type": "object",
+  "$defs": {
+    "pitch": {
+      "type": "object",
+      "properties": {
+        "step": {
+          "enum": ["C", "D", "E", "F", "G", "A", "B"]
+        },
+        "octave": {
+          "type": "integer"
+        },
+        "alter": {
+          "type": "integer"
+        }
+      },
+      "required": ["step", "octave"]
+    },
+    "guitar-note-extension": {
+      "type": "object",
+      "description": "Stored under note._x.guitar",
+      "properties": {
+        "fret": {
+          "type": "integer",
+          "description": "Fret number (0 for open string).",
+          "minimum": 0,
+          "maximum": 36
+        },
+        "string": {
+          "type": "integer",
+          "description": "String number (1 is the highest pitch string, e.g. E4 in standard tuning).",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "fingering": {
+          "type": "object",
+          "properties": {
+            "hand": {
+              "enum": ["left", "right"]
+            },
+            "finger": {
+              "type": "string",
+              "description": "Finger identifier (e.g., T, 1, 2, 3, 4 for left hand; p, i, m, a, c for right hand)."
+            }
+          },
+          "required": ["hand", "finger"],
+          "additionalProperties": false
+        },
+        "bend": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Type of bend (e.g., 'bend', 'pre-bend', 'bend-release')."
+            },
+            "amount": {
+              "type": "number",
+              "description": "Bend interval in whole steps (e.g. 0.5 for half step, 1.0 for whole step)."
+            },
+            "release": {
+              "type": "boolean",
+              "description": "True if the bend returns/releases back to the original fret pitch."
+            }
+          },
+          "required": ["type", "amount"],
+          "additionalProperties": false
+        },
+        "slide": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": ["shift", "legato", "slide-in", "slide-out"]
+            },
+            "direction": {
+              "enum": ["up", "down"]
+            },
+            "targetNote": {
+              "type": "string",
+              "description": "The ID of the note to slide into."
+            }
+          },
+          "required": ["type"],
+          "additionalProperties": false
+        },
+        "hammerOnPullOff": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": ["hammer-on", "pull-off"]
+            },
+            "targetNote": {
+              "type": "string",
+              "description": "The ID of the destination note."
+            }
+          },
+          "required": ["type", "targetNote"],
+          "additionalProperties": false
+        },
+        "vibrato": {
+          "type": "boolean",
+          "description": "True if note has vibrato ornament."
+        }
+      },
+      "required": ["fret", "string"],
+      "additionalProperties": false
+    },
+    "guitar-part-extension": {
+      "type": "object",
+      "description": "Stored under part._x.guitar",
+      "properties": {
+        "tuning": {
+          "type": "object",
+          "description": "Defines the tuning for each string from lowest string (highest index) to highest string (index 1).",
+          "properties": {
+            "strings": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/pitch"
+              },
+              "description": "Array of string tunings, ordered from lowest index (highest string, e.g. string 1) to highest index (lowest string)."
+            }
+          },
+          "required": ["strings"],
+          "additionalProperties": false
+        },
+        "capo": {
+          "type": "integer",
+          "description": "Capo fret position (0 or undefined if no capo).",
+          "minimum": 0,
+          "maximum": 12
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

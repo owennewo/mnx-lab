@@ -1,0 +1,46 @@
+{
+  "title": "All conventional dynamic marks",
+  "description": "One of each conventional dynamic marking the renderer maps to SMuFL glyphs, one per quarter note: pppppp through ffffff, mp/mf/pf, fp, fz, the sforzando family (sf, sfp, sfpp, sfz, sfzp, sffz), rinforzandos (rf, rfz), niente and z — 27 marks over 7 bars. MNX v19 constrains dynamic-group.value to a closed enum (ppp…fff, n); marks outside it carry an explicit glyphs list, which this scenario exercises. Unmapped values fall back to italic text.",
+  "bars": 7,
+  "tags": [
+    "dynamics",
+    "showcase"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/dynamic-group/"
+  ],
+  "coversDefs": [
+    "root",
+    "mnx",
+    "global",
+    "measure-global",
+    "time",
+    "time-signature-unit",
+    "part",
+    "part-measure",
+    "sequence",
+    "event",
+    "note",
+    "pitch",
+    "note-value",
+    "dynamic-group",
+    "dynamic-group-list",
+    "dynamic-group-type",
+    "dynamic-value",
+    "smufl-glyph-list",
+    "rhythmic-position",
+    "fraction"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17",
+    "primitivesHash": "sha256:1961bd378a81aa9c"
+  }
+}

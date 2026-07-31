@@ -1,0 +1,48 @@
+{
+  "title": "System layouts",
+  "description": "MNX spec example \"system-layouts\".",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/system-layouts/"
+  ],
+  "coversDefs": [
+    "global",
+    "id",
+    "literal-string-group",
+    "literal-string-staff",
+    "measure-number",
+    "mnx",
+    "page",
+    "part",
+    "part-name",
+    "part-short-name",
+    "root",
+    "score",
+    "score-name",
+    "staff",
+    "staff-count",
+    "staff-group",
+    "staff-label",
+    "staff-labelref",
+    "staff-number",
+    "staff-source",
+    "staff-symbol",
+    "stem-direction",
+    "system",
+    "system-layout",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17",
+    "primitivesHash": "sha256:e8a4d301ae6ce92c"
+  }
+}

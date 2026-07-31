@@ -1,0 +1,45 @@
+{
+  "title": "Measure repeats",
+  "description": "Measure repeats (aka \"simile\" markings) are encoded on the part-measure object, as a \"measureRepeat\" attribute.\n\nIn a part-measure that contains a measureRepeat, the sequence content is usually empty. (Occasionally, published music uses a measure-repeat marking with notation in the same bar. In that case, use \"measureRepeat\" and populate the sequence content.)\n\nFor a multi-measure repeat, such as the two-bar repeat at the end of this example, the measureRepeat is encoded on the first of the bars, and nothing is encoded in the remaining bars.",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/measure-repeats/"
+  ],
+  "coversDefs": [
+    "barline",
+    "barline-type",
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "measure-global",
+    "measure-repeat",
+    "measure-repeat-count",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "root",
+    "sequence",
+    "staff-position",
+    "step",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "rendered"
+}

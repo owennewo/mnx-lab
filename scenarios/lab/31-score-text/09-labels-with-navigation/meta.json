@@ -1,0 +1,57 @@
+{
+  "title": "Labels with navigation marks",
+  "description": "Rehearsal marks and sections sit alongside the navigation marks a measure already carries. Both describe the measure, so they align to the barline, while a segno or a fine is positioned at a point within it and stays there. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
+  "bars": 4,
+  "tags": [
+    "labels",
+    "navigation",
+    "proposed"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/112"
+  ],
+  "coversDefs": [
+    "bpm",
+    "clef",
+    "clef-sign",
+    "event",
+    "fine",
+    "fraction",
+    "global",
+    "integer-unsigned",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rehearsal",
+    "rhythmic-position",
+    "root",
+    "section",
+    "segno",
+    "sequence",
+    "staff-position",
+    "step",
+    "string",
+    "tempo",
+    "tempos",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "schema": "proposed",
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "rendered"
+}

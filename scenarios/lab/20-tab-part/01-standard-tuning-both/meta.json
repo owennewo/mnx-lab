@@ -1,0 +1,33 @@
+{
+  "title": "Standard tuning, staffKind both",
+  "description": "A one-note guitar part carrying the full part-level _x.mnxLab.tab extension: explicit standard tuning (six entries with explicit string numbers — array order carries no meaning) and staffKind \"both\", declaring that this part prefers notation + tab views derived from the single note stream. The note itself has no position annotation, so tab rendering exercises the playability heuristic.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:part",
+    "tuning"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/part/"
+  ],
+  "coversDefs": [
+    "part",
+    "vendor-extensions",
+    "clef",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17",
+    "primitivesHash": "sha256:1440b77c8012ff54"
+  }
+}

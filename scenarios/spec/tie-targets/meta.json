@@ -1,0 +1,61 @@
+{
+  "title": "Tie targets",
+  "description": "MNX supports various types of tie “targets,” and this data can be encoded in order to help programs parse a document (for example, ignoring ties that a program cannot internally model).\n\nThis example also includes a laissez vibrer tie, encoded via \"lv\".",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/tie-targets/"
+  ],
+  "coversDefs": [
+    "alter",
+    "clef",
+    "clef-sign",
+    "ending",
+    "ending-duration",
+    "ending-number",
+    "ending-open",
+    "event",
+    "fifths",
+    "global",
+    "id",
+    "key",
+    "literal-string-event",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "ottava-amount-or-zero",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "repeat-end",
+    "rest",
+    "root",
+    "sequence",
+    "slur-side",
+    "smufl-glyph",
+    "staff-position",
+    "step",
+    "tie",
+    "tie-target-type",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17",
+    "primitivesHash": "sha256:35b8e976187a3015"
+  }
+}

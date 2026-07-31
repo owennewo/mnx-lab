@@ -1,0 +1,1125 @@
+{
+  "widthSp": 80,
+  "notation": {
+    "widthSp": 80,
+    "heightSp": 52,
+    "primitives": [
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 8,
+        "x2": 50.684,
+        "y2": 8,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 9,
+        "x2": 50.684,
+        "y2": 9,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 10,
+        "x2": 50.684,
+        "y2": 10,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 11,
+        "x2": 50.684,
+        "y2": 11,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 12,
+        "x2": 50.684,
+        "y2": 12,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 3.1,
+        "y": 11,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "timeSig4",
+        "x": 7.35,
+        "y": 9,
+        "anchor": "middle",
+        "className": "time-sig-num"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "timeSig4",
+        "x": 7.35,
+        "y": 11,
+        "anchor": "middle",
+        "className": "time-sig-den"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 10.2255,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "@m0.v0.e0.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 11.4055,
+        "y1": 7.5,
+        "x2": 11.4055,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 22.6765,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "@m0.v0.e1.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 23.8565,
+        "y1": 7.5,
+        "x2": 23.8565,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 33.7075,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "@m0.v0.e2.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 34.8875,
+        "y1": 7.5,
+        "x2": 34.8875,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 43.3185,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "@m0.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 44.4985,
+        "y1": 7.5,
+        "x2": 44.4985,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 50.684,
+        "y1": 8,
+        "x2": 50.684,
+        "y2": 12,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicPPPPPP",
+        "x": 10.8155,
+        "y": 15.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicPPPPP",
+        "x": 23.2665,
+        "y": 15.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicPPPP",
+        "x": 34.2975,
+        "y": 15.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicPPP",
+        "x": 43.9085,
+        "y": 15.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "line",
+        "x1": 50.684,
+        "y1": 8,
+        "x2": 78,
+        "y2": 8,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 50.684,
+        "y1": 9,
+        "x2": 78,
+        "y2": 9,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 50.684,
+        "y1": 10,
+        "x2": 78,
+        "y2": 10,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 50.684,
+        "y1": 11,
+        "x2": 78,
+        "y2": 11,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 50.684,
+        "y1": 12,
+        "x2": 78,
+        "y2": 12,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 52.9095,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "@m1.v0.e0.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 54.0895,
+        "y1": 7.5,
+        "x2": 54.0895,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 59.6805,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "@m1.v0.e1.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 60.8605,
+        "y1": 7.5,
+        "x2": 60.8605,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 65.0315,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "@m1.v0.e2.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 66.2115,
+        "y1": 7.5,
+        "x2": 66.2115,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 71.9425,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "@m1.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 73.1225,
+        "y1": 7.5,
+        "x2": 73.1225,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 78,
+        "y1": 8,
+        "x2": 78,
+        "y2": 12,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicPP",
+        "x": 53.4995,
+        "y": 15.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicPiano",
+        "x": 60.2705,
+        "y": 15.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicMP",
+        "x": 65.6215,
+        "y": 15.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicMF",
+        "x": 72.5325,
+        "y": 15.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 24,
+        "x2": 39.126,
+        "y2": 24,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 25,
+        "x2": 39.126,
+        "y2": 25,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 26,
+        "x2": 39.126,
+        "y2": 26,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 27,
+        "x2": 39.126,
+        "y2": 27,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 28,
+        "x2": 39.126,
+        "y2": 28,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 3.1,
+        "y": 27,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 8.2583,
+        "y": 27,
+        "className": "notehead",
+        "sourceId": "@m2.v0.e0.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 9.4383,
+        "y1": 23.5,
+        "x2": 9.4383,
+        "y2": 26.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 14.8748,
+        "y": 27,
+        "className": "notehead",
+        "sourceId": "@m2.v0.e1.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 16.0547,
+        "y1": 23.5,
+        "x2": 16.0547,
+        "y2": 26.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 22.4512,
+        "y": 27,
+        "className": "notehead",
+        "sourceId": "@m2.v0.e2.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 23.6312,
+        "y1": 23.5,
+        "x2": 23.6312,
+        "y2": 26.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 30.9878,
+        "y": 27,
+        "className": "notehead",
+        "sourceId": "@m2.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 32.1678,
+        "y1": 23.5,
+        "x2": 32.1678,
+        "y2": 26.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 39.126,
+        "y1": 24,
+        "x2": 39.126,
+        "y2": 28,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicForte",
+        "x": 8.8483,
+        "y": 31.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicFF",
+        "x": 15.4648,
+        "y": 31.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicFFF",
+        "x": 23.0412,
+        "y": 31.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicFFFF",
+        "x": 31.5778,
+        "y": 31.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "line",
+        "x1": 39.126,
+        "y1": 24,
+        "x2": 78,
+        "y2": 24,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 39.126,
+        "y1": 25,
+        "x2": 78,
+        "y2": 25,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 39.126,
+        "y1": 26,
+        "x2": 78,
+        "y2": 26,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 39.126,
+        "y1": 27,
+        "x2": 78,
+        "y2": 27,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 39.126,
+        "y1": 28,
+        "x2": 78,
+        "y2": 28,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 41.8842,
+        "y": 27,
+        "className": "notehead",
+        "sourceId": "@m3.v0.e0.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 43.0642,
+        "y1": 23.5,
+        "x2": 43.0642,
+        "y2": 26.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 52.3407,
+        "y": 27,
+        "className": "notehead",
+        "sourceId": "@m3.v0.e1.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 53.5207,
+        "y1": 23.5,
+        "x2": 53.5207,
+        "y2": 26.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 63.7573,
+        "y": 27,
+        "className": "notehead",
+        "sourceId": "@m3.v0.e2.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 64.9373,
+        "y1": 23.5,
+        "x2": 64.9373,
+        "y2": 26.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 71.7217,
+        "y": 27,
+        "className": "notehead",
+        "sourceId": "@m3.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 72.9017,
+        "y1": 23.5,
+        "x2": 72.9017,
+        "y2": 26.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 78,
+        "y1": 24,
+        "x2": 78,
+        "y2": 28,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicFFFFF",
+        "x": 42.4743,
+        "y": 31.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicFFFFFF",
+        "x": 52.9308,
+        "y": 31.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicPF",
+        "x": 64.3473,
+        "y": 31.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicFortePiano",
+        "x": 72.3117,
+        "y": 31.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 40,
+        "x2": 31.7467,
+        "y2": 40,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 41,
+        "x2": 31.7467,
+        "y2": 41,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 42,
+        "x2": 31.7467,
+        "y2": 42,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 43,
+        "x2": 31.7467,
+        "y2": 43,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 44,
+        "x2": 31.7467,
+        "y2": 44,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 3.1,
+        "y": 43,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 7.4228,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m4.v0.e0.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 8.6028,
+        "y1": 39.5,
+        "x2": 8.6028,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 12.9005,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m4.v0.e1.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 14.0805,
+        "y1": 39.5,
+        "x2": 14.0805,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 18.2422,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m4.v0.e2.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 19.4222,
+        "y1": 39.5,
+        "x2": 19.4222,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 24.5478,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m4.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 25.7278,
+        "y1": 39.5,
+        "x2": 25.7278,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 31.7467,
+        "y1": 40,
+        "x2": 31.7467,
+        "y2": 44,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicForzando",
+        "x": 8.0128,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicSforzando1",
+        "x": 13.4905,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicSforzandoPiano",
+        "x": 18.8322,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicSforzandoPianissimo",
+        "x": 25.1378,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "line",
+        "x1": 31.7467,
+        "y1": 40,
+        "x2": 58.5213,
+        "y2": 40,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 31.7467,
+        "y1": 41,
+        "x2": 58.5213,
+        "y2": 41,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 31.7467,
+        "y1": 42,
+        "x2": 58.5213,
+        "y2": 42,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 31.7467,
+        "y1": 43,
+        "x2": 58.5213,
+        "y2": 43,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 31.7467,
+        "y1": 44,
+        "x2": 58.5213,
+        "y2": 44,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 33.6695,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m5.v0.e0.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 34.8495,
+        "y1": 39.5,
+        "x2": 34.8495,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 39.5272,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m5.v0.e1.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 40.7072,
+        "y1": 39.5,
+        "x2": 40.7072,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 46.7568,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m5.v0.e2.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 47.9368,
+        "y1": 39.5,
+        "x2": 47.9368,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 53.5385,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m5.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 54.7185,
+        "y1": 39.5,
+        "x2": 54.7185,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 58.5213,
+        "y1": 40,
+        "x2": 58.5213,
+        "y2": 44,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicSforzato",
+        "x": 34.2595,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicSforzatoPiano",
+        "x": 40.1172,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicSforzatoFF",
+        "x": 47.3468,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicRinforzando1",
+        "x": 54.1285,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "line",
+        "x1": 58.5213,
+        "y1": 40,
+        "x2": 78,
+        "y2": 40,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 58.5213,
+        "y1": 41,
+        "x2": 78,
+        "y2": 41,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 58.5213,
+        "y1": 42,
+        "x2": 78,
+        "y2": 42,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 58.5213,
+        "y1": 43,
+        "x2": 78,
+        "y2": 43,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 58.5213,
+        "y1": 44,
+        "x2": 78,
+        "y2": 44,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 60.4442,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m6.v0.e0.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 61.6242,
+        "y1": 39.5,
+        "x2": 61.6242,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 66.4258,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m6.v0.e1.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 67.6058,
+        "y1": 39.5,
+        "x2": 67.6058,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 70.6755,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m6.v0.e2.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 71.8555,
+        "y1": 39.5,
+        "x2": 71.8555,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 74.6972,
+        "y": 43,
+        "className": "notehead",
+        "sourceId": "@m6.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 75.8772,
+        "y1": 39.5,
+        "x2": 75.8772,
+        "y2": 42.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 77.2,
+        "y1": 40,
+        "x2": 77.2,
+        "y2": 44,
+        "thickness": 0.16,
+        "className": "barline barline-final-thin"
+      },
+      {
+        "kind": "rect",
+        "x": 77.5,
+        "y": 40,
+        "w": 0.5,
+        "h": 4,
+        "fill": "currentColor",
+        "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicRinforzando2",
+        "x": 61.0342,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicNiente",
+        "x": 67.0158,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "dynamicZ",
+        "x": 71.2655,
+        "y": 47.5,
+        "anchor": "middle",
+        "className": "dynamic"
+      }
+    ]
+  }
+}

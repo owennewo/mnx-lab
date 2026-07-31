@@ -1,0 +1,39 @@
+{
+  "title": "Bar duration mismatch (under- and overfull)",
+  "description": "Schema-valid two-voice document whose bars don't add up. Bar 1: each voice underfills 4/4 by a different amount (voice 1: half + quarter + eighth = 3.5 beats; voice 2: half + quarter = 3 beats) — two red markers, one per voice. Bar 2: voice 1 overfills (half + half + eighth = 4.5 beats) while voice 2 is exactly right (whole = 4) — one marker only. Exercises the semantic validator: per-voice beat arithmetic in each tooltip, correct voices stay silent, and the notes still draw.",
+  "bars": 2,
+  "tags": [
+    "validation",
+    "edge-case"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/sequence-content/"
+  ],
+  "coversDefs": [
+    "root",
+    "mnx",
+    "global",
+    "measure-global",
+    "time",
+    "time-signature-unit",
+    "part",
+    "part-measure",
+    "sequence",
+    "event",
+    "note",
+    "pitch",
+    "note-value"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17",
+    "primitivesHash": "sha256:13172e54f46fc72f"
+  }
+}

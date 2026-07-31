@@ -1,0 +1,46 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {}
+    ]
+  },
+  "parts": [
+    {
+      "name": "Guitar",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "TAB",
+                "staffPosition": 0
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 2
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

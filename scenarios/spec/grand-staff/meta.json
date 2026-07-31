@@ -1,0 +1,51 @@
+{
+  "title": "Grand staff piano music",
+  "description": "The grand staff, despite having two staves, is considered a single \"part.\" The part is encoded with \"staves\": 2. Where necessary, you encode which staff a given notation belongs to — such as clefs and sequences.",
+  "tags": [
+    "spec-example"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/grand-staff/"
+  ],
+  "coversDefs": [
+    "beam",
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "id",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "part-name",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rest",
+    "root",
+    "sequence",
+    "staff-count",
+    "staff-number",
+    "staff-position",
+    "step",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "source": "spec-example",
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17",
+    "primitivesHash": "sha256:f0b27793de8a0ac9"
+  }
+}

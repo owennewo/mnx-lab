@@ -1,0 +1,44 @@
+{
+  "title": "Rest gallery — every rest length",
+  "description": "Every rest the renderer draws, longest to shortest over 17 bars of 4/4: a sequence-level fullMeasure rest, then maxima / longa / breve (each resting its own bar), whole, half, quarter, eighth through 128th rests alternating with notes so the rhythm reads, the tiny 256th / 512th / 1024th rests, and dotted rests (dotted half; dotted quarter + dotted eighth mix). Bars with timed content sum exactly to 4/4, so no validation markers should appear; single-rest bars use the full-measure-rest convention.",
+  "bars": 17,
+  "tags": [
+    "rests",
+    "durations",
+    "showcase"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/full-measure-rest/",
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/rest/"
+  ],
+  "coversDefs": [
+    "root",
+    "mnx",
+    "global",
+    "measure-global",
+    "time",
+    "time-signature-unit",
+    "part",
+    "part-measure",
+    "sequence",
+    "event",
+    "rest",
+    "full-measure-rest",
+    "note",
+    "pitch",
+    "note-value",
+    "note-value-base"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17",
+    "primitivesHash": "sha256:45273f44bed4e43a"
+  }
+}

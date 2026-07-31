@@ -1,0 +1,53 @@
+{
+  "title": "Stacked directions",
+  "description": "Directions sharing a position and an orientation are displayed stacked outward from the staff, in the order they appear in the array — the first is nearest the notes. That ordering is all a renderer needs to place several instructions at one point. No direction says how far from the staff it belongs, and none needs to. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
+  "bars": 1,
+  "tags": [
+    "directions",
+    "stacking",
+    "proposed"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/112"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "direction",
+    "direction-list",
+    "event",
+    "fraction",
+    "global",
+    "integer-unsigned",
+    "measure-global",
+    "mnx",
+    "multi-staff-orientation",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rhythmic-position",
+    "root",
+    "sequence",
+    "staff-position",
+    "step",
+    "string",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "schema": "proposed",
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "rendered"
+}

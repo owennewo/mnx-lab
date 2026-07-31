@@ -1,0 +1,156 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "guitar",
+      "name": "Guitar",
+      "_x": {
+        "mnxLab": {
+          "tab": {
+            "staffKind": "both"
+          }
+        }
+      },
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2,
+                "octave": -1
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "id": "n-s6",
+                      "pitch": {
+                        "step": "E",
+                        "octave": 2
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 6,
+                              "fret": 0
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "n-s5",
+                      "pitch": {
+                        "step": "A",
+                        "octave": 2
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 5,
+                              "fret": 0
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "n-s4",
+                      "pitch": {
+                        "step": "D",
+                        "octave": 3
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 4,
+                              "fret": 0
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "n-s3",
+                      "pitch": {
+                        "step": "G",
+                        "octave": 3
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 3,
+                              "fret": 0
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "n-s2",
+                      "pitch": {
+                        "step": "B",
+                        "octave": 3
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 2,
+                              "fret": 0
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "n-s1",
+                      "pitch": {
+                        "step": "E",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "position": {
+                              "string": 1,
+                              "fret": 0
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

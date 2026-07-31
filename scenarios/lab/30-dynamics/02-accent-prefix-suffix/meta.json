@@ -1,0 +1,48 @@
+{
+  "title": "Accent family via accentPrefix/accentSuffix, written out in full",
+  "description": "MNX encodes the sforzando family structurally rather than as opaque glyph names: accentPrefix + value + accentSuffix + residualValue concatenate to the conventional abbreviation, so s+f+z is sfz, r+f+z is rfz, \"\"+f+z is fz, s+f+\"\" is sf, \"\"+f+\"\"+p is fp and s+f+z+p is sfzp. This scenario engraves all six with every component stated explicitly. The spec's own dynamic-accents example is the complement: it writes the same markings idiomatically, leaning on the accentPrefix=\"s\" / accentSuffix=\"z\" defaults, so between them the two cover both spellings. Was invalid by design under v24, whose dynamic-prefix and dynamic-suffix enums held literal quote characters; fixed upstream in v26 (w3c-cg/mnx#529) and valid from then on.",
+  "bars": 2,
+  "tags": [
+    "dynamics",
+    "accent"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/dynamic-group/",
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/dynamic-prefix/",
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/dynamic-suffix/"
+  ],
+  "coversDefs": [
+    "root",
+    "mnx",
+    "global",
+    "measure-global",
+    "time",
+    "time-signature-unit",
+    "part",
+    "part-measure",
+    "sequence",
+    "event",
+    "note",
+    "pitch",
+    "note-value",
+    "clef",
+    "clef-sign",
+    "positioned-clef",
+    "dynamic-group",
+    "dynamic-group-list",
+    "dynamic-group-type",
+    "dynamic-value",
+    "dynamic-prefix",
+    "dynamic-suffix",
+    "rhythmic-position",
+    "fraction"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "status": "rendered"
+}

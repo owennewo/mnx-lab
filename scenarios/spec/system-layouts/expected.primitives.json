@@ -1,0 +1,2350 @@
+{
+  "widthSp": 80,
+  "notation": {
+    "widthSp": 80,
+    "heightSp": 134.6,
+    "primitives": [
+      {
+        "kind": "text",
+        "text": "Full score",
+        "x": 25.5,
+        "y": 3.4,
+        "font": "body",
+        "size": 2.4,
+        "anchor": "middle",
+        "className": "score-title"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 12.6,
+        "x2": 29.8,
+        "y2": 12.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 13.6,
+        "x2": 29.8,
+        "y2": 13.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 14.6,
+        "x2": 29.8,
+        "y2": 14.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 15.6,
+        "x2": 29.8,
+        "y2": 15.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 16.6,
+        "x2": 29.8,
+        "y2": 16.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 22.6,
+        "x2": 29.8,
+        "y2": 22.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 23.6,
+        "x2": 29.8,
+        "y2": 23.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 24.6,
+        "x2": 29.8,
+        "y2": 24.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 25.6,
+        "x2": 29.8,
+        "y2": 25.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 26.6,
+        "x2": 29.8,
+        "y2": 26.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 32.6,
+        "x2": 29.8,
+        "y2": 32.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 33.6,
+        "x2": 29.8,
+        "y2": 33.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 34.6,
+        "x2": 29.8,
+        "y2": 34.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 35.6,
+        "x2": 29.8,
+        "y2": 35.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 36.6,
+        "x2": 29.8,
+        "y2": 36.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 42.6,
+        "x2": 29.8,
+        "y2": 42.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 43.6,
+        "x2": 29.8,
+        "y2": 43.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 44.6,
+        "x2": 29.8,
+        "y2": 44.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 45.6,
+        "x2": 29.8,
+        "y2": 45.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 46.6,
+        "x2": 29.8,
+        "y2": 46.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 52.6,
+        "x2": 29.8,
+        "y2": 52.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 53.6,
+        "x2": 29.8,
+        "y2": 53.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 54.6,
+        "x2": 29.8,
+        "y2": 54.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 55.6,
+        "x2": 29.8,
+        "y2": 55.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 56.6,
+        "x2": 29.8,
+        "y2": 56.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 18.9,
+        "y1": 12.6,
+        "x2": 18.9,
+        "y2": 56.6,
+        "thickness": 0.16,
+        "className": "barline barline-start"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "brace",
+        "x": 15.7485,
+        "y": 26.6,
+        "scale": 3.5105,
+        "className": "brace"
+      },
+      {
+        "kind": "rect",
+        "x": 17.5,
+        "y": 12.5,
+        "w": 0.5,
+        "h": 24.2,
+        "fill": "currentColor",
+        "className": "bracket"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "bracketTop",
+        "x": 17.5,
+        "y": 12.5,
+        "className": "bracket"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "bracketBottom",
+        "x": 17.5,
+        "y": 36.7,
+        "className": "bracket"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "brace",
+        "x": 17.3485,
+        "y": 56.6,
+        "scale": 3.5105,
+        "className": "brace"
+      },
+      {
+        "kind": "text",
+        "text": "3",
+        "x": 15,
+        "y": 25.2,
+        "font": "body",
+        "size": 1.6,
+        "anchor": "end",
+        "className": "staff-label"
+      },
+      {
+        "kind": "text",
+        "text": "Oboes",
+        "x": 13.6,
+        "y": 35.2,
+        "font": "body",
+        "size": 1.6,
+        "anchor": "end",
+        "className": "staff-label"
+      },
+      {
+        "kind": "text",
+        "text": "1",
+        "x": 15,
+        "y": 14.1,
+        "font": "body",
+        "size": 1.4,
+        "anchor": "end",
+        "className": "source-label"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 15,
+        "y": 16.1,
+        "font": "body",
+        "size": 1.4,
+        "anchor": "end",
+        "className": "source-label"
+      },
+      {
+        "kind": "text",
+        "text": "1",
+        "x": 15,
+        "y": 34.1,
+        "font": "body",
+        "size": 1.4,
+        "anchor": "end",
+        "className": "source-label"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 15,
+        "y": 36.1,
+        "font": "body",
+        "size": 1.4,
+        "anchor": "end",
+        "className": "source-label"
+      },
+      {
+        "kind": "text",
+        "text": "Flutes",
+        "x": 13.4,
+        "y": 20.2,
+        "font": "body",
+        "size": 1.6,
+        "anchor": "end",
+        "className": "group-label"
+      },
+      {
+        "kind": "text",
+        "text": "Piano",
+        "x": 15,
+        "y": 50.2,
+        "font": "body",
+        "size": 1.6,
+        "anchor": "end",
+        "className": "group-label"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 20,
+        "y": 15.6,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 20,
+        "y": 25.6,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 20,
+        "y": 35.6,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 20,
+        "y": 45.6,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "fClef",
+        "x": 20,
+        "y": 53.6,
+        "className": "clef"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 12.6,
+        "x2": 29.8,
+        "y2": 26.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 12.6,
+        "x2": 29.8,
+        "y2": 36.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 42.6,
+        "x2": 29.8,
+        "y2": 56.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 12.6,
+        "x2": 37.2,
+        "y2": 12.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 13.6,
+        "x2": 37.2,
+        "y2": 13.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 14.6,
+        "x2": 37.2,
+        "y2": 14.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 15.6,
+        "x2": 37.2,
+        "y2": 15.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 16.6,
+        "x2": 37.2,
+        "y2": 16.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 22.6,
+        "x2": 37.2,
+        "y2": 22.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 23.6,
+        "x2": 37.2,
+        "y2": 23.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 24.6,
+        "x2": 37.2,
+        "y2": 24.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 25.6,
+        "x2": 37.2,
+        "y2": 25.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 26.6,
+        "x2": 37.2,
+        "y2": 26.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 32.6,
+        "x2": 37.2,
+        "y2": 32.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 33.6,
+        "x2": 37.2,
+        "y2": 33.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 34.6,
+        "x2": 37.2,
+        "y2": 34.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 35.6,
+        "x2": 37.2,
+        "y2": 35.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 36.6,
+        "x2": 37.2,
+        "y2": 36.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 42.6,
+        "x2": 37.2,
+        "y2": 42.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 43.6,
+        "x2": 37.2,
+        "y2": 43.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 44.6,
+        "x2": 37.2,
+        "y2": 44.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 45.6,
+        "x2": 37.2,
+        "y2": 45.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 46.6,
+        "x2": 37.2,
+        "y2": 46.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 52.6,
+        "x2": 37.2,
+        "y2": 52.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 53.6,
+        "x2": 37.2,
+        "y2": 53.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 54.6,
+        "x2": 37.2,
+        "y2": 54.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 55.6,
+        "x2": 37.2,
+        "y2": 55.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 29.8,
+        "y1": 56.6,
+        "x2": 37.2,
+        "y2": 56.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 12.6,
+        "x2": 37.2,
+        "y2": 26.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 12.6,
+        "x2": 37.2,
+        "y2": 36.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 42.6,
+        "x2": 37.2,
+        "y2": 56.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 12.6,
+        "x2": 44.6,
+        "y2": 12.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 13.6,
+        "x2": 44.6,
+        "y2": 13.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 14.6,
+        "x2": 44.6,
+        "y2": 14.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 15.6,
+        "x2": 44.6,
+        "y2": 15.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 16.6,
+        "x2": 44.6,
+        "y2": 16.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 22.6,
+        "x2": 44.6,
+        "y2": 22.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 23.6,
+        "x2": 44.6,
+        "y2": 23.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 24.6,
+        "x2": 44.6,
+        "y2": 24.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 25.6,
+        "x2": 44.6,
+        "y2": 25.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 26.6,
+        "x2": 44.6,
+        "y2": 26.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 32.6,
+        "x2": 44.6,
+        "y2": 32.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 33.6,
+        "x2": 44.6,
+        "y2": 33.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 34.6,
+        "x2": 44.6,
+        "y2": 34.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 35.6,
+        "x2": 44.6,
+        "y2": 35.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 36.6,
+        "x2": 44.6,
+        "y2": 36.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 42.6,
+        "x2": 44.6,
+        "y2": 42.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 43.6,
+        "x2": 44.6,
+        "y2": 43.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 44.6,
+        "x2": 44.6,
+        "y2": 44.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 45.6,
+        "x2": 44.6,
+        "y2": 45.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 46.6,
+        "x2": 44.6,
+        "y2": 46.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 52.6,
+        "x2": 44.6,
+        "y2": 52.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 53.6,
+        "x2": 44.6,
+        "y2": 53.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 54.6,
+        "x2": 44.6,
+        "y2": 54.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 55.6,
+        "x2": 44.6,
+        "y2": 55.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 37.2,
+        "y1": 56.6,
+        "x2": 44.6,
+        "y2": 56.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 43.8,
+        "y1": 12.6,
+        "x2": 43.8,
+        "y2": 26.6,
+        "thickness": 0.16,
+        "className": "barline barline-final-thin"
+      },
+      {
+        "kind": "rect",
+        "x": 44.1,
+        "y": 12.6,
+        "w": 0.5,
+        "h": 14,
+        "fill": "currentColor",
+        "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "line",
+        "x1": 43.8,
+        "y1": 12.6,
+        "x2": 43.8,
+        "y2": 36.6,
+        "thickness": 0.16,
+        "className": "barline barline-final-thin"
+      },
+      {
+        "kind": "rect",
+        "x": 44.1,
+        "y": 12.6,
+        "w": 0.5,
+        "h": 24,
+        "fill": "currentColor",
+        "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "line",
+        "x1": 43.8,
+        "y1": 42.6,
+        "x2": 43.8,
+        "y2": 56.6,
+        "thickness": 0.16,
+        "className": "barline barline-final-thin"
+      },
+      {
+        "kind": "rect",
+        "x": 44.1,
+        "y": 42.6,
+        "w": 0.5,
+        "h": 14,
+        "fill": "currentColor",
+        "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 72.6,
+        "x2": 26.8,
+        "y2": 72.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 73.6,
+        "x2": 26.8,
+        "y2": 73.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 74.6,
+        "x2": 26.8,
+        "y2": 74.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 75.6,
+        "x2": 26.8,
+        "y2": 75.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 76.6,
+        "x2": 26.8,
+        "y2": 76.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 82.6,
+        "x2": 26.8,
+        "y2": 82.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 83.6,
+        "x2": 26.8,
+        "y2": 83.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 84.6,
+        "x2": 26.8,
+        "y2": 84.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 85.6,
+        "x2": 26.8,
+        "y2": 85.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 86.6,
+        "x2": 26.8,
+        "y2": 86.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 92.6,
+        "x2": 26.8,
+        "y2": 92.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 93.6,
+        "x2": 26.8,
+        "y2": 93.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 94.6,
+        "x2": 26.8,
+        "y2": 94.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 95.6,
+        "x2": 26.8,
+        "y2": 95.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 96.6,
+        "x2": 26.8,
+        "y2": 96.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 102.6,
+        "x2": 26.8,
+        "y2": 102.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 103.6,
+        "x2": 26.8,
+        "y2": 103.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 104.6,
+        "x2": 26.8,
+        "y2": 104.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 105.6,
+        "x2": 26.8,
+        "y2": 105.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 106.6,
+        "x2": 26.8,
+        "y2": 106.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 112.6,
+        "x2": 26.8,
+        "y2": 112.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 113.6,
+        "x2": 26.8,
+        "y2": 113.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 114.6,
+        "x2": 26.8,
+        "y2": 114.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 115.6,
+        "x2": 26.8,
+        "y2": 115.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 116.6,
+        "x2": 26.8,
+        "y2": 116.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 122.6,
+        "x2": 26.8,
+        "y2": 122.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 123.6,
+        "x2": 26.8,
+        "y2": 123.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 124.6,
+        "x2": 26.8,
+        "y2": 124.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 125.6,
+        "x2": 26.8,
+        "y2": 125.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 126.6,
+        "x2": 26.8,
+        "y2": 126.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.9,
+        "y1": 72.6,
+        "x2": 15.9,
+        "y2": 126.6,
+        "thickness": 0.16,
+        "className": "barline barline-start"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "brace",
+        "x": 11.9261,
+        "y": 96.6,
+        "scale": 6.0181,
+        "className": "brace"
+      },
+      {
+        "kind": "rect",
+        "x": 14.5,
+        "y": 72.5,
+        "w": 0.5,
+        "h": 34.2,
+        "fill": "currentColor",
+        "className": "bracket"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "bracketTop",
+        "x": 14.5,
+        "y": 72.5,
+        "className": "bracket"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "bracketBottom",
+        "x": 14.5,
+        "y": 106.7,
+        "className": "bracket"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "brace",
+        "x": 14.3485,
+        "y": 126.6,
+        "scale": 3.5105,
+        "className": "brace"
+      },
+      {
+        "kind": "text",
+        "text": "1",
+        "x": 12,
+        "y": 75.2,
+        "font": "body",
+        "size": 1.6,
+        "anchor": "end",
+        "className": "staff-label"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 12,
+        "y": 85.2,
+        "font": "body",
+        "size": 1.6,
+        "anchor": "end",
+        "className": "staff-label"
+      },
+      {
+        "kind": "text",
+        "text": "3",
+        "x": 12,
+        "y": 95.2,
+        "font": "body",
+        "size": 1.6,
+        "anchor": "end",
+        "className": "staff-label"
+      },
+      {
+        "kind": "text",
+        "text": "Ob.",
+        "x": 10.6,
+        "y": 105.2,
+        "font": "body",
+        "size": 1.6,
+        "anchor": "end",
+        "className": "staff-label"
+      },
+      {
+        "kind": "text",
+        "text": "1",
+        "x": 12,
+        "y": 104.1,
+        "font": "body",
+        "size": 1.4,
+        "anchor": "end",
+        "className": "source-label"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 12,
+        "y": 106.1,
+        "font": "body",
+        "size": 1.4,
+        "anchor": "end",
+        "className": "source-label"
+      },
+      {
+        "kind": "text",
+        "text": "Fl.",
+        "x": 10.4,
+        "y": 85.2,
+        "font": "body",
+        "size": 1.6,
+        "anchor": "end",
+        "className": "group-label"
+      },
+      {
+        "kind": "text",
+        "text": "Piano",
+        "x": 12,
+        "y": 120.2,
+        "font": "body",
+        "size": 1.6,
+        "anchor": "end",
+        "className": "group-label"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 17,
+        "y": 75.6,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 17,
+        "y": 85.6,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 17,
+        "y": 95.6,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 17,
+        "y": 105.6,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef",
+        "x": 17,
+        "y": 115.6,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "fClef",
+        "x": 17,
+        "y": 123.6,
+        "className": "clef"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 72.6,
+        "x2": 26.8,
+        "y2": 96.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 72.6,
+        "x2": 26.8,
+        "y2": 106.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 112.6,
+        "x2": 26.8,
+        "y2": 126.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 72.6,
+        "x2": 34.2,
+        "y2": 72.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 73.6,
+        "x2": 34.2,
+        "y2": 73.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 74.6,
+        "x2": 34.2,
+        "y2": 74.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 75.6,
+        "x2": 34.2,
+        "y2": 75.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 76.6,
+        "x2": 34.2,
+        "y2": 76.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 82.6,
+        "x2": 34.2,
+        "y2": 82.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 83.6,
+        "x2": 34.2,
+        "y2": 83.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 84.6,
+        "x2": 34.2,
+        "y2": 84.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 85.6,
+        "x2": 34.2,
+        "y2": 85.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 86.6,
+        "x2": 34.2,
+        "y2": 86.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 92.6,
+        "x2": 34.2,
+        "y2": 92.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 93.6,
+        "x2": 34.2,
+        "y2": 93.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 94.6,
+        "x2": 34.2,
+        "y2": 94.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 95.6,
+        "x2": 34.2,
+        "y2": 95.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 96.6,
+        "x2": 34.2,
+        "y2": 96.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 102.6,
+        "x2": 34.2,
+        "y2": 102.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 103.6,
+        "x2": 34.2,
+        "y2": 103.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 104.6,
+        "x2": 34.2,
+        "y2": 104.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 105.6,
+        "x2": 34.2,
+        "y2": 105.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 106.6,
+        "x2": 34.2,
+        "y2": 106.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 112.6,
+        "x2": 34.2,
+        "y2": 112.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 113.6,
+        "x2": 34.2,
+        "y2": 113.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 114.6,
+        "x2": 34.2,
+        "y2": 114.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 115.6,
+        "x2": 34.2,
+        "y2": 115.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 116.6,
+        "x2": 34.2,
+        "y2": 116.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 122.6,
+        "x2": 34.2,
+        "y2": 122.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 123.6,
+        "x2": 34.2,
+        "y2": 123.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 124.6,
+        "x2": 34.2,
+        "y2": 124.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 125.6,
+        "x2": 34.2,
+        "y2": 125.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 26.8,
+        "y1": 126.6,
+        "x2": 34.2,
+        "y2": 126.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 72.6,
+        "x2": 34.2,
+        "y2": 96.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 72.6,
+        "x2": 34.2,
+        "y2": 106.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 112.6,
+        "x2": 34.2,
+        "y2": 126.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 72.6,
+        "x2": 41.6,
+        "y2": 72.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 73.6,
+        "x2": 41.6,
+        "y2": 73.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 74.6,
+        "x2": 41.6,
+        "y2": 74.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 75.6,
+        "x2": 41.6,
+        "y2": 75.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 76.6,
+        "x2": 41.6,
+        "y2": 76.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 82.6,
+        "x2": 41.6,
+        "y2": 82.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 83.6,
+        "x2": 41.6,
+        "y2": 83.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 84.6,
+        "x2": 41.6,
+        "y2": 84.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 85.6,
+        "x2": 41.6,
+        "y2": 85.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 86.6,
+        "x2": 41.6,
+        "y2": 86.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 92.6,
+        "x2": 41.6,
+        "y2": 92.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 93.6,
+        "x2": 41.6,
+        "y2": 93.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 94.6,
+        "x2": 41.6,
+        "y2": 94.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 95.6,
+        "x2": 41.6,
+        "y2": 95.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 96.6,
+        "x2": 41.6,
+        "y2": 96.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 102.6,
+        "x2": 41.6,
+        "y2": 102.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 103.6,
+        "x2": 41.6,
+        "y2": 103.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 104.6,
+        "x2": 41.6,
+        "y2": 104.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 105.6,
+        "x2": 41.6,
+        "y2": 105.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 106.6,
+        "x2": 41.6,
+        "y2": 106.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 112.6,
+        "x2": 41.6,
+        "y2": 112.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 113.6,
+        "x2": 41.6,
+        "y2": 113.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 114.6,
+        "x2": 41.6,
+        "y2": 114.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 115.6,
+        "x2": 41.6,
+        "y2": 115.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 116.6,
+        "x2": 41.6,
+        "y2": 116.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 122.6,
+        "x2": 41.6,
+        "y2": 122.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 123.6,
+        "x2": 41.6,
+        "y2": 123.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 124.6,
+        "x2": 41.6,
+        "y2": 124.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 125.6,
+        "x2": 41.6,
+        "y2": 125.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.2,
+        "y1": 126.6,
+        "x2": 41.6,
+        "y2": 126.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 72.6,
+        "x2": 41.6,
+        "y2": 96.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 72.6,
+        "x2": 41.6,
+        "y2": 106.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 112.6,
+        "x2": 41.6,
+        "y2": 126.6,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 72.6,
+        "x2": 49,
+        "y2": 72.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 73.6,
+        "x2": 49,
+        "y2": 73.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 74.6,
+        "x2": 49,
+        "y2": 74.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 75.6,
+        "x2": 49,
+        "y2": 75.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 76.6,
+        "x2": 49,
+        "y2": 76.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 82.6,
+        "x2": 49,
+        "y2": 82.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 83.6,
+        "x2": 49,
+        "y2": 83.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 84.6,
+        "x2": 49,
+        "y2": 84.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 85.6,
+        "x2": 49,
+        "y2": 85.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 86.6,
+        "x2": 49,
+        "y2": 86.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 92.6,
+        "x2": 49,
+        "y2": 92.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 93.6,
+        "x2": 49,
+        "y2": 93.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 94.6,
+        "x2": 49,
+        "y2": 94.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 95.6,
+        "x2": 49,
+        "y2": 95.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 96.6,
+        "x2": 49,
+        "y2": 96.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 102.6,
+        "x2": 49,
+        "y2": 102.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 103.6,
+        "x2": 49,
+        "y2": 103.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 104.6,
+        "x2": 49,
+        "y2": 104.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 105.6,
+        "x2": 49,
+        "y2": 105.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 106.6,
+        "x2": 49,
+        "y2": 106.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 112.6,
+        "x2": 49,
+        "y2": 112.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 113.6,
+        "x2": 49,
+        "y2": 113.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 114.6,
+        "x2": 49,
+        "y2": 114.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 115.6,
+        "x2": 49,
+        "y2": 115.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 116.6,
+        "x2": 49,
+        "y2": 116.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 122.6,
+        "x2": 49,
+        "y2": 122.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 123.6,
+        "x2": 49,
+        "y2": 123.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 124.6,
+        "x2": 49,
+        "y2": 124.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 125.6,
+        "x2": 49,
+        "y2": 125.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 41.6,
+        "y1": 126.6,
+        "x2": 49,
+        "y2": 126.6,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 48.2,
+        "y1": 72.6,
+        "x2": 48.2,
+        "y2": 96.6,
+        "thickness": 0.16,
+        "className": "barline barline-final-thin"
+      },
+      {
+        "kind": "rect",
+        "x": 48.5,
+        "y": 72.6,
+        "w": 0.5,
+        "h": 24,
+        "fill": "currentColor",
+        "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "line",
+        "x1": 48.2,
+        "y1": 72.6,
+        "x2": 48.2,
+        "y2": 106.6,
+        "thickness": 0.16,
+        "className": "barline barline-final-thin"
+      },
+      {
+        "kind": "rect",
+        "x": 48.5,
+        "y": 72.6,
+        "w": 0.5,
+        "h": 34,
+        "fill": "currentColor",
+        "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "line",
+        "x1": 48.2,
+        "y1": 112.6,
+        "x2": 48.2,
+        "y2": 126.6,
+        "thickness": 0.16,
+        "className": "barline barline-final-thin"
+      },
+      {
+        "kind": "rect",
+        "x": 48.5,
+        "y": 112.6,
+        "w": 0.5,
+        "h": 14,
+        "fill": "currentColor",
+        "className": "barline barline-final-thick"
+      }
+    ]
+  }
+}
