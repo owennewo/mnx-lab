@@ -1,0 +1,12 @@
+<svg width="1280" height="320" viewBox="0 0 1280 320" xmlns="http://www.w3.org/2000/svg">
+<line x1="32" y1="128" x2="294.4" y2="128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="144" x2="294.4" y2="144" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="160" x2="294.4" y2="160" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="176" x2="294.4" y2="176" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="192" x2="294.4" y2="192" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<text x="49.6" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
+<line x1="177.696" y1="208" x2="217.504" y2="208" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
+<text x="184.096" y="208" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
+<line x1="281.6" y1="128" x2="281.6" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="286.4" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+</svg>

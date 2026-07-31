@@ -128,13 +128,18 @@
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{16}$",
           "description": "Hash of expected.primitives.json at approval time. Absent for invalid-by-design scenarios, which have no primitives."
+        },
+        "renderHash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{16}$",
+          "description": "Hash of the SVG goldens (expected.svg + expected.tab.svg) at approval time — the emitter's own output, which primitivesHash cannot see. Optional: approvals predating the SVG golden carry no renderHash and are NOT treated as stale for lacking one; run --backfill-render to stamp them."
         }
       },
       "required": [
         "at"
       ],
       "additionalProperties": false,
-      "description": "Provenance of the last human approval, written only by verify-scenarios.mjs and deliberately KEPT through demotion — so the approval queue can distinguish 'stale' (verified once, primitives changed since: hash differs or status was demoted) from 'never seen' (no record). See roadmap/complete/structure-lab.md."
+      "description": "Provenance of the last human approval, written only by verify-scenarios.mjs and deliberately KEPT through demotion — so the approval queue can distinguish 'stale' (verified once, a golden changed since: a hash differs or status was demoted) from 'never seen' (no record). See roadmap/complete/structure-lab.md."
     }
   },
   "required": [

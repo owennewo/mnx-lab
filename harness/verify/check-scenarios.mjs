@@ -15,7 +15,15 @@ import Ajv2020 from 'ajv/dist/2020.js';
 export const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
 const SCENARIOS_DIR = path.join(ROOT, 'scenarios');
 
-const ALLOWED_FILES = new Set(['meta.json', 'score.mnx.json', 'expected.primitives.json', 'notes.md']);
+const ALLOWED_FILES = new Set([
+  'meta.json',
+  'score.mnx.json',
+  'expected.primitives.json',
+  // The emitter golden, and its tab companion when the part declares one.
+  'expected.svg',
+  'expected.tab.svg',
+  'notes.md'
+]);
 const SEGMENT_RE = /^(\d+-)?[a-z0-9][a-z0-9-]*$/;
 const STATUS_ORDER = { draft: 0, valid: 1, rendered: 2, verified: 3 };
 

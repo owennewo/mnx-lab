@@ -44,8 +44,10 @@ file in this flow.
      carry one in the pinned spec checkout — `spec/tools/specSource.mjs`
      `loadSpecExamples()` resolves each example's `imagePath`);
    - for **stale** items additionally a what-changed note derived from diffing the
-     committed `expected.primitives.json` against the freshly computed primitives
-     (summarize in words — "beam spacing changed", "new glyph" — don't dump JSON).
+     committed goldens against freshly computed output — `expected.primitives.json`
+     for layout, `expected.svg` for the emitter (the queue entry names which hash
+     moved). Summarize in words — "beam spacing changed", "new glyph", "clef now
+     emits a different codepoint" — don't dump JSON or SVG.
    Load the artifact-design skill before writing the page. Publish as an Artifact
    and reuse the same file path every round. Keep the page self-contained (inline
    the SVGs; no external requests).

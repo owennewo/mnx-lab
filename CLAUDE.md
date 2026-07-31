@@ -103,7 +103,8 @@ consumer needing independent versioning — a check, not a debate.
 ## The corpus: one format, two axes
 
 Each scenario is a directory (`meta.json`, `score.mnx.json`, optional
-`expected.primitives.json` golden and `notes.md`) with **two orthogonal axes** in meta:
+`expected.primitives.json` + `expected.svg` (+ `expected.tab.svg`) goldens and
+`notes.md`) with **two orthogonal axes** in meta:
 
 - **`origin`**: `mirrored` (generated from the pinned spec by `sync:spec`, which owns
   the whole `scenarios/spec/` tree — hand-edit forbidden) | `local` (ours, under
@@ -115,31 +116,52 @@ Each scenario is a directory (`meta.json`, `score.mnx.json`, optional
   `check-scenarios` enforces all of this.
 
 **Verification is a human assertion with provenance.** `status: verified` and the
-`verification: {at, primitivesHash}` record are written **only** by
+`verification: {at, primitivesHash, renderHash}` record are written **only** by
 `harness/verify/verify-scenarios.mjs`; the record is *kept through demotion*, so the
 attention queue distinguishes **stale** (approved once, output changed) from **never
 seen** (no record). `npm run update:primitives` keeps statuses honest: a successful
 snapshot write promotes `valid`→`rendered`, a changed snapshot demotes
-`verified`→`rendered`, a layout crash demotes to `valid` (removing the snapshot). The
+`verified`→`rendered`, a layout crash demotes to `valid` (removing the snapshots). A
+golden appearing for the **first** time is never a change — that is how a new golden is
+introduced without mass-demoting the corpus. `renderHash` is **optional** in a record
+for the same reason: approvals predating `expected.svg` were real assertions made on the
+layout evidence, so their absence is not staleness; `--backfill-render` stamps them, and
+what that asserts is spelled out at the flag. The
 approval flow is the conversational **`/verify` skill** (`.claude/skills/verify/`) —
 queue → one stable review page → verdicts in sentences; there is no human-facing CLI and
 no checkbox page. The initial 57/57 sweep is recorded in
 [roadmap/complete/SPEC_APPROVAL.md](roadmap/complete/SPEC_APPROVAL.md), still the recipe
 for verifying renderer features.
 
-**The primitives goldens are the crown jewels.** Any move or refactor of
-`model/`/`engine/` must reproduce them byte-identically
-(`npm run update:primitives` then a clean `git diff -- scenarios/`); a mismatch stops
-the line — diff against `legacy`, never "close enough".
+**The goldens are the crown jewels.** Any move or refactor of `model/`/`engine/` must
+reproduce them byte-identically (`npm run update:primitives` then a clean
+`git diff -- scenarios/`); a mismatch stops the line — diff against `legacy`, never
+"close enough".
+
+There are **two** goldens per scenario because they cover different code.
+`expected.primitives.json` pins layout, and stops at staff-space coordinates and SMuFL
+glyph *names*. `expected.svg` puts those primitives through the real emitter
+(`harness/helpers/corpusSvg.ts` → `src/engine/render/svg.ts`), pinning what
+`expected.primitives.json` structurally cannot see: the glyph name→codepoint lookup, the
+five emit branches, sp→px, the viewBox. Map `gClef` to the wrong codepoint and the
+primitives hash does not move. It is **text, not pixels, on purpose** — a PNG hash would
+absorb the local Chrome build, font hinting and antialiasing, so a browser upgrade would
+demote every approval at once and the queue would stop meaning "the renderer changed".
+`GOLDEN_PX_PER_SP` is a **power of two** so sp→px adds no float noise. PNGs stay what
+they always were: proposal engravings and a review aid (`harness/render/render-png.ts`),
+never a golden and never hashed.
 
 ## The workbench (`src/ui/`) — review-first, no backend
 
 Home is the **attention queue** (blocked → stale → never-seen; current counted, not
 shown), derived from committed provenance in `src/ui/queue.ts`. Every scenario + view
 has a stable deep link: `#/scenario/<id>?view=notation|tab|both|compare|json`. The
-**compare** view shows our render beside the spec's reference engraving, served by a
-dev-only read-only Vite middleware (`/spec-media/*` from the pinned `vendor/mnx`; a
-static deploy degrades to a note).
+**compare** view shows our render beside the spec's reference engraving at
+`/spec-media/<slug>.png` — read-only from the pinned `vendor/mnx` by Vite middleware in
+dev, and copied into `dist/client/spec-media/` by the same plugin at build time. Built
+without the submodule, the pane degrades to a note. The images are the CG's, shown with
+attribution and never committed here. The scenario page distinguishes **loading** from
+**failed** (the score is a lazy chunk — a dead dev server must not read as a render bug).
 
 **The workbench has no backend — by rule.** It must stay fully functional (minus live
 AI edits) from static build output alone: the corpus is committed JSON, documents live
@@ -204,8 +226,11 @@ Saved documents upgrade v1→v2→v3 on load via `src/model/upgradeTabExtension.
 
 ## The spec loop: sync down, push up
 
-`vendor/mnx` is the spec repo as a submodule, **pin only, dev-time only** — builds and
-deploys never read it, and it is never checked out to a proposal branch. Upstream is a
+`vendor/mnx` is the spec repo as a submodule, **pin only**, and it is never checked out
+to a proposal branch. A build **may read it but must never require it**: the only build
+that touches it is the `spec-media` copy above, which skips with a warning when the
+submodule is absent, so `npm run build` still succeeds in a fresh clone (the compare pane
+degrades). Nothing else in a build or deploy reads it. Upstream is a
 *generated* site (Django fixture `doctools/data.json`); a spec change edits the fixture,
 never `mnx-schema.json` by hand. Everything — reading it, moving the pin, the worktree
 recipe, the doctools/`uv` setup — is in

@@ -10,29 +10,63 @@
 //   node harness/verify/verify-scenarios.mjs --backfill <date>  add provenance records to
 //                                                        already-verified scenarios
 //                                                        that predate provenance
+//   node harness/verify/verify-scenarios.mjs --backfill-render  stamp renderHash onto
+//                                                        current records that predate
+//                                                        the SVG golden
 //
 // Eligibility: the scenario must pass check-scenarios cleanly, and (for
 // expected-valid documents) must have a committed expected.primitives.json —
 // i.e. you can only verify what actually renders today.
 //
-// Provenance: verifying writes `verification: {at, primitivesHash}` beside
-// `status`. Demotion (update:primitives) rewrites `status` but KEEPS the
+// Provenance: verifying writes `verification: {at, primitivesHash, renderHash}`
+// beside `status`. Demotion (update:primitives) rewrites `status` but KEEPS the
 // record, so the queue can tell three states apart:
-//   current    — status verified, hash matches the committed primitives
-//   stale      — a record exists, but status was demoted or the hash differs;
+//   current    — status verified, both hashes match the committed goldens
+//   stale      — a record exists, but status was demoted or a hash differs;
 //                the committed goldens diff shows exactly what changed
 //   never seen — renders, but no human has ever approved it (no record)
+//
+// Two hashes because there are two goldens: `primitivesHash` covers layout
+// (expected.primitives.json), `renderHash` covers the emitter's own output
+// (expected.svg + expected.tab.svg — see harness/helpers/corpusSvg.ts).
+// `renderHash` is OPTIONAL in a record, and its absence is not staleness:
+// approvals predating the SVG golden were real human assertions made on the
+// layout evidence, and demoting all of them to introduce a new field would be
+// exactly the mass-demotion this record exists to avoid. They stay current,
+// carry a note, and pick up a renderHash the next time they are approved.
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { loadCorpus, createContext, checkScenario } from './check-scenarios.mjs';
 
+const SVG_GOLDEN_FILES = ['expected.svg', 'expected.tab.svg'];
+
+function shortHash(update) {
+  const hash = crypto.createHash('sha256');
+  update(hash);
+  return `sha256:${hash.digest('hex').slice(0, 16)}`;
+}
+
 /** sha256 of the committed primitives snapshot, or null when there is none. */
 function primitivesHash(scenario) {
   const primsPath = path.join(scenario.dir, 'expected.primitives.json');
   if (!fs.existsSync(primsPath)) return null;
-  const digest = crypto.createHash('sha256').update(fs.readFileSync(primsPath)).digest('hex');
-  return `sha256:${digest.slice(0, 16)}`;
+  return shortHash(h => h.update(fs.readFileSync(primsPath)));
+}
+
+/**
+ * sha256 over the committed SVG goldens, or null when none exist. Filenames
+ * are hashed alongside contents so gaining or losing the tab golden moves the
+ * digest even if the notation SVG is untouched.
+ */
+function renderHash(scenario) {
+  const present = SVG_GOLDEN_FILES.map(name => [name, path.join(scenario.dir, name)]).filter(
+    ([, p]) => fs.existsSync(p)
+  );
+  if (present.length === 0) return null;
+  return shortHash(h => {
+    for (const [name, p] of present) h.update(name).update('\0').update(fs.readFileSync(p));
+  });
 }
 
 function writeMeta(scenario, mutate) {
@@ -45,9 +79,23 @@ function writeMeta(scenario, mutate) {
 function markVerified(scenario, at) {
   writeMeta(scenario, meta => {
     meta.status = 'verified';
-    const hash = primitivesHash(scenario);
-    meta.verification = hash === null ? { at } : { at, primitivesHash: hash };
+    const prims = primitivesHash(scenario);
+    const render = renderHash(scenario);
+    const record = { at };
+    if (prims !== null) record.primitivesHash = prims;
+    if (render !== null) record.renderHash = render;
+    meta.verification = record;
   });
+}
+
+/**
+ * Is this record still an assertion about the current goldens? A missing
+ * renderHash is grandfathered (see the header); a present one must match.
+ */
+function recordMatches(record, prims, render) {
+  if (record === null) return false;
+  if ((record.primitivesHash ?? null) !== prims) return false;
+  return record.renderHash === undefined || record.renderHash === render;
 }
 
 /**
@@ -67,24 +115,30 @@ export function buildQueue() {
       continue;
     }
     const hash = primitivesHash(scenario);
+    const render = renderHash(scenario);
     const record = meta.verification ?? null;
     const entry = {
       id: scenario.id,
       status: meta.status,
       verifiedAt: record?.at ?? null,
       approvedHash: record?.primitivesHash ?? null,
-      currentHash: hash
+      currentHash: hash,
+      approvedRenderHash: record?.renderHash ?? null,
+      currentRenderHash: render
     };
     if (errors.length > 0) {
       queue.blocked.push({ ...entry, reason: 'checker errors', errors: errors.slice(0, 3) });
     } else if (meta.expect.standard === 'valid' && hash === null) {
       queue.blocked.push({ ...entry, reason: 'not rendered (no expected.primitives.json)' });
-    } else if (meta.status === 'verified' && (record?.primitivesHash ?? null) === hash) {
-      // Verified with no record and no primitives (invalid-by-design, pre-provenance)
-      // also lands here: both sides are null.
-      queue.current.push(entry);
+    } else if (meta.status === 'verified' && recordMatches(record, hash, render)) {
+      queue.current.push(
+        record !== null && record.renderHash === undefined && render !== null
+          ? { ...entry, note: 'approved before the SVG golden — renderHash recorded on next approval' }
+          : entry
+      );
     } else if (meta.status === 'verified' && record === null) {
-      // Pre-provenance approval: trusted (tests would have demoted a drifted
+      // Pre-provenance approval — including invalid-by-design scenarios, which
+      // have no goldens at all. Trusted (tests would have demoted a drifted
       // snapshot), but backfill a record so staleness becomes observable.
       queue.current.push({ ...entry, note: 'no provenance record — run --backfill' });
     } else if (record !== null) {
@@ -108,7 +162,16 @@ function printQueue(queue, asJson) {
   );
   for (const e of queue.blocked) console.log(`  blocked    ${e.id} — ${e.reason}`);
   for (const e of queue.stale) {
-    console.log(`  stale      ${e.id} — approved ${e.verifiedAt} at ${e.approvedHash}, now ${e.currentHash}`);
+    // Name which golden moved: layout and emitter drift are different bugs.
+    const drifted = [];
+    if (e.approvedHash !== e.currentHash) {
+      drifted.push(`primitives ${e.approvedHash} → ${e.currentHash}`);
+    }
+    if (e.approvedRenderHash !== null && e.approvedRenderHash !== e.currentRenderHash) {
+      drifted.push(`svg ${e.approvedRenderHash} → ${e.currentRenderHash}`);
+    }
+    const why = drifted.length > 0 ? drifted.join(', ') : `status demoted to ${e.status}`;
+    console.log(`  stale      ${e.id} — approved ${e.verifiedAt}; ${why}`);
   }
   for (const e of queue.neverSeen) console.log(`  never-seen ${e.id}`);
   if (attention === 0) console.log('The queue is empty.');
@@ -149,6 +212,37 @@ function main() {
     return;
   }
 
+  if (args[0] === '--backfill-render') {
+    // Stamps renderHash onto approvals made before the SVG golden existed,
+    // keeping each record's original `at` date.
+    //
+    // Read what this asserts before running it: "the SVG our emitter produces
+    // today is the output that was approved on that date". That is true only
+    // if nothing downstream of the primitives has moved since — the emitter,
+    // the glyph name → codepoint table, the sp→px arithmetic. Layout drift
+    // would already have demoted these scenarios out of `current`; emitter
+    // drift is exactly what nothing was watching, which is why the golden was
+    // added. So this is a judgement call, not a derivation, and it is a
+    // separate command for that reason. If in doubt, re-verify through
+    // /verify instead and let a human look at the render.
+    const ctx = createContext();
+    let stamped = 0;
+    for (const scenario of corpus) {
+      const { errors, meta } = checkScenario(scenario, ctx);
+      if (!meta || errors.length > 0 || meta.status !== 'verified') continue;
+      const record = meta.verification ?? null;
+      if (record === null || record.renderHash !== undefined) continue;
+      const hash = primitivesHash(scenario);
+      const render = renderHash(scenario);
+      if (render === null || (record.primitivesHash ?? null) !== hash) continue;
+      markVerified(scenario, record.at);
+      console.log(`STAMP ${scenario.id}: renderHash ${render} (approved ${record.at})`);
+      stamped++;
+    }
+    console.log(`\n${stamped} record(s) stamped with a renderHash.`);
+    return;
+  }
+
   const ctx = createContext();
   let failures = 0;
   let approved = 0;
@@ -172,11 +266,12 @@ function main() {
       failures++;
       continue;
     }
-    if (meta.status === 'verified' && (meta.verification?.primitivesHash ?? null) === hash) {
+    const render = renderHash(scenario);
+    if (meta.status === 'verified' && recordMatches(meta.verification ?? null, hash, render)) {
       console.log(`OK   ${id}: already verified and current`);
       continue;
     }
-    markVerified(scenario, new Date().toISOString());
+    markVerified(scenario, new Date().toISOString().slice(0, 10));
     console.log(`OK   ${id}: ${meta.status} → verified (${hash ?? 'no primitives — invalid-by-design'})`);
     approved++;
   }

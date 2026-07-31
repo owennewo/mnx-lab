@@ -25,6 +25,11 @@ export class ScenarioPage extends LitElement {
   @state() private rawScore = '';
   @state() private pinnedErrors: PinnedError[] = [];
   @state() private referenceFailed = false;
+  // Three states, not two: the score arrives over a lazy import, so "nothing
+  // on screen" is either still-in-flight or a dead fetch. Collapsing them
+  // into one empty pane is how a stopped dev server reads as a render bug.
+  @state() private loadState: 'loading' | 'ready' | 'failed' = 'loading';
+  @state() private loadError = '';
 
   static styles = [
     designTokens,
@@ -164,7 +169,8 @@ export class ScenarioPage extends LitElement {
         padding: 20px;
       }
 
-      .ref-missing {
+      .ref-missing,
+      .load-state {
         margin: 26px;
         padding: 22px;
         border: 1px dashed var(--line-strong);
@@ -172,6 +178,33 @@ export class ScenarioPage extends LitElement {
         font-size: 12.5px;
         color: var(--ink-2);
         line-height: 1.55;
+      }
+
+      .ref-credit {
+        margin: -14px 26px 26px;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--ink-3);
+      }
+
+      .ref-credit a {
+        color: inherit;
+      }
+
+      .load-state p {
+        margin: 8px 0 0;
+      }
+
+      .load-state.failed {
+        border-style: solid;
+        border-color: var(--st-gap);
+      }
+
+      .load-state .detail {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--ink-3);
+        word-break: break-word;
       }
 
       .json {
@@ -204,6 +237,8 @@ export class ScenarioPage extends LitElement {
       this.rawScore = '';
       this.pinnedErrors = [];
       this.referenceFailed = false;
+      this.loadState = 'loading';
+      this.loadError = '';
       void this.loadScore();
     }
   }
@@ -211,17 +246,27 @@ export class ScenarioPage extends LitElement {
   private async loadScore() {
     const entry = this.entry();
     if (!entry) return;
-    const score = (await entry.loadScore()) as MnxStructure;
-    if (entry.id !== this.scenarioId) return; // navigated away meanwhile
-    this.doc = {
-      id: entry.id,
-      name: entry.meta.title,
-      lastUpdated: 0,
-      mnxJson: score
-    };
-    this.rawScore = JSON.stringify(score, null, 2);
-    if (entry.invalidByDesign) {
-      this.pinnedErrors = await resolvePinnedErrors(score, entry.meta.expect.errors ?? []);
+    try {
+      const score = (await entry.loadScore()) as MnxStructure;
+      if (entry.id !== this.scenarioId) return; // navigated away meanwhile
+      this.doc = {
+        id: entry.id,
+        name: entry.meta.title,
+        lastUpdated: 0,
+        mnxJson: score
+      };
+      this.rawScore = JSON.stringify(score, null, 2);
+      if (entry.invalidByDesign) {
+        this.pinnedErrors = await resolvePinnedErrors(score, entry.meta.expect.errors ?? []);
+      }
+      this.loadState = 'ready';
+    } catch (e) {
+      // The score is a lazy chunk: a dead dev server, an offline reload or a
+      // half-deployed build all land here. Surfacing the reason is the whole
+      // point — silently leaving the pane blank blames the renderer.
+      if (entry.id !== this.scenarioId) return;
+      this.loadState = 'failed';
+      this.loadError = e instanceof Error ? e.message : String(e);
     }
   }
 
@@ -233,6 +278,20 @@ export class ScenarioPage extends LitElement {
   }
 
   private viewer(entry: ScenarioEntry, viewMode: ViewMode) {
+    if (this.loadState === 'loading') {
+      return html`<div class="load-state">Loading ${entry.id}…</div>`;
+    }
+    if (this.loadState === 'failed') {
+      return html`<div class="load-state failed">
+        <strong>Could not load this scenario's score.</strong>
+        <p>
+          <code>score.mnx.json</code> is fetched as a lazy chunk, so this is a transport failure,
+          not a rendering one — most often a stopped <code>npm run dev</code> server or a stale
+          tab against a redeployed build. Reload once the server is back.
+        </p>
+        <p class="detail">${this.loadError}</p>
+      </div>`;
+    }
     return html`
       <mnx-score-viewer
         .mnxDoc=${this.doc}
@@ -290,7 +349,9 @@ export class ScenarioPage extends LitElement {
       </div>
       <div class="body">
         ${view === 'json'
-          ? html`<pre class="json">${this.rawScore}</pre>`
+          ? this.loadState === 'ready'
+            ? html`<pre class="json">${this.rawScore}</pre>`
+            : this.viewer(entry, 'notation')
           : view === 'compare'
             ? html`
                 <div class="compare">
@@ -302,18 +363,30 @@ export class ScenarioPage extends LitElement {
                     <div class="side-cap">spec reference engraving</div>
                     ${entry.ns === 'spec' && !this.referenceFailed
                       ? html`<img
-                          src=${`/spec-media/${entry.id.replace(/^spec\//, '')}.png`}
-                          alt="Reference engraving from the MNX spec"
-                          @error=${() => (this.referenceFailed = true)}
-                        />`
+                            src=${`/spec-media/${entry.id.replace(/^spec\//, '')}.png`}
+                            alt="Reference engraving from the MNX spec"
+                            @error=${() => (this.referenceFailed = true)}
+                          />
+                          <p class="ref-credit">
+                            Reference engraving © the W3C MNX Community Group, from the pinned spec
+                            release${entry.specRef
+                              ? html` — <a href=${entry.specRef} target="_blank">source ↗</a>`
+                              : nothing}
+                          </p>`
                       : html`<div class="ref-missing">
-                          ${entry.ns === 'spec'
-                            ? html`Reference engraving unavailable — it is served from the pinned
-                              <code>vendor/mnx</code> checkout by a dev-only middleware, so it only
-                              appears under <code>npm run dev</code>.`
-                            : html`A lab scenario has no spec reference engraving — compare against
+                          ${entry.ns !== 'spec'
+                            ? html`A lab scenario has no spec reference engraving — compare against
                               the committed golden via the harness
-                              (<code>npm run verify:scenarios</code> shows what changed).`}
+                              (<code>npm run verify:scenarios</code> shows what changed).`
+                            : this.loadState === 'failed'
+                              ? // The score failed to fetch too, so this image 404'd for the same
+                                // reason. Don't send them chasing the submodule.
+                                html`Reference engraving unavailable — the same transport failure
+                                as the left pane, not a missing image.`
+                              : html`Reference engraving unavailable — the images come from the
+                                pinned <code>vendor/mnx</code> checkout, copied into the build when
+                                one is present. This build was made without the submodule; run
+                                <code>git submodule update --init vendor/mnx</code> and rebuild.`}
                         </div>`}
                   </div>
                 </div>
