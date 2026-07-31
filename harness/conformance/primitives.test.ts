@@ -70,8 +70,11 @@ describe(`scenario layout snapshots${UPDATE ? ' (UPDATING)' : ''}`, () => {
         const serialized = JSON.stringify(computed, null, 2) + '\n';
         const previous = hasSnapshot ? fs.readFileSync(snapshotPath, 'utf8') : null;
         fs.writeFileSync(snapshotPath, serialized);
-        if (previous === null && status === 'valid') {
-          setStatus(scenario.dir, 'rendered', 'first snapshot generated');
+        if (status === 'valid') {
+          // Promote on ANY successful snapshot write, not only the first —
+          // a snapshot committed without its status bump would otherwise
+          // stay 'valid' forever and read as "doesn't render".
+          setStatus(scenario.dir, 'rendered', previous === null ? 'first snapshot generated' : 'snapshot exists — status was lagging');
         } else if (previous !== null && previous !== serialized && status === 'verified') {
           setStatus(scenario.dir, 'rendered', 'primitives changed since approval — re-verify');
         }

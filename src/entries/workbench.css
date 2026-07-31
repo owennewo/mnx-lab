@@ -1,0 +1,28 @@
+/* Document-level base styles for the workbench face. Design tokens live on
+   <mnx-workbench>'s :host (src/elements/tokens.ts); this file carries only
+   what genuinely must be document-level: the SMuFL font face (font faces do
+   not originate inside shadow roots) and the host page reset. */
+
+@font-face {
+  font-family: 'Bravura';
+  src: url('/smufl/Bravura.woff2') format('woff2');
+  font-display: block;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+  /* Matches the light-theme --bg token so there's no flash before the
+     component mounts; the component paints its own background after. */
+  background: oklch(0.967 0.005 88);
+}

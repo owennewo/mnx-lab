@@ -24,11 +24,20 @@ export interface ScenarioMeta {
   tags?: string[];
   specRefs?: string[];
   coversDefs?: string[];
+  /** Which MNX schema judges expect.standard; default "published". */
+  schema?: 'published' | 'proposed';
   expect: ScenarioExpect;
   requires?: string[];
   idRefs?: boolean;
   source: string;
   status: 'draft' | 'valid' | 'rendered' | 'verified';
+  /**
+   * Provenance of the last human approval — written only by
+   * harness/verify/verify-scenarios.mjs and kept through demotion, so the
+   * workbench can tell stale (record present, status demoted) from
+   * never-seen (no record). Display-only here: the workbench never writes it.
+   */
+  verification?: { at: string; primitivesHash?: string };
 }
 
 export interface ScenarioEntry {

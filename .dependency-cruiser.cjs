@@ -20,7 +20,10 @@ function layerRule(name, from, allowed) {
     from: { path: `^${from}/` },
     to: {
       path: '^(src|worker)/',
-      pathNot: `^(${[from, ...allowed].join('|')})/`
+      // worker/generated/ is not worker logic — it is schema DATA precompiled
+      // from spec/ (Workers disallow runtime codegen), importable from any
+      // layer (model/pinnedErrors lazy-loads the validator in the browser).
+      pathNot: `^(${[from, ...allowed].join('|')})/|^worker/generated/`
     }
   };
 }
