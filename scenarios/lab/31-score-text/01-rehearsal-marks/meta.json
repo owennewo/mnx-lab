@@ -40,6 +40,7 @@
     "version-number"
   ],
   "schema": "proposed",
+  "proposal": "score-text",
   "expect": {
     "standard": "valid",
     "extension": "n/a"
@@ -47,5 +48,6 @@
   "requires": [],
   "idRefs": false,
   "source": "hand-written",
+  "origin": "local",
   "status": "rendered"
 }

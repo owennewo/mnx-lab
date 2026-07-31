@@ -126,11 +126,15 @@ function main() {
     fs.writeFileSync(scorePath, newScore);
     if (!scoreUnchanged) updated++;
 
-    // Preserve status across re-syncs when the document hasn't changed.
+    // Preserve status AND verification provenance across re-syncs when the
+    // document hasn't changed — a re-sync must not erase a human approval.
     const metaPath = path.join(dir, 'meta.json');
     let status = 'valid';
+    let verification;
     if (scoreUnchanged && fs.existsSync(metaPath)) {
-      status = JSON.parse(fs.readFileSync(metaPath, 'utf8')).status ?? 'valid';
+      const prev = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+      status = prev.status ?? 'valid';
+      verification = prev.verification;
     }
 
     const meta = {
@@ -148,7 +152,10 @@ function main() {
       },
       requires: [],
       source: 'spec-example',
-      status
+      // The origin axis: this tree is generated — sync owns it wholesale.
+      origin: 'mirrored',
+      status,
+      ...(verification !== undefined ? { verification } : {})
     };
     fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2) + '\n');
 

@@ -38,6 +38,7 @@
   "requires": [],
   "idRefs": false,
   "source": "hand-written",
+  "origin": "local",
   "status": "verified",
   "verification": {
     "at": "2026-07-17",

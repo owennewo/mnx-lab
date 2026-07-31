@@ -1,0 +1,142 @@
+--- spec/mnx-schema.json	2026-07-31 15:19:33.706279596 +0100
++++ spec/mnx-schema.proposed.json	2026-07-31 15:19:33.706452976 +0100
+@@ -254,6 +254,47 @@
+     "color": {
+       "type": "string"
+     },
++    "direction": {
++      "allOf": [
++        {
++          "$ref": "#/$defs/global-attrs"
++        }
++      ],
++      "properties": {
++        "color": {
++          "$ref": "#/$defs/color"
++        },
++        "glyphs": {
++          "$ref": "#/$defs/smufl-glyph-list"
++        },
++        "orient": {
++          "$ref": "#/$defs/multi-staff-orientation"
++        },
++        "position": {
++          "$ref": "#/$defs/rhythmic-position"
++        },
++        "staff": {
++          "$ref": "#/$defs/staff-number"
++        },
++        "text": {
++          "$ref": "#/$defs/string"
++        },
++        "voice": {
++          "$ref": "#/$defs/voice-name"
++        }
++      },
++      "required": [
++        "position"
++      ],
++      "type": "object",
++      "unevaluatedProperties": false
++    },
++    "direction-list": {
++      "items": {
++        "$ref": "#/$defs/direction"
++      },
++      "type": "array"
++    },
+     "dynamic-group": {
+       "allOf": [
+         {
+@@ -1061,12 +1102,18 @@
+         "number": {
+           "$ref": "#/$defs/measure-number"
+         },
++        "rehearsal": {
++          "$ref": "#/$defs/rehearsal"
++        },
+         "repeatEnd": {
+           "$ref": "#/$defs/repeat-end"
+         },
+         "repeatStart": {
+           "$ref": "#/$defs/repeat-start"
+         },
++        "section": {
++          "$ref": "#/$defs/section"
++        },
+         "segno": {
+           "$ref": "#/$defs/segno"
+         },
+@@ -1532,6 +1579,9 @@
+         "clefs": {
+           "$ref": "#/$defs/positioned-clef-list"
+         },
++        "directions": {
++          "$ref": "#/$defs/direction-list"
++        },
+         "dynamics": {
+           "$ref": "#/$defs/dynamic-group-list"
+         },
+@@ -1661,6 +1711,26 @@
+     "positive-integer": {
+       "type": "integer"
+     },
++    "rehearsal": {
++      "allOf": [
++        {
++          "$ref": "#/$defs/global-attrs"
++        }
++      ],
++      "properties": {
++        "color": {
++          "$ref": "#/$defs/color"
++        },
++        "label": {
++          "$ref": "#/$defs/string"
++        }
++      },
++      "required": [
++        "label"
++      ],
++      "type": "object",
++      "unevaluatedProperties": false
++    },
+     "relative-dynamic-value": {
+       "enum": [
+         "louder",
+@@ -1798,6 +1868,26 @@
+       },
+       "type": "array"
+     },
++    "section": {
++      "allOf": [
++        {
++          "$ref": "#/$defs/global-attrs"
++        }
++      ],
++      "properties": {
++        "color": {
++          "$ref": "#/$defs/color"
++        },
++        "label": {
++          "$ref": "#/$defs/string"
++        }
++      },
++      "required": [
++        "label"
++      ],
++      "type": "object",
++      "unevaluatedProperties": false
++    },
+     "segno": {
+       "allOf": [
+         {
+@@ -2590,7 +2680,7 @@
+       "type": "string"
+     }
+   },
+-  "$id": "https://w3c-cg.github.io/mnx/docs/mnx-schema.json/version/27",
++  "$id": "https://w3c-cg.github.io/mnx/docs/mnx-schema.json/version/28",
+   "$ref": "#/$defs/root",
+   "$schema": "https://json-schema.org/draft/2020-12/schema",
+   "description": "An encoding of Common Western Music Notation.",

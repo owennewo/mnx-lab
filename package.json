@@ -6,9 +6,24 @@
   "workspaces": [
     "converters/*"
   ],
+  "files": [
+    "dist/lib",
+    "public/smufl"
+  ],
+  "exports": {
+    ".": "./dist/lib/index.js",
+    "./model": "./dist/lib/model.js",
+    "./engine": "./dist/lib/engine.js",
+    "./audio": "./dist/lib/audio.js",
+    "./elements": "./dist/lib/elements.js",
+    "./smufl/*": "./public/smufl/*"
+  },
   "scripts": {
     "dev": "vite",
     "build": "npm run compile-validator && npm run check:boundaries && tsc && tsc -p worker && vite build",
+    "build:lib": "vite build -c vite.lib.config.ts",
+    "build:embed": "vite build -c vite.embed.config.ts",
+    "smoke:lib": "npm run build:lib && node harness/verify/lib-smoke.mjs",
     "preview": "vite preview",
     "compile-validator": "node spec/tools/compile-validator.mjs",
     "check:scenarios": "node harness/verify/check-scenarios.mjs",

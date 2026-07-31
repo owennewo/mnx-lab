@@ -9,7 +9,7 @@ git submodule update --init vendor/mnx     # after a fresh clone
 ```
 
 The submodule is **dev-time only**. `npm run build` and the Cloudflare deploy must
-never need it: `schemas/mnx-schema.json` stays vendored (the Worker's validator is
+never need it: `spec/mnx-schema.json` stays vendored (the Worker's validator is
 compiled from it) and `scenarios/spec/` stays committed. The submodule is what those
 are *generated from*, not what they are read from at build time.
 
@@ -72,9 +72,9 @@ out, and committing it would leave a submodule nobody else can fetch.
 ```bash
 git -C vendor/mnx fetch origin
 git -C vendor/mnx checkout <sha>
-cp vendor/mnx/docs/mnx-schema.json schemas/mnx-schema.json   # if the version changed
+cp vendor/mnx/docs/mnx-schema.json spec/mnx-schema.json   # if the version changed
 npm run compile-validator && npm run sync:spec && npm test
-git add vendor/mnx schemas/mnx-schema.json scenarios/spec
+git add vendor/mnx spec/mnx-schema.json scenarios/spec
 ```
 
 A schema bump can legitimately change render output, which demotes `verified` scenarios
@@ -114,21 +114,31 @@ A bug fix can be described in an issue. A *design* proposal is only convincing i
 built, so this repo carries a second schema while one is in flight.
 
 ```
-schemas/mnx-schema.json            verbatim copy of the pinned upstream release — never edited
-schemas/mnx-schema.proposed.json   generated from our proposal branch — optional, transient
+spec/mnx-schema.json            verbatim copy of the pinned upstream release — never edited
+spec/mnx-schema.proposed.json   generated from our proposal branch — optional, transient
 ```
 
-**Generating it**, from a proposal branch in the submodule:
+**Generating it**, from a proposal branch — **never checked out in `vendor/mnx`**. The
+submodule is the *pin only* (always the upstream commit `sync:spec` reads); proposal
+branches live in git **worktrees** beside the repo, so the pin and the proposal can never
+double-duty (structure-lab). `pinIsUpstream` is thereby an assertion, not a load-bearing
+guard:
 
 ```bash
-git -C vendor/mnx checkout <proposal-branch>
-cd vendor/mnx/doctools
+git -C vendor/mnx worktree add ../../../mnx-proposals/<branch> <branch>
+cd ../mnx-proposals/<branch>/doctools
 uv run --python 3.12 --with django==4.2.24 --with lxml \
   --with git+https://github.com/w3c-cg/mnxdocgenerator.git \
   python manage.py makesite /tmp/proposed-site
-cp /tmp/proposed-site/mnx-schema.json ../../../schemas/mnx-schema.proposed.json
-git -C vendor/mnx checkout <the pinned upstream sha>      # leave the pin where it was
+cp /tmp/proposed-site/mnx-schema.json <repo>/spec/mnx-schema.proposed.json
 ```
+
+Injecting a topic's scenarios + engravings into the branch fixture is mechanised:
+`node spec/tools/push-proposal.mjs <topic>` upserts the `exampledocument` records,
+media JSON, our engravings and the `coversDefs` joins directly into the worktree's
+`doctools/data.json` (byte-stable freezedb layout, verified before writing; re-runs are
+no-ops). `loaddb` → `freezedb` round-trips `data.json` byte-identically, so fixture-direct
+writes and admin edits compose.
 
 Bump `xmlschema.version` on the branch (e.g. to `28-proposed`) so the two `$id`s are never
 confusable.
@@ -146,7 +156,7 @@ than a silent fallback.
 
 **Boundaries that matter:**
 
-- `schemas/mnx-schema.json` stays a byte-for-byte copy of the pinned release. A proposal never
+- `spec/mnx-schema.json` stays a byte-for-byte copy of the pinned release. A proposal never
   edits it — otherwise "does this validate against MNX?" stops having an answer.
 - The Worker's precompiled validators and the AI retry loop use the **published** schema only.
   Teaching the LLM to emit unadopted fields would poison the primary defence against schema

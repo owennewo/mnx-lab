@@ -41,12 +41,24 @@
       "uniqueItems": true,
       "description": "Schema $defs this scenario exercises \u2014 drives the coverage report."
     },
+    "origin": {
+      "enum": [
+        "mirrored",
+        "local"
+      ],
+      "description": "Who writes this scenario. \"mirrored\" = generated from the pinned spec by sync:spec, hand-edit forbidden (sync owns the whole scenarios/spec/ tree); \"local\" = ours. One corpus format, two axes \u2014 see roadmap/inprogress/structure-lab.md."
+    },
     "schema": {
       "enum": [
         "published",
         "proposed"
       ],
-      "description": "Which MNX schema `expect.standard` is judged against. Default \"published\" \u2014 the vendored spec release. \"proposed\" opts into schemas/mnx-schema.proposed.json, a spec change drafted in our fork but not adopted by the CG; use it so a proposal can be proved against the corpus instead of only described. See docs/mnx-spec-submodule.md."
+      "description": "Which MNX schema `expect.standard` is judged against. Default \"published\" \u2014 the vendored spec release. \"proposed\" opts into spec/mnx-schema.proposed.json, a spec change drafted in our fork but not adopted by the CG; use it so a proposal can be proved against the corpus instead of only described. See docs/mnx-spec-submodule.md."
+    },
+    "proposal": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Required iff schema is \"proposed\": the proposal topic this scenario is evidence for; spec/proposals/<topic>/ must exist. No proposal scenarios loose in lab/ with their rationale only in a roadmap doc."
     },
     "expect": {
       "type": "object",

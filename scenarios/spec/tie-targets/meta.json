@@ -53,6 +53,7 @@
   },
   "requires": [],
   "source": "spec-example",
+  "origin": "mirrored",
   "status": "verified",
   "verification": {
     "at": "2026-07-17",
