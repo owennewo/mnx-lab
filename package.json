@@ -1,0 +1,43 @@
+{
+  "name": "mnx-lab",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "workspaces": [
+    "converters/*"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run compile-validator && npm run check:boundaries && tsc && tsc -p worker && vite build",
+    "preview": "vite preview",
+    "compile-validator": "node spec/tools/compile-validator.mjs",
+    "check:scenarios": "node harness/verify/check-scenarios.mjs",
+    "check:boundaries": "depcruise src worker harness --config .dependency-cruiser.cjs",
+    "sync:spec": "node spec/tools/sync-spec-examples.mjs",
+    "update:primitives": "UPDATE_PRIMITIVES=1 vitest run harness/conformance/primitives.test.ts",
+    "verify:scenarios": "node harness/verify/verify-scenarios.mjs",
+    "test": "vitest run",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "@awesome.me/webawesome": "^3.7.0",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
+    "@fontsource/ibm-plex-serif": "^5.2.7",
+    "@lit/context": "^1.1.3",
+    "hono": "^4.12.25",
+    "idb-keyval": "^6.2.4",
+    "lit": "^3.3.3",
+    "tone": "^15.1.22"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.40.1",
+    "@cloudflare/workers-types": "^4.20260609.1",
+    "ajv": "^8.20.0",
+    "dependency-cruiser": "^17.0.1",
+    "typescript": "^5.4.5",
+    "vite": "^8.0.14",
+    "vitest": "^4.1.8",
+    "wrangler": "^4.99.0"
+  }
+}
