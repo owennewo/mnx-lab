@@ -46,7 +46,7 @@
         "mirrored",
         "local"
       ],
-      "description": "Who writes this scenario. \"mirrored\" = generated from the pinned spec by sync:spec, hand-edit forbidden (sync owns the whole scenarios/spec/ tree); \"local\" = ours. One corpus format, two axes \u2014 see roadmap/inprogress/structure-lab.md."
+      "description": "Who writes this scenario. \"mirrored\" = generated from the pinned spec by sync:spec, hand-edit forbidden (sync owns the whole scenarios/spec/ tree); \"local\" = ours. One corpus format, two axes \u2014 see roadmap/complete/structure-lab.md."
     },
     "schema": {
       "enum": [
@@ -134,7 +134,7 @@
         "at"
       ],
       "additionalProperties": false,
-      "description": "Provenance of the last human approval, written only by verify-scenarios.mjs and deliberately KEPT through demotion — so the approval queue can distinguish 'stale' (verified once, primitives changed since: hash differs or status was demoted) from 'never seen' (no record). See roadmap/inprogress/structure-lab.md."
+      "description": "Provenance of the last human approval, written only by verify-scenarios.mjs and deliberately KEPT through demotion — so the approval queue can distinguish 'stale' (verified once, primitives changed since: hash differs or status was demoted) from 'never seen' (no record). See roadmap/complete/structure-lab.md."
     }
   },
   "required": [

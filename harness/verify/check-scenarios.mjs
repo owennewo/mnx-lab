@@ -186,7 +186,7 @@ export function checkScenario(scenario, ctx) {
 
   if (!meta || !doc) return { errors, warnings, meta };
 
-  // The two corpus axes (roadmap/inprogress/structure-lab.md):
+  // The two corpus axes (roadmap/complete/structure-lab.md):
   //   origin — who writes it. spec/ is owned wholesale by sync:spec
   //   (mirrored, hand-edit forbidden); lab/ is ours (local).
   //   schema — which MNX schema judges expect.standard.

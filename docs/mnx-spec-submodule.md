@@ -27,10 +27,10 @@ are records, not files:
 | `coversDefs` | the `exampledocumentobject` join |
 | Schema version | `xmlschema.version` — this is the number in `mnx-schema.json`'s `$id` |
 
-[scripts/specSource.mjs](../scripts/specSource.mjs) resolves all of it;
-[scripts/sync-spec-examples.mjs](../scripts/sync-spec-examples.mjs) (`npm run sync:spec`)
-writes `scenarios/spec/`, and [tests/preview.test.ts](../tests/preview.test.ts) reads the
-engravings straight off disk so the contact sheet works offline.
+[spec/tools/specSource.mjs](../spec/tools/specSource.mjs) resolves all of it;
+[spec/tools/sync-spec-examples.mjs](../spec/tools/sync-spec-examples.mjs) (`npm run sync:spec`)
+writes `scenarios/spec/`; the workbench's compare view and the `/verify` review page
+read the engravings straight off disk (dev-only), so review works offline.
 
 Three things worth knowing, all learned the hard way when this replaced HTML scraping:
 
@@ -51,10 +51,10 @@ Three things worth knowing, all learned the hard way when this replaced HTML scr
 MNX's descriptions are **normative**, and `mnx-schema.json` drops all of them — so a
 field can be redefined with no schema change whatsoever. This is not hypothetical: v24
 reversed what `dynamic-group.value` means for an accent (see
-[schemas/HISTORY.md](../schemas/HISTORY.md)) and separately documented a `type: 'accent'`
+[spec/HISTORY.md](../spec/HISTORY.md)) and separately documented a `type: 'accent'`
 enum value that had been legal and unmentioned since v19. A schema diff shows neither.
 
-`schemas/spec-prose.json` fingerprints every documented object, relationship and enum
+`spec/spec-prose.json` fingerprints every documented object, relationship and enum
 (651 items, ~31 KB) — hashes, not text, so we report *which* items moved without copying
 upstream's documentation into this repo. `npm run sync:spec` diffs against it, prints
 what changed, and rewrites it, so the delta lands in the same commit as the pin move.

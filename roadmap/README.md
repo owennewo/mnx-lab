@@ -59,17 +59,6 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   **voice/transcription stage was never built**. What's left here is the voice half.
 
 ### inprogress/
-- **[structure-lab.md](inprogress/structure-lab.md)** — **the adopted structure direction,
-  under execution**: composes platform (capability layers + build faces for the code) with
-  workbench (`spec/` / `harness/` for the data). One scenario format with two axes
-  (origin: mirrored/local × schema: published/proposed) serves both development loops; the
-  spec loop becomes a symmetric `sync:spec`/`push:proposal` pipeline through the spec's own
-  fixture; scores exit to `converters/fixtures/`; the **workbench** and **studio** are
-  isolated, clean-room leaf shells over a shared `elements/` layer (workbench backend-less
-  and review-first; studio a placeholder README); scenario approval becomes a conversational
-  `/verify` skill with no human-facing CLI; the migration is a **fresh-slate rebuild of
-  main** — transplant the evidence, rebuild the shells, `legacy` branch + tag keep the
-  pre-rebuild history; toolchain is deferred until a real external consumer appears.
 - **[guitar-pro.md](inprogress/guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion, built at
   `converters/guitarpro-mnx/` using **alphaTab** as a headless format codec (no binary parsing
   hand-written). Reads gp3/gp4/gp5/gpx/gp, writes `.gp` (GP7 — the only format anything can
@@ -85,6 +74,19 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   keeps growing, so it stays "in progress."
 
 ### complete/
+- **[structure-lab.md](complete/structure-lab.md)** — **the adopted repo structure,
+  executed 2026-07-31 as a fresh-slate rebuild of main** (pre-rebuild history on the
+  `legacy` branch + `pre-rebuild` tag). Capability layers with machine-enforced
+  boundaries (`model → engine · audio · edit · corpus · storage; elements; ui/entries
+  as leaves; worker ≤ model+assist`); one scenario format with two axes
+  (origin: mirrored/local × schema: published/proposed); the symmetric
+  `sync:spec`/`push:proposal` spec-loop pipeline with `spec/proposals/<topic>/`
+  evidence bundles and the submodule as pin-only (proposal branches in worktrees);
+  scores moved to `converters/fixtures/`; the backend-less, review-first **workbench**
+  (attention-queue home, compare view, deep links) with approval as the conversational
+  `/verify` skill over `verification` provenance; embed + `mnx-lab` library build
+  faces; reserved studio/edit/storage seams. Execution deviations recorded in the
+  doc's appendix.
 - **[SPEC_APPROVAL.md](complete/SPEC_APPROVAL.md)** — the spec-by-spec renderer verification
   sweep, **complete (57/57 verified: 49/49 spec + 8/8 lab)**. The per-scenario scoreboard, the
   approval bar, the renderer's capability list + deferred-polish backlog, and the "how to add a

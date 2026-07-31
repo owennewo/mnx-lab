@@ -1,7 +1,9 @@
 # Structure direction — the lab: layered apparatus, one corpus, two loops
 
-> **Status: in progress** (filed 2026-07-31, revised same day; **adopted and under
-> execution 2026-07-31**). The fourth structure sketch, now the direction of travel. It
+> **Status: complete** (filed 2026-07-31, revised same day; **executed 2026-07-31** —
+> the fresh-slate rebuild landed as the commit series from the `pre-rebuild` tag to
+> main; execution deviations are recorded in the appendix at the bottom). The fourth
+> structure sketch, the adopted direction. It
 > **composes** two of the three earlier
 > alternatives — [structure-platform.md](../superseded/structure-platform.md) for the code and
 > [structure-workbench.md](../superseded/structure-workbench.md) for the data — and defers
@@ -90,7 +92,7 @@ deliberately, with a meta.json. Until then it stays a fixture.
 With scores out, **`scenarios/` stays exactly where it is** — the first draft's
 `corpus/` move existed to unify scores with scenarios, and that need is gone. Less
 churn: ids, golden paths, `manifest.json` and
-[04-scenario-library.md](04-scenario-library.md) are all untouched.
+[04-scenario-library.md](../inprogress/04-scenario-library.md) are all untouched.
 
 ## The spec loop: `sync` down, `push` up
 
@@ -551,3 +553,36 @@ This plan will be executed by a fresh session starting with maximum context head
 - When evals land in `harness/evals/`: manual `mnx eval` with committed results, or CI?
   (Default: manual, committed — nondeterministic paid API calls don't belong in CI.)
 - `cli/`: build it when the library face ships, or wait until someone external asks?
+
+## Execution record (appended 2026-07-31)
+
+Executed as planned — steps 1–9 plus the recommended pre-wipe slice (verification
+provenance + `/verify`), one commit per step, all gates green (goldens byte-identical
+at the step-5 checkpoint; 57/57 verifications stand). Deviations, per the handoff's
+"append a revision note" rule:
+
+- **`research/` was kept through the wipe.** The step-2 keep-list omitted it but the
+  target shape lists it "unchanged at root"; keeping it avoided a pointless
+  delete-and-restore.
+- **The `edit/` placeholder is proven by a harness test** (`harness/conformance/
+  edit-ops.test.ts`), not the planned "hidden toolbar button" — the clean-room shell
+  deliberately has no editing chrome yet, and a pinned contract is stronger proof.
+- **`/api/voice-transcribe` was not rebuilt.** The voice stage was never built
+  client-side ([open_router.md](../proposed/open_router.md)); the route is retrievable
+  from `legacy` when that feature starts.
+- **The clean shell dropped Web Awesome** — plain Lit only; the reading-room's UI-kit
+  dependency stayed on `legacy` with the components that used it.
+- **`push:proposal` v0 writes fixture records directly** (the open question's second
+  branch): freezedb's layout round-trips byte-identically, verified before every write,
+  so re-runs are no-ops and diffs stay record-level. `makesite` on the branch rendered
+  all nine score-text examples with our engravings; the branch fixture was reconciled
+  and committed on `proposal-score-text` (worktree `~/dev/mnx-proposals/`).
+- **Status-honesty fix**: `update:primitives` now promotes `valid`→`rendered` on any
+  successful snapshot write, not only the first — healing seven score-text scenarios
+  whose goldens had been committed without the promotion.
+- **First redeploy not performed** — the build is green end to end, but pushing to
+  mnx-lab.totai.uk is left as a human action (deploys are manual by policy).
+- Two of the three proposal bundles (chord-symbols, guitar-technique) are README-only:
+  their schema drafts don't exist in the fork yet, so they have no `schema.diff` or
+  proposal scenarios — accurately reflecting their "data path built, spec draft
+  pending" state.

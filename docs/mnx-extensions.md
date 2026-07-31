@@ -4,7 +4,7 @@ Everything this project carries that **W3C MNX v19 cannot express**, in one
 place: what it is, why standard MNX has no field for it, which CG issue it
 drafts, and how far it has been built.
 
-Schema: [`schemas/mnx-lab-extensions.schema.json`](../schemas/mnx-lab-extensions.schema.json).
+Schema: [`spec/mnx-lab-extensions.schema.json`](../spec/mnx-lab-extensions.schema.json).
 Strategy and the case for each design: [`roadmap/proposed/mnx-cg-proposals.md`](../roadmap/proposed/mnx-cg-proposals.md).
 A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 
@@ -25,7 +25,7 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 **Graduated out of `_x` in v4:** `rehearsal` and `section`. They are no longer
 extensions — they are written as the *standard* MNX objects proposed in
 [roadmap/proposed/score-text.md](../roadmap/proposed/score-text.md), and validate
-against `schemas/mnx-schema.proposed.json` until the CG adopts them. An extension
+against `spec/mnx-schema.proposed.json` until the CG adopts them. An extension
 is supposed to be a draft of the standard object; keeping a private copy after
 drafting one would mean two spellings of the same fact. The same doc adds
 `directions` for ordinary annotations, which `_x` never covered at all.
@@ -202,7 +202,7 @@ only the first two; the other four are Guitar Pro's.
 
 Both moved out of the vendor dict and into standard MNX shape — see
 [roadmap/proposed/score-text.md](../roadmap/proposed/score-text.md) for the design
-and [schemas/HISTORY.md](../schemas/HISTORY.md) for the version history. The
+and [spec/HISTORY.md](../spec/HISTORY.md) for the version history. The
 argument for keeping them *separate* still holds and now lives in the proposal:
 a rehearsal mark is an arbitrary index into the score, a section name states what
 the music is, and they co-occur (`[A] Verse`).
@@ -274,7 +274,7 @@ corpus and tested as such. Three caveats worth knowing:
 
 Two independent verdicts, reported separately:
 
-1. **Standard MNX validity** — the document against `schemas/mnx-schema.json`.
+1. **Standard MNX validity** — the document against `spec/mnx-schema.json`.
    These extensions never affect it: `_x` content is unconstrained there by
    design.
 2. **Extension validity** — every `_x.mnxLab` dict against this extension's
@@ -283,7 +283,7 @@ Two independent verdicts, reported separately:
    misspelled sibling key.
 
 The validators are precompiled by
-[`scripts/compile-validator.mjs`](../scripts/compile-validator.mjs) because
+[`spec/tools/compile-validator.mjs`](../spec/tools/compile-validator.mjs) because
 Cloudflare Workers cannot run `ajv.compile()`.
 
 ## Open questions (input wanted)

@@ -37,10 +37,12 @@ file in this flow.
    empty, say so and stop — do not invent work.
 2. **Render the review page**: one HTML page, one section per queue item, ordered
    blocked → stale → never-seen. For each item show, side by side:
-   - **our render** — the scenario's current SVG output (render it headlessly via
-     the harness; the preview/contact-sheet tooling shows how the SVG is produced);
+   - **our render** — the scenario's current SVG output, rendered headlessly via
+     the harness helpers (`harness/helpers/corpusPrimitives.ts` +
+     `harness/helpers/svgString.ts`);
    - **the spec's reference engraving**, when one exists (spec-mirrored scenarios
-     carry one in the pinned spec checkout — the preview tooling locates it);
+     carry one in the pinned spec checkout — `spec/tools/specSource.mjs`
+     `loadSpecExamples()` resolves each example's `imagePath`);
    - for **stale** items additionally a what-changed note derived from diffing the
      committed `expected.primitives.json` against the freshly computed primitives
      (summarize in words — "beam spacing changed", "new glyph" — don't dump JSON).

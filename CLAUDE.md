@@ -2,91 +2,250 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> **Rebuild in progress.** Main is being rebuilt from an empty slate per
-> [roadmap/inprogress/structure-lab.md](roadmap/inprogress/structure-lab.md) — that doc is
-> the authority; this file is a *forecast* of the target shape and is rewritten as-built in
-> the final step. The full pre-rebuild tree and history are on the **`legacy` branch** and
-> **`pre-rebuild` tag** — anything missing here is retrieved from there, never reconstructed
-> from memory.
+## Overview
 
-## What this repo is
+**MNX Lab** (package `mnx-lab`) — a test bench for the developing W3C MNX notation format,
+with emphasis on guitar tab. Custom SMuFL/SVG rendering engine (no third-party notation
+libraries), an LLM-assisted edit loop through OpenRouter, and a scenario corpus with
+human-verified engravings. The repo was rebuilt from an empty slate in 2026-07 per
+[roadmap/complete/structure-lab.md](roadmap/complete/structure-lab.md); the full
+pre-rebuild tree and history live on the **`legacy` branch** and **`pre-rebuild` tag** —
+retrieve missing things from there, never reconstruct them from memory.
 
-**MNX Lab** (`mnx-lab`) — a test bench for the developing W3C MNX notation format with
-emphasis on guitar tab. Custom SMuFL/SVG rendering engine (no third-party notation
-libraries), Tone.js playback, an LLM-assisted edit loop. It runs **two development loops**,
-and every artifact declares which it serves:
+The repo runs **two development loops**, and every artifact declares which it serves:
 
-- **Implementation loop** — the spec is the constant, our code the variable. Scenarios are
-  oracles; `status: verified` and the primitives goldens are verdicts about **our code**.
+- **Implementation loop** — the spec is the constant, our code the variable. Scenarios
+  are oracles; `status: verified` and the primitives goldens are verdicts about **our code**.
 - **Spec loop** — our implementation is the (rough) constant, the schema the variable.
-  `schema: proposed` scenarios are probes; their renders and verdicts are evidence about
-  **the spec**, packaged for upstream via `spec/proposals/<topic>/`.
+  `schema: proposed` scenarios are probes grouped by `proposal` topic; their verdicts and
+  engravings are evidence about **the spec**, packaged for upstream in `spec/proposals/`.
 
-## Target shape (forecast)
-
-```
-spec/           the standard + our proposals: mnx-schema.json (verbatim pinned release),
-                mnx-schema.proposed.json (generated from the proposal worktree),
-                extension schemas, proposals/<topic>/ evidence bundles, tools/
-                (sync-spec-examples, push-proposal, compile-validator)
-scenarios/      one corpus format, two axes — origin: mirrored|local (spec/ vs lab/,
-                an ownership boundary: sync owns spec/ wholesale) × schema:
-                published|proposed (which schema judges expect.standard)
-harness/        every way the evidence is exercised: conformance/ (corpus + primitives
-                tests), verify/ (check/verify scripts — the only status mutation path),
-                render/, helpers/; evals/ reserved
-src/            capability layers: model → engine · audio · edit · corpus · storage;
-                edit → assist; elements/ (embeddable Lit custom elements — Lit is
-                load-bearing here only); ui/ (workbench shell, a leaf); entries/
-worker/         Hono; secrets-and-validation proxy for assist ONLY — the workbench has
-                no backend by rule (fully functional from static build output alone)
-converters/     npm-workspace sub-packages (musicxml-mnx, guitarpro-mnx) + fixtures/
-                (the .gpx-sourced scores; alphaTab never reachable from src/)
-apps/studio/    placeholder README only — the future consumer product's reserved seam
-vendor/mnx      the spec submodule, PIN ONLY (proposal branches live in git worktrees
-                under ../mnx-proposals/, never checked out here)
-```
-
-Layer boundaries are machine-enforced: `.dependency-cruiser.cjs` +
-`npm run check:boundaries` (wired into `npm run build`) — a violation is a red build.
-`ui/` and `entries/` are leaves; anything two shells want must be promoted into
-`elements/` or below. `model`/`engine`/`audio` stay importable from Node (no DOM at
-module top level).
-
-## Commands
+## Running the project
 
 ```bash
-npm run dev                # Vite dev server + Worker (via @cloudflare/vite-plugin)
-npm test                   # harness suites over the scenario corpus
-npm run check:scenarios    # corpus police (harness/verify/check-scenarios.mjs)
-npm run verify:scenarios   # approval queue + provenance writer — use via /verify
+git submodule update --init vendor/mnx   # the MNX spec sources (dev-time only)
+npm run dev                # Vite dev server + Worker API (via @cloudflare/vite-plugin)
+npm test                   # harness suites over the corpus (root vitest)
+npm run check:scenarios    # corpus police
+npm run verify:scenarios   # attention queue / approval writer — drive via /verify
 npm run update:primitives  # regenerate layout goldens; keeps statuses honest
 npm run sync:spec          # pinned spec fixture → scenarios/spec/ (owns that tree)
-npm run build              # validators + boundaries + tsc + vite build
+npm run build              # validators + boundaries + tsc (app+worker) + vite build
+npm run build:lib          # the mnx-lab library face → dist/lib
+npm run build:embed        # the embed face → dist/embed/mnx-lab.js
+npm run smoke:lib          # npm pack → install → render SVG in Node via mnx-lab/engine
 npm run deploy             # build + wrangler deploy (mnx-lab.totai.uk)
 ```
 
-## Rules that survive the rebuild
+## Repository shape
 
-- **`verified` is a human assertion** — only `verify-scenarios.mjs` (via the `/verify`
-  skill conversation) writes `status: verified` and the `verification: {at,
-  primitivesHash}` provenance record; the record is kept through demotion.
-- **The primitives goldens are the crown jewels** — transplanted machinery must
-  reproduce them byte-identically; a mismatch stops the line (diff against `legacy`).
-- **No notation libraries** (VexFlow etc.); the SMuFL/SVG engine is ours. alphaTab is a
-  format codec confined to `converters/guitarpro-mnx`.
-- **`.mnx.json`** is the write extension for MNX documents (`.json`/`.mnx` accepted on
-  read). `.ts` extensions in imports are required (`moduleResolution: bundler`).
-- **`_x.mnxLab` v3** is the one vendor key for everything MNX can't express (tab,
-  rehearsal/section, harmonies) — extend it and its schema, never standard MNX fields;
-  register in [docs/mnx-extensions.md](docs/mnx-extensions.md).
-- **Guitar Pro string numbering is inverted** relative to `_x.mnxLab.tab` — go through
-  `converters/guitarpro-mnx/src/common/tuning.ts`, never open-code it.
-- **The Worker never validates against the proposed schema** — the LLM edit loop must
-  not be taught fields that don't exist yet.
-- **The workbench has no backend**: corpus is committed JSON, documents are IndexedDB,
-  verification writes happen through harness scripts editing repo files. If browser
-  authoring is ever wanted, it's a dev-only Vite middleware writing repo files — never
-  a deployed API. The real API layer is studio's, on the reserved seams.
-- Interpret roadmap-shaped requests against `roadmap/` (proposed / inprogress /
-  complete / superseded); index at [roadmap/README.md](roadmap/README.md).
+```
+spec/                the standard + our proposals against it
+  mnx-schema.json         verbatim copy of the pinned upstream release — never edited
+  mnx-schema.proposed.json generated from a proposal worktree — transient, dev-time only
+  mnx-lab-extensions.schema.json  the _x.mnxLab vendor schema (v3)
+  guitar-tab-extension.schema.json (v2 legacy, kept for upgrade tests), spec-prose.json,
+  HISTORY.md
+  proposals/<topic>/      evidence bundles: README, schema.diff, scenarios.md, engravings/
+  tools/                  sync-spec-examples, specSource, push-proposal, compile-validator
+scenarios/           ONE corpus format, two axes (below); manifest.json, meta.schema.json
+harness/             every way the evidence is exercised
+  conformance/            scenarios/primitives/tab-validation/upgrade/edit-ops tests
+  verify/                 check-scenarios, verify-scenarios (the ONLY status writers),
+                          lib-smoke
+  render/                 render-png.ts (engravings for proposals; needs google-chrome)
+  helpers/                corpusPrimitives (SMuFL from disk + fixed viewport), svgString
+src/                 the apparatus — capability layers (order below)
+  model/  engine/  audio/  edit/  corpus/  storage/  assist/  elements/  ui/  entries/
+worker/              Hono; a secrets-and-validation proxy for assist ONLY
+  api/                    editNotation, models + reserved 501 seams documents, auth
+  editLoop.ts             the self-correcting loop, factored for future evals
+  prompts/editNotation.ts the LLM-facing system prompt (§-numbered, addressable)
+  generated/              validators precompiled from spec/ (committed; schema DATA,
+                          importable from any layer)
+converters/          npm-workspace sub-packages + fixtures/ (the three scores)
+apps/studio/         README only — the future consumer product's reserved seam
+roadmap/ docs/ research/ vendor/mnx    unchanged at root
+```
+
+### The layer order (machine-enforced)
+
+```
+model                                      (floor — imports nothing internal)
+model → engine · audio · edit · corpus · storage      (peers over the model)
+edit  → assist                             (assist carries ops; edit owns them)
+engine · audio · model → elements          (the embeddable surface)
+elements → ui                              (workbench shell — leaf)
+ui · elements → entries                    (build faces)
+worker: model + assist only                (sibling ceiling; DOM-free)
+```
+
+`.dependency-cruiser.cjs` + `npm run check:boundaries` (inside `npm run build`) make a
+violation a red build. **`ui/` and `entries/` are leaves — nothing imports them**;
+anything two shells want is first *promoted* into `elements/` or below, a deliberate,
+reviewed move. `model`/`engine`/`audio` stay importable from Node (no DOM at module top
+level; `engine/headless.ts` is the guarantee and the harness's entry). Lit is
+load-bearing **only in `elements/`** (shadow DOM = the embeddability story); the
+workbench shell also uses it as incumbent; studio's framework is deliberately undecided.
+alphaTab is confined to `converters/guitarpro-mnx` and must never reach `src/`.
+
+### Build faces (one source tree)
+
+| Face | Entry | Artifact |
+|---|---|---|
+| Workbench | `index.html` → `src/entries/main.ts` | the deployed site + Worker |
+| Embed | `src/entries/embed.ts` (`embed.html` = mock host demo) | `dist/embed/mnx-lab.js` (IIFE+ESM) — registers `elements/` only |
+| Library | `src/entries/lib.ts` via `build:lib` | `mnx-lab` with subpath exports `mnx-lab/{model,engine,audio,elements}` + `mnx-lab/smufl/*` |
+
+The trigger for graduating to independently-versioned packages is a real external
+consumer needing independent versioning — a check, not a debate.
+
+## The corpus: one format, two axes
+
+Each scenario is a directory (`meta.json`, `score.mnx.json`, optional
+`expected.primitives.json` golden and `notes.md`) with **two orthogonal axes** in meta:
+
+- **`origin`**: `mirrored` (generated from the pinned spec by `sync:spec`, which owns
+  the whole `scenarios/spec/` tree — hand-edit forbidden) | `local` (ours, under
+  `scenarios/lab/<category>/`). `spec/` vs `lab/` is an *ownership boundary*, not a
+  taxonomy.
+- **`schema`**: `published` (default) | `proposed` — which schema judges
+  `expect.standard`. `proposed` **must** name its `proposal: <topic>` and
+  `spec/proposals/<topic>/` must exist; `mirrored` is always `published`.
+  `check-scenarios` enforces all of this.
+
+**Verification is a human assertion with provenance.** `status: verified` and the
+`verification: {at, primitivesHash}` record are written **only** by
+`harness/verify/verify-scenarios.mjs`; the record is *kept through demotion*, so the
+attention queue distinguishes **stale** (approved once, output changed) from **never
+seen** (no record). `npm run update:primitives` keeps statuses honest: a successful
+snapshot write promotes `valid`→`rendered`, a changed snapshot demotes
+`verified`→`rendered`, a layout crash demotes to `valid` (removing the snapshot). The
+approval flow is the conversational **`/verify` skill** (`.claude/skills/verify/`) —
+queue → one stable review page → verdicts in sentences; there is no human-facing CLI and
+no checkbox page. The initial 57/57 sweep is recorded in
+[roadmap/complete/SPEC_APPROVAL.md](roadmap/complete/SPEC_APPROVAL.md), still the recipe
+for verifying renderer features.
+
+**The primitives goldens are the crown jewels.** Any move or refactor of
+`model/`/`engine/` must reproduce them byte-identically
+(`npm run update:primitives` then a clean `git diff -- scenarios/`); a mismatch stops
+the line — diff against `legacy`, never "close enough".
+
+## The workbench (`src/ui/`) — review-first, no backend
+
+Home is the **attention queue** (blocked → stale → never-seen; current counted, not
+shown), derived from committed provenance in `src/ui/queue.ts`. Every scenario + view
+has a stable deep link: `#/scenario/<id>?view=notation|tab|both|compare|json`. The
+**compare** view shows our render beside the spec's reference engraving, served by a
+dev-only read-only Vite middleware (`/spec-media/*` from the pinned `vendor/mnx`; a
+static deploy degrades to a note).
+
+**The workbench has no backend — by rule.** It must stay fully functional (minus live
+AI edits) from static build output alone: the corpus is committed JSON, documents live
+in IndexedDB, and every verification write happens through harness scripts editing repo
+files — git is the database and the audit trail. The Worker is *not* its backend; `ui/`
+may reach it only through `assist/`. If browser-driven corpus authoring is ever wanted,
+the pattern is a dev-only Vite middleware writing repo files — never a deployed API.
+The real API layer (documents, auth, sync) belongs to **studio**
+([apps/studio/README.md](apps/studio/README.md)) on the reserved seams
+(`worker/api/documents|auth` 501 stubs, `storage/cloudRepository.ts`).
+
+## AI editing flow (`/api/edit-notation`)
+
+A **self-correcting NDJSON stream**: `src/assist/protocol.ts` defines the frames
+(shared by Worker and client), `worker/editLoop.ts` runs the loop — forced
+`update_document` tool call (with a `required`→`auto` tool_choice fallback), streamed
+accumulation, then **two verdicts**: the official schema and every `_x.mnxLab` dict
+against the extension schema. On failure the failed tool call + a synthetic
+`role: 'tool'` error re-enter the conversation, up to 3 attempts.
+`formatValidationErrors` deliberately filters `anyOf`/`oneOf`/`allOf` noise down to the
+`event` branch — don't "fix" it, that makes errors unusable. With no
+`OPENROUTER_API_KEY` (from `.dev.vars` locally, a Worker secret in prod) the shared
+mock (`src/assist/mock.ts`) keeps the UI demoable. **Workers can't run
+`ajv.compile()`**, so validators are precompiled by `spec/tools/compile-validator.mjs`
+into `worker/generated/` (committed; rebuilt by `npm run build`). **The Worker and the
+retry loop use the published schema only** — never teach the LLM proposed-schema fields.
+When touching `worker/prompts/editNotation.ts` or the tool schema, mirror structural
+rules (plural `notes` array, etc.) — they are the primary defense against schema drift.
+
+## Rendering (custom SMuFL/SVG engine)
+
+Pipeline: layout → primitives → SVG. `src/engine/layout/{notation,tab}.ts` are pure
+functions emitting staff-space primitives; `src/engine/render/svg.ts` is the dumb
+emitter. **All horizontal spacing** lives in `src/engine/layout/spacing.ts` (springs-
+and-rods; tune the named knobs, never per-renderer grid math) — both layouts consume one
+plan so notation and tab stay column-aligned. Fret/string assignment uses
+`_x.mnxLab.tab.position` when fully annotated, else the lowest-reasonable-position
+heuristic (`src/engine/tab/guitarPositions.ts`). Layouts render **forgivingly**:
+unsupported content degrades to a placeholder and per-measure "!" badges
+(`src/engine/layout/diagnostics.ts`) — red = user-fixable error, blue = warning, amber =
+renderer gap. `ValidationIssue.scope: 'tab'` marks fingerboard-only constraints (the
+notation renderer drops them; severity matters — a warning must not read as "you made a
+mistake", and the schema validators must never see these). Everything renders into
+shadow DOM. Do **not** reintroduce VexFlow or any notation library. The note↔JSON
+cross-highlight depends on `model/noteKeys.ts` and `model/jsonView.ts` mirroring the
+same traversal — keep them in lockstep.
+
+## MNX types and `_x.mnxLab` (v3)
+
+Types: `src/model/mnx.ts`. **Documents are written as `.mnx.json`** (`.json`/`.mnx`
+accepted on read; helpers in `converters/musicxml-mnx/src/common/mnxFile.ts`).
+Everything MNX v19 can't express lives under the one vendor key **`_x.mnxLab`** (the
+`_x` sub-key names a vendor, not a feature): `tab` (single-source — no TAB clefs, no
+duplicated staves; bends are curves of `{position, alter}` in semitones),
+`rehearsal`/`section` (two separate `{label}` objects on the global measure — don't
+re-merge them), `harmonies` (structured + literal, parallel to `tempos`). Schema:
+`spec/mnx-lab-extensions.schema.json`; register + rationale:
+[docs/mnx-extensions.md](docs/mnx-extensions.md). Blocks are shaped like the standard
+objects they draft (camelCase, `rhythmic-position`, note-id references) so adoption
+deletes the wrapper. Extend `_x.mnxLab` and its schema — never standard MNX fields.
+Saved documents upgrade v1→v2→v3 on load via `src/model/upgradeTabExtension.ts`.
+
+## The spec loop: sync down, push up
+
+`vendor/mnx` is the spec repo as a submodule, **pin only, dev-time only** — builds and
+deploys never read it, and it is never checked out to a proposal branch. Upstream is a
+*generated* site (Django fixture `doctools/data.json`); a spec change edits the fixture,
+never `mnx-schema.json` by hand. Everything — reading it, moving the pin, the worktree
+recipe, the doctools/`uv` setup — is in
+[docs/mnx-spec-submodule.md](docs/mnx-spec-submodule.md).
+
+- **`npm run sync:spec` (down)**: pinned fixture → `scenarios/spec/` mirrored scenarios
+  (+ prose-drift tripwire in `spec/spec-prose.json`).
+- **`node spec/tools/push-proposal.mjs <topic>` (up)**: injects a topic's scenarios,
+  our engravings and `coversDefs` joins into the proposal branch's fixture, byte-stable.
+  Proposal branches live in **git worktrees** (`~/dev/mnx-proposals/<branch>`), where
+  `makesite` verifies the result and `mnx-schema.proposed.json` is generated from.
+- **On adoption**: move the pin, re-vendor, `sync:spec` mirrors the examples back down,
+  the local scenarios retire, and `mnx-schema.proposed.json` + every
+  `"schema": "proposed"` declaration are deleted.
+  [#529](https://github.com/w3c-cg/mnx/pull/529) is the worked precedent.
+
+## Converters
+
+`converters/*` are npm workspaces, Node-only, never in the app build. Shared fixtures in
+`converters/fixtures/` — **authored as Guitar Pro** (`.gpx` sources; `.mnx.json` derived
+via `guitarpro-mnx --import`, `.xml` derived via `musicxml-mnx --export`). Both round
+trips are lossless and tested (notes, technique, lyrics, repeats, voltas, tuning, capo,
+key; note ids are legitimately rewritten by the MusicXML split — compare technique
+targets by resolution, not string equality). **Guitar Pro string numbering is inverted**
+relative to `_x.mnxLab.tab` — go through `converters/guitarpro-mnx/src/common/tuning.ts`,
+never open-code it. MusicXML allows `<lyric>` on rests — never assume pitched notes.
+CLI: `npx musicxml-mnx|guitarpro-mnx --import|--export <file> [--output out]` (derived
+output names refuse to overwrite).
+
+## Conventions
+
+- **`.ts` extensions in imports are required** (`moduleResolution: bundler`).
+- **Decorator config**: `experimentalDecorators` + `emitDecoratorMetadata` for Lit —
+  don't flip to standard decorators without testing the whole tree.
+- The clean-room shell is plain Lit — no Web Awesome, no other UI kit.
+- Tests: root vitest = `harness/`; converter packages run their own
+  (`npm -w @mnx-editor/<name> test`). The Worker and UI have no tests.
+- `dist/` is gitignored build output. The scratch site for proposal verification comes
+  from `makesite` in the worktree, not from this repo.
+- Roadmap-driven development: interpret roadmap-shaped requests against `roadmap/`
+  (index: [roadmap/README.md](roadmap/README.md)) — "add to the roadmap" → new doc in
+  `roadmap/proposed/` + index line; "what's next" → propose from `inprogress/` +
+  `proposed/`; finished efforts move to `complete/`.
