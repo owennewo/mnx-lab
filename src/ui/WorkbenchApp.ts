@@ -14,21 +14,51 @@ import { buildQueue, classify } from './queue.ts';
 import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import './QueueHome.ts';
 import './ScenarioPage.ts';
+import './ObjectsPage.ts';
 
 export interface Route {
-  page: 'home' | 'scenario';
+  page: 'home' | 'scenario' | 'objects';
   id?: string;
   view?: string;
+  /** The schema object on #/objects/<def>; absent on the index itself. */
+  def?: string;
 }
 
 export function parseHash(hash: string): Route {
-  const m = /^#\/scenario\/([^?]+)(?:\?view=([a-z-]+))?$/.exec(hash);
-  if (m) return { page: 'scenario', id: decodeURIComponent(m[1]), view: m[2] };
+  const scenario = /^#\/scenario\/([^?]+)(?:\?view=([a-z-]+))?$/.exec(hash);
+  if (scenario) return { page: 'scenario', id: decodeURIComponent(scenario[1]), view: scenario[2] };
+  const objects = /^#\/objects(?:\/([a-z0-9-]+))?$/.exec(hash);
+  if (objects) return { page: 'objects', def: objects[1] };
   return { page: 'home' };
 }
 
 export function scenarioHref(id: string, view?: string): string {
   return `#/scenario/${encodeURIComponent(id).replace(/%2F/g, '/')}${view ? `?view=${view}` : ''}`;
+}
+
+export function objectsHref(def?: string): string {
+  return def ? `#/objects/${def}` : '#/objects';
+}
+
+/**
+ * The rail's filter syntax. A bare word matches id/title; `def:<name>` narrows
+ * to the scenarios exercising a schema object.
+ *
+ * Deliberately ONE filter mechanism rather than a second "filter mode" beside
+ * the search box: clicking an object tag writes `def:<name>` into the box, so
+ * what filtered the list is always visible, editable and clearable by the
+ * control the reader already knows.
+ */
+export const DEF_QUERY_PREFIX = 'def:';
+
+export function matchesQuery(entry: ScenarioEntry, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  if (q.startsWith(DEF_QUERY_PREFIX)) {
+    const def = q.slice(DEF_QUERY_PREFIX.length);
+    return !def || entry.featureDefs.some(d => d.toLowerCase().includes(def));
+  }
+  return entry.id.toLowerCase().includes(q) || entry.meta.title.toLowerCase().includes(q);
 }
 
 @customElement('mnx-workbench')
@@ -38,6 +68,14 @@ export class WorkbenchApp extends LitElement {
 
   private onHashChange = () => {
     this.route = parseHash(location.hash);
+    // #/objects/<def> IS the filter: the URL drives the rail so that "show me
+    // this object's examples" is deep-linkable rather than transient state.
+    // Only ever clobber a def: query — a hand-typed search survives navigation.
+    if (this.route.page === 'objects' && this.route.def) {
+      this.query = `${DEF_QUERY_PREFIX}${this.route.def}`;
+    } else if (this.query.startsWith(DEF_QUERY_PREFIX)) {
+      this.query = '';
+    }
   };
 
   static styles = [
@@ -85,6 +123,17 @@ export class WorkbenchApp extends LitElement {
         display: flex;
         gap: 14px;
         margin-left: auto;
+      }
+
+      /* The coverage fraction was always a tease; make it the door. */
+      header .facts .cov {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px dotted var(--line-strong);
+      }
+
+      header .facts .cov:hover {
+        color: var(--accent);
       }
 
       nav {
@@ -242,10 +291,7 @@ export class WorkbenchApp extends LitElement {
   }
 
   private grouped(): Map<string, ScenarioEntry[]> {
-    const q = this.query.toLowerCase();
-    const matches = corpus.filter(
-      e => !q || e.id.toLowerCase().includes(q) || e.meta.title.toLowerCase().includes(q)
-    );
+    const matches = corpus.filter(e => matchesQuery(e, this.query));
     // Topic groups, not the authoring category — see src/corpus/groups.ts.
     // Lab and spec interleave here, which is the point; `origin` carries the
     // provenance the old lab/spec headers used to imply.
@@ -305,7 +351,9 @@ export class WorkbenchApp extends LitElement {
         <span class="brand"><a href="#/">MNX Lab — workbench</a></span>
         <span class="facts">
           <span>MNX v${corpusManifest.mnxVersion} · ext v${corpusManifest.extensionVersion}</span>
-          <span>coverage ${coverage.covered}/${coverage.total} $defs</span>
+          <a class="cov" href=${objectsHref()}
+            >coverage ${coverage.covered}/${coverage.total} $defs</a
+          >
           <span>${corpus.length} scenarios</span>
         </span>
       </header>
@@ -335,7 +383,9 @@ export class WorkbenchApp extends LitElement {
               .scenarioId=${this.route.id ?? ''}
               .view=${this.route.view ?? ''}
             ></mnx-scenario-page>`
-          : html`<mnx-queue-home></mnx-queue-home>`}
+          : this.route.page === 'objects'
+            ? html`<mnx-objects-page .def=${this.route.def ?? ''}></mnx-objects-page>`
+            : html`<mnx-queue-home></mnx-queue-home>`}
       </main>
     `;
   }

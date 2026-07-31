@@ -8,13 +8,16 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { corpus, type ScenarioEntry } from '../corpus/corpus.ts';
 import { classify } from './queue.ts';
 import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
-import { scenarioHref } from './WorkbenchApp.ts';
+import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
 import type { ViewMode } from '../elements/ScoreViewer.ts';
 import '../elements/ScoreViewer.ts';
 
 type PageView = ViewMode | 'compare' | 'json';
+
+/** How many object tags to show before collapsing the tail into a count. */
+const DEF_PREVIEW = 9;
 
 @customElement('mnx-scenario-page')
 export class ScenarioPage extends LitElement {
@@ -30,6 +33,7 @@ export class ScenarioPage extends LitElement {
   // into one empty pane is how a stopped dev server reads as a render bug.
   @state() private loadState: 'loading' | 'ready' | 'failed' = 'loading';
   @state() private loadError = '';
+  @state() private allDefs = false;
 
   static styles = [
     designTokens,
@@ -108,6 +112,37 @@ export class ScenarioPage extends LitElement {
       .badge a {
         color: inherit;
         text-decoration: none;
+      }
+
+      .defs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 9px;
+      }
+
+      .def {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--ink-2);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 1px 6px;
+        text-decoration: none;
+      }
+
+      .def:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      button.def {
+        cursor: pointer;
+        color: var(--ink-3);
+        font: inherit;
+        font-family: var(--mono);
+        font-size: 10px;
       }
 
       .tabs {
@@ -244,6 +279,7 @@ export class ScenarioPage extends LitElement {
       this.referenceFailed = false;
       this.loadState = 'loading';
       this.loadError = '';
+      this.allDefs = false;
       void this.loadScore();
     }
   }
@@ -363,6 +399,26 @@ export class ScenarioPage extends LitElement {
             ? html`<span class="badge"><a href=${entry.issueRef} target="_blank">issue ↗</a></span>`
             : nothing}
         </div>
+        <!-- The schema objects this scenario exercises, from the spec's own
+             coversDefs join. featureDefs (plumbing stripped) is what makes
+             this wearable: the raw list runs to a median of 25 and a max of
+             50, but once the structural skeleton is gone the median is 5 and
+             58 of 70 scenarios fit in nine. The handful that don't get a
+             count instead of a wall. -->
+        ${entry.featureDefs.length > 0
+          ? html`<div class="defs">
+              ${(this.allDefs ? entry.featureDefs : entry.featureDefs.slice(0, DEF_PREVIEW)).map(
+                d => html`<a class="def" href=${objectsHref(d)} title="show every scenario using ${d}"
+                  >${d}</a
+                >`
+              )}
+              ${!this.allDefs && entry.featureDefs.length > DEF_PREVIEW
+                ? html`<button class="def more" @click=${() => (this.allDefs = true)}>
+                    +${entry.featureDefs.length - DEF_PREVIEW} more
+                  </button>`
+                : nothing}
+            </div>`
+          : nothing}
         <div class="tabs">
           ${views.map(
             v => html`

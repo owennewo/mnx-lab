@@ -157,6 +157,17 @@ Home is the **attention queue** (blocked → stale → never-seen; current count
 shown), derived from committed provenance in `src/ui/queue.ts`. Every scenario + view
 has a stable deep link: `#/scenario/<id>?view=notation|tab|both|compare|json`.
 
+**`#/objects`** is the coverage map — every non-plumbing `$def` against the scenarios
+exercising it (`src/corpus/defIndex.ts`, inverting the spec's own `coversDefs` join),
+tiered **never exercised → one example → covered**. Counts read *verified / total*, so an
+object covered only by unapproved scenarios reads as exercised-but-not-evidence; the
+header's coverage fraction links here, because a fraction is a scoreboard and the tiers
+are a work queue. **`#/objects/<def>`** is both the per-object page and the rail filter:
+it writes `def:<name>` into the rail's search box, so filtering is deep-linkable, visible
+and clearable by the one control that already exists — there is no second filter mode.
+A scenario page tags its `featureDefs` (plumbing stripped: median 5, vs 25 raw), capped
+at nine with a `+N more`.
+
 The rail groups by **topic**, not by authoring category — `src/corpus/groups.ts`, an
 ordered name→regex table matched on the scenario id, **first match wins**. The spec has
 no taxonomy to inherit (its own index is a flat alphabetical list of 52 "example
