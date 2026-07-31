@@ -1,8 +1,9 @@
 # Structure direction — the workbench: organize around spec, corpus and evidence
 
-> **Status: proposed** (filed 2026-07-31). One of four self-contained structure sketches —
+> **Status: superseded** (filed 2026-07-31; superseded same day by the adopted
+> [structure-lab.md](../inprogress/structure-lab.md) direction, now under execution). One of four self-contained structure sketches —
 > the others are [structure-toolchain.md](structure-toolchain.md),
-> [structure-platform.md](structure-platform.md) and [structure-lab.md](structure-lab.md)
+> [structure-platform.md](structure-platform.md) and [structure-lab.md](../inprogress/structure-lab.md)
 > (the likely direction of travel, which absorbs this plan's `spec/`/`corpus/`/`harness/`
 > restructure). They are alternatives for a single decision; each is written to stand alone.
 

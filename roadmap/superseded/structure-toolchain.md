@@ -1,8 +1,9 @@
 # Structure direction — the toolchain: a workspace of publishable packages
 
-> **Status: proposed** (filed 2026-07-31). One of four self-contained structure sketches —
+> **Status: superseded** (filed 2026-07-31; superseded same day by the adopted
+> [structure-lab.md](../inprogress/structure-lab.md) direction, now under execution). One of four self-contained structure sketches —
 > the others are [structure-platform.md](structure-platform.md),
-> [structure-workbench.md](structure-workbench.md) and [structure-lab.md](structure-lab.md)
+> [structure-workbench.md](structure-workbench.md) and [structure-lab.md](../inprogress/structure-lab.md)
 > (the likely direction of travel, which defers this plan rather than rejecting it). They
 > are alternatives for a single decision; each is written to stand alone.
 
@@ -16,7 +17,7 @@ monorepo whose unit of structure is the published package**, and whose disciplin
 one-way dependency graph.
 
 This revives P2 ([01-principles.md](../complete/01-principles.md)) and the package split
-sketched in [02-architecture.md](../superseded/02-architecture.md) — but as an **extraction
+sketched in [02-architecture.md](02-architecture.md) — but as an **extraction
 from working code**, not a clean-room build. The contracts that plan could only sketch (C1
 validate, C2 layout→primitives→draw, C6 corpus loader) now exist as proven internal seams in
 `src/`, and the corpus gives the extraction a mechanical acceptance test: **a move is correct

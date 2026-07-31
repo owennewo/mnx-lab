@@ -1,11 +1,12 @@
 # Structure direction — the lab: layered apparatus, one corpus, two loops
 
-> **Status: proposed** (filed 2026-07-31, revised same day). The fourth structure sketch,
-> and the likely direction of travel. It **composes** two of the three earlier
-> alternatives — [structure-platform.md](structure-platform.md) for the code and
-> [structure-workbench.md](structure-workbench.md) for the data — and defers
-> [structure-toolchain.md](structure-toolchain.md) rather than rejecting it. If adopted,
-> the other three move to `superseded/` with a pointer here.
+> **Status: in progress** (filed 2026-07-31, revised same day; **adopted and under
+> execution 2026-07-31**). The fourth structure sketch, now the direction of travel. It
+> **composes** two of the three earlier
+> alternatives — [structure-platform.md](../superseded/structure-platform.md) for the code and
+> [structure-workbench.md](../superseded/structure-workbench.md) for the data — and defers
+> [structure-toolchain.md](../superseded/structure-toolchain.md) rather than rejecting it. The
+> other three sketches are in `superseded/` with pointers here.
 >
 > **Revision note.** The first draft had a three-role corpus model
 > (oracle / probe / repertoire) and moved scores into the corpus. Both were wrong and are
@@ -89,7 +90,7 @@ deliberately, with a meta.json. Until then it stays a fixture.
 With scores out, **`scenarios/` stays exactly where it is** — the first draft's
 `corpus/` move existed to unify scores with scenarios, and that need is gone. Less
 churn: ids, golden paths, `manifest.json` and
-[04-scenario-library.md](../inprogress/04-scenario-library.md) are all untouched.
+[04-scenario-library.md](04-scenario-library.md) are all untouched.
 
 ## The spec loop: `sync` down, `push` up
 
@@ -130,10 +131,10 @@ spec/proposals/score-text/
   engravings/        our rendered output per scenario — what push:proposal injects
 ```
 
-Seeded from the three live topics: **score-text** ([score-text.md](score-text.md)),
+Seeded from the three live topics: **score-text** ([score-text.md](../proposed/score-text.md)),
 **chord-symbols** (#109, the `harmonies` block), **guitar-technique** (#63/#179, the
 `tab` block + `24-tab-spec-gaps`). Roadmap docs keep the narrative;
-[mnx-cg-proposals.md](mnx-cg-proposals.md) keeps the outward campaign.
+[mnx-cg-proposals.md](../proposed/mnx-cg-proposals.md) keeps the outward campaign.
 
 ### The submodule stops double-dutying
 
@@ -494,9 +495,9 @@ This plan will be executed by a fresh session starting with maximum context head
   two-axis corpus, fresh-slate rebuild. Don't re-litigate them; if execution reveals a
   genuine problem, append a revision note rather than silently deviating.
 - **On starting**: move this doc to `roadmap/inprogress/` and the three sibling
-  sketches ([structure-toolchain.md](structure-toolchain.md),
-  [structure-workbench.md](structure-workbench.md),
-  [structure-platform.md](structure-platform.md)) to `roadmap/superseded/` with
+  sketches ([structure-toolchain.md](../superseded/structure-toolchain.md),
+  [structure-workbench.md](../superseded/structure-workbench.md),
+  [structure-platform.md](../superseded/structure-platform.md)) to `roadmap/superseded/` with
   pointers here; refresh `roadmap/README.md`.
 - **Commit discipline**: one step = one commit (or short series), message naming the
   step and its gate. Gates are non-negotiable — a transplant that can't produce
