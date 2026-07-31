@@ -114,7 +114,7 @@ Child-to-parent communication uses bubbling DOM `CustomEvent`s with `composed: t
 
 ### Storage abstraction
 
-`DocumentRepository` ([src/types/repository.ts](src/types/repository.ts)) is the swap point for future cloud sync. The current `IndexedDbRepository` uses `idb-keyval` with key prefix `mnx-doc:`. `DocumentController.initDefaultDocument` seeds the "House of the Rising Sun" sample on first run by importing `server/scores/House-of-the-Rising-Sun.mnx.json` as a JSON module — note that this couples the frontend build to a path under `server/`, and `tsconfig.json` has `resolveJsonModule: true` to make it work (`.mnx.json` still ends in `.json`, so it resolves as a JSON module normally).
+`DocumentRepository` ([src/types/repository.ts](src/types/repository.ts)) is the swap point for future cloud sync. The current `IndexedDbRepository` uses `idb-keyval` with key prefix `mnx-doc:`. `DocumentController.initDefaultDocument` seeds a sample score on first run from the inline object in [src/utils/defaultScore.ts](src/utils/defaultScore.ts) — the frontend no longer imports anything from `server/`; the files under `server/scores/` are consumed only by the converter test suites as round-trip fixtures.
 
 ### AI editing flow (`/api/edit-notation`)
 
