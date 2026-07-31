@@ -27,5 +27,9 @@
   "requires": [],
   "idRefs": false,
   "source": "hand-written",
-  "status": "verified"
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17",
+    "primitivesHash": "sha256:9d38bba962c6be41"
+  }
 }

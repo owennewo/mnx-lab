@@ -40,5 +40,9 @@
   },
   "requires": [],
   "source": "spec-example",
-  "status": "verified"
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17",
+    "primitivesHash": "sha256:68e8a574f028a199"
+  }
 }

@@ -26,5 +26,8 @@
   "requires": [],
   "idRefs": false,
   "source": "hand-written",
-  "status": "verified"
+  "status": "verified",
+  "verification": {
+    "at": "2026-07-17"
+  }
 }
