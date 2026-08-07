@@ -50,10 +50,32 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   mute** all survive `MNX ⇄ .gp` and `MNX ⇄ MusicXML`, and bends are now **curves**
   (`points: [{position, alter}]` in semitones) rather than a single interval that flattened
   anything more elaborate. Remaining: **rendering** — nothing draws technique yet.
+- **[instrument-position.md](proposed/instrument-position.md)** — **where a note is played**:
+  the string declaration, capo, `note.string`, `note.fingering`. Thesis: **the string and the
+  finger are choices, the fret and the hand position are consequences** — given tuning, string
+  and pitch, the fret is arithmetic (and on violin, string + pitch + finger derives the hand
+  position). Argued from the conflict rule MNX already used against MusicXML's duplicated tab
+  staves, not from "derivable data shouldn't be stored". Names are tested against **piano**,
+  which sorts them: only `fingering` is universal, so it must not nest under a `tab` namespace.
+  Records upstream state (#63 open with a standing invitation from the spec editor, **no
+  discussion exists**), natural/artificial harmonic derivation, and the divergence from the
+  built `_x.mnxLab.tab.position`, which stores the fret. Scope is bounded by a principle
+  rather than a list — **encode the choice, not the consequence** — which maps the same shape
+  onto brass (valve combination selects a fundamental, pitch determines the partial) and
+  excludes tin whistle by the same rule that excludes storing the fret. Design only — nothing built, nothing
+  posted; complements [guitar-technique.md](proposed/guitar-technique.md) (what the hands do).
 - **[render-density-zoom.md](proposed/render-density-zoom.md)** — configurable horizontal +
   vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
   in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
   vertical density = layout gap/padding constants. Not started.
+- **[editor-ai-prompt.md](proposed/editor-ai-prompt.md)** — the command palette's **third
+  mode**: `Ctrl+K` text routing to `/api/edit-notation` when it reads as a sentence rather than
+  a command (research §6.2), inheriting the `ui/ → assist/` boundary. Owns the deeper
+  convergence `src/edit/ops.ts` has always named: the assist loop emitting **`EditOp[]`
+  through `applyOp`** instead of replacing whole documents, so AI edits land in the session's
+  undo history and op log like keyboard edits. Split out of
+  [editor-input-layer.md](inprogress/editor-input-layer.md); the voice half stays in
+  [open_router.md](proposed/open_router.md).
 - **[open_router.md](proposed/open_router.md)** — two-stage **voice** input + structured edit.
   The *text* edit path shipped (worker `/api/edit-notation` NDJSON self-correcting loop); the
   **voice/transcription stage was never built**. What's left here is the voice half.
@@ -68,6 +90,23 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   Harmonics, palm mute and chord symbols now travel too (v3 of the extension). Left:
   tuplets/grace, ties/staccato, a third-party gp3/gp4/gp5 import fixture, and manual
   acceptance in Guitar Pro.
+- **[editor-input-layer.md](inprogress/editor-input-layer.md)** — the **editor's input layer**,
+  designed to be testable while super-experimental: a declarative keymap (key → intent), a
+  pure state machine (intent + selection → `EditOp`), and **intent-trace fixtures** that are
+  also recordings ("copy trace" → `harness/fixtures/edit-traces/`, replayed by vitest, undo-all
+  must round-trip byte-identically). Editor edits the model, renderer reacts; the cursor is a
+  **rhythmic position, not a note id** (empty measures must be navigable). **Phases 1+2 built
+  2026-08-03** (`src/edit/{intents,keymap,cursor,session,tabStrings}.ts`): string-mode cursor
+  with entry ghosts, note entry/deletion/duration, two-digit fret combining, **setup-as-ops**
+  (`setTuning`/`setTimeSignature`), the `lab/document/empty-tab-canvas` template, the
+  from-scratch flagship trace, **setup popovers** (Shift+T/Shift+U, typed grammar in
+  `setupGrammar.ts`), and **rests & ties** (§8.11's no-rest-key model: ops keep touched bars
+  full of beat rests; `T` ties; `Alt+↑↓` nudges rests), and the **command palette**
+  (`Ctrl+K` commands / `Ctrl+G` go-to, one grammar shared with the rail filter; bar jumps are
+  a traceable `goToMeasure` intent; AI mode split to
+  [editor-ai-prompt.md](proposed/editor-ai-prompt.md)). Remaining: `elements/` promotion.
+  Grounded in
+  [research/notation-editor-keyboard-models.md](../research/notation-editor-keyboard-models.md).
 - **[04-scenario-library.md](inprogress/04-scenario-library.md)** — the scenario corpus
   structure (`spec/` + `lab/`, path-derived ids, `meta.json`, `expected.primitives.json`,
   `check-scenarios.mjs`). The one clean-room doc that describes *current* reality; the corpus

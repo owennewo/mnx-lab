@@ -1,0 +1,33 @@
+{
+  "title": "Empty tab canvas — the from-scratch template",
+  "description": "One empty measure of a tab-capable guitar part: no notes, no time signature, no tuning (consumers assume standard), no clef. This is the editor's document-genesis template (roadmap/inprogress/editor-input-layer.md): from-scratch trace fixtures start here, set up time signature and tuning through EditOps, and enter notes onto the empty grid. Also pins that an empty-content sequence is schema-valid and renderable.",
+  "bars": 1,
+  "tags": [
+    "minimal",
+    "template",
+    "tab"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/sequence/"
+  ],
+  "coversDefs": [
+    "root",
+    "mnx",
+    "global",
+    "part",
+    "part-measure",
+    "sequence",
+    "vendor-extensions"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

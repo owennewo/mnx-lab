@@ -12,6 +12,20 @@ import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
 import type { ViewMode } from '../elements/ScoreViewer.ts';
+import type { SelectionContext } from '../elements/mnxContext.ts';
+import { EditorSession } from '../edit/session.ts';
+import type { EditorIntent } from '../edit/intents.ts';
+import {
+  EDIT_LAYER,
+  NAVIGATION_LAYER,
+  TAB_DIGIT_LAYER,
+  resolveIntent,
+  resolveShellAction,
+  strokeOf,
+  type KeymapLayer,
+  type ShellAction
+} from '../edit/keymap.ts';
+import { parseTimeSignature, parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
 import '../elements/ScoreViewer.ts';
 
 type PageView = ViewMode | 'compare' | 'json';
@@ -34,6 +48,18 @@ export class ScenarioPage extends LitElement {
   @state() private loadState: 'loading' | 'ready' | 'failed' = 'loading';
   @state() private loadError = '';
   @state() private allDefs = false;
+  // The editor incubates here (roadmap/proposed/editor-input-layer.md):
+  // in-memory only — the workbench has no backend, and this page is a bench
+  // for testing the editor, not for authoring corpus files.
+  @state() private session: EditorSession | null = null;
+  @state() private selection: SelectionContext | null = null;
+  @state() private copied = false;
+  /** The open setup popover (survey §6.2's Shift+letter tier), if any.
+   *  (Named to dodge the DOM's built-in HTMLElement.popover property.) */
+  @state() private setupPopover: 'time' | 'tuning' | null = null;
+  @state() private setupPopoverError = '';
+  /** Esc hides the cursor highlight until the next intent (review sense-0). */
+  private cursorHidden = false;
 
   static styles = [
     designTokens,
@@ -149,6 +175,91 @@ export class ScenarioPage extends LitElement {
         display: flex;
         gap: 2px;
         margin-top: 12px;
+      }
+
+      /* The incubating editor's status strip — cursor, history, trace. */
+      .edit-strip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--ink-2);
+      }
+
+      .edit-strip .cur {
+        color: var(--ink);
+      }
+
+      .edit-strip .dirty {
+        color: var(--accent);
+      }
+
+      .edit-strip button {
+        font: inherit;
+        color: var(--ink-2);
+        background: transparent;
+        border: 1px solid var(--line-strong);
+        border-radius: 5px;
+        padding: 1px 8px;
+        cursor: pointer;
+      }
+
+      .edit-strip button:hover:not(:disabled) {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .edit-strip button:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      .edit-strip .hint {
+        margin-left: auto;
+        color: var(--ink-3);
+      }
+
+      /* Setup popovers (survey §6.2's Shift+letter tier): a typed prompt
+         whose text parses into a setup intent. */
+      .popover {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin-top: 8px;
+        padding: 8px 12px;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        background: var(--surface);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+
+      .popover .pop-label {
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 9.5px;
+      }
+
+      .popover input {
+        font: inherit;
+        color: var(--ink);
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--line-strong);
+        outline: none;
+        padding: 2px 4px;
+        min-width: 22ch;
+      }
+
+      .popover .pop-hint {
+        color: var(--ink-3);
+      }
+
+      .popover .pop-error {
+        color: var(--st-gap);
       }
 
       .tabs a {
@@ -280,8 +391,28 @@ export class ScenarioPage extends LitElement {
       this.loadState = 'loading';
       this.loadError = '';
       this.allDefs = false;
+      this.session = null;
+      this.selection = null;
+      this.copied = false;
+      this.setupPopover = null;
+      this.setupPopoverError = '';
+      this.cursorHidden = false;
       void this.loadScore();
     }
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('mnx-palette-intent', this.onPaletteIntent);
+    window.addEventListener('mnx-palette-action', this.onPaletteAction);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('mnx-palette-intent', this.onPaletteIntent);
+    window.removeEventListener('mnx-palette-action', this.onPaletteAction);
   }
 
   private async loadScore() {
@@ -299,6 +430,9 @@ export class ScenarioPage extends LitElement {
       this.rawScore = JSON.stringify(score, null, 2);
       if (entry.invalidByDesign) {
         this.pinnedErrors = await resolvePinnedErrors(score, entry.meta.expect.errors ?? []);
+      } else {
+        this.session = new EditorSession(score, entry.id);
+        this.syncFromSession();
       }
       this.loadState = 'ready';
     } catch (e) {
@@ -309,6 +443,148 @@ export class ScenarioPage extends LitElement {
       this.loadState = 'failed';
       this.loadError = e instanceof Error ? e.message : String(e);
     }
+  }
+
+  /** Pull doc/selection out of the session after it changed. */
+  private syncFromSession() {
+    const session = this.session;
+    if (!session || !this.doc) return;
+    this.doc = { ...this.doc, mnxJson: session.doc };
+    this.rawScore = JSON.stringify(session.doc, null, 2);
+    this.selection = {
+      activePartId: null,
+      activeMeasureIndex: session.cursor.measureIndex,
+      activeVoiceIndex: null,
+      activeEventIndex: null,
+      selectedNoteIds: this.cursorHidden ? [] : session.selectedNoteKeys
+    };
+  }
+
+  /**
+   * The pane-owned layer rule (survey §6.1, adopted in the roadmap doc):
+   * digits belong to the pane on screen — frets when a tab pane is visible.
+   * Bare arrows never mutate, so navigation is active on every score view.
+   */
+  private activeLayers(): KeymapLayer[] {
+    const entry = this.entry();
+    if (!entry || !this.session) return [];
+    const view = this.activeView(entry);
+    if (view === 'json') return [];
+    const layers: KeymapLayer[] = [];
+    if (entry.hasTab && (view === 'tab' || view === 'both')) layers.push(TAB_DIGIT_LAYER);
+    layers.push(NAVIGATION_LAYER, EDIT_LAYER);
+    return layers;
+  }
+
+  private onKeyDown = (event: KeyboardEvent) => {
+    if (event.defaultPrevented || event.isComposing) return;
+    // Shadow-DOM retargeting makes window-level `event.target` the outermost
+    // host; composedPath()[0] is the real target (the focused input, if any).
+    const target = event.composedPath()[0];
+    if (target instanceof HTMLElement) {
+      const tag = target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable)
+        return;
+    }
+    if (event.code === 'Escape') {
+      this.cursorHidden = true;
+      this.syncFromSession();
+      return;
+    }
+    if (this.session && this.activeLayers().length > 0) {
+      const action = resolveShellAction(strokeOf(event));
+      if (action && this.openPopover(action)) {
+        event.preventDefault();
+        return;
+      }
+    }
+    const intent = resolveIntent(strokeOf(event), this.activeLayers());
+    if (!intent || !this.session) return;
+    event.preventDefault();
+    this.cursorHidden = false;
+    this.session.handleIntent(intent);
+    this.copied = false;
+    this.syncFromSession();
+  };
+
+  private openPopover(action: ShellAction): boolean {
+    // Only the two popover actions are ours; palette actions belong to the shell.
+    if (action !== 'timeSignaturePopover' && action !== 'tuningPopover') return false;
+    const entry = this.entry();
+    if (action === 'tuningPopover' && !entry?.hasTab) return false;
+    this.setupPopover = action === 'timeSignaturePopover' ? 'time' : 'tuning';
+    this.setupPopoverError = '';
+    return true;
+  }
+
+  /** Palette items act on the editor through the same funnels as keys: the
+   *  intent channel feeds the session (recorded in traces), the action
+   *  channel drives page chrome (popovers, copy trace, revert). */
+  private onPaletteIntent = (event: Event) => {
+    this.stripIntent((event as CustomEvent<EditorIntent>).detail);
+  };
+
+  private onPaletteAction = (event: Event) => {
+    const action = (event as CustomEvent<string>).detail;
+    if (action === 'copyTrace') void this.copyTrace();
+    else if (action === 'revert') this.revertEdits();
+    else this.openPopover(action as ShellAction);
+  };
+
+  updated() {
+    if (this.setupPopover) {
+      this.renderRoot.querySelector<HTMLInputElement>('.popover input')?.focus();
+    }
+  }
+
+  private onPopoverKey(event: KeyboardEvent) {
+    const input = event.target as HTMLInputElement;
+    if (event.code === 'Escape') {
+      event.preventDefault();
+      this.setupPopover = null;
+      return;
+    }
+    if (event.code !== 'Enter') return;
+    event.preventDefault();
+    if (this.setupPopover === 'time') {
+      const time = parseTimeSignature(input.value);
+      if (!time) {
+        this.setupPopoverError = 'not a time signature — try 4/4 or 6/8';
+        return;
+      }
+      this.stripIntent({ type: 'setTimeSignature', count: time.count, unit: time.unit });
+    } else if (this.setupPopover === 'tuning') {
+      const tuning = parseTuning(input.value);
+      if (!tuning) {
+        this.setupPopoverError = `not a tuning — a preset (${TUNING_PRESET_NAMES.join(', ')}) or pitches low→high like D2 A2 D3 G3 A3 D4`;
+        return;
+      }
+      this.stripIntent({ type: 'setTuning', tuning });
+    }
+    this.setupPopover = null;
+  }
+
+  /** Button-driven intents go through the same funnel as keys, so they are
+   *  recorded in the trace too — a recording must replay clicks as well. */
+  private stripIntent(intent: EditorIntent) {
+    if (!this.session) return;
+    this.cursorHidden = false;
+    this.session.handleIntent(intent);
+    this.copied = false;
+    this.syncFromSession();
+  }
+
+  private async copyTrace() {
+    if (!this.session) return;
+    await navigator.clipboard.writeText(JSON.stringify(this.session.trace(), null, 2) + '\n');
+    this.copied = true;
+  }
+
+  private revertEdits() {
+    if (!this.session) return;
+    this.session = new EditorSession(this.session.initial, this.scenarioId);
+    this.copied = false;
+    this.syncFromSession();
   }
 
   private activeView(entry: ScenarioEntry): PageView {
@@ -340,6 +616,7 @@ export class ScenarioPage extends LitElement {
         .hasTab=${entry.hasTab}
         .invalidByDesign=${entry.invalidByDesign}
         .pinnedErrors=${this.pinnedErrors}
+        .selection=${this.selection}
       ></mnx-score-viewer>
     `;
   }
@@ -428,6 +705,81 @@ export class ScenarioPage extends LitElement {
             `
           )}
         </div>
+        ${this.session && view !== 'json'
+          ? html`
+              <div class="edit-strip">
+                <span class="cur">
+                  m${this.session.cursor.measureIndex + 1} ·
+                  ${this.session.cursor.onset.num}/${this.session.cursor.onset.den}
+                  ${this.session.mode === 'string'
+                    ? html`· s${this.session.cursor.line}`
+                    : nothing}
+                  · ${this.session.entryDurationBase}${this.session.selectedNoteKeys.length &&
+                  !this.cursorHidden
+                    ? html` · ${this.session.selectedNoteKeys[0]}`
+                    : nothing}
+                </span>
+                ${this.session.dirty
+                  ? html`<span class="dirty" title="edits are in-memory only — the corpus file is untouched"
+                      >● ${this.session.appliedOps.length}
+                      op${this.session.appliedOps.length === 1 ? '' : 's'}</span
+                    >`
+                  : nothing}
+                <button
+                  ?disabled=${!this.session.canUndo}
+                  @click=${() => this.stripIntent({ type: 'undo' })}
+                >
+                  undo
+                </button>
+                <button
+                  ?disabled=${!this.session.canRedo}
+                  @click=${() => this.stripIntent({ type: 'redo' })}
+                >
+                  redo
+                </button>
+                <button
+                  ?disabled=${this.session.intentLog.length === 0}
+                  @click=${() => void this.copyTrace()}
+                  title="copy this session as a replayable intent-trace fixture — paste into harness/fixtures/edit-traces/"
+                >
+                  ${this.copied ? 'copied ✓' : 'copy trace'}
+                </button>
+                ${this.session.dirty
+                  ? html`<button @click=${() => this.revertEdits()}>revert</button>`
+                  : nothing}
+                <button @click=${() => this.openPopover('timeSignaturePopover')}>time…</button>
+                ${entry.hasTab
+                  ? html`<button @click=${() => this.openPopover('tuningPopover')}>tuning…</button>`
+                  : nothing}
+                <span class="hint"
+                  >arrows move${entry.hasTab ? ' (↑↓ strings) · digits enter frets' : ''} · Del
+                  removes · −/= duration · Alt+↑↓ transpose · Shift+M add bar · Shift+T
+                  time${entry.hasTab ? ' · Shift+U tuning' : ''} · Ctrl+K palette · Ctrl+G go
+                  to</span
+                >
+              </div>
+              ${this.setupPopover
+                ? html`
+                    <div class="popover">
+                      <span class="pop-label"
+                        >${this.setupPopover === 'time' ? 'time signature' : 'tuning'}</span
+                      >
+                      <input
+                        placeholder=${this.setupPopover === 'time' ? '4/4' : 'standard · drop-d · D2 A2 D3 G3 A3 D4'}
+                        @keydown=${(e: KeyboardEvent) => this.onPopoverKey(e)}
+                      />
+                      ${this.setupPopoverError
+                        ? html`<span class="pop-error">${this.setupPopoverError}</span>`
+                        : html`<span class="pop-hint"
+                            >${this.setupPopover === 'time'
+                              ? 'applies to the current bar onward · Enter applies · Esc closes'
+                              : 'low string first · Enter applies · Esc closes'}</span
+                          >`}
+                    </div>
+                  `
+                : nothing}
+            `
+          : nothing}
       </div>
       <div class="body">
         ${view === 'json'

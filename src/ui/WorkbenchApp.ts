@@ -12,6 +12,10 @@ import { corpus, corpusManifest, coverage, type ScenarioEntry } from '../corpus/
 import { groupScenarios } from '../corpus/groups.ts';
 import { buildQueue, classify } from './queue.ts';
 import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
+import { resolveShellAction, strokeOf } from '../edit/keymap.ts';
+import type { EditorIntent } from '../edit/intents.ts';
+import type { PaletteItem } from './CommandPalette.ts';
+import './CommandPalette.ts';
 import './QueueHome.ts';
 import './ScenarioPage.ts';
 import './ObjectsPage.ts';
@@ -65,6 +69,8 @@ export function matchesQuery(entry: ScenarioEntry, query: string): boolean {
 export class WorkbenchApp extends LitElement {
   @state() private route: Route = parseHash(location.hash);
   @state() private query = '';
+  /** The palette overlay: 'commands' (Ctrl+K, `>` prefilled) or 'goto' (Ctrl+G). */
+  @state() private palette: 'commands' | 'goto' | null = null;
 
   private onHashChange = () => {
     this.route = parseHash(location.hash);
@@ -283,11 +289,127 @@ export class WorkbenchApp extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('hashchange', this.onHashChange);
+    window.addEventListener('keydown', this.onKeyDown);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener('hashchange', this.onHashChange);
+    window.removeEventListener('keydown', this.onKeyDown);
+  }
+
+  /** The shell's keys: `/` focuses the rail filter (survey §6.1), Ctrl+K /
+   *  Ctrl+G open the palette (resolved through the keymap module's shell
+   *  table — it stays the sole KeyboardEvent interpreter). Everything
+   *  score-shaped is the scenario page's keymap, not ours. */
+  private onKeyDown = (event: KeyboardEvent) => {
+    if (event.defaultPrevented || event.isComposing) return;
+    const target = event.composedPath()[0];
+    if (target instanceof HTMLElement) {
+      const tag = target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable)
+        return;
+    }
+    const action = resolveShellAction(strokeOf(event));
+    if (action === 'commandPalette' || action === 'goTo') {
+      event.preventDefault();
+      this.palette = action === 'commandPalette' ? 'commands' : 'goto';
+      return;
+    }
+    if (event.code === 'Slash' && !event.ctrlKey && !event.altKey && !event.metaKey) {
+      const search = this.renderRoot.querySelector<HTMLInputElement>('.search');
+      if (search) {
+        event.preventDefault();
+        search.focus();
+        search.select();
+      }
+    }
+  };
+
+  // ── The palette's provider: one grammar. `>` prefix = commands; bare text
+  // is go-to — bar numbers move the editor cursor, `def:` opens coverage, and
+  // anything else matches scenarios with the rail filter's own matcher, so
+  // the palette and the rail agree about what a query means.
+  private paletteItems = (query: string): PaletteItem[] => {
+    const q = query.trim();
+    if (q.startsWith('>')) return this.commandItems(q.slice(1).trim().toLowerCase());
+    return this.goToItems(q);
+  };
+
+  private commandItems(filter: string): PaletteItem[] {
+    const intent = (label: string, detail: EditorIntent, hint?: string): PaletteItem => ({
+      label,
+      hint,
+      run: () => window.dispatchEvent(new CustomEvent('mnx-palette-intent', { detail }))
+    });
+    const action = (label: string, detail: string, hint?: string): PaletteItem => ({
+      label,
+      hint,
+      run: () => window.dispatchEvent(new CustomEvent('mnx-palette-action', { detail }))
+    });
+    const nav = (label: string, hash: string, hint?: string): PaletteItem => ({
+      label,
+      hint,
+      run: () => (location.hash = hash)
+    });
+
+    const items: PaletteItem[] = [
+      nav('go: attention queue', '#/'),
+      nav('go: objects coverage', objectsHref())
+    ];
+    const entry =
+      this.route.page === 'scenario' ? corpus.find(e => e.id === this.route.id) : undefined;
+    if (entry) {
+      const views = entry.hasTab
+        ? ['notation', 'tab', 'both', 'compare', 'json']
+        : ['notation', 'compare', 'json'];
+      for (const v of views) items.push(nav(`view: ${v}`, scenarioHref(entry.id, v)));
+      items.push(
+        intent('edit: undo', { type: 'undo' }, 'Ctrl+Z'),
+        intent('edit: redo', { type: 'redo' }, 'Ctrl+Y'),
+        intent('edit: add bar', { type: 'appendMeasure' }, 'Shift+M'),
+        intent('edit: toggle tie', { type: 'toggleTie' }, 'T'),
+        action('edit: copy trace', 'copyTrace'),
+        action('edit: revert edits', 'revert'),
+        action('setup: time signature…', 'timeSignaturePopover', 'Shift+T')
+      );
+      if (entry.hasTab) items.push(action('setup: tuning…', 'tuningPopover', 'Shift+U'));
+    }
+    return items.filter(i => i.label.toLowerCase().includes(filter));
+  }
+
+  private goToItems(q: string): PaletteItem[] {
+    const items: PaletteItem[] = [];
+    const bar = /^(\d+)$/.exec(q);
+    if (bar && this.route.page === 'scenario') {
+      const n = Number(bar[1]);
+      if (n >= 1) {
+        items.push({
+          label: `go to bar ${n}`,
+          hint: 'moves the cursor',
+          run: () =>
+            window.dispatchEvent(
+              new CustomEvent('mnx-palette-intent', {
+                detail: { type: 'goToMeasure', measureIndex: n - 1 }
+              })
+            )
+        });
+      }
+    }
+    if (q.toLowerCase().startsWith(DEF_QUERY_PREFIX)) {
+      const def = q.slice(DEF_QUERY_PREFIX.length).trim();
+      if (def) {
+        items.push({
+          label: `objects: ${def}`,
+          hint: 'coverage map + rail filter',
+          run: () => (location.hash = objectsHref(def))
+        });
+      }
+    }
+    for (const e of corpus.filter(e => matchesQuery(e, q)).slice(0, 12)) {
+      items.push({ label: e.meta.title, hint: e.id, run: () => (location.hash = scenarioHref(e.id)) });
+    }
+    return items;
   }
 
   private grouped(): Map<string, ScenarioEntry[]> {
@@ -387,6 +509,13 @@ export class WorkbenchApp extends LitElement {
             ? html`<mnx-objects-page .def=${this.route.def ?? ''}></mnx-objects-page>`
             : html`<mnx-queue-home></mnx-queue-home>`}
       </main>
+      ${this.palette
+        ? html`<mnx-command-palette
+            .provider=${this.paletteItems}
+            .initialQuery=${this.palette === 'commands' ? '> ' : ''}
+            @palette-close=${() => (this.palette = null)}
+          ></mnx-command-palette>`
+        : nothing}
     `;
   }
 }

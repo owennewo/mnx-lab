@@ -34,7 +34,7 @@ export interface ScenarioGroup {
 export const FALLBACK_GROUP = 'Other';
 
 export const SCENARIO_GROUPS: readonly ScenarioGroup[] = [
-  { name: 'Getting started', match: /hello-world|c-major-scale|chord-and-half-rest|minimal-single-note/ },
+  { name: 'Getting started', match: /hello-world|c-major-scale|chord-and-half-rest|minimal-single-note|empty-tab-canvas/ },
   { name: 'Tab', match: /^lab\/tab-/ },
   { name: 'Edge cases & spec gaps', match: /edge-case|mismatch|spec-gap/ },
   { name: 'Pitch & accidentals', match: /accidental|key-signature|ottava/ },

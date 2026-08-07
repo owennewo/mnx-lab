@@ -4,8 +4,31 @@
 // instead, and for editor chrome to funnel through applyOp, so undo/redo,
 // validation and provenance all live in one place. Three ops prove the shape;
 // grow the union as real editing features land.
-import type { MnxStructure, MnxNote } from '../model/mnx.ts';
+import type {
+  MnxEvent,
+  MnxNote,
+  MnxNoteValueBase,
+  MnxSequence,
+  MnxStructure,
+  MnxTuningEntry
+} from '../model/mnx.ts';
+import { isTimedEvent } from '../model/mnx.ts';
+import {
+  addOnsets,
+  forEachKeyedNote,
+  itemSpan,
+  noteKeyOf,
+  onsetLess,
+  onsetsEqual,
+  type Onset
+} from './cursor.ts';
+import { midiOfPitch, tuningOf } from './tabStrings.ts';
 
+// Note addressing: every `noteId(s)` field accepts a note's real `id` OR its
+// synthetic positional key (src/model/noteKeys.ts) — most spec mirrors carry
+// no ids, and the cursor must be able to edit them too. Positional ops
+// (insert/setDuration) address (measureIndex, onset-as-whole-note-fraction)
+// in voice 0 of staff 1 — the entry surface phase 2 defines.
 export type EditOp =
   | {
       /** Shift the selected notes (or every note) by a signed semitone count. */
@@ -14,11 +37,66 @@ export type EditOp =
       noteIds?: string[];
     }
   | {
-      /** Set the tab position of one note (string 1 = highest-pitched, like `_x.mnxLab.tab`). */
+      /** Put one note on (string, fret): sets `_x.mnxLab.tab.position` AND the
+       *  pitch the fingerboard place sounds — the fret is a choice, the pitch
+       *  its consequence (string 1 = highest-pitched, like `_x.mnxLab.tab`). */
       type: 'setFret';
       noteId: string;
       string: number;
       fret: number;
+    }
+  | {
+      /** Insert a note at a metric position in voice 0 (an existing event
+       *  there gains a chord member; a rest there becomes the note; empty
+       *  space gains a new event of `duration`). Pitch derives from
+       *  string+fret against the part's tuning. */
+      type: 'insertNote';
+      measureIndex: number;
+      onset: [number, number];
+      string: number;
+      fret: number;
+      duration: { base: MnxNoteValueBase; dots?: number };
+    }
+  | {
+      /** Remove one note; a now-empty event becomes a rest of the same
+       *  duration, so the measure's grid does not shift under the cursor. */
+      type: 'deleteNote';
+      noteId: string;
+    }
+  | {
+      /** Re-value the voice-0 event at a metric position. */
+      type: 'setDuration';
+      measureIndex: number;
+      onset: [number, number];
+      duration: { base: MnxNoteValueBase; dots?: number };
+    }
+  | {
+      /** Nudge the voice-0 rest at a metric position vertically —
+       *  `rest.staffPosition`, in half-staff-spaces, +up. The §8.11
+       *  polymorphic verb: Alt+↑↓ re-pitches a note, repositions a rest. */
+      type: 'nudgeRest';
+      measureIndex: number;
+      onset: [number, number];
+      delta: number;
+    }
+  | {
+      /** Tie the note to the SAME pitch in the immediately following event
+       *  (same voice, or the next measure's first event); toggles off if the
+       *  note is already tied. Mints a deterministic id on the target when it
+       *  has none — MNX ties point at note ids. */
+      type: 'toggleTie';
+      noteId: string;
+    }
+  | {
+      /** Set the time signature on a global measure (persists until changed). */
+      type: 'setTimeSignature';
+      measureIndex: number;
+      time: { count: number; unit: number };
+    }
+  | {
+      /** Declare the part's string tuning (`_x.mnxLab.tab.tuning`). */
+      type: 'setTuning';
+      tuning: MnxTuningEntry[];
     }
   | {
       /** Append an empty measure to every part and the global timeline. */
@@ -52,6 +130,8 @@ function setPitchFromMidi(note: MnxNote, midi: number): void {
   }
 }
 
+/** Every note of every part/staff — the "no selection" universe, wider than
+ *  the keyed (parts[0], staff-1) universe the cursor can address. */
 function forEachNote(doc: MnxStructure, fn: (note: MnxNote) => void): void {
   for (const part of doc.parts ?? []) {
     for (const measure of part.measures ?? []) {
@@ -68,33 +148,361 @@ function forEachNote(doc: MnxStructure, fn: (note: MnxNote) => void): void {
 export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
   const next = JSON.parse(JSON.stringify(doc)) as MnxStructure;
   switch (op.type) {
-    case 'transposeSelection':
-      forEachNote(next, note => {
-        if (op.noteIds && op.noteIds.length > 0 && !op.noteIds.includes(note.id ?? '')) return;
+    case 'transposeSelection': {
+      if (!op.noteIds || op.noteIds.length === 0) {
+        forEachNote(next, note => setPitchFromMidi(note, midiOf(note) + op.semitones));
+        return next;
+      }
+      forEachKeyedNote(next, (note, key) => {
+        if (!op.noteIds!.includes(key)) return;
         setPitchFromMidi(note, midiOf(note) + op.semitones);
       });
       return next;
-    case 'setFret':
-      forEachNote(next, note => {
-        if (note.id !== op.noteId) return;
+    }
+    case 'setFret': {
+      const midi = fingerboardMidi(next, op.string, op.fret);
+      forEachKeyedNote(next, (note, key) => {
+        if (key !== op.noteId) return;
         const x = ((note._x ??= {}).mnxLab ??= {});
         x.tab = { ...x.tab, position: { string: op.string, fret: op.fret } };
+        if (midi !== undefined) setPitchFromMidi(note, midi);
       });
       return next;
+    }
+    case 'insertNote': {
+      const seq = entrySequence(next, op.measureIndex);
+      if (!seq) return next;
+      const midi = fingerboardMidi(next, op.string, op.fret);
+      if (midi === undefined) return next;
+      const note: MnxNote = { pitch: { step: 'C', octave: 4 } };
+      setPitchFromMidi(note, midi);
+      note._x = { mnxLab: { tab: { position: { string: op.string, fret: op.fret } } } };
+
+      const target: Onset = { num: op.onset[0], den: op.onset[1] };
+      const found = eventAtOnset(seq, target);
+      if (found?.event) {
+        const event = found.event;
+        if (event.rest) {
+          delete event.rest;
+          event.notes = [note];
+          return next;
+        }
+        event.notes ??= [];
+        // One string, one note: re-entering an occupied string replaces it.
+        const existing = event.notes.findIndex(
+          n => n._x?.mnxLab?.tab?.position?.string === op.string
+        );
+        if (existing >= 0) event.notes.splice(existing, 1, note);
+        else event.notes.push(note);
+        return next;
+      }
+      if (found) {
+        seq.content.splice(found.index, 0, { duration: { ...op.duration }, notes: [note] });
+        // The §8.11 invariant: a touched measure always has content for its
+        // full metric duration, so unentered positions are already rests.
+        padMeasureRests(next, op.measureIndex);
+      }
+      return next;
+    }
+    case 'deleteNote': {
+      forEachEventNote(next, (event, note, key) => {
+        if (key !== op.noteId) return;
+        event.notes!.splice(event.notes!.indexOf(note), 1);
+        if (event.notes!.length === 0) {
+          delete event.notes;
+          event.rest = {};
+        }
+      });
+      return next;
+    }
+    case 'setDuration': {
+      const seq = entrySequence(next, op.measureIndex);
+      if (!seq) return next;
+      const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
+      if (found?.event) {
+        found.event.duration = { ...op.duration };
+        // Shrinking opens a gap at the end (later events slide earlier) —
+        // pad it; growing eats trailing rests instead.
+        padMeasureRests(next, op.measureIndex);
+      }
+      return next;
+    }
+    case 'nudgeRest': {
+      const seq = entrySequence(next, op.measureIndex);
+      if (!seq) return next;
+      const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
+      if (found?.event?.rest) {
+        const position = (found.event.rest.staffPosition ?? 0) + op.delta;
+        found.event.rest = { ...found.event.rest, staffPosition: position };
+      }
+      return next;
+    }
+    case 'toggleTie': {
+      const located = findKeyedNote(next, op.noteId);
+      if (!located) return next;
+      const { note } = located;
+      if (note.ties && note.ties.length > 0) {
+        delete note.ties;
+        return next;
+      }
+      const target = tieTarget(next, located);
+      if (!target) return next;
+      target.id ??= mintNoteId(next);
+      note.ties = [{ target: target.id }];
+      return next;
+    }
+    case 'setTimeSignature': {
+      const measure = next.global.measures[op.measureIndex];
+      if (!measure) return next;
+      measure.time = { ...op.time };
+      // The signature persists until the next explicit one — re-establish the
+      // full-bar invariant for every measure it now governs.
+      for (let i = op.measureIndex; i < next.global.measures.length; i++) {
+        if (i > op.measureIndex && next.global.measures[i].time) break;
+        padMeasureRests(next, i);
+      }
+      return next;
+    }
+    case 'setTuning': {
+      const part = next.parts[0];
+      if (!part) return next;
+      const x = ((part._x ??= {}).mnxLab ??= {});
+      x.tab = { ...x.tab, tuning: op.tuning.map(t => ({ string: t.string, pitch: { ...t.pitch } })) };
+      return next;
+    }
     case 'appendMeasure': {
       next.global.measures.push({});
       for (const part of next.parts ?? []) {
         part.measures?.push({ sequences: [{ content: [] }] });
       }
+      // New bars arrive pre-filled with beat rests (§8.11: unentered
+      // positions ARE rests; the cursor walks them, digits convert them).
+      padMeasureRests(next, next.global.measures.length - 1);
       return next;
     }
   }
 }
 
-/** Minimal undo/redo over applyOp — the history contract the UI will consume. */
+/** Beat-value bases by time-signature unit (and the greedy pad ladder). */
+const BASE_BY_UNIT: Record<number, MnxNoteValueBase> = {
+  1: 'whole',
+  2: 'half',
+  4: 'quarter',
+  8: 'eighth',
+  16: '16th',
+  32: '32nd',
+  64: '64th'
+};
+
+const PAD_LADDER: { base: MnxNoteValueBase; span: Onset }[] = (
+  [
+    ['whole', 1, 1],
+    ['half', 1, 2],
+    ['quarter', 1, 4],
+    ['eighth', 1, 8],
+    ['16th', 1, 16],
+    ['32nd', 1, 32],
+    ['64th', 1, 64]
+  ] as [MnxNoteValueBase, number, number][]
+).map(([base, num, den]) => ({ base, span: { num, den } }));
+
+/** The meter governing a measure: metric span + the beat value for padding.
+ *  MNX time signatures persist until changed; 4/4 before the first one. */
+function meterOf(doc: MnxStructure, measureIndex: number): { span: Onset; beatBase: MnxNoteValueBase } {
+  let time = { count: 4, unit: 4 };
+  for (let i = 0; i <= measureIndex && i < doc.global.measures.length; i++) {
+    const t = doc.global.measures[i].time;
+    if (t) time = t;
+  }
+  return {
+    span: { num: time.count, den: time.unit },
+    beatBase: BASE_BY_UNIT[time.unit] ?? 'quarter'
+  };
+}
+
+function voiceFill(seq: MnxSequence): Onset {
+  let onset: Onset = { num: 0, den: 1 };
+  for (const item of seq.content) onset = addOnsets(onset, itemSpan(item));
+  return onset;
+}
+
+function subtractOnsets(a: Onset, b: Onset): Onset {
+  return addOnsets(a, { num: -b.num, den: b.den });
+}
+
+/**
+ * The §8.11 full-bar invariant for a touched measure: voice 0 always sums to
+ * the measure's metric span. Underfull → append beat rests (then smaller
+ * values for any tail); overfull → consume trailing RESTS only (real notes
+ * are never deleted — a still-overfull bar stays overfull and the renderer's
+ * duration-mismatch badge says so).
+ */
+function padMeasureRests(doc: MnxStructure, measureIndex: number): void {
+  const seq = entrySequence(doc, measureIndex);
+  if (!seq || seq.fullMeasure) return; // a full-measure rest is already full
+  const { span, beatBase } = meterOf(doc, measureIndex);
+  const beat = PAD_LADDER.find(l => l.base === beatBase)?.span ?? { num: 1, den: 4 };
+
+  // Overfull: pop trailing rests while they help.
+  while (onsetLess(span, voiceFill(seq))) {
+    const last = seq.content[seq.content.length - 1];
+    if (!last || !isTimedEvent(last) || !last.rest) break;
+    seq.content.pop();
+  }
+
+  // Underfull: beat rests first, then the greedy tail.
+  let remainder = subtractOnsets(span, voiceFill(seq));
+  while (!onsetLess(remainder, beat) && remainder.num > 0) {
+    seq.content.push({ duration: { base: beatBase }, rest: {} });
+    remainder = subtractOnsets(remainder, beat);
+  }
+  while (remainder.num > 0) {
+    const fit = PAD_LADDER.find(l => !onsetLess(remainder, l.span));
+    if (!fit) break; // a sliver finer than the ladder: leave it (badge shows it)
+    seq.content.push({ duration: { base: fit.base }, rest: {} });
+    remainder = subtractOnsets(remainder, fit.span);
+  }
+}
+
+interface LocatedNote {
+  seq: MnxSequence;
+  measureIndex: number;
+  voiceIndex: number;
+  eventIndex: number;
+  note: MnxNote;
+}
+
+function findKeyedNote(doc: MnxStructure, key: string): LocatedNote | null {
+  const measures = doc.parts[0]?.measures ?? [];
+  for (let measureIndex = 0; measureIndex < measures.length; measureIndex++) {
+    const sequences = (measures[measureIndex].sequences ?? []).filter(s => (s.staff ?? 1) === 1);
+    for (let voiceIndex = 0; voiceIndex < sequences.length; voiceIndex++) {
+      const seq = sequences[voiceIndex];
+      for (let eventIndex = 0; eventIndex < seq.content.length; eventIndex++) {
+        const item = seq.content[eventIndex];
+        if (!isTimedEvent(item)) continue;
+        const notes = item.notes ?? [];
+        for (let noteIndex = 0; noteIndex < notes.length; noteIndex++) {
+          if (noteKeyOf(notes[noteIndex], measureIndex, voiceIndex, eventIndex, noteIndex) === key) {
+            return { seq, measureIndex, voiceIndex, eventIndex, note: notes[noteIndex] };
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function samePitch(a: MnxNote, b: MnxNote): boolean {
+  return (
+    a.pitch.step === b.pitch.step &&
+    a.pitch.octave === b.pitch.octave &&
+    (a.pitch.alter ?? 0) === (b.pitch.alter ?? 0)
+  );
+}
+
+/** The same pitch in the immediately following timed event — this voice's
+ *  next event, else the next measure's same-voice first event. */
+function tieTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined {
+  for (let i = located.eventIndex + 1; i < located.seq.content.length; i++) {
+    const item = located.seq.content[i];
+    if (!isTimedEvent(item)) continue;
+    return (item.notes ?? []).find(n => samePitch(n, located.note));
+  }
+  const nextMeasure = doc.parts[0]?.measures?.[located.measureIndex + 1];
+  const seq = (nextMeasure?.sequences ?? []).filter(s => (s.staff ?? 1) === 1)[located.voiceIndex];
+  for (const item of seq?.content ?? []) {
+    if (!isTimedEvent(item)) continue;
+    return (item.notes ?? []).find(n => samePitch(n, located.note));
+  }
+  return undefined;
+}
+
+/** A fresh deterministic note id: t1, t2, … skipping anything taken. */
+function mintNoteId(doc: MnxStructure): string {
+  const taken = new Set<string>();
+  for (const part of doc.parts ?? []) {
+    for (const measure of part.measures ?? []) {
+      for (const seq of measure.sequences ?? []) {
+        for (const item of seq.content ?? []) {
+          for (const note of (item as { notes?: MnxNote[] }).notes ?? []) {
+            if (note.id) taken.add(note.id);
+          }
+        }
+      }
+    }
+  }
+  for (let i = 1; ; i++) {
+    if (!taken.has(`t${i}`)) return `t${i}`;
+  }
+}
+
+/** What (string, fret) sounds under the part's (or standard) tuning. */
+function fingerboardMidi(doc: MnxStructure, string: number, fret: number): number | undefined {
+  const open = tuningOf(doc.parts[0]).find(t => t.string === string);
+  return open ? midiOfPitch(open.pitch) + fret : undefined;
+}
+
+/** Voice 0 of staff 1 in a part-0 measure — the entry surface. Created on
+ *  demand so entry works in measures that never had a sequence. */
+function entrySequence(doc: MnxStructure, measureIndex: number): MnxSequence | undefined {
+  const measure = doc.parts[0]?.measures?.[measureIndex];
+  if (!measure) return undefined;
+  measure.sequences ??= [];
+  const existing = measure.sequences.filter(s => (s.staff ?? 1) === 1)[0];
+  if (existing) return existing;
+  const created: MnxSequence = { content: [] };
+  measure.sequences.push(created);
+  return created;
+}
+
+/** The timed event starting exactly at `target`, or (event: undefined) with
+ *  the content index where a new event at `target` belongs. Returns undefined
+ *  when `target` falls INSIDE an item's span — phase 2 does not split events. */
+function eventAtOnset(
+  seq: MnxSequence,
+  target: Onset
+): { event?: MnxEvent; index: number } | undefined {
+  let onset: Onset = { num: 0, den: 1 };
+  for (let index = 0; index < seq.content.length; index++) {
+    const item = seq.content[index];
+    if (onsetsEqual(onset, target)) {
+      return isTimedEvent(item) ? { event: item, index } : { index };
+    }
+    onset = addOnsets(onset, itemSpan(item));
+    if (onsetLess(target, onset)) return undefined; // inside the item just passed
+  }
+  return onsetsEqual(onset, target) ? { index: seq.content.length } : undefined;
+}
+
+/** Like forEachKeyedNote but with the owning event, for structural edits. */
+function forEachEventNote(
+  doc: MnxStructure,
+  fn: (event: MnxEvent, note: MnxNote, key: string) => void
+): void {
+  (doc.parts[0]?.measures ?? []).forEach((measure, measureIndex) => {
+    (measure.sequences ?? [])
+      .filter(s => (s.staff ?? 1) === 1)
+      .forEach((sequence, voiceIndex) => {
+        sequence.content.forEach((item, eventIndex) => {
+          if (!isTimedEvent(item)) return;
+          for (const [noteIndex, note] of [...(item.notes ?? []).entries()]) {
+            fn(item, note, noteKeyOf(note, measureIndex, voiceIndex, eventIndex, noteIndex));
+          }
+        });
+      });
+  });
+}
+
+/**
+ * Undo/redo over applyOp. The history RETAINS the ops it applied — undo
+ * history, trace recording, and (later) the AI loop's EditOp[] output are
+ * three consumers of one log (roadmap/proposed/editor-input-layer.md).
+ * Snapshots ride along for O(1) undo; the op log is the durable artifact.
+ */
 export class EditHistory {
-  private past: MnxStructure[] = [];
-  private future: MnxStructure[] = [];
+  private past: { op: EditOp; before: MnxStructure }[] = [];
+  private future: { op: EditOp; after: MnxStructure }[] = [];
 
   constructor(private present: MnxStructure) {}
 
@@ -102,27 +510,40 @@ export class EditHistory {
     return this.present;
   }
 
+  /** The ops currently in effect, oldest first. */
+  get appliedOps(): EditOp[] {
+    return this.past.map(entry => entry.op);
+  }
+
+  get canUndo(): boolean {
+    return this.past.length > 0;
+  }
+
+  get canRedo(): boolean {
+    return this.future.length > 0;
+  }
+
   apply(op: EditOp): MnxStructure {
-    this.past.push(this.present);
+    this.past.push({ op, before: this.present });
     this.present = applyOp(this.present, op);
     this.future = [];
     return this.present;
   }
 
   undo(): MnxStructure {
-    const prev = this.past.pop();
-    if (prev) {
-      this.future.push(this.present);
-      this.present = prev;
+    const entry = this.past.pop();
+    if (entry) {
+      this.future.push({ op: entry.op, after: this.present });
+      this.present = entry.before;
     }
     return this.present;
   }
 
   redo(): MnxStructure {
-    const next = this.future.pop();
-    if (next) {
-      this.past.push(this.present);
-      this.present = next;
+    const entry = this.future.pop();
+    if (entry) {
+      this.past.push({ op: entry.op, before: this.present });
+      this.present = entry.after;
     }
     return this.present;
   }

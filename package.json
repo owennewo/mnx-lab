@@ -30,6 +30,7 @@
     "check:boundaries": "depcruise src worker harness --config .dependency-cruiser.cjs",
     "sync:spec": "node spec/tools/sync-spec-examples.mjs",
     "update:primitives": "UPDATE_PRIMITIVES=1 vitest run harness/conformance/primitives.test.ts",
+    "update:edit-traces": "UPDATE_EDIT_TRACES=1 vitest run harness/conformance/edit-traces.test.ts",
     "verify:scenarios": "node harness/verify/verify-scenarios.mjs",
     "test": "vitest run",
     "deploy": "npm run build && wrangler deploy"

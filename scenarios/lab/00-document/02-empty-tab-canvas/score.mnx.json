@@ -1,0 +1,32 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {}
+    ]
+  },
+  "parts": [
+    {
+      "id": "guitar",
+      "name": "Guitar",
+      "_x": {
+        "mnxLab": {
+          "tab": {
+            "staffKind": "both"
+          }
+        }
+      },
+      "measures": [
+        {
+          "sequences": [
+            {
+              "content": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

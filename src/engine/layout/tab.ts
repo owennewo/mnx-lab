@@ -192,13 +192,15 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
           );
           const primaryNoteId = noteIds[0];
 
-          const isActive = noteIds.some(id => activeNoteIds.includes(id));
-          const isSelected = noteIds.some(id => selectedNoteIds.includes(id));
-          const fretFill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : undefined;
-
           for (let k = 0; k < positions.length; k++) {
             const pos = positions[k];
             const noteId = noteIds[k] ?? primaryNoteId;
+
+            // Per NOTE, not per event: the editor's cursor is one note of a
+            // chord, and highlighting the whole event would erase it.
+            const isActive = activeNoteIds.includes(noteId);
+            const isSelected = selectedNoteIds.includes(noteId);
+            const fretFill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : undefined;
 
             const fretSlot = `${Math.round(eventX * 1e4)}:${pos.str}:${pos.fret}`;
             if (drawnFrets.has(fretSlot)) continue;

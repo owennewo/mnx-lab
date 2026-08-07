@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { applyOp, EditHistory } from '../../src/edit/ops.ts';
+import { syntheticNoteKey } from '../../src/model/noteKeys.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 
 const doc = (): MnxStructure =>
@@ -32,10 +33,13 @@ describe('edit ops placeholder', () => {
     expect(firstNote(up).pitch.octave).toBe(firstNote(original).pitch.octave + 1);
   });
 
-  it('sets a tab position under _x.mnxLab', () => {
+  it('sets a tab position under _x.mnxLab, addressing an id-less note by its synthetic key', () => {
     const original = doc();
-    const id = firstNote(original).id!;
-    const next = applyOp(original, { type: 'setFret', noteId: id, string: 2, fret: 5 });
+    // The minimal scenario's note has no id — ops accept the positional key
+    // the layouts synthesize (src/model/noteKeys.ts), so spec mirrors are
+    // editable too.
+    const key = syntheticNoteKey(0, 0, 0, 0);
+    const next = applyOp(original, { type: 'setFret', noteId: key, string: 2, fret: 5 });
     expect(firstNote(next)._x.mnxLab.tab.position).toEqual({ string: 2, fret: 5 });
   });
 
@@ -56,5 +60,16 @@ describe('edit ops placeholder', () => {
     expect(edited).not.toBe(start);
     expect(JSON.stringify(history.undo())).toBe(start);
     expect(JSON.stringify(history.redo())).toBe(edited);
+  });
+
+  it('history retains the op log — undo shrinks it, redo regrows it', () => {
+    const history = new EditHistory(doc());
+    history.apply({ type: 'transposeSelection', semitones: 2 });
+    history.apply({ type: 'appendMeasure' });
+    expect(history.appliedOps.map(op => op.type)).toEqual(['transposeSelection', 'appendMeasure']);
+    history.undo();
+    expect(history.appliedOps.map(op => op.type)).toEqual(['transposeSelection']);
+    history.redo();
+    expect(history.appliedOps.map(op => op.type)).toEqual(['transposeSelection', 'appendMeasure']);
   });
 });

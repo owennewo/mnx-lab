@@ -3222,11 +3222,25 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   // Pitch → staff y for each chord member
   const staffYs = notes.map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
 
-  // Highlight color (whole event highlights if any member is active/selected)
+  // Event-level highlight for the geometry chord members share (ledger
+  // lines, stem); noteheads and accidentals color per NOTE below, so the
+  // editor's one-note cursor stays visible inside a chord.
   const isActive = noteIds.some(id => id !== undefined && activeNoteIds.includes(id));
   const isSelected = noteIds.some(id => id !== undefined && selectedNoteIds.includes(id));
   const fill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : undefined;
   const colorClass = isActive ? ' active' : isSelected ? ' selected' : '';
+  const noteFill = (idx: number): string | undefined => {
+    const id = noteIds[idx];
+    if (id === undefined) return undefined;
+    return activeNoteIds.includes(id) ? ACTIVE_COLOR
+      : selectedNoteIds.includes(id) ? SELECTED_COLOR
+      : undefined;
+  };
+  const noteColorClass = (idx: number): string => {
+    const id = noteIds[idx];
+    if (id === undefined) return '';
+    return activeNoteIds.includes(id) ? ' active' : selectedNoteIds.includes(id) ? ' selected' : '';
+  };
 
   // Stem direction — a beam run's shared direction trumps everything.
   const eventStemDir = (event as { stemDirection?: 'up' | 'down' }).stemDirection;
@@ -3271,7 +3285,8 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   const accidentalEntries = notes
     .map((n, idx) => ({
       glyph: noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths),
-      staffY: staffYs[idx]
+      staffY: staffYs[idx],
+      noteIdx: idx
     }))
     .filter(e => e.glyph);
   const accidentalsToLeft = accidentalEntries.length;
@@ -3282,8 +3297,8 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       glyph: acc.glyph!,
       x: eventX - NOTEHEAD_WIDTH_SP / 2 - offset,
       y: staffTop + acc.staffY,
-      fill,
-      className: 'accidental' + colorClass
+      fill: noteFill(acc.noteIdx),
+      className: 'accidental' + noteColorClass(acc.noteIdx)
     });
   });
 
@@ -3295,8 +3310,8 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       glyph: noteheadGlyph,
       x: eventX - headW / 2,
       y,
-      fill,
-      className: 'notehead' + colorClass,
+      fill: noteFill(idx),
+      className: 'notehead' + noteColorClass(idx),
       sourceId: noteIds[idx]
     });
   });
