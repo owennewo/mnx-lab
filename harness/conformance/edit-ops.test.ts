@@ -40,7 +40,7 @@ describe('edit ops placeholder', () => {
     // editable too.
     const key = syntheticNoteKey(0, 0, 0, 0);
     const next = applyOp(original, { type: 'setFret', noteId: key, string: 2, fret: 5 });
-    expect(firstNote(next)._x.mnxLab.tab.position).toEqual({ string: 2, fret: 5 });
+    expect(firstNote(next)._x.mnxLab).toMatchObject({ string: 2, fret: 5 });
   });
 
   it('appends a measure to global and every part in lock-step', () => {

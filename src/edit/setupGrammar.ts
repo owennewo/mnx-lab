@@ -47,7 +47,7 @@ function parsePitchToken(token: string): MnxPitch | null {
  * A preset name ("standard", "drop-d", "dadgad", "open-g") or a pitch list
  * recited LOW string first ("D2 A2 D3 G3 A3 D4" — the order players say
  * tunings in), any string count 3–12. Returns entries numbered per
- * `_x.mnxLab.tab`: string 1 = highest-pitched (the last token).
+ * `_x.mnxLab`: string 1 = highest-pitched (the last token).
  */
 export function parseTuning(text: string): MnxTuningEntry[] | null {
   const trimmed = text.trim().toLowerCase();

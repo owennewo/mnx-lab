@@ -305,10 +305,10 @@ export class Aligner {
           // happens on one string, and with chords the immediately following
           // note is often a chord member on a different one. Fall back to the
           // next note when the source carries no positions.
-          const string = note._x?.mnxLab?.tab?.position?.string;
+          const string = note._x?.mnxLab?.string;
           const next =
             (string !== undefined
-              ? notes.slice(index + 1).find(n => n._x?.mnxLab?.tab?.position?.string === string)
+              ? notes.slice(index + 1).find(n => n._x?.mnxLab?.string === string)
               : undefined) ?? notes[index + 1];
 
           for (const kind of ['hammerOn', 'pullOff'] as const) {
@@ -580,7 +580,7 @@ export class Aligner {
           const lines = getChildInt(staffDetailsEl, 'staff-lines');
           if (lines !== null) state.staffLines = lines;
 
-          // A capo raises every string; `_x.mnxLab.tab` fret numbers are measured from
+          // A capo raises every string; `_x.mnxLab` fret numbers are measured from
           // it, so losing it detunes the whole part (Sun-did-glide is capo 4 —
           // a major third).
           const capo = getChildInt(staffDetailsEl, 'capo');
@@ -746,22 +746,22 @@ export class Aligner {
     this.resolveEndings(globalMeasures);
     this.resolveHarmonies(globalMeasures);
 
-    const tabPartExtension: any = {};
+    const labExtension: any = {};
     if (state.tuning) {
       // state.tuning is indexed by MusicXML staff-tuning line (line 1 = bottom
       // visual line = lowest-pitched string). Convert to explicit string
       // numbers: string 1 = highest-pitched string.
       const numStrings = state.tuning.length;
-      tabPartExtension.tuning = state.tuning.map((pitch, idx) => ({
+      labExtension.strings = state.tuning.map((pitch, idx) => ({
         string: numStrings - idx,
         pitch
       }));
     }
     if (state.capo > 0) {
-      tabPartExtension.capo = state.capo;
+      labExtension.capo = state.capo;
     }
     if (state.clefSign === 'TAB') {
-      tabPartExtension.staffKind = 'tab';
+      labExtension.tab = { staffKind: 'tab' };
     }
 
     // Build W3C MNX transposition metadata block (top-level on the part, not in _x)
@@ -781,8 +781,8 @@ export class Aligner {
       name: partName,
       measures,
       ...transpositionBlock,
-      ...(Object.keys(tabPartExtension).length > 0
-        ? { _x: { mnxLab: { tab: tabPartExtension } } }
+      ...(Object.keys(labExtension).length > 0
+        ? { _x: { mnxLab: labExtension } }
         : {})
     };
   }
@@ -944,10 +944,10 @@ export class Aligner {
               ? {
                   _x: {
                     mnxLab: {
-                      tab: {
-                        ...(tabPosition ? { position: tabPosition } : {}),
-                        ...(technique ? { technique } : {})
-                      }
+                      ...(tabPosition
+                        ? { string: tabPosition.string, fret: tabPosition.fret }
+                        : {}),
+                      ...(technique ? { tab: { technique } } : {})
                     }
                   }
                 }
@@ -1117,15 +1117,13 @@ export class Aligner {
       ...(standardPart.transposition ? { transposition: standardPart.transposition } : {}),
       _x: {
         mnxLab: {
-          tab: {
-            ...(tabPart._x?.mnxLab?.tab?.tuning
-              ? { tuning: tabPart._x.mnxLab.tab.tuning }
-              : {}),
-            ...(tabPart._x?.mnxLab?.tab?.capo !== undefined
-              ? { capo: tabPart._x.mnxLab.tab.capo }
-              : {}),
-            staffKind: 'both'
-          }
+          ...(tabPart._x?.mnxLab?.strings
+            ? { strings: tabPart._x.mnxLab.strings }
+            : {}),
+          ...(tabPart._x?.mnxLab?.capo !== undefined
+            ? { capo: tabPart._x.mnxLab.capo }
+            : {}),
+          tab: { staffKind: 'both' }
         }
       }
     };
@@ -1170,15 +1168,16 @@ export class Aligner {
               // AND technique: the exporter writes them on the TAB staff only
               // (the treble staff stays clean), so the standard note this merge
               // keeps is the one that has neither.
-              const tabData = tabNote._x?.mnxLab?.tab;
-              if (tabData?.position || tabData?.technique) {
+              const tabLab = tabNote._x?.mnxLab;
+              if (tabLab?.string !== undefined || tabLab?.tab?.technique) {
                 stdNote._x = {
                   mnxLab: {
-                    tab: {
-                      ...stdNote._x?.mnxLab?.tab,
-                      ...(tabData.position ? { position: tabData.position } : {}),
-                      ...(tabData.technique ? { technique: tabData.technique } : {})
-                    }
+                    ...stdNote._x?.mnxLab,
+                    ...(tabLab.string !== undefined ? { string: tabLab.string } : {}),
+                    ...(tabLab.fret !== undefined ? { fret: tabLab.fret } : {}),
+                    ...(tabLab.tab?.technique
+                      ? { tab: { technique: tabLab.tab.technique } }
+                      : {})
                   }
                 };
               }

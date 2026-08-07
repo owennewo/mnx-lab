@@ -50,12 +50,8 @@
                       },
                       "_x": {
                         "mnxLab": {
-                          "tab": {
-                            "position": {
-                              "string": 6,
-                              "fret": 0
-                            }
-                          }
+                          "string": 6,
+                          "fret": 0
                         }
                       }
                     },
@@ -67,12 +63,8 @@
                       },
                       "_x": {
                         "mnxLab": {
-                          "tab": {
-                            "position": {
-                              "string": 5,
-                              "fret": 0
-                            }
-                          }
+                          "string": 5,
+                          "fret": 0
                         }
                       }
                     },
@@ -84,12 +76,8 @@
                       },
                       "_x": {
                         "mnxLab": {
-                          "tab": {
-                            "position": {
-                              "string": 4,
-                              "fret": 0
-                            }
-                          }
+                          "string": 4,
+                          "fret": 0
                         }
                       }
                     },
@@ -101,12 +89,8 @@
                       },
                       "_x": {
                         "mnxLab": {
-                          "tab": {
-                            "position": {
-                              "string": 3,
-                              "fret": 0
-                            }
-                          }
+                          "string": 3,
+                          "fret": 0
                         }
                       }
                     },
@@ -118,12 +102,8 @@
                       },
                       "_x": {
                         "mnxLab": {
-                          "tab": {
-                            "position": {
-                              "string": 2,
-                              "fret": 0
-                            }
-                          }
+                          "string": 2,
+                          "fret": 0
                         }
                       }
                     },
@@ -135,12 +115,8 @@
                       },
                       "_x": {
                         "mnxLab": {
-                          "tab": {
-                            "position": {
-                              "string": 1,
-                              "fret": 0
-                            }
-                          }
+                          "string": 1,
+                          "fret": 0
                         }
                       }
                     }

@@ -1,0 +1,78 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "guitar",
+      "name": "Guitar",
+      "_x": {
+        "mnxLab": {
+          "tab": {
+            "staffKind": "both"
+          }
+        }
+      },
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2,
+                "octave": -1
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 2
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 3
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "string": 1
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

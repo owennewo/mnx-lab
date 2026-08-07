@@ -50,12 +50,12 @@ function rows(mnx: MnxStructure): Row[] {
             continue;
           }
           for (const note of item.notes) {
-            const position = note._x?.mnxLab?.tab?.position;
+            const x = note._x?.mnxLab;
             out.push({
               ...common,
               midi: pitchToMidi(note.pitch),
-              string: position?.string,
-              fret: position?.fret
+              string: x?.string,
+              fret: x?.fret
             });
           }
         }
@@ -65,7 +65,7 @@ function rows(mnx: MnxStructure): Row[] {
   return out;
 }
 
-/** Tuning keyed by string number — `_x.mnxLab.tab` says array order carries no meaning. */
+/** Tuning keyed by string number — `_x.mnxLab.strings` says array order carries no meaning. */
 function tuningByString(entries: MnxTuningEntry[] | undefined): Record<number, number> {
   const map: Record<number, number> = {};
   for (const entry of entries ?? []) map[entry.string] = pitchToMidi(entry.pitch);
@@ -123,18 +123,18 @@ describe.each(FIXTURES)('MNX -> Guitar Pro -> MNX: %s', name => {
 
   it('preserves tuning exactly, including non-standard tunings', async () => {
     const { original, back } = await roundTrip();
-    const before = tuningByString(original.parts[0]._x?.mnxLab?.tab?.tuning);
-    const after = tuningByString(back.parts[0]._x?.mnxLab?.tab?.tuning);
+    const before = tuningByString(original.parts[0]._x?.mnxLab?.strings);
+    const after = tuningByString(back.parts[0]._x?.mnxLab?.strings);
     expect(Object.keys(after).length).toBeGreaterThan(0);
     expect(after).toEqual(before);
   });
 
   it('keeps sounding pitch consistent with tuning + capo + fret', async () => {
     const { back } = await roundTrip();
-    const tuning = tuningByString(back.parts[0]._x?.mnxLab?.tab?.tuning);
-    // `_x.mnxLab.tab` frets are measured FROM the capo, so it belongs in the identity.
+    const tuning = tuningByString(back.parts[0]._x?.mnxLab?.strings);
+    // `_x.mnxLab` frets are measured FROM the capo, so it belongs in the identity.
     // Sun-did-glide is capo 4 — omitting it reads as a major third of error.
-    const capo = back.parts[0]._x?.mnxLab?.tab?.capo ?? 0;
+    const capo = back.parts[0]._x?.mnxLab?.capo ?? 0;
     let checked = 0;
     for (const row of rows(back)) {
       if (row.midi === 'REST' || row.string === undefined) continue;
@@ -221,7 +221,7 @@ describe('string numbering', () => {
       await fs.readFile(path.join(SCORES, 'Sun-did-glide.mnx.json'), 'utf-8')
     );
     const back = importGuitarPro(exportGuitarPro(original));
-    const tuning = tuningByString(back.parts[0]._x?.mnxLab?.tab?.tuning);
+    const tuning = tuningByString(back.parts[0]._x?.mnxLab?.strings);
 
     expect(tuning[1]).toBe(64); // string 1 = E4, the HIGHEST string
     expect(tuning[2]).toBe(57); // string 2 = A3 (non-standard; B3 would be 59)
@@ -313,7 +313,7 @@ describe('lyrics', () => {
                     {
                       duration: { base: 'whole' },
                       lyrics: { lines: { '1': { text: 'two words', type: 'whole' } } },
-                      notes: [{ pitch: { step: 'E', octave: 4 }, _x: { mnxLab: { tab: { position: { string: 1, fret: 0 } } } } }]
+                      notes: [{ pitch: { step: 'E', octave: 4 }, _x: { mnxLab: { string: 1, fret: 0 } } }]
                     }
                   ]
                 }
@@ -361,10 +361,10 @@ describe('same-string unisons', () => {
           for (const item of sequence.content ?? []) {
             if (!isTimedEvent(item)) break;
             for (const note of item.notes ?? []) {
-              const position = note._x?.mnxLab?.tab?.position;
-              if (!position) continue;
-              const key = `${Math.round(onset * 1e6)}:${position.string}`;
-              at.set(key, [...(at.get(key) ?? []), position.fret]);
+              const x = note._x?.mnxLab;
+              if (x?.string === undefined || x?.fret === undefined) continue;
+              const key = `${Math.round(onset * 1e6)}:${x.string}`;
+              at.set(key, [...(at.get(key) ?? []), x.fret]);
             }
             onset +=
               (WHOLES[item.duration.base] ?? 0) * (2 - Math.pow(2, -(item.duration.dots ?? 0)));
@@ -435,7 +435,7 @@ describe('same-string unisons', () => {
                     notes: [
                       {
                         pitch: { step: 'F' as const, octave: 2, ...(fret === 5 ? { alter: 1 } : {}) },
-                        _x: { mnxLab: { tab: { position: { string: 6, fret } } } }
+                        _x: { mnxLab: { string: 6, fret } }
                       }
                     ]
                   }

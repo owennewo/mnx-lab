@@ -3,7 +3,7 @@ import { MnxPitch, MnxStep, MnxTuningEntry } from './types.js';
 /**
  * STRING NUMBERING — the single easiest thing to get silently wrong.
  *
- *   MNX `_x.mnxLab.tab.position.string`: 1 = HIGHEST-pitched string (E4 on a guitar).
+ *   MNX `_x.mnxLab.string`: 1 = HIGHEST-pitched string (E4 on a guitar).
  *   alphaTab / Guitar Pro `note.string`: 1 = LOWEST-pitched string (E2).
  *
  * They run in opposite directions, so every crossing needs an inversion.
@@ -82,7 +82,7 @@ export function alphaTabTuningToMnx(tunings: number[], fifths = 0): MnxTuningEnt
  * Sounding pitch of a fingerboard position, from an MNX tuning.
  * `mnxString` is 1 = highest.
  *
- * A capo raises every string, and `_x.mnxLab.tab` fret numbers are measured FROM the
+ * A capo raises every string, and `_x.mnxLab` fret numbers are measured FROM the
  * capo (`docs/mnx-extensions.md`), so the full relation is
  * `sounding = openString + capo + fret`. Leaving the capo out silently detunes
  * a whole score — Sun-did-glide is capo 4, i.e. a major third.
@@ -98,7 +98,7 @@ export function positionToMidi(
 }
 
 /**
- * Chooses a playable string/fret for a pitch that carries no `_x.mnxLab.tab.position`.
+ * Chooses a playable string/fret for a pitch that carries no flat `_x.mnxLab` string/fret.
  * Mirrors the app's "lowest reasonable position" heuristic
  * ([src/tab/guitarPositions.ts]): prefer the highest-numbered (lowest-pitched)
  * string that can reach the note within `maxFret`, which keeps the hand low on

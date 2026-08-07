@@ -99,13 +99,13 @@ function planUnisonCollapse(
     for (const item of sequence.content ?? []) {
       if (!isTimedEvent(item)) return; // timing unknowable from here on
       for (const note of item.notes ?? []) {
-        const position = note._x?.mnxLab?.tab?.position;
-        if (position) {
-          const key = `${Math.round(onset * 1e6)}:${position.string}`;
+        const x = note._x?.mnxLab;
+        if (x?.string !== undefined && x?.fret !== undefined) {
+          const key = `${Math.round(onset * 1e6)}:${x.string}`;
           const list = byOnsetAndString.get(key) ?? [];
           list.push({
             note,
-            fret: position.fret,
+            fret: x.fret,
             voiceIndex,
             chordSize: item.notes?.length ?? 1
           });
@@ -127,7 +127,7 @@ function planUnisonCollapse(
     for (const claim of claims) {
       if (claim.note !== keeper.note && !suppressed.has(claim.note)) {
         suppressed.add(claim.note);
-        onCollapse(claim.note._x!.mnxLab!.tab!.position!.string, claim.fret);
+        onCollapse(claim.note._x!.mnxLab!.string!, claim.fret);
       }
     }
   }
@@ -295,9 +295,9 @@ function buildTrack(
   const staff = new M.Staff();
   track.addStaff(staff);
 
-  const tunings = mnxTuningToAlphaTab(part._x?.mnxLab?.tab?.tuning);
+  const tunings = mnxTuningToAlphaTab(part._x?.mnxLab?.strings);
   staff.stringTuning.tunings = tunings;
-  const capo = part._x?.mnxLab?.tab?.capo ?? 0;
+  const capo = part._x?.mnxLab?.capo ?? 0;
   if (capo) staff.capo = capo;
 
   // `staffKind` is an MNX view flag; map it onto Guitar Pro's two staff toggles.
@@ -466,7 +466,11 @@ function buildBeat(
     const midi = pitchToMidi(note.pitch);
     // Prefer the authored fingering; fall back to a playable one so pitches
     // from non-tab documents still export.
-    let position = note._x?.mnxLab?.tab?.position;
+    const x = note._x?.mnxLab;
+    let position =
+      x?.string !== undefined && x?.fret !== undefined
+        ? { string: x.string, fret: x.fret }
+        : undefined;
     if (!position) {
       const chosen = choosePosition(midi, tunings, 24, capo);
       if (!chosen) {

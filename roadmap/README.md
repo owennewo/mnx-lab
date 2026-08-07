@@ -64,6 +64,22 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   onto brass (valve combination selects a fundamental, pitch determines the partial) and
   excludes tin whistle by the same rule that excludes storing the fret. Design only — nothing built, nothing
   posted; complements [guitar-technique.md](proposed/guitar-technique.md) (what the hands do).
+- **[derived-positions.md](proposed/derived-positions.md)** — the execution half of
+  [instrument-position.md](proposed/instrument-position.md): migrate `_x.mnxLab` to the
+  proposal's shape (v5: string authoritative, `fret` optional and non-authoritative, `fingering`
+  un-nested, `tuning[]` → `strings[]`) **and specify the derivation ladder** so unannotated
+  guitar notation still renders valid tab — lowest-playable-fret assignment, default standard
+  tuning, capo-aware (the current fallback in `guitarPositions.ts` ignores both; MNX pitch is
+  sounding, so no transposition term — `part.transposition` is display-only). The pitch-only
+  assignment is ruled **presentation, not content** — never written back, not proposed as
+  normative spec text; our renderer's determinism is owned by the
+  `lab/tab-derivation` scenario family, so heuristic changes become reviewed golden
+  demotions instead of silent drift. **Stages 2–4 shipped 2026-08-07** — the v5 reshape
+  (schema, v4→v5 upgrade hop, converters, corpus, edit layer, Worker prompt), the
+  hardened derivation (tuning/capo-aware authority ladder, red mismatch/unplayable badges,
+  no silent clamp), and nine rendered scenarios pinning it (bare melody/chord, string-only,
+  partial annotation, drop-D, capo, transposition-is-display-only, out-of-range, fret
+  mismatch); goldens byte-identical throughout. Left: the `/verify` sweep of the family.
 - **[viewer-surface.md](proposed/viewer-surface.md)** — name and define **the viewer
   surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
   undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench

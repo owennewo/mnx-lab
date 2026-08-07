@@ -35,7 +35,7 @@ describe('Bi-directional Roundtrip Pipeline', () => {
     expect(part2._x?.mnxLab?.tab?.staffKind).toBe('both');
 
     // Verify tuning roundtripped (explicit string numbers)
-    const tuning2 = part2._x?.mnxLab?.tab?.tuning;
+    const tuning2 = part2._x?.mnxLab?.strings;
     expect(tuning2).toBeDefined();
     expect(tuning2!.length).toBe(6);
     const byString = new Map(tuning2!.map(t => [t.string, t.pitch]));
@@ -67,8 +67,8 @@ describe('Bi-directional Roundtrip Pipeline', () => {
     const note1_2 = seq2.content[0].notes?.[0]!;
     expect(note1_2.pitch.step).toBe(note1_1.pitch.step);
     expect(note1_2.pitch.octave).toBe(note1_1.pitch.octave);
-    expect(note1_2._x?.mnxLab?.tab?.position?.fret).toBe(note1_1._x?.mnxLab?.tab?.position?.fret);
-    expect(note1_2._x?.mnxLab?.tab?.position?.string).toBe(note1_1._x?.mnxLab?.tab?.position?.string);
+    expect(note1_2._x?.mnxLab?.fret).toBe(note1_1._x?.mnxLab?.fret);
+    expect(note1_2._x?.mnxLab?.string).toBe(note1_1._x?.mnxLab?.string);
 
     // IDs roundtripped perfectly (regenerated deterministically; _std/_tab
     // suffixes only ever exist inside the exported MusicXML)

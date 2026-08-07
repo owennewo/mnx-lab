@@ -1,5 +1,5 @@
 import { MnxSequence, isTimedEvent } from '../../model/mnx.ts';
-import { resolveEventPositions } from '../tab/guitarPositions.ts';
+import { resolveEventPositions, TabPositionContext, tabPositionContext } from '../tab/guitarPositions.ts';
 import { Primitive, SpatialIndex } from '../primitives.ts';
 import { syntheticNoteKey } from '../../model/noteKeys.ts';
 import { EventSlot } from './spacing.ts';
@@ -119,6 +119,12 @@ export interface EmitTabVoicesArgs {
   index: SpatialIndex;
   /** Forgiving render: a throwing event reports here, never kills the bar. */
   onIssue: (message: string) => void;
+  /**
+   * The part's effective string set (declared strings or the standard-guitar
+   * default, capo applied) — the derivation context for every fret drawn.
+   * Optional only for compatibility; omitting it means standard tuning, no capo.
+   */
+  positionContext?: TabPositionContext;
 }
 
 /**
@@ -130,6 +136,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
     voices, slots, staffTop, measureIndex,
     activeNoteIds, selectedNoteIds, synthesizeKeys, primitives, index, onIssue
   } = args;
+  const positionContext = args.positionContext ?? tabPositionContext(undefined);
 
   // A note written in two voices at one fingerboard position is ONE note.
   // Both copies land on the same digit, so drawing the second is redundant
@@ -153,7 +160,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
         // Tab convention: rests in tab-only view consume time but aren't
         // drawn. (When tab pairs with a notation staff, rests live there.)
       } else if (event.notes && event.notes.length > 0) {
-        const positions = resolveEventPositions(event.notes);
+        const positions = resolveEventPositions(event.notes, positionContext);
         // Per-note selection keys: real ids, or synthesized positional keys
         // for id-less documents (see src/utils/noteKeys.ts).
         const noteIds = event.notes.map((n, idx) =>
@@ -165,6 +172,9 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
 
         for (let k = 0; k < positions.length; k++) {
           const pos = positions[k];
+          // Unplayable (no position derivable): draw nothing — the red badge
+          // comes from validate.ts, never a silently clamped digit.
+          if (pos === null) continue;
           const noteId = noteIds[k] ?? primaryNoteId;
 
           // Per NOTE, not per event: the editor's cursor is one note of a

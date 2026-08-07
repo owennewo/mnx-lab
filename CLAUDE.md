@@ -43,7 +43,7 @@ npm run deploy             # build + wrangler deploy (mnx-lab.totai.uk)
 spec/                the standard + our proposals against it
   mnx-schema.json         verbatim copy of the pinned upstream release — never edited
   mnx-schema.proposed.json generated from a proposal worktree — transient, dev-time only
-  mnx-lab-extensions.schema.json  the _x.mnxLab vendor schema (v3)
+  mnx-lab-extensions.schema.json  the _x.mnxLab vendor schema (v5)
   guitar-tab-extension.schema.json (v2 legacy, kept for upgrade tests), spec-prose.json,
   HISTORY.md
   proposals/<topic>/      evidence bundles: README, schema.diff, scenarios.md, engravings/
@@ -228,8 +228,11 @@ interleaved multi-system wrap, columns aligned by shared plan slots. Tab-staff e
 (lines/clef/timesig/frets) lives ONCE in `src/engine/layout/tabStaff.ts`, used by both
 the standalone tab layout and the native staff — extend it there, never fork it. See
 [roadmap/inprogress/both-view-single-system.md](roadmap/inprogress/both-view-single-system.md). Fret/string assignment uses
-`_x.mnxLab.tab.position` when fully annotated, else the lowest-reasonable-position
-heuristic (`src/engine/tab/guitarPositions.ts`). Layouts render **forgivingly**:
+the derivation ladder in `src/engine/tab/guitarPositions.ts` (tuning- and capo-aware;
+MNX pitch is sounding): an annotated `_x.mnxLab.string` derives its fret (a stored
+`fret` is validation-only — a mismatch renders the derived fret plus a red badge),
+bare notes get the lowest-playable-fret assignment, and unplayable notes draw
+nothing plus a red `scope: 'tab'` badge — never a silent clamp. Layouts render **forgivingly**:
 unsupported content degrades to a placeholder and per-measure "!" badges
 (`src/engine/layout/diagnostics.ts`) — red = user-fixable error, blue = warning, amber =
 renderer gap. `ValidationIssue.scope: 'tab'` marks fingerboard-only constraints (the
@@ -239,20 +242,25 @@ shadow DOM. Do **not** reintroduce VexFlow or any notation library. The note↔J
 cross-highlight depends on `model/noteKeys.ts` and `model/jsonView.ts` mirroring the
 same traversal — keep them in lockstep.
 
-## MNX types and `_x.mnxLab` (v3)
+## MNX types and `_x.mnxLab` (v5)
 
 Types: `src/model/mnx.ts`. **Documents are written as `.mnx.json`** (`.json`/`.mnx`
 accepted on read; helpers in `converters/musicxml-mnx/src/common/mnxFile.ts`).
 Everything MNX v19 can't express lives under the one vendor key **`_x.mnxLab`** (the
-`_x` sub-key names a vendor, not a feature): `tab` (single-source — no TAB clefs, no
-duplicated staves; bends are curves of `{position, alter}` in semitones),
-`rehearsal`/`section` (two separate `{label}` objects on the global measure — don't
-re-merge them), `harmonies` (structured + literal, parallel to `tempos`). Schema:
+`_x` sub-key names a vendor, not a feature). v5 shape: note-level **flat**
+`string`/`fret`/`fingering` (the string is the authoritative choice; `fret` is
+optional and non-authoritative — validation only; single-source — no TAB clefs, no
+duplicated staves), part-level flat `strings[]`/`capo`; only `tab.technique` (bends
+are curves of `{position, alter}` in semitones) and `tab.staffKind` stay under the
+`tab` sub-namespace. `rehearsal`/`section` are standard objects on the global measure
+(two separate `{label}` objects — don't re-merge them); `harmonies` (structured +
+literal, parallel to `tempos`) is the global-measure vendor block. Schema:
 `spec/mnx-lab-extensions.schema.json`; register + rationale:
 [docs/mnx-extensions.md](docs/mnx-extensions.md). Blocks are shaped like the standard
 objects they draft (camelCase, `rhythmic-position`, note-id references) so adoption
-deletes the wrapper. Extend `_x.mnxLab` and its schema — never standard MNX fields.
-Saved documents upgrade v1→v2→v3 on load via `src/model/upgradeTabExtension.ts`.
+deletes the wrapper — see roadmap/proposed/{instrument-position,derived-positions}.md.
+Extend `_x.mnxLab` and its schema — never standard MNX fields.
+Saved documents upgrade v1→v2→v3→v4→v5 on load via `src/model/upgradeTabExtension.ts`.
 
 ## The spec loop: sync down, push up
 
@@ -285,7 +293,7 @@ via `guitarpro-mnx --import`, `.xml` derived via `musicxml-mnx --export`). Both 
 trips are lossless and tested (notes, technique, lyrics, repeats, voltas, tuning, capo,
 key; note ids are legitimately rewritten by the MusicXML split — compare technique
 targets by resolution, not string equality). **Guitar Pro string numbering is inverted**
-relative to `_x.mnxLab.tab` — go through `converters/guitarpro-mnx/src/common/tuning.ts`,
+relative to `_x.mnxLab` — go through `converters/guitarpro-mnx/src/common/tuning.ts`,
 never open-code it. MusicXML allows `<lyric>` on rests — never assume pitched notes.
 CLI: `npx musicxml-mnx|guitarpro-mnx --import|--export <file> [--output out]` (derived
 output names refuse to overwrite).

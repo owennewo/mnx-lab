@@ -9,7 +9,7 @@
 //   §3  User vocabulary → MNX terms (general)
 //   §4  Edit-operation recipes
 //   §5  Validation gotchas
-//   §6  Vendor extensions: tab, labels, chord symbols (`_x.mnxLab`, v3)
+//   §6  Vendor extensions: tab, labels, chord symbols (`_x.mnxLab`, v5)
 //   §7  Preservation rules
 //   §8  Selection context interpretation
 //   §9  Ambiguity policy
@@ -77,7 +77,7 @@ Minimal shapes for the operations that come up most often. Apply only the change
 
 2. **Replace one note's pitch.** Find the note by \`id\`, mutate \`pitch.step\` / \`pitch.octave\` / \`pitch.alter\` only. Keep its \`id\` and any \`_x\` data (see §6 if guitar).
 
-3. **Transpose a passage.** Loop the affected notes; adjust \`step\` / \`octave\` / \`alter\` consistently. For tab parts, see §6 — either also update each note's \`_x.mnxLab.tab.position\` or remove the \`position\`.
+3. **Transpose a passage.** Loop the affected notes; adjust \`step\` / \`octave\` / \`alter\` consistently. For tab parts, see §6 — either also update each note's \`_x.mnxLab.string\`/\`fret\` or remove both.
 
 4. **Insert a new empty measure** at position \`i\`. Append \`{}\` (or with \`key\`/\`time\`) to \`global.measures\` AND append a placeholder to **every** part's \`measures\` array:
    \`\`\`json
@@ -106,49 +106,49 @@ const VALIDATION_GOTCHAS = `## §5 — Validation gotchas / "if X, remember Y"
 - **\`time.unit\` must be a power of 2 ≤ 128:** 1, 2, 4, 8, 16, 32, 64, 128.
 - **Clef \`sign\` is \`"C" | "F" | "G"\` only. There is NO TAB clef in MNX — never emit \`{sign: "TAB"}\`.** A part's tab presentation is declared by \`part._x.mnxLab.tab.staffKind\` (see §6), not by a clef and not by a second staff.`;
 
-const GUITAR = `## §6 — Vendor extensions (\`_x.mnxLab\`, v3)
+const GUITAR = `## §6 — Vendor extensions (\`_x.mnxLab\`, v5)
 
 Standard W3C MNX has no model for fret numbers, string assignments, playing technique, capo, alternate tunings, rehearsal marks, section names or chord symbols. This project adds all of them under a SINGLE vendor key, \`_x.mnxLab\`. The MNX schema permits arbitrary subkeys under \`_x\`, so this stays fully valid MNX. The extension content is ALSO schema-validated, so follow these shapes exactly.
 
-**The vendor key is \`mnxLab\`, always.** Never write \`_x.tab\`, \`_x.section\` or \`_x.harmony\` at the top level of \`_x\` — those are the deprecated v2 spellings. \`_x\` sub-keys name a vendor, not a feature.
+**The vendor key is \`mnxLab\`, always.** Never write \`_x.tab\`, \`_x.section\` or \`_x.harmony\` at the top level of \`_x\` — those are deprecated spellings. \`_x\` sub-keys name a vendor, not a feature.
 
-### §6.1 Tablature parts (\`_x.mnxLab.tab\`)
+### §6.1 Tablature parts
 
-**Single-source principle.** The music is encoded ONCE: each note carries its pitch AND (optionally) its fingerboard position. There is no separate tab staff, no duplicated notes, and no TAB clef — notation and tab are derived views, selected by the part-level \`staffKind\` flag.
+**Single-source principle.** The music is encoded ONCE: each note carries its pitch AND (optionally) its string. There is no separate tab staff, no duplicated notes, and no TAB clef — notation and tab are derived views, selected by the part-level \`tab.staffKind\` flag.
 
 **When to apply tab rules.** A part is a tab part if any of the following is true:
-- It has a \`_x.mnxLab.tab\` extension at the part level (tuning/capo/staffKind).
-- Any note in it has \`_x.mnxLab.tab\` (position).
+- Its part-level \`_x.mnxLab\` declares \`strings\`, \`capo\` or \`tab.staffKind\`.
+- Any note in it has \`_x.mnxLab.string\`.
 - The user's instruction references guitar/tab concepts ("fret", "string", "bend", "open D", "capo", "drop D", etc.).
 
-**Part-level extension** (\`part._x.mnxLab.tab\`):
+**Part-level extension** (\`part._x.mnxLab\`) — \`strings\`/\`capo\` sit FLAT on the vendor dict; only \`staffKind\` nests under \`tab\`:
 \`\`\`json
 "_x": {
   "mnxLab": {
-    "tab": {
-      "tuning": [
-        { "string": 1, "pitch": { "step": "E", "octave": 4 } },
-        { "string": 2, "pitch": { "step": "B", "octave": 3 } },
-        { "string": 3, "pitch": { "step": "G", "octave": 3 } },
-        { "string": 4, "pitch": { "step": "D", "octave": 3 } },
-        { "string": 5, "pitch": { "step": "A", "octave": 2 } },
-        { "string": 6, "pitch": { "step": "E", "octave": 2 } }
-      ],
-      "capo": 0,
-      "staffKind": "both"
-    }
+    "strings": [
+      { "string": 1, "pitch": { "step": "E", "octave": 4 } },
+      { "string": 2, "pitch": { "step": "B", "octave": 3 } },
+      { "string": 3, "pitch": { "step": "G", "octave": 3 } },
+      { "string": 4, "pitch": { "step": "D", "octave": 3 } },
+      { "string": 5, "pitch": { "step": "A", "octave": 2 } },
+      { "string": 6, "pitch": { "step": "E", "octave": 2 } }
+    ],
+    "capo": 0,
+    "tab": { "staffKind": "both" }
   }
 }
 \`\`\`
-- Tuning entries carry **explicit string numbers** — array order is meaningless. String 1 = highest-pitched string. If a tab part has no \`tuning\`, assume standard guitar tuning (above).
-- \`staffKind\` (\`"notation" | "tab" | "both"\`) declares the part's preferred presentation. This flag — not a clef, not a second staff — is what makes a part a tab part.
+- \`strings\` entries carry **explicit string numbers** — array order is meaningless. String 1 = highest-pitched string. If a tab part has no \`strings\`, assume standard guitar tuning (above). Never write \`tuning\` — that is the deprecated v4 spelling.
+- \`tab.staffKind\` (\`"notation" | "tab" | "both"\`) declares the part's preferred presentation. This flag — not a clef, not a second staff — is what selects the tab view.
 
-**Note-level extension** (\`note._x.mnxLab.tab\`) — three independent optional blocks:
+**Note-level extension** (\`note._x.mnxLab\`) — \`string\`/\`fret\`/\`fingering\` sit FLAT on the vendor dict; only \`technique\` nests under \`tab\`:
 \`\`\`json
 "_x": {
   "mnxLab": {
+    "string": 2,
+    "fret": 5,
+    "fingering": { "hand": "left", "finger": "1" },
     "tab": {
-      "position":  { "string": 2, "fret": 5 },
       "technique": {
         "bend":     { "points": [{ "position": 0, "alter": 0 }, { "position": 1, "alter": 2 }] },
         "slide":    { "type": "legato", "direction": "up", "target": "<note-id>" },
@@ -157,27 +157,26 @@ Standard W3C MNX has no model for fret numbers, string assignments, playing tech
         "vibrato":  true,
         "harmonic": { "type": "natural" },
         "palmMute": true
-      },
-      "fingering": { "hand": "left", "finger": "1" }
+      }
     }
   }
 }
 \`\`\`
-- \`position\` requires BOTH \`string\` (1–12, 1 = highest pitch) and \`fret\` (0–36, 0 = open string).
+- \`string\` (1–12, 1 = highest pitch) is the authoritative choice; \`fret\` (0–36, 0 = open string) is derivable from string + pitch, but write BOTH and keep them consistent — a mismatch is flagged as an error. Never write \`fret\` without \`string\`, and never write the deprecated \`position: {string, fret}\` object.
 - **\`bend\` is a CURVE**, not a single interval: \`points\` is an ordered array of at least two \`{position, alter}\` objects. \`position\` is a fraction of the note's own duration (0 = onset, 1 = release). \`alter\` is the pitch offset **in SEMITONES** — a whole-step bend is \`2\`, a half-step is \`1\`, a quarter-tone curl is \`0.5\`. A pre-bend is a first point at position 0 with a non-zero \`alter\`; a release is a later point whose \`alter\` decreases.
 - \`slide.type\` is \`"shift" | "legato" | "slideIn" | "slideOut"\` (camelCase); \`target\` is a note id (omit for slideIn/slideOut).
 - \`harmonic.type\` is \`"natural" | "artificial" | "pinch" | "tap" | "semi" | "feedback"\`.
-- A note can carry \`technique\` or \`fingering\` without a \`position\`.
+- A note can carry \`tab.technique\` or \`fingering\` without a \`string\`.
 
-**Tab vocabulary → MNX (note-level under \`_x.mnxLab.tab\`):**
+**Tab vocabulary → MNX (note-level under \`_x.mnxLab\`):**
 
 | User says | MNX |
 | --- | --- |
-| "open D string" | \`position: {string: 4, fret: 0}\` + pitch \`{step:"D", octave:3}\` (standard tuning). |
-| "open low E" | \`position: {string: 6, fret: 0}\` + pitch \`{step:"E", octave:2}\`. |
-| "open high E" | \`position: {string: 1, fret: 0}\` + pitch \`{step:"E", octave:4}\`. |
-| "5th fret on the B string" | \`position: {string: 2, fret: 5}\` + pitch \`{step:"E", octave:4}\`. |
-| "12th fret on the D string" | \`position: {string: 4, fret: 12}\` + pitch one octave above open D. |
+| "open D string" | \`string: 4, fret: 0\` + pitch \`{step:"D", octave:3}\` (standard tuning). |
+| "open low E" | \`string: 6, fret: 0\` + pitch \`{step:"E", octave:2}\`. |
+| "open high E" | \`string: 1, fret: 0\` + pitch \`{step:"E", octave:4}\`. |
+| "5th fret on the B string" | \`string: 2, fret: 5\` + pitch \`{step:"E", octave:4}\`. |
+| "12th fret on the D string" | \`string: 4, fret: 12\` + pitch one octave above open D. |
 | "full bend" / "whole-step bend" | \`technique.bend: {points: [{position: 0, alter: 0}, {position: 1, alter: 2}]}\`. |
 | "half bend" / "half-step bend" | same with \`alter: 1\` on the last point. |
 | "pre-bend" | first point already bent: \`{points: [{position: 0, alter: 2}, {position: 1, alter: 2}]}\`. |
@@ -191,11 +190,11 @@ Standard W3C MNX has no model for fret numbers, string assignments, playing tech
 | "palm mute" / "P.M." | \`technique.palmMute: true\` on each muted note. |
 | "1st/2nd/3rd/4th finger" | \`fingering: {hand: "left", finger: "1"}\` (also \`"2"\`, \`"3"\`, \`"4"\`, \`"T"\` for thumb). |
 | "p / i / m / a / c" (classical right-hand) | \`fingering: {hand: "right", finger: "p"}\` etc. |
-| "capo on fret N" | **Part-level** \`part._x.mnxLab.tab.capo = N\`. Don't change note-level fret values — capo is a rendering concern. |
-| "drop D" | Part-level tuning: standard but entry \`{string: 6, pitch: {step:"D", octave:2}}\` (only the lowest string drops). |
+| "capo on fret N" | **Part-level** \`part._x.mnxLab.capo = N\`. Don't change note-level fret values — capo is a rendering concern. |
+| "drop D" | Part-level \`strings\`: standard but entry \`{string: 6, pitch: {step:"D", octave:2}}\` (only the lowest string drops). |
 | "DADGAD" | strings 1→6: D4, A3, G3, D3, A2, D2 (explicit \`string\` numbers on each entry). |
 | "open G" | strings 1→6: D4, B3, G3, D3, G2, D2. |
-| "show this as tab" / "as notation" / "both" | Part-level \`staffKind: "tab" / "notation" / "both"\`. |
+| "show this as tab" / "as notation" / "both" | Part-level \`tab.staffKind: "tab" / "notation" / "both"\`. |
 
 ### §6.2 Rehearsal marks and section names (global measure)
 
@@ -240,18 +239,18 @@ Chord symbols live on \`global.measures[i]._x.mnxLab.harmonies\` — an array, o
 **Gotchas across all three:**
 - **String 1 = highest-pitched string, not the lowest.** Visual tab convention puts the lowest string at the bottom; the data convention is the opposite. In standard tuning, string 1 = E4 and string 6 = E2.
 - **A chord must not assign two notes to the same \`string\`.** Each note in a chord picks a distinct string.
-- **When you change a note's pitch, decide:** either recompute \`position\` to match the new pitch (and the part's tuning/capo), or remove \`position\`. Never leave a stale string/fret pair.
+- **When you change a note's pitch, decide:** either recompute \`string\`/\`fret\` to match the new pitch (and the part's strings/capo), or remove both. Never leave a stale string/fret pair.
 - **\`fret: 0\` = open string** (a valid playable position, not "no fret").
 - **Never create a TAB clef or a duplicate tab staff.** Older documents did this; current ones never do. If you somehow receive one, leave its structure alone unless asked to change it.
-- **No \`_x.mnxLab.tab\` on rest events** — the tab block only applies to notes.
-- **Legacy note:** the deprecated v1 namespace \`_x.guitar\` and the v2 spellings \`_x.tab\` / \`_x.section\` must never be emitted. Always nest under \`_x.mnxLab\` with the shapes above.`;
+- **No fingerboard data on rest events** — \`string\`/\`fret\`/\`fingering\`/\`tab\` apply only to notes.
+- **Legacy note:** the deprecated v1 namespace \`_x.guitar\`, the v2 spellings \`_x.tab\` / \`_x.section\`, and the v4 nested shapes \`tab.position\` / \`tab.tuning\` / \`tab.capo\` / \`tab.fingering\` must never be emitted. Always use the flat v5 shapes above.`;
 
 const PRESERVATION = `## §7 — Preservation rules
 
 - Copy unrelated parts, measures, sequences, and events verbatim.
 - Preserve existing \`id\` values unchanged. Generate new IDs **only** for newly inserted notes/events.
 - Preserve **all** \`_x.*\` data (any vendor namespace) on any element you're not directly changing.
-- When you change a tab note's pitch, follow §6: either update its \`_x.mnxLab.tab.position\` to match, or remove the \`position\`.`;
+- When you change a tab note's pitch, follow §6: either update its \`_x.mnxLab.string\`/\`fret\` to match, or remove both.`;
 
 const SELECTION_CONTEXT = `## §8 — Selection context interpretation
 

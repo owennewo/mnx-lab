@@ -1,0 +1,38 @@
+{
+  "title": "Unplayable pitches draw nothing — and say so in red",
+  "description": "Two half notes no guitar can play: a bare C2 (below every open string) and a C3 annotated onto string 1 (below that string's open E4). Neither gets a fret digit — there is no silent clamp — and each raises a red scope:'tab' validation badge on the bar. The notation staff engraves both notes perfectly; only the tab staff reports, because the constraint is the fingerboard's, not the music's.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:derivation",
+    "derivation",
+    "diagnostics",
+    "unplayable"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "vendor-extensions"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-derivation"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-07",
+    "primitivesHash": "sha256:c5d6535b36e3f2a6",
+    "renderHash": "sha256:017ab831f78262da"
+  }
+}

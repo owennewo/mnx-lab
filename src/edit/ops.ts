@@ -22,7 +22,7 @@ import {
   onsetsEqual,
   type Onset
 } from './cursor.ts';
-import { midiOfPitch, tuningOf } from './tabStrings.ts';
+import { capoOf, midiOfPitch, tuningOf } from './tabStrings.ts';
 
 // Note addressing: every `noteId(s)` field accepts a note's real `id` OR its
 // synthetic positional key (src/model/noteKeys.ts) — most spec mirrors carry
@@ -37,9 +37,9 @@ export type EditOp =
       noteIds?: string[];
     }
   | {
-      /** Put one note on (string, fret): sets `_x.mnxLab.tab.position` AND the
-       *  pitch the fingerboard place sounds — the fret is a choice, the pitch
-       *  its consequence (string 1 = highest-pitched, like `_x.mnxLab.tab`). */
+      /** Put one note on (string, fret): sets flat `_x.mnxLab.string`/`fret`
+       *  AND the pitch the fingerboard place sounds — the fret is a choice,
+       *  the pitch its consequence (string 1 = highest-pitched). */
       type: 'setFret';
       noteId: string;
       string: number;
@@ -94,7 +94,7 @@ export type EditOp =
       time: { count: number; unit: number };
     }
   | {
-      /** Declare the part's string tuning (`_x.mnxLab.tab.tuning`). */
+      /** Declare the part's string tuning (`_x.mnxLab.strings`). */
       type: 'setTuning';
       tuning: MnxTuningEntry[];
     }
@@ -164,7 +164,8 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       forEachKeyedNote(next, (note, key) => {
         if (key !== op.noteId) return;
         const x = ((note._x ??= {}).mnxLab ??= {});
-        x.tab = { ...x.tab, position: { string: op.string, fret: op.fret } };
+        x.string = op.string;
+        x.fret = op.fret;
         if (midi !== undefined) setPitchFromMidi(note, midi);
       });
       return next;
@@ -176,7 +177,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (midi === undefined) return next;
       const note: MnxNote = { pitch: { step: 'C', octave: 4 } };
       setPitchFromMidi(note, midi);
-      note._x = { mnxLab: { tab: { position: { string: op.string, fret: op.fret } } } };
+      note._x = { mnxLab: { string: op.string, fret: op.fret } };
 
       const target: Onset = { num: op.onset[0], den: op.onset[1] };
       const found = eventAtOnset(seq, target);
@@ -190,7 +191,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         event.notes ??= [];
         // One string, one note: re-entering an occupied string replaces it.
         const existing = event.notes.findIndex(
-          n => n._x?.mnxLab?.tab?.position?.string === op.string
+          n => n._x?.mnxLab?.string === op.string
         );
         if (existing >= 0) event.notes.splice(existing, 1, note);
         else event.notes.push(note);
@@ -267,7 +268,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const part = next.parts[0];
       if (!part) return next;
       const x = ((part._x ??= {}).mnxLab ??= {});
-      x.tab = { ...x.tab, tuning: op.tuning.map(t => ({ string: t.string, pitch: { ...t.pitch } })) };
+      x.strings = op.tuning.map(t => ({ string: t.string, pitch: { ...t.pitch } }));
       return next;
     }
     case 'appendMeasure': {
@@ -440,7 +441,8 @@ function mintNoteId(doc: MnxStructure): string {
 /** What (string, fret) sounds under the part's (or standard) tuning. */
 function fingerboardMidi(doc: MnxStructure, string: number, fret: number): number | undefined {
   const open = tuningOf(doc.parts[0]).find(t => t.string === string);
-  return open ? midiOfPitch(open.pitch) + fret : undefined;
+  // Frets are capo-relative, so the sounding pitch includes the capo shift.
+  return open ? midiOfPitch(open.pitch) + capoOf(doc.parts[0]) + fret : undefined;
 }
 
 /** Voice 0 of staff 1 in a part-0 measure — the entry surface. Created on

@@ -76,11 +76,12 @@ const secondNote = (doc: any) =>
   doc.parts[0].measures[0].sequences[0].content[0].notes[1];
 
 describe('extension upgrade: v2 -> v3', () => {
-  it('re-namespaces tab data under the mnxLab vendor key', () => {
+  it('re-namespaces tab data under the mnxLab vendor key, landing on the v5 flat shape', () => {
     const doc: any = upgradeTabExtension(v2Document() as MnxStructure);
 
-    expect(doc.parts[0]._x).toEqual({ mnxLab: { tab: { staffKind: 'both', capo: 2 } } });
-    expect(firstNote(doc)._x.mnxLab.tab.position).toEqual({ string: 1, fret: 0 });
+    expect(doc.parts[0]._x).toEqual({ mnxLab: { capo: 2, tab: { staffKind: 'both' } } });
+    expect(firstNote(doc)._x.mnxLab.string).toBe(1);
+    expect(firstNote(doc)._x.mnxLab.fret).toBe(0);
     // The v2 spelling must be gone, not merely shadowed — a stale `_x.tab`
     // would silently keep feeding the old shape to anything still reading it.
     expect(doc.parts[0]._x.tab).toBeUndefined();
@@ -141,7 +142,7 @@ describe('extension upgrade: v2 -> v3', () => {
     expect(out.global.measures[0]._x).toBeUndefined();
   });
 
-  it('leaves an already-v4 document untouched, by identity', () => {
+  it('leaves an already-v5 document untouched, by identity', () => {
     const doc = {
       mnx: { version: 1 },
       global: { measures: [{ rehearsal: { label: 'B' } }] },
@@ -157,8 +158,110 @@ describe('extension upgrade: v2 -> v3', () => {
   });
 });
 
-describe('extension upgrade: v1 -> v3 in one pass', () => {
-  it('lands on the current shape, not the intermediate v2 one', () => {
+describe('extension upgrade: v4 -> v5', () => {
+  it('flattens the tab sub-namespace onto the vendor dict, keeping the stored fret', () => {
+    const v4: any = {
+      mnx: { version: 1 },
+      global: { measures: [{ time: { count: 4, unit: 4 } }] },
+      parts: [
+        {
+          _x: {
+            mnxLab: {
+              tab: {
+                tuning: [{ string: 1, pitch: { step: 'E', octave: 4 } }],
+                capo: 2,
+                staffKind: 'both'
+              }
+            }
+          },
+          measures: [
+            {
+              sequences: [
+                {
+                  content: [
+                    {
+                      duration: { base: 'quarter' },
+                      notes: [
+                        {
+                          id: 'n1',
+                          pitch: { step: 'E', octave: 4 },
+                          _x: {
+                            mnxLab: {
+                              tab: {
+                                position: { string: 1, fret: 0 },
+                                fingering: { hand: 'left', finger: '1' },
+                                technique: { vibrato: true }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+    const doc: any = upgradeTabExtension(v4 as MnxStructure);
+
+    expect(doc.parts[0]._x.mnxLab).toEqual({
+      strings: [{ string: 1, pitch: { step: 'E', octave: 4 } }],
+      capo: 2,
+      tab: { staffKind: 'both' }
+    });
+    // string/fret/fingering flatten; the fret survives (v5 keeps it as a
+    // non-authoritative validation field); technique stays under `tab`.
+    expect(firstNote(doc)._x.mnxLab).toEqual({
+      string: 1,
+      fret: 0,
+      fingering: { hand: 'left', finger: '1' },
+      tab: { technique: { vibrato: true } }
+    });
+  });
+
+  it('drops an emptied tab block rather than leaving `tab: {}` behind', () => {
+    const v4: any = {
+      mnx: { version: 1 },
+      global: { measures: [{}] },
+      parts: [
+        {
+          _x: { mnxLab: { tab: { tuning: [{ string: 1, pitch: { step: 'E', octave: 4 } }] } } },
+          measures: [
+            {
+              sequences: [
+                {
+                  content: [
+                    {
+                      duration: { base: 'quarter' },
+                      notes: [
+                        {
+                          pitch: { step: 'E', octave: 4 },
+                          _x: { mnxLab: { tab: { position: { string: 1, fret: 0 } } } }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+    const doc: any = upgradeTabExtension(v4 as MnxStructure);
+
+    expect(doc.parts[0]._x.mnxLab).toEqual({
+      strings: [{ string: 1, pitch: { step: 'E', octave: 4 } }]
+    });
+    expect(firstNote(doc)._x.mnxLab).toEqual({ string: 1, fret: 0 });
+  });
+});
+
+describe('extension upgrade: v1 -> v5 in one pass', () => {
+  it('lands on the current shape, not an intermediate one', () => {
     const doc: any = upgradeTabExtension({
       mnx: { version: 1 },
       global: { measures: [{ time: { count: 4, unit: 4 } }] },
@@ -212,17 +315,18 @@ describe('extension upgrade: v1 -> v3 in one pass', () => {
       ]
     } as unknown as MnxStructure);
 
-    const tab = doc.parts[0]._x.mnxLab.tab;
-    expect(tab.capo).toBe(3);
-    expect(tab.staffKind).toBe('both'); // it had a TAB clef
+    const lab = doc.parts[0]._x.mnxLab;
+    expect(lab.capo).toBe(3);
+    expect(lab.tab.staffKind).toBe('both'); // it had a TAB clef
     // v1's tuning array order was documented both ways; string 1 is resolved by
     // PITCH, so the highest string wins regardless of how the array was written.
-    expect(tab.tuning[0]).toEqual({ string: 1, pitch: { step: 'E', octave: 4 } });
+    expect(lab.strings[0]).toEqual({ string: 1, pitch: { step: 'E', octave: 4 } });
     // The invalid TAB clef is dropped: tab-ness is a view flag, not a clef.
     expect(doc.parts[0].measures[0].clefs).toBeUndefined();
 
     const note = firstNote(doc);
-    expect(note._x.mnxLab.tab.position).toEqual({ string: 1, fret: 0 });
+    expect(note._x.mnxLab.string).toBe(1);
+    expect(note._x.mnxLab.fret).toBe(0);
     // v1's "bend-release": rise a whole step, then back. v1 carried no timing,
     // so the peak lands mid-note rather than stacking two points at the end.
     expect(note._x.mnxLab.tab.technique.bend).toEqual({

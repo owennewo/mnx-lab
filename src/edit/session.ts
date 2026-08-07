@@ -24,7 +24,7 @@ import {
   type EditorCursor,
   type PositionGrid
 } from './cursor.ts';
-import { defaultStringFor, tuningOf } from './tabStrings.ts';
+import { capoOf, defaultStringFor, tuningOf } from './tabStrings.ts';
 
 /** The on-disk shape of harness/fixtures/edit-traces/<name>.json. */
 export interface TraceFixture {
@@ -257,8 +257,8 @@ export class EditorSession {
       const string =
         this.grid.mode === 'string'
           ? this.cursorState.line
-          : note._x?.mnxLab?.tab?.position?.string ??
-            defaultStringFor(note.pitch, tuningOf(this.doc.parts[0]));
+          : note._x?.mnxLab?.string ??
+            defaultStringFor(note.pitch, tuningOf(this.doc.parts[0]), capoOf(this.doc.parts[0]));
       this.apply({ type: 'setFret', noteId: slot.noteKey, string, fret });
     } else {
       // Nothing on this string at this position: insert. Only meaningful on

@@ -31,14 +31,11 @@ export interface MnxNoteValue {
   dots?: number;
 }
 
-// ---- MNX Lab extensions v4 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
-
-export interface MnxTabPosition {
-  /** String number; 1 = highest-pitched string. */
-  string: number;
-  /** Fret number; 0 = open string. */
-  fret: number;
-}
+// ---- MNX Lab extensions v5 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
+// v5: `string`/`fret`/`fingering` sit FLAT on the vendor dict (`fret` is
+// optional and non-authoritative — validation only; converters keep writing it
+// because the source formats store both). Only `technique` and `staffKind`
+// remain under `tab`.
 
 /** One control point on a bend curve. */
 export interface MnxBendPoint {
@@ -132,9 +129,16 @@ export interface MnxGlobalMeasureExtension {
 }
 
 export interface MnxTabNoteExtension {
-  position?: MnxTabPosition;
   technique?: MnxTabTechnique;
+}
+
+export interface MnxNoteExtension {
+  /** The performer's choice; 1 = highest-pitched string. */
+  string?: number;
+  /** Optional, non-authoritative (validation only); 0 = open, capo-relative. */
+  fret?: number;
   fingering?: { hand: 'left' | 'right'; finger: string };
+  tab?: MnxTabNoteExtension;
 }
 
 export interface MnxTuningEntry {
@@ -144,9 +148,14 @@ export interface MnxTuningEntry {
 }
 
 export interface MnxTabPartExtension {
-  tuning?: MnxTuningEntry[];
-  capo?: number;
   staffKind?: 'notation' | 'tab' | 'both';
+}
+
+export interface MnxPartExtension {
+  /** Sounding open-string pitches, before the capo. Absent ⇒ standard guitar. */
+  strings?: MnxTuningEntry[];
+  capo?: number;
+  tab?: MnxTabPartExtension;
 }
 
 // ---- Core document ----
@@ -163,7 +172,7 @@ export interface MnxNote {
   pitch: MnxPitch;
   accidentalDisplay?: { show: boolean; force?: boolean };
   ties?: MnxTie[];
-  _x?: { mnxLab?: { tab?: MnxTabNoteExtension } };
+  _x?: { mnxLab?: MnxNoteExtension };
 }
 
 export interface MnxRest {
@@ -241,7 +250,7 @@ export interface MnxPart {
   name?: string;
   staves?: number;
   measures: MnxPartMeasure[];
-  _x?: { mnxLab?: { tab?: MnxTabPartExtension } };
+  _x?: { mnxLab?: MnxPartExtension };
 }
 
 export interface MnxGlobalMeasure {

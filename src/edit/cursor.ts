@@ -25,7 +25,7 @@
 import type { MnxSequenceItem, MnxSequence, MnxStructure, MnxNote } from '../model/mnx.ts';
 import { isTimedEvent, isTuplet, isTremolo } from '../model/mnx.ts';
 import { syntheticNoteKey } from '../model/noteKeys.ts';
-import { defaultStringFor, midiOfPitch, tuningOf } from './tabStrings.ts';
+import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
 
 /** A metric onset within a measure, as a reduced whole-note fraction. */
 export interface Onset {
@@ -196,8 +196,9 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
   const measures = part?.measures ?? [];
   const measureCount = Math.max(measures.length, doc.global.measures.length);
   const tuning = tuningOf(part);
+  const capo = capoOf(part);
   const spans = measureSpans(doc);
-  const mode: PositionGrid['mode'] = part?._x?.mnxLab?.tab ? 'string' : 'ordinal';
+  const mode: PositionGrid['mode'] = isTabPart(part) ? 'string' : 'ordinal';
 
   interface RawSlot {
     slot: NoteSlot;
@@ -228,7 +229,7 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
             position.raw.push({
               slot: {
                 noteKey: noteKeyOf(note, measureIndex, voiceIndex, eventIndex, noteIndex),
-                line: note._x?.mnxLab?.tab?.position?.string ?? defaultStringFor(note.pitch, tuning),
+                line: note._x?.mnxLab?.string ?? defaultStringFor(note.pitch, tuning, capo),
                 voiceIndex,
                 eventIndex,
                 noteIndex

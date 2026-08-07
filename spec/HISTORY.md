@@ -116,6 +116,16 @@ express, under the single vendor key `_x.mnxLab`. It is a `$defs` library, not a
 `global-measure-ext`) and consumers walk the document. Register + rationale:
 [docs/mnx-extensions.md](../docs/mnx-extensions.md).
 
+- **v5 (2026-08-07)** — the tab sub-namespace flattened to the adopted shape it drafts
+  (roadmap/proposed/instrument-position.md): `tab.position.{string,fret}` → flat `string`/`fret`
+  (fret now optional and non-authoritative — validation only, `dependentRequired` on `string`),
+  `tab.fingering` → `fingering`, `tab.tuning` → `strings` (avoiding "tuning", claimed by
+  temperament work in w3c-cg/mnx#365), `tab.capo` → `capo`. Only `technique` and `staffKind`
+  remain under `tab`. New defs `string-number`/`fret-number`/`string-entry`; `position` and
+  `tuning-entry` removed. Migration: the v4 → v5 hop in `upgradeTabExtension.ts`.
+- **v4 (2026-07-29)** — `rehearsal` and `section` graduated out of the vendor dict into the
+  standard objects proposed in roadmap/proposed/score-text.md; the global-measure dict now
+  holds `harmonies` only.
 - **v3 (2026-07-26)** — replaced `mnx-tab-extension.schema.json` (v2). The `_x` sub-key names a
   *vendor*, not a feature ([w3c-cg/mnx#429](https://github.com/w3c-cg/mnx/issues/429)), so `_x.tab`
   and `_x.section` moved under `_x.mnxLab`. Added `rehearsal`, `section`, `harmonies`,

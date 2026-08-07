@@ -1,7 +1,7 @@
-import { MnxStructure, MnxTabNoteExtension, MnxTuningEntry } from './mnx.ts';
+import { MnxStructure, MnxTuningEntry } from './mnx.ts';
 
 /**
- * Load-time upgrade shim for saved documents, run once on load. Three hops:
+ * Load-time upgrade shim for saved documents, run once on load. Four hops:
  *
  *   v1 → v2  `_x.guitar` + TAB clefs + a duplicated tab staff → the
  *            single-source `_x.tab` form.
@@ -10,6 +10,11 @@ import { MnxStructure, MnxTabNoteExtension, MnxTuningEntry } from './mnx.ts';
  *            camelCase, and the single-interval bend → a bend curve.
  *   v3 → v4  `_x.mnxLab.{rehearsal,section}` → the STANDARD `rehearsal` and
  *            `section` objects on the global measure.
+ *   v4 → v5  the `tab` sub-namespace flattens to the adopted shape it drafts
+ *            (roadmap/proposed/instrument-position.md): `tab.position.{string,
+ *            fret}` → flat `string`/`fret`, `tab.fingering` → `fingering`,
+ *            `tab.tuning` → `strings`, `tab.capo` → `capo`. Only `technique`
+ *            and `staffKind` stay under `tab`.
  *
  * The v3 hop exists because `_x` sub-keys name a VENDOR, not a feature
  * (w3c-cg/mnx#429) — `_x.tab` squatted a generic token in a shared namespace.
@@ -17,12 +22,19 @@ import { MnxStructure, MnxTabNoteExtension, MnxTuningEntry } from './mnx.ts';
  * standard object: once drafted and proposed, keeping a private copy would mean
  * two spellings of the same fact. See roadmap/proposed/score-text.md, and note
  * these fields validate only against `schemas/mnx-schema.proposed.json` until
- * the CG adopts them.
+ * the CG adopts them. The v5 hop applies the same draft-mirroring rule to the
+ * tab block itself — nesting universal fields under `tab` made them
+ * fretboard-scoped by construction.
  *
- * Already-v4 documents come back unchanged. See docs/mnx-extensions.md.
+ * Already-v5 documents come back unchanged. See docs/mnx-extensions.md.
  */
 export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
-  if (!needsUpgrade(mnxJson) && !needsNamespaceUpgrade(mnxJson) && !needsLabelUpgrade(mnxJson)) {
+  if (
+    !needsUpgrade(mnxJson) &&
+    !needsNamespaceUpgrade(mnxJson) &&
+    !needsLabelUpgrade(mnxJson) &&
+    !needsFlattenUpgrade(mnxJson)
+  ) {
     return mnxJson;
   }
 
@@ -30,7 +42,63 @@ export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
   upgradeV1(doc);
   upgradeV2(doc);
   upgradeV3(doc);
+  upgradeV4(doc);
   return doc as MnxStructure;
+}
+
+/** v4 → v5: flatten `tab.position`/`tab.fingering`/`tab.tuning`/`tab.capo`
+ *  onto the vendor dict. A move, not a translation — values are unchanged; the
+ *  stored fret is kept (its v5 role is validation, and deleting data in an
+ *  upgrade shim is never right). */
+function upgradeV4(doc: any): void {
+  for (const part of doc.parts ?? []) {
+    const lab = part._x?.mnxLab;
+    const tab = lab?.tab;
+    if (tab && (tab.tuning !== undefined || tab.capo !== undefined)) {
+      // Rebuilt (not mutated) so key order matches what the converters emit:
+      // strings, capo, …, tab.
+      const { tuning, capo, ...restTab } = tab;
+      const { tab: _t, ...restLab } = lab;
+      part._x.mnxLab = {
+        ...(tuning !== undefined ? { strings: tuning } : {}),
+        ...(capo !== undefined ? { capo } : {}),
+        ...restLab,
+        ...(Object.keys(restTab).length ? { tab: restTab } : {})
+      };
+    }
+
+    forEachNote(part, (note: any) => {
+      const nLab = note._x?.mnxLab;
+      const nTab = nLab?.tab;
+      if (!nTab || (nTab.position === undefined && nTab.fingering === undefined)) return;
+      const { position, fingering, ...restTab } = nTab;
+      const { tab: _t, ...restLab } = nLab;
+      note._x.mnxLab = {
+        ...(position ? { string: position.string, fret: position.fret } : {}),
+        ...(fingering ? { fingering } : {}),
+        ...restLab,
+        ...(Object.keys(restTab).length ? { tab: restTab } : {})
+      };
+    });
+  }
+}
+
+function needsFlattenUpgrade(doc: any): boolean {
+  for (const part of doc.parts ?? []) {
+    const tab = part._x?.mnxLab?.tab;
+    if (tab && (tab.tuning !== undefined || tab.capo !== undefined)) return true;
+    for (const measure of part.measures ?? []) {
+      for (const seq of measure.sequences ?? []) {
+        for (const event of seq.content ?? []) {
+          for (const note of event.notes ?? []) {
+            const nTab = note._x?.mnxLab?.tab;
+            if (nTab && (nTab.position !== undefined || nTab.fingering !== undefined)) return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
 }
 
 /** v3 → v4: promote the two label objects out of the vendor dict. Both are
@@ -109,7 +177,8 @@ function upgradeV1(doc: any): void {
       const fromMap = note.id ? positionsById.get(note.id) : undefined;
       if (!g && !fromMap) return;
 
-      const tab: MnxTabNoteExtension = {};
+      // v2-SHAPED on purpose: this hop targets v2; the v4→v5 hop flattens it.
+      const tab: any = {};
       const position = g && g.string !== undefined && g.fret !== undefined
         ? { string: g.string, fret: g.fret }
         : fromMap;

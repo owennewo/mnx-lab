@@ -1,0 +1,37 @@
+{
+  "title": "String without fret — the annotation is the choice, the fret is arithmetic",
+  "description": "Two half notes (sounding C3, E3) each annotated with string 6 ONLY — no stored fret. The derived frets are 8 and 12, NOT the lowest-fret defaults (string 5 fret 3, string 4 fret 2): an authored string wins over the assignment heuristic, and the fret needs no storing because it is pitch minus open string. The middle rung of the authority ladder, and the core claim of roadmap/proposed/instrument-position.md in one bar.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:derivation",
+    "derivation",
+    "string-annotation"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "vendor-extensions"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-derivation"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-07",
+    "primitivesHash": "sha256:459b3a37ca09f3b6",
+    "renderHash": "sha256:f0548f6e176ade28"
+  }
+}

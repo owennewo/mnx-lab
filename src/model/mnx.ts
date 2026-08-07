@@ -4,20 +4,21 @@ export interface MnxPitch {
   alter?: number;
 }
 
-// ---- MNX Lab extensions v3 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
+// ---- MNX Lab extensions v5 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
 //
 // Everything this project carries that W3C MNX v19 cannot express lives under
 // ONE vendor key, `mnxLab`. The `_x` sub-key names an agent/vendor/community
 // (w3c-cg/mnx#429), not a feature — `_x.tab` (v2) squatted a generic token in a
 // shared namespace, so another app writing `_x.tab` for something else would
 // have made our own validator reject a legal document.
-
-export interface MnxTabPosition {
-  /** String number; 1 = highest-pitched string. */
-  string: number;
-  /** Fret number; 0 = open string. */
-  fret: number;
-}
+//
+// v5 mirrors the adopted shape drafted in roadmap/proposed/instrument-position.md:
+// `string`, `fret` and `fingering` sit FLAT on the vendor dict (peers of `pitch`,
+// as they would be on `note`), the part declares `strings[]` + `capo` flat, and
+// only `technique` (pending a general articulations proposal) and `staffKind`
+// (upstream placement undecided) remain under the `tab` sub-namespace. The
+// string is the authoritative choice; the fret derives from string + pitch, and
+// a stored fret is validation-only. See roadmap/proposed/derived-positions.md.
 
 /** One control point on a bend curve. */
 export interface MnxBendPoint {
@@ -48,13 +49,26 @@ export interface MnxTabTechnique {
   palmMute?: boolean;
 }
 
+/** note._x.mnxLab.tab — v5 keeps only `technique` here. */
 export interface MnxTabNoteExtension {
-  position?: MnxTabPosition;
   technique?: MnxTabTechnique;
-  fingering?: {
-    hand: 'left' | 'right';
-    finger: string;
-  };
+}
+
+export interface MnxFingering {
+  hand: 'left' | 'right';
+  finger: string;
+}
+
+/** The whole vendor dict at note._x.mnxLab. */
+export interface MnxNoteExtension {
+  /** Which string the note is played on — the performer's authoritative
+   *  choice; 1 = highest-pitched string. The fret derives from this + pitch. */
+  string?: number;
+  /** Optional and NON-AUTHORITATIVE: rendering always derives the fret; a
+   *  stored one only cross-checks it. 0 = open string, capo-relative. */
+  fret?: number;
+  fingering?: MnxFingering;
+  tab?: MnxTabNoteExtension;
 }
 
 /** A chord root or bass note: an MNX pitch minus the octave. */
@@ -133,7 +147,7 @@ export interface MnxNote {
   accidentalDisplay?: MnxAccidentalDisplay;
   ties?: MnxTie[];
   _x?: {
-    mnxLab?: { tab?: MnxTabNoteExtension };
+    mnxLab?: MnxNoteExtension;
   };
 }
 
@@ -435,11 +449,21 @@ export interface MnxTuningEntry {
   pitch: MnxPitch;
 }
 
+/** part._x.mnxLab.tab — v5 keeps only `staffKind` here. */
 export interface MnxTabPartExtension {
-  tuning?: MnxTuningEntry[];
-  capo?: number;
   /** The part's preferred presentation; tab-ness is a view, not content. */
   staffKind?: 'notation' | 'tab' | 'both';
+}
+
+/** The whole vendor dict at part._x.mnxLab. */
+export interface MnxPartExtension {
+  /** Sounding pitch of each open string, before the capo. Named `strings`
+   *  (not "tuning") because temperament work already claims that word
+   *  (w3c-cg/mnx#365). Absent ⇒ standard guitar tuning. */
+  strings?: MnxTuningEntry[];
+  /** Shifts open-string pitches AND re-origins printed fret numbers. */
+  capo?: number;
+  tab?: MnxTabPartExtension;
 }
 
 export interface MnxPart {
@@ -450,7 +474,7 @@ export interface MnxPart {
   staves?: number;
   measures: MnxPartMeasure[];
   _x?: {
-    mnxLab?: { tab?: MnxTabPartExtension };
+    mnxLab?: MnxPartExtension;
   };
 }
 

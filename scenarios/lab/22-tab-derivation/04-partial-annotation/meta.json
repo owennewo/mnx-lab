@@ -1,0 +1,38 @@
+{
+  "title": "Partial annotation — pinned strings reserve, bare notes derive around them",
+  "description": "A whole-note chord of C4 pinned to string 3 (deriving fret 5), plus bare E4 and G3. The pinned string is reserved before any assignment runs, so the bare E4 takes string 1 fret 0 and the bare G3 — whose lowest-fret home (string 3 fret 0) is taken — derives to string 4 fret 5. Annotated and unannotated notes coexist in one chord without conflict.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:derivation",
+    "derivation",
+    "chords",
+    "string-annotation"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "vendor-extensions"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-derivation"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-07",
+    "primitivesHash": "sha256:ff680dc14beaac51",
+    "renderHash": "sha256:8a124f5677344a9c"
+  }
+}

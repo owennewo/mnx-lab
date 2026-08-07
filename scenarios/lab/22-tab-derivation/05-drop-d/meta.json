@@ -1,0 +1,37 @@
+{
+  "title": "Drop-D declaration flows into derivation",
+  "description": "The part declares drop-D strings (string 6 = D2); four bare quarters sound D2 A2 D3 F#3. D2 derives to string 6 fret 0 — unreachable in standard tuning — and the rest fall out as (5,0) (4,0) (4,4). Proves the declared strings[] actually feed the derivation (the pre-stage-3 fallback hardcoded standard tuning and would have failed this scenario).",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:derivation",
+    "derivation",
+    "tuning"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "vendor-extensions"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-derivation"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-07",
+    "primitivesHash": "sha256:faf701c1cc8e6cbc",
+    "renderHash": "sha256:d4638e40cfc8ba6d"
+  }
+}

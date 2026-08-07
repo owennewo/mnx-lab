@@ -1,0 +1,37 @@
+{
+  "title": "Bare melody — every fret derived from pitch alone",
+  "description": "Four quarter notes (sounding C3 D3 E3 F3) with no fingerboard annotations anywhere: no part strings, no note string, no fret. The renderer assumes standard tuning and assigns each note the lowest playable fret — (5,3) (4,0) (4,2) (4,3). The headline case of the derivation ladder's bottom rung: any guitar-range score renders valid (if not necessarily ideally fingered) tab, and the assignment is presentation — nothing is written back to the document.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:derivation",
+    "derivation",
+    "defaults"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "vendor-extensions"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-derivation"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-07",
+    "primitivesHash": "sha256:0edf671cb07b64f7",
+    "renderHash": "sha256:4b9dad9ca3b98338"
+  }
+}

@@ -1,4 +1,4 @@
-# MNX Lab extensions (`_x.mnxLab`) — v3
+# MNX Lab extensions (`_x.mnxLab`) — v5
 
 Everything this project carries that **W3C MNX v19 cannot express**, in one
 place: what it is, why standard MNX has no field for it, which CG issue it
@@ -12,14 +12,14 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 
 | Extension | What MNX v19 lacks | Drafts | Data path | Rendering |
 |---|---|---|---|---|
-| `tab.position` | no string/fret anywhere; the clef enum is `C\|F\|G`, so `sign: "TAB"` is invalid | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ tab staff |
-| `tab.tuning`, `tab.capo` | no instrument tuning of any kind | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ |
+| `string` (+ optional `fret`) | no string/fret anywhere; the clef enum is `C\|F\|G`, so `sign: "TAB"` is invalid | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ tab staff |
+| `strings[]`, `capo` | no instrument tuning of any kind | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ |
 | `tab.staffKind` | no way to say a part prefers a tab view | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ |
 | `tab.technique.bend` | nothing; and MusicXML's own model can't hold a curve | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ❌ |
 | `tab.technique.slide` / `hammerOn` / `pullOff` / `vibrato` | no articulation covers them | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ❌ |
 | `tab.technique.harmonic` | nothing; MusicXML's `<harmonic>` is a redesign candidate | [#179](https://github.com/w3c-cg/mnx/issues/179) | ✅ both converters | ❌ |
 | `tab.technique.palmMute` | nothing; MusicXML smuggles it through generic elements | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ❌ |
-| `tab.fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
+| `fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
 | `harmonies` | **no harmony concept anywhere** — no `root`, no `kind`, no chord | [#109](https://github.com/w3c-cg/mnx/issues/109) | ✅ both converters | ❌ |
 
 **Graduated out of `_x` in v4:** `rehearsal` and `section`. They are no longer
@@ -69,10 +69,14 @@ nothing to verify an implementation against.
    ukulele, mandolin, lute. Nothing assumes six strings.
 
 6. **Orthogonal concerns stay separable**, so each can migrate into standard
-   MNX on its own schedule: `position` is the only genuinely fretboard-specific
-   data, `technique` is meaningful for any instrument, `fingering` is universal.
+   MNX on its own schedule: `string` is the only genuinely fretboard-specific
+   datum, `technique` is meaningful for any instrument, `fingering` is universal.
+   v5 makes the separation structural: the universal fields sit **flat** on the
+   vendor dict, mirroring the flat-on-`note` adopted shape they draft
+   ([roadmap/proposed/instrument-position.md](../roadmap/proposed/instrument-position.md))
+   — nesting them under `tab` made them fretboard-scoped by construction.
 
-## Note level: `note._x.mnxLab.tab`
+## Note level: `note._x.mnxLab`
 
 ```jsonc
 {
@@ -80,8 +84,10 @@ nothing to verify an implementation against.
   "pitch": { "step": "E", "octave": 4 },
   "_x": {
     "mnxLab": {
+      "string": 2,
+      "fret": 5,
+      "fingering": { "hand": "left", "finger": "1" },
       "tab": {
-        "position":  { "string": 2, "fret": 5 },
         "technique": {
           "bend":     { "points": [{ "position": 0, "alter": 0 }, { "position": 1, "alter": 2 }] },
           "slide":    { "type": "legato", "direction": "up", "target": "n-2-1-1" },
@@ -90,20 +96,26 @@ nothing to verify an implementation against.
           "vibrato":  true,
           "harmonic": { "type": "natural" },
           "palmMute": true
-        },
-        "fingering": { "hand": "left", "finger": "1" }
+        }
       }
     }
   }
 }
 ```
 
-- `position.string`: 1 = the **highest-pitched** string (E4 on a standard
-  guitar). This matches MusicXML's `<string>` convention; note it is the
-  opposite of the visual tab convention (lowest line at the bottom).
-- `position.fret`: 0 = open string. Fret numbers are relative to the capo.
+- `string`: 1 = the **highest-pitched** string (E4 on a standard guitar). This
+  matches MusicXML's `<string>` convention; note it is the opposite of the
+  visual tab convention (lowest line at the bottom). The string is the
+  performer's authoritative **choice**; given the part's `strings` declaration,
+  the capo and the pitch, the fret is derived arithmetic.
+- `fret`: **optional and non-authoritative** — its only job is validation (a
+  mismatch with the derived fret typically means a broken importer). 0 = open
+  string; fret numbers are relative to the capo. It requires `string` (a bare
+  fret is meaningless). Both converters keep writing it, because MusicXML and
+  Guitar Pro both store both. See
+  [roadmap/proposed/derived-positions.md](../roadmap/proposed/derived-positions.md).
 - A chord must not assign two of its notes the same `string`.
-- Rests never carry a tab annotation.
+- Rests never carry a fingerboard annotation.
 
 ### Bends are curves
 
@@ -139,25 +151,23 @@ cannot. The fret, when there is one, is already in `position`.
 `type` is `natural | artificial | pinch | tap | semi | feedback`. MusicXML knows
 only the first two; the other four are Guitar Pro's.
 
-## Part level: `part._x.mnxLab.tab`
+## Part level: `part._x.mnxLab`
 
 ```jsonc
 {
   "name": "Guitar",
   "_x": {
     "mnxLab": {
-      "tab": {
-        "tuning": [
-          { "string": 1, "pitch": { "step": "E", "octave": 4 } },
-          { "string": 2, "pitch": { "step": "B", "octave": 3 } },
-          { "string": 3, "pitch": { "step": "G", "octave": 3 } },
-          { "string": 4, "pitch": { "step": "D", "octave": 3 } },
-          { "string": 5, "pitch": { "step": "A", "octave": 2 } },
-          { "string": 6, "pitch": { "step": "E", "octave": 2 } }
-        ],
-        "capo": 0,
-        "staffKind": "both"
-      }
+      "strings": [
+        { "string": 1, "pitch": { "step": "E", "octave": 4 } },
+        { "string": 2, "pitch": { "step": "B", "octave": 3 } },
+        { "string": 3, "pitch": { "step": "G", "octave": 3 } },
+        { "string": 4, "pitch": { "step": "D", "octave": 3 } },
+        { "string": 5, "pitch": { "step": "A", "octave": 2 } },
+        { "string": 6, "pitch": { "step": "E", "octave": 2 } }
+      ],
+      "capo": 0,
+      "tab": { "staffKind": "both" }
     }
   },
   "measures": [ ... ]
@@ -172,10 +182,18 @@ only the first two; the other four are Guitar Pro's.
   Consequently there is **no TAB clef**: a clef is a pitch-to-line mapping, and
   a tab staff has no pitch axis. (`{"sign": "TAB"}` is also invalid against the
   MNX schema's `C|F|G` enum — see the `lab/tab-spec-gaps` scenario.)
-- `tuning` entries carry **explicit string numbers**; array order is
-  meaningless. Sounding pitches; absent ⇒ standard guitar tuning.
-- `staffKind` (`notation | tab | both`, default `notation`) is a *hint*, not a
-  command — interactive consumers may expose a view toggle that overrides it.
+- `strings` entries carry **explicit string numbers**; array order is
+  meaningless. Sounding pitches, before the capo; absent ⇒ standard guitar
+  tuning. Named `strings`, not "tuning": temperament work
+  ([#365](https://github.com/w3c-cg/mnx/discussions/365)) already claims that
+  word, and the shape mirrors MNX's own `part.kit` / `kit-note.kitComponent`
+  precedent — declared numbers, referenced by `note._x.mnxLab.string`.
+- `capo` shifts every open-string pitch up AND re-origins printed fret numbers
+  (fret numbers are capo-relative).
+- `tab.staffKind` (`notation | tab | both`, default `notation`) is a *hint*,
+  not a command — interactive consumers may expose a view toggle that overrides
+  it. It stays under `tab` because its adopted home is undecided (possibly
+  `staff-source` — presentation, not part setup).
 
 ## Global measure: `global.measures[i]._x.mnxLab`
 
@@ -233,10 +251,10 @@ structure, so most chords carry none.
 
 | MusicXML | Guitar Pro (alphaTab) | This extension |
 | --- | --- | --- |
-| `<clef><sign>TAB</sign></clef>` + duplicated staff | `Staff.showTablature` | `part.tab.staffKind` (content encoded once) |
-| `<staff-details><staff-tuning line="n">` | `Staff.stringTuning` | `tab.tuning[]` with explicit `string` |
-| `<capo>` | `Staff.capo` | `tab.capo` |
-| `<technical><string>` / `<fret>` | `Note.string` / `Note.fret` | `position.string` / `position.fret` |
+| `<clef><sign>TAB</sign></clef>` + duplicated staff | `Staff.showTablature` | `tab.staffKind` (content encoded once) |
+| `<staff-details><staff-tuning line="n">` | `Staff.stringTuning` | `strings[]` with explicit `string` |
+| `<capo>` | `Staff.capo` | `capo` |
+| `<technical><string>` / `<fret>` | `Note.string` / `Note.fret` | flat `string` / `fret` |
 | run of `<bend>` gestures | `Note.bendPoints` | `technique.bend.points` |
 | `<hammer-on type="start\|stop">` pair | `Note.isHammerPullOrigin` | `technique.hammerOn.target` (note id) |
 | `<pull-off type="start\|stop">` pair | (same, split by pitch direction) | `technique.pullOff.target` |
@@ -288,9 +306,9 @@ Cloudflare Workers cannot run `ajv.compile()`.
 
 ## Open questions (input wanted)
 
-- Should `position` eventually live under standard MNX's `note.perform`
-  (currently an empty placeholder object) rather than `_x`? Its existence
-  suggests the CG intends performance data to live there.
+- Should `string` eventually live under standard MNX's `note.perform`
+  (currently an empty placeholder object) rather than flat on `note`? Its
+  existence suggests the CG intends performance data to live there.
 - `palmMute` is per-note here, matching Guitar Pro. In standard MNX it should
   probably be a **span** on the part measure with `position` + `end`, like
   `ottava` and `dynamic-group` — as should `letRing`, which is not carried yet.
@@ -304,6 +322,15 @@ Cloudflare Workers cannot run `ajv.compile()`.
 
 ## History
 
+- **v5** (2026-08-07): the tab sub-namespace flattened to the adopted shape it
+  drafts ([roadmap/proposed/instrument-position.md](../roadmap/proposed/instrument-position.md)):
+  `tab.position.{string,fret}` → flat `string`/`fret` (fret now **optional and
+  non-authoritative** — validation only), `tab.fingering` → `fingering`,
+  `tab.tuning` → `strings`, `tab.capo` → `capo`. Only `technique` (pending a
+  general articulations proposal) and `staffKind` (adopted home undecided)
+  remain under `tab`. Load-time migration is the v4 → v5 hop in
+  `upgradeTabExtension.ts`; execution plan in
+  [roadmap/proposed/derived-positions.md](../roadmap/proposed/derived-positions.md).
 - **v4** (2026-07-29): `rehearsal` and `section` graduated out of `_x` into the
   standard MNX objects proposed in
   [roadmap/proposed/score-text.md](../roadmap/proposed/score-text.md); the vendor

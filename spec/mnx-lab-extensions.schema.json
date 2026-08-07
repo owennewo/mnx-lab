@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://mnx-lab.totai.uk/schemas/mnx-lab-extensions.schema.json/v4",
-  "title": "MNX Lab vendor extensions (`_x.mnxLab`) \u2014 v4",
+  "$id": "https://mnx-lab.totai.uk/schemas/mnx-lab-extensions.schema.json/v5",
+  "title": "MNX Lab vendor extensions (`_x.mnxLab`) \u2014 v5",
   "description": "Everything MNX Lab carries that W3C MNX v19 cannot express: fretted-instrument tablature, section/rehearsal labels, and chord symbols. All of it lives under the single vendor key `_x.mnxLab`, which is how the MNX spec says extensions are namespaced (w3c-cg/mnx#63/#429: the `_x` key identifies an agent, vendor or community). Documents using these extensions remain fully valid against the official MNX schema. Each block is shaped like the standard MNX object it is a draft of, so adopting any of them upstream means deleting the `_x.mnxLab` wrapper rather than rewriting the data. Rationale and the proposals these draft: docs/mnx-extensions.md.",
   "type": "object",
   "$defs": {
@@ -57,28 +57,17 @@
       ],
       "additionalProperties": false
     },
-    "position": {
-      "type": "object",
-      "description": "Where the note is played on the fingerboard. The only truly tab-specific data: notation rendering ignores it; tab rendering requires it (or falls back to a playability heuristic).",
-      "properties": {
-        "string": {
-          "type": "integer",
-          "description": "String number. String 1 is the highest-pitched string (E4 on a standard-tuned guitar).",
-          "minimum": 1,
-          "maximum": 12
-        },
-        "fret": {
-          "type": "integer",
-          "description": "Fret number; 0 = open string.",
-          "minimum": 0,
-          "maximum": 36
-        }
-      },
-      "required": [
-        "string",
-        "fret"
-      ],
-      "additionalProperties": false
+    "string-number": {
+      "type": "integer",
+      "description": "Which string the note is played on — the performer's authoritative CHOICE. String 1 is the highest-pitched string (E4 on a standard-tuned guitar), MusicXML's convention and the opposite of the visual tab convention. Drafts `note.string` (roadmap/proposed/instrument-position.md): given the part's string declaration, the capo and the note's sounding pitch, the fret is derived arithmetic.",
+      "minimum": 1,
+      "maximum": 12
+    },
+    "fret-number": {
+      "type": "integer",
+      "description": "Fret number; 0 = open string, counted from the capo when one is declared. OPTIONAL and NON-AUTHORITATIVE: the rendered fret is always derived from string + pitch, and a stored fret's only job is validation — a mismatch with the derived fret is a diagnostic (typically a broken importer), never a rendering input. See roadmap/proposed/derived-positions.md.",
+      "minimum": 0,
+      "maximum": 36
     },
     "bend-point": {
       "type": "object",
@@ -179,7 +168,7 @@
         },
         "harmonic": {
           "type": "object",
-          "description": "A harmonic. Identified by TOUCHING PITCH rather than touching fret: that is MusicXML's model, it covers fretless instruments, and it can state the between-fret nodes that w3c-cg/mnx#179 is about, which a fret integer cannot. The fret, when there is one, is already in `position`.",
+          "description": "A harmonic. Identified by TOUCHING PITCH rather than touching fret: that is MusicXML's model, it covers fretless instruments, and it can state the between-fret nodes that w3c-cg/mnx#179 is about, which a fret integer cannot. The stopped position, when there is one, is already stated by the note's `string` (+ derived or stored `fret`).",
           "properties": {
             "type": {
               "enum": [
@@ -232,23 +221,17 @@
     },
     "note-tab": {
       "type": "object",
-      "description": "Stored under note._x.mnxLab.tab. All blocks optional and independent: a note may carry a technique or fingering without committing to a fingerboard position.",
+      "description": "Stored under note._x.mnxLab.tab. v5 leaves only `technique` here: `string`/`fret`/`fingering` moved flat onto the vendor dict, mirroring the adopted shape they draft (flat on `note` \u2014 roadmap/proposed/instrument-position.md). `technique` stays until it graduates via a general articulations proposal (roadmap/proposed/guitar-technique.md).",
       "properties": {
-        "position": {
-          "$ref": "#/$defs/position"
-        },
         "technique": {
           "$ref": "#/$defs/technique"
-        },
-        "fingering": {
-          "$ref": "#/$defs/fingering"
         }
       },
       "additionalProperties": false
     },
-    "tuning-entry": {
+    "string-entry": {
       "type": "object",
-      "description": "One string's tuning. The string number is explicit \u2014 array order carries no meaning.",
+      "description": "One string's declaration. The string number is explicit \u2014 array order carries no meaning.",
       "properties": {
         "string": {
           "type": "integer",
@@ -267,22 +250,8 @@
     },
     "part-tab": {
       "type": "object",
-      "description": "Stored under part._x.mnxLab.tab. Declares the instrument's fingerboard configuration and the part's preferred staff presentation. Tab-ness is a VIEW declaration here \u2014 there is no tab clef and no duplicated tab staff; notation and tab are both derived from the same note stream.",
+      "description": "Stored under part._x.mnxLab.tab. v5 leaves only `staffKind` here: `strings`/`capo` moved flat onto the vendor dict (drafting flat `part.strings[]`/`part.capo`). Tab-ness is a VIEW declaration \u2014 there is no tab clef and no duplicated tab staff; notation and tab are both derived from the same note stream.",
       "properties": {
-        "tuning": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/tuning-entry"
-          },
-          "minItems": 1,
-          "description": "Sounding pitch of each open string. If absent, consumers should assume standard guitar tuning (string 1 = E4 \u2026 string 6 = E2)."
-        },
-        "capo": {
-          "type": "integer",
-          "description": "Capo fret position (omit or 0 = no capo). A rendering/performance concern: fret numbers in positions are relative to the capo.",
-          "minimum": 0,
-          "maximum": 24
-        },
         "staffKind": {
           "enum": [
             "notation",
@@ -459,18 +428,46 @@
     },
     "note-ext": {
       "type": "object",
-      "description": "The whole vendor dict at note._x.mnxLab.",
+      "description": "The whole vendor dict at note._x.mnxLab. `string`, `fret` and `fingering` sit flat — peers of the note's own `pitch`/`staff` in the shape they draft — because nesting them under `tab` would make universal fields (fingering is piano's whole interest) fretboard-scoped by construction. A note may carry any subset: `string` alone derives its fret; `fret` alone is meaningless and therefore requires `string`.",
       "properties": {
+        "string": {
+          "$ref": "#/$defs/string-number"
+        },
+        "fret": {
+          "$ref": "#/$defs/fret-number"
+        },
+        "fingering": {
+          "$ref": "#/$defs/fingering"
+        },
         "tab": {
           "$ref": "#/$defs/note-tab"
         }
+      },
+      "dependentRequired": {
+        "fret": [
+          "string"
+        ]
       },
       "additionalProperties": false
     },
     "part-ext": {
       "type": "object",
-      "description": "The whole vendor dict at part._x.mnxLab.",
+      "description": "The whole vendor dict at part._x.mnxLab. `strings` declares the sounding pitch of each open string (named to avoid \"tuning\", which temperament work — w3c-cg/mnx#365 — already claims; the shape mirrors `part.kit` + `kit-note.kitComponent`: declared numbers, referenced by `note._x.mnxLab.string`). If absent, consumers assume standard guitar tuning (string 1 = E4 … string 6 = E2).",
       "properties": {
+        "strings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/string-entry"
+          },
+          "minItems": 1,
+          "description": "Sounding pitch of each open string, before the capo is applied."
+        },
+        "capo": {
+          "type": "integer",
+          "description": "Capo fret position (omit or 0 = no capo). Shifts every open-string pitch up by this many semitones AND re-origins printed fret numbers (fret numbers are capo-relative).",
+          "minimum": 0,
+          "maximum": 24
+        },
         "tab": {
           "$ref": "#/$defs/part-tab"
         }

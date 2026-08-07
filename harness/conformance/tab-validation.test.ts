@@ -24,6 +24,21 @@ function readScore(name: string): MnxStructure {
   return JSON.parse(fs.readFileSync(path.join(SCORES, `${name}.mnx.json`), 'utf-8'));
 }
 
+/** Sounding pitch of (string, fret) in standard tuning — v5 derives the fret
+ *  from string + pitch, so fixture pitches must be CONSISTENT with their
+ *  stored positions or the mismatch tripwire (deliberately) fires. */
+type Step = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
+function pitchAt(string: number, fret: number): { step: Step; octave: number; alter?: number } {
+  const OPEN = [64, 59, 55, 50, 45, 40]; // string 1..6
+  const midi = OPEN[string - 1] + fret;
+  const NAMES: [Step, number?][] = [
+    ['C'], ['C', 1], ['D'], ['D', 1], ['E'], ['F'], ['F', 1], ['G'], ['G', 1], ['A'], ['A', 1], ['B']
+  ];
+  const [step, alter] = NAMES[midi % 12];
+  const octave = Math.floor(midi / 12) - 1;
+  return alter !== undefined ? { step, octave, alter } : { step, octave };
+}
+
 /** Minimal one-measure document with the given per-voice positions. */
 function docWith(voices: { string: number; fret: number }[][]): MnxStructure {
   return {
@@ -39,8 +54,8 @@ function docWith(voices: { string: number; fret: number }[][]): MnxStructure {
                 {
                   duration: { base: 'whole' as const },
                   notes: positions.map(position => ({
-                    pitch: { step: 'E' as const, octave: 4 },
-                    _x: { mnxLab: { tab: { position } } }
+                    pitch: pitchAt(position.string, position.fret),
+                    _x: { mnxLab: { string: position.string, fret: position.fret } }
                   }))
                 }
               ]
@@ -109,8 +124,8 @@ describe('tab fingerboard validation', () => {
     const doc = docWith([[{ string: 1, fret: 0 }]]);
     // Two half notes, same position, sequential — perfectly playable.
     doc.parts[0].measures[0].sequences[0].content = [
-      { duration: { base: 'half' }, notes: [{ pitch: { step: 'E', octave: 4 }, _x: { mnxLab: { tab: { position: { string: 1, fret: 0 } } } } }] },
-      { duration: { base: 'half' }, notes: [{ pitch: { step: 'E', octave: 4 }, _x: { mnxLab: { tab: { position: { string: 1, fret: 0 } } } } }] }
+      { duration: { base: 'half' }, notes: [{ pitch: { step: 'E', octave: 4 }, _x: { mnxLab: { string: 1, fret: 0 } } }] },
+      { duration: { base: 'half' }, notes: [{ pitch: { step: 'E', octave: 4 }, _x: { mnxLab: { string: 1, fret: 0 } } }] }
     ];
     expect(validateDocument(doc).filter(i => i.scope === 'tab')).toEqual([]);
   });

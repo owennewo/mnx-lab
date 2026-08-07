@@ -324,13 +324,11 @@ function buildPart(
   if (stringCount > 0) {
     part._x = {
       mnxLab: {
-        tab: {
-          tuning: alphaTabTuningToMnx(tunings, fifthsByMeasure[0] ?? 0),
-          ...(staff?.capo ? { capo: staff.capo } : {}),
-          // Guitar Pro scores are single-source tab+notation, which is exactly
-          // the tab extension's model — no merge step needed.
-          staffKind: 'both'
-        }
+        strings: alphaTabTuningToMnx(tunings, fifthsByMeasure[0] ?? 0),
+        ...(staff?.capo ? { capo: staff.capo } : {}),
+        // Guitar Pro scores are single-source tab+notation, which is exactly
+        // the tab extension's model — no merge step needed.
+        tab: { staffKind: 'both' }
       }
     };
   }
@@ -454,12 +452,8 @@ function buildNote(
   if (note.string > 0) {
     mnxNote._x = {
       mnxLab: {
-        tab: {
-          position: {
-            string: alphaTabStringToMnx(note.string, stringCount),
-            fret: note.fret
-          }
-        }
+        string: alphaTabStringToMnx(note.string, stringCount),
+        fret: note.fret
       }
     };
   }
@@ -467,7 +461,7 @@ function buildNote(
   const technique = readTechniques(note);
   if (technique) {
     mnxNote._x = mnxNote._x ?? {};
-    mnxNote._x.mnxLab = { tab: { ...mnxNote._x.mnxLab?.tab, technique } };
+    mnxNote._x.mnxLab = { ...mnxNote._x.mnxLab, tab: { technique } };
   }
 
   return mnxNote;

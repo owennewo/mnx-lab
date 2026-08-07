@@ -234,7 +234,7 @@ export function exportMusicXML(
 
       // Staff details (tuning) for TAB clefs
       if (m === 0 && activeClefSign === 'TAB') {
-        const tuning = part._x?.mnxLab?.tab?.tuning;
+        const tuning = part._x?.mnxLab?.strings;
         const numStrings = tuning?.length || 6;
 
         const staffDetailsEl = doc.createElement('staff-details');
@@ -269,8 +269,8 @@ export function exportMusicXML(
         }
 
         // `<capo>` follows the tunings in the MusicXML content model. Losing it
-        // detunes the whole part, since `_x.mnxLab.tab` frets are measured from it.
-        const capo = part._x?.mnxLab?.tab?.capo;
+        // detunes the whole part, since `_x.mnxLab` frets are measured from it.
+        const capo = part._x?.mnxLab?.capo;
         if (capo) {
           const capoEl = doc.createElement('capo');
           capoEl.textContent = `${capo}`;
@@ -639,8 +639,12 @@ function buildXmlNode(
     }
 
     // Technical (fingerboard position + playing technique)
-    const position = node.note._x?.mnxLab?.tab?.position;
-    const technique = node.note._x?.mnxLab?.tab?.technique;
+    const noteExt = node.note._x?.mnxLab;
+    const position =
+      noteExt?.string !== undefined && noteExt?.fret !== undefined
+        ? { string: noteExt.string, fret: noteExt.fret }
+        : undefined;
+    const technique = noteExt?.tab?.technique;
     if (position || technique) {
       notationsEl = doc.createElement('notations');
 

@@ -45,5 +45,10 @@
   "idRefs": false,
   "source": "hand-written",
   "origin": "local",
-  "status": "rendered"
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-07",
+    "primitivesHash": "sha256:a122dd763775d4d9",
+    "renderHash": "sha256:fed5f098a3aa409b"
+  }
 }

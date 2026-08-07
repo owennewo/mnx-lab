@@ -45,6 +45,7 @@ import {
   emitTabTimeSig,
   emitTabVoices
 } from './tabStaff.ts';
+import { tabPositionContext } from '../tab/guitarPositions.ts';
 
 /**
  * Pure layout for standard 5-line notation. Working in staff spaces, returns
@@ -1419,7 +1420,8 @@ function renderSegment(args: RenderSegmentArgs): {
           synthesizeKeys: td.planStaff === 0 && synthesizeKeysForStaff0,
           primitives,
           index,
-          onIssue: message => measureIssues.push({ kind: 'render', message })
+          onIssue: message => measureIssues.push({ kind: 'render', message }),
+          positionContext: tabPositionContext(td.part)
         });
       }
     }

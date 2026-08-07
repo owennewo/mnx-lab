@@ -36,13 +36,6 @@ export interface MnxHarmonic {
   touchingPitch?: MnxPitch;
 }
 
-export interface MnxTabPosition {
-  /** String number; 1 = highest-pitched string. */
-  string: number;
-  /** Fret number; 0 = open string. */
-  fret: number;
-}
-
 export interface MnxTabTechnique {
   bend?: MnxBend;
   slide?: MnxSlide;
@@ -53,10 +46,19 @@ export interface MnxTabTechnique {
   palmMute?: boolean;
 }
 
+/** v5: only `technique` remains under `tab`. */
 export interface MnxTabNoteExtension {
-  position?: MnxTabPosition;
   technique?: MnxTabTechnique;
+}
+
+/** The whole vendor dict at note._x.mnxLab — v5 flat shape. `fret` is
+ *  optional and non-authoritative (validation only); converters keep writing
+ *  it because the source formats store both. */
+export interface MnxNoteExtension {
+  string?: number;
+  fret?: number;
   fingering?: MnxFingering;
+  tab?: MnxTabNoteExtension;
 }
 
 /** A chord root or bass note: an MNX pitch minus the octave. */
@@ -130,7 +132,7 @@ export interface MnxNote {
     };
   };
   _x?: {
-    mnxLab?: { tab?: MnxTabNoteExtension };
+    mnxLab?: MnxNoteExtension;
   };
 }
 
@@ -186,11 +188,18 @@ export interface MnxTuningEntry {
   pitch: MnxPitch;
 }
 
+/** v5: only `staffKind` remains under `tab`. */
 export interface MnxTabPartExtension {
-  tuning?: MnxTuningEntry[];
-  capo?: number;
   /** The part's preferred presentation; tab-ness is a view, not content. */
   staffKind?: 'notation' | 'tab' | 'both';
+}
+
+/** The whole vendor dict at part._x.mnxLab — v5 flat shape. */
+export interface MnxPartExtension {
+  /** Sounding open-string pitches, before the capo. Absent ⇒ standard guitar. */
+  strings?: MnxTuningEntry[];
+  capo?: number;
+  tab?: MnxTabPartExtension;
 }
 
 export interface MnxPart {
@@ -205,7 +214,7 @@ export interface MnxPart {
     };
   };
   _x?: {
-    mnxLab?: { tab?: MnxTabPartExtension };
+    mnxLab?: MnxPartExtension;
   };
 }
 

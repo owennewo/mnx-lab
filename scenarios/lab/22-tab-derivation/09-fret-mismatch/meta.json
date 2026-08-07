@@ -1,0 +1,38 @@
+{
+  "title": "A stored fret that lies is flagged, and the derived fret renders",
+  "description": "One whole note sounding C3 annotated string 5 fret 5 — but string 5 (open A2) sounds C3 at fret 3. The stored fret is non-authoritative: the tab staff draws the DERIVED fret 3, and a red badge reports the disagreement. This is the stored fret's entire v5 job — a mismatch is one of the few signals that catches a broken importer — and the conflict rule of instrument-position.md adjudicated: pitch wins, annotations are checked against it.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:derivation",
+    "derivation",
+    "diagnostics",
+    "mismatch"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "vendor-extensions"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-derivation"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-07",
+    "primitivesHash": "sha256:3db60f4892b93f8e",
+    "renderHash": "sha256:a43981e916816f18"
+  }
+}

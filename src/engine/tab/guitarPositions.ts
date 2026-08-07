@@ -1,10 +1,26 @@
-import { MnxNote } from '../../model/mnx.ts';
+import { MnxNote, MnxPart, MnxPitch } from '../../model/mnx.ts';
+
+/**
+ * Fingerboard position derivation (roadmap/proposed/derived-positions.md).
+ *
+ * The authority ladder:
+ *   string + fret  → the DERIVED fret renders; a disagreeing stored fret is
+ *                    flagged (validate.ts), never drawn.
+ *   string only    → the fret is arithmetic: pitch − (open + capo).
+ *   neither        → the default assignment below — presentation, not content,
+ *                    never written back to the document.
+ *
+ * All pitches are SOUNDING (MNX stores sounding pitch; `part.transposition`
+ * is display metadata and never enters this arithmetic).
+ */
 
 /**
  * Standard guitar tuning, open string MIDI notes.
  * Index 0 = string 1 (high E, MIDI 64); index 5 = string 6 (low E, MIDI 40).
  */
 export const GUITAR_TUNING = [64, 59, 55, 50, 45, 40];
+
+export const MAX_FRET = 24;
 
 function getMidiNote(step: string, octave: number, alter: number = 0): number {
   const stepOffsets: Record<string, number> = {
@@ -14,80 +30,93 @@ function getMidiNote(step: string, octave: number, alter: number = 0): number {
   return (octave + 1) * 12 + base + alter;
 }
 
-/**
- * Map a chord of MNX notes to fret/string positions.
- * Uses `_x.mnxLab.tab.position` when annotated; otherwise picks the lowest
- * playable fret per pitch, avoiding string collisions within the chord.
- */
-export function resolveEventPositions(notes: MnxNote[]): { str: number; fret: number }[] {
-  const allAnnotated = notes.every(n => n._x?.mnxLab?.tab?.position !== undefined);
-  if (allAnnotated) {
-    return notes.map(n => ({
-      str: n._x!.mnxLab!.tab!.position!.string,
-      fret: n._x!.mnxLab!.tab!.position!.fret
-    }));
-  }
+export function midiOfMnxPitch(pitch: MnxPitch): number {
+  return getMidiNote(pitch.step, pitch.octave, pitch.alter ?? 0);
+}
 
-  const resolved: { str: number; fret: number }[] = [];
+export interface TabPositionContext {
+  /** Sounding MIDI of each EFFECTIVE open string (capo applied), by string number. */
+  openMidi: ReadonlyMap<number, number>;
+}
+
+/**
+ * The part's effective string set: declared `_x.mnxLab.strings` (or standard
+ * guitar when absent — the documented default), each shifted up by the capo.
+ * Printed frets are counted from the capo, so deriving against the shifted
+ * opens makes them capo-relative by construction.
+ */
+export function tabPositionContext(part: MnxPart | undefined): TabPositionContext {
+  const declared = part?._x?.mnxLab?.strings;
+  const capo = part?._x?.mnxLab?.capo ?? 0;
+  const openMidi = new Map<number, number>();
+  if (declared && declared.length > 0) {
+    for (const entry of declared) {
+      openMidi.set(entry.string, midiOfMnxPitch(entry.pitch) + capo);
+    }
+  } else {
+    GUITAR_TUNING.forEach((midi, index) => openMidi.set(index + 1, midi + capo));
+  }
+  return { openMidi };
+}
+
+export interface ResolvedTabPosition {
+  str: number;
+  fret: number;
+  /** The stored fret disagreed with the derived one (the derived one is used). */
+  mismatch?: boolean;
+}
+
+/**
+ * Map a chord of MNX notes to fret/string positions, aligned with the input
+ * order. `null` marks an unplayable note (annotated string not declared,
+ * derived fret outside [0, MAX_FRET], or no free string can reach the pitch):
+ * the caller draws nothing for it, and validate.ts raises the red badge —
+ * never a silent clamp.
+ */
+export function resolveEventPositions(
+  notes: MnxNote[],
+  ctx: TabPositionContext = tabPositionContext(undefined)
+): (ResolvedTabPosition | null)[] {
+  const resolved: (ResolvedTabPosition | null)[] = new Array(notes.length).fill(null);
   const usedStrings = new Set<number>();
 
-  const notesWithMidi = notes.map((note, index) => {
-    const step = note.pitch.step;
-    const octave = note.pitch.octave;
-    const alter = note.pitch.alter || 0;
-    const midi = getMidiNote(step, octave, alter);
-    return { note, midi, index };
+  // Pass 1: annotated strings are authoritative and reserve their string even
+  // when the derived fret turns out unplayable — the author claimed it.
+  notes.forEach((note, index) => {
+    const x = note._x?.mnxLab;
+    if (x?.string === undefined) return;
+    usedStrings.add(x.string);
+    const open = ctx.openMidi.get(x.string);
+    if (open === undefined) return;
+    const fret = midiOfMnxPitch(note.pitch) - open;
+    if (fret < 0 || fret > MAX_FRET) return;
+    resolved[index] = {
+      str: x.string,
+      fret,
+      ...(x.fret !== undefined && x.fret !== fret ? { mismatch: true } : {})
+    };
   });
 
-  notesWithMidi.sort((a, b) => b.midi - a.midi);
+  // Pass 2: bare notes, highest pitch first (high pitches have the fewest
+  // reachable strings, so they choose first); lowest playable fret wins, ties
+  // break to the lower string number; no string collisions within the chord.
+  const bare = notes
+    .map((note, index) => ({ index, midi: midiOfMnxPitch(note.pitch), note }))
+    .filter(({ note }) => note._x?.mnxLab?.string === undefined)
+    .sort((a, b) => b.midi - a.midi);
+  const stringsAscending = [...ctx.openMidi.keys()].sort((a, b) => a - b);
 
-  for (const item of notesWithMidi) {
-    const pos = item.note._x?.mnxLab?.tab?.position;
-    if (pos) {
-      resolved.push({ str: pos.string, fret: pos.fret });
-      usedStrings.add(pos.string);
-    }
-  }
-
-  for (const item of notesWithMidi) {
-    if (item.note._x?.mnxLab?.tab?.position) {
-      continue;
-    }
-
-    const midi = item.midi;
-    const candidates: { string: number; fret: number }[] = [];
-    for (let s = 1; s <= 6; s++) {
+  for (const item of bare) {
+    let best: ResolvedTabPosition | null = null;
+    for (const s of stringsAscending) {
       if (usedStrings.has(s)) continue;
-      const openMidi = GUITAR_TUNING[s - 1];
-      const fret = midi - openMidi;
-      if (fret >= 0 && fret <= 24) {
-        candidates.push({ string: s, fret });
-      }
+      const fret = item.midi - ctx.openMidi.get(s)!;
+      if (fret < 0 || fret > MAX_FRET) continue;
+      if (!best || fret < best.fret) best = { str: s, fret };
     }
-
-    if (candidates.length > 0) {
-      candidates.sort((a, b) => a.fret - b.fret);
-      const chosen = candidates[0];
-      resolved.push({ str: chosen.string, fret: chosen.fret });
-      usedStrings.add(chosen.string);
-    } else {
-      let chosenStr = 1;
-      for (let s = 1; s <= 6; s++) {
-        if (!usedStrings.has(s)) {
-          chosenStr = s;
-          break;
-        }
-      }
-      const alterSuffix = item.note.pitch.alter
-        ? (item.note.pitch.alter === 1 ? '#' : 'b')
-        : '';
-      console.warn(
-        `Pitch ${item.note.pitch.step}${alterSuffix}${item.note.pitch.octave} (MIDI ${midi}) outside guitar range or collision. Clamping.`
-      );
-      const openMidi = GUITAR_TUNING[chosenStr - 1];
-      const fret = Math.max(0, Math.min(24, midi - openMidi));
-      resolved.push({ str: chosenStr, fret });
-      usedStrings.add(chosenStr);
+    if (best) {
+      resolved[item.index] = best;
+      usedStrings.add(best.str);
     }
   }
 

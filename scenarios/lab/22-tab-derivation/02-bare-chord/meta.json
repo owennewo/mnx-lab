@@ -1,0 +1,37 @@
+{
+  "title": "Bare chord — collision-free assignment from pitches alone",
+  "description": "One whole-note chord (sounding C3 E3 G3 C4 E4 — the open C-major shape) with no annotations. Assignment runs highest-pitch-first so the crowded top strings choose first, and no two notes may share a string: the derived shape is exactly the open C chord — strings 1..5, frets 0 1 0 2 3. Proves the within-chord collision avoidance of the default algorithm.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:derivation",
+    "derivation",
+    "chords"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "vendor-extensions"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-derivation"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-07",
+    "primitivesHash": "sha256:9e7ff90639d15cc1",
+    "renderHash": "sha256:232f0f1a185ca2d8"
+  }
+}

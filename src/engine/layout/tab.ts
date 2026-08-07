@@ -10,6 +10,7 @@ import {
   emitTabVoices
 } from './tabStaff.ts';
 import { validateDocument } from './validate.ts';
+import { tabPositionContext } from '../tab/guitarPositions.ts';
 
 /**
  * Pure layout function for guitar tab. Takes parsed MNX + viewport width
@@ -71,6 +72,9 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   }
 
   const numMeasures = part.measures.length;
+  // Effective string set (declared or standard-guitar default, capo applied) —
+  // one context for every fret this layout derives.
+  const positionContext = tabPositionContext(part);
   // All horizontal decisions (system packing, bar widths, event x positions)
   // come from the shared plan — layoutNotation consumes the same one, which is
   // what keeps notation and tab column-aligned in the "both" view.
@@ -137,7 +141,8 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       synthesizeKeys: true,
       primitives,
       index,
-      onIssue: message => measureIssues.push({ kind: 'render', message })
+      onIssue: message => measureIssues.push({ kind: 'render', message }),
+      positionContext
     });
 
     // End barline

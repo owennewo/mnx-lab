@@ -3,7 +3,7 @@ import { addIdSuffix } from '../common/utils.js';
 
 /**
  * Synthesizes the MusicXML notation+TAB pair from a SINGLE-SOURCE MNX part
- * (one note stream annotated with `_x.mnxLab.tab` positions — see
+ * (one note stream annotated with flat `_x.mnxLab` string/fret — see
  * docs/mnx-extensions.md). The duplicated two-staff form exists only at
  * the MusicXML boundary; it never appears in MNX documents.
  *
@@ -83,9 +83,10 @@ function copySequenceStd(seq: MnxSequence): MnxSequence {
         if (note.id) {
           copyNote.id = addIdSuffix(note.id, 'std');
         }
-        if (copyNote._x?.mnxLab?.tab) {
-          const { tab: _tab, ...restLab } = copyNote._x.mnxLab;
-          const { mnxLab: _lab, ...restX } = copyNote._x;
+        const lab = copyNote._x?.mnxLab;
+        if (lab && (lab.string !== undefined || lab.fingering || lab.tab)) {
+          const { string: _s, fret: _f, fingering: _fg, tab: _tab, ...restLab } = lab;
+          const { mnxLab: _lab, ...restX } = copyNote._x!;
           const mnxLab = Object.keys(restLab).length > 0 ? { mnxLab: restLab } : {};
           const next = { ...restX, ...mnxLab };
           if (Object.keys(next).length > 0) {

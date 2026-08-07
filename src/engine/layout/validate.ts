@@ -1,5 +1,6 @@
-import { MnxStructure, isGrace, isTremolo, isTuplet, isTimedEvent } from '../../model/mnx.ts';
+import { MnxStructure, MnxPitch, isGrace, isTremolo, isTuplet, isTimedEvent } from '../../model/mnx.ts';
 import { durationValue, tremoloDuration, tupletDuration } from './spacing.ts';
+import { MAX_FRET, midiOfMnxPitch, tabPositionContext } from '../tab/guitarPositions.ts';
 
 /**
  * Semantic (musical) validation — problems the schema can't see but the user
@@ -91,6 +92,22 @@ interface PositionClaim {
   voiceIndex: number;
 }
 
+/** "C#4" / "Bb2" — display form of an MNX pitch for diagnostics. */
+function fmtPitch(pitch: MnxPitch): string {
+  const alter = pitch.alter ?? 0;
+  const accidental = alter > 0 ? '#'.repeat(alter) : 'b'.repeat(-alter);
+  return `${pitch.step}${accidental}${pitch.octave}`;
+}
+
+/** "E2–D6" — the reachable sounding range, MIDI → spelled without alteration bias. */
+function fmtRange(lowMidi: number, highMidi: number): string {
+  const name = (midi: number): string => {
+    const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    return `${names[((midi % 12) + 12) % 12]}${Math.floor(midi / 12) - 1}`;
+  };
+  return `${name(lowMidi)}–${name(highMidi)}`;
+}
+
 /**
  * Fingerboard conflicts: two notes claiming the same string at the same instant.
  * A string is one physical object, so it can sound one pitch at a time — a
@@ -106,12 +123,35 @@ interface PositionClaim {
  *     Guitar Pro re-frets the duplicate somewhere else (inventing a note nobody
  *     plays), TuxGuitar and this renderer draw them on top of each other.
  *
- * Silent for documents without `_x.mnxLab.tab.position` — there is nothing to conflict.
+ * Since v5 the string is authoritative and the fret is DERIVED (string + pitch
+ * + tuning + capo — roadmap/proposed/derived-positions.md), so this pass also
+ * checks the derivation itself:
+ *
+ *   - an annotated string the part never declared     → error
+ *   - a derived fret outside [0, MAX_FRET]            → error (the layout
+ *     draws nothing for that note; this badge is its only trace)
+ *   - a stored fret disagreeing with the derived one  → error (the stored
+ *     fret's whole v5 job is this tripwire — it typically means a broken
+ *     importer, and the derived fret is what renders)
+ *   - on a declared tab part, a bare note no string can reach → error
+ *
+ * Conflict claims use the DERIVED fret. Silent for documents with no tab
+ * declaration and no `_x.mnxLab.string` — there is nothing to check.
  */
 function validateTabPositions(
   part: NonNullable<MnxStructure['parts']>[number],
   issues: ValidationIssue[]
 ): void {
+  const lab = part._x?.mnxLab;
+  const partIsTab = !!(lab?.strings || lab?.capo !== undefined || lab?.tab);
+  const ctx = tabPositionContext(part);
+  const opens = [...ctx.openMidi.values()];
+  const lowestReach = Math.min(...opens);
+  const highestReach = Math.max(...opens) + MAX_FRET;
+
+  const error = (measureIndex: number, message: string) =>
+    issues.push({ measureIndex, severity: 'error', scope: 'tab', message });
+
   part.measures.forEach((partMeasure, measureIndex) => {
     // onset (whole-note fraction) → string number → claims
     const claims = new Map<number, Map<number, PositionClaim[]>>();
@@ -124,13 +164,55 @@ function validateTabPositions(
         if (!isTimedEvent(item)) return;
 
         for (const note of item.notes ?? []) {
-          const position = note._x?.mnxLab?.tab?.position;
-          if (!position) continue;
+          const x = note._x?.mnxLab;
+          if (x?.string === undefined) {
+            // Bare note: on a declared tab part, flag a pitch that no string
+            // can reach — the assignment is presentation, but an unreachable
+            // pitch is a content problem the user should see.
+            if (partIsTab) {
+              const midi = midiOfMnxPitch(note.pitch);
+              if (midi < lowestReach || midi > highestReach) {
+                error(
+                  measureIndex,
+                  `${fmtPitch(note.pitch)} is not playable on the declared strings` +
+                    ` (reachable range ${fmtRange(lowestReach, highestReach)})`
+                );
+              }
+            }
+            continue;
+          }
+
+          const open = ctx.openMidi.get(x.string);
+          if (open === undefined) {
+            error(
+              measureIndex,
+              `string ${x.string} is not declared in the part's strings`
+            );
+            continue;
+          }
+          const derived = midiOfMnxPitch(note.pitch) - open;
+          if (derived < 0 || derived > MAX_FRET) {
+            error(
+              measureIndex,
+              `${fmtPitch(note.pitch)} is not playable on string ${x.string}` +
+                ` (derived fret ${derived} is outside 0–${MAX_FRET})`
+            );
+            continue;
+          }
+          if (x.fret !== undefined && x.fret !== derived) {
+            error(
+              measureIndex,
+              `stored fret ${x.fret} disagrees with the derived fret ${derived}` +
+                ` on string ${x.string} — the pitch, the tuning or the` +
+                ` annotation is wrong (the derived fret is rendered)`
+            );
+          }
+
           const key = Math.round(onset * 1e6) / 1e6;
           const byString = claims.get(key) ?? new Map<number, PositionClaim[]>();
-          const list = byString.get(position.string) ?? [];
-          list.push({ fret: position.fret, voiceIndex });
-          byString.set(position.string, list);
+          const list = byString.get(x.string) ?? [];
+          list.push({ fret: derived, voiceIndex });
+          byString.set(x.string, list);
           claims.set(key, byString);
         }
         onset += durationValue(item.duration);

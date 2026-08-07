@@ -98,16 +98,17 @@ function malformedMeasures(xml: string): string[] {
 function tabPitchMismatches(mnx: MnxStructure): number {
   let mismatches = 0;
   for (const part of mnx.parts) {
-    const tuning = part._x?.mnxLab?.tab?.tuning;
+    const tuning = part._x?.mnxLab?.strings;
     if (!tuning) continue;
-    // `_x.mnxLab.tab` frets are measured FROM the capo, so it belongs in the identity.
-    const capo = part._x?.mnxLab?.tab?.capo ?? 0;
+    // `_x.mnxLab` frets are measured FROM the capo, so it belongs in the identity.
+    const capo = part._x?.mnxLab?.capo ?? 0;
     const open = new Map(tuning.map(t => [t.string, t.pitch]));
     for (const measure of part.measures) {
       for (const seq of measure.sequences ?? []) {
         for (const event of seq.content ?? []) {
           for (const note of event.notes ?? []) {
-            const pos = note._x?.mnxLab?.tab?.position;
+            const x = note._x?.mnxLab;
+            const pos = x?.string !== undefined && x?.fret !== undefined ? { string: x.string, fret: x.fret } : undefined;
             if (!pos) continue;
             const openPitch = open.get(pos.string);
             if (!openPitch || midi(openPitch) + capo + pos.fret !== midi(note.pitch)) mismatches++;
@@ -507,7 +508,8 @@ describe.each(['House-of-the-Rising-Sun', 'Sun-did-glide', 'Vestapol'])(
                       .filter(Boolean)
                       .join(',')
                   : '-';
-                const p = note._x?.mnxLab?.tab?.position;
+                const px = note._x?.mnxLab;
+                const p = px?.string !== undefined && px?.fret !== undefined ? { string: px.string, fret: px.fret } : undefined;
                 out.push(`${head}/${midi(note.pitch)}/${p ? `s${p.string}f${p.fret}` : '-'}/${tech}/${lyrics}`);
               }
             }
@@ -527,9 +529,9 @@ describe.each(['House-of-the-Rising-Sun', 'Sun-did-glide', 'Vestapol'])(
         // carries no meaning, and the MusicXML round trip reverses it (staff
         // lines run bottom-up, string numbers run top-down).
         tuning: Object.fromEntries(
-          (m.parts[0]._x?.mnxLab?.tab?.tuning ?? []).map(t => [t.string, t.pitch])
+          (m.parts[0]._x?.mnxLab?.strings ?? []).map(t => [t.string, t.pitch])
         ),
-        capo: m.parts[0]._x?.mnxLab?.tab?.capo,
+        capo: m.parts[0]._x?.mnxLab?.capo,
         staffKind: m.parts[0]._x?.mnxLab?.tab?.staffKind
       });
       expect(tab(back)).toEqual(tab(source));

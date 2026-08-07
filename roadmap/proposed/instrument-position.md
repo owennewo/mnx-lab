@@ -399,8 +399,11 @@ mirror MusicXML and Guitar Pro, which both store both, and the round trips depen
 
 If the derivation thesis survives CG contact, the migration is to keep `fret` as an
 optional non-authoritative field (its validation role) rather than to delete it — the
-converters keep working, and documents stay readable. Nothing needs to change before
-then. Recorded here so the divergence is a decision rather than a drift.
+converters keep working, and documents stay readable. Recorded here so the divergence
+is a decision rather than a drift. **That migration is now planned** — without waiting
+for the CG — in [derived-positions.md](derived-positions.md), which also specifies the
+no-annotation fallback (derive string *and* fret from pitch alone, default tuning) as
+renderer presentation rather than spec text.
 
 ## Open questions for the CG
 

@@ -1,6 +1,6 @@
 {
-  "mnxSchemaVersion": 19,
-  "extensionVersion": 3,
+  "mnxSchemaVersion": 27,
+  "extensionVersion": 5,
   "categories": {
     "lab/document": "Document basics",
     "lab/pitches": "Pitches and accidentals",
@@ -11,9 +11,10 @@
     "lab/tab-positions": "Fingerboard positions",
     "lab/tab-fingering": "Fingering",
     "lab/tab-techniques": "Techniques (bends, slides, hammer-ons)",
-    "lab/tab-spec-gaps": "Spec gaps \u2014 invalid-by-design exhibits",
+    "lab/tab-derivation": "Derived positions (string → fret, defaults, diagnostics)",
+    "lab/tab-spec-gaps": "Spec gaps — invalid-by-design exhibits",
     "lab/edge-cases": "Edge cases and regressions",
-    "lab/score-text": "Score text \u2014 rehearsal marks, sections, directions (proposed)"
+    "lab/score-text": "Score text — rehearsal marks, sections, directions (proposed)"
   },
   "specExamples": {
     "upstream": "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/",

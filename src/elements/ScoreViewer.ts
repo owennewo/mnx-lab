@@ -322,7 +322,7 @@ export class ScoreViewer extends LitElement {
 
     this.container.innerHTML = '';
     if (this.viewMode === 'tab') {
-      const pane = this.appendPane(this.hasTab ? 'tab · _x.mnxLab.tab' : null);
+      const pane = this.appendPane(this.hasTab ? 'tab · _x.mnxLab' : null);
       guarded(pane, 'tab', () => renderMnxToSvgTab({ container: pane, ...commonOpts }));
     } else if (this.viewMode === 'notation') {
       const pane = this.appendPane(this.hasTab ? 'notation' : null);
@@ -333,7 +333,7 @@ export class ScoreViewer extends LitElement {
       // One composed system — notation staff over tab staff in a single SVG
       // with joined barlines (src/engine/layout/bothSystem.ts), not two
       // stacked renders.
-      const pane = this.appendPane('notation + tab · _x.mnxLab.tab');
+      const pane = this.appendPane('notation + tab · _x.mnxLab');
       guarded(pane, 'both', () => renderMnxToSvgBoth({ container: pane, ...commonOpts }));
     }
 

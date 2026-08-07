@@ -12,7 +12,7 @@ import { importMusicXML } from '../src/index.js';
  * rather than counts that move whenever a fixture is re-exported.
  */
 describe('MusicXML -> MNX Import Pipeline', () => {
-  it('parses a two-staff MusicXML file into a single-source part with _x.mnxLab.tab annotations', async () => {
+  it('parses a two-staff MusicXML file into a single-source part with _x.mnxLab annotations', async () => {
     const xmlPath = path.resolve(__dirname, '../../fixtures/House-of-the-Rising-Sun.xml');
     const xmlContent = await fs.readFile(xmlPath, 'utf-8');
 
@@ -41,7 +41,7 @@ describe('MusicXML -> MNX Import Pipeline', () => {
     expect(guitarPart._x?.mnxLab?.tab?.staffKind).toBe('both');
 
     // Part-level tuning: explicit string numbers, standard guitar tuning.
-    const tuning = guitarPart._x?.mnxLab?.tab?.tuning;
+    const tuning = guitarPart._x?.mnxLab?.strings;
     expect(tuning).toBeDefined();
     expect(tuning!.length).toBe(6);
     const byString = new Map(tuning!.map(t => [t.string, t.pitch]));
@@ -56,7 +56,7 @@ describe('MusicXML -> MNX Import Pipeline', () => {
         for (const event of sequence.content)
           for (const note of event.notes ?? []) {
             notes++;
-            if (note._x?.mnxLab?.tab?.position) positioned++;
+            if (note._x?.mnxLab?.string !== undefined) positioned++;
           }
     expect(notes).toBeGreaterThan(0);
     expect(positioned).toBe(notes);
