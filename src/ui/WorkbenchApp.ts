@@ -360,9 +360,9 @@ export class WorkbenchApp extends LitElement {
     const entry =
       this.route.page === 'scenario' ? corpus.find(e => e.id === this.route.id) : undefined;
     if (entry) {
-      const views = entry.hasTab
-        ? ['auto', 'notation', 'tab', 'both', 'compare', 'json']
-        : ['auto', 'notation', 'compare', 'json'];
+      // Tab/both are forceable on any scenario (the derivation ladder renders
+      // them from pitch alone); hasTab only shapes edit affordances below.
+      const views = ['auto', 'notation', 'tab', 'both', 'compare', 'json'];
       for (const v of views) items.push(nav(`view: ${v}`, scenarioHref(entry.id, v)));
       items.push(
         intent('edit: undo', { type: 'undo' }, 'Ctrl+Z'),

@@ -591,11 +591,20 @@ export class ScenarioPage extends LitElement {
     this.syncFromSession();
   }
 
-  private activeView(entry: ScenarioEntry): PageView {
-    const allowed: PageView[] = entry.hasTab
-      ? ['auto', 'notation', 'tab', 'both', 'compare', 'json']
-      : ['auto', 'notation', 'compare', 'json'];
-    return allowed.includes(this.view as PageView) ? (this.view as PageView) : 'auto';
+  // Every scenario offers every view: since the derivation ladder
+  // (roadmap/proposed/derived-positions.md), tab is a VIEW any guitar-range
+  // document can be forced into — string/fret assignment derives from pitch
+  // against the default standard tuning, and out-of-range notes degrade to
+  // red badges rather than breaking the render. `hasTab` still gates the
+  // *edit* affordances (fret digits, tuning popover) and what `auto` resolves
+  // to; it no longer gates what a reviewer may look at.
+  private static readonly ALL_VIEWS: readonly PageView[] =
+    ['auto', 'notation', 'tab', 'both', 'compare', 'json'];
+
+  private activeView(_entry: ScenarioEntry): PageView {
+    return ScenarioPage.ALL_VIEWS.includes(this.view as PageView)
+      ? (this.view as PageView)
+      : 'auto';
   }
 
   /** What `auto` resolves to: the loaded document's `tab.staffKind` hint
@@ -643,9 +652,7 @@ export class ScenarioPage extends LitElement {
     const view = this.activeView(entry);
     const item = classify(entry);
     const verification = entry.meta.verification;
-    const views: PageView[] = entry.hasTab
-      ? ['auto', 'notation', 'tab', 'both', 'compare', 'json']
-      : ['auto', 'notation', 'compare', 'json'];
+    const views = ScenarioPage.ALL_VIEWS;
 
     return html`
       <div class="head">
