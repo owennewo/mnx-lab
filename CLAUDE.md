@@ -221,7 +221,13 @@ Pipeline: layout → primitives → SVG. `src/engine/layout/{notation,tab}.ts` a
 functions emitting staff-space primitives; `src/engine/render/svg.ts` is the dumb
 emitter. **All horizontal spacing** lives in `src/engine/layout/spacing.ts` (springs-
 and-rods; tune the named knobs, never per-renderer grid math) — both layouts consume one
-plan so notation and tab stay column-aligned. Fret/string assignment uses
+plan so notation and tab stay column-aligned. The `both` view is **one native system**:
+`layoutNotation({includeTabStaves: true})` (seam: `src/engine/layout/bothSystem.ts`)
+draws each tab-bearing part's tab staff inside the same system walk — shared barlines,
+interleaved multi-system wrap, columns aligned by shared plan slots. Tab-staff emission
+(lines/clef/timesig/frets) lives ONCE in `src/engine/layout/tabStaff.ts`, used by both
+the standalone tab layout and the native staff — extend it there, never fork it. See
+[roadmap/inprogress/both-view-single-system.md](roadmap/inprogress/both-view-single-system.md). Fret/string assignment uses
 `_x.mnxLab.tab.position` when fully annotated, else the lowest-reasonable-position
 heuristic (`src/engine/tab/guitarPositions.ts`). Layouts render **forgivingly**:
 unsupported content degrades to a placeholder and per-measure "!" badges

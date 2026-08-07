@@ -10,6 +10,7 @@ import type { PlaybackState, SelectionContext } from './mnxContext.ts';
 import { MnxDocument } from '../model/mnx.ts';
 import { renderMnxToSvgTab } from '../engine/tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../engine/notation/notationRenderer.ts';
+import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
 import { isSmuflLoaded, loadSmufl } from '../engine/smufl/smufl.ts';
 import type { PinnedError } from '../model/pinnedErrors.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
@@ -98,10 +99,6 @@ export class ScoreViewer extends LitElement {
         margin: 0 0 4px 4px;
       }
 
-      .both-gap {
-        height: 26px;
-      }
-
       /* Compact embed chrome (the container lives on the host card). */
       @container mnx-embed (max-width: 419px) {
         .pane-cap {
@@ -109,10 +106,14 @@ export class ScoreViewer extends LitElement {
         }
       }
 
+      /* Honor the engine's intrinsic size — fitPxPerSp already fills the
+         width up to FIT_MAX_PX_PER_SP; stretching past it would defeat the
+         cap and turn one-bar scenarios into posters. */
       #score-container svg {
         display: block;
-        width: 100%;
+        max-width: 100%;
         height: auto;
+        margin: 0 auto;
         pointer-events: auto;
         color: var(--paper-ink);
       }
@@ -329,15 +330,11 @@ export class ScoreViewer extends LitElement {
         renderMnxToSvgNotation({ container: pane, ...commonOpts })
       );
     } else {
-      const notationPane = this.appendPane('notation');
-      const gap = document.createElement('div');
-      gap.className = 'both-gap';
-      this.container.appendChild(gap);
-      const tabPane = this.appendPane('tab · _x.mnxLab.tab');
-      guarded(notationPane, 'notation', () =>
-        renderMnxToSvgNotation({ container: notationPane, ...commonOpts })
-      );
-      guarded(tabPane, 'tab', () => renderMnxToSvgTab({ container: tabPane, ...commonOpts }));
+      // One composed system — notation staff over tab staff in a single SVG
+      // with joined barlines (src/engine/layout/bothSystem.ts), not two
+      // stacked renders.
+      const pane = this.appendPane('notation + tab · _x.mnxLab.tab');
+      guarded(pane, 'both', () => renderMnxToSvgBoth({ container: pane, ...commonOpts }));
     }
 
     // Only update state when it changed, to avoid a render loop.

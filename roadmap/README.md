@@ -64,10 +64,17 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   onto brass (valve combination selects a fundamental, pitch determines the partial) and
   excludes tin whistle by the same rule that excludes storing the fret. Design only — nothing built, nothing
   posted; complements [guitar-technique.md](proposed/guitar-technique.md) (what the hands do).
+- **[viewer-surface.md](proposed/viewer-surface.md)** — name and define **the viewer
+  surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
+  undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench
+  chrome), attribute-first, the `view="auto"` precedence chain (user > host > document
+  `staffKind` hint > default), a set-valued `hide` knob, and eviction of workbench leakage
+  (`pinnedErrors` et al). Subsumes render-density-zoom's "where do the levers live" question.
 - **[render-density-zoom.md](proposed/render-density-zoom.md)** — configurable horizontal +
   vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
   in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
-  vertical density = layout gap/padding constants. Not started.
+  vertical density = layout gap/padding constants. Not started. Where the levers are *exposed*
+  is now owned by [viewer-surface.md](proposed/viewer-surface.md).
 - **[editor-ai-prompt.md](proposed/editor-ai-prompt.md)** — the command palette's **third
   mode**: `Ctrl+K` text routing to `/api/edit-notation` when it reads as a sentence rather than
   a command (research §6.2), inheriting the `ui/ → assist/` boundary. Owns the deeper
@@ -81,6 +88,13 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   **voice/transcription stage was never built**. What's left here is the voice half.
 
 ### inprogress/
+- **[both-view-single-system.md](inprogress/both-view-single-system.md)** — the notation+tab
+  `both` view as **one engraved system** (connected barlines, one SVG) instead of two stacked
+  renders. **Phases 1+2 shipped** (2026-08-07): tab is now a **native display staff** in the
+  notation layout's system walk (`includeTabStaves`; seam `layoutBothSystem`) — single-stroke
+  shared barlines, interleaved multi-system wrap, fret emission shared with the standalone tab
+  layout via `tabStaff.ts`. Goldens byte-identical throughout. Left: the combined-golden
+  decision + recorded limitations (lyrics gap, repeat dots on tab, scores-doc injection).
 - **[guitar-pro.md](inprogress/guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion, built at
   `converters/guitarpro-mnx/` using **alphaTab** as a headless format codec (no binary parsing
   hand-written). Reads gp3/gp4/gp5/gpx/gp, writes `.gp` (GP7 — the only format anything can

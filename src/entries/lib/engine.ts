@@ -2,6 +2,7 @@
 // (no DOM at module top level; see src/engine/headless.ts).
 export { layoutNotation } from '../../engine/layout/notation.ts';
 export { layoutTab } from '../../engine/layout/tab.ts';
+export { layoutBothSystem } from '../../engine/layout/bothSystem.ts';
 export {
   ensureSmufl,
   computePrimitives,

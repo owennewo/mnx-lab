@@ -33,9 +33,18 @@ import {
   BeamSegmentSpec,
   BeamHookSpec
 } from './beams.ts';
-import { Primitive, LayoutResult, LayoutDiagnostic, SpatialIndex } from '../primitives.ts';
+import {
+  Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, translatePrimitiveY
+} from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
 import { syntheticNoteKey } from '../../model/noteKeys.ts';
+import {
+  TAB_STAFF_HEIGHT_SP,
+  emitTabClef,
+  emitTabStaffLines,
+  emitTabTimeSig,
+  emitTabVoices
+} from './tabStaff.ts';
 
 /**
  * Pure layout for standard 5-line notation. Working in staff spaces, returns
@@ -391,6 +400,13 @@ export interface LayoutNotationOptions {
   widthSp: number;
   activeNoteIds?: readonly string[];
   selectedNoteIds?: readonly string[];
+  /**
+   * Append each tab-bearing part's tab staff to its system (the `both` view):
+   * one system walk, native shared barlines. Limitation: documents declaring
+   * `scores` skip injection (their layout trees aren't expanded — no such
+   * document exists in the corpus or fixtures today).
+   */
+  includeTabStaves?: boolean;
 }
 
 const TITLE_SIZE_SP = 2.4;
@@ -662,24 +678,6 @@ function buildScoreJobs(mnx: MnxStructure): ScoreJob[] {
   });
 }
 
-/** Shifts a primitive vertically in place (score stacking). */
-function translatePrimitiveY(p: Primitive, dy: number): void {
-  switch (p.kind) {
-    case 'glyph':
-    case 'text':
-    case 'rect':
-      p.y += dy;
-      break;
-    case 'line':
-      p.y1 += dy;
-      p.y2 += dy;
-      break;
-    case 'curve':
-      for (const pt of p.points) pt.y += dy;
-      break;
-  }
-}
-
 export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   const { mnx, widthSp } = opts;
   const activeNoteIds = opts.activeNoteIds ?? [];
@@ -691,7 +689,11 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
 
   const jobs = buildScoreJobs(mnx);
   if (jobs.length === 0) {
-    return { primitives, widthSp, heightSp: ROW_HEIGHT_SP + 2 * MARGIN_SP, usedWidthSp: widthSp, index, diagnostics };
+    const staffTop = MARGIN_SP + ROW_PAD_TOP_SP;
+    return {
+      primitives, widthSp, heightSp: ROW_HEIGHT_SP + 2 * MARGIN_SP, usedWidthSp: widthSp,
+      index, diagnostics, rows: [{ staffTop, staffBottom: staffTop + STAFF_HEIGHT_SP }]
+    };
   }
 
   // Each score renders as its own block (title + segments), stacked
@@ -700,6 +702,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   // translates by 0 — byte-identical output.
   let cursorY = 0;
   let usedWidthSp = 0;
+  const rows: RowBandSp[] = [];
   for (const job of jobs) {
     const rs = job.segments.map(segment =>
       renderSegment({
@@ -711,7 +714,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         activeNoteIds,
         selectedNoteIds,
         index,
-        diagnostics
+        diagnostics,
+        includeTabStaves: opts.includeTabStaves === true && (mnx.scores ?? []).length === 0
       })
     );
     const jobUsed = Math.max(...rs.map(r => r.usedWidthSp));
@@ -734,12 +738,15 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         for (const p of r.primitives) translatePrimitiveY(p, cursorY);
       }
       primitives.push(...r.primitives);
+      for (const band of r.rows) {
+        rows.push({ staffTop: band.staffTop + cursorY, staffBottom: band.staffBottom + cursorY });
+      }
       cursorY += r.heightSp;
     }
     usedWidthSp = Math.max(usedWidthSp, jobUsed);
   }
 
-  return { primitives, widthSp, heightSp: cursorY, usedWidthSp, index, diagnostics };
+  return { primitives, widthSp, heightSp: cursorY, usedWidthSp, index, diagnostics, rows };
 }
 
 interface RenderSegmentArgs {
@@ -752,6 +759,7 @@ interface RenderSegmentArgs {
   selectedNoteIds: readonly string[];
   index: SpatialIndex;
   diagnostics: LayoutDiagnostic[];
+  includeTabStaves: boolean;
 }
 
 // Left-of-system geometry: nested decorations step left of their parents,
@@ -766,8 +774,9 @@ function renderSegment(args: RenderSegmentArgs): {
   primitives: Primitive[];
   heightSp: number;
   usedWidthSp: number;
+  rows: RowBandSp[];
 } {
-  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics } = args;
+  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves } = args;
   const primitives: Primitive[] = [];
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
@@ -810,6 +819,54 @@ function renderSegment(args: RenderSegmentArgs): {
   });
   const numMeasures = plan.measures.length;
 
+  // ---- Display staves: the plan's notation staves plus, in the `both` view,
+  // each tab-bearing part's tab staff appended after its notation staves.
+  // The plan and every plan-indexed subsystem (beams, curves, ottavas,
+  // dynamics, lyrics, labels) stay blind to tab staves — this overlay owns
+  // vertical geometry and the extra emission only. Phase 2 of
+  // roadmap/inprogress/both-view-single-system.md.
+  const tabParts: MnxPart[] = [];
+  if (includeTabStaves && segment.staves.length) {
+    const inSegment = new Set<MnxPart>();
+    for (const st of segment.staves) for (const src of st.sources) inSegment.add(src.part);
+    for (const p of mnx.parts ?? []) {
+      const kind = p._x?.mnxLab?.tab?.staffKind;
+      if (inSegment.has(p) && (kind === 'both' || kind === 'tab')) tabParts.push(p);
+    }
+    // No part declares a tab preference: the view still promised a tab staff —
+    // give the first part one (mirrors the standalone tab layout, which
+    // renders parts[0] by heuristic).
+    if (tabParts.length === 0) tabParts.push(segment.staves[0].sources[0].part);
+  }
+  const lastPlanStaffOf = new Map<MnxPart, number>();
+  segment.staves.forEach((st, s) => {
+    for (const src of st.sources) lastPlanStaffOf.set(src.part, s);
+  });
+  /** Display index per plan staff, staff heights per display staff, and the
+   *  injected tab staves (each reading its part's staff-1 plan slots). */
+  const displayOfPlan: number[] = [];
+  const displayHeights: number[] = [];
+  const tabDisplays: { part: MnxPart; planStaff: number; displayIndex: number }[] = [];
+  const tabByAnchorPlan = new Map<number, number>(); // plan staff -> tab display index
+  segment.staves.forEach((_st, s) => {
+    displayOfPlan.push(displayHeights.length);
+    displayHeights.push(STAFF_HEIGHT_SP);
+    for (const part of tabParts) {
+      if (lastPlanStaffOf.get(part) !== s) continue;
+      const staffOne = segment.staves.findIndex(cand =>
+        cand.sources.some(src => src.part === part && src.staff === 1)
+      );
+      tabDisplays.push({ part, planStaff: staffOne >= 0 ? staffOne : s, displayIndex: displayHeights.length });
+      tabByAnchorPlan.set(s, displayHeights.length);
+      displayHeights.push(TAB_STAFF_HEIGHT_SP);
+    }
+  });
+  if (displayHeights.length === 0) {
+    displayOfPlan.push(0);
+    displayHeights.push(STAFF_HEIGHT_SP);
+  }
+  const displayCount = displayHeights.length;
+
   // Beams are resolved part-wide (groups may reference events in a later
   // measure) and split at system breaks. Beamed events defer their stems —
   // collected per run during emission, drawn against the beam line after.
@@ -839,8 +896,9 @@ function renderSegment(args: RenderSegmentArgs): {
   if (drawValidation) {
     for (const v of validateDocument(mnx)) {
       // `scope: 'tab'` issues are fingerboard constraints — the notation staff
-      // engraves those bars correctly, so a badge here would be noise.
-      if (v.scope === 'tab') continue;
+      // engraves those bars correctly, so a badge would be noise UNLESS this
+      // system draws the fingerboard too (native tab staves).
+      if (v.scope === 'tab' && tabDisplays.length === 0) continue;
       const list = validationByMeasure.get(v.measureIndex) ?? [];
       list.push({ kind: v.severity === 'warning' ? 'warning' : 'validation', message: v.message });
       validationByMeasure.set(v.measureIndex, list);
@@ -860,14 +918,25 @@ function renderSegment(args: RenderSegmentArgs): {
           ROW_PAD_BOTTOM_SP
       )
     : 0;
+  // Per-display-staff tops as prefix sums — generalizes the old uniform
+  // arithmetic (s * (STAFF_HEIGHT + GAP)) to mixed staff heights. For
+  // all-notation systems the integer sums are equal term for term, so the
+  // goldens cannot move.
+  const displayPrefix: number[] = [];
+  let displayHeightSum = 0;
+  for (const h of displayHeights) {
+    displayPrefix.push(displayHeightSum + displayPrefix.length * INTER_STAFF_GAP_SP);
+    displayHeightSum += h;
+  }
   const systemHeightSp =
     ROW_PAD_TOP_SP +
-    numStaves * STAFF_HEIGHT_SP +
-    (numStaves - 1) * INTER_STAFF_GAP_SP +
+    displayHeightSum +
+    (displayCount - 1) * INTER_STAFF_GAP_SP +
     ROW_PAD_BOTTOM_SP +
     lyricExtraSp;
-  const staffTopOf = (row: number, s: number) =>
-    MARGIN_SP + row * systemHeightSp + ROW_PAD_TOP_SP + s * (STAFF_HEIGHT_SP + INTER_STAFF_GAP_SP);
+  const displayTopOf = (row: number, d: number) =>
+    MARGIN_SP + row * systemHeightSp + ROW_PAD_TOP_SP + displayPrefix[d];
+  const staffTopOf = (row: number, s: number) => displayTopOf(row, displayOfPlan[s]);
 
   // Lyric syllables collected per (staff, line) in document order; hyphens
   // join start/middle syllables to their successor after the loop.
@@ -893,9 +962,10 @@ function renderSegment(args: RenderSegmentArgs): {
     if (m.hidden) continue;
     const staffTops = Array.from({ length: numStaves }, (_, s) => staffTopOf(m.row, s));
     const staffBottoms = staffTops.map(t => t + STAFF_HEIGHT_SP);
-    // The system's top staff / overall bottom — barlines span the lot.
+    // The system's top staff / overall bottom — barlines span the lot,
+    // native tab staves included.
     const staffTop = staffTops[0];
-    const sysBottom = staffBottoms[numStaves - 1];
+    const sysBottom = displayTopOf(m.row, displayCount - 1) + displayHeights[displayCount - 1];
 
     // Staff lines, per staff
     for (const top of staffTops) {
@@ -913,8 +983,8 @@ function renderSegment(args: RenderSegmentArgs): {
     if (m.firstInSystem) {
       // A system-start barline binds MULTIPLE staves into a system; a single
       // staff conventionally has an open left end (as the reference engravings
-      // do), so only draw it for grand-staff / multi-part systems.
-      if (numStaves > 1) {
+      // do), so only draw it for grand-staff / multi-part / notation+tab systems.
+      if (displayCount > 1) {
         primitives.push({
           kind: 'line',
           x1: m.x, y1: staffTop, x2: m.x, y2: sysBottom,
@@ -1034,14 +1104,22 @@ function renderSegment(args: RenderSegmentArgs): {
     }
 
     // Spans a group's barlines: one run for the whole group, or one per staff
-    // when the layout asks for individual barlines.
+    // when the layout asks for individual barlines. A part's native tab staff
+    // hangs off its last notation staff, so the group's run extends to it.
+    const groupBottom = (g: JobGroup): number => {
+      const lastPlan = g.start + g.count - 1;
+      const tabDisplay = tabByAnchorPlan.get(lastPlan);
+      return tabDisplay !== undefined
+        ? displayTopOf(m.row, tabDisplay) + TAB_STAFF_HEIGHT_SP
+        : staffBottoms[lastPlan];
+    };
     const groupSpans = (g: JobGroup): [number, number][] =>
       g.individualBarlines
         ? Array.from({ length: g.count }, (_, k): [number, number] => [
             staffTops[g.start + k],
             staffBottoms[g.start + k]
           ])
-        : [[staffTops[g.start], staffBottoms[g.start + g.count - 1]]];
+        : [[staffTops[g.start], groupBottom(g)]];
 
     // Forward repeat |: — thick + thin per group span, dots per staff.
     if (m.repeatStart) {
@@ -1318,6 +1396,34 @@ function renderSegment(args: RenderSegmentArgs): {
       });
     });
 
+    // Native tab staves (the `both` view): six lines, TAB clef, tab-style
+    // time signature and fret digits — the emission shared with the
+    // standalone tab layout (tabStaff.ts), driven by the SAME plan slots as
+    // the part's notation staff, so columns align by construction.
+    for (const td of tabDisplays) {
+      const tabTop = displayTopOf(m.row, td.displayIndex);
+      emitTabStaffLines(m.x, m.width, tabTop, primitives);
+      if (m.firstInSystem) emitTabClef(m.clefX, tabTop, primitives);
+      if (m.showTimeSig) emitTabTimeSig(m.timeSig, m.timeSigCentreX, tabTop, primitives);
+      if (!m.multiRest) {
+        emitTabVoices({
+          voices: resolvedByStaff[td.planStaff]?.map(v => v.seq) ?? [],
+          slots: m.staves[td.planStaff] ?? [],
+          staffTop: tabTop,
+          measureIndex: i,
+          activeNoteIds,
+          selectedNoteIds,
+          // Synthetic keys encode the staff-1-of-first-part traversal jsonView
+          // mirrors — the tab staff may reuse them only when its notation
+          // sibling is exactly that staff (cross-highlight then works on both).
+          synthesizeKeys: td.planStaff === 0 && synthesizeKeysForStaff0,
+          primitives,
+          index,
+          onIssue: message => measureIssues.push({ kind: 'render', message })
+        });
+      }
+    }
+
     // End barline — drawn per part group: internal barlines don't bridge the
     // gap between parts (only the system-start barline joins them).
     const isLast = i === numMeasures - 1 || plan.measures.slice(i + 1).every(n => n.hidden);
@@ -1506,8 +1612,12 @@ function renderSegment(args: RenderSegmentArgs): {
   if (ottavaOnsets && ottavaSpans.length) emitOttavas(ottavaSpans, plan, staffTopOf, ottavaOnsets, primitives);
 
   const heightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * systemHeightSp;
+  const rows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r): RowBandSp => ({
+    staffTop: displayTopOf(r, 0),
+    staffBottom: displayTopOf(r, displayCount - 1) + displayHeights[displayCount - 1]
+  }));
 
-  return { primitives, heightSp, usedWidthSp: plan.usedWidthSp };
+  return { primitives, heightSp, usedWidthSp: plan.usedWidthSp, rows };
 }
 
 // ---------- Beams ----------

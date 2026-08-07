@@ -1,5 +1,6 @@
 import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation } from '../layout/notation.ts';
+import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
 
 /**
@@ -9,6 +10,9 @@ import { fitPxPerSp, renderSvg } from '../render/svg.ts';
  */
 
 const DEFAULT_PX_PER_SP = 10;
+
+/** Breathing room around the cropped content, in staff spaces. */
+const CROP_PAD_SP = 1;
 
 export interface RenderNotationOptions {
   container: HTMLElement;
@@ -36,12 +40,20 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): void {
   const fitted = opts.pxPerSp === undefined;
   const pxPerSp = fitted ? fitPxPerSp(opts.width, layout.usedWidthSp, basePxPerSp) : basePxPerSp;
 
+  const widthSp = fitted ? layout.usedWidthSp : layout.widthSp;
+  // Crop the row's fixed ledger/stem headroom to the content's real vertical
+  // extent. y only — the x window stays the full plan width so notation and
+  // tab keep their shared left edge and column alignment in the `both` view.
+  const bounds = computeBoundsSp(layout.primitives, CROP_PAD_SP);
+  const viewBoxSp = bounds ? { x: 0, y: bounds.y, w: widthSp, h: bounds.h } : undefined;
+
   renderSvg({
     container: opts.container,
     primitives: layout.primitives,
-    widthSp: fitted ? layout.usedWidthSp : layout.widthSp,
+    widthSp,
     heightSp: layout.heightSp,
     pxPerSp,
+    viewBoxSp,
     className: 'mnx-notation-svg',
     onSourceClick: opts.onNoteClick
       ? sourceId => {

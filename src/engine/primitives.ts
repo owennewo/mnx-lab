@@ -104,6 +104,24 @@ export interface RectPrim extends PrimitiveBase {
   thickness?: number;
 }
 
+/** Shifts a primitive vertically in place (score/system stacking). */
+export function translatePrimitiveY(p: Primitive, dy: number): void {
+  switch (p.kind) {
+    case 'glyph':
+    case 'text':
+    case 'rect':
+      p.y += dy;
+      break;
+    case 'line':
+      p.y1 += dy;
+      p.y2 += dy;
+      break;
+    case 'curve':
+      for (const pt of p.points) pt.y += dy;
+      break;
+  }
+}
+
 /**
  * Map from MNX source id to where its primitive lives in the score, so the
  * host application can answer "the user clicked id X — which measure/voice/event
@@ -135,6 +153,16 @@ export interface LayoutDiagnostic {
   kind: DiagnosticKind;
 }
 
+/**
+ * Vertical band of one laid-out system row: the top line of its first staff to
+ * the bottom line of its last. Metadata for composition (the `both` view's
+ * system composer) — never serialized into goldens.
+ */
+export interface RowBandSp {
+  staffTop: number;
+  staffBottom: number;
+}
+
 export interface LayoutResult {
   primitives: Primitive[];
   /** Total layout width in staff spaces. */
@@ -149,4 +177,6 @@ export interface LayoutResult {
   index: SpatialIndex;
   /** Non-fatal problems encountered while laying out (forgiving render). */
   diagnostics: LayoutDiagnostic[];
+  /** Staff bands per system row, in layout order (see RowBandSp). */
+  rows?: RowBandSp[];
 }

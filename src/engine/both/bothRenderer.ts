@@ -1,13 +1,12 @@
 import { MnxStructure } from '../../model/mnx.ts';
-import { layoutTab } from '../layout/tab.ts';
+import { layoutBothSystem } from '../layout/bothSystem.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
 
 /**
- * Thin entry point for the tab view: computes layout in staff spaces,
- * renders SVG, and bridges generic sourceId clicks back into the
- * project's `(noteId, measureIdx, noteIdx)` callback contract using the
- * spatial index produced by the layout pass.
+ * Thin entry point for the combined notation+tab view: one composed system
+ * (src/engine/layout/bothSystem.ts), one SVG, one coordinate space — the
+ * sourceId click bridge spans both staves through the merged index.
  */
 
 const DEFAULT_PX_PER_SP = 10;
@@ -15,7 +14,7 @@ const DEFAULT_PX_PER_SP = 10;
 /** Breathing room around the cropped content, in staff spaces. */
 const CROP_PAD_SP = 1;
 
-export interface RenderTabOptions {
+export interface RenderBothOptions {
   container: HTMLElement;
   mnx: MnxStructure;
   /** Total viewport width in pixels. */
@@ -27,26 +26,22 @@ export interface RenderTabOptions {
   pxPerSp?: number;
 }
 
-export function renderMnxToSvgTab(opts: RenderTabOptions): void {
+export function renderMnxToSvgBoth(opts: RenderBothOptions): void {
   const basePxPerSp = opts.pxPerSp ?? DEFAULT_PX_PER_SP;
 
-  const layout = layoutTab({
+  const layout = layoutBothSystem({
     mnx: opts.mnx,
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds
   });
 
-  // An explicit pxPerSp pins the scale; the default scales short scores up to
-  // fill the viewport. Notation derives the same factor from the shared
-  // horizontal plan, so the `both` view stays column-aligned.
   const fitted = opts.pxPerSp === undefined;
   const pxPerSp = fitted ? fitPxPerSp(opts.width, layout.usedWidthSp, basePxPerSp) : basePxPerSp;
 
   const widthSp = fitted ? layout.usedWidthSp : layout.widthSp;
-  // Crop the row's fixed headroom to the content's real vertical extent.
-  // y only — the x window stays the full plan width so notation and tab keep
-  // their shared left edge and column alignment in the `both` view.
+  // Crop the rows' fixed headroom to the content's real vertical extent.
+  // y only — the x window stays the full plan width (see the other renderers).
   const bounds = computeBoundsSp(layout.primitives, CROP_PAD_SP);
   const viewBoxSp = bounds ? { x: 0, y: bounds.y, w: widthSp, h: bounds.h } : undefined;
 
@@ -57,13 +52,11 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): void {
     heightSp: layout.heightSp,
     pxPerSp,
     viewBoxSp,
-    className: 'mnx-tab-svg',
+    className: 'mnx-both-svg',
     onSourceClick: opts.onNoteClick
       ? sourceId => {
           const loc = layout.index.get(sourceId);
-          if (loc) {
-            opts.onNoteClick!(sourceId, loc.measureIndex, loc.eventIndex);
-          }
+          if (loc) opts.onNoteClick!(sourceId, loc.measureIndex, loc.eventIndex);
         }
       : undefined
   });

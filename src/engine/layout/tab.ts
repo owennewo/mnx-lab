@@ -1,9 +1,14 @@
-import { MnxStructure, isTimedEvent } from '../../model/mnx.ts';
-import { resolveEventPositions } from '../tab/guitarPositions.ts';
-import { Primitive, LayoutResult, LayoutDiagnostic, SpatialIndex } from '../primitives.ts';
-import { syntheticNoteKey } from '../../model/noteKeys.ts';
+import { MnxStructure } from '../../model/mnx.ts';
+import { Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex } from '../primitives.ts';
 import { planHorizontal, staffOneSequences } from './spacing.ts';
 import { emitMeasureDiagnostics, MeasureIssue } from './diagnostics.ts';
+import {
+  TAB_STAFF_HEIGHT_SP,
+  emitTabClef,
+  emitTabStaffLines,
+  emitTabTimeSig,
+  emitTabVoices
+} from './tabStaff.ts';
 import { validateDocument } from './validate.ts';
 
 /**
@@ -17,30 +22,20 @@ import { validateDocument } from './validate.ts';
  */
 
 // ---------- Layout constants (all in staff spaces) ----------
+// Staff geometry and fret emission live in tabStaff.ts, shared with the
+// notation layout's native tab staff kind — only the standalone view's own
+// row/barline framing stays here.
 
-const STAFF_LINES = 6;
-const STAFF_HEIGHT_SP = STAFF_LINES - 1;          // 5 sp from top string to bottom string
+const STAFF_HEIGHT_SP = TAB_STAFF_HEIGHT_SP;      // 5 sp from top string to bottom string
 
 const ROW_PAD_TOP_SP = 4;
 const ROW_PAD_BOTTOM_SP = 4;
 const ROW_HEIGHT_SP = STAFF_HEIGHT_SP + ROW_PAD_TOP_SP + ROW_PAD_BOTTOM_SP;
 const MARGIN_SP = 2;
 
-const STAFF_LINE_THICKNESS_SP = 0.1;
 const BARLINE_THICKNESS_SP = 0.1;
 const FINAL_BARLINE_THICK_WIDTH_SP = 0.4;
 const FINAL_BARLINE_GAP_SP = 0.3;
-
-const FRET_FONT_SIZE_SP = 1.1;
-
-const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
-const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
-// The fret digit's backing rect masks the string line under it, so it must be
-// the SCORE PAPER colour — which never inverts with the theme — not the app
-// chrome (`--bg-app`, which is dark in dark mode and undefined in the standalone
-// preview/embed, where it falls back to black and hides the digit). Carries the
-// paper token's own fallback so it resolves even where `--paper` isn't defined.
-const FRET_BG_FILL = 'var(--paper, oklch(0.985 0.006 85))';
 
 // ---------- Public API ----------
 
@@ -62,9 +57,17 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
 
   const diagnostics: LayoutDiagnostic[] = [];
 
+  const rowBand = (row: number): RowBandSp => {
+    const staffTop = MARGIN_SP + row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP;
+    return { staffTop, staffBottom: staffTop + STAFF_HEIGHT_SP };
+  };
+
   const part = mnx.parts?.[0];
   if (!part) {
-    return { primitives, widthSp, heightSp: ROW_HEIGHT_SP + 2 * MARGIN_SP, usedWidthSp: widthSp, index, diagnostics };
+    return {
+      primitives, widthSp, heightSp: ROW_HEIGHT_SP + 2 * MARGIN_SP,
+      usedWidthSp: widthSp, index, diagnostics, rows: [rowBand(0)]
+    };
   }
 
   const numMeasures = part.measures.length;
@@ -90,16 +93,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     const staffTop = MARGIN_SP + m.row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP;
     const staffBottom = staffTop + STAFF_HEIGHT_SP;
 
-    // Staff lines (drawn as primitives — per SMuFL guidance, don't use staff6Lines glyph)
-    for (let s = 0; s < STAFF_LINES; s++) {
-      const lineY = staffTop + s;
-      primitives.push({
-        kind: 'line',
-        x1: m.x, y1: lineY, x2: m.x + m.width, y2: lineY,
-        thickness: STAFF_LINE_THICKNESS_SP,
-        className: 'staff-line'
-      });
-    }
+    emitTabStaffLines(m.x, m.width, staffTop, primitives);
 
     // System-start barline
     if (m.firstInSystem) {
@@ -113,42 +107,12 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
 
     // Tab clef (the notation clef's slot in the shared plan keeps both views aligned)
     if (m.firstInSystem) {
-      primitives.push({
-        kind: 'glyph',
-        glyph: '6stringTabClef',
-        x: m.clefX,
-        y: staffTop + STAFF_HEIGHT_SP / 2,
-        className: 'tab-clef'
-      });
+      emitTabClef(m.clefX, staffTop, primitives);
     }
 
     // Time signature (digits centred in upper and lower halves of the staff)
     if (m.showTimeSig) {
-      const numCenterY = staffTop + STAFF_HEIGHT_SP / 4;
-      const denCenterY = staffTop + (3 * STAFF_HEIGHT_SP) / 4;
-
-      // SMuFL time-sig digits have their alphabetic baseline at the visual
-      // centre of the digit, so y = centre directly.
-      for (const digit of String(m.timeSig.count)) {
-        primitives.push({
-          kind: 'glyph',
-          glyph: 'timeSig' + digit,
-          x: m.timeSigCentreX,
-          y: numCenterY,
-          anchor: 'middle',
-          className: 'time-sig-num'
-        });
-      }
-      for (const digit of String(m.timeSig.unit)) {
-        primitives.push({
-          kind: 'glyph',
-          glyph: 'timeSig' + digit,
-          x: m.timeSigCentreX,
-          y: denCenterY,
-          anchor: 'middle',
-          className: 'time-sig-den'
-        });
-      }
+      emitTabTimeSig(m.timeSig, m.timeSigCentreX, staffTop, primitives);
     }
 
     // Events per voice (staff 1 only — the same filter the plan was built from)
@@ -162,101 +126,18 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       ...m.issues.map(message => ({ kind: 'render' as const, message }))
     ];
 
-    // A note written in two voices at one fingerboard position is ONE note.
-    // Both copies land on the same digit, so drawing the second is redundant
-    // (and doubles the glyph's anti-aliasing). Keyed by column + string + fret,
-    // so a genuine conflict — different frets, one string — still draws both
-    // and stays visible next to its red badge.
-    const drawnFrets = new Set<string>();
-    stdSequences.forEach((sequence, voiceIndex) => {
-      sequence.content.forEach((event, eventIndex) => {
-        const slot = m.voices[voiceIndex]?.[eventIndex];
-        if (!slot) return;
-        const eventX = slot.x;
-
-        try {
-        // Grace notes and tremolos aren't drawn on tab yet — the plan still
-        // reserves their columns, so the staves stay aligned in the "both"
-        // view. Unknown item kinds (tuplet, …) were recorded by the plan.
-        if (!isTimedEvent(event)) {
-          // skip
-        } else if (event.rest) {
-          // Tab convention: rests in tab-only view consume time but aren't
-          // drawn. (When tab pairs with a notation staff, rests live there.)
-        } else if (event.notes && event.notes.length > 0) {
-          const positions = resolveEventPositions(event.notes);
-          // Per-note selection keys: real ids, or synthesized positional keys
-          // for id-less documents (see src/utils/noteKeys.ts).
-          const noteIds = event.notes.map(
-            (n, idx) => n.id ?? syntheticNoteKey(i, voiceIndex, eventIndex, idx)
-          );
-          const primaryNoteId = noteIds[0];
-
-          for (let k = 0; k < positions.length; k++) {
-            const pos = positions[k];
-            const noteId = noteIds[k] ?? primaryNoteId;
-
-            // Per NOTE, not per event: the editor's cursor is one note of a
-            // chord, and highlighting the whole event would erase it.
-            const isActive = activeNoteIds.includes(noteId);
-            const isSelected = selectedNoteIds.includes(noteId);
-            const fretFill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : undefined;
-
-            const fretSlot = `${Math.round(eventX * 1e4)}:${pos.str}:${pos.fret}`;
-            if (drawnFrets.has(fretSlot)) continue;
-            drawnFrets.add(fretSlot);
-
-            const stringY = staffTop + (pos.str - 1);
-            const fretStr = String(pos.fret);
-            const charWidthSp = FRET_FONT_SIZE_SP * 0.6 * Math.max(1, fretStr.length);
-
-            // Background rect obscures the staff line under the digit
-            primitives.push({
-              kind: 'rect',
-              x: eventX - charWidthSp / 2,
-              y: stringY - 0.5,
-              w: charWidthSp,
-              h: 1,
-              fill: FRET_BG_FILL,
-              className: 'fret-bg',
-              sourceId: noteId
-            });
-            primitives.push({
-              kind: 'text',
-              text: fretStr,
-              x: eventX,
-              y: stringY,
-              font: 'body',
-              size: FRET_FONT_SIZE_SP,
-              anchor: 'middle',
-              baseline: 'central',
-              weight: 600,
-              fill: fretFill,
-              className: 'fret-number' +
-                (isActive ? ' active' : '') +
-                (isSelected ? ' selected' : ''),
-              sourceId: noteId
-            });
-          }
-
-          if (primaryNoteId) {
-            index.set(primaryNoteId, {
-              measureIndex: i,
-              voiceIndex,
-              eventIndex
-            });
-            // Also index the chord notes — they all click-target the same event.
-            for (const id of noteIds) {
-              if (id !== primaryNoteId && !index.has(id)) {
-                index.set(id, { measureIndex: i, voiceIndex, eventIndex });
-              }
-            }
-          }
-        }
-        } catch (e) {
-          measureIssues.push({ kind: 'render', message: (e as Error).message });
-        }
-      });
+    emitTabVoices({
+      voices: stdSequences,
+      slots: m.voices,
+      staffTop,
+      measureIndex: i,
+      activeNoteIds,
+      selectedNoteIds,
+      // This layout IS the staff-1-of-first-part traversal jsonView mirrors.
+      synthesizeKeys: true,
+      primitives,
+      index,
+      onIssue: message => measureIssues.push({ kind: 'render', message })
     });
 
     // End barline
@@ -293,6 +174,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   }
 
   const heightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * ROW_HEIGHT_SP;
+  const rows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r) => rowBand(r));
 
-  return { primitives, widthSp, heightSp, usedWidthSp: plan.usedWidthSp, index, diagnostics };
+  return { primitives, widthSp, heightSp, usedWidthSp: plan.usedWidthSp, index, diagnostics, rows };
 }
