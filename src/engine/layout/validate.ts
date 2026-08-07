@@ -1,6 +1,6 @@
 import { MnxStructure, MnxPitch, isGrace, isTremolo, isTuplet, isTimedEvent } from '../../model/mnx.ts';
 import { durationValue, tremoloDuration, tupletDuration } from './spacing.ts';
-import { MAX_FRET, midiOfMnxPitch, tabPositionContext } from '../tab/guitarPositions.ts';
+import { MAX_FRET, midiOfMnxPitch, tabPositionContext, TabSetup } from '../tab/guitarPositions.ts';
 
 /**
  * Semantic (musical) validation — problems the schema can't see but the user
@@ -25,6 +25,12 @@ export interface ValidationIssue {
    * perfectly there, so a badge would be noise.
    */
   scope?: 'tab';
+  /**
+   * When the issue is attributable to ONE event, its address within the
+   * measure — layouts that know the event's column draw the badge under that
+   * column instead of stacking it in the bar corner.
+   */
+  at?: { voiceIndex: number; eventIndex: number };
 }
 
 const EPSILON = 1e-6;
@@ -34,7 +40,14 @@ function fmtBeats(beats: number): string {
   return String(Math.round(beats * 1000) / 1000);
 }
 
-export function validateDocument(mnx: MnxStructure): ValidationIssue[] {
+/**
+ * `tabSetup` is the viewer's instrument override, when one is in effect: the
+ * fingerboard checks must judge against the SAME strings the layout derived
+ * with, or a note the override cannot reach would vanish from the tab staff
+ * with no badge explaining why. Document-level checks (bar arithmetic) are
+ * unaffected.
+ */
+export function validateDocument(mnx: MnxStructure, tabSetup?: TabSetup): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const part = mnx.parts?.[0];
   if (!part) return issues;
@@ -82,7 +95,7 @@ export function validateDocument(mnx: MnxStructure): ValidationIssue[] {
     });
   });
 
-  validateTabPositions(part, issues);
+  validateTabPositions(part, issues, tabSetup);
   return issues;
 }
 
@@ -140,17 +153,37 @@ function fmtRange(lowMidi: number, highMidi: number): string {
  */
 function validateTabPositions(
   part: NonNullable<MnxStructure['parts']>[number],
-  issues: ValidationIssue[]
+  issues: ValidationIssue[],
+  tabSetup?: TabSetup
 ): void {
   const lab = part._x?.mnxLab;
-  const partIsTab = !!(lab?.strings || lab?.capo !== undefined || lab?.tab);
-  const ctx = tabPositionContext(part);
+  const ctx = tabPositionContext(part, tabSetup);
+  if (!ctx) {
+    // No declared strings: no fingerboard exists, so there is nothing to
+    // derive or conflict — but a document that ASKS for a tab view without
+    // declaring an instrument is a user-fixable inconsistency.
+    const kind = lab?.tab?.staffKind;
+    if (kind === 'tab' || kind === 'both') {
+      issues.push({
+        measureIndex: 0,
+        severity: 'error',
+        scope: 'tab',
+        message:
+          'the part asks for a tab view (staffKind) but declares no strings — ' +
+          'add _x.mnxLab.strings, or supply an instrument from the viewer'
+      });
+    }
+    return;
+  }
   const opens = [...ctx.openMidi.values()];
   const lowestReach = Math.min(...opens);
   const highestReach = Math.max(...opens) + MAX_FRET;
 
-  const error = (measureIndex: number, message: string) =>
-    issues.push({ measureIndex, severity: 'error', scope: 'tab', message });
+  const error = (
+    measureIndex: number,
+    message: string,
+    at?: { voiceIndex: number; eventIndex: number }
+  ) => issues.push({ measureIndex, severity: 'error', scope: 'tab', message, ...(at ? { at } : {}) });
 
   part.measures.forEach((partMeasure, measureIndex) => {
     // onset (whole-note fraction) → string number → claims
@@ -158,26 +191,26 @@ function validateTabPositions(
 
     (partMeasure.sequences ?? []).forEach((seq, voiceIndex) => {
       let onset = 0;
-      for (const item of seq.content ?? []) {
+      for (const [eventIndex, item] of (seq.content ?? []).entries()) {
         // Un-timed containers make every later onset in this voice unknowable;
         // stop rather than report conflicts against invented times.
         if (!isTimedEvent(item)) return;
+        const at = { voiceIndex, eventIndex };
 
         for (const note of item.notes ?? []) {
           const x = note._x?.mnxLab;
           if (x?.string === undefined) {
-            // Bare note: on a declared tab part, flag a pitch that no string
-            // can reach — the assignment is presentation, but an unreachable
-            // pitch is a content problem the user should see.
-            if (partIsTab) {
-              const midi = midiOfMnxPitch(note.pitch);
-              if (midi < lowestReach || midi > highestReach) {
-                error(
-                  measureIndex,
-                  `${fmtPitch(note.pitch)} is not playable on the declared strings` +
-                    ` (reachable range ${fmtRange(lowestReach, highestReach)})`
-                );
-              }
+            // Bare note: strings are declared (ctx exists), so flag a pitch
+            // no string can reach — the assignment is presentation, but an
+            // unreachable pitch is a content problem the user should see.
+            const midi = midiOfMnxPitch(note.pitch);
+            if (midi < lowestReach || midi > highestReach) {
+              error(
+                measureIndex,
+                `${fmtPitch(note.pitch)} is not playable on the declared strings` +
+                  ` (reachable range ${fmtRange(lowestReach, highestReach)})`,
+                at
+              );
             }
             continue;
           }
@@ -186,7 +219,8 @@ function validateTabPositions(
           if (open === undefined) {
             error(
               measureIndex,
-              `string ${x.string} is not declared in the part's strings`
+              `string ${x.string} is not declared in the part's strings`,
+              at
             );
             continue;
           }
@@ -195,7 +229,8 @@ function validateTabPositions(
             error(
               measureIndex,
               `${fmtPitch(note.pitch)} is not playable on string ${x.string}` +
-                ` (derived fret ${derived} is outside 0–${MAX_FRET})`
+                ` (derived fret ${derived} is outside 0–${MAX_FRET})`,
+              at
             );
             continue;
           }
@@ -204,7 +239,8 @@ function validateTabPositions(
               measureIndex,
               `stored fret ${x.fret} disagrees with the derived fret ${derived}` +
                 ` on string ${x.string} — the pitch, the tuning or the` +
-                ` annotation is wrong (the derived fret is rendered)`
+                ` annotation is wrong (the derived fret is rendered)`,
+              at
             );
           }
 

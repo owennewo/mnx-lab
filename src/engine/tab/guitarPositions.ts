@@ -1,4 +1,4 @@
-import { MnxNote, MnxPart, MnxPitch } from '../../model/mnx.ts';
+import { MnxNote, MnxPart, MnxPitch, MnxTuningEntry } from '../../model/mnx.ts';
 
 /**
  * Fingerboard position derivation (roadmap/proposed/derived-positions.md).
@@ -37,26 +37,45 @@ export function midiOfMnxPitch(pitch: MnxPitch): number {
 export interface TabPositionContext {
   /** Sounding MIDI of each EFFECTIVE open string (capo applied), by string number. */
   openMidi: ReadonlyMap<number, number>;
+  /** The physical string set the context was built from (no capo shift) —
+   *  what a tuning legend prints. */
+  strings: readonly MnxTuningEntry[];
+  capo: number;
 }
 
 /**
- * The part's effective string set: declared `_x.mnxLab.strings` (or standard
- * guitar when absent — the documented default), each shifted up by the capo.
- * Printed frets are counted from the capo, so deriving against the shifted
- * opens makes them capo-relative by construction.
+ * A consumer-supplied instrument: the viewer surface's override. Presentation,
+ * not content — it wins over the document's declaration for rendering and is
+ * never written back.
  */
-export function tabPositionContext(part: MnxPart | undefined): TabPositionContext {
-  const declared = part?._x?.mnxLab?.strings;
-  const capo = part?._x?.mnxLab?.capo ?? 0;
+export interface TabSetup {
+  strings?: readonly MnxTuningEntry[];
+  capo?: number;
+}
+
+/**
+ * The part's effective string set — declared `_x.mnxLab.strings` unless the
+ * consumer overrides it — each shifted up by the capo. Printed frets are
+ * counted from the capo, so deriving against the shifted opens makes them
+ * capo-relative by construction.
+ *
+ * Returns null when NO strings are known: there is deliberately no assumed
+ * instrument (roadmap/proposed/derived-positions.md) — a document without a
+ * declaration has no fingerboard, and tab views require one from the document
+ * or from the surface.
+ */
+export function tabPositionContext(
+  part: MnxPart | undefined,
+  override?: TabSetup
+): TabPositionContext | null {
+  const strings = override?.strings ?? part?._x?.mnxLab?.strings;
+  if (!strings || strings.length === 0) return null;
+  const capo = override?.capo ?? part?._x?.mnxLab?.capo ?? 0;
   const openMidi = new Map<number, number>();
-  if (declared && declared.length > 0) {
-    for (const entry of declared) {
-      openMidi.set(entry.string, midiOfMnxPitch(entry.pitch) + capo);
-    }
-  } else {
-    GUITAR_TUNING.forEach((midi, index) => openMidi.set(index + 1, midi + capo));
+  for (const entry of strings) {
+    openMidi.set(entry.string, midiOfMnxPitch(entry.pitch) + capo);
   }
-  return { openMidi };
+  return { openMidi, strings, capo };
 }
 
 export interface ResolvedTabPosition {
@@ -75,7 +94,7 @@ export interface ResolvedTabPosition {
  */
 export function resolveEventPositions(
   notes: MnxNote[],
-  ctx: TabPositionContext = tabPositionContext(undefined)
+  ctx: TabPositionContext
 ): (ResolvedTabPosition | null)[] {
   const resolved: (ResolvedTabPosition | null)[] = new Array(notes.length).fill(null);
   const usedStrings = new Set<number>();

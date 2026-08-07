@@ -7,7 +7,7 @@ import {
   selectionContext
 } from './mnxContext.ts';
 import type { PlaybackState, SelectionContext } from './mnxContext.ts';
-import { MnxDocument } from '../model/mnx.ts';
+import { MnxDocument, MnxTuningEntry } from '../model/mnx.ts';
 import { renderMnxToSvgTab } from '../engine/tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../engine/notation/notationRenderer.ts';
 import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
@@ -43,6 +43,13 @@ export class ScoreViewer extends LitElement {
   @property({ type: String }) viewMode: ViewMode = 'notation';
   @property({ type: Number }) zoom = 1;
   @property({ type: Boolean }) hasTab = false;
+  /**
+   * Viewer-supplied instrument: overrides the document's `_x.mnxLab.strings`
+   * / `capo` for rendering (presentation only — never written back). Without
+   * either source, no instrument is assumed and tab staves don't render.
+   */
+  @property({ attribute: false }) stringsOverride: MnxTuningEntry[] | null = null;
+  @property({ type: Number }) capoOverride: number | null = null;
   @property({ type: Boolean }) invalidByDesign = false;
   @property({ attribute: false }) pinnedErrors: PinnedError[] = [];
   /** Pointer of the pinned error currently highlighted in the document pane. */
@@ -272,7 +279,9 @@ export class ScoreViewer extends LitElement {
       changed.has('selection') ||
       changed.has('viewMode') ||
       changed.has('zoom') ||
-      changed.has('invalidByDesign')
+      changed.has('invalidByDesign') ||
+      changed.has('stringsOverride') ||
+      changed.has('capoOverride')
     ) {
       this.renderScore();
     }
@@ -320,10 +329,18 @@ export class ScoreViewer extends LitElement {
       }
     };
 
+    const tabSetup =
+      this.stringsOverride || this.capoOverride !== null
+        ? {
+            ...(this.stringsOverride ? { strings: this.stringsOverride } : {}),
+            ...(this.capoOverride !== null ? { capo: this.capoOverride } : {})
+          }
+        : undefined;
+
     this.container.innerHTML = '';
     if (this.viewMode === 'tab') {
       const pane = this.appendPane(this.hasTab ? 'tab · _x.mnxLab' : null);
-      guarded(pane, 'tab', () => renderMnxToSvgTab({ container: pane, ...commonOpts }));
+      guarded(pane, 'tab', () => renderMnxToSvgTab({ container: pane, ...commonOpts, tabSetup }));
     } else if (this.viewMode === 'notation') {
       const pane = this.appendPane(this.hasTab ? 'notation' : null);
       guarded(pane, 'notation', () =>
@@ -334,7 +351,7 @@ export class ScoreViewer extends LitElement {
       // with joined barlines (src/engine/layout/bothSystem.ts), not two
       // stacked renders.
       const pane = this.appendPane('notation + tab · _x.mnxLab');
-      guarded(pane, 'both', () => renderMnxToSvgBoth({ container: pane, ...commonOpts }));
+      guarded(pane, 'both', () => renderMnxToSvgBoth({ container: pane, ...commonOpts, tabSetup }));
     }
 
     // Only update state when it changed, to avoid a render loop.

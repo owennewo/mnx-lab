@@ -24,7 +24,13 @@ const TUNING_PRESETS: Record<string, string> = {
   standard: 'E2 A2 D3 G3 B3 E4',
   'drop-d': 'D2 A2 D3 G3 B3 E4',
   dadgad: 'D2 A2 D3 G3 A3 D4',
-  'open-g': 'D2 G2 D3 G3 B3 D4'
+  'open-g': 'D2 G2 D3 G3 B3 D4',
+  'open-d': 'D2 A2 D3 F#3 A3 D4',
+  // Other standard-geometry fretted instruments — the string set IS the
+  // instrument as far as derivation is concerned.
+  bass: 'E1 A1 D2 G2',
+  ukulele: 'G4 C4 E4 A4',
+  mandolin: 'G3 D4 A4 E5'
 };
 
 export const TUNING_PRESET_NAMES = Object.keys(TUNING_PRESETS);

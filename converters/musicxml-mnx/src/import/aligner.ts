@@ -12,7 +12,8 @@ import {
   MnxBendPoint,
   MnxHarmonic,
   MnxHarmony,
-  MnxHarmonyStep
+  MnxHarmonyStep,
+  STANDARD_GUITAR_STRINGS
 } from '../common/types.js';
 import {
   renderChordSymbol,
@@ -762,6 +763,14 @@ export class Aligner {
     }
     if (state.clefSign === 'TAB') {
       labExtension.tab = { staffKind: 'tab' };
+      // Tab without its own <staff-tuning>: write the standard declaration
+      // explicitly — no consumer assumes an instrument any more.
+      if (!labExtension.strings) {
+        labExtension.strings = STANDARD_GUITAR_STRINGS.map(s => ({
+          string: s.string,
+          pitch: { ...s.pitch }
+        }));
+      }
     }
 
     // Build W3C MNX transposition metadata block (top-level on the part, not in _x)
@@ -1117,9 +1126,12 @@ export class Aligner {
       ...(standardPart.transposition ? { transposition: standardPart.transposition } : {}),
       _x: {
         mnxLab: {
-          ...(tabPart._x?.mnxLab?.strings
-            ? { strings: tabPart._x.mnxLab.strings }
-            : {}),
+          // Always explicit: the merged part IS tab content, and absent
+          // strings would leave it fingerboard-less under the retracted
+          // default.
+          strings:
+            tabPart._x?.mnxLab?.strings ??
+            STANDARD_GUITAR_STRINGS.map(s => ({ string: s.string, pitch: { ...s.pitch } })),
           ...(tabPart._x?.mnxLab?.capo !== undefined
             ? { capo: tabPart._x.mnxLab.capo }
             : {}),

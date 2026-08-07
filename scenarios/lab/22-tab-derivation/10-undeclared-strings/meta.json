@@ -1,0 +1,37 @@
+{
+  "title": "Tab asked for, no strings declared — nothing is assumed",
+  "description": "The part sets tab.staffKind: \"both\" but declares no strings[]. Since the instrument-neutrality change, no consumer assumes a tuning: the tab staff renders bare (lines, clef, time signature — no fret digits, because no fingerboard exists to derive against) and a red scope:'tab' badge reports the inconsistency — declare strings, or supply an instrument from the viewer. Pins the retraction of the old \"absent ⇒ standard guitar\" default: this render breaking silent-guitar assumptions is the point.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:derivation",
+    "diagnostics",
+    "undeclared-strings"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "vendor-extensions"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-derivation"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-07",
+    "primitivesHash": "sha256:3a539557df77b93a",
+    "renderHash": "sha256:c33e73c5db1ed006"
+  }
+}

@@ -79,7 +79,11 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   hardened derivation (tuning/capo-aware authority ladder, red mismatch/unplayable badges,
   no silent clamp), and nine rendered scenarios pinning it (bare melody/chord, string-only,
   partial annotation, drop-D, capo, transposition-is-display-only, out-of-range, fret
-  mismatch); goldens byte-identical throughout. Left: the `/verify` sweep of the family.
+  mismatch); goldens byte-identical throughout. **Instrument neutrality followed the same
+  day**: the assume-standard-guitar default is retired — tab requires declared `strings[]`
+  or a viewer override (`<mnx-score-viewer>` `stringsOverride`/`capoOverride`, surfaced as
+  the workbench's instrument selector with presets incl. open D/bass/uke/mandolin); the
+  shim materializes the old implicit default into saved documents.
 - **[viewer-surface.md](proposed/viewer-surface.md)** — name and define **the viewer
   surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
   undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench

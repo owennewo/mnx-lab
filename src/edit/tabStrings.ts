@@ -11,6 +11,7 @@
 // unannotated note keeps the digit on the line where the renderer was already
 // drawing the note, instead of yanking it to string 1.
 import type { MnxPart, MnxPitch, MnxTuningEntry } from '../model/mnx.ts';
+import { STANDARD_GUITAR_STRINGS } from '../model/mnx.ts';
 
 const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
@@ -18,15 +19,11 @@ export function midiOfPitch(pitch: MnxPitch): number {
   return (pitch.octave + 1) * 12 + STEP_SEMITONES[pitch.step] + (pitch.alter ?? 0);
 }
 
-/** Standard guitar tuning (consumers assume it when a tab part omits one). */
-export const STANDARD_TUNING: MnxTuningEntry[] = [
-  { string: 1, pitch: { step: 'E', octave: 4 } },
-  { string: 2, pitch: { step: 'B', octave: 3 } },
-  { string: 3, pitch: { step: 'G', octave: 3 } },
-  { string: 4, pitch: { step: 'D', octave: 3 } },
-  { string: 5, pitch: { step: 'A', octave: 2 } },
-  { string: 6, pitch: { step: 'E', octave: 2 } }
-];
+/** Standard guitar tuning — the edit layer's LAST-RESORT echo only. No
+ *  consumer assumes an instrument any more; the upgrade shim materializes an
+ *  explicit declaration into tab documents, so this is reachable only for a
+ *  hand-authored doc that dodged the shim. */
+export const STANDARD_TUNING: MnxTuningEntry[] = [...STANDARD_GUITAR_STRINGS];
 
 export function tuningOf(part: MnxPart | undefined): MnxTuningEntry[] {
   const strings = part?._x?.mnxLab?.strings;

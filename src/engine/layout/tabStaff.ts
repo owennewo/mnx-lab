@@ -1,10 +1,9 @@
-import { MnxPart, MnxSequence, isTimedEvent } from '../../model/mnx.ts';
+import { MnxSequence, isTimedEvent } from '../../model/mnx.ts';
 import {
   GUITAR_TUNING,
   midiOfMnxPitch,
   resolveEventPositions,
-  TabPositionContext,
-  tabPositionContext
+  TabPositionContext
 } from '../tab/guitarPositions.ts';
 import { Primitive, SpatialIndex } from '../primitives.ts';
 import { syntheticNoteKey } from '../../model/noteKeys.ts';
@@ -55,26 +54,25 @@ function tuningLetter(pitch: { step: string; alter?: number }): string {
 
 /**
  * The player-facing setup instructions, drawn once above/beside the FIRST bar
- * (standard publishing practice — never repeated per system):
+ * (standard publishing practice — never repeated per system), from the
+ * EFFECTIVE context — so a viewer-supplied instrument override renders
+ * honestly, exactly like a document declaration:
  *
- *   - "Capo N" text above the top string line, when the part declares a capo.
- *   - Guitar-Pro-style open-string letters at the line starts, when the part
- *     declares a tuning that differs from standard guitar. Standard tuning is
- *     the documented default ("absent ⇒ standard"), so spelling it out would
- *     be noise — the letters appear exactly when the player must retune.
+ *   - "Capo N" text above the top string line, when a capo is in effect.
+ *   - Guitar-Pro-style open-string letters at the line starts, when the
+ *     effective tuning differs from standard guitar — the letters appear
+ *     exactly when the player must retune.
  *
  * Letters show the PHYSICAL tuning (no capo shift): they are peg-setting
  * instructions, and the capo line above already carries the rest.
  */
 export function emitTabSystemHeader(
-  part: MnxPart | undefined,
+  ctx: TabPositionContext,
   x: number,
   staffTop: number,
   primitives: Primitive[]
 ): void {
-  const lab = part?._x?.mnxLab;
-
-  const capo = lab?.capo ?? 0;
+  const capo = ctx.capo;
   if (capo > 0) {
     primitives.push({
       kind: 'text',
@@ -90,8 +88,7 @@ export function emitTabSystemHeader(
     });
   }
 
-  const strings = lab?.strings;
-  if (!strings || strings.length === 0) return;
+  const strings = ctx.strings;
   const standard =
     strings.length === GUITAR_TUNING.length &&
     strings.every(s => GUITAR_TUNING[s.string - 1] === midiOfMnxPitch(s.pitch));
@@ -200,11 +197,11 @@ export interface EmitTabVoicesArgs {
   /** Forgiving render: a throwing event reports here, never kills the bar. */
   onIssue: (message: string) => void;
   /**
-   * The part's effective string set (declared strings or the standard-guitar
-   * default, capo applied) — the derivation context for every fret drawn.
-   * Optional only for compatibility; omitting it means standard tuning, no capo.
+   * The effective string set (document declaration or viewer override, capo
+   * applied) — the derivation context for every fret drawn. Callers must
+   * resolve it first; a staff with no context draws no frets at all.
    */
-  positionContext?: TabPositionContext;
+  positionContext: TabPositionContext;
 }
 
 /**
@@ -213,10 +210,9 @@ export interface EmitTabVoicesArgs {
  */
 export function emitTabVoices(args: EmitTabVoicesArgs): void {
   const {
-    voices, slots, staffTop, measureIndex,
+    voices, slots, staffTop, measureIndex, positionContext,
     activeNoteIds, selectedNoteIds, synthesizeKeys, primitives, index, onIssue
   } = args;
-  const positionContext = args.positionContext ?? tabPositionContext(undefined);
 
   // A note written in two voices at one fingerboard position is ONE note.
   // Both copies land on the same digit, so drawing the second is redundant

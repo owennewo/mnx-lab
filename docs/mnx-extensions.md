@@ -183,8 +183,12 @@ only the first two; the other four are Guitar Pro's.
   a tab staff has no pitch axis. (`{"sign": "TAB"}` is also invalid against the
   MNX schema's `C|F|G` enum — see the `lab/tab-spec-gaps` scenario.)
 - `strings` entries carry **explicit string numbers**; array order is
-  meaningless. Sounding pitches, before the capo; absent ⇒ standard guitar
-  tuning. Named `strings`, not "tuning": temperament work
+  meaningless. Sounding pitches, before the capo. **Absent ⇒ no fingerboard**:
+  no consumer assumes an instrument — tab views require a declaration, or a
+  viewer-supplied override (presentation only, never written back). The old
+  "absent ⇒ standard guitar" default is retired; the load-time shim stamps the
+  declaration into older documents that relied on it. Named `strings`, not
+  "tuning": temperament work
   ([#365](https://github.com/w3c-cg/mnx/discussions/365)) already claims that
   word, and the shape mirrors MNX's own `part.kit` / `kit-note.kitComponent`
   precedent — declared numbers, referenced by `note._x.mnxLab.string`.
@@ -322,6 +326,15 @@ Cloudflare Workers cannot run `ajv.compile()`.
 
 ## History
 
+- **v5.1** (2026-08-07, same day): **instrument neutrality** — the
+  "absent `strings[]` ⇒ standard guitar" default is retired. Absent strings
+  now mean *no fingerboard*: tab rendering requires a document declaration or
+  a viewer-level override (`<mnx-score-viewer>` `stringsOverride`/
+  `capoOverride`). The upgrade shim materializes an explicit standard
+  declaration into older tab documents (staffKind/capo/note-strings present,
+  strings absent), and the MusicXML importer writes it for TAB parts without
+  their own `<staff-tuning>`. Schema shape unchanged — only the meaning of
+  absence.
 - **v5** (2026-08-07): the tab sub-namespace flattened to the adopted shape it
   drafts ([roadmap/proposed/instrument-position.md](../roadmap/proposed/instrument-position.md)):
   `tab.position.{string,fret}` → flat `string`/`fret` (fret now **optional and

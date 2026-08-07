@@ -62,7 +62,19 @@ function docWith(voices: { string: number; fret: number }[][]): MnxStructure {
             }))
           }
         ],
-        _x: { mnxLab: { tab: { staffKind: 'both' as const } } }
+        _x: {
+          mnxLab: {
+            strings: [
+              { string: 1, pitch: { step: 'E' as const, octave: 4 } },
+              { string: 2, pitch: { step: 'B' as const, octave: 3 } },
+              { string: 3, pitch: { step: 'G' as const, octave: 3 } },
+              { string: 4, pitch: { step: 'D' as const, octave: 3 } },
+              { string: 5, pitch: { step: 'A' as const, octave: 2 } },
+              { string: 6, pitch: { step: 'E' as const, octave: 2 } }
+            ],
+            tab: { staffKind: 'both' as const }
+          }
+        }
       }
     ]
   };

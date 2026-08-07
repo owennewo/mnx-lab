@@ -449,6 +449,23 @@ export interface MnxTuningEntry {
   pitch: MnxPitch;
 }
 
+/**
+ * Standard guitar tuning, as an explicit declaration. NOT a default: since the
+ * instrument-neutrality change (roadmap/proposed/derived-positions.md) an
+ * absent `strings[]` means "no fingerboard declared" and tab views are
+ * unavailable — no consumer silently assumes guitar. This constant exists for
+ * the places that DECLARE standard tuning explicitly: the upgrade shim
+ * materializing it into older tab documents, importers, presets, tests.
+ */
+export const STANDARD_GUITAR_STRINGS: readonly MnxTuningEntry[] = [
+  { string: 1, pitch: { step: 'E', octave: 4 } },
+  { string: 2, pitch: { step: 'B', octave: 3 } },
+  { string: 3, pitch: { step: 'G', octave: 3 } },
+  { string: 4, pitch: { step: 'D', octave: 3 } },
+  { string: 5, pitch: { step: 'A', octave: 2 } },
+  { string: 6, pitch: { step: 'E', octave: 2 } }
+];
+
 /** part._x.mnxLab.tab — v5 keeps only `staffKind` here. */
 export interface MnxTabPartExtension {
   /** The part's preferred presentation; tab-ness is a view, not content. */

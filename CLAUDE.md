@@ -155,8 +155,11 @@ never a golden and never hashed.
 
 Home is the **attention queue** (blocked → stale → never-seen; current counted, not
 shown), derived from committed provenance in `src/ui/queue.ts`. Every scenario + view
-has a stable deep link: `#/scenario/<id>?view=auto|notation|tab|both|compare|json`
-(`auto` — the default when unspecified — follows the document's `tab.staffKind` hint).
+has a stable deep link: `#/scenario/<id>?view=notation|tab|both|compare|json`
+(unspecified ⇒ the document's `tab.staffKind` hint). Tab/both exist only when the
+strings are KNOWN — declared in the document, or supplied through the scenario
+page's instrument selector (a `<mnx-score-viewer>` `stringsOverride`/`capoOverride`
+— presentation only). No instrument is ever assumed.
 
 **`#/objects`** is the coverage map — every non-plumbing `$def` against the scenarios
 exercising it (`src/corpus/defIndex.ts`, inverting the spec's own `coversDefs` join),
@@ -229,11 +232,14 @@ interleaved multi-system wrap, columns aligned by shared plan slots. Tab-staff e
 (lines/clef/timesig/frets) lives ONCE in `src/engine/layout/tabStaff.ts`, used by both
 the standalone tab layout and the native staff — extend it there, never fork it. See
 [roadmap/inprogress/both-view-single-system.md](roadmap/inprogress/both-view-single-system.md). Fret/string assignment uses
-the derivation ladder in `src/engine/tab/guitarPositions.ts` (tuning- and capo-aware;
-MNX pitch is sounding): an annotated `_x.mnxLab.string` derives its fret (a stored
-`fret` is validation-only — a mismatch renders the derived fret plus a red badge),
-bare notes get the lowest-playable-fret assignment, and unplayable notes draw
-nothing plus a red `scope: 'tab'` badge — never a silent clamp. Layouts render **forgivingly**:
+the derivation ladder in `src/engine/tab/guitarPositions.ts` (MNX pitch is
+sounding): an annotated `_x.mnxLab.string` derives its fret against the declared
+`strings[]` + capo (a stored `fret` is validation-only — a mismatch renders the
+derived fret plus a red badge), bare notes get the lowest-playable-fret
+assignment, and unplayable notes draw nothing plus a red `scope: 'tab'` badge —
+never a silent clamp. **No instrument is assumed**: absent `strings[]` means no
+fingerboard (the shim materializes standard into older tab documents); a viewer
+override (`TabSetup`) may supply strings/capo as presentation. Layouts render **forgivingly**:
 unsupported content degrades to a placeholder and per-measure "!" badges
 (`src/engine/layout/diagnostics.ts`) — red = user-fixable error, blue = warning, amber =
 renderer gap. `ValidationIssue.scope: 'tab'` marks fingerboard-only constraints (the

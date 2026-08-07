@@ -138,7 +138,7 @@ Standard W3C MNX has no model for fret numbers, string assignments, playing tech
   }
 }
 \`\`\`
-- \`strings\` entries carry **explicit string numbers** — array order is meaningless. String 1 = highest-pitched string. If a tab part has no \`strings\`, assume standard guitar tuning (above). Never write \`tuning\` — that is the deprecated v4 spelling.
+- \`strings\` entries carry **explicit string numbers** — array order is meaningless. String 1 = highest-pitched string. **A tab part MUST declare \`strings\`** — no consumer assumes an instrument; when the user asks for tab and the part has none, write the standard set above. Never write \`tuning\` — that is the deprecated v4 spelling.
 - \`tab.staffKind\` (\`"notation" | "tab" | "both"\`) declares the part's preferred presentation. This flag — not a clef, not a second staff — is what selects the tab view.
 
 **Note-level extension** (\`note._x.mnxLab\`) — \`string\`/\`fret\`/\`fingering\` sit FLAT on the vendor dict; only \`technique\` nests under \`tab\`:

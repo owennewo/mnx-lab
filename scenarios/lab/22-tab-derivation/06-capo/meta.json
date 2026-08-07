@@ -1,6 +1,6 @@
 {
   "title": "Capo re-origins the fret numbers",
-  "description": "Capo 2 on default (undeclared) standard tuning; four bare quarters sound F#2 B2 E3 A3 — each exactly an effective open string (open + 2 semitones), so every derived fret is 0 on strings 6 5 4 3. Proves both capo jobs at once: the open pitches shift up, and printed frets are counted from the capo. Also exercises the absent-strings[] default composing with a declared capo.",
+  "description": "Capo 2 on declared standard strings; four bare quarters sound F#2 B2 E3 A3 — each exactly an effective open string (open + 2 semitones), so every derived fret is 0 on strings 6 5 4 3. Proves both capo jobs at once: the open pitches shift up, and printed frets are counted from the capo.",
   "bars": 1,
   "tags": [
     "tab",

@@ -5,7 +5,13 @@ import {
   MAX_FRET
 } from '../../src/engine/tab/guitarPositions.ts';
 import { validateDocument } from '../../src/engine/layout/validate.ts';
-import { MnxStructure, MnxNote, MnxPart, MnxPitch } from '../../src/model/mnx.ts';
+import {
+  MnxStructure,
+  MnxNote,
+  MnxPart,
+  MnxPitch,
+  STANDARD_GUITAR_STRINGS
+} from '../../src/model/mnx.ts';
 
 /**
  * The derivation ladder of roadmap/proposed/derived-positions.md, stage 3:
@@ -24,7 +30,8 @@ const onString = (pitch: MnxPitch, string: number, fret?: number): MnxNote => ({
   _x: { mnxLab: fret !== undefined ? { string, fret } : { string } }
 });
 
-const STANDARD = tabPositionContext(undefined);
+// No instrument is assumed any more — the standard context must be DECLARED.
+const STANDARD = tabPositionContext(undefined, { strings: STANDARD_GUITAR_STRINGS })!;
 
 function partWith(overrides: {
   strings?: { string: number; pitch: MnxPitch }[];
@@ -34,7 +41,8 @@ function partWith(overrides: {
   return {
     _x: {
       mnxLab: {
-        ...(overrides.strings ? { strings: overrides.strings } : {}),
+        // Explicit declaration required: absent strings ⇒ no fingerboard.
+        strings: overrides.strings ?? [...STANDARD_GUITAR_STRINGS],
         ...(overrides.capo !== undefined ? { capo: overrides.capo } : {}),
         tab: { staffKind: 'tab' }
       }
@@ -192,7 +200,7 @@ describe('derivation validation (red scope:tab issues)', () => {
     // Two voices, same instant: string 5 carries C3 (derives 3) and D3
     // (derives 5) — a genuine conflict even though no frets are stored.
     const part = {
-      _x: { mnxLab: { tab: { staffKind: 'tab' } } },
+      _x: { mnxLab: { strings: [...STANDARD_GUITAR_STRINGS], tab: { staffKind: 'tab' } } },
       measures: [
         {
           sequences: [

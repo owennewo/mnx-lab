@@ -35,6 +35,52 @@ const STYLE: Record<DiagnosticKind, { fill: string; radius: number; titlePrefix:
 /** Leftmost first: errors, then warnings, then renderer gaps. */
 const ORDER: Record<DiagnosticKind, number> = { validation: 0, warning: 1, render: 2 };
 
+/**
+ * Badges for issues attributable to ONE event: centred under that event's
+ * column, same styles and drop as the corner stack — position IS the
+ * attribution, so the reader's eye lands on the offending note.
+ */
+export function emitPositionedDiagnostics(
+  xCentre: number,
+  staffBottom: number,
+  issues: readonly MeasureIssue[],
+  primitives: Primitive[]
+): void {
+  const ordered = [...issues].sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
+  const total = ordered.length * MARKER_SIZE_SP + (ordered.length - 1) * MARKER_GAP_SP;
+  const start = xCentre - total / 2;
+  ordered.forEach((issue, i) => {
+    const style = STYLE[issue.kind];
+    const title = style.titlePrefix + issue.message;
+    const className = `diagnostic-marker diagnostic-${issue.kind}`;
+    const x = start + i * (MARKER_SIZE_SP + MARKER_GAP_SP);
+    const y = staffBottom + MARKER_DROP_SP;
+    primitives.push({
+      kind: 'rect',
+      x, y,
+      w: MARKER_SIZE_SP, h: MARKER_SIZE_SP,
+      radius: style.radius,
+      fill: style.fill,
+      className,
+      title
+    });
+    primitives.push({
+      kind: 'text',
+      text: '!',
+      x: x + MARKER_SIZE_SP / 2,
+      y: y + MARKER_SIZE_SP / 2,
+      font: 'body',
+      size: 0.9,
+      weight: 'bold',
+      anchor: 'middle',
+      baseline: 'central',
+      fill: '#fff',
+      className,
+      title
+    });
+  });
+}
+
 export function emitMeasureDiagnostics(
   measureX: number,
   staffBottom: number,

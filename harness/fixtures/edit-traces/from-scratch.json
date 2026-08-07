@@ -255,9 +255,6 @@
           "name": "Guitar",
           "_x": {
             "mnxLab": {
-              "tab": {
-                "staffKind": "both"
-              },
               "strings": [
                 {
                   "string": 1,
@@ -301,7 +298,10 @@
                     "octave": 2
                   }
                 }
-              ]
+              ],
+              "tab": {
+                "staffKind": "both"
+              }
             }
           },
           "measures": [

@@ -11,6 +11,7 @@ import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
+import type { MnxTuningEntry } from '../model/mnx.ts';
 import type { ViewMode } from '../elements/ScoreViewer.ts';
 import type { SelectionContext } from '../elements/mnxContext.ts';
 import { EditorSession } from '../edit/session.ts';
@@ -28,10 +29,7 @@ import {
 import { parseTimeSignature, parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
 import '../elements/ScoreViewer.ts';
 
-// `auto` = unspecified: follow the document's own `tab.staffKind` hint — the
-// document rung of viewer-surface.md's precedence chain (user > host >
-// document > default). It is the default when the deep link names no view.
-type PageView = ViewMode | 'auto' | 'compare' | 'json';
+type PageView = ViewMode | 'compare' | 'json';
 
 /** How many object tags to show before collapsing the tail into a count. */
 const DEF_PREVIEW = 9;
@@ -40,6 +38,11 @@ const DEF_PREVIEW = 9;
 export class ScenarioPage extends LitElement {
   @property({ type: String }) scenarioId = '';
   @property({ type: String }) view = '';
+
+  /** Instrument selector: 'document' = no override, else a tuning preset
+   *  name from setupGrammar. Presentation only — never written back. */
+  @state() private instrument = 'document';
+  @state() private capoOverride: number | null = null;
 
   @state() private doc: MnxDocument | null = null;
   @state() private rawScore = '';
@@ -178,6 +181,31 @@ export class ScenarioPage extends LitElement {
         display: flex;
         gap: 2px;
         margin-top: 12px;
+        align-items: center;
+      }
+
+      /* The instrument override — the viewer surface's strings/capo. */
+      .tabs .instrument {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--mono);
+        font-size: 10.5px;
+      }
+
+      .tabs .instrument select,
+      .tabs .instrument input {
+        font: inherit;
+        color: var(--ink-2);
+        background: var(--surface);
+        border: 1px solid var(--line-strong);
+        border-radius: 5px;
+        padding: 2px 6px;
+      }
+
+      .tabs .instrument .capo {
+        width: 56px;
       }
 
       /* The incubating editor's status strip — cursor, history, trace. */
@@ -473,9 +501,8 @@ export class ScenarioPage extends LitElement {
     if (!entry || !this.session) return [];
     const view = this.activeView(entry);
     if (view === 'json') return [];
-    const mode = view === 'auto' ? this.docViewMode(entry) : view;
     const layers: KeymapLayer[] = [];
-    if (entry.hasTab && (mode === 'tab' || mode === 'both')) layers.push(TAB_DIGIT_LAYER);
+    if (entry.hasTab && (view === 'tab' || view === 'both')) layers.push(TAB_DIGIT_LAYER);
     layers.push(NAVIGATION_LAYER, EDIT_LAYER);
     return layers;
   }
@@ -591,26 +618,43 @@ export class ScenarioPage extends LitElement {
     this.syncFromSession();
   }
 
-  // Every scenario offers every view: since the derivation ladder
-  // (roadmap/proposed/derived-positions.md), tab is a VIEW any guitar-range
-  // document can be forced into — string/fret assignment derives from pitch
-  // against the default standard tuning, and out-of-range notes degrade to
-  // red badges rather than breaking the render. `hasTab` still gates the
-  // *edit* affordances (fret digits, tuning popover) and what `auto` resolves
-  // to; it no longer gates what a reviewer may look at.
-  private static readonly ALL_VIEWS: readonly PageView[] =
-    ['auto', 'notation', 'tab', 'both', 'compare', 'json'];
-
-  private activeView(_entry: ScenarioEntry): PageView {
-    return ScenarioPage.ALL_VIEWS.includes(this.view as PageView)
-      ? (this.view as PageView)
-      : 'auto';
+  // Tab/both exist only when the strings are KNOWN — declared by the document
+  // or supplied through the instrument selector (the viewer override,
+  // presentation-only). No instrument is ever assumed
+  // (roadmap/proposed/derived-positions.md): a document without strings has
+  // no fingerboard until the user names one.
+  private docDeclaresStrings(): boolean {
+    return (this.doc?.mnxJson.parts ?? []).some(
+      p => (p._x?.mnxLab?.strings?.length ?? 0) > 0
+    );
   }
 
-  /** What `auto` resolves to: the loaded document's `tab.staffKind` hint
-   *  (`both` beats `tab` when parts disagree), else notation. */
-  private docViewMode(entry: ScenarioEntry): ViewMode {
-    if (!entry.hasTab) return 'notation';
+  private overrideStrings(): MnxTuningEntry[] | null {
+    if (this.instrument === 'document') return null;
+    return parseTuning(this.instrument);
+  }
+
+  private tabCapable(): boolean {
+    return this.docDeclaresStrings() || this.overrideStrings() !== null;
+  }
+
+  private availableViews(): PageView[] {
+    return this.tabCapable()
+      ? ['notation', 'tab', 'both', 'compare', 'json']
+      : ['notation', 'compare', 'json'];
+  }
+
+  private activeView(_entry: ScenarioEntry): PageView {
+    const allowed = this.availableViews();
+    if (allowed.includes(this.view as PageView)) return this.view as PageView;
+    // Unspecified (or no-longer-available) view: the document's own hint.
+    return this.defaultView();
+  }
+
+  /** The document's preferred view when the URL names none: its `staffKind`
+   *  hint when tab is possible, else notation. */
+  private defaultView(): PageView {
+    if (!this.tabCapable()) return 'notation';
     const kinds = (this.doc?.mnxJson.parts ?? []).map(p => p._x?.mnxLab?.tab?.staffKind);
     if (kinds.includes('both')) return 'both';
     if (kinds.includes('tab')) return 'tab';
@@ -637,6 +681,8 @@ export class ScenarioPage extends LitElement {
         .mnxDoc=${this.doc}
         .viewMode=${viewMode}
         .hasTab=${entry.hasTab}
+        .stringsOverride=${this.overrideStrings()}
+        .capoOverride=${this.capoOverride}
         .invalidByDesign=${entry.invalidByDesign}
         .pinnedErrors=${this.pinnedErrors}
         .selection=${this.selection}
@@ -652,7 +698,7 @@ export class ScenarioPage extends LitElement {
     const view = this.activeView(entry);
     const item = classify(entry);
     const verification = entry.meta.verification;
-    const views = ScenarioPage.ALL_VIEWS;
+    const views = this.availableViews();
 
     return html`
       <div class="head">
@@ -725,6 +771,32 @@ export class ScenarioPage extends LitElement {
               </a>
             `
           )}
+          <span class="instrument" title="view this score on an instrument — a rendering override, the document is untouched">
+            <select
+              .value=${this.instrument}
+              @change=${(e: Event) => {
+                this.instrument = (e.target as HTMLSelectElement).value;
+              }}
+            >
+              <option value="document">instrument: document</option>
+              ${TUNING_PRESET_NAMES.map(
+                n => html`<option value=${n} ?selected=${this.instrument === n}>${n}</option>`
+              )}
+            </select>
+            <input
+              class="capo"
+              type="number"
+              min="0"
+              max="24"
+              placeholder="capo"
+              .value=${this.capoOverride === null ? '' : String(this.capoOverride)}
+              @change=${(e: Event) => {
+                const raw = (e.target as HTMLInputElement).value.trim();
+                const n = raw === '' ? NaN : Number(raw);
+                this.capoOverride = Number.isInteger(n) && n >= 0 && n <= 24 ? n : null;
+              }}
+            />
+          </span>
         </div>
         ${this.session && view !== 'json'
           ? html`
@@ -846,7 +918,7 @@ export class ScenarioPage extends LitElement {
                   </div>
                 </div>
               `
-            : this.viewer(entry, view === 'auto' ? this.docViewMode(entry) : view)}
+            : this.viewer(entry, view)}
       </div>
     `;
   }

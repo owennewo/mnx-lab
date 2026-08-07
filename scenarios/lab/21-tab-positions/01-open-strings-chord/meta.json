@@ -1,6 +1,6 @@
 {
   "title": "All six open strings as one chord",
-  "description": "A single whole-note event whose six notes are the open strings of a standard-tuned guitar, each carrying _x.mnxLab.tab.position with fret 0 and a distinct string. Exercises the single-source model (pitch and position on the same note), the chord rule that no two notes share a string, and omitted part tuning (consumers assume standard).",
+  "description": "A single whole-note event whose six notes are the open strings of a standard-tuned guitar, each carrying flat _x.mnxLab string/fret with fret 0 and a distinct string. Exercises the single-source model (pitch and position on the same note), the chord rule that no two notes share a string, and an explicit standard strings[] declaration — since the instrument-neutrality change no consumer assumes a tuning, so the declaration is required for the tab view.",
   "bars": 1,
   "tags": [
     "tab",

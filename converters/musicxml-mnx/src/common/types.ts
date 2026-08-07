@@ -188,6 +188,18 @@ export interface MnxTuningEntry {
   pitch: MnxPitch;
 }
 
+/** Standard guitar tuning as an EXPLICIT declaration. Not a default: an
+ *  absent `strings[]` means no fingerboard, so the importer must write this
+ *  out whenever the source is tab without its own staff-tuning. */
+export const STANDARD_GUITAR_STRINGS: MnxTuningEntry[] = [
+  { string: 1, pitch: { step: 'E', octave: 4 } },
+  { string: 2, pitch: { step: 'B', octave: 3 } },
+  { string: 3, pitch: { step: 'G', octave: 3 } },
+  { string: 4, pitch: { step: 'D', octave: 3 } },
+  { string: 5, pitch: { step: 'A', octave: 2 } },
+  { string: 6, pitch: { step: 'E', octave: 2 } }
+];
+
 /** v5: only `staffKind` remains under `tab`. */
 export interface MnxTabPartExtension {
   /** The part's preferred presentation; tab-ness is a view, not content. */
@@ -196,7 +208,8 @@ export interface MnxTabPartExtension {
 
 /** The whole vendor dict at part._x.mnxLab — v5 flat shape. */
 export interface MnxPartExtension {
-  /** Sounding open-string pitches, before the capo. Absent ⇒ standard guitar. */
+  /** Sounding open-string pitches, before the capo. Absent ⇒ no fingerboard
+   *  declared (no consumer assumes an instrument). */
   strings?: MnxTuningEntry[];
   capo?: number;
   tab?: MnxTabPartExtension;

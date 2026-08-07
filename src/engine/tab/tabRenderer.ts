@@ -1,4 +1,5 @@
 import { MnxStructure } from '../../model/mnx.ts';
+import { TabSetup } from './guitarPositions.ts';
 import { layoutTab } from '../layout/tab.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
@@ -25,6 +26,9 @@ export interface RenderTabOptions {
   onNoteClick?: (noteId: string, measureIdx: number, noteIdx: number) => void;
   /** Pixels per staff space (zoom). Default 10. */
   pxPerSp?: number;
+  /** Viewer-supplied instrument (strings/capo) — overrides the document's
+   *  declaration for rendering; never written back. */
+  tabSetup?: TabSetup;
 }
 
 export function renderMnxToSvgTab(opts: RenderTabOptions): void {
@@ -34,7 +38,8 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): void {
     mnx: opts.mnx,
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
-    selectedNoteIds: opts.selectedNoteIds
+    selectedNoteIds: opts.selectedNoteIds,
+    tabSetup: opts.tabSetup
   });
 
   // An explicit pxPerSp pins the scale; the default scales short scores up to

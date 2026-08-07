@@ -1,6 +1,7 @@
 import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation } from './notation.ts';
 import { LayoutResult } from '../primitives.ts';
+import { TabSetup } from '../tab/guitarPositions.ts';
 
 /**
  * The `both` view as ONE system, natively: the notation layout's system
@@ -21,6 +22,9 @@ export interface LayoutBothOptions {
   widthSp: number;
   activeNoteIds?: readonly string[];
   selectedNoteIds?: readonly string[];
+  /** Viewer-supplied instrument (strings/capo) — overrides each part's own
+   *  declaration; never written back. */
+  tabSetup?: TabSetup;
 }
 
 export function layoutBothSystem(opts: LayoutBothOptions): LayoutResult {

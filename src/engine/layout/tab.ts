@@ -1,7 +1,7 @@
 import { MnxStructure } from '../../model/mnx.ts';
 import { Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex } from '../primitives.ts';
 import { planHorizontal, staffOneSequences } from './spacing.ts';
-import { emitMeasureDiagnostics, MeasureIssue } from './diagnostics.ts';
+import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
 import {
   TAB_STAFF_HEIGHT_SP,
   emitTabClef,
@@ -11,7 +11,7 @@ import {
   emitTabVoices
 } from './tabStaff.ts';
 import { validateDocument } from './validate.ts';
-import { tabPositionContext } from '../tab/guitarPositions.ts';
+import { tabPositionContext, TabSetup } from '../tab/guitarPositions.ts';
 
 /**
  * Pure layout function for guitar tab. Takes parsed MNX + viewport width
@@ -47,6 +47,9 @@ export interface LayoutTabOptions {
   widthSp: number;
   activeNoteIds?: readonly string[];
   selectedNoteIds?: readonly string[];
+  /** Viewer-supplied instrument (strings/capo) — overrides the document's
+   *  declaration for rendering; never written back. */
+  tabSetup?: TabSetup;
 }
 
 export function layoutTab(opts: LayoutTabOptions): LayoutResult {
@@ -73,9 +76,11 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   }
 
   const numMeasures = part.measures.length;
-  // Effective string set (declared or standard-guitar default, capo applied) —
-  // one context for every fret this layout derives.
-  const positionContext = tabPositionContext(part);
+  // Effective string set (document declaration, unless the viewer overrides;
+  // capo applied) — one context for every fret this layout derives. Null when
+  // no strings are known ANYWHERE: no instrument is assumed, so the staff
+  // renders bare (lines/clef/time, no frets) and validate.ts badges the ask.
+  const positionContext = tabPositionContext(part, opts.tabSetup);
   // All horizontal decisions (system packing, bar widths, event x positions)
   // come from the shared plan — layoutNotation consumes the same one, which is
   // what keeps notation and tab column-aligned in the "both" view.
@@ -85,10 +90,15 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   // into each measure's diagnostic markers alongside renderer-gap issues.
   // Unlike the notation staff, this one KEEPS `scope: 'tab'` issues — the
   // fingerboard constraints they describe are exactly what this view draws.
-  const validationByMeasure = new Map<number, MeasureIssue[]>();
-  for (const v of validateDocument(mnx)) {
+  type AnchoredIssue = MeasureIssue & { at?: { voiceIndex: number; eventIndex: number } };
+  const validationByMeasure = new Map<number, AnchoredIssue[]>();
+  for (const v of validateDocument(mnx, opts.tabSetup)) {
     const list = validationByMeasure.get(v.measureIndex) ?? [];
-    list.push({ kind: v.severity === 'warning' ? 'warning' : 'validation', message: v.message });
+    list.push({
+      kind: v.severity === 'warning' ? 'warning' : 'validation',
+      message: v.message,
+      ...(v.at ? { at: v.at } : {})
+    });
     validationByMeasure.set(v.measureIndex, list);
   }
 
@@ -102,7 +112,9 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
 
     // Setup instructions — capo text and (non-standard) tuning letters,
     // above/beside the FIRST bar only.
-    if (i === 0) emitTabSystemHeader(part, m.x, staffTop, primitives);
+    if (i === 0 && positionContext) {
+      emitTabSystemHeader(positionContext, m.x, staffTop, primitives);
+    }
 
     // System-start barline
     if (m.firstInSystem) {
@@ -129,26 +141,33 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
 
     // Validation issues (user-fixable), the plan's issues (unsupported items),
     // plus anything an individual event throws (forgiving render) — one bad
-    // event must not take down the bar.
+    // event must not take down the bar. Issues attributable to one event draw
+    // UNDER that event's column; the rest stack in the bar corner.
+    const fromValidation = validationByMeasure.get(i) ?? [];
+    const anchored = fromValidation.filter(
+      v => v.at && m.voices[v.at.voiceIndex]?.[v.at.eventIndex]
+    );
     const measureIssues: MeasureIssue[] = [
-      ...(validationByMeasure.get(i) ?? []),
+      ...fromValidation.filter(v => !anchored.includes(v)),
       ...m.issues.map(message => ({ kind: 'render' as const, message }))
     ];
 
-    emitTabVoices({
-      voices: stdSequences,
-      slots: m.voices,
-      staffTop,
-      measureIndex: i,
-      activeNoteIds,
-      selectedNoteIds,
-      // This layout IS the staff-1-of-first-part traversal jsonView mirrors.
-      synthesizeKeys: true,
-      primitives,
-      index,
-      onIssue: message => measureIssues.push({ kind: 'render', message }),
-      positionContext
-    });
+    if (positionContext) {
+      emitTabVoices({
+        voices: stdSequences,
+        slots: m.voices,
+        staffTop,
+        measureIndex: i,
+        activeNoteIds,
+        selectedNoteIds,
+        // This layout IS the staff-1-of-first-part traversal jsonView mirrors.
+        synthesizeKeys: true,
+        primitives,
+        index,
+        onIssue: message => measureIssues.push({ kind: 'render', message }),
+        positionContext
+      });
+    }
 
     // End barline
     const isLast = i === numMeasures - 1;
@@ -177,6 +196,18 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       });
     }
 
+    if (anchored.length) {
+      const bySlot = new Map<number, MeasureIssue[]>();
+      for (const v of anchored) {
+        const slot = m.voices[v.at!.voiceIndex][v.at!.eventIndex];
+        const key = Math.round(slot.x * 1e4);
+        bySlot.set(key, [...(bySlot.get(key) ?? []), v]);
+      }
+      for (const [key, list] of bySlot) {
+        emitPositionedDiagnostics(key / 1e4, staffBottom, list, primitives);
+      }
+      for (const { at: _at, ...issue } of anchored) diagnostics.push({ measureIndex: i, ...issue });
+    }
     if (measureIssues.length) {
       emitMeasureDiagnostics(m.x, staffBottom, measureIssues, primitives);
       for (const issue of measureIssues) diagnostics.push({ measureIndex: i, ...issue });

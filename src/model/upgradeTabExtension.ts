@@ -1,4 +1,4 @@
-import { MnxStructure, MnxTuningEntry } from './mnx.ts';
+import { MnxStructure, MnxTuningEntry, STANDARD_GUITAR_STRINGS } from './mnx.ts';
 
 /**
  * Load-time upgrade shim for saved documents, run once on load. Four hops:
@@ -33,7 +33,8 @@ export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
     !needsUpgrade(mnxJson) &&
     !needsNamespaceUpgrade(mnxJson) &&
     !needsLabelUpgrade(mnxJson) &&
-    !needsFlattenUpgrade(mnxJson)
+    !needsFlattenUpgrade(mnxJson) &&
+    !needsStringsMaterialized(mnxJson)
   ) {
     return mnxJson;
   }
@@ -43,7 +44,66 @@ export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
   upgradeV2(doc);
   upgradeV3(doc);
   upgradeV4(doc);
+  materializeStrings(doc);
   return doc as MnxStructure;
+}
+
+/**
+ * Documents written while "absent strings[] ⇒ standard guitar" was the
+ * documented default relied on it implicitly. That default is retracted
+ * (roadmap/proposed/derived-positions.md: no consumer assumes an instrument),
+ * so the shim stamps the previously-implicit declaration ONCE into any part
+ * that carries tab-ish data (a tab view ask, a capo, or note strings) without
+ * declaring its strings — no saved document loses meaning, and no new
+ * document ever inherits the default silently.
+ */
+function materializeStrings(doc: any): void {
+  for (const part of doc.parts ?? []) {
+    const lab = part._x?.mnxLab;
+    if (lab?.strings) continue;
+    const tabish =
+      lab?.tab?.staffKind === 'tab' ||
+      lab?.tab?.staffKind === 'both' ||
+      lab?.capo !== undefined ||
+      partHasNoteStrings(part);
+    if (!tabish) continue;
+    part._x ??= {};
+    const { tab, ...rest } = part._x.mnxLab ?? {};
+    part._x.mnxLab = {
+      strings: STANDARD_GUITAR_STRINGS.map(s => ({ string: s.string, pitch: { ...s.pitch } })),
+      ...rest,
+      ...(tab !== undefined ? { tab } : {})
+    };
+  }
+}
+
+function partHasNoteStrings(part: any): boolean {
+  for (const measure of part.measures ?? []) {
+    for (const seq of measure.sequences ?? []) {
+      for (const event of seq.content ?? []) {
+        for (const note of event.notes ?? []) {
+          if (note._x?.mnxLab?.string !== undefined) return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function needsStringsMaterialized(doc: any): boolean {
+  for (const part of doc.parts ?? []) {
+    const lab = part._x?.mnxLab;
+    if (lab?.strings) continue;
+    if (
+      lab?.tab?.staffKind === 'tab' ||
+      lab?.tab?.staffKind === 'both' ||
+      lab?.capo !== undefined ||
+      partHasNoteStrings(part)
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /** v4 → v5: flatten `tab.position`/`tab.fingering`/`tab.tuning`/`tab.capo`

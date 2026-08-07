@@ -128,11 +128,19 @@ text (at most a RECOMMENDED default upstream, so the CG never standardizes an
 assignment algorithm); different consumers may legitimately differ; *our* renderer's
 determinism is owned by the goldens, not by the spec.
 
-### Defaults and their scope
+### Defaults and their scope — superseded by instrument neutrality (2026-08-07)
 
-`strings[]` absent ⇒ standard guitar — already the documented promise, now
-load-bearing. Explicitly guitar-only: no inference of bass/ukulele/banjo from part
-names or ranges; other instruments declare their strings or get no tab. Derivation
+The original plan kept "absent ⇒ standard guitar" as a load-bearing default. That
+default is now **retired**: absent `strings[]` means *no fingerboard* — no consumer
+assumes an instrument, and tab views require the strings to be KNOWN, from exactly
+two sources: the document's declaration (content) or the viewer surface's override
+(`TabSetup` on the engine → `stringsOverride`/`capoOverride` on
+`<mnx-score-viewer>` → the workbench's instrument selector — presentation, never
+written back, user > document). Consequences executed with the change: the upgrade
+shim materializes explicit standard strings into older tab documents; the MusicXML
+importer writes them for TAB parts without `<staff-tuning>`; the corpus's tab
+scenarios all declare; `lab/tab-derivation/undeclared-strings` pins the bare-staff
+degradation + red badge. Still no inference from part names or ranges. Derivation
 runs only when a tab staff is actually being laid out.
 
 ## Schema v5 — the reshape

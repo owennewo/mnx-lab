@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mnx-lab.totai.uk/schemas/mnx-lab-extensions.schema.json/v5",
-  "title": "MNX Lab vendor extensions (`_x.mnxLab`) \u2014 v5",
+  "title": "MNX Lab vendor extensions (`_x.mnxLab`) — v5",
   "description": "Everything MNX Lab carries that W3C MNX v19 cannot express: fretted-instrument tablature, section/rehearsal labels, and chord symbols. All of it lives under the single vendor key `_x.mnxLab`, which is how the MNX spec says extensions are namespaced (w3c-cg/mnx#63/#429: the `_x` key identifies an agent, vendor or community). Documents using these extensions remain fully valid against the official MNX schema. Each block is shaped like the standard MNX object it is a draft of, so adopting any of them upstream means deleting the `_x.mnxLab` wrapper rather than rewriting the data. Rationale and the proposals these draft: docs/mnx-extensions.md.",
   "type": "object",
   "$defs": {
@@ -81,7 +81,7 @@
         },
         "alter": {
           "type": "number",
-          "description": "Pitch offset from the written note at this point, in SEMITONES \u2014 the unit of MNX `pitch.alter` (2 = a whole-step bend). Non-integers are legal: a quarter-tone curl is 0.5."
+          "description": "Pitch offset from the written note at this point, in SEMITONES — the unit of MNX `pitch.alter` (2 = a whole-step bend). Non-integers are legal: a quarter-tone curl is 0.5."
         }
       },
       "required": [
@@ -92,11 +92,11 @@
     },
     "technique": {
       "type": "object",
-      "description": "Playing techniques. Visible in both notation and tab views; none of them require a position, and none is specific to fretted instruments \u2014 this block is drafted for standard MNX, not for tab (see docs/mnx-extensions.md \u00a7technique).",
+      "description": "Playing techniques. Visible in both notation and tab views; none of them require a position, and none is specific to fretted instruments — this block is drafted for standard MNX, not for tab (see docs/mnx-extensions.md §technique).",
       "properties": {
         "bend": {
           "type": "object",
-          "description": "A bend as a CURVE, not a single interval: an ordered list of control points across the note. A pre-bend is a first point at position 0 with a non-zero alter; a release is any later point whose alter decreases. This is how every guitar editor models bends, and it is the deficiency w3c-cg/mnx#63 opens with \u2014 MusicXML's single `<bend-alter>` cannot state a bend that rises, releases and rises again.",
+          "description": "A bend as a CURVE, not a single interval: an ordered list of control points across the note. A pre-bend is a first point at position 0 with a non-zero alter; a release is any later point whose alter decreases. This is how every guitar editor models bends, and it is the deficiency w3c-cg/mnx#63 opens with — MusicXML's single `<bend-alter>` cannot state a bend that rises, releases and rises again.",
           "properties": {
             "points": {
               "type": "array",
@@ -193,7 +193,7 @@
         },
         "palmMute": {
           "type": "boolean",
-          "description": "Per-note, matching how Guitar Pro stores it. In standard MNX this should be a span on the part measure with `position` + `end`, like `ottava` \u2014 see docs/mnx-extensions.md."
+          "description": "Per-note, matching how Guitar Pro stores it. In standard MNX this should be a span on the part measure with `position` + `end`, like `ottava` — see docs/mnx-extensions.md."
         }
       },
       "additionalProperties": false
@@ -221,7 +221,7 @@
     },
     "note-tab": {
       "type": "object",
-      "description": "Stored under note._x.mnxLab.tab. v5 leaves only `technique` here: `string`/`fret`/`fingering` moved flat onto the vendor dict, mirroring the adopted shape they draft (flat on `note` \u2014 roadmap/proposed/instrument-position.md). `technique` stays until it graduates via a general articulations proposal (roadmap/proposed/guitar-technique.md).",
+      "description": "Stored under note._x.mnxLab.tab. v5 leaves only `technique` here: `string`/`fret`/`fingering` moved flat onto the vendor dict, mirroring the adopted shape they draft (flat on `note` — roadmap/proposed/instrument-position.md). `technique` stays until it graduates via a general articulations proposal (roadmap/proposed/guitar-technique.md).",
       "properties": {
         "technique": {
           "$ref": "#/$defs/technique"
@@ -231,7 +231,7 @@
     },
     "string-entry": {
       "type": "object",
-      "description": "One string's declaration. The string number is explicit \u2014 array order carries no meaning.",
+      "description": "One string's declaration. The string number is explicit — array order carries no meaning.",
       "properties": {
         "string": {
           "type": "integer",
@@ -250,7 +250,7 @@
     },
     "part-tab": {
       "type": "object",
-      "description": "Stored under part._x.mnxLab.tab. v5 leaves only `staffKind` here: `strings`/`capo` moved flat onto the vendor dict (drafting flat `part.strings[]`/`part.capo`). Tab-ness is a VIEW declaration \u2014 there is no tab clef and no duplicated tab staff; notation and tab are both derived from the same note stream.",
+      "description": "Stored under part._x.mnxLab.tab. v5 leaves only `staffKind` here: `strings`/`capo` moved flat onto the vendor dict (drafting flat `part.strings[]`/`part.capo`). Tab-ness is a VIEW declaration — there is no tab clef and no duplicated tab staff; notation and tab are both derived from the same note stream.",
       "properties": {
         "staffKind": {
           "enum": [
@@ -291,7 +291,7 @@
     },
     "harmony-degree": {
       "type": "object",
-      "description": "An added, altered or omitted extension \u2014 MusicXML's `<degree>` model, which is proven interchange and hard to improve on.",
+      "description": "An added, altered or omitted extension — MusicXML's `<degree>` model, which is proven interchange and hard to improve on.",
       "properties": {
         "value": {
           "type": "integer",
@@ -319,7 +319,7 @@
     },
     "harmony": {
       "type": "object",
-      "description": "One chord symbol. Drafts w3c-cg/mnx#109. Structured AND literal: the enum carries the semantics (so it transposes and re-spells), `text` is the display escape hatch for anything the enum cannot say \u2014 the same pattern the CG settled on for dynamics in #518. Positioned by `location`, with no duration: a chord lasts until the next one (w3c-cg/mnx#110).",
+      "description": "One chord symbol. Drafts w3c-cg/mnx#109. Structured AND literal: the enum carries the semantics (so it transposes and re-spells), `text` is the display escape hatch for anything the enum cannot say — the same pattern the CG settled on for dynamics in #518. Positioned by `location`, with no duration: a chord lasts until the next one (w3c-cg/mnx#110).",
       "properties": {
         "location": {
           "$ref": "#/$defs/rhythmic-position"
@@ -378,7 +378,7 @@
         },
         "text": {
           "type": "string",
-          "description": "Display override. Present ONLY when the source's literal spelling differs from what a consumer would render from the structure \u2014 so most chords carry none."
+          "description": "Display override. Present ONLY when the source's literal spelling differs from what a consumer would render from the structure — so most chords carry none."
         }
       },
       "required": [
@@ -452,7 +452,7 @@
     },
     "part-ext": {
       "type": "object",
-      "description": "The whole vendor dict at part._x.mnxLab. `strings` declares the sounding pitch of each open string (named to avoid \"tuning\", which temperament work — w3c-cg/mnx#365 — already claims; the shape mirrors `part.kit` + `kit-note.kitComponent`: declared numbers, referenced by `note._x.mnxLab.string`). If absent, consumers assume standard guitar tuning (string 1 = E4 … string 6 = E2).",
+      "description": "The whole vendor dict at part._x.mnxLab. `strings` declares the sounding pitch of each open string (named to avoid \"tuning\", which temperament work — w3c-cg/mnx#365 — already claims; the shape mirrors `part.kit` + `kit-note.kitComponent`: declared numbers, referenced by `note._x.mnxLab.string`). ABSENT MEANS NO FINGERBOARD: no consumer assumes an instrument, and tab views are unavailable unless the strings are supplied out-of-band (a viewer-level override — presentation, never written back). Older documents that relied on the retired assume-standard-guitar default are migrated by the load-time shim, which stamps the declaration explicitly.",
       "properties": {
         "strings": {
           "type": "array",
@@ -460,7 +460,7 @@
             "$ref": "#/$defs/string-entry"
           },
           "minItems": 1,
-          "description": "Sounding pitch of each open string, before the capo is applied."
+          "description": "Sounding pitch of each open string, before the capo is applied. Required for any tab rendering — there is no default instrument."
         },
         "capo": {
           "type": "integer",
@@ -476,7 +476,7 @@
     },
     "global-measure-ext": {
       "type": "object",
-      "description": "The whole vendor dict at global.measures[i]._x.mnxLab. Harmony lives here \u2014 on the GLOBAL timeline beside `key` and `tempos` \u2014 because two parts cannot legitimately disagree about the chord on a beat, which is the test that put dynamics and ottavas in the part measure and key/time/tempo in the global one. `rehearsal` and `section` were here in v3; v4 removed them in favour of the standard MNX objects proposed in roadmap/proposed/score-text.md \u2014 an extension should be a draft of the standard object, so once drafted it stops being an extension.",
+      "description": "The whole vendor dict at global.measures[i]._x.mnxLab. Harmony lives here — on the GLOBAL timeline beside `key` and `tempos` — because two parts cannot legitimately disagree about the chord on a beat, which is the test that put dynamics and ottavas in the part measure and key/time/tempo in the global one. `rehearsal` and `section` were here in v3; v4 removed them in favour of the standard MNX objects proposed in roadmap/proposed/score-text.md — an extension should be a draft of the standard object, so once drafted it stops being an extension.",
       "properties": {
         "harmonies": {
           "type": "array",
@@ -484,7 +484,7 @@
             "$ref": "#/$defs/harmony"
           },
           "minItems": 1,
-          "description": "Every chord symbol starting in this measure, in `location` order. An array parallel to `tempos` \u2014 the other repeatable, metrically-positioned global object."
+          "description": "Every chord symbol starting in this measure, in `location` order. An array parallel to `tempos` — the other repeatable, metrically-positioned global object."
         }
       },
       "additionalProperties": false

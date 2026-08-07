@@ -1,5 +1,5 @@
 import { MnxStructure, MnxEvent, MnxEventMarkings, MnxGlobalMeasure, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
-import { emitMeasureDiagnostics, MeasureIssue } from './diagnostics.ts';
+import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
 import { validateDocument } from './validate.ts';
 import { dynamicGlyph, dynamicLabel } from './dynamics.ts';
 import {
@@ -46,7 +46,7 @@ import {
   emitTabTimeSig,
   emitTabVoices
 } from './tabStaff.ts';
-import { tabPositionContext } from '../tab/guitarPositions.ts';
+import { tabPositionContext, TabPositionContext, TabSetup } from '../tab/guitarPositions.ts';
 
 /**
  * Pure layout for standard 5-line notation. Working in staff spaces, returns
@@ -409,6 +409,9 @@ export interface LayoutNotationOptions {
    * document exists in the corpus or fixtures today).
    */
   includeTabStaves?: boolean;
+  /** Viewer-supplied instrument (strings/capo) — overrides each part's own
+   *  declaration for the injected tab staves; never written back. */
+  tabSetup?: TabSetup;
 }
 
 const TITLE_SIZE_SP = 2.4;
@@ -717,7 +720,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         selectedNoteIds,
         index,
         diagnostics,
-        includeTabStaves: opts.includeTabStaves === true && (mnx.scores ?? []).length === 0
+        includeTabStaves: opts.includeTabStaves === true && (mnx.scores ?? []).length === 0,
+        tabSetup: opts.tabSetup
       })
     );
     const jobUsed = Math.max(...rs.map(r => r.usedWidthSp));
@@ -762,6 +766,7 @@ interface RenderSegmentArgs {
   index: SpatialIndex;
   diagnostics: LayoutDiagnostic[];
   includeTabStaves: boolean;
+  tabSetup?: TabSetup;
 }
 
 // Left-of-system geometry: nested decorations step left of their parents,
@@ -778,7 +783,7 @@ function renderSegment(args: RenderSegmentArgs): {
   usedWidthSp: number;
   rows: RowBandSp[];
 } {
-  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves } = args;
+  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup } = args;
   const primitives: Primitive[] = [];
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
@@ -831,14 +836,30 @@ function renderSegment(args: RenderSegmentArgs): {
   if (includeTabStaves && segment.staves.length) {
     const inSegment = new Set<MnxPart>();
     for (const st of segment.staves) for (const src of st.sources) inSegment.add(src.part);
+    // A part can bear a tab staff only when its strings are KNOWN — declared
+    // in the document or supplied by the viewer override. No instrument is
+    // ever assumed.
     for (const p of mnx.parts ?? []) {
       const kind = p._x?.mnxLab?.tab?.staffKind;
-      if (inSegment.has(p) && (kind === 'both' || kind === 'tab')) tabParts.push(p);
+      if (
+        inSegment.has(p) &&
+        (kind === 'both' || kind === 'tab') &&
+        tabPositionContext(p, tabSetup) !== null
+      ) {
+        tabParts.push(p);
+      }
     }
     // No part declares a tab preference: the view still promised a tab staff —
-    // give the first part one (mirrors the standalone tab layout, which
-    // renders parts[0] by heuristic).
-    if (tabParts.length === 0) tabParts.push(segment.staves[0].sources[0].part);
+    // give one to the first part whose strings are known (declared or viewer
+    // override). If none are, the promise cannot be kept and the both view
+    // degrades to notation alone.
+    if (tabParts.length === 0) {
+      const candidate = segment.staves
+        .flatMap(st => st.sources)
+        .map(src => src.part)
+        .find(p => tabPositionContext(p, tabSetup) !== null);
+      if (candidate) tabParts.push(candidate);
+    }
   }
   const lastPlanStaffOf = new Map<MnxPart, number>();
   segment.staves.forEach((st, s) => {
@@ -848,7 +869,12 @@ function renderSegment(args: RenderSegmentArgs): {
    *  injected tab staves (each reading its part's staff-1 plan slots). */
   const displayOfPlan: number[] = [];
   const displayHeights: number[] = [];
-  const tabDisplays: { part: MnxPart; planStaff: number; displayIndex: number }[] = [];
+  const tabDisplays: {
+    part: MnxPart;
+    planStaff: number;
+    displayIndex: number;
+    ctx: TabPositionContext;
+  }[] = [];
   const tabByAnchorPlan = new Map<number, number>(); // plan staff -> tab display index
   segment.staves.forEach((_st, s) => {
     displayOfPlan.push(displayHeights.length);
@@ -858,7 +884,13 @@ function renderSegment(args: RenderSegmentArgs): {
       const staffOne = segment.staves.findIndex(cand =>
         cand.sources.some(src => src.part === part && src.staff === 1)
       );
-      tabDisplays.push({ part, planStaff: staffOne >= 0 ? staffOne : s, displayIndex: displayHeights.length });
+      tabDisplays.push({
+        part,
+        planStaff: staffOne >= 0 ? staffOne : s,
+        displayIndex: displayHeights.length,
+        // Non-null by construction: tabParts only admits parts with a context.
+        ctx: tabPositionContext(part, tabSetup)!
+      });
       tabByAnchorPlan.set(s, displayHeights.length);
       displayHeights.push(TAB_STAFF_HEIGHT_SP);
     }
@@ -894,15 +926,27 @@ function renderSegment(args: RenderSegmentArgs): {
   // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
   // into each measure's diagnostic markers alongside renderer-gap issues.
   // Drawn on the first job only, so stacked scores don't repeat the badges.
-  const validationByMeasure = new Map<number, MeasureIssue[]>();
+  type AnchoredIssue = MeasureIssue & {
+    at?: { voiceIndex: number; eventIndex: number };
+    scope?: 'tab';
+  };
+  const validationByMeasure = new Map<number, AnchoredIssue[]>();
   if (drawValidation) {
-    for (const v of validateDocument(mnx)) {
+    // Fingerboard checks judge against the same strings the tab staves derive
+    // with — including a viewer override — or an unreachable note would
+    // vanish with no badge.
+    for (const v of validateDocument(mnx, tabSetup)) {
       // `scope: 'tab'` issues are fingerboard constraints — the notation staff
       // engraves those bars correctly, so a badge would be noise UNLESS this
       // system draws the fingerboard too (native tab staves).
       if (v.scope === 'tab' && tabDisplays.length === 0) continue;
       const list = validationByMeasure.get(v.measureIndex) ?? [];
-      list.push({ kind: v.severity === 'warning' ? 'warning' : 'validation', message: v.message });
+      list.push({
+        kind: v.severity === 'warning' ? 'warning' : 'validation',
+        message: v.message,
+        ...(v.at ? { at: v.at } : {}),
+        ...(v.scope ? { scope: v.scope } : {})
+      });
       validationByMeasure.set(v.measureIndex, list);
     }
   }
@@ -1286,9 +1330,21 @@ function renderSegment(args: RenderSegmentArgs): {
 
     // Validation issues (user-fixable), the plan's issues (unsupported items),
     // plus anything an individual event throws (forgiving render) — one bad
-    // event must not take down the bar.
+    // event must not take down the bar. Fingerboard issues attributable to one
+    // event draw UNDER that event's column on the (part-0) tab staff; the rest
+    // stack in the bar corner.
+    const fromValidation = validationByMeasure.get(i) ?? [];
+    const tabAnchorTd = tabDisplays.find(td => td.part === mnx.parts?.[0]);
+    const anchoredTabIssues = tabAnchorTd
+      ? fromValidation.filter(
+          v =>
+            v.scope === 'tab' &&
+            v.at &&
+            m.staves[tabAnchorTd.planStaff]?.[v.at.voiceIndex]?.[v.at.eventIndex]
+        )
+      : [];
     const measureIssues: MeasureIssue[] = [
-      ...(validationByMeasure.get(i) ?? []),
+      ...fromValidation.filter(v => !anchoredTabIssues.includes(v)),
       ...m.issues.map(message => ({ kind: 'render' as const, message }))
     ];
     resolvedByStaff.forEach((staffVoices, s) => {
@@ -1407,7 +1463,7 @@ function renderSegment(args: RenderSegmentArgs): {
       emitTabStaffLines(m.x, m.width, tabTop, primitives);
       // Setup instructions (capo, non-standard tuning letters) on the FIRST
       // bar only — same emission as the standalone tab view.
-      if (i === 0) emitTabSystemHeader(td.part, m.x, tabTop, primitives);
+      if (i === 0) emitTabSystemHeader(td.ctx, m.x, tabTop, primitives);
       if (m.firstInSystem) emitTabClef(m.clefX, tabTop, primitives);
       if (m.showTimeSig) emitTabTimeSig(m.timeSig, m.timeSigCentreX, tabTop, primitives);
       if (!m.multiRest) {
@@ -1425,7 +1481,7 @@ function renderSegment(args: RenderSegmentArgs): {
           primitives,
           index,
           onIssue: message => measureIssues.push({ kind: 'render', message }),
-          positionContext: tabPositionContext(td.part)
+          positionContext: td.ctx
         });
       }
     }
@@ -1574,6 +1630,21 @@ function renderSegment(args: RenderSegmentArgs): {
     // occupies the space over this staff — a tempo mark, a segno, a direction.
     emitScoreLabels({ gm: mnx.global.measures[i] ?? {}, m, staffTop, primitives });
 
+    if (anchoredTabIssues.length && tabAnchorTd) {
+      const tabBottom = displayTopOf(m.row, tabAnchorTd.displayIndex) + TAB_STAFF_HEIGHT_SP;
+      const bySlot = new Map<number, MeasureIssue[]>();
+      for (const v of anchoredTabIssues) {
+        const slot = m.staves[tabAnchorTd.planStaff][v.at!.voiceIndex][v.at!.eventIndex];
+        const key = Math.round(slot.x * 1e4);
+        bySlot.set(key, [...(bySlot.get(key) ?? []), v]);
+      }
+      for (const [key, list] of bySlot) {
+        emitPositionedDiagnostics(key / 1e4, tabBottom, list, primitives);
+      }
+      for (const { at: _at, scope: _scope, ...issue } of anchoredTabIssues) {
+        diagnostics.push({ measureIndex: i, ...issue });
+      }
+    }
     if (measureIssues.length) {
       emitMeasureDiagnostics(m.x, sysBottom, measureIssues, primitives);
       for (const issue of measureIssues) diagnostics.push({ measureIndex: i, ...issue });

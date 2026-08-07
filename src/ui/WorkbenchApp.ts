@@ -360,9 +360,12 @@ export class WorkbenchApp extends LitElement {
     const entry =
       this.route.page === 'scenario' ? corpus.find(e => e.id === this.route.id) : undefined;
     if (entry) {
-      // Tab/both are forceable on any scenario (the derivation ladder renders
-      // them from pitch alone); hasTab only shapes edit affordances below.
-      const views = ['auto', 'notation', 'tab', 'both', 'compare', 'json'];
+      // Tab/both require known strings; the palette can't see the loaded doc,
+      // so it uses the extension-data approximation. A tab link that turns
+      // out unavailable falls back to the document's default view.
+      const views = entry.hasTab
+        ? ['notation', 'tab', 'both', 'compare', 'json']
+        : ['notation', 'compare', 'json'];
       for (const v of views) items.push(nav(`view: ${v}`, scenarioHref(entry.id, v)));
       items.push(
         intent('edit: undo', { type: 'undo' }, 'Ctrl+Z'),

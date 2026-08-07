@@ -79,7 +79,11 @@ describe('extension upgrade: v2 -> v3', () => {
   it('re-namespaces tab data under the mnxLab vendor key, landing on the v5 flat shape', () => {
     const doc: any = upgradeTabExtension(v2Document() as MnxStructure);
 
-    expect(doc.parts[0]._x).toEqual({ mnxLab: { capo: 2, tab: { staffKind: 'both' } } });
+    // Materialization stamps the previously-implicit standard declaration.
+    expect(doc.parts[0]._x.mnxLab.capo).toBe(2);
+    expect(doc.parts[0]._x.mnxLab.tab).toEqual({ staffKind: 'both' });
+    expect(doc.parts[0]._x.mnxLab.strings).toHaveLength(6);
+    expect(doc.parts[0]._x.mnxLab.strings[0]).toEqual({ string: 1, pitch: { step: 'E', octave: 4 } });
     expect(firstNote(doc)._x.mnxLab.string).toBe(1);
     expect(firstNote(doc)._x.mnxLab.fret).toBe(0);
     // The v2 spelling must be gone, not merely shadowed — a stale `_x.tab`
@@ -148,7 +152,12 @@ describe('extension upgrade: v2 -> v3', () => {
       global: { measures: [{ rehearsal: { label: 'B' } }] },
       parts: [
         {
-          _x: { mnxLab: { tab: { staffKind: 'tab' } } },
+          _x: {
+            mnxLab: {
+              strings: [{ string: 1, pitch: { step: 'E', octave: 4 } }],
+              tab: { staffKind: 'tab' }
+            }
+          },
           measures: [{ sequences: [{ content: [{ duration: { base: 'whole' }, rest: {} }] }] }]
         }
       ]

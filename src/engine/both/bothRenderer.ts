@@ -1,4 +1,5 @@
 import { MnxStructure } from '../../model/mnx.ts';
+import { TabSetup } from '../tab/guitarPositions.ts';
 import { layoutBothSystem } from '../layout/bothSystem.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
@@ -24,6 +25,9 @@ export interface RenderBothOptions {
   onNoteClick?: (noteId: string, measureIdx: number, noteIdx: number) => void;
   /** Pixels per staff space (zoom). Default 10. */
   pxPerSp?: number;
+  /** Viewer-supplied instrument (strings/capo) — overrides the document's
+   *  declaration for rendering; never written back. */
+  tabSetup?: TabSetup;
 }
 
 export function renderMnxToSvgBoth(opts: RenderBothOptions): void {
@@ -33,7 +37,8 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): void {
     mnx: opts.mnx,
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
-    selectedNoteIds: opts.selectedNoteIds
+    selectedNoteIds: opts.selectedNoteIds,
+    tabSetup: opts.tabSetup
   });
 
   const fitted = opts.pxPerSp === undefined;

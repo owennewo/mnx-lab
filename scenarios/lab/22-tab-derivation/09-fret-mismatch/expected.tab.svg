@@ -13,7 +13,7 @@
 <text x="237.6" y="160" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e0.n0">3</text>
 <line x1="323.2" y1="96" x2="323.2" y2="176" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
 <rect x="328" y="96" width="6.4" height="80" fill="currentColor" class="barline barline-final-thick"></rect>
-<rect x="36.8" y="195.2" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
+<rect x="228.8" y="195.2" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
 <title>validation — stored fret 5 disagrees with the derived fret 3 on string 5 — the pitch, the tuning or the annotation is wrong (the derived fret is rendered)</title></rect>
-<text x="45.6" y="204" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-validation">!<title>validation — stored fret 5 disagrees with the derived fret 3 on string 5 — the pitch, the tuning or the annotation is wrong (the derived fret is rendered)</title></text>
+<text x="237.6" y="204" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-validation">!<title>validation — stored fret 5 disagrees with the derived fret 3 on string 5 — the pitch, the tuning or the annotation is wrong (the derived fret is rendered)</title></text>
 </svg>

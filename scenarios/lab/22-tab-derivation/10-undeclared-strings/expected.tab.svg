@@ -11,10 +11,7 @@
 <text x="117.6" y="156" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
 <line x1="451.2" y1="96" x2="451.2" y2="176" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
 <rect x="456" y="96" width="6.4" height="80" fill="currentColor" class="barline barline-final-thick"></rect>
-<rect x="206.8" y="195.2" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
-<title>validation — C2 is not playable on the declared strings (reachable range E2–E6)</title></rect>
-<text x="215.6" y="204" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-validation">!<title>validation — C2 is not playable on the declared strings (reachable range E2–E6)</title></text>
-<rect x="362.8" y="195.2" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
-<title>validation — C3 is not playable on string 1 (derived fret -16 is outside 0–24)</title></rect>
-<text x="371.6" y="204" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-validation">!<title>validation — C3 is not playable on string 1 (derived fret -16 is outside 0–24)</title></text>
+<rect x="36.8" y="195.2" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
+<title>validation — the part asks for a tab view (staffKind) but declares no strings — add _x.mnxLab.strings, or supply an instrument from the viewer</title></rect>
+<text x="45.6" y="204" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-validation">!<title>validation — the part asks for a tab view (staffKind) but declares no strings — add _x.mnxLab.strings, or supply an instrument from the viewer</title></text>
 </svg>
