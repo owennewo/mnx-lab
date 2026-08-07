@@ -155,7 +155,8 @@ never a golden and never hashed.
 
 Home is the **attention queue** (blocked → stale → never-seen; current counted, not
 shown), derived from committed provenance in `src/ui/queue.ts`. Every scenario + view
-has a stable deep link: `#/scenario/<id>?view=notation|tab|both|compare|json`.
+has a stable deep link: `#/scenario/<id>?view=auto|notation|tab|both|compare|json`
+(`auto` — the default when unspecified — follows the document's `tab.staffKind` hint).
 
 **`#/objects`** is the coverage map — every non-plumbing `$def` against the scenarios
 exercising it (`src/corpus/defIndex.ts`, inverting the spec's own `coversDefs` join),

@@ -1,5 +1,11 @@
-import { MnxSequence, isTimedEvent } from '../../model/mnx.ts';
-import { resolveEventPositions, TabPositionContext, tabPositionContext } from '../tab/guitarPositions.ts';
+import { MnxPart, MnxSequence, isTimedEvent } from '../../model/mnx.ts';
+import {
+  GUITAR_TUNING,
+  midiOfMnxPitch,
+  resolveEventPositions,
+  TabPositionContext,
+  tabPositionContext
+} from '../tab/guitarPositions.ts';
 import { Primitive, SpatialIndex } from '../primitives.ts';
 import { syntheticNoteKey } from '../../model/noteKeys.ts';
 import { EventSlot } from './spacing.ts';
@@ -31,6 +37,80 @@ const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
 // preview/embed, where it falls back to black and hides the digit). Carries the
 // paper token's own fallback so it resolves even where `--paper` isn't defined.
 const FRET_BG_FILL = 'var(--paper, oklch(0.985 0.006 85))';
+
+// ---------- System header: capo + tuning instructions ----------
+
+const CAPO_FONT_SIZE_SP = 1.1;
+const CAPO_RISE_SP = 1.5; // above the top string line
+const CAPO_INSET_SP = 0.4; // clear of the system-start barline
+const TUNING_LETTER_SIZE_SP = 0.85;
+const TUNING_LETTER_INSET_SP = 0.35; // gap between letter and the system start
+
+/** "D" / "C#" / "Eb" — the letter a tuning peg is set to (octave omitted,
+ *  like every printed tuning legend). */
+function tuningLetter(pitch: { step: string; alter?: number }): string {
+  const alter = pitch.alter ?? 0;
+  return pitch.step + (alter > 0 ? '#'.repeat(alter) : 'b'.repeat(-alter));
+}
+
+/**
+ * The player-facing setup instructions, drawn once above/beside the FIRST bar
+ * (standard publishing practice — never repeated per system):
+ *
+ *   - "Capo N" text above the top string line, when the part declares a capo.
+ *   - Guitar-Pro-style open-string letters at the line starts, when the part
+ *     declares a tuning that differs from standard guitar. Standard tuning is
+ *     the documented default ("absent ⇒ standard"), so spelling it out would
+ *     be noise — the letters appear exactly when the player must retune.
+ *
+ * Letters show the PHYSICAL tuning (no capo shift): they are peg-setting
+ * instructions, and the capo line above already carries the rest.
+ */
+export function emitTabSystemHeader(
+  part: MnxPart | undefined,
+  x: number,
+  staffTop: number,
+  primitives: Primitive[]
+): void {
+  const lab = part?._x?.mnxLab;
+
+  const capo = lab?.capo ?? 0;
+  if (capo > 0) {
+    primitives.push({
+      kind: 'text',
+      text: `Capo ${capo}`,
+      x: x + CAPO_INSET_SP,
+      y: staffTop - CAPO_RISE_SP,
+      font: 'body',
+      size: CAPO_FONT_SIZE_SP,
+      anchor: 'start',
+      baseline: 'central',
+      weight: 600,
+      className: 'tab-capo'
+    });
+  }
+
+  const strings = lab?.strings;
+  if (!strings || strings.length === 0) return;
+  const standard =
+    strings.length === GUITAR_TUNING.length &&
+    strings.every(s => GUITAR_TUNING[s.string - 1] === midiOfMnxPitch(s.pitch));
+  if (standard) return;
+
+  for (const entry of strings) {
+    primitives.push({
+      kind: 'text',
+      text: tuningLetter(entry.pitch),
+      x: x - TUNING_LETTER_INSET_SP,
+      y: staffTop + (entry.string - 1),
+      font: 'body',
+      size: TUNING_LETTER_SIZE_SP,
+      anchor: 'end',
+      baseline: 'central',
+      className: 'tab-tuning-letter'
+    });
+  }
+}
 
 // ---------- Prefix emission ----------
 

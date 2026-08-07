@@ -280,6 +280,72 @@
         "className": "staff-line"
       },
       {
+        "kind": "text",
+        "text": "E",
+        "x": 1.65,
+        "y": 6,
+        "font": "body",
+        "size": 0.85,
+        "anchor": "end",
+        "baseline": "central",
+        "className": "tab-tuning-letter"
+      },
+      {
+        "kind": "text",
+        "text": "B",
+        "x": 1.65,
+        "y": 7,
+        "font": "body",
+        "size": 0.85,
+        "anchor": "end",
+        "baseline": "central",
+        "className": "tab-tuning-letter"
+      },
+      {
+        "kind": "text",
+        "text": "G",
+        "x": 1.65,
+        "y": 8,
+        "font": "body",
+        "size": 0.85,
+        "anchor": "end",
+        "baseline": "central",
+        "className": "tab-tuning-letter"
+      },
+      {
+        "kind": "text",
+        "text": "D",
+        "x": 1.65,
+        "y": 9,
+        "font": "body",
+        "size": 0.85,
+        "anchor": "end",
+        "baseline": "central",
+        "className": "tab-tuning-letter"
+      },
+      {
+        "kind": "text",
+        "text": "A",
+        "x": 1.65,
+        "y": 10,
+        "font": "body",
+        "size": 0.85,
+        "anchor": "end",
+        "baseline": "central",
+        "className": "tab-tuning-letter"
+      },
+      {
+        "kind": "text",
+        "text": "D",
+        "x": 1.65,
+        "y": 11,
+        "font": "body",
+        "size": 0.85,
+        "anchor": "end",
+        "baseline": "central",
+        "className": "tab-tuning-letter"
+      },
+      {
         "kind": "line",
         "x1": 2,
         "y1": 6,

@@ -6,6 +6,7 @@ import {
   TAB_STAFF_HEIGHT_SP,
   emitTabClef,
   emitTabStaffLines,
+  emitTabSystemHeader,
   emitTabTimeSig,
   emitTabVoices
 } from './tabStaff.ts';
@@ -98,6 +99,10 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     const staffBottom = staffTop + STAFF_HEIGHT_SP;
 
     emitTabStaffLines(m.x, m.width, staffTop, primitives);
+
+    // Setup instructions — capo text and (non-standard) tuning letters,
+    // above/beside the FIRST bar only.
+    if (i === 0) emitTabSystemHeader(part, m.x, staffTop, primitives);
 
     // System-start barline
     if (m.firstInSystem) {

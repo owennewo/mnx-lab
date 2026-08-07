@@ -28,7 +28,10 @@ import {
 import { parseTimeSignature, parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
 import '../elements/ScoreViewer.ts';
 
-type PageView = ViewMode | 'compare' | 'json';
+// `auto` = unspecified: follow the document's own `tab.staffKind` hint — the
+// document rung of viewer-surface.md's precedence chain (user > host >
+// document > default). It is the default when the deep link names no view.
+type PageView = ViewMode | 'auto' | 'compare' | 'json';
 
 /** How many object tags to show before collapsing the tail into a count. */
 const DEF_PREVIEW = 9;
@@ -470,8 +473,9 @@ export class ScenarioPage extends LitElement {
     if (!entry || !this.session) return [];
     const view = this.activeView(entry);
     if (view === 'json') return [];
+    const mode = view === 'auto' ? this.docViewMode(entry) : view;
     const layers: KeymapLayer[] = [];
-    if (entry.hasTab && (view === 'tab' || view === 'both')) layers.push(TAB_DIGIT_LAYER);
+    if (entry.hasTab && (mode === 'tab' || mode === 'both')) layers.push(TAB_DIGIT_LAYER);
     layers.push(NAVIGATION_LAYER, EDIT_LAYER);
     return layers;
   }
@@ -589,9 +593,19 @@ export class ScenarioPage extends LitElement {
 
   private activeView(entry: ScenarioEntry): PageView {
     const allowed: PageView[] = entry.hasTab
-      ? ['notation', 'tab', 'both', 'compare', 'json']
-      : ['notation', 'compare', 'json'];
-    return allowed.includes(this.view as PageView) ? (this.view as PageView) : 'notation';
+      ? ['auto', 'notation', 'tab', 'both', 'compare', 'json']
+      : ['auto', 'notation', 'compare', 'json'];
+    return allowed.includes(this.view as PageView) ? (this.view as PageView) : 'auto';
+  }
+
+  /** What `auto` resolves to: the loaded document's `tab.staffKind` hint
+   *  (`both` beats `tab` when parts disagree), else notation. */
+  private docViewMode(entry: ScenarioEntry): ViewMode {
+    if (!entry.hasTab) return 'notation';
+    const kinds = (this.doc?.mnxJson.parts ?? []).map(p => p._x?.mnxLab?.tab?.staffKind);
+    if (kinds.includes('both')) return 'both';
+    if (kinds.includes('tab')) return 'tab';
+    return 'notation';
   }
 
   private viewer(entry: ScenarioEntry, viewMode: ViewMode) {
@@ -630,8 +644,8 @@ export class ScenarioPage extends LitElement {
     const item = classify(entry);
     const verification = entry.meta.verification;
     const views: PageView[] = entry.hasTab
-      ? ['notation', 'tab', 'both', 'compare', 'json']
-      : ['notation', 'compare', 'json'];
+      ? ['auto', 'notation', 'tab', 'both', 'compare', 'json']
+      : ['auto', 'notation', 'compare', 'json'];
 
     return html`
       <div class="head">
@@ -825,7 +839,7 @@ export class ScenarioPage extends LitElement {
                   </div>
                 </div>
               `
-            : this.viewer(entry, view)}
+            : this.viewer(entry, view === 'auto' ? this.docViewMode(entry) : view)}
       </div>
     `;
   }

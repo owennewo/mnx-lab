@@ -32,7 +32,7 @@
   "status": "verified",
   "verification": {
     "at": "2026-08-07",
-    "primitivesHash": "sha256:c84928d661d6e79a",
-    "renderHash": "sha256:bbed966219e0f17e"
+    "primitivesHash": "sha256:7f82f2f1fac74b22",
+    "renderHash": "sha256:ba831ce094aafac8"
   }
 }

@@ -42,6 +42,7 @@ import {
   TAB_STAFF_HEIGHT_SP,
   emitTabClef,
   emitTabStaffLines,
+  emitTabSystemHeader,
   emitTabTimeSig,
   emitTabVoices
 } from './tabStaff.ts';
@@ -1404,6 +1405,9 @@ function renderSegment(args: RenderSegmentArgs): {
     for (const td of tabDisplays) {
       const tabTop = displayTopOf(m.row, td.displayIndex);
       emitTabStaffLines(m.x, m.width, tabTop, primitives);
+      // Setup instructions (capo, non-standard tuning letters) on the FIRST
+      // bar only — same emission as the standalone tab view.
+      if (i === 0) emitTabSystemHeader(td.part, m.x, tabTop, primitives);
       if (m.firstInSystem) emitTabClef(m.clefX, tabTop, primitives);
       if (m.showTimeSig) emitTabTimeSig(m.timeSig, m.timeSigCentreX, tabTop, primitives);
       if (!m.multiRest) {

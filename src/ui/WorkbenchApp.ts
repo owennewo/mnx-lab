@@ -361,8 +361,8 @@ export class WorkbenchApp extends LitElement {
       this.route.page === 'scenario' ? corpus.find(e => e.id === this.route.id) : undefined;
     if (entry) {
       const views = entry.hasTab
-        ? ['notation', 'tab', 'both', 'compare', 'json']
-        : ['notation', 'compare', 'json'];
+        ? ['auto', 'notation', 'tab', 'both', 'compare', 'json']
+        : ['auto', 'notation', 'compare', 'json'];
       for (const v of views) items.push(nav(`view: ${v}`, scenarioHref(entry.id, v)));
       items.push(
         intent('edit: undo', { type: 'undo' }, 'Ctrl+Z'),

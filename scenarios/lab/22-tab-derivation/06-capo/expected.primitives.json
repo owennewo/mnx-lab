@@ -262,6 +262,18 @@
         "className": "staff-line"
       },
       {
+        "kind": "text",
+        "text": "Capo 2",
+        "x": 2.4,
+        "y": 4.5,
+        "font": "body",
+        "size": 1.1,
+        "anchor": "start",
+        "baseline": "central",
+        "weight": 600,
+        "className": "tab-capo"
+      },
+      {
         "kind": "line",
         "x1": 2,
         "y1": 6,

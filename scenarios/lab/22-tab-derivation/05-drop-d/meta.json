@@ -31,7 +31,7 @@
   "status": "verified",
   "verification": {
     "at": "2026-08-07",
-    "primitivesHash": "sha256:faf701c1cc8e6cbc",
-    "renderHash": "sha256:d4638e40cfc8ba6d"
+    "primitivesHash": "sha256:d84b888f5a219b7f",
+    "renderHash": "sha256:d95fd78580f3c47a"
   }
 }
