@@ -26,20 +26,29 @@
 //                the committed goldens diff shows exactly what changed
 //   never seen — renders, but no human has ever approved it (no record)
 //
-// Two hashes because there are two goldens: `primitivesHash` covers layout
+// One hash per golden: `primitivesHash` covers layout
 // (expected.primitives.json), `renderHash` covers the emitter's own output
-// (expected.svg + expected.tab.svg — see harness/helpers/corpusSvg.ts).
-// `renderHash` is OPTIONAL in a record, and its absence is not staleness:
-// approvals predating the SVG golden were real human assertions made on the
-// layout evidence, and demoting all of them to introduce a new field would be
-// exactly the mass-demotion this record exists to avoid. They stay current,
-// carry a note, and pick up a renderHash the next time they are approved.
+// (expected.svg + expected.tab.svg — see harness/helpers/corpusSvg.ts), and
+// `bothHash` covers the combined notation+tab system (expected.both.svg).
+// `renderHash` and `bothHash` are OPTIONAL in a record, and their absence is
+// not staleness: approvals predating each golden were real human assertions
+// made on the evidence that existed, and demoting all of them to introduce a
+// new field would be exactly the mass-demotion this record exists to avoid.
+// They stay current, carry a note, and pick up the hash the next time they
+// are approved. (That is also why renderHash's file set is FROZEN at the two
+// standalone SVGs: folding expected.both.svg into it would move every
+// committed digest at once. There is no --backfill for bothHash — nobody
+// approved a both view before the golden existed, so the combined system
+// earns its hash only through a real approval.)
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { loadCorpus, createContext, checkScenario } from './check-scenarios.mjs';
 
-const SVG_GOLDEN_FILES = ['expected.svg', 'expected.tab.svg'];
+// renderHash's file set — frozen (see header); expected.both.svg is hashed
+// separately as bothHash.
+const RENDER_HASH_FILES = ['expected.svg', 'expected.tab.svg'];
+const BOTH_GOLDEN_FILE = 'expected.both.svg';
 
 function shortHash(update) {
   const hash = crypto.createHash('sha256');
@@ -60,13 +69,20 @@ function primitivesHash(scenario) {
  * digest even if the notation SVG is untouched.
  */
 function renderHash(scenario) {
-  const present = SVG_GOLDEN_FILES.map(name => [name, path.join(scenario.dir, name)]).filter(
+  const present = RENDER_HASH_FILES.map(name => [name, path.join(scenario.dir, name)]).filter(
     ([, p]) => fs.existsSync(p)
   );
   if (present.length === 0) return null;
   return shortHash(h => {
     for (const [name, p] of present) h.update(name).update('\0').update(fs.readFileSync(p));
   });
+}
+
+/** sha256 of the combined-system golden, or null when there is none. */
+function bothHash(scenario) {
+  const p = path.join(scenario.dir, BOTH_GOLDEN_FILE);
+  if (!fs.existsSync(p)) return null;
+  return shortHash(h => h.update(fs.readFileSync(p)));
 }
 
 function writeMeta(scenario, mutate) {
@@ -76,26 +92,35 @@ function writeMeta(scenario, mutate) {
   fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2) + '\n');
 }
 
-function markVerified(scenario, at) {
+/**
+ * `skipBothHash` is for the backfill commands: they re-stamp records with the
+ * ORIGINAL approval date, and no approval that old can have looked at the
+ * both view — recording a bothHash there would be false provenance.
+ */
+function markVerified(scenario, at, { skipBothHash = false } = {}) {
   writeMeta(scenario, meta => {
     meta.status = 'verified';
     const prims = primitivesHash(scenario);
     const render = renderHash(scenario);
+    const both = skipBothHash ? null : bothHash(scenario);
     const record = { at };
     if (prims !== null) record.primitivesHash = prims;
     if (render !== null) record.renderHash = render;
+    if (both !== null) record.bothHash = both;
     meta.verification = record;
   });
 }
 
 /**
  * Is this record still an assertion about the current goldens? A missing
- * renderHash is grandfathered (see the header); a present one must match.
+ * renderHash or bothHash is grandfathered (see the header); a present one
+ * must match.
  */
-function recordMatches(record, prims, render) {
+function recordMatches(record, prims, render, both) {
   if (record === null) return false;
   if ((record.primitivesHash ?? null) !== prims) return false;
-  return record.renderHash === undefined || record.renderHash === render;
+  if (record.renderHash !== undefined && record.renderHash !== render) return false;
+  return record.bothHash === undefined || record.bothHash === both;
 }
 
 /**
@@ -116,6 +141,7 @@ export function buildQueue() {
     }
     const hash = primitivesHash(scenario);
     const render = renderHash(scenario);
+    const both = bothHash(scenario);
     const record = meta.verification ?? null;
     const entry = {
       id: scenario.id,
@@ -124,16 +150,27 @@ export function buildQueue() {
       approvedHash: record?.primitivesHash ?? null,
       currentHash: hash,
       approvedRenderHash: record?.renderHash ?? null,
-      currentRenderHash: render
+      currentRenderHash: render,
+      approvedBothHash: record?.bothHash ?? null,
+      currentBothHash: both
     };
     if (errors.length > 0) {
       queue.blocked.push({ ...entry, reason: 'checker errors', errors: errors.slice(0, 3) });
     } else if (meta.expect.standard === 'valid' && hash === null) {
       queue.blocked.push({ ...entry, reason: 'not rendered (no expected.primitives.json)' });
-    } else if (meta.status === 'verified' && recordMatches(record, hash, render)) {
+    } else if (meta.status === 'verified' && recordMatches(record, hash, render, both)) {
+      // Approvals that predate a golden stay current (see the header) but say
+      // which evidence a fresh approval would add to the record.
+      const predates = [];
+      if (record !== null && record.renderHash === undefined && render !== null) {
+        predates.push('the SVG golden');
+      }
+      if (record !== null && record.bothHash === undefined && both !== null) {
+        predates.push('the both golden');
+      }
       queue.current.push(
-        record !== null && record.renderHash === undefined && render !== null
-          ? { ...entry, note: 'approved before the SVG golden — renderHash recorded on next approval' }
+        predates.length
+          ? { ...entry, note: `approved before ${predates.join(' and ')} — hash recorded on next approval` }
           : entry
       );
     } else if (meta.status === 'verified' && record === null) {
@@ -170,6 +207,9 @@ function printQueue(queue, asJson) {
     if (e.approvedRenderHash !== null && e.approvedRenderHash !== e.currentRenderHash) {
       drifted.push(`svg ${e.approvedRenderHash} → ${e.currentRenderHash}`);
     }
+    if (e.approvedBothHash !== null && e.approvedBothHash !== e.currentBothHash) {
+      drifted.push(`both ${e.approvedBothHash} → ${e.currentBothHash}`);
+    }
     const why = drifted.length > 0 ? drifted.join(', ') : `status demoted to ${e.status}`;
     console.log(`  stale      ${e.id} — approved ${e.verifiedAt}; ${why}`);
   }
@@ -204,7 +244,7 @@ function main() {
       const { errors, meta } = checkScenario(scenario, ctx);
       if (!meta || errors.length > 0) continue;
       if (meta.status !== 'verified' || meta.verification !== undefined) continue;
-      markVerified(scenario, at);
+      markVerified(scenario, at, { skipBothHash: true });
       console.log(`BACKFILL ${scenario.id}: verification { at: ${at} }`);
       backfilled++;
     }
@@ -235,7 +275,7 @@ function main() {
       const hash = primitivesHash(scenario);
       const render = renderHash(scenario);
       if (render === null || (record.primitivesHash ?? null) !== hash) continue;
-      markVerified(scenario, record.at);
+      markVerified(scenario, record.at, { skipBothHash: true });
       console.log(`STAMP ${scenario.id}: renderHash ${render} (approved ${record.at})`);
       stamped++;
     }
@@ -267,7 +307,8 @@ function main() {
       continue;
     }
     const render = renderHash(scenario);
-    if (meta.status === 'verified' && recordMatches(meta.verification ?? null, hash, render)) {
+    const both = bothHash(scenario);
+    if (meta.status === 'verified' && recordMatches(meta.verification ?? null, hash, render, both)) {
       console.log(`OK   ${id}: already verified and current`);
       continue;
     }

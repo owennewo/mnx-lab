@@ -1,14 +1,18 @@
 # The `both` view as one system — tab as a staff, not a second render
 
-> **Status: in progress — phases 1 AND 2 SHIPPED (2026-08-07).** Direction set in
+> **Status: in progress — phases 1–3 SHIPPED (phase 3: 2026-08-08).** Direction set in
 > conversation: the notation+tab view should read as **one engraved system** (connected
 > barlines, one coordinate space), the way published guitar music prints it — not two
 > stacked SVGs. Phase 1 built a composer that stacked and stitched the two standalone
 > layouts; phase 2 replaced the stitch with the real thing: **tab is a display staff
 > inside the notation layout's system walk** (`includeTabStaves`), with native shared
 > barlines and interleaved multi-system wrap (verified 27 systems on the Vestapol
-> fixture, every one a notation+tab pair). All goldens byte-identical throughout.
-> Remaining: the phase-3 golden decision below, plus the recorded limitations.
+> fixture, every one a notation+tab pair). Phase 3 (below) settled the golden decision
+> (**`expected.both.svg`**, SVG-only, `bothHash` provenance — zero demotions), made the
+> compare pane prefer the combined system for tab-preferring documents, and cleared two
+> recorded limitations (tab repeat dots, content-driven lyrics gap). All goldens
+> byte-identical throughout every phase. Remaining: the human `/verify` sweep of the 13
+> new both goldens, and the deferred items below.
 
 ## Where we are
 
@@ -53,23 +57,26 @@ byte-identical for all-notation systems) and the extra emission. Key pieces:
 - Multi-system wrap interleaves naturally: every system is a notation+tab pair.
 - `scope: 'tab'` validation issues badge on the system when it draws the fingerboard.
 
-### Recorded limitations (phase-3 candidates)
+### Recorded limitations — status after phase 3
 
+- ✔ **Lyrics between the staves** (2026-08-08): the gap above an injected tab staff is
+  now **content-driven** — it grows to clear the verse-row block
+  (`gapAboveSp`/`TAB_LYRIC_CLEARANCE_SP` in `notation.ts`), and the bottom lyric pad is
+  dropped when a tab staff sits below the verses instead. Constant 6sp everywhere else,
+  so notation goldens couldn't move; verified 1.8sp minimum clearance on the
+  Sun-did-glide fixture (2 verses, which previously collided). Where the gap *knob* is
+  exposed still belongs to [render-density-zoom.md](../proposed/render-density-zoom.md) /
+  [viewer-surface.md](../proposed/viewer-surface.md).
+- ✔ **Repeat dots on tab** (2026-08-08): native tab staves now carry their own dots at
+  the six-line staff's middle (`TAB_REPEAT_DOT_YS`), forward and backward. Both-view
+  only — the standalone tab layout still draws no repeat furniture, so its goldens
+  didn't move.
 - Documents declaring `scores` skip tab-staff injection (their layout trees aren't
-  expanded); no such tab-bearing document exists in corpus or fixtures today.
-- Lyrics between the staves: 2+ verse rows can collide with the tab staff (the
-  inter-staff gap is a constant 6sp, not content-driven — the gap knob belongs to
-  [render-density-zoom.md](../proposed/render-density-zoom.md) /
-  [viewer-surface.md](../proposed/viewer-surface.md)).
-- Repeat dots draw on notation staves only (barlines span both; the standalone tab
-  layout draws no repeat furniture at all).
+  expanded); no such tab-bearing document exists in corpus or fixtures today —
+  **deferred until one does** (building it now would be speculation with no evidence to
+  pin it).
 - Grace notes / tremolos still aren't drawn on tab (columns reserved, staves aligned —
-  same as the standalone view).
-
-**Goldens/corpus impact:** none forced. `expected.primitives.json` pins the standalone
-notation and tab projections, which both remain (`viewMode: 'notation' | 'tab'`, and
-`staffKind` still means what it means). A combined-system golden would be a *new,
-deliberate* addition with its own `/verify` sweep, not a demotion.
+  same as the standalone view; parity is owned by the tab renderer, not this effort).
 
 ## Phase 1 — SHIPPED, then superseded by phase 2: the system composer
 
@@ -96,6 +103,34 @@ without touching the notation walk:
 Phase 1 deliberately does not: touch `spacing.ts`, change any layout constant, alter
 either standalone view's output, or add a combined golden.
 
+## Phase 3 — SHIPPED (2026-08-08): the golden decision + polish
+
+**The both view earns its own golden, as SVG only: `expected.both.svg`.** Decided
+against a third `RenderedSystem` in `expected.primitives.json`: the combined system
+reads the same plan slots as the standalone projections, so its staff-space layout is
+already pinned twice over — what it *adds* (vertical composition, spanning barlines,
+interleaved wrap) is exactly what the emitted SVG text shows. And a new key in the
+primitives JSON would have rewritten all 13 committed tab-scenario goldens, demoting
+every approval — the mass-demotion the provenance record exists to avoid.
+
+- `computeBothSystem` (`src/engine/headless.ts`) drives it through the
+  `layoutBothSystem` seam; emitted for every tab-opting scenario, including the
+  honestly-degraded case (tab wanted, no strings declared ⇒ both == notation — the
+  golden pins instrument neutrality too).
+- Provenance mirrors the `renderHash` precedent exactly: a new **optional `bothHash`**
+  in the verification record; absence is grandfathered, never staleness.
+  `renderHash`'s file set is **frozen** at the two standalone SVGs (folding
+  `expected.both.svg` in would have moved every committed digest). **No backfill** for
+  `bothHash` — nobody approved a both view before the golden existed, so it is earned
+  only through a real `/verify` approval; the backfill commands explicitly skip it.
+- The 13 tab scenarios stayed `verified`+current with a queue note ("approved before
+  the both golden"); the `/verify` review page now shows every projection a scenario
+  pins, so the next sweep collects the hashes honestly.
+- **Compare** prefers the combined system for the "our render" pane when the
+  *document* declares a tab preference — not when only a viewer override makes tab
+  possible, so a notation-only spec scenario under an override still compares
+  notation-to-notation with the reference engraving.
+
 ## Order of work
 
 1. ✔ **Phase 1** — one render, joined barlines for the bench's single-system
@@ -105,7 +140,8 @@ either standalone view's output, or add a combined golden.
    2026-08-07: 27 interleaved systems verified on the Vestapol fixture; all
    corpus goldens byte-identical; `tab.ts` refactored onto the shared
    `tabStaff.ts` with zero golden movement.
-3. **Next**: decide whether the both view earns its own golden (new
-   `expected.both.svg` or a third `RenderedSystem`), whether `compare` view should
-   prefer the combined system for tab-part scenarios, and the recorded limitations
-   above (lyrics gap, repeat dots on tab, scores-document injection).
+3. ✔ **Phase 3** — `expected.both.svg` + `bothHash` (zero demotions), compare-pane
+   preference, tab repeat dots, content-driven lyrics gap. Shipped 2026-08-08.
+4. **Next**: the human `/verify` sweep stamping `bothHash` on the 13 tab scenarios.
+   Then this effort is done — the deferred items (scores-doc injection awaiting a real
+   fixture; grace/tremolo tab parity) live with their owning components.

@@ -661,6 +661,18 @@ export class ScenarioPage extends LitElement {
     return 'notation';
   }
 
+  /** The compare pane's "our render": the combined notation+tab system when
+   *  the DOCUMENT prefers a tab view (published guitar engraving is what a
+   *  reviewer wants beside the reference), plain notation otherwise. The
+   *  document's own hint, not the viewer override — an override on a
+   *  notation-only spec scenario must keep the comparison notation-to-
+   *  notation with the reference engraving. */
+  private comparePaneView(): ViewMode {
+    const kinds = (this.doc?.mnxJson.parts ?? []).map(p => p._x?.mnxLab?.tab?.staffKind);
+    const prefersTab = kinds.includes('both') || kinds.includes('tab');
+    return prefersTab && this.tabCapable() ? 'both' : 'notation';
+  }
+
   private viewer(entry: ScenarioEntry, viewMode: ViewMode) {
     if (this.loadState === 'loading') {
       return html`<div class="load-state">Loading ${entry.id}…</div>`;
@@ -708,11 +720,11 @@ export class ScenarioPage extends LitElement {
           <span class="badge ${item.state === 'current' ? 'verified' : 'attention'}">
             ${item.state === 'current' ? entry.meta.status : item.state} — ${item.detail}
           </span>
-          <!-- Two goldens, two hashes: say which code each one witnesses,
+          <!-- One hash per golden: say which code each one witnesses,
                because a bare digest says neither. A verified scenario with no
-               renderHash was approved before the emitter golden existed — it
-               is current, not stale, and that distinction is the whole reason
-               the field is optional. -->
+               renderHash (or bothHash) was approved before that golden
+               existed — it is current, not stale, and that distinction is
+               the whole reason the fields are optional. -->
           ${verification?.primitivesHash
             ? html`<span class="badge" title="hash of expected.primitives.json — layout"
                 >layout ${verification.primitivesHash.replace('sha256:', '')}</span
@@ -729,6 +741,13 @@ export class ScenarioPage extends LitElement {
                   >render not witnessed</span
                 >`
               : nothing}
+          ${verification?.bothHash
+            ? html`<span
+                class="badge"
+                title="hash of expected.both.svg — the combined notation+tab system"
+                >both ${verification.bothHash.replace('sha256:', '')}</span
+              >`
+            : nothing}
           <span class="badge" title=${entry.ns === 'spec' ? 'mirrored by sync:spec — hand-edits forbidden' : 'ours, authored in scenarios/lab/'}>
             ${entry.ns === 'spec' ? 'mirrored' : 'local'}
           </span>
@@ -884,7 +903,7 @@ export class ScenarioPage extends LitElement {
                 <div class="compare">
                   <div>
                     <div class="side-cap">our render</div>
-                    ${this.viewer(entry, 'notation')}
+                    ${this.viewer(entry, this.comparePaneView())}
                   </div>
                   <div class="ref">
                     <div class="side-cap">spec reference engraving</div>

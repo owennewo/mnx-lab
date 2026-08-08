@@ -10,7 +10,9 @@ import path from 'node:path';
 import { ROOT } from '../verify/check-scenarios.mjs';
 import {
   computePrimitives as computePrimitivesAt,
+  computeBothSystem,
   ensureSmufl,
+  type RenderedSystem,
   type ScenarioPrimitives
 } from '../../src/engine/headless.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
@@ -30,4 +32,11 @@ export function initSmufl(): void {
 export function computePrimitives(doc: MnxStructure): ScenarioPrimitives {
   initSmufl();
   return computePrimitivesAt(doc, WIDTH_SP);
+}
+
+/** The combined notation+tab system for the third SVG golden (null when the
+ *  document opts into no tab view) — see computeBothSystem in headless.ts. */
+export function computeBoth(doc: MnxStructure): RenderedSystem | null {
+  initSmufl();
+  return computeBothSystem(doc, WIDTH_SP);
 }

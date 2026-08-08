@@ -222,6 +222,9 @@ const TEMPO_BASELINE_RISE_SP = 2.7; // above the top staff line
 
 // Repeat barlines and volta brackets.
 const REPEAT_DOT_SCALE = 1.2;
+// Notation dots straddle the middle line ([1.5, 2.5] on a 4sp staff); the
+// six-line tab staff's middle is 2.5sp, so its dots sit at ±0.5 of that.
+const TAB_REPEAT_DOT_YS = [2, 3];
 const VOLTA_RISE_SP = 3.4;  // bracket line above the top staff line
 const VOLTA_HOOK_SP = 1.3;
 const VOLTA_THICKNESS_SP = 0.13;
@@ -422,6 +425,9 @@ const LYRIC_FIRST_BASELINE_DROP_SP = 4.5; // first verse baseline below bottom l
 const LYRIC_LINE_SPACING_SP = 2.2;
 const LYRIC_SIZE_SP = 1.7;
 const LYRIC_DESCENDER_PAD_SP = 0.8;
+// Air between the last verse row's descenders and a native tab staff below it
+// (the both view's content-driven inter-staff gap).
+const TAB_LYRIC_CLEARANCE_SP = 1;
 
 /** All lyric line ids a segment's parts use, in global lineOrder (then sorted). */
 function collectLyricLineIds(mnx: MnxStructure, segment: JobSegment): string[] {
@@ -952,34 +958,45 @@ function renderSegment(args: RenderSegmentArgs): {
   }
 
   const numStaves = plan.numStaves;
-  // Verse rows below the staff push the system's bottom padding out when they
-  // need more room than the standard pad provides.
+  // Verse rows hang below the staff their events are on. Their block height
+  // drives two things: extra bottom padding when they hang below the system,
+  // and (both view) the gap above an injected tab staff.
   const lyricLineIds = collectLyricLineIds(mnx, segment);
-  const lyricExtraSp = lyricLineIds.length
-    ? Math.max(
-        0,
-        LYRIC_FIRST_BASELINE_DROP_SP +
-          (lyricLineIds.length - 1) * LYRIC_LINE_SPACING_SP +
-          LYRIC_DESCENDER_PAD_SP -
-          ROW_PAD_BOTTOM_SP
-      )
+  const lyricBlockSp = lyricLineIds.length
+    ? LYRIC_FIRST_BASELINE_DROP_SP +
+      (lyricLineIds.length - 1) * LYRIC_LINE_SPACING_SP +
+      LYRIC_DESCENDER_PAD_SP
     : 0;
+  const tabDisplayIndexes = new Set(tabDisplays.map(td => td.displayIndex));
+  // Bottom padding absorbs the verse rows only when they actually hang below
+  // the system — with a tab staff at the bottom they sit between the staves,
+  // and the gap above it (not the pad below it) is what clears them.
+  const lyricExtraSp =
+    lyricBlockSp && !tabDisplayIndexes.has(displayCount - 1)
+      ? Math.max(0, lyricBlockSp - ROW_PAD_BOTTOM_SP)
+      : 0;
+  // The gap above each display staff. Constant between notation staves (the
+  // goldens pin that arithmetic); the gap above an injected tab staff is
+  // content-driven — it grows so 2+ verse rows hanging from the notation
+  // staff above stop colliding with the strings.
+  const gapAboveSp = (d: number) =>
+    tabDisplayIndexes.has(d)
+      ? Math.max(INTER_STAFF_GAP_SP, lyricBlockSp + TAB_LYRIC_CLEARANCE_SP)
+      : INTER_STAFF_GAP_SP;
   // Per-display-staff tops as prefix sums — generalizes the old uniform
   // arithmetic (s * (STAFF_HEIGHT + GAP)) to mixed staff heights. For
   // all-notation systems the integer sums are equal term for term, so the
   // goldens cannot move.
   const displayPrefix: number[] = [];
   let displayHeightSum = 0;
+  let gapSum = 0;
   for (const h of displayHeights) {
-    displayPrefix.push(displayHeightSum + displayPrefix.length * INTER_STAFF_GAP_SP);
+    if (displayPrefix.length > 0) gapSum += gapAboveSp(displayPrefix.length);
+    displayPrefix.push(displayHeightSum + gapSum);
     displayHeightSum += h;
   }
   const systemHeightSp =
-    ROW_PAD_TOP_SP +
-    displayHeightSum +
-    (displayCount - 1) * INTER_STAFF_GAP_SP +
-    ROW_PAD_BOTTOM_SP +
-    lyricExtraSp;
+    ROW_PAD_TOP_SP + displayHeightSum + gapSum + ROW_PAD_BOTTOM_SP + lyricExtraSp;
   const displayTopOf = (row: number, d: number) =>
     MARGIN_SP + row * systemHeightSp + ROW_PAD_TOP_SP + displayPrefix[d];
   const staffTopOf = (row: number, s: number) => displayTopOf(row, displayOfPlan[s]);
@@ -1194,6 +1211,22 @@ function renderSegment(args: RenderSegmentArgs): {
             glyph: 'augmentationDot',
             x: thinX + 0.4,
             y: top + dotY,
+            scale: REPEAT_DOT_SCALE,
+            className: 'repeat-dot'
+          });
+        }
+      }
+      // Native tab staves carry their own dots (published tab repeats do),
+      // straddling the middle of the six-line staff the way the notation
+      // dots straddle the middle line.
+      for (const td of tabDisplays) {
+        const tabTop = displayTopOf(m.row, td.displayIndex);
+        for (const dotY of TAB_REPEAT_DOT_YS) {
+          primitives.push({
+            kind: 'glyph',
+            glyph: 'augmentationDot',
+            x: thinX + 0.4,
+            y: tabTop + dotY,
             scale: REPEAT_DOT_SCALE,
             className: 'repeat-dot'
           });
@@ -1544,6 +1577,19 @@ function renderSegment(args: RenderSegmentArgs): {
             glyph: 'augmentationDot',
             x: dotX,
             y: top + dotY,
+            scale: REPEAT_DOT_SCALE,
+            className: 'repeat-dot'
+          });
+        }
+      }
+      for (const td of tabDisplays) {
+        const tabTop = displayTopOf(m.row, td.displayIndex);
+        for (const dotY of TAB_REPEAT_DOT_YS) {
+          primitives.push({
+            kind: 'glyph',
+            glyph: 'augmentationDot',
+            x: dotX,
+            y: tabTop + dotY,
             scale: REPEAT_DOT_SCALE,
             className: 'repeat-dot'
           });

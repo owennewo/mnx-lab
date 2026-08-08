@@ -52,14 +52,21 @@ export function renderSystemSvg(system: RenderedSystem): string {
   );
 }
 
-/** The SVG goldens for a scenario, keyed by the filename each is stored under. */
-export function scenarioSvg(computed: ScenarioPrimitives): Record<string, string> {
+/** The SVG goldens for a scenario, keyed by the filename each is stored under.
+ *  `both` is the combined notation+tab system (computeBothSystem) — a third
+ *  golden pinning what the standalone projections structurally cannot see:
+ *  vertical composition, spanning barlines, interleaved multi-system wrap. */
+export function scenarioSvg(
+  computed: ScenarioPrimitives,
+  both?: RenderedSystem | null
+): Record<string, string> {
   const out: Record<string, string> = {
     'expected.svg': renderSystemSvg(computed.notation)
   };
   if (computed.tab) out['expected.tab.svg'] = renderSystemSvg(computed.tab);
+  if (both) out['expected.both.svg'] = renderSystemSvg(both);
   return out;
 }
 
-/** Every filename a scenario's SVG goldens can occupy, tab included. */
-export const SVG_GOLDEN_FILES = ['expected.svg', 'expected.tab.svg'] as const;
+/** Every filename a scenario's SVG goldens can occupy, tab and both included. */
+export const SVG_GOLDEN_FILES = ['expected.svg', 'expected.tab.svg', 'expected.both.svg'] as const;

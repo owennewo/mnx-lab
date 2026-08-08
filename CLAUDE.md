@@ -103,8 +103,8 @@ consumer needing independent versioning — a check, not a debate.
 ## The corpus: one format, two axes
 
 Each scenario is a directory (`meta.json`, `score.mnx.json`, optional
-`expected.primitives.json` + `expected.svg` (+ `expected.tab.svg`) goldens and
-`notes.md`) with **two orthogonal axes** in meta:
+`expected.primitives.json` + `expected.svg` (+ `expected.tab.svg` + `expected.both.svg`)
+goldens and `notes.md`) with **two orthogonal axes** in meta:
 
 - **`origin`**: `mirrored` (generated from the pinned spec by `sync:spec`, which owns
   the whole `scenarios/spec/` tree — hand-edit forbidden) | `local` (ours, under
@@ -116,17 +116,20 @@ Each scenario is a directory (`meta.json`, `score.mnx.json`, optional
   `check-scenarios` enforces all of this.
 
 **Verification is a human assertion with provenance.** `status: verified` and the
-`verification: {at, primitivesHash, renderHash}` record are written **only** by
+`verification: {at, primitivesHash, renderHash, bothHash}` record are written **only** by
 `harness/verify/verify-scenarios.mjs`; the record is *kept through demotion*, so the
 attention queue distinguishes **stale** (approved once, output changed) from **never
 seen** (no record). `npm run update:primitives` keeps statuses honest: a successful
 snapshot write promotes `valid`→`rendered`, a changed snapshot demotes
 `verified`→`rendered`, a layout crash demotes to `valid` (removing the snapshots). A
 golden appearing for the **first** time is never a change — that is how a new golden is
-introduced without mass-demoting the corpus. `renderHash` is **optional** in a record
-for the same reason: approvals predating `expected.svg` were real assertions made on the
-layout evidence, so their absence is not staleness; `--backfill-render` stamps them, and
-what that asserts is spelled out at the flag. The
+introduced without mass-demoting the corpus. `renderHash` and `bothHash` are **optional**
+in a record for the same reason: approvals predating a golden were real assertions made
+on the evidence that existed, so their absence is not staleness; `--backfill-render`
+stamps the former (what that asserts is spelled out at the flag), and `bothHash` has
+**no backfill** — the combined system earns its hash only through a real approval.
+`renderHash`'s file set is **frozen** at the two standalone SVGs; `expected.both.svg`
+hashes separately, or adding it would have moved every committed digest at once. The
 approval flow is the conversational **`/verify` skill** (`.claude/skills/verify/`) —
 queue → one stable review page → verdicts in sentences; there is no human-facing CLI and
 no checkbox page. The initial 57/57 sweep is recorded in
@@ -138,13 +141,17 @@ reproduce them byte-identically (`npm run update:primitives` then a clean
 `git diff -- scenarios/`); a mismatch stops the line — diff against `legacy`, never
 "close enough".
 
-There are **two** goldens per scenario because they cover different code.
+The goldens per scenario cover different code.
 `expected.primitives.json` pins layout, and stops at staff-space coordinates and SMuFL
 glyph *names*. `expected.svg` puts those primitives through the real emitter
 (`harness/helpers/corpusSvg.ts` → `src/engine/render/svg.ts`), pinning what
 `expected.primitives.json` structurally cannot see: the glyph name→codepoint lookup, the
 five emit branches, sp→px, the viewBox. Map `gClef` to the wrong codepoint and the
-primitives hash does not move. It is **text, not pixels, on purpose** — a PNG hash would
+primitives hash does not move. `expected.both.svg` (tab-opting scenarios) pins the
+combined notation+tab system — vertical composition, spanning barlines, interleaved
+wrap — which the standalone projections structurally cannot see; it is deliberately
+**not** a third `RenderedSystem` in the primitives file, so introducing it rewrote no
+committed golden. It is **text, not pixels, on purpose** — a PNG hash would
 absorb the local Chrome build, font hinting and antialiasing, so a browser upgrade would
 demote every approval at once and the queue would stop meaning "the renderer changed".
 `GOLDEN_PX_PER_SP` is a **power of two** so sp→px adds no float noise. PNGs stay what

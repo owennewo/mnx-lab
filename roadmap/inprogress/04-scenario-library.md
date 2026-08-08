@@ -62,6 +62,8 @@ scenarios/
         score.mnx.json               # the exhibit — pristine MNX, canonical 2-space format
         expected.primitives.json     # generated layout snapshot; absent until rendered,
                                      # absent for invalid documents
+        expected.svg                 # emitter goldens (+ expected.tab.svg +
+                                     # expected.both.svg for tab scenarios) — see below
         notes.md                     # optional prose: what's interesting, spec quotes
     20-tab-part/
     24-tab-spec-gaps/
@@ -173,15 +175,21 @@ techniques target notes. `idRefs: true` is the cross-cutting facet that surfaces
 the scenarios most likely to break a renderer get their own filter and their own emphasis in
 tests. Category 09 remains the home of the gnarly multi-event spanners.
 
-## Reference output: primitives, not SVG
+## Reference output: primitives first — and, since, the emitter SVGs
 
-The committed machine artifact is **`expected.primitives.json`** — the layout engine's output.
+The primary machine artifact is **`expected.primitives.json`** — the layout engine's output.
 It is deterministic, font-independent, diffs meaningfully, and runs in Node with no DOM.
-`expected.svg` is **not** committed: `renderSvg` is a pure emitter over the primitives, so a
-committed SVG would state the same fact twice and churn on cosmetic renderer changes (px
-scaling, class names). Visual approval (the `verified` gate) happens in the gallery's live
-render or via `check-scenarios --preview` writing to a gitignored `scenarios/.preview/`.
-If SVG-in-PR-diffs is missed in practice, re-add it as a CI artifact, not a committed file.
+
+This doc originally ruled `expected.svg` out as "the same fact twice". **That was
+reversed** once the gap it left became clear: the primitives stop at staff-space
+coordinates and SMuFL glyph *names*, so the emitter itself (name→codepoint lookup, the
+emit branches, sp→px, the viewBox) was ungoverned — map `gClef` to the wrong codepoint
+and the primitives hash doesn't move. Committed now: `expected.svg` (+
+`expected.tab.svg`), and `expected.both.svg` for tab-opting scenarios pinning the
+combined notation+tab system (vertical composition, spanning barlines, interleaved
+wrap — deliberately *not* a third system in the primitives file, so introducing it
+rewrote no committed golden). Still text, never pixels — the full rationale lives at
+`harness/helpers/corpusSvg.ts` and in CLAUDE.md's corpus section.
 
 ## How the library is consumed
 
@@ -224,6 +232,7 @@ test suite from scenario #1 is the point.
   inherits `global-attrs`), but the document is the exhibit: the gallery's JSON pane and
   CG-facing examples must show pristine MNX, invalid-by-design documents need byte-exact
   control over *why* they're invalid, and status churn would dirty the music diffs.
-- **`expected.svg` as a committed artifact.** See above — derived data, cosmetic churn.
+- **`expected.svg` as a committed artifact.** *Reversed* — see above; the emitter needed
+  its own witness, and the churn fear was answered with a fixed power-of-two scale.
 - **A deep tree.** Two levels (category/scenario) is a filing convention, not a data
   structure; the model stays flat and facet-driven.

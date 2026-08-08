@@ -1,4 +1,4 @@
-// Render snapshots over the scenario corpus — two goldens per scenario.
+// Render snapshots over the scenario corpus — the goldens per scenario.
 //
 // For every scenario whose document is expected valid, computes the layout
 // engine's primitive output (notation, plus tab when the part declares a tab
@@ -6,7 +6,11 @@
 // expected.primitives.json, then puts those primitives through the real SVG
 // emitter and compares that to expected.svg (+ expected.tab.svg). The second
 // golden covers what the first structurally cannot — glyph name → codepoint,
-// the emit branches, sp→px — see harness/helpers/corpusSvg.ts.
+// the emit branches, sp→px — see harness/helpers/corpusSvg.ts. Tab-opting
+// scenarios carry a third SVG golden, expected.both.svg: the combined
+// notation+tab system, pinning what the standalone projections cannot see
+// (vertical composition, spanning barlines, interleaved wrap) without
+// touching the committed primitives files.
 //
 // Regenerate snapshots with: npm run update:primitives
 // (UPDATE_PRIMITIVES=1 makes this file WRITE instead of assert.)
@@ -25,7 +29,7 @@ import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 // @ts-expect-error — plain .mjs module without type declarations
 import { loadCorpus, createContext, checkScenario } from '../verify/check-scenarios.mjs';
-import { computePrimitives } from '../helpers/corpusPrimitives.ts';
+import { computeBoth, computePrimitives } from '../helpers/corpusPrimitives.ts';
 import { scenarioSvg, SVG_GOLDEN_FILES } from '../helpers/corpusSvg.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 
@@ -72,8 +76,10 @@ describe(`scenario layout snapshots${UPDATE ? ' (UPDATING)' : ''}`, () => {
         ) as MnxStructure;
         const status = (scenario as any).meta.status as string;
         let computed;
+        let both;
         try {
           computed = computePrimitives(doc);
+          both = computeBoth(doc);
         } catch (e) {
           // A layout crash is an honest "can't render yet": leave the scenario
           // without snapshots (status stays 'valid') and report it.
@@ -94,7 +100,7 @@ describe(`scenario layout snapshots${UPDATE ? ' (UPDATING)' : ''}`, () => {
         const serialized = JSON.stringify(computed, null, 2) + '\n';
         const primitivesChanged = writeGolden(snapshotPath, serialized);
 
-        const svg = scenarioSvg(computed);
+        const svg = scenarioSvg(computed, both);
         let svgChanged = false;
         for (const name of SVG_GOLDEN_FILES) {
           const filePath = path.join(scenario.dir, name);
@@ -134,7 +140,7 @@ describe(`scenario layout snapshots${UPDATE ? ' (UPDATING)' : ''}`, () => {
         // Second golden: the emitter's own output. Skipped where it has not
         // been generated yet, so the suite stays green between adding the
         // golden and running update:primitives.
-        const svg = scenarioSvg(computed);
+        const svg = scenarioSvg(computed, computeBoth(doc));
         for (const name of SVG_GOLDEN_FILES) {
           const filePath = path.join(scenario.dir, name);
           const exists = fs.existsSync(filePath);

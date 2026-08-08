@@ -19,9 +19,11 @@ const ALLOWED_FILES = new Set([
   'meta.json',
   'score.mnx.json',
   'expected.primitives.json',
-  // The emitter golden, and its tab companion when the part declares one.
+  // The emitter golden, and its tab/both companions when the part declares
+  // a tab view (expected.both.svg pins the combined notation+tab system).
   'expected.svg',
   'expected.tab.svg',
+  'expected.both.svg',
   'notes.md'
 ]);
 const SEGMENT_RE = /^(\d+-)?[a-z0-9][a-z0-9-]*$/;

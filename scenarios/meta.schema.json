@@ -132,7 +132,12 @@
         "renderHash": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{16}$",
-          "description": "Hash of the SVG goldens (expected.svg + expected.tab.svg) at approval time — the emitter's own output, which primitivesHash cannot see. Optional: approvals predating the SVG golden carry no renderHash and are NOT treated as stale for lacking one; run --backfill-render to stamp them."
+          "description": "Hash of the standalone SVG goldens (expected.svg + expected.tab.svg — this file set is frozen; expected.both.svg hashes separately as bothHash) at approval time — the emitter's own output, which primitivesHash cannot see. Optional: approvals predating the SVG golden carry no renderHash and are NOT treated as stale for lacking one; run --backfill-render to stamp them."
+        },
+        "bothHash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{16}$",
+          "description": "Hash of expected.both.svg (the combined notation+tab system) at approval time. Optional: approvals predating the both golden carry no bothHash and are NOT stale for lacking one. There is no backfill — the combined system earns its hash only through a real approval."
         }
       },
       "required": [

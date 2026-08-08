@@ -37,7 +37,7 @@ export interface ScenarioMeta {
    * workbench can tell stale (record present, status demoted) from
    * never-seen (no record). Display-only here: the workbench never writes it.
    */
-  verification?: { at: string; primitivesHash?: string; renderHash?: string };
+  verification?: { at: string; primitivesHash?: string; renderHash?: string; bothHash?: string };
 }
 
 export interface ScenarioEntry {

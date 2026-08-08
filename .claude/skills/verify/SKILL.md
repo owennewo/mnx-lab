@@ -39,13 +39,18 @@ file in this flow.
    blocked → stale → never-seen. For each item show, side by side:
    - **our render** — the scenario's current SVG output, rendered headlessly via
      the harness helpers (`harness/helpers/corpusPrimitives.ts` +
-     `harness/helpers/svgString.ts`);
+     `harness/helpers/svgString.ts`). Show EVERY projection the scenario pins:
+     notation, plus the standalone tab and the combined notation+tab system
+     (`computeBoth`) when the scenario carries those goldens — approving stamps
+     a hash per golden (`primitivesHash`/`renderHash`/`bothHash`), and a hash
+     must never be stamped for a view the human did not see;
    - **the spec's reference engraving**, when one exists (spec-mirrored scenarios
      carry one in the pinned spec checkout — `spec/tools/specSource.mjs`
      `loadSpecExamples()` resolves each example's `imagePath`);
    - for **stale** items additionally a what-changed note derived from diffing the
      committed goldens against freshly computed output — `expected.primitives.json`
-     for layout, `expected.svg` for the emitter (the queue entry names which hash
+     for layout, `expected.svg`/`expected.tab.svg` for the emitter,
+     `expected.both.svg` for the combined system (the queue entry names which hash
      moved). Summarize in words — "beam spacing changed", "new glyph", "clef now
      emits a different codepoint" — don't dump JSON or SVG.
    Load the artifact-design skill before writing the page. Publish as an Artifact

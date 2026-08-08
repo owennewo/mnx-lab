@@ -1,0 +1,31 @@
+<svg width="1280" height="496" viewBox="0 0 1280 496" xmlns="http://www.w3.org/2000/svg">
+<line x1="32" y1="128" x2="462.4" y2="128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="144" x2="462.4" y2="144" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="160" x2="462.4" y2="160" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="176" x2="462.4" y2="176" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="192" x2="462.4" y2="192" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="128" x2="32" y2="368" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
+<text x="49.6" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
+<text x="117.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
+<text x="117.6" y="176" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
+<line x1="199.76" y1="208" x2="231.44" y2="208" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
+<text x="206.16" y="208" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
+<line x1="225.04" y1="152" x2="225.04" y2="205.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<text x="362.16" y="192" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
+<line x1="381.04" y1="136" x2="381.04" y2="189.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="32" y1="288" x2="462.4" y2="288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="304" x2="462.4" y2="304" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="320" x2="462.4" y2="320" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="336" x2="462.4" y2="336" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="352" x2="462.4" y2="352" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="368" x2="462.4" y2="368" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<text x="49.6" y="328" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
+<text x="117.6" y="308" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
+<text x="117.6" y="348" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
+<rect x="210.32" y="360" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
+<text x="215.6" y="368" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e0.n0">8</text>
+<rect x="361.04" y="360" width="21.12" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
+<text x="371.6" y="368" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e1.n0">12</text>
+<line x1="449.6" y1="128" x2="449.6" y2="368" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="454.4" y="128" width="8" height="240" fill="currentColor" class="barline barline-final-thick"></rect>
+</svg>
