@@ -74,7 +74,7 @@ user toggle  >  host attribute  >  document hint  >  built-in default
 and *unset means "defer to the layer below"*, not "the default value". First instance:
 `view` gains an `'auto'` default (replacing `viewMode`'s unconditional `'notation'`),
 resolved from `staffKind` — `both` → the composed system
-([both-view-single-system.md](../inprogress/both-view-single-system.md)), `tab` → tab,
+([both-view-single-system.md](../complete/both-view-single-system.md)), `tab` → tab,
 absent/`notation` → notation. The read-only player becomes zero-config; the author's
 declared presentation finally works; interactive shells still override at will.
 `staffKind` stays a **hint, never a command** — read-only means "I don't edit the

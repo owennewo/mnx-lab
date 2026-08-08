@@ -1,6 +1,7 @@
 # The `both` view as one system — tab as a staff, not a second render
 
-> **Status: in progress — phases 1–3 SHIPPED (phase 3: 2026-08-08).** Direction set in
+> **Status: COMPLETE (2026-08-08 — phase 3 shipped and the 13 both goldens human-approved,
+> `bothHash` stamped on every tab scenario).** Direction set in
 > conversation: the notation+tab view should read as **one engraved system** (connected
 > barlines, one coordinate space), the way published guitar music prints it — not two
 > stacked SVGs. Phase 1 built a composer that stacked and stitched the two standalone
@@ -142,6 +143,10 @@ every approval — the mass-demotion the provenance record exists to avoid.
    `tabStaff.ts` with zero golden movement.
 3. ✔ **Phase 3** — `expected.both.svg` + `bothHash` (zero demotions), compare-pane
    preference, tab repeat dots, content-driven lyrics gap. Shipped 2026-08-08.
-4. **Next**: the human `/verify` sweep stamping `bothHash` on the 13 tab scenarios.
-   Then this effort is done — the deferred items (scores-doc injection awaiting a real
-   fixture; grace/tremolo tab parity) live with their owning components.
+4. ✔ **The `/verify` sweep** — all 13 combined systems human-reviewed and approved
+   2026-08-08; `bothHash` stamped on every tab scenario (two also picked up their
+   first `renderHash`). The sweep surfaced and fixed an approval-path gap: a
+   grandfathered record must be *completed* by an explicit approval, not
+   short-circuited as already-current. **This effort is done** — the deferred items
+   (scores-doc injection awaiting a real fixture; grace/tremolo tab parity) live with
+   their owning components.

@@ -108,16 +108,6 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   **voice/transcription stage was never built**. What's left here is the voice half.
 
 ### inprogress/
-- **[both-view-single-system.md](inprogress/both-view-single-system.md)** — the notation+tab
-  `both` view as **one engraved system** (connected barlines, one SVG) instead of two stacked
-  renders. **Phases 1–3 shipped** (2026-08-07/08): tab is a **native display staff** in the
-  notation layout's system walk (`includeTabStaves`; seam `layoutBothSystem`) — single-stroke
-  shared barlines, interleaved multi-system wrap, fret emission shared with the standalone tab
-  layout via `tabStaff.ts`. Phase 3 added the **`expected.both.svg` golden** (SVG-only, with
-  optional `bothHash` provenance — zero demotions, 13 scenarios pinned), tab repeat dots, the
-  content-driven lyrics gap, and the compare pane preferring the combined system for
-  tab-preferring documents. Goldens byte-identical throughout. Left: the human `/verify`
-  sweep stamping `bothHash`; scores-doc injection stays deferred until a real fixture exists.
 - **[guitar-pro.md](inprogress/guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion, built at
   `converters/guitarpro-mnx/` using **alphaTab** as a headless format codec (no binary parsing
   hand-written). Reads gp3/gp4/gp5/gpx/gp, writes `.gp` (GP7 — the only format anything can
@@ -150,6 +140,15 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   keeps growing, so it stays "in progress."
 
 ### complete/
+- **[both-view-single-system.md](complete/both-view-single-system.md)** — the notation+tab
+  `both` view as **one engraved system**, complete 2026-08-08. Tab is a **native display
+  staff** in the notation layout's system walk (`includeTabStaves`; seam `layoutBothSystem`) —
+  single-stroke shared barlines, interleaved multi-system wrap, fret emission shared with the
+  standalone tab layout via `tabStaff.ts`. Phase 3 added the **`expected.both.svg` golden**
+  (SVG-only, optional `bothHash` provenance — zero demotions), tab repeat dots, the
+  content-driven lyrics gap, and the compare-pane preference; all 13 both goldens
+  human-approved and `bothHash`-stamped the same day. Deferred out: scores-doc injection
+  (awaits a real fixture) and grace/tremolo tab parity (owned by the tab renderer).
 - **[structure-lab.md](complete/structure-lab.md)** — **the adopted repo structure,
   executed 2026-07-31 as a fresh-slate rebuild of main** (pre-rebuild history on the
   `legacy` branch + `pre-rebuild` tag). Capability layers with machine-enforced

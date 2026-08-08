@@ -837,7 +837,7 @@ function renderSegment(args: RenderSegmentArgs): {
   // The plan and every plan-indexed subsystem (beams, curves, ottavas,
   // dynamics, lyrics, labels) stay blind to tab staves — this overlay owns
   // vertical geometry and the extra emission only. Phase 2 of
-  // roadmap/inprogress/both-view-single-system.md.
+  // roadmap/complete/both-view-single-system.md.
   const tabParts: MnxPart[] = [];
   if (includeTabStaves && segment.staves.length) {
     const inSegment = new Set<MnxPart>();

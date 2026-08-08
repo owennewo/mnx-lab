@@ -12,7 +12,7 @@ import { TabSetup } from '../tab/guitarPositions.ts';
  * documents interleave notation ↔ tab per system.
  *
  * This entry point is the API seam (phase 1 of
- * roadmap/inprogress/both-view-single-system.md shipped a composer here that
+ * roadmap/complete/both-view-single-system.md shipped a composer here that
  * stacked and stitched the two standalone layouts; phase 2 made the staff
  * native and retired the stitch).
  */

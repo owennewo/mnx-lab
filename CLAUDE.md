@@ -238,7 +238,7 @@ draws each tab-bearing part's tab staff inside the same system walk — shared b
 interleaved multi-system wrap, columns aligned by shared plan slots. Tab-staff emission
 (lines/clef/timesig/frets) lives ONCE in `src/engine/layout/tabStaff.ts`, used by both
 the standalone tab layout and the native staff — extend it there, never fork it. See
-[roadmap/inprogress/both-view-single-system.md](roadmap/inprogress/both-view-single-system.md). Fret/string assignment uses
+[roadmap/complete/both-view-single-system.md](roadmap/complete/both-view-single-system.md). Fret/string assignment uses
 the derivation ladder in `src/engine/tab/guitarPositions.ts` (MNX pitch is
 sounding): an annotated `_x.mnxLab.string` derives its fret against the declared
 `strings[]` + capo (a stored `fret` is validation-only — a mismatch renders the
