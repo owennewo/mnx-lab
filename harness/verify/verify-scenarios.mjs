@@ -308,12 +308,29 @@ function main() {
     }
     const render = renderHash(scenario);
     const both = bothHash(scenario);
-    if (meta.status === 'verified' && recordMatches(meta.verification ?? null, hash, render, both)) {
+    const record = meta.verification ?? null;
+    // Grandfathered records (a hash missing for evidence that exists on disk)
+    // count as CURRENT in the queue — but an explicit approval is the human
+    // looking at that evidence right now, so it must go through and complete
+    // the record rather than short-circuit. Only skip when there is truly
+    // nothing to add.
+    const recordComplete =
+      record !== null &&
+      (render === null || record.renderHash !== undefined) &&
+      (both === null || record.bothHash !== undefined);
+    if (meta.status === 'verified' && recordMatches(record, hash, render, both) && recordComplete) {
       console.log(`OK   ${id}: already verified and current`);
       continue;
     }
+    const adding = [];
+    if (record !== null && record.renderHash === undefined && render !== null) adding.push('renderHash');
+    if (record !== null && record.bothHash === undefined && both !== null) adding.push('bothHash');
     markVerified(scenario, new Date().toISOString().slice(0, 10));
-    console.log(`OK   ${id}: ${meta.status} → verified (${hash ?? 'no primitives — invalid-by-design'})`);
+    const detail =
+      meta.status === 'verified' && adding.length > 0 && recordMatches(record, hash, render, both)
+        ? `re-approved — ${adding.join(' + ')} recorded`
+        : (hash ?? 'no primitives — invalid-by-design');
+    console.log(`OK   ${id}: ${meta.status} → verified (${detail})`);
     approved++;
   }
   console.log(`\n${approved} verified, ${failures} skipped.`);

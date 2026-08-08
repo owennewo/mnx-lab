@@ -31,8 +31,9 @@
   "origin": "local",
   "status": "verified",
   "verification": {
-    "at": "2026-08-07",
+    "at": "2026-08-08",
     "primitivesHash": "sha256:1912eb3477edd08b",
-    "renderHash": "sha256:3014bf5ef624adaa"
+    "renderHash": "sha256:3014bf5ef624adaa",
+    "bothHash": "sha256:22f5901ec676e597"
   }
 }
