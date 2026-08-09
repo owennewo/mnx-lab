@@ -234,7 +234,7 @@ The work:
 - **No single-key bindings for setup** — palette/popovers only, per the frequency rule.
 - **No keyboard instruments / grand staff** — guitar-first, per charter; the instrument
   generalisation argument lives in
-  [instrument-position.md](instrument-position.md), not here.
+  [instrument-position.md](../proposed/instrument-position.md), not here.
 - **No keystroke-level goldens, ever** — fixtures are intents; keys are tested only in
   the keymap table's own tiny tests.
 - **No AI-loop convergence yet** — the worker loop still replaces whole documents; it

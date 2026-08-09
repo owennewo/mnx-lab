@@ -1,22 +1,33 @@
 # Guitar Pro ⇄ MNX conversion (via alphaTab)
 
-> **Status: in progress (2026-07-25).** The package exists and round-trips
-> cleanly: `converters/guitarpro-mnx/`. Sibling to the shipped
+> **Status: COMPLETE (2026-08-09).** `converters/guitarpro-mnx/` is bi-directional,
+> alphaTab-backed and **56 tests green** — the corpus is authored as Guitar Pro and
+> both directions are pinned. Sibling to the shipped
 > [MusicXML converter](../complete/MUSICXML.md); same shape, different source format.
+>
+> Two things were deliberately scoped **out** rather than left as implied promises,
+> both recorded at "What was left, and where it went" below: gp3/gp4/gp5 reader
+> coverage (alphaTab's code, not ours) and tuplets/grace notes (never
+> Guitar-Pro-specific — split to
+> [tuplets-grace-notes.md](../proposed/tuplets-grace-notes.md)).
 
 ## What is built
 
-`converters/guitarpro-mnx/` — bi-directional, alphaTab-backed, 17 tests green.
+`converters/guitarpro-mnx/` — bi-directional, alphaTab-backed, **56 tests green**
+(47 round-trip + 9 import).
 
 | | Status |
 |---|---|
 | Import `.gp`/`.gpx`/`.gp3`/`.gp4`/`.gp5` → MNX | ✅ notes, rests, durations+dots, voices, tunings, capo, positions, clefs, key/time, repeats, alternate endings, tempo |
+| **Import from a real Guitar Pro binary** | ✅ the three `.gpx` fixtures are BCFS containers authored in the app; importing each **reproduces its committed `.mnx.json` exactly** (`tests/import.test.ts`) |
 | Lyrics, both directions | ✅ multi-verse, with hyphenation — see below |
 | Repeats + alternate endings, both directions | ✅ incl. play count and multi-bar volta spans — see below |
+| Sections, rehearsal marks, tempo | ✅ both directions, incl. non-quarter beat units |
+| Chord symbols | ✅ beat text *and* GP `Chord` objects → `harmonies[]`, slash chords, literal spellings preserved |
 | Export MNX → `.gp` (GP7) | ✅ verified as a real GP7 zip container (`VERSION` 7.0 + `Content/score.gpif`) |
-| `MNX → .gp → MNX` round trip | ✅ **byte-for-byte identical events** on both reference scores |
-| `_x.tab.technique` | ⚠️ mapped both ways (bend / slide / hammer-on / pull-off / vibrato) but **not yet exercised** — neither fixture contains any |
-| Tuplets, grace notes | ❌ not modelled; both directions `warn()` rather than silently dropping |
+| `MNX → .gp → MNX` round trip | ✅ **byte-for-byte identical events** on all three reference scores |
+| `_x.mnxLab.tab.technique` | ✅ **exercised** — Vestapol carries hammer-ons, pull-offs, slides, vibrato, harmonics and palm mute; bends round-trip as **curves** (`points: [{position, alter}]`, semitones ← GP's quarter tones) |
+| Tuplets, grace notes | ➡️ **out of scope here** — both directions `warn()` rather than silently dropping; the feature moved to [tuplets-grace-notes.md](../proposed/tuplets-grace-notes.md) |
 
 **Round-trip results** (`MNX → .gp → MNX`, comparing measure, voice, sounding
 pitch, duration base, dots, string and fret for every event):
@@ -101,19 +112,58 @@ self-inconsistent MusicXML. The dash encoding forces the correct answer on the
 way back, so those come home as `end`. The round trip is more correct than its
 input.
 
-## What is left
+## What was left, and where it went
 
-- **Technique fixtures.** The mapping is written but unproven. Needs a real
-  `.gp` with bends/slides/hammer-ons — the first genuine test of
-  `_x.tab.technique`, which no other converter populates.
-- **Tuplets and grace notes** — containers in MNX, per-beat flags in Guitar Pro.
-- **Import-side fixtures.** Every test so far starts from MNX. A third-party
-  `.gp`/`.gp4` from the wild is the real import test, and the only way to
-  exercise the gp3/gp4/gp5 binary readers at all.
-- **Manual acceptance**: open the generated `.gp` in Guitar Pro / upload to
-  Ultimate Guitar. The container is structurally right, but only a real consumer
-  proves it.
-- Wiring into the app (drag-and-drop import) — see the bundle-size caveat below.
+The original list, resolved item by item — three closed, two scoped out.
+
+- ✔ **Technique fixtures.** Closed by the **Vestapol** fixture: hammer-ons, pull-offs,
+  slides, vibrato, harmonics and palm mute all survive `MNX ⇄ .gp`, and bends became
+  *curves* rather than a single interval that flattened anything more elaborate. This
+  converter is still the only one that populates `_x.mnxLab.tab.technique`.
+
+- ✔ **Import-side fixtures** (2026-08-09). The gap was subtler than "we need a file
+  from the wild": all 47 round-trip tests started from `.mnx.json`, so nothing
+  exercised the thing a user does *first* — open a file Guitar Pro wrote. The fixtures
+  were already the right evidence and nobody had pointed a test at them. They are
+  **BCFS containers** (GP6's proprietary binary, authored in the app), and per the
+  corpus rule the `.mnx.json` is *derived from them*. `tests/import.test.ts` now
+  asserts that derivation byte for byte on all three, plus the container magic (so the
+  suite can't quietly start proving something about our own exporter's output) and a
+  fingerboard sanity check. An importer change can no longer silently invalidate every
+  committed fixture — and transitively the `.xml` derived from them.
+
+- ➡️ **gp3/gp4/gp5 reader coverage — out of scope, deliberately.** Those are
+  **alphaTab's** binary readers; our mapper consumes an alphaTab `Score` and cannot
+  tell which reader produced it. A third-party `.gp4` would test alphaTab's parsing,
+  not our mapping, and the project already took the position that not writing byte
+  readers is the whole reason alphaTab is a dependency. The one legacy-format concern
+  that *is* ours is documented and unchanged: finding 4 below — alphaTab's gp3–gp5
+  `applyLyrics` path re-dispatches a verse onto voice 0, skipping rests, so **lyric
+  attachment does not survive an old binary import**. That is a known limitation with a
+  named cause, not a missing test.
+
+- ➡️ **Tuplets and grace notes — moved, not dropped.** Never Guitar-Pro-specific:
+  *neither* converter handles them (MusicXML doesn't even look) and the tab renderer
+  draws neither, while the model and the notation renderer support both. Recording the
+  same hole in three places was the actual problem. Now
+  [tuplets-grace-notes.md](../proposed/tuplets-grace-notes.md), at its real scope, with
+  the fixture as step zero — no reference score contains a tuplet or a grace note, which
+  is why the round trips are honestly lossless and still never present the case.
+
+- ⚠️ **Manual acceptance — a recorded caveat, not a blocker.** Downgraded on evidence.
+  What it aimed to prove was that a real consumer accepts our output; three things
+  narrow that: the `.gp` is written by alphaTab's own `Gp7Exporter` (container
+  conformance is alphaTab's contract, not ours — our file declares GPIF 8.1.3), alphaTab
+  re-reads our output losslessly in every round-trip test, and **acceptance testing has
+  already happened once against a real consumer** — finding 5 below (Ultimate Guitar
+  silently re-fretting a duplicated string) was discovered by uploading a generated
+  file, which is also why the export now collapses unisons. Ultimate Guitar is a
+  **browser upload**, so a fresh acceptance pass never needed the desktop app. What
+  remains unproven is only the Guitar Pro *application's* own reader, and no test in
+  this repo could ever have covered that.
+
+- Wiring into the app (drag-and-drop import) — **explicitly not this**; see the
+  bundle-size caveat below (alphaTab unpacks to ~13.7 MB).
 
 ## The goal
 
@@ -213,6 +263,16 @@ Two mapping details worth pinning down early:
    signature — the one place this converter does *more* work than the MusicXML one.
 
 ## Reference fixture: `Sun-did-glide`
+
+> **Historical from here down** — the sections below are the original plan, kept for
+> provenance, and their paths and field names predate the 2026-07 rebuild
+> (`server/scores/` → `converters/fixtures/`, `_x.tab.position.string` → flat
+> `_x.mnxLab.string`, `src/types/mnx.ts` → `src/model/mnx.ts`). What actually happened:
+> the fixture direction **inverted**. The plan below treats MusicXML as the source and
+> derives Guitar Pro from it; the corpus now does the opposite — `.gpx` is **authored**
+> in Guitar Pro and both `.mnx.json` and `.xml` are derived from it, which is what makes
+> `tests/import.test.ts` meaningful. A third fixture, **Vestapol**, joined to carry
+> technique.
 
 Use [server/scores/Sun-did-glide.xml](../../server/scores/Sun-did-glide.xml) as the
 round-trip fixture, mirroring how `House-of-the-Rising-Sun.xml` anchors the MusicXML

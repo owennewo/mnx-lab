@@ -103,20 +103,20 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   undo history and op log like keyboard edits. Split out of
   [editor-input-layer.md](inprogress/editor-input-layer.md); the voice half stays in
   [open_router.md](proposed/open_router.md).
+- **[tuplets-grace-notes.md](proposed/tuplets-grace-notes.md)** — tuplets and grace notes
+  **across both converters and on tab**. Split out of
+  [guitar-pro.md](complete/guitar-pro.md) when that closed, at its real scope: the model
+  and the notation renderer already support both (`MnxTuplet`/`MnxGrace`, drawn, with spec
+  scenarios), but **neither converter carries them** (Guitar Pro flattens with a `warn()`;
+  MusicXML never looks) and the tab staff reserves their columns without drawing them.
+  Step zero is a **fixture** — none of the three reference scores contains a tuplet or a
+  grace note, which is why the round trips are honestly lossless and still never present
+  the case. Import/export follows the collapse-expand precedent already solved for voltas.
 - **[open_router.md](proposed/open_router.md)** — two-stage **voice** input + structured edit.
   The *text* edit path shipped (worker `/api/edit-notation` NDJSON self-correcting loop); the
   **voice/transcription stage was never built**. What's left here is the voice half.
 
 ### inprogress/
-- **[guitar-pro.md](inprogress/guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion, built at
-  `converters/guitarpro-mnx/` using **alphaTab** as a headless format codec (no binary parsing
-  hand-written). Reads gp3/gp4/gp5/gpx/gp, writes `.gp` (GP7 — the only format anything can
-  still write). The score corpus is now **authored as `.gpx`**, with `.mnx.json` and `.xml`
-  derived from it. `MNX → .gp → MNX` round-trips **all three reference scores with zero
-  differences** — notes, technique, lyrics, repeats, voltas, tuning, capo, key — schema-valid.
-  Harmonics, palm mute and chord symbols now travel too (v3 of the extension). Left:
-  tuplets/grace, ties/staccato, a third-party gp3/gp4/gp5 import fixture, and manual
-  acceptance in Guitar Pro.
 - **[editor-input-layer.md](inprogress/editor-input-layer.md)** — the **editor's input layer**,
   designed to be testable while super-experimental: a declarative keymap (key → intent), a
   pure state machine (intent + selection → `EditOp`), and **intent-trace fixtures** that are
@@ -140,6 +140,20 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   keeps growing, so it stays "in progress."
 
 ### complete/
+- **[guitar-pro.md](complete/guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion at
+  `converters/guitarpro-mnx/`, using **alphaTab** as a headless format codec (no binary
+  parsing hand-written), complete 2026-08-09 with **56 tests**. Reads gp3/gp4/gp5/gpx/gp,
+  writes `.gp` (GP7 — the only format anything can still write). The score corpus is
+  **authored as `.gpx`**, with `.mnx.json` and `.xml` derived from it — and
+  `tests/import.test.ts` now pins that derivation byte for byte, so the import side is
+  exercised against real Guitar-Pro-authored binaries rather than only our own output.
+  `MNX → .gp → MNX` round-trips **all three reference scores with zero differences** —
+  notes, technique (bends as curves, harmonics, palm mute), chord symbols, lyrics,
+  repeats, voltas, sections, tempo, tuning, capo, key — schema-valid. Scoped out with
+  reasons recorded: gp3/gp4/gp5 reader coverage (alphaTab's code, not ours) and manual
+  acceptance in the GP *application* (downgraded to a caveat — the container is
+  alphaTab's contract, and the one real-consumer finding came from an Ultimate Guitar
+  upload, which needs no desktop app).
 - **[both-view-single-system.md](complete/both-view-single-system.md)** — the notation+tab
   `both` view as **one engraved system**, complete 2026-08-08. Tab is a **native display
   staff** in the notation layout's system walk (`includeTabStaves`; seam `layoutBothSystem`) —
@@ -182,7 +196,7 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
 ### superseded/
 - **Structure sketches** — three of the four self-contained restructuring sketches
   (alternatives for a single decision), superseded by the adopted
-  [structure-lab.md](inprogress/structure-lab.md), which composes two of them:
+  [structure-lab.md](complete/structure-lab.md), which composes two of them:
   - **[structure-toolchain.md](superseded/structure-toolchain.md)** — an npm-workspaces
     monorepo of publishable `@mnx-lab/*` packages with a one-way dependency graph; apps
     become thin consumers. *Deferred, not rejected* — the recorded trigger for revisiting

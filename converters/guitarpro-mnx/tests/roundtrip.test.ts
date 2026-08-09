@@ -234,7 +234,7 @@ describe('lyrics', () => {
    * Guitar Pro stores lyrics as one text blob per verse, re-split on
    * whitespace, with a trailing `-` marking a syllable that continues. GP7 also
    * writes them per-beat, which is why attachment (voice, and rest-vs-note)
-   * survives — see roadmap/inprogress/guitar-pro.md.
+   * survives — see roadmap/complete/guitar-pro.md.
    */
   async function sunRoundTrip() {
     const original: MnxStructure = JSON.parse(
