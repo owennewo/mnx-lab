@@ -1,6 +1,6 @@
 # The editor input layer — intents, traces, and a testable MVP
 
-> **Status: in progress. Phases 1 AND 2 built 2026-08-03** — intents + declarative
+> **Status: complete 2026-08-09. Phases 1 AND 2 built 2026-08-03** — intents + declarative
 > keymap (`src/edit/intents.ts`, `keymap.ts`), position cursor with string-mode
 > vertical axis and entry ghosts (`cursor.ts`), session with note entry, digit
 > combining and pending entry duration (`session.ts`), ops incl. `insertNote` /
@@ -26,9 +26,11 @@
 > opens the coverage map, anything else jumps to a scenario; command items
 > feed the session through the same intent funnel as keys. The **AI prompt
 > mode** is split out to
-> [roadmap/proposed/editor-ai-prompt.md](../proposed/editor-ai-prompt.md).
-> Remaining: the `elements/` promotion, gated on the intent vocabulary
-> stabilising. The keybinding research behind it is
+> [roadmap/proposed/editor-ai-prompt.md](../proposed/editor-ai-prompt.md), and
+> the one item that outlived this doc — the **`elements/` promotion**, gated on
+> the intent vocabulary stabilising and a real second consumer — is split out to
+> [roadmap/proposed/editor-element-promotion.md](../proposed/editor-element-promotion.md)
+> with its own trigger and brief. The keybinding research behind it is
 > [research/notation-editor-keyboard-models.md](../../research/notation-editor-keyboard-models.md)
 > (the survey, and §6 for its MNX Lab implications). The input layer is expected to stay
 > **experimental for a while** — this design's job is to make that churn cheap.

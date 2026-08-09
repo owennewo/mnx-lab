@@ -499,7 +499,7 @@ function forEachEventNote(
 /**
  * Undo/redo over applyOp. The history RETAINS the ops it applied — undo
  * history, trace recording, and (later) the AI loop's EditOp[] output are
- * three consumers of one log (roadmap/proposed/editor-input-layer.md).
+ * three consumers of one log (roadmap/complete/editor-input-layer.md).
  * Snapshots ride along for O(1) undo; the op log is the durable artifact.
  */
 export class EditHistory {

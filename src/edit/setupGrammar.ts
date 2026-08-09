@@ -1,4 +1,4 @@
-// The setup popovers' typed grammar — roadmap/inprogress/editor-input-layer.md.
+// The setup popovers' typed grammar — roadmap/complete/editor-input-layer.md.
 //
 // Setup (tuning, time signature) is low-frequency, so it gets no single keys;
 // its keyboard story is the popover tier (survey §6.2, Dorico's Shift+letter):

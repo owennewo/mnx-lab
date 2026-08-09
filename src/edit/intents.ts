@@ -1,4 +1,4 @@
-// The editor's intent vocabulary — roadmap/inprogress/editor-input-layer.md.
+// The editor's intent vocabulary — roadmap/complete/editor-input-layer.md.
 //
 // Intents are the stable middle of the input layer: keymaps (experimental,
 // churning) map keys to intents, and the session maps intents to cursor moves

@@ -54,7 +54,7 @@ export class ScenarioPage extends LitElement {
   @state() private loadState: 'loading' | 'ready' | 'failed' = 'loading';
   @state() private loadError = '';
   @state() private allDefs = false;
-  // The editor incubates here (roadmap/proposed/editor-input-layer.md):
+  // The editor incubates here (roadmap/complete/editor-input-layer.md):
   // in-memory only — the workbench has no backend, and this page is a bench
   // for testing the editor, not for authoring corpus files.
   @state() private session: EditorSession | null = null;

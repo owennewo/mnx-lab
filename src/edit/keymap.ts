@@ -1,4 +1,4 @@
-// The declarative keymap — roadmap/proposed/editor-input-layer.md.
+// The declarative keymap — roadmap/complete/editor-input-layer.md.
 //
 // Bindings are DATA, not keydown switches: rebinding a key edits this table
 // and nothing else, and future emulation presets ("Like Guitar Pro") are

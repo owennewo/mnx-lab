@@ -101,8 +101,19 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   convergence `src/edit/ops.ts` has always named: the assist loop emitting **`EditOp[]`
   through `applyOp`** instead of replacing whole documents, so AI edits land in the session's
   undo history and op log like keyboard edits. Split out of
-  [editor-input-layer.md](inprogress/editor-input-layer.md); the voice half stays in
+  [editor-input-layer.md](complete/editor-input-layer.md); the voice half stays in
   [open_router.md](proposed/open_router.md).
+- **[editor-element-promotion.md](proposed/editor-element-promotion.md)** — promoting the
+  editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
+  embed face and studio. Split out of [editor-input-layer.md](complete/editor-input-layer.md)
+  when that closed. **Deliberately parked** behind a two-part trigger — the intent
+  vocabulary stabilising AND a real second consumer asking for editing (a check, not a
+  debate) — with the costs of moving early recorded (API pressure on the public surface,
+  the shadow-DOM focus story coming due, embed bundle weight; testing is unchanged either
+  way). The promotion review's work list: the `elements/ → edit/` boundary change, the
+  element contract under [viewer-surface.md](proposed/viewer-surface.md)'s layered rule,
+  focus story, code-splitting, and the palette's `elements → assist` question from
+  [editor-ai-prompt.md](proposed/editor-ai-prompt.md).
 - **[tuplets-grace-notes.md](proposed/tuplets-grace-notes.md)** — tuplets and grace notes
   **across both converters and on tab**. Split out of
   [guitar-pro.md](complete/guitar-pro.md) when that closed, at its real scope: the model
@@ -117,29 +128,27 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   **voice/transcription stage was never built**. What's left here is the voice half.
 
 ### inprogress/
-- **[editor-input-layer.md](inprogress/editor-input-layer.md)** — the **editor's input layer**,
-  designed to be testable while super-experimental: a declarative keymap (key → intent), a
-  pure state machine (intent + selection → `EditOp`), and **intent-trace fixtures** that are
-  also recordings ("copy trace" → `harness/fixtures/edit-traces/`, replayed by vitest, undo-all
-  must round-trip byte-identically). Editor edits the model, renderer reacts; the cursor is a
-  **rhythmic position, not a note id** (empty measures must be navigable). **Phases 1+2 built
-  2026-08-03** (`src/edit/{intents,keymap,cursor,session,tabStrings}.ts`): string-mode cursor
-  with entry ghosts, note entry/deletion/duration, two-digit fret combining, **setup-as-ops**
-  (`setTuning`/`setTimeSignature`), the `lab/document/empty-tab-canvas` template, the
-  from-scratch flagship trace, **setup popovers** (Shift+T/Shift+U, typed grammar in
-  `setupGrammar.ts`), and **rests & ties** (§8.11's no-rest-key model: ops keep touched bars
-  full of beat rests; `T` ties; `Alt+↑↓` nudges rests), and the **command palette**
-  (`Ctrl+K` commands / `Ctrl+G` go-to, one grammar shared with the rail filter; bar jumps are
-  a traceable `goToMeasure` intent; AI mode split to
-  [editor-ai-prompt.md](proposed/editor-ai-prompt.md)). Remaining: `elements/` promotion.
-  Grounded in
-  [research/notation-editor-keyboard-models.md](../research/notation-editor-keyboard-models.md).
 - **[04-scenario-library.md](inprogress/04-scenario-library.md)** — the scenario corpus
   structure (`spec/` + `lab/`, path-derived ids, `meta.json`, `expected.primitives.json`,
   `check-scenarios.mjs`). The one clean-room doc that describes *current* reality; the corpus
   keeps growing, so it stays "in progress."
 
 ### complete/
+- **[editor-input-layer.md](complete/editor-input-layer.md)** — the **editor's input layer**,
+  complete 2026-08-09: a declarative keymap (key → intent), a pure state machine
+  (intent + selection → `EditOp`), and **intent-trace fixtures** that are also recordings
+  ("copy trace" → `harness/fixtures/edit-traces/`, replayed by vitest, undo-all must
+  round-trip byte-identically). Editor edits the model, renderer reacts; the cursor is a
+  **rhythmic position, not a note id** (empty measures must be navigable). Shipped across
+  2026-08-03: string-mode cursor with entry ghosts, note entry/deletion/duration, two-digit
+  fret combining, **setup-as-ops** (`setTuning`/`setTimeSignature`) behind Shift+T/Shift+U
+  popovers, **rests & ties** (§8.11's no-rest-key model), the **command palette**
+  (`Ctrl+K` commands / `Ctrl+G` go-to, bar jumps as a traceable `goToMeasure` intent), the
+  `lab/document/empty-tab-canvas` template and the from-scratch flagship trace. Both
+  descendants live in proposed/: the AI mode
+  ([editor-ai-prompt.md](proposed/editor-ai-prompt.md)) and the `elements/` promotion
+  ([editor-element-promotion.md](proposed/editor-element-promotion.md)). Grounded in
+  [research/notation-editor-keyboard-models.md](../research/notation-editor-keyboard-models.md).
 - **[guitar-pro.md](complete/guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion at
   `converters/guitarpro-mnx/`, using **alphaTab** as a headless format codec (no binary
   parsing hand-written), complete 2026-08-09 with **56 tests**. Reads gp3/gp4/gp5/gpx/gp,

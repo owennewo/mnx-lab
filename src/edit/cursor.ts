@@ -1,4 +1,4 @@
-// The position cursor — roadmap/inprogress/editor-input-layer.md.
+// The position cursor — roadmap/complete/editor-input-layer.md.
 //
 // The cursor is a RHYTHMIC POSITION plus a VERTICAL LINE, not a note id: an
 // empty measure has no note keys at all, so a note-list cursor would make a

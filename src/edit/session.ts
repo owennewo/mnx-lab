@@ -1,5 +1,5 @@
 // The editor session: intent + (doc, cursor) → cursor move or EditOp.
-// This is stage 2 of the input layer (roadmap/inprogress/editor-input-layer.md)
+// This is stage 2 of the input layer (roadmap/complete/editor-input-layer.md)
 // — DOM-free on purpose, so the workbench mount and the harness replay test
 // drive the exact same object. The session records every intent it handles;
 // that log IS the trace fixture ("recording is the same stream as undo").

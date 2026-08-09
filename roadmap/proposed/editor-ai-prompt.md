@@ -1,7 +1,7 @@
 # The AI prompt in the editor — the palette's third mode
 
 > **Status: proposed (2026-08-03), not started.** Split out of
-> [editor-input-layer.md](../inprogress/editor-input-layer.md), whose remaining
+> [editor-input-layer.md](../complete/editor-input-layer.md), whose remaining
 > palette work is now go-to + commands only; the AI half grew its own design
 > questions and deserves its own decision record. The research grounding is
 > [research/notation-editor-keyboard-models.md](../../research/notation-editor-keyboard-models.md)

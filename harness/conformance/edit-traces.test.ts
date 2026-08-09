@@ -1,5 +1,5 @@
 // Intent-trace replay over the editor session — the editor's fixture
-// mechanism (roadmap/proposed/editor-input-layer.md).
+// mechanism (roadmap/complete/editor-input-layer.md).
 //
 // A fixture in harness/fixtures/edit-traces/ names a corpus scenario (the
 // starting document — fixtures never copy scores), an intent list (never
