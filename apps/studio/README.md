@@ -8,7 +8,7 @@ the product starts (roadmap/complete/structure-lab.md).
 The Soundslice-like consumer service: a person's whole library of MNX documents —
 accounts, sync across devices, purchased/imported scores, practice tools (looping,
 slowdown, backing tracks). A **different product for different users** than the
-workbench (`src/ui/`), which is the lab's internal review instrument. The two must
+workbench (`src/workbench/`), which is the lab's internal review instrument. The two must
 never bleed together; that guard is structural, not vigilance.
 
 ## The framework-neutrality contract
@@ -22,7 +22,7 @@ framework-neutral surfaces:
 - the **`mnx-lab` library** (`mnx-lab/model`, `mnx-lab/engine`, `mnx-lab/audio`);
 - the **Worker origin's** reserved API seams.
 
-It must not import `src/ui/` (the workbench shell is a leaf; dependency-cruiser makes
+It must not import `src/workbench/` (the workbench shell is a leaf; dependency-cruiser makes
 that a red build), and nothing may import studio. Anything both shells want is first
 *promoted* into `elements/` or below — a deliberate, reviewed move.
 

@@ -1098,7 +1098,7 @@ review even if editing never lands.
 
 ### 6.1 Now — a navigation keymap for the review workbench
 
-The workbench is a queue-driven review tool (`src/ui/queue.ts`, the topic-grouped rail,
+The workbench is a queue-driven review tool (`src/workbench/queue.ts`, the topic-grouped rail,
 `#/scenario/<id>?view=…` deep links, `#/objects` coverage map). Reviewing is exactly the
 "navigation mode" the accessibility work describes, and it is pure sense-0: **no key should
 mutate anything**, which makes it the cheapest possible place to establish a keymap
@@ -1191,7 +1191,7 @@ tab-first by charter:
 - Everything renders into **shadow DOM** — key handling, focus management and
   `:focus-visible` all need an explicit story there, and shadow roots are where a naive
   document-level listener silently breaks.
-- Does the review keymap belong in `ui/` (shell-only, leaf) or `elements/` (so an embedded
+- Does the review keymap belong in `workbench/` (shell-only, leaf) or `elements/` (so an embedded
   `ScoreViewer` is keyboard-navigable too)? The embed face arguably needs score navigation
   more than the workbench does — an embedded score with no keyboard access is inaccessible
   on someone else's site.

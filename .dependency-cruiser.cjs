@@ -7,8 +7,8 @@
 //   model → engine · audio · edit · corpus · storage   (peers over the model)
 //   edit  → assist                          (assist carries ops; edit owns them)
 //   engine · audio · model → elements       (the embeddable surface)
-//   elements → ui                           (workbench shell — leaf)
-//   ui · elements → entries                 (build faces)
+//   elements → workbench                    (workbench shell — leaf)
+//   workbench · elements → entries          (build faces)
 //   worker: model + assist only             (sibling ceiling; DOM-free)
 //   harness: anything except the shells     (exercises the machinery headlessly)
 
@@ -42,7 +42,7 @@ module.exports = {
       'src/engine',
       'src/audio'
     ]),
-    layerRule('ui-is-a-leaf-consumer', 'src/ui', [
+    layerRule('workbench-is-a-leaf-consumer', 'src/workbench', [
       'src/model',
       'src/engine',
       'src/audio',
@@ -56,18 +56,18 @@ module.exports = {
     {
       name: 'nothing-imports-the-shells',
       comment:
-        'ui/ and entries/ are leaves: anything two consumers want must first be ' +
+        'workbench/ and entries/ are leaves: anything two consumers want must first be ' +
         'promoted down into elements/ or below — a deliberate, reviewed move.',
       severity: 'error',
-      from: { path: '^(src|worker|harness)/', pathNot: '^src/(ui|entries)/' },
-      to: { path: '^src/(ui|entries)/' }
+      from: { path: '^(src|worker|harness)/', pathNot: '^src/(workbench|entries)/' },
+      to: { path: '^src/(workbench|entries)/' }
     },
     {
       name: 'harness-not-into-shells',
       comment: 'The harness exercises machinery headlessly, never the app shells.',
       severity: 'error',
       from: { path: '^harness/' },
-      to: { path: '^src/(ui|entries|elements)/' }
+      to: { path: '^src/(workbench|entries|elements)/' }
     },
     {
       name: 'no-alphatab-outside-converters',

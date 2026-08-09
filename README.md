@@ -12,7 +12,7 @@ format, with emphasis on guitar tab — live at **[mnx-lab.totai.uk](https://mnx
 - **A spec-loop pipeline** (`spec/`) — `sync:spec` mirrors the standard down;
   `push:proposal` packages our proposals (schema diff + scenarios + engravings) back up
   in the spec's native fixture format.
-- **The workbench** (`src/ui/`) — a review-first shell over all of it: attention queue,
+- **The workbench** (`src/workbench/`) — a review-first shell over all of it: attention queue,
   render/compare views, deep links.
 
 ```bash

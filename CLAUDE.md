@@ -56,7 +56,7 @@ harness/             every way the evidence is exercised
   render/                 render-png.ts (engravings for proposals; needs google-chrome)
   helpers/                corpusPrimitives (SMuFL from disk + fixed viewport), svgString
 src/                 the apparatus — capability layers (order below)
-  model/  engine/  audio/  edit/  corpus/  storage/  assist/  elements/  ui/  entries/
+  model/  engine/  audio/  edit/  corpus/  storage/  assist/  elements/  workbench/  entries/
 worker/              Hono; a secrets-and-validation proxy for assist ONLY
   api/                    editNotation, models + reserved 501 seams documents, auth
   editLoop.ts             the self-correcting loop, factored for future evals
@@ -75,13 +75,13 @@ model                                      (floor — imports nothing internal)
 model → engine · audio · edit · corpus · storage      (peers over the model)
 edit  → assist                             (assist carries ops; edit owns them)
 engine · audio · model → elements          (the embeddable surface)
-elements → ui                              (workbench shell — leaf)
-ui · elements → entries                    (build faces)
+elements → workbench                       (workbench shell — leaf)
+workbench · elements → entries             (build faces)
 worker: model + assist only                (sibling ceiling; DOM-free)
 ```
 
 `.dependency-cruiser.cjs` + `npm run check:boundaries` (inside `npm run build`) make a
-violation a red build. **`ui/` and `entries/` are leaves — nothing imports them**;
+violation a red build. **`workbench/` and `entries/` are leaves — nothing imports them**;
 anything two shells want is first *promoted* into `elements/` or below, a deliberate,
 reviewed move. `model`/`engine`/`audio` stay importable from Node (no DOM at module top
 level; `engine/headless.ts` is the guarantee and the harness's entry). Lit is
@@ -158,10 +158,10 @@ demote every approval at once and the queue would stop meaning "the renderer cha
 they always were: proposal engravings and a review aid (`harness/render/render-png.ts`),
 never a golden and never hashed.
 
-## The workbench (`src/ui/`) — review-first, no backend
+## The workbench (`src/workbench/`) — review-first, no backend
 
 Home is the **attention queue** (blocked → stale → never-seen; current counted, not
-shown), derived from committed provenance in `src/ui/queue.ts`. Every scenario + view
+shown), derived from committed provenance in `src/workbench/queue.ts`. Every scenario + view
 has a stable deep link: `#/scenario/<id>?view=notation|tab|both|compare|json`
 (unspecified ⇒ the document's `tab.staffKind` hint). Tab/both exist only when the
 strings are KNOWN — declared in the document, or supplied through the scenario
@@ -201,8 +201,8 @@ attribution and never committed here. The scenario page distinguishes **loading*
 **The workbench has no backend — by rule.** It must stay fully functional (minus live
 AI edits) from static build output alone: the corpus is committed JSON, documents live
 in IndexedDB, and every verification write happens through harness scripts editing repo
-files — git is the database and the audit trail. The Worker is *not* its backend; `ui/`
-may reach it only through `assist/`. If browser-driven corpus authoring is ever wanted,
+files — git is the database and the audit trail. The Worker is *not* its backend;
+`workbench/` may reach it only through `assist/`. If browser-driven corpus authoring is ever wanted,
 the pattern is a dev-only Vite middleware writing repo files — never a deployed API.
 The real API layer (documents, auth, sync) belongs to **studio**
 ([apps/studio/README.md](apps/studio/README.md)) on the reserved seams

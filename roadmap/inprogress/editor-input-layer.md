@@ -19,7 +19,7 @@
 > `staffPosition` on a rest), `T` toggles a tie to the next same-pitch event
 > (minting deterministic target ids), and `Alt+←→` is duration's primary
 > binding with `-`/`=` as the alias. **Command palette shipped**
-> (`src/ui/CommandPalette.ts`): one widget, two entry points — `Ctrl+K`
+> (`src/workbench/CommandPalette.ts`): one widget, two entry points — `Ctrl+K`
 > prefills the `>` command prefix, `Ctrl+G` opens bare go-to — with one
 > grammar shared with the rail filter (`matchesQuery`): bar numbers move the
 > cursor via a `goToMeasure` NAVIGATION INTENT (traceable, clamped), `def:`
@@ -123,15 +123,15 @@ with git-as-database: a **"copy trace" button** puts the trace JSON on the clipb
 the human pastes it into `harness/fixtures/edit-traces/` and commits. No dev
 middleware, no write API, no backend.
 
-## Where the code lives — incubate in `ui/`, promote later
+## Where the code lives — incubate in `workbench/`, promote later
 
 The layer order says `engine · audio · model → elements` — **`elements/` may not import
 `edit/` today**. Rather than change that boundary while the input layer is experimental,
-the editor surface **incubates in `ui/`** (workbench-only), and the move into
+the editor surface **incubates in `workbench/`** (workbench-only), and the move into
 `elements/` — which is what makes it consumable by studio and the embed face — happens
 as the deliberate, reviewed *promotion* the repo already prescribes, when the intent
 vocabulary has stabilised. This answers the survey's own open question (§6.3, review
-keymap in `ui/` or `elements/`): `ui/` now, `elements/` when stable, and the
+keymap in `workbench/` or `elements/`): `workbench/` now, `elements/` when stable, and the
 dependency-cruiser change is part of that promotion review. Stages 1–2 are DOM-free
 pure modules regardless (candidates: keymap table + `selection.ts` beside `ops.ts` in
 `edit/`), so the promotion moves mount-point code, not logic.

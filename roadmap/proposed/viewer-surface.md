@@ -93,7 +93,7 @@ every future candidate.
 - `hasTab` — derived from the document inside the element (the one-liner already lives
   in `src/engine/headless.ts`); prop deleted or demoted to override.
 - `invalidByDesign` / `pinnedErrors` / `errorPointer` — the spec-gap exhibit is
-  workbench chrome; move the panel up into `ui/`, or explicitly document these as
+  workbench chrome; move the panel up into `workbench/`, or explicitly document these as
   workbench-tier extensions outside the surface contract. Either way the surface doc
   draws the line.
 
@@ -113,7 +113,7 @@ every future candidate.
    current prop keep/derive/evict. Cheap, and everything after cites it.
 2. **`view="auto"`** + `hasTab` derivation + precedence documented in
    mnx-extensions.md's staffKind entry. (Smallest slice; fixes the read-only player.)
-3. **Evict the exhibit panel** into `ui/` (or document the workbench tier).
+3. **Evict the exhibit panel** into `workbench/` (or document the workbench tier).
 4. **`hide` set**, starting with `badges` (emit-side, easy) and `lyrics` (layout-side,
    proves the reflow path through `RenderOptions`).
 5. **Density levers land per render-density-zoom.md**, entering through
