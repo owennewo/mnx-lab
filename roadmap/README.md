@@ -3,7 +3,8 @@
 Planning docs for MNX Lab, filed by their status **relative to the current codebase**. This
 is an archive of intent, not a live task board. The recent driver — the spec-approval sweep —
 is now complete ([complete/SPEC_APPROVAL.md](complete/SPEC_APPROVAL.md), 57/57 verified); the
-living corpus contract is [inprogress/04-scenario-library.md](inprogress/04-scenario-library.md).
+corpus contract is [complete/04-scenario-library.md](complete/04-scenario-library.md), closed
+2026-08-09 — corpus growth now arrives as its own tickets, not through that doc.
 
 The big picture: the `clean_room_impl/` **pivot plan** (library-first: scenarios → gallery →
 render → tab → playback → editing → AI-last) was **executed by refactoring the existing app
@@ -128,12 +129,44 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   **voice/transcription stage was never built**. What's left here is the voice half.
 
 ### inprogress/
-- **[04-scenario-library.md](inprogress/04-scenario-library.md)** — the scenario corpus
-  structure (`spec/` + `lab/`, path-derived ids, `meta.json`, `expected.primitives.json`,
-  `check-scenarios.mjs`). The one clean-room doc that describes *current* reality; the corpus
-  keeps growing, so it stays "in progress."
+- **[selection-ladder.md](inprogress/selection-ladder.md)** — **progressive selection as
+  the input-mode system**: input modes *are* the selection level, and each level offers
+  exactly the properties the data model puts there. One containment ladder (note → event →
+  [container] → voice-measure → part-measure → measure → [section] → score) walked
+  vertically by Escape/Enter (breadcrumb descent, relative addresses), with the horizontal
+  axis as a second gesture family — Shift+arrows extend, **Ctrl+A is the closure** (closure
+  at part-measure = the part, which is why part is not a rung). Presence rule skips absent
+  rungs; ghost enclosures let the cursor address what *could* exist (selection addresses
+  what is). One visual vocabulary — the enclosure — from a square note cell through column
+  slices, voice-run hulls and growing panels to the score frame, so Escape/Enter
+  animate as a single shape tween that teaches containment. Both view shows primary +
+  echo per projection (the active-projection bit also picks the input dialect: ↑↓ = pitch
+  vs string). Builds on [editor-input-layer.md](complete/editor-input-layer.md)'s
+  intents/traces/overlay substrate; the section rung is live evidence for
+  [score-text.md](proposed/score-text.md)'s proposed field. **Phases 1–2 built
+  2026-08-09**: the vertical ladder as session state (`src/edit/selection.ts`,
+  Escape/Enter intents, level-scaled arrows with section jumps) pinned by
+  `harness/conformance/selection.test.ts`, and the enclosure vocabulary
+  (`src/elements/enclosure.ts` — cell → slice → run → panel → panel-wide → frame from
+  the rendered SVG's own geometry; the both view's part-measure panel spans the
+  notation+tab pair via the shared-barline join; voice-measure revised to a single run
+  hull, part-measure/measure to the ink/space principle). **Next: the per-level
+  navigation map** — decide what every key means at each rung (e.g. ↑↓ at event level =
+  next voice?), built one level at a time with a hands-on review after each. Then:
+  extension/closures, the relax/tighten animation, primary/echo asymmetry, ghost cells,
+  container rungs.
 
 ### complete/
+- **[04-scenario-library.md](complete/04-scenario-library.md)** — the scenario corpus
+  structure (`spec/` + `lab/`, path-derived ids, `meta.json`, dual-verdict `expect`, the
+  primitives/SVG/both goldens, `check-scenarios`), **closed 2026-08-09** fully populated
+  against the pinned spec: 104 scenarios (52 mirrored + 52 lab), 18 lab categories
+  including tab-fingering, tab-techniques, five invalid-by-design spec-gap exhibits,
+  percussion and layout, and **feature-def coverage 105/108** with the plumbing
+  exclusion list shared between the checker and `#/objects` via `manifest.json`. The
+  three uncovered defs are recorded in the doc with reasons (`line-type`,
+  `slur-tie-end-location` — an orphan def nothing references, `smufl-font`). New spec
+  pins, proposals and renderer features open their own tickets from here.
 - **[editor-input-layer.md](complete/editor-input-layer.md)** — the **editor's input layer**,
   complete 2026-08-09: a declarative keymap (key → intent), a pure state machine
   (intent + selection → `EditOp`), and **intent-trace fixtures** that are also recordings

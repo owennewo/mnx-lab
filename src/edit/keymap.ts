@@ -40,11 +40,24 @@ export const NAVIGATION_LAYER: KeymapLayer = {
   bindings: [
     { code: 'ArrowRight', intent: { type: 'nextPosition' } },
     { code: 'ArrowLeft', intent: { type: 'prevPosition' } },
-    { code: 'ArrowRight', ctrl: true, intent: { type: 'nextMeasure' } },
-    { code: 'ArrowLeft', ctrl: true, intent: { type: 'prevMeasure' } },
+    // The Ctrl climb (selection-ladder navigation map): the arrow applied at
+    // the nearest ancestor rung where it means something different. At note
+    // level ←→ = bar jump / tab event-skip, ↑↓ = voice jump.
+    { code: 'ArrowRight', ctrl: true, intent: { type: 'jumpNext' } },
+    { code: 'ArrowLeft', ctrl: true, intent: { type: 'jumpPrev' } },
+    { code: 'ArrowUp', ctrl: true, intent: { type: 'jumpUp' } },
+    { code: 'ArrowDown', ctrl: true, intent: { type: 'jumpDown' } },
     // Down/up the vertical axis: strings in a tab part, the note stack else.
     { code: 'ArrowDown', intent: { type: 'lineDown' } },
-    { code: 'ArrowUp', intent: { type: 'lineUp' } }
+    { code: 'ArrowUp', intent: { type: 'lineUp' } },
+    // The selection ladder: Escape relaxes toward score (the mount turns a
+    // relax past the top into the conventional deselect, so Escape's meaning
+    // never changes — it just becomes gradual), Enter tightens toward note.
+    // Overlays keep precedence mechanically: popovers/palette preventDefault
+    // their Escape/Enter before the window listener sees them.
+    { code: 'Escape', intent: { type: 'relaxSelection' } },
+    { code: 'Enter', intent: { type: 'tightenSelection' } },
+    { code: 'NumpadEnter', intent: { type: 'tightenSelection' } }
   ]
 };
 
@@ -70,6 +83,10 @@ export const EDIT_LAYER: KeymapLayer = {
     // Tie: `T` (Dorico/MuseScore convention; free in this scheme — the
     // technique alphabet B H S V X O doesn't claim it).
     { code: 'KeyT', intent: { type: 'toggleTie' } },
+    // The notation projection's entry action: toggle a notehead at the
+    // cursor's (staff position × beat) cell. Binding provisional — Space is
+    // the play/pause convention elsewhere; the ladder review owns the call.
+    { code: 'Space', intent: { type: 'toggleNote' } },
     { code: 'KeyZ', ctrl: true, intent: { type: 'undo' } },
     { code: 'KeyY', ctrl: true, intent: { type: 'redo' } },
     { code: 'KeyZ', ctrl: true, shift: true, intent: { type: 'redo' } }

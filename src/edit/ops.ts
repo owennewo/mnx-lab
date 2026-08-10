@@ -58,6 +58,19 @@ export type EditOp =
       duration: { base: MnxNoteValueBase; dots?: number };
     }
   | {
+      /** Insert a note BY PITCH at a metric position in voice 0 — the
+       *  notation projection's entry (spatial cursor + toggle; the
+       *  selection-ladder navigation map). Same event/rest/insert mechanics
+       *  as `insertNote`; a chord member on the same letter+octave is
+       *  replaced (one staff position, one note). No string/fret is written
+       *  — tab derives positions from pitch as usual. */
+      type: 'insertPitchNote';
+      measureIndex: number;
+      onset: [number, number];
+      pitch: { step: 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B'; octave: number; alter?: number };
+      duration: { base: MnxNoteValueBase; dots?: number };
+    }
+  | {
       /** Remove one note; a now-empty event becomes a rest of the same
        *  duration, so the measure's grid does not shift under the cursor. */
       type: 'deleteNote';
@@ -201,6 +214,34 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         seq.content.splice(found.index, 0, { duration: { ...op.duration }, notes: [note] });
         // The §8.11 invariant: a touched measure always has content for its
         // full metric duration, so unentered positions are already rests.
+        padMeasureRests(next, op.measureIndex);
+      }
+      return next;
+    }
+    case 'insertPitchNote': {
+      const seq = entrySequence(next, op.measureIndex);
+      if (!seq) return next;
+      const note: MnxNote = { pitch: { ...op.pitch } };
+      const target: Onset = { num: op.onset[0], den: op.onset[1] };
+      const found = eventAtOnset(seq, target);
+      if (found?.event) {
+        const event = found.event;
+        if (event.rest) {
+          delete event.rest;
+          event.notes = [note];
+          return next;
+        }
+        event.notes ??= [];
+        // One staff position, one note: same letter+octave replaces.
+        const existing = event.notes.findIndex(
+          n => n.pitch.step === op.pitch.step && n.pitch.octave === op.pitch.octave
+        );
+        if (existing >= 0) event.notes.splice(existing, 1, note);
+        else event.notes.push(note);
+        return next;
+      }
+      if (found) {
+        seq.content.splice(found.index, 0, { duration: { ...op.duration }, notes: [note] });
         padMeasureRests(next, op.measureIndex);
       }
       return next;

@@ -13,8 +13,9 @@ import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
 import type { MnxTuningEntry } from '../model/mnx.ts';
 import type { ViewMode } from '../elements/ScoreViewer.ts';
-import type { SelectionContext } from '../elements/mnxContext.ts';
+import type { EnclosureKind, SelectionContext } from '../elements/mnxContext.ts';
 import { EditorSession } from '../edit/session.ts';
+import type { SelectionLevel } from '../edit/selection.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import {
   EDIT_LAYER,
@@ -33,6 +34,20 @@ type PageView = ViewMode | 'compare' | 'json';
 
 /** How many object tags to show before collapsing the tail into a count. */
 const DEF_PREVIEW = 9;
+
+/** Ladder level → enclosure shape (roadmap/inprogress/selection-ladder.md).
+ *  The mapping lives HERE so elements/ knows shapes, never editor levels.
+ *  measure and section share panel-wide: the extent difference (one bar vs
+ *  the labelled range) comes from the footprint itself. */
+const ENCLOSURE_BY_LEVEL: Record<SelectionLevel, EnclosureKind> = {
+  note: 'cell',
+  event: 'slice',
+  voiceMeasure: 'run',
+  partMeasure: 'panel',
+  measure: 'panel-wide',
+  section: 'panel-wide',
+  score: 'frame'
+};
 
 @customElement('mnx-scenario-page')
 export class ScenarioPage extends LitElement {
@@ -487,8 +502,25 @@ export class ScenarioPage extends LitElement {
       activeMeasureIndex: session.cursor.measureIndex,
       activeVoiceIndex: null,
       activeEventIndex: null,
-      selectedNoteIds: this.cursorHidden ? [] : session.selectedNoteKeys
+      selectedNoteIds: this.cursorHidden ? [] : session.selectedNoteKeys,
+      enclosure: this.cursorHidden ? null : ENCLOSURE_BY_LEVEL[session.selectionLevel],
+      cursor: this.cursorHidden ? null : session.cursorContext()
     };
+  }
+
+  /** Keep the session's projection following the pane on screen: notation
+   *  pane → staff space, tab pane → fingerboard; the both view keeps its
+   *  last (tab by default on tab documents). Recorded as an intent so traces
+   *  replay navigation faithfully. */
+  private followProjection() {
+    const entry = this.entry();
+    if (!entry || !this.session) return;
+    const view = this.activeView(entry);
+    const desired =
+      view === 'tab' ? 'tab' : view === 'notation' ? 'notation' : null;
+    if (!desired || desired === this.session.projection) return;
+    if (desired === 'tab' && this.session.mode !== 'string') return;
+    this.session.handleIntent({ type: 'setProjection', projection: desired });
   }
 
   /**
@@ -517,11 +549,6 @@ export class ScenarioPage extends LitElement {
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable)
         return;
     }
-    if (event.code === 'Escape') {
-      this.cursorHidden = true;
-      this.syncFromSession();
-      return;
-    }
     if (this.session && this.activeLayers().length > 0) {
       const action = resolveShellAction(strokeOf(event));
       if (action && this.openPopover(action)) {
@@ -532,8 +559,18 @@ export class ScenarioPage extends LitElement {
     const intent = resolveIntent(strokeOf(event), this.activeLayers());
     if (!intent || !this.session) return;
     event.preventDefault();
-    this.cursorHidden = false;
-    this.session.handleIntent(intent);
+    this.followProjection();
+    // The selection ladder (roadmap/inprogress/selection-ladder.md): Escape
+    // relaxes rung by rung; only a relax that can't widen further — already at
+    // score — becomes the old deselect. While deselected, Escape stays inert
+    // (and unrecorded — deselection is view chrome, not session history).
+    if (intent.type === 'relaxSelection' && this.cursorHidden) return;
+    const handled = this.session.handleIntent(intent);
+    if (intent.type === 'relaxSelection') {
+      if (!handled) this.cursorHidden = true;
+    } else {
+      this.cursorHidden = false;
+    }
     this.copied = false;
     this.syncFromSession();
   };
@@ -823,9 +860,14 @@ export class ScenarioPage extends LitElement {
                 <span class="cur">
                   m${this.session.cursor.measureIndex + 1} ·
                   ${this.session.cursor.onset.num}/${this.session.cursor.onset.den}
-                  ${this.session.mode === 'string'
+                  ${this.session.projection === 'tab'
                     ? html`· s${this.session.cursor.line}`
-                    : nothing}
+                    : html`· p${this.session.cursor.line}`}
+                  ${this.cursorHidden
+                    ? nothing
+                    : html`· <b title="selection level — Esc widens, Enter narrows"
+                          >${this.session.selectionLevel}</b
+                        >`}
                   · ${this.session.entryDurationBase}${this.session.selectedNoteKeys.length &&
                   !this.cursorHidden
                     ? html` · ${this.session.selectedNoteKeys[0]}`

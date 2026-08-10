@@ -26,6 +26,16 @@ import type { MnxSequenceItem, MnxSequence, MnxStructure, MnxNote } from '../mod
 import { isTimedEvent, isTuplet, isTremolo } from '../model/mnx.ts';
 import { syntheticNoteKey } from '../model/noteKeys.ts';
 import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
+import { clefAt, staffPositionOfPitch } from './staffSpace.ts';
+
+/**
+ * The active projection — which SPACE the cursor's vertical line addresses
+ * (roadmap/inprogress/selection-ladder.md): 'tab' = the fingerboard (line is
+ * a string number, 1 = top), 'notation' = the staff (line is a staff
+ * position in half-staff-spaces from the middle line, positive up). Both
+ * projections view ONE model; switching remaps the line, never the music.
+ */
+export type Projection = 'notation' | 'tab';
 
 /** A metric onset within a measure, as a reduced whole-note fraction. */
 export interface Onset {
@@ -37,8 +47,10 @@ export interface Onset {
 export interface NoteSlot {
   /** `note.id`, or the synthetic positional key for id-less documents. */
   noteKey: string;
-  /** The visual line: annotated string, else the heuristic default. */
+  /** The tab line: annotated string, else the heuristic default. */
   line: number;
+  /** The notation line: staff position under the measure's clef. */
+  staffPosition: number;
   voiceIndex: number;
   eventIndex: number;
   noteIndex: number;
@@ -51,6 +63,9 @@ export interface Position {
   measureIndex: number;
   onset: Onset;
   slots: NoteSlot[];
+  /** Voice indices with a TIMED event starting here (rests included) — what
+   *  the notation projection's voice-sticky walk stops at. */
+  voices: number[];
 }
 
 export interface EditorCursor {
@@ -207,11 +222,12 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
   }
 
   for (let measureIndex = 0; measureIndex < measureCount; measureIndex++) {
-    const byOnset: { onset: Onset; raw: RawSlot[] }[] = [];
+    const clef = clefAt(doc, measureIndex);
+    const byOnset: { onset: Onset; raw: RawSlot[]; voices: Set<number> }[] = [];
     const at = (onset: Onset) => {
       let found = byOnset.find(p => onsetsEqual(p.onset, onset));
       if (!found) {
-        found = { onset, raw: [] };
+        found = { onset, raw: [], voices: new Set() };
         byOnset.push(found);
       }
       return found;
@@ -225,11 +241,13 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
       sequence.content.forEach((item, eventIndex) => {
         if (isTimedEvent(item)) {
           const position = at(onset);
+          position.voices.add(voiceIndex);
           (item.notes ?? []).forEach((note, noteIndex) => {
             position.raw.push({
               slot: {
                 noteKey: noteKeyOf(note, measureIndex, voiceIndex, eventIndex, noteIndex),
                 line: note._x?.mnxLab?.string ?? defaultStringFor(note.pitch, tuning, capo),
+                staffPosition: staffPositionOfPitch(clef, note.pitch),
                 voiceIndex,
                 eventIndex,
                 noteIndex
@@ -246,12 +264,15 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
 
     // The entry ghost: the un-filled remainder of the measure (empty measure
     // → its start). A rest-only voice already made real positions, but the
-    // ghost past the LAST event is what makes append-entry navigable.
+    // ghost past the LAST event is what makes append-entry navigable. A ghost
+    // is a potential event of VOICE 0, so it joins voice 0's walk — that is
+    // what makes an empty bar addressable in the notation projection too.
     const span = spans[measureIndex] ?? { num: 1, den: 1 };
     if (onsetLess(voiceZeroEnd, span) && !byOnset.some(p => onsetsEqual(p.onset, voiceZeroEnd))) {
-      byOnset.push({ onset: voiceZeroEnd, raw: [] });
+      byOnset.push({ onset: voiceZeroEnd, raw: [], voices: new Set([0]) });
     }
-    if (byOnset.length === 0) byOnset.push({ onset: { num: 0, den: 1 }, raw: [] });
+    if (byOnset.length === 0)
+      byOnset.push({ onset: { num: 0, den: 1 }, raw: [], voices: new Set([0]) });
 
     byOnset.sort((a, b) => a.onset.num * b.onset.den - b.onset.num * a.onset.den);
     positions.push(
@@ -260,7 +281,8 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
         onset: p.onset,
         slots: p.raw
           .sort((a, b) => a.slot.line - b.slot.line || b.midi - a.midi || a.order - b.order)
-          .map(r => r.slot)
+          .map(r => r.slot),
+        voices: [...p.voices].sort((a, b) => a - b)
       }))
     );
   }
@@ -272,7 +294,7 @@ export function initialCursor(grid: PositionGrid): EditorCursor {
   const first = grid.positions[0];
   if (!first) return { measureIndex: 0, onset: { num: 0, den: 1 }, line: grid.mode === 'string' ? 1 : 0 };
   const line =
-    grid.mode === 'string' ? first.slots[0]?.line ?? 1 : 0;
+    grid.mode === 'string' ? first.slots[0]?.line ?? 1 : first.slots[0]?.staffPosition ?? 0;
   return { measureIndex: first.measureIndex, onset: first.onset, line };
 }
 
@@ -287,13 +309,19 @@ export function positionAt(grid: PositionGrid, cursor: EditorCursor): Position |
   return grid.positions[positionIndexOf(grid.positions, cursor)];
 }
 
-/** The note slot the cursor selects: the note on its string ('string' mode),
- *  or the line-th note of the stack ('ordinal' mode). */
-export function slotAt(grid: PositionGrid, cursor: EditorCursor): NoteSlot | undefined {
+/** The note slot the cursor selects: the note on its string (tab), or the
+ *  note on its staff position (notation) — the line's meaning follows the
+ *  active projection, both SPACES (selection-ladder navigation map). */
+export function slotAt(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  projection: Projection
+): NoteSlot | undefined {
   const position = positionAt(grid, cursor);
   if (!position || position.slots.length === 0) return undefined;
-  if (grid.mode === 'string') return position.slots.find(s => s.line === cursor.line);
-  return position.slots[Math.min(Math.max(cursor.line, 0), position.slots.length - 1)];
+  if (projection === 'tab' && grid.mode === 'string')
+    return position.slots.find(s => s.line === cursor.line);
+  return position.slots.find(s => s.staffPosition === cursor.line);
 }
 
 /**
@@ -319,6 +347,46 @@ export function movePosition(grid: PositionGrid, cursor: EditorCursor, delta: 1 
   return next ? toPosition(cursor, next) : cursor;
 }
 
+/**
+ * The voice-sticky INK walk (notation note-level ←→, and tab's Ctrl
+ * event-skip): the prev/next position where the anchor voice has a timed
+ * event — rests and its own entry ghost included, other voices' onsets
+ * skipped. Landing 'nearest' re-aims the line at the anchor voice's
+ * nearest-staff-position note (tie → upper); 'keep' holds the line (tab
+ * stays on its string).
+ */
+export function movePositionInk(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  delta: 1 | -1,
+  projection: Projection,
+  landing: 'nearest' | 'keep'
+): EditorCursor {
+  const index = positionIndexOf(grid.positions, cursor);
+  if (index < 0) return cursor;
+  const anchor = slotAt(grid, cursor, projection)?.voiceIndex ?? 0;
+  for (let i = index + delta; i >= 0 && i < grid.positions.length; i += delta) {
+    const position = grid.positions[i];
+    if (!position.voices.includes(anchor)) continue;
+    let line = cursor.line;
+    if (landing === 'nearest') {
+      const mine = position.slots.filter(s => s.voiceIndex === anchor);
+      if (mine.length > 0) {
+        let best = mine[0];
+        for (const slot of mine) {
+          const dist = Math.abs(slot.staffPosition - cursor.line);
+          const bestDist = Math.abs(best.staffPosition - cursor.line);
+          if (dist < bestDist || (dist === bestDist && slot.staffPosition > best.staffPosition))
+            best = slot;
+        }
+        line = best.staffPosition;
+      }
+    }
+    return { measureIndex: position.measureIndex, onset: position.onset, line };
+  }
+  return cursor;
+}
+
 /** Jump to the first position of the neighbouring measure. */
 export function moveMeasure(grid: PositionGrid, cursor: EditorCursor, delta: 1 | -1): EditorCursor {
   const target = cursor.measureIndex + delta;
@@ -339,16 +407,23 @@ export function moveToMeasure(
   return first ? toPosition(cursor, first) : cursor;
 }
 
-/** Walk the vertical axis: strings top→bottom in 'string' mode (clamped to
- *  the fingerboard), the note stack in 'ordinal' mode. */
-export function moveLine(grid: PositionGrid, cursor: EditorCursor, delta: 1 | -1): EditorCursor {
-  if (grid.mode === 'string') {
+/** How far the notation cursor may leave the staff, in staff positions
+ *  (±16 = four ledger lines' worth each way). */
+const STAFF_POSITION_RANGE = 16;
+
+/** Walk the vertical axis of the active projection's SPACE: strings
+ *  top→bottom on the fingerboard, staff positions (occupied or not) on the
+ *  staff — visual down decreases the staff position (+up in MNX units). */
+export function moveLine(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  delta: 1 | -1,
+  projection: Projection
+): EditorCursor {
+  if (projection === 'tab' && grid.mode === 'string') {
     const next = Math.min(Math.max(cursor.line + delta, 1), grid.lineCount);
     return { ...cursor, line: next };
   }
-  const position = positionAt(grid, cursor);
-  if (!position || position.slots.length === 0) return cursor;
-  const current = Math.min(Math.max(cursor.line, 0), position.slots.length - 1);
-  const next = Math.min(Math.max(current + delta, 0), position.slots.length - 1);
+  const next = Math.min(Math.max(cursor.line - delta, -STAFF_POSITION_RANGE), STAFF_POSITION_RANGE);
   return { ...cursor, line: next };
 }

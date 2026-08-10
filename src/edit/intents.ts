@@ -16,7 +16,24 @@ export type NavigationIntent =
   | { type: 'lineDown' }
   | { type: 'lineUp' }
   /** Jump to a bar (0-based), clamped — the go-to grammar's "12" (survey §3.8). */
-  | { type: 'goToMeasure'; measureIndex: number };
+  | { type: 'goToMeasure'; measureIndex: number }
+  /** The selection ladder (roadmap/inprogress/selection-ladder.md): relax
+   *  widens one rung (note → … → score; past the top the MOUNT deselects),
+   *  tighten narrows back down the same containment chain. Navigation, not
+   *  mutation — the ladder changes what the cursor addresses, never the doc. */
+  | { type: 'relaxSelection' }
+  | { type: 'tightenSelection' }
+  /** The active projection: which SPACE the vertical line addresses (string
+   *  vs staff position). Recorded so traces replay navigation faithfully. */
+  | { type: 'setProjection'; projection: 'notation' | 'tab' }
+  /** The Ctrl climb (selection-ladder navigation map): the direction applied
+   *  at the nearest ancestor rung where it means something different, then
+   *  descend back. At note level: ←→ = bar jump (notation) / event-skip
+   *  (tab), ↑↓ = voice jump. Never crosses the component boundary. */
+  | { type: 'jumpNext' }
+  | { type: 'jumpPrev' }
+  | { type: 'jumpUp' }
+  | { type: 'jumpDown' };
 
 /** Mutation: becomes an EditOp against the cursor's position/note. */
 export type MutationIntent =
@@ -24,6 +41,12 @@ export type MutationIntent =
    *  INSERT one there (rest / empty space). Consecutive digits on an
    *  unmoved cursor combine into two-digit frets (1,2 → 12). */
   | { type: 'fretDigit'; digit: number }
+  /** The notation projection's entry action: toggle a notehead at the
+   *  cursor's (staff position × beat) cell — add the key-signature default
+   *  pitch, or remove the note already there. The spatial-entry model of the
+   *  selection-ladder navigation map (chords need no mode: the address
+   *  disambiguates). */
+  | { type: 'toggleNote' }
   /** Delete the note under the cursor (an emptied event becomes a rest). */
   | { type: 'delete' }
   /** Step the value of the event under the cursor (or, on an entry ghost,
@@ -52,7 +75,14 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'prevMeasure',
   'lineDown',
   'lineUp',
-  'goToMeasure'
+  'goToMeasure',
+  'relaxSelection',
+  'tightenSelection',
+  'setProjection',
+  'jumpNext',
+  'jumpPrev',
+  'jumpUp',
+  'jumpDown'
 ]);
 
 export function isNavigationIntent(intent: EditorIntent): intent is NavigationIntent {

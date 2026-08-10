@@ -12,6 +12,7 @@ import { renderMnxToSvgTab } from '../engine/tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../engine/notation/notationRenderer.ts';
 import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
 import { isSmuflLoaded, loadSmufl } from '../engine/smufl/smufl.ts';
+import { drawCursorGhost, drawEnclosure } from './enclosure.ts';
 import type { PinnedError } from '../model/pinnedErrors.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
@@ -63,6 +64,11 @@ export class ScoreViewer extends LitElement {
   @state() private renderErrors: { pane: string; message: string }[] = [];
 
   private resizeHandler = () => this.renderScore();
+
+  /** One-shot re-render when the Bravura font file finishes loading: the
+   *  enclosure overlay measures glyph boxes, and a first paint that races the
+   *  font would freeze fallback-font geometry into the highlight. */
+  private fontRedrawQueued = false;
 
   static styles = [
     sharedChrome,
@@ -150,6 +156,59 @@ export class ScoreViewer extends LitElement {
       #score-container svg .fret-number.selected,
       #score-container svg .fret-number.active {
         fill: var(--accent) !important;
+      }
+
+      /* The selection-ladder enclosure (enclosure.ts): one vocabulary, fill
+         fading and border firming as the level widens — cell → slice → beads
+         → panel → panel-wide → frame. Behind the ink, never clickable. */
+      #score-container svg .enclosure {
+        pointer-events: none;
+      }
+
+      #score-container svg .enclosure rect {
+        fill: var(--accent);
+        stroke: var(--accent);
+      }
+
+      #score-container svg .enc-cell rect {
+        fill-opacity: 0.16;
+        stroke-opacity: 0.9;
+      }
+
+      #score-container svg .enc-slice rect {
+        fill-opacity: 0.13;
+        stroke-opacity: 0.6;
+      }
+
+      #score-container svg .enc-run rect {
+        fill-opacity: 0.13;
+        stroke-opacity: 0.55;
+      }
+
+      #score-container svg .enc-panel rect {
+        fill-opacity: 0.09;
+        stroke-opacity: 0.45;
+      }
+
+      #score-container svg .enc-panel-wide rect {
+        fill-opacity: 0.06;
+        stroke-opacity: 0.5;
+      }
+
+      #score-container svg .enc-frame rect {
+        fill-opacity: 0;
+        stroke-opacity: 0.75;
+      }
+
+      /* The cursor's ghost cell: hollow, dashed — a place for a thing. */
+      #score-container svg .cursor-ghost {
+        pointer-events: none;
+      }
+
+      #score-container svg .cursor-ghost rect {
+        fill: none;
+        stroke: var(--accent);
+        stroke-opacity: 0.8;
       }
 
       /* The tab fret knock-out must match the paper, not the app bg. */
@@ -337,21 +396,47 @@ export class ScoreViewer extends LitElement {
           }
         : undefined;
 
+    // The selection-ladder enclosure: drawn from the finished SVG's own
+    // geometry, after the engine is done — the renderer never learns about
+    // editor state, the overlay reads what it drew.
+    const enclosed = (pane: HTMLElement) => {
+      const kind = this.selection?.enclosure;
+      const svg = pane.querySelector('svg');
+      if (kind && svg) {
+        drawEnclosure(svg, kind);
+        // The ghost cell: the cursor's own cell when empty (note level only —
+        // wider rungs select what exists, the ghost is an entry affordance).
+        const ghost = this.selection?.cursor;
+        if (kind === 'cell' && ghost) drawCursorGhost(svg, ghost);
+        if (!this.fontRedrawQueued && !document.fonts.check('4px Bravura')) {
+          this.fontRedrawQueued = true;
+          void document.fonts.ready.then(() => this.renderScore());
+        }
+      }
+    };
+
     this.container.innerHTML = '';
     if (this.viewMode === 'tab') {
       const pane = this.appendPane(this.hasTab ? 'tab · _x.mnxLab' : null);
-      guarded(pane, 'tab', () => renderMnxToSvgTab({ container: pane, ...commonOpts, tabSetup }));
+      guarded(pane, 'tab', () => {
+        renderMnxToSvgTab({ container: pane, ...commonOpts, tabSetup });
+        enclosed(pane);
+      });
     } else if (this.viewMode === 'notation') {
       const pane = this.appendPane(this.hasTab ? 'notation' : null);
-      guarded(pane, 'notation', () =>
-        renderMnxToSvgNotation({ container: pane, ...commonOpts })
-      );
+      guarded(pane, 'notation', () => {
+        renderMnxToSvgNotation({ container: pane, ...commonOpts });
+        enclosed(pane);
+      });
     } else {
       // One composed system — notation staff over tab staff in a single SVG
       // with joined barlines (src/engine/layout/bothSystem.ts), not two
       // stacked renders.
       const pane = this.appendPane('notation + tab · _x.mnxLab');
-      guarded(pane, 'both', () => renderMnxToSvgBoth({ container: pane, ...commonOpts, tabSetup }));
+      guarded(pane, 'both', () => {
+        renderMnxToSvgBoth({ container: pane, ...commonOpts, tabSetup });
+        enclosed(pane);
+      });
     }
 
     // Only update state when it changed, to avoid a render loop.

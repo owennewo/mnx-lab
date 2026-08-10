@@ -18,13 +18,26 @@ import {
   moveLine,
   moveMeasure,
   movePosition,
+  movePositionInk,
   moveToMeasure,
+  onsetLess,
   onsetsEqual,
+  positionAt,
   slotAt,
   type EditorCursor,
-  type PositionGrid
+  type PositionGrid,
+  type Projection
 } from './cursor.ts';
 import { capoOf, defaultStringFor, tuningOf } from './tabStrings.ts';
+import { clefAt, keyFifthsAt, pitchAtStaffPosition } from './staffSpace.ts';
+import {
+  presentLevels,
+  relaxLevel,
+  sectionStarts,
+  selectionNoteKeys,
+  tightenLevel,
+  type SelectionLevel
+} from './selection.ts';
 
 /** The on-disk shape of harness/fixtures/edit-traces/<name>.json. */
 export interface TraceFixture {
@@ -61,6 +74,14 @@ export class EditorSession {
   /** Digit-combining anchor: consecutive fret digits on an unmoved cursor
    *  combine (1,2 → 12) — deterministic, no timers, so traces replay. */
   private lastDigit: { anchor: string; fret: number } | null = null;
+  /** The selection ladder rung (roadmap/inprogress/selection-ladder.md). The
+   *  cursor is the anchor; the level says how much around it is selected.
+   *  Relaxing never moves the cursor, so tighten re-resolves the same
+   *  measure/onset/line as relative addresses — the implicit breadcrumb. */
+  private level: SelectionLevel = 'note';
+  /** Which SPACE the cursor's line addresses (selection-ladder map): the
+   *  fingerboard on tab documents by default, else the staff. */
+  private activeProjection: Projection;
   readonly initial: MnxStructure;
 
   constructor(
@@ -74,6 +95,7 @@ export class EditorSession {
     this.history = new EditHistory(this.initial);
     this.grid = buildGrid(this.initial);
     this.cursorState = initialCursor(this.grid);
+    this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
   }
 
   get doc(): MnxStructure {
@@ -118,10 +140,36 @@ export class EditorSession {
     return this.history.canUndo;
   }
 
-  /** Selection keys for the highlight overlay: the note under the cursor. */
+  get selectionLevel(): SelectionLevel {
+    return this.level;
+  }
+
+  get projection(): Projection {
+    return this.activeProjection;
+  }
+
+  /** Selection keys for the highlight overlay: the current rung's footprint —
+   *  each level paints exactly the notes its operations can affect. */
   get selectedNoteKeys(): string[] {
-    const slot = slotAt(this.grid, this.cursorState);
-    return slot ? [slot.noteKey] : [];
+    return selectionNoteKeys(this.doc, this.grid, this.cursorState, this.level, this.activeProjection);
+  }
+
+  /** The cursor's cell for the overlay's ghost: whether it is occupied, its
+   *  line in the active projection's space, and the beat's ink (any voice)
+   *  as column anchors. */
+  cursorContext(): {
+    occupied: boolean;
+    staffPosition: number | null;
+    string: number | null;
+    anchorKeys: string[];
+  } {
+    const position = positionAt(this.grid, this.cursorState);
+    return {
+      occupied: !!slotAt(this.grid, this.cursorState, this.activeProjection),
+      staffPosition: this.activeProjection === 'notation' ? this.cursorState.line : null,
+      string: this.activeProjection === 'tab' ? this.cursorState.line : null,
+      anchorKeys: position?.slots.map(s => s.noteKey) ?? []
+    };
   }
 
   /**
@@ -167,15 +215,39 @@ export class EditorSession {
         return true;
       }
       case 'toggleTie': {
-        const slot = slotAt(this.grid, this.cursorState);
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
         this.apply({ type: 'toggleTie', noteId: slot.noteKey });
         return true;
       }
       case 'fretDigit':
         return this.fretDigit(intent.digit);
+      case 'toggleNote': {
+        // The notation projection's entry action: one (staff position ×
+        // beat) cell, one note — remove what is there, else add the key-
+        // signature default pitch. Entry targets voice 0 (the entry surface),
+        // so positions belonging only to other voices refuse.
+        if (this.activeProjection !== 'notation') return false;
+        const slot = slotAt(this.grid, this.cursorState, 'notation');
+        if (slot) {
+          this.apply({ type: 'deleteNote', noteId: slot.noteKey });
+          return true;
+        }
+        const position = positionAt(this.grid, this.cursorState);
+        if (!position || !position.voices.includes(0)) return false;
+        const clef = clefAt(this.doc, this.cursorState.measureIndex);
+        const fifths = keyFifthsAt(this.doc, this.cursorState.measureIndex);
+        this.apply({
+          type: 'insertPitchNote',
+          measureIndex: this.cursorState.measureIndex,
+          onset: [this.cursorState.onset.num, this.cursorState.onset.den],
+          pitch: pitchAtStaffPosition(clef, this.cursorState.line, fifths),
+          duration: { base: this.entryDuration }
+        });
+        return true;
+      }
       case 'delete': {
-        const slot = slotAt(this.grid, this.cursorState);
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
         this.apply({ type: 'deleteNote', noteId: slot.noteKey });
         return true;
@@ -251,7 +323,7 @@ export class EditorSession {
       }
     }
 
-    const slot = slotAt(this.grid, this.cursorState);
+    const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
     const note = this.selectedNote();
     if (slot && note) {
       const string =
@@ -280,11 +352,55 @@ export class EditorSession {
   private navigate(intent: EditorIntent): boolean {
     const before = this.cursorState;
     switch (intent.type) {
+      // The ladder walk. Presence is computed fresh at the cursor, so absent
+      // rungs (no note under a rest, no sections declared) are skipped.
+      case 'relaxSelection': {
+        const next = relaxLevel(presentLevels(this.doc, this.grid, before, this.activeProjection), this.level);
+        if (!next) return false; // at the top — the mount deselects
+        this.level = next;
+        return true;
+      }
+      case 'tightenSelection': {
+        const next = tightenLevel(presentLevels(this.doc, this.grid, before, this.activeProjection), this.level);
+        if (next) {
+          this.level = next;
+          return true;
+        }
+        if (this.level === 'note') return false; // the bottom — Enter's input job, later
+        // The breadcrumb (the carried line) didn't resolve to a note —
+        // moving while relaxed left it pointing at an empty cell. Descend to
+        // the NEAREST child instead of refusing (the corresponding-child
+        // fallback: history → nearest → first), preferring the anchor
+        // voice's notes (the event the selection was showing).
+        const position = positionAt(this.grid, before);
+        if (!position || position.slots.length === 0) return false;
+        const anchorVoice = position.voices.includes(0) ? 0 : position.voices[0];
+        const mine = position.slots.filter(s => s.voiceIndex === anchorVoice);
+        const pool = mine.length > 0 ? mine : position.slots;
+        const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
+        let best = pool[0];
+        for (const slot of pool) {
+          const lineOf = (s: typeof slot) => (tab ? s.line : s.staffPosition);
+          const dist = Math.abs(lineOf(slot) - before.line);
+          const bestDist = Math.abs(lineOf(best) - before.line);
+          // Ties break UPWARD: smaller string number, larger staff position.
+          if (
+            dist < bestDist ||
+            (dist === bestDist && (tab ? slot.line < best.line : slot.staffPosition > best.staffPosition))
+          )
+            best = slot;
+        }
+        this.cursorState = { ...before, line: tab ? best.line : best.staffPosition };
+        this.level = 'note';
+        return true;
+      }
+      // Bare arrows move by the rung's unit: positions at note/event, bars at
+      // the bar rungs, sections at section, nothing at score.
       case 'nextPosition':
-        this.cursorState = movePosition(this.grid, before, 1);
+        this.cursorState = this.moveHorizontal(before, 1);
         break;
       case 'prevPosition':
-        this.cursorState = movePosition(this.grid, before, -1);
+        this.cursorState = this.moveHorizontal(before, -1);
         break;
       case 'nextMeasure':
         this.cursorState = moveMeasure(this.grid, before, 1);
@@ -293,21 +409,113 @@ export class EditorSession {
         this.cursorState = moveMeasure(this.grid, before, -1);
         break;
       case 'lineDown':
-        this.cursorState = moveLine(this.grid, before, 1);
+        this.cursorState = moveLine(this.grid, before, 1, this.activeProjection);
         break;
       case 'lineUp':
-        this.cursorState = moveLine(this.grid, before, -1);
+        this.cursorState = moveLine(this.grid, before, -1, this.activeProjection);
         break;
       case 'goToMeasure':
         this.cursorState = moveToMeasure(this.grid, before, intent.measureIndex);
         break;
+      case 'setProjection': {
+        if (intent.projection === this.activeProjection) return false;
+        // A doc with no fingerboard has no tab projection to switch to.
+        if (intent.projection === 'tab' && this.grid.mode !== 'string') return false;
+        // Remap the line into the new space: the selected note carries over;
+        // otherwise land on the first note here, else the space's home row.
+        const selected =
+          slotAt(this.grid, before, this.activeProjection) ??
+          positionAt(this.grid, before)?.slots[0];
+        this.activeProjection = intent.projection;
+        this.cursorState = {
+          ...before,
+          line:
+            intent.projection === 'tab'
+              ? selected?.line ?? 1
+              : selected?.staffPosition ?? 0
+        };
+        return true;
+      }
+      // The Ctrl climb (selection-ladder map): ←→ = bar jump in BOTH
+      // projections. The pure rule gave tab an event-skip (its grid walk
+      // differs from the event walk on paper), but the note-level hands-on
+      // review overruled it: in single-voice music the grid IS the voice's
+      // events plus the ghost, so event-skip felt identical to bare → —
+      // degenerate in practice, and the climb continues to the bar.
+      case 'jumpNext':
+      case 'jumpPrev': {
+        const delta = intent.type === 'jumpNext' ? 1 : -1;
+        this.cursorState = moveMeasure(this.grid, before, delta);
+        return this.cursorState !== before;
+      }
+      case 'jumpUp':
+      case 'jumpDown': {
+        if (this.level !== 'note') return false;
+        const anchor = slotAt(this.grid, before, this.activeProjection)?.voiceIndex ?? 0;
+        const target = anchor + (intent.type === 'jumpDown' ? 1 : -1);
+        // The voice jump targets the event SOUNDING at the cursor's instant:
+        // voices rarely share onsets (an alternating bass against a melody
+        // almost never does), so requiring a same-beat onset made the jump
+        // feel broken — land on the target voice's event covering the
+        // cursor's beat (latest onset at or before it; else its first in
+        // the bar).
+        const inMeasure = this.grid.positions.filter(
+          p => p.measureIndex === before.measureIndex && p.voices.includes(target)
+        );
+        if (inMeasure.length === 0) return false;
+        const covering = [...inMeasure].reverse().find(p => !onsetLess(before.onset, p.onset));
+        const targetPos = covering ?? inMeasure[0];
+        const slots = targetPos.slots.filter(s => s.voiceIndex === target);
+        const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
+        this.cursorState = {
+          measureIndex: targetPos.measureIndex,
+          onset: targetPos.onset,
+          line: slots.length > 0 ? nearestSlotLine(slots, before.line, tab) : before.line
+        };
+        return true;
+      }
     }
     return this.cursorState !== before;
+  }
+
+  /** One step of horizontal movement in the current rung's unit. */
+  private moveHorizontal(before: EditorCursor, delta: 1 | -1): EditorCursor {
+    switch (this.level) {
+      case 'note':
+        // The note row of the navigation map: tab walks the full grid (space,
+        // string-sticky); notation walks this voice's ink, landing on the
+        // nearest-pitch member (snap-to-ink, the working default).
+        return this.activeProjection === 'tab' && this.grid.mode === 'string'
+          ? movePosition(this.grid, before, delta)
+          : movePositionInk(this.grid, before, delta, this.activeProjection, 'nearest');
+      case 'event':
+        return movePosition(this.grid, before, delta);
+      case 'voiceMeasure':
+      case 'partMeasure':
+      case 'measure':
+        return moveMeasure(this.grid, before, delta);
+      case 'section': {
+        // Next/previous section START; prev from mid-section goes to the own
+        // section's start first (the audio-player convention).
+        const starts = sectionStarts(this.doc);
+        const target =
+          delta === 1
+            ? starts.find(s => s > before.measureIndex)
+            : [...starts].reverse().find(s => s < before.measureIndex);
+        return target === undefined ? before : moveToMeasure(this.grid, before, target);
+      }
+      case 'score':
+        return before; // the whole score is selected — nowhere to go
+    }
   }
 
   private apply(op: EditOp): void {
     this.history.apply(op);
     this.reindex();
+    // A mutation acts at the cursor's note/position, so it re-anchors the
+    // selection there — typing a fret while a bar is selected must not leave
+    // the whole bar reading as "what you just edited".
+    this.level = 'note';
   }
 
   /** The grid derives from the document, so every doc change rebuilds it and
@@ -318,7 +526,7 @@ export class EditorSession {
   }
 
   private selectedNote(): MnxNote | undefined {
-    const slot = slotAt(this.grid, this.cursorState);
+    const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
     if (!slot) return undefined;
     const measure = this.doc.parts[0]?.measures?.[this.cursorState.measureIndex];
     const sequences = (measure?.sequences ?? []).filter(s => (s.staff ?? 1) === 1);
@@ -340,6 +548,27 @@ export class EditorSession {
     }
     return undefined;
   }
+}
+
+/** The slot line nearest `line` in the active space — ties break UPWARD
+ *  (smaller string number, larger staff position). */
+function nearestSlotLine(
+  slots: { line: number; staffPosition: number }[],
+  line: number,
+  tab: boolean
+): number {
+  const lineOf = (s: { line: number; staffPosition: number }) => (tab ? s.line : s.staffPosition);
+  let best = slots[0];
+  for (const slot of slots) {
+    const dist = Math.abs(lineOf(slot) - line);
+    const bestDist = Math.abs(lineOf(best) - line);
+    if (
+      dist < bestDist ||
+      (dist === bestDist && (tab ? slot.line < best.line : slot.staffPosition > best.staffPosition))
+    )
+      best = slot;
+  }
+  return lineOf(best);
 }
 
 function stepLadder(base: MnxNoteValueBase, step: 1 | -1): MnxNoteValueBase {
