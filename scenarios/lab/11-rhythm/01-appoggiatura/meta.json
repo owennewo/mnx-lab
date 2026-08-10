@@ -1,0 +1,31 @@
+{
+  "title": "An appoggiatura — unslashed grace note stealing forward",
+  "description": "A single grace note (D5) before a quarter-note C5, written without a slash and marked graceType stealFollowing — the classical appoggiatura, which leans on the beat and takes its time from the main note. The spec mirror covers the slashed acciaccatura default; this scenario pins the two fields that distinguish an appoggiatura: slash false (rendered — no slash is drawn) and the graceType enum (performance semantics, no visual difference).",
+  "bars": 1,
+  "tags": [
+    "rhythm",
+    "grace-notes"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/grace/"
+  ],
+  "coversDefs": [
+    "grace",
+    "grace-type",
+    "event",
+    "note",
+    "pitch",
+    "rest"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [
+    "grace-notes"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

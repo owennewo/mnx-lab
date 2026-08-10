@@ -1,0 +1,32 @@
+{
+  "title": "A triplet with its number suppressed",
+  "description": "One eighth-note triplet whose showNumber is noNumber — the convention for passages saturated with identical tuplets, where repeating the 3 on every beat is noise. The renderer honors the suppression (no number, and no bracket gap reserved for one). The enum also offers inner and both; both is not distinguished from inner yet, which is recorded rather than exercised here so the golden pins only settled behavior.",
+  "bars": 1,
+  "tags": [
+    "rhythm",
+    "tuplets"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/tuplet/"
+  ],
+  "coversDefs": [
+    "tuplet",
+    "tuplet-display-setting",
+    "note-value-quantity",
+    "event",
+    "note",
+    "pitch",
+    "rest"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [
+    "tuplets"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

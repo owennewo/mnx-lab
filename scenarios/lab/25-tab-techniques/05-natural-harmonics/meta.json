@@ -1,0 +1,31 @@
+{
+  "title": "Natural harmonics at the twelfth fret",
+  "description": "Two half notes: the octave harmonics of the open low E and A strings. MNX pitch is sounding, so each note stores what is heard (E3, A3) and the derivation ladder places it — string 6 and string 5 at fret 12, which for the octave node is also where the finger touches, so the tab digits read as a player expects. harmonic.type distinguishes natural from artificial/pinch/tap/semi/feedback; artificial harmonics (where the touching fret is not the sounding position) are deliberately left to a later scenario once the renderer can mark them. MusicXML's harmonic model is a known redesign candidate (w3c-cg/mnx#179). The renderer does not draw harmonic marks yet; the goldens pin the derived 12s.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "technique",
+    "technique:harmonic"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/179"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-techniques"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

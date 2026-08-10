@@ -1,0 +1,133 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "id": "m1",
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "vn1",
+      "name": "Violin 1",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 5
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vn2",
+      "name": "Violin 2",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "layouts": [
+    {
+      "id": "layout1",
+      "content": [
+        {
+          "type": "group",
+          "barlineStyle": "individual",
+          "symbol": "bracket",
+          "content": [
+            {
+              "type": "staff",
+              "sources": [
+                {
+                  "part": "vn1"
+                }
+              ]
+            },
+            {
+              "type": "staff",
+              "sources": [
+                {
+                  "part": "vn2"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "scores": [
+    {
+      "name": "Score",
+      "pages": [
+        {
+          "systems": [
+            {
+              "measure": "m1",
+              "layout": "layout1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

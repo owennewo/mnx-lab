@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mnx-lab.totai.uk/schemas/scenario-meta.schema.json/v1",
   "title": "MNX Lab scenario metadata (meta.json)",
-  "description": "Sidecar metadata for one scenario in the corpus. Identity (id, category) is derived from the folder path and deliberately NOT stored here. See roadmap/inprogress/04-scenario-library.md.",
+  "description": "Sidecar metadata for one scenario in the corpus. Identity (id, category) is derived from the folder path and deliberately NOT stored here. See roadmap/complete/04-scenario-library.md.",
   "type": "object",
   "properties": {
     "title": {

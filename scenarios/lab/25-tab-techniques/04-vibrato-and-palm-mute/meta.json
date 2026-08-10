@@ -1,0 +1,32 @@
+{
+  "title": "Vibrato and palm mute",
+  "description": "The two boolean techniques: a half-note D4 (string 2) with vibrato, then two palm-muted quarter-note chugs on the open low E. Both are flags rather than structured objects because they carry no parameters — vibrato depth and mute intensity are performance, not notation. Palm mute is arguably a span (like ottava) rather than a per-note flag; that open question is recorded in docs/mnx-extensions.md, and this scenario exercises the per-note form v5 actually has. The renderer does not draw either mark yet; the goldens pin the annotated notes rendering cleanly on both staves.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "technique",
+    "technique:vibrato",
+    "technique:palm-mute"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/63"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-techniques"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

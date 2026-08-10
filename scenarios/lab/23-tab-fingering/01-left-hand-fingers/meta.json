@@ -1,0 +1,31 @@
+{
+  "title": "Left-hand fingering on a C-major arpeggio",
+  "description": "Four quarter notes climbing a C-major arpeggio in open position, each annotated with its string and the conventional left-hand finger: C3 (string 5, finger 3), E3 (string 4, finger 2), G3 (string 3, open — no fingering, because open strings need none), C4 (string 2, finger 1). Fingering is flat on the note (a peer of string, not tab-scoped — piano wants it too) with hand + finger. The renderer does not draw fingering yet; the goldens pin that the annotations are carried without disturbing either staff.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "fingering",
+    "fingering:left"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-fingering"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

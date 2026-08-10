@@ -1,0 +1,32 @@
+{
+  "title": "Shift slide and legato slide",
+  "description": "Four quarter notes in two slid pairs: a shift slide up string 3 from A3 (fret 2) to C4 (fret 5), then a legato slide up string 4 from E3 (fret 2) to G3 (fret 5). The slide lives on the departing note and names its destination by note id — shift and legato differ only in whether the arrival is re-picked, so the data model is identical and the type field carries the distinction. slideIn/slideOut (no target) are the other two members of the enum. The renderer does not draw slides yet; the goldens pin the annotated notes rendering cleanly on both staves.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "technique",
+    "technique:slide"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/63"
+  ],
+  "coversDefs": [
+    "event",
+    "id",
+    "note",
+    "notes",
+    "pitch",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-techniques"
+  ],
+  "idRefs": true,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

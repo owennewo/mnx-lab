@@ -1,0 +1,32 @@
+{
+  "title": "The rare articulations: staccatissimo, stress, unstress, soft accent",
+  "description": "Four identical quarter-note C5s, each carrying one of the four less-common event markings the renderer draws: staccatissimo (the wedge-dot), stress, unstress, and soft accent. The spec mirror covers the everyday four (staccato, accent, tenuto, strong accent); this scenario completes the drawn set so every rendered marking glyph has a golden.",
+  "bars": 1,
+  "tags": [
+    "articulations"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/event-markings/"
+  ],
+  "coversDefs": [
+    "event-markings",
+    "staccatissimo",
+    "stress-marking",
+    "unstress-marking",
+    "soft-accent",
+    "event",
+    "note",
+    "pitch"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [
+    "articulations"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

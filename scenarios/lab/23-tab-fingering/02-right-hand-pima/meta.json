@@ -1,0 +1,31 @@
+{
+  "title": "Right-hand p-i-m-a across open strings",
+  "description": "A classical right-hand arpeggio pattern: thumb (p) on the open low E, then i-m-a on the open G, B and high E strings. Every note is an open string, so the left hand is silent and the only annotation of interest is fingering with hand: right — the p/i/m/a vocabulary that MusicXML keeps in a separate <pluck> element but v5 unifies under one fingering object. The renderer does not draw fingering yet; the goldens pin the open-string zeros on the tab staff.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "fingering",
+    "fingering:right"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-fingering"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

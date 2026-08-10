@@ -4,7 +4,7 @@ import { isPlumbingDef } from './plumbingDefs.ts';
 
 /**
  * The scenario corpus as the front-end sees it (see
- * roadmap/inprogress/04-scenario-library.md). Metadata is bundled eagerly (it is
+ * roadmap/complete/04-scenario-library.md). Metadata is bundled eagerly (it is
  * small and drives the rail, facets, and the coverage dashboard); score
  * documents and notes.md load on demand. The data model is deliberately FLAT:
  * "category" is just the default grouping facet — shelving by status, source,

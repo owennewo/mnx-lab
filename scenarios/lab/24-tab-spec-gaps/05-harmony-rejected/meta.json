@@ -1,0 +1,31 @@
+{
+  "title": "A harmony (chord symbol) on a global measure is rejected",
+  "description": "MNX has no harmony concept anywhere: no root, no kind, no chord symbol — the single most ubiquitous marking in guitar, jazz and pop notation. This document writes a minimal structured harmony (root + kind at a rhythmic position) on the global measure, parallel to how tempos already work, and pins the rejection: the global measure refuses unevaluated properties. The workaround is the _x.mnxLab.harmonies vendor block, shaped exactly like this exhibit so adoption deletes the wrapper.",
+  "bars": 1,
+  "tags": [
+    "spec-gap",
+    "harmony"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/measure-global/",
+    "https://github.com/w3c-cg/mnx/issues/109"
+  ],
+  "coversDefs": [
+    "measure-global",
+    "event",
+    "note",
+    "pitch"
+  ],
+  "expect": {
+    "standard": "invalid",
+    "extension": "n/a",
+    "errors": [
+      "/global/measures/0 [#/unevaluatedProperties]"
+    ]
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "valid"
+}

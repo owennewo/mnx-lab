@@ -1,0 +1,32 @@
+{
+  "title": "Marks the renderer carries but does not draw: spiccato, breath, bow direction",
+  "description": "Three quarter-note C5s with the three event markings that are valid MNX but have no glyph in the engraving yet: spiccato (excluded from the drawn set for want of a glyph in the bundled Bravura subset), a breath mark with the comma symbol, and an up-bow direction. Each is silently dropped — no badge, because a marking the reader would merely miss is a warning-grade gap at most. The goldens pin the bare notes; each mark that lands later moves this golden.",
+  "bars": 1,
+  "tags": [
+    "articulations",
+    "renderer-gap"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/event-markings/"
+  ],
+  "coversDefs": [
+    "event-markings",
+    "spiccato",
+    "breath-mark",
+    "breath-mark-symbol",
+    "bow-direction",
+    "event",
+    "note",
+    "pitch",
+    "rest"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

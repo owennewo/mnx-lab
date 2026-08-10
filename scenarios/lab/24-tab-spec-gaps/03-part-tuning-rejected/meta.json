@@ -1,0 +1,31 @@
+{
+  "title": "Instrument tuning and capo on a part are rejected",
+  "description": "MNX has no concept of instrument tuning: a part cannot say what its strings sound, so no fret can ever be derived from a pitch. This document writes a standard six-string tuning plus a capo as the flat part-level fields they would naturally be (the exact shape _x.mnxLab.strings/capo drafts) and pins the rejection: the part object refuses unevaluated properties. Without a declared fingerboard the whole derivation ladder of lab/tab-derivation is impossible — this gap is why no instrument is ever assumed.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "spec-gap",
+    "tuning",
+    "capo"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/part/",
+    "https://github.com/w3c-cg/mnx/issues/63"
+  ],
+  "coversDefs": [
+    "part",
+    "pitch"
+  ],
+  "expect": {
+    "standard": "invalid",
+    "extension": "n/a",
+    "errors": [
+      "/parts/0 [#/unevaluatedProperties]"
+    ]
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "valid"
+}

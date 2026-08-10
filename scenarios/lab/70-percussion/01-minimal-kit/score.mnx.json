@@ -1,0 +1,84 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "sounds": {
+      "kick": {
+        "midiNumber": 36,
+        "name": "Bass Drum"
+      }
+    },
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "drums",
+      "name": "Drums",
+      "kit": {
+        "kick": {
+          "name": "Kick",
+          "sound": "kick",
+          "staffPosition": -4
+        }
+      },
+      "measures": [
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "kitNotes": [
+                    {
+                      "kitComponent": "kick"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "kitNotes": [
+                    {
+                      "kitComponent": "kick"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "kitNotes": [
+                    {
+                      "kitComponent": "kick"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "kitNotes": [
+                    {
+                      "kitComponent": "kick"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

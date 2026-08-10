@@ -38,14 +38,16 @@ export const SCENARIO_GROUPS: readonly ScenarioGroup[] = [
   { name: 'Tab', match: /^lab\/tab-/ },
   { name: 'Edge cases & spec gaps', match: /edge-case|mismatch|spec-gap/ },
   { name: 'Pitch & accidentals', match: /accidental|key-signature|ottava/ },
-  { name: 'Rhythm & rests', match: /time-signature|dotted-note|tuplet|rest|duration/ },
+  // Anchored: a bare /space/ would also claim a future "spacing-*".
+  { name: 'Rhythm & rests', match: /time-signature|dotted-note|tuplet|rest|duration|(^|[/-])space([/-]|$)/ },
   { name: 'Beams', match: /beam/ },
   // Anchored: a bare /tie/ would also claim a future "properties" or "quantities".
   { name: 'Slurs & ties', match: /slur|(^|[/-])ties?([/-]|$)/ },
-  { name: 'Grace notes & tremolos', match: /grace|tremolo/ },
+  { name: 'Grace notes & tremolos', match: /grace|tremolo|appoggiatura|acciaccatura/ },
   { name: 'Dynamics & articulation', match: /dynamic|articulation|accent/ },
   { name: 'Text & lyrics', match: /lyric|score-text|tempo|direction|rehearsal|section|label/ },
   { name: 'Repeats & navigation', match: /repeat|jump|navigation/ },
+  { name: 'Percussion', match: /percussion/ },
   // Anchored for the same reason: a bare /part/ would claim "partial-*".
   { name: 'Layout & parts', match: /layout|(^|[/-])parts?([/-]|$)|staff|clef|voice/ }
 ];

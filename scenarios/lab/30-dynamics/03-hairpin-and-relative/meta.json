@@ -1,0 +1,31 @@
+{
+  "title": "A crescendo wedge and a relative dynamic",
+  "description": "Two half notes under the two dynamic-group types that carry no absolute value: a gradual group with wedgeType increasing (the crescendo hairpin) starting at beat one, and a relative group with relativeValue louder at beat three. The renderer draws point dynamics only — wedges and relative marks are a known renderer gap, so the goldens pin two unadorned notes; when hairpins land, this golden is the one that moves.",
+  "bars": 1,
+  "tags": [
+    "dynamics",
+    "wedges"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/dynamic-group/"
+  ],
+  "coversDefs": [
+    "dynamic-group",
+    "dynamic-group-type",
+    "wedge-type",
+    "relative-dynamic-value",
+    "rhythmic-position",
+    "event",
+    "note",
+    "pitch"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

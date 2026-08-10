@@ -1,0 +1,30 @@
+{
+  "title": "Fingering on a note is rejected",
+  "description": "Which finger plays a note — pedagogy's bread and butter on every instrument, not just fretted ones — has no home on the MNX note. This document writes a left-hand fingering as the flat note-level object it would naturally be (the exact shape _x.mnxLab.fingering drafts: hand + finger) and pins the rejection: the note object refuses unevaluated properties. Deliberately not tab-scoped — piano fingering is the same gap.",
+  "bars": 1,
+  "tags": [
+    "spec-gap",
+    "fingering"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/note/"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch"
+  ],
+  "expect": {
+    "standard": "invalid",
+    "extension": "n/a",
+    "errors": [
+      "notes/0 [#/unevaluatedProperties]"
+    ]
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "valid"
+}

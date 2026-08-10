@@ -1,4 +1,4 @@
-// Corpus police for scenarios/ (see roadmap/inprogress/04-scenario-library.md).
+// Corpus police for scenarios/ (see roadmap/complete/04-scenario-library.md).
 // Checks, per scenario: metadata validates against meta.schema.json, JSON files
 // are canonically formatted, actual validation verdicts (standard MNX + _x.mnxLab
 // extension) match the declared `expect` in both directions, pinned error
@@ -341,8 +341,26 @@ function main() {
   const statusSummary = Object.entries(STATUS_ORDER)
     .map(([s]) => `${s}: ${statusCounts[s] ?? 0}`)
     .join(', ');
+  // Feature-def coverage: the curated denominator (plumbing excluded — the
+  // exclusion list lives in scenarios/manifest.json, shared with the
+  // workbench's #/objects view). The uncovered list IS the backlog.
+  const plumbing = ctx.manifest.plumbingDefs ?? { defs: [], suffixes: [], prefixes: [] };
+  const plumbingSet = new Set(plumbing.defs ?? []);
+  const isPlumbingDef = def =>
+    plumbingSet.has(def) ||
+    (plumbing.suffixes ?? []).some(s => def.endsWith(s)) ||
+    (plumbing.prefixes ?? []).some(p => def.startsWith(p));
+  const featureDefs = [...ctx.mnxDefs].filter(d => !isPlumbingDef(d));
+  const uncoveredFeatureDefs = featureDefs.filter(d => !coveredDefs.has(d)).sort();
+
   console.log(`\n${corpus.length} scenario(s) — ${statusSummary}`);
   console.log(`Defs coverage: ${coveredDefs.size} of ${ctx.mnxDefs.size} schema $defs referenced by coversDefs`);
+  console.log(
+    `Feature-def coverage: ${featureDefs.length - uncoveredFeatureDefs.length} of ${featureDefs.length} (plumbing excluded per scenarios/manifest.json)`
+  );
+  if (uncoveredFeatureDefs.length > 0) {
+    console.log(`Uncovered feature defs (the backlog): ${uncoveredFeatureDefs.join(', ')}`);
+  }
   console.log(allErrors.length === 0 ? 'check-scenarios: OK' : `check-scenarios: ${allErrors.length} error(s)`);
   process.exit(allErrors.length === 0 ? 0 : 1);
 }

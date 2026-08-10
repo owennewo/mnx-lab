@@ -1,0 +1,31 @@
+{
+  "title": "Bend up, then pre-bend and release",
+  "description": "Two half notes on string 3, both sounding D4. The first carries a whole-step bend as a curve: alter 0 at position 0 rising to alter 2 at position 1. The second is the inverse gesture — a pre-bend: alter already 2 at position 0, held to the midpoint, released to 0 by the end. Bends are curves of {position, alter} in semitones, not a single interval, which is exactly what MusicXML cannot say (its bend is one number) and why the extension drafts this shape. The renderer does not draw bends yet; the goldens pin the annotated notes rendering cleanly on both staves.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "technique",
+    "technique:bend"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/63"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-techniques"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

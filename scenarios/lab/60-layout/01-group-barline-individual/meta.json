@@ -1,0 +1,36 @@
+{
+  "title": "A bracketed group with individual barlines",
+  "description": "Two violin parts in one bracketed group whose barlineStyle is individual: each staff closes its own barline instead of sharing one stroke through the group — the convention for vocal groups, here exercised on the smallest possible pair. individual is the one member of the enum the renderer distinguishes; instrument, unified and mensurstrich all currently draw as the unified default, which is why this scenario pins the honored value rather than the whole enum.",
+  "bars": 1,
+  "tags": [
+    "layout",
+    "barlines"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/staff-group/"
+  ],
+  "coversDefs": [
+    "staff-group",
+    "staff-group-barline-style",
+    "system-layout",
+    "system",
+    "page",
+    "score",
+    "staff",
+    "staff-source",
+    "event",
+    "note",
+    "pitch"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [
+    "layouts"
+  ],
+  "idRefs": true,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

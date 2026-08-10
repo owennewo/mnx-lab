@@ -1,0 +1,28 @@
+{
+  "title": "A space — one deliberately empty beat",
+  "description": "Quarter-note C4, then a space of a quarter (duration is a whole-note fraction: 1/4), then a half-note E4. A space is sequence content that occupies time but draws nothing — not a rest, which is a visible assertion of silence, but an absence, used for voices that genuinely have nothing in part of a bar. The renderer gives the space its column and moves on; the goldens pin the gap.",
+  "bars": 1,
+  "tags": [
+    "rhythm",
+    "space"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/space/"
+  ],
+  "coversDefs": [
+    "space",
+    "fraction",
+    "event",
+    "note",
+    "pitch"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

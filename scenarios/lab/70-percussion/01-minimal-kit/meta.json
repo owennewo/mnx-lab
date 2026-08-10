@@ -1,0 +1,28 @@
+{
+  "title": "A one-drum kit: four kick hits",
+  "description": "The smallest possible percussion document: a global sound (MIDI 36, Bass Drum), a part-level kit mapping one component to a staff position, and four quarter-note events whose kitNotes reference the component instead of carrying pitched notes. Unpitched percussion is a whole MNX subsystem the renderer does not draw yet — kit events currently produce nothing, not even a badge — so the goldens pin an empty staff and this scenario is the tripwire for percussion support arriving.",
+  "bars": 1,
+  "tags": [
+    "percussion",
+    "kit",
+    "renderer-gap"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/kit-component/"
+  ],
+  "coversDefs": [
+    "sound",
+    "kit-component",
+    "kit-note",
+    "event"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": true,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

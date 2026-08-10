@@ -1,0 +1,61 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "harmonies": [
+          {
+            "position": {
+              "fraction": [
+                0,
+                1
+              ]
+            },
+            "root": {
+              "step": "E"
+            },
+            "kind": "major"
+          }
+        ]
+      }
+    ]
+  },
+  "parts": [
+    {
+      "name": "Guitar",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 3
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
