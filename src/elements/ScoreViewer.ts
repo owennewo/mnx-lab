@@ -7,7 +7,8 @@ import {
   selectionContext
 } from './mnxContext.ts';
 import type { PlaybackState, SelectionContext } from './mnxContext.ts';
-import { MnxDocument, MnxTuningEntry } from '../model/mnx.ts';
+import { MnxDocument, MnxPart, MnxTuningEntry } from '../model/mnx.ts';
+import type { PartTabSetups, TabSetup } from '../engine/tab/guitarPositions.ts';
 import { renderMnxToSvgTab } from '../engine/tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../engine/notation/notationRenderer.ts';
 import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
@@ -48,9 +49,20 @@ export class ScoreViewer extends LitElement {
    * Viewer-supplied instrument: overrides the document's `_x.mnxLab.strings`
    * / `capo` for rendering (presentation only — never written back). Without
    * either source, no instrument is assumed and tab staves don't render.
+   * The flat pair applies to EVERY part — right for single-instrument
+   * documents, wrong for ensembles (it clobbers parts that declared their
+   * own strings and hands the rest an instrument they never asked for).
    */
   @property({ attribute: false }) stringsOverride: MnxTuningEntry[] | null = null;
   @property({ type: Number }) capoOverride: number | null = null;
+  /**
+   * Per-part instrument overrides (roadmap/inprogress/core-score-hud.md),
+   * keyed by part `id` when the part has one, else by its index as a string.
+   * Mirrors the shape of the declaration it stands in for — `_x.mnxLab`
+   * strings/capo live on the part. Per part it wins over the flat pair
+   * above, which remains the fallback for parts without an entry.
+   */
+  @property({ attribute: false }) partTabSetups: Record<string, TabSetup> | null = null;
   @property({ type: Boolean }) invalidByDesign = false;
   @property({ attribute: false }) pinnedErrors: PinnedError[] = [];
   /** Pointer of the pinned error currently highlighted in the document pane. */
@@ -78,13 +90,9 @@ export class ScoreViewer extends LitElement {
         display: block;
         height: 100%;
         overflow: auto;
-        padding: 26px;
+        padding: 5px;
         min-width: 0;
         background: var(--bg);
-      }
-
-      :host([compact]) {
-        padding: 16px;
       }
 
       .paper {
@@ -101,22 +109,6 @@ export class ScoreViewer extends LitElement {
       :host([compact]) .paper {
         padding: 16px 14px;
         border-radius: 8px;
-      }
-
-      .pane-cap {
-        font-family: var(--mono);
-        font-size: 10px;
-        color: var(--paper-line);
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin: 0 0 4px 4px;
-      }
-
-      /* Compact embed chrome (the container lives on the host card). */
-      @container mnx-embed (max-width: 419px) {
-        .pane-cap {
-          display: none;
-        }
       }
 
       /* Honor the engine's intrinsic size — fitPxPerSp already fills the
@@ -340,7 +332,8 @@ export class ScoreViewer extends LitElement {
       changed.has('zoom') ||
       changed.has('invalidByDesign') ||
       changed.has('stringsOverride') ||
-      changed.has('capoOverride')
+      changed.has('capoOverride') ||
+      changed.has('partTabSetups')
     ) {
       this.renderScore();
     }
@@ -388,13 +381,26 @@ export class ScoreViewer extends LitElement {
       }
     };
 
-    const tabSetup =
+    const flatSetup: TabSetup | undefined =
       this.stringsOverride || this.capoOverride !== null
         ? {
             ...(this.stringsOverride ? { strings: this.stringsOverride } : {}),
             ...(this.capoOverride !== null ? { capo: this.capoOverride } : {})
           }
         : undefined;
+    // Per-part overrides resolve by part id, then index; a part without an
+    // entry falls back to the flat pair (which applies to every part).
+    const perPart = this.partTabSetups;
+    const tabSetup: PartTabSetups | undefined = perPart
+      ? (part: MnxPart) => {
+          const parts = this.mnxDoc?.mnxJson.parts ?? [];
+          return (
+            (part.id !== undefined ? perPart[part.id] : undefined) ??
+            perPart[String(parts.indexOf(part))] ??
+            flatSetup
+          );
+        }
+      : flatSetup;
 
     // The selection-ladder enclosure: drawn from the finished SVG's own
     // geometry, after the engine is done — the renderer never learns about
@@ -415,15 +421,18 @@ export class ScoreViewer extends LitElement {
       }
     };
 
+    // No pane captions: the view is named by whichever surface hosts this
+    // element (the workbench's tabs, an embed host's chrome) — a label inside
+    // the paper spent engraving space restating it.
     this.container.innerHTML = '';
     if (this.viewMode === 'tab') {
-      const pane = this.appendPane(this.hasTab ? 'tab · _x.mnxLab' : null);
+      const pane = this.appendPane();
       guarded(pane, 'tab', () => {
         renderMnxToSvgTab({ container: pane, ...commonOpts, tabSetup });
         enclosed(pane);
       });
     } else if (this.viewMode === 'notation') {
-      const pane = this.appendPane(this.hasTab ? 'notation' : null);
+      const pane = this.appendPane();
       guarded(pane, 'notation', () => {
         renderMnxToSvgNotation({ container: pane, ...commonOpts });
         enclosed(pane);
@@ -432,7 +441,7 @@ export class ScoreViewer extends LitElement {
       // One composed system — notation staff over tab staff in a single SVG
       // with joined barlines (src/engine/layout/bothSystem.ts), not two
       // stacked renders.
-      const pane = this.appendPane('notation + tab · _x.mnxLab');
+      const pane = this.appendPane();
       guarded(pane, 'both', () => {
         renderMnxToSvgBoth({ container: pane, ...commonOpts, tabSetup });
         enclosed(pane);
@@ -445,13 +454,7 @@ export class ScoreViewer extends LitElement {
     }
   }
 
-  private appendPane(caption: string | null): HTMLElement {
-    if (caption) {
-      const cap = document.createElement('p');
-      cap.className = 'pane-cap';
-      cap.textContent = caption;
-      this.container.appendChild(cap);
-    }
+  private appendPane(): HTMLElement {
     const pane = document.createElement('div');
     this.container.appendChild(pane);
     return pane;

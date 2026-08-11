@@ -12,13 +12,13 @@ export interface MnxPitch {
 // shared namespace, so another app writing `_x.tab` for something else would
 // have made our own validator reject a legal document.
 //
-// v5 mirrors the adopted shape drafted in roadmap/proposed/instrument-position.md:
+// v5 mirrors the adopted shape drafted in roadmap/proposed/spec-instrument-position.md:
 // `string`, `fret` and `fingering` sit FLAT on the vendor dict (peers of `pitch`,
 // as they would be on `note`), the part declares `strings[]` + `capo` flat, and
 // only `technique` (pending a general articulations proposal) and `staffKind`
 // (upstream placement undecided) remain under the `tab` sub-namespace. The
 // string is the authoritative choice; the fret derives from string + pitch, and
-// a stored fret is validation-only. See roadmap/proposed/derived-positions.md.
+// a stored fret is validation-only. See roadmap/proposed/core-derived-positions.md.
 
 /** One control point on a bend curve. */
 export interface MnxBendPoint {
@@ -116,7 +116,7 @@ export interface MnxMeasureLabel {
  *  "let ring"). Shaped like `dynamic-group`: positioned, optionally scoped to a
  *  staff and voice, oriented above/below/between. Carries no typography — how a
  *  direction is set is the renderer's decision. Exactly one of `text`/`glyphs`.
- *  **Proposed, not adopted** — see roadmap/proposed/score-text.md. */
+ *  **Proposed, not adopted** — see roadmap/proposed/spec-score-text.md. */
 export interface MnxDirection {
   position: { fraction: [number, number] };
   text?: string;
@@ -358,7 +358,7 @@ export type MnxDynamicValue =
  *  required. A plain dynamic carries a `value` (enum) and/or `glyphs` (explicit
  *  SMuFL names for marks outside the enum). `wedgeType`/`end` describe a hairpin
  *  (crescendo/diminuendo) — not yet rendered; see the renderer gap in
- *  roadmap/complete/SPEC_APPROVAL.md. */
+ *  roadmap/complete/lab-spec-approval.md. */
 export interface MnxDynamic {
   position: {
     fraction: [number, number];
@@ -424,7 +424,7 @@ export interface MnxPartMeasure {
   beams?: MnxBeam[];
   dynamics?: MnxDynamic[];
   /** Free-text/symbolic instructions for this part. **Proposed, not adopted** —
-   *  see roadmap/proposed/score-text.md. */
+   *  see roadmap/proposed/spec-score-text.md. */
   directions?: MnxDirection[];
   ottavas?: MnxOttava[];
   clefs?: {
@@ -451,7 +451,7 @@ export interface MnxTuningEntry {
 
 /**
  * Standard guitar tuning, as an explicit declaration. NOT a default: since the
- * instrument-neutrality change (roadmap/proposed/derived-positions.md) an
+ * instrument-neutrality change (roadmap/proposed/core-derived-positions.md) an
  * absent `strings[]` means "no fingerboard declared" and tab views are
  * unavailable — no consumer silently assumes guitar. This constant exists for
  * the places that DECLARE standard tuning explicitly: the upgrade shim
@@ -476,7 +476,8 @@ export interface MnxTabPartExtension {
 export interface MnxPartExtension {
   /** Sounding pitch of each open string, before the capo. Named `strings`
    *  (not "tuning") because temperament work already claims that word
-   *  (w3c-cg/mnx#365). Absent ⇒ standard guitar tuning. */
+   *  (w3c-cg/mnx#365). Absent ⇒ no fingerboard: no instrument is ever
+   *  assumed, though a viewer may supply one as presentation (`TabSetup`). */
   strings?: MnxTuningEntry[];
   /** Shifts open-string pitches AND re-origins printed fret numbers. */
   capo?: number;
@@ -559,7 +560,7 @@ export interface MnxGlobalMeasure {
   /** A rehearsal mark: an arbitrary index into the score ("A", "12"). Score-wide,
    *  so it sits beside `segno`/`fine`/`jump` rather than in a part. **Proposed,
    *  not adopted** — validates against `schemas/mnx-schema.proposed.json` only.
-   *  See roadmap/proposed/score-text.md. */
+   *  See roadmap/proposed/spec-score-text.md. */
   rehearsal?: MnxMeasureLabel;
   /** The formal section beginning here ("Intro", "Verse 1"), extending until the
    *  next one. Separate from `rehearsal` because it states what the music *is*

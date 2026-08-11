@@ -46,7 +46,12 @@ import {
   emitTabTimeSig,
   emitTabVoices
 } from './tabStaff.ts';
-import { tabPositionContext, TabPositionContext, TabSetup } from '../tab/guitarPositions.ts';
+import {
+  resolveTabSetup,
+  tabPositionContext,
+  TabPositionContext,
+  PartTabSetups
+} from '../tab/guitarPositions.ts';
 
 /**
  * Pure layout for standard 5-line notation. Working in staff spaces, returns
@@ -177,7 +182,7 @@ const ARTICULATIONS: { key: keyof MnxEventMarkings; above: string; below: string
 
 const DYNAMIC_BASELINE_DROP_SP = 3.5; // glyph baseline below the bottom staff line
 
-// ---------- Score text (proposed: roadmap/proposed/score-text.md) ----------
+// ---------- Score text (proposed: roadmap/proposed/spec-score-text.md) ----------
 //
 // Rehearsal marks and sections are score-wide, so they stack above the TOP
 // staff of the system, clear of the tempo row. Directions belong to a part and
@@ -414,7 +419,7 @@ export interface LayoutNotationOptions {
   includeTabStaves?: boolean;
   /** Viewer-supplied instrument (strings/capo) — overrides each part's own
    *  declaration for the injected tab staves; never written back. */
-  tabSetup?: TabSetup;
+  tabSetup?: PartTabSetups;
 }
 
 const TITLE_SIZE_SP = 2.4;
@@ -772,7 +777,7 @@ interface RenderSegmentArgs {
   index: SpatialIndex;
   diagnostics: LayoutDiagnostic[];
   includeTabStaves: boolean;
-  tabSetup?: TabSetup;
+  tabSetup?: PartTabSetups;
 }
 
 // Left-of-system geometry: nested decorations step left of their parents,
@@ -837,34 +842,37 @@ function renderSegment(args: RenderSegmentArgs): {
   // The plan and every plan-indexed subsystem (beams, curves, ottavas,
   // dynamics, lyrics, labels) stay blind to tab staves — this overlay owns
   // vertical geometry and the extra emission only. Phase 2 of
-  // roadmap/complete/both-view-single-system.md.
+  // roadmap/complete/core-both-view-single-system.md.
   const tabParts: MnxPart[] = [];
   if (includeTabStaves && segment.staves.length) {
     const inSegment = new Set<MnxPart>();
     for (const st of segment.staves) for (const src of st.sources) inSegment.add(src.part);
     // A part can bear a tab staff only when its strings are KNOWN — declared
     // in the document or supplied by the viewer override. No instrument is
-    // ever assumed.
-    for (const p of mnx.parts ?? []) {
+    // ever assumed. Which known-strings parts bear one:
+    //  - a part opting in via staffKind — the document's own hint, or the
+    //    override's (an explicitly targeted part shows its fingerboard even
+    //    when the document never opted it into tab);
+    //  - in a document where NO part declares a preference, every part with
+    //    known strings — the view promised tab staves and nothing says whose
+    //    (the per-part generalization of the old first-candidate fallback;
+    //    kind-less documents make no both goldens, `wantsTab` gates those).
+    // If none qualify, the promise cannot be kept and the both view degrades
+    // to notation alone.
+    const anyDeclaredKind = (mnx.parts ?? []).some(p => {
       const kind = p._x?.mnxLab?.tab?.staffKind;
+      return kind === 'both' || kind === 'tab';
+    });
+    for (const p of mnx.parts ?? []) {
+      const kind = resolveTabSetup(tabSetup, p)?.staffKind ?? p._x?.mnxLab?.tab?.staffKind;
+      const opted = kind === 'both' || kind === 'tab';
       if (
         inSegment.has(p) &&
-        (kind === 'both' || kind === 'tab') &&
+        (opted || !anyDeclaredKind) &&
         tabPositionContext(p, tabSetup) !== null
       ) {
         tabParts.push(p);
       }
-    }
-    // No part declares a tab preference: the view still promised a tab staff —
-    // give one to the first part whose strings are known (declared or viewer
-    // override). If none are, the promise cannot be kept and the both view
-    // degrades to notation alone.
-    if (tabParts.length === 0) {
-      const candidate = segment.staves
-        .flatMap(st => st.sources)
-        .map(src => src.part)
-        .find(p => tabPositionContext(p, tabSetup) !== null);
-      if (candidate) tabParts.push(candidate);
     }
   }
   const lastPlanStaffOf = new Map<MnxPart, number>();
@@ -1674,7 +1682,13 @@ function renderSegment(args: RenderSegmentArgs): {
     });
     // Last for the measure: the label row is placed above whatever else already
     // occupies the space over this staff — a tempo mark, a segno, a direction.
-    emitScoreLabels({ gm: mnx.global.measures[i] ?? {}, m, staffTop, primitives });
+    emitScoreLabels({
+      gm: mnx.global.measures[i] ?? {},
+      m,
+      staffTop,
+      rowTop: staffTop - ROW_PAD_TOP_SP,
+      primitives
+    });
 
     if (anchoredTabIssues.length && tabAnchorTd) {
       const tabBottom = displayTopOf(m.row, tabAnchorTd.displayIndex) + TAB_STAFF_HEIGHT_SP;
@@ -2600,6 +2614,11 @@ interface EmitScoreLabelsArgs {
   gm: MnxGlobalMeasure;
   m: { x: number; width: number };
   staffTop: number;
+  /** Top of the measure's own row band. The occupied scan must stop here:
+   *  after a system wrap the x-range repeats, so an unbounded scan sees the
+   *  SYSTEMS ABOVE and climbs the label to the top of the page (the
+   *  twelve-bar-blues "Turnaround over bar 1" bug). */
+  rowTop: number;
   primitives: Primitive[];
 }
 
@@ -2612,7 +2631,7 @@ interface EmitScoreLabelsArgs {
  * needs no typography at all.
  */
 function emitScoreLabels(args: EmitScoreLabelsArgs): void {
-  const { gm, m, staffTop, primitives } = args;
+  const { gm, m, staffTop, rowTop, primitives } = args;
   if (!gm.rehearsal && !gm.section) return;
 
   // Labels describe the measure rather than a moment in it, so they align to the
@@ -2629,7 +2648,7 @@ function emitScoreLabels(args: EmitScoreLabelsArgs): void {
     const py = (p as { y?: number }).y;
     const px = (p as { x?: number }).x;
     if (py === undefined || px === undefined) continue;
-    if (px < m.x || px > m.x + m.width || py >= staffTop) continue;
+    if (px < m.x || px > m.x + m.width || py >= staffTop || py <= rowTop) continue;
     occupiedTop = Math.min(occupiedTop, py - capH);
   }
   const innerY =

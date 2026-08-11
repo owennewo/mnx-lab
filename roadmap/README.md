@@ -2,8 +2,8 @@
 
 Planning docs for MNX Lab, filed by their status **relative to the current codebase**. This
 is an archive of intent, not a live task board. The recent driver — the spec-approval sweep —
-is now complete ([complete/SPEC_APPROVAL.md](complete/SPEC_APPROVAL.md), 57/57 verified); the
-corpus contract is [complete/04-scenario-library.md](complete/04-scenario-library.md), closed
+is now complete ([complete/lab-spec-approval.md](complete/lab-spec-approval.md), 57/57 verified); the
+corpus contract is [complete/lab-04-scenario-library.md](complete/lab-04-scenario-library.md), closed
 2026-08-09 — corpus growth now arrives as its own tickets, not through that doc.
 
 The big picture: the `clean_room_impl/` **pivot plan** (library-first: scenarios → gallery →
@@ -21,10 +21,21 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
 | `complete/` | Built and shipped (kept for provenance; may be aspirational in tense). |
 | `superseded/` | Overtaken by reality or a later decision; kept for history, **not current**. |
 
+Every doc is prefixed by what it serves (all buckets renamed 2026-08-11):
+
+| Prefix | Serves |
+|--------|--------|
+| `studio-` / `workbench-` | one of the two shells |
+| `core-` | the shared apparatus beneath them (model/engine/audio/edit/elements/converters) |
+| `spec-` | the spec loop — arguments about the standard, aimed upstream |
+| `lab-` | the repo itself — structure, process, corpus machinery |
+
+Another prefix is admitted only when it earns its keep: separate *and* important.
+
 ## Contents
 
 ### proposed/
-- **[mnx-cg-proposals.md](proposed/mnx-cg-proposals.md)** — **where** chord symbols, section
+- **[spec-mnx-cg-proposals.md](proposed/spec-mnx-cg-proposals.md)** — **where** chord symbols, section
   labels and technique should live, designed to be adoptable by the MNX CG rather than to stay
   private `_x` fields. Checked against the CG's live issues: #109 chord symbols, #112/#377
   rehearsal marks (the spec editor asked for a proposal and nobody wrote one), #63 guitar tab,
@@ -32,7 +43,7 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   dynamics rework (#518, proposed → merged in three weeks). **The designs are now built**
   (`_x.mnxLab` v3 — see [docs/mnx-extensions.md](../docs/mnx-extensions.md)); what is left here
   is the outward half: join the CG, sign the CLA, and post the three proposals.
-- **[score-text.md](proposed/score-text.md)** — **where text belongs in MNX.** v27 allows free
+- **[spec-score-text.md](proposed/spec-score-text.md)** — **where text belongs in MNX.** v27 allows free
   text in seven places (lyrics, naming, two dynamics decorations) and a bar can carry no text
   at all, so rehearsal marks, section names and performance directions have nowhere to go.
   Proposes typed `rehearsal`/`section` on the global measure beside `segno`/`fine`/`jump`, plus
@@ -40,18 +51,18 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   makes placement derivable, which is why Soundslice needs an inner/outer axis and MNX would
   not. Includes a round-trip stress test — 3 of 4 directions are destroyed or misclassified
   today, and the corpus never catches it. Supersedes the placement half of
-  [mnx-cg-proposals.md](proposed/mnx-cg-proposals.md) §3.
-- **[chord-symbols.md](proposed/chord-symbols.md)** — chord symbols. **Data path shipped**
+  [spec-mnx-cg-proposals.md](proposed/spec-mnx-cg-proposals.md) §3.
+- **[core-chord-symbols.md](proposed/core-chord-symbols.md)** — chord symbols. **Data path shipped**
   (2026-07-26) as `global.measures[i]._x.mnxLab.harmonies[]`: structured *and* literal, read
   from Guitar Pro `beat.text` **and** `Chord` objects, written and read as MusicXML
   `<harmony>`, lossless both ways (`Vestapol` 25, `House-of-the-Rising-Sun` 14). Remaining:
   **rendering** — nothing draws a chord symbol yet.
-- **[guitar-technique.md](proposed/guitar-technique.md)** — playing technique. **Data path
+- **[core-guitar-technique.md](proposed/core-guitar-technique.md)** — playing technique. **Data path
   complete** (2026-07-26): hammer-ons, pull-offs, slides, vibrato, **harmonics** and **palm
   mute** all survive `MNX ⇄ .gp` and `MNX ⇄ MusicXML`, and bends are now **curves**
   (`points: [{position, alter}]` in semitones) rather than a single interval that flattened
   anything more elaborate. Remaining: **rendering** — nothing draws technique yet.
-- **[instrument-position.md](proposed/instrument-position.md)** — **where a note is played**:
+- **[spec-instrument-position.md](proposed/spec-instrument-position.md)** — **where a note is played**:
   the string declaration, capo, `note.string`, `note.fingering`. Thesis: **the string and the
   finger are choices, the fret and the hand position are consequences** — given tuning, string
   and pitch, the fret is arithmetic (and on violin, string + pitch + finger derives the hand
@@ -64,9 +75,9 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   rather than a list — **encode the choice, not the consequence** — which maps the same shape
   onto brass (valve combination selects a fundamental, pitch determines the partial) and
   excludes tin whistle by the same rule that excludes storing the fret. Design only — nothing built, nothing
-  posted; complements [guitar-technique.md](proposed/guitar-technique.md) (what the hands do).
-- **[derived-positions.md](proposed/derived-positions.md)** — the execution half of
-  [instrument-position.md](proposed/instrument-position.md): migrate `_x.mnxLab` to the
+  posted; complements [core-guitar-technique.md](proposed/core-guitar-technique.md) (what the hands do).
+- **[core-derived-positions.md](proposed/core-derived-positions.md)** — the execution half of
+  [spec-instrument-position.md](proposed/spec-instrument-position.md): migrate `_x.mnxLab` to the
   proposal's shape (v5: string authoritative, `fret` optional and non-authoritative, `fingering`
   un-nested, `tuning[]` → `strings[]`) **and specify the derivation ladder** so unannotated
   guitar notation still renders valid tab — lowest-playable-fret assignment, default standard
@@ -85,51 +96,83 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   or a viewer override (`<mnx-score-viewer>` `stringsOverride`/`capoOverride`, surfaced as
   the workbench's instrument selector with presets incl. open D/bass/uke/mandolin); the
   shim materializes the old implicit default into saved documents.
-- **[viewer-surface.md](proposed/viewer-surface.md)** — name and define **the viewer
+- **[core-viewer-surface.md](proposed/core-viewer-surface.md)** — name and define **the viewer
   surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
   undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench
   chrome), attribute-first, the `view="auto"` precedence chain (user > host > document
   `staffKind` hint > default), a set-valued `hide` knob, and eviction of workbench leakage
   (`pinnedErrors` et al). Subsumes render-density-zoom's "where do the levers live" question.
-- **[render-density-zoom.md](proposed/render-density-zoom.md)** — configurable horizontal +
+- **[core-render-density-zoom.md](proposed/core-render-density-zoom.md)** — configurable horizontal +
   vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
   in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
   vertical density = layout gap/padding constants. Not started. Where the levers are *exposed*
-  is now owned by [viewer-surface.md](proposed/viewer-surface.md).
-- **[editor-ai-prompt.md](proposed/editor-ai-prompt.md)** — the command palette's **third
+  is now owned by [core-viewer-surface.md](proposed/core-viewer-surface.md).
+- **[core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md)** — the command palette's **third
   mode**: `Ctrl+K` text routing to `/api/edit-notation` when it reads as a sentence rather than
   a command (research §6.2), inheriting the `ui/ → assist/` boundary. Owns the deeper
   convergence `src/edit/ops.ts` has always named: the assist loop emitting **`EditOp[]`
   through `applyOp`** instead of replacing whole documents, so AI edits land in the session's
   undo history and op log like keyboard edits. Split out of
-  [editor-input-layer.md](complete/editor-input-layer.md); the voice half stays in
-  [open_router.md](proposed/open_router.md).
-- **[editor-element-promotion.md](proposed/editor-element-promotion.md)** — promoting the
+  [core-editor-input-layer.md](complete/core-editor-input-layer.md); the voice half stays in
+  [core-open-router.md](proposed/core-open-router.md).
+- **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
-  embed face and studio. Split out of [editor-input-layer.md](complete/editor-input-layer.md)
+  embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
   when that closed. **Deliberately parked** behind a two-part trigger — the intent
   vocabulary stabilising AND a real second consumer asking for editing (a check, not a
   debate) — with the costs of moving early recorded (API pressure on the public surface,
   the shadow-DOM focus story coming due, embed bundle weight; testing is unchanged either
   way). The promotion review's work list: the `elements/ → edit/` boundary change, the
-  element contract under [viewer-surface.md](proposed/viewer-surface.md)'s layered rule,
+  element contract under [core-viewer-surface.md](proposed/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
-  [editor-ai-prompt.md](proposed/editor-ai-prompt.md).
-- **[tuplets-grace-notes.md](proposed/tuplets-grace-notes.md)** — tuplets and grace notes
+  [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
+- **[core-tuplets-grace-notes.md](proposed/core-tuplets-grace-notes.md)** — tuplets and grace notes
   **across both converters and on tab**. Split out of
-  [guitar-pro.md](complete/guitar-pro.md) when that closed, at its real scope: the model
+  [core-guitar-pro.md](complete/core-guitar-pro.md) when that closed, at its real scope: the model
   and the notation renderer already support both (`MnxTuplet`/`MnxGrace`, drawn, with spec
   scenarios), but **neither converter carries them** (Guitar Pro flattens with a `warn()`;
   MusicXML never looks) and the tab staff reserves their columns without drawing them.
   Step zero is a **fixture** — none of the three reference scores contains a tuplet or a
   grace note, which is why the round trips are honestly lossless and still never present
   the case. Import/export follows the collapse-expand precedent already solved for voltas.
-- **[open_router.md](proposed/open_router.md)** — two-stage **voice** input + structured edit.
+- **[core-open-router.md](proposed/core-open-router.md)** — two-stage **voice** input + structured edit.
   The *text* edit path shipped (worker `/api/edit-notation` NDJSON self-correcting loop); the
   **voice/transcription stage was never built**. What's left here is the voice half.
+- **[studio-storage-sync.md](proposed/studio-storage-sync.md)** — **studio's storage, sync
+  and sharing**: a hand-rolled op-log sync engine in the Replicache mold (server-authoritative
+  rebase over `EditOp`/`applyOp` — CRDTs rejected with reasons), persisted as a SQLite Durable
+  Object per document + D1 library layer + R2 snapshots, IndexedDB demoted to replica. Library
+  model is **multi-dimensional tags** (path/setlist asserted; tuning/artist derived by the doc
+  DO, never stale) and **the tag is the unit of share** — live sets, materialized grants,
+  capability URLs — over a tier ladder (URL-fragment → tag-shares → git/jsDelivr publish →
+  Drive as export only). Records the adoption-day snapshot barrier, the worker/`applyOp`
+  boundary question, free-tier→$5 cost shape, and a five-stage build order starting with
+  whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
-- **[selection-ladder.md](inprogress/selection-ladder.md)** — **progressive selection as
+- **[core-score-hud.md](inprogress/core-score-hud.md)** — a **HUD companion** beside the viewer:
+  the selection ladder's missing *property surface* as one row per containment level (score /
+  section / bar / part / voice / event / note), active rung highlighted, rows clickable for
+  mouse parity with Escape/Enter. Rows are the *address chain*, highlight is the *rung* (part
+  is deliberately not a rung); presence rule drops absent rows. The part row is an **ensemble
+  table** owning the **per-part strings/capo override** — the global `TabSetup` reshaped into
+  a per-part map, closing the multi-part gap (a global override clobbers declared parts and
+  infects the rest — twelve-bar-blues). **Stages 1–3 built 2026-08-11** (same day as
+  proposed): `mnx-score-hud` + the session→`HudRow[]` mapping, click-to-level through the
+  intent funnel, engine `PartTabSetups` end to end, the override's `staffKind` intent (an
+  explicit entry opts a part's fingerboard in), and the kind-less both-view fallback
+  generalized to every known-strings part — goldens byte-identical, verified hands-on in
+  headless Chrome (bass override gains its own 4-string staff beside the guitar's declared
+  tab). **Same-day revision**: the HUD anchored a full **side-panel consolidation** — the
+  scenario page's chrome became one tabbed rail (description | tags | actions | hud |
+  compare | json), the edit strip's duplicated cursor readout deleted, compare reduced to
+  the reference pane, legacy `?view=compare|json` links opening the matching panel tab.
+  Incubates in `workbench/` against a neutral contract (`elements/` never imports
+  `edit/`); the selection half promotes with the editor
+  ([core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)), the
+  instrument half is viewer-tier and may promote earlier. **Remaining: stage 4** — rung
+  property edits through ops, parked behind the ladder's per-level pass.
+- **[core-selection-ladder.md](inprogress/core-selection-ladder.md)** — **progressive selection as
   the input-mode system**: input modes *are* the selection level, and each level offers
   exactly the properties the data model puts there. One containment ladder (note → event →
   [container] → voice-measure → part-measure → measure → [section] → score) walked
@@ -141,9 +184,9 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   slices, voice-run hulls and growing panels to the score frame, so Escape/Enter
   animate as a single shape tween that teaches containment. Both view shows primary +
   echo per projection (the active-projection bit also picks the input dialect: ↑↓ = pitch
-  vs string). Builds on [editor-input-layer.md](complete/editor-input-layer.md)'s
+  vs string). Builds on [core-editor-input-layer.md](complete/core-editor-input-layer.md)'s
   intents/traces/overlay substrate; the section rung is live evidence for
-  [score-text.md](proposed/score-text.md)'s proposed field. **Phases 1–2 built
+  [spec-score-text.md](proposed/spec-score-text.md)'s proposed field. **Phases 1–2 built
   2026-08-09**: the vertical ladder as session state (`src/edit/selection.ts`,
   Escape/Enter intents, level-scaled arrows with section jumps) pinned by
   `harness/conformance/selection.test.ts`, and the enclosure vocabulary
@@ -157,7 +200,7 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   container rungs.
 
 ### complete/
-- **[04-scenario-library.md](complete/04-scenario-library.md)** — the scenario corpus
+- **[lab-04-scenario-library.md](complete/lab-04-scenario-library.md)** — the scenario corpus
   structure (`spec/` + `lab/`, path-derived ids, `meta.json`, dual-verdict `expect`, the
   primitives/SVG/both goldens, `check-scenarios`), **closed 2026-08-09** fully populated
   against the pinned spec: 104 scenarios (52 mirrored + 52 lab), 18 lab categories
@@ -167,7 +210,7 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   three uncovered defs are recorded in the doc with reasons (`line-type`,
   `slur-tie-end-location` — an orphan def nothing references, `smufl-font`). New spec
   pins, proposals and renderer features open their own tickets from here.
-- **[editor-input-layer.md](complete/editor-input-layer.md)** — the **editor's input layer**,
+- **[core-editor-input-layer.md](complete/core-editor-input-layer.md)** — the **editor's input layer**,
   complete 2026-08-09: a declarative keymap (key → intent), a pure state machine
   (intent + selection → `EditOp`), and **intent-trace fixtures** that are also recordings
   ("copy trace" → `harness/fixtures/edit-traces/`, replayed by vitest, undo-all must
@@ -179,10 +222,10 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   (`Ctrl+K` commands / `Ctrl+G` go-to, bar jumps as a traceable `goToMeasure` intent), the
   `lab/document/empty-tab-canvas` template and the from-scratch flagship trace. Both
   descendants live in proposed/: the AI mode
-  ([editor-ai-prompt.md](proposed/editor-ai-prompt.md)) and the `elements/` promotion
-  ([editor-element-promotion.md](proposed/editor-element-promotion.md)). Grounded in
+  ([core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md)) and the `elements/` promotion
+  ([core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)). Grounded in
   [research/notation-editor-keyboard-models.md](../research/notation-editor-keyboard-models.md).
-- **[guitar-pro.md](complete/guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion at
+- **[core-guitar-pro.md](complete/core-guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion at
   `converters/guitarpro-mnx/`, using **alphaTab** as a headless format codec (no binary
   parsing hand-written), complete 2026-08-09 with **56 tests**. Reads gp3/gp4/gp5/gpx/gp,
   writes `.gp` (GP7 — the only format anything can still write). The score corpus is
@@ -196,7 +239,7 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   acceptance in the GP *application* (downgraded to a caveat — the container is
   alphaTab's contract, and the one real-consumer finding came from an Ultimate Guitar
   upload, which needs no desktop app).
-- **[both-view-single-system.md](complete/both-view-single-system.md)** — the notation+tab
+- **[core-both-view-single-system.md](complete/core-both-view-single-system.md)** — the notation+tab
   `both` view as **one engraved system**, complete 2026-08-08. Tab is a **native display
   staff** in the notation layout's system walk (`includeTabStaves`; seam `layoutBothSystem`) —
   single-stroke shared barlines, interleaved multi-system wrap, fret emission shared with the
@@ -205,7 +248,7 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   content-driven lyrics gap, and the compare-pane preference; all 13 both goldens
   human-approved and `bothHash`-stamped the same day. Deferred out: scores-doc injection
   (awaits a real fixture) and grace/tremolo tab parity (owned by the tab renderer).
-- **[structure-lab.md](complete/structure-lab.md)** — **the adopted repo structure,
+- **[lab-structure-lab.md](complete/lab-structure-lab.md)** — **the adopted repo structure,
   executed 2026-07-31 as a fresh-slate rebuild of main** (pre-rebuild history on the
   `legacy` branch + `pre-rebuild` tag). Capability layers with machine-enforced
   boundaries (`model → engine · audio · edit · corpus · storage; elements; ui/entries
@@ -218,44 +261,45 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
   `/verify` skill over `verification` provenance; embed + `mnx-lab` library build
   faces; reserved studio/edit/storage seams. Execution deviations recorded in the
   doc's appendix.
-- **[SPEC_APPROVAL.md](complete/SPEC_APPROVAL.md)** — the spec-by-spec renderer verification
+- **[lab-spec-approval.md](complete/lab-spec-approval.md)** — the spec-by-spec renderer verification
   sweep, **complete (57/57 verified: 49/49 spec + 8/8 lab)**. The per-scenario scoreboard, the
   approval bar, the renderer's capability list + deferred-polish backlog, and the "how to add a
   renderer feature" recipe — still the process for verifying any newly-added scenario.
-- **[clean-room-plan.md](complete/clean-room-plan.md)** — index/methodology for the pivot plan
+- **[lab-clean-room-plan.md](complete/lab-clean-room-plan.md)** — index/methodology for the pivot plan
   (was `clean_room_impl/README.md`).
-- **[00-vision.md](complete/00-vision.md)** — goals 1–8; all realized (AI demoted to the
+- **[lab-00-vision.md](complete/lab-00-vision.md)** — goals 1–8; all realized (AI demoted to the
   sketches-only Assist drawer, as designed).
-- **[01-principles.md](complete/01-principles.md)** — P1–P10; all honored **except P2**
+- **[lab-01-principles.md](complete/lab-01-principles.md)** — P1–P10; all honored **except P2**
   ("every capability is a package / monorepo"), which reality contradicts.
-- **[03-rollout.md](complete/03-rollout.md)** — the 7-phase sequence; all phases shipped
-  in-place (phase-3 spec coverage is the ongoing part, tracked in SPEC_APPROVAL).
-- **[module-specs.md](complete/module-specs.md)** — planned just-in-time module specs; **none
+- **[lab-03-rollout.md](complete/lab-03-rollout.md)** — the 7-phase sequence; all phases shipped
+  in-place (phase-3 spec coverage is the ongoing part, tracked in
+  [lab-spec-approval.md](complete/lab-spec-approval.md)).
+- **[lab-module-specs.md](complete/lab-module-specs.md)** — planned just-in-time module specs; **none
   written** (moot without the monorepo).
-- **[MUSICXML.md](complete/MUSICXML.md)** — MusicXML⇄MNX assessment; the converter is built at
+- **[core-musicxml.md](complete/core-musicxml.md)** — MusicXML⇄MNX assessment; the converter is built at
   `converters/musicxml-mnx/`.
 
 ### superseded/
 - **Structure sketches** — three of the four self-contained restructuring sketches
   (alternatives for a single decision), superseded by the adopted
-  [structure-lab.md](complete/structure-lab.md), which composes two of them:
-  - **[structure-toolchain.md](superseded/structure-toolchain.md)** — an npm-workspaces
+  [lab-structure-lab.md](complete/lab-structure-lab.md), which composes two of them:
+  - **[lab-structure-toolchain.md](superseded/lab-structure-toolchain.md)** — an npm-workspaces
     monorepo of publishable `@mnx-lab/*` packages with a one-way dependency graph; apps
     become thin consumers. *Deferred, not rejected* — the recorded trigger for revisiting
     is a real external consumer needing independent versioning.
-  - **[structure-platform.md](superseded/structure-platform.md)** — one deployable modular
+  - **[lab-structure-platform.md](superseded/lab-structure-platform.md)** — one deployable modular
     monolith: capability layers inside `src/` with machine-enforced import boundaries;
     embed and library as extra build faces. *Absorbed into structure-lab* (the code half).
-  - **[structure-workbench.md](superseded/structure-workbench.md)** — reorganize around the
+  - **[lab-structure-workbench.md](superseded/lab-structure-workbench.md)** — reorganize around the
     data and evidence (`spec/` / `corpus/` / `harness/` / `cli/`). *Absorbed into
     structure-lab* (the data half).
-- **[02-architecture.md](superseded/02-architecture.md)** — the **monorepo package split**
+- **[lab-02-architecture.md](superseded/lab-02-architecture.md)** — the **monorepo package split**
   (`mnx-core`/`mnx-render`/`gallery`/…). Not adopted: the app stayed a single `mnx-lab` in
   `src/`. The *contracts* (C1 validate, C2 layout→primitives→draw, C6 loader) live on as
   internal `src/` modules, just not as packages.
-- **[tech_stack.md](superseded/tech_stack.md)** — pre-pivot "locked-in" stack; names **VexFlow**
+- **[lab-tech-stack.md](superseded/lab-tech-stack.md)** — pre-pivot "locked-in" stack; names **VexFlow**
   (since replaced by the custom SVG engine — CLAUDE.md now forbids notation libraries).
-- **[UX_Layout.md](superseded/UX_Layout.md)** — pre-pivot AI-first glassmorphic UI; replaced by
+- **[workbench-ux-layout.md](superseded/workbench-ux-layout.md)** — pre-pivot AI-first glassmorphic UI; replaced by
   the 2026-06 reading-room redesign (`mnx-library-rail` + `mnx-scenario-header` +
   `mnx-assist-drawer`).
 

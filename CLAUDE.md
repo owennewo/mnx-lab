@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 with emphasis on guitar tab. Custom SMuFL/SVG rendering engine (no third-party notation
 libraries), an LLM-assisted edit loop through OpenRouter, and a scenario corpus with
 human-verified engravings. The repo was rebuilt from an empty slate in 2026-07 per
-[roadmap/complete/structure-lab.md](roadmap/complete/structure-lab.md); the full
+[roadmap/complete/lab-structure-lab.md](roadmap/complete/lab-structure-lab.md); the full
 pre-rebuild tree and history live on the **`legacy` branch** and **`pre-rebuild` tag** —
 retrieve missing things from there, never reconstruct them from memory.
 
@@ -133,7 +133,7 @@ hashes separately, or adding it would have moved every committed digest at once.
 approval flow is the conversational **`/verify` skill** (`.claude/skills/verify/`) —
 queue → one stable review page → verdicts in sentences; there is no human-facing CLI and
 no checkbox page. The initial 57/57 sweep is recorded in
-[roadmap/complete/SPEC_APPROVAL.md](roadmap/complete/SPEC_APPROVAL.md), still the recipe
+[roadmap/complete/lab-spec-approval.md](roadmap/complete/lab-spec-approval.md), still the recipe
 for verifying renderer features.
 
 **The goldens are the crown jewels.** Any move or refactor of `model/`/`engine/` must
@@ -162,11 +162,15 @@ never a golden and never hashed.
 
 Home is the **attention queue** (blocked → stale → never-seen; current counted, not
 shown), derived from committed provenance in `src/workbench/queue.ts`. Every scenario + view
-has a stable deep link: `#/scenario/<id>?view=notation|tab|both|compare|json`
-(unspecified ⇒ the document's `tab.staffKind` hint). Tab/both exist only when the
-strings are KNOWN — declared in the document, or supplied through the scenario
-page's instrument selector (a `<mnx-score-viewer>` `stringsOverride`/`capoOverride`
-— presentation only). No instrument is ever assumed.
+has a stable deep link: `#/scenario/<id>?view=notation|tab|both` (unspecified ⇒ the
+document's `tab.staffKind` hint); legacy `?view=compare|json` links are honored and
+open the matching tab of the scenario page's **side panel** (description | tags |
+actions | hud | compare | json — roadmap/inprogress/core-score-hud.md), which holds
+all page chrome including the selection HUD and the per-part instrument override
+(the HUD's ensemble table → `<mnx-score-viewer>.partTabSetups`; the flat
+`stringsOverride`/`capoOverride` pair remains for single-instrument embeds —
+presentation only). Tab/both exist only when the strings are KNOWN — declared in
+the document, or supplied through that override. No instrument is ever assumed.
 
 **`#/objects`** is the coverage map — every non-plumbing `$def` against the scenarios
 exercising it (`src/corpus/defIndex.ts`, inverting the spec's own `coversDefs` join),
@@ -238,7 +242,7 @@ draws each tab-bearing part's tab staff inside the same system walk — shared b
 interleaved multi-system wrap, columns aligned by shared plan slots. Tab-staff emission
 (lines/clef/timesig/frets) lives ONCE in `src/engine/layout/tabStaff.ts`, used by both
 the standalone tab layout and the native staff — extend it there, never fork it. See
-[roadmap/complete/both-view-single-system.md](roadmap/complete/both-view-single-system.md). Fret/string assignment uses
+[roadmap/complete/core-both-view-single-system.md](roadmap/complete/core-both-view-single-system.md). Fret/string assignment uses
 the derivation ladder in `src/engine/tab/guitarPositions.ts` (MNX pitch is
 sounding): an annotated `_x.mnxLab.string` derives its fret against the declared
 `strings[]` + capo (a stored `fret` is validation-only — a mismatch renders the
@@ -325,4 +329,10 @@ output names refuse to overwrite).
 - Roadmap-driven development: interpret roadmap-shaped requests against `roadmap/`
   (index: [roadmap/README.md](roadmap/README.md)) — "add to the roadmap" → new doc in
   `roadmap/proposed/` + index line; "what's next" → propose from `inprogress/` +
-  `proposed/`; finished efforts move to `complete/`.
+  `proposed/`; finished efforts move to `complete/`. **Every roadmap doc is prefixed
+  by what it serves** (all buckets renamed 2026-08-11): `studio-` and `workbench-`
+  (the two shells), `core-` (the shared apparatus beneath them — model/engine/audio/
+  edit/elements/converters), `spec-` (the spec loop: arguments about the standard,
+  aimed upstream), `lab-` (the repo itself: structure, process, corpus machinery).
+  Another prefix is acceptable only when it earns its keep: a concern that is
+  genuinely separate *and* important enough to name.

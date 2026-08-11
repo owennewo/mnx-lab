@@ -11,7 +11,7 @@ import {
   emitTabVoices
 } from './tabStaff.ts';
 import { validateDocument } from './validate.ts';
-import { tabPositionContext, TabSetup } from '../tab/guitarPositions.ts';
+import { tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
 
 /**
  * Pure layout function for guitar tab. Takes parsed MNX + viewport width
@@ -49,7 +49,7 @@ export interface LayoutTabOptions {
   selectedNoteIds?: readonly string[];
   /** Viewer-supplied instrument (strings/capo) — overrides the document's
    *  declaration for rendering; never written back. */
-  tabSetup?: TabSetup;
+  tabSetup?: PartTabSetups;
 }
 
 export function layoutTab(opts: LayoutTabOptions): LayoutResult {

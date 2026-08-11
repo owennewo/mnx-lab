@@ -1,7 +1,7 @@
 import { MnxNote, MnxPart, MnxPitch, MnxTuningEntry } from '../../model/mnx.ts';
 
 /**
- * Fingerboard position derivation (roadmap/proposed/derived-positions.md).
+ * Fingerboard position derivation (roadmap/proposed/core-derived-positions.md).
  *
  * The authority ladder:
  *   string + fret  → the DERIVED fret renders; a disagreeing stored fret is
@@ -51,26 +51,50 @@ export interface TabPositionContext {
 export interface TabSetup {
   strings?: readonly MnxTuningEntry[];
   capo?: number;
+  /** Overrides the part's own `tab.staffKind` hint for staff eligibility in
+   *  the both view. A consumer that explicitly targets a part with an
+   *  instrument usually wants to SEE its fingerboard — the document may
+   *  never have opted that part into tab. */
+  staffKind?: 'both' | 'tab';
+}
+
+/**
+ * The override as the layouts carry it (roadmap/inprogress/core-score-hud.md):
+ * one `TabSetup` applied to EVERY part (the original flat surface — right for
+ * single-instrument documents), or a per-part resolver, which is how a
+ * multi-part override avoids clobbering the part that declared its own
+ * strings and handing the rest an instrument they never asked for.
+ */
+export type PartTabSetups = TabSetup | ((part: MnxPart) => TabSetup | undefined);
+
+/** The setup in effect for one part — flat overrides apply to every part. */
+export function resolveTabSetup(
+  override: PartTabSetups | undefined,
+  part: MnxPart | undefined
+): TabSetup | undefined {
+  return typeof override === 'function' ? (part ? override(part) : undefined) : override;
 }
 
 /**
  * The part's effective string set — declared `_x.mnxLab.strings` unless the
  * consumer overrides it — each shifted up by the capo. Printed frets are
  * counted from the capo, so deriving against the shifted opens makes them
- * capo-relative by construction.
+ * capo-relative by construction. Strings and capo fall back independently,
+ * per part: a capo-only override rides the document's declared tuning.
  *
  * Returns null when NO strings are known: there is deliberately no assumed
- * instrument (roadmap/proposed/derived-positions.md) — a document without a
+ * instrument (roadmap/proposed/core-derived-positions.md) — a document without a
  * declaration has no fingerboard, and tab views require one from the document
  * or from the surface.
  */
 export function tabPositionContext(
   part: MnxPart | undefined,
-  override?: TabSetup
+  override?: PartTabSetups
 ): TabPositionContext | null {
-  const strings = override?.strings ?? part?._x?.mnxLab?.strings;
+  const setup = resolveTabSetup(override, part);
+  const strings = setup?.strings ?? part?._x?.mnxLab?.strings;
   if (!strings || strings.length === 0) return null;
-  const capo = override?.capo ?? part?._x?.mnxLab?.capo ?? 0;
+  const capo = setup?.capo ?? part?._x?.mnxLab?.capo ?? 0;
   const openMidi = new Map<number, number>();
   for (const entry of strings) {
     openMidi.set(entry.string, midiOfMnxPitch(entry.pitch) + capo);

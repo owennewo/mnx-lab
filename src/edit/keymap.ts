@@ -1,4 +1,4 @@
-// The declarative keymap — roadmap/complete/editor-input-layer.md.
+// The declarative keymap — roadmap/complete/core-editor-input-layer.md.
 //
 // Bindings are DATA, not keydown switches: rebinding a key edits this table
 // and nothing else, and future emulation presets ("Like Guitar Pro") are
@@ -114,7 +114,8 @@ export type ShellAction =
   | 'timeSignaturePopover'
   | 'tuningPopover'
   | 'commandPalette'
-  | 'goTo';
+  | 'goTo'
+  | 'toggleRail';
 
 const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   { code: 'KeyT', shift: true, action: 'timeSignaturePopover' },
@@ -123,7 +124,9 @@ const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // go-to (§3.8: Ctrl+G + typed grammar) are ONE widget, two entry points:
   // Ctrl+K prefills the `>` command prefix, Ctrl+G opens bare (go-to).
   { code: 'KeyK', ctrl: true, action: 'commandPalette' },
-  { code: 'KeyG', ctrl: true, action: 'goTo' }
+  { code: 'KeyG', ctrl: true, action: 'goTo' },
+  // The library rail toggle (VS Code's Ctrl+B sidebar reflex).
+  { code: 'KeyB', ctrl: true, action: 'toggleRail' }
 ];
 
 export function resolveShellAction(stroke: KeyStroke): ShellAction | null {

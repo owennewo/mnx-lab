@@ -1,5 +1,5 @@
 import { MnxStructure } from '../../model/mnx.ts';
-import { TabSetup } from './guitarPositions.ts';
+import { PartTabSetups } from './guitarPositions.ts';
 import { layoutTab } from '../layout/tab.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
@@ -28,7 +28,7 @@ export interface RenderTabOptions {
   pxPerSp?: number;
   /** Viewer-supplied instrument (strings/capo) — overrides the document's
    *  declaration for rendering; never written back. */
-  tabSetup?: TabSetup;
+  tabSetup?: PartTabSetups;
 }
 
 export function renderMnxToSvgTab(opts: RenderTabOptions): void {

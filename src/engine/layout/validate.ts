@@ -1,6 +1,6 @@
 import { MnxStructure, MnxPitch, isGrace, isTremolo, isTuplet, isTimedEvent } from '../../model/mnx.ts';
 import { durationValue, tremoloDuration, tupletDuration } from './spacing.ts';
-import { MAX_FRET, midiOfMnxPitch, tabPositionContext, TabSetup } from '../tab/guitarPositions.ts';
+import { MAX_FRET, midiOfMnxPitch, tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
 
 /**
  * Semantic (musical) validation — problems the schema can't see but the user
@@ -47,7 +47,7 @@ function fmtBeats(beats: number): string {
  * with no badge explaining why. Document-level checks (bar arithmetic) are
  * unaffected.
  */
-export function validateDocument(mnx: MnxStructure, tabSetup?: TabSetup): ValidationIssue[] {
+export function validateDocument(mnx: MnxStructure, tabSetup?: PartTabSetups): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const part = mnx.parts?.[0];
   if (!part) return issues;
@@ -137,7 +137,7 @@ function fmtRange(lowMidi: number, highMidi: number): string {
  *     plays), TuxGuitar and this renderer draw them on top of each other.
  *
  * Since v5 the string is authoritative and the fret is DERIVED (string + pitch
- * + tuning + capo — roadmap/proposed/derived-positions.md), so this pass also
+ * + tuning + capo — roadmap/proposed/core-derived-positions.md), so this pass also
  * checks the derivation itself:
  *
  *   - an annotated string the part never declared     → error
@@ -154,7 +154,7 @@ function fmtRange(lowMidi: number, highMidi: number): string {
 function validateTabPositions(
   part: NonNullable<MnxStructure['parts']>[number],
   issues: ValidationIssue[],
-  tabSetup?: TabSetup
+  tabSetup?: PartTabSetups
 ): void {
   const lab = part._x?.mnxLab;
   const ctx = tabPositionContext(part, tabSetup);

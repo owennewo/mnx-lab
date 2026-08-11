@@ -65,12 +65,23 @@ export function matchesQuery(entry: ScenarioEntry, query: string): boolean {
   return entry.id.toLowerCase().includes(q) || entry.meta.title.toLowerCase().includes(q);
 }
 
+const RAIL_HIDDEN_KEY = 'mnx-lab.rail-hidden';
+
 @customElement('mnx-workbench')
 export class WorkbenchApp extends LitElement {
   @state() private route: Route = parseHash(location.hash);
   @state() private query = '';
   /** The palette overlay: 'commands' (Ctrl+K, `>` prefilled) or 'goto' (Ctrl+G). */
   @state() private palette: 'commands' | 'goto' | null = null;
+  /** Rail visibility (Ctrl+B / the header chevron) — remembered per browser;
+   *  a UI preference, so localStorage, not the document store. */
+  @state() private railHidden = localStorage.getItem(RAIL_HIDDEN_KEY) === '1';
+
+  private toggleRail() {
+    this.railHidden = !this.railHidden;
+    localStorage.setItem(RAIL_HIDDEN_KEY, this.railHidden ? '1' : '0');
+    this.toggleAttribute('rail-hidden', this.railHidden);
+  }
 
   private onHashChange = () => {
     this.route = parseHash(location.hash);
@@ -100,6 +111,33 @@ export class WorkbenchApp extends LitElement {
         background: var(--bg);
         color: var(--ink);
         font-family: var(--sans);
+      }
+
+      /* The rail folds away (Ctrl+B / the header chevron) — all width goes
+         to the score. */
+      :host([rail-hidden]) {
+        grid-template-columns: 0 1fr;
+      }
+
+      :host([rail-hidden]) nav {
+        display: none;
+      }
+
+      .rail-toggle {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ink-2);
+        background: transparent;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
+        padding: 1px 8px;
+        cursor: pointer;
+        align-self: center;
+      }
+
+      .rail-toggle:hover {
+        color: var(--accent);
+        border-color: var(--accent);
       }
 
       header {
@@ -290,6 +328,7 @@ export class WorkbenchApp extends LitElement {
     super.connectedCallback();
     window.addEventListener('hashchange', this.onHashChange);
     window.addEventListener('keydown', this.onKeyDown);
+    this.toggleAttribute('rail-hidden', this.railHidden);
   }
 
   disconnectedCallback() {
@@ -314,6 +353,11 @@ export class WorkbenchApp extends LitElement {
     if (action === 'commandPalette' || action === 'goTo') {
       event.preventDefault();
       this.palette = action === 'commandPalette' ? 'commands' : 'goto';
+      return;
+    }
+    if (action === 'toggleRail') {
+      event.preventDefault();
+      this.toggleRail();
       return;
     }
     if (event.code === 'Slash' && !event.ctrlKey && !event.altKey && !event.metaKey) {
@@ -355,7 +399,12 @@ export class WorkbenchApp extends LitElement {
 
     const items: PaletteItem[] = [
       nav('go: attention queue', '#/'),
-      nav('go: objects coverage', objectsHref())
+      nav('go: objects coverage', objectsHref()),
+      {
+        label: `view: ${this.railHidden ? 'show' : 'hide'} scenario rail`,
+        hint: 'Ctrl+B',
+        run: () => this.toggleRail()
+      }
     ];
     const entry =
       this.route.page === 'scenario' ? corpus.find(e => e.id === this.route.id) : undefined;
@@ -473,6 +522,13 @@ export class WorkbenchApp extends LitElement {
 
     return html`
       <header>
+        <button
+          class="rail-toggle"
+          title="${this.railHidden ? 'show' : 'hide'} the scenario rail (Ctrl+B)"
+          @click=${() => this.toggleRail()}
+        >
+          ${this.railHidden ? '⟩' : '⟨'}
+        </button>
         <span class="brand"><a href="#/">MNX Lab — workbench</a></span>
         <span class="facts">
           <span>MNX v${corpusManifest.mnxVersion} · ext v${corpusManifest.extensionVersion}</span>

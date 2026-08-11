@@ -11,12 +11,13 @@ import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
-import type { MnxTuningEntry } from '../model/mnx.ts';
 import type { ViewMode } from '../elements/ScoreViewer.ts';
 import type { EnclosureKind, SelectionContext } from '../elements/mnxContext.ts';
 import { EditorSession } from '../edit/session.ts';
-import type { SelectionLevel } from '../edit/selection.ts';
+import { SELECTION_LADDER, type SelectionLevel } from '../edit/selection.ts';
 import type { EditorIntent } from '../edit/intents.ts';
+import type { TabSetup } from '../engine/tab/guitarPositions.ts';
+import { buildHudParts, buildHudRows, LEVEL_BY_ROW } from './hudRows.ts';
 import {
   EDIT_LAYER,
   NAVIGATION_LAYER,
@@ -29,13 +30,34 @@ import {
 } from '../edit/keymap.ts';
 import { parseTimeSignature, parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
 import '../elements/ScoreViewer.ts';
+import './ScoreHud.ts';
 
-type PageView = ViewMode | 'compare' | 'json';
+/** The side panel's tabs (roadmap/inprogress/core-score-hud.md): the page's
+ *  scattered chrome — description, badges/defs, the edit strip, the HUD, the
+ *  spec reference, the raw JSON — consolidated into one rail. */
+type PanelTab = 'description' | 'tags' | 'actions' | 'hud' | 'compare' | 'json';
+
+/** One part's override state — the HUD ensemble table's currency. */
+interface PartOverride {
+  instrument: string;
+  capo: number | null;
+}
+
+/** Side panel width bounds and its remembered-per-browser preference key. */
+const PANEL_WIDTH_KEY = 'mnx-lab.panel-width';
+const PANEL_MIN = 240;
+const PANEL_MAX = 640;
+const PANEL_DEFAULT = 320;
+
+function storedPanelWidth(): number {
+  const n = Number(localStorage.getItem(PANEL_WIDTH_KEY));
+  return Number.isFinite(n) && n >= PANEL_MIN && n <= PANEL_MAX ? n : PANEL_DEFAULT;
+}
 
 /** How many object tags to show before collapsing the tail into a count. */
 const DEF_PREVIEW = 9;
 
-/** Ladder level → enclosure shape (roadmap/inprogress/selection-ladder.md).
+/** Ladder level → enclosure shape (roadmap/inprogress/core-selection-ladder.md).
  *  The mapping lives HERE so elements/ knows shapes, never editor levels.
  *  measure and section share panel-wide: the extent difference (one bar vs
  *  the labelled range) comes from the footprint itself. */
@@ -54,10 +76,12 @@ export class ScenarioPage extends LitElement {
   @property({ type: String }) scenarioId = '';
   @property({ type: String }) view = '';
 
-  /** Instrument selector: 'document' = no override, else a tuning preset
-   *  name from setupGrammar. Presentation only — never written back. */
-  @state() private instrument = 'document';
-  @state() private capoOverride: number | null = null;
+  /** Per-part instrument overrides (roadmap/inprogress/core-score-hud.md),
+   *  keyed by part index: 'document' = no strings override, else a tuning
+   *  preset name from setupGrammar. Presentation only — never written back.
+   *  Single-part scores edit entry 0 through the toolbar selector; the HUD's
+   *  ensemble table edits any entry. */
+  @state() private partSetups = new Map<number, PartOverride>();
 
   @state() private doc: MnxDocument | null = null;
   @state() private rawScore = '';
@@ -69,7 +93,7 @@ export class ScenarioPage extends LitElement {
   @state() private loadState: 'loading' | 'ready' | 'failed' = 'loading';
   @state() private loadError = '';
   @state() private allDefs = false;
-  // The editor incubates here (roadmap/complete/editor-input-layer.md):
+  // The editor incubates here (roadmap/complete/core-editor-input-layer.md):
   // in-memory only — the workbench has no backend, and this page is a bench
   // for testing the editor, not for authoring corpus files.
   @state() private session: EditorSession | null = null;
@@ -81,6 +105,36 @@ export class ScenarioPage extends LitElement {
   @state() private setupPopoverError = '';
   /** Esc hides the cursor highlight until the next intent (review sense-0). */
   private cursorHidden = false;
+
+  /** The side panel's active tab; falls back when the tab isn't available
+   *  (hud/actions need a session). */
+  @state() private panelTab: PanelTab = 'hud';
+
+  /** Side panel width in px — the drag bar on its left edge adjusts it. */
+  @state() private panelWidth = storedPanelWidth();
+
+  /** The drag bar: pointer capture keeps the gesture on the handle; width is
+   *  measured from the body's right edge so the math is anchor-independent. */
+  private onPanelDrag = (down: PointerEvent) => {
+    const handle = down.currentTarget as HTMLElement;
+    const body = this.renderRoot.querySelector('.body');
+    if (!body) return;
+    const right = body.getBoundingClientRect().right;
+    handle.setPointerCapture(down.pointerId);
+    const move = (e: PointerEvent) => {
+      this.panelWidth = Math.round(
+        Math.min(PANEL_MAX, Math.max(PANEL_MIN, right - e.clientX))
+      );
+    };
+    const up = () => {
+      handle.removeEventListener('pointermove', move);
+      handle.removeEventListener('pointerup', up);
+      localStorage.setItem(PANEL_WIDTH_KEY, String(this.panelWidth));
+    };
+    handle.addEventListener('pointermove', move);
+    handle.addEventListener('pointerup', up);
+    down.preventDefault();
+  };
 
   static styles = [
     designTokens,
@@ -95,34 +149,26 @@ export class ScenarioPage extends LitElement {
       }
 
       .head {
-        padding: 16px 24px 12px;
+        padding: 10px 24px 0;
         border-bottom: 1px solid var(--line);
       }
 
-      .head h1 {
+      /* Title + id live in the description tab now — the head is tabs only. */
+      .panel-body h1 {
         font-family: var(--serif);
         font-weight: 500;
-        font-size: 20px;
-        margin: 0;
-        display: flex;
-        align-items: baseline;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .head .id {
-        font-family: var(--mono);
-        font-size: 11.5px;
-        color: var(--ink-3);
-      }
-
-      .head p {
-        font-size: 12.5px;
-        color: var(--ink-2);
-        line-height: 1.55;
-        margin: 6px 0 10px;
-        max-width: 78ch;
+        font-size: 17px;
+        line-height: 1.3;
+        margin: 0 0 4px;
         text-wrap: pretty;
+      }
+
+      .panel-body .id {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--ink-3);
+        margin-bottom: 10px;
+        overflow-wrap: anywhere;
       }
 
       .badges {
@@ -195,54 +241,30 @@ export class ScenarioPage extends LitElement {
       .tabs {
         display: flex;
         gap: 2px;
-        margin-top: 12px;
         align-items: center;
       }
 
-      /* The instrument override — the viewer surface's strings/capo. */
-      .tabs .instrument {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        gap: 6px;
+      /* The actions tab — the former edit strip, stacked for the panel. */
+      .actions {
         font-family: var(--mono);
         font-size: 10.5px;
-      }
-
-      .tabs .instrument select,
-      .tabs .instrument input {
-        font: inherit;
         color: var(--ink-2);
-        background: var(--surface);
-        border: 1px solid var(--line-strong);
-        border-radius: 5px;
-        padding: 2px 6px;
-      }
-
-      .tabs .instrument .capo {
-        width: 56px;
-      }
-
-      /* The incubating editor's status strip — cursor, history, trace. */
-      .edit-strip {
         display: flex;
-        align-items: center;
+        flex-direction: column;
         gap: 10px;
-        margin-top: 10px;
-        font-family: var(--mono);
-        font-size: 10.5px;
-        color: var(--ink-2);
       }
 
-      .edit-strip .cur {
-        color: var(--ink);
+      .actions .action-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
       }
 
-      .edit-strip .dirty {
+      .actions .dirty {
         color: var(--accent);
       }
 
-      .edit-strip button {
+      .actions button {
         font: inherit;
         color: var(--ink-2);
         background: transparent;
@@ -252,28 +274,29 @@ export class ScenarioPage extends LitElement {
         cursor: pointer;
       }
 
-      .edit-strip button:hover:not(:disabled) {
+      .actions button:hover:not(:disabled) {
         color: var(--accent);
         border-color: var(--accent);
       }
 
-      .edit-strip button:disabled {
+      .actions button:disabled {
         opacity: 0.45;
         cursor: default;
       }
 
-      .edit-strip .hint {
-        margin-left: auto;
+      .actions .hint {
+        margin: 0;
         color: var(--ink-3);
+        line-height: 1.6;
       }
 
       /* Setup popovers (survey §6.2's Shift+letter tier): a typed prompt
          whose text parses into a setup intent. */
       .popover {
         display: flex;
+        flex-wrap: wrap;
         align-items: baseline;
         gap: 10px;
-        margin-top: 8px;
         padding: 8px 12px;
         border: 1px solid var(--accent);
         border-radius: 8px;
@@ -297,7 +320,8 @@ export class ScenarioPage extends LitElement {
         border-bottom: 1px solid var(--line-strong);
         outline: none;
         padding: 2px 4px;
-        min-width: 22ch;
+        min-width: 14ch;
+        flex: 1;
       }
 
       .popover .pop-hint {
@@ -324,51 +348,117 @@ export class ScenarioPage extends LitElement {
         border-color: var(--line);
       }
 
+      /* Score pane + the side panel (columns set inline — the drag bar). */
       .body {
+        display: grid;
         overflow: hidden;
         min-height: 0;
       }
 
-      .compare {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0;
-        height: 100%;
+      .main {
         overflow: hidden;
-      }
-
-      .compare > div {
-        overflow: auto;
         min-width: 0;
       }
 
-      .compare .side-cap {
+      .panel {
+        position: relative;
+        border-left: 1px solid var(--line);
+        background: var(--surface);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+        min-width: 0;
+      }
+
+      .panel-drag {
+        position: absolute;
+        left: -4px;
+        top: 0;
+        bottom: 0;
+        width: 8px;
+        cursor: col-resize;
+        z-index: 1;
+        touch-action: none;
+      }
+
+      .panel-drag:hover,
+      .panel-drag:active {
+        background: color-mix(in oklab, var(--accent) 25%, transparent);
+      }
+
+      .panel-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+        padding: 8px 10px 0;
+        border-bottom: 1px solid var(--line);
+        font-family: var(--mono);
+      }
+
+      .panel-tabs button {
+        font: inherit;
+        font-size: 10.5px;
+        color: var(--ink-2);
+        background: transparent;
+        border: 1px solid transparent;
+        border-bottom: none;
+        border-radius: 6px 6px 0 0;
+        padding: 4px 8px;
+        cursor: pointer;
+      }
+
+      .panel-tabs button[aria-current='true'] {
+        color: var(--accent-fg);
+        background: var(--bg);
+        border-color: var(--line);
+      }
+
+      .panel-body {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+        padding: 12px 14px;
+      }
+
+      /* The hud tab: the component owns its rows' padding. */
+      .panel-body:has(> mnx-score-hud) {
+        padding: 0;
+      }
+
+      .panel-body .description {
+        font-size: 12.5px;
+        color: var(--ink-2);
+        line-height: 1.55;
+        margin: 0;
+        text-wrap: pretty;
+      }
+
+      .side-cap {
         font-family: var(--mono);
         font-size: 10px;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: var(--ink-3);
-        padding: 10px 16px 0;
+        margin-bottom: 8px;
       }
 
-      .compare .ref {
-        border-left: 1px solid var(--line);
-        background: var(--bg);
-      }
-
-      .compare .ref img {
+      .ref-pane img {
         display: block;
-        max-width: calc(100% - 52px);
-        margin: 26px;
+        max-width: 100%;
         background: var(--paper);
         border-radius: 10px;
         box-shadow: var(--shadow);
-        padding: 20px;
+        padding: 12px;
+        box-sizing: border-box;
+      }
+
+      .load-state {
+        margin: 26px;
       }
 
       .ref-missing,
       .load-state {
-        margin: 26px;
         padding: 22px;
         border: 1px dashed var(--line-strong);
         border-radius: 10px;
@@ -378,7 +468,7 @@ export class ScenarioPage extends LitElement {
       }
 
       .ref-credit {
-        margin: -14px 26px 26px;
+        margin: 8px 0 0;
         font-family: var(--mono);
         font-size: 10px;
         color: var(--ink-3);
@@ -405,16 +495,12 @@ export class ScenarioPage extends LitElement {
       }
 
       .json {
-        height: 100%;
-        overflow: auto;
         margin: 0;
-        padding: 18px 24px;
-        box-sizing: border-box;
         font-family: var(--mono);
-        font-size: 11.5px;
+        font-size: 10.5px;
         line-height: 1.5;
         color: var(--ink);
-        background: var(--surface);
+        overflow-x: auto;
       }
 
       .missing {
@@ -429,7 +515,13 @@ export class ScenarioPage extends LitElement {
   }
 
   willUpdate(changed: Map<string, unknown>) {
+    // Legacy ?view=compare|json deep links (the documented contract) open
+    // the matching panel tab — the main pane keeps the default score view.
+    if (changed.has('view') || changed.has('scenarioId')) {
+      if (this.view === 'compare' || this.view === 'json') this.panelTab = this.view;
+    }
     if (changed.has('scenarioId')) {
+      if (this.view !== 'compare' && this.view !== 'json') this.panelTab = 'hud';
       this.doc = null;
       this.rawScore = '';
       this.pinnedErrors = [];
@@ -443,6 +535,9 @@ export class ScenarioPage extends LitElement {
       this.setupPopover = null;
       this.setupPopoverError = '';
       this.cursorHidden = false;
+      // Overrides are per-part by INDEX, so carrying them to a different
+      // document would misapply them.
+      this.partSetups = new Map();
       void this.loadScore();
     }
   }
@@ -532,7 +627,6 @@ export class ScenarioPage extends LitElement {
     const entry = this.entry();
     if (!entry || !this.session) return [];
     const view = this.activeView(entry);
-    if (view === 'json') return [];
     const layers: KeymapLayer[] = [];
     if (entry.hasTab && (view === 'tab' || view === 'both')) layers.push(TAB_DIGIT_LAYER);
     layers.push(NAVIGATION_LAYER, EDIT_LAYER);
@@ -560,7 +654,7 @@ export class ScenarioPage extends LitElement {
     if (!intent || !this.session) return;
     event.preventDefault();
     this.followProjection();
-    // The selection ladder (roadmap/inprogress/selection-ladder.md): Escape
+    // The selection ladder (roadmap/inprogress/core-selection-ladder.md): Escape
     // relaxes rung by rung; only a relax that can't widen further — already at
     // score — becomes the old deselect. While deselected, Escape stays inert
     // (and unrecorded — deselection is view chrome, not session history).
@@ -582,6 +676,9 @@ export class ScenarioPage extends LitElement {
     if (action === 'tuningPopover' && !entry?.hasTab) return false;
     this.setupPopover = action === 'timeSignaturePopover' ? 'time' : 'tuning';
     this.setupPopoverError = '';
+    // The popover lives in the actions tab now; a keyboard-opened one must
+    // still be visible.
+    this.panelTab = 'actions';
     return true;
   }
 
@@ -632,6 +729,31 @@ export class ScenarioPage extends LitElement {
     this.setupPopover = null;
   }
 
+  /** A HUD row click moves the selection to that row's level by walking
+   *  relax/tighten intents — clicks go through the same funnel as keys, so
+   *  traces replay them. Bounded: every step must actually move (the
+   *  presence rule may stop the walk short of an absent rung). */
+  private onHudRow = (event: Event) => {
+    const key = (event as CustomEvent<{ key: string }>).detail.key;
+    const target = LEVEL_BY_ROW[key];
+    if (!this.session || !target) return;
+    this.cursorHidden = false;
+    for (let guard = 0; guard < SELECTION_LADDER.length; guard++) {
+      const current: SelectionLevel = this.session.selectionLevel;
+      if (current === target) break;
+      const widen = SELECTION_LADDER.indexOf(target) > SELECTION_LADDER.indexOf(current);
+      this.session.handleIntent({ type: widen ? 'relaxSelection' : 'tightenSelection' });
+      if (this.session.selectionLevel === current) break;
+    }
+    this.copied = false;
+    this.syncFromSession();
+  };
+
+  private onHudPartSetup = (event: Event) => {
+    const detail = (event as CustomEvent<{ index: number } & PartOverride>).detail;
+    this.setPartOverride(detail.index, { instrument: detail.instrument, capo: detail.capo });
+  };
+
   /** Button-driven intents go through the same funnel as keys, so they are
    *  recorded in the trace too — a recording must replay clicks as well. */
   private stripIntent(intent: EditorIntent) {
@@ -658,7 +780,7 @@ export class ScenarioPage extends LitElement {
   // Tab/both exist only when the strings are KNOWN — declared by the document
   // or supplied through the instrument selector (the viewer override,
   // presentation-only). No instrument is ever assumed
-  // (roadmap/proposed/derived-positions.md): a document without strings has
+  // (roadmap/proposed/core-derived-positions.md): a document without strings has
   // no fingerboard until the user names one.
   private docDeclaresStrings(): boolean {
     return (this.doc?.mnxJson.parts ?? []).some(
@@ -666,48 +788,65 @@ export class ScenarioPage extends LitElement {
     );
   }
 
-  private overrideStrings(): MnxTuningEntry[] | null {
-    if (this.instrument === 'document') return null;
-    return parseTuning(this.instrument);
+  private partOverride(index: number): PartOverride {
+    return this.partSetups.get(index) ?? { instrument: 'document', capo: null };
+  }
+
+  private setPartOverride(index: number, patch: Partial<PartOverride>) {
+    const next = new Map(this.partSetups);
+    next.set(index, { ...this.partOverride(index), ...patch });
+    this.partSetups = next;
+  }
+
+  /** The viewer's per-part override map, keyed by part index (the workbench
+   *  owns the keys, so index is enough — presentation-only state). */
+  private partTabSetups(): Record<string, TabSetup> | null {
+    if (this.partSetups.size === 0) return null;
+    const out: Record<string, TabSetup> = {};
+    for (const [index, override] of this.partSetups) {
+      const strings =
+        override.instrument === 'document' ? null : parseTuning(override.instrument);
+      const setup: TabSetup = {
+        ...(strings ? { strings } : {}),
+        ...(override.capo !== null ? { capo: override.capo } : {})
+      };
+      // An explicit per-part entry is the ask to SEE that part's fingerboard
+      // — the document may never have opted the part into tab.
+      if (Object.keys(setup).length > 0) out[String(index)] = { ...setup, staffKind: 'both' };
+    }
+    return Object.keys(out).length > 0 ? out : null;
+  }
+
+  private overrideProvidesStrings(): boolean {
+    return [...this.partSetups.values()].some(
+      override => override.instrument !== 'document' && parseTuning(override.instrument) !== null
+    );
   }
 
   private tabCapable(): boolean {
-    return this.docDeclaresStrings() || this.overrideStrings() !== null;
+    return this.docDeclaresStrings() || this.overrideProvidesStrings();
   }
 
-  private availableViews(): PageView[] {
-    return this.tabCapable()
-      ? ['notation', 'tab', 'both', 'compare', 'json']
-      : ['notation', 'compare', 'json'];
+  private availableViews(): ViewMode[] {
+    return this.tabCapable() ? ['notation', 'tab', 'both'] : ['notation'];
   }
 
-  private activeView(_entry: ScenarioEntry): PageView {
+  private activeView(_entry: ScenarioEntry): ViewMode {
     const allowed = this.availableViews();
-    if (allowed.includes(this.view as PageView)) return this.view as PageView;
-    // Unspecified (or no-longer-available) view: the document's own hint.
+    if (allowed.includes(this.view as ViewMode)) return this.view as ViewMode;
+    // Unspecified (or no-longer-available, or legacy compare/json) view:
+    // the document's own hint.
     return this.defaultView();
   }
 
   /** The document's preferred view when the URL names none: its `staffKind`
    *  hint when tab is possible, else notation. */
-  private defaultView(): PageView {
+  private defaultView(): ViewMode {
     if (!this.tabCapable()) return 'notation';
     const kinds = (this.doc?.mnxJson.parts ?? []).map(p => p._x?.mnxLab?.tab?.staffKind);
     if (kinds.includes('both')) return 'both';
     if (kinds.includes('tab')) return 'tab';
     return 'notation';
-  }
-
-  /** The compare pane's "our render": the combined notation+tab system when
-   *  the DOCUMENT prefers a tab view (published guitar engraving is what a
-   *  reviewer wants beside the reference), plain notation otherwise. The
-   *  document's own hint, not the viewer override — an override on a
-   *  notation-only spec scenario must keep the comparison notation-to-
-   *  notation with the reference engraving. */
-  private comparePaneView(): ViewMode {
-    const kinds = (this.doc?.mnxJson.parts ?? []).map(p => p._x?.mnxLab?.tab?.staffKind);
-    const prefersTab = kinds.includes('both') || kinds.includes('tab');
-    return prefersTab && this.tabCapable() ? 'both' : 'notation';
   }
 
   private viewer(entry: ScenarioEntry, viewMode: ViewMode) {
@@ -730,8 +869,7 @@ export class ScenarioPage extends LitElement {
         .mnxDoc=${this.doc}
         .viewMode=${viewMode}
         .hasTab=${entry.hasTab}
-        .stringsOverride=${this.overrideStrings()}
-        .capoOverride=${this.capoOverride}
+        .partTabSetups=${this.partTabSetups()}
         .invalidByDesign=${entry.invalidByDesign}
         .pinnedErrors=${this.pinnedErrors}
         .selection=${this.selection}
@@ -745,15 +883,83 @@ export class ScenarioPage extends LitElement {
       return html`<div class="missing">No scenario with id “${this.scenarioId}”.</div>`;
     }
     const view = this.activeView(entry);
-    const item = classify(entry);
-    const verification = entry.meta.verification;
     const views = this.availableViews();
 
     return html`
       <div class="head">
-        <h1>${entry.meta.title} <span class="id">${entry.id}</span></h1>
-        <p>${entry.meta.description}</p>
-        <div class="badges">
+        <div class="tabs">
+          ${views.map(
+            v => html`
+              <a href=${scenarioHref(entry.id, v)} aria-current=${v === view}>${v}</a>
+            `
+          )}
+        </div>
+      </div>
+      <div class="body" style="grid-template-columns: 1fr ${this.panelWidth}px">
+        <div class="main">${this.viewer(entry, view)}</div>
+        ${this.sidePanel(entry)}
+      </div>
+    `;
+  }
+
+  // ---- The side panel (roadmap/inprogress/core-score-hud.md): the page's
+  // chrome, one tab each — description, tags (badges + defs), actions (the
+  // former edit strip), the HUD, the spec reference, the raw JSON.
+
+  private panelTabs(): PanelTab[] {
+    const tabs: PanelTab[] = ['description', 'tags'];
+    if (this.session) tabs.push('actions', 'hud');
+    tabs.push('compare', 'json');
+    return tabs;
+  }
+
+  private sidePanel(entry: ScenarioEntry) {
+    const tabs = this.panelTabs();
+    const tab = tabs.includes(this.panelTab) ? this.panelTab : 'description';
+    return html`
+      <aside class="panel">
+        <div
+          class="panel-drag"
+          title="drag to resize"
+          @pointerdown=${this.onPanelDrag}
+        ></div>
+        <div class="panel-tabs">
+          ${tabs.map(
+            t => html`
+              <button aria-current=${t === tab} @click=${() => (this.panelTab = t)}>${t}</button>
+            `
+          )}
+        </div>
+        <div class="panel-body">
+          ${tab === 'description'
+            ? this.panelDescription(entry)
+            : tab === 'tags'
+              ? this.panelTags(entry)
+              : tab === 'actions'
+                ? this.panelActions(entry)
+                : tab === 'hud'
+                  ? this.hud(entry)
+                  : tab === 'compare'
+                    ? this.panelCompare(entry)
+                    : this.panelJson()}
+        </div>
+      </aside>
+    `;
+  }
+
+  private panelDescription(entry: ScenarioEntry) {
+    return html`
+      <h1>${entry.meta.title}</h1>
+      <div class="id">${entry.id}</div>
+      <p class="description">${entry.meta.description}</p>
+    `;
+  }
+
+  private panelTags(entry: ScenarioEntry) {
+    const item = classify(entry);
+    const verification = entry.meta.verification;
+    return html`
+      <div class="badges">
           <span class="badge ${item.state === 'current' ? 'verified' : 'attention'}">
             ${item.state === 'current' ? entry.meta.status : item.state} — ${item.detail}
           </span>
@@ -819,168 +1025,137 @@ export class ScenarioPage extends LitElement {
                 : nothing}
             </div>`
           : nothing}
-        <div class="tabs">
-          ${views.map(
-            v => html`
-              <a href=${scenarioHref(entry.id, v)} aria-current=${v === view}>
-                ${v === 'compare' ? 'compare · spec reference' : v}
-              </a>
-            `
-          )}
-          <span class="instrument" title="view this score on an instrument — a rendering override, the document is untouched">
-            <select
-              .value=${this.instrument}
-              @change=${(e: Event) => {
-                this.instrument = (e.target as HTMLSelectElement).value;
-              }}
-            >
-              <option value="document">instrument: document</option>
-              ${TUNING_PRESET_NAMES.map(
-                n => html`<option value=${n} ?selected=${this.instrument === n}>${n}</option>`
-              )}
-            </select>
-            <input
-              class="capo"
-              type="number"
-              min="0"
-              max="24"
-              placeholder="capo"
-              .value=${this.capoOverride === null ? '' : String(this.capoOverride)}
-              @change=${(e: Event) => {
-                const raw = (e.target as HTMLInputElement).value.trim();
-                const n = raw === '' ? NaN : Number(raw);
-                this.capoOverride = Number.isInteger(n) && n >= 0 && n <= 24 ? n : null;
-              }}
-            />
-          </span>
+    `;
+  }
+
+  /** The former edit strip: history/trace/setup controls. The cursor readout
+   *  it used to carry (bar · beat · line · selection) is the HUD's job now —
+   *  duplicating it here was the overlap the panel exists to remove. */
+  private panelActions(entry: ScenarioEntry) {
+    if (!this.session) return nothing;
+    return html`
+      <div class="actions">
+        <div class="action-row">
+          <button
+            ?disabled=${!this.session.canUndo}
+            @click=${() => this.stripIntent({ type: 'undo' })}
+          >
+            undo
+          </button>
+          <button
+            ?disabled=${!this.session.canRedo}
+            @click=${() => this.stripIntent({ type: 'redo' })}
+          >
+            redo
+          </button>
+          ${this.session.dirty
+            ? html`<button @click=${() => this.revertEdits()}>revert</button>`
+            : nothing}
+          <button
+            ?disabled=${this.session.intentLog.length === 0}
+            @click=${() => void this.copyTrace()}
+            title="copy this session as a replayable intent-trace fixture — paste into harness/fixtures/edit-traces/"
+          >
+            ${this.copied ? 'copied ✓' : 'copy trace'}
+          </button>
+          <button @click=${() => this.openPopover('timeSignaturePopover')}>time…</button>
+          ${entry.hasTab
+            ? html`<button @click=${() => this.openPopover('tuningPopover')}>tuning…</button>`
+            : nothing}
         </div>
-        ${this.session && view !== 'json'
+        <div class="action-state">
+          entry duration: ${this.session.entryDurationBase}
+          ${this.session.dirty
+            ? html`<span class="dirty" title="edits are in-memory only — the corpus file is untouched"
+                >· ● ${this.session.appliedOps.length}
+                op${this.session.appliedOps.length === 1 ? '' : 's'}</span
+              >`
+            : nothing}
+        </div>
+        ${this.setupPopover
           ? html`
-              <div class="edit-strip">
-                <span class="cur">
-                  m${this.session.cursor.measureIndex + 1} ·
-                  ${this.session.cursor.onset.num}/${this.session.cursor.onset.den}
-                  ${this.session.projection === 'tab'
-                    ? html`· s${this.session.cursor.line}`
-                    : html`· p${this.session.cursor.line}`}
-                  ${this.cursorHidden
-                    ? nothing
-                    : html`· <b title="selection level — Esc widens, Enter narrows"
-                          >${this.session.selectionLevel}</b
-                        >`}
-                  · ${this.session.entryDurationBase}${this.session.selectedNoteKeys.length &&
-                  !this.cursorHidden
-                    ? html` · ${this.session.selectedNoteKeys[0]}`
-                    : nothing}
-                </span>
-                ${this.session.dirty
-                  ? html`<span class="dirty" title="edits are in-memory only — the corpus file is untouched"
-                      >● ${this.session.appliedOps.length}
-                      op${this.session.appliedOps.length === 1 ? '' : 's'}</span
-                    >`
-                  : nothing}
-                <button
-                  ?disabled=${!this.session.canUndo}
-                  @click=${() => this.stripIntent({ type: 'undo' })}
+              <div class="popover">
+                <span class="pop-label"
+                  >${this.setupPopover === 'time' ? 'time signature' : 'tuning'}</span
                 >
-                  undo
-                </button>
-                <button
-                  ?disabled=${!this.session.canRedo}
-                  @click=${() => this.stripIntent({ type: 'redo' })}
-                >
-                  redo
-                </button>
-                <button
-                  ?disabled=${this.session.intentLog.length === 0}
-                  @click=${() => void this.copyTrace()}
-                  title="copy this session as a replayable intent-trace fixture — paste into harness/fixtures/edit-traces/"
-                >
-                  ${this.copied ? 'copied ✓' : 'copy trace'}
-                </button>
-                ${this.session.dirty
-                  ? html`<button @click=${() => this.revertEdits()}>revert</button>`
-                  : nothing}
-                <button @click=${() => this.openPopover('timeSignaturePopover')}>time…</button>
-                ${entry.hasTab
-                  ? html`<button @click=${() => this.openPopover('tuningPopover')}>tuning…</button>`
-                  : nothing}
-                <span class="hint"
-                  >arrows move${entry.hasTab ? ' (↑↓ strings) · digits enter frets' : ''} · Del
-                  removes · −/= duration · Alt+↑↓ transpose · Shift+M add bar · Shift+T
-                  time${entry.hasTab ? ' · Shift+U tuning' : ''} · Ctrl+K palette · Ctrl+G go
-                  to</span
-                >
+                <input
+                  placeholder=${this.setupPopover === 'time' ? '4/4' : 'standard · drop-d · D2 A2 D3 G3 A3 D4'}
+                  @keydown=${(e: KeyboardEvent) => this.onPopoverKey(e)}
+                />
+                ${this.setupPopoverError
+                  ? html`<span class="pop-error">${this.setupPopoverError}</span>`
+                  : html`<span class="pop-hint"
+                      >${this.setupPopover === 'time'
+                        ? 'applies to the current bar onward · Enter applies · Esc closes'
+                        : 'low string first · Enter applies · Esc closes'}</span
+                    >`}
               </div>
-              ${this.setupPopover
-                ? html`
-                    <div class="popover">
-                      <span class="pop-label"
-                        >${this.setupPopover === 'time' ? 'time signature' : 'tuning'}</span
-                      >
-                      <input
-                        placeholder=${this.setupPopover === 'time' ? '4/4' : 'standard · drop-d · D2 A2 D3 G3 A3 D4'}
-                        @keydown=${(e: KeyboardEvent) => this.onPopoverKey(e)}
-                      />
-                      ${this.setupPopoverError
-                        ? html`<span class="pop-error">${this.setupPopoverError}</span>`
-                        : html`<span class="pop-hint"
-                            >${this.setupPopover === 'time'
-                              ? 'applies to the current bar onward · Enter applies · Esc closes'
-                              : 'low string first · Enter applies · Esc closes'}</span
-                          >`}
-                    </div>
-                  `
-                : nothing}
             `
           : nothing}
+        <p class="hint">
+          arrows move${entry.hasTab ? ' (↑↓ strings) · digits enter frets' : ''} · Del removes ·
+          −/= duration · Alt+↑↓ transpose · Shift+M add bar · Shift+T
+          time${entry.hasTab ? ' · Shift+U tuning' : ''} · Ctrl+K palette · Ctrl+G go to
+        </p>
       </div>
-      <div class="body">
-        ${view === 'json'
-          ? this.loadState === 'ready'
-            ? html`<pre class="json">${this.rawScore}</pre>`
-            : this.viewer(entry, 'notation')
-          : view === 'compare'
-            ? html`
-                <div class="compare">
-                  <div>
-                    <div class="side-cap">our render</div>
-                    ${this.viewer(entry, this.comparePaneView())}
-                  </div>
-                  <div class="ref">
-                    <div class="side-cap">spec reference engraving</div>
-                    ${entry.ns === 'spec' && !this.referenceFailed
-                      ? html`<img
-                            src=${`/spec-media/${entry.id.replace(/^spec\//, '')}.png`}
-                            alt="Reference engraving from the MNX spec"
-                            @error=${() => (this.referenceFailed = true)}
-                          />
-                          <p class="ref-credit">
-                            Reference engraving © the W3C MNX Community Group, from the pinned spec
-                            release${entry.specRef
-                              ? html` — <a href=${entry.specRef} target="_blank">source ↗</a>`
-                              : nothing}
-                          </p>`
-                      : html`<div class="ref-missing">
-                          ${entry.ns !== 'spec'
-                            ? html`A lab scenario has no spec reference engraving — compare against
-                              the committed golden via the harness
-                              (<code>npm run verify:scenarios</code> shows what changed).`
-                            : this.loadState === 'failed'
-                              ? // The score failed to fetch too, so this image 404'd for the same
-                                // reason. Don't send them chasing the submodule.
-                                html`Reference engraving unavailable — the same transport failure
-                                as the left pane, not a missing image.`
-                              : html`Reference engraving unavailable — the images come from the
-                                pinned <code>vendor/mnx</code> checkout, copied into the build when
-                                one is present. This build was made without the submodule; run
-                                <code>git submodule update --init vendor/mnx</code> and rebuild.`}
-                        </div>`}
-                  </div>
-                </div>
-              `
-            : this.viewer(entry, view)}
+    `;
+  }
+
+  /** The spec's reference engraving — the main pane is always "our render",
+   *  so showing the reference beside it IS the comparison. */
+  private panelCompare(entry: ScenarioEntry) {
+    return html`
+      <div class="ref-pane">
+        <div class="side-cap">spec reference engraving</div>
+        ${entry.ns === 'spec' && !this.referenceFailed
+          ? html`<img
+                src=${`/spec-media/${entry.id.replace(/^spec\//, '')}.png`}
+                alt="Reference engraving from the MNX spec"
+                @error=${() => (this.referenceFailed = true)}
+              />
+              <p class="ref-credit">
+                Reference engraving © the W3C MNX Community Group, from the pinned spec
+                release${entry.specRef
+                  ? html` — <a href=${entry.specRef} target="_blank">source ↗</a>`
+                  : nothing}
+              </p>`
+          : html`<div class="ref-missing">
+              ${entry.ns !== 'spec'
+                ? html`A lab scenario has no spec reference engraving — compare against the
+                  committed golden via the harness (<code>npm run verify:scenarios</code> shows
+                  what changed).`
+                : this.loadState === 'failed'
+                  ? // The score failed to fetch too, so this image 404'd for the same
+                    // reason. Don't send them chasing the submodule.
+                    html`Reference engraving unavailable — the same transport failure as the
+                    score pane, not a missing image.`
+                  : html`Reference engraving unavailable — the images come from the pinned
+                    <code>vendor/mnx</code> checkout, copied into the build when one is present.
+                    This build was made without the submodule; run
+                    <code>git submodule update --init vendor/mnx</code> and rebuild.`}
+            </div>`}
       </div>
+    `;
+  }
+
+  private panelJson() {
+    return this.loadState === 'ready'
+      ? html`<pre class="json">${this.rawScore}</pre>`
+      : html`<div class="ref-missing">The score has not loaded (${this.loadState}).</div>`;
+  }
+
+  /** The HUD companion (roadmap/inprogress/core-score-hud.md): wired through
+   *  the host, never through the viewer's props. */
+  private hud(entry: ScenarioEntry) {
+    if (!this.session || this.loadState !== 'ready') return nothing;
+    return html`
+      <mnx-score-hud
+        .rows=${buildHudRows(entry.meta.title, this.session, this.cursorHidden)}
+        .parts=${buildHudParts(this.session.doc, index => this.partOverride(index))}
+        .presets=${TUNING_PRESET_NAMES}
+        @hud-row-activated=${this.onHudRow}
+        @hud-part-setup-changed=${this.onHudPartSetup}
+      ></mnx-score-hud>
     `;
   }
 }
