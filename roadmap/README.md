@@ -115,6 +115,18 @@ Another prefix is admitted only when it earns its keep: separate *and* important
   undo history and op log like keyboard edits. Split out of
   [core-editor-input-layer.md](complete/core-editor-input-layer.md); the voice half stays in
   [core-open-router.md](proposed/core-open-router.md).
+- **[core-keymap-cheatsheet.md](proposed/core-keymap-cheatsheet.md)** — a **selection-mode-dependent
+  keyboard cheatsheet**, built by making the ladder's per-level navigation map DATA. The keymap's
+  binding tables are already data, but the *meaning* of a key at each rung lives in
+  `session.navigate` (arrows move by the rung's unit, voice jumps only at note level) — so a
+  cheatsheet from bindings alone would say "→: next position" at every rung. Proposes a
+  `KeyDoc` meaning table beside the keymap (stroke → per-level meaning, DOM-free in `edit/`),
+  with four consumers: the cheatsheet as a hud-tab section
+  ([core-score-hud.md](inprogress/core-score-hud.md) — rows are the nouns, keys are the verbs),
+  the actions tab's drifting hand-written hint line replaced, a canonical diffable home for the
+  [core-selection-ladder.md](inprogress/core-selection-ladder.md) per-level review verdicts, and
+  join + guard-mirroring conformance tests so the cheatsheet cannot lie. Static meaning, not a
+  live enablement oracle; physical-key labels per the keymap's `KeyboardEvent.code` decision.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
