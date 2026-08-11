@@ -1,4 +1,4 @@
-// Corpus police for scenarios/ (see roadmap/complete/04-scenario-library.md).
+// Corpus police for scenarios/ (see roadmap/complete/lab-04-scenario-library.md).
 // Checks, per scenario: metadata validates against meta.schema.json, JSON files
 // are canonically formatted, actual validation verdicts (standard MNX + _x.mnxLab
 // extension) match the declared `expect` in both directions, pinned error
@@ -196,7 +196,7 @@ export function checkScenario(scenario, ctx) {
 
   if (!meta || !doc) return { errors, warnings, meta };
 
-  // The two corpus axes (roadmap/complete/structure-lab.md):
+  // The two corpus axes (roadmap/complete/lab-structure-lab.md):
   //   origin — who writes it. spec/ is owned wholesale by sync:spec
   //   (mirrored, hand-edit forbidden); lab/ is ours (local).
   //   schema — which MNX schema judges expect.standard.

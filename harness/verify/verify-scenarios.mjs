@@ -230,7 +230,7 @@ function main() {
   if (args[0] === '--backfill') {
     // Adds provenance to scenarios verified before the record existed. The
     // date is required and should be when the approval actually happened
-    // (e.g. 2026-07-17 for the initial 57/57 sweep — see SPEC_APPROVAL.md),
+    // (e.g. 2026-07-17 for the initial 57/57 sweep — see lab-spec-approval.md),
     // not today: the record states when a human looked, and inventing a
     // fresher date would be false provenance.
     const at = args[1];

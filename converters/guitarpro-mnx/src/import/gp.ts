@@ -141,7 +141,7 @@ function buildGlobalMeasures(
     // `Section{marker, text}`; we split them, because a rehearsal mark is an
     // arbitrary index into the score while a section name states what the music
     // IS. Written as the PROPOSED standard objects — see
-    // roadmap/proposed/score-text.md; they validate against
+    // roadmap/proposed/spec-score-text.md; they validate against
     // schemas/mnx-schema.proposed.json until the CG adopts them.
     const marker = masterBar.section?.marker?.trim();
     const sectionText = masterBar.section?.text?.trim();

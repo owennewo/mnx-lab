@@ -26,7 +26,7 @@ section label and a direction are different kinds of thing, an engraver can plac
 correctly without the inner/outer placement axis other formats need. The narrative case,
 including a round-trip stress test in which 3 of 4 directions are destroyed or
 misclassified by today's format, is
-[roadmap/proposed/score-text.md](../../../roadmap/proposed/score-text.md).
+[roadmap/proposed/spec-score-text.md](../../../roadmap/proposed/spec-score-text.md).
 
 ## Contents
 

@@ -1,7 +1,7 @@
 # MNX Studio — reserved
 
 **There is no code here, deliberately.** This README is the only studio artifact until
-the product starts (roadmap/complete/structure-lab.md).
+the product starts (roadmap/complete/lab-structure-lab.md).
 
 ## What it is
 

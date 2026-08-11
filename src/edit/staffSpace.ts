@@ -1,4 +1,4 @@
-// The notation cursor's SPACE — roadmap/inprogress/selection-ladder.md.
+// The notation cursor's SPACE — roadmap/inprogress/core-selection-ladder.md.
 //
 // Note-level navigation is spatial in both projections: tab's space is the
 // fingerboard (string × beat), notation's is the staff (staff position ×

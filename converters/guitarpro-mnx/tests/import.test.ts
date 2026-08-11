@@ -21,7 +21,7 @@ import { MnxStructure, isTimedEvent } from '../src/common/types.js';
  * the CLI when a change is intended; a diff here means the corpus moved.
  *
  * What this cannot cover: gp3/gp4/gp5. Those are alphaTab's binary readers,
- * not ours — see the scope note in roadmap/complete/guitar-pro.md.
+ * not ours — see the scope note in roadmap/complete/core-guitar-pro.md.
  */
 
 const SCORES = path.resolve(__dirname, '../../fixtures');

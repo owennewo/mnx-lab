@@ -1,6 +1,6 @@
 {
   "title": "part.transposition never enters the fret arithmetic",
-  "description": "The part carries the standard guitar transposition block (written an octave above sounding, halfSteps -12) and two bare half notes sounding C3 and E3. MNX pitch is the SOUNDING pitch, so the derived frets are (5,3) and (4,2) — identical to the same notes without the block. The transposition is display metadata for written-pitch notation; a derivation that consumed it would come out 12 frets sharp. Pins the resolution of instrument-position.md precondition 1.",
+  "description": "The part carries the standard guitar transposition block (written an octave above sounding, halfSteps -12) and two bare half notes sounding C3 and E3. MNX pitch is the SOUNDING pitch, so the derived frets are (5,3) and (4,2) — identical to the same notes without the block. The transposition is display metadata for written-pitch notation; a derivation that consumed it would come out 12 frets sharp. Pins the resolution of spec-instrument-position.md precondition 1.",
   "bars": 1,
   "tags": [
     "tab",

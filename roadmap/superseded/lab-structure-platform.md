@@ -1,9 +1,9 @@
 # Structure direction — the platform: one app, hard internal seams
 
 > **Status: superseded** (filed 2026-07-31; superseded same day by the adopted
-> [structure-lab.md](../complete/structure-lab.md) direction, now under execution). One of four self-contained structure sketches —
-> the others are [structure-toolchain.md](structure-toolchain.md),
-> [structure-workbench.md](structure-workbench.md) and [structure-lab.md](../complete/structure-lab.md)
+> [lab-structure-lab.md](../complete/lab-structure-lab.md) direction, now under execution). One of four self-contained structure sketches —
+> the others are [lab-structure-toolchain.md](lab-structure-toolchain.md),
+> [lab-structure-workbench.md](lab-structure-workbench.md) and [lab-structure-lab.md](../complete/lab-structure-lab.md)
 > (the likely direction of travel, which absorbs this plan's layer model and build faces).
 > They are alternatives for a single decision; each is written to stand alone.
 
@@ -47,7 +47,7 @@ worker/
   prompts/     editNotation.ts — moved from server/prompts and converted to TS
   api/documents.ts, api/auth.ts   reserved SaaS seams (501 stubs, no bindings yet)
   generated/   precompiled validators (unchanged)
-scenarios/     unchanged (the corpus data contract in 04-scenario-library.md keeps its paths)
+scenarios/     unchanged (the corpus data contract in lab-04-scenario-library.md keeps its paths)
 scores/        moved from server/scores — the .gpx sources + derived .mnx.json/.xml
 converters/    unchanged in place; linked as npm workspaces for install/dedup only —
                Node-only satellites that feed the corpus, never part of the app build

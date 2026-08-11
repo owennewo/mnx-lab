@@ -17,7 +17,7 @@ document that everything re-derives from.
 
 ### P2 — Every capability is a package behind a contract
 The repo is a monorepo of packages. A package may only import packages that
-`../superseded/02-architecture.md` explicitly permits.
+`../superseded/lab-02-architecture.md` explicitly permits.
 *Why:* this is the mechanism that makes the pieces reusable and independently testable.
 *Apply:* if you need something from another package that isn't in its public contract,
 the fix is to extend that contract deliberately — never to reach into its internals.
@@ -26,7 +26,7 @@ the fix is to extend that contract deliberately — never to reach into its inte
 The **layout engine** consumes the document and emits **primitive shapes** (lines, glyphs,
 beams, positions). The **SVG renderer** consumes primitives and knows nothing about music.
 *Why:* this is the project's best existing idea (see `../../SVG_RENDERING_ENGING.md` and
-`MUSICXML.md` §9). It lets the same layout feed SVG today, canvas/PDF later, and lets the
+`core-musicxml.md` §9). It lets the same layout feed SVG today, canvas/PDF later, and lets the
 renderer be tested without any musical knowledge.
 *Apply:* the `Primitive[]` type *is* the contract between layout and render. Nothing
 music-aware crosses into the renderer.

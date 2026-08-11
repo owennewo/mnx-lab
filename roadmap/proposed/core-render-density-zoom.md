@@ -40,7 +40,7 @@ Three distinct axes, deliberately separated:
 - Presets (`compact` / `normal` / `spacious`) vs. continuous sliders vs. both?
 - Do the three axes couple (a single "density" control) or stay independent (H / V / zoom)?
 - ~~Where do they live — viewer toolbar, embed attributes, `RenderOptions`, or all three?~~
-  Answered by [viewer-surface.md](viewer-surface.md): all three, layered — the lever enters
+  Answered by [core-viewer-surface.md](core-viewer-surface.md): all three, layered — the lever enters
   `RenderOptions` (behavior ground truth), the element binds it as an attribute, the
   toolbar composes the attribute.
 - Interaction with justification (does horizontal density change the justification target, or

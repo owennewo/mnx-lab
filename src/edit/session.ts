@@ -1,5 +1,5 @@
 // The editor session: intent + (doc, cursor) → cursor move or EditOp.
-// This is stage 2 of the input layer (roadmap/complete/editor-input-layer.md)
+// This is stage 2 of the input layer (roadmap/complete/core-editor-input-layer.md)
 // — DOM-free on purpose, so the workbench mount and the harness replay test
 // drive the exact same object. The session records every intent it handles;
 // that log IS the trace fixture ("recording is the same stream as undo").
@@ -74,7 +74,7 @@ export class EditorSession {
   /** Digit-combining anchor: consecutive fret digits on an unmoved cursor
    *  combine (1,2 → 12) — deterministic, no timers, so traces replay. */
   private lastDigit: { anchor: string; fret: number } | null = null;
-  /** The selection ladder rung (roadmap/inprogress/selection-ladder.md). The
+  /** The selection ladder rung (roadmap/inprogress/core-selection-ladder.md). The
    *  cursor is the anchor; the level says how much around it is selected.
    *  Relaxing never moves the cursor, so tighten re-resolves the same
    *  measure/onset/line as relative addresses — the implicit breadcrumb. */

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mnx-lab.totai.uk/schemas/scenario-meta.schema.json/v1",
   "title": "MNX Lab scenario metadata (meta.json)",
-  "description": "Sidecar metadata for one scenario in the corpus. Identity (id, category) is derived from the folder path and deliberately NOT stored here. See roadmap/complete/04-scenario-library.md.",
+  "description": "Sidecar metadata for one scenario in the corpus. Identity (id, category) is derived from the folder path and deliberately NOT stored here. See roadmap/complete/lab-04-scenario-library.md.",
   "type": "object",
   "properties": {
     "title": {
@@ -46,7 +46,7 @@
         "mirrored",
         "local"
       ],
-      "description": "Who writes this scenario. \"mirrored\" = generated from the pinned spec by sync:spec, hand-edit forbidden (sync owns the whole scenarios/spec/ tree); \"local\" = ours. One corpus format, two axes \u2014 see roadmap/complete/structure-lab.md."
+      "description": "Who writes this scenario. \"mirrored\" = generated from the pinned spec by sync:spec, hand-edit forbidden (sync owns the whole scenarios/spec/ tree); \"local\" = ours. One corpus format, two axes \u2014 see roadmap/complete/lab-structure-lab.md."
     },
     "schema": {
       "enum": [
@@ -144,7 +144,7 @@
         "at"
       ],
       "additionalProperties": false,
-      "description": "Provenance of the last human approval, written only by verify-scenarios.mjs and deliberately KEPT through demotion — so the approval queue can distinguish 'stale' (verified once, a golden changed since: a hash differs or status was demoted) from 'never seen' (no record). See roadmap/complete/structure-lab.md."
+      "description": "Provenance of the last human approval, written only by verify-scenarios.mjs and deliberately KEPT through demotion — so the approval queue can distinguish 'stale' (verified once, a golden changed since: a hash differs or status was demoted) from 'never seen' (no record). See roadmap/complete/lab-structure-lab.md."
     }
   },
   "required": [

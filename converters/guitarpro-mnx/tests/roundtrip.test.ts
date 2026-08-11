@@ -172,7 +172,7 @@ describe.each(FIXTURES)('schema conformance: %s', name => {
     // schemas/mnx-lab-extensions.schema.json.
     //
     // Validated against the PROPOSED schema: the importer writes `rehearsal` and
-    // `section`, which are drafted in roadmap/proposed/score-text.md and not yet
+    // `section`, which are drafted in roadmap/proposed/spec-score-text.md and not yet
     // adopted, so the published schema rejects them by design. Swap this import
     // back to validate-mnx.mjs the moment the CG adopts them — the published
     // validator passing is the signal that the proposal has landed.
@@ -234,7 +234,7 @@ describe('lyrics', () => {
    * Guitar Pro stores lyrics as one text blob per verse, re-split on
    * whitespace, with a trailing `-` marking a syllable that continues. GP7 also
    * writes them per-beat, which is why attachment (voice, and rest-vs-note)
-   * survives — see roadmap/complete/guitar-pro.md.
+   * survives — see roadmap/complete/core-guitar-pro.md.
    */
   async function sunRoundTrip() {
     const original: MnxStructure = JSON.parse(

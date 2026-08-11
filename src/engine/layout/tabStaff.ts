@@ -14,7 +14,7 @@ import { EventSlot } from './spacing.ts';
  * the tab-style time signature and fret digits — shared verbatim between the
  * standalone tab layout (src/engine/layout/tab.ts) and the notation layout's
  * native tab staff kind in the combined `both` system
- * (roadmap/complete/both-view-single-system.md phase 2). One source, so the
+ * (roadmap/complete/core-both-view-single-system.md phase 2). One source, so the
  * standalone view and the combined system cannot drift; the tab goldens pin
  * this module through tab.ts byte-for-byte.
  */

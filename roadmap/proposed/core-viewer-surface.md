@@ -2,7 +2,7 @@
 
 > **Status: proposed (2026-08-07), not started.** Design direction agreed in conversation;
 > nothing built. Subsumes the "where do the levers live" open question of
-> [render-density-zoom.md](render-density-zoom.md) and the view-default design below.
+> [core-render-density-zoom.md](core-render-density-zoom.md) and the view-default design below.
 
 ## The problem
 
@@ -26,14 +26,14 @@ Concrete symptoms of the gap:
 - A read-only player must set `viewMode` (and compute `hasTab`!) to show a document the
   way its author intended — `_x.mnxLab.tab.staffKind` is documented as a hint
   ([docs/mnx-extensions.md](../../docs/mnx-extensions.md)) but no surface consults it.
-- Density/zoom levers ([render-density-zoom.md](render-density-zoom.md)) have named
+- Density/zoom levers ([core-render-density-zoom.md](core-render-density-zoom.md)) have named
   engine knobs but no answer to "toolbar, embed attribute, `RenderOptions`, or all three?"
 - Feature visibility (lyrics, harmonies, diagnostics badges, tempo marks) is not
   controllable anywhere; layouts always draw everything they support.
 
 ## The design
 
-**Name:** *the viewer surface* — documented as `docs/viewer-surface.md` when built, with
+**Name:** *the viewer surface* — documented as `docs/core-viewer-surface.md` when built, with
 the same contract status as the `--mnx-*` token vocabulary and the layer diagram in
 CLAUDE.md. The doc is the review question "does this belong on the surface?" made
 answerable.
@@ -74,7 +74,7 @@ user toggle  >  host attribute  >  document hint  >  built-in default
 and *unset means "defer to the layer below"*, not "the default value". First instance:
 `view` gains an `'auto'` default (replacing `viewMode`'s unconditional `'notation'`),
 resolved from `staffKind` — `both` → the composed system
-([both-view-single-system.md](../complete/both-view-single-system.md)), `tab` → tab,
+([core-both-view-single-system.md](../complete/core-both-view-single-system.md)), `tab` → tab,
 absent/`notation` → notation. The read-only player becomes zero-config; the author's
 declared presentation finally works; interactive shells still override at will.
 `staffKind` stays a **hint, never a command** — read-only means "I don't edit the
@@ -109,16 +109,16 @@ every future candidate.
 
 ## Order of work
 
-1. **Write `docs/viewer-surface.md`** — the contract as it *should* be, marking each
+1. **Write `docs/core-viewer-surface.md`** — the contract as it *should* be, marking each
    current prop keep/derive/evict. Cheap, and everything after cites it.
 2. **`view="auto"`** + `hasTab` derivation + precedence documented in
    mnx-extensions.md's staffKind entry. (Smallest slice; fixes the read-only player.)
 3. **Evict the exhibit panel** into `workbench/` (or document the workbench tier).
 4. **`hide` set**, starting with `badges` (emit-side, easy) and `lyrics` (layout-side,
    proves the reflow path through `RenderOptions`).
-5. **Density levers land per render-density-zoom.md**, entering through
+5. **Density levers land per core-render-density-zoom.md**, entering through
    `RenderOptions` → attributes, per the layering rule.
 
 ✔ when: a bare `<mnx-score-viewer>` + document shows the author's intended view;
-every host-controllable behavior is listed in `docs/viewer-surface.md`; no prop on the
+every host-controllable behavior is listed in `docs/core-viewer-surface.md`; no prop on the
 element is workbench-private without being marked as such.

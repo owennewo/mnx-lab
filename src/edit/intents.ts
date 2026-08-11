@@ -1,4 +1,4 @@
-// The editor's intent vocabulary — roadmap/complete/editor-input-layer.md.
+// The editor's intent vocabulary — roadmap/complete/core-editor-input-layer.md.
 //
 // Intents are the stable middle of the input layer: keymaps (experimental,
 // churning) map keys to intents, and the session maps intents to cursor moves
@@ -17,7 +17,7 @@ export type NavigationIntent =
   | { type: 'lineUp' }
   /** Jump to a bar (0-based), clamped — the go-to grammar's "12" (survey §3.8). */
   | { type: 'goToMeasure'; measureIndex: number }
-  /** The selection ladder (roadmap/inprogress/selection-ladder.md): relax
+  /** The selection ladder (roadmap/inprogress/core-selection-ladder.md): relax
    *  widens one rung (note → … → score; past the top the MOUNT deselects),
    *  tighten narrows back down the same containment chain. Navigation, not
    *  mutation — the ladder changes what the cursor addresses, never the doc. */

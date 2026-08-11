@@ -1,5 +1,5 @@
 // The note level of the selection-ladder navigation map
-// (roadmap/inprogress/selection-ladder.md): spatial cursor in both
+// (roadmap/inprogress/core-selection-ladder.md): spatial cursor in both
 // projections, snap-to-ink notation walking, the Ctrl climb at note level,
 // and the notation entry toggle — driven over the navigation playground
 // scenario, the standing test bed for the per-level reviews.

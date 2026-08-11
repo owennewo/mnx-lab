@@ -1,6 +1,6 @@
 {
   "title": "Directions on a multi-staff part",
-  "description": "On a part with more than one staff, a direction may name the staff it belongs to. An orientation of \"between\" places it between the staves, where it belongs to the part as a whole rather than to either staff — a placement a simple above/below cannot express. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
+  "description": "On a part with more than one staff, a direction may name the staff it belongs to. An orientation of \"between\" places it between the staves, where it belongs to the part as a whole rather than to either staff — a placement a simple above/below cannot express. Proposed MNX objects, not yet adopted — see roadmap/proposed/spec-score-text.md.",
   "bars": 2,
   "tags": [
     "directions",

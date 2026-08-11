@@ -1,12 +1,12 @@
 # The AI prompt in the editor — the palette's third mode
 
 > **Status: proposed (2026-08-03), not started.** Split out of
-> [editor-input-layer.md](../complete/editor-input-layer.md), whose remaining
+> [core-editor-input-layer.md](../complete/core-editor-input-layer.md), whose remaining
 > palette work is now go-to + commands only; the AI half grew its own design
 > questions and deserves its own decision record. The research grounding is
 > [research/notation-editor-keyboard-models.md](../../research/notation-editor-keyboard-models.md)
 > §6.2; the voice/transcription half of this idea stays in
-> [open_router.md](open_router.md).
+> [core-open-router.md](core-open-router.md).
 
 ## The idea
 
@@ -65,7 +65,7 @@ clears it. Pieces:
 
 ## Not this
 
-- Not the voice/transcription stage — that is [open_router.md](open_router.md)'s
+- Not the voice/transcription stage — that is [core-open-router.md](core-open-router.md)'s
   remaining half, layered on top of this once text prompts work.
 - Not a chat: one prompt, one edit, landed in history. The Assist drawer
   remains the conversational surface.

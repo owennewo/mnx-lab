@@ -1,4 +1,4 @@
-// The position cursor — roadmap/complete/editor-input-layer.md.
+// The position cursor — roadmap/complete/core-editor-input-layer.md.
 //
 // The cursor is a RHYTHMIC POSITION plus a VERTICAL LINE, not a note id: an
 // empty measure has no note keys at all, so a note-list cursor would make a
@@ -30,7 +30,7 @@ import { clefAt, staffPositionOfPitch } from './staffSpace.ts';
 
 /**
  * The active projection — which SPACE the cursor's vertical line addresses
- * (roadmap/inprogress/selection-ladder.md): 'tab' = the fingerboard (line is
+ * (roadmap/inprogress/core-selection-ladder.md): 'tab' = the fingerboard (line is
  * a string number, 1 = top), 'notation' = the staff (line is a staff
  * position in half-staff-spaces from the middle line, positive up). Both
  * projections view ONE model; switching remaps the line, never the music.

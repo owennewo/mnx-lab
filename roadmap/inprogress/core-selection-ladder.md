@@ -63,7 +63,7 @@
 > full strength), ghost cells beyond the existing entry ghosts, container
 > rungs (the cursor still treats containers as opaque), and trace fixtures
 > asserting selection. Builds directly on the complete
-> input layer ([editor-input-layer.md](../complete/editor-input-layer.md)), which
+> input layer ([core-editor-input-layer.md](../complete/core-editor-input-layer.md)), which
 > already decided the load-bearing substrate: the cursor is a **rhythmic
 > position, not a note id**; selection is a **first-class output** of the intent
 > state machine; the cursor/selection render as an **overlay keyed by
@@ -71,7 +71,7 @@
 > session state. Entry ghosts exist. This doc is the next storey: what
 > "selection" *is* when it can be wider than one position, and how input modes
 > fall out of it. The section rung leans on
-> [score-text.md](score-text.md)'s proposed `section` field.
+> [spec-score-text.md](spec-score-text.md)'s proposed `section` field.
 
 ## The idea
 
@@ -97,7 +97,7 @@ the document has one (skipped otherwise — the **presence rule**).
 | voice-measure (= one `sequence`) | `fullMeasure` rest, staff assignment, voice ops (delete/swap/move) |
 | part-measure | clefs, beams, dynamics, ottavas (stored here in MNX) |
 | measure (global) | key, time, barline, repeats, volta, segno/fine/jump, tempo, rehearsal/section, harmonies; insert/delete measure |
-| [section] | label/color, boundaries, select-the-range (proposed field — [score-text.md](score-text.md)) |
+| [section] | label/color, boundaries, select-the-range (proposed field — [spec-score-text.md](spec-score-text.md)) |
 | score | layouts, system breaks, multimeasure rests, title |
 
 Schema facts this design rests on (verified against the pinned schema):
@@ -269,7 +269,7 @@ Why the rows are what they are:
   direction) from the component. The workbench binds it to prev/next
   scenario in the rail; studio will bind it to prev/next score. This is part
   of the element's public surface — record it in
-  [viewer-surface.md](../proposed/viewer-surface.md)'s event contract when
+  [core-viewer-surface.md](../proposed/core-viewer-surface.md)'s event contract when
   that lands. Emitted ONLY at score level, so arrows stay inert everywhere
   they lack meaning.
 
@@ -389,7 +389,7 @@ defaults feel consistent.
 - **The section rung is spec-loop evidence.** It is built on a
   proposed-schema field; if section-nav proves out, that experience belongs in
   `spec/proposals/` as an implementation argument for adoption
-  ([score-text.md](score-text.md)).
+  ([spec-score-text.md](spec-score-text.md)).
 - **Interaction with the full-bar invariant** — unentered positions ARE beat
   rests; ghost cells and the rest/note-rung skipping must agree with that
   model, not fight it.
@@ -399,12 +399,12 @@ defaults feel consistent.
 - **Not a renderer change.** Enclosures are the existing overlay pattern,
   grown; `expected.primitives.json` and every golden are untouched by design.
 - **Not the `elements/` promotion** — the ladder lands in the workbench mount
-  first ([editor-element-promotion.md](editor-element-promotion.md) keeps its
+  first ([core-editor-element-promotion.md](core-editor-element-promotion.md) keeps its
   own trigger).
 - **Not discontiguous multi-select** (Ctrl+click collections) — the ladder is
   one contiguous selection at one level; overlap lives in the document's
   spanners, never in the selection.
 - **Not the properties panels themselves** (part tuning/capo, score layout) —
   this doc only decides how they are *reached* (closures); their contents sit
-  with [viewer-surface.md](viewer-surface.md) and the editor work that needs
+  with [core-viewer-surface.md](core-viewer-surface.md) and the editor work that needs
   them.

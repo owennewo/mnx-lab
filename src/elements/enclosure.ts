@@ -1,4 +1,4 @@
-// The selection enclosure overlay — roadmap/inprogress/selection-ladder.md.
+// The selection enclosure overlay — roadmap/inprogress/core-selection-ladder.md.
 //
 // One visual vocabulary for every selection level: an enclosure whose extent
 // grows and whose fill fades as the level widens (cell → slice → beads →

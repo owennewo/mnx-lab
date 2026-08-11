@@ -1,4 +1,4 @@
-// Machine-enforced layer boundaries — roadmap/inprogress/structure-lab.md.
+// Machine-enforced layer boundaries — roadmap/complete/lab-structure-lab.md.
 // A violation is a red build (`npm run check:boundaries`, wired into build),
 // not a review comment.
 //

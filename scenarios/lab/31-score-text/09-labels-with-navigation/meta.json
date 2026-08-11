@@ -1,6 +1,6 @@
 {
   "title": "Labels with navigation marks",
-  "description": "Rehearsal marks and sections sit alongside the navigation marks a measure already carries. Both describe the measure, so they align to the barline, while a segno or a fine is positioned at a point within it and stays there. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
+  "description": "Rehearsal marks and sections sit alongside the navigation marks a measure already carries. Both describe the measure, so they align to the barline, while a segno or a fine is positioned at a point within it and stays there. Proposed MNX objects, not yet adopted — see roadmap/proposed/spec-score-text.md.",
   "bars": 4,
   "tags": [
     "labels",

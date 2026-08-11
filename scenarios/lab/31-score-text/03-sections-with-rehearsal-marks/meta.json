@@ -1,6 +1,6 @@
 {
   "title": "Sections with rehearsal marks",
-  "description": "Rehearsal marks and sections are separate objects because they are separate things, and they routinely appear together — a chart marked \"A\" at the start of the verse carries both an index and a name for the same bar. Proposed MNX objects, not yet adopted — see roadmap/proposed/score-text.md.",
+  "description": "Rehearsal marks and sections are separate objects because they are separate things, and they routinely appear together — a chart marked \"A\" at the start of the verse carries both an index and a name for the same bar. Proposed MNX objects, not yet adopted — see roadmap/proposed/spec-score-text.md.",
   "bars": 4,
   "tags": [
     "labels",

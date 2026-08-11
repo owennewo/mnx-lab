@@ -14,7 +14,7 @@ export const playbackStateContext = createContext<PlaybackState>(Symbol('playbac
 
 /**
  * The selection-ladder enclosure vocabulary (roadmap/inprogress/
- * selection-ladder.md) — PRESENTATION ONLY. The workbench maps editor
+ * core-selection-ladder.md) — PRESENTATION ONLY. The workbench maps editor
  * selection levels onto these shapes so `elements/` never learns about
  * `edit/`: note→cell, event→slice, voiceMeasure→run, partMeasure→panel,
  * measure/section→panel-wide, score→frame.

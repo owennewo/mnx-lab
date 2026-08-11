@@ -1,6 +1,6 @@
 {
   "title": "A stored fret that lies is flagged, and the derived fret renders",
-  "description": "One whole note sounding C3 annotated string 5 fret 5 — but string 5 (open A2) sounds C3 at fret 3. The stored fret is non-authoritative: the tab staff draws the DERIVED fret 3, and a red badge reports the disagreement. This is the stored fret's entire v5 job — a mismatch is one of the few signals that catches a broken importer — and the conflict rule of instrument-position.md adjudicated: pitch wins, annotations are checked against it.",
+  "description": "One whole note sounding C3 annotated string 5 fret 5 — but string 5 (open A2) sounds C3 at fret 3. The stored fret is non-authoritative: the tab staff draws the DERIVED fret 3, and a red badge reports the disagreement. This is the stored fret's entire v5 job — a mismatch is one of the few signals that catches a broken importer — and the conflict rule of spec-instrument-position.md adjudicated: pitch wins, annotations are checked against it.",
   "bars": 1,
   "tags": [
     "tab",

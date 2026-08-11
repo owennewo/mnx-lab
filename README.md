@@ -24,5 +24,5 @@ npm test           # harness suites over the corpus
 
 Structure, conventions and the full command list: **[CLAUDE.md](CLAUDE.md)**. Planning
 history: [roadmap/](roadmap/README.md). The repo was rebuilt fresh-slate in 2026-07
-([roadmap/complete/structure-lab.md](roadmap/complete/structure-lab.md)); the previous
+([roadmap/complete/lab-structure-lab.md](roadmap/complete/lab-structure-lab.md)); the previous
 tree lives on the `legacy` branch.

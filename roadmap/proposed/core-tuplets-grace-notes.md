@@ -1,7 +1,7 @@
 # Tuplets and grace notes across the converters (and on tab)
 
 > **Status: proposed (2026-08-09).** Split out of
-> [guitar-pro.md](../complete/guitar-pro.md) when that effort closed. It was the one
+> [core-guitar-pro.md](../complete/core-guitar-pro.md) when that effort closed. It was the one
 > genuine feature gap left there, and it was never Guitar-Pro-specific: **neither**
 > converter carries tuplets or grace notes, and the tab renderer draws neither. Filing
 > it once, at its real scope, beats leaving the same hole recorded in three places.

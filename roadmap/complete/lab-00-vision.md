@@ -28,7 +28,7 @@ being genuinely good.
 
 1. **A spec-coverage scenario library.** Small, valid, readable MNX docs (mostly 1–2 bars),
    categorised hierarchically, each with metadata and a rendered reference. See
-   `../inprogress/04-scenario-library.md`. *This is the first deliverable.*
+   `../inprogress/lab-04-scenario-library.md`. *This is the first deliverable.*
 2. **A reusable rendering core.** Document-agnostic layout engine → primitive shapes → dumb
    SVG renderer. Proven correct against the library.
 3. **A gallery app.** Browse the library, see each document's JSON, validation status, and
@@ -50,7 +50,7 @@ being genuinely good.
 - **No editor or player in the first milestone.** The first thing that ships is read-only.
 - **Not** a general-purpose notation *framework* — we expose packages, not a plugin system.
 - **No** accounts, collaboration, or cloud sync in v1 (storage contract leaves room).
-- **No** framework lock-in: no React/Vue/Redux (see `01-principles.md`).
+- **No** framework lock-in: no React/Vue/Redux (see `lab-01-principles.md`).
 - **No** mouse-driven WYSIWYG score editing in the first editing pass — editing starts from
   the document + AI, not drag-the-notehead. *(Confirm: ever in scope, or never?)*
 - v1 proves the pipeline on a focused instrument set; **guitar (notation + tab)** is the

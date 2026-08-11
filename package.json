@@ -19,7 +19,7 @@
     "./smufl/*": "./public/smufl/*"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "NODE_OPTIONS=--disable-warning=DEP0040 vite",
     "build": "npm run compile-validator && npm run check:boundaries && tsc && tsc -p worker && vite build",
     "build:lib": "vite build -c vite.lib.config.ts",
     "build:embed": "vite build -c vite.embed.config.ts",

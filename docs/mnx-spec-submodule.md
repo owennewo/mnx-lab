@@ -79,7 +79,7 @@ git add vendor/mnx spec/mnx-schema.json scenarios/spec
 
 A schema bump can legitimately change render output, which demotes `verified` scenarios
 back into the approval queue — that is the mechanism working, see
-[roadmap/complete/SPEC_APPROVAL.md](../roadmap/complete/SPEC_APPROVAL.md).
+[roadmap/complete/lab-spec-approval.md](../roadmap/complete/lab-spec-approval.md).
 
 ## Contributing upstream
 
@@ -102,7 +102,7 @@ and [doctools/README.md](https://github.com/w3c-cg/mnx/blob/main/doctools/README
   `main`.)
 - **This is a W3C CG report repo** (`w3c.json`, group 81249). Contributions need CG
   membership and a signed CLA — see
-  [roadmap/proposed/mnx-cg-proposals.md](../roadmap/proposed/mnx-cg-proposals.md) §6.
+  [roadmap/proposed/spec-mnx-cg-proposals.md](../roadmap/proposed/spec-mnx-cg-proposals.md) §6.
 - **You cannot hand-edit the spec.** Changes are made through the Django admin and
   serialized with `freezedb`; the PR carries `doctools/data.json` (plus, for a new
   example, its `.json` and `.png` — `freezedb` doesn't produce those). Don't regenerate

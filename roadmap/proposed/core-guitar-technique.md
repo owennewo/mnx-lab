@@ -8,7 +8,7 @@
 > `points: [{position, alter}]` in semitones — instead of the single interval
 > that silently flattened anything more elaborate than a ramp. Slide enum values
 > are camelCase (`slideIn` / `slideOut`), matching MNX house style. Design:
-> [mnx-cg-proposals.md](mnx-cg-proposals.md) §5; spec:
+> [spec-mnx-cg-proposals.md](spec-mnx-cg-proposals.md) §5; spec:
 > [docs/mnx-extensions.md](../../docs/mnx-extensions.md).
 >
 > **What is left is rendering** — nothing draws any of it. Note that bend-point
@@ -227,7 +227,7 @@ tractable.
 
 This should probably be **split**: land the data path (1–3) first so documents
 stop losing information, then treat rendering as its own item against the
-[SPEC_APPROVAL](../complete/SPEC_APPROVAL.md) process. Carrying technique that
+[lab-spec-approval.md](../complete/lab-spec-approval.md) process. Carrying technique that
 nothing draws is still a strict improvement — the `.gp` export becomes correct
 for Guitar Pro users immediately, which is the main consumer of this data today.
 

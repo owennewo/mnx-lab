@@ -503,7 +503,7 @@ function buildBeat(
  * alphaTab re-splits on whitespace; a syllable that continues into the next one
  * is marked by a trailing `-` (`par-` + `ting`). That is precisely MNX's
  * `start`/`middle` line type, so hyphenation survives — see the round-trip
- * caveats in roadmap/complete/guitar-pro.md for what does not.
+ * caveats in roadmap/complete/core-guitar-pro.md for what does not.
  */
 function applyLyrics(
   beat: alphaTab.model.Beat,

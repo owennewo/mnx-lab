@@ -78,5 +78,5 @@ MusicXML ⇄ MNX (C4) can be hardened independently whenever useful — notably 
 - The hard spine is **0 → 1 → 2 → 3**. Guitar (4), playback (5), editing (6) are reorderable
   once rendering is solid — they only share `mnx-core`.
 - **AI (7) stays last** regardless. It presupposes a trustworthy model, renderer, and editor.
-- Each phase that introduces a package triggers its `module-specs.md` entry (just-in-time) and an
+- Each phase that introduces a package triggers its `lab-module-specs.md` entry (just-in-time) and an
   ADR if it embodies a real choice.

@@ -3,7 +3,7 @@
 // points: Ctrl+K prefills `>` (commands), Ctrl+G opens bare (go-to). The
 // component is deliberately dumb: the shell supplies a provider that turns
 // the query into runnable items; all routing/intent knowledge stays outside.
-// (The AI prompt mode is a separate roadmap item — editor-ai-prompt.md.)
+// (The AI prompt mode is a separate roadmap item — core-editor-ai-prompt.md.)
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, scrollbars } from '../elements/tokens.ts';

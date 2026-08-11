@@ -3,7 +3,7 @@
 > **Status: data path SHIPPED (2026-07-26); rendering not started.**
 >
 > Built as `global.measures[i]._x.mnxLab.harmonies[]` — the design argued in
-> [mnx-cg-proposals.md](mnx-cg-proposals.md) §4 and specified in
+> [spec-mnx-cg-proposals.md](spec-mnx-cg-proposals.md) §4 and specified in
 > [docs/mnx-extensions.md](../../docs/mnx-extensions.md). What landed:
 >
 > | | |
@@ -87,7 +87,7 @@ should be decided together rather than one at a time:
 | Tab (positions, tuning, capo) | ✅ shipped as `_x.tab` v2 | the whole corpus |
 | Section / rehearsal labels | ✅ shipped as `_x.section` | Sun-did-glide (5), Vestapol (4) |
 | **Chord symbols** | ❌ this doc | Vestapol (25) |
-| **Harmonics, palm mute** | ❌ [guitar-technique.md](guitar-technique.md) | Vestapol (42 + 4) |
+| **Harmonics, palm mute** | ❌ [core-guitar-technique.md](core-guitar-technique.md) | Vestapol (42 + 4) |
 
 Worth writing up as input to the MNX CG alongside the tab-clef finding that
 already feeds [w3c-cg/mnx#63](https://github.com/w3c/mnx/issues/63) — "what a

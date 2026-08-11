@@ -5,7 +5,7 @@
 > re-derived. The *initial* CG discussion is deliberately narrower than this doc
 > and does not mention the derivation thesis.
 >
-> Sibling docs: [guitar-technique.md](guitar-technique.md) covers what the *hands
+> Sibling docs: [core-guitar-technique.md](core-guitar-technique.md) covers what the *hands
 > do* (bends, slides, harmonics); this covers **where the note is played**.
 > [docs/mnx-extensions.md](../../docs/mnx-extensions.md) records what is actually
 > built today — and it differs from this design in one important way (see
@@ -358,7 +358,7 @@ the derivation rules and their three preconditions.
   palm mute, let ring, tapping, tremolo bar, dead/ghost notes. None of it is needed to
   render a readable tab staff, and most is not string-specific anyway (slides, harmonics
   and vibrato exist on trombone and violin), so it belongs in a general articulations
-  conversation. See [guitar-technique.md](guitar-technique.md).
+  conversation. See [core-guitar-technique.md](core-guitar-technique.md).
 - **The entire right hand** — pick vs fingers, stroke direction, p-i-m-a, strums, rakes,
   rasgueado, pick scrape. MusicXML already splits these (`<fingering>` left, `<pluck>`
   right), so scoping to the left hand follows an existing seam. Strums likely extend the
@@ -367,7 +367,7 @@ the derivation rules and their three preconditions.
 - **Barre and position markers** — worth calling out explicitly because they *are*
   left-hand and readers will assume they are in. A barre is a span across strings; a
   position marker is a directive. Different object shapes.
-- **Chord symbols and fretboard diagrams** — see [chord-symbols.md](chord-symbols.md)
+- **Chord symbols and fretboard diagrams** — see [core-chord-symbols.md](core-chord-symbols.md)
   and [#110](https://github.com/w3c-cg/mnx/issues/110).
 - **Bowing** — up/down bow already exists as `bowDirection`; sul tasto/ponticello, pizz.
   do not. Sharing fingering does not make it the same proposal.
@@ -401,7 +401,7 @@ If the derivation thesis survives CG contact, the migration is to keep `fret` as
 optional non-authoritative field (its validation role) rather than to delete it — the
 converters keep working, and documents stay readable. Recorded here so the divergence
 is a decision rather than a drift. **That migration is now planned** — without waiting
-for the CG — in [derived-positions.md](derived-positions.md), which also specifies the
+for the CG — in [core-derived-positions.md](core-derived-positions.md), which also specifies the
 no-annotation fallback (derive string *and* fret from pitch alone, default tuning) as
 renderer presentation rather than spec text.
 

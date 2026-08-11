@@ -3,13 +3,13 @@
 > **Status: COMPLETE (2026-08-09).** `converters/guitarpro-mnx/` is bi-directional,
 > alphaTab-backed and **56 tests green** — the corpus is authored as Guitar Pro and
 > both directions are pinned. Sibling to the shipped
-> [MusicXML converter](../complete/MUSICXML.md); same shape, different source format.
+> [MusicXML converter](../complete/core-musicxml.md); same shape, different source format.
 >
 > Two things were deliberately scoped **out** rather than left as implied promises,
 > both recorded at "What was left, and where it went" below: gp3/gp4/gp5 reader
 > coverage (alphaTab's code, not ours) and tuplets/grace notes (never
 > Guitar-Pro-specific — split to
-> [tuplets-grace-notes.md](../proposed/tuplets-grace-notes.md)).
+> [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md)).
 
 ## What is built
 
@@ -27,7 +27,7 @@
 | Export MNX → `.gp` (GP7) | ✅ verified as a real GP7 zip container (`VERSION` 7.0 + `Content/score.gpif`) |
 | `MNX → .gp → MNX` round trip | ✅ **byte-for-byte identical events** on all three reference scores |
 | `_x.mnxLab.tab.technique` | ✅ **exercised** — Vestapol carries hammer-ons, pull-offs, slides, vibrato, harmonics and palm mute; bends round-trip as **curves** (`points: [{position, alter}]`, semitones ← GP's quarter tones) |
-| Tuplets, grace notes | ➡️ **out of scope here** — both directions `warn()` rather than silently dropping; the feature moved to [tuplets-grace-notes.md](../proposed/tuplets-grace-notes.md) |
+| Tuplets, grace notes | ➡️ **out of scope here** — both directions `warn()` rather than silently dropping; the feature moved to [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md) |
 
 **Round-trip results** (`MNX → .gp → MNX`, comparing measure, voice, sounding
 pitch, duration base, dots, string and fret for every event):
@@ -146,7 +146,7 @@ The original list, resolved item by item — three closed, two scoped out.
   *neither* converter handles them (MusicXML doesn't even look) and the tab renderer
   draws neither, while the model and the notation renderer support both. Recording the
   same hole in three places was the actual problem. Now
-  [tuplets-grace-notes.md](../proposed/tuplets-grace-notes.md), at its real scope, with
+  [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md), at its real scope, with
   the fixture as step zero — no reference score contains a tuplet or a grace note, which
   is why the round trips are honestly lossless and still never present the case.
 
@@ -369,7 +369,7 @@ moment Arobas ships a new format).
   does not draw yet (bends, slides, palm mute, rhythm slashes, arpeggio/strum). Imported
   documents will surface amber "renderer gap" diagnostic badges. That is correct behaviour —
   but it means importing GP files will grow the deferred-polish backlog in
-  [SPEC_APPROVAL.md](../complete/SPEC_APPROVAL.md). Worth deciding whether GP imports enter
+  [lab-spec-approval.md](../complete/lab-spec-approval.md). Worth deciding whether GP imports enter
   the scenario corpus as `lab/` scenarios.
 - **Arpeggio has nowhere to go** (see fixture notes) — needs an `_x` extension or an explicit
   drop.

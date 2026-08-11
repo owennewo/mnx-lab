@@ -1,7 +1,7 @@
 # Promoting the editor into `elements/` — the second-consumer move
 
 > **Status: proposed (2026-08-09), deliberately parked.** Split out of
-> [editor-input-layer.md](../complete/editor-input-layer.md) as its one remaining
+> [core-editor-input-layer.md](../complete/core-editor-input-layer.md) as its one remaining
 > item, so that doc could close at its real scope (everything else shipped). This
 > doc owns the move that makes the editor consumable outside the workbench —
 > and, just as deliberately, the reasons not to make it yet.
@@ -55,7 +55,7 @@ trace fixtures, root vitest), before and after.
    docs prescribe — the review *is* this list.
 2. **The element contract**: editor element vs editing mode on
    `<mnx-score-viewer>`; its attributes/properties/events, designed under
-   [viewer-surface.md](viewer-surface.md)'s layered rule (engine options →
+   [core-viewer-surface.md](core-viewer-surface.md)'s layered rule (engine options →
    element bindings → workbench chrome). Intents become the event vocabulary;
    the op log / trace capture needs a host-visible seam.
 3. **The shadow-DOM focus story** (survey §6.3), now unavoidable: where key
@@ -66,7 +66,7 @@ trace fixtures, root vitest), before and after.
 5. **Workbench consumes the promoted element** and its own mount code is
    deleted — one editor surface, not two.
 6. **The palette question travels along**:
-   [editor-ai-prompt.md](editor-ai-prompt.md) already flags that a promoted
+   [core-editor-ai-prompt.md](core-editor-ai-prompt.md) already flags that a promoted
    palette pulls the `elements → assist` boundary into question (embeds
    probably should **not** ship an AI prompt; that mode may stay
    workbench-only by configuration). Decide it here if the palette is part of

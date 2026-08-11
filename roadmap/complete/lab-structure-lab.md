@@ -5,9 +5,9 @@
 > main; execution deviations are recorded in the appendix at the bottom). The fourth
 > structure sketch, the adopted direction. It
 > **composes** two of the three earlier
-> alternatives — [structure-platform.md](../superseded/structure-platform.md) for the code and
-> [structure-workbench.md](../superseded/structure-workbench.md) for the data — and defers
-> [structure-toolchain.md](../superseded/structure-toolchain.md) rather than rejecting it. The
+> alternatives — [lab-structure-platform.md](../superseded/lab-structure-platform.md) for the code and
+> [lab-structure-workbench.md](../superseded/lab-structure-workbench.md) for the data — and defers
+> [lab-structure-toolchain.md](../superseded/lab-structure-toolchain.md) rather than rejecting it. The
 > other three sketches are in `superseded/` with pointers here.
 >
 > **Revision note.** The first draft had a three-role corpus model
@@ -92,7 +92,7 @@ deliberately, with a meta.json. Until then it stays a fixture.
 With scores out, **`scenarios/` stays exactly where it is** — the first draft's
 `corpus/` move existed to unify scores with scenarios, and that need is gone. Less
 churn: ids, golden paths, `manifest.json` and
-[04-scenario-library.md](../inprogress/04-scenario-library.md) are all untouched.
+[lab-04-scenario-library.md](../inprogress/lab-04-scenario-library.md) are all untouched.
 
 ## The spec loop: `sync` down, `push` up
 
@@ -133,10 +133,10 @@ spec/proposals/score-text/
   engravings/        our rendered output per scenario — what push:proposal injects
 ```
 
-Seeded from the three live topics: **score-text** ([score-text.md](../proposed/score-text.md)),
+Seeded from the three live topics: **score-text** ([spec-score-text.md](../proposed/spec-score-text.md)),
 **chord-symbols** (#109, the `harmonies` block), **guitar-technique** (#63/#179, the
 `tab` block + `24-tab-spec-gaps`). Roadmap docs keep the narrative;
-[mnx-cg-proposals.md](../proposed/mnx-cg-proposals.md) keeps the outward campaign.
+[spec-mnx-cg-proposals.md](../proposed/spec-mnx-cg-proposals.md) keeps the outward campaign.
 
 ### The submodule stops double-dutying
 
@@ -166,7 +166,7 @@ harness/                       every way the evidence is exercised — merges te
   conformance/                 scenarios.test.ts, primitives.test.ts, tab-validation.test.ts,
                                upgrade-extension.test.ts
   verify/                      verify-scenarios.mjs, check-scenarios.mjs, preview.test.ts —
-                               the human approval flow (SPEC_APPROVAL.md, unchanged)
+                               the human approval flow (lab-spec-approval.md, unchanged)
   render/                      render-png.ts — engravings for proposals and previews
   evals/                       RESERVED — LLM-edit experiments (cases, runner, scored
                                results); feature work, out of scope here, prerequisite is
@@ -497,9 +497,9 @@ This plan will be executed by a fresh session starting with maximum context head
   two-axis corpus, fresh-slate rebuild. Don't re-litigate them; if execution reveals a
   genuine problem, append a revision note rather than silently deviating.
 - **On starting**: move this doc to `roadmap/inprogress/` and the three sibling
-  sketches ([structure-toolchain.md](../superseded/structure-toolchain.md),
-  [structure-workbench.md](../superseded/structure-workbench.md),
-  [structure-platform.md](../superseded/structure-platform.md)) to `roadmap/superseded/` with
+  sketches ([lab-structure-toolchain.md](../superseded/lab-structure-toolchain.md),
+  [lab-structure-workbench.md](../superseded/lab-structure-workbench.md),
+  [lab-structure-platform.md](../superseded/lab-structure-platform.md)) to `roadmap/superseded/` with
   pointers here; refresh `roadmap/README.md`.
 - **Commit discipline**: one step = one commit (or short series), message naming the
   step and its gate. Gates are non-negotiable — a transplant that can't produce
@@ -568,7 +568,7 @@ at the step-5 checkpoint; 57/57 verifications stand). Deviations, per the handof
   edit-ops.test.ts`), not the planned "hidden toolbar button" — the clean-room shell
   deliberately has no editing chrome yet, and a pinned contract is stronger proof.
 - **`/api/voice-transcribe` was not rebuilt.** The voice stage was never built
-  client-side ([open_router.md](../proposed/open_router.md)); the route is retrievable
+  client-side ([core-open-router.md](../proposed/core-open-router.md)); the route is retrievable
   from `legacy` when that feature starts.
 - **The clean shell dropped Web Awesome** — plain Lit only; the reading-room's UI-kit
   dependency stayed on `legacy` with the components that used it.

@@ -26,10 +26,10 @@
 > opens the coverage map, anything else jumps to a scenario; command items
 > feed the session through the same intent funnel as keys. The **AI prompt
 > mode** is split out to
-> [roadmap/proposed/editor-ai-prompt.md](../proposed/editor-ai-prompt.md), and
+> [roadmap/proposed/core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md), and
 > the one item that outlived this doc — the **`elements/` promotion**, gated on
 > the intent vocabulary stabilising and a real second consumer — is split out to
-> [roadmap/proposed/editor-element-promotion.md](../proposed/editor-element-promotion.md)
+> [roadmap/proposed/core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md)
 > with its own trigger and brief. The keybinding research behind it is
 > [research/notation-editor-keyboard-models.md](../../research/notation-editor-keyboard-models.md)
 > (the survey, and §6 for its MNX Lab implications). The input layer is expected to stay
@@ -236,7 +236,7 @@ The work:
 - **No single-key bindings for setup** — palette/popovers only, per the frequency rule.
 - **No keyboard instruments / grand staff** — guitar-first, per charter; the instrument
   generalisation argument lives in
-  [instrument-position.md](../proposed/instrument-position.md), not here.
+  [spec-instrument-position.md](../proposed/spec-instrument-position.md), not here.
 - **No keystroke-level goldens, ever** — fixtures are intents; keys are tested only in
   the keymap table's own tiny tests.
 - **No AI-loop convergence yet** — the worker loop still replaces whole documents; it

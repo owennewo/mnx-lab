@@ -1,9 +1,9 @@
 # Structure direction — the workbench: organize around spec, corpus and evidence
 
 > **Status: superseded** (filed 2026-07-31; superseded same day by the adopted
-> [structure-lab.md](../complete/structure-lab.md) direction, now under execution). One of four self-contained structure sketches —
-> the others are [structure-toolchain.md](structure-toolchain.md),
-> [structure-platform.md](structure-platform.md) and [structure-lab.md](../complete/structure-lab.md)
+> [lab-structure-lab.md](../complete/lab-structure-lab.md) direction, now under execution). One of four self-contained structure sketches —
+> the others are [lab-structure-toolchain.md](lab-structure-toolchain.md),
+> [lab-structure-platform.md](lab-structure-platform.md) and [lab-structure-lab.md](../complete/lab-structure-lab.md)
 > (the likely direction of travel, which absorbs this plan's `spec/`/`corpus/`/`harness/`
 > restructure). They are alternatives for a single decision; each is written to stand alone.
 
@@ -121,7 +121,7 @@ roadmap/ docs/ research/ vendor/mnx    unchanged
    `corpus/scores/`; delete the Express app; fix the frontend's sample-score import path.
 2. **Move the data.** `schemas/` → `spec/`, `scenarios/` → `corpus/scenarios/`; update the
    path constants in `src/library/corpus.ts`, `scripts/`, `tests/`, vitest config, and
-   [04-scenario-library.md](../inprogress/04-scenario-library.md) (the corpus contract doc
+   [lab-04-scenario-library.md](../inprogress/lab-04-scenario-library.md) (the corpus contract doc
    moves with its subject). Acceptance: snapshots byte-identical, `npm run build` green.
 3. **Merge `scripts/` + `tests/` into `harness/`** by question (conformance / verify /
    render), promoting `tests/helpers` to `harness/helpers` and ending the render-png

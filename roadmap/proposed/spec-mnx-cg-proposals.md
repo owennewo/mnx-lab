@@ -11,8 +11,8 @@
 > **What is left is §6 steps 1, 5 and 6**: join the CG and sign the CLA, then
 > post the proposals. Nothing can be contributed upstream until the CLA is
 > signed. Rendering — chord symbols, labels and technique are all still undrawn —
-> is tracked in [chord-symbols.md](chord-symbols.md) and
-> [guitar-technique.md](guitar-technique.md).
+> is tracked in [core-chord-symbols.md](core-chord-symbols.md) and
+> [core-guitar-technique.md](core-guitar-technique.md).
 >
 > The rest of this doc is the research and the argument each proposal rests on.
 
@@ -58,7 +58,7 @@ Copy its shape:
    somebody couldn't encode.
 3. **A closed semantic enum plus a display escape hatch** — `value: "ppp"` is
    required, and anything outside the enum is carried as display override. This
-   is the answer to chord-symbols.md's "structured or literal?" question: the CG
+   is the answer to core-chord-symbols.md's "structured or literal?" question: the CG
    has already ruled, and the ruling is *both, with structure required*.
 4. **Spans end with `end: measure-rhythmic-position`, never a `duration`.** The
    proposal shipped with `duration`; `rpatters1` produced one engraving it
@@ -310,4 +310,4 @@ map them.
 
 Rendering none of this is a prerequisite for any of it — carrying the data
 correctly is independently useful, and drawing it is tracked separately against
-the [SPEC_APPROVAL](../complete/SPEC_APPROVAL.md) process.
+the [lab-spec-approval.md](../complete/lab-spec-approval.md) process.

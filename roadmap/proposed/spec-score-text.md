@@ -1,7 +1,7 @@
 # Text and labels in MNX: a positioned-direction proposal
 
 > **Status: proposed design, nothing built.** This supersedes the *placement* half of
-> [mnx-cg-proposals.md](mnx-cg-proposals.md) §3 — that doc argued for `rehearsal` and
+> [spec-mnx-cg-proposals.md](spec-mnx-cg-proposals.md) §3 — that doc argued for `rehearsal` and
 > `section` as separate objects (still right) but hung them off the global measure with
 > no location and no story for ordinary annotations (under-specified). Written against
 > **MNX v27**, verified against the pinned spec sources in `vendor/mnx`.
@@ -117,7 +117,7 @@ Optional `glyph` is worth considering — `segno` can override its symbol and
 
 **Harmony and analysis are not text.** Chord symbols carry structure (root, quality,
 bass, degrees) that transposes; Roman numerals need a key. MusicXML agrees — `<harmony>`
-is not a `<direction>`. They belong in their own proposal ([chord-symbols.md](chord-symbols.md),
+is not a `<direction>`. They belong in their own proposal ([core-chord-symbols.md](core-chord-symbols.md),
 CG issue #109).
 
 **Typography.** MNX carries `color`, `glyph`/`glyphs`, `orient`, `staffPosition` and

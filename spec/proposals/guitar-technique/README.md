@@ -15,7 +15,7 @@ exhibit) and no duplicated tab staves. `tab.technique` covers bends (a **curve**
 `{position, alter}` points, `alter` in semitones like `pitch.alter`), slides, hammer-ons,
 pull-offs, vibrato, harmonics and palm mute. Design + register:
 [docs/mnx-extensions.md](../../../docs/mnx-extensions.md); narrative:
-[roadmap/proposed/guitar-technique.md](../../../roadmap/proposed/guitar-technique.md).
+[roadmap/proposed/core-guitar-technique.md](../../../roadmap/proposed/core-guitar-technique.md).
 
 ## Evidence so far
 
