@@ -183,7 +183,7 @@ export function forEachKeyedNote(
   doc: MnxStructure,
   fn: (note: MnxNote, key: string) => void
 ): void {
-  (doc.parts[0]?.measures ?? []).forEach((measure, measureIndex) => {
+  (doc.parts?.[0]?.measures ?? []).forEach((measure, measureIndex) => {
     staffOneSequences(measure.sequences).forEach((sequence, voiceIndex) => {
       sequence.content.forEach((item, eventIndex) => {
         if (!isTimedEvent(item)) return;
@@ -199,7 +199,7 @@ export function forEachKeyedNote(
  *  signatures persist until changed; 4/4 before the first one appears. */
 export function measureSpans(doc: MnxStructure): Onset[] {
   let current: Onset = { num: 1, den: 1 };
-  return doc.global.measures.map(measure => {
+  return (doc.global?.measures ?? []).map(measure => {
     if (measure.time) current = reduce(measure.time.count, measure.time.unit);
     return current;
   });
@@ -207,9 +207,9 @@ export function measureSpans(doc: MnxStructure): Onset[] {
 
 export function buildGrid(doc: MnxStructure): PositionGrid {
   const positions: Position[] = [];
-  const part = doc.parts[0];
+  const part = doc.parts?.[0];
   const measures = part?.measures ?? [];
-  const measureCount = Math.max(measures.length, doc.global.measures.length);
+  const measureCount = Math.max(measures.length, doc.global?.measures?.length ?? 0);
   const tuning = tuningOf(part);
   const capo = capoOf(part);
   const spans = measureSpans(doc);

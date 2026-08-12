@@ -162,6 +162,25 @@ describe('selection ladder', () => {
     expect(session.selectedNoteKeys).toEqual(['n1']);
   });
 
+  it('the cursor follows a transpose across a staff line (C#→D moves, C→C# does not)', () => {
+    const session = new EditorSession(makeDoc());
+    session.handleIntent({ type: 'setProjection', projection: 'notation' });
+    // The cursor sits on n1 (E4); its notation line is the staff position.
+    const before = session.cursor.line;
+    expect(session.selectedNoteKeys).toEqual(['n1']);
+
+    // E4 → F4: the letter changes, the notehead moves one staff step, and
+    // the cursor must move WITH it — not stay behind on the empty line.
+    session.handleIntent({ type: 'transpose', semitones: 1 });
+    expect(session.cursor.line).toBe(before + 1);
+    expect(session.selectedNoteKeys).toEqual(['n1']);
+
+    // F4 → F#4: same letter, same staff position — the cursor holds still.
+    session.handleIntent({ type: 'transpose', semitones: 1 });
+    expect(session.cursor.line).toBe(before + 1);
+    expect(session.selectedNoteKeys).toEqual(['n1']);
+  });
+
   it('replays through a trace: ladder intents are recorded like any navigation', () => {
     const session = new EditorSession(makeDoc());
     session.handleIntent(relax);

@@ -8,10 +8,12 @@ import type {
   MnxEvent,
   MnxNote,
   MnxNoteValueBase,
+  MnxPart,
   MnxSequence,
   MnxStructure,
   MnxTuningEntry
 } from '../model/mnx.ts';
+import type { EditorIntent } from './intents.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import {
   addOnsets,
@@ -112,8 +114,26 @@ export type EditOp =
       tuning: MnxTuningEntry[];
     }
   | {
+      /** Declare the part's tab staff preference (`_x.mnxLab.tab.staffKind`).
+       *  Presentation, but document-level: it gates the tab/both projections
+       *  (engine/headless), so the goldens — and the construct-trace verdict
+       *  — see it. Discovered by the element-ops exemplar. */
+      type: 'setStaffKind';
+      kind: 'notation' | 'tab' | 'both';
+    }
+  | {
       /** Append an empty measure to every part and the global timeline. */
       type: 'appendMeasure';
+    }
+  | {
+      /** Add a part (id/name both optional — an anonymous part is legal
+       *  MNX), materializing the document skeleton on demand: construct
+       *  traces start from the literal `{}` and genesis is ops, not chrome
+       *  (roadmap/inprogress/core-element-ops-exemplar.md). New part measures
+       *  align with the global timeline. */
+      type: 'addPart';
+      partId?: string;
+      name?: string;
     };
 
 const NOTE_STEPS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
@@ -294,7 +314,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setTimeSignature': {
-      const measure = next.global.measures[op.measureIndex];
+      const measure = next.global?.measures?.[op.measureIndex];
       if (!measure) return next;
       measure.time = { ...op.time };
       // The signature persists until the next explicit one — re-establish the
@@ -306,13 +326,21 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setTuning': {
-      const part = next.parts[0];
+      const part = next.parts?.[0];
       if (!part) return next;
       const x = ((part._x ??= {}).mnxLab ??= {});
       x.strings = op.tuning.map(t => ({ string: t.string, pitch: { ...t.pitch } }));
       return next;
     }
+    case 'setStaffKind': {
+      const part = next.parts?.[0];
+      if (!part) return next;
+      const x = ((part._x ??= {}).mnxLab ??= {});
+      (x.tab ??= {}).staffKind = op.kind;
+      return next;
+    }
     case 'appendMeasure': {
+      ensureSkeleton(next);
       next.global.measures.push({});
       for (const part of next.parts ?? []) {
         part.measures?.push({ sequences: [{ content: [] }] });
@@ -322,7 +350,33 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       padMeasureRests(next, next.global.measures.length - 1);
       return next;
     }
+    case 'addPart': {
+      ensureSkeleton(next);
+      const part: MnxPart = {
+        ...(op.partId !== undefined ? { id: op.partId } : {}),
+        ...(op.name !== undefined ? { name: op.name } : {}),
+        measures: next.global.measures.map(() => ({ sequences: [{ content: [] }] }))
+      };
+      next.parts.push(part);
+      // Only the entry surface (parts[0]) holds the full-bar invariant.
+      if (next.parts.length === 1) {
+        for (let i = 0; i < next.global.measures.length; i++) padMeasureRests(next, i);
+      }
+      return next;
+    }
   }
+}
+
+/** Genesis: materialize the document skeleton — `{}` is a legal starting
+ *  document (construct traces begin there), so the ops that can run on it
+ *  create `mnx`/`global`/`parts` on demand, the same `??=` posture
+ *  entrySequence takes one level down. */
+function ensureSkeleton(doc: MnxStructure): void {
+  const d = doc as Partial<MnxStructure>;
+  d.mnx ??= { version: 1 };
+  d.global ??= { measures: [] };
+  d.global.measures ??= [];
+  d.parts ??= [];
 }
 
 /** Beat-value bases by time-signature unit (and the greedy pad ladder). */
@@ -352,8 +406,9 @@ const PAD_LADDER: { base: MnxNoteValueBase; span: Onset }[] = (
  *  MNX time signatures persist until changed; 4/4 before the first one. */
 function meterOf(doc: MnxStructure, measureIndex: number): { span: Onset; beatBase: MnxNoteValueBase } {
   let time = { count: 4, unit: 4 };
-  for (let i = 0; i <= measureIndex && i < doc.global.measures.length; i++) {
-    const t = doc.global.measures[i].time;
+  const measures = doc.global?.measures ?? [];
+  for (let i = 0; i <= measureIndex && i < measures.length; i++) {
+    const t = measures[i].time;
     if (t) time = t;
   }
   return {
@@ -415,7 +470,7 @@ interface LocatedNote {
 }
 
 function findKeyedNote(doc: MnxStructure, key: string): LocatedNote | null {
-  const measures = doc.parts[0]?.measures ?? [];
+  const measures = doc.parts?.[0]?.measures ?? [];
   for (let measureIndex = 0; measureIndex < measures.length; measureIndex++) {
     const sequences = (measures[measureIndex].sequences ?? []).filter(s => (s.staff ?? 1) === 1);
     for (let voiceIndex = 0; voiceIndex < sequences.length; voiceIndex++) {
@@ -451,7 +506,7 @@ function tieTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined
     if (!isTimedEvent(item)) continue;
     return (item.notes ?? []).find(n => samePitch(n, located.note));
   }
-  const nextMeasure = doc.parts[0]?.measures?.[located.measureIndex + 1];
+  const nextMeasure = doc.parts?.[0]?.measures?.[located.measureIndex + 1];
   const seq = (nextMeasure?.sequences ?? []).filter(s => (s.staff ?? 1) === 1)[located.voiceIndex];
   for (const item of seq?.content ?? []) {
     if (!isTimedEvent(item)) continue;
@@ -481,15 +536,15 @@ function mintNoteId(doc: MnxStructure): string {
 
 /** What (string, fret) sounds under the part's (or standard) tuning. */
 function fingerboardMidi(doc: MnxStructure, string: number, fret: number): number | undefined {
-  const open = tuningOf(doc.parts[0]).find(t => t.string === string);
+  const open = tuningOf(doc.parts?.[0]).find(t => t.string === string);
   // Frets are capo-relative, so the sounding pitch includes the capo shift.
-  return open ? midiOfPitch(open.pitch) + capoOf(doc.parts[0]) + fret : undefined;
+  return open ? midiOfPitch(open.pitch) + capoOf(doc.parts?.[0]) + fret : undefined;
 }
 
 /** Voice 0 of staff 1 in a part-0 measure — the entry surface. Created on
  *  demand so entry works in measures that never had a sequence. */
 function entrySequence(doc: MnxStructure, measureIndex: number): MnxSequence | undefined {
-  const measure = doc.parts[0]?.measures?.[measureIndex];
+  const measure = doc.parts?.[0]?.measures?.[measureIndex];
   if (!measure) return undefined;
   measure.sequences ??= [];
   const existing = measure.sequences.filter(s => (s.staff ?? 1) === 1)[0];
@@ -523,7 +578,7 @@ function forEachEventNote(
   doc: MnxStructure,
   fn: (event: MnxEvent, note: MnxNote, key: string) => void
 ): void {
-  (doc.parts[0]?.measures ?? []).forEach((measure, measureIndex) => {
+  (doc.parts?.[0]?.measures ?? []).forEach((measure, measureIndex) => {
     (measure.sequences ?? [])
       .filter(s => (s.staff ?? 1) === 1)
       .forEach((sequence, voiceIndex) => {
@@ -537,6 +592,15 @@ function forEachEventNote(
   });
 }
 
+/** One op-queue entry: the op plus the intent that provoked it — stamped
+ *  FORWARD at apply time (never inferred backward), so the ops panel can
+ *  reverse-join intent → key/surface through the keymap docs
+ *  (roadmap/inprogress/core-element-ops-exemplar.md, provenance columns). */
+export interface OpLogEntry {
+  op: EditOp;
+  intent?: EditorIntent;
+}
+
 /**
  * Undo/redo over applyOp. The history RETAINS the ops it applied — undo
  * history, trace recording, and (later) the AI loop's EditOp[] output are
@@ -544,8 +608,8 @@ function forEachEventNote(
  * Snapshots ride along for O(1) undo; the op log is the durable artifact.
  */
 export class EditHistory {
-  private past: { op: EditOp; before: MnxStructure }[] = [];
-  private future: { op: EditOp; after: MnxStructure }[] = [];
+  private past: { op: EditOp; intent?: EditorIntent; before: MnxStructure }[] = [];
+  private future: { op: EditOp; intent?: EditorIntent; after: MnxStructure }[] = [];
 
   constructor(private present: MnxStructure) {}
 
@@ -558,6 +622,16 @@ export class EditHistory {
     return this.past.map(entry => entry.op);
   }
 
+  /** The applied queue with intent provenance, oldest first. */
+  get appliedEntries(): OpLogEntry[] {
+    return this.past.map(({ op, intent }) => ({ op, intent }));
+  }
+
+  /** The redo stack with intent provenance, next-to-redo first. */
+  get futureEntries(): OpLogEntry[] {
+    return [...this.future].reverse().map(({ op, intent }) => ({ op, intent }));
+  }
+
   get canUndo(): boolean {
     return this.past.length > 0;
   }
@@ -566,8 +640,8 @@ export class EditHistory {
     return this.future.length > 0;
   }
 
-  apply(op: EditOp): MnxStructure {
-    this.past.push({ op, before: this.present });
+  apply(op: EditOp, intent?: EditorIntent): MnxStructure {
+    this.past.push({ op, intent, before: this.present });
     this.present = applyOp(this.present, op);
     this.future = [];
     return this.present;
@@ -576,7 +650,7 @@ export class EditHistory {
   undo(): MnxStructure {
     const entry = this.past.pop();
     if (entry) {
-      this.future.push({ op: entry.op, after: this.present });
+      this.future.push({ op: entry.op, intent: entry.intent, after: this.present });
       this.present = entry.before;
     }
     return this.present;
@@ -585,7 +659,7 @@ export class EditHistory {
   redo(): MnxStructure {
     const entry = this.future.pop();
     if (entry) {
-      this.past.push({ op: entry.op, before: this.present });
+      this.past.push({ op: entry.op, intent: entry.intent, before: this.present });
       this.present = entry.after;
     }
     return this.present;

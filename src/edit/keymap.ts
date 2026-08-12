@@ -113,13 +113,19 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
 export type ShellAction =
   | 'timeSignaturePopover'
   | 'tuningPopover'
+  | 'partPopover'
   | 'commandPalette'
   | 'goTo'
   | 'toggleRail';
 
-const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
+/** Exported for the cheatsheet's join tests (keymapDocs.ts) — resolution
+ *  still goes through resolveShellAction only. */
+export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   { code: 'KeyT', shift: true, action: 'timeSignaturePopover' },
   { code: 'KeyU', shift: true, action: 'tuningPopover' },
+  // Part genesis (element-ops exemplar): construct traces start from {},
+  // so "add part" needs a keyboard surface — setup tier like its siblings.
+  { code: 'KeyP', shift: true, action: 'partPopover' },
   // The palette (survey §8.5: Ctrl+K — Dorico's Jump Bar, GP's Cmd+E) and
   // go-to (§3.8: Ctrl+G + typed grammar) are ONE widget, two entry points:
   // Ctrl+K prefills the `>` command prefix, Ctrl+G opens bare (go-to).

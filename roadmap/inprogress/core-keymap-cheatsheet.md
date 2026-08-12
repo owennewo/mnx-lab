@@ -1,7 +1,22 @@
 # The keymap cheatsheet — the per-level navigation map as data
 
-> **Status: proposed (2026-08-11), not started.** Design agreed in
-> conversation; nothing built. The rendering surface builds on
+> **Status: in progress — stages 1–3 built 2026-08-11, same day as proposed.**
+> Shipped: `src/edit/keymapDocs.ts` (the `KeyDoc` table over all 45 bound
+> strokes, seven display groups Navigation → Workbench, `cheatsheet()`
+> filtering by level + tabPane + projection; `SHELL_BINDINGS` exported for
+> the joins); the hud-tab cheatsheet section ("keys · at this level" —
+> grouped, restyled rows under the selection rows, neutral `HudCheatGroup`
+> contract); the actions tab's hand-written hint retired (now one pointer
+> line); `harness/conformance/keymap-docs.test.ts` — both joins plus three
+> guard mirrors (voice jump note-only, toggleNote notation-only, arrows
+> inert at score) and level/context-dependence assertions on the rendered
+> sheet. Open questions resolved in the build: meanings keyed per stroke-
+> group row (aliases share a row: `Del/⌫`, `Alt+←/→ · −/=`); shell actions
+> joined the table (`setup`/`workbench` groups); the score rung shows its
+> honest near-empty truth. **Remaining: stage 4** — each ladder per-level
+> review pass lands its key decisions here as data (event next).
+>
+> Original proposal below. The rendering surface builds on
 > [core-score-hud.md](../inprogress/core-score-hud.md) (the hud panel tab);
 > the data table is the documentation half of the
 > [core-selection-ladder.md](../inprogress/core-selection-ladder.md)

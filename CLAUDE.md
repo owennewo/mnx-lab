@@ -336,3 +336,14 @@ output names refuse to overwrite).
   aimed upstream), `lab-` (the repo itself: structure, process, corpus machinery).
   Another prefix is acceptable only when it earns its keep: a concern that is
   genuinely separate *and* important enough to name.
+- **Campaigns**: a roadmap doc may be a *campaign* — an index over many normal
+  proposals that share one goal, named `<prefix>-campaign-<name>.md` and living in the
+  same buckets. The campaign carries three things: the **shared contract** its items
+  follow when they are similar in nature (agreements every item must make before code),
+  the **index** (rows may predate their docs — a row graduates to an ordinary proposal
+  when picked up, and may adopt a pre-existing proposal), and a running **progress +
+  learnings log** appended as items land, so later items start smarter than earlier
+  ones. An indexed proposal names its campaign and inherits its contract. "Add to
+  campaign X" → a new index row; closing an item → its learnings entry. A campaign
+  moves to `inprogress/` when its first item does and to `complete/` when the index is
+  exhausted or formally cut.

@@ -49,6 +49,19 @@ function parsePitchToken(token: string): MnxPitch | null {
   return pitch;
 }
 
+/** Part genesis grammar (the Shift+P popover): a display name, with the id
+ *  derived as its slug ("Lead Guitar" → lead-guitar). Empty input is an
+ *  ANONYMOUS part — legal MNX, and what the minimal scenarios carry. */
+export function parsePart(text: string): { partId?: string; name?: string } {
+  const name = text.trim();
+  if (name === '') return {};
+  const partId = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return partId ? { partId, name } : { name };
+}
+
 /**
  * A preset name ("standard", "drop-d", "dadgad", "open-g") or a pitch list
  * recited LOW string first ("D2 A2 D3 G3 A3 D4" — the order players say

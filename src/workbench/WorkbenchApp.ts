@@ -423,9 +423,19 @@ export class WorkbenchApp extends LitElement {
         intent('edit: toggle tie', { type: 'toggleTie' }, 'T'),
         action('edit: copy trace', 'copyTrace'),
         action('edit: revert edits', 'revert'),
-        action('setup: time signature…', 'timeSignaturePopover', 'Shift+T')
+        action('setup: time signature…', 'timeSignaturePopover', 'Shift+T'),
+        action('setup: add part…', 'partPopover', 'Shift+P')
       );
-      if (entry.hasTab) items.push(action('setup: tuning…', 'tuningPopover', 'Shift+U'));
+      if (entry.hasTab)
+        items.push(
+          action('setup: tuning…', 'tuningPopover', 'Shift+U'),
+          // The staffKind toggles keep SURFACE_INTENTS honest: the palette
+          // really emits setStaffKind (element-ops exemplar — the kind gates
+          // the tab/both projections, so it is document data, not view state).
+          intent('setup: tab staff — both', { type: 'setStaffKind', kind: 'both' }),
+          intent('setup: tab staff — tab', { type: 'setStaffKind', kind: 'tab' }),
+          intent('setup: tab staff — notation', { type: 'setStaffKind', kind: 'notation' })
+        );
     }
     return items.filter(i => i.label.toLowerCase().includes(filter));
   }

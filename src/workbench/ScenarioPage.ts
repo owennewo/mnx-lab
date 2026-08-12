@@ -13,10 +13,12 @@ import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
 import type { ViewMode } from '../elements/ScoreViewer.ts';
 import type { EnclosureKind, SelectionContext } from '../elements/mnxContext.ts';
-import { EditorSession } from '../edit/session.ts';
+import { EditorSession, replayIntents } from '../edit/session.ts';
+import { constructTraceByTarget, type ConstructTrace } from './constructTraces.ts';
 import { SELECTION_LADDER, type SelectionLevel } from '../edit/selection.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
+import { cheatsheet } from '../edit/keymapDocs.ts';
 import { buildHudParts, buildHudRows, LEVEL_BY_ROW } from './hudRows.ts';
 import {
   EDIT_LAYER,
@@ -28,14 +30,16 @@ import {
   type KeymapLayer,
   type ShellAction
 } from '../edit/keymap.ts';
-import { parseTimeSignature, parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
+import { parsePart, parseTimeSignature, parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
+import { buildOpRow } from './opRows.ts';
 import '../elements/ScoreViewer.ts';
 import './ScoreHud.ts';
 
 /** The side panel's tabs (roadmap/inprogress/core-score-hud.md): the page's
- *  scattered chrome — description, badges/defs, the edit strip, the HUD, the
- *  spec reference, the raw JSON — consolidated into one rail. */
-type PanelTab = 'description' | 'tags' | 'actions' | 'hud' | 'compare' | 'json';
+ *  scattered chrome — description, badges/defs, the edit strip, the op
+ *  queue (core-element-ops-exemplar.md), the HUD, the spec reference, the
+ *  raw JSON — consolidated into one rail. */
+type PanelTab = 'description' | 'tags' | 'actions' | 'ops' | 'hud' | 'compare' | 'json';
 
 /** One part's override state — the HUD ensemble table's currency. */
 interface PartOverride {
@@ -101,7 +105,7 @@ export class ScenarioPage extends LitElement {
   @state() private copied = false;
   /** The open setup popover (survey §6.2's Shift+letter tier), if any.
    *  (Named to dodge the DOM's built-in HTMLElement.popover property.) */
-  @state() private setupPopover: 'time' | 'tuning' | null = null;
+  @state() private setupPopover: 'time' | 'tuning' | 'part' | null = null;
   @state() private setupPopoverError = '';
   /** Esc hides the cursor highlight until the next intent (review sense-0). */
   private cursorHidden = false;
@@ -421,6 +425,58 @@ export class ScenarioPage extends LitElement {
         padding: 12px 14px;
       }
 
+      /* The ops tab: the op queue as provenance rows — op · intent · key.
+         Applied entries above the redo stack (dimmed); current position
+         accented. */
+      ol.ops {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font-family: var(--mono);
+        font-size: 10.5px;
+      }
+
+      ol.ops li {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 2px 10px;
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--line);
+        cursor: pointer;
+        color: var(--ink-2);
+      }
+
+      ol.ops li:hover {
+        background: var(--hover);
+      }
+
+      ol.ops li.current {
+        border-left: 2px solid var(--accent);
+        padding-left: 6px;
+        color: var(--ink);
+      }
+
+      ol.ops li.future {
+        opacity: 0.45;
+      }
+
+      ol.ops .op-what {
+        grid-column: 1;
+      }
+
+      ol.ops .op-keys {
+        grid-column: 2;
+        grid-row: 1;
+        color: var(--ink-3);
+        white-space: nowrap;
+      }
+
+      ol.ops .op-intent {
+        grid-column: 1 / -1;
+        font-size: 9.5px;
+        color: var(--ink-3);
+      }
+
       /* The hud tab: the component owns its rows' padding. */
       .panel-body:has(> mnx-score-hud) {
         padding: 0;
@@ -670,11 +726,13 @@ export class ScenarioPage extends LitElement {
   };
 
   private openPopover(action: ShellAction): boolean {
-    // Only the two popover actions are ours; palette actions belong to the shell.
-    if (action !== 'timeSignaturePopover' && action !== 'tuningPopover') return false;
+    // Only the popover actions are ours; palette actions belong to the shell.
+    if (action !== 'timeSignaturePopover' && action !== 'tuningPopover' && action !== 'partPopover')
+      return false;
     const entry = this.entry();
     if (action === 'tuningPopover' && !entry?.hasTab) return false;
-    this.setupPopover = action === 'timeSignaturePopover' ? 'time' : 'tuning';
+    this.setupPopover =
+      action === 'timeSignaturePopover' ? 'time' : action === 'tuningPopover' ? 'tuning' : 'part';
     this.setupPopoverError = '';
     // The popover lives in the actions tab now; a keyboard-opened one must
     // still be visible.
@@ -725,6 +783,13 @@ export class ScenarioPage extends LitElement {
         return;
       }
       this.stripIntent({ type: 'setTuning', tuning });
+    } else if (this.setupPopover === 'part') {
+      // parsePart never fails: empty input is an anonymous part (legal MNX).
+      const part = parsePart(input.value);
+      const intent: Extract<EditorIntent, { type: 'addPart' }> = { type: 'addPart' };
+      if (part.partId !== undefined) intent.partId = part.partId;
+      if (part.name !== undefined) intent.name = part.name;
+      this.stripIntent(intent);
     }
     this.setupPopover = null;
   }
@@ -908,7 +973,7 @@ export class ScenarioPage extends LitElement {
 
   private panelTabs(): PanelTab[] {
     const tabs: PanelTab[] = ['description', 'tags'];
-    if (this.session) tabs.push('actions', 'hud');
+    if (this.session) tabs.push('actions', 'ops', 'hud');
     tabs.push('compare', 'json');
     return tabs;
   }
@@ -937,11 +1002,13 @@ export class ScenarioPage extends LitElement {
               ? this.panelTags(entry)
               : tab === 'actions'
                 ? this.panelActions(entry)
-                : tab === 'hud'
-                  ? this.hud(entry)
-                  : tab === 'compare'
-                    ? this.panelCompare(entry)
-                    : this.panelJson()}
+                : tab === 'ops'
+                  ? this.panelOps()
+                  : tab === 'hud'
+                    ? this.hud(entry)
+                    : tab === 'compare'
+                      ? this.panelCompare(entry)
+                      : this.panelJson()}
         </div>
       </aside>
     `;
@@ -1062,6 +1129,7 @@ export class ScenarioPage extends LitElement {
           ${entry.hasTab
             ? html`<button @click=${() => this.openPopover('tuningPopover')}>tuning…</button>`
             : nothing}
+          <button @click=${() => this.openPopover('partPopover')}>part…</button>
         </div>
         <div class="action-state">
           entry duration: ${this.session.entryDurationBase}
@@ -1076,10 +1144,18 @@ export class ScenarioPage extends LitElement {
           ? html`
               <div class="popover">
                 <span class="pop-label"
-                  >${this.setupPopover === 'time' ? 'time signature' : 'tuning'}</span
+                  >${this.setupPopover === 'time'
+                    ? 'time signature'
+                    : this.setupPopover === 'tuning'
+                      ? 'tuning'
+                      : 'add part'}</span
                 >
                 <input
-                  placeholder=${this.setupPopover === 'time' ? '4/4' : 'standard · drop-d · D2 A2 D3 G3 A3 D4'}
+                  placeholder=${this.setupPopover === 'time'
+                    ? '4/4'
+                    : this.setupPopover === 'tuning'
+                      ? 'standard · drop-d · D2 A2 D3 G3 A3 D4'
+                      : 'Guitar · empty = anonymous part'}
                   @keydown=${(e: KeyboardEvent) => this.onPopoverKey(e)}
                 />
                 ${this.setupPopoverError
@@ -1087,16 +1163,17 @@ export class ScenarioPage extends LitElement {
                   : html`<span class="pop-hint"
                       >${this.setupPopover === 'time'
                         ? 'applies to the current bar onward · Enter applies · Esc closes'
-                        : 'low string first · Enter applies · Esc closes'}</span
+                        : this.setupPopover === 'tuning'
+                          ? 'low string first · Enter applies · Esc closes'
+                          : 'a name — the id derives as its slug · Enter applies · Esc closes'}</span
                     >`}
               </div>
             `
           : nothing}
-        <p class="hint">
-          arrows move${entry.hasTab ? ' (↑↓ strings) · digits enter frets' : ''} · Del removes ·
-          −/= duration · Alt+↑↓ transpose · Shift+M add bar · Shift+T
-          time${entry.hasTab ? ' · Shift+U tuning' : ''} · Ctrl+K palette · Ctrl+G go to
-        </p>
+        <!-- The hand-written key hint retired: the hud tab's cheatsheet is
+             the reference, rendered from the keymap's own meaning table
+             (roadmap/inprogress/core-keymap-cheatsheet.md). -->
+        <p class="hint">keys: see the hud tab — the list follows the selection level</p>
       </div>
     `;
   }
@@ -1138,6 +1215,94 @@ export class ScenarioPage extends LitElement {
     `;
   }
 
+  /** The ops tab (roadmap/inprogress/core-element-ops-exemplar.md): the
+   *  session's op log rendered as the undo/redo queue it already is —
+   *  applied entries, the redo stack dimmed below, position marked, each
+   *  row op · provoking intent · key (the provenance columns). Clicking an
+   *  entry steps undo/redo to that boundary through the intent funnel. */
+  private panelOps() {
+    if (!this.session) return nothing;
+    const { applied, future } = this.session.opQueue;
+    if (applied.length === 0 && future.length === 0) {
+      const trace = constructTraceByTarget.get(this.entry()?.id ?? '');
+      return html`
+        <p class="description">
+          no edits yet — the queue fills as ops apply (every entry shows the op,
+          the intent that provoked it, and the key that produced the intent)
+        </p>
+        ${trace
+          ? html`
+              <div class="actions">
+                <div class="action-row">
+                  <button @click=${() => this.replayConstructTrace(trace)}>
+                    replay construct trace (${trace.intents.length} intents)
+                  </button>
+                </div>
+                <p class="hint">
+                  rebuilds this score from the literal <code>{}</code> through the
+                  recorded intents — the queue fills with the genesis ops, and undo
+                  walks construction backward. the replayed session starts from
+                  <code>{}</code>, so revert returns there, not to the corpus file;
+                  reload the page to get the committed score back.
+                </p>
+              </div>
+            `
+          : nothing}
+      `;
+    }
+    return html`
+      <ol class="ops">
+        ${applied.map((entry, index) => {
+          const row = buildOpRow(entry);
+          return html`
+            <li
+              class=${index === applied.length - 1 ? 'current' : ''}
+              title="undo back to this point"
+              @click=${() => this.jumpToOp(index + 1)}
+            >
+              <span class="op-what">${row.op}</span>
+              <span class="op-intent">${row.intent}</span>
+              <span class="op-keys">${row.keys}</span>
+            </li>
+          `;
+        })}
+        ${future.map((entry, index) => {
+          const row = buildOpRow(entry);
+          return html`
+            <li class="future" title="redo forward to this point" @click=${() => this.jumpToOp(applied.length + index + 1)}>
+              <span class="op-what">${row.op}</span>
+              <span class="op-intent">${row.intent}</span>
+              <span class="op-keys">${row.keys}</span>
+            </li>
+          `;
+        })}
+      </ol>
+    `;
+  }
+
+  /** Replace the session with the fixture's replay from `{}` — the ops
+   *  queue becomes the construct sequence, undoable back to genesis. The
+   *  committed corpus file is untouched (edits are in-memory by rule). */
+  private replayConstructTrace(trace: ConstructTrace) {
+    this.session = replayIntents({} as MnxStructure, trace.intents);
+    this.cursorHidden = false;
+    this.copied = false;
+    this.syncFromSession();
+  }
+
+  /** Undo/redo until the applied queue holds `target` ops — through
+   *  handleIntent, so panel clicks are recorded like keys. */
+  private jumpToOp(target: number) {
+    if (!this.session) return;
+    for (let guard = 0; this.session.opQueue.applied.length > target && this.session.canUndo && guard < 128; guard++) {
+      this.session.handleIntent({ type: 'undo' });
+    }
+    for (let guard = 0; this.session.opQueue.applied.length < target && this.session.canRedo && guard < 128; guard++) {
+      this.session.handleIntent({ type: 'redo' });
+    }
+    this.syncFromSession();
+  }
+
   private panelJson() {
     return this.loadState === 'ready'
       ? html`<pre class="json">${this.rawScore}</pre>`
@@ -1148,11 +1313,19 @@ export class ScenarioPage extends LitElement {
    *  the host, never through the viewer's props. */
   private hud(entry: ScenarioEntry) {
     if (!this.session || this.loadState !== 'ready') return nothing;
+    // The cheatsheet's context mirrors activeLayers(): the digit layer is
+    // live exactly when a tab pane is on screen.
+    const view = this.activeView(entry);
+    const tabPane = entry.hasTab && (view === 'tab' || view === 'both');
     return html`
       <mnx-score-hud
         .rows=${buildHudRows(entry.meta.title, this.session, this.cursorHidden)}
         .parts=${buildHudParts(this.session.doc, index => this.partOverride(index))}
         .presets=${TUNING_PRESET_NAMES}
+        .cheats=${cheatsheet(this.session.selectionLevel, {
+          tabPane,
+          projection: this.session.projection
+        })}
         @hud-row-activated=${this.onHudRow}
         @hud-part-setup-changed=${this.onHudPartSetup}
       ></mnx-score-hud>

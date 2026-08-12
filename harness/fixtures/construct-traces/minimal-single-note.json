@@ -1,0 +1,16 @@
+{
+  "target": "lab/document/minimal-single-note",
+  "intents": [
+    { "type": "addPart" },
+    { "type": "appendMeasure" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "toggleNote" },
+    { "type": "longerDuration" },
+    { "type": "longerDuration" }
+  ]
+}

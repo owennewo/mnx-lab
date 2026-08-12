@@ -61,8 +61,12 @@ export type MutationIntent =
   | { type: 'appendMeasure' }
   // Setup-as-ops (roadmap: "setup is ops, not chrome"): document genesis
   // choices flow through the same funnel — undoable, traceable, AI-emittable.
+  // Construct traces start from the literal `{}` (core-element-ops-exemplar),
+  // so genesis includes the part itself.
   | { type: 'setTimeSignature'; count: number; unit: number }
-  | { type: 'setTuning'; tuning: MnxTuningEntry[] };
+  | { type: 'setTuning'; tuning: MnxTuningEntry[] }
+  | { type: 'addPart'; partId?: string; name?: string }
+  | { type: 'setStaffKind'; kind: 'notation' | 'tab' | 'both' };
 
 export type HistoryIntent = { type: 'undo' } | { type: 'redo' };
 

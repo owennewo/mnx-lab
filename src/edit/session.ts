@@ -7,7 +7,7 @@ import type { MnxEvent, MnxNote, MnxNoteValueBase, MnxStructure } from '../model
 import { isTimedEvent } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent } from './intents.ts';
-import type { EditOp } from './ops.ts';
+import type { EditOp, OpLogEntry } from './ops.ts';
 import { EditHistory } from './ops.ts';
 import {
   addOnsets,
@@ -74,6 +74,9 @@ export class EditorSession {
   /** Digit-combining anchor: consecutive fret digits on an unmoved cursor
    *  combine (1,2 → 12) — deterministic, no timers, so traces replay. */
   private lastDigit: { anchor: string; fret: number } | null = null;
+  /** The intent currently being handled — stamped into history entries by
+   *  apply() as the op queue's provenance (forward-recorded at apply time). */
+  private applyingIntent: EditorIntent | null = null;
   /** The selection ladder rung (roadmap/inprogress/core-selection-ladder.md). The
    *  cursor is the anchor; the level says how much around it is selected.
    *  Relaxing never moves the cursor, so tighten re-resolves the same
@@ -131,6 +134,12 @@ export class EditorSession {
     return this.history.appliedOps;
   }
 
+  /** The op queue with intent provenance, for the workbench's ops panel:
+   *  applied (oldest first) and the redo stack (next-to-redo first). */
+  get opQueue(): { applied: OpLogEntry[]; future: OpLogEntry[] } {
+    return { applied: this.history.appliedEntries, future: this.history.futureEntries };
+  }
+
   /** Every intent handled, including navigation and undo/redo. */
   get intentLog(): EditorIntent[] {
     return [...this.intents];
@@ -183,6 +192,9 @@ export class EditorSession {
     this.intents.push(intent);
     if (intent.type !== 'fretDigit') this.lastDigit = null;
     if (isNavigationIntent(intent)) return this.navigate(intent);
+    // Provenance for the op queue: apply() stamps the intent being handled
+    // into the history entry (forward-recorded, never inferred).
+    this.applyingIntent = intent;
     switch (intent.type) {
       case 'undo': {
         if (!this.history.canUndo) return false;
@@ -290,6 +302,17 @@ export class EditorSession {
         this.apply({ type: 'appendMeasure' });
         return true;
       }
+      case 'addPart': {
+        const op: Extract<EditOp, { type: 'addPart' }> = { type: 'addPart' };
+        if (intent.partId !== undefined) op.partId = intent.partId;
+        if (intent.name !== undefined) op.name = intent.name;
+        this.apply(op);
+        return true;
+      }
+      case 'setStaffKind': {
+        this.apply({ type: 'setStaffKind', kind: intent.kind });
+        return true;
+      }
     }
   }
 
@@ -330,7 +353,7 @@ export class EditorSession {
         this.grid.mode === 'string'
           ? this.cursorState.line
           : note._x?.mnxLab?.string ??
-            defaultStringFor(note.pitch, tuningOf(this.doc.parts[0]), capoOf(this.doc.parts[0]));
+            defaultStringFor(note.pitch, tuningOf(this.doc.parts?.[0]), capoOf(this.doc.parts?.[0]));
       this.apply({ type: 'setFret', noteId: slot.noteKey, string, fret });
     } else {
       // Nothing on this string at this position: insert. Only meaningful on
@@ -510,8 +533,24 @@ export class EditorSession {
   }
 
   private apply(op: EditOp): void {
-    this.history.apply(op);
+    // The note under the cursor before the mutation: if it survives, the
+    // cursor FOLLOWS it. A transpose that crosses a staff line (C#→D moves
+    // the notehead; C→C# does not) must not leave the cursor behind on the
+    // now-empty line — same for a tab re-pitch that lands on another string.
+    const anchor = slotAt(this.grid, this.cursorState, this.activeProjection)?.noteKey ?? null;
+    this.history.apply(op, this.applyingIntent ?? undefined);
     this.reindex();
+    if (anchor) {
+      const moved = positionAt(this.grid, this.cursorState)?.slots.find(
+        s => s.noteKey === anchor
+      );
+      if (moved) {
+        const line = this.activeProjection === 'tab' ? moved.line : moved.staffPosition;
+        if (line !== this.cursorState.line) {
+          this.cursorState = { ...this.cursorState, line };
+        }
+      }
+    }
     // A mutation acts at the cursor's note/position, so it re-anchors the
     // selection there — typing a fret while a bar is selected must not leave
     // the whole bar reading as "what you just edited".

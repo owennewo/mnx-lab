@@ -26,7 +26,7 @@ export const DEFAULT_CLEF: ClefSpec = { sign: 'G', staffPosition: -2, octave: 0 
  *  the measure for now). */
 export function clefAt(doc: MnxStructure, measureIndex: number): ClefSpec {
   let current = DEFAULT_CLEF;
-  const measures = doc.parts[0]?.measures ?? [];
+  const measures = doc.parts?.[0]?.measures ?? [];
   for (let i = 0; i <= measureIndex && i < measures.length; i++) {
     for (const positioned of measures[i].clefs ?? []) {
       if ((positioned.staff ?? 1) !== 1) continue;
@@ -64,8 +64,9 @@ function referenceDiatonic(clef: ClefSpec): number {
 /** The key signature governing a measure (fifths; persists until changed). */
 export function keyFifthsAt(doc: MnxStructure, measureIndex: number): number {
   let fifths = 0;
-  for (let i = 0; i <= measureIndex && i < doc.global.measures.length; i++) {
-    const key = doc.global.measures[i].key;
+  const measures = doc.global?.measures ?? [];
+  for (let i = 0; i <= measureIndex && i < measures.length; i++) {
+    const key = measures[i].key;
     if (key) fifths = key.fifths;
   }
   return fifths;

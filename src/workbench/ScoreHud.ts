@@ -28,6 +28,19 @@ export interface HudRow {
   activatable?: boolean;
 }
 
+/** One cheatsheet line — keys and what they do at the CURRENT level. The
+ *  shapes mirror keymapDocs' CheatRow/CheatGroup structurally, restated here
+ *  so the component keeps its neutral contract (no `edit/` imports). */
+export interface HudCheatRow {
+  keys: string;
+  meaning: string;
+}
+
+export interface HudCheatGroup {
+  label: string;
+  rows: HudCheatRow[];
+}
+
 /** One line of the ensemble table (the part row's value). */
 export interface HudPart {
   index: number;
@@ -46,6 +59,7 @@ export class ScoreHud extends LitElement {
   @property({ attribute: false }) rows: HudRow[] = [];
   @property({ attribute: false }) parts: HudPart[] = [];
   @property({ attribute: false }) presets: string[] = [];
+  @property({ attribute: false }) cheats: HudCheatGroup[] = [];
 
   static styles = [
     designTokens,
@@ -171,6 +185,40 @@ export class ScoreHud extends LitElement {
       .part .declared.override {
         color: var(--accent);
       }
+
+      /* The cheatsheet: the verbs at the current rung, under the noun rows. */
+      .cheats {
+        margin-top: 10px;
+        border-top: 1px solid var(--line);
+        padding: 2px 0 12px;
+      }
+
+      .cheat-group {
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        padding: 10px 14px 3px;
+      }
+
+      .cheat {
+        display: grid;
+        grid-template-columns: 86px 1fr;
+        gap: 8px;
+        align-items: baseline;
+        padding: 2px 14px;
+      }
+
+      .cheat .cheat-keys {
+        color: var(--ink);
+        font-size: 10.5px;
+        white-space: nowrap;
+      }
+
+      .cheat .cheat-meaning {
+        font-size: 10.5px;
+        color: var(--ink-2);
+      }
     `
   ];
 
@@ -257,6 +305,31 @@ export class ScoreHud extends LitElement {
           </div>
         `
       )}
+      ${this.cheats.length > 0
+        ? html`
+            <div class="cheats">
+              <div
+                class="cap"
+                title="what the keyboard does at the CURRENT selection level — the list changes as you widen and narrow"
+              >
+                keys · at this level
+              </div>
+              ${this.cheats.map(
+                group => html`
+                  <div class="cheat-group">${group.label}</div>
+                  ${group.rows.map(
+                    row => html`
+                      <div class="cheat">
+                        <span class="cheat-keys">${row.keys}</span>
+                        <span class="cheat-meaning">${row.meaning}</span>
+                      </div>
+                    `
+                  )}
+                `
+              )}
+            </div>
+          `
+        : nothing}
     `;
   }
 }

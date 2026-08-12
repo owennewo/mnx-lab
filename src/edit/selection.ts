@@ -88,7 +88,7 @@ function eventIndexAt(sequence: MnxSequence | undefined, onset: Onset): number {
 /** Measure indices where a section label sits (proposed `global.measure.section`). */
 export function sectionStarts(doc: MnxStructure): number[] {
   const starts: number[] = [];
-  doc.global.measures.forEach((measure, index) => {
+  (doc.global?.measures ?? []).forEach((measure, index) => {
     if (measure.section) starts.push(index);
   });
   return starts;
@@ -110,8 +110,8 @@ export function sectionRangeAt(
   if (start < 0) return null;
   const next = starts.find(s => s > start);
   const measureCount = Math.max(
-    doc.global.measures.length,
-    doc.parts[0]?.measures?.length ?? 0
+    doc.global?.measures?.length ?? 0,
+    doc.parts?.[0]?.measures?.length ?? 0
   );
   return { start, end: next ?? measureCount };
 }
@@ -126,7 +126,7 @@ export function presentLevels(
 ): Set<SelectionLevel> {
   const present = new Set<SelectionLevel>(['partMeasure', 'measure', 'score']);
   const sequences = staffOneSequences(
-    doc.parts[0]?.measures?.[cursor.measureIndex]?.sequences
+    doc.parts?.[0]?.measures?.[cursor.measureIndex]?.sequences
   );
   if (sequences.length > 0) present.add('voiceMeasure');
   const voice = anchorVoiceIndex(grid, cursor, projection);
@@ -187,13 +187,13 @@ export function selectionNoteKeys(
   const anchorEvent =
     level === 'event'
       ? eventIndexAt(
-          staffOneSequences(doc.parts[0]?.measures?.[cursor.measureIndex]?.sequences)[voice],
+          staffOneSequences(doc.parts?.[0]?.measures?.[cursor.measureIndex]?.sequences)[voice],
           cursor.onset
         )
       : -1;
 
   const keys: string[] = [];
-  (doc.parts[0]?.measures ?? []).forEach((measure, measureIndex) => {
+  (doc.parts?.[0]?.measures ?? []).forEach((measure, measureIndex) => {
     if (level !== 'score') {
       if (section) {
         if (measureIndex < section.start || measureIndex >= section.end) return;
