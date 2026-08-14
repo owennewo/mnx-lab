@@ -1,5 +1,5 @@
 // The committed construct traces, keyed by target scenario id — the ops
-// panel's replay affordance (roadmap/inprogress/core-element-ops-exemplar.md,
+// panel's replay affordance (roadmap/complete/core-element-ops-exemplar.md,
 // stage 5 feedback: SEEING the genesis queue beats reading about it). The
 // fixtures are harness evidence, imported read-only the same way the corpus
 // itself is (committed JSON via glob); the workbench never writes them —

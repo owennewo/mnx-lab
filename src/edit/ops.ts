@@ -129,7 +129,7 @@ export type EditOp =
       /** Add a part (id/name both optional — an anonymous part is legal
        *  MNX), materializing the document skeleton on demand: construct
        *  traces start from the literal `{}` and genesis is ops, not chrome
-       *  (roadmap/inprogress/core-element-ops-exemplar.md). New part measures
+       *  (roadmap/complete/core-element-ops-exemplar.md). New part measures
        *  align with the global timeline. */
       type: 'addPart';
       partId?: string;
@@ -656,7 +656,7 @@ function forEachEventNote(
 /** One op-queue entry: the op plus the intent that provoked it — stamped
  *  FORWARD at apply time (never inferred backward), so the ops panel can
  *  reverse-join intent → key/surface through the keymap docs
- *  (roadmap/inprogress/core-element-ops-exemplar.md, provenance columns). */
+ *  (roadmap/complete/core-element-ops-exemplar.md, provenance columns). */
 export interface OpLogEntry {
   op: EditOp;
   intent?: EditorIntent;

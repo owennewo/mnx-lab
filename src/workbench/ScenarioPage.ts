@@ -1256,7 +1256,7 @@ export class ScenarioPage extends LitElement {
     `;
   }
 
-  /** The ops tab (roadmap/inprogress/core-element-ops-exemplar.md): the
+  /** The ops tab (roadmap/complete/core-element-ops-exemplar.md): the
    *  session's op log rendered as the undo/redo queue it already is —
    *  applied entries, the redo stack dimmed below, position marked, each
    *  row op · provoking intent · key (the provenance columns). Clicking an

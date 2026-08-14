@@ -6,13 +6,12 @@
     <title>MNX Lab embed — mock host page</title>
     <style>
       /* A deliberately foreign host page: the embed must look right without
-         controlling the document. Only the SMuFL face is required, served
-         from wherever the host puts it. */
-      @font-face {
-        font-family: 'Bravura';
-        src: url('/smufl/Bravura.woff2') format('woff2');
-        font-display: block;
-      }
+         controlling the document — and, since the artifact locates its own
+         assets (roadmap/proposed/core-viewer-embedded-app.md), WITHOUT
+         declaring an @font-face or hosting SMuFL metadata. This page used to
+         declare Bravura itself, which is precisely why the broken contract
+         went unnoticed: served from the workbench origin, `/smufl` happened
+         to exist. The real cross-origin check is `npm run smoke:embed`. */
 
       body {
         margin: 0;

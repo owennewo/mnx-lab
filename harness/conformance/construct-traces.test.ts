@@ -1,5 +1,5 @@
 // Construct traces — the element-ops exemplar's FORWARD harness
-// (roadmap/inprogress/core-element-ops-exemplar.md, campaign
+// (roadmap/complete/core-element-ops-exemplar.md, campaign
 // core-campaign-element-ops.md item 1).
 //
 // A fixture in harness/fixtures/construct-traces/ names a TARGET corpus

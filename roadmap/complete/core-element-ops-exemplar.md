@@ -1,6 +1,10 @@
 # The element-ops exemplar — two scenarios prove the forward/reverse harness
 
-> **Status: in progress — stages 1–4 built 2026-08-12, same day as proposed.**
+> **Status: complete 2026-08-14. Stages 1–4 built 2026-08-12** (same day as
+> proposed), **stage 5 closed 2026-08-14** — the hands-on pass ran as three
+> rounds of feedback that day (the destruct terminal revised to `{}`, the
+> queue's baseline row, the replay/destruct buttons) and its learnings are
+> threaded into the campaign log, where items 2–3 inherit them.
 > Shipped: the genesis ops (`addPart` with skeleton-on-demand, plus `setStaffKind`
 > — discovered necessary, see below) and `{}` hardening across `edit/`; the two
 > construct traces (`harness/fixtures/construct-traces/`) and their forward
@@ -14,8 +18,18 @@
 > palette entries. Results: `minimal-single-note` replays to a **byte-identical**
 > document (11 intents → 5 ops); `open-strings-chord` passes the primitives
 > verdict with a doc delta of exactly its note ids + declared clef (24 intents →
-> 13 ops). Goldens untouched throughout. **Remaining: stage 5** — hands-on
-> workbench pass over the ops panel, learnings threaded back as items 2–3 draft.
+> 13 ops). Goldens untouched throughout.
+>
+> **What item 2 inherits** (the v0 limits, deliberate and now a punch list): the
+> walker enumerates keyed notes of `parts[0]`/staff 1 only; the dangling-
+> reference oracle scans `ties[].target` and nothing else, so it has never fired
+> (neither exemplar has an inbound reference — the `deleteNote` bug is still
+> uncaught, by design); and `unaddressed` elements surface in the console rather
+> than a report. **What item 3 inherits**: the fixture kind, the key
+> normalization rule, and the keyboard join — plus the recording surface, since
+> "copy trace" still stamps a corpus scenario id and construct traces start from
+> `{}` (the new-document journey), which is also where the last open question
+> below lands.
 >
 > Empirical answers to the open questions: `tab.staffKind` is NOT invisible — it
 > gates the tab/both projections in `engine/headless.ts`, so a document-level
@@ -25,7 +39,7 @@
 > fixtures got their own kind (`{target, intents}`, no inline expectations —
 > the goldens are the oracle, so there is nothing for an update mode to write).
 
-> Campaign: [core-campaign-element-ops.md](core-campaign-element-ops.md), item 1.
+> Campaign: [core-campaign-element-ops.md](../inprogress/core-campaign-element-ops.md), item 1.
 > This item IS the harness-proving step, so its "agreement block" is the algorithm
 > itself: both harness halves built end-to-end over two deliberately simple scenarios,
 > plus the op-queue panel that makes the command sequence visible and reviewable.
@@ -207,7 +221,7 @@ key/surface that produced the intent — built without reverse *inference*:
   op→intent inference is reserved for foreign (AI/synthesized) ops, where it doubles
   as the reachability audit.
 
-**Stage-5 feedback rounds (2026-08-12).** The queue gained its **baseline row**:
+**Stage-5 feedback rounds (2026-08-14).** The queue gained its **baseline row**:
 a queue of N ops has N+1 positions, and position 0 (before any op) was reachable
 only by Ctrl+Z — it now renders as an italic "start · the empty document {}" /
 "start · the score as loaded" row (labeled by what the session actually started
@@ -245,7 +259,7 @@ polish for the ladder's ghost-enclosure work rather than this item.
 - Does the ops tab belong on non-scenario documents too (IndexedDB docs)? Probably,
   but the exemplar only needs the scenario page.
 - ~~Should the panel offer "replay trace" for committed fixtures naming this
-  scenario?~~ **Built (2026-08-12, stage-5 feedback)**: the ops tab's empty state
+  scenario?~~ **Built (2026-08-14, stage-5 feedback)**: the ops tab's empty state
   offers "replay construct trace" when a fixture targets the scenario
   (`src/workbench/constructTraces.ts` globs the committed fixtures read-only, the
   same posture as the corpus itself). The session is rebuilt from `{}` through the

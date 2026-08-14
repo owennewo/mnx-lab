@@ -37,9 +37,26 @@ export interface SmuflLoadOptions {
   basePath?: string;
 }
 
+/**
+ * Where the metadata is fetched from when a caller names no `basePath`.
+ * Defaults to the host page's `/smufl` — correct for the workbench, and a 404
+ * for an embed on a foreign origin, which is why the embed build face SETS
+ * this from its own script URL (roadmap/proposed/core-viewer-embedded-app.md:
+ * the artifact locates its own assets, so one script tag really is enough).
+ */
+let defaultBasePath = '/smufl';
+
+export function setSmuflBasePath(base: string): void {
+  defaultBasePath = base.replace(/\/+$/, '');
+}
+
+export function smuflBasePath(): string {
+  return defaultBasePath;
+}
+
 export function loadSmufl(options: SmuflLoadOptions = {}): Promise<void> {
   if (loadPromise) return loadPromise;
-  const base = options.basePath ?? '/smufl';
+  const base = options.basePath ?? defaultBasePath;
   loadPromise = Promise.all([
     fetch(`${base}/glyphnames.json`).then(r => r.json()),
     fetch(`${base}/bravura_metadata.json`).then(r => r.json())

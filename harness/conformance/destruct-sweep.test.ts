@@ -1,5 +1,5 @@
 // The destruct sweep v0 — the element-ops exemplar's REVERSE harness
-// (roadmap/inprogress/core-element-ops-exemplar.md, campaign
+// (roadmap/complete/core-element-ops-exemplar.md, campaign
 // core-campaign-element-ops.md item 1; item 2 scales this corpus-wide).
 //
 // No fixtures: the walk regenerates each run. For each exemplar scenario,
@@ -18,10 +18,13 @@
 //      restores the loaded document BYTE-identically
 //
 // Then the exhaustive pass: delete every element in one session, in two
-// orders (chord members must commute) — terminal state = the walker
-// enumerates zero elements. A measure of rests IS the legal terminal; the
-// blank doc is not the goal (scaffolding teardown is coarse-op territory,
-// deliberately out of the campaign's frame).
+// orders (chord members must commute) — first to the ink-free state (the
+// walker enumerates zero elements; a measure of rests is legal, rests being
+// absence rather than elements), then PHASE 2, the scaffolding teardown, to
+// the literal `{}`. (Superseding this file's first draft: teardown is not
+// coarse-op cheating, because a container is removable only once EMPTY — the
+// cascade never destroys ink. `{}` is the construct start, so the round trip
+// closes, byte-identical undo-all both ways.)
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';

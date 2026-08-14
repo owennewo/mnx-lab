@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Score reader — an MNX Lab embed</title>
+    <!--
+      A deliberately FOREIGN host page (roadmap/proposed/core-viewer-embedded-app.md).
+      It knows three things and no more: the URL of the embed artifact, the URLs
+      of its own score files, and the element's public attributes. It declares no
+      @font-face and hosts no SMuFL metadata — the artifact locates its own
+      assets. If this page needs anything else to render music, the embed
+      contract is broken and this app is the thing that says so.
+    -->
+    <style>
+      :root {
+        color-scheme: light dark;
+        --page: #fbf8f3;
+        --ink: #241f1a;
+        --muted: #6d635a;
+        --line: #ddd3c4;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --page: #17140f;
+          --ink: #ece5da;
+          --muted: #9c9086;
+          --line: #342d25;
+        }
+      }
+
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--ink);
+        font: 16px/1.6 Georgia, 'Times New Roman', serif;
+      }
+
+      main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 20px 80px;
+      }
+
+      h1 {
+        font-size: 22px;
+        font-weight: 600;
+        margin: 0 0 4px;
+      }
+
+      p.lede {
+        margin: 0 0 28px;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      nav button {
+        font: inherit;
+        font-size: 14px;
+        padding: 4px 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+
+      nav button[aria-current='true'] {
+        color: var(--ink);
+        border-color: currentColor;
+      }
+
+      .frame {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+        background: canvas;
+      }
+
+      mnx-score-viewer {
+        height: 460px;
+      }
+
+      /* The host restyles the component through its public custom properties
+         — the only styling seam a shadow-DOM element offers. */
+      mnx-score-viewer {
+        --mnx-accent: #7a4a2f;
+      }
+
+      footer {
+        margin-top: 28px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      code {
+        font-family: ui-monospace, monospace;
+        font-size: 12.5px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Score reader</h1>
+      <p class="lede">
+        A plain web page that embeds <code>&lt;mnx-score-viewer&gt;</code> from the
+        MNX Lab embed artifact. Read-only: no editing, no workbench.
+      </p>
+
+      <nav id="scores"></nav>
+
+      <div class="frame">
+        <mnx-score-viewer id="viewer"></mnx-score-viewer>
+      </div>
+
+      <footer id="status"></footer>
+    </main>
+
+    <!-- One script tag. The `?base=` query lets the smoke harness and local
+         development point at a different artifact origin; production hard-codes
+         one. Loaded as a module so the ESM face is exercised. -->
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

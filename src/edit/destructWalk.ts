@@ -1,5 +1,5 @@
 // The destruct walk — the element-ops campaign's reverse direction
-// (roadmap/inprogress/core-element-ops-exemplar.md), shared verbatim by the
+// (roadmap/complete/core-element-ops-exemplar.md), shared verbatim by the
 // harness sweep (destruct-sweep.test.ts) and the ops panel's "run destruct
 // sweep" button, so the button IS the sweep: enumerate elements (v0 walker =
 // keyed notes), address each with NAVIGATION INTENTS ONLY (the

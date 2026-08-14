@@ -88,9 +88,9 @@ agreed or candidate claims; **bold** = agreed.
 
 | # | Item | Scope | Unlocks | Keys / tier | Rung | Status |
 |---|------|-------|---------|-------------|------|--------|
-| 1 | [exemplar](core-element-ops-exemplar.md) | Both harness halves built end-to-end over two simple scenarios (`minimal-single-note`, `open-strings-chord`). Start is **decided: the literal `{}`** — so the campaign's first new ops are the genesis verbs (`addPart`, skeleton-on-demand; score rung, setup tier) and the session is hardened for zero parts/measures. Settles key normalization; adds the **op-queue panel** (side-panel ops tab: `appliedOps` as a visible undo/redo queue) so command sequences can be read and reviewed. | the algorithm + genesis ops + 2 traced scenarios | **Shift+P** part popover; staffKind: palette | **score** | in progress — stages 1–4 built 2026-08-12 |
-| 2 | destructibility sweep | Item 1's reverse walk scaled corpus-wide: element walker per kind (noteKeys generalized), attempt address+delete per element; oracles: applies / no new diagnostics / no dangling references / undo byte-identical. No trace fixtures — the walk regenerates each run; the report is the artifact. Doubles as ladder addressability audit. Fix the `deleteNote` dangling-reference bug it will catch. | verdicts for all 106 | n/a | n/a | undrafted |
-| 3 | constructibility traces | Item 1's forward harness scaled: the construct-fixture kind + per-scenario tiers (unreachable → ops-reachable → keyboard-reachable → traced) + the expected-unreachable class. Traces themselves arrive with items 4–13 (recorded via "copy trace", never hand-written); possible workbench coverage map later. | verdict machinery for all 106; traces accumulate per item | n/a | n/a | undrafted |
+| 1 | [exemplar](../complete/core-element-ops-exemplar.md) | Both harness halves built end-to-end over two simple scenarios (`minimal-single-note`, `open-strings-chord`). Start is **decided: the literal `{}`** — so the campaign's first new ops are the genesis verbs (`addPart`, skeleton-on-demand; score rung, setup tier) and the session is hardened for zero parts/measures. Settles key normalization; adds the **op-queue panel** (side-panel ops tab: `appliedOps` as a visible undo/redo queue) so command sequences can be read and reviewed. | the algorithm + genesis ops + 2 traced scenarios | **Shift+P** part popover; staffKind: palette | **score** | **complete 2026-08-14** |
+| 2 | [destructibility sweep](../proposed/core-element-ops-destruct-sweep.md) | Item 1's reverse walk scaled corpus-wide: element walker per kind (noteKeys generalized), attempt address+delete per element; oracles: applies / no new diagnostics / no dangling references / undo byte-identical, **widened** (relative validity, references past ties, a surviving-document check). No trace fixtures — the walk regenerates each run; the report is the artifact. Doubles as ladder addressability audit. Fix the `deleteNote` dangling-reference bug it will catch. | verdicts for all 106 | n/a | n/a | **drafted 2026-08-14** |
+| 3 | constructibility traces | Item 1's forward harness scaled: the construct-fixture kind + per-scenario tiers (unreachable → ops-reachable → keyboard-reachable → traced) + the expected-unreachable class. Traces themselves arrive with items 4–13 (recorded via "copy trace", never hand-written); possible workbench coverage map later. Inherits item 1's parked **recording surface** question: "copy trace" stamps a corpus scenario id as the start, so recording from `{}` wants the new-document journey — and with it, the ops tab on non-scenario (IndexedDB) documents. | verdict machinery for all 106; traces accumulate per item | n/a | n/a | undrafted |
 | 4 | duration completion | Dots (op already accepts `dots?` — cheapest unlock), capo (read but unwritable), time `display: common\|cut`. | ~10 | dot: single key (`.` candidate); capo/display: popover grammar | event / setup | undrafted |
 | 5 | clef & key signature | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class. | gates ~all entry; F-clef + 5 key-sig scenarios | popover tier (Shift+letter) | measure | undrafted |
 | 6 | accidental spelling | Flats (natural-then-sharp policy makes E♭ unwritable), enharmonic respell, `accidentalDisplay`/parentheses. | 9+ | respell: single key | note | undrafted |
@@ -108,7 +108,38 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
-- **2026-08-12 — destruct tears down to `{}` (revision, stage-5 feedback).**
+- **2026-08-14 — item 1 closed; what items 2–3 inherit.** The exemplar moves to
+  `complete/`. The pieces it settled are now campaign rules, and its v0
+  shortcuts are item 2's opening punch list rather than debt to rediscover:
+  - **The walker interface** is three exported functions in `src/edit/destructWalk.ts`
+    — `elementKeys(doc) → string[]`, `driveToElement(session, key) → boolean`,
+    `runDestructWalk(session) → {deleted, unaddressed}`. Two rules are
+    load-bearing and item 2 keeps both: addressing goes through **navigation
+    intents only** (the grid is read to aim, never to teleport — that is what
+    makes the sweep an addressability audit), and the key list is **recomputed
+    after every deletion** (positional keys shift as chord siblings go).
+    Elements the cursor cannot reach are recorded, never skipped.
+  - **v0's deliberate limits, now item 2's work list**: the walker sees keyed
+    notes of `parts[0]`/staff 1 only; the dangling-reference oracle scans
+    `ties[].target` alone and has therefore never fired (no exemplar has an
+    inbound reference — the `deleteNote` bug remains uncaught **as designed**,
+    waiting for `spec/ties`); `unaddressed` findings surface in the console,
+    where item 2's report replaces them; and the two-order commute check has
+    only ever met chord members, never voices or parts.
+  - **The panel button IS the sweep** — one implementation, so a corpus-wide
+    finding is reproducible by hand on the scenario page. Item 2 should keep
+    that property when the walk grows a report: the report is the harness's
+    rendering of the walk, not a second walk.
+  - **The exemplar's own oracle set transfers unchanged**: applies · still
+    schema-valid · no *new* diagnostics beyond the loaded doc's baseline · no
+    dangling references · undo-all byte-identical. Nothing in it was
+    exemplar-specific, which is the evidence that the algorithm is corpus-ready.
+  - Two threads forwarded rather than dropped: the ops tab on non-scenario
+    documents rides item 3's recording surface (indexed on its row), and
+    "an empty part draws nothing" is recorded in
+    [core-selection-ladder.md](core-selection-ladder.md) as ghost-vocabulary
+    work (corpus-neutral — no scenario is measureless).
+- **2026-08-14 — destruct tears down to `{}` (revision, stage-5 feedback).**
   The "ink-free terminal" read as principled asymmetry but conflated two
   things: the anti-cheat rule forbids destroying *ink through* a container,
   not removing an *empty* container — an empty bar's deletion destroys only

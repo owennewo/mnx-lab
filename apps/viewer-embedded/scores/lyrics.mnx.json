@@ -1,0 +1,102 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "lyrics": {
+      "lineMetadata": {
+        "verse1": {
+          "label": "1."
+        },
+        "verse2": {
+          "label": "2."
+        }
+      },
+      "lineOrder": [
+        "verse1",
+        "verse2"
+      ]
+    },
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "name": "Voice",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "verse1": {
+                        "text": "Shine",
+                        "type": "whole"
+                      },
+                      "verse2": {
+                        "text": "Morn",
+                        "type": "start"
+                      }
+                    }
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 4
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "verse1": {
+                        "text": "bright",
+                        "type": "whole"
+                      },
+                      "verse2": {
+                        "text": "ing",
+                        "type": "end"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

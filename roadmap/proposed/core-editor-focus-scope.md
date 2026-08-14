@@ -1,14 +1,18 @@
 # Keyboard focus scope — who owns the next keystroke, and how you can tell
 
-> **Status: stages 1, 3 and 4 built 2026-08-12, same day as proposed. Stage 2
-> remains, gated behind the `elements/` promotion** (which is itself parked
-> behind its own trigger — a real second consumer).
+> **Status: COMPLETE for its scope, 2026-08-14 (same day as proposed).**
+> Stages 1, 3 and 4 built; **stage 2 retired as "not wanted"** —
+> [core-viewer-embedded-app.md](core-viewer-embedded-app.md) settled the fork
+> (*embeds view; studio edits*), and a read-only embed needs nothing beyond
+> not stealing the host's keys, which stage 1 ships. Should studio bring the
+> editor into `elements/`, the host-scoped listener returns as item 3 of the
+> promotion's own work list.
 > Shipped: `--mnx-focus-ring` (public token, light + dark), the viewer's
 > `tabindex="0"` default (author-set values never clobbered) and its
 > `:host(:focus-within)` outline, `src/workbench/keyScope.ts` (the shared
 > scope tests — `realTarget`/`isTextEntry`/`focusWithin`/`focusUnclaimed`/
-> `keyIsOurs`) wired into both listeners (the page scopes to itself, the
-> shell keeps document scope deliberately), and
+> `editorHasKeyboard`/`keyIsOurs`) wired into both listeners (the page scopes
+> to itself, the shell keeps document scope deliberately), and
 > `harness/conformance/key-scope.test.ts` (no shell binding claimed by an
 > editor layer; no editor binding on a browser-reserved chord).
 > **Verified in headless Chrome via CDP**, all four behaviors: `tabindex="0"`
@@ -47,7 +51,7 @@
 > Feeds [core-editor-element-promotion.md](core-editor-element-promotion.md)'s
 > "the shadow-DOM focus story coming due" line item, and hands
 > [core-viewer-surface.md](core-viewer-surface.md) one public token
-> (`--mnx-focus-ring`). Raised 2026-08-12 from an embed question: *on a random
+> (`--mnx-focus-ring`). Raised 2026-08-14 from an embed question: *on a random
 > host page that embeds the viewer, when do PgUp/PgDn reach me and when do they
 > reach the page?*
 
@@ -112,9 +116,14 @@ Four nested scopes decide whether a handler runs. Naming them is half the work:
    INPUT/TEXTAREA/contentEditable check survives as scope 4: a popover input
    inside our own shadow root must still win over the editor.
 4. **Swallow only what we consumed** — `preventDefault()` exactly when an
-   intent handled the key, so unhandled keys fall through to the host page. The
-   keymap tables already know which those are (`resolveIntent` returning null is
-   the signal); today's handlers are looser than that.
+   intent claimed the key, so unhandled keys fall through to the host page.
+   **Audited, already correct**: `if (!intent || !this.session) return;`
+   precedes the only `preventDefault()`, so an unmatched stroke is never
+   swallowed — no change was needed. One deliberate nuance: a stroke that
+   matched an intent is swallowed even when `handleIntent` returns false (an
+   arrow at the edge of the score). The key was *ours*; letting it fall
+   through to scroll the page because the cursor happened to be at a boundary
+   would be worse than doing nothing visibly.
 
 ### The visible signal
 
@@ -137,9 +146,17 @@ without pressing a key and finding out:
 ### The second signal: the cursor must not lie
 
 An unfocused component drawing a cursor/enclosure is claiming keystrokes it
-will not receive. When focus leaves, the overlay should dim (or hide) and
-restore on focus — the `cursorHidden` machinery from the ladder work already
-expresses exactly this state, so this is wiring, not new concepts.
+will not receive. When focus leaves, the overlay dims and restores on focus.
+
+**Built with its own state, NOT the ladder's `cursorHidden`** — the original
+sketch here proposed reusing that flag ("wiring, not new concepts"); the build
+rejected it. `cursorHidden` means *the user deliberately deselected* (Escape
+relaxed past the top rung), and folding focus loss into it would make
+"I dismissed the selection" and "my keyboard is elsewhere" indistinguishable —
+returning focus would then have to guess whether to restore a selection the
+user had dismissed. So the overlay reads a separate `hasKeyboard`, derived
+from the same `editorHasKeyboard` predicate the key gate uses, and reaches
+the element as `selection-inactive`. Two different truths, two flags.
 
 ### Shell bindings do not travel
 
@@ -158,8 +175,11 @@ element-tier layer) so the split cannot rot.
 - **`preventDefault()` on arrows/Space is load-bearing** — they scroll. Scoped
   to "focus is inside us and we handled it", that is correct; unscoped, it is
   the current antisocial behavior in miniature.
-- **Multiple embedded viewers on one page** fall out for free: focus picks the
-  target, and the ring says which one. This is impossible to express today.
+- **Multiple embedded viewers on one page** fall out for free **once stage 2
+  lands** — focus picks the target, and the ring says which one. Not true yet:
+  the shipped ownership test is per *page* (the workbench mount asks "is focus
+  inside this scenario page"), so two viewers would both answer yes. The ring
+  is already per-element, so only the key routing is missing.
 - **Programmatic focus** (`element.focus()`) is the host's API for handing over
   the keyboard deliberately; it works once `tabindex` exists.
 - **Accessibility is adjacent, not solved here** — a focusable editor wants a
@@ -167,15 +187,37 @@ element-tier layer) so the split cannot rot.
 
 ## Staging
 
-1. **The ring + focus-awareness where the listeners are today** (workbench
-   tier): `tabindex` on the viewer, `:host(:focus-within)` outline with the
-   token, the focus-containment test added beside the tag-name guard, and
-   `preventDefault()` narrowed to handled keys. Ships the embed-visible half of
-   the behavior without waiting for the promotion.
+1. ~~**The ring + focus-awareness where the listeners are today**~~ —
+   **built**: `tabindex` on the viewer, `:host(:focus-within)` outline with the
+   token, the focus-containment test beside the tag-name guard;
+   `preventDefault()` audited and found already narrow (no change). Ships the
+   antisocial-behavior fix without waiting for the promotion. **Note what this
+   does NOT ship**: an embed still has no key handling of its own, because the
+   listener lives in `workbench/`, which embeds never load. Stage 1 stops the
+   workbench from over-claiming; stage 2 is what makes an embed *work*.
 2. **Move the listener to the host element** — with
    [core-editor-element-promotion.md](core-editor-element-promotion.md), when
    the mount layer becomes `elements/`-tier. Deletes the window listener and
    the focus test together: containment becomes structural.
+   **RETIRED as "not wanted" (2026-08-14)**: the fork below was answered by
+   [core-viewer-embedded-app.md](core-viewer-embedded-app.md) — **embeds view;
+   studio edits**. A read-only embedded viewer needs no key handling beyond
+   *not stealing the host's keys*, which stage 1 already delivers, so there is
+   nothing here left to want. If studio later brings the editor into
+   `elements/`, this stage returns as item 3 of the promotion's work list,
+   where it already lives. **This doc is complete for its scope.**
+   Original blocking analysis, kept for the record (trigger re-check
+   2026-08-14): the promotion's
+   trigger 1 (a stable intent vocabulary) is **met** — five changes to
+   `intents.ts`, all additive, no renames ever — so the only thing standing
+   is trigger 2, *a real second consumer asking for editing*. That is a
+   product decision, not engineering, and it has a fork worth forcing:
+   **if embeds are read-only by design, stage 2 is not "pending" but "not
+   wanted"** — a read-only embedded viewer needs no key handling beyond not
+   stealing the host's keys, which stage 1 already delivers, and this doc can
+   close. The promotion doc now carries the three ways forward (decide the
+   consumer question · a scope-only intermediate needing no boundary change ·
+   the full promotion).
 3. ~~**The overlay's unfocused state**~~ — **built**: `selection-inactive`
    fades enclosure, ghost cell and accent recolor, driven by the shared
    `editorHasKeyboard` predicate. Not yet covered: the whole *window* losing

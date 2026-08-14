@@ -1,5 +1,5 @@
 // The ops panel's display rows — the element-ops exemplar's provenance
-// columns (roadmap/inprogress/core-element-ops-exemplar.md): each op-queue
+// columns (roadmap/complete/core-element-ops-exemplar.md): each op-queue
 // entry renders as op · provoking intent · the key/surface that produced it.
 // Provenance is forward-stamped by the session (opQueue); this module only
 // REVERSE-JOINS intent type → key label through the keymap's own tables —
