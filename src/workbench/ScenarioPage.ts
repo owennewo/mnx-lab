@@ -14,6 +14,7 @@ import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts'
 import type { ViewMode } from '../elements/ScoreViewer.ts';
 import type { EnclosureKind, SelectionContext } from '../elements/mnxContext.ts';
 import { EditorSession, replayIntents } from '../edit/session.ts';
+import { elementKeys, runDestructWalk } from '../edit/destructWalk.ts';
 import { constructTraceByTarget, type ConstructTrace } from './constructTraces.ts';
 import { SELECTION_LADDER, type SelectionLevel } from '../edit/selection.ts';
 import type { EditorIntent } from '../edit/intents.ts';
@@ -32,6 +33,7 @@ import {
 } from '../edit/keymap.ts';
 import { parsePart, parseTimeSignature, parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
 import { buildOpRow } from './opRows.ts';
+import { keyIsOurs } from './keyScope.ts';
 import '../elements/ScoreViewer.ts';
 import './ScoreHud.ts';
 
@@ -460,6 +462,10 @@ export class ScenarioPage extends LitElement {
         opacity: 0.45;
       }
 
+      ol.ops li.baseline {
+        font-style: italic;
+      }
+
       ol.ops .op-what {
         grid-column: 1;
       }
@@ -690,15 +696,12 @@ export class ScenarioPage extends LitElement {
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (event.defaultPrevented || event.isComposing) return;
-    // Shadow-DOM retargeting makes window-level `event.target` the outermost
-    // host; composedPath()[0] is the real target (the focused input, if any).
-    const target = event.composedPath()[0];
-    if (target instanceof HTMLElement) {
-      const tag = target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable)
-        return;
-    }
+    // Scope (core-editor-focus-scope.md): the editor's keys are ours while
+    // focus is inside this page (or unclaimed — nothing focused yet). The
+    // listener is still window-scoped because the mount lives in
+    // `workbench/`; the promotion moves it onto the host element and this
+    // test becomes structural.
+    if (!keyIsOurs(event, this)) return;
     if (this.session && this.activeLayers().length > 0) {
       const action = resolveShellAction(strokeOf(event));
       if (action && this.openPopover(action)) {
@@ -1225,33 +1228,62 @@ export class ScenarioPage extends LitElement {
     const { applied, future } = this.session.opQueue;
     if (applied.length === 0 && future.length === 0) {
       const trace = constructTraceByTarget.get(this.entry()?.id ?? '');
+      const elements = elementKeys(this.session.doc);
       return html`
         <p class="description">
           no edits yet — the queue fills as ops apply (every entry shows the op,
           the intent that provoked it, and the key that produced the intent)
         </p>
-        ${trace
+        ${trace || elements.length > 0
           ? html`
               <div class="actions">
                 <div class="action-row">
-                  <button @click=${() => this.replayConstructTrace(trace)}>
-                    replay construct trace (${trace.intents.length} intents)
-                  </button>
+                  ${trace
+                    ? html`
+                        <button @click=${() => this.replayConstructTrace(trace)}>
+                          replay construct trace (${trace.intents.length} intents)
+                        </button>
+                      `
+                    : nothing}
+                  ${elements.length > 0
+                    ? html`
+                        <button @click=${() => this.runDestructSweep()}>
+                          run destruct sweep (${elements.length} element${elements.length === 1 ? '' : 's'})
+                        </button>
+                      `
+                    : nothing}
                 </div>
                 <p class="hint">
-                  rebuilds this score from the literal <code>{}</code> through the
-                  recorded intents — the queue fills with the genesis ops, and undo
-                  walks construction backward. the replayed session starts from
-                  <code>{}</code>, so revert returns there, not to the corpus file;
-                  reload the page to get the committed score back.
+                  mirror sessions, both queues forward in time — “backwards” is only
+                  relative to the score's fullness. <b>construct</b> replaces the
+                  session: start <code>{}</code>, the recorded intents build the score,
+                  undo dismantles it (revert returns to <code>{}</code>; reload for the
+                  corpus file). <b>destruct</b> drives this session: the walker deletes
+                  every element it can address, then tears down the emptied scaffolding
+                  — bars, part, skeleton — to the literal <code>{}</code> (containers
+                  are removable only once empty, so nothing is destroyed implicitly).
+                  undo rebuilds everything back to the committed score. destruct needs
+                  no fixture, so it works on any scenario.
                 </p>
               </div>
             `
           : nothing}
       `;
     }
+    // Position 0 — the state before any op. A queue of N ops has N+1
+    // positions; without this row the start is reachable only by Ctrl+Z.
+    const startIsEmpty = !('mnx' in (this.session.initial as object));
     return html`
       <ol class="ops">
+        <li
+          class="baseline ${applied.length === 0 ? 'current' : ''}"
+          title="undo everything — back to the start"
+          @click=${() => this.jumpToOp(0)}
+        >
+          <span class="op-what">start · ${startIsEmpty ? 'the empty document {}' : 'the score as loaded'}</span>
+          <span class="op-keys">—</span>
+          <span class="op-intent">before any op</span>
+        </li>
         ${applied.map((entry, index) => {
           const row = buildOpRow(entry);
           return html`
@@ -1285,6 +1317,25 @@ export class ScenarioPage extends LitElement {
    *  committed corpus file is untouched (edits are in-memory by rule). */
   private replayConstructTrace(trace: ConstructTrace) {
     this.session = replayIntents({} as MnxStructure, trace.intents);
+    this.cursorHidden = false;
+    this.copied = false;
+    this.syncFromSession();
+  }
+
+  /** Run the destruct walk on THIS session (the construct mirror: no
+   *  session replacement — it starts from the loaded score, so revert and
+   *  undo-all still return to the committed document). The queue fills with
+   *  the delete ops; undo rebuilds the score element by element. Same code
+   *  as the harness sweep (src/edit/destructWalk.ts) — the button IS the
+   *  sweep. */
+  private runDestructSweep() {
+    if (!this.session) return;
+    const result = runDestructWalk(this.session);
+    if (result.unaddressed.length > 0) {
+      // A campaign finding, not a silent skip — v0 surfaces it to the console
+      // (the harness asserts it; the panel stays a viewer).
+      console.warn('destruct sweep: unaddressable elements', result.unaddressed);
+    }
     this.cursorHidden = false;
     this.copied = false;
     this.syncFromSession();

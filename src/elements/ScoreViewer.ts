@@ -95,6 +95,23 @@ export class ScoreViewer extends LitElement {
         background: var(--bg);
       }
 
+      /* Keyboard ownership, made visible (core-editor-focus-scope.md).
+         :focus-within, not :focus — a popover input inside the component
+         still means the keyboard is ours, and the ring must not blink off
+         mid-typing. Outline rather than border: no reflow, and it draws
+         outside the box so the paper's geometry is untouched. Click focus
+         counts on purpose — for an editor, a click really does transfer key
+         ownership. */
+      :host(:focus-within) {
+        outline: 2px solid var(--focus-ring);
+        outline-offset: -2px;
+      }
+
+      /* The host is the focus target; its own ring is the signal above. */
+      :host(:focus) {
+        outline-color: var(--focus-ring);
+      }
+
       .paper {
         background: var(--paper);
         color: var(--paper-ink);
@@ -315,6 +332,12 @@ export class ScoreViewer extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    // Focusable by default (core-editor-focus-scope.md): a custom element
+    // cannot be document.activeElement without a tabindex, so "the keyboard
+    // is ours while focus is inside us" is not even expressible until this
+    // exists. A host page may override — tabindex="-1" for click-only focus,
+    // or its own order — so an author-set value is never clobbered.
+    if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0');
     window.addEventListener('resize', this.resizeHandler);
   }
 

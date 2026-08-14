@@ -150,12 +150,14 @@ per element (each from a FRESH session):
             reference oracle — trivial here, load-bearing from item 2 on);
             undo restores the loaded doc byte-identically
 exhaustive pass: delete every element in one session, in at least two orders
-         (chord members must commute); terminal state = the walker enumerates
-         zero elements. A measure of rests IS the legal terminal — rests are
-         absence, not elements; and although construct now starts at {}, destruct
-         does NOT end there. The asymmetry is principled: individual destruct
-         removes ink; tearing down scaffolding (part, measures, tuning) is
-         exactly the coarse-op territory the campaign's framing excludes.
+         (chord members must commute) down to the ink-free state (a measure
+         of rests — rests are absence, not elements), then PHASE 2: tear
+         down the emptied scaffolding — bars at the measure rung, the part
+         at the score rung, each REFUSED while any ink remains (the
+         anti-cheat rule refined: a container is removable only once empty,
+         so cascade never destroys notes) — until the hollow skeleton
+         dissolves to the literal {}. Terminal = the construct start: the
+         round trip closes, with byte-identical undo-all both ways.
 report:  per-element verdicts — the sweep's artifact (no fixtures; the walk
          regenerates each run)
 ```
@@ -205,6 +207,17 @@ key/surface that produced the intent — built without reverse *inference*:
   op→intent inference is reserved for foreign (AI/synthesized) ops, where it doubles
   as the reachability audit.
 
+**Stage-5 feedback rounds (2026-08-12).** The queue gained its **baseline row**:
+a queue of N ops has N+1 positions, and position 0 (before any op) was reachable
+only by Ctrl+Z — it now renders as an italic "start · the empty document {}" /
+"start · the score as loaded" row (labeled by what the session actually started
+from), clicking = undo-all. Observation recorded, not yet addressed: **a part
+with no measures draws nothing**, so a construct walkback's first two positions
+(`{}` and part-added) look identical in the score pane — the ops queue and json
+tab distinguish them, but the score pane could earn an empty-part placeholder
+(engine work; corpus-neutral since no scenario is measureless). Candidate
+polish for the ladder's ghost-enclosure work rather than this item.
+
 ## Stages
 
 1. The genesis ops (`addPart`, skeleton-on-demand) + session hardening for `{}`,
@@ -238,3 +251,14 @@ key/surface that produced the intent — built without reverse *inference*:
   same posture as the corpus itself). The session is rebuilt from `{}` through the
   recorded intents, so the queue shows the genesis ops and undo walks construction
   backward — the "real need" was watching the sequence, not re-recording it.
+  **The destruct mirror followed the same day**: "run destruct sweep" beside it,
+  built by promoting the sweep's walk into `src/edit/destructWalk.ts`
+  (`elementKeys`/`driveToElement`/`runDestructWalk`) so the harness and the button
+  are one implementation. The polarity lesson landed as UI copy: both are ordinary
+  forward op queues — construct *replaces* the session (start `{}`, ops build,
+  undo dismantles), destruct *drives* the loaded one (ops empty the score, **undo
+  rebuilds it element by element**); "backwards" is only relative to the score's
+  fullness, and no reverse-queue machinery exists or is needed. Because the walk
+  is generative, the destruct button works on every scenario, not just the
+  exemplars — an early taste of item 2, and its unaddressable-element findings
+  surface in the console until the corpus-wide sweep owns them.

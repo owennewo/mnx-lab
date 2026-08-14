@@ -135,7 +135,13 @@ export const KEY_DOCS: KeyDoc[] = [
     keys: 'Del/⌫',
     strokes: [{ code: 'Delete' }, { code: 'Backspace' }],
     group: 'editing',
-    meaning: { note: 'delete the note under the cursor (an emptied event becomes a rest)' }
+    // Containers must be EMPTY to be deletable (element-ops: removal never
+    // destroys ink implicitly) — hence the guards in the upper-rung meanings.
+    meaning: {
+      note: 'delete the note under the cursor (an emptied event becomes a rest)',
+      measure: 'delete this bar — only when it holds no notes',
+      score: 'delete the part (then trailing bars) — only when no notes remain'
+    }
   },
   {
     keys: 'Alt+↑/↓',

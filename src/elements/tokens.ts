@@ -39,6 +39,10 @@ export const designTokens = css`
     --ink-2: oklch(0.45 0.012 80);
     --ink-3: oklch(0.6 0.01 80);
     --accent-fg: var(--accent);
+    /* The keyboard-ownership ring (roadmap/proposed/core-editor-focus-scope.md):
+       drawn while focus is inside the viewer, so "who gets the next keystroke"
+       is legible without pressing a key. Public — a host page restyles it. */
+    --focus-ring: var(--mnx-focus-ring, color-mix(in oklab, var(--accent), transparent 25%));
     --hover: oklch(0 0 0 / 0.045);
     --shadow: 0 1px 2px oklch(0 0 0 / 0.05), 0 6px 24px -8px oklch(0.3 0.02 80 / 0.18);
     --drawer-shadow: -12px 0 32px -12px oklch(0 0 0 / 0.18);
@@ -62,6 +66,8 @@ export const designTokens = css`
     --ink-2: oklch(0.72 0.01 85);
     --ink-3: oklch(0.58 0.01 85);
     --accent-fg: color-mix(in oklab, var(--accent), white 38%);
+    /* Dark: ride the lightened accent, or the ring vanishes into the ground. */
+    --focus-ring: var(--mnx-focus-ring, color-mix(in oklab, var(--accent-fg), transparent 20%));
     --hover: oklch(1 0 0 / 0.05);
     --shadow: 0 1px 2px oklch(0 0 0 / 0.3), 0 10px 32px -8px oklch(0 0 0 / 0.5);
     --drawer-shadow: -12px 0 32px -12px oklch(0 0 0 / 0.6);

@@ -13,6 +13,7 @@ import { groupScenarios } from '../corpus/groups.ts';
 import { buildQueue, classify } from './queue.ts';
 import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import { resolveShellAction, strokeOf } from '../edit/keymap.ts';
+import { keyIsOurs } from './keyScope.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import type { PaletteItem } from './CommandPalette.ts';
 import './CommandPalette.ts';
@@ -342,13 +343,11 @@ export class WorkbenchApp extends LitElement {
    *  table — it stays the sole KeyboardEvent interpreter). Everything
    *  score-shaped is the scenario page's keymap, not ours. */
   private onKeyDown = (event: KeyboardEvent) => {
-    if (event.defaultPrevented || event.isComposing) return;
-    const target = event.composedPath()[0];
-    if (target instanceof HTMLElement) {
-      const tag = target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable)
-        return;
-    }
+    // The SHELL's bindings are page-level by nature (the rail, the palette,
+    // go-to), so they keep document scope — `host: null`
+    // (core-editor-focus-scope.md: shell bindings do not travel to embeds,
+    // which is why they live here and not in an element-tier layer).
+    if (!keyIsOurs(event, null)) return;
     const action = resolveShellAction(strokeOf(event));
     if (action === 'commandPalette' || action === 'goTo') {
       event.preventDefault();

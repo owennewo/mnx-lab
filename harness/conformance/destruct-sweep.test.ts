@@ -26,7 +26,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { EditorSession } from '../../src/edit/session.ts';
-import { forEachKeyedNote, onsetsEqual } from '../../src/edit/cursor.ts';
+import { forEachKeyedNote } from '../../src/edit/cursor.ts';
+import { driveToElement, elementKeys, runDestructWalk } from '../../src/edit/destructWalk.ts';
 import { isTimedEvent, type MnxNote, type MnxStructure } from '../../src/model/mnx.ts';
 import { computePrimitives } from '../helpers/corpusPrimitives.ts';
 import validateMnx from '../../worker/generated/validate-mnx.mjs';
@@ -43,13 +44,6 @@ function loadDoc(id: string): MnxStructure {
   const dir = dirById.get(id);
   if (!dir) throw new Error(`unknown scenario id: ${id}`);
   return JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8')) as MnxStructure;
-}
-
-/** The v0 element walker: every keyed note (both exemplars are notes-only). */
-function elementKeys(doc: MnxStructure): string[] {
-  const keys: string[] = [];
-  forEachKeyedNote(doc, (_note, key) => keys.push(key));
-  return keys;
 }
 
 /** Diagnostic-badge count across both projections — the "no new
@@ -89,41 +83,6 @@ function noteIds(doc: MnxStructure): Set<string> {
   return ids;
 }
 
-/**
- * Drive the cursor to the element via navigation intents only, then return
- * whether it arrived (slot under cursor = the target key). This is the
- * addressability audit: the grid is consulted to AIM (the UI does the same),
- * but every move goes through handleIntent.
- */
-function driveTo(session: EditorSession, key: string): boolean {
-  const target = session.positions.positions
-    .flatMap(p => p.slots.map(slot => ({ position: p, slot })))
-    .find(({ slot }) => slot.noteKey === key);
-  if (!target) return false;
-
-  session.handleIntent({ type: 'goToMeasure', measureIndex: target.position.measureIndex });
-  for (
-    let guard = 0;
-    !onsetsEqual(session.cursor.onset, target.position.onset) && guard < 64;
-    guard++
-  ) {
-    session.handleIntent({ type: 'nextPosition' });
-  }
-  const line =
-    session.projection === 'tab' ? target.slot.line : target.slot.staffPosition;
-  for (let guard = 0; session.cursor.line !== line && guard < 64; guard++) {
-    // lineDown decreases staff position / increases string number.
-    session.handleIntent({
-      type: session.cursor.line > line === (session.projection === 'tab') ? 'lineUp' : 'lineDown'
-    });
-  }
-  return (
-    session.cursor.measureIndex === target.position.measureIndex &&
-    onsetsEqual(session.cursor.onset, target.position.onset) &&
-    session.cursor.line === line
-  );
-}
-
 describe('destruct sweep v0 (element-ops exemplar)', () => {
   for (const id of EXEMPLARS) {
     describe(id, () => {
@@ -141,7 +100,7 @@ describe('destruct sweep v0 (element-ops exemplar)', () => {
           const session = new EditorSession(JSON.parse(loadedBytes) as MnxStructure, id);
 
           // 1. Addressability — pure navigation.
-          expect(driveTo(session, key), `cursor cannot address ${key}`).toBe(true);
+          expect(driveToElement(session, key), `cursor cannot address ${key}`).toBe(true);
 
           // 2. The deletion.
           expect(session.handleIntent({ type: 'delete' })).toBe(true);
@@ -165,18 +124,30 @@ describe('destruct sweep v0 (element-ops exemplar)', () => {
         });
       }
 
-      it('exhaustive pass: two orders commute to the same ink-free terminal', () => {
+      it('exhaustive pass: two orders commute, teardown reaches {}', () => {
         const terminals = [false, true].map(reversed => {
           const session = new EditorSession(JSON.parse(loadedBytes) as MnxStructure, id);
           for (let guard = 0; elementKeys(session.doc).length > 0 && guard < 64; guard++) {
             const remaining = elementKeys(session.doc);
             const key = reversed ? remaining[remaining.length - 1] : remaining[0];
-            expect(driveTo(session, key), `cursor cannot address ${key}`).toBe(true);
+            expect(driveToElement(session, key), `cursor cannot address ${key}`).toBe(true);
             expect(session.handleIntent({ type: 'delete' })).toBe(true);
           }
-          // Terminal: the walker enumerates zero elements — NOT the blank doc.
+          // Ink-free: the walker enumerates zero elements, and the doc is
+          // still schema-valid (a measure of rests is legal).
           expect(elementKeys(session.doc)).toEqual([]);
           expect(validateMnx(session.doc)).toBe(true);
+          // Phase 2 — scaffolding teardown (runDestructWalk finds no ink
+          // left and proceeds straight to it): empty bars, then the part,
+          // then the hollow skeleton dissolves. Terminal: the literal {},
+          // the construct start — the round trip closes. ({} is not valid
+          // MNX and needn't be — the same boundary exemption as construct's
+          // start.)
+          runDestructWalk(session);
+          expect(JSON.stringify(session.doc)).toBe('{}');
+          // And undo-all still restores the loaded document byte-identically.
+          while (session.canUndo) session.handleIntent({ type: 'undo' });
+          expect(JSON.stringify(session.doc)).toBe(loadedBytes);
           return session.doc;
         });
         expect(terminals[0]).toEqual(terminals[1]);

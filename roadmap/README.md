@@ -101,6 +101,21 @@ proposals that name their campaign.
   or a viewer override (`<mnx-score-viewer>` `stringsOverride`/`capoOverride`, surfaced as
   the workbench's instrument selector with presets incl. open D/bass/uke/mandolin); the
   shim materializes the old implicit default into saved documents.
+- **[core-editor-focus-scope.md](proposed/core-editor-focus-scope.md)** — **who owns the next
+  keystroke, and how you can tell.** Raised from an embed question (when do PgUp/PgDn reach
+  the component vs the host page?) whose honest answer was "almost always the component":
+  both listeners are `window`-scoped with no focus check, and a custom element isn't even
+  focusable by default — so "while focused" wasn't expressible. Names the four-scope ladder
+  (browser/OS → document → host element → regions within), notes that **shadow DOM retargets
+  but never scopes key events**, and sets one rule: handle a key iff focus is inside the host
+  — `tabindex`, a host-scoped listener, containment tested across shadow roots, and
+  `preventDefault()` only on keys actually consumed. Plus the visible signal (a
+  `:host(:focus-within)` ring on the public `--mnx-focus-ring` token — an unfocused component
+  drawing a cursor is lying about who gets the keystroke) and the rule that **shell bindings
+  don't travel** (an embed must not eat a host page's Ctrl+K). **Stage 1 built 2026-08-12**
+  (ring, token, `keyScope.ts`, the binding-split assertion), verified in headless Chrome;
+  stage 2 — moving the listener onto the host element — rides
+  [core-editor-element-promotion.md](proposed/core-editor-element-promotion.md).
 - **[core-viewer-surface.md](proposed/core-viewer-surface.md)** — name and define **the viewer
   surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
   undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench

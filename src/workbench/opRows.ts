@@ -92,6 +92,10 @@ function opLabel(op: EditOp): string {
       return `tab staff · ${op.kind}`;
     case 'appendMeasure':
       return 'append bar';
+    case 'removeMeasure':
+      return `remove bar m${op.measureIndex + 1} (empty)`;
+    case 'removePart':
+      return 'remove part (empty)';
     case 'addPart':
       return `add part${op.name ? ` “${op.name}”` : op.partId ? ` ${op.partId}` : ' (anonymous)'}`;
   }

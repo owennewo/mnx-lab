@@ -108,6 +108,20 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
+- **2026-08-12 — destruct tears down to `{}` (revision, stage-5 feedback).**
+  The "ink-free terminal" read as principled asymmetry but conflated two
+  things: the anti-cheat rule forbids destroying *ink through* a container,
+  not removing an *empty* container — an empty bar's deletion destroys only
+  itself. Refined rule: **a container is removable only once it is empty**;
+  cascades never delete notes. Landed as guarded `removeMeasure`/`removePart`
+  ops, the skeleton dissolving in reverse symmetry with skeleton-on-demand
+  (`{}` when no parts and no measures remain — no tombstones), and Del
+  gaining its upper-rung meanings (measure rung: the empty bar; score rung:
+  the empty part, then trailing bars) — the ladder's polymorphic delete,
+  keyboard-reachable through the existing binding. The round trip now closes:
+  `{}` →construct→ score →destruct→ `{}`, byte-identical undo-all both ways,
+  asserted by the sweep. The walk lives in `src/edit/destructWalk.ts`, shared
+  verbatim by the harness and the ops panel's button.
 - **2026-08-12 — exemplar stages 1–4 built** (the campaign's first landing; the
   campaign moves to `inprogress/` with it). What the build taught:
   - **`tab.staffKind` is document data, not view state**: it gates the tab/both
@@ -149,6 +163,8 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
   at ink-free, not `{}` — scaffolding teardown is the excluded coarse-op territory.
   Recording consequence: the workbench's *new-document* journey becomes the
   recording surface for construct traces (test-first until it lands).
+  *(The "destruct stops at ink-free" clause below was superseded the same
+  day — see the teardown entry above.)*
 - **2026-08-11 — campaign opened** from the constructibility/destructibility gap
   analysis. Findings that shaped the contract:
   - The keymap has spare keys; the op union is the constraint. Ranking by

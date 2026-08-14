@@ -134,6 +134,21 @@ export type EditOp =
       type: 'addPart';
       partId?: string;
       name?: string;
+    }
+  | {
+      /** Remove one measure column (the global measure + every part's) —
+       *  refused while the bar holds any note, anywhere. The campaign's
+       *  anti-cheat rule refined: a CONTAINER may be removed only once it is
+       *  empty, so removal never destroys ink implicitly; the bar's own
+       *  attributes (time signature, barline) go with their container. */
+      type: 'removeMeasure';
+      measureIndex: number;
+    }
+  | {
+      /** Remove parts[0] (the entry surface — item 13 owns the rest) —
+       *  refused while the part holds any note. Its declarations (name,
+       *  tuning, staffKind) go with their container: no tombstones. */
+      type: 'removePart';
     };
 
 const NOTE_STEPS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
@@ -364,7 +379,53 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       }
       return next;
     }
+    case 'removeMeasure': {
+      if (!next.global?.measures?.[op.measureIndex]) return next;
+      if (measureHasInk(next, op.measureIndex)) return next;
+      next.global.measures.splice(op.measureIndex, 1);
+      for (const part of next.parts ?? []) part.measures?.splice(op.measureIndex, 1);
+      return dissolveIfHollow(next);
+    }
+    case 'removePart': {
+      const part = next.parts?.[0];
+      if (!part || partHasInk(part)) return next;
+      next.parts.shift();
+      return dissolveIfHollow(next);
+    }
   }
+}
+
+/** Any note in any part's copy of this bar? (Rests are absence, not ink.) */
+export function measureHasInk(doc: MnxStructure, measureIndex: number): boolean {
+  for (const part of doc.parts ?? []) {
+    for (const seq of part.measures?.[measureIndex]?.sequences ?? []) {
+      for (const item of seq.content ?? []) {
+        if (isTimedEvent(item) && (item.notes?.length ?? 0) > 0) return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** Any note anywhere in the part? */
+export function partHasInk(part: MnxPart): boolean {
+  for (const measure of part.measures ?? []) {
+    for (const seq of measure.sequences ?? []) {
+      for (const item of seq.content ?? []) {
+        if (isTimedEvent(item) && (item.notes?.length ?? 0) > 0) return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** The skeleton follows the content in BOTH directions: ensureSkeleton
+ *  materializes it on demand, and a doc left with no parts and no measures
+ *  dissolves back to the literal `{}` — the construct start, so the
+ *  construct/destruct round trip closes without tombstones. */
+function dissolveIfHollow(doc: MnxStructure): MnxStructure {
+  const hollow = (doc.parts?.length ?? 0) === 0 && (doc.global?.measures?.length ?? 0) === 0;
+  return hollow ? ({} as MnxStructure) : doc;
 }
 
 /** Genesis: materialize the document skeleton — `{}` is a legal starting

@@ -8,7 +8,7 @@ import { isTimedEvent } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent } from './intents.ts';
 import type { EditOp, OpLogEntry } from './ops.ts';
-import { EditHistory } from './ops.ts';
+import { EditHistory, measureHasInk, partHasInk } from './ops.ts';
 import {
   addOnsets,
   buildGrid,
@@ -260,9 +260,38 @@ export class EditorSession {
       }
       case 'delete': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
-        if (!slot) return false;
-        this.apply({ type: 'deleteNote', noteId: slot.noteKey });
-        return true;
+        if (slot) {
+          this.apply({ type: 'deleteNote', noteId: slot.noteKey });
+          return true;
+        }
+        // The container rungs' guarded delete (element-ops): a container may
+        // be removed only when it holds no ink — Del at the measure rung
+        // removes the empty bar, at the score rung the empty part (then the
+        // trailing empty bars), and the hollowed skeleton dissolves to {}.
+        if (this.level === 'measure') {
+          const measureIndex = this.cursorState.measureIndex;
+          if (
+            !this.doc.global?.measures?.[measureIndex] ||
+            measureHasInk(this.doc, measureIndex)
+          )
+            return false;
+          this.apply({ type: 'removeMeasure', measureIndex });
+          return true;
+        }
+        if (this.level === 'score') {
+          const part = this.doc.parts?.[0];
+          if (part && !partHasInk(part)) {
+            this.apply({ type: 'removePart' });
+            return true;
+          }
+          const last = (this.doc.global?.measures?.length ?? 0) - 1;
+          if (!part && last >= 0) {
+            this.apply({ type: 'removeMeasure', measureIndex: last });
+            return true;
+          }
+          return false;
+        }
+        return false;
       }
       case 'shorterDuration':
       case 'longerDuration': {
