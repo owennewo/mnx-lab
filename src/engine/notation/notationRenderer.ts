@@ -1,5 +1,5 @@
 import { MnxStructure } from '../../model/mnx.ts';
-import { layoutNotation } from '../layout/notation.ts';
+import { layoutNotation, type HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
 
@@ -22,6 +22,9 @@ export interface RenderNotationOptions {
   selectedNoteIds?: string[];
   onNoteClick?: (noteId: string, measureIdx: number, noteIdx: number) => void;
   pxPerSp?: number;
+  /** Features the host hid (docs/core-viewer-surface.md) — layout-side ones
+   *  reach the layout so the space they reserved is reclaimed. */
+  hide?: readonly HideableFeature[];
 }
 
 export function renderMnxToSvgNotation(opts: RenderNotationOptions): void {
@@ -31,7 +34,8 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): void {
     mnx: opts.mnx,
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
-    selectedNoteIds: opts.selectedNoteIds
+    selectedNoteIds: opts.selectedNoteIds,
+    hide: opts.hide
   });
 
   // An explicit pxPerSp pins the scale; the default scales short scores up to

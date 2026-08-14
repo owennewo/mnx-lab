@@ -48,11 +48,13 @@ async function show(score) {
     const response = await fetch(score.file);
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
     const mnxJson = await response.json();
-    // The element's document property — the host supplies the score, the
-    // component owns everything about drawing it.
+    // The host supplies the score and nothing else. `view` stays unset, so the
+    // element resolves the author's own `staffKind` hint — the tab scores come
+    // up as tab, the rest as notation, with no host JavaScript deciding.
+    // This used to be two lines of homework here, including a string-search of
+    // the document JSON for '"strings"' (docs/core-viewer-surface.md: derived
+    // data a host must compute is a defect in the surface, not in the host).
     viewer.mnxDoc = { id: score.id, name: score.label, lastUpdated: 0, mnxJson };
-    viewer.hasTab = JSON.stringify(mnxJson).includes('"strings"');
-    viewer.viewMode = viewer.hasTab ? 'both' : 'notation';
     setStatus(`${score.label} — rendered by the embed artifact at ${base}`);
   } catch (error) {
     setStatus(`could not load ${score.file}: ${error.message}`, false);
@@ -90,6 +92,13 @@ wireThemeButtons('page', value => {
   if (value === 'auto') delete document.documentElement.dataset.pageTheme;
   else document.documentElement.dataset.pageTheme = value;
 });
+
+// The precedence chain made visible: `auto` defers to the document's
+// staffKind, anything else is the host outranking it. Setting tab on a score
+// whose parts declare no strings still yields notation — no instrument is
+// ever assumed, so the element declines rather than drawing a guessed
+// fretboard.
+wireThemeButtons('view', value => viewer.setAttribute('view', value));
 
 wireThemeButtons('score', value => {
   // `auto` is the element's default: it follows the page, because

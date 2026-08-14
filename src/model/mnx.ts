@@ -306,6 +306,36 @@ export function isTimedEvent(item: MnxSequenceItem): item is MnxEvent {
   return sequenceItemKind(item) === 'event';
 }
 
+/**
+ * The view the DOCUMENT asks for, from `_x.mnxLab.tab.staffKind` — a hint the
+ * author declared, never a command (docs/core-viewer-surface.md: read-only
+ * means "I do not edit the document", not "the document edits me").
+ *
+ * `both` wins over `tab` when parts disagree: the composed system shows every
+ * part's notation, so it is the reading that loses no one's music. Returns
+ * undefined when no part declares one, which is the signal to fall through to
+ * the built-in default rather than to guess.
+ *
+ * Lives in `model/` because both the engine (gating the tab projection) and
+ * the element (resolving `view="auto"`) must answer this identically — two
+ * copies of this rule would be two definitions of what a document means.
+ */
+export function declaredStaffKind(
+  doc: MnxStructure | undefined
+): 'notation' | 'tab' | 'both' | undefined {
+  const kinds = (doc?.parts ?? []).map(part => part?._x?.mnxLab?.tab?.staffKind);
+  if (kinds.includes('both')) return 'both';
+  if (kinds.includes('tab')) return 'tab';
+  if (kinds.includes('notation')) return 'notation';
+  return undefined;
+}
+
+/** Does any part opt into a fingerboard view? Gates the tab projections. */
+export function wantsTabView(doc: MnxStructure | undefined): boolean {
+  const kind = declaredStaffKind(doc);
+  return kind === 'tab' || kind === 'both';
+}
+
 /** MNX `full-measure-rest`: an empty-content sequence resting the whole bar.
  *  Conventionally drawn as a whole rest centred in the measure, any meter. */
 export interface MnxFullMeasureRest {

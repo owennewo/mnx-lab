@@ -198,6 +198,17 @@ only the first two; the other four are Guitar Pro's.
   not a command — interactive consumers may expose a view toggle that overrides
   it. It stays under `tab` because its adopted home is undecided (possibly
   `staff-source` — presentation, not part setup).
+  **Who consults it**: `<mnx-score-viewer view="auto">` (the default) resolves
+  it — `both` → the composed system, `tab` → tab, absent/`notation` →
+  notation — so a bare element plus a document shows the author's intended
+  view with no host code. The precedence is
+  `host attribute > this hint > built-in default`
+  ([docs/core-viewer-surface.md](core-viewer-surface.md)), which is what keeps
+  it a hint: naming a view outranks it, always. One override it cannot beat:
+  tab needs KNOWN strings, so a part declaring `tab` without `strings[]` (and
+  without a viewer override supplying them) still renders notation — no
+  instrument is ever assumed. `declaredStaffKind()` in `src/model/mnx.ts` is
+  the single reading of this field; the engine's tab gate uses the same one.
 
 ## Global measure: `global.measures[i]._x.mnxLab`
 

@@ -150,6 +150,10 @@ export class ScenarioPage extends LitElement {
   @state() private doc: MnxDocument | null = null;
   @state() private rawScore = '';
   @state() private pinnedErrors: PinnedError[] = [];
+  /** Which pinned error the json tab is highlighting — workbench chrome, and
+   *  since stage 3 of the viewer surface it lives here rather than on the
+   *  element (docs/core-viewer-surface.md). */
+  @state() private errorPointer: string | null = null;
   @state() private referenceFailed = false;
   // Three states, not two: the score arrives over a lazy import, so "nothing
   // on screen" is either still-in-flight or a dead fetch. Collapsing them
@@ -581,6 +585,92 @@ export class ScenarioPage extends LitElement {
 
       .load-state {
         margin: 26px;
+      }
+
+      /* The spec-gap exhibit — workbench chrome since the viewer-surface
+         eviction (docs/core-viewer-surface.md). Sits on the same paper card
+         the score would have, so the page's shape is unchanged. */
+      .exhibit {
+        padding: 5px;
+        background: var(--bg);
+        height: 100%;
+        overflow: auto;
+        box-sizing: border-box;
+      }
+
+      .exhibit-panel {
+        background: var(--paper);
+        color: var(--paper-ink);
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        border: 1px solid oklch(0.85 0.01 85 / 0.6);
+        padding: 26px 24px;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .exhibit-panel h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 10px;
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 15px;
+      }
+
+      .exhibit-panel .sp-dia {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--st-gap);
+        flex: none;
+      }
+
+      .exhibit-panel p {
+        margin: 0 0 16px;
+        font-size: 12.5px;
+        line-height: 1.6;
+        color: var(--ink-2);
+      }
+
+      .err-table {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .err-row {
+        display: grid;
+        gap: 2px;
+        text-align: left;
+        font: inherit;
+        background: transparent;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+
+      .err-row:hover {
+        border-color: var(--accent);
+      }
+
+      .err-row .er-rule {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--st-gap);
+      }
+
+      .err-row .er-msg {
+        font-size: 12.5px;
+        color: var(--ink);
+      }
+
+      .err-row .er-path {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--ink-3);
       }
 
       .ref-missing,
@@ -1064,17 +1154,66 @@ export class ScenarioPage extends LitElement {
         <p class="detail">${this.loadError}</p>
       </div>`;
     }
+    // The spec-gap exhibit is WORKBENCH chrome, not the viewer's job
+    // (docs/core-viewer-surface.md, stage 3): the document is the exhibit and
+    // rendering is deliberately skipped, so the score element is not involved
+    // at all. It used to ride on the element as three props an embed could
+    // never want.
+    if (entry.invalidByDesign) return this.exhibit();
+
     return html`
       <mnx-score-viewer
         .mnxDoc=${this.doc}
         .view=${viewMode}
         .partTabSetups=${this.partTabSetups()}
-        .invalidByDesign=${entry.invalidByDesign}
-        .pinnedErrors=${this.pinnedErrors}
         .selection=${this.selection}
         .selectionInactive=${!this.hasKeyboard}
       ></mnx-score-viewer>
     `;
+  }
+
+  /** The invalid-by-design exhibit: pinned schema errors, each row locating
+   *  its offending value in the document pane. */
+  private exhibit() {
+    return html`
+      <div class="exhibit">
+        <div class="exhibit-panel">
+          <h3><span class="sp-dia"></span>Invalid by design — a spec-gap exhibit</h3>
+          <p>
+            This document is deliberately rejected by the official MNX schema. The validation
+            errors below are pinned: if a schema bump makes this document start passing, the
+            corpus tests flag it as a spec-evolution signal. Rendering is skipped — the document
+            itself is the exhibit.
+          </p>
+          <div class="err-table">
+            ${this.pinnedErrors.map(
+              err => html`
+                <button
+                  class="err-row"
+                  title="Click to locate the offending value in the document"
+                  @click=${() => this.showErrorInJson(err)}
+                >
+                  <span class="er-rule"
+                    >${err.rule}${this.errorPointer === err.pointer
+                      ? ' · highlighted in document →'
+                      : ''}</span
+                  >
+                  <span class="er-msg">${err.msg}</span>
+                  ${err.path ? html`<span class="er-path">${err.path}</span>` : nothing}
+                </button>
+              `
+            )}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /** An exhibit row was clicked: pin it and open the json tab, where the
+   *  pointer highlights the offending value. Formerly an element event. */
+  private showErrorInJson(err: PinnedError) {
+    this.errorPointer = err.pointer;
+    this.panelTab = 'json';
   }
 
   render() {

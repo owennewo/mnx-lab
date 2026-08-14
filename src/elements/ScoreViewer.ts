@@ -7,18 +7,23 @@ import {
   selectionContext
 } from './mnxContext.ts';
 import type { PlaybackState, SelectionContext } from './mnxContext.ts';
-import { MnxDocument, MnxPart, MnxTuningEntry } from '../model/mnx.ts';
+import { MnxDocument, MnxPart, MnxTuningEntry, declaredStaffKind } from '../model/mnx.ts';
 import type { PartTabSetups, TabSetup } from '../engine/tab/guitarPositions.ts';
 import { renderMnxToSvgTab } from '../engine/tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../engine/notation/notationRenderer.ts';
 import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
 import { isSmuflLoaded, loadSmufl } from '../engine/smufl/smufl.ts';
 import { drawCursorGhost, drawEnclosure } from './enclosure.ts';
-import type { PinnedError } from '../model/pinnedErrors.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
+/** The projections the engine can draw. */
 export type ViewMode = 'notation' | 'tab' | 'both';
+
+/** What a host may ASK for: a projection, or `auto` — "defer to the document"
+ *  (docs/core-viewer-surface.md). Unset is not a value; it is a deferral. */
+export type ViewSetting = ViewMode | 'auto';
 import { sharedChrome, scrollbars, viewerTokens } from './tokens.ts';
+import type { HideableFeature } from '../engine/layout/notation.ts';
 
 /**
  * The score area: a scrollable bench with a warm PAPER card at its centre.
@@ -42,9 +47,21 @@ export class ScoreViewer extends LitElement {
   @property({ attribute: false })
   selection!: SelectionContext;
 
-  @property({ type: String }) viewMode: ViewMode = 'notation';
+  /**
+   * Which projection to draw — `auto` (default), `notation`, `tab`, `both`.
+   *
+   * `auto` is NOT a synonym for `notation`: unset means *defer to the layer
+   * below*, so it resolves the document's own `_x.mnxLab.tab.staffKind`
+   * (docs/core-viewer-surface.md, the precedence chain). That is what makes a
+   * bare `<mnx-score-viewer>` plus a document show the AUTHOR's intended view
+   * with no host JavaScript — the read-only player's whole story. A host that
+   * names a view outranks the document, always: the hint is a hint.
+   */
+  @property({ type: String, reflect: true }) view: ViewSetting = 'auto';
   @property({ type: Number }) zoom = 1;
-  @property({ type: Boolean }) hasTab = false;
+  // `hasTab` was evicted (docs/core-viewer-surface.md): the element never read
+  // it, so it was pure host homework — and hosts did it badly, string-searching
+  // the document JSON. `view="auto"` derives the same fact from the document.
   /**
    * Viewer-supplied instrument: overrides the document's `_x.mnxLab.strings`
    * / `capo` for rendering (presentation only — never written back). Without
@@ -63,10 +80,10 @@ export class ScoreViewer extends LitElement {
    * above, which remains the fallback for parts without an entry.
    */
   @property({ attribute: false }) partTabSetups: Record<string, TabSetup> | null = null;
-  @property({ type: Boolean }) invalidByDesign = false;
-  @property({ attribute: false }) pinnedErrors: PinnedError[] = [];
-  /** Pointer of the pinned error currently highlighted in the document pane. */
-  @property({ type: String }) errorPointer: string | null = null;
+  // invalidByDesign / pinnedErrors / errorPointer were EVICTED
+  // (docs/core-viewer-surface.md, stage 3): the spec-gap exhibit is workbench
+  // chrome that rode on the element as three props an embed could never want.
+  // The workbench renders it and skips this element entirely.
   /** Embed trim: tighter paper margins. */
   @property({ type: Boolean, reflect: true }) compact = false;
   /**
@@ -84,6 +101,19 @@ export class ScoreViewer extends LitElement {
    * why this explicit override exists.
    */
   @property({ type: String, reflect: true }) theme: 'auto' | 'light' | 'dark' = 'auto';
+  /**
+   * Features to hide, comma-separated: `hide="lyrics,badges"`
+   * (docs/core-viewer-surface.md — ONE set-valued knob, not N booleans).
+   *
+   * Each member is sorted by one question: does hiding it reclaim SPACE?
+   * `lyrics` reserve a vertical band, so hiding them is a layout concern and
+   * travels to the engine, where the system closes up. `badges` are drawn in
+   * the margin and reclaim nothing, so they are hidden in this stylesheet.
+   * Same attribute either way — the host should not have to know which kind a
+   * feature is, and the split is what stops CSS from being asked to do
+   * layout's job.
+   */
+  @property({ type: String, reflect: true }) hide = '';
   /**
    * The selection overlay is showing where the cursor WAS, but keystrokes
    * are going somewhere else (core-editor-focus-scope.md, stage 3): a
@@ -280,6 +310,14 @@ export class ScoreViewer extends LitElement {
         fill: color-mix(in oklab, var(--accent), var(--paper-ink) 65%) !important;
       }
 
+      /* Emit-side hide (docs/core-viewer-surface.md): diagnostic badges sit
+         in the margin and reclaim no space, so CSS is the honest tool. A
+         layout-side feature must never be hidden this way — it would leave a
+         gap where the content used to be. */
+      :host([hide~='badges']) #score-container svg .diagnostic-marker {
+        display: none;
+      }
+
       /* The tab fret knock-out must match the paper, not the app bg. */
       #score-container svg .fret-bg {
         fill: var(--paper) !important;
@@ -411,9 +449,8 @@ export class ScoreViewer extends LitElement {
       changed.has('mnxDoc') ||
       changed.has('playbackState') ||
       changed.has('selection') ||
-      changed.has('viewMode') ||
+      changed.has('view') ||
       changed.has('zoom') ||
-      changed.has('invalidByDesign') ||
       changed.has('stringsOverride') ||
       changed.has('capoOverride') ||
       changed.has('partTabSetups')
@@ -423,7 +460,7 @@ export class ScoreViewer extends LitElement {
   }
 
   renderScore() {
-    if (!this.container || !this.mnxDoc || this.invalidByDesign) return;
+    if (!this.container || !this.mnxDoc) return;
 
     // Embeds can reach here before the SMuFL metadata fetch resolves (the
     // full app usually renders after a user gesture). Defer one round trip.
@@ -450,7 +487,10 @@ export class ScoreViewer extends LitElement {
       width,
       activeNoteIds: this.playbackState?.activeNoteIds ?? [],
       selectedNoteIds: this.selection?.selectedNoteIds ?? [],
-      onNoteClick
+      onNoteClick,
+      // Layout-side hides reach the engine so their space is reclaimed; the
+      // tab renderer ignores what it has no concept of (lyrics).
+      hide: this.hiddenFeatures()
     };
 
     // The layout engine throws on documents using features it doesn't support
@@ -508,13 +548,14 @@ export class ScoreViewer extends LitElement {
     // element (the workbench's tabs, an embed host's chrome) — a label inside
     // the paper spent engraving space restating it.
     this.container.innerHTML = '';
-    if (this.viewMode === 'tab') {
+    const resolvedView = this.resolvedView();
+    if (resolvedView === 'tab') {
       const pane = this.appendPane();
       guarded(pane, 'tab', () => {
         renderMnxToSvgTab({ container: pane, ...commonOpts, tabSetup });
         enclosed(pane);
       });
-    } else if (this.viewMode === 'notation') {
+    } else if (resolvedView === 'notation') {
       const pane = this.appendPane();
       guarded(pane, 'notation', () => {
         renderMnxToSvgNotation({ container: pane, ...commonOpts });
@@ -537,6 +578,44 @@ export class ScoreViewer extends LitElement {
     }
   }
 
+  /**
+   * The precedence chain, resolved (docs/core-viewer-surface.md):
+   * host attribute > document hint > built-in default.
+   *
+   * The fingerboard gate applies to every branch, not just `auto`: tab needs
+   * KNOWN strings — declared by the part or supplied as a viewer override —
+   * because no instrument is ever assumed. A document asking for tab without
+   * strings, or a host asking for it, gets notation rather than an empty
+   * fretboard drawn on a guess.
+   */
+  private resolvedView(): ViewMode {
+    const asked = this.view === 'auto' ? declaredStaffKind(this.mnxDoc?.mnxJson) : this.view;
+    if (asked !== 'tab' && asked !== 'both') return 'notation';
+    return this.tabCapable() ? asked : 'notation';
+  }
+
+  /** Are there strings to fret? Declared by a part, or supplied by the host's
+   *  override — the two ways an instrument can become known. */
+  private tabCapable(): boolean {
+    const declared = (this.mnxDoc?.mnxJson.parts ?? []).some(
+      part => (part._x?.mnxLab?.strings?.length ?? 0) > 0
+    );
+    const overridden =
+      (this.stringsOverride?.length ?? 0) > 0 ||
+      Object.values(this.partTabSetups ?? {}).some(setup => (setup.strings?.length ?? 0) > 0);
+    return declared || overridden;
+  }
+
+  /** The `hide` attribute as a list. Unknown names are ignored rather than
+   *  rejected: a host on an older artifact naming a newer feature should
+   *  degrade to showing it, not to a broken render. */
+  private hiddenFeatures(): readonly HideableFeature[] {
+    return this.hide
+      .split(',')
+      .map(name => name.trim())
+      .filter((name): name is HideableFeature => name === 'lyrics' || name === 'badges');
+  }
+
   private appendPane(): HTMLElement {
     const pane = document.createElement('div');
     this.container.appendChild(pane);
@@ -550,41 +629,6 @@ export class ScoreViewer extends LitElement {
       return html`
         <div class="paper" style="width: ${paperWidth}">
           <div class="no-doc">No document loaded</div>
-        </div>
-      `;
-    }
-
-    if (this.invalidByDesign) {
-      return html`
-        <div class="paper" style="width: ${paperWidth}">
-          <div class="state-panel">
-            <h3><span class="sp-dia"></span>Invalid by design — a spec-gap exhibit</h3>
-            <p>
-              This document is deliberately rejected by the official MNX schema. The validation
-              errors below are pinned: if a schema bump makes this document start passing, the
-              corpus tests flag it as a spec-evolution signal. Rendering is skipped — the document
-              itself is the exhibit.
-            </p>
-            <div class="err-table">
-              ${this.pinnedErrors.map(
-                err => html`
-                  <button
-                    class="err-row"
-                    title="Click to locate the offending value in the document"
-                    @click=${() => this.emitError(err)}
-                  >
-                    <span class="er-rule"
-                      >${err.rule}${this.errorPointer != null && this.errorPointer === err.pointer
-                        ? ' · highlighted in document →'
-                        : ''}</span
-                    >
-                    <span class="er-msg">${err.msg}</span>
-                    ${err.path ? html`<span class="er-path">${err.path}</span>` : nothing}
-                  </button>
-                `
-              )}
-            </div>
-          </div>
         </div>
       `;
     }
@@ -611,15 +655,6 @@ export class ScoreViewer extends LitElement {
     `;
   }
 
-  private emitError(err: PinnedError) {
-    this.dispatchEvent(
-      new CustomEvent('error-row-selected', {
-        detail: { pointer: err.pointer },
-        bubbles: true,
-        composed: true
-      })
-    );
-  }
 }
 
 export default ScoreViewer;

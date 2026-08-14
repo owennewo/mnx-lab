@@ -1,5 +1,5 @@
 import { MnxStructure } from '../../model/mnx.ts';
-import { layoutNotation } from './notation.ts';
+import { layoutNotation, type HideableFeature } from './notation.ts';
 import { LayoutResult } from '../primitives.ts';
 import { PartTabSetups } from '../tab/guitarPositions.ts';
 
@@ -25,6 +25,8 @@ export interface LayoutBothOptions {
   /** Viewer-supplied instrument (strings/capo) — overrides each part's own
    *  declaration; never written back. */
   tabSetup?: PartTabSetups;
+  /** Features the host hid — layout-side ones reflow (core-viewer-surface). */
+  hide?: readonly HideableFeature[];
 }
 
 export function layoutBothSystem(opts: LayoutBothOptions): LayoutResult {

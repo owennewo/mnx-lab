@@ -292,7 +292,7 @@ Why the rows are what they are:
   direction) from the component. The workbench binds it to prev/next
   scenario in the rail; studio will bind it to prev/next score. This is part
   of the element's public surface — record it in
-  [core-viewer-surface.md](../proposed/core-viewer-surface.md)'s event contract when
+  [core-viewer-surface.md](core-viewer-surface.md)'s event contract when
   that lands. Emitted ONLY at score level, so arrows stay inert everywhere
   they lack meaning.
 

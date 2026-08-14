@@ -208,6 +208,36 @@ try {
   // Back to auto for the remaining checks (and to prove the attribute clears).
   await cdp.evaluate(`document.getElementById('viewer').setAttribute('theme','auto'); true`);
 
+  // 2c. ZERO-CONFIG VIEW (docs/core-viewer-surface.md): a bare element plus a
+  // document must show the AUTHOR's intended view. The host sets `mnxDoc` and
+  // nothing else; a tab-declaring document must come up as the composed
+  // system, and the element must reflect what it resolved. This is the
+  // surface's headline promise, so it is asserted rather than assumed.
+  const zeroConfig = await cdp.evaluate(`
+    (async () => {
+      const v = document.getElementById('viewer');
+      // The tab score, selected the way a reader would — by clicking a link.
+      document.querySelectorAll('#scores button')[1].click();
+      await new Promise(r => setTimeout(r, 1800));
+      const svg = v.shadowRoot.querySelector('svg');
+      return JSON.stringify({
+        attr: v.getAttribute('view'),
+        // The composed system draws the tab staff's fret numbers in the SAME
+        // svg as the notation staff — that is what proves 'both' resolved.
+        frets: svg ? svg.querySelectorAll('.fret-number').length : 0,
+        staffKindInDoc: (v.mnxDoc?.mnxJson?.parts ?? [])
+          .map(p => p?._x?.mnxLab?.tab?.staffKind).filter(Boolean).join(',')
+      });
+    })()
+  `);
+  const zc = JSON.parse(zeroConfig);
+  if (zc.attr !== 'auto') fail(`view should still read 'auto' (host set nothing), got '${zc.attr}'`);
+  if (zc.staffKindInDoc !== 'both')
+    fail(`fixture no longer declares staffKind=both (got '${zc.staffKindInDoc}') — the zero-config check proves nothing`);
+  if (zc.frets < 6)
+    fail(`document declares staffKind=both but only ${zc.frets} fret numbers rendered — view="auto" did not resolve the document hint`);
+  console.log(`zero-config: view="auto" + staffKind=both → composed system, ${zc.frets} frets`);
+
   // 3. The font was registered BY THE ARTIFACT — the host page declares none.
   const fontRegistered = await cdp.evaluate(
     `[...document.fonts].some(f => f.family === 'Bravura')`

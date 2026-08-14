@@ -420,7 +420,18 @@ export interface LayoutNotationOptions {
   /** Viewer-supplied instrument (strings/capo) — overrides each part's own
    *  declaration for the injected tab staves; never written back. */
   tabSetup?: PartTabSetups;
+  /** Features the host asked to hide (docs/core-viewer-surface.md, the `hide`
+   *  set). Only LAYOUT-side features belong here — hiding lyrics must reclaim
+   *  the vertical band they reserve, which CSS cannot do. Emit-side features
+   *  (diagnostic badges) are hidden in the element's stylesheet instead; that
+   *  split is the test the surface doc applies to every future candidate. */
+  hide?: readonly HideableFeature[];
 }
+
+/** What a host may hide. Layout-side members must be honored HERE (space
+ *  reflows); emit-side members are listed for one shared vocabulary but are
+ *  handled by the element's CSS. */
+export type HideableFeature = 'lyrics' | 'badges';
 
 const TITLE_SIZE_SP = 2.4;
 const TITLE_GAP_SP = 1.2;
@@ -732,7 +743,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         index,
         diagnostics,
         includeTabStaves: opts.includeTabStaves === true && (mnx.scores ?? []).length === 0,
-        tabSetup: opts.tabSetup
+        tabSetup: opts.tabSetup,
+        hide: opts.hide ?? []
       })
     );
     const jobUsed = Math.max(...rs.map(r => r.usedWidthSp));
@@ -778,6 +790,7 @@ interface RenderSegmentArgs {
   diagnostics: LayoutDiagnostic[];
   includeTabStaves: boolean;
   tabSetup?: PartTabSetups;
+  hide: readonly HideableFeature[];
 }
 
 // Left-of-system geometry: nested decorations step left of their parents,
@@ -794,7 +807,7 @@ function renderSegment(args: RenderSegmentArgs): {
   usedWidthSp: number;
   rows: RowBandSp[];
 } {
-  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup } = args;
+  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide } = args;
   const primitives: Primitive[] = [];
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
@@ -969,7 +982,10 @@ function renderSegment(args: RenderSegmentArgs): {
   // Verse rows hang below the staff their events are on. Their block height
   // drives two things: extra bottom padding when they hang below the system,
   // and (both view) the gap above an injected tab staff.
-  const lyricLineIds = collectLyricLineIds(mnx, segment);
+  // Hiding lyrics is a LAYOUT concern: an empty id list both skips the draw
+  // (each syllable looks its line up in this array) and zeroes the reserved
+  // band below, so the system closes up instead of leaving a gap.
+  const lyricLineIds = hide.includes('lyrics') ? [] : collectLyricLineIds(mnx, segment);
   const lyricBlockSp = lyricLineIds.length
     ? LYRIC_FIRST_BASELINE_DROP_SP +
       (lyricLineIds.length - 1) * LYRIC_LINE_SPACING_SP +

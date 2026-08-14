@@ -1,6 +1,7 @@
 import { MnxStructure } from '../../model/mnx.ts';
 import { PartTabSetups } from '../tab/guitarPositions.ts';
 import { layoutBothSystem } from '../layout/bothSystem.ts';
+import type { HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
 
@@ -28,6 +29,8 @@ export interface RenderBothOptions {
   /** Viewer-supplied instrument (strings/capo) — overrides the document's
    *  declaration for rendering; never written back. */
   tabSetup?: PartTabSetups;
+  /** Features the host hid (docs/core-viewer-surface.md). */
+  hide?: readonly HideableFeature[];
 }
 
 export function renderMnxToSvgBoth(opts: RenderBothOptions): void {
@@ -38,7 +41,8 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): void {
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds,
-    tabSetup: opts.tabSetup
+    tabSetup: opts.tabSetup,
+    hide: opts.hide
   });
 
   const fitted = opts.pxPerSp === undefined;

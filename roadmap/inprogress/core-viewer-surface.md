@@ -1,8 +1,60 @@
 # The viewer surface — naming and defining the component's public contract
 
-> **Status: proposed (2026-08-07), not started.** Design direction agreed in conversation;
-> nothing built. Subsumes the "where do the levers live" open question of
-> [core-render-density-zoom.md](core-render-density-zoom.md) and the view-default design below.
+> **Status: in progress — ALL FIVE STAGES addressed 2026-08-14** (3 built, 1 answered, 1 handed on). Unblocked by the arrival of
+> its consumer: [core-viewer-embedded-app.md](../proposed/core-viewer-embedded-app.md)
+> is the read-only player this doc's first symptom describes, and it committed that
+> exact sin — a host string-searching the document JSON
+> (`JSON.stringify(mnxJson).includes('"strings"')`) to decide `hasTab`, then
+> restating `viewMode`, because the surface made it. Two lines that are now deleted.
+>
+> Shipped: **[docs/core-viewer-surface.md](../../docs/core-viewer-surface.md)** — the
+> contract, with every current prop marked keep / derive / evict / workbench-tier;
+> **`view="auto"`** with the precedence chain resolved in the element
+> (`ScoreViewer.resolvedView`), replacing `viewMode`'s unconditional `notation`;
+> **`hasTab` evicted** (it was never even *read* inside the component); the
+> `staffKind` rule centralized as `declaredStaffKind`/`wantsTabView` in `model/` so
+> the engine's tab gate and the element's `auto` cannot drift into two definitions of
+> what a document means; and the fingerboard gate applied to every branch — asking
+> for `tab` on a part with no strings still renders notation, because no instrument
+> is ever assumed.
+>
+> Verified in headless Chrome across the whole precedence chain: a document with no
+> `staffKind` renders notation under `auto` (the old host hack forced tab merely
+> because the JSON contained "strings" — the fix corrected behavior, not just code);
+> `staffKind: both` renders the composed system with zero host JavaScript; a host
+> attribute outranks the document in both directions; and forcing `tab` on a
+> string-less score declines to notation rather than drawing a guessed fretboard.
+> `smoke:embed` now asserts the zero-config promise. The workbench renders
+> identically across notation/tab/both, goldens byte-identical.
+>
+> **Stage 3 — the exhibit evicted.** `invalidByDesign`/`pinnedErrors`/`errorPointer`
+> are gone from the element, along with its `error-row-selected` event: the spec-gap
+> exhibit *is* the document (rendering is deliberately skipped), so the workbench
+> renders the panel itself and does not mount the viewer at all. Verified in the
+> browser: no `mnx-score-viewer` on an invalid-by-design page, the panel and its
+> pinned rows render, and clicking a row still opens the json tab with the pointer
+> highlighted.
+>
+> **Stage 4 — the `hide` set**, one attribute (`hide="lyrics,badges"`), with the
+> sorting question answered per member and *both answers implemented*: `lyrics` is
+> layout-side, so it travels through `LayoutNotationOptions.hide` and the system
+> closes up (CSS could remove the ink but never the gap); `badges` is emit-side and
+> hidden in the element's stylesheet, because it reclaims nothing.
+> `harness/conformance/viewer-surface.test.ts` pins both directions — lyrics must
+> shrink the layout, badges must NOT move it — so a future feature that changes
+> category is caught rather than silently mis-implemented. Unknown names are
+> ignored, so an older artifact degrades to showing a newer feature.
+>
+> **Stage 5 — density: answered, not built, and deliberately so.** The layering rule
+> settles *where* the levers go (`RenderOptions` first, attribute second), which is
+> the question [core-render-density-zoom.md](../proposed/core-render-density-zoom.md)
+> was blocked on. Exposing an attribute before the engine option exists would make
+> the element the implementation rather than a binding — the one thing this doc
+> forbids. The work stays that doc's; the ✔ condition here is met without it.
+>
+> **Note on history**: commit `775d115` claims stages 1–2 but contains only the
+> file rename — its `git add` aborted on a stale pathspec and the error was
+> suppressed. The code for all of it landed in the follow-up commit.
 
 ## The problem
 
@@ -26,7 +78,7 @@ Concrete symptoms of the gap:
 - A read-only player must set `viewMode` (and compute `hasTab`!) to show a document the
   way its author intended — `_x.mnxLab.tab.staffKind` is documented as a hint
   ([docs/mnx-extensions.md](../../docs/mnx-extensions.md)) but no surface consults it.
-- Density/zoom levers ([core-render-density-zoom.md](core-render-density-zoom.md)) have named
+- Density/zoom levers ([core-render-density-zoom.md](../proposed/core-render-density-zoom.md)) have named
   engine knobs but no answer to "toolbar, embed attribute, `RenderOptions`, or all three?"
 - Feature visibility (lyrics, harmonies, diagnostics badges, tempo marks) is not
   controllable anywhere; layouts always draw everything they support.
@@ -109,9 +161,9 @@ every future candidate.
 
 ## Order of work
 
-1. **Write `docs/core-viewer-surface.md`** — the contract as it *should* be, marking each
+1. ~~**Write `docs/core-viewer-surface.md`**~~ — **built** — the contract as it *should* be, marking each
    current prop keep/derive/evict. Cheap, and everything after cites it.
-2. **`view="auto"`** + `hasTab` derivation + precedence documented in
+2. ~~**`view="auto"`**~~ — **built** + `hasTab` derivation + precedence documented in
    mnx-extensions.md's staffKind entry. (Smallest slice; fixes the read-only player.)
 3. **Evict the exhibit panel** into `workbench/` (or document the workbench tier).
 4. **`hide` set**, starting with `badges` (emit-side, easy) and `lyrics` (layout-side,

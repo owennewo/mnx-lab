@@ -8,6 +8,7 @@ import { layoutNotation } from './layout/notation.ts';
 import { layoutTab } from './layout/tab.ts';
 import { layoutBothSystem } from './layout/bothSystem.ts';
 import type { MnxStructure } from '../model/mnx.ts';
+import { wantsTabView } from '../model/mnx.ts';
 import type { Primitive } from './primitives.ts';
 
 let smuflReady = false;
@@ -38,13 +39,11 @@ export interface ScenarioPrimitives {
   tab?: RenderedSystem;
 }
 
-/** Does any part opt into a tab view? Gates the tab and both projections. */
-function wantsTab(doc: MnxStructure): boolean {
-  return (doc.parts ?? []).some(p => {
-    const kind = p?._x?.mnxLab?.tab?.staffKind;
-    return kind === 'tab' || kind === 'both';
-  });
-}
+/** Does any part opt into a tab view? Gates the tab and both projections.
+ *  The rule itself lives in `model/` — the element resolves `view="auto"`
+ *  from the same predicate, and two copies would be two definitions of what
+ *  the document means (docs/core-viewer-surface.md). */
+const wantsTab = wantsTabView;
 
 /**
  * The corpus-goldens pipeline: notation layout always, tab layout when a part

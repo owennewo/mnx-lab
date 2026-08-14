@@ -121,7 +121,7 @@ proposals that name their campaign.
   from `activeElement` on the *causes* of focus change. Stage 2 — moving the listener onto
   the host element — rides
   [core-editor-element-promotion.md](proposed/core-editor-element-promotion.md).
-- **[core-viewer-surface.md](proposed/core-viewer-surface.md)** — name and define **the viewer
+- **[core-viewer-surface.md](inprogress/core-viewer-surface.md)** — name and define **the viewer
   surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
   undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench
   chrome), attribute-first, the `view="auto"` precedence chain (user > host > document
@@ -131,7 +131,7 @@ proposals that name their campaign.
   vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
   in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
   vertical density = layout gap/padding constants. Not started. Where the levers are *exposed*
-  is now owned by [core-viewer-surface.md](proposed/core-viewer-surface.md).
+  is now owned by [core-viewer-surface.md](inprogress/core-viewer-surface.md).
 - **[core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md)** — the command palette's **third
   mode**: `Ctrl+K` text routing to `/api/edit-notation` when it reads as a sentence rather than
   a command (research §6.2), inheriting the `ui/ → assist/` boundary. Owns the deeper
@@ -148,7 +148,7 @@ proposals that name their campaign.
   debate) — with the costs of moving early recorded (API pressure on the public surface,
   the shadow-DOM focus story coming due, embed bundle weight; testing is unchanged either
   way). The promotion review's work list: the `elements/ → edit/` boundary change, the
-  element contract under [core-viewer-surface.md](proposed/core-viewer-surface.md)'s layered rule,
+  element contract under [core-viewer-surface.md](inprogress/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
   [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
 - **[core-selection-tray-visuals.md](proposed/core-selection-tray-visuals.md)** — the **selection
@@ -162,7 +162,7 @@ proposals that name their campaign.
   edge of a possible restyle, which would be its own proposal). Incubates as a dumb
   `<mnx-selection-tray>` in `workbench/` (ScoreHud posture); the one `elements/` change is a
   `selection-anchored` rect event on the viewer, satisfying
-  [core-viewer-surface.md](proposed/core-viewer-surface.md)'s layering.
+  [core-viewer-surface.md](inprogress/core-viewer-surface.md)'s layering.
 - **[core-selection-tray-mechanism.md](proposed/core-selection-tray-mechanism.md)** — part 2:
   the tray wired. One ruling — tiles fire **intents through `session.handleIntent`, nothing
   else** — so tray clicks land in the op queue and replay through traces like keystrokes. A
