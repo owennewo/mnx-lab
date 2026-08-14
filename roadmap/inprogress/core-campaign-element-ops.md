@@ -98,7 +98,8 @@ agreed or candidate claims; **bold** = agreed.
 | 8 | event adornments | Articulations/markings, dynamics, directions. | ~14 | adornment alphabet (letter keys) | note/event | undrafted |
 | 9 | tab technique alphabet | Bends, slides, hammer/pull, vibrato, palm mute, harmonics — the `B H S V X O` set `keymapDocs.ts` already reserves. Entry side of [core-guitar-technique.md](../proposed/core-guitar-technique.md) (which owns rendering). | 5 | **B H S V X O** (reserved) | note | undrafted |
 | 10 | [spanners](core-element-ops-spanners.md) | Slurs; tie variants (`crossVoice`, `lv`, `arpeggio`). The two-ended **anchor gesture** (press, navigate, press); reference removal class. | 3 (reachable 42 → 45) | **S**, polymorphic by projection: slur in notation, slide in tab (resolves item 9's collision) | **note→note** | **built 2026-08-14** |
-| 11 | rhythm model | Tuplets, grace notes, tremolo, `space`, full-measure/multimeasure rests, measure repeats. Changes what an onset is (cursor grid, `eventAtOnset`). Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md) (converters/tab). | ~12 | t.b.d. per sub-family | event | undrafted |
+| 11 | [rhythm declarations](core-element-ops-rhythm-declarations.md) | **Split at build time**: this item takes the declarations that leave ink where it is — beams (top level), full-measure rests, measure repeats. Beams reuse item 10's anchor at event→event. | 10 (reachable 45 → 55); 22 elements | **B**, polymorphic (beam in notation, bend in tab); rests via the bar popover | **measure**, **event→event** | **built 2026-08-14** |
+| 11b | rhythm containers & onset granularity | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | ~9 | t.b.d. | event | undrafted |
 | 12 | text entry | Lyrics, part names, verse labels — a text *mode* that suspends the keymap, not a binding. | ~8 | Enter-into-text candidate | event / part | undrafted |
 | 13 | structural surface | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 (first-part genesis lands with item 1; this item owns the *second* of everything). The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
 
@@ -107,6 +108,34 @@ et al are layout-only, zero measures — a different surface, not keys), percuss
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — item 11 built, at half its index row's scope, because the code said so.**
+  Beams (top level), full-measure rests and measure repeats; the rest of the row
+  becomes **item 11b**, with evidence rather than a hunch.
+  - **Reachable 45 → 55** (predicted exactly), **removable 820 → 842**. The
+    histogram's head is gone; the tail is flat (layout 6, score 6, direction 5,
+    dynamic 5, staves 5, technique 5), so ordering-by-evidence has taken the
+    campaign as far as it usefully can — from here the question is which surface
+    you want, not which number is biggest.
+  - **The split was forced twice by the code.** The grid skips non-timed items, so
+    a `wrapInTuplet` verb would have removed ink from the addressable surface and
+    the sweep would have said so. Then a beam trace failed for an unrelated
+    reason: the entry surface cannot lay a run of 32nds — after the first note,
+    `nextPosition` lands on the original quarter rest and each subsequent note
+    inherits *that* duration. **No beam scenario is traceable today and beams are
+    not why.** Onset granularity is the blocker, and it is now item 11b's first
+    job.
+  - **A verb can be right while its scenarios stay untraceable.** The destruct
+    side proves the ops (14 beams removed under all six oracles); the construct
+    side proves only the tier. Recording that difference is the campaign's whole
+    method — the alternative was shipping verbs that make the scoreboard green
+    while the editor gets no better.
+  - **The anchor generalized on first contact**: beams reuse item 10's
+    `spanAnchorKey` unchanged, resolving to events rather than notes. Two verbs,
+    one gesture, no new state.
+  - **Nested beams have no verb, and 26 of 40 beam elements say `no-op`** — hooks
+    and secondary breaks, plus second-part and staff-2 beams. Reported rather than
+    quietly counted, which is what keeps the scoreboard worth reading.
 
 - **2026-08-14 — item 10 built: the first two-ended gesture, and the S collision resolved.**
   Slurs (`setSlur`/`removeSlur`) plus `setTieVariant`, at the note→note rung.

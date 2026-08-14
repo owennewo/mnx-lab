@@ -88,6 +88,9 @@ export const EDIT_LAYER: KeymapLayer = {
     // reserved letter) — which is the ladder's decided principle that the
     // active projection picks the input dialect, applied to a letter.
     { code: 'KeyS', intent: { type: 'toggleSlur' } },
+    // Beams (campaign item 11) reuse item 10's anchor and its resolution:
+    // `B` beams in notation, bends in tab.
+    { code: 'KeyB', intent: { type: 'toggleBeam' } },
     // The notation projection's entry action: toggle a notehead at the
     // cursor's (staff position × beat) cell. Binding provisional — Space is
     // the play/pause convention elsewhere; the ladder review owns the call.

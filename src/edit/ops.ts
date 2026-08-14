@@ -11,6 +11,7 @@ import type {
   MnxNote,
   MnxNoteValueBase,
   MnxPart,
+  MnxPartMeasure,
   MnxSequence,
   MnxSequenceItem,
   MnxSlur,
@@ -220,6 +221,40 @@ export type EditOp =
       targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump';
       lv?: boolean;
     }
+  // Rhythm declarations (campaign item 11,
+  // roadmap/inprogress/core-element-ops-rhythm-declarations.md) — the ones
+  // that leave ink where it is. The containers that SWALLOW ink (tuplet,
+  // grace, tremolo) wait for the grid to descend into them.
+  | {
+      /** Beam a run of events, minting ids where they are missing (the same
+       *  move `setSlur` makes — both name events). Top level only: nested
+       *  beams are a rendering subdivision with their own gesture to come. */
+      type: 'setBeam';
+      measureIndex: number;
+      eventIds: string[];
+    }
+  | {
+      /** Un-beam: the *reference* removal class again — a grouping goes, no
+       *  ink moves. An emptied `beams` array goes with its last member. */
+      type: 'removeBeam';
+      measureIndex: number;
+      index: number;
+    }
+  | {
+      /** Declare the bar's rest (`sequence.fullMeasure`). Refused on a bar
+       *  holding ink: a declaration ABOUT an empty bar must not delete notes
+       *  to make room — that is the coarse-op cheating the campaign forbids. */
+      type: 'setFullMeasureRest';
+      measureIndex: number;
+    }
+  | { type: 'removeFullMeasureRest'; measureIndex: number }
+  | {
+      /** Declare this bar a repeat of the previous `number` bars. */
+      type: 'setMeasureRepeat';
+      measureIndex: number;
+      number: number;
+    }
+  | { type: 'removeMeasureRepeat'; measureIndex: number }
   | {
       type: 'setMeasureAttribute';
       measureIndex: number;
@@ -611,6 +646,54 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (op.targetType) existing.targetType = op.targetType;
       return next;
     }
+    case 'setBeam': {
+      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      if (!measure || op.eventIds.length < 2) return next;
+      measure.beams = [...(measure.beams ?? []), { events: [...op.eventIds] }];
+      return next;
+    }
+    case 'removeBeam': {
+      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      const beams = measure?.beams;
+      if (!measure || !beams?.[op.index]) return next;
+      const kept = beams.filter((_, i) => i !== op.index);
+      if (kept.length > 0) measure.beams = kept;
+      else delete measure.beams;
+      return next;
+    }
+    case 'setFullMeasureRest': {
+      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      const seq = measure?.sequences?.[0];
+      if (!seq) return next;
+      // Refuse rather than clear: see the op's comment.
+      if (seq.content.some(item => isTimedEvent(item) && (item.notes?.length ?? 0) > 0)) return next;
+      seq.content = [];
+      seq.fullMeasure = {};
+      return next;
+    }
+    case 'removeFullMeasureRest': {
+      const seq = next.parts?.[0]?.measures?.[op.measureIndex]?.sequences?.[0];
+      if (!seq?.fullMeasure) return next;
+      delete seq.fullMeasure;
+      padMeasureRests(next, op.measureIndex);
+      return next;
+    }
+    case 'setMeasureRepeat': {
+      const measure = next.parts?.[0]?.measures?.[op.measureIndex] as
+        | (MnxPartMeasure & { measureRepeat?: { number: number } })
+        | undefined;
+      if (!measure) return next;
+      measure.measureRepeat = { number: op.number };
+      return next;
+    }
+    case 'removeMeasureRepeat': {
+      const measure = next.parts?.[0]?.measures?.[op.measureIndex] as
+        | (MnxPartMeasure & { measureRepeat?: { number: number } })
+        | undefined;
+      if (!measure?.measureRepeat) return next;
+      delete measure.measureRepeat;
+      return next;
+    }
     case 'setTimeSignature': {
       const measure = next.global?.measures?.[op.measureIndex];
       if (!measure) return next;
@@ -860,6 +943,44 @@ function tieTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined
 }
 
 /** A fresh deterministic note id: t1, t2, … skipping anything taken. */
+/** The index of the beam whose run STARTS at this note's event, or -1. The
+ *  toggle asks before applying, so a no-op never reaches the op queue. */
+export function beamStartingAt(doc: MnxStructure, noteKey: string): { measureIndex: number; index: number } | null {
+  const located = findKeyedNote(doc, noteKey);
+  if (!located) return null;
+  const event = located.seq.content[located.eventIndex] as MnxEvent;
+  if (!event.id) return null;
+  const beams = doc.parts?.[0]?.measures?.[located.measureIndex]?.beams ?? [];
+  const index = beams.findIndex(beam => beam.events?.[0] === event.id);
+  return index >= 0 ? { measureIndex: located.measureIndex, index } : null;
+}
+
+/** The event ids of the run from one note's event to another's, minting ids as
+ *  it goes — a beam names events, so the run must be nameable. Both ends must
+ *  live in the same measure and voice; returns null when they do not. */
+export function beamRunBetween(
+  doc: MnxStructure,
+  fromNoteKey: string,
+  toNoteKey: string
+): { measureIndex: number; eventIds: string[] } | null {
+  const from = findKeyedNote(doc, fromNoteKey);
+  const to = findKeyedNote(doc, toNoteKey);
+  if (!from || !to) return null;
+  if (from.measureIndex !== to.measureIndex || from.seq !== to.seq) return null;
+  const [start, end] =
+    from.eventIndex <= to.eventIndex ? [from.eventIndex, to.eventIndex] : [to.eventIndex, from.eventIndex];
+  const eventIds: string[] = [];
+  for (let i = start; i <= end; i++) {
+    const item = from.seq.content[i];
+    if (!isTimedEvent(item)) continue;
+    const event = item as MnxEvent;
+    if ((event.notes?.length ?? 0) === 0) continue; // a rest breaks a beam
+    event.id ??= mintEventId(doc);
+    eventIds.push(event.id);
+  }
+  return eventIds.length >= 2 ? { measureIndex: from.measureIndex, eventIds } : null;
+}
+
 /** Does a slur start at this note? The toggle asks BEFORE applying, so a
  *  no-op removal never reaches the op queue (the `removeClef` rule). */
 export function hasSlurStartingAt(doc: MnxStructure, noteKey: string): boolean {

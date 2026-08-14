@@ -108,16 +108,28 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   space: { classes: [], note: 'Authored silence that occupies a column but draws nothing.' },
   'full-measure-rest': {
     classes: ['rest-full-measure'],
-    note: 'A rest is absence (§8.11) — but DECLARING the whole bar rests is a choice.'
+    note: 'A rest is absence (§8.11) — but DECLARING the whole bar rests is a choice.',
+    construct: ['setFullMeasureRest'],
+    remove: ['removeFullMeasureRest']
   },
-  'measure-repeat': { classes: [], note: 'Renderer gap — the repeat sign is not drawn yet.' },
+  'measure-repeat': {
+    classes: [],
+    note: 'Renderer gap — the repeat sign is not drawn yet.',
+    construct: ['setMeasureRepeat'],
+    remove: ['removeMeasureRepeat']
+  },
   clef: {
     classes: ['clef', 'clef-change'],
     note: 'Inherited-attribute removal class: removing the DECLARATION reverts the bar to its predecessor’s governance (or the engine default), never to "no clef".',
     construct: ['setClef'],
     remove: ['removeClef']
   },
-  beam: { classes: ['beam'], note: 'Authored beaming over event ids; the stroke is its ink.' },
+  beam: {
+    classes: ['beam'],
+    note: 'Authored beaming over event ids; the stroke is its ink, and removal is the *reference* class — a grouping goes, no ink moves.',
+    construct: ['setBeam'],
+    remove: ['removeBeam']
+  },
   dynamic: { classes: ['dynamic'], note: 'A dynamic group at a metric position.' },
   direction: { classes: ['direction'], note: 'A text/symbolic instruction (proposed field).' },
   ottava: { classes: ['ottava', 'ottava-label'], note: 'An octave-shift line.' },
@@ -318,10 +330,15 @@ function walkBeams(
   out: ElementRef[],
   beams: MnxBeam[] | undefined,
   path: string,
-  jsonPath: (string | number)[]
+  jsonPath: (string | number)[],
+  ownerFor?: (beam: MnxBeam) => string | undefined
 ): void {
   (beams ?? []).forEach((beam, index) => {
-    push(out, 'beam', `${path}/b${index}`, [...jsonPath, index]);
+    // A beam is addressed through the first note of the event it starts at —
+    // the same "aim at the ink, act on what hangs off it" rule slurs use.
+    pushOnNote(out, 'beam', `${path}/b${index}`, [...jsonPath, index], ownerFor?.(beam));
+    // Nested beams have no verb yet (item 11 authors the outer level only), so
+    // they carry no owner: the report says `no-op`, honestly.
     walkBeams(out, beam.beams, `${path}/b${index}`, [...jsonPath, index, 'beams']);
   });
 }
@@ -496,8 +513,33 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
           ...measureJson, 'ottavas', ottavaIndex
         ]);
       if ((measure as unknown as Record<string, unknown>).measureRepeat !== undefined)
-        push(out, 'measure-repeat', `${measurePath}/measureRepeat`, [...measureJson, 'measureRepeat']);
-      walkBeams(out, measure.beams, `${measurePath}/beam`, [...measureJson, 'beams']);
+        pushAtMeasure(
+          out,
+          'measure-repeat',
+          `${measurePath}/measureRepeat`,
+          [...measureJson, 'measureRepeat'],
+          partIndex === 0 ? measureIndex : undefined
+        );
+      // Resolve each top-level beam's first event to a note key, when the ops
+      // layer can name it (the entry surface, staff 1).
+      const beamOwner = (beam: MnxBeam): string | undefined => {
+        if (partIndex !== 0) return undefined;
+        let staffOne = -1;
+        for (const sequence of measure.sequences ?? []) {
+          if ((sequence.staff ?? 1) !== 1) continue;
+          staffOne++;
+          for (const [eventIndex, item] of (sequence.content ?? []).entries()) {
+            if (!isTimedEvent(item)) continue;
+            const event = item as { id?: string; notes?: unknown[] };
+            if (!event.id || event.id !== beam.events?.[0]) continue;
+            const note = (event.notes ?? [])[0];
+            if (!note) return undefined;
+            return noteKeyOf(note as never, measureIndex, staffOne, eventIndex, 0);
+          }
+        }
+        return undefined;
+      };
+      walkBeams(out, measure.beams, `${measurePath}/beam`, [...measureJson, 'beams'], beamOwner);
 
       // The ops layer's note keys exist only for staff-1 sequences of parts[0]
       // — `forEachKeyedNote`'s traversal, mirrored here so a key means exactly
@@ -511,7 +553,13 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
         const sequencePath = `${measurePath}/v${sequenceIndex}`;
         const sequenceJson = [...measureJson, 'sequences', sequenceIndex];
         if (sequence.fullMeasure)
-          push(out, 'full-measure-rest', `${sequencePath}/fullMeasure`, [...sequenceJson, 'fullMeasure']);
+          pushAtMeasure(
+            out,
+            'full-measure-rest',
+            `${sequencePath}/fullMeasure`,
+            [...sequenceJson, 'fullMeasure'],
+            addressable && sequenceIndex === 0 ? measureIndex : undefined
+          );
         walkContent(
           out,
           sequence.content,

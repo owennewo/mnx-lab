@@ -68,6 +68,8 @@ const MEASURE_ATTRIBUTE_KINDS: Partial<Record<ElementKind, MeasureAttributeKind>
 function measureRemovalIntent(kind: ElementKind): EditorIntent | null {
   if (kind === 'clef') return { type: 'removeClef' };
   if (kind === 'key-signature') return { type: 'removeKeySignature' };
+  if (kind === 'full-measure-rest') return { type: 'removeFullMeasureRest' };
+  if (kind === 'measure-repeat') return { type: 'removeMeasureRepeat' };
   const attribute = MEASURE_ATTRIBUTE_KINDS[kind];
   return attribute ? { type: 'removeMeasureAttribute', kind: attribute } : null;
 }
@@ -106,7 +108,9 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
       ? ({ type: 'toggleTie' } as const)
       : element.kind === 'slur'
         ? ({ type: 'toggleSlur' } as const)
-        : ({ type: 'delete' } as const);
+        : element.kind === 'beam'
+          ? ({ type: 'toggleBeam' } as const)
+          : ({ type: 'delete' } as const);
   // "Handled" is not "removed": `toggleSlur` legitimately returns true when it
   // merely ARMS an anchor, and a walk that counted that as a removal would
   // report ink gone that is still on the page. Compare the document instead.

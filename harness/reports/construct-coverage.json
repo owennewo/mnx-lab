@@ -3,12 +3,11 @@
   "summary": {
     "scenarios": 106,
     "traced": 5,
-    "opsReachable": 40,
-    "blocked": 56,
+    "opsReachable": 50,
+    "blocked": 46,
     "expectedUnreachable": 5
   },
   "blockingKinds": {
-    "beam": 10,
     "layout": 6,
     "score": 6,
     "direction": 5,
@@ -20,9 +19,7 @@
     "lyric": 4,
     "accidental-display": 3,
     "fingering": 2,
-    "full-measure-rest": 2,
     "lyric-line-metadata": 2,
-    "measure-repeat": 2,
     "space": 2,
     "tuplet": 2,
     "capo": 1,
@@ -65,10 +62,7 @@
       "tier": "ops-reachable"
     },
     "lab/durations/rest-gallery": {
-      "tier": "blocked",
-      "blockedBy": [
-        "full-measure-rest"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/dynamics/accent-prefix-suffix": {
       "tier": "blocked",
@@ -292,41 +286,25 @@
       ]
     },
     "spec/beam-hooks": {
-      "tier": "blocked",
-      "blockedBy": [
-        "beam"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/beams": {
-      "tier": "blocked",
-      "blockedBy": [
-        "beam"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/beams-across-barlines": {
-      "tier": "blocked",
-      "blockedBy": [
-        "beam"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/beams-inner-grace-notes": {
       "tier": "blocked",
       "blockedBy": [
-        "beam",
         "grace"
       ]
     },
     "spec/beams-secondary-beam-breaks": {
-      "tier": "blocked",
-      "blockedBy": [
-        "beam"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/beams-secondary-beam-breaks-implied": {
-      "tier": "blocked",
-      "blockedBy": [
-        "beam"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/clef-changes": {
       "tier": "ops-reachable"
@@ -347,10 +325,7 @@
       ]
     },
     "spec/full-measure-rests": {
-      "tier": "blocked",
-      "blockedBy": [
-        "full-measure-rest"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/grace-note": {
       "tier": "blocked",
@@ -361,14 +336,12 @@
     "spec/grace-notes-beamed": {
       "tier": "blocked",
       "blockedBy": [
-        "beam",
         "grace"
       ]
     },
     "spec/grand-staff": {
       "tier": "blocked",
       "blockedBy": [
-        "beam",
         "staves"
       ]
     },
@@ -404,16 +377,10 @@
       ]
     },
     "spec/measure-repeats": {
-      "tier": "blocked",
-      "blockedBy": [
-        "measure-repeat"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/measure-repeats-with-counters": {
-      "tier": "blocked",
-      "blockedBy": [
-        "measure-repeat"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/multimeasure-rests": {
       "tier": "blocked",
@@ -457,10 +424,7 @@
       ]
     },
     "spec/parts": {
-      "tier": "blocked",
-      "blockedBy": [
-        "beam"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/repeats": {
       "tier": "ops-reachable"
@@ -533,7 +497,6 @@
     "spec/tuplets": {
       "tier": "blocked",
       "blockedBy": [
-        "beam",
         "tuplet"
       ]
     },

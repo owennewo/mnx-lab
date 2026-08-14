@@ -196,6 +196,14 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: { note: 'tie to the same pitch in the next event (toggles)' }
   },
   {
+    keys: 'B',
+    strokes: [{ code: 'KeyB' }],
+    group: 'adornments',
+    meaning: {
+      note: 'beam: arm at the first note, press again at the last (Esc drops it) — bend in the tab projection'
+    }
+  },
+  {
     keys: 'S',
     strokes: [{ code: 'KeyS' }],
     group: 'adornments',
@@ -282,7 +290,16 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // token emits the removal intent (campaign item 5).
   clefPopover: ['setClef', 'removeClef'],
   keySignaturePopover: ['setKeySignature', 'removeKeySignature'],
-  barAttributePopover: ['setMeasureAttribute', 'removeMeasureAttribute'],
+  barAttributePopover: [
+    'setMeasureAttribute',
+    'removeMeasureAttribute',
+    // The popover is a SURFACE, not a data-owner: it writes part-measure
+    // rhythm declarations beside the global-measure keys (item 11).
+    'setFullMeasureRest',
+    'removeFullMeasureRest',
+    'setMeasureRepeat',
+    'removeMeasureRepeat'
+  ],
   commandPalette: ['undo', 'redo', 'appendMeasure', 'toggleTie', 'setStaffKind'],
   goTo: ['goToMeasure'],
   // The view tabs (workbench) / view attribute (embeds): switching the pane

@@ -9,6 +9,8 @@ import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent } from './intents.ts';
 import type { EditOp, OpLogEntry } from './ops.ts';
 import {
+  beamRunBetween,
+  beamStartingAt,
   EditHistory,
   hasSlurStartingAt,
   MEASURE_ATTRIBUTE_FIELDS,
@@ -394,6 +396,51 @@ export class EditorSession {
         }
         // 3. Otherwise arm (or disarm, pressing twice in one place).
         this.spanAnchorKey = this.spanAnchorKey === slot.noteKey ? null : slot.noteKey;
+        return true;
+      }
+      case 'toggleBeam': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        // 1. A beam already starting here? Toggle it off.
+        const existing = beamStartingAt(this.doc, slot.noteKey);
+        if (existing) {
+          this.spanAnchorKey = null;
+          this.apply({ type: 'removeBeam', ...existing });
+          return true;
+        }
+        // 2. An armed anchor? Beam the run between it and here.
+        if (this.spanAnchorKey !== null && this.spanAnchorKey !== slot.noteKey) {
+          // The run is computed against a COPY: minting ids is a document
+          // change, and only `apply` is allowed to make one.
+          const probe = JSON.parse(JSON.stringify(this.doc)) as MnxStructure;
+          const run = beamRunBetween(probe, this.spanAnchorKey, slot.noteKey);
+          this.spanAnchorKey = null;
+          if (!run) return false;
+          this.apply({ type: 'setBeam', measureIndex: run.measureIndex, eventIds: run.eventIds });
+          return true;
+        }
+        // 3. Otherwise arm (or disarm, pressing twice in one place).
+        this.spanAnchorKey = this.spanAnchorKey === slot.noteKey ? null : slot.noteKey;
+        return true;
+      }
+      case 'setFullMeasureRest':
+      case 'removeFullMeasureRest':
+      case 'setMeasureRepeat':
+      case 'removeMeasureRepeat': {
+        const measureIndex = this.cursorState.measureIndex;
+        const before = JSON.stringify(this.doc);
+        this.apply(
+          intent.type === 'setMeasureRepeat'
+            ? { type: 'setMeasureRepeat', measureIndex, number: intent.number }
+            : { type: intent.type, measureIndex }
+        );
+        // These refuse (a bar holding ink, nothing declared to strip), and a
+        // refusal must not leave an op that changed nothing on the queue.
+        if (JSON.stringify(this.doc) === before) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
         return true;
       }
       case 'setTieVariant': {

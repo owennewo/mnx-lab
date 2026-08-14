@@ -245,6 +245,25 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-rhythm-declarations.md](inprogress/core-element-ops-rhythm-declarations.md)** —
+  campaign item 11, **built 2026-08-14** at deliberately **half its index row's
+  scope, because the code made the split**. Beams (top level), full-measure rests
+  and measure repeats land; tuplets, grace and tremolo become item 11b. The reason:
+  the cursor grid skips non-timed items, so container content is invisible to the
+  editor — a `wrapInTuplet` verb would have *removed ink from the addressable
+  surface* and the sweep would have said so. Beams reuse item 10's anchor verbatim
+  (arm at the first note, press again at the last), resolving to events rather than
+  notes — two verbs, one gesture, no new state — and `B` is the second customer of
+  item 10's projection rule (beam in notation, bend in tab). The rest declarations
+  ride the bar popover, which now writes both global- and part-measure keys because
+  **a popover is a surface, not a data-owner**. Results: reachable scenarios
+  **45 → 55** (predicted exactly), removable elements **820 → 842**, with 26 of 40
+  beams honestly `no-op` (nested levels, second parts, staff 2). Then a beam trace
+  failed for an unrelated reason worth more than the trace: the entry surface
+  cannot lay a run of 32nds — after the first note, `nextPosition` lands on the
+  original quarter rest and each subsequent note inherits *that* duration. **No
+  beam scenario is traceable today and beams are not why**; onset granularity is,
+  which is now item 11b's first job.
 - **[core-element-ops-spanners.md](inprogress/core-element-ops-spanners.md)** —
   campaign item 10: **the first two-ended gesture**, **built 2026-08-14** the same
   day as proposed. Items 5 and 7 were attributes at the cursor; a slur has two ends

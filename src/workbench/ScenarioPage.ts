@@ -79,7 +79,7 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
   },
   bar: {
     label: 'bar attribute',
-    placeholder: 'barline double · repeat end · ending 1,2 · segno · tempo 120 · section Verse 1',
+    placeholder: 'barline double · repeat end · ending 1,2 · tempo 120 · full-measure rest',
     hint: 'this bar only · “no <attribute>” strips it · Enter applies · Esc closes'
   }
 };
@@ -1007,11 +1007,21 @@ export class ScenarioPage extends LitElement {
         this.setupPopoverError = `not a bar attribute — ${BAR_ATTRIBUTE_HELP}`;
         return;
       }
-      this.stripIntent(
-        'set' in parsed
-          ? { type: 'setMeasureAttribute', attribute: parsed.set }
-          : { type: 'removeMeasureAttribute', kind: parsed.remove }
-      );
+      if ('rhythm' in parsed) {
+        this.stripIntent(
+          parsed.rhythm === 'fullMeasureRest'
+            ? { type: parsed.remove ? 'removeFullMeasureRest' : 'setFullMeasureRest' }
+            : parsed.remove
+              ? { type: 'removeMeasureRepeat' }
+              : { type: 'setMeasureRepeat', number: parsed.number ?? 1 }
+        );
+      } else {
+        this.stripIntent(
+          'set' in parsed
+            ? { type: 'setMeasureAttribute', attribute: parsed.set }
+            : { type: 'removeMeasureAttribute', kind: parsed.remove }
+        );
+      }
     } else if (this.setupPopover === 'key') {
       const key = parseKeySignature(input.value);
       if (!key) {

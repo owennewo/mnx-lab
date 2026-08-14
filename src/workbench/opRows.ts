@@ -143,6 +143,18 @@ function opLabel(op: EditOp): string {
       return `remove slur at ${op.noteKey}`;
     case 'setTieVariant':
       return `tie ${op.lv ? 'l.v.' : (op.targetType ?? 'variant')} · ${op.noteId}`;
+    case 'setBeam':
+      return `beam ${op.eventIds.length} events @ m${op.measureIndex + 1}`;
+    case 'removeBeam':
+      return `remove beam @ m${op.measureIndex + 1}`;
+    case 'setFullMeasureRest':
+      return `full-measure rest @ m${op.measureIndex + 1}`;
+    case 'removeFullMeasureRest':
+      return `no full-measure rest @ m${op.measureIndex + 1}`;
+    case 'setMeasureRepeat':
+      return `measure repeat ${op.number} @ m${op.measureIndex + 1}`;
+    case 'removeMeasureRepeat':
+      return `no measure repeat @ m${op.measureIndex + 1}`;
   }
 }
 

@@ -165,11 +165,16 @@ const TEMPO_UNITS: Record<string, MnxNoteValueBase> = {
 
 export const BAR_ATTRIBUTE_HELP =
   'barline double · repeat start · repeat end 3 · ending 1,2 · segno · fine · ' +
-  'jump dsalfine · tempo 120 · rehearsal A · section Verse 1 · no <attribute>';
+  'jump dsalfine · tempo 120 · rehearsal A · section Verse 1 · full-measure rest · ' +
+  'measure repeat 2 · no <attribute>';
 
 export type BarAttributeResult =
   | { set: MeasureAttribute }
   | { remove: MeasureAttributeKind }
+  // Part-measure rhythm declarations (campaign item 11) ride the same popover:
+  // it is a SURFACE, not a data-owner, and the user's question is "what about
+  // this bar?" — which object holds the answer is our problem, not theirs.
+  | { rhythm: 'fullMeasureRest' | 'measureRepeat'; remove?: boolean; number?: number }
   | null;
 
 /** The word a user types → the attribute kind it names. */
@@ -194,9 +199,26 @@ export function parseBarAttribute(text: string): BarAttributeResult {
   // Removal: `no repeat` / `no section` / `no barline`.
   if (head === 'no') {
     const target = (words[1] ?? '').toLowerCase();
+    const rest = words.slice(1).join(' ').toLowerCase();
+    if (rest === 'full-measure rest' || rest === 'full measure rest')
+      return { rhythm: 'fullMeasureRest', remove: true };
+    if (rest === 'measure repeat') return { rhythm: 'measureRepeat', remove: true };
     if (target === 'repeat') return { remove: 'repeatEnd' };
     const kind = ATTRIBUTE_WORDS[target];
     return kind ? { remove: kind } : null;
+  }
+
+  // `full-measure rest` — the bar declares its own silence.
+  if (head === 'full-measure' || (head === 'full' && words[1]?.toLowerCase() === 'measure')) {
+    const rest = trimmed.toLowerCase().replace(/^full[- ]measure\s*/, '');
+    return rest === 'rest' ? { rhythm: 'fullMeasureRest' } : null;
+  }
+
+  // `measure repeat` / `measure repeat 2` — repeat the previous N bars.
+  if (head === 'measure' && (words[1] ?? '').toLowerCase() === 'repeat') {
+    const count = words[2] !== undefined ? Number(words[2]) : 1;
+    if (!Number.isInteger(count) || count < 1 || count > 4) return null;
+    return { rhythm: 'measureRepeat', number: count };
   }
 
   // `repeat start` / `repeat end` / `repeat end 3` — one word, two kinds.

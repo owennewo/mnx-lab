@@ -84,6 +84,13 @@ export type MutationIntent =
   // arm the anchor. Traces record what was pressed, so replay rebuilds the
   // anchor exactly as a player would.
   | { type: 'toggleSlur' }
+  // Beams reuse the SAME anchor as slurs (campaign item 11): "press here,
+  // press there" is one mechanism whatever the span turns out to mean.
+  | { type: 'toggleBeam' }
+  | { type: 'setFullMeasureRest' }
+  | { type: 'removeFullMeasureRest' }
+  | { type: 'setMeasureRepeat'; number: number }
+  | { type: 'removeMeasureRepeat' }
   | { type: 'setTieVariant'; targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump'; lv?: boolean };
 
 export type HistoryIntent = { type: 'undo' } | { type: 'redo' };
