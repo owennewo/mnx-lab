@@ -167,6 +167,16 @@ function opLabel(op: EditOp): string {
       return `no fingering · ${op.noteKey}`;
     case 'removeContainer':
       return `remove container @ m${op.measureIndex + 1} (empty)`;
+    case 'removeKitNote':
+      return `remove kit note ${op.noteKey}`;
+    case 'removeKitComponent':
+      return `remove kit component “${op.component}”`;
+    case 'removeSound':
+      return `remove sound “${op.sound}”`;
+    case 'setAccidentalDisplay':
+      return `accidental ${op.show ? 'shown' : 'hidden'} · ${op.noteKey}`;
+    case 'removeAccidentalDisplay':
+      return `accidental auto · ${op.noteKey}`;
     case 'removeLayout':
       return `remove layout ${op.index + 1}`;
     case 'removeScore':
@@ -181,10 +191,14 @@ function opLabel(op: EditOp): string {
       return `${op.marking} · ${op.noteKey}`;
     case 'removeMarking':
       return `no ${op.marking} · ${op.noteKey}`;
-    case 'setPositioned':
-      return op.attribute.kind === 'dynamic'
-        ? `dynamic ${op.attribute.value ?? (op.attribute.glyphs ?? []).join(' ')} @ m${op.measureIndex + 1} ${onsetText(op.onset)}`
-        : `text “${op.attribute.text}” @ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
+    case 'setPositioned': {
+      const where = `@ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
+      if (op.attribute.kind === 'dynamic')
+        return `dynamic ${op.attribute.value ?? (op.attribute.glyphs ?? []).join(' ')} ${where}`;
+      if (op.attribute.kind === 'ottava')
+        return `ottava ${op.attribute.value > 0 ? '+' : ''}${op.attribute.value} ${where}`;
+      return `text “${op.attribute.text}” ${where}`;
+    }
     case 'removePositioned':
       return `no ${op.kind} @ m${op.measureIndex + 1}`;
     case 'setBeam':

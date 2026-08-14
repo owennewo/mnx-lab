@@ -365,15 +365,22 @@ export class EditorSession {
         const partIndex = this.cursorState.partIndex ?? 0;
         const measure = this.doc.parts?.[partIndex]?.measures?.[this.cursorState.measureIndex];
         const staffIndex = this.cursorState.staffIndex ?? 1;
-        const declared = (measure?.clefs ?? []).some(
-          entry => (entry.staff ?? 1) === staffIndex && entry.position === undefined
-        );
-        if (!declared) return false;
+        // The clef governing from the cursor's own position: a mid-measure one
+        // when the cursor sits on it, else the bar's own declaration.
+        const onset: [number, number] = [this.cursorState.onset.num, this.cursorState.onset.den];
+        const here = (measure?.clefs ?? []).find(entry => {
+          if ((entry.staff ?? 1) !== staffIndex) return false;
+          if (!entry.position) return onset[0] === 0;
+          const [n, d] = entry.position.fraction;
+          return n * onset[1] === onset[0] * d;
+        });
+        if (!here) return false;
         this.apply({
           type: 'removeClef',
           measureIndex: this.cursorState.measureIndex,
           partIndex,
-          staffIndex
+          staffIndex,
+          ...(here.position ? { onset } : {})
         });
         return true;
       }
@@ -557,6 +564,54 @@ export class EditorSession {
         }
         return true;
       }
+      case 'setAccidentalDisplay':
+      case 'removeAccidentalDisplay': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        const was = JSON.stringify(this.doc);
+        this.apply(
+          intent.type === 'setAccidentalDisplay'
+            ? { type: 'setAccidentalDisplay', noteKey: slot.noteKey, show: intent.show }
+            : { type: 'removeAccidentalDisplay', noteKey: slot.noteKey }
+        );
+        if (JSON.stringify(this.doc) === was) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
+      case 'removeKitNote': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        const was = JSON.stringify(this.doc);
+        this.apply({ type: 'removeKitNote', noteKey: slot.noteKey });
+        if (JSON.stringify(this.doc) === was) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
+      case 'removeKitComponent':
+      case 'removeSound': {
+        const was = JSON.stringify(this.doc);
+        this.apply(
+          intent.type === 'removeSound'
+            ? { type: 'removeSound', sound: intent.sound }
+            : {
+                type: 'removeKitComponent',
+                partIndex: this.cursorState.partIndex ?? 0,
+                component: intent.component
+              }
+        );
+        if (JSON.stringify(this.doc) === was) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
       case 'removeLayout':
       case 'removeScore':
       case 'removeMultimeasureRest': {
@@ -599,7 +654,12 @@ export class EditorSession {
         // Remove the entry at the cursor's own position — "the dynamic here",
         // which is how a player would name it.
         const measure = this.doc.parts?.[0]?.measures?.[this.cursorState.measureIndex];
-        const list = (intent.kind === 'dynamic' ? measure?.dynamics : measure?.directions) ?? [];
+        const list =
+          (intent.kind === 'dynamic'
+            ? measure?.dynamics
+            : intent.kind === 'ottava'
+              ? measure?.ottavas
+              : measure?.directions) ?? [];
         const index = list.findIndex(entry => {
           const [num, den] = entry.position?.fraction ?? [0, 1];
           return num * this.cursorState.onset.den === this.cursorState.onset.num * den;

@@ -3,21 +3,19 @@
   "summary": {
     "scenarios": 106,
     "traced": 5,
-    "opsReachable": 77,
-    "blocked": 19,
+    "opsReachable": 80,
+    "blocked": 16,
     "expectedUnreachable": 5
   },
   "blockingKinds": {
     "layout": 6,
     "score": 6,
     "grace": 4,
-    "accidental-display": 3,
     "space": 2,
     "tuplet": 2,
     "kit-component": 1,
     "kit-note": 1,
     "multimeasure-rest": 1,
-    "ottava": 1,
     "sound": 1,
     "tremolo": 1
   },
@@ -83,10 +81,7 @@
       ]
     },
     "lab/pitches/parenthesized-accidental": {
-      "tier": "blocked",
-      "blockedBy": [
-        "accidental-display"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/rhythm/appoggiatura": {
       "tier": "blocked",
@@ -206,10 +201,7 @@
       "tier": "ops-reachable"
     },
     "spec/accidentals": {
-      "tier": "blocked",
-      "blockedBy": [
-        "accidental-display"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/articulations": {
       "tier": "ops-reachable"
@@ -320,16 +312,12 @@
     "spec/organ-layout": {
       "tier": "blocked",
       "blockedBy": [
-        "accidental-display",
         "layout",
         "score"
       ]
     },
     "spec/ottavas-8va": {
-      "tier": "blocked",
-      "blockedBy": [
-        "ottava"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/parts": {
       "tier": "ops-reachable"

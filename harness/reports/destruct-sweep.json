@@ -4,15 +4,15 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "removed": 1415,
-      "no-op": 26,
+      "removed": 1434,
+      "no-op": 7,
       "refused": 19
     },
-    "unaddressableWithAnOp": 12
+    "unaddressableWithAnOp": 7
   },
   "kinds": {
     "accidental-display": {
-      "no-op": 7
+      "removed": 7
     },
     "articulation": {
       "removed": 14
@@ -21,15 +21,13 @@
       "removed": 7
     },
     "beam": {
-      "removed": 36,
-      "no-op": 4
+      "removed": 40
     },
     "capo": {
       "removed": 1
     },
     "clef": {
-      "removed": 112,
-      "no-op": 1
+      "removed": 113
     },
     "direction": {
       "removed": 13
@@ -59,10 +57,10 @@
       "removed": 6
     },
     "kit-component": {
-      "no-op": 1
+      "refused": 1
     },
     "kit-note": {
-      "no-op": 4
+      "removed": 4
     },
     "layout": {
       "removed": 13
@@ -84,7 +82,7 @@
       "no-op": 7
     },
     "ottava": {
-      "no-op": 1
+      "removed": 1
     },
     "part-name": {
       "removed": 59
@@ -111,10 +109,10 @@
       "removed": 6
     },
     "sound": {
-      "no-op": 1
+      "refused": 1
     },
     "space": {
-      "refused": 2
+      "removed": 2
     },
     "staff-kind": {
       "removed": 20
@@ -409,16 +407,16 @@
     },
     "lab/percussion/minimal-kit": {
       "kit-component": {
-        "no-op": 1
+        "refused": 1
       },
       "kit-note": {
-        "no-op": 4
+        "removed": 4
       },
       "part-name": {
         "removed": 1
       },
       "sound": {
-        "no-op": 1
+        "refused": 1
       },
       "time-signature": {
         "removed": 1
@@ -426,7 +424,7 @@
     },
     "lab/pitches/parenthesized-accidental": {
       "accidental-display": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1
@@ -469,7 +467,7 @@
         "removed": 1
       },
       "space": {
-        "refused": 1
+        "removed": 1
       },
       "time-signature": {
         "removed": 1
@@ -1142,7 +1140,7 @@
     },
     "spec/accidentals": {
       "accidental-display": {
-        "no-op": 3
+        "removed": 3
       },
       "clef": {
         "removed": 1
@@ -1260,8 +1258,7 @@
     },
     "spec/clef-changes": {
       "clef": {
-        "removed": 1,
-        "no-op": 1
+        "removed": 2
       },
       "note": {
         "removed": 4
@@ -1339,7 +1336,7 @@
     },
     "spec/grace-notes-beamed": {
       "beam": {
-        "no-op": 3
+        "removed": 3
       },
       "clef": {
         "removed": 1
@@ -1583,7 +1580,7 @@
     },
     "spec/organ-layout": {
       "accidental-display": {
-        "no-op": 3
+        "removed": 3
       },
       "clef": {
         "removed": 1
@@ -1619,7 +1616,7 @@
         "no-op": 1
       },
       "ottava": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "removed": 1
@@ -1854,7 +1851,7 @@
         "removed": 1
       },
       "space": {
-        "refused": 1
+        "removed": 1
       },
       "tie": {
         "removed": 9
@@ -1919,7 +1916,7 @@
     },
     "spec/tuplets": {
       "beam": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1
@@ -1969,30 +1966,6 @@
       "verdict": "unaddressable"
     },
     {
-      "scenario": "spec/clef-changes",
-      "element": "p0/m0/clef1",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/beam/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/beam/b1",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/beam/b2",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
       "scenario": "spec/multiple-voices",
       "element": "p0/m1/v1/e1/n0",
       "kind": "note",
@@ -2014,12 +1987,6 @@
       "scenario": "spec/tie-targets",
       "element": "p0/m0/v1/e2/n0",
       "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m0/beam/b0",
-      "kind": "beam",
       "verdict": "unaddressable"
     }
   ]

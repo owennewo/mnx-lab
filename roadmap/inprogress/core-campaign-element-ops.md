@@ -110,6 +110,28 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
+- **2026-08-15 — the tail: the `no-op` column empties.** 26 elements across
+  seven kinds in one pass ([core-element-ops-the-tail.md](core-element-ops-the-tail.md)).
+  **Corpus 1,415 → 1,434 removed of 1,460; `no-op` is now seven notes.**
+  - **The `space` bug was a field shape, not a missing feature.** It had blocked
+    three pieces of work, and each diagnosis stopped at "`itemSpan` counts it as
+    zero". The cause: `space.duration` is a rhythmic **fraction** (`[1, 4]`),
+    not the `{base, dots}` every other item carries. One mis-read field, three
+    blocked features, and the campaign's own log recorded the symptom twice
+    without anyone checking the shape. **A symptom seen twice deserves a look at
+    the data, not a third workaround.**
+  - **Percussion belongs in the grid.** Kit notes were drawn and unreachable
+    because the grid builds slots from `notes` and a kit part has `kitNotes`.
+    They now get slots keyed `@m0.v0.e0.k0`, lined by the component's declared
+    staff position — ink the cursor can finally address.
+  - **Guarded removal, fourth and fifth applications**: a kit component and a
+    sound are removable once nothing references them, exactly as containers are
+    removable once they hold no ink.
+  - **What is left is not vocabulary.** Every kind now has its verb. The seven
+    remaining notes are navigation failures in edge cases (an intentionally
+    mis-summing bar, second voices with unshared onsets), and they belong with
+    the selection ladder's per-level pass.
+
 - **2026-08-14 — the wrap verbs: `refused` is the answer, and it is the right one.**
   Containers (tuplet, grace, tremolo, space) get `removeContainer`, guarded by
   the campaign's container rule for the third time: **removable only once it

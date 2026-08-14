@@ -66,6 +66,19 @@ export function positionalNoteKey(coords: {
   return `@${part}m${coords.measureIndex}${staff}.v${coords.voiceIndex}.e${coords.eventIndex}${container}.n${coords.noteIndex}`;
 }
 
+/** A percussion kit note's key: same coordinates, `k` instead of `n`, because
+ *  it is a different list on the event (`kitNotes`, not `notes`). */
+export function kitNoteKey(
+  measureIndex: number,
+  voiceIndex: number,
+  eventIndex: number,
+  kitIndex: number,
+  partIndex = 0
+): string {
+  const part = partIndex > 0 ? `p${partIndex}.` : '';
+  return `@${part}m${measureIndex}.v${voiceIndex}.e${eventIndex}.k${kitIndex}`;
+}
+
 export function isSyntheticNoteKey(key: string): boolean {
   return key.startsWith('@m');
 }

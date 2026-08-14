@@ -183,6 +183,9 @@ export type EditOp =
       partIndex?: number;
       /** Which staff's clef (13c); default the first. */
       staffIndex?: number;
+      /** A MID-MEASURE clef is addressed by its onset (spec/clef-changes);
+       *  absent means the one governing from the bar's start. */
+      onset?: [number, number];
     }
   | {
       /** Declare the key signature governing this measure onward. */
@@ -288,6 +291,13 @@ export type EditOp =
       eventIndex: number;
       partIndex?: number;
     }
+  // Percussion and the note's accidental display — the tail of kinds that had
+  // no verb at all (campaign item 2's board, finally emptied).
+  | { type: 'removeKitNote'; noteKey: string }
+  | { type: 'removeKitComponent'; partIndex: number; component: string }
+  | { type: 'removeSound'; sound: string }
+  | { type: 'setAccidentalDisplay'; noteKey: string; show: boolean }
+  | { type: 'removeAccidentalDisplay'; noteKey: string }
   | { type: 'removeLayout'; index: number }
   | { type: 'removeScore'; index: number }
   | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }
@@ -398,7 +408,10 @@ export type PartDeclarationKind = 'name' | 'staves' | 'strings' | 'capo' | 'staf
  *  and a removal — which is why they share a verb. */
 export type PositionedAttribute =
   | { kind: 'dynamic'; value?: MnxDynamicValue; glyphs?: string[] }
-  | { kind: 'direction'; text: string };
+  | { kind: 'direction'; text: string }
+  /** An octave-shift line: same owner and shape as the other two, so it shares
+   *  their verb — item 7's family test, applied once more. */
+  | { kind: 'ottava'; value: 1 | 2 | 3 | -1 | -2 | -3 };
 
 /** The ten bar attributes, each carrying exactly what its MNX object needs. */
 export type MeasureAttribute =
@@ -656,9 +669,13 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const clefs = measure?.clefs;
       if (!measure || !clefs) return next;
       const staff = op.staffIndex ?? 1;
-      const kept = clefs.filter(
-        entry => !((entry.staff ?? 1) === staff && entry.position === undefined)
-      );
+      const sameOnset = (entry: { position?: { fraction: [number, number] } }): boolean => {
+        if (!op.onset) return entry.position === undefined;
+        if (!entry.position) return false;
+        const [n, d] = entry.position.fraction;
+        return n * op.onset[1] === op.onset[0] * d;
+      };
+      const kept = clefs.filter(entry => !((entry.staff ?? 1) === staff && sameOnset(entry)));
       if (kept.length === clefs.length) return next;
       // No tombstone: an emptied array goes with its last member.
       if (kept.length > 0) measure.clefs = kept;
@@ -920,13 +937,80 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       // Ink first: a container goes only when it holds none.
       const holdsInk = (item.content ?? []).some(event => (event.notes?.length ?? 0) > 0);
       if (holdsInk) return next;
-      // A `space` holds no ink but IS time, and `itemSpan` still counts it as
-      // zero — so removing one silently shortens the bar and the renderer
-      // reports it. Refused until that span is right: the third time this gap
-      // has surfaced (see core-element-ops-onset-granularity.md).
-      if (item.type === 'space') return next;
+
       seq.content = seq.content.filter((_, i) => i !== op.eventIndex);
-      padMeasureRests(next, op.measureIndex);
+      // Pad THIS sequence, not the entry one: a container can live in any
+      // voice, and `padMeasureRests` only fills voice 0 — which is how the
+      // first version left voice 2 three beats long in a 4/4 bar.
+      const { span } = meterOf(next, op.measureIndex);
+      const remainder = subtractOnsets(span, voiceFill(seq));
+      if (remainder.num > 0) seq.content.push(...restsSpanning(remainder));
+      return next;
+    }
+    case 'removeKitNote': {
+      // Kit notes are addressed like notes but live in `kitNotes`; the walk
+      // keys them positionally, so the key carries the event's coordinates.
+      const match = /^@(?:p(\d+)\.)?m(\d+)\.v(\d+)\.e(\d+)\.k(\d+)$/.exec(op.noteKey);
+      if (!match) return next;
+      const [, part, measure, voice, event, kit] = match;
+      const seqs = (next.parts?.[Number(part || 0)]?.measures?.[Number(measure)]?.sequences ?? [])
+        .filter(s2 => (s2.staff ?? 1) === 1);
+      const item = seqs[Number(voice)]?.content?.[Number(event)] as
+        | { kitNotes?: unknown[] }
+        | undefined;
+      if (!item?.kitNotes?.[Number(kit)]) return next;
+      const kept = item.kitNotes.filter((_, i) => i !== Number(kit));
+      if (kept.length > 0) item.kitNotes = kept;
+      else delete item.kitNotes;
+      return next;
+    }
+    case 'removeKitComponent': {
+      const part = next.parts?.[op.partIndex] as { kit?: Record<string, unknown> } | undefined;
+      if (!part?.kit?.[op.component]) return next;
+      // A component is what its notes are made of: removable only once nothing
+      // plays it. The same guard containers get, for the same reason — the
+      // alternative is orphaning ink.
+      const played = (part as unknown as { measures?: { sequences?: { content?: unknown[] }[] }[] })
+        .measures?.some(measure =>
+          (measure.sequences ?? []).some(seq =>
+            (seq.content ?? []).some(item =>
+              ((item as { kitNotes?: { kitComponent?: string }[] }).kitNotes ?? []).some(
+                kitNote => kitNote.kitComponent === op.component
+              )
+            )
+          )
+        );
+      if (played) return next;
+      delete part.kit[op.component];
+      if (Object.keys(part.kit).length === 0) delete part.kit;
+      return next;
+    }
+    case 'removeSound': {
+      const global = next.global as unknown as { sounds?: Record<string, unknown> };
+      if (!global.sounds?.[op.sound]) return next;
+      // Likewise: a sound a kit component names is still in use.
+      const used = (next.parts ?? []).some(part =>
+        Object.values((part as unknown as { kit?: Record<string, { sound?: string }> }).kit ?? {}).some(
+          component => component?.sound === op.sound
+        )
+      );
+      if (used) return next;
+      delete global.sounds[op.sound];
+      if (Object.keys(global.sounds).length === 0) delete global.sounds;
+      return next;
+    }
+    case 'setAccidentalDisplay': {
+      const located = findKeyedNote(next, op.noteKey);
+      if (!located) return next;
+      located.note.accidentalDisplay = { show: op.show };
+      return next;
+    }
+    case 'removeAccidentalDisplay': {
+      const located = findKeyedNote(next, op.noteKey);
+      if (!located?.note.accidentalDisplay) return next;
+      // The *annotation* class: the note keeps its pitch, and the renderer
+      // goes back to deciding whether an accidental is needed.
+      delete located.note.accidentalDisplay;
       return next;
     }
     case 'removeLayout': {
@@ -1022,6 +1106,18 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const measure = next.parts?.[0]?.measures?.[op.measureIndex];
       if (!measure) return next;
       const position = { fraction: [op.onset[0], op.onset[1]] as [number, number] };
+      if (op.attribute.kind === 'ottava') {
+        // `end` is required by the schema; a keyboard-made ottava spans its own
+        // bar until a range gesture exists (the same limit item 7 recorded for
+        // volta durations).
+        const measureId = next.global?.measures?.[op.measureIndex]?.id;
+        if (!measureId) return next;
+        measure.ottavas = [
+          ...(measure.ottavas ?? []),
+          { position, value: op.attribute.value, end: { measure: measureId, position } }
+        ];
+        return next;
+      }
       if (op.attribute.kind === 'dynamic') {
         const entry: MnxDynamic = { position, type: 'immediate' };
         if (op.attribute.value) entry.value = op.attribute.value;
@@ -1036,7 +1132,8 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const measure = next.parts?.[0]?.measures?.[op.measureIndex];
       if (!measure) return next;
       const record = measure as unknown as Record<string, unknown[] | undefined>;
-      const field = op.kind === 'dynamic' ? 'dynamics' : 'directions';
+      const field =
+        op.kind === 'dynamic' ? 'dynamics' : op.kind === 'ottava' ? 'ottavas' : 'directions';
       const list = record[field];
       if (!list?.[op.index]) return next;
       const kept = list.filter((_, i) => i !== op.index);

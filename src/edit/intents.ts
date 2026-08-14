@@ -121,6 +121,11 @@ export type MutationIntent =
   // Document-level presentation: no cursor involved, the document IS the
   // address (as with lyric lines).
   | { type: 'removeContainer'; sequenceIndex: number; eventIndex: number }
+  | { type: 'removeKitNote' }
+  | { type: 'removeKitComponent'; component: string }
+  | { type: 'removeSound'; sound: string }
+  | { type: 'setAccidentalDisplay'; show: boolean }
+  | { type: 'removeAccidentalDisplay' }
   | { type: 'removeLayout'; index: number }
   | { type: 'removeScore'; index: number }
   | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }

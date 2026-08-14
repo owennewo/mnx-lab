@@ -25,6 +25,7 @@
 import type { MnxEvent, MnxSequenceItem, MnxStructure, MnxNote } from '../model/mnx.ts';
 import { isTimedEvent, isTuplet, isTremolo } from '../model/mnx.ts';
 import { forEachNoteAddress, noteKeyAt } from '../model/noteWalk.ts';
+import { kitNoteKey } from '../model/noteKeys.ts';
 import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
 import { clefAt, staffPositionOfPitch } from './staffSpace.ts';
 
@@ -189,6 +190,15 @@ export function itemSpan(item: MnxSequenceItem): Onset {
     const first = item.content[0];
     return first ? durationSpan(first.duration) : { num: 0, den: 1 };
   }
+  // A `space` is authored silence that OCCUPIES TIME, and its duration is a
+  // RHYTHMIC FRACTION (`[1, 4]`) rather than the `{base, dots}` every other
+  // item carries — which is why reading it with `durationSpan` produced zero
+  // and the bar arithmetic went wrong wherever a space appeared. That single
+  // mis-read blocked the container verb, the time-signature removal and the
+  // rest-spelling attempt.
+  const space = item as { type?: string; duration?: [number, number] };
+  if (space.type === 'space')
+    return Array.isArray(space.duration) ? reduce(space.duration[0], space.duration[1]) : { num: 0, den: 1 };
   return { num: 0, den: 1 };
 }
 
@@ -245,6 +255,7 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
   const part = doc.parts?.[partIndex];
   const measures = part?.measures ?? [];
   const measureCount = Math.max(measures.length, doc.global?.measures?.length ?? 0);
+  const kit = (part as unknown as { kit?: Record<string, { staffPosition?: number }> } | undefined)?.kit;
   const tuning = tuningOf(part);
   const capo = capoOf(part);
   const spans = measureSpans(doc);
@@ -301,7 +312,33 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
           });
         };
 
-        if (isTimedEvent(item)) push(item, onset);
+        if (isTimedEvent(item)) {
+          push(item, onset);
+          // Percussion: kit notes are the ink of a kit part, and their staff
+          // position comes from the component they name. Without this they are
+          // drawn but unreachable — ink the cursor cannot address.
+          const kitNotes = (item as { kitNotes?: { kitComponent?: string }[] }).kitNotes ?? [];
+          if (kitNotes.length > 0) {
+            const position = at(onset);
+            position.voices.add(voiceIndex);
+            kitNotes.forEach((kitNote, kitIndex) => {
+              const component = kit?.[kitNote.kitComponent ?? ''];
+              const staffPosition = component?.staffPosition ?? 0;
+              position.raw.push({
+                slot: {
+                  noteKey: kitNoteKey(measureIndex, voiceIndex, eventIndex, kitIndex, partIndex),
+                  line: staffPosition,
+                  staffPosition,
+                  voiceIndex,
+                  eventIndex,
+                  noteIndex: kitIndex
+                },
+                midi: 60 + staffPosition,
+                order: position.raw.length
+              });
+            });
+          }
+        }
         else {
           // Container content (campaign item 11b). A tuplet's inner events have
           // real, scaled onsets — its written durations in the outer's time —

@@ -130,6 +130,15 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
     });
     return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
   }
+  if (element.kind === 'kit-component' || element.kind === 'sound') {
+    const name = element.path.split('/').pop()!;
+    const applied = session.handleIntent(
+      element.kind === 'sound'
+        ? { type: 'removeSound', sound: name }
+        : { type: 'removeKitComponent', component: name }
+    );
+    return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
+  }
   if (element.kind === 'lyric-line-metadata') {
     const line = element.path.split('/').pop()!;
     const applied = session.handleIntent({ type: 'removeLyricLine', line });
@@ -149,7 +158,7 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
 
   // Positioned adornments need the cursor at the right MOMENT, not just the
   // right bar — the first elements whose address has two coordinates.
-  if (element.kind === 'dynamic' || element.kind === 'direction') {
+  if (element.kind === 'dynamic' || element.kind === 'direction' || element.kind === 'ottava') {
     if (element.measureIndex === undefined) return { address: 'unaddressable', removal: 'no-op' };
     session.handleIntent({ type: 'goToMeasure', measureIndex: element.measureIndex });
     const [num, den] = element.onset ?? [0, 1];
@@ -174,6 +183,15 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
     if (element.staffIndex !== undefined && (session.cursor.staffIndex ?? 1) !== element.staffIndex)
       session.handleIntent({ type: 'setStaff', staffIndex: element.staffIndex });
     session.handleIntent({ type: 'goToMeasure', measureIndex: element.measureIndex });
+    // A mid-measure attribute needs the cursor at its moment, not just its bar.
+    if (element.onset) {
+      const [num, den] = element.onset;
+      for (let guard = 0; guard < 64; guard++) {
+        const at = session.cursor.onset;
+        if (at.num * den === num * at.den) break;
+        if (!session.handleIntent({ type: 'nextPosition' })) break;
+      }
+    }
     if (session.cursor.measureIndex !== element.measureIndex)
       return { address: 'unaddressable', removal: 'no-op' };
     const applied = session.handleIntent(measureIntent);
@@ -197,7 +215,11 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
           ? ({ type: 'toggleBeam' } as const)
           : element.kind === 'articulation'
             ? ({ type: 'removeMarking', marking: element.path.split('/').pop()! } as const)
-            : element.kind === 'string-annotation'
+            : element.kind === 'accidental-display'
+              ? ({ type: 'removeAccidentalDisplay' } as const)
+              : element.kind === 'kit-note'
+                ? ({ type: 'removeKitNote' } as const)
+                : element.kind === 'string-annotation'
               ? ({ type: 'removeStringAnnotation' } as const)
               : element.kind === 'lyric'
               ? ({ type: 'removeSyllable', line: element.path.split('/').pop()! } as const)

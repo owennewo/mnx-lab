@@ -24,6 +24,7 @@ import type { MnxBeam, MnxStructure } from '../model/mnx.ts';
 import type { EditOp } from './ops.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import { noteKeyAt } from '../model/noteWalk.ts';
+import { kitNoteKey } from '../model/noteKeys.ts';
 
 export type ElementKind =
   // note & event level
@@ -73,7 +74,11 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['insertNote', 'insertPitchNote'],
     remove: ['deleteNote']
   },
-  'kit-note': { classes: [], note: 'Percussion kit note — drawn as a notehead by the kit component.' },
+  'kit-note': {
+    classes: [],
+    note: 'Percussion kit note — drawn as a notehead by the kit component.',
+    remove: ['removeKitNote']
+  },
   tie: {
     classes: ['tie'],
     note: 'A curve between two notes; reference removal class.',
@@ -98,7 +103,12 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['setMarking'],
     remove: ['removeMarking']
   },
-  'accidental-display': { classes: [], note: 'Modifier: forces or parenthesizes the note accidental.' },
+  'accidental-display': {
+    classes: [],
+    note: 'Modifier: forces or parenthesizes the note accidental. Removing it returns the decision to the renderer; SPELLING (when E♭ becomes D♯) is a different question and still undrafted.',
+    construct: ['setAccidentalDisplay'],
+    remove: ['removeAccidentalDisplay']
+  },
   'string-annotation': {
     classes: [],
     note: 'Modifier: chooses which string a note is played on. Removing it hands the note back to the derivation ladder — and takes the `fret` with it, since the fret is the choice’s consequence, not a second choice.',
@@ -173,7 +183,12 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['setPositioned'],
     remove: ['removePositioned']
   },
-  ottava: { classes: ['ottava', 'ottava-label'], note: 'An octave-shift line.' },
+  ottava: {
+    classes: ['ottava', 'ottava-label'],
+    note: 'An octave-shift line — same owner and shape as dynamics, so it shares their verb.',
+    construct: ['setPositioned'],
+    remove: ['removePositioned']
+  },
   'time-signature': {
     classes: ['time-sig', 'time-sig-num', 'time-sig-den'],
     note: 'Inherited-attribute removal class: reverts to the predecessor, and re-establishes the full-bar invariant for the bars it governed.',
@@ -271,7 +286,11 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['setStaffKind'],
     remove: ['removePartDeclaration']
   },
-  'kit-component': { classes: [], note: 'One percussion kit mapping; its notes draw noteheads.' },
+  'kit-component': {
+    classes: [],
+    note: 'One percussion kit mapping; its notes draw noteheads.',
+    remove: ['removeKitComponent']
+  },
   staves: {
     classes: [],
     note: 'Modifier: how many staves the part is notated on.',
@@ -299,7 +318,11 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['setLyricLine'],
     remove: ['removeLyricLine']
   },
-  sound: { classes: [], note: 'A named sound the kit maps onto; audio only, never drawn.' }
+  sound: {
+    classes: [],
+    note: 'A named sound the kit maps onto; audio only, never drawn.',
+    remove: ['removeSound']
+  }
 };
 
 /**
@@ -441,7 +464,9 @@ function walkEvent(
   event: Record<string, unknown>,
   path: string,
   jsonPath: (string | number)[],
-  keyOf: ((noteIndex: number, note: Record<string, unknown>) => string | undefined) | null
+  keyOf: ((noteIndex: number, note: Record<string, unknown>) => string | undefined) | null,
+  /** Percussion notes key differently (`k` not `n`), so they get their own. */
+  kitKeyOf?: (kitIndex: number) => string | undefined
 ): void {
   const notes = (event.notes ?? []) as Record<string, unknown>[];
   notes.forEach((note, noteIndex) => {
@@ -468,7 +493,13 @@ function walkEvent(
     }
   });
   for (const [kitIndex] of ((event.kitNotes ?? []) as unknown[]).entries())
-    push(out, 'kit-note', `${path}/kit${kitIndex}`, [...jsonPath, 'kitNotes', kitIndex]);
+    pushOnNote(
+      out,
+      'kit-note',
+      `${path}/kit${kitIndex}`,
+      [...jsonPath, 'kitNotes', kitIndex],
+      kitKeyOf?.(kitIndex)
+    );
   for (const [slurIndex, raw] of ((event.slurs ?? []) as { startNote?: string }[]).entries()) {
     // A slur is addressed through the note it STARTS at: `startNote` names it
     // on a chord, and a single-note event has only one candidate. That is what
@@ -513,7 +544,8 @@ function walkContent(
     | ((eventIndex: number, noteIndex: number, note: Record<string, unknown>, containerIndex?: number) => string | undefined)
     | null,
   /** Where this content lives, so containers can be addressed by position. */
-  sequenceIndex = 0
+  sequenceIndex = 0,
+  kitKeyOf?: (eventIndex: number, kitIndex: number) => string | undefined
 ): void {
   (content ?? []).forEach((raw, index) => {
     const item = raw as Record<string, unknown>;
@@ -545,7 +577,14 @@ function walkContent(
       return;
     }
     if (!isTimedEvent(raw as never)) return;
-    walkEvent(out, item, itemPath, itemJson, keyOf ? (n, note) => keyOf(index, n, note) : null);
+    walkEvent(
+      out,
+      item,
+      itemPath,
+      itemJson,
+      keyOf ? (n, note) => keyOf(index, n, note) : null,
+      kitKeyOf ? (kitIndex: number) => kitKeyOf(index, kitIndex) : undefined
+    );
   });
 }
 
@@ -615,17 +654,16 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
       const measurePath = `${partPath}/m${measureIndex}`;
       const measureJson = [...partJson, 'measures', measureIndex];
       for (const [clefIndex, positioned] of (measure.clefs ?? []).entries()) {
-        // Any part, any staff (13b/13c) — but a MID-MEASURE clef still needs an
-        // onset-addressed variant of the op, which item 11b's territory owns.
-        const reachable = positioned.position === undefined;
-        pushAtMeasure(
-          out,
-          'clef',
-          `${measurePath}/clef${clefIndex}`,
-          [...measureJson, 'clefs', clefIndex],
-          reachable ? measureIndex : undefined,
-          positioned.staff ?? 1
-        );
+        // Any part, any staff, and any position: a mid-measure clef is
+        // addressed by the onset it takes effect at (spec/clef-changes).
+        out.push({
+          kind: 'clef',
+          path: `${measurePath}/clef${clefIndex}`,
+          jsonPath: [...measureJson, 'clefs', clefIndex],
+          measureIndex,
+          staffIndex: positioned.staff ?? 1,
+          onset: positioned.position?.fraction ?? [0, 1]
+        });
       }
       for (const [dynamicIndex, dynamic] of (measure.dynamics ?? []).entries())
         pushPositioned(
@@ -645,10 +683,15 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
           partIndex === 0 ? measureIndex : undefined,
           direction.position?.fraction
         );
-      for (const [ottavaIndex] of (measure.ottavas ?? []).entries())
-        push(out, 'ottava', `${measurePath}/ottava${ottavaIndex}`, [
-          ...measureJson, 'ottavas', ottavaIndex
-        ]);
+      for (const [ottavaIndex, ottava] of (measure.ottavas ?? []).entries())
+        pushPositioned(
+          out,
+          'ottava',
+          `${measurePath}/ottava${ottavaIndex}`,
+          [...measureJson, 'ottavas', ottavaIndex],
+          partIndex === 0 ? measureIndex : undefined,
+          ottava.position?.fraction
+        );
       if ((measure as unknown as Record<string, unknown>).measureRepeat !== undefined)
         pushAtMeasure(
           out,
@@ -666,12 +709,22 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
           const voice = (voices.get(staff) ?? -1) + 1;
           voices.set(staff, voice);
           for (const [eventIndex, item] of (sequence.content ?? []).entries()) {
-            if (!isTimedEvent(item)) continue;
-            const event = item as { id?: string; notes?: unknown[] };
-            if (!event.id || event.id !== beam.events?.[0]) continue;
-            const note = (event.notes ?? [])[0];
-            if (!note) return undefined;
-            return noteKeyAt(note as never, measureIndex, voice, eventIndex, 0, undefined, partIndex, staff);
+            // A beamed run can start inside a grace container (campaign
+            // item 11b made those notes addressable), so look there too.
+            const inner = (item as { content?: unknown[] }).content;
+            const candidates: [unknown, number | undefined][] = Array.isArray(inner)
+              ? inner.map((event, containerIndex) => [event, containerIndex])
+              : [[item, undefined]];
+            for (const [candidate, containerIndex] of candidates) {
+              if (!isTimedEvent(candidate as never)) continue;
+              const event = candidate as { id?: string; notes?: unknown[] };
+              if (!event.id || event.id !== beam.events?.[0]) continue;
+              const note = (event.notes ?? [])[0];
+              if (!note) return undefined;
+              return noteKeyAt(
+                note as never, measureIndex, voice, eventIndex, 0, containerIndex, partIndex, staff
+              );
+            }
           }
         }
         return undefined;
@@ -712,7 +765,10 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
                   partIndex, sequence.staff ?? 1
                 )
             : null,
-          sequenceIndex
+          sequenceIndex,
+          addressable
+            ? (eventIndex, kitIndex) => kitNoteKey(measureIndex, voiceIndex, eventIndex, kitIndex, partIndex)
+            : undefined
         );
       });
     });
