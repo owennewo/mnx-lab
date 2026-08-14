@@ -23,6 +23,8 @@ import {
   addOnsets,
   buildGrid,
   clampCursor,
+  coincidentSlots,
+  cycleSlot,
   initialCursor,
   itemSpan,
   moveLine,
@@ -705,6 +707,12 @@ export class EditorSession {
     return true;
   }
 
+  /** How many notes share the cursor's moment and line — more than one means
+   *  the address is ambiguous and `cycleSlot` has somewhere to go. */
+  get coincidentCount(): number {
+    return coincidentSlots(this.grid, this.cursorState, this.activeProjection).length;
+  }
+
   /** The armed spanner anchor, for the HUD and the ops panel. */
   get spanAnchor(): string | null {
     return this.spanAnchorKey;
@@ -784,6 +792,12 @@ export class EditorSession {
       case 'goToMeasure':
         this.cursorState = moveToMeasure(this.grid, before, intent.measureIndex);
         break;
+      case 'cycleSlot': {
+        const next = cycleSlot(this.grid, before, this.activeProjection);
+        if (next === before) return false; // nothing coincident to step to
+        this.cursorState = next;
+        return true;
+      }
       case 'setProjection': {
         if (intent.projection === this.activeProjection) return false;
         // A doc with no fingerboard has no tab projection to switch to.

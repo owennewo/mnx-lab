@@ -110,6 +110,27 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
+- **2026-08-14 — the addressing layer, in two moves; and a number I had wrong.**
+  [core-note-address.md](core-note-address.md): one enumeration produces note
+  coordinates (`model/noteWalk.ts`, with a corpus-wide join proving the renderer
+  agrees), and the cursor gains the discriminator its address was missing
+  (`slotIndex`, stepped by `Alt+V`).
+  - **Move 1 is what makes 11b safe**: container descent is now one function's
+    business instead of five walks kept in lockstep by care, and the join says
+    whether they moved together. Goldens byte-identical — the proof it changed
+    nothing.
+  - **Move 2 closes a correctness hole, not a backlog.** `slotAt` used to return
+    whichever coincident note came first, so Delete could act on a neighbour.
+    Fixed. But measuring the corpus corrected my own claim that this would
+    retire item 2's 162 findings: **154 of them have no key at all** — 100 in
+    second parts, 32 in containers, 22 on staff 2 — and only **7** were
+    navigation failures, of which coincidence explained one. The mass is the
+    `parts[0]`/staff-1 assumption, i.e. items 13b and 11b.
+  - **The lesson for the campaign's own bookkeeping**: a finding's *count* and
+    its *cause* are different questions, and the report answers the first. When
+    an item is chosen because a number is big, check what the number is made of
+    before promising the number will move.
+
 - **2026-08-14 — item 12 built: text entry, and the mode was not needed.**
   Syllables (`setSyllable`/`removeSyllable`) and verse metadata
   (`setLyricLine`/`removeLyricLine`), behind `Shift+L`.

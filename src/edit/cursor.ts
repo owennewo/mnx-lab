@@ -74,6 +74,22 @@ export interface EditorCursor {
   /** Vertical line: a string number in 'string' mode (1 = top), else an
    *  index into the position's note stack (0 = top). */
   line: number;
+  /**
+   * Which of the COINCIDENT notes at (onset × line) the cursor means — the
+   * discriminator that (measure, onset, line) alone cannot carry.
+   *
+   * More than one note can share a moment and a line: two voices on one string
+   * or staff position, two chord members the tab derivation puts on one string,
+   * a grace note sharing its host's onset. Before this, `slotAt` took whichever
+   * came first, so those notes were unreachable and Delete could act on a
+   * neighbour — three separate campaign findings with one cause
+   * (roadmap/inprogress/core-note-address.md, move 2).
+   *
+   * Absent means "the first one", so every cursor written before this stays
+   * valid, and every MOVE drops it: a different line has a different set of
+   * coincident notes, so carrying an ordinal across would be meaningless.
+   */
+  slotIndex?: number;
 }
 
 /** The whole navigable surface of a document, rebuilt after every edit. */
@@ -303,11 +319,37 @@ export function slotAt(
   cursor: EditorCursor,
   projection: Projection
 ): NoteSlot | undefined {
+  const coincident = coincidentSlots(grid, cursor, projection);
+  return coincident[cursor.slotIndex ?? 0];
+}
+
+/**
+ * Every note sharing this moment and line, in the grid's visual order. Usually
+ * one; when it is more, the cursor's `slotIndex` says which — and the fact that
+ * there IS more than one is what the cycle key exists to reveal.
+ */
+export function coincidentSlots(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  projection: Projection
+): NoteSlot[] {
   const position = positionAt(grid, cursor);
-  if (!position || position.slots.length === 0) return undefined;
-  if (projection === 'tab' && grid.mode === 'string')
-    return position.slots.find(s => s.line === cursor.line);
-  return position.slots.find(s => s.staffPosition === cursor.line);
+  if (!position || position.slots.length === 0) return [];
+  return projection === 'tab' && grid.mode === 'string'
+    ? position.slots.filter(s => s.line === cursor.line)
+    : position.slots.filter(s => s.staffPosition === cursor.line);
+}
+
+/** Step to the next note sharing this moment and line, wrapping. Returns the
+ *  same cursor when there is nothing to disambiguate. */
+export function cycleSlot(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  projection: Projection
+): EditorCursor {
+  const count = coincidentSlots(grid, cursor, projection).length;
+  if (count < 2) return cursor;
+  return { ...cursor, slotIndex: ((cursor.slotIndex ?? 0) + 1) % count };
 }
 
 /**
@@ -408,8 +450,8 @@ export function moveLine(
 ): EditorCursor {
   if (projection === 'tab' && grid.mode === 'string') {
     const next = Math.min(Math.max(cursor.line + delta, 1), grid.lineCount);
-    return { ...cursor, line: next };
+    return { measureIndex: cursor.measureIndex, onset: cursor.onset, line: next };
   }
   const next = Math.min(Math.max(cursor.line - delta, -STAFF_POSITION_RANGE), STAFF_POSITION_RANGE);
-  return { ...cursor, line: next };
+  return { measureIndex: cursor.measureIndex, onset: cursor.onset, line: next };
 }

@@ -196,6 +196,14 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: { note: 'tie to the same pitch in the next event (toggles)' }
   },
   {
+    keys: 'Alt+V',
+    strokes: [{ code: 'KeyV', alt: true }],
+    group: 'navigation',
+    meaning: {
+      all: 'step between notes sharing this beat and line (a second voice, a chord member on the same string)'
+    }
+  },
+  {
     keys: 'B',
     strokes: [{ code: 'KeyB' }],
     group: 'adornments',

@@ -15,7 +15,7 @@
 //                    that one, because the gap between the two IS the report
 //                    (roadmap/inprogress/core-element-ops-destruct-sweep.md).
 import type { MnxStructure } from '../model/mnx.ts';
-import { forEachKeyedNote, onsetsEqual, slotAt } from './cursor.ts';
+import { coincidentSlots, forEachKeyedNote, onsetsEqual, slotAt } from './cursor.ts';
 import { ELEMENT_KINDS, type ElementKind, type ElementRef } from './elementWalk.ts';
 import type { EditorIntent } from './intents.ts';
 import type { MeasureAttributeKind, PartDeclarationKind } from './ops.ts';
@@ -221,7 +221,18 @@ function driveWithinProjection(session: EditorSession, key: string): boolean {
       type: session.cursor.line > line === (session.projection === 'tab') ? 'lineUp' : 'lineDown'
     });
   }
-  return slotAt(session.positions, session.cursor, session.projection)?.noteKey === key;
+  if (slotAt(session.positions, session.cursor, session.projection)?.noteKey === key) return true;
+
+  // Coincidence: several notes can share this moment and line (two voices on
+  // one string, two chord members the derivation stacks there). The cursor
+  // carries a discriminator for exactly this, so step through them — the same
+  // `Alt+V` a player would press (core-note-address.md move 2).
+  const coincident = coincidentSlots(session.positions, session.cursor, session.projection).length;
+  for (let step = 1; step < coincident; step++) {
+    if (!session.handleIntent({ type: 'cycleSlot' })) break;
+    if (slotAt(session.positions, session.cursor, session.projection)?.noteKey === key) return true;
+  }
+  return false;
 }
 
 export interface DestructResult {

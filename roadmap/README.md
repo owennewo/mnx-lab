@@ -257,9 +257,14 @@ proposals that name their campaign.
   the agreement over all 106 scenarios (every synthesized key the renderer stamps
   must be one the walk produced; the walk must produce no duplicates — a
   duplicate being the container collision in miniature). Goldens byte-identical,
-  which is the proof it changed nothing. **Move 2 stays open**: the cursor
-  address `{measure, onset, line}` is the same shortcut one level up, and its
-  discriminator would retire three separate campaign findings at once.
+  which is the proof it changed nothing. **Move 2 followed the same day**: the
+  cursor address `{measure, onset, line}` was the same shortcut one level up, so
+  `EditorCursor` gained a `slotIndex` and `Alt+V` steps between notes sharing a
+  moment and a line — closing the hole that let the editor act on a *neighbour*.
+  Measuring it also corrected an over-attribution: of 161 unaddressable notes only
+  **7** are navigation failures, while **154 have no key at all** (100 in second
+  parts, 32 in containers, 22 on staff 2) — the `parts[0]`/staff-1 assumption,
+  which is items 13b and 11b, not coincidence.
 - **[core-element-ops-lyrics.md](inprogress/core-element-ops-lyrics.md)** —
   campaign item 12, **built 2026-08-14**: syllables and verse metadata, and the
   index's proposed "text *mode* that suspends the keymap" is **rejected** — a

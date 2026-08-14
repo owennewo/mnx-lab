@@ -50,14 +50,45 @@ descends, every consumer descends with it, and the nested key form
 (`@m0.v0.e2.c1.n0`) stays inside this module rather than becoming a contract
 five files have to honour. The join then says whether they moved together.
 
-## Move 2, still open
+## Move 2 — the cursor discriminator (built 2026-08-14)
 
-The other collision is the **cursor address**: `{measure, onset, line}` assumes
-at most one thing per moment × line, and the campaign has hit that three times —
-two voices on one string (item 2, 162 unaddressable notes), two chord members
-derived onto one string (item 10), and a grace note sharing its host's onset
-(item 11b). The grid already knows the answer — `NoteSlot` carries
-`voiceIndex`/`eventIndex`/`noteIndex` — so the fix is a discriminator on the
-cursor, not a longer key. One mechanism retires all three findings, and it
-belongs with [core-selection-ladder.md](core-selection-ladder.md)'s per-level
-pass.
+`EditorCursor` gains `slotIndex?`, `slotAt` resolves through it, and `Alt+V`
+steps between notes sharing a moment and a line. Every cursor move drops the
+ordinal (a different line has a different set of coincident notes), and absent
+means "the first", so every cursor written before this stays valid — the
+edit-trace fixtures did not move.
+
+**What it fixes: the class, not the count.** Before, `slotAt` returned whichever
+coincident note came first, so the editor could act on a *neighbour* — the
+wrong-note deletion item 2 caught. Now the address is complete, the sweep cycles
+the same way a player would, and the keyboard can reach the second voice on a
+shared string.
+
+**But the corpus's unaddressable mass has a different cause, and I had
+over-attributed it.** Measured directly, of 161 unaddressable notes:
+
+| cause | notes | whose problem |
+|---|---|---|
+| no key at all — a second part | 100 | item 13b |
+| no key at all — container content | 32 | item 11b |
+| no key at all — staff 2 / non-entry sequence | 22 | item 13b |
+| had a key, navigation failed | **7** | this, and the ladder's per-level pass |
+
+So move 2 rescued **one** note in the corpus and closed the correctness hole
+that produced the finding. The 154 are the ops layer refusing to *name* those
+notes, which no amount of cursor work reaches — it is the `parts[0]`/staff-1
+assumption, and it is exactly what items 11b and 13b are for. Seven navigation
+failures remain unexplained and belong with the ladder pass.
+
+The earlier claim that move 2 would "retire item 2's 162 findings" was wrong in
+magnitude: it retires their *cause* where coincidence was the cause, which the
+corpus turns out to contain barely at all.
+
+## What is still open
+
+**Container descent** (item 11b) is now one function's business, and **the
+`parts[0]` assumption** (item 13b) is the single biggest remaining cause of
+unaddressable ink at 122 notes. The seven unexplained navigation failures want a
+look during [core-selection-ladder.md](core-selection-ladder.md)'s per-level
+pass, which also owns whether `Alt+V` is the right key for stepping coincident
+notes or whether it should fall out of the ladder's vertical axis.

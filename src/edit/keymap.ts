@@ -82,6 +82,10 @@ export const EDIT_LAYER: KeymapLayer = {
     { code: 'Equal', intent: { type: 'longerDuration' } },
     // Tie: `T` (Dorico/MuseScore convention; free in this scheme — the
     // technique alphabet B H S V X O doesn't claim it).
+    // The coincidence discriminator (core-note-address.md move 2). Alt, not a
+    // bare letter: it is a NAVIGATION step, and the bare letters belong to the
+    // adornment/technique dialects in both panes.
+    { code: 'KeyV', alt: true, intent: { type: 'cycleSlot' } },
     { code: 'KeyT', intent: { type: 'toggleTie' } },
     // Spanners (campaign item 10). `S` is ONE key with two meanings, chosen by
     // the active projection — slur in notation, slide in tab (item 9's

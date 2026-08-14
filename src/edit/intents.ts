@@ -34,6 +34,10 @@ export type NavigationIntent =
   /** The active projection: which SPACE the vertical line addresses (string
    *  vs staff position). Recorded so traces replay navigation faithfully. */
   | { type: 'setProjection'; projection: 'notation' | 'tab' }
+  // The coincidence discriminator (core-note-address.md move 2): step between
+  // notes that share this moment and line — voices, chord members the tab
+  // derivation stacks on one string, and later grace notes.
+  | { type: 'cycleSlot' }
   /** The Ctrl climb (selection-ladder navigation map): the direction applied
    *  at the nearest ancestor rung where it means something different, then
    *  descend back. At note level: ←→ = bar jump (notation) / event-skip
@@ -134,6 +138,7 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'relaxSelection',
   'tightenSelection',
   'setProjection',
+  'cycleSlot',
   'jumpNext',
   'jumpPrev',
   'jumpUp',
