@@ -404,6 +404,49 @@ export class EditorSession {
         this.spanAnchorKey = this.spanAnchorKey === slot.noteKey ? null : slot.noteKey;
         return true;
       }
+      case 'setSyllable':
+      case 'removeSyllable': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        const before = JSON.stringify(this.doc);
+        this.apply(
+          intent.type === 'setSyllable'
+            ? {
+                type: 'setSyllable',
+                noteKey: slot.noteKey,
+                line: intent.line,
+                text: intent.text,
+                ...(intent.syllableType ? { syllableType: intent.syllableType } : {})
+              }
+            : { type: 'removeSyllable', noteKey: slot.noteKey, line: intent.line }
+        );
+        if (JSON.stringify(this.doc) === before) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
+      case 'setLyricLine':
+      case 'removeLyricLine': {
+        const before = JSON.stringify(this.doc);
+        this.apply(
+          intent.type === 'setLyricLine'
+            ? {
+                type: 'setLyricLine',
+                line: intent.line,
+                ...(intent.label !== undefined ? { label: intent.label } : {}),
+                ...(intent.lang !== undefined ? { lang: intent.lang } : {})
+              }
+            : { type: 'removeLyricLine', line: intent.line }
+        );
+        if (JSON.stringify(this.doc) === before) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
       case 'toggleTechnique': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;

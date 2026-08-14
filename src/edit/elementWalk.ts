@@ -86,7 +86,12 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['setSlur'],
     remove: ['removeSlur']
   },
-  lyric: { classes: ['lyric', 'lyric-hyphen'], note: 'One syllable of one line under an event.' },
+  lyric: {
+    classes: ['lyric', 'lyric-hyphen'],
+    note: 'One syllable of one line under an event.',
+    construct: ['setSyllable'],
+    remove: ['removeSyllable']
+  },
   articulation: {
     classes: ['articulation', 'tremolo'],
     note: 'One event marking (accent, staccato, single-note tremolo…).',
@@ -269,7 +274,12 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     classes: ['multirest-bar', 'multirest-cap', 'multirest-count'],
     note: 'A collapsed measure range inside a score.'
   },
-  'lyric-line-metadata': { classes: [], note: 'A lyric line’s label/language (drawn as lyric ink).' },
+  'lyric-line-metadata': {
+    classes: [],
+    note: 'A lyric line’s label/language (drawn as lyric ink).',
+    construct: ['setLyricLine'],
+    remove: ['removeLyricLine']
+  },
   sound: { classes: [], note: 'A named sound the kit maps onto; audio only, never drawn.' }
 };
 
@@ -448,7 +458,13 @@ function walkEvent(
   for (const line of Object.keys(
     (event.lyrics as { lines?: Record<string, unknown> } | undefined)?.lines ?? {}
   ))
-    push(out, 'lyric', `${path}/lyric/${line}`, [...jsonPath, 'lyrics', 'lines', line]);
+    pushOnNote(
+      out,
+      'lyric',
+      `${path}/lyric/${line}`,
+      [...jsonPath, 'lyrics', 'lines', line],
+      keyOf?.(0, notes[0] ?? {})
+    );
   for (const marking of Object.keys((event.markings ?? {}) as Record<string, unknown>))
     pushOnNote(
       out,

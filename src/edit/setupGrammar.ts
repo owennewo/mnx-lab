@@ -384,3 +384,63 @@ function resolveMarking(word: string): string | null {
   const aliased = MARKING_ALIASES[lower] ?? word;
   return MARKING_WORDS.find(m => m.toLowerCase() === aliased.toLowerCase()) ?? null;
 }
+
+// ---------------------------------------------------------------------------
+// Lyrics (campaign item 12, roadmap/inprogress/core-element-ops-lyrics.md).
+// Text entry is a MODE in most editors; here it is the same typed popover the
+// rest of the campaign uses, because a syllable is one short string attached to
+// one note — and the popover already knows how to be a text field.
+
+export const LYRIC_HELP =
+  'sleep- · -ing · 2: Am · line 2 Nederlands nl · no lyric · no line 2';
+
+export type LyricResult =
+  | { syllable: string; line: string; syllableType?: 'start' | 'middle' | 'end' | 'whole' }
+  | { removeSyllable: string }
+  | { line: string; label?: string; lang?: string }
+  | { removeLine: string }
+  | null;
+
+export function parseLyric(text: string): LyricResult {
+  const trimmed = text.trim().replace(/\s+/g, ' ');
+  if (trimmed === '') return null;
+  const words = trimmed.split(' ');
+  const head = words[0].toLowerCase();
+
+  if (head === 'no') {
+    const target = (words[1] ?? '').toLowerCase();
+    if (target === 'line') return words[2] ? { removeLine: words[2] } : null;
+    if (target === 'lyric') return { removeSyllable: words[2] ?? '1' };
+    return null;
+  }
+
+  // `line 2 Nederlands nl` — declare a verse's label and language.
+  if (head === 'line') {
+    const line = words[1];
+    if (!line) return null;
+    const rest = words.slice(2);
+    // A trailing 2-3 letter token is a language code, else it is all label.
+    const lang = rest.length > 1 && /^[a-z]{2,3}$/.test(rest[rest.length - 1])
+      ? rest.pop()
+      : undefined;
+    return {
+      line,
+      ...(rest.length > 0 ? { label: rest.join(' ') } : {}),
+      ...(lang ? { lang } : {})
+    };
+  }
+
+  // `2: Am` — an explicit verse number, else verse 1.
+  const numbered = /^(\d+):\s*(.+)$/.exec(trimmed);
+  const line = numbered ? numbered[1] : '1';
+  const raw = numbered ? numbered[2] : trimmed;
+
+  // Hyphens carry the syllable's role, the way a singer writes it:
+  // `sleep-` starts a word, `-ing` ends one, `-ly-` continues.
+  const leading = raw.startsWith('-');
+  const trailing = raw.endsWith('-');
+  const body = raw.replace(/^-/, '').replace(/-$/, '');
+  if (body === '') return null;
+  const syllableType = trailing && leading ? 'middle' : trailing ? 'start' : leading ? 'end' : undefined;
+  return { syllable: body, line, ...(syllableType ? { syllableType } : {}) };
+}

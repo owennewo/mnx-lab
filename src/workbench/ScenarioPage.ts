@@ -33,6 +33,8 @@ import {
 } from '../edit/keymap.ts';
 import {
   ADORNMENT_HELP,
+  LYRIC_HELP,
+  parseLyric,
   parsePartDeclaration,
   BAR_ATTRIBUTE_HELP,
   parseAdornment,
@@ -52,7 +54,7 @@ import '../elements/ScoreViewer.ts';
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
-type PopoverKind = 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar' | 'adornment';
+type PopoverKind = 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar' | 'adornment' | 'lyric';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
   time: {
@@ -80,6 +82,11 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
     placeholder: 'C · Bb · F# · -3 · inherit',
     hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
   },
+  lyric: {
+    label: 'lyric',
+    placeholder: 'sleep- · -ing · 2: Am · line 2 Nederlands nl',
+    hint: 'a syllable at the cursor’s note; trailing/leading “-” joins a word · “no lyric” strips · Enter applies'
+  },
   adornment: {
     label: 'adornment',
     placeholder: 'accent · staccato · mf · text Play 8x',
@@ -99,7 +106,8 @@ const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   clefPopover: 'clef',
   keySignaturePopover: 'key',
   barAttributePopover: 'bar',
-  adornmentPopover: 'adornment'
+  adornmentPopover: 'adornment',
+  lyricPopover: 'lyric'
 };
 
 import './ScoreHud.ts';
@@ -1021,6 +1029,31 @@ export class ScenarioPage extends LitElement {
               ...(clef.octave ? { octave: clef.octave } : {})
             }
       );
+    } else if (this.setupPopover === 'lyric') {
+      const parsed = parseLyric(input.value);
+      if (!parsed) {
+        this.setupPopoverError = `not a lyric — ${LYRIC_HELP}`;
+        return;
+      }
+      this.stripIntent(
+        'syllable' in parsed
+          ? {
+              type: 'setSyllable',
+              line: parsed.line,
+              text: parsed.syllable,
+              ...(parsed.syllableType ? { syllableType: parsed.syllableType } : {})
+            }
+          : 'removeSyllable' in parsed
+            ? { type: 'removeSyllable', line: parsed.removeSyllable }
+            : 'removeLine' in parsed
+              ? { type: 'removeLyricLine', line: parsed.removeLine }
+              : {
+                  type: 'setLyricLine',
+                  line: parsed.line,
+                  ...(parsed.label !== undefined ? { label: parsed.label } : {}),
+                  ...(parsed.lang !== undefined ? { lang: parsed.lang } : {})
+                }
+      );
     } else if (this.setupPopover === 'adornment') {
       const parsed = parseAdornment(input.value);
       if (!parsed) {
@@ -1457,6 +1490,7 @@ export class ScenarioPage extends LitElement {
           <button @click=${() => this.openPopover('keySignaturePopover')}>key…</button>
           <button @click=${() => this.openPopover('barAttributePopover')}>bar…</button>
           <button @click=${() => this.openPopover('adornmentPopover')}>adorn…</button>
+          <button @click=${() => this.openPopover('lyricPopover')}>lyric…</button>
         </div>
         <div class="action-state">
           entry duration: ${this.session.entryDurationBase}

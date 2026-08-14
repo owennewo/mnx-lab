@@ -32,6 +32,7 @@ const SURFACE_LABELS: Record<string, string> = {
   keySignaturePopover: 'Shift+K · popover',
   barAttributePopover: 'Shift+B · popover',
   adornmentPopover: 'Shift+A · popover',
+  lyricPopover: 'Shift+L · popover',
   commandPalette: 'Ctrl+K · palette',
   goTo: 'Ctrl+G · go-to',
   viewSwitcher: 'view tabs'
@@ -144,6 +145,14 @@ function opLabel(op: EditOp): string {
       return `remove slur at ${op.noteKey}`;
     case 'setTieVariant':
       return `tie ${op.lv ? 'l.v.' : (op.targetType ?? 'variant')} · ${op.noteId}`;
+    case 'setSyllable':
+      return `lyric ${op.line}: “${op.text}” · ${op.noteKey}`;
+    case 'removeSyllable':
+      return `no lyric ${op.line} · ${op.noteKey}`;
+    case 'setLyricLine':
+      return `lyric line ${op.line}${op.label ? ` “${op.label}”` : ''}`;
+    case 'removeLyricLine':
+      return `no lyric line ${op.line}`;
     case 'setTechnique':
       return `${op.technique.kind} · ${op.noteKey}`;
     case 'removeTechnique':

@@ -138,6 +138,7 @@ export type ShellAction =
   | 'keySignaturePopover'
   | 'barAttributePopover'
   | 'adornmentPopover'
+  | 'lyricPopover'
   | 'commandPalette'
   | 'goTo'
   | 'toggleRail';
@@ -162,6 +163,9 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // dynamics and directions — single-letter accelerators are a later
   // pass, since keys are the unstable layer and the ops are not.
   { code: 'KeyA', shift: true, action: 'adornmentPopover' },
+  // Lyrics (campaign item 12): text entry as a popover, not a mode —
+  // a syllable is one short string attached to one note.
+  { code: 'KeyL', shift: true, action: 'lyricPopover' },
   // The palette (survey §8.5: Ctrl+K — Dorico's Jump Bar, GP's Cmd+E) and
   // go-to (§3.8: Ctrl+G + typed grammar) are ONE widget, two entry points:
   // Ctrl+K prefills the `>` command prefix, Ctrl+G opens bare (go-to).

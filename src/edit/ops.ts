@@ -224,6 +224,13 @@ export type EditOp =
       targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump';
       lv?: boolean;
     }
+  // Lyrics (campaign item 12, roadmap/inprogress/core-element-ops-lyrics.md).
+  // A syllable is a key on the EVENT's lyric line; the line's metadata is a
+  // key on the document. Two owners, so two pairs — item 7's test.
+  | { type: 'setSyllable'; noteKey: string; line: string; text: string; syllableType?: 'start' | 'middle' | 'end' | 'whole' }
+  | { type: 'removeSyllable'; noteKey: string; line: string }
+  | { type: 'setLyricLine'; line: string; label?: string; lang?: string }
+  | { type: 'removeLyricLine'; line: string }
   // Tab technique + fingering (campaign item 9,
   // roadmap/inprogress/core-element-ops-technique.md). Both live under the
   // note's vendor block; technique is the ENTRY side of
@@ -724,6 +731,48 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const existing = note.ties?.[0];
       if (!existing) return next;
       if (op.targetType) existing.targetType = op.targetType;
+      return next;
+    }
+    case 'setSyllable': {
+      const located = findKeyedNote(next, op.noteKey);
+      if (!located) return next;
+      const event = located.seq.content[located.eventIndex] as MnxEvent;
+      const lines = ((event.lyrics ??= {}).lines ??= {});
+      lines[op.line] = {
+        text: op.text,
+        ...(op.syllableType ? { type: op.syllableType } : {})
+      };
+      return next;
+    }
+    case 'removeSyllable': {
+      const located = findKeyedNote(next, op.noteKey);
+      if (!located) return next;
+      const event = located.seq.content[located.eventIndex] as MnxEvent;
+      const lines = event.lyrics?.lines;
+      if (!lines?.[op.line]) return next;
+      delete lines[op.line];
+      // No tombstones: the emptied line map and its wrapper go too.
+      if (Object.keys(lines).length === 0) delete event.lyrics;
+      return next;
+    }
+    case 'setLyricLine': {
+      const lyrics = ((next.global as { lyrics?: MnxStructure['global']['lyrics'] }).lyrics ??= {});
+      const metadata = (lyrics.lineMetadata ??= {});
+      metadata[op.line] = {
+        ...(op.label !== undefined ? { label: op.label } : {}),
+        ...(op.lang !== undefined ? { lang: op.lang } : {})
+      };
+      return next;
+    }
+    case 'removeLyricLine': {
+      const lyrics = next.global?.lyrics;
+      if (!lyrics?.lineMetadata?.[op.line]) return next;
+      delete lyrics.lineMetadata[op.line];
+      // `lineOrder` is NOT touched: it is a separate declaration about the same
+      // line (where it sits), not part of the label. The sweep caught the first
+      // version reordering the verses as a side effect of renaming one.
+      if (Object.keys(lyrics.lineMetadata).length === 0) delete lyrics.lineMetadata;
+      if (Object.keys(lyrics).length === 0) delete next.global.lyrics;
       return next;
     }
     case 'setTechnique': {

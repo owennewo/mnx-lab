@@ -245,6 +245,18 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-lyrics.md](inprogress/core-element-ops-lyrics.md)** —
+  campaign item 12, **built 2026-08-14**: syllables and verse metadata, and the
+  index's proposed "text *mode* that suspends the keymap" is **rejected** — a
+  syllable is one short string attached to one note, and the campaign already has
+  a surface for typing one short string. The grammar borrows a singer's own
+  notation (`sleep-`, `-ing`, `-ly-` carry the syllable's role; `2: Am` picks the
+  verse; `line 2 Nederlands nl` names it). Two pairs, because a syllable belongs
+  to the event and a verse's identity to the document. The sweep caught a real
+  semantic error at once: the first `removeLyricLine` also pulled the line from
+  `lineOrder`, so removing a verse's *label* silently reordered the verses —
+  **sibling declarations are not cascades**. Reachable scenarios **78 → 82**,
+  removable elements **1022 → 1056**.
 - **[core-element-ops-technique.md](inprogress/core-element-ops-technique.md)** —
   campaign item 9, **built 2026-08-14**: the entry half of tab technique (bends as
   curves, slides, hammer-ons, pull-offs, vibrato, palm mute, harmonics) plus

@@ -94,6 +94,15 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
   // Measure-scoped attributes are addressed by navigating to their bar, then
   // fired with their own verb: the inherited pair reverts to the predecessor's
   // governance (item 5), the bar-attribute family simply strips (item 7).
+  // Document-level declarations need no navigation either: the document is the
+  // address. A lyric LINE is score-wide (its label and language), unlike the
+  // syllables that hang off notes.
+  if (element.kind === 'lyric-line-metadata') {
+    const line = element.path.split('/').pop()!;
+    const applied = session.handleIntent({ type: 'removeLyricLine', line });
+    return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
+  }
+
   // Part declarations live on parts[0] and need no navigation at all — the
   // part IS the address, which is why they attach at the score rung.
   const partKind = PART_DECLARATION_KINDS[element.kind];
@@ -147,7 +156,9 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
           ? ({ type: 'toggleBeam' } as const)
           : element.kind === 'articulation'
             ? ({ type: 'removeMarking', marking: element.path.split('/').pop()! } as const)
-            : element.kind === 'technique'
+            : element.kind === 'lyric'
+              ? ({ type: 'removeSyllable', line: element.path.split('/').pop()! } as const)
+              : element.kind === 'technique'
               ? ({ type: 'toggleTechnique', kind: element.path.split('/').pop() } as never)
               : element.kind === 'fingering'
                 ? ({ type: 'removeFingering' } as const)

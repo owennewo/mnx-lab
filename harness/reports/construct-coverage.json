@@ -3,17 +3,15 @@
   "summary": {
     "scenarios": 106,
     "traced": 5,
-    "opsReachable": 73,
-    "blocked": 23,
+    "opsReachable": 77,
+    "blocked": 19,
     "expectedUnreachable": 5
   },
   "blockingKinds": {
     "layout": 6,
     "score": 6,
     "grace": 4,
-    "lyric": 4,
     "accidental-display": 3,
-    "lyric-line-metadata": 2,
     "space": 2,
     "tuplet": 2,
     "kit-component": 1,
@@ -71,11 +69,7 @@
       ]
     },
     "lab/lyrics/verse-labels": {
-      "tier": "blocked",
-      "blockedBy": [
-        "lyric",
-        "lyric-line-metadata"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/navigation/jumps-and-signs": {
       "tier": "ops-reachable"
@@ -284,23 +278,13 @@
       "tier": "ops-reachable"
     },
     "spec/lyric-line-metadata": {
-      "tier": "blocked",
-      "blockedBy": [
-        "lyric",
-        "lyric-line-metadata"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/lyrics-basic": {
-      "tier": "blocked",
-      "blockedBy": [
-        "lyric"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/lyrics-multi-line": {
-      "tier": "blocked",
-      "blockedBy": [
-        "lyric"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/measure-repeats": {
       "tier": "ops-reachable"

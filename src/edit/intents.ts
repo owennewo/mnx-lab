@@ -96,6 +96,12 @@ export type MutationIntent =
   | { type: 'toggleBeam' }
   // Event adornments (campaign item 8): markings attach to the event under the
   // cursor, dynamics and directions to the cursor's MOMENT in the part.
+  // Lyrics (campaign item 12): a syllable at the cursor's note, and the
+  // document-level line it belongs to.
+  | { type: 'setSyllable'; line: string; text: string; syllableType?: 'start' | 'middle' | 'end' | 'whole' }
+  | { type: 'removeSyllable'; line: string }
+  | { type: 'setLyricLine'; line: string; label?: string; lang?: string }
+  | { type: 'removeLyricLine'; line: string }
   // Tab technique (campaign item 9): one toggle per technique, and `hammerPull`
   // is ONE intent — which of the pair you get is physics, not a choice.
   | { type: 'toggleTechnique'; kind: TechniqueChoice['kind'] | 'hammerPull' }

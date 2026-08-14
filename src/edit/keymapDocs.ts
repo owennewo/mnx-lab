@@ -279,6 +279,14 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
+    keys: 'Shift+L',
+    strokes: [{ code: 'KeyL', shift: true }],
+    group: 'setup',
+    meaning: {
+      all: 'lyric… (typed popover: `sleep-`, `-ing`, `2: Am`, `line 2 Nederlands nl`; `no lyric` strips)'
+    }
+  },
+  {
     keys: 'Shift+B',
     strokes: [{ code: 'KeyB', shift: true }],
     group: 'setup',
@@ -324,6 +332,12 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // token emits the removal intent (campaign item 5).
   clefPopover: ['setClef', 'removeClef'],
   keySignaturePopover: ['setKeySignature', 'removeKeySignature'],
+  lyricPopover: [
+    'setSyllable',
+    'removeSyllable',
+    'setLyricLine',
+    'removeLyricLine'
+  ],
   adornmentPopover: [
     'setMarking',
     'removeMarking',
