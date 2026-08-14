@@ -117,13 +117,26 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['setTechnique'],
     remove: ['removeTechnique']
   },
-  tuplet: { classes: ['tuplet-bracket', 'tuplet-number'], note: 'A time-modifying container.' },
+  tuplet: {
+    classes: ['tuplet-bracket', 'tuplet-number'],
+    note: 'A time-modifying container — removable only once it holds no ink, because unwrapping would re-time the music.',
+    remove: ['removeContainer']
+  },
   grace: {
     classes: ['grace-slash'],
-    note: 'An un-timed container. Its only ink of its own is the slash — the `grace` token merely sizes the notes it holds.'
+    note: 'An un-timed container. Its only ink of its own is the slash — the `grace` token merely sizes the notes it holds. Removable once those notes are gone.',
+    remove: ['removeContainer']
   },
-  tremolo: { classes: ['tremolo-beam'], note: 'A two-event tremolo container.' },
-  space: { classes: [], note: 'Authored silence that occupies a column but draws nothing.' },
+  tremolo: {
+    classes: ['tremolo-beam'],
+    note: 'A two-event tremolo container; removable once empty.',
+    remove: ['removeContainer']
+  },
+  space: {
+    classes: [],
+    note: 'Authored silence that occupies a column but draws nothing — it holds no ink, so it is removable outright.',
+    remove: ['removeContainer']
+  },
   'full-measure-rest': {
     classes: ['rest-full-measure'],
     note: 'A rest is absence (§8.11) — but DECLARING the whole bar rests is a choice.',
@@ -341,6 +354,9 @@ export interface ElementRef {
   onset?: [number, number];
   /** For per-staff attributes (a clef): which staff it governs. */
   staffIndex?: number;
+  /** For containers: where they sit in their sequence, since they are addressed
+   *  by position rather than through ink they may not hold. */
+  container?: { sequenceIndex: number; eventIndex: number };
   /** Where the element lives, for the surviving-document oracle. */
   jsonPath: (string | number)[];
 }
@@ -495,7 +511,9 @@ function walkContent(
   jsonPath: (string | number)[],
   keyOf:
     | ((eventIndex: number, noteIndex: number, note: Record<string, unknown>, containerIndex?: number) => string | undefined)
-    | null
+    | null,
+  /** Where this content lives, so containers can be addressed by position. */
+  sequenceIndex = 0
 ): void {
   (content ?? []).forEach((raw, index) => {
     const item = raw as Record<string, unknown>;
@@ -503,7 +521,12 @@ function walkContent(
     const itemJson = [...jsonPath, index];
     const type = item.type as string | undefined;
     if (type === 'tuplet' || type === 'grace' || type === 'tremolo' || type === 'space') {
-      push(out, type as ElementKind, itemPath, itemJson);
+      out.push({
+        kind: type as ElementKind,
+        path: itemPath,
+        jsonPath: itemJson,
+        container: { sequenceIndex, eventIndex: index }
+      });
       // Container content is addressable now (campaign item 11b): its notes
       // carry nested keys, so the walker hands them through with a keyOf that
       // knows the container index.
@@ -688,7 +711,8 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
                   note as never, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex,
                   partIndex, sequence.staff ?? 1
                 )
-            : null
+            : null,
+          sequenceIndex
         );
       });
     });

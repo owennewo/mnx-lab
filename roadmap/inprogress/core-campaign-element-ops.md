@@ -110,6 +110,24 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
+- **2026-08-14 — the wrap verbs: `refused` is the answer, and it is the right one.**
+  Containers (tuplet, grace, tremolo, space) get `removeContainer`, guarded by
+  the campaign's container rule for the third time: **removable only once it
+  holds no ink**.
+  - **Unwrapping was refused on purpose.** Keeping the notes and dropping the
+    ratio re-times the music — three eighths in the time of two become three
+    plain eighths and the bar overfills — and an editor may not reshape time as
+    a side effect of removing a bracket. Same argument as the time-signature
+    guard. So fifteen containers move `no-op` → **`refused`**: the verb exists
+    and declines. That is a different fact from "no verb exists", and the whole
+    point of the two-axis verdict is that the report can tell them apart.
+  - **`space` refuses for a different reason — and it is the same gap for the
+    third time.** A space holds no ink but IS time, and `itemSpan` counts it as
+    zero, so removal silently shortens the bar. It has now blocked the wrap
+    verb, the time-signature removal, and the rest-spelling attempt. **One small
+    fix closes all three**, and it deserves its own change rather than being
+    sneaked into an unrelated item.
+
 - **2026-08-14 — the presentation layer: removal without construction, on purpose.**
   `layout`, `score` and `multimeasure-rest` (26 elements) become removable;
   **corpus 1,389 → 1,415 of 1,460**.

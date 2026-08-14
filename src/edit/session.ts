@@ -541,6 +541,22 @@ export class EditorSession {
         }
         return true;
       }
+      case 'removeContainer': {
+        const before_ = JSON.stringify(this.doc);
+        this.apply({
+          type: 'removeContainer',
+          measureIndex: this.cursorState.measureIndex,
+          sequenceIndex: intent.sequenceIndex,
+          eventIndex: intent.eventIndex,
+          partIndex: this.cursorState.partIndex ?? 0
+        });
+        if (JSON.stringify(this.doc) === before_) {
+          this.history.undo();
+          this.reindex();
+          return false; // holds ink: refused, not silently ignored
+        }
+        return true;
+      }
       case 'removeLayout':
       case 'removeScore':
       case 'removeMultimeasureRest': {

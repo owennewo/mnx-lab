@@ -134,6 +134,33 @@ Still `no-op`, honestly: the container *elements* themselves (tuplet, grace,
 tremolo) have no wrap verb yet. That is now an ordinary op-family item with
 nothing structural riding on it — the point of doing the addressing first.
 
+## The wrap verbs, and what they decided (2026-08-14)
+
+The containers get their removal verb, and the semantics is the interesting
+part: **a container is removable only once it holds no ink** — the campaign's
+container rule, third application after measures and parts.
+
+**Unwrapping is the tempting reading and it is refused.** "Remove the tuplet"
+usually means keep the notes and drop the ratio — but three eighths written in
+the time of two become three plain eighths, and the bar overfills. An editor may
+not reshape time as a side effect of removing a bracket. That is the same
+argument that refused a time-signature removal which would have reshaped bars,
+and it is why the fifteen containers now report **`refused`** rather than
+`no-op`: the verb exists and declines, which is a different fact and the report
+distinguishes them.
+
+Their route to removability is the one the campaign already has: delete the ink
+first, then the empty container goes — exactly as an emptied bar and an emptied
+part do.
+
+**`space` refuses for a different reason, and it is the third sighting of one
+gap.** A space holds no ink but IS time, and `itemSpan` still counts it as zero,
+so removing one silently shortens the bar and the renderer says so
+(`spec/tie-targets`: diagnostics 0 → 2). It has now surfaced three times — here,
+in the time-signature removal, and in the rest-spelling attempt. **That span is
+the single fix that would close all three**, and it is small; it is left
+deliberate rather than sneaked into an unrelated item.
+
 ## Scope boundary
 
 Unchanged: the grid still skips non-timed items, so tuplet, grace and tremolo

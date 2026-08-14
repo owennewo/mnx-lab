@@ -5,8 +5,8 @@
     "elements": 1460,
     "verdicts": {
       "removed": 1415,
-      "no-op": 41,
-      "refused": 4
+      "no-op": 26,
+      "refused": 19
     },
     "unaddressableWithAnOp": 12
   },
@@ -50,7 +50,7 @@
       "removed": 2
     },
     "grace": {
-      "no-op": 6
+      "refused": 6
     },
     "jump": {
       "removed": 4
@@ -114,7 +114,7 @@
       "no-op": 1
     },
     "space": {
-      "no-op": 2
+      "refused": 2
     },
     "staff-kind": {
       "removed": 20
@@ -142,10 +142,10 @@
       "refused": 4
     },
     "tremolo": {
-      "no-op": 3
+      "refused": 3
     },
     "tuplet": {
-      "no-op": 4
+      "refused": 4
     }
   },
   "scenarios": {
@@ -446,7 +446,7 @@
         "removed": 1
       },
       "grace": {
-        "no-op": 1
+        "refused": 1
       },
       "note": {
         "removed": 3
@@ -469,7 +469,7 @@
         "removed": 1
       },
       "space": {
-        "no-op": 1
+        "refused": 1
       },
       "time-signature": {
         "removed": 1
@@ -489,7 +489,7 @@
         "removed": 1
       },
       "tuplet": {
-        "no-op": 1
+        "refused": 1
       }
     },
     "lab/score-text/directions": {
@@ -1221,7 +1221,7 @@
         "removed": 1
       },
       "grace": {
-        "no-op": 1
+        "refused": 1
       },
       "note": {
         "removed": 5
@@ -1328,7 +1328,7 @@
         "removed": 1
       },
       "grace": {
-        "no-op": 1
+        "refused": 1
       },
       "note": {
         "removed": 2
@@ -1345,7 +1345,7 @@
         "removed": 1
       },
       "grace": {
-        "no-op": 3
+        "refused": 3
       },
       "note": {
         "removed": 13
@@ -1854,7 +1854,7 @@
         "removed": 1
       },
       "space": {
-        "no-op": 1
+        "refused": 1
       },
       "tie": {
         "removed": 9
@@ -1914,7 +1914,7 @@
         "removed": 1
       },
       "tremolo": {
-        "no-op": 3
+        "refused": 3
       }
     },
     "spec/tuplets": {
@@ -1931,7 +1931,7 @@
         "removed": 1
       },
       "tuplet": {
-        "no-op": 3
+        "refused": 3
       }
     },
     "spec/two-bar-c-major-scale": {

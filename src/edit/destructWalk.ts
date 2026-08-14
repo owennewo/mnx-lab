@@ -98,6 +98,20 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
   // Document-level declarations need no navigation either: the document is the
   // address. A lyric LINE is score-wide (its label and language), unlike the
   // syllables that hang off notes.
+  if (element.container) {
+    if (element.measureIndex === undefined) {
+      // Containers sit in a measure the walker knows; derive it from the path.
+      const m = Number(/\/m(\d+)\//.exec(element.path)?.[1] ?? -1);
+      if (m < 0) return { address: 'unaddressable', removal: 'no-op' };
+      session.handleIntent({ type: 'goToMeasure', measureIndex: m });
+    }
+    const applied = session.handleIntent({
+      type: 'removeContainer',
+      sequenceIndex: element.container.sequenceIndex,
+      eventIndex: element.container.eventIndex
+    });
+    return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
+  }
   if (element.kind === 'layout' || element.kind === 'score') {
     const index = Number(/(\d+)$/.exec(element.path)?.[1] ?? -1);
     if (index < 0) return { address: 'unaddressable', removal: 'no-op' };

@@ -271,6 +271,23 @@ export type EditOp =
   // system breaks. Neither is a declaration, so neither gets a typed grammar
   // here — removal lands now, authoring waits for a surface that can express a
   // tree without pretending a one-line grammar is one.
+  | {
+      /** Remove a CONTAINER (tuplet, grace, tremolo, space) from a sequence.
+       *
+       * The campaign's container rule, third application: **removable only
+       * once it holds no ink**. Unwrapping — keeping the notes and dropping the
+       * grouping — is the tempting reading and it is refused, because it
+       * RE-TIMES the music: three eighths written in the time of two become
+       * three plain eighths, and the bar overfills. An editor may not reshape
+       * time as a side effect of removing a bracket, which is the same rule
+       * that refused a time-signature removal that would have reshaped bars.
+       */
+      type: 'removeContainer';
+      measureIndex: number;
+      sequenceIndex: number;
+      eventIndex: number;
+      partIndex?: number;
+    }
   | { type: 'removeLayout'; index: number }
   | { type: 'removeScore'; index: number }
   | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }
@@ -892,6 +909,24 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       delete x.fingering;
       if (Object.keys(x).length === 0) delete located.note._x!.mnxLab;
       if (Object.keys(located.note._x!).length === 0) delete located.note._x;
+      return next;
+    }
+    case 'removeContainer': {
+      const seq = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex]?.sequences?.[
+        op.sequenceIndex
+      ];
+      const item = seq?.content?.[op.eventIndex] as { type?: string; content?: MnxEvent[] } | undefined;
+      if (!seq || !item?.type) return next;
+      // Ink first: a container goes only when it holds none.
+      const holdsInk = (item.content ?? []).some(event => (event.notes?.length ?? 0) > 0);
+      if (holdsInk) return next;
+      // A `space` holds no ink but IS time, and `itemSpan` still counts it as
+      // zero — so removing one silently shortens the bar and the renderer
+      // reports it. Refused until that span is right: the third time this gap
+      // has surfaced (see core-element-ops-onset-granularity.md).
+      if (item.type === 'space') return next;
+      seq.content = seq.content.filter((_, i) => i !== op.eventIndex);
+      padMeasureRests(next, op.measureIndex);
       return next;
     }
     case 'removeLayout': {

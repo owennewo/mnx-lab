@@ -165,6 +165,8 @@ function opLabel(op: EditOp): string {
       return `fingering ${op.hand} ${op.finger} · ${op.noteKey}`;
     case 'removeFingering':
       return `no fingering · ${op.noteKey}`;
+    case 'removeContainer':
+      return `remove container @ m${op.measureIndex + 1} (empty)`;
     case 'removeLayout':
       return `remove layout ${op.index + 1}`;
     case 'removeScore':

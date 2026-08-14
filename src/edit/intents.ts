@@ -120,6 +120,7 @@ export type MutationIntent =
   | { type: 'removePartDeclaration'; kind: PartDeclarationKind }
   // Document-level presentation: no cursor involved, the document IS the
   // address (as with lyric lines).
+  | { type: 'removeContainer'; sequenceIndex: number; eventIndex: number }
   | { type: 'removeLayout'; index: number }
   | { type: 'removeScore'; index: number }
   | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }
