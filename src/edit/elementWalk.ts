@@ -1,6 +1,6 @@
 /**
  * The element inventory — what the destructibility sweep must try to remove
- * (roadmap/proposed/core-element-ops-destruct-sweep.md, campaign item 2).
+ * (roadmap/inprogress/core-element-ops-destruct-sweep.md, campaign item 2).
  *
  * The campaign's definition is "an element is anything the renderer draws
  * distinguishable ink for". That is a claim about the renderer, so the
@@ -21,6 +21,7 @@
  * the ink they were modifying behind.
  */
 import type { MnxBeam, MnxStructure } from '../model/mnx.ts';
+import type { EditOp } from './ops.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import { noteKeyOf } from './cursor.ts';
 
@@ -41,18 +42,44 @@ export type ElementKind =
   | 'layout' | 'score' | 'multimeasure-rest' | 'lyric-line-metadata' | 'sound';
 
 /**
- * Per kind: the primitive classes it claims, and why it is an element. A kind
- * claiming NO class is either a modifier (it changes ink another kind draws)
- * or a renderer gap (the document carries it, nothing draws it yet) — both are
- * real elements, and the empty list is the honest record of which.
+ * Per kind: the primitive classes it claims, why it is an element, and **the op
+ * pair** — the verbs that build it and the verbs that remove it.
+ *
+ * A kind claiming NO class is either a modifier (it changes ink another kind
+ * draws) or a renderer gap (the document carries it, nothing draws it yet) —
+ * both are real elements, and the empty list is the honest record of which.
+ *
+ * The pair lives here, on one row, because the campaign contract requires
+ * construct and destruct to be **defined together**
+ * (roadmap/inprogress/core-campaign-element-ops.md): removal is not creation
+ * reversed, and splitting the two across modules is how they drift. Both
+ * harnesses read this table — the destruct sweep for its `no-op` verdict, the
+ * construct tiers for what they are blocked on. An empty verb list is not a
+ * gap in the table, it IS the campaign's remaining work, itemized.
  */
-export const ELEMENT_KINDS: Record<ElementKind, { classes: string[]; note: string }> = {
+export interface ElementKindSpec {
+  classes: string[];
+  note: string;
+  /** Ops that can bring this element into existence today. */
+  construct?: EditOp['type'][];
+  /** Ops that can remove it today. */
+  remove?: EditOp['type'][];
+}
+
+export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   note: {
     classes: ['notehead', 'accidental', 'fret-number', 'fret-bg'],
-    note: 'The ink. Its accidental and fret number exist only because it does.'
+    note: 'The ink. Its accidental and fret number exist only because it does.',
+    construct: ['insertNote', 'insertPitchNote'],
+    remove: ['deleteNote']
   },
   'kit-note': { classes: [], note: 'Percussion kit note — drawn as a notehead by the kit component.' },
-  tie: { classes: ['tie'], note: 'A curve between two notes; reference removal class.' },
+  tie: {
+    classes: ['tie'],
+    note: 'A curve between two notes; reference removal class.',
+    construct: ['toggleTie'],
+    remove: ['toggleTie']
+  },
   slur: { classes: ['slur'], note: 'A curve between two events; reference removal class.' },
   lyric: { classes: ['lyric', 'lyric-hyphen'], note: 'One syllable of one line under an event.' },
   articulation: {
@@ -60,7 +87,11 @@ export const ELEMENT_KINDS: Record<ElementKind, { classes: string[]; note: strin
     note: 'One event marking (accent, staccato, single-note tremolo…).'
   },
   'accidental-display': { classes: [], note: 'Modifier: forces or parenthesizes the note accidental.' },
-  'string-annotation': { classes: [], note: 'Modifier: chooses which string a note is played on.' },
+  'string-annotation': {
+    classes: [],
+    note: 'Modifier: chooses which string a note is played on.',
+    construct: ['setFret']
+  },
   fingering: { classes: [], note: 'Renderer gap — carried by the document, nothing draws it yet.' },
   technique: { classes: [], note: 'Renderer gap — core-guitar-technique.md owns the drawing half.' },
   tuplet: { classes: ['tuplet-bracket', 'tuplet-number'], note: 'A time-modifying container.' },
@@ -82,7 +113,10 @@ export const ELEMENT_KINDS: Record<ElementKind, { classes: string[]; note: strin
   ottava: { classes: ['ottava', 'ottava-label'], note: 'An octave-shift line.' },
   'time-signature': {
     classes: ['time-sig', 'time-sig-num', 'time-sig-den'],
-    note: 'Inherited-attribute removal class: reverts to the predecessor.'
+    note: 'Inherited-attribute removal class: reverts to the predecessor.',
+    // `setTimeSignature` overwrites but cannot un-declare — the asymmetry the
+    // campaign opened on.
+    construct: ['setTimeSignature']
   },
   'key-signature': { classes: ['key-sig'], note: 'Inherited-attribute removal class.' },
   barline: { classes: [], note: 'Modifier: every measure ends with a barline; this picks its type.' },
@@ -96,10 +130,26 @@ export const ELEMENT_KINDS: Record<ElementKind, { classes: string[]; note: strin
   rehearsal: { classes: ['rehearsal-box', 'rehearsal-label'], note: 'A rehearsal mark (proposed field).' },
   section: { classes: ['section-label'], note: 'A formal section label (proposed field).' },
   harmony: { classes: [], note: 'Renderer gap — core-chord-symbols.md owns the drawing half.' },
-  'part-name': { classes: ['staff-label'], note: 'The name drawn left of the part’s staff.' },
-  strings: { classes: ['tab-tuning-letter'], note: 'The declared fingerboard; without it there is no tab.' },
+  'part-name': {
+    classes: ['staff-label'],
+    note: 'The name drawn left of the part’s staff.',
+    // `addPart` takes the name, so creating one is real. Nothing STRIPS a
+    // name: `removePart` removes the whole (empty) part, which is its
+    // container's verb, not this element's — the distinction the drift test
+    // caught the moment this row claimed otherwise.
+    construct: ['addPart']
+  },
+  strings: {
+    classes: ['tab-tuning-letter'],
+    note: 'The declared fingerboard; without it there is no tab.',
+    construct: ['setTuning']
+  },
   capo: { classes: ['tab-capo'], note: 'The capo declaration, drawn on the tab staff.' },
-  'staff-kind': { classes: ['tab-clef'], note: 'The part’s projection choice; the tab clef is its ink.' },
+  'staff-kind': {
+    classes: ['tab-clef'],
+    note: 'The part’s projection choice; the tab clef is its ink.',
+    construct: ['setStaffKind']
+  },
   'kit-component': { classes: [], note: 'One percussion kit mapping; its notes draw noteheads.' },
   staves: { classes: [], note: 'Modifier: how many staves the part is notated on.' },
   layout: {
@@ -136,6 +186,14 @@ export const STRUCTURAL_CLASSES: Record<string, string> = {
   'mnx-tab-svg': 'the tab staff’s root group'
 };
 
+/** Can ANY op in the union bring this kind into existence today? The forward
+ *  half of the pair, and the construct tiers' whole basis: a scenario is
+ *  blocked by exactly the kinds for which this is false
+ *  (roadmap/inprogress/core-element-ops-construct-traces.md). */
+export function kindHasConstructOp(kind: ElementKind): boolean {
+  return (ELEMENT_KINDS[kind].construct?.length ?? 0) > 0;
+}
+
 export interface ElementRef {
   kind: ElementKind;
   /** Stable positional address, unique within the document. */
@@ -143,6 +201,11 @@ export interface ElementRef {
   /** Present when the ops layer can name this element today: a note inside
    *  `parts[0]`, staff 1 — the entry surface `deleteNote` addresses. */
   noteKey?: string;
+  /** For elements ATTACHED to a note (a tie, a technique, a string choice):
+   *  the key of the note that carries them. Their verbs act through the note
+   *  — `toggleTie` addresses the note and toggles what hangs off it — so the
+   *  sweep needs the owner's key, not one of their own. */
+  ownerNoteKey?: string;
   /** Where the element lives, for the surviving-document oracle. */
   jsonPath: (string | number)[];
 }
@@ -155,6 +218,18 @@ function push(
   noteKey?: string
 ): void {
   out.push(noteKey ? { kind, path, jsonPath, noteKey } : { kind, path, jsonPath });
+}
+
+/** An element hanging off a note: it carries the OWNER's key, because its
+ *  verbs are aimed at the note (address the note, press T). */
+function pushOnNote(
+  out: ElementRef[],
+  kind: ElementKind,
+  path: string,
+  jsonPath: (string | number)[],
+  ownerNoteKey?: string
+): void {
+  out.push(ownerNoteKey ? { kind, path, jsonPath, ownerNoteKey } : { kind, path, jsonPath });
 }
 
 function walkBeams(
@@ -183,20 +258,24 @@ function walkEvent(
   notes.forEach((note, noteIndex) => {
     const notePath = `${path}/n${noteIndex}`;
     const noteJson = [...jsonPath, 'notes', noteIndex];
-    push(out, 'note', notePath, noteJson, keyOf?.(noteIndex, note));
+    const ownerKey = keyOf?.(noteIndex, note);
+    push(out, 'note', notePath, noteJson, ownerKey);
     for (const [tieIndex] of ((note.ties ?? []) as unknown[]).entries())
-      push(out, 'tie', `${notePath}/tie${tieIndex}`, [...noteJson, 'ties', tieIndex]);
+      pushOnNote(out, 'tie', `${notePath}/tie${tieIndex}`, [...noteJson, 'ties', tieIndex], ownerKey);
     if (note.accidentalDisplay)
-      push(out, 'accidental-display', `${notePath}/acc`, [...noteJson, 'accidentalDisplay']);
+      pushOnNote(out, 'accidental-display', `${notePath}/acc`, [...noteJson, 'accidentalDisplay'], ownerKey);
     const x = (note._x as { mnxLab?: Record<string, unknown> } | undefined)?.mnxLab;
     if (x) {
       const xJson = [...noteJson, '_x', 'mnxLab'];
       if (x.string !== undefined)
-        push(out, 'string-annotation', `${notePath}/string`, [...xJson, 'string']);
-      if (x.fingering) push(out, 'fingering', `${notePath}/fingering`, [...xJson, 'fingering']);
+        pushOnNote(out, 'string-annotation', `${notePath}/string`, [...xJson, 'string'], ownerKey);
+      if (x.fingering)
+        pushOnNote(out, 'fingering', `${notePath}/fingering`, [...xJson, 'fingering'], ownerKey);
       const technique = (x.tab as { technique?: Record<string, unknown> } | undefined)?.technique;
       for (const name of Object.keys(technique ?? {}))
-        push(out, 'technique', `${notePath}/technique/${name}`, [...xJson, 'tab', 'technique', name]);
+        pushOnNote(
+          out, 'technique', `${notePath}/technique/${name}`, [...xJson, 'tab', 'technique', name], ownerKey
+        );
     }
   });
   for (const [kitIndex] of ((event.kitNotes ?? []) as unknown[]).entries())

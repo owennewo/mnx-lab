@@ -4,10 +4,10 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "no-op": 821,
-      "removed": 639
+      "no-op": 809,
+      "removed": 651
     },
-    "unaddressableWithAnOp": 162
+    "unaddressableWithAnOp": 163
   },
   "kinds": {
     "accidental-display": {
@@ -132,7 +132,8 @@
       "no-op": 2
     },
     "tie": {
-      "no-op": 13
+      "no-op": 1,
+      "removed": 12
     },
     "time-signature": {
       "no-op": 99
@@ -1867,7 +1868,7 @@
         "no-op": 1
       },
       "tie": {
-        "no-op": 9
+        "removed": 9
       },
       "time-signature": {
         "no-op": 1
@@ -1881,7 +1882,7 @@
         "removed": 6
       },
       "tie": {
-        "no-op": 3
+        "removed": 3
       },
       "time-signature": {
         "no-op": 1
@@ -2774,6 +2775,12 @@
       "scenario": "spec/organ-layout",
       "element": "p0/m0/v3/e0/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/organ-layout",
+      "element": "p0/m0/v3/e0/n0/tie0",
+      "kind": "tie",
       "verdict": "unaddressable"
     },
     {

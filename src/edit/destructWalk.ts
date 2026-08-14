@@ -13,10 +13,10 @@
 //   `walkElements` — every element of the document, whether or not anything
 //                    can remove it (elementWalk.ts). The corpus sweep drives
 //                    that one, because the gap between the two IS the report
-//                    (roadmap/proposed/core-element-ops-destruct-sweep.md).
+//                    (roadmap/inprogress/core-element-ops-destruct-sweep.md).
 import type { MnxStructure } from '../model/mnx.ts';
 import { forEachKeyedNote, onsetsEqual, slotAt } from './cursor.ts';
-import type { ElementKind, ElementRef } from './elementWalk.ts';
+import { ELEMENT_KINDS, type ElementKind, type ElementRef } from './elementWalk.ts';
 import type { EditorSession } from './session.ts';
 
 /** The ink the ops layer can name: every keyed note of parts[0]/staff 1. */
@@ -26,11 +26,12 @@ export function elementKeys(doc: MnxStructure): string[] {
   return keys;
 }
 
-/** Can ANY op in the union remove this kind of element? The campaign's
- *  scoreboard denominator — every `false` here is an undrafted item's work,
- *  and flipping one to `true` is what an item lands. */
+/** Can ANY op in the union remove this kind of element? Read from the kind
+ *  table's op pair (elementWalk.ts), so the sweep's `no-op` verdict and the
+ *  construct tiers can never disagree about what the vocabulary contains —
+ *  the campaign's scoreboard denominator, in one place. */
 export function kindHasRemovalOp(kind: ElementKind): boolean {
-  return kind === 'note';
+  return (ELEMENT_KINDS[kind].remove?.length ?? 0) > 0;
 }
 
 /** Did the cursor reach it, and did anything remove it? Two axes, because
@@ -55,9 +56,14 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
   if (!kindHasRemovalOp(element.kind)) return { address: 'unaddressable', removal: 'no-op' };
   // A note the ops layer cannot name (a second part, a second staff, inside a
   // container) is an addressing gap, not a missing verb.
-  if (element.noteKey === undefined) return { address: 'unaddressable', removal: 'no-op' };
-  if (!driveToElement(session, element.noteKey)) return { address: 'unaddressable', removal: 'no-op' };
-  const applied = session.handleIntent({ type: 'delete' });
+  const key = element.noteKey ?? element.ownerNoteKey;
+  if (key === undefined) return { address: 'unaddressable', removal: 'no-op' };
+  if (!driveToElement(session, key)) return { address: 'unaddressable', removal: 'no-op' };
+  // Note-attached elements are removed THROUGH their note: address the note,
+  // then use the element's own verb. `toggleTie` is the only such verb today,
+  // and it is genuinely a pair — the same key that ties, unties.
+  const intent = element.kind === 'tie' ? { type: 'toggleTie' as const } : { type: 'delete' as const };
+  const applied = session.handleIntent(intent);
   return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
 }
 

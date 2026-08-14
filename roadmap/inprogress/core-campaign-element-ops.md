@@ -90,7 +90,7 @@ agreed or candidate claims; **bold** = agreed.
 |---|------|-------|---------|-------------|------|--------|
 | 1 | [exemplar](../complete/core-element-ops-exemplar.md) | Both harness halves built end-to-end over two simple scenarios (`minimal-single-note`, `open-strings-chord`). Start is **decided: the literal `{}`** — so the campaign's first new ops are the genesis verbs (`addPart`, skeleton-on-demand; score rung, setup tier) and the session is hardened for zero parts/measures. Settles key normalization; adds the **op-queue panel** (side-panel ops tab: `appliedOps` as a visible undo/redo queue) so command sequences can be read and reviewed. | the algorithm + genesis ops + 2 traced scenarios | **Shift+P** part popover; staffKind: palette | **score** | **complete 2026-08-14** |
 | 2 | [destructibility sweep](core-element-ops-destruct-sweep.md) | Item 1's reverse walk scaled corpus-wide: element walker per kind (noteKeys generalized), attempt address+delete per element; oracles: applies / no new diagnostics / no dangling references / undo byte-identical, **widened** (relative validity, references past ties, a surviving-document check). No trace fixtures — the walk regenerates each run; the report is the artifact. Doubles as ladder addressability audit. Fix the `deleteNote` dangling-reference bug it will catch. | verdicts for all 106 | n/a | n/a | **built 2026-08-14** |
-| 3 | constructibility traces | Item 1's forward harness scaled: the construct-fixture kind + per-scenario tiers (unreachable → ops-reachable → keyboard-reachable → traced) + the expected-unreachable class. Traces themselves arrive with items 4–13 (recorded via "copy trace", never hand-written); possible workbench coverage map later. Inherits item 1's parked **recording surface** question: "copy trace" stamps a corpus scenario id as the start, so recording from `{}` wants the new-document journey — and with it, the ops tab on non-scenario (IndexedDB) documents. | verdict machinery for all 106; traces accumulate per item | n/a | n/a | undrafted |
+| 3 | [constructibility traces](core-element-ops-construct-traces.md) | Item 1's forward harness scaled: the construct-fixture kind + per-scenario tiers (unreachable → ops-reachable → keyboard-reachable → traced) + the expected-unreachable class. Traces themselves arrive with items 4–13 (recorded via "copy trace", never hand-written); possible workbench coverage map later. Inherits item 1's parked **recording surface** question: "copy trace" stamps a corpus scenario id as the start, so recording from `{}` wants the new-document journey — and with it, the ops tab on non-scenario (IndexedDB) documents. | verdict machinery for all 106; traces accumulate per item | n/a | n/a | **built 2026-08-14** |
 | 4 | duration completion | Dots (op already accepts `dots?` — cheapest unlock), capo (read but unwritable), time `display: common\|cut`. | ~10 | dot: single key (`.` candidate); capo/display: popover grammar | event / setup | undrafted |
 | 5 | clef & key signature | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class. | gates ~all entry; F-clef + 5 key-sig scenarios | popover tier (Shift+letter) | measure | undrafted |
 | 6 | accidental spelling | Flats (natural-then-sharp policy makes E♭ unwritable), enharmonic respell, `accidentalDisplay`/parentheses. | 9+ | respell: single key | note | undrafted |
@@ -107,6 +107,32 @@ et al are layout-only, zero measures — a different surface, not keys), percuss
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — item 3 built: the forward verdict, and one verb gates the corpus.**
+  `npm run sweep:construct` writes `harness/reports/construct-coverage.json`, drift
+  fails the build both ways, and the two harnesses now read ONE table. Baseline:
+  **traced 2 · ops-reachable 1 · blocked 98 · expected-unreachable 5**.
+  - **`clef` blocks 96 of 106 scenarios.** The next nine blockers together account
+    for fewer (beam 10, barline 7, layout 6, repeat-end 6, score 6, section 6,
+    direction 5, dynamic 5, key-signature 5). Item 5 was already ranked first on
+    taste; it is now ranked first on evidence, and by a margin no other argument
+    survives. **Do item 5 next.**
+  - **The op pair moved onto the kind table** (`ELEMENT_KINDS` rows now carry
+    `construct` and `remove`), because the contract's "defined together" is only
+    true when they live together. Two things fell out within minutes: the destruct
+    sweep had never attempted `toggleTie` — a removal verb it owned all along, now
+    turning 12 of 13 corpus ties into `removed` — and a row claiming `removePart`
+    removes a part's *name* was refused by the destruct report's drift test.
+    Container verbs are not their contents' verbs.
+  - **A prediction is not a verdict, in BOTH directions.** `open-strings-chord`
+    traces green while blocked on a clef (invisible to the goldens — the engine
+    draws the same default); `empty-tab-canvas` is predicted reachable and is not
+    traceable at all, because `appendMeasure` writes four explicit rests where the
+    hand-written template has none. Rule for later items: **the tier model is
+    kind-shaped and cannot see op semantics** — only a trace can.
+  - **New question with evidence attached**: which empty bar is canonical — the
+    model's implicit rests or the op's explicit ones? Item 11 (rhythm model)
+    inherits it; it already owns what an onset is.
 
 - **2026-08-14 — item 2 built: the corpus has a scoreboard, and it found four bugs.**
   `npm run sweep:destruct` writes `harness/reports/destruct-sweep.json`; `npm test`

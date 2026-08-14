@@ -1,5 +1,5 @@
 // The surviving-document oracle's eyes (campaign item 2,
-// roadmap/proposed/core-element-ops-destruct-sweep.md).
+// roadmap/inprogress/core-element-ops-destruct-sweep.md).
 //
 // The campaign promises that removing one element leaves "everything else
 // surviving byte-identically except forced cascades". Asserting that needs a

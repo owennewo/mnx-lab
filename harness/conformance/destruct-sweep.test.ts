@@ -120,8 +120,17 @@ function unexplainedChanges(
 ): DocChange[] {
   const container = element.jsonPath.slice(0, -1); // the array the element sat in
   const event = element.jsonPath.slice(0, -2); // …/content/<e>  for …/notes/<n>
+  const containerKey = element.jsonPath[element.jsonPath.length - 2];
   return changes.filter(change => {
     if (pathWithin(change.path, container)) return false;
+    // Emptying the container removes it outright — no tombstone `ties: []`
+    // left on the note. That shows up one level above the container.
+    if (
+      pathString(change.path) === pathString(event) &&
+      change.added.length === 0 &&
+      change.removed.every(entry => entry.startsWith(`${String(containerKey)}=`))
+    )
+      return false;
     // The declared cascade of emptying an event: it becomes a rest of the
     // same duration, and the ink-bound things it carried go with its ink — a
     // rest does not slur.

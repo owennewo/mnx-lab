@@ -151,6 +151,37 @@ proposals that name their campaign.
   element contract under [core-viewer-surface.md](proposed/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
   [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
+- **[core-selection-tray-visuals.md](proposed/core-selection-tray-visuals.md)** — the **selection
+  command tray**, part 1 of 3: Ctrl+K stops opening a document-wide list and opens a tray
+  **planted under the selection** — scope tabs that are the ladder's rungs (not the design's
+  four; presence-rule filtered, HUD vocabulary), a Bravura glyph grid with shortcut and
+  current state on every tile, shaft+plinth connector, hover readout, scoped search — built
+  whole on demo data, firing nothing, so look and feel get a hands-on review before any
+  wiring. From a Claude Design spec ("SPEC · v1"), shipped **faithful to its art direction**
+  (Archivo / `#ec3013` / zero radius, deliberately apart from current chrome — the leading
+  edge of a possible restyle, which would be its own proposal). Incubates as a dumb
+  `<mnx-selection-tray>` in `workbench/` (ScoreHud posture); the one `elements/` change is a
+  `selection-anchored` rect event on the viewer, satisfying
+  [core-viewer-surface.md](proposed/core-viewer-surface.md)'s layering.
+- **[core-selection-tray-mechanism.md](proposed/core-selection-tray-mechanism.md)** — part 2:
+  the tray wired. One ruling — tiles fire **intents through `session.handleIntent`, nothing
+  else** — so tray clicks land in the op queue and replay through traces like keystrokes. A
+  command registry in `src/edit/` (testable below the harness boundary) whose rows are the
+  *surface half* of [campaign](inprogress/core-campaign-element-ops.md) agreement blocks:
+  id, rungs, glyph, key/tier, `isActive`, `toIntent` — `toIntent: null` renders greyed, so
+  the greyed tiles *are* the campaign's remaining index, visible in the product. Joins both
+  ways (stroke ⇒ keymap + `KEY_DOCS` at every claimed rung; ops panel gains `tray`
+  provenance). Scope preview/commit via `SelectionContext.preview` + a dashed enclosure and
+  the HUD's shared level-walk; Ctrl+K → tray / Ctrl+Shift+K → global palette; **Escape
+  precedence stated once** in the keymap layer, answering the ladder's open question.
+- **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3: the
+  **ledger of what cannot be wired yet**, each greyed tile with an address — adornments,
+  dynamics, spanners, rhythm, bar attributes, clef/key, text, voices-beyond-one map to
+  campaign items 5–13; mixed state, extension/closure, the container tab and mouse
+  selection wait on the ladder's `{level, anchor, extent}`; part transposition, mute, the
+  embed/studio tray and wide-selection shaft geometry each name their own blocker. Rows
+  retire as unblockers land (registry `blockedBy` keeps table and tiles from drifting);
+  empty table ⇒ `complete/`.
 - **[core-tuplets-grace-notes.md](proposed/core-tuplets-grace-notes.md)** — tuplets and grace notes
   **across both converters and on tab**. Split out of
   [core-guitar-pro.md](complete/core-guitar-pro.md) when that closed, at its real scope: the model
@@ -214,6 +245,23 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-construct-traces.md](inprogress/core-element-ops-construct-traces.md)** —
+  campaign item 3: **the forward verdict for all 106**, the half item 2 built backwards.
+  **Built 2026-08-14**, same day as proposed. A trace cannot be generated — it is a
+  recorded performance — so the forward answer is deliberately two things: a
+  **prediction** computed statically from the element inventory (does every kind this
+  scenario contains have a construct verb?) and a **verdict** earned only by a committed
+  trace replaying from `{}` against the goldens. Where they disagree, the disagreement is
+  the finding, and both directions turned up immediately: `open-strings-chord` traces
+  green while blocked on a clef the goldens never see, and `empty-tab-canvas` is
+  predicted reachable yet untraceable because `appendMeasure` writes four explicit rests
+  where the template has none (the tier model is kind-shaped and blind to op semantics).
+  The campaign contract's **op pair moved onto the kind table** — one row per kind
+  carrying both `construct` and `remove` — which promptly showed the destruct sweep had
+  never attempted `toggleTie`, a removal verb it owned all along (12 of 13 corpus ties
+  now `removed`). Baseline: **traced 2 · ops-reachable 1 · blocked 98 ·
+  expected-unreachable 5**, and one number settles the campaign's ordering: **`clef`
+  blocks 96 of 106 scenarios**, so item 5 is next on evidence rather than taste.
 - **[core-keymap-cheatsheet.md](inprogress/core-keymap-cheatsheet.md)** — a **selection-mode-
   dependent keyboard cheatsheet**, built by making the ladder's per-level navigation map DATA.
   The keymap's binding tables are already data, but the *meaning* of a key at each rung lives

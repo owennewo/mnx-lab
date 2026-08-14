@@ -6,7 +6,7 @@
  * *removes* anything can be correct without knowing the whole set — the
  * element-ops campaign's *reference* removal class is "unlink both ends", and
  * the destructibility sweep's oracle is "no reference dangles"
- * (roadmap/proposed/core-element-ops-destruct-sweep.md). Both need this list,
+ * (roadmap/inprogress/core-element-ops-destruct-sweep.md). Both need this list,
  * so it lives at the model floor rather than being re-derived per consumer.
  *
  * Two kinds of breakage are distinguished, because they fail differently:
