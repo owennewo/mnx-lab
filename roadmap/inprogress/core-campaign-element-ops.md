@@ -110,6 +110,22 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
+- **2026-08-14 — staff addressing, and a bug in ordinary editing it exposed.**
+  The cursor carries a `staffIndex`, the grid filters to it, `setStaff` moves
+  between them, and the renderer keys any staff showing one part's one staff.
+  **Removable 1,351 → 1,389**; notes down to 7 no-op, clefs to 1.
+  - **Navigation was silently dropping the part.** Fresh cursors are how the
+    coincidence ordinal resets — and they dropped `partIndex` with it, so
+    `goToMeasure` after moving to part 2 sent the next edit back to `parts[0]`
+    while the cursor still showed part 2. A clef removal returned `true` and
+    removed the WRONG part's clef. **Position survives a move; meaning at that
+    position does not** — that is the rule, and the sweep found the violation as
+    nine `refused` clefs.
+  - Three more scenarios demoted (staff-2 `sourceId`s), no geometry moved.
+  - What is left is mostly *kinds with no verbs at all*: layout 13, score 10,
+    accidental-display 7, the container wrap verbs 15, percussion 6 — plus seven
+    unexplained navigation failures and one mid-measure clef.
+
 - **2026-08-14 — nested beams, and the identity oracle they exposed.** The
   report said 26 beams were unremovable; the cause was not second parts but
   **nested levels (17)** — subdivisions and hooks. `removeBeam` takes a path

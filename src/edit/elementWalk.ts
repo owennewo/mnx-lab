@@ -333,6 +333,8 @@ export interface ElementRef {
   /** For attributes positioned WITHIN a measure (dynamics, directions): the
    *  metric onset their verbs aim at, as a whole-note fraction. */
   onset?: [number, number];
+  /** For per-staff attributes (a clef): which staff it governs. */
+  staffIndex?: number;
   /** Where the element lives, for the surviving-document oracle. */
   jsonPath: (string | number)[];
 }
@@ -370,9 +372,14 @@ function pushAtMeasure(
   kind: ElementKind,
   path: string,
   jsonPath: (string | number)[],
-  measureIndex: number | undefined
+  measureIndex: number | undefined,
+  staffIndex?: number
 ): void {
-  out.push(measureIndex === undefined ? { kind, path, jsonPath } : { kind, path, jsonPath, measureIndex });
+  out.push(
+    measureIndex === undefined
+      ? { kind, path, jsonPath }
+      : { kind, path, jsonPath, measureIndex, ...(staffIndex === undefined ? {} : { staffIndex }) }
+  );
 }
 
 /** An element hanging off a note: it carries the OWNER's key, because its
@@ -579,14 +586,16 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
       const measurePath = `${partPath}/m${measureIndex}`;
       const measureJson = [...partJson, 'measures', measureIndex];
       for (const [clefIndex, positioned] of (measure.clefs ?? []).entries()) {
-        const reachable =
-          partIndex === 0 && (positioned.staff ?? 1) === 1 && positioned.position === undefined;
+        // Any part, any staff (13b/13c) — but a MID-MEASURE clef still needs an
+        // onset-addressed variant of the op, which item 11b's territory owns.
+        const reachable = positioned.position === undefined;
         pushAtMeasure(
           out,
           'clef',
           `${measurePath}/clef${clefIndex}`,
           [...measureJson, 'clefs', clefIndex],
-          reachable ? measureIndex : undefined
+          reachable ? measureIndex : undefined,
+          positioned.staff ?? 1
         );
       }
       for (const [dynamicIndex, dynamic] of (measure.dynamics ?? []).entries())
@@ -622,17 +631,18 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
       // Resolve each top-level beam's first event to a note key, when the ops
       // layer can name it (the entry surface, staff 1).
       const beamOwner = (beam: MnxBeam): string | undefined => {
-        let staffOne = -1;
+        const voices = new Map<number, number>();
         for (const sequence of measure.sequences ?? []) {
-          if ((sequence.staff ?? 1) !== 1) continue;
-          staffOne++;
+          const staff = sequence.staff ?? 1;
+          const voice = (voices.get(staff) ?? -1) + 1;
+          voices.set(staff, voice);
           for (const [eventIndex, item] of (sequence.content ?? []).entries()) {
             if (!isTimedEvent(item)) continue;
             const event = item as { id?: string; notes?: unknown[] };
             if (!event.id || event.id !== beam.events?.[0]) continue;
             const note = (event.notes ?? [])[0];
             if (!note) return undefined;
-            return noteKeyAt(note as never, measureIndex, staffOne, eventIndex, 0, undefined, partIndex);
+            return noteKeyAt(note as never, measureIndex, voice, eventIndex, 0, undefined, partIndex, staff);
           }
         }
         return undefined;
@@ -642,14 +652,15 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
       // The ops layer's note keys exist only for staff-1 sequences of parts[0]
       // — `forEachKeyedNote`'s traversal, mirrored here so a key means exactly
       // what `deleteNote` means by it. Voice index counts staff-1 sequences.
-      let staffOneVoice = -1;
+      const voiceByStaff = new Map<number, number>();
       (measure.sequences ?? []).forEach((sequence, sequenceIndex) => {
-        const onStaffOne = (sequence.staff ?? 1) === 1;
-        if (onStaffOne) staffOneVoice++;
-        const voiceIndex = staffOneVoice;
-        // Every part's staff-1 notes are nameable now (campaign item 13b); the
-        // second STAFF of a part is item 13c.
-        const addressable = onStaffOne;
+        // Voices count PER STAFF, exactly as model/noteWalk.ts counts them —
+        // the two must agree or the keys diverge.
+        const sequenceStaff = sequence.staff ?? 1;
+        const voiceIndex = (voiceByStaff.get(sequenceStaff) ?? -1) + 1;
+        voiceByStaff.set(sequenceStaff, voiceIndex);
+        // Every staff of every part is nameable now (campaign items 13b/13c).
+        const addressable = true;
         const sequencePath = `${measurePath}/v${sequenceIndex}`;
         const sequenceJson = [...measureJson, 'sequences', sequenceIndex];
         if (sequence.fullMeasure)
@@ -668,7 +679,8 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
           addressable
             ? (eventIndex, noteIndex, note, containerIndex) =>
                 noteKeyAt(
-                  note as never, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex, partIndex
+                  note as never, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex,
+                  partIndex, sequence.staff ?? 1
                 )
             : null
         );

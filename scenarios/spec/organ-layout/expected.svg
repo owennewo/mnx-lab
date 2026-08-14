@@ -54,7 +54,7 @@
 <text x="653.3568" y="281.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v1.e4.n0"></text>
 <text x="311.6688" y="393.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
 <text x="322.8688" y="385.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="dot"></text>
-<text x="302.2288" y="545.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead"></text>
+<text x="302.2288" y="545.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.s3.v0.e0.n0"></text>
 <line x1="302.2288" y1="548.288" x2="302.2288" y2="601.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="326.7088" y="545.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="dot"></text>
 <line x1="698.4688" y1="201.6" x2="698.4688" y2="425.6" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>

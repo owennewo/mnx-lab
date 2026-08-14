@@ -955,9 +955,11 @@ function renderSegment(args: RenderSegmentArgs): {
   // it shows exactly one part's staff 1 — and it keys them with THAT part's
   // index, so the cursor and the overlay agree wherever the cursor goes.
   const synthesizePartForStaff = segment.staves.map(staff => {
-    if (staff.sources.length !== 1 || staff.sources[0].staff !== 1) return null;
+    if (staff.sources.length !== 1) return null;
     const index = (mnx.parts ?? []).indexOf(staff.sources[0].part);
-    return index >= 0 ? index : null;
+    // Any staff showing exactly one part's ONE staff can key its notes — the
+    // grand staff's lower half included (campaign item 13c).
+    return index >= 0 ? { partIndex: index, staffIndex: staff.sources[0].staff ?? 1 } : null;
   });
   const synthesizeKeysForStaff0 = synthesizePartForStaff[0] !== null;
 
@@ -1456,7 +1458,8 @@ function renderSegment(args: RenderSegmentArgs): {
                         return note
                           ? noteKeyAt(
                               note, i, voiceIndex, eventIndex, noteIndex, containerIndex,
-                              synthesizePartForStaff[s]!
+                              synthesizePartForStaff[s]!.partIndex,
+                              synthesizePartForStaff[s]!.staffIndex
                             )
                           : undefined;
                       }
@@ -1483,7 +1486,8 @@ function renderSegment(args: RenderSegmentArgs): {
                         return note
                           ? noteKeyAt(
                               note, i, voiceIndex, eventIndex, noteIndex, containerIndex,
-                              synthesizePartForStaff[s]!
+                              synthesizePartForStaff[s]!.partIndex,
+                              synthesizePartForStaff[s]!.staffIndex
                             )
                           : undefined;
                       }
@@ -1510,7 +1514,8 @@ function renderSegment(args: RenderSegmentArgs): {
                         return note
                           ? noteKeyAt(
                               note, i, voiceIndex, eventIndex, noteIndex, containerIndex,
-                              synthesizePartForStaff[s]!
+                              synthesizePartForStaff[s]!.partIndex,
+                              synthesizePartForStaff[s]!.staffIndex
                             )
                           : undefined;
                       }
@@ -1542,7 +1547,8 @@ function renderSegment(args: RenderSegmentArgs): {
               // Synthetic keys encode the staff-1 traversal that jsonView
               // mirrors; other staves use real ids only.
               synthesizeKeys: synthesizePartForStaff[s] !== null,
-              keyPartIndex: synthesizePartForStaff[s] ?? 0
+              keyPartIndex: synthesizePartForStaff[s]?.partIndex ?? 0,
+              keyStaffIndex: synthesizePartForStaff[s]?.staffIndex ?? 1
             });
             if (beamRun && stem && event.id) beamRun.stems.set(event.id, stem);
             const lyricLines = event.lyrics?.lines;
@@ -3504,6 +3510,8 @@ interface EmitEventArgs {
   synthesizeKeys: boolean;
   /** Which part those keys belong to (campaign item 13b). */
   keyPartIndex?: number;
+  /** Which staff of it (13c). */
+  keyStaffIndex?: number;
 }
 
 /** Returns the deferred stem when the event is beamed, else null. */
@@ -3512,7 +3520,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
     event, eventX, staffTop, clef, stemOverride, beamDir, useAccidentalDisplay, keyFifths,
     activeNoteIds, selectedNoteIds,
     primitives, index, measureIndex, voiceIndex, eventIndex,
-    row, curveKey, curveAnchors, synthesizeKeys, keyPartIndex
+    row, curveKey, curveAnchors, synthesizeKeys, keyPartIndex, keyStaffIndex
   } = args;
 
   const base = event.duration.base;
@@ -3562,7 +3570,9 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   // note↔document cross-highlight work across the whole corpus.
   const noteIds = notes.map((n, idx) =>
     synthesizeKeys
-      ? noteKeyAt(n, measureIndex, voiceIndex, eventIndex, idx, undefined, keyPartIndex ?? 0)
+      ? noteKeyAt(
+          n, measureIndex, voiceIndex, eventIndex, idx, undefined, keyPartIndex ?? 0, keyStaffIndex ?? 1
+        )
       : n.id
   );
   const primaryNoteId = noteIds.find((id): id is string => id !== undefined);

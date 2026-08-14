@@ -4,11 +4,11 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "removed": 1351,
-      "no-op": 105,
+      "removed": 1389,
+      "no-op": 67,
       "refused": 4
     },
-    "unaddressableWithAnOp": 50
+    "unaddressableWithAnOp": 12
   },
   "kinds": {
     "accidental-display": {
@@ -21,15 +21,15 @@
       "removed": 7
     },
     "beam": {
-      "removed": 32,
-      "no-op": 8
+      "removed": 36,
+      "no-op": 4
     },
     "capo": {
       "removed": 1
     },
     "clef": {
-      "removed": 101,
-      "no-op": 12
+      "removed": 112,
+      "no-op": 1
     },
     "direction": {
       "removed": 13
@@ -80,8 +80,8 @@
       "no-op": 3
     },
     "note": {
-      "removed": 772,
-      "no-op": 29
+      "removed": 794,
+      "no-op": 7
     },
     "ottava": {
       "no-op": 1
@@ -135,8 +135,7 @@
       "removed": 2
     },
     "tie": {
-      "no-op": 1,
-      "removed": 12
+      "removed": 13
     },
     "time-signature": {
       "removed": 95,
@@ -233,8 +232,7 @@
         "removed": 1
       },
       "clef": {
-        "removed": 1,
-        "no-op": 1
+        "removed": 2
       },
       "note": {
         "removed": 40
@@ -257,8 +255,7 @@
         "removed": 1
       },
       "clef": {
-        "removed": 1,
-        "no-op": 1
+        "removed": 2
       },
       "key-signature": {
         "removed": 1
@@ -352,8 +349,7 @@
     },
     "lab/layout/group-barline-individual": {
       "clef": {
-        "removed": 1,
-        "no-op": 1
+        "removed": 2
       },
       "layout": {
         "no-op": 1
@@ -512,8 +508,7 @@
     },
     "lab/score-text/directions-across-parts": {
       "clef": {
-        "removed": 1,
-        "no-op": 1
+        "removed": 2
       },
       "direction": {
         "removed": 1
@@ -536,15 +531,13 @@
     },
     "lab/score-text/directions-multi-staff": {
       "clef": {
-        "removed": 1,
-        "no-op": 1
+        "removed": 2
       },
       "direction": {
         "removed": 3
       },
       "note": {
-        "removed": 5,
-        "no-op": 5
+        "removed": 10
       },
       "part-name": {
         "removed": 1
@@ -1363,16 +1356,13 @@
     },
     "spec/grand-staff": {
       "beam": {
-        "no-op": 4,
-        "removed": 1
+        "removed": 5
       },
       "clef": {
-        "removed": 1,
-        "no-op": 1
+        "removed": 2
       },
       "note": {
-        "removed": 7,
-        "no-op": 16
+        "removed": 23
       },
       "part-name": {
         "removed": 1
@@ -1530,8 +1520,7 @@
         "removed": 1
       },
       "clef": {
-        "removed": 1,
-        "no-op": 1
+        "removed": 2
       },
       "layout": {
         "no-op": 2
@@ -1551,8 +1540,7 @@
     },
     "spec/multiple-layouts": {
       "clef": {
-        "removed": 1,
-        "no-op": 3
+        "removed": 4
       },
       "layout": {
         "no-op": 4
@@ -1607,8 +1595,7 @@
         "no-op": 2
       },
       "note": {
-        "removed": 6,
-        "no-op": 1
+        "removed": 7
       },
       "score": {
         "no-op": 1
@@ -1617,7 +1604,7 @@
         "removed": 1
       },
       "tie": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "refused": 1
@@ -1643,8 +1630,7 @@
         "removed": 1
       },
       "clef": {
-        "removed": 1,
-        "no-op": 1
+        "removed": 2
       },
       "note": {
         "removed": 14
@@ -1965,18 +1951,6 @@
   },
   "findings": [
     {
-      "scenario": "lab/document/navigation-playground",
-      "element": "p1/m0/clef0",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/document/twelve-bar-blues",
-      "element": "p1/m0/clef0",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
       "scenario": "lab/edge-cases/bar-duration-mismatch",
       "element": "p0/m0/v0/e2/n0",
       "kind": "note",
@@ -1991,54 +1965,6 @@
     {
       "scenario": "lab/edge-cases/bar-duration-mismatch",
       "element": "p0/m1/v0/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/layout/group-barline-individual",
-      "element": "p1/m0/clef0",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/score-text/directions-across-parts",
-      "element": "p1/m0/clef0",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/score-text/directions-multi-staff",
-      "element": "p0/m0/clef1",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/score-text/directions-multi-staff",
-      "element": "p0/m0/v1/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/score-text/directions-multi-staff",
-      "element": "p0/m0/v1/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/score-text/directions-multi-staff",
-      "element": "p0/m0/v1/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/score-text/directions-multi-staff",
-      "element": "p0/m0/v1/e3/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/score-text/directions-multi-staff",
-      "element": "p0/m1/v1/e0/n0",
       "kind": "note",
       "verdict": "unaddressable"
     },
@@ -2067,156 +1993,6 @@
       "verdict": "unaddressable"
     },
     {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/clef1",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/beam/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/beam/b1",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/v1/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/v1/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/v1/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/v1/e3/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/v1/e4/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/v1/e5/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/v1/e6/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m0/v1/e7/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m1/beam/b1",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m1/beam/b2",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m1/v1/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m1/v1/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m1/v1/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m1/v1/e3/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m1/v1/e4/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m1/v1/e5/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m1/v1/e6/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grand-staff",
-      "element": "p0/m1/v1/e7/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/multimeasure-rests",
-      "element": "p1/m0/clef0",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/multiple-layouts",
-      "element": "p1/m0/clef0",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/multiple-layouts",
-      "element": "p2/m0/clef0",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/multiple-layouts",
-      "element": "p3/m0/clef0",
-      "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
       "scenario": "spec/multiple-voices",
       "element": "p0/m1/v1/e1/n0",
       "kind": "note",
@@ -2226,30 +2002,12 @@
       "scenario": "spec/multiple-voices",
       "element": "p0/m1/v1/e2/n0",
       "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/organ-layout",
-      "element": "p0/m0/v3/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/organ-layout",
-      "element": "p0/m0/v3/e0/n0/tie0",
-      "kind": "tie",
       "verdict": "unaddressable"
     },
     {
       "scenario": "spec/ottavas-8va",
       "element": "p0/m1/v0/e0/n0",
       "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/parts",
-      "element": "p1/m0/clef0",
-      "kind": "clef",
       "verdict": "unaddressable"
     },
     {

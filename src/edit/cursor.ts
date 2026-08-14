@@ -97,6 +97,13 @@ export interface EditorCursor {
    * unrelated voices into shared columns.
    */
   partIndex?: number;
+  /**
+   * Which STAFF of that part (1-based). Absent means the first, so cursors
+   * written before staves were addressable stay valid. A grand staff is two
+   * spaces, not one taller one: the ladder addresses a staff at a time
+   * (campaign item 13c).
+   */
+  staffIndex?: number;
 }
 
 /** The whole navigable surface of a document, rebuilt after every edit. */
@@ -230,7 +237,7 @@ export function measureSpans(doc: MnxStructure): Onset[] {
   });
 }
 
-export function buildGrid(doc: MnxStructure, partIndex = 0): PositionGrid {
+export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): PositionGrid {
   // Which part the cursor is in (campaign item 13b). One part at a time: a
   // score-wide grid would merge unrelated voices into shared columns, and the
   // ladder addresses one part's music at a time.
@@ -250,7 +257,7 @@ export function buildGrid(doc: MnxStructure, partIndex = 0): PositionGrid {
   }
 
   for (let measureIndex = 0; measureIndex < measureCount; measureIndex++) {
-    const clef = clefAt(doc, measureIndex, partIndex);
+    const clef = clefAt(doc, measureIndex, partIndex, staffIndex);
     const byOnset: { onset: Onset; raw: RawSlot[]; voices: Set<number> }[] = [];
     const at = (onset: Onset) => {
       let found = byOnset.find(p => onsetsEqual(p.onset, onset));
@@ -266,10 +273,11 @@ export function buildGrid(doc: MnxStructure, partIndex = 0): PositionGrid {
 
     const voiceByStaff = new Map<number, number>();
     (measures[measureIndex]?.sequences ?? []).forEach(sequence => {
-      const staffIndex = sequence.staff ?? 1;
-      const voiceIndex = (voiceByStaff.get(staffIndex) ?? -1) + 1;
-      voiceByStaff.set(staffIndex, voiceIndex);
-      if (staffIndex !== 1) return; // staff 2+ addressing is item 13c
+      const sequenceStaff = sequence.staff ?? 1;
+      const voiceIndex = (voiceByStaff.get(sequenceStaff) ?? -1) + 1;
+      voiceByStaff.set(sequenceStaff, voiceIndex);
+      // One staff at a time: the grid is the space the cursor moves in.
+      if (sequenceStaff !== staffIndex) return;
       let onset: Onset = { num: 0, den: 1 };
       sequence.content.forEach((item, eventIndex) => {
         const push = (event: MnxEvent, at_: Onset, containerIndex?: number) => {
@@ -279,7 +287,7 @@ export function buildGrid(doc: MnxStructure, partIndex = 0): PositionGrid {
             position.raw.push({
               slot: {
                 noteKey: noteKeyAt(
-                  note, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex, partIndex, staffIndex
+                  note, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex, partIndex, sequenceStaff
                 ),
                 line: note._x?.mnxLab?.string ?? defaultStringFor(note.pitch, tuning, capo),
                 staffPosition: staffPositionOfPitch(clef, note.pitch),
@@ -414,11 +422,31 @@ export function clampCursor(grid: PositionGrid, cursor: EditorCursor): EditorCur
   if (positionIndexOf(grid.positions, cursor) >= 0) return cursor;
   const inMeasure = grid.positions.filter(p => p.measureIndex === cursor.measureIndex);
   const target = inMeasure[inMeasure.length - 1] ?? grid.positions[grid.positions.length - 1];
-  return { measureIndex: target.measureIndex, onset: target.onset, line: cursor.line };
+  return {
+    measureIndex: target.measureIndex,
+    onset: target.onset,
+    line: cursor.line,
+    ...carry(cursor)
+  };
+}
+
+/** Where the cursor IS — part and staff — survives every move; what it means
+ *  at that spot (the line's coincidence ordinal) does not. Dropping the part on
+ *  a move sent edits back to `parts[0]` while the cursor showed part 2. */
+function carry(cursor: EditorCursor): Pick<EditorCursor, 'partIndex' | 'staffIndex'> {
+  return {
+    ...(cursor.partIndex ? { partIndex: cursor.partIndex } : {}),
+    ...(cursor.staffIndex && cursor.staffIndex !== 1 ? { staffIndex: cursor.staffIndex } : {})
+  };
 }
 
 function toPosition(cursor: EditorCursor, position: Position): EditorCursor {
-  return { measureIndex: position.measureIndex, onset: position.onset, line: cursor.line };
+  return {
+    measureIndex: position.measureIndex,
+    onset: position.onset,
+    line: cursor.line,
+    ...carry(cursor)
+  };
 }
 
 export function movePosition(grid: PositionGrid, cursor: EditorCursor, delta: 1 | -1): EditorCursor {
@@ -462,7 +490,7 @@ export function movePositionInk(
         line = best.staffPosition;
       }
     }
-    return { measureIndex: position.measureIndex, onset: position.onset, line };
+    return { measureIndex: position.measureIndex, onset: position.onset, line, ...carry(cursor) };
   }
   return cursor;
 }
@@ -502,8 +530,8 @@ export function moveLine(
 ): EditorCursor {
   if (projection === 'tab' && grid.mode === 'string') {
     const next = Math.min(Math.max(cursor.line + delta, 1), grid.lineCount);
-    return { measureIndex: cursor.measureIndex, onset: cursor.onset, line: next };
+    return { measureIndex: cursor.measureIndex, onset: cursor.onset, line: next, ...carry(cursor) };
   }
   const next = Math.min(Math.max(cursor.line - delta, -STAFF_POSITION_RANGE), STAFF_POSITION_RANGE);
-  return { measureIndex: cursor.measureIndex, onset: cursor.onset, line: next };
+  return { measureIndex: cursor.measureIndex, onset: cursor.onset, line: next, ...carry(cursor) };
 }

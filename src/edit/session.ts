@@ -364,14 +364,16 @@ export class EditorSession {
         // rather than pushing an op that changes nothing onto the queue.
         const partIndex = this.cursorState.partIndex ?? 0;
         const measure = this.doc.parts?.[partIndex]?.measures?.[this.cursorState.measureIndex];
+        const staffIndex = this.cursorState.staffIndex ?? 1;
         const declared = (measure?.clefs ?? []).some(
-          entry => (entry.staff ?? 1) === 1 && entry.position === undefined
+          entry => (entry.staff ?? 1) === staffIndex && entry.position === undefined
         );
         if (!declared) return false;
         this.apply({
           type: 'removeClef',
           measureIndex: this.cursorState.measureIndex,
-          partIndex
+          partIndex,
+          staffIndex
         });
         return true;
       }
@@ -832,8 +834,22 @@ export class EditorSession {
         if ((before.partIndex ?? 0) === intent.partIndex) return false;
         // A different part is a different grid: rebuild, then land on its first
         // position rather than pretending the old address means anything here.
-        this.grid = buildGrid(this.doc, intent.partIndex);
+        this.grid = buildGrid(this.doc, intent.partIndex, 1);
         this.cursorState = { ...initialCursor(this.grid), partIndex: intent.partIndex };
+        this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
+        return true;
+      }
+      case 'setStaff': {
+        const part = this.doc.parts?.[before.partIndex ?? 0];
+        const staves = part?.staves ?? 1;
+        if (intent.staffIndex < 1 || intent.staffIndex > staves) return false;
+        if ((before.staffIndex ?? 1) === intent.staffIndex) return false;
+        this.grid = buildGrid(this.doc, before.partIndex ?? 0, intent.staffIndex);
+        this.cursorState = {
+          ...initialCursor(this.grid),
+          ...(before.partIndex ? { partIndex: before.partIndex } : {}),
+          staffIndex: intent.staffIndex
+        };
         this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
         return true;
       }
@@ -963,7 +979,11 @@ export class EditorSession {
   /** The grid derives from the document, so every doc change rebuilds it and
    *  re-anchors the cursor (a removed measure must not strand it). */
   private reindex(): void {
-    this.grid = buildGrid(this.doc, this.cursorState.partIndex ?? 0);
+    this.grid = buildGrid(
+      this.doc,
+      this.cursorState.partIndex ?? 0,
+      this.cursorState.staffIndex ?? 1
+    );
     this.cursorState = clampCursor(this.grid, this.cursorState);
   }
 

@@ -40,6 +40,7 @@ export type NavigationIntent =
   | { type: 'cycleSlot' }
   // Move the cursor to another part (campaign item 13b).
   | { type: 'setPart'; partIndex: number }
+  | { type: 'setStaff'; staffIndex: number }
   /** The Ctrl climb (selection-ladder navigation map): the direction applied
    *  at the nearest ancestor rung where it means something different, then
    *  descend back. At note level: ←→ = bar jump (notation) / event-skip
@@ -144,6 +145,7 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'setProjection',
   'cycleSlot',
   'setPart',
+  'setStaff',
   'jumpNext',
   'jumpPrev',
   'jumpUp',

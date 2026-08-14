@@ -139,6 +139,8 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
     const owner = Number(/^p(\d+)\//.exec(element.path)?.[1] ?? 0);
     if ((session.cursor.partIndex ?? 0) !== owner && !session.handleIntent({ type: 'setPart', partIndex: owner }))
       return { address: 'unaddressable', removal: 'no-op' };
+    if (element.staffIndex !== undefined && (session.cursor.staffIndex ?? 1) !== element.staffIndex)
+      session.handleIntent({ type: 'setStaff', staffIndex: element.staffIndex });
     session.handleIntent({ type: 'goToMeasure', measureIndex: element.measureIndex });
     if (session.cursor.measureIndex !== element.measureIndex)
       return { address: 'unaddressable', removal: 'no-op' };
@@ -205,12 +207,19 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
 export function driveToElement(session: EditorSession, key: string): boolean {
   // The part comes first: a different part is a different grid, so no amount of
   // navigation inside the current one can reach it (campaign item 13b).
-  const parts = session.doc.parts?.length ?? 0;
-  for (let partIndex = 0; partIndex < parts; partIndex++) {
+  const parts = session.doc.parts ?? [];
+  for (const [partIndex, part] of parts.entries()) {
     if ((session.cursor.partIndex ?? 0) !== partIndex) {
       if (!session.handleIntent({ type: 'setPart', partIndex })) continue;
     }
-    if (driveWithinPart(session, key)) return true;
+    // …and each staff of it: a grand staff is two spaces, so the note may be
+    // in the one the cursor is not looking at (campaign item 13c).
+    for (let staffIndex = 1; staffIndex <= (part.staves ?? 1); staffIndex++) {
+      if ((session.cursor.staffIndex ?? 1) !== staffIndex) {
+        if (!session.handleIntent({ type: 'setStaff', staffIndex })) continue;
+      }
+      if (driveWithinPart(session, key)) return true;
+    }
   }
   return false;
 }

@@ -455,7 +455,8 @@
         "glyph": "noteheadHalf",
         "x": 18.8893,
         "y": 34.1,
-        "className": "notehead"
+        "className": "notehead",
+        "sourceId": "@m0.s3.v0.e0.n0"
       },
       {
         "kind": "line",

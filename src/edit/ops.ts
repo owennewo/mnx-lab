@@ -181,6 +181,8 @@ export type EditOp =
       measureIndex: number;
       /** Which part's clef (campaign item 13b); default the first. */
       partIndex?: number;
+      /** Which staff's clef (13c); default the first. */
+      staffIndex?: number;
     }
   | {
       /** Declare the key signature governing this measure onward. */
@@ -628,8 +630,9 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
       const clefs = measure?.clefs;
       if (!measure || !clefs) return next;
+      const staff = op.staffIndex ?? 1;
       const kept = clefs.filter(
-        entry => !((entry.staff ?? 1) === 1 && entry.position === undefined)
+        entry => !((entry.staff ?? 1) === staff && entry.position === undefined)
       );
       if (kept.length === clefs.length) return next;
       // No tombstone: an emptied array goes with its last member.

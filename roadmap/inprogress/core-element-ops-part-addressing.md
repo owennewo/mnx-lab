@@ -1,4 +1,4 @@
-# Part addressing — the cursor learns there is more than one part
+# Part & staff addressing — the cursor learns where else music lives
 
 > **Status: built 2026-08-14.** Campaign:
 > [core-campaign-element-ops.md](core-campaign-element-ops.md), item 13b's
@@ -49,12 +49,31 @@ anonymous — `spec/parts`, `spec/multiple-layouts`, `spec/multimeasure-rests`,
 — with **no geometry moved**; they wait in `/verify` with the seven from the
 container work.
 
+## Staff addressing followed (13c's first half, 2026-08-14)
+
+The same shape, one level down: the cursor carries a `staffIndex`, the grid
+filters to it, `clefAt` honours it, a `setStaff` intent moves between them, and
+the renderer keys **any staff showing exactly one part's one staff** — so the
+grand staff's lower half is addressable and paintable.
+
+**And it uncovered a real bug in ordinary editing.** Navigation builds fresh
+cursors — which is how the coincidence ordinal resets — and that silently
+dropped the part too. So `goToMeasure` after moving to part 2 sent the next edit
+back to `parts[0]` while the cursor still showed part 2: a clef removal that
+returned `true` and removed the wrong part's clef. Position (part, staff) now
+survives every move; only meaning-at-that-spot (the ordinal) resets. The sweep
+caught it as nine `refused` clefs that should have been removable.
+
+**Removable elements 1,351 → 1,389.** Notes 794 (7 left, the navigation
+failures), clefs 112 (1 left, the mid-measure one), ties and beams all but four.
+Three more scenarios' goldens gained `sourceId`s on staff 2 — `spec/grand-staff`,
+`spec/organ-layout`, `lab/score-text/directions-multi-staff` — no geometry moved.
+
 ## What remains, honestly
 
 - **Entry still writes to `parts[0]`** (item 13c). You can navigate to part 2,
   select and remove there — but a note you type lands in part 1. That is a real
   incoherence, bounded and documented, and it is the ~25 sites above.
-- **Staff 2 is not addressable** (`note` 29 no-op = 22 staff-2 notes + the seven
-  navigation failures; `clef` 12 = mid-measure and staff-2). The walk names them
-  now; the grid still filters to staff 1, which is the same shape of change one
-  level down.
+- **Seven navigation failures** remain unexplained (notes the cursor reaches by
+  coordinates but not by resolution) and one **mid-measure clef**, which needs an
+  onset-addressed variant of the op.
