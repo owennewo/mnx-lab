@@ -5,11 +5,13 @@
 // validation and provenance all live in one place. Three ops prove the shape;
 // grow the union as real editing features land.
 import type {
+  MnxBeam,
   MnxEvent,
   MnxNote,
   MnxNoteValueBase,
   MnxPart,
   MnxSequence,
+  MnxSequenceItem,
   MnxStructure,
   MnxTuningEntry
 } from '../model/mnx.ts';
@@ -282,14 +284,25 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'deleteNote': {
+      let removedNoteId: string | undefined;
+      let emptiedEventId: string | undefined;
+      let emptied: MnxEvent | undefined;
       forEachEventNote(next, (event, note, key) => {
         if (key !== op.noteId) return;
+        removedNoteId = note.id;
         event.notes!.splice(event.notes!.indexOf(note), 1);
         if (event.notes!.length === 0) {
           delete event.notes;
           event.rest = {};
+          emptied = event;
+          emptiedEventId = event.id;
         }
       });
+      // The *reference* removal class: unlink BOTH ends. Nothing may be left
+      // pointing at what just went — and an emptied event keeps its id, so a
+      // beam over it would not dangle, it would beam a rest.
+      if (emptied?.slurs) delete emptied.slurs;
+      if (removedNoteId || emptiedEventId) unlinkReferences(next, removedNoteId, emptiedEventId);
       return next;
     }
     case 'setDuration': {
@@ -651,6 +664,97 @@ function forEachEventNote(
         });
       });
   });
+}
+
+/**
+ * Strip every reference to a note that was just removed, and to an event that
+ * just became a rest — the campaign's *reference* removal class ("unlink both
+ * ends"), caught corpus-wide by the destructibility sweep
+ * (roadmap/inprogress/core-element-ops-destruct-sweep.md). Scans ALL parts:
+ * `deleteNote` edits the entry surface, but a tie or slur may point into it
+ * from anywhere.
+ *
+ * The two failure modes are different and both are fixed here: a reference to
+ * the note DANGLES (its id resolves to nothing), while a reference to the
+ * emptied event goes INKLESS (the id still resolves — to a rest). No
+ * tombstones: emptied containers are deleted, never left behind.
+ */
+function unlinkReferences(
+  doc: MnxStructure,
+  noteId: string | undefined,
+  eventId: string | undefined
+): void {
+  const pruneBeams = (beams: MnxBeam[] | undefined, top: boolean): MnxBeam[] | undefined => {
+    if (!beams || !eventId) return beams;
+    const kept = beams
+      .map(beam => ({ ...beam, events: (beam.events ?? []).filter(id => id !== eventId) }))
+      .map(beam => {
+        const nested = pruneBeams(beam.beams, false);
+        if (nested && nested.length > 0) beam.beams = nested;
+        else delete beam.beams;
+        return beam;
+      })
+      // A beam needs two events to mean anything; a NESTED beam over one is a
+      // legal hook (a partial beam), so only the outer level demands two.
+      .filter(beam => beam.events.length >= (top ? 2 : 1));
+    return kept;
+  };
+
+  for (const part of doc.parts ?? []) {
+    for (const measure of part.measures ?? []) {
+      if (measure.beams) {
+        const kept = pruneBeams(measure.beams, true);
+        if (kept && kept.length > 0) measure.beams = kept;
+        else delete measure.beams;
+      }
+      for (const sequence of measure.sequences ?? []) {
+        const visit = (content: MnxSequenceItem[] | undefined): void => {
+          for (const item of content ?? []) {
+            if (!isTimedEvent(item)) {
+              visit((item as { content?: MnxSequenceItem[] }).content);
+              continue;
+            }
+            const event = item as MnxEvent;
+            if (event.slurs) {
+              const kept = event.slurs
+                // A slur onto a rest is not a slur.
+                .filter(slur => !eventId || slur.target !== eventId)
+                .map(slur => {
+                  // The endpoint pins name chord members; the slur itself
+                  // survives losing one, it just stops pinning.
+                  if (noteId && slur.startNote === noteId) delete slur.startNote;
+                  if (noteId && slur.endNote === noteId) delete slur.endNote;
+                  return slur;
+                });
+              if (kept.length > 0) event.slurs = kept;
+              else delete event.slurs;
+            }
+            for (const note of event.notes ?? []) {
+              if (noteId && note.ties) {
+                const kept = note.ties.filter(tie => tie.target !== noteId);
+                if (kept.length > 0) note.ties = kept;
+                else delete note.ties;
+              }
+              const tab = note._x?.mnxLab?.tab;
+              if (noteId && tab?.technique) {
+                const technique = tab.technique as Record<string, { target?: string } | undefined>;
+                for (const [name, value] of Object.entries(technique))
+                  // A hammer-on to a note that no longer exists is not a
+                  // hammer-on: the technique IS the relationship.
+                  if (value && typeof value === 'object' && value.target === noteId)
+                    delete technique[name];
+                if (Object.keys(technique).length === 0) delete tab.technique;
+                if (Object.keys(tab).length === 0) delete note._x!.mnxLab!.tab;
+                if (Object.keys(note._x!.mnxLab!).length === 0) delete note._x!.mnxLab;
+                if (Object.keys(note._x!).length === 0) delete note._x;
+              }
+            }
+          }
+        };
+        visit(sequence.content);
+      }
+    }
+  }
 }
 
 /** One op-queue entry: the op plus the intent that provoked it — stamped

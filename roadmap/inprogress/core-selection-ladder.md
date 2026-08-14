@@ -148,6 +148,29 @@ existing entry ghosts generalized): Enter into a rest drops a ghost cell on a
 staff line or string; typing materializes the note. Solid = a thing, ghost = a
 place for a thing.
 
+**The cursor has no voice, and that loses notes.** `EditorCursor` is
+`{measureIndex, onset, line}`, so `slotAt` returns whichever slot matches the
+line first: when two voices put a note on the same string at the same onset
+(twelve-bar-blues m10 — melody over the alternating bass), the address is
+ambiguous and Delete removes *the other voice's* note. Found 2026-08-14 by the
+destructibility sweep, which now reports 48 of that scenario's notes as
+unaddressable ([core-element-ops-destruct-sweep.md](core-element-ops-destruct-sweep.md),
+campaign item 2). The per-level pass owns the decision — a voice component in
+the cursor, or a disambiguating gesture at the note rung — and the sweep's
+report is the regression surface for whichever lands. Note the asymmetry it
+also exposed: the same chord can be ambiguous in tab (two members derived onto
+one string) and perfectly addressable in notation, so the fix has to name which
+projection's address it fixes.
+
+**A measureless part draws nothing** — observed 2026-08-12 walking a construct
+op queue backward ([core-element-ops-exemplar.md](../complete/core-element-ops-exemplar.md),
+campaign item 1): the first two positions of a from-`{}` build (`{}` and
+part-added) are identical in the score pane, distinguishable only in the ops
+queue and the json tab. The ghost vocabulary is where the fix belongs — an
+empty part is a *place for a bar*, exactly the solid/ghost distinction one
+level up from the cell — and it is corpus-neutral (no scenario is measureless),
+so it costs no goldens.
+
 ## One visual vocabulary: the enclosure
 
 Every rung is an enclosure; differentiation is geometry, not styling systems —

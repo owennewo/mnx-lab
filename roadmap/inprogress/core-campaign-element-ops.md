@@ -89,7 +89,7 @@ agreed or candidate claims; **bold** = agreed.
 | # | Item | Scope | Unlocks | Keys / tier | Rung | Status |
 |---|------|-------|---------|-------------|------|--------|
 | 1 | [exemplar](../complete/core-element-ops-exemplar.md) | Both harness halves built end-to-end over two simple scenarios (`minimal-single-note`, `open-strings-chord`). Start is **decided: the literal `{}`** — so the campaign's first new ops are the genesis verbs (`addPart`, skeleton-on-demand; score rung, setup tier) and the session is hardened for zero parts/measures. Settles key normalization; adds the **op-queue panel** (side-panel ops tab: `appliedOps` as a visible undo/redo queue) so command sequences can be read and reviewed. | the algorithm + genesis ops + 2 traced scenarios | **Shift+P** part popover; staffKind: palette | **score** | **complete 2026-08-14** |
-| 2 | [destructibility sweep](../proposed/core-element-ops-destruct-sweep.md) | Item 1's reverse walk scaled corpus-wide: element walker per kind (noteKeys generalized), attempt address+delete per element; oracles: applies / no new diagnostics / no dangling references / undo byte-identical, **widened** (relative validity, references past ties, a surviving-document check). No trace fixtures — the walk regenerates each run; the report is the artifact. Doubles as ladder addressability audit. Fix the `deleteNote` dangling-reference bug it will catch. | verdicts for all 106 | n/a | n/a | **drafted 2026-08-14** |
+| 2 | [destructibility sweep](core-element-ops-destruct-sweep.md) | Item 1's reverse walk scaled corpus-wide: element walker per kind (noteKeys generalized), attempt address+delete per element; oracles: applies / no new diagnostics / no dangling references / undo byte-identical, **widened** (relative validity, references past ties, a surviving-document check). No trace fixtures — the walk regenerates each run; the report is the artifact. Doubles as ladder addressability audit. Fix the `deleteNote` dangling-reference bug it will catch. | verdicts for all 106 | n/a | n/a | **built 2026-08-14** |
 | 3 | constructibility traces | Item 1's forward harness scaled: the construct-fixture kind + per-scenario tiers (unreachable → ops-reachable → keyboard-reachable → traced) + the expected-unreachable class. Traces themselves arrive with items 4–13 (recorded via "copy trace", never hand-written); possible workbench coverage map later. Inherits item 1's parked **recording surface** question: "copy trace" stamps a corpus scenario id as the start, so recording from `{}` wants the new-document journey — and with it, the ops tab on non-scenario (IndexedDB) documents. | verdict machinery for all 106; traces accumulate per item | n/a | n/a | undrafted |
 | 4 | duration completion | Dots (op already accepts `dots?` — cheapest unlock), capo (read but unwritable), time `display: common\|cut`. | ~10 | dot: single key (`.` candidate); capo/display: popover grammar | event / setup | undrafted |
 | 5 | clef & key signature | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class. | gates ~all entry; F-clef + 5 key-sig scenarios | popover tier (Shift+letter) | measure | undrafted |
@@ -108,6 +108,43 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
+- **2026-08-14 — item 2 built: the corpus has a scoreboard, and it found four bugs.**
+  `npm run sweep:destruct` writes `harness/reports/destruct-sweep.json`; `npm test`
+  fails on drift in either direction, so a later item's new verb lands as rows
+  moving `no-op` → `removed`. **First baseline: 1,460 elements over 106 scenarios —
+  639 removed, 821 no-op, 162 unaddressable notes**, every scenario passing its
+  invariants. What the run taught the campaign:
+  - **The denominator is now real.** 45 element kinds, 44 exercised by the corpus,
+    **one** with a removal verb. Ordering evidence for items 4–13 by ink volume:
+    clef 113, time-signature 99, part-name 59, dynamic 43, beam 40,
+    string-annotation 34, lyric 28, articulation 14, direction 13, tie 13.
+  - **"Element = distinguishable ink" is machine-checked now.** Every one of the 63
+    primitive classes drawn in the goldens must be claimed by a kind or declared
+    structural with a reason (`element-census.test.ts`). A renderer feature that
+    draws something new turns that test red until a kind owns it — the census, not
+    taste, decides when the walker is complete. Element-vs-structure is drawn by
+    *encode the choice, not the consequence* — the same rule that sorts string from
+    fret, reused rather than reinvented.
+  - **Item 1's addressability test was too weak, and it hid a wrong-note deletion.**
+    Comparing cursor coordinates said "arrived"; the editor then deleted a
+    DIFFERENT note, because `EditorCursor` carries no voice and `slotAt` takes the
+    first slot on the line. Resolve the slot and compare its key instead. The rule
+    for the campaign: **an addressability oracle must ask what the editor would act
+    on, never where the cursor sits.**
+  - **The predicted reference bug was four bugs.** Ties dangled as designed
+    (`spec/ties`, `spec/tie-targets`) — and so did slurs, technique relationships
+    (a hammer-on to a deleted note), while seven beam scenarios went **inkless**
+    instead: the emptied event keeps its id, so the beam does not break, it beams a
+    rest. 13 scenarios in total, fixed in `deleteNote` as the *reference* removal
+    class (unlink both ends) plus a declared beam cascade. Later items get the
+    check for free — `src/model/references.ts` is one list of every id join.
+  - **The surviving-document oracle earns its place immediately**: it is what
+    proved the new cascades removed only what they should. Array-shift-aware
+    diffing was the trick — splicing a chord member must not read as five changes.
+  - Two findings handed onward: the cursor's missing voice component (evidence
+    filed to [core-selection-ladder.md](core-selection-ladder.md)), and a chord in
+    navigation-playground deriving two notes onto one string, which no fingerboard
+    can play.
 - **2026-08-14 — item 1 closed; what items 2–3 inherit.** The exemplar moves to
   `complete/`. The pieces it settled are now campaign rules, and its v0
   shortcuts are item 2's opening punch list rather than debt to rediscover:
