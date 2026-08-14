@@ -273,6 +273,13 @@ export function driveToElement(session: EditorSession, key: string): boolean {
         if (!session.handleIntent({ type: 'setStaff', staffIndex })) continue;
       }
       if (driveWithinPart(session, key)) return true;
+      // ←→ at the note rung is voice-STICKY (the ladder's decided walk), so a
+      // second voice's unshared onsets cannot be reached by walking alone —
+      // the voice jump is how a player gets there, so the sweep uses it too.
+      for (const jump of ['jumpDown', 'jumpUp'] as const) {
+        if (!session.handleIntent({ type: jump })) continue;
+        if (driveWithinPart(session, key)) return true;
+      }
     }
   }
   return false;

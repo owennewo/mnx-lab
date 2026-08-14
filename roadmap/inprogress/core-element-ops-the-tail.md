@@ -43,7 +43,33 @@ component's declared staff position. Removing a *component* or a *sound* is
 guarded the way containers are: removable once nothing references them, because
 the alternative is orphaning ink.
 
-## The seven that remain, named
+## Three of the seven closed (2026-08-15)
+
+Diagnosed rather than guessed, and they were three different bugs, not one:
+
+- **`spec/ottavas-8va`** — the line clamp. `STAFF_POSITION_RANGE` was a hard
+  ±16, and an 8va note sits at staff position **17**: ink the renderer had
+  drawn and the cursor could not travel to. Now ±24.
+- **`spec/multiple-voices` ×2** — ←→ at the note rung is **voice-sticky** by
+  design, so a second voice's unshared onsets are unreachable by walking. The
+  sweep now uses the **voice jump**, which is what a player does.
+- The remaining four have one cause, and it is a ladder question rather than a
+  sweep one — see below.
+
+## The four that remain, named
+
+`lab/edge-cases/bar-duration-mismatch` ×3 and `spec/tie-targets` ×1, all for the
+same reason: **the ink walk re-anchors mid-walk**. `movePositionInk` takes its
+anchor voice from whichever slot comes first on the cursor's line, so when two
+voices share a line at one onset the walk can continue in the *other* voice and
+skip the rest of the one being read. In the mis-summing bar that strands the
+notes past the meter; in `tie-targets` it strands voice 1's note at 1/8.
+
+That is the same coincidence problem the cursor's `slotIndex` fixed for
+*addressing*, now showing up in *walking* — and the fix belongs to
+[core-selection-ladder.md](core-selection-ladder.md)'s per-level pass, which
+owns what ←→ means at the note rung. Recorded there.
+
 
 All notes, all in edge cases where the cursor's onset walk cannot reach the
 note's position:
@@ -54,6 +80,4 @@ note's position:
   onsets the entry voice does not share.
 - `spec/ottavas-8va` ×1.
 
-They are 0.5% of the corpus and they are a *navigation* question, not a
-vocabulary one: every kind now has its verb. The right home is the selection
-ladder's per-level pass, which already owns how the cursor walks onsets.
+

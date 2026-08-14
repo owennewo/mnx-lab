@@ -4,11 +4,11 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "removed": 1434,
-      "no-op": 7,
+      "removed": 1437,
+      "no-op": 4,
       "refused": 19
     },
-    "unaddressableWithAnOp": 7
+    "unaddressableWithAnOp": 4
   },
   "kinds": {
     "accidental-display": {
@@ -78,8 +78,8 @@
       "removed": 3
     },
     "note": {
-      "removed": 794,
-      "no-op": 7
+      "removed": 797,
+      "no-op": 4
     },
     "ottava": {
       "removed": 1
@@ -1560,8 +1560,7 @@
         "removed": 1
       },
       "note": {
-        "removed": 8,
-        "no-op": 2
+        "removed": 10
       },
       "time-signature": {
         "removed": 1
@@ -1612,8 +1611,7 @@
         "removed": 1
       },
       "note": {
-        "removed": 5,
-        "no-op": 1
+        "removed": 6
       },
       "ottava": {
         "removed": 1
@@ -1962,24 +1960,6 @@
     {
       "scenario": "lab/edge-cases/bar-duration-mismatch",
       "element": "p0/m1/v0/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/multiple-voices",
-      "element": "p0/m1/v1/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/multiple-voices",
-      "element": "p0/m1/v1/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/ottavas-8va",
-      "element": "p0/m1/v0/e0/n0",
       "kind": "note",
       "verdict": "unaddressable"
     },

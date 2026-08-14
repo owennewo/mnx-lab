@@ -554,7 +554,11 @@ export function moveToMeasure(
 
 /** How far the notation cursor may leave the staff, in staff positions
  *  (±16 = four ledger lines' worth each way). */
-const STAFF_POSITION_RANGE = 16;
+/** How far the cursor may travel above/below the middle line. Wide enough for
+ *  ink an octave line puts out there: an 8va note in `spec/ottavas-8va` sits at
+ *  staff position 17, and a hard 16 made it unreachable — the cursor could not
+ *  go where the renderer had drawn. */
+const STAFF_POSITION_RANGE = 24;
 
 /** Walk the vertical axis of the active projection's SPACE: strings
  *  top→bottom on the fingerboard, staff positions (occupied or not) on the

@@ -148,6 +148,23 @@ existing entry ghosts generalized): Enter into a rest drops a ghost cell on a
 staff line or string; typing materializes the note. Solid = a thing, ghost = a
 place for a thing.
 
+**The ink walk re-anchors, and a shared line hands it to the wrong voice.**
+`movePositionInk` takes its anchor voice from `slotAt` — whichever slot comes
+first on the cursor's line — so when two voices put a note on one line at one
+onset, a ←→ step can silently continue in the OTHER voice, skipping the rest of
+the one you were reading. Found 2026-08-15 by the destructibility sweep, which
+still cannot reach three notes of `lab/edge-cases/bar-duration-mismatch` (a bar
+that deliberately does not sum) or one of `spec/tie-targets` for exactly this
+reason. The per-level pass owns the decision: carry the anchor voice in the
+cursor rather than re-deriving it per step, or re-derive it but prefer the voice
+the previous step was in.
+
+Two smaller navigation findings closed alongside it: the line clamp was a hard
+±16 staff positions, so an 8va note at position 17 (`spec/ottavas-8va`) was ink
+the cursor could not reach — now ±24; and the sweep learned to use the **voice
+jump** to reach a second voice's unshared onsets, which is what a player does,
+since ←→ is voice-sticky by design.
+
 **The cursor has no voice, and that loses notes.** `EditorCursor` is
 `{measureIndex, onset, line}`, so `slotAt` returns whichever slot matches the
 line first: when two voices put a note on the same string at the same onset
