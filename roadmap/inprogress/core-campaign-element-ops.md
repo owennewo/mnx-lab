@@ -96,7 +96,7 @@ agreed or candidate claims; **bold** = agreed.
 | 6 | accidental spelling | Flats (natural-then-sharp policy makes E♭ unwritable), enharmonic respell, `accidentalDisplay`/parentheses. | 9+ | respell: single key | note | undrafted |
 | 7 | [bar-attribute family](core-element-ops-bar-attributes.md) | Barlines, repeats, endings, segno/jump/fine, sections, rehearsal, tempo — one typed-popover family on the global measure. ONE op pair for ten kinds; `no <attribute>` strips. | **18 scenarios** (reachable 24 → 42); 56 elements removable | **Shift+B** | **measure** | **built 2026-08-14** |
 | 8 | [event adornments](core-element-ops-adornments.md) | Articulations/markings, dynamics, directions — **two** op pairs, because markings are owned by the event and the other two by the part measure. | 13 (reachable 55 → 68); 70 elements | **Shift+A** popover (letter accelerators deferred) | **note/event** | **built 2026-08-14** |
-| 9 | tab technique alphabet | Bends, slides, hammer/pull, vibrato, palm mute, harmonics — the `B H S V X O` set `keymapDocs.ts` already reserves. Entry side of [core-guitar-technique.md](../proposed/core-guitar-technique.md) (which owns rendering). | 5 | **B H S V X O** (reserved) | note | undrafted |
+| 9 | [tab technique alphabet](core-element-ops-technique.md) | Bends, slides, hammer/pull, vibrato, palm mute, harmonics — the `B H S V X O` set `keymapDocs.ts` already reserves. Entry side of [core-guitar-technique.md](../proposed/core-guitar-technique.md) (which owns rendering). | 7 (reachable 71 → 78); +fingering | **B H S V X O** — live only in the tab pane layer, so B/S are polymorphic with beam/slur | **note** | **built 2026-08-14** |
 | 10 | [spanners](core-element-ops-spanners.md) | Slurs; tie variants (`crossVoice`, `lv`, `arpeggio`). The two-ended **anchor gesture** (press, navigate, press); reference removal class. | 3 (reachable 42 → 45) | **S**, polymorphic by projection: slur in notation, slide in tab (resolves item 9's collision) | **note→note** | **built 2026-08-14** |
 | 11 | [rhythm declarations](core-element-ops-rhythm-declarations.md) | **Split at build time**: this item takes the declarations that leave ink where it is — beams (top level), full-measure rests, measure repeats. Beams reuse item 10's anchor at event→event. | 10 (reachable 45 → 55); 22 elements | **B**, polymorphic (beam in notation, bend in tab); rests via the bar popover | **measure**, **event→event** | **built 2026-08-14** |
 | 11b | [onset granularity](core-element-ops-onset-granularity.md) **(built)** + containers & rest spelling | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | ~9 | t.b.d. | event | **granularity built 2026-08-14**; containers + rest spelling open |
@@ -109,6 +109,46 @@ et al are layout-only, zero measures — a different surface, not keys), percuss
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — item 9 built: the reserved letters, and the collision dissolves.**
+  Technique (`setTechnique`/`removeTechnique`) plus fingering, at the note rung.
+  - **`B` and `S` needed no conditional at all.** The letters live in the **tab
+    pane layer**, and `resolveIntent` tries pane layers before shared ones — so
+    B bends in tab and beams in notation, S slides in tab and slurs in notation.
+    Item 10 named the principle, item 11 reused it, and here the keymap turns
+    out to have had the mechanism all along. **A polymorphic key is a layering
+    fact, not a branch.**
+  - **`H` is one key because the music decides**: hammer-on when the next note
+    is higher, pull-off when lower. Two keys would ask the player to name what
+    their fingers already chose.
+  - **Reachable 71 → 78, removable 1003 → 1022.** Goldens untouched: nothing
+    here draws yet, which is the gap core-guitar-technique.md owns — this item
+    is deliberately only the entry half.
+  - Fingering rode along: same owner, same rung, same removal — item 7's test
+    saying "collapse" for the fourth time.
+
+- **2026-08-14 — 11b's remainder, measured: two findings instead of two features.**
+  - **Rest spelling is the entry grid.** Making `padMeasureRests` write one half
+    rest instead of two quarters is a five-line change that broke two traces
+    instantly: **the cursor's positions come from rest events**, so coarse rests
+    delete the places the cursor can aim at (an empty 4/4 bar spelled as one
+    whole rest offers exactly one). Beat-rest padding is not naive — it is the
+    grid. The real fix decouples grid positions from rest events, which is
+    bigger than the spelling it would buy. Reverted.
+  - **Container descent is a key-scheme migration.** The goldens were the
+    expected cost (7 scenarios, 32 noteheads — an accepted demotion), but they
+    are not the blocker: the renderer indexes `sequence.content` per item, so a
+    container's inner events would all synthesize the SAME key. Descent needs a
+    nested key form (`@m0.v0.e2.c1.n0`) landed simultaneously across
+    `noteKeys.ts`, `jsonView.ts`, `cursor.ts`, `notation.ts` and `tabStaff.ts`
+    — the five traversals CLAUDE.md requires to stay in lockstep. Half a
+    migration desynchronizes the overlay, the JSON pane and the render, so it is
+    deliberately left whole and unstarted rather than begun and abandoned.
+  - Tuplet/tremolo onsets are not the hard part (`itemSpan` already scales
+    them) and grace notes share their host's onset, which the slot list
+    supports. **The hard part is agreement between traversals**, which is the
+    same lesson the campaign started with: the goldens are the witness that they
+    agree.
 
 - **2026-08-14 — item 11b's first half: a run of short notes is enterable at last.**
   Item 11 could not record a beam trace for a reason that had nothing to do with

@@ -224,6 +224,14 @@ export type EditOp =
       targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump';
       lv?: boolean;
     }
+  // Tab technique + fingering (campaign item 9,
+  // roadmap/inprogress/core-element-ops-technique.md). Both live under the
+  // note's vendor block; technique is the ENTRY side of
+  // roadmap/proposed/core-guitar-technique.md, which owns the drawing.
+  | { type: 'setTechnique'; noteKey: string; technique: TechniqueChoice }
+  | { type: 'removeTechnique'; noteKey: string; kind: TechniqueChoice['kind'] }
+  | { type: 'setFingering'; noteKey: string; hand: 'left' | 'right'; finger: string }
+  | { type: 'removeFingering'; noteKey: string }
   // Part declarations (campaign item 13,
   // roadmap/inprogress/core-element-ops-part-declarations.md): five keys on
   // parts[0] that shipped with constructors and no removals. One pair, because
@@ -301,6 +309,17 @@ export type EditOp =
       kind: MeasureAttributeKind;
       index?: number;
     };
+
+/** What a technique key writes. `hammerOn`/`pullOff`/`slide` name the note they
+ *  travel to; the rest are flags or curves. */
+export type TechniqueChoice =
+  | { kind: 'bend'; semitones?: number }
+  | { kind: 'slide' }
+  | { kind: 'hammerOn' }
+  | { kind: 'pullOff' }
+  | { kind: 'vibrato' }
+  | { kind: 'palmMute' }
+  | { kind: 'harmonic' };
 
 /** The part's own declarations. `name`/`strings`/`staffKind` keep their
  *  existing setters (`addPart`, `setTuning`, `setStaffKind`) — rewriting them
@@ -705,6 +724,73 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const existing = note.ties?.[0];
       if (!existing) return next;
       if (op.targetType) existing.targetType = op.targetType;
+      return next;
+    }
+    case 'setTechnique': {
+      const located = findKeyedNote(next, op.noteKey);
+      if (!located) return next;
+      const tab = ((((located.note._x ??= {}).mnxLab ??= {}).tab ??= {}) as {
+        technique?: Record<string, unknown>;
+      });
+      const technique = (tab.technique ??= {});
+      switch (op.technique.kind) {
+        case 'bend':
+          // A bend is a CURVE (points in semitones), never a single interval —
+          // the shape core-guitar-technique.md settled. The keyboard writes the
+          // common one: straight up by a tone over the note's length.
+          technique.bend = {
+            points: [
+              { position: 0, alter: 0 },
+              { position: 1, alter: op.technique.semitones ?? 2 }
+            ]
+          };
+          break;
+        case 'vibrato':
+        case 'palmMute':
+          technique[op.technique.kind] = true;
+          break;
+        case 'harmonic':
+          technique.harmonic = { type: 'natural' };
+          break;
+        default: {
+          // hammerOn / pullOff / slide travel to the following note, so they
+          // mint its id the way `toggleTie` does.
+          const target = tieTarget(next, located);
+          if (!target) return next;
+          target.id ??= mintNoteId(next);
+          technique[op.technique.kind] =
+            op.technique.kind === 'slide'
+              ? { type: 'legato', target: target.id }
+              : { target: target.id };
+        }
+      }
+      return next;
+    }
+    case 'removeTechnique': {
+      const located = findKeyedNote(next, op.noteKey);
+      const tab = located?.note._x?.mnxLab?.tab as { technique?: Record<string, unknown> } | undefined;
+      if (!located || !tab?.technique?.[op.kind]) return next;
+      delete tab.technique[op.kind];
+      // No tombstones, all the way up the vendor chain.
+      if (Object.keys(tab.technique).length === 0) delete tab.technique;
+      if (Object.keys(tab).length === 0) delete located.note._x!.mnxLab!.tab;
+      if (Object.keys(located.note._x!.mnxLab!).length === 0) delete located.note._x!.mnxLab;
+      if (Object.keys(located.note._x!).length === 0) delete located.note._x;
+      return next;
+    }
+    case 'setFingering': {
+      const located = findKeyedNote(next, op.noteKey);
+      if (!located) return next;
+      ((located.note._x ??= {}).mnxLab ??= {}).fingering = { hand: op.hand, finger: op.finger };
+      return next;
+    }
+    case 'removeFingering': {
+      const located = findKeyedNote(next, op.noteKey);
+      const x = located?.note._x?.mnxLab;
+      if (!located || !x?.fingering) return next;
+      delete x.fingering;
+      if (Object.keys(x).length === 0) delete located.note._x!.mnxLab;
+      if (Object.keys(located.note._x!).length === 0) delete located.note._x;
       return next;
     }
     case 'setPartDeclaration': {
@@ -1135,6 +1221,27 @@ export function beamRunBetween(
     eventIds.push(event.id);
   }
   return eventIds.length >= 2 ? { measureIndex: from.measureIndex, eventIds } : null;
+}
+
+/** The technique of `kind` on this note, if any — asked before applying, so a
+ *  toggle never queues an op that changes nothing. */
+export function techniqueAt(doc: MnxStructure, noteKey: string, kind: string): unknown {
+  const located = findKeyedNote(doc, noteKey);
+  const technique = located?.note._x?.mnxLab?.tab?.technique as Record<string, unknown> | undefined;
+  return technique?.[kind];
+}
+
+/** This note's midi pitch and the following note's — what decides hammer-on
+ *  from pull-off (up hammers, down pulls). */
+export function nextNotePitchPair(
+  doc: MnxStructure,
+  noteKey: string
+): { current: number; next: number } | null {
+  const located = findKeyedNote(doc, noteKey);
+  if (!located) return null;
+  const target = tieTarget(doc, located);
+  if (!target) return null;
+  return { current: midiOf(located.note), next: midiOf(target) };
 }
 
 /** Does a slur start at this note? The toggle asks BEFORE applying, so a

@@ -147,7 +147,11 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
           ? ({ type: 'toggleBeam' } as const)
           : element.kind === 'articulation'
             ? ({ type: 'removeMarking', marking: element.path.split('/').pop()! } as const)
-            : ({ type: 'delete' } as const);
+            : element.kind === 'technique'
+              ? ({ type: 'toggleTechnique', kind: element.path.split('/').pop() } as never)
+              : element.kind === 'fingering'
+                ? ({ type: 'removeFingering' } as const)
+                : ({ type: 'delete' } as const);
   // "Handled" is not "removed": `toggleSlur` legitimately returns true when it
   // merely ARMS an anchor, and a walk that counted that as a removal would
   // report ink gone that is still on the page. Compare the document instead.

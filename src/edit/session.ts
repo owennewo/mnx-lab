@@ -13,6 +13,8 @@ import {
   beamStartingAt,
   EditHistory,
   hasSlurStartingAt,
+  nextNotePitchPair,
+  techniqueAt,
   MEASURE_ATTRIBUTE_FIELDS,
   measureHasInk,
   partHasInk
@@ -400,6 +402,52 @@ export class EditorSession {
         }
         // 3. Otherwise arm (or disarm, pressing twice in one place).
         this.spanAnchorKey = this.spanAnchorKey === slot.noteKey ? null : slot.noteKey;
+        return true;
+      }
+      case 'toggleTechnique': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        // Hammer-on vs pull-off is decided by the interval to the next note,
+        // because it is decided by the fingers: you hammer UP and pull OFF
+        // downward. One key, and the music picks the name.
+        const kind =
+          intent.kind === 'hammerPull' ? this.hammerOrPull(slot.noteKey) : intent.kind;
+        if (!kind) return false;
+        const existing = techniqueAt(this.doc, slot.noteKey, kind);
+        const before = JSON.stringify(this.doc);
+        this.apply(
+          existing
+            ? { type: 'removeTechnique', noteKey: slot.noteKey, kind }
+            : { type: 'setTechnique', noteKey: slot.noteKey, technique: { kind } as never }
+        );
+        if (JSON.stringify(this.doc) === before) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
+      case 'setFingering': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        this.apply({
+          type: 'setFingering',
+          noteKey: slot.noteKey,
+          hand: intent.hand,
+          finger: intent.finger
+        });
+        return true;
+      }
+      case 'removeFingering': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        const before = JSON.stringify(this.doc);
+        this.apply({ type: 'removeFingering', noteKey: slot.noteKey });
+        if (JSON.stringify(this.doc) === before) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
         return true;
       }
       case 'setPartDeclaration': {
@@ -827,6 +875,14 @@ export class EditorSession {
   }
 
   /** The voice-0 timed event starting exactly at the cursor's onset. */
+  /** Hammer-on or pull-off? The interval to the next note decides — up is a
+   *  hammer, down a pull. Returns null when there is no next note to travel to. */
+  private hammerOrPull(noteKey: string): 'hammerOn' | 'pullOff' | null {
+    const pair = nextNotePitchPair(this.doc, noteKey);
+    if (!pair) return null;
+    return pair.next > pair.current ? 'hammerOn' : 'pullOff';
+  }
+
   private eventUnderCursor(): MnxEvent | undefined {
     const measure = this.doc.parts[0]?.measures?.[this.cursorState.measureIndex];
     const seq = (measure?.sequences ?? []).filter(s => (s.staff ?? 1) === 1)[0];

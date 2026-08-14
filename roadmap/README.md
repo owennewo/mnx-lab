@@ -245,6 +245,18 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-technique.md](inprogress/core-element-ops-technique.md)** —
+  campaign item 9, **built 2026-08-14**: the entry half of tab technique (bends as
+  curves, slides, hammer-ons, pull-offs, vibrato, palm mute, harmonics) plus
+  fingering. The `S` collision item 10 flagged **dissolves without a conditional**:
+  the reserved letters `B H S V X O` live in the tab *pane layer*, and pane layers
+  resolve before shared ones — so `B` bends in tab and beams in notation, `S`
+  slides in tab and slurs in notation. A polymorphic key turns out to be a
+  layering fact, not a branch. `H` is one key for hammer-on and pull-off because
+  the interval decides which — you hammer up and pull off downward. Reachable
+  scenarios **71 → 78**, removable elements **1003 → 1022**, goldens untouched
+  (drawing remains [core-guitar-technique.md](proposed/core-guitar-technique.md)'s
+  gap).
 - **[core-element-ops-onset-granularity.md](inprogress/core-element-ops-onset-granularity.md)** —
   campaign item 11b's first half, **built 2026-08-14**: the bug that stopped item
   11 recording a beam trace, and it had nothing to do with beams — **a run of short

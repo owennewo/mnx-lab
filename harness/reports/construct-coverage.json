@@ -3,18 +3,16 @@
   "summary": {
     "scenarios": 106,
     "traced": 5,
-    "opsReachable": 66,
-    "blocked": 30,
+    "opsReachable": 73,
+    "blocked": 23,
     "expectedUnreachable": 5
   },
   "blockingKinds": {
     "layout": 6,
     "score": 6,
-    "technique": 5,
     "grace": 4,
     "lyric": 4,
     "accidental-display": 3,
-    "fingering": 2,
     "lyric-line-metadata": 2,
     "space": 2,
     "tuplet": 2,
@@ -172,16 +170,10 @@
       "tier": "ops-reachable"
     },
     "lab/tab-fingering/left-hand-fingers": {
-      "tier": "blocked",
-      "blockedBy": [
-        "fingering"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/tab-fingering/right-hand-pima": {
-      "tier": "blocked",
-      "blockedBy": [
-        "fingering"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/tab-part/standard-tuning-both": {
       "tier": "ops-reachable"
@@ -205,34 +197,19 @@
       "tier": "expected-unreachable"
     },
     "lab/tab-techniques/bend-and-release": {
-      "tier": "blocked",
-      "blockedBy": [
-        "technique"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/tab-techniques/hammer-pull-chain": {
-      "tier": "blocked",
-      "blockedBy": [
-        "technique"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/tab-techniques/natural-harmonics": {
-      "tier": "blocked",
-      "blockedBy": [
-        "technique"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/tab-techniques/slides": {
-      "tier": "blocked",
-      "blockedBy": [
-        "technique"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/tab-techniques/vibrato-and-palm-mute": {
-      "tier": "blocked",
-      "blockedBy": [
-        "technique"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/accidentals": {
       "tier": "blocked",

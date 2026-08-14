@@ -204,6 +204,30 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
+    keys: 'H',
+    strokes: [{ code: 'KeyH' }],
+    group: 'adornments',
+    meaning: { note: 'tab: hammer-on or pull-off to the next note — the interval decides which' }
+  },
+  {
+    keys: 'V',
+    strokes: [{ code: 'KeyV' }],
+    group: 'adornments',
+    meaning: { note: 'tab: vibrato (toggles)' }
+  },
+  {
+    keys: 'X',
+    strokes: [{ code: 'KeyX' }],
+    group: 'adornments',
+    meaning: { note: 'tab: palm mute (toggles)' }
+  },
+  {
+    keys: 'O',
+    strokes: [{ code: 'KeyO' }],
+    group: 'adornments',
+    meaning: { note: 'tab: natural harmonic (toggles)' }
+  },
+  {
     keys: 'S',
     strokes: [{ code: 'KeyS' }],
     group: 'adornments',

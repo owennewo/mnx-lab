@@ -144,6 +144,14 @@ function opLabel(op: EditOp): string {
       return `remove slur at ${op.noteKey}`;
     case 'setTieVariant':
       return `tie ${op.lv ? 'l.v.' : (op.targetType ?? 'variant')} · ${op.noteId}`;
+    case 'setTechnique':
+      return `${op.technique.kind} · ${op.noteKey}`;
+    case 'removeTechnique':
+      return `no ${op.kind} · ${op.noteKey}`;
+    case 'setFingering':
+      return `fingering ${op.hand} ${op.finger} · ${op.noteKey}`;
+    case 'removeFingering':
+      return `no fingering · ${op.noteKey}`;
     case 'setPartDeclaration':
       return `part ${op.declaration.kind} ${op.declaration.value}`;
     case 'removePartDeclaration':

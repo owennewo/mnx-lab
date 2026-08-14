@@ -4,8 +4,8 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "no-op": 457,
-      "removed": 1003
+      "no-op": 438,
+      "removed": 1022
     },
     "unaddressableWithAnOp": 216
   },
@@ -43,7 +43,7 @@
       "removed": 3
     },
     "fingering": {
-      "no-op": 7
+      "removed": 7
     },
     "full-measure-rest": {
       "removed": 2
@@ -130,7 +130,7 @@
       "removed": 21
     },
     "technique": {
-      "no-op": 12
+      "removed": 12
     },
     "tempo": {
       "removed": 2
@@ -882,7 +882,7 @@
         "removed": 1
       },
       "fingering": {
-        "no-op": 3
+        "removed": 3
       },
       "note": {
         "removed": 4
@@ -908,7 +908,7 @@
         "removed": 1
       },
       "fingering": {
-        "no-op": 4
+        "removed": 4
       },
       "note": {
         "removed": 4
@@ -1047,7 +1047,7 @@
         "removed": 1
       },
       "technique": {
-        "no-op": 2
+        "removed": 2
       },
       "time-signature": {
         "no-op": 1
@@ -1073,7 +1073,7 @@
         "removed": 1
       },
       "technique": {
-        "no-op": 3
+        "removed": 3
       },
       "time-signature": {
         "no-op": 1
@@ -1099,7 +1099,7 @@
         "removed": 1
       },
       "technique": {
-        "no-op": 2
+        "removed": 2
       },
       "time-signature": {
         "no-op": 1
@@ -1125,7 +1125,7 @@
         "removed": 1
       },
       "technique": {
-        "no-op": 2
+        "removed": 2
       },
       "time-signature": {
         "no-op": 1
@@ -1151,7 +1151,7 @@
         "removed": 1
       },
       "technique": {
-        "no-op": 3
+        "removed": 3
       },
       "time-signature": {
         "no-op": 1

@@ -61,6 +61,37 @@ needs either a rest-duration verb or a smarter normalization in
 `padMeasureRests` (an engraver writes one half rest, not two quarters). It joins
 the containers in item 11b's remainder.
 
+## What 11b's remainder actually costs (measured 2026-08-14)
+
+Two attempts at the remainder ended in findings rather than code, and both are
+worth more than a half-migration would have been.
+
+**Rest spelling cannot be fixed where it appears to live.** Making
+`padMeasureRests` engraver-correct (one half rest rather than two quarters, by
+only letting a rest be as long as its own starting boundary allows) works — and
+immediately broke two recorded traces, because **the cursor grid is derived from
+rest events**. Coarse rests delete the positions the cursor needs: an empty 4/4
+bar spelled as one whole rest offers exactly one place to aim. So the beat-rest
+padding is not naive, it is the entry grid, and the real fix is to decouple grid
+positions from rest events — a bigger change than the spelling it would enable.
+Reverted; the finding stands.
+
+**Container descent is a key-scheme migration, not a walker change.** The
+blocker is not the goldens (7 scenarios, 32 noteheads, an accepted demotion):
+it is that the renderer indexes `sequence.content` per item, so a container's
+inner events would all synthesize the SAME key under
+`syntheticNoteKey(measure, voice, eventIndex, noteIndex)`. Descent therefore
+needs a nested key form (`@m0.v0.e2.c1.n0`) landed simultaneously in
+`model/noteKeys.ts`, `model/jsonView.ts`, `edit/cursor.ts`,
+`engine/layout/notation.ts` and `engine/layout/tabStaff.ts` — the five
+traversals CLAUDE.md requires to stay in lockstep, with the goldens as the
+witness. Half a migration would put the overlay, the document pane and the
+render out of step with each other, so it wants doing whole.
+
+Tuplet and tremolo content is *timed* (`itemSpan` already scales it), so their
+onsets fall out; grace content is un-timed and would share its host's onset,
+which the grid's slot list supports. Neither is the hard part.
+
 ## Scope boundary
 
 Unchanged: the grid still skips non-timed items, so tuplet, grace and tremolo

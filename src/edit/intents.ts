@@ -9,7 +9,8 @@ import type {
   MeasureAttributeKind,
   PartDeclaration,
   PartDeclarationKind,
-  PositionedAttribute
+  PositionedAttribute,
+  TechniqueChoice
 } from './ops.ts';
 import type { MnxTuningEntry } from '../model/mnx.ts';
 
@@ -95,6 +96,11 @@ export type MutationIntent =
   | { type: 'toggleBeam' }
   // Event adornments (campaign item 8): markings attach to the event under the
   // cursor, dynamics and directions to the cursor's MOMENT in the part.
+  // Tab technique (campaign item 9): one toggle per technique, and `hammerPull`
+  // is ONE intent — which of the pair you get is physics, not a choice.
+  | { type: 'toggleTechnique'; kind: TechniqueChoice['kind'] | 'hammerPull' }
+  | { type: 'setFingering'; hand: 'left' | 'right'; finger: string }
+  | { type: 'removeFingering' }
   | { type: 'setPartDeclaration'; declaration: PartDeclaration }
   | { type: 'removePartDeclaration'; kind: PartDeclarationKind }
   | { type: 'setMarking'; marking: string }

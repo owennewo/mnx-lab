@@ -104,11 +104,23 @@ export const EDIT_LAYER: KeymapLayer = {
 /** The tab pane's digit layer: digits are frets (survey §3.4, unanimous).
  *  Consecutive digits combine into two-digit frets in the session. */
 export const TAB_DIGIT_LAYER: KeymapLayer = {
-  name: 'tab-digits',
-  bindings: Array.from({ length: 10 }, (_, digit) => [
-    { code: `Digit${digit}`, intent: { type: 'fretDigit', digit } as EditorIntent },
-    { code: `Numpad${digit}`, intent: { type: 'fretDigit', digit } as EditorIntent }
-  ]).flat()
+  name: 'tab-pane',
+  bindings: [
+    ...Array.from({ length: 10 }, (_, digit) => [
+      { code: `Digit${digit}`, intent: { type: 'fretDigit', digit } as EditorIntent },
+      { code: `Numpad${digit}`, intent: { type: 'fretDigit', digit } as EditorIntent }
+    ]).flat(),
+    // Tab technique (campaign item 9): the reserved letters live ONLY in this
+    // pane layer, which is what makes `B` and `S` polymorphic without a
+    // conditional anywhere — pane layers resolve before the shared ones, so in
+    // tab they bend and slide, and in notation the same keys beam and slur.
+    { code: 'KeyB', intent: { type: 'toggleTechnique', kind: 'bend' } as EditorIntent },
+    { code: 'KeyH', intent: { type: 'toggleTechnique', kind: 'hammerPull' } as EditorIntent },
+    { code: 'KeyS', intent: { type: 'toggleTechnique', kind: 'slide' } as EditorIntent },
+    { code: 'KeyV', intent: { type: 'toggleTechnique', kind: 'vibrato' } as EditorIntent },
+    { code: 'KeyX', intent: { type: 'toggleTechnique', kind: 'palmMute' } as EditorIntent },
+    { code: 'KeyO', intent: { type: 'toggleTechnique', kind: 'harmonic' } as EditorIntent }
+  ]
 };
 
 /**

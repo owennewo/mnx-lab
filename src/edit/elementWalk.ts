@@ -99,8 +99,18 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     note: 'Modifier: chooses which string a note is played on.',
     construct: ['setFret']
   },
-  fingering: { classes: [], note: 'Renderer gap — carried by the document, nothing draws it yet.' },
-  technique: { classes: [], note: 'Renderer gap — core-guitar-technique.md owns the drawing half.' },
+  fingering: {
+    classes: [],
+    note: 'Renderer gap — carried by the document, nothing draws it yet.',
+    construct: ['setFingering'],
+    remove: ['removeFingering']
+  },
+  technique: {
+    classes: [],
+    note: 'Renderer gap — core-guitar-technique.md owns the drawing half; item 9 owns the entry half.',
+    construct: ['setTechnique'],
+    remove: ['removeTechnique']
+  },
   tuplet: { classes: ['tuplet-bracket', 'tuplet-number'], note: 'A time-modifying container.' },
   grace: {
     classes: ['grace-slash'],
