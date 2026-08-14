@@ -33,7 +33,7 @@ import {
 } from '../edit/keymap.ts';
 import { parsePart, parseTimeSignature, parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
 import { buildOpRow } from './opRows.ts';
-import { keyIsOurs } from './keyScope.ts';
+import { editorHasKeyboard, keyIsOurs } from './keyScope.ts';
 import '../elements/ScoreViewer.ts';
 import './ScoreHud.ts';
 
@@ -111,6 +111,12 @@ export class ScenarioPage extends LitElement {
   @state() private setupPopoverError = '';
   /** Esc hides the cursor highlight until the next intent (review sense-0). */
   private cursorHidden = false;
+
+  /** Does the editor own the keyboard right now (core-editor-focus-scope.md
+   *  stage 3)? Drives the overlay's dimming through the SAME predicate the
+   *  key handler gates on, so the cursor can never claim a keystroke that
+   *  would land elsewhere. Starts true: unclaimed focus counts as ours. */
+  @state() private hasKeyboard = true;
 
   /** The side panel's active tab; falls back when the tab isn't available
    *  (hud/actions need a session). */
@@ -609,6 +615,18 @@ export class ScenarioPage extends LitElement {
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.addEventListener('mnx-palette-action', this.onPaletteAction);
+    // Keyboard-ownership tracking re-reads `document.activeElement`, which is
+    // always accurate; the only question is WHEN. Focus events are the
+    // obvious trigger but are not dependable everywhere (headless Chrome
+    // delivers none of the four to `window`, even for real clicks, while
+    // activeElement updates correctly) — so the causes of focus change are
+    // watched too: pointerdown (clicks) and keydown (Tab). Cheap, and it
+    // keeps the overlay honest where focus events are silent.
+    window.addEventListener('focusin', this.onFocusChange);
+    window.addEventListener('focusout', this.onFocusChange);
+    window.addEventListener('focus', this.onFocusChange, true);
+    window.addEventListener('blur', this.onFocusChange, true);
+    window.addEventListener('pointerdown', this.onFocusChange, true);
   }
 
   disconnectedCallback() {
@@ -616,7 +634,23 @@ export class ScenarioPage extends LitElement {
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.removeEventListener('mnx-palette-action', this.onPaletteAction);
+    window.removeEventListener('focusin', this.onFocusChange);
+    window.removeEventListener('focusout', this.onFocusChange);
+    window.removeEventListener('focus', this.onFocusChange, true);
+    window.removeEventListener('blur', this.onFocusChange, true);
+    window.removeEventListener('pointerdown', this.onFocusChange, true);
   }
+
+  /** Focus may have moved — re-ask the ownership predicate. Deferred a task,
+   *  not a microtask: `focusout` and `pointerdown` both fire BEFORE the new
+   *  element is active, so an immediate read would see the outgoing state
+   *  and every transition would flicker as "lost". */
+  private onFocusChange = () => {
+    setTimeout(() => {
+      if (!this.isConnected) return;
+      this.hasKeyboard = editorHasKeyboard(this);
+    }, 0);
+  };
 
   private async loadScore() {
     const entry = this.entry();
@@ -696,6 +730,9 @@ export class ScenarioPage extends LitElement {
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
+    // Tab moves focus with no pointer event, so a keydown is also a
+    // focus-change cause — re-ask after it settles.
+    if (event.code === 'Tab') this.onFocusChange();
     // Scope (core-editor-focus-scope.md): the editor's keys are ours while
     // focus is inside this page (or unclaimed — nothing focused yet). The
     // listener is still window-scoped because the mount lives in
@@ -941,6 +978,7 @@ export class ScenarioPage extends LitElement {
         .invalidByDesign=${entry.invalidByDesign}
         .pinnedErrors=${this.pinnedErrors}
         .selection=${this.selection}
+        .selectionInactive=${!this.hasKeyboard}
       ></mnx-score-viewer>
     `;
   }

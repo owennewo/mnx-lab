@@ -1,6 +1,8 @@
 # Keyboard focus scope — who owns the next keystroke, and how you can tell
 
-> **Status: stage 1 built 2026-08-12, same day as proposed** (stages 2–4 open).
+> **Status: stages 1, 3 and 4 built 2026-08-12, same day as proposed. Stage 2
+> remains, gated behind the `elements/` promotion** (which is itself parked
+> behind its own trigger — a real second consumer).
 > Shipped: `--mnx-focus-ring` (public token, light + dark), the viewer's
 > `tabindex="0"` default (author-set values never clobbered) and its
 > `:host(:focus-within)` outline, `src/workbench/keyScope.ts` (the shared
@@ -19,6 +21,28 @@
 > and works again on refocus. Unclaimed focus (`<body>`, i.e. a fresh load)
 > still counts as ours — deliberate workbench leniency, documented at
 > `focusUnclaimed`, and exactly what an embed must not do.
+>
+> **Stage 3** (the overlay stops lying): `editorHasKeyboard(host)` is now
+> **the** ownership predicate, shared by the key gate and the visual so they
+> cannot drift; the page tracks it as state and passes it to the viewer as
+> `selection-inactive`, which fades the enclosure, the ghost cell and the
+> accent recolor. *Faded, not hidden* — losing your place entirely makes
+> refocus disorienting, and the goal is to drop the claim, not the memory.
+> Verified with real mouse clicks: `dimmed` and `keyLanded` are exact
+> inverses at every step (score focused → bright + key lands; rail search
+> focused → dim + key ignored; refocused → bright again).
+>
+> **Environment finding worth keeping** (it shaped the implementation):
+> headless Chrome delivers **none** of `focusin`/`focusout`/`focus`/`blur` to
+> `window` — not even for real dispatched mouse clicks, with focus emulation
+> enabled — while `document.activeElement` updates correctly throughout. So
+> ownership is re-read on the *causes* of focus change (`pointerdown`
+> capture, `Tab` keydown) as well as the focus events themselves. That is not
+> merely a test workaround: it is why the dimming is trustworthy in
+> environments where focus events are unreliable, and it is the reason to
+> prefer reading `activeElement` over trusting an event stream.
+>
+> **Stage 4** landed with stage 1 (`harness/conformance/key-scope.test.ts`).
 >
 > Feeds [core-editor-element-promotion.md](core-editor-element-promotion.md)'s
 > "the shadow-DOM focus story coming due" line item, and hands
@@ -152,7 +176,10 @@ element-tier layer) so the split cannot rot.
    [core-editor-element-promotion.md](core-editor-element-promotion.md), when
    the mount layer becomes `elements/`-tier. Deletes the window listener and
    the focus test together: containment becomes structural.
-3. **The overlay's unfocused state** — dim/hide the cursor and enclosure,
-   restoring on focus.
-4. **The shell/editor binding assertion** — a conformance test that no
-   `SHELL_BINDINGS` stroke appears in an element-tier keymap layer.
+3. ~~**The overlay's unfocused state**~~ — **built**: `selection-inactive`
+   fades enclosure, ghost cell and accent recolor, driven by the shared
+   `editorHasKeyboard` predicate. Not yet covered: the whole *window* losing
+   focus (another app in front) leaves `activeElement` inside us, so the
+   overlay stays bright while no key can arrive — arguably correct (the
+   editor is still the page's keyboard owner), revisit if it reads wrong.
+4. ~~**The shell/editor binding assertion**~~ — **built** with stage 1.

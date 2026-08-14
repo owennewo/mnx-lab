@@ -69,6 +69,17 @@ export class ScoreViewer extends LitElement {
   @property({ type: String }) errorPointer: string | null = null;
   /** Embed trim: tighter paper margins. */
   @property({ type: Boolean, reflect: true }) compact = false;
+  /**
+   * The selection overlay is showing where the cursor WAS, but keystrokes
+   * are going somewhere else (core-editor-focus-scope.md, stage 3): a
+   * cursor drawn at full strength while the keyboard belongs to another
+   * element claims input it will not receive. Presentation only — the host
+   * decides the policy and the element just renders it dimmed. Once the
+   * editor mount promotes to `elements/` and the listener sits on this host,
+   * this becomes derivable here from :focus-within.
+   */
+  @property({ type: Boolean, reflect: true, attribute: 'selection-inactive' })
+  selectionInactive = false;
 
   @query('#score-container')
   container!: HTMLElement;
@@ -218,6 +229,22 @@ export class ScoreViewer extends LitElement {
         fill: none;
         stroke: var(--accent);
         stroke-opacity: 0.8;
+      }
+
+      /* Keyboard elsewhere (core-editor-focus-scope.md): fade the selection
+         vocabulary — enclosure, ghost cell, and the accent recolor — so the
+         overlay reads as "where you were", not "where your next keystroke
+         lands". Faded, not hidden: losing the place entirely makes refocus
+         disorienting, and the point is to stop the CLAIM, not the memory. */
+      :host([selection-inactive]) #score-container svg .enclosure,
+      :host([selection-inactive]) #score-container svg .cursor-ghost {
+        opacity: 0.3;
+      }
+
+      :host([selection-inactive]) #score-container svg .notehead.selected,
+      :host([selection-inactive]) #score-container svg .accidental.selected,
+      :host([selection-inactive]) #score-container svg .fret-number.selected {
+        fill: color-mix(in oklab, var(--accent), var(--paper-ink) 65%) !important;
       }
 
       /* The tab fret knock-out must match the paper, not the app bg. */

@@ -112,9 +112,14 @@ proposals that name their campaign.
   `preventDefault()` only on keys actually consumed. Plus the visible signal (a
   `:host(:focus-within)` ring on the public `--mnx-focus-ring` token — an unfocused component
   drawing a cursor is lying about who gets the keystroke) and the rule that **shell bindings
-  don't travel** (an embed must not eat a host page's Ctrl+K). **Stage 1 built 2026-08-12**
-  (ring, token, `keyScope.ts`, the binding-split assertion), verified in headless Chrome;
-  stage 2 — moving the listener onto the host element — rides
+  don't travel** (an embed must not eat a host page's Ctrl+K). **Stages 1, 3 and 4 built
+  2026-08-12** (the ring + `--mnx-focus-ring` token, `keyScope.ts`'s shared
+  `editorHasKeyboard` predicate driving both the key gate and the overlay's `selection-inactive`
+  fade, the binding-split assertion) and verified in headless Chrome over CDP — `dimmed` and
+  `keyLanded` are exact inverses at every focus step. Records a reusable finding: headless
+  Chrome delivers no focus events to `window` even for real clicks, so ownership is re-read
+  from `activeElement` on the *causes* of focus change. Stage 2 — moving the listener onto
+  the host element — rides
   [core-editor-element-promotion.md](proposed/core-editor-element-promotion.md).
 - **[core-viewer-surface.md](proposed/core-viewer-surface.md)** — name and define **the viewer
   surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an

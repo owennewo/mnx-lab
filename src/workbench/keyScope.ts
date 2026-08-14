@@ -56,14 +56,25 @@ export function focusUnclaimed(): boolean {
 }
 
 /**
+ * **The** ownership predicate: will the next keystroke reach this editor?
+ * Focus inside it, or unclaimed. Deliberately the single source for BOTH
+ * the key handler and the cursor overlay's dimming — a cursor drawn while
+ * this is false is a lie about who owns the keyboard, and two separate
+ * rules would drift into telling it.
+ */
+export function editorHasKeyboard(host: Element): boolean {
+  return focusWithin(host) || focusUnclaimed();
+}
+
+/**
  * The composite gate every keydown handler starts with: not already handled,
  * not mid-IME-composition, not a text field, and — when a host is given —
- * focus is inside it (or unclaimed). `host: null` keeps document scope
+ * the editor owns the keyboard. `host: null` keeps document scope
  * deliberately (the workbench shell's own bindings, page-level by nature).
  */
 export function keyIsOurs(event: KeyboardEvent, host: Element | null): boolean {
   if (event.defaultPrevented || event.isComposing) return false;
   if (isTextEntry(realTarget(event))) return false;
   if (!host) return true;
-  return focusWithin(host) || focusUnclaimed();
+  return editorHasKeyboard(host);
 }
