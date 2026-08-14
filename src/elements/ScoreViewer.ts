@@ -18,7 +18,7 @@ import type { PinnedError } from '../model/pinnedErrors.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
 export type ViewMode = 'notation' | 'tab' | 'both';
-import { sharedChrome, scrollbars } from './tokens.ts';
+import { sharedChrome, scrollbars, viewerTokens } from './tokens.ts';
 
 /**
  * The score area: a scrollable bench with a warm PAPER card at its centre.
@@ -70,6 +70,21 @@ export class ScoreViewer extends LitElement {
   /** Embed trim: tighter paper margins. */
   @property({ type: Boolean, reflect: true }) compact = false;
   /**
+   * Colour scheme for the score: `auto` (default), `light`, or `dark`.
+   *
+   * `auto` needs no host cooperation and is not a guess: `color-scheme` is an
+   * inherited CSS property, so the component simply resolves `light-dark()`
+   * against whatever scheme the host page is using — its own declared
+   * `color-scheme`, or the reader's OS preference when the page says
+   * `light dark`. A page that never opts into dark stays light, which is the
+   * right answer: the paper should match the page it sits on, not the OS.
+   *
+   * What auto CANNOT see is a host's private convention (a `.dark` class,
+   * `data-theme="night"`) — nothing in CSS exposes that — which is exactly
+   * why this explicit override exists.
+   */
+  @property({ type: String, reflect: true }) theme: 'auto' | 'light' | 'dark' = 'auto';
+  /**
    * The selection overlay is showing where the cursor WAS, but keystrokes
    * are going somewhere else (core-editor-focus-scope.md, stage 3): a
    * cursor drawn at full strength while the keyboard belongs to another
@@ -94,6 +109,11 @@ export class ScoreViewer extends LitElement {
   private fontRedrawQueued = false;
 
   static styles = [
+    // The viewer carries its own tokens (core-viewer-embedded-app.md): on a
+    // host page there is no app ancestor to inherit them from, and without
+    // them the paper is transparent, the ink is the host's, and the staff
+    // lines are not drawn at all.
+    viewerTokens,
     sharedChrome,
     scrollbars,
     css`
@@ -104,6 +124,19 @@ export class ScoreViewer extends LitElement {
         padding: 5px;
         min-width: 0;
         background: var(--bg);
+      }
+
+      /* The explicit theme override. Declaring color-scheme is the whole
+         mechanism: light-dark() resolves against the USED scheme, so pinning
+         it here re-resolves every token below in one stroke. The auto value
+         declares nothing on purpose — that is what lets the inherited value
+         (the host page's choice, else the reader's preference) through. */
+      :host([theme='light']) {
+        color-scheme: light;
+      }
+
+      :host([theme='dark']) {
+        color-scheme: dark;
       }
 
       /* Keyboard ownership, made visible (core-editor-focus-scope.md).

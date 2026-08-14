@@ -67,6 +67,37 @@ for (const score of SCORES) {
   nav.append(button);
 }
 
+// The two theme axes, deliberately independent: page light/dark × score
+// light/dark are four combinations that all have to look right, and a host
+// whose own scheme is locked to the component's could never show three of
+// them. The page moves via `color-scheme` (the standard declaration, and the
+// very signal the component reads when its theme is `auto`); the score moves
+// via the element's `theme` attribute.
+function wireThemeButtons(attribute, apply) {
+  const buttons = [...document.querySelectorAll(`.themes button[data-${attribute}]`)];
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      const value = button.dataset[attribute];
+      apply(value);
+      for (const other of buttons) {
+        other.setAttribute('aria-current', String(other === button));
+      }
+    });
+  }
+}
+
+wireThemeButtons('page', value => {
+  if (value === 'auto') delete document.documentElement.dataset.pageTheme;
+  else document.documentElement.dataset.pageTheme = value;
+});
+
+wireThemeButtons('score', value => {
+  // `auto` is the element's default: it follows the page, because
+  // color-scheme is inherited. Setting it explicitly is how a host overrides
+  // that — e.g. a dark site that still wants the score on white paper.
+  viewer.setAttribute('theme', value);
+});
+
 // Load the artifact, then the first score. `whenDefined` is the honest wait:
 // the element is usable only once the custom element registry has it.
 if (!base) {

@@ -13,21 +13,26 @@
       contract is broken and this app is the thing that says so.
     -->
     <style>
+      /* The host page's OWN theme, switchable independently of the score's —
+         the four combinations (page light/dark × score light/dark) all have to
+         look right, and only a host that can flip its own scheme can show
+         that. `color-scheme` is the standard declaration, which is also the
+         signal the component reads when its theme is `auto`: no bespoke
+         handshake, just CSS. */
       :root {
         color-scheme: light dark;
-        --page: #fbf8f3;
-        --ink: #241f1a;
-        --muted: #6d635a;
-        --line: #ddd3c4;
+        --page: light-dark(#fbf8f3, #17140f);
+        --ink: light-dark(#241f1a, #ece5da);
+        --muted: light-dark(#6d635a, #9c9086);
+        --line: light-dark(#ddd3c4, #342d25);
       }
 
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --page: #17140f;
-          --ink: #ece5da;
-          --muted: #9c9086;
-          --line: #342d25;
-        }
+      :root[data-page-theme='light'] {
+        color-scheme: light;
+      }
+
+      :root[data-page-theme='dark'] {
+        color-scheme: dark;
       }
 
       body {
@@ -55,14 +60,33 @@
         font-size: 15px;
       }
 
-      nav {
+      nav,
+      .themes {
         display: flex;
         flex-wrap: wrap;
+        align-items: baseline;
         gap: 8px;
         margin-bottom: 20px;
       }
 
-      nav button {
+      .themes {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 24px;
+      }
+
+      .themes .group {
+        display: flex;
+        gap: 6px;
+        align-items: baseline;
+      }
+
+      .themes .group + .group {
+        margin-left: 18px;
+      }
+
+      nav button,
+      .themes button {
         font: inherit;
         font-size: 14px;
         padding: 4px 12px;
@@ -73,7 +97,13 @@
         cursor: pointer;
       }
 
-      nav button[aria-current='true'] {
+      .themes button {
+        font-size: 12.5px;
+        padding: 2px 10px;
+      }
+
+      nav button[aria-current='true'],
+      .themes button[aria-current='true'] {
         color: var(--ink);
         border-color: currentColor;
       }
@@ -116,6 +146,21 @@
       </p>
 
       <nav id="scores"></nav>
+
+      <div class="themes">
+        <span class="group">
+          <span>page</span>
+          <button data-page="auto" aria-current="true">auto</button>
+          <button data-page="light">light</button>
+          <button data-page="dark">dark</button>
+        </span>
+        <span class="group">
+          <span>score</span>
+          <button data-score="auto" aria-current="true">auto</button>
+          <button data-score="light">light</button>
+          <button data-score="dark">dark</button>
+        </span>
+      </div>
 
       <div class="frame">
         <mnx-score-viewer id="viewer"></mnx-score-viewer>

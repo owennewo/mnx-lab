@@ -35,6 +35,52 @@ being open questions:
   `core-viewer-surface.md` calls today's contract "an undesigned accretion";
   accretions get designed when something outside the repo depends on them.
 
+## The second finding: the viewer had no styles of its own
+
+Caught within minutes of looking at the app on a dark page — and worse than
+the asset bug, because it was invisible-by-degrees rather than fatal.
+
+`designTokens` is declared on the **app component's** `:host` and inherits
+down through the workbench's shadow roots. `ScoreViewer` never included it. On
+a host page there is no such ancestor, so **every token was undefined**:
+
+- `background: var(--paper)` → transparent, so the host's page colour showed
+  through and *looked* like a themed score,
+- `color: var(--paper-ink)` → inherited the host's text colour,
+- `stroke: var(--paper-line)` → computed to `none`: **the staff lines were
+  not drawn at all**,
+- and `--mnx-accent` and friends did nothing, because the `var(--mnx-*)`
+  reads that give them meaning live in that same un-applied block — so the
+  documented public styling API was dead in the only place it was for.
+
+**Fix**: the score tokens split into `scoreTokens`, composed by both
+`designTokens` (app chrome) and a new `viewerTokens` that `ScoreViewer`
+carries itself. The light values are identical to the app's, deliberately —
+inside the workbench the viewer's own definitions now win, so any drift would
+silently restyle the app.
+
+### Theme, and how a component can know
+
+The paper now **follows the colour scheme**, reversing the old rule that "the
+score always renders on warm paper, even under dark chrome" — a blazing white
+score on a dark page is exactly what the app made obvious.
+
+Resolution needs no API and no host cooperation: `color-scheme` is an
+*inherited* CSS property, and `light-dark()` resolves against the **used**
+scheme. So the component honours the host page's declared scheme, and for a
+page that says `light dark`, the reader's OS preference. A page that never
+opts into dark keeps a light score — correct, because the paper should match
+the page it sits on, not the operating system.
+
+What automatic detection **cannot** see is a host's private convention (a
+`.dark` class, `data-theme="night"`); nothing in CSS exposes that. Hence
+`<mnx-score-viewer theme="auto | light | dark">`, which works by declaring
+`color-scheme` on the host and letting every token re-resolve at once.
+
+The demo app drives both axes independently — page light/dark × score
+light/dark — because all four combinations have to look right and a host
+locked to the component's scheme can only ever show two of them.
+
 ## The finding this app exists to catch
 
 **The embed is broken for a genuinely external host, today.**

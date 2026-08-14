@@ -175,6 +175,39 @@ try {
     console.log(`rendered: viewBox="${viewBox}", ${glyphs} glyphs, ${lines} staff primitives`);
   }
 
+  // 2b. THE TOKENS ARE THE VIEWER'S OWN. In an embed there is no app ancestor
+  // to inherit design tokens from, and the failure is silent-looking but
+  // total: `background: var(--paper)` falls back to transparent, ink inherits
+  // the host's colour, and `stroke: var(--paper-line)` computes to `none` —
+  // the staff lines are simply not drawn. Assert the resolved values, not the
+  // token strings, so a future refactor that loses the tokens fails here.
+  for (const theme of ['light', 'dark']) {
+    const probe = await cdp.evaluate(`
+      (async () => {
+        const v = document.getElementById('viewer');
+        v.setAttribute('theme', '${theme}');
+        await new Promise(r => setTimeout(r, 400));
+        const paper = v.shadowRoot.querySelector('.paper');
+        const line = v.shadowRoot.querySelector('svg line');
+        const cs = getComputedStyle(v);
+        return JSON.stringify({
+          paperBg: paper ? getComputedStyle(paper).backgroundColor : '(no paper)',
+          staffStroke: line ? getComputedStyle(line).stroke : '(no line)',
+          accent: cs.getPropertyValue('--accent').trim()
+        });
+      })()
+    `);
+    const { paperBg, staffStroke, accent } = JSON.parse(probe);
+    const transparent = /rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(paperBg);
+    if (transparent) fail(`theme=${theme}: paper is transparent — the viewer's tokens are missing`);
+    if (!staffStroke || staffStroke === 'none')
+      fail(`theme=${theme}: staff lines have stroke:${staffStroke} — --paper-line did not resolve`);
+    if (!accent) fail(`theme=${theme}: --accent is undefined inside the embed`);
+    console.log(`theme=${theme}: paper ${paperBg}, staff stroke ${staffStroke}`);
+  }
+  // Back to auto for the remaining checks (and to prove the attribute clears).
+  await cdp.evaluate(`document.getElementById('viewer').setAttribute('theme','auto'); true`);
+
   // 3. The font was registered BY THE ARTIFACT — the host page declares none.
   const fontRegistered = await cdp.evaluate(
     `[...document.fonts].some(f => f.family === 'Bravura')`

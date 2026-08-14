@@ -21,6 +21,24 @@ the embed contract has a hole — and that is exactly the hole this app found
 when it was written (the component used to fetch its metadata from the *host's*
 origin root, so any real embed 404'd).
 
+## The two theme axes
+
+The buttons switch **page** and **score** independently, because all four
+combinations have to look right and a host locked to the component's scheme
+can only show two of them.
+
+- **page** flips `color-scheme` on `:root` — the standard declaration, and the
+  very signal the component reads when its theme is `auto`. No bespoke
+  handshake.
+- **score** sets `<mnx-score-viewer theme>`. `auto` follows the page (because
+  `color-scheme` is inherited and the component resolves `light-dark()`
+  against it); `light`/`dark` override — a dark site that still wants white
+  paper, say.
+
+That second finding was the app's first real catch: on a dark page the score
+had no styles at all — transparent paper, the host's ink, and staff lines
+with `stroke: none`, i.e. not drawn. The viewer now carries its own tokens.
+
 ## Running it
 
 ```bash

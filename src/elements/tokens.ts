@@ -1,15 +1,89 @@
 import { css } from 'lit';
 
 /**
+ * THE SCORE'S OWN TOKENS — the paper, its ink, its rules, and the accent.
+ *
+ * Split out of `designTokens` (2026-08-14) because the viewer must be
+ * SELF-SUFFICIENT. `designTokens` is declared on the *app component's* host and
+ * inherits down through the workbench's shadow roots; an embedded
+ * `<mnx-score-viewer>` has no such ancestor, so every one of these was
+ * UNDEFINED on a host page — `background: var(--paper)` fell back to
+ * transparent, ink inherited the host's text colour, and
+ * `stroke: var(--paper-line)` computed to `none`, i.e. **the staff lines were
+ * not drawn at all**. The public `--mnx-*` overrides were dead there too,
+ * since the vars that read them live in this block. See
+ * roadmap/proposed/core-viewer-embedded-app.md.
+ *
+ * THEME: the paper now follows the colour scheme, reversing the older "the
+ * score always renders on warm paper, even under dark chrome" rule — a dark
+ * page with a blazing white score is the thing the embed app made obvious.
+ * Resolution is automatic and needs no API: `light-dark()` resolves against
+ * the *used* `color-scheme`, which is an inherited property, so the component
+ * honours whatever the host page declared (and, for a page that says
+ * `light dark`, the reader's OS preference). `<mnx-score-viewer theme="…">`
+ * overrides explicitly — see ScoreViewer.
+ */
+export const scoreTokens = css`
+  :host {
+    --accent: var(--mnx-accent, light-dark(#3e5c86, #8aa9d6));
+    --paper: var(--mnx-paper, light-dark(oklch(0.985 0.006 85), oklch(0.235 0.008 80)));
+    --paper-ink: var(--mnx-paper-ink, light-dark(oklch(0.24 0.015 80), oklch(0.92 0.008 85)));
+    --paper-line: var(
+      --mnx-paper-line,
+      light-dark(oklch(0.55 0.012 80), oklch(0.68 0.012 85))
+    );
+  }
+`;
+
+/**
+ * The tokens `<mnx-score-viewer>` needs to stand ALONE on a stranger's page:
+ * the score tokens plus the handful of chrome vars its own stylesheet (and
+ * `sharedChrome`/`scrollbars`) reference. Declared on the viewer's own host, so
+ * an embed is fully styled with zero host setup, and `--mnx-*` overrides work
+ * there for the first time.
+ *
+ * The light values are IDENTICAL to `designTokens`' — inside the workbench
+ * these definitions win (a closer host beats an inherited value), so any drift
+ * would silently restyle the app. Only the dark half is new, and the workbench
+ * never resolves to it: it declares no `color-scheme`, so `light-dark()` stays
+ * light there until someone deliberately opts the app in.
+ */
+export const viewerTokens = css`
+  ${scoreTokens}
+  :host {
+    --sans: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+    --serif: 'IBM Plex Serif', Georgia, serif;
+
+    --bg: var(--mnx-bg, light-dark(oklch(0.967 0.005 88), oklch(0.185 0.008 75)));
+    --surface: var(--mnx-surface, light-dark(oklch(0.992 0.003 88), oklch(0.255 0.01 75)));
+    --line: var(--mnx-line, light-dark(oklch(0.895 0.007 88), oklch(0.31 0.01 75)));
+    --line-strong: light-dark(oklch(0.82 0.008 88), oklch(0.38 0.01 75));
+    --ink: var(--mnx-ink, light-dark(oklch(0.255 0.012 80), oklch(0.9 0.008 85)));
+    --ink-2: light-dark(oklch(0.45 0.012 80), oklch(0.72 0.01 85));
+    --ink-3: light-dark(oklch(0.6 0.01 80), oklch(0.58 0.01 85));
+    --accent-fg: light-dark(var(--accent), color-mix(in oklab, var(--accent), white 38%));
+    --focus-ring: var(--mnx-focus-ring, color-mix(in oklab, var(--accent), transparent 25%));
+    --hover: light-dark(oklch(0 0 0 / 0.045), oklch(1 0 0 / 0.05));
+    /* light-dark() takes COLORS, not whole shadow lists — so the scheme-
+       dependent part is factored into a colour the shadow then uses. */
+    --shadow-near: light-dark(oklch(0 0 0 / 0.05), oklch(0 0 0 / 0.3));
+    --shadow-far: light-dark(oklch(0.3 0.02 80 / 0.18), oklch(0 0 0 / 0.5));
+    --shadow: 0 1px 2px var(--shadow-near), 0 6px 24px -8px var(--shadow-far);
+  }
+`;
+
+/**
  * MNX Lab design tokens (see claude_design/…/mnx-lab-redesign/tokens.css and
  * DIRECTION.md — "the reading room"). Declared on the app component's :host so
  * they inherit through every child shadow root; embedders can override via the
  * public --mnx-* custom properties (P4: no styles on `document`).
  *
- * The paper tokens deliberately do NOT change with the theme — the score
- * always renders on warm paper, even under dark chrome.
+ * Composes `scoreTokens` so the app chrome and the score agree on paper and
+ * accent without either duplicating the values.
  */
 export const designTokens = css`
+  ${scoreTokens}
   :host {
     --sans: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
@@ -18,11 +92,6 @@ export const designTokens = css`
     --rail-w: 312px;
     --header-h: 52px;
     --footer-h: 30px;
-
-    --accent: var(--mnx-accent, #3e5c86);
-    --paper: var(--mnx-paper, oklch(0.985 0.006 85));
-    --paper-ink: var(--mnx-paper-ink, oklch(0.24 0.015 80));
-    --paper-line: oklch(0.55 0.012 80);
 
     --st-draft: oklch(0.62 0.012 80);
     --st-valid: oklch(0.66 0.105 78);
