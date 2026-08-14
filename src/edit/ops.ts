@@ -24,6 +24,7 @@ import type { EditorIntent } from './intents.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import {
   addOnsets,
+  durationSpan,
   forEachKeyedNote,
   itemSpan,
   noteKeyOf,
@@ -458,8 +459,18 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (found?.event) {
         const event = found.event;
         if (event.rest) {
+          // A rest is absence, so entry does not inherit its duration: the
+          // note takes the PENDING one, and any surplus stays as rest AFTER
+          // it (never by shortening in place, which would drag every later
+          // event earlier). Campaign item 11b — before this, the second note
+          // of a short run always came out as long as the rest it landed on.
+          const surplus = subtractOnsets(durationSpan(event.duration), durationSpan(op.duration));
           delete event.rest;
           event.notes = [note];
+          if (surplus.num > 0) {
+            event.duration = { ...op.duration };
+            seq.content.splice(found.index + 1, 0, ...restsSpanning(surplus));
+          }
           return next;
         }
         event.notes ??= [];
@@ -488,8 +499,16 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (found?.event) {
         const event = found.event;
         if (event.rest) {
+          // Same rule as `insertNote` above (campaign item 11b): a rest is
+          // absence, so the note takes the PENDING duration and the surplus
+          // stays as rest after it.
+          const surplus = subtractOnsets(durationSpan(event.duration), durationSpan(op.duration));
           delete event.rest;
           event.notes = [note];
+          if (surplus.num > 0) {
+            event.duration = { ...op.duration };
+            seq.content.splice(found.index + 1, 0, ...restsSpanning(surplus));
+          }
           return next;
         }
         event.notes ??= [];
@@ -984,6 +1003,20 @@ function subtractOnsets(a: Onset, b: Onset): Onset {
  * are never deleted — a still-overfull bar stays overfull and the renderer's
  * duration-mismatch badge says so).
  */
+/** Decompose a span into legal rest events, longest first — the same ladder
+ *  `padMeasureRests` uses, factored out so entry can fill a gap IN PLACE. */
+function restsSpanning(span: Onset): MnxEvent[] {
+  const rests: MnxEvent[] = [];
+  let remainder = span;
+  while (remainder.num > 0) {
+    const fit = PAD_LADDER.find(l => !onsetLess(remainder, l.span));
+    if (!fit) break; // a sliver finer than the ladder: the badge shows it
+    rests.push({ duration: { base: fit.base }, rest: {} });
+    remainder = subtractOnsets(remainder, fit.span);
+  }
+  return rests;
+}
+
 function padMeasureRests(doc: MnxStructure, measureIndex: number): void {
   const seq = entrySequence(doc, measureIndex);
   if (!seq || seq.fullMeasure) return; // a full-measure rest is already full

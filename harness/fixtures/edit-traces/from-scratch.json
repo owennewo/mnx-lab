@@ -529,7 +529,7 @@
                     },
                     {
                       "duration": {
-                        "base": "eighth"
+                        "base": "16th"
                       },
                       "notes": [
                         {
@@ -548,7 +548,7 @@
                     },
                     {
                       "duration": {
-                        "base": "quarter"
+                        "base": "16th"
                       },
                       "rest": {
                         "staffPosition": 1
@@ -556,13 +556,13 @@
                     },
                     {
                       "duration": {
-                        "base": "eighth"
+                        "base": "quarter"
                       },
                       "rest": {}
                     },
                     {
                       "duration": {
-                        "base": "eighth"
+                        "base": "quarter"
                       },
                       "rest": {}
                     }
@@ -576,7 +576,7 @@
                   "content": [
                     {
                       "duration": {
-                        "base": "half"
+                        "base": "eighth"
                       },
                       "notes": [
                         {
@@ -595,7 +595,7 @@
                     },
                     {
                       "duration": {
-                        "base": "quarter"
+                        "base": "16th"
                       },
                       "notes": [
                         {
@@ -619,7 +619,7 @@
                     },
                     {
                       "duration": {
-                        "base": "quarter"
+                        "base": "16th"
                       },
                       "notes": [
                         {
@@ -636,6 +636,36 @@
                           "id": "t1"
                         }
                       ]
+                    },
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "rest": {}
+                    },
+                    {
+                      "duration": {
+                        "base": "quarter"
+                      },
+                      "rest": {}
+                    },
+                    {
+                      "duration": {
+                        "base": "quarter"
+                      },
+                      "rest": {}
+                    },
+                    {
+                      "duration": {
+                        "base": "eighth"
+                      },
+                      "rest": {}
+                    },
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "rest": {}
                     }
                   ]
                 }
@@ -648,8 +678,8 @@
     "cursor": {
       "measureIndex": 2,
       "onset": {
-        "num": 1,
-        "den": 2
+        "num": 7,
+        "den": 16
       },
       "line": 6
     }

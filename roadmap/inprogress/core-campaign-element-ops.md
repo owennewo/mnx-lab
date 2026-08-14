@@ -99,7 +99,7 @@ agreed or candidate claims; **bold** = agreed.
 | 9 | tab technique alphabet | Bends, slides, hammer/pull, vibrato, palm mute, harmonics — the `B H S V X O` set `keymapDocs.ts` already reserves. Entry side of [core-guitar-technique.md](../proposed/core-guitar-technique.md) (which owns rendering). | 5 | **B H S V X O** (reserved) | note | undrafted |
 | 10 | [spanners](core-element-ops-spanners.md) | Slurs; tie variants (`crossVoice`, `lv`, `arpeggio`). The two-ended **anchor gesture** (press, navigate, press); reference removal class. | 3 (reachable 42 → 45) | **S**, polymorphic by projection: slur in notation, slide in tab (resolves item 9's collision) | **note→note** | **built 2026-08-14** |
 | 11 | [rhythm declarations](core-element-ops-rhythm-declarations.md) | **Split at build time**: this item takes the declarations that leave ink where it is — beams (top level), full-measure rests, measure repeats. Beams reuse item 10's anchor at event→event. | 10 (reachable 45 → 55); 22 elements | **B**, polymorphic (beam in notation, bend in tab); rests via the bar popover | **measure**, **event→event** | **built 2026-08-14** |
-| 11b | rhythm containers & onset granularity | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | ~9 | t.b.d. | event | undrafted |
+| 11b | [onset granularity](core-element-ops-onset-granularity.md) **(built)** + containers & rest spelling | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | ~9 | t.b.d. | event | **granularity built 2026-08-14**; containers + rest spelling open |
 | 12 | text entry | Lyrics, part names, verse labels — a text *mode* that suspends the keymap, not a binding. | ~8 | Enter-into-text candidate | event / part | undrafted |
 | 13 | [part declarations](core-element-ops-part-declarations.md) | **Split at build time**: the five keys on `parts[0]` (name, strings, capo, staffKind, staves) get the removal halves their genesis verbs never had, plus constructors for capo and staves. | 2 (reachable 68 → 71); 91 elements | **Shift+P** popover (`capo 3`, `no strings`) | **score** | **built 2026-08-14** |
 | 13b | structural surface | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-codes `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changes note keys — which the primitives goldens embed. A corpus re-verification event, not a refactor. The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
@@ -109,6 +109,34 @@ et al are layout-only, zero measures — a different surface, not keys), percuss
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — item 11b's first half: a run of short notes is enterable at last.**
+  Item 11 could not record a beam trace for a reason that had nothing to do with
+  beams, and this is the diagnosis: entering eight 32nds produced
+  `C5/32nd, D5/quarter, E5/quarter…`.
+  - **Two compounding mechanisms.** The duration keys stepped the pending
+    duration only on an *entry ghost*, but a padded bar is full of rest EVENTS,
+    so they re-valued the rest instead; and entry then inherited the rest's
+    duration, ignoring the one it was given.
+  - **The campaign's own founding rule settled both**: a rest is absence
+    (§8.11). There is nothing there to re-value, so the keys step the pending
+    duration over a rest as over a ghost; and entry does not inherit a rest's
+    duration — the note takes the pending one and the surplus stays as rest
+    **after** it, never by shortening in place (sequence content is sequential,
+    so shrinking drags every later event earlier and silently re-times the bar).
+  - **The parked trace-maintenance question arrived for the first time.**
+    `from-scratch` changed correctly and was regenerated with
+    `npm run update:edit-traces`; every bar still sums to its meter. One trace,
+    one documented tool, no drama — but the campaign should expect this to scale
+    with trace volume, exactly as the opening entry predicted.
+  - **And it uncovered the next blocker in the same breath.** Rests are now
+    un-re-valuable by keyboard, which is the honest consequence of treating them
+    as absence — so `beams-secondary-beam-breaks-implied` is *still* untraceable,
+    because it writes one **half** rest where padding spends two **quarters**.
+    Legal either way, identical sums, different glyphs. **Rest durations are a
+    consequence of padding, not a choice**, and reproducing an authored rest
+    pattern needs a rest verb or a smarter `padMeasureRests`. Filed with the
+    containers in 11b's remainder.
 
 - **2026-08-14 — item 13 built at a narrower scope: every genesis verb's missing half.**
   The five declarations on `parts[0]` (name, strings, capo, staffKind, staves) get

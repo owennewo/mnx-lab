@@ -311,9 +311,13 @@ export class EditorSession {
       case 'longerDuration': {
         const step = intent.type === 'shorterDuration' ? 1 : -1;
         const event = this.eventUnderCursor();
-        if (!event) {
-          // Entry ghost: step the pending entry duration (session state, not
-          // an op — it exists only until the next insert consumes it).
+        // A REST IS ABSENCE (§8.11), so there is nothing there to re-value:
+        // the duration keys step the PENDING entry duration over a rest or an
+        // entry ghost alike, and only re-value an event that has ink. Before
+        // campaign item 11b this re-valued the rest instead, which made a run
+        // of short notes unenterable — every rest after the first stayed a
+        // quarter, so every note after the first came out a quarter.
+        if (!event || (event.notes?.length ?? 0) === 0) {
           const next = stepLadder(this.entryDuration, step);
           if (next === this.entryDuration) return false;
           this.entryDuration = next;

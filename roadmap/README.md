@@ -245,6 +245,23 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-onset-granularity.md](inprogress/core-element-ops-onset-granularity.md)** —
+  campaign item 11b's first half, **built 2026-08-14**: the bug that stopped item
+  11 recording a beam trace, and it had nothing to do with beams — **a run of short
+  notes was unenterable** (eight 32nds came out `32nd, quarter, quarter…`). Two
+  compounding mechanisms: the duration keys stepped the pending duration only on an
+  *entry ghost*, but a padded bar is full of rest EVENTS, so they re-valued the rest
+  instead; and entry then inherited the rest's duration, ignoring the one it was
+  given. The campaign's own founding rule settles both — **a rest is absence**
+  (§8.11) — so the keys step the pending duration over a rest as over a ghost, and
+  entry takes the pending duration with the surplus staying as rest *after* it
+  (never by shortening in place, which would drag every later event earlier and
+  re-time the bar). It also triggered the campaign's parked trace-maintenance case
+  for the first time: `from-scratch` changed correctly and was regenerated through
+  `npm run update:edit-traces`. And it uncovered the next blocker in the same
+  breath — rest durations are a *consequence of padding, not a choice*, so a
+  scenario writing one half rest where padding spends two quarters is still
+  untraceable. Containers and rest spelling remain 11b's open half.
 - **[core-element-ops-part-declarations.md](inprogress/core-element-ops-part-declarations.md)** —
   campaign item 13, **built 2026-08-14** at a narrower scope the numbers chose:
   the five keys on `parts[0]` (name, strings, capo, staffKind, staves) finally get
