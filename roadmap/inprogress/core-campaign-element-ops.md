@@ -102,13 +102,33 @@ agreed or candidate claims; **bold** = agreed.
 | 11b | [onset granularity + container descent](core-element-ops-onset-granularity.md) **(built)**; wrap verbs & rest spelling open | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | 32 notes addressable | t.b.d. | event | **granularity + descent built 2026-08-14**; wrap verbs + rest spelling open |
 | 12 | [lyrics](core-element-ops-lyrics.md) | Lyrics, part names, verse labels — a text *mode* that suspends the keymap, not a binding. | 4 (reachable 78 → 82); 34 elements | **Shift+L** popover — the text *mode* is rejected, see the doc | **note / score** | **built 2026-08-14** |
 | 13 | [part declarations](core-element-ops-part-declarations.md) | **Split at build time**: the five keys on `parts[0]` (name, strings, capo, staffKind, staves) get the removal halves their genesis verbs never had, plus constructors for capo and staves. | 2 (reachable 68 → 71); 91 elements | **Shift+P** popover (`capo 3`, `no strings`) | **score** | **built 2026-08-14** |
-| 13b | structural surface | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-codes `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changes note keys — which the primitives goldens embed. A corpus re-verification event, not a refactor. The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
+| 13b | [part addressing](core-element-ops-part-addressing.md) **(built)**; entry + staff 2 open | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-codes `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changes note keys — which the primitives goldens embed. A corpus re-verification event, not a refactor. The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
 
 Beyond the campaign (recorded, not indexed): layout documents (`spec/orchestral-layout`
 et al are layout-only, zero measures — a different surface, not keys), percussion kit,
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — 13b's addressing half: the cursor learns there is more than one part.**
+  Measured first: `parts[0]` was hard-coded in **44 places**, splitting into
+  ~10 addressing sites and ~25 writing sites. Removal was already part-agnostic
+  (it resolves through the shared walk), so the addressing half alone unlocks
+  the blocked set — and the writing half can follow without either being
+  half-done. **Removable 1,218 → 1,333**; notes 672 → 772, part-names 46 → 59,
+  unaddressable-with-a-verb 183 → 68.
+  - **The key grammar generalized without moving a byte**: part 0 and staff 1
+    stay silent in the key, because they were the whole world when the scheme
+    was written. Every key the goldens embed is unchanged; only new ones appear.
+  - **Voices are counted per staff** now, so a second staff cannot shift the
+    first staff's voice indices — the kind of silent renumbering that would have
+    rewritten keys across the corpus.
+  - **The renderer keys per staff rather than "staff 0 of part 0"**, so the
+    overlay can paint wherever the cursor can now go. Five more scenarios
+    demoted, no geometry moved.
+  - **The boundary is stated rather than hidden**: entry still writes to
+    `parts[0]`, so you can navigate to part 2 and remove there but a typed note
+    lands in part 1. Bounded, documented, and item 13c.
 
 - **2026-08-14 — the last unfinished pair: string annotations.** `setFret` wrote
   a note's string choice and nothing stripped it (34 elements). The model's own

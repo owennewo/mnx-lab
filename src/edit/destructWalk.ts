@@ -108,7 +108,9 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
   // part IS the address, which is why they attach at the score rung.
   const partKind = PART_DECLARATION_KINDS[element.kind];
   if (partKind) {
-    if (!element.path.startsWith('p0/')) return { address: 'unaddressable', removal: 'no-op' };
+    const owner = Number(/^p(\d+)\//.exec(element.path)?.[1] ?? 0);
+    if ((session.cursor.partIndex ?? 0) !== owner && !session.handleIntent({ type: 'setPart', partIndex: owner }))
+      return { address: 'unaddressable', removal: 'no-op' };
     const applied = session.handleIntent({ type: 'removePartDeclaration', kind: partKind });
     return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
   }
@@ -133,6 +135,10 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
   const measureIntent = measureRemovalIntent(element.kind);
   if (measureIntent) {
     if (element.measureIndex === undefined) return { address: 'unaddressable', removal: 'no-op' };
+    // A part-measure attribute (a clef) belongs to its own part's timeline.
+    const owner = Number(/^p(\d+)\//.exec(element.path)?.[1] ?? 0);
+    if ((session.cursor.partIndex ?? 0) !== owner && !session.handleIntent({ type: 'setPart', partIndex: owner }))
+      return { address: 'unaddressable', removal: 'no-op' };
     session.handleIntent({ type: 'goToMeasure', measureIndex: element.measureIndex });
     if (session.cursor.measureIndex !== element.measureIndex)
       return { address: 'unaddressable', removal: 'no-op' };
@@ -197,6 +203,19 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
  * switching costs the walk nothing and stops the report from inventing gaps.
  */
 export function driveToElement(session: EditorSession, key: string): boolean {
+  // The part comes first: a different part is a different grid, so no amount of
+  // navigation inside the current one can reach it (campaign item 13b).
+  const parts = session.doc.parts?.length ?? 0;
+  for (let partIndex = 0; partIndex < parts; partIndex++) {
+    if ((session.cursor.partIndex ?? 0) !== partIndex) {
+      if (!session.handleIntent({ type: 'setPart', partIndex })) continue;
+    }
+    if (driveWithinPart(session, key)) return true;
+  }
+  return false;
+}
+
+function driveWithinPart(session: EditorSession, key: string): boolean {
   if (driveWithinProjection(session, key)) return true;
   const other = session.projection === 'tab' ? 'notation' : 'tab';
   if (!session.handleIntent({ type: 'setProjection', projection: other })) return false;

@@ -22,7 +22,7 @@
 // sequences, events in content order) — the contract documented in
 // src/model/noteKeys.ts. edit/ may not import engine/, so the staff filter is
 // restated; noteKeys.ts is the shared spec both sides answer to.
-import type { MnxEvent, MnxSequenceItem, MnxSequence, MnxStructure, MnxNote } from '../model/mnx.ts';
+import type { MnxEvent, MnxSequenceItem, MnxStructure, MnxNote } from '../model/mnx.ts';
 import { isTimedEvent, isTuplet, isTremolo } from '../model/mnx.ts';
 import { forEachNoteAddress, noteKeyAt } from '../model/noteWalk.ts';
 import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
@@ -90,6 +90,13 @@ export interface EditorCursor {
    * coincident notes, so carrying an ordinal across would be meaningless.
    */
   slotIndex?: number;
+  /**
+   * Which PART the cursor is editing (campaign item 13b). Absent means the
+   * first, so every cursor written before parts were addressable stays valid —
+   * and the grid is rebuilt per part, because one score-wide grid would merge
+   * unrelated voices into shared columns.
+   */
+  partIndex?: number;
 }
 
 /** The whole navigable surface of a document, rebuilt after every edit. */
@@ -199,11 +206,6 @@ function scaleOnset(span: Onset, scale: Onset): Onset {
   return reduce(span.num * scale.num, span.den * scale.den);
 }
 
-/** The staff-1 filter, restated from the layouts (see file header). */
-function staffOneSequences(sequences: MnxSequence[] | undefined): MnxSequence[] {
-  return (sequences ?? []).filter(seq => (seq.staff ?? 1) === 1);
-}
-
 /** The key a note carries at these coordinates. Re-exported from the canonical
  *  walk (`model/noteWalk.ts`) so the editor and the layouts cannot drift. */
 export const noteKeyOf = noteKeyAt;
@@ -228,9 +230,12 @@ export function measureSpans(doc: MnxStructure): Onset[] {
   });
 }
 
-export function buildGrid(doc: MnxStructure): PositionGrid {
+export function buildGrid(doc: MnxStructure, partIndex = 0): PositionGrid {
+  // Which part the cursor is in (campaign item 13b). One part at a time: a
+  // score-wide grid would merge unrelated voices into shared columns, and the
+  // ladder addresses one part's music at a time.
   const positions: Position[] = [];
-  const part = doc.parts?.[0];
+  const part = doc.parts?.[partIndex];
   const measures = part?.measures ?? [];
   const measureCount = Math.max(measures.length, doc.global?.measures?.length ?? 0);
   const tuning = tuningOf(part);
@@ -245,7 +250,7 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
   }
 
   for (let measureIndex = 0; measureIndex < measureCount; measureIndex++) {
-    const clef = clefAt(doc, measureIndex);
+    const clef = clefAt(doc, measureIndex, partIndex);
     const byOnset: { onset: Onset; raw: RawSlot[]; voices: Set<number> }[] = [];
     const at = (onset: Onset) => {
       let found = byOnset.find(p => onsetsEqual(p.onset, onset));
@@ -259,7 +264,12 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
     // Voice 0's fill point — where the next inserted event would start.
     let voiceZeroEnd: Onset = { num: 0, den: 1 };
 
-    staffOneSequences(measures[measureIndex]?.sequences).forEach((sequence, voiceIndex) => {
+    const voiceByStaff = new Map<number, number>();
+    (measures[measureIndex]?.sequences ?? []).forEach(sequence => {
+      const staffIndex = sequence.staff ?? 1;
+      const voiceIndex = (voiceByStaff.get(staffIndex) ?? -1) + 1;
+      voiceByStaff.set(staffIndex, voiceIndex);
+      if (staffIndex !== 1) return; // staff 2+ addressing is item 13c
       let onset: Onset = { num: 0, den: 1 };
       sequence.content.forEach((item, eventIndex) => {
         const push = (event: MnxEvent, at_: Onset, containerIndex?: number) => {
@@ -268,7 +278,9 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
           (event.notes ?? []).forEach((note, noteIndex) => {
             position.raw.push({
               slot: {
-                noteKey: noteKeyAt(note, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex),
+                noteKey: noteKeyAt(
+                  note, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex, partIndex, staffIndex
+                ),
                 line: note._x?.mnxLab?.string ?? defaultStringFor(note.pitch, tuning, capo),
                 staffPosition: staffPositionOfPitch(clef, note.pitch),
                 voiceIndex,

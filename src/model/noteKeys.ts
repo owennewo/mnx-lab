@@ -40,6 +40,32 @@ export function syntheticContainerNoteKey(
   return `@m${measureIndex}.v${voiceIndex}.e${eventIndex}.c${containerIndex}.n${noteIndex}`;
 }
 
+/**
+ * The general positional key. Every segment is OPTIONAL except the ones the
+ * original form always carried, so keys written before parts and staves became
+ * addressable are byte-identical under the new grammar:
+ *
+ *   `@[p<part>.]m<measure>[.s<staff>].v<voice>.e<event>[.c<container>].n<note>`
+ *
+ * Part 0 and staff 1 stay silent because they were the whole world when the
+ * scheme was written (campaign item 13b) — and because a key that changed shape
+ * would move every golden that embeds it.
+ */
+export function positionalNoteKey(coords: {
+  partIndex: number;
+  measureIndex: number;
+  staffIndex: number;
+  voiceIndex: number;
+  eventIndex: number;
+  containerIndex?: number;
+  noteIndex: number;
+}): string {
+  const part = coords.partIndex > 0 ? `p${coords.partIndex}.` : '';
+  const staff = coords.staffIndex > 1 ? `.s${coords.staffIndex}` : '';
+  const container = coords.containerIndex === undefined ? '' : `.c${coords.containerIndex}`;
+  return `@${part}m${coords.measureIndex}${staff}.v${coords.voiceIndex}.e${coords.eventIndex}${container}.n${coords.noteIndex}`;
+}
+
 export function isSyntheticNoteKey(key: string): boolean {
   return key.startsWith('@m');
 }

@@ -950,13 +950,16 @@ function renderSegment(args: RenderSegmentArgs): {
     byNoteId: new Map()
   };
 
-  // Synthetic note keys encode the staff-1-of-first-part traversal jsonView
-  // mirrors — only a staff showing exactly that may synthesize them.
-  const primaryStaff = segment.staves[0];
-  const synthesizeKeysForStaff0 =
-    primaryStaff.sources.length === 1 &&
-    primaryStaff.sources[0].part === mnx.parts?.[0] &&
-    primaryStaff.sources[0].staff === 1;
+  // Synthetic note keys encode the walk in model/noteWalk.ts, which now spans
+  // every part's staff 1 (campaign item 13b). A staff may synthesize them when
+  // it shows exactly one part's staff 1 — and it keys them with THAT part's
+  // index, so the cursor and the overlay agree wherever the cursor goes.
+  const synthesizePartForStaff = segment.staves.map(staff => {
+    if (staff.sources.length !== 1 || staff.sources[0].staff !== 1) return null;
+    const index = (mnx.parts ?? []).indexOf(staff.sources[0].part);
+    return index >= 0 ? index : null;
+  });
+  const synthesizeKeysForStaff0 = synthesizePartForStaff[0] !== null;
 
   // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
   // into each measure's diagnostic markers alongside renderer-gap issues.
@@ -1444,14 +1447,17 @@ function renderSegment(args: RenderSegmentArgs): {
                 keyFifths: m.keyFifths,
                 primitives,
                 keyFor:
-                  s === 0 && synthesizeKeysForStaff0
+                  synthesizePartForStaff[s] !== null
                     ? (containerIndex, noteIndex) => {
                         const inner = (event as { content?: { notes?: MnxNote[] }[] }).content?.[
                           containerIndex
                         ];
                         const note = inner?.notes?.[noteIndex];
                         return note
-                          ? noteKeyAt(note, i, voiceIndex, eventIndex, noteIndex, containerIndex)
+                          ? noteKeyAt(
+                              note, i, voiceIndex, eventIndex, noteIndex, containerIndex,
+                              synthesizePartForStaff[s]!
+                            )
                           : undefined;
                       }
                     : undefined
@@ -1468,14 +1474,17 @@ function renderSegment(args: RenderSegmentArgs): {
                 keyFifths: m.keyFifths,
                 primitives,
                 keyFor:
-                  s === 0 && synthesizeKeysForStaff0
+                  synthesizePartForStaff[s] !== null
                     ? (containerIndex, noteIndex) => {
                         const inner = (event as { content?: { notes?: MnxNote[] }[] }).content?.[
                           containerIndex
                         ];
                         const note = inner?.notes?.[noteIndex];
                         return note
-                          ? noteKeyAt(note, i, voiceIndex, eventIndex, noteIndex, containerIndex)
+                          ? noteKeyAt(
+                              note, i, voiceIndex, eventIndex, noteIndex, containerIndex,
+                              synthesizePartForStaff[s]!
+                            )
                           : undefined;
                       }
                     : undefined
@@ -1492,14 +1501,17 @@ function renderSegment(args: RenderSegmentArgs): {
                 keyFifths: m.keyFifths,
                 primitives,
                 keyFor:
-                  s === 0 && synthesizeKeysForStaff0
+                  synthesizePartForStaff[s] !== null
                     ? (containerIndex, noteIndex) => {
                         const inner = (event as { content?: { notes?: MnxNote[] }[] }).content?.[
                           containerIndex
                         ];
                         const note = inner?.notes?.[noteIndex];
                         return note
-                          ? noteKeyAt(note, i, voiceIndex, eventIndex, noteIndex, containerIndex)
+                          ? noteKeyAt(
+                              note, i, voiceIndex, eventIndex, noteIndex, containerIndex,
+                              synthesizePartForStaff[s]!
+                            )
                           : undefined;
                       }
                     : undefined
@@ -1529,7 +1541,8 @@ function renderSegment(args: RenderSegmentArgs): {
               curveAnchors,
               // Synthetic keys encode the staff-1 traversal that jsonView
               // mirrors; other staves use real ids only.
-              synthesizeKeys: s === 0 && synthesizeKeysForStaff0
+              synthesizeKeys: synthesizePartForStaff[s] !== null,
+              keyPartIndex: synthesizePartForStaff[s] ?? 0
             });
             if (beamRun && stem && event.id) beamRun.stems.set(event.id, stem);
             const lyricLines = event.lyrics?.lines;
@@ -3486,9 +3499,11 @@ interface EmitEventArgs {
   /** This event's key in the curve-anchor registry. */
   curveKey: string;
   curveAnchors: CurveAnchors;
-  /** Staff-1 events synthesize positional note keys (the traversal jsonView
-   *  mirrors); other staves use real note ids only. */
+  /** Staff-1 events synthesize positional note keys (the walk in
+   *  model/noteWalk.ts); other staves use real note ids only. */
   synthesizeKeys: boolean;
+  /** Which part those keys belong to (campaign item 13b). */
+  keyPartIndex?: number;
 }
 
 /** Returns the deferred stem when the event is beamed, else null. */
@@ -3497,7 +3512,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
     event, eventX, staffTop, clef, stemOverride, beamDir, useAccidentalDisplay, keyFifths,
     activeNoteIds, selectedNoteIds,
     primitives, index, measureIndex, voiceIndex, eventIndex,
-    row, curveKey, curveAnchors, synthesizeKeys
+    row, curveKey, curveAnchors, synthesizeKeys, keyPartIndex
   } = args;
 
   const base = event.duration.base;
@@ -3546,7 +3561,9 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   // for id-less documents (see src/utils/noteKeys.ts) so selection and the
   // note↔document cross-highlight work across the whole corpus.
   const noteIds = notes.map((n, idx) =>
-    synthesizeKeys ? noteKeyAt(n, measureIndex, voiceIndex, eventIndex, idx) : n.id
+    synthesizeKeys
+      ? noteKeyAt(n, measureIndex, voiceIndex, eventIndex, idx, undefined, keyPartIndex ?? 0)
+      : n.id
   );
   const primaryNoteId = noteIds.find((id): id is string => id !== undefined);
 

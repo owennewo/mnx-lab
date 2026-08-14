@@ -648,7 +648,9 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
         const onStaffOne = (sequence.staff ?? 1) === 1;
         if (onStaffOne) staffOneVoice++;
         const voiceIndex = staffOneVoice;
-        const addressable = partIndex === 0 && onStaffOne;
+        // Every part's staff-1 notes are nameable now (campaign item 13b); the
+        // second STAFF of a part is item 13c.
+        const addressable = onStaffOne;
         const sequencePath = `${measurePath}/v${sequenceIndex}`;
         const sequenceJson = [...measureJson, 'sequences', sequenceIndex];
         if (sequence.fullMeasure)
@@ -666,7 +668,9 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
           [...sequenceJson, 'content'],
           addressable
             ? (eventIndex, noteIndex, note, containerIndex) =>
-                noteKeyAt(note as never, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex)
+                noteKeyAt(
+                  note as never, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex, partIndex
+                )
             : null
         );
       });

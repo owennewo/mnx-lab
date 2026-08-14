@@ -179,6 +179,8 @@ export type EditOp =
        *  `clefs` array with it: no tombstones. */
       type: 'removeClef';
       measureIndex: number;
+      /** Which part's clef (campaign item 13b); default the first. */
+      partIndex?: number;
     }
   | {
       /** Declare the key signature governing this measure onward. */
@@ -263,7 +265,12 @@ export type EditOp =
   // parts[0] that shipped with constructors and no removals. One pair, because
   // they share an owner — item 7's test, third application.
   | { type: 'setPartDeclaration'; declaration: PartDeclaration }
-  | { type: 'removePartDeclaration'; kind: PartDeclarationKind }
+  | {
+      type: 'removePartDeclaration';
+      kind: PartDeclarationKind;
+      /** Which part's declaration (campaign item 13b); default the first. */
+      partIndex?: number;
+    }
   // Event adornments (campaign item 8,
   // roadmap/inprogress/core-element-ops-adornments.md). TWO pairs, because the
   // owners differ: a marking is a key on the EVENT, while dynamics and
@@ -613,7 +620,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'removeClef': {
-      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
       const clefs = measure?.clefs;
       if (!measure || !clefs) return next;
       const kept = clefs.filter(
@@ -879,7 +886,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'removePartDeclaration': {
-      const part = next.parts?.[0];
+      const part = next.parts?.[op.partIndex ?? 0];
       if (!part) return next;
       if (op.kind === 'name') delete part.name;
       else if (op.kind === 'staves') delete part.staves;

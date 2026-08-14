@@ -21,7 +21,7 @@
 <text x="144.8" y="377.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="144.8" y="409.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
 <text x="251.296" y="209.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
-<text x="251.296" y="409.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead"></text>
+<text x="251.296" y="409.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m0.v0.e0.n0"></text>
 <line x1="348.8" y1="201.6" x2="348.8" y2="265.6" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="353.6" y="201.6" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="348.8" y1="361.6" x2="348.8" y2="425.6" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>

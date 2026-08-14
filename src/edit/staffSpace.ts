@@ -21,12 +21,12 @@ const DEFAULT_SEAT: Record<string, number> = { G: -2, F: 2, C: 0 };
 
 export const DEFAULT_CLEF: ClefSpec = { sign: 'G', staffPosition: -2, octave: 0 };
 
-/** The clef governing parts[0]/staff-1 at a measure: the last one declared at
+/** The clef governing a part's staff-1 at a measure: the last one declared at
  *  or before it (mid-measure clef changes are ignored — the cursor's grain is
  *  the measure for now). */
-export function clefAt(doc: MnxStructure, measureIndex: number): ClefSpec {
+export function clefAt(doc: MnxStructure, measureIndex: number, partIndex = 0): ClefSpec {
   let current = DEFAULT_CLEF;
-  const measures = doc.parts?.[0]?.measures ?? [];
+  const measures = doc.parts?.[partIndex]?.measures ?? [];
   for (let i = 0; i <= measureIndex && i < measures.length; i++) {
     for (const positioned of measures[i].clefs ?? []) {
       if ((positioned.staff ?? 1) !== 1) continue;

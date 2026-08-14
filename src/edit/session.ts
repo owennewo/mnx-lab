@@ -115,7 +115,7 @@ export class EditorSession {
     // byte-identical undo-all contract.
     this.initial = JSON.parse(JSON.stringify(doc)) as MnxStructure;
     this.history = new EditHistory(this.initial);
-    this.grid = buildGrid(this.initial);
+    this.grid = buildGrid(this.initial, 0);
     this.cursorState = initialCursor(this.grid);
     this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
   }
@@ -362,12 +362,17 @@ export class EditorSession {
       case 'removeClef': {
         // Nothing declared here means the measure ALREADY inherits: refuse,
         // rather than pushing an op that changes nothing onto the queue.
-        const measure = this.doc.parts?.[0]?.measures?.[this.cursorState.measureIndex];
+        const partIndex = this.cursorState.partIndex ?? 0;
+        const measure = this.doc.parts?.[partIndex]?.measures?.[this.cursorState.measureIndex];
         const declared = (measure?.clefs ?? []).some(
           entry => (entry.staff ?? 1) === 1 && entry.position === undefined
         );
         if (!declared) return false;
-        this.apply({ type: 'removeClef', measureIndex: this.cursorState.measureIndex });
+        this.apply({
+          type: 'removeClef',
+          measureIndex: this.cursorState.measureIndex,
+          partIndex
+        });
         return true;
       }
       case 'setKeySignature': {
@@ -516,13 +521,17 @@ export class EditorSession {
         return true;
       }
       case 'setPartDeclaration': {
-        if (!this.doc.parts?.[0]) return false;
+        if (!this.doc.parts?.[this.cursorState.partIndex ?? 0]) return false;
         this.apply({ type: 'setPartDeclaration', declaration: intent.declaration });
         return true;
       }
       case 'removePartDeclaration': {
         const before = JSON.stringify(this.doc);
-        this.apply({ type: 'removePartDeclaration', kind: intent.kind });
+        this.apply({
+          type: 'removePartDeclaration',
+          kind: intent.kind,
+          partIndex: this.cursorState.partIndex ?? 0
+        });
         if (JSON.stringify(this.doc) === before) {
           this.history.undo();
           this.reindex();
@@ -812,6 +821,17 @@ export class EditorSession {
       case 'goToMeasure':
         this.cursorState = moveToMeasure(this.grid, before, intent.measureIndex);
         break;
+      case 'setPart': {
+        const parts = this.doc.parts ?? [];
+        if (intent.partIndex < 0 || intent.partIndex >= parts.length) return false;
+        if ((before.partIndex ?? 0) === intent.partIndex) return false;
+        // A different part is a different grid: rebuild, then land on its first
+        // position rather than pretending the old address means anything here.
+        this.grid = buildGrid(this.doc, intent.partIndex);
+        this.cursorState = { ...initialCursor(this.grid), partIndex: intent.partIndex };
+        this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
+        return true;
+      }
       case 'cycleSlot': {
         const next = cycleSlot(this.grid, before, this.activeProjection);
         if (next === before) return false; // nothing coincident to step to
@@ -938,7 +958,7 @@ export class EditorSession {
   /** The grid derives from the document, so every doc change rebuilds it and
    *  re-anchors the cursor (a removed measure must not strand it). */
   private reindex(): void {
-    this.grid = buildGrid(this.doc);
+    this.grid = buildGrid(this.doc, this.cursorState.partIndex ?? 0);
     this.cursorState = clampCursor(this.grid, this.cursorState);
   }
 

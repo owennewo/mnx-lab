@@ -23,13 +23,17 @@
  */
 import type { MnxEvent, MnxNote, MnxSequence, MnxStructure } from './mnx.ts';
 import { isTimedEvent } from './mnx.ts';
-import { syntheticContainerNoteKey, syntheticNoteKey } from './noteKeys.ts';
+import { positionalNoteKey } from './noteKeys.ts';
 
 /** Where a note lives, and what names it. */
 export interface NoteAddress {
   note: MnxNote;
   /** The note's own id when it has one, else the positional key. */
   key: string;
+  /** Which part the note lives in — 0 is the entry surface (campaign 13b). */
+  partIndex: number;
+  /** Which staff of that part (1-based, as MNX numbers them). */
+  staffIndex: number;
   measureIndex: number;
   /** Index among the measure's STAFF-1 sequences — what the key encodes, and
    *  deliberately not the raw `sequences` index (the layouts filter the same
@@ -58,12 +62,20 @@ export function noteKeyAt(
   voiceIndex: number,
   eventIndex: number,
   noteIndex: number,
-  containerIndex?: number
+  containerIndex?: number,
+  partIndex = 0,
+  staffIndex = 1
 ): string {
   if (note.id !== undefined) return note.id;
-  return containerIndex === undefined
-    ? syntheticNoteKey(measureIndex, voiceIndex, eventIndex, noteIndex)
-    : syntheticContainerNoteKey(measureIndex, voiceIndex, eventIndex, containerIndex, noteIndex);
+  return positionalNoteKey({
+    partIndex,
+    measureIndex,
+    staffIndex,
+    voiceIndex,
+    eventIndex,
+    ...(containerIndex === undefined ? {} : { containerIndex }),
+    noteIndex
+  });
 }
 
 /** Is this sequence item a container holding events (tuplet, grace, tremolo)? */
@@ -83,18 +95,25 @@ export function forEachNoteAddress(
   doc: MnxStructure,
   fn: (address: NoteAddress) => void
 ): void {
-  (doc.parts?.[0]?.measures ?? []).forEach((measure, measureIndex) => {
-    let voiceIndex = -1;
+  (doc.parts ?? []).forEach((part, partIndex) => {
+  (part.measures ?? []).forEach((measure, measureIndex) => {
+    // Voices are counted PER STAFF, so a second staff cannot shift the voice
+    // indices of the first — which would rewrite keys the goldens embed.
+    const voiceByStaff = new Map<number, number>();
     (measure.sequences ?? []).forEach((sequence, sequenceIndex) => {
-      if (!isEntryStaff(sequence)) return;
-      voiceIndex++;
-      const voice = voiceIndex;
+      const staffIndex = sequence.staff ?? 1;
+      const voice = (voiceByStaff.get(staffIndex) ?? -1) + 1;
+      voiceByStaff.set(staffIndex, voice);
       (sequence.content ?? []).forEach((item, eventIndex) => {
         const emit = (event: MnxEvent, containerIndex?: number) =>
           (event.notes ?? []).forEach((note, noteIndex) => {
             fn({
               note,
-              key: noteKeyAt(note, measureIndex, voice, eventIndex, noteIndex, containerIndex),
+              key: noteKeyAt(
+                note, measureIndex, voice, eventIndex, noteIndex, containerIndex, partIndex, staffIndex
+              ),
+              partIndex,
+              staffIndex,
               measureIndex,
               voiceIndex: voice,
               sequenceIndex,
@@ -120,6 +139,7 @@ export function forEachNoteAddress(
         emit(item as MnxEvent);
       });
     });
+  });
   });
 }
 

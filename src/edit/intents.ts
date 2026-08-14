@@ -38,6 +38,8 @@ export type NavigationIntent =
   // notes that share this moment and line — voices, chord members the tab
   // derivation stacks on one string, and later grace notes.
   | { type: 'cycleSlot' }
+  // Move the cursor to another part (campaign item 13b).
+  | { type: 'setPart'; partIndex: number }
   /** The Ctrl climb (selection-ladder navigation map): the direction applied
    *  at the nearest ancestor rung where it means something different, then
    *  descend back. At note level: ←→ = bar jump (notation) / event-skip
@@ -141,6 +143,7 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'tightenSelection',
   'setProjection',
   'cycleSlot',
+  'setPart',
   'jumpNext',
   'jumpPrev',
   'jumpUp',
