@@ -245,6 +245,25 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-spanners.md](inprogress/core-element-ops-spanners.md)** —
+  campaign item 10: **the first two-ended gesture**, **built 2026-08-14** the same
+  day as proposed. Items 5 and 7 were attributes at the cursor; a slur has two ends
+  and the ladder cannot extend laterally yet, so the keyboard names two places in
+  two presses: `S` arms an anchor at the start note, navigate, `S` completes it,
+  `Esc` drops it — **the first session state beyond the cursor and entry duration**,
+  and traces stay honest because they record the two presses rather than a
+  synthesized "slur A→B". It also **resolves the `S` collision** the campaign index
+  flagged against item 9's slide: one key, two meanings, chosen by the active
+  projection (slur in notation, slide in tab) — the ladder's own "the projection
+  picks the input dialect" principle applied to a letter. A slur is one object
+  holding both ends (the *reference* removal class made concrete), so removal takes
+  both, and chord pins make three slurs on one event independently addressable.
+  Results: reachable scenarios **42 → 45**, all 6 slur elements removable, and a
+  fifth recorded trace (`spec/slurs`, 52 intents). Two rules for later items fell
+  out: **"handled" is not "removed"** (an intent returning true has been handled,
+  which is not a claim about ink — the sweep now compares documents), and
+  **recording a trace is a loop with the session**, since horizontal moves snap to
+  ink and pre-computed vertical corrections overshoot.
 - **[core-element-ops-bar-attributes.md](inprogress/core-element-ops-bar-attributes.md)** —
   campaign item 7: **ten bar attributes behind one popover**, the second op-family
   item, **built 2026-08-14** the same day as proposed and again chosen by item 3's

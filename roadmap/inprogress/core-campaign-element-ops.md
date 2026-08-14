@@ -97,7 +97,7 @@ agreed or candidate claims; **bold** = agreed.
 | 7 | [bar-attribute family](core-element-ops-bar-attributes.md) | Barlines, repeats, endings, segno/jump/fine, sections, rehearsal, tempo — one typed-popover family on the global measure. ONE op pair for ten kinds; `no <attribute>` strips. | **18 scenarios** (reachable 24 → 42); 56 elements removable | **Shift+B** | **measure** | **built 2026-08-14** |
 | 8 | event adornments | Articulations/markings, dynamics, directions. | ~14 | adornment alphabet (letter keys) | note/event | undrafted |
 | 9 | tab technique alphabet | Bends, slides, hammer/pull, vibrato, palm mute, harmonics — the `B H S V X O` set `keymapDocs.ts` already reserves. Entry side of [core-guitar-technique.md](../proposed/core-guitar-technique.md) (which owns rendering). | 5 | **B H S V X O** (reserved) | note | undrafted |
-| 10 | spanners | Slurs; tie variants (`crossVoice`, `lv`, `arpeggio`). Needs the two-ended target gesture; reference removal class. | 4 | S candidate (collides with slide — resolve here) | note→note | undrafted |
+| 10 | [spanners](core-element-ops-spanners.md) | Slurs; tie variants (`crossVoice`, `lv`, `arpeggio`). The two-ended **anchor gesture** (press, navigate, press); reference removal class. | 3 (reachable 42 → 45) | **S**, polymorphic by projection: slur in notation, slide in tab (resolves item 9's collision) | **note→note** | **built 2026-08-14** |
 | 11 | rhythm model | Tuplets, grace notes, tremolo, `space`, full-measure/multimeasure rests, measure repeats. Changes what an onset is (cursor grid, `eventAtOnset`). Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md) (converters/tab). | ~12 | t.b.d. per sub-family | event | undrafted |
 | 12 | text entry | Lyrics, part names, verse labels — a text *mode* that suspends the keymap, not a binding. | ~8 | Enter-into-text candidate | event / part | undrafted |
 | 13 | structural surface | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 (first-part genesis lands with item 1; this item owns the *second* of everything). The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
@@ -107,6 +107,36 @@ et al are layout-only, zero measures — a different surface, not keys), percuss
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — item 10 built: the first two-ended gesture, and the S collision resolved.**
+  Slurs (`setSlur`/`removeSlur`) plus `setTieVariant`, at the note→note rung.
+  - **The gesture is an anchor**, because the ladder cannot extend laterally yet:
+    press `S` at the start note, navigate, press `S` at the far note; `Esc` drops
+    it. That is **the first session state beyond the cursor and entry duration** —
+    one nullable note key — and traces stay honest because they record the two
+    presses, not a synthesized "slur A→B". When lateral selection lands, "slur the
+    selected run" becomes a second route to the same op, not a replacement.
+  - **`S` is one key with two meanings, chosen by the active projection** — slur in
+    notation, slide in tab. Not a compromise: it is the ladder's decided principle
+    (the active projection picks the input dialect) applied to a letter, and it
+    joins `Alt+↑↓` and `Del` as polymorphic verbs. Item 9 inherits it; the index
+    records `S` as agreed for both.
+  - **"Handled" is not "removed."** `toggleSlur` returns true when it merely arms
+    an anchor, and the sweep counted that as a removal until the oracle said "the
+    document did not change". `attemptElement` now compares the document.
+    **Rule for every later gesture item**: an intent returning true has been
+    handled, which is not a claim about ink.
+  - **Recording a trace is a loop with the session, not a script.** Horizontal
+    moves snap to the ink at the destination, so vertical corrections computed in
+    advance overshoot — mine left the anchor armed and silently dropped a slur.
+    The trace generator now tracks where the cursor actually lands.
+  - **Reachable 42 → 45, all 6 slurs removable**, fifth recorded trace
+    (`spec/slurs`, 52 intents). The renderer's default curve side matched the
+    corpus's explicit `side: up`/`down`, confirming `side` is presentation.
+  - **Tie variants close an optimistic prediction rather than unlocking anything**:
+    `spec/tie-targets` was already predicted reachable because every kind in it had
+    a verb, yet `toggleTie` only makes plain `nextNote` ties. `setTieVariant` fills
+    that in — the kind-shaped blindness item 3 warned about, met a second time.
 
 - **2026-08-14 — item 7 built: ten kinds, one verb, and the histogram proved itself.**
   The bar-attribute family (`setMeasureAttribute`/`removeMeasureAttribute`) at

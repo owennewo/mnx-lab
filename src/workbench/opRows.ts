@@ -137,6 +137,12 @@ function opLabel(op: EditOp): string {
       return `${attributeText(op.attribute)} @ m${op.measureIndex + 1}`;
     case 'removeMeasureAttribute':
       return `no ${op.kind} @ m${op.measureIndex + 1}`;
+    case 'setSlur':
+      return `slur ${op.fromNoteKey} → ${op.toNoteKey}`;
+    case 'removeSlur':
+      return `remove slur at ${op.noteKey}`;
+    case 'setTieVariant':
+      return `tie ${op.lv ? 'l.v.' : (op.targetType ?? 'variant')} · ${op.noteId}`;
   }
 }
 

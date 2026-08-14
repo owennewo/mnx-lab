@@ -99,11 +99,21 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
   if (key === undefined) return { address: 'unaddressable', removal: 'no-op' };
   if (!driveToElement(session, key)) return { address: 'unaddressable', removal: 'no-op' };
   // Note-attached elements are removed THROUGH their note: address the note,
-  // then use the element's own verb. `toggleTie` is the only such verb today,
-  // and it is genuinely a pair — the same key that ties, unties.
-  const intent = element.kind === 'tie' ? { type: 'toggleTie' as const } : { type: 'delete' as const };
+  // then use the element's own verb. Both of these are genuinely pairs — the
+  // same key that ties unties, and the same key that slurs unslurs.
+  const intent =
+    element.kind === 'tie'
+      ? ({ type: 'toggleTie' } as const)
+      : element.kind === 'slur'
+        ? ({ type: 'toggleSlur' } as const)
+        : ({ type: 'delete' } as const);
+  // "Handled" is not "removed": `toggleSlur` legitimately returns true when it
+  // merely ARMS an anchor, and a walk that counted that as a removal would
+  // report ink gone that is still on the page. Compare the document instead.
+  const before = JSON.stringify(session.doc);
   const applied = session.handleIntent(intent);
-  return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
+  const changed = JSON.stringify(session.doc) !== before;
+  return { address: 'addressed', removal: applied && changed ? 'removed' : 'refused' };
 }
 
 /**

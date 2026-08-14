@@ -195,6 +195,14 @@ export const KEY_DOCS: KeyDoc[] = [
     group: 'adornments',
     meaning: { note: 'tie to the same pitch in the next event (toggles)' }
   },
+  {
+    keys: 'S',
+    strokes: [{ code: 'KeyS' }],
+    group: 'adornments',
+    meaning: {
+      note: 'slur: arm at this note, press again at the far note (Esc drops it) — slide in the tab projection'
+    }
+  },
 
   // ── Setup — the typed popovers (shell actions: a trace records the intent
   // the popover emits, never its opening).

@@ -80,7 +80,12 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['toggleTie'],
     remove: ['toggleTie']
   },
-  slur: { classes: ['slur'], note: 'A curve between two events; reference removal class.' },
+  slur: {
+    classes: ['slur'],
+    note: 'A curve between two events; the *reference* removal class — one object holds both ends, so removal takes them together.',
+    construct: ['setSlur'],
+    remove: ['removeSlur']
+  },
   lyric: { classes: ['lyric', 'lyric-hyphen'], note: 'One syllable of one line under an event.' },
   articulation: {
     classes: ['articulation', 'tremolo'],
@@ -357,8 +362,21 @@ function walkEvent(
   });
   for (const [kitIndex] of ((event.kitNotes ?? []) as unknown[]).entries())
     push(out, 'kit-note', `${path}/kit${kitIndex}`, [...jsonPath, 'kitNotes', kitIndex]);
-  for (const [slurIndex] of ((event.slurs ?? []) as unknown[]).entries())
-    push(out, 'slur', `${path}/slur${slurIndex}`, [...jsonPath, 'slurs', slurIndex]);
+  for (const [slurIndex, raw] of ((event.slurs ?? []) as { startNote?: string }[]).entries()) {
+    // A slur is addressed through the note it STARTS at: `startNote` names it
+    // on a chord, and a single-note event has only one candidate. That is what
+    // lets three slurs on one event be removed independently.
+    const startIndex = raw.startNote
+      ? notes.findIndex(note => (note as { id?: string }).id === raw.startNote)
+      : 0;
+    pushOnNote(
+      out,
+      'slur',
+      `${path}/slur${slurIndex}`,
+      [...jsonPath, 'slurs', slurIndex],
+      startIndex >= 0 ? keyOf?.(startIndex, notes[startIndex]) : undefined
+    );
+  }
   for (const line of Object.keys(
     (event.lyrics as { lines?: Record<string, unknown> } | undefined)?.lines ?? {}
   ))

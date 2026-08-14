@@ -83,6 +83,11 @@ export const EDIT_LAYER: KeymapLayer = {
     // Tie: `T` (Dorico/MuseScore convention; free in this scheme — the
     // technique alphabet B H S V X O doesn't claim it).
     { code: 'KeyT', intent: { type: 'toggleTie' } },
+    // Spanners (campaign item 10). `S` is ONE key with two meanings, chosen by
+    // the active projection — slur in notation, slide in tab (item 9's
+    // reserved letter) — which is the ladder's decided principle that the
+    // active projection picks the input dialect, applied to a letter.
+    { code: 'KeyS', intent: { type: 'toggleSlur' } },
     // The notation projection's entry action: toggle a notehead at the
     // cursor's (staff position × beat) cell. Binding provisional — Space is
     // the play/pause convention elsewhere; the ladder review owns the call.

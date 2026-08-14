@@ -78,7 +78,13 @@ export type MutationIntent =
   // The bar-attribute family (campaign item 7): ten kinds, one verb, because
   // they are all one thing — a key on the global measure.
   | { type: 'setMeasureAttribute'; attribute: MeasureAttribute }
-  | { type: 'removeMeasureAttribute'; kind: MeasureAttributeKind };
+  | { type: 'removeMeasureAttribute'; kind: MeasureAttributeKind }
+  // Spanners (campaign item 10): ONE intent, three meanings decided by
+  // session state — remove the slur starting here, complete a pending one, or
+  // arm the anchor. Traces record what was pressed, so replay rebuilds the
+  // anchor exactly as a player would.
+  | { type: 'toggleSlur' }
+  | { type: 'setTieVariant'; targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump'; lv?: boolean };
 
 export type HistoryIntent = { type: 'undo' } | { type: 'redo' };
 

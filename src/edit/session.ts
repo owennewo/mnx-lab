@@ -8,7 +8,13 @@ import { isTimedEvent } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent } from './intents.ts';
 import type { EditOp, OpLogEntry } from './ops.ts';
-import { EditHistory, MEASURE_ATTRIBUTE_FIELDS, measureHasInk, partHasInk } from './ops.ts';
+import {
+  EditHistory,
+  hasSlurStartingAt,
+  MEASURE_ATTRIBUTE_FIELDS,
+  measureHasInk,
+  partHasInk
+} from './ops.ts';
 import {
   addOnsets,
   buildGrid,
@@ -74,6 +80,12 @@ export class EditorSession {
   /** Digit-combining anchor: consecutive fret digits on an unmoved cursor
    *  combine (1,2 → 12) — deterministic, no timers, so traces replay. */
   private lastDigit: { anchor: string; fret: number } | null = null;
+
+  /** The armed end of a spanner-in-progress (campaign item 10): a note key, or
+   *  null. The keyboard names two places in two presses because the ladder
+   *  cannot yet extend laterally; when it can, "slur the selected run" becomes
+   *  a second route to the same op rather than a replacement. */
+  private spanAnchorKey: string | null = null;
   /** The intent currently being handled — stamped into history entries by
    *  apply() as the op queue's provenance (forward-recorded at apply time). */
   private applyingIntent: EditorIntent | null = null;
@@ -362,6 +374,39 @@ export class EditorSession {
       }
       // The bar-attribute family (campaign item 7): the cursor's measure is
       // the target, like every other measure-rung attribute.
+      // Spanners (campaign item 10): the first session state beyond the
+      // cursor and the entry duration — one nullable note key.
+      case 'toggleSlur': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        // 1. A slur already starting here? Toggle it off.
+        if (hasSlurStartingAt(this.doc, slot.noteKey)) {
+          this.spanAnchorKey = null;
+          this.apply({ type: 'removeSlur', noteKey: slot.noteKey });
+          return true;
+        }
+        // 2. An armed anchor? Complete the slur.
+        if (this.spanAnchorKey !== null && this.spanAnchorKey !== slot.noteKey) {
+          const from = this.spanAnchorKey;
+          this.spanAnchorKey = null;
+          this.apply({ type: 'setSlur', fromNoteKey: from, toNoteKey: slot.noteKey });
+          return true;
+        }
+        // 3. Otherwise arm (or disarm, pressing twice in one place).
+        this.spanAnchorKey = this.spanAnchorKey === slot.noteKey ? null : slot.noteKey;
+        return true;
+      }
+      case 'setTieVariant': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        this.apply({
+          type: 'setTieVariant',
+          noteId: slot.noteKey,
+          ...(intent.targetType ? { targetType: intent.targetType } : {}),
+          ...(intent.lv ? { lv: true } : {})
+        });
+        return true;
+      }
       case 'setMeasureAttribute': {
         this.apply({
           type: 'setMeasureAttribute',
@@ -463,12 +508,23 @@ export class EditorSession {
     return true;
   }
 
+  /** The armed spanner anchor, for the HUD and the ops panel. */
+  get spanAnchor(): string | null {
+    return this.spanAnchorKey;
+  }
+
   private navigate(intent: EditorIntent): boolean {
     const before = this.cursorState;
     switch (intent.type) {
       // The ladder walk. Presence is computed fresh at the cursor, so absent
       // rungs (no note under a rest, no sections declared) are skipped.
       case 'relaxSelection': {
+        // Escape drops an armed spanner anchor before it does anything else —
+        // the gesture must be abandonable without touching the document.
+        if (this.spanAnchorKey !== null) {
+          this.spanAnchorKey = null;
+          return true;
+        }
         const next = relaxLevel(presentLevels(this.doc, this.grid, before, this.activeProjection), this.level);
         if (!next) return false; // at the top — the mount deselects
         this.level = next;

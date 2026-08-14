@@ -13,6 +13,7 @@ import type {
   MnxPart,
   MnxSequence,
   MnxSequenceItem,
+  MnxSlur,
   MnxStructure,
   MnxTuningEntry
 } from '../model/mnx.ts';
@@ -190,6 +191,35 @@ export type EditOp =
   // roadmap/inprogress/core-element-ops-bar-attributes.md). Ten kinds that are
   // all one thing — a key on the GLOBAL measure — so they share one verb with
   // a typed payload rather than restating the same shape ten times.
+  // Spanners (campaign item 10,
+  // roadmap/inprogress/core-element-ops-spanners.md). A slur is ONE object
+  // holding both ends: it lives on the start event and names the end EVENT's
+  // id, pinning chord members when either end is a chord.
+  | {
+      /** Slur from one note to another; both are note keys, and the op
+       *  resolves them to their events (minting an id on the target when it
+       *  has none, as `toggleTie` does for notes). */
+      type: 'setSlur';
+      fromNoteKey: string;
+      toNoteKey: string;
+      side?: 'up' | 'down';
+    }
+  | {
+      /** Drop the slur starting at this note — the *reference* removal class,
+       *  and the whole object goes, so both ends leave together. With chord
+       *  pins the note disambiguates which slur; without them an event carries
+       *  at most one. */
+      type: 'removeSlur';
+      noteKey: string;
+    }
+  | {
+      /** Re-type an existing tie (`crossVoice`, `arpeggio`, `crossJump`) or
+       *  make a target-less `lv` tie. `toggleTie` remains the removal half. */
+      type: 'setTieVariant';
+      noteId: string;
+      targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump';
+      lv?: boolean;
+    }
   | {
       type: 'setMeasureAttribute';
       measureIndex: number;
@@ -531,6 +561,56 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       note.ties = [{ target: target.id }];
       return next;
     }
+    case 'setSlur': {
+      const from = findKeyedNote(next, op.fromNoteKey);
+      const to = findKeyedNote(next, op.toNoteKey);
+      if (!from || !to || from === to) return next;
+      const fromEvent = from.seq.content[from.eventIndex] as MnxEvent;
+      const toEvent = to.seq.content[to.eventIndex] as MnxEvent;
+      if (fromEvent === toEvent) return next;
+      toEvent.id ??= mintEventId(next);
+      // Pins name chord members; a single-note event needs none, which is how
+      // the corpus writes them (spec/slurs vs slurs-targeting-specific-notes).
+      const pinned = (fromEvent.notes?.length ?? 0) > 1 || (toEvent.notes?.length ?? 0) > 1;
+      if (pinned) {
+        from.note.id ??= mintNoteId(next);
+        to.note.id ??= mintNoteId(next);
+      }
+      const slur: MnxSlur = { target: toEvent.id };
+      if (op.side) slur.side = op.side;
+      if (pinned) {
+        slur.startNote = from.note.id;
+        slur.endNote = to.note.id;
+      }
+      fromEvent.slurs = [...(fromEvent.slurs ?? []), slur];
+      return next;
+    }
+    case 'removeSlur': {
+      const located = findKeyedNote(next, op.noteKey);
+      if (!located) return next;
+      const event = located.seq.content[located.eventIndex] as MnxEvent;
+      if (!event.slurs?.length) return next;
+      const kept = event.slurs.filter(slur => !slurStartsAt(slur, event, located.note));
+      if (kept.length === event.slurs.length) return next;
+      // No tombstone: an emptied array goes with its last member.
+      if (kept.length > 0) event.slurs = kept;
+      else delete event.slurs;
+      return next;
+    }
+    case 'setTieVariant': {
+      const located = findKeyedNote(next, op.noteId);
+      if (!located) return next;
+      const { note } = located;
+      if (op.lv) {
+        // An `lv` tie has no target at all — the one-ended member of the family.
+        note.ties = [{ lv: true }];
+        return next;
+      }
+      const existing = note.ties?.[0];
+      if (!existing) return next;
+      if (op.targetType) existing.targetType = op.targetType;
+      return next;
+    }
     case 'setTimeSignature': {
       const measure = next.global?.measures?.[op.measureIndex];
       if (!measure) return next;
@@ -780,6 +860,44 @@ function tieTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined
 }
 
 /** A fresh deterministic note id: t1, t2, … skipping anything taken. */
+/** Does a slur start at this note? The toggle asks BEFORE applying, so a
+ *  no-op removal never reaches the op queue (the `removeClef` rule). */
+export function hasSlurStartingAt(doc: MnxStructure, noteKey: string): boolean {
+  const located = findKeyedNote(doc, noteKey);
+  if (!located) return false;
+  const event = located.seq.content[located.eventIndex] as MnxEvent;
+  return (event.slurs ?? []).some(slur => slurStartsAt(slur, event, located.note));
+}
+
+/** Does this slur start at `note`? With chord pins the `startNote` names it;
+ *  without pins a single-note event's only slur starts at its only note. */
+function slurStartsAt(slur: MnxSlur, event: MnxEvent, note: MnxNote): boolean {
+  if (slur.startNote !== undefined) return slur.startNote === note.id;
+  // Unpinned, the slur belongs to the whole event (spec/slurs-chords carries
+  // one on a chord), so it is addressed from the event's FIRST note — the same
+  // convention the element walker uses to hand it an owner key.
+  return event.notes?.[0] === note;
+}
+
+/** A fresh event id, deterministic like `mintNoteId` so replays are stable. */
+function mintEventId(doc: MnxStructure): string {
+  const taken = new Set<string>();
+  for (const part of doc.parts ?? []) {
+    for (const measure of part.measures ?? []) {
+      for (const seq of measure.sequences ?? []) {
+        for (const item of seq.content ?? []) {
+          const id = (item as { id?: string }).id;
+          if (id) taken.add(id);
+        }
+      }
+    }
+  }
+  for (let n = 1; ; n++) {
+    const id = `ev${n}`;
+    if (!taken.has(id)) return id;
+  }
+}
+
 function mintNoteId(doc: MnxStructure): string {
   const taken = new Set<string>();
   for (const part of doc.parts ?? []) {

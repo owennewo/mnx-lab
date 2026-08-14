@@ -338,6 +338,12 @@ export class ScenarioPage extends LitElement {
         color: var(--accent);
       }
 
+      /* An armed spanner anchor (campaign item 10): the gesture spans two
+         presses, so the pending half must be visible between them. */
+      .actions .span-anchor {
+        color: var(--accent);
+      }
+
       .actions button {
         font: inherit;
         color: var(--ink-2);
@@ -1410,6 +1416,13 @@ export class ScenarioPage extends LitElement {
         </div>
         <div class="action-state">
           entry duration: ${this.session.entryDurationBase}
+          ${this.session.spanAnchor
+            ? html`<span
+                class="span-anchor"
+                title="press S again at the far note to complete the slur · Esc drops it"
+                >· slur from ${this.session.spanAnchor}…</span
+              >`
+            : nothing}
           ${this.session.dirty
             ? html`<span class="dirty" title="edits are in-memory only — the corpus file is untouched"
                 >· ● ${this.session.appliedOps.length}
