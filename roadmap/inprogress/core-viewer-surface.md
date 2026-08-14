@@ -47,7 +47,7 @@
 >
 > **Stage 5 — density: answered, not built, and deliberately so.** The layering rule
 > settles *where* the levers go (`RenderOptions` first, attribute second), which is
-> the question [core-render-density-zoom.md](../proposed/core-render-density-zoom.md)
+> the question [core-render-density-zoom.md](../inprogress/core-render-density-zoom.md)
 > was blocked on. Exposing an attribute before the engine option exists would make
 > the element the implementation rather than a binding — the one thing this doc
 > forbids. The work stays that doc's; the ✔ condition here is met without it.
@@ -78,7 +78,7 @@ Concrete symptoms of the gap:
 - A read-only player must set `viewMode` (and compute `hasTab`!) to show a document the
   way its author intended — `_x.mnxLab.tab.staffKind` is documented as a hint
   ([docs/mnx-extensions.md](../../docs/mnx-extensions.md)) but no surface consults it.
-- Density/zoom levers ([core-render-density-zoom.md](../proposed/core-render-density-zoom.md)) have named
+- Density/zoom levers ([core-render-density-zoom.md](../inprogress/core-render-density-zoom.md)) have named
   engine knobs but no answer to "toolbar, embed attribute, `RenderOptions`, or all three?"
 - Feature visibility (lyrics, harmonies, diagnostics badges, tempo marks) is not
   controllable anywhere; layouts always draw everything they support.

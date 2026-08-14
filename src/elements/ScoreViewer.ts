@@ -22,6 +22,16 @@ export type ViewMode = 'notation' | 'tab' | 'both';
 /** What a host may ASK for: a projection, or `auto` — "defer to the document"
  *  (docs/core-viewer-surface.md). Unset is not a value; it is a deferral. */
 export type ViewSetting = ViewMode | 'auto';
+
+/** Named horizontal densities. The engine's knob is a multiplier; these are
+ *  the three values worth a name (core-render-density-zoom.md). */
+export type DensityPreset = 'compact' | 'normal' | 'spacious';
+
+const DENSITY_H: Record<DensityPreset, number> = {
+  compact: 0.65,
+  normal: 1,
+  spacious: 1.5
+};
 import { sharedChrome, scrollbars, viewerTokens } from './tokens.ts';
 import type { HideableFeature } from '../engine/layout/notation.ts';
 
@@ -114,6 +124,19 @@ export class ScoreViewer extends LitElement {
    * layout's job.
    */
   @property({ type: String, reflect: true }) hide = '';
+  /**
+   * Horizontal density — `normal` (default), `compact`, `spacious`
+   * (roadmap/inprogress/core-render-density-zoom.md): how much music fits on a
+   * line, WITHOUT shrinking the glyphs. Zoom changes how big the notes are;
+   * density changes how much air sits between them, which is why they are
+   * separate axes and compose freely.
+   *
+   * A preset, not a slider, because the element is a binding: the engine takes
+   * a multiplier, and these are the three values worth naming. `density-h`
+   * could accept a number later without breaking anyone — presets resolve to
+   * numbers, so the vocabulary widens rather than changes.
+   */
+  @property({ type: String, reflect: true }) density: DensityPreset = 'normal';
   /**
    * The selection overlay is showing where the cursor WAS, but keystrokes
    * are going somewhere else (core-editor-focus-scope.md, stage 3): a
@@ -450,6 +473,8 @@ export class ScoreViewer extends LitElement {
       changed.has('playbackState') ||
       changed.has('selection') ||
       changed.has('view') ||
+      changed.has('density') ||
+      changed.has('hide') ||
       changed.has('zoom') ||
       changed.has('stringsOverride') ||
       changed.has('capoOverride') ||
@@ -490,7 +515,10 @@ export class ScoreViewer extends LitElement {
       onNoteClick,
       // Layout-side hides reach the engine so their space is reclaimed; the
       // tab renderer ignores what it has no concept of (lyrics).
-      hide: this.hiddenFeatures()
+      hide: this.hiddenFeatures(),
+      // The preset resolves to the engine's multiplier here — the element
+      // binds a behavior it does not implement (docs/core-viewer-surface.md).
+      densityH: DENSITY_H[this.density] ?? 1
     };
 
     // The layout engine throws on documents using features it doesn't support

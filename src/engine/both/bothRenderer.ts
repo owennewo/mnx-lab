@@ -31,6 +31,8 @@ export interface RenderBothOptions {
   tabSetup?: PartTabSetups;
   /** Features the host hid (docs/core-viewer-surface.md). */
   hide?: readonly HideableFeature[];
+  /** Horizontal density multiplier (core-render-density-zoom.md). */
+  densityH?: number;
 }
 
 export function renderMnxToSvgBoth(opts: RenderBothOptions): void {
@@ -42,7 +44,8 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): void {
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds,
     tabSetup: opts.tabSetup,
-    hide: opts.hide
+    hide: opts.hide,
+    densityH: opts.densityH
   });
 
   const fitted = opts.pxPerSp === undefined;

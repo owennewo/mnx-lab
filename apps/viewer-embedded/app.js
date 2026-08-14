@@ -100,6 +100,10 @@ wireThemeButtons('page', value => {
 // fretboard.
 wireThemeButtons('view', value => viewer.setAttribute('view', value));
 
+// Horizontal density: more music per line WITHOUT smaller notes. It composes
+// with zoom rather than duplicating it — that independence is the point.
+wireThemeButtons('density', value => viewer.setAttribute('density', value));
+
 wireThemeButtons('score', value => {
   // `auto` is the element's default: it follows the page, because
   // color-scheme is inherited. Setting it explicitly is how a host overrides

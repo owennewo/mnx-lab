@@ -426,6 +426,11 @@ export interface LayoutNotationOptions {
    *  (diagnostic badges) are hidden in the element's stylesheet instead; that
    *  split is the test the surface doc applies to every future candidate. */
   hide?: readonly HideableFeature[];
+  /** Horizontal density (core-render-density-zoom.md): a multiplier on the
+   *  springs — 1 is today's engraving, <1 packs more bars per system. Glyphs
+   *  keep their size; only the air between them changes, which is what makes
+   *  this independent of zoom. */
+  densityH?: number;
 }
 
 /** What a host may hide. Layout-side members must be honored HERE (space
@@ -744,7 +749,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         diagnostics,
         includeTabStaves: opts.includeTabStaves === true && (mnx.scores ?? []).length === 0,
         tabSetup: opts.tabSetup,
-        hide: opts.hide ?? []
+        hide: opts.hide ?? [],
+        densityH: opts.densityH
       })
     );
     const jobUsed = Math.max(...rs.map(r => r.usedWidthSp));
@@ -791,6 +797,7 @@ interface RenderSegmentArgs {
   includeTabStaves: boolean;
   tabSetup?: PartTabSetups;
   hide: readonly HideableFeature[];
+  densityH?: number;
 }
 
 // Left-of-system geometry: nested decorations step left of their parents,
@@ -807,7 +814,7 @@ function renderSegment(args: RenderSegmentArgs): {
   usedWidthSp: number;
   rows: RowBandSp[];
 } {
-  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide } = args;
+  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH } = args;
   const primitives: Primitive[] = [];
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
@@ -841,6 +848,7 @@ function renderSegment(args: RenderSegmentArgs): {
   // come from the shared plan — layoutTab consumes the same one, which is what
   // keeps notation and tab column-aligned in the "both" view.
   const plan = planHorizontal(mnx, widthSp, {
+    densityH,
     staves: segment.staves,
     leftInsetSp,
     collapse,

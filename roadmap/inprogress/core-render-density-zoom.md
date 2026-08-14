@@ -1,6 +1,35 @@
 # Configurable render density / zoom levers
 
-> **Status: proposed (2026-07-17), not started.** A user-facing goal, not yet designed.
+> **Status: in progress — the HORIZONTAL axis built 2026-08-14.** Unblocked by
+> [core-viewer-surface.md](../inprogress/core-viewer-surface.md)'s layering rule, which
+> settled where the levers live. Shipped: `PlanOptions.densityH` (a multiplier on the
+> springs, clamped 0.5–2), threaded through `layoutNotation`/`bothSystem` and both
+> renderers, bound by the element as `density="compact|normal|spacious"` — a preset,
+> because the element binds behavior rather than implementing it, and these are the
+> three values worth naming (a numeric `density-h` can widen the vocabulary later
+> without breaking anyone).
+>
+> **Springs only, never the rigid columns.** A notehead, an accidental stack and a
+> clef occupy the width they occupy at a given staff size; squeezing those would be
+> shrinking the music, i.e. zoom wearing density's name. That invariant is asserted
+> (`harness/conformance/viewer-surface.test.ts`: the clef anchor's offset is identical
+> at every density) and confirmed in the browser — glyph font-size stays 40px from
+> compact to spacious while the music repacks.
+>
+> Density is applied in ONE pass over the finished metrics, before anything reads a
+> spring: scaling at the four `springSp()` call sites would rely on them staying in
+> step, and scaling at consumption would desync the per-event cursor from the measure
+> widths, since both read springs independently. Default (`1`) is byte-identical to
+> today's engraving — asserted, and the corpus goldens never moved.
+>
+> **Remaining: the vertical axis and zoom.**
+> *Vertical* is deliberately not started, on this doc's own advice: `ROW_HEIGHT_SP` is
+> a module-level constant derived from the row pads, so per-layout scaling is a real
+> refactor — and the note below says the stem-length clamp should land first or
+> alongside, since stem headroom feeds vertical spacing. *Zoom* already exists as
+> `pxPerSp` in the engine, but the element's `zoom` prop only sizes the paper card;
+> wiring it to the glyph scale means deciding fit-to-width vs pinned scale, which is
+> a real choice rather than a wiring job.
 
 ## The goal
 
@@ -37,8 +66,13 @@ Three distinct axes, deliberately separated:
 
 ## Open questions (design later)
 
-- Presets (`compact` / `normal` / `spacious`) vs. continuous sliders vs. both?
-- Do the three axes couple (a single "density" control) or stay independent (H / V / zoom)?
+- ~~Presets vs. continuous sliders vs. both?~~ **Presets first** — the element binds
+  a multiplier the engine owns, so presets are names for numbers and a numeric
+  attribute stays open without a breaking change.
+- ~~Do the three axes couple or stay independent?~~ **Independent in the engine**
+  (three scalars), and the user-facing control may couple them later if a reader
+  wants one "fit more music" knob. Coupling is reversible; conflating them in the
+  engine would not be.
 - ~~Where do they live — viewer toolbar, embed attributes, `RenderOptions`, or all three?~~
   Answered by [core-viewer-surface.md](core-viewer-surface.md): all three, layered — the lever enters
   `RenderOptions` (behavior ground truth), the element binds it as an attribute, the

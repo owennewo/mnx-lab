@@ -127,7 +127,7 @@ proposals that name their campaign.
   chrome), attribute-first, the `view="auto"` precedence chain (user > host > document
   `staffKind` hint > default), a set-valued `hide` knob, and eviction of workbench leakage
   (`pinnedErrors` et al). Subsumes render-density-zoom's "where do the levers live" question.
-- **[core-render-density-zoom.md](proposed/core-render-density-zoom.md)** — configurable horizontal +
+- **[core-render-density-zoom.md](inprogress/core-render-density-zoom.md)** — configurable horizontal +
   vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
   in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
   vertical density = layout gap/padding constants. Not started. Where the levers are *exposed*

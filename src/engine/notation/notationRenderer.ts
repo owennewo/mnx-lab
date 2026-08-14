@@ -25,6 +25,8 @@ export interface RenderNotationOptions {
   /** Features the host hid (docs/core-viewer-surface.md) — layout-side ones
    *  reach the layout so the space they reserved is reclaimed. */
   hide?: readonly HideableFeature[];
+  /** Horizontal density multiplier (core-render-density-zoom.md). */
+  densityH?: number;
 }
 
 export function renderMnxToSvgNotation(opts: RenderNotationOptions): void {
@@ -35,7 +37,8 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): void {
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds,
-    hide: opts.hide
+    hide: opts.hide,
+    densityH: opts.densityH
   });
 
   // An explicit pxPerSp pins the scale; the default scales short scores up to

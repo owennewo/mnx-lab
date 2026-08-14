@@ -128,6 +128,16 @@ export function tupletDuration(t: MnxTuplet): number {
   return durationValue(t.outer.duration) * (t.outer.multiple ?? 1);
 }
 
+/** Density clamp: enough range to be useful, bounded so a bad value cannot
+ *  produce a plan the justifier then has to rescue. */
+const MIN_DENSITY = 0.5;
+const MAX_DENSITY = 2;
+
+export function clampDensity(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value)) return 1;
+  return Math.min(MAX_DENSITY, Math.max(MIN_DENSITY, value));
+}
+
 /** Ideal space after a note: log2 in duration so long notes are compressed. */
 function springSp(duration: number): number {
   if (duration <= 0) return MIN_SPRING_SP;
@@ -399,6 +409,18 @@ export interface PlanOptions {
   collapse?: { startIndex: number; count: number }[];
   /** Measure indexes that must start a new system. */
   forcedBreaks?: ReadonlySet<number>;
+  /**
+   * HORIZONTAL DENSITY (roadmap/inprogress/core-render-density-zoom.md): a
+   * multiplier on the springs — the *stretchy* part of the plan — where 1 is
+   * today's engraving, <1 packs more bars per system and >1 opens it out.
+   *
+   * Springs only, never the rigid columns: a notehead, an accidental stack
+   * and a clef occupy the width they occupy at a given staff size, so
+   * squeezing THEM would be shrinking the music rather than tightening it.
+   * That is what keeps this axis independent of zoom — density changes how
+   * much air sits between glyphs; zoom changes how big the glyphs are.
+   */
+  densityH?: number;
   /** Only plan measures in [from, to] (inclusive); the rest become hidden
    *  stubs. Lets a score render each per-system layout as its own segment
    *  while plan.measures stays index-aligned with the document. */
@@ -793,6 +815,26 @@ export function planHorizontal(
       (m.hasRepeatStart ? REPEAT_START_WIDTH_SP : 0)
     );
   };
+
+  // Horizontal density, applied ONCE here — after every spring is computed and
+  // before anything reads one (roadmap/inprogress/core-render-density-zoom.md).
+  // Scaling at the source would mean touching four springSp() call sites and
+  // trusting them to stay in step; scaling at consumption would desync the
+  // per-event cursor from the measure widths, since both read springs
+  // independently. One pass over the finished metrics keeps every reader
+  // consistent by construction.
+  const densityH = clampDensity(options?.densityH);
+  if (densityH !== 1) {
+    for (const m of metrics) {
+      m.spring *= densityH;
+      m.leadingSpring *= densityH;
+      for (const staff of m.staves) {
+        for (const voice of staff) {
+          for (const event of voice) event.spring *= densityH;
+        }
+      }
+    }
+  }
 
   // Pass 2 — greedy system packing on natural widths (hidden measures take no
   // slot; forced breaks from a score's `pages.systems` start new rows).

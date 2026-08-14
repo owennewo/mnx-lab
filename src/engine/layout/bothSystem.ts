@@ -27,6 +27,8 @@ export interface LayoutBothOptions {
   tabSetup?: PartTabSetups;
   /** Features the host hid — layout-side ones reflow (core-viewer-surface). */
   hide?: readonly HideableFeature[];
+  /** Horizontal density multiplier (core-render-density-zoom.md). */
+  densityH?: number;
 }
 
 export function layoutBothSystem(opts: LayoutBothOptions): LayoutResult {

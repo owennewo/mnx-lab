@@ -17,6 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
+import { planHorizontal } from '../../src/engine/layout/spacing.ts';
 import { declaredStaffKind, wantsTabView } from '../../src/model/mnx.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
@@ -86,6 +87,66 @@ describe('viewer surface', () => {
         hide: ['nonsense' as unknown as 'lyrics']
       });
       expect(odd.heightSp).toBe(base.heightSp);
+    });
+  });
+
+  describe('horizontal density', () => {
+    // The lever's whole claim: MORE MUSIC PER LINE, same size notes
+    // (roadmap/inprogress/core-render-density-zoom.md). Both halves are
+    // asserted, because scaling everything would be zoom wearing density's
+    // name — the two axes have to stay independent to compose.
+    const twelveBars = () => doc('lab/document/twelve-bar-blues');
+
+    it('compact narrows the natural width; spacious widens it', () => {
+      initSmufl();
+      // A SHORT score, deliberately: a long one is justified out to the line
+      // width at every density, so `usedWidthSp` would report 80 either way
+      // and prove nothing. Density shows up in the natural width — what the
+      // music wants — which only survives justification when it fits.
+      const width = (densityH: number) =>
+        planHorizontal(doc('lab/tab-positions/open-strings-chord'), 80, { densityH }).usedWidthSp;
+      expect(width(0.65)).toBeLessThan(width(1));
+      expect(width(1.5)).toBeGreaterThan(width(1));
+    });
+
+    it('packs more bars into the same line', () => {
+      initSmufl();
+      const barsInFirstRow = (densityH: number) =>
+        planHorizontal(twelveBars(), 80, { densityH }).measures.filter(m => m.row === 0).length;
+      const rowCount = (densityH: number) =>
+        planHorizontal(twelveBars(), 80, { densityH }).rowCount;
+      expect(barsInFirstRow(0.65)).toBeGreaterThan(barsInFirstRow(1));
+      expect(rowCount(0.65)).toBeLessThanOrEqual(rowCount(1));
+      expect(barsInFirstRow(1.5)).toBeLessThanOrEqual(barsInFirstRow(1));
+    });
+
+    it('leaves the RIGID prefix alone — density is not zoom', () => {
+      initSmufl();
+      // Clef + key + time occupy what they occupy at a given staff size. If
+      // this distance moved, we would be shrinking the music, not tightening
+      // it — which is zoom wearing density's name.
+      // clefX, not contentStartX: the latter sits AFTER the leading spring,
+      // which is stretchy by design. The clef anchor is pure prefix geometry.
+      const prefix = (densityH: number) => {
+        const first = planHorizontal(twelveBars(), 80, { densityH }).measures[0];
+        return Number((first.clefX - first.x).toFixed(6));
+      };
+      expect(prefix(0.65)).toBe(prefix(1));
+      expect(prefix(1.5)).toBe(prefix(1));
+    });
+
+    it('clamps absurd values instead of producing an unrescuable plan', () => {
+      initSmufl();
+      const w = (densityH: number) => planHorizontal(twelveBars(), 80, { densityH }).usedWidthSp;
+      expect(w(0)).toBe(w(0.5));
+      expect(w(99)).toBe(w(2));
+    });
+
+    it('default is byte-for-byte todays engraving', () => {
+      initSmufl();
+      const withOut = planHorizontal(twelveBars(), 80);
+      const withOne = planHorizontal(twelveBars(), 80, { densityH: 1 });
+      expect(JSON.stringify(withOne)).toBe(JSON.stringify(withOut));
     });
   });
 });

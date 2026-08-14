@@ -113,7 +113,7 @@ Not on the surface yet, and deliberately: the levers exist as engine constants
 but not as `RenderOptions`, so exposing an attribute now would make the element
 the implementation rather than a binding. The layering rule answers *where they
 go* — `RenderOptions` first, attribute second — which is the question
-[core-render-density-zoom.md](../roadmap/proposed/core-render-density-zoom.md)
+[core-render-density-zoom.md](../roadmap/inprogress/core-render-density-zoom.md)
 was blocked on; the work itself stays that doc's.
 
 ### Evicted
