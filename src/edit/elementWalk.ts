@@ -23,7 +23,7 @@
 import type { MnxBeam, MnxStructure } from '../model/mnx.ts';
 import type { EditOp } from './ops.ts';
 import { isTimedEvent } from '../model/mnx.ts';
-import { noteKeyOf } from './cursor.ts';
+import { noteKeyAt } from '../model/noteWalk.ts';
 
 export type ElementKind =
   // note & event level
@@ -480,7 +480,9 @@ function walkContent(
   content: unknown[] | undefined,
   path: string,
   jsonPath: (string | number)[],
-  keyOf: ((eventIndex: number, noteIndex: number, note: Record<string, unknown>) => string | undefined) | null
+  keyOf:
+    | ((eventIndex: number, noteIndex: number, note: Record<string, unknown>, containerIndex?: number) => string | undefined)
+    | null
 ): void {
   (content ?? []).forEach((raw, index) => {
     const item = raw as Record<string, unknown>;
@@ -489,9 +491,21 @@ function walkContent(
     const type = item.type as string | undefined;
     if (type === 'tuplet' || type === 'grace' || type === 'tremolo' || type === 'space') {
       push(out, type as ElementKind, itemPath, itemJson);
-      // Container content keeps its own elements, minus an ops-layer key: the
-      // entry surface cannot address inside a container yet.
-      walkContent(out, item.content as unknown[] | undefined, `${itemPath}/c`, [...itemJson, 'content'], null);
+      // Container content is addressable now (campaign item 11b): its notes
+      // carry nested keys, so the walker hands them through with a keyOf that
+      // knows the container index.
+      (item.content as Record<string, unknown>[] | undefined)?.forEach((inner, containerIndex) => {
+        if (!isTimedEvent(inner as never)) return;
+        walkEvent(
+          out,
+          inner,
+          `${itemPath}/c${containerIndex}`,
+          [...itemJson, 'content', containerIndex],
+          keyOf
+            ? (noteIndex, note) => keyOf(index, noteIndex, note, containerIndex)
+            : null
+        );
+      });
       return;
     }
     if (!isTimedEvent(raw as never)) return;
@@ -619,7 +633,7 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
             if (!event.id || event.id !== beam.events?.[0]) continue;
             const note = (event.notes ?? [])[0];
             if (!note) return undefined;
-            return noteKeyOf(note as never, measureIndex, staffOne, eventIndex, 0);
+            return noteKeyAt(note as never, measureIndex, staffOne, eventIndex, 0);
           }
         }
         return undefined;
@@ -651,8 +665,8 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
           sequencePath,
           [...sequenceJson, 'content'],
           addressable
-            ? (eventIndex, noteIndex, note) =>
-                noteKeyOf(note as never, measureIndex, voiceIndex, eventIndex, noteIndex)
+            ? (eventIndex, noteIndex, note, containerIndex) =>
+                noteKeyAt(note as never, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex)
             : null
         );
       });

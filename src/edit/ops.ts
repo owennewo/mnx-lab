@@ -687,8 +687,8 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const from = findKeyedNote(next, op.fromNoteKey);
       const to = findKeyedNote(next, op.toNoteKey);
       if (!from || !to || from === to) return next;
-      const fromEvent = from.seq.content[from.eventIndex] as MnxEvent;
-      const toEvent = to.seq.content[to.eventIndex] as MnxEvent;
+      const fromEvent = from.event;
+      const toEvent = to.event;
       if (fromEvent === toEvent) return next;
       toEvent.id ??= mintEventId(next);
       // Pins name chord members; a single-note event needs none, which is how
@@ -710,7 +710,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
     case 'removeSlur': {
       const located = findKeyedNote(next, op.noteKey);
       if (!located) return next;
-      const event = located.seq.content[located.eventIndex] as MnxEvent;
+      const event = located.event;
       if (!event.slurs?.length) return next;
       const kept = event.slurs.filter(slur => !slurStartsAt(slur, event, located.note));
       if (kept.length === event.slurs.length) return next;
@@ -736,7 +736,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
     case 'setSyllable': {
       const located = findKeyedNote(next, op.noteKey);
       if (!located) return next;
-      const event = located.seq.content[located.eventIndex] as MnxEvent;
+      const event = located.event;
       const lines = ((event.lyrics ??= {}).lines ??= {});
       lines[op.line] = {
         text: op.text,
@@ -747,7 +747,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
     case 'removeSyllable': {
       const located = findKeyedNote(next, op.noteKey);
       if (!located) return next;
-      const event = located.seq.content[located.eventIndex] as MnxEvent;
+      const event = located.event;
       const lines = event.lyrics?.lines;
       if (!lines?.[op.line]) return next;
       delete lines[op.line];
@@ -882,14 +882,14 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
     case 'setMarking': {
       const located = findKeyedNote(next, op.noteKey);
       if (!located) return next;
-      const event = located.seq.content[located.eventIndex] as MnxEvent;
+      const event = located.event;
       ((event.markings ??= {}) as Record<string, unknown>)[op.marking] = {};
       return next;
     }
     case 'removeMarking': {
       const located = findKeyedNote(next, op.noteKey);
       if (!located) return next;
-      const event = located.seq.content[located.eventIndex] as MnxEvent;
+      const event = located.event;
       const markings = event.markings as Record<string, unknown> | undefined;
       if (!markings || markings[op.marking] === undefined) return next;
       delete markings[op.marking];
@@ -1184,6 +1184,10 @@ interface LocatedNote {
   measureIndex: number;
   voiceIndex: number;
   eventIndex: number;
+  /** The event that OWNS the note. Carried rather than re-derived from
+   *  `seq.content[eventIndex]`, because a container sits at that index and its
+   *  inner events do not (campaign item 11b). */
+  event: MnxEvent;
   note: MnxNote;
 }
 
@@ -1195,6 +1199,7 @@ function findKeyedNote(doc: MnxStructure, key: string): LocatedNote | null {
     measureIndex: address.measureIndex,
     voiceIndex: address.voiceIndex,
     eventIndex: address.eventIndex,
+    event: address.event,
     note: address.note
   };
 }
@@ -1230,7 +1235,7 @@ function tieTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined
 export function beamStartingAt(doc: MnxStructure, noteKey: string): { measureIndex: number; index: number } | null {
   const located = findKeyedNote(doc, noteKey);
   if (!located) return null;
-  const event = located.seq.content[located.eventIndex] as MnxEvent;
+  const event = located.event;
   if (!event.id) return null;
   const beams = doc.parts?.[0]?.measures?.[located.measureIndex]?.beams ?? [];
   const index = beams.findIndex(beam => beam.events?.[0] === event.id);
@@ -1289,7 +1294,7 @@ export function nextNotePitchPair(
 export function hasSlurStartingAt(doc: MnxStructure, noteKey: string): boolean {
   const located = findKeyedNote(doc, noteKey);
   if (!located) return false;
-  const event = located.seq.content[located.eventIndex] as MnxEvent;
+  const event = located.event;
   return (event.slurs ?? []).some(slur => slurStartsAt(slur, event, located.note));
 }
 

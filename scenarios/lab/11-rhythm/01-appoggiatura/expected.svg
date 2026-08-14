@@ -7,7 +7,7 @@
 <text x="49.6" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
 <text x="117.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="117.6" y="176" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<text x="187.936" y="144" font-family="Bravura" font-size="38.4" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead grace"></text>
+<text x="187.936" y="144" font-family="Bravura" font-size="38.4" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead grace" data-source-id="@m0.v0.e0.c0.n0"></text>
 <line x1="199.264" y1="104" x2="199.264" y2="142.3872" stroke="currentColor" stroke-width="1.92" class="stem grace"></line>
 <text x="199.264" y="104" font-family="Bravura" font-size="38.4" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="flag grace"></text>
 <text x="212.96" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e1.n0"></text>

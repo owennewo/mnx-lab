@@ -4,10 +4,10 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "no-op": 403,
-      "removed": 1057
+      "no-op": 371,
+      "removed": 1089
     },
-    "unaddressableWithAnOp": 215
+    "unaddressableWithAnOp": 183
   },
   "kinds": {
     "accidental-display": {
@@ -79,8 +79,8 @@
       "no-op": 3
     },
     "note": {
-      "removed": 640,
-      "no-op": 161
+      "removed": 672,
+      "no-op": 129
     },
     "ottava": {
       "no-op": 1
@@ -459,8 +459,7 @@
         "no-op": 1
       },
       "note": {
-        "no-op": 1,
-        "removed": 2
+        "removed": 3
       },
       "part-name": {
         "removed": 1
@@ -491,8 +490,7 @@
         "removed": 1
       },
       "note": {
-        "no-op": 3,
-        "removed": 1
+        "removed": 4
       },
       "part-name": {
         "removed": 1
@@ -1243,8 +1241,7 @@
         "no-op": 1
       },
       "note": {
-        "removed": 4,
-        "no-op": 1
+        "removed": 5
       },
       "time-signature": {
         "no-op": 1
@@ -1352,8 +1349,7 @@
         "no-op": 1
       },
       "note": {
-        "no-op": 1,
-        "removed": 1
+        "removed": 2
       },
       "time-signature": {
         "no-op": 1
@@ -1370,8 +1366,7 @@
         "no-op": 3
       },
       "note": {
-        "removed": 4,
-        "no-op": 9
+        "removed": 13
       },
       "time-signature": {
         "no-op": 1
@@ -1943,7 +1938,7 @@
         "removed": 1
       },
       "note": {
-        "no-op": 6
+        "removed": 6
       },
       "time-signature": {
         "no-op": 1
@@ -1960,8 +1955,7 @@
         "removed": 1
       },
       "note": {
-        "no-op": 11,
-        "removed": 2
+        "removed": 13
       },
       "time-signature": {
         "no-op": 1
@@ -2383,30 +2377,6 @@
       "verdict": "unaddressable"
     },
     {
-      "scenario": "lab/rhythm/appoggiatura",
-      "element": "p0/m0/v0/e0/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/rhythm/tuplet-number-hidden",
-      "element": "p0/m0/v0/e0/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/rhythm/tuplet-number-hidden",
-      "element": "p0/m0/v0/e0/c/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "lab/rhythm/tuplet-number-hidden",
-      "element": "p0/m0/v0/e0/c/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
       "scenario": "lab/score-text/directions-across-parts",
       "element": "p1/name",
       "kind": "part-name",
@@ -2545,12 +2515,6 @@
       "verdict": "unaddressable"
     },
     {
-      "scenario": "spec/beams-inner-grace-notes",
-      "element": "p0/m0/v0/e1/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
       "scenario": "spec/beams-secondary-beam-breaks",
       "element": "p0/m0/beam/b0/b0",
       "kind": "beam",
@@ -2617,12 +2581,6 @@
       "verdict": "unaddressable"
     },
     {
-      "scenario": "spec/grace-note",
-      "element": "p0/m0/v0/e0/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
       "scenario": "spec/grace-notes-beamed",
       "element": "p0/m0/beam/b0",
       "kind": "beam",
@@ -2638,60 +2596,6 @@
       "scenario": "spec/grace-notes-beamed",
       "element": "p0/m0/beam/b2",
       "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/v0/e1/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/v0/e1/c/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/v0/e3/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/v0/e3/c/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/v0/e3/c/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/v0/e5/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/v0/e5/c/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/v0/e5/c/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/grace-notes-beamed",
-      "element": "p0/m0/v0/e5/c/e3/n0",
-      "kind": "note",
       "verdict": "unaddressable"
     },
     {
@@ -3169,111 +3073,9 @@
       "verdict": "unaddressable"
     },
     {
-      "scenario": "spec/tremolos-multi-note",
-      "element": "p0/m0/v0/e0/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tremolos-multi-note",
-      "element": "p0/m0/v0/e0/c/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tremolos-multi-note",
-      "element": "p0/m0/v0/e1/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tremolos-multi-note",
-      "element": "p0/m0/v0/e1/c/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tremolos-multi-note",
-      "element": "p0/m1/v0/e0/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tremolos-multi-note",
-      "element": "p0/m1/v0/e0/c/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
       "scenario": "spec/tuplets",
       "element": "p0/m0/beam/b0",
       "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m0/v0/e0/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m0/v0/e0/c/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m0/v0/e1/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m0/v0/e1/c/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m0/v0/e1/c/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m1/v0/e0/c/e0/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m1/v0/e0/c/e1/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m1/v0/e0/c/e2/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m1/v0/e0/c/e3/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m1/v0/e0/c/e4/n0",
-      "kind": "note",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/tuplets",
-      "element": "p0/m1/v0/e0/c/e5/n0",
-      "kind": "note",
       "verdict": "unaddressable"
     }
   ]

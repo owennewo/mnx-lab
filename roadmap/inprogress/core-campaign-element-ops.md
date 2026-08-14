@@ -99,7 +99,7 @@ agreed or candidate claims; **bold** = agreed.
 | 9 | [tab technique alphabet](core-element-ops-technique.md) | Bends, slides, hammer/pull, vibrato, palm mute, harmonics — the `B H S V X O` set `keymapDocs.ts` already reserves. Entry side of [core-guitar-technique.md](../proposed/core-guitar-technique.md) (which owns rendering). | 7 (reachable 71 → 78); +fingering | **B H S V X O** — live only in the tab pane layer, so B/S are polymorphic with beam/slur | **note** | **built 2026-08-14** |
 | 10 | [spanners](core-element-ops-spanners.md) | Slurs; tie variants (`crossVoice`, `lv`, `arpeggio`). The two-ended **anchor gesture** (press, navigate, press); reference removal class. | 3 (reachable 42 → 45) | **S**, polymorphic by projection: slur in notation, slide in tab (resolves item 9's collision) | **note→note** | **built 2026-08-14** |
 | 11 | [rhythm declarations](core-element-ops-rhythm-declarations.md) | **Split at build time**: this item takes the declarations that leave ink where it is — beams (top level), full-measure rests, measure repeats. Beams reuse item 10's anchor at event→event. | 10 (reachable 45 → 55); 22 elements | **B**, polymorphic (beam in notation, bend in tab); rests via the bar popover | **measure**, **event→event** | **built 2026-08-14** |
-| 11b | [onset granularity](core-element-ops-onset-granularity.md) **(built)** + containers & rest spelling | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | ~9 | t.b.d. | event | **granularity built 2026-08-14**; containers + rest spelling open |
+| 11b | [onset granularity + container descent](core-element-ops-onset-granularity.md) **(built)**; wrap verbs & rest spelling open | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | 32 notes addressable | t.b.d. | event | **granularity + descent built 2026-08-14**; wrap verbs + rest spelling open |
 | 12 | [lyrics](core-element-ops-lyrics.md) | Lyrics, part names, verse labels — a text *mode* that suspends the keymap, not a binding. | 4 (reachable 78 → 82); 34 elements | **Shift+L** popover — the text *mode* is rejected, see the doc | **note / score** | **built 2026-08-14** |
 | 13 | [part declarations](core-element-ops-part-declarations.md) | **Split at build time**: the five keys on `parts[0]` (name, strings, capo, staffKind, staves) get the removal halves their genesis verbs never had, plus constructors for capo and staves. | 2 (reachable 68 → 71); 91 elements | **Shift+P** popover (`capo 3`, `no strings`) | **score** | **built 2026-08-14** |
 | 13b | structural surface | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-codes `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changes note keys — which the primitives goldens embed. A corpus re-verification event, not a refactor. The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
@@ -109,6 +109,29 @@ et al are layout-only, zero measures — a different surface, not keys), percuss
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — 11b cracked: container content is addressable.** The third
+  attempt, and the difference was doing the addressing layer first.
+  - **Descent was one enumeration plus its consumers**, exactly as move 1
+    predicted: `noteWalk` mints the nested key, the ops layer follows for free,
+    the grid gains scaled tuplet columns, and the renderer stamps the same keys
+    so the overlay can paint what the cursor can reach. **32 container notes
+    became addressable and removable** (notes removed 640 → 672, total 1089).
+  - **Move 2 turned out to be the prerequisite nobody planned.** Grace and
+    tremolo content shares its host's moment, so without the cursor's
+    discriminator those notes would have been reachable in principle and
+    unreachable in fact. Coincidence is rare in the corpus and *structural* in
+    containers.
+  - **`LocatedNote` was a bug waiting to happen**: several ops re-derived the
+    owning event as `seq.content[eventIndex]`, which for a container returns the
+    container. It now carries the event the walk found.
+  - **The goldens moved exactly as promised**: seven scenarios gained
+    `sourceId`s where ink was anonymous, **no geometry changed**, statuses
+    demoted `verified → rendered` for `/verify`. The approved cost was the real
+    cost.
+  - What remains is an ordinary op-family item — the wrap verbs (`tuplet`,
+    `grace`, `tremolo` are still `no-op` as elements) — with nothing structural
+    riding on it, which is what "do the addressing first" bought.
 
 - **2026-08-14 — the addressing layer, in two moves; and a number I had wrong.**
   [core-note-address.md](core-note-address.md): one enumeration produces note

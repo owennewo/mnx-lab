@@ -1,4 +1,4 @@
-import { MnxStructure, MnxEvent, MnxEventMarkings, MnxGlobalMeasure, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
+import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGlobalMeasure, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
 import { validateDocument } from './validate.ts';
 import { dynamicGlyph, dynamicLabel } from './dynamics.ts';
@@ -1442,7 +1442,19 @@ function renderSegment(args: RenderSegmentArgs): {
                 clef: posClef,
                 useAccidentalDisplay,
                 keyFifths: m.keyFifths,
-                primitives
+                primitives,
+                keyFor:
+                  s === 0 && synthesizeKeysForStaff0
+                    ? (containerIndex, noteIndex) => {
+                        const inner = (event as { content?: { notes?: MnxNote[] }[] }).content?.[
+                          containerIndex
+                        ];
+                        const note = inner?.notes?.[noteIndex];
+                        return note
+                          ? noteKeyAt(note, i, voiceIndex, eventIndex, noteIndex, containerIndex)
+                          : undefined;
+                      }
+                    : undefined
               });
               return;
             }
@@ -1454,7 +1466,19 @@ function renderSegment(args: RenderSegmentArgs): {
                 clef: posClef,
                 useAccidentalDisplay,
                 keyFifths: m.keyFifths,
-                primitives
+                primitives,
+                keyFor:
+                  s === 0 && synthesizeKeysForStaff0
+                    ? (containerIndex, noteIndex) => {
+                        const inner = (event as { content?: { notes?: MnxNote[] }[] }).content?.[
+                          containerIndex
+                        ];
+                        const note = inner?.notes?.[noteIndex];
+                        return note
+                          ? noteKeyAt(note, i, voiceIndex, eventIndex, noteIndex, containerIndex)
+                          : undefined;
+                      }
+                    : undefined
               });
               return;
             }
@@ -1466,7 +1490,19 @@ function renderSegment(args: RenderSegmentArgs): {
                 clef: posClef,
                 useAccidentalDisplay,
                 keyFifths: m.keyFifths,
-                primitives
+                primitives,
+                keyFor:
+                  s === 0 && synthesizeKeysForStaff0
+                    ? (containerIndex, noteIndex) => {
+                        const inner = (event as { content?: { notes?: MnxNote[] }[] }).content?.[
+                          containerIndex
+                        ];
+                        const note = inner?.notes?.[noteIndex];
+                        return note
+                          ? noteKeyAt(note, i, voiceIndex, eventIndex, noteIndex, containerIndex)
+                          : undefined;
+                      }
+                    : undefined
               });
               return;
             }
@@ -2844,6 +2880,10 @@ interface EmitGraceGroupArgs {
   useAccidentalDisplay: boolean;
   keyFifths: number;
   primitives: Primitive[];
+  /** Selection key for the note at (raw index in the container's content,
+   *  note index) — container content is addressable now (campaign item 11b),
+   *  and the RAW index is what `model/noteWalk.ts` counts. */
+  keyFor?: (containerIndex: number, noteIndex: number) => string | undefined;
 }
 
 /**
@@ -2856,7 +2896,8 @@ interface EmitGraceGroupArgs {
  * principal.
  */
 function emitGraceGroup(args: EmitGraceGroupArgs): void {
-  const { grace, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives } = args;
+  const { grace, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
+  const rawIndex = new Map<MnxEvent, number>(grace.content.map((e, i) => [e, i]));
   const inner = grace.content.filter(e => !e.rest && (e.notes?.length ?? 0) > 0);
   if (inner.length === 0) return;
 
@@ -2909,13 +2950,15 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
           className: 'accidental grace'
         });
       }
+      const graceKey = keyFor?.(rawIndex.get(event) ?? 0, idx);
       primitives.push({
         kind: 'glyph',
         glyph: headGlyph,
         x: x - headW / 2,
         y: staffTop + staffYs[idx],
         scale: GRACE_SCALE,
-        className: 'notehead grace'
+        className: 'notehead grace',
+        ...(graceKey ? { sourceId: graceKey } : {})
       });
     });
 
@@ -3040,6 +3083,10 @@ interface EmitTremoloGroupArgs {
   useAccidentalDisplay: boolean;
   keyFifths: number;
   primitives: Primitive[];
+  /** Selection key for the note at (raw index in the container's content,
+   *  note index) — container content is addressable now (campaign item 11b),
+   *  and the RAW index is what `model/noteWalk.ts` counts. */
+  keyFor?: (containerIndex: number, noteIndex: number) => string | undefined;
 }
 
 /**
@@ -3049,7 +3096,8 @@ interface EmitTremoloGroupArgs {
  * whole notes. Stem direction follows the pair's combined pitches.
  */
 function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
-  const { tremolo, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives } = args;
+  const { tremolo, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
+  const rawIndex = new Map<MnxEvent, number>(tremolo.content.map((e, i) => [e, i]));
   const inner = tremolo.content.filter(e => (e.notes?.length ?? 0) > 0).slice(0, 2);
   if (inner.length === 0) return;
 
@@ -3087,6 +3135,7 @@ function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
     }
 
     notes.forEach((n, idx) => {
+      const tremoloKey = keyFor?.(rawIndex.get(event) ?? 0, idx);
       const accGlyph = noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths);
       if (accGlyph) {
         primitives.push({
@@ -3102,7 +3151,8 @@ function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
         glyph: headGlyph,
         x: x - NOTEHEAD_WIDTH_SP / 2,
         y: staffTop + staffYs[idx],
-        className: 'notehead'
+        className: 'notehead',
+        ...(tremoloKey ? { sourceId: tremoloKey } : {})
       });
     });
 
@@ -3173,6 +3223,10 @@ interface EmitTupletGroupArgs {
   useAccidentalDisplay: boolean;
   keyFifths: number;
   primitives: Primitive[];
+  /** Selection key for the note at (raw index in the container's content,
+   *  note index) — container content is addressable now (campaign item 11b),
+   *  and the RAW index is what `model/noteWalk.ts` counts. */
+  keyFor?: (containerIndex: number, noteIndex: number) => string | undefined;
 }
 
 /**
@@ -3183,7 +3237,7 @@ interface EmitTupletGroupArgs {
  * `inner.multiple` number in a gap, as in the spec's reference engraving.
  */
 function emitTupletGroup(args: EmitTupletGroupArgs): void {
-  const { tuplet, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives } = args;
+  const { tuplet, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
   const cols = tupletColumns(tuplet, useAccidentalDisplay, keyFifths);
   const events = tuplet.content;
   if (events.length === 0) return;
@@ -3271,7 +3325,8 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
         glyph: headGlyph,
         x: x - NOTEHEAD_WIDTH_SP / 2,
         y: staffTop + staffYs[idx],
-        className: 'notehead'
+        className: 'notehead',
+        ...(keyFor?.(j, idx) ? { sourceId: keyFor(j, idx)! } : {})
       });
       for (let d = 0; d < (event.duration.dots ?? 0); d++) {
         const yDot = Math.round(staffYs[idx]) === staffYs[idx] ? staffYs[idx] - 0.5 : staffYs[idx];

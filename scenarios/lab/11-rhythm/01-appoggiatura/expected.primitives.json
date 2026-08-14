@@ -78,7 +78,8 @@
         "x": 11.746,
         "y": 9,
         "scale": 0.6,
-        "className": "notehead grace"
+        "className": "notehead grace",
+        "sourceId": "@m0.v0.e0.c0.n0"
       },
       {
         "kind": "line",

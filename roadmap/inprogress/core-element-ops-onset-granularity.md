@@ -101,6 +101,39 @@ agrees. Container descent is now a change to **one function**, and the nested ke
 form stays inside it. What remains for 11b is the descent itself plus the cursor
 discriminator (move 2), not a migration.
 
+## Container descent landed (2026-08-14)
+
+With one enumeration in place, descent was a change to that enumeration plus the
+consumers that need more than identity — and it went in without drama:
+
+- **`model/noteWalk.ts` descends**, minting the nested key
+  (`@m0.v0.e2.c1.n0`) that tells a container's inner events apart. The form
+  stays inside `noteKeys.ts`/`noteWalk.ts`; nothing else knows it.
+- **The ops layer follows for free** (`findKeyedNote` reads the shared walk), so
+  `deleteNote` and every note-attached verb reach container notes. `LocatedNote`
+  now carries its owning `event` rather than re-deriving it from
+  `seq.content[eventIndex]` — which for a container returns the container, and
+  was a bug waiting to happen.
+- **The grid descends**: a tuplet's inner events get real scaled onsets (its
+  written durations in the outer's time) and become their own columns; grace and
+  tremolo content shares the host moment, which is reachable precisely because
+  move 2 gave the cursor a discriminator. **Move 2 was the prerequisite nobody
+  planned** — coincidence turned out to be rare in the corpus but structural for
+  containers.
+- **The renderer stamps the same keys**, so the overlay can highlight what the
+  cursor can now reach. Each container emitter filters its content before
+  drawing, so the key factory works from the **raw** index — the one the walk
+  counts. The key-agreement join is what would have caught getting that wrong.
+
+**Result: 32 container notes became addressable and removable** — notes removed
+640 → 672, total removable 1057 → 1089. Seven scenarios' goldens gained
+`sourceId`s where ink was previously anonymous; **no geometry moved**, and they
+are demoted `verified → rendered` awaiting `/verify`.
+
+Still `no-op`, honestly: the container *elements* themselves (tuplet, grace,
+tremolo) have no wrap verb yet. That is now an ordinary op-family item with
+nothing structural riding on it — the point of doing the addressing first.
+
 ## Scope boundary
 
 Unchanged: the grid still skips non-timed items, so tuplet, grace and tremolo

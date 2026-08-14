@@ -22,7 +22,7 @@
 // sequences, events in content order) — the contract documented in
 // src/model/noteKeys.ts. edit/ may not import engine/, so the staff filter is
 // restated; noteKeys.ts is the shared spec both sides answer to.
-import type { MnxSequenceItem, MnxSequence, MnxStructure, MnxNote } from '../model/mnx.ts';
+import type { MnxEvent, MnxSequenceItem, MnxSequence, MnxStructure, MnxNote } from '../model/mnx.ts';
 import { isTimedEvent, isTuplet, isTremolo } from '../model/mnx.ts';
 import { forEachNoteAddress, noteKeyAt } from '../model/noteWalk.ts';
 import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
@@ -178,6 +178,27 @@ export function itemSpan(item: MnxSequenceItem): Onset {
   return { num: 0, den: 1 };
 }
 
+/** A container's inner events, or null when the item is not a container. */
+function containerEvents(item: MnxSequenceItem): MnxEvent[] | null {
+  if (isTuplet(item) || isTremolo(item)) return item.content;
+  const grace = item as { type?: string; content?: MnxEvent[] };
+  return grace.type === 'grace' ? (grace.content ?? []) : null;
+}
+
+/** A tuplet's time scale (outer ÷ inner), or null for containers whose content
+ *  does not advance the clock — grace notes are un-timed, and a tremolo's two
+ *  events are alternations of one span rather than a sequence. */
+function tupletScale(item: MnxSequenceItem): Onset | null {
+  if (!isTuplet(item)) return null;
+  const outer = durationSpan(item.outer.duration);
+  const inner = durationSpan(item.inner.duration);
+  return reduce(outer.num * item.outer.multiple * inner.den, outer.den * inner.num * item.inner.multiple);
+}
+
+function scaleOnset(span: Onset, scale: Onset): Onset {
+  return reduce(span.num * scale.num, span.den * scale.den);
+}
+
 /** The staff-1 filter, restated from the layouts (see file header). */
 function staffOneSequences(sequences: MnxSequence[] | undefined): MnxSequence[] {
   return (sequences ?? []).filter(seq => (seq.staff ?? 1) === 1);
@@ -241,13 +262,13 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
     staffOneSequences(measures[measureIndex]?.sequences).forEach((sequence, voiceIndex) => {
       let onset: Onset = { num: 0, den: 1 };
       sequence.content.forEach((item, eventIndex) => {
-        if (isTimedEvent(item)) {
-          const position = at(onset);
+        const push = (event: MnxEvent, at_: Onset, containerIndex?: number) => {
+          const position = at(at_);
           position.voices.add(voiceIndex);
-          (item.notes ?? []).forEach((note, noteIndex) => {
+          (event.notes ?? []).forEach((note, noteIndex) => {
             position.raw.push({
               slot: {
-                noteKey: noteKeyOf(note, measureIndex, voiceIndex, eventIndex, noteIndex),
+                noteKey: noteKeyAt(note, measureIndex, voiceIndex, eventIndex, noteIndex, containerIndex),
                 line: note._x?.mnxLab?.string ?? defaultStringFor(note.pitch, tuning, capo),
                 staffPosition: staffPositionOfPitch(clef, note.pitch),
                 voiceIndex,
@@ -258,6 +279,25 @@ export function buildGrid(doc: MnxStructure): PositionGrid {
               order: position.raw.length
             });
           });
+        };
+
+        if (isTimedEvent(item)) push(item, onset);
+        else {
+          // Container content (campaign item 11b). A tuplet's inner events have
+          // real, scaled onsets — its written durations in the outer's time —
+          // so they become their own columns. Grace and tremolo content shares
+          // the host moment, which is addressable now that the cursor carries a
+          // discriminator (core-note-address.md move 2).
+          const inner = containerEvents(item);
+          if (inner) {
+            const scale = tupletScale(item);
+            let innerOnset = onset;
+            inner.forEach((event, containerIndex) => {
+              if (!isTimedEvent(event)) return;
+              push(event, innerOnset, containerIndex);
+              if (scale) innerOnset = addOnsets(innerOnset, scaleOnset(durationSpan(event.duration), scale));
+            });
+          }
         }
         onset = addOnsets(onset, itemSpan(item));
       });

@@ -23,7 +23,7 @@
  */
 import type { MnxEvent, MnxNote, MnxSequence, MnxStructure } from './mnx.ts';
 import { isTimedEvent } from './mnx.ts';
-import { syntheticNoteKey } from './noteKeys.ts';
+import { syntheticContainerNoteKey, syntheticNoteKey } from './noteKeys.ts';
 
 /** Where a note lives, and what names it. */
 export interface NoteAddress {
@@ -38,6 +38,9 @@ export interface NoteAddress {
   /** The raw index into `measure.sequences`, for consumers addressing JSON. */
   sequenceIndex: number;
   eventIndex: number;
+  /** Set when the note lives inside a container: its event's index within the
+   *  container's own content. */
+  containerIndex?: number;
   noteIndex: number;
   event: MnxEvent;
   sequence: MnxSequence;
@@ -54,9 +57,21 @@ export function noteKeyAt(
   measureIndex: number,
   voiceIndex: number,
   eventIndex: number,
-  noteIndex: number
+  noteIndex: number,
+  containerIndex?: number
 ): string {
-  return note.id ?? syntheticNoteKey(measureIndex, voiceIndex, eventIndex, noteIndex);
+  if (note.id !== undefined) return note.id;
+  return containerIndex === undefined
+    ? syntheticNoteKey(measureIndex, voiceIndex, eventIndex, noteIndex)
+    : syntheticContainerNoteKey(measureIndex, voiceIndex, eventIndex, containerIndex, noteIndex);
+}
+
+/** Is this sequence item a container holding events (tuplet, grace, tremolo)? */
+function containerContent(item: unknown): MnxEvent[] | null {
+  const record = item as { type?: string; content?: unknown };
+  if (!record || typeof record !== 'object') return null;
+  if (record.type !== 'tuplet' && record.type !== 'grace' && record.type !== 'tremolo') return null;
+  return Array.isArray(record.content) ? (record.content as MnxEvent[]) : null;
 }
 
 /**
@@ -75,21 +90,34 @@ export function forEachNoteAddress(
       voiceIndex++;
       const voice = voiceIndex;
       (sequence.content ?? []).forEach((item, eventIndex) => {
-        if (!isTimedEvent(item)) return;
-        const event = item as MnxEvent;
-        (event.notes ?? []).forEach((note, noteIndex) => {
-          fn({
-            note,
-            key: noteKeyAt(note, measureIndex, voice, eventIndex, noteIndex),
-            measureIndex,
-            voiceIndex: voice,
-            sequenceIndex,
-            eventIndex,
-            noteIndex,
-            event,
-            sequence
+        const emit = (event: MnxEvent, containerIndex?: number) =>
+          (event.notes ?? []).forEach((note, noteIndex) => {
+            fn({
+              note,
+              key: noteKeyAt(note, measureIndex, voice, eventIndex, noteIndex, containerIndex),
+              measureIndex,
+              voiceIndex: voice,
+              sequenceIndex,
+              eventIndex,
+              ...(containerIndex === undefined ? {} : { containerIndex }),
+              noteIndex,
+              event,
+              sequence
+            });
           });
-        });
+
+        // Container content is enumerated too (campaign item 11b): a tuplet's
+        // notes are as much ink as any other, and the nested key form is what
+        // lets them be told apart.
+        const inner = containerContent(item);
+        if (inner) {
+          inner.forEach((event, containerIndex) => {
+            if (isTimedEvent(event)) emit(event, containerIndex);
+          });
+          return;
+        }
+        if (!isTimedEvent(item)) return;
+        emit(item as MnxEvent);
       });
     });
   });
