@@ -37,7 +37,7 @@ import {
   Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, translatePrimitiveY
 } from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
-import { syntheticNoteKey } from '../../model/noteKeys.ts';
+import { noteKeyAt } from '../../model/noteWalk.ts';
 import {
   TAB_STAFF_HEIGHT_SP,
   emitTabClef,
@@ -3491,7 +3491,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   // for id-less documents (see src/utils/noteKeys.ts) so selection and the
   // note↔document cross-highlight work across the whole corpus.
   const noteIds = notes.map((n, idx) =>
-    n.id ?? (synthesizeKeys ? syntheticNoteKey(measureIndex, voiceIndex, eventIndex, idx) : undefined)
+    synthesizeKeys ? noteKeyAt(n, measureIndex, voiceIndex, eventIndex, idx) : n.id
   );
   const primaryNoteId = noteIds.find((id): id is string => id !== undefined);
 

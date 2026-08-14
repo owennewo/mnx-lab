@@ -22,12 +22,12 @@ import type {
 } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import { isTimedEvent } from '../model/mnx.ts';
+import { findNoteAddress, forEachNoteAddress } from '../model/noteWalk.ts';
 import {
   addOnsets,
   durationSpan,
   forEachKeyedNote,
   itemSpan,
-  noteKeyOf,
   onsetLess,
   onsetsEqual,
   type Onset
@@ -1188,24 +1188,15 @@ interface LocatedNote {
 }
 
 function findKeyedNote(doc: MnxStructure, key: string): LocatedNote | null {
-  const measures = doc.parts?.[0]?.measures ?? [];
-  for (let measureIndex = 0; measureIndex < measures.length; measureIndex++) {
-    const sequences = (measures[measureIndex].sequences ?? []).filter(s => (s.staff ?? 1) === 1);
-    for (let voiceIndex = 0; voiceIndex < sequences.length; voiceIndex++) {
-      const seq = sequences[voiceIndex];
-      for (let eventIndex = 0; eventIndex < seq.content.length; eventIndex++) {
-        const item = seq.content[eventIndex];
-        if (!isTimedEvent(item)) continue;
-        const notes = item.notes ?? [];
-        for (let noteIndex = 0; noteIndex < notes.length; noteIndex++) {
-          if (noteKeyOf(notes[noteIndex], measureIndex, voiceIndex, eventIndex, noteIndex) === key) {
-            return { seq, measureIndex, voiceIndex, eventIndex, note: notes[noteIndex] };
-          }
-        }
-      }
-    }
-  }
-  return null;
+  const address = findNoteAddress(doc, key);
+  if (!address) return null;
+  return {
+    seq: address.sequence,
+    measureIndex: address.measureIndex,
+    voiceIndex: address.voiceIndex,
+    eventIndex: address.eventIndex,
+    note: address.note
+  };
 }
 
 function samePitch(a: MnxNote, b: MnxNote): boolean {
@@ -1388,23 +1379,13 @@ function eventAtOnset(
   return onsetsEqual(onset, target) ? { index: seq.content.length } : undefined;
 }
 
-/** Like forEachKeyedNote but with the owning event, for structural edits. */
+/** Like forEachKeyedNote but with the owning event, for structural edits —
+ *  the same enumeration (`model/noteWalk.ts`), just handing back more of it. */
 function forEachEventNote(
   doc: MnxStructure,
   fn: (event: MnxEvent, note: MnxNote, key: string) => void
 ): void {
-  (doc.parts?.[0]?.measures ?? []).forEach((measure, measureIndex) => {
-    (measure.sequences ?? [])
-      .filter(s => (s.staff ?? 1) === 1)
-      .forEach((sequence, voiceIndex) => {
-        sequence.content.forEach((item, eventIndex) => {
-          if (!isTimedEvent(item)) return;
-          for (const [noteIndex, note] of [...(item.notes ?? []).entries()]) {
-            fn(item, note, noteKeyOf(note, measureIndex, voiceIndex, eventIndex, noteIndex));
-          }
-        });
-      });
-  });
+  forEachNoteAddress(doc, address => fn(address.event, address.note, address.key));
 }
 
 /**

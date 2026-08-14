@@ -245,6 +245,21 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-note-address.md](inprogress/core-note-address.md)** — **one note
+  enumeration**, built 2026-08-14 as the prerequisite that makes campaign item
+  11b's container descent safe. `noteKeys.ts` was always a shared *formatter*,
+  but the coordinates fed to it were derived independently in **six** places
+  (cursor ×2, ops ×2, jsonView ×2, plus both layouts) — which is why CLAUDE.md
+  has to ask that they be "kept in lockstep", and why teaching the editor to see
+  inside containers looked like a five-file migration with the goldens as the
+  only witness. Now `model/noteWalk.ts` produces coordinates once, three walks
+  are thin wrappers over it, and `harness/conformance/note-keys.test.ts` checks
+  the agreement over all 106 scenarios (every synthesized key the renderer stamps
+  must be one the walk produced; the walk must produce no duplicates — a
+  duplicate being the container collision in miniature). Goldens byte-identical,
+  which is the proof it changed nothing. **Move 2 stays open**: the cursor
+  address `{measure, onset, line}` is the same shortcut one level up, and its
+  discriminator would retire three separate campaign findings at once.
 - **[core-element-ops-lyrics.md](inprogress/core-element-ops-lyrics.md)** —
   campaign item 12, **built 2026-08-14**: syllables and verse metadata, and the
   index's proposed "text *mode* that suspends the keymap" is **rejected** — a

@@ -24,7 +24,7 @@
 // restated; noteKeys.ts is the shared spec both sides answer to.
 import type { MnxSequenceItem, MnxSequence, MnxStructure, MnxNote } from '../model/mnx.ts';
 import { isTimedEvent, isTuplet, isTremolo } from '../model/mnx.ts';
-import { syntheticNoteKey } from '../model/noteKeys.ts';
+import { forEachNoteAddress, noteKeyAt } from '../model/noteWalk.ts';
 import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
 import { clefAt, staffPositionOfPitch } from './staffSpace.ts';
 
@@ -167,32 +167,18 @@ function staffOneSequences(sequences: MnxSequence[] | undefined): MnxSequence[] 
   return (sequences ?? []).filter(seq => (seq.staff ?? 1) === 1);
 }
 
-export function noteKeyOf(
-  note: MnxNote,
-  measureIndex: number,
-  voiceIndex: number,
-  eventIndex: number,
-  noteIndex: number
-): string {
-  return note.id ?? syntheticNoteKey(measureIndex, voiceIndex, eventIndex, noteIndex);
-}
+/** The key a note carries at these coordinates. Re-exported from the canonical
+ *  walk (`model/noteWalk.ts`) so the editor and the layouts cannot drift. */
+export const noteKeyOf = noteKeyAt;
 
 /** Visit every staff-1 note of parts[0] with the selection key the layouts
- *  would give it. This is the addressing scheme EditOps resolve against. */
+ *  would give it. This is the addressing scheme EditOps resolve against —
+ *  now a thin wrapper over the one enumeration that defines it. */
 export function forEachKeyedNote(
   doc: MnxStructure,
   fn: (note: MnxNote, key: string) => void
 ): void {
-  (doc.parts?.[0]?.measures ?? []).forEach((measure, measureIndex) => {
-    staffOneSequences(measure.sequences).forEach((sequence, voiceIndex) => {
-      sequence.content.forEach((item, eventIndex) => {
-        if (!isTimedEvent(item)) return;
-        (item.notes ?? []).forEach((note, noteIndex) => {
-          fn(note, noteKeyOf(note, measureIndex, voiceIndex, eventIndex, noteIndex));
-        });
-      });
-    });
-  });
+  forEachNoteAddress(doc, address => fn(address.note, address.key));
 }
 
 /** Each measure's metric span from its (inherited) time signature — MNX time

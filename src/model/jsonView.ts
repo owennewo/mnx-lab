@@ -1,4 +1,5 @@
-import { syntheticNoteKey } from './noteKeys.ts';
+// Keys come from the canonical walk, not a local restatement of it.
+import { noteKeyAt } from './noteWalk.ts';
 
 /**
  * Renders an MNX document to the exact text `JSON.stringify(doc, null, 2)`
@@ -94,7 +95,7 @@ export function buildJsonView(doc: unknown): JsonView {
       voiceIndex++;
       (seq?.content ?? []).forEach((event, e) => {
         (event?.notes ?? []).forEach((note, n) => {
-          const key = note?.id ?? syntheticNoteKey(m, voiceIndex, e, n);
+          const key = noteKeyAt(note as never, m, voiceIndex, e, n);
           const base = `/parts/0/measures/${m}/sequences/${seqIdx}/content/${e}/notes/${n}`;
           const line =
             lineByPointer.get(`${base}/id`) ??
@@ -147,7 +148,7 @@ export function describeNote(doc: unknown, key: string): NoteDescription | null 
       voiceIndex++;
       (seq?.content ?? []).forEach((event, e) => {
         (event?.notes ?? []).forEach((note, n) => {
-          const k = note?.id ?? syntheticNoteKey(m, voiceIndex, e, n);
+          const k = noteKeyAt(note as never, m, voiceIndex, e, n);
           if (k !== key || found) return;
           const p = note?.pitch;
           const acc = p?.alter === 1 ? SHARP : p?.alter === -1 ? FLAT : '';

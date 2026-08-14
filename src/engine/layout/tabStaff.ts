@@ -6,7 +6,7 @@ import {
   TabPositionContext
 } from '../tab/guitarPositions.ts';
 import { Primitive, SpatialIndex } from '../primitives.ts';
-import { syntheticNoteKey } from '../../model/noteKeys.ts';
+import { noteKeyAt } from '../../model/noteWalk.ts';
 import { EventSlot } from './spacing.ts';
 
 /**
@@ -240,9 +240,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
         // Per-note selection keys: real ids, or synthesized positional keys
         // for id-less documents (see src/utils/noteKeys.ts).
         const noteIds = event.notes.map((n, idx) =>
-          n.id ?? (synthesizeKeys
-            ? syntheticNoteKey(measureIndex, voiceIndex, eventIndex, idx)
-            : undefined)
+          synthesizeKeys ? noteKeyAt(n, measureIndex, voiceIndex, eventIndex, idx) : n.id
         );
         const primaryNoteId = noteIds[0];
 
