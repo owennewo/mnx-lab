@@ -250,7 +250,7 @@ export const KEY_DOCS: KeyDoc[] = [
     keys: 'Shift+T',
     strokes: [{ code: 'KeyT', shift: true }],
     group: 'setup',
-    meaning: { all: 'time signature… (typed popover)' }
+    meaning: { all: 'time signature… (typed popover: 4/4, 6/8; `inherit` un-declares)' }
   },
   {
     keys: 'Shift+U',
@@ -333,7 +333,7 @@ export const KEY_DOCS: KeyDoc[] = [
  * here must really emit that intent in the workbench.
  */
 export const SURFACE_INTENTS: Record<string, string[]> = {
-  timeSignaturePopover: ['setTimeSignature'],
+  timeSignaturePopover: ['setTimeSignature', 'removeTimeSignature'],
   tuningPopover: ['setTuning'],
   partPopover: ['addPart', 'setPartDeclaration', 'removePartDeclaration'],
   // One popover per attribute, two intents each: the grammar's `inherit`

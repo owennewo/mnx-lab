@@ -77,6 +77,7 @@ const PART_DECLARATION_KINDS: Partial<Record<ElementKind, PartDeclarationKind>> 
 function measureRemovalIntent(kind: ElementKind): EditorIntent | null {
   if (kind === 'clef') return { type: 'removeClef' };
   if (kind === 'key-signature') return { type: 'removeKeySignature' };
+  if (kind === 'time-signature') return { type: 'removeTimeSignature' };
   if (kind === 'full-measure-rest') return { type: 'removeFullMeasureRest' };
   if (kind === 'measure-repeat') return { type: 'removeMeasureRepeat' };
   const attribute = MEASURE_ATTRIBUTE_KINDS[kind];

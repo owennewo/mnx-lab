@@ -92,7 +92,7 @@ agreed or candidate claims; **bold** = agreed.
 | 2 | [destructibility sweep](core-element-ops-destruct-sweep.md) | Item 1's reverse walk scaled corpus-wide: element walker per kind (noteKeys generalized), attempt address+delete per element; oracles: applies / no new diagnostics / no dangling references / undo byte-identical, **widened** (relative validity, references past ties, a surviving-document check). No trace fixtures — the walk regenerates each run; the report is the artifact. Doubles as ladder addressability audit. Fix the `deleteNote` dangling-reference bug it will catch. | verdicts for all 106 | n/a | n/a | **built 2026-08-14** |
 | 3 | [constructibility traces](core-element-ops-construct-traces.md) | Item 1's forward harness scaled: the construct-fixture kind + per-scenario tiers (unreachable → ops-reachable → keyboard-reachable → traced) + the expected-unreachable class. Traces themselves arrive with items 4–13 (recorded via "copy trace", never hand-written); possible workbench coverage map later. Inherits item 1's parked **recording surface** question: "copy trace" stamps a corpus scenario id as the start, so recording from `{}` wants the new-document journey — and with it, the ops tab on non-scenario (IndexedDB) documents. | verdict machinery for all 106; traces accumulate per item | n/a | n/a | **built 2026-08-14** |
 | 4 | duration completion | Dots (op already accepts `dots?` — cheapest unlock), capo (read but unwritable), time `display: common\|cut`. | ~10 | dot: single key (`.` candidate); capo/display: popover grammar | event / setup | undrafted |
-| 5 | [clef & key signature](core-element-ops-clef-key.md) | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class; `inherit` is the removal token. | **22 scenarios reachable** (from 1); 101 clefs + 6 key sigs removable | **Shift+C** clef, **Shift+K** key | **measure** | **built 2026-08-14** |
+| 5 | [clef, key & time](core-element-ops-clef-key.md) | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class; `inherit` is the removal token. | **22 scenarios reachable** (from 1); 101 clefs + 6 key sigs + 95 time sigs removable | **Shift+C** clef, **Shift+K** key | **measure** | **built 2026-08-14** |
 | 6 | accidental spelling | Flats (natural-then-sharp policy makes E♭ unwritable), enharmonic respell, `accidentalDisplay`/parentheses. | 9+ | respell: single key | note | undrafted |
 | 7 | [bar-attribute family](core-element-ops-bar-attributes.md) | Barlines, repeats, endings, segno/jump/fine, sections, rehearsal, tempo — one typed-popover family on the global measure. ONE op pair for ten kinds; `no <attribute>` strips. | **18 scenarios** (reachable 24 → 42); 56 elements removable | **Shift+B** | **measure** | **built 2026-08-14** |
 | 8 | [event adornments](core-element-ops-adornments.md) | Articulations/markings, dynamics, directions — **two** op pairs, because markings are owned by the event and the other two by the part measure. | 13 (reachable 55 → 68); 70 elements | **Shift+A** popover (letter accelerators deferred) | **note/event** | **built 2026-08-14** |
@@ -109,6 +109,28 @@ et al are layout-only, zero measures — a different surface, not keys), percuss
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — item 5's missing third member: time signatures.** The largest
+  single gap on the destruct board (99 elements) was an oversight in an item
+  already called done: clef and key got their inherited-attribute removals,
+  time did not, because `setTimeSignature` existed and nobody noticed the pair
+  was half-built. **95 removed, 4 refused; the corpus goes 1,089 → 1,184.**
+  - **The corpus sharpened the semantics twice.** Re-padding the governed bars
+    failed on `spec/organ-layout` — `padMeasureRests` only fills the entry
+    sequence, so other voices keep their old fill — and on
+    `lab/rhythm/sequence-space`, where `itemSpan` counts a `space` as zero and
+    the padding mis-measured a bar whose meter had not changed at all.
+  - **So removal means pure un-declaration**: offered where the meter that would
+    govern afterwards equals the one declared, refused where the meter would
+    really change, because repairing the bars would mean reshaping music the ops
+    layer does not own. Guarded removal, same as containers.
+  - **`refused` is not `no-op`, and the report says so** — four time signatures
+    now read "the verb declined" rather than "no verb exists". The two-axis
+    verdict paying off a fourth time.
+  - **The lesson worth generalizing**: an item can be "done" while half a pair
+    is missing, because the construct half often pre-dates the campaign. The
+    kind table is the place to check — a row with `construct` and no `remove` is
+    an unfinished pair, and there are still several.
 
 - **2026-08-14 — 11b cracked: container content is addressable.** The third
   attempt, and the difference was doing the addressing layer first.

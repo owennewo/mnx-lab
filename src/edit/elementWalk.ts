@@ -162,10 +162,9 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   ottava: { classes: ['ottava', 'ottava-label'], note: 'An octave-shift line.' },
   'time-signature': {
     classes: ['time-sig', 'time-sig-num', 'time-sig-den'],
-    note: 'Inherited-attribute removal class: reverts to the predecessor.',
-    // `setTimeSignature` overwrites but cannot un-declare — the asymmetry the
-    // campaign opened on.
-    construct: ['setTimeSignature']
+    note: 'Inherited-attribute removal class: reverts to the predecessor, and re-establishes the full-bar invariant for the bars it governed.',
+    construct: ['setTimeSignature'],
+    remove: ['removeTimeSignature']
   },
   'key-signature': {
     classes: ['key-sig'],

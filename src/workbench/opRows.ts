@@ -115,6 +115,8 @@ function opLabel(op: EditOp): string {
       return `toggle tie · ${op.noteId}`;
     case 'setTimeSignature':
       return `time ${op.time.count}/${op.time.unit} @ m${op.measureIndex + 1}`;
+    case 'removeTimeSignature':
+      return `time inherited @ m${op.measureIndex + 1}`;
     case 'setTuning':
       return `tuning · ${tuningText(op.tuning)}`;
     case 'setStaffKind':

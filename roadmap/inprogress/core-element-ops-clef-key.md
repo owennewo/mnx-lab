@@ -1,4 +1,4 @@
-# Clef & key signature — the inherited-attribute pair
+# Clef, key & time — the inherited-attribute family
 
 > **Status: built 2026-08-14, same day as proposed.** Campaign:
 > [core-campaign-element-ops.md](core-campaign-element-ops.md), item 5 — the
@@ -112,6 +112,36 @@ Both axes moved, and the numbers are the agreement block's fourth point discharg
   template was already at its limit; `POPOVER_SPECS` (label · placeholder · hint)
   is the same "make it data" move as the keymap docs, and the next family adds a
   row rather than a limb.
+
+## The third member, added 2026-08-14
+
+The item shipped with a hole its own framing should have caught: **time
+signatures are the same removal class and were left out**, because
+`setTimeSignature` already existed and the missing half went unnoticed. It was
+the single largest gap on the destruct board — **99 elements**, more than any
+other kind.
+
+`removeTimeSignature` closes it, and the corpus made the semantics sharper than
+the first attempt:
+
+- The first version re-padded the bars the declaration governed, and two
+  scenarios refused it for two different reasons. `spec/organ-layout` (3/4 →
+  inherited 4/4) showed that `padMeasureRests` only fills the **entry
+  sequence**, so other voices and staves keep their old fill and the bar reports
+  "voice 2 underfills". `lab/rhythm/sequence-space` showed `itemSpan` counts a
+  `space` as zero, so padding mis-measured a bar whose meter had not even
+  changed — the gap item 11b still owns.
+- So removal is offered exactly where it is a **pure un-declaration**: the
+  meter that would govern afterwards equals the one declared. That is the
+  redundant-declaration case, and it changes no music at all. Where the meter
+  would really change, removal is **refused** — the same guarded-removal shape
+  the campaign uses for containers, and for the same reason: repairing the bars
+  would mean reshaping music the ops layer does not own.
+
+**95 removed, 4 refused** (the meter-changing ones), taking the corpus from
+1,089 to **1,184 removable elements**. The four refusals are the honest residue,
+and they are `refused` rather than `no-op` — the report distinguishes "no verb
+exists" from "the verb declined", which is the two-axis verdict earning its keep.
 
 ## Open questions
 

@@ -16,7 +16,11 @@ import type {
 
 /** "4/4", "6/8", "12/8" → an MNX time signature. Unit must be a power of two
  *  the notation can express. */
-export function parseTimeSignature(text: string): { count: number; unit: number } | null {
+export function parseTimeSignature(text: string): { count: number; unit: number } | 'inherit' | null {
+  const token = text.trim().toLowerCase();
+  // The inherited-attribute removal token (campaign item 5), now on its third
+  // family: clef, key, and the meter itself.
+  if (token === INHERIT_TOKEN || token === '-') return 'inherit';
   const match = /^\s*(\d{1,2})\s*\/\s*(\d{1,3})\s*$/.exec(text);
   if (!match) return null;
   const count = Number(match[1]);

@@ -86,6 +86,7 @@ export type MutationIntent =
   | { type: 'removeClef' }
   | { type: 'setKeySignature'; fifths: number }
   | { type: 'removeKeySignature' }
+  | { type: 'removeTimeSignature' }
   // The bar-attribute family (campaign item 7): ten kinds, one verb, because
   // they are all one thing — a key on the global measure.
   | { type: 'setMeasureAttribute'; attribute: MeasureAttribute }

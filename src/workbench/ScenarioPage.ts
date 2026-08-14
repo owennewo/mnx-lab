@@ -59,8 +59,8 @@ type PopoverKind = 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar' | 'adornm
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
   time: {
     label: 'time signature',
-    placeholder: '4/4',
-    hint: 'applies to the current bar onward · Enter applies · Esc closes'
+    placeholder: '4/4 · 6/8 · inherit',
+    hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
   },
   tuning: {
     label: 'tuning',
@@ -982,10 +982,14 @@ export class ScenarioPage extends LitElement {
     if (this.setupPopover === 'time') {
       const time = parseTimeSignature(input.value);
       if (!time) {
-        this.setupPopoverError = 'not a time signature — try 4/4 or 6/8';
+        this.setupPopoverError = 'not a time signature — try 4/4, 6/8, or “inherit”';
         return;
       }
-      this.stripIntent({ type: 'setTimeSignature', count: time.count, unit: time.unit });
+      this.stripIntent(
+        time === 'inherit'
+          ? { type: 'removeTimeSignature' }
+          : { type: 'setTimeSignature', count: time.count, unit: time.unit }
+      );
     } else if (this.setupPopover === 'tuning') {
       const tuning = parseTuning(input.value);
       if (!tuning) {

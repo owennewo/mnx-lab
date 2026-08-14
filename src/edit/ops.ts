@@ -191,6 +191,16 @@ export type EditOp =
       type: 'removeKeySignature';
       measureIndex: number;
     }
+  | {
+      /** Drop this measure's time DECLARATION — the third inherited attribute,
+       *  and the one that governs the FULL-BAR INVARIANT: the bars it ruled now
+       *  answer to the predecessor's meter (or 4/4), so they are re-padded.
+       *  Refused when that would leave a bar overfull, since re-padding pops
+       *  only rests and shortening a meter under real ink would silently make
+       *  an invalid bar (`timeSignatureRemovalFits`). */
+      type: 'removeTimeSignature';
+      measureIndex: number;
+    }
   // The bar-attribute family (campaign item 7,
   // roadmap/inprogress/core-element-ops-bar-attributes.md). Ten kinds that are
   // all one thing — a key on the GLOBAL measure — so they share one verb with
@@ -983,6 +993,15 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       }
       return next;
     }
+    case 'removeTimeSignature': {
+      const measure = next.global?.measures?.[op.measureIndex];
+      if (!measure?.time) return next;
+      // A pure un-declaration (the session guards it with
+      // `timeSignatureRemovalFits`), so the bars keep their fill and there is
+      // nothing to re-pad — the removal touches one key and nothing else.
+      delete measure.time;
+      return next;
+    }
     case 'setTuning': {
       const part = next.parts?.[0];
       if (!part) return next;
@@ -1266,6 +1285,36 @@ export function beamRunBetween(
     eventIds.push(event.id);
   }
   return eventIds.length >= 2 ? { measureIndex: from.measureIndex, eventIds } : null;
+}
+
+/**
+ * Is un-declaring the time signature at `measureIndex` a PURE un-declaration —
+ * that is, does the meter that would govern afterwards equal the one declared?
+ *
+ * The first version asked the weaker question ("would any bar end up
+ * overfull?") and planned to re-pad the rest. The corpus refused it twice, for
+ * two different reasons, and both say the repair is not ours to make:
+ *
+ * - `spec/organ-layout` (3/4 → inherited 4/4): `padMeasureRests` only fills the
+ *   ENTRY sequence, so the other voices and staves keep their three beats and
+ *   the bar reports "voice 2 underfills". Repairing them would mean reshaping
+ *   music the ops layer deliberately does not own.
+ * - `lab/rhythm/sequence-space`: `itemSpan` counts a `space` as zero, so the
+ *   padding mis-measured a bar whose meter had not even changed — the `space`
+ *   gap item 11b still owns.
+ *
+ * So removal is offered exactly where it changes no music: the redundant
+ * declaration. Where the meter would really change, refusing is the same
+ * "guarded removal" the campaign uses for containers — no silent damage.
+ */
+export function timeSignatureRemovalFits(doc: MnxStructure, measureIndex: number): boolean {
+  const declared = doc.global?.measures?.[measureIndex]?.time;
+  if (!declared) return false;
+  const probe = JSON.parse(JSON.stringify(doc)) as MnxStructure;
+  delete probe.global.measures[measureIndex].time;
+  const after = meterOf(probe, measureIndex).span;
+  const before = { num: declared.count, den: declared.unit };
+  return before.num * after.den === after.num * before.den;
 }
 
 /** The technique of `kind` on this note, if any — asked before applying, so a

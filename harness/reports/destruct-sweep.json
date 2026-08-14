@@ -4,8 +4,9 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "no-op": 371,
-      "removed": 1089
+      "removed": 1184,
+      "no-op": 272,
+      "refused": 4
     },
     "unaddressableWithAnOp": 183
   },
@@ -140,7 +141,8 @@
       "removed": 12
     },
     "time-signature": {
-      "no-op": 99
+      "removed": 95,
+      "refused": 4
     },
     "tremolo": {
       "no-op": 3
@@ -161,7 +163,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/articulations/fermata": {
@@ -175,7 +177,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/articulations/rare-articulations": {
@@ -192,7 +194,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/articulations/unrendered-marks": {
@@ -209,7 +211,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/document/empty-tab-canvas": {
@@ -251,7 +253,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/document/twelve-bar-blues": {
@@ -280,7 +282,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/durations/rest-gallery": {
@@ -294,7 +296,7 @@
         "removed": 18
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/dynamics/accent-prefix-suffix": {
@@ -308,7 +310,7 @@
         "removed": 6
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/dynamics/all-dynamic-marks": {
@@ -322,7 +324,7 @@
         "removed": 28
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/dynamics/hairpin-and-relative": {
@@ -339,7 +341,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/edge-cases/bar-duration-mismatch": {
@@ -351,7 +353,7 @@
         "no-op": 3
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/layout/group-barline-individual": {
@@ -374,7 +376,7 @@
         "no-op": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/lyrics/verse-labels": {
@@ -394,7 +396,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/navigation/jumps-and-signs": {
@@ -414,7 +416,7 @@
         "removed": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/percussion/minimal-kit": {
@@ -431,7 +433,7 @@
         "no-op": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/pitches/parenthesized-accidental": {
@@ -448,7 +450,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/rhythm/appoggiatura": {
@@ -465,7 +467,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/rhythm/sequence-space": {
@@ -482,7 +484,7 @@
         "no-op": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/rhythm/tuplet-number-hidden": {
@@ -496,7 +498,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       },
       "tuplet": {
         "no-op": 1
@@ -513,7 +515,7 @@
         "removed": 8
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/score-text/directions-across-parts": {
@@ -539,7 +541,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/score-text/directions-multi-staff": {
@@ -561,7 +563,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/score-text/directions-stacked": {
@@ -575,7 +577,7 @@
         "removed": 4
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/score-text/directions-symbolic": {
@@ -589,7 +591,7 @@
         "removed": 8
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/score-text/labels-with-navigation": {
@@ -615,7 +617,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/score-text/rehearsal-marks": {
@@ -629,7 +631,7 @@
         "removed": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/score-text/sections": {
@@ -643,7 +645,7 @@
         "removed": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/score-text/sections-with-rehearsal-marks": {
@@ -660,7 +662,7 @@
         "removed": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-derivation/bare-chord": {
@@ -680,7 +682,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-derivation/bare-melody": {
@@ -700,7 +702,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-derivation/capo": {
@@ -723,7 +725,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-derivation/drop-d": {
@@ -743,7 +745,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-derivation/fret-mismatch": {
@@ -766,7 +768,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-derivation/out-of-range": {
@@ -789,7 +791,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-derivation/partial-annotation": {
@@ -812,7 +814,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-derivation/string-only": {
@@ -835,7 +837,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-derivation/transposition-display-only": {
@@ -855,7 +857,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-derivation/undeclared-strings": {
@@ -872,7 +874,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-fingering/left-hand-fingers": {
@@ -898,7 +900,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-fingering/right-hand-pima": {
@@ -924,7 +926,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-part/standard-tuning-both": {
@@ -944,7 +946,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-positions/open-strings-chord": {
@@ -967,7 +969,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-spec-gaps/fingering-rejected": {
@@ -1048,7 +1050,7 @@
         "removed": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-techniques/hammer-pull-chain": {
@@ -1074,7 +1076,7 @@
         "removed": 3
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-techniques/natural-harmonics": {
@@ -1100,7 +1102,7 @@
         "removed": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-techniques/slides": {
@@ -1126,7 +1128,7 @@
         "removed": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-techniques/vibrato-and-palm-mute": {
@@ -1152,7 +1154,7 @@
         "removed": 3
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/accidentals": {
@@ -1169,7 +1171,7 @@
         "removed": 8
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/articulations": {
@@ -1183,7 +1185,7 @@
         "removed": 4
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/beam-hooks": {
@@ -1198,7 +1200,7 @@
         "removed": 10
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/beams": {
@@ -1213,7 +1215,7 @@
         "removed": 15
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/beams-across-barlines": {
@@ -1227,7 +1229,7 @@
         "removed": 4
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/beams-inner-grace-notes": {
@@ -1244,7 +1246,7 @@
         "removed": 5
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/beams-secondary-beam-breaks": {
@@ -1259,7 +1261,7 @@
         "removed": 16
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/beams-secondary-beam-breaks-implied": {
@@ -1273,7 +1275,7 @@
         "removed": 16
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/clef-changes": {
@@ -1285,7 +1287,7 @@
         "removed": 4
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/dotted-notes": {
@@ -1296,7 +1298,7 @@
         "removed": 6
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/dynamic-accents": {
@@ -1310,7 +1312,7 @@
         "removed": 6
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/dynamics": {
@@ -1324,7 +1326,7 @@
         "removed": 7
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/full-measure-rests": {
@@ -1338,7 +1340,7 @@
         "removed": 7
       },
       "time-signature": {
-        "no-op": 1
+        "refused": 1
       }
     },
     "spec/grace-note": {
@@ -1352,7 +1354,7 @@
         "removed": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/grace-notes-beamed": {
@@ -1369,7 +1371,7 @@
         "removed": 13
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/grand-staff": {
@@ -1392,7 +1394,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/hello-world": {
@@ -1406,7 +1408,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/jumps-dal-segno": {
@@ -1423,7 +1425,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/jumps-ds-al-fine": {
@@ -1443,7 +1445,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/key-signatures": {
@@ -1457,7 +1459,7 @@
         "removed": 10
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/lyric-line-metadata": {
@@ -1474,7 +1476,7 @@
         "removed": 3
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/lyrics-basic": {
@@ -1488,7 +1490,7 @@
         "removed": 4
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/lyrics-multi-line": {
@@ -1502,7 +1504,7 @@
         "removed": 4
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/measure-repeats": {
@@ -1519,7 +1521,7 @@
         "removed": 4
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/measure-repeats-with-counters": {
@@ -1533,7 +1535,7 @@
         "removed": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/multimeasure-rests": {
@@ -1558,7 +1560,7 @@
         "no-op": 3
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/multiple-layouts": {
@@ -1581,7 +1583,7 @@
         "no-op": 3
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/multiple-voices": {
@@ -1593,7 +1595,7 @@
         "no-op": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/orchestral-layout": {
@@ -1634,7 +1636,7 @@
         "no-op": 1
       },
       "time-signature": {
-        "no-op": 1
+        "refused": 1
       }
     },
     "spec/ottavas-8va": {
@@ -1649,7 +1651,7 @@
         "no-op": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/parts": {
@@ -1669,7 +1671,7 @@
         "no-op": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/repeats": {
@@ -1686,7 +1688,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/repeats-alternate-endings-advanced": {
@@ -1706,7 +1708,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "refused": 1
       }
     },
     "spec/repeats-alternate-endings-simple": {
@@ -1726,7 +1728,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/repeats-implied-start-repeat": {
@@ -1740,7 +1742,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/repeats-more-once-repeated": {
@@ -1754,7 +1756,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/rest-positions": {
@@ -1765,7 +1767,7 @@
         "removed": 7
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/single-note-tremolos": {
@@ -1779,7 +1781,7 @@
         "removed": 4
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/slurs": {
@@ -1793,7 +1795,7 @@
         "removed": 2
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/slurs-chords": {
@@ -1807,7 +1809,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/slurs-targeting-specific-notes": {
@@ -1821,7 +1823,7 @@
         "removed": 3
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/system-layouts": {
@@ -1850,7 +1852,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/three-note-chord-and-half-rest": {
@@ -1864,7 +1866,7 @@
         "removed": 3
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/tie-targets": {
@@ -1891,7 +1893,7 @@
         "removed": 9
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/ties": {
@@ -1905,7 +1907,7 @@
         "removed": 3
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "spec/time-signature-glyphs": {
@@ -1919,7 +1921,7 @@
         "removed": 1
       },
       "time-signature": {
-        "no-op": 2
+        "removed": 2
       }
     },
     "spec/time-signatures": {
@@ -1930,7 +1932,8 @@
         "removed": 10
       },
       "time-signature": {
-        "no-op": 2
+        "removed": 1,
+        "refused": 1
       }
     },
     "spec/tremolos-multi-note": {
@@ -1941,7 +1944,7 @@
         "removed": 6
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       },
       "tremolo": {
         "no-op": 3
@@ -1958,7 +1961,7 @@
         "removed": 13
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       },
       "tuplet": {
         "no-op": 3
@@ -1975,7 +1978,7 @@
         "removed": 8
       },
       "time-signature": {
-        "no-op": 1
+        "removed": 1
       }
     }
   },

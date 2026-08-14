@@ -17,7 +17,8 @@ import {
   techniqueAt,
   MEASURE_ATTRIBUTE_FIELDS,
   measureHasInk,
-  partHasInk
+  partHasInk,
+  timeSignatureRemovalFits
 } from './ops.ts';
 import {
   addOnsets,
@@ -375,6 +376,13 @@ export class EditorSession {
           measureIndex: this.cursorState.measureIndex,
           fifths: intent.fifths
         });
+        return true;
+      }
+      case 'removeTimeSignature': {
+        // Refuse rather than make a bar overfull — the same "guarded removal"
+        // shape as removeMeasure, for the same reason: no silent damage.
+        if (!timeSignatureRemovalFits(this.doc, this.cursorState.measureIndex)) return false;
+        this.apply({ type: 'removeTimeSignature', measureIndex: this.cursorState.measureIndex });
         return true;
       }
       case 'removeKeySignature': {

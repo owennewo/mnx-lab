@@ -149,6 +149,7 @@ function unexplainedChanges(
       change.removed.every(entry => removedIds.some(id => id && entry.includes(`"${id}"`)))
     )
       return false;
+
     return true;
   });
 }
