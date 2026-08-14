@@ -7,10 +7,22 @@
 // asymmetry is the test: if this file ever grows a workaround, the embed
 // contract has a hole in it.
 
-/** Where the embed artifact lives. `?base=` overrides for local dev and the
- *  cross-origin smoke harness; the default is a sibling directory. */
+/**
+ * Where the embed artifact lives. A real host hard-codes its CDN URL here;
+ * this repo has nowhere to point yet (the deploy ships `dist/client`, not
+ * `dist/embed` — deploying the artifact is an open decision in the proposal),
+ * so ARTIFACT_BASE stays null and the page demands `?base=`.
+ *
+ * Deliberately NOT defaulted to a relative path: a wrong default 404s with a
+ * cryptic module error and invites someone to "fix" it by serving the
+ * artifact same-origin — which is the exact convenience that hid the asset
+ * bug this app was built to catch. `npm run dev:embed-app` prints the right
+ * URL; `npm run smoke:embed` asserts the same topology.
+ */
+const ARTIFACT_BASE = null;
+
 const params = new URLSearchParams(location.search);
-const base = (params.get('base') ?? '../../dist/embed').replace(/\/+$/, '');
+const base = (params.get('base') ?? ARTIFACT_BASE)?.replace(/\/+$/, '');
 
 /** The scores THIS host serves — its own files, not the lab's corpus. */
 const SCORES = [
@@ -57,8 +69,15 @@ for (const score of SCORES) {
 
 // Load the artifact, then the first score. `whenDefined` is the honest wait:
 // the element is usable only once the custom element registry has it.
-setStatus('loading the embed artifact…');
-import(/* @vite-ignore */ `${base}/mnx-lab.esm.js`)
-  .then(() => customElements.whenDefined('mnx-score-viewer'))
-  .then(() => show(SCORES[0]))
-  .catch(error => setStatus(`could not load the embed artifact: ${error.message}`, false));
+if (!base) {
+  setStatus(
+    'no artifact base configured — open with ?base=<url of dist/embed>, or run npm run dev:embed-app, which prints the URL.',
+    false
+  );
+} else {
+  setStatus('loading the embed artifact…');
+  import(/* @vite-ignore */ `${base}/mnx-lab.esm.js`)
+    .then(() => customElements.whenDefined('mnx-score-viewer'))
+    .then(() => show(SCORES[0]))
+    .catch(error => setStatus(`could not load the embed artifact: ${error.message}`, false));
+}

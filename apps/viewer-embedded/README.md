@@ -24,10 +24,21 @@ origin root, so any real embed 404'd).
 ## Running it
 
 ```bash
-npm run build:embed          # produces dist/embed/ (artifact + its smufl/ assets)
-npx http-server apps/viewer-embedded   # …or any static server
-# then open index.html; ?base=<url> points at a different artifact origin
+npm run dev:embed-app        # builds the artifact, serves BOTH origins, prints the URL
 ```
+
+It starts two servers — the artifact on one port, this page on another — and
+prints the one URL to open. Two origins is not ceremony: it is what a real
+embed faces, and serving both from one root is precisely the convenience that
+hid the asset bug for so long.
+
+Opening `index.html` directly (or serving only this directory) shows
+*“no artifact base configured”* rather than rendering. That is deliberate:
+there is no correct default to fall back to — the deploy currently ships
+`dist/client`, not `dist/embed`, so this repo has no artifact URL to point at,
+and inventing a relative one would just tempt someone to serve the artifact
+same-origin. A real host hard-codes its CDN URL in `ARTIFACT_BASE` (`app.js`);
+here, `?base=<url>` supplies it.
 
 The scores in `scores/` are copies, deliberately: a host serves its own
 documents. They are not read from `scenarios/` at runtime — coupling the demo

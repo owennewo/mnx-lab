@@ -21,39 +21,11 @@ import http from 'node:http';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { serveStatic } from './staticServer.mjs';
 
 const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
 const ARTIFACT_DIR = path.join(ROOT, 'dist/embed');
 const APP_DIR = path.join(ROOT, 'apps/viewer-embedded');
-
-const TYPES = {
-  '.html': 'text/html; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.mjs': 'text/javascript; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.woff2': 'font/woff2'
-};
-
-/** A static server with CORS on — a real CDN would send these headers, and
- *  without them the cross-origin module import fails for the wrong reason. */
-function serve(dir) {
-  const server = http.createServer((req, res) => {
-    const rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    const file = path.join(dir, rel === '/' ? 'index.html' : rel);
-    if (!file.startsWith(dir) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
-      res.writeHead(404).end('not found');
-      return;
-    }
-    res.writeHead(200, {
-      'content-type': TYPES[path.extname(file)] ?? 'application/octet-stream',
-      'access-control-allow-origin': '*'
-    });
-    fs.createReadStream(file).pipe(res);
-  });
-  return new Promise(resolve => {
-    server.listen(0, '127.0.0.1', () => resolve({ server, port: server.address().port }));
-  });
-}
 
 const fail = message => {
   console.error(`embed smoke FAILED: ${message}`);
@@ -144,8 +116,8 @@ try {
     );
   }
 
-  artifact = await serve(ARTIFACT_DIR);
-  host = await serve(APP_DIR);
+  artifact = await serveStatic(ARTIFACT_DIR);
+  host = await serveStatic(APP_DIR);
   const artifactBase = `http://127.0.0.1:${artifact.port}`;
   const pageUrl = `http://127.0.0.1:${host.port}/index.html?base=${encodeURIComponent(artifactBase)}`;
   console.log(`artifact origin ${artifactBase} · host origin http://127.0.0.1:${host.port}`);

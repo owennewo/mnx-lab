@@ -25,6 +25,7 @@
     "build:embed": "vite build -c vite.embed.config.ts",
     "smoke:lib": "npm run build:lib && node harness/verify/lib-smoke.mjs",
     "smoke:embed": "npm run build:embed && node harness/verify/embed-smoke.mjs",
+    "dev:embed-app": "npm run build:embed && node harness/verify/serve-embed-app.mjs",
     "preview": "vite preview",
     "compile-validator": "node spec/tools/compile-validator.mjs",
     "check:scenarios": "node harness/verify/check-scenarios.mjs",
