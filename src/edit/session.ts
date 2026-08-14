@@ -398,6 +398,46 @@ export class EditorSession {
         this.spanAnchorKey = this.spanAnchorKey === slot.noteKey ? null : slot.noteKey;
         return true;
       }
+      case 'setMarking':
+      case 'removeMarking': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        const before = JSON.stringify(this.doc);
+        this.apply({ type: intent.type, noteKey: slot.noteKey, marking: intent.marking });
+        if (JSON.stringify(this.doc) === before) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
+      case 'setPositioned': {
+        this.apply({
+          type: 'setPositioned',
+          measureIndex: this.cursorState.measureIndex,
+          onset: [this.cursorState.onset.num, this.cursorState.onset.den],
+          attribute: intent.attribute
+        });
+        return true;
+      }
+      case 'removePositioned': {
+        // Remove the entry at the cursor's own position — "the dynamic here",
+        // which is how a player would name it.
+        const measure = this.doc.parts?.[0]?.measures?.[this.cursorState.measureIndex];
+        const list = (intent.kind === 'dynamic' ? measure?.dynamics : measure?.directions) ?? [];
+        const index = list.findIndex(entry => {
+          const [num, den] = entry.position?.fraction ?? [0, 1];
+          return num * this.cursorState.onset.den === this.cursorState.onset.num * den;
+        });
+        if (index < 0) return false;
+        this.apply({
+          type: 'removePositioned',
+          measureIndex: this.cursorState.measureIndex,
+          kind: intent.kind,
+          index
+        });
+        return true;
+      }
       case 'toggleBeam': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;

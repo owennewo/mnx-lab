@@ -4,7 +4,7 @@
 // churning) map keys to intents, and the session maps intents to cursor moves
 // or EditOps. Trace fixtures are written in intents, NEVER keys, so they
 // survive every rebinding and every future emulation preset.
-import type { MeasureAttribute, MeasureAttributeKind } from './ops.ts';
+import type { MeasureAttribute, MeasureAttributeKind, PositionedAttribute } from './ops.ts';
 import type { MnxTuningEntry } from '../model/mnx.ts';
 
 /** Navigation: moves the cursor, never mutates the document. */
@@ -87,6 +87,12 @@ export type MutationIntent =
   // Beams reuse the SAME anchor as slurs (campaign item 11): "press here,
   // press there" is one mechanism whatever the span turns out to mean.
   | { type: 'toggleBeam' }
+  // Event adornments (campaign item 8): markings attach to the event under the
+  // cursor, dynamics and directions to the cursor's MOMENT in the part.
+  | { type: 'setMarking'; marking: string }
+  | { type: 'removeMarking'; marking: string }
+  | { type: 'setPositioned'; attribute: PositionedAttribute }
+  | { type: 'removePositioned'; kind: PositionedAttribute['kind'] }
   | { type: 'setFullMeasureRest' }
   | { type: 'removeFullMeasureRest' }
   | { type: 'setMeasureRepeat'; number: number }

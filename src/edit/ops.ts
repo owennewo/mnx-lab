@@ -6,6 +6,8 @@
 // grow the union as real editing features land.
 import type {
   MnxBeam,
+  MnxDynamic,
+  MnxDynamicValue,
   MnxGlobalMeasure,
   MnxEvent,
   MnxNote,
@@ -221,6 +223,26 @@ export type EditOp =
       targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump';
       lv?: boolean;
     }
+  // Event adornments (campaign item 8,
+  // roadmap/inprogress/core-element-ops-adornments.md). TWO pairs, because the
+  // owners differ: a marking is a key on the EVENT, while dynamics and
+  // directions are positioned entries in PART-MEASURE arrays. Item 7's family
+  // test (do they share an owner?) is what splits them.
+  | { type: 'setMarking'; noteKey: string; marking: string }
+  | { type: 'removeMarking'; noteKey: string; marking: string }
+  | {
+      /** A dynamic or direction at a metric position in the part measure. */
+      type: 'setPositioned';
+      measureIndex: number;
+      onset: [number, number];
+      attribute: PositionedAttribute;
+    }
+  | {
+      type: 'removePositioned';
+      measureIndex: number;
+      kind: PositionedAttribute['kind'];
+      index: number;
+    }
   // Rhythm declarations (campaign item 11,
   // roadmap/inprogress/core-element-ops-rhythm-declarations.md) — the ones
   // that leave ink where it is. The containers that SWALLOW ink (tuplet,
@@ -272,6 +294,12 @@ export type EditOp =
       kind: MeasureAttributeKind;
       index?: number;
     };
+
+/** The part-measure adornments: positioned entries sharing an owner, a shape
+ *  and a removal — which is why they share a verb. */
+export type PositionedAttribute =
+  | { kind: 'dynamic'; value?: MnxDynamicValue; glyphs?: string[] }
+  | { kind: 'direction'; text: string };
 
 /** The ten bar attributes, each carrying exactly what its MNX object needs. */
 export type MeasureAttribute =
@@ -644,6 +672,50 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const existing = note.ties?.[0];
       if (!existing) return next;
       if (op.targetType) existing.targetType = op.targetType;
+      return next;
+    }
+    case 'setMarking': {
+      const located = findKeyedNote(next, op.noteKey);
+      if (!located) return next;
+      const event = located.seq.content[located.eventIndex] as MnxEvent;
+      ((event.markings ??= {}) as Record<string, unknown>)[op.marking] = {};
+      return next;
+    }
+    case 'removeMarking': {
+      const located = findKeyedNote(next, op.noteKey);
+      if (!located) return next;
+      const event = located.seq.content[located.eventIndex] as MnxEvent;
+      const markings = event.markings as Record<string, unknown> | undefined;
+      if (!markings || markings[op.marking] === undefined) return next;
+      delete markings[op.marking];
+      // No tombstone: an emptied container goes with its last member.
+      if (Object.keys(markings).length === 0) delete event.markings;
+      return next;
+    }
+    case 'setPositioned': {
+      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      if (!measure) return next;
+      const position = { fraction: [op.onset[0], op.onset[1]] as [number, number] };
+      if (op.attribute.kind === 'dynamic') {
+        const entry: MnxDynamic = { position, type: 'immediate' };
+        if (op.attribute.value) entry.value = op.attribute.value;
+        if (op.attribute.glyphs) entry.glyphs = op.attribute.glyphs;
+        measure.dynamics = [...(measure.dynamics ?? []), entry];
+      } else {
+        measure.directions = [...(measure.directions ?? []), { position, text: op.attribute.text }];
+      }
+      return next;
+    }
+    case 'removePositioned': {
+      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      if (!measure) return next;
+      const record = measure as unknown as Record<string, unknown[] | undefined>;
+      const field = op.kind === 'dynamic' ? 'dynamics' : 'directions';
+      const list = record[field];
+      if (!list?.[op.index]) return next;
+      const kept = list.filter((_, i) => i !== op.index);
+      if (kept.length > 0) record[field] = kept;
+      else delete record[field];
       return next;
     }
     case 'setBeam': {

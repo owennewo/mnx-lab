@@ -3,18 +3,15 @@
   "summary": {
     "scenarios": 106,
     "traced": 5,
-    "opsReachable": 50,
-    "blocked": 46,
+    "opsReachable": 63,
+    "blocked": 33,
     "expectedUnreachable": 5
   },
   "blockingKinds": {
     "layout": 6,
     "score": 6,
-    "direction": 5,
-    "dynamic": 5,
     "staves": 5,
     "technique": 5,
-    "articulation": 4,
     "grace": 4,
     "lyric": 4,
     "accidental-display": 3,
@@ -38,16 +35,10 @@
       "tier": "ops-reachable"
     },
     "lab/articulations/rare-articulations": {
-      "tier": "blocked",
-      "blockedBy": [
-        "articulation"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/articulations/unrendered-marks": {
-      "tier": "blocked",
-      "blockedBy": [
-        "articulation"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/document/empty-tab-canvas": {
       "tier": "ops-reachable"
@@ -65,22 +56,13 @@
       "tier": "ops-reachable"
     },
     "lab/dynamics/accent-prefix-suffix": {
-      "tier": "blocked",
-      "blockedBy": [
-        "dynamic"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/dynamics/all-dynamic-marks": {
-      "tier": "blocked",
-      "blockedBy": [
-        "dynamic"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/dynamics/hairpin-and-relative": {
-      "tier": "blocked",
-      "blockedBy": [
-        "dynamic"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/edge-cases/bar-duration-mismatch": {
       "tier": "ops-reachable"
@@ -135,35 +117,22 @@
       ]
     },
     "lab/score-text/directions": {
-      "tier": "blocked",
-      "blockedBy": [
-        "direction"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/score-text/directions-across-parts": {
-      "tier": "blocked",
-      "blockedBy": [
-        "direction"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/score-text/directions-multi-staff": {
       "tier": "blocked",
       "blockedBy": [
-        "direction",
         "staves"
       ]
     },
     "lab/score-text/directions-stacked": {
-      "tier": "blocked",
-      "blockedBy": [
-        "direction"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/score-text/directions-symbolic": {
-      "tier": "blocked",
-      "blockedBy": [
-        "direction"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/score-text/labels-with-navigation": {
       "tier": "ops-reachable"
@@ -280,10 +249,7 @@
       ]
     },
     "spec/articulations": {
-      "tier": "blocked",
-      "blockedBy": [
-        "articulation"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/beam-hooks": {
       "tier": "ops-reachable"
@@ -313,16 +279,10 @@
       "tier": "ops-reachable"
     },
     "spec/dynamic-accents": {
-      "tier": "blocked",
-      "blockedBy": [
-        "dynamic"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/dynamics": {
-      "tier": "blocked",
-      "blockedBy": [
-        "dynamic"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/full-measure-rests": {
       "tier": "ops-reachable"
@@ -445,10 +405,7 @@
       "tier": "ops-reachable"
     },
     "spec/single-note-tremolos": {
-      "tier": "blocked",
-      "blockedBy": [
-        "articulation"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/slurs": {
       "tier": "traced"

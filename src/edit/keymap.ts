@@ -125,6 +125,7 @@ export type ShellAction =
   | 'clefPopover'
   | 'keySignaturePopover'
   | 'barAttributePopover'
+  | 'adornmentPopover'
   | 'commandPalette'
   | 'goTo'
   | 'toggleRail';
@@ -145,6 +146,10 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // The bar-attribute family (campaign item 7): ten kinds behind one
   // popover, because they are all keys on the global measure.
   { code: 'KeyB', shift: true, action: 'barAttributePopover' },
+  // Event adornments (campaign item 8): one popover for markings,
+  // dynamics and directions — single-letter accelerators are a later
+  // pass, since keys are the unstable layer and the ops are not.
+  { code: 'KeyA', shift: true, action: 'adornmentPopover' },
   // The palette (survey §8.5: Ctrl+K — Dorico's Jump Bar, GP's Cmd+E) and
   // go-to (§3.8: Ctrl+G + typed grammar) are ONE widget, two entry points:
   // Ctrl+K prefills the `>` command prefix, Ctrl+G opens bare (go-to).

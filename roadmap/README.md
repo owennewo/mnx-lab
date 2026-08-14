@@ -245,6 +245,17 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-adornments.md](inprogress/core-element-ops-adornments.md)** —
+  campaign item 8: markings, dynamics and directions, **built 2026-08-14**. The
+  first item where the campaign's own family test says **do not collapse**: all
+  three read as "attached to this moment", but a marking is a key on the *event*
+  while dynamics and directions are positioned entries on the *part measure*, so
+  they land as two op pairs behind one `Shift+A` popover. It also introduces the
+  **first two-coordinate address** — a dynamic sits at a moment, not just a bar, so
+  `ElementRef` grew an `onset` and the sweep drives to the cursor's position before
+  firing. Results: reachable scenarios **55 → 68**, removable elements
+  **842 → 912**, both predictions exact. Single-letter accelerators are deferred on
+  purpose: keys are the unstable layer, and no op or trace changes when they bind.
 - **[core-element-ops-rhythm-declarations.md](inprogress/core-element-ops-rhythm-declarations.md)** —
   campaign item 11, **built 2026-08-14** at deliberately **half its index row's
   scope, because the code made the split**. Beams (top level), full-measure rests

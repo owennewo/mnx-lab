@@ -89,7 +89,9 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   lyric: { classes: ['lyric', 'lyric-hyphen'], note: 'One syllable of one line under an event.' },
   articulation: {
     classes: ['articulation', 'tremolo'],
-    note: 'One event marking (accent, staccato, single-note tremolo…).'
+    note: 'One event marking (accent, staccato, single-note tremolo…).',
+    construct: ['setMarking'],
+    remove: ['removeMarking']
   },
   'accidental-display': { classes: [], note: 'Modifier: forces or parenthesizes the note accidental.' },
   'string-annotation': {
@@ -130,8 +132,18 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['setBeam'],
     remove: ['removeBeam']
   },
-  dynamic: { classes: ['dynamic'], note: 'A dynamic group at a metric position.' },
-  direction: { classes: ['direction'], note: 'A text/symbolic instruction (proposed field).' },
+  dynamic: {
+    classes: ['dynamic'],
+    note: 'A dynamic group at a metric position.',
+    construct: ['setPositioned'],
+    remove: ['removePositioned']
+  },
+  direction: {
+    classes: ['direction'],
+    note: 'A text/symbolic instruction (proposed field).',
+    construct: ['setPositioned'],
+    remove: ['removePositioned']
+  },
   ottava: { classes: ['ottava', 'ottava-label'], note: 'An octave-shift line.' },
   'time-signature': {
     classes: ['time-sig', 'time-sig-num', 'time-sig-den'],
@@ -289,6 +301,9 @@ export interface ElementRef {
    *  second part has no index here, which is how the sweep reports it as
    *  unaddressable rather than pretending. */
   measureIndex?: number;
+  /** For attributes positioned WITHIN a measure (dynamics, directions): the
+   *  metric onset their verbs aim at, as a whole-note fraction. */
+  onset?: [number, number];
   /** Where the element lives, for the surviving-document oracle. */
   jsonPath: (string | number)[];
 }
@@ -301,6 +316,23 @@ function push(
   noteKey?: string
 ): void {
   out.push(noteKey ? { kind, path, jsonPath, noteKey } : { kind, path, jsonPath });
+}
+
+/** A part-measure attribute addressed by bar AND onset — the cursor must reach
+ *  the moment, not just the measure (campaign item 8). */
+function pushPositioned(
+  out: ElementRef[],
+  kind: ElementKind,
+  path: string,
+  jsonPath: (string | number)[],
+  measureIndex: number | undefined,
+  fraction: [number, number] | undefined
+): void {
+  out.push(
+    measureIndex === undefined
+      ? { kind, path, jsonPath }
+      : { kind, path, jsonPath, measureIndex, onset: fraction ?? [0, 1] }
+  );
 }
 
 /** A measure-scoped attribute, addressed by navigating to its bar. */
@@ -399,7 +431,13 @@ function walkEvent(
   ))
     push(out, 'lyric', `${path}/lyric/${line}`, [...jsonPath, 'lyrics', 'lines', line]);
   for (const marking of Object.keys((event.markings ?? {}) as Record<string, unknown>))
-    push(out, 'articulation', `${path}/marking/${marking}`, [...jsonPath, 'markings', marking]);
+    pushOnNote(
+      out,
+      'articulation',
+      `${path}/marking/${marking}`,
+      [...jsonPath, 'markings', marking],
+      keyOf?.(0, notes[0] ?? {})
+    );
 }
 
 function walkContent(
@@ -502,12 +540,24 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
           reachable ? measureIndex : undefined
         );
       }
-      for (const [dynamicIndex] of (measure.dynamics ?? []).entries())
-        push(out, 'dynamic', `${measurePath}/dyn${dynamicIndex}`, [...measureJson, 'dynamics', dynamicIndex]);
-      for (const [directionIndex] of (measure.directions ?? []).entries())
-        push(out, 'direction', `${measurePath}/dir${directionIndex}`, [
-          ...measureJson, 'directions', directionIndex
-        ]);
+      for (const [dynamicIndex, dynamic] of (measure.dynamics ?? []).entries())
+        pushPositioned(
+          out,
+          'dynamic',
+          `${measurePath}/dyn${dynamicIndex}`,
+          [...measureJson, 'dynamics', dynamicIndex],
+          partIndex === 0 ? measureIndex : undefined,
+          dynamic.position?.fraction
+        );
+      for (const [directionIndex, direction] of (measure.directions ?? []).entries())
+        pushPositioned(
+          out,
+          'direction',
+          `${measurePath}/dir${directionIndex}`,
+          [...measureJson, 'directions', directionIndex],
+          partIndex === 0 ? measureIndex : undefined,
+          direction.position?.fraction
+        );
       for (const [ottavaIndex] of (measure.ottavas ?? []).entries())
         push(out, 'ottava', `${measurePath}/ottava${ottavaIndex}`, [
           ...measureJson, 'ottavas', ottavaIndex

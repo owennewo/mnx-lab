@@ -32,7 +32,9 @@ import {
   type ShellAction
 } from '../edit/keymap.ts';
 import {
+  ADORNMENT_HELP,
   BAR_ATTRIBUTE_HELP,
+  parseAdornment,
   CLEF_NAME_LIST,
   parseBarAttribute,
   parseClef,
@@ -49,7 +51,7 @@ import '../elements/ScoreViewer.ts';
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
-type PopoverKind = 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar';
+type PopoverKind = 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar' | 'adornment';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
   time: {
@@ -77,6 +79,11 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
     placeholder: 'C · Bb · F# · -3 · inherit',
     hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
   },
+  adornment: {
+    label: 'adornment',
+    placeholder: 'accent · staccato · mf · text Play 8x',
+    hint: 'at the cursor’s position · “no <adornment>” strips it · Enter applies · Esc closes'
+  },
   bar: {
     label: 'bar attribute',
     placeholder: 'barline double · repeat end · ending 1,2 · tempo 120 · full-measure rest',
@@ -90,7 +97,8 @@ const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   partPopover: 'part',
   clefPopover: 'clef',
   keySignaturePopover: 'key',
-  barAttributePopover: 'bar'
+  barAttributePopover: 'bar',
+  adornmentPopover: 'adornment'
 };
 
 import './ScoreHud.ts';
@@ -1001,6 +1009,19 @@ export class ScenarioPage extends LitElement {
               ...(clef.octave ? { octave: clef.octave } : {})
             }
       );
+    } else if (this.setupPopover === 'adornment') {
+      const parsed = parseAdornment(input.value);
+      if (!parsed) {
+        this.setupPopoverError = `not an adornment — ${ADORNMENT_HELP}`;
+        return;
+      }
+      this.stripIntent(
+        'marking' in parsed
+          ? { type: parsed.remove ? 'removeMarking' : 'setMarking', marking: parsed.marking }
+          : 'positioned' in parsed
+            ? { type: 'setPositioned', attribute: parsed.positioned }
+            : { type: 'removePositioned', kind: parsed.removePositioned }
+      );
     } else if (this.setupPopover === 'bar') {
       const parsed = parseBarAttribute(input.value);
       if (!parsed) {
@@ -1423,6 +1444,7 @@ export class ScenarioPage extends LitElement {
           <button @click=${() => this.openPopover('clefPopover')}>clef…</button>
           <button @click=${() => this.openPopover('keySignaturePopover')}>key…</button>
           <button @click=${() => this.openPopover('barAttributePopover')}>bar…</button>
+          <button @click=${() => this.openPopover('adornmentPopover')}>adorn…</button>
         </div>
         <div class="action-state">
           entry duration: ${this.session.entryDurationBase}

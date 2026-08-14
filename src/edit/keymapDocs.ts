@@ -245,6 +245,14 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: { all: 'key signature… (typed popover: C/Bb/-3/+2; `inherit` un-declares)' }
   },
   {
+    keys: 'Shift+A',
+    strokes: [{ code: 'KeyA', shift: true }],
+    group: 'setup',
+    meaning: {
+      all: 'adornment… (typed popover: accent/staccato/…, a dynamic like mf, or `text …`; `no X` strips)'
+    }
+  },
+  {
     keys: 'Shift+B',
     strokes: [{ code: 'KeyB', shift: true }],
     group: 'setup',
@@ -290,6 +298,12 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // token emits the removal intent (campaign item 5).
   clefPopover: ['setClef', 'removeClef'],
   keySignaturePopover: ['setKeySignature', 'removeKeySignature'],
+  adornmentPopover: [
+    'setMarking',
+    'removeMarking',
+    'setPositioned',
+    'removePositioned'
+  ],
   barAttributePopover: [
     'setMeasureAttribute',
     'removeMeasureAttribute',

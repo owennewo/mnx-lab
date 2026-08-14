@@ -95,7 +95,7 @@ agreed or candidate claims; **bold** = agreed.
 | 5 | [clef & key signature](core-element-ops-clef-key.md) | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class; `inherit` is the removal token. | **22 scenarios reachable** (from 1); 101 clefs + 6 key sigs removable | **Shift+C** clef, **Shift+K** key | **measure** | **built 2026-08-14** |
 | 6 | accidental spelling | Flats (natural-then-sharp policy makes E♭ unwritable), enharmonic respell, `accidentalDisplay`/parentheses. | 9+ | respell: single key | note | undrafted |
 | 7 | [bar-attribute family](core-element-ops-bar-attributes.md) | Barlines, repeats, endings, segno/jump/fine, sections, rehearsal, tempo — one typed-popover family on the global measure. ONE op pair for ten kinds; `no <attribute>` strips. | **18 scenarios** (reachable 24 → 42); 56 elements removable | **Shift+B** | **measure** | **built 2026-08-14** |
-| 8 | event adornments | Articulations/markings, dynamics, directions. | ~14 | adornment alphabet (letter keys) | note/event | undrafted |
+| 8 | [event adornments](core-element-ops-adornments.md) | Articulations/markings, dynamics, directions — **two** op pairs, because markings are owned by the event and the other two by the part measure. | 13 (reachable 55 → 68); 70 elements | **Shift+A** popover (letter accelerators deferred) | **note/event** | **built 2026-08-14** |
 | 9 | tab technique alphabet | Bends, slides, hammer/pull, vibrato, palm mute, harmonics — the `B H S V X O` set `keymapDocs.ts` already reserves. Entry side of [core-guitar-technique.md](../proposed/core-guitar-technique.md) (which owns rendering). | 5 | **B H S V X O** (reserved) | note | undrafted |
 | 10 | [spanners](core-element-ops-spanners.md) | Slurs; tie variants (`crossVoice`, `lv`, `arpeggio`). The two-ended **anchor gesture** (press, navigate, press); reference removal class. | 3 (reachable 42 → 45) | **S**, polymorphic by projection: slur in notation, slide in tab (resolves item 9's collision) | **note→note** | **built 2026-08-14** |
 | 11 | [rhythm declarations](core-element-ops-rhythm-declarations.md) | **Split at build time**: this item takes the declarations that leave ink where it is — beams (top level), full-measure rests, measure repeats. Beams reuse item 10's anchor at event→event. | 10 (reachable 45 → 55); 22 elements | **B**, polymorphic (beam in notation, bend in tab); rests via the bar popover | **measure**, **event→event** | **built 2026-08-14** |
@@ -108,6 +108,24 @@ et al are layout-only, zero measures — a different surface, not keys), percuss
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — item 8 built: the family test says "two pairs", and a new kind of address.**
+  Markings (`setMarking`/`removeMarking`) plus dynamics and directions
+  (`setPositioned`/`removePositioned`), behind one `Shift+A` popover.
+  - **Item 7's test earned its keep by saying NO.** All three read as "something
+    attached to this moment", but markings are keys on the *event* while dynamics
+    and directions are positioned entries on the *part measure*. Collapsing them
+    would have meant a payload whose owner depended on its own discriminant.
+    Same test, opposite answer — which is what makes it a test.
+  - **The first two-coordinate address.** Every attribute so far was reachable by
+    measure index; a dynamic sits at a *moment*, so `ElementRef` grew `onset` and
+    the sweep drives `nextPosition` until the cursor's position matches. Later
+    positioned families (item 11b's `space`, mid-bar clefs) inherit it.
+  - **Reachable 55 → 68, removable 842 → 912**, both predictions exact.
+  - **Letter accelerators deliberately deferred.** The index pencilled in an
+    "adornment alphabet", but claiming eight letters while the vocabulary is
+    unsettled spends the campaign's scarcest budget worst. Keys are the unstable
+    layer; the ops and traces will not change when they bind.
 
 - **2026-08-14 — item 11 built, at half its index row's scope, because the code said so.**
   Beams (top level), full-measure rests and measure repeats; the rest of the row

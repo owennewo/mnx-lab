@@ -85,6 +85,23 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
   // Measure-scoped attributes are addressed by navigating to their bar, then
   // fired with their own verb: the inherited pair reverts to the predecessor's
   // governance (item 5), the bar-attribute family simply strips (item 7).
+  // Positioned adornments need the cursor at the right MOMENT, not just the
+  // right bar — the first elements whose address has two coordinates.
+  if (element.kind === 'dynamic' || element.kind === 'direction') {
+    if (element.measureIndex === undefined) return { address: 'unaddressable', removal: 'no-op' };
+    session.handleIntent({ type: 'goToMeasure', measureIndex: element.measureIndex });
+    const [num, den] = element.onset ?? [0, 1];
+    for (let guard = 0; guard < 64; guard++) {
+      const at = session.cursor.onset;
+      if (at.num * den === num * at.den) break;
+      if (!session.handleIntent({ type: 'nextPosition' })) break;
+    }
+    const at = session.cursor.onset;
+    if (at.num * den !== num * at.den) return { address: 'unaddressable', removal: 'no-op' };
+    const applied = session.handleIntent({ type: 'removePositioned', kind: element.kind });
+    return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
+  }
+
   const measureIntent = measureRemovalIntent(element.kind);
   if (measureIntent) {
     if (element.measureIndex === undefined) return { address: 'unaddressable', removal: 'no-op' };
@@ -110,7 +127,9 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
         ? ({ type: 'toggleSlur' } as const)
         : element.kind === 'beam'
           ? ({ type: 'toggleBeam' } as const)
-          : ({ type: 'delete' } as const);
+          : element.kind === 'articulation'
+            ? ({ type: 'removeMarking', marking: element.path.split('/').pop()! } as const)
+            : ({ type: 'delete' } as const);
   // "Handled" is not "removed": `toggleSlur` legitimately returns true when it
   // merely ARMS an anchor, and a walk that counted that as a removal would
   // report ink gone that is still on the page. Compare the document instead.

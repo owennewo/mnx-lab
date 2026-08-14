@@ -6,7 +6,7 @@
 // lives in edit/ — it is input-layer logic, DOM-free and unit-testable; the
 // popover chrome in ui/ only hosts the input box.
 import type { MnxNoteValueBase, MnxPitch, MnxTuningEntry } from '../model/mnx.ts';
-import type { MeasureAttribute, MeasureAttributeKind } from './ops.ts';
+import type { MeasureAttribute, MeasureAttributeKind, PositionedAttribute } from './ops.ts';
 
 /** "4/4", "6/8", "12/8" → an MNX time signature. Unit must be a power of two
  *  the notation can express. */
@@ -281,4 +281,65 @@ export function parseBarAttribute(text: string): BarAttributeResult {
     default:
       return null;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Event adornments (campaign item 8,
+// roadmap/inprogress/core-element-ops-adornments.md). One popover, three kinds
+// with two owners: a bare marking word, a bare dynamic word, or `text …`.
+// Removal keeps item 7's `no <thing>` token — these are annotations too.
+
+const MARKING_WORDS = [
+  'accent', 'breath', 'softAccent', 'spiccato', 'staccatissimo', 'staccato',
+  'stress', 'strongAccent', 'tenuto'
+] as const;
+
+const DYNAMIC_WORDS = [
+  'pppppp', 'ppppp', 'pppp', 'ppp', 'pp', 'p', 'mp', 'mf',
+  'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff', 'n'
+] as const;
+
+export const ADORNMENT_HELP =
+  'accent · staccato · tenuto · strongAccent · … · a dynamic (pp, mf, fff) · ' +
+  'text Play 8x · no accent · no dynamic · no text';
+
+export type AdornmentResult =
+  | { marking: string; remove?: boolean }
+  | { positioned: PositionedAttribute }
+  | { removePositioned: PositionedAttribute['kind'] }
+  | null;
+
+/** `marcato` is what players say; MNX calls it `strongAccent`. */
+const MARKING_ALIASES: Record<string, string> = { marcato: 'strongAccent' };
+
+export function parseAdornment(text: string): AdornmentResult {
+  const trimmed = text.trim().replace(/\s+/g, ' ');
+  if (trimmed === '') return null;
+  const words = trimmed.split(' ');
+  const head = words[0].toLowerCase();
+
+  if (head === 'no') {
+    const target = (words[1] ?? '').toLowerCase();
+    if (target === 'dynamic') return { removePositioned: 'dynamic' };
+    if (target === 'text' || target === 'direction') return { removePositioned: 'direction' };
+    const marking = resolveMarking(words[1] ?? '');
+    return marking ? { marking, remove: true } : null;
+  }
+
+  if (head === 'text') {
+    const body = words.slice(1).join(' ');
+    return body === '' ? null : { positioned: { kind: 'direction', text: body } };
+  }
+
+  const dynamic = DYNAMIC_WORDS.find(d => d === trimmed);
+  if (dynamic) return { positioned: { kind: 'dynamic', value: dynamic } };
+
+  const marking = resolveMarking(trimmed);
+  return marking ? { marking } : null;
+}
+
+function resolveMarking(word: string): string | null {
+  const lower = word.toLowerCase();
+  const aliased = MARKING_ALIASES[lower] ?? word;
+  return MARKING_WORDS.find(m => m.toLowerCase() === aliased.toLowerCase()) ?? null;
 }

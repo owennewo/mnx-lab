@@ -4,8 +4,8 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "no-op": 618,
-      "removed": 842
+      "no-op": 548,
+      "removed": 912
     },
     "unaddressableWithAnOp": 201
   },
@@ -14,7 +14,7 @@
       "no-op": 7
     },
     "articulation": {
-      "no-op": 14
+      "removed": 14
     },
     "barline": {
       "removed": 7
@@ -31,10 +31,10 @@
       "no-op": 12
     },
     "direction": {
-      "no-op": 13
+      "removed": 13
     },
     "dynamic": {
-      "no-op": 43
+      "removed": 43
     },
     "ending": {
       "removed": 7
@@ -178,7 +178,7 @@
     },
     "lab/articulations/rare-articulations": {
       "articulation": {
-        "no-op": 4
+        "removed": 4
       },
       "clef": {
         "removed": 1
@@ -195,7 +195,7 @@
     },
     "lab/articulations/unrendered-marks": {
       "articulation": {
-        "no-op": 3
+        "removed": 3
       },
       "clef": {
         "removed": 1
@@ -298,7 +298,7 @@
         "removed": 1
       },
       "dynamic": {
-        "no-op": 6
+        "removed": 6
       },
       "note": {
         "removed": 6
@@ -312,7 +312,7 @@
         "removed": 1
       },
       "dynamic": {
-        "no-op": 27
+        "removed": 27
       },
       "note": {
         "removed": 28
@@ -326,7 +326,7 @@
         "removed": 1
       },
       "dynamic": {
-        "no-op": 2
+        "removed": 2
       },
       "note": {
         "removed": 2
@@ -504,7 +504,7 @@
         "removed": 1
       },
       "direction": {
-        "no-op": 3
+        "removed": 3
       },
       "note": {
         "removed": 8
@@ -519,7 +519,7 @@
         "no-op": 1
       },
       "direction": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 8,
@@ -544,7 +544,7 @@
         "no-op": 1
       },
       "direction": {
-        "no-op": 3
+        "removed": 3
       },
       "note": {
         "removed": 5,
@@ -565,7 +565,7 @@
         "removed": 1
       },
       "direction": {
-        "no-op": 4
+        "removed": 4
       },
       "note": {
         "removed": 4
@@ -579,7 +579,7 @@
         "removed": 1
       },
       "direction": {
-        "no-op": 2
+        "removed": 2
       },
       "note": {
         "removed": 8
@@ -1170,7 +1170,7 @@
     },
     "spec/articulations": {
       "articulation": {
-        "no-op": 4
+        "removed": 4
       },
       "clef": {
         "removed": 1
@@ -1301,7 +1301,7 @@
         "removed": 1
       },
       "dynamic": {
-        "no-op": 6
+        "removed": 6
       },
       "note": {
         "removed": 6
@@ -1315,7 +1315,7 @@
         "removed": 1
       },
       "dynamic": {
-        "no-op": 2
+        "removed": 2
       },
       "note": {
         "removed": 7
@@ -1767,7 +1767,7 @@
     },
     "spec/single-note-tremolos": {
       "articulation": {
-        "no-op": 3
+        "removed": 3
       },
       "clef": {
         "removed": 1

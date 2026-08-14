@@ -31,6 +31,7 @@ const SURFACE_LABELS: Record<string, string> = {
   clefPopover: 'Shift+C · popover',
   keySignaturePopover: 'Shift+K · popover',
   barAttributePopover: 'Shift+B · popover',
+  adornmentPopover: 'Shift+A · popover',
   commandPalette: 'Ctrl+K · palette',
   goTo: 'Ctrl+G · go-to',
   viewSwitcher: 'view tabs'
@@ -143,6 +144,16 @@ function opLabel(op: EditOp): string {
       return `remove slur at ${op.noteKey}`;
     case 'setTieVariant':
       return `tie ${op.lv ? 'l.v.' : (op.targetType ?? 'variant')} · ${op.noteId}`;
+    case 'setMarking':
+      return `${op.marking} · ${op.noteKey}`;
+    case 'removeMarking':
+      return `no ${op.marking} · ${op.noteKey}`;
+    case 'setPositioned':
+      return op.attribute.kind === 'dynamic'
+        ? `dynamic ${op.attribute.value ?? (op.attribute.glyphs ?? []).join(' ')} @ m${op.measureIndex + 1} ${onsetText(op.onset)}`
+        : `text “${op.attribute.text}” @ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
+    case 'removePositioned':
+      return `no ${op.kind} @ m${op.measureIndex + 1}`;
     case 'setBeam':
       return `beam ${op.eventIds.length} events @ m${op.measureIndex + 1}`;
     case 'removeBeam':
