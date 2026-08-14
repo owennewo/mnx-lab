@@ -69,7 +69,7 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
   },
   part: {
     label: 'part',
-    placeholder: 'Guitar · capo 3 · staves 2 · no strings',
+    placeholder: 'Guitar · capo 3 · staves 2 · no strings · no layout 2',
     hint: 'a name adds a part; capo/staves change this one; “no <thing>” strips · Enter applies · Esc closes'
   },
   clef: {
@@ -1004,7 +1004,13 @@ export class ScenarioPage extends LitElement {
         this.stripIntent(
           'set' in declaration
             ? { type: 'setPartDeclaration', declaration: declaration.set }
-            : { type: 'removePartDeclaration', kind: declaration.remove }
+            : 'removeDocument' in declaration
+              ? declaration.removeDocument === 'layout'
+                ? { type: 'removeLayout', index: declaration.index }
+                : declaration.removeDocument === 'score'
+                  ? { type: 'removeScore', index: declaration.index }
+                  : { type: 'removeMultimeasureRest', scoreIndex: 0, index: declaration.index }
+              : { type: 'removePartDeclaration', kind: declaration.remove }
         );
         this.setupPopover = null;
         return;

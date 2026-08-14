@@ -266,6 +266,14 @@ export type EditOp =
   // roadmap/inprogress/core-element-ops-part-declarations.md): five keys on
   // parts[0] that shipped with constructors and no removals. One pair, because
   // they share an owner — item 7's test, third application.
+  // The document's presentation layer (campaign item 13b's remainder): a
+  // LAYOUT is a tree of staff/group nodes, a SCORE a presentation with its own
+  // system breaks. Neither is a declaration, so neither gets a typed grammar
+  // here — removal lands now, authoring waits for a surface that can express a
+  // tree without pretending a one-line grammar is one.
+  | { type: 'removeLayout'; index: number }
+  | { type: 'removeScore'; index: number }
+  | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }
   | { type: 'setPartDeclaration'; declaration: PartDeclaration }
   | {
       type: 'removePartDeclaration';
@@ -884,6 +892,40 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       delete x.fingering;
       if (Object.keys(x).length === 0) delete located.note._x!.mnxLab;
       if (Object.keys(located.note._x!).length === 0) delete located.note._x;
+      return next;
+    }
+    case 'removeLayout': {
+      const layouts = next.layouts;
+      if (!layouts?.[op.index]) return next;
+      const id = layouts[op.index].id;
+      const kept = layouts.filter((_, i) => i !== op.index);
+      if (kept.length > 0) next.layouts = kept;
+      else delete next.layouts;
+      // The *reference* class: a score naming a layout that no longer exists
+      // would dangle, and the field is optional — so unlinking means "all
+      // parts", which is what a score with no layout has always meant.
+      for (const score of next.scores ?? []) {
+        if (score.layout === id) delete score.layout;
+        for (const page of score.pages ?? [])
+          for (const system of page.systems ?? []) if (system.layout === id) delete system.layout;
+      }
+      return next;
+    }
+    case 'removeScore': {
+      const scores = next.scores;
+      if (!scores?.[op.index]) return next;
+      const kept = scores.filter((_, i) => i !== op.index);
+      if (kept.length > 0) next.scores = kept;
+      else delete next.scores;
+      return next;
+    }
+    case 'removeMultimeasureRest': {
+      const score = next.scores?.[op.scoreIndex];
+      const rests = score?.multimeasureRests;
+      if (!score || !rests?.[op.index]) return next;
+      const kept = rests.filter((_, i) => i !== op.index);
+      if (kept.length > 0) score.multimeasureRests = kept;
+      else delete score.multimeasureRests;
       return next;
     }
     case 'setPartDeclaration': {

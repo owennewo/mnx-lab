@@ -165,6 +165,12 @@ function opLabel(op: EditOp): string {
       return `fingering ${op.hand} ${op.finger} · ${op.noteKey}`;
     case 'removeFingering':
       return `no fingering · ${op.noteKey}`;
+    case 'removeLayout':
+      return `remove layout ${op.index + 1}`;
+    case 'removeScore':
+      return `remove score ${op.index + 1}`;
+    case 'removeMultimeasureRest':
+      return `remove multimeasure rest ${op.index + 1} (score ${op.scoreIndex + 1})`;
     case 'setPartDeclaration':
       return `part ${op.declaration.kind} ${op.declaration.value}`;
     case 'removePartDeclaration':

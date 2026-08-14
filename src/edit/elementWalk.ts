@@ -267,12 +267,18 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   },
   layout: {
     classes: ['brace', 'bracket', 'group-label', 'source-label'],
-    note: 'A system layout: staff grouping, braces and their labels.'
+    note: 'A system layout: staff grouping, braces and their labels. Removal unlinks the scores that named it — the field is optional, and a score without one means "all parts".',
+    remove: ['removeLayout']
   },
-  score: { classes: ['score-title'], note: 'One presentation of the document.' },
+  score: {
+    classes: ['score-title'],
+    note: 'One presentation of the document.',
+    remove: ['removeScore']
+  },
   'multimeasure-rest': {
     classes: ['multirest-bar', 'multirest-cap', 'multirest-count'],
-    note: 'A collapsed measure range inside a score.'
+    note: 'A collapsed measure range inside a score.',
+    remove: ['removeMultimeasureRest']
   },
   'lyric-line-metadata': {
     classes: [],

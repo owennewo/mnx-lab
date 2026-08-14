@@ -69,6 +69,9 @@ function parsePitchToken(token: string): MnxPitch | null {
 export type PartDeclarationResult =
   | { set: PartDeclaration }
   | { remove: PartDeclarationKind }
+  /** The document's presentation layer (campaign item 13b): 1-based, because
+   *  the user is counting what they can see, not indexing an array. */
+  | { removeDocument: 'layout' | 'score' | 'multimeasureRest'; index: number }
   | null;
 
 const PART_REMOVAL_WORDS: Record<string, PartDeclarationKind> = {
@@ -85,7 +88,16 @@ export function parsePartDeclaration(text: string): PartDeclarationResult {
   const words = trimmed.split(' ');
   const head = (words[0] ?? '').toLowerCase();
   if (head === 'no') {
-    const kind = PART_REMOVAL_WORDS[(words[1] ?? '').toLowerCase()];
+    const target = (words[1] ?? '').toLowerCase();
+    const nth = Number(words[2] ?? '1');
+    if (target === 'layout' || target === 'score' || target === 'multimeasure-rest') {
+      if (!Number.isInteger(nth) || nth < 1) return null;
+      return {
+        removeDocument: target === 'multimeasure-rest' ? 'multimeasureRest' : target,
+        index: nth - 1
+      };
+    }
+    const kind = PART_REMOVAL_WORDS[target];
     return kind ? { remove: kind } : null;
   }
   if (head === 'capo' || head === 'staves') {

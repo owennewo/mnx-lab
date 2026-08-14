@@ -541,6 +541,22 @@ export class EditorSession {
         }
         return true;
       }
+      case 'removeLayout':
+      case 'removeScore':
+      case 'removeMultimeasureRest': {
+        const before_ = JSON.stringify(this.doc);
+        this.apply(
+          intent.type === 'removeMultimeasureRest'
+            ? { type: 'removeMultimeasureRest', scoreIndex: intent.scoreIndex, index: intent.index }
+            : { type: intent.type, index: intent.index }
+        );
+        if (JSON.stringify(this.doc) === before_) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
       case 'setMarking':
       case 'removeMarking': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);

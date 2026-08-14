@@ -335,7 +335,16 @@ export const KEY_DOCS: KeyDoc[] = [
 export const SURFACE_INTENTS: Record<string, string[]> = {
   timeSignaturePopover: ['setTimeSignature', 'removeTimeSignature'],
   tuningPopover: ['setTuning'],
-  partPopover: ['addPart', 'setPartDeclaration', 'removePartDeclaration'],
+  partPopover: [
+    'addPart',
+    'setPartDeclaration',
+    'removePartDeclaration',
+    // The document's presentation layer shares the score rung's surface: the
+    // user supplies the index, as `no line 2` does for lyric verses.
+    'removeLayout',
+    'removeScore',
+    'removeMultimeasureRest'
+  ],
   // One popover per attribute, two intents each: the grammar's `inherit`
   // token emits the removal intent (campaign item 5).
   clefPopover: ['setClef', 'removeClef'],
@@ -363,7 +372,13 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'setMeasureRepeat',
     'removeMeasureRepeat'
   ],
-  commandPalette: ['undo', 'redo', 'appendMeasure', 'toggleTie', 'setStaffKind'],
+  commandPalette: [
+    'undo',
+    'redo',
+    'appendMeasure',
+    'toggleTie',
+    'setStaffKind'
+  ],
   goTo: ['goToMeasure'],
   // The view tabs (workbench) / view attribute (embeds): switching the pane
   // is what emits setProjection — recorded so traces replay faithfully.

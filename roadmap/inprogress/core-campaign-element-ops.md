@@ -110,6 +110,23 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
+- **2026-08-14 — the presentation layer: removal without construction, on purpose.**
+  `layout`, `score` and `multimeasure-rest` (26 elements) become removable;
+  **corpus 1,389 → 1,415 of 1,460**.
+  - **The pair is defined, not shipped whole.** A layout is a *tree* and a score
+    a *presentation*; authoring either needs a surface that can express a tree,
+    and a one-line grammar pretending otherwise would be worse than the gap. The
+    construct report keeps saying they block six scenarios each until that
+    surface exists — which is the honest state, and the inverse of the
+    "construct without removal" pairs the earlier audit found.
+  - **Removing a layout unlinks the scores that named it**, and the reference
+    class is unusually clean here: `score.layout` is optional, so unlinking
+    means "all parts" — a sane state rather than a hole.
+  - **The palette could not be the surface** because it deliberately cannot see
+    the loaded document, so it cannot enumerate what to offer. The typed
+    popover can, with the user supplying the index (`no layout 2`) exactly as
+    `no line 2` does for lyric verses.
+
 - **2026-08-14 — staff addressing, and a bug in ordinary editing it exposed.**
   The cursor carries a `staffIndex`, the grid filters to it, `setStaff` moves
   between them, and the renderer keys any staff showing one part's one staff.

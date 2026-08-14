@@ -69,6 +69,27 @@ failures), clefs 112 (1 left, the mid-measure one), ties and beams all but four.
 Three more scenarios' goldens gained `sourceId`s on staff 2 — `spec/grand-staff`,
 `spec/organ-layout`, `lab/score-text/directions-multi-staff` — no geometry moved.
 
+## The presentation layer (2026-08-14)
+
+`layout`, `score` and `multimeasure-rest` — 26 elements, the last large block —
+get **removal only**, and the asymmetry is the point:
+
+- A **layout** is a tree of staff and group nodes; a **score** is a presentation
+  with its own page and system breaks. Neither is a declaration, so neither gets
+  a typed grammar: authoring one needs a surface that can express a tree without
+  pretending a one-line grammar is one. Naming that gap is better than filling
+  it badly, and the construct report keeps saying `layout`/`score` block six
+  scenarios each until it is filled.
+- Removing a layout **unlinks the scores that named it** — the *reference*
+  class, and unusually clean here because `score.layout` is optional: a score
+  without one means "all parts", which is a sane state rather than a hole.
+- The surface is the part popover's `no layout 2` / `no score 1`, where the user
+  supplies the index, exactly as `no line 2` does for lyric verses. The palette
+  would have been the natural home, but it deliberately cannot see the loaded
+  document, so it cannot enumerate what to offer.
+
+**All 26 removed; the corpus reaches 1,415 of 1,460.**
+
 ## What remains, honestly
 
 - **Entry still writes to `parts[0]`** (item 13c). You can navigate to part 2,

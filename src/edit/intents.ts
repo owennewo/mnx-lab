@@ -118,6 +118,11 @@ export type MutationIntent =
   | { type: 'removeStringAnnotation' }
   | { type: 'setPartDeclaration'; declaration: PartDeclaration }
   | { type: 'removePartDeclaration'; kind: PartDeclarationKind }
+  // Document-level presentation: no cursor involved, the document IS the
+  // address (as with lyric lines).
+  | { type: 'removeLayout'; index: number }
+  | { type: 'removeScore'; index: number }
+  | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }
   | { type: 'setMarking'; marking: string }
   | { type: 'removeMarking'; marking: string }
   | { type: 'setPositioned'; attribute: PositionedAttribute }

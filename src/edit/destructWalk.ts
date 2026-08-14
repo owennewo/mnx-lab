@@ -98,6 +98,24 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
   // Document-level declarations need no navigation either: the document is the
   // address. A lyric LINE is score-wide (its label and language), unlike the
   // syllables that hang off notes.
+  if (element.kind === 'layout' || element.kind === 'score') {
+    const index = Number(/(\d+)$/.exec(element.path)?.[1] ?? -1);
+    if (index < 0) return { address: 'unaddressable', removal: 'no-op' };
+    const applied = session.handleIntent(
+      element.kind === 'layout' ? { type: 'removeLayout', index } : { type: 'removeScore', index }
+    );
+    return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
+  }
+  if (element.kind === 'multimeasure-rest') {
+    const match = /^score(\d+)\/mmr(\d+)$/.exec(element.path);
+    if (!match) return { address: 'unaddressable', removal: 'no-op' };
+    const applied = session.handleIntent({
+      type: 'removeMultimeasureRest',
+      scoreIndex: Number(match[1]),
+      index: Number(match[2])
+    });
+    return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
+  }
   if (element.kind === 'lyric-line-metadata') {
     const line = element.path.split('/').pop()!;
     const applied = session.handleIntent({ type: 'removeLyricLine', line });
