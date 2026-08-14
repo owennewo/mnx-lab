@@ -350,7 +350,8 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'setMarking',
     'removeMarking',
     'setPositioned',
-    'removePositioned'
+    'removePositioned',
+    'removeStringAnnotation'
   ],
   barAttributePopover: [
     'setMeasureAttribute',

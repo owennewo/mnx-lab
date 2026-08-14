@@ -55,6 +55,28 @@ Every technique attaches to the note under the cursor.
 - Goldens byte-identical: nothing here draws yet, which is the renderer gap
   core-guitar-technique.md owns.
 
+## The string annotation's missing half (2026-08-14)
+
+Audited after item 5's time-signature oversight, the kind table showed one more
+unfinished pair: `setFret` wrote a note's string choice and nothing stripped it —
+34 elements.
+
+`removeStringAnnotation` closes it, and the model's own rule decides the
+semantics: **the string is the choice, the fret its consequence**
+(roadmap/proposed/spec-instrument-position.md), so the fret leaves with it
+rather than surviving as a fret belonging to no string. The note falls back to
+the derivation ladder, which is instrument neutrality read from the other
+direction — removing the annotation does not remove the tab, it returns the
+choice to the renderer.
+
+The surface is the adornment popover's `no string`, on the same reasoning item
+11 used for the bar popover: a popover is a surface, not a data-owner, and the
+note-level annotations belong together whatever object holds them.
+
+**34 removed; the corpus reaches 1,218 removable elements — and the kind table
+now has no rows with a construct verb and no removal.** Every remaining `no-op`
+is a kind with no verbs at all, which is honest ground rather than an oversight.
+
 ## Scope boundary
 
 The bend's curve is written in its simplest form; authoring a multi-point bend

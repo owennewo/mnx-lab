@@ -157,7 +157,9 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
           ? ({ type: 'toggleBeam' } as const)
           : element.kind === 'articulation'
             ? ({ type: 'removeMarking', marking: element.path.split('/').pop()! } as const)
-            : element.kind === 'lyric'
+            : element.kind === 'string-annotation'
+              ? ({ type: 'removeStringAnnotation' } as const)
+              : element.kind === 'lyric'
               ? ({ type: 'removeSyllable', line: element.path.split('/').pop()! } as const)
               : element.kind === 'technique'
               ? ({ type: 'toggleTechnique', kind: element.path.split('/').pop() } as never)

@@ -247,6 +247,15 @@ export type EditOp =
   // roadmap/proposed/core-guitar-technique.md, which owns the drawing.
   | { type: 'setTechnique'; noteKey: string; technique: TechniqueChoice }
   | { type: 'removeTechnique'; noteKey: string; kind: TechniqueChoice['kind'] }
+  | {
+      /** Strip a note's string choice — and its `fret` with it, because the
+       *  fret is the CONSEQUENCE of the choice (the model's own rule: string
+       *  authoritative, fret validation-only). The note falls back to the
+       *  derivation ladder, which is what "no instrument is ever assumed"
+       *  means from the other direction. */
+      type: 'removeStringAnnotation';
+      noteKey: string;
+    }
   | { type: 'setFingering'; noteKey: string; hand: 'left' | 'right'; finger: string }
   | { type: 'removeFingering'; noteKey: string }
   // Part declarations (campaign item 13,
@@ -834,6 +843,16 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (Object.keys(tab.technique).length === 0) delete tab.technique;
       if (Object.keys(tab).length === 0) delete located.note._x!.mnxLab!.tab;
       if (Object.keys(located.note._x!.mnxLab!).length === 0) delete located.note._x!.mnxLab;
+      if (Object.keys(located.note._x!).length === 0) delete located.note._x;
+      return next;
+    }
+    case 'removeStringAnnotation': {
+      const located = findKeyedNote(next, op.noteKey);
+      const x = located?.note._x?.mnxLab;
+      if (!located || !x || x.string === undefined) return next;
+      delete x.string;
+      delete x.fret; // the consequence leaves with the choice
+      if (Object.keys(x).length === 0) delete located.note._x!.mnxLab;
       if (Object.keys(located.note._x!).length === 0) delete located.note._x;
       return next;
     }

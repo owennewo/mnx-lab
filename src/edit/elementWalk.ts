@@ -101,8 +101,9 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   'accidental-display': { classes: [], note: 'Modifier: forces or parenthesizes the note accidental.' },
   'string-annotation': {
     classes: [],
-    note: 'Modifier: chooses which string a note is played on.',
-    construct: ['setFret']
+    note: 'Modifier: chooses which string a note is played on. Removing it hands the note back to the derivation ladder — and takes the `fret` with it, since the fret is the choice’s consequence, not a second choice.',
+    construct: ['setFret'],
+    remove: ['removeStringAnnotation']
   },
   fingering: {
     classes: [],

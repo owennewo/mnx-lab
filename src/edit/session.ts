@@ -491,6 +491,18 @@ export class EditorSession {
         });
         return true;
       }
+      case 'removeStringAnnotation': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        const before = JSON.stringify(this.doc);
+        this.apply({ type: 'removeStringAnnotation', noteKey: slot.noteKey });
+        if (JSON.stringify(this.doc) === before) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
       case 'removeFingering': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;

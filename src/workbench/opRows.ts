@@ -159,6 +159,8 @@ function opLabel(op: EditOp): string {
       return `${op.technique.kind} · ${op.noteKey}`;
     case 'removeTechnique':
       return `no ${op.kind} · ${op.noteKey}`;
+    case 'removeStringAnnotation':
+      return `no string · ${op.noteKey}`;
     case 'setFingering':
       return `fingering ${op.hand} ${op.finger} · ${op.noteKey}`;
     case 'removeFingering':

@@ -1065,7 +1065,9 @@ export class ScenarioPage extends LitElement {
         return;
       }
       this.stripIntent(
-        'marking' in parsed
+        'removeStringAnnotation' in parsed
+          ? { type: 'removeStringAnnotation' }
+          : 'marking' in parsed
           ? { type: parsed.remove ? 'removeMarking' : 'setMarking', marking: parsed.marking }
           : 'positioned' in parsed
             ? { type: 'setPositioned', attribute: parsed.positioned }

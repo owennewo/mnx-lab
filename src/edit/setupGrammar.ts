@@ -346,10 +346,11 @@ const DYNAMIC_WORDS = [
 
 export const ADORNMENT_HELP =
   'accent · staccato · tenuto · strongAccent · … · a dynamic (pp, mf, fff) · ' +
-  'text Play 8x · no accent · no dynamic · no text';
+  'text Play 8x · no accent · no dynamic · no text · no string';
 
 export type AdornmentResult =
   | { marking: string; remove?: boolean }
+  | { removeStringAnnotation: true }
   | { positioned: PositionedAttribute }
   | { removePositioned: PositionedAttribute['kind'] }
   | null;
@@ -367,6 +368,9 @@ export function parseAdornment(text: string): AdornmentResult {
     const target = (words[1] ?? '').toLowerCase();
     if (target === 'dynamic') return { removePositioned: 'dynamic' };
     if (target === 'text' || target === 'direction') return { removePositioned: 'direction' };
+    // The string choice is a note-level annotation like the markings, so it
+    // strips here: `no string` hands the note back to the derivation ladder.
+    if (target === 'string' || target === 'fret') return { removeStringAnnotation: true };
     const marking = resolveMarking(words[1] ?? '');
     return marking ? { marking, remove: true } : null;
   }

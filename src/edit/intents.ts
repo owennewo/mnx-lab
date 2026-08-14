@@ -112,6 +112,7 @@ export type MutationIntent =
   | { type: 'toggleTechnique'; kind: TechniqueChoice['kind'] | 'hammerPull' }
   | { type: 'setFingering'; hand: 'left' | 'right'; finger: string }
   | { type: 'removeFingering' }
+  | { type: 'removeStringAnnotation' }
   | { type: 'setPartDeclaration'; declaration: PartDeclaration }
   | { type: 'removePartDeclaration'; kind: PartDeclarationKind }
   | { type: 'setMarking'; marking: string }

@@ -110,6 +110,23 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
+- **2026-08-14 — the last unfinished pair: string annotations.** `setFret` wrote
+  a note's string choice and nothing stripped it (34 elements). The model's own
+  rule settled the semantics — **the string is the choice, the fret its
+  consequence** — so the fret leaves with it rather than surviving as a fret
+  belonging to no string, and the note falls back to the derivation ladder.
+  Surface: `no string` in the adornment popover, on item 11's reasoning that a
+  popover is a surface rather than a data-owner.
+  - **Corpus: 1,184 → 1,218 removable elements**, and the audit that prompted it
+    now comes back clean: **no kind has a construct verb without a removal**.
+    Every remaining `no-op` is a kind with no verbs at all — honest ground rather
+    than an oversight, which is a different backlog to work.
+  - Remaining, in order: `note` 129 (second parts, staff 2, the seven navigation
+    failures), `beam` 26 (nested levels, second parts), `layout`/`score` 23,
+    `part-name`/`clef`/`staves` 27 (second parts, mid-measure clefs),
+    `accidental-display` 7, the container wrap verbs 15, percussion 6, and one
+    ottava.
+
 - **2026-08-14 — item 5's missing third member: time signatures.** The largest
   single gap on the destruct board (99 elements) was an oversight in an item
   already called done: clef and key got their inherited-attribute removals,
