@@ -101,13 +101,35 @@ agreed or candidate claims; **bold** = agreed.
 | 11 | [rhythm declarations](core-element-ops-rhythm-declarations.md) | **Split at build time**: this item takes the declarations that leave ink where it is — beams (top level), full-measure rests, measure repeats. Beams reuse item 10's anchor at event→event. | 10 (reachable 45 → 55); 22 elements | **B**, polymorphic (beam in notation, bend in tab); rests via the bar popover | **measure**, **event→event** | **built 2026-08-14** |
 | 11b | rhythm containers & onset granularity | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | ~9 | t.b.d. | event | undrafted |
 | 12 | text entry | Lyrics, part names, verse labels — a text *mode* that suspends the keymap, not a binding. | ~8 | Enter-into-text candidate | event / part | undrafted |
-| 13 | structural surface | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 (first-part genesis lands with item 1; this item owns the *second* of everything). The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
+| 13 | [part declarations](core-element-ops-part-declarations.md) | **Split at build time**: the five keys on `parts[0]` (name, strings, capo, staffKind, staves) get the removal halves their genesis verbs never had, plus constructors for capo and staves. | 2 (reachable 68 → 71); 91 elements | **Shift+P** popover (`capo 3`, `no strings`) | **score** | **built 2026-08-14** |
+| 13b | structural surface | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-codes `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changes note keys — which the primitives goldens embed. A corpus re-verification event, not a refactor. The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
 
 Beyond the campaign (recorded, not indexed): layout documents (`spec/orchestral-layout`
 et al are layout-only, zero measures — a different surface, not keys), percussion kit,
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — item 13 built at a narrower scope: every genesis verb's missing half.**
+  The five declarations on `parts[0]` (name, strings, capo, staffKind, staves) get
+  `setPartDeclaration`/`removePartDeclaration`; the index row's real subject —
+  a *second* part, voice or staff, plus layouts and scores — becomes item 13b.
+  - **The biggest remaining `no-op` counts were not exotic.** part-name 59,
+    strings 21, staff-kind 20: verbs that shipped without their pair, because
+    item 1 built genesis in a hurry for construct traces. **Removable 912 → 1003.**
+  - **13b now carries a price tag, which is why it is its own item**: `parts[0]`
+    is hard-coded in `findKeyedNote`, `buildGrid` and the note-key traversal, so
+    a second part changes note keys — and the primitives goldens embed them. That
+    is a corpus re-verification event, and it deserves an explicit decision rather
+    than arriving as a side effect.
+  - **The sweep refused this item twice and improved it both times.** Removing
+    `strings` from a tab part left it declaring an undrawable view (diagnostics
+    0 → 2) → a declared cascade: the fingerboard and the preference to show it
+    leave together. Then the no-tombstone cleanup read as damage, because
+    emptying `_x.mnxLab` collapses `_x` two levels up → the surviving-document
+    oracle grew an **ancestor-collapse** rule, precise enough that a sibling can
+    never be excused by it. **The sweep is a constraint on the ops, not a report
+    about them.**
 
 - **2026-08-14 — item 8 built: the family test says "two pairs", and a new kind of address.**
   Markings (`setMarking`/`removeMarking`) plus dynamics and directions

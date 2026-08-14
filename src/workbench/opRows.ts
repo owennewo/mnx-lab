@@ -144,6 +144,10 @@ function opLabel(op: EditOp): string {
       return `remove slur at ${op.noteKey}`;
     case 'setTieVariant':
       return `tie ${op.lv ? 'l.v.' : (op.targetType ?? 'variant')} · ${op.noteId}`;
+    case 'setPartDeclaration':
+      return `part ${op.declaration.kind} ${op.declaration.value}`;
+    case 'removePartDeclaration':
+      return `part: no ${op.kind}`;
     case 'setMarking':
       return `${op.marking} · ${op.noteKey}`;
     case 'removeMarking':

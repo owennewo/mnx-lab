@@ -3,14 +3,13 @@
   "summary": {
     "scenarios": 106,
     "traced": 5,
-    "opsReachable": 63,
-    "blocked": 33,
+    "opsReachable": 66,
+    "blocked": 30,
     "expectedUnreachable": 5
   },
   "blockingKinds": {
     "layout": 6,
     "score": 6,
-    "staves": 5,
     "technique": 5,
     "grace": 4,
     "lyric": 4,
@@ -19,7 +18,6 @@
     "lyric-line-metadata": 2,
     "space": 2,
     "tuplet": 2,
-    "capo": 1,
     "kit-component": 1,
     "kit-note": 1,
     "multimeasure-rest": 1,
@@ -123,10 +121,7 @@
       "tier": "ops-reachable"
     },
     "lab/score-text/directions-multi-staff": {
-      "tier": "blocked",
-      "blockedBy": [
-        "staves"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/score-text/directions-stacked": {
       "tier": "ops-reachable"
@@ -153,10 +148,7 @@
       "tier": "traced"
     },
     "lab/tab-derivation/capo": {
-      "tier": "blocked",
-      "blockedBy": [
-        "capo"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/tab-derivation/drop-d": {
       "tier": "ops-reachable"
@@ -300,10 +292,7 @@
       ]
     },
     "spec/grand-staff": {
-      "tier": "blocked",
-      "blockedBy": [
-        "staves"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/hello-world": {
       "tier": "traced"
@@ -364,8 +353,7 @@
       "tier": "blocked",
       "blockedBy": [
         "layout",
-        "score",
-        "staves"
+        "score"
       ]
     },
     "spec/organ-layout": {
@@ -373,8 +361,7 @@
       "blockedBy": [
         "accidental-display",
         "layout",
-        "score",
-        "staves"
+        "score"
       ]
     },
     "spec/ottavas-8va": {
@@ -420,8 +407,7 @@
       "tier": "blocked",
       "blockedBy": [
         "layout",
-        "score",
-        "staves"
+        "score"
       ]
     },
     "spec/tempo-markings": {

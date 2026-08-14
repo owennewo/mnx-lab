@@ -230,7 +230,9 @@ export const KEY_DOCS: KeyDoc[] = [
     keys: 'Shift+P',
     strokes: [{ code: 'KeyP', shift: true }],
     group: 'setup',
-    meaning: { all: 'add part… (typed popover; empty input = anonymous part)' }
+    meaning: {
+      all: 'part… (typed popover: a name adds one; `capo 3`/`staves 2` change it; `no <thing>` strips)'
+    }
   },
   {
     keys: 'Shift+C',
@@ -293,7 +295,7 @@ export const KEY_DOCS: KeyDoc[] = [
 export const SURFACE_INTENTS: Record<string, string[]> = {
   timeSignaturePopover: ['setTimeSignature'],
   tuningPopover: ['setTuning'],
-  partPopover: ['addPart'],
+  partPopover: ['addPart', 'setPartDeclaration', 'removePartDeclaration'],
   // One popover per attribute, two intents each: the grammar's `inherit`
   // token emits the removal intent (campaign item 5).
   clefPopover: ['setClef', 'removeClef'],

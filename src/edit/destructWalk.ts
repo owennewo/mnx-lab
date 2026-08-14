@@ -18,7 +18,7 @@ import type { MnxStructure } from '../model/mnx.ts';
 import { forEachKeyedNote, onsetsEqual, slotAt } from './cursor.ts';
 import { ELEMENT_KINDS, type ElementKind, type ElementRef } from './elementWalk.ts';
 import type { EditorIntent } from './intents.ts';
-import type { MeasureAttributeKind } from './ops.ts';
+import type { MeasureAttributeKind, PartDeclarationKind } from './ops.ts';
 import type { EditorSession } from './session.ts';
 
 /** The ink the ops layer can name: every keyed note of parts[0]/staff 1. */
@@ -64,6 +64,15 @@ const MEASURE_ATTRIBUTE_KINDS: Partial<Record<ElementKind, MeasureAttributeKind>
   section: 'section'
 };
 
+/** Element kinds that are declarations on `parts[0]` → the key they strip. */
+const PART_DECLARATION_KINDS: Partial<Record<ElementKind, PartDeclarationKind>> = {
+  'part-name': 'name',
+  staves: 'staves',
+  strings: 'strings',
+  capo: 'capo',
+  'staff-kind': 'staffKind'
+};
+
 /** The removal intent for a measure-scoped element kind, if it has one. */
 function measureRemovalIntent(kind: ElementKind): EditorIntent | null {
   if (kind === 'clef') return { type: 'removeClef' };
@@ -85,6 +94,15 @@ export function attemptElement(session: EditorSession, element: ElementRef): Ele
   // Measure-scoped attributes are addressed by navigating to their bar, then
   // fired with their own verb: the inherited pair reverts to the predecessor's
   // governance (item 5), the bar-attribute family simply strips (item 7).
+  // Part declarations live on parts[0] and need no navigation at all — the
+  // part IS the address, which is why they attach at the score rung.
+  const partKind = PART_DECLARATION_KINDS[element.kind];
+  if (partKind) {
+    if (!element.path.startsWith('p0/')) return { address: 'unaddressable', removal: 'no-op' };
+    const applied = session.handleIntent({ type: 'removePartDeclaration', kind: partKind });
+    return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
+  }
+
   // Positioned adornments need the cursor at the right MOMENT, not just the
   // right bar — the first elements whose address has two coordinates.
   if (element.kind === 'dynamic' || element.kind === 'direction') {

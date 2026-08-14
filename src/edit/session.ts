@@ -398,6 +398,21 @@ export class EditorSession {
         this.spanAnchorKey = this.spanAnchorKey === slot.noteKey ? null : slot.noteKey;
         return true;
       }
+      case 'setPartDeclaration': {
+        if (!this.doc.parts?.[0]) return false;
+        this.apply({ type: 'setPartDeclaration', declaration: intent.declaration });
+        return true;
+      }
+      case 'removePartDeclaration': {
+        const before = JSON.stringify(this.doc);
+        this.apply({ type: 'removePartDeclaration', kind: intent.kind });
+        if (JSON.stringify(this.doc) === before) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
       case 'setMarking':
       case 'removeMarking': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);

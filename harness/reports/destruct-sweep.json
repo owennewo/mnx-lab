@@ -4,10 +4,10 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "no-op": 548,
-      "removed": 912
+      "no-op": 457,
+      "removed": 1003
     },
-    "unaddressableWithAnOp": 201
+    "unaddressableWithAnOp": 216
   },
   "kinds": {
     "accidental-display": {
@@ -24,7 +24,7 @@
       "no-op": 26
     },
     "capo": {
-      "no-op": 1
+      "removed": 1
     },
     "clef": {
       "removed": 101,
@@ -86,7 +86,8 @@
       "no-op": 1
     },
     "part-name": {
-      "no-op": 59
+      "removed": 46,
+      "no-op": 13
     },
     "rehearsal": {
       "removed": 7
@@ -116,16 +117,17 @@
       "no-op": 2
     },
     "staff-kind": {
-      "no-op": 20
+      "removed": 20
     },
     "staves": {
-      "no-op": 5
+      "removed": 3,
+      "no-op": 2
     },
     "string-annotation": {
       "no-op": 34
     },
     "strings": {
-      "no-op": 21
+      "removed": 21
     },
     "technique": {
       "no-op": 12
@@ -156,7 +158,7 @@
         "removed": 6
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -170,7 +172,7 @@
         "removed": 1
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -187,7 +189,7 @@
         "removed": 4
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -204,7 +206,7 @@
         "removed": 3
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -212,13 +214,13 @@
     },
     "lab/document/empty-tab-canvas": {
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/document/minimal-single-note": {
@@ -239,13 +241,14 @@
         "no-op": 8
       },
       "part-name": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "section": {
         "removed": 2
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -267,13 +270,14 @@
         "no-op": 48
       },
       "part-name": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "section": {
         "removed": 2
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -332,7 +336,7 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -363,7 +367,8 @@
         "no-op": 1
       },
       "part-name": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "score": {
         "no-op": 1
@@ -386,7 +391,7 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -420,7 +425,7 @@
         "no-op": 4
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "sound": {
         "no-op": 1
@@ -440,7 +445,7 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -458,7 +463,7 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -472,7 +477,7 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "space": {
         "no-op": 1
@@ -490,7 +495,7 @@
         "removed": 1
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -526,7 +531,8 @@
         "no-op": 8
       },
       "part-name": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "rehearsal": {
         "removed": 1
@@ -551,10 +557,10 @@
         "no-op": 5
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staves": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -667,13 +673,13 @@
         "removed": 5
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -687,13 +693,13 @@
         "removed": 4
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -701,7 +707,7 @@
     },
     "lab/tab-derivation/capo": {
       "capo": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1
@@ -710,13 +716,13 @@
         "removed": 4
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -730,13 +736,13 @@
         "removed": 4
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -750,16 +756,16 @@
         "removed": 1
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 1
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -773,16 +779,16 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 1
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -796,16 +802,16 @@
         "removed": 3
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 1
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -819,16 +825,16 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 2
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -842,13 +848,13 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -862,10 +868,10 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -882,16 +888,16 @@
         "removed": 4
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 4
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -908,16 +914,16 @@
         "removed": 4
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 4
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -931,13 +937,13 @@
         "removed": 1
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -951,16 +957,16 @@
         "removed": 6
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 6
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -974,7 +980,7 @@
         "removed": 1
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-spec-gaps/harmony-rejected": {
@@ -985,7 +991,7 @@
         "removed": 1
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-spec-gaps/note-position-rejected": {
@@ -996,7 +1002,7 @@
         "removed": 1
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-spec-gaps/part-tuning-rejected": {
@@ -1007,7 +1013,7 @@
         "removed": 1
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-spec-gaps/tab-clef-rejected": {
@@ -1018,7 +1024,7 @@
         "removed": 1
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       }
     },
     "lab/tab-techniques/bend-and-release": {
@@ -1029,16 +1035,16 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 2
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "technique": {
         "no-op": 2
@@ -1055,16 +1061,16 @@
         "removed": 4
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 4
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "technique": {
         "no-op": 3
@@ -1081,16 +1087,16 @@
         "removed": 2
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 2
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "technique": {
         "no-op": 2
@@ -1107,16 +1113,16 @@
         "removed": 4
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 4
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "technique": {
         "no-op": 2
@@ -1133,16 +1139,16 @@
         "removed": 3
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staff-kind": {
-        "no-op": 1
+        "removed": 1
       },
       "string-annotation": {
         "no-op": 3
       },
       "strings": {
-        "no-op": 1
+        "removed": 1
       },
       "technique": {
         "no-op": 3
@@ -1385,10 +1391,10 @@
         "no-op": 16
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "staves": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -1573,7 +1579,8 @@
         "no-op": 22
       },
       "part-name": {
-        "no-op": 4
+        "removed": 1,
+        "no-op": 3
       },
       "score": {
         "no-op": 3
@@ -1626,7 +1633,7 @@
         "no-op": 1
       },
       "staves": {
-        "no-op": 1
+        "removed": 1
       },
       "tie": {
         "no-op": 1
@@ -1663,7 +1670,8 @@
         "no-op": 6
       },
       "part-name": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "time-signature": {
         "no-op": 1
@@ -1826,7 +1834,8 @@
         "no-op": 2
       },
       "part-name": {
-        "no-op": 6
+        "removed": 1,
+        "no-op": 5
       },
       "score": {
         "no-op": 1
@@ -1912,7 +1921,7 @@
         "removed": 6
       },
       "part-name": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 2
@@ -1979,6 +1988,12 @@
   "findings": [
     {
       "scenario": "lab/document/navigation-playground",
+      "element": "p1/name",
+      "kind": "part-name",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "lab/document/navigation-playground",
       "element": "p1/m0/clef0",
       "kind": "clef",
       "verdict": "unaddressable"
@@ -2029,6 +2044,12 @@
       "scenario": "lab/document/navigation-playground",
       "element": "p1/m7/v0/e0/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "lab/document/twelve-bar-blues",
+      "element": "p1/name",
+      "kind": "part-name",
       "verdict": "unaddressable"
     },
     {
@@ -2345,6 +2366,12 @@
     },
     {
       "scenario": "lab/layout/group-barline-individual",
+      "element": "p1/name",
+      "kind": "part-name",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "lab/layout/group-barline-individual",
       "element": "p1/m0/clef0",
       "kind": "clef",
       "verdict": "unaddressable"
@@ -2377,6 +2404,12 @@
       "scenario": "lab/rhythm/tuplet-number-hidden",
       "element": "p0/m0/v0/e0/c/e2/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "lab/score-text/directions-across-parts",
+      "element": "p1/name",
+      "kind": "part-name",
       "verdict": "unaddressable"
     },
     {
@@ -2837,6 +2870,12 @@
     },
     {
       "scenario": "spec/multiple-layouts",
+      "element": "p1/name",
+      "kind": "part-name",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/multiple-layouts",
       "element": "p1/m0/clef0",
       "kind": "clef",
       "verdict": "unaddressable"
@@ -2881,6 +2920,12 @@
       "scenario": "spec/multiple-layouts",
       "element": "p1/m1/v0/e2/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/multiple-layouts",
+      "element": "p2/name",
+      "kind": "part-name",
       "verdict": "unaddressable"
     },
     {
@@ -2935,6 +2980,12 @@
       "scenario": "spec/multiple-layouts",
       "element": "p2/m1/v0/e3/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/multiple-layouts",
+      "element": "p3/name",
+      "kind": "part-name",
       "verdict": "unaddressable"
     },
     {
@@ -2998,6 +3049,12 @@
       "verdict": "unaddressable"
     },
     {
+      "scenario": "spec/orchestral-layout",
+      "element": "p7/staves",
+      "kind": "staves",
+      "verdict": "unaddressable"
+    },
+    {
       "scenario": "spec/organ-layout",
       "element": "p0/m0/v3/e0/n0",
       "kind": "note",
@@ -3013,6 +3070,12 @@
       "scenario": "spec/ottavas-8va",
       "element": "p0/m1/v0/e0/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/parts",
+      "element": "p1/name",
+      "kind": "part-name",
       "verdict": "unaddressable"
     },
     {
@@ -3061,6 +3124,42 @@
       "scenario": "spec/parts",
       "element": "p1/m1/v0/e2/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/system-layouts",
+      "element": "p1/name",
+      "kind": "part-name",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/system-layouts",
+      "element": "p2/name",
+      "kind": "part-name",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/system-layouts",
+      "element": "p3/name",
+      "kind": "part-name",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/system-layouts",
+      "element": "p4/name",
+      "kind": "part-name",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/system-layouts",
+      "element": "p5/name",
+      "kind": "part-name",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/system-layouts",
+      "element": "p5/staves",
+      "kind": "staves",
       "verdict": "unaddressable"
     },
     {

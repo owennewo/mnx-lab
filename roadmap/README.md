@@ -245,6 +245,22 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-part-declarations.md](inprogress/core-element-ops-part-declarations.md)** —
+  campaign item 13, **built 2026-08-14** at a narrower scope the numbers chose:
+  the five keys on `parts[0]` (name, strings, capo, staffKind, staves) finally get
+  **the removal halves their genesis verbs never had** — part-name alone was 59
+  unremovable elements, because item 1 built genesis in a hurry for construct
+  traces. Removable elements **912 → 1003**, reachable **68 → 71**. The sweep
+  refused the first version twice and sharpened it both times: removing `strings`
+  from a tab-projecting part left it declaring a view it could not draw
+  (diagnostics 0 → 2), which became a **declared cascade** — fingerboard and tab
+  preference are one decision; and the no-tombstone cleanup then read as damage,
+  since emptying `_x.mnxLab` collapses `_x` two levels up, which became the
+  oracle's **ancestor-collapse** rule. The index row's real subject (a second
+  part, voice or staff, plus layouts and scores) is now **item 13b**, and it
+  carries a price tag: `parts[0]` is hard-coded in the note-key traversal, so it
+  changes keys the primitives goldens embed — a corpus re-verification event that
+  deserves its own decision.
 - **[core-element-ops-adornments.md](inprogress/core-element-ops-adornments.md)** —
   campaign item 8: markings, dynamics and directions, **built 2026-08-14**. The
   first item where the campaign's own family test says **do not collapse**: all

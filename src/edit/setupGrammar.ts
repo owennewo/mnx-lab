@@ -6,7 +6,13 @@
 // lives in edit/ — it is input-layer logic, DOM-free and unit-testable; the
 // popover chrome in ui/ only hosts the input box.
 import type { MnxNoteValueBase, MnxPitch, MnxTuningEntry } from '../model/mnx.ts';
-import type { MeasureAttribute, MeasureAttributeKind, PositionedAttribute } from './ops.ts';
+import type {
+  MeasureAttribute,
+  MeasureAttributeKind,
+  PartDeclaration,
+  PartDeclarationKind,
+  PositionedAttribute
+} from './ops.ts';
 
 /** "4/4", "6/8", "12/8" → an MNX time signature. Unit must be a power of two
  *  the notation can express. */
@@ -53,6 +59,41 @@ function parsePitchToken(token: string): MnxPitch | null {
 /** Part genesis grammar (the Shift+P popover): a display name, with the id
  *  derived as its slug ("Lead Guitar" → lead-guitar). Empty input is an
  *  ANONYMOUS part — legal MNX, and what the minimal scenarios carry. */
+/** The part popover's second job (campaign item 13): change the part you are
+ *  in, not just create one. `capo 3` / `staves 2` set; `no name` / `no strings`
+ *  / `no capo` / `no tab` / `no staves` strip — item 7's token, third family. */
+export type PartDeclarationResult =
+  | { set: PartDeclaration }
+  | { remove: PartDeclarationKind }
+  | null;
+
+const PART_REMOVAL_WORDS: Record<string, PartDeclarationKind> = {
+  name: 'name',
+  strings: 'strings',
+  tuning: 'strings',
+  capo: 'capo',
+  tab: 'staffKind',
+  staves: 'staves'
+};
+
+export function parsePartDeclaration(text: string): PartDeclarationResult {
+  const trimmed = text.trim().replace(/\s+/g, ' ');
+  const words = trimmed.split(' ');
+  const head = (words[0] ?? '').toLowerCase();
+  if (head === 'no') {
+    const kind = PART_REMOVAL_WORDS[(words[1] ?? '').toLowerCase()];
+    return kind ? { remove: kind } : null;
+  }
+  if (head === 'capo' || head === 'staves') {
+    const value = Number(words[1]);
+    if (!Number.isInteger(value)) return null;
+    if (head === 'capo' && (value < 0 || value > 12)) return null;
+    if (head === 'staves' && (value < 1 || value > 4)) return null;
+    return { set: { kind: head, value } };
+  }
+  return null;
+}
+
 export function parsePart(text: string): { partId?: string; name?: string } {
   const name = text.trim();
   if (name === '') return {};

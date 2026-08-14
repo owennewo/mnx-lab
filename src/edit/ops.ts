@@ -223,6 +223,12 @@ export type EditOp =
       targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump';
       lv?: boolean;
     }
+  // Part declarations (campaign item 13,
+  // roadmap/inprogress/core-element-ops-part-declarations.md): five keys on
+  // parts[0] that shipped with constructors and no removals. One pair, because
+  // they share an owner — item 7's test, third application.
+  | { type: 'setPartDeclaration'; declaration: PartDeclaration }
+  | { type: 'removePartDeclaration'; kind: PartDeclarationKind }
   // Event adornments (campaign item 8,
   // roadmap/inprogress/core-element-ops-adornments.md). TWO pairs, because the
   // owners differ: a marking is a key on the EVENT, while dynamics and
@@ -294,6 +300,14 @@ export type EditOp =
       kind: MeasureAttributeKind;
       index?: number;
     };
+
+/** The part's own declarations. `name`/`strings`/`staffKind` keep their
+ *  existing setters (`addPart`, `setTuning`, `setStaffKind`) — rewriting them
+ *  would disturb recorded traces for no gain — so only the two that never had
+ *  one are constructible here. */
+export type PartDeclaration = { kind: 'capo'; value: number } | { kind: 'staves'; value: number };
+
+export type PartDeclarationKind = 'name' | 'staves' | 'strings' | 'capo' | 'staffKind';
 
 /** The part-measure adornments: positioned entries sharing an owner, a shape
  *  and a removal — which is why they share a verb. */
@@ -672,6 +686,43 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const existing = note.ties?.[0];
       if (!existing) return next;
       if (op.targetType) existing.targetType = op.targetType;
+      return next;
+    }
+    case 'setPartDeclaration': {
+      const part = next.parts?.[0];
+      if (!part) return next;
+      if (op.declaration.kind === 'staves') part.staves = op.declaration.value;
+      else ((part._x ??= {}).mnxLab ??= {}).capo = op.declaration.value;
+      return next;
+    }
+    case 'removePartDeclaration': {
+      const part = next.parts?.[0];
+      if (!part) return next;
+      if (op.kind === 'name') delete part.name;
+      else if (op.kind === 'staves') delete part.staves;
+      else {
+        const x = part._x?.mnxLab;
+        if (!x) return next;
+        if (op.kind === 'strings') {
+          delete x.strings;
+          // DECLARED CASCADE: a tab view without a fingerboard is not a view,
+          // it is a diagnostic. The fingerboard and the preference to show it
+          // are one decision, so they leave together — but only when the
+          // preference actually asks for tab (`notation` survives fine).
+          if (x.tab?.staffKind === 'tab' || x.tab?.staffKind === 'both') {
+            delete x.tab.staffKind;
+            if (Object.keys(x.tab).length === 0) delete x.tab;
+          }
+        }
+        else if (op.kind === 'capo') delete x.capo;
+        else if (x.tab) {
+          delete x.tab.staffKind;
+          if (Object.keys(x.tab).length === 0) delete x.tab;
+        }
+        // No tombstones: emptied vendor containers go with their last key.
+        if (Object.keys(x).length === 0) delete part._x!.mnxLab;
+        if (part._x && Object.keys(part._x).length === 0) delete part._x;
+      }
       return next;
     }
     case 'setMarking': {

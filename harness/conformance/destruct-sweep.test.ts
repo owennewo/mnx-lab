@@ -120,17 +120,19 @@ function unexplainedChanges(
 ): DocChange[] {
   const container = element.jsonPath.slice(0, -1); // the array the element sat in
   const event = element.jsonPath.slice(0, -2); // …/content/<e>  for …/notes/<n>
-  const containerKey = element.jsonPath[element.jsonPath.length - 2];
   return changes.filter(change => {
     if (pathWithin(change.path, container)) return false;
-    // Emptying the container removes it outright — no tombstone `ties: []`
-    // left on the note. That shows up one level above the container.
-    if (
-      pathString(change.path) === pathString(event) &&
-      change.added.length === 0 &&
-      change.removed.every(entry => entry.startsWith(`${String(containerKey)}=`))
-    )
-      return false;
+    // The ANCESTOR COLLAPSE: emptying a container removes it outright — no
+    // tombstone `ties: []` on the note, no `_x: {mnxLab: {}}` on the part — and
+    // that can cascade up several levels. Allowed only along the element's own
+    // ancestor chain, and only when the vanished key is the very segment the
+    // element sits under, so a SIBLING can never be excused this way.
+    for (let depth = element.jsonPath.length - 1; depth >= 0; depth--) {
+      if (pathString(change.path) !== pathString(element.jsonPath.slice(0, depth))) continue;
+      const segment = String(element.jsonPath[depth]);
+      if (change.added.length === 0 && change.removed.every(entry => entry.startsWith(`${segment}=`)))
+        return false;
+    }
     // The declared cascade of emptying an event: it becomes a rest of the
     // same duration, and the ink-bound things it carried go with its ink — a
     // rest does not slur.

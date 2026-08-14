@@ -33,6 +33,7 @@ import {
 } from '../edit/keymap.ts';
 import {
   ADORNMENT_HELP,
+  parsePartDeclaration,
   BAR_ATTRIBUTE_HELP,
   parseAdornment,
   CLEF_NAME_LIST,
@@ -65,9 +66,9 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
     hint: 'low string first · Enter applies · Esc closes'
   },
   part: {
-    label: 'add part',
-    placeholder: 'Guitar · empty = anonymous part',
-    hint: 'a name — the id derives as its slug · Enter applies · Esc closes'
+    label: 'part',
+    placeholder: 'Guitar · capo 3 · staves 2 · no strings',
+    hint: 'a name adds a part; capo/staves change this one; “no <thing>” strips · Enter applies · Esc closes'
   },
   clef: {
     label: 'clef',
@@ -985,6 +986,17 @@ export class ScenarioPage extends LitElement {
       }
       this.stripIntent({ type: 'setTuning', tuning });
     } else if (this.setupPopover === 'part') {
+      // "capo 3" / "no strings" change THIS part; anything else names a new one.
+      const declaration = parsePartDeclaration(input.value);
+      if (declaration) {
+        this.stripIntent(
+          'set' in declaration
+            ? { type: 'setPartDeclaration', declaration: declaration.set }
+            : { type: 'removePartDeclaration', kind: declaration.remove }
+        );
+        this.setupPopover = null;
+        return;
+      }
       // parsePart never fails: empty input is an anonymous part (legal MNX).
       const part = parsePart(input.value);
       const intent: Extract<EditorIntent, { type: 'addPart' }> = { type: 'addPart' };

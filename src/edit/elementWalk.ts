@@ -221,26 +221,35 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   harmony: { classes: [], note: 'Renderer gap — core-chord-symbols.md owns the drawing half.' },
   'part-name': {
     classes: ['staff-label'],
-    note: 'The name drawn left of the part’s staff.',
-    // `addPart` takes the name, so creating one is real. Nothing STRIPS a
-    // name: `removePart` removes the whole (empty) part, which is its
-    // container's verb, not this element's — the distinction the drift test
-    // caught the moment this row claimed otherwise.
-    construct: ['addPart']
+    note: 'The name drawn left of the part’s staff. `addPart` takes it; `removePartDeclaration` strips it — `removePart` is the CONTAINER’s verb, not this element’s.',
+    construct: ['addPart'],
+    remove: ['removePartDeclaration']
   },
   strings: {
     classes: ['tab-tuning-letter'],
-    note: 'The declared fingerboard; without it there is no tab.',
-    construct: ['setTuning']
+    note: 'The declared fingerboard; without it there is no tab — removal is instrument neutrality doing its job, not a crash.',
+    construct: ['setTuning'],
+    remove: ['removePartDeclaration']
   },
-  capo: { classes: ['tab-capo'], note: 'The capo declaration, drawn on the tab staff.' },
+  capo: {
+    classes: ['tab-capo'],
+    note: 'The capo declaration, drawn on the tab staff.',
+    construct: ['setPartDeclaration'],
+    remove: ['removePartDeclaration']
+  },
   'staff-kind': {
     classes: ['tab-clef'],
     note: 'The part’s projection choice; the tab clef is its ink.',
-    construct: ['setStaffKind']
+    construct: ['setStaffKind'],
+    remove: ['removePartDeclaration']
   },
   'kit-component': { classes: [], note: 'One percussion kit mapping; its notes draw noteheads.' },
-  staves: { classes: [], note: 'Modifier: how many staves the part is notated on.' },
+  staves: {
+    classes: [],
+    note: 'Modifier: how many staves the part is notated on.',
+    construct: ['setPartDeclaration'],
+    remove: ['removePartDeclaration']
+  },
   layout: {
     classes: ['brace', 'bracket', 'group-label', 'source-label'],
     note: 'A system layout: staff grouping, braces and their labels.'
