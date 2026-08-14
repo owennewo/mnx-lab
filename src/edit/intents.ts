@@ -66,7 +66,14 @@ export type MutationIntent =
   | { type: 'setTimeSignature'; count: number; unit: number }
   | { type: 'setTuning'; tuning: MnxTuningEntry[] }
   | { type: 'addPart'; partId?: string; name?: string }
-  | { type: 'setStaffKind'; kind: 'notation' | 'tab' | 'both' };
+  | { type: 'setStaffKind'; kind: 'notation' | 'tab' | 'both' }
+  // The inherited-attribute pair (campaign item 5): setting and un-declaring
+  // are DIFFERENT intents, because "remove" here means "revert to the
+  // predecessor's governance", not "set to nothing".
+  | { type: 'setClef'; sign: string; staffPosition?: number; octave?: number }
+  | { type: 'removeClef' }
+  | { type: 'setKeySignature'; fifths: number }
+  | { type: 'removeKeySignature' };
 
 export type HistoryIntent = { type: 'undo' } | { type: 'redo' };
 

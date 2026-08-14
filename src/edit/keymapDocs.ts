@@ -216,6 +216,18 @@ export const KEY_DOCS: KeyDoc[] = [
     group: 'setup',
     meaning: { all: 'add part… (typed popover; empty input = anonymous part)' }
   },
+  {
+    keys: 'Shift+C',
+    strokes: [{ code: 'KeyC', shift: true }],
+    group: 'setup',
+    meaning: { all: 'clef… (typed popover: treble/bass/alto/tenor/…; `inherit` un-declares)' }
+  },
+  {
+    keys: 'Shift+K',
+    strokes: [{ code: 'KeyK', shift: true }],
+    group: 'setup',
+    meaning: { all: 'key signature… (typed popover: C/Bb/-3/+2; `inherit` un-declares)' }
+  },
 
   // ── Workbench shell.
   {
@@ -250,6 +262,10 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   timeSignaturePopover: ['setTimeSignature'],
   tuningPopover: ['setTuning'],
   partPopover: ['addPart'],
+  // One popover per attribute, two intents each: the grammar's `inherit`
+  // token emits the removal intent (campaign item 5).
+  clefPopover: ['setClef', 'removeClef'],
+  keySignaturePopover: ['setKeySignature', 'removeKeySignature'],
   commandPalette: ['undo', 'redo', 'appendMeasure', 'toggleTie', 'setStaffKind'],
   goTo: ['goToMeasure'],
   // The view tabs (workbench) / view attribute (embeds): switching the pane

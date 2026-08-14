@@ -114,6 +114,8 @@ export type ShellAction =
   | 'timeSignaturePopover'
   | 'tuningPopover'
   | 'partPopover'
+  | 'clefPopover'
+  | 'keySignaturePopover'
   | 'commandPalette'
   | 'goTo'
   | 'toggleRail';
@@ -126,6 +128,11 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // Part genesis (element-ops exemplar): construct traces start from {},
   // so "add part" needs a keyboard surface — setup tier like its siblings.
   { code: 'KeyP', shift: true, action: 'partPopover' },
+  // The inherited-attribute pair (campaign item 5): setup tier like their
+  // siblings, and the same grammar hosts removal via the `inherit` token,
+  // because Del at the measure rung already means "remove the empty bar".
+  { code: 'KeyC', shift: true, action: 'clefPopover' },
+  { code: 'KeyK', shift: true, action: 'keySignaturePopover' },
   // The palette (survey §8.5: Ctrl+K — Dorico's Jump Bar, GP's Cmd+E) and
   // go-to (§3.8: Ctrl+G + typed grammar) are ONE widget, two entry points:
   // Ctrl+K prefills the `>` command prefix, Ctrl+G opens bare (go-to).

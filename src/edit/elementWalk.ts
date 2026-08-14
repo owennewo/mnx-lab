@@ -106,7 +106,12 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     note: 'A rest is absence (§8.11) — but DECLARING the whole bar rests is a choice.'
   },
   'measure-repeat': { classes: [], note: 'Renderer gap — the repeat sign is not drawn yet.' },
-  clef: { classes: ['clef', 'clef-change'], note: 'Inherited-attribute removal class.' },
+  clef: {
+    classes: ['clef', 'clef-change'],
+    note: 'Inherited-attribute removal class: removing the DECLARATION reverts the bar to its predecessor’s governance (or the engine default), never to "no clef".',
+    construct: ['setClef'],
+    remove: ['removeClef']
+  },
   beam: { classes: ['beam'], note: 'Authored beaming over event ids; the stroke is its ink.' },
   dynamic: { classes: ['dynamic'], note: 'A dynamic group at a metric position.' },
   direction: { classes: ['direction'], note: 'A text/symbolic instruction (proposed field).' },
@@ -118,7 +123,12 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     // campaign opened on.
     construct: ['setTimeSignature']
   },
-  'key-signature': { classes: ['key-sig'], note: 'Inherited-attribute removal class.' },
+  'key-signature': {
+    classes: ['key-sig'],
+    note: 'Inherited-attribute removal class; removal reverts to the predecessor, or C.',
+    construct: ['setKeySignature'],
+    remove: ['removeKeySignature']
+  },
   barline: { classes: [], note: 'Modifier: every measure ends with a barline; this picks its type.' },
   'repeat-start': { classes: ['repeat-start'], note: 'Forward repeat at the measure start.' },
   'repeat-end': { classes: ['repeat-end', 'repeat-dot', 'repeat-times'], note: 'Backward repeat.' },
@@ -206,6 +216,12 @@ export interface ElementRef {
    *  — `toggleTie` addresses the note and toggles what hangs off it — so the
    *  sweep needs the owner's key, not one of their own. */
   ownerNoteKey?: string;
+  /** For MEASURE-scoped attributes (clef, key signature): the measure their
+   *  verbs address, set only when the ops layer can actually reach it — the
+   *  entry surface, at the start of the bar. A mid-measure clef or one on a
+   *  second part has no index here, which is how the sweep reports it as
+   *  unaddressable rather than pretending. */
+  measureIndex?: number;
   /** Where the element lives, for the surviving-document oracle. */
   jsonPath: (string | number)[];
 }
@@ -218,6 +234,17 @@ function push(
   noteKey?: string
 ): void {
   out.push(noteKey ? { kind, path, jsonPath, noteKey } : { kind, path, jsonPath });
+}
+
+/** A measure-scoped attribute, addressed by navigating to its bar. */
+function pushAtMeasure(
+  out: ElementRef[],
+  kind: ElementKind,
+  path: string,
+  jsonPath: (string | number)[],
+  measureIndex: number | undefined
+): void {
+  out.push(measureIndex === undefined ? { kind, path, jsonPath } : { kind, path, jsonPath, measureIndex });
 }
 
 /** An element hanging off a note: it carries the OWNER's key, because its
@@ -331,7 +358,8 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
         push(out, kind, `${path}/${field}`, [...json, field]);
     };
     at('time-signature', 'time');
-    at('key-signature', 'key');
+    if (measure.key !== undefined)
+      pushAtMeasure(out, 'key-signature', `${path}/key`, [...json, 'key'], measureIndex);
     at('barline', 'barline');
     at('repeat-start', 'repeatStart');
     at('repeat-end', 'repeatEnd');
@@ -376,8 +404,17 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
     (part.measures ?? []).forEach((measure, measureIndex) => {
       const measurePath = `${partPath}/m${measureIndex}`;
       const measureJson = [...partJson, 'measures', measureIndex];
-      for (const [clefIndex] of (measure.clefs ?? []).entries())
-        push(out, 'clef', `${measurePath}/clef${clefIndex}`, [...measureJson, 'clefs', clefIndex]);
+      for (const [clefIndex, positioned] of (measure.clefs ?? []).entries()) {
+        const reachable =
+          partIndex === 0 && (positioned.staff ?? 1) === 1 && positioned.position === undefined;
+        pushAtMeasure(
+          out,
+          'clef',
+          `${measurePath}/clef${clefIndex}`,
+          [...measureJson, 'clefs', clefIndex],
+          reachable ? measureIndex : undefined
+        );
+      }
       for (const [dynamicIndex] of (measure.dynamics ?? []).entries())
         push(out, 'dynamic', `${measurePath}/dyn${dynamicIndex}`, [...measureJson, 'dynamics', dynamicIndex]);
       for (const [directionIndex] of (measure.directions ?? []).entries())

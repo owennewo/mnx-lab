@@ -245,6 +245,21 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-clef-key.md](inprogress/core-element-ops-clef-key.md)** —
+  campaign item 5, **the first op-family item** and the campaign's biggest single step.
+  **Built 2026-08-14**, same day as proposed, chosen by item 3's histogram rather than
+  taste: `clef` blocked 96 of 106 scenarios. Ships the **inherited-attribute pair** —
+  `setClef`/`removeClef`, `setKeySignature`/`removeKeySignature` — at the popover tier
+  (**Shift+C**, **Shift+K**) on the **measure rung**, with `KeyDoc` rows landed in the
+  same change per the contract. The removal half is the interesting half: removing a
+  clef removes a *declaration*, so the bar reverts to its predecessor's governance (or
+  the engine default, which for a tab part is the guitar treble-8) — never to "no
+  clef" — and the grammar says so in a word, **`inherit`**, because Del at the measure
+  rung already means "remove the empty bar". Results: reachable scenarios **1 → 22**,
+  removable elements **651 → 758** (101 of 113 clefs, all 6 key signatures), a third
+  recorded trace, and the next blocker down to `beam` at 10. It also taught the
+  campaign a rule: **a verb without an address is invisible to the sweep** — declaring
+  the ops moved nothing until the walk learned to navigate to a bar.
 - **[core-element-ops-construct-traces.md](inprogress/core-element-ops-construct-traces.md)** —
   campaign item 3: **the forward verdict for all 106**, the half item 2 built backwards.
   **Built 2026-08-14**, same day as proposed. A trace cannot be generated — it is a

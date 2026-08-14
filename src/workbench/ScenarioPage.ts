@@ -31,10 +31,60 @@ import {
   type KeymapLayer,
   type ShellAction
 } from '../edit/keymap.ts';
-import { parsePart, parseTimeSignature, parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
+import {
+  CLEF_NAME_LIST,
+  parseClef,
+  parseKeySignature,
+  parsePart,
+  parseTimeSignature,
+  parseTuning,
+  TUNING_PRESET_NAMES
+} from '../edit/setupGrammar.ts';
 import { buildOpRow } from './opRows.ts';
 import { editorHasKeyboard, keyIsOurs } from './keyScope.ts';
 import '../elements/ScoreViewer.ts';
+
+/** The setup popovers, as data — one row per attribute rather than a ternary
+ *  chain that grows a limb per campaign item. Label, placeholder and hint are
+ *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
+type PopoverKind = 'time' | 'tuning' | 'part' | 'clef' | 'key';
+
+const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
+  time: {
+    label: 'time signature',
+    placeholder: '4/4',
+    hint: 'applies to the current bar onward · Enter applies · Esc closes'
+  },
+  tuning: {
+    label: 'tuning',
+    placeholder: 'standard · drop-d · D2 A2 D3 G3 A3 D4',
+    hint: 'low string first · Enter applies · Esc closes'
+  },
+  part: {
+    label: 'add part',
+    placeholder: 'Guitar · empty = anonymous part',
+    hint: 'a name — the id derives as its slug · Enter applies · Esc closes'
+  },
+  clef: {
+    label: 'clef',
+    placeholder: 'treble · bass · treble8vb · inherit',
+    hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
+  },
+  key: {
+    label: 'key signature',
+    placeholder: 'C · Bb · F# · -3 · inherit',
+    hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
+  }
+};
+
+const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
+  timeSignaturePopover: 'time',
+  tuningPopover: 'tuning',
+  partPopover: 'part',
+  clefPopover: 'clef',
+  keySignaturePopover: 'key'
+};
+
 import './ScoreHud.ts';
 
 /** The side panel's tabs (roadmap/inprogress/core-score-hud.md): the page's
@@ -107,7 +157,7 @@ export class ScenarioPage extends LitElement {
   @state() private copied = false;
   /** The open setup popover (survey §6.2's Shift+letter tier), if any.
    *  (Named to dodge the DOM's built-in HTMLElement.popover property.) */
-  @state() private setupPopover: 'time' | 'tuning' | 'part' | null = null;
+  @state() private setupPopover: PopoverKind | null = null;
   @state() private setupPopoverError = '';
   /** Esc hides the cursor highlight until the next intent (review sense-0). */
   private cursorHidden = false;
@@ -767,12 +817,11 @@ export class ScenarioPage extends LitElement {
 
   private openPopover(action: ShellAction): boolean {
     // Only the popover actions are ours; palette actions belong to the shell.
-    if (action !== 'timeSignaturePopover' && action !== 'tuningPopover' && action !== 'partPopover')
-      return false;
+    const kind = POPOVER_ACTIONS[action];
+    if (!kind) return false;
     const entry = this.entry();
-    if (action === 'tuningPopover' && !entry?.hasTab) return false;
-    this.setupPopover =
-      action === 'timeSignaturePopover' ? 'time' : action === 'tuningPopover' ? 'tuning' : 'part';
+    if (kind === 'tuning' && !entry?.hasTab) return false;
+    this.setupPopover = kind;
     this.setupPopoverError = '';
     // The popover lives in the actions tab now; a keyboard-opened one must
     // still be visible.
@@ -830,6 +879,33 @@ export class ScenarioPage extends LitElement {
       if (part.partId !== undefined) intent.partId = part.partId;
       if (part.name !== undefined) intent.name = part.name;
       this.stripIntent(intent);
+    } else if (this.setupPopover === 'clef') {
+      const clef = parseClef(input.value);
+      if (!clef) {
+        this.setupPopoverError = `not a clef — one of ${CLEF_NAME_LIST.join(', ')}, or “inherit”`;
+        return;
+      }
+      // `inherit` is removal: the bar reverts to the predecessor's governance
+      // (campaign item 5's inherited-attribute class), never to "no clef".
+      this.stripIntent(
+        clef === 'inherit'
+          ? { type: 'removeClef' }
+          : {
+              type: 'setClef',
+              sign: clef.sign,
+              staffPosition: clef.staffPosition,
+              ...(clef.octave ? { octave: clef.octave } : {})
+            }
+      );
+    } else if (this.setupPopover === 'key') {
+      const key = parseKeySignature(input.value);
+      if (!key) {
+        this.setupPopoverError = 'not a key — C, Bb, F#, a fifths count like -3, or “inherit”';
+        return;
+      }
+      this.stripIntent(
+        key === 'inherit' ? { type: 'removeKeySignature' } : { type: 'setKeySignature', fifths: key.fifths }
+      );
     }
     this.setupPopover = null;
   }
@@ -1171,6 +1247,8 @@ export class ScenarioPage extends LitElement {
             ? html`<button @click=${() => this.openPopover('tuningPopover')}>tuning…</button>`
             : nothing}
           <button @click=${() => this.openPopover('partPopover')}>part…</button>
+          <button @click=${() => this.openPopover('clefPopover')}>clef…</button>
+          <button @click=${() => this.openPopover('keySignaturePopover')}>key…</button>
         </div>
         <div class="action-state">
           entry duration: ${this.session.entryDurationBase}
@@ -1184,30 +1262,14 @@ export class ScenarioPage extends LitElement {
         ${this.setupPopover
           ? html`
               <div class="popover">
-                <span class="pop-label"
-                  >${this.setupPopover === 'time'
-                    ? 'time signature'
-                    : this.setupPopover === 'tuning'
-                      ? 'tuning'
-                      : 'add part'}</span
-                >
+                <span class="pop-label">${POPOVER_SPECS[this.setupPopover].label}</span>
                 <input
-                  placeholder=${this.setupPopover === 'time'
-                    ? '4/4'
-                    : this.setupPopover === 'tuning'
-                      ? 'standard · drop-d · D2 A2 D3 G3 A3 D4'
-                      : 'Guitar · empty = anonymous part'}
+                  placeholder=${POPOVER_SPECS[this.setupPopover].placeholder}
                   @keydown=${(e: KeyboardEvent) => this.onPopoverKey(e)}
                 />
                 ${this.setupPopoverError
                   ? html`<span class="pop-error">${this.setupPopoverError}</span>`
-                  : html`<span class="pop-hint"
-                      >${this.setupPopover === 'time'
-                        ? 'applies to the current bar onward · Enter applies · Esc closes'
-                        : this.setupPopover === 'tuning'
-                          ? 'low string first · Enter applies · Esc closes'
-                          : 'a name — the id derives as its slug · Enter applies · Esc closes'}</span
-                    >`}
+                  : html`<span class="pop-hint">${POPOVER_SPECS[this.setupPopover].hint}</span>`}
               </div>
             `
           : nothing}

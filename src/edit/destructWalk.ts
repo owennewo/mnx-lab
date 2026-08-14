@@ -54,6 +54,20 @@ export interface ElementAttempt {
  */
 export function attemptElement(session: EditorSession, element: ElementRef): ElementAttempt {
   if (!kindHasRemovalOp(element.kind)) return { address: 'unaddressable', removal: 'no-op' };
+
+  // Measure-scoped attributes are addressed by navigating to their bar; their
+  // removal reverts the bar to its predecessor's governance (campaign item 5).
+  if (element.kind === 'clef' || element.kind === 'key-signature') {
+    if (element.measureIndex === undefined) return { address: 'unaddressable', removal: 'no-op' };
+    session.handleIntent({ type: 'goToMeasure', measureIndex: element.measureIndex });
+    if (session.cursor.measureIndex !== element.measureIndex)
+      return { address: 'unaddressable', removal: 'no-op' };
+    const applied = session.handleIntent({
+      type: element.kind === 'clef' ? 'removeClef' : 'removeKeySignature'
+    });
+    return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
+  }
+
   // A note the ops layer cannot name (a second part, a second staff, inside a
   // container) is an addressing gap, not a missing verb.
   const key = element.noteKey ?? element.ownerNoteKey;

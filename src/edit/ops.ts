@@ -151,6 +151,39 @@ export type EditOp =
        *  refused while the part holds any note. Its declarations (name,
        *  tuning, staffKind) go with their container: no tombstones. */
       type: 'removePart';
+    }
+  // The inherited-attribute pair (campaign item 5,
+  // roadmap/inprogress/core-element-ops-clef-key.md). Clef is a PART-measure
+  // attribute, key signature a GLOBAL-measure one — the same rung addressing
+  // two different owners — and both persist until changed, so removing one
+  // reverts the measure to its predecessor's governance rather than to
+  // nothing.
+  | {
+      /** Declare the clef governing this measure onward (parts[0], staff 1). */
+      type: 'setClef';
+      measureIndex: number;
+      sign: string;
+      staffPosition?: number;
+      octave?: number;
+    }
+  | {
+      /** Drop this measure's clef DECLARATION — the staff keeps drawing a
+       *  clef, the predecessor's (or the engine default, which for a
+       *  tab-bearing part is the guitar treble-8). Deletes an emptied
+       *  `clefs` array with it: no tombstones. */
+      type: 'removeClef';
+      measureIndex: number;
+    }
+  | {
+      /** Declare the key signature governing this measure onward. */
+      type: 'setKeySignature';
+      measureIndex: number;
+      fifths: number;
+    }
+  | {
+      /** Drop this measure's key DECLARATION; the predecessor governs, or C. */
+      type: 'removeKeySignature';
+      measureIndex: number;
     };
 
 const NOTE_STEPS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
@@ -303,6 +336,50 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       // beam over it would not dangle, it would beam a rest.
       if (emptied?.slurs) delete emptied.slurs;
       if (removedNoteId || emptiedEventId) unlinkReferences(next, removedNoteId, emptiedEventId);
+      return next;
+    }
+    case 'setClef': {
+      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      if (!measure) return next;
+      const clef = {
+        clef: {
+          sign: op.sign,
+          ...(op.staffPosition !== undefined ? { staffPosition: op.staffPosition } : {}),
+          ...(op.octave ? { octave: op.octave } : {})
+        }
+      };
+      // One declaration per measure on the entry surface: overwrite the
+      // staff-1 measure-start clef rather than stacking a second.
+      const existing = (measure.clefs ?? []).findIndex(
+        entry => (entry.staff ?? 1) === 1 && entry.position === undefined
+      );
+      if (existing >= 0) measure.clefs![existing] = clef;
+      else measure.clefs = [...(measure.clefs ?? []), clef];
+      return next;
+    }
+    case 'removeClef': {
+      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      const clefs = measure?.clefs;
+      if (!measure || !clefs) return next;
+      const kept = clefs.filter(
+        entry => !((entry.staff ?? 1) === 1 && entry.position === undefined)
+      );
+      if (kept.length === clefs.length) return next;
+      // No tombstone: an emptied array goes with its last member.
+      if (kept.length > 0) measure.clefs = kept;
+      else delete measure.clefs;
+      return next;
+    }
+    case 'setKeySignature': {
+      const measure = next.global?.measures?.[op.measureIndex];
+      if (!measure) return next;
+      measure.key = { fifths: op.fifths };
+      return next;
+    }
+    case 'removeKeySignature': {
+      const measure = next.global?.measures?.[op.measureIndex];
+      if (!measure?.key) return next;
+      delete measure.key;
       return next;
     }
     case 'setDuration': {

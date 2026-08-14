@@ -11,7 +11,7 @@ import type { EditOp, OpLogEntry } from '../edit/ops.ts';
 import type { MnxTuningEntry } from '../model/mnx.ts';
 import { EDIT_LAYER, NAVIGATION_LAYER, TAB_DIGIT_LAYER } from '../edit/keymap.ts';
 import { KEY_DOCS, SURFACE_INTENTS, strokeKey } from '../edit/keymapDocs.ts';
-import { parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
+import { CLEF_NAME_LIST, parseClef, parseTuning, TUNING_PRESET_NAMES } from '../edit/setupGrammar.ts';
 
 export interface OpRow {
   /** What changed — the op, human-readable. */
@@ -28,6 +28,8 @@ const SURFACE_LABELS: Record<string, string> = {
   timeSignaturePopover: 'Shift+T · popover',
   tuningPopover: 'Shift+U · popover',
   partPopover: 'Shift+P · popover',
+  clefPopover: 'Shift+C · popover',
+  keySignaturePopover: 'Shift+K · popover',
   commandPalette: 'Ctrl+K · palette',
   goTo: 'Ctrl+G · go-to',
   viewSwitcher: 'view tabs'
@@ -61,6 +63,30 @@ function tuningText(tuning: MnxTuningEntry[]): string {
     .sort((a, b) => b.string - a.string)
     .map(t => `${t.pitch.step}${t.pitch.alter === 1 ? '#' : t.pitch.alter === -1 ? 'b' : ''}${t.pitch.octave}`)
     .join(' ');
+}
+
+/** The clef as its popover name, when it has one — the same reverse-join
+ *  posture as `tuningText`: show what the user would have typed. */
+function clefText(clef: { sign: string; staffPosition?: number; octave?: number }): string {
+  for (const name of CLEF_NAME_LIST) {
+    const parsed = parseClef(name);
+    if (
+      parsed &&
+      parsed !== 'inherit' &&
+      parsed.sign === clef.sign &&
+      parsed.staffPosition === (clef.staffPosition ?? parsed.staffPosition) &&
+      (parsed.octave ?? 0) === (clef.octave ?? 0)
+    )
+      return name;
+  }
+  return `${clef.sign}${clef.staffPosition ?? ''}`;
+}
+
+/** Fifths as the key name a player would say, with the count in parentheses. */
+function keyText(fifths: number): string {
+  const names = ['Cb', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'];
+  const name = names[fifths + 7];
+  return name ? `${name} (${fifths > 0 ? '+' : ''}${fifths})` : `${fifths}`;
 }
 
 const onsetText = (onset: [number, number]) => `${onset[0]}/${onset[1]}`;
@@ -98,6 +124,14 @@ function opLabel(op: EditOp): string {
       return 'remove part (empty)';
     case 'addPart':
       return `add part${op.name ? ` “${op.name}”` : op.partId ? ` ${op.partId}` : ' (anonymous)'}`;
+    case 'setClef':
+      return `clef ${clefText(op)} @ m${op.measureIndex + 1}`;
+    case 'removeClef':
+      return `clef inherited @ m${op.measureIndex + 1}`;
+    case 'setKeySignature':
+      return `key ${keyText(op.fifths)} @ m${op.measureIndex + 1}`;
+    case 'removeKeySignature':
+      return `key inherited @ m${op.measureIndex + 1}`;
   }
 }
 

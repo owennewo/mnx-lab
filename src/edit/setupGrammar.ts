@@ -84,3 +84,63 @@ export function parseTuning(text: string): MnxTuningEntry[] | null {
     pitch: pitch!
   }));
 }
+
+// ---------------------------------------------------------------------------
+// The inherited-attribute pair (campaign item 5,
+// roadmap/inprogress/core-element-ops-clef-key.md). Both grammars accept
+// `inherit` (shorthand `-`), which names what removal DOES — revert to the
+// predecessor's governance — rather than what it deletes. One token, one
+// meaning, reusable by every later inherited-attribute item.
+
+/** The removal token shared by every inherited-attribute popover. */
+export const INHERIT_TOKEN = 'inherit';
+
+export interface ClefChoice {
+  sign: string;
+  staffPosition: number;
+  octave?: number;
+}
+
+/** The clefs an engraver actually writes, by the names they say out loud.
+ *  Staff positions are half-spaces from the middle line, positive up. */
+const CLEF_NAMES: Record<string, ClefChoice> = {
+  treble: { sign: 'G', staffPosition: -2 },
+  bass: { sign: 'F', staffPosition: 2 },
+  alto: { sign: 'C', staffPosition: 0 },
+  tenor: { sign: 'C', staffPosition: 2 },
+  // The guitar clef — what a tab-bearing part already renders by default.
+  treble8vb: { sign: 'G', staffPosition: -2, octave: -1 },
+  treble8va: { sign: 'G', staffPosition: -2, octave: 1 },
+  bass8vb: { sign: 'F', staffPosition: 2, octave: -1 }
+};
+
+export const CLEF_NAME_LIST = Object.keys(CLEF_NAMES);
+
+/** "treble" | "bass8vb" | "inherit" → a clef choice, or the removal token. */
+export function parseClef(text: string): ClefChoice | 'inherit' | null {
+  const token = text.trim().toLowerCase().replace(/[\s_]+/g, '');
+  if (token === '') return null;
+  if (token === INHERIT_TOKEN || token === '-') return 'inherit';
+  return CLEF_NAMES[token] ?? null;
+}
+
+/** Major keys by name, in fifths — the circle as players recite it. */
+const KEY_NAMES: Record<string, number> = {
+  c: 0, g: 1, d: 2, a: 3, e: 4, b: 5, 'f#': 6, 'c#': 7,
+  f: -1, bb: -2, eb: -3, ab: -4, db: -5, gb: -6, cb: -7
+};
+
+/** "C" | "Bb" | "-3" | "+2" | "inherit" → fifths, or the removal token. */
+export function parseKeySignature(text: string): { fifths: number } | 'inherit' | null {
+  const token = text.trim().toLowerCase().replace(/\s+/g, '');
+  if (token === '') return null;
+  if (token === INHERIT_TOKEN) return 'inherit';
+  // `-` alone is the removal shorthand; `-3` is three flats. Order matters.
+  if (token === '-') return 'inherit';
+  if (/^[+-]?\d$/.test(token)) {
+    const fifths = Number(token);
+    return fifths >= -7 && fifths <= 7 ? { fifths } : null;
+  }
+  const named = KEY_NAMES[token];
+  return named === undefined ? null : { fifths: named };
+}

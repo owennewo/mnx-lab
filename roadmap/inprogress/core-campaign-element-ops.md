@@ -92,7 +92,7 @@ agreed or candidate claims; **bold** = agreed.
 | 2 | [destructibility sweep](core-element-ops-destruct-sweep.md) | Item 1's reverse walk scaled corpus-wide: element walker per kind (noteKeys generalized), attempt address+delete per element; oracles: applies / no new diagnostics / no dangling references / undo byte-identical, **widened** (relative validity, references past ties, a surviving-document check). No trace fixtures — the walk regenerates each run; the report is the artifact. Doubles as ladder addressability audit. Fix the `deleteNote` dangling-reference bug it will catch. | verdicts for all 106 | n/a | n/a | **built 2026-08-14** |
 | 3 | [constructibility traces](core-element-ops-construct-traces.md) | Item 1's forward harness scaled: the construct-fixture kind + per-scenario tiers (unreachable → ops-reachable → keyboard-reachable → traced) + the expected-unreachable class. Traces themselves arrive with items 4–13 (recorded via "copy trace", never hand-written); possible workbench coverage map later. Inherits item 1's parked **recording surface** question: "copy trace" stamps a corpus scenario id as the start, so recording from `{}` wants the new-document journey — and with it, the ops tab on non-scenario (IndexedDB) documents. | verdict machinery for all 106; traces accumulate per item | n/a | n/a | **built 2026-08-14** |
 | 4 | duration completion | Dots (op already accepts `dots?` — cheapest unlock), capo (read but unwritable), time `display: common\|cut`. | ~10 | dot: single key (`.` candidate); capo/display: popover grammar | event / setup | undrafted |
-| 5 | clef & key signature | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class. | gates ~all entry; F-clef + 5 key-sig scenarios | popover tier (Shift+letter) | measure | undrafted |
+| 5 | [clef & key signature](core-element-ops-clef-key.md) | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class; `inherit` is the removal token. | **22 scenarios reachable** (from 1); 101 clefs + 6 key sigs removable | **Shift+C** clef, **Shift+K** key | **measure** | **built 2026-08-14** |
 | 6 | accidental spelling | Flats (natural-then-sharp policy makes E♭ unwritable), enharmonic respell, `accidentalDisplay`/parentheses. | 9+ | respell: single key | note | undrafted |
 | 7 | bar-attribute family | Barlines, repeats, endings, segno/jump/fine, sections, rehearsal, tempo — one typed-popover family on the global measure. | ~20 | popover tier | measure | undrafted |
 | 8 | event adornments | Articulations/markings, dynamics, directions. | ~14 | adornment alphabet (letter keys) | note/event | undrafted |
@@ -107,6 +107,31 @@ et al are layout-only, zero measures — a different surface, not keys), percuss
 transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
+
+- **2026-08-14 — item 5 built: the first op family, and the campaign's biggest step.**
+  The inherited-attribute pair (`setClef`/`removeClef`, `setKeySignature`/
+  `removeKeySignature`), popover tier at **Shift+C** / **Shift+K**, measure rung,
+  `KeyDoc` rows landed in the same change per the contract.
+  - **Both scoreboards moved, as predicted.** Construct: reachable scenarios
+    **1 → 22**, and clef/key vanish from the blocking histogram — the top blocker is
+    now `beam` at 10, down from clef's 96. Destruct: **651 → 758** removable
+    elements (101 of 113 clefs, all 6 key signatures). Item 3's histogram picked the
+    right item, which is the first real test of ordering-by-evidence.
+  - **`inherit` is the removal token**, not a second key. Del at the measure rung
+    was already taken (item 1's empty-bar removal), and "revert to the predecessor's
+    governance" is what removal MEANS for this class — so the popover grammar says
+    it in a word. Later inherited-attribute items inherit the token.
+  - **A verb without an address is invisible to the sweep.** Declaring the ops moved
+    nothing at first: `attemptElement` knew how to drive notes and note-attached
+    elements only, so 113 clefs came back `unaddressable` *with* a verb — the same
+    under-attempt ties had one item earlier. **Rule: every op family must teach the
+    walk its address**, and `ElementRef` grew `measureIndex` (set only when the ops
+    layer can really reach it) the way `noteKey` already worked.
+  - **The scope boundary shows up as 12 honest `no-op` clefs** — second part, second
+    staff, mid-measure position — rather than as failures. That is the two-axis
+    verdict doing its job: an item can ship a family without claiming the whole of it.
+  - **Third traced scenario**: `lab/tab-derivation/bare-melody`, 24 intents from
+    `{}` through the new clef verb to four pitched notes, matching its goldens.
 
 - **2026-08-14 — item 3 built: the forward verdict, and one verb gates the corpus.**
   `npm run sweep:construct` writes `harness/reports/construct-coverage.json`, drift

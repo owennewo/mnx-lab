@@ -4,10 +4,10 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "no-op": 809,
-      "removed": 651
+      "no-op": 702,
+      "removed": 758
     },
-    "unaddressableWithAnOp": 163
+    "unaddressableWithAnOp": 175
   },
   "kinds": {
     "accidental-display": {
@@ -26,7 +26,8 @@
       "no-op": 1
     },
     "clef": {
-      "no-op": 113
+      "removed": 101,
+      "no-op": 12
     },
     "direction": {
       "no-op": 13
@@ -53,7 +54,7 @@
       "no-op": 4
     },
     "key-signature": {
-      "no-op": 6
+      "removed": 6
     },
     "kit-component": {
       "no-op": 1
@@ -148,7 +149,7 @@
   "scenarios": {
     "lab/articulations/arpeggiated-chords": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 6
@@ -162,7 +163,7 @@
     },
     "lab/articulations/fermata": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -179,7 +180,7 @@
         "no-op": 4
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -196,7 +197,7 @@
         "no-op": 3
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 3
@@ -229,7 +230,8 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "note": {
         "removed": 32,
@@ -253,10 +255,11 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "key-signature": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 91,
@@ -277,7 +280,7 @@
     },
     "lab/durations/rest-gallery": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "full-measure-rest": {
         "no-op": 1
@@ -291,7 +294,7 @@
     },
     "lab/dynamics/accent-prefix-suffix": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "dynamic": {
         "no-op": 6
@@ -305,7 +308,7 @@
     },
     "lab/dynamics/all-dynamic-marks": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "dynamic": {
         "no-op": 27
@@ -319,7 +322,7 @@
     },
     "lab/dynamics/hairpin-and-relative": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "dynamic": {
         "no-op": 2
@@ -336,7 +339,7 @@
     },
     "lab/edge-cases/bar-duration-mismatch": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 6,
@@ -348,7 +351,8 @@
     },
     "lab/layout/group-barline-individual": {
       "clef": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "layout": {
         "no-op": 1
@@ -369,7 +373,7 @@
     },
     "lab/lyrics/verse-labels": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "lyric": {
         "no-op": 4
@@ -389,7 +393,7 @@
     },
     "lab/navigation/jumps-and-signs": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "fine": {
         "no-op": 1
@@ -429,7 +433,7 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 2
@@ -443,7 +447,7 @@
     },
     "lab/rhythm/appoggiatura": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "grace": {
         "no-op": 1
@@ -461,7 +465,7 @@
     },
     "lab/rhythm/sequence-space": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 2
@@ -478,7 +482,7 @@
     },
     "lab/rhythm/tuplet-number-hidden": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "no-op": 3,
@@ -496,7 +500,7 @@
     },
     "lab/score-text/directions": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "direction": {
         "no-op": 3
@@ -510,7 +514,8 @@
     },
     "lab/score-text/directions-across-parts": {
       "clef": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "direction": {
         "no-op": 1
@@ -534,7 +539,8 @@
     },
     "lab/score-text/directions-multi-staff": {
       "clef": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "direction": {
         "no-op": 3
@@ -555,7 +561,7 @@
     },
     "lab/score-text/directions-stacked": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "direction": {
         "no-op": 4
@@ -569,7 +575,7 @@
     },
     "lab/score-text/directions-symbolic": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "direction": {
         "no-op": 2
@@ -583,7 +589,7 @@
     },
     "lab/score-text/labels-with-navigation": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "fine": {
         "no-op": 1
@@ -609,7 +615,7 @@
     },
     "lab/score-text/rehearsal-marks": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -623,7 +629,7 @@
     },
     "lab/score-text/sections": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -637,7 +643,7 @@
     },
     "lab/score-text/sections-with-rehearsal-marks": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -654,7 +660,7 @@
     },
     "lab/tab-derivation/bare-chord": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 5
@@ -674,7 +680,7 @@
     },
     "lab/tab-derivation/bare-melody": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -697,7 +703,7 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -717,7 +723,7 @@
     },
     "lab/tab-derivation/drop-d": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -737,7 +743,7 @@
     },
     "lab/tab-derivation/fret-mismatch": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -760,7 +766,7 @@
     },
     "lab/tab-derivation/out-of-range": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 2
@@ -783,7 +789,7 @@
     },
     "lab/tab-derivation/partial-annotation": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 3
@@ -806,7 +812,7 @@
     },
     "lab/tab-derivation/string-only": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 2
@@ -829,7 +835,7 @@
     },
     "lab/tab-derivation/transposition-display-only": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 2
@@ -849,7 +855,7 @@
     },
     "lab/tab-derivation/undeclared-strings": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 2
@@ -866,7 +872,7 @@
     },
     "lab/tab-fingering/left-hand-fingers": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "fingering": {
         "no-op": 3
@@ -892,7 +898,7 @@
     },
     "lab/tab-fingering/right-hand-pima": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "fingering": {
         "no-op": 4
@@ -918,7 +924,7 @@
     },
     "lab/tab-part/standard-tuning-both": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -938,7 +944,7 @@
     },
     "lab/tab-positions/open-strings-chord": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 6
@@ -961,7 +967,7 @@
     },
     "lab/tab-spec-gaps/fingering-rejected": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -972,7 +978,7 @@
     },
     "lab/tab-spec-gaps/harmony-rejected": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -983,7 +989,7 @@
     },
     "lab/tab-spec-gaps/note-position-rejected": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -994,7 +1000,7 @@
     },
     "lab/tab-spec-gaps/part-tuning-rejected": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -1005,7 +1011,7 @@
     },
     "lab/tab-spec-gaps/tab-clef-rejected": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -1016,7 +1022,7 @@
     },
     "lab/tab-techniques/bend-and-release": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 2
@@ -1042,7 +1048,7 @@
     },
     "lab/tab-techniques/hammer-pull-chain": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -1068,7 +1074,7 @@
     },
     "lab/tab-techniques/natural-harmonics": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 2
@@ -1094,7 +1100,7 @@
     },
     "lab/tab-techniques/slides": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -1120,7 +1126,7 @@
     },
     "lab/tab-techniques/vibrato-and-palm-mute": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 3
@@ -1149,10 +1155,10 @@
         "no-op": 3
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "key-signature": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 8
@@ -1166,7 +1172,7 @@
         "no-op": 4
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -1180,7 +1186,7 @@
         "no-op": 9
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 10
@@ -1194,7 +1200,7 @@
         "no-op": 5
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 15
@@ -1208,7 +1214,7 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -1222,7 +1228,7 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "grace": {
         "no-op": 1
@@ -1240,7 +1246,7 @@
         "no-op": 12
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 16
@@ -1254,7 +1260,7 @@
         "no-op": 2
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 16
@@ -1265,7 +1271,8 @@
     },
     "spec/clef-changes": {
       "clef": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "note": {
         "removed": 4
@@ -1276,7 +1283,7 @@
     },
     "spec/dotted-notes": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 6
@@ -1287,7 +1294,7 @@
     },
     "spec/dynamic-accents": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "dynamic": {
         "no-op": 6
@@ -1301,7 +1308,7 @@
     },
     "spec/dynamics": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "dynamic": {
         "no-op": 2
@@ -1315,7 +1322,7 @@
     },
     "spec/full-measure-rests": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "full-measure-rest": {
         "no-op": 1
@@ -1329,7 +1336,7 @@
     },
     "spec/grace-note": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "grace": {
         "no-op": 1
@@ -1347,7 +1354,7 @@
         "no-op": 3
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "grace": {
         "no-op": 3
@@ -1365,7 +1372,8 @@
         "no-op": 5
       },
       "clef": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "note": {
         "removed": 7,
@@ -1386,7 +1394,7 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -1397,7 +1405,7 @@
     },
     "spec/jumps-dal-segno": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "jump": {
         "no-op": 1
@@ -1414,7 +1422,7 @@
     },
     "spec/jumps-ds-al-fine": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "fine": {
         "no-op": 1
@@ -1434,10 +1442,10 @@
     },
     "spec/key-signatures": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "key-signature": {
-        "no-op": 2
+        "removed": 2
       },
       "note": {
         "removed": 10
@@ -1448,7 +1456,7 @@
     },
     "spec/lyric-line-metadata": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "lyric": {
         "no-op": 12
@@ -1465,7 +1473,7 @@
     },
     "spec/lyrics-basic": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "lyric": {
         "no-op": 4
@@ -1479,7 +1487,7 @@
     },
     "spec/lyrics-multi-line": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "lyric": {
         "no-op": 8
@@ -1496,7 +1504,7 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "measure-repeat": {
         "no-op": 3
@@ -1510,7 +1518,7 @@
     },
     "spec/measure-repeats-with-counters": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "measure-repeat": {
         "no-op": 3
@@ -1527,7 +1535,8 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "layout": {
         "no-op": 2
@@ -1548,7 +1557,8 @@
     },
     "spec/multiple-layouts": {
       "clef": {
-        "no-op": 4
+        "removed": 1,
+        "no-op": 3
       },
       "layout": {
         "no-op": 4
@@ -1569,7 +1579,7 @@
     },
     "spec/multiple-voices": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 8,
@@ -1595,10 +1605,10 @@
         "no-op": 3
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "key-signature": {
-        "no-op": 1
+        "removed": 1
       },
       "layout": {
         "no-op": 2
@@ -1622,7 +1632,7 @@
     },
     "spec/ottavas-8va": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 5,
@@ -1640,7 +1650,8 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 2
+        "removed": 1,
+        "no-op": 1
       },
       "note": {
         "removed": 8,
@@ -1655,7 +1666,7 @@
     },
     "spec/repeats": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -1672,7 +1683,7 @@
     },
     "spec/repeats-alternate-endings-advanced": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "ending": {
         "no-op": 2
@@ -1692,7 +1703,7 @@
     },
     "spec/repeats-alternate-endings-simple": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "ending": {
         "no-op": 3
@@ -1712,7 +1723,7 @@
     },
     "spec/repeats-implied-start-repeat": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -1726,7 +1737,7 @@
     },
     "spec/repeats-more-once-repeated": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 1
@@ -1740,7 +1751,7 @@
     },
     "spec/rest-positions": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 7
@@ -1754,7 +1765,7 @@
         "no-op": 3
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
@@ -1765,7 +1776,7 @@
     },
     "spec/slurs": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 8
@@ -1779,7 +1790,7 @@
     },
     "spec/slurs-chords": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 8
@@ -1793,7 +1804,7 @@
     },
     "spec/slurs-targeting-specific-notes": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 6
@@ -1821,7 +1832,7 @@
     },
     "spec/tempo-markings": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 8
@@ -1838,7 +1849,7 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 3
@@ -1849,13 +1860,13 @@
     },
     "spec/tie-targets": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "ending": {
         "no-op": 2
       },
       "key-signature": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 17,
@@ -1876,7 +1887,7 @@
     },
     "spec/ties": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 6
@@ -1890,7 +1901,7 @@
     },
     "spec/time-signature-glyphs": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 6
@@ -1904,7 +1915,7 @@
     },
     "spec/time-signatures": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 10
@@ -1915,7 +1926,7 @@
     },
     "spec/tremolos-multi-note": {
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "no-op": 6
@@ -1932,7 +1943,7 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "no-op": 11,
@@ -1950,7 +1961,7 @@
         "no-op": 1
       },
       "clef": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 8
@@ -1961,6 +1972,12 @@
     }
   },
   "findings": [
+    {
+      "scenario": "lab/document/navigation-playground",
+      "element": "p1/m0/clef0",
+      "kind": "clef",
+      "verdict": "unaddressable"
+    },
     {
       "scenario": "lab/document/navigation-playground",
       "element": "p1/m0/v0/e0/n0",
@@ -2007,6 +2024,12 @@
       "scenario": "lab/document/navigation-playground",
       "element": "p1/m7/v0/e0/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "lab/document/twelve-bar-blues",
+      "element": "p1/m0/clef0",
+      "kind": "clef",
       "verdict": "unaddressable"
     },
     {
@@ -2317,6 +2340,12 @@
     },
     {
       "scenario": "lab/layout/group-barline-individual",
+      "element": "p1/m0/clef0",
+      "kind": "clef",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "lab/layout/group-barline-individual",
       "element": "p1/m0/v0/e0/n0",
       "kind": "note",
       "verdict": "unaddressable"
@@ -2343,6 +2372,12 @@
       "scenario": "lab/rhythm/tuplet-number-hidden",
       "element": "p0/m0/v0/e0/c/e2/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "lab/score-text/directions-across-parts",
+      "element": "p1/m0/clef0",
+      "kind": "clef",
       "verdict": "unaddressable"
     },
     {
@@ -2395,6 +2430,12 @@
     },
     {
       "scenario": "lab/score-text/directions-multi-staff",
+      "element": "p0/m0/clef1",
+      "kind": "clef",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "lab/score-text/directions-multi-staff",
       "element": "p0/m0/v1/e0/n0",
       "kind": "note",
       "verdict": "unaddressable"
@@ -2427,6 +2468,12 @@
       "scenario": "spec/beams-inner-grace-notes",
       "element": "p0/m0/v0/e1/c/e0/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/clef-changes",
+      "element": "p0/m0/clef1",
+      "kind": "clef",
       "verdict": "unaddressable"
     },
     {
@@ -2487,6 +2534,12 @@
       "scenario": "spec/grace-notes-beamed",
       "element": "p0/m0/v0/e5/c/e3/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/grand-staff",
+      "element": "p0/m0/clef1",
+      "kind": "clef",
       "verdict": "unaddressable"
     },
     {
@@ -2587,6 +2640,12 @@
     },
     {
       "scenario": "spec/multimeasure-rests",
+      "element": "p1/m0/clef0",
+      "kind": "clef",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/multimeasure-rests",
       "element": "p1/m2/v0/e0/n0",
       "kind": "note",
       "verdict": "unaddressable"
@@ -2629,6 +2688,12 @@
     },
     {
       "scenario": "spec/multiple-layouts",
+      "element": "p1/m0/clef0",
+      "kind": "clef",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/multiple-layouts",
       "element": "p1/m0/v0/e0/n0",
       "kind": "note",
       "verdict": "unaddressable"
@@ -2667,6 +2732,12 @@
       "scenario": "spec/multiple-layouts",
       "element": "p1/m1/v0/e2/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/multiple-layouts",
+      "element": "p2/m0/clef0",
+      "kind": "clef",
       "verdict": "unaddressable"
     },
     {
@@ -2715,6 +2786,12 @@
       "scenario": "spec/multiple-layouts",
       "element": "p2/m1/v0/e3/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/multiple-layouts",
+      "element": "p3/m0/clef0",
+      "kind": "clef",
       "verdict": "unaddressable"
     },
     {
@@ -2787,6 +2864,12 @@
       "scenario": "spec/ottavas-8va",
       "element": "p0/m1/v0/e0/n0",
       "kind": "note",
+      "verdict": "unaddressable"
+    },
+    {
+      "scenario": "spec/parts",
+      "element": "p1/m0/clef0",
+      "kind": "clef",
       "verdict": "unaddressable"
     },
     {

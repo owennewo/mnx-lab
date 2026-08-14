@@ -323,6 +323,43 @@ export class EditorSession {
         });
         return true;
       }
+      // The inherited-attribute pair (campaign item 5): the cursor's measure
+      // is the target, as with setTimeSignature. Clef writes the part
+      // measure, key the global one — same rung, two owners.
+      case 'setClef': {
+        this.apply({
+          type: 'setClef',
+          measureIndex: this.cursorState.measureIndex,
+          sign: intent.sign,
+          ...(intent.staffPosition !== undefined ? { staffPosition: intent.staffPosition } : {}),
+          ...(intent.octave ? { octave: intent.octave } : {})
+        });
+        return true;
+      }
+      case 'removeClef': {
+        // Nothing declared here means the measure ALREADY inherits: refuse,
+        // rather than pushing an op that changes nothing onto the queue.
+        const measure = this.doc.parts?.[0]?.measures?.[this.cursorState.measureIndex];
+        const declared = (measure?.clefs ?? []).some(
+          entry => (entry.staff ?? 1) === 1 && entry.position === undefined
+        );
+        if (!declared) return false;
+        this.apply({ type: 'removeClef', measureIndex: this.cursorState.measureIndex });
+        return true;
+      }
+      case 'setKeySignature': {
+        this.apply({
+          type: 'setKeySignature',
+          measureIndex: this.cursorState.measureIndex,
+          fifths: intent.fifths
+        });
+        return true;
+      }
+      case 'removeKeySignature': {
+        if (!this.doc.global?.measures?.[this.cursorState.measureIndex]?.key) return false;
+        this.apply({ type: 'removeKeySignature', measureIndex: this.cursorState.measureIndex });
+        return true;
+      }
       case 'setTuning': {
         this.apply({ type: 'setTuning', tuning: intent.tuning });
         return true;
