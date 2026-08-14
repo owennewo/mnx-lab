@@ -5,7 +5,8 @@
 // a small prompt whose text parses into an existing setup INTENT. Parsing
 // lives in edit/ — it is input-layer logic, DOM-free and unit-testable; the
 // popover chrome in ui/ only hosts the input box.
-import type { MnxPitch, MnxTuningEntry } from '../model/mnx.ts';
+import type { MnxNoteValueBase, MnxPitch, MnxTuningEntry } from '../model/mnx.ts';
+import type { MeasureAttribute, MeasureAttributeKind } from './ops.ts';
 
 /** "4/4", "6/8", "12/8" → an MNX time signature. Unit must be a power of two
  *  the notation can express. */
@@ -143,4 +144,119 @@ export function parseKeySignature(text: string): { fifths: number } | 'inherit' 
   }
   const named = KEY_NAMES[token];
   return named === undefined ? null : { fifths: named };
+}
+
+// ---------------------------------------------------------------------------
+// The bar-attribute family (campaign item 7,
+// roadmap/inprogress/core-element-ops-bar-attributes.md). One popover, ten
+// kinds: the first word names the attribute, the rest is its value. Removal is
+// `no <attribute>` — where item 5's inherited attributes say `inherit`
+// ("revert to the predecessor"), an annotation says it is simply not there.
+// The token names the removal CLASS, so the grammar teaches the taxonomy.
+
+const BARLINE_TYPES = [
+  'regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
+  'heavyLight', 'heavyHeavy', 'tick', 'short', 'noBarline'
+] as const;
+
+const TEMPO_UNITS: Record<string, MnxNoteValueBase> = {
+  whole: 'whole', half: 'half', quarter: 'quarter', eighth: 'eighth', '16th': '16th'
+};
+
+export const BAR_ATTRIBUTE_HELP =
+  'barline double · repeat start · repeat end 3 · ending 1,2 · segno · fine · ' +
+  'jump dsalfine · tempo 120 · rehearsal A · section Verse 1 · no <attribute>';
+
+export type BarAttributeResult =
+  | { set: MeasureAttribute }
+  | { remove: MeasureAttributeKind }
+  | null;
+
+/** The word a user types → the attribute kind it names. */
+const ATTRIBUTE_WORDS: Record<string, MeasureAttributeKind> = {
+  barline: 'barline',
+  ending: 'ending',
+  volta: 'ending',
+  segno: 'segno',
+  fine: 'fine',
+  jump: 'jump',
+  tempo: 'tempo',
+  rehearsal: 'rehearsal',
+  section: 'section'
+};
+
+export function parseBarAttribute(text: string): BarAttributeResult {
+  const trimmed = text.trim().replace(/\s+/g, ' ');
+  if (trimmed === '') return null;
+  const words = trimmed.split(' ');
+  const head = words[0].toLowerCase();
+
+  // Removal: `no repeat` / `no section` / `no barline`.
+  if (head === 'no') {
+    const target = (words[1] ?? '').toLowerCase();
+    if (target === 'repeat') return { remove: 'repeatEnd' };
+    const kind = ATTRIBUTE_WORDS[target];
+    return kind ? { remove: kind } : null;
+  }
+
+  // `repeat start` / `repeat end` / `repeat end 3` — one word, two kinds.
+  if (head === 'repeat') {
+    const which = (words[1] ?? '').toLowerCase();
+    if (which === 'start') return { set: { kind: 'repeatStart' } };
+    if (which !== 'end') return null;
+    const times = words[2] !== undefined ? Number(words[2]) : undefined;
+    if (times !== undefined && (!Number.isInteger(times) || times < 2)) return null;
+    return { set: { kind: 'repeatEnd', ...(times !== undefined ? { times } : {}) } };
+  }
+
+  const kind = ATTRIBUTE_WORDS[head];
+  if (!kind) return null;
+  const rest = words.slice(1).join(' ');
+
+  switch (kind) {
+    case 'barline': {
+      const type = BARLINE_TYPES.find(t => t.toLowerCase() === rest.toLowerCase());
+      return type ? { set: { kind: 'barline', type } } : null;
+    }
+    case 'ending': {
+      // "1", "1,2", "1 open" — the numbers, then an optional open flag.
+      const open = /\bopen\b/i.test(rest);
+      const numbers = rest
+        .replace(/\bopen\b/i, '')
+        .split(/[,\s]+/)
+        .filter(Boolean)
+        .map(Number);
+      if (numbers.some(n => !Number.isInteger(n) || n < 1)) return null;
+      return {
+        set: {
+          kind: 'ending',
+          ...(numbers.length > 0 ? { numbers } : {}),
+          ...(open ? { open: true } : {})
+        }
+      };
+    }
+    case 'segno':
+    case 'fine':
+      return rest === '' ? { set: { kind } } : null;
+    case 'jump': {
+      const type = rest.toLowerCase().replace(/[.\s]/g, '');
+      if (type === 'segno' || type === 'ds') return { set: { kind: 'jump', type: 'segno' } };
+      if (type === 'dsalfine') return { set: { kind: 'jump', type: 'dsalfine' } };
+      return null;
+    }
+    case 'tempo': {
+      // "120" (quarter implied) or "half=80".
+      const match = /^(?:([a-z0-9]+)\s*=\s*)?(\d{1,3})$/i.exec(rest);
+      if (!match) return null;
+      const base = match[1] ? TEMPO_UNITS[match[1].toLowerCase()] : 'quarter';
+      const bpm = Number(match[2]);
+      if (!base || bpm < 20 || bpm > 400) return null;
+      return { set: { kind: 'tempo', bpm, base } };
+    }
+    case 'rehearsal':
+    case 'section':
+      return rest === '' ? null : { set: { kind, label: rest } };
+    default:
+      return null;
+  }
 }

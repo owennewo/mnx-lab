@@ -4,8 +4,8 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "no-op": 702,
-      "removed": 758
+      "no-op": 646,
+      "removed": 814
     },
     "unaddressableWithAnOp": 175
   },
@@ -17,7 +17,7 @@
       "no-op": 14
     },
     "barline": {
-      "no-op": 7
+      "removed": 7
     },
     "beam": {
       "no-op": 40
@@ -36,10 +36,10 @@
       "no-op": 43
     },
     "ending": {
-      "no-op": 7
+      "removed": 7
     },
     "fine": {
-      "no-op": 3
+      "removed": 3
     },
     "fingering": {
       "no-op": 7
@@ -51,7 +51,7 @@
       "no-op": 6
     },
     "jump": {
-      "no-op": 4
+      "removed": 4
     },
     "key-signature": {
       "removed": 6
@@ -88,22 +88,22 @@
       "no-op": 59
     },
     "rehearsal": {
-      "no-op": 7
+      "removed": 7
     },
     "repeat-end": {
-      "no-op": 7
+      "removed": 7
     },
     "repeat-start": {
-      "no-op": 3
+      "removed": 3
     },
     "score": {
       "no-op": 10
     },
     "section": {
-      "no-op": 11
+      "removed": 11
     },
     "segno": {
-      "no-op": 5
+      "removed": 5
     },
     "slur": {
       "no-op": 6
@@ -130,7 +130,7 @@
       "no-op": 12
     },
     "tempo": {
-      "no-op": 2
+      "removed": 2
     },
     "tie": {
       "no-op": 1,
@@ -227,7 +227,7 @@
     },
     "lab/document/navigation-playground": {
       "barline": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1,
@@ -241,7 +241,7 @@
         "no-op": 2
       },
       "section": {
-        "no-op": 2
+        "removed": 2
       },
       "strings": {
         "no-op": 1
@@ -252,7 +252,7 @@
     },
     "lab/document/twelve-bar-blues": {
       "barline": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1,
@@ -269,7 +269,7 @@
         "no-op": 2
       },
       "section": {
-        "no-op": 2
+        "removed": 2
       },
       "strings": {
         "no-op": 1
@@ -396,16 +396,16 @@
         "removed": 1
       },
       "fine": {
-        "no-op": 1
+        "removed": 1
       },
       "jump": {
-        "no-op": 2
+        "removed": 2
       },
       "note": {
         "removed": 6
       },
       "segno": {
-        "no-op": 2
+        "removed": 2
       },
       "time-signature": {
         "no-op": 1
@@ -528,10 +528,10 @@
         "no-op": 2
       },
       "rehearsal": {
-        "no-op": 1
+        "removed": 1
       },
       "section": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -592,22 +592,22 @@
         "removed": 1
       },
       "fine": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 4
       },
       "rehearsal": {
-        "no-op": 2
+        "removed": 2
       },
       "section": {
-        "no-op": 2
+        "removed": 2
       },
       "segno": {
-        "no-op": 1
+        "removed": 1
       },
       "tempo": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -621,7 +621,7 @@
         "removed": 4
       },
       "rehearsal": {
-        "no-op": 2
+        "removed": 2
       },
       "time-signature": {
         "no-op": 1
@@ -635,7 +635,7 @@
         "removed": 4
       },
       "section": {
-        "no-op": 2
+        "removed": 2
       },
       "time-signature": {
         "no-op": 1
@@ -649,10 +649,10 @@
         "removed": 4
       },
       "rehearsal": {
-        "no-op": 2
+        "removed": 2
       },
       "section": {
-        "no-op": 2
+        "removed": 2
       },
       "time-signature": {
         "no-op": 1
@@ -1391,7 +1391,7 @@
     },
     "spec/hello-world": {
       "barline": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1
@@ -1408,13 +1408,13 @@
         "removed": 1
       },
       "jump": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 5
       },
       "segno": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -1425,16 +1425,16 @@
         "removed": 1
       },
       "fine": {
-        "no-op": 1
+        "removed": 1
       },
       "jump": {
-        "no-op": 1
+        "removed": 1
       },
       "note": {
         "removed": 5
       },
       "segno": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -1501,7 +1501,7 @@
     },
     "spec/measure-repeats": {
       "barline": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1
@@ -1532,7 +1532,7 @@
     },
     "spec/multimeasure-rests": {
       "barline": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1,
@@ -1672,10 +1672,10 @@
         "removed": 1
       },
       "repeat-end": {
-        "no-op": 1
+        "removed": 1
       },
       "repeat-start": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -1686,16 +1686,16 @@
         "removed": 1
       },
       "ending": {
-        "no-op": 2
+        "removed": 2
       },
       "note": {
         "removed": 8
       },
       "repeat-end": {
-        "no-op": 1
+        "removed": 1
       },
       "repeat-start": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -1706,16 +1706,16 @@
         "removed": 1
       },
       "ending": {
-        "no-op": 3
+        "removed": 3
       },
       "note": {
         "removed": 4
       },
       "repeat-end": {
-        "no-op": 2
+        "removed": 2
       },
       "repeat-start": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -1729,7 +1729,7 @@
         "removed": 1
       },
       "repeat-end": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -1743,7 +1743,7 @@
         "removed": 1
       },
       "repeat-end": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -1838,7 +1838,7 @@
         "removed": 8
       },
       "tempo": {
-        "no-op": 1
+        "removed": 1
       },
       "time-signature": {
         "no-op": 1
@@ -1846,7 +1846,7 @@
     },
     "spec/three-note-chord-and-half-rest": {
       "barline": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1
@@ -1863,7 +1863,7 @@
         "removed": 1
       },
       "ending": {
-        "no-op": 2
+        "removed": 2
       },
       "key-signature": {
         "removed": 1
@@ -1873,7 +1873,7 @@
         "no-op": 2
       },
       "repeat-end": {
-        "no-op": 1
+        "removed": 1
       },
       "space": {
         "no-op": 1
@@ -1958,7 +1958,7 @@
     },
     "spec/two-bar-c-major-scale": {
       "barline": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1

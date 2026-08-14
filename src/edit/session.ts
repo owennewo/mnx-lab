@@ -8,7 +8,7 @@ import { isTimedEvent } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent } from './intents.ts';
 import type { EditOp, OpLogEntry } from './ops.ts';
-import { EditHistory, measureHasInk, partHasInk } from './ops.ts';
+import { EditHistory, MEASURE_ATTRIBUTE_FIELDS, measureHasInk, partHasInk } from './ops.ts';
 import {
   addOnsets,
   buildGrid,
@@ -358,6 +358,31 @@ export class EditorSession {
       case 'removeKeySignature': {
         if (!this.doc.global?.measures?.[this.cursorState.measureIndex]?.key) return false;
         this.apply({ type: 'removeKeySignature', measureIndex: this.cursorState.measureIndex });
+        return true;
+      }
+      // The bar-attribute family (campaign item 7): the cursor's measure is
+      // the target, like every other measure-rung attribute.
+      case 'setMeasureAttribute': {
+        this.apply({
+          type: 'setMeasureAttribute',
+          measureIndex: this.cursorState.measureIndex,
+          attribute: intent.attribute
+        });
+        return true;
+      }
+      case 'removeMeasureAttribute': {
+        // Refuse when the attribute is not there, rather than queueing an op
+        // that changes nothing (the same rule as removeClef).
+        const measure = this.doc.global?.measures?.[this.cursorState.measureIndex] as
+          | Record<string, unknown>
+          | undefined;
+        const field = MEASURE_ATTRIBUTE_FIELDS[intent.kind];
+        if (!measure || measure[field] === undefined) return false;
+        this.apply({
+          type: 'removeMeasureAttribute',
+          measureIndex: this.cursorState.measureIndex,
+          kind: intent.kind
+        });
         return true;
       }
       case 'setTuning': {

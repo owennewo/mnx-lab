@@ -4,6 +4,7 @@
 // churning) map keys to intents, and the session maps intents to cursor moves
 // or EditOps. Trace fixtures are written in intents, NEVER keys, so they
 // survive every rebinding and every future emulation preset.
+import type { MeasureAttribute, MeasureAttributeKind } from './ops.ts';
 import type { MnxTuningEntry } from '../model/mnx.ts';
 
 /** Navigation: moves the cursor, never mutates the document. */
@@ -73,7 +74,11 @@ export type MutationIntent =
   | { type: 'setClef'; sign: string; staffPosition?: number; octave?: number }
   | { type: 'removeClef' }
   | { type: 'setKeySignature'; fifths: number }
-  | { type: 'removeKeySignature' };
+  | { type: 'removeKeySignature' }
+  // The bar-attribute family (campaign item 7): ten kinds, one verb, because
+  // they are all one thing — a key on the global measure.
+  | { type: 'setMeasureAttribute'; attribute: MeasureAttribute }
+  | { type: 'removeMeasureAttribute'; kind: MeasureAttributeKind };
 
 export type HistoryIntent = { type: 'undo' } | { type: 'redo' };
 

@@ -116,6 +116,7 @@ export type ShellAction =
   | 'partPopover'
   | 'clefPopover'
   | 'keySignaturePopover'
+  | 'barAttributePopover'
   | 'commandPalette'
   | 'goTo'
   | 'toggleRail';
@@ -133,6 +134,9 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // because Del at the measure rung already means "remove the empty bar".
   { code: 'KeyC', shift: true, action: 'clefPopover' },
   { code: 'KeyK', shift: true, action: 'keySignaturePopover' },
+  // The bar-attribute family (campaign item 7): ten kinds behind one
+  // popover, because they are all keys on the global measure.
+  { code: 'KeyB', shift: true, action: 'barAttributePopover' },
   // The palette (survey §8.5: Ctrl+K — Dorico's Jump Bar, GP's Cmd+E) and
   // go-to (§3.8: Ctrl+G + typed grammar) are ONE widget, two entry points:
   // Ctrl+K prefills the `>` command prefix, Ctrl+G opens bare (go-to).

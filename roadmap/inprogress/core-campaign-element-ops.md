@@ -94,7 +94,7 @@ agreed or candidate claims; **bold** = agreed.
 | 4 | duration completion | Dots (op already accepts `dots?` — cheapest unlock), capo (read but unwritable), time `display: common\|cut`. | ~10 | dot: single key (`.` candidate); capo/display: popover grammar | event / setup | undrafted |
 | 5 | [clef & key signature](core-element-ops-clef-key.md) | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class; `inherit` is the removal token. | **22 scenarios reachable** (from 1); 101 clefs + 6 key sigs removable | **Shift+C** clef, **Shift+K** key | **measure** | **built 2026-08-14** |
 | 6 | accidental spelling | Flats (natural-then-sharp policy makes E♭ unwritable), enharmonic respell, `accidentalDisplay`/parentheses. | 9+ | respell: single key | note | undrafted |
-| 7 | bar-attribute family | Barlines, repeats, endings, segno/jump/fine, sections, rehearsal, tempo — one typed-popover family on the global measure. | ~20 | popover tier | measure | undrafted |
+| 7 | [bar-attribute family](core-element-ops-bar-attributes.md) | Barlines, repeats, endings, segno/jump/fine, sections, rehearsal, tempo — one typed-popover family on the global measure. ONE op pair for ten kinds; `no <attribute>` strips. | **18 scenarios** (reachable 24 → 42); 56 elements removable | **Shift+B** | **measure** | **built 2026-08-14** |
 | 8 | event adornments | Articulations/markings, dynamics, directions. | ~14 | adornment alphabet (letter keys) | note/event | undrafted |
 | 9 | tab technique alphabet | Bends, slides, hammer/pull, vibrato, palm mute, harmonics — the `B H S V X O` set `keymapDocs.ts` already reserves. Entry side of [core-guitar-technique.md](../proposed/core-guitar-technique.md) (which owns rendering). | 5 | **B H S V X O** (reserved) | note | undrafted |
 | 10 | spanners | Slurs; tie variants (`crossVoice`, `lv`, `arpeggio`). Needs the two-ended target gesture; reference removal class. | 4 | S candidate (collides with slide — resolve here) | note→note | undrafted |
@@ -108,12 +108,39 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
+- **2026-08-14 — item 7 built: ten kinds, one verb, and the histogram proved itself.**
+  The bar-attribute family (`setMeasureAttribute`/`removeMeasureAttribute`) at
+  **Shift+B**, measure rung, `KeyDoc` row in the same change.
+  - **Reachable scenarios 24 → 42, removable elements 758 → 814** (all 56 family
+    elements). The predicted +18 landed exactly, two items after the histogram
+    started choosing the work — it is a planning instrument now, not a curiosity.
+  - **One op pair for ten kinds** because they are all *the same thing*: a key on
+    the global measure. The union keeps each payload typed (this is not a
+    stringly-typed bag) while the sweep gets one address, the panel one row shape
+    and the popover one grammar. **Test for a future family: do they share an
+    owner?** If not, they will not collapse like this.
+  - **The removal token names the removal CLASS.** `inherit` = revert to the
+    predecessor's governance (item 5, inherited attributes); `no <attribute>` =
+    it is simply not there (here, annotations). The grammar teaches the taxonomy;
+    a third class should earn a third word rather than overload these.
+  - **`barline` is the family's odd member and the taxonomy already had the word**:
+    it is a MODIFIER, not an annotation — every bar draws a barline regardless, so
+    removal returns the default stroke rather than removing ink. The ink census
+    listing `barline` as structural is what keeps that honest.
+  - **Trace-recording gotcha for later items**: the cursor's starting line depends
+    on the grid mode, so a fingerboard-less document needs one fewer `lineDown`
+    than a tab-mode one. Cost one iteration on `spec/hello-world`, now the fourth
+    recorded trace.
+  - Correction to item 5's entry: its "1 → 22" counted only untraced scenarios;
+    the honest figures are **3 → 24** (the +21 delta is unchanged).
+
 - **2026-08-14 — item 5 built: the first op family, and the campaign's biggest step.**
   The inherited-attribute pair (`setClef`/`removeClef`, `setKeySignature`/
   `removeKeySignature`), popover tier at **Shift+C** / **Shift+K**, measure rung,
   `KeyDoc` rows landed in the same change per the contract.
   - **Both scoreboards moved, as predicted.** Construct: reachable scenarios
-    **1 → 22**, and clef/key vanish from the blocking histogram — the top blocker is
+    **3 → 24** (`ops-reachable` 1 → 21, plus a promotion to `traced`), and
+    clef/key vanish from the blocking histogram — the top blocker is
     now `beam` at 10, down from clef's 96. Destruct: **651 → 758** removable
     elements (101 of 113 clefs, all 6 key signatures). Item 3's histogram picked the
     right item, which is the first real test of ordering-by-evidence.

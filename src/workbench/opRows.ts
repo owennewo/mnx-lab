@@ -7,7 +7,7 @@
 // same layering as hudRows.ts. An intent with no binding and no surface
 // renders "(no key)" honestly: the panel is a live gap detector.
 import type { EditorIntent } from '../edit/intents.ts';
-import type { EditOp, OpLogEntry } from '../edit/ops.ts';
+import type { EditOp, MeasureAttribute, OpLogEntry } from '../edit/ops.ts';
 import type { MnxTuningEntry } from '../model/mnx.ts';
 import { EDIT_LAYER, NAVIGATION_LAYER, TAB_DIGIT_LAYER } from '../edit/keymap.ts';
 import { KEY_DOCS, SURFACE_INTENTS, strokeKey } from '../edit/keymapDocs.ts';
@@ -30,6 +30,7 @@ const SURFACE_LABELS: Record<string, string> = {
   partPopover: 'Shift+P · popover',
   clefPopover: 'Shift+C · popover',
   keySignaturePopover: 'Shift+K · popover',
+  barAttributePopover: 'Shift+B · popover',
   commandPalette: 'Ctrl+K · palette',
   goTo: 'Ctrl+G · go-to',
   viewSwitcher: 'view tabs'
@@ -132,6 +133,36 @@ function opLabel(op: EditOp): string {
       return `key ${keyText(op.fifths)} @ m${op.measureIndex + 1}`;
     case 'removeKeySignature':
       return `key inherited @ m${op.measureIndex + 1}`;
+    case 'setMeasureAttribute':
+      return `${attributeText(op.attribute)} @ m${op.measureIndex + 1}`;
+    case 'removeMeasureAttribute':
+      return `no ${op.kind} @ m${op.measureIndex + 1}`;
+  }
+}
+
+/** A bar attribute as the popover grammar would have taken it. */
+function attributeText(attribute: MeasureAttribute): string {
+  switch (attribute.kind) {
+    case 'barline':
+      return `barline ${attribute.type}`;
+    case 'repeatStart':
+      return 'repeat start';
+    case 'repeatEnd':
+      return `repeat end${attribute.times !== undefined ? ` ${attribute.times}` : ''}`;
+    case 'ending':
+      return `ending ${(attribute.numbers ?? []).join(',')}${attribute.open ? ' open' : ''}`.trim();
+    case 'segno':
+      return 'segno';
+    case 'fine':
+      return 'fine';
+    case 'jump':
+      return `jump ${attribute.type}`;
+    case 'tempo':
+      return `tempo ${attribute.base}=${attribute.bpm}`;
+    case 'rehearsal':
+      return `rehearsal ${attribute.label}`;
+    case 'section':
+      return `section ${attribute.label}`;
   }
 }
 

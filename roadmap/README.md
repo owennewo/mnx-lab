@@ -245,6 +245,22 @@ proposals that name their campaign.
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
   now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-bar-attributes.md](inprogress/core-element-ops-bar-attributes.md)** —
+  campaign item 7: **ten bar attributes behind one popover**, the second op-family
+  item, **built 2026-08-14** the same day as proposed and again chosen by item 3's
+  histogram. Barline, repeat start/end, ending, segno, fine, jump, tempo, rehearsal
+  and section are all *the same thing* — a key on the global measure — so they share
+  **one op pair** (`setMeasureAttribute`/`removeMeasureAttribute`, payload typed per
+  kind, never a stringly-typed bag), one address in the sweep, one row shape in the
+  ops panel and one typed grammar at **Shift+B** (`barline double`, `repeat end 3`,
+  `ending 1,2`, `tempo half=80`, `section Verse 1`). Removal is **`no <attribute>`**,
+  because the token names the removal *class*: item 5's `inherit` says "revert to the
+  predecessor", an annotation's removal says "it is not there". `barline` is the odd
+  member and the taxonomy already had the word — a **modifier**, since every bar
+  draws a barline regardless, so removal returns the default stroke rather than
+  removing ink. Results: reachable scenarios **24 → 42** (the predicted +18, exactly),
+  removable elements **758 → 814** (all 56 family elements, no `broken` verdicts), and
+  a fourth recorded trace (`spec/hello-world`, 14 intents from `{}`).
 - **[core-element-ops-clef-key.md](inprogress/core-element-ops-clef-key.md)** —
   campaign item 5, **the first op-family item** and the campaign's biggest single step.
   **Built 2026-08-14**, same day as proposed, chosen by item 3's histogram rather than
@@ -255,7 +271,7 @@ proposals that name their campaign.
   clef removes a *declaration*, so the bar reverts to its predecessor's governance (or
   the engine default, which for a tab part is the guitar treble-8) — never to "no
   clef" — and the grammar says so in a word, **`inherit`**, because Del at the measure
-  rung already means "remove the empty bar". Results: reachable scenarios **1 → 22**,
+  rung already means "remove the empty bar". Results: reachable scenarios **3 → 24**,
   removable elements **651 → 758** (101 of 113 clefs, all 6 key signatures), a third
   recorded trace, and the next blocker down to `beam` at 10. It also taught the
   campaign a rule: **a verb without an address is invisible to the sweep** — declaring

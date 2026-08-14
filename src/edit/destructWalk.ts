@@ -17,6 +17,8 @@
 import type { MnxStructure } from '../model/mnx.ts';
 import { forEachKeyedNote, onsetsEqual, slotAt } from './cursor.ts';
 import { ELEMENT_KINDS, type ElementKind, type ElementRef } from './elementWalk.ts';
+import type { EditorIntent } from './intents.ts';
+import type { MeasureAttributeKind } from './ops.ts';
 import type { EditorSession } from './session.ts';
 
 /** The ink the ops layer can name: every keyed note of parts[0]/staff 1. */
@@ -47,6 +49,29 @@ export interface ElementAttempt {
   removal: RemovalVerdict;
 }
 
+/** The bar-attribute family's kinds → the `MeasureAttributeKind` they strip.
+ *  (`ElementKind` names them with hyphens, the op union in camelCase.) */
+const MEASURE_ATTRIBUTE_KINDS: Partial<Record<ElementKind, MeasureAttributeKind>> = {
+  barline: 'barline',
+  'repeat-start': 'repeatStart',
+  'repeat-end': 'repeatEnd',
+  ending: 'ending',
+  segno: 'segno',
+  fine: 'fine',
+  jump: 'jump',
+  tempo: 'tempo',
+  rehearsal: 'rehearsal',
+  section: 'section'
+};
+
+/** The removal intent for a measure-scoped element kind, if it has one. */
+function measureRemovalIntent(kind: ElementKind): EditorIntent | null {
+  if (kind === 'clef') return { type: 'removeClef' };
+  if (kind === 'key-signature') return { type: 'removeKeySignature' };
+  const attribute = MEASURE_ATTRIBUTE_KINDS[kind];
+  return attribute ? { type: 'removeMeasureAttribute', kind: attribute } : null;
+}
+
 /**
  * Try to remove one element from a session, the way a person would: navigate
  * to it, press Delete. Elements no op can remove are reported honestly rather
@@ -55,16 +80,16 @@ export interface ElementAttempt {
 export function attemptElement(session: EditorSession, element: ElementRef): ElementAttempt {
   if (!kindHasRemovalOp(element.kind)) return { address: 'unaddressable', removal: 'no-op' };
 
-  // Measure-scoped attributes are addressed by navigating to their bar; their
-  // removal reverts the bar to its predecessor's governance (campaign item 5).
-  if (element.kind === 'clef' || element.kind === 'key-signature') {
+  // Measure-scoped attributes are addressed by navigating to their bar, then
+  // fired with their own verb: the inherited pair reverts to the predecessor's
+  // governance (item 5), the bar-attribute family simply strips (item 7).
+  const measureIntent = measureRemovalIntent(element.kind);
+  if (measureIntent) {
     if (element.measureIndex === undefined) return { address: 'unaddressable', removal: 'no-op' };
     session.handleIntent({ type: 'goToMeasure', measureIndex: element.measureIndex });
     if (session.cursor.measureIndex !== element.measureIndex)
       return { address: 'unaddressable', removal: 'no-op' };
-    const applied = session.handleIntent({
-      type: element.kind === 'clef' ? 'removeClef' : 'removeKeySignature'
-    });
+    const applied = session.handleIntent(measureIntent);
     return { address: 'addressed', removal: applied ? 'removed' : 'refused' };
   }
 

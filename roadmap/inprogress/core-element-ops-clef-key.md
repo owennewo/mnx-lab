@@ -87,8 +87,8 @@ the cheatsheet cannot drift from the keymap.
 
 Both axes moved, and the numbers are the agreement block's fourth point discharged:
 
-- **Construct: reachable scenarios 1 → 22** (21 `ops-reachable` plus `bare-melody`
-  promoted past them to `traced`), exactly the predicted step. `clef` and
+- **Construct: reachable scenarios 3 → 24** — `ops-reachable` 1 → 21 plus
+  `bare-melody` promoted past them to `traced`, against a predicted +21. `clef` and
   `key-signature` have left the blocking histogram entirely; the top blocker is now
   **beam at 10**, down from clef's 96. `lab/tab-derivation/bare-melody` is recorded
   as a trace — 24 intents from `{}` (part, tuning, staff kind, bar, 4/4, the

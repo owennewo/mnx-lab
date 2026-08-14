@@ -228,6 +228,14 @@ export const KEY_DOCS: KeyDoc[] = [
     group: 'setup',
     meaning: { all: 'key signature… (typed popover: C/Bb/-3/+2; `inherit` un-declares)' }
   },
+  {
+    keys: 'Shift+B',
+    strokes: [{ code: 'KeyB', shift: true }],
+    group: 'setup',
+    meaning: {
+      all: 'bar attribute… (typed popover: barline/repeat/ending/segno/fine/jump/tempo/rehearsal/section; `no X` strips)'
+    }
+  },
 
   // ── Workbench shell.
   {
@@ -266,6 +274,7 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // token emits the removal intent (campaign item 5).
   clefPopover: ['setClef', 'removeClef'],
   keySignaturePopover: ['setKeySignature', 'removeKeySignature'],
+  barAttributePopover: ['setMeasureAttribute', 'removeMeasureAttribute'],
   commandPalette: ['undo', 'redo', 'appendMeasure', 'toggleTie', 'setStaffKind'],
   goTo: ['goToMeasure'],
   // The view tabs (workbench) / view attribute (embeds): switching the pane

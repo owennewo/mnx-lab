@@ -129,16 +129,66 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['setKeySignature'],
     remove: ['removeKeySignature']
   },
-  barline: { classes: [], note: 'Modifier: every measure ends with a barline; this picks its type.' },
-  'repeat-start': { classes: ['repeat-start'], note: 'Forward repeat at the measure start.' },
-  'repeat-end': { classes: ['repeat-end', 'repeat-dot', 'repeat-times'], note: 'Backward repeat.' },
-  ending: { classes: ['ending', 'ending-label'], note: 'A volta bracket over a measure range.' },
-  segno: { classes: ['segno'], note: 'A segno sign at a metric position.' },
-  fine: { classes: ['fine'], note: 'A fine marking at a metric position.' },
-  jump: { classes: ['jump'], note: 'A D.S./D.S. al Fine instruction.' },
-  tempo: { classes: ['tempo'], note: 'A metronome mark.' },
-  rehearsal: { classes: ['rehearsal-box', 'rehearsal-label'], note: 'A rehearsal mark (proposed field).' },
-  section: { classes: ['section-label'], note: 'A formal section label (proposed field).' },
+  barline: {
+    classes: [],
+    note: 'Modifier: every measure ends with a barline; this picks its type, so removal returns the default stroke rather than removing ink.',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  'repeat-start': {
+    classes: ['repeat-start'],
+    note: 'Forward repeat at the measure start.',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  'repeat-end': {
+    classes: ['repeat-end', 'repeat-dot', 'repeat-times'],
+    note: 'Backward repeat.',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  ending: {
+    classes: ['ending', 'ending-label'],
+    note: 'A volta bracket over a measure range.',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  segno: {
+    classes: ['segno'],
+    note: 'A segno sign at a metric position.',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  fine: {
+    classes: ['fine'],
+    note: 'A fine marking at a metric position.',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  jump: {
+    classes: ['jump'],
+    note: 'A D.S./D.S. al Fine instruction.',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  tempo: {
+    classes: ['tempo'],
+    note: 'A metronome mark.',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  rehearsal: {
+    classes: ['rehearsal-box', 'rehearsal-label'],
+    note: 'A rehearsal mark (proposed field).',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  section: {
+    classes: ['section-label'],
+    note: 'A formal section label (proposed field).',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
   harmony: { classes: [], note: 'Renderer gap — core-chord-symbols.md owns the drawing half.' },
   'part-name': {
     classes: ['staff-label'],
@@ -355,7 +405,9 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
     const json: (string | number)[] = ['global', 'measures', measureIndex];
     const at = (kind: ElementKind, field: string) => {
       if ((measure as unknown as Record<string, unknown>)[field] !== undefined)
-        push(out, kind, `${path}/${field}`, [...json, field]);
+        // Global-measure attributes are addressed by navigating to their bar
+        // (campaign item 7's family, and item 5's key signature before it).
+        pushAtMeasure(out, kind, `${path}/${field}`, [...json, field], measureIndex);
     };
     at('time-signature', 'time');
     if (measure.key !== undefined)
@@ -370,7 +422,7 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
     at('rehearsal', 'rehearsal');
     at('section', 'section');
     for (const [tempoIndex] of (measure.tempos ?? []).entries())
-      push(out, 'tempo', `${path}/tempo${tempoIndex}`, [...json, 'tempos', tempoIndex]);
+      pushAtMeasure(out, 'tempo', `${path}/tempo${tempoIndex}`, [...json, 'tempos', tempoIndex], measureIndex);
     for (const [harmonyIndex] of (measure._x?.mnxLab?.harmonies ?? []).entries())
       push(out, 'harmony', `${path}/harmony${harmonyIndex}`, [
         ...json, '_x', 'mnxLab', 'harmonies', harmonyIndex

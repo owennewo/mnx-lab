@@ -32,7 +32,9 @@ import {
   type ShellAction
 } from '../edit/keymap.ts';
 import {
+  BAR_ATTRIBUTE_HELP,
   CLEF_NAME_LIST,
+  parseBarAttribute,
   parseClef,
   parseKeySignature,
   parsePart,
@@ -47,7 +49,7 @@ import '../elements/ScoreViewer.ts';
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
-type PopoverKind = 'time' | 'tuning' | 'part' | 'clef' | 'key';
+type PopoverKind = 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
   time: {
@@ -74,6 +76,11 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
     label: 'key signature',
     placeholder: 'C · Bb · F# · -3 · inherit',
     hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
+  },
+  bar: {
+    label: 'bar attribute',
+    placeholder: 'barline double · repeat end · ending 1,2 · segno · tempo 120 · section Verse 1',
+    hint: 'this bar only · “no <attribute>” strips it · Enter applies · Esc closes'
   }
 };
 
@@ -82,7 +89,8 @@ const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   tuningPopover: 'tuning',
   partPopover: 'part',
   clefPopover: 'clef',
-  keySignaturePopover: 'key'
+  keySignaturePopover: 'key',
+  barAttributePopover: 'bar'
 };
 
 import './ScoreHud.ts';
@@ -897,6 +905,17 @@ export class ScenarioPage extends LitElement {
               ...(clef.octave ? { octave: clef.octave } : {})
             }
       );
+    } else if (this.setupPopover === 'bar') {
+      const parsed = parseBarAttribute(input.value);
+      if (!parsed) {
+        this.setupPopoverError = `not a bar attribute — ${BAR_ATTRIBUTE_HELP}`;
+        return;
+      }
+      this.stripIntent(
+        'set' in parsed
+          ? { type: 'setMeasureAttribute', attribute: parsed.set }
+          : { type: 'removeMeasureAttribute', kind: parsed.remove }
+      );
     } else if (this.setupPopover === 'key') {
       const key = parseKeySignature(input.value);
       if (!key) {
@@ -1048,8 +1067,7 @@ export class ScenarioPage extends LitElement {
     return html`
       <mnx-score-viewer
         .mnxDoc=${this.doc}
-        .viewMode=${viewMode}
-        .hasTab=${entry.hasTab}
+        .view=${viewMode}
         .partTabSetups=${this.partTabSetups()}
         .invalidByDesign=${entry.invalidByDesign}
         .pinnedErrors=${this.pinnedErrors}
@@ -1249,6 +1267,7 @@ export class ScenarioPage extends LitElement {
           <button @click=${() => this.openPopover('partPopover')}>part…</button>
           <button @click=${() => this.openPopover('clefPopover')}>clef…</button>
           <button @click=${() => this.openPopover('keySignaturePopover')}>key…</button>
+          <button @click=${() => this.openPopover('barAttributePopover')}>bar…</button>
         </div>
         <div class="action-state">
           entry duration: ${this.session.entryDurationBase}

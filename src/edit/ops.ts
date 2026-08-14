@@ -6,6 +6,7 @@
 // grow the union as real editing features land.
 import type {
   MnxBeam,
+  MnxGlobalMeasure,
   MnxEvent,
   MnxNote,
   MnxNoteValueBase,
@@ -184,7 +185,90 @@ export type EditOp =
       /** Drop this measure's key DECLARATION; the predecessor governs, or C. */
       type: 'removeKeySignature';
       measureIndex: number;
+    }
+  // The bar-attribute family (campaign item 7,
+  // roadmap/inprogress/core-element-ops-bar-attributes.md). Ten kinds that are
+  // all one thing — a key on the GLOBAL measure — so they share one verb with
+  // a typed payload rather than restating the same shape ten times.
+  | {
+      type: 'setMeasureAttribute';
+      measureIndex: number;
+      attribute: MeasureAttribute;
+    }
+  | {
+      /** Strip the attribute: the *annotation* removal class, so the key goes
+       *  entirely (an emptied `tempos` array with it — no tombstones).
+       *  `barline` is the exception the class taxonomy already covers: it is a
+       *  MODIFIER, so removing it returns the bar to the default stroke rather
+       *  than removing ink. `index` picks one entry of an array-valued
+       *  attribute (`tempos`); absent means the first. */
+      type: 'removeMeasureAttribute';
+      measureIndex: number;
+      kind: MeasureAttributeKind;
+      index?: number;
     };
+
+/** The ten bar attributes, each carrying exactly what its MNX object needs. */
+export type MeasureAttribute =
+  | { kind: 'barline'; type: NonNullable<NonNullable<MnxGlobalMeasure['barline']>['type']> }
+  | { kind: 'repeatStart' }
+  | { kind: 'repeatEnd'; times?: number }
+  | { kind: 'ending'; numbers?: number[]; duration?: number; open?: boolean }
+  | { kind: 'segno' }
+  | { kind: 'fine' }
+  | { kind: 'jump'; type: 'segno' | 'dsalfine' }
+  | { kind: 'tempo'; bpm: number; base: MnxNoteValueBase }
+  | { kind: 'rehearsal'; label: string }
+  | { kind: 'section'; label: string };
+
+export type MeasureAttributeKind = MeasureAttribute['kind'];
+
+/** Where each attribute lives on the global measure. `tempo` is the only
+ *  array, which is why removal takes an index. */
+export const MEASURE_ATTRIBUTE_FIELDS: Record<MeasureAttributeKind, string> = {
+  barline: 'barline',
+  repeatStart: 'repeatStart',
+  repeatEnd: 'repeatEnd',
+  ending: 'ending',
+  segno: 'segno',
+  fine: 'fine',
+  jump: 'jump',
+  tempo: 'tempos',
+  rehearsal: 'rehearsal',
+  section: 'section'
+};
+
+/** The measure-start position these three carry (mid-bar placement is item
+ *  11's onset-addressing work — see the scope boundary). */
+const MEASURE_START = { fraction: [0, 1] as [number, number] };
+
+function measureAttributeValue(attribute: MeasureAttribute): unknown {
+  switch (attribute.kind) {
+    case 'barline':
+      return { type: attribute.type };
+    case 'repeatStart':
+      return {};
+    case 'repeatEnd':
+      return attribute.times !== undefined ? { times: attribute.times } : {};
+    case 'ending':
+      return {
+        ...(attribute.numbers ? { numbers: attribute.numbers } : {}),
+        ...(attribute.duration !== undefined ? { duration: attribute.duration } : {}),
+        ...(attribute.open ? { open: true } : {})
+      };
+    case 'segno':
+      return { location: MEASURE_START };
+    case 'fine':
+      return { location: MEASURE_START };
+    case 'jump':
+      return { type: attribute.type, location: MEASURE_START };
+    case 'tempo':
+      return { bpm: attribute.bpm, value: { base: attribute.base } };
+    case 'rehearsal':
+    case 'section':
+      return { label: attribute.label };
+  }
+}
 
 const NOTE_STEPS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
 const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -380,6 +464,35 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const measure = next.global?.measures?.[op.measureIndex];
       if (!measure?.key) return next;
       delete measure.key;
+      return next;
+    }
+    case 'setMeasureAttribute': {
+      const measure = next.global?.measures?.[op.measureIndex] as
+        | Record<string, unknown>
+        | undefined;
+      if (!measure) return next;
+      const field = MEASURE_ATTRIBUTE_FIELDS[op.attribute.kind];
+      const value = measureAttributeValue(op.attribute);
+      // `tempos` is an array of marks; everything else is a single object.
+      if (field === 'tempos') measure.tempos = [value];
+      else measure[field] = value;
+      return next;
+    }
+    case 'removeMeasureAttribute': {
+      const measure = next.global?.measures?.[op.measureIndex] as
+        | Record<string, unknown>
+        | undefined;
+      if (!measure) return next;
+      const field = MEASURE_ATTRIBUTE_FIELDS[op.kind];
+      if (field === 'tempos') {
+        const tempos = (measure.tempos as unknown[] | undefined) ?? [];
+        const kept = tempos.filter((_, i) => i !== (op.index ?? 0));
+        // No tombstone: an emptied array goes with its last member.
+        if (kept.length > 0) measure.tempos = kept;
+        else delete measure.tempos;
+        return next;
+      }
+      delete measure[field];
       return next;
     }
     case 'setDuration': {

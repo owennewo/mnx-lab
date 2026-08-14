@@ -1,0 +1,55 @@
+{
+  "target": "spec/hello-world",
+  "intents": [
+    {
+      "type": "addPart"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "barline",
+        "type": "regular"
+      }
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    }
+  ]
+}
