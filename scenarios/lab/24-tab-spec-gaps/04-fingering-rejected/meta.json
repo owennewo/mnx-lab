@@ -26,5 +26,8 @@
   "idRefs": false,
   "source": "hand-written",
   "origin": "local",
-  "status": "valid"
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-14"
+  }
 }

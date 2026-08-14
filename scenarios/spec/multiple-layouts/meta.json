@@ -60,9 +60,10 @@
   "requires": [],
   "source": "spec-example",
   "origin": "mirrored",
-  "status": "rendered",
+  "status": "verified",
   "verification": {
-    "at": "2026-07-17",
-    "primitivesHash": "sha256:a1b392bb29a468ea"
+    "at": "2026-08-14",
+    "primitivesHash": "sha256:5c10527825df00a5",
+    "renderHash": "sha256:04782b94cad5ac78"
   }
 }

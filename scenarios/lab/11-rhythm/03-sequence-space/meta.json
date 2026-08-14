@@ -24,5 +24,10 @@
   "idRefs": false,
   "source": "hand-written",
   "origin": "local",
-  "status": "rendered"
+  "status": "verified",
+  "verification": {
+    "at": "2026-08-14",
+    "primitivesHash": "sha256:a12eb0f5ce800b64",
+    "renderHash": "sha256:97be7c777de095d7"
+  }
 }
