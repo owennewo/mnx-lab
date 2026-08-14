@@ -597,7 +597,12 @@ export class EditorSession {
           const run = beamRunBetween(probe, this.spanAnchorKey, slot.noteKey);
           this.spanAnchorKey = null;
           if (!run) return false;
-          this.apply({ type: 'setBeam', measureIndex: run.measureIndex, eventIds: run.eventIds });
+          this.apply({
+            type: 'setBeam',
+            measureIndex: run.measureIndex,
+            eventIds: run.eventIds,
+            partIndex: this.cursorState.partIndex ?? 0
+          });
           return true;
         }
         // 3. Otherwise arm (or disarm, pressing twice in one place).

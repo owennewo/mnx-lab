@@ -127,6 +127,33 @@ groups events, not notes, so the anchor resolves to its event.
 - **`B` is the second customer of item 10's projection rule**: beam in notation,
   bend in tab. The pattern is now a convention rather than a one-off.
 
+## Nested beams, and an oracle that was missing (2026-08-14)
+
+The item shipped with "only top-level beams get a verb", and the report showed
+the cost honestly: **17 of the 26 unremovable beams were nested levels** — the
+16th/32nd subdivisions and hooks in `beam-hooks` and
+`beams-secondary-beam-breaks` — not second parts as the row assumed.
+
+`removeBeam` now takes a **path** (the index chain: `[0]` the first top-level
+beam, `[0,1]` its second nested one), and the beam key **peels from the inside
+out** — deepest beam starting at this note first, so pressing it walks the 32nd
+level, then the 16th, then the primary. Removing an outer level while a
+secondary still hung off it would delete a grouping the player can see and did
+not aim at.
+
+**That semantics exposed a hole in the sweep.** A verb can change the document
+and still leave the element you aimed at: peeling removes the *nested* beam
+while the outer one, which starts at the same note, stays. The sweep counted
+that as `removed`, and the ink was still on the page. So the oracle set gained
+an **identity check** — after a removal, the value at the element's own path
+must have changed — and a verb that declines now reports `refused` rather than a
+false success. Every kind gets that check, not just beams; it is the same class
+of error as item 2's wrong-note deletion, caught this time by construction.
+
+**Beams 15 → 32 removed; the corpus reaches 1,351.** The remaining eight are
+staff 2 (`grand-staff`) and beams whose first event sits inside a grace
+container — both the same "one level down" work item 13c owns.
+
 ## Open questions
 
 - Should `setFullMeasureRest` clear the bar's content, or refuse on a bar that

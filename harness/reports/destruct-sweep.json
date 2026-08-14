@@ -4,11 +4,11 @@
     "scenarios": 106,
     "elements": 1460,
     "verdicts": {
-      "removed": 1333,
-      "no-op": 123,
+      "removed": 1351,
+      "no-op": 105,
       "refused": 4
     },
-    "unaddressableWithAnOp": 68
+    "unaddressableWithAnOp": 50
   },
   "kinds": {
     "accidental-display": {
@@ -21,8 +21,8 @@
       "removed": 7
     },
     "beam": {
-      "removed": 14,
-      "no-op": 26
+      "removed": 32,
+      "no-op": 8
     },
     "capo": {
       "removed": 1
@@ -1180,8 +1180,7 @@
     },
     "spec/beam-hooks": {
       "beam": {
-        "removed": 3,
-        "no-op": 6
+        "removed": 9
       },
       "clef": {
         "removed": 1
@@ -1195,8 +1194,7 @@
     },
     "spec/beams": {
       "beam": {
-        "removed": 4,
-        "no-op": 1
+        "removed": 5
       },
       "clef": {
         "removed": 1
@@ -1241,8 +1239,7 @@
     },
     "spec/beams-secondary-beam-breaks": {
       "beam": {
-        "removed": 2,
-        "no-op": 10
+        "removed": 12
       },
       "clef": {
         "removed": 1
@@ -1643,7 +1640,7 @@
     },
     "spec/parts": {
       "beam": {
-        "no-op": 1
+        "removed": 1
       },
       "clef": {
         "removed": 1,
@@ -2046,108 +2043,6 @@
       "verdict": "unaddressable"
     },
     {
-      "scenario": "spec/beam-hooks",
-      "element": "p0/m0/beam/b0/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beam-hooks",
-      "element": "p0/m0/beam/b0/b1",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beam-hooks",
-      "element": "p0/m0/beam/b1/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beam-hooks",
-      "element": "p0/m0/beam/b1/b1",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beam-hooks",
-      "element": "p0/m0/beam/b2/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beam-hooks",
-      "element": "p0/m0/beam/b2/b1",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams",
-      "element": "p0/m1/beam/b0/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams-secondary-beam-breaks",
-      "element": "p0/m0/beam/b0/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams-secondary-beam-breaks",
-      "element": "p0/m0/beam/b0/b0/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams-secondary-beam-breaks",
-      "element": "p0/m0/beam/b0/b1",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams-secondary-beam-breaks",
-      "element": "p0/m0/beam/b0/b1/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams-secondary-beam-breaks",
-      "element": "p0/m0/beam/b1/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams-secondary-beam-breaks",
-      "element": "p0/m0/beam/b1/b0/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams-secondary-beam-breaks",
-      "element": "p0/m0/beam/b1/b0/b1",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams-secondary-beam-breaks",
-      "element": "p0/m0/beam/b1/b1",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams-secondary-beam-breaks",
-      "element": "p0/m0/beam/b1/b1/b0",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/beams-secondary-beam-breaks",
-      "element": "p0/m0/beam/b1/b1/b1",
-      "kind": "beam",
-      "verdict": "unaddressable"
-    },
-    {
       "scenario": "spec/clef-changes",
       "element": "p0/m0/clef1",
       "kind": "clef",
@@ -2355,12 +2250,6 @@
       "scenario": "spec/parts",
       "element": "p1/m0/clef0",
       "kind": "clef",
-      "verdict": "unaddressable"
-    },
-    {
-      "scenario": "spec/parts",
-      "element": "p1/m0/beam/b0",
-      "kind": "beam",
       "verdict": "unaddressable"
     },
     {

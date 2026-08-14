@@ -110,6 +110,23 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
 
 ## Progress + learnings
 
+- **2026-08-14 — nested beams, and the identity oracle they exposed.** The
+  report said 26 beams were unremovable; the cause was not second parts but
+  **nested levels (17)** — subdivisions and hooks. `removeBeam` takes a path
+  now, and the beam key **peels from the inside out**: deepest first, so a
+  press walks the 32nd level, then the 16th, then the primary, rather than
+  deleting a grouping the player can see and did not aim at.
+  - **The sweep was counting a false success.** Peeling changes the document
+    while leaving the OUTER beam — the element actually aimed at — in place, and
+    the old oracles (doc changed, no dangling refs, undo restores) all passed.
+    The oracle set gained an **identity check**: after a removal, the value at
+    the element's own path must have changed, else the verdict is `refused`.
+    Every kind gets it. **"The document changed" was never the same claim as
+    "this element went"** — the same class of error as item 2's wrong-note
+    deletion, this time caught by construction rather than by luck.
+  - **Beams 15 → 32 removed; corpus 1,333 → 1,351.** The remaining eight are
+    staff 2 and beams whose first event sits inside a grace container.
+
 - **2026-08-14 — 13b's addressing half: the cursor learns there is more than one part.**
   Measured first: `parts[0]` was hard-coded in **44 places**, splitting into
   ~10 addressing sites and ~25 writing sites. Removal was already part-agnostic

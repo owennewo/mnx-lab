@@ -214,6 +214,24 @@ function sweepScenario(scenario: Scenario): ScenarioResult {
     const after = session.doc;
     if (JSON.stringify(after) === loadedBytes) failures.push('the document did not change');
 
+    // THE IDENTITY ORACLE: did the removal take THIS element? A verb can change
+    // the document and still leave the thing you aimed at — a beam key that
+    // peels the innermost level removes a nested beam while the outer one, also
+    // starting at that note, stays. Without this, the report would count it
+    // removed and the ink would still be on the page.
+    const at = (doc: unknown, jsonPath: (string | number)[]): unknown =>
+      jsonPath.reduce<unknown>(
+        (node, segment) => (node as Record<string | number, unknown> | undefined)?.[segment],
+        doc
+      );
+    const stillThere =
+      JSON.stringify(at(before, element.jsonPath)) === JSON.stringify(at(after, element.jsonPath));
+    if (stillThere) {
+      // Not a failure — the verb declined this one. `refused` says so.
+      row.verdict = 'refused';
+      return row;
+    }
+
     const freshErrors = newlyPresent(baseline.errors, validationErrors(after));
     if (freshErrors.length) failures.push(`new schema errors: ${freshErrors.slice(0, 2).join('; ')}`);
 

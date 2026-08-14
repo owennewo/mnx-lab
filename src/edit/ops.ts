@@ -302,13 +302,18 @@ export type EditOp =
       type: 'setBeam';
       measureIndex: number;
       eventIds: string[];
+      partIndex?: number;
     }
   | {
       /** Un-beam: the *reference* removal class again — a grouping goes, no
-       *  ink moves. An emptied `beams` array goes with its last member. */
+       *  ink moves. An emptied `beams` array goes with its last member.
+       *  `path` is the index chain, so a SECONDARY level (a 16th subdivision, a
+       *  hook) is addressable as itself: [0] is the first top-level beam, [0,1]
+       *  its second nested one. */
       type: 'removeBeam';
       measureIndex: number;
-      index: number;
+      path: number[];
+      partIndex?: number;
     }
   | {
       /** Declare the bar's rest (`sequence.fullMeasure`). Refused on a bar
@@ -960,18 +965,26 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setBeam': {
-      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
       if (!measure || op.eventIds.length < 2) return next;
       measure.beams = [...(measure.beams ?? []), { events: [...op.eventIds] }];
       return next;
     }
     case 'removeBeam': {
-      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
-      const beams = measure?.beams;
-      if (!measure || !beams?.[op.index]) return next;
-      const kept = beams.filter((_, i) => i !== op.index);
-      if (kept.length > 0) measure.beams = kept;
-      else delete measure.beams;
+      const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
+      if (!measure?.beams || op.path.length === 0) return next;
+      // Walk to the parent of the beam named by the path, then splice.
+      let owner: { beams?: MnxBeam[] } = measure;
+      for (const step of op.path.slice(0, -1)) {
+        const child = owner.beams?.[step];
+        if (!child) return next;
+        owner = child;
+      }
+      const index = op.path[op.path.length - 1];
+      if (!owner.beams?.[index]) return next;
+      const kept = owner.beams.filter((_, i) => i !== index);
+      if (kept.length > 0) owner.beams = kept;
+      else delete owner.beams; // no tombstone
       return next;
     }
     case 'setFullMeasureRest': {
@@ -1277,14 +1290,33 @@ function tieTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined
 /** A fresh deterministic note id: t1, t2, … skipping anything taken. */
 /** The index of the beam whose run STARTS at this note's event, or -1. The
  *  toggle asks before applying, so a no-op never reaches the op queue. */
-export function beamStartingAt(doc: MnxStructure, noteKey: string): { measureIndex: number; index: number } | null {
+/**
+ * The beam starting at this note's event — **deepest first**, so pressing the
+ * beam key peels one subdivision at a time from the inside out: the 32nd level,
+ * then the 16th, then the primary. Removing the outer level while a secondary
+ * still hung off it would delete a grouping the player can see and did not aim
+ * at (campaign item 11's nested-beam gap).
+ */
+export function beamStartingAt(
+  doc: MnxStructure,
+  noteKey: string
+): { measureIndex: number; path: number[]; partIndex: number } | null {
   const located = findKeyedNote(doc, noteKey);
-  if (!located) return null;
-  const event = located.event;
-  if (!event.id) return null;
-  const beams = doc.parts?.[0]?.measures?.[located.measureIndex]?.beams ?? [];
-  const index = beams.findIndex(beam => beam.events?.[0] === event.id);
-  return index >= 0 ? { measureIndex: located.measureIndex, index } : null;
+  if (!located?.event.id) return null;
+  const eventId = located.event.id;
+  const partIndex = findNoteAddress(doc, noteKey)?.partIndex ?? 0;
+  const beams = doc.parts?.[partIndex]?.measures?.[located.measureIndex]?.beams ?? [];
+
+  let best: number[] | null = null;
+  const visit = (list: MnxBeam[], prefix: number[]) => {
+    list.forEach((beam, index) => {
+      const path = [...prefix, index];
+      if (beam.events?.[0] === eventId && (best === null || path.length > best.length)) best = path;
+      visit(beam.beams ?? [], path);
+    });
+  };
+  visit(beams, []);
+  return best === null ? null : { measureIndex: located.measureIndex, path: best, partIndex };
 }
 
 /** The event ids of the run from one note's event to another's, minting ids as

@@ -398,9 +398,9 @@ function walkBeams(
     // A beam is addressed through the first note of the event it starts at —
     // the same "aim at the ink, act on what hangs off it" rule slurs use.
     pushOnNote(out, 'beam', `${path}/b${index}`, [...jsonPath, index], ownerFor?.(beam));
-    // Nested beams have no verb yet (item 11 authors the outer level only), so
-    // they carry no owner: the report says `no-op`, honestly.
-    walkBeams(out, beam.beams, `${path}/b${index}`, [...jsonPath, index, 'beams']);
+    // Nested levels are addressed the same way — through the note their run
+    // starts at — now that the beam verb peels from the inside out.
+    walkBeams(out, beam.beams, `${path}/b${index}`, [...jsonPath, index, 'beams'], ownerFor);
   });
 }
 
@@ -622,7 +622,6 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
       // Resolve each top-level beam's first event to a note key, when the ops
       // layer can name it (the entry surface, staff 1).
       const beamOwner = (beam: MnxBeam): string | undefined => {
-        if (partIndex !== 0) return undefined;
         let staffOne = -1;
         for (const sequence of measure.sequences ?? []) {
           if ((sequence.staff ?? 1) !== 1) continue;
@@ -633,7 +632,7 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
             if (!event.id || event.id !== beam.events?.[0]) continue;
             const note = (event.notes ?? [])[0];
             if (!note) return undefined;
-            return noteKeyAt(note as never, measureIndex, staffOne, eventIndex, 0);
+            return noteKeyAt(note as never, measureIndex, staffOne, eventIndex, 0, undefined, partIndex);
           }
         }
         return undefined;
