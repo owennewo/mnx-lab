@@ -88,7 +88,13 @@ corpus turns out to contain barely at all.
 
 **Container descent** (item 11b) is now one function's business, and **the
 `parts[0]` assumption** (item 13b) is the single biggest remaining cause of
-unaddressable ink at 122 notes. The seven unexplained navigation failures want a
-look during [core-selection-ladder.md](core-selection-ladder.md)'s per-level
-pass, which also owns whether `Alt+V` is the right key for stepping coincident
-notes or whether it should fall out of the ladder's vertical axis.
+unaddressable ink at 122 notes.
+
+**The seven navigation failures are closed** (2026-08-15, during
+[core-selection-ladder.md](core-selection-ladder.md)'s pass): three were a hard
+±16 line clamp an 8va note sat outside of, and four were the ink walk
+re-deriving its anchor voice from the ink under the cursor. The cursor now
+carries `voiceIndex`, completing the address this doc set out to complete —
+part, staff, voice, measure, onset, line, and the ordinal for what is found
+there. Whether `Alt+V` is the right key for stepping coincident notes, or
+whether it should fall out of the ladder's vertical axis, stays with the ladder.

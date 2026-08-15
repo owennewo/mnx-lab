@@ -273,13 +273,6 @@ export function driveToElement(session: EditorSession, key: string): boolean {
         if (!session.handleIntent({ type: 'setStaff', staffIndex })) continue;
       }
       if (driveWithinPart(session, key)) return true;
-      // ←→ at the note rung is voice-STICKY (the ladder's decided walk), so a
-      // second voice's unshared onsets cannot be reached by walking alone —
-      // the voice jump is how a player gets there, so the sweep uses it too.
-      for (const jump of ['jumpDown', 'jumpUp'] as const) {
-        if (!session.handleIntent({ type: jump })) continue;
-        if (driveWithinPart(session, key)) return true;
-      }
     }
   }
   return false;
@@ -299,6 +292,19 @@ function driveWithinProjection(session: EditorSession, key: string): boolean {
   if (!target) return false;
 
   session.handleIntent({ type: 'goToMeasure', measureIndex: target.position.measureIndex });
+  // The VOICE comes before the walk. ←→ at the note rung is voice-sticky (the
+  // ladder's decided walk, and the cursor now carries the anchor), so a second
+  // voice's unshared onsets are not reachable by walking at all — the voice
+  // jump is how a player gets there, so the sweep goes the same way, aimed at
+  // the voice the target actually lives in rather than trying jumps blind.
+  for (
+    let guard = 0;
+    (session.cursor.voiceIndex ?? 0) !== target.slot.voiceIndex && guard < 8;
+    guard++
+  ) {
+    const jump = (session.cursor.voiceIndex ?? 0) < target.slot.voiceIndex ? 'jumpDown' : 'jumpUp';
+    if (!session.handleIntent({ type: jump })) break;
+  }
   for (
     let guard = 0;
     !onsetsEqual(session.cursor.onset, target.position.onset) && guard < 64;

@@ -148,16 +148,46 @@ existing entry ghosts generalized): Enter into a rest drops a ghost cell on a
 staff line or string; typing materializes the note. Solid = a thing, ghost = a
 place for a thing.
 
-**The ink walk re-anchors, and a shared line hands it to the wrong voice.**
-`movePositionInk` takes its anchor voice from `slotAt` — whichever slot comes
-first on the cursor's line — so when two voices put a note on one line at one
-onset, a ←→ step can silently continue in the OTHER voice, skipping the rest of
-the one you were reading. Found 2026-08-15 by the destructibility sweep, which
-still cannot reach three notes of `lab/edge-cases/bar-duration-mismatch` (a bar
-that deliberately does not sum) or one of `spec/tie-targets` for exactly this
-reason. The per-level pass owns the decision: carry the anchor voice in the
-cursor rather than re-deriving it per step, or re-derive it but prefer the voice
-the previous step was in.
+**The ink walk re-anchored, and a shared line handed it to the wrong voice —
+decided 2026-08-15: THE CURSOR CARRIES ITS VOICE.** `movePositionInk` took its
+anchor from `slotAt` — whichever slot came first on the cursor's line — so when
+two voices put a note on one line at one onset, a ←→ step could silently
+continue in the OTHER voice, skipping the rest of the one being read. Found by
+the destructibility sweep, which could not reach three notes of
+`lab/edge-cases/bar-duration-mismatch` (a bar that deliberately does not sum)
+or one of `spec/tie-targets` for exactly this reason.
+
+The decision reads off the containment: MNX nests part → measure → sequence
+(**voice**) → event → note, and `EditorCursor` had grown `partIndex` and
+`staffIndex` but never the voice — the one component of a note's address that
+was re-derived from ink instead of held. So it is held: `voiceIndex?`, absent
+meaning the first, so every cursor and recorded trace written before this stays
+valid.
+
+Three rules fall out, and each is a test in `harness/conformance/navigation.test.ts`:
+
+- **Horizontal movement stays in one voice; vertical movement crosses.** ←→
+  walks the anchor's ink and never re-derives. Stepping the line onto ink that
+  belongs to another voice *adopts* it — otherwise the selection would show one
+  voice while the walk continued in another, the same incoherence mirrored.
+  The **voice jump** stays the explicit form, for when a line step cannot say
+  it (both voices on one line, or the wanted voice silent here).
+- **`slotIndex` disambiguates within the voice, not across it.** The ordinal is
+  position-local — it names a slot among *these* coincident slots and means
+  nothing at the next position, which is why every move drops it. Voice is
+  where you are; the ordinal is what you found there.
+- **A bar without the anchor voice falls back** to the nearest voice at or
+  below it, never persisting a voice that is not there and leaving the cursor
+  addressing nothing.
+
+Entry still targets voice 0 — a stated boundary, not an oversight: a typed note
+following the cursor's voice is the entry surface's question
+([core-element-ops-part-addressing.md](core-element-ops-part-addressing.md),
+campaign item 13c).
+
+The sweep's `no-op` column is now **empty**: 1,441 of 1,460 elements removed,
+19 refused on purpose, **zero unaddressable**. Its drive aims at the target's
+voice with the jump before it walks, which is the route a player takes.
 
 Two smaller navigation findings closed alongside it: the line clamp was a hard
 ±16 staff positions, so an 8va note at position 17 (`spec/ottavas-8va`) was ink
@@ -165,16 +195,17 @@ the cursor could not reach — now ±24; and the sweep learned to use the **voic
 jump** to reach a second voice's unshared onsets, which is what a player does,
 since ←→ is voice-sticky by design.
 
-**The cursor has no voice, and that loses notes.** `EditorCursor` is
-`{measureIndex, onset, line}`, so `slotAt` returns whichever slot matches the
-line first: when two voices put a note on the same string at the same onset
-(twelve-bar-blues m10 — melody over the alternating bass), the address is
-ambiguous and Delete removes *the other voice's* note. Found 2026-08-14 by the
-destructibility sweep, which now reports 48 of that scenario's notes as
-unaddressable ([core-element-ops-destruct-sweep.md](core-element-ops-destruct-sweep.md),
-campaign item 2). The per-level pass owns the decision — a voice component in
-the cursor, or a disambiguating gesture at the note rung — and the sweep's
-report is the regression surface for whichever lands. Note the asymmetry it
+**The cursor had no voice, and that lost notes — closed by the same decision.**
+`EditorCursor` was `{measureIndex, onset, line}`, so `slotAt` returned whichever
+slot matched the line first: when two voices put a note on the same string at the
+same onset (twelve-bar-blues m10 — melody over the alternating bass), the address
+was ambiguous and Delete removed *the other voice's* note. Found 2026-08-14 by the
+destructibility sweep, which reported 48 of that scenario's notes as unaddressable
+([core-element-ops-destruct-sweep.md](core-element-ops-destruct-sweep.md),
+campaign item 2). It took **both** halves of the answer, which is why it read as
+one problem and was two: the disambiguating gesture at the note rung
+(`slotIndex` + `Alt+V`, core-note-address.md move 2) for coincidence *within* a
+voice, and the anchor above for coincidence *across* voices. Note the asymmetry it
 also exposed: the same chord can be ambiguous in tab (two members derived onto
 one string) and perfectly addressable in notation, so the fix has to name which
 projection's address it fixes.

@@ -985,7 +985,7 @@ export class EditorSession {
       case 'jumpUp':
       case 'jumpDown': {
         if (this.level !== 'note') return false;
-        const anchor = slotAt(this.grid, before, this.activeProjection)?.voiceIndex ?? 0;
+        const anchor = before.voiceIndex ?? 0;
         const target = anchor + (intent.type === 'jumpDown' ? 1 : -1);
         // The voice jump targets the event SOUNDING at the cursor's instant:
         // voices rarely share onsets (an alternating bass against a melody
@@ -1004,6 +1004,8 @@ export class EditorSession {
         this.cursorState = {
           measureIndex: targetPos.measureIndex,
           onset: targetPos.onset,
+          // The jump is what SETS the anchor voice — ←→ then stays in it.
+          ...(target ? { voiceIndex: target } : {}),
           line: slots.length > 0 ? nearestSlotLine(slots, before.line, tab) : before.line
         };
         return true;
@@ -1021,7 +1023,7 @@ export class EditorSession {
         // nearest-pitch member (snap-to-ink, the working default).
         return this.activeProjection === 'tab' && this.grid.mode === 'string'
           ? movePosition(this.grid, before, delta)
-          : movePositionInk(this.grid, before, delta, this.activeProjection, 'nearest');
+          : movePositionInk(this.grid, before, delta, 'nearest');
       case 'event':
         return movePosition(this.grid, before, delta);
       case 'voiceMeasure':

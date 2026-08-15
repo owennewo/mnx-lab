@@ -27,6 +27,11 @@
 > **First baseline: 1,460 elements over 106 scenarios — 639 removed, 821 no-op, 162
 > unaddressable notes**, and every scenario passes its invariants. Goldens
 > byte-identical; the suite went 4 s → 9.7 s (110 sweep tests inside it).
+>
+> **Where it stands 2026-08-15: 1,441 removed, 19 refused, 0 no-op, 0
+> unaddressable.** The 19 refusals are the correct answer (containers still
+> holding ink, a meter-changing time signature, a referenced kit component);
+> the report's `findings` array is empty for the first time.
 
 ## The four decisions
 

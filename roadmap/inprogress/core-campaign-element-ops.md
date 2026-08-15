@@ -707,3 +707,28 @@ transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-cho
     distinguishable ink for".
   - Both oracles already exist in the repo: primitives goldens for construct,
     byte-identical undo-all for destruct. Neither harness needs new verdict machinery.
+
+### 2026-08-15 — the cursor's voice, and an empty `no-op` column
+
+The sweep's last four unaddressable notes were one missing field. `EditorCursor`
+had grown `partIndex` and `staffIndex` but not `voiceIndex`, so the ink walk
+re-derived its anchor voice from whichever slot sat on the cursor's line and
+could hand itself to the other voice mid-step. Carrying it closes the column:
+**1,441 removed / 19 refused / 0 unaddressable** of 1,460 elements, across all
+106 scenarios.
+
+Three learnings for the items still open:
+
+- **An address should mirror the document's containment, component for
+  component.** Every gap this campaign found at the note rung was a component
+  of `part → measure → voice → event → note` that the cursor did not hold and
+  re-derived instead. There are none left to add — which is a claim the sweep
+  now checks rather than a hope.
+- **Coincidence is two problems, not one.** Within a voice it is an ordinal
+  (`slotIndex`, position-local, dropped by every move); across voices it is an
+  anchor (carried, survives moves). Conflating them is what made
+  twelve-bar-blues look like a single 48-note failure.
+- **A sweep that navigates like a player finds what a player finds.** The drive
+  now takes the voice jump to the target's voice *before* walking, because ←→
+  is voice-sticky by design — the fix was to route the sweep the way the design
+  says a person gets there, not to loosen the walk.

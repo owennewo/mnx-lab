@@ -96,6 +96,94 @@ describe('note-level navigation (notation projection)', () => {
     expect(session.selectedNoteKeys).toEqual(['l7']);
   });
 
+  // The anchor voice (core-selection-ladder.md): a two-voice bar where the
+  // voices SHARE a staff position at one onset — the case that used to hand
+  // the ←→ walk to the other voice, because the anchor was re-derived from
+  // whichever slot sat on the line rather than carried by the cursor.
+  const twoVoices = (): MnxStructure => ({
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }, {}] },
+    parts: [
+      {
+        measures: [
+          {
+            clefs: [{ clef: { sign: 'G', staffPosition: -2 } }],
+            sequences: [
+              {
+                content: (['C', 'D', 'E', 'F'] as const).map(step => ({
+                  type: 'event' as const,
+                  duration: { base: 'quarter' as const },
+                  notes: [{ pitch: { step, octave: 4 } }]
+                }))
+              },
+              {
+                content: [
+                  // C4 shares voice 0's line at onset 0; G5 does not.
+                  { type: 'event', duration: { base: 'half' }, notes: [{ pitch: { step: 'C', octave: 4 } }] },
+                  { type: 'event', duration: { base: 'half' }, notes: [{ pitch: { step: 'G', octave: 5 } }] }
+                ]
+              }
+            ]
+          },
+          // One voice only — what the anchor falls back from.
+          {
+            sequences: [
+              {
+                content: [
+                  { type: 'event', duration: { base: 'whole' }, notes: [{ pitch: { step: 'C', octave: 4 } }] }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  } as MnxStructure);
+
+  const voiceSession = (): EditorSession => {
+    const session = new EditorSession(twoVoices());
+    session.handleIntent({ type: 'setProjection', projection: 'notation' });
+    return session;
+  };
+
+  it('the walk stays in the anchor voice where the voices share a line', () => {
+    const session = voiceSession();
+    session.handleIntent({ type: 'jumpDown' }); // into voice 1
+    expect(session.cursor.voiceIndex).toBe(1);
+    expect(session.selectedNoteKeys).toEqual(['@m0.v1.e0.n0']);
+    session.handleIntent({ type: 'nextPosition' });
+    // Voice 1's own next onset is 1/2 — voice 0's 1/4 belongs to a line the
+    // cursor is not reading, however close it sits.
+    expect(session.cursor.onset).toEqual({ num: 1, den: 2 });
+    expect(session.selectedNoteKeys).toEqual(['@m0.v1.e1.n0']);
+  });
+
+  it('vertical movement adopts the voice it lands in', () => {
+    const session = voiceSession();
+    expect(session.cursor.voiceIndex ?? 0).toBe(0);
+    session.handleIntent({ type: 'nextPosition' });
+    session.handleIntent({ type: 'nextPosition' }); // voice 0's E4 at 1/2
+    expect(session.selectedNoteKeys).toEqual(['@m0.v0.e2.n0']);
+    // Climb onto voice 1's G5, sharing the onset: the selection says voice 1,
+    // so the walk must too.
+    for (let guard = 0; guard < 24 && session.selectedNoteKeys[0] !== '@m0.v1.e1.n0'; guard++) {
+      session.handleIntent({ type: 'lineUp' });
+    }
+    expect(session.selectedNoteKeys).toEqual(['@m0.v1.e1.n0']);
+    expect(session.cursor.voiceIndex).toBe(1);
+  });
+
+  it('a bar without the anchor voice falls back rather than stranding', () => {
+    const session = voiceSession();
+    session.handleIntent({ type: 'jumpDown' });
+    expect(session.cursor.voiceIndex).toBe(1);
+    session.handleIntent({ type: 'goToMeasure', measureIndex: 1 });
+    // Bar 2 has one voice; the cursor addresses it rather than a voice that
+    // is not there.
+    expect(session.cursor.voiceIndex ?? 0).toBe(0);
+    expect(session.selectedNoteKeys).toEqual(['@m1.v0.e0.n0']);
+  });
+
   it('chord arrival picks the nearest staff position', () => {
     const session = notationSession();
     session.handleIntent({ type: 'goToMeasure', measureIndex: 4 });

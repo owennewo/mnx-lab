@@ -99,6 +99,18 @@ export interface EditorCursor {
    */
   partIndex?: number;
   /**
+   * Which VOICE of that staff the cursor is reading. Absent means the first,
+   * so every cursor written before this stays valid.
+   *
+   * MNX's containment is part → measure → sequence (voice) → event → note, and
+   * this address mirrored all of it except the voice — which is why the walk
+   * kept re-deriving the voice from whichever slot came first on the line, and
+   * kept getting it wrong when two voices shared a line
+   * (core-selection-ladder.md). Voice is part of WHERE you are, not what you
+   * find there, so it survives a move like part and staff do.
+   */
+  voiceIndex?: number;
+  /**
    * Which STAFF of that part (1-based). Absent means the first, so cursors
    * written before staves were addressable stay valid. A grand staff is two
    * spaces, not one taller one: the ladder addresses a staff at a time
@@ -432,9 +444,16 @@ export function coincidentSlots(
 ): NoteSlot[] {
   const position = positionAt(grid, cursor);
   if (!position || position.slots.length === 0) return [];
-  return projection === 'tab' && grid.mode === 'string'
-    ? position.slots.filter(s => s.line === cursor.line)
-    : position.slots.filter(s => s.staffPosition === cursor.line);
+  const onLine =
+    projection === 'tab' && grid.mode === 'string'
+      ? position.slots.filter(s => s.line === cursor.line)
+      : position.slots.filter(s => s.staffPosition === cursor.line);
+  // The cursor's voice scopes what it sees; the ordinal then disambiguates
+  // WITHIN that voice (two chord members derived onto one string). Switching
+  // voice is the voice jump's job, not the cycle key's.
+  const voice = cursor.voiceIndex ?? 0;
+  const mine = onLine.filter(s => s.voiceIndex === voice);
+  return mine.length > 0 ? mine : onLine;
 }
 
 /** Step to the next note sharing this moment and line, wrapping. Returns the
@@ -470,10 +489,11 @@ export function clampCursor(grid: PositionGrid, cursor: EditorCursor): EditorCur
 /** Where the cursor IS — part and staff — survives every move; what it means
  *  at that spot (the line's coincidence ordinal) does not. Dropping the part on
  *  a move sent edits back to `parts[0]` while the cursor showed part 2. */
-function carry(cursor: EditorCursor): Pick<EditorCursor, 'partIndex' | 'staffIndex'> {
+function carry(cursor: EditorCursor): Pick<EditorCursor, 'partIndex' | 'staffIndex' | 'voiceIndex'> {
   return {
     ...(cursor.partIndex ? { partIndex: cursor.partIndex } : {}),
-    ...(cursor.staffIndex && cursor.staffIndex !== 1 ? { staffIndex: cursor.staffIndex } : {})
+    ...(cursor.staffIndex && cursor.staffIndex !== 1 ? { staffIndex: cursor.staffIndex } : {}),
+    ...(cursor.voiceIndex ? { voiceIndex: cursor.voiceIndex } : {})
   };
 }
 
@@ -504,12 +524,14 @@ export function movePositionInk(
   grid: PositionGrid,
   cursor: EditorCursor,
   delta: 1 | -1,
-  projection: Projection,
   landing: 'nearest' | 'keep'
 ): EditorCursor {
   const index = positionIndexOf(grid.positions, cursor);
   if (index < 0) return cursor;
-  const anchor = slotAt(grid, cursor, projection)?.voiceIndex ?? 0;
+  // THE ANCHOR IS THE CURSOR'S, not whichever slot happens to sit on this line:
+  // deriving it from the ink let a shared line hand the walk to the other voice
+  // mid-step, stranding the rest of the one being read.
+  const anchor = cursor.voiceIndex ?? 0;
   for (let i = index + delta; i >= 0 && i < grid.positions.length; i += delta) {
     const position = grid.positions[i];
     if (!position.voices.includes(anchor)) continue;
@@ -548,8 +570,18 @@ export function moveToMeasure(
   const last = grid.positions[grid.positions.length - 1];
   if (!last) return cursor;
   const target = Math.min(Math.max(measureIndex, 0), last.measureIndex);
-  const first = grid.positions.find(p => p.measureIndex === target);
-  return first ? toPosition(cursor, first) : cursor;
+  const inMeasure = grid.positions.filter(p => p.measureIndex === target);
+  if (inMeasure.length === 0) return cursor;
+  // The anchor voice may not exist in this bar. Fall back to the nearest one
+  // at or below it, else the first — never persist a voice that is not there,
+  // which would leave the cursor addressing nothing.
+  const wanted = cursor.voiceIndex ?? 0;
+  const available = [...new Set(inMeasure.flatMap(p => [...p.voices]))].sort((a, b) => a - b);
+  const voice = available.includes(wanted)
+    ? wanted
+    : ([...available].reverse().find(v => v < wanted) ?? available[0] ?? 0);
+  const first = inMeasure.find(p => p.voices.includes(voice)) ?? inMeasure[0];
+  return withVoice(toPosition(cursor, first), voice);
 }
 
 /** How far the notation cursor may leave the staff, in staff positions
@@ -569,10 +601,44 @@ export function moveLine(
   delta: 1 | -1,
   projection: Projection
 ): EditorCursor {
-  if (projection === 'tab' && grid.mode === 'string') {
-    const next = Math.min(Math.max(cursor.line + delta, 1), grid.lineCount);
-    return { measureIndex: cursor.measureIndex, onset: cursor.onset, line: next, ...carry(cursor) };
-  }
-  const next = Math.min(Math.max(cursor.line - delta, -STAFF_POSITION_RANGE), STAFF_POSITION_RANGE);
-  return { measureIndex: cursor.measureIndex, onset: cursor.onset, line: next, ...carry(cursor) };
+  const tab = projection === 'tab' && grid.mode === 'string';
+  const next = tab
+    ? Math.min(Math.max(cursor.line + delta, 1), grid.lineCount)
+    : Math.min(Math.max(cursor.line - delta, -STAFF_POSITION_RANGE), STAFF_POSITION_RANGE);
+  const moved = { measureIndex: cursor.measureIndex, onset: cursor.onset, line: next, ...carry(cursor) };
+  return adoptedVoice(grid, moved, projection);
+}
+
+/**
+ * VERTICAL movement crosses voices; horizontal movement stays in one.
+ *
+ * Stepping the line onto ink that belongs to another voice IS the statement
+ * "I'm reading that now" — otherwise the selection would show one voice while
+ * ←→ walked another, the same incoherence the anchor fixes, mirrored. The
+ * voice jump remains the explicit form, for when a line step cannot say it
+ * (both voices on one line, or the target voice silent here).
+ */
+function adoptedVoice(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  projection: Projection
+): EditorCursor {
+  const anchor = cursor.voiceIndex ?? 0;
+  const position = positionAt(grid, cursor);
+  if (!position) return cursor;
+  const onLine = (
+    projection === 'tab' && grid.mode === 'string'
+      ? position.slots.filter(s => s.line === cursor.line)
+      : position.slots.filter(s => s.staffPosition === cursor.line)
+  );
+  if (onLine.length === 0 || onLine.some(s => s.voiceIndex === anchor)) return cursor;
+  return withVoice(cursor, onLine[0].voiceIndex);
+}
+
+/** Set the anchor voice, dropping the field for the first voice so a cursor
+ *  written before the anchor existed and one written after are the same
+ *  object — the trace fixtures compare them literally. */
+function withVoice(cursor: EditorCursor, voice: number): EditorCursor {
+  const { voiceIndex: _drop, ...rest } = cursor;
+  return voice ? { ...rest, voiceIndex: voice } : rest;
 }
