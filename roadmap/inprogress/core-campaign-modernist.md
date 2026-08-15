@@ -1,6 +1,8 @@
 # Campaign: Modernist — the workbench restyle the tray's art direction leads
 
-> **Status: IN PROGRESS 2026-08-15 — items 1–6 built; 7 open, 8 undrafted.**
+> **Status: IN PROGRESS 2026-08-15 — items 1–7 all built. Only row 8 remains
+> (the `<360px` drawer), undrafted and deliberately deferred: it needs a panel
+> open/close control the design never drew.**
 > A campaign (see CLAUDE.md → Conventions): this doc
 > is an index over several normal proposals, the shared contract they follow, and the
 > running log of progress and learnings as items land. Indexed items are ordinary
@@ -129,8 +131,9 @@ frame exists.
 | 4 | revision on [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) | The tray drops its 55 hard-coded literals for token references — but **keeps inheriting** the palette rather than declaring `designTokens` locally (an early draft said otherwise; a local block would pin the tray light when the theme switches). A revision block on the complete doc, not a new one: same component, same art direction, and that doc already carries the deviations section this closes. | 1, 3 | **built 2026-08-15** |
 | 5 | [workbench-score-panel.md](../complete/workbench-score-panel.md) | The score panel: five-band frame, seven tabs cut to five, the width change, and the per-tab rebuilds. The campaign's structure half and its showcase. **Built** except the two halves that belong to other items — the JSON gutter and selection scoping (item 7) and compare's live render/overlay. | 1 | **built 2026-08-15** |
 | 6 | [workbench-queue-pips.md](../complete/workbench-queue-pips.md) | Re-deriving the five-state queue ramp under one accent — the bill "red everywhere" runs up. Shape and lightness carry what hue no longer can. | 1 | **built 2026-08-15** |
-| 7 | [core-json-view.md](../proposed/core-json-view.md) | `buildJsonView()` gains `spanByPointer`; the dormant module finally gets a consumer, a conformance test, and the pinned-error highlight the panel consolidation lost. The only below-the-boundary code change in the campaign. | — (5 for the UI half) | proposed |
+| 7 | [core-json-view.md](../complete/core-json-view.md) | `buildJsonView()` gains `spanByPointer`; the dormant module finally gets a consumer, a conformance test, and the pinned-error highlight the panel consolidation lost. The only below-the-boundary code change in the campaign. | — (5 for the UI half) | **built 2026-08-15** |
 | 8 | *(undrafted)* | The `<360px` drawer mode. Needs a viewport breakpoint, an absolutely-positioned panel, **and a panel open/close control that does not exist** — the rail has Ctrl+B, the panel has nothing, and the mock specifies neither the control nor its keystroke. | 5 | undrafted |
+| 9 | [core-zoom-density-pad.md](../proposed/core-zoom-density-pad.md) | The crosshair zoom/density pad over the score's top right — the same design project's `Zoom Control.dc.html`. Also closes the UI half of [core-render-density-zoom.md](core-render-density-zoom.md): **↑↓ staff** wires `zoom` to `pxPerSp` at last, **←→ spacing** gives the shipped `densityH` a control. The campaign's first item that lands ink **on the score canvas** rather than in the chrome, so contract rule 5 is tested rather than restated. | 1, 3 | proposed |
 
 Beyond the campaign (recorded, not indexed): whether `<mnx-command-palette>` adopts the
 skin — the tray doc already parked this; the emitter's dangling `--font-family-sans` and
@@ -173,6 +176,31 @@ depends on. Revisit if a session's queue ever gets long enough to hurt.
 *(Appended as items land, per the convention — later items start smarter than earlier
 ones.)*
 
+- **2026-08-15 — item 7 lands: the JSON view gets a consumer, a test, and its promise
+  back.** `spanByPointer` on `buildJsonView`; the pane gets a gutter of real document
+  line numbers, three inks, a selection scope and a find box; the pinned-error highlight
+  works again. With this the campaign's drafted items are all built.
+  - **Mutation testing killed two drafts of the test, and the second failure was the
+    instructive one.** Round-tripping `noteLineByKey` against `noteKeyByLine` proves
+    only that they are mutual inverses — a property that survives every key in them
+    being WRONG. Breaking jsonView's staff-1 filter (which shifts every voice index, and
+    so every synthesized key) sailed through. The fix was to join against
+    `noteWalk.noteKeysOf`, the canonical enumeration `note-keys.test.ts` already binds
+    the renderer to. **When a test checks two things against each other, ask what they
+    are both allowed to be wrong about.**
+  - **Then the same mutation passed again — because the fixtures never reached the
+    code.** Neither sample document had a non-staff-1 sequence, so deleting the filter
+    was a no-op on that data; only three scenarios in the whole corpus exercise the
+    branch. Adding `spec/grand-staff` is what made the assertion bite. A test can be
+    correct in its logic and blind in its inputs, and mutation testing is what tells the
+    two apart.
+  - **The dead primitive is adopted.** `.row-state` / `.row-current` / `.row-past` went
+    into `sharedChrome` with item 1 as the campaign's declared shared vocabulary, and
+    then item 5 built the panel with its own row styling instead — leaving a contract
+    clause nothing obeyed. The ops list now uses the primitives (verified by computed
+    style, not by eye: transparent reserved edge, accent edge plus tint on the head,
+    0.45 on the redo branch). **A shared primitive nobody adopts is just dead code with
+    a good reputation.**
 - **2026-08-15 — item 6 lands: the queue pays the accent's bill, and most of the ramp
   turned out to be dead.** One accent on `blocked`; the other three states carry their
   own near-neutral lightness ramp plus the shape encoding the rail already had. The

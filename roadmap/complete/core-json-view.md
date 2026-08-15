@@ -1,6 +1,26 @@
 # The JSON view finally gets a consumer
 
-> **Status: proposed 2026-08-15.** Item 7 of
+> **Status: BUILT 2026-08-15**, same day as proposed. `spanByPointer` landed on
+> `buildJsonView`, the pane got its gutter, three inks, selection scope and find
+> box, and the pinned-error highlight works again — the exhibit's
+> "highlighted in document →" had been a promise the pane did not keep since the
+> panel consolidation.
+>
+> **The test is the point, and its first draft was not good enough.** Mutation
+> checks killed two versions of it. Recording the span before the closing token
+> was caught (293 bad ends). Breaking jsonView's staff-1 filter — which shifts
+> every voice index and therefore every SYNTHESIZED note key — was **not**:
+> round-tripping the two maps against each other proves only that they are
+> mutual inverses, which stays true when every key in them is wrong. The fix was
+> to join against `noteWalk.noteKeysOf`, the canonical enumeration that
+> `note-keys.test.ts` already binds the renderer to, so all three traversals now
+> answer to one definition. Then the mutation *still* passed — because neither
+> sample document contained a non-staff-1 sequence, so it was a no-op on the
+> data. Only three scenarios in the corpus exercise that branch; adding
+> `spec/grand-staff` is what finally made the assertion bite. **A test can be
+> right and still be blind if its fixtures never reach the code.**
+>
+> Item 7 of
 > [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md). The UI half lands with
 > [workbench-score-panel.md](../complete/workbench-score-panel.md)'s json tab; the model half stands alone and
 > can go first.

@@ -26,6 +26,8 @@ import type { TabSetup } from '../engine/tab/guitarPositions.ts';
 import { cheatsheet } from '../edit/keymapDocs.ts';
 import { buildHudParts, buildHudRows, LEVEL_BY_ROW } from './hudRows.ts';
 import { keyFifthsAt } from '../edit/staffSpace.ts';
+import { buildJsonView } from '../model/jsonView.ts';
+import { findNoteAddress } from '../model/noteWalk.ts';
 import {
   EDIT_LAYER,
   NAVIGATION_LAYER,
@@ -221,6 +223,34 @@ const GLOBAL_TAB = 'global';
 /** Tile ids the PAGE owns rather than the registry; see `chromeCommands`. */
 const CHROME_PREFIX = 'page:';
 
+/**
+ * One JSON line, split into the design's THREE inks and nothing more: keys in
+ * ink, numbers in the accent, everything else quiet. Explicitly not a
+ * syntax-highlighting rainbow — the design's words are "only three inks" — and
+ * explicitly not a tokenizer, because this pane is read-only and a regex over
+ * one already-serialized line cannot meet input it did not produce.
+ */
+function jsonInk(line: string) {
+  const parts: { text: string; cls: string }[] = [];
+  // Key, string, number — in that order, so a key is never read as a string.
+  const re = /("(?:[^"\\]|\\.)*")(\s*:)|("(?:[^"\\]|\\.)*")|(-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)/g;
+  let at = 0;
+  for (let m = re.exec(line); m; m = re.exec(line)) {
+    if (m.index > at) parts.push({ text: line.slice(at, m.index), cls: 'jp' });
+    if (m[1]) {
+      parts.push({ text: m[1], cls: 'jk' });
+      parts.push({ text: m[2], cls: 'jp' });
+    } else if (m[3]) {
+      parts.push({ text: m[3], cls: 'js' });
+    } else {
+      parts.push({ text: m[4], cls: 'jn' });
+    }
+    at = m.index + m[0].length;
+  }
+  if (at < line.length) parts.push({ text: line.slice(at), cls: 'jp' });
+  return parts.map(p => html`<span class=${p.cls}>${p.text}</span>`);
+}
+
 /** How many object tags to show before collapsing the tail into a count. */
 const DEF_PREVIEW = 9;
 
@@ -268,6 +298,9 @@ export class ScenarioPage extends LitElement {
   @state() private defFilter = '';
   @state() private copiedId = false;
   @state() private copiedJson = false;
+  /** The json tab's scope toggle and its find box. */
+  @state() private jsonScope: 'selection' | 'whole' = 'whole';
+  @state() private jsonFind = '';
   // The editor incubates here (roadmap/complete/core-editor-input-layer.md):
   // in-memory only — the workbench has no backend, and this page is a bench
   // for testing the editor, not for authoring corpus files.
@@ -860,20 +893,10 @@ export class ScenarioPage extends LitElement {
         color: var(--ink-2);
       }
 
-      ol.ops li:hover {
-        background: var(--hover);
-      }
-
-      ol.ops li.current {
-        border-left: 2px solid var(--accent);
-        padding-left: 6px;
-        color: var(--ink);
-      }
-
-      ol.ops li.future {
-        opacity: 0.45;
-      }
-
+      /* The three states come from sharedChrome's .row-state primitives, which
+         the campaign contract declares and which nothing had adopted until now
+         - the ops list, the HUD's active rung and the tray's active tile were
+         three spellings of two states. Only the italics are ops-specific. */
       ol.ops li.baseline {
         font-style: italic;
       }
@@ -1054,13 +1077,72 @@ export class ScenarioPage extends LitElement {
         word-break: break-word;
       }
 
-      .json {
-        margin: 0;
+      /* The json pane (core-json-view.md). A gutter of real DOCUMENT line
+         numbers - they stay correct when the view is scoped to a selection or
+         filtered by the find box, which is the whole point of showing them. */
+      .jsonv {
         font-family: var(--mono);
         font-size: 10.5px;
-        line-height: 1.5;
+        line-height: 1.55;
+        color: var(--ink-2);
+      }
+
+      .jline {
+        display: flex;
+        gap: 10px;
+        white-space: pre;
+      }
+
+      .jnum {
+        flex: none;
+        width: 34px;
+        text-align: right;
+        color: var(--line-strong);
+        user-select: none;
+      }
+
+      .jcode {
+        min-width: 0;
+      }
+
+      /* The pinned validation error, restored: showErrorInJson has set
+         errorPointer since the panel consolidation and nothing has read it
+         since, so the exhibit's "highlighted in document" has been a promise
+         the pane did not keep. */
+      .jline.pinned {
+        background: var(--row-current);
+        box-shadow: inset 2px 0 0 var(--accent);
+      }
+
+      /* THREE INKS, and the design means three: keys, numbers, everything
+         else. No rainbow. */
+      .jk {
         color: var(--ink);
-        overflow-x: auto;
+        font-weight: 600;
+      }
+
+      .jn {
+        color: var(--accent-fg);
+      }
+
+      .js,
+      .jp {
+        color: var(--ink-2);
+      }
+
+      .jp {
+        color: var(--ink-3);
+      }
+
+      /* The scope toggle reads as one control, not two buttons. */
+      .jscope {
+        margin-left: 0;
+      }
+
+      .jscope button[aria-current='true'] {
+        background: var(--ink);
+        color: var(--surface);
+        border-color: var(--ink);
       }
 
       .missing {
@@ -1092,6 +1174,8 @@ export class ScenarioPage extends LitElement {
       this.defFilter = '';
       this.copiedId = false;
       this.copiedJson = false;
+      this.jsonScope = 'whole';
+      this.jsonFind = '';
       this.session = null;
       this.selection = null;
       this.copied = false;
@@ -2428,7 +2512,7 @@ export class ScenarioPage extends LitElement {
       </div>
       <ol class="ops">
         <li
-          class="baseline ${applied.length === 0 ? 'current' : ''}"
+          class="baseline row-state ${applied.length === 0 ? 'row-current' : ''}"
           title="undo everything — back to the start"
           @click=${() => this.jumpToOp(0)}
         >
@@ -2440,7 +2524,7 @@ export class ScenarioPage extends LitElement {
           const row = buildOpRow(entry);
           return html`
             <li
-              class=${index === applied.length - 1 ? 'current' : ''}
+              class="row-state ${index === applied.length - 1 ? 'row-current' : ''}"
               title="undo back to this point"
               @click=${() => this.jumpToOp(index + 1)}
             >
@@ -2453,7 +2537,7 @@ export class ScenarioPage extends LitElement {
         ${future.map((entry, index) => {
           const row = buildOpRow(entry);
           return html`
-            <li class="future" title="redo forward to this point" @click=${() => this.jumpToOp(applied.length + index + 1)}>
+            <li class="row-state row-past" title="redo forward to this point" @click=${() => this.jumpToOp(applied.length + index + 1)}>
               <span class="op-what">${row.op}</span>
               <span class="op-intent">${row.intent}</span>
               <span class="op-keys">${row.keys}</span>
@@ -2507,38 +2591,130 @@ export class ScenarioPage extends LitElement {
     this.syncFromSession();
   }
 
+  /** Selection level → the JSON pointer whose span is worth showing.
+   *
+   *  Null means "no narrower scope than the whole document": at `section` and
+   *  `score` the answer really is the file, and a pointer that pretended
+   *  otherwise would scope the pane to something the reader did not select.
+   *  Addresses come from `findNoteAddress`, the canonical walk — which carries
+   *  `sequenceIndex` explicitly, documented as being for consumers addressing
+   *  JSON, so this reuses the traversal rather than restating it. */
+  private selectionPointer(): string | null {
+    const session = this.session;
+    if (!session || this.cursorHidden) return null;
+    const level = session.selectionLevel;
+    if (level === 'score' || level === 'section') return null;
+
+    const key = session.selectedNoteKeys[0];
+    const at = key ? findNoteAddress(session.doc, key) : null;
+    const m = session.cursor.measureIndex;
+
+    if (level === 'measure') return `/global/measures/${m}`;
+    if (!at) return null;
+    const part = `/parts/${at.partIndex}/measures/${at.measureIndex}`;
+    if (level === 'partMeasure') return part;
+    const seq = `${part}/sequences/${at.sequenceIndex}`;
+    if (level === 'voiceMeasure') return seq;
+    const event = `${seq}/content/${at.eventIndex}`;
+    if (level === 'event') return event;
+    return `${event}/notes/${at.noteIndex}`;
+  }
+
   private panelJson() {
-    const lines = this.rawScore ? this.rawScore.split('\n').length : 0;
+    if (this.loadState !== 'ready') {
+      return this.panelFrame({
+        body: html`<div class="ref-missing">The score has not loaded (${this.loadState}).</div>`
+      });
+    }
+    const source = this.session?.doc ?? this.parsedScore();
+    const view = buildJsonView(source);
+
+    const pointer = this.selectionPointer();
+    const scoped = this.jsonScope === 'selection' && pointer !== null;
+    const span = scoped ? view.spanByPointer.get(pointer!) : undefined;
+    const [from, to] = span ?? [0, view.lines.length - 1];
+
+    // The error's line is a DOCUMENT line, so it survives scoping: pin an
+    // error, switch to selection scope, and it is either in view or it is not,
+    // which is itself informative.
+    const errorLine =
+      this.errorPointer !== null ? (view.lineByPointer.get(this.errorPointer) ?? null) : null;
+
+    const needle = this.jsonFind.trim().toLowerCase();
+    const rows: number[] = [];
+    for (let i = from; i <= to; i++) {
+      if (needle && !view.lines[i].toLowerCase().includes(needle)) continue;
+      rows.push(i);
+    }
+
     return this.panelFrame({
-      context: html`<span class="ctx-name">whole score</span>
-        <span class="ctx-dim">${this.session?.dirty ? '· edited, in memory' : '· as committed'}</span>
-        <span class="ctx-actions">
+      context: html`
+        <span class="ctx-actions jscope">
           <button
-            ?disabled=${!this.rawScore}
-            title="copy the document as JSON"
-            @click=${() => void this.copyJson()}
+            aria-current=${scoped}
+            ?disabled=${pointer === null}
+            title=${pointer === null
+              ? 'nothing narrower than the whole document is selected'
+              : `scope to ${pointer}`}
+            @click=${() => (this.jsonScope = 'selection')}
           >
+            selection
+          </button>
+          <button aria-current=${!scoped} @click=${() => (this.jsonScope = 'whole')}>
+            whole score
+          </button>
+        </span>
+        <span class="ctx-dim"
+          >${this.session?.dirty ? 'edited, in memory' : 'as committed'}</span
+        >
+        <span class="ctx-actions">
+          <button title="copy the document as JSON" @click=${() => void this.copyJson(view.text)}>
             ${this.copiedJson ? 'copied ✓' : 'copy'}
           </button>
-        </span>`,
-      // The selection-scoped view the design draws needs `spanByPointer` on
-      // buildJsonView, which is campaign item 7 (core-json-view.md) — the
-      // gutter and the three inks land with it, since they all read the same
-      // module. The footer states the size honestly in the meantime.
-      footer: html`<span class="ctx-dim"
-        >${lines.toLocaleString()} line${lines === 1 ? '' : 's'} · whole-document view;
-        selection scoping lands with the JSON view</span
-      >`,
-      body:
-        this.loadState === 'ready'
-          ? html`<pre class="json">${this.rawScore}</pre>`
-          : html`<div class="ref-missing">The score has not loaded (${this.loadState}).</div>`
+        </span>
+      `,
+      footer: html`<span class="prompt">&gt;</span>
+        <input
+          class="tagfilter"
+          type="text"
+          placeholder="find in JSON…"
+          .value=${this.jsonFind}
+          @input=${(e: Event) => (this.jsonFind = (e.target as HTMLInputElement).value)}
+        />
+        <span class="ctx-dim"
+          >${needle || scoped
+            ? `${rows.length} of ${view.lines.length}`
+            : `${view.lines.length} lines`}</span
+        >`,
+      body: html`
+        <div class="jsonv">
+          ${rows.map(
+            i => html`
+              <div class="jline ${i === errorLine ? 'pinned' : ''}">
+                <span class="jnum">${i + 1}</span>
+                <span class="jcode">${jsonInk(view.lines[i])}</span>
+              </div>
+            `
+          )}
+          ${rows.length === 0
+            ? html`<div class="ref-missing">Nothing matches “${this.jsonFind}”.</div>`
+            : nothing}
+        </div>
+      `
     });
   }
 
-  private async copyJson() {
-    if (!this.rawScore) return;
-    await navigator.clipboard.writeText(this.rawScore);
+  /** The committed file, for scenarios with no edit session. */
+  private parsedScore(): unknown {
+    try {
+      return this.rawScore ? JSON.parse(this.rawScore) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private async copyJson(text: string) {
+    await navigator.clipboard.writeText(text);
     this.copiedJson = true;
   }
 

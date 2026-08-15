@@ -21,6 +21,17 @@ export interface JsonView {
   noteKeyByLine: Map<number, string>;
   /** JSON pointer (e.g. /parts/0/measures/0/clefs/0/clef/sign) → 0-based line. */
   lineByPointer: Map<string, number>;
+  /**
+   * JSON pointer → the INCLUSIVE `[first, last]` lines its value occupies.
+   *
+   * `lineByPointer` says where a subtree starts, which is enough to jump to
+   * something and not enough to *show* it. This is what lets a reader ask for
+   * the eight lines behind the current selection instead of scrolling a
+   * thousand-line document (roadmap/proposed/core-json-view.md). For a scalar
+   * both entries are the same line; for a container the range runs to its
+   * closing brace or bracket.
+   */
+  spanByPointer: Map<string, [number, number]>;
 }
 
 interface MnxNoteish {
@@ -42,8 +53,19 @@ interface MnxDocish {
 export function buildJsonView(doc: unknown): JsonView {
   const lines: string[] = [];
   const lineByPointer = new Map<string, number>();
+  const spanByPointer = new Map<string, [number, number]>();
 
+  /* Wraps the walk so the span is recorded on EVERY exit path — `emitValue`
+     returns from four places (scalar, empty array, array, empty object), and a
+     span set per-branch is a span that will be forgotten by whoever adds the
+     fifth. */
   const emit = (value: unknown, pointer: string, indent: string, prefix: string) => {
+    const startLine = lines.length;
+    emitValue(value, pointer, indent, prefix);
+    spanByPointer.set(pointer, [startLine, lines.length - 1]);
+  };
+
+  const emitValue = (value: unknown, pointer: string, indent: string, prefix: string) => {
     const startLine = lines.length;
     if (value === null || typeof value !== 'object') {
       lines.push(indent + prefix + JSON.stringify(value));
@@ -110,7 +132,14 @@ export function buildJsonView(doc: unknown): JsonView {
     });
   });
 
-  return { text: lines.join('\n'), lines, noteLineByKey, noteKeyByLine, lineByPointer };
+  return {
+    text: lines.join('\n'),
+    lines,
+    noteLineByKey,
+    noteKeyByLine,
+    lineByPointer,
+    spanByPointer
+  };
 }
 
 function escapePointerSegment(seg: string): string {
