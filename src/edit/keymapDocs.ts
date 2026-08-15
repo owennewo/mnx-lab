@@ -330,16 +330,12 @@ export const KEY_DOCS: KeyDoc[] = [
 
   // ── Workbench shell.
   {
-    keys: 'Ctrl+K',
-    strokes: [{ code: 'KeyK', ctrl: true }],
+    keys: '/',
+    strokes: [{ code: 'Slash' }],
     group: 'workbench',
-    meaning: { all: 'selection command tray (the palette, when no editor holds the keyboard)' }
-  },
-  {
-    keys: 'Ctrl+Shift+K',
-    strokes: [{ code: 'KeyK', ctrl: true, shift: true }],
-    group: 'workbench',
-    meaning: { all: 'command palette (document-wide)' }
+    meaning: {
+      all: 'command tray for what is selected; again widens to the `global` tab (go-to, with no editor)'
+    }
   },
   {
     keys: 'Ctrl+G',
@@ -396,7 +392,13 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     // (campaign item 6); its SPELLING is `J`, a key, because that is a
     // different question.
     'setAccidentalDisplay',
-    'removeAccidentalDisplay'
+    'removeAccidentalDisplay',
+    // Fingering and a shaped bend: note-level ink whose VALUE exceeds a
+    // keystroke, so the typed surface carries them (campaign item 9 shipped
+    // the ops; item 3's trace queue found they had no way in).
+    'setFingering',
+    'removeFingering',
+    'toggleTechnique'
   ],
   // The rhythm declarations (campaign item 11b): the three containers share
   // one wrap verb, silence is inserted, and rest spelling is a verb rather

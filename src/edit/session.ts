@@ -531,7 +531,15 @@ export class EditorSession {
         this.apply(
           existing
             ? { type: 'removeTechnique', noteKey: slot.noteKey, kind }
-            : { type: 'setTechnique', noteKey: slot.noteKey, technique: { kind } as never }
+            : {
+                type: 'setTechnique',
+                noteKey: slot.noteKey,
+                technique: {
+                  kind,
+                  ...(intent.semitones !== undefined ? { semitones: intent.semitones } : {}),
+                  ...(intent.release ? { release: true } : {})
+                } as never
+              }
         );
         if (JSON.stringify(this.doc) === before) {
           this.history.undo();

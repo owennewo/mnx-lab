@@ -405,12 +405,19 @@ const DYNAMIC_WORDS = [
 
 export const ADORNMENT_HELP =
   'accent · staccato · tenuto · strongAccent · … · a dynamic (pp, mf, fff) · ' +
-  'text Play 8x · text below cantabile · 8va 2 · cresc · dim · louder · softer · breath comma · bow up · ' +
+  'text Play 8x · text below cantabile · 8va 2 · bend release · finger 3 · right p · cresc · dim · louder · softer · breath comma · bow up · ' +
   'accidental · accidental parens · ' +
   'no accent · no dynamic · no text · no string · no accidental';
 
 export type AdornmentResult =
   | { marking: string; remove?: boolean; attributes?: Record<string, string> }
+  /** Tab technique with a SHAPE. The single letters (B H S V X O) toggle the
+   *  plain form; a bend that is released, or bent by something other than a
+   *  tone, needs words — so the popover carries them, as it does for the
+   *  other adornments whose shape exceeds a keystroke. */
+  | { technique: { kind: 'bend'; semitones?: number; release?: boolean } }
+  | { fingering: { hand: 'left' | 'right'; finger: string } }
+  | { removeFingering: true }
   // The accidental's DISPLAY is note-level ink like the markings, so it lives
   // in their popover rather than earning a sixth one (campaign item 6). The
   // SPELLING is a key (`J`) — a different question with a different answer.
@@ -465,6 +472,29 @@ export function parseAdornment(text: string): AdornmentResult {
             ...(oriented ? { orient: side as 'above' | 'below' | 'between' } : {})
           }
         };
+  }
+
+  // Fingering had an op and an intent and no way in either — the same hole the
+  // ottava had, found the same way (campaign item 3's queue). `1`–`4`/`0` and
+  // `p i m a` are what players write, so the words are the notation itself:
+  // `finger 3`, `left 3`, `right p`.
+  const finger = /^(?:(left|right)\s+|finger\s+)([0-4pimac])$/.exec(trimmed.toLowerCase());
+  if (finger) {
+    const digit = finger[2];
+    const hand = finger[1] ?? (/^[pimac]$/.test(digit) ? 'right' : 'left');
+    return { fingering: { hand: hand as 'left' | 'right', finger: digit } };
+  }
+  if (trimmed.toLowerCase() === 'no finger' || trimmed.toLowerCase() === 'no fingering')
+    return { removeFingering: true };
+
+  // `bend`, `bend 3`, `bend release` — the shapes the `B` key cannot say.
+  const bend = /^bend(?:\s+(release|\d+))?$/.exec(trimmed.toLowerCase());
+  if (bend) {
+    const qualifier = bend[1];
+    if (qualifier === 'release') return { technique: { kind: 'bend', release: true } };
+    return {
+      technique: { kind: 'bend', ...(qualifier ? { semitones: Number(qualifier) } : {}) }
+    };
   }
 
   // The octave lines had an op and an intent and NO WAY IN — the keyboard join

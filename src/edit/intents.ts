@@ -113,7 +113,13 @@ export type MutationIntent =
   | { type: 'removeLyricLine'; line: string }
   // Tab technique (campaign item 9): one toggle per technique, and `hammerPull`
   // is ONE intent — which of the pair you get is physics, not a choice.
-  | { type: 'toggleTechnique'; kind: TechniqueChoice['kind'] | 'hammerPull' }
+  | {
+      type: 'toggleTechnique';
+      kind: TechniqueChoice['kind'] | 'hammerPull';
+      /** Bend shape, when the surface offers one (`bend 3`, `bend release`). */
+      semitones?: number;
+      release?: boolean;
+    }
   | { type: 'setFingering'; hand: 'left' | 'right'; finger: string }
   | { type: 'removeFingering' }
   | { type: 'removeStringAnnotation' }

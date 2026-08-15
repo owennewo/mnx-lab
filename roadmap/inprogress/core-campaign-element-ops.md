@@ -981,3 +981,32 @@ owns. The queue skips scenarios needing a second staff, voice or part, and
 `awaitingEntrySurface`. So the closing condition is precise: **`uncovered` must
 hold nothing but that list**, not nothing at all. A campaign that graduated an
 item cannot then wait on it.
+
+### 2026-08-15 — the tab-side three: a whole projection, two more holes
+
+`capo`, `left-hand-fingers`, `bend-and-release` — the first traces to drive the
+**fingerboard** rather than the staff. **Traced 19 → 22, kinds covered 30 → 33
+of 38, queue 7 → 4 traces / 48 elements.**
+
+- **Fingering had an op, an intent, and no way in** — the ottava's hole exactly,
+  found the same way one day later. Item 9 shipped `setFingering` with a key
+  reserved for it and no grammar behind it, so nothing typed produced one. The
+  words are the notation players already write: `finger 3`, `left 3`, `right p`,
+  `no finger`.
+- **A bend could only be one shape.** `setTechnique` wrote a straight rise, so
+  the *release* half of `bend-and-release` — bent before the note sounds, held,
+  let down — was unreachable. `bend release` and `bend 3` say the shapes the
+  single `B` key cannot, which is the same division the adornment popover makes
+  for everything else whose value exceeds a keystroke.
+- **A trace can change projection mid-performance, and must.** The document
+  becomes a tab document when the tuning lands, and the session picks its
+  projection when it is constructed — so a from-`{}` trace starts on the staff
+  and has to press its way onto the fingerboard. That is what a player does
+  too; it is only surprising when you expect the document's own hint to apply
+  retroactively.
+- **Bare notes stay bare on purpose.** `lab/tab-derivation/capo` proves the
+  derivation ladder, so its notes carry no string annotation at all — which
+  means the trace enters them in NOTATION even though the scenario is a tab
+  document, because a fret digit would write the annotation the scenario exists
+  to do without. The projection is a choice about what you are saying, not a
+  property of the file.

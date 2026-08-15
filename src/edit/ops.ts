@@ -503,7 +503,10 @@ export type EditOp =
 /** What a technique key writes. `hammerOn`/`pullOff`/`slide` name the note they
  *  travel to; the rest are flags or curves. */
 export type TechniqueChoice =
-  | { kind: 'bend'; semitones?: number }
+  /** A bend's shape: straight up by `semitones`, or — with `release` — bent
+   *  before the note sounds, held, and let back down
+   *  (`lab/tab-techniques/bend-and-release`, the second half of its name). */
+  | { kind: 'bend'; semitones?: number; release?: boolean }
   | { kind: 'slide' }
   | { kind: 'hammerOn' }
   | { kind: 'pullOff' }
@@ -1034,12 +1037,21 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           // A bend is a CURVE (points in semitones), never a single interval —
           // the shape core-guitar-technique.md settled. The keyboard writes the
           // common one: straight up by a tone over the note's length.
-          technique.bend = {
-            points: [
-              { position: 0, alter: 0 },
-              { position: 1, alter: op.technique.semitones ?? 2 }
-            ]
-          };
+          {
+            const alter = op.technique.semitones ?? 2;
+            technique.bend = {
+              points: op.technique.release
+                ? [
+                    { position: 0, alter },
+                    { position: 0.5, alter },
+                    { position: 1, alter: 0 }
+                  ]
+                : [
+                    { position: 0, alter: 0 },
+                    { position: 1, alter }
+                  ]
+            };
+          }
           break;
         case 'vibrato':
         case 'palmMute':
