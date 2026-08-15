@@ -164,7 +164,7 @@ export class ScoreHud extends LitElement {
         color: var(--ink-2);
         background: var(--bg);
         border: 1px solid var(--line-strong);
-        border-radius: 5px;
+        border-radius: var(--radius-chip);
         padding: 1px 5px;
         min-width: 0;
       }

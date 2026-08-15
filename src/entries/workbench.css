@@ -23,6 +23,8 @@ body {
 body {
   overflow: hidden;
   /* Matches the light-theme --bg token so there's no flash before the
-     component mounts; the component paints its own background after. */
-  background: oklch(0.967 0.005 88);
+     component mounts; the component paints its own background after. Keep this
+     in step with `--bg` in src/elements/tokens.ts — out of step, it becomes a
+     flash of the PREVIOUS design rather than no flash at all. */
+  background: oklch(0.962 0.002 60);
 }

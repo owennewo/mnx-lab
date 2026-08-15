@@ -21,8 +21,18 @@
 > keeps it, wired to the same per-part state). Verified hands-on in headless
 > Chrome on twelve-bar-blues: guitar keeps its declared 6-string tab, an
 > overridden bass gains its own 4-string staff, clicks walk the ladder.
-> **Remaining: stage 4** (rung property edits through ops), parked behind the
-> ladder's per-level pass as designed.
+> **Stage 4 (rung property edits through ops) is CUT, not parked — revised
+> 2026-08-15.** It was parked behind the ladder's per-level pass; the score-panel
+> design ([workbench-score-panel.md](../proposed/workbench-score-panel.md), campaign item 5)
+> retires it instead, and redirects the work to the selection tray. The design's
+> governing rule is **"the tray edits, the HUD explains"**: the HUD's keys half is
+> reference and never clickable, and its footer hands editing back to Ctrl+K. That
+> is incompatible with the HUD growing content edits, so adopting the design makes
+> the HUD permanently a *read* surface — plus the one presentation exception the
+> rule itself names (the part row's strings and capo, which are per-part overrides
+> with values rather than toggles). This closes the stage with a reason rather than
+> leaving it open indefinitely, and it makes this doc completable: with stage 4 cut,
+> stages 1–3 are the whole of it.
 >
 > **Same-day revision from using it: the HUD became the anchor tab of a side
 > panel.** The first build put the HUD beside the viewer while the head kept
@@ -55,10 +65,10 @@
 > `<mnx-score-viewer>`. Builds on
 > [core-selection-ladder.md](../inprogress/core-selection-ladder.md) (the rungs and the
 > walk), takes its promotion discipline from
-> [core-editor-element-promotion.md](core-editor-element-promotion.md), keeps the
+> [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md), keeps the
 > viewer's prop surface small per [core-viewer-surface.md](core-viewer-surface.md),
 > and owns the **per-part strings/capo override** gap left open by
-> [core-derived-positions.md](core-derived-positions.md)'s instrument-neutrality work.
+> [core-derived-positions.md](../proposed/core-derived-positions.md)'s instrument-neutrality work.
 
 ## The problem, twice over
 
@@ -92,6 +102,14 @@ The ladder is deliberately not the containment chain — **part is not a rung** 
 ladder is the vertical axis; part is the horizontal closure of part-measure,
 `selection.ts`). The HUD displays what humans read, the *address chain*, and maps the
 rung onto it:
+
+> **Vocabulary note (2026-08-15).** "Part is not a rung" is a statement about
+> `SELECTION_LADDER` in `src/edit/selection.ts` — the vertical containment axis — and
+> **not** about this table. There *is* a part **row**, `LEVEL_BY_ROW` maps it to
+> `partMeasure`, and it is listed below. The score-panel design draws it as a "PART
+> rung" and that reads like a contradiction of this section; it is not one. Same
+> surface, different word. When the two vocabularies meet, this doc's is the one to
+> use: **rows are the address chain, the highlight is the rung.**
 
 | HUD row | Shows | Highlighted at rung |
 |---|---|---|
@@ -164,7 +182,7 @@ promotion:
    row-data contract from day one** — the workbench maps session → `HudRow[]`; the
    component renders rows and emits `row-activated` / `tab-setup-changed`. Same
    pattern as the enclosure vocabulary: `elements/` draws, `workbench/` interprets.
-2. **The promotion gate** ([core-editor-element-promotion.md](core-editor-element-promotion.md))
+2. **The promotion gate** ([core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md))
    applies to the selection half — it renders session state, so it promotes when the
    editor does (a check, not a debate).
 3. **The instrument half is viewer-tier** — a read-only embed could want the ensemble

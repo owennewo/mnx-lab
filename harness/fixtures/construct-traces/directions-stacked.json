@@ -1,0 +1,24 @@
+{
+  "target": "lab/score-text/directions-stacked",
+  "intents": [
+    { "type": "addPart" },
+    { "type": "appendMeasure" },
+    { "type": "setTimeSignature", "count": 4, "unit": 4 },
+    { "type": "setClef", "sign": "G", "staffPosition": -2 },
+    { "type": "lineUp" },
+    { "type": "toggleNote" },
+    { "type": "setPositioned", "attribute": { "kind": "direction", "text": "nearest above", "orient": "above" } },
+    { "type": "setPositioned", "attribute": { "kind": "direction", "text": "furthest above", "orient": "above" } },
+    { "type": "setPositioned", "attribute": { "kind": "direction", "text": "nearest below", "orient": "below" } },
+    { "type": "setPositioned", "attribute": { "kind": "direction", "text": "furthest below", "orient": "below" } },
+    { "type": "nextPosition" },
+    { "type": "lineUp" },
+    { "type": "toggleNote" },
+    { "type": "nextPosition" },
+    { "type": "lineUp" },
+    { "type": "toggleNote" },
+    { "type": "nextPosition" },
+    { "type": "lineUp" },
+    { "type": "toggleNote" }
+  ]
+}

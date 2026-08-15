@@ -1,6 +1,6 @@
 // The command palette — the workbench's one prompt (survey §8.5, §3.8; the
 // same-widget-as-the-rail-filter idea from §6.1). One grammar, two entry
-// points: Ctrl+K prefills `>` (commands), Ctrl+G opens bare (go-to). The
+// points: Ctrl+Shift+K prefills `>` (commands), Ctrl+G opens bare (go-to). The
 // component is deliberately dumb: the shell supplies a provider that turns
 // the query into runnable items; all routing/intent knowledge stays outside.
 // (The AI prompt mode is a separate roadmap item — core-editor-ai-prompt.md.)
@@ -45,7 +45,7 @@ export class CommandPalette extends LitElement {
         width: min(560px, calc(100vw - 48px));
         background: var(--surface);
         border: 1px solid var(--line-strong);
-        border-radius: 12px;
+        border-radius: var(--radius-card);
         box-shadow: var(--shadow);
         overflow: hidden;
       }

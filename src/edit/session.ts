@@ -839,7 +839,13 @@ export class EditorSession {
                 number: intent.number,
                 ...(intent.counter ? { counter: intent.counter } : {})
               }
-            : { type: intent.type, measureIndex }
+            : intent.type === 'setFullMeasureRest'
+              ? {
+                  type: 'setFullMeasureRest',
+                  measureIndex,
+                  ...(intent.visualDuration ? { visualDuration: intent.visualDuration } : {})
+                }
+              : { type: intent.type, measureIndex }
         );
         // These refuse (a bar holding ink, nothing declared to strip), and a
         // refusal must not leave an op that changed nothing on the queue.

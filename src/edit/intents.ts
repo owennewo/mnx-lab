@@ -149,7 +149,7 @@ export type MutationIntent =
   // entry ghost the PENDING duration is what changes — because a rest is
   // absence, so there is nothing there to dot.
   | { type: 'toggleDots' }
-  | { type: 'setFullMeasureRest' }
+  | { type: 'setFullMeasureRest'; visualDuration?: { base: MnxNoteValueBase; dots?: number } }
   | { type: 'removeFullMeasureRest' }
   | { type: 'setMeasureRepeat'; number: number; counter?: { count: number; orient?: 'above' | 'below' } }
   | { type: 'removeMeasureRepeat' }

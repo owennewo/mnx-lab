@@ -25,13 +25,63 @@ import { css } from 'lit';
  */
 export const scoreTokens = css`
   :host {
-    --accent: var(--mnx-accent, light-dark(#3e5c86, #8aa9d6));
-    --paper: var(--mnx-paper, light-dark(oklch(0.985 0.006 85), oklch(0.235 0.008 80)));
-    --paper-ink: var(--mnx-paper-ink, light-dark(oklch(0.24 0.015 80), oklch(0.92 0.008 85)));
+    /* ACCENT vs the engine's frozen error red — read this before retuning.
+       The Modernist accent (#ec3013) and the diagnostic red that
+       layout/diagnostics.ts hard-codes for validation errors (#b91c1c) are
+       only ~4 degrees apart in hue: oklch(0.611 0.225 31.5) against
+       oklch(0.505 0.190 27.5). The diagnostic hex is emitted as a fill
+       attribute into the SVG and is baked into 10 committed goldens, so it
+       CANNOT move — the accent is the only side with any room.
+       They stay tellable apart on two axes, and both must hold:
+         VALUE — the accent is ~0.11 lighter and more saturated. Keep that gap.
+         FORM  — a diagnostic is a filled circle carrying a white glyph; the
+                 selection is a stroked enclosure and a tinted notehead.
+       Checked on a real stave at the hands-on review, never in a swatch.
+       See roadmap/proposed/core-modernist-tokens.md. */
+    --accent: var(--mnx-accent, light-dark(oklch(0.611 0.225 31.5), oklch(0.7 0.19 31.5)));
+    --paper: var(--mnx-paper, light-dark(oklch(1 0 0), oklch(0.235 0.008 80)));
+    --paper-ink: var(--mnx-paper-ink, light-dark(oklch(0.237 0.004 60), oklch(0.92 0.008 85)));
     --paper-line: var(
       --mnx-paper-line,
-      light-dark(oklch(0.55 0.012 80), oklch(0.68 0.012 85))
+      light-dark(oklch(0.52 0.006 60), oklch(0.68 0.012 85))
     );
+  }
+`;
+
+/**
+ * THE CORNER SCALE — one knob per role, so the whole app's radius is a token
+ * decision rather than 39 literals (roadmap/proposed/core-modernist-tokens.md,
+ * stage 1). Values here are the ones the app already used; this block was
+ * introduced as a deliberate no-op so the flip that follows is a one-file diff.
+ *
+ * Composed into BOTH `viewerTokens` and `designTokens` rather than duplicated
+ * into each the way the colour vars are: `sharedChrome` and `scrollbars` cite
+ * these and are included by the standalone viewer as well as the app, so a
+ * value that drifted between the two would restyle the embed only.
+ *
+ * NOT in this scale, on purpose: `border-radius: 50%` on `.pip` / `.vchip .vdot`
+ * and the 1px softening on `.gapdia`. Those are **shapes that carry meaning** —
+ * the rail's dots vary shape as well as colour so *stale* cannot be mistaken for
+ * *never seen* (CLAUDE.md), and the gap diamond is a rotated square. A circular
+ * status mark is not a rounded corner, and the design system agrees: its own
+ * stylesheet keeps `border-radius: 50%` on radio dots while every radius token
+ * is 0.
+ */
+export const radiusTokens = css`
+  :host {
+    /* All zero, per the design's one hard "don't": *do not round a corner
+       anywhere*. The roles are kept as separate names rather than collapsed to
+       a single --radius, because they record WHAT is being squared and let a
+       consumer re-round one family without re-deriving the sweep. */
+    --radius-pill: 0px;
+    --radius-card: 0px;
+    --radius-panel: 0px;
+    --radius-control: 0px;
+    --radius-input: 0px;
+    --radius-tab: 0px;
+    --radius-chip: 0px;
+    --radius-xs: 0px;
+    --radius-hair: 0px;
   }
 `;
 
@@ -50,26 +100,51 @@ export const scoreTokens = css`
  */
 export const viewerTokens = css`
   ${scoreTokens}
+  ${radiusTokens}
   :host {
-    --sans: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, sans-serif;
-    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
-    --serif: 'IBM Plex Serif', Georgia, serif;
+    /* TWO VOICES, STRICTLY: Archivo for anything a person wrote or reads as
+       prose, mono for anything the machine owns — paths, hashes, ids, op names,
+       coordinates, JSON. Never mono for a whole sentence, never Archivo for an
+       id. There is no --serif: the design system is set entirely in Archivo,
+       and the headings that used one now share this stack.
 
-    --bg: var(--mnx-bg, light-dark(oklch(0.967 0.005 88), oklch(0.185 0.008 75)));
-    --surface: var(--mnx-surface, light-dark(oklch(0.992 0.003 88), oklch(0.255 0.01 75)));
-    --line: var(--mnx-line, light-dark(oklch(0.895 0.007 88), oklch(0.31 0.01 75)));
-    --line-strong: light-dark(oklch(0.82 0.008 88), oklch(0.38 0.01 75));
-    --ink: var(--mnx-ink, light-dark(oklch(0.255 0.012 80), oklch(0.9 0.008 85)));
-    --ink-2: light-dark(oklch(0.45 0.012 80), oklch(0.72 0.01 85));
-    --ink-3: light-dark(oklch(0.6 0.01 80), oklch(0.58 0.01 85));
+       Archivo is bundled by the WORKBENCH face (src/entries/main.ts, via
+       @fontsource — no CDN). The embed face ships no document CSS and so
+       cannot load it; the fallback chain is what carries that case, and an
+       embedder who does load Archivo gets it. Both token blocks must name the
+       same stack regardless — their light values are identical BY CONTRACT
+       (see viewerTokens), because the viewer declares its own host inside the
+       app and a closer host wins.
+
+       --mono is a system stack on purpose, not an omission. */
+    --sans: 'Archivo', 'Helvetica Neue', Helvetica, system-ui, sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, monospace;
+
+    --bg: var(--mnx-bg, light-dark(oklch(0.962 0.002 60), oklch(0.185 0.008 75)));
+    --surface: var(--mnx-surface, light-dark(oklch(1 0 0), oklch(0.255 0.01 75)));
+    --bg-context: light-dark(oklch(0.983 0.002 60), oklch(0.225 0.009 75));
+    --line: var(--mnx-line, light-dark(oklch(0.887 0.005 60), oklch(0.31 0.01 75)));
+    --line-strong: light-dark(oklch(0.807 0.007 60), oklch(0.38 0.01 75));
+    --rule-w: 2px;
+    --ink: var(--mnx-ink, light-dark(oklch(0.237 0.004 60), oklch(0.9 0.008 85)));
+    --ink-2: light-dark(oklch(0.397 0.006 60), oklch(0.72 0.01 85));
+    --ink-3: light-dark(oklch(0.62 0.008 60), oklch(0.58 0.01 85));
     --accent-fg: light-dark(var(--accent), color-mix(in oklab, var(--accent), white 38%));
+    /* One step past the base, which is the design system's own instruction for
+       a pressed/held state. Also the "this tile is already on" ink. */
+    --accent-pressed: light-dark(oklch(0.508 0.186 31.5), oklch(0.62 0.17 31.5));
+    /* Between --ink-3 and --line-strong: text that must recede further than
+       muted without becoming a rule. */
+    --ink-faint: light-dark(oklch(0.754 0.008 60), oklch(0.5 0.01 85));
+    --row-current: color-mix(in oklab, var(--accent), var(--bg) 90%);
+    --row-done: var(--line);
     --focus-ring: var(--mnx-focus-ring, color-mix(in oklab, var(--accent), transparent 25%));
-    --hover: light-dark(oklch(0 0 0 / 0.045), oklch(1 0 0 / 0.05));
+    --hover: light-dark(oklch(0 0 0 / 0.035), oklch(1 0 0 / 0.05));
     /* light-dark() takes COLORS, not whole shadow lists — so the scheme-
        dependent part is factored into a colour the shadow then uses. */
-    --shadow-near: light-dark(oklch(0 0 0 / 0.05), oklch(0 0 0 / 0.3));
-    --shadow-far: light-dark(oklch(0.3 0.02 80 / 0.18), oklch(0 0 0 / 0.5));
-    --shadow: 0 1px 2px var(--shadow-near), 0 6px 24px -8px var(--shadow-far);
+    --shadow-near: light-dark(oklch(0.237 0.004 60 / 0.14), oklch(0 0 0 / 0.3));
+    --shadow-far: light-dark(oklch(0.237 0.004 60 / 0.16), oklch(0 0 0 / 0.5));
+    --shadow: 0 1px 2px var(--shadow-near), 0 3px 10px var(--shadow-far);
   }
 `;
 
@@ -84,10 +159,25 @@ export const viewerTokens = css`
  */
 export const designTokens = css`
   ${scoreTokens}
+  ${radiusTokens}
   :host {
-    --sans: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, sans-serif;
-    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
-    --serif: 'IBM Plex Serif', Georgia, serif;
+    /* TWO VOICES, STRICTLY: Archivo for anything a person wrote or reads as
+       prose, mono for anything the machine owns — paths, hashes, ids, op names,
+       coordinates, JSON. Never mono for a whole sentence, never Archivo for an
+       id. There is no --serif: the design system is set entirely in Archivo,
+       and the headings that used one now share this stack.
+
+       Archivo is bundled by the WORKBENCH face (src/entries/main.ts, via
+       @fontsource — no CDN). The embed face ships no document CSS and so
+       cannot load it; the fallback chain is what carries that case, and an
+       embedder who does load Archivo gets it. Both token blocks must name the
+       same stack regardless — their light values are identical BY CONTRACT
+       (see viewerTokens), because the viewer declares its own host inside the
+       app and a closer host wins.
+
+       --mono is a system stack on purpose, not an omission. */
+    --sans: 'Archivo', 'Helvetica Neue', Helvetica, system-ui, sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, monospace;
 
     --rail-w: 312px;
     --header-h: 52px;
@@ -99,22 +189,40 @@ export const designTokens = css`
     --st-verified: oklch(0.5 0.1 250);
     --st-gap: oklch(0.55 0.125 42);
 
-    --bg: var(--mnx-bg, oklch(0.967 0.005 88));
-    --bg-rail: var(--mnx-bg-rail, oklch(0.952 0.006 88));
-    --surface: var(--mnx-surface, oklch(0.992 0.003 88));
-    --line: var(--mnx-line, oklch(0.895 0.007 88));
-    --line-strong: oklch(0.82 0.008 88);
-    --ink: var(--mnx-ink, oklch(0.255 0.012 80));
-    --ink-2: oklch(0.45 0.012 80);
-    --ink-3: oklch(0.6 0.01 80);
+    --bg: var(--mnx-bg, oklch(0.962 0.002 60));
+    --bg-rail: var(--mnx-bg-rail, oklch(0.945 0.002 60));
+    --surface: var(--mnx-surface, oklch(1 0 0));
+    /* Band 3 of the panel frame, and the shared hover fill. */
+    --bg-context: oklch(0.983 0.002 60);
+    --line: var(--mnx-line, oklch(0.887 0.005 60));
+    --line-strong: oklch(0.807 0.007 60);
+    /* One knob for the design's structural rule: alignment and the strength of
+       the dividers do the organising, so this must never soften to a hairline. */
+    --rule-w: 2px;
+    --ink: var(--mnx-ink, oklch(0.237 0.004 60));
+    --ink-2: oklch(0.397 0.006 60);
+    --ink-3: oklch(0.62 0.008 60);
     --accent-fg: var(--accent);
+    /* One step past the base, which is the design system's own instruction for
+       a pressed/held state. Also the "this tile is already on" ink. */
+    --accent-pressed: oklch(0.508 0.186 31.5);
+    /* Between --ink-3 and --line-strong: text that must recede further than
+       muted without becoming a rule. */
+    --ink-faint: oklch(0.754 0.008 60);
+    /* The shared row states (ops head, active rung, current row). Derived from
+       the accent rather than pinned to #fce7e3 so a future accent carries its
+       own tint instead of leaving a stale pink behind. */
+    --row-current: color-mix(in oklab, var(--accent), var(--bg) 90%);
+    --row-done: var(--line);
     /* The keyboard-ownership ring (roadmap/proposed/core-editor-focus-scope.md):
        drawn while focus is inside the viewer, so "who gets the next keystroke"
        is legible without pressing a key. Public — a host page restyles it. */
     --focus-ring: var(--mnx-focus-ring, color-mix(in oklab, var(--accent), transparent 25%));
-    --hover: oklch(0 0 0 / 0.045);
-    --shadow: 0 1px 2px oklch(0 0 0 / 0.05), 0 6px 24px -8px oklch(0.3 0.02 80 / 0.18);
-    --drawer-shadow: -12px 0 32px -12px oklch(0 0 0 / 0.18);
+    --hover: oklch(0 0 0 / 0.035);
+    /* Ink-tinted and shallow: in this system nothing floats, so elevation is a
+       hint that something sits above the page, not a soft cushion under it. */
+    --shadow: 0 1px 2px oklch(0.237 0.004 60 / 0.14), 0 3px 10px oklch(0.237 0.004 60 / 0.16);
+    --drawer-shadow: -12px 0 32px -12px oklch(0.237 0.004 60 / 0.22);
     --json-string: oklch(0.52 0.1 155);
     --json-number: oklch(0.55 0.13 60);
     --json-boolean: oklch(0.5 0.13 300);
@@ -190,6 +298,38 @@ export const sharedChrome = css`
     background: color-mix(in oklab, var(--accent), transparent 70%);
   }
 
+  /* THE SHARED ROW STATES. One definition for the ops queue's head, the HUD's
+     active rung, the tray's active tile and (later) the compare tab's
+     difference rows — the design specifies these as one vocabulary across every
+     list in the app, and before this they were three independent spellings of
+     the same two states (ScenarioPage's li.current/li.future, ScoreHud's
+     .row.active). A list opts in by adding the class; the left edge is drawn on
+     every row so that becoming current does not shift the text sideways. */
+  .row-state {
+    border-left: var(--rule-w) solid transparent;
+  }
+
+  .row-state.row-current {
+    border-left-color: var(--accent);
+    background: var(--row-current);
+    color: var(--ink);
+  }
+
+  /* Past the head: the redo branch, still readable but plainly not in play. */
+  .row-state.row-past {
+    opacity: 0.45;
+  }
+
+  /* Settled — matches, resolved, nothing to do. Grey edge, quiet text. */
+  .row-state.row-done {
+    border-left-color: var(--row-done);
+    color: var(--ink-3);
+  }
+
+  .row-state:hover:not(.row-current) {
+    background: var(--bg-context);
+  }
+
   .pip {
     width: 7px;
     height: 7px;
@@ -232,7 +372,7 @@ export const sharedChrome = css`
     padding: 0 10px;
     white-space: nowrap;
     border: 1px solid var(--line);
-    border-radius: 6px;
+    border-radius: var(--radius-tab);
     color: var(--ink-2);
     font-size: 12px;
     background: var(--surface);
@@ -256,7 +396,7 @@ export const sharedChrome = css`
   .seg {
     display: inline-flex;
     border: 1px solid var(--line);
-    border-radius: 7px;
+    border-radius: var(--radius-input);
     background: var(--surface);
     padding: 2px;
     gap: 1px;
@@ -264,7 +404,7 @@ export const sharedChrome = css`
 
   .seg button {
     padding: 4px 13px;
-    border-radius: 5px;
+    border-radius: var(--radius-chip);
     font-size: 12.5px;
     color: var(--ink-2);
   }
@@ -287,7 +427,7 @@ export const sharedChrome = css`
   .fchip {
     font-size: 11px;
     padding: 3px 8px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     white-space: nowrap;
     border: 1px solid var(--line);
     color: var(--ink-2);
@@ -325,7 +465,7 @@ export const sharedChrome = css`
     font-family: var(--mono);
     font-size: 10.5px;
     padding: 2.5px 8px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     border: 1px solid var(--line);
     color: var(--ink-2);
   }
@@ -372,7 +512,7 @@ export const scrollbars = css`
 
   ::-webkit-scrollbar-thumb {
     background: var(--line-strong);
-    border-radius: 6px;
+    border-radius: var(--radius-tab);
     border: 3px solid transparent;
     background-clip: content-box;
   }

@@ -467,6 +467,9 @@ export type EditOp =
        *  to make room — that is the coarse-op cheating the campaign forbids. */
       type: 'setFullMeasureRest';
       measureIndex: number;
+      /** How the rest is drawn when it differs from the meter — a 3/4 bar
+       *  rests with a WHOLE rest by convention (`spec/full-measure-rests`). */
+      visualDuration?: { base: MnxNoteValueBase; dots?: number };
     }
   | { type: 'removeFullMeasureRest'; measureIndex: number }
   | {
@@ -544,10 +547,19 @@ export type PositionedAttribute =
       wedgeType?: 'increasing' | 'decreasing';
       relativeValue?: 'louder' | 'softer';
     }
-  | { kind: 'direction'; text: string }
+  | {
+      /** `orient` is the side of the staff the words sit on — `above` is the
+       *  default a renderer assumes, `below` and `between` are choices the
+       *  document has to carry (`lab/score-text/directions-stacked`). */
+      kind: 'direction';
+      text: string;
+      orient?: 'above' | 'below' | 'between';
+    }
   /** An octave-shift line: same owner and shape as the other two, so it shares
-   *  their verb — item 7's family test, applied once more. */
-  | { kind: 'ottava'; value: 1 | 2 | 3 | -1 | -2 | -3 };
+   *  their verb — item 7's family test, applied once more. `bars` is how many
+   *  bars it spans (1 = this one), the same shape item 7 gave a volta's
+   *  duration, and the stand-in for a press-navigate-press range gesture. */
+  | { kind: 'ottava'; value: 1 | 2 | 3 | -1 | -2 | -3; bars?: number };
 
 /** The ten bar attributes, each carrying exactly what its MNX object needs. */
 export type MeasureAttribute =
@@ -555,9 +567,9 @@ export type MeasureAttribute =
   | { kind: 'repeatStart' }
   | { kind: 'repeatEnd'; times?: number }
   | { kind: 'ending'; numbers?: number[]; duration?: number; open?: boolean }
-  | { kind: 'segno' }
-  | { kind: 'fine' }
-  | { kind: 'jump'; type: 'segno' | 'dsalfine' }
+  | { kind: 'segno'; at?: 'start' | 'end' }
+  | { kind: 'fine'; at?: 'start' | 'end' }
+  | { kind: 'jump'; type: 'segno' | 'dsalfine'; at?: 'start' | 'end' }
   | { kind: 'tempo'; bpm: number; base: MnxNoteValueBase }
   | { kind: 'rehearsal'; label: string }
   | { kind: 'section'; label: string };
@@ -583,6 +595,12 @@ export const MEASURE_ATTRIBUTE_FIELDS: Record<MeasureAttributeKind, string> = {
  *  11's onset-addressing work — see the scope boundary). */
 const MEASURE_START = { fraction: [0, 1] as [number, number] };
 
+/** Where in the bar a navigation mark sits: `[0, 1]` at the start, `[1, 1]`
+ *  at the end (a whole bar's worth in). */
+function locationOf(at: 'start' | 'end' | undefined, fallback: 'start' | 'end') {
+  return (at ?? fallback) === 'end' ? { fraction: [1, 1] as [number, number] } : MEASURE_START;
+}
+
 function measureAttributeValue(attribute: MeasureAttribute): unknown {
   switch (attribute.kind) {
     case 'barline':
@@ -597,12 +615,18 @@ function measureAttributeValue(attribute: MeasureAttribute): unknown {
         ...(attribute.duration !== undefined ? { duration: attribute.duration } : {}),
         ...(attribute.open ? { open: true } : {})
       };
+    // The navigation marks are the one family whose POSITION IN THE BAR is
+    // part of what they mean: a segno marks the point you return TO (the bar's
+    // start), while a jump and a fine are read after the bar has been played
+    // (its end). The corpus is not unanimous — `lab/score-text/labels-with-navigation`
+    // puts its fine at the start — so the position is offered rather than
+    // assumed: `at` says which, and each kind keeps the default it had.
     case 'segno':
-      return { location: MEASURE_START };
+      return { location: locationOf(attribute.at, 'start') };
     case 'fine':
-      return { location: MEASURE_START };
+      return { location: locationOf(attribute.at, 'start') };
     case 'jump':
-      return { type: attribute.type, location: MEASURE_START };
+      return { type: attribute.type, location: locationOf(attribute.at, 'end') };
     case 'tempo':
       return { bpm: attribute.bpm, value: { base: attribute.base } };
     case 'rehearsal':
@@ -1257,11 +1281,23 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (!measure) return next;
       const position = { fraction: [op.onset[0], op.onset[1]] as [number, number] };
       if (op.attribute.kind === 'ottava') {
-        // `end` is required by the schema; a keyboard-made ottava spans its own
-        // bar until a range gesture exists (the same limit item 7 recorded for
-        // volta durations).
-        const measureId = next.global?.measures?.[op.measureIndex]?.id;
-        if (!measureId) return next;
+        // `end` is required by the schema. A typed span stands in for the
+        // press-navigate-press range gesture that spanners have and positioned
+        // attributes do not yet — the same stand-in item 7 gave volta duration.
+        // The end names a bar (this one, or `bars` on), and a keyboard-built
+        // document has unnamed bars
+        // — so mint here, exactly as `setBeam` mints the event ids it will
+        // reference. A reference verb that refuses because its target has no
+        // name is a verb that only works on documents somebody else wrote.
+        const span = Math.max(1, Math.trunc(op.attribute.bars ?? 1));
+        const endIndex = Math.min(
+          op.measureIndex + span - 1,
+          (next.global?.measures?.length ?? 1) - 1
+        );
+        const endMeasure = next.global?.measures?.[endIndex];
+        if (!endMeasure) return next;
+        endMeasure.id ??= mintMeasureId(next);
+        const measureId = endMeasure.id;
         measure.ottavas = [
           ...(measure.ottavas ?? []),
           { position, value: op.attribute.value, end: { measure: measureId, position } }
@@ -1276,7 +1312,14 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         if (op.attribute.relativeValue) entry.relativeValue = op.attribute.relativeValue;
         measure.dynamics = [...(measure.dynamics ?? []), entry];
       } else {
-        measure.directions = [...(measure.directions ?? []), { position, text: op.attribute.text }];
+        measure.directions = [
+          ...(measure.directions ?? []),
+          {
+            position,
+            text: op.attribute.text,
+            ...(op.attribute.orient ? { orient: op.attribute.orient } : {})
+          }
+        ];
       }
       return next;
     }
@@ -1430,7 +1473,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       // Refuse rather than clear: see the op's comment.
       if (seq.content.some(item => isTimedEvent(item) && (item.notes?.length ?? 0) > 0)) return next;
       seq.content = [];
-      seq.fullMeasure = {};
+      seq.fullMeasure = op.visualDuration ? { visualDuration: { ...op.visualDuration } } : {};
       return next;
     }
     case 'removeFullMeasureRest': {
@@ -2064,6 +2107,15 @@ function slurStartsAt(slur: MnxSlur, event: MnxEvent, note: MnxNote): boolean {
 }
 
 /** A fresh event id, deterministic like `mintNoteId` so replays are stable. */
+/** A free `m<n>` for a global measure — the corpus spells them `m1`, `m2`. */
+function mintMeasureId(doc: MnxStructure): string {
+  const taken = new Set((doc.global?.measures ?? []).map(measure => measure.id).filter(Boolean));
+  for (let n = 1; ; n++) {
+    const id = `m${n}`;
+    if (!taken.has(id)) return id;
+  }
+}
+
 function mintEventId(doc: MnxStructure): string {
   const taken = new Set<string>();
   for (const part of doc.parts ?? []) {

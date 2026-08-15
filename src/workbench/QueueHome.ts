@@ -25,7 +25,7 @@ export class QueueHome extends LitElement {
       }
 
       h1 {
-        font-family: var(--serif);
+        font-family: var(--sans);
         font-weight: 500;
         font-size: 24px;
         margin: 0 0 6px;
@@ -67,7 +67,7 @@ export class QueueHome extends LitElement {
 
       .rows {
         border: 1px solid var(--line);
-        border-radius: 10px;
+        border-radius: var(--radius-panel);
         overflow: hidden;
         background: var(--surface);
       }
@@ -104,7 +104,7 @@ export class QueueHome extends LitElement {
 
       .empty {
         border: 1px dashed var(--line-strong);
-        border-radius: 12px;
+        border-radius: var(--radius-card);
         padding: 34px;
         max-width: 860px;
         text-align: center;
@@ -113,7 +113,7 @@ export class QueueHome extends LitElement {
       }
 
       .empty .big {
-        font-family: var(--serif);
+        font-family: var(--sans);
         font-size: 19px;
         color: var(--ink);
         display: block;

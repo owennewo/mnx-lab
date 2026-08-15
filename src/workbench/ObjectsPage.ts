@@ -46,7 +46,7 @@ export class ObjectsPage extends LitElement {
       }
 
       h1 {
-        font-family: var(--serif);
+        font-family: var(--sans);
         font-weight: 500;
         font-size: 24px;
         margin: 0 0 6px;
@@ -107,7 +107,7 @@ export class ObjectsPage extends LitElement {
         gap: 1px;
         background: var(--line);
         border: 1px solid var(--line);
-        border-radius: 10px;
+        border-radius: var(--radius-panel);
         overflow: hidden;
       }
 
@@ -141,7 +141,7 @@ export class ObjectsPage extends LitElement {
 
       .rows {
         border: 1px solid var(--line);
-        border-radius: 10px;
+        border-radius: var(--radius-panel);
         overflow: hidden;
         background: var(--surface);
       }

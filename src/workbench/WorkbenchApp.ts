@@ -137,7 +137,7 @@ export class WorkbenchApp extends LitElement {
         color: var(--ink-2);
         background: transparent;
         border: 1px solid var(--line-strong);
-        border-radius: 6px;
+        border-radius: var(--radius-tab);
         padding: 1px 8px;
         cursor: pointer;
         align-self: center;
@@ -158,7 +158,7 @@ export class WorkbenchApp extends LitElement {
       }
 
       header .brand {
-        font-family: var(--serif);
+        font-family: var(--sans);
         font-size: 17px;
         font-weight: 500;
       }
@@ -206,7 +206,7 @@ export class WorkbenchApp extends LitElement {
         display: block;
         margin: 0 10px 10px;
         padding: 8px 10px;
-        border-radius: 8px;
+        border-radius: var(--radius-control);
         font-size: 12.5px;
         font-weight: 500;
         color: var(--ink);
@@ -233,7 +233,7 @@ export class WorkbenchApp extends LitElement {
         color: var(--ink);
         background: transparent;
         border: 1px solid var(--line);
-        border-radius: 7px;
+        border-radius: var(--radius-input);
         box-sizing: border-box;
       }
 
@@ -298,7 +298,7 @@ export class WorkbenchApp extends LitElement {
 
       /* Orthogonal to state: rejected by the schema on purpose. */
       .dot.by-design {
-        border-radius: 2px;
+        border-radius: var(--radius-hair);
         transform: rotate(45deg);
       }
 
@@ -314,7 +314,7 @@ export class WorkbenchApp extends LitElement {
         letter-spacing: 0.04em;
         color: var(--ink-3);
         border: 1px solid var(--line);
-        border-radius: 4px;
+        border-radius: var(--radius-xs);
         padding: 0 4px;
         line-height: 1.5;
       }

@@ -212,7 +212,7 @@ export class ScoreViewer extends LitElement {
       .paper {
         background: var(--paper);
         color: var(--paper-ink);
-        border-radius: 10px;
+        border-radius: var(--radius-panel);
         box-shadow: var(--shadow);
         border: 1px solid oklch(0.85 0.01 85 / 0.6);
         padding: 30px 26px;
@@ -222,7 +222,7 @@ export class ScoreViewer extends LitElement {
 
       :host([compact]) .paper {
         padding: 16px 14px;
-        border-radius: 8px;
+        border-radius: var(--radius-control);
       }
 
       /* Honor the engine's intrinsic size — fitPxPerSp already fills the
@@ -381,7 +381,7 @@ export class ScoreViewer extends LitElement {
         display: flex;
         align-items: center;
         gap: 9px;
-        font-family: var(--serif);
+        font-family: var(--sans);
         font-size: 17px;
         font-weight: 500;
         margin: 0 0 8px;
@@ -392,7 +392,7 @@ export class ScoreViewer extends LitElement {
         height: 10px;
         background: oklch(0.55 0.125 42);
         transform: rotate(45deg);
-        border-radius: 2px;
+        border-radius: var(--radius-hair);
         flex-shrink: 0;
       }
 
@@ -414,7 +414,7 @@ export class ScoreViewer extends LitElement {
 
       .err-table {
         border: 1px solid oklch(0.85 0.02 60);
-        border-radius: 8px;
+        border-radius: var(--radius-control);
         overflow: hidden;
         margin-top: 12px;
       }
@@ -458,7 +458,7 @@ export class ScoreViewer extends LitElement {
         color: oklch(0.55 0.125 42);
         background: oklch(0.96 0.01 60);
         border: 1px solid oklch(0.88 0.015 60);
-        border-radius: 6px;
+        border-radius: var(--radius-tab);
         padding: 9px 12px;
         margin-top: 8px;
         display: block;

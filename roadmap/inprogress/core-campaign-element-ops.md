@@ -948,3 +948,36 @@ different doc rather than a fourteenth row.
 
 With that, every index row is closed and the campaign's only outstanding work
 is the trace queue draining to zero.
+
+### 2026-08-15 — four notation-side traces, and a dependency named
+
+`jumps-dal-segno`, `ottavas-8va`, `full-measure-rests`, `directions-stacked`.
+**Traced 15 → 19, kinds covered 26 → 30 of 38, queue 11 → 7 traces / 85
+elements** — and the seven that remain are the tab-side three plus four
+notation ones.
+
+**The ottava had an op, an intent, and no way in.** No grammar, no key, nothing
+typed produced it — and the keyboard join could not see the hole, because
+`setPositioned` reaches a surface through its dynamic and direction siblings.
+A join over intent TYPES cannot notice that one of a shared verb's shapes is
+unreachable; the trace can, because it has to type the thing. It also needed
+the end-bar reference minted, which is `setBeam`'s finding again: **a verb that
+refuses because its target has no name only works on documents somebody else
+wrote.**
+
+Three more vocabulary gaps, all the same shape as yesterday's: a **direction**
+could not say which side of the staff it sits on, a **full-measure rest** could
+not say how it is drawn (a 3/4 bar rests with a whole rest), and a **jump** was
+always written at the bar's start when a D.S. is read at its end. That last one
+found the corpus disagreeing with itself — our own `labels-with-navigation`
+puts a *fine* at the start — so the position is now offered (`at start`/`at end`)
+rather than assumed, with each kind keeping the default it had.
+
+**And the queue now knows what it cannot ask for.** `directions-multi-staff`
+was next in line and is unbuildable: its music lives on a second staff, which
+is exactly what [core-entry-surface.md](../proposed/core-entry-surface.md)
+owns. The queue skips scenarios needing a second staff, voice or part, and
+`staves` — whose every corpus home is one of those — is reported as
+`awaitingEntrySurface`. So the closing condition is precise: **`uncovered` must
+hold nothing but that list**, not nothing at all. A campaign that graduated an
+item cannot then wait on it.

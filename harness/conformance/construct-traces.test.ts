@@ -279,6 +279,28 @@ const DEFERRED_KINDS: Record<string, string> = {
 };
 
 /**
+ * A scenario today's ENTRY SURFACE cannot build: music in a second staff,
+ * voice or part. The cursor reaches all three and every removal verb follows
+ * it, but entry still writes to voice 0 of `parts[0]`, staff 1 — the policy
+ * question that graduated out as `roadmap/proposed/core-entry-surface.md`.
+ *
+ * The queue has to know, because a trace is a keyboard performance: proposing
+ * one for a grand staff would be proposing work nobody can do.
+ */
+function needsEntrySurface(id: string): boolean {
+  const dir = dirById.get(id);
+  if (!dir) return false;
+  const doc = JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8')) as MnxStructure;
+  const parts = doc.parts ?? [];
+  if (parts.length > 1) return true;
+  return parts.some(
+    part =>
+      (part.staves ?? 1) > 1 ||
+      (part.measures ?? []).some(measure => (measure.sequences ?? []).length > 1)
+  );
+}
+
+/**
  * THE TRACE BAR (scoping decision, 2026-08-15): kind coverage, not scenario
  * coverage.
  *
@@ -320,6 +342,7 @@ function traceQueue(): { scenario: string; elements: number; kinds: string[] }[]
   for (const scenario of scenarios) {
     if (scenario.tier === 'expected-unreachable' || scenario.traced) continue;
     if (scenario.blockedBy.some(kind => kind in DEFERRED_KINDS)) continue;
+    if (needsEntrySurface(scenario.id)) continue;
     const kinds = kindsOf(scenario.id);
     pool.set(scenario.id, kinds);
     const dir = dirById.get(scenario.id)!;
@@ -379,6 +402,14 @@ const coverage = {
     kindsWithAVerb: constructibleKinds.length,
     covered: constructibleKinds.length - uncoveredKinds.length,
     uncovered: uncoveredKinds,
+    /** Uncovered kinds whose every corpus home needs a second staff, voice or
+     *  part — coverable only once `core-entry-surface.md` lands, so the bar
+     *  closes when `uncovered` is a subset of THIS, not when it is empty. */
+    awaitingEntrySurface: uncoveredKinds.filter(kind =>
+      scenarios
+        .filter(s => s.tier !== 'expected-unreachable' && kindsOf(s.id).has(kind))
+        .every(s => needsEntrySurface(s.id))
+    ),
     queue: traceQueue()
   },
   deferredKinds: DEFERRED_KINDS,
@@ -453,11 +484,36 @@ describe('construct coverage (element-ops campaign item 3)', () => {
       ).toBe(true);
   });
 
+  it('the queue plus the entry-surface wait accounts for every uncovered kind', () => {
+    // Nothing may sit uncovered without a reason: either a queued trace will
+    // cover it, or its only homes need an entry surface this campaign does not
+    // own. A third case would be a hole in the bar.
+    const queued = new Set(traceQueue().flatMap(row => row.kinds));
+    const awaiting = new Set(coverage.traceCoverage.awaitingEntrySurface);
+    expect(
+      uncoveredKinds.filter(kind => !queued.has(kind) && !awaiting.has(kind)),
+      'uncovered, unqueued, and not waiting on anything'
+    ).toEqual([]);
+  });
+
+  it('a kind waits on the entry surface only if EVERY home needs it', () => {
+    for (const kind of coverage.traceCoverage.awaitingEntrySurface) {
+      const homes = scenarios.filter(
+        s => s.tier !== 'expected-unreachable' && kindsOf(s.id).has(kind)
+      );
+      expect(homes.length, `${kind} has no corpus home at all`).toBeGreaterThan(0);
+      expect(
+        homes.filter(s => !needsEntrySurface(s.id)).map(s => s.id),
+        `${kind} has a single-staff home and should be queued, not waiting`
+      ).toEqual([]);
+    }
+  });
+
   it('the trace queue would finish the cover', () => {
     // The bar is reported, not asserted, while the queue drains — but the
     // QUEUE itself must be complete, or the campaign would be reading a work
     // list that cannot reach the claim it promises.
-    const reached = new Set(coveredKinds);
+    const reached = new Set([...coveredKinds, ...coverage.traceCoverage.awaitingEntrySurface]);
     for (const row of traceQueue()) row.kinds.forEach(kind => reached.add(kind));
     expect(constructibleKinds.filter(kind => !reached.has(kind))).toEqual([]);
   });

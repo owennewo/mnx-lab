@@ -283,7 +283,7 @@ export class ScenarioPage extends LitElement {
 
       /* Title + id live in the description tab now — the head is tabs only. */
       .panel-body h1 {
-        font-family: var(--serif);
+        font-family: var(--sans);
         font-weight: 500;
         font-size: 17px;
         line-height: 1.3;
@@ -310,7 +310,7 @@ export class ScenarioPage extends LitElement {
 
       .badge {
         border: 1px solid var(--line-strong);
-        border-radius: 999px;
+        border-radius: var(--radius-pill);
         padding: 2px 9px;
         color: var(--ink-2);
       }
@@ -348,7 +348,7 @@ export class ScenarioPage extends LitElement {
         color: var(--ink-2);
         background: var(--surface);
         border: 1px solid var(--line);
-        border-radius: 5px;
+        border-radius: var(--radius-chip);
         padding: 1px 6px;
         text-decoration: none;
       }
@@ -403,7 +403,7 @@ export class ScenarioPage extends LitElement {
         color: var(--ink-2);
         background: transparent;
         border: 1px solid var(--line-strong);
-        border-radius: 5px;
+        border-radius: var(--radius-chip);
         padding: 1px 8px;
         cursor: pointer;
       }
@@ -433,7 +433,7 @@ export class ScenarioPage extends LitElement {
         gap: 10px;
         padding: 8px 12px;
         border: 1px solid var(--accent);
-        border-radius: 8px;
+        border-radius: var(--radius-control);
         background: var(--surface);
         font-family: var(--mono);
         font-size: 11px;
@@ -469,7 +469,7 @@ export class ScenarioPage extends LitElement {
       .tabs a {
         font-size: 12px;
         padding: 5px 12px;
-        border-radius: 7px 7px 0 0;
+        border-radius: var(--radius-input) var(--radius-input) 0 0;
         color: var(--ink-2);
         text-decoration: none;
         border: 1px solid transparent;
@@ -540,7 +540,7 @@ export class ScenarioPage extends LitElement {
         background: transparent;
         border: 1px solid transparent;
         border-bottom: none;
-        border-radius: 6px 6px 0 0;
+        border-radius: var(--radius-tab) var(--radius-tab) 0 0;
         padding: 4px 8px;
         cursor: pointer;
       }
@@ -640,7 +640,7 @@ export class ScenarioPage extends LitElement {
         display: block;
         max-width: 100%;
         background: var(--paper);
-        border-radius: 10px;
+        border-radius: var(--radius-panel);
         box-shadow: var(--shadow);
         padding: 12px;
         box-sizing: border-box;
@@ -664,7 +664,7 @@ export class ScenarioPage extends LitElement {
       .exhibit-panel {
         background: var(--paper);
         color: var(--paper-ink);
-        border-radius: 10px;
+        border-radius: var(--radius-panel);
         box-shadow: var(--shadow);
         border: 1px solid oklch(0.85 0.01 85 / 0.6);
         padding: 26px 24px;
@@ -677,7 +677,7 @@ export class ScenarioPage extends LitElement {
         align-items: center;
         gap: 8px;
         margin: 0 0 10px;
-        font-family: var(--serif);
+        font-family: var(--sans);
         font-weight: 500;
         font-size: 15px;
       }
@@ -710,7 +710,7 @@ export class ScenarioPage extends LitElement {
         font: inherit;
         background: transparent;
         border: 1px solid var(--line);
-        border-radius: 7px;
+        border-radius: var(--radius-input);
         padding: 8px 10px;
         cursor: pointer;
       }
@@ -740,7 +740,7 @@ export class ScenarioPage extends LitElement {
       .load-state {
         padding: 22px;
         border: 1px dashed var(--line-strong);
-        border-radius: 10px;
+        border-radius: var(--radius-panel);
         font-size: 12.5px;
         color: var(--ink-2);
         line-height: 1.55;
@@ -1332,7 +1332,12 @@ export class ScenarioPage extends LitElement {
       if ('rhythm' in parsed) {
         this.stripIntent(
           parsed.rhythm === 'fullMeasureRest'
-            ? { type: parsed.remove ? 'removeFullMeasureRest' : 'setFullMeasureRest' }
+            ? parsed.remove
+              ? { type: 'removeFullMeasureRest' }
+              : {
+                  type: 'setFullMeasureRest',
+                  ...(parsed.visualDuration ? { visualDuration: parsed.visualDuration } : {})
+                }
             : parsed.remove
               ? { type: 'removeMeasureRepeat' }
               : {

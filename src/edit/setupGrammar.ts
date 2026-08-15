@@ -235,7 +235,7 @@ const TEMPO_UNITS: Record<string, MnxNoteValueBase> = {
 
 export const BAR_ATTRIBUTE_HELP =
   'barline double · repeat start · repeat end 3 · ending 1,2 · segno · fine · ' +
-  'jump dsalfine · tempo 120 · rehearsal A · section Verse 1 · full-measure rest · ' +
+  'jump dsalfine · jump segno at start · fine at end · tempo 120 · rehearsal A · section Verse 1 · full-measure rest · ' +
   'measure repeat 2 · measure repeat counter 3 · no <attribute>';
 
 export type BarAttributeResult =
@@ -248,6 +248,7 @@ export type BarAttributeResult =
       rhythm: 'fullMeasureRest' | 'measureRepeat';
       remove?: boolean;
       number?: number;
+      visualDuration?: { base: MnxNoteValueBase };
       counter?: { count: number; orient?: 'above' | 'below' };
     }
   | null;
@@ -286,6 +287,13 @@ export function parseBarAttribute(text: string): BarAttributeResult {
   // `full-measure rest` — the bar declares its own silence.
   if (head === 'full-measure' || (head === 'full' && words[1]?.toLowerCase() === 'measure')) {
     const rest = trimmed.toLowerCase().replace(/^full[- ]measure\s*/, '');
+    // `full-measure rest` / `full-measure rest whole` — the second form says
+    // how it is DRAWN, which differs from the meter in 3/4 and 6/8.
+    const drawn = /^rest\s+(\S+)$/.exec(rest);
+    if (drawn) {
+      const value = NOTE_VALUES[drawn[1]];
+      return value ? { rhythm: 'fullMeasureRest', visualDuration: { base: value } } : null;
+    }
     return rest === 'rest' ? { rhythm: 'fullMeasureRest' } : null;
   }
 
@@ -345,13 +353,21 @@ export function parseBarAttribute(text: string): BarAttributeResult {
         }
       };
     }
+    // The navigation marks may say WHERE in the bar they sit — `fine at end`,
+    // `jump dsalfine at end` — because for these three the position is part of
+    // the meaning rather than a nicety (see `measureAttributeValue`).
     case 'segno':
-    case 'fine':
-      return rest === '' ? { set: { kind } } : null;
+    case 'fine': {
+      const at = /^at\s+(start|end)$/.exec(rest.toLowerCase());
+      if (rest !== '' && !at) return null;
+      return { set: { kind, ...(at ? { at: at[1] as 'start' | 'end' } : {}) } };
+    }
     case 'jump': {
-      const type = rest.toLowerCase().replace(/[.\s]/g, '');
-      if (type === 'segno' || type === 'ds') return { set: { kind: 'jump', type: 'segno' } };
-      if (type === 'dsalfine') return { set: { kind: 'jump', type: 'dsalfine' } };
+      const at = /\s+at\s+(start|end)$/.exec(rest.toLowerCase());
+      const body = (at ? rest.slice(0, at.index) : rest).toLowerCase().replace(/[.\s]/g, '');
+      const where = at ? { at: at[1] as 'start' | 'end' } : {};
+      if (body === 'segno' || body === 'ds') return { set: { kind: 'jump', type: 'segno', ...where } };
+      if (body === 'dsalfine') return { set: { kind: 'jump', type: 'dsalfine', ...where } };
       return null;
     }
     case 'tempo': {
@@ -389,7 +405,7 @@ const DYNAMIC_WORDS = [
 
 export const ADORNMENT_HELP =
   'accent · staccato · tenuto · strongAccent · … · a dynamic (pp, mf, fff) · ' +
-  'text Play 8x · cresc · dim · louder · softer · breath comma · bow up · ' +
+  'text Play 8x · text below cantabile · 8va 2 · cresc · dim · louder · softer · breath comma · bow up · ' +
   'accidental · accidental parens · ' +
   'no accent · no dynamic · no text · no string · no accidental';
 
@@ -435,8 +451,34 @@ export function parseAdornment(text: string): AdornmentResult {
   }
 
   if (head === 'text') {
-    const body = words.slice(1).join(' ');
-    return body === '' ? null : { positioned: { kind: 'direction', text: body } };
+    // `text above R.H.` / `text below cantabile` — the side is a leading word,
+    // and a direction that really begins "above" is spelled `text above above`.
+    const side = (words[1] ?? '').toLowerCase();
+    const oriented = side === 'above' || side === 'below' || side === 'between';
+    const body = words.slice(oriented ? 2 : 1).join(' ');
+    return body === ''
+      ? null
+      : {
+          positioned: {
+            kind: 'direction',
+            text: body,
+            ...(oriented ? { orient: side as 'above' | 'below' | 'between' } : {})
+          }
+        };
+  }
+
+  // The octave lines had an op and an intent and NO WAY IN — the keyboard join
+  // could not see it, because `setPositioned` reaches the popover through its
+  // dynamic and direction siblings. `8va`, `8vb`, `15ma`… and an optional bar
+  // span (`8va 2` runs to the end of the next bar).
+  const ottava = /^(8va|8vb|15ma|15mb|22ma|22mb)(?:\s+(\d+))?$/.exec(trimmed.toLowerCase());
+  if (ottava) {
+    const value = ({ '8va': 1, '15ma': 2, '22ma': 3, '8vb': -1, '15mb': -2, '22mb': -3 } as const)[
+      ottava[1] as '8va'
+    ];
+    const bars = ottava[2] ? Number(ottava[2]) : undefined;
+    if (bars !== undefined && (!Number.isInteger(bars) || bars < 1)) return null;
+    return { positioned: { kind: 'ottava', value, ...(bars ? { bars } : {}) } };
   }
 
   const dynamic = DYNAMIC_WORDS.find(d => d === trimmed);

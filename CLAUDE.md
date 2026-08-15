@@ -165,12 +165,16 @@ shown), derived from committed provenance in `src/workbench/queue.ts`. Every sce
 has a stable deep link: `#/scenario/<id>?view=notation|tab|both` (unspecified ⇒ the
 document's `tab.staffKind` hint); legacy `?view=compare|json` links are honored and
 open the matching tab of the scenario page's **side panel** (description | tags |
-actions | hud | compare | json — roadmap/inprogress/core-score-hud.md), which holds
+actions | ops | hud | compare | json — roadmap/inprogress/core-score-hud.md, which
+created the panel; `ops` arrived later with the element-ops exemplar), which holds
 all page chrome including the selection HUD and the per-part instrument override
 (the HUD's ensemble table → `<mnx-score-viewer>.partTabSetups`; the flat
 `stringsOverride`/`capoOverride` pair remains for single-instrument embeds —
 presentation only). Tab/both exist only when the strings are KNOWN — declared in
 the document, or supplied through that override. No instrument is ever assumed.
+The seven tabs are **proposed to become five** (`tags` folding into `description`,
+`actions` retiring into the selection tray and the palette) —
+roadmap/proposed/workbench-score-panel.md, part of the Modernist restyle campaign.
 
 **`#/objects`** is the coverage map — every non-plumbing `$def` against the scenarios
 exercising it (`src/corpus/defIndex.ts`, inverting the spec's own `coversDefs` join),

@@ -12,10 +12,22 @@
 // which `elements/` is also allowed.
 //
 // Styling is FAITHFUL to the design spec ("SPEC · v1 — selection command
-// tray"): Archivo, ink #201e1d, accent #ec3013, zero border-radius — the
-// tray's own self-contained look, deliberately apart from workbench chrome
-// (the leading edge of a possible restyle; see the visuals doc's ruling). It
-// does not include designTokens, on purpose.
+// tray") — and since 2026-08-15 it says so in TOKENS rather than in literals.
+// The tray shipped ahead of its system, hard-coding the design's palette
+// because the workbench had not adopted it yet; the Modernist campaign moved
+// the chrome to meet the tray, so the ~55 literals became `var(--ink)`,
+// `var(--accent)` and friends with no visual change. The visuals doc's
+// "deliberately apart from the surrounding chrome" ruling is retired.
+//
+// It still does NOT include `designTokens`, and that is now load-bearing for a
+// different reason than before: the tokens reach here by INHERITANCE from
+// `<mnx-workbench>`'s host (custom properties cross shadow boundaries), and
+// the dark half is selected by a `resolved-theme` attribute on that host.
+// Re-declaring designTokens here would plant a light-only `:host` block
+// between the app and this component and pin the tray light forever — the
+// theme switch would visibly skip it. A workbench leaf should inherit its
+// palette, not restate it.
+// See roadmap/proposed/core-campaign-modernist.md.
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { glyphBBox, glyphCodepoint, isSmuflLoaded } from '../engine/smufl/smufl.ts';
@@ -111,7 +123,7 @@ export class SelectionTray extends LitElement {
       z-index: 30;
       display: block;
       width: var(--tray-w, 470px);
-      font-family: Archivo, system-ui, sans-serif;
+      font-family: var(--sans);
       outline: none;
       /* Re-anchoring animates position, never fades (the spec's rule). */
       transition:
@@ -123,7 +135,7 @@ export class SelectionTray extends LitElement {
     .shaft {
       position: absolute;
       height: ${SHAFT_H}px;
-      background: #ec3013;
+      background: var(--accent);
     }
 
     :host(:not([data-flipped])) .shaft {
@@ -136,13 +148,13 @@ export class SelectionTray extends LitElement {
 
     .plinth {
       height: ${PLINTH_H}px;
-      background: #201e1d;
+      background: var(--ink);
     }
 
     .tray {
-      background: #fff;
-      border: 2px solid #201e1d;
-      box-shadow: 0 18px 40px rgba(32, 30, 29, 0.18);
+      background: var(--surface);
+      border: 2px solid var(--ink);
+      box-shadow: 0 18px 40px color-mix(in oklab, var(--ink), transparent 82%);
     }
 
     :host(:not([data-flipped])) .tray {
@@ -157,14 +169,14 @@ export class SelectionTray extends LitElement {
     .tabs {
       display: flex;
       align-items: stretch;
-      border-bottom: 1px solid #e6e3e0;
+      border-bottom: 1px solid var(--line);
     }
 
     .tabs button {
-      font: 600 10px/1 Archivo, system-ui, sans-serif;
+      font: 600 10px/1 var(--sans);
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #8a8582;
+      color: var(--ink-3);
       background: none;
       border: 0;
       padding: 11px 9px;
@@ -173,20 +185,20 @@ export class SelectionTray extends LitElement {
     }
 
     .tabs button:hover {
-      color: #201e1d;
-      background: #faf9f8;
+      color: var(--ink);
+      background: var(--bg-context);
     }
 
     .tabs button[aria-current='true'] {
-      color: #ec3013;
-      box-shadow: inset 0 -2px 0 #ec3013;
+      color: var(--accent);
+      box-shadow: inset 0 -2px 0 var(--accent);
     }
 
     .tabs .dot {
       display: inline-block;
       width: 5px;
       height: 5px;
-      background: #ec3013;
+      background: var(--accent);
       margin-left: 6px;
       vertical-align: middle;
     }
@@ -196,9 +208,9 @@ export class SelectionTray extends LitElement {
       display: flex;
       align-items: center;
       padding: 0 9px;
-      font: 500 10px/1 Archivo, system-ui, sans-serif;
+      font: 500 10px/1 var(--sans);
       letter-spacing: 0.06em;
-      color: #b3aeaa;
+      color: var(--ink-faint);
       flex: none;
     }
 
@@ -208,34 +220,34 @@ export class SelectionTray extends LitElement {
       align-items: center;
       gap: 9px;
       padding: 9px 13px;
-      border-bottom: 2px solid #201e1d;
-      background: #faf9f8;
+      border-bottom: 2px solid var(--ink);
+      background: var(--bg-context);
       white-space: nowrap;
       overflow: hidden;
     }
 
     .meta .primary {
-      font: 600 11.5px/1 Archivo, system-ui, sans-serif;
-      color: #201e1d;
+      font: 600 11.5px/1 var(--sans);
+      color: var(--ink);
     }
 
     .meta .secondary {
-      font: 400 11.5px/1 Archivo, system-ui, sans-serif;
-      color: #8a8582;
+      font: 400 11.5px/1 var(--sans);
+      color: var(--ink-3);
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .meta .count {
       margin-left: auto;
-      font: 500 10px/1 Archivo, system-ui, sans-serif;
+      font: 500 10px/1 var(--sans);
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: #8a8582;
+      color: var(--ink-3);
     }
 
     .meta .count.widen {
-      color: #ec3013;
+      color: var(--accent);
     }
 
     /* ── D · glyph grid ── */
@@ -250,8 +262,8 @@ export class SelectionTray extends LitElement {
       position: relative;
       width: 66px;
       height: 64px;
-      background: #fff;
-      border: 1px solid #dcd9d6;
+      background: var(--surface);
+      border: 1px solid var(--line);
       cursor: pointer;
       font: inherit;
       padding: 0;
@@ -280,7 +292,7 @@ export class SelectionTray extends LitElement {
     }
 
     .tile .glyph {
-      color: #201e1d;
+      color: var(--ink);
       /* The ink box is the viewBox, and the text inside it carries the font's
          full em box — ascent and descent well beyond the glyph's own ink.
          Visible overflow is what lets that ink paint past the tiny box, but
@@ -301,66 +313,66 @@ export class SelectionTray extends LitElement {
       pointer-events: none;
       min-width: 17px;
       padding: 2px 4px;
-      background: #201e1d;
-      color: #fff;
-      font: 600 9.5px/1.2 Archivo, system-ui, sans-serif;
+      background: var(--ink);
+      color: var(--surface);
+      font: 600 9.5px/1.2 var(--sans);
       letter-spacing: 0.04em;
       text-align: center;
     }
 
     .tile svg path {
-      stroke: #201e1d;
+      stroke: var(--ink);
     }
 
     .tile:hover,
     .tile.cursor {
-      background: #fce7e3;
-      border-color: #ec3013;
+      background: var(--row-current);
+      border-color: var(--accent);
     }
 
     .tile[data-state='active'] {
-      background: #ec3013;
-      border-color: #ec3013;
+      background: var(--accent);
+      border-color: var(--accent);
     }
 
     .tile[data-state='active']:hover,
     .tile[data-state='active'].cursor {
-      background: #b8240d;
-      border-color: #b8240d;
+      background: var(--accent-pressed);
+      border-color: var(--accent-pressed);
     }
 
     .tile[data-state='active'] .glyph {
-      color: #fff;
+      color: var(--surface);
     }
 
     /* On the accent fill the dark chip would disappear, so it inverts. */
     .tile[data-state='active'] .key {
-      background: #fff;
-      color: #201e1d;
+      background: var(--surface);
+      color: var(--ink);
     }
 
     .tile[data-state='active'] svg path {
-      stroke: #fff;
+      stroke: var(--surface);
     }
 
     .tile[data-state='mixed'] {
-      box-shadow: inset 2px 0 0 #ec3013;
+      box-shadow: inset 2px 0 0 var(--accent);
     }
 
     .tile[data-state='unavailable'] {
-      background: #f5f3f1;
-      border-color: #e6e3e0;
+      background: var(--bg-context);
+      border-color: var(--line);
       cursor: default;
       pointer-events: none;
     }
 
     .tile[data-state='unavailable'] .glyph {
-      color: #c3bfbb;
+      color: var(--line-strong);
     }
 
     .tile[data-state='unavailable'] .key {
-      background: #e6e3e0;
-      color: #a9a4a0;
+      background: var(--line);
+      color: var(--ink-faint);
     }
 
     /* ── D′ · value rows (the part tab) ── */
@@ -371,7 +383,7 @@ export class SelectionTray extends LitElement {
       width: 100%;
       padding: 8px 13px;
       border: 0;
-      border-bottom: 1px solid #efedea;
+      border-bottom: 1px solid var(--line);
       background: none;
       cursor: pointer;
       font: inherit;
@@ -385,7 +397,7 @@ export class SelectionTray extends LitElement {
 
     .vrows .vrow:hover,
     .vrows .vrow.cursor {
-      background: #fce7e3;
+      background: var(--row-current);
     }
 
     .vrow .glyph {
@@ -393,18 +405,18 @@ export class SelectionTray extends LitElement {
       font-size: 22px;
       line-height: 1;
       width: 24px;
-      color: #201e1d;
+      color: var(--ink);
     }
 
     .vrow .label {
-      font: 500 12.5px/1 Archivo, system-ui, sans-serif;
-      color: #201e1d;
+      font: 500 12.5px/1 var(--sans);
+      color: var(--ink);
     }
 
     .vrow .value {
       margin-left: auto;
-      font: 500 11px/1 Archivo, system-ui, sans-serif;
-      color: #8a8582;
+      font: 500 11px/1 var(--sans);
+      color: var(--ink-3);
     }
 
     /* ── E · hover readout ── */
@@ -413,7 +425,7 @@ export class SelectionTray extends LitElement {
       align-items: center;
       gap: 9px;
       padding: 9px 13px;
-      background: #201e1d;
+      background: var(--ink);
     }
 
     .readout .glyph {
@@ -425,16 +437,16 @@ export class SelectionTray extends LitElement {
       font-family: Bravura;
       font-size: 19px;
       line-height: 1;
-      color: #fff;
+      color: var(--surface);
     }
 
     .readout svg path {
-      stroke: #fff;
+      stroke: var(--surface);
     }
 
     .readout .words {
-      font: 500 11.5px/1 Archivo, system-ui, sans-serif;
-      color: #fff;
+      font: 500 11.5px/1 var(--sans);
+      color: var(--surface);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -442,10 +454,10 @@ export class SelectionTray extends LitElement {
 
     .readout .chip {
       margin-left: auto;
-      font: 600 10px/1 Archivo, system-ui, sans-serif;
+      font: 600 10px/1 var(--sans);
       letter-spacing: 0.1em;
-      color: #fff;
-      border: 1px solid #5f5b58;
+      color: var(--surface);
+      border: 1px solid color-mix(in oklab, var(--ink), var(--surface) 25%);
       padding: 4px 6px;
       flex: none;
     }
@@ -456,19 +468,19 @@ export class SelectionTray extends LitElement {
       align-items: center;
       gap: 8px;
       padding: 9px 13px;
-      border-top: 2px solid #201e1d;
-      background: #faf9f8;
+      border-top: 2px solid var(--ink);
+      background: var(--bg-context);
     }
 
     .search .prompt {
-      font: 600 12px/1 Archivo, system-ui, sans-serif;
-      color: #ec3013;
+      font: 600 12px/1 var(--sans);
+      color: var(--accent);
     }
 
     .search input {
       flex: 1;
-      font: 400 12px/1 Archivo, system-ui, sans-serif;
-      color: #201e1d;
+      font: 400 12px/1 var(--sans);
+      color: var(--ink);
       background: none;
       border: 0;
       outline: none;
@@ -476,7 +488,7 @@ export class SelectionTray extends LitElement {
     }
 
     .search input::placeholder {
-      color: #8a8582;
+      color: var(--ink-3);
     }
   `;
 

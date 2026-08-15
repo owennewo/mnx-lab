@@ -43,6 +43,44 @@ polymorphic beam/bend); part name/strings/capo/staffKind/staves →
 [item 13](../inprogress/core-element-ops-part-declarations.md) (the Shift+P
 grammar). These now sit in the mechanism's wired tables instead.
 
+## Retired 2026-08-15 — the restyle
+
+Two rows from the geometry-and-surface table, retired the day
+[core-campaign-modernist.md](core-campaign-modernist.md) opened.
+
+**"the workbench restyle the tray's art direction leads"** — retired **by adoption, and
+now by delivery**. The row read *"its own future proposal, raised only if the tray's look
+wins the review."* The look won, the campaign is that proposal, and its **item 4 landed
+2026-08-15**: the tray's 55 colour literals became token references, so it consumes the
+system instead of restating it. The recorded contrast between the tray and the chrome
+around it is gone — though not the way anyone expected. The chrome moved to meet the
+tray, so by the time the literals were swapped there was **nothing left to reconcile**:
+the change was pure de-duplication, measured at a 1.04% pixel delta confined to three
+deliberate decisions (see the campaign's learnings log).
+
+One correction to the row's own assumption, worth keeping: it presumed the tray would
+end up *including* `designTokens`. It does not, and must not. Tokens reach a workbench
+leaf by **inheritance** from `<mnx-workbench>`'s host, while the dark half is selected by
+a `resolved-theme` attribute on that host — so re-declaring the block inside the tray
+would plant a light-only `:host` between the app and the component and pin it light
+forever, making the theme switch visibly skip it. A conformance assertion now holds
+that line in both directions (no literals, no local `designTokens`).
+
+**"the tray on a dark page"** — retired **by unblocking**. The row named two possible
+unblockers, *"the restyle proposal, or a dark pass on the spec — whichever comes first"*;
+the restyle came first, and it chose to author the dark half rather than cut it
+([core-modernist-dark.md](core-modernist-dark.md)). Note the road not taken, since the row
+permitted it: had dark been cut, this row would have retired **by decision** under the
+"what this doc is not" rule below, converting into the recorded choice that the workbench
+is light-only. It was kept instead, on the grounds that a restyle should not quietly
+remove a capability on its way past — the dark half was authored and never wired, which
+is a bug in the wiring rather than evidence nobody wanted it.
+
+Worth recording for the ledger's own sake: **both rows were written when the tray
+shipped, each naming its unblocker, and both were still accurate a day later.** This is
+the first time an address in this table was actually used, which is the whole claim the
+doc makes for itself.
+
 ## Still greyed: the vocabulary tail
 
 | Tray surface | Rung(s) | Blocked by | Unblocked when |
@@ -77,10 +115,8 @@ the ladder's per-level pass**, not vocabulary.
 |---|---|---|
 | shaft geometry for selections **wider than the tray** (multi-bar, cross-part) | the design's own open question — no rule drawn | decided at the mechanism's hands-on review once wide selections exist (needs `extent` first) |
 | dashed on-score preview of a **wider** scope than the enclosure can show today (e.g. score frame previewed from a note) | preview rides `SelectionContext.preview` + `drawEnclosure`'s dashed variant — mechanism stage 3 | lands with the mechanism; listed here only until then |
-| **the tray on a dark page** | the viewer now carries its own tokens and follows the page's colour scheme (`light-dark()`, 2026-08-14); the tray's faithful art direction is light-only and the design has no dark variant | the restyle proposal, or a dark pass on the spec — whichever comes first |
 | score-rung `↑↓` escalating to the host (`score-navigate`) | the event is specified in the ladder's navigation map but not built | the ladder's score-level pass |
 | the tray in the **embed / studio** | `elements/` promotion is parked — trigger 2 (a real editing consumer) belongs to studio | [core-editor-element-promotion.md](core-editor-element-promotion.md); scope-only promotion is the recorded interim option |
-| the workbench restyle the tray's art direction leads | deliberately out of scope of the trio | its own future proposal, raised only if the tray's look wins the review |
 
 ## What this doc is not
 

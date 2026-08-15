@@ -19,10 +19,11 @@
 > shaft+plinth connector with flip-above and the docked fallback;
 > `trayDemo.ts` demo sets for all seven rungs; the viewer's
 > `selection-anchored` event **plus a `selectionAnchorRect()` method**, re-fired
-> on the host's own scroll so the tray follows the paper; the Ctrl+K →
-> `selectionTray` / Ctrl+Shift+K → palette split in `SHELL_BINDINGS` (the
-> shell's Ctrl+K dispatches a cancelable `mnx-tray-intent`; unclaimed, it
-> falls through to the palette — so editorless pages keep today's behavior),
+> on the host's own scroll so the tray follows the paper; the tray/palette
+> split in `SHELL_BINDINGS` (the shell dispatches a cancelable
+> `mnx-tray-intent`; unclaimed, it falls through to the palette — so
+> editorless pages still get a command surface). Shipped on Ctrl+K, rebound
+> to `/` on 2026-08-15 (see below),
 > with `KEY_DOCS` rows and the ops-panel palette label updated. Verified in
 > headless Chrome over CDP: open-on-selection with the shaft planted on the
 > enclosure, preview dot + "↵ to widen", the event scope's full glyph grid
@@ -57,7 +58,7 @@
 
 ## What this is
 
-Ctrl+K stops opening a document-wide list. It opens a **tray planted under whatever
+`/` stops opening a document-wide list. It opens a **tray planted under whatever
 is selected**, showing the commands that apply to *that* thing at *that* rung — drawn
 as Bravura glyphs with their shortcut printed underneath and their current state
 visible on the tile. Global commands still exist, one keystroke further away
@@ -197,11 +198,19 @@ it) — one more designed binding, not accretion.
 ## Mounting
 
 `ScenarioPage` renders the tray over `.main`, positioned from `selection-anchored`.
-**Ctrl+K opens the tray when an edit session exists** and the editor has the
+**`/` opens the tray when an edit session exists** and the editor has the
 keyboard; **Ctrl+Shift+K opens the global `<mnx-command-palette>`**; with no
-session, Ctrl+K falls through to the palette as today. The binding move itself
+session, `/` falls through to go-to. The binding move itself
 (`SHELL_BINDINGS`) lands with this part so the demo is reachable, but everything the
 tray *fires* stays inert until the mechanism.
+
+> Shipped on **Ctrl+K**; rebound to **`/`** on 2026-08-15. Chrome owns Ctrl+K
+> (the omnibox), and since the shell deliberately never consumes keys typed
+> into text fields, it worked from the score and escaped to the browser from
+> every input. Slash costs no modifier, no browser fights it, and it is the
+> convention for "start a command". The rail filter's own `/` retired to
+> Ctrl+G, which already matched scenarios through the same `matchesQuery` and
+> reaches bars and objects besides.
 
 ## Styling: faithful, and deliberately so
 
@@ -219,10 +228,13 @@ direction — that restyle is its own future proposal, not smuggled in here. Unt
 it lands the tray will sit visibly apart from the surrounding chrome; that contrast
 is accepted, recorded, and reviewable in the hands-on pass.
 
-Open item: **Archivo loading**. The workbench does not carry Archivo today; the
-component should declare its own `@font-face` (bundled woff2, the way the embed
-face registers Bravura) rather than reach for a CDN, with the system sans fallback
-acceptable for the demo stage.
+~~Open item: **Archivo loading**.~~ **CLOSED 2026-08-15** by
+[core-modernist-type.md](../proposed/core-modernist-type.md) — bundled through
+`@fontsource` in the workbench entry, not a component-local `@font-face`. The guess
+recorded here (that the component should declare its own face, the way the embed
+registers Bravura) was wrong in a useful way: the workbench already had a font
+pipeline, and the right move was to put Archivo through it rather than give this one
+component a private one. Re-review results in the revision block above.
 
 Open item: **the tray on a dark page**. Since 2026-08-14 the viewer carries its
 own tokens and follows the page's colour scheme (`light-dark()`); the spec's art
@@ -230,6 +242,42 @@ direction is light-only and has no dark variant. The tray ships light-only —
 acceptable in the light-chrome workbench — and the dark pass belongs to the
 restyle question. Recorded as a residue row so it cannot be forgotten at
 promotion time.
+
+### Revision 2026-08-15 — the restyle arrived; both open items close
+
+**The look won the review**, so the future proposal this section anticipated now
+exists: [core-campaign-modernist.md](../proposed/core-campaign-modernist.md), a campaign
+whose contract is the token vocabulary this component currently hard-codes. Three
+consequences land back here, each as an indexed campaign item:
+
+- **The tray drops its hexes** (campaign item 4). The ruling above — ship the art
+  direction verbatim as self-contained shadow styles, deliberately without
+  `designTokens` — was correct for a component landing ahead of its system, and it
+  expires when the system catches up. Once
+  [core-modernist-tokens.md](../proposed/core-modernist-tokens.md) lands, `SelectionTray.ts`
+  adds `designTokens` and its ~60 colour literals become token references. The
+  paragraph above about sitting "visibly apart from the surrounding chrome" stops
+  being true, which was always the intent. Delete the component's header comment
+  explaining why it excludes `designTokens` in the same change.
+- **Archivo is bundled — the open item below is CLOSED** (campaign item 3, landed
+  2026-08-15). The proposed mechanism turned out to be unnecessary: the workbench
+  already bundles its faces through `@fontsource/*` imported in `src/entries/main.ts`
+  — *"no font CDN"*, as that file's header puts it — so Archivo was a dependency plus
+  three import lines (latin subset, 3 files, 43KB), with no `@font-face` authoring and
+  no `public/` asset. This component now renders in the face it has always declared.
+  **Re-reviewed with the tray open, driven over CDP**, since a keyboard surface cannot
+  be reached by a plain screenshot: seven rung tabs still fit one row, the 8.5px corner
+  chips stay legible, the readout bar holds. **The recorded deviations below (tab
+  padding 9px, rows-variant width 400px) were re-checked against the real face and
+  stand as written** — no amendment needed.
+- **The dark page gets an answer** (campaign item 2), by authoring a dark half rather
+  than deferring again. The tray inherits it for free *provided* the de-hexing was
+  total — which makes dark mode the real completeness test for item 4.
+
+The two residue rows behind these — *"the tray on a dark page"* and *"the workbench
+restyle the tray's art direction leads"* — are retired in
+[core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md), the first by
+unblocking and the second by adoption.
 
 ## Demo data
 
