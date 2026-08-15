@@ -258,6 +258,12 @@ export class EditorSession {
         });
         return true;
       }
+      case 'respellNote': {
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        this.apply({ type: 'respellNote', noteId: slot.noteKey });
+        return true;
+      }
       case 'toggleTie': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
@@ -611,7 +617,12 @@ export class EditorSession {
         const was = JSON.stringify(this.doc);
         this.apply(
           intent.type === 'setAccidentalDisplay'
-            ? { type: 'setAccidentalDisplay', noteKey: slot.noteKey, show: intent.show }
+            ? {
+                type: 'setAccidentalDisplay',
+                noteKey: slot.noteKey,
+                show: intent.show,
+                ...(intent.parenthesized ? { parenthesized: true } : {})
+              }
             : { type: 'removeAccidentalDisplay', noteKey: slot.noteKey }
         );
         if (JSON.stringify(this.doc) === was) {

@@ -151,21 +151,26 @@ proposals that name their campaign.
   element contract under [core-viewer-surface.md](inprogress/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
   [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
-- **[core-selection-tray-mechanism.md](proposed/core-selection-tray-mechanism.md)** — part 2:
-  the tray wired. One ruling — tiles fire **intents through `session.handleIntent`, nothing
-  else** — so tray clicks land in the op queue and replay through traces like keystrokes. A
-  command registry in `src/edit/` (testable below the harness boundary) whose rows are the
-  *surface half* of [campaign](inprogress/core-campaign-element-ops.md) agreement blocks:
-  id, rungs, glyph, key/tier, `isActive`, `toIntent`. Drafted against a 15-op vocabulary;
-  the campaign's 2026-08-14/15 sweep inverted the emphasis and strengthened the case —
-  the verbs now exist and their only human surface is typed popover grammars
-  (Shift+C/K/B/A/L/P/T/U), so the tray's day-one job is fronting a nearly complete
-  vocabulary with glyphs, states and discoverable keys; `toIntent: null` (greyed) is the
-  residue's short tail, not the index it once was. Joins both ways (stroke ⇒ keymap +
-  `KEY_DOCS` at every claimed rung; ops panel gains `tray` provenance). Scope
-  preview/commit via `SelectionContext.preview` + a dashed enclosure and the HUD's shared
-  level-walk; Ctrl+K → tray / Ctrl+Shift+K → global palette; **Escape precedence stated
-  once** in the keymap layer, answering the ladder's open question.
+- **[core-selection-tray-mechanism.md](inprogress/core-selection-tray-mechanism.md)** — part 2:
+  the tray wired, **stages 1–4 built 2026-08-15** (hands-on review open). One ruling — tiles
+  fire **intents through `session.handleIntent`, nothing else** — so tray clicks land in the
+  op queue and replay through traces like keystrokes. `src/edit/commandRegistry.ts` holds 56
+  commands over all seven rungs, each row the *surface half* of a
+  [campaign](inprogress/core-campaign-element-ops.md) agreement block (rungs, glyph,
+  key/tier, `isActive`, `action`), pinned by 18 conformance joins: shortcuts some table
+  really binds, surfaces that exist, intent types the session handles, glyph names the font
+  carries with bounding boxes, and the ledger agreement that keeps greyed tiles and the
+  residue doc from drifting. Drafted against a 15-op vocabulary; the sweep inverted the
+  emphasis — the verbs exist and their only human surface was typed popover grammars, so the
+  tray fronts a nearly complete vocabulary and the greyed set is the residue's short tail.
+  Scope preview draws a dashed candidate enclosure found through the renderer's existing
+  `data-source-id`, so **no layout code and no golden moved**; commit walks the ladder via a
+  `walkToLevel` shared with the HUD. **Escape precedence declared once** as
+  `ESCAPE_PRECEDENCE` and asserted, answering the ladder's open question. Two findings: the
+  tray must call `followProjection` on open (it offers a *dialect* — `S` slurs in notation,
+  slides in tab), and the ops panel credits **the key, not the emitter**, which is its
+  existing contract — so the tray registers as a surface only for `setAccidentalDisplay`,
+  the one intent it adds to keyboard reachability.
 - **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3: the
   **ledger of what cannot be wired yet**, each greyed tile with an address. Its first
   retirement wave predates the tray itself: the 2026-08-14/15 vocabulary sweep landed
@@ -505,7 +510,7 @@ proposals that name their campaign.
   component: **ink-box glyph normalization** (each glyph drawn into its own font-metadata
   bounding box, 34px target with a 30px/sp ceiling — a palette normalizes optical size
   where a score must not) and **the shortcut as a corner chip** on 66×64 tiles. Parts 2–3
-  ([mechanism](proposed/core-selection-tray-mechanism.md),
+  ([mechanism](inprogress/core-selection-tray-mechanism.md),
   [residue](proposed/core-selection-tray-residue.md)) stay in `proposed/`.
 - **[core-element-ops-exemplar.md](complete/core-element-ops-exemplar.md)** — campaign
   item 1 of [core-campaign-element-ops.md](inprogress/core-campaign-element-ops.md):

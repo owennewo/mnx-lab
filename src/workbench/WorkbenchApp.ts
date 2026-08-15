@@ -72,8 +72,15 @@ const RAIL_HIDDEN_KEY = 'mnx-lab.rail-hidden';
 export class WorkbenchApp extends LitElement {
   @state() private route: Route = parseHash(location.hash);
   @state() private query = '';
-  /** The palette overlay: 'commands' (Ctrl+K, `>` prefilled) or 'goto' (Ctrl+G). */
+  /** The palette overlay: 'commands' (Ctrl+Shift+K, `>` prefilled) or 'goto'
+   *  (Ctrl+G). Ctrl+K belongs to the selection tray when an editor claims it. */
   @state() private palette: 'commands' | 'goto' | null = null;
+  /** Text carried in from the tray's search line: widening the search must
+   *  not make the user retype it (core-selection-tray-mechanism.md). */
+  @state() private paletteQuery = '';
+  /** What the tray last had in its search box, published by the scenario page
+   *  so a widen keystroke can pick it up. Not state: it never renders. */
+  private widenQuery = '';
   /** Rail visibility (Ctrl+B / the header chevron) — remembered per browser;
    *  a UI preference, so localStorage, not the document store. */
   @state() private railHidden = localStorage.getItem(RAIL_HIDDEN_KEY) === '1';
@@ -329,6 +336,7 @@ export class WorkbenchApp extends LitElement {
     super.connectedCallback();
     window.addEventListener('hashchange', this.onHashChange);
     window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('mnx-tray-search', this.onTraySearch);
     this.toggleAttribute('rail-hidden', this.railHidden);
   }
 
@@ -336,12 +344,18 @@ export class WorkbenchApp extends LitElement {
     super.disconnectedCallback();
     window.removeEventListener('hashchange', this.onHashChange);
     window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('mnx-tray-search', this.onTraySearch);
   }
 
   /** The shell's keys: `/` focuses the rail filter (survey §6.1), Ctrl+K /
    *  Ctrl+G open the palette (resolved through the keymap module's shell
    *  table — it stays the sole KeyboardEvent interpreter). Everything
    *  score-shaped is the scenario page's keymap, not ours. */
+  /** The tray publishes its search text so Ctrl+Shift+K can widen it. */
+  private onTraySearch = (event: Event) => {
+    this.widenQuery = (event as CustomEvent<{ text: string }>).detail?.text ?? '';
+  };
+
   private onKeyDown = (event: KeyboardEvent) => {
     // The SHELL's bindings are page-level by nature (the rail, the palette,
     // go-to), so they keep document scope — `host: null`
@@ -364,6 +378,10 @@ export class WorkbenchApp extends LitElement {
     }
     if (action === 'commandPalette' || action === 'goTo') {
       event.preventDefault();
+      // Ctrl+Shift+K from inside the tray widens its scoped search to every
+      // global command; the text travels so nothing is retyped.
+      this.paletteQuery = action === 'commandPalette' ? this.widenQuery : '';
+      this.widenQuery = '';
       this.palette = action === 'commandPalette' ? 'commands' : 'goto';
       return;
     }
@@ -593,8 +611,11 @@ export class WorkbenchApp extends LitElement {
       ${this.palette
         ? html`<mnx-command-palette
             .provider=${this.paletteItems}
-            .initialQuery=${this.palette === 'commands' ? '> ' : ''}
-            @palette-close=${() => (this.palette = null)}
+            .initialQuery=${this.palette === 'commands' ? `> ${this.paletteQuery}` : ''}
+            @palette-close=${() => {
+              this.palette = null;
+              this.paletteQuery = '';
+            }}
           ></mnx-command-palette>`
         : nothing}
     `;

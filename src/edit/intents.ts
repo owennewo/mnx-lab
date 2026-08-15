@@ -125,7 +125,9 @@ export type MutationIntent =
   | { type: 'removeKitNote' }
   | { type: 'removeKitComponent'; component: string }
   | { type: 'removeSound'; sound: string }
-  | { type: 'setAccidentalDisplay'; show: boolean }
+  | { type: 'setAccidentalDisplay'; show: boolean; parenthesized?: boolean }
+  // Spelling as a player's choice, not the editor's (campaign item 6).
+  | { type: 'respellNote' }
   | { type: 'removeAccidentalDisplay' }
   | { type: 'removeLayout'; index: number }
   | { type: 'removeScore'; index: number }

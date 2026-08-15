@@ -6,7 +6,7 @@
 > built on 2026-08-14/15, so the ledger's **first retirement wave predates the
 > tray itself** (recorded below). Third of the trio behind
 > [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) and
-> [core-selection-tray-mechanism.md](core-selection-tray-mechanism.md):
+> [core-selection-tray-mechanism.md](../inprogress/core-selection-tray-mechanism.md):
 > everything the design draws or implies that **cannot be hooked up yet**, each
 > row naming what unblocks it and where that work is tracked. Nothing in this
 > doc is new work — every unblocker has an owner; the doc exists so the tray's

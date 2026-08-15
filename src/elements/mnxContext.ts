@@ -48,5 +48,12 @@ export interface SelectionContext {
   enclosure?: EnclosureKind | null;
   /** The cursor's cell, for the ghost when its position is empty. */
   cursor?: CursorGhost | null;
+  /**
+   * A CANDIDATE scope, drawn dashed beside the live selection — the tray's
+   * scope preview (core-selection-tray-mechanism.md). Presentation only, like
+   * everything else here: the host has not moved its selection, so the
+   * footprint travels as note ids rather than as a rendered `.selected` class.
+   */
+  preview?: { enclosure: EnclosureKind; noteIds: string[] } | null;
 }
 export const selectionContext = createContext<SelectionContext>(Symbol('selection-context'));

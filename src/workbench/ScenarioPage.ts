@@ -16,7 +16,11 @@ import type { EnclosureKind, SelectionContext } from '../elements/mnxContext.ts'
 import { EditorSession, replayIntents } from '../edit/session.ts';
 import { elementKeys, runDestructWalk } from '../edit/destructWalk.ts';
 import { constructTraceByTarget, type ConstructTrace } from './constructTraces.ts';
-import { SELECTION_LADDER, type SelectionLevel } from '../edit/selection.ts';
+import {
+  SELECTION_LADDER,
+  selectionNoteKeys,
+  type SelectionLevel
+} from '../edit/selection.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
 import { cheatsheet } from '../edit/keymapDocs.ts';
@@ -51,11 +55,15 @@ import {
 } from '../edit/setupGrammar.ts';
 import { buildOpRow } from './opRows.ts';
 import { editorHasKeyboard, keyIsOurs } from './keyScope.ts';
-import { TRAY_DEMO } from './trayDemo.ts';
+import {
+  commandState,
+  commandsForRung,
+  sessionView,
+  type EditorCommand
+} from '../edit/commandRegistry.ts';
 import type {
   TrayAnchor,
   TrayMeta,
-  TrayRow,
   TrayTab,
   TrayTile
 } from './SelectionTray.ts';
@@ -226,12 +234,8 @@ export class ScenarioPage extends LitElement {
   @state() private trayOpen = false;
   /** Previewed tab (row key), or null = the tab holding the selection. */
   @state() private trayTab: string | null = null;
-  /** Demo-committed base tab — the visuals stand-in for a real scope commit. */
-  @state() private trayBase: string | null = null;
   /** The selection's box in `.main` coordinates, from `selection-anchored`. */
   @state() private trayAnchor: TrayAnchor | null = null;
-  /** Demo flip state: `${tab}:${tile}` toggled active by a fired tile. */
-  @state() private trayFlips = new Set<string>();
   @state() private traySearch = '';
 
   /** Side panel width in px — the drag bar on its left edge adjusts it. */
@@ -812,7 +816,6 @@ export class ScenarioPage extends LitElement {
       this.cursorHidden = false;
       this.trayOpen = false;
       this.trayTab = null;
-      this.trayBase = null;
       this.trayAnchor = null;
       // Overrides are per-part by INDEX, so carrying them to a different
       // document would misapply them.
@@ -908,7 +911,29 @@ export class ScenarioPage extends LitElement {
       activeEventIndex: null,
       selectedNoteIds: this.cursorHidden ? [] : session.selectedNoteKeys,
       enclosure: this.cursorHidden ? null : ENCLOSURE_BY_LEVEL[session.selectionLevel],
-      cursor: this.cursorHidden ? null : session.cursorContext()
+      cursor: this.cursorHidden ? null : session.cursorContext(),
+      preview: this.previewScope()
+    };
+  }
+
+  /** The tray's previewed scope as a drawable footprint: the rung's own note
+   *  keys computed WITHOUT moving the session, so previewing costs the
+   *  document nothing and Escape has nothing to undo. Null unless a tray tab
+   *  other than the selection's own is on display. */
+  private previewScope(): SelectionContext['preview'] {
+    const session = this.session;
+    if (!session || !this.trayOpen || this.cursorHidden) return null;
+    const level = this.trayTab ? LEVEL_BY_ROW[this.trayTab] : undefined;
+    if (!level || level === session.selectionLevel) return null;
+    return {
+      enclosure: ENCLOSURE_BY_LEVEL[level],
+      noteIds: selectionNoteKeys(
+        session.doc,
+        session.positions,
+        session.cursor,
+        level,
+        session.projection
+      )
     };
   }
 
@@ -996,6 +1021,9 @@ export class ScenarioPage extends LitElement {
    *  intent channel feeds the session (recorded in traces), the action
    *  channel drives page chrome (popovers, copy trace, revert). */
   private onPaletteIntent = (event: Event) => {
+    // The palette took over (Ctrl+Shift+K widened the tray's search, or a
+    // global command ran): two overlays wanting the same keys is one too many.
+    this.trayOpen = false;
     this.stripIntent((event as CustomEvent<EditorIntent>).detail);
   };
 
@@ -1013,11 +1041,15 @@ export class ScenarioPage extends LitElement {
   private onTrayIntent = (event: Event) => {
     if (!this.session || !this.hasKeyboard || this.loadState !== 'ready') return;
     event.preventDefault();
+    // The tray offers a DIALECT — `S` slurs in notation and slides in tab —
+    // so it must follow the pane exactly as the keys do. Without this the
+    // projection keeps whatever it defaulted to (tab, on a string document)
+    // and the notation pane would show the fingerboard's commands.
+    this.followProjection();
     this.trayOpen = true;
     this.trayTab = null;
-    this.trayBase = null;
-    this.trayFlips = new Set();
     this.traySearch = '';
+    this.syncFromSession();
   };
 
   /** The viewer's enclosure rect (viewport coords) → `.main` coords. */
@@ -1043,25 +1075,29 @@ export class ScenarioPage extends LitElement {
     this.renderRoot.querySelector<HTMLElement>('mnx-score-viewer')?.focus();
   }
 
-  /** The tray's view model — VISUALS STAGE: tabs, meta and anchor are real
-   *  (the HUD's rows, presence rule included, reversed into ladder order);
-   *  tiles are trayDemo.ts placeholders with page-local flip state, and a
-   *  scope commit merely adopts the previewed tab. The mechanism replaces
-   *  every piece of this with the command registry. */
+  /**
+   * The tray's view model: a pure projection of registry + session, rebuilt
+   * every render. Tabs are the ladder's present rungs (the HUD's rows, so the
+   * tray and the HUD can never disagree about the address); tiles are the
+   * registry filtered to the displayed rung, each drawing its own state from
+   * the document.
+   *
+   * The displayed rung is the previewed tab when one is open, else the
+   * session's own level — preview never touches the session.
+   */
   private trayView(entry: ScenarioEntry): {
     tabs: TrayTab[];
     meta: TrayMeta | null;
     tiles: TrayTile[];
-    rows: TrayRow[];
+    commands: EditorCommand[];
   } | null {
     if (!this.session) return null;
     const hudRows = buildHudRows(entry.meta.title, this.session, this.cursorHidden);
     const ladder = [...hudRows].reverse(); // note first, score last
     if (ladder.length === 0) return null;
-    const baseKey =
-      this.trayBase ?? hudRows.find(r => r.active)?.key ?? ladder[0].key;
+    const baseKey = hudRows.find(r => r.active)?.key ?? ladder[0].key;
     const known = (key: string | null) => ladder.some(r => r.key === key);
-    const displayKey = known(this.trayTab) ? this.trayTab! : known(baseKey) ? baseKey : ladder[0].key;
+    const displayKey = known(this.trayTab) ? this.trayTab! : baseKey;
 
     const tabs: TrayTab[] = ladder.map(r => ({
       key: r.key,
@@ -1070,28 +1106,52 @@ export class ScenarioPage extends LitElement {
       holdsSelection: r.key === baseKey
     }));
 
-    const demo = TRAY_DEMO[displayKey] ?? {};
-    const flip = (tile: TrayTile): TrayTile =>
-      this.trayFlips.has(`${displayKey}:${tile.id}`)
-        ? { ...tile, state: tile.state === 'active' ? 'available' : 'active' }
-        : tile;
+    const level = LEVEL_BY_ROW[displayKey];
+    const view = sessionView(this.session);
     const q = this.traySearch.trim().toLowerCase();
-    const tiles = (demo.tiles ?? [])
-      .map(flip)
-      .filter(tile => !q || tile.label.toLowerCase().includes(q));
-    const rows = (demo.rows ?? []).filter(row => !q || row.label.toLowerCase().includes(q));
+    const commands = commandsForRung(level, view).filter(
+      command => !q || command.label.toLowerCase().includes(q)
+    );
+    const tiles: TrayTile[] = commands.map(command => ({
+      id: command.id,
+      glyph: command.glyph,
+      shortcut: command.shortcut ?? '',
+      label: command.label,
+      state: commandState(command, view)
+    }));
 
     const displayRow = ladder.find(r => r.key === displayKey);
-    const count = rows.length > 0 ? rows.length : tiles.length;
+    const live = tiles.filter(t => t.state !== 'unavailable').length;
     const meta: TrayMeta | null = displayRow
       ? {
           primary: displayRow.label,
           secondary: displayRow.value,
-          count: `${count} command${count === 1 ? '' : 's'} · demo`
+          count: `${live} command${live === 1 ? '' : 's'}`
         }
       : null;
 
-    return { tabs, meta, tiles, rows };
+    return { tabs, meta, tiles, commands };
+  }
+
+  /** A tile fired: resolve the command against the CURRENT session and send
+   *  what it asks for through the one funnel — an intent to the session, or a
+   *  typed popover to open. Never `applyOp`, so every tray edit lands in the
+   *  op queue with provenance and replays in a trace. */
+  private fireTrayCommand(entry: ScenarioEntry, id: string) {
+    if (!this.session) return;
+    const command = this.trayView(entry)?.commands.find(c => c.id === id);
+    if (!command?.action) return;
+    const action = command.action(sessionView(this.session));
+    if (!action) return;
+    if ('surface' in action) {
+      // The tray is where a typed grammar becomes discoverable; it does not
+      // reimplement one. Opening the popover closes the tray, because both
+      // want the same keystrokes.
+      this.trayOpen = false;
+      this.openPopover(action.surface);
+      return;
+    }
+    this.stripIntent(action.intent);
   }
 
   private trayOverlay(entry: ScenarioEntry) {
@@ -1102,31 +1162,27 @@ export class ScenarioPage extends LitElement {
         .tabs=${view.tabs}
         .meta=${view.meta}
         .tiles=${view.tiles}
-        .rows=${view.rows}
+        .rows=${[]}
         .anchor=${this.trayAnchor}
         .searchText=${this.traySearch}
         @tray-tab-preview=${(e: CustomEvent<{ key: string }>) => {
           this.trayTab = e.detail.key;
+          this.syncFromSession();
         }}
         @tray-tab-commit=${(e: CustomEvent<{ key: string }>) => {
-          // Visuals stage: adopting the preview stands in for the real
-          // relax/tighten walk the mechanism will record.
-          this.trayBase = e.detail.key;
+          this.walkToLevel(LEVEL_BY_ROW[e.detail.key]);
           this.trayTab = null;
         }}
         @tray-command=${(e: CustomEvent<{ id: string }>) => {
-          // Visuals stage: the tile flips in place (the spec's stays-open
-          // behavior); no intent is fired.
-          const view2 = this.trayView(entry);
-          const active = view2?.tabs.find(t => t.active)?.key ?? 'note';
-          const key = `${active}:${e.detail.id}`;
-          const flips = new Set(this.trayFlips);
-          if (flips.has(key)) flips.delete(key);
-          else flips.add(key);
-          this.trayFlips = flips;
+          this.fireTrayCommand(entry, e.detail.id);
         }}
         @tray-search=${(e: CustomEvent<{ text: string }>) => {
           this.traySearch = e.detail.text;
+          // Publish it so the shell's Ctrl+Shift+K can widen this search to
+          // the global list without the text being retyped.
+          window.dispatchEvent(
+            new CustomEvent('mnx-tray-search', { detail: { text: e.detail.text } })
+          );
         }}
         @tray-close=${() => this.closeTray()}
       ></mnx-selection-tray>
@@ -1310,7 +1366,20 @@ export class ScenarioPage extends LitElement {
    *  presence rule may stop the walk short of an absent rung). */
   private onHudRow = (event: Event) => {
     const key = (event as CustomEvent<{ key: string }>).detail.key;
-    const target = LEVEL_BY_ROW[key];
+    this.walkToLevel(LEVEL_BY_ROW[key]);
+  };
+
+  /**
+   * Move the selection to a rung by walking relax/tighten intents until it
+   * matches — the ladder has no "go to level" verb, and inventing one would
+   * put a second way to change the selection beside Escape/Enter.
+   *
+   * Shared by the HUD's rows and the tray's scope commit: both are mouse
+   * parity for the same keys, so both are recorded in the trace as the ladder
+   * moves they are. Bounded by the ladder's own length, and it stops early
+   * when a step doesn't move (the presence rule skipped the target).
+   */
+  private walkToLevel(target: SelectionLevel | undefined) {
     if (!this.session || !target) return;
     this.cursorHidden = false;
     for (let guard = 0; guard < SELECTION_LADDER.length; guard++) {
@@ -1322,7 +1391,7 @@ export class ScenarioPage extends LitElement {
     }
     this.copied = false;
     this.syncFromSession();
-  };
+  }
 
   private onHudPartSetup = (event: Event) => {
     const detail = (event as CustomEvent<{ index: number } & PartOverride>).detail;

@@ -1,17 +1,56 @@
 # The selection command tray — the mechanism
 
-> **Status: proposed 2026-08-14; revised 2026-08-15** after the campaign's
+> **Status: in progress — stages 1–4 built 2026-08-15, same day as picked up;
+> the hands-on review is open.** Shipped: `src/edit/commandRegistry.ts` (56
+> commands over all seven rungs, each declaring rungs/glyph/shortcut/tier and
+> its own `isActive`/`action` over a narrow `SessionView`) with
+> `harness/conformance/command-registry.test.ts` — 18 joins covering unique
+> ids, real rungs, shortcuts that some table actually binds, surfaces that
+> exist, intent types the session handles, glyph names the font carries *with
+> bounding boxes*, and the ledger agreement (an unwired command names its
+> residue row, a wired one carries no stale blocker). The tray is now fed
+> from the registry (`trayDemo.ts` deleted), fires through
+> `session.handleIntent`, and popover-tier tiles open the typed grammar they
+> front. Scope preview draws a **dashed candidate enclosure** —
+> `SelectionContext.preview` + `drawEnclosure(svg, kind, {preview, noteIds})`,
+> found via the `data-source-id` the renderer already writes, so **no layout
+> code and no golden moved**; commit walks the ladder through the shared
+> `walkToLevel` (factored out of the HUD's row click). Escape precedence is
+> declared once as `ESCAPE_PRECEDENCE` in the keymap layer and asserted in
+> `key-scope.test.ts`, answering the ladder doc's open question. Ctrl+Shift+K
+> carries the tray's search text into the global palette.
+>
+> Three findings. **The cheatsheet is the arbiter of rungs**: a join asserting
+> that no command offers a rung where its key is documented inert caught the
+> tray offering slur and beam at `event` — both are spanning gestures, but
+> both are armed and closed at the *note* rung, which is what `KEY_DOCS` says
+> and what the session's guards allow (the campaign index's "event→event" is
+> about the span, not the rung). A tile a rung above its key would have
+> contradicted the cheatsheet on the same screen. **The tray must follow the
+> pane**: it offers a
+> *dialect* (`S` slurs in notation, slides in tab), and the session's
+> projection defaults to tab on a string document, so opening the tray over
+> the notation pane showed the fingerboard's commands until `followProjection`
+> ran on open — a bug the keys never had because they call it on every press.
+> And the ops panel credits **the key, not the emitter**: a tray-fired
+> staccato reads `Shift+A · popover`, because the reverse join answers "how do
+> you do this from the keyboard", which is the more useful answer and the
+> panel's existing contract — so `selectionTray` is registered as a surface
+> only for `setAccidentalDisplay`, the one intent the tray genuinely adds to
+> keyboard reachability. 583 tests green; goldens byte-identical.
+>
+> Revised 2026-08-15 (before build) after the campaign's
 > vocabulary sweep (items 5, 7–13 built 2026-08-14/15 — ops 15 → ~60, "every
 > kind now has its verb"). Second of the trio — builds on
 > [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) (the component
 > and its neutral contract) and hands everything it cannot wire to
-> [core-selection-tray-residue.md](core-selection-tray-residue.md).
+> [core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md).
 >
 > The design's own architecture ask (the "command registry" handoff note in
 > `Selection Palette.dc.html`) turns out to be a thing the repo already half-owns:
 > a registry row — id, rungs, glyph, key, is-it-active, what-it-fires — is the
 > *surface half* of a campaign agreement block
-> ([core-campaign-element-ops.md](../inprogress/core-campaign-element-ops.md)).
+> ([core-campaign-element-ops.md](core-campaign-element-ops.md)).
 > This doc makes that identity literal, so the tray becomes the campaign's
 > palette-tier surface rather than a parallel command system.
 >
@@ -106,9 +145,9 @@ Key-tier tiles — the intent fires directly:
 | Tile | Fires | Rungs |
 |---|---|---|
 | tie to next | `toggleTie` (T) | note |
-| slur | `toggleSlur` (S, notation — polymorphic with slide in tab, per [item 10](../inprogress/core-element-ops-spanners.md)) | note→note |
-| beam | `toggleBeam` (B, notation — polymorphic with bend in tab, per [item 11](../inprogress/core-element-ops-rhythm-declarations.md)) | event→event |
-| tab technique: bend / hammer-pull / slide / vibrato / palm mute / harmonic | `toggleTechnique` (the reserved `B H S V X O`, tab pane — [item 9](../inprogress/core-element-ops-technique.md)) | note |
+| slur | `toggleSlur` (S, notation — polymorphic with slide in tab, per [item 10](core-element-ops-spanners.md)) | note→note |
+| beam | `toggleBeam` (B, notation — polymorphic with bend in tab, per [item 11](core-element-ops-rhythm-declarations.md)) | event→event |
+| tab technique: bend / hammer-pull / slide / vibrato / palm mute / harmonic | `toggleTechnique` (the reserved `B H S V X O`, tab pane — [item 9](core-element-ops-technique.md)) | note |
 | delete | `delete` (the ladder's polymorphic delete) | note → score |
 | transpose ± semitone / ± octave | `transpose` (Alt+↑↓, Alt+Shift+↑↓) | note, event |
 | shorter / longer duration | `shorterDuration` / `longerDuration` | event |
@@ -123,13 +162,13 @@ family (the tray is how these grammars become discoverable):
 
 | Tile | Opens | Rungs |
 |---|---|---|
-| time signature… | `timeSignaturePopover` (Shift+T; removal via `inherit`, [item 5](../inprogress/core-element-ops-clef-key.md)) | bar |
+| time signature… | `timeSignaturePopover` (Shift+T; removal via `inherit`, [item 5](core-element-ops-clef-key.md)) | bar |
 | clef… / key… | `clefPopover` / `keySignaturePopover` (Shift+C / Shift+K, item 5) | bar |
-| barline, repeats, endings, segno/coda/jump/fine, section, rehearsal, tempo… | `barAttributePopover` (Shift+B — ten kinds, [item 7](../inprogress/core-element-ops-bar-attributes.md)) | bar |
-| articulations, dynamics (incl. hairpins), directions… | `adornmentPopover` (Shift+A, [item 8](../inprogress/core-element-ops-adornments.md)) | note, event |
-| lyric… | `lyricPopover` (Shift+L, [item 12](../inprogress/core-element-ops-lyrics.md)) | note |
+| barline, repeats, endings, segno/coda/jump/fine, section, rehearsal, tempo… | `barAttributePopover` (Shift+B — ten kinds, [item 7](core-element-ops-bar-attributes.md)) | bar |
+| articulations, dynamics (incl. hairpins), directions… | `adornmentPopover` (Shift+A, [item 8](core-element-ops-adornments.md)) | note, event |
+| lyric… | `lyricPopover` (Shift+L, [item 12](core-element-ops-lyrics.md)) | note |
 | tuning… | `tuningPopover` (Shift+U) | part |
-| part…, capo, strings, staves | `partPopover` (Shift+P grammar, [item 13](../inprogress/core-element-ops-part-declarations.md)) | part, score |
+| part…, capo, strings, staves | `partPopover` (Shift+P grammar, [item 13](core-element-ops-part-declarations.md)) | part, score |
 
 A design question the sweep sharpens, owned by the visuals review: several
 design tiles (fermata, crescendo, repeat end…) are now *reachable through a
@@ -141,7 +180,7 @@ review; both routes go through the same funnel either way.
 What still enters the registry greyed with a `blockedBy` is the residue's short
 tail — respell, duration dots, the container wrap verbs, entry beyond the first
 voice/staff, layout/score authoring, part transposition, mute — enumerated in
-[core-selection-tray-residue.md](core-selection-tray-residue.md).
+[core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md).
 
 ## Scope preview and commit
 
@@ -162,7 +201,7 @@ voice/staff, layout/score authoring, part transposition, mute — enumerated in
 - **`SHELL_BINDINGS` change**: Ctrl+K → the tray when a session exists and
   `editorHasKeyboard`; Ctrl+Shift+K → the global `<mnx-command-palette>`; no
   session, Ctrl+K falls through to the palette. Both remain workbench-tier — shell
-  bindings do not travel ([core-editor-focus-scope.md](core-editor-focus-scope.md)).
+  bindings do not travel ([core-editor-focus-scope.md](../proposed/core-editor-focus-scope.md)).
 - **The tray is a scope-4 region**: while open it consumes exactly the keys the
   visuals doc lists, via the same `keyScope` discipline as the popovers; direct
   command shortcuts stay live underneath because the tray re-dispatches anything it
@@ -196,7 +235,7 @@ everything below the boundary is pinned:
 - **Not `{level, anchor, extent}`** — extension, closure (Ctrl+A), and the mixed
   tile state wait on the ladder's selection-state work; the registry carries the
   shapes so nothing needs redesign when it arrives.
-- **Not the AI mode.** [core-editor-ai-prompt.md](core-editor-ai-prompt.md)'s
+- **Not the AI mode.** [core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md)'s
   sentence-routing belongs to the global palette; the tray's search filters its own
   scope and hands off via Ctrl+Shift+K (`initialQuery` carries the text across).
 

@@ -92,6 +92,9 @@ export const EDIT_LAYER: KeymapLayer = {
     // adornment/technique dialects in both panes.
     { code: 'KeyV', alt: true, intent: { type: 'cycleSlot' } },
     { code: 'KeyT', intent: { type: 'toggleTie' } },
+    // Respell (campaign item 6): `J`, the spelling key MuseScore and Dorico
+    // both use. Cycles, because "the other spelling" has no single answer.
+    { code: 'KeyJ', intent: { type: 'respellNote' } },
     // Spanners (campaign item 10). `S` is ONE key with two meanings, chosen by
     // the active projection — slur in notation, slide in tab (item 9's
     // reserved letter) — which is the ladder's decided principle that the
@@ -197,6 +200,36 @@ export function resolveShellAction(stroke: KeyStroke): ShellAction | null {
   const hit = SHELL_BINDINGS.find(b => matches(b, stroke));
   return hit?.action ?? null;
 }
+
+/**
+ * ESCAPE PRECEDENCE — the selection ladder's open question, answered here
+ * because this module is the only interpreter of KeyboardEvents and the
+ * answer must be stated once rather than per surface.
+ *
+ * **Innermost open thing first.** Escape means "back out of the thing I am
+ * in", and the overlays are inside the editor, so they consume it before the
+ * ladder ever sees it:
+ *
+ *   1. a typed popover (Shift+letter grammar) — closes, nothing applied
+ *   2. the selection tray / the command palette — closes, selection intact
+ *      (inside the tray, a previewed scope returns to the real one first:
+ *      the preview is a thing you are in too)
+ *   3. otherwise `relaxSelection` — the ladder widens one rung
+ *   4. past `score` — the mount's deselect
+ *
+ * The rule is enforced mechanically rather than by consultation: overlays own
+ * their own keydown and `preventDefault()` before the page-level listener
+ * runs, so this list is a description of what the DOM already guarantees —
+ * which is why the ORDER is the whole contract and no code branches on it.
+ */
+export const ESCAPE_PRECEDENCE = [
+  'popover',
+  'overlay',
+  'relaxSelection',
+  'deselect'
+] as const;
+
+export type EscapeConsumer = (typeof ESCAPE_PRECEDENCE)[number];
 
 function matches(binding: KeyStroke, stroke: KeyStroke): boolean {
   return (

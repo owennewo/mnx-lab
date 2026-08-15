@@ -33,6 +33,8 @@ const SURFACE_LABELS: Record<string, string> = {
   barAttributePopover: 'Shift+B · popover',
   adornmentPopover: 'Shift+A · popover',
   lyricPopover: 'Shift+L · popover',
+  rhythmPopover: 'Shift+R · popover',
+  selectionTray: 'Ctrl+K · tray',
   commandPalette: 'Ctrl+Shift+K · palette',
   goTo: 'Ctrl+G · go-to',
   viewSwitcher: 'view tabs'

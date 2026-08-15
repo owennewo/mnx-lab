@@ -130,6 +130,11 @@ export interface MnxDirection {
 export interface MnxAccidentalDisplay {
   show: boolean;
   force?: boolean;
+  /** The cautionary form: a shown accidental in brackets. The renderer does
+   *  not draw the enclosure yet (`lab/01-pitches/01-parenthesized-accidental`
+   *  pins that gap); the DOCUMENT has carried it all along, and campaign item
+   *  6 gives it a way in. */
+  enclosure?: { symbol: 'parentheses' | 'brackets' };
 }
 
 /** A tie from this note to `target` (a note id elsewhere in the document).

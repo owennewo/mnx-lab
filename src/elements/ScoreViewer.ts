@@ -276,6 +276,21 @@ export class ScoreViewer extends LitElement {
         stroke: var(--accent);
       }
 
+      /* The scope PREVIEW: the same shapes, drawn as a candidate — no fill,
+         a dashed border. It must read as "this is what widening would take",
+         never as a second selection, so it takes the accent's outline and
+         none of its weight. */
+      #score-container svg .enclosure-preview {
+        pointer-events: none;
+      }
+
+      #score-container svg .enclosure-preview rect {
+        fill: none;
+        stroke: var(--accent);
+        stroke-opacity: 0.85;
+        stroke-dasharray: 4 3;
+      }
+
       #score-container svg .enc-cell rect {
         fill-opacity: 0.16;
         stroke-opacity: 0.9;
@@ -561,6 +576,15 @@ export class ScoreViewer extends LitElement {
     const enclosed = (pane: HTMLElement) => {
       const kind = this.selection?.enclosure;
       const svg = pane.querySelector('svg');
+      // The candidate scope, when the host is previewing one: its own dashed
+      // layer, drawn from note ids because nothing in the render is tagged
+      // for it (the selection has not moved).
+      const preview = this.selection?.preview;
+      if (preview && svg) {
+        drawEnclosure(svg, preview.enclosure, { preview: true, noteIds: preview.noteIds });
+      } else if (svg) {
+        svg.querySelector(':scope > g.enclosure-preview')?.remove();
+      }
       if (kind && svg) {
         drawEnclosure(svg, kind);
         // The ghost cell: the cursor's own cell when empty (note level only —

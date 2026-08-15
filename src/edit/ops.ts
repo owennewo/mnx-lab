@@ -26,6 +26,7 @@ import type { EditorIntent } from './intents.ts';
 import type { PartialContainerSpec } from './setupGrammar.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import { findNoteAddress, forEachNoteAddress } from '../model/noteWalk.ts';
+import { enharmonicSpellings, keyFifthsAt, spellPitch } from './staffSpace.ts';
 import {
   addOnsets,
   durationSpan,
@@ -302,7 +303,15 @@ export type EditOp =
   | { type: 'removeKitNote'; noteKey: string }
   | { type: 'removeKitComponent'; partIndex: number; component: string }
   | { type: 'removeSound'; sound: string }
-  | { type: 'setAccidentalDisplay'; noteKey: string; show: boolean }
+  | {
+      /** Force or hide the accidental, and optionally enclose it: the
+       *  cautionary form is `show` plus parentheses — one decision in two
+       *  fields, because that is how the schema has it. */
+      type: 'setAccidentalDisplay';
+      noteKey: string;
+      show: boolean;
+      parenthesized?: boolean;
+    }
   | { type: 'removeAccidentalDisplay'; noteKey: string }
   | { type: 'removeLayout'; index: number }
   | { type: 'removeScore'; index: number }
@@ -384,6 +393,20 @@ export type EditOp =
       to: number;
       spec: ContainerSpec;
       partIndex?: number;
+    }
+  | {
+      /**
+       * Write the same sound a different way: the next enharmonic spelling,
+       * cycling back round. The SOUND is fixed (the MIDI number never moves),
+       * so a tab fret and every reference survive — only the letter, the
+       * accidental and therefore the staff position change.
+       *
+       * Cycling rather than choosing, because "the other spelling" has no
+       * single answer: C♯ is also D♭ and B♯♯. `spellPitch` picks for the
+       * editor; this is how a player overrules it.
+       */
+      type: 'respellNote';
+      noteId: string;
     }
   | {
       /**
@@ -561,23 +584,11 @@ function midiOf(note: MnxNote): number {
   return (octave + 1) * 12 + STEP_SEMITONES[step] + alter;
 }
 
-function setPitchFromMidi(note: MnxNote, midi: number): void {
-  const octave = Math.floor(midi / 12) - 1;
-  const pc = midi - (octave + 1) * 12;
-  // Prefer a natural, then a sharp — good enough for a placeholder; real
-  // spelling policy arrives with the editor feature work.
-  for (const step of NOTE_STEPS) {
-    if (STEP_SEMITONES[step] === pc) {
-      note.pitch = { step, octave };
-      return;
-    }
-  }
-  for (const step of NOTE_STEPS) {
-    if (STEP_SEMITONES[step] === pc - 1) {
-      note.pitch = { step, octave, alter: 1 };
-      return;
-    }
-  }
+function setPitchFromMidi(note: MnxNote, midi: number, fifths = 0, direction: 1 | -1 = 1): void {
+  // The policy lives in staffSpace.ts, with the key context it needs (campaign
+  // item 6). This used to prefer a natural then a sharp, which made E♭
+  // unwritable: transposing E down produced D♯, in every key.
+  note.pitch = spellPitch(midi, fifths, direction);
 }
 
 /** Every note of every part/staff — the "no selection" universe, wider than
@@ -599,13 +610,34 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
   const next = JSON.parse(JSON.stringify(doc)) as MnxStructure;
   switch (op.type) {
     case 'transposeSelection': {
+      // Spelling reads the key of the bar the note is IN and the direction of
+      // the move (campaign item 6) — both are context the old MIDI→pitch
+      // conversion threw away.
+      const direction: 1 | -1 = op.semitones < 0 ? -1 : 1;
       if (!op.noteIds || op.noteIds.length === 0) {
-        forEachNote(next, note => setPitchFromMidi(note, midiOf(note) + op.semitones));
+        (next.parts ?? []).forEach(part =>
+          (part.measures ?? []).forEach((measure, measureIndex) => {
+            const fifths = keyFifthsAt(next, measureIndex);
+            (measure.sequences ?? []).forEach(seq =>
+              (seq.content ?? []).forEach(item => {
+                if (!isTimedEvent(item)) return;
+                (item.notes ?? []).forEach(note =>
+                  setPitchFromMidi(note, midiOf(note) + op.semitones, fifths, direction)
+                );
+              })
+            );
+          })
+        );
         return next;
       }
-      forEachKeyedNote(next, (note, key) => {
-        if (!op.noteIds!.includes(key)) return;
-        setPitchFromMidi(note, midiOf(note) + op.semitones);
+      forEachNoteAddress(next, address => {
+        if (!op.noteIds!.includes(address.key)) return;
+        setPitchFromMidi(
+          address.note,
+          midiOf(address.note) + op.semitones,
+          keyFifthsAt(next, address.measureIndex),
+          direction
+        );
       });
       return next;
     }
@@ -1092,7 +1124,10 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
     case 'setAccidentalDisplay': {
       const located = findKeyedNote(next, op.noteKey);
       if (!located) return next;
-      located.note.accidentalDisplay = { show: op.show };
+      located.note.accidentalDisplay = {
+        show: op.show,
+        ...(op.parenthesized ? { enclosure: { symbol: 'parentheses' as const } } : {})
+      };
       return next;
     }
     case 'removeAccidentalDisplay': {
@@ -1273,6 +1308,23 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         buildContainer(op.spec, events),
         ...seq.content.slice(end + 1)
       ];
+      return next;
+    }
+    case 'respellNote': {
+      const located = findKeyedNote(next, op.noteId);
+      if (!located) return next;
+      const spellings = enharmonicSpellings(midiOf(located.note));
+      const current = spellings.findIndex(
+        p =>
+          p.step === located.note.pitch.step &&
+          p.octave === located.note.pitch.octave &&
+          (p.alter ?? 0) === (located.note.pitch.alter ?? 0)
+      );
+      // A spelling outside the cycle (a triple flat, say) enters it at the
+      // front rather than refusing — the verb's job is to offer a way out.
+      const spelled = spellings[(current + 1) % spellings.length];
+      if (!spelled) return next;
+      located.note.pitch = { ...spelled };
       return next;
     }
     case 'setRestSpelling': {

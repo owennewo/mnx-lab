@@ -171,6 +171,14 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
+    keys: 'J',
+    strokes: [{ code: 'KeyJ' }],
+    group: 'editing',
+    meaning: {
+      all: 'respell the note enharmonically (D♯ → E♭ → …), same sound, cycles'
+    }
+  },
+  {
     keys: '.',
     strokes: [{ code: 'Period' }, { code: 'NumpadDecimal' }],
     group: 'editing',
@@ -395,6 +403,13 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'setMeasureRepeat',
     'removeMeasureRepeat'
   ],
+  // The selection tray (core-selection-tray-mechanism.md) fires the registry's
+  // commands through the same funnel as keys, so most of what it offers is
+  // already reachable — bound to a key or owned by a popover grammar above.
+  // Listed here is what the tray ADDS to reachability: the accidental's
+  // display flag, which no binding and no grammar claims, so before the tray
+  // the only way to set it was an AI edit or a hand-written file.
+  selectionTray: ['setAccidentalDisplay'],
   commandPalette: [
     'undo',
     'redo',

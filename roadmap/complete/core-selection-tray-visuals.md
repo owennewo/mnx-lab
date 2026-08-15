@@ -32,7 +32,7 @@
 > not four, so tab padding is 9px (spec 13px) and the rows-variant width is
 > 400px (spec 330); Archivo is not yet bundled (system-sans fallback — the
 > open item below stands). First of a trio: this doc (the look, complete
-> and unwired), [core-selection-tray-mechanism.md](../proposed/core-selection-tray-mechanism.md)
+> and unwired), [core-selection-tray-mechanism.md](../inprogress/core-selection-tray-mechanism.md)
 > (state and actions through the intent funnel), and
 > [core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md) (what cannot be
 > wired yet, and what unblocks each row).

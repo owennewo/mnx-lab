@@ -11,6 +11,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   EDIT_LAYER,
+  ESCAPE_PRECEDENCE,
   NAVIGATION_LAYER,
   SHELL_BINDINGS,
   TAB_DIGIT_LAYER,
@@ -40,5 +41,41 @@ describe('keyboard scope', () => {
       layer.bindings.filter(b => b.ctrl && !b.shift && !b.alt && reserved.has(b.code))
     );
     expect(dead).toEqual([]);
+  });
+});
+
+describe('escape precedence', () => {
+  // The selection ladder left this open ("popovers and the palette already
+  // consume Escape"); core-selection-tray-mechanism.md answers it once, in
+  // the keymap layer. The order is the contract — innermost open thing
+  // first — so it is asserted rather than left to each surface's habits.
+  it('is innermost-first: popover, then overlay, then the ladder', () => {
+    expect([...ESCAPE_PRECEDENCE]).toEqual([
+      'popover',
+      'overlay',
+      'relaxSelection',
+      'deselect'
+    ]);
+  });
+
+  it('puts every overlay ahead of the ladder walk', () => {
+    // A regression here would mean Escape widening the selection *behind* an
+    // open tray — the selection moving while the user was backing out of a
+    // menu, which is the exact confusion the ordering exists to prevent.
+    const ladder = ESCAPE_PRECEDENCE.indexOf('relaxSelection');
+    expect(ESCAPE_PRECEDENCE.indexOf('popover')).toBeLessThan(ladder);
+    expect(ESCAPE_PRECEDENCE.indexOf('overlay')).toBeLessThan(ladder);
+    expect(ESCAPE_PRECEDENCE.indexOf('deselect')).toBeGreaterThan(ladder);
+  });
+
+  it('Escape is bound to the ladder, not to any overlay', () => {
+    // The overlays consume Escape by owning their own keydown and calling
+    // preventDefault — they are NOT keymap bindings. If one ever became a
+    // binding, two handlers would race for the same key.
+    const escapeBindings = SHELL_BINDINGS.filter(b => b.code === 'Escape');
+    expect(escapeBindings).toEqual([]);
+    expect(resolveIntent({ code: 'Escape' }, EDITOR_LAYERS)).toEqual({
+      type: 'relaxSelection'
+    });
   });
 });

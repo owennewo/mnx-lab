@@ -168,13 +168,38 @@ function snapToBarlines(
   return { left, right };
 }
 
-export function drawEnclosure(svg: SVGSVGElement, kind: EnclosureKind): void {
-  svg.querySelector(':scope > g.enclosure')?.remove();
+/**
+ * Options for a SECOND enclosure drawn beside the real one: the selection
+ * tray's scope preview (core-selection-tray-mechanism.md). The footprint
+ * arrives as note keys rather than a `.selected` class, because previewing
+ * must not touch the layout — the renderer tags what the session selected,
+ * and a candidate scope is not selected. Note glyphs already carry their key
+ * as `data-source-id`, so the overlay can find its own footprint.
+ */
+export interface EnclosureOptions {
+  /** Draw as a dashed candidate into its own layer, not the live selection. */
+  preview?: boolean;
+  /** The footprint, when it is not the rendered `.selected` set. */
+  noteIds?: readonly string[];
+}
+
+export function drawEnclosure(
+  svg: SVGSVGElement,
+  kind: EnclosureKind,
+  options: EnclosureOptions = {}
+): void {
+  const preview = options.preview === true;
+  const layer = preview ? 'enclosure-preview' : 'enclosure';
+  svg.querySelector(`:scope > g.${layer}`)?.remove();
 
   const sp = unitsPerSp(svg);
-  const selector =
-    kind === 'cell' ? '.notehead.selected, .fret-number.selected' : '.selected';
-  const glyphs = [...svg.querySelectorAll<SVGGraphicsElement>(selector)];
+  const glyphs = options.noteIds
+    ? previewGlyphs(svg, kind, options.noteIds)
+    : [
+        ...svg.querySelectorAll<SVGGraphicsElement>(
+          kind === 'cell' ? '.notehead.selected, .fret-number.selected' : '.selected'
+        )
+      ];
   const boxes = glyphs.map(el => inkBox(el, sp));
   if (boxes.length === 0 && kind !== 'frame') return;
 
@@ -182,7 +207,7 @@ export function drawEnclosure(svg: SVGSVGElement, kind: EnclosureKind): void {
   const staves = assignSystems(collectStaves(svg, sp), barlines);
 
   const g = document.createElementNS(SVG_NS, 'g');
-  g.setAttribute('class', `enclosure enc-${kind}`);
+  g.setAttribute('class', `${layer} enc-${kind}`);
   const rect = (x: number, y: number, w: number, h: number, radius: number, stroke: number) => {
     const r = document.createElementNS(SVG_NS, 'rect');
     r.setAttribute('x', String(x));
@@ -324,6 +349,24 @@ export function drawEnclosure(svg: SVGSVGElement, kind: EnclosureKind): void {
   }
 
   svg.insertBefore(g, svg.firstChild);
+}
+
+/** The preview footprint's glyphs, found by the note keys the renderer wrote
+ *  as `data-source-id` — the same vocabulary `selectedNoteIds` speaks. */
+function previewGlyphs(
+  svg: SVGSVGElement,
+  kind: EnclosureKind,
+  noteIds: readonly string[]
+): SVGGraphicsElement[] {
+  const wanted = new Set(noteIds);
+  return [...svg.querySelectorAll<SVGGraphicsElement>('[data-source-id]')].filter(el => {
+    if (!wanted.has(el.getAttribute('data-source-id') ?? '')) return false;
+    // Mirrors the `.selected` selector's split: a cell is a position mark on
+    // the notehead itself, wider rungs take whatever ink they cover.
+    return kind !== 'cell'
+      ? true
+      : el.classList.contains('notehead') || el.classList.contains('fret-number');
+  });
 }
 
 /**

@@ -106,3 +106,67 @@ export function pitchAtStaffPosition(
 export function staffPositionOfPitch(clef: ClefSpec, pitch: MnxPitch): number {
   return clef.staffPosition + (diatonic(pitch.step as Step, pitch.octave) - referenceDiatonic(clef));
 }
+
+// ── Spelling (campaign item 6) ─────────────────────────────────────────────
+//
+// A MIDI number names a sound; a PITCH names how it is written, and MNX stores
+// the writing. Everything that turns a sound back into notation needs a policy
+// for the choice, and the placeholder ("prefer a natural, then a sharp") made
+// E♭ unwritable: transposing E down a semitone produced D♯, in every key, in
+// both directions.
+
+const SEMITONE_OF: Record<Step, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+
+/** MIDI note number for a spelled pitch (C4 = 60). */
+export function midiOfSpelling(step: Step, octave: number, alter = 0): number {
+  return (octave + 1) * 12 + SEMITONE_OF[step] + alter;
+}
+
+/**
+ * Every way this sound can be written with at most `maxAlter` accidentals,
+ * nearest spelling first (plainest letter, then flat before sharp).
+ *
+ * This is the respell verb's cycle AND the policy's candidate set — one list,
+ * so a spelling the policy would never choose is still reachable by asking.
+ */
+export function enharmonicSpellings(midi: number, maxAlter = 2): MnxPitch[] {
+  const found: MnxPitch[] = [];
+  for (const alter of [0, -1, 1, -2, 2].filter(a => Math.abs(a) <= maxAlter))
+    for (const step of STEPS) {
+      // The octave is whatever makes this letter sound at `midi` — B♯3 and C4
+      // are the same key, and only the letter tells them apart.
+      const octave = Math.round((midi - SEMITONE_OF[step] - alter) / 12) - 1;
+      if (midiOfSpelling(step, octave, alter) !== midi) continue;
+      found.push(alter === 0 ? { step, octave } : { step, octave, alter });
+    }
+  return found;
+}
+
+/**
+ * How to write this sound here: the key signature decides, and where the key
+ * is silent the DIRECTION of the move does.
+ *
+ * 1. A letter the key already alters this way is the plain answer — in E♭
+ *    major, the black key below F is E♭, not D♯, because the key says E is
+ *    flat and the reader is already carrying that.
+ * 2. Otherwise follow the key's sign: flat keys spell flats, sharp keys sharps.
+ * 3. In C (and where the sign does not settle it), spell the direction of the
+ *    move — down is a flat, up is a sharp. This is the ordinary convention,
+ *    and it is what makes Alt+↓ from E write E♭ instead of D♯.
+ *
+ * Double accidentals are never *chosen*, only asked for (`respell`).
+ */
+export function spellPitch(midi: number, fifths = 0, direction: 1 | -1 = 1): MnxPitch {
+  const candidates = enharmonicSpellings(midi, 1);
+  const natural = candidates.find(p => p.alter === undefined);
+  if (natural && keyAlter(natural.step as Step, fifths) === 0) return natural;
+
+  const keyed = candidates.find(p => (p.alter ?? 0) !== 0 && keyAlter(p.step as Step, fifths) === p.alter);
+  if (keyed) return keyed;
+  if (natural) return natural;
+
+  const sign = fifths !== 0 ? Math.sign(fifths) : direction;
+  return (
+    candidates.find(p => Math.sign(p.alter ?? 0) === sign) ?? candidates[0] ?? { step: 'C', octave: 4 }
+  );
+}
