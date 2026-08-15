@@ -1,11 +1,10 @@
 # Campaign: Modernist — the workbench restyle the tray's art direction leads
 
-> **Status: IN PROGRESS 2026-08-15 — items 1–7 all built.** Row 8 (the `<360px`
-> drawer) is **drafted and unblocked**: its close gesture is decided — Escape
-> *and* a click outside — and neither needs new machinery, because the drawer is
-> an `overlay` and that tier already exists. Row 9 (the zoom/density pad) is the
-> parallel session's, and is the campaign's first item to put ink on the score
-> canvas rather than in the chrome.
+> **Status: IN PROGRESS 2026-08-15 — items 1–7 built.** Row 8 (the `<360px`
+> drawer) is drafted and **formally declined**: the design is complete, the need
+> is not, and it is kept as a *possible* so the analysis is not redone. Row 9
+> (the zoom/density pad) is the parallel session's and is landing — the
+> campaign closes when it does.
 > A campaign (see CLAUDE.md → Conventions): this doc
 > is an index over several normal proposals, the shared contract they follow, and the
 > running log of progress and learnings as items land. Indexed items are ordinary
@@ -135,7 +134,7 @@ frame exists.
 | 5 | [workbench-score-panel.md](../complete/workbench-score-panel.md) | The score panel: five-band frame, seven tabs cut to five, the width change, and the per-tab rebuilds. The campaign's structure half and its showcase. **Built** except the two halves that belong to other items — the JSON gutter and selection scoping (item 7) and compare's live render/overlay. | 1 | **built 2026-08-15** |
 | 6 | [workbench-queue-pips.md](../complete/workbench-queue-pips.md) | Re-deriving the five-state queue ramp under one accent — the bill "red everywhere" runs up. Shape and lightness carry what hue no longer can. | 1 | **built 2026-08-15** |
 | 7 | [core-json-view.md](../complete/core-json-view.md) | `buildJsonView()` gains `spanByPointer`; the dormant module finally gets a consumer, a conformance test, and the pinned-error highlight the panel consolidation lost. The only below-the-boundary code change in the campaign. | — (5 for the UI half) | **built 2026-08-15** |
-| 8 | [workbench-panel-drawer.md](../proposed/workbench-panel-drawer.md) | The `<360px` drawer mode. **Unblocked 2026-08-15**: closing is decided — Escape *and* a click outside — which needs no new Escape tier, because the drawer is an `overlay` and that slot already means "a thing you are in". Opening is recommended rather than left blank: the tab strip stays as a thin rail and tapping a tab opens the drawer on it, so the narrow layout keeps the same addressing as the wide one and spends no keystroke. | 5 | proposed |
+| 8 | [workbench-panel-drawer.md](../proposed/workbench-panel-drawer.md) | The `<360px` drawer. **Drafted and NOT RECOMMENDED** — the design is ready, the need is not: the squeeze only bites below ~1100px, where Ctrl+B already reclaims 270px and the drag handle reaches the 360 floor. Kept as a *possible* so the analysis is not redone. Two findings outlive it: any future overlay gets Escape free at slot 2 (it needs to own its keydown, not a keymap change), and a dismissing click must be swallowed — decide that before `note-selected` gets a consumer, not after. | 5 | **possible — not recommended** |
 | 9 | [core-zoom-density-pad.md](../proposed/core-zoom-density-pad.md) | The crosshair zoom/density pad over the score's top right — the same design project's `Zoom Control.dc.html`. Also closes the UI half of [core-render-density-zoom.md](core-render-density-zoom.md): **↑↓ staff** wires `zoom` to `pxPerSp` at last, **←→ spacing** gives the shipped `densityH` a control. The campaign's first item that lands ink **on the score canvas** rather than in the chrome, so contract rule 5 is tested rather than restated. | 1, 3 | proposed |
 
 Beyond the campaign (recorded, not indexed): whether `<mnx-command-palette>` adopts the

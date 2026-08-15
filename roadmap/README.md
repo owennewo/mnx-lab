@@ -342,6 +342,18 @@ proposals that name their campaign.
   ledger's click→cursor row closes. Opening is recommended rather than deferred again:
   the tab strip stays as a thin rail, so the narrow layout keeps the wide one's
   addressing and spends none of the element-ops campaign's free-key budget.
+- **[workbench-panel-drawer.md](proposed/workbench-panel-drawer.md)** — item 8 of the
+  Modernist campaign: the score panel as a drawer on narrow windows. **Drafted and
+  explicitly NOT RECOMMENDED.** The design is complete and the need is not — the squeeze
+  only bites below ~1100px, and there Ctrl+B already reclaims the rail's 270px and the
+  drag handle reaches the panel's 360 floor, so a new mode, breakpoint and control buy
+  little. Kept as a *possible* rather than cut so the next person to say "the panel
+  should collapse on a narrow window" finds the analysis instead of repeating it. Two
+  findings outlive the feature either way: **any future overlay gets Escape for free** at
+  slot 2 of `ESCAPE_PRECEDENCE` (it must own its keydown; no keymap change, no
+  arbitration code), and **a dismissing click should be swallowed** — worth deciding
+  before `note-selected` gets a consumer, because afterwards it presents as an
+  intermittent "the cursor jumped" bug.
 - **[workbench-queue-pips.md](complete/workbench-queue-pips.md)** — campaign item 6, the bill
   "red everywhere" runs up. Four status hues and four queue states do not fit through a
   one-accent system, and `--st-verified` (blue) beside a red accent reads as a leftover while
