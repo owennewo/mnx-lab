@@ -128,10 +128,22 @@ export function tupletDuration(t: MnxTuplet): number {
   return durationValue(t.outer.duration) * (t.outer.multiple ?? 1);
 }
 
-/** Density clamp: enough range to be useful, bounded so a bad value cannot
- *  produce a plan the justifier then has to rescue. */
-const MIN_DENSITY = 0.5;
-const MAX_DENSITY = 2;
+/**
+ * Density clamp: enough range to be useful, bounded so a bad value cannot
+ * produce a plan the justifier then has to rescue.
+ *
+ * `MIN_DENSITY` is a LEGIBILITY floor, not a collision floor — and the
+ * distinction is load-bearing (core-zoom-density-pad.md, ruling 1). Density
+ * scales the springs and never the rigid columns, so no value here can make
+ * two glyphs overlap; at the bottom of the range they simply abut. A control
+ * offering this axis should show the floor rather than compute one.
+ *
+ * Exported because the clamp used to be silent: a host asking for 0.2 got 0.5
+ * and was never told. A control has to know where the wall is to say it is
+ * against it.
+ */
+export const MIN_DENSITY = 0.5;
+export const MAX_DENSITY = 2;
 
 export function clampDensity(value: number | undefined): number {
   if (value === undefined || !Number.isFinite(value)) return 1;

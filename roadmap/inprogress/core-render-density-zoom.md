@@ -22,14 +22,24 @@
 > widths, since both read springs independently. Default (`1`) is byte-identical to
 > today's engraving — asserted, and the corpus goldens never moved.
 >
-> **Remaining: the vertical axis and zoom.**
-> *Vertical* is deliberately not started, on this doc's own advice: `ROW_HEIGHT_SP` is
+> **Zoom landed 2026-08-15**
+> ([core-zoom-density-pad.md](../complete/core-zoom-density-pad.md)), and with it the
+> control surface for both shipped axes. The fit-to-width vs pinned-scale choice this
+> doc flagged as "a real choice rather than a wiring job" was decided **fitted until
+> first touched**: `zoom` is `number | null`, unset sends no `pxPerSp` so the renderer
+> still fits, and the element reports what it actually used via `render-scale` so a
+> control can print a true number instead of assuming 100%. `density-h` added the
+> numeric form this doc reserved. That item also found and fixed a real gap — the
+> standalone **tab** view never received `densityH` at all, so `density=` had been
+> silently ignored on tab-only scores since the axis shipped.
+>
+> **Remaining: the vertical axis only.**
+> Deliberately not started, on this doc's own advice: `ROW_HEIGHT_SP` is
 > a module-level constant derived from the row pads, so per-layout scaling is a real
 > refactor — and the note below says the stem-length clamp should land first or
-> alongside, since stem headroom feeds vertical spacing. *Zoom* already exists as
-> `pxPerSp` in the engine, but the element's `zoom` prop only sizes the paper card;
-> wiring it to the glyph scale means deciding fit-to-width vs pinned scale, which is
-> a real choice rather than a wiring job.
+> alongside, since stem headroom feeds vertical spacing. It also needs a **control of
+> its own**: the pad's four arms are spent on the two shipped axes, a cut that item
+> recorded rather than worked around.
 
 ## The goal
 

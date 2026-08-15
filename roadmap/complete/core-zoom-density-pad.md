@@ -1,5 +1,30 @@
 # The zoom/density pad — two axes, one crosshair, quiet until wanted
 
+> **Status: BUILT 2026-08-15.** All four stages landed. `src/workbench/ZoomPad.ts`
+> (the mark, the pad, the gestures), the engine wiring (`zoom` → `pxPerSp`,
+> numeric `density-h`, `render-scale`, `src/engine/render/scale.ts`), the mount
+> in `ScenarioPage` at z-index 4, and `harness/conformance/zoom-density.test.ts`
+> (8 assertions, mutation-checked). 670 tests pass, `git diff -- scenarios/` is
+> clean, `npm run build` and `check:boundaries` are green.
+>
+> Verified hands-on over CDP in a real browser, both themes: idle mark measures
+> **24×24 inside a 44×47 hit area**; hover expands to **76×100** anchored on its
+> top-right corner; stepping UP twice takes the staff 100→105→110 and the SVG
+> from 1004px to 1105px tall; dragging left to the floor drops the score from
+> 1004px to 744px (the music genuinely repacks) and shows `SPACE 50 MIN` on the
+> ink band with the exhausted arm greyed; the magnifier returns both to fitted;
+> idle-off-default prints `100 / 50` beside the mark with the changed axis in
+> the accent; values survive a reload and a stored `99` **clamps to 1.6 rather
+> than resetting**; and opening the tray drops the pad to 0.28 and keeps it
+> there even under the pointer.
+>
+> **One gap found and fixed on the way in:** the standalone **tab** view never
+> received `densityH` at all — `layoutTab` called `planHorizontal(mnx, widthSp)`
+> with no options, so `density=` was silently ignored on tab-only scores from
+> the day the axis shipped. The pad, having to drive all three views, is what
+> surfaced it. Now wired and asserted; verified in the browser (viewBox width
+> 335.6 → 410.4 across the range) where it was previously identical.
+>
 > **Campaign item.** Item 9 of
 > [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md); inherits its shared
 > contract, and the agreement block below is what that contract requires before
@@ -68,10 +93,25 @@ it meets this engine. Recorded here so the build doesn't relitigate them.
 
 The design's central horizontal claim — *"the tightest ratio at which no two
 glyphs in the current system overlap, recomputed each layout pass"* — specifies
-machinery for a problem this architecture **already eliminates**. `densityH`
-scales springs; the rigid columns (`CORE_SP`, accidental slots, dots, the
-clef/key/time prefix) are never scaled. Collision is structurally impossible at
-any density: at the extreme the glyphs abut with zero air between them.
+machinery for a problem this architecture **already eliminates**, and eliminates
+**twice**:
+
+1. `densityH` scales springs; the rigid columns (`CORE_SP`, accidental slots,
+   dots, the clef/key/time prefix) are never scaled.
+2. The **justifier** is a second, independent guard: when a row's rigid sum
+   shrinks, `voiceStretch` grows and hands the width straight back to the
+   springs.
+
+The second one was found by mutation-checking the conformance test rather than
+assumed, and it is worth recording because it changes what can be *proved*.
+Deliberately breaking guard 1 — scaling the rigid core along with the spring —
+moves the tightest column gap on `twelve-bar-blues` from 1.745sp to 1.540sp and
+**still** does not breach `CORE_SP`. So the collision guarantee is
+over-determined: no plan-level assertion can isolate springs-only as its sole
+cause, and `zoom-density.test.ts` therefore pins the guarantee while pointing at
+`viewer-surface.test.ts`'s prefix assertion for the mechanism. The ruling stands
+and is in fact stronger than drafted; the *evidence* for it is narrower than
+first written.
 
 So the floor is a **legibility** floor — a chosen constant, and it already
 exists: `MIN_DENSITY = 0.5` ([spacing.ts:133](../../src/engine/layout/spacing.ts)).

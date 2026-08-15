@@ -4,6 +4,7 @@ import { layoutBothSystem } from '../layout/bothSystem.ts';
 import type { HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import { renderScale, type RenderScale } from '../render/scale.ts';
 
 /**
  * Thin entry point for the combined notation+tab view: one composed system
@@ -35,7 +36,7 @@ export interface RenderBothOptions {
   densityH?: number;
 }
 
-export function renderMnxToSvgBoth(opts: RenderBothOptions): void {
+export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderScale {
   const basePxPerSp = opts.pxPerSp ?? DEFAULT_PX_PER_SP;
 
   const layout = layoutBothSystem({
@@ -72,4 +73,6 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): void {
         }
       : undefined
   });
+
+  return renderScale(pxPerSp, fitted);
 }

@@ -133,6 +133,11 @@ export const viewerTokens = css`
     /* One step past the base, which is the design system's own instruction for
        a pressed/held state. Also the "this tile is already on" ink. */
     --accent-pressed: light-dark(oklch(0.508 0.186 31.5), oklch(0.62 0.17 31.5));
+    /* Accent legible on an INK ground, which is dark in light theme and light
+       in dark theme — so this token flips the opposite way to --accent-fg.
+       Used where a strip fills with --ink and still needs an accent voice
+       (the zoom pad's clamped readout). */
+    --accent-on-ink: light-dark(oklch(0.75 0.15 31.5), oklch(0.55 0.2 31.5));
     /* Between --ink-3 and --line-strong: text that must recede further than
        muted without becoming a rule. */
     --ink-faint: light-dark(oklch(0.754 0.008 60), oklch(0.5 0.008 60));
@@ -228,6 +233,11 @@ export const designTokens = css`
        a pressed/held state ("accent-600 on a light ground, accent-400 on a
        dark one"). Also the "this tile is already on" ink. */
     --accent-pressed: light-dark(oklch(0.508 0.186 31.5), oklch(0.62 0.17 31.5));
+    /* Accent legible on an INK ground, which is dark in light theme and light
+       in dark theme — so this token flips the opposite way to --accent-fg.
+       Used where a strip fills with --ink and still needs an accent voice
+       (the zoom pad's clamped readout). */
+    --accent-on-ink: light-dark(oklch(0.75 0.15 31.5), oklch(0.55 0.2 31.5));
     /* Between --ink-3 and --line-strong: text that must recede further than
        muted without becoming a rule. */
     --ink-faint: light-dark(oklch(0.754 0.008 60), oklch(0.5 0.008 60));

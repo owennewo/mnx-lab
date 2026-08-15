@@ -2,6 +2,7 @@ import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation, type HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import { renderScale, type RenderScale } from '../render/scale.ts';
 
 /**
  * Thin entry point for the standard-notation view. Mirrors `tabRenderer.ts`:
@@ -29,7 +30,7 @@ export interface RenderNotationOptions {
   densityH?: number;
 }
 
-export function renderMnxToSvgNotation(opts: RenderNotationOptions): void {
+export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderScale {
   const basePxPerSp = opts.pxPerSp ?? DEFAULT_PX_PER_SP;
 
   const layout = layoutNotation({
@@ -69,4 +70,6 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): void {
         }
       : undefined
   });
+
+  return renderScale(pxPerSp, fitted);
 }

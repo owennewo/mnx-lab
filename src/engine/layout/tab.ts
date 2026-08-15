@@ -50,6 +50,11 @@ export interface LayoutTabOptions {
   /** Viewer-supplied instrument (strings/capo) — overrides the document's
    *  declaration for rendering; never written back. */
   tabSetup?: PartTabSetups;
+  /** Horizontal density multiplier (core-render-density-zoom.md) — the same
+   *  spring scaling notation gets. The standalone tab view shipped without
+   *  this and so ignored `density` entirely; core-zoom-density-pad.md found
+   *  it when the pad had to drive all three views. */
+  densityH?: number;
 }
 
 export function layoutTab(opts: LayoutTabOptions): LayoutResult {
@@ -84,7 +89,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   // All horizontal decisions (system packing, bar widths, event x positions)
   // come from the shared plan — layoutNotation consumes the same one, which is
   // what keeps notation and tab column-aligned in the "both" view.
-  const plan = planHorizontal(mnx, widthSp);
+  const plan = planHorizontal(mnx, widthSp, { densityH: opts.densityH });
 
   // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
   // into each measure's diagnostic markers alongside renderer-gap issues.

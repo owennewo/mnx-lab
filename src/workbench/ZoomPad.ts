@@ -1,0 +1,678 @@
+import { LitElement, html, css, svg, nothing } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { designTokens, sharedChrome } from '../elements/tokens.ts';
+import {
+  MIN_STAFF_SCALE,
+  MAX_STAFF_SCALE,
+  clampStaffScale
+} from '../engine/render/scale.ts';
+import { MIN_DENSITY, MAX_DENSITY } from '../engine/layout/spacing.ts';
+
+/**
+ * The zoom/density pad — roadmap/proposed/core-zoom-density-pad.md, campaign
+ * item 9 of core-campaign-modernist.md, from the design project's
+ * `Zoom Control.dc.html`.
+ *
+ * Two axes that are genuinely different things, which is why one control shows
+ * both rather than pretending they are one slider:
+ *
+ *   ↑ ↓  STAFF   — a true scale. Line gap, glyphs, text and stems multiply
+ *                  together, because everything downstream is in staff spaces
+ *                  and `pxPerSp` is the single multiplier.
+ *   ← →  SPACE   — horizontal distance between events only. Glyphs untouched:
+ *                  the engine scales the springs and never the rigid columns,
+ *                  which is what makes this axis independent of the other.
+ *
+ * The magnifier where the arms cross resets both.
+ *
+ * **This is chrome, not surface.** It composes `<mnx-score-viewer>`'s
+ * attributes and implements no presentation behavior of its own — every value
+ * it emits is clamped by the engine that owns it (`clampStaffScale`,
+ * `clampDensity`). The layering rule is docs/core-viewer-surface.md's.
+ *
+ * The idle mark is the one place the design was revised. Its spec idles the
+ * FULL 3×3 grid at 72×72 and opacity 0.28 — about a bar of music, and faint is
+ * not absent. Idle here draws the same four-arrow mark as a single 24×24 glyph:
+ * 89% less area over the engraving, same identity, and the pad is one hover
+ * away.
+ */
+
+/** Design: staff step 5%, spacing step 4%. Both ranges are the ENGINE's. */
+const STAFF_STEP = 0.05;
+const SPACE_STEP = 0.04;
+
+/** Drag: ±1 step per 6px, halved with shift; axis-locks after 8px of travel
+ *  if that travel is within 20° of an axis. All three from the design. */
+const DRAG_PX_PER_STEP = 6;
+const AXIS_LOCK_PX = 8;
+const AXIS_LOCK_TAN = Math.tan((20 * Math.PI) / 180);
+
+/** Click-and-hold repeat, per the design's 400ms. */
+const REPEAT_DELAY_MS = 400;
+const REPEAT_EVERY_MS = 60;
+
+export type ZoomAxis = 'staff' | 'space';
+
+export interface ZoomPadChange {
+  /** null = fitted: no pxPerSp is sent and the renderer fits to the viewport. */
+  staffScale: number | null;
+  /** null = the element's `density` preset decides. */
+  densityH: number | null;
+}
+
+/** Round to the step grid so repeated ±0.05 cannot drift into 0.8500000001. */
+function snap(value: number, step: number): number {
+  return Math.round(value / step) * step;
+}
+
+@customElement('mnx-zoom-pad')
+export class ZoomPad extends LitElement {
+  /** Staff scale, or null for fitted. Mirrors the viewer's `zoom`. */
+  @property({ type: Number }) staffScale: number | null = null;
+  /** Spacing multiplier, or null for the preset. Mirrors `density-h`. */
+  @property({ type: Number }) densityH: number | null = null;
+
+  /**
+   * What the last paint actually used, from the viewer's `render-scale`.
+   * While `staffScale` is null this is the ONLY honest number to print — the
+   * renderer fitted the score and the value moves with the viewport.
+   */
+  @property({ type: Number }) effectiveStaffScale = 1;
+
+  /**
+   * The tray is open over the score. The design: *"the pad drops to 0.28 for
+   * as long as the tray is open — the selection is the more urgent thing."*
+   * Forces the quiet state even under the pointer.
+   */
+  @property({ type: Boolean, reflect: true }) suppressed = false;
+
+  @state() private open = false;
+  @state() private dragging = false;
+  /** The axis that just hit its clamp — drives the MIN/MAX chip. */
+  @state() private clamped: { axis: ZoomAxis; at: 'min' | 'max' } | null = null;
+
+  private repeatTimer: number | null = null;
+  private drag: {
+    pointerId: number;
+    x0: number;
+    y0: number;
+    /** Steps already applied, so accumulation is absolute, not incremental. */
+    dx: number;
+    dy: number;
+    lock: ZoomAxis | 'both' | null;
+    moved: boolean;
+    staff0: number;
+    space0: number;
+  } | null = null;
+
+  static styles = [
+    designTokens,
+    sharedChrome,
+    css`
+      :host {
+        display: block;
+        font-family: var(--sans);
+        /* The 44px grabbable area the design asks for, around a 24px mark:
+           the padding is part of the target, so the mark is catchable before
+           it is legible. Negative margins keep the VISUAL inset at the 14px
+           ScenarioPage sets, rather than 14 + the padding. */
+        padding: 10px;
+        margin: -10px;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: none;
+      }
+
+      /* ── the quiet state ── */
+      .mark {
+        display: block;
+        margin-left: auto;
+        opacity: 0.28;
+        transition: opacity 0.12s ease;
+      }
+
+      /* Off default: the floor rises and the changed arm prints in the accent,
+         so the score never lies about its own scale. */
+      :host([data-off]) .mark {
+        opacity: 0.55;
+      }
+
+      :host([suppressed]) .mark,
+      :host([suppressed]) .pad {
+        opacity: 0.28;
+      }
+
+      .mark-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 5px;
+      }
+
+      .mark-nums {
+        font: 600 9px/1.15 var(--mono);
+        text-align: right;
+        color: var(--ink);
+      }
+
+      .mark-nums .hot {
+        color: var(--accent);
+      }
+
+      /* ── the pad ── */
+      .pad {
+        width: 76px;
+        box-sizing: border-box;
+        background: var(--surface);
+        border: var(--rule-w) solid var(--ink);
+        border-radius: var(--radius-card);
+        box-shadow: 0 10px 26px var(--shadow-near);
+        margin-left: auto;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 24px);
+        grid-template-rows: repeat(3, 24px);
+      }
+
+      /* Corners are empty and carry NO hit area — the design is explicit, and
+         a diagonal press would otherwise mean two axes at once by accident. */
+      .grid .gap {
+        pointer-events: none;
+      }
+
+      button.cell {
+        appearance: none;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--ink);
+      }
+
+      button.cell:hover:not(:disabled),
+      button.cell:focus-visible {
+        background: var(--row-current);
+        color: var(--accent);
+      }
+
+      button.cell:focus-visible {
+        outline: var(--rule-w) solid var(--focus-ring);
+        outline-offset: -2px;
+      }
+
+      /* The exhausted arm greys; the live arm keeps the accent. */
+      button.cell:disabled {
+        cursor: default;
+        background: var(--bg-context);
+        color: var(--ink-faint);
+      }
+
+      .up { border-bottom: 1px solid var(--line); }
+      .down { border-top: 1px solid var(--line); }
+      .left { border-right: 1px solid var(--line); }
+      .right { border-left: 1px solid var(--line); }
+
+      /* ── the readout ── */
+      .readout {
+        display: flex;
+        height: 24px;
+        box-sizing: border-box;
+        border-top: var(--rule-w) solid var(--ink);
+      }
+
+      .readout .half {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .readout .half + .half {
+        border-left: 1px solid var(--line);
+      }
+
+      .readout .lbl {
+        font: 600 6.5px/1.2 var(--sans);
+        letter-spacing: 0.1em;
+        color: var(--ink-3);
+      }
+
+      .readout .val {
+        font: 600 9px/1.3 var(--mono);
+        color: var(--ink);
+      }
+
+      .readout .val.hot {
+        color: var(--accent);
+      }
+
+      /* Fitted is not a value the user chose — it reads as derived. */
+      .readout .val.derived {
+        color: var(--ink-3);
+      }
+
+      /* Same 24px whether light or ink, so the pad never changes height. */
+      .readout.limit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        background: var(--ink);
+        white-space: nowrap;
+      }
+
+      .readout.limit .lim-val {
+        font: 600 7px/1.3 var(--sans);
+        letter-spacing: 0.09em;
+        color: var(--surface);
+      }
+
+      .readout.limit .lim-tag {
+        font: 600 7px/1.3 var(--sans);
+        letter-spacing: 0.09em;
+        color: var(--accent-on-ink);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .mark { transition: none; }
+      }
+    `
+  ];
+
+  // ── values ──────────────────────────────────────────────────────────────
+
+  /** What the staff readout prints: the pinned value, else what was drawn. */
+  private get shownStaff(): number {
+    return this.staffScale ?? this.effectiveStaffScale;
+  }
+
+  private get shownSpace(): number {
+    return this.densityH ?? 1;
+  }
+
+  private get offDefault(): boolean {
+    return this.staffScale !== null || this.densityH !== null;
+  }
+
+  // ── stepping ────────────────────────────────────────────────────────────
+
+  /**
+   * Move one axis by `steps`, clamp through the ENGINE's own bounds, and
+   * report a clamp that actually bit. Stepping from `shownStaff` is what makes
+   * the first click off a fitted score continue from what is on screen rather
+   * than jumping to 100%.
+   */
+  private step(axis: ZoomAxis, steps: number) {
+    if (steps === 0) return;
+    if (axis === 'staff') {
+      const next = snap(this.shownStaff + steps * STAFF_STEP, STAFF_STEP);
+      const clampedTo = clampStaffScale(next)!;
+      this.noteClamp('staff', next, clampedTo, MIN_STAFF_SCALE, MAX_STAFF_SCALE);
+      this.commit({ staffScale: clampedTo, densityH: this.densityH });
+    } else {
+      const next = snap(this.shownSpace + steps * SPACE_STEP, SPACE_STEP);
+      const clampedTo = Math.min(MAX_DENSITY, Math.max(MIN_DENSITY, next));
+      this.noteClamp('space', next, clampedTo, MIN_DENSITY, MAX_DENSITY);
+      this.commit({ staffScale: this.staffScale, densityH: clampedTo });
+    }
+  }
+
+  /** The clamp used to be silent — a host asking for 0.2 got 0.5 and was never
+   *  told. Surfacing it is this control's real contribution to the axis. */
+  private noteClamp(axis: ZoomAxis, wanted: number, got: number, min: number, max: number) {
+    if (wanted < got && got === min) this.clamped = { axis, at: 'min' };
+    else if (wanted > got && got === max) this.clamped = { axis, at: 'max' };
+    else this.clamped = null;
+  }
+
+  private commit(change: ZoomPadChange) {
+    this.staffScale = change.staffScale;
+    this.densityH = change.densityH;
+    this.dispatchEvent(
+      new CustomEvent<ZoomPadChange>('zoom-change', {
+        detail: change,
+        bubbles: true,
+        composed: true
+      })
+    );
+  }
+
+  private reset() {
+    this.clamped = null;
+    // Back to BOTH defaults — and the staff default is fitted, not 100%.
+    this.commit({ staffScale: null, densityH: null });
+  }
+
+  // ── gestures ────────────────────────────────────────────────────────────
+
+  private onArmDown(event: PointerEvent, axis: ZoomAxis, dir: 1 | -1) {
+    // Left button only; let anything else fall through to the page.
+    if (event.button !== 0) return;
+    event.preventDefault();
+    this.step(axis, dir);
+    this.startRepeat(axis, dir);
+    this.beginDrag(event);
+  }
+
+  private startRepeat(axis: ZoomAxis, dir: 1 | -1) {
+    this.stopRepeat();
+    this.repeatTimer = window.setTimeout(() => {
+      this.repeatTimer = window.setInterval(() => this.step(axis, dir), REPEAT_EVERY_MS);
+    }, REPEAT_DELAY_MS);
+  }
+
+  private stopRepeat() {
+    if (this.repeatTimer === null) return;
+    // One handle, two timer kinds — clearing both is cheaper than tracking
+    // which phase it was in, and clearing the wrong kind is a no-op.
+    window.clearTimeout(this.repeatTimer);
+    window.clearInterval(this.repeatTimer);
+    this.repeatTimer = null;
+  }
+
+  private beginDrag(event: PointerEvent) {
+    this.drag = {
+      pointerId: event.pointerId,
+      x0: event.clientX,
+      y0: event.clientY,
+      dx: 0,
+      dy: 0,
+      lock: null,
+      moved: false,
+      staff0: this.shownStaff,
+      space0: this.shownSpace
+    };
+    this.dragging = true;
+    (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
+  }
+
+  private onPadDown(event: PointerEvent) {
+    // Only bare pad ground — the arms and the magnifier handle their own.
+    if (event.button !== 0 || event.target !== event.currentTarget) return;
+    event.preventDefault();
+    this.beginDrag(event);
+  }
+
+  private onPointerMove(event: PointerEvent) {
+    const drag = this.drag;
+    if (!drag || event.pointerId !== drag.pointerId) return;
+
+    const dx = event.clientX - drag.x0;
+    const dy = event.clientY - drag.y0;
+    const travel = Math.hypot(dx, dy);
+
+    if (!drag.moved && travel > 2) {
+      drag.moved = true;
+      // A real drag supersedes the click's hold-repeat.
+      this.stopRepeat();
+    }
+
+    // Axis lock is decided ONCE, on the first 8px of travel, and then held —
+    // deciding it per move would let a curving drag flip axes mid-gesture.
+    if (drag.lock === null && travel >= AXIS_LOCK_PX) {
+      const ax = Math.abs(dx);
+      const ay = Math.abs(dy);
+      if (ay <= ax * AXIS_LOCK_TAN) drag.lock = 'space';
+      else if (ax <= ay * AXIS_LOCK_TAN) drag.lock = 'staff';
+      else drag.lock = 'both';
+    }
+    if (drag.lock === null) return;
+
+    const rate = event.shiftKey ? DRAG_PX_PER_STEP * 2 : DRAG_PX_PER_STEP;
+    // Absolute from the gesture's origin, so a drag out and back returns to
+    // where it started instead of ratcheting.
+    const staffSteps = drag.lock === 'space' ? 0 : Math.round(-dy / rate);
+    const spaceSteps = drag.lock === 'staff' ? 0 : Math.round(dx / rate);
+
+    const wantStaff = snap(drag.staff0 + staffSteps * STAFF_STEP, STAFF_STEP);
+    const wantSpace = snap(drag.space0 + spaceSteps * SPACE_STEP, SPACE_STEP);
+    const gotStaff = clampStaffScale(wantStaff)!;
+    const gotSpace = Math.min(MAX_DENSITY, Math.max(MIN_DENSITY, wantSpace));
+
+    // Report the axis the user is actually pushing against.
+    if (drag.lock !== 'staff' && gotSpace !== wantSpace) {
+      this.noteClamp('space', wantSpace, gotSpace, MIN_DENSITY, MAX_DENSITY);
+    } else if (drag.lock !== 'space' && gotStaff !== wantStaff) {
+      this.noteClamp('staff', wantStaff, gotStaff, MIN_STAFF_SCALE, MAX_STAFF_SCALE);
+    } else {
+      this.clamped = null;
+    }
+
+    const nextStaff = drag.lock === 'space' ? this.staffScale : gotStaff;
+    const nextSpace = drag.lock === 'staff' ? this.densityH : gotSpace;
+    if (nextStaff !== this.staffScale || nextSpace !== this.densityH) {
+      this.commit({ staffScale: nextStaff, densityH: nextSpace });
+    }
+  }
+
+  private onPointerUp(event: PointerEvent) {
+    if (!this.drag || event.pointerId !== this.drag.pointerId) return;
+    this.stopRepeat();
+    this.drag = null;
+    this.dragging = false;
+    this.clamped = null;
+  }
+
+  private onMagnifier(event: PointerEvent) {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    this.beginDrag(event);
+  }
+
+  private onMagnifierUp() {
+    // A press that never became a drag is a click: reset. Dragging FROM the
+    // magnifier is still a drag, per "press and drag anywhere in the pad".
+    if (this.drag && !this.drag.moved) this.reset();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.stopRepeat();
+  }
+
+  updated() {
+    this.toggleAttribute('data-off', this.offDefault);
+  }
+
+  // ── marks ───────────────────────────────────────────────────────────────
+
+  /**
+   * The idle mark: the four-arrow crosshair as ONE glyph at 24×24, not the
+   * pad's grid with its borders removed. The magnifier is dropped at this size
+   * — at 3px of clear centre it would be mush — and returns on hover, where it
+   * is also the reset target.
+   */
+  private markGlyph() {
+    const staffHot = this.staffScale !== null;
+    const spaceHot = this.densityH !== null;
+    const hot = 'var(--accent)';
+    const base = 'var(--ink)';
+    return svg`
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 0 16 5h-2.5v4h-3V5H8z" fill=${staffHot ? hot : base}></path>
+        <path d="M12 24 8 19h2.5v-4h3v4H16z" fill=${staffHot ? hot : base}></path>
+        <path d="M0 12 5 8v2.5h4v3H5V16z" fill=${spaceHot ? hot : base}></path>
+        <path d="M24 12 19 16v-2.5h-4v-3h4V8z" fill=${spaceHot ? hot : base}></path>
+      </svg>
+    `;
+  }
+
+  private arrow(dir: 'up' | 'down' | 'left' | 'right') {
+    const paths = {
+      up: 'M8.5 0 17 8h-5v7H5V8H0z',
+      down: 'M8.5 15 0 7h5V0h7v7h5z',
+      left: 'M0 8.5 8 0v5h7v7H8v5z',
+      right: 'M15 8.5 7 17v-5H0V5h7V0z'
+    };
+    const vertical = dir === 'up' || dir === 'down';
+    return svg`
+      <svg
+        width=${vertical ? 13 : 12}
+        height=${vertical ? 12 : 13}
+        viewBox=${vertical ? '0 0 17 15' : '0 0 15 17'}
+        aria-hidden="true"
+      >
+        <path d=${paths[dir]} fill="currentColor"></path>
+      </svg>
+    `;
+  }
+
+  private magnifierGlyph() {
+    return svg`
+      <svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true">
+        <circle cx="9.5" cy="9.5" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>
+        <path d="M6 7.5h7M6 10h7M6 12.5h7" stroke="currentColor" stroke-width="1.1"></path>
+        <path d="M14.6 14.6 21 21" stroke="currentColor" stroke-width="2"></path>
+      </svg>
+    `;
+  }
+
+  // ── render ──────────────────────────────────────────────────────────────
+
+  private pct(value: number) {
+    return String(Math.round(value * 100));
+  }
+
+  private renderReadout() {
+    if (this.clamped) {
+      const axis = this.clamped.axis;
+      const value = axis === 'staff' ? this.shownStaff : this.shownSpace;
+      return html`
+        <div class="readout limit">
+          <span class="lim-val">${axis === 'staff' ? 'STAFF' : 'SPACE'} ${this.pct(value)}</span>
+          <span class="lim-tag">${this.clamped.at === 'min' ? 'MIN' : 'MAX'}</span>
+        </div>
+      `;
+    }
+    const fitted = this.staffScale === null;
+    return html`
+      <div class="readout">
+        <div class="half">
+          <div class="lbl">${fitted ? 'FIT' : 'STAFF'}</div>
+          <div class="val ${fitted ? 'derived' : 'hot'}">${this.pct(this.shownStaff)}</div>
+        </div>
+        <div class="half">
+          <div class="lbl">SPACE</div>
+          <div class="val ${this.densityH === null ? '' : 'hot'}">${this.pct(this.shownSpace)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  private renderPad() {
+    const atStaffMax = this.shownStaff >= MAX_STAFF_SCALE;
+    const atStaffMin = this.shownStaff <= MIN_STAFF_SCALE;
+    const atSpaceMax = this.shownSpace >= MAX_DENSITY;
+    const atSpaceMin = this.shownSpace <= MIN_DENSITY;
+
+    return html`
+      <div
+        class="pad"
+        @pointerdown=${this.onPadDown}
+        @pointermove=${this.onPointerMove}
+        @pointerup=${this.onPointerUp}
+        @pointercancel=${this.onPointerUp}
+      >
+        <div class="grid">
+          <div class="gap"></div>
+          <button
+            class="cell up"
+            ?disabled=${atStaffMax}
+            title="Larger staff"
+            aria-label="Larger staff"
+            @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'staff', 1)}
+          >
+            ${this.arrow('up')}
+          </button>
+          <div class="gap"></div>
+
+          <button
+            class="cell left"
+            ?disabled=${atSpaceMin}
+            title="Tighter spacing"
+            aria-label="Tighter spacing"
+            @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'space', -1)}
+          >
+            ${this.arrow('left')}
+          </button>
+          <button
+            class="cell mag"
+            title="Reset zoom and spacing"
+            aria-label="Reset zoom and spacing"
+            @pointerdown=${this.onMagnifier}
+            @pointerup=${this.onMagnifierUp}
+          >
+            ${this.magnifierGlyph()}
+          </button>
+          <button
+            class="cell right"
+            ?disabled=${atSpaceMax}
+            title="Wider spacing"
+            aria-label="Wider spacing"
+            @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'space', 1)}
+          >
+            ${this.arrow('right')}
+          </button>
+
+          <div class="gap"></div>
+          <button
+            class="cell down"
+            ?disabled=${atStaffMin}
+            title="Smaller staff"
+            aria-label="Smaller staff"
+            @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'staff', -1)}
+          >
+            ${this.arrow('down')}
+          </button>
+          <div class="gap"></div>
+        </div>
+        ${this.renderReadout()}
+      </div>
+    `;
+  }
+
+  render() {
+    // Dragging holds the pad open even when the pointer leaves it, and the
+    // tray's claim on attention beats both.
+    const expanded = !this.suppressed && (this.open || this.dragging);
+    return html`
+      <div
+        @pointerenter=${() => (this.open = true)}
+        @pointerleave=${() => (this.open = false)}
+        @focusin=${() => (this.open = true)}
+        @focusout=${() => (this.open = false)}
+      >
+        ${expanded
+          ? this.renderPad()
+          : html`
+              <div class="mark-row">
+                ${this.offDefault
+                  ? html`<div class="mark-nums">
+                      <div class=${this.staffScale !== null ? 'hot' : ''}>
+                        ${this.pct(this.shownStaff)}
+                      </div>
+                      <div class=${this.densityH !== null ? 'hot' : ''}>
+                        ${this.pct(this.shownSpace)}
+                      </div>
+                    </div>`
+                  : nothing}
+                <div class="mark">${this.markGlyph()}</div>
+              </div>
+            `}
+      </div>
+    `;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'mnx-zoom-pad': ZoomPad;
+  }
+}

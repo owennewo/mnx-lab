@@ -175,18 +175,6 @@ proposals that name their campaign.
   own seven remaining `no-op` notes also point); and geometry/surface gaps (wide-selection
   shaft, dark-page colour scheme, the embed/studio tray). Rows retire as unblockers land
   (registry `blockedBy` keeps table and tiles from drifting); empty table ⇒ `complete/`.
-- **[core-zoom-density-pad.md](proposed/core-zoom-density-pad.md)** — campaign item 9, and the UI
-  half core-render-density-zoom.md's status line still names as missing. A crosshair pad at the
-  score's top right: **↑↓ staff** (a true scale, finally wiring `zoom` to `pxPerSp` instead of the
-  paper card) and **←→ spacing** (the shipped `densityH`), magnifier resets. Five rulings the
-  spec-grade mock left open, two of which delete work: the "computed collision floor" **cannot
-  happen** — density scales springs, never the rigid columns — so it stays the existing
-  `MIN_DENSITY` constant and the pad's contribution is making the silent clamp *visible*; and the
-  ⌘+/⌘− question answers itself against keymap.ts's own Ctrl+K precedent (browser-claimed, don't
-  take it). Staff is **fitted until first touched**, so the readout is honest on first paint.
-  Vertical density is formally **cut** from this control — the arms are spent, and axis 3 needs
-  the stem-length clamp first. One revision to the design: idle collapses to a 24×24 mark, 89%
-  less score obscured.
 - **[core-tuplets-grace-notes.md](proposed/core-tuplets-grace-notes.md)** — tuplets and grace notes
   **across both converters and on tab**. Split out of
   [core-guitar-pro.md](complete/core-guitar-pro.md) when that closed, at its real scope: the model
@@ -323,6 +311,18 @@ proposals that name their campaign.
   container rungs.
 
 ### complete/
+- **[core-zoom-density-pad.md](complete/core-zoom-density-pad.md)** — campaign item 9, and the UI
+  half core-render-density-zoom.md's status line still names as missing. A crosshair pad at the
+  score's top right: **↑↓ staff** (a true scale, finally wiring `zoom` to `pxPerSp` instead of the
+  paper card) and **←→ spacing** (the shipped `densityH`), magnifier resets. Five rulings the
+  spec-grade mock left open, two of which delete work: the "computed collision floor" **cannot
+  happen** — density scales springs, never the rigid columns — so it stays the existing
+  `MIN_DENSITY` constant and the pad's contribution is making the silent clamp *visible*; and the
+  ⌘+/⌘− question answers itself against keymap.ts's own Ctrl+K precedent (browser-claimed, don't
+  take it). Staff is **fitted until first touched**, so the readout is honest on first paint.
+  Vertical density is formally **cut** from this control — the arms are spent, and axis 3 needs
+  the stem-length clamp first. One revision to the design: idle collapses to a 24×24 mark, 89%
+  less score obscured.
 - **[core-json-view.md](complete/core-json-view.md)** — campaign item 7. `src/model/jsonView.ts`
   is a **complete JSON-view engine with no UI consumer and no test**, while the panel renders
   raw text; `errorPointer` is set and never read, so the exhibit's "highlighted in document

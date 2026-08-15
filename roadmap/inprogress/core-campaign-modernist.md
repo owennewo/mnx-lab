@@ -1,10 +1,9 @@
 # Campaign: Modernist — the workbench restyle the tray's art direction leads
 
-> **Status: IN PROGRESS 2026-08-15 — items 1–7 built.** Row 8 (the `<360px`
-> drawer) is drafted and **formally declined**: the design is complete, the need
-> is not, and it is kept as a *possible* so the analysis is not redone. Row 9
-> (the zoom/density pad) is the parallel session's and is landing — the
-> campaign closes when it does.
+> **Status: 2026-08-15 — items 1–7 and 9 all built; row 8 formally declined.**
+> The index is exhausted, so this campaign is done bar the filing: row 8 (the
+> `<360px` drawer) is drafted and **not recommended** — the design is complete,
+> the need is not — and is kept as a *possible* so the analysis is not redone.
 > A campaign (see CLAUDE.md → Conventions): this doc
 > is an index over several normal proposals, the shared contract they follow, and the
 > running log of progress and learnings as items land. Indexed items are ordinary
@@ -135,7 +134,7 @@ frame exists.
 | 6 | [workbench-queue-pips.md](../complete/workbench-queue-pips.md) | Re-deriving the five-state queue ramp under one accent — the bill "red everywhere" runs up. Shape and lightness carry what hue no longer can. | 1 | **built 2026-08-15** |
 | 7 | [core-json-view.md](../complete/core-json-view.md) | `buildJsonView()` gains `spanByPointer`; the dormant module finally gets a consumer, a conformance test, and the pinned-error highlight the panel consolidation lost. The only below-the-boundary code change in the campaign. | — (5 for the UI half) | **built 2026-08-15** |
 | 8 | [workbench-panel-drawer.md](../proposed/workbench-panel-drawer.md) | The `<360px` drawer. **Drafted and NOT RECOMMENDED** — the design is ready, the need is not: the squeeze only bites below ~1100px, where Ctrl+B already reclaims 270px and the drag handle reaches the 360 floor. Kept as a *possible* so the analysis is not redone. Two findings outlive it: any future overlay gets Escape free at slot 2 (it needs to own its keydown, not a keymap change), and a dismissing click must be swallowed — decide that before `note-selected` gets a consumer, not after. | 5 | **possible — not recommended** |
-| 9 | [core-zoom-density-pad.md](../proposed/core-zoom-density-pad.md) | The crosshair zoom/density pad over the score's top right — the same design project's `Zoom Control.dc.html`. Also closes the UI half of [core-render-density-zoom.md](core-render-density-zoom.md): **↑↓ staff** wires `zoom` to `pxPerSp` at last, **←→ spacing** gives the shipped `densityH` a control. The campaign's first item that lands ink **on the score canvas** rather than in the chrome, so contract rule 5 is tested rather than restated. | 1, 3 | proposed |
+| 9 | [core-zoom-density-pad.md](../complete/core-zoom-density-pad.md) | The crosshair zoom/density pad over the score's top right — the same design project's `Zoom Control.dc.html`. Also closes the UI half of [core-render-density-zoom.md](core-render-density-zoom.md): **↑↓ staff** wires `zoom` to `pxPerSp` at last, **←→ spacing** gives the shipped `densityH` a control. The campaign's first item that lands ink **on the score canvas** rather than in the chrome, so contract rule 5 is tested rather than restated. | 1, 3 | **built 2026-08-15** |
 
 Beyond the campaign (recorded, not indexed): whether `<mnx-command-palette>` adopts the
 skin — the tray doc already parked this; the emitter's dangling `--font-family-sans` and
@@ -178,6 +177,56 @@ depends on. Revisit if a session's queue ever gets long enough to hurt.
 *(Appended as items land, per the convention — later items start smarter than earlier
 ones.)*
 
+- **2026-08-15 — item 9 lands: the pad, and the first ink this campaign put on the
+  score canvas.** Two axes wired to the engine (`zoom` → `pxPerSp` at last, numeric
+  `density-h`), a 24×24 idle mark, the 76×100 pad on hover, and the clamp finally
+  visible. Verified over CDP in both themes; goldens byte-identical.
+  - **The design asked for a feature the architecture had already deleted.** The mock
+    specified a floor "recomputed each layout pass — the tightest ratio at which no two
+    glyphs overlap". Density scales springs and never rigid columns, so no value can
+    make ink collide; the floor is a legibility constant that already existed. **Third
+    time in this campaign the design has asked for something the codebase cannot
+    honestly provide** (after the KEY name and the EDITED timestamp), and the third time
+    the answer was to ship the fact we do have — here, making the *silent* clamp
+    visible, which is a real gain the mock never asked for. The ratio the campaign's
+    opening entry predicted is holding almost exactly.
+  - **A test that passes is not evidence, and mutation-checking cost me two rewrites.**
+    The first collision assertion read `voice[i].coreSp` — a property that **does not
+    exist** on `EventSlot`. It was `undefined`, every comparison was `NaN`-false, and
+    the test passed vacuously. It survived because **`tsconfig.json` includes only
+    `src`, so no harness test is ever typechecked** and vitest transpiles without
+    checking. Worth generalising: a harness assertion that reads a field off an engine
+    type is unverified by anything but your own eyes — typecheck the file by hand
+    (`tsc --noEmit --allowImportingTsExtensions …`) before believing a green run.
+    **Then measured rather than left as a warning**: typechecking all 25 harness suites
+    turns up **5 errors and zero of the `TS2339` "property does not exist" class** — the
+    one that makes an assertion vacuous. So the hazard is real in kind and the harness is
+    currently clean of it; this bug was the only instance. Recorded so a later item can
+    weigh a `tsconfig` include against a gap that has produced exactly one defect.
+  - **Then the rewritten test still would not fail under mutation, and that was the
+    real finding.** Deliberately scaling the rigid core moved the tightest gap only
+    1.745sp → 1.540sp — still clear of `CORE_SP` — because **the justifier is a second,
+    independent guard**: when rigid width shrinks, `voiceStretch` grows and hands it
+    straight back to the springs. So the no-collision guarantee is over-determined and
+    no plan-level assertion can isolate springs-only as its cause. The ruling got
+    *stronger* and its evidence got *narrower*, and the doc now says so. **Measure the
+    mechanism before claiming it**; "the test passes and my explanation is plausible" is
+    two claims, not one.
+  - **The pad found a shipped bug by having to drive all three views.** `layoutTab`
+    called `planHorizontal(mnx, widthSp)` with no options, so the standalone tab view
+    ignored `density=` from the day the axis shipped — invisible while the only consumer
+    was a three-button demo on a notation score. **A control that must work everywhere
+    audits its own engine**; the preset UI never had to.
+  - **`--accent-on-ink` flips the opposite way to `--accent-fg`, and that is not a
+    mistake.** `--ink` is dark in light theme and *light* in dark theme, so a band filled
+    with it needs a *lighter* accent in light theme and a *darker* one in dark. Every
+    other accent token lightens with the theme. Any future token named "X on ink" should
+    expect the same inversion rather than copying `--accent-fg`'s ramp.
+  - **Contract rule 5 was finally tested rather than restated.** This is the first item
+    to put accent-red on the same canvas as the engine's frozen `#b91c1c`, and it passes
+    on a third form again — type and a filled arrow inside a bordered card, against a
+    filled disc (diagnostic) and a stroked rect (enclosure). The rule's reliance on form
+    over hue, recorded at item 1, is now carrying three shapes rather than two.
 - **2026-08-15 — item 7 lands: the JSON view gets a consumer, a test, and its promise
   back.** `spanByPointer` on `buildJsonView`; the pane gets a gutter of real document
   line numbers, three inks, a selection scope and a find box; the pinned-error highlight

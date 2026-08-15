@@ -73,6 +73,14 @@ import type {
 } from './SelectionTray.ts';
 import '../elements/ScoreViewer.ts';
 import './SelectionTray.ts';
+import './ZoomPad.ts';
+import type { ZoomPadChange } from './ZoomPad.ts';
+import {
+  MIN_STAFF_SCALE,
+  MAX_STAFF_SCALE,
+  type RenderScale
+} from '../engine/render/scale.ts';
+import { MIN_DENSITY, MAX_DENSITY } from '../engine/layout/spacing.ts';
 
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
@@ -191,6 +199,23 @@ const PANEL_WIDTH_KEY = 'mnx-lab.panel-width';
 const PANEL_MIN = 360;
 const PANEL_MAX = 560;
 const PANEL_DEFAULT = 420;
+
+/* The zoom pad's two axes (core-zoom-density-pad.md). localStorage, not the
+   document store: how big you like the staff is a property of you, not of the
+   score — looking at a document must not modify it. Both keys store "unset" by
+   ABSENCE rather than a sentinel, because unset genuinely differs from any
+   value: no staff scale means FITTED, which no number can express. */
+const STAFF_SCALE_KEY = 'mnx-lab.staff-scale';
+const DENSITY_H_KEY = 'mnx-lab.density-h';
+
+function storedScale(key: string, min: number, max: number): number | null {
+  const raw = localStorage.getItem(key);
+  if (raw === null) return null;
+  const n = Number(raw);
+  // CLAMP, don't reset — storedPanelWidth's rule, for the same reason: a value
+  // saved under wider bounds means "as far as it goes", not "start over".
+  return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : null;
+}
 
 function storedPanelWidth(): number {
   const n = Number(localStorage.getItem(PANEL_WIDTH_KEY));
@@ -329,6 +354,22 @@ export class ScenarioPage extends LitElement {
   // from trayDemo.ts, and no intents fired — tab commits and tile flips are
   // page-local so the look and keyboard model can be reviewed before wiring.
   @state() private trayOpen = false;
+
+  /** The zoom pad's two axes. `null` staff scale means FITTED — the renderer
+   *  gets no pxPerSp and sizes the score to the viewport. */
+  @state() private staffScale: number | null = storedScale(
+    STAFF_SCALE_KEY,
+    MIN_STAFF_SCALE,
+    MAX_STAFF_SCALE
+  );
+  @state() private densityH: number | null = storedScale(
+    DENSITY_H_KEY,
+    MIN_DENSITY,
+    MAX_DENSITY
+  );
+  /** What the viewer's last paint actually used, so a fitted readout can print
+   *  a true number instead of assuming 100%. */
+  @state() private effectiveStaffScale = 1;
   /** Previewed tab (row key), or null = the tab holding the selection. */
   @state() private trayTab: string | null = null;
   /** The selection's box in `.main` coordinates, from `selection-anchored`. */
@@ -870,6 +911,19 @@ export class ScenarioPage extends LitElement {
         left: 16px;
         bottom: 16px;
         z-index: 5;
+      }
+
+      /* The zoom/density pad (core-zoom-density-pad.md). Top-RIGHT, 14px in,
+         pinned while the score scrolls — the viewer scrolls itself one level
+         down, so an absolute child of .main simply stays put. z-index 4 puts
+         it under the popover layer (5) and the tray (30): everything that can
+         cover it, should. The panel needs no z-order at all, being a grid
+         column rather than an overlay. */
+      mnx-zoom-pad {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        z-index: 4;
       }
 
       /* The ops tab: the op queue as provenance rows — op · intent · key.
@@ -2012,12 +2066,31 @@ export class ScenarioPage extends LitElement {
       <mnx-score-viewer
         .mnxDoc=${this.doc}
         .view=${viewMode}
+        .zoom=${this.staffScale}
+        .densityH=${this.densityH}
         .partTabSetups=${this.partTabSetups()}
         .selection=${this.selection}
         .selectionInactive=${!this.hasKeyboard}
         @selection-anchored=${this.onSelectionAnchored}
+        @render-scale=${this.onRenderScale}
       ></mnx-score-viewer>
     `;
+  }
+
+  private onRenderScale(event: CustomEvent<RenderScale>) {
+    this.effectiveStaffScale = event.detail.staffScale;
+  }
+
+  private onZoomChange(event: CustomEvent<ZoomPadChange>) {
+    const { staffScale, densityH } = event.detail;
+    this.staffScale = staffScale;
+    this.densityH = densityH;
+    // Absence is the "unset" state, so reset REMOVES rather than writing a
+    // sentinel — otherwise the next load could not tell "fitted" from "1.0".
+    if (staffScale === null) localStorage.removeItem(STAFF_SCALE_KEY);
+    else localStorage.setItem(STAFF_SCALE_KEY, String(staffScale));
+    if (densityH === null) localStorage.removeItem(DENSITY_H_KEY);
+    else localStorage.setItem(DENSITY_H_KEY, String(densityH));
   }
 
   /** The invalid-by-design exhibit: pinned schema errors, each row locating
@@ -2085,6 +2158,15 @@ export class ScenarioPage extends LitElement {
       <div class="body" style="grid-template-columns: 1fr ${this.panelWidth}px">
         <div class="main">
           ${this.viewer(entry, view)}
+          ${this.loadState === 'ready' && !entry.invalidByDesign
+            ? html`<mnx-zoom-pad
+                .staffScale=${this.staffScale}
+                .densityH=${this.densityH}
+                .effectiveStaffScale=${this.effectiveStaffScale}
+                ?suppressed=${this.trayOpen}
+                @zoom-change=${this.onZoomChange}
+              ></mnx-zoom-pad>`
+            : nothing}
           ${this.trayOpen && this.session ? this.trayOverlay(entry) : nothing}
           ${this.setupPopoverOverlay()}
         </div>

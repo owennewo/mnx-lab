@@ -13,6 +13,11 @@ import { renderMnxToSvgTab } from '../engine/tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../engine/notation/notationRenderer.ts';
 import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
 import { isSmuflLoaded, loadSmufl } from '../engine/smufl/smufl.ts';
+import {
+  BASELINE_PX_PER_SP,
+  clampStaffScale,
+  type RenderScale
+} from '../engine/render/scale.ts';
 import { drawCursorGhost, drawEnclosure } from './enclosure.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
@@ -68,7 +73,22 @@ export class ScoreViewer extends LitElement {
    * names a view outranks the document, always: the hint is a hint.
    */
   @property({ type: String, reflect: true }) view: ViewSetting = 'auto';
-  @property({ type: Number }) zoom = 1;
+  /**
+   * Staff scale — a multiplier on `pxPerSp`, so line spacing, glyphs, text and
+   * stems all scale together (core-zoom-density-pad.md). Clamped 0.6–1.6.
+   *
+   * **`null` (the default) means FITTED, not 1.** Unset defers downward, per
+   * the precedence chain: with no `pxPerSp` the renderers fit a short score up
+   * to fill the viewport, and pinning it to 1 would silently switch that off
+   * for every host that never asked. A number pins the scale; `render-scale`
+   * reports what any given paint actually used.
+   *
+   * This prop used to size the paper CARD and never reached the engine —
+   * core-render-density-zoom.md called that out as the wrong wiring. It had no
+   * consumers anywhere in the repo, so it was repurposed rather than joined by
+   * a second knob meaning the same thing.
+   */
+  @property({ type: Number }) zoom: number | null = null;
   // `hasTab` was evicted (docs/core-viewer-surface.md): the element never read
   // it, so it was pure host homework — and hosts did it badly, string-searching
   // the document JSON. `view="auto"` derives the same fact from the document.
@@ -137,6 +157,17 @@ export class ScoreViewer extends LitElement {
    * numbers, so the vocabulary widens rather than changes.
    */
   @property({ type: String, reflect: true }) density: DensityPreset = 'normal';
+  /**
+   * The numeric form of the same axis — `density-h="0.82"`. When set it wins
+   * over `density`; unset (the default) the preset decides.
+   *
+   * The preset doc above reserved exactly this: *"`density-h` could accept a
+   * number later without breaking anyone — presets resolve to numbers, so the
+   * vocabulary widens rather than changes."* A continuous control
+   * (core-zoom-density-pad.md) is what needed it. Clamped by the engine's own
+   * `clampDensity`, so a host and the pad get the same floor.
+   */
+  @property({ type: Number, attribute: 'density-h' }) densityH: number | null = null;
   /**
    * The selection overlay is showing where the cursor WAS, but keystrokes
    * are going somewhere else (core-editor-focus-scope.md, stage 3): a
@@ -491,6 +522,7 @@ export class ScoreViewer extends LitElement {
       changed.has('selection') ||
       changed.has('view') ||
       changed.has('density') ||
+      changed.has('densityH') ||
       changed.has('hide') ||
       changed.has('zoom') ||
       changed.has('stringsOverride') ||
@@ -513,6 +545,11 @@ export class ScoreViewer extends LitElement {
 
     const width = this.container.getBoundingClientRect().width || 600;
     const failures: { pane: string; message: string }[] = [];
+    const staffScale = clampStaffScale(this.zoom);
+    // Whichever pane actually drew: `both` is one render, and in the split
+    // views notation and tab derive the same factor from the shared plan, so
+    // there is never a second, disagreeing answer to report.
+    let scale: RenderScale | null = null;
 
     const onNoteClick = (noteId: string, measureIdx: number, noteIdx: number) => {
       this.dispatchEvent(
@@ -535,7 +572,12 @@ export class ScoreViewer extends LitElement {
       hide: this.hiddenFeatures(),
       // The preset resolves to the engine's multiplier here — the element
       // binds a behavior it does not implement (docs/core-viewer-surface.md).
-      densityH: DENSITY_H[this.density] ?? 1
+      // A numeric `density-h` outranks the preset; unset, the preset decides.
+      densityH: this.densityH ?? DENSITY_H[this.density] ?? 1,
+      // undefined, not 10: an absent pxPerSp is what tells the renderers to
+      // FIT (core-zoom-density-pad.md, ruling 2). Sending a number here would
+      // pin every score at load and quietly retire fit-to-width.
+      pxPerSp: staffScale === null ? undefined : staffScale * BASELINE_PX_PER_SP
     };
 
     // The layout engine throws on documents using features it doesn't support
@@ -606,13 +648,13 @@ export class ScoreViewer extends LitElement {
     if (resolvedView === 'tab') {
       const pane = this.appendPane();
       guarded(pane, 'tab', () => {
-        renderMnxToSvgTab({ container: pane, ...commonOpts, tabSetup });
+        scale = renderMnxToSvgTab({ container: pane, ...commonOpts, tabSetup });
         enclosed(pane);
       });
     } else if (resolvedView === 'notation') {
       const pane = this.appendPane();
       guarded(pane, 'notation', () => {
-        renderMnxToSvgNotation({ container: pane, ...commonOpts });
+        scale = renderMnxToSvgNotation({ container: pane, ...commonOpts });
         enclosed(pane);
       });
     } else {
@@ -621,7 +663,7 @@ export class ScoreViewer extends LitElement {
       // stacked renders.
       const pane = this.appendPane();
       guarded(pane, 'both', () => {
-        renderMnxToSvgBoth({ container: pane, ...commonOpts, tabSetup });
+        scale = renderMnxToSvgBoth({ container: pane, ...commonOpts, tabSetup });
         enclosed(pane);
       });
     }
@@ -629,6 +671,21 @@ export class ScoreViewer extends LitElement {
     // Only update state when it changed, to avoid a render loop.
     if (JSON.stringify(failures) !== JSON.stringify(this.renderErrors)) {
       this.renderErrors = failures;
+    }
+
+    // `render-scale`: what this paint actually used. A host cannot print an
+    // honest zoom readout without it — `fitted` scales with the viewport, so
+    // the number moves on resize with nobody touching a control. Skipped when
+    // the layout threw: there is no scale to report, and the last good value
+    // is a better thing for a readout to keep showing than a fabricated 100%.
+    if (scale) {
+      this.dispatchEvent(
+        new CustomEvent<RenderScale>('render-scale', {
+          detail: scale,
+          bubbles: true,
+          composed: true
+        })
+      );
     }
 
     this.emitSelectionAnchor();
@@ -713,7 +770,10 @@ export class ScoreViewer extends LitElement {
   }
 
   render() {
-    const paperWidth = `min(100%, ${Math.round(820 * this.zoom)}px)`;
+    // The paper is the page, and the page does not resize when the engraving
+    // does. `zoom` used to scale this card and nothing else — now it scales
+    // the music inside it (core-zoom-density-pad.md, ruling 3).
+    const paperWidth = `min(100%, 820px)`;
 
     if (!this.mnxDoc) {
       return html`

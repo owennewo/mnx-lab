@@ -73,7 +73,9 @@ outranks any `staffKind`, always.
 | `theme` | `auto` · `light` · `dark` | `auto` | `auto` needs no host cooperation: `color-scheme` is an inherited CSS property and the component resolves `light-dark()` against the *used* value, so it follows the host page (and, for a page declaring `light dark`, the reader's preference). The attribute exists for what CSS cannot expose — a host's private convention (a `.dark` class). |
 | `hide` | comma-separated set: `lyrics`, `badges` | empty | features to omit. **One set-valued knob, not N booleans** — an options bag of `hideLyrics`/`hideBadges`/… turns every addition into a silent contract change. Unknown names are ignored, so a host naming a newer feature on an older artifact degrades to showing it rather than to a broken render. |
 | `compact` | boolean | absent | tighter paper padding for small frames. |
-| `zoom` | number | `1` | scale multiplier. |
+| `zoom` | number | *unset* | **staff scale** — a multiplier on `pxPerSp`, so line gap, glyphs, text and stems scale together. Clamped 0.6–1.6. **Unset is not `1`**: with no `pxPerSp` the renderer *fits* a short score to the viewport, and defaulting to `1` would silently retire fit-to-width for every host that never set it. Until 2026-08-15 this prop sized the paper card and never reached the engine. |
+| `density` | `normal` · `compact` · `spacious` | `normal` | **horizontal density** — how much music fits on a line, *without* shrinking glyphs. The engine scales the springs and never the rigid columns, which is what keeps this independent of `zoom` so the two compose. |
+| `density-h` | number | *unset* | the numeric form of the same axis; wins over `density` when set. Clamped by the engine's own `clampDensity` (0.5–2), so a host and a control get the same floor. The floor is **legibility, not collision** — no density can make ink overlap. |
 
 #### How a `hide` member is sorted
 
@@ -107,14 +109,43 @@ the URL it was loaded from. A host hosting the assets elsewhere sets
 `smufl-base` **on the script tag**, not on the element — it is a property of
 the build, not of a viewer instance.
 
-### Density
+### Density and zoom — on the surface as of 2026-08-15
 
-Not on the surface yet, and deliberately: the levers exist as engine constants
-but not as `RenderOptions`, so exposing an attribute now would make the element
-the implementation rather than a binding. The layering rule answers *where they
-go* — `RenderOptions` first, attribute second — which is the question
+Both axes now sit in the Presentation table above, and they arrived in the order
+the layering rule prescribes: `RenderOptions` first (`PlanOptions.densityH`
+2026-08-14, `pxPerSp` reached from the element 2026-08-15), attribute second.
+The horizontal axis shipped as a **preset** and gained its numeric form only
+when a continuous control needed one — presets are names for numbers, so the
+vocabulary widened without a breaking change, exactly as
 [core-render-density-zoom.md](../roadmap/inprogress/core-render-density-zoom.md)
-was blocked on; the work itself stays that doc's.
+predicted.
+
+They are two axes and not one knob on purpose: `zoom` changes how big the notes
+are, `density` changes how much air sits between them. Conflating them in the
+engine would be irreversible; a control that couples them for the user is not
+(the workbench's pad —
+[core-zoom-density-pad.md](../roadmap/complete/core-zoom-density-pad.md) — keeps
+them separate and shows both).
+
+**Vertical density is deliberately still absent.** Systems packing closer
+without shrinking the staff is a third axis, and `ROW_HEIGHT_SP` is a
+module-level constant derived from the row pads, so it is a real refactor rather
+than a wiring job — and the stem-length clamp should land first or alongside,
+since stem headroom feeds vertical spacing.
+
+### Reporting back
+
+`render-scale` fires after each paint with `{ pxPerSp, staffScale, fitted }`.
+It exists because **a host cannot compose a scale control without knowing the
+scale**: while `zoom` is unset the renderer picks the factor from the viewport,
+so the true number moves on resize with nobody touching a control, and any
+readout printing a hard-coded `100%` would be lying on first paint. `fitted`
+is carried rather than inferred so a control can say the value was *derived*
+rather than chosen.
+
+> Gap, recorded honestly: the element also emits `note-selected` and
+> `selection-anchored`, which predate this contract and are not described here.
+> Documenting the event surface properly is its own small pass.
 
 ### Evicted
 

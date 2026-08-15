@@ -3,6 +3,7 @@ import { PartTabSetups } from './guitarPositions.ts';
 import { layoutTab } from '../layout/tab.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import { renderScale, type RenderScale } from '../render/scale.ts';
 
 /**
  * Thin entry point for the tab view: computes layout in staff spaces,
@@ -29,9 +30,11 @@ export interface RenderTabOptions {
   /** Viewer-supplied instrument (strings/capo) — overrides the document's
    *  declaration for rendering; never written back. */
   tabSetup?: PartTabSetups;
+  /** Horizontal density multiplier (core-render-density-zoom.md). */
+  densityH?: number;
 }
 
-export function renderMnxToSvgTab(opts: RenderTabOptions): void {
+export function renderMnxToSvgTab(opts: RenderTabOptions): RenderScale {
   const basePxPerSp = opts.pxPerSp ?? DEFAULT_PX_PER_SP;
 
   const layout = layoutTab({
@@ -39,7 +42,8 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): void {
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds,
-    tabSetup: opts.tabSetup
+    tabSetup: opts.tabSetup,
+    densityH: opts.densityH
   });
 
   // An explicit pxPerSp pins the scale; the default scales short scores up to
@@ -72,4 +76,6 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): void {
         }
       : undefined
   });
+
+  return renderScale(pxPerSp, fitted);
 }
