@@ -79,7 +79,7 @@ export type MutationIntent =
   // choices flow through the same funnel — undoable, traceable, AI-emittable.
   // Construct traces start from the literal `{}` (core-element-ops-exemplar),
   // so genesis includes the part itself.
-  | { type: 'setTimeSignature'; count: number; unit: number }
+  | { type: 'setTimeSignature'; count: number; unit: number; display?: 'common' | 'cut' }
   | { type: 'setTuning'; tuning: MnxTuningEntry[] }
   | { type: 'addPart'; partId?: string; name?: string }
   | { type: 'setStaffKind'; kind: 'notation' | 'tab' | 'both' }
@@ -142,6 +142,11 @@ export type MutationIntent =
   | { type: 'wrapInContainer'; spec: PartialContainerSpec; count?: number }
   | { type: 'insertSpace'; duration: [number, number] }
   | { type: 'setRestSpelling'; duration: { base: MnxNoteValueBase; dots?: number } }
+  // Dots (campaign item 4). One key, two targets, mirroring the duration
+  // ladder exactly: an event with ink is re-valued, and over a rest or an
+  // entry ghost the PENDING duration is what changes — because a rest is
+  // absence, so there is nothing there to dot.
+  | { type: 'toggleDots' }
   | { type: 'setFullMeasureRest' }
   | { type: 'removeFullMeasureRest' }
   | { type: 'setMeasureRepeat'; number: number }

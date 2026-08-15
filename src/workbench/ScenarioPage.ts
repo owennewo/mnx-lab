@@ -71,7 +71,7 @@ type PopoverKind =
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
   time: {
     label: 'time signature',
-    placeholder: '4/4 · 6/8 · inherit',
+    placeholder: '4/4 · 6/8 · common · 2/2 cut · inherit',
     hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
   },
   tuning: {
@@ -1151,13 +1151,18 @@ export class ScenarioPage extends LitElement {
     if (this.setupPopover === 'time') {
       const time = parseTimeSignature(input.value);
       if (!time) {
-        this.setupPopoverError = 'not a time signature — try 4/4, 6/8, or “inherit”';
+        this.setupPopoverError = 'not a time signature — try 4/4, 6/8, common, 2/2 cut, or “inherit”';
         return;
       }
       this.stripIntent(
         time === 'inherit'
           ? { type: 'removeTimeSignature' }
-          : { type: 'setTimeSignature', count: time.count, unit: time.unit }
+          : {
+              type: 'setTimeSignature',
+              count: time.count,
+              unit: time.unit,
+              ...(time.display ? { display: time.display } : {})
+            }
       );
     } else if (this.setupPopover === 'tuning') {
       const tuning = parseTuning(input.value);
@@ -1279,7 +1284,7 @@ export class ScenarioPage extends LitElement {
         'space' in parsed
           ? { type: 'insertSpace', duration: parsed.space }
           : 'rest' in parsed
-            ? { type: 'setRestSpelling', duration: { base: parsed.rest } }
+            ? { type: 'setRestSpelling', duration: parsed.rest }
           : {
               type: 'wrapInContainer',
               spec: parsed.wrap,
@@ -1695,7 +1700,7 @@ export class ScenarioPage extends LitElement {
           <button @click=${() => this.openPopover('lyricPopover')}>lyric…</button>
         </div>
         <div class="action-state">
-          entry duration: ${this.session.entryDurationBase}
+          entry duration: ${this.session.entryDurationBase}${'.'.repeat(this.session.entryDurationDots)}
           ${this.session.spanAnchor
             ? html`<span
                 class="span-anchor"

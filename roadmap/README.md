@@ -285,6 +285,16 @@ proposals that name their campaign.
   scenarios **71 → 78**, removable elements **1003 → 1022**, goldens untouched
   (drawing remains [core-guitar-technique.md](proposed/core-guitar-technique.md)'s
   gap).
+- **[core-element-ops-duration-completion.md](inprogress/core-element-ops-duration-completion.md)** —
+  campaign item 4, **built 2026-08-15**: the dot (`.`, cycling 0→1→2→none, splitting
+  ink from absence exactly as the duration ladder does) and the time signature's
+  **glyph** (`common`, `2/2 cut` — `display` is what it is DRAWN as, not the meter).
+  Capo turned out to have been closed by item 13, so the row was two verbs, not
+  three — check the index before building from it. The dot uncovered a silent clamp:
+  entry took the shorter of the pending duration and the rest it landed on, so a
+  dotted quarter over beat-rest padding came out plain. Entry now eats following
+  RESTS to make room and refuses when ink is in the way. Dotted rests stay with
+  11b's spelling verb (`rest half.`), because a rest is absence.
 - **[core-element-ops-onset-granularity.md](inprogress/core-element-ops-onset-granularity.md)** —
   campaign item 11b's first half, **built 2026-08-14**: the bug that stopped item
   11 recording a beam trace, and it had nothing to do with beams — **a run of short

@@ -16,18 +16,31 @@ import type {
 
 /** "4/4", "6/8", "12/8" → an MNX time signature. Unit must be a power of two
  *  the notation can express. */
-export function parseTimeSignature(text: string): { count: number; unit: number } | 'inherit' | null {
-  const token = text.trim().toLowerCase();
+export function parseTimeSignature(
+  text: string
+): { count: number; unit: number; display?: 'common' | 'cut' } | 'inherit' | null {
+  let token = text.trim().toLowerCase();
   // The inherited-attribute removal token (campaign item 5), now on its third
   // family: clef, key, and the meter itself.
   if (token === INHERIT_TOKEN || token === '-') return 'inherit';
-  const match = /^\s*(\d{1,2})\s*\/\s*(\d{1,3})\s*$/.exec(text);
+  // The GLYPH, not the meter (campaign item 4): common time is 4/4 drawn as
+  // 𝄴, so the bare word implies the meter every player means by it, and the
+  // qualified form spells the meter out.
+  if (token === 'common') return { count: 4, unit: 4, display: 'common' };
+  if (token === 'cut') return { count: 2, unit: 2, display: 'cut' };
+  let display: 'common' | 'cut' | undefined;
+  const glyph = /^(.*?)\s+(common|cut)$/.exec(token);
+  if (glyph) {
+    display = glyph[2] as 'common' | 'cut';
+    token = glyph[1];
+  }
+  const match = /^\s*(\d{1,2})\s*\/\s*(\d{1,3})\s*$/.exec(token);
   if (!match) return null;
   const count = Number(match[1]);
   const unit = Number(match[2]);
   if (count < 1 || count > 32) return null;
   if (![1, 2, 4, 8, 16, 32, 64].includes(unit)) return null;
-  return { count, unit };
+  return { count, unit, ...(display ? { display } : {}) };
 }
 
 /** Named tunings, recited the way players do (low string first). */
@@ -474,7 +487,7 @@ export function parseLyric(text: string): LyricResult {
 
 export const RHYTHM_HELP =
   '3:2 · 3 eighth in 2 eighth · 3 eighth in 1 quarter, no number · ' +
-  'grace · grace 2 · appoggiatura · acciaccatura · tremolo 2 · space 1/4 · rest half';
+  'grace · grace 2 · appoggiatura · acciaccatura · tremolo 2 · space 1/4 · rest half.';
 
 /** The note values a wrap may name, spelled as the schema spells them. */
 const NOTE_VALUES: Record<string, MnxNoteValueBase> = {
@@ -506,7 +519,7 @@ export type PartialContainerSpec =
 
 export type RhythmResult =
   | { space: [number, number] }
-  | { rest: MnxNoteValueBase }
+  | { rest: { base: MnxNoteValueBase; dots?: number } }
   | { wrap: PartialContainerSpec; count?: number }
   | null;
 
@@ -519,10 +532,13 @@ export function parseRhythm(text: string): RhythmResult {
   // Rest SPELLING (campaign item 11b): entry pads with beat rests because the
   // cursor's positions are the rest events; an author who wants the engraver's
   // one half rest says so here, after the fact.
-  const rest = /^rest\s+(\S+)$/.exec(token);
+  const rest = /^rest\s+(\S+?)(\.*)$/.exec(token);
   if (rest) {
     const value = NOTE_VALUES[rest[1]];
-    return value ? { rest: value } : null;
+    // Trailing dots read as they are written: `rest half.` is a dotted half
+    // rest. Dotted rests have no key of their own because a rest is absence —
+    // the spelling verb is their only route (campaign items 11b and 4).
+    return value ? { rest: { base: value, ...(rest[2] ? { dots: rest[2].length } : {}) } } : null;
   }
 
   const space = /^space\s+(\d+)\s*\/\s*(\d+)$/.exec(token);

@@ -117,7 +117,10 @@ export type EditOp =
       /** Set the time signature on a global measure (persists until changed). */
       type: 'setTimeSignature';
       measureIndex: number;
-      time: { count: number; unit: number };
+      /** `display` is the GLYPH, not the meter: common time is 4/4 drawn as
+       *  𝄴. The renderer already reads it (`spec/time-signature-glyphs`); it
+       *  had no way in. */
+      time: { count: number; unit: number; display?: 'common' | 'cut' };
     }
   | {
       /** Declare the part's string tuning (`_x.mnxLab.strings`). */
@@ -636,13 +639,19 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           // it (never by shortening in place, which would drag every later
           // event earlier). Campaign item 11b — before this, the second note
           // of a short run always came out as long as the rest it landed on.
-          const surplus = subtractOnsets(durationSpan(event.duration), durationSpan(op.duration));
+          // Longer than the rest it lands on? Eat the FOLLOWING rests to make
+          // room — a dotted quarter over beat-rest padding is the ordinary
+          // case (campaign item 4), and clamping it to the rest's own value
+          // would be exactly the silent clamp this codebase refuses. Ink is
+          // never consumed: if a note stands in the way, the entry refuses.
+          const eaten = restsCovering(seq, found.index, durationSpan(op.duration));
+          if (eaten === null) return next;
+          const surplus = subtractOnsets(eaten.span, durationSpan(op.duration));
+          seq.content.splice(found.index + 1, eaten.count - 1);
           delete event.rest;
           event.notes = [note];
-          if (surplus.num > 0) {
-            event.duration = { ...op.duration };
-            seq.content.splice(found.index + 1, 0, ...restsSpanning(surplus));
-          }
+          event.duration = { ...op.duration };
+          if (surplus.num > 0) seq.content.splice(found.index + 1, 0, ...restsSpanning(surplus));
           return next;
         }
         event.notes ??= [];
@@ -674,13 +683,19 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           // Same rule as `insertNote` above (campaign item 11b): a rest is
           // absence, so the note takes the PENDING duration and the surplus
           // stays as rest after it.
-          const surplus = subtractOnsets(durationSpan(event.duration), durationSpan(op.duration));
+          // Longer than the rest it lands on? Eat the FOLLOWING rests to make
+          // room — a dotted quarter over beat-rest padding is the ordinary
+          // case (campaign item 4), and clamping it to the rest's own value
+          // would be exactly the silent clamp this codebase refuses. Ink is
+          // never consumed: if a note stands in the way, the entry refuses.
+          const eaten = restsCovering(seq, found.index, durationSpan(op.duration));
+          if (eaten === null) return next;
+          const surplus = subtractOnsets(eaten.span, durationSpan(op.duration));
+          seq.content.splice(found.index + 1, eaten.count - 1);
           delete event.rest;
           event.notes = [note];
-          if (surplus.num > 0) {
-            event.duration = { ...op.duration };
-            seq.content.splice(found.index + 1, 0, ...restsSpanning(surplus));
-          }
+          event.duration = { ...op.duration };
+          if (surplus.num > 0) seq.content.splice(found.index + 1, 0, ...restsSpanning(surplus));
           return next;
         }
         event.notes ??= [];
@@ -1504,6 +1519,26 @@ function subtractOnsets(a: Onset, b: Onset): Onset {
  */
 /** Decompose a span into legal rest events, longest first — the same ladder
  *  `padMeasureRests` uses, factored out so entry can fill a gap IN PLACE. */
+/**
+ * The run of rests starting at `index` that covers `want`, and how much time
+ * they hold. Null when ink (or the end of the bar) gets in the way first —
+ * entry may lengthen silence, never overwrite music.
+ */
+function restsCovering(
+  seq: MnxSequence,
+  index: number,
+  want: Onset
+): { count: number; span: Onset } | null {
+  let span: Onset = { num: 0, den: 1 };
+  for (let i = index; i < seq.content.length; i++) {
+    const item = seq.content[i];
+    if (!isTimedEvent(item) || !item.rest) break;
+    span = addOnsets(span, itemSpan(item));
+    if (!onsetLess(span, want)) return { count: i - index + 1, span };
+  }
+  return null;
+}
+
 function restsSpanning(span: Onset): MnxEvent[] {
   const rests: MnxEvent[] = [];
   let remainder = span;

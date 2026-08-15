@@ -171,6 +171,15 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
+    keys: '.',
+    strokes: [{ code: 'Period' }, { code: 'NumpadDecimal' }],
+    group: 'editing',
+    meaning: {
+      note: 'dot the note (cycles 0 → 1 → 2 → none); on an empty cell: the pending entry duration',
+      event: 'dot the event (cycles 0 → 1 → 2 → none)'
+    }
+  },
+  {
     keys: 'Shift+M',
     strokes: [{ code: 'KeyM', shift: true }],
     group: 'editing',

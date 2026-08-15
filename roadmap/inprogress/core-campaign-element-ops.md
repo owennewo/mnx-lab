@@ -91,7 +91,7 @@ agreed or candidate claims; **bold** = agreed.
 | 1 | [exemplar](../complete/core-element-ops-exemplar.md) | Both harness halves built end-to-end over two simple scenarios (`minimal-single-note`, `open-strings-chord`). Start is **decided: the literal `{}`** — so the campaign's first new ops are the genesis verbs (`addPart`, skeleton-on-demand; score rung, setup tier) and the session is hardened for zero parts/measures. Settles key normalization; adds the **op-queue panel** (side-panel ops tab: `appliedOps` as a visible undo/redo queue) so command sequences can be read and reviewed. | the algorithm + genesis ops + 2 traced scenarios | **Shift+P** part popover; staffKind: palette | **score** | **complete 2026-08-14** |
 | 2 | [destructibility sweep](core-element-ops-destruct-sweep.md) | Item 1's reverse walk scaled corpus-wide: element walker per kind (noteKeys generalized), attempt address+delete per element; oracles: applies / no new diagnostics / no dangling references / undo byte-identical, **widened** (relative validity, references past ties, a surviving-document check). No trace fixtures — the walk regenerates each run; the report is the artifact. Doubles as ladder addressability audit. Fix the `deleteNote` dangling-reference bug it will catch. | verdicts for all 106 | n/a | n/a | **built 2026-08-14** |
 | 3 | [constructibility traces](core-element-ops-construct-traces.md) | Item 1's forward harness scaled: the construct-fixture kind + per-scenario tiers (unreachable → ops-reachable → keyboard-reachable → traced) + the expected-unreachable class. Traces themselves arrive with items 4–13 (recorded via "copy trace", never hand-written); possible workbench coverage map later. Inherits item 1's parked **recording surface** question: "copy trace" stamps a corpus scenario id as the start, so recording from `{}` wants the new-document journey — and with it, the ops tab on non-scenario (IndexedDB) documents. | verdict machinery for all 106; traces accumulate per item | n/a | n/a | **built 2026-08-14** |
-| 4 | duration completion | Dots (op already accepts `dots?` — cheapest unlock), capo (read but unwritable), time `display: common\|cut`. | ~10 | dot: single key (`.` candidate); capo/display: popover grammar | event / setup | undrafted |
+| 4 | [duration completion](core-element-ops-duration-completion.md) | Dots and time `display: common\|cut` — capo turned out to be **already closed by item 13**, so the row was two verbs, not three. The dot is one key cycling 0→1→2→none, splitting ink/absence like the ladder; dotted RESTS go through 11b's spelling verb (`rest half.`). Uncovered and fixed: entry could not lengthen past the rest it landed on, so dots were unenterable. | traceability for 7 scenarios (6 dotted, 1 glyph); no new kinds | **`.`** ; `common`/`4/4 cut` in the time popover | event / setup | **complete 2026-08-15** |
 | 5 | [clef, key & time](core-element-ops-clef-key.md) | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class; `inherit` is the removal token. | **22 scenarios reachable** (from 1); 101 clefs + 6 key sigs + 95 time sigs removable | **Shift+C** clef, **Shift+K** key | **measure** | **built 2026-08-14** |
 | 6 | accidental spelling | Flats (natural-then-sharp policy makes E♭ unwritable), enharmonic respell, `accidentalDisplay`/parentheses. | 9+ | respell: single key | note | undrafted |
 | 7 | [bar-attribute family](core-element-ops-bar-attributes.md) | Barlines, repeats, endings, segno/jump/fine, sections, rehearsal, tempo — one typed-popover family on the global measure. ONE op pair for ten kinds; `no <attribute>` strips. | **18 scenarios** (reachable 24 → 42); 56 elements removable | **Shift+B** | **measure** | **built 2026-08-14** |
@@ -752,3 +752,20 @@ ops-reachable 80 → 89**. Three things worth carrying to items 4 and 6:
   byte-identity. The target is human-verified, so the test cannot be satisfied
   by whatever the ops happen to emit — it caught the tremolo's performed `outer`
   being the written value DIVIDED by the count, which copying would have missed.
+
+### 2026-08-15 — item 4: check the row before building it
+
+Two of the row's three parts were not what it said. **Capo had been writable
+since item 13** (`setPartDeclaration`, `Shift+P → capo 3`) — the row was true
+when written and stale when picked up. A campaign index ages; reading it as a
+spec rather than a starting point would have produced a duplicate verb.
+
+The other learning is the campaign's most repeated one, third sighting:
+**a feature is usually blocked by a neighbour's assumption, not by its own
+absence.** Dots were unenterable because entry took the shorter of the pending
+duration and the rest it landed on — a dotted quarter over beat-rest padding
+came out a plain quarter. The dot code was fine; the clamp was the bug, and it
+was silent because nothing had ever asked for more than a beat. (The other two:
+`space.duration`'s field shape, and rest spelling being coupled to the entry
+grid.) Worth making a habit of: before building a family, try the neighbouring
+op with the value the family will need.

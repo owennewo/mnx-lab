@@ -87,6 +87,11 @@ export class EditorSession {
   private intents: EditorIntent[] = [];
   /** Duration a fresh entry event gets; `-`/`=` on an entry ghost step it. */
   private entryDuration: MnxNoteValueBase = 'quarter';
+  /** Dots on the PENDING entry duration (campaign item 4). Separate from the
+   *  base because the ladder steps one and the dot key the other, and a
+   *  dotted quarter stepping to an eighth stays dotted — as it does in every
+   *  editor a player has used. */
+  private entryDots = 0;
   /** Digit-combining anchor: consecutive fret digits on an unmoved cursor
    *  combine (1,2 → 12) — deterministic, no timers, so traces replay. */
   private lastDigit: { anchor: string; fret: number } | null = null;
@@ -141,6 +146,11 @@ export class EditorSession {
 
   get entryDurationBase(): MnxNoteValueBase {
     return this.entryDuration;
+  }
+
+  /** Dots the next entered note will carry. */
+  get entryDurationDots(): number {
+    return this.entryDots;
   }
 
   get canUndo(): boolean {
@@ -276,7 +286,7 @@ export class EditorSession {
           measureIndex: this.cursorState.measureIndex,
           onset: [this.cursorState.onset.num, this.cursorState.onset.den],
           pitch: pitchAtStaffPosition(clef, this.cursorState.line, fifths),
-          duration: { base: this.entryDuration }
+          duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) }
         });
         return true;
       }
@@ -337,7 +347,30 @@ export class EditorSession {
           type: 'setDuration',
           measureIndex: this.cursorState.measureIndex,
           onset: [this.cursorState.onset.num, this.cursorState.onset.den],
-          duration: { base: next }
+          // Dots survive a re-value: stepping a dotted quarter gives a dotted
+          // eighth, not a plain one. The dot is a property of the value the
+          // player is writing, and the ladder steps the value.
+          duration: { base: next, ...(event.duration.dots ? { dots: event.duration.dots } : {}) }
+        });
+        return true;
+      }
+      case 'toggleDots': {
+        // The same split the duration ladder makes: ink is re-valued, absence
+        // moves the pending duration instead (campaign item 11b's rule, item
+        // 4's key). Dotted RESTS are reached by `rest half.` — the spelling
+        // verb — for exactly that reason.
+        const event = this.eventUnderCursor();
+        const cycle = (dots: number) => (dots + 1) % 3;
+        if (!event || (event.notes?.length ?? 0) === 0) {
+          this.entryDots = cycle(this.entryDots);
+          return true;
+        }
+        const dots = cycle(event.duration.dots ?? 0);
+        this.apply({
+          type: 'setDuration',
+          measureIndex: this.cursorState.measureIndex,
+          onset: [this.cursorState.onset.num, this.cursorState.onset.den],
+          duration: { base: event.duration.base, ...(dots ? { dots } : {}) }
         });
         return true;
       }
@@ -345,7 +378,11 @@ export class EditorSession {
         this.apply({
           type: 'setTimeSignature',
           measureIndex: this.cursorState.measureIndex,
-          time: { count: intent.count, unit: intent.unit }
+          time: {
+            count: intent.count,
+            unit: intent.unit,
+            ...(intent.display ? { display: intent.display } : {})
+          }
         });
         return true;
       }
@@ -884,7 +921,7 @@ export class EditorSession {
         onset: [this.cursorState.onset.num, this.cursorState.onset.den],
         string: this.cursorState.line,
         fret,
-        duration: { base: this.entryDuration }
+        duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) }
       });
     }
     this.lastDigit = { anchor, fret };

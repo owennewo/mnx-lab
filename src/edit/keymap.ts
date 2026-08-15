@@ -80,6 +80,11 @@ export const EDIT_LAYER: KeymapLayer = {
     { code: 'ArrowRight', alt: true, intent: { type: 'longerDuration' } },
     { code: 'Minus', intent: { type: 'shorterDuration' } },
     { code: 'Equal', intent: { type: 'longerDuration' } },
+    // The dot (campaign item 4): `.` beside the ladder it modifies, and the
+    // key every notation editor already uses. Cycles 0 → 1 → 2 → none, so one
+    // key both adds and removes.
+    { code: 'Period', intent: { type: 'toggleDots' } },
+    { code: 'NumpadDecimal', intent: { type: 'toggleDots' } },
     // Tie: `T` (Dorico/MuseScore convention; free in this scheme — the
     // technique alphabet B H S V X O doesn't claim it).
     // The coincidence discriminator (core-note-address.md move 2). Alt, not a
