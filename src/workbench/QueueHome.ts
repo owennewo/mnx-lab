@@ -49,25 +49,27 @@ export class QueueHome extends LitElement {
         max-width: 860px;
       }
 
+      /* Type comes from .band-label (sharedChrome); only layout is local. The
+         count is the loud half — a small tracked label with an accent number
+         beside it, which is how the panel's stat strip reads too. */
       h2 {
-        font-size: 12px;
-        font-family: var(--mono);
-        letter-spacing: 0.07em;
-        text-transform: uppercase;
-        color: var(--ink-2);
         margin: 0 0 8px;
         display: flex;
         gap: 8px;
-        align-items: center;
+        align-items: baseline;
       }
 
       h2 .n {
-        color: var(--accent);
+        font-size: 12px;
+        color: var(--accent-fg);
+        font-variant-numeric: tabular-nums;
       }
 
+      /* A list is a framed region, so its edge is a rule; the hairlines stay
+         INSIDE it, between rows. That is the whole distinction the two weights
+         carry (workbench-chrome-language.md). */
       .rows {
-        border: 1px solid var(--line);
-        border-radius: var(--radius-panel);
+        border: var(--rule-w) solid var(--ink);
         overflow: hidden;
         background: var(--surface);
       }
@@ -89,7 +91,7 @@ export class QueueHome extends LitElement {
       }
 
       .row:hover {
-        background: var(--hover);
+        background: var(--bg-context);
       }
 
       .row .id {
@@ -103,8 +105,7 @@ export class QueueHome extends LitElement {
       }
 
       .empty {
-        border: 1px dashed var(--line-strong);
-        border-radius: var(--radius-card);
+        border: var(--rule-w) dashed var(--line-strong);
         padding: 34px;
         max-width: 860px;
         text-align: center;
@@ -126,7 +127,7 @@ export class QueueHome extends LitElement {
     if (items.length === 0) return nothing;
     return html`
       <section>
-        <h2><span class="n">${items.length}</span> ${title}</h2>
+        <h2 class="band-label"><span class="n">${items.length}</span> ${title}</h2>
         <div class="rows">
           ${items.map(
             i => html`

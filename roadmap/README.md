@@ -40,6 +40,23 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[workbench-chrome-language.md](proposed/workbench-chrome-language.md)** — **the rail and
+  the headers in the panel's language**, a post-campaign item against
+  [core-campaign-modernist.md](complete/core-campaign-modernist.md) rather than a reopening
+  of its closed index. That campaign flipped the tokens workbench-wide but gave only the
+  right-hand side panel a *frame*, so the app ran one palette across two grammars: 2px ink
+  rules and tracked Archivo labels on the right, hairlines and mono on the left. Three
+  moves, all the panel's own — a rule is 2px of ink (the rail's right edge now mirrors
+  `.panel`'s left, so the score sits between equals), the rail gains the panel's pinned
+  context band over ONE scrolling body, and both tab strips become the same control. Adds
+  exactly one shared primitive (`.band-label`, adopted at three sites, per the campaign's
+  own *"a shared primitive nobody adopts is just dead code with a good reputation"*), and
+  the rail's current row finally adopts `.row-state`/`.row-current` instead of spelling it
+  a fourth way. Records two corrections: every `--radius-*` was **already** `0px`, so the
+  rounding this item set out to remove had been gone for a day; and the two tab strips
+  cannot align horizontally, because `.head` spans above `.body`. **Built 2026-08-15 on
+  branch `workbench-chrome-language`**, gates green and goldens byte-identical, awaiting a
+  clean `main` to land.
 - **[core-entry-surface.md](proposed/core-entry-surface.md)** — typing anywhere the
   cursor can already go, graduated out of the element-ops campaign (2026-08-15) as the
   last thing holding its index open. The cursor addresses part → staff → voice in full

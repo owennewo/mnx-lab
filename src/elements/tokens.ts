@@ -347,6 +347,26 @@ export const sharedChrome = css`
     background: var(--bg-context);
   }
 
+  /* THE SECTION LABEL. The panel's tab strip, its stat keys and its context bar
+     all name things the same way — Archivo 600, small, uppercase, generously
+     tracked — and before this every OTHER list in the app named things in mono
+     instead (the rail's group headings, the queue home's and the coverage map's
+     section headings, at three different sizes and two tracking values). Mono is
+     reserved for what the MACHINE owns (ids, hashes, versions, counts); a
+     heading is something a person wrote, so it is set in the same face as the
+     prose it introduces. See roadmap/proposed/workbench-chrome-language.md.
+
+     Type only, deliberately: LAYOUT stays with the use site, because the rail's
+     heading floats a count to the right margin and the section headings put
+     theirs inline with a hint after it. A primitive that tried to own both
+     would be overridden at both. */
+  .band-label {
+    font: 600 10px/1 var(--sans);
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
   /* .pip[data-st] and .gapdia lived here and were rendered by NOTHING - dead
      since some earlier refactor, and between them they were the only consumers
      of two of the five status tokens. Removed with those tokens

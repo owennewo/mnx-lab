@@ -203,19 +203,28 @@ export class WorkbenchApp extends LitElement {
         border-color: var(--accent);
       }
 
+      /* THE HEADER AS A BAND (workbench-chrome-language.md). Structurally this
+         was always the panel's band 3 — pinned, never scrolling, naming what
+         you are looking at — so it now says so: the context ground, and a full
+         2px ink rule under it rather than a hairline. Alignment moves from
+         baseline to centre because a band aligns its contents to itself. */
       header {
         grid-area: header;
         display: flex;
-        align-items: baseline;
+        align-items: center;
         gap: 14px;
-        padding: 10px 18px;
-        border-bottom: 1px solid var(--line);
+        padding: 0 18px;
+        min-height: 46px;
+        background: var(--bg-context);
+        border-bottom: var(--rule-w) solid var(--ink);
       }
 
       header .brand {
         font-family: var(--sans);
-        font-size: 17px;
-        font-weight: 500;
+        font-size: 15px;
+        /* 600, the weight .ctx-name uses for the thing being named. Not
+           uppercase: this is a name, not a label. */
+        font-weight: 600;
       }
 
       header .brand a {
@@ -223,32 +232,84 @@ export class WorkbenchApp extends LitElement {
         text-decoration: none;
       }
 
+      /* The facts strip is a STAT STRIP, and the panel already decided what one
+         looks like (.fact-k / .fact-v). Same two roles here, inline rather than
+         in four columns. The values stay in Archivo rather than mono for the
+         same reason the panel's do: a version and a count are facts being read,
+         not identifiers being copied — two voices spends mono on ids, hashes
+         and paths. */
       header .facts {
-        font-family: var(--mono);
-        font-size: 11px;
-        color: var(--ink-3);
         display: flex;
-        gap: 14px;
+        gap: 18px;
         margin-left: auto;
+        align-items: baseline;
+      }
+
+      header .fact {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+      }
+
+      header .fact-k {
+        font: 600 9.5px/1 var(--sans);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+
+      header .fact-v {
+        font: 600 12px/1.2 var(--sans);
+        color: var(--ink-2);
+        font-variant-numeric: tabular-nums;
       }
 
       /* The coverage fraction was always a tease; make it the door. */
-      header .facts .cov {
-        color: inherit;
-        text-decoration: none;
-        border-bottom: 1px dotted var(--line-strong);
+      header a.fact-v {
+        text-decoration: underline;
+        text-decoration-color: var(--line-strong);
+        text-underline-offset: 3px;
       }
 
-      header .facts .cov:hover {
-        color: var(--accent);
+      header a.fact-v:hover {
+        color: var(--accent-fg);
+        text-decoration-color: var(--accent);
       }
 
+      /* THE RAIL, BANDED (workbench-chrome-language.md). The whole nav used to
+         be one scroll; it is now the panel's frame mirrored — a pinned context
+         band (the queue link and the filter) over the ONE scrolling body. The
+         right edge is a full rule, so the score sits between two 2px rules of
+         equal weight instead of a hairline on one side and .panel's rule on the
+         other. */
       nav {
         grid-area: rail;
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
         background: var(--bg-rail);
-        border-right: 1px solid var(--line);
-        padding: 12px 0 24px;
+        border-right: var(--rule-w) solid var(--ink);
+      }
+
+      /* Band 3: pinned, so the filter you are typing into cannot scroll away
+         from the list it filters. */
+      .rail-context {
+        flex: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 12px;
+        background: var(--bg-context);
+        border-bottom: var(--rule-w) solid var(--ink);
+      }
+
+      /* Band 4 — the only scrolling region in the rail. */
+      .rail-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 4px 0 24px;
       }
 
       main {
@@ -257,15 +318,18 @@ export class WorkbenchApp extends LitElement {
         min-width: 0;
       }
 
+      /* Inside the band, so it carries the band's own surface rather than a
+         margin. The context bar's buttons are the nearest relative in the
+         panel; this one is a full-width destination rather than an action, so
+         it keeps prose case and the reading size. */
       .queue-link {
         display: block;
-        margin: 0 10px 10px;
-        padding: 8px 10px;
-        border-radius: var(--radius-control);
+        padding: 7px 10px;
         font-size: 12.5px;
         font-weight: 500;
         color: var(--ink);
         text-decoration: none;
+        background: var(--surface);
         border: 1px solid var(--line);
       }
 
@@ -280,44 +344,42 @@ export class WorkbenchApp extends LitElement {
 
       .search {
         display: block;
-        width: calc(100% - 20px);
-        margin: 0 10px 12px;
+        width: 100%;
         padding: 6px 9px;
         font: inherit;
         font-size: 12px;
         color: var(--ink);
-        background: transparent;
+        background: var(--surface);
         border: 1px solid var(--line);
-        border-radius: var(--radius-input);
         box-sizing: border-box;
       }
 
-      .cat {
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--ink-3);
-        padding: 10px 18px 4px;
+      .search:focus-visible {
+        outline: var(--rule-w) solid var(--focus-ring);
+        outline-offset: 1px;
       }
 
+      /* Type comes from .band-label; only the layout is local — the count sits
+         out at the right margin, which the section headings elsewhere do not
+         do. */
+      .cat {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        padding: 14px 18px 5px;
+      }
+
+      /* Left padding is 16 rather than 18 because .row-state draws a 2px edge
+         on EVERY row: the text stays put when a row becomes current, which is
+         the whole reason that primitive reserves the edge. */
       .item {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 4px 18px;
+        padding: 4px 18px 4px 16px;
         font-size: 12.5px;
         color: var(--ink);
         text-decoration: none;
-      }
-
-      .item:hover {
-        background: var(--hover);
-      }
-
-      .item[aria-current='true'] {
-        background: var(--hover);
-        color: var(--accent);
       }
 
       /* Queue state, by shape as well as colour. */
@@ -373,14 +435,17 @@ export class WorkbenchApp extends LitElement {
         min-width: 0;
       }
 
+      /* Provenance chips, and deliberately the panel's .def chip in miniature —
+         mono on --surface inside a hairline, because both are machine-owned
+         words attached to something a person is reading. */
       .tag {
         flex-shrink: 0;
         font-family: var(--mono);
         font-size: 9px;
         letter-spacing: 0.04em;
         color: var(--ink-3);
+        background: var(--surface);
         border: 1px solid var(--line);
-        border-radius: var(--radius-xs);
         padding: 0 4px;
         line-height: 1.5;
       }
@@ -393,7 +458,7 @@ export class WorkbenchApp extends LitElement {
       }
 
       .cat-n {
-        float: right;
+        margin-left: auto;
         color: var(--ink-3);
         font-variant-numeric: tabular-nums;
       }
@@ -611,8 +676,17 @@ export class WorkbenchApp extends LitElement {
   private railItem(e: ScenarioEntry, active: string | null) {
     const { state, detail } = classify(e);
     const record = e.meta.verification;
+    // The current row is the SHARED row state (sharedChrome's .row-state /
+    // .row-current), not a rail-local tint: it is the same "this is the one"
+    // the ops list and the HUD's active rung draw. Adopting it here is what
+    // stops the rail from spelling the state a fourth way.
+    const current = e.id === active;
     return html`
-      <a class="item" href=${scenarioHref(e.id)} aria-current=${e.id === active}>
+      <a
+        class="item row-state ${current ? 'row-current' : ''}"
+        href=${scenarioHref(e.id)}
+        aria-current=${current}
+      >
         <span
           class="dot ${state}${e.invalidByDesign ? ' by-design' : ''}"
           title=${`${detail}${e.invalidByDesign ? ' · invalid by design' : ''}${
@@ -648,32 +722,51 @@ export class WorkbenchApp extends LitElement {
         </button>
         <span class="brand"><a href="#/">MNX Lab — workbench</a></span>
         <span class="facts">
-          <span>MNX v${corpusManifest.mnxVersion} · ext v${corpusManifest.extensionVersion}</span>
-          <a class="cov" href=${objectsHref()}
-            >coverage ${coverage.covered}/${coverage.total} $defs</a
-          >
-          <span>${corpus.length} scenarios</span>
+          <span class="fact">
+            <span class="fact-k">MNX</span>
+            <span class="fact-v">v${corpusManifest.mnxVersion}</span>
+          </span>
+          <span class="fact">
+            <span class="fact-k">ext</span>
+            <span class="fact-v">v${corpusManifest.extensionVersion}</span>
+          </span>
+          <span class="fact">
+            <span class="fact-k">coverage</span>
+            <a class="fact-v" href=${objectsHref()} title="every non-plumbing $def, by coverage"
+              >${coverage.covered}/${coverage.total}</a
+            >
+          </span>
+          <span class="fact">
+            <span class="fact-k">scenarios</span>
+            <span class="fact-v">${corpus.length}</span>
+          </span>
         </span>
       </header>
       <nav>
-        <a class="queue-link" href="#/">
-          Attention queue —
-          <span class="count">${attention === 0 ? 'empty' : attention}</span>
-          <span style="color: var(--ink-3)">(${queue.currentCount} current)</span>
-        </a>
-        <input
-          class="search"
-          type="search"
-          placeholder="Filter scenarios…"
-          .value=${this.query}
-          @input=${(e: InputEvent) => (this.query = (e.target as HTMLInputElement).value)}
-        />
-        ${[...this.grouped()].map(
-          ([group, entries]) => html`
-            <div class="cat">${group}<span class="cat-n">${entries.length}</span></div>
-            ${entries.map(e => this.railItem(e, active))}
-          `
-        )}
+        <div class="rail-context">
+          <a class="queue-link" href="#/">
+            Attention queue —
+            <span class="count">${attention === 0 ? 'empty' : attention}</span>
+            <span style="color: var(--ink-3)">(${queue.currentCount} current)</span>
+          </a>
+          <input
+            class="search"
+            type="search"
+            placeholder="Filter scenarios…"
+            .value=${this.query}
+            @input=${(e: InputEvent) => (this.query = (e.target as HTMLInputElement).value)}
+          />
+        </div>
+        <div class="rail-body">
+          ${[...this.grouped()].map(
+            ([group, entries]) => html`
+              <div class="cat band-label">
+                ${group}<span class="cat-n">${entries.length}</span>
+              </div>
+              ${entries.map(e => this.railItem(e, active))}
+            `
+          )}
+        </div>
       </nav>
       <main>
         ${this.route.page === 'scenario'

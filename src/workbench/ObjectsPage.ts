@@ -78,12 +78,10 @@ export class ObjectsPage extends LitElement {
         max-width: 900px;
       }
 
+      /* Type comes from .band-label (sharedChrome); only layout is local — the
+         count and the hint sit inline here, which is why the primitive carries
+         no layout of its own. */
       h2 {
-        font-size: 12px;
-        font-family: var(--mono);
-        letter-spacing: 0.07em;
-        text-transform: uppercase;
-        color: var(--ink-2);
         margin: 0 0 8px;
         display: flex;
         gap: 8px;
@@ -91,23 +89,29 @@ export class ObjectsPage extends LitElement {
       }
 
       h2 .n {
-        color: var(--accent);
+        font-size: 12px;
+        color: var(--accent-fg);
+        font-variant-numeric: tabular-nums;
       }
 
+      /* The hint is a SENTENCE, so it drops out of label voice entirely and
+         back into prose. */
       h2 .hint {
+        font-weight: 400;
         text-transform: none;
         letter-spacing: 0;
         color: var(--ink-3);
         font-size: 11px;
       }
 
+      /* Framed region: a rule at the edge, hairlines inside (here the 1px grid
+         gap showing the ground through). */
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
         gap: 1px;
         background: var(--line);
-        border: 1px solid var(--line);
-        border-radius: var(--radius-panel);
+        border: var(--rule-w) solid var(--ink);
         overflow: hidden;
       }
 
@@ -125,7 +129,7 @@ export class ObjectsPage extends LitElement {
       }
 
       .cell:hover {
-        background: var(--hover);
+        background: var(--bg-context);
       }
 
       .cell .counts {
@@ -140,8 +144,7 @@ export class ObjectsPage extends LitElement {
       }
 
       .rows {
-        border: 1px solid var(--line);
-        border-radius: var(--radius-panel);
+        border: var(--rule-w) solid var(--ink);
         overflow: hidden;
         background: var(--surface);
       }
@@ -162,7 +165,7 @@ export class ObjectsPage extends LitElement {
       }
 
       .row:hover {
-        background: var(--hover);
+        background: var(--bg-context);
       }
 
       .row .id {
@@ -270,21 +273,21 @@ export class ObjectsPage extends LitElement {
         ${coverage.covered}/${coverage.total} covered.
       </p>
       <section>
-        <h2>
+        <h2 class="band-label">
           Never exercised <span class="n">${tiers.none.length}</span>
           <span class="hint">the coverage backlog</span>
         </h2>
         <div class="grid">${tiers.none.map(e => this.cell(e))}</div>
       </section>
       <section>
-        <h2>
+        <h2 class="band-label">
           One example only <span class="n">${tiers.thin.length}</span>
           <span class="hint">thinnest cover — nothing disagrees with a single example</span>
         </h2>
         <div class="grid">${tiers.thin.map(e => this.cell(e))}</div>
       </section>
       <section>
-        <h2>
+        <h2 class="band-label">
           Covered <span class="n">${tiers.covered.length}</span>
           <span class="hint">two or more, deepest first</span>
         </h2>

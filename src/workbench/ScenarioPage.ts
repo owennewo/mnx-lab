@@ -414,9 +414,22 @@ export class ScenarioPage extends LitElement {
         overflow: hidden;
       }
 
+      /* The page head is the panel's tab strip in the same vocabulary: flush
+         left, no padding of its own (the tabs carry it), and a full 2px ink
+         rule under it. Band 2 for the score exactly as .panel-tabs is band 2
+         for the panel (workbench-chrome-language.md).
+
+         They do NOT line up horizontally, and cannot: .head spans the whole
+         page ABOVE .body, so the panel's strip necessarily sits one band
+         lower. The two read as one control because they are the same shape and
+         the same mark, not because they share a baseline.
+
+         The ground stays the score pane's --bg rather than --bg-context,
+         because a tab strip takes the ground of the REGION IT HEADS — which is
+         why .panel-tabs sits on the panel's --surface and this one does not. */
       .head {
-        padding: 10px 24px 0;
-        border-bottom: 1px solid var(--line);
+        padding: 0;
+        border-bottom: var(--rule-w) solid var(--ink);
       }
 
       /* Title + id live in the description tab now — the head is tabs only. */
@@ -507,8 +520,8 @@ export class ScenarioPage extends LitElement {
 
       .tabs {
         display: flex;
-        gap: 2px;
-        align-items: center;
+        gap: 0;
+        align-items: stretch;
       }
 
       /* The actions tab — the former edit strip, stacked for the panel. */
@@ -611,20 +624,32 @@ export class ScenarioPage extends LitElement {
         color: var(--accent-fg);
       }
 
+      /* Identical to .panel-tabs button, deliberately: the view tabs and the
+         panel tabs are the same control doing the same job on two sides of one
+         page, and before this they were a boxed 12px link and an uppercase
+         10px label. The active one is marked by a 2px inset underline rather
+         than by an outlined box — nothing floats in this system, so the mark
+         goes under the word instead of around it. */
       .tabs a {
-        font-size: 12px;
-        padding: 5px 12px;
-        border-radius: var(--radius-input) var(--radius-input) 0 0;
-        color: var(--ink-2);
+        font: 600 10px/1 var(--sans);
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        padding: 11px 12px;
         text-decoration: none;
-        border: 1px solid transparent;
-        border-bottom: none;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+      }
+
+      .tabs a:hover[aria-current='false'] {
+        color: var(--ink);
+        background: var(--bg-context);
       }
 
       .tabs a[aria-current='true'] {
         color: var(--accent-fg);
-        background: var(--surface);
-        border-color: var(--line);
+        box-shadow: inset 0 -2px 0 var(--accent);
       }
 
       /* Score pane + the side panel (columns set inline — the drag bar). */
