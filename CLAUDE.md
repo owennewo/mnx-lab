@@ -9,8 +9,10 @@ with emphasis on guitar tab. Custom SMuFL/SVG rendering engine (no third-party n
 libraries), an LLM-assisted edit loop through OpenRouter, and a scenario corpus with
 human-verified engravings. The repo was rebuilt from an empty slate in 2026-07 per
 [roadmap/complete/lab-structure-lab.md](roadmap/complete/lab-structure-lab.md); the full
-pre-rebuild tree and history live on the **`legacy` branch** and **`pre-rebuild` tag** —
-retrieve missing things from there, never reconstruct them from memory.
+pre-rebuild tree and history live on the **`pre-rebuild` tag** (`git show pre-rebuild:<path>`,
+or check it out detached) — retrieve missing things from there, never reconstruct them from
+memory. The `legacy` branch was the same commit and was deleted 2026-08-15; the tag is now
+the only name for that history.
 
 The repo runs **two development loops**, and every artifact declares which it serves:
 
@@ -215,7 +217,7 @@ for verifying renderer features.
 
 **The goldens are the crown jewels.** Any move or refactor of `model/`/`engine/` must
 reproduce them byte-identically (`npm run update:primitives` then a clean
-`git diff -- scenarios/`); a mismatch stops the line — diff against `legacy`, never
+`git diff -- scenarios/`); a mismatch stops the line — diff against `pre-rebuild`, never
 "close enough".
 
 The goldens per scenario cover different code.
