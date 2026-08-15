@@ -129,22 +129,26 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   },
   tuplet: {
     classes: ['tuplet-bracket', 'tuplet-number'],
-    note: 'A time-modifying container — removable only once it holds no ink, because unwrapping would re-time the music.',
+    note: 'A time-modifying container — removable only once it holds no ink, because unwrapping would re-time the music. WRAPPING may re-time it, because that is the request rather than a side effect.',
+    construct: ['wrapInContainer'],
     remove: ['removeContainer']
   },
   grace: {
     classes: ['grace-slash'],
     note: 'An un-timed container. Its only ink of its own is the slash — the `grace` token merely sizes the notes it holds. Removable once those notes are gone.',
+    construct: ['wrapInContainer'],
     remove: ['removeContainer']
   },
   tremolo: {
     classes: ['tremolo-beam'],
     note: 'A two-event tremolo container; removable once empty.',
+    construct: ['wrapInContainer'],
     remove: ['removeContainer']
   },
   space: {
     classes: [],
-    note: 'Authored silence that occupies a column but draws nothing — it holds no ink, so it is removable outright.',
+    note: 'Authored silence that occupies a column but draws nothing — it holds no ink, so it is removable outright. Inserted rather than wrapped: it holds no events to wrap.',
+    construct: ['insertSpace'],
     remove: ['removeContainer']
   },
   'full-measure-rest': {

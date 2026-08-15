@@ -33,7 +33,7 @@ const SURFACE_LABELS: Record<string, string> = {
   barAttributePopover: 'Shift+B · popover',
   adornmentPopover: 'Shift+A · popover',
   lyricPopover: 'Shift+L · popover',
-  commandPalette: 'Ctrl+K · palette',
+  commandPalette: 'Ctrl+Shift+K · palette',
   goTo: 'Ctrl+G · go-to',
   viewSwitcher: 'view tabs'
 };
@@ -167,6 +167,20 @@ function opLabel(op: EditOp): string {
       return `no fingering · ${op.noteKey}`;
     case 'removeContainer':
       return `remove container @ m${op.measureIndex + 1} (empty)`;
+    case 'wrapInContainer': {
+      const span = op.to - op.from + 1;
+      const what =
+        op.spec.type === 'tuplet'
+          ? `${op.spec.inner.multiple} ${op.spec.inner.duration.base} in ${op.spec.outer.multiple} ${op.spec.outer.duration.base}`
+          : op.spec.type === 'tremolo'
+            ? `tremolo${op.spec.marks === undefined ? '' : ` ${op.spec.marks}`}`
+            : 'grace';
+      return `wrap ${span} event${span === 1 ? '' : 's'} in ${what} @ m${op.measureIndex + 1}`;
+    }
+    case 'setRestSpelling':
+      return `respell rest as ${durationText(op.duration)} @ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
+    case 'insertSpace':
+      return `insert space ${onsetText(op.duration)} @ m${op.measureIndex + 1}`;
     case 'removeKitNote':
       return `remove kit note ${op.noteKey}`;
     case 'removeKitComponent':

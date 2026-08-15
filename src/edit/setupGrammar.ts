@@ -464,3 +464,147 @@ export function parseLyric(text: string): LyricResult {
   const syllableType = trailing && leading ? 'middle' : trailing ? 'start' : leading ? 'end' : undefined;
   return { syllable: body, line, ...(syllableType ? { syllableType } : {}) };
 }
+
+// ── Rhythm declarations (campaign item 11b) ────────────────────────────────
+//
+// One popover for the four items that are content but not events: the three
+// containers (tuplet, grace, tremolo) and authored silence (`space`). The
+// typed text carries the whole address — see `wrapExtent`: a container knows
+// its own extent, so there is no press-navigate-press anchor here.
+
+export const RHYTHM_HELP =
+  '3:2 · 3 eighth in 2 eighth · 3 eighth in 1 quarter, no number · ' +
+  'grace · grace 2 · appoggiatura · acciaccatura · tremolo 2 · space 1/4 · rest half';
+
+/** The note values a wrap may name, spelled as the schema spells them. */
+const NOTE_VALUES: Record<string, MnxNoteValueBase> = {
+  whole: 'whole',
+  half: 'half',
+  quarter: 'quarter',
+  eighth: 'eighth',
+  '16th': '16th',
+  '32nd': '32nd',
+  '64th': '64th',
+  '128th': '128th'
+};
+
+export const NOTE_VALUE_NAMES = Object.keys(NOTE_VALUES);
+
+/** A wrap whose note values may still be blank — the parser cannot see the
+ *  document, and an unqualified `3:2` means "at whatever value the cursor is
+ *  sitting on". `completeContainerSpec` (ops.ts) fills them from the event. */
+export type PartialContainerSpec =
+  | {
+      type: 'tuplet';
+      inner: { multiple: number; duration?: { base: MnxNoteValueBase } };
+      outer: { multiple: number; duration?: { base: MnxNoteValueBase } };
+      bracket?: 'yes' | 'no' | 'auto';
+      showNumber?: 'noNumber' | 'inner' | 'both';
+    }
+  | { type: 'grace'; graceType?: 'makeTime' | 'stealFollowing' | 'stealPrevious'; slash?: boolean }
+  | { type: 'tremolo'; marks?: number };
+
+export type RhythmResult =
+  | { space: [number, number] }
+  | { rest: MnxNoteValueBase }
+  | { wrap: PartialContainerSpec; count?: number }
+  | null;
+
+/** "3:2", "3 eighth in 1 quarter, no number", "grace 2", "appoggiatura",
+ *  "tremolo 2", "space 1/4". */
+export function parseRhythm(text: string): RhythmResult {
+  let token = text.trim().toLowerCase();
+  if (token === '') return null;
+
+  // Rest SPELLING (campaign item 11b): entry pads with beat rests because the
+  // cursor's positions are the rest events; an author who wants the engraver's
+  // one half rest says so here, after the fact.
+  const rest = /^rest\s+(\S+)$/.exec(token);
+  if (rest) {
+    const value = NOTE_VALUES[rest[1]];
+    return value ? { rest: value } : null;
+  }
+
+  const space = /^space\s+(\d+)\s*\/\s*(\d+)$/.exec(token);
+  if (space) {
+    const [num, den] = [Number(space[1]), Number(space[2])];
+    return num > 0 && den > 0 ? { space: [num, den] } : null;
+  }
+
+  // Display modifiers are suffixes on the tuplet forms, comma-separated so the
+  // ratio stays readable: "3 eighth in 1 quarter, no number".
+  let showNumber: 'noNumber' | undefined;
+  let bracket: 'yes' | 'no' | undefined;
+  const parts = token.split(',').map(part => part.trim());
+  token = parts[0];
+  for (const modifier of parts.slice(1)) {
+    if (modifier === 'no number' || modifier === 'nonumber') showNumber = 'noNumber';
+    else if (modifier === 'bracket') bracket = 'yes';
+    else if (modifier === 'no bracket') bracket = 'no';
+    else return null;
+  }
+  const display = {
+    ...(bracket ? { bracket } : {}),
+    ...(showNumber ? { showNumber } : {})
+  };
+
+  // The two grace idioms players actually name. An acciaccatura is the crushed,
+  // slashed one; an appoggiatura leans on the note it steals from — which is
+  // exactly `stealFollowing` without a slash (`lab/rhythm/appoggiatura`).
+  if (token === 'acciaccatura') return { wrap: { type: 'grace', slash: true } };
+  if (token === 'appoggiatura')
+    return { wrap: { type: 'grace', graceType: 'stealFollowing', slash: false } };
+
+  const grace = /^grace(?:\s+(\d+))?(?:\s+(make-time|steal-following|steal-previous))?$/.exec(token);
+  if (grace) {
+    const graceType =
+      grace[2] === 'make-time'
+        ? ('makeTime' as const)
+        : grace[2] === 'steal-following'
+          ? ('stealFollowing' as const)
+          : grace[2] === 'steal-previous'
+            ? ('stealPrevious' as const)
+            : undefined;
+    return {
+      wrap: { type: 'grace', ...(graceType ? { graceType } : {}) },
+      ...(grace[1] ? { count: Number(grace[1]) } : {})
+    };
+  }
+
+  const tremolo = /^tremolo(?:\s+(\d+))?$/.exec(token);
+  if (tremolo)
+    return { wrap: { type: 'tremolo', ...(tremolo[1] ? { marks: Number(tremolo[1]) } : {}) } };
+
+  // "3 eighth in 2 eighth" — the full form, where the corpus needs an outer
+  // value the short ratio cannot express (1 quarter, not 2 eighths).
+  const full = /^(\d+)\s+(\S+)\s+in\s+(\d+)\s+(\S+)$/.exec(token);
+  if (full) {
+    const inner = NOTE_VALUES[full[2]];
+    const outer = NOTE_VALUES[full[4]];
+    if (!inner || !outer) return null;
+    return {
+      wrap: {
+        type: 'tuplet',
+        inner: { multiple: Number(full[1]), duration: { base: inner } },
+        outer: { multiple: Number(full[3]), duration: { base: outer } },
+        ...display
+      }
+    };
+  }
+
+  // "3:2" — both values default to the one under the cursor.
+  const ratio = /^(\d+)\s*:\s*(\d+)$/.exec(token);
+  if (ratio) {
+    const [innerCount, outerCount] = [Number(ratio[1]), Number(ratio[2])];
+    if (innerCount < 1 || outerCount < 1) return null;
+    return {
+      wrap: {
+        type: 'tuplet',
+        inner: { multiple: innerCount },
+        outer: { multiple: outerCount },
+        ...display
+      }
+    };
+  }
+  return null;
+}

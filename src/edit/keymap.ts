@@ -143,6 +143,8 @@ export type ShellAction =
   | 'barAttributePopover'
   | 'adornmentPopover'
   | 'lyricPopover'
+  | 'rhythmPopover'
+  | 'selectionTray'
   | 'commandPalette'
   | 'goTo'
   | 'toggleRail';
@@ -170,10 +172,17 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // Lyrics (campaign item 12): text entry as a popover, not a mode —
   // a syllable is one short string attached to one note.
   { code: 'KeyL', shift: true, action: 'lyricPopover' },
-  // The palette (survey §8.5: Ctrl+K — Dorico's Jump Bar, GP's Cmd+E) and
-  // go-to (§3.8: Ctrl+G + typed grammar) are ONE widget, two entry points:
-  // Ctrl+K prefills the `>` command prefix, Ctrl+G opens bare (go-to).
-  { code: 'KeyK', ctrl: true, action: 'commandPalette' },
+  // Rhythm declarations (campaign item 11b): the containers and authored
+  // silence — the four things that are content but not events. No anchor
+  // gesture: the typed declaration already says how much music it takes.
+  { code: 'KeyR', shift: true, action: 'rhythmPopover' },
+  // The selection command tray (core-selection-tray-visuals.md): Ctrl+K
+  // belongs to the selection when an editor holds the keyboard — the shell
+  // falls back to the palette when nothing does. The document-wide palette
+  // (survey §8.5: Dorico's Jump Bar, GP's Cmd+E) moves one keystroke away;
+  // go-to (§3.8: Ctrl+G + typed grammar) is the same widget's bare entry.
+  { code: 'KeyK', ctrl: true, action: 'selectionTray' },
+  { code: 'KeyK', ctrl: true, shift: true, action: 'commandPalette' },
   { code: 'KeyG', ctrl: true, action: 'goTo' },
   // The library rail toggle (VS Code's Ctrl+B sidebar reflex).
   { code: 'KeyB', ctrl: true, action: 'toggleRail' }

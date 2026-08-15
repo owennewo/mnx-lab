@@ -133,6 +133,7 @@ are demoted `verified → rendered` awaiting `/verify`.
 Still `no-op`, honestly: the container *elements* themselves (tuplet, grace,
 tremolo) have no wrap verb yet. That is now an ordinary op-family item with
 nothing structural riding on it — the point of doing the addressing first.
+**Built 2026-08-15 — see the two sections at the end.**
 
 ## The wrap verbs, and what they decided (2026-08-14)
 
@@ -161,9 +162,68 @@ in the time-signature removal, and in the rest-spelling attempt. **That span is
 the single fix that would close all three**, and it is small; it is left
 deliberate rather than sneaked into an unrelated item.
 
+## The construction half, built 2026-08-15
+
+`Shift+R` — **rhythm…** — the fourth typed popover family, holding the four
+things that are content but not events: the three containers and authored
+silence. Nine of the sweep's sixteen blocked scenarios open with it
+(**blocked 16 → 7, ops-reachable 80 → 89**).
+
+**One verb for three kinds, by item 7's family test.** Tuplet, grace and
+tremolo share an owner — a run of one sequence's content — and differ only in
+the declaration wrapped around it, so `wrapInContainer` takes a `ContainerSpec`
+rather than three verbs taking nothing. `space` is deliberately NOT in it: it
+shares the containers' shape (a non-event item in content) and none of their
+act, because it holds no events to wrap. It gets `insertSpace`.
+
+**Wrapping may re-time the bar; unwrapping may not.** That reads like a
+contradiction of this item's own removal rule and is not: three eighths becoming
+a triplet shortens the bar, and *that is the request*, not a side effect an
+editor slipped in. Removal has no such request behind it, which is why it stays
+refused. The bar-duration diagnostic is what tells the author either way.
+
+**No anchor gesture — the declaration already says how much music it takes.**
+Slurs and beams need press-navigate-press because a span is genuinely open;
+a container's extent is written into it. A tuplet consumes the events that
+exactly fill its inner value (`3 eighth in 2 eighth` takes three eighths — and
+also the quarter-plus-eighth `spec/tuplets` actually holds), a tremolo its two,
+a grace one unless told `grace 2`. Where the run does not fill the value, the
+wrap refuses rather than guess. `wrapExtent` is that rule, and it is why this
+family needed no new gesture at all.
+
+**Addressed by content indices, not event ids.** `setBeam` mints ids because a
+beam *references* its events; a wrap *moves* them, so minting would write names
+the document never asked for — and the round-trip test below would have caught
+it instantly.
+
+**The evidence is a round trip, not a trace.** For each of the six containers
+the corpus holds, `harness/conformance/rhythm-wrap.test.ts` unwraps it out of
+its own scenario, navigates back with `driveToElement`, types the declaration,
+and demands the whole document return byte-identical. That is a stronger claim
+than a recorded trace: the target is a human-verified scenario rather than
+whatever the ops happened to produce. It caught the tremolo's `outer` — the two
+events are each WRITTEN with the total duration while `outer` is what is
+PERFORMED, so the value is the written one divided by the count (two written
+halves → `2 × quarter`), which no amount of copying the first field would have
+produced.
+
+## Rest spelling: a verb, not a policy (2026-08-15)
+
+The finding above said rest durations were "a consequence of padding, not a
+choice", and that making `padMeasureRests` engraver-correct broke the cursor,
+because the grid's positions ARE the rest events.
+
+Both facts survive if spelling is a **verb**. `rest half` at the cursor joins the
+run of rests starting there into one, refusing unless they sum to it exactly —
+respelling may not change how long the bar is silent. Padding keeps writing beat
+rests, so the entry grid is untouched; an author who wants the engraver's
+spelling says so, after the fact, which is also how they would think about it.
+The grid-decoupling work the earlier attempt implied is no longer owed by this
+item — it is a nicety about defaults, not a blocker.
+
 ## Scope boundary
 
-Unchanged: the grid still skips non-timed items, so tuplet, grace and tremolo
-content remains unaddressable. This item makes *runs* enterable, not containers
+Unchanged from the granularity half: the grid still skips non-timed items, so
+tuplet, grace and tremolo content remains unaddressable. This item makes *runs* enterable, not containers
 enterable — the two were tangled in item 11's row and are now separately
 diagnosed.

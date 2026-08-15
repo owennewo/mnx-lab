@@ -12,7 +12,8 @@ import type {
   PositionedAttribute,
   TechniqueChoice
 } from './ops.ts';
-import type { MnxTuningEntry } from '../model/mnx.ts';
+import type { MnxNoteValueBase, MnxTuningEntry } from '../model/mnx.ts';
+import type { PartialContainerSpec } from './setupGrammar.ts';
 
 /** Navigation: moves the cursor, never mutates the document. */
 export type NavigationIntent =
@@ -133,6 +134,14 @@ export type MutationIntent =
   | { type: 'removeMarking'; marking: string }
   | { type: 'setPositioned'; attribute: PositionedAttribute }
   | { type: 'removePositioned'; kind: PositionedAttribute['kind'] }
+  // The rhythm-declaration family (campaign item 11b): one wrap for the three
+  // containers, an insert for authored silence. The spec arrives PARTIAL — an
+  // unqualified `3:2` takes its note value from the event under the cursor —
+  // and the session completes it, because the popover grammar is document-free
+  // by design.
+  | { type: 'wrapInContainer'; spec: PartialContainerSpec; count?: number }
+  | { type: 'insertSpace'; duration: [number, number] }
+  | { type: 'setRestSpelling'; duration: { base: MnxNoteValueBase; dots?: number } }
   | { type: 'setFullMeasureRest' }
   | { type: 'removeFullMeasureRest' }
   | { type: 'setMeasureRepeat'; number: number }

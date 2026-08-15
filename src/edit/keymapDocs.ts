@@ -295,6 +295,14 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
+    keys: 'Shift+R',
+    strokes: [{ code: 'KeyR', shift: true }],
+    group: 'setup',
+    meaning: {
+      all: 'rhythm… (typed popover: `3:2`, `3 eighth in 1 quarter, no number`, `grace`, `appoggiatura`, `tremolo 2`, `space 1/4`)'
+    }
+  },
+  {
     keys: 'Shift+B',
     strokes: [{ code: 'KeyB', shift: true }],
     group: 'setup',
@@ -308,7 +316,13 @@ export const KEY_DOCS: KeyDoc[] = [
     keys: 'Ctrl+K',
     strokes: [{ code: 'KeyK', ctrl: true }],
     group: 'workbench',
-    meaning: { all: 'command palette' }
+    meaning: { all: 'selection command tray (the palette, when no editor holds the keyboard)' }
+  },
+  {
+    keys: 'Ctrl+Shift+K',
+    strokes: [{ code: 'KeyK', ctrl: true, shift: true }],
+    group: 'workbench',
+    meaning: { all: 'command palette (document-wide)' }
   },
   {
     keys: 'Ctrl+G',

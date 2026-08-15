@@ -3,21 +3,17 @@
   "summary": {
     "scenarios": 106,
     "traced": 5,
-    "opsReachable": 80,
-    "blocked": 16,
+    "opsReachable": 89,
+    "blocked": 7,
     "expectedUnreachable": 5
   },
   "blockingKinds": {
     "layout": 6,
     "score": 6,
-    "grace": 4,
-    "space": 2,
-    "tuplet": 2,
     "kit-component": 1,
     "kit-note": 1,
     "multimeasure-rest": 1,
-    "sound": 1,
-    "tremolo": 1
+    "sound": 1
   },
   "scenarios": {
     "lab/articulations/arpeggiated-chords": {
@@ -84,22 +80,13 @@
       "tier": "ops-reachable"
     },
     "lab/rhythm/appoggiatura": {
-      "tier": "blocked",
-      "blockedBy": [
-        "grace"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/rhythm/sequence-space": {
-      "tier": "blocked",
-      "blockedBy": [
-        "space"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/rhythm/tuplet-number-hidden": {
-      "tier": "blocked",
-      "blockedBy": [
-        "tuplet"
-      ]
+      "tier": "ops-reachable"
     },
     "lab/score-text/directions": {
       "tier": "ops-reachable"
@@ -216,10 +203,7 @@
       "tier": "ops-reachable"
     },
     "spec/beams-inner-grace-notes": {
-      "tier": "blocked",
-      "blockedBy": [
-        "grace"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/beams-secondary-beam-breaks": {
       "tier": "ops-reachable"
@@ -243,16 +227,10 @@
       "tier": "ops-reachable"
     },
     "spec/grace-note": {
-      "tier": "blocked",
-      "blockedBy": [
-        "grace"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/grace-notes-beamed": {
-      "tier": "blocked",
-      "blockedBy": [
-        "grace"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/grand-staff": {
       "tier": "ops-reachable"
@@ -366,10 +344,7 @@
       "tier": "ops-reachable"
     },
     "spec/tie-targets": {
-      "tier": "blocked",
-      "blockedBy": [
-        "space"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/ties": {
       "tier": "ops-reachable"
@@ -381,16 +356,10 @@
       "tier": "ops-reachable"
     },
     "spec/tremolos-multi-note": {
-      "tier": "blocked",
-      "blockedBy": [
-        "tremolo"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/tuplets": {
-      "tier": "blocked",
-      "blockedBy": [
-        "tuplet"
-      ]
+      "tier": "ops-reachable"
     },
     "spec/two-bar-c-major-scale": {
       "tier": "ops-reachable"

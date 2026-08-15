@@ -10,6 +10,8 @@ import type {
   MnxDynamicValue,
   MnxGlobalMeasure,
   MnxEvent,
+  MnxGrace,
+  MnxTremolo,
   MnxNote,
   MnxNoteValueBase,
   MnxPart,
@@ -21,6 +23,7 @@ import type {
   MnxTuningEntry
 } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
+import type { PartialContainerSpec } from './setupGrammar.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import { findNoteAddress, forEachNoteAddress } from '../model/noteWalk.ts';
 import {
@@ -353,6 +356,65 @@ export type EditOp =
       partIndex?: number;
     }
   | {
+      /**
+       * Wrap a run of sequence content in a container — tuplet, grace or
+       * tremolo. ONE verb for three kinds, by item 7's family test: they share
+       * an owner (a run of one sequence's content) and differ only in the
+       * declaration wrapped around it.
+       *
+       * The mirror of the removal rule, and worth stating because it looks
+       * like a contradiction: *removing* a container may not re-time the music
+       * (which is why unwrapping is refused), but *wrapping* is an act ON time
+       * that was explicitly asked for. Three eighths becoming a triplet
+       * shortens the bar, and that is the request, not a side effect — the
+       * renderer's bar-duration diagnostic is what tells the author.
+       *
+       * Addressed by content INDICES, not event ids: wrapping moves items
+       * rather than referencing them, so minting ids (as `setBeam` must) would
+       * write names the document never asked for.
+       */
+      type: 'wrapInContainer';
+      measureIndex: number;
+      sequenceIndex: number;
+      /** Inclusive content indices — the run that becomes the container. */
+      from: number;
+      to: number;
+      spec: ContainerSpec;
+      partIndex?: number;
+    }
+  | {
+      /**
+       * Respell a run of rests as ONE rest of the given value.
+       *
+       * The finding this closes said rest durations were "a consequence of
+       * padding, not a choice", and that fixing `padMeasureRests` to write one
+       * half rest instead of two quarters broke the cursor — because the grid's
+       * positions ARE the rest events, so coarse rests delete places to aim.
+       * Both facts survive if spelling is a **verb** rather than a policy: the
+       * padding keeps writing beat rests (the grid stays fine), and an author
+       * who wants the engraver's spelling says so, after the fact.
+       *
+       * Refused unless the run sums EXACTLY to the value asked for — respelling
+       * may not change how long the bar is silent.
+       */
+      type: 'setRestSpelling';
+      measureIndex: number;
+      onset: [number, number];
+      duration: { base: MnxNoteValueBase; dots?: number };
+    }
+  | {
+      /** Insert authored silence. NOT a wrap: a `space` holds no events, so it
+       *  shares the containers' shape (a non-event item in content) and none of
+       *  their act. Its duration is a rhythmic FRACTION, as the schema has it. */
+      type: 'insertSpace';
+      measureIndex: number;
+      sequenceIndex: number;
+      /** Content index to insert before. */
+      index: number;
+      duration: [number, number];
+      partIndex?: number;
+    }
+  | {
       /** Declare the bar's rest (`sequence.fullMeasure`). Refused on a bar
        *  holding ink: a declaration ABOUT an empty bar must not delete notes
        *  to make room — that is the coarse-op cheating the campaign forbids. */
@@ -400,6 +462,19 @@ export type TechniqueChoice =
  *  existing setters (`addPart`, `setTuning`, `setStaffKind`) — rewriting them
  *  would disturb recorded traces for no gain — so only the two that never had
  *  one are constructible here. */
+/** What a wrap declares. The document shapes, minus the content they hold —
+ *  so a spec plus a run is exactly one container object. */
+export type ContainerSpec =
+  | {
+      type: 'tuplet';
+      inner: { duration: { base: MnxNoteValueBase; dots?: number }; multiple: number };
+      outer: { duration: { base: MnxNoteValueBase; dots?: number }; multiple: number };
+      bracket?: 'yes' | 'no' | 'auto';
+      showNumber?: 'noNumber' | 'inner' | 'both';
+    }
+  | { type: 'grace'; graceType?: MnxGrace['graceType']; slash?: boolean }
+  | { type: 'tremolo'; marks?: number; outer?: MnxTremolo['outer'] };
+
 export type PartDeclaration = { kind: 'capo'; value: number } | { kind: 'staves'; value: number };
 
 export type PartDeclarationKind = 'name' | 'staves' | 'strings' | 'capo' | 'staffKind';
@@ -1164,6 +1239,60 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       else delete owner.beams; // no tombstone
       return next;
     }
+    case 'wrapInContainer': {
+      const seq =
+        next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex]?.sequences?.[op.sequenceIndex];
+      if (!seq) return next;
+      const [start, end] = op.from <= op.to ? [op.from, op.to] : [op.to, op.from];
+      const run = seq.content.slice(start, end + 1);
+      if (run.length === 0) return next;
+      // Only plain events wrap. A container inside a container is a shape the
+      // renderer does not model (it would draw blank columns), so this refuses
+      // rather than produce ink nobody can read — the guarded-removal habit,
+      // pointed forward.
+      if (!run.every(item => isTimedEvent(item))) return next;
+      const events = run as MnxEvent[];
+      if (op.spec.type === 'tremolo' && events.length !== 2) return next;
+      seq.content = [
+        ...seq.content.slice(0, start),
+        buildContainer(op.spec, events),
+        ...seq.content.slice(end + 1)
+      ];
+      return next;
+    }
+    case 'setRestSpelling': {
+      const seq = entrySequence(next, op.measureIndex);
+      if (!seq) return next;
+      const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
+      if (!found?.event?.rest) return next;
+      const want = durationSpan(op.duration);
+      let span: Onset = { num: 0, den: 1 };
+      let end = found.index - 1;
+      for (let i = found.index; i < seq.content.length; i++) {
+        const item = seq.content[i];
+        if (!isTimedEvent(item) || !item.rest) break;
+        span = addOnsets(span, itemSpan(item));
+        end = i;
+        if (!onsetLess(span, want)) break;
+      }
+      if (!onsetsEqual(span, want)) return next; // no run of rests sums to it
+      seq.content.splice(found.index, end - found.index + 1, {
+        duration: { ...op.duration },
+        rest: {}
+      });
+      return next;
+    }
+    case 'insertSpace': {
+      const seq =
+        next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex]?.sequences?.[op.sequenceIndex];
+      if (!seq) return next;
+      const [num, den] = op.duration;
+      if (!Number.isInteger(num) || !Number.isInteger(den) || num < 1 || den < 1) return next;
+      const index = Math.min(Math.max(op.index, 0), seq.content.length);
+      const space = { type: 'space', duration: [num, den] } as unknown as MnxSequenceItem;
+      seq.content = [...seq.content.slice(0, index), space, ...seq.content.slice(index)];
+      return next;
+    }
     case 'setFullMeasureRest': {
       const measure = next.parts?.[0]?.measures?.[op.measureIndex];
       const seq = measure?.sequences?.[0];
@@ -1499,6 +1628,140 @@ export function beamStartingAt(
 /** The event ids of the run from one note's event to another's, minting ids as
  *  it goes — a beam names events, so the run must be nameable. Both ends must
  *  live in the same measure and voice; returns null when they do not. */
+/** A spec plus its content, as the document writes it. Optional fields are
+ *  omitted rather than defaulted, so a plain `grace` is `{type, content}` —
+ *  what `spec/grace-note` actually holds. */
+function buildContainer(spec: ContainerSpec, content: MnxEvent[]): MnxSequenceItem {
+  if (spec.type === 'tuplet')
+    return {
+      type: 'tuplet',
+      inner: spec.inner,
+      outer: spec.outer,
+      ...(spec.bracket ? { bracket: spec.bracket } : {}),
+      ...(spec.showNumber ? { showNumber: spec.showNumber } : {}),
+      content
+    } as MnxSequenceItem;
+  if (spec.type === 'grace')
+    return {
+      type: 'grace',
+      ...(spec.graceType ? { graceType: spec.graceType } : {}),
+      ...(spec.slash === undefined ? {} : { slash: spec.slash }),
+      content
+    } as MnxSequenceItem;
+  return {
+    type: 'tremolo',
+    ...(spec.marks === undefined ? {} : { marks: spec.marks }),
+    ...(spec.outer ? { outer: spec.outer } : {}),
+    content
+  } as MnxSequenceItem;
+}
+
+/** A rhythmic fraction, divided. */
+function divideSpan(span: Onset, by: number): Onset {
+  return { num: span.num, den: span.den * by };
+}
+
+/** The plain (undotted) note value spanning this fraction, if one does. */
+function noteValueForSpan(span: Onset): MnxNoteValueBase | null {
+  const bases: MnxNoteValueBase[] = [
+    'breve', 'whole', 'half', 'quarter', 'eighth', '16th', '32nd', '64th', '128th'
+  ];
+  return bases.find(base => onsetsEqual(durationSpan({ base }), span)) ?? null;
+}
+
+/** Fill a typed wrap's blanks from the music it will hold: an unqualified
+ *  `3:2` means "at the value under the cursor", and a tremolo's performed
+ *  `outer` is its two written events. The parser cannot see the document, so
+ *  this is where the spec becomes complete. */
+export function completeContainerSpec(
+  seq: MnxSequence,
+  eventIndex: number,
+  partial: PartialContainerSpec
+): ContainerSpec | null {
+  const item = seq.content[eventIndex];
+  if (!isTimedEvent(item)) return null;
+  const duration = (item as MnxEvent).duration;
+  if (partial.type === 'grace') return { ...partial };
+  if (partial.type === 'tremolo') {
+    // The two events are each WRITTEN with the tremolo's total duration, and
+    // `outer` is what is PERFORMED: duration × multiple = that same total. So
+    // the outer value is the written one divided by the count — two written
+    // halves are performed as 2 × quarter. Where that division names no note
+    // value, `outer` is left out (legal, and `itemSpan` reads the written
+    // events instead) rather than invented.
+    const performed = noteValueForSpan(divideSpan(durationSpan(duration), 2));
+    return {
+      type: 'tremolo',
+      ...(partial.marks === undefined ? {} : { marks: partial.marks }),
+      ...(performed ? { outer: { duration: { base: performed }, multiple: 2 } } : {})
+    };
+  }
+  return {
+    type: 'tuplet',
+    inner: { multiple: partial.inner.multiple, duration: partial.inner.duration ?? { base: duration.base } },
+    outer: { multiple: partial.outer.multiple, duration: partial.outer.duration ?? { base: duration.base } },
+    ...(partial.bracket ? { bracket: partial.bracket } : {}),
+    ...(partial.showNumber ? { showNumber: partial.showNumber } : {})
+  };
+}
+
+/** Where a wrap starts: the run of content the note at `noteKey` opens, as
+ *  indices into its own sequence. Refuses a note already inside a container —
+ *  nesting is the shape the renderer does not model. */
+export function containerRunAt(
+  doc: MnxStructure,
+  noteKey: string
+): { partIndex: number; measureIndex: number; sequenceIndex: number; eventIndex: number; seq: MnxSequence } | null {
+  const address = findNoteAddress(doc, noteKey);
+  if (!address || address.containerIndex !== undefined) return null;
+  return {
+    partIndex: address.partIndex,
+    measureIndex: address.measureIndex,
+    sequenceIndex: address.sequenceIndex,
+    eventIndex: address.eventIndex,
+    seq: address.sequence
+  };
+}
+
+/**
+ * How many content items a wrap consumes, starting at `eventIndex`.
+ *
+ * **The container already knows its own extent, so the gesture does not have to
+ * restate it.** A tuplet takes the events that exactly FILL its inner value
+ * (3 eighths = an eighth triplet, and also a quarter-plus-eighth, which is what
+ * `spec/tuplets` holds); a tremolo takes its two; a grace takes one unless told
+ * otherwise. That is why the wrap needs no press-navigate-press anchor: asking
+ * for `3 eighth in 2 eighth` has already said how much music is involved.
+ *
+ * Null = refuse: the run overshoots the inner value, or runs out of bar.
+ */
+export function wrapExtent(
+  seq: MnxSequence,
+  eventIndex: number,
+  spec: ContainerSpec,
+  count?: number
+): number | null {
+  if (count !== undefined) return countFits(seq, eventIndex, count) ? count : null;
+  if (spec.type === 'tremolo') return countFits(seq, eventIndex, 2) ? 2 : null;
+  if (spec.type === 'grace') return countFits(seq, eventIndex, 1) ? 1 : null;
+  const inner = durationSpan(spec.inner.duration);
+  const target = { num: inner.num * spec.inner.multiple, den: inner.den };
+  let span: Onset = { num: 0, den: 1 };
+  for (let i = eventIndex; i < seq.content.length; i++) {
+    const item = seq.content[i];
+    if (!isTimedEvent(item)) return null;
+    span = addOnsets(span, itemSpan(item));
+    if (onsetLess(target, span)) return null; // overshot — the run does not fit
+    if (!onsetLess(span, target)) return i - eventIndex + 1;
+  }
+  return null;
+}
+
+function countFits(seq: MnxSequence, eventIndex: number, count: number): boolean {
+  if (count < 1 || eventIndex + count > seq.content.length) return false;
+  return seq.content.slice(eventIndex, eventIndex + count).every(item => isTimedEvent(item));
+}
+
 export function beamRunBetween(
   doc: MnxStructure,
   fromNoteKey: string,

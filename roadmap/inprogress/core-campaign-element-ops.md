@@ -99,7 +99,7 @@ agreed or candidate claims; **bold** = agreed.
 | 9 | [tab technique alphabet](core-element-ops-technique.md) | Bends, slides, hammer/pull, vibrato, palm mute, harmonics — the `B H S V X O` set `keymapDocs.ts` already reserves. Entry side of [core-guitar-technique.md](../proposed/core-guitar-technique.md) (which owns rendering). | 7 (reachable 71 → 78); +fingering | **B H S V X O** — live only in the tab pane layer, so B/S are polymorphic with beam/slur | **note** | **built 2026-08-14** |
 | 10 | [spanners](core-element-ops-spanners.md) | Slurs; tie variants (`crossVoice`, `lv`, `arpeggio`). The two-ended **anchor gesture** (press, navigate, press); reference removal class. | 3 (reachable 42 → 45) | **S**, polymorphic by projection: slur in notation, slide in tab (resolves item 9's collision) | **note→note** | **built 2026-08-14** |
 | 11 | [rhythm declarations](core-element-ops-rhythm-declarations.md) | **Split at build time**: this item takes the declarations that leave ink where it is — beams (top level), full-measure rests, measure repeats. Beams reuse item 10's anchor at event→event. | 10 (reachable 45 → 55); 22 elements | **B**, polymorphic (beam in notation, bend in tab); rests via the bar popover | **measure**, **event→event** | **built 2026-08-14** |
-| 11b | [onset granularity + container descent](core-element-ops-onset-granularity.md) **(built)**; wrap verbs & rest spelling open | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | 32 notes addressable | t.b.d. | event | **granularity + descent built 2026-08-14**; wrap verbs + rest spelling open |
+| 11b | [onset granularity, container descent, wrap verbs](core-element-ops-onset-granularity.md) | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second; rest spelling closed as a VERB (`rest half`) rather than a padding policy. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | 32 notes addressable; 9 scenarios unblocked | **Shift+R** rhythm popover | event | **complete 2026-08-15** |
 | 12 | [lyrics](core-element-ops-lyrics.md) | Lyrics, part names, verse labels — a text *mode* that suspends the keymap, not a binding. | 4 (reachable 78 → 82); 34 elements | **Shift+L** popover — the text *mode* is rejected, see the doc | **note / score** | **built 2026-08-14** |
 | 13 | [part declarations](core-element-ops-part-declarations.md) | **Split at build time**: the five keys on `parts[0]` (name, strings, capo, staffKind, staves) get the removal halves their genesis verbs never had, plus constructors for capo and staves. | 2 (reachable 68 → 71); 91 elements | **Shift+P** popover (`capo 3`, `no strings`) | **score** | **built 2026-08-14** |
 | 13b | [part addressing](core-element-ops-part-addressing.md) **(built)**; entry + staff 2 open | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-codes `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changes note keys — which the primitives goldens embed. A corpus re-verification event, not a refactor. The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
@@ -732,3 +732,23 @@ Three learnings for the items still open:
   now takes the voice jump to the target's voice *before* walking, because ←→
   is voice-sticky by design — the fix was to route the sweep the way the design
   says a person gets there, not to loosen the walk.
+
+### 2026-08-15 — 11b closes: the wrap verbs, and spelling as a verb
+
+`Shift+R` lands the rhythm-declaration family and takes **blocked 16 → 7,
+ops-reachable 80 → 89**. Three things worth carrying to items 4 and 6:
+
+- **A family needs no gesture when its declaration carries its own extent.**
+  Slurs and beams need press-navigate-press; a tuplet does not, because
+  `3 eighth in 2 eighth` has already said how much music is involved. Before
+  adding a gesture, check whether the grammar already said it.
+- **A parked finding can be closed by moving it to a different layer.** Rest
+  spelling was blocked as a *policy* (fixing `padMeasureRests` broke the cursor,
+  because the grid's positions are the rest events) and is trivial as a *verb*
+  (`rest half`, refusing unless the run sums exactly). Nothing about the earlier
+  measurement was wrong — it was measuring the wrong layer.
+- **Round-tripping a corpus container beats a trace as evidence.** Unwrap it out
+  of its own scenario, rebuild it through navigation and the typed text, demand
+  byte-identity. The target is human-verified, so the test cannot be satisfied
+  by whatever the ops happen to emit — it caught the tremolo's performed `outer`
+  being the written value DIVIDED by the count, which copying would have missed.

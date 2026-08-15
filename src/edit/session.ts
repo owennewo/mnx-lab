@@ -11,6 +11,9 @@ import type { EditOp, OpLogEntry } from './ops.ts';
 import {
   beamRunBetween,
   beamStartingAt,
+  completeContainerSpec,
+  containerRunAt,
+  wrapExtent,
   EditHistory,
   hasSlurStartingAt,
   nextNotePitchPair,
@@ -702,6 +705,59 @@ export class EditorSession {
         // 3. Otherwise arm (or disarm, pressing twice in one place).
         this.spanAnchorKey = this.spanAnchorKey === slot.noteKey ? null : slot.noteKey;
         return true;
+      }
+      case 'setRestSpelling': {
+        // Addressed by ONSET, not by note key: a rest is absence, so there is
+        // no slot under the cursor to name — which is exactly why the cursor
+        // can still sit there.
+        const before = JSON.stringify(this.doc);
+        this.apply({
+          type: 'setRestSpelling',
+          measureIndex: this.cursorState.measureIndex,
+          onset: [this.cursorState.onset.num, this.cursorState.onset.den],
+          duration: intent.duration
+        });
+        return JSON.stringify(this.doc) !== before;
+      }
+      case 'wrapInContainer':
+      case 'insertSpace': {
+        // Both address the cursor's own event, in its own sequence — which is
+        // why neither needs the press-navigate-press anchor slurs and beams
+        // use: the typed declaration already says how much music it takes
+        // (`wrapExtent`), and silence is inserted at a point, not over a span.
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        const site = containerRunAt(this.doc, slot.noteKey);
+        if (!site) return false;
+        const before = JSON.stringify(this.doc);
+        if (intent.type === 'insertSpace') {
+          this.apply({
+            type: 'insertSpace',
+            partIndex: site.partIndex,
+            measureIndex: site.measureIndex,
+            sequenceIndex: site.sequenceIndex,
+            index: site.eventIndex,
+            duration: intent.duration
+          });
+        } else {
+          const spec = completeContainerSpec(site.seq, site.eventIndex, intent.spec);
+          if (!spec) return false;
+          const extent = wrapExtent(site.seq, site.eventIndex, spec, intent.count);
+          if (extent === null) return false;
+          this.apply({
+            type: 'wrapInContainer',
+            partIndex: site.partIndex,
+            measureIndex: site.measureIndex,
+            sequenceIndex: site.sequenceIndex,
+            from: site.eventIndex,
+            to: site.eventIndex + extent - 1,
+            spec
+          });
+        }
+        // The wrap re-times the bar on purpose, so the grid must be rebuilt
+        // before the cursor is re-read — `apply` already does that; this only
+        // reports whether the document actually moved.
+        return JSON.stringify(this.doc) !== before;
       }
       case 'setFullMeasureRest':
       case 'removeFullMeasureRest':

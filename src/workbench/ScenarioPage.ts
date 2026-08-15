@@ -37,9 +37,11 @@ import {
   parseLyric,
   parsePartDeclaration,
   BAR_ATTRIBUTE_HELP,
+  RHYTHM_HELP,
   parseAdornment,
   CLEF_NAME_LIST,
   parseBarAttribute,
+  parseRhythm,
   parseClef,
   parseKeySignature,
   parsePart,
@@ -54,7 +56,8 @@ import '../elements/ScoreViewer.ts';
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
-type PopoverKind = 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar' | 'adornment' | 'lyric';
+type PopoverKind =
+  | 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar' | 'adornment' | 'lyric' | 'rhythm';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
   time: {
@@ -92,6 +95,11 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
     placeholder: 'accent · staccato · mf · text Play 8x',
     hint: 'at the cursor’s position · “no <adornment>” strips it · Enter applies · Esc closes'
   },
+  rhythm: {
+    label: 'rhythm',
+    placeholder: '3:2 · 3 eighth in 1 quarter, no number · grace · tremolo 2 · rest half · space 1/4',
+    hint: 'wraps from the cursor — the declaration says how much music it takes · Enter applies · Esc closes'
+  },
   bar: {
     label: 'bar attribute',
     placeholder: 'barline double · repeat end · ending 1,2 · tempo 120 · full-measure rest',
@@ -107,7 +115,8 @@ const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   keySignaturePopover: 'key',
   barAttributePopover: 'bar',
   adornmentPopover: 'adornment',
-  lyricPopover: 'lyric'
+  lyricPopover: 'lyric',
+  rhythmPopover: 'rhythm'
 };
 
 import './ScoreHud.ts';
@@ -1100,6 +1109,23 @@ export class ScenarioPage extends LitElement {
             : { type: 'removeMeasureAttribute', kind: parsed.remove }
         );
       }
+    } else if (this.setupPopover === 'rhythm') {
+      const parsed = parseRhythm(input.value);
+      if (!parsed) {
+        this.setupPopoverError = `not a rhythm declaration — ${RHYTHM_HELP}`;
+        return;
+      }
+      this.stripIntent(
+        'space' in parsed
+          ? { type: 'insertSpace', duration: parsed.space }
+          : 'rest' in parsed
+            ? { type: 'setRestSpelling', duration: { base: parsed.rest } }
+          : {
+              type: 'wrapInContainer',
+              spec: parsed.wrap,
+              ...(parsed.count === undefined ? {} : { count: parsed.count })
+            }
+      );
     } else if (this.setupPopover === 'key') {
       const key = parseKeySignature(input.value);
       if (!key) {
