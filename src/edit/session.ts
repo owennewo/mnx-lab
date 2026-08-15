@@ -736,16 +736,17 @@ export class EditorSession {
         }
         // 2. An armed anchor? Beam the run between it and here.
         if (this.spanAnchorKey !== null && this.spanAnchorKey !== slot.noteKey) {
-          // The run is computed against a COPY: minting ids is a document
-          // change, and only `apply` is allowed to make one.
-          const probe = JSON.parse(JSON.stringify(this.doc)) as MnxStructure;
-          const run = beamRunBetween(probe, this.spanAnchorKey, slot.noteKey);
+          // Indices, not ids: the op mints what the beam will reference, so
+          // reading the document here cannot change it and the ids the beam
+          // names are the ids the document actually carries.
+          const run = beamRunBetween(this.doc, this.spanAnchorKey, slot.noteKey);
           this.spanAnchorKey = null;
           if (!run) return false;
           this.apply({
             type: 'setBeam',
             measureIndex: run.measureIndex,
-            eventIds: run.eventIds,
+            from: run.from,
+            to: run.to,
             partIndex: this.cursorState.partIndex ?? 0
           });
           return true;

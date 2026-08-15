@@ -220,7 +220,7 @@ function opLabel(op: EditOp): string {
     case 'removePositioned':
       return `no ${op.kind} @ m${op.measureIndex + 1}`;
     case 'setBeam':
-      return `beam ${op.eventIds.length} events @ m${op.measureIndex + 1}`;
+      return `beam events ${op.from}–${op.to} @ m${op.measureIndex + 1}`;
     case 'removeBeam':
       return `remove beam @ m${op.measureIndex + 1}`;
     case 'setFullMeasureRest':

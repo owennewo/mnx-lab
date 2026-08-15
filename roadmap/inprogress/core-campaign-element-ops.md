@@ -857,3 +857,37 @@ tail's space work was verified by the sweep's verdicts moving, and those moved
 for other reasons; nothing asserted the span itself. One trace, replaying a
 real performance, found in minutes what four rounds of reasoning had missed —
 which is the argument for the trace queue in miniature.
+
+### 2026-08-15 — three more traces, and the queue keeps finding bugs
+
+`labels-with-navigation`, `beams-inner-grace-notes`, `verse-labels`.
+**Traced 8 → 11, kinds covered 13 → 22 of 38, queue 18 → 15 traces / 162
+elements.** Three findings, each invisible to the destruct sweep because
+removal never has to build anything:
+
+- **The construct harness could not trace a `schema: proposed` scenario.** Its
+  first oracle asserted the replayed document is schema-VALID, absolutely — and
+  the only validator this repo can compile is the published one, so every
+  proposal probe was untraceable by construction. Now it is **relative**: the
+  replay must introduce no error its own target does not already carry, which
+  is the widening item 2 made on the destruct side, arriving on this side for
+  the same reason. The corpus has two axes; an oracle that knows only one will
+  eventually say something false.
+- **`setBeam` wrote ids that existed nowhere.** The session computed the run
+  against a throwaway copy — correctly, since only `apply` may mutate — and the
+  id MINTING went with the copy, so beaming events that carry no ids (which is
+  every document the keyboard built) produced a beam naming ids the document
+  did not have. The sweep could not see it: it only ever removes beams that
+  already exist, and every corpus document with a beam already has ids. The op
+  mints now, because minting is a document change and belongs with the write
+  that needs it.
+- **Entry landed in front of a grace container**, so each note entered after a
+  grace pushed it one place later and the grace walked to the end of the bar. A
+  grace is un-timed and belongs to the note it precedes; entry now goes past
+  it.
+
+The pattern across all three: **the construct axis exercises code the destruct
+axis structurally cannot reach.** Removal needs identity; construction needs
+ordering, minting and validity — and each of those had a bug that had never
+been executed. The queue is not a formality; it is the other half of the
+campaign's coverage, and it is finding roughly one real defect per trace.

@@ -7,8 +7,10 @@
 // `{}` — genesis is ops (addPart materializes the skeleton), so every trace
 // builds its own scaffolding. Four verdicts per fixture:
 //
-//   1. the replayed document is schema-valid (FINAL doc only — `{}` is not
-//      valid MNX and needn't be; mid-flight invalidity is already normal)
+//   1. the replayed document introduces no schema error its TARGET does not
+//      already carry — RELATIVE, because `schema: proposed` scenarios are
+//      judged by a schema the harness cannot compile (final doc only: `{}` is
+//      not valid MNX and needn't be, and mid-flight invalidity is normal)
 //   2. undo-all returns to `{}` byte-identically
 //   3. THE KEYBOARD JOIN (static, no replay needed): every intent type in
 //      the trace is either bound in a keymap layer or emitted by a
@@ -117,6 +119,19 @@ function diffPaths(a: unknown, b: unknown, prefix = '', out: string[] = []): str
   return out;
 }
 
+/** Schema errors as comparable strings — the relative oracle asks whether the
+ *  replay's set exceeds its TARGET's, never whether it is empty. */
+function validationErrors(doc: MnxStructure): string[] {
+  const validator = validateMnx as unknown as {
+    (doc: unknown): boolean;
+    errors?: { instancePath?: string; schemaPath?: string; message?: string }[] | null;
+  };
+  if (validator(doc)) return [];
+  return (validator.errors ?? [])
+    .map(e => `${e.instancePath || '/'} [${e.schemaPath}] ${e.message}`)
+    .sort();
+}
+
 describe('construct traces (element-ops exemplar)', () => {
   it('has at least one fixture', () => {
     expect(fixtureFiles.length).toBeGreaterThan(0);
@@ -145,17 +160,26 @@ describe('construct traces (element-ops exemplar)', () => {
       const empty = {} as MnxStructure;
       const session = replayIntents(JSON.parse(JSON.stringify(empty)), fixture.intents);
 
-      // 1. Final document is schema-valid.
-      expect(
-        validateMnx(session.doc),
-        `replayed document is schema-invalid: ${JSON.stringify(validateMnx.errors?.slice(0, 3))}`
-      ).toBe(true);
-
-      // 4. THE VERDICT: primitives vs the committed golden, key-normalized
-      // on both sides (golden: real ids; replay: any minted ids).
       const targetDoc = JSON.parse(
         fs.readFileSync(path.join(dir!, 'score.mnx.json'), 'utf8')
       ) as MnxStructure;
+
+      // 1. Schema validity, RELATIVE to the target — the same widening item 2
+      // made on the destruct side, and for the same reason the corpus has two
+      // axes: a `schema: proposed` scenario is judged by a schema this repo
+      // cannot compile (the published validator is the only one the harness
+      // has), so an absolute assertion would make every proposal probe
+      // untraceable. What must hold is that building it introduces no error
+      // its own target does not already carry.
+      const targetErrors = validationErrors(targetDoc);
+      const replayErrors = validationErrors(session.doc);
+      expect(
+        replayErrors.filter(error => !targetErrors.includes(error)),
+        'the replay introduced schema errors the target does not have'
+      ).toEqual([]);
+
+      // 4. THE VERDICT: primitives vs the committed golden, key-normalized
+      // on both sides (golden: real ids; replay: any minted ids).
       const golden = JSON.parse(
         fs.readFileSync(path.join(dir!, 'expected.primitives.json'), 'utf8')
       ) as unknown;

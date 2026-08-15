@@ -348,12 +348,25 @@ export type EditOp =
   // that leave ink where it is. The containers that SWALLOW ink (tuplet,
   // grace, tremolo) wait for the grid to descend into them.
   | {
-      /** Beam a run of events, minting ids where they are missing (the same
-       *  move `setSlur` makes — both name events). Top level only: nested
-       *  beams are a rendering subdivision with their own gesture to come. */
+      /**
+       * Beam a run of events, addressed by CONTENT INDEX and minting the ids
+       * the beam will reference.
+       *
+       * It used to take ids, which the session computed against a throwaway
+       * copy so that only `apply` mutated the document — and the minting went
+       * with the copy, so beaming id-less events (any document the keyboard
+       * built) wrote a beam naming ids that existed nowhere. Found by the
+       * first traced beam (campaign item 3's queue). Minting is a document
+       * change, so it belongs here, with the write that needs it.
+       *
+       * Top level only: nested beams are a rendering subdivision with their
+       * own gesture to come.
+       */
       type: 'setBeam';
       measureIndex: number;
-      eventIds: string[];
+      /** Inclusive content indices of the run; un-timed items are skipped. */
+      from: number;
+      to: number;
       partIndex?: number;
     }
   | {
@@ -680,7 +693,10 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         return next;
       }
       if (found) {
-        seq.content.splice(found.index, 0, { duration: { ...op.duration }, notes: [note] });
+        seq.content.splice(pastGraceContainers(seq, found.index), 0, {
+          duration: { ...op.duration },
+          notes: [note]
+        });
         // The §8.11 invariant: a touched measure always has content for its
         // full metric duration, so unentered positions are already rests.
         padMeasureRests(next, op.measureIndex);
@@ -724,7 +740,10 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         return next;
       }
       if (found) {
-        seq.content.splice(found.index, 0, { duration: { ...op.duration }, notes: [note] });
+        seq.content.splice(pastGraceContainers(seq, found.index), 0, {
+          duration: { ...op.duration },
+          notes: [note]
+        });
         padMeasureRests(next, op.measureIndex);
       }
       return next;
@@ -1252,8 +1271,21 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
     }
     case 'setBeam': {
       const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
-      if (!measure || op.eventIds.length < 2) return next;
-      measure.beams = [...(measure.beams ?? []), { events: [...op.eventIds] }];
+      const seq = measure?.sequences?.find(sequence => (sequence.staff ?? 1) === 1);
+      if (!measure || !seq) return next;
+      const [start, end] = op.from <= op.to ? [op.from, op.to] : [op.to, op.from];
+      const events: string[] = [];
+      for (let i = start; i <= end && i < seq.content.length; i++) {
+        const item = seq.content[i];
+        // A grace container is not beamed with its neighbours (the spec's own
+        // `beams-inner-grace-notes` says so in a comment), and a rest breaks a
+        // beam — both are skipped rather than refused.
+        if (!isTimedEvent(item) || (item.notes?.length ?? 0) === 0) continue;
+        item.id ??= mintEventId(next);
+        events.push(item.id);
+      }
+      if (events.length < 2) return next;
+      measure.beams = [...(measure.beams ?? []), { events }];
       return next;
     }
     case 'removeBeam': {
@@ -1576,6 +1608,17 @@ function subtractOnsets(a: Onset, b: Onset): Onset {
  * they hold. Null when ink (or the end of the bar) gets in the way first —
  * entry may lengthen silence, never overwrite music.
  */
+/** Where a new event goes at a content index: AFTER any grace container
+ *  sitting there. A grace is un-timed and belongs to the note it precedes
+ *  (it steals that note's time), so entering at its onset must put the new
+ *  note on the far side of it — otherwise every note entered after a grace
+ *  lands in front of it and the grace walks to the end of the bar. */
+function pastGraceContainers(seq: MnxSequence, index: number): number {
+  let at = index;
+  while (at < seq.content.length && (seq.content[at] as { type?: string }).type === 'grace') at++;
+  return at;
+}
+
 function restsCovering(
   seq: MnxSequence,
   index: number,
@@ -1882,27 +1925,25 @@ function countFits(seq: MnxSequence, eventIndex: number, count: number): boolean
   return seq.content.slice(eventIndex, eventIndex + count).every(item => isTimedEvent(item));
 }
 
+/** The content range two note keys span, for the beam verb — indices only, so
+ *  reading the document cannot change it (the minting happens in the op). */
 export function beamRunBetween(
   doc: MnxStructure,
   fromNoteKey: string,
   toNoteKey: string
-): { measureIndex: number; eventIds: string[] } | null {
+): { measureIndex: number; from: number; to: number } | null {
   const from = findKeyedNote(doc, fromNoteKey);
   const to = findKeyedNote(doc, toNoteKey);
   if (!from || !to) return null;
   if (from.measureIndex !== to.measureIndex || from.seq !== to.seq) return null;
   const [start, end] =
     from.eventIndex <= to.eventIndex ? [from.eventIndex, to.eventIndex] : [to.eventIndex, from.eventIndex];
-  const eventIds: string[] = [];
+  let beamable = 0;
   for (let i = start; i <= end; i++) {
     const item = from.seq.content[i];
-    if (!isTimedEvent(item)) continue;
-    const event = item as MnxEvent;
-    if ((event.notes?.length ?? 0) === 0) continue; // a rest breaks a beam
-    event.id ??= mintEventId(doc);
-    eventIds.push(event.id);
+    if (isTimedEvent(item) && (item.notes?.length ?? 0) > 0) beamable++;
   }
-  return eventIds.length >= 2 ? { measureIndex: from.measureIndex, eventIds } : null;
+  return beamable >= 2 ? { measureIndex: from.measureIndex, from: start, to: end } : null;
 }
 
 /**

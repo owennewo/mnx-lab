@@ -1,0 +1,109 @@
+{
+  "target": "spec/beams-inner-grace-notes",
+  "intents": [
+    {
+      "type": "addPart"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "wrapInContainer",
+      "spec": {
+        "type": "grace"
+      }
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "setRestSpelling",
+      "duration": {
+        "base": "half"
+      }
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 0
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleBeam"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "toggleBeam"
+    }
+  ]
+}

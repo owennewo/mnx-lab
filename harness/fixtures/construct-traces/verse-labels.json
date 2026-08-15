@@ -1,0 +1,26 @@
+{
+  "target": "lab/lyrics/verse-labels",
+  "intents": [
+    { "type": "addPart", "name": "Voice" },
+    { "type": "appendMeasure" },
+    { "type": "setTimeSignature", "count": 4, "unit": 4 },
+    { "type": "setClef", "sign": "G", "staffPosition": -2 },
+    { "type": "setLyricLine", "line": "verse1", "label": "1." },
+    { "type": "setLyricLine", "line": "verse2", "label": "2." },
+    { "type": "longerDuration" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "toggleNote" },
+    { "type": "setSyllable", "line": "verse1", "text": "Shine", "syllableType": "whole" },
+    { "type": "setSyllable", "line": "verse2", "text": "Morn", "syllableType": "start" },
+    { "type": "nextPosition" },
+    { "type": "lineUp" },
+    { "type": "toggleNote" },
+    { "type": "setSyllable", "line": "verse1", "text": "bright", "syllableType": "whole" },
+    { "type": "setSyllable", "line": "verse2", "text": "ing", "syllableType": "end" }
+  ]
+}
