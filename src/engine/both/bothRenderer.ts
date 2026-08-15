@@ -34,6 +34,8 @@ export interface RenderBothOptions {
   hide?: readonly HideableFeature[];
   /** Horizontal density multiplier (core-render-density-zoom.md). */
   densityH?: number;
+  /** Vertical/frame density multiplier (core-vertical-density.md). */
+  densityPad?: number;
 }
 
 export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
@@ -46,7 +48,8 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
     selectedNoteIds: opts.selectedNoteIds,
     tabSetup: opts.tabSetup,
     hide: opts.hide,
-    densityH: opts.densityH
+    densityH: opts.densityH,
+    densityPad: opts.densityPad
   });
 
   const fitted = opts.pxPerSp === undefined;

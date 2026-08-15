@@ -20,6 +20,7 @@ import {
   type RenderScale
 } from '../engine/render/scale.ts';
 import { densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
+import { padDensityFor } from '../engine/layout/verticalDensity.ts';
 import { drawCursorGhost, drawEnclosure } from './enclosure.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
@@ -170,6 +171,23 @@ export class ScoreViewer extends LitElement {
    * `clampDensity`, so a host and the pad get the same floor.
    */
   @property({ type: Number, attribute: 'density-h' }) densityH: number | null = null;
+  /**
+   * Vertical/frame density (roadmap/complete/core-vertical-density.md): a
+   * multiplier on the whitespace a page RESERVES — the pads above and below
+   * each system, and the margins either side — as opposed to `density-h`,
+   * which spaces the music itself. Floored per row by the ink that row
+   * actually holds, so tightening it can never put one system's stems through
+   * the system above.
+   *
+   * **Unset is not 1.** Left alone it is DERIVED from the effective
+   * `density-h` through `padDensityFor`, so a host that asks for tighter
+   * spacing gets a tighter page rather than the same page with the music
+   * squeezed inside it. That is the coupling core-vertical-density.md argued
+   * for — one reader-facing intent over two engine scalars — and it lives
+   * here, at the surface, precisely so it stays reversible: set this and it
+   * wins, exactly like `density-h` over `density`.
+   */
+  @property({ type: Number, attribute: 'density-pad' }) densityPad: number | null = null;
   /**
    * The selection overlay is showing where the cursor WAS, but keystrokes
    * are going somewhere else (core-editor-focus-scope.md, stage 3): a
@@ -575,6 +593,7 @@ export class ScoreViewer extends LitElement {
       changed.has('view') ||
       changed.has('density') ||
       changed.has('densityH') ||
+      changed.has('densityPad') ||
       changed.has('hide') ||
       changed.has('zoom') ||
       changed.has('stringsOverride') ||
@@ -604,6 +623,9 @@ export class ScoreViewer extends LitElement {
     // re-pack at the value THIS paint used, not at whatever the properties say
     // when it is asked.
     const densityH = this.densityH ?? DENSITY_H[this.density] ?? 1;
+    // Unset couples to the horizontal axis; explicit wins. Same precedence
+    // shape as `density-h` over `density`, one level up.
+    const densityPad = this.densityPad ?? padDensityFor(densityH);
     // Whichever pane actually drew: `both` is one render, and in the split
     // views notation and tab derive the same factor from the shared plan, so
     // there is never a second, disagreeing answer to report.
@@ -632,6 +654,7 @@ export class ScoreViewer extends LitElement {
       // binds a behavior it does not implement (docs/core-viewer-surface.md).
       // A numeric `density-h` outranks the preset; unset, the preset decides.
       densityH,
+      densityPad,
       // undefined, not 10: an absent pxPerSp is what tells the renderers to
       // FIT (core-zoom-density-pad.md, ruling 2). Sending a number here would
       // pin every score at load and quietly retire fit-to-width.

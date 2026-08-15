@@ -10,6 +10,7 @@ import {
   emitTabTimeSig,
   emitTabVoices
 } from './tabStaff.ts';
+import { clampPadDensity, tightenRows } from './verticalDensity.ts';
 import { validateDocument } from './validate.ts';
 import { tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
 
@@ -55,6 +56,10 @@ export interface LayoutTabOptions {
    *  this and so ignored `density` entirely; core-zoom-density-pad.md found
    *  it when the pad had to drive all three views. */
   densityH?: number;
+  /** Vertical/frame density (core-vertical-density.md). A tab staff reserves
+   *  4sp above it and uses a median of 0.0 — this is the view the axis was
+   *  measured on and buys the most. */
+  densityPad?: number;
 }
 
 export function layoutTab(opts: LayoutTabOptions): LayoutResult {
@@ -89,7 +94,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   // All horizontal decisions (system packing, bar widths, event x positions)
   // come from the shared plan — layoutNotation consumes the same one, which is
   // what keeps notation and tab column-aligned in the "both" view.
-  const plan = planHorizontal(mnx, widthSp, { densityH: opts.densityH });
+  const plan = planHorizontal(mnx, widthSp, { densityH: opts.densityH, densityPad: opts.densityPad });
 
   // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
   // into each measure's diagnostic markers alongside renderer-gap issues.
@@ -221,9 +226,13 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
 
   const heightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * ROW_HEIGHT_SP;
   const rows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r) => rowBand(r));
+  const tightened = tightenRows({
+    primitives, rows, heightSp, padDensity: clampPadDensity(opts.densityPad)
+  });
 
   return {
-    primitives, widthSp, heightSp, usedWidthSp: plan.usedWidthSp, index, diagnostics, rows,
+    primitives, widthSp, heightSp: tightened?.heightSp ?? heightSp, usedWidthSp: plan.usedWidthSp,
+    index, diagnostics, rows: tightened?.rows ?? rows,
     packings: [plan.packing]
   };
 }

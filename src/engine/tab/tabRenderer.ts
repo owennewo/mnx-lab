@@ -32,6 +32,8 @@ export interface RenderTabOptions {
   tabSetup?: PartTabSetups;
   /** Horizontal density multiplier (core-render-density-zoom.md). */
   densityH?: number;
+  /** Vertical/frame density multiplier (core-vertical-density.md). */
+  densityPad?: number;
 }
 
 export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
@@ -43,7 +45,8 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds,
     tabSetup: opts.tabSetup,
-    densityH: opts.densityH
+    densityH: opts.densityH,
+    densityPad: opts.densityPad
   });
 
   // An explicit pxPerSp pins the scale; the default scales short scores up to

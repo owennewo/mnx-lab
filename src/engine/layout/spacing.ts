@@ -13,6 +13,7 @@ import {
   sequenceItemKind
 } from '../../model/mnx.ts';
 import { dynamicWidthSp } from './dynamics.ts';
+import { clampPadDensity } from './verticalDensity.ts';
 
 /**
  * Horizontal spacing — the one place bar widths and note spacing are decided.
@@ -38,6 +39,7 @@ import { dynamicWidthSp } from './dynamics.ts';
 // ---------- Spacing knobs (all horizontal "feel" lives here) ----------
 
 const MARGIN_SP = 2;               // page margin either side of a system
+const MIN_PAGE_MARGIN_SP = 0.5;    // floor under `densityPad` (core-vertical-density.md)
 const CONTENT_LEFT_PAD_SP = 0.6;
 const CONTENT_RIGHT_PAD_SP = 0.8;
 const START_BARLINE_PAD_SP = 0.5;
@@ -665,6 +667,17 @@ export interface PlanOptions {
    * much air sits between glyphs; zoom changes how big the glyphs are.
    */
   densityH?: number;
+  /**
+   * FRAME DENSITY (roadmap/complete/core-vertical-density.md): a multiplier on
+   * the fixed whitespace a page reserves rather than on the music inside it.
+   * Horizontally that is the page margin either side of a system — the only
+   * width on the line that is neither a spring nor a rigid column, and so the
+   * only one this axis may touch.
+   *
+   * Floored at `MIN_PAGE_MARGIN_SP`: a system flush against the viewport edge
+   * reads as clipped rather than as tight.
+   */
+  densityPad?: number;
   /** Only plan measures in [from, to] (inclusive); the rest become hidden
    *  stubs. Lets a score render each per-system layout as its own segment
    *  while plan.measures stays index-aligned with the document. */
@@ -765,8 +778,9 @@ export function planHorizontal(
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
   const leftInset = options?.leftInsetSp ?? 0;
-  const startX = MARGIN_SP + leftInset;
-  const lineWidth = widthSp - 2 * MARGIN_SP - leftInset;
+  const marginSp = Math.max(MIN_PAGE_MARGIN_SP, MARGIN_SP * clampPadDensity(options?.densityPad));
+  const startX = marginSp + leftInset;
+  const lineWidth = widthSp - 2 * marginSp - leftInset;
   const forcedBreaks = options?.forcedBreaks ?? new Set<number>();
 
   // Multimeasure-rest collapses: the start measure becomes an H-bar stand-in,
@@ -1251,7 +1265,7 @@ export function planHorizontal(
   }
 
   const usedWidthSp = measures.length
-    ? Math.max(...measures.map(m => m.x + m.width)) + MARGIN_SP
+    ? Math.max(...measures.map(m => m.x + m.width)) + marginSp
     : widthSp;
   return { measures, rowCount: packed.length, numStaves, staffGroups, usedWidthSp, packing };
 }

@@ -28,6 +28,8 @@ export interface RenderNotationOptions {
   hide?: readonly HideableFeature[];
   /** Horizontal density multiplier (core-render-density-zoom.md). */
   densityH?: number;
+  /** Vertical/frame density multiplier (core-vertical-density.md). */
+  densityPad?: number;
 }
 
 export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutcome {
@@ -39,7 +41,8 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds,
     hide: opts.hide,
-    densityH: opts.densityH
+    densityH: opts.densityH,
+    densityPad: opts.densityPad
   });
 
   // An explicit pxPerSp pins the scale; the default scales short scores up to

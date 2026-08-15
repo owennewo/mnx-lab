@@ -29,6 +29,8 @@ export interface LayoutBothOptions {
   hide?: readonly HideableFeature[];
   /** Horizontal density multiplier (core-render-density-zoom.md). */
   densityH?: number;
+  /** Vertical/frame density multiplier (core-vertical-density.md). */
+  densityPad?: number;
 }
 
 export function layoutBothSystem(opts: LayoutBothOptions): LayoutResult {

@@ -38,6 +38,7 @@ import {
   Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, translatePrimitiveY
 } from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
+import { clampPadDensity, tightenRows } from './verticalDensity.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
 import {
   TAB_STAFF_HEIGHT_SP,
@@ -432,6 +433,11 @@ export interface LayoutNotationOptions {
    *  keep their size; only the air between them changes, which is what makes
    *  this independent of zoom. */
   densityH?: number;
+  /** Vertical/frame density (core-vertical-density.md): a multiplier on the
+   *  fixed whitespace every system reserves — the row pads above and below a
+   *  staff, and the page margins — floored by the ink each row actually
+   *  contains. 1 is today's engraving and skips the pass entirely. */
+  densityPad?: number;
 }
 
 /** What a host may hide. Layout-side members must be honored HERE (space
@@ -755,7 +761,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         includeTabStaves: opts.includeTabStaves === true && (mnx.scores ?? []).length === 0,
         tabSetup: opts.tabSetup,
         hide: opts.hide ?? [],
-        densityH: opts.densityH
+        densityH: opts.densityH,
+        densityPad: opts.densityPad
       })
     );
     const jobUsed = Math.max(...rs.map(r => r.usedWidthSp));
@@ -787,7 +794,18 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     usedWidthSp = Math.max(usedWidthSp, jobUsed);
   }
 
-  return { primitives, widthSp, heightSp: cursorY, usedWidthSp, index, diagnostics, rows, packings };
+  // Vertical density last, over the finished score: rows are re-placed against
+  // the ink they hold rather than the headroom they reserved. At density 1 the
+  // pass returns null and nothing moves — which is what keeps the goldens
+  // byte-identical by construction rather than by arithmetic.
+  const tightened = tightenRows({
+    primitives, rows, heightSp: cursorY, padDensity: clampPadDensity(opts.densityPad)
+  });
+
+  return {
+    primitives, widthSp, heightSp: tightened?.heightSp ?? cursorY, usedWidthSp, index, diagnostics,
+    rows: tightened?.rows ?? rows, packings
+  };
 }
 
 interface RenderSegmentArgs {
@@ -804,6 +822,7 @@ interface RenderSegmentArgs {
   tabSetup?: PartTabSetups;
   hide: readonly HideableFeature[];
   densityH?: number;
+  densityPad?: number;
 }
 
 // Left-of-system geometry: nested decorations step left of their parents,
@@ -823,7 +842,7 @@ function renderSegment(args: RenderSegmentArgs): {
    *  other densities would draw (spacing.ts `densityLadder`). */
   packing: PackingInput;
 } {
-  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH } = args;
+  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH, densityPad } = args;
   const primitives: Primitive[] = [];
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
@@ -858,6 +877,7 @@ function renderSegment(args: RenderSegmentArgs): {
   // keeps notation and tab column-aligned in the "both" view.
   const plan = planHorizontal(mnx, widthSp, {
     densityH,
+    densityPad,
     staves: segment.staves,
     leftInsetSp,
     collapse,

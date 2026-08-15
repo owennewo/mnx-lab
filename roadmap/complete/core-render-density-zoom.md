@@ -5,7 +5,7 @@
 > surface ([core-zoom-density-pad.md](core-zoom-density-pad.md), 2026-08-15),
 > and on the same day the two corrections below that came out of *using* the
 > pad. The third axis, **vertical density**, was never started here and is
-> handed on whole to [core-vertical-density.md](../proposed/core-vertical-density.md)
+> handed on whole to [core-vertical-density.md](../complete/core-vertical-density.md)
 > rather than kept as an open line on a doc whose other work is done.
 >
 > **Closing increment 1 — the floor moved 0.5 → 0.02.** Ruling 1 of the pad doc
@@ -180,7 +180,7 @@ Three distinct axes, deliberately separated:
 - Adjacent engraving refinements that affect vertical rhythm should land first or alongside —
   e.g. the stem-length "reach-to-the-middle-line" clamp (currently a fixed `STEM_LENGTH_SP`),
   since stem headroom feeds vertical spacing. **Carried to
-  [core-vertical-density.md](../proposed/core-vertical-density.md)**, which owns that axis now.
+  [core-vertical-density.md](../complete/core-vertical-density.md)**, which owns that axis now.
 
 ## Not this
 

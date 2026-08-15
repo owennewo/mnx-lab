@@ -40,18 +40,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-vertical-density.md](proposed/core-vertical-density.md)** — **systems per page
-  without shrinking the staff**, split out of
-  [core-render-density-zoom.md](complete/core-render-density-zoom.md) (2026-08-15) as the
-  one axis of three that never started. Two reasons it didn't, both still true:
-  `ROW_HEIGHT_SP` is a module-level constant read from `notation.ts`, `tab.ts` and the
-  `both` composer, so making it per-layout is a real refactor the goldens will judge; and
-  the stem-length clamp should land first or alongside, since row headroom is sized for
-  whatever `STEM_LENGTH_SP` allows. Arrives with its control question already open —
-  the zoom pad's four arms are spent (its ruling 4), and the honest answer may be one
-  coupled "fit more music" intent rather than a third slider. Carries the horizontal
-  axis's hard-won lesson: **ask which values of the knob draw a different page** before
-  giving it a control.
 - **[core-entry-surface.md](proposed/core-entry-surface.md)** — typing anywhere the
   cursor can already go, graduated out of the element-ops campaign (2026-08-15) as the
   last thing holding its index open. The cursor addresses part → staff → voice in full
@@ -255,6 +243,24 @@ proposals that name their campaign.
   container rungs.
 
 ### complete/
+- **[core-vertical-density.md](complete/core-vertical-density.md)** — **systems per page
+  without shrinking the staff**: the third axis of
+  [core-render-density-zoom.md](complete/core-render-density-zoom.md), proposed and built
+  the same day (2026-08-15) because both reasons it had been deferred dissolved on
+  contact. It needed no `ROW_HEIGHT_SP` refactor — the pass runs *after* a layout, over
+  the finished `LayoutResult`, so one implementation serves notation, tab and the `both`
+  system and no row arithmetic became per-instance. And it needed no stem-length clamp
+  first, because it does not tighten toward a chosen constant: measuring the goldens
+  showed a notation staff reserves 6sp above itself and uses a **median of 0.5**, a tab
+  staff reserves 4sp and uses **0.0**, so a plain multiplier would clip the p90 score
+  while helping the median one. It tightens toward each row's **measured ink** instead —
+  real SMuFL glyph boxes, not baselines, since a clef's ink reaches 2.5sp above its own
+  baseline — which turns the collision question `densityH` answers structurally into one
+  this axis answers by assertion. The control question answered itself too: the coupling
+  sits on the element (`density-pad` unset ⇒ derived from `density-h` by a square root),
+  so the zoom pad's existing ←→ arms drive both axes and its ruling-4 "no third arm pair"
+  still holds. Tab loses 51% of its height at the tight end, notation 25%; density 1
+  does not run the pass at all, so every golden is byte-identical by construction.
 - **[workbench-chrome-language.md](complete/workbench-chrome-language.md)** — **the rail and
   the headers in the panel's language**, a post-campaign item against
   [core-campaign-modernist.md](complete/core-campaign-modernist.md) rather than a reopening
@@ -287,8 +293,8 @@ proposals that name their campaign.
   `spring × densityH × stretch` and the justifier's `stretch` is inversely proportional
   to `densityH`, so most of the range is *exactly* degenerate. `packSystems()` (factored
   out of `planHorizontal`, goldens unmoved) + `densityLadder()` return the values that do
-  something; the pad's arms walk those. The third axis is now
-  [core-vertical-density.md](proposed/core-vertical-density.md).
+  something; the pad's arms walk those. The third axis landed the next day —
+  [core-vertical-density.md](complete/core-vertical-density.md).
 - **[core-campaign-modernist.md](complete/core-campaign-modernist.md)** — **campaign**: the
   workbench restyle the tray's art direction leads, plus the score panel it was drawn for.
   Fills the slot [core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)

@@ -76,6 +76,7 @@ outranks any `staffKind`, always.
 | `zoom` | number | *unset* | **staff scale** — a multiplier on `pxPerSp`, so line gap, glyphs, text and stems scale together. Clamped 0.6–1.6. **Unset is not `1`**: with no `pxPerSp` the renderer *fits* a short score to the viewport, and defaulting to `1` would silently retire fit-to-width for every host that never set it. Until 2026-08-15 this prop sized the paper card and never reached the engine. |
 | `density` | `normal` · `compact` · `spacious` | `normal` | **horizontal density** — how much music fits on a line, *without* shrinking glyphs. The engine scales the springs and never the rigid columns, which is what keeps this independent of `zoom` so the two compose. |
 | `density-h` | number | *unset* | the numeric form of the same axis; wins over `density` when set. Clamped by the engine's own `clampDensity` (0.5–2), so a host and a control get the same floor. The floor is **legibility, not collision** — no density can make ink overlap. |
+| `density-pad` | number | *derived* | **frame density** — a multiplier on the whitespace the page *reserves* (the pads above and below each system, the margins either side) as opposed to the space between the music. Floored per row by the ink that row actually holds, so no value can put one system's stems through the system above. **Unset is neither `1` nor a preset: it is DERIVED from the effective `density-h`** (`padDensityFor`, a square root) — see below. |
 
 #### How a `hide` member is sorted
 
@@ -137,11 +138,46 @@ engine would be irreversible; a control that couples them for the user is not
 them separate and shows both).
 
 **Vertical density is deliberately still absent.** Systems packing closer
-without shrinking the staff is a third axis, and `ROW_HEIGHT_SP` is a
-module-level constant derived from the row pads, so it is a real refactor rather
-than a wiring job — and the stem-length clamp should land first or alongside,
-since stem headroom feeds vertical spacing. It has its own item now:
-[core-vertical-density.md](../roadmap/proposed/core-vertical-density.md).
+without shrinking the staff was a third axis, deferred because `ROW_HEIGHT_SP`
+is a module-level constant derived from the row pads. **It shipped 2026-08-15**
+as `density-pad` above — and the refactor that doc expected never happened,
+because the axis runs as a post-pass over a finished `LayoutResult` instead:
+`rows[]` says where each system sits, the primitives say where its ink reaches,
+and rows move by translation. One implementation serves notation, tab and the
+combined system, and no layout had to make its row arithmetic per-instance.
+[core-vertical-density.md](../roadmap/complete/core-vertical-density.md).
+
+#### Why `density-pad` couples to `density-h` by default
+
+The two axes answer one reader question — *fit more music on the screen* — and
+a control offering them separately asks the reader to solve for something they
+do not think in. So the element couples them: unset, `density-pad` follows the
+effective `density-h`, and a host that only ever writes `density-h` gets a
+tighter *page* rather than the same page with the music squeezed inside it.
+
+The coupling lives **here, at the surface, not in the engine**, and that is the
+whole design: the two scalars stay independent below this line, so setting
+`density-pad` explicitly wins and separates them again — the same precedence
+shape as `density-h` over `density`, one level up. Coupling in the control is
+reversible; conflating the scalars in the engine would not be.
+
+It is a square root rather than a copy because the axes buy very different
+amounts per unit. `density-h` runs usefully down to 0.02 before packing bottoms
+out; padding is spent by roughly 0.3, floored by ink. Coupled linearly, the
+pads would hit their floor in the first tenth of a control's travel and sit
+there — which reads as a broken control rather than an exhausted one.
+
+The safety argument differs from `density-h`'s, and the difference matters.
+Horizontal density cannot make ink collide *structurally* — it scales springs
+and never the rigid columns. Vertically there is no such guarantee, because the
+row pads **are** the clearance. So this axis does not tighten toward a constant;
+it tightens toward each row's measured ink (through the same `computeBoundsSp`
+the snug crop uses, real SMuFL glyph boxes rather than baselines) and stops
+there. The space it reclaims is the space nothing was using: measured across
+the committed goldens, a notation staff reserves 6sp above itself and uses a
+median of 0.5sp, and a tab staff reserves 4sp and uses a median of 0.0sp.
+`harness/conformance/vertical-density.test.ts` asserts the non-overlap
+guarantee at and past the clamp.
 
 The `density-h` range widened at the bottom on 2026-08-15 (`MIN_DENSITY`
 0.5 → 0.02): the old floor stopped a reader two systems short of what this
