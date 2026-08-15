@@ -9,14 +9,14 @@
 <text x="49.6" y="141.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
 <text x="117.6" y="118.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="117.6" y="164.5712" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<rect x="188.32" y="124.5712" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n1"></rect>
-<text x="193.6" y="132.5712" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="n1">2</text>
-<rect x="300.32" y="124.5712" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n2"></rect>
-<text x="305.6" y="132.5712" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="n2">5</text>
-<rect x="412.32" y="142.8576" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n3"></rect>
-<text x="417.6" y="150.8576" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="n3">2</text>
-<rect x="524.32" y="142.8576" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n4"></rect>
-<text x="529.6" y="150.8576" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="n4">5</text>
+<rect x="187.6" y="124.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n1"></rect>
+<text x="193.6" y="132.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n1">2</text>
+<rect x="299.6" y="124.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n2"></rect>
+<text x="305.6" y="132.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n2">5</text>
+<rect x="411.6" y="142.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n3"></rect>
+<text x="417.6" y="150.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n3">2</text>
+<rect x="523.6" y="142.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n4"></rect>
+<text x="529.6" y="150.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n4">5</text>
 <line x1="587.2" y1="96" x2="587.2" y2="187.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
 <rect x="592" y="96" width="6.4" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

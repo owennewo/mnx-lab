@@ -219,10 +219,10 @@
       },
       {
         "kind": "rect",
-        "x": 14.52,
-        "y": 11.2143,
-        "w": 0.66,
-        "h": 1,
+        "x": 14.475,
+        "y": 11.2029,
+        "w": 0.75,
+        "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
         "sourceId": "n1"
@@ -233,10 +233,10 @@
         "x": 14.85,
         "y": 11.7143,
         "font": "body",
-        "size": 1.1,
+        "size": 1.25,
         "anchor": "middle",
         "baseline": "central",
-        "weight": 600,
+        "weight": 700,
         "className": "fret-number",
         "sourceId": "n1"
       },

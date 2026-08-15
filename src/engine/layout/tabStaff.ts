@@ -49,7 +49,27 @@ export const TAB_STAFF_HEIGHT_SP = (TAB_STAFF_LINES - 1) * TAB_STRING_SPACING_SP
 
 export const TAB_STAFF_LINE_THICKNESS_SP = 0.1;
 
-const FRET_FONT_SIZE_SP = 1.1;
+const FRET_FONT_SIZE_SP = 1.25;
+
+/**
+ * Fret digits are the tab staff's ONLY musical content — the reader's eye goes
+ * to them and nothing else — so they carry the boldest weight in the engine.
+ * 700 is a real bundled face (`@fontsource/archivo/latin-700` in
+ * src/entries/main.ts), not a synthesized one; the rest of the engine's `bold`
+ * text resolves to the same face.
+ */
+const FRET_FONT_WEIGHT = 700;
+
+/**
+ * The digit's mask over the string line. Tracks the font size so a larger digit
+ * cannot spill past the hole it punches, but is CAPPED clear of the next
+ * string: if two masks on adjacent strings met, a chord would erase the staff
+ * lines between its digits and the tab would read as broken.
+ */
+const FRET_BG_HEIGHT_SP = Math.min(
+  FRET_FONT_SIZE_SP * 0.85,
+  TAB_STRING_SPACING_SP - 0.12
+);
 
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
@@ -292,9 +312,9 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
           primitives.push({
             kind: 'rect',
             x: eventX - charWidthSp / 2,
-            y: stringY - 0.5,
+            y: stringY - FRET_BG_HEIGHT_SP / 2,
             w: charWidthSp,
-            h: 1,
+            h: FRET_BG_HEIGHT_SP,
             fill: FRET_BG_FILL,
             className: 'fret-bg',
             sourceId: noteId
@@ -308,7 +328,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
             size: FRET_FONT_SIZE_SP,
             anchor: 'middle',
             baseline: 'central',
-            weight: 600,
+            weight: FRET_FONT_WEIGHT,
             fill: fretFill,
             className: 'fret-number' +
               (isActive ? ' active' : '') +

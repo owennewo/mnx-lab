@@ -201,10 +201,10 @@
       },
       {
         "kind": "rect",
-        "x": 14.52,
-        "y": 10.0714,
-        "w": 0.66,
-        "h": 1,
+        "x": 14.475,
+        "y": 10.06,
+        "w": 0.75,
+        "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
         "sourceId": "@m0.v0.e0.n0"
@@ -215,10 +215,10 @@
         "x": 14.85,
         "y": 10.5714,
         "font": "body",
-        "size": 1.1,
+        "size": 1.25,
         "anchor": "middle",
         "baseline": "central",
-        "weight": 600,
+        "weight": 700,
         "className": "fret-number",
         "sourceId": "@m0.v0.e0.n0"
       },

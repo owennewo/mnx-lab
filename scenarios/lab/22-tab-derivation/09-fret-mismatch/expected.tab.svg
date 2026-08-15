@@ -9,8 +9,8 @@
 <text x="49.6" y="141.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
 <text x="117.6" y="118.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="117.6" y="164.5712" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<rect x="232.32" y="161.1424" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
-<text x="237.6" y="169.1424" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e0.n0">3</text>
+<rect x="231.6" y="160.96" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
+<text x="237.6" y="169.1424" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e0.n0">3</text>
 <line x1="323.2" y1="96" x2="323.2" y2="187.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
 <rect x="328" y="96" width="6.4" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 <rect x="228.8" y="206.6288" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
