@@ -164,17 +164,17 @@ Home is the **attention queue** (blocked → stale → never-seen; current count
 shown), derived from committed provenance in `src/workbench/queue.ts`. Every scenario + view
 has a stable deep link: `#/scenario/<id>?view=notation|tab|both` (unspecified ⇒ the
 document's `tab.staffKind` hint); legacy `?view=compare|json` links are honored and
-open the matching tab of the scenario page's **side panel** (description | tags |
-actions | ops | hud | compare | json — roadmap/inprogress/core-score-hud.md, which
-created the panel; `ops` arrived later with the element-ops exemplar), which holds
+open the matching tab of the scenario page's **side panel** (description | ops | hud |
+compare | json — roadmap/inprogress/core-score-hud.md created it;
+roadmap/proposed/workbench-score-panel.md cut it from seven to five and gave every tab
+the same five-band frame: tab strip, context bar, ONE scrolling body, footer), which holds
 all page chrome including the selection HUD and the per-part instrument override
 (the HUD's ensemble table → `<mnx-score-viewer>.partTabSetups`; the flat
 `stringsOverride`/`capoOverride` pair remains for single-instrument embeds —
 presentation only). Tab/both exist only when the strings are KNOWN — declared in
 the document, or supplied through that override. No instrument is ever assumed.
-The seven tabs are **proposed to become five** (`tags` folding into `description`,
-`actions` retiring into the selection tray and the palette) —
-roadmap/proposed/workbench-score-panel.md, part of the Modernist restyle campaign.
+The setup popovers are a **page-level overlay over the score**, not a tab: opening one
+with the keyboard must not move the panel out from under what you were reading.
 
 **`#/objects`** is the coverage map — every non-plumbing `$def` against the scenarios
 exercising it (`src/corpus/defIndex.ts`, inverting the spec's own `coversDefs` join),

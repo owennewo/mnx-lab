@@ -118,8 +118,8 @@ interface EditorCommand {
   an extension of the campaign's static keyboard join over `SURFACE_INTENTS`.
   Asserted in a new `harness/conformance/command-registry.test.ts`.
 - **Reverse**: `opRows.ts` `SURFACE_LABELS` gains `selectionTray` — an op fired
-  from a tile shows `tray` provenance in the ops panel the way palette ops show
-  `Ctrl+K · palette` today.
+  from a tile shows `/ · tray` provenance in the ops panel the way palette ops
+  show `Ctrl+Shift+K · palette`.
 - **Agreement with the cheatsheet**: a key inert at a rung (`KEY_DOCS` meaning
   absent) must not appear available on that rung's tab — the same
   guards-mirror-docs discipline `keymap-docs.test.ts` already enforces.
@@ -198,9 +198,17 @@ voice/staff, layout/score authoring, part transposition, mute — enumerated in
 
 ## Keyboard ownership
 
-- **`SHELL_BINDINGS` change**: Ctrl+K → the tray when a session exists and
-  `editorHasKeyboard`; Ctrl+Shift+K → the global `<mnx-command-palette>`; no
-  session, Ctrl+K falls through to the palette. Both remain workbench-tier — shell
+- **`SHELL_BINDINGS` change**: **`/`** → the tray when a session exists and
+  `editorHasKeyboard`; with no session it falls through to **go-to** — the job
+  slash used to do from the rail, by a different mechanism. Ctrl+G → go-to (whose
+  `>` prefix still reaches the global command list). **Ctrl+Shift+K retired**
+  when those commands became the tray's own `global` tab
+  ([core-selection-tray-global-tab.md](../proposed/core-selection-tray-global-tab.md)). **Ctrl+K is unbound**:
+  Chrome owns it (the omnibox), and because we deliberately never consume keys
+  typed into text fields it worked from the score and escaped to the browser
+  from every input — a shortcut that works most of the time teaches that it
+  cannot be trusted. (Revised 2026-08-15, after the tray shipped on Ctrl+K.)
+  All of them remain workbench-tier — shell
   bindings do not travel ([core-editor-focus-scope.md](../proposed/core-editor-focus-scope.md)).
 - **The tray is a scope-4 region**: while open it consumes exactly the keys the
   visuals doc lists, via the same `keyScope` discipline as the popovers; direct

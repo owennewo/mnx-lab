@@ -1,5 +1,18 @@
 # The score panel — five bands, five tabs
 
+> **Status: BUILT 2026-08-15**, same day as proposed — except two halves that belong to
+> other items: the JSON gutter / three inks / selection scoping (all read
+> `buildJsonView`, so they ride [core-json-view.md](core-json-view.md)) and compare's
+> live render + overlay. The tab retirement went through its sequence intact: the
+> popover was rehomed to a page-level overlay first, the palette's four-of-nine gap
+> closed from one shared table, then `actions` was deleted with `tsc` catching every
+> stale branch. Two design cells were **refused as drawn** because the corpus does not
+> hold the fact they ask for — EDITED (no backend, no mtime → APPROVED from real
+> provenance) and KEY-as-a-name (MNX stores `fifths` and no mode, so "G major" was
+> literally wrong on the first document it rendered → the signature, `1♯`). Verified
+> hands-on over CDP across all five tabs, a live two-op queue with a redo branch, and a
+> keyboard-opened popover. Goldens byte-identical; 625 tests green.
+>
 > **Status: proposed 2026-08-15.** Item 5 of
 > [core-campaign-modernist.md](core-campaign-modernist.md) — the campaign's structure half and
 > its showcase. Blocks on [core-modernist-tokens.md](core-modernist-tokens.md); the JSON tab's

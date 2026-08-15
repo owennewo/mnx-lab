@@ -1,6 +1,7 @@
 // The command palette — the workbench's one prompt (survey §8.5, §3.8; the
 // same-widget-as-the-rail-filter idea from §6.1). One grammar, two entry
-// points: Ctrl+Shift+K prefills `>` (commands), Ctrl+G opens bare (go-to). The
+// points: Ctrl+G opens bare (go-to), and its `>` prefix reaches the same
+// global command list the tray shows on its `global` tab. The
 // component is deliberately dumb: the shell supplies a provider that turns
 // the query into runnable items; all routing/intent knowledge stays outside.
 // (The AI prompt mode is a separate roadmap item — core-editor-ai-prompt.md.)

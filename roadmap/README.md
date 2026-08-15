@@ -244,6 +244,22 @@ proposals that name their campaign.
   workbench's primary information display, and re-encoding semantics inside a repaint is how
   meaning gets lost. The opening is that **shape is already load-bearing** — the rail's dots
   vary shape as well as colour, for exactly this reason. Grayscale is the acceptance test.
+- **[core-selection-tray-global-tab.md](proposed/core-selection-tray-global-tab.md)** — a fourth
+  tray item, **built 2026-08-15 the day it was proposed**: should the command palette just be
+  another tab? **Half yes** — and the half is only visible once you notice the palette is two
+  things wearing one coat. Its `>` half is a small fixed set of **commands**; its bare half is a
+  ranked, unbounded **destination** finder over scenarios, bars and objects. The commands become
+  the tray's always-present `global` tab (the scope above `score` — the word the design spec
+  itself used, and the top of the containment chain the tabs already are); go-to stays on Ctrl+G,
+  because it must run where the tray cannot exist at all — the queue, the coverage map — and
+  because "commands for what is selected" and "search everything" are the two halves of the
+  tray's whole claim. The line that falls out: **`/` is commands, escalating outward; Ctrl+G is
+  destinations**, so `//` now moves one scope further rather than switching widgets, and
+  **Ctrl+Shift+K retires**. Landed the `CommandScope = SelectionLevel | 'document'` axis, nine
+  document commands, and the page's own chrome tiles (copy trace, revert) joining that tab under
+  a `page:` prefix — `edit/` keeps only editor verbs. The build taught one rule: a tab outside
+  the ladder must be **non-committable**, or it inherits the "↵ to widen selection" hint and
+  Enter silently does nothing.
 - **[core-tuplets-grace-notes.md](proposed/core-tuplets-grace-notes.md)** — tuplets and grace notes
   **across both converters and on tab**. Split out of
   [core-guitar-pro.md](complete/core-guitar-pro.md) when that closed, at its real scope: the model

@@ -39,6 +39,10 @@ export interface TrayTab {
   label: string;
   active: boolean;
   holdsSelection: boolean;
+  /** Can the selection be moved here? False for a tab that is not a rung —
+   *  the `global` scope sits outside the ladder, so there is nothing for
+   *  Enter to commit and the widen hint would be a lie. Absent = true. */
+  committable?: boolean;
 }
 
 /** A Bravura glyph by canonical SMuFL name, or one of the two marks that have
@@ -574,6 +578,15 @@ export class SelectionTray extends LitElement {
 
   // ── keyboard (a scope-4 region: the tray owns the keys it names) ─────────
 
+  /** Is a scope being previewed — i.e. is the tab on display one the
+   *  selection could still move to? A non-committable tab (global) is never a
+   *  preview: it is a place to run commands, not a scope to select. */
+  private get previewing(): boolean {
+    const active = this.tabs.find(t => t.active);
+    if (active?.committable === false) return false;
+    return this.tabs.some(t => t.holdsSelection && !t.active);
+  }
+
   private onKeyDown = (event: KeyboardEvent) => {
     const target = event.composedPath()[0] as HTMLElement;
     const inSearch = target instanceof HTMLInputElement;
@@ -584,7 +597,7 @@ export class SelectionTray extends LitElement {
       event.stopPropagation();
     };
 
-    const previewing = this.tabs.some(t => t.holdsSelection && !t.active);
+    const previewing = this.previewing;
 
     switch (event.code) {
       case 'Escape': {
@@ -634,9 +647,19 @@ export class SelectionTray extends LitElement {
       }
     }
 
-    // Any printable character jumps focus to the search line (the spec's
-    // rule). The triggering character is appended by hand because refocusing
-    // mid-keydown does not retarget the insertion.
+    // A SECOND slash widens: `/` opened this tray on the selection, so `/`
+    // again asks the same question of everything. One key, one escalating
+    // meaning — rather than a second chord to remember — and it is why a bare
+    // slash never reaches the search box as a character.
+    if (!inSearch && event.key === '/') {
+      consume();
+      this.emit('tray-widen', { text: this.searchText });
+      return;
+    }
+
+    // Any other printable character jumps focus to the search line (the
+    // spec's rule). The triggering character is appended by hand because
+    // refocusing mid-keydown does not retarget the insertion.
     if (!inSearch && event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
       consume();
       const input = this.renderRoot.querySelector<HTMLInputElement>('.search input');
@@ -647,6 +670,28 @@ export class SelectionTray extends LitElement {
       }
     }
   };
+
+  /**
+   * The search line's own text. A slash ANYWHERE in it is the widen gesture,
+   * carrying whatever was typed before it: the natural motion is to type a
+   * few letters, find the scope too narrow, and reach for `/` again — by
+   * which point the caret is past the text, so a leading-slash-only rule
+   * would miss the very case it exists for.
+   *
+   * The cost is that a query cannot contain a slash. No command label does,
+   * and "type / to go wider" is worth more than searching for one.
+   */
+  private onSearchInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const slash = input.value.indexOf('/');
+    if (slash >= 0) {
+      const before = input.value.slice(0, slash);
+      input.value = before;
+      this.emit('tray-widen', { text: before });
+      return;
+    }
+    this.emit('tray-search', { text: input.value });
+  }
 
   private emit(name: string, detail: unknown) {
     this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
@@ -708,7 +753,7 @@ export class SelectionTray extends LitElement {
   }
 
   render() {
-    const previewing = this.tabs.some(t => t.holdsSelection && !t.active);
+    const previewing = this.previewing;
     const entries = this.entries();
     return html`
       <div class="shaft" style="display: none"></div>
@@ -785,9 +830,8 @@ export class SelectionTray extends LitElement {
           <span class="prompt">&gt;</span>
           <input
             .value=${this.searchText}
-            placeholder="search this scope, or Ctrl+Shift+K for global…"
-            @input=${(e: Event) =>
-              this.emit('tray-search', { text: (e.target as HTMLInputElement).value })}
+            placeholder="search this scope · / again for everything"
+            @input=${(e: Event) => this.onSearchInput(e)}
           />
         </div>
       </div>

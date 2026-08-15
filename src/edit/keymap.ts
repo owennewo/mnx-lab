@@ -184,13 +184,26 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // silence — the four things that are content but not events. No anchor
   // gesture: the typed declaration already says how much music it takes.
   { code: 'KeyR', shift: true, action: 'rhythmPopover' },
-  // The selection command tray (core-selection-tray-visuals.md): Ctrl+K
-  // belongs to the selection when an editor holds the keyboard — the shell
-  // falls back to the palette when nothing does. The document-wide palette
-  // (survey §8.5: Dorico's Jump Bar, GP's Cmd+E) moves one keystroke away;
-  // go-to (§3.8: Ctrl+G + typed grammar) is the same widget's bare entry.
-  { code: 'KeyK', ctrl: true, action: 'selectionTray' },
-  { code: 'KeyK', ctrl: true, shift: true, action: 'commandPalette' },
+  // `/` opens a command surface — the selection tray when an editor holds the
+  // keyboard, the palette's go-to when none does. Slash rather than Ctrl+K on
+  // two grounds. It is the surface used most while editing, so it should cost
+  // no modifier; and Ctrl+K is the browser's own (Chrome sends it to the
+  // omnibox), which a page can only take back by consuming the event — and we
+  // deliberately do NOT consume keys typed into text fields, so Ctrl+K worked
+  // from the score and escaped to Google from every input. A key that works
+  // most of the time teaches that it cannot be trusted.
+  //
+  // Slash was the rail filter's; that job moves to Ctrl+G, which already
+  // matches scenarios through the same `matchesQuery` and can also reach bars
+  // and objects. So `/` keeps meaning "search or command" — the mechanism
+  // just changes from narrowing a list to picking from one.
+  { code: 'Slash', action: 'selectionTray' },
+  // Go-to (survey §3.8: typed grammar over scenarios, bars and objects) is
+  // the DESTINATION surface — the counterpart to `/`, which is the command
+  // one. Its `>` prefix still reaches the global command list, so the list
+  // has two doors and neither needs a chord of its own: the tray's `global`
+  // tab while editing, `>` here otherwise
+  // (core-selection-tray-global-tab.md, which retired Ctrl+Shift+K).
   { code: 'KeyG', ctrl: true, action: 'goTo' },
   // The library rail toggle (VS Code's Ctrl+B sidebar reflex).
   { code: 'KeyB', ctrl: true, action: 'toggleRail' }

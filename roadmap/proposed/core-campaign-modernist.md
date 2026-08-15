@@ -126,7 +126,7 @@ frame exists.
 | 2 | [core-modernist-dark.md](core-modernist-dark.md) | Authoring Modernist-dark in OKLCH and finally **wiring** `resolved-theme`, which appears once in the codebase and is set by nothing. Split out because it is a design task with an upstream dependency, not a token conversion. | 1 | proposed |
 | 3 | [core-modernist-type.md](core-modernist-type.md) | Archivo via `@fontsource`, `--serif` retired, the mono voice decided. Carries the tray's re-review, because bundling the font changes a surface that was reviewed in the fallback. | 1 | **built 2026-08-15** |
 | 4 | revision on [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) | The tray drops its 55 hard-coded literals for token references — but **keeps inheriting** the palette rather than declaring `designTokens` locally (an early draft said otherwise; a local block would pin the tray light when the theme switches). A revision block on the complete doc, not a new one: same component, same art direction, and that doc already carries the deviations section this closes. | 1, 3 | **built 2026-08-15** |
-| 5 | [workbench-score-panel.md](workbench-score-panel.md) | The score panel: five-band frame, seven tabs cut to five, the width change, and the per-tab rebuilds. The campaign's structure half and its showcase. | 1 | proposed |
+| 5 | [workbench-score-panel.md](workbench-score-panel.md) | The score panel: five-band frame, seven tabs cut to five, the width change, and the per-tab rebuilds. The campaign's structure half and its showcase. **Built** except the two halves that belong to other items — the JSON gutter and selection scoping (item 7) and compare's live render/overlay. | 1 | **built 2026-08-15** |
 | 6 | [workbench-queue-pips.md](workbench-queue-pips.md) | Re-deriving the five-state queue ramp under one accent — the bill "red everywhere" runs up. Shape and lightness carry what hue no longer can. | 1 | proposed |
 | 7 | [core-json-view.md](core-json-view.md) | `buildJsonView()` gains `spanByPointer`; the dormant module finally gets a consumer, a conformance test, and the pinned-error highlight the panel consolidation lost. The only below-the-boundary code change in the campaign. | — (5 for the UI half) | proposed |
 | 8 | *(undrafted)* | The `<360px` drawer mode. Needs a viewport breakpoint, an absolutely-positioned panel, **and a panel open/close control that does not exist** — the rail has Ctrl+B, the panel has nothing, and the mock specifies neither the control nor its keystroke. | 5 | undrafted |
@@ -172,6 +172,37 @@ depends on. Revisit if a session's queue ever gets long enough to hurt.
 *(Appended as items land, per the convention — later items start smarter than earlier
 ones.)*
 
+- **2026-08-15 — item 5 lands: the panel gets a frame and loses two tabs.**
+  Seven tabs become five, every tab is the same five bands, the widths move to
+  360/420/560, and the `actions` tab retires. Verified hands-on over CDP with the panel
+  driven through all five tabs, a real two-op edit queue, and a keyboard-opened popover.
+  - **The panel was hiding a lie, and the stat strip exposed it.** The design's KEY cell
+    was first implemented as a key *name* — and rendered "G major" for
+    `twelve-bar-blues`, whose own description says E minor. MNX's `key` object carries
+    **`fifths` and nothing else**; there is no mode, so one sharp is both, and naming
+    either one invents information the document does not contain. The cell now prints the
+    **signature** (`1♯`), which is what the file actually says. The same instinct killed
+    the mock's EDITED cell earlier (no backend, no mtime — it shows APPROVED from real
+    provenance instead). **Twice now the design has asked for a fact the corpus does not
+    have**; the answer both times was to print the fact it does have, not to derive a
+    plausible one.
+  - **Retiring a tab is mostly about where things RENDER, not what invokes them.** The
+    hard part of dropping `actions` was that `openPopover()` force-switched the panel to
+    it, so a keyboard-opened popover yanked the panel away from whatever you were
+    reading. Rehoming the popover to a page-level overlay over the score fixed a real
+    annoyance that had nothing to do with the restyle — and only then was the tab
+    deletable. The palette gap closed the same way: it hard-coded four of the nine
+    popovers, so both now map over one exported table instead of two hand-kept lists.
+  - **`tsc` was the whole safety net for the cut, and it was enough.** Narrowing
+    `PanelTab` from seven members to five turned every stale branch into a compile
+    error. No test could have covered this — `workbench/` is a leaf nothing may import —
+    and promoting a UI table into `elements/` purely to test it would have been the
+    wrong trade. Worth remembering the next time a leaf feels untestable: the type
+    system is the coverage.
+  - **One deferral, recorded rather than fudged.** The JSON tab gets its frame, a copy
+    button and an honest line count, but not the gutter, the three inks or the
+    selection-scoped slice — those all read `buildJsonView` and belong to item 7. The
+    footer says so on screen rather than leaving a half-built control implying more.
 - **2026-08-15 — item 4 lands: the tray stops restating the system.** All 55 colour
   literals in `SelectionTray.ts` become token references, plus its font. Two genuinely
   new shared roles were added to the sheet rather than fudged — `--accent-pressed` (the

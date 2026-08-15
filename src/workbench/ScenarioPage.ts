@@ -25,6 +25,7 @@ import type { EditorIntent } from '../edit/intents.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
 import { cheatsheet } from '../edit/keymapDocs.ts';
 import { buildHudParts, buildHudRows, LEVEL_BY_ROW } from './hudRows.ts';
+import { keyFifthsAt } from '../edit/staffSpace.ts';
 import {
   EDIT_LAYER,
   NAVIGATION_LAYER,
@@ -57,8 +58,9 @@ import { buildOpRow } from './opRows.ts';
 import { editorHasKeyboard, keyIsOurs } from './keyScope.ts';
 import {
   commandState,
-  commandsForRung,
+  commandsForScope,
   sessionView,
+  type CommandScope,
   type EditorCommand
 } from '../edit/commandRegistry.ts';
 import type {
@@ -136,13 +138,40 @@ const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   rhythmPopover: 'rhythm'
 };
 
+/** EVERY setup popover, as a palette row (workbench-score-panel.md, step C).
+ *
+ *  The `actions` tab used to be the only place several of these could be
+ *  reached by mouse; the palette hard-coded four of the nine. Retiring the tab
+ *  without closing that gap would have removed a working surface, so the two
+ *  now come from ONE table — `WorkbenchApp` maps over this rather than keeping
+ *  its own list, which is what stops them drifting apart again.
+ *
+ *  `needsTab` mirrors `openPopover`'s own guard: tuning is meaningless without
+ *  a fingerboard. */
+export const SETUP_POPOVER_COMMANDS: {
+  label: string;
+  action: ShellAction;
+  stroke: string;
+  needsTab?: boolean;
+}[] = [
+  { label: 'setup: time signature…', action: 'timeSignaturePopover', stroke: 'Shift+T' },
+  { label: 'setup: add part…', action: 'partPopover', stroke: 'Shift+P' },
+  { label: 'setup: clef…', action: 'clefPopover', stroke: 'Shift+C' },
+  { label: 'setup: key signature…', action: 'keySignaturePopover', stroke: 'Shift+K' },
+  { label: 'setup: bar attribute…', action: 'barAttributePopover', stroke: 'Shift+B' },
+  { label: 'setup: adornment…', action: 'adornmentPopover', stroke: 'Shift+A' },
+  { label: 'setup: lyric…', action: 'lyricPopover', stroke: 'Shift+L' },
+  { label: 'setup: rhythm…', action: 'rhythmPopover', stroke: 'Shift+R' },
+  { label: 'setup: tuning…', action: 'tuningPopover', stroke: 'Shift+U', needsTab: true }
+];
+
 import './ScoreHud.ts';
 
 /** The side panel's tabs (roadmap/inprogress/core-score-hud.md): the page's
  *  scattered chrome — description, badges/defs, the edit strip, the op
  *  queue (core-element-ops-exemplar.md), the HUD, the spec reference, the
  *  raw JSON — consolidated into one rail. */
-type PanelTab = 'description' | 'tags' | 'actions' | 'ops' | 'hud' | 'compare' | 'json';
+type PanelTab = 'description' | 'ops' | 'hud' | 'compare' | 'json';
 
 /** One part's override state — the HUD ensemble table's currency. */
 interface PartOverride {
@@ -150,16 +179,47 @@ interface PartOverride {
   capo: number | null;
 }
 
-/** Side panel width bounds and its remembered-per-browser preference key. */
+/** Side panel width bounds and its remembered-per-browser preference key.
+ *  Widened from 240/640/320 by the score-panel design
+ *  (roadmap/proposed/workbench-score-panel.md): 420 is the width the five-band
+ *  frame was drawn at, and the floor matters because the tab strip is flush
+ *  left and MUST NOT WRAP — that is why the width change and the seven-to-five
+ *  tab cut are one change and not two. */
 const PANEL_WIDTH_KEY = 'mnx-lab.panel-width';
-const PANEL_MIN = 240;
-const PANEL_MAX = 640;
-const PANEL_DEFAULT = 320;
+const PANEL_MIN = 360;
+const PANEL_MAX = 560;
+const PANEL_DEFAULT = 420;
 
 function storedPanelWidth(): number {
   const n = Number(localStorage.getItem(PANEL_WIDTH_KEY));
-  return Number.isFinite(n) && n >= PANEL_MIN && n <= PANEL_MAX ? n : PANEL_DEFAULT;
+  // CLAMP, don't reset: someone who deliberately dragged to 600 under the old
+  // bounds means "as wide as it goes", so land them on the new ceiling rather
+  // than snapping back to the default. The key is deliberately NOT bumped —
+  // a new one would silently discard every stored preference for no gain.
+  return Number.isFinite(n) && n > 0 ? Math.min(PANEL_MAX, Math.max(PANEL_MIN, n)) : PANEL_DEFAULT;
 }
+
+/** Fifths → the KEY SIGNATURE, for the description's stat strip.
+ *
+ *  Deliberately not a key NAME. MNX's `key` object carries `fifths` and
+ *  nothing else — there is no mode — so one sharp is G major and E minor
+ *  equally, and naming it "G major" would invent information the document
+ *  does not contain. (The scenario this was first read against is
+ *  twelve-bar-blues, which is E minor: the fabricated label was wrong on the
+ *  very first document it rendered.) The signature is what the file actually
+ *  says, so the signature is what the strip prints. */
+function fmtKey(fifths: number): string {
+  if (fifths === 0) return 'no sharps or flats';
+  const n = Math.abs(fifths);
+  return `${n}${fifths > 0 ? '♯' : '♭'}`;
+}
+
+/** The tray tab for the `document` scope — the one that is not a ladder rung
+ *  (core-selection-tray-global-tab.md). */
+const GLOBAL_TAB = 'global';
+
+/** Tile ids the PAGE owns rather than the registry; see `chromeCommands`. */
+const CHROME_PREFIX = 'page:';
 
 /** How many object tags to show before collapsing the tail into a count. */
 const DEF_PREVIEW = 9;
@@ -204,6 +264,10 @@ export class ScenarioPage extends LitElement {
   @state() private loadState: 'loading' | 'ready' | 'failed' = 'loading';
   @state() private loadError = '';
   @state() private allDefs = false;
+  /** The description footer's object filter — the design's tag filter. */
+  @state() private defFilter = '';
+  @state() private copiedId = false;
+  @state() private copiedJson = false;
   // The editor incubates here (roadmap/complete/core-editor-input-layer.md):
   // in-memory only — the workbench has no backend, and this page is a bench
   // for testing the editor, not for authoring corpus files.
@@ -432,11 +496,17 @@ export class ScenarioPage extends LitElement {
         align-items: baseline;
         gap: 10px;
         padding: 8px 12px;
-        border: 1px solid var(--accent);
+        /* A full rule, and the accent: this is the one surface that owns the
+           next keystroke, so it should look like it. */
+        border: var(--rule-w) solid var(--accent);
         border-radius: var(--radius-control);
         background: var(--surface);
+        box-shadow: var(--shadow);
         font-family: var(--mono);
         font-size: 11px;
+        /* Bounded so the grammar hint wraps instead of running off the score
+           pane — it used to sit in a ~320px panel where wrapping was forced. */
+        max-width: min(560px, calc(100% - 32px));
       }
 
       .popover .pop-label {
@@ -497,9 +567,13 @@ export class ScenarioPage extends LitElement {
         position: relative;
       }
 
+      /* THE FIVE-BAND FRAME (roadmap/proposed/workbench-score-panel.md):
+         ink border, tab strip, context bar, ONE scrolling body, footer. The
+         border is a full rule rather than a hairline because in this system
+         alignment and the strength of the dividers do the organising. */
       .panel {
         position: relative;
-        border-left: 1px solid var(--line);
+        border-left: var(--rule-w) solid var(--ink);
         background: var(--surface);
         display: flex;
         flex-direction: column;
@@ -524,38 +598,244 @@ export class ScenarioPage extends LitElement {
         background: color-mix(in oklab, var(--accent) 25%, transparent);
       }
 
+      /* Band 2. Flush left, and NO WRAP: five tabs at 360px+ fit on one line,
+         which is exactly what the seven-to-five cut bought. If a sixth is ever
+         added this row is where it shows up first. */
       .panel-tabs {
         display: flex;
-        flex-wrap: wrap;
-        gap: 2px;
-        padding: 8px 10px 0;
-        border-bottom: 1px solid var(--line);
-        font-family: var(--mono);
+        gap: 0;
+        padding: 0;
+        border-bottom: var(--rule-w) solid var(--ink);
+        font-family: var(--sans);
+        flex: none;
       }
 
       .panel-tabs button {
-        font: inherit;
-        font-size: 10.5px;
-        color: var(--ink-2);
+        font: 600 10px/1 var(--sans);
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+        color: var(--ink-3);
         background: transparent;
-        border: 1px solid transparent;
-        border-bottom: none;
-        border-radius: var(--radius-tab) var(--radius-tab) 0 0;
-        padding: 4px 8px;
+        border: none;
+        padding: 11px 12px;
         cursor: pointer;
+        white-space: nowrap;
       }
 
+      .panel-tabs button:hover[aria-current='false'] {
+        color: var(--ink);
+        background: var(--bg-context);
+      }
+
+      /* The active tab is the accent plus a 2px inset underline — the same
+         marker the tray's scope tabs use, so the two panels read as one. */
       .panel-tabs button[aria-current='true'] {
         color: var(--accent-fg);
-        background: var(--bg);
-        border-color: var(--line);
+        box-shadow: inset 0 -2px 0 var(--accent);
       }
 
+      /* Band 3: what you are looking at, pinned so it cannot scroll away. */
+      .panel-context,
+      .panel-foot {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        background: var(--bg-context);
+        font-size: 11.5px;
+        min-height: 34px;
+      }
+
+      .panel-context {
+        border-bottom: var(--rule-w) solid var(--ink);
+      }
+
+      /* Band 5. */
+      .panel-foot {
+        border-top: var(--rule-w) solid var(--ink);
+      }
+
+      .ctx-name {
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .ctx-dim {
+        color: var(--ink-3);
+        font-size: 11px;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .ctx-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 4px;
+        flex: none;
+      }
+
+      .ctx-actions button {
+        font: 600 9.5px/1.2 var(--sans);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-2);
+        border: 1px solid var(--line);
+        background: var(--surface);
+        padding: 4px 7px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .ctx-actions button:hover:not(:disabled) {
+        border-color: var(--accent);
+        color: var(--accent-fg);
+      }
+
+      .ctx-actions button:disabled {
+        color: var(--line-strong);
+        border-color: var(--line);
+        cursor: not-allowed;
+      }
+
+      /* Band 4 — the ONLY scrolling region in the panel. */
       .panel-body {
         flex: 1;
         overflow-y: auto;
         min-height: 0;
         padding: 12px 14px;
+      }
+
+      /* The hud tab's footer inverts: the one deliberately dark band in a
+         light app, because the panel has to say where editing happens without
+         growing a control that would contradict "the HUD explains". */
+      .panel-body:has(> mnx-score-hud) ~ .panel-foot {
+        background: var(--ink);
+        color: var(--surface);
+      }
+
+      .hud-handoff {
+        font-weight: 500;
+      }
+
+      .hud-key {
+        margin-left: auto;
+        font: 600 10px/1 var(--sans);
+        letter-spacing: 0.1em;
+        border: 1px solid color-mix(in oklab, var(--surface), transparent 65%);
+        padding: 4px 7px;
+      }
+
+      /* The description tab's stat strip: four facts, flush left. */
+      .facts {
+        display: flex;
+        gap: 0;
+        margin: 14px 0 0;
+      }
+
+      .fact {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .fact-k {
+        font: 600 9.5px/1 var(--sans);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin-bottom: 4px;
+      }
+
+      .fact-v {
+        font: 600 13px/1.2 var(--sans);
+      }
+
+      /* The 2px rule the design puts between "what this is" and "what the repo
+         knows about it" — the seam where the tags tab was folded in. */
+      .rule-strong {
+        height: var(--rule-w);
+        background: var(--ink);
+        margin: 16px 0 0;
+      }
+
+      .tag-group {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font: 600 9px/1 var(--sans);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin: 14px 0 7px;
+      }
+
+      .tag-count {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0;
+      }
+
+      .idline {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 10px;
+      }
+
+      .idline .copy {
+        font: 600 9px/1 var(--sans);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent-fg);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      .panel-foot .prompt {
+        color: var(--accent-fg);
+        font-weight: 600;
+        flex: none;
+      }
+
+      .tagfilter {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        background: transparent;
+        font: inherit;
+        font-size: 11.5px;
+        color: var(--ink);
+        outline: none;
+      }
+
+      .tagfilter::placeholder {
+        color: var(--ink-3);
+      }
+
+      /* The ops tab's entry state, moved out of the retired actions tab. */
+      .entry-state {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--ink-3);
+        padding-bottom: 8px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      /* The setup popover is a page-level overlay over the score now, not a
+         panel tab (workbench-score-panel.md step A). Bottom-LEFT so it cannot
+         collide with the tray's bottom-centre docked fallback. */
+      .popover-layer {
+        position: absolute;
+        left: 16px;
+        bottom: 16px;
+        z-index: 5;
       }
 
       /* The ops tab: the op queue as provenance rows — op · intent · key.
@@ -808,6 +1088,9 @@ export class ScenarioPage extends LitElement {
       this.loadState = 'loading';
       this.loadError = '';
       this.allDefs = false;
+      this.defFilter = '';
+      this.copiedId = false;
+      this.copiedJson = false;
       this.session = null;
       this.selection = null;
       this.copied = false;
@@ -1011,9 +1294,10 @@ export class ScenarioPage extends LitElement {
     if (kind === 'tuning' && !entry?.hasTab) return false;
     this.setupPopover = kind;
     this.setupPopoverError = '';
-    // The popover lives in the actions tab now; a keyboard-opened one must
-    // still be visible.
-    this.panelTab = 'actions';
+    // No panel tab to switch to any more: the popover is a page-level overlay
+    // over the score (setupPopoverOverlay), so it is visible wherever the panel
+    // happens to be — and opening one no longer moves the panel out from under
+    // whatever you were reading.
     return true;
   }
 
@@ -1021,8 +1305,8 @@ export class ScenarioPage extends LitElement {
    *  intent channel feeds the session (recorded in traces), the action
    *  channel drives page chrome (popovers, copy trace, revert). */
   private onPaletteIntent = (event: Event) => {
-    // The palette took over (Ctrl+Shift+K widened the tray's search, or a
-    // global command ran): two overlays wanting the same keys is one too many.
+    // The palette took over (a global command ran from go-to's `>` list):
+    // two overlays wanting the same keys is one too many.
     this.trayOpen = false;
     this.stripIntent((event as CustomEvent<EditorIntent>).detail);
   };
@@ -1036,8 +1320,8 @@ export class ScenarioPage extends LitElement {
 
   // ── The selection command tray's mount ─────────────────────────────────────
 
-  /** The shell's cancelable Ctrl+K intent: claim it while an editor session
-   *  holds the keyboard; unclaimed, the shell opens the palette instead. */
+  /** The shell's cancelable `/` intent: claim it while an editor session holds
+   *  the keyboard; unclaimed, the shell opens go-to instead. */
   private onTrayIntent = (event: Event) => {
     if (!this.session || !this.hasKeyboard || this.loadState !== 'ready') return;
     event.preventDefault();
@@ -1096,20 +1380,35 @@ export class ScenarioPage extends LitElement {
     const ladder = [...hudRows].reverse(); // note first, score last
     if (ladder.length === 0) return null;
     const baseKey = hudRows.find(r => r.active)?.key ?? ladder[0].key;
-    const known = (key: string | null) => ladder.some(r => r.key === key);
+    // `global` is the scope ABOVE the ladder, so unlike the rungs it is never
+    // presence-filtered — the document is always there
+    // (core-selection-tray-global-tab.md).
+    const known = (key: string | null) =>
+      key === GLOBAL_TAB || ladder.some(r => r.key === key);
     const displayKey = known(this.trayTab) ? this.trayTab! : baseKey;
 
-    const tabs: TrayTab[] = ladder.map(r => ({
-      key: r.key,
-      label: r.label,
-      active: r.key === displayKey,
-      holdsSelection: r.key === baseKey
-    }));
+    const tabs: TrayTab[] = [
+      ...ladder.map(r => ({
+        key: r.key,
+        label: r.label,
+        active: r.key === displayKey,
+        holdsSelection: r.key === baseKey
+      })),
+      {
+        key: GLOBAL_TAB,
+        label: GLOBAL_TAB,
+        active: displayKey === GLOBAL_TAB,
+        holdsSelection: false,
+        // Not a rung: there is no selection to widen to the document.
+        committable: false
+      }
+    ];
 
-    const level = LEVEL_BY_ROW[displayKey];
     const view = sessionView(this.session);
     const q = this.traySearch.trim().toLowerCase();
-    const commands = commandsForRung(level, view).filter(
+    const scope: CommandScope =
+      displayKey === GLOBAL_TAB ? 'document' : LEVEL_BY_ROW[displayKey];
+    const commands = commandsForScope(scope, view).filter(
       command => !q || command.label.toLowerCase().includes(q)
     );
     const tiles: TrayTile[] = commands.map(command => ({
@@ -1119,18 +1418,54 @@ export class ScenarioPage extends LitElement {
       label: command.label,
       state: commandState(command, view)
     }));
+    // The page's OWN commands join the global tab as neutral tiles: they act
+    // on the session's history and fixtures rather than on the document, so
+    // `edit/` has no business knowing them. `fireTrayCommand` recognises the
+    // prefix and never consults the registry for them.
+    if (displayKey === GLOBAL_TAB) {
+      for (const chrome of this.chromeCommands()) {
+        if (!q || chrome.label.toLowerCase().includes(q)) tiles.push(chrome);
+      }
+    }
 
     const displayRow = ladder.find(r => r.key === displayKey);
     const live = tiles.filter(t => t.state !== 'unavailable').length;
-    const meta: TrayMeta | null = displayRow
-      ? {
-          primary: displayRow.label,
-          secondary: displayRow.value,
-          count: `${live} command${live === 1 ? '' : 's'}`
-        }
-      : null;
+    const meta: TrayMeta = {
+      primary: displayKey === GLOBAL_TAB ? 'document' : (displayRow?.label ?? ''),
+      secondary:
+        displayKey === GLOBAL_TAB
+          ? entry.meta.title
+          : (displayRow?.value ?? ''),
+      count: `${live} command${live === 1 ? '' : 's'}`
+    };
 
     return { tabs, meta, tiles, commands };
+  }
+
+  /** Workbench-tier commands for the global tab — the session's own chrome,
+   *  which is the page's to run and not the registry's to describe. */
+  private chromeCommands(): TrayTile[] {
+    const session = this.session;
+    if (!session) return [];
+    const tiles: TrayTile[] = [
+      {
+        id: `${CHROME_PREFIX}copy-trace`,
+        glyph: { smufl: 'repeat1Bar' },
+        shortcut: '',
+        label: 'Copy this session as a trace fixture',
+        state: session.intentLog.length === 0 ? 'unavailable' : 'available'
+      }
+    ];
+    if (session.dirty) {
+      tiles.push({
+        id: `${CHROME_PREFIX}revert`,
+        glyph: { smufl: 'arrowBlackLeft' },
+        shortcut: '',
+        label: 'Revert every edit',
+        state: 'available'
+      });
+    }
+    return tiles;
   }
 
   /** A tile fired: resolve the command against the CURRENT session and send
@@ -1139,6 +1474,13 @@ export class ScenarioPage extends LitElement {
    *  op queue with provenance and replays in a trace. */
   private fireTrayCommand(entry: ScenarioEntry, id: string) {
     if (!this.session) return;
+    if (id.startsWith(CHROME_PREFIX)) {
+      const chrome = id.slice(CHROME_PREFIX.length);
+      this.trayOpen = false;
+      if (chrome === 'copy-trace') void this.copyTrace();
+      else if (chrome === 'revert') this.revertEdits();
+      return;
+    }
     const command = this.trayView(entry)?.commands.find(c => c.id === id);
     if (!command?.action) return;
     const action = command.action(sessionView(this.session));
@@ -1178,11 +1520,14 @@ export class ScenarioPage extends LitElement {
         }}
         @tray-search=${(e: CustomEvent<{ text: string }>) => {
           this.traySearch = e.detail.text;
-          // Publish it so the shell's Ctrl+Shift+K can widen this search to
-          // the global list without the text being retyped.
-          window.dispatchEvent(
-            new CustomEvent('mnx-tray-search', { detail: { text: e.detail.text } })
-          );
+        }}
+        @tray-widen=${(e: CustomEvent<{ text: string }>) => {
+          // A second `/`: the same question, asked of everything. Since the
+          // global commands are a TAB now, widening moves one scope outward
+          // and stays in this surface — no widget switch, no context lost
+          // (core-selection-tray-global-tab.md). The typed text carries over.
+          this.trayTab = GLOBAL_TAB;
+          this.traySearch = e.detail.text;
         }}
         @tray-close=${() => this.closeTray()}
       ></mnx-selection-tray>
@@ -1301,7 +1646,20 @@ export class ScenarioPage extends LitElement {
         return;
       }
       this.stripIntent(
-        'accidental' in parsed
+        'fingering' in parsed
+          ? { type: 'setFingering', hand: parsed.fingering.hand, finger: parsed.fingering.finger }
+          : 'removeFingering' in parsed
+            ? { type: 'removeFingering' }
+            : 'technique' in parsed
+          ? {
+              type: 'toggleTechnique',
+              kind: parsed.technique.kind,
+              ...(parsed.technique.semitones !== undefined
+                ? { semitones: parsed.technique.semitones }
+                : {}),
+              ...(parsed.technique.release ? { release: true } : {})
+            }
+          : 'accidental' in parsed
           ? parsed.accidental === 'remove'
             ? { type: 'removeAccidentalDisplay' }
             : {
@@ -1435,6 +1793,13 @@ export class ScenarioPage extends LitElement {
     if (!this.session) return;
     await navigator.clipboard.writeText(JSON.stringify(this.session.trace(), null, 2) + '\n');
     this.copied = true;
+  }
+
+  /** The id is the thing you paste into a `/verify` sentence or a commit
+   *  message, so it gets a copy button rather than a careful double-click. */
+  private async copyId(id: string) {
+    await navigator.clipboard.writeText(id);
+    this.copiedId = true;
   }
 
   private revertEdits() {
@@ -1616,6 +1981,7 @@ export class ScenarioPage extends LitElement {
         <div class="main">
           ${this.viewer(entry, view)}
           ${this.trayOpen && this.session ? this.trayOverlay(entry) : nothing}
+          ${this.setupPopoverOverlay()}
         </div>
         ${this.sidePanel(entry)}
       </div>
@@ -1627,10 +1993,29 @@ export class ScenarioPage extends LitElement {
   // former edit strip), the HUD, the spec reference, the raw JSON.
 
   private panelTabs(): PanelTab[] {
-    const tabs: PanelTab[] = ['description', 'tags'];
-    if (this.session) tabs.push('actions', 'ops', 'hud');
+    const tabs: PanelTab[] = ['description'];
+    if (this.session) tabs.push('ops', 'hud');
     tabs.push('compare', 'json');
     return tabs;
+  }
+
+  /** THE FIVE-BAND FRAME (roadmap/proposed/workbench-score-panel.md).
+   *
+   *  Every tab is the same five bands: the panel's ink border, the tab strip, a
+   *  CONTEXT BAR naming what you are looking at, exactly ONE scrolling body,
+   *  and a footer carrying search or status. Only the body scrolls.
+   *
+   *  It is a helper rather than a convention because "only the body scrolls"
+   *  and "the answer to *what am I looking at* stays put" are properties the
+   *  panel should own. Before this, four of the tabs opened with an improvised
+   *  header inside the scroll area, so the heading scrolled away exactly when a
+   *  long document made it useful. */
+  private panelFrame(parts: { context?: unknown; body: unknown; footer?: unknown }) {
+    return html`
+      ${parts.context ? html`<div class="panel-context">${parts.context}</div>` : nothing}
+      <div class="panel-body">${parts.body}</div>
+      ${parts.footer ? html`<div class="panel-foot">${parts.footer}</div>` : nothing}
+    `;
   }
 
   private sidePanel(entry: ScenarioEntry) {
@@ -1650,181 +2035,203 @@ export class ScenarioPage extends LitElement {
             `
           )}
         </div>
-        <div class="panel-body">
-          ${tab === 'description'
-            ? this.panelDescription(entry)
-            : tab === 'tags'
-              ? this.panelTags(entry)
-              : tab === 'actions'
-                ? this.panelActions(entry)
-                : tab === 'ops'
-                  ? this.panelOps()
-                  : tab === 'hud'
-                    ? this.hud(entry)
-                    : tab === 'compare'
-                      ? this.panelCompare(entry)
-                      : this.panelJson()}
-        </div>
+        ${tab === 'description'
+          ? this.panelDescription(entry)
+          : tab === 'ops'
+            ? this.panelOps()
+            : tab === 'hud'
+              ? this.hud(entry)
+              : tab === 'compare'
+                ? this.panelCompare(entry)
+                : this.panelJson()}
       </aside>
     `;
   }
 
+  /** Description, with TAGS FOLDED IN below a rule — the design's seven-to-five
+   *  cut. They were always one idea split across two tabs: what this scenario
+   *  is, and what the repo knows about it. */
   private panelDescription(entry: ScenarioEntry) {
+    return this.panelFrame({
+      context: html`<span class="ctx-name">${entry.meta.title}</span>
+        <span class="ctx-dim">${entry.category}</span>`,
+      body: html`
+        <h1>${entry.meta.title}</h1>
+        <div class="idline">
+          <span class="id">${entry.id}</span>
+          <button
+            class="copy"
+            title="copy the scenario id"
+            @click=${() => this.copyId(entry.id)}
+          >
+            ${this.copiedId ? 'copied' : 'copy'}
+          </button>
+        </div>
+        <p class="description">${entry.meta.description}</p>
+        ${this.scoreFacts(entry)}
+        <div class="rule-strong"></div>
+        ${this.panelTags(entry)}
+      `,
+      footer: html`<span class="prompt">&gt;</span>
+        <input
+          class="tagfilter"
+          type="text"
+          placeholder="filter objects…"
+          .value=${this.defFilter}
+          @input=${(e: Event) => (this.defFilter = (e.target as HTMLInputElement).value)}
+        />`
+    });
+  }
+
+  /** BARS / PARTS / KEY / APPROVED — four facts, flush left, in the design's
+   *  stat strip. The mock's fourth cell is EDITED; there is no such date and
+   *  none can be invented (no backend, no mtime — git is the database), so the
+   *  honest substitute is the provenance the repo really keeps: when a human
+   *  last approved it. A dirty session adds a fifth cell counting its ops. */
+  private scoreFacts(entry: ScenarioEntry) {
+    const doc = this.session?.doc;
+    const cell = (label: string, value: string) =>
+      html`<div class="fact"><div class="fact-k">${label}</div><div class="fact-v">${value}</div></div>`;
+    const approved = entry.meta.verification?.at;
     return html`
-      <h1>${entry.meta.title}</h1>
-      <div class="id">${entry.id}</div>
-      <p class="description">${entry.meta.description}</p>
+      <div class="facts">
+        ${cell('bars', String(entry.meta.bars ?? doc?.global.measures.length ?? '—'))}
+        ${cell('parts', String(doc?.parts.length ?? '—'))}
+        ${cell('key', doc ? fmtKey(keyFifthsAt(doc, 0)) : '—')}
+        ${cell('approved', approved ? approved.slice(0, 10) : 'never')}
+        ${this.session?.dirty
+          ? cell('edits', String(this.session.appliedOps.length))
+          : nothing}
+      </div>
     `;
   }
 
+  /** The provenance half of the description tab, in the design's three named
+   *  groups. A flat cloud of fourteen badges hides the two that matter. */
   private panelTags(entry: ScenarioEntry) {
     const item = classify(entry);
     const verification = entry.meta.verification;
+    const defs = entry.featureDefs.filter(d =>
+      this.defFilter ? d.toLowerCase().includes(this.defFilter.toLowerCase()) : true
+    );
     return html`
+      <div class="tag-group">status</div>
       <div class="badges">
-          <span class="badge ${item.state === 'current' ? 'verified' : 'attention'}">
-            ${item.state === 'current' ? entry.meta.status : item.state} — ${item.detail}
-          </span>
-          <!-- One hash per golden: say which code each one witnesses,
-               because a bare digest says neither. A verified scenario with no
-               renderHash (or bothHash) was approved before that golden
-               existed — it is current, not stale, and that distinction is
-               the whole reason the fields are optional. -->
-          ${verification?.primitivesHash
-            ? html`<span class="badge" title="hash of expected.primitives.json — layout"
-                >layout ${verification.primitivesHash.replace('sha256:', '')}</span
-              >`
-            : nothing}
-          ${verification?.renderHash
-            ? html`<span class="badge" title="hash of expected.svg — the SVG emitter's output"
-                >render ${verification.renderHash.replace('sha256:', '')}</span
-              >`
-            : verification?.primitivesHash
-              ? html`<span
-                  class="badge muted"
-                  title="approved before the SVG golden existed — run verify-scenarios --backfill-render to stamp one"
-                  >render not witnessed</span
-                >`
-              : nothing}
-          ${verification?.bothHash
+        <span class="badge ${item.state === 'current' ? 'verified' : 'attention'}">
+          ${item.state === 'current' ? entry.meta.status : item.state} — ${item.detail}
+        </span>
+        <span
+          class="badge"
+          title=${entry.ns === 'spec'
+            ? 'mirrored by sync:spec — hand-edits forbidden'
+            : 'ours, authored in scenarios/lab/'}
+        >
+          ${entry.ns === 'spec' ? 'mirrored' : 'local'}
+        </span>
+        <span class="badge">${entry.meta.source}</span>
+        ${entry.meta.schema === 'proposed'
+          ? html`<span class="badge attention">proposed schema</span>`
+          : nothing}
+        ${entry.specRef
+          ? html`<span class="badge"><a href=${entry.specRef} target="_blank">spec ↗</a></span>`
+          : nothing}
+        ${entry.issueRef
+          ? html`<span class="badge"><a href=${entry.issueRef} target="_blank">issue ↗</a></span>`
+          : nothing}
+      </div>
+
+      <!-- One hash per golden: say which code each one witnesses, because a
+           bare digest says neither. A verified scenario with no renderHash (or
+           bothHash) was approved before that golden existed — it is current,
+           not stale, and that distinction is the whole reason the fields are
+           optional. Grouped away from status because a digest is not a verdict:
+           it is what the verdict was made against. -->
+      <div class="tag-group">build</div>
+      <div class="badges">
+        ${verification?.primitivesHash
+          ? html`<span class="badge hash" title="hash of expected.primitives.json — layout"
+              ><b>layout</b>${verification.primitivesHash.replace('sha256:', '')}</span
+            >`
+          : nothing}
+        ${verification?.renderHash
+          ? html`<span class="badge hash" title="hash of expected.svg — the SVG emitter's output"
+              ><b>render</b>${verification.renderHash.replace('sha256:', '')}</span
+            >`
+          : verification?.primitivesHash
             ? html`<span
-                class="badge"
-                title="hash of expected.both.svg — the combined notation+tab system"
-                >both ${verification.bothHash.replace('sha256:', '')}</span
+                class="badge muted"
+                title="approved before the SVG golden existed — run verify-scenarios --backfill-render to stamp one"
+                >render not witnessed</span
               >`
             : nothing}
-          <span class="badge" title=${entry.ns === 'spec' ? 'mirrored by sync:spec — hand-edits forbidden' : 'ours, authored in scenarios/lab/'}>
-            ${entry.ns === 'spec' ? 'mirrored' : 'local'}
-          </span>
-          <span class="badge">${entry.meta.source}</span>
-          ${entry.meta.schema === 'proposed'
-            ? html`<span class="badge attention">proposed schema</span>`
-            : nothing}
-          ${entry.specRef
-            ? html`<span class="badge"><a href=${entry.specRef} target="_blank">spec ↗</a></span>`
-            : nothing}
-          ${entry.issueRef
-            ? html`<span class="badge"><a href=${entry.issueRef} target="_blank">issue ↗</a></span>`
-            : nothing}
-        </div>
-        <!-- The schema objects this scenario exercises, from the spec's own
-             coversDefs join. featureDefs (plumbing stripped) is what makes
-             this wearable: the raw list runs to a median of 25 and a max of
-             50, but once the structural skeleton is gone the median is 5 and
-             58 of 70 scenarios fit in nine. The handful that don't get a
-             count instead of a wall. -->
-        ${entry.featureDefs.length > 0
-          ? html`<div class="defs">
-              ${(this.allDefs ? entry.featureDefs : entry.featureDefs.slice(0, DEF_PREVIEW)).map(
+        ${verification?.bothHash
+          ? html`<span
+              class="badge hash"
+              title="hash of expected.both.svg — the combined notation+tab system"
+              ><b>both</b>${verification.bothHash.replace('sha256:', '')}</span
+            >`
+          : nothing}
+        ${!verification ? html`<span class="badge muted">no approval on record</span>` : nothing}
+      </div>
+
+      <!-- The schema objects this scenario exercises, from the spec's own
+           coversDefs join. featureDefs (plumbing stripped) is what makes this
+           wearable: the raw list runs to a median of 25 and a max of 50, but
+           once the structural skeleton is gone the median is 5 and 58 of 70
+           scenarios fit in nine. The handful that don't get a count instead of
+           a wall. The footer's filter searches this group. -->
+      ${entry.featureDefs.length > 0
+        ? html`
+            <div class="tag-group">
+              schema coverage
+              <span class="tag-count">${defs.length}/${entry.featureDefs.length}</span>
+            </div>
+            <div class="defs">
+              ${(this.allDefs || this.defFilter ? defs : defs.slice(0, DEF_PREVIEW)).map(
                 d => html`<a class="def" href=${objectsHref(d)} title="show every scenario using ${d}"
                   >${d}</a
                 >`
               )}
-              ${!this.allDefs && entry.featureDefs.length > DEF_PREVIEW
+              ${!this.allDefs && !this.defFilter && defs.length > DEF_PREVIEW
                 ? html`<button class="def more" @click=${() => (this.allDefs = true)}>
-                    +${entry.featureDefs.length - DEF_PREVIEW} more
+                    +${defs.length - DEF_PREVIEW} more
                   </button>`
                 : nothing}
-            </div>`
-          : nothing}
+              ${this.defFilter && defs.length === 0
+                ? html`<span class="def muted">no object matches</span>`
+                : nothing}
+            </div>
+          `
+        : nothing}
     `;
   }
 
-  /** The former edit strip: history/trace/setup controls. The cursor readout
-   *  it used to carry (bar · beat · line · selection) is the HUD's job now —
-   *  duplicating it here was the overlap the panel exists to remove. */
-  private panelActions(entry: ScenarioEntry) {
-    if (!this.session) return nothing;
+  /** THE SETUP POPOVER, REHOMED (roadmap/proposed/workbench-score-panel.md, step A).
+   *
+   *  It used to render inside the `actions` tab, and `openPopover()` force-switched
+   *  the panel there so a keyboard-opened popover would be visible — which meant
+   *  pressing Shift+K yanked the panel away from whatever you were reading. It is
+   *  a page-level overlay now, so the popover appears over the score where the
+   *  edit is happening and the panel keeps its place. Worth doing on its own
+   *  merits; retiring the tab is what forced the issue.
+   *
+   *  Anchored bottom-left of `.main`, deliberately clear of the tray's own
+   *  bottom-centre dock so the two overlays cannot collide. */
+  private setupPopoverOverlay() {
+    if (!this.setupPopover) return nothing;
+    const spec = POPOVER_SPECS[this.setupPopover];
     return html`
-      <div class="actions">
-        <div class="action-row">
-          <button
-            ?disabled=${!this.session.canUndo}
-            @click=${() => this.stripIntent({ type: 'undo' })}
-          >
-            undo
-          </button>
-          <button
-            ?disabled=${!this.session.canRedo}
-            @click=${() => this.stripIntent({ type: 'redo' })}
-          >
-            redo
-          </button>
-          ${this.session.dirty
-            ? html`<button @click=${() => this.revertEdits()}>revert</button>`
-            : nothing}
-          <button
-            ?disabled=${this.session.intentLog.length === 0}
-            @click=${() => void this.copyTrace()}
-            title="copy this session as a replayable intent-trace fixture — paste into harness/fixtures/edit-traces/"
-          >
-            ${this.copied ? 'copied ✓' : 'copy trace'}
-          </button>
-          <button @click=${() => this.openPopover('timeSignaturePopover')}>time…</button>
-          ${entry.hasTab
-            ? html`<button @click=${() => this.openPopover('tuningPopover')}>tuning…</button>`
-            : nothing}
-          <button @click=${() => this.openPopover('partPopover')}>part…</button>
-          <button @click=${() => this.openPopover('clefPopover')}>clef…</button>
-          <button @click=${() => this.openPopover('keySignaturePopover')}>key…</button>
-          <button @click=${() => this.openPopover('barAttributePopover')}>bar…</button>
-          <button @click=${() => this.openPopover('adornmentPopover')}>adorn…</button>
-          <button @click=${() => this.openPopover('lyricPopover')}>lyric…</button>
+      <div class="popover-layer">
+        <div class="popover">
+          <span class="pop-label">${spec.label}</span>
+          <input
+            placeholder=${spec.placeholder}
+            @keydown=${(e: KeyboardEvent) => this.onPopoverKey(e)}
+          />
+          ${this.setupPopoverError
+            ? html`<span class="pop-error">${this.setupPopoverError}</span>`
+            : html`<span class="pop-hint">${spec.hint}</span>`}
         </div>
-        <div class="action-state">
-          entry duration: ${this.session.entryDurationBase}${'.'.repeat(this.session.entryDurationDots)}
-          ${this.session.spanAnchor
-            ? html`<span
-                class="span-anchor"
-                title="press S again at the far note to complete the slur · Esc drops it"
-                >· slur from ${this.session.spanAnchor}…</span
-              >`
-            : nothing}
-          ${this.session.dirty
-            ? html`<span class="dirty" title="edits are in-memory only — the corpus file is untouched"
-                >· ● ${this.session.appliedOps.length}
-                op${this.session.appliedOps.length === 1 ? '' : 's'}</span
-              >`
-            : nothing}
-        </div>
-        ${this.setupPopover
-          ? html`
-              <div class="popover">
-                <span class="pop-label">${POPOVER_SPECS[this.setupPopover].label}</span>
-                <input
-                  placeholder=${POPOVER_SPECS[this.setupPopover].placeholder}
-                  @keydown=${(e: KeyboardEvent) => this.onPopoverKey(e)}
-                />
-                ${this.setupPopoverError
-                  ? html`<span class="pop-error">${this.setupPopoverError}</span>`
-                  : html`<span class="pop-hint">${POPOVER_SPECS[this.setupPopover].hint}</span>`}
-              </div>
-            `
-          : nothing}
-        <!-- The hand-written key hint retired: the hud tab's cheatsheet is
-             the reference, rendered from the keymap's own meaning table
-             (roadmap/inprogress/core-keymap-cheatsheet.md). -->
-        <p class="hint">keys: see the hud tab — the list follows the selection level</p>
       </div>
     `;
   }
@@ -1832,7 +2239,16 @@ export class ScenarioPage extends LitElement {
   /** The spec's reference engraving — the main pane is always "our render",
    *  so showing the reference beside it IS the comparison. */
   private panelCompare(entry: ScenarioEntry) {
-    return html`
+    return this.panelFrame({
+      context: html`<span class="ctx-name">${entry.meta.title}</span>
+        <span class="ctx-dim"
+          >${entry.ns === 'spec' ? 'mirrored from the spec' : 'no spec reference'}</span
+        >`,
+      // The pinned release is the whole provenance of the image above it: an
+      // engraving is only evidence if you can say which spec drew it.
+      footer: html`<span class="ctx-dim">reference images © the W3C MNX CG, from the pinned
+        <code>vendor/mnx</code> checkout</span>`,
+      body: html`
       <div class="ref-pane">
         <div class="side-cap">spec reference engraving</div>
         ${entry.ns === 'spec' && !this.referenceFailed
@@ -1863,7 +2279,8 @@ export class ScenarioPage extends LitElement {
                     <code>git submodule update --init vendor/mnx</code> and rebuild.`}
             </div>`}
       </div>
-    `;
+      `
+    });
   }
 
   /** The ops tab (roadmap/complete/core-element-ops-exemplar.md): the
@@ -1877,7 +2294,10 @@ export class ScenarioPage extends LitElement {
     if (applied.length === 0 && future.length === 0) {
       const trace = constructTraceByTarget.get(this.entry()?.id ?? '');
       const elements = elementKeys(this.session.doc);
-      return html`
+      return this.panelFrame({
+        context: html`<span class="ctx-name">no ops</span>
+          <span class="ctx-dim">nothing edited yet</span>`,
+        body: html`
         <p class="description">
           no edits yet — the queue fills as ops apply (every entry shows the op,
           the intent that provoked it, and the key that produced the intent)
@@ -1916,12 +2336,75 @@ export class ScenarioPage extends LitElement {
               </div>
             `
           : nothing}
-      `;
+      `
+      });
     }
     // Position 0 — the state before any op. A queue of N ops has N+1
     // positions; without this row the start is reachable only by Ctrl+Z.
     const startIsEmpty = !('mnx' in (this.session.initial as object));
-    return html`
+    const session = this.session;
+    return this.panelFrame({
+      // The design puts the count, the position and UNDO/REDO in the context
+      // bar. They came from the retired actions tab; this is where they belong,
+      // because they act on exactly what the body is listing.
+      context: html`
+        <span class="ctx-name"
+          >${applied.length} op${applied.length === 1 ? '' : 's'}</span
+        >
+        <span class="ctx-dim"
+          >${future.length === 0
+            ? '· at head'
+            : `· ${future.length} ahead`}${session.dirty ? '' : ' · clean'}</span
+        >
+        <span class="ctx-actions">
+          <button
+            ?disabled=${!session.canUndo}
+            title="undo one op"
+            @click=${() => this.stripIntent({ type: 'undo' })}
+          >
+            undo
+          </button>
+          <button
+            ?disabled=${!session.canRedo}
+            title="redo one op"
+            @click=${() => this.stripIntent({ type: 'redo' })}
+          >
+            redo
+          </button>
+        </span>
+      `,
+      footer: html`<span class="ctx-dim"
+          >click any row to travel to that state</span
+        >
+        <span class="ctx-actions">
+          ${session.dirty
+            ? html`<button
+                title="discard every edit — back to the committed corpus file"
+                @click=${() => this.revertEdits()}
+              >
+                revert
+              </button>`
+            : nothing}
+          <button
+            ?disabled=${session.intentLog.length === 0}
+            title="copy this session as a replayable intent-trace fixture — paste into harness/fixtures/edit-traces/"
+            @click=${() => void this.copyTrace()}
+          >
+            ${this.copied ? 'copied ✓' : 'copy trace'}
+          </button>
+        </span>`,
+      body: html`
+      <div class="entry-state">
+        entry duration:
+        ${session.entryDurationBase}${'.'.repeat(session.entryDurationDots)}
+        ${session.spanAnchor
+          ? html`<span
+              class="span-anchor"
+              title="press S again at the far note to complete the slur · Esc drops it"
+              >· slur from ${session.spanAnchor}…</span
+            >`
+          : nothing}
+      </div>
       <ol class="ops">
         <li
           class="baseline ${applied.length === 0 ? 'current' : ''}"
@@ -1957,7 +2440,8 @@ export class ScenarioPage extends LitElement {
           `;
         })}
       </ol>
-    `;
+      `
+    });
   }
 
   /** Replace the session with the fixture's replay from `{}` — the ops
@@ -2003,9 +2487,38 @@ export class ScenarioPage extends LitElement {
   }
 
   private panelJson() {
-    return this.loadState === 'ready'
-      ? html`<pre class="json">${this.rawScore}</pre>`
-      : html`<div class="ref-missing">The score has not loaded (${this.loadState}).</div>`;
+    const lines = this.rawScore ? this.rawScore.split('\n').length : 0;
+    return this.panelFrame({
+      context: html`<span class="ctx-name">whole score</span>
+        <span class="ctx-dim">${this.session?.dirty ? '· edited, in memory' : '· as committed'}</span>
+        <span class="ctx-actions">
+          <button
+            ?disabled=${!this.rawScore}
+            title="copy the document as JSON"
+            @click=${() => void this.copyJson()}
+          >
+            ${this.copiedJson ? 'copied ✓' : 'copy'}
+          </button>
+        </span>`,
+      // The selection-scoped view the design draws needs `spanByPointer` on
+      // buildJsonView, which is campaign item 7 (core-json-view.md) — the
+      // gutter and the three inks land with it, since they all read the same
+      // module. The footer states the size honestly in the meantime.
+      footer: html`<span class="ctx-dim"
+        >${lines.toLocaleString()} line${lines === 1 ? '' : 's'} · whole-document view;
+        selection scoping lands with the JSON view</span
+      >`,
+      body:
+        this.loadState === 'ready'
+          ? html`<pre class="json">${this.rawScore}</pre>`
+          : html`<div class="ref-missing">The score has not loaded (${this.loadState}).</div>`
+    });
+  }
+
+  private async copyJson() {
+    if (!this.rawScore) return;
+    await navigator.clipboard.writeText(this.rawScore);
+    this.copiedJson = true;
   }
 
   /** The HUD companion (roadmap/inprogress/core-score-hud.md): wired through
@@ -2016,18 +2529,33 @@ export class ScenarioPage extends LitElement {
     // live exactly when a tab pane is on screen.
     const view = this.activeView(entry);
     const tabPane = entry.hasTab && (view === 'tab' || view === 'both');
-    return html`
-      <mnx-score-hud
-        .rows=${buildHudRows(entry.meta.title, this.session, this.cursorHidden)}
-        .parts=${buildHudParts(this.session.doc, index => this.partOverride(index))}
-        .presets=${TUNING_PRESET_NAMES}
-        .cheats=${cheatsheet(this.session.selectionLevel, {
-          tabPane,
-          projection: this.session.projection
-        })}
-        @hud-row-activated=${this.onHudRow}
-        @hud-part-setup-changed=${this.onHudPartSetup}
-      ></mnx-score-hud>
-    `;
+    const rows = buildHudRows(entry.meta.title, this.session, this.cursorHidden);
+    const active = rows.find(r => r.active);
+    return this.panelFrame({
+      context: html`<span class="ctx-name">selection</span>
+        <span class="ctx-dim"
+          >${active ? `${active.label} · ${active.value}` : 'no cursor'}</span
+        >`,
+      // THE ONE DELIBERATELY DARK BAND IN A LIGHT APP — do not "fix" it.
+      // The design's rule is "the tray edits, the HUD explains": the keys half
+      // above is reference and never clickable, so the panel has to say where
+      // editing actually happens. Inverting the footer is how it says so
+      // without growing a control that would contradict the rule.
+      footer: html`<span class="hud-handoff">edit commands live in the tray</span>
+        <kbd class="hud-key">/</kbd>`,
+      body: html`
+        <mnx-score-hud
+          .rows=${rows}
+          .parts=${buildHudParts(this.session.doc, index => this.partOverride(index))}
+          .presets=${TUNING_PRESET_NAMES}
+          .cheats=${cheatsheet(this.session.selectionLevel, {
+            tabPane,
+            projection: this.session.projection
+          })}
+          @hud-row-activated=${this.onHudRow}
+          @hud-part-setup-changed=${this.onHudPartSetup}
+        ></mnx-score-hud>
+      `
+    });
   }
 }

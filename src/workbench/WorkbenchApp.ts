@@ -18,7 +18,7 @@ import type { EditorIntent } from '../edit/intents.ts';
 import type { PaletteItem } from './CommandPalette.ts';
 import './CommandPalette.ts';
 import './QueueHome.ts';
-import './ScenarioPage.ts';
+import { SETUP_POPOVER_COMMANDS } from './ScenarioPage.ts';
 import './ObjectsPage.ts';
 
 export interface Route {
@@ -72,15 +72,10 @@ const RAIL_HIDDEN_KEY = 'mnx-lab.rail-hidden';
 export class WorkbenchApp extends LitElement {
   @state() private route: Route = parseHash(location.hash);
   @state() private query = '';
-  /** The palette overlay: 'commands' (Ctrl+Shift+K, `>` prefilled) or 'goto'
-   *  (Ctrl+G). Ctrl+K belongs to the selection tray when an editor claims it. */
+  /** The palette overlay: 'goto' (Ctrl+G, and `/` when no editor claims it),
+   *  or 'commands' when go-to's `>` prefix asks for the command list. The
+   *  tray's `global` tab is the editor-side door to those same commands. */
   @state() private palette: 'commands' | 'goto' | null = null;
-  /** Text carried in from the tray's search line: widening the search must
-   *  not make the user retype it (core-selection-tray-mechanism.md). */
-  @state() private paletteQuery = '';
-  /** What the tray last had in its search box, published by the scenario page
-   *  so a widen keystroke can pick it up. Not state: it never renders. */
-  private widenQuery = '';
   /** Rail visibility (Ctrl+B / the header chevron) — remembered per browser;
    *  a UI preference, so localStorage, not the document store. */
   @state() private railHidden = localStorage.getItem(RAIL_HIDDEN_KEY) === '1';
@@ -336,7 +331,7 @@ export class WorkbenchApp extends LitElement {
     super.connectedCallback();
     window.addEventListener('hashchange', this.onHashChange);
     window.addEventListener('keydown', this.onKeyDown);
-    window.addEventListener('mnx-tray-search', this.onTraySearch);
+
     this.toggleAttribute('rail-hidden', this.railHidden);
   }
 
@@ -344,18 +339,14 @@ export class WorkbenchApp extends LitElement {
     super.disconnectedCallback();
     window.removeEventListener('hashchange', this.onHashChange);
     window.removeEventListener('keydown', this.onKeyDown);
-    window.removeEventListener('mnx-tray-search', this.onTraySearch);
+
   }
 
-  /** The shell's keys: `/` focuses the rail filter (survey §6.1), Ctrl+K /
-   *  Ctrl+G open the palette (resolved through the keymap module's shell
-   *  table — it stays the sole KeyboardEvent interpreter). Everything
-   *  score-shaped is the scenario page's keymap, not ours. */
-  /** The tray publishes its search text so Ctrl+Shift+K can widen it. */
-  private onTraySearch = (event: Event) => {
-    this.widenQuery = (event as CustomEvent<{ text: string }>).detail?.text ?? '';
-  };
-
+  /** The shell's keys: `/` opens a command surface (the tray, else go-to),
+   *  Ctrl+G opens go-to (whose `>` prefix reaches commands), Ctrl+B folds
+   *  the rail — all resolved through the keymap module's shell table, which
+   *  stays the sole KeyboardEvent interpreter. Everything score-shaped is the
+   *  scenario page's keymap, not ours. */
   private onKeyDown = (event: KeyboardEvent) => {
     // The SHELL's bindings are page-level by nature (the rail, the palette,
     // go-to), so they keep document scope — `host: null`
@@ -364,24 +355,25 @@ export class WorkbenchApp extends LitElement {
     if (!keyIsOurs(event, null)) return;
     const action = resolveShellAction(strokeOf(event));
     if (action === 'selectionTray') {
-      // Ctrl+K belongs to the selection (core-selection-tray-visuals.md): a
+      // `/` belongs to the selection (core-selection-tray-visuals.md): a
       // scenario page whose editor holds the keyboard claims this cancelable
-      // intent and opens the tray; unclaimed, the key falls through to the
-      // palette — so Ctrl+K still works on the queue, the coverage map, and
-      // editorless scenarios.
+      // intent and opens the tray.
+      //
+      // Unclaimed — the queue, the coverage map, a scenario with no session —
+      // it opens go-to instead. That is deliberately the SAME job slash used
+      // to do from the rail: type a few letters, land on a scenario. The
+      // mechanism changes (a jump, not a filter) and the reach widens (bars
+      // and objects too), but the muscle memory survives, which is the whole
+      // reason slash was worth taking.
       event.preventDefault();
       const claimed = !window.dispatchEvent(
         new CustomEvent('mnx-tray-intent', { cancelable: true })
       );
-      if (!claimed) this.palette = 'commands';
+      if (!claimed) this.palette = 'goto';
       return;
     }
     if (action === 'commandPalette' || action === 'goTo') {
       event.preventDefault();
-      // Ctrl+Shift+K from inside the tray widens its scoped search to every
-      // global command; the text travels so nothing is retyped.
-      this.paletteQuery = action === 'commandPalette' ? this.widenQuery : '';
-      this.widenQuery = '';
       this.palette = action === 'commandPalette' ? 'commands' : 'goto';
       return;
     }
@@ -389,14 +381,6 @@ export class WorkbenchApp extends LitElement {
       event.preventDefault();
       this.toggleRail();
       return;
-    }
-    if (event.code === 'Slash' && !event.ctrlKey && !event.altKey && !event.metaKey) {
-      const search = this.renderRoot.querySelector<HTMLInputElement>('.search');
-      if (search) {
-        event.preventDefault();
-        search.focus();
-        search.select();
-      }
     }
   };
 
@@ -452,13 +436,19 @@ export class WorkbenchApp extends LitElement {
         intent('edit: add bar', { type: 'appendMeasure' }, 'Shift+M'),
         intent('edit: toggle tie', { type: 'toggleTie' }, 'T'),
         action('edit: copy trace', 'copyTrace'),
-        action('edit: revert edits', 'revert'),
-        action('setup: time signature…', 'timeSignaturePopover', 'Shift+T'),
-        action('setup: add part…', 'partPopover', 'Shift+P')
+        action('edit: revert edits', 'revert')
       );
+      // ALL NINE setup popovers, from the one table the page also uses
+      // (workbench-score-panel.md, step C). The palette used to carry four of
+      // them by hand while the rest were reachable only from the `actions`
+      // tab; that tab is retired, so the gap had to close first — and driving
+      // both from one list is what stops it reopening.
+      for (const p of SETUP_POPOVER_COMMANDS) {
+        if (p.needsTab && !entry.hasTab) continue;
+        items.push(action(p.label, p.action, p.stroke));
+      }
       if (entry.hasTab)
         items.push(
-          action('setup: tuning…', 'tuningPopover', 'Shift+U'),
           // The staffKind toggles keep SURFACE_INTENTS honest: the palette
           // really emits setStaffKind (element-ops exemplar — the kind gates
           // the tab/both projections, so it is document data, not view state).
@@ -611,11 +601,8 @@ export class WorkbenchApp extends LitElement {
       ${this.palette
         ? html`<mnx-command-palette
             .provider=${this.paletteItems}
-            .initialQuery=${this.palette === 'commands' ? `> ${this.paletteQuery}` : ''}
-            @palette-close=${() => {
-              this.palette = null;
-              this.paletteQuery = '';
-            }}
+            .initialQuery=${this.palette === 'commands' ? '> ' : ''}
+            @palette-close=${() => (this.palette = null)}
           ></mnx-command-palette>`
         : nothing}
     `;

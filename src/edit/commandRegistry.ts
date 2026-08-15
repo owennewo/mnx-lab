@@ -22,6 +22,14 @@ import type { MeasureAttributeKind } from './ops.ts';
 import { hasSlurStartingAt, techniqueAt } from './ops.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
 
+/**
+ * Where a command applies: a rung of the selection ladder, or `document` —
+ * the scope above `score`, which is what the design spec called it and what
+ * the tray shows as its `global` tab
+ * (roadmap/proposed/core-selection-tray-global-tab.md).
+ */
+export type CommandScope = SelectionLevel | 'document';
+
 /** How a command draws: a canonical SMuFL glyph name, or one of the two marks
  *  that have no single glyph and are drawn as arcs by the tray. */
 export type CommandGlyph = { smufl: string } | { arc: 'slur' | 'tie' };
@@ -57,8 +65,8 @@ export interface SessionView {
 
 export interface EditorCommand {
   id: string;
-  /** Which tabs offer it. A command absent from a rung renders nowhere. */
-  rungs: readonly SelectionLevel[];
+  /** Which tabs offer it. A command in no scope renders nowhere. */
+  scopes: readonly CommandScope[];
   glyph: CommandGlyph;
   label: string;
   /** Display form of the key that already fires it, for the tile's chip. */
@@ -138,7 +146,7 @@ export function sessionView(session: SessionLike): SessionView {
 
 // ── The table ──────────────────────────────────────────────────────────────
 
-const NOTE_EVENT: readonly SelectionLevel[] = ['note', 'event'];
+const NOTE_EVENT: readonly CommandScope[] = ['note', 'event'];
 
 /** A marking tile: on when the event carries it, and the same tile removes it
  *  (the design's rule — an active tile IS the remove). */
@@ -150,7 +158,7 @@ function marking(
 ): EditorCommand {
   return {
     id,
-    rungs: NOTE_EVENT,
+    scopes: NOTE_EVENT,
     glyph: { smufl },
     label,
     shortcut: 'Shift+A',
@@ -170,7 +178,7 @@ function marking(
 function dynamic(id: string, smufl: string, label: string, value: string): EditorCommand {
   return {
     id,
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl },
     label,
     shortcut: 'Shift+A',
@@ -194,7 +202,7 @@ function barAttribute(
 ): EditorCommand {
   return {
     id,
-    rungs: ['measure'],
+    scopes: ['measure'],
     glyph: { smufl },
     label,
     shortcut: 'Shift+B',
@@ -219,7 +227,7 @@ function technique(
   const probe = kind === 'hammerPull' ? 'hammerOn' : kind;
   return {
     id,
-    rungs: ['note'],
+    scopes: ['note'],
     glyph: { smufl },
     label,
     shortcut,
@@ -242,7 +250,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   // ── note ────────────────────────────────────────────────────────────────
   {
     id: 'tie',
-    rungs: ['note'],
+    scopes: ['note'],
     glyph: { arc: 'tie' },
     label: 'Tie to the next note',
     shortcut: 'T',
@@ -257,7 +265,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   // same screen; the tray follows the docs, and the docs follow the guards.
   {
     id: 'slur',
-    rungs: ['note'],
+    scopes: ['note'],
     glyph: { arc: 'slur' },
     label: 'Slur — press again at the last note',
     shortcut: 'S',
@@ -268,7 +276,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'beam',
-    rungs: ['note'],
+    scopes: ['note'],
     glyph: { smufl: 'textCont8thBeamShortStem' },
     label: 'Beam — press again at the last event',
     shortcut: 'B',
@@ -278,7 +286,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'accidental-display',
-    rungs: ['note'],
+    scopes: ['note'],
     glyph: { smufl: 'accidentalParensLeft' },
     label: 'Force the accidental',
     shortcut: 'Shift+A',
@@ -287,7 +295,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'respell-flat',
-    rungs: ['note'],
+    scopes: ['note'],
     glyph: { smufl: 'accidentalFlat' },
     label: 'Respell flat',
     tier: 'popover',
@@ -295,7 +303,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'respell-sharp',
-    rungs: ['note'],
+    scopes: ['note'],
     glyph: { smufl: 'accidentalSharp' },
     label: 'Respell sharp',
     tier: 'popover',
@@ -315,7 +323,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   technique('harmonic', 'stringsHarmonic', 'Natural harmonic', 'harmonic', 'O'),
   {
     id: 'fingering',
-    rungs: ['note'],
+    scopes: ['note'],
     glyph: { smufl: 'fingering1' },
     label: 'Fingering',
     shortcut: 'Shift+A',
@@ -326,7 +334,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   // ── event ───────────────────────────────────────────────────────────────
   {
     id: 'shorter',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'note8thUp' },
     label: 'Shorter duration',
     shortcut: '−',
@@ -335,7 +343,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'longer',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'noteHalfUp' },
     label: 'Longer duration',
     shortcut: '=',
@@ -344,7 +352,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'dots',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'augmentationDot' },
     label: 'Dot the value',
     tier: 'popover',
@@ -352,7 +360,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'tuplet',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'tuplet3' },
     label: 'Triplet',
     shortcut: 'Shift+R',
@@ -361,7 +369,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'grace',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'graceNoteAcciaccaturaStemUp' },
     label: 'Grace note',
     shortcut: 'Shift+R',
@@ -370,7 +378,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'tremolo',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'tremolo3' },
     label: 'Tremolo',
     shortcut: 'Shift+R',
@@ -382,7 +390,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   dynamic('forte', 'dynamicForte', 'Forte', 'f'),
   {
     id: 'crescendo',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'dynamicCrescendoHairpin' },
     label: 'Crescendo',
     shortcut: 'Shift+A',
@@ -391,7 +399,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'diminuendo',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'dynamicDiminuendoHairpin' },
     label: 'Diminuendo',
     shortcut: 'Shift+A',
@@ -400,7 +408,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'ottava',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'ottavaAlta' },
     label: 'Ottava alta',
     shortcut: 'Shift+A',
@@ -409,7 +417,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'direction',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'textBlackNoteShortStem' },
     label: 'Direction text…',
     shortcut: 'Shift+A',
@@ -418,7 +426,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'lyric',
-    rungs: ['note', 'event'],
+    scopes: ['note', 'event'],
     glyph: { smufl: 'lyricsElisionNarrow' },
     label: 'Lyric syllable…',
     shortcut: 'Shift+L',
@@ -427,7 +435,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'fermata',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'fermataAbove' },
     label: 'Fermata',
     shortcut: 'Shift+A',
@@ -436,7 +444,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'arpeggio',
-    rungs: ['event'],
+    scopes: ['event'],
     glyph: { smufl: 'arpeggiato' },
     label: 'Arpeggio',
     tier: 'popover',
@@ -446,7 +454,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   // ── voice-measure ───────────────────────────────────────────────────────
   {
     id: 'full-measure-rest',
-    rungs: ['voiceMeasure'],
+    scopes: ['voiceMeasure'],
     glyph: { smufl: 'restWhole' },
     label: 'Full-measure rest',
     shortcut: 'Shift+B',
@@ -455,7 +463,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'rest-spelling',
-    rungs: ['voiceMeasure'],
+    scopes: ['voiceMeasure'],
     glyph: { smufl: 'restHalf' },
     label: 'Respell the rests…',
     shortcut: 'Shift+R',
@@ -464,7 +472,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'space',
-    rungs: ['voiceMeasure'],
+    scopes: ['voiceMeasure'],
     glyph: { smufl: 'restQuarter' },
     label: 'Insert space…',
     shortcut: 'Shift+R',
@@ -473,7 +481,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'cycle-voice',
-    rungs: ['voiceMeasure'],
+    scopes: ['voiceMeasure'],
     glyph: { smufl: 'arrowBlackUp' },
     label: 'Step to the next voice at this beat',
     shortcut: 'Alt+V',
@@ -482,7 +490,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'new-voice',
-    rungs: ['voiceMeasure'],
+    scopes: ['voiceMeasure'],
     glyph: { smufl: 'arrowBlackDown' },
     label: 'Add a voice',
     tier: 'popover',
@@ -492,7 +500,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   // ── part-measure ────────────────────────────────────────────────────────
   {
     id: 'clef',
-    rungs: ['partMeasure', 'measure'],
+    scopes: ['partMeasure', 'measure'],
     glyph: { smufl: 'gClef' },
     label: 'Clef…',
     shortcut: 'Shift+C',
@@ -501,7 +509,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'tuning',
-    rungs: ['partMeasure'],
+    scopes: ['partMeasure'],
     glyph: { smufl: '6stringTabClef' },
     label: 'Tuning…',
     shortcut: 'Shift+U',
@@ -510,7 +518,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'capo',
-    rungs: ['partMeasure'],
+    scopes: ['partMeasure'],
     glyph: { smufl: 'fingering0' },
     label: 'Capo…',
     shortcut: 'Shift+P',
@@ -519,7 +527,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'transpose-part',
-    rungs: ['partMeasure'],
+    scopes: ['partMeasure'],
     glyph: { smufl: 'ottava' },
     label: 'Instrument transposition',
     tier: 'popover',
@@ -527,7 +535,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'mute-part',
-    rungs: ['partMeasure'],
+    scopes: ['partMeasure'],
     glyph: { smufl: 'pluckedDampAll' },
     label: 'Mute the part',
     tier: 'popover',
@@ -537,7 +545,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   // ── measure (the global bar) ────────────────────────────────────────────
   {
     id: 'key-signature',
-    rungs: ['measure'],
+    scopes: ['measure'],
     glyph: { smufl: 'accidentalSharp' },
     label: 'Key signature…',
     shortcut: 'Shift+K',
@@ -546,7 +554,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'time-signature',
-    rungs: ['measure'],
+    scopes: ['measure'],
     glyph: { smufl: 'timeSig4' },
     label: 'Time signature…',
     shortcut: 'Shift+T',
@@ -575,7 +583,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   })),
   {
     id: 'ending',
-    rungs: ['measure'],
+    scopes: ['measure'],
     glyph: { smufl: 'repeat2Bars' },
     label: 'Volta ending…',
     shortcut: 'Shift+B',
@@ -585,7 +593,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'rehearsal',
-    rungs: ['measure'],
+    scopes: ['measure'],
     glyph: { smufl: 'repeat1Bar' },
     label: 'Rehearsal mark…',
     shortcut: 'Shift+B',
@@ -595,7 +603,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'tempo',
-    rungs: ['measure'],
+    scopes: ['measure'],
     glyph: { smufl: 'metNoteQuarterUp' },
     label: 'Tempo…',
     shortcut: 'Shift+B',
@@ -605,7 +613,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'measure-repeat',
-    rungs: ['measure'],
+    scopes: ['measure'],
     glyph: { smufl: 'repeat1Bar' },
     label: 'Measure repeat…',
     shortcut: 'Shift+B',
@@ -614,7 +622,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'delete-bar',
-    rungs: ['measure'],
+    scopes: ['measure'],
     glyph: { smufl: 'restWhole' },
     label: 'Delete this bar (only when empty)',
     shortcut: 'Del',
@@ -625,7 +633,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   // ── section ─────────────────────────────────────────────────────────────
   {
     id: 'section',
-    rungs: ['section', 'measure'],
+    scopes: ['section', 'measure'],
     glyph: { smufl: 'segno' },
     label: 'Section label…',
     shortcut: 'Shift+B',
@@ -635,7 +643,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'section-colour',
-    rungs: ['section'],
+    scopes: ['section'],
     glyph: { smufl: 'coda' },
     label: 'Section colour',
     tier: 'popover',
@@ -643,7 +651,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'section-range',
-    rungs: ['section'],
+    scopes: ['section'],
     glyph: { smufl: 'barlineDashed' },
     label: 'Select the section’s range',
     tier: 'popover',
@@ -653,7 +661,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   // ── score ───────────────────────────────────────────────────────────────
   {
     id: 'add-part',
-    rungs: ['score'],
+    scopes: ['score'],
     glyph: { smufl: 'brace' },
     label: 'Add a part…',
     shortcut: 'Shift+P',
@@ -662,7 +670,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'staff-kind',
-    rungs: ['score'],
+    scopes: ['score'],
     glyph: { smufl: '6stringTabClef' },
     label: 'Staff kind: notation + tab',
     shortcut: 'Shift+P',
@@ -671,7 +679,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'add-bar',
-    rungs: ['score', 'measure'],
+    scopes: ['score', 'measure'],
     glyph: { smufl: 'barlineSingle' },
     label: 'Append a bar',
     shortcut: 'Shift+M',
@@ -680,7 +688,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'part-name',
-    rungs: ['score'],
+    scopes: ['score'],
     glyph: { smufl: 'textBlackNoteShortStem' },
     label: 'Part name…',
     shortcut: 'Shift+P',
@@ -689,7 +697,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'staves',
-    rungs: ['score'],
+    scopes: ['score'],
     glyph: { smufl: 'brace' },
     label: 'Staves per part…',
     shortcut: 'Shift+P',
@@ -698,7 +706,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'system-break',
-    rungs: ['score'],
+    scopes: ['score'],
     glyph: { smufl: 'systemDivider' },
     label: 'System break',
     tier: 'popover',
@@ -706,24 +714,112 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'multimeasure-rest',
-    rungs: ['score'],
+    scopes: ['score'],
     glyph: { smufl: 'restHBar' },
     label: 'Multimeasure rest',
     tier: 'popover',
     blockedBy: 'layout-authoring'
+  },
+
+  // ── document — the scope above `score`, shown as the tray's `global` tab
+  // (core-selection-tray-global-tab.md). These apply to the session rather
+  // than to anything selected, which is exactly why they sit past the top of
+  // the ladder rather than on `score`.
+  //
+  // Undo and redo stay AVAILABLE with an empty history on purpose: the tile
+  // states say whether a verb exists, not whether it would do something this
+  // instant. Ctrl+Z on a fresh document is a no-op, and the tile reads the
+  // same way.
+  {
+    id: 'undo',
+    scopes: ['document'],
+    glyph: { smufl: 'arrowBlackLeft' },
+    label: 'Undo',
+    shortcut: 'Ctrl+Z/Y',
+    tier: 'key',
+    action: () => ({ intent: { type: 'undo' } })
+  },
+  {
+    id: 'redo',
+    scopes: ['document'],
+    glyph: { smufl: 'arrowBlackRight' },
+    label: 'Redo',
+    shortcut: 'Ctrl+Z/Y',
+    tier: 'key',
+    action: () => ({ intent: { type: 'redo' } })
+  },
+  {
+    id: 'doc-add-bar',
+    scopes: ['document'],
+    glyph: { smufl: 'barlineSingle' },
+    label: 'Append a bar',
+    shortcut: 'Shift+M',
+    tier: 'key',
+    action: () => ({ intent: { type: 'appendMeasure' } })
+  },
+  {
+    id: 'doc-add-part',
+    scopes: ['document'],
+    glyph: { smufl: 'brace' },
+    label: 'Add a part…',
+    shortcut: 'Shift+P',
+    tier: 'popover',
+    action: () => ({ surface: 'partPopover' })
+  },
+  {
+    id: 'doc-time',
+    scopes: ['document'],
+    glyph: { smufl: 'timeSig4' },
+    label: 'Time signature…',
+    shortcut: 'Shift+T',
+    tier: 'popover',
+    action: () => ({ surface: 'timeSignaturePopover' })
+  },
+  {
+    id: 'doc-tuning',
+    scopes: ['document'],
+    glyph: { smufl: '6stringTabClef' },
+    label: 'Tuning…',
+    shortcut: 'Shift+U',
+    tier: 'popover',
+    action: () => ({ surface: 'tuningPopover' })
+  },
+  {
+    id: 'staff-kind-both',
+    scopes: ['document'],
+    glyph: { smufl: 'brace' },
+    label: 'Staff kind — notation + tab',
+    tier: 'popover',
+    action: () => ({ intent: { type: 'setStaffKind', kind: 'both' } })
+  },
+  {
+    id: 'staff-kind-tab',
+    scopes: ['document'],
+    glyph: { smufl: '6stringTabClef' },
+    label: 'Staff kind — tab only',
+    tier: 'popover',
+    action: () => ({ intent: { type: 'setStaffKind', kind: 'tab' } })
+  },
+  {
+    id: 'staff-kind-notation',
+    scopes: ['document'],
+    glyph: { smufl: 'gClef' },
+    label: 'Staff kind — notation only',
+    tier: 'popover',
+    action: () => ({ intent: { type: 'setStaffKind', kind: 'notation' } })
   }
 ];
 
 // ── Selection ──────────────────────────────────────────────────────────────
 
-/** The commands offered at one rung, in declared order: the rung must match,
- *  and a projection-specific command only appears in its own dialect. */
-export function commandsForRung(
-  level: SelectionLevel,
+/** The commands offered in one scope, in declared order: the scope must
+ *  match, and a projection-specific command only appears in its own dialect. */
+export function commandsForScope(
+  scope: CommandScope,
   view: SessionView
 ): readonly EditorCommand[] {
   return COMMANDS.filter(command => {
-    if (!command.rungs.includes(level)) return false;
+    if (!command.scopes.includes(scope)) return false;
     if (command.projection && command.projection !== view.projection) return false;
     return true;
   });

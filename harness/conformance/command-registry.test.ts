@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import {
   COMMANDS,
   commandState,
-  commandsForRung,
+  commandsForScope,
   sessionView,
   type EditorCommand
 } from '../../src/edit/commandRegistry.ts';
@@ -93,16 +93,26 @@ describe('command registry — the joins', () => {
     expect([...seen].filter(([, n]) => n > 1).map(([id]) => id)).toEqual([]);
   });
 
-  it('every rung named is a real ladder rung', () => {
-    const rungs = new Set<string>(SELECTION_LADDER);
-    const strays = COMMANDS.flatMap(c => c.rungs.filter(r => !rungs.has(r)));
+  it('every scope named is a real ladder rung, or `document`', () => {
+    const scopes = new Set<string>([...SELECTION_LADDER, 'document']);
+    const strays = COMMANDS.flatMap(c => c.scopes.filter(r => !scopes.has(r)));
     expect(strays).toEqual([]);
   });
 
-  it('every command is reachable from some rung', () => {
+  it('every command is reachable from some scope', () => {
     // A command no tab can show is dead weight the tray would never draw.
-    const orphans = COMMANDS.filter(c => c.rungs.length === 0);
+    const orphans = COMMANDS.filter(c => c.scopes.length === 0);
     expect(orphans.map(c => c.id)).toEqual([]);
+  });
+
+  it('the document scope offers commands, and never mixes with a rung', () => {
+    // `document` is the scope ABOVE the ladder (the tray's `global` tab), so a
+    // command claiming both it and a rung would appear twice with two
+    // different meanings of "here".
+    const global = COMMANDS.filter(c => c.scopes.includes('document'));
+    expect(global.length).toBeGreaterThan(0);
+    const mixed = global.filter(c => c.scopes.length > 1);
+    expect(mixed.map(c => c.id)).toEqual([]);
   });
 
   it('every shortcut names a key some table actually binds', () => {
@@ -210,7 +220,7 @@ describe('command registry — the funnel', () => {
     // throw — the cheap proof that nothing in the registry emits a shape the
     // session cannot read back.
     const session = new EditorSession(makeDoc());
-    const intents = commandsForRung('note', sessionView(session))
+    const intents = commandsForScope('note', sessionView(session))
       .map(command => command.action?.(sessionView(session)))
       .filter((a): a is { intent: never } => !!a && 'intent' in a)
       .map(a => a.intent);
@@ -231,7 +241,8 @@ describe('command registry — rung filtering', () => {
       const doc = KEY_DOCS.find(d => d.keys === command.shortcut);
       if (!doc || doc.meaning.all !== undefined) continue;
       const documented = new Set(Object.keys(doc.meaning));
-      for (const rung of command.rungs) {
+      // `document` has no rung, so no per-rung meaning can contradict it.
+      for (const rung of command.scopes.filter(s => s !== 'document')) {
         if (!documented.has(rung)) contradictions.push(`${command.id} @ ${rung} (${doc.keys})`);
       }
     }
@@ -241,7 +252,7 @@ describe('command registry — rung filtering', () => {
   it('offers commands at every rung the ladder can reach', () => {
     // A rung whose tab is empty is a dead tab; the tray shows all seven.
     const v = view();
-    const empty = SELECTION_LADDER.filter(level => commandsForRung(level, v).length === 0);
+    const empty = SELECTION_LADDER.filter(level => commandsForScope(level, v).length === 0);
     expect(empty).toEqual([]);
   });
 
@@ -254,12 +265,12 @@ describe('command registry — rung filtering', () => {
     session.handleIntent({ type: 'setProjection', projection: 'notation' });
     const notation = sessionView(session);
     expect(notation.projection).toBe('notation');
-    const inNotation = commandsForRung('note', notation).map(c => c.id);
+    const inNotation = commandsForScope('note', notation).map(c => c.id);
     expect(inNotation).toContain('slur');
     expect(inNotation).not.toContain('slide');
 
     session.handleIntent({ type: 'setProjection', projection: 'tab' });
-    const inTab = commandsForRung('note', sessionView(session)).map(c => c.id);
+    const inTab = commandsForScope('note', sessionView(session)).map(c => c.id);
     expect(inTab).toContain('slide');
     expect(inTab).not.toContain('slur');
   });
