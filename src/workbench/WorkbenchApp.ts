@@ -18,7 +18,7 @@ import type { EditorIntent } from '../edit/intents.ts';
 import type { PaletteItem } from './CommandPalette.ts';
 import './CommandPalette.ts';
 import './QueueHome.ts';
-import { SETUP_POPOVER_COMMANDS } from './ScenarioPage.ts';
+import { SETUP_POPOVER_COMMANDS, type ScenarioPage } from './ScenarioPage.ts';
 import './ObjectsPage.ts';
 
 export interface Route {
@@ -523,7 +523,22 @@ export class WorkbenchApp extends LitElement {
       this.toggleRail();
       return;
     }
+    if (action === 'togglePanel') {
+      // The panel belongs to the scenario page, so the shell asks it rather
+      // than mirroring its state — and a no-op anywhere else is right: on
+      // #/objects there is no panel to fold.
+      const page = this.scenarioPage();
+      if (!page) return;
+      event.preventDefault();
+      page.togglePanel();
+      return;
+    }
   };
+
+  /** The mounted scenario page, when one is routed. */
+  private scenarioPage(): ScenarioPage | null {
+    return this.renderRoot?.querySelector<ScenarioPage>('mnx-scenario-page') ?? null;
+  }
 
   // ── The palette's provider: one grammar. `>` prefix = commands; bare text
   // is go-to — bar numbers move the editor cursor, `def:` opens coverage, and
@@ -560,6 +575,17 @@ export class WorkbenchApp extends LitElement {
         hint: 'Ctrl+B',
         run: () => this.toggleRail()
       },
+      // Offered only where there is a panel to fold — the palette lists what
+      // it can actually do, and on #/objects this row would be a dead entry.
+      ...(this.scenarioPage()
+        ? [
+            {
+              label: `view: ${this.scenarioPage()!.panelIsHidden ? 'show' : 'hide'} score panel`,
+              hint: 'Ctrl+Alt+B',
+              run: () => this.scenarioPage()?.togglePanel()
+            }
+          ]
+        : []),
       // The theme's only control, and deliberately no keystroke: the free-key
       // budget belongs to the element-ops campaign, and a theme switch is not
       // a thing you reach for mid-edit. All three settings are offered rather

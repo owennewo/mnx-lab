@@ -16,8 +16,10 @@ import { isSmuflLoaded, loadSmufl } from '../engine/smufl/smufl.ts';
 import {
   BASELINE_PX_PER_SP,
   clampStaffScale,
+  type RenderOutcome,
   type RenderScale
 } from '../engine/render/scale.ts';
+import { densityLadder, type PackingInput } from '../engine/layout/spacing.ts';
 import { drawCursorGhost, drawEnclosure } from './enclosure.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
@@ -146,7 +148,7 @@ export class ScoreViewer extends LitElement {
   @property({ type: String, reflect: true }) hide = '';
   /**
    * Horizontal density — `normal` (default), `compact`, `spacious`
-   * (roadmap/inprogress/core-render-density-zoom.md): how much music fits on a
+   * (roadmap/complete/core-render-density-zoom.md): how much music fits on a
    * line, WITHOUT shrinking the glyphs. Zoom changes how big the notes are;
    * density changes how much air sits between them, which is why they are
    * separate axes and compose freely.
@@ -187,10 +189,32 @@ export class ScoreViewer extends LitElement {
 
   private resizeHandler = () => this.renderScore();
 
+  /**
+   * Re-lay-out when the CONTAINER's width changes, not just the window's.
+   *
+   * The window listener above cannot see the shell folding its rail or its
+   * side panel away: the viewport never moves, so the score kept its old line
+   * width and the reader's new room stayed empty until they happened to
+   * resize something. Same for an embed host animating its own layout.
+   *
+   * Width only, and compared against the width actually rendered at, because
+   * the observer also fires on the HEIGHT changes this render causes — a
+   * taller engraving, a scrollbar appearing — and re-rendering on those is
+   * how a resize observer turns into a loop.
+   */
+  private containerObserver: ResizeObserver | null = null;
+  private renderedWidth = 0;
+
   /** One-shot re-render when the Bravura font file finishes loading: the
    *  enclosure overlay measures glyph boxes, and a first paint that races the
    *  font would freeze fallback-font geometry into the highlight. */
   private fontRedrawQueued = false;
+
+  /** The last successful paint's system packing, and the density ladder
+   *  derived from it — keyed on the packing's identity, so a new paint
+   *  invalidates it and repeated `densitySteps()` calls do not re-pack. */
+  private lastPackings: PackingInput[] | null = null;
+  private ladder: { of: PackingInput[]; steps: number[] } | null = null;
 
   static styles = [
     // The viewer carries its own tokens (core-viewer-embedded-app.md): on a
@@ -240,7 +264,19 @@ export class ScoreViewer extends LitElement {
         outline-color: var(--focus-ring);
       }
 
+      /* The paper FILLS the space it is given, and the engine lays the music
+         out to whatever width that is — a wider window is more bars per
+         system, which is the whole point of a screen-first engraver.
+         It used to be capped at min(100%, 820px), a page-shaped constant
+         that left a fold of empty bench either side once the rail folded
+         away: the reader had made room for music and got margin.
+         --mnx-paper-width is the escape hatch for a host that wants the page
+         look back (--mnx-paper-width: 820px); max-width keeps any value
+         honest against the container. */
       .paper {
+        width: var(--mnx-paper-width, 100%);
+        max-width: 100%;
+        box-sizing: border-box;
         background: var(--paper);
         color: var(--paper-ink);
         border-radius: var(--radius-panel);
@@ -513,6 +549,20 @@ export class ScoreViewer extends LitElement {
     super.disconnectedCallback();
     window.removeEventListener('resize', this.resizeHandler);
     this.removeEventListener('scroll', this.onAnchorScroll);
+    this.containerObserver?.disconnect();
+    this.containerObserver = null;
+  }
+
+  firstUpdated() {
+    if (!this.container || typeof ResizeObserver === 'undefined') return;
+    this.containerObserver = new ResizeObserver(() => {
+      const width = this.container.getBoundingClientRect().width;
+      // Sub-pixel jitter is not a new line width; ignore it rather than
+      // re-engraving the score on a rounding difference.
+      if (Math.abs(width - this.renderedWidth) < 1) return;
+      this.renderScore();
+    });
+    this.containerObserver.observe(this.container);
   }
 
   updated(changed: Map<string | number | symbol, unknown>) {
@@ -544,12 +594,14 @@ export class ScoreViewer extends LitElement {
     }
 
     const width = this.container.getBoundingClientRect().width || 600;
+    // What this paint was laid out for — the observer's comparison point.
+    this.renderedWidth = width;
     const failures: { pane: string; message: string }[] = [];
     const staffScale = clampStaffScale(this.zoom);
     // Whichever pane actually drew: `both` is one render, and in the split
     // views notation and tab derive the same factor from the shared plan, so
     // there is never a second, disagreeing answer to report.
-    let scale: RenderScale | null = null;
+    let outcome: RenderOutcome | null = null;
 
     const onNoteClick = (noteId: string, measureIdx: number, noteIdx: number) => {
       this.dispatchEvent(
@@ -648,13 +700,13 @@ export class ScoreViewer extends LitElement {
     if (resolvedView === 'tab') {
       const pane = this.appendPane();
       guarded(pane, 'tab', () => {
-        scale = renderMnxToSvgTab({ container: pane, ...commonOpts, tabSetup });
+        outcome = renderMnxToSvgTab({ container: pane, ...commonOpts, tabSetup });
         enclosed(pane);
       });
     } else if (resolvedView === 'notation') {
       const pane = this.appendPane();
       guarded(pane, 'notation', () => {
-        scale = renderMnxToSvgNotation({ container: pane, ...commonOpts });
+        outcome = renderMnxToSvgNotation({ container: pane, ...commonOpts });
         enclosed(pane);
       });
     } else {
@@ -663,7 +715,7 @@ export class ScoreViewer extends LitElement {
       // stacked renders.
       const pane = this.appendPane();
       guarded(pane, 'both', () => {
-        scale = renderMnxToSvgBoth({ container: pane, ...commonOpts, tabSetup });
+        outcome = renderMnxToSvgBoth({ container: pane, ...commonOpts, tabSetup });
         enclosed(pane);
       });
     }
@@ -678,10 +730,18 @@ export class ScoreViewer extends LitElement {
     // the number moves on resize with nobody touching a control. Skipped when
     // the layout threw: there is no scale to report, and the last good value
     // is a better thing for a readout to keep showing than a fabricated 100%.
-    if (scale) {
+    // Cast, not annotation: every assignment above happens inside a callback,
+    // so control-flow analysis has narrowed `outcome` to `never` by here.
+    const drawn = outcome as RenderOutcome | null;
+    if (drawn) {
+      const { pxPerSp, staffScale: used, fitted } = drawn;
+      // The packing rides along on the same paint, for `densitySteps()`. It is
+      // NOT in the event: the detail stays exactly `RenderScale`, because a
+      // host wants the answer ("which values do something?"), not the input.
+      this.lastPackings = drawn.packings;
       this.dispatchEvent(
         new CustomEvent<RenderScale>('render-scale', {
-          detail: scale,
+          detail: { pxPerSp, staffScale: used, fitted },
           bubbles: true,
           composed: true
         })
@@ -689,6 +749,31 @@ export class ScoreViewer extends LitElement {
     }
 
     this.emitSelectionAnchor();
+  }
+
+  /**
+   * The density values that would actually change THIS score, as it is
+   * currently drawn — ascending, from the engine's floor.
+   *
+   * A control stepping `density-h` by a fixed percentage spends most of its
+   * clicks on values that engrave identically: inside the justifier's linear
+   * range, tightening the springs and stretching them back are the same
+   * operation (`spacing.ts`, `packingSignature`). Density only bites where it
+   * moves a barline to another system. So the honest step is "the next value
+   * that changes something", and only the layer that just laid the score out
+   * can say which those are — it depends on the document, the viewport width
+   * and the staff scale, all of which move.
+   *
+   * Null until a paint has succeeded. Recomputed per paint, cached in between:
+   * a host may call this on every render of its own.
+   */
+  densitySteps(): number[] | null {
+    const packings = this.lastPackings;
+    if (!packings) return null;
+    if (this.ladder?.of !== packings) {
+      this.ladder = { of: packings, steps: densityLadder(packings) };
+    }
+    return this.ladder.steps;
   }
 
   /** The selection's on-screen box: the enclosure overlay's bounding rect in
@@ -770,21 +855,21 @@ export class ScoreViewer extends LitElement {
   }
 
   render() {
-    // The paper is the page, and the page does not resize when the engraving
-    // does. `zoom` used to scale this card and nothing else — now it scales
-    // the music inside it (core-zoom-density-pad.md, ruling 3).
-    const paperWidth = `min(100%, 820px)`;
-
+    // The paper's width is CSS now, not an inline style: it fills the
+    // container and a host retunes it with `--mnx-paper-width`. It was never
+    // dynamic — the same expression was pasted into both branches — and
+    // `zoom` has not sized this card since core-zoom-density-pad.md ruling 3
+    // sent it to the music inside instead.
     if (!this.mnxDoc) {
       return html`
-        <div class="paper" style="width: ${paperWidth}">
+        <div class="paper">
           <div class="no-doc">No document loaded</div>
         </div>
       `;
     }
 
     return html`
-      <div class="paper" style="width: ${paperWidth}">
+      <div class="paper">
         ${this.renderErrors.length
           ? html`
               <div class="state-panel">

@@ -3,7 +3,7 @@ import { PartTabSetups } from './guitarPositions.ts';
 import { layoutTab } from '../layout/tab.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
-import { renderScale, type RenderScale } from '../render/scale.ts';
+import { renderOutcome, type RenderOutcome } from '../render/scale.ts';
 
 /**
  * Thin entry point for the tab view: computes layout in staff spaces,
@@ -34,7 +34,7 @@ export interface RenderTabOptions {
   densityH?: number;
 }
 
-export function renderMnxToSvgTab(opts: RenderTabOptions): RenderScale {
+export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
   const basePxPerSp = opts.pxPerSp ?? DEFAULT_PX_PER_SP;
 
   const layout = layoutTab({
@@ -77,5 +77,5 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderScale {
       : undefined
   });
 
-  return renderScale(pxPerSp, fitted);
+  return renderOutcome(pxPerSp, fitted, layout.packings);
 }

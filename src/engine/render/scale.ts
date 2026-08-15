@@ -11,6 +11,8 @@
  * fire-and-forget for every caller that doesn't care, and the corpus harness
  * ignores it entirely.
  */
+import type { PackingInput } from '../layout/spacing.ts';
+
 export interface RenderScale {
   /** Pixels per staff space the SVG was actually emitted at. */
   pxPerSp: number;
@@ -25,12 +27,37 @@ export interface RenderScale {
   fitted: boolean;
 }
 
+/**
+ * What a render reports back: the scale it used, plus the system packing it
+ * built.
+ *
+ * The packing is here for the same reason `RenderScale` is — a host cannot
+ * compose an honest density control without it. Stepping density by a fixed
+ * percentage mostly changes nothing (`spacing.ts`, `packingSignature`), so a
+ * control has to be able to ask which values are real, and asking means
+ * re-packing what this render already worked out. Ignorable by every caller
+ * that doesn't, exactly like `fitted`.
+ */
+export interface RenderOutcome extends RenderScale {
+  /** One per laid-out segment; empty when the layout packed nothing. */
+  packings: PackingInput[];
+}
+
 /** The baseline every `staffScale` is measured against. One definition, so the
  *  three renderers cannot drift on what "100%" means. */
 export const BASELINE_PX_PER_SP = 10;
 
 export function renderScale(pxPerSp: number, fitted: boolean): RenderScale {
   return { pxPerSp, staffScale: pxPerSp / BASELINE_PX_PER_SP, fitted };
+}
+
+/** The scale plus the layout's packing — what the three renderers return. */
+export function renderOutcome(
+  pxPerSp: number,
+  fitted: boolean,
+  packings: PackingInput[] | undefined
+): RenderOutcome {
+  return { ...renderScale(pxPerSp, fitted), packings: packings ?? [] };
 }
 
 /**

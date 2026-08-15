@@ -20,6 +20,22 @@
 > `workbench-` because `src/workbench/ScenarioPage.ts` is a **leaf** — nothing imports it
 > and nothing will; this is not promotion-track work. (The campaign's contract items are
 > `core-` because they live in `src/elements/`.)
+>
+> **Addendum 2026-08-15 — the panel folds.** Asked for directly, alongside the
+> paper filling its pane: a reader who wants the score and nothing else can now
+> put the panel away. The chevron sits at the right end of the view tabs (the
+> head spans the panel, so the control stays reachable in both states, which one
+> living *inside* the panel could not), `Ctrl+Alt+B` drives it — VS Code's own
+> secondary-sidebar chord, one modifier off the rail's `Ctrl+B` — and the
+> palette carries the row wherever a panel exists to fold. Folded/unfolded is
+> remembered **separately from the width**, so unfolding restores the width that
+> was dragged rather than the default.
+>
+> The panel is a grid column, so folding it hands its pixels to the score — and
+> that only became visible work because the same change made the paper fill its
+> pane and taught the viewer to observe its own box. Before that, folding either
+> pane left the engraving at its old line width until the window happened to
+> resize.
 
 ## The problem
 

@@ -66,7 +66,7 @@ byte-identical for all-notation systems) and the extra emission. Key pieces:
   dropped when a tab staff sits below the verses instead. Constant 6sp everywhere else,
   so notation goldens couldn't move; verified 1.8sp minimum clearance on the
   Sun-did-glide fixture (2 verses, which previously collided). Where the gap *knob* is
-  exposed still belongs to [core-render-density-zoom.md](../inprogress/core-render-density-zoom.md) /
+  exposed still belongs to [core-render-density-zoom.md](../complete/core-render-density-zoom.md) /
   [core-viewer-surface.md](core-viewer-surface.md).
 - ✔ **Repeat dots on tab** (2026-08-08): native tab staves now carry their own dots at
   the six-line staff's middle (`TAB_REPEAT_DOT_YS`), forward and backward. Both-view

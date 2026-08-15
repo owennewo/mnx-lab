@@ -6,7 +6,7 @@ import {
   MAX_STAFF_SCALE,
   clampStaffScale
 } from '../engine/render/scale.ts';
-import { MIN_DENSITY, MAX_DENSITY } from '../engine/layout/spacing.ts';
+import { MIN_DENSITY, MAX_DENSITY, clampDensity } from '../engine/layout/spacing.ts';
 
 /**
  * The zoom/density pad — roadmap/proposed/core-zoom-density-pad.md, campaign
@@ -37,9 +37,16 @@ import { MIN_DENSITY, MAX_DENSITY } from '../engine/layout/spacing.ts';
  * away.
  */
 
-/** Design: staff step 5%, spacing step 4%. Both ranges are the ENGINE's. */
+/** Design: staff step 5%, spacing step 4%. Both ranges are the ENGINE's.
+ *
+ *  SPACE_STEP is now a MINIMUM rather than the step: with a ladder supplied
+ *  (see `densitySteps`) the arm lands on the first rung at least this far away,
+ *  so a click never does nothing and never does less than the design asked. */
 const STAFF_STEP = 0.05;
 const SPACE_STEP = 0.04;
+
+/** Float slack when comparing against ladder rungs (they are 1% grid values). */
+const RUNG_EPS = 1e-6;
 
 /** Drag: ±1 step per 6px, halved with shift; axis-locks after 8px of travel
  *  if that travel is within 20° of an axis. All three from the design. */
@@ -78,6 +85,24 @@ export class ZoomPad extends LitElement {
    * renderer fitted the score and the value moves with the viewport.
    */
   @property({ type: Number }) effectiveStaffScale = 1;
+
+  /**
+   * The spacing values that actually change the score on screen, ascending —
+   * `<mnx-score-viewer>.densitySteps()`, passed in as a getter because it moves
+   * with every paint (viewport width, staff scale, the document itself).
+   *
+   * The ← → arms walk THIS, not a fixed percentage. The reason is the whole
+   * point of the axis: on a justified score most density values engrave
+   * identically, because the justifier hands back exactly what density took
+   * away, so stepping blindly means clicking *tighter* three times and
+   * watching nothing move. Rungs are the values where the packing really
+   * changes — where a bar moves to another system.
+   *
+   * Unset (or returning null) falls back to the flat SPACE_STEP: the pad stays
+   * a self-contained control, and a host without a viewer to ask still gets
+   * the axis.
+   */
+  @property({ attribute: false }) densitySteps: (() => number[] | null) | null = null;
 
   /**
    * The tray is open over the score. The design: *"the pad drops to 0.28 for
@@ -317,11 +342,57 @@ export class ZoomPad extends LitElement {
       this.noteClamp('staff', next, clampedTo, MIN_STAFF_SCALE, MAX_STAFF_SCALE);
       this.commit({ staffScale: clampedTo, densityH: this.densityH });
     } else {
-      const next = snap(this.shownSpace + steps * SPACE_STEP, SPACE_STEP);
-      const clampedTo = Math.min(MAX_DENSITY, Math.max(MIN_DENSITY, next));
-      this.noteClamp('space', next, clampedTo, MIN_DENSITY, MAX_DENSITY);
-      this.commit({ staffScale: this.staffScale, densityH: clampedTo });
+      const dir = steps > 0 ? 1 : -1;
+      const walk = this.walkSpace(this.shownSpace, Math.abs(steps), dir);
+      this.clamped = walk.exhausted ? { axis: 'space', at: dir < 0 ? 'min' : 'max' } : null;
+      if (walk.value !== this.densityH) {
+        this.commit({ staffScale: this.staffScale, densityH: walk.value });
+      }
     }
+  }
+
+  /** The ladder to walk, or null when there is nobody to ask (or nothing to
+   *  walk — a score with one distinct engraving across the whole range). */
+  private ladder(): number[] | null {
+    const steps = this.densitySteps?.() ?? null;
+    return steps && steps.length > 1 ? steps : null;
+  }
+
+  /**
+   * The next spacing value in `dir` — the next value that DRAWS something
+   * different — or null when this arm has nothing left to reach.
+   *
+   * A rung is the low edge of its run, so any value between two rungs engraves
+   * what the lower one engraves; stepping to it would be exactly the invisible
+   * click this walk exists to skip. Hence "the run `from` sits in", not "the
+   * nearest rung". Within what is left, the first rung at least SPACE_STEP
+   * away wins — a dense ladder must not turn the design's 4% step into 1%.
+   */
+  private nextSpace(dir: 1 | -1, from: number): number | null {
+    const ladder = this.ladder();
+    if (!ladder) {
+      const next = clampDensity(snap(from + dir * SPACE_STEP, SPACE_STEP));
+      return next === from ? null : next;
+    }
+    let cur = -1;
+    while (cur + 1 < ladder.length && ladder[cur + 1] <= from + RUNG_EPS) cur++;
+    const ahead = dir < 0
+      ? ladder.slice(0, Math.max(0, cur)).reverse()
+      : ladder.slice(cur + 1);
+    if (ahead.length === 0) return null;
+    return ahead.find(v => Math.abs(v - from) >= SPACE_STEP - RUNG_EPS) ?? ahead[0];
+  }
+
+  /** `steps` rungs from `from`, stopping where the arm runs out. Absolute from
+   *  a starting value, so a drag out and back returns to where it started. */
+  private walkSpace(from: number, steps: number, dir: 1 | -1) {
+    let value = from;
+    for (let i = 0; i < steps; i++) {
+      const next = this.nextSpace(dir, value);
+      if (next === null) return { value, exhausted: true };
+      value = next;
+    }
+    return { value, exhausted: false };
   }
 
   /** The clamp used to be silent — a host asking for 0.2 got 0.5 and was never
@@ -432,13 +503,15 @@ export class ZoomPad extends LitElement {
     const spaceSteps = drag.lock === 'staff' ? 0 : Math.round(dx / rate);
 
     const wantStaff = snap(drag.staff0 + staffSteps * STAFF_STEP, STAFF_STEP);
-    const wantSpace = snap(drag.space0 + spaceSteps * SPACE_STEP, SPACE_STEP);
     const gotStaff = clampStaffScale(wantStaff)!;
-    const gotSpace = Math.min(MAX_DENSITY, Math.max(MIN_DENSITY, wantSpace));
+    // Same walk the arms take, so a drag and a click agree on what a step is:
+    // rungs, not percentages.
+    const space = this.walkSpace(drag.space0, Math.abs(spaceSteps), spaceSteps >= 0 ? 1 : -1);
+    const gotSpace = space.value;
 
     // Report the axis the user is actually pushing against.
-    if (drag.lock !== 'staff' && gotSpace !== wantSpace) {
-      this.noteClamp('space', wantSpace, gotSpace, MIN_DENSITY, MAX_DENSITY);
+    if (drag.lock !== 'staff' && space.exhausted) {
+      this.clamped = { axis: 'space', at: spaceSteps >= 0 ? 'max' : 'min' };
     } else if (drag.lock !== 'space' && gotStaff !== wantStaff) {
       this.noteClamp('staff', wantStaff, gotStaff, MIN_STAFF_SCALE, MAX_STAFF_SCALE);
     } else {
@@ -544,10 +617,20 @@ export class ZoomPad extends LitElement {
     if (this.clamped) {
       const axis = this.clamped.axis;
       const value = axis === 'staff' ? this.shownStaff : this.shownSpace;
+      // MIN/MAX means the ENGINE's wall. The spacing arms can also run out
+      // BEFORE it — past the last rung nothing tighter or wider draws anything
+      // different — and calling that "MAX" would be claiming a clamp that
+      // isn't there. Same chip, honest word.
+      const bound = this.clamped.at === 'min'
+        ? value <= MIN_DENSITY + RUNG_EPS
+        : value >= MAX_DENSITY - RUNG_EPS;
+      const tag = this.clamped.at === 'min'
+        ? (axis === 'staff' || bound ? 'MIN' : 'TIGHTEST')
+        : (axis === 'staff' || bound ? 'MAX' : 'WIDEST');
       return html`
         <div class="readout limit">
           <span class="lim-val">${axis === 'staff' ? 'STAFF' : 'SPACE'} ${this.pct(value)}</span>
-          <span class="lim-tag">${this.clamped.at === 'min' ? 'MIN' : 'MAX'}</span>
+          <span class="lim-tag">${tag}</span>
         </div>
       `;
     }
@@ -569,8 +652,11 @@ export class ZoomPad extends LitElement {
   private renderPad() {
     const atStaffMax = this.shownStaff >= MAX_STAFF_SCALE;
     const atStaffMin = this.shownStaff <= MIN_STAFF_SCALE;
-    const atSpaceMax = this.shownSpace >= MAX_DENSITY;
-    const atSpaceMin = this.shownSpace <= MIN_DENSITY;
+    // Greyed when the arm has nothing left to REACH, which on a ladder can
+    // happen inside the engine's range: an arm that still moves a number the
+    // score ignores is worse than an arm that says it is done.
+    const atSpaceMax = this.nextSpace(1, this.shownSpace) === null;
+    const atSpaceMin = this.nextSpace(-1, this.shownSpace) === null;
 
     return html`
       <div

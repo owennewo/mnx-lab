@@ -236,7 +236,7 @@ Knuth–Plass line breaking, within-measure accidental carryover, fine stem/beam
 angles, and the **stem "reach-to-the-middle-line" clamp** (stems are a constant
 `STEM_LENGTH_SP = 3.5` in `notation.ts`, so far-out notes don't lengthen to reach
 the centre line — the convention that evens out vertical rhythm; also feeds the
-render-density work in `roadmap/inprogress/core-render-density-zoom.md`). See
+render-density work in `roadmap/complete/core-render-density-zoom.md`). See
 `src/layout/spacing.ts` header for the spacing model (springs-and-rods, log₂
 duration; tune via the named constants at the top).
 

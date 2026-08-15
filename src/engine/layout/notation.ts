@@ -13,6 +13,7 @@ import {
   ActiveClef,
   ClefAt,
   HorizontalPlan,
+  PackingInput,
   ACCIDENTAL_SLOT_WIDTH_SP,
   ACCIDENTAL_RIGHT_PAD_SP,
   KEY_SIG_GLYPH_ADVANCE_SP,
@@ -735,6 +736,10 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   let cursorY = 0;
   let usedWidthSp = 0;
   const rows: RowBandSp[] = [];
+  // One per laid-out segment: a score with per-system layouts packs each range
+  // separately, and a density value is only degenerate when it changes NONE of
+  // them.
+  const packings: PackingInput[] = [];
   for (const job of jobs) {
     const rs = job.segments.map(segment =>
       renderSegment({
@@ -769,6 +774,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
       cursorY += TITLE_GAP_SP;
     }
     for (const r of rs) {
+      packings.push(r.packing);
       if (cursorY !== 0) {
         for (const p of r.primitives) translatePrimitiveY(p, cursorY);
       }
@@ -781,7 +787,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     usedWidthSp = Math.max(usedWidthSp, jobUsed);
   }
 
-  return { primitives, widthSp, heightSp: cursorY, usedWidthSp, index, diagnostics, rows };
+  return { primitives, widthSp, heightSp: cursorY, usedWidthSp, index, diagnostics, rows, packings };
 }
 
 interface RenderSegmentArgs {
@@ -813,6 +819,9 @@ function renderSegment(args: RenderSegmentArgs): {
   heightSp: number;
   usedWidthSp: number;
   rows: RowBandSp[];
+  /** This segment's system-packing input — carried up so a host can ask what
+   *  other densities would draw (spacing.ts `densityLadder`). */
+  packing: PackingInput;
 } {
   const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH } = args;
   const primitives: Primitive[] = [];
@@ -1833,7 +1842,7 @@ function renderSegment(args: RenderSegmentArgs): {
     staffBottom: displayTopOf(r, displayCount - 1) + displayHeights[displayCount - 1]
   }));
 
-  return { primitives, heightSp, usedWidthSp: plan.usedWidthSp, rows };
+  return { primitives, heightSp, usedWidthSp: plan.usedWidthSp, rows, packing: plan.packing };
 }
 
 // ---------- Beams ----------

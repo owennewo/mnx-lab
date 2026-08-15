@@ -11,7 +11,7 @@ import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
-import type { ViewMode } from '../elements/ScoreViewer.ts';
+import type { ScoreViewer, ViewMode } from '../elements/ScoreViewer.ts';
 import type { EnclosureKind, SelectionContext } from '../elements/mnxContext.ts';
 import { EditorSession, replayIntents } from '../edit/session.ts';
 import { elementKeys, runDestructWalk } from '../edit/destructWalk.ts';
@@ -196,6 +196,9 @@ interface PartOverride {
  *  left and MUST NOT WRAP — that is why the width change and the seven-to-five
  *  tab cut are one change and not two. */
 const PANEL_WIDTH_KEY = 'mnx-lab.panel-width';
+/** Folded or not — SEPARATE from the width, so unfolding restores the width
+ *  that was dragged rather than a default (mirrors `mnx-lab.rail-hidden`). */
+const PANEL_HIDDEN_KEY = 'mnx-lab.panel-hidden';
 const PANEL_MIN = 360;
 const PANEL_MAX = 560;
 const PANEL_DEFAULT = 420;
@@ -379,6 +382,28 @@ export class ScenarioPage extends LitElement {
   /** Side panel width in px — the drag bar on its left edge adjusts it. */
   @state() private panelWidth = storedPanelWidth();
 
+  /**
+   * The panel folds away, like the rail (`Ctrl+Alt+B`, or the chevron at the
+   * right of the view tabs) — the score takes the whole page.
+   *
+   * Remembered per browser, next to the width it does not disturb: folding is
+   * not resizing to zero, and a reader who folds the panel expects their 480px
+   * back when they unfold it. Same reasoning as the zoom pad's two keys.
+   */
+  @state() private panelHidden = localStorage.getItem(PANEL_HIDDEN_KEY) === '1';
+
+  /** Read by the shell's palette, which labels the row show-or-hide. */
+  get panelIsHidden(): boolean {
+    return this.panelHidden;
+  }
+
+  /** Public because the shell's Ctrl+Alt+B reaches it the way the rail's
+   *  Ctrl+B reaches `toggleRail` — one handler, one keymap, two panes. */
+  togglePanel() {
+    this.panelHidden = !this.panelHidden;
+    localStorage.setItem(PANEL_HIDDEN_KEY, this.panelHidden ? '1' : '0');
+  }
+
   /** The drag bar: pointer capture keeps the gesture on the handle; width is
    *  measured from the body's right edge so the math is anchor-independent. */
   private onPanelDrag = (down: PointerEvent) => {
@@ -430,6 +455,45 @@ export class ScenarioPage extends LitElement {
       .head {
         padding: 0;
         border-bottom: var(--rule-w) solid var(--ink);
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      /* The panel's fold control, and deliberately the app header's rail
+         chevron in a mirror: same glyphs, same borrowed-outline styling, same
+         chevron-points-where-it-goes rule. The head spans the panel too, so
+         this button stays put — and stays reachable — whichever state it is
+         in, which a control living inside the panel could not do. */
+      .panel-toggle {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ink-2);
+        background: transparent;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius-tab);
+        padding: 1px 8px;
+        /* Centred in the band rather than dropped to its baseline: the head
+           lost its own padding when it became band 2
+           (workbench-chrome-language.md), so the old margin-bottom: 6px
+           against align-items: flex-end no longer has a gap to sit in. This
+           also lines it up with .rail-toggle, its mirror in the app header,
+           which already centred itself. */
+        align-self: center;
+        margin-right: 12px;
+        cursor: pointer;
+        flex: none;
+      }
+
+      .panel-toggle:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .panel-toggle:focus-visible {
+        outline: var(--rule-w) solid var(--focus-ring);
+        outline-offset: 2px;
       }
 
       /* Title + id live in the description tab now — the head is tabs only. */
@@ -665,6 +729,14 @@ export class ScenarioPage extends LitElement {
         /* The selection tray overlays the score and positions against this
            box (core-selection-tray-visuals.md). */
         position: relative;
+      }
+
+      /* The paper fills the pane now, so the gutter around it is the page's
+         call rather than the element's 5px embed default (an outer rule beats
+         the shadow root's own :host). 14px is the inset the zoom pad already
+         sits at, which is why the two read as one decision. */
+      mnx-score-viewer {
+        padding: 14px;
       }
 
       /* THE FIVE-BAND FRAME (roadmap/proposed/workbench-score-panel.md):
@@ -938,16 +1010,22 @@ export class ScenarioPage extends LitElement {
         z-index: 5;
       }
 
-      /* The zoom/density pad (core-zoom-density-pad.md). Top-RIGHT, 14px in,
-         pinned while the score scrolls — the viewer scrolls itself one level
-         down, so an absolute child of .main simply stays put. z-index 4 puts
-         it under the popover layer (5) and the tray (30): everything that can
-         cover it, should. The panel needs no z-order at all, being a grid
-         column rather than an overlay. */
+      /* The zoom/density pad (core-zoom-density-pad.md). Top-RIGHT, pinned
+         while the score scrolls — the viewer scrolls itself one level down, so
+         an absolute child of .main simply stays put. z-index 4 puts it under
+         the popover layer (5) and the tray (30): everything that can cover it,
+         should. The panel needs no z-order at all, being a grid column rather
+         than an overlay.
+
+         The design's inset is 14px from this box; it is 28 here because the
+         paper now starts at 14 and the pad would otherwise straddle its
+         corner. Same 14px of clear space the design asked for — measured from
+         the paper it overlays, which is what it was measuring when the bench
+         behind it was empty. */
       mnx-zoom-pad {
         position: absolute;
-        top: 14px;
-        right: 14px;
+        top: 28px;
+        right: 28px;
         z-index: 4;
       }
 
@@ -2106,6 +2184,13 @@ export class ScenarioPage extends LitElement {
     this.effectiveStaffScale = event.detail.staffScale;
   }
 
+  /** Which spacing values actually change the score the viewer just drew — the
+   *  pad walks these instead of stepping a flat percentage through values the
+   *  justifier absorbs. Asked live rather than pushed: it moves with the
+   *  viewport, and the viewer caches it per paint. */
+  private densitySteps = () =>
+    this.renderRoot?.querySelector<ScoreViewer>('mnx-score-viewer')?.densitySteps() ?? null;
+
   private onZoomChange(event: CustomEvent<ZoomPadChange>) {
     const { staffScale, densityH } = event.detail;
     this.staffScale = staffScale;
@@ -2179,14 +2264,27 @@ export class ScenarioPage extends LitElement {
             `
           )}
         </div>
+        <button
+          class="panel-toggle"
+          title="${this.panelHidden ? 'show' : 'hide'} the score panel (Ctrl+Alt+B)"
+          aria-label="${this.panelHidden ? 'show' : 'hide'} the score panel"
+          aria-expanded=${!this.panelHidden}
+          @click=${() => this.togglePanel()}
+        >
+          ${this.panelHidden ? '⟨' : '⟩'}
+        </button>
       </div>
-      <div class="body" style="grid-template-columns: 1fr ${this.panelWidth}px">
+      <div
+        class="body"
+        style="grid-template-columns: 1fr ${this.panelHidden ? 0 : this.panelWidth}px"
+      >
         <div class="main">
           ${this.viewer(entry, view)}
           ${this.loadState === 'ready' && !entry.invalidByDesign
             ? html`<mnx-zoom-pad
                 .staffScale=${this.staffScale}
                 .densityH=${this.densityH}
+                .densitySteps=${this.densitySteps}
                 .effectiveStaffScale=${this.effectiveStaffScale}
                 ?suppressed=${this.trayOpen}
                 @zoom-change=${this.onZoomChange}
@@ -2195,7 +2293,7 @@ export class ScenarioPage extends LitElement {
           ${this.trayOpen && this.session ? this.trayOverlay(entry) : nothing}
           ${this.setupPopoverOverlay()}
         </div>
-        ${this.sidePanel(entry)}
+        ${this.panelHidden ? nothing : this.sidePanel(entry)}
       </div>
     `;
   }

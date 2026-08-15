@@ -102,6 +102,15 @@ surface — shadow DOM admits no other seam. `--mnx-accent`, `--mnx-paper`,
 `--mnx-surface`, `--mnx-focus-ring`. They work in an embed as of 2026-08-14;
 before that the vars reading them lived in a block the element did not carry.
 
+`--mnx-paper-width` (2026-08-15) is the one that is not a colour: the paper
+**fills its container** by default, so the engine gets every pixel the host
+gave it and lays out more bars per system on a wider one. It used to be capped
+at 820px, which meant a host making room for music got margin instead. A page
+look is still one declaration away — `--mnx-paper-width: 820px` — and any value
+is bounded by the container. Layout follows the container, not just the window:
+the element observes its own box, so a host folding a sidebar re-engraves the
+score without a window resize to prompt it.
+
 ### Assets
 
 The artifact locates its own SMuFL metadata and registers Bravura itself, from
@@ -117,7 +126,7 @@ the layering rule prescribes: `RenderOptions` first (`PlanOptions.densityH`
 The horizontal axis shipped as a **preset** and gained its numeric form only
 when a continuous control needed one — presets are names for numbers, so the
 vocabulary widened without a breaking change, exactly as
-[core-render-density-zoom.md](../roadmap/inprogress/core-render-density-zoom.md)
+[core-render-density-zoom.md](../roadmap/complete/core-render-density-zoom.md)
 predicted.
 
 They are two axes and not one knob on purpose: `zoom` changes how big the notes
@@ -131,7 +140,16 @@ them separate and shows both).
 without shrinking the staff is a third axis, and `ROW_HEIGHT_SP` is a
 module-level constant derived from the row pads, so it is a real refactor rather
 than a wiring job — and the stem-length clamp should land first or alongside,
-since stem headroom feeds vertical spacing.
+since stem headroom feeds vertical spacing. It has its own item now:
+[core-vertical-density.md](../roadmap/proposed/core-vertical-density.md).
+
+The `density-h` range widened at the bottom on 2026-08-15 (`MIN_DENSITY`
+0.5 → 0.02): the old floor stopped a reader two systems short of what this
+engraver draws readably, and 0.02 is where packing bottoms out — rigid notehead
+columns fill the line and no lower value fits another bar. The clamp is still
+the engine's, so a host writing `density-h="0.001"` gets the floor rather than
+an error — and `densitySteps()` below is how a control finds out which values
+in the range are worth offering.
 
 ### Reporting back
 
@@ -142,6 +160,21 @@ so the true number moves on resize with nobody touching a control, and any
 readout printing a hard-coded `100%` would be lying on first paint. `fitted`
 is carried rather than inferred so a control can say the value was *derived*
 rather than chosen.
+
+`densitySteps()` — a method, not an event — returns the `density-h` values
+that would actually **change** the score as currently drawn, ascending from the
+engine's floor, or `null` before the first successful paint. Same principle as
+`render-scale`, one level up: a host cannot compose a *density* control without
+knowing which values do anything, and most of them do not. Every horizontal
+coordinate is `spring × densityH × stretch`, and inside the justifier's linear
+range `stretch` is inversely proportional to `densityH` — the two cancel, and
+the engraving is byte-identical until density repacks a system. A control
+stepping a flat percentage therefore spends most of its clicks drawing exactly
+what was already on screen. The answer depends on the document, the viewport
+width and the staff scale, so only the layer that just laid the score out can
+give it; the value is recomputed per paint and cached in between, so a host may
+call it on every render of its own. See
+[core-render-density-zoom.md](../roadmap/complete/core-render-density-zoom.md).
 
 > Gap, recorded honestly: the element also emits `note-selected` and
 > `selection-anchored`, which predate this contract and are not described here.

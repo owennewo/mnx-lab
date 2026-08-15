@@ -141,13 +141,197 @@ export function tupletDuration(t: MnxTuplet): number {
  * Exported because the clamp used to be silent: a host asking for 0.2 got 0.5
  * and was never told. A control has to know where the wall is to say it is
  * against it.
+ *
+ * **Retuned 0.5 → 0.02 on 2026-08-15**, the retune ruling 1 of
+ * core-zoom-density-pad.md explicitly reserved for its own evidence rather
+ * than letting it ride in on a control. Measured on `twelve-bar-blues` at the
+ * workbench's own line width: 0.5 and 0.25 both pack it into three systems,
+ * 0.1 into **two**, and 0.02 puts a **seventh bar on the first system**. Each
+ * of those is a whole page-turn's worth of music, so the old floor was
+ * bounding the *control*, not legibility.
+ *
+ * 0.02 is where PACKING bottoms out, and that is the number this constant is
+ * chosen against: springs shrink, rigid columns do not, so a line ends up
+ * holding every bar its notehead columns will fit and no lower value adds
+ * another. On `twelve-bar-blues` at 80sp that limit is nine bars on the first
+ * system, reached at 0.02 and unchanged at a quarter of it — asserted in
+ * `zoom-density.test.ts`.
+ *
+ * Below that the knob is not inert — and this is the honest reason a floor is
+ * still needed rather than none at all. What keeps changing is *raggedness*:
+ * once a row's springs are this short they can no longer stretch to the right
+ * margin within `MAX_STRETCH`, so tightening further just draws the same bars
+ * narrower and leaves more white at the end of the system. The density ladder
+ * duly reports those values as distinct, because they are — they simply are
+ * not worth offering.
+ *
+ * The other cost at the bottom is *proportional* notation: springs carry
+ * duration, so squeezing them squeezes the difference between a quarter's
+ * space and an eighth's. Below ~0.2 that difference stops being legible and
+ * rhythm is read from noteheads and beams. That is a trade a reader on a
+ * tablet may want to make, and not one a constant should make for them. The
+ * collision guarantee is untouched at any value — asserted at the floor and
+ * below it in `zoom-density.test.ts`.
  */
-export const MIN_DENSITY = 0.5;
+export const MIN_DENSITY = 0.02;
 export const MAX_DENSITY = 2;
 
 export function clampDensity(value: number | undefined): number {
   if (value === undefined || !Number.isFinite(value)) return 1;
   return Math.min(MAX_DENSITY, Math.max(MIN_DENSITY, value));
+}
+
+// ---------- System packing (shared with the density ladder) ----------
+
+/**
+ * One packable measure, captured at density 1: every number the system packer
+ * reads, and nothing else.
+ *
+ * Split out because the packer has a second caller. `densityLadder` re-packs
+ * the same score at other densities to find the values that actually change
+ * the engraving; doing that by re-planning would mean re-deriving every event
+ * column, and doing it with a second copy of the packing arithmetic would mean
+ * two implementations of the one thing this module exists to own.
+ */
+export interface MeasurePack {
+  /** Index into `plan.measures` — packable measures are not contiguous. */
+  index: number;
+  /** Prefix width as the first measure of a system (clef/key/time all shown). */
+  prefixFirst: number;
+  /** Prefix width mid-system (only what this measure itself declares). */
+  prefixRest: number;
+  rigid: number;
+  /** Σ springs at density 1 — the packer applies the multiplier. */
+  spring: number;
+  /** Barline→first-event spring at density 1. */
+  lead: number;
+  repeatExtra: number;
+  forcedBreak: boolean;
+}
+
+export interface PackingInput {
+  measures: MeasurePack[];
+  lineWidthSp: number;
+}
+
+export interface PackedRow {
+  /** Positions within `PackingInput.measures`, in system order. */
+  measures: number[];
+  /** The row's common spring factor (justification), already clamped. */
+  stretch: number;
+}
+
+/**
+ * Greedy system packing plus each row's justification factor — the whole of
+ * "which bars land on which line, and how hard are their springs stretched".
+ *
+ * Arithmetic here is written to match `planHorizontal`'s own passes term for
+ * term and in the same order: this function REPLACED that code rather than
+ * paralleling it, and the corpus goldens are the assertion that it did so
+ * without moving a single coordinate.
+ */
+export function packSystems(packing: PackingInput, densityH: number): PackedRow[] {
+  const packs = packing.measures;
+  const lineWidth = packing.lineWidthSp;
+
+  const rows: number[][] = [];
+  let current: number[] = [];
+  let currentWidth = 0;
+  packs.forEach((m, k) => {
+    const content =
+      m.lead * densityH + m.rigid + m.spring * densityH + CONTENT_RIGHT_PAD_SP + m.repeatExtra;
+    const natural = (current.length === 0 ? m.prefixFirst : m.prefixRest) + content;
+    if (current.length > 0 && (currentWidth + natural > lineWidth || m.forcedBreak)) {
+      rows.push(current);
+      current = [];
+      currentWidth = m.prefixFirst + content;
+    } else {
+      currentWidth += natural;
+    }
+    current.push(k);
+  });
+  if (current.length > 0) rows.push(current);
+
+  return rows.map(measures => {
+    let rowRigid = 0;
+    let rowSpring = 0;
+    measures.forEach((k, j) => {
+      const m = packs[k];
+      rowRigid +=
+        (j === 0 ? m.prefixFirst : m.prefixRest) + m.rigid + CONTENT_RIGHT_PAD_SP + m.repeatExtra;
+      rowSpring += m.spring * densityH + m.lead * densityH;
+    });
+    const stretch = rowSpring > 0
+      ? Math.min(MAX_STRETCH, Math.max(MIN_SQUEEZE, (lineWidth - rowRigid) / rowSpring))
+      : 1;
+    return { measures, stretch };
+  });
+}
+
+// ---------- The density ladder ----------
+
+/**
+ * Grid the ladder is scanned on: 1% of the density range. Finer than any step
+ * a control offers, so no distinct engraving can hide between two grid points.
+ */
+const LADDER_GRID = 100;
+
+/**
+ * What a density value actually DRAWS, compressed to a string.
+ *
+ * Two densities engrave identically iff they pack the same bars onto the same
+ * lines AND agree on `densityH × stretch` — because every horizontal
+ * coordinate downstream is `spring × densityH × stretch`. That product is the
+ * whole subtlety, and it is why most density values are invisible: inside the
+ * justifier's linear range, `stretch` is inversely proportional to `densityH`,
+ * so the product — and therefore the engraving — is *exactly* unchanged.
+ * Density only bites where it moves a barline to another system, or where a
+ * row is against the `MAX_STRETCH` / `MIN_SQUEEZE` clamp and the proportion
+ * breaks.
+ *
+ * Rounded to 1e-6, i.e. sub-1e-4-staff-space differences count as identical.
+ */
+export function packingSignature(
+  packings: readonly PackingInput[],
+  densityH: number
+): string {
+  return packings
+    .map(p =>
+      packSystems(p, densityH)
+        .map(row => `${row.measures.join(',')}@${(densityH * row.stretch).toFixed(6)}`)
+        .join('|')
+    )
+    .join(';');
+}
+
+/**
+ * Every density value in `[MIN_DENSITY, MAX_DENSITY]` that engraves this score
+ * differently from the one below it — ascending, always starting at
+ * `MIN_DENSITY`.
+ *
+ * This is what lets a control step density and get a visible result every
+ * time. Stepping by a fixed percentage does not: on a justified score most of
+ * the range is degenerate (see `packingSignature`), so a reader clicks
+ * *tighter* three times, sees nothing move, and concludes the control is
+ * broken. It isn't — those clicks genuinely changed nothing.
+ *
+ * A rung is the LOW edge of its run: the tightest value that draws that
+ * particular engraving. Cheap enough to compute on demand — it re-packs a
+ * ready-made input ~176 times and never re-derives an event column — but a
+ * host should cache it per render, since it changes with the viewport.
+ */
+export function densityLadder(packings: readonly PackingInput[]): number[] {
+  const steps: number[] = [];
+  let previous: string | null = null;
+  for (let n = MIN_DENSITY * LADDER_GRID; n <= MAX_DENSITY * LADDER_GRID; n++) {
+    const densityH = n / LADDER_GRID;
+    const signature = packingSignature(packings, densityH);
+    if (signature !== previous) {
+      steps.push(densityH);
+      previous = signature;
+    }
+  }
+  return steps;
 }
 
 /** Ideal space after a note: log2 in duration so long notes are compressed. */
@@ -329,6 +513,9 @@ export interface HorizontalPlan {
   staffGroups: StaffGroup[];
   /** Right edge of the widest system plus the page margin, ≤ widthSp. */
   usedWidthSp: number;
+  /** This plan's packing input, at density 1 — enough to ask what ANOTHER
+   *  density would draw without planning it (`densityLadder`). */
+  packing: PackingInput;
 }
 
 /** One contributor to a rendered staff: a part-staff, optionally with a
@@ -422,7 +609,7 @@ export interface PlanOptions {
   /** Measure indexes that must start a new system. */
   forcedBreaks?: ReadonlySet<number>;
   /**
-   * HORIZONTAL DENSITY (roadmap/inprogress/core-render-density-zoom.md): a
+   * HORIZONTAL DENSITY (roadmap/complete/core-render-density-zoom.md): a
    * multiplier on the springs — the *stretchy* part of the plan — where 1 is
    * today's engraving, <1 packs more bars per system and >1 opens it out.
    *
@@ -525,7 +712,10 @@ export function planHorizontal(
     });
   }
   if (planStaves.length === 0) {
-    return { measures: [], rowCount: 0, numStaves: 1, staffGroups: [], usedWidthSp: widthSp };
+    return {
+      measures: [], rowCount: 0, numStaves: 1, staffGroups: [], usedWidthSp: widthSp,
+      packing: { measures: [], lineWidthSp: widthSp }
+    };
   }
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
@@ -828,8 +1018,28 @@ export function planHorizontal(
     );
   };
 
+  // The packer's input, captured BEFORE density is applied — the ladder needs
+  // density-1 naturals to ask what any other value would draw.
+  const packing: PackingInput = {
+    lineWidthSp: lineWidth,
+    measures: metrics.flatMap((m, i) =>
+      m.hidden || !inRange(i)
+        ? []
+        : [{
+            index: i,
+            prefixFirst: prefixWidth(m, true),
+            prefixRest: prefixWidth(m, false),
+            rigid: m.rigid,
+            spring: m.spring,
+            lead: m.leadingSpring,
+            repeatExtra: m.repeatEnd ? REPEAT_END_EXTRA_SP : 0,
+            forcedBreak: forcedBreaks.has(i)
+          }]
+    )
+  };
+
   // Horizontal density, applied ONCE here — after every spring is computed and
-  // before anything reads one (roadmap/inprogress/core-render-density-zoom.md).
+  // before anything reads one (roadmap/complete/core-render-density-zoom.md).
   // Scaling at the source would mean touching four springSp() call sites and
   // trusting them to stay in step; scaling at consumption would desync the
   // per-event cursor from the measure widths, since both read springs
@@ -849,42 +1059,16 @@ export function planHorizontal(
   }
 
   // Pass 2 — greedy system packing on natural widths (hidden measures take no
-  // slot; forced breaks from a score's `pages.systems` start new rows).
-  const rows: number[][] = [];
-  let current: number[] = [];
-  let currentWidth = 0;
-  metrics.forEach((m, i) => {
-    if (m.hidden || !inRange(i)) return;
-    const content =
-      m.leadingSpring + m.rigid + m.spring + CONTENT_RIGHT_PAD_SP +
-      (m.repeatEnd ? REPEAT_END_EXTRA_SP : 0);
-    const natural = prefixWidth(m, current.length === 0) + content;
-    if (current.length > 0 && (currentWidth + natural > lineWidth || forcedBreaks.has(i))) {
-      rows.push(current);
-      current = [];
-      currentWidth = prefixWidth(m, true) + content;
-    } else {
-      currentWidth += natural;
-    }
-    current.push(i);
-  });
-  if (current.length > 0) rows.push(current);
+  // slot; forced breaks from a score's `pages.systems` start new rows), plus
+  // each row's justification factor. Both live in packSystems, so the density
+  // ladder asks the same question of the same code.
+  const packed = packSystems(packing, densityH);
 
-  // Pass 3 — justify each row (stretch springs by a common factor) and place.
+  // Pass 3 — place each row at its justified stretch.
   const measures: MeasurePlan[] = new Array(metrics.length);
-  rows.forEach((rowIndices, row) => {
-    let rowRigid = 0;
-    let rowSpring = 0;
-    for (const i of rowIndices) {
-      const m = metrics[i];
-      rowRigid +=
-        prefixWidth(m, i === rowIndices[0]) + m.rigid + CONTENT_RIGHT_PAD_SP +
-        (m.repeatEnd ? REPEAT_END_EXTRA_SP : 0);
-      rowSpring += m.spring + m.leadingSpring;
-    }
-    const stretch = rowSpring > 0
-      ? Math.min(MAX_STRETCH, Math.max(MIN_SQUEEZE, (lineWidth - rowRigid) / rowSpring))
-      : 1;
+  packed.forEach((packedRow, row) => {
+    const rowIndices = packedRow.measures.map(k => packing.measures[k].index);
+    const stretch = packedRow.stretch;
 
     let x = startX;
     for (const i of rowIndices) {
@@ -1024,5 +1208,5 @@ export function planHorizontal(
   const usedWidthSp = measures.length
     ? Math.max(...measures.map(m => m.x + m.width)) + MARGIN_SP
     : widthSp;
-  return { measures, rowCount: rows.length, numStaves, staffGroups, usedWidthSp };
+  return { measures, rowCount: packed.length, numStaves, staffGroups, usedWidthSp, packing };
 }

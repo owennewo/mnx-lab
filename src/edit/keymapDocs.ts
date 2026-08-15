@@ -348,6 +348,12 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'KeyB', ctrl: true }],
     group: 'workbench',
     meaning: { all: 'toggle the scenario rail' }
+  },
+  {
+    keys: 'Ctrl+Alt+B',
+    strokes: [{ code: 'KeyB', ctrl: true, alt: true }],
+    group: 'workbench',
+    meaning: { all: 'toggle the score panel (the other pane, VS Code’s chord)' }
   }
 ];
 

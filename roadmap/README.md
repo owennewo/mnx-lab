@@ -40,23 +40,18 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-chrome-language.md](proposed/workbench-chrome-language.md)** — **the rail and
-  the headers in the panel's language**, a post-campaign item against
-  [core-campaign-modernist.md](complete/core-campaign-modernist.md) rather than a reopening
-  of its closed index. That campaign flipped the tokens workbench-wide but gave only the
-  right-hand side panel a *frame*, so the app ran one palette across two grammars: 2px ink
-  rules and tracked Archivo labels on the right, hairlines and mono on the left. Three
-  moves, all the panel's own — a rule is 2px of ink (the rail's right edge now mirrors
-  `.panel`'s left, so the score sits between equals), the rail gains the panel's pinned
-  context band over ONE scrolling body, and both tab strips become the same control. Adds
-  exactly one shared primitive (`.band-label`, adopted at three sites, per the campaign's
-  own *"a shared primitive nobody adopts is just dead code with a good reputation"*), and
-  the rail's current row finally adopts `.row-state`/`.row-current` instead of spelling it
-  a fourth way. Records two corrections: every `--radius-*` was **already** `0px`, so the
-  rounding this item set out to remove had been gone for a day; and the two tab strips
-  cannot align horizontally, because `.head` spans above `.body`. **Built 2026-08-15 on
-  branch `workbench-chrome-language`**, gates green and goldens byte-identical, awaiting a
-  clean `main` to land.
+- **[core-vertical-density.md](proposed/core-vertical-density.md)** — **systems per page
+  without shrinking the staff**, split out of
+  [core-render-density-zoom.md](complete/core-render-density-zoom.md) (2026-08-15) as the
+  one axis of three that never started. Two reasons it didn't, both still true:
+  `ROW_HEIGHT_SP` is a module-level constant read from `notation.ts`, `tab.ts` and the
+  `both` composer, so making it per-layout is a real refactor the goldens will judge; and
+  the stem-length clamp should land first or alongside, since row headroom is sized for
+  whatever `STEM_LENGTH_SP` allows. Arrives with its control question already open —
+  the zoom pad's four arms are spent (its ruling 4), and the honest answer may be one
+  coupled "fit more music" intent rather than a third slider. Carries the horizontal
+  axis's hard-won lesson: **ask which values of the knob draw a different page** before
+  giving it a control.
 - **[core-entry-surface.md](proposed/core-entry-surface.md)** — typing anywhere the
   cursor can already go, graduated out of the element-ops campaign (2026-08-15) as the
   last thing holding its index open. The cursor addresses part → staff → voice in full
@@ -216,11 +211,6 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
-- **[core-render-density-zoom.md](inprogress/core-render-density-zoom.md)** — configurable horizontal +
-  vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
-  in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
-  vertical density = layout gap/padding constants. Not started. Where the levers are *exposed*
-  is now owned by [core-viewer-surface.md](complete/core-viewer-surface.md).
 - **[core-keymap-cheatsheet.md](inprogress/core-keymap-cheatsheet.md)** — a **selection-mode-
   dependent keyboard cheatsheet**, built by making the ladder's per-level navigation map DATA.
   The keymap's binding tables are already data, but the *meaning* of a key at each rung lives
@@ -265,6 +255,40 @@ proposals that name their campaign.
   container rungs.
 
 ### complete/
+- **[workbench-chrome-language.md](complete/workbench-chrome-language.md)** — **the rail and
+  the headers in the panel's language**, a post-campaign item against
+  [core-campaign-modernist.md](complete/core-campaign-modernist.md) rather than a reopening
+  of its closed index. That campaign flipped the tokens workbench-wide but gave only the
+  right-hand side panel a *frame*, so the app ran one palette across two grammars: 2px ink
+  rules and tracked Archivo labels on the right, hairlines and mono on the left. Three
+  moves, all the panel's own — a rule is 2px of ink (the rail's right edge now mirrors
+  `.panel`'s left, so the score sits between equals), the rail gains the panel's pinned
+  context band over ONE scrolling body, and both tab strips become the same control. Adds
+  exactly one shared primitive (`.band-label`, adopted at three sites, per the campaign's
+  own *"a shared primitive nobody adopts is just dead code with a good reputation"*), and
+  the rail's current row finally adopts `.row-state`/`.row-current` instead of spelling it
+  a fourth way. Records two corrections: every `--radius-*` was **already** `0px`, so the
+  rounding this item set out to remove had been gone for a day; and the two tab strips
+  cannot align horizontally, because `.head` spans above `.body`. **Landed on `main` 2026-08-15**
+  at `98ebaea`, gates green and goldens byte-identical. Its landing is the first to
+  have met an occupied `main`, so the doc keeps a **Landing** section: the ff-only
+  refusal is the contract working, the stash/pop restoration wants a file-by-file
+  check rather than an eyeball, the dirty set is not stable across a five-minute
+  test run, and a conflict resolution is only judged by building the combined tree.
+- **[core-render-density-zoom.md](complete/core-render-density-zoom.md)** — configurable
+  **density / zoom levers** ("see more music on less page"). Horizontal density shipped
+  2026-08-14 (a multiplier on the springs, never the rigid columns), uniform zoom and the
+  control surface with [core-zoom-density-pad.md](complete/core-zoom-density-pad.md), and
+  **closed 2026-08-15** with the two corrections that came out of using the pad: the
+  legibility floor retuned **0.5 → 0.02**, the point where packing bottoms out (0.5 stopped
+  a reader two systems short of what the engraver draws readably), and the **density
+  ladder** — the answer to why
+  clicking *tighter* usually did nothing. It isn't a control bug: every x is
+  `spring × densityH × stretch` and the justifier's `stretch` is inversely proportional
+  to `densityH`, so most of the range is *exactly* degenerate. `packSystems()` (factored
+  out of `planHorizontal`, goldens unmoved) + `densityLadder()` return the values that do
+  something; the pad's arms walk those. The third axis is now
+  [core-vertical-density.md](proposed/core-vertical-density.md).
 - **[core-campaign-modernist.md](complete/core-campaign-modernist.md)** — **campaign**: the
   workbench restyle the tray's art direction leads, plus the score panel it was drawn for.
   Fills the slot [core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)

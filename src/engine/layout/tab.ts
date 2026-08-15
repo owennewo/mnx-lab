@@ -222,5 +222,8 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   const heightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * ROW_HEIGHT_SP;
   const rows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r) => rowBand(r));
 
-  return { primitives, widthSp, heightSp, usedWidthSp: plan.usedWidthSp, index, diagnostics, rows };
+  return {
+    primitives, widthSp, heightSp, usedWidthSp: plan.usedWidthSp, index, diagnostics, rows,
+    packings: [plan.packing]
+  };
 }

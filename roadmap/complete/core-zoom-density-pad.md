@@ -31,7 +31,7 @@
 > any code is written.
 >
 > **Also closes the UI half of**
-> [core-render-density-zoom.md](../inprogress/core-render-density-zoom.md), whose status line names
+> [core-render-density-zoom.md](../complete/core-render-density-zoom.md), whose status line names
 > exactly what is missing: *"Remaining: the vertical axis and zoom."* This doc
 > supplies **zoom**, gives the shipped horizontal axis a control surface, and
 > **formally cuts the vertical axis from this control** (see Ruling 4).
@@ -132,6 +132,17 @@ surfaces to a human.
 > bottom of the range easy to look at. It is **not** this item: the constant is
 > shipped behavior, and moving it is a judgement about engraving that deserves
 > its own evidence rather than riding in on a control.
+>
+> **It happened the same day, exactly that way** — 0.5 → 0.02, with the
+> evidence the pad made visible (0.5 and 0.25 both leave `twelve-bar-blues` a
+> system longer than 0.1 does, and 0.02 is where packing bottoms out), recorded
+> in
+> [core-render-density-zoom.md](core-render-density-zoom.md)'s closing status.
+> The pad also produced a second finding this ruling did not anticipate: most
+> density values engrave *identically*, so the arms now walk a ladder of the
+> ones that don't. The `MIN` chip survives unchanged and gained a sibling —
+> `TIGHTEST`/`WIDEST` for an arm that runs out inside the engine's range, since
+> saying `MAX` there would claim a clamp that isn't there.
 
 ### 2. Staff scale: fitted until first touched
 

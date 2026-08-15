@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
-import { planHorizontal } from '../../src/engine/layout/spacing.ts';
+import { planHorizontal, MIN_DENSITY, MAX_DENSITY } from '../../src/engine/layout/spacing.ts';
 import { declaredStaffKind, wantsTabView } from '../../src/model/mnx.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
@@ -92,7 +92,7 @@ describe('viewer surface', () => {
 
   describe('horizontal density', () => {
     // The lever's whole claim: MORE MUSIC PER LINE, same size notes
-    // (roadmap/inprogress/core-render-density-zoom.md). Both halves are
+    // (roadmap/complete/core-render-density-zoom.md). Both halves are
     // asserted, because scaling everything would be zoom wearing density's
     // name — the two axes have to stay independent to compose.
     const twelveBars = () => doc('lab/document/twelve-bar-blues');
@@ -138,8 +138,12 @@ describe('viewer surface', () => {
     it('clamps absurd values instead of producing an unrescuable plan', () => {
       initSmufl();
       const w = (densityH: number) => planHorizontal(twelveBars(), 80, { densityH }).usedWidthSp;
-      expect(w(0)).toBe(w(0.5));
-      expect(w(99)).toBe(w(2));
+      // Against the engine's OWN bounds, not a transcription of them: the
+      // floor moved 0.5 → 0.25 once the pad made the bottom of the range easy
+      // to look at, and a test naming the number would have failed for the
+      // wrong reason.
+      expect(w(0)).toBe(w(MIN_DENSITY));
+      expect(w(99)).toBe(w(MAX_DENSITY));
     });
 
     it('default is byte-for-byte todays engraving', () => {

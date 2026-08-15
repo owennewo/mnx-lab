@@ -1,6 +1,85 @@
 # Configurable render density / zoom levers
 
-> **Status: in progress — the HORIZONTAL axis built 2026-08-14.** Unblocked by
+> **Status: COMPLETE 2026-08-15.** Both axes this doc could honestly finish are
+> shipped — horizontal density (2026-08-14), uniform zoom and the control
+> surface ([core-zoom-density-pad.md](core-zoom-density-pad.md), 2026-08-15),
+> and on the same day the two corrections below that came out of *using* the
+> pad. The third axis, **vertical density**, was never started here and is
+> handed on whole to [core-vertical-density.md](../proposed/core-vertical-density.md)
+> rather than kept as an open line on a doc whose other work is done.
+>
+> **Closing increment 1 — the floor moved 0.5 → 0.02.** Ruling 1 of the pad doc
+> reserved this retune for its own evidence, and using the control supplied it:
+> on `twelve-bar-blues` at the workbench's own line width, 0.5 and 0.25 both
+> pack into three systems, 0.1 into **two**, and 0.02 puts a **seventh bar on
+> the first system**. Each of those is a page turn's worth of music. The old
+> floor was bounding the *control*, not legibility — it stopped a reader well
+> short of what the engraver draws perfectly well (both settings checked in the
+> browser).
+>
+> 0.02 is not an arbitrary "very small": it is where **packing bottoms out**.
+> Springs shrink and rigid columns do not, so a line ends up holding every bar
+> its notehead columns will fit and no lower value adds another — nine bars on
+> the first system at 80sp, unchanged at a quarter of the floor, and that is
+> the assertion in the harness. Below it the knob is not inert, which is why a
+> floor still exists at all: what keeps changing is *raggedness*, since springs
+> that short can no longer reach the right margin within `MAX_STRETCH`, so
+> tightening only draws the same bars narrower with more white at the end of
+> the system. The ladder honestly reports those values as distinct; they are
+> simply not worth offering. (First cut of this retune stopped at 0.1 and was
+> argued from "the model runs out on its own" — measuring the ladder's bottom
+> showed it doesn't, and the reasoning was corrected rather than the number
+> being quietly kept.)
+>
+> The other cost at the bottom is *proportional* notation: springs carry
+> duration, so below ~0.2 a quarter's space and an eighth's are no longer
+> distinguishable and rhythm is read from noteheads and beams. That is a trade
+> a reader on a tablet is allowed to make; it is not one a constant should make
+> for them. The collision guarantee is untouched — density never scales a rigid
+> column, at any value.
+>
+> **Closing increment 2 — the density ladder, and it is the more interesting
+> one.** The reported symptom was that clicking *tighter* usually did nothing.
+> It was not a control bug. Every horizontal coordinate is
+> `spring × densityH × stretch`, and inside the justifier's linear range
+> `stretch` is inversely proportional to `densityH` — so tightening the springs
+> and stretching them back are **the same operation**, and the engraving is
+> *exactly* unchanged. Density only bites where it moves a barline to another
+> system, or where a row is against `MAX_STRETCH`/`MIN_SQUEEZE` and the
+> proportion breaks. Most of the range is therefore degenerate, and a control
+> stepping a flat 4% spends most of its clicks there.
+>
+> So the engine now answers the question directly. `packSystems()` is the
+> packing pass, factored out of `planHorizontal` (which now *calls* it — not a
+> parallel copy; the corpus goldens are the proof it moved nothing), and
+> `densityLadder()` re-packs a ready-made input across the range to return
+> **every density that draws something different**. It rides out through
+> `LayoutResult.packings` → `RenderOutcome` → the element's `densitySteps()`,
+> and the pad's ← → arms walk *that* — the next rung at least the design's 4%
+> away, so a dense ladder never turns a 4% step into 1%. An arm greys when it
+> has nothing left to reach, which can happen inside the engine's range; the
+> chip says `TIGHTEST`/`WIDEST` there and keeps `MIN`/`MAX` for the real clamp,
+> because claiming a wall that isn't there would be the same dishonesty the
+> chip was built to fix.
+>
+> Verified in a real browser over CDP: on `twelve-bar-blues`, six consecutive
+> tighter clicks each changed the engraving (1.00 → 0.71 → 0.67 → 0.40 → 0.36 →
+> 0.32 → 0.28, every SVG distinct), widening retraced the same rungs exactly,
+> the bottom arm greyed at 0.10 and a drag to it read `SPACE 10 MIN`, the top
+> arm greyed at the ladder's last rung — 1.23 at that line width — reading
+> `SPACE 123 WIDEST`, and all three views produce a ladder. In the harness (`zoom-density.test.ts`, +5 tests, mutation-checked):
+> the ladder is swept at its own resolution across three line widths with
+> **zero** missed changes and **zero** flat rungs, and the reported bug is
+> pinned as a test — a 4% step off the default engraves identically, byte for
+> byte.
+>
+> Goldens byte-identical throughout; 675 tests, `npm run build` and
+> `check:boundaries` green.
+
+<details>
+<summary>The status through 2026-08-15, before the close</summary>
+
+> **The HORIZONTAL axis built 2026-08-14.** Unblocked by
 > [core-viewer-surface.md](../complete/core-viewer-surface.md)'s layering rule, which
 > settled where the levers live. Shipped: `PlanOptions.densityH` (a multiplier on the
 > springs, clamped 0.5–2), threaded through `layoutNotation`/`bothSystem` and both
@@ -40,6 +119,8 @@
 > alongside, since stem headroom feeds vertical spacing. It also needs a **control of
 > its own**: the pad's four arms are spent on the two shipped axes, a cut that item
 > recorded rather than worked around.
+
+</details>
 
 ## The goal
 
@@ -87,11 +168,19 @@ Three distinct axes, deliberately separated:
   Answered by [core-viewer-surface.md](../complete/core-viewer-surface.md): all three, layered — the lever enters
   `RenderOptions` (behavior ground truth), the element binds it as an attribute, the
   toolbar composes the attribute.
-- Interaction with justification (does horizontal density change the justification target, or
-  the pre-justification spring plan)?
+- ~~Interaction with justification (does horizontal density change the justification target, or
+  the pre-justification spring plan)?~~ **The pre-justification spring plan — and the
+  consequence is the whole story of this axis.** Justification then hands the width straight
+  back: `stretch` is inversely proportional to `densityH` in its linear range, so the two
+  cancel *exactly* and density is invisible until it repacks a system. That is not a flaw to
+  fix (the alternative — density moving the justification target — would mean tightening a
+  score and getting ragged rows instead of more bars, which is the opposite of the goal). It
+  is a fact a **control** has to know, and `densityLadder()` is how it knows: see the closing
+  status above.
 - Adjacent engraving refinements that affect vertical rhythm should land first or alongside —
   e.g. the stem-length "reach-to-the-middle-line" clamp (currently a fixed `STEM_LENGTH_SP`),
-  since stem headroom feeds vertical spacing.
+  since stem headroom feeds vertical spacing. **Carried to
+  [core-vertical-density.md](../proposed/core-vertical-density.md)**, which owns that axis now.
 
 ## Not this
 

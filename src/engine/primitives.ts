@@ -12,6 +12,11 @@
  * queries (hit-testing, highlight sync) can trace primitives back to the model.
  */
 
+// Type-only, and the only import in this file: `LayoutResult` carries the
+// packing input back out of a layout (see its `packings`), and the shape of
+// that input belongs to the module that owns horizontal geometry.
+import type { PackingInput } from './layout/spacing.ts';
+
 export interface Point {
   x: number;
   y: number;
@@ -179,4 +184,15 @@ export interface LayoutResult {
   diagnostics: LayoutDiagnostic[];
   /** Staff bands per system row, in layout order (see RowBandSp). */
   rows?: RowBandSp[];
+  /**
+   * The system-packing input behind this layout, one per laid-out segment.
+   *
+   * Metadata for composition, like `rows`: never serialized into goldens, and
+   * absent from the trivial layouts that pack nothing. It exists so a host can
+   * ask `densityLadder` which OTHER density values would draw this score
+   * differently — the answer is mostly "very few", and a control that steps
+   * blindly spends most of its clicks on values that change nothing
+   * (roadmap/complete/core-render-density-zoom.md).
+   */
+  packings?: PackingInput[];
 }

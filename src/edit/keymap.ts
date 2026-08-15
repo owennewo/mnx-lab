@@ -155,7 +155,8 @@ export type ShellAction =
   | 'selectionTray'
   | 'commandPalette'
   | 'goTo'
-  | 'toggleRail';
+  | 'toggleRail'
+  | 'togglePanel';
 
 /** Exported for the cheatsheet's join tests (keymapDocs.ts) — resolution
  *  still goes through resolveShellAction only. */
@@ -206,7 +207,12 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // (core-selection-tray-global-tab.md, which retired Ctrl+Shift+K).
   { code: 'KeyG', ctrl: true, action: 'goTo' },
   // The library rail toggle (VS Code's Ctrl+B sidebar reflex).
-  { code: 'KeyB', ctrl: true, action: 'toggleRail' }
+  { code: 'KeyB', ctrl: true, action: 'toggleRail' },
+  // The score panel folds the same way, and VS Code has already taught the
+  // chord for the OTHER side: Ctrl+Alt+B is its secondary sidebar. Adding a
+  // modifier to the pane toggle beats inventing an unrelated letter, and the
+  // browser claims neither.
+  { code: 'KeyB', ctrl: true, alt: true, action: 'togglePanel' }
 ];
 
 export function resolveShellAction(stroke: KeyStroke): ShellAction | null {
