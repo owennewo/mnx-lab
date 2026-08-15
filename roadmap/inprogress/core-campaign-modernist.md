@@ -1,6 +1,7 @@
 # Campaign: Modernist — the workbench restyle the tray's art direction leads
 
-> **Status: proposed 2026-08-15.** A campaign (see CLAUDE.md → Conventions): this doc
+> **Status: IN PROGRESS 2026-08-15 — items 1, 3, 4 and 5 built; 2, 6, 7 open.**
+> A campaign (see CLAUDE.md → Conventions): this doc
 > is an index over several normal proposals, the shared contract they follow, and the
 > running log of progress and learnings as items land. Indexed items are ordinary
 > `core-*` / `workbench-*` proposals that name this campaign; rows without a link are
@@ -12,7 +13,7 @@
 > of a possible workbench-wide restyle in this direction — that restyle is its own
 > future proposal, not smuggled in here. Until it lands the tray will sit visibly apart
 > from the surrounding chrome; that contrast is accepted, recorded, and reviewable."*
-> [core-selection-tray-residue.md](core-selection-tray-residue.md)'s last row names the same
+> [core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md)'s last row names the same
 > thing: *"the workbench restyle the tray's art direction leads — its own future
 > proposal, raised only if the tray's look wins the review."* The look won.
 
@@ -122,13 +123,13 @@ frame exists.
 
 | # | Item | Scope | Blocks on | Status |
 |---|------|-------|-----------|--------|
-| 1 | [core-modernist-tokens.md](core-modernist-tokens.md) | **The contract.** Radius tokenization as a values-unchanged no-op refactor, then the OKLCH re-cut, `--rule-w`, the unified red accent, the shared row-state primitives in `sharedChrome`, and the selection-red / error-red separation rule. | — | **built 2026-08-15** |
-| 2 | [core-modernist-dark.md](core-modernist-dark.md) | Authoring Modernist-dark in OKLCH and finally **wiring** `resolved-theme`, which appears once in the codebase and is set by nothing. Split out because it is a design task with an upstream dependency, not a token conversion. | 1 | proposed |
-| 3 | [core-modernist-type.md](core-modernist-type.md) | Archivo via `@fontsource`, `--serif` retired, the mono voice decided. Carries the tray's re-review, because bundling the font changes a surface that was reviewed in the fallback. | 1 | **built 2026-08-15** |
+| 1 | [core-modernist-tokens.md](../complete/core-modernist-tokens.md) | **The contract.** Radius tokenization as a values-unchanged no-op refactor, then the OKLCH re-cut, `--rule-w`, the unified red accent, the shared row-state primitives in `sharedChrome`, and the selection-red / error-red separation rule. | — | **built 2026-08-15** |
+| 2 | [core-modernist-dark.md](../proposed/core-modernist-dark.md) | Authoring Modernist-dark in OKLCH and finally **wiring** `resolved-theme`, which appears once in the codebase and is set by nothing. Split out because it is a design task with an upstream dependency, not a token conversion. | 1 | proposed |
+| 3 | [core-modernist-type.md](../complete/core-modernist-type.md) | Archivo via `@fontsource`, `--serif` retired, the mono voice decided. Carries the tray's re-review, because bundling the font changes a surface that was reviewed in the fallback. | 1 | **built 2026-08-15** |
 | 4 | revision on [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) | The tray drops its 55 hard-coded literals for token references — but **keeps inheriting** the palette rather than declaring `designTokens` locally (an early draft said otherwise; a local block would pin the tray light when the theme switches). A revision block on the complete doc, not a new one: same component, same art direction, and that doc already carries the deviations section this closes. | 1, 3 | **built 2026-08-15** |
-| 5 | [workbench-score-panel.md](workbench-score-panel.md) | The score panel: five-band frame, seven tabs cut to five, the width change, and the per-tab rebuilds. The campaign's structure half and its showcase. **Built** except the two halves that belong to other items — the JSON gutter and selection scoping (item 7) and compare's live render/overlay. | 1 | **built 2026-08-15** |
-| 6 | [workbench-queue-pips.md](workbench-queue-pips.md) | Re-deriving the five-state queue ramp under one accent — the bill "red everywhere" runs up. Shape and lightness carry what hue no longer can. | 1 | proposed |
-| 7 | [core-json-view.md](core-json-view.md) | `buildJsonView()` gains `spanByPointer`; the dormant module finally gets a consumer, a conformance test, and the pinned-error highlight the panel consolidation lost. The only below-the-boundary code change in the campaign. | — (5 for the UI half) | proposed |
+| 5 | [workbench-score-panel.md](../complete/workbench-score-panel.md) | The score panel: five-band frame, seven tabs cut to five, the width change, and the per-tab rebuilds. The campaign's structure half and its showcase. **Built** except the two halves that belong to other items — the JSON gutter and selection scoping (item 7) and compare's live render/overlay. | 1 | **built 2026-08-15** |
+| 6 | [workbench-queue-pips.md](../proposed/workbench-queue-pips.md) | Re-deriving the five-state queue ramp under one accent — the bill "red everywhere" runs up. Shape and lightness carry what hue no longer can. | 1 | proposed |
+| 7 | [core-json-view.md](../proposed/core-json-view.md) | `buildJsonView()` gains `spanByPointer`; the dormant module finally gets a consumer, a conformance test, and the pinned-error highlight the panel consolidation lost. The only below-the-boundary code change in the campaign. | — (5 for the UI half) | proposed |
 | 8 | *(undrafted)* | The `<360px` drawer mode. Needs a viewport breakpoint, an absolutely-positioned panel, **and a panel open/close control that does not exist** — the rail has Ctrl+B, the panel has nothing, and the mock specifies neither the control nor its keystroke. | 5 | undrafted |
 
 Beyond the campaign (recorded, not indexed): whether `<mnx-command-palette>` adopts the
@@ -314,7 +315,7 @@ ones.)*
     the same failure mode `tokens.ts` already records from the pre-`viewerTokens` era.
     Composing one block into both is what the conformance test now pins.
 - **2026-08-15 — the campaign opens; two residue rows retire.**
-  [core-selection-tray-residue.md](core-selection-tray-residue.md) loses both rows this campaign
+  [core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md) loses both rows this campaign
   was reserved by: *"the workbench restyle the tray's art direction leads"* retires **by
   adoption** (this doc is the proposal that row held a slot for), and *"the tray on a
   dark page"* retires **by unblocking** (item 2 authors the dark half it was waiting

@@ -46,7 +46,7 @@ grammar). These now sit in the mechanism's wired tables instead.
 ## Retired 2026-08-15 — the restyle
 
 Two rows from the geometry-and-surface table, retired the day
-[core-campaign-modernist.md](core-campaign-modernist.md) opened.
+[core-campaign-modernist.md](../inprogress/core-campaign-modernist.md) opened.
 
 **"the workbench restyle the tray's art direction leads"** — retired **by adoption, and
 now by delivery**. The row read *"its own future proposal, raised only if the tray's look

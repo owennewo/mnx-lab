@@ -183,29 +183,6 @@ proposals that name their campaign.
   own seven remaining `no-op` notes also point); and geometry/surface gaps (wide-selection
   shaft, dark-page colour scheme, the embed/studio tray). Rows retire as unblockers land
   (registry `blockedBy` keeps table and tiles from drifting); empty table ⇒ `complete/`.
-- **[core-campaign-modernist.md](proposed/core-campaign-modernist.md)** — **campaign**: the
-  workbench restyle the tray's art direction leads, plus the score panel it was drawn for.
-  Fills the slot [core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)
-  reserved for it ("its own future proposal, raised only if the tray's look wins the
-  review") and retires that row plus the dark-page one. Four decisions taken up front:
-  **workbench-wide token flip** (the tray drops its hexes and consumes `designTokens` again
-  — panel-only styling was rejected as adding a *fourth* dialect); **one red accent** across
-  chrome, enclosure and pips; **a dark pass authored and finally wired**; Archivo bundled.
-  Two verified tripwires the contract freezes: `src/engine/render/svg.ts` holds a **dangling
-  `var(--font-family-sans)` baked into 68 goldens**, and `diagnostics.ts`'s error red
-  `#b91c1c` is frozen in 10 more — so "red everywhere" puts selection-red and error-red on
-  one canvas with only the accent movable. Records what the mock gets right (much of it is
-  already built), and **rejects two of its features with reasons**: a computed DIFFERENCES
-  list (a second, unowned verdict channel competing with `status: verified`) and op grouping
-  (breaks time-travel's row↔position identity).
-- **[core-modernist-tokens.md](proposed/core-modernist-tokens.md)** — campaign item 1, **the
-  contract everything blocks on**. Radius tokenized first as a values-unchanged no-op
-  refactor precisely so the palette flip is a one-file diff a human can review; then the
-  OKLCH re-cut, `--rule-w`, five new semantic names, and the accent. Argues *against*
-  importing the design's numeric 100–900 ramps — the repo's vocabulary is semantic and is
-  the contract with the public `--mnx-*` overrides, and a numeric ramp invites use-site
-  guessing. Deliberately does **not** touch the pip ramp (item 6): the job is to flip the
-  surface without changing what anything means.
 - **[core-modernist-dark.md](proposed/core-modernist-dark.md)** — campaign item 2. The
   workbench has a **complete dark theme nothing can turn on**: `resolved-theme` appears
   exactly once in the codebase, in its own selector. And Modernist is light-only by
@@ -213,23 +190,6 @@ proposals that name their campaign.
   the design project rather than invented in CSS. Keeps rather than cuts, on the grounds
   that a restyle should not quietly remove a capability on its way past. Dark doubles as the
   completeness test for the tray's de-hexing.
-- **[core-modernist-type.md](proposed/core-modernist-type.md)** — campaign item 3. Corrects
-  the record: fonts **are** bundled, via `@fontsource/*` in `src/entries/main.ts` ("no font
-  CDN"), so Archivo is a dependency plus three imports — no `@font-face`, no `public/`
-  asset. `--serif` retired (Modernist has no serif); mono stays a **deliberate** system
-  stack, recorded so nobody adds a second webfont back. Flags that bundling the real face
-  **changes an already-reviewed shipped surface** — the tray was tuned against the fallback
-  — so it carries a full tray re-review.
-- **[workbench-score-panel.md](proposed/workbench-score-panel.md)** — campaign item 5, the
-  structure half and the campaign's showcase. **Seven tabs become five** (`description ·
-  ops · hud · compare · json` — authored, changed, current, expected, raw), all in one
-  five-band frame where only the body scrolls. Adopts the design's rule **"the tray edits,
-  the HUD explains"** as the user-facing half of the HUD doc's content/presentation
-  boundary. Resolves the apparent PART-rung conflict as **vocabulary, not substance** (the
-  mock's "rung" is the HUD's existing part row) — and takes the one real consequence: the
-  HUD's stage 4 is **cut and redirected to the tray**. Sequences the `actions` retirement so
-  nothing is removed before its replacement exists, keeps `?view=compare|json` untouched,
-  and defers the `<360px` drawer for want of a panel toggle nobody has drawn.
 - **[core-json-view.md](proposed/core-json-view.md)** — campaign item 7. `src/model/jsonView.ts`
   is a **complete JSON-view engine with no UI consumer and no test**, while the panel renders
   raw text; `errorPointer` is set and never read, so the exhibit's "highlighted in document
@@ -284,6 +244,21 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
+- **[core-campaign-modernist.md](inprogress/core-campaign-modernist.md)** — **campaign**: the
+  workbench restyle the tray's art direction leads, plus the score panel it was drawn for.
+  Fills the slot [core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)
+  reserved for it ("its own future proposal, raised only if the tray's look wins the
+  review") and retires that row plus the dark-page one. Four decisions taken up front:
+  **workbench-wide token flip** (the tray drops its hexes and consumes `designTokens` again
+  — panel-only styling was rejected as adding a *fourth* dialect); **one red accent** across
+  chrome, enclosure and pips; **a dark pass authored and finally wired**; Archivo bundled.
+  Two verified tripwires the contract freezes: `src/engine/render/svg.ts` holds a **dangling
+  `var(--font-family-sans)` baked into 68 goldens**, and `diagnostics.ts`'s error red
+  `#b91c1c` is frozen in 10 more — so "red everywhere" puts selection-red and error-red on
+  one canvas with only the accent movable. Records what the mock gets right (much of it is
+  already built), and **rejects two of its features with reasons**: a computed DIFFERENCES
+  list (a second, unowned verdict channel competing with `status: verified`) and op grouping
+  (breaks time-travel's row↔position identity).
 - **[core-campaign-element-ops.md](inprogress/core-campaign-element-ops.md)** — **campaign**
   (the first): every corpus element constructible from an empty score and *individually*
   destructible (surgical removal, no coarse delete-measure/voice/part cheats). Opened from
@@ -607,6 +582,31 @@ proposals that name their campaign.
   container rungs.
 
 ### complete/
+- **[workbench-score-panel.md](complete/workbench-score-panel.md)** — campaign item 5, the
+  structure half and the campaign's showcase. **Seven tabs become five** (`description ·
+  ops · hud · compare · json` — authored, changed, current, expected, raw), all in one
+  five-band frame where only the body scrolls. Adopts the design's rule **"the tray edits,
+  the HUD explains"** as the user-facing half of the HUD doc's content/presentation
+  boundary. Resolves the apparent PART-rung conflict as **vocabulary, not substance** (the
+  mock's "rung" is the HUD's existing part row) — and takes the one real consequence: the
+  HUD's stage 4 is **cut and redirected to the tray**. Sequences the `actions` retirement so
+  nothing is removed before its replacement exists, keeps `?view=compare|json` untouched,
+  and defers the `<360px` drawer for want of a panel toggle nobody has drawn.
+- **[core-modernist-type.md](complete/core-modernist-type.md)** — campaign item 3. Corrects
+  the record: fonts **are** bundled, via `@fontsource/*` in `src/entries/main.ts` ("no font
+  CDN"), so Archivo is a dependency plus three imports — no `@font-face`, no `public/`
+  asset. `--serif` retired (Modernist has no serif); mono stays a **deliberate** system
+  stack, recorded so nobody adds a second webfont back. Flags that bundling the real face
+  **changes an already-reviewed shipped surface** — the tray was tuned against the fallback
+  — so it carries a full tray re-review.
+- **[core-modernist-tokens.md](complete/core-modernist-tokens.md)** — campaign item 1, **the
+  contract everything blocks on**. Radius tokenized first as a values-unchanged no-op
+  refactor precisely so the palette flip is a one-file diff a human can review; then the
+  OKLCH re-cut, `--rule-w`, five new semantic names, and the accent. Argues *against*
+  importing the design's numeric 100–900 ramps — the repo's vocabulary is semantic and is
+  the contract with the public `--mnx-*` overrides, and a numeric ramp invites use-site
+  guessing. Deliberately does **not** touch the pip ramp (item 6): the job is to flip the
+  surface without changing what anything means.
 - **[core-selection-tray-visuals.md](complete/core-selection-tray-visuals.md)** — the **selection
   command tray**, part 1 of 3, **complete 2026-08-15** (stages 1–4 in one day): `/` stops
   opening a document-wide list and opens a tray **planted under the selection** — scope tabs

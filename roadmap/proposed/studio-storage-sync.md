@@ -65,7 +65,7 @@ with its own op language. Replicache's openly published protocol docs are the
 reference design.
 
 Convergence bonus: once assist emits `EditOp[]` (the plan
-[editor-ai-prompt.md](editor-ai-prompt.md) owns), an AI edit is just another client
+[editor-ai-prompt.md](core-editor-ai-prompt.md) owns), an AI edit is just another client
 pushing mutations — same validation, same history, same conflict story.
 
 ## Persistence: what lives where
@@ -113,7 +113,7 @@ too — with a distinction built in from day one:
   metadata) are **extracted by the doc DO** into the index on every accepted push —
   never typed, never stale, always rebuildable by a re-index sweep. This is the
   authoritative-vs-derived discipline of
-  [derived-positions.md](derived-positions.md) applied to the library layer.
+  [derived-positions.md](core-derived-positions.md) applied to the library layer.
 - **Asserted dimensions** (path, setlist) have no source of truth but the user. They
   are first-class data — D1 is their system of record, writes go through auth, and
   offline tag edits join the client's queued-mutation machinery (as LWW rows, not

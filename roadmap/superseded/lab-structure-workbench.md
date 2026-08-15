@@ -121,7 +121,7 @@ roadmap/ docs/ research/ vendor/mnx    unchanged
    `corpus/scores/`; delete the Express app; fix the frontend's sample-score import path.
 2. **Move the data.** `schemas/` → `spec/`, `scenarios/` → `corpus/scenarios/`; update the
    path constants in `src/library/corpus.ts`, `scripts/`, `tests/`, vitest config, and
-   [lab-04-scenario-library.md](../inprogress/lab-04-scenario-library.md) (the corpus contract doc
+   [lab-04-scenario-library.md](../complete/lab-04-scenario-library.md) (the corpus contract doc
    moves with its subject). Acceptance: snapshots byte-identical, `npm run build` green.
 3. **Merge `scripts/` + `tests/` into `harness/`** by question (conformance / verify /
    render), promoting `tests/helpers` to `harness/helpers` and ending the render-png

@@ -1,8 +1,8 @@
 # The queue's colours after "red everywhere"
 
 > **Status: proposed 2026-08-15.** Item 6 of
-> [core-campaign-modernist.md](core-campaign-modernist.md). Blocks on
-> [core-modernist-tokens.md](core-modernist-tokens.md), which deliberately does **not** touch the
+> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md). Blocks on
+> [core-modernist-tokens.md](../complete/core-modernist-tokens.md), which deliberately does **not** touch the
 > pip ramp — this is the bill that item runs up.
 
 ## The problem the restyle creates

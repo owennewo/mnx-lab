@@ -1,8 +1,8 @@
 # The JSON view finally gets a consumer
 
 > **Status: proposed 2026-08-15.** Item 7 of
-> [core-campaign-modernist.md](core-campaign-modernist.md). The UI half lands with
-> [workbench-score-panel.md](workbench-score-panel.md)'s json tab; the model half stands alone and
+> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md). The UI half lands with
+> [workbench-score-panel.md](../complete/workbench-score-panel.md)'s json tab; the model half stands alone and
 > can go first.
 >
 > `core-` because the work is in `src/model/` — below the harness boundary, so it is the

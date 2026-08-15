@@ -2,7 +2,7 @@
 
 > **Status: BUILT 2026-08-15**, same day as proposed — except two halves that belong to
 > other items: the JSON gutter / three inks / selection scoping (all read
-> `buildJsonView`, so they ride [core-json-view.md](core-json-view.md)) and compare's
+> `buildJsonView`, so they ride [core-json-view.md](../proposed/core-json-view.md)) and compare's
 > live render + overlay. The tab retirement went through its sequence intact: the
 > popover was rehomed to a page-level overlay first, the palette's four-of-nine gap
 > closed from one shared table, then `actions` was deleted with `tsc` catching every
@@ -12,11 +12,10 @@
 > literally wrong on the first document it rendered → the signature, `1♯`). Verified
 > hands-on over CDP across all five tabs, a live two-op queue with a redo branch, and a
 > keyboard-opened popover. Goldens byte-identical; 625 tests green.
->
-> **Status: proposed 2026-08-15.** Item 5 of
-> [core-campaign-modernist.md](core-campaign-modernist.md) — the campaign's structure half and
+> Item 5 of
+> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md) — the campaign's structure half and
 > its showcase. Blocks on [core-modernist-tokens.md](core-modernist-tokens.md); the JSON tab's
-> below-the-boundary half is [core-json-view.md](core-json-view.md).
+> below-the-boundary half is [core-json-view.md](../proposed/core-json-view.md).
 >
 > `workbench-` because `src/workbench/ScenarioPage.ts` is a **leaf** — nothing imports it
 > and nothing will; this is not promotion-track work. (The campaign's contract items are
@@ -243,7 +242,7 @@ campaign doc. No data source exists, and computing one would create a second, un
 verdict channel competing with `status: verified` and the attention queue.
 
 ### json
-The UI half of [core-json-view.md](core-json-view.md): gutter, three inks (the
+The UI half of [core-json-view.md](../proposed/core-json-view.md): gutter, three inks (the
 `--json-string/number/boolean` tokens already exist and are referenced nowhere), the
 SELECTION / WHOLE SCORE toggle, COPY, and a find-in-JSON footer with the line count.
 Also **restore the pinned-error highlight** — `showErrorInJson()` sets `errorPointer` and

@@ -23,7 +23,7 @@
 > overridden bass gains its own 4-string staff, clicks walk the ladder.
 > **Stage 4 (rung property edits through ops) is CUT, not parked — revised
 > 2026-08-15.** It was parked behind the ladder's per-level pass; the score-panel
-> design ([workbench-score-panel.md](../proposed/workbench-score-panel.md), campaign item 5)
+> design ([workbench-score-panel.md](../complete/workbench-score-panel.md), campaign item 5)
 > retires it instead, and redirects the work to the selection tray. The design's
 > governing rule is **"the tray edits, the HUD explains"**: the HUD's keys half is
 > reference and never clickable, and its footer hands editing back to Ctrl+K. That

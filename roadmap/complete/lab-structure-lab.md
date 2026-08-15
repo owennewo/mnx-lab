@@ -92,7 +92,7 @@ deliberately, with a meta.json. Until then it stays a fixture.
 With scores out, **`scenarios/` stays exactly where it is** — the first draft's
 `corpus/` move existed to unify scores with scenarios, and that need is gone. Less
 churn: ids, golden paths, `manifest.json` and
-[lab-04-scenario-library.md](../inprogress/lab-04-scenario-library.md) are all untouched.
+[lab-04-scenario-library.md](lab-04-scenario-library.md) are all untouched.
 
 ## The spec loop: `sync` down, `push` up
 

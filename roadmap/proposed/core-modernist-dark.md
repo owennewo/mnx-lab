@@ -1,8 +1,8 @@
 # Modernist: the dark pass, and finally wiring it
 
 > **Status: proposed 2026-08-15.** Item 2 of
-> [core-campaign-modernist.md](core-campaign-modernist.md). Blocks on
-> [core-modernist-tokens.md](core-modernist-tokens.md). Retires the residue ledger's *"the tray
+> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md). Blocks on
+> [core-modernist-tokens.md](../complete/core-modernist-tokens.md). Retires the residue ledger's *"the tray
 > on a dark page"* row **by unblocking** it.
 
 ## The problem, which is two problems

@@ -50,7 +50,7 @@
 >
 > Feeds [core-editor-element-promotion.md](core-editor-element-promotion.md)'s
 > "the shadow-DOM focus story coming due" line item, and hands
-> [core-viewer-surface.md](core-viewer-surface.md) one public token
+> [core-viewer-surface.md](../inprogress/core-viewer-surface.md) one public token
 > (`--mnx-focus-ring`). Raised 2026-08-14 from an embed question: *on a random
 > host page that embeds the viewer, when do PgUp/PgDn reach me and when do they
 > reach the page?*
@@ -137,7 +137,7 @@ without pressing a key and finding out:
   the box so the paper's geometry is untouched.
 - A token, `--mnx-focus-ring`, defaulting to the accent-derived colour and
   restylable by the host — the one piece of this that touches the public
-  surface, so [core-viewer-surface.md](core-viewer-surface.md) owns its final
+  surface, so [core-viewer-surface.md](../inprogress/core-viewer-surface.md) owns its final
   name and shape.
 - **Click focus counts.** For an editor, a mouse click genuinely transfers key
   ownership, so the ring shows on click too rather than strict `:focus-visible`

@@ -229,7 +229,7 @@ it lands the tray will sit visibly apart from the surrounding chrome; that contr
 is accepted, recorded, and reviewable in the hands-on pass.
 
 ~~Open item: **Archivo loading**.~~ **CLOSED 2026-08-15** by
-[core-modernist-type.md](../proposed/core-modernist-type.md) — bundled through
+[core-modernist-type.md](core-modernist-type.md) — bundled through
 `@fontsource` in the workbench entry, not a component-local `@font-face`. The guess
 recorded here (that the component should declare its own face, the way the embed
 registers Bravura) was wrong in a useful way: the workbench already had a font
@@ -246,7 +246,7 @@ promotion time.
 ### Revision 2026-08-15 — the restyle arrived; both open items close
 
 **The look won the review**, so the future proposal this section anticipated now
-exists: [core-campaign-modernist.md](../proposed/core-campaign-modernist.md), a campaign
+exists: [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md), a campaign
 whose contract is the token vocabulary this component currently hard-codes. Three
 consequences land back here, each as an indexed campaign item:
 
@@ -254,7 +254,7 @@ consequences land back here, each as an indexed campaign item:
   direction verbatim as self-contained shadow styles, deliberately without
   `designTokens` — was correct for a component landing ahead of its system, and it
   expires when the system catches up. Once
-  [core-modernist-tokens.md](../proposed/core-modernist-tokens.md) lands, `SelectionTray.ts`
+  [core-modernist-tokens.md](core-modernist-tokens.md) lands, `SelectionTray.ts`
   adds `designTokens` and its ~60 colour literals become token references. The
   paragraph above about sitting "visibly apart from the surrounding chrome" stops
   being true, which was always the intent. Delete the component's header comment
