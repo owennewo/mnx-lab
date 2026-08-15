@@ -1,0 +1,26 @@
+{
+  "target": "spec/measure-repeats-with-counters",
+  "intents": [
+    { "type": "addPart" },
+    { "type": "appendMeasure" },
+    { "type": "appendMeasure" },
+    { "type": "appendMeasure" },
+    { "type": "appendMeasure" },
+    { "type": "setTimeSignature", "count": 4, "unit": 4 },
+    { "type": "setClef", "sign": "G", "staffPosition": -2 },
+    { "type": "longerDuration" },
+    { "type": "lineUp" },
+    { "type": "toggleNote" },
+    { "type": "nextPosition" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "toggleNote" },
+    { "type": "goToMeasure", "measureIndex": 1 },
+    { "type": "setMeasureRepeat", "number": 1, "counter": { "count": 2, "orient": "above" } },
+    { "type": "goToMeasure", "measureIndex": 2 },
+    { "type": "setMeasureRepeat", "number": 1, "counter": { "count": 3, "orient": "above" } },
+    { "type": "goToMeasure", "measureIndex": 3 },
+    { "type": "setMeasureRepeat", "number": 1, "counter": { "count": 4, "orient": "above" } }
+  ]
+}

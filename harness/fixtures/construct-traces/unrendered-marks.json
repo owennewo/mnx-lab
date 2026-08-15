@@ -1,0 +1,18 @@
+{
+  "target": "lab/articulations/unrendered-marks",
+  "intents": [
+    { "type": "addPart", "name": "Music" },
+    { "type": "appendMeasure" },
+    { "type": "setTimeSignature", "count": 4, "unit": 4 },
+    { "type": "setClef", "sign": "G", "staffPosition": -2 },
+    { "type": "lineUp" },
+    { "type": "toggleNote" },
+    { "type": "setMarking", "marking": "spiccato" },
+    { "type": "nextPosition" },
+    { "type": "toggleNote" },
+    { "type": "setMarking", "marking": "breath", "attributes": { "symbol": "comma" } },
+    { "type": "nextPosition" },
+    { "type": "toggleNote" },
+    { "type": "setMarking", "marking": "bowDirection", "attributes": { "direction": "up" } }
+  ]
+}

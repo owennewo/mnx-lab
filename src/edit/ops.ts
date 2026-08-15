@@ -328,7 +328,15 @@ export type EditOp =
   // owners differ: a marking is a key on the EVENT, while dynamics and
   // directions are positioned entries in PART-MEASURE arrays. Item 7's family
   // test (do they share an owner?) is what splits them.
-  | { type: 'setMarking'; noteKey: string; marking: string }
+  | {
+      /** One event marking. `attributes` carries the few that are not bare
+       *  flags — a breath's symbol, a bow's direction — because the marking
+       *  IS its object and an empty one would be a different mark. */
+      type: 'setMarking';
+      noteKey: string;
+      marking: string;
+      attributes?: Record<string, string>;
+    }
   | { type: 'removeMarking'; noteKey: string; marking: string }
   | {
       /** A dynamic or direction at a metric position in the part measure. */
@@ -466,6 +474,9 @@ export type EditOp =
       type: 'setMeasureRepeat';
       measureIndex: number;
       number: number;
+      /** How many times, drawn above or below — `spec/measure-repeats-with-counters`
+       *  numbers each repeated bar, and the count is authored, not derived. */
+      counter?: { count: number; orient?: 'above' | 'below' };
     }
   | { type: 'removeMeasureRepeat'; measureIndex: number }
   | {
@@ -521,7 +532,18 @@ export type PartDeclarationKind = 'name' | 'staves' | 'strings' | 'capo' | 'staf
 /** The part-measure adornments: positioned entries sharing an owner, a shape
  *  and a removal — which is why they share a verb. */
 export type PositionedAttribute =
-  | { kind: 'dynamic'; value?: MnxDynamicValue; glyphs?: string[] }
+  | {
+      kind: 'dynamic';
+      value?: MnxDynamicValue;
+      glyphs?: string[];
+      /** A dynamic is not always a letter at a point: MNX types it, and the
+       *  corpus uses three of the four (`lab/dynamics/hairpin-and-relative`).
+       *  Same object, same owner, so the same verb carries them — item 7's
+       *  family test, rather than a hairpin verb and a relative verb. */
+      dynamicType?: 'immediate' | 'gradual' | 'relative' | 'accent';
+      wedgeType?: 'increasing' | 'decreasing';
+      relativeValue?: 'louder' | 'softer';
+    }
   | { kind: 'direction'; text: string }
   /** An octave-shift line: same owner and shape as the other two, so it shares
    *  their verb — item 7's family test, applied once more. */
@@ -1216,7 +1238,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const located = findKeyedNote(next, op.noteKey);
       if (!located) return next;
       const event = located.event;
-      ((event.markings ??= {}) as Record<string, unknown>)[op.marking] = {};
+      ((event.markings ??= {}) as Record<string, unknown>)[op.marking] = { ...(op.attributes ?? {}) };
       return next;
     }
     case 'removeMarking': {
@@ -1247,9 +1269,11 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         return next;
       }
       if (op.attribute.kind === 'dynamic') {
-        const entry: MnxDynamic = { position, type: 'immediate' };
+        const entry: MnxDynamic = { position, type: op.attribute.dynamicType ?? 'immediate' };
         if (op.attribute.value) entry.value = op.attribute.value;
         if (op.attribute.glyphs) entry.glyphs = op.attribute.glyphs;
+        if (op.attribute.wedgeType) entry.wedgeType = op.attribute.wedgeType;
+        if (op.attribute.relativeValue) entry.relativeValue = op.attribute.relativeValue;
         measure.dynamics = [...(measure.dynamics ?? []), entry];
       } else {
         measure.directions = [...(measure.directions ?? []), { position, text: op.attribute.text }];
@@ -1324,6 +1348,13 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         buildContainer(op.spec, events),
         ...seq.content.slice(end + 1)
       ];
+      // A wrap re-times the bar on purpose, and §8.11's invariant still holds:
+      // a touched measure has content for its full metric duration. Padding
+      // only fires where the bar came up SHORT (a triplet gives back an
+      // eighth), and is a no-op when the wrap restores an exactly-full bar —
+      // which is why re-wrapping a corpus container still reproduces it byte
+      // for byte.
+      padMeasureRests(next, op.measureIndex);
       return next;
     }
     case 'respellNote': {
@@ -1411,10 +1442,26 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
     }
     case 'setMeasureRepeat': {
       const measure = next.parts?.[0]?.measures?.[op.measureIndex] as
-        | (MnxPartMeasure & { measureRepeat?: { number: number } })
+        | (MnxPartMeasure & { measureRepeat?: unknown })
         | undefined;
       if (!measure) return next;
-      measure.measureRepeat = { number: op.number };
+      measure.measureRepeat = {
+        number: op.number,
+        ...(op.counter
+          ? {
+              counter: {
+                count: op.counter.count,
+                ...(op.counter.orient ? { orient: op.counter.orient } : {})
+              }
+            }
+          : {})
+      };
+      // A repeated bar restates the previous one, so its own content is empty
+      // — the same "declaration about the bar" rule `setFullMeasureRest`
+      // follows, and what the spec's own examples hold.
+      const seq = measure.sequences?.[0];
+      if (seq && !seq.content.some(item => isTimedEvent(item) && (item.notes?.length ?? 0) > 0))
+        seq.content = [];
       return next;
     }
     case 'removeMeasureRepeat': {

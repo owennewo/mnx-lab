@@ -132,7 +132,7 @@ export type MutationIntent =
   | { type: 'removeLayout'; index: number }
   | { type: 'removeScore'; index: number }
   | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }
-  | { type: 'setMarking'; marking: string }
+  | { type: 'setMarking'; marking: string; attributes?: Record<string, string> }
   | { type: 'removeMarking'; marking: string }
   | { type: 'setPositioned'; attribute: PositionedAttribute }
   | { type: 'removePositioned'; kind: PositionedAttribute['kind'] }
@@ -151,7 +151,7 @@ export type MutationIntent =
   | { type: 'toggleDots' }
   | { type: 'setFullMeasureRest' }
   | { type: 'removeFullMeasureRest' }
-  | { type: 'setMeasureRepeat'; number: number }
+  | { type: 'setMeasureRepeat'; number: number; counter?: { count: number; orient?: 'above' | 'below' } }
   | { type: 'removeMeasureRepeat' }
   | { type: 'setTieVariant'; targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump'; lv?: boolean };
 

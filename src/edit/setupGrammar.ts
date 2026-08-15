@@ -236,7 +236,7 @@ const TEMPO_UNITS: Record<string, MnxNoteValueBase> = {
 export const BAR_ATTRIBUTE_HELP =
   'barline double · repeat start · repeat end 3 · ending 1,2 · segno · fine · ' +
   'jump dsalfine · tempo 120 · rehearsal A · section Verse 1 · full-measure rest · ' +
-  'measure repeat 2 · no <attribute>';
+  'measure repeat 2 · measure repeat counter 3 · no <attribute>';
 
 export type BarAttributeResult =
   | { set: MeasureAttribute }
@@ -244,7 +244,12 @@ export type BarAttributeResult =
   // Part-measure rhythm declarations (campaign item 11) ride the same popover:
   // it is a SURFACE, not a data-owner, and the user's question is "what about
   // this bar?" — which object holds the answer is our problem, not theirs.
-  | { rhythm: 'fullMeasureRest' | 'measureRepeat'; remove?: boolean; number?: number }
+  | {
+      rhythm: 'fullMeasureRest' | 'measureRepeat';
+      remove?: boolean;
+      number?: number;
+      counter?: { count: number; orient?: 'above' | 'below' };
+    }
   | null;
 
 /** The word a user types → the attribute kind it names. */
@@ -284,11 +289,24 @@ export function parseBarAttribute(text: string): BarAttributeResult {
     return rest === 'rest' ? { rhythm: 'fullMeasureRest' } : null;
   }
 
-  // `measure repeat` / `measure repeat 2` — repeat the previous N bars.
+  // `measure repeat` / `measure repeat 2` — repeat the previous N bars, with
+  // an optional printed COUNTER (`measure repeat counter 3`): how many times
+  // this bar has come round, which MNX authors rather than derives.
   if (head === 'measure' && (words[1] ?? '').toLowerCase() === 'repeat') {
-    const count = words[2] !== undefined ? Number(words[2]) : 1;
+    const rest = words.slice(2);
+    let counter: { count: number; orient?: 'above' | 'below' } | undefined;
+    const at = rest.findIndex(word => word.toLowerCase() === 'counter');
+    if (at >= 0) {
+      const value = Number(rest[at + 1]);
+      if (!Number.isInteger(value) || value < 1) return null;
+      const orient = (rest[at + 2] ?? '').toLowerCase();
+      if (orient !== '' && orient !== 'above' && orient !== 'below') return null;
+      counter = { count: value, orient: orient === 'below' ? 'below' : 'above' };
+      rest.splice(at);
+    }
+    const count = rest[0] !== undefined ? Number(rest[0]) : 1;
     if (!Number.isInteger(count) || count < 1 || count > 4) return null;
-    return { rhythm: 'measureRepeat', number: count };
+    return { rhythm: 'measureRepeat', number: count, ...(counter ? { counter } : {}) };
   }
 
   // `repeat start` / `repeat end` / `repeat end 3` — one word, two kinds.
@@ -371,11 +389,12 @@ const DYNAMIC_WORDS = [
 
 export const ADORNMENT_HELP =
   'accent · staccato · tenuto · strongAccent · … · a dynamic (pp, mf, fff) · ' +
-  'text Play 8x · accidental · accidental parens · ' +
+  'text Play 8x · cresc · dim · louder · softer · breath comma · bow up · ' +
+  'accidental · accidental parens · ' +
   'no accent · no dynamic · no text · no string · no accidental';
 
 export type AdornmentResult =
-  | { marking: string; remove?: boolean }
+  | { marking: string; remove?: boolean; attributes?: Record<string, string> }
   // The accidental's DISPLAY is note-level ink like the markings, so it lives
   // in their popover rather than earning a sixth one (campaign item 6). The
   // SPELLING is a key (`J`) — a different question with a different answer.
@@ -422,6 +441,27 @@ export function parseAdornment(text: string): AdornmentResult {
 
   const dynamic = DYNAMIC_WORDS.find(d => d === trimmed);
   if (dynamic) return { positioned: { kind: 'dynamic', value: dynamic } };
+
+  // A dynamic is not always a letter at a point (campaign item 8's verb, the
+  // rest of its vocabulary): a hairpin is a GRADUAL one and `louder`/`softer`
+  // are RELATIVE ones. Same object, same verb.
+  const lower = trimmed.toLowerCase();
+  if (lower === 'cresc' || lower === 'crescendo')
+    return { positioned: { kind: 'dynamic', dynamicType: 'gradual', wedgeType: 'increasing' } };
+  if (lower === 'dim' || lower === 'decresc' || lower === 'diminuendo')
+    return { positioned: { kind: 'dynamic', dynamicType: 'gradual', wedgeType: 'decreasing' } };
+  if (lower === 'louder' || lower === 'softer')
+    return {
+      positioned: { kind: 'dynamic', dynamicType: 'relative', relativeValue: lower }
+    };
+
+  // The two markings that are not bare flags: a breath names its symbol and a
+  // bow its direction, and an empty object would be a different mark.
+  const breath = /^breath(?:\s+(comma|tick|upbow|salzedo))?$/.exec(lower);
+  if (breath)
+    return { marking: 'breath', ...(breath[1] ? { attributes: { symbol: breath[1] } } : {}) };
+  const bow = /^bow\s+(up|down)$/.exec(lower);
+  if (bow) return { marking: 'bowDirection', attributes: { direction: bow[1] } };
 
   const marking = resolveMarking(trimmed);
   return marking ? { marking } : null;

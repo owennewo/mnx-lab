@@ -1312,7 +1312,13 @@ export class ScenarioPage extends LitElement {
           : 'removeStringAnnotation' in parsed
           ? { type: 'removeStringAnnotation' }
           : 'marking' in parsed
-          ? { type: parsed.remove ? 'removeMarking' : 'setMarking', marking: parsed.marking }
+          ? parsed.remove
+            ? { type: 'removeMarking', marking: parsed.marking }
+            : {
+                type: 'setMarking',
+                marking: parsed.marking,
+                ...(parsed.attributes ? { attributes: parsed.attributes } : {})
+              }
           : 'positioned' in parsed
             ? { type: 'setPositioned', attribute: parsed.positioned }
             : { type: 'removePositioned', kind: parsed.removePositioned }
@@ -1329,7 +1335,11 @@ export class ScenarioPage extends LitElement {
             ? { type: parsed.remove ? 'removeFullMeasureRest' : 'setFullMeasureRest' }
             : parsed.remove
               ? { type: 'removeMeasureRepeat' }
-              : { type: 'setMeasureRepeat', number: parsed.number ?? 1 }
+              : {
+                type: 'setMeasureRepeat',
+                number: parsed.number ?? 1,
+                ...(parsed.counter ? { counter: parsed.counter } : {})
+              }
         );
       } else {
         this.stripIntent(

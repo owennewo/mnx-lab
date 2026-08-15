@@ -684,7 +684,16 @@ export class EditorSession {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
         const before = JSON.stringify(this.doc);
-        this.apply({ type: intent.type, noteKey: slot.noteKey, marking: intent.marking });
+        this.apply(
+          intent.type === 'setMarking'
+            ? {
+                type: 'setMarking',
+                noteKey: slot.noteKey,
+                marking: intent.marking,
+                ...(intent.attributes ? { attributes: intent.attributes } : {})
+              }
+            : { type: 'removeMarking', noteKey: slot.noteKey, marking: intent.marking }
+        );
         if (JSON.stringify(this.doc) === before) {
           this.history.undo();
           this.reindex();
@@ -824,7 +833,12 @@ export class EditorSession {
         const before = JSON.stringify(this.doc);
         this.apply(
           intent.type === 'setMeasureRepeat'
-            ? { type: 'setMeasureRepeat', measureIndex, number: intent.number }
+            ? {
+                type: 'setMeasureRepeat',
+                measureIndex,
+                number: intent.number,
+                ...(intent.counter ? { counter: intent.counter } : {})
+              }
             : { type: intent.type, measureIndex }
         );
         // These refuse (a bar holding ink, nothing declared to strip), and a

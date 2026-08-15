@@ -1,0 +1,114 @@
+{
+  "target": "lab/rhythm/tuplet-number-hidden",
+  "intents": [
+    {
+      "type": "addPart",
+      "name": "Music"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 0
+    },
+    {
+      "type": "wrapInContainer",
+      "spec": {
+        "type": "tuplet",
+        "inner": {
+          "multiple": 3,
+          "duration": {
+            "base": "eighth"
+          }
+        },
+        "outer": {
+          "multiple": 1,
+          "duration": {
+            "base": "quarter"
+          }
+        },
+        "showNumber": "noNumber"
+      }
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "setRestSpelling",
+      "duration": {
+        "base": "half"
+      }
+    }
+  ]
+}

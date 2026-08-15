@@ -891,3 +891,34 @@ axis structurally cannot reach.** Removal needs identity; construction needs
 ordering, minting and validity — and each of those had a bug that had never
 been executed. The queue is not a formality; it is the other half of the
 campaign's coverage, and it is finding roughly one real defect per trace.
+
+### 2026-08-15 — four more traces: the kinds were built, the vocabularies were not
+
+`hairpin-and-relative`, `measure-repeats-with-counters`, `tuplet-number-hidden`,
+`unrendered-marks`. **Traced 11 → 15, kinds covered 22 → 26 of 38, queue 15 → 11
+traces / 131 elements.** Three of the four were blocked not by a missing verb
+but by a verb that could only say part of what its kind can mean:
+
+- **A dynamic was always `immediate`.** `setPositioned` hard-coded the type, so
+  a hairpin (`gradual` + `wedgeType`) and a `relative` louder/softer were
+  unwritable although the kind counted as constructible. Same object, same
+  owner, so the same verb carries them — item 7's family test again, rather
+  than a hairpin verb and a relative verb.
+- **A measure repeat had no counter.** MNX authors the count (2, 3, 4 above
+  each repeated bar); we wrote only `number`. The op also empties the bar's own
+  content now, which is what a repeated bar means and what the spec's examples
+  hold.
+- **A marking was always a bare flag.** `breath` names its symbol and
+  `bowDirection` its direction; writing `{}` produced a different mark.
+
+**The tier model cannot see any of this**, and that is worth stating plainly:
+`kindHasConstructOp` asks whether a verb exists, not whether it can say
+everything the corpus says. The trace is the only thing that asks the second
+question — which is the strongest argument yet for the kind-coverage bar being
+about *traces*, not about the table.
+
+One semantic decision fell out: **a wrap re-pads its bar.** Wrapping three
+eighths as a triplet gives an eighth back, and §8.11's invariant (a touched
+measure has content for its full metric duration) still holds. Padding fires
+only where the bar came up short, so re-wrapping a corpus container — which
+restores an exactly-full bar — is untouched and still reproduces byte for byte.
