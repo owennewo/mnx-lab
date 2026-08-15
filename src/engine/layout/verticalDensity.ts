@@ -184,6 +184,40 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
   };
 }
 
+/**
+ * Shifts a finished layout down so nothing sits above the page top.
+ *
+ * A layout's first-row offset is a FIXED reservation, and a fixed reservation
+ * can be too small as easily as too large: the tab layout keeps 4sp above its
+ * staff, which is ample for a capo line and not nearly enough for a rehearsal
+ * box stacked over a metronome mark. The overflow is silent — the primitives
+ * are emitted at negative y and simply fall outside the viewport, so a
+ * reviewer sees a score with its labels missing rather than a score that is
+ * wrong.
+ *
+ * Measuring is the fix, and it is the same move `tightenRows` makes one level
+ * up: the frame follows the ink instead of predicting it. Unlike that pass
+ * this one runs at every density — a label that would be clipped is not a
+ * density question — but it is a no-op whenever the reservation was already
+ * enough, which is every scenario in the corpus that has no labels.
+ */
+export function ensureTopMargin(
+  primitives: Primitive[],
+  rows: readonly RowBandSp[],
+  heightSp: number,
+  marginSp: number
+): TightenedRows | null {
+  const bounds = computeBoundsSp(primitives);
+  if (!bounds || bounds.y >= marginSp) return null;
+
+  const dy = marginSp - bounds.y;
+  for (const p of primitives) translatePrimitiveY(p, dy);
+  return {
+    heightSp: heightSp + dy,
+    rows: rows.map(b => ({ staffTop: b.staffTop + dy, staffBottom: b.staffBottom + dy }))
+  };
+}
+
 /** The y a primitive is anchored at, for deciding which row owns it. */
 function anchorY(p: Primitive): number {
   switch (p.kind) {

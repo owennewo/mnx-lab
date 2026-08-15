@@ -10,7 +10,8 @@ import {
   emitTabTimeSig,
   emitTabVoices
 } from './tabStaff.ts';
-import { clampPadDensity, tightenRows } from './verticalDensity.ts';
+import { emitNavigationMarkers, emitScoreLabels, emitTempoMark } from './scoreText.ts';
+import { clampPadDensity, ensureTopMargin, tightenRows } from './verticalDensity.ts';
 import { validateDocument } from './validate.ts';
 import { tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
 
@@ -188,6 +189,19 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       });
     }
 
+    // Score-wide marks from the GLOBAL measure — the tempo, the navigation
+    // marks and the structural labels. They describe the BAR, not a notation
+    // staff (MNX gives them a `location`, never a `staff`), so a tab reader is
+    // owed them exactly as much: a section name and a D.S. are how you know
+    // where you are in the piece, and losing them was losing the map.
+    //
+    // Same order as the notation layout, and the order matters: labels scan
+    // what already sits over this measure and stack above it.
+    const gm = mnx.global.measures[i] ?? {};
+    emitTempoMark({ gm, m, staffTop, primitives });
+    emitNavigationMarkers({ gm, m, stdSequences, staffTop, primitives });
+    emitScoreLabels({ gm, m, staffTop, rowTop: staffTop - ROW_PAD_TOP_SP, primitives });
+
     // End barline
     const isLast = i === numMeasures - 1;
     const barX = m.x + m.width;
@@ -233,8 +247,17 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     }
   }
 
-  const heightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * ROW_HEIGHT_SP;
-  const rows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r) => rowBand(r));
+  const baseHeightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * ROW_HEIGHT_SP;
+  const baseRows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r) => rowBand(r));
+
+  // ROW_PAD_TOP_SP is sized for a capo line, and the score-wide labels stack
+  // higher than that — a rehearsal box over a metronome mark reaches past the
+  // page top and would be quietly clipped. Fit the frame to the ink FIRST, so
+  // the density pass below sees a layout whose gaps are all real.
+  const fitted = ensureTopMargin(primitives, baseRows, baseHeightSp, MARGIN_SP);
+  const heightSp = fitted?.heightSp ?? baseHeightSp;
+  const rows = fitted?.rows ?? baseRows;
+
   const tightened = tightenRows({
     primitives, rows, heightSp, padDensity: clampPadDensity(opts.densityPad)
   });

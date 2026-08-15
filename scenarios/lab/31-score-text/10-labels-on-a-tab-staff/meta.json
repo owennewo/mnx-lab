@@ -1,0 +1,58 @@
+{
+  "title": "Labels and marks on a tab staff",
+  "description": "The same score-wide furniture as 09 — rehearsal mark, section name, segno, fine and a metronome mark — on a part whose staffKind is \"tab\". Everything here lives on the GLOBAL measure, which is MNX's container for things that describe the bar rather than a staff: they carry a `location`, never a `staff`. So none of it is notation's to keep, and a tab reader needs it more than most — a section name and a D.S. are how you know where you are in the piece. Until this scenario existed the corpus had no document that was both tab-rendered and label-bearing, which is exactly why the tab layout drew none of them.",
+  "bars": 4,
+  "tags": [
+    "labels",
+    "section",
+    "tab",
+    "proposed"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/112"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "event",
+    "fraction",
+    "global",
+    "integer-unsigned",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rhythmic-position",
+    "root",
+    "section",
+    "sequence",
+    "staff-position",
+    "step",
+    "string",
+    "tempo",
+    "time",
+    "time-signature-unit",
+    "vendor-extensions",
+    "version-number"
+  ],
+  "schema": "proposed",
+  "proposal": "score-text",
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}
