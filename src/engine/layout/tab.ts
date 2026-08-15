@@ -28,7 +28,7 @@ import { tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
 // notation layout's native tab staff kind — only the standalone view's own
 // row/barline framing stays here.
 
-const STAFF_HEIGHT_SP = TAB_STAFF_HEIGHT_SP;      // 5 sp from top string to bottom string
+const STAFF_HEIGHT_SP = TAB_STAFF_HEIGHT_SP;      // top string to bottom string
 
 const ROW_PAD_TOP_SP = 4;
 const ROW_PAD_BOTTOM_SP = 4;

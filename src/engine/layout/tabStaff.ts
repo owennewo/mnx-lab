@@ -22,7 +22,30 @@ import { EventSlot } from './spacing.ts';
 // ---------- Tab staff geometry (staff spaces) ----------
 
 export const TAB_STAFF_LINES = 6;
-export const TAB_STAFF_HEIGHT_SP = TAB_STAFF_LINES - 1; // 5 sp, top to bottom string
+
+/**
+ * The notation staff's height (5 lines ⇒ 4 sp) — the reference the tab staff is
+ * sized against. Deliberately duplicated from notation.ts's private
+ * STAFF_HEIGHT_SP rather than imported: notation.ts imports THIS module, so the
+ * dependency only runs one way.
+ */
+const NOTATION_STAFF_HEIGHT_SP = 4;
+
+/**
+ * Notation height ÷ tab height. Engravers commonly open the tab staff up a
+ * little for legibility — fret digits are text sitting ON the string lines, not
+ * noteheads sitting between staff lines, so they need more room than a plain
+ * "one string line per staff space" (ratio 0.8) gives them. Published practice
+ * sits between 0.70 and 0.80; 0.70 is the roomy end of that range.
+ */
+export const TAB_TO_NOTATION_HEIGHT_RATIO = 0.7;
+
+/** Distance between adjacent string lines — the single knob for tab openness. */
+export const TAB_STRING_SPACING_SP =
+  NOTATION_STAFF_HEIGHT_SP / TAB_TO_NOTATION_HEIGHT_RATIO / (TAB_STAFF_LINES - 1);
+
+/** Top string to bottom string. */
+export const TAB_STAFF_HEIGHT_SP = (TAB_STAFF_LINES - 1) * TAB_STRING_SPACING_SP;
 
 export const TAB_STAFF_LINE_THICKNESS_SP = 0.1;
 
@@ -99,7 +122,7 @@ export function emitTabSystemHeader(
       kind: 'text',
       text: tuningLetter(entry.pitch),
       x: x - TUNING_LETTER_INSET_SP,
-      y: staffTop + (entry.string - 1),
+      y: staffTop + (entry.string - 1) * TAB_STRING_SPACING_SP,
       font: 'body',
       size: TUNING_LETTER_SIZE_SP,
       anchor: 'end',
@@ -120,7 +143,7 @@ export function emitTabStaffLines(
 ): void {
   // Staff lines (drawn as primitives — per SMuFL guidance, don't use staff6Lines glyph)
   for (let s = 0; s < TAB_STAFF_LINES; s++) {
-    const lineY = staffTop + s;
+    const lineY = staffTop + s * TAB_STRING_SPACING_SP;
     primitives.push({
       kind: 'line',
       x1: x, y1: lineY, x2: x + width, y2: lineY,
@@ -261,7 +284,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
           if (drawnFrets.has(fretSlot)) continue;
           drawnFrets.add(fretSlot);
 
-          const stringY = staffTop + (pos.str - 1);
+          const stringY = staffTop + (pos.str - 1) * TAB_STRING_SPACING_SP;
           const fretStr = String(pos.fret);
           const charWidthSp = FRET_FONT_SIZE_SP * 0.6 * Math.max(1, fretStr.length);
 

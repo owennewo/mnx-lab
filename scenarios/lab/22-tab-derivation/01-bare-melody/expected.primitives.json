@@ -171,7 +171,7 @@
   },
   "tab": {
     "widthSp": 80,
-    "heightSp": 17,
+    "heightSp": 17.7143,
     "primitives": [
       {
         "kind": "line",
@@ -185,45 +185,45 @@
       {
         "kind": "line",
         "x1": 2,
-        "y1": 7,
+        "y1": 7.1429,
         "x2": 37.4,
-        "y2": 7,
+        "y2": 7.1429,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 8,
+        "y1": 8.2857,
         "x2": 37.4,
-        "y2": 8,
+        "y2": 8.2857,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 9,
+        "y1": 9.4286,
         "x2": 37.4,
-        "y2": 9,
+        "y2": 9.4286,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 10,
+        "y1": 10.5714,
         "x2": 37.4,
-        "y2": 10,
+        "y2": 10.5714,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 11,
+        "y1": 11.7143,
         "x2": 37.4,
-        "y2": 11,
+        "y2": 11.7143,
         "thickness": 0.1,
         "className": "staff-line"
       },
@@ -232,7 +232,7 @@
         "x1": 2,
         "y1": 6,
         "x2": 2,
-        "y2": 11,
+        "y2": 11.7143,
         "thickness": 0.1,
         "className": "barline barline-start"
       },
@@ -240,14 +240,14 @@
         "kind": "glyph",
         "glyph": "6stringTabClef",
         "x": 3.1,
-        "y": 8.5,
+        "y": 8.8571,
         "className": "tab-clef"
       },
       {
         "kind": "glyph",
         "glyph": "timeSig4",
         "x": 7.35,
-        "y": 7.25,
+        "y": 7.4286,
         "anchor": "middle",
         "className": "time-sig-num"
       },
@@ -255,14 +255,14 @@
         "kind": "glyph",
         "glyph": "timeSig4",
         "x": 7.35,
-        "y": 9.75,
+        "y": 10.2857,
         "anchor": "middle",
         "className": "time-sig-den"
       },
       {
         "kind": "rect",
         "x": 11.77,
-        "y": 9.5,
+        "y": 10.0714,
         "w": 0.66,
         "h": 1,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
@@ -273,7 +273,7 @@
         "kind": "text",
         "text": "3",
         "x": 12.1,
-        "y": 10,
+        "y": 10.5714,
         "font": "body",
         "size": 1.1,
         "anchor": "middle",
@@ -285,7 +285,7 @@
       {
         "kind": "rect",
         "x": 18.77,
-        "y": 8.5,
+        "y": 8.9286,
         "w": 0.66,
         "h": 1,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
@@ -296,7 +296,7 @@
         "kind": "text",
         "text": "0",
         "x": 19.1,
-        "y": 9,
+        "y": 9.4286,
         "font": "body",
         "size": 1.1,
         "anchor": "middle",
@@ -308,7 +308,7 @@
       {
         "kind": "rect",
         "x": 25.77,
-        "y": 8.5,
+        "y": 8.9286,
         "w": 0.66,
         "h": 1,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
@@ -319,7 +319,7 @@
         "kind": "text",
         "text": "2",
         "x": 26.1,
-        "y": 9,
+        "y": 9.4286,
         "font": "body",
         "size": 1.1,
         "anchor": "middle",
@@ -331,7 +331,7 @@
       {
         "kind": "rect",
         "x": 32.77,
-        "y": 8.5,
+        "y": 8.9286,
         "w": 0.66,
         "h": 1,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
@@ -342,7 +342,7 @@
         "kind": "text",
         "text": "3",
         "x": 33.1,
-        "y": 9,
+        "y": 9.4286,
         "font": "body",
         "size": 1.1,
         "anchor": "middle",
@@ -356,7 +356,7 @@
         "x1": 36.7,
         "y1": 6,
         "x2": 36.7,
-        "y2": 11,
+        "y2": 11.7143,
         "thickness": 0.1,
         "className": "barline barline-final-thin"
       },
@@ -365,7 +365,7 @@
         "x": 37,
         "y": 6,
         "w": 0.4,
-        "h": 5,
+        "h": 5.7143,
         "fill": "currentColor",
         "className": "barline barline-final-thick"
       }

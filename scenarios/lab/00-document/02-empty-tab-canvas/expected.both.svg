@@ -1,18 +1,18 @@
-<svg width="1280" height="496" viewBox="0 0 1280 496" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="507.4288" viewBox="0 0 1280 507.4288" xmlns="http://www.w3.org/2000/svg">
 <line x1="32" y1="128" x2="206.4" y2="128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="144" x2="206.4" y2="144" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="160" x2="206.4" y2="160" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="176" x2="206.4" y2="176" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="192" x2="206.4" y2="192" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="128" x2="32" y2="368" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
+<line x1="32" y1="128" x2="32" y2="379.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
 <text x="49.6" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
 <line x1="32" y1="288" x2="206.4" y2="288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="304" x2="206.4" y2="304" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="320" x2="206.4" y2="320" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="336" x2="206.4" y2="336" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="352" x2="206.4" y2="352" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="368" x2="206.4" y2="368" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<text x="49.6" y="328" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
-<line x1="193.6" y1="128" x2="193.6" y2="368" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="198.4" y="128" width="8" height="240" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="32" y1="306.2864" x2="206.4" y2="306.2864" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="324.5712" x2="206.4" y2="324.5712" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="342.8576" x2="206.4" y2="342.8576" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="361.1424" x2="206.4" y2="361.1424" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="379.4288" x2="206.4" y2="379.4288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<text x="49.6" y="333.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
+<line x1="193.6" y1="128" x2="193.6" y2="379.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="198.4" y="128" width="8" height="251.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

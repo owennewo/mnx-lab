@@ -1,10 +1,10 @@
-<svg width="1280" height="496" viewBox="0 0 1280 496" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="507.4288" viewBox="0 0 1280 507.4288" xmlns="http://www.w3.org/2000/svg">
 <line x1="32" y1="128" x2="616.8" y2="128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="144" x2="616.8" y2="144" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="160" x2="616.8" y2="160" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="176" x2="616.8" y2="176" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="192" x2="616.8" y2="192" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="128" x2="32" y2="368" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
+<line x1="32" y1="128" x2="32" y2="379.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
 <text x="49.6" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
 <text x="117.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="117.6" y="176" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
@@ -24,28 +24,28 @@
 <text x="538.56" y="184" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
 <line x1="557.44" y1="128" x2="557.44" y2="181.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="32" y1="288" x2="616.8" y2="288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="304" x2="616.8" y2="304" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="320" x2="616.8" y2="320" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="336" x2="616.8" y2="336" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="352" x2="616.8" y2="352" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="368" x2="616.8" y2="368" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="306.2864" x2="616.8" y2="306.2864" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="324.5712" x2="616.8" y2="324.5712" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="342.8576" x2="616.8" y2="342.8576" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="361.1424" x2="616.8" y2="361.1424" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="379.4288" x2="616.8" y2="379.4288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <text x="26.4" y="288" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">E</text>
-<text x="26.4" y="304" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">B</text>
-<text x="26.4" y="320" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">G</text>
-<text x="26.4" y="336" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">D</text>
-<text x="26.4" y="352" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">A</text>
-<text x="26.4" y="368" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">D</text>
-<text x="49.6" y="328" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
-<text x="117.6" y="308" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
-<text x="117.6" y="348" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<rect x="188.32" y="360" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
-<text x="193.6" y="368" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e0.n0">0</text>
-<rect x="300.32" y="344" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
-<text x="305.6" y="352" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
-<rect x="412.32" y="328" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
-<text x="417.6" y="336" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e2.n0">0</text>
-<rect x="542.72" y="328" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
-<text x="548" y="336" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e3.n0">4</text>
-<line x1="604" y1="128" x2="604" y2="368" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="608.8" y="128" width="8" height="240" fill="currentColor" class="barline barline-final-thick"></rect>
+<text x="26.4" y="306.2864" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">B</text>
+<text x="26.4" y="324.5712" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">G</text>
+<text x="26.4" y="342.8576" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">D</text>
+<text x="26.4" y="361.1424" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">A</text>
+<text x="26.4" y="379.4288" font-family="var(--font-family-sans)" font-size="13.6" text-anchor="end" dominant-baseline="central" fill="currentColor" class="tab-tuning-letter">D</text>
+<text x="49.6" y="333.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
+<text x="117.6" y="310.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
+<text x="117.6" y="356.5712" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
+<rect x="188.32" y="371.4288" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
+<text x="193.6" y="379.4288" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e0.n0">0</text>
+<rect x="300.32" y="353.1424" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
+<text x="305.6" y="361.1424" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
+<rect x="412.32" y="334.8576" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
+<text x="417.6" y="342.8576" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e2.n0">0</text>
+<rect x="542.72" y="334.8576" width="10.56" height="16" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
+<text x="548" y="342.8576" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="600" class="fret-number" data-source-id="@m0.v0.e3.n0">4</text>
+<line x1="604" y1="128" x2="604" y2="379.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="608.8" y="128" width="8" height="251.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>
