@@ -168,20 +168,28 @@ proposals that name their campaign.
   else** — so tray clicks land in the op queue and replay through traces like keystrokes. A
   command registry in `src/edit/` (testable below the harness boundary) whose rows are the
   *surface half* of [campaign](inprogress/core-campaign-element-ops.md) agreement blocks:
-  id, rungs, glyph, key/tier, `isActive`, `toIntent` — `toIntent: null` renders greyed, so
-  the greyed tiles *are* the campaign's remaining index, visible in the product. Joins both
-  ways (stroke ⇒ keymap + `KEY_DOCS` at every claimed rung; ops panel gains `tray`
-  provenance). Scope preview/commit via `SelectionContext.preview` + a dashed enclosure and
-  the HUD's shared level-walk; Ctrl+K → tray / Ctrl+Shift+K → global palette; **Escape
-  precedence stated once** in the keymap layer, answering the ladder's open question.
+  id, rungs, glyph, key/tier, `isActive`, `toIntent`. Drafted against a 15-op vocabulary;
+  the campaign's 2026-08-14/15 sweep inverted the emphasis and strengthened the case —
+  the verbs now exist and their only human surface is typed popover grammars
+  (Shift+C/K/B/A/L/P/T/U), so the tray's day-one job is fronting a nearly complete
+  vocabulary with glyphs, states and discoverable keys; `toIntent: null` (greyed) is the
+  residue's short tail, not the index it once was. Joins both ways (stroke ⇒ keymap +
+  `KEY_DOCS` at every claimed rung; ops panel gains `tray` provenance). Scope
+  preview/commit via `SelectionContext.preview` + a dashed enclosure and the HUD's shared
+  level-walk; Ctrl+K → tray / Ctrl+Shift+K → global palette; **Escape precedence stated
+  once** in the keymap layer, answering the ladder's open question.
 - **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3: the
-  **ledger of what cannot be wired yet**, each greyed tile with an address — adornments,
-  dynamics, spanners, rhythm, bar attributes, clef/key, text, voices-beyond-one map to
-  campaign items 5–13; mixed state, extension/closure, the container tab and mouse
-  selection wait on the ladder's `{level, anchor, extent}`; part transposition, mute, the
-  embed/studio tray and wide-selection shaft geometry each name their own blocker. Rows
-  retire as unblockers land (registry `blockedBy` keeps table and tiles from drifting);
-  empty table ⇒ `complete/`.
+  **ledger of what cannot be wired yet**, each greyed tile with an address. Its first
+  retirement wave predates the tray itself: the 2026-08-14/15 vocabulary sweep landed
+  adornments, spanners, technique, bar attributes, clef/key/time, lyrics, beams and part
+  declarations, so those rows are already retired into the mechanism's wired tables. What
+  remains: the vocabulary tail (respell, duration dots, the container wrap verbs, entry
+  beyond the first voice/staff, layout/score authoring, part transposition, mute); the
+  ladder's half (mixed state, extension/closure, the container tab, mouse selection —
+  all waiting on `{level, anchor, extent}` and the per-level pass, where the campaign's
+  own seven remaining `no-op` notes also point); and geometry/surface gaps (wide-selection
+  shaft, dark-page colour scheme, the embed/studio tray). Rows retire as unblockers land
+  (registry `blockedBy` keeps table and tiles from drifting); empty table ⇒ `complete/`.
 - **[core-tuplets-grace-notes.md](proposed/core-tuplets-grace-notes.md)** — tuplets and grace notes
   **across both converters and on tab**. Split out of
   [core-guitar-pro.md](complete/core-guitar-pro.md) when that closed, at its real scope: the model
