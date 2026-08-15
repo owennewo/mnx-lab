@@ -349,6 +349,19 @@ export class WorkbenchApp extends LitElement {
     // which is why they live here and not in an element-tier layer).
     if (!keyIsOurs(event, null)) return;
     const action = resolveShellAction(strokeOf(event));
+    if (action === 'selectionTray') {
+      // Ctrl+K belongs to the selection (core-selection-tray-visuals.md): a
+      // scenario page whose editor holds the keyboard claims this cancelable
+      // intent and opens the tray; unclaimed, the key falls through to the
+      // palette — so Ctrl+K still works on the queue, the coverage map, and
+      // editorless scenarios.
+      event.preventDefault();
+      const claimed = !window.dispatchEvent(
+        new CustomEvent('mnx-tray-intent', { cancelable: true })
+      );
+      if (!claimed) this.palette = 'commands';
+      return;
+    }
     if (action === 'commandPalette' || action === 'goTo') {
       event.preventDefault();
       this.palette = action === 'commandPalette' ? 'commands' : 'goto';

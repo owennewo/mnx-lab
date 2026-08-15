@@ -1,11 +1,40 @@
 # The selection command tray — the visuals
 
-> **Status: proposed 2026-08-14; touched 2026-08-15** (links to the moved
-> viewer-surface doc, the colour-scheme open item — the campaign's vocabulary
-> sweep mostly lands on parts 2–3). First of a trio: this doc (the look, complete
-> and unwired), [core-selection-tray-mechanism.md](core-selection-tray-mechanism.md)
+> **Status: COMPLETE 2026-08-15 — stages 1–4, same day as picked up.** The
+> stage-4 hands-on review landed two visual revisions, both in the component
+> only: **ink-box glyph normalization** — each tile glyph is drawn into an SVG
+> whose viewBox is the glyph's own bounding box from the font metadata
+> (`glyphBBox`, staff spaces, 1em = 4sp), scaled to a 34px target with a
+> 30px-per-staff-space ceiling, because a palette normalizes optical size
+> where a score must not (a staccato dot vs a repeat barline; Dorico's and
+> Sibelius's palettes do the same) — and **the shortcut as a corner chip**
+> (ink chip, bottom-right, inverting on active tiles) rather than a second
+> row under the glyph, with tiles at 66×64 and grid gap 7. Verified again
+> after the review in headless Chrome: all seven rungs, both variants, zero
+> console errors; 555 tests green.
+>
+> Shipped by stages 1–3: `<mnx-selection-tray>`
+> (`src/workbench/SelectionTray.ts`) with all six regions, the four tile
+> reads, the value-rows variant, the in-component keyboard model and the
+> shaft+plinth connector with flip-above and the docked fallback;
+> `trayDemo.ts` demo sets for all seven rungs; the viewer's
+> `selection-anchored` event **plus a `selectionAnchorRect()` method**, re-fired
+> on the host's own scroll so the tray follows the paper; the Ctrl+K →
+> `selectionTray` / Ctrl+Shift+K → palette split in `SHELL_BINDINGS` (the
+> shell's Ctrl+K dispatches a cancelable `mnx-tray-intent`; unclaimed, it
+> falls through to the palette — so editorless pages keep today's behavior),
+> with `KEY_DOCS` rows and the ops-panel palette label updated. Verified in
+> headless Chrome over CDP: open-on-selection with the shaft planted on the
+> enclosure, preview dot + "↵ to widen", the event scope's full glyph grid
+> incl. the slur/tie arcs, the part rows variant, demo commit and flip,
+> Escape close — zero console errors; all 542 tests green, goldens untouched.
+> Deviations from the spec's mocks, recorded: our tab row holds seven rungs,
+> not four, so tab padding is 9px (spec 13px) and the rows-variant width is
+> 400px (spec 330); Archivo is not yet bundled (system-sans fallback — the
+> open item below stands). First of a trio: this doc (the look, complete
+> and unwired), [core-selection-tray-mechanism.md](../proposed/core-selection-tray-mechanism.md)
 > (state and actions through the intent funnel), and
-> [core-selection-tray-residue.md](core-selection-tray-residue.md) (what cannot be
+> [core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md) (what cannot be
 > wired yet, and what unblocks each row).
 >
 > **Design provenance.** The visual spec is a Claude Design project —
@@ -19,8 +48,8 @@
 > Siblings: [core-selection-ladder.md](../inprogress/core-selection-ladder.md) (the
 > rungs the tabs are), [core-campaign-element-ops.md](../inprogress/core-campaign-element-ops.md)
 > (the verbs the tiles will fire),
-> [core-editor-focus-scope.md](core-editor-focus-scope.md) (who owns the keystroke
-> while the tray is open), [core-editor-element-promotion.md](core-editor-element-promotion.md)
+> [core-editor-focus-scope.md](../proposed/core-editor-focus-scope.md) (who owns the keystroke
+> while the tray is open), [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md)
 > (why it incubates in `workbench/`),
 > [core-viewer-surface.md](../inprogress/core-viewer-surface.md) (the one
 > element-surface addition it needs — that contract is now real, stages 1–5
@@ -63,7 +92,7 @@ the real axis: the selection ladder (`src/edit/selection.ts`), and the tray's ta
 Absent rungs (no sections declared, an empty measure with no note rung) render no
 tab — the presence rule the ladder already computes; the tray never shows a tab the
 ladder would skip. The `container` rung joins the row when the ladder grows it
-(recorded in [core-selection-tray-residue.md](core-selection-tray-residue.md)).
+(recorded in [core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md)).
 
 The tray opens on the tab matching the current selection level. Moving to another
 tab is a **preview** — the tab highlights, a red dot marks the tab still holding the
@@ -116,7 +145,7 @@ apologizes for the codebase.
 
 ## Keyboard, inside the component
 
-Scope-4 region rules ([core-editor-focus-scope.md](core-editor-focus-scope.md)):
+Scope-4 region rules ([core-editor-focus-scope.md](../proposed/core-editor-focus-scope.md)):
 while the tray is open it owns the keys it names and nothing else.
 
 - `↑ ↓` — move between scope tabs (preview only).
@@ -131,7 +160,7 @@ while the tray is open it owns the keys it names and nothing else.
 `<mnx-selection-tray>`, incubating at `src/workbench/SelectionTray.ts` with the
 ScoreHud posture stated in its header: deliberately dumb, speaking a **neutral data
 contract** — no `edit/` types in its props — so the eventual promotion to
-`elements/` ([core-editor-element-promotion.md](core-editor-element-promotion.md),
+`elements/` ([core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md),
 parked on studio) is a move, not a rewrite.
 
 Properties (down):

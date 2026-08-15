@@ -460,11 +460,13 @@ export class ScoreViewer extends LitElement {
     // or its own order — so an author-set value is never clobbered.
     if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0');
     window.addEventListener('resize', this.resizeHandler);
+    this.addEventListener('scroll', this.onAnchorScroll);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener('resize', this.resizeHandler);
+    this.removeEventListener('scroll', this.onAnchorScroll);
   }
 
   updated(changed: Map<string | number | symbol, unknown>) {
@@ -604,7 +606,43 @@ export class ScoreViewer extends LitElement {
     if (JSON.stringify(failures) !== JSON.stringify(this.renderErrors)) {
       this.renderErrors = failures;
     }
+
+    this.emitSelectionAnchor();
   }
+
+  /** The selection's on-screen box: the enclosure overlay's bounding rect in
+   *  viewport coordinates, or null while nothing is enclosed. The overlay is
+   *  drawn from the finished SVG (enclosure.ts), so this is presentation
+   *  geometry only — no editor vocabulary crosses the boundary
+   *  (roadmap/inprogress/core-selection-tray-visuals.md). */
+  selectionAnchorRect(): DOMRect | null {
+    const enclosure = this.container?.querySelector('svg .enclosure');
+    return enclosure ? enclosure.getBoundingClientRect() : null;
+  }
+
+  /** `selection-anchored`: fired after each render, and on the host's own
+   *  scroll (the paper scrolls inside the host), so chrome planted on the
+   *  selection — the command tray's shaft — can follow it. */
+  private emitSelectionAnchor() {
+    this.dispatchEvent(
+      new CustomEvent('selection-anchored', {
+        detail: { rect: this.selectionAnchorRect() },
+        bubbles: true,
+        composed: true
+      })
+    );
+  }
+
+  private anchorScrollQueued = false;
+
+  private onAnchorScroll = () => {
+    if (this.anchorScrollQueued) return;
+    this.anchorScrollQueued = true;
+    requestAnimationFrame(() => {
+      this.anchorScrollQueued = false;
+      this.emitSelectionAnchor();
+    });
+  };
 
   /**
    * The precedence chain, resolved (docs/core-viewer-surface.md):

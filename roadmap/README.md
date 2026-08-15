@@ -151,18 +151,6 @@ proposals that name their campaign.
   element contract under [core-viewer-surface.md](inprogress/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
   [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
-- **[core-selection-tray-visuals.md](proposed/core-selection-tray-visuals.md)** — the **selection
-  command tray**, part 1 of 3: Ctrl+K stops opening a document-wide list and opens a tray
-  **planted under the selection** — scope tabs that are the ladder's rungs (not the design's
-  four; presence-rule filtered, HUD vocabulary), a Bravura glyph grid with shortcut and
-  current state on every tile, shaft+plinth connector, hover readout, scoped search — built
-  whole on demo data, firing nothing, so look and feel get a hands-on review before any
-  wiring. From a Claude Design spec ("SPEC · v1"), shipped **faithful to its art direction**
-  (Archivo / `#ec3013` / zero radius, deliberately apart from current chrome — the leading
-  edge of a possible restyle, which would be its own proposal). Incubates as a dumb
-  `<mnx-selection-tray>` in `workbench/` (ScoreHud posture); the one `elements/` change is a
-  `selection-anchored` rect event on the viewer, satisfying
-  [core-viewer-surface.md](inprogress/core-viewer-surface.md)'s layering.
 - **[core-selection-tray-mechanism.md](proposed/core-selection-tray-mechanism.md)** — part 2:
   the tray wired. One ruling — tiles fire **intents through `session.handleIntent`, nothing
   else** — so tray clicks land in the op queue and replay through traces like keystrokes. A
@@ -493,6 +481,22 @@ proposals that name their campaign.
   container rungs.
 
 ### complete/
+- **[core-selection-tray-visuals.md](complete/core-selection-tray-visuals.md)** — the **selection
+  command tray**, part 1 of 3, **complete 2026-08-15** (stages 1–4 in one day): Ctrl+K stops
+  opening a document-wide list and opens a tray **planted under the selection** — scope tabs
+  that are the ladder's rungs (presence-rule filtered, HUD vocabulary), a Bravura glyph grid
+  with shortcut and state per tile, shaft+plinth connector, hover readout, scoped search —
+  on demo data, firing nothing, per the visuals/mechanism split. Faithful to the Claude
+  Design spec's art direction (Archivo / `#ec3013` / zero radius); a dumb
+  `<mnx-selection-tray>` incubating in `workbench/` (ScoreHud posture); the one `elements/`
+  change is the viewer's `selection-anchored` rect event + `selectionAnchorRect()` method;
+  Ctrl+K → tray / Ctrl+Shift+K → palette via a cancelable `mnx-tray-intent` that falls
+  through on editorless pages. The stage-4 UX review revised two things, both in the
+  component: **ink-box glyph normalization** (each glyph drawn into its own font-metadata
+  bounding box, 34px target with a 30px/sp ceiling — a palette normalizes optical size
+  where a score must not) and **the shortcut as a corner chip** on 66×64 tiles. Parts 2–3
+  ([mechanism](proposed/core-selection-tray-mechanism.md),
+  [residue](proposed/core-selection-tray-residue.md)) stay in `proposed/`.
 - **[core-element-ops-exemplar.md](complete/core-element-ops-exemplar.md)** — campaign
   item 1 of [core-campaign-element-ops.md](inprogress/core-campaign-element-ops.md):
   **the forward/reverse harness algorithm proven small** over `minimal-single-note`

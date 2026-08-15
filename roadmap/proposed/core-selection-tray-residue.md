@@ -5,7 +5,7 @@
 > [core-campaign-element-ops.md](../inprogress/core-campaign-element-ops.md) all
 > built on 2026-08-14/15, so the ledger's **first retirement wave predates the
 > tray itself** (recorded below). Third of the trio behind
-> [core-selection-tray-visuals.md](core-selection-tray-visuals.md) and
+> [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) and
 > [core-selection-tray-mechanism.md](core-selection-tray-mechanism.md):
 > everything the design draws or implies that **cannot be hooked up yet**, each
 > row naming what unblocks it and where that work is tracked. Nothing in this

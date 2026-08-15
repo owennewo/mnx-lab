@@ -3,7 +3,7 @@
 > **Status: proposed 2026-08-14; revised 2026-08-15** after the campaign's
 > vocabulary sweep (items 5, 7–13 built 2026-08-14/15 — ops 15 → ~60, "every
 > kind now has its verb"). Second of the trio — builds on
-> [core-selection-tray-visuals.md](core-selection-tray-visuals.md) (the component
+> [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) (the component
 > and its neutral contract) and hands everything it cannot wire to
 > [core-selection-tray-residue.md](core-selection-tray-residue.md).
 >

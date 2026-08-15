@@ -51,7 +51,16 @@ import {
 } from '../edit/setupGrammar.ts';
 import { buildOpRow } from './opRows.ts';
 import { editorHasKeyboard, keyIsOurs } from './keyScope.ts';
+import { TRAY_DEMO } from './trayDemo.ts';
+import type {
+  TrayAnchor,
+  TrayMeta,
+  TrayRow,
+  TrayTab,
+  TrayTile
+} from './SelectionTray.ts';
 import '../elements/ScoreViewer.ts';
+import './SelectionTray.ts';
 
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
@@ -209,6 +218,21 @@ export class ScenarioPage extends LitElement {
   /** The side panel's active tab; falls back when the tab isn't available
    *  (hud/actions need a session). */
   @state() private panelTab: PanelTab = 'hud';
+
+  // ── The selection command tray (core-selection-tray-visuals.md), at its
+  // VISUALS stage: real tabs and anchor from the session/viewer, DEMO tiles
+  // from trayDemo.ts, and no intents fired — tab commits and tile flips are
+  // page-local so the look and keyboard model can be reviewed before wiring.
+  @state() private trayOpen = false;
+  /** Previewed tab (row key), or null = the tab holding the selection. */
+  @state() private trayTab: string | null = null;
+  /** Demo-committed base tab — the visuals stand-in for a real scope commit. */
+  @state() private trayBase: string | null = null;
+  /** The selection's box in `.main` coordinates, from `selection-anchored`. */
+  @state() private trayAnchor: TrayAnchor | null = null;
+  /** Demo flip state: `${tab}:${tile}` toggled active by a fired tile. */
+  @state() private trayFlips = new Set<string>();
+  @state() private traySearch = '';
 
   /** Side panel width in px — the drag bar on its left edge adjusts it. */
   @state() private panelWidth = storedPanelWidth();
@@ -464,6 +488,9 @@ export class ScenarioPage extends LitElement {
       .main {
         overflow: hidden;
         min-width: 0;
+        /* The selection tray overlays the score and positions against this
+           box (core-selection-tray-visuals.md). */
+        position: relative;
       }
 
       .panel {
@@ -783,6 +810,10 @@ export class ScenarioPage extends LitElement {
       this.setupPopover = null;
       this.setupPopoverError = '';
       this.cursorHidden = false;
+      this.trayOpen = false;
+      this.trayTab = null;
+      this.trayBase = null;
+      this.trayAnchor = null;
       // Overrides are per-part by INDEX, so carrying them to a different
       // document would misapply them.
       this.partSetups = new Map();
@@ -795,6 +826,7 @@ export class ScenarioPage extends LitElement {
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.addEventListener('mnx-palette-action', this.onPaletteAction);
+    window.addEventListener('mnx-tray-intent', this.onTrayIntent);
     // Keyboard-ownership tracking re-reads `document.activeElement`, which is
     // always accurate; the only question is WHEN. Focus events are the
     // obvious trigger but are not dependable everywhere (headless Chrome
@@ -814,6 +846,7 @@ export class ScenarioPage extends LitElement {
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.removeEventListener('mnx-palette-action', this.onPaletteAction);
+    window.removeEventListener('mnx-tray-intent', this.onTrayIntent);
     window.removeEventListener('focusin', this.onFocusChange);
     window.removeEventListener('focusout', this.onFocusChange);
     window.removeEventListener('focus', this.onFocusChange, true);
@@ -972,6 +1005,133 @@ export class ScenarioPage extends LitElement {
     else if (action === 'revert') this.revertEdits();
     else this.openPopover(action as ShellAction);
   };
+
+  // ── The selection command tray's mount ─────────────────────────────────────
+
+  /** The shell's cancelable Ctrl+K intent: claim it while an editor session
+   *  holds the keyboard; unclaimed, the shell opens the palette instead. */
+  private onTrayIntent = (event: Event) => {
+    if (!this.session || !this.hasKeyboard || this.loadState !== 'ready') return;
+    event.preventDefault();
+    this.trayOpen = true;
+    this.trayTab = null;
+    this.trayBase = null;
+    this.trayFlips = new Set();
+    this.traySearch = '';
+  };
+
+  /** The viewer's enclosure rect (viewport coords) → `.main` coords. */
+  private onSelectionAnchored = (event: Event) => {
+    const rect = (event as CustomEvent<{ rect: DOMRect | null }>).detail.rect;
+    const main = this.renderRoot.querySelector('.main');
+    if (!rect || !main) {
+      this.trayAnchor = null;
+      return;
+    }
+    const box = main.getBoundingClientRect();
+    this.trayAnchor = {
+      x: rect.left - box.left,
+      y: rect.top - box.top,
+      width: rect.width,
+      height: rect.height
+    };
+  };
+
+  private closeTray() {
+    this.trayOpen = false;
+    // The keyboard goes back to the editor, not into the void.
+    this.renderRoot.querySelector<HTMLElement>('mnx-score-viewer')?.focus();
+  }
+
+  /** The tray's view model — VISUALS STAGE: tabs, meta and anchor are real
+   *  (the HUD's rows, presence rule included, reversed into ladder order);
+   *  tiles are trayDemo.ts placeholders with page-local flip state, and a
+   *  scope commit merely adopts the previewed tab. The mechanism replaces
+   *  every piece of this with the command registry. */
+  private trayView(entry: ScenarioEntry): {
+    tabs: TrayTab[];
+    meta: TrayMeta | null;
+    tiles: TrayTile[];
+    rows: TrayRow[];
+  } | null {
+    if (!this.session) return null;
+    const hudRows = buildHudRows(entry.meta.title, this.session, this.cursorHidden);
+    const ladder = [...hudRows].reverse(); // note first, score last
+    if (ladder.length === 0) return null;
+    const baseKey =
+      this.trayBase ?? hudRows.find(r => r.active)?.key ?? ladder[0].key;
+    const known = (key: string | null) => ladder.some(r => r.key === key);
+    const displayKey = known(this.trayTab) ? this.trayTab! : known(baseKey) ? baseKey : ladder[0].key;
+
+    const tabs: TrayTab[] = ladder.map(r => ({
+      key: r.key,
+      label: r.label,
+      active: r.key === displayKey,
+      holdsSelection: r.key === baseKey
+    }));
+
+    const demo = TRAY_DEMO[displayKey] ?? {};
+    const flip = (tile: TrayTile): TrayTile =>
+      this.trayFlips.has(`${displayKey}:${tile.id}`)
+        ? { ...tile, state: tile.state === 'active' ? 'available' : 'active' }
+        : tile;
+    const q = this.traySearch.trim().toLowerCase();
+    const tiles = (demo.tiles ?? [])
+      .map(flip)
+      .filter(tile => !q || tile.label.toLowerCase().includes(q));
+    const rows = (demo.rows ?? []).filter(row => !q || row.label.toLowerCase().includes(q));
+
+    const displayRow = ladder.find(r => r.key === displayKey);
+    const count = rows.length > 0 ? rows.length : tiles.length;
+    const meta: TrayMeta | null = displayRow
+      ? {
+          primary: displayRow.label,
+          secondary: displayRow.value,
+          count: `${count} command${count === 1 ? '' : 's'} · demo`
+        }
+      : null;
+
+    return { tabs, meta, tiles, rows };
+  }
+
+  private trayOverlay(entry: ScenarioEntry) {
+    const view = this.trayView(entry);
+    if (!view) return nothing;
+    return html`
+      <mnx-selection-tray
+        .tabs=${view.tabs}
+        .meta=${view.meta}
+        .tiles=${view.tiles}
+        .rows=${view.rows}
+        .anchor=${this.trayAnchor}
+        .searchText=${this.traySearch}
+        @tray-tab-preview=${(e: CustomEvent<{ key: string }>) => {
+          this.trayTab = e.detail.key;
+        }}
+        @tray-tab-commit=${(e: CustomEvent<{ key: string }>) => {
+          // Visuals stage: adopting the preview stands in for the real
+          // relax/tighten walk the mechanism will record.
+          this.trayBase = e.detail.key;
+          this.trayTab = null;
+        }}
+        @tray-command=${(e: CustomEvent<{ id: string }>) => {
+          // Visuals stage: the tile flips in place (the spec's stays-open
+          // behavior); no intent is fired.
+          const view2 = this.trayView(entry);
+          const active = view2?.tabs.find(t => t.active)?.key ?? 'note';
+          const key = `${active}:${e.detail.id}`;
+          const flips = new Set(this.trayFlips);
+          if (flips.has(key)) flips.delete(key);
+          else flips.add(key);
+          this.trayFlips = flips;
+        }}
+        @tray-search=${(e: CustomEvent<{ text: string }>) => {
+          this.traySearch = e.detail.text;
+        }}
+        @tray-close=${() => this.closeTray()}
+      ></mnx-selection-tray>
+    `;
+  }
 
   updated() {
     if (this.setupPopover) {
@@ -1288,6 +1448,7 @@ export class ScenarioPage extends LitElement {
         .partTabSetups=${this.partTabSetups()}
         .selection=${this.selection}
         .selectionInactive=${!this.hasKeyboard}
+        @selection-anchored=${this.onSelectionAnchored}
       ></mnx-score-viewer>
     `;
   }
@@ -1355,7 +1516,10 @@ export class ScenarioPage extends LitElement {
         </div>
       </div>
       <div class="body" style="grid-template-columns: 1fr ${this.panelWidth}px">
-        <div class="main">${this.viewer(entry, view)}</div>
+        <div class="main">
+          ${this.viewer(entry, view)}
+          ${this.trayOpen && this.session ? this.trayOverlay(entry) : nothing}
+        </div>
         ${this.sidePanel(entry)}
       </div>
     `;
