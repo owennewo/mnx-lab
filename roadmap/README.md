@@ -290,6 +290,19 @@ proposals that name their campaign.
   scenarios **71 → 78**, removable elements **1003 → 1022**, goldens untouched
   (drawing remains [core-guitar-technique.md](proposed/core-guitar-technique.md)'s
   gap).
+- **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
+  `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
+  (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
+  **place** and a layout is a **tree** — system → group → staff sources, nothing at an
+  onset, so the ladder cannot reach it. The asymmetry is the evidence: removal already
+  works by index, because deletion needs identity and construction needs somewhere to
+  stand. Opens with the addressing question (a ladder rung, a text form, or a panel);
+  blocks six scenarios, all of which render and verify today.
+- **[core-percussion-kit.md](proposed/core-percussion-kit.md)** — the `kit-component`,
+  `kit-note` and `sound` kinds, handed over alongside it. A kit part has no pitch axis
+  (the vertical axis is a component NAME the document declares, so there is nothing to
+  derive — the no-instrument-assumed rule one level up) and a component is referenced
+  rather than placed, so the verb order is fixed by the reference. One scenario.
 - **[core-element-ops-accidental-spelling.md](inprogress/core-element-ops-accidental-spelling.md)** —
   campaign item 6, **built 2026-08-15**: the row was **two questions wearing one name**.
   SPELLING is a policy — `spellPitch` in `staffSpace.ts`, where the key context already

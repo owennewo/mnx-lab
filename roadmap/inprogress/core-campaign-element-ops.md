@@ -104,9 +104,13 @@ agreed or candidate claims; **bold** = agreed.
 | 13 | [part declarations](core-element-ops-part-declarations.md) | **Split at build time**: the five keys on `parts[0]` (name, strings, capo, staffKind, staves) get the removal halves their genesis verbs never had, plus constructors for capo and staves. | 2 (reachable 68 → 71); 91 elements | **Shift+P** popover (`capo 3`, `no strings`) | **score** | **built 2026-08-14** |
 | 13b | [part addressing](core-element-ops-part-addressing.md) **(built)**; entry + staff 2 open | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-codes `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changes note keys — which the primitives goldens embed. A corpus re-verification event, not a refactor. The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
 
-Beyond the campaign (recorded, not indexed): layout documents (`spec/orchestral-layout`
-et al are layout-only, zero measures — a different surface, not keys), percussion kit,
-transposition, harmonies rendering ([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
+Beyond the campaign, and now **formally handed over with owners** (2026-08-15):
+layout documents and multimeasure rests →
+[core-layout-authoring.md](../proposed/core-layout-authoring.md); the percussion kit →
+[core-percussion-kit.md](../proposed/core-percussion-kit.md). Their six kinds carry
+`deferredTo` in `construct-coverage.json`, and a test refuses any verbless kind that
+names no owner. Still recorded, not indexed: transposition, harmonies rendering
+([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
 
 ## Progress + learnings
 
@@ -790,3 +794,28 @@ Two more, both re-confirmations the campaign can now state as habits:
   `chord-stack-fret` ends in a downward transpose that used to spell A♯ and now
   spells B♭; the trace was pinning the placeholder. Regenerate, and say in the
   commit which note moved and why.
+
+### 2026-08-15 — the two scoping decisions, and what "done" now means
+
+The campaign had two unanswered questions about its own edges, and both are
+settled in `harness/reports/construct-coverage.json` rather than in prose.
+
+**The trace bar is KIND coverage.** Tracing all 89 reachable scenarios is 1,276
+elements of recorded performance; the claim worth making is the symmetric one
+to the destruct sweep — every kind with a verb, built once, from `{}`, through
+the keyboard. 38 kinds have a verb, 9 are covered, and the report now computes
+the queue that finishes it: **21 traces, 212 elements**, ordered by kinds gained
+per element so the work list prefers small documents. Reported while it drains;
+an assertion when it empties. That is this campaign's closing condition.
+
+**The six verbless kinds now name an owner** rather than being reclassified.
+`expected-unreachable` means "the ops must never author this", and layout
+documents are valid — a scope decision must not change what the harness asserts
+about the schema. So `blocked` keeps its meaning and the row gains `deferredTo`,
+with two tests: an owner doc must exist on disk, and nothing may be blocked
+without one.
+
+The learning behind both: **when a campaign wants to declare an edge, put the
+edge in the artifact both harnesses already read.** Prose in a roadmap doc ages
+into the "capo is unwritable" problem (item 4); a field in the report is checked
+on every run.

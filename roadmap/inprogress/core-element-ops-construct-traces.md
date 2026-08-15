@@ -85,6 +85,69 @@ that lands a construct verb shows up as scenarios moving `blocked` →
 `ops-reachable`, and its traces as `ops-reachable` → `traced`. No new verdict
 machinery: item 1's four assertions per trace are unchanged.
 
+### 5. The bar is KIND coverage, not scenario coverage (decided 2026-08-15)
+
+The item shipped without saying how much tracing the campaign owes, and the
+number turned out to matter: 89 scenarios are ops-reachable and untraced, at a
+median of 11 elements and **1,276 elements in total**. Existing traces run
+11–52 intents, so "trace everything" is roughly 2,500–3,000 recorded intents —
+a project, and precisely the front-loaded authoring push this item's scope
+boundary already refused.
+
+**The bar is the symmetric claim to item 2's.** The destruct sweep proves every
+kind is *removable*, across the whole corpus. The construct side proves every
+kind with a verb has been *built* at least once, from `{}`, through the
+keyboard. `ELEMENT_KINDS` is already the shared denominator for both
+directions, so the bar uses the same table rather than inventing a second
+scoreboard.
+
+It costs a sixth of the alternative. `traceCoverage` in the report computes it,
+and the **queue** with it: a greedy cover weighted by *kinds gained per
+element*, so the work list prefers small documents — **21 traces, 212
+elements**, ordered, ties broken by id so the list is stable across runs.
+Today: **38 kinds with a verb, 9 covered by the five existing traces, 29 to
+go.**
+
+Why per element and not per kind gained: a trace's cost is roughly its element
+count, and `spec/tie-targets` buys five kinds at 35 elements while five small
+scenarios buy the same five at 40 between them — but each is a shorter, more
+readable performance, and a trace nobody can read is a fixture, not evidence.
+
+The bar is **reported, not asserted**, while the queue drains: a hard assertion
+today would redden the build for work nobody has done. The committed numbers
+move only through `npm run sweep:construct`, so a verb landing without a trace
+appears as a deliberate diff. **When `uncovered` empties, it becomes an
+assertion** — that is the campaign's closing condition for this item.
+
+What it buys is also a better sentence than a percentage: *every verb this
+campaign built has been driven from an empty document to a human-verified
+scenario* beats *23% of scenarios traced*.
+
+### 6. Kinds this campaign will not build name an OWNER (decided 2026-08-15)
+
+Six kinds have no construct verb and are not going to get one here: `layout`,
+`score`, `multimeasure-rest` ([core-layout-authoring.md](../proposed/core-layout-authoring.md))
+and `kit-component`, `kit-note`, `sound`
+([core-percussion-kit.md](../proposed/core-percussion-kit.md)). They block
+seven scenarios.
+
+**The tempting move is wrong.** Reclassifying them as `expected-unreachable`
+would corrupt the one class whose meaning is load-bearing: decision 3 above
+defines it as *invalid by design only* — "the ops must never be able to author
+this". A layout document is perfectly valid and ought to be constructible one
+day. Whatever the campaign decides about its own scope must not change what the
+harness asserts about the schema.
+
+So the cut is made by **naming an owner**. The tier stays `blocked` (no verb
+exists — still true), and the row gains `deferredTo`. Two new tests keep it
+honest: every deferred kind must name a roadmap doc that **exists on disk**, and
+**nothing may be blocked without an owner** — a new verbless kind arriving
+unowned fails the build rather than sitting in the report looking finished.
+
+The two decisions interlock: the bar counts kinds *with* a verb (38), and the
+deferral covers exactly the six without one. Nothing falls between them, and
+`blocked: 7 · deferred: 7` says the campaign's own debt is zero.
+
 ## Scope boundary
 
 This item ships the machinery, the report, and traces only for scenarios today's
