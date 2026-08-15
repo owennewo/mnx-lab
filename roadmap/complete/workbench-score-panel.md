@@ -76,7 +76,7 @@ pages.
   and the hash in grey; `verified` is the only filled tag in the panel. Description also
   gains a copyable id line and a small stat strip.
 - **`actions` retires.** Scope-specific commands belong to the selection tray at `/`;
-  document-level ones to the global palette at Ctrl+Shift+K. *"If a document-level action
+  document-level ones to the tray's `global` tab. *"If a document-level action
   has no home, it goes in a menu on the panel header, not a tab."* (The mock and the
   tray docs both say Ctrl+K — the tray was **rebound to `/` on 2026-08-15**, after those
   were written. Read every "Ctrl+K" in the design as "the tray key".)

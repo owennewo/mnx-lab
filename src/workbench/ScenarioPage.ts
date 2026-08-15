@@ -1523,7 +1523,6 @@ export class ScenarioPage extends LitElement {
         .tabs=${view.tabs}
         .meta=${view.meta}
         .tiles=${view.tiles}
-        .rows=${[]}
         .anchor=${this.trayAnchor}
         .searchText=${this.traySearch}
         @tray-tab-preview=${(e: CustomEvent<{ key: string }>) => {

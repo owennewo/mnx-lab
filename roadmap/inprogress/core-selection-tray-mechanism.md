@@ -18,8 +18,8 @@
 > code and no golden moved**; commit walks the ladder through the shared
 > `walkToLevel` (factored out of the HUD's row click). Escape precedence is
 > declared once as `ESCAPE_PRECEDENCE` in the keymap layer and asserted in
-> `key-scope.test.ts`, answering the ladder doc's open question. Ctrl+Shift+K
-> carries the tray's search text into the global palette.
+> `key-scope.test.ts`, answering the ladder doc's open question. A second `/`
+> in the search line widens, carrying the typed text to the `global` tab.
 >
 > Three findings. **The cheatsheet is the arbiter of rungs**: a join asserting
 > that no command offers a rung where its key is documented inert caught the
@@ -51,7 +51,7 @@
 > `Selection Palette.dc.html`) turns out to be a thing the repo already half-owns:
 > a registry row — id, rungs, glyph, key, is-it-active, what-it-fires — is the
 > *surface half* of a campaign agreement block
-> ([core-campaign-element-ops.md](core-campaign-element-ops.md)).
+> ([core-campaign-element-ops.md](../complete/core-campaign-element-ops.md)).
 > This doc makes that identity literal, so the tray becomes the campaign's
 > palette-tier surface rather than a parallel command system.
 >
@@ -148,9 +148,9 @@ Key-tier tiles — the intent fires directly:
 | Tile | Fires | Rungs |
 |---|---|---|
 | tie to next | `toggleTie` (T) | note |
-| slur | `toggleSlur` (S, notation — polymorphic with slide in tab, per [item 10](core-element-ops-spanners.md)) | note→note |
-| beam | `toggleBeam` (B, notation — polymorphic with bend in tab, per [item 11](core-element-ops-rhythm-declarations.md)) | event→event |
-| tab technique: bend / hammer-pull / slide / vibrato / palm mute / harmonic | `toggleTechnique` (the reserved `B H S V X O`, tab pane — [item 9](core-element-ops-technique.md)) | note |
+| slur | `toggleSlur` (S, notation — polymorphic with slide in tab, per [item 10](../complete/core-element-ops-spanners.md)) | note→note |
+| beam | `toggleBeam` (B, notation — polymorphic with bend in tab, per [item 11](../complete/core-element-ops-rhythm-declarations.md)) | event→event |
+| tab technique: bend / hammer-pull / slide / vibrato / palm mute / harmonic | `toggleTechnique` (the reserved `B H S V X O`, tab pane — [item 9](../complete/core-element-ops-technique.md)) | note |
 | delete | `delete` (the ladder's polymorphic delete) | note → score |
 | transpose ± semitone / ± octave | `transpose` (Alt+↑↓, Alt+Shift+↑↓) | note, event |
 | shorter / longer duration | `shorterDuration` / `longerDuration` | event |
@@ -165,13 +165,13 @@ family (the tray is how these grammars become discoverable):
 
 | Tile | Opens | Rungs |
 |---|---|---|
-| time signature… | `timeSignaturePopover` (Shift+T; removal via `inherit`, [item 5](core-element-ops-clef-key.md)) | bar |
+| time signature… | `timeSignaturePopover` (Shift+T; removal via `inherit`, [item 5](../complete/core-element-ops-clef-key.md)) | bar |
 | clef… / key… | `clefPopover` / `keySignaturePopover` (Shift+C / Shift+K, item 5) | bar |
-| barline, repeats, endings, segno/coda/jump/fine, section, rehearsal, tempo… | `barAttributePopover` (Shift+B — ten kinds, [item 7](core-element-ops-bar-attributes.md)) | bar |
-| articulations, dynamics (incl. hairpins), directions… | `adornmentPopover` (Shift+A, [item 8](core-element-ops-adornments.md)) | note, event |
-| lyric… | `lyricPopover` (Shift+L, [item 12](core-element-ops-lyrics.md)) | note |
+| barline, repeats, endings, segno/coda/jump/fine, section, rehearsal, tempo… | `barAttributePopover` (Shift+B — ten kinds, [item 7](../complete/core-element-ops-bar-attributes.md)) | bar |
+| articulations, dynamics (incl. hairpins), directions… | `adornmentPopover` (Shift+A, [item 8](../complete/core-element-ops-adornments.md)) | note, event |
+| lyric… | `lyricPopover` (Shift+L, [item 12](../complete/core-element-ops-lyrics.md)) | note |
 | tuning… | `tuningPopover` (Shift+U) | part |
-| part…, capo, strings, staves | `partPopover` (Shift+P grammar, [item 13](core-element-ops-part-declarations.md)) | part, score |
+| part…, capo, strings, staves | `partPopover` (Shift+P grammar, [item 13](../complete/core-element-ops-part-declarations.md)) | part, score |
 
 A design question the sweep sharpens, owned by the visuals review: several
 design tiles (fermata, crescendo, repeat end…) are now *reachable through a
@@ -248,7 +248,7 @@ everything below the boundary is pinned:
   shapes so nothing needs redesign when it arrives.
 - **Not the AI mode.** [core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md)'s
   sentence-routing belongs to the global palette; the tray's search filters its own
-  scope and hands off via Ctrl+Shift+K (`initialQuery` carries the text across).
+  scope and widens to the `global` tab on a second `/`, carrying the text.
 
 ## Staging
 
@@ -257,7 +257,7 @@ everything below the boundary is pinned:
    ops-panel provenance label.
 3. **Preview/commit** — `SelectionContext.preview`, the dashed enclosure,
    `walkToLevel` shared with the HUD.
-4. **Keyboard** — the Ctrl+K / Ctrl+Shift+K split, scope-4 region wiring, the
+4. **Keyboard** — the `/` binding, scope-4 region wiring, the
    Escape-precedence declaration and its test.
 5. **Hands-on review** at each stage boundary, campaign-style; learnings feed the
    residue doc's rows.

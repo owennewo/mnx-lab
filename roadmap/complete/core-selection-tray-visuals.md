@@ -47,7 +47,7 @@
 > says why.
 >
 > Siblings: [core-selection-ladder.md](../inprogress/core-selection-ladder.md) (the
-> rungs the tabs are), [core-campaign-element-ops.md](../inprogress/core-campaign-element-ops.md)
+> rungs the tabs are), [core-campaign-element-ops.md](core-campaign-element-ops.md)
 > (the verbs the tiles will fire),
 > [core-editor-focus-scope.md](../proposed/core-editor-focus-scope.md) (who owns the keystroke
 > while the tray is open), [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md)
@@ -204,13 +204,27 @@ session, `/` falls through to go-to. The binding move itself
 (`SHELL_BINDINGS`) lands with this part so the demo is reachable, but everything the
 tray *fires* stays inert until the mechanism.
 
-> Shipped on **Ctrl+K**; rebound to **`/`** on 2026-08-15. Chrome owns Ctrl+K
-> (the omnibox), and since the shell deliberately never consumes keys typed
-> into text fields, it worked from the score and escaped to the browser from
-> every input. Slash costs no modifier, no browser fights it, and it is the
-> convention for "start a command". The rail filter's own `/` retired to
-> Ctrl+G, which already matched scenarios through the same `matchesQuery` and
-> reaches bars and objects besides.
+> **Two later corrections, recorded here because this doc's body describes the
+> state on the day it shipped:**
+>
+> 1. **The key.** Shipped on **Ctrl+K**; rebound to **`/`** on 2026-08-15.
+>    Chrome owns Ctrl+K (the omnibox), and since the shell deliberately never
+>    consumes keys typed into text fields, it worked from the score and escaped
+>    to the browser from every input. Slash costs no modifier, no browser
+>    fights it, and it is the convention for "start a command". The rail
+>    filter's own `/` retired to Ctrl+G, which already matched scenarios
+>    through the same `matchesQuery` and reaches bars and objects besides. Then
+>    **Ctrl+Shift+K retired too**: the global commands became the tray's own
+>    `global` tab, so a second `/` widens to it and go-to's `>` prefix is the
+>    off-editor door
+>    ([core-selection-tray-global-tab.md](../proposed/core-selection-tray-global-tab.md)).
+>    Every "Ctrl+Shift+K" below should be read as one of those two.
+> 2. **The value-rows variant** (region D's second half) was **removed
+>    2026-08-15 as dead code**. Every tab renders tiles from the command
+>    registry, and the part tab's clef/key/transpose values were never wired
+>    into rows — an untested code path pretending to be a feature. It returns
+>    with the closure that would give it real values to show (the residue
+>    ledger's "part rows as the closure's surface").
 
 ## Styling: faithful, and deliberately so
 

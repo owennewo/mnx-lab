@@ -3,7 +3,7 @@
 // ladder's rungs, a Bravura glyph grid with shortcut and state per tile, the
 // shaft+plinth connector, hover readout and scoped search.
 //
-// The component is deliberately dumb — tabs, tiles, rows and the anchor arrive
+// The component is deliberately dumb — tabs, tiles and the anchor arrive
 // as neutral view-model data, and every interaction leaves as a composed
 // CustomEvent. That is the promotion posture (the ScoreHud precedent):
 // `elements/` never imports `edit/`, so a tray that one day moves there must
@@ -59,15 +59,6 @@ export interface TrayTile {
   state: TrayTileState;
 }
 
-/** The part tab's variant: commands that carry values render as labelled rows
- *  with the current value flush right — a bare glyph cannot show a value. */
-export interface TrayRow {
-  id: string;
-  glyph: TrayGlyph;
-  label: string;
-  value: string;
-}
-
 /**
  * How large a tile glyph is drawn, in px along its longest side.
  *
@@ -99,22 +90,20 @@ export interface TrayAnchor {
 const SHAFT_H = 30;
 const PLINTH_H = 6;
 const EDGE_GAP = 8;
-// The design mocks 470/330, but its tab row held four scopes — ours holds the
-// whole ladder (seven), so the rows variant gets more room and the tab
-// padding below is a shade tighter than the spec's 13px.
+// The design mocks 470, and its tab row held four scopes where ours holds the
+// whole ladder plus `global`, so the tab padding below is a shade tighter
+// than the spec's 13px.
 const TRAY_W = 470;
-const TRAY_W_ROWS = 400;
 
 @customElement('mnx-selection-tray')
 export class SelectionTray extends LitElement {
   @property({ attribute: false }) tabs: TrayTab[] = [];
   @property({ attribute: false }) meta: TrayMeta | null = null;
   @property({ attribute: false }) tiles: TrayTile[] = [];
-  @property({ attribute: false }) rows: TrayRow[] = [];
   @property({ attribute: false }) anchor: TrayAnchor | null = null;
   @property({ type: String }) searchText = '';
 
-  /** The keyboard tile cursor — an index into the focusable tiles/rows. */
+  /** The keyboard tile cursor — an index into the focusable tiles. */
   @state() private cursorIndex = 0;
   /** The pointer's tile, when hovering; wins over the cursor in the readout. */
   @state() private hoverId: string | null = null;
@@ -379,50 +368,6 @@ export class SelectionTray extends LitElement {
       color: var(--ink-faint);
     }
 
-    /* ── D′ · value rows (the part tab) ── */
-    .vrows .vrow {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      width: 100%;
-      padding: 8px 13px;
-      border: 0;
-      border-bottom: 1px solid var(--line);
-      background: none;
-      cursor: pointer;
-      font: inherit;
-      text-align: left;
-      box-sizing: border-box;
-    }
-
-    .vrows .vrow:last-child {
-      border-bottom: 0;
-    }
-
-    .vrows .vrow:hover,
-    .vrows .vrow.cursor {
-      background: var(--row-current);
-    }
-
-    .vrow .glyph {
-      font-family: Bravura;
-      font-size: 22px;
-      line-height: 1;
-      width: 24px;
-      color: var(--ink);
-    }
-
-    .vrow .label {
-      font: 500 12.5px/1 var(--sans);
-      color: var(--ink);
-    }
-
-    .vrow .value {
-      margin-left: auto;
-      font: 500 11px/1 var(--sans);
-      color: var(--ink-3);
-    }
-
     /* ── E · hover readout ── */
     .readout {
       display: flex;
@@ -512,19 +457,16 @@ export class SelectionTray extends LitElement {
 
   // ── placement ─────────────────────────────────────────────────────────────
 
-  /** Focusable entries in display order — tiles or rows, whichever variant is
-   *  on screen. Unavailable tiles are skipped (the spec: not focusable). */
+  /** Focusable entries in display order. Unavailable tiles are skipped (the
+   *  spec: not focusable). */
   private entries(): { id: string; label: string; shortcut: string; glyph: TrayGlyph }[] {
-    if (this.rows.length > 0) {
-      return this.rows.map(r => ({ id: r.id, label: r.label, shortcut: r.value, glyph: r.glyph }));
-    }
     return this.tiles
       .filter(t => t.state !== 'unavailable')
       .map(t => ({ id: t.id, label: t.label, shortcut: t.shortcut, glyph: t.glyph }));
   }
 
   updated(changed: Map<string | number | symbol, unknown>) {
-    if (changed.has('tabs') || changed.has('tiles') || changed.has('rows')) {
+    if (changed.has('tabs') || changed.has('tiles')) {
       this.cursorIndex = Math.min(this.cursorIndex, Math.max(0, this.entries().length - 1));
     }
     this.place();
@@ -538,7 +480,7 @@ export class SelectionTray extends LitElement {
     const host = this;
     const parent = this.offsetParent as HTMLElement | null;
     if (!parent) return;
-    const width = this.rows.length > 0 ? TRAY_W_ROWS : TRAY_W;
+    const width = TRAY_W;
     host.style.setProperty('--tray-w', `${width}px`);
     const pw = parent.clientWidth;
     const ph = parent.clientHeight;
@@ -787,24 +729,7 @@ export class SelectionTray extends LitElement {
                   : nothing}
             </div>`
           : nothing}
-        ${this.rows.length > 0
-          ? html`<div class="vrows" @mouseleave=${() => (this.hoverId = null)}>
-              ${this.rows.map(
-                (row, i) => html`
-                  <button
-                    class="vrow ${entries[this.cursorIndex]?.id === row.id ? 'cursor' : ''}"
-                    @click=${() => this.emit('tray-command', { id: row.id })}
-                    @mouseenter=${() => (this.hoverId = row.id)}
-                    @focus=${() => (this.cursorIndex = i)}
-                  >
-                    ${this.glyph(row.glyph)}
-                    <span class="label">${row.label}</span>
-                    <span class="value">${row.value}</span>
-                  </button>
-                `
-              )}
-            </div>`
-          : html`<div class="grid" @mouseleave=${() => (this.hoverId = null)}>
+        ${html`<div class="grid" @mouseleave=${() => (this.hoverId = null)}>
               ${this.tiles.map(
                 tile => html`
                   <button
