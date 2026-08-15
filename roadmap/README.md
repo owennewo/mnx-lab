@@ -290,6 +290,17 @@ proposals that name their campaign.
   scenarios **71 → 78**, removable elements **1003 → 1022**, goldens untouched
   (drawing remains [core-guitar-technique.md](proposed/core-guitar-technique.md)'s
   gap).
+- **[core-element-ops-accidental-spelling.md](inprogress/core-element-ops-accidental-spelling.md)** —
+  campaign item 6, **built 2026-08-15**: the row was **two questions wearing one name**.
+  SPELLING is a policy — `spellPitch` in `staffSpace.ts`, where the key context already
+  lives: a letter the key alters wins, else the key's sign, else the DIRECTION of the
+  move (down spells flat), which is what finally makes E♭ writable after a placeholder
+  that answered "natural, then sharp" in every key. `J` cycles the policy's own
+  candidate list to overrule it, sound held fixed. DISPLAY is ink — `accidental parens`
+  joins the adornment popover rather than earning a sixth one, and writes the
+  `enclosure` the corpus has carried all along (the renderer's gap is unchanged).
+  One recorded trace changed correctly: `chord-stack-fret`'s downward transpose now
+  spells B♭ where it spelled A♯.
 - **[core-element-ops-duration-completion.md](inprogress/core-element-ops-duration-completion.md)** —
   campaign item 4, **built 2026-08-15**: the dot (`.`, cycling 0→1→2→none, splitting
   ink from absence exactly as the duration ladder does) and the time signature's

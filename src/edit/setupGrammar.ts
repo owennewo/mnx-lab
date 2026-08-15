@@ -371,10 +371,15 @@ const DYNAMIC_WORDS = [
 
 export const ADORNMENT_HELP =
   'accent · staccato · tenuto · strongAccent · … · a dynamic (pp, mf, fff) · ' +
-  'text Play 8x · no accent · no dynamic · no text · no string';
+  'text Play 8x · accidental · accidental parens · ' +
+  'no accent · no dynamic · no text · no string · no accidental';
 
 export type AdornmentResult =
   | { marking: string; remove?: boolean }
+  // The accidental's DISPLAY is note-level ink like the markings, so it lives
+  // in their popover rather than earning a sixth one (campaign item 6). The
+  // SPELLING is a key (`J`) — a different question with a different answer.
+  | { accidental: { show: boolean; parenthesized?: boolean } | 'remove' }
   | { removeStringAnnotation: true }
   | { positioned: PositionedAttribute }
   | { removePositioned: PositionedAttribute['kind'] }
@@ -389,8 +394,18 @@ export function parseAdornment(text: string): AdornmentResult {
   const words = trimmed.split(' ');
   const head = words[0].toLowerCase();
 
+  if (head === 'accidental') {
+    const qualifier = (words[1] ?? '').toLowerCase();
+    if (qualifier === '' || qualifier === 'show') return { accidental: { show: true } };
+    if (qualifier === 'parens' || qualifier === 'parenthesized' || qualifier === 'cautionary')
+      return { accidental: { show: true, parenthesized: true } };
+    if (qualifier === 'hidden' || qualifier === 'hide') return { accidental: { show: false } };
+    return null;
+  }
+
   if (head === 'no') {
     const target = (words[1] ?? '').toLowerCase();
+    if (target === 'accidental') return { accidental: 'remove' };
     if (target === 'dynamic') return { removePositioned: 'dynamic' };
     if (target === 'text' || target === 'direction') return { removePositioned: 'direction' };
     // The string choice is a note-level annotation like the markings, so it

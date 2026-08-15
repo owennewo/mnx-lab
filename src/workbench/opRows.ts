@@ -179,6 +179,8 @@ function opLabel(op: EditOp): string {
             : 'grace';
       return `wrap ${span} event${span === 1 ? '' : 's'} in ${what} @ m${op.measureIndex + 1}`;
     }
+    case 'respellNote':
+      return `respell ${op.noteId}`;
     case 'setRestSpelling':
       return `respell rest as ${durationText(op.duration)} @ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
     case 'insertSpace':

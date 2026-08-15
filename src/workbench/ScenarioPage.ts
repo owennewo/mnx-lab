@@ -109,7 +109,7 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
   },
   adornment: {
     label: 'adornment',
-    placeholder: 'accent · staccato · mf · text Play 8x',
+    placeholder: 'accent · staccato · mf · text Play 8x · accidental parens',
     hint: 'at the cursor’s position · “no <adornment>” strips it · Enter applies · Esc closes'
   },
   rhythm: {
@@ -1301,7 +1301,15 @@ export class ScenarioPage extends LitElement {
         return;
       }
       this.stripIntent(
-        'removeStringAnnotation' in parsed
+        'accidental' in parsed
+          ? parsed.accidental === 'remove'
+            ? { type: 'removeAccidentalDisplay' }
+            : {
+                type: 'setAccidentalDisplay',
+                show: parsed.accidental.show,
+                ...(parsed.accidental.parenthesized ? { parenthesized: true } : {})
+              }
+          : 'removeStringAnnotation' in parsed
           ? { type: 'removeStringAnnotation' }
           : 'marking' in parsed
           ? { type: parsed.remove ? 'removeMarking' : 'setMarking', marking: parsed.marking }

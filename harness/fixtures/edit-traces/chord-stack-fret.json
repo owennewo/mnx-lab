@@ -164,9 +164,9 @@
                         {
                           "id": "n-s2",
                           "pitch": {
-                            "step": "A",
+                            "step": "B",
                             "octave": 3,
-                            "alter": 1
+                            "alter": -1
                           },
                           "_x": {
                             "mnxLab": {

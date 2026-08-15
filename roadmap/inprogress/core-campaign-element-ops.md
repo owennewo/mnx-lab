@@ -93,7 +93,7 @@ agreed or candidate claims; **bold** = agreed.
 | 3 | [constructibility traces](core-element-ops-construct-traces.md) | Item 1's forward harness scaled: the construct-fixture kind + per-scenario tiers (unreachable → ops-reachable → keyboard-reachable → traced) + the expected-unreachable class. Traces themselves arrive with items 4–13 (recorded via "copy trace", never hand-written); possible workbench coverage map later. Inherits item 1's parked **recording surface** question: "copy trace" stamps a corpus scenario id as the start, so recording from `{}` wants the new-document journey — and with it, the ops tab on non-scenario (IndexedDB) documents. | verdict machinery for all 106; traces accumulate per item | n/a | n/a | **built 2026-08-14** |
 | 4 | [duration completion](core-element-ops-duration-completion.md) | Dots and time `display: common\|cut` — capo turned out to be **already closed by item 13**, so the row was two verbs, not three. The dot is one key cycling 0→1→2→none, splitting ink/absence like the ladder; dotted RESTS go through 11b's spelling verb (`rest half.`). Uncovered and fixed: entry could not lengthen past the rest it landed on, so dots were unenterable. | traceability for 7 scenarios (6 dotted, 1 glyph); no new kinds | **`.`** ; `common`/`4/4 cut` in the time popover | event / setup | **complete 2026-08-15** |
 | 5 | [clef, key & time](core-element-ops-clef-key.md) | Set/change/remove ops; session already *reads* both (`clefAt`, `keyFifthsAt`) for entry. Inherited-attribute removal class; `inherit` is the removal token. | **22 scenarios reachable** (from 1); 101 clefs + 6 key sigs + 95 time sigs removable | **Shift+C** clef, **Shift+K** key | **measure** | **built 2026-08-14** |
-| 6 | accidental spelling | Flats (natural-then-sharp policy makes E♭ unwritable), enharmonic respell, `accidentalDisplay`/parentheses. | 9+ | respell: single key | note | undrafted |
+| 6 | [accidental spelling](core-element-ops-accidental-spelling.md) | **Two questions wearing one name**: SPELLING (which letter names this sound — a policy in `staffSpace.ts` reading key then direction, plus `J` to overrule it) and DISPLAY (printed? in brackets? — note-level ink, so a word in the adornment popover). The old placeholder ("natural, then sharp") made E♭ unwritable in every key. | traceability for 8 altered-pitch + 3 display scenarios; no new kinds | **J** respell; `accidental parens` in the adornment popover | note | **complete 2026-08-15** |
 | 7 | [bar-attribute family](core-element-ops-bar-attributes.md) | Barlines, repeats, endings, segno/jump/fine, sections, rehearsal, tempo — one typed-popover family on the global measure. ONE op pair for ten kinds; `no <attribute>` strips. | **18 scenarios** (reachable 24 → 42); 56 elements removable | **Shift+B** | **measure** | **built 2026-08-14** |
 | 8 | [event adornments](core-element-ops-adornments.md) | Articulations/markings, dynamics, directions — **two** op pairs, because markings are owned by the event and the other two by the part measure. | 13 (reachable 55 → 68); 70 elements | **Shift+A** popover (letter accelerators deferred) | **note/event** | **built 2026-08-14** |
 | 9 | [tab technique alphabet](core-element-ops-technique.md) | Bends, slides, hammer/pull, vibrato, palm mute, harmonics — the `B H S V X O` set `keymapDocs.ts` already reserves. Entry side of [core-guitar-technique.md](../proposed/core-guitar-technique.md) (which owns rendering). | 7 (reachable 71 → 78); +fingering | **B H S V X O** — live only in the tab pane layer, so B/S are polymorphic with beam/slur | **note** | **built 2026-08-14** |
@@ -769,3 +769,24 @@ was silent because nothing had ever asked for more than a beat. (The other two:
 `space.duration`'s field shape, and rest spelling being coupled to the entry
 grid.) Worth making a habit of: before building a family, try the neighbouring
 op with the value the family will need.
+
+### 2026-08-15 — item 6: one name, two questions
+
+The row said "accidental spelling" and contained a policy question and an ink
+question that share nothing but a word. Splitting them made both small: the
+policy is one function where the key context already lives, and the display is
+a member of an existing family rather than a sixth popover. **When an item
+resists sizing, check whether its name is covering two owners** — the family
+test (item 7) applies to questions as well as kinds.
+
+Two more, both re-confirmations the campaign can now state as habits:
+
+- **An override must be able to reach what the policy avoids.** `J` cycles the
+  policy's own candidate list, so the spelling `spellPitch` would never choose
+  is exactly the one a player can still ask for. A separate, narrower list
+  would have made the override decorative.
+- **An intended semantic change breaking a recorded trace is the system
+  working** — second sighting (item 11b's `from-scratch` was the first).
+  `chord-stack-fret` ends in a downward transpose that used to spell A♯ and now
+  spells B♭; the trace was pinning the placeholder. Regenerate, and say in the
+  commit which note moved and why.

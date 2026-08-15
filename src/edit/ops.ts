@@ -26,7 +26,7 @@ import type { EditorIntent } from './intents.ts';
 import type { PartialContainerSpec } from './setupGrammar.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import { findNoteAddress, forEachNoteAddress } from '../model/noteWalk.ts';
-import { enharmonicSpellings, keyFifthsAt, spellPitch } from './staffSpace.ts';
+import { enharmonicSpellings, keyFifthsAt, midiOfSpelling, spellPitch } from './staffSpace.ts';
 import {
   addOnsets,
   durationSpan,
@@ -576,12 +576,9 @@ function measureAttributeValue(attribute: MeasureAttribute): unknown {
   }
 }
 
-const NOTE_STEPS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
-const STEP_SEMITONES: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-
 function midiOf(note: MnxNote): number {
   const { step, octave, alter = 0 } = note.pitch;
-  return (octave + 1) * 12 + STEP_SEMITONES[step] + alter;
+  return midiOfSpelling(step as 'C', octave, alter);
 }
 
 function setPitchFromMidi(note: MnxNote, midi: number, fifths = 0, direction: 1 | -1 = 1): void {
@@ -591,19 +588,6 @@ function setPitchFromMidi(note: MnxNote, midi: number, fifths = 0, direction: 1 
   note.pitch = spellPitch(midi, fifths, direction);
 }
 
-/** Every note of every part/staff — the "no selection" universe, wider than
- *  the keyed (parts[0], staff-1) universe the cursor can address. */
-function forEachNote(doc: MnxStructure, fn: (note: MnxNote) => void): void {
-  for (const part of doc.parts ?? []) {
-    for (const measure of part.measures ?? []) {
-      for (const seq of measure.sequences ?? []) {
-        for (const item of seq.content ?? []) {
-          for (const note of (item as { notes?: MnxNote[] }).notes ?? []) fn(note);
-        }
-      }
-    }
-  }
-}
 
 /** Pure: returns a new document with the op applied; never mutates `doc`. */
 export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
