@@ -182,22 +182,6 @@ proposals that name their campaign.
   (`spanByPointer`, ~10 lines) to unlock the selection-scoped view, and the conformance test
   CLAUDE.md's "keep `jsonView` and `noteKeys` in lockstep" rule has always implied. The only
   below-the-boundary change in the campaign, hence the only properly testable one.
-- **[core-selection-tray-global-tab.md](proposed/core-selection-tray-global-tab.md)** — a fourth
-  tray item, **built 2026-08-15 the day it was proposed**: should the command palette just be
-  another tab? **Half yes** — and the half is only visible once you notice the palette is two
-  things wearing one coat. Its `>` half is a small fixed set of **commands**; its bare half is a
-  ranked, unbounded **destination** finder over scenarios, bars and objects. The commands become
-  the tray's always-present `global` tab (the scope above `score` — the word the design spec
-  itself used, and the top of the containment chain the tabs already are); go-to stays on Ctrl+G,
-  because it must run where the tray cannot exist at all — the queue, the coverage map — and
-  because "commands for what is selected" and "search everything" are the two halves of the
-  tray's whole claim. The line that falls out: **`/` is commands, escalating outward; Ctrl+G is
-  destinations**, so `//` now moves one scope further rather than switching widgets, and
-  **Ctrl+Shift+K retires**. Landed the `CommandScope = SelectionLevel | 'document'` axis, nine
-  document commands, and the page's own chrome tiles (copy trace, revert) joining that tab under
-  a `page:` prefix — `edit/` keeps only editor verbs. The build taught one rule: a tab outside
-  the ladder must be **non-committable**, or it inherits the "↵ to widen selection" hint and
-  Enter silently does nothing.
 - **[core-tuplets-grace-notes.md](proposed/core-tuplets-grace-notes.md)** — tuplets and grace notes
   **across both converters and on tab**. Split out of
   [core-guitar-pro.md](complete/core-guitar-pro.md) when that closed, at its real scope: the model
@@ -233,26 +217,6 @@ proposals that name their campaign.
   in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
   vertical density = layout gap/padding constants. Not started. Where the levers are *exposed*
   is now owned by [core-viewer-surface.md](inprogress/core-viewer-surface.md).
-- **[core-selection-tray-mechanism.md](inprogress/core-selection-tray-mechanism.md)** — part 2:
-  the tray wired, **stages 1–4 built 2026-08-15** (hands-on review open). One ruling — tiles
-  fire **intents through `session.handleIntent`, nothing else** — so tray clicks land in the
-  op queue and replay through traces like keystrokes. `src/edit/commandRegistry.ts` holds 56
-  commands over all seven rungs, each row the *surface half* of a
-  [campaign](complete/core-campaign-element-ops.md) agreement block (rungs, glyph,
-  key/tier, `isActive`, `action`), pinned by 18 conformance joins: shortcuts some table
-  really binds, surfaces that exist, intent types the session handles, glyph names the font
-  carries with bounding boxes, and the ledger agreement that keeps greyed tiles and the
-  residue doc from drifting. Drafted against a 15-op vocabulary; the sweep inverted the
-  emphasis — the verbs exist and their only human surface was typed popover grammars, so the
-  tray fronts a nearly complete vocabulary and the greyed set is the residue's short tail.
-  Scope preview draws a dashed candidate enclosure found through the renderer's existing
-  `data-source-id`, so **no layout code and no golden moved**; commit walks the ladder via a
-  `walkToLevel` shared with the HUD. **Escape precedence declared once** as
-  `ESCAPE_PRECEDENCE` and asserted, answering the ladder's open question. Two findings: the
-  tray must call `followProjection` on open (it offers a *dialect* — `S` slurs in notation,
-  slides in tab), and the ops panel credits **the key, not the emitter**, which is its
-  existing contract — so the tray registers as a surface only for `setAccidentalDisplay`,
-  the one intent it adds to keyboard reachability.
 - **[core-campaign-modernist.md](inprogress/core-campaign-modernist.md)** — **campaign**: the
   workbench restyle the tray's art direction leads, plus the score panel it was drawn for.
   Fills the slot [core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)
@@ -637,8 +601,45 @@ proposals that name their campaign.
   component: **ink-box glyph normalization** (each glyph drawn into its own font-metadata
   bounding box, 34px target with a 30px/sp ceiling — a palette normalizes optical size
   where a score must not) and **the shortcut as a corner chip** on 66×64 tiles. Parts 2–3
-  ([mechanism](inprogress/core-selection-tray-mechanism.md),
-  [residue](proposed/core-selection-tray-residue.md)) stay in `proposed/`.
+  ([mechanism](complete/core-selection-tray-mechanism.md) and its
+  [global tab](complete/core-selection-tray-global-tab.md) also complete; the
+  [residue ledger](proposed/core-selection-tray-residue.md) stays open).
+- **[core-selection-tray-mechanism.md](complete/core-selection-tray-mechanism.md)** — part 2:
+  the tray wired, **stages 1–4 built 2026-08-15** (hands-on review open). One ruling — tiles
+  fire **intents through `session.handleIntent`, nothing else** — so tray clicks land in the
+  op queue and replay through traces like keystrokes. `src/edit/commandRegistry.ts` holds 56
+  commands over all seven rungs, each row the *surface half* of a
+  [campaign](complete/core-campaign-element-ops.md) agreement block (rungs, glyph,
+  key/tier, `isActive`, `action`), pinned by 18 conformance joins: shortcuts some table
+  really binds, surfaces that exist, intent types the session handles, glyph names the font
+  carries with bounding boxes, and the ledger agreement that keeps greyed tiles and the
+  residue doc from drifting. Drafted against a 15-op vocabulary; the sweep inverted the
+  emphasis — the verbs exist and their only human surface was typed popover grammars, so the
+  tray fronts a nearly complete vocabulary and the greyed set is the residue's short tail.
+  Scope preview draws a dashed candidate enclosure found through the renderer's existing
+  `data-source-id`, so **no layout code and no golden moved**; commit walks the ladder via a
+  `walkToLevel` shared with the HUD. **Escape precedence declared once** as
+  `ESCAPE_PRECEDENCE` and asserted, answering the ladder's open question. Two findings: the
+  tray must call `followProjection` on open (it offers a *dialect* — `S` slurs in notation,
+  slides in tab), and the ops panel credits **the key, not the emitter**, which is its
+  existing contract — so the tray registers as a surface only for `setAccidentalDisplay`,
+  the one intent it adds to keyboard reachability. **Complete 2026-08-15** — the hands-on review ran through the build, so later findings arrive as their own proposals rather than reopening it.
+- **[core-selection-tray-global-tab.md](complete/core-selection-tray-global-tab.md)** — a fourth
+  tray item, **built 2026-08-15 the day it was proposed**: should the command palette just be
+  another tab? **Half yes** — and the half is only visible once you notice the palette is two
+  things wearing one coat. Its `>` half is a small fixed set of **commands**; its bare half is a
+  ranked, unbounded **destination** finder over scenarios, bars and objects. The commands become
+  the tray's always-present `global` tab (the scope above `score` — the word the design spec
+  itself used, and the top of the containment chain the tabs already are); go-to stays on Ctrl+G,
+  because it must run where the tray cannot exist at all — the queue, the coverage map — and
+  because "commands for what is selected" and "search everything" are the two halves of the
+  tray's whole claim. The line that falls out: **`/` is commands, escalating outward; Ctrl+G is
+  destinations**, so `//` now moves one scope further rather than switching widgets, and
+  **Ctrl+Shift+K retires**. Landed the `CommandScope = SelectionLevel | 'document'` axis, nine
+  document commands, and the page's own chrome tiles (copy trace, revert) joining that tab under
+  a `page:` prefix — `edit/` keeps only editor verbs. The build taught one rule: a tab outside
+  the ladder must be **non-committable**, or it inherits the "↵ to widen selection" hint and
+  Enter silently does nothing. **Complete the day it was proposed**; review comments become new proposals.
 - **[core-element-ops-exemplar.md](complete/core-element-ops-exemplar.md)** — campaign
   item 1 of [core-campaign-element-ops.md](complete/core-campaign-element-ops.md):
   **the forward/reverse harness algorithm proven small** over `minimal-single-note`

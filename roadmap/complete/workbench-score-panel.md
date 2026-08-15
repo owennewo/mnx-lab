@@ -151,7 +151,7 @@ the popover renders, not what invokes it.**
   its own merits, independent of this campaign** — today a keyboard-opened popover yanks
   the panel away from whatever you were reading.
 - **B. Let the tray mechanism land.**
-  [core-selection-tray-mechanism.md](../inprogress/core-selection-tray-mechanism.md) is in flight;
+  [core-selection-tray-mechanism.md](core-selection-tray-mechanism.md) is in flight;
   its popover-tier tiles are the replacement for scope-specific commands. Don't
   front-run it.
 - **C. Close the palette's gap.** Generate all nine palette entries from the existing

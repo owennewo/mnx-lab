@@ -33,7 +33,7 @@
 > not four, so tab padding is 9px (spec 13px) and the rows-variant width is
 > 400px (spec 330); Archivo is not yet bundled (system-sans fallback — the
 > open item below stands). First of a trio: this doc (the look, complete
-> and unwired), [core-selection-tray-mechanism.md](../inprogress/core-selection-tray-mechanism.md)
+> and unwired), [core-selection-tray-mechanism.md](core-selection-tray-mechanism.md)
 > (state and actions through the intent funnel), and
 > [core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md) (what cannot be
 > wired yet, and what unblocks each row).
@@ -217,7 +217,7 @@ tray *fires* stays inert until the mechanism.
 >    **Ctrl+Shift+K retired too**: the global commands became the tray's own
 >    `global` tab, so a second `/` widens to it and go-to's `>` prefix is the
 >    off-editor door
->    ([core-selection-tray-global-tab.md](../proposed/core-selection-tray-global-tab.md)).
+>    ([core-selection-tray-global-tab.md](core-selection-tray-global-tab.md)).
 >    Every "Ctrl+Shift+K" below should be read as one of those two.
 > 2. **The value-rows variant** (region D's second half) was **removed
 >    2026-08-15 as dead code**. Every tab renders tiles from the command

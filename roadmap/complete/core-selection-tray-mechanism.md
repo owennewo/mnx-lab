@@ -1,7 +1,18 @@
 # The selection command tray — the mechanism
 
-> **Status: in progress — stages 1–4 built 2026-08-15, same day as picked up;
-> the hands-on review is open.** Shipped: `src/edit/commandRegistry.ts` (~60
+> **Status: COMPLETE 2026-08-15 — stages 1–4 built the day it was picked up,
+> and stage 5 closed as a channel rather than a checkpoint.** The tray was
+> driven hands-on throughout the build (every stage verified over CDP, and
+> three findings below came out of it), so what stage 5 reserved — a separate
+> review pass — is the one thing left, and holding an otherwise-finished doc
+> open for it would misfile it. **Review comments become new proposals**:
+> anything the tray turns out to need arrives as its own item, the way the
+> hover-flicker fix and the global tab already did, rather than reopening
+> this. The residue ledger
+> ([core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md))
+> stays open as the standing home for what the tray cannot do yet.
+>
+> Built: Shipped: `src/edit/commandRegistry.ts` (~60
 > commands over all seven rungs plus the `document` scope, each declaring
 > scopes/glyph/shortcut/tier and
 > its own `isActive`/`action` over a narrow `SessionView`) with
@@ -43,7 +54,7 @@
 > Revised 2026-08-15 (before build) after the campaign's
 > vocabulary sweep (items 5, 7–13 built 2026-08-14/15 — ops 15 → ~60, "every
 > kind now has its verb"). Second of the trio — builds on
-> [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) (the component
+> [core-selection-tray-visuals.md](core-selection-tray-visuals.md) (the component
 > and its neutral contract) and hands everything it cannot wire to
 > [core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md).
 >
@@ -206,7 +217,7 @@ voice/staff, layout/score authoring, part transposition, mute — enumerated in
   slash used to do from the rail, by a different mechanism. Ctrl+G → go-to (whose
   `>` prefix still reaches the global command list). **Ctrl+Shift+K retired**
   when those commands became the tray's own `global` tab
-  ([core-selection-tray-global-tab.md](../proposed/core-selection-tray-global-tab.md)). **Ctrl+K is unbound**:
+  ([core-selection-tray-global-tab.md](core-selection-tray-global-tab.md)). **Ctrl+K is unbound**:
   Chrome owns it (the omnibox), and because we deliberately never consume keys
   typed into text fields it worked from the score and escaped to the browser
   from every input — a shortcut that works most of the time teaches that it
@@ -259,5 +270,6 @@ everything below the boundary is pinned:
    `walkToLevel` shared with the HUD.
 4. **Keyboard** — the `/` binding, scope-4 region wiring, the
    Escape-precedence declaration and its test.
-5. **Hands-on review** at each stage boundary, campaign-style; learnings feed the
-   residue doc's rows.
+5. ~~**Hands-on review** at each stage boundary~~ — done continuously during
+   the build rather than as a final gate (see the status). Later findings
+   arrive as their own proposals; the residue ledger keeps the standing gaps.

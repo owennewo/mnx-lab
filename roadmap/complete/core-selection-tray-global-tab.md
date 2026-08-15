@@ -1,6 +1,12 @@
 # The selection tray's global tab — one command surface, not two
 
-> **Status: BUILT 2026-08-15, same day as proposed.** Shipped: the
+> **Status: COMPLETE 2026-08-15, same day as proposed.** Stage 4's hands-on
+> review is closed the same way the mechanism's was: the tab was driven over
+> CDP as it was built (the non-committable finding below came out of exactly
+> that), and **review comments become new proposals** rather than reopening
+> this doc.
+>
+> Built: Shipped: the
 > `CommandScope = SelectionLevel | 'document'` axis (`rungs` → `scopes`
 > throughout the registry), nine document-scope commands, the always-present
 > `global` tab with the page's own chrome tiles (copy trace, revert) joining
@@ -20,9 +26,9 @@
 > focused tile instead.
 >
 > Originally proposed 2026-08-15. A fourth item behind the tray trio —
-> [visuals](../complete/core-selection-tray-visuals.md) (complete),
-> [mechanism](../inprogress/core-selection-tray-mechanism.md) (stages 1–4 built),
-> [residue](core-selection-tray-residue.md) (the ledger). Raised from a
+> [visuals](core-selection-tray-visuals.md) (complete),
+> [mechanism](core-selection-tray-mechanism.md) (stages 1–4 built),
+> [residue](../proposed/core-selection-tray-residue.md) (the ledger). Raised from a
 > question asked while using the tray: should the command palette simply be
 > another tab?
 >
@@ -123,4 +129,5 @@ handles, glyph names carry bounding boxes. Two additions:
 2. The tab: always present, page-contributed chrome tiles, rows presentation.
 3. The `//` escalation retargeted; Ctrl+Shift+K retired from `SHELL_BINDINGS`
    and `KEY_DOCS`.
-4. Hands-on review — the campaign's posture, and the last three items' habit.
+4. ~~Hands-on review~~ — done during the build; later findings arrive as their
+   own proposals.
