@@ -1,9 +1,19 @@
 # The rail and the headers, in the panel's language
 
-> **Status: built 2026-08-15 on branch `workbench-chrome-language`, not yet
-> landed.** The primary checkout held unrelated uncommitted work in the same
-> files when this was written, so the `--ff-only` merge is deferred rather than
-> forced.
+> **Status: COMPLETE 2026-08-15.** Built in a worktree, landed on `main` at
+> `98ebaea` with all gates green and the goldens byte-identical.
+>
+> The landing is worth a line of its own, because it is the first time this
+> repo's parallel-work contract was tested against a genuinely occupied `main`.
+> The primary checkout held ~1,240 lines of another session's uncommitted work
+> touching two of the same files, so `merge --ff-only` refused — correctly, and
+> that refusal is the contract working rather than an obstacle. Resolved by
+> stash → fast-forward → pop, with the two conflicts (`roadmap/README.md`,
+> `ScenarioPage.ts`) settled by keeping **both** sides: their `.panel-toggle`
+> needed the flex head this item's band styling had removed the padding from,
+> so the merge produced a change neither side wrote — the toggle centres in the
+> band now, which also lines it up with `.rail-toggle`, its mirror. See the
+> **Landing** section at the end.
 >
 > A **post-campaign** item against [core-campaign-modernist.md](../complete/core-campaign-modernist.md),
 > whose index closed with the look half done everywhere and the *structure* half
@@ -115,3 +125,41 @@ already decided what a stat strip looks like.
   the rail's pinned band does not scroll, that the two 2px rules framing the
   score read as one decision, and that the active rail row and the active panel
   tab are recognisably the same state in two shapes.
+
+All done, plus 670/670 harness tests before the landing and 676/676 after (the
+extra six are the other session's, and they pass against this item's tree —
+which is the useful half of that number).
+
+## Landing
+
+Kept because this is the first landing to meet an occupied `main`, and the
+lessons are about the contract rather than about chrome.
+
+**The refusal is the feature.** `merge --ff-only` declined because three files
+were dirty in the primary checkout. That is exactly what the rule is for: a
+forced merge would have silently discarded another session's afternoon. The
+stash → fast-forward → pop cycle is the whole remedy, and `git stash` keeps the
+entry on a conflicting pop, so there is no window in which the work is only in
+one place.
+
+**Verify the restoration file-by-file, not by eye.** After the pop, diffing
+every stashed path against its stashed blob showed exactly three differing —
+the two conflicts plus `WorkbenchApp.ts`, which differs *legitimately* because
+the working tree is now their version plus this item's. Grepping for a marker
+from each side (`togglePanel` and `scenarioPage()` for theirs, `rail-context`
+and `fact-k` for ours) is what turns "it seems fine" into a check.
+
+**Three files vanished from the dirty set between the status check and the
+stash**, all of them `src/edit/*` selection-ladder files, and a
+`.claude/worktrees/selection-ladder-nav/` had appeared. A live session moved its
+own work into its own worktree mid-landing. Nothing was lost and nothing needed
+doing — but it is worth knowing that on this repo **the dirty set is not stable
+across a five-minute test run**, so a landing plan built on a stale `git status`
+is built on sand.
+
+**A conflict resolution can only be judged by building the combined tree.**
+Taking both sides left a comment containing backticks inside a `` css` ` ``
+template literal, which terminated the literal and produced five parser errors
+in a file that had compiled on both sides of the merge. The landed commit never
+contained it — it existed only in the working tree — but it would have been the
+next session's mystery. **Build after the pop, not only before the merge.**
