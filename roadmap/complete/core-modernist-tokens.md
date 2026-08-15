@@ -98,7 +98,7 @@ stays in step.*
 accent cannot express five states, and `--st-verified` (blue) sitting beside a red accent
 will read as an accident rather than a signal. That is a change to the workbench's
 primary information display and it deserves its own review —
-[workbench-queue-pips.md](../proposed/workbench-queue-pips.md). **This item does not touch the pip ramp.**
+[workbench-queue-pips.md](workbench-queue-pips.md). **This item does not touch the pip ramp.**
 Its job is to flip the surface without changing what anything *means*; re-encoding the
 queue's semantics inside a repaint is exactly how meaning gets lost.
 

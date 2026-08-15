@@ -329,26 +329,37 @@ export class WorkbenchApp extends LitElement {
         box-sizing: border-box;
       }
 
-      /* Approved and still matching its goldens. */
-      .dot.current {
-        background: var(--st-verified);
-        box-shadow: 0 0 0 2px color-mix(in oklab, var(--st-verified), transparent 78%);
+      /* THE FOUR STATES, in one accent (workbench-queue-pips.md). Reading down
+         the rail the marks go: a red haloed dot you cannot miss, a dark ring, a
+         solid mid dot, a pale dot asking for nothing. Colour names only the
+         first; the rest is lightness and shape, so the column still sorts with
+         the colour taken away. */
+
+      /* Stop. The one saturated mark, and the only haloed one - the halo used
+         to sit on current, which is the state wanting the LEAST attention. */
+      .dot.blocked {
+        background: var(--st-blocked);
+        box-shadow: 0 0 0 2px color-mix(in oklab, var(--st-blocked), transparent 72%);
       }
 
       /* Approved once, output has moved since — hollow: the ring is still
-         there, the substance isn't. */
+         there, the substance isn't. Darkest of the inks, because after a hard
+         block this is the most actionable thing on the list: somebody already
+         judged it and it changed underneath them. */
       .dot.stale {
         background: transparent;
-        border: 2px solid var(--st-verified);
+        border: 2px solid var(--st-stale);
       }
 
-      /* Renders, but no human has ever signed it off. */
+      /* Renders, but no human has ever signed it off: present, unjudged. */
       .dot.never-seen {
-        background: var(--st-rendered);
+        background: var(--st-unseen);
       }
 
-      .dot.blocked {
-        background: var(--st-gap);
+      /* Approved and still matching its goldens - nothing to do, so it recedes.
+         The queue counts these and deliberately does not list them. */
+      .dot.current {
+        background: var(--st-current);
       }
 
       /* Orthogonal to state: rejected by the schema on purpose. */
@@ -374,9 +385,11 @@ export class WorkbenchApp extends LitElement {
         line-height: 1.5;
       }
 
+      /* Provenance, not a queue state - but a proposed-schema scenario is an
+         unusual thing to be looking at, so it earns the accent. */
       .tag.proposed {
-        color: var(--st-gap);
-        border-color: color-mix(in oklab, var(--st-gap), transparent 55%);
+        color: var(--accent-fg);
+        border-color: color-mix(in oklab, var(--accent), transparent 55%);
       }
 
       .cat-n {

@@ -185,11 +185,26 @@ export const designTokens = css`
     --header-h: 52px;
     --footer-h: 30px;
 
-    --st-draft: light-dark(oklch(0.62 0.012 80), oklch(0.66 0.012 80));
-    --st-valid: light-dark(oklch(0.66 0.105 78), oklch(0.74 0.105 78));
-    --st-rendered: light-dark(oklch(0.55 0.1 155), oklch(0.68 0.1 155));
-    --st-verified: light-dark(oklch(0.5 0.1 250), oklch(0.68 0.1 250));
-    --st-gap: light-dark(oklch(0.55 0.125 42), oklch(0.68 0.125 42));
+    /* THE QUEUE'S MARKS (roadmap/proposed/workbench-queue-pips.md).
+       Four states through a one-accent system. Colour cannot carry four
+       meanings here, so it carries ONE - saturated red is spent on blocked,
+       the only state that means stop - and the rest separate on LIGHTNESS and
+       on SHAPE, which the rail already used so stale could not read as
+       never-seen.
+
+       The steps are spread far enough to survive GRAYSCALE, which this item's
+       doc names as its acceptance test and which
+       harness/conformance/design-tokens.test.ts now asserts: colour is the
+       redundant channel here, never the only one.
+
+       They carry their own values rather than aliasing the ink ramp, as an
+       earlier draft did: those steps are spaced for TEXT contrast, and reusing
+       them put unseen within 0.08 of the accent in dark - invisible in a
+       swatch, identical in grayscale. Spaced here for four 7px marks. */
+    --st-blocked: var(--accent);
+    --st-stale: light-dark(oklch(0.25 0.005 60), oklch(0.92 0.004 60));
+    --st-unseen: light-dark(oklch(0.45 0.006 60), oklch(0.56 0.006 60));
+    --st-current: light-dark(oklch(0.83 0.004 60), oklch(0.34 0.005 60));
 
     --bg: var(--mnx-bg, light-dark(oklch(0.962 0.002 60), oklch(0.185 0.004 60)));
     --bg-rail: var(--mnx-bg-rail, light-dark(oklch(0.945 0.002 60), oklch(0.16 0.004 60)));
@@ -322,39 +337,11 @@ export const sharedChrome = css`
     background: var(--bg-context);
   }
 
-  .pip {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .pip[data-st='draft'] {
-    background: transparent;
-    border: 1.2px solid var(--st-draft);
-  }
-
-  .pip[data-st='valid'] {
-    background: var(--st-valid);
-  }
-
-  .pip[data-st='rendered'] {
-    background: var(--st-rendered);
-  }
-
-  .pip[data-st='verified'] {
-    background: var(--st-verified);
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--st-verified), transparent 75%);
-  }
-
-  .gapdia {
-    width: 7px;
-    height: 7px;
-    flex-shrink: 0;
-    background: var(--st-gap);
-    transform: rotate(45deg);
-    border-radius: 1px;
-  }
+  /* .pip[data-st] and .gapdia lived here and were rendered by NOTHING - dead
+     since some earlier refactor, and between them they were the only consumers
+     of two of the five status tokens. Removed with those tokens
+     (roadmap/proposed/workbench-queue-pips.md). The live status marks are the
+     rail's and the coverage map's own .dot rules. */
 
   .tb-btn {
     display: inline-flex;
@@ -449,50 +436,10 @@ export const sharedChrome = css`
     color: var(--accent-fg);
   }
 
-  .vchip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    white-space: nowrap;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    padding: 2.5px 8px;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--line);
-    color: var(--ink-2);
-  }
-
-  .vchip .vdot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-  }
-
-  .vchip.ok {
-    color: var(--st-rendered);
-    border-color: color-mix(in oklab, var(--st-rendered), transparent 55%);
-  }
-
-  .vchip.gap {
-    color: var(--st-gap);
-    border-color: color-mix(in oklab, var(--st-gap), transparent 50%);
-  }
-
-  .vchip.sketch {
-    color: var(--st-valid);
-    border-color: color-mix(in oklab, var(--st-valid), transparent 45%);
-  }
-
-  .vchip.clicky {
-    cursor: pointer;
-    background: transparent;
-  }
-
-  .vchip.clicky:hover,
-  .vchip.clicky.on {
-    border-color: var(--accent-fg);
-    color: var(--accent-fg);
-  }
+  /* .vchip lived here - a verdict chip in three status colours, rendered by
+     nothing. It went with the status ramp it cited. .fchip and .tb-btn are
+     also unrendered today but cite only live tokens, so they are left alone
+     rather than swept up in a colour change. */
 `;
 
 /** Scrollbar treatment shared by every scrollable pane. */

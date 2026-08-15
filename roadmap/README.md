@@ -182,13 +182,6 @@ proposals that name their campaign.
   (`spanByPointer`, ~10 lines) to unlock the selection-scoped view, and the conformance test
   CLAUDE.md's "keep `jsonView` and `noteKeys` in lockstep" rule has always implied. The only
   below-the-boundary change in the campaign, hence the only properly testable one.
-- **[workbench-queue-pips.md](proposed/workbench-queue-pips.md)** — campaign item 6, the bill
-  "red everywhere" runs up. Four status hues and four queue states do not fit through a
-  one-accent system, and `--st-verified` (blue) beside a red accent reads as a leftover while
-  `--st-gap` reads as an accident. Kept out of item 1 deliberately: the queue is the
-  workbench's primary information display, and re-encoding semantics inside a repaint is how
-  meaning gets lost. The opening is that **shape is already load-bearing** — the rail's dots
-  vary shape as well as colour, for exactly this reason. Grayscale is the acceptance test.
 - **[core-selection-tray-global-tab.md](proposed/core-selection-tray-global-tab.md)** — a fourth
   tray item, **built 2026-08-15 the day it was proposed**: should the command palette just be
   another tab? **Half yes** — and the half is only visible once you notice the palette is two
@@ -361,6 +354,13 @@ proposals that name their campaign.
   container rungs.
 
 ### complete/
+- **[workbench-queue-pips.md](complete/workbench-queue-pips.md)** — campaign item 6, the bill
+  "red everywhere" runs up. Four status hues and four queue states do not fit through a
+  one-accent system, and `--st-verified` (blue) beside a red accent reads as a leftover while
+  `--st-gap` reads as an accident. Kept out of item 1 deliberately: the queue is the
+  workbench's primary information display, and re-encoding semantics inside a repaint is how
+  meaning gets lost. The opening is that **shape is already load-bearing** — the rail's dots
+  vary shape as well as colour, for exactly this reason. Grayscale is the acceptance test.
 - **[core-modernist-dark.md](complete/core-modernist-dark.md)** — campaign item 2. The
   workbench has a **complete dark theme nothing can turn on**: `resolved-theme` appears
   exactly once in the codebase, in its own selector. And Modernist is light-only by

@@ -379,13 +379,14 @@ export class ScenarioPage extends LitElement {
         color: var(--ink-2);
       }
 
+      /* The resting state of most of the corpus: it should not shout. */
       .badge.verified {
-        color: var(--st-verified);
+        color: var(--ink-2);
         border-color: currentColor;
       }
 
       .badge.attention {
-        color: var(--st-gap);
+        color: var(--accent-fg);
         border-color: currentColor;
       }
 
@@ -533,7 +534,7 @@ export class ScenarioPage extends LitElement {
       }
 
       .popover .pop-error {
-        color: var(--st-gap);
+        color: var(--accent-fg);
       }
 
       .tabs a {
@@ -966,7 +967,7 @@ export class ScenarioPage extends LitElement {
         width: 9px;
         height: 9px;
         border-radius: 50%;
-        background: var(--st-gap);
+        background: var(--accent);
         flex: none;
       }
 
@@ -1002,7 +1003,7 @@ export class ScenarioPage extends LitElement {
       .err-row .er-rule {
         font-family: var(--mono);
         font-size: 11px;
-        color: var(--st-gap);
+        color: var(--accent-fg);
       }
 
       .err-row .er-msg {
@@ -1043,7 +1044,7 @@ export class ScenarioPage extends LitElement {
 
       .load-state.failed {
         border-style: solid;
-        border-color: var(--st-gap);
+        border-color: var(--accent);
       }
 
       .load-state .detail {

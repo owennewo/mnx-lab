@@ -136,7 +136,7 @@ export class ObjectsPage extends LitElement {
 
       /* Exercised, but nothing here has been signed off. */
       .cell .counts.unwitnessed {
-        color: var(--st-gap);
+        color: var(--st-unseen);
       }
 
       .rows {
@@ -181,20 +181,20 @@ export class ObjectsPage extends LitElement {
       }
 
       .dot.current {
-        background: var(--st-verified);
+        background: var(--st-current);
       }
 
       .dot.stale {
         background: transparent;
-        border: 2px solid var(--st-verified);
+        border: 2px solid var(--st-stale);
       }
 
       .dot.never-seen {
-        background: var(--st-rendered);
+        background: var(--st-unseen);
       }
 
       .dot.blocked {
-        background: var(--st-gap);
+        background: var(--st-blocked);
       }
 
       .back {

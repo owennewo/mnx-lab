@@ -244,6 +244,75 @@ describe('design tokens', () => {
     });
   });
 
+  describe('the queue survives grayscale', () => {
+    // workbench-queue-pips.md makes grayscale the ACCEPTANCE TEST: "if the
+    // states are still distinguishable with colour removed, the shape encoding
+    // is doing its job and the ramp is honest." Shape cannot be asserted from
+    // a stylesheet, but LIGHTNESS can — and lightness is what a grayscale
+    // render leaves you. So the rule is encoded here rather than left to
+    // somebody's eye at review time, which is how a ramp drifts back into
+    // hue-only over a few well-meaning commits.
+    //
+    // The four states resolve to --accent / --ink / --ink-2 / --line-strong, so
+    // this walks the reference chain to whatever oklch() each ends at.
+    const L = (token: string, theme: 0 | 1): number => {
+      const seen = new Set<string>();
+      let value = token;
+      for (let i = 0; i < 8; i++) {
+        const m = new RegExp(`${value}:\\s*([^;]+);`).exec(designTokens);
+        if (!m) break;
+        // Peel a public-override wrapper as ONE match. Stripping the opening
+        // and the trailing paren separately mangles a bare `var(--accent)`,
+        // which has no wrapper to peel — it loses its closing paren and stops
+        // looking like a reference at all.
+        let v = m[1].trim();
+        const hook = /^var\(--mnx-[\w-]+,\s*([\s\S]*)\)$/.exec(v);
+        if (hook) v = hook[1].trim();
+        const ld = /light-dark\(\s*([^,]+?)\s*,\s*(.+)\s*\)$/.exec(v);
+        if (ld) v = [ld[1], ld[2]][theme].trim();
+        const lit = /^oklch\(\s*([\d.]+)/.exec(v);
+        if (lit) return Number(lit[1]);
+        const ref = /^var\((--[\w-]+)\)$/.exec(v);
+        if (!ref || seen.has(ref[1])) break;
+        seen.add(ref[1]);
+        value = ref[1];
+      }
+      throw new Error(`could not resolve a lightness for ${token}`);
+    };
+
+    for (const [themeName, theme] of [['light', 0], ['dark', 1]] as const) {
+      it(`keeps the four states apart by lightness in ${themeName}`, () => {
+        const states = ['--st-blocked', '--st-stale', '--st-unseen', '--st-current'];
+        const ls = states.map(s => [s, L(s, theme)] as const).sort((a, b) => a[1] - b[1]);
+        // Every neighbouring pair must clear a step a reader can actually see
+        // at 7px. 0.12 in OKLCH lightness is a comfortable, not heroic, margin.
+        const tooClose: string[] = [];
+        for (let i = 1; i < ls.length; i++) {
+          const gap = ls[i][1] - ls[i - 1][1];
+          if (gap < 0.12) tooClose.push(`${ls[i - 1][0]} (${ls[i - 1][1]}) vs ${ls[i][0]} (${ls[i][1]}) — Δ${gap.toFixed(3)}`);
+        }
+        expect(tooClose, `states collide in grayscale:\n  ${tooClose.join('\n  ')}`).toEqual([]);
+      });
+    }
+
+    it('spends saturated colour on exactly one state', () => {
+      // The whole point of the re-encoding: one accent, and it goes to `stop`.
+      const decl = (t: string) => new RegExp(`${t}:\\s*([^;]+);`).exec(designTokens)?.[1].trim();
+      expect(decl('--st-blocked')).toBe('var(--accent)');
+      // The other three must be near-neutral in BOTH themes. Chroma, not the
+      // token's spelling, is the real rule — it stays true whether they alias
+      // an ink or carry their own value.
+      for (const quiet of ['--st-stale', '--st-unseen', '--st-current']) {
+        const v = decl(quiet) ?? '';
+        const chromas = [...v.matchAll(/oklch\(\s*[\d.]+\s+([\d.]+)/g)].map(m => Number(m[1]));
+        expect(chromas.length, `${quiet} should resolve to oklch values`).toBeGreaterThan(0);
+        for (const c of chromas) {
+          expect(c, `${quiet} must be near-neutral (chroma ${c}) — one hue only`).toBeLessThanOrEqual(0.02);
+        }
+      }
+    });
+  });
+
   describe('the anti-flash ground', () => {
     it('matches --bg in BOTH themes', () => {
       // `workbench.css` paints the body before the component mounts, now via

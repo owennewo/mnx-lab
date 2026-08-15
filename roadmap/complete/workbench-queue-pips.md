@@ -1,6 +1,31 @@
 # The queue's colours after "red everywhere"
 
-> **Status: proposed 2026-08-15.** Item 6 of
+> **Status: BUILT 2026-08-15**, same day as proposed. One accent, spent on
+> `blocked`; the other three states carry their own near-neutral lightness ramp
+> and keep the shape encoding the rail already had. Grayscale is no longer a
+> review ritual — it is an assertion in
+> `harness/conformance/design-tokens.test.ts`, which resolves each state through
+> its token chain to an `oklch()` lightness and fails if any neighbouring pair
+> closes to within 0.12 in either theme.
+>
+> **The doc's premise was half wrong, and the truth made the job smaller.** It
+> said the ramp "appears anywhere a scenario is listed" via `.pip[data-st]` in
+> `sharedChrome`. `.pip` was rendered by NOTHING — dead, along with `.gapdia`
+> and `.vchip`, and between them they were the only consumers of two of the five
+> status tokens. The live palette was three tokens, not five, and one of them
+> (`--st-gap`) had quietly become the generic "something needs you" colour:
+> blocked dots, unwitnessed counts, attention badges, popover errors, a failed
+> load border. Deleting the dead CSS was most of the work; the rest was giving
+> the overloaded token's jobs their real names.
+>
+> Two values-level findings. Aliasing `--ink-*` for the quiet states looked
+> elegant and **failed the grayscale test in dark** — the shared ramp is spaced
+> for text contrast, and it put `unseen` within 0.08 of the accent. The states
+> carry their own values now. And the first pass left `current` only 0.14 from
+> `never-seen` in dark, which cleared the floor but read tight at 7px; `current`
+> was darkened until the weakest remaining pair is one the halo also separates.
+>
+> Item 6 of
 > [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md). Blocks on
 > [core-modernist-tokens.md](../complete/core-modernist-tokens.md), which deliberately does **not** touch the
 > pip ramp — this is the bill that item runs up.

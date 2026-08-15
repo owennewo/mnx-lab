@@ -1,6 +1,6 @@
 # Campaign: Modernist — the workbench restyle the tray's art direction leads
 
-> **Status: IN PROGRESS 2026-08-15 — items 1, 3, 4 and 5 built; 2, 6, 7 open.**
+> **Status: IN PROGRESS 2026-08-15 — items 1–6 built; 7 open, 8 undrafted.**
 > A campaign (see CLAUDE.md → Conventions): this doc
 > is an index over several normal proposals, the shared contract they follow, and the
 > running log of progress and learnings as items land. Indexed items are ordinary
@@ -128,7 +128,7 @@ frame exists.
 | 3 | [core-modernist-type.md](../complete/core-modernist-type.md) | Archivo via `@fontsource`, `--serif` retired, the mono voice decided. Carries the tray's re-review, because bundling the font changes a surface that was reviewed in the fallback. | 1 | **built 2026-08-15** |
 | 4 | revision on [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) | The tray drops its 55 hard-coded literals for token references — but **keeps inheriting** the palette rather than declaring `designTokens` locally (an early draft said otherwise; a local block would pin the tray light when the theme switches). A revision block on the complete doc, not a new one: same component, same art direction, and that doc already carries the deviations section this closes. | 1, 3 | **built 2026-08-15** |
 | 5 | [workbench-score-panel.md](../complete/workbench-score-panel.md) | The score panel: five-band frame, seven tabs cut to five, the width change, and the per-tab rebuilds. The campaign's structure half and its showcase. **Built** except the two halves that belong to other items — the JSON gutter and selection scoping (item 7) and compare's live render/overlay. | 1 | **built 2026-08-15** |
-| 6 | [workbench-queue-pips.md](../proposed/workbench-queue-pips.md) | Re-deriving the five-state queue ramp under one accent — the bill "red everywhere" runs up. Shape and lightness carry what hue no longer can. | 1 | proposed |
+| 6 | [workbench-queue-pips.md](../complete/workbench-queue-pips.md) | Re-deriving the five-state queue ramp under one accent — the bill "red everywhere" runs up. Shape and lightness carry what hue no longer can. | 1 | **built 2026-08-15** |
 | 7 | [core-json-view.md](../proposed/core-json-view.md) | `buildJsonView()` gains `spanByPointer`; the dormant module finally gets a consumer, a conformance test, and the pinned-error highlight the panel consolidation lost. The only below-the-boundary code change in the campaign. | — (5 for the UI half) | proposed |
 | 8 | *(undrafted)* | The `<360px` drawer mode. Needs a viewport breakpoint, an absolutely-positioned panel, **and a panel open/close control that does not exist** — the rail has Ctrl+B, the panel has nothing, and the mock specifies neither the control nor its keystroke. | 5 | undrafted |
 
@@ -173,6 +173,33 @@ depends on. Revisit if a session's queue ever gets long enough to hurt.
 *(Appended as items land, per the convention — later items start smarter than earlier
 ones.)*
 
+- **2026-08-15 — item 6 lands: the queue pays the accent's bill, and most of the ramp
+  turned out to be dead.** One accent on `blocked`; the other three states carry their
+  own near-neutral lightness ramp plus the shape encoding the rail already had. The
+  campaign's colour work is done.
+  - **Half the thing being re-encoded did not exist.** The doc said the status ramp
+    "appears anywhere a scenario is listed" through `.pip[data-st]` in `sharedChrome`.
+    `.pip` was rendered by nothing — dead, along with `.gapdia` and `.vchip`, and
+    between them they were the only consumers of two of the five status tokens. The live
+    palette was three tokens, and one (`--st-gap`) had drifted into being the generic
+    "something needs you" colour across five unrelated surfaces. **Read the use sites
+    before re-encoding a vocabulary**; the doc described the token sheet, not the app.
+  - **Grayscale stopped being a review ritual and became an assertion.** The doc named
+    it as the acceptance test, which in practice means somebody remembering to squint.
+    It is now a conformance test that resolves each state through its token chain to an
+    `oklch()` lightness and fails if neighbouring states close to within 0.12 in either
+    theme. It caught a real collision on the first run — see below — and it is the kind
+    of rule that otherwise decays over a few well-meaning commits.
+  - **Aliasing the ink ramp was elegant and wrong.** Pointing the quiet states at
+    `--ink`/`--ink-2`/`--line-strong` reads beautifully and put `unseen` within 0.08 of
+    the accent in dark, because that ramp is spaced for TEXT contrast, not for four 7px
+    marks. The states carry their own values now. **A shared scale is not automatically
+    the right scale** — check what it was spaced for.
+  - **The corpus could not verify its own queue.** With 99 `current` and 7 `never-seen`
+    and nothing blocked or stale, the rail shows two of the four states, so the visual
+    check had to be a synthetic swatch rendering all five marks in both themes and
+    desaturated. Worth remembering for any state-encoding work here: the attention queue
+    being nearly empty is the healthy case and the untestable one.
 - **2026-08-15 — item 2 lands: dark is authored, wired, and the mechanism turned out
   to be wrong.** `auto | light | dark`, persisted, resolved against
   `prefers-color-scheme` (verified in both directions by emulating the media query),
