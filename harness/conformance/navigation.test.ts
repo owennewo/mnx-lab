@@ -16,6 +16,12 @@ import {
 } from '../../src/edit/staffSpace.ts';
 import type { MnxEvent, MnxStructure } from '../../src/model/mnx.ts';
 import type { SelectionLevel } from '../../src/edit/selection.ts';
+import {
+  neighbourSystemMeasure,
+  packedRowMeasures,
+  planHorizontal
+} from '../../src/engine/layout/spacing.ts';
+import { initSmufl } from '../helpers/corpusPrimitives.ts';
 
 const playground = (): MnxStructure =>
   JSON.parse(
@@ -419,6 +425,48 @@ describe('the per-level navigation map', () => {
     // part-measure's climb is the system jump — the mount's, like its bare row.
     expect(at('partMeasure').handleIntent({ type: 'jumpDown' })).toBe(false);
     expect(at('score').handleIntent({ type: 'jumpDown' })).toBe(false);
+  });
+
+  // The measure rung's ↑↓ and part-measure's Ctrl+↑↓ mean "the neighbouring
+  // SYSTEM", which the session cannot see: `src/edit` imports only `src/model`,
+  // and where the score wrapped is the layout's answer. The mount asks the
+  // viewer and dispatches a resolved `goToMeasure`; the geometry it asks about
+  // lives with the packing that decided it, and is pure — so it is testable
+  // here, where the element's own resolution would need a browser.
+  describe('the system rung’s geometry', () => {
+    it('reads which bars landed on which system row', () => {
+      initSmufl();
+      const packing = planHorizontal(playground(), 60).packing;
+      const rows = packedRowMeasures([packing], 1);
+      expect(rows.length).toBeGreaterThan(1); // the playground wraps, by design
+      expect(rows.flat()).toEqual([0, 1, 2, 3, 4, 5, 6, 7]); // every bar, in order
+    });
+
+    it('preserves the COLUMN, clamping onto a shorter row', () => {
+      // Text-editor line navigation over the bar-wrap grid: the same rule that
+      // puts the caret at the end of a short line above.
+      const rows = [
+        [0, 1, 2, 3],
+        [4, 5],
+        [6, 7, 8, 9]
+      ];
+      expect(neighbourSystemMeasure(rows, 0, 1)).toBe(4);
+      expect(neighbourSystemMeasure(rows, 1, 1)).toBe(5);
+      expect(neighbourSystemMeasure(rows, 2, 1)).toBe(5); // clamped to the row's last bar
+      expect(neighbourSystemMeasure(rows, 5, -1)).toBe(1);
+      expect(neighbourSystemMeasure(rows, 9, -1)).toBe(5);
+    });
+
+    it('dies at the ends, and on a bar no system holds', () => {
+      const rows = [
+        [0, 1],
+        [2, 3]
+      ];
+      expect(neighbourSystemMeasure(rows, 0, -1)).toBeNull();
+      expect(neighbourSystemMeasure(rows, 3, 1)).toBeNull();
+      // A hidden or out-of-range bar is one the reader cannot see.
+      expect(neighbourSystemMeasure(rows, 9, 1)).toBeNull();
+    });
   });
 
   it('the selection reads the cursor’s voice, not the ink under it', () => {

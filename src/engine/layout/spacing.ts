@@ -334,6 +334,51 @@ export function densityLadder(packings: readonly PackingInput[]): number[] {
   return steps;
 }
 
+/**
+ * Which bars landed on which system row, as MEASURE indices — the packing
+ * answering a question about itself.
+ *
+ * `PackedRow.measures` indexes `PackingInput.measures`, which skips hidden and
+ * out-of-range bars, so the ordinals it carries are not measure numbers. The
+ * selection ladder's measure rung navigates systems (roadmap/inprogress/
+ * core-selection-ladder.md), and `src/edit` may import only `src/model` — so
+ * "the score, wrapped into lines" has to reach the editor as data, from the
+ * layer that decided the wrap. Reads `packSystems` rather than restating it,
+ * for the reason the density ladder does: two copies of the packing arithmetic
+ * is exactly what this module exists to prevent.
+ */
+export function packedRowMeasures(
+  packings: readonly PackingInput[],
+  densityH: number
+): number[][] {
+  return packings.flatMap(packing =>
+    packSystems(packing, densityH).map(row => row.measures.map(k => packing.measures[k].index))
+  );
+}
+
+/**
+ * The nearest bar one system away, preserving the COLUMN — text-editor line
+ * navigation over the bar-wrap grid, which is exactly what the measure rung's
+ * ↑↓ means. A shorter neighbouring row clamps to its last bar rather than
+ * refusing, the way a cursor lands at the end of a short line.
+ *
+ * Null when there is no such row (the first system going up, the last going
+ * down) or when the measure is in none — a bar the layout never packed is one
+ * the reader cannot see, so there is nothing to move from.
+ */
+export function neighbourSystemMeasure(
+  rows: readonly (readonly number[])[],
+  measureIndex: number,
+  delta: 1 | -1
+): number | null {
+  const row = rows.findIndex(r => r.includes(measureIndex));
+  if (row < 0) return null;
+  const target = rows[row + delta];
+  if (!target || target.length === 0) return null;
+  const column = rows[row].indexOf(measureIndex);
+  return target[Math.min(column, target.length - 1)];
+}
+
 /** Ideal space after a note: log2 in duration so long notes are compressed. */
 function springSp(duration: number): number {
   if (duration <= 0) return MIN_SPRING_SP;

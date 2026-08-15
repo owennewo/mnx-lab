@@ -19,7 +19,7 @@ import {
   type RenderOutcome,
   type RenderScale
 } from '../engine/render/scale.ts';
-import { densityLadder, type PackingInput } from '../engine/layout/spacing.ts';
+import { densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
 import { drawCursorGhost, drawEnclosure } from './enclosure.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
@@ -215,6 +215,8 @@ export class ScoreViewer extends LitElement {
    *  invalidates it and repeated `densitySteps()` calls do not re-pack. */
   private lastPackings: PackingInput[] | null = null;
   private ladder: { of: PackingInput[]; steps: number[] } | null = null;
+  /** The density that packing was laid out at — `systemRows()`'s input. */
+  private lastDensityH = 1;
 
   static styles = [
     // The viewer carries its own tokens (core-viewer-embedded-app.md): on a
@@ -598,6 +600,10 @@ export class ScoreViewer extends LitElement {
     this.renderedWidth = width;
     const failures: { pane: string; message: string }[] = [];
     const staffScale = clampStaffScale(this.zoom);
+    // Resolved once and remembered with the packing: `systemRows()` has to
+    // re-pack at the value THIS paint used, not at whatever the properties say
+    // when it is asked.
+    const densityH = this.densityH ?? DENSITY_H[this.density] ?? 1;
     // Whichever pane actually drew: `both` is one render, and in the split
     // views notation and tab derive the same factor from the shared plan, so
     // there is never a second, disagreeing answer to report.
@@ -625,7 +631,7 @@ export class ScoreViewer extends LitElement {
       // The preset resolves to the engine's multiplier here — the element
       // binds a behavior it does not implement (docs/core-viewer-surface.md).
       // A numeric `density-h` outranks the preset; unset, the preset decides.
-      densityH: this.densityH ?? DENSITY_H[this.density] ?? 1,
+      densityH,
       // undefined, not 10: an absent pxPerSp is what tells the renderers to
       // FIT (core-zoom-density-pad.md, ruling 2). Sending a number here would
       // pin every score at load and quietly retire fit-to-width.
@@ -739,6 +745,7 @@ export class ScoreViewer extends LitElement {
       // NOT in the event: the detail stays exactly `RenderScale`, because a
       // host wants the answer ("which values do something?"), not the input.
       this.lastPackings = drawn.packings;
+      this.lastDensityH = densityH;
       this.dispatchEvent(
         new CustomEvent<RenderScale>('render-scale', {
           detail: { pxPerSp, staffScale: used, fitted },
@@ -774,6 +781,24 @@ export class ScoreViewer extends LitElement {
       this.ladder = { of: packings, steps: densityLadder(packings) };
     }
     return this.ladder.steps;
+  }
+
+  /**
+   * Which bars are on which system row, as measure indices — the score as the
+   * reader sees it wrapped, top row first.
+   *
+   * Here for the same reason `densitySteps()` is: only the layer that just laid
+   * the score out knows where the lines broke, and it depends on the viewport
+   * width and the staff scale, both of which move. The selection ladder's
+   * measure rung navigates systems with ↑↓, and `src/edit` may import only
+   * `src/model`, so the mount asks this and hands the session an already
+   * resolved `goToMeasure` — the stage-1 pattern, keeping the session
+   * deterministic and its traces replayable.
+   *
+   * Null until a paint has succeeded.
+   */
+  systemRows(): number[][] | null {
+    return this.lastPackings ? packedRowMeasures(this.lastPackings, this.lastDensityH) : null;
   }
 
   /** The selection's on-screen box: the enclosure overlay's bounding rect in

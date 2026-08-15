@@ -80,12 +80,12 @@ function makeTwoPartDoc(): MnxStructure {
 describe('keymap docs — the guard mirrors', () => {
   it('the Ctrl climb: documented per rung, and the session mirrors it', () => {
     // The climb's vertical, rung by rung (selection-ladder navigation map):
-    // the voice at note level, the staves from event and voice-measure. The
-    // rungs ABOVE are absent from the table on purpose — part-measure's climb
-    // reaches the SYSTEM, which only the mount can resolve, and nothing wider
-    // has a vertical unit at all.
+    // the voice at note level, the staves from event and voice-measure, the
+    // system from part-measure. That last one is the MOUNT's — documented
+    // because the reader gets it, refused by the session because the paint is
+    // not visible from a DOM-free layer. Nothing wider has a vertical unit.
     const doc = KEY_DOCS.find(d => d.keys === 'Ctrl+↑/↓')!;
-    expect(Object.keys(doc.meaning)).toEqual(['note', 'event', 'voiceMeasure']);
+    expect(Object.keys(doc.meaning)).toEqual(['note', 'event', 'voiceMeasure', 'partMeasure']);
 
     const session = new EditorSession(makeTwoPartDoc());
     expect(session.selectionLevel).toBe('note');
@@ -101,24 +101,38 @@ describe('keymap docs — the guard mirrors', () => {
     while (session.selectionLevel !== 'partMeasure') {
       session.handleIntent({ type: 'relaxSelection' });
     }
-    expect(session.handleIntent({ type: 'jumpDown' })).toBe(false);
+    expect(session.handleIntent({ type: 'jumpDown' })).toBe(false); // the mount's
     expect(session.handleIntent({ type: 'jumpUp' })).toBe(false);
   });
 
-  it('bare ↑/↓: documented to part-measure, and the wider rungs refuse', () => {
-    // measure and score ARE bound for the reader — the neighbouring system and
-    // the next document — but both are resolved by the mount (a fact about the
-    // paint, and one about the host), so the session must say no.
+  it('bare ↑/↓: every rung but section, and exactly two belong to the mount', () => {
+    // The table says what the READER gets, so measure and score are in it —
+    // the neighbouring system and the next score. Both are resolved by the
+    // mount and reach the session as `goToMeasure` or not at all, so the
+    // session refuses them here. Naming the pair is the point of the test: a
+    // THIRD rung quietly going inert would otherwise read as documented.
     const doc = KEY_DOCS.find(d => d.keys === '↑/↓')!;
-    expect(Object.keys(doc.meaning)).toEqual(['note', 'event', 'voiceMeasure', 'partMeasure']);
+    expect(Object.keys(doc.meaning)).toEqual([
+      'note',
+      'event',
+      'voiceMeasure',
+      'partMeasure',
+      'measure',
+      'score'
+    ]);
 
-    const session = new EditorSession(makeTwoPartDoc());
-    while (session.selectionLevel !== 'measure') session.handleIntent({ type: 'relaxSelection' });
-    expect(session.handleIntent({ type: 'lineDown' })).toBe(false);
-    expect(session.handleIntent({ type: 'lineUp' })).toBe(false);
-
-    while (session.selectionLevel !== 'score') session.handleIntent({ type: 'relaxSelection' });
-    expect(session.handleIntent({ type: 'lineDown' })).toBe(false);
+    // A session per rung: the voice step STOPS at the outermost voice, so a
+    // shared session would arrive at the next rung already pressed against it.
+    const handles = (level: string): boolean => {
+      const session = new EditorSession(makeTwoPartDoc());
+      while (session.selectionLevel !== level) session.handleIntent({ type: 'relaxSelection' });
+      return session.handleIntent({ type: 'lineDown' });
+    };
+    expect(handles('event')).toBe(true);
+    expect(handles('voiceMeasure')).toBe(true);
+    expect(handles('partMeasure')).toBe(true);
+    expect(handles('measure')).toBe(false); // the mount's
+    expect(handles('score')).toBe(false); // the mount's
   });
 
   it('toggleNote: documented notation-only, and the tab projection refuses', () => {

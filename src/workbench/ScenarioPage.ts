@@ -81,7 +81,7 @@ import {
   MAX_STAFF_SCALE,
   type RenderScale
 } from '../engine/render/scale.ts';
-import { MIN_DENSITY, MAX_DENSITY } from '../engine/layout/spacing.ts';
+import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layout/spacing.ts';
 
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
@@ -1529,7 +1529,7 @@ export class ScenarioPage extends LitElement {
         return;
       }
     }
-    const intent = resolveIntent(strokeOf(event), this.activeLayers());
+    let intent = resolveIntent(strokeOf(event), this.activeLayers());
     if (!intent || !this.session) return;
     event.preventDefault();
     this.followProjection();
@@ -1552,6 +1552,17 @@ export class ScenarioPage extends LitElement {
       this.escalateToRail(intent.type === 'lineDown' ? 1 : -1);
       return;
     }
+    // The system rungs, resolved HERE and dispatched as `goToMeasure` — the
+    // stage-1 pattern: this layer already owns environment-dependent
+    // interpretation, and it emits the RESOLVED intent so the session stays
+    // deterministic and the trace records a bar, never a paint. `src/edit` may
+    // import only `src/model`, so where the renderer wrapped the score is a
+    // fact it structurally cannot see.
+    const systemStep = this.resolveSystemStep(intent);
+    if (systemStep !== undefined) {
+      if (systemStep === null) return; // no neighbouring system — the arrow dies here
+      intent = systemStep;
+    }
     const handled = this.session.handleIntent(intent);
     if (intent.type === 'relaxSelection') {
       if (!handled) this.cursorHidden = true;
@@ -1561,6 +1572,32 @@ export class ScenarioPage extends LitElement {
     this.copied = false;
     this.syncFromSession();
   };
+
+  /**
+   * The two rungs whose vertical arrow means "the neighbouring SYSTEM": bare
+   * ↑↓ at the measure rung, and the Ctrl climb from part-measure (whose own
+   * ↑↓ is the staff step, so the climb lands one rung further up).
+   *
+   * Returns the resolved `goToMeasure` intent, `null` when there is no
+   * neighbouring system to move to, or `undefined` when this stroke is not a
+   * system step at all — three answers, because "not mine" and "mine, but
+   * nowhere to go" have to act differently at the call site.
+   */
+  private resolveSystemStep(intent: EditorIntent): EditorIntent | null | undefined {
+    const session = this.session;
+    if (!session || this.cursorHidden) return undefined;
+    const level = session.selectionLevel;
+    const vertical =
+      (level === 'measure' && (intent.type === 'lineUp' || intent.type === 'lineDown')) ||
+      (level === 'partMeasure' && (intent.type === 'jumpUp' || intent.type === 'jumpDown'));
+    if (!vertical) return undefined;
+
+    const rows = this.renderRoot?.querySelector<ScoreViewer>('mnx-score-viewer')?.systemRows();
+    if (!rows || rows.length === 0) return null; // nothing painted yet
+    const delta = intent.type === 'lineDown' || intent.type === 'jumpDown' ? 1 : -1;
+    const target = neighbourSystemMeasure(rows, session.cursor.measureIndex, delta);
+    return target === null ? null : { type: 'goToMeasure', measureIndex: target };
+  }
 
   /**
    * The score rung's vertical neighbour: the prev/next scenario in the RAIL's

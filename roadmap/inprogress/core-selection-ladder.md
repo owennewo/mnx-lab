@@ -23,7 +23,7 @@
 > race fixed (enclosures measured fallback-font glyph boxes before Bravura
 > loaded — one-shot redraw on `document.fonts.ready`).
 >
-> **The navigation pass is COMPLETE for every rung but one — 2026-08-15.** The
+> **The navigation pass is COMPLETE — every rung, both axes, 2026-08-15.** The
 > vertical arrows had never consulted the rung (`lineUp`/`lineDown` always
 > walked the staff line, `jumpUp`/`jumpDown` returned false above note), so at
 > event level ↑ crawled up empty staff positions while the slice never moved.
@@ -40,8 +40,15 @@
 >   `goToMeasure` — the stage-1 pattern the digit debounce established. `edit/`
 >   may import only `model/`, so "the nearest bar in the neighbouring system" is
 >   a fact it structurally cannot see; delivering it as an already-resolved
->   intent keeps the session deterministic and the trace replayable. **This is
->   the one rung still unwired** — it waits on the viewer's packing accessor.
+>   intent keeps the session deterministic and the trace replayable (a trace
+>   records a bar, never a paint). The geometry lives with the packing that
+>   decided it — `packedRowMeasures` and `neighbourSystemMeasure` in
+>   `engine/layout/spacing.ts`, reading `packSystems` rather than restating the
+>   wrap — surfaced by `ScoreViewer.systemRows()` beside `densitySteps()`, which
+>   is the accessor this rung waited on
+>   ([core-render-density-zoom.md](../complete/core-render-density-zoom.md)).
+>   The column is PRESERVED across the step and clamps onto a shorter row: text-
+>   editor line navigation over the bar-wrap grid, which is what the rung means.
 > - **The score rung's ↑↓ escalates in the workbench mount** (prev/next scenario
 >   in the rail's topic order), not yet as the element's `score-navigate` event —
 >   that belongs with the `elements/` promotion and
@@ -93,8 +100,8 @@
 > playground keeps the presence-rule bars; the rail groups both under
 > "Editor test beds".
 >
-> **What remains, after the per-level pass**: the system rung's mount wiring
-> (above); lateral extension + closures (Shift+arrows/Ctrl+A), which need
+> **What remains, after the per-level pass**: lateral extension + closures
+> (Shift+arrows/Ctrl+A), which need
 > selection to become `{level, anchor, extent}` rather than a level plus a
 > cursor; the relax/tighten shape TWEEN (each level currently re-renders
 > statically); primary/echo asymmetry (both projections draw at full strength);
@@ -323,12 +330,14 @@ note↔JSON cross-highlight: one selection, echoed across representations.
 
 ## The bare-arrow navigation map (drafted 2026-08-10, BUILT 2026-08-15)
 
-> Every row below is implemented — `session.moveHorizontal` and the level
-> switch beside it (`stepVoice`, `stepStaff`, `sectionStep`) — except the two
-> the mount owns: the measure row's ↑↓ and the score row's, for the reasons in
-> the status block. The cheatsheet carries the same table as data
-> (`src/edit/keymapDocs.ts`), and `keymap-docs.test.ts` asserts the two cannot
-> drift: a rung absent from the table must be a session no-op.
+> Every row below is implemented. Most of it is `session.moveHorizontal` and
+> the level switch beside it (`stepVoice`, `stepStaff`, `sectionStep`); the
+> measure row's ↑↓ and the score row's are resolved in the mount and arrive as
+> `goToMeasure` or as a rail navigation. The cheatsheet carries the same table
+> as data (`src/edit/keymapDocs.ts`) and states what the READER gets, so those
+> two rows are in it even though the session refuses them —
+> `keymap-docs.test.ts` names exactly that pair, so a third rung going quietly
+> inert cannot pass as documented.
 
 
 The matrix is selection level × projection (notation vs tab). Forcing it flat

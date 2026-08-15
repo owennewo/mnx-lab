@@ -79,16 +79,20 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'ArrowUp' }, { code: 'ArrowDown' }],
     group: 'navigation',
     // The vertical axis coarsens as the rung widens: the staff's own space,
-    // then the voice stack, then the system's staves. Section is deliberately
-    // unbound (no honest referent). The MEASURE rung's row is missing here on
-    // purpose — "the nearest bar in the neighbouring system" is a fact about
-    // the paint, resolved by the mount and delivered as `goToMeasure`, so the
-    // session guard this table mirrors correctly refuses it.
+    // then the voice stack, then the system's staves, then the systems
+    // themselves. Section is deliberately unbound (no honest referent). This
+    // table states what the READER gets, so the last two rows are here even
+    // though the session refuses them — both are resolved by the mount (a fact
+    // about the paint, and one about the host) and arrive as a resolved intent
+    // or not at all. keymap-docs.test.ts names that pair, so a third cannot
+    // appear unnoticed.
     meaning: {
       note: 'up/down the vertical line (string / staff position)',
       event: 'the voice above/below, at this instant',
       voiceMeasure: 'the voice above/below in this bar',
-      partMeasure: 'the staff above/below (this part’s staves, then the next part)'
+      partMeasure: 'the staff above/below (this part’s staves, then the next part)',
+      measure: 'the nearest bar in the system above/below',
+      score: 'the previous/next score in the collection'
     }
   },
   {
@@ -116,13 +120,13 @@ export const KEY_DOCS: KeyDoc[] = [
       { code: 'ArrowDown', ctrl: true }
     ],
     group: 'navigation',
-    // The same climb on the vertical — mirrored by the session's level guards
-    // (the honesty test). Part-measure's climb reaches the SYSTEM, the mount's
-    // to resolve, so it is absent here for the same reason as the bare row.
+    // The same climb on the vertical. Part-measure's climb reaches the SYSTEM
+    // — the mount's to resolve, like the measure rung's bare ↑↓.
     meaning: {
       note: 'jump to the voice above/below (the event sounding at this beat)',
       event: 'jump to the staff above/below',
-      voiceMeasure: 'jump to the staff above/below'
+      voiceMeasure: 'jump to the staff above/below',
+      partMeasure: 'jump to the system above/below'
     }
   },
 
