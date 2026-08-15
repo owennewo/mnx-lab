@@ -39,7 +39,7 @@
 > fixtures got their own kind (`{target, intents}`, no inline expectations —
 > the goldens are the oracle, so there is nothing for an update mode to write).
 
-> Campaign: [core-campaign-element-ops.md](../inprogress/core-campaign-element-ops.md), item 1.
+> Campaign: [core-campaign-element-ops.md](core-campaign-element-ops.md), item 1.
 > This item IS the harness-proving step, so its "agreement block" is the algorithm
 > itself: both harness halves built end-to-end over two deliberately simple scenarios,
 > plus the op-queue panel that makes the command sequence visible and reviewable.

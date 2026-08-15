@@ -3,7 +3,7 @@
 > **Status: built 2026-08-14, same day as proposed.** Campaign:
 > [core-campaign-element-ops.md](core-campaign-element-ops.md), item 2,
 > inheriting item 1's walker interface, oracle set and
-> [close-out learnings](../complete/core-element-ops-exemplar.md).
+> [close-out learnings](core-element-ops-exemplar.md).
 >
 > Item 1 proved the reverse algorithm over two scenarios and seven notes. This item
 > runs it over all 106 and every kind of ink in them, and turns the run into the
@@ -245,7 +245,7 @@ in-memory sessions, and never writes `scenarios/`.
   Resolving the slot and comparing its key is the honest test, and it turns a
   silent mis-edit into a reported finding. **The ladder owns the fix** — this is
   concrete evidence for a voice component in the cursor, filed to
-  [core-selection-ladder.md](core-selection-ladder.md).
+  [core-selection-ladder.md](../inprogress/core-selection-ladder.md).
 - **Addressability is projection-dependent.** Two chord members can derive onto the
   same *string* (navigation-playground's first bar puts both on string 1 — itself a
   tab derivation worth a look, since one string cannot sound two notes) while their

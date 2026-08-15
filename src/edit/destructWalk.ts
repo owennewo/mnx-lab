@@ -13,7 +13,7 @@
 //   `walkElements` — every element of the document, whether or not anything
 //                    can remove it (elementWalk.ts). The corpus sweep drives
 //                    that one, because the gap between the two IS the report
-//                    (roadmap/inprogress/core-element-ops-destruct-sweep.md).
+//                    (roadmap/complete/core-element-ops-destruct-sweep.md).
 import type { MnxStructure } from '../model/mnx.ts';
 import { coincidentSlots, forEachKeyedNote, onsetsEqual, slotAt } from './cursor.ts';
 import { ELEMENT_KINDS, type ElementKind, type ElementRef } from './elementWalk.ts';

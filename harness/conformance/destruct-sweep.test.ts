@@ -1,5 +1,5 @@
 // The destructibility sweep — the element-ops campaign's reverse harness at
-// corpus scale (item 2, roadmap/inprogress/core-element-ops-destruct-sweep.md;
+// corpus scale (item 2, roadmap/complete/core-element-ops-destruct-sweep.md;
 // item 1 proved the algorithm over two scenarios in
 // roadmap/complete/core-element-ops-exemplar.md).
 //

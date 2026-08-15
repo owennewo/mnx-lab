@@ -1,7 +1,7 @@
 # One note enumeration — the address, produced once
 
 > **Status: move 1 built 2026-08-14.** Prerequisite for campaign item 11b
-> ([core-element-ops-onset-granularity.md](core-element-ops-onset-granularity.md)),
+> ([core-element-ops-onset-granularity.md](../complete/core-element-ops-onset-granularity.md)),
 > and a standing hazard retired on its own merits.
 
 ## The problem it removes

@@ -63,10 +63,10 @@ proposal opens with, and is reviewed on:
    (Shift+letter typed grammar) or palette-tier instead. Free-key budget is shared
    across the campaign; claims are recorded here in the index so items don't collide.
 3. **The rung** — which selection-ladder level(s) the ops attach to, decided with the
-   [core-selection-ladder.md](core-selection-ladder.md) per-level review
+   [core-selection-ladder.md](../inprogress/core-selection-ladder.md) per-level review
    (its navigation map and this campaign are two halves of one set of decisions), and
    landed as `KeyDoc` rows in `src/edit/keymapDocs.ts` in the same change so the
-   cheatsheet joins ([core-keymap-cheatsheet.md](core-keymap-cheatsheet.md)
+   cheatsheet joins ([core-keymap-cheatsheet.md](../inprogress/core-keymap-cheatsheet.md)
    stage 4) keep it honest.
 4. **The evidence** — which scenarios the item unlocks, proven by the campaign's two
    harnesses: the constructibility trace (replay from empty, judge against the
@@ -95,7 +95,7 @@ verb landing without a trace fails the build.
 
 | # | Item | Scope | Unlocks | Keys / tier | Rung | Status |
 |---|------|-------|---------|-------------|------|--------|
-| 1 | [exemplar](../complete/core-element-ops-exemplar.md) | Both harness halves built end-to-end over two simple scenarios (`minimal-single-note`, `open-strings-chord`). Start is **decided: the literal `{}`** — so the campaign's first new ops are the genesis verbs (`addPart`, skeleton-on-demand; score rung, setup tier) and the session is hardened for zero parts/measures. Settles key normalization; adds the **op-queue panel** (side-panel ops tab: `appliedOps` as a visible undo/redo queue) so command sequences can be read and reviewed. | the algorithm + genesis ops + 2 traced scenarios | **Shift+P** part popover; staffKind: palette | **score** | **complete 2026-08-14** |
+| 1 | [exemplar](core-element-ops-exemplar.md) | Both harness halves built end-to-end over two simple scenarios (`minimal-single-note`, `open-strings-chord`). Start is **decided: the literal `{}`** — so the campaign's first new ops are the genesis verbs (`addPart`, skeleton-on-demand; score rung, setup tier) and the session is hardened for zero parts/measures. Settles key normalization; adds the **op-queue panel** (side-panel ops tab: `appliedOps` as a visible undo/redo queue) so command sequences can be read and reviewed. | the algorithm + genesis ops + 2 traced scenarios | **Shift+P** part popover; staffKind: palette | **score** | **complete 2026-08-14** |
 | 2 | [destructibility sweep](core-element-ops-destruct-sweep.md) | Item 1's reverse walk scaled corpus-wide: element walker per kind (noteKeys generalized), attempt address+delete per element; oracles: applies / no new diagnostics / no dangling references / undo byte-identical, **widened** (relative validity, references past ties, a surviving-document check). No trace fixtures — the walk regenerates each run; the report is the artifact. Doubles as ladder addressability audit. Fix the `deleteNote` dangling-reference bug it will catch. | verdicts for all 106 | n/a | n/a | **built 2026-08-14** |
 | 3 | [constructibility traces](core-element-ops-construct-traces.md) | Item 1's forward harness scaled: the construct-fixture kind + per-scenario tiers (unreachable → ops-reachable → keyboard-reachable → traced) + the expected-unreachable class. Traces themselves arrive with items 4–13 (recorded via "copy trace", never hand-written); possible workbench coverage map later. Inherits item 1's parked **recording surface** question: "copy trace" stamps a corpus scenario id as the start, so recording from `{}` wants the new-document journey — and with it, the ops tab on non-scenario (IndexedDB) documents. | verdict machinery for all 106; traces accumulate per item | n/a | n/a | **built 2026-08-14** |
 | 4 | [duration completion](core-element-ops-duration-completion.md) | Dots and time `display: common\|cut` — capo turned out to be **already closed by item 13**, so the row was two verbs, not three. The dot is one key cycling 0→1→2→none, splitting ink/absence like the ladder; dotted RESTS go through 11b's spelling verb (`rest half.`). Uncovered and fixed: entry could not lengthen past the rest it landed on, so dots were unenterable. | traceability for 7 scenarios (6 dotted, 1 glyph); no new kinds | **`.`** ; `common`/`4/4 cut` in the time popover | event / setup | **complete 2026-08-15** |
@@ -294,7 +294,7 @@ names no owner. Still recorded, not indexed: transposition, harmonies rendering
     riding on it, which is what "do the addressing first" bought.
 
 - **2026-08-14 — the addressing layer, in two moves; and a number I had wrong.**
-  [core-note-address.md](core-note-address.md): one enumeration produces note
+  [core-note-address.md](../inprogress/core-note-address.md): one enumeration produces note
   coordinates (`model/noteWalk.ts`, with a corpus-wide join proving the renderer
   agrees), and the cursor gains the discriminator its address was missing
   (`slotIndex`, stepped by `Alt+V`).
@@ -610,7 +610,7 @@ names no owner. Still recorded, not indexed: transposition, harmonies rendering
     proved the new cascades removed only what they should. Array-shift-aware
     diffing was the trick — splicing a chord member must not read as five changes.
   - Two findings handed onward: the cursor's missing voice component (evidence
-    filed to [core-selection-ladder.md](core-selection-ladder.md)), and a chord in
+    filed to [core-selection-ladder.md](../inprogress/core-selection-ladder.md)), and a chord in
     navigation-playground deriving two notes onto one string, which no fingerboard
     can play.
 - **2026-08-14 — item 1 closed; what items 2–3 inherit.** The exemplar moves to
@@ -642,7 +642,7 @@ names no owner. Still recorded, not indexed: transposition, harmonies rendering
   - Two threads forwarded rather than dropped: the ops tab on non-scenario
     documents rides item 3's recording surface (indexed on its row), and
     "an empty part draws nothing" is recorded in
-    [core-selection-ladder.md](core-selection-ladder.md) as ghost-vocabulary
+    [core-selection-ladder.md](../inprogress/core-selection-ladder.md) as ghost-vocabulary
     work (corpus-neutral — no scenario is measureless).
 - **2026-08-14 — destruct tears down to `{}` (revision, stage-5 feedback).**
   The "ink-free terminal" read as principled asymmetry but conflated two

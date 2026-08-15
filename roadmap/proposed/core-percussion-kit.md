@@ -2,7 +2,7 @@
 
 Serves the **implementation loop**. Owner of the `kit-component`, `kit-note` and
 `sound` element kinds, formally handed over by
-[core-campaign-element-ops.md](../inprogress/core-campaign-element-ops.md) on
+[core-campaign-element-ops.md](../complete/core-campaign-element-ops.md) on
 2026-08-15 (its second scoping decision).
 
 ## Why it is not element-ops work

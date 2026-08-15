@@ -172,7 +172,7 @@ export function parseTuning(text: string): MnxTuningEntry[] | null {
 
 // ---------------------------------------------------------------------------
 // The inherited-attribute pair (campaign item 5,
-// roadmap/inprogress/core-element-ops-clef-key.md). Both grammars accept
+// roadmap/complete/core-element-ops-clef-key.md). Both grammars accept
 // `inherit` (shorthand `-`), which names what removal DOES — revert to the
 // predecessor's governance — rather than what it deletes. One token, one
 // meaning, reusable by every later inherited-attribute item.
@@ -232,7 +232,7 @@ export function parseKeySignature(text: string): { fifths: number } | 'inherit' 
 
 // ---------------------------------------------------------------------------
 // The bar-attribute family (campaign item 7,
-// roadmap/inprogress/core-element-ops-bar-attributes.md). One popover, ten
+// roadmap/complete/core-element-ops-bar-attributes.md). One popover, ten
 // kinds: the first word names the attribute, the rest is its value. Removal is
 // `no <attribute>` — where item 5's inherited attributes say `inherit`
 // ("revert to the predecessor"), an annotation says it is simply not there.
@@ -411,7 +411,7 @@ export function parseBarAttribute(text: string): BarAttributeResult {
 
 // ---------------------------------------------------------------------------
 // Event adornments (campaign item 8,
-// roadmap/inprogress/core-element-ops-adornments.md). One popover, three kinds
+// roadmap/complete/core-element-ops-adornments.md). One popover, three kinds
 // with two owners: a bare marking word, a bare dynamic word, or `text …`.
 // Removal keeps item 7's `no <thing>` token — these are annotations too.
 
@@ -568,7 +568,7 @@ function resolveMarking(word: string): string | null {
 }
 
 // ---------------------------------------------------------------------------
-// Lyrics (campaign item 12, roadmap/inprogress/core-element-ops-lyrics.md).
+// Lyrics (campaign item 12, roadmap/complete/core-element-ops-lyrics.md).
 // Text entry is a MODE in most editors; here it is the same typed popover the
 // rest of the campaign uses, because a syllable is one short string attached to
 // one note — and the popover already knows how to be a text field.

@@ -40,6 +40,29 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-entry-surface.md](proposed/core-entry-surface.md)** — typing anywhere the
+  cursor can already go, graduated out of the element-ops campaign (2026-08-15) as the
+  last thing holding its index open. The cursor addresses part → staff → voice in full
+  and every removal verb follows it; **entry still writes to voice 0 of `parts[0]`**, so
+  the ladder can visit a voice it cannot create. What makes it a design item rather than
+  a gap: nobody has decided what typing into a second voice MEANS when the bar is
+  already full — create the sequence, pad it with rests nobody asked for, or leave a
+  voice that underfills on every render. Corpus cost is nil (the key grammar already
+  spells part and staff, silent for 0 and 1). Acceptance: a construct trace for
+  `spec/multiple-voices` and `spec/tie-targets`.
+- **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
+  `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
+  (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
+  **place** and a layout is a **tree** — system → group → staff sources, nothing at an
+  onset, so the ladder cannot reach it. The asymmetry is the evidence: removal already
+  works by index, because deletion needs identity and construction needs somewhere to
+  stand. Opens with the addressing question (a ladder rung, a text form, or a panel);
+  blocks six scenarios, all of which render and verify today.
+- **[core-percussion-kit.md](proposed/core-percussion-kit.md)** — the `kit-component`,
+  `kit-note` and `sound` kinds, handed over alongside it. A kit part has no pitch axis
+  (the vertical axis is a component NAME the document declares, so there is nothing to
+  derive — the no-instrument-assumed rule one level up) and a component is referenced
+  rather than placed, so the verb order is fixed by the reference. One scenario.
 - **[spec-mnx-cg-proposals.md](proposed/spec-mnx-cg-proposals.md)** — **where** chord symbols, section
   labels and technique should live, designed to be adoptable by the MNX CG rather than to stay
   private `_x` fields. Checked against the CG's live issues: #109 chord symbols, #112/#377
@@ -121,17 +144,6 @@ proposals that name their campaign.
   from `activeElement` on the *causes* of focus change. Stage 2 — moving the listener onto
   the host element — rides
   [core-editor-element-promotion.md](proposed/core-editor-element-promotion.md).
-- **[core-viewer-surface.md](inprogress/core-viewer-surface.md)** — name and define **the viewer
-  surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
-  undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench
-  chrome), attribute-first, the `view="auto"` precedence chain (user > host > document
-  `staffKind` hint > default), a set-valued `hide` knob, and eviction of workbench leakage
-  (`pinnedErrors` et al). Subsumes render-density-zoom's "where do the levers live" question.
-- **[core-render-density-zoom.md](inprogress/core-render-density-zoom.md)** — configurable horizontal +
-  vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
-  in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
-  vertical density = layout gap/padding constants. Not started. Where the levers are *exposed*
-  is now owned by [core-viewer-surface.md](inprogress/core-viewer-surface.md).
 - **[core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md)** — the command palette's **third
   mode**: `Ctrl+K` text routing to `/api/edit-notation` when it reads as a sentence rather than
   a command (research §6.2), inheriting the `ui/ → assist/` boundary. Owns the deeper
@@ -151,26 +163,6 @@ proposals that name their campaign.
   element contract under [core-viewer-surface.md](inprogress/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
   [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
-- **[core-selection-tray-mechanism.md](inprogress/core-selection-tray-mechanism.md)** — part 2:
-  the tray wired, **stages 1–4 built 2026-08-15** (hands-on review open). One ruling — tiles
-  fire **intents through `session.handleIntent`, nothing else** — so tray clicks land in the
-  op queue and replay through traces like keystrokes. `src/edit/commandRegistry.ts` holds 56
-  commands over all seven rungs, each row the *surface half* of a
-  [campaign](inprogress/core-campaign-element-ops.md) agreement block (rungs, glyph,
-  key/tier, `isActive`, `action`), pinned by 18 conformance joins: shortcuts some table
-  really binds, surfaces that exist, intent types the session handles, glyph names the font
-  carries with bounding boxes, and the ledger agreement that keeps greyed tiles and the
-  residue doc from drifting. Drafted against a 15-op vocabulary; the sweep inverted the
-  emphasis — the verbs exist and their only human surface was typed popover grammars, so the
-  tray fronts a nearly complete vocabulary and the greyed set is the residue's short tail.
-  Scope preview draws a dashed candidate enclosure found through the renderer's existing
-  `data-source-id`, so **no layout code and no golden moved**; commit walks the ladder via a
-  `walkToLevel` shared with the HUD. **Escape precedence declared once** as
-  `ESCAPE_PRECEDENCE` and asserted, answering the ladder's open question. Two findings: the
-  tray must call `followProjection` on open (it offers a *dialect* — `S` slurs in notation,
-  slides in tab), and the ops panel credits **the key, not the emitter**, which is its
-  existing contract — so the tray registers as a surface only for `setAccidentalDisplay`,
-  the one intent it adds to keyboard reachability.
 - **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3: the
   **ledger of what cannot be wired yet**, each greyed tile with an address. Its first
   retirement wave predates the tray itself: the 2026-08-14/15 vocabulary sweep landed
@@ -244,6 +236,37 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
+- **[core-viewer-surface.md](inprogress/core-viewer-surface.md)** — name and define **the viewer
+  surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
+  undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench
+  chrome), attribute-first, the `view="auto"` precedence chain (user > host > document
+  `staffKind` hint > default), a set-valued `hide` knob, and eviction of workbench leakage
+  (`pinnedErrors` et al). Subsumes render-density-zoom's "where do the levers live" question.
+- **[core-render-density-zoom.md](inprogress/core-render-density-zoom.md)** — configurable horizontal +
+  vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
+  in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
+  vertical density = layout gap/padding constants. Not started. Where the levers are *exposed*
+  is now owned by [core-viewer-surface.md](inprogress/core-viewer-surface.md).
+- **[core-selection-tray-mechanism.md](inprogress/core-selection-tray-mechanism.md)** — part 2:
+  the tray wired, **stages 1–4 built 2026-08-15** (hands-on review open). One ruling — tiles
+  fire **intents through `session.handleIntent`, nothing else** — so tray clicks land in the
+  op queue and replay through traces like keystrokes. `src/edit/commandRegistry.ts` holds 56
+  commands over all seven rungs, each row the *surface half* of a
+  [campaign](complete/core-campaign-element-ops.md) agreement block (rungs, glyph,
+  key/tier, `isActive`, `action`), pinned by 18 conformance joins: shortcuts some table
+  really binds, surfaces that exist, intent types the session handles, glyph names the font
+  carries with bounding boxes, and the ledger agreement that keeps greyed tiles and the
+  residue doc from drifting. Drafted against a 15-op vocabulary; the sweep inverted the
+  emphasis — the verbs exist and their only human surface was typed popover grammars, so the
+  tray fronts a nearly complete vocabulary and the greyed set is the residue's short tail.
+  Scope preview draws a dashed candidate enclosure found through the renderer's existing
+  `data-source-id`, so **no layout code and no golden moved**; commit walks the ladder via a
+  `walkToLevel` shared with the HUD. **Escape precedence declared once** as
+  `ESCAPE_PRECEDENCE` and asserted, answering the ladder's open question. Two findings: the
+  tray must call `followProjection` on open (it offers a *dialect* — `S` slurs in notation,
+  slides in tab), and the ops panel credits **the key, not the emitter**, which is its
+  existing contract — so the tray registers as a surface only for `setAccidentalDisplay`,
+  the one intent it adds to keyboard reachability.
 - **[core-campaign-modernist.md](inprogress/core-campaign-modernist.md)** — **campaign**: the
   workbench restyle the tray's art direction leads, plus the score panel it was drawn for.
   Fills the slot [core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)
@@ -259,45 +282,6 @@ proposals that name their campaign.
   already built), and **rejects two of its features with reasons**: a computed DIFFERENCES
   list (a second, unowned verdict channel competing with `status: verified`) and op grouping
   (breaks time-travel's row↔position identity).
-- **[core-campaign-element-ops.md](inprogress/core-campaign-element-ops.md)** — **campaign**
-  (the first): every corpus element constructible from an empty score and *individually*
-  destructible (surgical removal, no coarse delete-measure/voice/part cheats). Opened from
-  the 2026-08-11 gap analysis: the op vocabulary, not the keymap, is the bottleneck — 12
-  `EditOp` types vs ~40 corpus constructs, one true removal op, no genesis ops. The shared
-  contract makes every indexed item open with an **agreement block** — the construct/destruct
-  op pair (with a removal class: no tombstones, no dangling references), the shortcut (or
-  popover/palette tier), and **which selection rung the ops attach to** — before any code.
-  Thirteen indexed items: the exemplar first (**complete 2026-08-14** — in `complete/`
-  below; the campaign moved here with it), then the corpus-wide harnesses (a generative
-  destructibility sweep and
-  empty→scenario constructibility traces), then the element families ordered by scenarios
-  unlocked. Construct traces start from **the literal `{}`**; verdicts ride the committed
-  primitives goldens and the byte-identical undo-all contract. Feeds the `EditOp[]`
-  convergence in [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
-- **[core-element-ops-destruct-sweep.md](inprogress/core-element-ops-destruct-sweep.md)** —
-  campaign item 2: **the destructibility sweep at corpus scale**, item 1's reverse walk
-  over all 106 scenarios and every kind of ink in them. A harness item, so its agreement
-  block is four decisions rather than the contract's op/key/rung. **Built 2026-08-14**,
-  same day as proposed: the element inventory (45 kinds, each declaring the primitive
-  classes it claims) and the reference map (15 join kinds over 8 id spaces); the **ink
-  census join** proving every one of the 63 drawn classes is claimed by a kind or
-  declared structural with a reason — "an element is anything the renderer draws
-  distinguishable ink for", made checkable, with element-vs-structure sorted by the
-  repo's own *encode the choice, not the consequence* rule; the sweep's **two verdict
-  axes** (addressed? removed?) where only a broken oracle reddens a build, so `no-op`
-  and `unaddressable` can be the scoreboard instead of a permanently red suite; six
-  oracles including relative validity (invalid-by-design exhibits stay judgeable), the
-  reference check and the new **surviving-document** check that finally asserts
-  "byte-identical except forced cascades"; and a committed report
-  (`npm run sweep:destruct`) whose drift fails the build in either direction. **First
-  baseline: 1,460 elements — 639 removed, 821 no-op, 162 unaddressable notes**, with
-  clef 113 / time-signature 99 / part-name 59 / dynamic 43 as the ordering evidence for
-  items 4–13. It caught four real bugs on its first run: the predicted dangling tie
-  **plus** slurs, technique relationships and seven beam scenarios going *inkless* (an
-  emptied event keeps its id, so the beam beams a rest) — 13 scenarios, fixed in
-  `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
-  (the cursor carries no voice, so Delete could remove the other voice's note — evidence
-  now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
 - **[core-note-address.md](inprogress/core-note-address.md)** — **one note
   enumeration**, built 2026-08-14 as the prerequisite that makes campaign item
   11b's container descent safe. `noteKeys.ts` was always a shared *formatter*,
@@ -318,204 +302,6 @@ proposals that name their campaign.
   **7** are navigation failures, while **154 have no key at all** (100 in second
   parts, 32 in containers, 22 on staff 2) — the `parts[0]`/staff-1 assumption,
   which is items 13b and 11b, not coincidence.
-- **[core-element-ops-lyrics.md](inprogress/core-element-ops-lyrics.md)** —
-  campaign item 12, **built 2026-08-14**: syllables and verse metadata, and the
-  index's proposed "text *mode* that suspends the keymap" is **rejected** — a
-  syllable is one short string attached to one note, and the campaign already has
-  a surface for typing one short string. The grammar borrows a singer's own
-  notation (`sleep-`, `-ing`, `-ly-` carry the syllable's role; `2: Am` picks the
-  verse; `line 2 Nederlands nl` names it). Two pairs, because a syllable belongs
-  to the event and a verse's identity to the document. The sweep caught a real
-  semantic error at once: the first `removeLyricLine` also pulled the line from
-  `lineOrder`, so removing a verse's *label* silently reordered the verses —
-  **sibling declarations are not cascades**. Reachable scenarios **78 → 82**,
-  removable elements **1022 → 1056**.
-- **[core-element-ops-technique.md](inprogress/core-element-ops-technique.md)** —
-  campaign item 9, **built 2026-08-14**: the entry half of tab technique (bends as
-  curves, slides, hammer-ons, pull-offs, vibrato, palm mute, harmonics) plus
-  fingering. The `S` collision item 10 flagged **dissolves without a conditional**:
-  the reserved letters `B H S V X O` live in the tab *pane layer*, and pane layers
-  resolve before shared ones — so `B` bends in tab and beams in notation, `S`
-  slides in tab and slurs in notation. A polymorphic key turns out to be a
-  layering fact, not a branch. `H` is one key for hammer-on and pull-off because
-  the interval decides which — you hammer up and pull off downward. Reachable
-  scenarios **71 → 78**, removable elements **1003 → 1022**, goldens untouched
-  (drawing remains [core-guitar-technique.md](proposed/core-guitar-technique.md)'s
-  gap).
-- **[core-entry-surface.md](proposed/core-entry-surface.md)** — typing anywhere the
-  cursor can already go, graduated out of the element-ops campaign (2026-08-15) as the
-  last thing holding its index open. The cursor addresses part → staff → voice in full
-  and every removal verb follows it; **entry still writes to voice 0 of `parts[0]`**, so
-  the ladder can visit a voice it cannot create. What makes it a design item rather than
-  a gap: nobody has decided what typing into a second voice MEANS when the bar is
-  already full — create the sequence, pad it with rests nobody asked for, or leave a
-  voice that underfills on every render. Corpus cost is nil (the key grammar already
-  spells part and staff, silent for 0 and 1). Acceptance: a construct trace for
-  `spec/multiple-voices` and `spec/tie-targets`.
-- **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
-  `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
-  (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
-  **place** and a layout is a **tree** — system → group → staff sources, nothing at an
-  onset, so the ladder cannot reach it. The asymmetry is the evidence: removal already
-  works by index, because deletion needs identity and construction needs somewhere to
-  stand. Opens with the addressing question (a ladder rung, a text form, or a panel);
-  blocks six scenarios, all of which render and verify today.
-- **[core-percussion-kit.md](proposed/core-percussion-kit.md)** — the `kit-component`,
-  `kit-note` and `sound` kinds, handed over alongside it. A kit part has no pitch axis
-  (the vertical axis is a component NAME the document declares, so there is nothing to
-  derive — the no-instrument-assumed rule one level up) and a component is referenced
-  rather than placed, so the verb order is fixed by the reference. One scenario.
-- **[core-element-ops-accidental-spelling.md](inprogress/core-element-ops-accidental-spelling.md)** —
-  campaign item 6, **built 2026-08-15**: the row was **two questions wearing one name**.
-  SPELLING is a policy — `spellPitch` in `staffSpace.ts`, where the key context already
-  lives: a letter the key alters wins, else the key's sign, else the DIRECTION of the
-  move (down spells flat), which is what finally makes E♭ writable after a placeholder
-  that answered "natural, then sharp" in every key. `J` cycles the policy's own
-  candidate list to overrule it, sound held fixed. DISPLAY is ink — `accidental parens`
-  joins the adornment popover rather than earning a sixth one, and writes the
-  `enclosure` the corpus has carried all along (the renderer's gap is unchanged).
-  One recorded trace changed correctly: `chord-stack-fret`'s downward transpose now
-  spells B♭ where it spelled A♯.
-- **[core-element-ops-duration-completion.md](inprogress/core-element-ops-duration-completion.md)** —
-  campaign item 4, **built 2026-08-15**: the dot (`.`, cycling 0→1→2→none, splitting
-  ink from absence exactly as the duration ladder does) and the time signature's
-  **glyph** (`common`, `2/2 cut` — `display` is what it is DRAWN as, not the meter).
-  Capo turned out to have been closed by item 13, so the row was two verbs, not
-  three — check the index before building from it. The dot uncovered a silent clamp:
-  entry took the shorter of the pending duration and the rest it landed on, so a
-  dotted quarter over beat-rest padding came out plain. Entry now eats following
-  RESTS to make room and refuses when ink is in the way. Dotted rests stay with
-  11b's spelling verb (`rest half.`), because a rest is absence.
-- **[core-element-ops-onset-granularity.md](inprogress/core-element-ops-onset-granularity.md)** —
-  campaign item 11b's first half, **built 2026-08-14**: the bug that stopped item
-  11 recording a beam trace, and it had nothing to do with beams — **a run of short
-  notes was unenterable** (eight 32nds came out `32nd, quarter, quarter…`). Two
-  compounding mechanisms: the duration keys stepped the pending duration only on an
-  *entry ghost*, but a padded bar is full of rest EVENTS, so they re-valued the rest
-  instead; and entry then inherited the rest's duration, ignoring the one it was
-  given. The campaign's own founding rule settles both — **a rest is absence**
-  (§8.11) — so the keys step the pending duration over a rest as over a ghost, and
-  entry takes the pending duration with the surplus staying as rest *after* it
-  (never by shortening in place, which would drag every later event earlier and
-  re-time the bar). It also triggered the campaign's parked trace-maintenance case
-  for the first time: `from-scratch` changed correctly and was regenerated through
-  `npm run update:edit-traces`. And it uncovered the next blocker in the same
-  breath — rest durations are a *consequence of padding, not a choice*, so a
-  scenario writing one half rest where padding spends two quarters is still
-  untraceable. Containers and rest spelling remain 11b's open half.
-- **[core-element-ops-part-declarations.md](inprogress/core-element-ops-part-declarations.md)** —
-  campaign item 13, **built 2026-08-14** at a narrower scope the numbers chose:
-  the five keys on `parts[0]` (name, strings, capo, staffKind, staves) finally get
-  **the removal halves their genesis verbs never had** — part-name alone was 59
-  unremovable elements, because item 1 built genesis in a hurry for construct
-  traces. Removable elements **912 → 1003**, reachable **68 → 71**. The sweep
-  refused the first version twice and sharpened it both times: removing `strings`
-  from a tab-projecting part left it declaring a view it could not draw
-  (diagnostics 0 → 2), which became a **declared cascade** — fingerboard and tab
-  preference are one decision; and the no-tombstone cleanup then read as damage,
-  since emptying `_x.mnxLab` collapses `_x` two levels up, which became the
-  oracle's **ancestor-collapse** rule. The index row's real subject (a second
-  part, voice or staff, plus layouts and scores) is now **item 13b**, and it
-  carries a price tag: `parts[0]` is hard-coded in the note-key traversal, so it
-  changes keys the primitives goldens embed — a corpus re-verification event that
-  deserves its own decision.
-- **[core-element-ops-adornments.md](inprogress/core-element-ops-adornments.md)** —
-  campaign item 8: markings, dynamics and directions, **built 2026-08-14**. The
-  first item where the campaign's own family test says **do not collapse**: all
-  three read as "attached to this moment", but a marking is a key on the *event*
-  while dynamics and directions are positioned entries on the *part measure*, so
-  they land as two op pairs behind one `Shift+A` popover. It also introduces the
-  **first two-coordinate address** — a dynamic sits at a moment, not just a bar, so
-  `ElementRef` grew an `onset` and the sweep drives to the cursor's position before
-  firing. Results: reachable scenarios **55 → 68**, removable elements
-  **842 → 912**, both predictions exact. Single-letter accelerators are deferred on
-  purpose: keys are the unstable layer, and no op or trace changes when they bind.
-- **[core-element-ops-rhythm-declarations.md](inprogress/core-element-ops-rhythm-declarations.md)** —
-  campaign item 11, **built 2026-08-14** at deliberately **half its index row's
-  scope, because the code made the split**. Beams (top level), full-measure rests
-  and measure repeats land; tuplets, grace and tremolo become item 11b. The reason:
-  the cursor grid skips non-timed items, so container content is invisible to the
-  editor — a `wrapInTuplet` verb would have *removed ink from the addressable
-  surface* and the sweep would have said so. Beams reuse item 10's anchor verbatim
-  (arm at the first note, press again at the last), resolving to events rather than
-  notes — two verbs, one gesture, no new state — and `B` is the second customer of
-  item 10's projection rule (beam in notation, bend in tab). The rest declarations
-  ride the bar popover, which now writes both global- and part-measure keys because
-  **a popover is a surface, not a data-owner**. Results: reachable scenarios
-  **45 → 55** (predicted exactly), removable elements **820 → 842**, with 26 of 40
-  beams honestly `no-op` (nested levels, second parts, staff 2). Then a beam trace
-  failed for an unrelated reason worth more than the trace: the entry surface
-  cannot lay a run of 32nds — after the first note, `nextPosition` lands on the
-  original quarter rest and each subsequent note inherits *that* duration. **No
-  beam scenario is traceable today and beams are not why**; onset granularity is,
-  which is now item 11b's first job.
-- **[core-element-ops-spanners.md](inprogress/core-element-ops-spanners.md)** —
-  campaign item 10: **the first two-ended gesture**, **built 2026-08-14** the same
-  day as proposed. Items 5 and 7 were attributes at the cursor; a slur has two ends
-  and the ladder cannot extend laterally yet, so the keyboard names two places in
-  two presses: `S` arms an anchor at the start note, navigate, `S` completes it,
-  `Esc` drops it — **the first session state beyond the cursor and entry duration**,
-  and traces stay honest because they record the two presses rather than a
-  synthesized "slur A→B". It also **resolves the `S` collision** the campaign index
-  flagged against item 9's slide: one key, two meanings, chosen by the active
-  projection (slur in notation, slide in tab) — the ladder's own "the projection
-  picks the input dialect" principle applied to a letter. A slur is one object
-  holding both ends (the *reference* removal class made concrete), so removal takes
-  both, and chord pins make three slurs on one event independently addressable.
-  Results: reachable scenarios **42 → 45**, all 6 slur elements removable, and a
-  fifth recorded trace (`spec/slurs`, 52 intents). Two rules for later items fell
-  out: **"handled" is not "removed"** (an intent returning true has been handled,
-  which is not a claim about ink — the sweep now compares documents), and
-  **recording a trace is a loop with the session**, since horizontal moves snap to
-  ink and pre-computed vertical corrections overshoot.
-- **[core-element-ops-bar-attributes.md](inprogress/core-element-ops-bar-attributes.md)** —
-  campaign item 7: **ten bar attributes behind one popover**, the second op-family
-  item, **built 2026-08-14** the same day as proposed and again chosen by item 3's
-  histogram. Barline, repeat start/end, ending, segno, fine, jump, tempo, rehearsal
-  and section are all *the same thing* — a key on the global measure — so they share
-  **one op pair** (`setMeasureAttribute`/`removeMeasureAttribute`, payload typed per
-  kind, never a stringly-typed bag), one address in the sweep, one row shape in the
-  ops panel and one typed grammar at **Shift+B** (`barline double`, `repeat end 3`,
-  `ending 1,2`, `tempo half=80`, `section Verse 1`). Removal is **`no <attribute>`**,
-  because the token names the removal *class*: item 5's `inherit` says "revert to the
-  predecessor", an annotation's removal says "it is not there". `barline` is the odd
-  member and the taxonomy already had the word — a **modifier**, since every bar
-  draws a barline regardless, so removal returns the default stroke rather than
-  removing ink. Results: reachable scenarios **24 → 42** (the predicted +18, exactly),
-  removable elements **758 → 814** (all 56 family elements, no `broken` verdicts), and
-  a fourth recorded trace (`spec/hello-world`, 14 intents from `{}`).
-- **[core-element-ops-clef-key.md](inprogress/core-element-ops-clef-key.md)** —
-  campaign item 5, **the first op-family item** and the campaign's biggest single step.
-  **Built 2026-08-14**, same day as proposed, chosen by item 3's histogram rather than
-  taste: `clef` blocked 96 of 106 scenarios. Ships the **inherited-attribute pair** —
-  `setClef`/`removeClef`, `setKeySignature`/`removeKeySignature` — at the popover tier
-  (**Shift+C**, **Shift+K**) on the **measure rung**, with `KeyDoc` rows landed in the
-  same change per the contract. The removal half is the interesting half: removing a
-  clef removes a *declaration*, so the bar reverts to its predecessor's governance (or
-  the engine default, which for a tab part is the guitar treble-8) — never to "no
-  clef" — and the grammar says so in a word, **`inherit`**, because Del at the measure
-  rung already means "remove the empty bar". Results: reachable scenarios **3 → 24**,
-  removable elements **651 → 758** (101 of 113 clefs, all 6 key signatures), a third
-  recorded trace, and the next blocker down to `beam` at 10. It also taught the
-  campaign a rule: **a verb without an address is invisible to the sweep** — declaring
-  the ops moved nothing until the walk learned to navigate to a bar.
-- **[core-element-ops-construct-traces.md](inprogress/core-element-ops-construct-traces.md)** —
-  campaign item 3: **the forward verdict for all 106**, the half item 2 built backwards.
-  **Built 2026-08-14**, same day as proposed. A trace cannot be generated — it is a
-  recorded performance — so the forward answer is deliberately two things: a
-  **prediction** computed statically from the element inventory (does every kind this
-  scenario contains have a construct verb?) and a **verdict** earned only by a committed
-  trace replaying from `{}` against the goldens. Where they disagree, the disagreement is
-  the finding, and both directions turned up immediately: `open-strings-chord` traces
-  green while blocked on a clef the goldens never see, and `empty-tab-canvas` is
-  predicted reachable yet untraceable because `appendMeasure` writes four explicit rests
-  where the template has none (the tier model is kind-shaped and blind to op semantics).
-  The campaign contract's **op pair moved onto the kind table** — one row per kind
-  carrying both `construct` and `remove` — which promptly showed the destruct sweep had
-  never attempted `toggleTie`, a removal verb it owned all along (12 of 13 corpus ties
-  now `removed`). Baseline: **traced 2 · ops-reachable 1 · blocked 98 ·
-  expected-unreachable 5**, and one number settles the campaign's ordering: **`clef`
-  blocks 96 of 106 scenarios**, so item 5 is next on evidence rather than taste.
 - **[core-keymap-cheatsheet.md](inprogress/core-keymap-cheatsheet.md)** — a **selection-mode-
   dependent keyboard cheatsheet**, built by making the ladder's per-level navigation map DATA.
   The keymap's binding tables are already data, but the *meaning* of a key at each rung lives
@@ -582,6 +368,234 @@ proposals that name their campaign.
   container rungs.
 
 ### complete/
+- **[core-element-ops-part-addressing.md](complete/core-element-ops-part-addressing.md)** —
+  campaign item 13b's addressing half, **built 2026-08-14**: `parts[0]` was hard-coded in
+  **44 places**, splitting cleanly into ~10 that ADDRESS (cursor, grid, clef lookup,
+  selection, the sweep) and ~25 that WRITE. Only the first half landed, and it unlocked the
+  whole blocked set on its own, because removal was already part-agnostic through the shared
+  walk. The key grammar generalized **without moving a byte** — part 0 and staff 1 stay
+  silent — so 115 more elements became removable with no golden touched. The writing half
+  became [core-entry-surface.md](proposed/core-entry-surface.md).
+- **[core-element-ops-the-tail.md](complete/core-element-ops-the-tail.md)** — not an indexed
+  item but the sweep of everything the board still called "no verb exists": **26 elements
+  across seven kinds in one pass** (space, a beam inside a grace, ottava, kit notes,
+  accidental display, a mid-measure clef), with kit components and sounds ending as
+  **refused** rather than removable — guarded while a note still plays them. Corpus
+  1,415 → 1,434 removed of 1,460.
+- **[core-campaign-element-ops.md](complete/core-campaign-element-ops.md)** — **campaign**
+  (the first): every corpus element constructible from an empty score and *individually*
+  destructible (surgical removal, no coarse delete-measure/voice/part cheats). Opened from
+  the 2026-08-11 gap analysis: the op vocabulary, not the keymap, is the bottleneck — 12
+  `EditOp` types vs ~40 corpus constructs, one true removal op, no genesis ops. The shared
+  contract makes every indexed item open with an **agreement block** — the construct/destruct
+  op pair (with a removal class: no tombstones, no dangling references), the shortcut (or
+  popover/palette tier), and **which selection rung the ops attach to** — before any code.
+  Thirteen indexed items: the exemplar first (**complete 2026-08-14** — in `complete/`
+  below; the campaign moved here with it), then the corpus-wide harnesses (a generative
+  destructibility sweep and
+  empty→scenario constructibility traces), then the element families ordered by scenarios
+  unlocked. Construct traces start from **the literal `{}`**; verdicts ride the committed
+  primitives goldens and the byte-identical undo-all contract. Feeds the `EditOp[]`
+  convergence in [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
+- **[core-element-ops-destruct-sweep.md](complete/core-element-ops-destruct-sweep.md)** —
+  campaign item 2: **the destructibility sweep at corpus scale**, item 1's reverse walk
+  over all 106 scenarios and every kind of ink in them. A harness item, so its agreement
+  block is four decisions rather than the contract's op/key/rung. **Built 2026-08-14**,
+  same day as proposed: the element inventory (45 kinds, each declaring the primitive
+  classes it claims) and the reference map (15 join kinds over 8 id spaces); the **ink
+  census join** proving every one of the 63 drawn classes is claimed by a kind or
+  declared structural with a reason — "an element is anything the renderer draws
+  distinguishable ink for", made checkable, with element-vs-structure sorted by the
+  repo's own *encode the choice, not the consequence* rule; the sweep's **two verdict
+  axes** (addressed? removed?) where only a broken oracle reddens a build, so `no-op`
+  and `unaddressable` can be the scoreboard instead of a permanently red suite; six
+  oracles including relative validity (invalid-by-design exhibits stay judgeable), the
+  reference check and the new **surviving-document** check that finally asserts
+  "byte-identical except forced cascades"; and a committed report
+  (`npm run sweep:destruct`) whose drift fails the build in either direction. **First
+  baseline: 1,460 elements — 639 removed, 821 no-op, 162 unaddressable notes**, with
+  clef 113 / time-signature 99 / part-name 59 / dynamic 43 as the ordering evidence for
+  items 4–13. It caught four real bugs on its first run: the predicted dangling tie
+  **plus** slurs, technique relationships and seven beam scenarios going *inkless* (an
+  emptied event keeps its id, so the beam beams a rest) — 13 scenarios, fixed in
+  `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
+  (the cursor carries no voice, so Delete could remove the other voice's note — evidence
+  now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+- **[core-element-ops-lyrics.md](complete/core-element-ops-lyrics.md)** —
+  campaign item 12, **built 2026-08-14**: syllables and verse metadata, and the
+  index's proposed "text *mode* that suspends the keymap" is **rejected** — a
+  syllable is one short string attached to one note, and the campaign already has
+  a surface for typing one short string. The grammar borrows a singer's own
+  notation (`sleep-`, `-ing`, `-ly-` carry the syllable's role; `2: Am` picks the
+  verse; `line 2 Nederlands nl` names it). Two pairs, because a syllable belongs
+  to the event and a verse's identity to the document. The sweep caught a real
+  semantic error at once: the first `removeLyricLine` also pulled the line from
+  `lineOrder`, so removing a verse's *label* silently reordered the verses —
+  **sibling declarations are not cascades**. Reachable scenarios **78 → 82**,
+  removable elements **1022 → 1056**.
+- **[core-element-ops-technique.md](complete/core-element-ops-technique.md)** —
+  campaign item 9, **built 2026-08-14**: the entry half of tab technique (bends as
+  curves, slides, hammer-ons, pull-offs, vibrato, palm mute, harmonics) plus
+  fingering. The `S` collision item 10 flagged **dissolves without a conditional**:
+  the reserved letters `B H S V X O` live in the tab *pane layer*, and pane layers
+  resolve before shared ones — so `B` bends in tab and beams in notation, `S`
+  slides in tab and slurs in notation. A polymorphic key turns out to be a
+  layering fact, not a branch. `H` is one key for hammer-on and pull-off because
+  the interval decides which — you hammer up and pull off downward. Reachable
+  scenarios **71 → 78**, removable elements **1003 → 1022**, goldens untouched
+  (drawing remains [core-guitar-technique.md](proposed/core-guitar-technique.md)'s
+  gap).
+- **[core-element-ops-accidental-spelling.md](complete/core-element-ops-accidental-spelling.md)** —
+  campaign item 6, **built 2026-08-15**: the row was **two questions wearing one name**.
+  SPELLING is a policy — `spellPitch` in `staffSpace.ts`, where the key context already
+  lives: a letter the key alters wins, else the key's sign, else the DIRECTION of the
+  move (down spells flat), which is what finally makes E♭ writable after a placeholder
+  that answered "natural, then sharp" in every key. `J` cycles the policy's own
+  candidate list to overrule it, sound held fixed. DISPLAY is ink — `accidental parens`
+  joins the adornment popover rather than earning a sixth one, and writes the
+  `enclosure` the corpus has carried all along (the renderer's gap is unchanged).
+  One recorded trace changed correctly: `chord-stack-fret`'s downward transpose now
+  spells B♭ where it spelled A♯.
+- **[core-element-ops-duration-completion.md](complete/core-element-ops-duration-completion.md)** —
+  campaign item 4, **built 2026-08-15**: the dot (`.`, cycling 0→1→2→none, splitting
+  ink from absence exactly as the duration ladder does) and the time signature's
+  **glyph** (`common`, `2/2 cut` — `display` is what it is DRAWN as, not the meter).
+  Capo turned out to have been closed by item 13, so the row was two verbs, not
+  three — check the index before building from it. The dot uncovered a silent clamp:
+  entry took the shorter of the pending duration and the rest it landed on, so a
+  dotted quarter over beat-rest padding came out plain. Entry now eats following
+  RESTS to make room and refuses when ink is in the way. Dotted rests stay with
+  11b's spelling verb (`rest half.`), because a rest is absence.
+- **[core-element-ops-onset-granularity.md](complete/core-element-ops-onset-granularity.md)** —
+  campaign item 11b's first half, **built 2026-08-14**: the bug that stopped item
+  11 recording a beam trace, and it had nothing to do with beams — **a run of short
+  notes was unenterable** (eight 32nds came out `32nd, quarter, quarter…`). Two
+  compounding mechanisms: the duration keys stepped the pending duration only on an
+  *entry ghost*, but a padded bar is full of rest EVENTS, so they re-valued the rest
+  instead; and entry then inherited the rest's duration, ignoring the one it was
+  given. The campaign's own founding rule settles both — **a rest is absence**
+  (§8.11) — so the keys step the pending duration over a rest as over a ghost, and
+  entry takes the pending duration with the surplus staying as rest *after* it
+  (never by shortening in place, which would drag every later event earlier and
+  re-time the bar). It also triggered the campaign's parked trace-maintenance case
+  for the first time: `from-scratch` changed correctly and was regenerated through
+  `npm run update:edit-traces`. And it uncovered the next blocker in the same
+  breath — rest durations are a *consequence of padding, not a choice*, so a
+  scenario writing one half rest where padding spends two quarters is still
+  untraceable. Containers and rest spelling remain 11b's open half.
+- **[core-element-ops-part-declarations.md](complete/core-element-ops-part-declarations.md)** —
+  campaign item 13, **built 2026-08-14** at a narrower scope the numbers chose:
+  the five keys on `parts[0]` (name, strings, capo, staffKind, staves) finally get
+  **the removal halves their genesis verbs never had** — part-name alone was 59
+  unremovable elements, because item 1 built genesis in a hurry for construct
+  traces. Removable elements **912 → 1003**, reachable **68 → 71**. The sweep
+  refused the first version twice and sharpened it both times: removing `strings`
+  from a tab-projecting part left it declaring a view it could not draw
+  (diagnostics 0 → 2), which became a **declared cascade** — fingerboard and tab
+  preference are one decision; and the no-tombstone cleanup then read as damage,
+  since emptying `_x.mnxLab` collapses `_x` two levels up, which became the
+  oracle's **ancestor-collapse** rule. The index row's real subject (a second
+  part, voice or staff, plus layouts and scores) is now **item 13b**, and it
+  carries a price tag: `parts[0]` is hard-coded in the note-key traversal, so it
+  changes keys the primitives goldens embed — a corpus re-verification event that
+  deserves its own decision.
+- **[core-element-ops-adornments.md](complete/core-element-ops-adornments.md)** —
+  campaign item 8: markings, dynamics and directions, **built 2026-08-14**. The
+  first item where the campaign's own family test says **do not collapse**: all
+  three read as "attached to this moment", but a marking is a key on the *event*
+  while dynamics and directions are positioned entries on the *part measure*, so
+  they land as two op pairs behind one `Shift+A` popover. It also introduces the
+  **first two-coordinate address** — a dynamic sits at a moment, not just a bar, so
+  `ElementRef` grew an `onset` and the sweep drives to the cursor's position before
+  firing. Results: reachable scenarios **55 → 68**, removable elements
+  **842 → 912**, both predictions exact. Single-letter accelerators are deferred on
+  purpose: keys are the unstable layer, and no op or trace changes when they bind.
+- **[core-element-ops-rhythm-declarations.md](complete/core-element-ops-rhythm-declarations.md)** —
+  campaign item 11, **built 2026-08-14** at deliberately **half its index row's
+  scope, because the code made the split**. Beams (top level), full-measure rests
+  and measure repeats land; tuplets, grace and tremolo become item 11b. The reason:
+  the cursor grid skips non-timed items, so container content is invisible to the
+  editor — a `wrapInTuplet` verb would have *removed ink from the addressable
+  surface* and the sweep would have said so. Beams reuse item 10's anchor verbatim
+  (arm at the first note, press again at the last), resolving to events rather than
+  notes — two verbs, one gesture, no new state — and `B` is the second customer of
+  item 10's projection rule (beam in notation, bend in tab). The rest declarations
+  ride the bar popover, which now writes both global- and part-measure keys because
+  **a popover is a surface, not a data-owner**. Results: reachable scenarios
+  **45 → 55** (predicted exactly), removable elements **820 → 842**, with 26 of 40
+  beams honestly `no-op` (nested levels, second parts, staff 2). Then a beam trace
+  failed for an unrelated reason worth more than the trace: the entry surface
+  cannot lay a run of 32nds — after the first note, `nextPosition` lands on the
+  original quarter rest and each subsequent note inherits *that* duration. **No
+  beam scenario is traceable today and beams are not why**; onset granularity is,
+  which is now item 11b's first job.
+- **[core-element-ops-spanners.md](complete/core-element-ops-spanners.md)** —
+  campaign item 10: **the first two-ended gesture**, **built 2026-08-14** the same
+  day as proposed. Items 5 and 7 were attributes at the cursor; a slur has two ends
+  and the ladder cannot extend laterally yet, so the keyboard names two places in
+  two presses: `S` arms an anchor at the start note, navigate, `S` completes it,
+  `Esc` drops it — **the first session state beyond the cursor and entry duration**,
+  and traces stay honest because they record the two presses rather than a
+  synthesized "slur A→B". It also **resolves the `S` collision** the campaign index
+  flagged against item 9's slide: one key, two meanings, chosen by the active
+  projection (slur in notation, slide in tab) — the ladder's own "the projection
+  picks the input dialect" principle applied to a letter. A slur is one object
+  holding both ends (the *reference* removal class made concrete), so removal takes
+  both, and chord pins make three slurs on one event independently addressable.
+  Results: reachable scenarios **42 → 45**, all 6 slur elements removable, and a
+  fifth recorded trace (`spec/slurs`, 52 intents). Two rules for later items fell
+  out: **"handled" is not "removed"** (an intent returning true has been handled,
+  which is not a claim about ink — the sweep now compares documents), and
+  **recording a trace is a loop with the session**, since horizontal moves snap to
+  ink and pre-computed vertical corrections overshoot.
+- **[core-element-ops-bar-attributes.md](complete/core-element-ops-bar-attributes.md)** —
+  campaign item 7: **ten bar attributes behind one popover**, the second op-family
+  item, **built 2026-08-14** the same day as proposed and again chosen by item 3's
+  histogram. Barline, repeat start/end, ending, segno, fine, jump, tempo, rehearsal
+  and section are all *the same thing* — a key on the global measure — so they share
+  **one op pair** (`setMeasureAttribute`/`removeMeasureAttribute`, payload typed per
+  kind, never a stringly-typed bag), one address in the sweep, one row shape in the
+  ops panel and one typed grammar at **Shift+B** (`barline double`, `repeat end 3`,
+  `ending 1,2`, `tempo half=80`, `section Verse 1`). Removal is **`no <attribute>`**,
+  because the token names the removal *class*: item 5's `inherit` says "revert to the
+  predecessor", an annotation's removal says "it is not there". `barline` is the odd
+  member and the taxonomy already had the word — a **modifier**, since every bar
+  draws a barline regardless, so removal returns the default stroke rather than
+  removing ink. Results: reachable scenarios **24 → 42** (the predicted +18, exactly),
+  removable elements **758 → 814** (all 56 family elements, no `broken` verdicts), and
+  a fourth recorded trace (`spec/hello-world`, 14 intents from `{}`).
+- **[core-element-ops-clef-key.md](complete/core-element-ops-clef-key.md)** —
+  campaign item 5, **the first op-family item** and the campaign's biggest single step.
+  **Built 2026-08-14**, same day as proposed, chosen by item 3's histogram rather than
+  taste: `clef` blocked 96 of 106 scenarios. Ships the **inherited-attribute pair** —
+  `setClef`/`removeClef`, `setKeySignature`/`removeKeySignature` — at the popover tier
+  (**Shift+C**, **Shift+K**) on the **measure rung**, with `KeyDoc` rows landed in the
+  same change per the contract. The removal half is the interesting half: removing a
+  clef removes a *declaration*, so the bar reverts to its predecessor's governance (or
+  the engine default, which for a tab part is the guitar treble-8) — never to "no
+  clef" — and the grammar says so in a word, **`inherit`**, because Del at the measure
+  rung already means "remove the empty bar". Results: reachable scenarios **3 → 24**,
+  removable elements **651 → 758** (101 of 113 clefs, all 6 key signatures), a third
+  recorded trace, and the next blocker down to `beam` at 10. It also taught the
+  campaign a rule: **a verb without an address is invisible to the sweep** — declaring
+  the ops moved nothing until the walk learned to navigate to a bar.
+- **[core-element-ops-construct-traces.md](complete/core-element-ops-construct-traces.md)** —
+  campaign item 3: **the forward verdict for all 106**, the half item 2 built backwards.
+  **Built 2026-08-14**, same day as proposed. A trace cannot be generated — it is a
+  recorded performance — so the forward answer is deliberately two things: a
+  **prediction** computed statically from the element inventory (does every kind this
+  scenario contains have a construct verb?) and a **verdict** earned only by a committed
+  trace replaying from `{}` against the goldens. Where they disagree, the disagreement is
+  the finding, and both directions turned up immediately: `open-strings-chord` traces
+  green while blocked on a clef the goldens never see, and `empty-tab-canvas` is
+  predicted reachable yet untraceable because `appendMeasure` writes four explicit rests
+  where the template has none (the tier model is kind-shaped and blind to op semantics).
+  The campaign contract's **op pair moved onto the kind table** — one row per kind
+  carrying both `construct` and `remove` — which promptly showed the destruct sweep had
+  never attempted `toggleTie`, a removal verb it owned all along (12 of 13 corpus ties
+  now `removed`). Baseline: **traced 2 · ops-reachable 1 · blocked 98 ·
+  expected-unreachable 5**, and one number settles the campaign's ordering: **`clef`
+  blocks 96 of 106 scenarios**, so item 5 is next on evidence rather than taste.
 - **[workbench-score-panel.md](complete/workbench-score-panel.md)** — campaign item 5, the
   structure half and the campaign's showcase. **Seven tabs become five** (`description ·
   ops · hud · compare · json` — authored, changed, current, expected, raw), all in one
@@ -616,16 +630,17 @@ proposals that name their campaign.
   Design spec's art direction (Archivo / `#ec3013` / zero radius); a dumb
   `<mnx-selection-tray>` incubating in `workbench/` (ScoreHud posture); the one `elements/`
   change is the viewer's `selection-anchored` rect event + `selectionAnchorRect()` method;
-  `/` → tray / Ctrl+Shift+K → palette via a cancelable `mnx-tray-intent` that falls through
-  to go-to on editorless pages (rebound from Ctrl+K on 2026-08-15: Chrome owns that chord
-  and took it back from every text field; the rail filter's `/` retired to Ctrl+G). The stage-4 UX review revised two things, both in the
+  `/` → tray via a cancelable `mnx-tray-intent` that falls through to go-to on editorless
+  pages (rebound from Ctrl+K on 2026-08-15: Chrome owns that chord and took it back from
+  every text field; the rail filter's `/` retired to Ctrl+G, and Ctrl+Shift+K retired when
+  the global commands became a tray tab). The stage-4 UX review revised two things, both in the
   component: **ink-box glyph normalization** (each glyph drawn into its own font-metadata
   bounding box, 34px target with a 30px/sp ceiling — a palette normalizes optical size
   where a score must not) and **the shortcut as a corner chip** on 66×64 tiles. Parts 2–3
   ([mechanism](inprogress/core-selection-tray-mechanism.md),
   [residue](proposed/core-selection-tray-residue.md)) stay in `proposed/`.
 - **[core-element-ops-exemplar.md](complete/core-element-ops-exemplar.md)** — campaign
-  item 1 of [core-campaign-element-ops.md](inprogress/core-campaign-element-ops.md):
+  item 1 of [core-campaign-element-ops.md](complete/core-campaign-element-ops.md):
   **the forward/reverse harness algorithm proven small** over `minimal-single-note`
   and `open-strings-chord`, **complete 2026-08-14** (stages 1–4 built 2026-08-12, the
   same day as proposed; stage 5 — the hands-on pass and the learnings threading —

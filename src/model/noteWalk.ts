@@ -7,7 +7,7 @@
  * layer, the JSON view, both layouts and the element walker — which is why
  * CLAUDE.md has to warn that they be "kept in lockstep", and why teaching the
  * editor to see inside containers looked like a five-file migration rather than
- * one change (roadmap/inprogress/core-element-ops-onset-granularity.md).
+ * one change (roadmap/complete/core-element-ops-onset-granularity.md).
  *
  * So: coordinates are produced here, once. A consumer that needs more than
  * identity (the grid needs onsets, the layouts need geometry) still walks for

@@ -203,7 +203,7 @@ describe('construct traces (element-ops exemplar)', () => {
 
 // ---------------------------------------------------------------------------
 // Campaign item 3: the forward verdict for all 106
-// (roadmap/inprogress/core-element-ops-construct-traces.md)
+// (roadmap/complete/core-element-ops-construct-traces.md)
 //
 // The destruct axis is generative, so item 2 got verdicts for the whole corpus
 // the day it ran. A trace cannot be generated — it is a recorded performance —

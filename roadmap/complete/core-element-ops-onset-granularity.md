@@ -95,7 +95,7 @@ which the grid's slot list supports. Neither is the hard part.
 ## Move 1 landed (2026-08-14)
 
 The five-traversal problem above is retired:
-[core-note-address.md](core-note-address.md) makes `model/noteWalk.ts` the one
+[core-note-address.md](../inprogress/core-note-address.md) makes `model/noteWalk.ts` the one
 place coordinates are produced, with a corpus-wide join proving the renderer
 agrees. Container descent is now a change to **one function**, and the nested key
 form stays inside it. What remains for 11b is the descent itself plus the cursor

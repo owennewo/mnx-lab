@@ -166,7 +166,7 @@ export type EditOp =
       type: 'removePart';
     }
   // The inherited-attribute pair (campaign item 5,
-  // roadmap/inprogress/core-element-ops-clef-key.md). Clef is a PART-measure
+  // roadmap/complete/core-element-ops-clef-key.md). Clef is a PART-measure
   // attribute, key signature a GLOBAL-measure one — the same rung addressing
   // two different owners — and both persist until changed, so removing one
   // reverts the measure to its predecessor's governance rather than to
@@ -216,11 +216,11 @@ export type EditOp =
       measureIndex: number;
     }
   // The bar-attribute family (campaign item 7,
-  // roadmap/inprogress/core-element-ops-bar-attributes.md). Ten kinds that are
+  // roadmap/complete/core-element-ops-bar-attributes.md). Ten kinds that are
   // all one thing — a key on the GLOBAL measure — so they share one verb with
   // a typed payload rather than restating the same shape ten times.
   // Spanners (campaign item 10,
-  // roadmap/inprogress/core-element-ops-spanners.md). A slur is ONE object
+  // roadmap/complete/core-element-ops-spanners.md). A slur is ONE object
   // holding both ends: it lives on the start event and names the end EVENT's
   // id, pinning chord members when either end is a chord.
   | {
@@ -248,7 +248,7 @@ export type EditOp =
       targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump';
       lv?: boolean;
     }
-  // Lyrics (campaign item 12, roadmap/inprogress/core-element-ops-lyrics.md).
+  // Lyrics (campaign item 12, roadmap/complete/core-element-ops-lyrics.md).
   // A syllable is a key on the EVENT's lyric line; the line's metadata is a
   // key on the document. Two owners, so two pairs — item 7's test.
   | { type: 'setSyllable'; noteKey: string; line: string; text: string; syllableType?: 'start' | 'middle' | 'end' | 'whole' }
@@ -256,7 +256,7 @@ export type EditOp =
   | { type: 'setLyricLine'; line: string; label?: string; lang?: string }
   | { type: 'removeLyricLine'; line: string }
   // Tab technique + fingering (campaign item 9,
-  // roadmap/inprogress/core-element-ops-technique.md). Both live under the
+  // roadmap/complete/core-element-ops-technique.md). Both live under the
   // note's vendor block; technique is the ENTRY side of
   // roadmap/proposed/core-guitar-technique.md, which owns the drawing.
   | { type: 'setTechnique'; noteKey: string; technique: TechniqueChoice }
@@ -273,7 +273,7 @@ export type EditOp =
   | { type: 'setFingering'; noteKey: string; hand: 'left' | 'right'; finger: string }
   | { type: 'removeFingering'; noteKey: string }
   // Part declarations (campaign item 13,
-  // roadmap/inprogress/core-element-ops-part-declarations.md): five keys on
+  // roadmap/complete/core-element-ops-part-declarations.md): five keys on
   // parts[0] that shipped with constructors and no removals. One pair, because
   // they share an owner — item 7's test, third application.
   // The document's presentation layer (campaign item 13b's remainder): a
@@ -324,7 +324,7 @@ export type EditOp =
       partIndex?: number;
     }
   // Event adornments (campaign item 8,
-  // roadmap/inprogress/core-element-ops-adornments.md). TWO pairs, because the
+  // roadmap/complete/core-element-ops-adornments.md). TWO pairs, because the
   // owners differ: a marking is a key on the EVENT, while dynamics and
   // directions are positioned entries in PART-MEASURE arrays. Item 7's family
   // test (do they share an owner?) is what splits them.
@@ -352,7 +352,7 @@ export type EditOp =
       index: number;
     }
   // Rhythm declarations (campaign item 11,
-  // roadmap/inprogress/core-element-ops-rhythm-declarations.md) — the ones
+  // roadmap/complete/core-element-ops-rhythm-declarations.md) — the ones
   // that leave ink where it is. The containers that SWALLOW ink (tuplet,
   // grace, tremolo) wait for the grid to descend into them.
   | {
@@ -2260,7 +2260,7 @@ function forEachEventNote(
  * Strip every reference to a note that was just removed, and to an event that
  * just became a rest — the campaign's *reference* removal class ("unlink both
  * ends"), caught corpus-wide by the destructibility sweep
- * (roadmap/inprogress/core-element-ops-destruct-sweep.md). Scans ALL parts:
+ * (roadmap/complete/core-element-ops-destruct-sweep.md). Scans ALL parts:
  * `deleteNote` edits the entry surface, but a tie or slur may point into it
  * from anywhere.
  *

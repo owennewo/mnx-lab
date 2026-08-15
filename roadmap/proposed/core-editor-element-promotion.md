@@ -34,7 +34,7 @@
 >   gate held while the expensive part got paid down early, which is the
 >   incubation design working as intended.
 > - **Caveat that cuts the other way**: the
->   [element-ops campaign](../inprogress/core-campaign-element-ops.md) will add
+>   [element-ops campaign](../complete/core-campaign-element-ops.md) will add
 >   intents for ~10 more item families. All additive on current evidence, but
 >   promoting mid-campaign means each item's new verbs land on a *public*
 >   surface. Not a blocker — additive is non-breaking — but it argues for

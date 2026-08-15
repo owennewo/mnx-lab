@@ -1,6 +1,6 @@
 /**
  * The element inventory — what the destructibility sweep must try to remove
- * (roadmap/inprogress/core-element-ops-destruct-sweep.md, campaign item 2).
+ * (roadmap/complete/core-element-ops-destruct-sweep.md, campaign item 2).
  *
  * The campaign's definition is "an element is anything the renderer draws
  * distinguishable ink for". That is a claim about the renderer, so the
@@ -52,7 +52,7 @@ export type ElementKind =
  *
  * The pair lives here, on one row, because the campaign contract requires
  * construct and destruct to be **defined together**
- * (roadmap/inprogress/core-campaign-element-ops.md): removal is not creation
+ * (roadmap/complete/core-campaign-element-ops.md): removal is not creation
  * reversed, and splitting the two across modules is how they drift. Both
  * harnesses read this table — the destruct sweep for its `no-op` verdict, the
  * construct tiers for what they are blocked on. An empty verb list is not a
@@ -353,7 +353,7 @@ export const STRUCTURAL_CLASSES: Record<string, string> = {
 /** Can ANY op in the union bring this kind into existence today? The forward
  *  half of the pair, and the construct tiers' whole basis: a scenario is
  *  blocked by exactly the kinds for which this is false
- *  (roadmap/inprogress/core-element-ops-construct-traces.md). */
+ *  (roadmap/complete/core-element-ops-construct-traces.md). */
 export function kindHasConstructOp(kind: ElementKind): boolean {
   return (ELEMENT_KINDS[kind].construct?.length ?? 0) > 0;
 }

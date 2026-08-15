@@ -1,7 +1,7 @@
 # The entry surface — typing anywhere the cursor can already go
 
 Serves the **implementation loop**. Graduated out of
-[core-campaign-element-ops.md](../inprogress/core-campaign-element-ops.md) on
+[core-campaign-element-ops.md](../complete/core-campaign-element-ops.md) on
 2026-08-15 (it was the campaign's item 13c, and the last thing holding its index
 open). The campaign owned *addressing*; this owns *writing*.
 
@@ -10,7 +10,7 @@ open). The campaign owned *addressing*; this owns *writing*.
 The cursor addresses `part → measure → staff → voice → event → note` in full: it
 carries `partIndex`, `staffIndex` and `voiceIndex`, the grid is built per part,
 the sweep drives across all of them, and every removal verb follows the cursor
-where it goes ([core-element-ops-part-addressing.md](../inprogress/core-element-ops-part-addressing.md),
+where it goes ([core-element-ops-part-addressing.md](../complete/core-element-ops-part-addressing.md),
 [core-note-address.md](../inprogress/core-note-address.md),
 [core-selection-ladder.md](../inprogress/core-selection-ladder.md)).
 

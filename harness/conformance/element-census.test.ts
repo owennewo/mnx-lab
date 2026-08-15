@@ -1,6 +1,6 @@
 // The ink census join — "an element is anything the renderer draws
 // distinguishable ink for", made checkable (campaign item 2,
-// roadmap/inprogress/core-element-ops-destruct-sweep.md).
+// roadmap/complete/core-element-ops-destruct-sweep.md).
 //
 // The walker is document-side by necessity: of the primitives in the committed
 // goldens, only noteheads and fret numbers carry a `sourceId`, so the render

@@ -2,7 +2,7 @@
 
 > **Status: proposed 2026-08-14; a living ledger, not a work item. Revised
 > 2026-08-15** after the campaign's vocabulary sweep — items 5, 7–13 of
-> [core-campaign-element-ops.md](../inprogress/core-campaign-element-ops.md) all
+> [core-campaign-element-ops.md](../complete/core-campaign-element-ops.md) all
 > built on 2026-08-14/15, so the ledger's **first retirement wave predates the
 > tray itself** (recorded below). Third of the trio behind
 > [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) and
@@ -26,21 +26,21 @@ op vocabulary" table listed thirteen rows. One day later most were dead, their
 verbs landed by the campaign sweep ("every kind now has its verb" — corpus
 removability 1,434/1,460, `no-op` down to seven notes). Retired, with their
 unblockers: articulations, dynamics **including hairpins**, and directions →
-[item 8](../inprogress/core-element-ops-adornments.md) (Shift+A); slurs and tie
-variants → [item 10](../inprogress/core-element-ops-spanners.md) (`S`,
+[item 8](../complete/core-element-ops-adornments.md) (Shift+A); slurs and tie
+variants → [item 10](../complete/core-element-ops-spanners.md) (`S`,
 polymorphic slur/slide by projection); tab technique →
-[item 9](../inprogress/core-element-ops-technique.md) (the `B H S V X O`
+[item 9](../complete/core-element-ops-technique.md) (the `B H S V X O`
 letters, tab pane); barlines, repeats, endings/voltas, segno/coda/jump/fine,
 sections, rehearsal marks, tempo →
-[item 7](../inprogress/core-element-ops-bar-attributes.md) (ten kinds behind
+[item 7](../complete/core-element-ops-bar-attributes.md) (ten kinds behind
 Shift+B); key change and clef →
-[item 5](../inprogress/core-element-ops-clef-key.md) (Shift+K / Shift+C, plus
+[item 5](../complete/core-element-ops-clef-key.md) (Shift+K / Shift+C, plus
 time-signature removal); lyrics →
-[item 12](../inprogress/core-element-ops-lyrics.md) (Shift+L — the text *mode*
+[item 12](../complete/core-element-ops-lyrics.md) (Shift+L — the text *mode*
 was rejected as unnecessary); full-measure rests and beams →
-[item 11](../inprogress/core-element-ops-rhythm-declarations.md) (`B`,
+[item 11](../complete/core-element-ops-rhythm-declarations.md) (`B`,
 polymorphic beam/bend); part name/strings/capo/staffKind/staves →
-[item 13](../inprogress/core-element-ops-part-declarations.md) (the Shift+P
+[item 13](../complete/core-element-ops-part-declarations.md) (the Shift+P
 grammar). These now sit in the mechanism's wired tables instead.
 
 ## Retired 2026-08-15 — the restyle
@@ -85,7 +85,7 @@ doc makes for itself.
 
 Two more rows went the same way before the tray's own review, which is the
 retirement rule working as designed rather than a coincidence worth
-celebrating: **respell** → [item 6](../inprogress/core-element-ops-clef-key.md)'s
+celebrating: **respell** → [item 6](../complete/core-element-ops-clef-key.md)'s
 sibling (`respellNote`, `J` — and note the tile became ONE cycling command,
 not the flat/sharp pair this ledger imagined, because "the other spelling"
 has no single answer); **duration dots, capo write, time `display`** → item 4
@@ -97,8 +97,8 @@ now.
 
 | Tray surface | Rung(s) | Blocked by | Unblocked when |
 |---|---|---|---|
-| grace note, tuplet, tremolo (construction) | event | the **wrap verbs** are the open half of [item 11b](../inprogress/core-element-ops-onset-granularity.md); note the removal half is now `refused` **by design** for inked containers (unwrapping re-times the music) — a verb that declines, not a missing verb | item 11b's wrap verbs + rest spelling |
-| voice / staff entry beyond the first | voice / part | *addressing* landed with [item 13b](../inprogress/core-element-ops-part-addressing.md) (cursor `partIndex`/`staffIndex`, Alt+V cycles slots) — the **entry surface** (creating a second voice or staff-2 ink) is the open half; "the ladder can visit voices it cannot create" | item 13b's entry stages |
+| grace note, tuplet, tremolo (construction) | event | the **wrap verbs** are the open half of [item 11b](../complete/core-element-ops-onset-granularity.md); note the removal half is now `refused` **by design** for inked containers (unwrapping re-times the music) — a verb that declines, not a missing verb | item 11b's wrap verbs + rest spelling |
+| voice / staff entry beyond the first | voice / part | *addressing* landed with [item 13b](../complete/core-element-ops-part-addressing.md) (cursor `partIndex`/`staffIndex`, Alt+V cycles slots) — the **entry surface** (creating a second voice or staff-2 ink) is the open half; "the ladder can visit voices it cannot create" | item 13b's entry stages |
 | layout / score authoring (system breaks, layouts) | score | removal landed (presentation layer); construction needs a surface that can express a **tree** — the popover grammar cannot, and the palette was ruled out because it cannot see the document. The tray *can* see the document (it is fed from the session), so it is a candidate surface — recorded, not claimed | its own proposal, per the campaign's "beyond" list |
 | transpose (part row: instrument transposition) | part | not a campaign item | the campaign's "beyond" list — needs its own proposal |
 | mute (part row) | part | no audio surface at all (no player element — [core-viewer-embedded-app.md](core-viewer-embedded-app.md) records why); until then the row renders value-less | audio's own decision |

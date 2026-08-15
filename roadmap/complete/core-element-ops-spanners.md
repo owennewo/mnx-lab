@@ -7,7 +7,7 @@
 >
 > Items 5 and 7 were attributes at the cursor: aim, type, done. A slur has two
 > ends, and the selection ladder cannot yet extend laterally
-> ([core-selection-ladder.md](core-selection-ladder.md) parks Shift+arrows and
+> ([core-selection-ladder.md](../inprogress/core-selection-ladder.md) parks Shift+arrows and
 > Ctrl+A), so this item must decide how a keyboard names two places at once.
 
 ## The agreement block

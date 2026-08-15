@@ -182,7 +182,7 @@ Three rules fall out, and each is a test in `harness/conformance/navigation.test
 
 Entry still targets voice 0 — a stated boundary, not an oversight: a typed note
 following the cursor's voice is the entry surface's question
-([core-element-ops-part-addressing.md](core-element-ops-part-addressing.md),
+([core-element-ops-part-addressing.md](../complete/core-element-ops-part-addressing.md),
 campaign item 13c).
 
 The sweep's `no-op` column is now **empty**: 1,441 of 1,460 elements removed,
@@ -201,7 +201,7 @@ slot matched the line first: when two voices put a note on the same string at th
 same onset (twelve-bar-blues m10 — melody over the alternating bass), the address
 was ambiguous and Delete removed *the other voice's* note. Found 2026-08-14 by the
 destructibility sweep, which reported 48 of that scenario's notes as unaddressable
-([core-element-ops-destruct-sweep.md](core-element-ops-destruct-sweep.md),
+([core-element-ops-destruct-sweep.md](../complete/core-element-ops-destruct-sweep.md),
 campaign item 2). It took **both** halves of the answer, which is why it read as
 one problem and was two: the disambiguating gesture at the note rung
 (`slotIndex` + `Alt+V`, core-note-address.md move 2) for coincidence *within* a
