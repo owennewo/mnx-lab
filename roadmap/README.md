@@ -330,6 +330,18 @@ proposals that name their campaign.
   (`spanByPointer`, ~10 lines) to unlock the selection-scoped view, and the conformance test
   CLAUDE.md's "keep `jsonView` and `noteKeys` in lockstep" rule has always implied. The only
   below-the-boundary change in the campaign, hence the only properly testable one.
+- **[workbench-panel-drawer.md](proposed/workbench-panel-drawer.md)** — item 8 of the
+  Modernist campaign, and the row that was blocked on a design question the mock never
+  answered. **Closing is now decided: Escape, or a click outside.** Neither needs new
+  machinery — the drawer is an `overlay`, which is already slot 2 of `ESCAPE_PRECEDENCE`
+  ("innermost open thing first"), and overlays consume Escape by owning their own keydown
+  rather than by anyone branching on the list; click-away reuses the command palette's
+  `.backdrop`. Records the ruling that **the dismissing click is swallowed**, which is
+  invisible today (clicking the score does nothing — `note-selected` still has no
+  consumer) and becomes a two-actions-from-one-gesture bug the moment the residue
+  ledger's click→cursor row closes. Opening is recommended rather than deferred again:
+  the tab strip stays as a thin rail, so the narrow layout keeps the wide one's
+  addressing and spends none of the element-ops campaign's free-key budget.
 - **[workbench-queue-pips.md](complete/workbench-queue-pips.md)** — campaign item 6, the bill
   "red everywhere" runs up. Four status hues and four queue states do not fit through a
   one-accent system, and `--st-verified` (blue) beside a red accent reads as a leftover while
