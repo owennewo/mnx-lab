@@ -1,22 +1,22 @@
 <svg width="1280" height="283.4288" viewBox="0 0 1280 283.4288" xmlns="http://www.w3.org/2000/svg">
-<line x1="32" y1="96" x2="598.4" y2="96" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="114.2864" x2="598.4" y2="114.2864" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="132.5712" x2="598.4" y2="132.5712" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="150.8576" x2="598.4" y2="150.8576" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="169.1424" x2="598.4" y2="169.1424" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="187.4288" x2="598.4" y2="187.4288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="96" x2="582.4" y2="96" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="114.2864" x2="582.4" y2="114.2864" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="132.5712" x2="582.4" y2="132.5712" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="150.8576" x2="582.4" y2="150.8576" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="169.1424" x2="582.4" y2="169.1424" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="187.4288" x2="582.4" y2="187.4288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="96" x2="32" y2="187.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-start"></line>
 <text x="49.6" y="141.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
-<text x="117.6" y="118.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
-<text x="117.6" y="164.5712" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<rect x="187.6" y="124.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n1"></rect>
-<text x="193.6" y="132.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n1">2</text>
-<rect x="299.6" y="124.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n2"></rect>
-<text x="305.6" y="132.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n2">5</text>
-<rect x="411.6" y="142.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n3"></rect>
-<text x="417.6" y="150.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n3">2</text>
-<rect x="523.6" y="142.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n4"></rect>
-<text x="529.6" y="150.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n4">5</text>
-<line x1="587.2" y1="96" x2="587.2" y2="187.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
-<rect x="592" y="96" width="6.4" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
+<text x="101.6" y="118.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
+<text x="101.6" y="164.5712" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
+<rect x="171.6" y="124.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n1"></rect>
+<text x="177.6" y="132.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n1">2</text>
+<rect x="283.6" y="124.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n2"></rect>
+<text x="289.6" y="132.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n2">5</text>
+<rect x="395.6" y="142.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n3"></rect>
+<text x="401.6" y="150.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n3">2</text>
+<rect x="507.6" y="142.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n4"></rect>
+<text x="513.6" y="150.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n4">5</text>
+<line x1="571.2" y1="96" x2="571.2" y2="187.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
+<rect x="576" y="96" width="6.4" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

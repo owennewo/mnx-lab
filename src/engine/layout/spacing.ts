@@ -44,6 +44,16 @@ const CONTENT_LEFT_PAD_SP = 0.6;
 const CONTENT_RIGHT_PAD_SP = 0.8;
 const START_BARLINE_PAD_SP = 0.5;
 const CLEF_WIDTH_SP = 3;
+/**
+ * The tab clef's own slot. `6stringTabClef` is 1.64sp of ink against `gClef`'s
+ * 2.68, so a tab-only system sized to the notation slot carries 1.36sp it can
+ * never fill. 2.0 leaves it the same ~0.35sp of breathing room the notation
+ * slot leaves its own glyph — the slot is right-sized, not tightened.
+ */
+const TAB_CLEF_WIDTH_SP = 2;
+/** Floor under every prefix pad `densityPad` scales — visible clearance
+ *  between two glyphs, below which they read as touching. */
+const MIN_GLYPH_CLEAR_SP = 0.2;
 const TIME_SIG_WIDTH_SP = 2.5;
 export const KEY_SIG_GLYPH_ADVANCE_SP = 1.0;
 const KEY_SIG_RIGHT_PAD_SP = 0.5;
@@ -214,6 +224,11 @@ export interface MeasurePack {
 export interface PackingInput {
   measures: MeasurePack[];
   lineWidthSp: number;
+  /** Trailing pad after a measure's content. Carried rather than read from the
+   *  module constant because `densityPad` scales it, and the packer must use
+   *  the same width the placement pass will. Absent ⇒ the unscaled default,
+   *  which is what a ladder re-pack at density 1 wants. */
+  contentRightPadSp?: number;
 }
 
 export interface PackedRow {
@@ -235,13 +250,14 @@ export interface PackedRow {
 export function packSystems(packing: PackingInput, densityH: number): PackedRow[] {
   const packs = packing.measures;
   const lineWidth = packing.lineWidthSp;
+  const contentRightPad = packing.contentRightPadSp ?? CONTENT_RIGHT_PAD_SP;
 
   const rows: number[][] = [];
   let current: number[] = [];
   let currentWidth = 0;
   packs.forEach((m, k) => {
     const content =
-      m.lead * densityH + m.rigid + m.spring * densityH + CONTENT_RIGHT_PAD_SP + m.repeatExtra;
+      m.lead * densityH + m.rigid + m.spring * densityH + contentRightPad + m.repeatExtra;
     const natural = (current.length === 0 ? m.prefixFirst : m.prefixRest) + content;
     if (current.length > 0 && (currentWidth + natural > lineWidth || m.forcedBreak)) {
       rows.push(current);
@@ -260,7 +276,7 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
     measures.forEach((k, j) => {
       const m = packs[k];
       rowRigid +=
-        (j === 0 ? m.prefixFirst : m.prefixRest) + m.rigid + CONTENT_RIGHT_PAD_SP + m.repeatExtra;
+        (j === 0 ? m.prefixFirst : m.prefixRest) + m.rigid + contentRightPad + m.repeatExtra;
       rowSpring += m.spring * densityH + m.lead * densityH;
     });
     const stretch = rowSpring > 0
@@ -678,6 +694,22 @@ export interface PlanOptions {
    * reads as clipped rather than as tight.
    */
   densityPad?: number;
+  /**
+   * What this plan is drawing for. `notation` (the default) reserves the
+   * prefix a notation staff needs; `tab` is the STANDALONE tab view, which
+   * draws no key signature at all and a narrower clef.
+   *
+   * Not a cosmetic switch — before it, a tab-only system in one sharp
+   * reserved a key-signature column it had nothing to put in, and sized its
+   * clef slot for a treble clef. On `twelve-bar-blues` that was 2.86sp of the
+   * 10.07sp between the barline and the first fret number.
+   *
+   * The `both` view does NOT use this: there the tab staff shares a system
+   * with a notation staff that really does draw a key signature, and the
+   * columns have to agree. Only `layoutTab` passes it, which is exactly the
+   * case where there is no notation staff to agree with.
+   */
+  staffKind?: 'notation' | 'tab';
   /** Only plan measures in [from, to] (inclusive); the rest become hidden
    *  stubs. Lets a score render each per-system layout as its own segment
    *  while plan.measures stays index-aligned with the document. */
@@ -778,7 +810,21 @@ export function planHorizontal(
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
   const leftInset = options?.leftInsetSp ?? 0;
-  const marginSp = Math.max(MIN_PAGE_MARGIN_SP, MARGIN_SP * clampPadDensity(options?.densityPad));
+  const padK = clampPadDensity(options?.densityPad);
+  const marginSp = Math.max(MIN_PAGE_MARGIN_SP, MARGIN_SP * padK);
+  // The prefix's PADS are whitespace and scale with the frame axis; the glyph
+  // SLOTS are rigid and do not (core-zoom-density-pad.md ruling 1 — a clef
+  // occupies the width it occupies at a given staff size). This is the line
+  // between the two, and it is the whole reason the gap before the first note
+  // used to ignore the spacing control entirely: every part of it was on the
+  // rigid side, including the parts that were only ever air.
+  const pad = (full: number) => Math.max(MIN_GLYPH_CLEAR_SP, full * padK);
+  const isTabOnly = options?.staffKind === 'tab';
+  const clefWidth = isTabOnly ? TAB_CLEF_WIDTH_SP : CLEF_WIDTH_SP;
+  const contentLeftPad = pad(CONTENT_LEFT_PAD_SP);
+  const startBarlinePad = pad(START_BARLINE_PAD_SP);
+  const keySigRightPad = pad(KEY_SIG_RIGHT_PAD_SP);
+  const contentRightPad = pad(CONTENT_RIGHT_PAD_SP);
   const startX = marginSp + leftInset;
   const lineWidth = widthSp - 2 * marginSp - leftInset;
   const forcedBreaks = options?.forcedBreaks ?? new Set<number>();
@@ -1060,18 +1106,24 @@ export function planHorizontal(
     };
   });
 
+  // How many key-signature glyphs this measure's prefix draws — none ever, on
+  // a standalone tab staff.
+  const keySigGlyphs = (m: MeasureMetrics, firstInSystem: boolean) => {
+    if (isTabOnly) return 0;
+    const showKeySig = (firstInSystem && m.keyFifths !== 0) || m.keyChanged;
+    if (!showKeySig) return 0;
+    return Math.abs(m.keyFifths !== 0 ? m.keyFifths : m.cancelledKeyFifths);
+  };
+
   const prefixWidth = (m: MeasureMetrics, firstInSystem: boolean) => {
     const showClef = firstInSystem || m.clefChanged;
-    const showKeySig = (firstInSystem && m.keyFifths !== 0) || m.keyChanged;
     const showTimeSig = m.timeSigShow;
-    const keySigCount = showKeySig
-      ? Math.abs(m.keyFifths !== 0 ? m.keyFifths : m.cancelledKeyFifths)
-      : 0;
+    const keySigCount = keySigGlyphs(m, firstInSystem);
     return (
-      CONTENT_LEFT_PAD_SP +
-      (firstInSystem ? START_BARLINE_PAD_SP : 0) +
-      (showClef ? CLEF_WIDTH_SP : 0) +
-      (keySigCount ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP + KEY_SIG_RIGHT_PAD_SP : 0) +
+      contentLeftPad +
+      (firstInSystem ? startBarlinePad : 0) +
+      (showClef ? clefWidth : 0) +
+      (keySigCount ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP + keySigRightPad : 0) +
       (showTimeSig ? TIME_SIG_WIDTH_SP : 0) +
       (m.hasRepeatStart ? REPEAT_START_WIDTH_SP : 0)
     );
@@ -1081,6 +1133,7 @@ export function planHorizontal(
   // density-1 naturals to ask what any other value would draw.
   const packing: PackingInput = {
     lineWidthSp: lineWidth,
+    contentRightPadSp: contentRightPad,
     measures: metrics.flatMap((m, i) =>
       m.hidden || !inRange(i)
         ? []
@@ -1134,16 +1187,13 @@ export function planHorizontal(
       const m = metrics[i];
       const firstInSystem = i === rowIndices[0];
       const showClef = firstInSystem || m.clefChanged;
-      const showKeySig = (firstInSystem && m.keyFifths !== 0) || m.keyChanged;
       const showTimeSig = m.timeSigShow;
-      const keySigCount = showKeySig
-        ? Math.abs(m.keyFifths !== 0 ? m.keyFifths : m.cancelledKeyFifths)
-        : 0;
+      const keySigCount = keySigGlyphs(m, firstInSystem);
 
-      const clefX = x + CONTENT_LEFT_PAD_SP + (firstInSystem ? START_BARLINE_PAD_SP : 0);
-      const keySigX = clefX + (showClef ? CLEF_WIDTH_SP : 0);
+      const clefX = x + contentLeftPad + (firstInSystem ? startBarlinePad : 0);
+      const keySigX = clefX + (showClef ? clefWidth : 0);
       const keySigWidth = keySigCount
-        ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP + KEY_SIG_RIGHT_PAD_SP
+        ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP + keySigRightPad
         : 0;
       const timeSigCentreX = keySigX + keySigWidth + TIME_SIG_WIDTH_SP / 2;
       // A forward repeat (|:) sits between the prefix glyphs and the content.
@@ -1156,7 +1206,7 @@ export function planHorizontal(
 
       const contentWidth = m.rigid + m.spring * stretch;
       const width =
-        contentStartX - x + contentWidth + CONTENT_RIGHT_PAD_SP +
+        contentStartX - x + contentWidth + contentRightPad +
         (m.repeatEnd ? REPEAT_END_EXTRA_SP : 0);
 
       // Each voice fills the measure's content span with its own spring factor.
@@ -1207,7 +1257,7 @@ export function planHorizontal(
         showTimeSig,
         keyFifths: m.keyFifths,
         cancelledKeyFifths: m.cancelledKeyFifths,
-        showKeySig,
+        showKeySig: keySigCount > 0,
         voices: staves[0] ?? [],
         staves,
         clefTimeline: m.clefTimelines[0],

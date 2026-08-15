@@ -94,7 +94,16 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   // All horizontal decisions (system packing, bar widths, event x positions)
   // come from the shared plan — layoutNotation consumes the same one, which is
   // what keeps notation and tab column-aligned in the "both" view.
-  const plan = planHorizontal(mnx, widthSp, { densityH: opts.densityH, densityPad: opts.densityPad });
+  // `staffKind: 'tab'` — this is the STANDALONE tab view, so the prefix
+  // reserves no key-signature column (a tab staff draws none) and sizes the
+  // clef slot for the tab clef. The `both` view goes through layoutNotation
+  // instead, where the tab staff shares a system with a notation staff that
+  // does draw one, and must keep agreeing with its columns.
+  const plan = planHorizontal(mnx, widthSp, {
+    densityH: opts.densityH,
+    densityPad: opts.densityPad,
+    staffKind: 'tab'
+  });
 
   // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
   // into each measure's diagnostic markers alongside renderer-gap issues.
