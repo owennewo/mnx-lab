@@ -66,15 +66,26 @@ would plant a light-only `:host` between the app and the component and pin it li
 forever, making the theme switch visibly skip it. A conformance assertion now holds
 that line in both directions (no literals, no local `designTokens`).
 
-**"the tray on a dark page"** — retired **by unblocking**. The row named two possible
-unblockers, *"the restyle proposal, or a dark pass on the spec — whichever comes first"*;
-the restyle came first, and it chose to author the dark half rather than cut it
-([core-modernist-dark.md](core-modernist-dark.md)). Note the road not taken, since the row
-permitted it: had dark been cut, this row would have retired **by decision** under the
-"what this doc is not" rule below, converting into the recorded choice that the workbench
-is light-only. It was kept instead, on the grounds that a restyle should not quietly
-remove a capability on its way past — the dark half was authored and never wired, which
-is a bug in the wiring rather than evidence nobody wanted it.
+**"the tray on a dark page"** — retired **by unblocking, and now delivered**. The row
+named two possible unblockers, *"the restyle proposal, or a dark pass on the spec —
+whichever comes first"*; the restyle came first, and it chose to author the dark half
+rather than cut it. **[core-modernist-dark.md](../complete/core-modernist-dark.md) landed
+2026-08-15**: there is now a dark page, and the tray sits on it correctly.
+
+Two things worth keeping. The tray needed **no work at all** to get there — it inherits
+the palette rather than declaring it, so it went dark on the first try, which is exactly
+the completeness test item 4's de-hexing was set up to face. And the row's premise was
+wrong in a useful way: it framed this as a problem with *the tray*, when the mechanism
+was in fact broken for every component that declares `designTokens` on its own host. The
+tray was the one surface guaranteed to work, precisely because it was the one that
+inherits.
+
+Note the road not taken, since the row permitted it: had dark been cut, this row would
+have retired **by decision** under the "what this doc is not" rule below, converting into
+the recorded choice that the workbench is light-only. It was kept instead, on the grounds
+that a restyle should not quietly remove a capability on its way past — the dark half was
+authored and never wired, which is a bug in the wiring rather than evidence nobody wanted
+it. That judgement paid: the wiring bug was real, and larger than the row supposed.
 
 Worth recording for the ledger's own sake: **both rows were written when the tray
 shipped, each naming its unblocker, and both were still accurate a day later.** This is

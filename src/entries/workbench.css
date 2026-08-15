@@ -20,11 +20,19 @@ body {
   height: 100%;
 }
 
+/* The pre-mount ground follows the reader's preference, which is the best a
+   document-level rule can do: the app's own setting lives in localStorage and
+   is not readable from CSS. A reader on a dark machine used to get a white
+   flash on every load; now only someone who has explicitly PINNED light while
+   their OS is dark sees a mismatch, and only until the component mounts. */
+html {
+  color-scheme: light dark;
+}
+
 body {
   overflow: hidden;
-  /* Matches the light-theme --bg token so there's no flash before the
-     component mounts; the component paints its own background after. Keep this
-     in step with `--bg` in src/elements/tokens.ts — out of step, it becomes a
-     flash of the PREVIOUS design rather than no flash at all. */
-  background: oklch(0.962 0.002 60);
+  /* Both halves must stay in step with `--bg` in src/elements/tokens.ts — out
+     of step, this becomes a flash of the PREVIOUS design rather than no flash
+     at all. A conformance test holds them together. */
+  background: light-dark(oklch(0.962 0.002 60), oklch(0.185 0.004 60));
 }

@@ -67,6 +67,16 @@ export function matchesQuery(entry: ScenarioEntry, query: string): boolean {
 }
 
 const RAIL_HIDDEN_KEY = 'mnx-lab.rail-hidden';
+const THEME_KEY = 'mnx-lab.theme';
+
+function readTheme(): ThemeSetting {
+  const v = localStorage.getItem(THEME_KEY);
+  return v === 'light' || v === 'dark' || v === 'auto' ? v : 'auto';
+}
+
+/** Same three-value vocabulary as `<mnx-score-viewer>.theme`, deliberately —
+ *  two names for one idea is how a chrome and its score end up disagreeing. */
+export type ThemeSetting = 'auto' | 'light' | 'dark';
 
 @customElement('mnx-workbench')
 export class WorkbenchApp extends LitElement {
@@ -85,6 +95,43 @@ export class WorkbenchApp extends LitElement {
     localStorage.setItem(RAIL_HIDDEN_KEY, this.railHidden ? '1' : '0');
     this.toggleAttribute('rail-hidden', this.railHidden);
   }
+
+  /** THE THEME (roadmap/proposed/core-modernist-dark.md).
+   *
+   *  The dark half existed in the token sheet from the start and nothing could
+   *  turn it on: `resolved-theme` appeared exactly once in the codebase, in its
+   *  own selector. This is the switch it was waiting for.
+   *
+   *  Two mechanisms, and both are needed. `resolved-theme` selects the token
+   *  block — an ATTRIBUTE, so `auto` has to be resolved here rather than left
+   *  to a media query. `color-scheme` (declared in CSS off the same attribute)
+   *  then re-resolves every `light-dark()` pair below us, which is what carries
+   *  the SCORE with the chrome: `color-scheme` is an inherited property and
+   *  crosses shadow boundaries, so `<mnx-score-viewer theme="auto">` picks up
+   *  the app's choice without a single prop being threaded. It also pins native
+   *  widgets — the HUD's instrument `<select>` and capo input, and scrollbars —
+   *  which would otherwise stay light under dark chrome. */
+  @state() private theme: ThemeSetting = readTheme();
+  private darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+  private resolvedTheme(): 'light' | 'dark' {
+    return this.theme === 'auto' ? (this.darkQuery.matches ? 'dark' : 'light') : this.theme;
+  }
+
+  private applyTheme() {
+    this.setAttribute('resolved-theme', this.resolvedTheme());
+  }
+
+  private setTheme(next: ThemeSetting) {
+    this.theme = next;
+    localStorage.setItem(THEME_KEY, next);
+    this.applyTheme();
+  }
+
+  /** Only meaningful while the setting is `auto`; harmless otherwise. */
+  private onSchemeChange = () => {
+    if (this.theme === 'auto') this.applyTheme();
+  };
 
   private onHashChange = () => {
     this.route = parseHash(location.hash);
@@ -114,6 +161,19 @@ export class WorkbenchApp extends LitElement {
         background: var(--bg);
         color: var(--ink);
         font-family: var(--sans);
+      }
+
+      /* Declaring color-scheme is what carries the SCORE with the chrome:
+         light-dark() resolves against the used scheme, and the property is
+         inherited, so it crosses into <mnx-score-viewer>'s shadow root and
+         re-resolves scoreTokens in one stroke. It also pins native widgets —
+         the HUD's <select> and capo input, and the scrollbars. */
+      :host([resolved-theme='light']) {
+        color-scheme: light;
+      }
+
+      :host([resolved-theme='dark']) {
+        color-scheme: dark;
       }
 
       /* The rail folds away (Ctrl+B / the header chevron) — all width goes
@@ -331,12 +391,15 @@ export class WorkbenchApp extends LitElement {
     super.connectedCallback();
     window.addEventListener('hashchange', this.onHashChange);
     window.addEventListener('keydown', this.onKeyDown);
+    this.darkQuery.addEventListener('change', this.onSchemeChange);
 
     this.toggleAttribute('rail-hidden', this.railHidden);
+    this.applyTheme();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this.darkQuery.removeEventListener('change', this.onSchemeChange);
     window.removeEventListener('hashchange', this.onHashChange);
     window.removeEventListener('keydown', this.onKeyDown);
 
@@ -418,7 +481,18 @@ export class WorkbenchApp extends LitElement {
         label: `view: ${this.railHidden ? 'show' : 'hide'} scenario rail`,
         hint: 'Ctrl+B',
         run: () => this.toggleRail()
-      }
+      },
+      // The theme's only control, and deliberately no keystroke: the free-key
+      // budget belongs to the element-ops campaign, and a theme switch is not
+      // a thing you reach for mid-edit. All three settings are offered rather
+      // than a toggle, because `auto` is a real third answer — "follow the
+      // machine" — and a two-state toggle cannot express it.
+      ...(['auto', 'light', 'dark'] as const)
+        .filter(t => t !== this.theme)
+        .map(t => ({
+          label: `view: theme ${t}${t === 'auto' ? ` (now ${this.resolvedTheme()})` : ''}`,
+          run: () => this.setTheme(t)
+        }))
     ];
     const entry =
       this.route.page === 'scenario' ? corpus.find(e => e.id === this.route.id) : undefined;

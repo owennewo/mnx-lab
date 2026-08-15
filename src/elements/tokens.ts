@@ -120,30 +120,32 @@ export const viewerTokens = css`
     --sans: 'Archivo', 'Helvetica Neue', Helvetica, system-ui, sans-serif;
     --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, monospace;
 
-    --bg: var(--mnx-bg, light-dark(oklch(0.962 0.002 60), oklch(0.185 0.008 75)));
-    --surface: var(--mnx-surface, light-dark(oklch(1 0 0), oklch(0.255 0.01 75)));
-    --bg-context: light-dark(oklch(0.983 0.002 60), oklch(0.225 0.009 75));
-    --line: var(--mnx-line, light-dark(oklch(0.887 0.005 60), oklch(0.31 0.01 75)));
-    --line-strong: light-dark(oklch(0.807 0.007 60), oklch(0.38 0.01 75));
+    --bg: var(--mnx-bg, light-dark(oklch(0.962 0.002 60), oklch(0.185 0.004 60)));
+    --surface: var(--mnx-surface, light-dark(oklch(1 0 0), oklch(0.237 0.004 60)));
+    --bg-context: light-dark(oklch(0.983 0.002 60), oklch(0.212 0.004 60));
+    --line: var(--mnx-line, light-dark(oklch(0.887 0.005 60), oklch(0.38 0.005 60)));
+    --line-strong: light-dark(oklch(0.807 0.007 60), oklch(0.5 0.006 60));
     --rule-w: 2px;
-    --ink: var(--mnx-ink, light-dark(oklch(0.237 0.004 60), oklch(0.9 0.008 85)));
-    --ink-2: light-dark(oklch(0.397 0.006 60), oklch(0.72 0.01 85));
-    --ink-3: light-dark(oklch(0.62 0.008 60), oklch(0.58 0.01 85));
-    --accent-fg: light-dark(var(--accent), color-mix(in oklab, var(--accent), white 38%));
+    --ink: var(--mnx-ink, light-dark(oklch(0.237 0.004 60), oklch(0.94 0.003 60)));
+    --ink-2: light-dark(oklch(0.397 0.006 60), oklch(0.78 0.005 60));
+    --ink-3: light-dark(oklch(0.62 0.008 60), oklch(0.62 0.006 60));
+    --accent-fg: light-dark(var(--accent), color-mix(in oklab, var(--accent), white 22%));
     /* One step past the base, which is the design system's own instruction for
        a pressed/held state. Also the "this tile is already on" ink. */
     --accent-pressed: light-dark(oklch(0.508 0.186 31.5), oklch(0.62 0.17 31.5));
     /* Between --ink-3 and --line-strong: text that must recede further than
        muted without becoming a rule. */
-    --ink-faint: light-dark(oklch(0.754 0.008 60), oklch(0.5 0.01 85));
+    --ink-faint: light-dark(oklch(0.754 0.008 60), oklch(0.5 0.008 60));
     --row-current: color-mix(in oklab, var(--accent), var(--bg) 90%);
     --row-done: var(--line);
-    --focus-ring: var(--mnx-focus-ring, color-mix(in oklab, var(--accent), transparent 25%));
+    /* Rides --accent-fg, not --accent: on a dark ground the ring must use
+       the lightened accent or it sinks into the page. */
+    --focus-ring: var(--mnx-focus-ring, color-mix(in oklab, var(--accent-fg), transparent 25%));
     --hover: light-dark(oklch(0 0 0 / 0.035), oklch(1 0 0 / 0.05));
     /* light-dark() takes COLORS, not whole shadow lists — so the scheme-
        dependent part is factored into a colour the shadow then uses. */
-    --shadow-near: light-dark(oklch(0.237 0.004 60 / 0.14), oklch(0 0 0 / 0.3));
-    --shadow-far: light-dark(oklch(0.237 0.004 60 / 0.16), oklch(0 0 0 / 0.5));
+    --shadow-near: light-dark(oklch(0.237 0.004 60 / 0.14), oklch(1 0 0 / 0.06));
+    --shadow-far: light-dark(oklch(0.237 0.004 60 / 0.16), oklch(0 0 0 / 0.45));
     --shadow: 0 1px 2px var(--shadow-near), 0 3px 10px var(--shadow-far);
   }
 `;
@@ -183,49 +185,63 @@ export const designTokens = css`
     --header-h: 52px;
     --footer-h: 30px;
 
-    --st-draft: oklch(0.62 0.012 80);
-    --st-valid: oklch(0.66 0.105 78);
-    --st-rendered: oklch(0.55 0.1 155);
-    --st-verified: oklch(0.5 0.1 250);
-    --st-gap: oklch(0.55 0.125 42);
+    --st-draft: light-dark(oklch(0.62 0.012 80), oklch(0.66 0.012 80));
+    --st-valid: light-dark(oklch(0.66 0.105 78), oklch(0.74 0.105 78));
+    --st-rendered: light-dark(oklch(0.55 0.1 155), oklch(0.68 0.1 155));
+    --st-verified: light-dark(oklch(0.5 0.1 250), oklch(0.68 0.1 250));
+    --st-gap: light-dark(oklch(0.55 0.125 42), oklch(0.68 0.125 42));
 
-    --bg: var(--mnx-bg, oklch(0.962 0.002 60));
-    --bg-rail: var(--mnx-bg-rail, oklch(0.945 0.002 60));
-    --surface: var(--mnx-surface, oklch(1 0 0));
+    --bg: var(--mnx-bg, light-dark(oklch(0.962 0.002 60), oklch(0.185 0.004 60)));
+    --bg-rail: var(--mnx-bg-rail, light-dark(oklch(0.945 0.002 60), oklch(0.16 0.004 60)));
+    --surface: var(--mnx-surface, light-dark(oklch(1 0 0), oklch(0.237 0.004 60)));
     /* Band 3 of the panel frame, and the shared hover fill. */
-    --bg-context: oklch(0.983 0.002 60);
-    --line: var(--mnx-line, oklch(0.887 0.005 60));
-    --line-strong: oklch(0.807 0.007 60);
+    --bg-context: light-dark(oklch(0.983 0.002 60), oklch(0.212 0.004 60));
+    /* Dark: LIGHTER than the surface it separates. A darker line on a dark
+       ground reads as a seam, not as structure, and structure is what this
+       system organises with. */
+    --line: var(--mnx-line, light-dark(oklch(0.887 0.005 60), oklch(0.38 0.005 60)));
+    --line-strong: light-dark(oklch(0.807 0.007 60), oklch(0.5 0.006 60));
     /* One knob for the design's structural rule: alignment and the strength of
-       the dividers do the organising, so this must never soften to a hairline. */
+       the dividers do the organising, so this must never soften to a hairline.
+       Unchanged across themes — a rule is 2px on any ground. */
     --rule-w: 2px;
-    --ink: var(--mnx-ink, oklch(0.237 0.004 60));
-    --ink-2: oklch(0.397 0.006 60);
-    --ink-3: oklch(0.62 0.008 60);
-    --accent-fg: var(--accent);
+    --ink: var(--mnx-ink, light-dark(oklch(0.237 0.004 60), oklch(0.94 0.003 60)));
+    --ink-2: light-dark(oklch(0.397 0.006 60), oklch(0.78 0.005 60));
+    --ink-3: light-dark(oklch(0.62 0.008 60), oklch(0.62 0.006 60));
+    --accent-fg: light-dark(var(--accent), color-mix(in oklab, var(--accent), white 22%));
     /* One step past the base, which is the design system's own instruction for
-       a pressed/held state. Also the "this tile is already on" ink. */
-    --accent-pressed: oklch(0.508 0.186 31.5);
+       a pressed/held state ("accent-600 on a light ground, accent-400 on a
+       dark one"). Also the "this tile is already on" ink. */
+    --accent-pressed: light-dark(oklch(0.508 0.186 31.5), oklch(0.62 0.17 31.5));
     /* Between --ink-3 and --line-strong: text that must recede further than
        muted without becoming a rule. */
-    --ink-faint: oklch(0.754 0.008 60);
+    --ink-faint: light-dark(oklch(0.754 0.008 60), oklch(0.5 0.008 60));
     /* The shared row states (ops head, active rung, current row). Derived from
        the accent rather than pinned to #fce7e3 so a future accent carries its
-       own tint instead of leaving a stale pink behind. */
+       own tint instead of leaving a stale pink behind — and so both themes get
+       one for free. */
     --row-current: color-mix(in oklab, var(--accent), var(--bg) 90%);
     --row-done: var(--line);
     /* The keyboard-ownership ring (roadmap/proposed/core-editor-focus-scope.md):
        drawn while focus is inside the viewer, so "who gets the next keystroke"
-       is legible without pressing a key. Public — a host page restyles it. */
-    --focus-ring: var(--mnx-focus-ring, color-mix(in oklab, var(--accent), transparent 25%));
-    --hover: oklch(0 0 0 / 0.035);
+       is legible without pressing a key. Public — a host page restyles it.
+       Rides --accent-fg so the dark half gets the lightened accent, or the ring
+       vanishes into the ground. */
+    --focus-ring: var(--mnx-focus-ring, color-mix(in oklab, var(--accent-fg), transparent 25%));
+    --hover: light-dark(oklch(0 0 0 / 0.035), oklch(1 0 0 / 0.05));
     /* Ink-tinted and shallow: in this system nothing floats, so elevation is a
-       hint that something sits above the page, not a soft cushion under it. */
-    --shadow: 0 1px 2px oklch(0.237 0.004 60 / 0.14), 0 3px 10px oklch(0.237 0.004 60 / 0.16);
-    --drawer-shadow: -12px 0 32px -12px oklch(0.237 0.004 60 / 0.22);
-    --json-string: oklch(0.52 0.1 155);
-    --json-number: oklch(0.55 0.13 60);
-    --json-boolean: oklch(0.5 0.13 300);
+       hint that something sits above the page, not a soft cushion under it. On
+       a dark ground the design system's own note applies — "a hairline edge +
+       ambient darkness" — so the near layer becomes an edge.
+       light-dark() takes COLOURS, not whole shadow lists, so the scheme-
+       dependent parts are factored out the way viewerTokens already does. */
+    --shadow-near: light-dark(oklch(0.237 0.004 60 / 0.14), oklch(1 0 0 / 0.06));
+    --shadow-far: light-dark(oklch(0.237 0.004 60 / 0.16), oklch(0 0 0 / 0.45));
+    --shadow: 0 1px 2px var(--shadow-near), 0 3px 10px var(--shadow-far);
+    --drawer-shadow: -12px 0 32px -12px light-dark(oklch(0.237 0.004 60 / 0.22), oklch(0 0 0 / 0.6));
+    --json-string: light-dark(oklch(0.52 0.1 155), oklch(0.75 0.1 155));
+    --json-number: light-dark(oklch(0.55 0.13 60), oklch(0.75 0.12 60));
+    --json-boolean: light-dark(oklch(0.5 0.13 300), oklch(0.74 0.11 300));
 
     font-family: var(--sans);
     font-size: 13.5px;
@@ -233,30 +249,6 @@ export const designTokens = css`
     -webkit-font-smoothing: antialiased;
   }
 
-  :host([resolved-theme='dark']) {
-    --bg: var(--mnx-bg, oklch(0.215 0.009 75));
-    --bg-rail: var(--mnx-bg-rail, oklch(0.195 0.009 75));
-    --surface: var(--mnx-surface, oklch(0.255 0.01 75));
-    --line: var(--mnx-line, oklch(0.31 0.01 75));
-    --line-strong: oklch(0.38 0.01 75);
-    --ink: var(--mnx-ink, oklch(0.9 0.008 85));
-    --ink-2: oklch(0.72 0.01 85);
-    --ink-3: oklch(0.58 0.01 85);
-    --accent-fg: color-mix(in oklab, var(--accent), white 38%);
-    /* Dark: ride the lightened accent, or the ring vanishes into the ground. */
-    --focus-ring: var(--mnx-focus-ring, color-mix(in oklab, var(--accent-fg), transparent 20%));
-    --hover: oklch(1 0 0 / 0.05);
-    --shadow: 0 1px 2px oklch(0 0 0 / 0.3), 0 10px 32px -8px oklch(0 0 0 / 0.5);
-    --drawer-shadow: -12px 0 32px -12px oklch(0 0 0 / 0.6);
-    --st-draft: oklch(0.66 0.012 80);
-    --st-valid: oklch(0.74 0.105 78);
-    --st-rendered: oklch(0.68 0.1 155);
-    --st-verified: oklch(0.68 0.1 250);
-    --st-gap: oklch(0.68 0.125 42);
-    --json-string: oklch(0.75 0.1 155);
-    --json-number: oklch(0.75 0.12 60);
-    --json-boolean: oklch(0.74 0.11 300);
-  }
 `;
 
 /**

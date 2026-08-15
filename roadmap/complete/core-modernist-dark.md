@@ -1,6 +1,30 @@
 # Modernist: the dark pass, and finally wiring it
 
-> **Status: proposed 2026-08-15.** Item 2 of
+> **Status: BUILT 2026-08-15**, same day as proposed. The dark half is authored
+> (no mock exists — the design project is light-only by construction, so this
+> half is OURS and a later mock outranks it) and finally WIRED: `auto | light |
+> dark`, persisted, resolved against `prefers-color-scheme`, offered in the
+> palette with no new keystroke.
+>
+> **The mechanism had to change, and that was the real finding.** The dark half
+> was a `:host([resolved-theme='dark'])` block, and an attribute block only
+> reaches the host that carries it — while EVERY workbench component includes
+> `designTokens` and so declares the light palette on its own host. A closer
+> host beats an inherited value, so switching to dark turned the header and rail
+> dark and left the entire side panel, HUD and palette pinned light. The fix is
+> the mechanism `viewerTokens` already used and proved: `light-dark()`, which
+> resolves against the *used* `color-scheme` — an inherited property that
+> crosses shadow boundaries. The attribute survives only as the switch that
+> sets `color-scheme`; the tokens no longer look at it.
+>
+> Two checks the doc demanded, both passed. **Selection-red vs the frozen error
+> red is BETTER in dark than in light**: the accent lightens to L≈0.70 while
+> `#b91c1c` cannot move from L≈0.505, so the gap nearly doubles (0.195 against
+> light's 0.106) and the badge becomes the darker, denser mark. And **the tray
+> goes dark with no work at all**, which is item 4's completeness test passing —
+> the de-hexing left no literals behind.
+>
+> Item 2 of
 > [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md). Blocks on
 > [core-modernist-tokens.md](../complete/core-modernist-tokens.md). Retires the residue ledger's *"the tray
 > on a dark page"* row **by unblocking** it.
@@ -66,10 +90,25 @@ looks:
    the dark theme is not. The existing dark block already does exactly this for the
    slate accent (`--accent-fg: color-mix(in oklab, var(--accent), white 38%)`); keep the
    mechanism, retune the value.
-3. **The score card stays paper.** `--paper` is a light surface because a score is
-   printed on paper, and the corpus's engravings are the crown jewels. A dark chrome
-   around a light score card is the correct answer and already how `viewerTokens` is
-   built — do not invert the staff.
+3. ~~**The score card stays paper.**~~ **WRONG — corrected at build time; the paper
+   follows the scheme.** This rule was written from first principles ("a score is
+   printed on paper") and asserted that `viewerTokens` already worked that way. It does
+   not, and the opposite is a *deliberate, documented* decision made on 2026-08-14 from
+   real experience with the embed app: `scoreTokens` reads
+   `--paper: light-dark(oklch(1 0 0), oklch(0.235 0.008 80))`, and its header records
+   why — *"the paper now follows the colour scheme, reversing the older 'the score
+   always renders on warm paper, even under dark chrome' rule — a dark page with a
+   blazing white score is the thing the embed app made obvious."*
+
+   So the rule inverts: **wiring dark must also set `color-scheme: dark` on the host**,
+   which is what makes `light-dark()` resolve dark and carries the score with the
+   chrome. The staff ink and staff lines invert with it (`--paper-ink`, `--paper-line`
+   already have dark halves). What must NOT change is the *engraving* — the goldens are
+   emitted without any of these tokens, so nothing here can move them.
+
+   Worth keeping as a lesson rather than deleting: a rule derived from what a thing
+   *ought* to be beat a decision already recorded in the code, and the code was right
+   because it had met a user. Check the token sheet before legislating about it.
 
 And the campaign's tripwire still applies with more force in the dark: the diagnostic
 `#b91c1c` is frozen in the goldens and cannot lighten to meet a dark ground, so

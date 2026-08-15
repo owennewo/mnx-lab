@@ -175,6 +175,12 @@ presentation only). Tab/both exist only when the strings are KNOWN — declared 
 the document, or supplied through that override. No instrument is ever assumed.
 The setup popovers are a **page-level overlay over the score**, not a tab: opening one
 with the keyboard must not move the panel out from under what you were reading.
+**Theming is `light-dark()`, never an attribute** — the shell resolves `auto|light|dark`
+(remembered per browser, palette-switchable) onto `color-scheme`, and every token
+follows because `color-scheme` is inherited and crosses shadow roots. An
+attribute-selected theme block only reaches the host that carries it, so it would leave
+every component that declares `designTokens` pinned to one theme —
+roadmap/complete/core-modernist-dark.md.
 
 **`#/objects`** is the coverage map — every non-plumbing `$def` against the scenarios
 exercising it (`src/corpus/defIndex.ts`, inverting the spec's own `coversDefs` join),

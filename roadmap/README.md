@@ -175,13 +175,6 @@ proposals that name their campaign.
   own seven remaining `no-op` notes also point); and geometry/surface gaps (wide-selection
   shaft, dark-page colour scheme, the embed/studio tray). Rows retire as unblockers land
   (registry `blockedBy` keeps table and tiles from drifting); empty table ⇒ `complete/`.
-- **[core-modernist-dark.md](proposed/core-modernist-dark.md)** — campaign item 2. The
-  workbench has a **complete dark theme nothing can turn on**: `resolved-theme` appears
-  exactly once in the codebase, in its own selector. And Modernist is light-only by
-  construction, so this is a *design* task, not a conversion — preferably drawn upstream in
-  the design project rather than invented in CSS. Keeps rather than cuts, on the grounds
-  that a restyle should not quietly remove a capability on its way past. Dark doubles as the
-  completeness test for the tray's de-hexing.
 - **[core-json-view.md](proposed/core-json-view.md)** — campaign item 7. `src/model/jsonView.ts`
   is a **complete JSON-view engine with no UI consumer and no test**, while the panel renders
   raw text; `errorPointer` is set and never read, so the exhibit's "highlighted in document
@@ -368,6 +361,13 @@ proposals that name their campaign.
   container rungs.
 
 ### complete/
+- **[core-modernist-dark.md](complete/core-modernist-dark.md)** — campaign item 2. The
+  workbench has a **complete dark theme nothing can turn on**: `resolved-theme` appears
+  exactly once in the codebase, in its own selector. And Modernist is light-only by
+  construction, so this is a *design* task, not a conversion — preferably drawn upstream in
+  the design project rather than invented in CSS. Keeps rather than cuts, on the grounds
+  that a restyle should not quietly remove a capability on its way past. Dark doubles as the
+  completeness test for the tray's de-hexing.
 - **[core-element-ops-part-addressing.md](complete/core-element-ops-part-addressing.md)** —
   campaign item 13b's addressing half, **built 2026-08-14**: `parts[0]` was hard-coded in
   **44 places**, splitting cleanly into ~10 that ADDRESS (cursor, grid, clef lookup,

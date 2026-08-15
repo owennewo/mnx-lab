@@ -155,10 +155,10 @@ describe('design tokens', () => {
     // Nothing enforced it, and the Modernist re-cut had to hand-maintain both
     // copies twice. Drift here is invisible until someone notices the score
     // card is a different white from the panel beside it.
-    const lightHalf = (decl: string) => {
-      const ld = /^light-dark\(\s*([\s\S]*?)\s*,\s*[\s\S]*\)$/.exec(decl.trim());
-      return (ld ? ld[1] : decl).trim();
-    };
+    // Both blocks now theme through light-dark(), so BOTH halves must agree —
+    // a dark-only divergence is exactly as visible to a reader as a light one,
+    // and was invisible to this test while only the light half was compared.
+    const halves = (decl: string) => decl.trim();
     /**
      * `--name: <value>;` pairs from the LIGHT rule only, with any
      * `var(--mnx-x, …)` wrapper peeled. Scoping to the bare `:host` selector
@@ -174,7 +174,7 @@ describe('design tokens', () => {
         let v = m[2].trim();
         const hook = /^var\(\s*--mnx-[\w-]+,\s*([\s\S]*)\)$/.exec(v);
         if (hook) v = hook[1].trim();
-        out.set(m[1], lightHalf(v).replace(/\s+/g, ' '));
+        out.set(m[1], halves(v).replace(/\s+/g, ' '));
       }
       return out;
     };
@@ -245,16 +245,61 @@ describe('design tokens', () => {
   });
 
   describe('the anti-flash ground', () => {
-    it('matches --bg exactly', () => {
-      // `workbench.css` paints the body before the component mounts. If it
-      // drifts from --bg the page flashes the OLD palette on every load — a
-      // bug that is invisible to every other check here, and precisely the
-      // kind a restyle introduces.
-      const body = /background:\s*(oklch\([^)]*\));/.exec(read('entries/workbench.css'));
-      const bg = /--bg:\s*var\(--mnx-bg,\s*(oklch\([^)]*\))\)/.exec(designTokens);
-      expect(body, 'no oklch background in workbench.css').toBeTruthy();
-      expect(bg, 'no --bg in designTokens').toBeTruthy();
-      expect(body![1]).toBe(bg![1]);
+    it('matches --bg in BOTH themes', () => {
+      // `workbench.css` paints the body before the component mounts, now via
+      // light-dark() so it follows the reader's preference. If either half
+      // drifts from its --bg the page flashes the OLD palette on every load —
+      // invisible to every other check here, and precisely the kind of bug a
+      // restyle introduces.
+      const body = /background:\s*light-dark\(\s*(oklch\([^)]*\))\s*,\s*(oklch\([^)]*\))\s*\)/.exec(
+        read('entries/workbench.css')
+      );
+      expect(body, 'no light-dark() background in workbench.css').toBeTruthy();
+
+      const bg = /--bg:\s*var\(--mnx-bg,\s*light-dark\(\s*(oklch\([^)]*\))\s*,\s*(oklch\([^)]*\))\s*\)\)/.exec(
+        designTokens
+      );
+      expect(bg, 'no light-dark() --bg in designTokens').toBeTruthy();
+      expect(body![1], 'light half').toBe(bg![1]);
+      expect(body![2], 'dark half').toBe(bg![2]);
+    });
+  });
+
+  describe('both themes, one mechanism', () => {
+    // The dark half used to be a `:host([resolved-theme='dark'])` block, and
+    // that MECHANISM WAS BROKEN in a way no swatch would reveal: every
+    // workbench component includes designTokens, so each declared the light
+    // palette on its OWN host, and the attribute — carried only by the app
+    // host — never matched there. A closer host beats an inherited value, so
+    // the whole panel pinned itself light while the header and rail went dark.
+    //
+    // light-dark() has no such hole: it resolves against the USED color-scheme,
+    // which is an inherited property and crosses shadow boundaries. That is why
+    // viewerTokens always themed correctly and designTokens did not.
+    it('has no attribute-selected theme block left', () => {
+      expect(
+        /:host\(\[resolved-theme/.test(designTokens),
+        'designTokens must theme via light-dark(), not an attribute — an ' +
+          'attribute block only reaches the host that carries it'
+      ).toBe(false);
+    });
+
+    it('gives every literal colour a light-dark() pair', () => {
+      const hostBody = [...designTokens.matchAll(/:host\s*\{([^}]*)\}/g)]
+        .map(m => m[1])
+        .join('\n');
+      const missing: string[] = [];
+      for (const m of hostBody.matchAll(/(--[\w-]+):\s*([^;]+);/g)) {
+        const [, name, raw] = m;
+        const value = raw.trim().replace(/^var\(--mnx-[\w-]+,\s*/, '').replace(/\)$/, '');
+        // Only literal colours need a pair. Tokens built from other tokens
+        // (var(), color-mix()) re-resolve on their own, and non-colours
+        // (radius, rule width, fonts) are theme-independent by design.
+        if (!/^oklch\(|^#|^rgb|^hsl/.test(value)) continue;
+        if (value.includes('light-dark(')) continue;
+        missing.push(`${name}: ${value}`);
+      }
+      expect(missing, `single-theme colour tokens:\n  ${missing.join('\n  ')}`).toEqual([]);
     });
   });
 

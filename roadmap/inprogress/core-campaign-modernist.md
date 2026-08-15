@@ -124,7 +124,7 @@ frame exists.
 | # | Item | Scope | Blocks on | Status |
 |---|------|-------|-----------|--------|
 | 1 | [core-modernist-tokens.md](../complete/core-modernist-tokens.md) | **The contract.** Radius tokenization as a values-unchanged no-op refactor, then the OKLCH re-cut, `--rule-w`, the unified red accent, the shared row-state primitives in `sharedChrome`, and the selection-red / error-red separation rule. | — | **built 2026-08-15** |
-| 2 | [core-modernist-dark.md](../proposed/core-modernist-dark.md) | Authoring Modernist-dark in OKLCH and finally **wiring** `resolved-theme`, which appears once in the codebase and is set by nothing. Split out because it is a design task with an upstream dependency, not a token conversion. | 1 | proposed |
+| 2 | [core-modernist-dark.md](../complete/core-modernist-dark.md) | Authoring Modernist-dark in OKLCH and finally **wiring** `resolved-theme`, which appears once in the codebase and is set by nothing. Split out because it is a design task with an upstream dependency, not a token conversion. | 1 | **built 2026-08-15** |
 | 3 | [core-modernist-type.md](../complete/core-modernist-type.md) | Archivo via `@fontsource`, `--serif` retired, the mono voice decided. Carries the tray's re-review, because bundling the font changes a surface that was reviewed in the fallback. | 1 | **built 2026-08-15** |
 | 4 | revision on [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) | The tray drops its 55 hard-coded literals for token references — but **keeps inheriting** the palette rather than declaring `designTokens` locally (an early draft said otherwise; a local block would pin the tray light when the theme switches). A revision block on the complete doc, not a new one: same component, same art direction, and that doc already carries the deviations section this closes. | 1, 3 | **built 2026-08-15** |
 | 5 | [workbench-score-panel.md](../complete/workbench-score-panel.md) | The score panel: five-band frame, seven tabs cut to five, the width change, and the per-tab rebuilds. The campaign's structure half and its showcase. **Built** except the two halves that belong to other items — the JSON gutter and selection scoping (item 7) and compare's live render/overlay. | 1 | **built 2026-08-15** |
@@ -173,6 +173,43 @@ depends on. Revisit if a session's queue ever gets long enough to hurt.
 *(Appended as items land, per the convention — later items start smarter than earlier
 ones.)*
 
+- **2026-08-15 — item 2 lands: dark is authored, wired, and the mechanism turned out
+  to be wrong.** `auto | light | dark`, persisted, resolved against
+  `prefers-color-scheme` (verified in both directions by emulating the media query),
+  offered in the palette with no new keystroke. The residue's last row retires.
+  - **An attribute-selected theme block is a trap in a shadow-DOM app, and it had
+    already sprung.** The dark half was `:host([resolved-theme='dark'])` — but every
+    workbench component includes `designTokens` and therefore declares the LIGHT
+    palette on *its own* host, where that attribute never appears. A closer host beats
+    an inherited value, so the first dark screenshot showed a dark header and rail
+    around a fully light panel, HUD and palette. `viewerTokens` never had the bug
+    because it uses `light-dark()`, which resolves against the *used* `color-scheme`
+    — an inherited property that crosses shadow boundaries. `designTokens` is now the
+    same mechanism, and the attribute survives only as the switch that *sets*
+    `color-scheme`. **Generalisable: in a shadow-DOM app, theme by inherited
+    computed value, never by an attribute on one host.**
+  - **The stronger test found real drift the weaker one could not.** Comparing only
+    the LIGHT halves of the two token blocks passed while their dark halves had
+    diverged completely — the viewer's was still the old warm-slate palette at hue
+    75–85 against the app's Modernist hue 60. Once both blocks used `light-dark()`,
+    comparing *both* halves caught it immediately, along with two accent tokens I had
+    aligned in one block and forgotten in the other. An invariant asserted on half the
+    data is an invariant you do not have.
+  - **Dark improves the campaign's worst tradeoff.** "Red everywhere" put selection-red
+    next to the engine's frozen error red at only 4° of hue. In dark the accent
+    lightens to L≈0.70 while `#b91c1c` cannot move from L≈0.505, so the separation
+    nearly doubles to ΔL 0.195 and the badge becomes the *darker* mark against a
+    lighter outline. The riskiest decision in the campaign is safest in its newest
+    theme.
+  - **Item 4's completeness test passed with nothing to do.** The tray went fully dark
+    on the first try, which is the assertion the doc set up: it proves the de-hexing
+    left no literals behind. A test that costs nothing to run because an earlier item
+    was done properly.
+  - **A doc rule lost to a code decision, correctly.** The item's own rule 3 said "the
+    score card stays paper, do not invert the staff", written from first principles.
+    `scoreTokens` had already decided the opposite on 2026-08-14, from real experience
+    — *"a dark page with a blazing white score is the thing the embed app made
+    obvious."* The code won. Check the token sheet before legislating about it.
 - **2026-08-15 — item 5 lands: the panel gets a frame and loses two tabs.**
   Seven tabs become five, every tab is the same five bands, the widths move to
   360/420/560, and the `actions` tab retires. Verified hands-on over CDP with the panel
