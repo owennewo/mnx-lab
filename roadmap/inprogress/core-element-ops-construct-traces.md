@@ -113,11 +113,13 @@ count, and `spec/tie-targets` buys five kinds at 35 elements while five small
 scenarios buy the same five at 40 between them — but each is a shorter, more
 readable performance, and a trace nobody can read is a fixture, not evidence.
 
-The bar is **reported, not asserted**, while the queue drains: a hard assertion
-today would redden the build for work nobody has done. The committed numbers
-move only through `npm run sweep:construct`, so a verb landing without a trace
-appears as a deliberate diff. **When `uncovered` empties, it becomes an
-assertion** — that is the campaign's closing condition for this item.
+The bar was **reported, not asserted**, while the queue drained: a hard
+assertion before the work would have reddened the build for nobody's benefit.
+**The queue emptied on 2026-08-15 and the bar is now an assertion** — 37 of 38
+kinds built at least once from `{}`, the 38th (`staves`) waiting on
+`core-entry-surface.md`, and a construct verb landing without a trace fails the
+build from here on. That was this item's closing condition, and the
+campaign's.
 
 What it buys is also a better sentence than a percentage: *every verb this
 campaign built has been driven from an empty document to a human-verified

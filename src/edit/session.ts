@@ -785,6 +785,13 @@ export class EditorSession {
         });
         return JSON.stringify(this.doc) !== before;
       }
+      case 'setSupport': {
+        // The document is the address — no navigation, like the part
+        // declarations it shares a surface with.
+        const before = JSON.stringify(this.doc);
+        this.apply({ type: 'setSupport', key: intent.key, value: intent.value });
+        return JSON.stringify(this.doc) !== before;
+      }
       case 'wrapInContainer':
       case 'insertSpace': {
         // Both address the cursor's own event, in its own sequence — which is

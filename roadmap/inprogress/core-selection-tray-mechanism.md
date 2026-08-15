@@ -1,8 +1,9 @@
 # The selection command tray — the mechanism
 
 > **Status: in progress — stages 1–4 built 2026-08-15, same day as picked up;
-> the hands-on review is open.** Shipped: `src/edit/commandRegistry.ts` (56
-> commands over all seven rungs, each declaring rungs/glyph/shortcut/tier and
+> the hands-on review is open.** Shipped: `src/edit/commandRegistry.ts` (~60
+> commands over all seven rungs plus the `document` scope, each declaring
+> scopes/glyph/shortcut/tier and
 > its own `isActive`/`action` over a narrow `SessionView`) with
 > `harness/conformance/command-registry.test.ts` — 18 joins covering unique
 > ids, real rungs, shortcuts that some table actually binds, surfaces that
@@ -79,17 +80,19 @@ testable, and it is pure data + pure functions over the session's read surface.
 ```ts
 interface EditorCommand {
   id: string
-  rungs: SelectionLevel[]            // which tabs show it
+  scopes: CommandScope[]             // which tabs show it; SelectionLevel | 'document'
   glyph: { smufl: string } | { arc: 'slur' | 'tie' }
   label: string
-  stroke?: string                    // physical code, joins to the keymap
-  tier: 'key' | 'popover' | 'palette'
+  shortcut?: string                  // the KEY_DOCS label, joined against the keymap
+  tier: 'key' | 'popover'
+  projection?: Projection            // the tab dialect's letters only
   isActive?: (view: SessionView) => boolean | 'mixed'
-  toIntent?: (view: SessionView) => EditorIntent | ShellAction | null
+  action?: (view: SessionView) => CommandAction | null
+  blockedBy?: string                 // the residue row, when unwired
 }
 ```
 
-- **`toIntent` absent or returning `null` ⇒ the tile renders unavailable** (the
+- **`action` absent or returning `null` ⇒ the tile renders unavailable** (the
   not-yet-built read). After the vocabulary sweep this is the exception, not the
   rule: the greyed set is the residue doc's short tail (respell, duration dots,
   the wrap verbs, entry beyond the first voice/staff, layout/score authoring,
@@ -98,7 +101,7 @@ interface EditorCommand {
 - **The tray sees the document; the palette cannot.** The campaign's
   presentation-layer learning ruled the palette out as an authoring surface
   because it deliberately cannot enumerate what the loaded document offers. The
-  registry's `isActive`/`toIntent` read a `SessionView`, so the tray *is* a
+  registry's `isActive`/`action` read a `SessionView`, so the tray *is* a
   document-aware surface — the property the layout/score construction question
   has been waiting for (recorded in the residue, not claimed here).
 - **`isActive` is queried per tile per render** — the tile flips in place after a
@@ -118,8 +121,8 @@ interface EditorCommand {
   an extension of the campaign's static keyboard join over `SURFACE_INTENTS`.
   Asserted in a new `harness/conformance/command-registry.test.ts`.
 - **Reverse**: `opRows.ts` `SURFACE_LABELS` gains `selectionTray` — an op fired
-  from a tile shows `/ · tray` provenance in the ops panel the way palette ops
-  show `Ctrl+Shift+K · palette`.
+  from a tile shows `/ · tray` provenance in the ops panel the way go-to's
+  command list shows `Ctrl+G › · palette`.
 - **Agreement with the cheatsheet**: a key inert at a rung (`KEY_DOCS` meaning
   absent) must not appear available on that rung's tab — the same
   guards-mirror-docs discipline `keymap-docs.test.ts` already enforces.
@@ -131,11 +134,11 @@ interface EditorCommand {
 - `tabs` — `presentLevels()` in ladder order, `active` = the session's level (or
   the previewed one), `holdsSelection` dot on the real level while previewing.
 - `tiles`/`rows` — registry filtered by the active tab's rung, states from
-  `isActive`/`toIntent`; the part tab's `rows` values read from the document
+  `isActive`/`action`; the part tab's `rows` values read from the document
   (clef, key, transpose, mute — wired per the residue's schedule).
 - `meta` — reuse `buildHudRows`' per-rung readouts; same nouns as the HUD, so the
   tray and HUD never disagree about the address.
-- `tray-command {id}` → `toIntent(view)` → `stripIntent`-style dispatch through the
+- `tray-command {id}` → `action(view)` → `stripIntent`-style dispatch through the
   funnel → `syncFromSession()` re-renders the tray in place.
 
 ## Wired on day one (existing vocabulary, post-sweep)
@@ -229,7 +232,7 @@ everything below the boundary is pinned:
 
 - `command-registry.test.ts` — the forward join (stroke ⇒ binding + `KEY_DOCS` at
   every claimed rung); rung-filtering agrees with `KEY_DOCS` meanings; every
-  `toIntent` result is a member of the intent/shell-action unions; wired commands
+  `action` result is a member of the intent/shell-action unions; wired commands
   replay through a trace and land in the op log with intent provenance.
 - Escape-precedence order asserted where it is declared.
 - The existing suites keep their force: goldens byte-identical (nothing here

@@ -1,0 +1,102 @@
+{
+  "target": "spec/ties",
+  "intents": [
+    {
+      "type": "addPart"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 0
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "toggleTie"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "toggleTie"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "toggleTie"
+    }
+  ]
+}

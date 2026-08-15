@@ -1125,6 +1125,7 @@ export class ScenarioPage extends LitElement {
     window.addEventListener('focus', this.onFocusChange, true);
     window.addEventListener('blur', this.onFocusChange, true);
     window.addEventListener('pointerdown', this.onFocusChange, true);
+    window.addEventListener('pointerdown', this.onPointerDownOutside, true);
   }
 
   disconnectedCallback() {
@@ -1138,6 +1139,7 @@ export class ScenarioPage extends LitElement {
     window.removeEventListener('focus', this.onFocusChange, true);
     window.removeEventListener('blur', this.onFocusChange, true);
     window.removeEventListener('pointerdown', this.onFocusChange, true);
+    window.removeEventListener('pointerdown', this.onPointerDownOutside, true);
   }
 
   /** Focus may have moved — re-ask the ownership predicate. Deferred a task,
@@ -1148,7 +1150,24 @@ export class ScenarioPage extends LitElement {
     setTimeout(() => {
       if (!this.isConnected) return;
       this.hasKeyboard = editorHasKeyboard(this);
+      // The tray goes with the keyboard. It is a surface for acting on the
+      // selection with keys it no longer receives, and one that advertises
+      // shortcuts it cannot honour is the same lie the dimmed cursor exists
+      // to avoid (core-editor-focus-scope.md, stage 3).
+      if (!this.hasKeyboard) this.trayOpen = false;
     }, 0);
+  };
+
+  /** A pointer went down somewhere: close the tray unless it landed inside
+   *  it. Capture phase and `composedPath`, so the check survives a handler
+   *  that stops propagation and sees through the tray's shadow root — and
+   *  nothing is prevented, so the click still reaches whatever it hit. */
+  private onPointerDownOutside = (event: Event) => {
+    if (!this.trayOpen) return;
+    const inTray = event
+      .composedPath()
+      .some(node => node instanceof HTMLElement && node.tagName === 'MNX-SELECTION-TRAY');
+    if (!inTray) this.trayOpen = false;
   };
 
   private async loadScore() {
@@ -1577,7 +1596,9 @@ export class ScenarioPage extends LitElement {
       const declaration = parsePartDeclaration(input.value);
       if (declaration) {
         this.stripIntent(
-          'set' in declaration
+          'support' in declaration
+            ? { type: 'setSupport', key: declaration.support.key, value: declaration.support.value }
+            : 'set' in declaration
             ? { type: 'setPartDeclaration', declaration: declaration.set }
             : 'removeDocument' in declaration
               ? declaration.removeDocument === 'layout'

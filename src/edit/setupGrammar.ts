@@ -85,6 +85,7 @@ export type PartDeclarationResult =
   /** The document's presentation layer (campaign item 13b): 1-based, because
    *  the user is counting what they can see, not indexing an array. */
   | { removeDocument: 'layout' | 'score' | 'multimeasureRest'; index: number }
+  | { support: { key: 'useAccidentalDisplay' | 'useBeams'; value: boolean } }
   | null;
 
 const PART_REMOVAL_WORDS: Record<string, PartDeclarationKind> = {
@@ -100,6 +101,19 @@ export function parsePartDeclaration(text: string): PartDeclarationResult {
   const trimmed = text.trim().replace(/\s+/g, ' ');
   const words = trimmed.split(' ');
   const head = (words[0] ?? '').toLowerCase();
+  // Document-level support declarations ride the part popover, as the layout
+  // and score removals do: the user's question is "what about this document?"
+  // and which object holds the answer is our problem. `explicit accidentals`
+  // is what `mnx.support.useAccidentalDisplay` means — print what each note
+  // asks for, infer nothing.
+  const support = /^(no\s+)?explicit\s+(accidentals|beams)$/.exec(trimmed.toLowerCase());
+  if (support)
+    return {
+      support: {
+        key: support[2] === 'beams' ? 'useBeams' : 'useAccidentalDisplay',
+        value: !support[1]
+      }
+    };
   if (head === 'no') {
     const target = (words[1] ?? '').toLowerCase();
     const nth = Number(words[2] ?? '1');
@@ -234,7 +248,8 @@ const TEMPO_UNITS: Record<string, MnxNoteValueBase> = {
 };
 
 export const BAR_ATTRIBUTE_HELP =
-  'barline double · repeat start · repeat end 3 · ending 1,2 · segno · fine · ' +
+  'barline double · repeat start · repeat end 3 · ending 1,2 · ending 3 for 1 open · ' +
+  'segno · fine · ' +
   'jump dsalfine · jump segno at start · fine at end · tempo 120 · rehearsal A · section Verse 1 · full-measure rest · ' +
   'measure repeat 2 · measure repeat counter 3 · no <attribute>';
 
@@ -337,10 +352,16 @@ export function parseBarAttribute(text: string): BarAttributeResult {
       return type ? { set: { kind: 'barline', type } } : null;
     }
     case 'ending': {
-      // "1", "1,2", "1 open" — the numbers, then an optional open flag.
+      // "1", "1,2", "1 open", "1 for 2" — the numbers, an optional open flag,
+      // and how many bars the volta lasts (item 7 recorded the missing
+      // duration; the trace queue is what finally needed it).
       const open = /\bopen\b/i.test(rest);
+      const span = /\bfor\s+(\d+)\b/i.exec(rest);
+      const duration = span ? Number(span[1]) : undefined;
+      if (duration !== undefined && (!Number.isInteger(duration) || duration < 1)) return null;
       const numbers = rest
         .replace(/\bopen\b/i, '')
+        .replace(/\bfor\s+\d+\b/i, '')
         .split(/[,\s]+/)
         .filter(Boolean)
         .map(Number);
@@ -349,6 +370,7 @@ export function parseBarAttribute(text: string): BarAttributeResult {
         set: {
           kind: 'ending',
           ...(numbers.length > 0 ? { numbers } : {}),
+          ...(duration !== undefined ? { duration } : {}),
           ...(open ? { open: true } : {})
         }
       };
@@ -614,7 +636,8 @@ export function parseLyric(text: string): LyricResult {
 
 export const RHYTHM_HELP =
   '3:2 · 3 eighth in 2 eighth · 3 eighth in 1 quarter, no number · ' +
-  'grace · grace 2 · appoggiatura · acciaccatura · tremolo 2 · space 1/4 · rest half.';
+  'grace · grace 2 · appoggiatura · acciaccatura · tremolo 2 · tremolo 3 in 2 half · ' +
+  'space 1/4 · rest half.';
 
 /** The note values a wrap may name, spelled as the schema spells them. */
 const NOTE_VALUES: Record<string, MnxNoteValueBase> = {
@@ -642,7 +665,14 @@ export type PartialContainerSpec =
       showNumber?: 'noNumber' | 'inner' | 'both';
     }
   | { type: 'grace'; graceType?: 'makeTime' | 'stealFollowing' | 'stealPrevious'; slash?: boolean }
-  | { type: 'tremolo'; marks?: number };
+  | {
+      type: 'tremolo';
+      marks?: number;
+      /** The PERFORMED value, when the written notes cannot imply it: the two
+       *  events each carry the tremolo's whole span, so a wrap normally reads
+       *  it off them — `tremolo 3 in 2 half` says it outright. */
+      outer?: { multiple: number; duration: { base: MnxNoteValueBase } };
+    };
 
 export type RhythmResult =
   | { space: [number, number] }
@@ -714,9 +744,22 @@ export function parseRhythm(text: string): RhythmResult {
     };
   }
 
-  const tremolo = /^tremolo(?:\s+(\d+))?$/.exec(token);
-  if (tremolo)
-    return { wrap: { type: 'tremolo', ...(tremolo[1] ? { marks: Number(tremolo[1]) } : {}) } };
+  // `tremolo 2` · `tremolo 3 in 2 half` — the second form spells the performed
+  // value, in the same `<multiple> <value>` shape the tuplet form uses.
+  const tremolo = /^tremolo(?:\s+(\d+))?(?:\s+in\s+(\d+)\s+(\S+))?$/.exec(token);
+  if (tremolo) {
+    const outerValue = tremolo[3] ? NOTE_VALUES[tremolo[3]] : undefined;
+    if (tremolo[3] && !outerValue) return null;
+    return {
+      wrap: {
+        type: 'tremolo',
+        ...(tremolo[1] ? { marks: Number(tremolo[1]) } : {}),
+        ...(outerValue
+          ? { outer: { multiple: Number(tremolo[2]), duration: { base: outerValue } } }
+          : {})
+      }
+    };
+  }
 
   // "3 eighth in 2 eighth" — the full form, where the corpus needs an outer
   // value the short ratio cannot express (1 quarter, not 2 eighths).

@@ -155,6 +155,10 @@ export type MutationIntent =
   // entry ghost the PENDING duration is what changes — because a rest is
   // absence, so there is nothing there to dot.
   | { type: 'toggleDots' }
+  // A document-level support declaration — not an element, so it has no rung
+  // and no navigation: the document is the address (campaign item 3's queue
+  // found `spec/accidentals` unbuildable without it).
+  | { type: 'setSupport'; key: 'useAccidentalDisplay' | 'useBeams'; value: boolean }
   | { type: 'setFullMeasureRest'; visualDuration?: { base: MnxNoteValueBase; dots?: number } }
   | { type: 'removeFullMeasureRest' }
   | { type: 'setMeasureRepeat'; number: number; counter?: { count: number; orient?: 'above' | 'below' } }

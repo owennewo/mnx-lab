@@ -181,6 +181,8 @@ function opLabel(op: EditOp): string {
     }
     case 'respellNote':
       return `respell ${op.noteId}`;
+    case 'setSupport':
+      return `${op.value ? 'declare' : 'un-declare'} ${op.key === 'useBeams' ? 'explicit beams' : 'explicit accidentals'}`;
     case 'setRestSpelling':
       return `respell rest as ${durationText(op.duration)} @ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
     case 'insertSpace':

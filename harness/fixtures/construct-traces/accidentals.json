@@ -1,0 +1,146 @@
+{
+  "target": "spec/accidentals",
+  "intents": [
+    {
+      "type": "addPart"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setSupport",
+      "key": "useAccidentalDisplay",
+      "value": true
+    },
+    {
+      "type": "setKeySignature",
+      "fifths": -2
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "transpose",
+      "semitones": 1
+    },
+    {
+      "type": "respellNote"
+    },
+    {
+      "type": "setAccidentalDisplay",
+      "show": true
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "transpose",
+      "semitones": -1
+    },
+    {
+      "type": "setAccidentalDisplay",
+      "show": true
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "transpose",
+      "semitones": -1
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 2
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "setAccidentalDisplay",
+      "show": true
+    }
+  ]
+}

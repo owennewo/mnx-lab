@@ -293,21 +293,18 @@ export const COMMANDS: readonly EditorCommand[] = [
     tier: 'popover',
     action: () => ({ intent: { type: 'setAccidentalDisplay', show: true } })
   },
+  // ONE tile, not the pick-flat/pick-sharp pair this table first drafted:
+  // campaign item 6 made spelling a CYCLE (D♯ → E♭ → …, same sound), because
+  // "the other spelling" has no single answer. A pair of tiles would promise
+  // a choice the verb does not offer.
   {
-    id: 'respell-flat',
+    id: 'respell',
     scopes: ['note'],
-    glyph: { smufl: 'accidentalFlat' },
-    label: 'Respell flat',
-    tier: 'popover',
-    blockedBy: 'respell'
-  },
-  {
-    id: 'respell-sharp',
-    scopes: ['note'],
-    glyph: { smufl: 'accidentalSharp' },
-    label: 'Respell sharp',
-    tier: 'popover',
-    blockedBy: 'respell'
+    glyph: { smufl: 'accidentalEnharmonicEquals' },
+    label: 'Respell enharmonically (cycles)',
+    shortcut: 'J',
+    tier: 'key',
+    action: () => ({ intent: { type: 'respellNote' } })
   },
   marking('staccato', 'articStaccatoAbove', 'Staccato', 'staccato'),
   marking('accent', 'articAccentAbove', 'Accent', 'accent'),
@@ -354,8 +351,9 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'dots',
     scopes: ['event'],
     glyph: { smufl: 'augmentationDot' },
-    label: 'Dot the value',
-    tier: 'popover',
+    label: 'Dot the value (cycles 0 → 1 → 2 → none)',
+    shortcut: '.',
+    tier: 'key',
     action: () => ({ intent: { type: 'toggleDots' } })
   },
   {

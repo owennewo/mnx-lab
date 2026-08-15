@@ -1,0 +1,142 @@
+{
+  "target": "spec/repeats-alternate-endings-simple",
+  "intents": [
+    {
+      "type": "addPart"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "repeatStart"
+      }
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "repeatEnd"
+      }
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "ending",
+        "numbers": [
+          1
+        ],
+        "duration": 1
+      }
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 2
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "repeatEnd"
+      }
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "ending",
+        "numbers": [
+          2
+        ],
+        "duration": 1
+      }
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 3
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "ending",
+        "numbers": [
+          3
+        ],
+        "duration": 1,
+        "open": true
+      }
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    }
+  ]
+}

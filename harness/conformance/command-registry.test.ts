@@ -280,7 +280,9 @@ describe('command registry — state reads the document', () => {
   const find = (id: string): EditorCommand => COMMANDS.find(c => c.id === id)!;
 
   it('an unwired command always draws unavailable', () => {
-    expect(commandState(find('respell-flat'), view())).toBe('unavailable');
+    // `arpeggio` has no op yet and names its residue row; respell used to sit
+    // here and now fires, which is the ledger doing its job.
+    expect(commandState(find('arpeggio'), view())).toBe('unavailable');
   });
 
   it('a marking tile turns active once the mark is on the event, and removes it', () => {

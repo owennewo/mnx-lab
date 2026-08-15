@@ -484,6 +484,20 @@ describe('construct coverage (element-ops campaign item 3)', () => {
       ).toBe(true);
   });
 
+  it('THE BAR: every kind with a construct verb has been built from {} at least once', () => {
+    // The closing condition, now an assertion rather than a report (campaign
+    // item 3, decision 5): the queue is empty and `uncovered` holds nothing
+    // but the kinds waiting on `core-entry-surface.md`. A verb landing without
+    // a trace reddens the build from here on, which is the whole point of
+    // having named a bar.
+    expect(
+      uncoveredKinds.filter(
+        kind => !coverage.traceCoverage.awaitingEntrySurface.includes(kind)
+      ),
+      'a construct verb exists for this kind and no trace has ever built one'
+    ).toEqual([]);
+  });
+
   it('the queue plus the entry-surface wait accounts for every uncovered kind', () => {
     // Nothing may sit uncovered without a reason: either a queued trace will
     // cover it, or its only homes need an entry surface this campaign does not

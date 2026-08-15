@@ -81,12 +81,22 @@ shipped, each naming its unblocker, and both were still accurate a day later.** 
 the first time an address in this table was actually used, which is the whole claim the
 doc makes for itself.
 
+## Retired 2026-08-15 — the second wave, one day later still
+
+Two more rows went the same way before the tray's own review, which is the
+retirement rule working as designed rather than a coincidence worth
+celebrating: **respell** → [item 6](../inprogress/core-element-ops-clef-key.md)'s
+sibling (`respellNote`, `J` — and note the tile became ONE cycling command,
+not the flat/sharp pair this ledger imagined, because "the other spelling"
+has no single answer); **duration dots, capo write, time `display`** → item 4
+(`.` cycles 0 → 1 → 2 → none), with capo already writable since item 13 and
+`common`/`cut` carried by the time popover's grammar. Both are wired tiles
+now.
+
 ## Still greyed: the vocabulary tail
 
 | Tray surface | Rung(s) | Blocked by | Unblocked when |
 |---|---|---|---|
-| flat / sharp (respell) | note | the *spelling* half has no op — the display half (`setAccidentalDisplay` pair, parentheses) landed with [the tail](../inprogress/core-element-ops-the-tail.md) | campaign item 6 — accidental spelling (undrafted) |
-| duration dots, capo write, time `display` | event / setup | campaign item 4 undrafted (the op already accepts `dots?` — the cheapest unlock left) | item 4 — duration completion |
 | grace note, tuplet, tremolo (construction) | event | the **wrap verbs** are the open half of [item 11b](../inprogress/core-element-ops-onset-granularity.md); note the removal half is now `refused` **by design** for inked containers (unwrapping re-times the music) — a verb that declines, not a missing verb | item 11b's wrap verbs + rest spelling |
 | voice / staff entry beyond the first | voice / part | *addressing* landed with [item 13b](../inprogress/core-element-ops-part-addressing.md) (cursor `partIndex`/`staffIndex`, Alt+V cycles slots) — the **entry surface** (creating a second voice or staff-2 ink) is the open half; "the ladder can visit voices it cannot create" | item 13b's entry stages |
 | layout / score authoring (system breaks, layouts) | score | removal landed (presentation layer); construction needs a surface that can express a **tree** — the popover grammar cannot, and the palette was ruled out because it cannot see the document. The tray *can* see the document (it is fed from the session), so it is a candidate surface — recorded, not claimed | its own proposal, per the campaign's "beyond" list |

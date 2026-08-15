@@ -390,6 +390,21 @@ export type EditOp =
     }
   | {
       /**
+       * A document-level support declaration: `useAccidentalDisplay` says the
+       * accidentals are AUTHORED, so the renderer prints what each note asks
+       * for and infers nothing; `useBeams` says the same about beams.
+       *
+       * It is not an element — no ink, no place in the music — so neither
+       * harness could see it missing, and `spec/accidentals` turned out to be
+       * unbuildable without it: the trace drew one accidental too many, in the
+       * one bar where the policy is the whole point.
+       */
+      type: 'setSupport';
+      key: 'useAccidentalDisplay' | 'useBeams';
+      value: boolean;
+    }
+  | {
+      /**
        * Wrap a run of sequence content in a container — tuplet, grace or
        * tremolo. ONE verb for three kinds, by item 7's family test: they share
        * an owner (a run of one sequence's content) and differ only in the
@@ -1384,6 +1399,17 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       else delete owner.beams; // no tombstone
       return next;
     }
+    case 'setSupport': {
+      ensureSkeleton(next);
+      const support = (next.mnx.support ??= {});
+      if (op.value) support[op.key] = true;
+      else {
+        delete support[op.key];
+        // No tombstone: an emptied declaration goes with its last member.
+        if (Object.keys(support).length === 0) delete next.mnx.support;
+      }
+      return next;
+    }
     case 'wrapInContainer': {
       const seq =
         next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex]?.sequences?.[op.sequenceIndex];
@@ -1864,6 +1890,18 @@ export function beamStartingAt(
  *  omitted rather than defaulted, so a plain `grace` is `{type, content}` —
  *  what `spec/grace-note` actually holds. */
 function buildContainer(spec: ContainerSpec, content: MnxEvent[]): MnxSequenceItem {
+  // A tremolo's two events are each WRITTEN with the tremolo's total duration
+  // (the model says so, and both corpus tremolos hold it: halves for a
+  // half-long tremolo, wholes for a whole-long one). So the wrap writes that
+  // rather than leaving whatever the notes were entered as — the value is a
+  // property of the object, not of how the author got there.
+  if (spec.type === 'tremolo' && spec.outer) {
+    const total = noteValueForSpan({
+      num: durationSpan(spec.outer.duration).num * (spec.outer.multiple ?? 2),
+      den: durationSpan(spec.outer.duration).den
+    });
+    if (total) content.forEach(event => (event.duration = { base: total }));
+  }
   if (spec.type === 'tuplet')
     return {
       type: 'tuplet',
@@ -1914,6 +1952,12 @@ export function completeContainerSpec(
   if (!isTimedEvent(item)) return null;
   const duration = (item as MnxEvent).duration;
   if (partial.type === 'grace') return { ...partial };
+  if (partial.type === 'tremolo' && partial.outer)
+    return {
+      type: 'tremolo',
+      ...(partial.marks === undefined ? {} : { marks: partial.marks }),
+      outer: partial.outer
+    };
   if (partial.type === 'tremolo') {
     // The two events are each WRITTEN with the tremolo's total duration, and
     // `outer` is what is PERFORMED: duration × multiple = that same total. So

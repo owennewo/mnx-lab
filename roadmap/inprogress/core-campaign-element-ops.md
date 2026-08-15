@@ -86,10 +86,12 @@ An exemplar first — the algorithm proven small before the corpus commits to it
 then the harnesses, then families ordered by scenarios unlocked. "Keys" records
 agreed or candidate claims; **bold** = agreed.
 
-**Every row is now closed.** What remains of the campaign is item 3's trace
-queue draining to zero — the closing condition it set itself — and nothing
-else: the six verbless kinds have owners, and the entry surface graduated out
-as [core-entry-surface.md](../proposed/core-entry-surface.md).
+**Every row is closed and the trace queue is empty.** The campaign's own
+closing condition — every kind with a construct verb built at least once from
+`{}` — is met at **37 of 38**, and the 38th (`staves`) waits on
+[core-entry-surface.md](../proposed/core-entry-surface.md), which graduated out
+for exactly that reason. The bar is an assertion now, not a report: a construct
+verb landing without a trace fails the build.
 
 | # | Item | Scope | Unlocks | Keys / tier | Rung | Status |
 |---|------|-------|---------|-------------|------|--------|
@@ -1010,3 +1012,39 @@ of 38, queue 7 → 4 traces / 48 elements.**
   document, because a fret digit would write the annotation the scenario exists
   to do without. The projection is a choice about what you are saying, not a
   property of the file.
+
+### 2026-08-15 — the queue empties, and the bar becomes an assertion
+
+`ties`, `tremolos-multi-note`, `repeats-alternate-endings-simple`,
+`accidentals`. **Traced 22 → 26, kinds covered 33 → 37 of 38, queue 4 → 0.**
+`uncovered` now holds nothing but `staves`, which is `awaitingEntrySurface`, so
+the closing condition is met and `harness/conformance/construct-traces.test.ts`
+asserts it rather than reporting it.
+
+The last four kept the pattern to the end — each found something no report
+could:
+
+- **`mnx.support.useAccidentalDisplay` had no verb, and is not an element.**
+  `spec/accidentals` was unbuildable without it: the trace drew one accidental
+  too many in the one bar where the policy is the whole point. Neither harness
+  could see the gap, because both enumerate ELEMENTS and this is a document
+  declaration — no ink, no place in the music. `explicit accidentals` in the
+  part popover says it now.
+- **A volta had no duration and a tremolo could not say its performed value.**
+  Item 7 recorded the first as a known limit and item 11b left the second
+  implicit; both were reachable only once a trace had to reproduce a real
+  document. `ending 3 for 1 open` and `tremolo 3 in 2 half`.
+- **A tie needs its destination to exist**, so the ties come after the notes —
+  the third sighting of "a reference verb needs its target named", after the
+  beam's minted event ids and the ottava's minted bar id.
+- **A tremolo pair cannot be written long in a full bar**, because the cursor
+  cannot stand past the end of one. So the pair is written SHORT and the wrap
+  restates it at the tremolo's own span — which is what the object means (both
+  corpus tremolos hold exactly that), not a workaround.
+
+**What the trace queue was worth, counted:** 21 traces, and a defect or a
+missing shape in roughly two out of three. Every one of them was invisible to
+the destruct sweep, which is the campaign's other half and its more complete
+one — removal needs identity, and construction needs ordering, minting,
+validity, vocabulary and policy. A verb table can say a kind is constructible;
+only a performance can say it is *buildable*.

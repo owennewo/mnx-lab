@@ -370,7 +370,10 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     // user supplies the index, as `no line 2` does for lyric verses.
     'removeLayout',
     'removeScore',
-    'removeMultimeasureRest'
+    'removeMultimeasureRest',
+    // Document-level support declarations (`explicit accidentals`): not an
+    // element, so neither harness could see it missing — a trace did.
+    'setSupport'
   ],
   // One popover per attribute, two intents each: the grammar's `inherit`
   // token emits the removal intent (campaign item 5).
