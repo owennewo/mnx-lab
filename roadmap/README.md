@@ -290,6 +290,16 @@ proposals that name their campaign.
   scenarios **71 → 78**, removable elements **1003 → 1022**, goldens untouched
   (drawing remains [core-guitar-technique.md](proposed/core-guitar-technique.md)'s
   gap).
+- **[core-entry-surface.md](proposed/core-entry-surface.md)** — typing anywhere the
+  cursor can already go, graduated out of the element-ops campaign (2026-08-15) as the
+  last thing holding its index open. The cursor addresses part → staff → voice in full
+  and every removal verb follows it; **entry still writes to voice 0 of `parts[0]`**, so
+  the ladder can visit a voice it cannot create. What makes it a design item rather than
+  a gap: nobody has decided what typing into a second voice MEANS when the bar is
+  already full — create the sequence, pad it with rests nobody asked for, or leave a
+  voice that underfills on every render. Corpus cost is nil (the key grammar already
+  spells part and staff, silent for 0 and 1). Acceptance: a construct trace for
+  `spec/multiple-voices` and `spec/tie-targets`.
 - **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
   `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
   (2026-08-15). Not element-ops work because the campaign's verbs all attach to a

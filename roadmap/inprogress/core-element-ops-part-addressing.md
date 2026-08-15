@@ -1,9 +1,12 @@
 # Part & staff addressing — the cursor learns where else music lives
 
-> **Status: built 2026-08-14.** Campaign:
+> **Status: built 2026-08-14; the row closed 2026-08-15.** Campaign:
 > [core-campaign-element-ops.md](core-campaign-element-ops.md), item 13b's
-> **addressing half**. Entry remains on `parts[0]` — that is 13c, and the
-> boundary is deliberate.
+> **addressing half**. Entry remains on `parts[0]` — deliberately, and it is no
+> longer this campaign's: it graduated out as
+> [core-entry-surface.md](../proposed/core-entry-surface.md), because what is
+> left of it is a policy question (what typing into a second voice means when
+> the bar is full) rather than a missing verb.
 
 ## The measurement that scoped it
 

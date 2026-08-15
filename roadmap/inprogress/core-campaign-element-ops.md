@@ -86,6 +86,11 @@ An exemplar first — the algorithm proven small before the corpus commits to it
 then the harnesses, then families ordered by scenarios unlocked. "Keys" records
 agreed or candidate claims; **bold** = agreed.
 
+**Every row is now closed.** What remains of the campaign is item 3's trace
+queue draining to zero — the closing condition it set itself — and nothing
+else: the six verbless kinds have owners, and the entry surface graduated out
+as [core-entry-surface.md](../proposed/core-entry-surface.md).
+
 | # | Item | Scope | Unlocks | Keys / tier | Rung | Status |
 |---|------|-------|---------|-------------|------|--------|
 | 1 | [exemplar](../complete/core-element-ops-exemplar.md) | Both harness halves built end-to-end over two simple scenarios (`minimal-single-note`, `open-strings-chord`). Start is **decided: the literal `{}`** — so the campaign's first new ops are the genesis verbs (`addPart`, skeleton-on-demand; score rung, setup tier) and the session is hardened for zero parts/measures. Settles key normalization; adds the **op-queue panel** (side-panel ops tab: `appliedOps` as a visible undo/redo queue) so command sequences can be read and reviewed. | the algorithm + genesis ops + 2 traced scenarios | **Shift+P** part popover; staffKind: palette | **score** | **complete 2026-08-14** |
@@ -102,7 +107,7 @@ agreed or candidate claims; **bold** = agreed.
 | 11b | [onset granularity, container descent, wrap verbs](core-element-ops-onset-granularity.md) | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second; rest spelling closed as a VERB (`rest half`) rather than a padding policy. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | 32 notes addressable; 9 scenarios unblocked | **Shift+R** rhythm popover | event | **complete 2026-08-15** |
 | 12 | [lyrics](core-element-ops-lyrics.md) | Lyrics, part names, verse labels — a text *mode* that suspends the keymap, not a binding. | 4 (reachable 78 → 82); 34 elements | **Shift+L** popover — the text *mode* is rejected, see the doc | **note / score** | **built 2026-08-14** |
 | 13 | [part declarations](core-element-ops-part-declarations.md) | **Split at build time**: the five keys on `parts[0]` (name, strings, capo, staffKind, staves) get the removal halves their genesis verbs never had, plus constructors for capo and staves. | 2 (reachable 68 → 71); 91 elements | **Shift+P** popover (`capo 3`, `no strings`) | **score** | **built 2026-08-14** |
-| 13b | [part addressing](core-element-ops-part-addressing.md) **(built)**; entry + staff 2 open | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-codes `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changes note keys — which the primitives goldens embed. A corpus re-verification event, not a refactor. The entry-surface ceiling — likely several proposals; the ladder can already *visit* voices it cannot create. | ~15 | t.b.d. | voice/part rungs | undrafted |
+| 13b | [part addressing](core-element-ops-part-addressing.md) | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-coded `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changed note keys — which the primitives goldens embed. It cost none in the end: the key grammar spells part and staff silently for 0 and 1. The ENTRY half graduated out on 2026-08-15 as [core-entry-surface.md](../proposed/core-entry-surface.md) — a policy question, not an element-ops gap. | ~15 | `setPart`/`setStaff`; entry keys unchanged | voice/part rungs | **complete 2026-08-15** |
 
 Beyond the campaign, and now **formally handed over with owners** (2026-08-15):
 layout documents and multimeasure rests →
@@ -922,3 +927,24 @@ eighths as a triplet gives an eighth back, and §8.11's invariant (a touched
 measure has content for its full metric duration) still holds. Padding fires
 only where the bar came up short, so re-wrapping a corpus container — which
 restores an exactly-full bar — is untouched and still reproduces byte for byte.
+
+### 2026-08-15 — the index closes; the entry surface graduates
+
+Item 13b's remaining half is out of the campaign and into
+[core-entry-surface.md](../proposed/core-entry-surface.md). Everything beneath
+it is built — the cursor carries part, staff and voice, and every removal verb
+follows it — so what is left is a single **policy** question the campaign has no
+special claim on: what typing into a second voice MEANS when the bar is already
+full (does the sequence get created, does it get padded, and is a voice that
+does not exist yet a ghost position?). That is a selection-and-entry design
+item, not an element-ops gap, and it would have held this index open while
+being decided.
+
+The rule this makes explicit, worth keeping for the next campaign: **a campaign
+closes when its remaining work stops being of its own kind.** Every item here
+answered "what verb builds or removes this element". The entry surface answers
+"what does writing mean where nothing is" — a different question, so it gets a
+different doc rather than a fourteenth row.
+
+With that, every index row is closed and the campaign's only outstanding work
+is the trace queue draining to zero.
