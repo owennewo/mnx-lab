@@ -58,19 +58,37 @@ export const SELECTION_LADDER: readonly SelectionLevel[] = [
   'score'
 ];
 
-/** The staff-1 filter, restated from the layouts (see cursor.ts header). */
-function staffOneSequences(sequences: MnxSequence[] | undefined): MnxSequence[] {
-  return (sequences ?? []).filter(seq => (seq.staff ?? 1) === 1);
+/** The cursor's staff filter, restated from the layouts (see cursor.ts header):
+ *  one staff at a time, and its sequences numbered per staff — the same
+ *  counting `buildGrid` does, so a voice index means the same thing in both. */
+function staffSequences(
+  sequences: MnxSequence[] | undefined,
+  staffIndex: number
+): MnxSequence[] {
+  return (sequences ?? []).filter(seq => (seq.staff ?? 1) === staffIndex);
 }
 
-/** The voice the selection anchors to: the voice of the note under the
- *  cursor, else voice 0 — the same primacy the session's duration ops use. */
-export function anchorVoiceIndex(
-  grid: PositionGrid,
-  cursor: EditorCursor,
-  projection: Projection
-): number {
-  return slotAt(grid, cursor, projection)?.voiceIndex ?? 0;
+/** The part the selection reads. The cursor addresses one part at a time
+ *  (campaign item 13b) and the part-measure rung's ↑↓ now WALKS parts, so a
+ *  footprint pinned to `parts[0]` would paint another part's bar than the one
+ *  the cursor is in — visible the moment a bare arrow can cross the boundary. */
+function partMeasures(doc: MnxStructure, cursor: EditorCursor) {
+  return doc.parts?.[cursor.partIndex ?? 0]?.measures ?? [];
+}
+
+/**
+ * The voice the selection anchors to — THE CURSOR'S, absent meaning the first.
+ *
+ * This used to read the voice off the ink under the cursor, which was the same
+ * mistake the ink walk made and was corrected for: a voice re-derived per read
+ * is a voice that changes when you step off ink. At event level it showed:
+ * moving down past voice 1's note left the cursor carrying voice 1 while the
+ * slice silently repainted voice 0's event, because empty space has no ink to
+ * derive from. The cursor holds the voice through every move (`carry`), so the
+ * selection reads it there and the two can no longer disagree.
+ */
+export function anchorVoiceIndex(cursor: EditorCursor): number {
+  return cursor.voiceIndex ?? 0;
 }
 
 /** Index of the timed event starting exactly at `onset`, or -1. */
@@ -125,11 +143,12 @@ export function presentLevels(
   projection: Projection
 ): Set<SelectionLevel> {
   const present = new Set<SelectionLevel>(['partMeasure', 'measure', 'score']);
-  const sequences = staffOneSequences(
-    doc.parts?.[0]?.measures?.[cursor.measureIndex]?.sequences
+  const sequences = staffSequences(
+    partMeasures(doc, cursor)[cursor.measureIndex]?.sequences,
+    cursor.staffIndex ?? 1
   );
   if (sequences.length > 0) present.add('voiceMeasure');
-  const voice = anchorVoiceIndex(grid, cursor, projection);
+  const voice = anchorVoiceIndex(cursor);
   if (eventIndexAt(sequences[voice], cursor.onset) >= 0) present.add('event');
   if (slotAt(grid, cursor, projection)) present.add('note');
   if (sectionRangeAt(doc, cursor.measureIndex)) present.add('section');
@@ -165,10 +184,14 @@ export function tightenLevel(
  * The note keys a selection paints — each rung highlights exactly the notes
  * its operations can affect, rendered through the overlay that already exists.
  * (The enclosure vocabulary — cells, slices, beads, panels — is a later
- * phase; until then the footprint IS the visual.) partMeasure and measure
- * paint the same keys today because the cursor lives on parts[0]: the rungs
- * stay distinct — measure owns bar adornments, partMeasure the part's bar —
- * and diverge visually once the overlay reaches multi-part documents.
+ * phase; until then the footprint IS the visual.)
+ *
+ * Everything here reads the CURSOR's part and staff, never `parts[0]`: the
+ * part-measure rung walks staves with a bare arrow, so a fixed part would paint
+ * one bar while the cursor addressed another. partMeasure and measure still
+ * paint the same keys — measure owns the bar's adornments and partMeasure the
+ * part's bar, a distinction the footprint cannot express until the measure rung
+ * paints every part's copy of the bar (see the roadmap doc's open half).
  */
 export function selectionNoteKeys(
   doc: MnxStructure,
@@ -182,30 +205,34 @@ export function selectionNoteKeys(
     return slot ? [slot.noteKey] : [];
   }
 
-  const voice = anchorVoiceIndex(grid, cursor, projection);
+  const voice = anchorVoiceIndex(cursor);
+  const partIndex = cursor.partIndex ?? 0;
+  const staffIndex = cursor.staffIndex ?? 1;
   const section = level === 'section' ? sectionRangeAt(doc, cursor.measureIndex) : null;
   const anchorEvent =
     level === 'event'
       ? eventIndexAt(
-          staffOneSequences(doc.parts?.[0]?.measures?.[cursor.measureIndex]?.sequences)[voice],
+          staffSequences(partMeasures(doc, cursor)[cursor.measureIndex]?.sequences, staffIndex)[voice],
           cursor.onset
         )
       : -1;
 
   const keys: string[] = [];
-  (doc.parts?.[0]?.measures ?? []).forEach((measure, measureIndex) => {
+  partMeasures(doc, cursor).forEach((measure, measureIndex) => {
     if (level !== 'score') {
       if (section) {
         if (measureIndex < section.start || measureIndex >= section.end) return;
       } else if (measureIndex !== cursor.measureIndex) return;
     }
-    staffOneSequences(measure.sequences).forEach((sequence, voiceIndex) => {
+    staffSequences(measure.sequences, staffIndex).forEach((sequence, voiceIndex) => {
       if ((level === 'voiceMeasure' || level === 'event') && voiceIndex !== voice) return;
       sequence.content.forEach((item, eventIndex) => {
         if (!isTimedEvent(item)) return;
         if (level === 'event' && eventIndex !== anchorEvent) return;
         (item.notes ?? []).forEach((note, noteIndex) => {
-          keys.push(noteKeyOf(note, measureIndex, voiceIndex, eventIndex, noteIndex));
+          keys.push(
+            noteKeyOf(note, measureIndex, voiceIndex, eventIndex, noteIndex, undefined, partIndex, staffIndex)
+          );
         });
       });
     });

@@ -6,6 +6,7 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { corpus, type ScenarioEntry } from '../corpus/corpus.ts';
+import { groupScenarios } from '../corpus/groups.ts';
 import { classify } from './queue.ts';
 import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
@@ -1537,6 +1538,20 @@ export class ScenarioPage extends LitElement {
     // score — becomes the old deselect. While deselected, Escape stays inert
     // (and unrecorded — deselection is view chrome, not session history).
     if (intent.type === 'relaxSelection' && this.cursorHidden) return;
+    // The ladder does not end at the document (the navigation map's score
+    // row): at the top rung the vertical neighbour is the next SCORE, which
+    // the session cannot know and the element must not assume. The workbench
+    // binds it to the rail; studio will bind the same gesture to its own
+    // collection. Handled here rather than as an intent because it leaves the
+    // document entirely — there is nothing for a trace to replay.
+    if (
+      (intent.type === 'lineUp' || intent.type === 'lineDown') &&
+      this.session.selectionLevel === 'score' &&
+      !this.cursorHidden
+    ) {
+      this.escalateToRail(intent.type === 'lineDown' ? 1 : -1);
+      return;
+    }
     const handled = this.session.handleIntent(intent);
     if (intent.type === 'relaxSelection') {
       if (!handled) this.cursorHidden = true;
@@ -1546,6 +1561,21 @@ export class ScenarioPage extends LitElement {
     this.copied = false;
     this.syncFromSession();
   };
+
+  /**
+   * The score rung's vertical neighbour: the prev/next scenario in the RAIL's
+   * order (topic groups — src/corpus/groups.ts), because the rail is the
+   * collection the reader can see. Stops at both ends, like every other rung's
+   * arrows. The unfiltered order is deliberate: the rail's search box is the
+   * shell's state, and a gesture that skipped differently depending on a filter
+   * in another component would be unpredictable from here.
+   */
+  private escalateToRail(delta: 1 | -1): void {
+    const ordered = [...groupScenarios(corpus, e => e.id).values()].flat();
+    const at = ordered.findIndex(e => e.id === this.scenarioId);
+    const next = at < 0 ? undefined : ordered[at + delta];
+    if (next) location.hash = scenarioHref(next.id, this.view || undefined);
+  }
 
   private openPopover(action: ShellAction): boolean {
     // Only the popover actions are ours; palette actions belong to the shell.

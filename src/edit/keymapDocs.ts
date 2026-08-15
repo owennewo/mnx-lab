@@ -66,7 +66,7 @@ export const KEY_DOCS: KeyDoc[] = [
     group: 'navigation',
     meaning: {
       note: 'walk positions (notation: this voice’s ink, nearest pitch)',
-      event: 'walk positions',
+      event: 'walk this voice’s events (rests included)',
       voiceMeasure: 'walk bars',
       partMeasure: 'walk bars',
       measure: 'walk bars',
@@ -78,7 +78,18 @@ export const KEY_DOCS: KeyDoc[] = [
     keys: '↑/↓',
     strokes: [{ code: 'ArrowUp' }, { code: 'ArrowDown' }],
     group: 'navigation',
-    meaning: { note: 'up/down the vertical line (string / staff position)' }
+    // The vertical axis coarsens as the rung widens: the staff's own space,
+    // then the voice stack, then the system's staves. Section is deliberately
+    // unbound (no honest referent). The MEASURE rung's row is missing here on
+    // purpose — "the nearest bar in the neighbouring system" is a fact about
+    // the paint, resolved by the mount and delivered as `goToMeasure`, so the
+    // session guard this table mirrors correctly refuses it.
+    meaning: {
+      note: 'up/down the vertical line (string / staff position)',
+      event: 'the voice above/below, at this instant',
+      voiceMeasure: 'the voice above/below in this bar',
+      partMeasure: 'the staff above/below (this part’s staves, then the next part)'
+    }
   },
   {
     keys: 'Ctrl+←/→',
@@ -87,7 +98,16 @@ export const KEY_DOCS: KeyDoc[] = [
       { code: 'ArrowRight', ctrl: true }
     ],
     group: 'navigation',
-    meaning: { all: 'bar jump (the Ctrl climb)' }
+    // The climb: at the note rungs the bar is the first ancestor whose ←→
+    // means something else; from voice-measure up the bar step is the rung's
+    // OWN move, so the climb continues to the section.
+    meaning: {
+      note: 'bar jump (the Ctrl climb)',
+      event: 'bar jump, keeping the voice',
+      voiceMeasure: 'jump to the prev/next section',
+      partMeasure: 'jump to the prev/next section',
+      measure: 'jump to the prev/next section'
+    }
   },
   {
     keys: 'Ctrl+↑/↓',
@@ -96,8 +116,14 @@ export const KEY_DOCS: KeyDoc[] = [
       { code: 'ArrowDown', ctrl: true }
     ],
     group: 'navigation',
-    // note-only — mirrored by the session's level guard (the honesty test).
-    meaning: { note: 'jump to the voice above/below (the event sounding at this beat)' }
+    // The same climb on the vertical — mirrored by the session's level guards
+    // (the honesty test). Part-measure's climb reaches the SYSTEM, the mount's
+    // to resolve, so it is absent here for the same reason as the bare row.
+    meaning: {
+      note: 'jump to the voice above/below (the event sounding at this beat)',
+      event: 'jump to the staff above/below',
+      voiceMeasure: 'jump to the staff above/below'
+    }
   },
 
   // ── Selection — the ladder walk.

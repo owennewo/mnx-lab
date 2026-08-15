@@ -140,7 +140,7 @@ export function buildHudRows(
   row('part', 'part', '');
 
   const sequences = staffOneSequences(doc.parts[0]?.measures?.[cursor.measureIndex]?.sequences);
-  const voice = anchorVoiceIndex(session.positions, cursor, session.projection);
+  const voice = anchorVoiceIndex(cursor);
   if (present.has('voiceMeasure')) {
     row('voice', 'voice', `${voice + 1} of ${sequences.length}`);
   }

@@ -409,9 +409,13 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
 export function initialCursor(grid: PositionGrid): EditorCursor {
   const first = grid.positions[0];
   if (!first) return { measureIndex: 0, onset: { num: 0, den: 1 }, line: grid.mode === 'string' ? 1 : 0 };
-  const line =
-    grid.mode === 'string' ? first.slots[0]?.line ?? 1 : first.slots[0]?.staffPosition ?? 0;
-  return { measureIndex: first.measureIndex, onset: first.onset, line };
+  const slot = first.slots[0];
+  const line = grid.mode === 'string' ? slot?.line ?? 1 : slot?.staffPosition ?? 0;
+  // The landing slot's voice is CARRIED, not left to be re-derived: slots sort
+  // by line, so a document whose second voice sits above the first would open
+  // with the cursor on voice 1's ink while every voice-scoped reader assumed
+  // voice 0 — the note cell and the event slice showing different voices.
+  return withVoice({ measureIndex: first.measureIndex, onset: first.onset, line }, slot?.voiceIndex ?? 0);
 }
 
 function positionIndexOf(positions: Position[], cursor: EditorCursor): number {
@@ -559,11 +563,14 @@ export function movePositionInk(
   return cursor;
 }
 
-/** Jump to the first position of the neighbouring measure. */
+/** Jump to the first position of the neighbouring measure. Delegates the
+ *  landing to `moveToMeasure` so the bar jump and the go-to grammar resolve the
+ *  anchor voice by ONE rule — a bar without your voice used to strand the
+ *  cursor when you arrived by Ctrl+→ and fall back when you arrived by "12". */
 export function moveMeasure(grid: PositionGrid, cursor: EditorCursor, delta: 1 | -1): EditorCursor {
   const target = cursor.measureIndex + delta;
-  const first = grid.positions.find(p => p.measureIndex === target);
-  return first ? toPosition(cursor, first) : cursor;
+  if (!grid.positions.some(p => p.measureIndex === target)) return cursor;
+  return moveToMeasure(grid, cursor, target);
 }
 
 /** Jump to the first position of an absolute measure, clamped to the score. */

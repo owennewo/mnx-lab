@@ -15,6 +15,7 @@ import {
   DEFAULT_CLEF
 } from '../../src/edit/staffSpace.ts';
 import type { MnxEvent, MnxStructure } from '../../src/model/mnx.ts';
+import type { SelectionLevel } from '../../src/edit/selection.ts';
 
 const playground = (): MnxStructure =>
   JSON.parse(
@@ -294,5 +295,145 @@ describe('note-level navigation (tab projection)', () => {
     expect(session.projection).toBe('notation');
     expect(session.handleIntent({ type: 'setProjection', projection: 'tab' })).toBe(false);
     expect(session.projection).toBe('notation');
+  });
+});
+
+// The rungs ABOVE note (roadmap/inprogress/core-selection-ladder.md, the
+// per-level navigation map). The vertical axis coarsens as the selection
+// widens — line → voice → staff — and the horizontal climb reaches the section
+// once the bar step is the rung's own move. Driven over the playground, which
+// carries the two-voice bar, the second part and the two sections this needs.
+describe('the per-level navigation map', () => {
+  /** Widen to a rung, whatever the presence rule skips on the way. */
+  const at = (level: SelectionLevel): EditorSession => {
+    const session = notationSession();
+    for (let guard = 0; guard < 8 && session.selectionLevel !== level; guard++) {
+      session.handleIntent({ type: 'relaxSelection' });
+    }
+    expect(session.selectionLevel).toBe(level);
+    return session;
+  };
+
+  it('event ↑↓ steps the voice stack, and stops at the outermost voice', () => {
+    const session = at('event');
+    expect(session.selectedNoteKeys).toEqual(['l1', 'l2']); // voice 0's chord
+
+    expect(session.handleIntent({ type: 'lineDown' })).toBe(true);
+    expect(session.cursor.voiceIndex).toBe(1);
+    expect(session.selectedNoteKeys).toEqual(['l6']); // voice 1's event
+    // The stop, not a wrap (decided 2026-08-15): there is no voice 2 here.
+    expect(session.handleIntent({ type: 'lineDown' })).toBe(false);
+
+    expect(session.handleIntent({ type: 'lineUp' })).toBe(true);
+    expect(session.selectedNoteKeys).toEqual(['l1', 'l2']);
+    expect(session.handleIntent({ type: 'lineUp' })).toBe(false);
+  });
+
+  it('event ←→ walks THIS voice’s events, not every column', () => {
+    const session = at('event');
+    session.handleIntent({ type: 'nextPosition' });
+    expect(session.cursor.onset).toEqual({ num: 1, den: 4 });
+    expect(session.selectedNoteKeys).toEqual(['l3']);
+    session.handleIntent({ type: 'nextPosition' });
+    expect(session.selectedNoteKeys).toEqual(['l4']);
+  });
+
+  it('voice-measure ↑↓ steps voices too — only the horizontal grain changed', () => {
+    const session = at('voiceMeasure');
+    expect(session.handleIntent({ type: 'lineDown' })).toBe(true);
+    expect(session.cursor.voiceIndex).toBe(1);
+    expect(session.selectedNoteKeys).toEqual(['l6', 'l7']); // voice 1's whole bar
+  });
+
+  it('part-measure ↑↓ walks the staves, and the BAR travels', () => {
+    const session = at('partMeasure');
+    session.handleIntent({ type: 'nextPosition' }); // bar 2, so the bar has something to keep
+    expect(session.cursor.measureIndex).toBe(1);
+
+    expect(session.handleIntent({ type: 'lineDown' })).toBe(true);
+    expect(session.cursor.partIndex).toBe(1); // the rhythm part
+    expect(session.cursor.measureIndex).toBe(1); // reading the same bar
+    // The footprint follows the cursor's part — it used to stay on parts[0],
+    // which no bare arrow could reach before this rung existed. (`r2` is the
+    // rhythm part's bar-2 note; the lead part's are `l*`.)
+    expect(session.selectedNoteKeys).toEqual(['r2']);
+
+    expect(session.handleIntent({ type: 'lineDown' })).toBe(false); // the last staff
+    expect(session.handleIntent({ type: 'lineUp' })).toBe(true);
+    expect(session.cursor.partIndex ?? 0).toBe(0);
+  });
+
+  it('the tab projection follows only when the staff it lands on has no fingerboard', () => {
+    const session = new EditorSession(playground()); // lead is a tab part
+    expect(session.projection).toBe('tab');
+    for (let guard = 0; guard < 8 && session.selectionLevel !== 'partMeasure'; guard++) {
+      session.handleIntent({ type: 'relaxSelection' });
+    }
+    session.handleIntent({ type: 'lineDown' }); // → rhythm, notation only
+    expect(session.projection).toBe('notation');
+  });
+
+  it('measure and score ↑↓ are the MOUNT’s — the session refuses both', () => {
+    // "The neighbouring system" is a fact about the paint and "the next
+    // document" one about the host; neither is visible from a DOM-free layer.
+    for (const level of ['measure', 'score'] as SelectionLevel[]) {
+      const session = at(level);
+      expect(session.handleIntent({ type: 'lineDown' })).toBe(false);
+      expect(session.handleIntent({ type: 'lineUp' })).toBe(false);
+    }
+  });
+
+  it('section ↑↓ stays unbound, and ←→ walks section starts', () => {
+    const session = at('section');
+    expect(session.handleIntent({ type: 'lineDown' })).toBe(false);
+    session.handleIntent({ type: 'nextPosition' });
+    expect(session.cursor.measureIndex).toBe(4); // Intro → Verse
+    session.handleIntent({ type: 'prevPosition' });
+    expect(session.cursor.measureIndex).toBe(0);
+  });
+
+  it('Ctrl+←→ climbs from the bar to the SECTION once the bar is the rung’s own step', () => {
+    for (const level of ['note', 'event'] as SelectionLevel[]) {
+      const session = at(level);
+      expect(session.handleIntent({ type: 'jumpNext' })).toBe(true);
+      expect(session.cursor.measureIndex).toBe(1); // still the bar jump
+    }
+    for (const level of ['voiceMeasure', 'partMeasure', 'measure'] as SelectionLevel[]) {
+      const session = at(level);
+      expect(session.handleIntent({ type: 'jumpNext' })).toBe(true);
+      expect(session.cursor.measureIndex).toBe(4); // Intro → Verse
+      expect(session.handleIntent({ type: 'jumpNext' })).toBe(false); // no third section
+    }
+    // Nothing wider has a horizontal unit to climb to.
+    expect(at('section').handleIntent({ type: 'jumpNext' })).toBe(false);
+    expect(at('score').handleIntent({ type: 'jumpNext' })).toBe(false);
+  });
+
+  it('Ctrl+↑↓ climbs voice → staff, and dies at the component boundary', () => {
+    expect(at('note').handleIntent({ type: 'jumpDown' })).toBe(true); // the voice
+
+    const event = at('event');
+    expect(event.handleIntent({ type: 'jumpDown' })).toBe(true); // the staff
+    expect(event.cursor.partIndex).toBe(1);
+
+    // part-measure's climb is the system jump — the mount's, like its bare row.
+    expect(at('partMeasure').handleIntent({ type: 'jumpDown' })).toBe(false);
+    expect(at('score').handleIntent({ type: 'jumpDown' })).toBe(false);
+  });
+
+  it('the selection reads the cursor’s voice, not the ink under it', () => {
+    // The bug this closes: stepping off ink left the cursor carrying voice 1
+    // while the event slice silently repainted voice 0's event, because an
+    // empty cell has no ink to derive a voice from.
+    const session = notationSession();
+    session.handleIntent({ type: 'jumpDown' }); // into voice 1
+    expect(session.cursor.voiceIndex).toBe(1);
+    session.handleIntent({ type: 'lineDown' });
+    session.handleIntent({ type: 'lineDown' }); // empty staff positions below
+    expect(session.selectedNoteKeys).toEqual([]); // no note at this cell — correct
+
+    session.handleIntent({ type: 'relaxSelection' });
+    expect(session.selectionLevel).toBe('event');
+    expect(session.selectedNoteKeys).toEqual(['l6']); // voice 1's, as the cursor says
   });
 });

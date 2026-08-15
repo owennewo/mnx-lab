@@ -1059,12 +1059,30 @@ export class EditorSession {
       case 'prevMeasure':
         this.cursorState = moveMeasure(this.grid, before, -1);
         break;
+      // The vertical axis belongs to the RUNG, not always to the line (the
+      // per-level navigation map): the staff/fingerboard at note level, the
+      // voice stack at the event rungs, the system's staves at part-measure.
+      // The measure and score rungs are resolved by the MOUNT — "the
+      // neighbouring system" is a fact about the paint and "the next document"
+      // one about the host, neither visible from this DOM-free layer, so both
+      // arrive here as an already-resolved intent (`goToMeasure`) or not at all.
       case 'lineDown':
-        this.cursorState = moveLine(this.grid, before, 1, this.activeProjection);
+      case 'lineUp': {
+        const delta = intent.type === 'lineDown' ? 1 : -1;
+        switch (this.level) {
+          case 'note':
+            this.cursorState = moveLine(this.grid, before, delta, this.activeProjection);
+            break;
+          case 'event':
+          case 'voiceMeasure':
+            return this.stepVoice(before, delta);
+          case 'partMeasure':
+            return this.stepStaff(before, delta);
+          default:
+            return false; // section: unbound (no honest referent); measure/score: the mount's
+        }
         break;
-      case 'lineUp':
-        this.cursorState = moveLine(this.grid, before, -1, this.activeProjection);
-        break;
+      }
       case 'goToMeasure':
         this.cursorState = moveToMeasure(this.grid, before, intent.measureIndex);
         break;
@@ -1127,36 +1145,41 @@ export class EditorSession {
       case 'jumpNext':
       case 'jumpPrev': {
         const delta = intent.type === 'jumpNext' ? 1 : -1;
-        this.cursorState = moveMeasure(this.grid, before, delta);
+        // The climb, by rung: at the note rungs the first ancestor whose ←→
+        // means something else is the bar; from voice-measure up the bar step
+        // is the rung's OWN move, so the climb continues to the section (dead
+        // in a document that declares none — the boundary, not a bug).
+        switch (this.level) {
+          case 'note':
+          case 'event':
+            this.cursorState = moveMeasure(this.grid, before, delta);
+            break;
+          case 'voiceMeasure':
+          case 'partMeasure':
+          case 'measure':
+            this.cursorState = this.sectionStep(before, delta);
+            break;
+          default:
+            return false; // section/score: no wider horizontal unit to climb to
+        }
         return this.cursorState !== before;
       }
       case 'jumpUp':
       case 'jumpDown': {
-        if (this.level !== 'note') return false;
-        const anchor = before.voiceIndex ?? 0;
-        const target = anchor + (intent.type === 'jumpDown' ? 1 : -1);
-        // The voice jump targets the event SOUNDING at the cursor's instant:
-        // voices rarely share onsets (an alternating bass against a melody
-        // almost never does), so requiring a same-beat onset made the jump
-        // feel broken — land on the target voice's event covering the
-        // cursor's beat (latest onset at or before it; else its first in
-        // the bar).
-        const inMeasure = this.grid.positions.filter(
-          p => p.measureIndex === before.measureIndex && p.voices.includes(target)
-        );
-        if (inMeasure.length === 0) return false;
-        const covering = [...inMeasure].reverse().find(p => !onsetLess(before.onset, p.onset));
-        const targetPos = covering ?? inMeasure[0];
-        const slots = targetPos.slots.filter(s => s.voiceIndex === target);
-        const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
-        this.cursorState = {
-          measureIndex: targetPos.measureIndex,
-          onset: targetPos.onset,
-          // The jump is what SETS the anchor voice — ←→ then stays in it.
-          ...(target ? { voiceIndex: target } : {}),
-          line: slots.length > 0 ? nearestSlotLine(slots, before.line, tab) : before.line
-        };
-        return true;
+        const delta = intent.type === 'jumpDown' ? 1 : -1;
+        // The same climb on the vertical: the voice at note level, the staves
+        // from event and voice-measure (whose own ↑↓ is already the voice
+        // step), and at part-measure the system — which the mount resolves,
+        // exactly as it does the measure rung's bare ↑↓.
+        switch (this.level) {
+          case 'note':
+            return this.stepVoice(before, delta);
+          case 'event':
+          case 'voiceMeasure':
+            return this.stepStaff(before, delta);
+          default:
+            return false;
+        }
       }
     }
     return this.cursorState !== before;
@@ -1173,24 +1196,121 @@ export class EditorSession {
           ? movePosition(this.grid, before, delta)
           : movePositionInk(this.grid, before, delta, 'nearest');
       case 'event':
-        return movePosition(this.grid, before, delta);
+        // "Prev/next event IN THIS VOICE, rests included" — the same walk in
+        // both projections. Walking every column instead (which is what this
+        // did) stepped onto onsets where the anchor voice has no event, and
+        // the event rung has nothing to address there: the slice went blank at
+        // a position the cursor had just been told to select.
+        return movePositionInk(this.grid, before, delta, 'keep');
       case 'voiceMeasure':
       case 'partMeasure':
       case 'measure':
         return moveMeasure(this.grid, before, delta);
-      case 'section': {
-        // Next/previous section START; prev from mid-section goes to the own
-        // section's start first (the audio-player convention).
-        const starts = sectionStarts(this.doc);
-        const target =
-          delta === 1
-            ? starts.find(s => s > before.measureIndex)
-            : [...starts].reverse().find(s => s < before.measureIndex);
-        return target === undefined ? before : moveToMeasure(this.grid, before, target);
-      }
+      case 'section':
+        return this.sectionStep(before, delta);
       case 'score':
         return before; // the whole score is selected — nowhere to go
     }
+  }
+
+  /** Prev/next section START; prev from mid-section goes to this section's own
+   *  start first (the audio-player convention). Shared by the section rung's
+   *  bare arrows and the section jump the bar rungs climb to. */
+  private sectionStep(before: EditorCursor, delta: 1 | -1): EditorCursor {
+    const starts = sectionStarts(this.doc);
+    const target =
+      delta === 1
+        ? starts.find(s => s > before.measureIndex)
+        : [...starts].reverse().find(s => s < before.measureIndex);
+    return target === undefined ? before : moveToMeasure(this.grid, before, target);
+  }
+
+  /**
+   * The voice step — the stack's next unit, and the event rungs' whole vertical
+   * axis. Lands on the target voice's event SOUNDING at the cursor's instant
+   * (latest onset at or before it, else its first in the bar): voices rarely
+   * share onsets, so requiring a same-beat onset made the move feel broken.
+   *
+   * STOPS at the outermost voice (decided 2026-08-15 with the per-level pass):
+   * a wrap across the stack is indistinguishable from a failed press in dense
+   * writing, and the doc's own rule is that an arrow doing nothing beats an
+   * arrow doing something arbitrary.
+   */
+  private stepVoice(before: EditorCursor, delta: 1 | -1): boolean {
+    const target = (before.voiceIndex ?? 0) + delta;
+    if (target < 0) return false;
+    const inMeasure = this.grid.positions.filter(
+      p => p.measureIndex === before.measureIndex && p.voices.includes(target)
+    );
+    if (inMeasure.length === 0) return false; // no such voice here — the upper stop
+    const covering = [...inMeasure].reverse().find(p => !onsetLess(before.onset, p.onset));
+    const targetPos = covering ?? inMeasure[0];
+    const slots = targetPos.slots.filter(s => s.voiceIndex === target);
+    const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
+    this.cursorState = {
+      measureIndex: targetPos.measureIndex,
+      onset: targetPos.onset,
+      // The step is what SETS the anchor voice — ←→ then stays in it.
+      ...(target ? { voiceIndex: target } : {}),
+      ...(before.partIndex ? { partIndex: before.partIndex } : {}),
+      ...(before.staffIndex && before.staffIndex !== 1 ? { staffIndex: before.staffIndex } : {}),
+      line: slots.length > 0 ? nearestSlotLine(slots, before.line, tab) : before.line
+    };
+    return true;
+  }
+
+  /**
+   * The part-measure rung's vertical: the system's staves in score order —
+   * every staff of a part before the next part, because that is the order they
+   * are drawn in. Stops at both ends, like the voice step.
+   *
+   * The BAR is what travels: walking staves must keep reading the same measure,
+   * which is the whole point of the rung. The anchor voice does not — voice
+   * numbering is per-sequence and means nothing in another part.
+   */
+  private stepStaff(before: EditorCursor, delta: 1 | -1): boolean {
+    const staves = (this.doc.parts ?? []).flatMap((part, partIndex) =>
+      Array.from({ length: Math.max(1, part.staves ?? 1) }, (_, k) => ({
+        partIndex,
+        staffIndex: k + 1
+      }))
+    );
+    const at = staves.findIndex(
+      s => s.partIndex === (before.partIndex ?? 0) && s.staffIndex === (before.staffIndex ?? 1)
+    );
+    const target = at < 0 ? undefined : staves[at + delta];
+    if (!target) return false;
+
+    this.grid = buildGrid(this.doc, target.partIndex, target.staffIndex);
+    if (this.grid.positions.length === 0) return false;
+    // Only FORCE the projection when the one in hand cannot exist here. The
+    // map's rule is that arrows never switch projection; notation always
+    // exists, so a tab reader arriving at a fingerboard-less staff is the one
+    // case that has to move.
+    if (this.activeProjection === 'tab' && this.grid.mode !== 'string') {
+      this.activeProjection = 'notation';
+    }
+    const landed = clampCursor(this.grid, {
+      measureIndex: before.measureIndex,
+      onset: before.onset,
+      line: before.line,
+      ...(target.partIndex ? { partIndex: target.partIndex } : {}),
+      ...(target.staffIndex !== 1 ? { staffIndex: target.staffIndex } : {})
+    });
+    // The line means a different SPACE in each grid (string number vs staff
+    // position), so it cannot simply travel: land on this staff's ink, which
+    // also gives the cursor an honest voice to carry.
+    const slot = positionAt(this.grid, landed)?.slots[0];
+    this.cursorState = slot
+      ? {
+          ...landed,
+          line: this.activeProjection === 'tab' && this.grid.mode === 'string'
+            ? slot.line
+            : slot.staffPosition,
+          ...(slot.voiceIndex ? { voiceIndex: slot.voiceIndex } : {})
+        }
+      : landed;
+    return true;
   }
 
   private apply(op: EditOp): void {

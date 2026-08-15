@@ -63,20 +63,62 @@ describe('keymap docs — the joins', () => {
   });
 });
 
-describe('keymap docs — the guard mirrors', () => {
-  it('voice jump: documented at note only, and the session refuses elsewhere', () => {
-    const doc = KEY_DOCS.find(d => d.keys === 'Ctrl+↑/↓')!;
-    expect(Object.keys(doc.meaning)).toEqual(['note']);
+/** The same document with a second part — the staves the climb walks. */
+function makeTwoPartDoc(): MnxStructure {
+  const doc = makeDoc();
+  doc.parts.push({
+    id: 'p2',
+    measures: [
+      { sequences: [{ content: [{ duration: { base: 'whole' }, notes: [note('n4', 'C', 3, 5)] }] }] },
+      { sequences: [{ content: [{ duration: { base: 'whole' }, rest: {} }] }] }
+    ],
+    _x: { mnxLab: { strings: [...STANDARD_GUITAR_STRINGS] } }
+  });
+  return doc;
+}
 
-    const session = new EditorSession(makeDoc());
+describe('keymap docs — the guard mirrors', () => {
+  it('the Ctrl climb: documented per rung, and the session mirrors it', () => {
+    // The climb's vertical, rung by rung (selection-ladder navigation map):
+    // the voice at note level, the staves from event and voice-measure. The
+    // rungs ABOVE are absent from the table on purpose — part-measure's climb
+    // reaches the SYSTEM, which only the mount can resolve, and nothing wider
+    // has a vertical unit at all.
+    const doc = KEY_DOCS.find(d => d.keys === 'Ctrl+↑/↓')!;
+    expect(Object.keys(doc.meaning)).toEqual(['note', 'event', 'voiceMeasure']);
+
+    const session = new EditorSession(makeTwoPartDoc());
     expect(session.selectionLevel).toBe('note');
     expect(session.handleIntent({ type: 'jumpDown' })).toBe(true); // two voices
+    expect(session.cursor.voiceIndex).toBe(1);
 
     session.handleIntent({ type: 'relaxSelection' }); // → event
-    session.handleIntent({ type: 'relaxSelection' }); // → voiceMeasure
-    expect(session.selectionLevel).not.toBe('note');
+    expect(session.selectionLevel).toBe('event');
+    expect(session.handleIntent({ type: 'jumpDown' })).toBe(true); // the second part
+    expect(session.cursor.partIndex).toBe(1);
+    expect(session.cursor.measureIndex).toBe(0); // the bar travels; the voice does not
+
+    while (session.selectionLevel !== 'partMeasure') {
+      session.handleIntent({ type: 'relaxSelection' });
+    }
     expect(session.handleIntent({ type: 'jumpDown' })).toBe(false);
     expect(session.handleIntent({ type: 'jumpUp' })).toBe(false);
+  });
+
+  it('bare ↑/↓: documented to part-measure, and the wider rungs refuse', () => {
+    // measure and score ARE bound for the reader — the neighbouring system and
+    // the next document — but both are resolved by the mount (a fact about the
+    // paint, and one about the host), so the session must say no.
+    const doc = KEY_DOCS.find(d => d.keys === '↑/↓')!;
+    expect(Object.keys(doc.meaning)).toEqual(['note', 'event', 'voiceMeasure', 'partMeasure']);
+
+    const session = new EditorSession(makeTwoPartDoc());
+    while (session.selectionLevel !== 'measure') session.handleIntent({ type: 'relaxSelection' });
+    expect(session.handleIntent({ type: 'lineDown' })).toBe(false);
+    expect(session.handleIntent({ type: 'lineUp' })).toBe(false);
+
+    while (session.selectionLevel !== 'score') session.handleIntent({ type: 'relaxSelection' });
+    expect(session.handleIntent({ type: 'lineDown' })).toBe(false);
   });
 
   it('toggleNote: documented notation-only, and the tab projection refuses', () => {

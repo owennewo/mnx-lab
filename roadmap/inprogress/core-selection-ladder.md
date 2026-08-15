@@ -23,8 +23,45 @@
 > race fixed (enclosures measured fallback-font glyph boxes before Bravura
 > loaded — one-shot redraw on `document.fonts.ready`).
 >
-> **The navigation pass is underway — NOTE LEVEL BUILT 2026-08-10, awaiting
-> its hands-on review.** Shipped: the navigation playground scenario
+> **The navigation pass is COMPLETE for every rung but one — 2026-08-15.** The
+> vertical arrows had never consulted the rung (`lineUp`/`lineDown` always
+> walked the staff line, `jumpUp`/`jumpDown` returned false above note), so at
+> event level ↑ crawled up empty staff positions while the slice never moved.
+> Now the axis coarsens as the selection widens: **line → voice → staff**, with
+> the Ctrl climb one rung ahead of it, and the bar rungs' Ctrl+←→ reaching the
+> **section**. Three decisions closed with it:
+>
+> - **The voice step STOPS at the outermost voice** (the parked stop-or-wrap
+>   question). A wrap across the stack is indistinguishable from a failed press
+>   in dense writing, and the doc's own rule already says an arrow that does
+>   nothing beats one that does something arbitrary.
+> - **The measure rung's ↑↓ and part-measure's Ctrl+↑↓ are resolved by the
+>   MOUNT**, which reads the viewer's system packing and emits the existing
+>   `goToMeasure` — the stage-1 pattern the digit debounce established. `edit/`
+>   may import only `model/`, so "the nearest bar in the neighbouring system" is
+>   a fact it structurally cannot see; delivering it as an already-resolved
+>   intent keeps the session deterministic and the trace replayable. **This is
+>   the one rung still unwired** — it waits on the viewer's packing accessor.
+> - **The score rung's ↑↓ escalates in the workbench mount** (prev/next scenario
+>   in the rail's topic order), not yet as the element's `score-navigate` event —
+>   that belongs with the `elements/` promotion and
+>   [core-viewer-surface.md](../complete/core-viewer-surface.md)'s event contract.
+>
+> Two bugs fell out of building it, both the same shape — **an address
+> re-derived instead of carried**. The selection read its voice off the ink
+> under the cursor, so stepping onto an empty cell repainted the OTHER voice's
+> event while the cursor still said voice 1 (the mirror of the ink-walk bug
+> below, one layer up); and the footprint walked `parts[0]` regardless of where
+> the cursor was, which no bare arrow could reach until part-measure's ↑↓
+> existed. Both now read the cursor. `initialCursor` carries the landed slot's
+> voice for the same reason, and `moveMeasure` delegates to `moveToMeasure` so
+> the bar jump and the go-to grammar resolve a missing voice by ONE rule.
+> Pinned by eleven new cases in `harness/conformance/navigation.test.ts` and the
+> rung mirrors in `keymap-docs.test.ts`; the cheatsheet
+> ([core-keymap-cheatsheet.md](core-keymap-cheatsheet.md)) states the new
+> meanings per rung, including which two rungs are the mount's.
+>
+> **Note level built 2026-08-10; its hands-on review same day.** Shipped: the navigation playground scenario
 > (`lab/document/navigation-playground` — 8 bars, two sections, two voices,
 > chords, rest/empty bars, deep ledgers, two parts, tab-opting Lead); the
 > spatial notation cursor (`src/edit/staffSpace.ts` — clef-aware staff
@@ -56,13 +93,21 @@
 > playground keeps the presence-rule bars; the rail groups both under
 > "Editor test beds".
 >
-> After the note-level review, continue the per-level pass (event next), then:
-> lateral extension + closures
-> (Shift+arrows/Ctrl+A), the relax/tighten shape TWEEN (each level currently
-> re-renders statically), primary/echo asymmetry (both projections draw at
-> full strength), ghost cells beyond the existing entry ghosts, container
-> rungs (the cursor still treats containers as opaque), and trace fixtures
-> asserting selection. Builds directly on the complete
+> **What remains, after the per-level pass**: the system rung's mount wiring
+> (above); lateral extension + closures (Shift+arrows/Ctrl+A), which need
+> selection to become `{level, anchor, extent}` rather than a level plus a
+> cursor; the relax/tighten shape TWEEN (each level currently re-renders
+> statically); primary/echo asymmetry (both projections draw at full strength);
+> ghost cells beyond the existing entry ghosts; the container rung (the cursor
+> descends into containers since element-ops item 11b, but `container` is still
+> not a `SelectionLevel`); the measure rung painting EVERY part's copy of the
+> bar (the footprint follows the cursor's part now, which is honest but still
+> one part); Delete's meaning at voice-measure, part-measure and section
+> (element-ops answered note, measure and score); and trace fixtures asserting
+> selection. The entry-mode axis — advance mode, the stage-1 digit debounce, the
+> letter accelerator — is the other open half; it shares only the cursor with
+> the ladder and is a candidate to graduate into its own proposal. Builds
+> directly on the complete
 > input layer ([core-editor-input-layer.md](../complete/core-editor-input-layer.md)), which
 > already decided the load-bearing substrate: the cursor is a **rhythmic
 > position, not a note id**; selection is a **first-class output** of the intent
@@ -276,7 +321,15 @@ one rect spanning the staff pair — the morph where two echoes merge is the
 visual statement that they were always one bar. Same idiom as the existing
 note↔JSON cross-highlight: one selection, echoed across representations.
 
-## The bare-arrow navigation map (draft 2026-08-10 — review level by level)
+## The bare-arrow navigation map (drafted 2026-08-10, BUILT 2026-08-15)
+
+> Every row below is implemented — `session.moveHorizontal` and the level
+> switch beside it (`stepVoice`, `stepStaff`, `sectionStep`) — except the two
+> the mount owns: the measure row's ↑↓ and the score row's, for the reasons in
+> the status block. The cheatsheet carries the same table as data
+> (`src/edit/keymapDocs.ts`), and `keymap-docs.test.ts` asserts the two cannot
+> drift: a rung absent from the table must be a session no-op.
+
 
 The matrix is selection level × projection (notation vs tab). Forcing it flat
 surfaced two regularities: **the projections agree at every level except
@@ -344,7 +397,7 @@ Why the rows are what they are:
   that lands. Emitted ONLY at score level, so arrows stay inert everywhere
   they lack meaning.
 
-### Ctrl+direction — climb to the first meaning change (decided 2026-08-10)
+### Ctrl+direction — climb to the first meaning change (decided 2026-08-10, BUILT 2026-08-15)
 
 **Ctrl+dir = relax until dir's meaning changes, apply it there, descend
 back** — the Esc-dir-Enter composition with degenerate hops removed (a hop
@@ -429,14 +482,16 @@ echoes) with declared `strings[]`. Note the implementation gap this exposes
 on purpose: the cursor currently addresses parts[0] staff 1 only — the
 part-measure rung's vertical needs the cursor to grow a part axis.
 
-Parked for the hands-on reviews (feel decisions): whether voice-switching ↑↓
-**stops or wraps** at the outermost voice; the notation note-level ←→
+Parked for the hands-on reviews (feel decisions): the notation note-level ←→
 **landing rule** (keep the staff position — pure space, symmetric with tab's
 string-stickiness — vs snap to the voice's nearest-pitch ink, which suits
 walking existing melodies); the entry action key's **binding** (Space vs
 Enter-at-bottom-rung vs other — Space collides with the play/pause
 convention); the **debounce window duration**; and whether per-pane advance
-defaults feel consistent.
+defaults feel consistent. **Decided 2026-08-15 with the per-level pass**:
+voice-switching ↑↓ **stops** at the outermost voice — a wrap across the stack
+reads as a failed press in dense writing, and the rung's own rule is that an
+arrow doing nothing beats one doing something arbitrary.
 
 ## Design questions this item owns
 
@@ -449,8 +504,12 @@ defaults feel consistent.
   level to check it feels natural before starting the next** — the map is a
   feel decision, not a derivation, so it gets the same review-first
   treatment as the corpus.
-- **Escape precedence** — popovers and the palette already consume Escape;
-  overlay-first ordering needs stating once in the keymap layer.
+- ~~**Escape precedence**~~ — **answered** in `src/edit/keymap.ts`
+  (`ESCAPE_PRECEDENCE`): innermost open thing first — popover, then tray or
+  palette, then `relaxSelection`, then the mount's deselect. Stated once, in the
+  only module that interprets KeyboardEvents, and enforced by the DOM rather
+  than by consultation (overlays `preventDefault()` before the page listener
+  runs), which is why the ORDER is the whole contract and nothing branches on it.
 - **The voice hull in dense two-voice writing** and **cell size in dense tab**
   are the two visuals most likely to fail; prototype first.
 - **Selection in the state machine** — today selection is a single position.
