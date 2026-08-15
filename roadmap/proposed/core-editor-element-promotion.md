@@ -90,7 +90,7 @@ trace fixtures, root vitest), before and after.
    docs prescribe — the review *is* this list.
 2. **The element contract**: editor element vs editing mode on
    `<mnx-score-viewer>`; its attributes/properties/events, designed under
-   [core-viewer-surface.md](../inprogress/core-viewer-surface.md)'s layered rule (engine options →
+   [core-viewer-surface.md](../complete/core-viewer-surface.md)'s layered rule (engine options →
    element bindings → workbench chrome). Intents become the event vocabulary;
    the op log / trace capture needs a host-visible seam.
 3. **The shadow-DOM focus story** (survey §6.3), now unavoidable: where key

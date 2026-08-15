@@ -1,9 +1,17 @@
 # Campaign: Modernist — the workbench restyle the tray's art direction leads
 
-> **Status: 2026-08-15 — items 1–7 and 9 all built; row 8 formally declined.**
-> The index is exhausted, so this campaign is done bar the filing: row 8 (the
-> `<360px` drawer) is drafted and **not recommended** — the design is complete,
-> the need is not — and is kept as a *possible* so the analysis is not redone.
+> **Status: COMPLETE 2026-08-15.** The index is exhausted: items 1–7 and 9
+> built, row 8 (the `<360px` drawer) drafted and **formally declined** — the
+> design is complete, the need is not — and kept as a *possible* so the analysis
+> is not redone rather than cut outright.
+>
+> One visual system now runs from the rail to the score: one palette, one accent,
+> one face, both themes, and the selection tray no longer sits apart from the
+> chrome it led. What the campaign did NOT do is as recorded as what it did — the
+> compare tab's computed DIFFERENCES list was refused as a second verdict channel
+> competing with `status: verified`, op grouping was refused for breaking
+> time-travel's row↔position identity, and two design cells (EDITED, KEY-as-a-name)
+> were refused because the corpus does not hold the fact they asked for.
 > A campaign (see CLAUDE.md → Conventions): this doc
 > is an index over several normal proposals, the shared contract they follow, and the
 > running log of progress and learnings as items land. Indexed items are ordinary
@@ -134,7 +142,7 @@ frame exists.
 | 6 | [workbench-queue-pips.md](../complete/workbench-queue-pips.md) | Re-deriving the five-state queue ramp under one accent — the bill "red everywhere" runs up. Shape and lightness carry what hue no longer can. | 1 | **built 2026-08-15** |
 | 7 | [core-json-view.md](../complete/core-json-view.md) | `buildJsonView()` gains `spanByPointer`; the dormant module finally gets a consumer, a conformance test, and the pinned-error highlight the panel consolidation lost. The only below-the-boundary code change in the campaign. | — (5 for the UI half) | **built 2026-08-15** |
 | 8 | [workbench-panel-drawer.md](../proposed/workbench-panel-drawer.md) | The `<360px` drawer. **Drafted and NOT RECOMMENDED** — the design is ready, the need is not: the squeeze only bites below ~1100px, where Ctrl+B already reclaims 270px and the drag handle reaches the 360 floor. Kept as a *possible* so the analysis is not redone. Two findings outlive it: any future overlay gets Escape free at slot 2 (it needs to own its keydown, not a keymap change), and a dismissing click must be swallowed — decide that before `note-selected` gets a consumer, not after. | 5 | **possible — not recommended** |
-| 9 | [core-zoom-density-pad.md](../complete/core-zoom-density-pad.md) | The crosshair zoom/density pad over the score's top right — the same design project's `Zoom Control.dc.html`. Also closes the UI half of [core-render-density-zoom.md](core-render-density-zoom.md): **↑↓ staff** wires `zoom` to `pxPerSp` at last, **←→ spacing** gives the shipped `densityH` a control. The campaign's first item that lands ink **on the score canvas** rather than in the chrome, so contract rule 5 is tested rather than restated. | 1, 3 | **built 2026-08-15** |
+| 9 | [core-zoom-density-pad.md](../complete/core-zoom-density-pad.md) | The crosshair zoom/density pad over the score's top right — the same design project's `Zoom Control.dc.html`. Also closes the UI half of [core-render-density-zoom.md](../inprogress/core-render-density-zoom.md): **↑↓ staff** wires `zoom` to `pxPerSp` at last, **←→ spacing** gives the shipped `densityH` a control. The campaign's first item that lands ink **on the score canvas** rather than in the chrome, so contract rule 5 is tested rather than restated. | 1, 3 | **built 2026-08-15** |
 
 Beyond the campaign (recorded, not indexed): whether `<mnx-command-palette>` adopts the
 skin — the tray doc already parked this; the emitter's dangling `--font-family-sans` and

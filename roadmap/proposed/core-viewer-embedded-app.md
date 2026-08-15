@@ -3,7 +3,7 @@
 > Raised 2026-08-14. Answers the fork left open by
 > [core-editor-element-promotion.md](core-editor-element-promotion.md)'s
 > "getting it moving" section, and gives
-> [core-viewer-surface.md](../inprogress/core-viewer-surface.md) the consumer it has been
+> [core-viewer-surface.md](../complete/core-viewer-surface.md) the consumer it has been
 > waiting for.
 
 ## What this is

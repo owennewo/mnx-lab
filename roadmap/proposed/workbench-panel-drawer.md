@@ -1,7 +1,7 @@
 # The score panel as a drawer, below 360px
 
 > **Status: POSSIBLE — drafted 2026-08-15, and NOT RECOMMENDED for build.**
-> Row 8 of [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md).
+> Row 8 of [core-campaign-modernist.md](../complete/core-campaign-modernist.md).
 >
 > This is a design that is ready to build and probably should not be. It is
 > written down because the question that blocked it finally got an answer, and

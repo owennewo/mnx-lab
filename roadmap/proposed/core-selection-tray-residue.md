@@ -46,7 +46,7 @@ grammar). These now sit in the mechanism's wired tables instead.
 ## Retired 2026-08-15 — the restyle
 
 Two rows from the geometry-and-surface table, retired the day
-[core-campaign-modernist.md](../inprogress/core-campaign-modernist.md) opened.
+[core-campaign-modernist.md](../complete/core-campaign-modernist.md) opened.
 
 **"the workbench restyle the tray's art direction leads"** — retired **by adoption, and
 now by delivery**. The row read *"its own future proposal, raised only if the tray's look
@@ -127,7 +127,7 @@ the ladder's per-level pass**, not vocabulary.
 | **Shift+←→ / Shift+End extension**, **Ctrl+A closure** reachable from the tray | `extend`/`closure` intents do not exist (the strokes are free — reserved by the ladder doc) | the ladder's horizontal-axis pass |
 | **container tab** (tuplet ratio, grace slash, tremolo marks at their true rung) | the cursor now *descends into* containers (item 11b), but `container` is still not a `SelectionLevel` | the container rung, riding the wrap verbs |
 | meta line counts for multi-member selections ("4 events · …") | single-position selection | `{level, anchor, extent}` again |
-| **part rows as the closure's surface** (the design's PART tab is really Ctrl+A at part-measure) | the row *values* are wireable since item 13; what is missing is the closure as the way to **reach** them | ladder closure + [core-score-hud.md](../inprogress/core-score-hud.md) stage 4 |
+| **part rows as the closure's surface** (the design's PART tab is really Ctrl+A at part-measure) | the row *values* are wireable since item 13; what is missing is the closure as the way to **reach** them | ladder closure + [core-score-hud.md](../complete/core-score-hud.md) stage 4 |
 | clicking a note to move the selection under the tray | `note-selected` still has no consumer — the mouse cannot place the cursor | a click→cursor intent path through the funnel; the ladder's mouse-parity story |
 
 ## Geometry and surface gaps

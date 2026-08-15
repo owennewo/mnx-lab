@@ -21,7 +21,7 @@
 > right and still be blind if its fixtures never reach the code.**
 >
 > Item 7 of
-> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md). The UI half lands with
+> [core-campaign-modernist.md](core-campaign-modernist.md). The UI half lands with
 > [workbench-score-panel.md](../complete/workbench-score-panel.md)'s json tab; the model half stands alone and
 > can go first.
 >

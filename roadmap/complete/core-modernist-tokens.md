@@ -1,7 +1,7 @@
 # Modernist: the token contract
 
 > **Status: COMPLETE 2026-08-15**, same day as proposed. Item 1 of
-> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md) — **the contract**. Everything else
+> [core-campaign-modernist.md](core-campaign-modernist.md) — **the contract**. Everything else
 > in the campaign blocks on this. Inherits the campaign's shared contract.
 
 ## The problem

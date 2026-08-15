@@ -294,7 +294,7 @@ names no owner. Still recorded, not indexed: transposition, harmonies rendering
     riding on it, which is what "do the addressing first" bought.
 
 - **2026-08-14 — the addressing layer, in two moves; and a number I had wrong.**
-  [core-note-address.md](../inprogress/core-note-address.md): one enumeration produces note
+  [core-note-address.md](core-note-address.md): one enumeration produces note
   coordinates (`model/noteWalk.ts`, with a corpus-wide join proving the renderer
   agrees), and the cursor gains the discriminator its address was missing
   (`slotIndex`, stepped by `Alt+V`).

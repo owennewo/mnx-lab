@@ -1,6 +1,11 @@
 # One note enumeration — the address, produced once
 
-> **Status: move 1 built 2026-08-14.** Prerequisite for campaign item 11b
+> **Status: COMPLETE 2026-08-15.** Moves 1 and 2 built 2026-08-14; the address
+> this doc set out to complete is complete — part, staff, voice, measure, onset,
+> line and the ordinal — since the cursor started carrying `voiceIndex`. What is
+> left in "still open" below belongs to OTHER efforts by name (container descent
+> to campaign item 11b, the `parts[0]` assumption to 13b, `Alt+V`'s fate to the
+> ladder), not to this one. Originally: Prerequisite for campaign item 11b
 > ([core-element-ops-onset-granularity.md](../complete/core-element-ops-onset-granularity.md)),
 > and a standing hazard retired on its own merits.
 
@@ -91,7 +96,7 @@ corpus turns out to contain barely at all.
 unaddressable ink at 122 notes.
 
 **The seven navigation failures are closed** (2026-08-15, during
-[core-selection-ladder.md](core-selection-ladder.md)'s pass): three were a hard
+[core-selection-ladder.md](../inprogress/core-selection-ladder.md)'s pass): three were a hard
 ±16 line clamp an 8va note sat outside of, and four were the ink walk
 re-deriving its anchor voice from the ink under the cursor. The cursor now
 carries `voiceIndex`, completing the address this doc set out to complete —

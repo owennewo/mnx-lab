@@ -340,7 +340,7 @@ Why the rows are what they are:
   direction) from the component. The workbench binds it to prev/next
   scenario in the rail; studio will bind it to prev/next score. This is part
   of the element's public surface — record it in
-  [core-viewer-surface.md](core-viewer-surface.md)'s event contract when
+  [core-viewer-surface.md](../complete/core-viewer-surface.md)'s event contract when
   that lands. Emitted ONLY at score level, so arrows stay inert everywhere
   they lack meaning.
 
@@ -477,5 +477,5 @@ defaults feel consistent.
   spanners, never in the selection.
 - **Not the properties panels themselves** (part tuning/capo, score layout) —
   this doc only decides how they are *reached* (closures); their contents sit
-  with [core-viewer-surface.md](core-viewer-surface.md) and the editor work that needs
+  with [core-viewer-surface.md](../complete/core-viewer-surface.md) and the editor work that needs
   them.

@@ -1,7 +1,7 @@
 # Configurable render density / zoom levers
 
 > **Status: in progress — the HORIZONTAL axis built 2026-08-14.** Unblocked by
-> [core-viewer-surface.md](../inprogress/core-viewer-surface.md)'s layering rule, which
+> [core-viewer-surface.md](../complete/core-viewer-surface.md)'s layering rule, which
 > settled where the levers live. Shipped: `PlanOptions.densityH` (a multiplier on the
 > springs, clamped 0.5–2), threaded through `layoutNotation`/`bothSystem` and both
 > renderers, bound by the element as `density="compact|normal|spacious"` — a preset,
@@ -84,7 +84,7 @@ Three distinct axes, deliberately separated:
   wants one "fit more music" knob. Coupling is reversible; conflating them in the
   engine would not be.
 - ~~Where do they live — viewer toolbar, embed attributes, `RenderOptions`, or all three?~~
-  Answered by [core-viewer-surface.md](core-viewer-surface.md): all three, layered — the lever enters
+  Answered by [core-viewer-surface.md](../complete/core-viewer-surface.md): all three, layered — the lever enters
   `RenderOptions` (behavior ground truth), the element binds it as an attribute, the
   toolbar composes the attribute.
 - Interaction with justification (does horizontal density change the justification target, or

@@ -1,6 +1,9 @@
 # The score HUD — the selection ladder's property surface
 
-> **Status: in progress — stages 1–3 built 2026-08-11, same day as proposed.**
+> **Status: COMPLETE 2026-08-15.** Stages 1–3 built 2026-08-11, same day as
+> proposed; **stage 4 was formally CUT** rather than parked (see below) and
+> redirected to the selection tray, which is what makes this closable — with it
+> gone, stages 1–3 are the whole of it. Originally:
 > Shipped: `src/workbench/ScoreHud.ts` (the component, neutral `HudRow[]`/
 > `HudPart[]` contract, `hud-row-activated`/`hud-part-setup-changed` events) +
 > `src/workbench/hudRows.ts` (the session→rows mapping: address chain, presence
@@ -26,7 +29,8 @@
 > design ([workbench-score-panel.md](../complete/workbench-score-panel.md), campaign item 5)
 > retires it instead, and redirects the work to the selection tray. The design's
 > governing rule is **"the tray edits, the HUD explains"**: the HUD's keys half is
-> reference and never clickable, and its footer hands editing back to Ctrl+K. That
+> reference and never clickable, and its footer hands editing back to the tray
+> key — `/` since 2026-08-15, Ctrl+K when the design was written. That
 > is incompatible with the HUD growing content edits, so adopting the design makes
 > the HUD permanently a *read* surface — plus the one presentation exception the
 > rule itself names (the part row's strings and capo, which are per-part overrides

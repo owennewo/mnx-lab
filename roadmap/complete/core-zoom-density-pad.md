@@ -26,7 +26,7 @@
 > 335.6 → 410.4 across the range) where it was previously identical.
 >
 > **Campaign item.** Item 9 of
-> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md); inherits its shared
+> [core-campaign-modernist.md](core-campaign-modernist.md); inherits its shared
 > contract, and the agreement block below is what that contract requires before
 > any code is written.
 >

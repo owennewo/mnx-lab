@@ -52,7 +52,7 @@
 > [core-editor-focus-scope.md](../proposed/core-editor-focus-scope.md) (who owns the keystroke
 > while the tray is open), [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md)
 > (why it incubates in `workbench/`),
-> [core-viewer-surface.md](../inprogress/core-viewer-surface.md) (the one
+> [core-viewer-surface.md](core-viewer-surface.md) (the one
 > element-surface addition it needs — that contract is now real, stages 1–5
 > built 2026-08-14).
 
@@ -191,7 +191,7 @@ draw. The viewer gains a **`selection-anchored`** composed event carrying the
 enclosure's bounding rect (viewport coordinates, `null` when nothing is enclosed),
 emitted after each enclosure draw. Presentation-only geometry in the existing
 `mnxContext.ts` spirit — the viewer still never learns editor vocabulary — and a
-knob that lands under [core-viewer-surface.md](../inprogress/core-viewer-surface.md)'s
+knob that lands under [core-viewer-surface.md](core-viewer-surface.md)'s
 now-built layering discipline (element binding; the workbench chrome consumes
 it) — one more designed binding, not accretion.
 
@@ -260,7 +260,7 @@ promotion time.
 ### Revision 2026-08-15 — the restyle arrived; both open items close
 
 **The look won the review**, so the future proposal this section anticipated now
-exists: [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md), a campaign
+exists: [core-campaign-modernist.md](core-campaign-modernist.md), a campaign
 whose contract is the token vocabulary this component currently hard-codes. Three
 consequences land back here, each as an indexed campaign item:
 

@@ -13,7 +13,7 @@
 > hands-on over CDP across all five tabs, a live two-op queue with a redo branch, and a
 > keyboard-opened popover. Goldens byte-identical; 625 tests green.
 > Item 5 of
-> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md) — the campaign's structure half and
+> [core-campaign-modernist.md](core-campaign-modernist.md) — the campaign's structure half and
 > its showcase. Blocks on [core-modernist-tokens.md](core-modernist-tokens.md); the JSON tab's
 > below-the-boundary half is [core-json-view.md](core-json-view.md).
 >
@@ -24,7 +24,7 @@
 ## The problem
 
 The side panel was created in a same-day consolidation recorded in
-[core-score-hud.md](../inprogress/core-score-hud.md): all page chrome swept into one tabbed
+[core-score-hud.md](core-score-hud.md): all page chrome swept into one tabbed
 right rail so the head could shrink to the score-view tabs. It worked, and it accreted.
 The panel now has **seven** tabs — `description | tags | actions | ops | hud | compare |
 json` — which is two more than the consolidation designed (`ops` arrived later with the
@@ -100,7 +100,7 @@ the tray. Selection state is shared: clicking a ladder rung moves the selection,
 tray re-anchors and re-scopes to match.
 
 This is a better statement of a boundary the repo already drew.
-[core-score-hud.md](../inprogress/core-score-hud.md)'s "two kinds of edit, one visible
+[core-score-hud.md](core-score-hud.md)'s "two kinds of edit, one visible
 boundary" says the same thing in terms of mechanism — *content* edits flow through
 intents and ops and dirty the session; *presentation* edits (strings, capo) flow to
 viewer props and leave the document untouched. The mock's sentence is the user-facing

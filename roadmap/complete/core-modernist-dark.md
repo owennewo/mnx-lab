@@ -25,7 +25,7 @@
 > the de-hexing left no literals behind.
 >
 > Item 2 of
-> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md). Blocks on
+> [core-campaign-modernist.md](core-campaign-modernist.md). Blocks on
 > [core-modernist-tokens.md](../complete/core-modernist-tokens.md). Retires the residue ledger's *"the tray
 > on a dark page"* row **by unblocking** it.
 

@@ -1,7 +1,7 @@
 # Modernist: the type voice
 
 > **Status: COMPLETE 2026-08-15**, same day as proposed. Item 3 of
-> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md). Blocks on
+> [core-campaign-modernist.md](core-campaign-modernist.md). Blocks on
 > [core-modernist-tokens.md](core-modernist-tokens.md). Retires the *"Archivo loading"* open item
 > recorded in [core-selection-tray-visuals.md](core-selection-tray-visuals.md).
 

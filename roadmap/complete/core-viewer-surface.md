@@ -1,6 +1,9 @@
 # The viewer surface — naming and defining the component's public contract
 
-> **Status: in progress — ALL FIVE STAGES addressed 2026-08-14** (3 built, 1 answered, 1 handed on). Unblocked by the arrival of
+> **Status: COMPLETE 2026-08-14 — all five stages addressed** (3 built, 1
+> answered, 1 handed on to [core-render-density-zoom.md](../inprogress/core-render-density-zoom.md),
+> whose own status records the levers landing since). Stage 5 states the ✔
+> condition is met without building here, so nothing is outstanding. Unblocked by the arrival of
 > its consumer: [core-viewer-embedded-app.md](../proposed/core-viewer-embedded-app.md)
 > is the read-only player this doc's first symptom describes, and it committed that
 > exact sin — a host string-searching the document JSON

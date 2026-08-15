@@ -19,7 +19,7 @@ in two:
   decide which part it writes to.
 
 Removal was already part-agnostic, because `deleteNote` and every note-attached
-verb resolve through the shared walk ([core-note-address.md](../inprogress/core-note-address.md)).
+verb resolve through the shared walk ([core-note-address.md](core-note-address.md)).
 So the addressing half alone unlocks the whole blocked set, and the writing half
 can follow separately without either being half-done.
 

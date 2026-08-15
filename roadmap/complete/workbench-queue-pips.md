@@ -26,7 +26,7 @@
 > was darkened until the weakest remaining pair is one the halo also separates.
 >
 > Item 6 of
-> [core-campaign-modernist.md](../inprogress/core-campaign-modernist.md). Blocks on
+> [core-campaign-modernist.md](core-campaign-modernist.md). Blocks on
 > [core-modernist-tokens.md](../complete/core-modernist-tokens.md), which deliberately does **not** touch the
 > pip ramp — this is the bill that item runs up.
 

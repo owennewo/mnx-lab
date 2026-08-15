@@ -160,7 +160,7 @@ proposals that name their campaign.
   debate) — with the costs of moving early recorded (API pressure on the public surface,
   the shadow-DOM focus story coming due, embed bundle weight; testing is unchanged either
   way). The promotion review's work list: the `elements/ → edit/` boundary change, the
-  element contract under [core-viewer-surface.md](inprogress/core-viewer-surface.md)'s layered rule,
+  element contract under [core-viewer-surface.md](complete/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
   [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
 - **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3: the
@@ -199,52 +199,11 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
-- **[core-viewer-surface.md](inprogress/core-viewer-surface.md)** — name and define **the viewer
-  surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
-  undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench
-  chrome), attribute-first, the `view="auto"` precedence chain (user > host > document
-  `staffKind` hint > default), a set-valued `hide` knob, and eviction of workbench leakage
-  (`pinnedErrors` et al). Subsumes render-density-zoom's "where do the levers live" question.
 - **[core-render-density-zoom.md](inprogress/core-render-density-zoom.md)** — configurable horizontal +
   vertical **density / zoom levers** ("see more music on less page"). Feasible today: layout is
   in staff-space units (uniform zoom = `pxPerSp`), horizontal density = `spacing.ts` knobs,
   vertical density = layout gap/padding constants. Not started. Where the levers are *exposed*
-  is now owned by [core-viewer-surface.md](inprogress/core-viewer-surface.md).
-- **[core-campaign-modernist.md](inprogress/core-campaign-modernist.md)** — **campaign**: the
-  workbench restyle the tray's art direction leads, plus the score panel it was drawn for.
-  Fills the slot [core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)
-  reserved for it ("its own future proposal, raised only if the tray's look wins the
-  review") and retires that row plus the dark-page one. Four decisions taken up front:
-  **workbench-wide token flip** (the tray drops its hexes and consumes `designTokens` again
-  — panel-only styling was rejected as adding a *fourth* dialect); **one red accent** across
-  chrome, enclosure and pips; **a dark pass authored and finally wired**; Archivo bundled.
-  Two verified tripwires the contract freezes: `src/engine/render/svg.ts` holds a **dangling
-  `var(--font-family-sans)` baked into 68 goldens**, and `diagnostics.ts`'s error red
-  `#b91c1c` is frozen in 10 more — so "red everywhere" puts selection-red and error-red on
-  one canvas with only the accent movable. Records what the mock gets right (much of it is
-  already built), and **rejects two of its features with reasons**: a computed DIFFERENCES
-  list (a second, unowned verdict channel competing with `status: verified`) and op grouping
-  (breaks time-travel's row↔position identity).
-- **[core-note-address.md](inprogress/core-note-address.md)** — **one note
-  enumeration**, built 2026-08-14 as the prerequisite that makes campaign item
-  11b's container descent safe. `noteKeys.ts` was always a shared *formatter*,
-  but the coordinates fed to it were derived independently in **six** places
-  (cursor ×2, ops ×2, jsonView ×2, plus both layouts) — which is why CLAUDE.md
-  has to ask that they be "kept in lockstep", and why teaching the editor to see
-  inside containers looked like a five-file migration with the goldens as the
-  only witness. Now `model/noteWalk.ts` produces coordinates once, three walks
-  are thin wrappers over it, and `harness/conformance/note-keys.test.ts` checks
-  the agreement over all 106 scenarios (every synthesized key the renderer stamps
-  must be one the walk produced; the walk must produce no duplicates — a
-  duplicate being the container collision in miniature). Goldens byte-identical,
-  which is the proof it changed nothing. **Move 2 followed the same day**: the
-  cursor address `{measure, onset, line}` was the same shortcut one level up, so
-  `EditorCursor` gained a `slotIndex` and `Alt+V` steps between notes sharing a
-  moment and a line — closing the hole that let the editor act on a *neighbour*.
-  Measuring it also corrected an over-attribution: of 161 unaddressable notes only
-  **7** are navigation failures, while **154 have no key at all** (100 in second
-  parts, 32 in containers, 22 on staff 2) — the `parts[0]`/staff-1 assumption,
-  which is items 13b and 11b, not coincidence.
+  is now owned by [core-viewer-surface.md](complete/core-viewer-surface.md).
 - **[core-keymap-cheatsheet.md](inprogress/core-keymap-cheatsheet.md)** — a **selection-mode-
   dependent keyboard cheatsheet**, built by making the ladder's per-level navigation map DATA.
   The keymap's binding tables are already data, but the *meaning* of a key at each rung lives
@@ -253,7 +212,7 @@ proposals that name their campaign.
   built 2026-08-11** (same day as proposed): the `KeyDoc` meaning table over all 45 bound
   strokes (`src/edit/keymapDocs.ts`, seven groups Navigation → Adornments → Workbench), the
   hud-tab "keys · at this level" section
-  ([core-score-hud.md](inprogress/core-score-hud.md) — rows are the nouns, keys are the
+  ([core-score-hud.md](complete/core-score-hud.md) — rows are the nouns, keys are the
   verbs), the actions tab's drifting hand-written hint retired, and
   `harness/conformance/keymap-docs.test.ts`: both joins (every binding documented, every doc
   bound) plus guard mirrors (voice jump note-only, toggleNote notation-only, arrows inert at
@@ -261,28 +220,6 @@ proposals that name their campaign.
   physical-key labels per the keymap's `KeyboardEvent.code` decision. **Remaining: stage 4**
   — each [core-selection-ladder.md](inprogress/core-selection-ladder.md) per-level review
   pass lands its key decisions here as data (event next).
-- **[core-score-hud.md](inprogress/core-score-hud.md)** — a **HUD companion** beside the viewer:
-  the selection ladder's missing *property surface* as one row per containment level (score /
-  section / bar / part / voice / event / note), active rung highlighted, rows clickable for
-  mouse parity with Escape/Enter. Rows are the *address chain*, highlight is the *rung* (part
-  is deliberately not a rung); presence rule drops absent rows. The part row is an **ensemble
-  table** owning the **per-part strings/capo override** — the global `TabSetup` reshaped into
-  a per-part map, closing the multi-part gap (a global override clobbers declared parts and
-  infects the rest — twelve-bar-blues). **Stages 1–3 built 2026-08-11** (same day as
-  proposed): `mnx-score-hud` + the session→`HudRow[]` mapping, click-to-level through the
-  intent funnel, engine `PartTabSetups` end to end, the override's `staffKind` intent (an
-  explicit entry opts a part's fingerboard in), and the kind-less both-view fallback
-  generalized to every known-strings part — goldens byte-identical, verified hands-on in
-  headless Chrome (bass override gains its own 4-string staff beside the guitar's declared
-  tab). **Same-day revision**: the HUD anchored a full **side-panel consolidation** — the
-  scenario page's chrome became one tabbed rail (description | tags | actions | hud |
-  compare | json), the edit strip's duplicated cursor readout deleted, compare reduced to
-  the reference pane, legacy `?view=compare|json` links opening the matching panel tab.
-  Incubates in `workbench/` against a neutral contract (`elements/` never imports
-  `edit/`); the selection half promotes with the editor
-  ([core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)), the
-  instrument half is viewer-tier and may promote earlier. **Remaining: stage 4** — rung
-  property edits through ops, parked behind the ladder's per-level pass.
 - **[core-selection-ladder.md](inprogress/core-selection-ladder.md)** — **progressive selection as
   the input-mode system**: input modes *are* the selection level, and each level offers
   exactly the properties the data model puts there. One containment ladder (note → event →
@@ -311,6 +248,69 @@ proposals that name their campaign.
   container rungs.
 
 ### complete/
+- **[core-campaign-modernist.md](complete/core-campaign-modernist.md)** — **campaign**: the
+  workbench restyle the tray's art direction leads, plus the score panel it was drawn for.
+  Fills the slot [core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)
+  reserved for it ("its own future proposal, raised only if the tray's look wins the
+  review") and retires that row plus the dark-page one. Four decisions taken up front:
+  **workbench-wide token flip** (the tray drops its hexes and consumes `designTokens` again
+  — panel-only styling was rejected as adding a *fourth* dialect); **one red accent** across
+  chrome, enclosure and pips; **a dark pass authored and finally wired**; Archivo bundled.
+  Two verified tripwires the contract freezes: `src/engine/render/svg.ts` holds a **dangling
+  `var(--font-family-sans)` baked into 68 goldens**, and `diagnostics.ts`'s error red
+  `#b91c1c` is frozen in 10 more — so "red everywhere" puts selection-red and error-red on
+  one canvas with only the accent movable. Records what the mock gets right (much of it is
+  already built), and **rejects two of its features with reasons**: a computed DIFFERENCES
+  list (a second, unowned verdict channel competing with `status: verified`) and op grouping
+  (breaks time-travel's row↔position identity).
+- **[core-note-address.md](complete/core-note-address.md)** — **one note
+  enumeration**, built 2026-08-14 as the prerequisite that makes campaign item
+  11b's container descent safe. `noteKeys.ts` was always a shared *formatter*,
+  but the coordinates fed to it were derived independently in **six** places
+  (cursor ×2, ops ×2, jsonView ×2, plus both layouts) — which is why CLAUDE.md
+  has to ask that they be "kept in lockstep", and why teaching the editor to see
+  inside containers looked like a five-file migration with the goldens as the
+  only witness. Now `model/noteWalk.ts` produces coordinates once, three walks
+  are thin wrappers over it, and `harness/conformance/note-keys.test.ts` checks
+  the agreement over all 106 scenarios (every synthesized key the renderer stamps
+  must be one the walk produced; the walk must produce no duplicates — a
+  duplicate being the container collision in miniature). Goldens byte-identical,
+  which is the proof it changed nothing. **Move 2 followed the same day**: the
+  cursor address `{measure, onset, line}` was the same shortcut one level up, so
+  `EditorCursor` gained a `slotIndex` and `Alt+V` steps between notes sharing a
+  moment and a line — closing the hole that let the editor act on a *neighbour*.
+  Measuring it also corrected an over-attribution: of 161 unaddressable notes only
+  **7** are navigation failures, while **154 have no key at all** (100 in second
+  parts, 32 in containers, 22 on staff 2) — the `parts[0]`/staff-1 assumption,
+  which is items 13b and 11b, not coincidence.
+- **[core-viewer-surface.md](complete/core-viewer-surface.md)** — name and define **the viewer
+  surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
+  undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench
+  chrome), attribute-first, the `view="auto"` precedence chain (user > host > document
+  `staffKind` hint > default), a set-valued `hide` knob, and eviction of workbench leakage
+  (`pinnedErrors` et al). Subsumes render-density-zoom's "where do the levers live" question.
+- **[core-score-hud.md](complete/core-score-hud.md)** — a **HUD companion** beside the viewer:
+  the selection ladder's missing *property surface* as one row per containment level (score /
+  section / bar / part / voice / event / note), active rung highlighted, rows clickable for
+  mouse parity with Escape/Enter. Rows are the *address chain*, highlight is the *rung* (part
+  is deliberately not a rung); presence rule drops absent rows. The part row is an **ensemble
+  table** owning the **per-part strings/capo override** — the global `TabSetup` reshaped into
+  a per-part map, closing the multi-part gap (a global override clobbers declared parts and
+  infects the rest — twelve-bar-blues). **Stages 1–3 built 2026-08-11** (same day as
+  proposed): `mnx-score-hud` + the session→`HudRow[]` mapping, click-to-level through the
+  intent funnel, engine `PartTabSetups` end to end, the override's `staffKind` intent (an
+  explicit entry opts a part's fingerboard in), and the kind-less both-view fallback
+  generalized to every known-strings part — goldens byte-identical, verified hands-on in
+  headless Chrome (bass override gains its own 4-string staff beside the guitar's declared
+  tab). **Same-day revision**: the HUD anchored a full **side-panel consolidation** — the
+  scenario page's chrome became one tabbed rail (description | tags | actions | hud |
+  compare | json), the edit strip's duplicated cursor readout deleted, compare reduced to
+  the reference pane, legacy `?view=compare|json` links opening the matching panel tab.
+  Incubates in `workbench/` against a neutral contract (`elements/` never imports
+  `edit/`); the selection half promotes with the editor
+  ([core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)), the
+  instrument half is viewer-tier and may promote earlier. **Remaining: stage 4** — rung
+  property edits through ops, parked behind the ladder's per-level pass.
 - **[core-zoom-density-pad.md](complete/core-zoom-density-pad.md)** — campaign item 9, and the UI
   half core-render-density-zoom.md's status line still names as missing. A crosshair pad at the
   score's top right: **↑↓ staff** (a true scale, finally wiring `zoom` to `pxPerSp` instead of the
