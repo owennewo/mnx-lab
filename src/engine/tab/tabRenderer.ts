@@ -3,7 +3,12 @@ import { PartTabSetups } from './guitarPositions.ts';
 import { layoutTab } from '../layout/tab.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
-import { renderOutcome, type RenderOutcome } from '../render/scale.ts';
+import {
+  BASELINE_PX_PER_SP,
+  clampStaffScale,
+  renderOutcome,
+  type RenderOutcome
+} from '../render/scale.ts';
 
 /**
  * Thin entry point for the tab view: computes layout in staff spaces,
@@ -27,6 +32,12 @@ export interface RenderTabOptions {
   onNoteClick?: (noteId: string, measureIdx: number, noteIdx: number) => void;
   /** Pixels per staff space (zoom). Default 10. */
   pxPerSp?: number;
+  /**
+   * Staff scale — how big the INK is, and nothing else. 1 (the default) is a
+   * square scale and behaves exactly as it always did. See
+   * `notationRenderer.ts` for why this is not folded into `pxPerSp`.
+   */
+  staffScale?: number;
   /** Viewer-supplied instrument (strings/capo) — overrides the document's
    *  declaration for rendering; never written back. */
   tabSetup?: PartTabSetups;
@@ -54,6 +65,14 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
   // horizontal plan, so the `both` view stays column-aligned.
   const fitted = opts.pxPerSp === undefined;
   const pxPerSp = fitted ? fitPxPerSp(opts.width, layout.usedWidthSp, basePxPerSp) : basePxPerSp;
+  // Staff scale is ABSOLUTE against the baseline, not a multiplier on the
+  // horizontal scale — 1.2 means the same size ink whatever the viewport did.
+  // A control that seeds its first step from the last painted scale (the pad
+  // does) needs that: multiplying would re-apply the fit it just read back.
+  // Unset leaves the emitter square, which is every other caller and the
+  // goldens.
+  const staffScale = clampStaffScale(opts.staffScale);
+  const pxPerSpY = staffScale === null ? pxPerSp : staffScale * BASELINE_PX_PER_SP;
 
   const widthSp = fitted ? layout.usedWidthSp : layout.widthSp;
   // Crop the row's fixed headroom to the content's real vertical extent.
@@ -68,6 +87,7 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
     widthSp,
     heightSp: layout.heightSp,
     pxPerSp,
+    pxPerSpY,
     viewBoxSp,
     className: 'mnx-tab-svg',
     onSourceClick: opts.onNoteClick
@@ -80,5 +100,6 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
       : undefined
   });
 
-  return renderOutcome(pxPerSp, fitted, layout.packings);
+  // The ink scale is what a zoom readout means; see notationRenderer.ts.
+  return renderOutcome(pxPerSpY, fitted, layout.packings);
 }

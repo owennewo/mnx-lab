@@ -1530,6 +1530,7 @@
         "y": 74.7,
         "w": 9.2,
         "h": 1,
+        "spanW": true,
         "fill": "currentColor",
         "className": "multirest-bar"
       },
@@ -1940,6 +1941,7 @@
         "y": 115.3,
         "w": 9.2,
         "h": 1,
+        "spanW": true,
         "fill": "currentColor",
         "className": "multirest-bar"
       },
@@ -2239,6 +2241,7 @@
         "y": 115.3,
         "w": 9.2,
         "h": 1,
+        "spanW": true,
         "fill": "currentColor",
         "className": "multirest-bar"
       },

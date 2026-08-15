@@ -14,7 +14,6 @@ import { renderMnxToSvgNotation } from '../engine/notation/notationRenderer.ts';
 import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
 import { isSmuflLoaded, loadSmufl } from '../engine/smufl/smufl.ts';
 import {
-  BASELINE_PX_PER_SP,
   clampStaffScale,
   type RenderOutcome,
   type RenderScale
@@ -655,10 +654,16 @@ export class ScoreViewer extends LitElement {
       // A numeric `density-h` outranks the preset; unset, the preset decides.
       densityH,
       densityPad,
-      // undefined, not 10: an absent pxPerSp is what tells the renderers to
-      // FIT (core-zoom-density-pad.md, ruling 2). Sending a number here would
-      // pin every score at load and quietly retire fit-to-width.
-      pxPerSp: staffScale === null ? undefined : staffScale * BASELINE_PX_PER_SP
+      // Always undefined — the horizontal axis FITS, at every zoom level
+      // (core-zoom-density-pad.md, ruling 2). `zoom` used to arrive here as a
+      // pinned pxPerSp, which is exactly what coupled it to the horizontal
+      // axis: pinning changed `widthSp`, the plan re-packed, and the notes
+      // slid sideways under a control that claims to be vertical. It now
+      // travels as `staffScale` and touches nothing but the ink, so zooming
+      // and resizing stay separate events.
+      pxPerSp: undefined,
+      // null stays null: unset means FITTED, and a fitted paint is square.
+      staffScale: staffScale ?? undefined
     };
 
     // The layout engine throws on documents using features it doesn't support

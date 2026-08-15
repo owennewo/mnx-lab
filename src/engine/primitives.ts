@@ -107,6 +107,17 @@ export interface RectPrim extends PrimitiveBase {
   stroke?: string;
   /** Stroke thickness in staff spaces (only meaningful when `stroke` is set). */
   thickness?: number;
+  /**
+   * `w` is a HORIZONTAL DISTANCE in layout space — the gap between two musical
+   * x positions — rather than ink measured in staff spaces.
+   *
+   * The distinction is invisible under a square scale and load-bearing under a
+   * non-square one (staff scale — see `pxPerSpY` in render/svg.ts): a rect
+   * whose width was computed as `x2 - x1` has to keep meeting x1 and x2, while
+   * a barline's thickness or a box drawn around a label has to keep its
+   * proportions against the glyphs. Ink is the common case and the default.
+   */
+  spanW?: boolean;
 }
 
 /** Shifts a primitive vertically in place (score/system stacking). */

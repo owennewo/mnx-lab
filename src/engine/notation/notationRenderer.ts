@@ -2,7 +2,12 @@ import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation, type HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
-import { renderOutcome, type RenderOutcome } from '../render/scale.ts';
+import {
+  BASELINE_PX_PER_SP,
+  clampStaffScale,
+  renderOutcome,
+  type RenderOutcome
+} from '../render/scale.ts';
 
 /**
  * Thin entry point for the standard-notation view. Mirrors `tabRenderer.ts`:
@@ -23,6 +28,18 @@ export interface RenderNotationOptions {
   selectedNoteIds?: string[];
   onNoteClick?: (noteId: string, measureIdx: number, noteIdx: number) => void;
   pxPerSp?: number;
+  /**
+   * Staff scale — how big the INK is, and nothing else. 1 (the default) is a
+   * square scale and behaves exactly as it always did.
+   *
+   * Deliberately NOT folded into `pxPerSp`, which is how zoom used to arrive.
+   * That spelling made the two axes one: raising it shrank `widthSp`, so the
+   * spacing plan was handed a different amount of room, re-packed the systems
+   * and moved every note sideways. Staff scale is a legibility control; the
+   * horizontal axis belongs to `densityH`. Keeping them apart is what lets the
+   * pad's crosshair actually behave like a crosshair.
+   */
+  staffScale?: number;
   /** Features the host hid (docs/core-viewer-surface.md) — layout-side ones
    *  reach the layout so the space they reserved is reclaimed. */
   hide?: readonly HideableFeature[];
@@ -50,6 +67,14 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
   // plan, so the `both` view stays column-aligned.
   const fitted = opts.pxPerSp === undefined;
   const pxPerSp = fitted ? fitPxPerSp(opts.width, layout.usedWidthSp, basePxPerSp) : basePxPerSp;
+  // Staff scale is ABSOLUTE against the baseline, not a multiplier on the
+  // horizontal scale — 1.2 means the same size ink whatever the viewport did.
+  // A control that seeds its first step from the last painted scale (the pad
+  // does) needs that: multiplying would re-apply the fit it just read back.
+  // Unset leaves the emitter square, which is every other caller and the
+  // goldens.
+  const staffScale = clampStaffScale(opts.staffScale);
+  const pxPerSpY = staffScale === null ? pxPerSp : staffScale * BASELINE_PX_PER_SP;
 
   const widthSp = fitted ? layout.usedWidthSp : layout.widthSp;
   // Crop the row's fixed ledger/stem headroom to the content's real vertical
@@ -64,6 +89,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
     widthSp,
     heightSp: layout.heightSp,
     pxPerSp,
+    pxPerSpY,
     viewBoxSp,
     className: 'mnx-notation-svg',
     onSourceClick: opts.onNoteClick
@@ -74,5 +100,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
       : undefined
   });
 
-  return renderOutcome(pxPerSp, fitted, layout.packings);
+  // The INK scale is what a zoom readout means by "how big is this", so that
+  // is the one reported — `pxPerSp` is now the horizontal axis's business.
+  return renderOutcome(pxPerSpY, fitted, layout.packings);
 }

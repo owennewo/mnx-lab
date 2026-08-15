@@ -1402,6 +1402,9 @@ function renderSegment(args: RenderSegmentArgs): {
         primitives.push({
           kind: 'rect',
           x: x1, y: top + 1.5, w: x2 - x1, h: 1,
+          // The bar spans the measure: its width is x2 − x1, so it has to
+          // scale with x or it would stop meeting its own end caps.
+          spanW: true,
           fill: 'currentColor',
           className: 'multirest-bar'
         });

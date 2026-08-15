@@ -48,6 +48,8 @@ export interface SvgStringOptions {
   widthSp: number;
   heightSp: number;
   pxPerSp: number;
+  /** Vertical scale; defaults to `pxPerSp` (square), as the goldens are. */
+  pxPerSpY?: number;
   viewBoxSp?: { x: number; y: number; w: number; h: number };
 }
 
@@ -64,6 +66,7 @@ export function renderSvgToString(opts: SvgStringOptions): string {
       widthSp: opts.widthSp,
       heightSp: opts.heightSp,
       pxPerSp: opts.pxPerSp,
+      pxPerSpY: opts.pxPerSpY,
       viewBoxSp: opts.viewBoxSp
     });
     const svg = container.children[0];
