@@ -37,6 +37,83 @@ npm run smoke:lib          # npm pack → install → render SVG in Node via mnx
 npm run deploy             # build + wrangler deploy (mnx-lab.totai.uk)
 ```
 
+## Working in parallel: one worktree per agent
+
+**Assume other agents are working in this repo right now.** Sessions run concurrently and
+independently, so `main` in the primary checkout (`/home/williao/dev/mnx-labs`) is
+**shared integration space, not a workspace** — leave it on `main` and clean. Every
+session that will change a tracked file takes its own worktree *first*, before the first
+edit, including for "small" changes: the cost of a collision is paid by whoever discovers
+it, not whoever caused it. Read-only sessions (answering questions, reading the roadmap)
+stay where they are and change nothing.
+
+```bash
+git -C ~/dev/mnx-labs worktree add ~/dev/mnx-labs-worktrees/<task> -b <task> main
+cd ~/dev/mnx-labs-worktrees/<task> && npm ci     # worktrees do NOT share node_modules
+```
+
+`<task>` is the roadmap doc's slug where the work has one (`core-vertical-density`),
+otherwise a short kebab-case name. Worktrees live **outside the repo** at
+`~/dev/mnx-labs-worktrees/` so nothing in the tree — gitignore, the corpus police, the
+boundary checker, Vite — ever has to know they exist. `git worktree add` does not
+populate `vendor/mnx`; leave it empty unless the task is in the spec loop (no build
+requires it — the compare pane degrades with a warning), and run
+`git submodule update --init vendor/mnx` inside the worktree if it does. Git refuses to
+check out one branch in two worktrees, so the branch name is itself the collision guard:
+if `add` refuses, another agent already owns that task — pick up something else rather
+than working around it.
+
+### Landing the work
+
+Self-merging to `main` is expected, not something to ask about — but it is the one moment
+when concurrent work actually collides, so it runs to a fixed order:
+
+1. Commit everything in the worktree; the tree must be clean.
+2. `git fetch origin && git rebase origin/main` — **rebase, never merge**. `main` stays
+   linear so the next agent's rebase is legible.
+3. **Re-earn the goldens.** If the rebase pulled in anything under `src/model/`,
+   `src/engine/` or `scenarios/`, run `npm run update:primitives` and require
+   `git diff -- scenarios/` to come back **clean**. A rebase can silently resurrect a
+   stale golden; regeneration is the only trustworthy resolution. Never hand-merge a
+   conflict *inside* an `expected.*` file — take either side wholesale, regenerate, and
+   let the diff be the verdict.
+4. **Never hand-edit a `verification:` block or a `status:` field to resolve a
+   conflict.** Only `harness/verify/verify-scenarios.mjs` writes them, and editing one by
+   hand forges a human assertion. On conflict keep `main`'s record; if your change really
+   moved the output, `update:primitives` demotes it to `rendered` and the queue asks a
+   human — which is the correct outcome.
+5. Gates, all of them, in the worktree after the rebase: `npm test`,
+   `npm run check:scenarios`, `npm run build`.
+6. `git -C ~/dev/mnx-labs merge --ff-only <task>`. **Fast-forward only** — a refusal
+   means `main` moved while you were testing, so return to step 2 and run the whole
+   sequence again. Never `--no-ff`, never force-push `main`, never rewrite a commit
+   already on `main`.
+7. Push `main`.
+
+If a gate fails, stop and fix it in the worktree. Landing a red build costs every other
+agent their next rebase.
+
+### Retiring the worktree
+
+**A worktree is deleted the moment it stops being needed — on completion, or as soon as
+it is clearly not wanted, whichever comes first.** Abandoned, superseded, and
+turned-out-to-be-a-no-op all count as "not wanted": remove it then, not later.
+
+```bash
+git -C ~/dev/mnx-labs worktree remove ~/dev/mnx-labs-worktrees/<task>
+git -C ~/dev/mnx-labs branch -d <task>       # -d, not -D — it must already be merged
+git -C ~/dev/mnx-labs worktree prune
+```
+
+`worktree remove` refusing on a dirty tree is information, not an obstacle — go look at
+what is uncommitted before reaching for `--force`. `branch -d` refusing means the work is
+not actually on `main` yet.
+
+**Removal comes *before* the roadmap doc moves to `complete/`.** That move is the last
+commit of a work item and it happens in the primary checkout on `main`, so "no worktree
+for this task exists" is a precondition of writing it — a checkable invariant rather than
+a habit. An item is not complete while its worktree is still on disk.
+
 ## Repository shape
 
 ```
@@ -336,6 +413,9 @@ output names refuse to overwrite).
   (`npm -w @mnx-editor/<name> test`). The Worker and UI have no tests.
 - `dist/` is gitignored build output. The scratch site for proposal verification comes
   from `makesite` in the worktree, not from this repo.
+- **Git**: one worktree per agent, rebase, `--ff-only` self-merge to `main`, worktree
+  deleted before the roadmap doc moves to `complete/` — the full contract is *Working in
+  parallel* above, and it governs every session that edits a tracked file.
 - Roadmap-driven development: interpret roadmap-shaped requests against `roadmap/`
   (index: [roadmap/README.md](roadmap/README.md)) — "add to the roadmap" → new doc in
   `roadmap/proposed/` + index line; "what's next" → propose from `inprogress/` +
