@@ -281,7 +281,15 @@ export class SelectionTray extends LitElement {
 
     .tile .glyph {
       color: #201e1d;
+      /* The ink box is the viewBox, and the text inside it carries the font's
+         full em box — ascent and descent well beyond the glyph's own ink.
+         Visible overflow is what lets that ink paint past the tiny box, but
+         overflow is HIT-TESTABLE as well as paintable: without the rule
+         below, each glyph captures the pointer over its neighbours and a
+         tile two rows down answers for a hover on this one. The button is
+         the only thing that should ever be hovered. */
       overflow: visible;
+      pointer-events: none;
     }
 
     /* The shortcut sits in the corner rather than under the glyph: it is a
@@ -290,6 +298,7 @@ export class SelectionTray extends LitElement {
       position: absolute;
       right: 0;
       bottom: 0;
+      pointer-events: none;
       min-width: 17px;
       padding: 2px 4px;
       background: #201e1d;
@@ -722,14 +731,13 @@ export class SelectionTray extends LitElement {
             </div>`
           : nothing}
         ${this.rows.length > 0
-          ? html`<div class="vrows">
+          ? html`<div class="vrows" @mouseleave=${() => (this.hoverId = null)}>
               ${this.rows.map(
                 (row, i) => html`
                   <button
                     class="vrow ${entries[this.cursorIndex]?.id === row.id ? 'cursor' : ''}"
                     @click=${() => this.emit('tray-command', { id: row.id })}
                     @mouseenter=${() => (this.hoverId = row.id)}
-                    @mouseleave=${() => (this.hoverId = null)}
                     @focus=${() => (this.cursorIndex = i)}
                   >
                     ${this.glyph(row.glyph)}
@@ -739,7 +747,7 @@ export class SelectionTray extends LitElement {
                 `
               )}
             </div>`
-          : html`<div class="grid">
+          : html`<div class="grid" @mouseleave=${() => (this.hoverId = null)}>
               ${this.tiles.map(
                 tile => html`
                   <button
@@ -753,7 +761,6 @@ export class SelectionTray extends LitElement {
                     title=${tile.label}
                     @click=${() => this.emit('tray-command', { id: tile.id })}
                     @mouseenter=${() => (this.hoverId = tile.id)}
-                    @mouseleave=${() => (this.hoverId = null)}
                   >
                     ${this.glyph(tile.glyph, 'glyph', GLYPH_TARGET_PX)}
                     <span class="key">${tile.shortcut}</span>
