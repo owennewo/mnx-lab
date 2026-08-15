@@ -1,0 +1,20 @@
+{
+  "target": "lab/pitches/parenthesized-accidental",
+  "intents": [
+    { "type": "addPart", "name": "Music" },
+    { "type": "appendMeasure" },
+    { "type": "setTimeSignature", "count": 4, "unit": 4 },
+    { "type": "setClef", "sign": "G", "staffPosition": -2 },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "lineDown" },
+    { "type": "toggleNote" },
+    { "type": "longerDuration" },
+    { "type": "transpose", "semitones": 1 },
+    { "type": "nextPosition" },
+    { "type": "toggleNote" },
+    { "type": "longerDuration" },
+    { "type": "transpose", "semitones": 1 },
+    { "type": "setAccidentalDisplay", "show": true, "parenthesized": true }
+  ]
+}

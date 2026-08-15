@@ -188,6 +188,18 @@ export function durationSpan(duration: { base: string; dots?: number } | undefin
  *  now (their inner notes get no slots) but must still advance the clock so
  *  the positions after them stay honest. Grace content is un-timed → 0. */
 export function itemSpan(item: MnxSequenceItem): Onset {
+  // The space check comes FIRST, and that ordering is the whole of it: a
+  // `space` carries a duration, so `sequenceItemKind` classifies it as an
+  // event on purpose ("anything carrying a duration spaces like an event") —
+  // which sent it into the branch below, where `durationSpan` reads a
+  // rhythmic fraction as a `{base}` and returns zero. The fraction-aware
+  // branch that used to sit at the bottom of this function was therefore
+  // never reached; the gap it was written to close stayed open.
+  const maybeSpace = item as { type?: string; duration?: unknown };
+  if (maybeSpace.type === 'space' || Array.isArray(maybeSpace.duration)) {
+    const fraction = maybeSpace.duration;
+    return Array.isArray(fraction) ? reduce(Number(fraction[0]), Number(fraction[1])) : { num: 0, den: 1 };
+  }
   if (isTimedEvent(item)) return durationSpan(item.duration);
   if (isTuplet(item)) {
     const outer = durationSpan(item.outer.duration);
@@ -202,15 +214,8 @@ export function itemSpan(item: MnxSequenceItem): Onset {
     const first = item.content[0];
     return first ? durationSpan(first.duration) : { num: 0, den: 1 };
   }
-  // A `space` is authored silence that OCCUPIES TIME, and its duration is a
-  // RHYTHMIC FRACTION (`[1, 4]`) rather than the `{base, dots}` every other
-  // item carries — which is why reading it with `durationSpan` produced zero
-  // and the bar arithmetic went wrong wherever a space appeared. That single
-  // mis-read blocked the container verb, the time-signature removal and the
-  // rest-spelling attempt.
-  const space = item as { type?: string; duration?: [number, number] };
-  if (space.type === 'space')
-    return Array.isArray(space.duration) ? reduce(space.duration[0], space.duration[1]) : { num: 0, den: 1 };
+  // Authored silence is handled at the top of this function — see the note
+  // there for why it cannot be handled here.
   return { num: 0, den: 1 };
 }
 

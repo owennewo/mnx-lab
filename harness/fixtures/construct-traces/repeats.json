@@ -1,0 +1,15 @@
+{
+  "target": "spec/repeats",
+  "intents": [
+    { "type": "addPart" },
+    { "type": "appendMeasure" },
+    { "type": "setTimeSignature", "count": 4, "unit": 4 },
+    { "type": "setClef", "sign": "G", "staffPosition": -2 },
+    { "type": "setMeasureAttribute", "attribute": { "kind": "repeatStart" } },
+    { "type": "setMeasureAttribute", "attribute": { "kind": "repeatEnd" } },
+    { "type": "lineUp" },
+    { "type": "toggleNote" },
+    { "type": "longerDuration" },
+    { "type": "longerDuration" }
+  ]
+}

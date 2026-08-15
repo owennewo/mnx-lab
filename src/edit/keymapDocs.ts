@@ -391,8 +391,17 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'removeMarking',
     'setPositioned',
     'removePositioned',
-    'removeStringAnnotation'
+    'removeStringAnnotation',
+    // The accidental's DISPLAY is note-level ink like the markings beside it
+    // (campaign item 6); its SPELLING is `J`, a key, because that is a
+    // different question.
+    'setAccidentalDisplay',
+    'removeAccidentalDisplay'
   ],
+  // The rhythm declarations (campaign item 11b): the three containers share
+  // one wrap verb, silence is inserted, and rest spelling is a verb rather
+  // than a padding policy.
+  rhythmPopover: ['wrapInContainer', 'insertSpace', 'setRestSpelling'],
   barAttributePopover: [
     'setMeasureAttribute',
     'removeMeasureAttribute',

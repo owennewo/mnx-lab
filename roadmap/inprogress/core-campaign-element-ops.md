@@ -819,3 +819,41 @@ The learning behind both: **when a campaign wants to declare an edge, put the
 edge in the artifact both harnesses already read.** Prose in a roadmap doc ages
 into the "capo is unwritable" problem (item 4); a field in the report is checked
 on every run.
+
+### 2026-08-15 — the queue opens, and the `space` gap was never actually closed
+
+First three traces off the new queue: `spec/repeats`,
+`lab/pitches/parenthesized-accidental` (which drives item 6's
+`accidental parens` end to end) and `lab/rhythm/sequence-space`. **Traced 5 → 8,
+kinds covered 9 → 13 of 38, queue 21 → 18 traces / 195 elements.** Two of the
+three landed first try; the third paid for itself several times over.
+
+- **The keyboard join caught a real hole immediately.** `insertSpace` had no
+  entry in `SURFACE_INTENTS`, so the trace failed before replaying: item 11b
+  shipped a popover whose intents no surface claimed. `setAccidentalDisplay`
+  was in the same state. A verb is not keyboard-reachable because a popover
+  calls it — it is reachable when the registry says which surface emits it, and
+  the join is what knows the difference.
+- **Silence had no address.** `insertSpace` and `wrapInContainer` resolved
+  through `containerRunAt`, which needs a note key — so a space could not be
+  inserted where there is no ink, which is the only place a space ever goes.
+  Both now address by ONSET through `entryContentAt`, and it picks the sequence
+  by the cursor's **voice** (`spec/tie-targets` puts its space in the second
+  voice) — today's anchor earning its keep within hours.
+- **A space consumes the rests it lands in; anywhere else it simply goes in.**
+  The invariant is the BAR, not the insertion: landing in silence keeps a full
+  bar full, and landing before ink is what fills a short one — which is the
+  case a space usually exists for.
+- **And the `space` span gap was never closed.** The tail item recorded it as a
+  one-field fix, and the fix was DEAD CODE: `sequenceItemKind` classifies a
+  space as an event on purpose (it carries a duration), so `itemSpan` took the
+  timed-event branch and read a rhythmic fraction as `{base}` — zero — before
+  ever reaching the fraction-aware branch written to handle it. The branch was
+  right; its position was wrong. **Fifth sighting of this gap, and the first
+  time it was actually fixed.**
+
+The learning to carry: **a fix needs a test that would fail without it.** The
+tail's space work was verified by the sweep's verdicts moving, and those moved
+for other reasons; nothing asserted the span itself. One trace, replaying a
+real performance, found in minutes what four rounds of reasoning had missed —
+which is the argument for the trace queue in miniature.

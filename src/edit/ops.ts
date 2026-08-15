@@ -1341,7 +1341,23 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (!Number.isInteger(num) || !Number.isInteger(den) || num < 1 || den < 1) return next;
       const index = Math.min(Math.max(op.index, 0), seq.content.length);
       const space = { type: 'space', duration: [num, den] } as unknown as MnxSequenceItem;
-      seq.content = [...seq.content.slice(0, index), space, ...seq.content.slice(index)];
+      // The invariant is the BAR, not the insertion. Landing in rests, the
+      // space consumes them — silence for silence, so a full bar stays full
+      // (a rest is absence; authored silence is the author saying the absence
+      // is deliberate). Landing anywhere else it simply goes in, which is what
+      // fills a SHORT bar — the case a space usually exists for.
+      const eaten = restsCovering(seq, index, { num, den });
+      if (eaten === null) {
+        seq.content = [...seq.content.slice(0, index), space, ...seq.content.slice(index)];
+        return next;
+      }
+      const surplus = subtractOnsets(eaten.span, { num, den });
+      seq.content = [
+        ...seq.content.slice(0, index),
+        space,
+        ...restsSpanning(surplus),
+        ...seq.content.slice(index + eaten.count)
+      ];
       return next;
     }
     case 'setFullMeasureRest': {
@@ -1774,6 +1790,39 @@ export function completeContainerSpec(
     ...(partial.bracket ? { bracket: partial.bracket } : {}),
     ...(partial.showNumber ? { showNumber: partial.showNumber } : {})
   };
+}
+
+/**
+ * The entry sequence's content index at a metric position — the address for
+ * content that may be SILENCE, where there is no note key to name.
+ *
+ * `containerRunAt` (below) addresses by note key and cannot see a rest; a
+ * space is inserted exactly where there is no ink, so it needs this instead.
+ */
+export function entryContentAt(
+  doc: MnxStructure,
+  measureIndex: number,
+  onset: Onset,
+  partIndex = 0,
+  voiceIndex = 0,
+  staffIndex = 1
+): { partIndex: number; sequenceIndex: number; index: number; seq: MnxSequence } | null {
+  const measure = doc.parts?.[partIndex]?.measures?.[measureIndex];
+  if (!measure) return null;
+  // The cursor's VOICE picks the sequence — `spec/tie-targets` puts its space
+  // in the second voice of the staff, and an address that always took the
+  // first would have written it into the wrong one (the anchor the cursor
+  // gained in core-selection-ladder.md, earning its keep).
+  const onStaff = (measure.sequences ?? [])
+    .map((sequence, index) => ({ sequence, index }))
+    .filter(entry => (entry.sequence.staff ?? 1) === staffIndex);
+  const chosen = onStaff[voiceIndex] ?? onStaff[0];
+  if (!chosen) return null;
+  const sequenceIndex = chosen.index;
+  const seq = chosen.sequence;
+  const found = eventAtOnset(seq, onset);
+  if (!found) return null;
+  return { partIndex, sequenceIndex, index: found.index, seq };
 }
 
 /** Where a wrap starts: the run of content the note at `noteKey` opens, as

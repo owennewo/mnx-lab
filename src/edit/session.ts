@@ -12,7 +12,7 @@ import {
   beamRunBetween,
   beamStartingAt,
   completeContainerSpec,
-  containerRunAt,
+  entryContentAt,
   wrapExtent,
   EditHistory,
   hasSlurStartingAt,
@@ -773,32 +773,40 @@ export class EditorSession {
         // why neither needs the press-navigate-press anchor slurs and beams
         // use: the typed declaration already says how much music it takes
         // (`wrapExtent`), and silence is inserted at a point, not over a span.
-        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
-        if (!slot) return false;
-        const site = containerRunAt(this.doc, slot.noteKey);
+        // Addressed by ONSET, not by note key: a space is inserted exactly
+        // where there is no ink, and a container may wrap rests as readily as
+        // notes. `containerRunAt` cannot see either.
+        const site = entryContentAt(
+          this.doc,
+          this.cursorState.measureIndex,
+          this.cursorState.onset,
+          this.cursorState.partIndex ?? 0,
+          this.cursorState.voiceIndex ?? 0,
+          this.cursorState.staffIndex ?? 1
+        );
         if (!site) return false;
         const before = JSON.stringify(this.doc);
         if (intent.type === 'insertSpace') {
           this.apply({
             type: 'insertSpace',
             partIndex: site.partIndex,
-            measureIndex: site.measureIndex,
+            measureIndex: this.cursorState.measureIndex,
             sequenceIndex: site.sequenceIndex,
-            index: site.eventIndex,
+            index: site.index,
             duration: intent.duration
           });
         } else {
-          const spec = completeContainerSpec(site.seq, site.eventIndex, intent.spec);
+          const spec = completeContainerSpec(site.seq, site.index, intent.spec);
           if (!spec) return false;
-          const extent = wrapExtent(site.seq, site.eventIndex, spec, intent.count);
+          const extent = wrapExtent(site.seq, site.index, spec, intent.count);
           if (extent === null) return false;
           this.apply({
             type: 'wrapInContainer',
             partIndex: site.partIndex,
-            measureIndex: site.measureIndex,
+            measureIndex: this.cursorState.measureIndex,
             sequenceIndex: site.sequenceIndex,
-            from: site.eventIndex,
-            to: site.eventIndex + extent - 1,
+            from: site.index,
+            to: site.index + extent - 1,
             spec
           });
         }
