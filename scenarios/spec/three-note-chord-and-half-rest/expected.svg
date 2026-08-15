@@ -13,6 +13,5 @@
 <text x="206.16" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e0.n2"></text>
 <line x1="225.04" y1="120" x2="225.04" y2="205.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="371.6" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
-<line x1="449.6" y1="128" x2="449.6" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="454.4" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="462.4" y1="128" x2="462.4" y2="192" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 </svg>

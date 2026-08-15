@@ -10,6 +10,7 @@ import {
   emitTabTimeSig,
   emitTabVoices
 } from './tabStaff.ts';
+import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barlines.ts';
 import { emitNavigationMarkers, emitScoreLabels, emitTempoMark } from './scoreText.ts';
 import { clampPadDensity, ensureTopMargin, tightenRows } from './verticalDensity.ts';
 import { validateDocument } from './validate.ts';
@@ -40,6 +41,11 @@ const MARGIN_SP = 2;
 const BARLINE_THICKNESS_SP = 0.1;
 const FINAL_BARLINE_THICK_WIDTH_SP = 0.4;
 const FINAL_BARLINE_GAP_SP = 0.3;
+const BARLINE_METRICS: BarlineMetrics = {
+  thinSp: BARLINE_THICKNESS_SP,
+  thickSp: FINAL_BARLINE_THICK_WIDTH_SP,
+  gapSp: FINAL_BARLINE_GAP_SP
+};
 
 // ---------- Public API ----------
 
@@ -202,32 +208,18 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     emitNavigationMarkers({ gm, m, stdSequences, staffTop, primitives });
     emitScoreLabels({ gm, m, staffTop, rowTop: staffTop - ROW_PAD_TOP_SP, primitives });
 
-    // End barline
+    // End barline — the global measure's style, defaulted per the spec. A tab
+    // staff is owed it for the same reason it is owed a section name: the
+    // barline describes the BAR, not a notation staff.
     const isLast = i === numMeasures - 1;
-    const barX = m.x + m.width;
-    if (isLast) {
-      const thinX = barX - FINAL_BARLINE_THICK_WIDTH_SP - FINAL_BARLINE_GAP_SP;
-      primitives.push({
-        kind: 'line',
-        x1: thinX, y1: staffTop, x2: thinX, y2: staffBottom,
-        thickness: BARLINE_THICKNESS_SP,
-        className: 'barline barline-final-thin'
-      });
-      primitives.push({
-        kind: 'rect',
-        x: barX - FINAL_BARLINE_THICK_WIDTH_SP, y: staffTop,
-        w: FINAL_BARLINE_THICK_WIDTH_SP, h: STAFF_HEIGHT_SP,
-        fill: 'currentColor',
-        className: 'barline barline-final-thick'
-      });
-    } else {
-      primitives.push({
-        kind: 'line',
-        x1: barX, y1: staffTop, x2: barX, y2: staffBottom,
-        thickness: BARLINE_THICKNESS_SP,
-        className: 'barline'
-      });
-    }
+    emitEndBarline({
+      type: resolveBarlineType(gm.barline, isLast),
+      x: m.x + m.width,
+      top: staffTop,
+      bottom: staffBottom,
+      metrics: BARLINE_METRICS,
+      primitives
+    });
 
     if (anchored.length) {
       const bySlot = new Map<number, MeasureIssue[]>();

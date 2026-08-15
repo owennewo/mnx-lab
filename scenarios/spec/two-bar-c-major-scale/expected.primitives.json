@@ -273,21 +273,12 @@
       },
       {
         "kind": "line",
-        "x1": 66,
+        "x1": 66.8,
         "y1": 8,
-        "x2": 66,
+        "x2": 66.8,
         "y2": 12,
         "thickness": 0.16,
-        "className": "barline barline-final-thin"
-      },
-      {
-        "kind": "rect",
-        "x": 66.3,
-        "y": 8,
-        "w": 0.5,
-        "h": 4,
-        "fill": "currentColor",
-        "className": "barline barline-final-thick"
+        "className": "barline"
       }
     ]
   }

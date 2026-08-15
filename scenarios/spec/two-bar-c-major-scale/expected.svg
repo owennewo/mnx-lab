@@ -30,6 +30,5 @@
 <line x1="878.56" y1="162.688" x2="878.56" y2="216" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="990.56" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e3.n0"></text>
 <line x1="990.56" y1="154.688" x2="990.56" y2="208" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="1056" y1="128" x2="1056" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="1060.8" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="1068.8" y1="128" x2="1068.8" y2="192" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 </svg>

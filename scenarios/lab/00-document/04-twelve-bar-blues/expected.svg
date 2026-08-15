@@ -197,8 +197,10 @@
 <line x1="1187.9104" y1="368" x2="1219.5904" y2="368" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
 <text x="1194.3104" y="368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="b16"></text>
 <line x1="1213.1904" y1="312" x2="1213.1904" y2="365.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="1248" y1="128" x2="1248" y2="192" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="1248" y1="288" x2="1248" y2="352" stroke="currentColor" stroke-width="2.56" class="barline"></line>
+<line x1="1243.2" y1="128" x2="1243.2" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-double"></line>
+<line x1="1248" y1="128" x2="1248" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-double"></line>
+<line x1="1243.2" y1="288" x2="1243.2" y2="352" stroke="currentColor" stroke-width="2.56" class="barline barline-double"></line>
+<line x1="1248" y1="288" x2="1248" y2="352" stroke="currentColor" stroke-width="2.56" class="barline barline-double"></line>
 <line x1="32" y1="544" x2="390.9824" y2="544" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="560" x2="390.9824" y2="560" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="576" x2="390.9824" y2="576" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
@@ -373,8 +375,10 @@
 <line x1="1187.288" y1="784" x2="1218.968" y2="784" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
 <text x="1193.688" y="784" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="b32"></text>
 <line x1="1212.568" y1="728" x2="1212.568" y2="781.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="1248" y1="544" x2="1248" y2="608" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="1248" y1="704" x2="1248" y2="768" stroke="currentColor" stroke-width="2.56" class="barline"></line>
+<line x1="1243.2" y1="544" x2="1243.2" y2="608" stroke="currentColor" stroke-width="2.56" class="barline barline-double"></line>
+<line x1="1248" y1="544" x2="1248" y2="608" stroke="currentColor" stroke-width="2.56" class="barline barline-double"></line>
+<line x1="1243.2" y1="704" x2="1243.2" y2="768" stroke="currentColor" stroke-width="2.56" class="barline barline-double"></line>
+<line x1="1248" y1="704" x2="1248" y2="768" stroke="currentColor" stroke-width="2.56" class="barline barline-double"></line>
 <line x1="32" y1="960" x2="393.4528" y2="960" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="976" x2="393.4528" y2="976" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="992" x2="393.4528" y2="992" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>

@@ -18,11 +18,19 @@
       },
       {},
       {},
+      {
+        "barline": {
+          "type": "double"
+        }
+      },
       {},
       {},
       {},
-      {},
-      {},
+      {
+        "barline": {
+          "type": "double"
+        }
+      },
       {
         "section": {
           "label": "Turnaround"

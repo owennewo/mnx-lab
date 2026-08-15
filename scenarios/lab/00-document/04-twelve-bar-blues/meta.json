@@ -60,7 +60,7 @@
   "idRefs": false,
   "source": "hand-written",
   "origin": "local",
-  "status": "verified",
+  "status": "rendered",
   "verification": {
     "at": "2026-08-14",
     "primitivesHash": "sha256:78b39f409f6087f1",

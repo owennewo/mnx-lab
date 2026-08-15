@@ -252,12 +252,21 @@
       },
       {
         "kind": "line",
+        "x1": 42.7,
+        "y1": 8,
+        "x2": 42.7,
+        "y2": 12,
+        "thickness": 0.16,
+        "className": "barline barline-double"
+      },
+      {
+        "kind": "line",
         "x1": 43,
         "y1": 8,
         "x2": 43,
         "y2": 12,
         "thickness": 0.16,
-        "className": "barline"
+        "className": "barline barline-double"
       },
       {
         "kind": "line",

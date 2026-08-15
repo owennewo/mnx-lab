@@ -344,6 +344,20 @@ export const STRUCTURAL_CLASSES: Record<string, string> = {
   'barline-final-thin': 'the final barline pair',
   'barline-final-thick': 'the final barline pair',
   'barline-start': 'the system-start barline',
+  // The rest of `barline-type`. Structural for the same reason `barline` is:
+  // the ink is the barline every measure already ends with, and the `barline`
+  // element kind is a MODIFIER that picks its style — removing it returns the
+  // default stroke rather than removing ink. Declared as a family, including
+  // styles no scenario draws yet, so a document using one is a render and not
+  // a census failure.
+  'barline-double': 'the measure’s end barline, in the style the document picked',
+  'barline-heavy': 'the measure’s end barline, in the style the document picked',
+  'barline-heavy-light': 'the measure’s end barline, in the style the document picked',
+  'barline-heavy-heavy': 'the measure’s end barline, in the style the document picked',
+  'barline-dashed': 'the measure’s end barline, in the style the document picked',
+  'barline-dotted': 'the measure’s end barline, in the style the document picked',
+  'barline-tick': 'the measure’s end barline, in the style the document picked',
+  'barline-short': 'the measure’s end barline, in the style the document picked',
   grace: 'a modifier token on grace-sized ink, not ink of its own',
   'diagnostic-marker': 'renderer diagnostics — our output, not the document’s content',
   'diagnostic-validation': 'renderer diagnostics — our output, not the document’s content',

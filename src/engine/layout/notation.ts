@@ -38,6 +38,7 @@ import {
   Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, translatePrimitiveY
 } from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
+import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barlines.ts';
 import { clampPadDensity, tightenRows } from './verticalDensity.ts';
 import {
   anchorAt,
@@ -101,6 +102,11 @@ const STEM_THICKNESS_SP = 0.12;
 const BARLINE_THICKNESS_SP = 0.16;
 const FINAL_BARLINE_THICK_SP = 0.5;
 const FINAL_BARLINE_GAP_SP = 0.3;
+const BARLINE_METRICS: BarlineMetrics = {
+  thinSp: BARLINE_THICKNESS_SP,
+  thickSp: FINAL_BARLINE_THICK_SP,
+  gapSp: FINAL_BARLINE_GAP_SP
+};
 
 const STEM_LENGTH_SP = 3.5;
 const BEAM_THICKNESS_SP = 0.5;
@@ -1619,27 +1625,16 @@ function renderSegment(args: RenderSegmentArgs): {
             thickness: BARLINE_THICKNESS_SP,
             className: 'barline repeat-end'
           });
-        } else if (isLast) {
-          const thinX = barX - FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP;
-          primitives.push({
-            kind: 'line',
-            x1: thinX, y1: gTop, x2: thinX, y2: gBottom,
-            thickness: BARLINE_THICKNESS_SP,
-            className: 'barline barline-final-thin'
-          });
-          primitives.push({
-            kind: 'rect',
-            x: barX - FINAL_BARLINE_THICK_SP, y: gTop,
-            w: FINAL_BARLINE_THICK_SP, h: gBottom - gTop,
-            fill: 'currentColor',
-            className: 'barline barline-final-thick'
-          });
         } else {
-          primitives.push({
-            kind: 'line',
-            x1: barX, y1: gTop, x2: barX, y2: gBottom,
-            thickness: BARLINE_THICKNESS_SP,
-            className: 'barline'
+          // The GLOBAL measure owns the barline style; `isLast` only supplies
+          // the spec's default when the document is silent about it.
+          emitEndBarline({
+            type: resolveBarlineType(mnx.global.measures[i]?.barline, isLast),
+            x: barX,
+            top: gTop,
+            bottom: gBottom,
+            metrics: BARLINE_METRICS,
+            primitives
           });
         }
       }
