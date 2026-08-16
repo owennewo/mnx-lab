@@ -249,7 +249,10 @@ proposals that name their campaign.
   mixed/bulk commands, the container rung and every rung's Delete meaning followed. The
   relax/tighten enclosure now morphs from the geometry actually on screen across same-kind
   extent changes and one↔many both-view echoes, with interruption continuity and reduced-motion
-  fallback. **Next:** primary/echo asymmetry, then wider ghosts. The separate entry-mode axis
+  fallback. Primary/echo asymmetry now keeps the active projection's ink and fine-rung
+  enclosure full strength, dims the other rendering, and resolves to one panel at
+  part-measure while preserving roles through the split/merge tween. **Next:** wider ghosts.
+  The separate entry-mode axis
   (advance mode, digit debounce, letter accelerators) is a candidate for its own proposal.
 
 ### complete/

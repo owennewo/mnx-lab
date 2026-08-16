@@ -1529,6 +1529,7 @@ export class ScenarioPage extends LitElement {
       activeVoiceIndex: null,
       activeEventIndex: null,
       selectedNoteIds: this.cursorHidden ? [] : session.selectedNoteKeys,
+      primaryProjection: session.projection,
       enclosure: this.cursorHidden ? null : ENCLOSURE_BY_LEVEL[session.selectionLevel],
       span: this.cursorHidden
         ? null
@@ -1558,6 +1559,19 @@ export class ScenarioPage extends LitElement {
       )
     };
   }
+
+  /** A click in the combined score chooses which rendering owns subsequent
+   * spatial input. Note membership is still model state and therefore does
+   * not fork: switching projection remaps the existing selection in place. */
+  private onNoteSelected = (
+    event: CustomEvent<{ projection?: 'notation' | 'tab' }>
+  ) => {
+    const projection = event.detail.projection;
+    if (!this.session || !projection || projection === this.session.projection) return;
+    if (this.session.handleIntent({ type: 'setProjection', projection })) {
+      this.syncFromSession();
+    }
+  };
 
   /** Keep the session's projection following the pane on screen: notation
    *  pane → staff space, tab pane → fingerboard; the both view keeps its
@@ -2318,6 +2332,7 @@ export class ScenarioPage extends LitElement {
         .partTabSetups=${this.partTabSetups()}
         .selection=${this.selection}
         .selectionInactive=${!this.hasKeyboard}
+        @note-selected=${this.onNoteSelected}
         @selection-anchored=${this.onSelectionAnchored}
         @render-scale=${this.onRenderScale}
       ></mnx-score-viewer>

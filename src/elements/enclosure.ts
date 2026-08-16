@@ -25,6 +25,10 @@ import {
   sameEnclosureRects,
   type EnclosureRectGeometry
 } from '../engine/render/enclosureTransition.ts';
+import {
+  isEchoProjection,
+  type RenderedProjection
+} from '../engine/render/projection.ts';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -270,6 +274,9 @@ export interface EnclosureOptions {
   /** Projection-specific model staff → rendered staff ordinals. Used only
    * when a structural unit has no glyph from which to infer its staff. */
   staffOrdinals?: (unit: SelectionSpanUnit) => readonly number[];
+  /** Which of the combined view's two rendered spaces owns input. Fine-rung
+   * fragments on the other projection are tagged as the quiet echo. */
+  primaryProjection?: RenderedProjection | null;
 }
 
 export interface EnclosureSnapshot {
@@ -284,7 +291,11 @@ const geometryOf = (rect: SVGRectElement): EnclosureRectGeometry => ({
   width: Number(rect.getAttribute('width') ?? 0),
   height: Number(rect.getAttribute('height') ?? 0),
   radius: Number(rect.getAttribute('rx') ?? 0),
-  stroke: Number(rect.getAttribute('stroke-width') ?? 0)
+  stroke: Number(rect.getAttribute('stroke-width') ?? 0),
+  ...(rect.dataset.projection === 'notation' || rect.dataset.projection === 'tab'
+    ? { projection: rect.dataset.projection }
+    : {}),
+  ...(rect.classList.contains('selection-echo') ? { echo: true } : {})
 });
 
 /** The currently visible enclosure, including an interrupted tween's live
@@ -309,6 +320,11 @@ function writeGeometry(rect: SVGRectElement, geometry: EnclosureRectGeometry): v
   rect.setAttribute('height', String(Math.max(0, geometry.height)));
   rect.setAttribute('rx', String(Math.max(0, geometry.radius)));
   rect.setAttribute('stroke-width', String(Math.max(0, geometry.stroke)));
+}
+
+function writePresentation(rect: SVGRectElement, geometry: EnclosureRectGeometry): void {
+  if (geometry.projection) rect.dataset.projection = geometry.projection;
+  rect.classList.toggle('selection-echo', geometry.echo === true);
 }
 
 const mix = (from: number, to: number, t: number) => from + (to - from) * t;
@@ -343,6 +359,7 @@ export function tweenEnclosure(
   const rects = pairs.map(pair => {
     const rect = document.createElementNS(SVG_NS, 'rect');
     writeGeometry(rect, pair.from);
+    writePresentation(rect, pair.to);
     transition.appendChild(rect);
     return rect;
   });
@@ -380,6 +397,21 @@ export function tweenEnclosure(
   };
   frame = requestAnimationFrame(step);
   return () => clean(false);
+}
+
+/** Apply the same primary/echo distinction to the selected ink that the
+ * enclosure uses. Only the combined view passes a primary projection; split
+ * views therefore keep their ordinary full-strength selection. */
+export function markProjectionEchoes(
+  svg: SVGSVGElement,
+  primary: RenderedProjection | null | undefined
+): void {
+  for (const element of svg.querySelectorAll<SVGGraphicsElement>('.selected')) {
+    const projection: RenderedProjection = element.classList.contains('fret-number')
+      ? 'tab'
+      : 'notation';
+    element.classList.toggle('selection-echo', isEchoProjection(projection, primary));
+  }
 }
 
 export function drawEnclosure(
@@ -429,7 +461,15 @@ export function drawEnclosure(
 
   const g = document.createElementNS(SVG_NS, 'g');
   g.setAttribute('class', `${layer} enc-${kind}`);
-  const rect = (x: number, y: number, w: number, h: number, radius: number, stroke: number) => {
+  const rect = (
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    radius: number,
+    stroke: number,
+    projection?: RenderedProjection
+  ) => {
     const r = document.createElementNS(SVG_NS, 'rect');
     r.setAttribute('x', String(x));
     r.setAttribute('y', String(y));
@@ -437,6 +477,13 @@ export function drawEnclosure(
     r.setAttribute('height', String(h));
     r.setAttribute('rx', String(radius));
     r.setAttribute('stroke-width', String(stroke));
+    if (projection) {
+      r.dataset.projection = projection;
+      r.classList.toggle(
+        'selection-echo',
+        isEchoProjection(projection, options.primaryProjection)
+      );
+    }
     g.appendChild(r);
   };
 
@@ -448,8 +495,11 @@ export function drawEnclosure(
    * semantics (frets = tab, noteheads = notation) is the honest tiebreak.
    */
   const byStaff = new Map<number, Box[]>();
+  const tabStaves = new Set<number>();
   if (staves.length > 0) {
-    const tabStaves = new Set<number>();
+    for (const marker of svg.querySelectorAll<SVGGraphicsElement>('.tab-clef, .fret-number')) {
+      tabStaves.add(staffIndexOf(staves, inkBox(marker, sp)));
+    }
     glyphs.forEach((el, i) => {
       if (el.classList.contains('fret-number')) tabStaves.add(staffIndexOf(staves, boxes[i]));
     });
@@ -461,6 +511,8 @@ export function drawEnclosure(
       byStaff.set(staff, [...(byStaff.get(staff) ?? []), boxes[i]]);
     });
   }
+  const projectionOfStaff = (staffIndex: number): RenderedProjection =>
+    tabStaves.has(staffIndex) ? 'tab' : 'notation';
 
   /** Range selections are structural spans, not merely unions of ink. Draw
    * them as one continuous enclosure on each row/projection and use the row's
@@ -483,9 +535,10 @@ export function drawEnclosure(
         width: number,
         height: number,
         radius: number,
-        stroke: number
+        stroke: number,
+        projection?: RenderedProjection
       ) => {
-        rect(x, y, width, height, radius, stroke);
+        rect(x, y, width, height, radius, stroke, projection);
         (g.lastElementChild as SVGRectElement | null)?.setAttribute('data-system-row', String(rowIndex));
       };
       const cellOf = (measureIndex: number) => {
@@ -613,7 +666,8 @@ export function drawEnclosure(
             side,
             side,
             0.3 * sp,
-            0.12 * sp
+            0.12 * sp,
+            projectionOfStaff(staffIndex)
           );
           continue;
         }
@@ -632,7 +686,8 @@ export function drawEnclosure(
           range.right - range.left + 0.8 * sp,
           bottom - top,
           kind === 'cell' ? 0.3 * sp : 0.5 * sp,
-          kind === 'cell' ? 0.12 * sp : 0.1 * sp
+          kind === 'cell' ? 0.12 * sp : 0.1 * sp,
+          projectionOfStaff(staffIndex)
         );
       }
     });
@@ -645,10 +700,21 @@ export function drawEnclosure(
     case 'cell': {
       // A snug SQUARE on each selected glyph — a position mark, not an ink
       // claim (the accidental is deliberately outside).
-      for (const b of boxes) {
+      boxes.forEach((b, index) => {
         const side = Math.max(b.w, b.h) + 0.7 * sp;
-        rect(b.x + b.w / 2 - side / 2, b.y + b.h / 2 - side / 2, side, side, 0.3 * sp, 0.12 * sp);
-      }
+        const projection: RenderedProjection = glyphs[index].classList.contains('fret-number')
+          ? 'tab'
+          : 'notation';
+        rect(
+          b.x + b.w / 2 - side / 2,
+          b.y + b.h / 2 - side / 2,
+          side,
+          side,
+          0.3 * sp,
+          0.12 * sp,
+          projection
+        );
+      });
       break;
     }
     case 'slice': {
@@ -659,16 +725,32 @@ export function drawEnclosure(
         const u = union(staffBoxes);
         const top = Math.min(staff.top - 1.5 * sp, u.y - 0.5 * sp);
         const bottom = Math.max(staff.bottom + 1.5 * sp, u.y + u.h + 0.5 * sp);
-        rect(u.x - 0.4 * sp, top, u.w + 0.8 * sp, bottom - top, 0.5 * sp, 0.1 * sp);
+        rect(
+          u.x - 0.4 * sp,
+          top,
+          u.w + 0.8 * sp,
+          bottom - top,
+          0.5 * sp,
+          0.1 * sp,
+          projectionOfStaff(i)
+        );
       }
       break;
     }
     case 'lasso': {
       // A snug hull around the container's child ink. The structural onset
       // supplies a small honest fallback for an empty container.
-      for (const [, staffBoxes] of byStaff) {
+      for (const [i, staffBoxes] of byStaff) {
         const u = union(staffBoxes);
-        rect(u.x - 0.5 * sp, u.y - 0.5 * sp, u.w + sp, u.h + sp, 0.55 * sp, 0.1 * sp);
+        rect(
+          u.x - 0.5 * sp,
+          u.y - 0.5 * sp,
+          u.w + sp,
+          u.h + sp,
+          0.55 * sp,
+          0.1 * sp,
+          projectionOfStaff(i)
+        );
       }
       break;
     }
@@ -683,7 +765,15 @@ export function drawEnclosure(
         const u = union(staffBoxes);
         const top = Math.min(staff.top - sp, u.y - 0.5 * sp);
         const bottom = Math.max(staff.bottom + sp, u.y + u.h + 0.5 * sp);
-        rect(u.x - 0.4 * sp, top, u.w + 0.8 * sp, bottom - top, 0.5 * sp, 0.1 * sp);
+        rect(
+          u.x - 0.4 * sp,
+          top,
+          u.w + 0.8 * sp,
+          bottom - top,
+          0.5 * sp,
+          0.1 * sp,
+          projectionOfStaff(i)
+        );
       }
       break;
     }

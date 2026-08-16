@@ -1,5 +1,6 @@
 import { createContext } from '@lit/context';
 import { MnxDocument } from '../model/mnx.ts';
+import type { RenderedProjection } from '../engine/render/projection.ts';
 
 export interface PlaybackState {
   playing: boolean;
@@ -71,6 +72,9 @@ export interface SelectionContext {
   activeVoiceIndex: number | null;
   activeEventIndex: number | null;
   selectedNoteIds: string[];
+  /** In the combined view, which rendering owns the input dialect. The same
+   * model selection remains visible on the other projection as a dim echo. */
+  primaryProjection?: RenderedProjection | null;
   /** Enclosure drawn around the selection footprint; absent/null = none. */
   enclosure?: EnclosureKind | null;
   /** Structural coverage, including rests and empty measure copies that have

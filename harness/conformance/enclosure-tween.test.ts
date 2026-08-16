@@ -40,6 +40,24 @@ describe('selection enclosure tween topology', () => {
     ]);
   });
 
+  it('keeps destination projection roles through a one-to-many split', () => {
+    const from = { ...rect(0), projection: 'tab' as const };
+    const targets = [
+      { ...rect(10), projection: 'notation' as const, echo: true },
+      { ...rect(20), projection: 'tab' as const }
+    ];
+    expect(pairEnclosureRects([from], targets)).toEqual([
+      { from, to: targets[0] },
+      { from, to: targets[1] }
+    ]);
+
+    // Role changes repaint presentation but do not invent a geometry tween.
+    expect(sameEnclosureRects(
+      [{ ...rect(0), projection: 'notation', echo: true }],
+      [{ ...rect(0), projection: 'tab' }]
+    )).toBe(true);
+  });
+
   it('keeps fragment order stable when wrapped ranges change topology', () => {
     const sources = [rect(0), rect(10)];
     const targets = [rect(20), rect(30), rect(40)];

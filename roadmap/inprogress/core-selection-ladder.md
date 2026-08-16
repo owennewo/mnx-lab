@@ -186,9 +186,23 @@
 > hands-on review covered every rung in the both-view navigation playground,
 > the same-kind measure→section transition, rapid reversal and clean settling.
 >
-> **What remains**: primary/echo asymmetry (both
-> projections draw at full strength);
-> ghost cells beyond the existing entry ghosts.
+> **Primary/echo asymmetry complete 2026-08-16.** The session's active
+> projection now reaches `SelectionContext`, so the combined viewer presents
+> one model selection in two strengths: the active input dialect's ink and
+> fine-rung enclosure stay full strength while the other projection remains a
+> visible 40% echo. Activating notation or tab ink records the existing
+> `setProjection` intent without forking or moving selection membership; the
+> source bridge uses pointer-down so a focus repaint cannot swallow the
+> activation, with a deduped click fallback for keyboard/synthetic input. At
+> part-measure and above the two enclosure fragments become the one untagged,
+> full-strength panel the shape vocabulary already draws. Projection/echo
+> metadata follows one↔many tween fragments, so the merge and split do not
+> flash back to equal weight. Pure classification tests pin the dialect rule;
+> hands-on review in the both-view navigation playground covered both active
+> projections, the two→one part-measure merge, the one→two tightening tween
+> and clean settling without console errors.
+>
+> **What remains**: ghost cells beyond the existing entry ghosts.
 > The entry-mode axis — advance mode, the
 > stage-1 digit debounce, the letter accelerator — is the other open half; it
 > shares only the cursor with
@@ -701,6 +715,12 @@ arrow doing nothing beats one doing something arbitrary.
    geometry into the new rung. Ordered fragment pairing covers one↔many echo
    topology, same-kind extent changes still animate, interrupted reversals do
    not snap back, and reduced-motion readers get the final static shape.
+7. **Complete 2026-08-16 — primary/echo asymmetry.** The active projection is
+   carried into the combined viewer and source activation switches it through
+   the existing recorded intent. Fine-rung ink and enclosure fragments on the
+   other projection are quiet echoes; wide rungs resolve to one full-strength
+   enclosure at the existing part-measure merge boundary, and tween fragments
+   retain their destination role through one↔many topology changes.
 
 ## Not this
 

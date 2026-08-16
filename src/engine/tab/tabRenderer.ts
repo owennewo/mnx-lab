@@ -3,6 +3,7 @@ import { PartTabSetups } from './guitarPositions.ts';
 import { layoutTab } from '../layout/tab.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import type { RenderedProjection } from '../render/projection.ts';
 import {
   BASELINE_PX_PER_SP,
   clampStaffScale,
@@ -29,7 +30,12 @@ export interface RenderTabOptions {
   width: number;
   activeNoteIds?: string[];
   selectedNoteIds?: string[];
-  onNoteClick?: (noteId: string, measureIdx: number, noteIdx: number) => void;
+  onNoteClick?: (
+    noteId: string,
+    measureIdx: number,
+    noteIdx: number,
+    projection: RenderedProjection
+  ) => void;
   /** Pixels per staff space (zoom). Default 10. */
   pxPerSp?: number;
   /**
@@ -90,11 +96,11 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
     pxPerSpY,
     viewBoxSp,
     className: 'mnx-tab-svg',
-    onSourceClick: opts.onNoteClick
+    onSourceActivate: opts.onNoteClick
       ? sourceId => {
           const loc = layout.index.get(sourceId);
           if (loc) {
-            opts.onNoteClick!(sourceId, loc.measureIndex, loc.eventIndex);
+            opts.onNoteClick!(sourceId, loc.measureIndex, loc.eventIndex, 'tab');
           }
         }
       : undefined

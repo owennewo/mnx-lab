@@ -1,3 +1,5 @@
+import type { RenderedProjection } from './projection.ts';
+
 /** Geometry shared by the SVG selection enclosure and its presentation-only
  * rung transition. Values are SVG user units, not client pixels. */
 export interface EnclosureRectGeometry {
@@ -7,9 +9,15 @@ export interface EnclosureRectGeometry {
   height: number;
   radius: number;
   stroke: number;
+  /** Presentation metadata follows a fragment through a topology-changing
+   * tween but is deliberately excluded from geometric equality. */
+  projection?: RenderedProjection;
+  echo?: boolean;
 }
 
-const GEOMETRY_FIELDS: readonly (keyof EnclosureRectGeometry)[] = [
+type NumericGeometryField = 'x' | 'y' | 'width' | 'height' | 'radius' | 'stroke';
+
+const GEOMETRY_FIELDS: readonly NumericGeometryField[] = [
   'x',
   'y',
   'width',

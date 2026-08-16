@@ -2,6 +2,7 @@ import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation, type HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import type { RenderedProjection } from '../render/projection.ts';
 import {
   BASELINE_PX_PER_SP,
   clampStaffScale,
@@ -26,7 +27,12 @@ export interface RenderNotationOptions {
   width: number;
   activeNoteIds?: string[];
   selectedNoteIds?: string[];
-  onNoteClick?: (noteId: string, measureIdx: number, noteIdx: number) => void;
+  onNoteClick?: (
+    noteId: string,
+    measureIdx: number,
+    noteIdx: number,
+    projection: RenderedProjection
+  ) => void;
   pxPerSp?: number;
   /**
    * Staff scale — how big the INK is, and nothing else. 1 (the default) is a
@@ -92,10 +98,10 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
     pxPerSpY,
     viewBoxSp,
     className: 'mnx-notation-svg',
-    onSourceClick: opts.onNoteClick
+    onSourceActivate: opts.onNoteClick
       ? sourceId => {
           const loc = layout.index.get(sourceId);
-          if (loc) opts.onNoteClick!(sourceId, loc.measureIndex, loc.eventIndex);
+          if (loc) opts.onNoteClick!(sourceId, loc.measureIndex, loc.eventIndex, 'notation');
         }
       : undefined
   });

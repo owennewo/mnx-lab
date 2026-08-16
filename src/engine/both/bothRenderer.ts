@@ -5,6 +5,10 @@ import type { HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
 import {
+  projectionForSourceClass,
+  type RenderedProjection
+} from '../render/projection.ts';
+import {
   BASELINE_PX_PER_SP,
   clampStaffScale,
   renderOutcome,
@@ -29,7 +33,12 @@ export interface RenderBothOptions {
   width: number;
   activeNoteIds?: string[];
   selectedNoteIds?: string[];
-  onNoteClick?: (noteId: string, measureIdx: number, noteIdx: number) => void;
+  onNoteClick?: (
+    noteId: string,
+    measureIdx: number,
+    noteIdx: number,
+    projection: RenderedProjection
+  ) => void;
   /** Pixels per staff space (zoom). Default 10. */
   pxPerSp?: number;
   /**
@@ -89,10 +98,20 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
     pxPerSpY,
     viewBoxSp,
     className: 'mnx-both-svg',
-    onSourceClick: opts.onNoteClick
-      ? sourceId => {
+    onSourceActivate: opts.onNoteClick
+      ? (sourceId, event) => {
           const loc = layout.index.get(sourceId);
-          if (loc) opts.onNoteClick!(sourceId, loc.measureIndex, loc.eventIndex);
+          const target = event.target instanceof Element
+            ? event.target.closest('[data-source-id]')
+            : null;
+          if (loc && target) {
+            opts.onNoteClick!(
+              sourceId,
+              loc.measureIndex,
+              loc.eventIndex,
+              projectionForSourceClass(target.getAttribute('class') ?? '')
+            );
+          }
         }
       : undefined
   });

@@ -28,9 +28,11 @@ import { padDensityFor } from '../engine/layout/verticalDensity.ts';
 import {
   drawCursorGhost,
   drawEnclosure,
+  markProjectionEchoes,
   snapshotEnclosure,
   tweenEnclosure
 } from './enclosure.ts';
+import type { RenderedProjection } from '../engine/render/projection.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
 /** The projections the engine can draw. */
@@ -365,6 +367,15 @@ export class ScoreViewer extends LitElement {
         fill: var(--accent) !important;
       }
 
+      /* Both view: one model selection, two renderings. The projection that
+         owns the input dialect stays full strength; the other remains visible
+         as an echo. From part-measure upward the enclosure is one merged rect,
+         so no child carries this class and the asymmetry resolves itself. */
+      #score-container svg .selected.selection-echo,
+      #score-container svg .enclosure rect.selection-echo {
+        opacity: 0.4;
+      }
+
       /* The selection-ladder enclosure (enclosure.ts): one vocabulary, fill
          fading and border firming as the level widens — cell → slice → beads
          → panel → panel-wide → frame. Behind the ink, never clickable. */
@@ -653,10 +664,15 @@ export class ScoreViewer extends LitElement {
     // there is never a second, disagreeing answer to report.
     let outcome: RenderOutcome | null = null;
 
-    const onNoteClick = (noteId: string, measureIdx: number, noteIdx: number) => {
+    const onNoteClick = (
+      noteId: string,
+      measureIdx: number,
+      noteIdx: number,
+      projection: RenderedProjection
+    ) => {
       this.dispatchEvent(
         new CustomEvent('note-selected', {
-          detail: { noteId, measureIdx, noteIdx },
+          detail: { noteId, measureIdx, noteIdx, projection },
           bubbles: true,
           composed: true
         })
@@ -762,12 +778,20 @@ export class ScoreViewer extends LitElement {
     const enclosed = (pane: HTMLElement, paint: RenderOutcome) => {
       const kind = this.selection?.enclosure;
       const svg = pane.querySelector('svg');
+      const primaryProjection = this.resolvedView() === 'both'
+        ? this.selection?.primaryProjection
+        : null;
+      if (svg) markProjectionEchoes(svg, primaryProjection);
       // The candidate scope, when the host is previewing one: its own dashed
       // layer, drawn from note ids because nothing in the render is tagged
       // for it (the selection has not moved).
       const preview = this.selection?.preview;
       if (preview && svg) {
-        drawEnclosure(svg, preview.enclosure, { preview: true, noteIds: preview.noteIds });
+        drawEnclosure(svg, preview.enclosure, {
+          preview: true,
+          noteIds: preview.noteIds,
+          primaryProjection
+        });
       } else if (svg) {
         svg.querySelector(':scope > g.enclosure-preview')?.remove();
       }
@@ -776,7 +800,8 @@ export class ScoreViewer extends LitElement {
           noteIds: this.selection?.selectedNoteIds,
           span: this.selection?.span,
           systemRows: packedRowMeasures(paint.packings, densityH),
-          staffOrdinals: renderedStaffOrdinals
+          staffOrdinals: renderedStaffOrdinals,
+          primaryProjection
         });
         let cancellation: (() => void) | null = null;
         cancellation = tweenEnclosure(svg, previousEnclosure, () => {

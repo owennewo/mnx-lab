@@ -54,15 +54,31 @@ export interface RenderSvgOptions {
   /** CSS class added to the root <svg>. */
   className?: string;
   /**
-   * Fires when the user clicks any element with a sourceId. Implemented with
-   * event delegation on the root <svg>, so callers don't pay per-element
-   * listener cost.
-   */
+   * Fires when the user activates any element with a sourceId. Delegation
+   * happens on the root <svg>, so callers don't pay per-element listener cost.
+   * Pointer-down is the primary boundary: taking keyboard ownership can
+   * repaint the viewer before the later click reaches the old SVG node. The
+   * click fallback covers keyboard and synthetic activation and is deduped
+   * from an ordinary pointer sequence.
+  */
+  onSourceActivate?: (sourceId: string, event: MouseEvent) => void;
+  /** Legacy click-only bridge. New interactive viewers should prefer
+   * `onSourceActivate`, which survives focus-triggered SVG replacement. */
   onSourceClick?: (sourceId: string, event: MouseEvent) => void;
 }
 
 export function renderSvg(opts: RenderSvgOptions): SVGSVGElement {
-  const { container, primitives, widthSp, heightSp, pxPerSp, viewBoxSp, className, onSourceClick } = opts;
+  const {
+    container,
+    primitives,
+    widthSp,
+    heightSp,
+    pxPerSp,
+    viewBoxSp,
+    className,
+    onSourceActivate,
+    onSourceClick
+  } = opts;
   const pxPerSpY = opts.pxPerSpY ?? pxPerSp;
 
   container.innerHTML = '';
@@ -82,14 +98,34 @@ export function renderSvg(opts: RenderSvgOptions): SVGSVGElement {
     svg.appendChild(emitPrimitive(p, pxPerSp, pxPerSpY));
   }
 
-  if (onSourceClick) {
-    svg.addEventListener('click', e => {
-      const target = e.target;
+  if (onSourceActivate) {
+    let pointerSource: string | null = null;
+    const sourceFrom = (event: Event): string | null => {
+      const target = event.target;
+      if (!(target instanceof Element)) return null;
+      return target.closest('[data-source-id]')?.getAttribute('data-source-id') ?? null;
+    };
+    svg.addEventListener('pointerdown', event => {
+      const sourceId = sourceFrom(event);
+      if (!sourceId) return;
+      pointerSource = sourceId;
+      setTimeout(() => {
+        pointerSource = null;
+      }, 0);
+      onSourceActivate(sourceId, event);
+    });
+    svg.addEventListener('click', event => {
+      const sourceId = sourceFrom(event);
+      if (!sourceId || pointerSource === sourceId) return;
+      onSourceActivate(sourceId, event);
+    });
+  } else if (onSourceClick) {
+    // Preserve the public library face's original click-only behavior.
+    svg.addEventListener('click', event => {
+      const target = event.target;
       if (!(target instanceof Element)) return;
-      const sourced = target.closest('[data-source-id]');
-      if (!sourced) return;
-      const sid = sourced.getAttribute('data-source-id');
-      if (sid) onSourceClick(sid, e);
+      const sourceId = target.closest('[data-source-id]')?.getAttribute('data-source-id');
+      if (sourceId) onSourceClick(sourceId, event);
     });
   }
 

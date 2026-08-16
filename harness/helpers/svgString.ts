@@ -25,7 +25,7 @@ class FakeElement {
   }
 
   addEventListener() {
-    // renderSvg only registers listeners when onSourceClick is passed; inert here.
+    // renderSvg only registers listeners when an activation callback is passed; inert here.
   }
 
   serialize(): string {
