@@ -45,6 +45,14 @@ import { capoOf, midiOfPitch, tuningOf } from './tabStrings.ts';
 // in voice 0 of staff 1 — the entry surface phase 2 defines.
 export type EditOp =
   | {
+      /** One user command over a resolved selection. The children are an
+       * implementation detail of that command: history, undo and provenance
+       * retain this single envelope rather than pretending each member was a
+       * separate gesture. */
+      type: 'batch';
+      ops: EditOp[];
+    }
+  | {
       /** Shift the selected notes (or every note) by a signed semitone count. */
       type: 'transposeSelection';
       semitones: number;
@@ -334,11 +342,15 @@ export type EditOp =
        *  flags — a breath's symbol, a bow's direction — because the marking
        *  IS its object and an empty one would be a different mark. */
       type: 'setMarking';
-      noteKey: string;
+      /** Existing point-edit address. */
+      noteKey?: string;
+      /** Structural address used when a range contains a rest event, which
+       * has no note key to borrow. */
+      event?: EventAddress;
       marking: string;
       attributes?: Record<string, string>;
     }
-  | { type: 'removeMarking'; noteKey: string; marking: string }
+  | { type: 'removeMarking'; noteKey?: string; event?: EventAddress; marking: string }
   | {
       /** A dynamic or direction at a metric position in the part measure. */
       type: 'setPositioned';
@@ -595,6 +607,17 @@ export type MeasureAttribute =
 
 export type MeasureAttributeKind = MeasureAttribute['kind'];
 
+/** A timed event's stable structural address. Voices are numbered per staff,
+ * matching the cursor, selection resolver and canonical note walk. */
+export interface EventAddress {
+  partIndex: number;
+  staffIndex: number;
+  measureIndex: number;
+  voiceIndex: number;
+  eventIndex: number;
+  containerIndex?: number;
+}
+
 /** Where each attribute lives on the global measure. `tempo` is the only
  *  array, which is why removal takes an index. */
 export const MEASURE_ATTRIBUTE_FIELDS: Record<MeasureAttributeKind, string> = {
@@ -669,6 +692,7 @@ function setPitchFromMidi(note: MnxNote, midi: number, fifths = 0, direction: 1 
 
 /** Pure: returns a new document with the op applied; never mutates `doc`. */
 export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
+  if (op.type === 'batch') return op.ops.reduce(applyOp, doc);
   const next = JSON.parse(JSON.stringify(doc)) as MnxStructure;
   switch (op.type) {
     case 'transposeSelection': {
@@ -1287,16 +1311,14 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setMarking': {
-      const located = findKeyedNote(next, op.noteKey);
-      if (!located) return next;
-      const event = located.event;
+      const event = markingEvent(next, op);
+      if (!event) return next;
       ((event.markings ??= {}) as Record<string, unknown>)[op.marking] = { ...(op.attributes ?? {}) };
       return next;
     }
     case 'removeMarking': {
-      const located = findKeyedNote(next, op.noteKey);
-      if (!located) return next;
-      const event = located.event;
+      const event = markingEvent(next, op);
+      if (!event) return next;
       const markings = event.markings as Record<string, unknown> | undefined;
       if (!markings || markings[op.marking] === undefined) return next;
       delete markings[op.marking];
@@ -1838,6 +1860,28 @@ function findKeyedNote(doc: MnxStructure, key: string): LocatedNote | null {
     event: address.event,
     note: address.note
   };
+}
+
+/** Resolve the event-owning side of a marking op. Point edits retain their
+ * note-key address; range edits use the structural event address so rests are
+ * first-class targets instead of silently dropping out of the command. */
+export function eventAtAddress(doc: MnxStructure, address: EventAddress): MnxEvent | null {
+  const sequences = doc.parts?.[address.partIndex]?.measures?.[address.measureIndex]?.sequences ?? [];
+  const sequence = sequences.filter(seq => (seq.staff ?? 1) === address.staffIndex)[address.voiceIndex];
+  const item = sequence?.content?.[address.eventIndex];
+  if (!item) return null;
+  if (address.containerIndex === undefined) return isTimedEvent(item) ? item : null;
+  const content = (item as { content?: unknown[] }).content;
+  const inner = content?.[address.containerIndex] as MnxSequenceItem | undefined;
+  return inner && isTimedEvent(inner) ? inner : null;
+}
+
+function markingEvent(
+  doc: MnxStructure,
+  op: Extract<EditOp, { type: 'setMarking' | 'removeMarking' }>
+): MnxEvent | null {
+  if (op.event) return eventAtAddress(doc, op.event);
+  return op.noteKey ? findKeyedNote(doc, op.noteKey)?.event ?? null : null;
 }
 
 function samePitch(a: MnxNote, b: MnxNote): boolean {

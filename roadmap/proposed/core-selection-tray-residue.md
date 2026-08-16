@@ -104,6 +104,17 @@ has no single answer); **duration dots, capo write, time `display`** → item 4
 `common`/`cut` carried by the time popover's grammar. Both are wired tiles
 now.
 
+## Retired 2026-08-16 — horizontal selection reaches the commands
+
+The ladder's state, gesture and presentation passes retired extension/closure
+reachability and wide-range shaft geometry first. Its command pass then closed
+the four consumers that depended on resolved membership: `mixed` tile reads
+with apply-to-all semantics, live member counts in the meta line, the
+section-range tile and honest whole-part closure command. Multi-member unary
+verbs are one batch op/history entry and keep the selection through apply,
+undo and redo; event articulations use structural addresses, so a selected
+rest is a member rather than an unaddressable hole.
+
 ## Still greyed: the vocabulary tail
 
 | Tray surface | Rung(s) | Blocked by | Unblocked when |
@@ -122,18 +133,13 @@ the ladder's horizontal state, not command vocabulary.
 
 | Tray behavior | Blocked by | Unblocked when |
 |---|---|---|
-| **mixed tile state** (some members carry the mark; click = apply-to-all) | selection is `{level}` + cursor — no range, so "some but not all" is inexpressible | the ladder's refreshed anchor/extent/closure state |
-| **Shift+←→ / Shift+End extension**, **Ctrl+A closure** reachable from the tray | `extend`/`closure` intents do not exist (the strokes are free — reserved by the ladder doc) | the ladder's horizontal-axis pass |
 | **container tab** (tuplet ratio, grace slash, tremolo marks at their true rung) | the cursor now *descends into* containers (item 11b), but `container` is still not a `SelectionLevel` | the container rung, riding the wrap verbs |
-| meta line counts for multi-member selections ("4 events · …") | single-position selection | the same range state |
-| **part-scope bulk/document commands** | the HUD already exposes per-part presentation values; what is missing is honest whole-part membership for commands | Ctrl+A closure at part-measure |
 | clicking a note to move the selection under the tray | `note-selected` still has no consumer — the mouse cannot place the cursor | a click→cursor intent path through the funnel; the ladder's mouse-parity story |
 
 ## Geometry and surface gaps
 
 | Tray behavior | Blocked by | Unblocked when |
 |---|---|---|
-| shaft geometry for selections **wider than the tray** (multi-bar, cross-part) | the design's own open question — no rule drawn | decided at the mechanism's hands-on review once wide selections exist (needs `extent` first) |
 | dashed on-score preview of a **wider** scope than the enclosure can show today (e.g. score frame previewed from a note) | preview rides `SelectionContext.preview` + `drawEnclosure`'s dashed variant — mechanism stage 3 | lands with the mechanism; listed here only until then |
 | public score-rung `↑↓` escalation (`score-navigate`) | workbench rail navigation is built in the mount; only the promoted element event is absent | [core-editor-element-promotion.md](core-editor-element-promotion.md) + viewer event contract |
 | the tray in the **embed / studio** | `elements/` promotion is parked — trigger 2 (a real editing consumer) belongs to studio | [core-editor-element-promotion.md](core-editor-element-promotion.md); scope-only promotion is the recorded interim option |

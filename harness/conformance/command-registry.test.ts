@@ -15,6 +15,7 @@ import {
   COMMANDS,
   commandState,
   commandsForScope,
+  selectionMemberSummary,
   sessionView,
   type EditorCommand
 } from '../../src/edit/commandRegistry.ts';
@@ -327,11 +328,117 @@ describe('command registry — state reads the document', () => {
     expect(commandState(tie, sessionView(session))).toBe('active');
   });
 
-  it('nothing returns mixed yet — the ladder has no range selection', () => {
-    // Recorded as a fact, not an aspiration: when {level, anchor, extent}
-    // lands, this test is the reminder that the fourth tile read wakes up.
-    const v = view();
-    const mixed = COMMANDS.filter(c => c.isActive?.(v) === 'mixed');
-    expect(mixed.map(c => c.id)).toEqual([]);
+  it('a partial range is mixed, applies to all in one undo entry, and keeps the range', () => {
+    const session = new EditorSession(makeDoc());
+    const staccato = find('staccato');
+    session.handleIntent({ type: 'setMarking', marking: 'staccato' });
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    const selection = session.selection;
+
+    expect(commandState(staccato, sessionView(session))).toBe('mixed');
+    expect(selectionMemberSummary(sessionView(session))).toBe('2 notes');
+    expect(staccato.action!(sessionView(session))).toEqual({
+      intent: { type: 'setMarking', marking: 'staccato' }
+    });
+
+    const entries = session.opQueue.applied.length;
+    session.handleIntent({ type: 'setMarking', marking: 'staccato' });
+    expect(session.opQueue.applied).toHaveLength(entries + 1);
+    expect(session.opQueue.applied.at(-1)?.op).toMatchObject({ type: 'batch' });
+    expect(commandState(staccato, sessionView(session))).toBe('active');
+    expect(session.selection).toEqual(selection);
+
+    session.handleIntent({ type: 'undo' });
+    expect(commandState(staccato, sessionView(session))).toBe('mixed');
+    expect(session.selection).toEqual(selection);
+  });
+
+  it('the section and part scope tiles commit structural ranges through intents', () => {
+    const doc = makeDoc();
+    doc.global!.measures![0].section = { label: 'A' };
+    const section = new EditorSession(doc);
+    while (section.selectionLevel !== 'section') {
+      section.handleIntent({ type: 'relaxSelection' });
+    }
+    const sectionRange = find('section-range').action!(sessionView(section));
+    expect(sectionRange).toEqual({ intent: { type: 'selectSectionRange' } });
+    section.handleIntent((sectionRange as { intent: never }).intent);
+    expect(section.selectionLevel).toBe('measure');
+    expect(section.resolvedSelection.members).toHaveLength(2);
+
+    const part = new EditorSession(makeDoc());
+    while (part.selectionLevel !== 'partMeasure') {
+      part.handleIntent({ type: 'relaxSelection' });
+    }
+    const partScope = find('part-scope').action!(sessionView(part));
+    expect(partScope).toEqual({ intent: { type: 'closeSelection' } });
+    part.handleIntent((partScope as { intent: never }).intent);
+    expect(part.selection.extent).toEqual({ kind: 'closure', scope: 'part' });
+  });
+
+  it('bulk event and measure commands include rests and keep one history envelope', () => {
+    const events = new EditorSession(makeDoc());
+    events.handleIntent({ type: 'relaxSelection' });
+    events.handleIntent({ type: 'closeSelection' });
+    const eventSelection = events.selection;
+    expect(events.resolvedSelection.members).toHaveLength(3);
+    expect(events.handleIntent({ type: 'setMarking', marking: 'accent' })).toBe(true);
+    expect(events.opQueue.applied).toHaveLength(1);
+    expect(events.opQueue.applied[0].op).toMatchObject({ type: 'batch' });
+    expect(events.doc.parts?.[0].measures?.[1].sequences?.[0].content[0]).toMatchObject({
+      markings: { accent: {} },
+      rest: {}
+    });
+    expect(events.selection).toEqual(eventSelection);
+
+    const bars = new EditorSession(makeDoc());
+    while (bars.selectionLevel !== 'measure') bars.handleIntent({ type: 'relaxSelection' });
+    bars.handleIntent({
+      type: 'setMeasureAttribute',
+      attribute: { kind: 'repeatEnd' }
+    });
+    bars.handleIntent({ type: 'extendSelection', direction: 'next' });
+    const barSelection = bars.selection;
+    expect(commandState(find('repeat-end'), sessionView(bars))).toBe('mixed');
+    expect(bars.handleIntent({
+      type: 'setMeasureAttribute',
+      attribute: { kind: 'repeatEnd' }
+    })).toBe(true);
+    expect(bars.opQueue.applied).toHaveLength(2);
+    expect(bars.opQueue.applied[1].op).toMatchObject({ type: 'batch' });
+    expect(bars.doc.global?.measures?.map(measure => measure.repeatEnd)).toEqual([{}, {}]);
+    expect(bars.selection).toEqual(barSelection);
+  });
+
+  it('a selected run supplies spanner endpoints while point selection keeps the anchor fallback', () => {
+    const slur = new EditorSession(makeDoc());
+    slur.handleIntent({ type: 'extendSelection', direction: 'next' });
+    const selection = slur.selection;
+    expect(slur.handleIntent({ type: 'toggleSlur' })).toBe(true);
+    expect(slur.opQueue.applied).toHaveLength(1);
+    expect(slur.opQueue.applied[0].op).toMatchObject({
+      type: 'setSlur',
+      fromNoteKey: 'n1',
+      toNoteKey: 'n2'
+    });
+    expect(slur.spanAnchor).toBeNull();
+    expect(slur.selection).toEqual(selection);
+    expect(commandState(find('slur'), sessionView(slur))).toBe('active');
+
+    const beamDoc = makeDoc();
+    const events = beamDoc.parts[0].measures?.[0].sequences?.[0].content ?? [];
+    events.forEach(event => {
+      if ('duration' in event) event.duration = { base: 'eighth' };
+    });
+    const beam = new EditorSession(beamDoc);
+    beam.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(beam.handleIntent({ type: 'toggleBeam' })).toBe(true);
+    expect(beam.opQueue.applied[0].op).toMatchObject({ type: 'setBeam', from: 0, to: 1 });
+    expect(beam.spanAnchor).toBeNull();
+
+    const anchor = new EditorSession(makeDoc());
+    expect(anchor.handleIntent({ type: 'toggleSlur' })).toBe(true);
+    expect(anchor.spanAnchor).toBe('n1');
+    expect(anchor.opQueue.applied).toHaveLength(0);
   });
 });

@@ -15,11 +15,11 @@
 // decided those; this table is where they become something a user can see.
 import type { EditorIntent } from './intents.ts';
 import type { ShellAction } from './keymap.ts';
-import type { SelectionLevel } from './selection.ts';
+import type { ResolvedSelection, SelectionLevel, SelectionMember } from './selection.ts';
 import type { Projection } from './cursor.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { MeasureAttributeKind } from './ops.ts';
-import { hasSlurStartingAt, techniqueAt } from './ops.ts';
+import { eventAtAddress, hasSlurStartingAt, techniqueAt } from './ops.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
 
 /**
@@ -53,10 +53,18 @@ export interface SessionView {
   /** The note key under the cursor, when the cursor sits on ink. */
   readonly noteKey: string | null;
   readonly measureIndex: number;
+  /** Concrete things the current selection resolves to, including rests and
+   * empty structural members that have no overlay key. */
+  readonly members: readonly SelectionMember[];
+  readonly memberCount: number;
+  readonly noteKeys: readonly string[];
   /** Markings on the event under the cursor (`accent`, `staccato`, …). */
   readonly markings: readonly string[];
+  /** Markings per selected note/event member; used for all/none/mixed reads. */
+  readonly memberMarkings: readonly (readonly string[])[];
   /** Bar attributes declared on the cursor's global measure. */
   readonly barAttributes: readonly MeasureAttributeKind[];
+  readonly memberBarAttributes: readonly (readonly MeasureAttributeKind[])[];
   /** Does the note under the cursor start a tie? */
   readonly tied: boolean;
   /** Are there strings to fret — is the tab dialect available at all? */
@@ -76,8 +84,7 @@ export interface EditorCommand {
   projection?: Projection;
   /**
    * Is the thing already on the selection? `true` draws the tile as a remove.
-   * `'mixed'` is reserved for the range selections the ladder cannot express
-   * yet — nothing returns it today (see the residue ledger).
+   * `'mixed'` means some resolved members carry it; firing applies it to all.
    */
   isActive?: (view: SessionView) => boolean | 'mixed';
   /**
@@ -98,6 +105,7 @@ export interface SessionLike {
   readonly selectionLevel: SelectionLevel;
   readonly projection: Projection;
   readonly cursor: { measureIndex: number };
+  readonly resolvedSelection: ResolvedSelection;
   cursorContext(): { anchorKeys: string[]; occupied: boolean };
   readonly mode?: string;
 }
@@ -119,6 +127,7 @@ const BAR_ATTRIBUTE_PROBES: readonly [MeasureAttributeKind, string][] = [
  *  find "the thing under the cursor"; commands just read the result. */
 export function sessionView(session: SessionLike): SessionView {
   const doc = session.doc;
+  const resolved = session.resolvedSelection;
   const context = session.cursorContext();
   const noteKey = context.occupied ? (context.anchorKeys[0] ?? null) : null;
   const address = noteKey ? findNoteAddress(doc, noteKey) : null;
@@ -130,6 +139,29 @@ export function sessionView(session: SessionLike): SessionView {
   const barAttributes = measure
     ? BAR_ATTRIBUTE_PROBES.filter(([, field]) => measure[field] !== undefined).map(([kind]) => kind)
     : [];
+  const members = resolved.members;
+  const selectedMemberMarkings = members.flatMap(member => {
+    const event = member.kind === 'note'
+      ? findNoteAddress(doc, member.noteKey)?.event
+      : member.kind === 'event'
+        ? eventAtAddress(doc, member)
+        : undefined;
+    return event
+      ? [event.markings ? Object.keys(event.markings as Record<string, unknown>) : []]
+      : [];
+  });
+  const selectedMemberBarAttributes = members.flatMap(member => {
+    const index = member.kind === 'measure'
+      ? member.measureIndex
+      : member.kind === 'section'
+        ? member.start
+        : undefined;
+    if (index === undefined) return [];
+    const selected = doc.global?.measures?.[index] as Record<string, unknown> | undefined;
+    return [selected
+      ? BAR_ATTRIBUTE_PROBES.filter(([, field]) => selected[field] !== undefined).map(([kind]) => kind)
+      : []];
+  });
   const ties = address?.note.ties;
   return {
     doc,
@@ -137,11 +169,40 @@ export function sessionView(session: SessionLike): SessionView {
     projection: session.projection,
     noteKey,
     measureIndex,
+    members,
+    memberCount: members.length,
+    noteKeys: resolved.noteKeys,
     markings,
+    memberMarkings: selectedMemberMarkings.length > 0 ? selectedMemberMarkings : [markings],
     barAttributes,
+    memberBarAttributes: selectedMemberBarAttributes.length > 0
+      ? selectedMemberBarAttributes
+      : [barAttributes],
     tied: Array.isArray(ties) && ties.length > 0,
     hasStrings: (doc.parts ?? []).some(part => (part._x?.mnxLab?.strings?.length ?? 0) > 0)
   };
+}
+
+function memberState<T>(members: readonly (readonly T[])[], value: T): boolean | 'mixed' {
+  if (members.length === 0) return false;
+  const active = members.filter(values => values.includes(value)).length;
+  if (active === 0) return false;
+  return active === members.length ? true : 'mixed';
+}
+
+/** Short, selection-honest quantity for the tray meta line. */
+export function selectionMemberSummary(view: SessionView): string {
+  const noun: Record<SelectionLevel, [string, string]> = {
+    note: ['note', 'notes'],
+    event: ['event', 'events'],
+    voiceMeasure: ['voice bar', 'voice bars'],
+    partMeasure: ['part bar', 'part bars'],
+    measure: ['bar', 'bars'],
+    section: ['section', 'sections'],
+    score: ['score', 'scores']
+  };
+  const [one, many] = noun[view.level];
+  return `${view.memberCount} ${view.memberCount === 1 ? one : many}`;
 }
 
 // ── The table ──────────────────────────────────────────────────────────────
@@ -163,9 +224,9 @@ function marking(
     label,
     shortcut: 'Shift+A',
     tier: 'popover',
-    isActive: view => view.markings.includes(markingName),
+    isActive: view => memberState(view.memberMarkings, markingName),
     action: view => ({
-      intent: view.markings.includes(markingName)
+      intent: memberState(view.memberMarkings, markingName) === true
         ? { type: 'removeMarking', marking: markingName }
         : { type: 'setMarking', marking: markingName }
     })
@@ -207,9 +268,9 @@ function barAttribute(
     label,
     shortcut: 'Shift+B',
     tier: 'popover',
-    isActive: view => view.barAttributes.includes(kind),
+    isActive: view => memberState(view.memberBarAttributes, kind),
     action: view => ({
-      intent: view.barAttributes.includes(kind)
+      intent: memberState(view.memberBarAttributes, kind) === true
         ? { type: 'removeMeasureAttribute', kind }
         : make()
     })
@@ -271,7 +332,12 @@ export const COMMANDS: readonly EditorCommand[] = [
     shortcut: 'S',
     tier: 'key',
     projection: 'notation',
-    isActive: view => view.noteKey !== null && hasSlurStartingAt(view.doc, view.noteKey),
+    isActive: view => {
+      const start = view.level === 'note' && view.noteKeys.length > 1
+        ? view.noteKeys[0]
+        : view.noteKey;
+      return start !== null && start !== undefined && hasSlurStartingAt(view.doc, start);
+    },
     action: () => ({ intent: { type: 'toggleSlur' } })
   },
   {
@@ -524,6 +590,15 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ surface: 'partPopover' })
   },
   {
+    id: 'part-scope',
+    scopes: ['partMeasure'],
+    glyph: { smufl: 'brace' },
+    label: 'Select the whole part',
+    shortcut: 'Ctrl+A',
+    tier: 'key',
+    action: () => ({ intent: { type: 'closeSelection' } })
+  },
+  {
     id: 'transpose-part',
     scopes: ['partMeasure'],
     glyph: { smufl: 'ottava' },
@@ -653,7 +728,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     glyph: { smufl: 'barlineDashed' },
     label: 'Select the section’s range',
     tier: 'popover',
-    blockedBy: 'closure'
+    action: () => ({ intent: { type: 'selectSectionRange' } })
   },
 
   // ── score ───────────────────────────────────────────────────────────────

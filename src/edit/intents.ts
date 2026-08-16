@@ -37,6 +37,9 @@ export type NavigationIntent =
    * closure rather than a frozen list of members. */
   | { type: 'extendSelection'; direction: 'previous' | 'next' | 'end' }
   | { type: 'closeSelection' }
+  /** Turn the current derived section into the concrete measure interval it
+   * names, so measure-rung commands can act on that range. */
+  | { type: 'selectSectionRange' }
   /** The active projection: which SPACE the vertical line addresses (string
    *  vs staff position). Recorded so traces replay navigation faithfully. */
   | { type: 'setProjection'; projection: 'notation' | 'tab' }
@@ -186,6 +189,7 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'tightenSelection',
   'extendSelection',
   'closeSelection',
+  'selectSectionRange',
   'setProjection',
   'cycleSlot',
   'setPart',

@@ -64,6 +64,7 @@ import { editorHasKeyboard, keyIsOurs } from './keyScope.ts';
 import {
   commandState,
   commandsForScope,
+  selectionMemberSummary,
   sessionView,
   type CommandScope,
   type EditorCommand
@@ -1837,7 +1838,7 @@ export class ScenarioPage extends LitElement {
       secondary:
         displayKey === GLOBAL_TAB
           ? entry.meta.title
-          : (displayRow?.value ?? ''),
+          : [selectionMemberSummary(view), displayRow?.value ?? ''].filter(Boolean).join(' · '),
       count: `${live} command${live === 1 ? '' : 's'}`
     };
 

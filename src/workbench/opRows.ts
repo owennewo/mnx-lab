@@ -99,6 +99,8 @@ const durationText = (d: { base: string; dots?: number }) => `${d.base}${'·'.re
 
 function opLabel(op: EditOp): string {
   switch (op.type) {
+    case 'batch':
+      return `${op.ops.length} edits · ${op.ops[0] ? opLabel(op.ops[0]) : 'empty'}${op.ops.length > 1 ? ` · +${op.ops.length - 1} more` : ''}`;
     case 'transposeSelection':
       return `transpose ${op.semitones > 0 ? '+' : ''}${op.semitones} (${op.noteIds?.length ?? 'all'} notes)`;
     case 'setFret':
@@ -208,9 +210,9 @@ function opLabel(op: EditOp): string {
     case 'removePartDeclaration':
       return `part: no ${op.kind}`;
     case 'setMarking':
-      return `${op.marking} · ${op.noteKey}`;
+      return `${op.marking} · ${op.noteKey ?? eventAddressText(op.event)}`;
     case 'removeMarking':
-      return `no ${op.marking} · ${op.noteKey}`;
+      return `no ${op.marking} · ${op.noteKey ?? eventAddressText(op.event)}`;
     case 'setPositioned': {
       const where = `@ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
       if (op.attribute.kind === 'dynamic')
@@ -234,6 +236,13 @@ function opLabel(op: EditOp): string {
     case 'removeMeasureRepeat':
       return `no measure repeat @ m${op.measureIndex + 1}`;
   }
+}
+
+function eventAddressText(
+  address: Extract<EditOp, { type: 'setMarking' }>['event']
+): string {
+  if (!address) return 'event';
+  return `p${address.partIndex + 1} s${address.staffIndex} m${address.measureIndex + 1} v${address.voiceIndex + 1} e${address.eventIndex + 1}`;
 }
 
 /** A bar attribute as the popover grammar would have taken it. */

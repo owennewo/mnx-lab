@@ -103,6 +103,19 @@
 > the active edge's system segment (and flips there), rather than anchoring to
 > the bounding box of the whole multi-system range and drifting below it.
 >
+> **Range commands complete 2026-08-16.** Registry reads now aggregate the
+> resolved structural members: articulation and direct bar-attribute tiles
+> report all/none/`mixed`, and mixed fires the apply-to-all intent. The tray's
+> meta line leads with the live member count. Unary note properties,
+> articulations (including rest events), transposition and direct bar
+> attributes execute through one batch `EditOp`, producing one undo/log entry
+> while retaining the concrete range or live closure through apply, undo and
+> redo. The section-range tile turns a derived section into its concrete
+> measure interval; the part-scope tile commits the existing live whole-part
+> closure. Spanners keep the established press–navigate–press anchor for an
+> endpoint outside the selected scope. Focused registry/selection tests pin
+> mixed→active, rest membership, history shape, undo and both scope tiles.
+>
 > Two bugs fell out of building it, both the same shape — **an address
 > re-derived instead of carried**. The selection read its voice off the ink
 > under the cursor, so stepping onto an empty cell repainted the OTHER voice's
@@ -155,8 +168,8 @@
 > ghost cells beyond the existing entry ghosts; the container rung (the cursor
 > descends into containers since element-ops item 11b, but `container` is still
 > not a `SelectionLevel`); Delete's meaning at event, voice-measure,
-> part-measure and section (note, measure and score are rung-first and pinned);
-> range-capable command states/verbs. The entry-mode axis — advance mode, the
+> part-measure and section (note, measure and score are rung-first and pinned).
+> The entry-mode axis — advance mode, the
 > stage-1 digit debounce, the letter accelerator — is the other open half; it
 > shares only the cursor with
 > the ladder and is a candidate to graduate into its own proposal. Builds
@@ -655,11 +668,11 @@ arrow doing nothing beats one doing something arbitrary.
    Hands-on review settled wide selections, and the tray shaft now follows the
    active edge's system segment. Overlay only; primitive/SVG goldens stayed
    byte-identical.
-4. **Next — commands.** Wake registry `mixed`, member counts and the section-range/
-   part-scope tiles. Bulk verbs apply one undoable op/log entry to the resolved
-   membership and preserve the selection; the existing spanner anchor remains
-   for out-of-scope endpoints.
-5. **Container + remaining rung meanings.** Add the container rung using the
+4. **Complete 2026-08-16 — commands.** Registry `mixed`, member counts and the
+   section-range/part-scope tiles are live. Bulk unary verbs apply one batch
+   op/log entry to resolved structural membership and preserve the selection;
+   the existing spanner anchor remains for out-of-scope endpoints.
+5. **Next — container + remaining rung meanings.** Add the container rung using the
    event identity already carried by the grid, then review Delete at event,
    container, voice-measure, part-measure and section one level at a time.
 

@@ -6,7 +6,7 @@
 import type { MnxEvent, MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent } from './intents.ts';
-import type { EditOp, OpLogEntry } from './ops.ts';
+import type { EditOp, EventAddress, OpLogEntry } from './ops.ts';
 import {
   beamRunBetween,
   beamStartingAt,
@@ -51,6 +51,7 @@ import {
   pointSelection,
   relaxLevel,
   resolveSelection,
+  sectionRangeAt,
   sectionStarts,
   tightenLevel,
   type ResolvedSelection,
@@ -243,20 +244,21 @@ export class EditorSession {
       case 'undo': {
         if (!this.history.canUndo) return false;
         this.history.undo();
-        this.reindex();
+        this.reindex(true);
         return true;
       }
       case 'redo': {
         if (!this.history.canRedo) return false;
         this.history.redo();
-        this.reindex();
+        this.reindex(true);
         return true;
       }
       case 'transpose': {
         const keys = this.selectedNoteKeys;
         if (keys.length > 0) {
-          this.apply({ type: 'transposeSelection', semitones: intent.semitones, noteIds: keys });
-          return true;
+          return this.applyBulk([
+            { type: 'transposeSelection', semitones: intent.semitones, noteIds: keys }
+          ]);
         }
         // §8.11's polymorphic verb: on a rest, the vertical axis is
         // `staffPosition` (half-staff-spaces, +up), one step per press.
@@ -271,10 +273,9 @@ export class EditorSession {
         return true;
       }
       case 'respellNote': {
-        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
-        if (!slot) return false;
-        this.apply({ type: 'respellNote', noteId: slot.noteKey });
-        return true;
+        return this.applyBulk(
+          this.selectedNoteKeys.map(noteId => ({ type: 'respellNote', noteId }))
+        );
       }
       case 'toggleTie': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
@@ -476,6 +477,16 @@ export class EditorSession {
       // Spanners (campaign item 10): the first session state beyond the
       // cursor and the entry duration — one nullable note key.
       case 'toggleSlur': {
+        const selected = this.selectionState.level === 'note' ? this.selectedNoteKeys : [];
+        if (selected.length > 1) {
+          const [fromNoteKey, toNoteKey] = [selected[0], selected[selected.length - 1]];
+          this.spanAnchorKey = null;
+          return this.applyBulk([
+            hasSlurStartingAt(this.doc, fromNoteKey)
+              ? { type: 'removeSlur', noteKey: fromNoteKey }
+              : { type: 'setSlur', fromNoteKey, toNoteKey }
+          ]);
+        }
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
         // 1. A slur already starting here? Toggle it off.
@@ -570,39 +581,24 @@ export class EditorSession {
         return true;
       }
       case 'setFingering': {
-        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
-        if (!slot) return false;
-        this.apply({
+        return this.applyBulk(this.selectedNoteKeys.map(noteKey => ({
           type: 'setFingering',
-          noteKey: slot.noteKey,
+          noteKey,
           hand: intent.hand,
           finger: intent.finger
-        });
-        return true;
+        })));
       }
       case 'removeStringAnnotation': {
-        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
-        if (!slot) return false;
-        const before = JSON.stringify(this.doc);
-        this.apply({ type: 'removeStringAnnotation', noteKey: slot.noteKey });
-        if (JSON.stringify(this.doc) === before) {
-          this.history.undo();
-          this.reindex();
-          return false;
-        }
-        return true;
+        return this.applyBulk(this.selectedNoteKeys.map(noteKey => ({
+          type: 'removeStringAnnotation',
+          noteKey
+        })));
       }
       case 'removeFingering': {
-        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
-        if (!slot) return false;
-        const before = JSON.stringify(this.doc);
-        this.apply({ type: 'removeFingering', noteKey: slot.noteKey });
-        if (JSON.stringify(this.doc) === before) {
-          this.history.undo();
-          this.reindex();
-          return false;
-        }
-        return true;
+        return this.applyBulk(this.selectedNoteKeys.map(noteKey => ({
+          type: 'removeFingering',
+          noteKey
+        })));
       }
       case 'setPartDeclaration': {
         if (!this.doc.parts?.[this.cursorState.partIndex ?? 0]) return false;
@@ -641,25 +637,16 @@ export class EditorSession {
       }
       case 'setAccidentalDisplay':
       case 'removeAccidentalDisplay': {
-        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
-        if (!slot) return false;
-        const was = JSON.stringify(this.doc);
-        this.apply(
+        return this.applyBulk(this.selectedNoteKeys.map(noteKey =>
           intent.type === 'setAccidentalDisplay'
             ? {
                 type: 'setAccidentalDisplay',
-                noteKey: slot.noteKey,
+                noteKey,
                 show: intent.show,
                 ...(intent.parenthesized ? { parenthesized: true } : {})
               }
-            : { type: 'removeAccidentalDisplay', noteKey: slot.noteKey }
-        );
-        if (JSON.stringify(this.doc) === was) {
-          this.history.undo();
-          this.reindex();
-          return false;
-        }
-        return true;
+            : { type: 'removeAccidentalDisplay', noteKey }
+        ));
       }
       case 'removeKitNote': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
@@ -710,25 +697,18 @@ export class EditorSession {
       }
       case 'setMarking':
       case 'removeMarking': {
-        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
-        if (!slot) return false;
-        const before = JSON.stringify(this.doc);
-        this.apply(
+        const targets = this.selectedEventAddresses();
+        if (targets.length === 0) return false;
+        return this.applyBulk(targets.map(event =>
           intent.type === 'setMarking'
             ? {
-                type: 'setMarking',
-                noteKey: slot.noteKey,
+                type: 'setMarking' as const,
+                event,
                 marking: intent.marking,
                 ...(intent.attributes ? { attributes: intent.attributes } : {})
               }
-            : { type: 'removeMarking', noteKey: slot.noteKey, marking: intent.marking }
-        );
-        if (JSON.stringify(this.doc) === before) {
-          this.history.undo();
-          this.reindex();
-          return false;
-        }
-        return true;
+            : { type: 'removeMarking' as const, event, marking: intent.marking }
+        ));
       }
       case 'setPositioned': {
         this.apply({
@@ -763,6 +743,27 @@ export class EditorSession {
         return true;
       }
       case 'toggleBeam': {
+        const selected = this.selectionState.level === 'note' ? this.selectedNoteKeys : [];
+        if (selected.length > 1) {
+          const first = selected[0];
+          const existing = beamStartingAt(this.doc, first);
+          if (existing) {
+            this.spanAnchorKey = null;
+            return this.applyBulk([{ type: 'removeBeam', ...existing }]);
+          }
+          const run = beamRunBetween(this.doc, first, selected[selected.length - 1]);
+          if (run) {
+            this.spanAnchorKey = null;
+            return this.applyBulk([{
+              type: 'setBeam',
+              ...run,
+              partIndex: this.cursorState.partIndex ?? 0
+            }]);
+          }
+          // A beam cannot cross a voice or bar. Keep the established anchor
+          // gesture available at the active edge for an endpoint the selected
+          // run cannot express.
+        }
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
         // 1. A beam already starting here? Toggle it off.
@@ -904,27 +905,27 @@ export class EditorSession {
         return true;
       }
       case 'setMeasureAttribute': {
-        this.apply({
+        return this.applyBulk(this.selectedMeasureIndices().map(measureIndex => ({
           type: 'setMeasureAttribute',
-          measureIndex: this.cursorState.measureIndex,
+          measureIndex,
           attribute: intent.attribute
-        });
-        return true;
+        })));
       }
       case 'removeMeasureAttribute': {
         // Refuse when the attribute is not there, rather than queueing an op
         // that changes nothing (the same rule as removeClef).
-        const measure = this.doc.global?.measures?.[this.cursorState.measureIndex] as
-          | Record<string, unknown>
-          | undefined;
         const field = MEASURE_ATTRIBUTE_FIELDS[intent.kind];
-        if (!measure || measure[field] === undefined) return false;
-        this.apply({
-          type: 'removeMeasureAttribute',
-          measureIndex: this.cursorState.measureIndex,
-          kind: intent.kind
+        const ops = this.selectedMeasureIndices().flatMap(measureIndex => {
+          const measure = this.doc.global?.measures?.[measureIndex] as
+            | Record<string, unknown>
+            | undefined;
+          return measure?.[field] === undefined ? [] : [{
+            type: 'removeMeasureAttribute',
+            measureIndex,
+            kind: intent.kind
+          } as const];
         });
-        return true;
+        return this.applyBulk(ops);
       }
       case 'setTuning': {
         this.apply({ type: 'setTuning', tuning: intent.tuning });
@@ -1038,6 +1039,20 @@ export class EditorSession {
           level: this.selectionState.level,
           anchor: copyCursorAddress(before),
           extent: { kind: 'closure', scope }
+        };
+        return true;
+      }
+      case 'selectSectionRange': {
+        if (this.selectionState.level !== 'section') return false;
+        const range = sectionRangeAt(this.doc, before.measureIndex);
+        if (!range || range.end <= range.start) return false;
+        const start = moveToMeasure(this.grid, before, range.start);
+        const end = moveToMeasure(this.grid, before, range.end - 1);
+        this.cursorState = end;
+        this.selectionState = {
+          level: 'measure',
+          anchor: copyCursorAddress(start),
+          extent: { kind: 'cursor', cursor: copyCursorAddress(end) }
         };
         return true;
       }
@@ -1533,34 +1548,69 @@ export class EditorSession {
     this.selectionState = pointSelection(level, this.cursorState);
   }
 
-  private apply(op: EditOp): void {
-    // The note under the cursor before the mutation: if it survives, the
-    // cursor FOLLOWS it. A transpose that crosses a staff line (C#→D moves
-    // the notehead; C→C# does not) must not leave the cursor behind on the
-    // now-empty line — same for a tab re-pitch that lands on another string.
-    const anchor = slotAt(this.grid, this.cursorState, this.activeProjection)?.noteKey ?? null;
+  /** One command over zero or more resolved members. A multi-member command
+   * is one history/log entry, and unlike entry gestures it keeps the range so
+   * the tray can immediately report its new active/mixed state. */
+  private applyBulk(ops: EditOp[]): boolean {
+    if (ops.length === 0) return false;
+    const before = JSON.stringify(this.doc);
+    this.apply(ops.length === 1 ? ops[0] : { type: 'batch', ops }, true);
+    if (JSON.stringify(this.doc) !== before) return true;
+    this.history.undo();
+    this.reindex(true);
+    return false;
+  }
+
+  private selectedEventAddresses(): EventAddress[] {
+    const addresses = this.resolvedSelection.members.flatMap(member => {
+      if (member.kind !== 'note' && member.kind !== 'event') return [];
+      return [{
+        partIndex: member.partIndex,
+        staffIndex: member.staffIndex,
+        measureIndex: member.measureIndex,
+        voiceIndex: member.voiceIndex,
+        eventIndex: member.eventIndex,
+        ...(member.containerIndex === undefined ? {} : { containerIndex: member.containerIndex })
+      }];
+    });
+    const seen = new Set<string>();
+    return addresses.filter(address => {
+      const key = eventAddressKey(address);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  private selectedMeasureIndices(): number[] {
+    const indices = this.resolvedSelection.members.flatMap(member => {
+      if (member.kind === 'measure') return [member.measureIndex];
+      if (member.kind === 'section') return [member.start];
+      return [];
+    });
+    return [...new Set(indices.length > 0 ? indices : [this.cursorState.measureIndex])];
+  }
+
+  private apply(op: EditOp, preserveSelection = false): void {
     this.history.apply(op, this.applyingIntent ?? undefined);
-    this.reindex();
-    if (anchor) {
-      const moved = positionAt(this.grid, this.cursorState)?.slots.find(
-        s => s.noteKey === anchor
-      );
-      if (moved) {
-        const line = this.activeProjection === 'tab' ? moved.line : moved.staffPosition;
-        if (line !== this.cursorState.line) {
-          this.cursorState = { ...this.cursorState, line };
-        }
-      }
+    this.reindex(preserveSelection);
+    if (!preserveSelection) {
+      // Entry and point mutations act at the cursor's note/position, so they
+      // re-anchor there. Bulk property commands retain the range in reindex.
+      this.reanchorSelection('note');
     }
-    // A mutation acts at the cursor's note/position, so it re-anchors the
-    // selection there — typing a fret while a bar is selected must not leave
-    // the whole bar reading as "what you just edited".
-    this.reanchorSelection('note');
   }
 
   /** The grid derives from the document, so every doc change rebuilds it and
    *  re-anchors the cursor (a removed measure must not strand it). */
-  private reindex(): void {
+  private reindex(preserveSelection = false): void {
+    const selection = preserveSelection ? cloneSelection(this.selectionState) : null;
+    const wasPoint = selection?.extent.kind === 'cursor' &&
+      cursorAddressesEqual(selection.anchor, selection.extent.cursor);
+    // The note under the active edge before the mutation: if it survives, the
+    // cursor follows its new line. This applies equally to apply, undo and
+    // redo, which is what lets all three preserve a range honestly.
+    const anchor = slotAt(this.grid, this.cursorState, this.activeProjection)?.noteKey ?? null;
     const partIndex = Math.min(
       this.cursorState.partIndex ?? 0,
       Math.max(0, (this.doc.parts?.length ?? 1) - 1)
@@ -1581,7 +1631,25 @@ export class EditorSession {
       staffIndex
     );
     this.cursorState = clampCursor(this.grid, this.cursorState);
-    this.reanchorSelection();
+    if (anchor) {
+      const moved = positionAt(this.grid, this.cursorState)?.slots.find(
+        slot => slot.noteKey === anchor
+      );
+      if (moved) {
+        const line = this.activeProjection === 'tab' ? moved.line : moved.staffPosition;
+        this.cursorState = { ...this.cursorState, line };
+      }
+    }
+    if (selection) {
+      this.selectionState = wasPoint
+        ? pointSelection(selection.level, this.cursorState)
+        : selection.extent.kind === 'cursor'
+          ? {
+              ...selection,
+              extent: { kind: 'cursor', cursor: copyCursorAddress(this.cursorState) }
+            }
+          : selection;
+    } else this.reanchorSelection();
   }
 
   private selectedNote(): MnxNote | undefined {
@@ -1621,6 +1689,17 @@ function cloneSelection(selection: SelectionState): SelectionState {
 
 function copyCursorAddress(cursor: EditorCursor): EditorCursor {
   return { ...cursor, onset: { ...cursor.onset } };
+}
+
+function eventAddressKey(address: EventAddress): string {
+  return [
+    address.partIndex,
+    address.staffIndex,
+    address.measureIndex,
+    address.voiceIndex,
+    address.eventIndex,
+    address.containerIndex ?? -1
+  ].join(':');
 }
 
 function cursorAddressesEqual(a: EditorCursor, b: EditorCursor): boolean {
