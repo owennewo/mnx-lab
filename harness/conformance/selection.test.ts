@@ -4,6 +4,11 @@
 // unit, and a mutation re-anchors the selection at the note.
 import { describe, it, expect } from 'vitest';
 import { EditorSession } from '../../src/edit/session.ts';
+import {
+  pointSelection,
+  resolveSelection,
+  type SelectionState
+} from '../../src/edit/selection.ts';
 import type {
   MnxNote,
   MnxPartMeasure,
@@ -348,5 +353,129 @@ describe('selection ladder', () => {
     session.handleIntent(relax);
     session.handleIntent(relax);
     expect(session.trace().intents).toEqual([relax, relax]);
+    expect(session.trace().expect.selection).toEqual(session.selection);
+  });
+
+  it('stores a point selection as two cursor edges and follows ordinary navigation', () => {
+    const session = new EditorSession(makeDoc());
+    expect(session.selection).toEqual(pointSelection('note', session.cursor));
+    session.handleIntent({ type: 'nextPosition' });
+    expect(session.selection.anchor).toEqual(session.cursor);
+    expect(session.selection.extent).toEqual({ kind: 'cursor', cursor: session.cursor });
+  });
+
+  it('resolves forward and reversed note ranges to the same ordered membership', () => {
+    const doc = makeDoc();
+    const left = { measureIndex: 0, onset: { num: 0, den: 1 }, line: 1 };
+    const right = { measureIndex: 0, onset: { num: 1, den: 4 }, line: 1 };
+    const forward: SelectionState = {
+      level: 'note',
+      anchor: left,
+      extent: { kind: 'cursor', cursor: right }
+    };
+    const reversed: SelectionState = {
+      level: 'note',
+      anchor: right,
+      extent: { kind: 'cursor', cursor: left }
+    };
+    const a = resolveSelection(doc, forward, 'tab');
+    const b = resolveSelection(doc, reversed, 'tab');
+    expect(a.members).toEqual(b.members);
+    expect(a.noteKeys).toEqual(['n1', 'n2', 'n3']);
+    expect(b.noteKeys).toEqual(a.noteKeys);
+  });
+
+  it('resolves voice closures live across rests, sparse voices and document edits', () => {
+    const doc = makeDoc();
+    const state: SelectionState = {
+      level: 'event',
+      anchor: { measureIndex: 0, onset: { num: 0, den: 1 }, line: 1 },
+      extent: { kind: 'closure', scope: 'voice' }
+    };
+    let resolved = resolveSelection(doc, state, 'tab');
+    expect(resolved.members).toHaveLength(3); // two pitched events + the whole rest
+    expect(resolved.noteKeys).toEqual(['n1', 'n2', 'n3']);
+
+    doc.parts[0].measures![2].sequences = [{
+      content: [{ duration: { base: 'whole' }, notes: [note('n5', 'A', 4, 1)] }]
+    }];
+    resolved = resolveSelection(doc, state, 'tab');
+    expect(resolved.members).toHaveLength(4);
+    expect(resolved.noteKeys).toEqual(['n1', 'n2', 'n3', 'n5']);
+
+    const sparse: SelectionState = {
+      level: 'event',
+      anchor: { measureIndex: 0, onset: { num: 0, den: 1 }, line: 3, voiceIndex: 1 },
+      extent: { kind: 'closure', scope: 'voice' }
+    };
+    expect(resolveSelection(doc, sparse, 'tab').noteKeys).toEqual(['n4']);
+  });
+
+  it('keeps container children as distinct structural event members', () => {
+    const state: SelectionState = {
+      level: 'event',
+      anchor: { measureIndex: 0, onset: { num: 0, den: 1 }, line: 1 },
+      extent: { kind: 'closure', scope: 'voice' }
+    };
+    const resolved = resolveSelection(containerDoc(), state, 'tab');
+    expect(resolved.members).toHaveLength(3);
+    expect(resolved.members.map(member => member.kind === 'event' ? member.containerIndex : null))
+      .toEqual([0, 1, undefined]);
+    expect(resolved.noteKeys).toEqual(['inside-1', 'inside-2', 'outside']);
+  });
+
+  it('represents empty multi-staff bar copies structurally while global ink crosses parts', () => {
+    const doc = ensembleDoc();
+    doc.global!.measures!.push({});
+    const partClosure: SelectionState = {
+      level: 'partMeasure',
+      anchor: {
+        measureIndex: 0,
+        onset: { num: 0, den: 1 },
+        line: 0,
+        partIndex: 1
+      },
+      extent: { kind: 'closure', scope: 'part' }
+    };
+    const part = resolveSelection(doc, partClosure, 'notation');
+    expect(part.members).toHaveLength(4); // two staves × two bars, including both empty copies
+    expect(part.noteKeys.sort()).toEqual(['left', 'right']);
+
+    const timeline: SelectionState = {
+      level: 'measure',
+      anchor: { measureIndex: 0, onset: { num: 0, den: 1 }, line: 0 },
+      extent: { kind: 'closure', scope: 'timeline' }
+    };
+    const global = resolveSelection(doc, timeline, 'notation');
+    expect(global.members).toEqual([
+      { kind: 'measure', measureIndex: 0 },
+      { kind: 'measure', measureIndex: 1 }
+    ]);
+    expect(global.noteKeys.sort()).toEqual(['lead', 'left', 'right']);
+  });
+
+  it('clamps a removed concrete range endpoint to the last surviving member', () => {
+    const doc = makeDoc();
+    const state: SelectionState = {
+      level: 'note',
+      anchor: { measureIndex: 0, onset: { num: 0, den: 1 }, line: 1 },
+      extent: {
+        kind: 'cursor',
+        cursor: { measureIndex: 0, onset: { num: 1, den: 4 }, line: 1 }
+      }
+    };
+    doc.parts[0].measures![0].sequences![0].content[1] = {
+      duration: { base: 'quarter' },
+      rest: {}
+    };
+    expect(resolveSelection(doc, state, 'tab').noteKeys).toEqual(['n1', 'n2']);
+  });
+
+  it('keeps point membership invariant when the active projection changes', () => {
+    const session = new EditorSession(makeDoc());
+    const before = session.selectedNoteKeys;
+    expect(session.handleIntent({ type: 'setProjection', projection: 'notation' })).toBe(true);
+    expect(session.selectedNoteKeys).toEqual(before);
+    expect(session.selection.anchor).toEqual(session.cursor);
   });
 });

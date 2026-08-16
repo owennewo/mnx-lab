@@ -240,9 +240,11 @@ proposals that name their campaign.
   2026-08-15; address/footprint consistency pass 2026-08-16** — every rung now has
   bare/Ctrl meanings, container children keep their event identity, global scopes cover
   every part/staff, Delete is rung-first, and the HUD follows the addressed part/staff.
-  **Next:** the specified anchor/extent/closure state, then range-capable command states;
-  relax/tighten animation, primary/echo asymmetry, wider ghosts and the container rung
-  remain behind it.
+  The **horizontal state foundation completed 2026-08-16**: sessions now carry
+  anchor/extent/closure state, a rung-aware live resolver exposes structural members plus
+  note/kit keys (including rests and empty bar copies), and traces assert final selection.
+  **Next:** gesture intents and Shift/Ctrl+A bindings, then range presentation and commands;
+  relax/tighten animation, primary/echo asymmetry, wider ghosts and the container rung remain.
 
 ### complete/
 - **[core-vertical-density.md](complete/core-vertical-density.md)** — **systems per page

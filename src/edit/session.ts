@@ -45,10 +45,13 @@ import { capoOf, defaultStringFor, tuningOf } from './tabStrings.ts';
 import { clefAt, keyFifthsAt, pitchAtStaffPosition } from './staffSpace.ts';
 import {
   presentLevels,
+  pointSelection,
   relaxLevel,
+  resolveSelection,
   sectionStarts,
-  selectionNoteKeys,
   tightenLevel,
+  type ResolvedSelection,
+  type SelectionState,
   type SelectionLevel
 } from './selection.ts';
 
@@ -61,6 +64,7 @@ export interface TraceFixture {
   expect: {
     doc: MnxStructure;
     cursor: EditorCursor;
+    selection: SelectionState;
   };
 }
 
@@ -101,11 +105,10 @@ export class EditorSession {
   /** The intent currently being handled — stamped into history entries by
    *  apply() as the op queue's provenance (forward-recorded at apply time). */
   private applyingIntent: EditorIntent | null = null;
-  /** The selection ladder rung (roadmap/inprogress/core-selection-ladder.md). The
-   *  cursor is the anchor; the level says how much around it is selected.
-   *  Relaxing never moves the cursor, so tighten re-resolves the same
-   *  measure/onset/line as relative addresses — the implicit breadcrumb. */
-  private level: SelectionLevel = 'note';
+  /** The selection ladder's durable address. Until range gestures land, every
+   *  ordinary navigation re-anchors both concrete edges at the cursor; the
+   *  resolver already supports reversed intervals and live closures. */
+  private selectionState!: SelectionState;
   /** Which SPACE the cursor's line addresses (selection-ladder map): the
    *  fingerboard on tab documents by default, else the staff. */
   private activeProjection: Projection;
@@ -122,6 +125,7 @@ export class EditorSession {
     this.history = new EditHistory(this.initial);
     this.grid = buildGrid(this.initial, 0);
     this.cursorState = initialCursor(this.grid);
+    this.selectionState = pointSelection('note', this.cursorState);
     this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
   }
 
@@ -179,7 +183,15 @@ export class EditorSession {
   }
 
   get selectionLevel(): SelectionLevel {
-    return this.level;
+    return this.selectionState.level;
+  }
+
+  get selection(): SelectionState {
+    return cloneSelection(this.selectionState);
+  }
+
+  get resolvedSelection(): ResolvedSelection {
+    return resolveSelection(this.doc, this.selectionState, this.activeProjection);
   }
 
   get projection(): Projection {
@@ -189,7 +201,7 @@ export class EditorSession {
   /** Selection keys for the highlight overlay: the current rung's footprint —
    *  each level paints exactly the notes its operations can affect. */
   get selectedNoteKeys(): string[] {
-    return selectionNoteKeys(this.doc, this.grid, this.cursorState, this.level, this.activeProjection);
+    return this.resolvedSelection.noteKeys;
   }
 
   /** The cursor's cell for the overlay's ghost: whether it is occupied, its
@@ -297,7 +309,7 @@ export class EditorSession {
         // Delete belongs to the selected RUNG, not whatever ink happens to be
         // under the cursor. Checking the slot first made Del at measure/score
         // silently remove one note while the enclosure claimed a container.
-        if (this.level === 'note') {
+        if (this.selectionState.level === 'note') {
           const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
           if (!slot) return false;
           this.apply(
@@ -311,7 +323,7 @@ export class EditorSession {
         // be removed only when it holds no ink — Del at the measure rung
         // removes the empty bar, at the score rung the empty part (then the
         // trailing empty bars), and the hollowed skeleton dissolves to {}.
-        if (this.level === 'measure') {
+        if (this.selectionState.level === 'measure') {
           const measureIndex = this.cursorState.measureIndex;
           if (
             !this.doc.global?.measures?.[measureIndex] ||
@@ -321,7 +333,7 @@ export class EditorSession {
           this.apply({ type: 'removeMeasure', measureIndex });
           return true;
         }
-        if (this.level === 'score') {
+        if (this.selectionState.level === 'score') {
           const partIndex = this.cursorState.partIndex ?? 0;
           const part = this.doc.parts?.[partIndex];
           if (part && !partHasInk(part)) {
@@ -940,7 +952,8 @@ export class EditorSession {
       intents: this.intentLog,
       expect: {
         doc: JSON.parse(JSON.stringify(this.doc)) as MnxStructure,
-        cursor: { ...this.cursorState, onset: { ...this.cursorState.onset } }
+        cursor: { ...this.cursorState, onset: { ...this.cursorState.onset } },
+        selection: this.selection
       }
     };
   }
@@ -1012,18 +1025,24 @@ export class EditorSession {
           this.spanAnchorKey = null;
           return true;
         }
-        const next = relaxLevel(presentLevels(this.doc, this.grid, before, this.activeProjection), this.level);
+        const next = relaxLevel(
+          presentLevels(this.doc, this.grid, before, this.activeProjection),
+          this.selectionState.level
+        );
         if (!next) return false; // at the top — the mount deselects
-        this.level = next;
+        this.selectionState = { ...this.selectionState, level: next };
         return true;
       }
       case 'tightenSelection': {
-        const next = tightenLevel(presentLevels(this.doc, this.grid, before, this.activeProjection), this.level);
+        const next = tightenLevel(
+          presentLevels(this.doc, this.grid, before, this.activeProjection),
+          this.selectionState.level
+        );
         if (next) {
-          this.level = next;
+          this.selectionState = { ...this.selectionState, level: next };
           return true;
         }
-        if (this.level === 'note') return false; // the bottom — Enter's input job, later
+        if (this.selectionState.level === 'note') return false; // the bottom — Enter's input job, later
         // The breadcrumb (the carried line) didn't resolve to a note —
         // moving while relaxed left it pointing at an empty cell. Descend to
         // the NEAREST child instead of refusing (the corresponding-child
@@ -1048,7 +1067,7 @@ export class EditorSession {
             best = slot;
         }
         this.cursorState = { ...before, line: tab ? best.line : best.staffPosition };
-        this.level = 'note';
+        this.reanchorSelection('note');
         return true;
       }
       // Bare arrows move by the rung's unit: positions at note/event, bars at
@@ -1075,15 +1094,19 @@ export class EditorSession {
       case 'lineDown':
       case 'lineUp': {
         const delta = intent.type === 'lineDown' ? 1 : -1;
-        switch (this.level) {
+        switch (this.selectionState.level) {
           case 'note':
             this.cursorState = moveLine(this.grid, before, delta, this.activeProjection);
             break;
           case 'event':
           case 'voiceMeasure':
-            return this.stepVoice(before, delta);
+            if (!this.stepVoice(before, delta)) return false;
+            this.reanchorSelection();
+            return true;
           case 'partMeasure':
-            return this.stepStaff(before, delta);
+            if (!this.stepStaff(before, delta)) return false;
+            this.reanchorSelection();
+            return true;
           default:
             return false; // section: unbound (no honest referent); measure/score: the mount's
         }
@@ -1101,6 +1124,7 @@ export class EditorSession {
         this.grid = buildGrid(this.doc, intent.partIndex, 1);
         this.cursorState = { ...initialCursor(this.grid), partIndex: intent.partIndex };
         this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
+        this.reanchorSelection();
         return true;
       }
       case 'setStaff': {
@@ -1115,12 +1139,14 @@ export class EditorSession {
           staffIndex: intent.staffIndex
         };
         this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
+        this.reanchorSelection();
         return true;
       }
       case 'cycleSlot': {
         const next = cycleSlot(this.grid, before, this.activeProjection);
         if (next === before) return false; // nothing coincident to step to
         this.cursorState = next;
+        this.reanchorSelection();
         return true;
       }
       case 'setProjection': {
@@ -1140,6 +1166,7 @@ export class EditorSession {
               ? selected?.line ?? 1
               : selected?.staffPosition ?? 0
         };
+        this.reanchorSelection();
         return true;
       }
       // The Ctrl climb (selection-ladder map): ←→ = bar jump in BOTH
@@ -1155,7 +1182,7 @@ export class EditorSession {
         // means something else is the bar; from voice-measure up the bar step
         // is the rung's OWN move, so the climb continues to the section (dead
         // in a document that declares none — the boundary, not a bug).
-        switch (this.level) {
+        switch (this.selectionState.level) {
           case 'note':
           case 'event':
             this.cursorState = moveMeasure(this.grid, before, delta);
@@ -1177,23 +1204,29 @@ export class EditorSession {
         // from event and voice-measure (whose own ↑↓ is already the voice
         // step), and at part-measure the system — which the mount resolves,
         // exactly as it does the measure rung's bare ↑↓.
-        switch (this.level) {
+        switch (this.selectionState.level) {
           case 'note':
-            return this.stepVoice(before, delta);
+            if (!this.stepVoice(before, delta)) return false;
+            this.reanchorSelection();
+            return true;
           case 'event':
           case 'voiceMeasure':
-            return this.stepStaff(before, delta);
+            if (!this.stepStaff(before, delta)) return false;
+            this.reanchorSelection();
+            return true;
           default:
             return false;
         }
       }
     }
-    return this.cursorState !== before;
+    const changed = this.cursorState !== before;
+    if (changed) this.reanchorSelection();
+    return changed;
   }
 
   /** One step of horizontal movement in the current rung's unit. */
   private moveHorizontal(before: EditorCursor, delta: 1 | -1): EditorCursor {
-    switch (this.level) {
+    switch (this.selectionState.level) {
       case 'note':
         // The note row of the navigation map: tab walks the full grid (space,
         // string-sticky); notation walks this voice's ink, landing on the
@@ -1319,6 +1352,13 @@ export class EditorSession {
     return true;
   }
 
+  /** Point selections follow ordinary navigation. Range gestures will move
+   * only the active extent; until those intents exist, every cursor move is a
+   * conventional collapse/re-anchor at the current rung. */
+  private reanchorSelection(level: SelectionLevel = this.selectionState.level): void {
+    this.selectionState = pointSelection(level, this.cursorState);
+  }
+
   private apply(op: EditOp): void {
     // The note under the cursor before the mutation: if it survives, the
     // cursor FOLLOWS it. A transpose that crosses a staff line (C#→D moves
@@ -1341,7 +1381,7 @@ export class EditorSession {
     // A mutation acts at the cursor's note/position, so it re-anchors the
     // selection there — typing a fret while a bar is selected must not leave
     // the whole bar reading as "what you just edited".
-    this.level = 'note';
+    this.reanchorSelection('note');
   }
 
   /** The grid derives from the document, so every doc change rebuilds it and
@@ -1367,6 +1407,7 @@ export class EditorSession {
       staffIndex
     );
     this.cursorState = clampCursor(this.grid, this.cursorState);
+    this.reanchorSelection();
   }
 
   private selectedNote(): MnxNote | undefined {
@@ -1389,6 +1430,19 @@ export class EditorSession {
   private eventUnderCursor(): MnxEvent | undefined {
     return eventAtCursor(this.doc, this.grid, this.cursorState, this.activeProjection);
   }
+}
+
+function cloneSelection(selection: SelectionState): SelectionState {
+  return {
+    level: selection.level,
+    anchor: { ...selection.anchor, onset: { ...selection.anchor.onset } },
+    extent: selection.extent.kind === 'cursor'
+      ? {
+          kind: 'cursor',
+          cursor: { ...selection.extent.cursor, onset: { ...selection.extent.cursor.onset } }
+        }
+      : { ...selection.extent }
+  };
 }
 
 /** The slot line nearest `line` in the active space — ties break UPWARD

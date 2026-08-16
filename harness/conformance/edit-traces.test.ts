@@ -67,6 +67,7 @@ describe(`edit traces${UPDATE ? ' (UPDATING)' : ''}`, () => {
         expect(fixture.expect, `${file} has no expectations — run npm run update:edit-traces`).toBeTruthy();
         expect(session.doc).toEqual(fixture.expect.doc);
         expect(session.cursor).toEqual(fixture.expect.cursor);
+        expect(session.selection).toEqual(fixture.expect.selection);
       }
 
       // Both modes: the invariants hold for freshly-written fixtures too.

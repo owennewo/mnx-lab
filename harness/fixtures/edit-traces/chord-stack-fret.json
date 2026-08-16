@@ -205,6 +205,28 @@
         "den": 1
       },
       "line": 2
+    },
+    "selection": {
+      "level": "note",
+      "anchor": {
+        "measureIndex": 0,
+        "onset": {
+          "num": 0,
+          "den": 1
+        },
+        "line": 2
+      },
+      "extent": {
+        "kind": "cursor",
+        "cursor": {
+          "measureIndex": 0,
+          "onset": {
+            "num": 0,
+            "den": 1
+          },
+          "line": 2
+        }
+      }
     }
   }
 }

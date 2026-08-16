@@ -68,6 +68,18 @@
 > not `parts[0]`. The HUD reads and marks that same part/staff. Focused
 > selection/navigation/edit-op/registry tests pin the join.
 >
+> **Horizontal state foundation complete 2026-08-16.** `EditorSession` now
+> owns the specified `SelectionState`; a point is represented by equal cursor
+> edges and ordinary navigation keeps the session cursor as the active edge.
+> The DOM-free resolver evaluates concrete intervals and live closures afresh
+> against the document, returning typed structural members alongside canonical
+> note/kit keys. Rests and empty multi-staff bar copies therefore remain honest
+> members without fake ink ids. Reversal, sparse voices, container children,
+> multi-part/staff scope, edits, endpoint clamping and projection invariance are
+> pinned in the focused selection suite, and edit-trace fixtures now assert the
+> final selection state beside document and cursor. No new binding landed in
+> this slice: **gestures as data are next**.
+>
 > Two bugs fell out of building it, both the same shape — **an address
 > re-derived instead of carried**. The selection read its voice off the ink
 > under the cursor, so stepping onto an empty cell repainted the OTHER voice's
@@ -608,13 +620,10 @@ arrow doing nothing beats one doing something arbitrary.
 
 ## Remaining implementation sequence
 
-1. **State + membership resolver.** Add `SelectionState`, make the current
-   cursor the active edge, resolve concrete ranges/closures at each rung, and
-   expose both structural members and note/kit keys. The structural half is
-   required because rests and empty bar copies are selectable but have no note
-   key to paint. Pin reversal, sparse voices, containers, multi-staff parts,
-   document edits and final trace state before binding keys.
-2. **Gestures as data.** Add `extendSelection` (direction/end) and
+1. **Complete 2026-08-16 — state + membership resolver.** `SelectionState`,
+   active-edge point synchronization, concrete range/live-closure resolution,
+   structural members, note/kit keys and final trace state are built and pinned.
+2. **Next — gestures as data.** Add `extendSelection` (direction/end) and
    `closeSelection` intents; bind Shift+←→, Shift+End, Ctrl+A and Meta+A; extend
    `KEY_DOCS` and its joins. Mouse drag/click parity uses the same intents — no
    second selection path.

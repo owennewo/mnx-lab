@@ -186,6 +186,28 @@
         "den": 1
       },
       "line": 6
+    },
+    "selection": {
+      "level": "note",
+      "anchor": {
+        "measureIndex": 1,
+        "onset": {
+          "num": 0,
+          "den": 1
+        },
+        "line": 6
+      },
+      "extent": {
+        "kind": "cursor",
+        "cursor": {
+          "measureIndex": 1,
+          "onset": {
+            "num": 0,
+            "den": 1
+          },
+          "line": 6
+        }
+      }
     }
   }
 }
