@@ -809,10 +809,16 @@ export class ScoreViewer extends LitElement {
           this.emitSelectionAnchor();
         });
         this.cancelEnclosureTween = cancellation;
-        // The ghost cell: the cursor's own cell when empty (note level only —
-        // wider rungs select what exists, the ghost is an entry affordance).
+        // The ghost cell: the cursor's own cell when empty. A measureless part
+        // is the one structural exception — it receives a panel-shaped vacancy
+        // because a note cannot exist until the first bar does.
         const ghost = this.selection?.cursor;
-        if (kind === 'cell' && ghost) drawCursorGhost(svg, ghost);
+        if ((kind === 'cell' || ghost?.structuralEmpty) && ghost) {
+          drawCursorGhost(svg, ghost, {
+            systemRows: packedRowMeasures(paint.packings, densityH),
+            staffOrdinals: renderedStaffOrdinals
+          });
+        }
         if (!this.fontRedrawQueued && !document.fonts.check('4px Bravura')) {
           this.fontRedrawQueued = true;
           void document.fonts.ready.then(() => this.renderScore());

@@ -29,6 +29,10 @@ import {
   isEchoProjection,
   type RenderedProjection
 } from '../engine/render/projection.ts';
+import {
+  emptyPartGhostRect,
+  measurePositionX
+} from '../engine/render/selectionGeometry.ts';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -278,6 +282,8 @@ export interface EnclosureOptions {
    * fragments on the other projection are tagged as the quiet echo. */
   primaryProjection?: RenderedProjection | null;
 }
+
+export type CursorGhostOptions = Pick<EnclosureOptions, 'systemRows' | 'staffOrdinals'>;
 
 export interface EnclosureSnapshot {
   kind: EnclosureKind;
@@ -590,10 +596,12 @@ export function drawEnclosure(
             // intermediate silence; with no ink they also represent a point
             // selection on a rest.
             if (isRange || cellBoxes.length === 0) {
-              const width = cell.right - cell.left;
-              const inset = Math.min(1.2 * sp, width * 0.18);
-              const usable = Math.max(0, width - 2 * inset);
-              const x = cell.left + inset + usable * (unit.position ?? 0);
+              const x = measurePositionX(
+                cell.left,
+                cell.right,
+                unit.position ?? 0,
+                sp
+              );
               ranges.push({ left: x - 0.4 * sp, right: x + 0.4 * sp });
             }
           } else if (kind === 'run') {
@@ -872,30 +880,73 @@ function previewGlyphs(
  * The cursor's GHOST CELL: a hollow dashed square at an empty (line × beat)
  * cell — the visual for "a place for a thing" (selection addresses what is;
  * the cursor may address what could be). Solid cells come from the selection
- * footprint; this draws only when the cursor's own cell is unoccupied. The
- * column is located from `anchorKeys` (any voice's ink at the cursor's
- * beat); with no ink anywhere at the beat there is nothing to anchor to and
- * the ghost is skipped (known gap: fully empty columns).
+ * footprint; this draws only when the cursor's own cell is unoccupied. A
+ * note/fret at the same moment is the exact column anchor. When the moment
+ * has no ink anywhere, the cursor's structural address falls back to the same
+ * packed-row + bar-cell geometry used by rest-only range endpoints.
  */
-export function drawCursorGhost(svg: SVGSVGElement, ghost: CursorGhost): void {
+export function drawCursorGhost(
+  svg: SVGSVGElement,
+  ghost: CursorGhost,
+  options: CursorGhostOptions = {}
+): void {
   svg.querySelector(':scope > g.cursor-ghost')?.remove();
+  const sp = unitsPerSp(svg);
+
+  if (ghost.structuralEmpty === 'part-measure') {
+    const view = svg.viewBox.baseVal;
+    const box = emptyPartGhostRect(
+      { x: view.x, y: view.y, width: view.width, height: view.height },
+      sp
+    );
+    const group = document.createElementNS(SVG_NS, 'g');
+    group.setAttribute('class', 'cursor-ghost cursor-ghost-panel');
+    const panel = document.createElementNS(SVG_NS, 'rect');
+    panel.dataset.ghostScope = 'part-measure';
+    panel.setAttribute('x', String(box.x));
+    panel.setAttribute('y', String(box.y));
+    panel.setAttribute('width', String(box.width));
+    panel.setAttribute('height', String(box.height));
+    panel.setAttribute('rx', String(0.5 * sp));
+    panel.setAttribute('stroke-width', String(0.12 * sp));
+    panel.setAttribute('stroke-dasharray', `${0.5 * sp} ${0.35 * sp}`);
+    group.appendChild(panel);
+    svg.appendChild(group);
+    return;
+  }
   if (ghost.occupied) return;
 
-  const sp = unitsPerSp(svg);
   const barlines = collectBarlines(svg);
   const staves = assignSystems(collectStaves(svg, sp), barlines);
   if (staves.length === 0) return;
 
-  // Tab bands: those with a fret number registered inside them (baseline y).
-  const fretYs = [...svg.querySelectorAll<SVGTextElement>('text.fret-number, text.fret-number.selected')].map(
-    el => (el.y.baseVal.numberOfItems > 0 ? el.y.baseVal.getItem(0).value : NaN)
-  );
+  const markerYs = [
+    ...svg.querySelectorAll<SVGTextElement>('text.tab-clef, text.fret-number')
+  ].map(el => (el.y.baseVal.numberOfItems > 0 ? el.y.baseVal.getItem(0).value : NaN));
   const isTabBand = (band: StaffBand) =>
-    fretYs.some(y => y >= band.top - sp && y <= band.bottom + sp);
-  const band =
-    ghost.string !== null
-      ? staves.find(isTabBand) ?? staves[staves.length - 1]
-      : staves.find(s => !isTabBand(s)) ?? staves[0];
+    markerYs.some(y => y >= band.top - sp && y <= band.bottom + sp);
+
+  const systems = collectSystemBands(staves);
+  const rows = options.systemRows ?? [];
+  const measureIndex = ghost.measureIndex ?? -1;
+  const rowIndex = rows.findIndex(row => row.includes(measureIndex));
+  const system = systems[rowIndex] ?? systems[0];
+  if (!system) return;
+
+  const unit: SelectionSpanUnit = {
+    measureIndex,
+    ...(ghost.partIndex === undefined ? {} : { partIndex: ghost.partIndex }),
+    ...(ghost.staffIndex === undefined ? {} : { staffIndex: ghost.staffIndex })
+  };
+  const mapped = (options.staffOrdinals?.(unit) ?? [])
+    .map(ordinal => system.staffIndices[ordinal])
+    .filter((index): index is number => index !== undefined);
+  const pool = (mapped.length > 0 ? mapped : system.staffIndices).filter(index =>
+    ghost.string !== null ? isTabBand(staves[index]) : !isTabBand(staves[index])
+  );
+  const bandIndex = pool[0] ?? mapped[0] ?? system.staffIndices[0];
+  const band = staves[bandIndex];
+  if (!band) return;
 
   // Line spacing within the band (tab and notation staves may differ).
   const lineYs = [...svg.querySelectorAll<SVGLineElement>('line.staff-line')]
@@ -918,11 +969,31 @@ export function drawCursorGhost(svg: SVGSVGElement, ghost: CursorGhost): void {
 
   let x: number | null = null;
   for (const key of ghost.anchorKeys) {
-    const el = svg.querySelector<SVGGraphicsElement>(`[data-source-id="${CSS.escape(key)}"]`);
+    const candidates = [
+      ...svg.querySelectorAll<SVGGraphicsElement>(`[data-source-id="${CSS.escape(key)}"]`)
+    ];
+    const el = candidates.find(candidate =>
+      ghost.string !== null
+        ? candidate.classList.contains('fret-number')
+        : candidate.classList.contains('notehead')
+    );
     if (!el) continue;
     const b = el.getBBox();
     x = b.x + b.width / 2;
     break;
+  }
+  if (x === null && rowIndex >= 0) {
+    const rowMeasures = rows[rowIndex];
+    const measureOffset = rowMeasures.indexOf(measureIndex);
+    if (measureOffset >= 0) {
+      const boundaries = measureBoundaries(system, barlines, rowMeasures.length, sp);
+      x = measurePositionX(
+        boundaries[measureOffset],
+        boundaries[measureOffset + 1],
+        ghost.position ?? 0,
+        sp
+      );
+    }
   }
   if (x === null) return;
 

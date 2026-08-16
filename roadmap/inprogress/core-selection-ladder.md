@@ -143,9 +143,10 @@
 > projections per the review's first verdict, voice jump vertically; other
 > rungs keep the legacy bar jump until their own pass); the entry toggle (Space →
 > `toggleNote` → `insertPitchNote` op, voice-0 entry surface, key-default
-> spelling) and the hollow dashed **ghost cell** overlay
-> (`drawCursorGhost`; known gap: columns with no ink anywhere can't anchor
-> an x). Pinned by `harness/conformance/navigation.test.ts`. NOT in this
+> spelling) and the hollow dashed **ghost cell** overlay (`drawCursorGhost`).
+> Generalized silent-column and structural ghosts closed its original ink-
+> anchor limitation on 2026-08-16; see the completion note below. Pinned by
+> `harness/conformance/navigation.test.ts`. NOT in this
 > slice: advance mode + the stage-1 digit debounce, the letter accelerator
 > layer, event level and above.
 >
@@ -202,11 +203,25 @@
 > projections, the two→one part-measure merge, the one→two tightening tween
 > and clean settling without console errors.
 >
-> **What remains**: ghost cells beyond the existing entry ghosts.
-> The entry-mode axis — advance mode, the
+> **Generalized ghosts complete 2026-08-16.** A ghost is now placed from the
+> cursor's structural address, not only from coincident rendered ink. Silent
+> and rest-only moments therefore use the same packed system row, measure-cell
+> boundaries and inset onset geometry as structural range endpoints; the
+> cursor's part/staff address and active projection choose the correct rendered
+> band in notation, tab and both views. The earlier construct-op finding is
+> closed one level up as well: a part with no measures receives one larger
+> dashed vacancy — a place for a bar — and materializing its first measure
+> returns to the ordinary cell ghost. Both remain cursor-only potential
+> addresses: neither becomes a selection member or projection echo. Pure
+> geometry tests pin the fallback, and hands-on review covered a rest-only bar,
+> both projections across wrapped systems, the measureless-part panel and its
+> first-measure transition without console errors. The overlay remains corpus-
+> neutral, so no renderer golden changes.
+>
+> **The selection ladder is complete.** The entry-mode axis — advance mode, the
 > stage-1 digit debounce, the letter accelerator — is the other open half; it
-> shares only the cursor with
-> the ladder and is a candidate to graduate into its own proposal. Builds
+> shares only the cursor with the ladder and should graduate into its own
+> proposal before implementation. Builds
 > directly on the complete
 > input layer ([core-editor-input-layer.md](../complete/core-editor-input-layer.md)), which
 > already decided the load-bearing substrate: the cursor is a **rhythmic
@@ -420,14 +435,15 @@ also exposed: the same chord can be ambiguous in tab (two members derived onto
 one string) and perfectly addressable in notation, so the fix has to name which
 projection's address it fixes.
 
-**A measureless part draws nothing** — observed 2026-08-12 walking a construct
+**A measureless part drew nothing — closed 2026-08-16** — observed 2026-08-12 walking a construct
 op queue backward ([core-element-ops-exemplar.md](../complete/core-element-ops-exemplar.md),
 campaign item 1): the first two positions of a from-`{}` build (`{}` and
 part-added) are identical in the score pane, distinguishable only in the ops
 queue and the json tab. The ghost vocabulary is where the fix belongs — an
 empty part is a *place for a bar*, exactly the solid/ghost distinction one
-level up from the cell — and it is corpus-neutral (no scenario is measureless),
-so it costs no goldens.
+level up from the cell. It now draws one larger dashed vacancy until its first
+measure materializes, and it is corpus-neutral (no scenario is measureless), so
+it costs no goldens.
 
 ## One visual vocabulary: the enclosure
 
@@ -721,6 +737,12 @@ arrow doing nothing beats one doing something arbitrary.
    other projection are quiet echoes; wide rungs resolve to one full-strength
    enclosure at the existing part-measure merge boundary, and tween fragments
    retain their destination role through one↔many topology changes.
+8. **Complete 2026-08-16 — generalized ghosts.** Empty/rest-only cursor moments
+   derive their x from packed row and bar-cell geometry when no note/fret can
+   anchor it, while model part/staff and projection choose the rendered band.
+   A measureless part draws a larger panel-shaped vacancy until its first bar
+   materializes. Ghosts remain cursor-only potential addresses and do not enter
+   range membership, closures or the primary/echo selection contract.
 
 ## Not this
 

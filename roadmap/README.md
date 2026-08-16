@@ -251,9 +251,11 @@ proposals that name their campaign.
   extent changes and one↔many both-view echoes, with interruption continuity and reduced-motion
   fallback. Primary/echo asymmetry now keeps the active projection's ink and fine-rung
   enclosure full strength, dims the other rendering, and resolves to one panel at
-  part-measure while preserving roles through the split/merge tween. **Next:** wider ghosts.
-  The separate entry-mode axis
-  (advance mode, digit debounce, letter accelerators) is a candidate for its own proposal.
+  part-measure while preserving roles through the split/merge tween. Generalized ghosts
+  now cover silent/rest-only columns from structural row/bar/staff geometry and give a
+  measureless part a larger “place for a bar” vacancy until its first measure exists.
+  **The selection ladder is complete. Next:** graduate the separate entry-mode axis
+  (advance mode, digit debounce, letter accelerators) into its own proposal.
 
 ### complete/
 - **[core-vertical-density.md](complete/core-vertical-density.md)** — **systems per page

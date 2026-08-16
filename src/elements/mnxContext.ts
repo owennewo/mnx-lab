@@ -63,7 +63,16 @@ export interface CursorGhost {
   staffPosition: number | null;
   /** Tab projection: string number (1 = top line). */
   string: number | null;
+  /** Structural address used when no rendered note can anchor the column. */
+  measureIndex?: number;
+  partIndex?: number;
+  staffIndex?: number;
+  /** Cursor onset normalized to this measure's metric span, 0…1. */
+  position?: number;
   anchorKeys: string[];
+  /** A part exists but has no measure cell yet: draw one panel-shaped
+   * vacancy rather than pretending a note can be entered without a bar. */
+  structuralEmpty?: 'part-measure';
 }
 
 export interface SelectionContext {

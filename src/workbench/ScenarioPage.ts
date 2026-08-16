@@ -1523,9 +1523,31 @@ export class ScenarioPage extends LitElement {
     if (!session || !this.doc) return;
     this.doc = { ...this.doc, mnxJson: session.doc };
     this.rawScore = JSON.stringify(session.doc, null, 2);
+    const cursor = session.cursor;
+    const partIndex = cursor.partIndex ?? 0;
+    const staffIndex = cursor.staffIndex ?? 1;
+    const measureSpan = measureSpans(session.doc)[cursor.measureIndex] ?? { num: 1, den: 1 };
+    const rawPosition =
+      (cursor.onset.num / cursor.onset.den) /
+      Math.max(Number.EPSILON, measureSpan.num / measureSpan.den);
+    const activePart = session.doc.parts?.[partIndex];
+    const cursorGhost: NonNullable<SelectionContext['cursor']> = {
+      ...session.cursorContext(),
+      measureIndex: cursor.measureIndex,
+      partIndex,
+      staffIndex,
+      position: Math.max(0, Math.min(1, rawPosition)),
+      ...(
+        activePart &&
+        (session.doc.global?.measures?.length ?? 0) === 0 &&
+        (activePart.measures?.length ?? 0) === 0
+          ? { structuralEmpty: 'part-measure' as const }
+          : {}
+      )
+    };
     this.selection = {
-      activePartId: null,
-      activeMeasureIndex: session.cursor.measureIndex,
+      activePartId: activePart?.id ?? null,
+      activeMeasureIndex: cursor.measureIndex,
       activeVoiceIndex: null,
       activeEventIndex: null,
       selectedNoteIds: this.cursorHidden ? [] : session.selectedNoteKeys,
@@ -1534,7 +1556,7 @@ export class ScenarioPage extends LitElement {
       span: this.cursorHidden
         ? null
         : presentationSpan(session.doc, session.selectionLevel, session.resolvedSelection.members),
-      cursor: this.cursorHidden ? null : session.cursorContext(),
+      cursor: this.cursorHidden ? null : cursorGhost,
       preview: this.previewScope()
     };
   }
