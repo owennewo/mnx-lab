@@ -82,6 +82,17 @@ describe('selection clip codec', () => {
           lineOrder: ['verse'],
           lineMetadata: { verse: { label: 'Verse 1', lang: 'en' } }
         }
+      },
+      relationships: {
+        measures: [{
+          offset: 0,
+          beams: [{ events: ['event-1', 'event-2'] }],
+          ottavas: [{
+            position: { fraction: [0, 1] },
+            end: { measure: 'm1', position: { fraction: [1, 1] } },
+            value: 1
+          }]
+        }]
       }
     };
     expect(decodeSelectionClip(encodeSelectionClip(source))).toEqual(source);

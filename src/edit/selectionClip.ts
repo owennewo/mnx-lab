@@ -8,6 +8,8 @@
 import type {
   MnxGlobalMeasure,
   MnxGrace,
+  MnxBeam,
+  MnxOttava,
   MnxPart,
   MnxPartMeasure,
   MnxNote,
@@ -76,6 +78,8 @@ export interface VoiceBarClipEntry {
   /** Relative bar offset; sparse voices retain their gaps. */
   offset: number;
   sequence: MnxSequence;
+  /** Voice-owned declarations which live beside the sequence in MNX. */
+  declarations?: Omit<MnxPartMeasure, 'sequences'>;
 }
 
 export interface VoiceBarsClip {
@@ -133,6 +137,18 @@ export interface ScoreClip {
   score: MnxStructure;
 }
 
+/** Relations live beside sequence content in MNX, so narrow clips need an
+ * explicit owner bar. Wider clips retain them in their copied measures. */
+export interface ClipBarRelationships {
+  offset: number;
+  beams?: MnxBeam[];
+  ottavas?: MnxOttava[];
+}
+
+export interface SelectionClipRelationships {
+  measures: ClipBarRelationships[];
+}
+
 export type SelectionClip =
   | NoteSetClip
   | EventRunClip
@@ -152,6 +168,7 @@ export interface SelectionClipEnvelope {
   clip: SelectionClip;
   context?: SelectionClipContext;
   dependencies?: SelectionClipDependencies;
+  relationships?: SelectionClipRelationships;
 }
 
 export class SelectionClipDecodeError extends Error {
@@ -342,9 +359,29 @@ function validateOffsetEntries(
 ): void {
   objectArrayAt(value, path).forEach((entry, index) => {
     const itemPath = `${path}[${index}]`;
-    exactKeys(entry, itemPath, ['offset', payloadKey]);
+    exactKeys(
+      entry,
+      itemPath,
+      ['offset', payloadKey],
+      payloadKey === 'sequence' ? ['declarations'] : []
+    );
     integerAt(entry.offset, `${itemPath}.offset`);
     objectAt(entry[payloadKey], `${itemPath}.${payloadKey}`);
+    if (entry.declarations !== undefined) {
+      objectAt(entry.declarations, `${itemPath}.declarations`);
+    }
+  });
+}
+
+function validateRelationships(value: unknown): void {
+  const relationships = objectAt(value, '$.relationships');
+  exactKeys(relationships, '$.relationships', ['measures']);
+  objectArrayAt(relationships.measures, '$.relationships.measures').forEach((measure, index) => {
+    const path = `$.relationships.measures[${index}]`;
+    exactKeys(measure, path, ['offset'], ['beams', 'ottavas']);
+    integerAt(measure.offset, `${path}.offset`);
+    if (measure.beams !== undefined) objectArrayAt(measure.beams, `${path}.beams`);
+    if (measure.ottavas !== undefined) objectArrayAt(measure.ottavas, `${path}.ottavas`);
   });
 }
 
@@ -424,7 +461,7 @@ export function assertSelectionClipEnvelope(value: unknown): asserts value is Se
     envelope,
     '$',
     ['format', 'version', 'source', 'selection', 'clip'],
-    ['context', 'dependencies']
+    ['context', 'dependencies', 'relationships']
   );
   if (envelope.format !== SELECTION_CLIP_FORMAT) fail('$.format', 'unknown clipboard format');
   if (envelope.version !== SELECTION_CLIP_VERSION) {
@@ -435,6 +472,7 @@ export function assertSelectionClipEnvelope(value: unknown): asserts value is Se
   validateClip(envelope.clip);
   if (envelope.context !== undefined) validateContext(envelope.context);
   if (envelope.dependencies !== undefined) validateDependencies(envelope.dependencies);
+  if (envelope.relationships !== undefined) validateRelationships(envelope.relationships);
 }
 
 /** Serialize through the same validator decode uses. No richer in-memory path

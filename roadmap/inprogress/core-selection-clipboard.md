@@ -4,17 +4,19 @@ Serves the **implementation loop**. Proposed 2026-08-16 after the completed
 [selection ladder](../complete/core-selection-ladder.md) made every point,
 range and live closure resolve to ordered model members.
 
-> **Status: in progress — stage 1 built 2026-08-16.** Landed the versioned,
-> DOM-free `SelectionClipEnvelope` and all nine rung-derived clip kinds in
-> `src/edit/selectionClip.ts`; one strict JSON encode/decode path with exact
-> envelope/kind validation and a version refusal seam; the asynchronous
-> `SelectionClipboardStore` plus string-only memory implementation; and one
-> store owned by `WorkbenchApp` and injected into every scenario page, so it
-> survives document/session navigation but deliberately not application
-> shutdown. `selection-clip.test.ts` pins every kind, context/dependencies,
-> malformed/unknown/cyclic refusals and memory-store behavior. No copy, cut,
-> paste binding or document mutation is live yet. **Next: stage 2, pure clip
-> extraction from resolved point/range/closure selections.**
+> **Status: in progress — stages 1–2 built 2026-08-16.** Stage 1 landed the
+> versioned DOM-free clip union, strict codec, asynchronous string-only store
+> seam and workbench-lifetime memory owner. Stage 2 added pure
+> `extractSelectionClip()` materialization for all nine clip kinds: it resolves
+> once; fixes point/range/closure membership and sparse bar offsets; filters
+> staff/voice-owned declarations; refuses partial rhythm containers; closes
+> ties, slurs, beams, techniques and ottava measure references; reports every
+> detached outgoing reference; collects measure context, source support and
+> only referenced lyric metadata; and proves the immutable result through the
+> same serialized codec path the store will use. `selection-clip.test.ts` and
+> `selection-clip-extraction.test.ts` pin the transport and extraction
+> contracts. No copy, cut, paste binding or document mutation is live yet.
+> **Next: stage 3, the pure conservative paste planner.**
 
 ## The boundary
 
