@@ -173,8 +173,20 @@
 > surviving ancestor. Focused tests pin container identity/ranges, reference
 > cleanup, every guard and section preservation.
 >
-> **What remains**: the relax/tighten shape TWEEN (each
-> level currently re-renders statically); primary/echo asymmetry (both
+> **Relax/tighten shape tween complete 2026-08-16.** Before the viewer replaces
+> its SVG, it snapshots the visible enclosure — including the live geometry of
+> an interrupted transition — then morphs that shape into the newly rendered
+> rung over 180 ms. Fragment pairing explicitly handles one→many duplication
+> and many→one convergence, so the both-view notation/tab echoes visibly merge
+> at part-measure and split again on tightening. The trigger compares geometry,
+> not only enclosure names: measure and section both use `panel-wide`, but their
+> extent change still teaches containment. A rapid Escape/Enter reversal starts
+> from the shape actually on screen, and `prefers-reduced-motion` keeps the
+> final redraw static. Pure topology/equality tests pin the morph contract;
+> hands-on review covered every rung in the both-view navigation playground,
+> the same-kind measure→section transition, rapid reversal and clean settling.
+>
+> **What remains**: primary/echo asymmetry (both
 > projections draw at full strength);
 > ghost cells beyond the existing entry ghosts.
 > The entry-mode axis — advance mode, the
@@ -684,6 +696,11 @@ arrow doing nothing beats one doing something arbitrary.
    through navigation, closures, HUD/tray and the lasso presentation. Delete is
    explicit and pinned at event, container, voice-measure, part-measure and
    section, including post-removal ancestor repair.
+6. **Complete 2026-08-16 — relax/tighten shape tween.** The viewer snapshots
+   the outgoing enclosure before its full SVG redraw and morphs from that live
+   geometry into the new rung. Ordered fragment pairing covers one↔many echo
+   topology, same-kind extent changes still animate, interrupted reversals do
+   not snap back, and reduced-motion readers get the final static shape.
 
 ## Not this
 

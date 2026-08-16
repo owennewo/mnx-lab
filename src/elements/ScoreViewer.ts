@@ -25,7 +25,12 @@ import {
 } from '../engine/render/scale.ts';
 import { densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
 import { padDensityFor } from '../engine/layout/verticalDensity.ts';
-import { drawCursorGhost, drawEnclosure } from './enclosure.ts';
+import {
+  drawCursorGhost,
+  drawEnclosure,
+  snapshotEnclosure,
+  tweenEnclosure
+} from './enclosure.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
 /** The projections the engine can draw. */
@@ -231,6 +236,11 @@ export class ScoreViewer extends LitElement {
    *  enclosure overlay measures glyph boxes, and a first paint that races the
    *  font would freeze fallback-font geometry into the highlight. */
   private fontRedrawQueued = false;
+  /** A rung morph survives the renderer replacing its SVG by snapshotting the
+   * old geometry first. A new paint cancels the old frame loop and begins
+   * from the transition's current shape, so fast Escape/Enter presses do not
+   * snap backward. */
+  private cancelEnclosureTween: (() => void) | null = null;
 
   /** The last successful paint's system packing, and the density ladder
    *  derived from it — keyed on the packing's identity, so a new paint
@@ -576,6 +586,8 @@ export class ScoreViewer extends LitElement {
     this.removeEventListener('scroll', this.onAnchorScroll);
     this.containerObserver?.disconnect();
     this.containerObserver = null;
+    this.cancelEnclosureTween?.();
+    this.cancelEnclosureTween = null;
   }
 
   firstUpdated() {
@@ -618,6 +630,11 @@ export class ScoreViewer extends LitElement {
       loadSmufl().then(() => this.renderScore());
       return;
     }
+
+    const previousSvg = this.container.querySelector<SVGSVGElement>('svg');
+    const previousEnclosure = previousSvg ? snapshotEnclosure(previousSvg) : null;
+    this.cancelEnclosureTween?.();
+    this.cancelEnclosureTween = null;
 
     const width = this.container.getBoundingClientRect().width || 600;
     // What this paint was laid out for — the observer's comparison point.
@@ -761,6 +778,12 @@ export class ScoreViewer extends LitElement {
           systemRows: packedRowMeasures(paint.packings, densityH),
           staffOrdinals: renderedStaffOrdinals
         });
+        let cancellation: (() => void) | null = null;
+        cancellation = tweenEnclosure(svg, previousEnclosure, () => {
+          if (this.cancelEnclosureTween === cancellation) this.cancelEnclosureTween = null;
+          this.emitSelectionAnchor();
+        });
+        this.cancelEnclosureTween = cancellation;
         // The ghost cell: the cursor's own cell when empty (note level only —
         // wider rungs select what exists, the ghost is an entry affordance).
         const ghost = this.selection?.cursor;

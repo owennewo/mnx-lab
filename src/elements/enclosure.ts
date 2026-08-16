@@ -20,6 +20,11 @@ import type {
   SelectionSpan,
   SelectionSpanUnit
 } from './mnxContext.ts';
+import {
+  pairEnclosureRects,
+  sameEnclosureRects,
+  type EnclosureRectGeometry
+} from '../engine/render/enclosureTransition.ts';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -265,6 +270,116 @@ export interface EnclosureOptions {
   /** Projection-specific model staff → rendered staff ordinals. Used only
    * when a structural unit has no glyph from which to infer its staff. */
   staffOrdinals?: (unit: SelectionSpanUnit) => readonly number[];
+}
+
+export interface EnclosureSnapshot {
+  kind: EnclosureKind;
+  viewBox: string;
+  rects: EnclosureRectGeometry[];
+}
+
+const geometryOf = (rect: SVGRectElement): EnclosureRectGeometry => ({
+  x: Number(rect.getAttribute('x') ?? 0),
+  y: Number(rect.getAttribute('y') ?? 0),
+  width: Number(rect.getAttribute('width') ?? 0),
+  height: Number(rect.getAttribute('height') ?? 0),
+  radius: Number(rect.getAttribute('rx') ?? 0),
+  stroke: Number(rect.getAttribute('stroke-width') ?? 0)
+});
+
+/** The currently visible enclosure, including an interrupted tween's live
+ * geometry. Kept as SVG user units so a redraw can replace the whole tree
+ * without losing the shape the reader just saw. */
+export function snapshotEnclosure(svg: SVGSVGElement): EnclosureSnapshot | null {
+  const group =
+    svg.querySelector<SVGGElement>(':scope > g.enclosure-transition') ??
+    svg.querySelector<SVGGElement>(':scope > g.enclosure');
+  if (!group) return null;
+  const kindClass = [...group.classList].find(name => name.startsWith('enc-'));
+  const kind = kindClass?.slice(4) as EnclosureKind | undefined;
+  const rects = [...group.querySelectorAll<SVGRectElement>('rect')].map(geometryOf);
+  if (!kind || rects.length === 0) return null;
+  return { kind, viewBox: svg.getAttribute('viewBox') ?? '', rects };
+}
+
+function writeGeometry(rect: SVGRectElement, geometry: EnclosureRectGeometry): void {
+  rect.setAttribute('x', String(geometry.x));
+  rect.setAttribute('y', String(geometry.y));
+  rect.setAttribute('width', String(Math.max(0, geometry.width)));
+  rect.setAttribute('height', String(Math.max(0, geometry.height)));
+  rect.setAttribute('rx', String(Math.max(0, geometry.radius)));
+  rect.setAttribute('stroke-width', String(Math.max(0, geometry.stroke)));
+}
+
+const mix = (from: number, to: number, t: number) => from + (to - from) * t;
+
+/** Morph the previous rung into the enclosure just drawn in `svg`. The real
+ * target stays in the tree (and supplies final anchor geometry) while a short-
+ * lived overlay carries the transition. Returns a cancellation hook, or null
+ * when the geometry/viewBox did not change or the reader requests reduced motion. */
+export function tweenEnclosure(
+  svg: SVGSVGElement,
+  previous: EnclosureSnapshot | null,
+  finished?: () => void,
+  duration = 180
+): (() => void) | null {
+  const target = snapshotEnclosure(svg);
+  const targetGroup = svg.querySelector<SVGGElement>(':scope > g.enclosure');
+  if (
+    !previous ||
+    !target ||
+    !targetGroup ||
+    sameEnclosureRects(previous.rects, target.rects) ||
+    previous.viewBox !== target.viewBox ||
+    globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  ) {
+    return null;
+  }
+  const pairs = pairEnclosureRects(previous.rects, target.rects);
+  if (pairs.length === 0) return null;
+
+  const transition = document.createElementNS(SVG_NS, 'g');
+  transition.setAttribute('class', `enclosure enclosure-transition enc-${target.kind}`);
+  const rects = pairs.map(pair => {
+    const rect = document.createElementNS(SVG_NS, 'rect');
+    writeGeometry(rect, pair.from);
+    transition.appendChild(rect);
+    return rect;
+  });
+  targetGroup.style.opacity = '0';
+  svg.insertBefore(transition, targetGroup);
+
+  let frame = 0;
+  let cancelled = false;
+  const started = performance.now();
+  const clean = (notify: boolean) => {
+    if (cancelled) return;
+    cancelled = true;
+    cancelAnimationFrame(frame);
+    transition.remove();
+    targetGroup.style.removeProperty('opacity');
+    if (notify) finished?.();
+  };
+  const step = (now: number) => {
+    const linear = Math.min(1, Math.max(0, (now - started) / duration));
+    const eased = linear < 0.5
+      ? 4 * linear * linear * linear
+      : 1 - Math.pow(-2 * linear + 2, 3) / 2;
+    pairs.forEach((pair, index) => {
+      writeGeometry(rects[index], {
+        x: mix(pair.from.x, pair.to.x, eased),
+        y: mix(pair.from.y, pair.to.y, eased),
+        width: mix(pair.from.width, pair.to.width, eased),
+        height: mix(pair.from.height, pair.to.height, eased),
+        radius: mix(pair.from.radius, pair.to.radius, eased),
+        stroke: mix(pair.from.stroke, pair.to.stroke, eased)
+      });
+    });
+    if (linear >= 1) clean(true);
+    else frame = requestAnimationFrame(step);
+  };
+  frame = requestAnimationFrame(step);
+  return () => clean(false);
 }
 
 export function drawEnclosure(

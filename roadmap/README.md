@@ -245,9 +245,12 @@ proposals that name their campaign.
   anchor/extent/closure state, a rung-aware live resolver exposes structural members plus
   note/kit keys (including rests and empty bar copies), and traces assert final selection.
   Gesture intents and Shift+←/→, Shift+End, Ctrl+A/Meta+A bindings completed the same day,
-  including collapse, reversal, projection preservation and trace replay. **Next:** range
-  presentation, then commands;
-  relax/tighten animation, primary/echo asymmetry, wider ghosts and the container rung remain.
+  including collapse, reversal, projection preservation and trace replay. Range presentation,
+  mixed/bulk commands, the container rung and every rung's Delete meaning followed. The
+  relax/tighten enclosure now morphs from the geometry actually on screen across same-kind
+  extent changes and one↔many both-view echoes, with interruption continuity and reduced-motion
+  fallback. **Next:** primary/echo asymmetry, then wider ghosts. The separate entry-mode axis
+  (advance mode, digit debounce, letter accelerators) is a candidate for its own proposal.
 
 ### complete/
 - **[core-vertical-density.md](complete/core-vertical-density.md)** — **systems per page
