@@ -59,6 +59,18 @@ proposals that name their campaign.
   voice that underfills on every render. Corpus cost is nil (the key grammar already
   spells part and staff, silent for 0 and 1). Acceptance: a construct trace for
   `spec/multiple-voices` and `spec/tie-targets`.
+- **[core-selection-clipboard.md](proposed/core-selection-clipboard.md)** — typed copy,
+  cut and paste over every selection rung, range and closure. The first transport is a
+  string-only in-memory store scoped above individual sessions, so material can move
+  between scores while the workbench stays open; system clipboard support and reload
+  persistence are explicitly deferred. The clip itself is a versioned, DOM-free JSON
+  union (`note-set` → event/container runs → voice/staff bars → part/measures/section/
+  score), resolved to an immutable snapshot at copy time. Paste is conservative and
+  typed, remints ids, repairs only wholly-contained references, validates before one
+  atomic history entry, and never silently retimes or maps incompatible structures.
+  Cut awaits a confirmed serialized write before its rung-specific removal. The
+  asynchronous store seam makes a later transport substitution local rather than a
+  rewrite of selection, history or trace semantics.
 - **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
   `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
   (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
