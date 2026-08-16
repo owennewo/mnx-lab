@@ -26,6 +26,10 @@ import {
 import { measureSpans } from '../edit/cursor.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
+import {
+  copySelectionToStore,
+  pasteSelectionFromStore
+} from '../edit/selectionClipboardActions.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
 import { cheatsheet } from '../edit/keymapDocs.ts';
 import { buildHudParts, buildHudRows, LEVEL_BY_ROW } from './hudRows.ts';
@@ -376,8 +380,8 @@ function presentationSpan(
 export class ScenarioPage extends LitElement {
   @property({ type: String }) scenarioId = '';
   @property({ type: String }) view = '';
-  /** App-lifetime transport injected by WorkbenchApp. Copy/paste behavior is
-   *  intentionally not wired until the clip extractor/planner stages land. */
+  /** App-lifetime transport injected by WorkbenchApp: route/session changes
+   *  replace this page's score but deliberately retain the copied clip. */
   @property({ attribute: false }) selectionClipboard: SelectionClipboardStore | null = null;
 
   /** Per-part instrument overrides (roadmap/inprogress/core-score-hud.md),
@@ -1893,6 +1897,22 @@ export class ScenarioPage extends LitElement {
     const session = this.session;
     if (!session) return [];
     const tiles: TrayTile[] = [
+      ...(this.selectionClipboard ? [
+        {
+          id: `${CHROME_PREFIX}copy-selection`,
+          glyph: { smufl: 'repeat1Bar' } as const,
+          shortcut: '',
+          label: 'Copy current selection',
+          state: 'available' as const
+        },
+        {
+          id: `${CHROME_PREFIX}paste-selection`,
+          glyph: { smufl: 'arrowBlackLeft' } as const,
+          shortcut: '',
+          label: 'Paste copied selection here',
+          state: 'available' as const
+        }
+      ] : []),
       {
         id: `${CHROME_PREFIX}copy-trace`,
         glyph: { smufl: 'repeat1Bar' },
@@ -1922,7 +1942,9 @@ export class ScenarioPage extends LitElement {
     if (id.startsWith(CHROME_PREFIX)) {
       const chrome = id.slice(CHROME_PREFIX.length);
       this.trayOpen = false;
-      if (chrome === 'copy-trace') void this.copyTrace();
+      if (chrome === 'copy-selection') void this.copyCurrentSelection();
+      else if (chrome === 'paste-selection') void this.pasteCurrentSelection();
+      else if (chrome === 'copy-trace') void this.copyTrace();
       else if (chrome === 'revert') this.revertEdits();
       return;
     }
@@ -2239,6 +2261,22 @@ export class ScenarioPage extends LitElement {
     if (!this.session) return;
     await navigator.clipboard.writeText(JSON.stringify(this.session.trace(), null, 2) + '\n');
     this.copied = true;
+  }
+
+  /** Stage 4 clipboard surface: explicit tray actions only. Keyboard bindings
+   *  and detailed success/refusal feedback land together in Stage 6. */
+  private async copyCurrentSelection() {
+    if (!this.session || !this.selectionClipboard) return;
+    await copySelectionToStore(this.session, this.selectionClipboard);
+  }
+
+  private async pasteCurrentSelection() {
+    if (!this.session || !this.selectionClipboard) return;
+    const result = await pasteSelectionFromStore(this.session, this.selectionClipboard);
+    if (!result.ok) return;
+    this.cursorHidden = false;
+    this.copied = false;
+    this.syncFromSession();
   }
 
   /** The id is the thing you paste into a `/verify` sentence or a commit

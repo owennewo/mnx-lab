@@ -4,7 +4,7 @@ Serves the **implementation loop**. Proposed 2026-08-16 after the completed
 [selection ladder](../complete/core-selection-ladder.md) made every point,
 range and live closure resolve to ordered model members.
 
-> **Status: in progress — stages 1–3 built 2026-08-16.** Stage 1 landed the
+> **Status: in progress — stages 1–4 built 2026-08-16.** Stage 1 landed the
 > versioned DOM-free clip union, strict codec, asynchronous string-only store
 > seam and workbench-lifetime memory owner. Stage 2 added pure
 > `extractSelectionClip()` materialization for all nine clip kinds: it resolves
@@ -27,8 +27,18 @@ range and live closure resolve to ordered model members.
 > bar-local starting onsets, so a sparse phrase cannot silently collapse time.
 > `selection-paste-planner.test.ts` pins the acceptance/refusal matrix, purity,
 > id/reference rewrites, dependency/context precedence, empty-document cases
-> and sparse timelines. No copy, cut, paste binding or live document mutation
-> is active yet. **Next: stage 4, atomic application/history/trace wiring.**
+> and sparse timelines. Stage 4 added the atomic `pasteSelection` edit op,
+> exact metric/structural landing metadata, pasted-range selection, and
+> selection-aware undo/redo snapshots. `applyPastePlan` traces carry the
+> already-materialized plan rather than a contextual clipboard read, so replay
+> is deterministic. `selectionClipboardActions.ts` now owns the asynchronous
+> extraction/store and read/plan boundaries; the workbench's app-lifetime
+> memory store is reachable from explicit selection-tray actions and therefore
+> survives cross-score navigation. `selection-clipboard-actions.test.ts` pins
+> cross-session transfer, one-entry history, note-line and range landing,
+> part/score closures, empty-store refusal and replay after the store changes.
+> Cut and keyboard bindings remain inactive. **Next: stage 5, exact cut
+> removal and write-before-mutate failure semantics.**
 
 ## The boundary
 

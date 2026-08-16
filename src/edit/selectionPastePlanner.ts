@@ -2,7 +2,8 @@
 //
 // The planner owns all compatibility decisions and builds a complete detached
 // next document. It never mutates the supplied score, reads a clipboard, or
-// writes editor history. Stage 4 only has to commit an accepted plan atomically.
+// writes editor history; selectionClipboardActions/session commit an accepted
+// plan atomically at the environment/history boundary.
 import type {
   MnxBeam,
   MnxEvent,
@@ -77,6 +78,15 @@ export interface PasteLanding {
   voiceIndex: number;
   measureStart: number;
   measureEnd: number;
+  /** Exact metric edges of the pasted material. Bar-and-above rungs use the
+   *  start of their edge bars; event/container ranges retain their real
+   *  onsets so Stage 4 can select the whole result without re-reading the
+   *  source clip. */
+  onsetStart: [number, number];
+  onsetEnd: [number, number];
+  /** Structural clips land as their natural live closure: a copied part is
+   *  the new part, and a copied score is the whole score. */
+  closure?: 'part' | 'score';
 }
 
 export interface PastePlan {
@@ -843,7 +853,9 @@ function landing(
   state: SelectionState,
   level: SelectionState['level'],
   measureStart: number,
-  measureEnd: number
+  measureEnd: number,
+  onsetStart: Onset = { num: 0, den: 1 },
+  onsetEnd: Onset = { num: 0, den: 1 }
 ): PasteLanding {
   return {
     level,
@@ -851,7 +863,9 @@ function landing(
     staffIndex: state.anchor.staffIndex ?? 1,
     voiceIndex: state.anchor.voiceIndex ?? 0,
     measureStart,
-    measureEnd
+    measureEnd,
+    onsetStart: [onsetStart.num, onsetStart.den],
+    onsetEnd: [onsetEnd.num, onsetEnd.den]
   };
 }
 
@@ -909,7 +923,14 @@ export function planSelectionPaste(
         if (!located?.event.notes?.[member.noteIndex]) return;
         located.event.notes[member.noteIndex] = clip.notes[index];
       });
-      resultLanding = landing(state, 'note', members[0].measureIndex, members[members.length - 1].measureIndex);
+      resultLanding = landing(
+        state,
+        'note',
+        members[0].measureIndex,
+        members[members.length - 1].measureIndex,
+        members[0].onset,
+        members[members.length - 1].onset
+      );
       break;
     }
     case 'event-run': {
@@ -932,7 +953,27 @@ export function planSelectionPaste(
       });
       const relationships = rewriteRelationships(envelope.relationships?.measures, ids);
       mergeRelationships(after, partIndex, targetStart, relationships);
-      resultLanding = landing(state, 'event', targetStart, units[units.length - 1].measureIndex);
+      const firstSourceBar = clip.bars[0];
+      const lastSourceBar = clip.bars[clip.bars.length - 1];
+      const onsetDelta = addOnsets(
+        units[0].onset,
+        { num: -firstSourceBar.onset[0], den: firstSourceBar.onset[1] }
+      );
+      const lastSourceOnset = lastSourceBar.items.slice(0, -1).reduce(
+        (onset, item) => addOnsets(onset, itemSpan(item)),
+        addOnsets(
+          { num: lastSourceBar.onset[0], den: lastSourceBar.onset[1] },
+          onsetDelta
+        )
+      );
+      resultLanding = landing(
+        state,
+        'event',
+        targetStart,
+        targetStart + lastSourceBar.offset,
+        units[0].onset,
+        lastSourceOnset
+      );
       break;
     }
     case 'container-run': {
@@ -1003,7 +1044,14 @@ export function planSelectionPaste(
       });
       const relationships = rewriteRelationships(envelope.relationships?.measures, ids);
       mergeRelationships(after, partIndex, targetStart, relationships);
-      resultLanding = landing(state, 'container', targetStart, targets[targets.length - 1].measureIndex);
+      resultLanding = landing(
+        state,
+        'container',
+        targetStart,
+        targets[targets.length - 1].measureIndex,
+        targets[0].onset,
+        targets[targets.length - 1].onset
+      );
       break;
     }
     case 'voice-bars': {
@@ -1118,7 +1166,8 @@ export function planSelectionPaste(
       const addedIndex = empty ? 0 : after.parts.length - 1;
       resultLanding = {
         level: 'partMeasure', partIndex: addedIndex, staffIndex: 1, voiceIndex: 0,
-        measureStart: 0, measureEnd: Math.max(0, clip.part.measures.length - 1)
+        measureStart: 0, measureEnd: Math.max(0, clip.part.measures.length - 1),
+        onsetStart: [0, 1], onsetEnd: [0, 1], closure: 'part'
       };
       break;
     }
@@ -1205,7 +1254,8 @@ export function planSelectionPaste(
       merge = undefined;
       resultLanding = {
         level: 'score', partIndex: 0, staffIndex: 1, voiceIndex: 0,
-        measureStart: 0, measureEnd: Math.max(0, clip.score.global.measures.length - 1)
+        measureStart: 0, measureEnd: Math.max(0, clip.score.global.measures.length - 1),
+        onsetStart: [0, 1], onsetEnd: [0, 1], closure: 'score'
       };
       const detached = pruneDanglingReferences(clip.score);
       return {

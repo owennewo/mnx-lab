@@ -23,6 +23,8 @@ import type {
   MnxTuningEntry
 } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
+import type { SelectionState } from './selection.ts';
+import type { SelectionClipEnvelope } from './selectionClip.ts';
 import type { PartialContainerSpec } from './setupGrammar.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import { findNoteAddress, forEachNoteAddress } from '../model/noteWalk.ts';
@@ -51,6 +53,21 @@ export type EditOp =
        * separate gesture. */
       type: 'batch';
       ops: EditOp[];
+    }
+  | {
+      /** One already-planned clipboard mutation. The environment-facing
+       *  read and every compatibility decision happened before this op was
+       *  created; applying it is therefore a pure atomic document swap.
+       *
+       *  The selection snapshots ride with the durable history entry because
+       *  paste has stronger landing semantics than ordinary point edits:
+       *  undo restores the target range and redo reselects the result. */
+      type: 'pasteSelection';
+      document: MnxStructure;
+      clipKind: SelectionClipEnvelope['clip']['kind'];
+      selectionBefore: SelectionState;
+      selectionAfter: SelectionState;
+      detachedTargetReferences: number;
     }
   | {
       /** Shift the selected notes (or every note) by a signed semitone count. */
@@ -717,6 +734,8 @@ function setPitchFromMidi(note: MnxNote, midi: number, fifths = 0, direction: 1 
 /** Pure: returns a new document with the op applied; never mutates `doc`. */
 export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
   if (op.type === 'batch') return op.ops.reduce(applyOp, doc);
+  if (op.type === 'pasteSelection')
+    return JSON.parse(JSON.stringify(op.document)) as MnxStructure;
   const next = JSON.parse(JSON.stringify(doc)) as MnxStructure;
   switch (op.type) {
     case 'transposeSelection': {

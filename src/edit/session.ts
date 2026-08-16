@@ -7,6 +7,7 @@ import type { MnxEvent, MnxNote, MnxNoteValueBase, MnxStructure } from '../model
 import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent } from './intents.ts';
 import type { EditOp, EventAddress, OpLogEntry } from './ops.ts';
+import type { PasteLanding } from './selectionPastePlanner.ts';
 import {
   beamRunBetween,
   beamStartingAt,
@@ -245,14 +246,36 @@ export class EditorSession {
     switch (intent.type) {
       case 'undo': {
         if (!this.history.canUndo) return false;
+        const op = this.history.appliedOps[this.history.appliedOps.length - 1];
         this.history.undo();
-        this.reindex(true);
+        if (op?.type === 'pasteSelection') this.restoreSelection(op.selectionBefore);
+        else this.reindex(true);
         return true;
       }
       case 'redo': {
         if (!this.history.canRedo) return false;
+        const op = this.history.futureEntries[0]?.op;
         this.history.redo();
-        this.reindex(true);
+        if (op?.type === 'pasteSelection') this.restoreSelection(op.selectionAfter);
+        else this.reindex(true);
+        return true;
+      }
+      case 'applyPastePlan': {
+        const selectionBefore = this.selection;
+        const selectionAfter = pasteLandingSelection(
+          intent.plan.document,
+          intent.plan.landing,
+          this.activeProjection
+        );
+        this.history.apply({
+          type: 'pasteSelection',
+          document: intent.plan.document,
+          clipKind: intent.plan.clipKind,
+          selectionBefore,
+          selectionAfter,
+          detachedTargetReferences: intent.plan.detachedTargetReferences
+        }, intent);
+        this.restoreSelection(selectionAfter);
         return true;
       }
       case 'transpose': {
@@ -1748,6 +1771,22 @@ export class EditorSession {
     }
   }
 
+  /** Restore a history-owned selection snapshot against the history's new
+   *  document. Paste is the only operation with this stronger contract;
+   *  ordinary edits continue through reindex's cursor-following behavior. */
+  private restoreSelection(selection: SelectionState): void {
+    const active = selection.extent.kind === 'cursor'
+      ? selection.extent.cursor
+      : selection.anchor;
+    this.grid = buildGrid(
+      this.doc,
+      active.partIndex ?? 0,
+      active.staffIndex ?? 1
+    );
+    this.cursorState = clampCursor(this.grid, copyCursorAddress(active));
+    this.selectionState = cloneSelection(selection);
+  }
+
   /** The grid derives from the document, so every doc change rebuilds it and
    *  re-anchors the cursor (a removed measure must not strand it). */
   private reindex(preserveSelection = false): void {
@@ -1819,6 +1858,81 @@ export class EditorSession {
   private eventUnderCursor(): MnxEvent | undefined {
     return eventAtCursor(this.doc, this.grid, this.cursorState, this.activeProjection);
   }
+}
+
+/** Resolve a planner's compact structural landing into the durable cursor
+ * range history needs. This reads only the materialized result, never the
+ * clipboard or the source document. */
+function pasteLandingSelection(
+  doc: MnxStructure,
+  landing: PasteLanding,
+  projection: Projection
+): SelectionState {
+  const anchor = pasteLandingCursor(doc, landing, projection, 'first');
+  if (landing.closure) {
+    return { level: landing.level, anchor, extent: { kind: 'closure', scope: landing.closure } };
+  }
+  return {
+    level: landing.level,
+    anchor,
+    extent: {
+      kind: 'cursor',
+      cursor: pasteLandingCursor(doc, landing, projection, 'last')
+    }
+  };
+}
+
+function pasteLandingCursor(
+  doc: MnxStructure,
+  landing: PasteLanding,
+  projection: Projection,
+  edge: 'first' | 'last'
+): EditorCursor {
+  const measureIndex = edge === 'first' ? landing.measureStart : landing.measureEnd;
+  const tuple = edge === 'first' ? landing.onsetStart : landing.onsetEnd;
+  const onset = { num: tuple[0], den: tuple[1] };
+  const grid = buildGrid(doc, landing.partIndex, landing.staffIndex);
+  const inMeasure = grid.positions.filter(position => position.measureIndex === measureIndex);
+  const position = inMeasure.find(candidate => onsetsEqual(candidate.onset, onset)) ??
+    (edge === 'first' ? inMeasure[0] : inMeasure[inMeasure.length - 1]) ??
+    grid.positions[edge === 'first' ? 0 : grid.positions.length - 1];
+  const base: EditorCursor = {
+    measureIndex: position?.measureIndex ?? measureIndex,
+    onset: position?.onset ?? onset,
+    line: grid.mode === 'string' ? 1 : 0,
+    ...(landing.partIndex ? { partIndex: landing.partIndex } : {}),
+    ...(landing.staffIndex !== 1 ? { staffIndex: landing.staffIndex } : {}),
+    ...(landing.voiceIndex ? { voiceIndex: landing.voiceIndex } : {})
+  };
+  if (!position) return base;
+
+  const voiceSlots = position.slots.filter(slot => slot.voiceIndex === landing.voiceIndex);
+  const voiceEvents = position.events.filter(event => event.voiceIndex === landing.voiceIndex);
+  const slot = edge === 'first' ? voiceSlots[0] : voiceSlots[voiceSlots.length - 1];
+  const event = edge === 'first' ? voiceEvents[0] : voiceEvents[voiceEvents.length - 1];
+  const matchedSlot = event
+    ? voiceSlots.find(candidate =>
+        candidate.eventIndex === event.eventIndex &&
+        candidate.containerIndex === event.containerIndex
+      ) ?? slot
+    : slot;
+  if (matchedSlot) {
+    base.line = projection === 'tab' && grid.mode === 'string'
+      ? matchedSlot.line
+      : matchedSlot.staffPosition;
+    const sameLine = voiceSlots.filter(candidate =>
+      (projection === 'tab' && grid.mode === 'string'
+        ? candidate.line === base.line
+        : candidate.staffPosition === base.line)
+    );
+    const slotIndex = sameLine.indexOf(matchedSlot);
+    if (slotIndex > 0) base.slotIndex = slotIndex;
+  }
+  if (event) {
+    const eventSlotIndex = position.events.indexOf(event);
+    if (eventSlotIndex >= 0) base.eventSlotIndex = eventSlotIndex;
+  }
+  return base;
 }
 
 function cloneSelection(selection: SelectionState): SelectionState {
