@@ -77,6 +77,20 @@ function makeTwoPartDoc(): MnxStructure {
   return doc;
 }
 
+function makeTwoPartContainerDoc(): MnxStructure {
+  const doc = makeTwoPartDoc();
+  for (const part of doc.parts) {
+    const sequence = part.measures![0].sequences[0];
+    sequence.content[0] = {
+      type: 'tuplet',
+      inner: { multiple: 1, duration: { base: 'quarter' } },
+      outer: { multiple: 1, duration: { base: 'quarter' } },
+      content: [sequence.content[0] as never]
+    };
+  }
+  return doc;
+}
+
 describe('keymap docs — the guard mirrors', () => {
   it('the Ctrl climb: documented per rung, and the session mirrors it', () => {
     // The climb's vertical, rung by rung (selection-ladder navigation map):
@@ -85,7 +99,9 @@ describe('keymap docs — the guard mirrors', () => {
     // because the reader gets it, refused by the session because the paint is
     // not visible from a DOM-free layer. Nothing wider has a vertical unit.
     const doc = KEY_DOCS.find(d => d.keys === 'Ctrl+↑/↓')!;
-    expect(Object.keys(doc.meaning)).toEqual(['note', 'event', 'voiceMeasure', 'partMeasure']);
+    expect(Object.keys(doc.meaning)).toEqual([
+      'note', 'event', 'container', 'voiceMeasure', 'partMeasure'
+    ]);
 
     const session = new EditorSession(makeTwoPartDoc());
     expect(session.selectionLevel).toBe('note');
@@ -97,6 +113,13 @@ describe('keymap docs — the guard mirrors', () => {
     expect(session.handleIntent({ type: 'jumpDown' })).toBe(true); // the second part
     expect(session.cursor.partIndex).toBe(1);
     expect(session.cursor.measureIndex).toBe(0); // the bar travels; the voice does not
+
+    const container = new EditorSession(makeTwoPartContainerDoc());
+    container.handleIntent({ type: 'relaxSelection' });
+    container.handleIntent({ type: 'relaxSelection' });
+    expect(container.selectionLevel).toBe('container');
+    expect(container.handleIntent({ type: 'jumpDown' })).toBe(true);
+    expect(container.cursor.partIndex).toBe(1);
 
     while (session.selectionLevel !== 'partMeasure') {
       session.handleIntent({ type: 'relaxSelection' });
@@ -115,6 +138,7 @@ describe('keymap docs — the guard mirrors', () => {
     expect(Object.keys(doc.meaning)).toEqual([
       'note',
       'event',
+      'container',
       'voiceMeasure',
       'partMeasure',
       'measure',
@@ -124,11 +148,14 @@ describe('keymap docs — the guard mirrors', () => {
     // A session per rung: the voice step STOPS at the outermost voice, so a
     // shared session would arrive at the next rung already pressed against it.
     const handles = (level: string): boolean => {
-      const session = new EditorSession(makeTwoPartDoc());
+      const session = new EditorSession(
+        level === 'container' ? makeTwoPartContainerDoc() : makeTwoPartDoc()
+      );
       while (session.selectionLevel !== level) session.handleIntent({ type: 'relaxSelection' });
       return session.handleIntent({ type: 'lineDown' });
     };
     expect(handles('event')).toBe(true);
+    expect(handles('container')).toBe(true);
     expect(handles('voiceMeasure')).toBe(true);
     expect(handles('partMeasure')).toBe(true);
     expect(handles('measure')).toBe(false); // the mount's

@@ -111,6 +111,8 @@ function opLabel(op: EditOp): string {
       return `insert ${op.pitch.step}${op.pitch.octave} @ m${op.measureIndex + 1} ${onsetText(op.onset)} (${durationText(op.duration)})`;
     case 'deleteNote':
       return `delete note ${op.noteId}`;
+    case 'clearEvent':
+      return `clear event @ m${op.event.measureIndex + 1}`;
     case 'setDuration':
       return `duration ${durationText(op.duration)} @ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
     case 'nudgeRest':
@@ -171,6 +173,10 @@ function opLabel(op: EditOp): string {
       return `no fingering · ${op.noteKey}`;
     case 'removeContainer':
       return `remove container @ m${op.measureIndex + 1} (empty)`;
+    case 'removeVoiceMeasure':
+      return `remove voice bar @ m${op.measureIndex + 1} (empty)`;
+    case 'removePartMeasure':
+      return `remove staff bar @ m${op.measureIndex + 1} (empty)`;
     case 'wrapInContainer': {
       const span = op.to - op.from + 1;
       const what =

@@ -195,6 +195,7 @@ export function selectionMemberSummary(view: SessionView): string {
   const noun: Record<SelectionLevel, [string, string]> = {
     note: ['note', 'notes'],
     event: ['event', 'events'],
+    container: ['container', 'containers'],
     voiceMeasure: ['voice bar', 'voice bars'],
     partMeasure: ['part bar', 'part bars'],
     measure: ['bar', 'bars'],
@@ -514,6 +515,34 @@ export const COMMANDS: readonly EditorCommand[] = [
     tier: 'popover',
     blockedBy: 'arpeggio'
   },
+  {
+    id: 'clear-event',
+    scopes: ['event'],
+    glyph: { smufl: 'restQuarter' },
+    label: 'Clear to an equal-duration rest',
+    shortcut: 'Del',
+    tier: 'key',
+    action: () => ({ intent: { type: 'delete' } })
+  },
+
+  // ── container ───────────────────────────────────────────────────────────
+  {
+    id: 'container-settings',
+    scopes: ['container'],
+    glyph: { smufl: 'tuplet3' },
+    label: 'Container settings…',
+    tier: 'popover',
+    blockedBy: 'container-properties'
+  },
+  {
+    id: 'delete-container',
+    scopes: ['container'],
+    glyph: { smufl: 'tuplet3' },
+    label: 'Delete this container (only when empty)',
+    shortcut: 'Del',
+    tier: 'key',
+    action: () => ({ intent: { type: 'delete' } })
+  },
 
   // ── voice-measure ───────────────────────────────────────────────────────
   {
@@ -559,6 +588,15 @@ export const COMMANDS: readonly EditorCommand[] = [
     label: 'Add a voice',
     tier: 'popover',
     blockedBy: 'voice-entry'
+  },
+  {
+    id: 'delete-voice-bar',
+    scopes: ['voiceMeasure'],
+    glyph: { smufl: 'restWhole' },
+    label: 'Delete this voice bar (only when empty)',
+    shortcut: 'Del',
+    tier: 'key',
+    action: () => ({ intent: { type: 'delete' } })
   },
 
   // ── part-measure ────────────────────────────────────────────────────────
@@ -613,6 +651,15 @@ export const COMMANDS: readonly EditorCommand[] = [
     label: 'Mute the part',
     tier: 'popover',
     blockedBy: 'mute'
+  },
+  {
+    id: 'delete-part-bar',
+    scopes: ['partMeasure'],
+    glyph: { smufl: 'restWhole' },
+    label: 'Delete this staff bar (only when empty)',
+    shortcut: 'Del',
+    tier: 'key',
+    action: () => ({ intent: { type: 'delete' } })
   },
 
   // ── measure (the global bar) ────────────────────────────────────────────
@@ -729,6 +776,15 @@ export const COMMANDS: readonly EditorCommand[] = [
     label: 'Select the section’s range',
     tier: 'popover',
     action: () => ({ intent: { type: 'selectSectionRange' } })
+  },
+  {
+    id: 'delete-section-boundary',
+    scopes: ['section'],
+    glyph: { smufl: 'barlineDashed' },
+    label: 'Delete this section boundary',
+    shortcut: 'Del',
+    tier: 'key',
+    action: () => ({ intent: { type: 'delete' } })
   },
 
   // ── score ───────────────────────────────────────────────────────────────

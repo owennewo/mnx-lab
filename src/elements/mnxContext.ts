@@ -16,10 +16,10 @@ export const playbackStateContext = createContext<PlaybackState>(Symbol('playbac
  * The selection-ladder enclosure vocabulary (roadmap/inprogress/
  * core-selection-ladder.md) — PRESENTATION ONLY. The workbench maps editor
  * selection levels onto these shapes so `elements/` never learns about
- * `edit/`: note→cell, event→slice, voiceMeasure→run, partMeasure→panel,
+ * `edit/`: note→cell, event→slice, container→lasso, voiceMeasure→run, partMeasure→panel,
  * measure/section→panel-wide, score→frame.
  */
-export type EnclosureKind = 'cell' | 'slice' | 'run' | 'panel' | 'panel-wide' | 'frame';
+export type EnclosureKind = 'cell' | 'slice' | 'lasso' | 'run' | 'panel' | 'panel-wide' | 'frame';
 
 /**
  * One structural unit covered by a selection, translated into presentation

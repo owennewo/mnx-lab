@@ -18,18 +18,17 @@
 // absolute ids are stored, so descending after lateral movement lands in the
 // current bar, never teleports back.
 //
-// Rungs not yet modelled: 'container' (tuplet/grace/tremolo). The cursor and
-// footprint DO descend into containers; the ladder currently walks directly
-// from their inner event to voice-measure until the container rung lands.
 // 'part' is DELIBERATELY not a rung: the ladder is the vertical axis, and the
 // part is the horizontal CLOSURE of part-measure (Ctrl+A), per the roadmap doc.
-import type { MnxSequence, MnxStructure } from '../model/mnx.ts';
+import type { MnxSequence, MnxSequenceItem, MnxStructure } from '../model/mnx.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import { forEachNoteAddress } from '../model/noteWalk.ts';
 import { kitNoteKey } from '../model/noteKeys.ts';
 import {
   buildGrid,
+  addOnsets,
   eventSlotAt,
+  itemSpan,
   onsetsEqual,
   slotAt,
   type EditorCursor,
@@ -43,6 +42,7 @@ import {
 export type SelectionLevel =
   | 'note'
   | 'event'
+  | 'container'
   | 'voiceMeasure'
   | 'partMeasure'
   | 'measure'
@@ -52,6 +52,7 @@ export type SelectionLevel =
 export const SELECTION_LADDER: readonly SelectionLevel[] = [
   'note',
   'event',
+  'container',
   'voiceMeasure',
   'partMeasure',
   'measure',
@@ -99,11 +100,24 @@ export type SelectionMember =
       containerIndex?: number;
     }
   | {
+      kind: 'container';
+      partIndex: number;
+      staffIndex: number;
+      measureIndex: number;
+      onset: Onset;
+      voiceIndex: number;
+      /** Raw sequence index and content index: the owning container object. */
+      sequenceIndex: number;
+      eventIndex: number;
+      containerType: 'tuplet' | 'grace' | 'tremolo';
+    }
+  | {
       kind: 'voiceMeasure';
       partIndex: number;
       staffIndex: number;
       measureIndex: number;
       voiceIndex: number;
+      sequenceIndex: number;
     }
   | { kind: 'partMeasure'; partIndex: number; staffIndex: number; measureIndex: number }
   | { kind: 'measure'; measureIndex: number }
@@ -123,6 +137,7 @@ export function closureScopeForLevel(level: SelectionLevel): SelectionClosureSco
   switch (level) {
     case 'note':
     case 'event':
+    case 'container':
     case 'voiceMeasure':
       return 'voice';
     case 'partMeasure':
@@ -219,6 +234,7 @@ export function presentLevels(
   );
   if (sequences.length > 0) present.add('voiceMeasure');
   if (eventSlotAt(grid, cursor, projection)) present.add('event');
+  if (eventSlotAt(grid, cursor, projection)?.containerIndex !== undefined) present.add('container');
   if (slotAt(grid, cursor, projection)) present.add('note');
   if (sectionRangeAt(doc, cursor.measureIndex)) present.add('section');
   return present;
@@ -304,15 +320,67 @@ function eventMembers(doc: MnxStructure, cursor: EditorCursor): SelectionMember[
   );
 }
 
+function containerType(item: MnxSequenceItem): 'tuplet' | 'grace' | 'tremolo' | null {
+  const type = (item as { type?: string }).type;
+  return type === 'tuplet' || type === 'grace' || type === 'tremolo' ? type : null;
+}
+
+/** Containers in the active part/staff/voice timeline. Their top-level
+ * content index is already carried by every inner EventSlot; enumeration here
+ * adds the raw sequence index needed by the guarded removal op. */
+function containerMembers(doc: MnxStructure, cursor: EditorCursor): SelectionMember[] {
+  const partIndex = cursor.partIndex ?? 0;
+  const staffIndex = cursor.staffIndex ?? 1;
+  const voiceIndex = anchorVoiceIndex(cursor);
+  const members: SelectionMember[] = [];
+  (doc.parts?.[partIndex]?.measures ?? []).forEach((measure, measureIndex) => {
+    const voiceByStaff = new Map<number, number>();
+    (measure.sequences ?? []).forEach((sequence, sequenceIndex) => {
+      const sequenceStaff = sequence.staff ?? 1;
+      const sequenceVoice = (voiceByStaff.get(sequenceStaff) ?? -1) + 1;
+      voiceByStaff.set(sequenceStaff, sequenceVoice);
+      if (sequenceStaff !== staffIndex || sequenceVoice !== voiceIndex) return;
+      let onset: Onset = { num: 0, den: 1 };
+      sequence.content.forEach((item, eventIndex) => {
+        const type = containerType(item);
+        if (type) {
+          members.push({
+            kind: 'container',
+            partIndex,
+            staffIndex,
+            measureIndex,
+            onset: { ...onset },
+            voiceIndex,
+            sequenceIndex,
+            eventIndex,
+            containerType: type
+          });
+        }
+        onset = addOnsets(onset, itemSpan(item));
+      });
+    });
+  });
+  return members;
+}
+
 function voiceMeasureMembers(doc: MnxStructure, cursor: EditorCursor): SelectionMember[] {
   const partIndex = cursor.partIndex ?? 0;
   const staffIndex = cursor.staffIndex ?? 1;
   const voiceIndex = anchorVoiceIndex(cursor);
   const members: SelectionMember[] = [];
   (doc.parts?.[partIndex]?.measures ?? []).forEach((measure, measureIndex) => {
-    if (staffSequences(measure.sequences, staffIndex)[voiceIndex]) {
-      members.push({ kind: 'voiceMeasure', partIndex, staffIndex, measureIndex, voiceIndex });
-    }
+    const sequenceIndex = (measure.sequences ?? [])
+      .map((sequence, index) => ({ sequence, index }))
+      .filter(entry => (entry.sequence.staff ?? 1) === staffIndex)[voiceIndex]?.index;
+    if (sequenceIndex !== undefined)
+      members.push({
+        kind: 'voiceMeasure',
+        partIndex,
+        staffIndex,
+        measureIndex,
+        voiceIndex,
+        sequenceIndex
+      });
   });
   return members;
 }
@@ -363,6 +431,8 @@ function universeFor(
       return noteMembers(doc, state.anchor);
     case 'event':
       return eventMembers(doc, state.anchor);
+    case 'container':
+      return containerMembers(doc, state.anchor);
     case 'voiceMeasure':
       return voiceMeasureMembers(doc, state.anchor);
     case 'partMeasure':
@@ -380,6 +450,7 @@ function memberMeasure(member: SelectionMember): number | null {
   switch (member.kind) {
     case 'note':
     case 'event':
+    case 'container':
     case 'voiceMeasure':
     case 'partMeasure':
     case 'measure':
@@ -417,6 +488,18 @@ function exactMemberIndex(
         member.voiceIndex === event?.voiceIndex &&
         member.eventIndex === event?.eventIndex &&
         member.containerIndex === event?.containerIndex
+      );
+    }
+    case 'container': {
+      const event = eventSlotAt(grid, cursor, projection);
+      return members.findIndex(member =>
+        member.kind === 'container' &&
+        member.partIndex === partIndex &&
+        member.staffIndex === staffIndex &&
+        member.measureIndex === cursor.measureIndex &&
+        member.voiceIndex === event?.voiceIndex &&
+        member.eventIndex === event?.eventIndex &&
+        event?.containerIndex !== undefined
       );
     }
     case 'voiceMeasure':
@@ -473,6 +556,7 @@ function sameCursor(a: EditorCursor, b: EditorCursor): boolean {
     onsetsEqual(a.onset, b.onset) &&
     a.line === b.line &&
     a.slotIndex === b.slotIndex &&
+    a.eventSlotIndex === b.eventSlotIndex &&
     (a.partIndex ?? 0) === (b.partIndex ?? 0) &&
     (a.staffIndex ?? 1) === (b.staffIndex ?? 1) &&
     (a.voiceIndex ?? 0) === (b.voiceIndex ?? 0)
@@ -541,6 +625,15 @@ function memberContainsInk(member: SelectionMember, address: InkAddress): boolea
         member.voiceIndex === address.voiceIndex &&
         member.eventIndex === address.eventIndex &&
         member.containerIndex === address.containerIndex
+      );
+    case 'container':
+      return (
+        member.partIndex === address.partIndex &&
+        member.staffIndex === address.staffIndex &&
+        member.measureIndex === address.measureIndex &&
+        member.voiceIndex === address.voiceIndex &&
+        member.eventIndex === address.eventIndex &&
+        address.containerIndex !== undefined
       );
     case 'voiceMeasure':
       return (

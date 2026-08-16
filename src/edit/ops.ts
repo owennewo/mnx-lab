@@ -99,6 +99,13 @@ export type EditOp =
       noteId: string;
     }
   | {
+      /** Clear the selected event to an equal-duration rest. This is the
+       * event rung's Delete: it removes all event ink and adornments without
+       * splicing time out of the voice. */
+      type: 'clearEvent';
+      event: EventAddress;
+    }
+  | {
       /** Re-value the voice-0 event at a metric position. */
       type: 'setDuration';
       measureIndex: number;
@@ -306,6 +313,23 @@ export type EditOp =
       sequenceIndex: number;
       eventIndex: number;
       partIndex?: number;
+    }
+  | {
+      /** Remove one sequence (the selected voice's bar copy), only when it
+       * holds no ink. Rests and empty declarations go with their container. */
+      type: 'removeVoiceMeasure';
+      partIndex: number;
+      measureIndex: number;
+      sequenceIndex: number;
+    }
+  | {
+      /** Remove the selected staff's part-measure structure, only when that
+       * staff holds no ink. A single-staff part drops the whole part-measure;
+       * a multi-staff part drops only this staff's sequences and clefs. */
+      type: 'removePartMeasure';
+      partIndex: number;
+      measureIndex: number;
+      staffIndex: number;
     }
   // Percussion and the note's accidental display — the tail of kinds that had
   // no verb at all (campaign item 2's board, finally emptied).
@@ -859,6 +883,21 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (removedNoteId || emptiedEventId) unlinkReferences(next, removedNoteId, emptiedEventId);
       return next;
     }
+    case 'clearEvent': {
+      const event = eventAtAddress(next, op.event);
+      if (!event) return next;
+      const noteIds = (event.notes ?? []).flatMap(note => note.id ? [note.id] : []);
+      const eventId = event.id;
+      delete event.notes;
+      delete (event as { kitNotes?: unknown[] }).kitNotes;
+      delete event.lyrics;
+      delete event.markings;
+      delete event.slurs;
+      event.rest = {};
+      for (const noteId of noteIds) unlinkReferences(next, noteId, undefined);
+      if (eventId) unlinkReferences(next, undefined, eventId);
+      return next;
+    }
     case 'setClef': {
       const measure = next.parts?.[0]?.measures?.[op.measureIndex];
       if (!measure) return next;
@@ -1168,6 +1207,49 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const { span } = meterOf(next, op.measureIndex);
       const remainder = subtractOnsets(span, voiceFill(seq));
       if (remainder.num > 0) seq.content.push(...restsSpanning(remainder));
+      return next;
+    }
+    case 'removeVoiceMeasure': {
+      const measure = next.parts?.[op.partIndex]?.measures?.[op.measureIndex];
+      const sequence = measure?.sequences?.[op.sequenceIndex];
+      if (!measure || !sequence || sequence.content.some(itemHasInk)) return next;
+      measure.sequences.splice(op.sequenceIndex, 1);
+      return next;
+    }
+    case 'removePartMeasure': {
+      const part = next.parts?.[op.partIndex];
+      const measure = part?.measures?.[op.measureIndex];
+      if (!part || !measure) return next;
+      const onStaff = (measure.sequences ?? []).filter(
+        sequence => (sequence.staff ?? 1) === op.staffIndex
+      );
+      if (onStaff.some(sequence => sequence.content.some(itemHasInk))) return next;
+      if ((part.staves ?? 1) <= 1) {
+        part.measures![op.measureIndex] = { sequences: [] };
+        return next;
+      }
+      const sequences = (measure.sequences ?? []).filter(
+        sequence => (sequence.staff ?? 1) !== op.staffIndex
+      );
+      measure.sequences = sequences;
+      const onOtherStaff = <T extends { staff?: number }>(items: T[] | undefined): T[] | undefined => {
+        const kept = (items ?? []).filter(item => (item.staff ?? 1) !== op.staffIndex);
+        return kept.length > 0 ? kept : undefined;
+      };
+      const clefs = (measure.clefs ?? []).filter(clef => (clef.staff ?? 1) !== op.staffIndex);
+      if (clefs.length > 0) measure.clefs = clefs;
+      else delete measure.clefs;
+      const dynamics = (measure.dynamics ?? []).filter(dynamic =>
+        (dynamic.staff ?? 1) !== op.staffIndex && dynamic.staffEnd !== op.staffIndex
+      );
+      if (dynamics.length > 0) measure.dynamics = dynamics;
+      else delete measure.dynamics;
+      const directions = onOtherStaff(measure.directions);
+      if (directions) measure.directions = directions;
+      else delete measure.directions;
+      const ottavas = onOtherStaff(measure.ottavas);
+      if (ottavas) measure.ottavas = ottavas;
+      else delete measure.ottavas;
       return next;
     }
     case 'removeKitNote': {

@@ -6,7 +6,7 @@
 > section jumps, level-aware `selectedNoteKeys` feeding the existing note-keys
 > overlay, level shown in the edit strip), pinned by
 > `harness/conformance/selection.test.ts`. **Phase 2 (same day): the enclosure
-> vocabulary** — `src/elements/enclosure.ts` draws cell/slice/run/panel/
+> vocabulary** — `src/elements/enclosure.ts` draws cell/slice/lasso/run/panel/
 > panel-wide/frame from the rendered SVG's own geometry (staff-line bands,
 > shared-barline system join, baseline-anchored glyph ink boxes — `getBBox` on
 > a Bravura `<text>` is the font line box, not ink), with the fill-fades/
@@ -162,13 +162,21 @@
 > playground keeps the presence-rule bars; the rail groups both under
 > "Editor test beds".
 >
-> **What remains, after the presentation pass**: the relax/tighten shape TWEEN (each
+> **Container + rung meanings complete 2026-08-16.** `container` is now a
+> presence-governed `SelectionLevel` between event and voice-measure, with
+> point/range/voice-closure membership, sibling navigation, HUD/tray rows and
+> a snug lasso enclosure. Delete now has an explicit anti-retiming meaning at
+> every remaining rung: event clears to an equal-duration rest; container,
+> voice-measure and part-measure remove only when their owned ink is empty;
+> section removes the boundary label, never its bars. Destructive range
+> commands remain one batch/history entry and repair a vanished rung to its
+> surviving ancestor. Focused tests pin container identity/ranges, reference
+> cleanup, every guard and section preservation.
+>
+> **What remains**: the relax/tighten shape TWEEN (each
 > level currently re-renders statically); primary/echo asymmetry (both
 > projections draw at full strength);
-> ghost cells beyond the existing entry ghosts; the container rung (the cursor
-> descends into containers since element-ops item 11b, but `container` is still
-> not a `SelectionLevel`); Delete's meaning at event, voice-measure,
-> part-measure and section (note, measure and score are rung-first and pinned).
+> ghost cells beyond the existing entry ghosts.
 > The entry-mode axis — advance mode, the
 > stage-1 digit debounce, the letter accelerator — is the other open half; it
 > shares only the cursor with
@@ -628,10 +636,9 @@ arrow doing nothing beats one doing something arbitrary.
 - ~~**The per-level navigation map**~~ — **complete and mirrored in
   `keymapDocs.ts`**. The element-ops pass also made digits note-only,
   transpose footprint-scaled, and the command set scope-filtered. Delete is
-  now rung-first at note/measure/score; event, voice-measure, part-measure and
-  section remain explicit design work. Continue the agreed process for those:
-  one level at a time, hands-on review after each — meanings are feel
-  decisions, not schema derivations.
+  rung-first and pinned at every rung: equal-duration clearing at event,
+  guarded structural removal through the bar scopes, boundary-only removal at
+  section, and guarded part removal at score.
 - ~~**Escape precedence**~~ — **answered** in `src/edit/keymap.ts`
   (`ESCAPE_PRECEDENCE`): innermost open thing first — popover, then tray or
   palette, then `relaxSelection`, then the mount's deselect. Stated once, in the
@@ -672,9 +679,11 @@ arrow doing nothing beats one doing something arbitrary.
    section-range/part-scope tiles are live. Bulk unary verbs apply one batch
    op/log entry to resolved structural membership and preserve the selection;
    the existing spanner anchor remains for out-of-scope endpoints.
-5. **Next — container + remaining rung meanings.** Add the container rung using the
-   event identity already carried by the grid, then review Delete at event,
-   container, voice-measure, part-measure and section one level at a time.
+5. **Complete 2026-08-16 — container + remaining rung meanings.** The container
+   rung uses the parent event identity already carried by the grid and is wired
+   through navigation, closures, HUD/tray and the lasso presentation. Delete is
+   explicit and pinned at event, container, voice-measure, part-measure and
+   section, including post-removal ancestor repair.
 
 ## Not this
 

@@ -128,12 +128,13 @@ rest is a member rather than an unaddressable hole.
 
 ## Selection-model gaps: the ladder's half
 
-The per-level navigation failures found by the sweep are closed. What remains is
-the ladder's horizontal state, not command vocabulary.
+The per-level navigation and container-rung failures found by the sweep are
+closed. What remains is mouse parity plus the container's property-editing
+half, not selection identity.
 
 | Tray behavior | Blocked by | Unblocked when |
 |---|---|---|
-| **container tab** (tuplet ratio, grace slash, tremolo marks at their true rung) | the cursor now *descends into* containers (item 11b), but `container` is still not a `SelectionLevel` | the container rung, riding the wrap verbs |
+| edit a selected container's ratio/slash/steal/marks | the container rung, HUD identity, lasso, range/closure and guarded Delete are live; the existing rhythm grammar constructs a wrapper but has no op for rewriting one in place | a `setContainerProperties`-class op + rhythm-popover edit mode; the tray exposes the disabled settings tile as `container-properties` meanwhile |
 | clicking a note to move the selection under the tray | `note-selected` still has no consumer — the mouse cannot place the cursor | a click→cursor intent path through the funnel; the ladder's mouse-parity story |
 
 ## Geometry and surface gaps

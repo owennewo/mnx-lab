@@ -214,7 +214,8 @@ proposals that name their campaign.
   score) so the cheatsheet cannot lie. Static meaning, not a live enablement oracle;
   physical-key labels per the keymap's `KeyboardEvent.code` decision. The ladder's
   complete per-rung bare/Ctrl navigation map and Shift-extension/Ctrl-or-Meta closure
-  gestures are mirrored here as data.
+  gestures are mirrored here as data, including the container rung and explicit
+  rung-first Delete meanings through section.
 - **[core-selection-ladder.md](inprogress/core-selection-ladder.md)** — **progressive selection as
   the input-mode system**: input modes *are* the selection level, and each level offers
   exactly the properties the data model puts there. One containment ladder (note → event →
@@ -224,7 +225,7 @@ proposals that name their campaign.
   at part-measure = the part, which is why part is not a rung). Presence rule skips absent
   rungs; ghost enclosures let the cursor address what *could* exist (selection addresses
   what is). One visual vocabulary — the enclosure — from a square note cell through column
-  slices, voice-run hulls and growing panels to the score frame, so Escape/Enter
+  slices, container lassos, voice-run hulls and growing panels to the score frame, so Escape/Enter
   animate as a single shape tween that teaches containment. Both view shows primary +
   echo per projection (the active-projection bit also picks the input dialect: ↑↓ = pitch
   vs string). Builds on [core-editor-input-layer.md](complete/core-editor-input-layer.md)'s

@@ -103,6 +103,10 @@ export interface EditorCursor {
    * coincident notes, so carrying an ordinal across would be meaningless.
    */
   slotIndex?: number;
+  /** Which coincident event at this onset the cursor means. Needed only when
+   * one voice starts multiple events together (grace/tremolo plus its host);
+   * absent leaves the ordinary note/voice resolution unchanged. */
+  eventSlotIndex?: number;
   /**
    * Which PART the cursor is editing (campaign item 13b). Absent means the
    * first, so every cursor written before parts were addressable stays valid —
@@ -472,6 +476,11 @@ export function eventSlotAt(
   cursor: EditorCursor,
   projection: Projection
 ): EventSlot | undefined {
+  const position = positionAt(grid, cursor);
+  if (cursor.eventSlotIndex !== undefined) {
+    const pinned = position?.events[cursor.eventSlotIndex];
+    if (pinned) return pinned;
+  }
   const note = slotAt(grid, cursor, projection);
   if (note) {
     return {
@@ -480,9 +489,30 @@ export function eventSlotAt(
       ...(note.containerIndex === undefined ? {} : { containerIndex: note.containerIndex })
     };
   }
-  const position = positionAt(grid, cursor);
   const voice = cursor.voiceIndex ?? 0;
   return position?.events.find(event => event.voiceIndex === voice) ?? position?.events[0];
+}
+
+/** Pin the current event only where voice+onset is genuinely ambiguous. */
+export function pinEventSlot(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  projection: Projection
+): EditorCursor {
+  const position = positionAt(grid, cursor);
+  const event = eventSlotAt(grid, cursor, projection);
+  if (!position || !event) return cursor;
+  const sameVoice = position.events.filter(candidate => candidate.voiceIndex === event.voiceIndex);
+  if (sameVoice.length < 2) {
+    const { eventSlotIndex: _drop, ...rest } = cursor;
+    return rest;
+  }
+  const eventSlotIndex = position.events.findIndex(candidate =>
+    candidate.voiceIndex === event.voiceIndex &&
+    candidate.eventIndex === event.eventIndex &&
+    candidate.containerIndex === event.containerIndex
+  );
+  return eventSlotIndex < 0 ? cursor : { ...cursor, eventSlotIndex };
 }
 
 /** Resolve the event slot against the cursor's active part and staff. */
@@ -536,7 +566,8 @@ export function cycleSlot(
 ): EditorCursor {
   const count = coincidentSlots(grid, cursor, projection).length;
   if (count < 2) return cursor;
-  return { ...cursor, slotIndex: ((cursor.slotIndex ?? 0) + 1) % count };
+  const { eventSlotIndex: _drop, ...rest } = cursor;
+  return { ...rest, slotIndex: ((cursor.slotIndex ?? 0) + 1) % count };
 }
 
 /**
@@ -713,6 +744,6 @@ function adoptedVoice(
  *  written before the anchor existed and one written after are the same
  *  object — the trace fixtures compare them literally. */
 function withVoice(cursor: EditorCursor, voice: number): EditorCursor {
-  const { voiceIndex: _drop, ...rest } = cursor;
+  const { voiceIndex: _drop, eventSlotIndex: _event, ...rest } = cursor;
   return voice ? { ...rest, voiceIndex: voice } : rest;
 }

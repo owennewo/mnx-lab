@@ -234,15 +234,138 @@ describe('selection ladder', () => {
     expect(session.selectionLevel).toBe('score');
   });
 
-  it('keeps container children on the event rung and in every wider footprint', () => {
+  it('adds the owning container between its child event and voice bar', () => {
     const session = new EditorSession(containerDoc());
     expect(session.selectedNoteKeys).toEqual(['inside-1']);
     session.handleIntent(relax);
     expect(session.selectionLevel).toBe('event');
     expect(session.selectedNoteKeys).toEqual(['inside-1']);
     session.handleIntent(relax);
+    expect(session.selectionLevel).toBe('container');
+    expect(session.resolvedSelection.members).toMatchObject([
+      { kind: 'container', containerType: 'tuplet', sequenceIndex: 0, eventIndex: 0 }
+    ]);
+    expect(session.selectedNoteKeys).toEqual(['inside-1', 'inside-2']);
+    session.handleIntent(relax);
     expect(session.selectionLevel).toBe('voiceMeasure');
     expect(session.selectedNoteKeys).toEqual(['inside-1', 'inside-2', 'outside']);
+  });
+
+  it('walks and ranges by authored containers, not by their child events', () => {
+    const doc = containerDoc();
+    doc.parts[0].measures![0].sequences[0].content.push({
+      type: 'grace',
+      content: [{ duration: { base: 'eighth' }, notes: [note('grace', 'F', 5, 1)] }]
+    });
+    const session = new EditorSession(doc);
+    session.handleIntent(relax); // event
+    session.handleIntent(relax); // container
+    expect(session.selectionLevel).toBe('container');
+    expect(session.selectedNoteKeys).toEqual(['inside-1', 'inside-2']);
+
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'next' })).toBe(true);
+    expect(session.resolvedSelection.members.map(member =>
+      member.kind === 'container' ? member.containerType : null
+    )).toEqual(['tuplet', 'grace']);
+    expect(session.selectedNoteKeys).toEqual(['inside-1', 'inside-2', 'grace']);
+
+    expect(session.handleIntent({ type: 'prevPosition' })).toBe(true); // collapse to first edge
+    expect(session.handleIntent({ type: 'nextPosition' })).toBe(true);
+    expect(session.selectedNoteKeys).toEqual(['grace']);
+  });
+
+  it('clears an event to an equal-duration rest and unlinks its ink', () => {
+    const doc = makeDoc();
+    const measure = doc.parts[0].measures![0];
+    const first = measure.sequences[0].content[0] as {
+      id?: string; lyrics?: object; markings?: object; slurs?: object[]
+    };
+    const second = measure.sequences[0].content[1] as { id?: string; slurs?: object[] };
+    first.id = 'e1';
+    first.lyrics = { lines: { '1': { text: 'word' } } };
+    first.markings = { staccato: {} };
+    second.id = 'e2';
+    second.slurs = [{ target: 'e1', startNote: 'n3', endNote: 'n1' }];
+    measure.beams = [{ events: ['e1', 'e2'] }];
+
+    const session = new EditorSession(doc);
+    session.handleIntent(relax); // event
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    const cleared = session.doc.parts[0].measures![0].sequences[0].content[0] as {
+      duration: object; notes?: unknown[]; rest?: object; lyrics?: object; markings?: object
+    };
+    expect(cleared.duration).toEqual({ base: 'quarter' });
+    expect(cleared).toMatchObject({ rest: {} });
+    expect(cleared.notes).toBeUndefined();
+    expect(cleared.lyrics).toBeUndefined();
+    expect(cleared.markings).toBeUndefined();
+    expect(session.doc.parts[0].measures![0].beams).toBeUndefined();
+    expect((session.doc.parts[0].measures![0].sequences[0].content[1] as { slurs?: unknown[] }).slurs)
+      .toBeUndefined();
+    expect(session.selectionLevel).toBe('event');
+  });
+
+  it('deletes an empty container, but refuses one that still owns ink', () => {
+    const session = new EditorSession(containerDoc());
+    session.handleIntent(relax); // event
+    session.handleIntent(relax); // container
+    expect(session.handleIntent({ type: 'delete' })).toBe(false);
+
+    session.handleIntent(tighten); // first child event
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.handleIntent({ type: 'nextPosition' })).toBe(true);
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    session.handleIntent(relax); // container
+    expect(session.selectionLevel).toBe('container');
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.selectionLevel).toBe('voiceMeasure');
+    expect((session.doc.parts[0].measures![0].sequences[0].content[0] as { type?: string }).type)
+      .toBeUndefined();
+  });
+
+  it('keeps a cleared grace event distinct from its coincident host', () => {
+    const doc = containerDoc();
+    doc.parts[0].measures![0].sequences[0].content[0] = {
+      type: 'grace',
+      content: [{ duration: { base: 'eighth' }, notes: [note('grace', 'E', 5, 1)] }]
+    };
+    const session = new EditorSession(doc);
+    session.handleIntent(relax); // grace child event; pins the coincident event identity
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.selectionLevel).toBe('event');
+    expect(session.selectedNoteKeys).toEqual([]);
+    session.handleIntent(relax);
+    expect(session.selectionLevel).toBe('container');
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.selectionLevel).toBe('voiceMeasure');
+    expect(session.selectedNoteKeys).toEqual(['outside']);
+  });
+
+  it('guards voice/staff bar removal by ink and repairs to the surviving ancestor', () => {
+    const voice = new EditorSession(makeDoc());
+    while (voice.selectionLevel !== 'voiceMeasure') voice.handleIntent(relax);
+    expect(voice.handleIntent({ type: 'delete' })).toBe(false);
+    voice.handleIntent({ type: 'goToMeasure', measureIndex: 1 });
+    while (voice.selectionLevel !== 'voiceMeasure') voice.handleIntent(relax);
+    expect(voice.handleIntent({ type: 'delete' })).toBe(true);
+    expect(voice.doc.parts[0].measures![1].sequences).toEqual([]);
+    expect(voice.selectionLevel).toBe('partMeasure');
+
+    const staff = new EditorSession(makeDoc());
+    staff.handleIntent({ type: 'goToMeasure', measureIndex: 1 });
+    while (staff.selectionLevel !== 'partMeasure') staff.handleIntent(relax);
+    expect(staff.handleIntent({ type: 'delete' })).toBe(true);
+    expect(staff.doc.parts[0].measures![1]).toEqual({ sequences: [] });
+    expect(staff.selectionLevel).toBe('partMeasure');
+  });
+
+  it('deletes a section boundary without deleting any bars', () => {
+    const session = new EditorSession(makeDoc(true));
+    while (session.selectionLevel !== 'section') session.handleIntent(relax);
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.doc.global.measures).toHaveLength(3);
+    expect(session.doc.global.measures[0].section).toBeUndefined();
+    expect(session.doc.global.measures[2].section?.label).toBe('Verse');
   });
 
   it('makes global measure, section and score footprints cross every part and staff', () => {

@@ -28,6 +28,7 @@ import {
   coincidentSlots,
   cycleSlot,
   eventAtCursor,
+  eventSlotAt,
   initialCursor,
   moveLine,
   moveMeasure,
@@ -36,6 +37,7 @@ import {
   moveToMeasure,
   onsetsEqual,
   onsetLess,
+  pinEventSlot,
   positionAt,
   slotAt,
   type EditorCursor,
@@ -314,19 +316,64 @@ export class EditorSession {
         // under the cursor. Checking the slot first made Del at measure/score
         // silently remove one note while the enclosure claimed a container.
         if (this.selectionState.level === 'note') {
-          const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
-          if (!slot) return false;
-          this.apply(
-            /\.k\d+$/.test(slot.noteKey)
-              ? { type: 'removeKitNote', noteKey: slot.noteKey }
-              : { type: 'deleteNote', noteId: slot.noteKey }
+          const ops = [...this.selectedNoteKeys].reverse().map(noteKey =>
+            /\.k\d+$/.test(noteKey)
+              ? { type: 'removeKitNote' as const, noteKey }
+              : { type: 'deleteNote' as const, noteId: noteKey }
           );
-          return true;
+          return this.applyDestructive(ops);
         }
-        // The container rungs' guarded delete (element-ops): a container may
-        // be removed only when it holds no ink — Del at the measure rung
-        // removes the empty bar, at the score rung the empty part (then the
-        // trailing empty bars), and the hollowed skeleton dissolves to {}.
+        if (this.selectionState.level === 'event') {
+          const ops = this.resolvedSelection.members.flatMap(member =>
+            member.kind === 'event'
+              ? [{ type: 'clearEvent' as const, event: eventAddressOf(member) }]
+              : []
+          );
+          return this.applyDestructive(ops);
+        }
+        if (this.selectionState.level === 'container') {
+          const ops = [...this.resolvedSelection.members].reverse().flatMap(member =>
+            member.kind === 'container'
+              ? [{
+                  type: 'removeContainer' as const,
+                  partIndex: member.partIndex,
+                  measureIndex: member.measureIndex,
+                  sequenceIndex: member.sequenceIndex,
+                  eventIndex: member.eventIndex
+                }]
+              : []
+          );
+          return this.applyDestructive(ops);
+        }
+        if (this.selectionState.level === 'voiceMeasure') {
+          const ops = this.resolvedSelection.members.flatMap(member =>
+            member.kind === 'voiceMeasure'
+              ? [{
+                  type: 'removeVoiceMeasure' as const,
+                  partIndex: member.partIndex,
+                  measureIndex: member.measureIndex,
+                  sequenceIndex: member.sequenceIndex
+                }]
+              : []
+          );
+          return this.applyDestructive(ops);
+        }
+        if (this.selectionState.level === 'partMeasure') {
+          const ops = this.resolvedSelection.members.flatMap(member =>
+            member.kind === 'partMeasure'
+              ? [{
+                  type: 'removePartMeasure' as const,
+                  partIndex: member.partIndex,
+                  measureIndex: member.measureIndex,
+                  staffIndex: member.staffIndex
+                }]
+              : []
+          );
+          return this.applyDestructive(ops);
+        }
+        // The same guarded-removal rule continues outward: Del at the measure
+        // rung removes the empty bar, and at score it removes the empty part
+        // (then trailing empty bars). No wider command destroys hidden ink.
         if (this.selectionState.level === 'measure') {
           const measureIndex = this.cursorState.measureIndex;
           if (
@@ -350,6 +397,18 @@ export class EditorSession {
             return true;
           }
           return false;
+        }
+        if (this.selectionState.level === 'section') {
+          const ops = [...this.resolvedSelection.members].reverse().flatMap(member =>
+            member.kind === 'section'
+              ? [{
+                  type: 'removeMeasureAttribute' as const,
+                  measureIndex: member.start,
+                  kind: 'section' as const
+                }]
+              : []
+          );
+          return this.applyDestructive(ops);
         }
         return false;
       }
@@ -1108,8 +1167,8 @@ export class EditorSession {
         this.reanchorSelection('note');
         return true;
       }
-      // Bare arrows move by the rung's unit: positions at note/event, bars at
-      // the bar rungs, sections at section, nothing at score.
+      // Bare arrows move by the rung's unit: positions/events/containers at
+      // the fine rungs, bars at the bar rungs, sections at section, nothing at score.
       case 'nextPosition':
         if (this.collapseHorizontal(1)) return true;
         this.cursorState = this.moveHorizontal(before, 1);
@@ -1126,7 +1185,7 @@ export class EditorSession {
         break;
       // The vertical axis belongs to the RUNG, not always to the line (the
       // per-level navigation map): the staff/fingerboard at note level, the
-      // voice stack at the event rungs, the system's staves at part-measure.
+      // voice stack at the event/container rungs, the system's staves at part-measure.
       // The measure and score rungs are resolved by the MOUNT — "the
       // neighbouring system" is a fact about the paint and "the next document"
       // one about the host, neither visible from this DOM-free layer, so both
@@ -1139,6 +1198,7 @@ export class EditorSession {
             this.cursorState = moveLine(this.grid, before, delta, this.activeProjection);
             break;
           case 'event':
+          case 'container':
           case 'voiceMeasure':
             if (!this.stepVoice(before, delta)) return false;
             this.reanchorSelection();
@@ -1241,6 +1301,7 @@ export class EditorSession {
         switch (this.selectionState.level) {
           case 'note':
           case 'event':
+          case 'container':
             this.cursorState = moveMeasure(this.grid, before, delta);
             break;
           case 'voiceMeasure':
@@ -1268,6 +1329,7 @@ export class EditorSession {
             this.reanchorSelection();
             return true;
           case 'event':
+          case 'container':
           case 'voiceMeasure':
             if (!this.stepStaff(before, delta)) return false;
             this.reanchorSelection();
@@ -1283,12 +1345,18 @@ export class EditorSession {
   }
 
   private setSelectionLevel(level: SelectionLevel): void {
+    const pin = (cursor: EditorCursor) =>
+      level === 'event' || level === 'container'
+        ? pinEventSlot(this.grid, cursor, this.activeProjection)
+        : withoutEventPin(cursor);
+    this.cursorState = pin(this.cursorState);
     this.selectionState = {
       ...this.selectionState,
       level,
+      anchor: pin(this.selectionState.anchor),
       extent: this.selectionState.extent.kind === 'closure'
         ? { kind: 'closure', scope: closureScopeForLevel(level) }
-        : this.selectionState.extent
+        : { kind: 'cursor', cursor: pin(this.selectionState.extent.cursor) }
     };
   }
 
@@ -1345,6 +1413,7 @@ export class EditorSession {
    * the same bar/section units as their bare horizontal navigation. */
   private moveSelectionHorizontal(before: EditorCursor, delta: 1 | -1): EditorCursor {
     const level = this.selectionState.level;
+    if (level === 'container') return this.containerStep(before, delta);
     if (level === 'note' || level === 'event') {
       const at = this.grid.positions.findIndex(position =>
         position.measureIndex === before.measureIndex && onsetsEqual(position.onset, before.onset)
@@ -1430,6 +1499,8 @@ export class EditorSession {
         // the event rung has nothing to address there: the slice went blank at
         // a position the cursor had just been told to select.
         return movePositionInk(this.grid, before, delta, 'keep');
+      case 'container':
+        return this.containerStep(before, delta);
       case 'voiceMeasure':
       case 'partMeasure':
       case 'measure':
@@ -1451,6 +1522,62 @@ export class EditorSession {
         ? starts.find(s => s > before.measureIndex)
         : [...starts].reverse().find(s => s < before.measureIndex);
     return target === undefined ? before : moveToMeasure(this.grid, before, target);
+  }
+
+  /** Prev/next authored rhythm container in this staff/voice. Inner events
+   * already carry their parent's content index in the grid; this walk merely
+   * deduplicates that identity and lands on the target's first child. */
+  private containerStep(before: EditorCursor, delta: 1 | -1): EditorCursor {
+    const members = resolveSelection(this.doc, {
+      level: 'container',
+      anchor: copyCursorAddress(before),
+      extent: { kind: 'closure', scope: 'voice' }
+    }, this.activeProjection).members.filter(member => member.kind === 'container');
+    const current = eventSlotAt(this.grid, before, this.activeProjection);
+    if (!current || current.containerIndex === undefined) return before;
+    const at = members.findIndex(member =>
+      member.measureIndex === before.measureIndex &&
+      member.voiceIndex === current.voiceIndex &&
+      member.eventIndex === current.eventIndex
+    );
+    const target = members[at + delta];
+    if (at < 0 || !target) return before;
+    const position = this.grid.positions.find(candidate =>
+      candidate.measureIndex === target.measureIndex &&
+      candidate.events.some(event =>
+        event.voiceIndex === target.voiceIndex &&
+        event.eventIndex === target.eventIndex &&
+        event.containerIndex !== undefined
+      )
+    );
+    if (!position) return before;
+    const targetSlots = position.slots.filter(slot =>
+      slot.voiceIndex === target.voiceIndex &&
+      slot.eventIndex === target.eventIndex &&
+      slot.containerIndex !== undefined
+    );
+    const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
+    const line = targetSlots.length > 0 ? nearestSlotLine(targetSlots, before.line, tab) : before.line;
+    const landed = cursorAtPosition(
+      { ...before, ...(target.voiceIndex ? { voiceIndex: target.voiceIndex } : {}) },
+      position,
+      line
+    );
+    const ordinal = coincidentSlots(this.grid, landed, this.activeProjection).findIndex(slot =>
+      slot.voiceIndex === target.voiceIndex &&
+      slot.eventIndex === target.eventIndex &&
+      slot.containerIndex !== undefined
+    );
+    const eventSlotIndex = position.events.findIndex(event =>
+      event.voiceIndex === target.voiceIndex &&
+      event.eventIndex === target.eventIndex &&
+      event.containerIndex !== undefined
+    );
+    return {
+      ...landed,
+      ...(ordinal > 0 ? { slotIndex: ordinal } : {}),
+      ...(eventSlotIndex >= 0 ? { eventSlotIndex } : {})
+    };
   }
 
   /**
@@ -1545,6 +1672,11 @@ export class EditorSession {
    * only the active extent; until those intents exist, every cursor move is a
    * conventional collapse/re-anchor at the current rung. */
   private reanchorSelection(level: SelectionLevel = this.selectionState.level): void {
+    if (level === 'event' || level === 'container') {
+      this.cursorState = pinEventSlot(this.grid, this.cursorState, this.activeProjection);
+    } else {
+      this.cursorState = withoutEventPin(this.cursorState);
+    }
     this.selectionState = pointSelection(level, this.cursorState);
   }
 
@@ -1559,6 +1691,21 @@ export class EditorSession {
     this.history.undo();
     this.reindex(true);
     return false;
+  }
+
+  private applyDestructive(ops: EditOp[]): boolean {
+    const level = this.selectionState.level;
+    if (!this.applyBulk(ops)) return false;
+    const present = presentLevels(
+      this.doc,
+      this.grid,
+      this.cursorState,
+      this.activeProjection
+    );
+    if (present.has(level) && this.resolvedSelection.members.length > 0) return true;
+    const ancestor = relaxLevel(present, level);
+    if (ancestor) this.reanchorSelection(ancestor);
+    return true;
   }
 
   private selectedEventAddresses(): EventAddress[] {
@@ -1691,6 +1838,11 @@ function copyCursorAddress(cursor: EditorCursor): EditorCursor {
   return { ...cursor, onset: { ...cursor.onset } };
 }
 
+function withoutEventPin(cursor: EditorCursor): EditorCursor {
+  const { eventSlotIndex: _drop, ...rest } = cursor;
+  return rest;
+}
+
 function eventAddressKey(address: EventAddress): string {
   return [
     address.partIndex,
@@ -1702,12 +1854,31 @@ function eventAddressKey(address: EventAddress): string {
   ].join(':');
 }
 
+function eventAddressOf(member: {
+  partIndex: number;
+  staffIndex: number;
+  measureIndex: number;
+  voiceIndex: number;
+  eventIndex: number;
+  containerIndex?: number;
+}): EventAddress {
+  return {
+    partIndex: member.partIndex,
+    staffIndex: member.staffIndex,
+    measureIndex: member.measureIndex,
+    voiceIndex: member.voiceIndex,
+    eventIndex: member.eventIndex,
+    ...(member.containerIndex === undefined ? {} : { containerIndex: member.containerIndex })
+  };
+}
+
 function cursorAddressesEqual(a: EditorCursor, b: EditorCursor): boolean {
   return (
     a.measureIndex === b.measureIndex &&
     onsetsEqual(a.onset, b.onset) &&
     a.line === b.line &&
     a.slotIndex === b.slotIndex &&
+    a.eventSlotIndex === b.eventSlotIndex &&
     (a.partIndex ?? 0) === (b.partIndex ?? 0) &&
     (a.staffIndex ?? 1) === (b.staffIndex ?? 1) &&
     (a.voiceIndex ?? 0) === (b.voiceIndex ?? 0)
@@ -1720,7 +1891,7 @@ function compareCursorTime(a: EditorCursor, b: EditorCursor): number {
 }
 
 function cursorAtPosition(before: EditorCursor, position: Position, line: number): EditorCursor {
-  const { slotIndex: _slotIndex, ...address } = before;
+  const { slotIndex: _slotIndex, eventSlotIndex: _eventSlotIndex, ...address } = before;
   return {
     ...address,
     measureIndex: position.measureIndex,

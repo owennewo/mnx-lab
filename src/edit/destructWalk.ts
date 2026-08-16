@@ -312,6 +312,14 @@ function driveWithinProjection(session: EditorSession, key: string): boolean {
   ) {
     session.handleIntent({ type: 'nextPosition' });
   }
+  // A destructive note command now repairs an emptied cell to its surviving
+  // event/container ancestor instead of leaving an impossible note selection
+  // on empty space. Descend again at the target onset before walking lines;
+  // tighten uses the ladder's nearest-child rule, exactly as a player does.
+  for (let guard = 0; session.selectionLevel !== 'note' && guard < 8; guard++) {
+    if (!session.handleIntent({ type: 'tightenSelection' })) break;
+  }
+  if (session.selectionLevel !== 'note') return false;
   const line = session.projection === 'tab' ? target.slot.line : target.slot.staffPosition;
   for (let guard = 0; session.cursor.line !== line && guard < 64; guard++) {
     // lineDown decreases staff position / increases string number.

@@ -392,6 +392,7 @@ export class ScoreViewer extends LitElement {
         stroke-opacity: 0.6;
       }
 
+      #score-container svg .enc-lasso rect,
       #score-container svg .enc-run rect {
         fill-opacity: 0.13;
         stroke-opacity: 0.55;
@@ -755,6 +756,7 @@ export class ScoreViewer extends LitElement {
       }
       if (kind && svg) {
         drawEnclosure(svg, kind, {
+          noteIds: this.selection?.selectedNoteIds,
           span: this.selection?.span,
           systemRows: packedRowMeasures(paint.packings, densityH),
           staffOrdinals: renderedStaffOrdinals

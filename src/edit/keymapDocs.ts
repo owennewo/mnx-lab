@@ -67,6 +67,7 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'walk positions (notation: this voice’s ink, nearest pitch)',
       event: 'walk this voice’s events (rests included)',
+      container: 'walk this voice’s rhythm containers',
       voiceMeasure: 'walk bars',
       partMeasure: 'walk bars',
       measure: 'walk bars',
@@ -89,6 +90,7 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'up/down the vertical line (string / staff position)',
       event: 'the voice above/below, at this instant',
+      container: 'the voice above/below, at this instant',
       voiceMeasure: 'the voice above/below in this bar',
       partMeasure: 'the staff above/below (this part’s staves, then the next part)',
       measure: 'the nearest bar in the system above/below',
@@ -108,6 +110,7 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'bar jump (the Ctrl climb)',
       event: 'bar jump, keeping the voice',
+      container: 'bar jump, keeping the voice',
       voiceMeasure: 'jump to the prev/next section',
       partMeasure: 'jump to the prev/next section',
       measure: 'jump to the prev/next section'
@@ -125,6 +128,7 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'jump to the voice above/below (the event sounding at this beat)',
       event: 'jump to the staff above/below',
+      container: 'jump to the staff above/below',
       voiceMeasure: 'jump to the staff above/below',
       partMeasure: 'jump to the system above/below'
     }
@@ -153,6 +157,7 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'extend through this voice’s existing notes',
       event: 'extend through this voice’s events (rests included)',
+      container: 'extend through this voice’s rhythm containers',
       voiceMeasure: 'extend through this voice’s existing bar copies',
       partMeasure: 'extend through bars on this staff',
       measure: 'extend through global bars',
@@ -166,6 +171,7 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'extend to this voice’s last existing note',
       event: 'extend to this voice’s last event',
+      container: 'extend to this voice’s last rhythm container',
       voiceMeasure: 'extend to this voice’s last existing bar copy',
       partMeasure: 'extend to the last bar on this staff',
       measure: 'extend to the last global bar',
@@ -182,6 +188,7 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'select every existing note in this staff/voice timeline',
       event: 'select every event in this staff/voice timeline',
+      container: 'select every rhythm container in this staff/voice timeline',
       voiceMeasure: 'select every existing bar copy in this staff/voice',
       partMeasure: 'select this whole part (all staves and bars)',
       measure: 'select the global timeline',
@@ -215,7 +222,12 @@ export const KEY_DOCS: KeyDoc[] = [
     // destroys ink implicitly) — hence the guards in the upper-rung meanings.
     meaning: {
       note: 'delete the note under the cursor (an emptied event becomes a rest)',
+      event: 'clear the event to an equal-duration rest',
+      container: 'delete the rhythm container — only when it holds no notes',
+      voiceMeasure: 'delete this voice’s bar copy — only when it holds no notes',
+      partMeasure: 'delete this staff’s bar copy — only when it holds no notes',
       measure: 'delete this bar — only when it holds no notes',
+      section: 'delete this section boundary (the bars remain)',
       score: 'delete the part (then trailing bars) — only when no notes remain'
     }
   },

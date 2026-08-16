@@ -293,6 +293,7 @@ const DEF_PREVIEW = 9;
 const ENCLOSURE_BY_LEVEL: Record<SelectionLevel, EnclosureKind> = {
   note: 'cell',
   event: 'slice',
+  container: 'lasso',
   voiceMeasure: 'run',
   partMeasure: 'panel',
   measure: 'panel-wide',
@@ -311,7 +312,7 @@ function presentationSpan(
   if (level === 'score') return null;
   const spans = measureSpans(doc);
   const coverage: SelectionSpan['coverage'] =
-    level === 'note' || level === 'event'
+    level === 'note' || level === 'event' || level === 'container'
       ? 'moment'
       : level === 'voiceMeasure' || level === 'partMeasure'
         ? 'staff-measure'
@@ -338,6 +339,7 @@ function presentationSpan(
     switch (member.kind) {
       case 'note':
       case 'event':
+      case 'container':
         push(member.measureIndex, member.partIndex, member.staffIndex, member.onset);
         break;
       case 'voiceMeasure':

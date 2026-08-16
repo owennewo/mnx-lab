@@ -1,8 +1,8 @@
 // The selection enclosure overlay — roadmap/inprogress/core-selection-ladder.md.
 //
 // One visual vocabulary for every selection level: an enclosure whose extent
-// grows and whose fill fades as the level widens (cell → slice → beads →
-// panel → panel-wide → frame). Drawn from the RENDERED SVG's own geometry —
+// grows and whose fill fades as the level widens (cell → slice → lasso → run
+// → panel → panel-wide → frame). Drawn from the RENDERED SVG's own geometry —
 // selected glyphs (`.selected`), staff lines (`.staff-line`) and barlines
 // (`.barline`) — so it needs no layout API, works identically in the
 // notation, tab and both views, and stays presentation-only: this module
@@ -277,13 +277,34 @@ export function drawEnclosure(
   svg.querySelector(`:scope > g.${layer}`)?.remove();
 
   const sp = unitsPerSp(svg);
-  const glyphs = options.noteIds
+  let glyphs = options.noteIds
     ? previewGlyphs(svg, kind, options.noteIds)
     : [
         ...svg.querySelectorAll<SVGGraphicsElement>(
           kind === 'cell' ? '.notehead.selected, .fret-number.selected' : '.selected'
         )
       ];
+  // Container artifacts do not carry note ids of their own. Once the member
+  // notes identify the horizontal extent, include the owning notation ink in
+  // that extent so the lasso surrounds the tuplet/grace/tremolo as a thing,
+  // not merely its child noteheads.
+  if (kind === 'lasso' && glyphs.length > 0) {
+    const seed = union(glyphs.map(el => inkBox(el, sp)));
+    const artifacts = [
+      ...svg.querySelectorAll<SVGGraphicsElement>(
+        '.tuplet-bracket, .tuplet-number, .grace-slash, .tremolo-beam'
+      )
+    ].filter(el => {
+      const box = inkBox(el, sp);
+      return (
+        box.x + box.w >= seed.x - sp &&
+        box.x <= seed.x + seed.w + sp &&
+        box.y + box.h >= seed.y - 5 * sp &&
+        box.y <= seed.y + seed.h + 5 * sp
+      );
+    });
+    glyphs = [...glyphs, ...artifacts];
+  }
   const boxes = glyphs.map(el => inkBox(el, sp));
   const hasStructuralSpan = Boolean(options.span?.units.length && options.systemRows?.length);
   if (boxes.length === 0 && kind !== 'frame' && !hasStructuralSpan) return;
@@ -481,10 +502,10 @@ export function drawEnclosure(
           );
           continue;
         }
-        const top = kind === 'cell' && selectedBox
+        const top = (kind === 'cell' || kind === 'lasso') && selectedBox
           ? selectedBox.y - 0.5 * sp
           : Math.min(staff.top - (kind === 'slice' ? 1.5 : 1) * sp, selectedBox?.y ?? Infinity);
-        const bottom = kind === 'cell' && selectedBox
+        const bottom = (kind === 'cell' || kind === 'lasso') && selectedBox
           ? selectedBox.y + selectedBox.h + 0.5 * sp
           : Math.max(
               staff.bottom + (kind === 'slice' ? 1.5 : 1) * sp,
@@ -524,6 +545,15 @@ export function drawEnclosure(
         const top = Math.min(staff.top - 1.5 * sp, u.y - 0.5 * sp);
         const bottom = Math.max(staff.bottom + 1.5 * sp, u.y + u.h + 0.5 * sp);
         rect(u.x - 0.4 * sp, top, u.w + 0.8 * sp, bottom - top, 0.5 * sp, 0.1 * sp);
+      }
+      break;
+    }
+    case 'lasso': {
+      // A snug hull around the container's child ink. The structural onset
+      // supplies a small honest fallback for an empty container.
+      for (const [, staffBoxes] of byStaff) {
+        const u = union(staffBoxes);
+        rect(u.x - 0.5 * sp, u.y - 0.5 * sp, u.w + sp, u.h + sp, 0.55 * sp, 0.1 * sp);
       }
       break;
     }

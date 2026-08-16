@@ -15,8 +15,11 @@
 > joined the table (`setup`/`workbench` groups); the score rung shows its
 > honest near-empty truth. The 2026-08-16 horizontal pass added the
 > Shift+←/→, Shift+End and Ctrl/Meta+A rows with per-rung meanings, covered by
-> the same binding↔documentation joins. **Remaining: stage 4** — later ladder
-> review decisions continue to land here as data.
+> the same binding↔documentation joins. The later container/Delete pass added
+> container navigation/range/closure meanings and the rung-first Delete
+> contract through section, with guard mirrors for both arrow families.
+> **Remaining: stage 4** — later ladder review decisions continue to land here
+> as data.
 >
 > Original proposal below. The rendering surface builds on
 > [core-score-hud.md](../complete/core-score-hud.md) (the hud panel tab);
