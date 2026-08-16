@@ -40,6 +40,15 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-entry-mode.md](proposed/core-entry-mode.md)** — the orthogonal entry axis
+  graduated from the completed selection ladder on 2026-08-16: **advance on/off** as
+  recorded session state, stage-1 fret-digit resolution, the notation action binding and
+  letter accelerators. Today the session records raw digits, combines every consecutive
+  pair on an unmoved cursor by undoing the first edit, and has no auto-advance. The plan
+  moves timing into the mount so traces receive one resolved fret, advances only after a
+  successful addition, and makes Space/default/window/key-layer choices a hands-on review.
+  Sibling boundary: this owns **when/how keystrokes resolve**;
+  [core-entry-surface.md](proposed/core-entry-surface.md) owns **where the write lands**.
 - **[core-entry-surface.md](proposed/core-entry-surface.md)** — typing anywhere the
   cursor can already go, graduated out of the element-ops campaign (2026-08-15) as the
   last thing holding its index open. The cursor addresses part → staff → voice in full
@@ -255,8 +264,8 @@ proposals that name their campaign.
   part-measure while preserving roles through the split/merge tween. Generalized ghosts
   now cover silent/rest-only columns from structural row/bar/staff geometry and give a
   measureless part a larger “place for a bar” vacancy until its first measure exists.
-  **Completed 2026-08-16. Next:** graduate the separate entry-mode axis (advance mode,
-  digit debounce, letter accelerators) into its own proposal.
+  **Completed 2026-08-16.** The separate advance/digit/letter axis graduated the same day
+  to [core-entry-mode.md](proposed/core-entry-mode.md).
 - **[core-vertical-density.md](complete/core-vertical-density.md)** — **systems per page
   without shrinking the staff**: the third axis of
   [core-render-density-zoom.md](complete/core-render-density-zoom.md), proposed and built

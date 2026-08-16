@@ -146,9 +146,9 @@
 > spelling) and the hollow dashed **ghost cell** overlay (`drawCursorGhost`).
 > Generalized silent-column and structural ghosts closed its original ink-
 > anchor limitation on 2026-08-16; see the completion note below. Pinned by
-> `harness/conformance/navigation.test.ts`. NOT in this
-> slice: advance mode + the stage-1 digit debounce, the letter accelerator
-> layer, event level and above.
+> `harness/conformance/navigation.test.ts`. NOT in this slice: the orthogonal
+> advance/digit/letter work, now graduated to
+> [core-entry-mode.md](../proposed/core-entry-mode.md), or event level and above.
 >
 > **Review findings folded in same-day**: (1) Ctrl+←→ = bar jump in BOTH
 > projections — tab's event-skip read as bare → in single-voice music
@@ -218,10 +218,11 @@
 > first-measure transition without console errors. The overlay remains corpus-
 > neutral, so no renderer golden changes.
 >
-> **The selection ladder is complete.** The entry-mode axis — advance mode, the
-> stage-1 digit debounce, the letter accelerator — is the other open half; it
-> shares only the cursor with the ladder and should graduate into its own
-> proposal before implementation. Builds
+> **The selection ladder is complete.** Its orthogonal entry-mode axis —
+> advance mode, stage-1 digit resolution and letter accelerators — graduated
+> on 2026-08-16 to
+> [core-entry-mode.md](../proposed/core-entry-mode.md). It shares the cursor but
+> no selection membership or rung state with this item. The ladder builds
 > directly on the complete
 > input layer ([core-editor-input-layer.md](../complete/core-editor-input-layer.md)), which
 > already decided the load-bearing substrate: the cursor is a **rhythmic
@@ -552,7 +553,8 @@ Why the rows are what they are:
   positions between chord members). Cross-voice movement at an instant stays
   Ctrl+↑↓'s job (event-level voice jump) — which the spatial model makes
   genuinely distinct in notation, repairing a degenerate Ctrl cell. A
-  **letter accelerator layer** comes later, with two candidate semantics:
+  **letter accelerator layer** is owned by
+  [core-entry-mode.md](../proposed/core-entry-mode.md), with two candidate semantics:
   letters-as-entry (incumbent-style, re-imports the chord patch) vs
   **letters-as-navigation** (letter jumps the cursor to the nearest matching
   staff position; the action key stays the only mutator) — lean: navigation.
@@ -613,41 +615,15 @@ Two riders:
   escalation, reachable only as bare arrows at score level — a climb that
   gets there dies instead (no Ctrl+↓-on-a-bar jumping documents).
 
-### Advance mode (on | off) — an orthogonal entry mode
+### Orthogonal entry mode — graduated 2026-08-16
 
-Whether entry auto-advances the cursor is **not a property of the entry
-keys** — it is an orthogonal session mode, **advance mode: on | off**
-(named 2026-08-10; "insert/append" was rejected because Dorico's *Insert
-mode* names a different axis — entry shifting subsequent music vs
-overwriting — which this repo will meet later against the full-bar
-invariant). It works identically in both panes. The reframe *explains* the
-incumbents: Dorico's Q chord mode is an advance-off toggle, MuseScore's
-Shift+letter is advance-off for one keystroke — patches needed only because
-advancement was baked into the letter keys. Here, any entry action
-materializes ink and the mode decides whether the cursor then steps (by the
-pending entry duration).
-
-- **Digit debounce — decided 2026-08-10, needed in BOTH modes.** Advance-on
-  needs a window so the second digit can combine before the cursor steps;
-  advance-off needs it too, because today's timer-free combining has a
-  hidden ambiguity — `1` then `2` ALWAYS combines, so fret 1 can never be
-  corrected to fret 2 in place. The window resolves both: within it a digit
-  combines, after it a digit replaces. **Determinism is preserved by
-  placement**: the debounce lives in stage 1 (the keymap/mount layer, which
-  already owns environment-dependent interpretation) and emits the RESOLVED
-  intent — the session stays timer-free and traces record what the debounce
-  resolved, never the timing. Commit happens at window expiry OR immediately
-  on any non-digit intent (navigation never waits); with advance on, the
-  cursor step is deferred to the commit. The window duration is a named
-  tunable; the session's current in-place combining retires when this lands.
-- **Removal never advances**: the mode applies to additions only; toggling a
-  head off stays put.
-- **Per-pane defaults, parked**: GP muscle memory says tab defaults to
-  advance-off (GP never auto-advances); incumbent muscle memory says
-  notation defaults to advance-on. Different defaults are defensible because
-  the axis is orthogonal; whether they FEEL consistent is for the review.
-- Mode changes are session state set through a recorded intent (like the
-  pending entry duration), so traces replay them.
+Advance on/off, stage-1 fret-digit resolution, the provisional Space binding
+and letter accelerators are now one standalone implementation proposal:
+[core-entry-mode.md](../proposed/core-entry-mode.md). The split preserves this
+item's settled claim: advance is session state, **not** a selection rung or a
+projection property. The new item owns timing, bindings and post-addition cursor
+movement; this completed ladder continues to own the cursor address those actions
+start from.
 
 ### The navigation playground scenario
 
@@ -664,9 +640,9 @@ echoes) with declared `strings[]`. The gap this originally exposed is closed:
 the cursor now carries part and staff, and the part-measure vertical walks the
 system's actual staff order.
 
-Still parked for hands-on entry review: whether Space remains the entry action
-key (it collides with play/pause), the **debounce window duration**, and whether
-per-pane advance defaults feel consistent. The notation note-level ←→ landing
+Still parked in [core-entry-mode.md](../proposed/core-entry-mode.md)'s hands-on
+entry review: whether Space remains the entry action key, the digit window and
+the single session default. The notation note-level ←→ landing
 is no longer parked: the review chose nearest-pitch ink. **Decided 2026-08-15
 with the per-level pass**:
 voice-switching ↑↓ **stops** at the outermost voice — a wrap across the stack

@@ -5,6 +5,12 @@ Serves the **implementation loop**. Graduated out of
 2026-08-15 (it was the campaign's item 13c, and the last thing holding its index
 open). The campaign owned *addressing*; this owns *writing*.
 
+Sibling boundary: [core-entry-mode.md](core-entry-mode.md) owns **when** a
+successful addition advances and **how** raw Space/digit/letter keystrokes
+become resolved intents. This item owns **where** those intents write — the
+cursor's part, staff and voice plus the new-sequence policy. They are independent
+and neither is a prerequisite for the other.
+
 ## The gap, exactly
 
 The cursor addresses `part → measure → staff → voice → event → note` in full: it
