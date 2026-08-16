@@ -59,18 +59,6 @@ proposals that name their campaign.
   voice that underfills on every render. Corpus cost is nil (the key grammar already
   spells part and staff, silent for 0 and 1). Acceptance: a construct trace for
   `spec/multiple-voices` and `spec/tie-targets`.
-- **[core-selection-clipboard.md](proposed/core-selection-clipboard.md)** — typed copy,
-  cut and paste over every selection rung, range and closure. The first transport is a
-  string-only in-memory store scoped above individual sessions, so material can move
-  between scores while the workbench stays open; system clipboard support and reload
-  persistence are explicitly deferred. The clip itself is a versioned, DOM-free JSON
-  union (`note-set` → event/container runs → voice/staff bars → part/measures/section/
-  score), resolved to an immutable snapshot at copy time. Paste is conservative and
-  typed, remints ids, repairs only wholly-contained references, validates before one
-  atomic history entry, and never silently retimes or maps incompatible structures.
-  Cut awaits a confirmed serialized write before its rung-specific removal. The
-  asynchronous store seam makes a later transport substitution local rather than a
-  rewrite of selection, history or trace semantics.
 - **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
   `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
   (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
@@ -220,6 +208,16 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
+- **[core-selection-clipboard.md](inprogress/core-selection-clipboard.md)** — typed
+  copy, cut and paste over every selection rung, range and closure. **Stage 1 built
+  2026-08-16:** the versioned DOM-free clip union and strict JSON codec, the
+  asynchronous string-only memory store, and app-level ownership that survives route,
+  document and session changes without claiming reload persistence. All nine clip kinds
+  (`note-set` through whole score), context/dependency fields and malformed/unknown/
+  cyclic refusals are pinned by `selection-clip.test.ts`. No editor command is live yet;
+  stage 2 is pure extraction from resolved point/range/closure selections. System
+  clipboard support remains deferred, but replacing the store later leaves clip,
+  history and paste semantics untouched.
 - **[core-keymap-cheatsheet.md](inprogress/core-keymap-cheatsheet.md)** — a **selection-mode-
   dependent keyboard cheatsheet**, built by making the ladder's per-level navigation map DATA.
   The keymap's binding tables are already data, but the *meaning* of a key at each rung lives

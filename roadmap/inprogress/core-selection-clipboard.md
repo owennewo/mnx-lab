@@ -4,6 +4,18 @@ Serves the **implementation loop**. Proposed 2026-08-16 after the completed
 [selection ladder](../complete/core-selection-ladder.md) made every point,
 range and live closure resolve to ordered model members.
 
+> **Status: in progress — stage 1 built 2026-08-16.** Landed the versioned,
+> DOM-free `SelectionClipEnvelope` and all nine rung-derived clip kinds in
+> `src/edit/selectionClip.ts`; one strict JSON encode/decode path with exact
+> envelope/kind validation and a version refusal seam; the asynchronous
+> `SelectionClipboardStore` plus string-only memory implementation; and one
+> store owned by `WorkbenchApp` and injected into every scenario page, so it
+> survives document/session navigation but deliberately not application
+> shutdown. `selection-clip.test.ts` pins every kind, context/dependencies,
+> malformed/unknown/cyclic refusals and memory-store behavior. No copy, cut,
+> paste binding or document mutation is live yet. **Next: stage 2, pure clip
+> extraction from resolved point/range/closure selections.**
+
 ## The boundary
 
 This item owns **copy, cut and paste of the current selection**, including
@@ -164,7 +176,7 @@ The initial compatibility rules are deliberately narrow:
 No initial paste truncates, tiles, rhythmically fits, merges chord tones or
 silently maps incompatible staves/voices. Those are named future commands, not
 hidden branches of Ctrl+V. Paste into a missing voice or staff follows
-[core-entry-surface.md](core-entry-surface.md); this item must not invent its
+[core-entry-surface.md](../proposed/core-entry-surface.md); this item must not invent its
 own sequence-creation policy.
 
 The destination's projection changes only spatial landing. Notation and tab

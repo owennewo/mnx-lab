@@ -15,6 +15,7 @@ import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import { resolveShellAction, strokeOf } from '../edit/keymap.ts';
 import { keyIsOurs } from './keyScope.ts';
 import type { EditorIntent } from '../edit/intents.ts';
+import { MemorySelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import type { PaletteItem } from './CommandPalette.ts';
 import './CommandPalette.ts';
 import './QueueHome.ts';
@@ -82,6 +83,10 @@ export type ThemeSetting = 'auto' | 'light' | 'dark';
 export class WorkbenchApp extends LitElement {
   @state() private route: Route = parseHash(location.hash);
   @state() private query = '';
+  /** One clipboard outlives every route/page/session but deliberately not the
+   *  application. It stores the serialized clip only; ScenarioPage receives
+   *  the transport seam, never a shared mutable model object. */
+  private readonly selectionClipboard = new MemorySelectionClipboardStore();
   /** The palette overlay: 'goto' (Ctrl+G, and `/` when no editor claims it),
    *  or 'commands' when go-to's `>` prefix asks for the command list. The
    *  tray's `global` tab is the editor-side door to those same commands. */
@@ -799,6 +804,7 @@ export class WorkbenchApp extends LitElement {
           ? html`<mnx-scenario-page
               .scenarioId=${this.route.id ?? ''}
               .view=${this.route.view ?? ''}
+              .selectionClipboard=${this.selectionClipboard}
             ></mnx-scenario-page>`
           : this.route.page === 'objects'
             ? html`<mnx-objects-page .def=${this.route.def ?? ''}></mnx-objects-page>`

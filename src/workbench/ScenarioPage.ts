@@ -25,6 +25,7 @@ import {
 } from '../edit/selection.ts';
 import { measureSpans } from '../edit/cursor.ts';
 import type { EditorIntent } from '../edit/intents.ts';
+import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
 import { cheatsheet } from '../edit/keymapDocs.ts';
 import { buildHudParts, buildHudRows, LEVEL_BY_ROW } from './hudRows.ts';
@@ -375,6 +376,9 @@ function presentationSpan(
 export class ScenarioPage extends LitElement {
   @property({ type: String }) scenarioId = '';
   @property({ type: String }) view = '';
+  /** App-lifetime transport injected by WorkbenchApp. Copy/paste behavior is
+   *  intentionally not wired until the clip extractor/planner stages land. */
+  @property({ attribute: false }) selectionClipboard: SelectionClipboardStore | null = null;
 
   /** Per-part instrument overrides (roadmap/inprogress/core-score-hud.md),
    *  keyed by part index: 'document' = no strings override, else a tuning
