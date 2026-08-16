@@ -32,6 +32,11 @@ export type NavigationIntent =
    *  mutation — the ladder changes what the cursor addresses, never the doc. */
   | { type: 'relaxSelection' }
   | { type: 'tightenSelection' }
+  /** Horizontal selection is data too: Shift extends the active edge by the
+   * rung's concrete unit (or to its end), while Ctrl/Meta+A records a live
+   * closure rather than a frozen list of members. */
+  | { type: 'extendSelection'; direction: 'previous' | 'next' | 'end' }
+  | { type: 'closeSelection' }
   /** The active projection: which SPACE the vertical line addresses (string
    *  vs staff position). Recorded so traces replay navigation faithfully. */
   | { type: 'setProjection'; projection: 'notation' | 'tab' }
@@ -179,6 +184,8 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'goToMeasure',
   'relaxSelection',
   'tightenSelection',
+  'extendSelection',
+  'closeSelection',
   'setProjection',
   'cycleSlot',
   'setPart',

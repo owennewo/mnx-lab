@@ -478,4 +478,108 @@ describe('selection ladder', () => {
     expect(session.selectedNoteKeys).toEqual(before);
     expect(session.selection.anchor).toEqual(session.cursor);
   });
+
+  it('extends from a fixed anchor, reverses through it, and keeps the cursor at the active edge', () => {
+    const doc = makeDoc();
+    doc.parts[0].measures![0].sequences![0].content.push({
+      duration: { base: 'quarter' },
+      notes: [note('n6', 'A', 4, 1)]
+    });
+    const session = new EditorSession(doc);
+    session.handleIntent({ type: 'nextPosition' }); // n3 — the middle position
+    const anchor = session.cursor;
+
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'previous' })).toBe(true);
+    expect(session.selection.anchor).toEqual(anchor);
+    expect(session.selectedNoteKeys).toEqual(['n1', 'n2', 'n3']);
+
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'next' })).toBe(true);
+    expect(session.selection.extent).toEqual({ kind: 'cursor', cursor: anchor });
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'next' })).toBe(true);
+    expect(session.selection.anchor).toEqual(anchor); // fixed while the active edge crosses it
+    expect(session.selection.extent).toEqual({ kind: 'cursor', cursor: session.cursor });
+    expect(session.selectedNoteKeys).toEqual(['n3', 'n6']);
+  });
+
+  it('Shift+End reaches the last concrete member, skipping note ghosts but retaining event rests', () => {
+    const notes = new EditorSession(makeDoc());
+    expect(notes.handleIntent({ type: 'extendSelection', direction: 'end' })).toBe(true);
+    expect(notes.cursor.measureIndex).toBe(0); // m1 is a rest; m2 is empty
+    expect(notes.selectedNoteKeys).toEqual(['n1', 'n2', 'n3']);
+
+    const events = new EditorSession(makeDoc());
+    events.handleIntent(relax); // event
+    expect(events.handleIntent({ type: 'extendSelection', direction: 'end' })).toBe(true);
+    expect(events.cursor.measureIndex).toBe(1); // the rest is a real event
+    expect(events.resolvedSelection.members).toHaveLength(3);
+  });
+
+  it('closes at the rung scope and remaps that live scope through the ladder', () => {
+    const session = new EditorSession(makeDoc());
+    expect(session.handleIntent({ type: 'closeSelection' })).toBe(true);
+    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'voice' });
+    expect(session.selectedNoteKeys).toEqual(['n1', 'n2', 'n3']);
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'previous' })).toBe(false);
+    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'voice' });
+
+    session.handleIntent(relax); // event: still voice scope
+    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'voice' });
+    session.handleIntent(relax); // voice-measure: still voice scope
+    session.handleIntent(relax); // part-measure: fork to part scope
+    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'part' });
+    session.handleIntent(relax); // measure: global timeline
+    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'timeline' });
+    while (session.selectionLevel !== 'score') session.handleIntent(relax);
+    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'score' });
+    expect(session.handleIntent({ type: 'closeSelection' })).toBe(false); // idempotent limit
+  });
+
+  it('bare horizontal arrows collapse a range to the requested edge before navigating', () => {
+    const right = new EditorSession(makeDoc());
+    right.handleIntent({ type: 'extendSelection', direction: 'next' });
+    const rightEdge = right.cursor;
+    expect(right.handleIntent({ type: 'prevPosition' })).toBe(true);
+    expect(right.cursor.measureIndex).toBe(0);
+    expect(right.cursor.onset).toEqual({ num: 0, den: 1 });
+    expect(right.selection).toEqual(pointSelection('note', right.cursor));
+
+    const left = new EditorSession(makeDoc());
+    left.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(left.handleIntent({ type: 'nextPosition' })).toBe(true);
+    expect(left.cursor).toEqual(rightEdge); // collapsed; did not navigate again
+    expect(left.handleIntent({ type: 'nextPosition' })).toBe(true);
+    expect(left.cursor.onset).toEqual({ num: 1, den: 2 }); // the following press reaches the entry ghost
+
+    const closure = new EditorSession(makeDoc());
+    closure.handleIntent({ type: 'closeSelection' });
+    const active = closure.cursor;
+    expect(closure.handleIntent({ type: 'nextPosition' })).toBe(true);
+    expect(closure.cursor).toEqual(active);
+    expect(closure.selection).toEqual(pointSelection('note', active));
+  });
+
+  it('preserves a concrete range and both endpoints across projection changes', () => {
+    const session = new EditorSession(makeDoc());
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    const keys = session.selectedNoteKeys;
+    const before = session.selection;
+    expect(session.handleIntent({ type: 'setProjection', projection: 'notation' })).toBe(true);
+    expect(session.selectedNoteKeys).toEqual(keys);
+    expect(session.selection.anchor.measureIndex).toBe(before.anchor.measureIndex);
+    expect(session.selection.extent.kind).toBe('cursor');
+    expect(session.selection.extent.kind === 'cursor' && session.selection.extent.cursor)
+      .toEqual(session.cursor);
+  });
+
+  it('records range and closure gestures as intents and asserts the final state', () => {
+    const session = new EditorSession(makeDoc());
+    const gestures = [
+      { type: 'extendSelection', direction: 'next' },
+      { type: 'closeSelection' }
+    ] as const;
+    gestures.forEach(intent => session.handleIntent(intent));
+    expect(session.trace().intents).toEqual(gestures);
+    expect(session.trace().expect.selection).toEqual(session.selection);
+    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'voice' });
+  });
 });

@@ -143,6 +143,52 @@ export const KEY_DOCS: KeyDoc[] = [
     group: 'selection',
     meaning: { all: 'narrow the selection one rung (descends to the nearest note)' }
   },
+  {
+    keys: 'Shift+←/→',
+    strokes: [
+      { code: 'ArrowLeft', shift: true },
+      { code: 'ArrowRight', shift: true }
+    ],
+    group: 'selection',
+    meaning: {
+      note: 'extend through this voice’s existing notes',
+      event: 'extend through this voice’s events (rests included)',
+      voiceMeasure: 'extend through this voice’s existing bar copies',
+      partMeasure: 'extend through bars on this staff',
+      measure: 'extend through global bars',
+      section: 'extend through labelled sections'
+    }
+  },
+  {
+    keys: 'Shift+End',
+    strokes: [{ code: 'End', shift: true }],
+    group: 'selection',
+    meaning: {
+      note: 'extend to this voice’s last existing note',
+      event: 'extend to this voice’s last event',
+      voiceMeasure: 'extend to this voice’s last existing bar copy',
+      partMeasure: 'extend to the last bar on this staff',
+      measure: 'extend to the last global bar',
+      section: 'extend to the last labelled section'
+    }
+  },
+  {
+    keys: 'Ctrl/⌘+A',
+    strokes: [
+      { code: 'KeyA', ctrl: true },
+      { code: 'KeyA', meta: true }
+    ],
+    group: 'selection',
+    meaning: {
+      note: 'select every existing note in this staff/voice timeline',
+      event: 'select every event in this staff/voice timeline',
+      voiceMeasure: 'select every existing bar copy in this staff/voice',
+      partMeasure: 'select this whole part (all staves and bars)',
+      measure: 'select the global timeline',
+      section: 'select the labelled timeline',
+      score: 'the whole score is already selected'
+    }
+  },
 
   // ── Note entry.
   {

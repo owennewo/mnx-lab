@@ -1,7 +1,7 @@
 # The keymap cheatsheet — the per-level navigation map as data
 
 > **Status: in progress — stages 1–3 built 2026-08-11, same day as proposed.**
-> Shipped: `src/edit/keymapDocs.ts` (the `KeyDoc` table over all 45 bound
+> Shipped: `src/edit/keymapDocs.ts` (the `KeyDoc` table over all bound
 > strokes, seven display groups Navigation → Workbench, `cheatsheet()`
 > filtering by level + tabPane + projection; `SHELL_BINDINGS` exported for
 > the joins); the hud-tab cheatsheet section ("keys · at this level" —
@@ -13,8 +13,10 @@
 > sheet. Open questions resolved in the build: meanings keyed per stroke-
 > group row (aliases share a row: `Del/⌫`, `Alt+←/→ · −/=`); shell actions
 > joined the table (`setup`/`workbench` groups); the score rung shows its
-> honest near-empty truth. **Remaining: stage 4** — each ladder per-level
-> review pass lands its key decisions here as data (event next).
+> honest near-empty truth. The 2026-08-16 horizontal pass added the
+> Shift+←/→, Shift+End and Ctrl/Meta+A rows with per-rung meanings, covered by
+> the same binding↔documentation joins. **Remaining: stage 4** — later ladder
+> review decisions continue to land here as data.
 >
 > Original proposal below. The rendering surface builds on
 > [core-score-hud.md](../complete/core-score-hud.md) (the hud panel tab);

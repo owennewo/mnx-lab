@@ -213,8 +213,8 @@ proposals that name their campaign.
   bound) plus guard mirrors (voice jump note-only, toggleNote notation-only, arrows inert at
   score) so the cheatsheet cannot lie. Static meaning, not a live enablement oracle;
   physical-key labels per the keymap's `KeyboardEvent.code` decision. The ladder's
-  complete per-rung bare/Ctrl navigation map is mirrored here as data; future
-  extension/closure bindings join it when their state lands.
+  complete per-rung bare/Ctrl navigation map and Shift-extension/Ctrl-or-Meta closure
+  gestures are mirrored here as data.
 - **[core-selection-ladder.md](inprogress/core-selection-ladder.md)** — **progressive selection as
   the input-mode system**: input modes *are* the selection level, and each level offers
   exactly the properties the data model puts there. One containment ladder (note → event →
@@ -243,7 +243,9 @@ proposals that name their campaign.
   The **horizontal state foundation completed 2026-08-16**: sessions now carry
   anchor/extent/closure state, a rung-aware live resolver exposes structural members plus
   note/kit keys (including rests and empty bar copies), and traces assert final selection.
-  **Next:** gesture intents and Shift/Ctrl+A bindings, then range presentation and commands;
+  Gesture intents and Shift+←/→, Shift+End, Ctrl+A/Meta+A bindings completed the same day,
+  including collapse, reversal, projection preservation and trace replay. **Next:** range
+  presentation, then commands;
   relax/tighten animation, primary/echo asymmetry, wider ghosts and the container rung remain.
 
 ### complete/

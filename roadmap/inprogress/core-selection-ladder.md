@@ -80,6 +80,16 @@
 > final selection state beside document and cursor. No new binding landed in
 > this slice: **gestures as data are next**.
 >
+> **Horizontal gestures complete 2026-08-16.** `extendSelection` records
+> previous/next/end movement and `closeSelection` records the rung-preserving
+> live closure. Shift+←/→, Shift+End, Ctrl+A and Meta+A are declarative
+> bindings with `KEY_DOCS` meanings at every applicable rung. The anchor stays
+> fixed while the active cursor reverses through it; note extension skips
+> ghosts, event extension retains rests, bare ←/→ collapses before navigating,
+> and projection changes remap both concrete endpoints. A committed edit trace
+> replays both new intent kinds and asserts its final closure. **Range
+> presentation is next.**
+>
 > Two bugs fell out of building it, both the same shape — **an address
 > re-derived instead of carried**. The selection read its voice off the ink
 > under the cursor, so stepping onto an empty cell repainted the OTHER voice's
@@ -126,17 +136,17 @@
 > playground keeps the presence-rule bars; the rail groups both under
 > "Editor test beds".
 >
-> **What remains, after the per-level pass and consistency refresh**: lateral
-> extension + closures (Shift+arrows/Ctrl+A), whose exact state contract is
-> specified below; the relax/tighten shape TWEEN (each level currently re-renders
-> statically); primary/echo asymmetry (both projections draw at full strength);
+> **What remains, after the horizontal gesture pass**: range presentation
+> across systems and rest/empty members; the relax/tighten shape TWEEN (each
+> level currently re-renders statically); primary/echo asymmetry (both
+> projections draw at full strength);
 > ghost cells beyond the existing entry ghosts; the container rung (the cursor
 > descends into containers since element-ops item 11b, but `container` is still
 > not a `SelectionLevel`); Delete's meaning at event, voice-measure,
 > part-measure and section (note, measure and score are rung-first and pinned);
-> range-capable command states/verbs; and trace fixtures asserting
-> selection. The entry-mode axis — advance mode, the stage-1 digit debounce, the
-> letter accelerator — is the other open half; it shares only the cursor with
+> range-capable command states/verbs. The entry-mode axis — advance mode, the
+> stage-1 digit debounce, the letter accelerator — is the other open half; it
+> shares only the cursor with
 > the ladder and is a candidate to graduate into its own proposal. Builds
 > directly on the complete
 > input layer ([core-editor-input-layer.md](../complete/core-editor-input-layer.md)), which
@@ -605,10 +615,10 @@ arrow doing nothing beats one doing something arbitrary.
   runs), which is why the ORDER is the whole contract and nothing branches on it.
 - ~~**The voice hull in dense two-voice writing and cell size in dense tab**~~
   — prototyped and reviewed in the enclosure pass; one run hull won over beads.
-- **Selection in the state machine** — today selection is still a single
-  cursor plus level. Implement the refreshed `SelectionState` contract above;
-  add `extendSelection`/`closeSelection` intents and final-state trace
-  assertions. The command registry already reserves `mixed`, and the tray
+- ~~**Selection in the state machine**~~ — built as `SelectionState` plus the
+  live membership resolver, then completed with replayable
+  `extendSelection`/`closeSelection` intents and final-state trace assertions.
+  The command registry already reserves `mixed`, and the tray
   residue ledger names the UI joins that wake when range membership exists.
 - **The section rung is spec-loop evidence.** It is built on a
   proposed-schema field; if section-nav proves out, that experience belongs in
@@ -623,13 +633,13 @@ arrow doing nothing beats one doing something arbitrary.
 1. **Complete 2026-08-16 — state + membership resolver.** `SelectionState`,
    active-edge point synchronization, concrete range/live-closure resolution,
    structural members, note/kit keys and final trace state are built and pinned.
-2. **Next — gestures as data.** Add `extendSelection` (direction/end) and
-   `closeSelection` intents; bind Shift+←→, Shift+End, Ctrl+A and Meta+A; extend
-   `KEY_DOCS` and its joins. Mouse drag/click parity uses the same intents — no
-   second selection path.
-3. **Range presentation.** Teach `SelectionContext`/`drawEnclosure` to consume
-   the resolved structural span: one continuous shape per system, with honest
-   breaks at wraps and a representation for rest-only/empty units. Then settle
+2. **Complete 2026-08-16 — gestures as data.** `extendSelection`
+   (previous/next/end), `closeSelection`, Shift+←→, Shift+End, Ctrl+A/Meta+A,
+   `KEY_DOCS`, collapse and projection-preservation rules are built and pinned.
+   Future mouse drag/click parity must emit these intents — no second path.
+3. **Next — range presentation.** Teach `SelectionContext`/`drawEnclosure` to
+   consume the resolved structural span: one continuous shape per system, with
+   honest breaks at wraps and a representation for rest-only/empty units. Then settle
    wide-selection tray shaft geometry in the hands-on review. This remains an
    overlay change; primitive/SVG goldens stay byte-identical.
 4. **Commands.** Wake registry `mixed`, member counts and the section-range/

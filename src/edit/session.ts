@@ -34,16 +34,19 @@ import {
   movePosition,
   movePositionInk,
   moveToMeasure,
+  onsetsEqual,
   onsetLess,
   positionAt,
   slotAt,
   type EditorCursor,
+  type Position,
   type PositionGrid,
   type Projection
 } from './cursor.ts';
 import { capoOf, defaultStringFor, tuningOf } from './tabStrings.ts';
 import { clefAt, keyFifthsAt, pitchAtStaffPosition } from './staffSpace.ts';
 import {
+  closureScopeForLevel,
   presentLevels,
   pointSelection,
   relaxLevel,
@@ -1018,6 +1021,26 @@ export class EditorSession {
     switch (intent.type) {
       // The ladder walk. Presence is computed fresh at the cursor, so absent
       // rungs (no note under a rest, no sections declared) are skipped.
+      case 'extendSelection':
+        return this.extendSelection(intent.direction);
+      case 'closeSelection': {
+        // The score rung already denotes the whole score; closing it again is
+        // semantically and structurally idempotent.
+        if (this.selectionState.level === 'score') return false;
+        const scope = closureScopeForLevel(this.selectionState.level);
+        if (
+          this.selectionState.extent.kind === 'closure' &&
+          this.selectionState.extent.scope === scope
+        ) {
+          return false;
+        }
+        this.selectionState = {
+          level: this.selectionState.level,
+          anchor: copyCursorAddress(before),
+          extent: { kind: 'closure', scope }
+        };
+        return true;
+      }
       case 'relaxSelection': {
         // Escape drops an armed spanner anchor before it does anything else —
         // the gesture must be abandonable without touching the document.
@@ -1030,7 +1053,7 @@ export class EditorSession {
           this.selectionState.level
         );
         if (!next) return false; // at the top — the mount deselects
-        this.selectionState = { ...this.selectionState, level: next };
+        this.setSelectionLevel(next);
         return true;
       }
       case 'tightenSelection': {
@@ -1039,7 +1062,7 @@ export class EditorSession {
           this.selectionState.level
         );
         if (next) {
-          this.selectionState = { ...this.selectionState, level: next };
+          this.setSelectionLevel(next);
           return true;
         }
         if (this.selectionState.level === 'note') return false; // the bottom — Enter's input job, later
@@ -1073,9 +1096,11 @@ export class EditorSession {
       // Bare arrows move by the rung's unit: positions at note/event, bars at
       // the bar rungs, sections at section, nothing at score.
       case 'nextPosition':
+        if (this.collapseHorizontal(1)) return true;
         this.cursorState = this.moveHorizontal(before, 1);
         break;
       case 'prevPosition':
+        if (this.collapseHorizontal(-1)) return true;
         this.cursorState = this.moveHorizontal(before, -1);
         break;
       case 'nextMeasure':
@@ -1153,20 +1178,36 @@ export class EditorSession {
         if (intent.projection === this.activeProjection) return false;
         // A doc with no fingerboard has no tab projection to switch to.
         if (intent.projection === 'tab' && this.grid.mode !== 'string') return false;
-        // Remap the line into the new space: the selected note carries over;
-        // otherwise land on the first note here, else the space's home row.
-        const selected =
-          slotAt(this.grid, before, this.activeProjection) ??
-          positionAt(this.grid, before)?.slots[0];
+        // Remap BOTH concrete endpoints into the new space. Re-anchoring here
+        // would silently discard a range merely because the reader switched
+        // between notation and tab.
+        const previousProjection = this.activeProjection;
+        const mappedCursor = this.remapProjectionCursor(
+          before,
+          previousProjection,
+          intent.projection
+        );
+        const mappedAnchor = this.remapProjectionCursor(
+          this.selectionState.anchor,
+          previousProjection,
+          intent.projection
+        );
         this.activeProjection = intent.projection;
-        this.cursorState = {
-          ...before,
-          line:
-            intent.projection === 'tab'
-              ? selected?.line ?? 1
-              : selected?.staffPosition ?? 0
+        this.cursorState = mappedCursor;
+        this.selectionState = {
+          ...this.selectionState,
+          anchor: mappedAnchor,
+          extent: this.selectionState.extent.kind === 'cursor'
+            ? {
+                kind: 'cursor',
+                cursor: this.remapProjectionCursor(
+                  this.selectionState.extent.cursor,
+                  previousProjection,
+                  intent.projection
+                )
+              }
+            : this.selectionState.extent
         };
-        this.reanchorSelection();
         return true;
       }
       // The Ctrl climb (selection-ladder map): ←→ = bar jump in BOTH
@@ -1195,7 +1236,9 @@ export class EditorSession {
           default:
             return false; // section/score: no wider horizontal unit to climb to
         }
-        return this.cursorState !== before;
+        const changed = this.cursorState !== before;
+        if (changed) this.reanchorSelection();
+        return changed;
       }
       case 'jumpUp':
       case 'jumpDown': {
@@ -1222,6 +1265,137 @@ export class EditorSession {
     const changed = this.cursorState !== before;
     if (changed) this.reanchorSelection();
     return changed;
+  }
+
+  private setSelectionLevel(level: SelectionLevel): void {
+    this.selectionState = {
+      ...this.selectionState,
+      level,
+      extent: this.selectionState.extent.kind === 'closure'
+        ? { kind: 'closure', scope: closureScopeForLevel(level) }
+        : this.selectionState.extent
+    };
+  }
+
+  /** First bare ←/→ collapses a range to that visual edge; only the next
+   * press navigates. A closure has no honest edge in a sparse voice, so it
+   * collapses at the active cursor. */
+  private collapseHorizontal(direction: 1 | -1): boolean {
+    if (this.selectionState.extent.kind === 'closure') {
+      this.reanchorSelection();
+      return true;
+    }
+    const anchor = this.selectionState.anchor;
+    const extent = this.selectionState.extent.cursor;
+    if (cursorAddressesEqual(anchor, extent)) return false;
+    const order = compareCursorTime(anchor, extent);
+    const left = order <= 0 ? anchor : extent;
+    const right = order <= 0 ? extent : anchor;
+    this.cursorState = copyCursorAddress(direction === -1 ? left : right);
+    this.reanchorSelection();
+    return true;
+  }
+
+  private extendSelection(direction: 'previous' | 'next' | 'end'): boolean {
+    // Shift after a live closure starts a fresh concrete range at the active
+    // cursor; a closure's sparse scope has no meaningful geometric edge.
+    const anchor = copyCursorAddress(
+      this.selectionState.extent.kind === 'closure'
+        ? this.cursorState
+        : this.selectionState.anchor
+    );
+    let next = this.cursorState;
+    if (direction === 'end') {
+      const limit = this.grid.positions.length + (this.doc.global?.measures?.length ?? 0) + 2;
+      for (let guard = 0; guard < limit; guard++) {
+        const candidate = this.moveSelectionHorizontal(next, 1);
+        if (cursorAddressesEqual(candidate, next)) break;
+        next = candidate;
+      }
+    } else {
+      next = this.moveSelectionHorizontal(next, direction === 'next' ? 1 : -1);
+    }
+    if (cursorAddressesEqual(next, this.cursorState)) return false;
+    this.cursorState = next;
+    this.selectionState = {
+      level: this.selectionState.level,
+      anchor,
+      extent: { kind: 'cursor', cursor: copyCursorAddress(next) }
+    };
+    return true;
+  }
+
+  /** The horizontal RANGE unit. Note and event extension deliberately skip
+   * entry ghosts; they select existing notes/events only. Wider rungs follow
+   * the same bar/section units as their bare horizontal navigation. */
+  private moveSelectionHorizontal(before: EditorCursor, delta: 1 | -1): EditorCursor {
+    const level = this.selectionState.level;
+    if (level === 'note' || level === 'event') {
+      const at = this.grid.positions.findIndex(position =>
+        position.measureIndex === before.measureIndex && onsetsEqual(position.onset, before.onset)
+      );
+      if (at < 0) return before;
+      const voice = before.voiceIndex ?? 0;
+      for (let index = at + delta; index >= 0 && index < this.grid.positions.length; index += delta) {
+        const position = this.grid.positions[index];
+        if (level === 'event') {
+          if (!position.events.some(event => event.voiceIndex === voice)) continue;
+          return cursorAtPosition(before, position, before.line);
+        }
+        const notes = position.slots.filter(slot => slot.voiceIndex === voice);
+        if (notes.length === 0) continue;
+        const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
+        const line = nearestSlotLine(notes, before.line, tab);
+        return cursorAtPosition(before, position, line);
+      }
+      return before;
+    }
+    if (level === 'voiceMeasure') {
+      const part = this.doc.parts?.[before.partIndex ?? 0];
+      const measureCount = Math.max(
+        part?.measures?.length ?? 0,
+        this.doc.global?.measures?.length ?? 0
+      );
+      const staff = before.staffIndex ?? 1;
+      const voice = before.voiceIndex ?? 0;
+      for (let measureIndex = before.measureIndex + delta;
+        measureIndex >= 0 && measureIndex < measureCount;
+        measureIndex += delta) {
+        const sequences = (part?.measures?.[measureIndex]?.sequences ?? [])
+          .filter(sequence => (sequence.staff ?? 1) === staff);
+        if (!sequences[voice]) continue;
+        const landed = moveToMeasure(this.grid, before, measureIndex);
+        const { voiceIndex: _landedVoice, ...position } = landed;
+        return {
+          ...position,
+          ...(voice ? { voiceIndex: voice } : {})
+        };
+      }
+      return before;
+    }
+    switch (level) {
+      case 'partMeasure':
+      case 'measure':
+        return moveMeasure(this.grid, before, delta);
+      case 'section':
+        return this.sectionStep(before, delta);
+      case 'score':
+        return before;
+    }
+  }
+
+  private remapProjectionCursor(
+    cursor: EditorCursor,
+    from: Projection,
+    to: Projection
+  ): EditorCursor {
+    const grid = buildGrid(this.doc, cursor.partIndex ?? 0, cursor.staffIndex ?? 1);
+    const selected = slotAt(grid, cursor, from) ?? positionAt(grid, cursor)?.slots[0];
+    return {
+      ...cursor,
+      onset: { ...cursor.onset },
+      line: to === 'tab' ? selected?.line ?? 1 : selected?.staffPosition ?? 0
+    };
   }
 
   /** One step of horizontal movement in the current rung's unit. */
@@ -1442,6 +1616,37 @@ function cloneSelection(selection: SelectionState): SelectionState {
           cursor: { ...selection.extent.cursor, onset: { ...selection.extent.cursor.onset } }
         }
       : { ...selection.extent }
+  };
+}
+
+function copyCursorAddress(cursor: EditorCursor): EditorCursor {
+  return { ...cursor, onset: { ...cursor.onset } };
+}
+
+function cursorAddressesEqual(a: EditorCursor, b: EditorCursor): boolean {
+  return (
+    a.measureIndex === b.measureIndex &&
+    onsetsEqual(a.onset, b.onset) &&
+    a.line === b.line &&
+    a.slotIndex === b.slotIndex &&
+    (a.partIndex ?? 0) === (b.partIndex ?? 0) &&
+    (a.staffIndex ?? 1) === (b.staffIndex ?? 1) &&
+    (a.voiceIndex ?? 0) === (b.voiceIndex ?? 0)
+  );
+}
+
+function compareCursorTime(a: EditorCursor, b: EditorCursor): number {
+  if (a.measureIndex !== b.measureIndex) return a.measureIndex - b.measureIndex;
+  return a.onset.num * b.onset.den - b.onset.num * a.onset.den;
+}
+
+function cursorAtPosition(before: EditorCursor, position: Position, line: number): EditorCursor {
+  const { slotIndex: _slotIndex, ...address } = before;
+  return {
+    ...address,
+    measureIndex: position.measureIndex,
+    onset: { ...position.onset },
+    line
   };
 }
 

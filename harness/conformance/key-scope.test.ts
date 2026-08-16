@@ -23,6 +23,27 @@ import {
 const EDITOR_LAYERS: KeymapLayer[] = [NAVIGATION_LAYER, EDIT_LAYER, TAB_DIGIT_LAYER];
 
 describe('keyboard scope', () => {
+  it('maps horizontal selection gestures to replayable intents', () => {
+    expect(resolveIntent({ code: 'ArrowLeft', shift: true }, EDITOR_LAYERS)).toEqual({
+      type: 'extendSelection',
+      direction: 'previous'
+    });
+    expect(resolveIntent({ code: 'ArrowRight', shift: true }, EDITOR_LAYERS)).toEqual({
+      type: 'extendSelection',
+      direction: 'next'
+    });
+    expect(resolveIntent({ code: 'End', shift: true }, EDITOR_LAYERS)).toEqual({
+      type: 'extendSelection',
+      direction: 'end'
+    });
+    expect(resolveIntent({ code: 'KeyA', ctrl: true }, EDITOR_LAYERS)).toEqual({
+      type: 'closeSelection'
+    });
+    expect(resolveIntent({ code: 'KeyA', meta: true }, EDITOR_LAYERS)).toEqual({
+      type: 'closeSelection'
+    });
+  });
+
   it('no shell binding is claimed by an editor layer', () => {
     // Shell strokes are page-level (rail, palette, go-to). If an editor layer
     // also claimed one, promoting the layers would carry the workbench's

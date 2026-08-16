@@ -31,6 +31,13 @@
     {
       "type": "goToMeasure",
       "measureIndex": 99
+    },
+    {
+      "type": "extendSelection",
+      "direction": "previous"
+    },
+    {
+      "type": "closeSelection"
     }
   ],
   "expect": {
@@ -180,7 +187,7 @@
       ]
     },
     "cursor": {
-      "measureIndex": 1,
+      "measureIndex": 0,
       "onset": {
         "num": 0,
         "den": 1
@@ -190,7 +197,7 @@
     "selection": {
       "level": "note",
       "anchor": {
-        "measureIndex": 1,
+        "measureIndex": 0,
         "onset": {
           "num": 0,
           "den": 1
@@ -198,15 +205,8 @@
         "line": 6
       },
       "extent": {
-        "kind": "cursor",
-        "cursor": {
-          "measureIndex": 1,
-          "onset": {
-            "num": 0,
-            "den": 1
-          },
-          "line": 6
-        }
+        "kind": "closure",
+        "scope": "voice"
       }
     }
   }

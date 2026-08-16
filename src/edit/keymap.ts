@@ -40,6 +40,14 @@ export const NAVIGATION_LAYER: KeymapLayer = {
   bindings: [
     { code: 'ArrowRight', intent: { type: 'nextPosition' } },
     { code: 'ArrowLeft', intent: { type: 'prevPosition' } },
+    // Horizontal selection: Shift moves only the active edge; Shift+End
+    // reaches the last concrete member. Ctrl/Meta+A is a live rung-preserving
+    // closure, not a snapshot of whichever ids exist today.
+    { code: 'ArrowRight', shift: true, intent: { type: 'extendSelection', direction: 'next' } },
+    { code: 'ArrowLeft', shift: true, intent: { type: 'extendSelection', direction: 'previous' } },
+    { code: 'End', shift: true, intent: { type: 'extendSelection', direction: 'end' } },
+    { code: 'KeyA', ctrl: true, intent: { type: 'closeSelection' } },
+    { code: 'KeyA', meta: true, intent: { type: 'closeSelection' } },
     // The Ctrl climb (selection-ladder navigation map): the arrow applied at
     // the nearest ancestor rung where it means something different. At note
     // level ←→ = bar jump / tab event-skip, ↑↓ = voice jump.
