@@ -230,7 +230,8 @@ describe('selection clip extraction', () => {
     const whole = success(containers(), closure('event', cursor(0)));
     expect(whole.envelope.clip).toMatchObject({
       kind: 'event-run',
-      items: [{ type: 'tuplet' }, { id: 'outside' }]
+      span: 1,
+      bars: [{ offset: 0, onset: [0, 1], items: [{ type: 'tuplet' }, { id: 'outside' }] }]
     });
   });
 
@@ -246,7 +247,7 @@ describe('selection clip extraction', () => {
       }]
     });
     if (closed.envelope.clip.kind !== 'event-run') throw new Error('wrong clip');
-    const first = closed.envelope.clip.items[0];
+    const first = closed.envelope.clip.bars[0].items[0];
     if (!('duration' in first)) throw new Error('wrong item');
     expect(first.notes?.[0].ties).toEqual([{ target: 'n2' }]);
     expect(first.slurs).toHaveLength(1);
@@ -257,7 +258,7 @@ describe('selection clip extraction', () => {
     ]);
     expect(open.envelope.relationships).toBeUndefined();
     if (open.envelope.clip.kind !== 'event-run') throw new Error('wrong clip');
-    const openFirst = open.envelope.clip.items[0];
+    const openFirst = open.envelope.clip.bars[0].items[0];
     if (!('duration' in openFirst)) throw new Error('wrong item');
     expect(openFirst.notes?.[0].ties).toBeUndefined();
     expect(openFirst.notes?.[0]._x?.mnxLab?.tab?.technique).toBeUndefined();

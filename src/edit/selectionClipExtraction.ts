@@ -32,6 +32,7 @@ import {
   type ClipMeasureContext,
   type ClipPartDescriptor,
   type MeasureClipColumn,
+  type MnxRhythmContainer,
   type SelectionClip,
   type SelectionClipDependencies,
   type SelectionClipEnvelope,
@@ -256,7 +257,7 @@ function eventItems(
     }
   }
 
-  const items: MnxSequenceItem[] = [];
+  const emitted: { member: typeof members[number]; item: MnxSequenceItem }[] = [];
   const emittedContainers = new Set<string>();
   for (const member of members) {
     const sequence = sequenceForMember(doc, member);
@@ -266,7 +267,7 @@ function eventItems(
       if (!isTimedEvent(item)) {
         return refuse('missing-source-member', 'A selected event no longer resolves to timed content.');
       }
-      items.push(cloneJson(item));
+      emitted.push({ member, item: cloneJson(item) });
       continue;
     }
     const key = [
@@ -278,10 +279,21 @@ function eventItems(
     ].join(':');
     if (!emittedContainers.has(key)) {
       emittedContainers.add(key);
-      items.push(cloneJson(item));
+      emitted.push({ member, item: cloneJson(item) });
     }
   }
-  return { kind: 'event-run', items };
+  const start = Math.min(...emitted.map(entry => entry.member.measureIndex));
+  const end = Math.max(...emitted.map(entry => entry.member.measureIndex));
+  const bars = [...new Set(emitted.map(entry => entry.member.measureIndex))].map(measureIndex => {
+    const entries = emitted.filter(entry => entry.member.measureIndex === measureIndex);
+    const onset = entries[0].member.onset;
+    return {
+      offset: measureIndex - start,
+      onset: [onset.num, onset.den] as [number, number],
+      items: entries.map(entry => entry.item)
+    };
+  });
+  return { kind: 'event-run', span: end - start + 1, bars };
 }
 
 function narrowRelationships(
@@ -333,7 +345,10 @@ function buildClip(
         (member): member is Extract<SelectionMember, { kind: 'event' }> => member.kind === 'event'
       ));
     case 'container': {
-      const containers = [];
+      const entries: {
+        member: Extract<SelectionMember, { kind: 'container' }>;
+        container: MnxRhythmContainer;
+      }[] = [];
       for (const member of members) {
         if (member.kind !== 'container') continue;
         const item = doc.parts?.[member.partIndex]?.measures?.[member.measureIndex]
@@ -341,9 +356,20 @@ function buildClip(
         if (!item || isTimedEvent(item)) {
           return refuse('missing-source-member', 'A selected rhythm container no longer exists.');
         }
-        containers.push(cloneJson(item));
+        entries.push({ member, container: cloneJson(item) });
       }
-      return { kind: 'container-run', containers };
+      const start = Math.min(...entries.map(entry => entry.member.measureIndex));
+      const end = Math.max(...entries.map(entry => entry.member.measureIndex));
+      const bars = [...new Set(entries.map(entry => entry.member.measureIndex))].map(measureIndex => {
+        const inMeasure = entries.filter(entry => entry.member.measureIndex === measureIndex);
+        const onset = inMeasure[0].member.onset;
+        return {
+          offset: measureIndex - start,
+          onset: [onset.num, onset.den] as [number, number],
+          containers: inMeasure.map(entry => entry.container)
+        };
+      });
+      return { kind: 'container-run', span: end - start + 1, bars };
     }
     case 'voiceMeasure': {
       const voiceMembers = members.filter(
@@ -440,10 +466,10 @@ function clipEvents(envelope: SelectionClipEnvelope): MnxEvent[] {
     case 'note-set':
       return [];
     case 'event-run':
-      visitItems(clip.items, event => events.push(event));
+      clip.bars.forEach(bar => visitItems(bar.items, event => events.push(event)));
       break;
     case 'container-run':
-      visitItems(clip.containers, event => events.push(event));
+      clip.bars.forEach(bar => visitItems(bar.containers, event => events.push(event)));
       break;
     case 'voice-bars':
       clip.bars.forEach(bar => visitItems(bar.sequence.content, event => events.push(event)));

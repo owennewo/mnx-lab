@@ -4,7 +4,7 @@ Serves the **implementation loop**. Proposed 2026-08-16 after the completed
 [selection ladder](../complete/core-selection-ladder.md) made every point,
 range and live closure resolve to ordered model members.
 
-> **Status: in progress — stages 1–2 built 2026-08-16.** Stage 1 landed the
+> **Status: in progress — stages 1–3 built 2026-08-16.** Stage 1 landed the
 > versioned DOM-free clip union, strict codec, asynchronous string-only store
 > seam and workbench-lifetime memory owner. Stage 2 added pure
 > `extractSelectionClip()` materialization for all nine clip kinds: it resolves
@@ -15,8 +15,20 @@ range and live closure resolve to ordered model members.
 > only referenced lyric metadata; and proves the immutable result through the
 > same serialized codec path the store will use. `selection-clip.test.ts` and
 > `selection-clip-extraction.test.ts` pin the transport and extraction
-> contracts. No copy, cut, paste binding or document mutation is live yet.
-> **Next: stage 3, the pure conservative paste planner.**
+> contracts. Stage 3 added `planSelectionPaste()`: it decodes the serialized
+> value, validates payload/version/destination compatibility, preserves sparse
+> bar offsets and translated onsets, requires exact per-bar metric closure,
+> maps all nine clip kinds conservatively, rewrites every copied id and retained
+> reference, rebinds measure context, validates destination fingerboards,
+> merges dependencies with destination precedence, repairs detached target
+> references, and returns a complete detached next document plus landing/id
+> metadata or one typed refusal. Planning exposed and fixed an underspecified
+> Stage 2 shape: event/container runs now retain relative bar offsets and
+> bar-local starting onsets, so a sparse phrase cannot silently collapse time.
+> `selection-paste-planner.test.ts` pins the acceptance/refusal matrix, purity,
+> id/reference rewrites, dependency/context precedence, empty-document cases
+> and sparse timelines. No copy, cut, paste binding or live document mutation
+> is active yet. **Next: stage 4, atomic application/history/trace wiring.**
 
 ## The boundary
 

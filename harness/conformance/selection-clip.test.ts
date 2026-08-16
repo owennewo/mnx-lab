@@ -31,11 +31,17 @@ const everyKind: SelectionClip[] = [
   { kind: 'note-set', notes: [{ pitch: { step: 'C', octave: 4 } }] },
   {
     kind: 'event-run',
-    items: [{ duration: { base: 'quarter' }, notes: [{ pitch: { step: 'D', octave: 4 } }] }]
+    span: 1,
+    bars: [{
+      offset: 0,
+      onset: [0, 1],
+      items: [{ duration: { base: 'quarter' }, notes: [{ pitch: { step: 'D', octave: 4 } }] }]
+    }]
   },
   {
     kind: 'container-run',
-    containers: [{ type: 'grace', content: [], slash: true }]
+    span: 1,
+    bars: [{ offset: 0, onset: [0, 1], containers: [{ type: 'grace', content: [], slash: true }] }]
   },
   {
     kind: 'voice-bars',
