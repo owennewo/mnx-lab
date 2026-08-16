@@ -8,7 +8,12 @@ import {
 } from './mnxContext.ts';
 import type { PlaybackState, SelectionContext } from './mnxContext.ts';
 import { MnxDocument, MnxPart, MnxTuningEntry, declaredStaffKind } from '../model/mnx.ts';
-import type { PartTabSetups, TabSetup } from '../engine/tab/guitarPositions.ts';
+import {
+  resolveTabSetup,
+  tabPositionContext,
+  type PartTabSetups,
+  type TabSetup
+} from '../engine/tab/guitarPositions.ts';
 import { renderMnxToSvgTab } from '../engine/tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../engine/notation/notationRenderer.ts';
 import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
@@ -701,7 +706,42 @@ export class ScoreViewer extends LitElement {
     // The selection-ladder enclosure: drawn from the finished SVG's own
     // geometry, after the engine is done — the renderer never learns about
     // editor state, the overlay reads what it drew.
-    const enclosed = (pane: HTMLElement) => {
+    const renderedStaffOrdinals = (unit: NonNullable<SelectionContext['span']>['units'][number]) => {
+      if (unit.partIndex === undefined || unit.staffIndex === undefined) return [];
+      const parts = this.mnxDoc?.mnxJson.parts ?? [];
+      const resolved = this.resolvedView();
+      if (resolved === 'tab') return unit.partIndex === 0 ? [0] : [];
+      const anyDeclaredKind = parts.some(part => {
+        const kind = part._x?.mnxLab?.tab?.staffKind;
+        return kind === 'both' || kind === 'tab';
+      });
+      let ordinal = 0;
+      const found: number[] = [];
+      parts.forEach((part, partIndex) => {
+        let staffCount = Math.max(1, part.staves ?? 1);
+        for (const measure of part.measures) {
+          for (const sequence of measure.sequences ?? []) {
+            staffCount = Math.max(staffCount, sequence.staff ?? 1);
+          }
+        }
+        if (partIndex === unit.partIndex) {
+          found.push(ordinal + Math.max(0, Math.min(staffCount - 1, unit.staffIndex! - 1)));
+        }
+        ordinal += staffCount;
+        if (resolved === 'both') {
+          const kind = resolveTabSetup(tabSetup, part)?.staffKind ?? part._x?.mnxLab?.tab?.staffKind;
+          const opted = kind === 'both' || kind === 'tab';
+          const hasTab = (opted || !anyDeclaredKind) && tabPositionContext(part, tabSetup) !== null;
+          if (hasTab) {
+            if (partIndex === unit.partIndex && unit.staffIndex === 1) found.push(ordinal);
+            ordinal++;
+          }
+        }
+      });
+      return found;
+    };
+
+    const enclosed = (pane: HTMLElement, paint: RenderOutcome) => {
       const kind = this.selection?.enclosure;
       const svg = pane.querySelector('svg');
       // The candidate scope, when the host is previewing one: its own dashed
@@ -714,7 +754,11 @@ export class ScoreViewer extends LitElement {
         svg.querySelector(':scope > g.enclosure-preview')?.remove();
       }
       if (kind && svg) {
-        drawEnclosure(svg, kind);
+        drawEnclosure(svg, kind, {
+          span: this.selection?.span,
+          systemRows: packedRowMeasures(paint.packings, densityH),
+          staffOrdinals: renderedStaffOrdinals
+        });
         // The ghost cell: the cursor's own cell when empty (note level only —
         // wider rungs select what exists, the ghost is an entry affordance).
         const ghost = this.selection?.cursor;
@@ -735,13 +779,13 @@ export class ScoreViewer extends LitElement {
       const pane = this.appendPane();
       guarded(pane, 'tab', () => {
         outcome = renderMnxToSvgTab({ container: pane, ...commonOpts, tabSetup });
-        enclosed(pane);
+        enclosed(pane, outcome);
       });
     } else if (resolvedView === 'notation') {
       const pane = this.appendPane();
       guarded(pane, 'notation', () => {
         outcome = renderMnxToSvgNotation({ container: pane, ...commonOpts });
-        enclosed(pane);
+        enclosed(pane, outcome);
       });
     } else {
       // One composed system — notation staff over tab staff in a single SVG
@@ -750,7 +794,7 @@ export class ScoreViewer extends LitElement {
       const pane = this.appendPane();
       guarded(pane, 'both', () => {
         outcome = renderMnxToSvgBoth({ container: pane, ...commonOpts, tabSetup });
-        enclosed(pane);
+        enclosed(pane, outcome);
       });
     }
 
@@ -835,8 +879,23 @@ export class ScoreViewer extends LitElement {
    *  geometry only — no editor vocabulary crosses the boundary
    *  (roadmap/inprogress/core-selection-tray-visuals.md). */
   selectionAnchorRect(): DOMRect | null {
-    const enclosure = this.container?.querySelector('svg .enclosure');
-    return enclosure ? enclosure.getBoundingClientRect() : null;
+    const enclosure = this.container?.querySelector<SVGGElement>('svg .enclosure');
+    if (!enclosure) return null;
+    const activeMeasure = this.selection?.activeMeasureIndex;
+    const rows = this.systemRows();
+    const activeRow = activeMeasure === null || activeMeasure === undefined
+      ? -1
+      : (rows?.findIndex(row => row.includes(activeMeasure)) ?? -1);
+    const pieces = activeRow >= 0
+      ? [...enclosure.querySelectorAll<SVGRectElement>(`rect[data-system-row="${activeRow}"]`)]
+      : [];
+    if (pieces.length === 0) return enclosure.getBoundingClientRect();
+    const boxes = pieces.map(piece => piece.getBoundingClientRect());
+    const left = Math.min(...boxes.map(box => box.left));
+    const top = Math.min(...boxes.map(box => box.top));
+    const right = Math.max(...boxes.map(box => box.right));
+    const bottom = Math.max(...boxes.map(box => box.bottom));
+    return new DOMRect(left, top, right - left, bottom - top);
   }
 
   /** `selection-anchored`: fired after each render, and on the host's own

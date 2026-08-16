@@ -22,6 +22,33 @@ export const playbackStateContext = createContext<PlaybackState>(Symbol('playbac
 export type EnclosureKind = 'cell' | 'slice' | 'run' | 'panel' | 'panel-wide' | 'frame';
 
 /**
+ * One structural unit covered by a selection, translated into presentation
+ * vocabulary by the host. `position` is the unit's metric onset normalized to
+ * its measure (0..1); it gives a rest-only moment somewhere honest to stand
+ * even though rests do not carry the note-key ids used by the ink overlay.
+ *
+ * Part/staff coordinates are model addresses, not renderer ordinals. The
+ * viewer maps them onto the staves in the projection it just painted.
+ */
+export interface SelectionSpanUnit {
+  measureIndex: number;
+  partIndex?: number;
+  staffIndex?: number;
+  position?: number;
+}
+
+/**
+ * The resolved structural footprint behind the selected note ids. Fine-grain
+ * moments use their onsets; staff-measure and global-measure scopes own the
+ * full bar cell. This stays deliberately smaller than `edit/`'s member union:
+ * elements need geometry, never editor rung names or mutation addresses.
+ */
+export interface SelectionSpan {
+  coverage: 'moment' | 'staff-measure' | 'measure';
+  units: SelectionSpanUnit[];
+}
+
+/**
  * The input cursor's cell for the ghost overlay (selection-ladder map):
  * where the cursor stands when NO note is there — a place for a thing,
  * drawn hollow. `anchorKeys` are note keys at the cursor's beat (any voice),
@@ -46,6 +73,9 @@ export interface SelectionContext {
   selectedNoteIds: string[];
   /** Enclosure drawn around the selection footprint; absent/null = none. */
   enclosure?: EnclosureKind | null;
+  /** Structural coverage, including rests and empty measure copies that have
+   *  no note id and therefore cannot be recovered from selected SVG ink. */
+  span?: SelectionSpan | null;
   /** The cursor's cell, for the ghost when its position is empty. */
   cursor?: CursorGhost | null;
   /**

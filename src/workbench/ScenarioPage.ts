@@ -13,15 +13,17 @@ import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
 import type { ScoreViewer, ViewMode } from '../elements/ScoreViewer.ts';
-import type { EnclosureKind, SelectionContext } from '../elements/mnxContext.ts';
+import type { EnclosureKind, SelectionContext, SelectionSpan } from '../elements/mnxContext.ts';
 import { EditorSession, replayIntents } from '../edit/session.ts';
 import { elementKeys, runDestructWalk } from '../edit/destructWalk.ts';
 import { constructTraceByTarget, type ConstructTrace } from './constructTraces.ts';
 import {
   SELECTION_LADDER,
   selectionNoteKeys,
+  type SelectionMember,
   type SelectionLevel
 } from '../edit/selection.ts';
+import { measureSpans } from '../edit/cursor.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
 import { cheatsheet } from '../edit/keymapDocs.ts';
@@ -296,6 +298,75 @@ const ENCLOSURE_BY_LEVEL: Record<SelectionLevel, EnclosureKind> = {
   section: 'panel-wide',
   score: 'frame'
 };
+
+/** Translate editor membership into the deliberately smaller geometry
+ * vocabulary accepted by `elements/`. Rests survive as onset-bearing moments;
+ * empty voice/part/global bar copies survive as full-measure units. */
+function presentationSpan(
+  doc: MnxStructure,
+  level: SelectionLevel,
+  members: readonly SelectionMember[]
+): SelectionSpan | null {
+  if (level === 'score') return null;
+  const spans = measureSpans(doc);
+  const coverage: SelectionSpan['coverage'] =
+    level === 'note' || level === 'event'
+      ? 'moment'
+      : level === 'voiceMeasure' || level === 'partMeasure'
+        ? 'staff-measure'
+        : 'measure';
+  const units: SelectionSpan['units'] = [];
+  const push = (
+    measureIndex: number,
+    partIndex?: number,
+    staffIndex?: number,
+    onset?: { num: number; den: number }
+  ) => {
+    const measure = spans[measureIndex] ?? { num: 1, den: 1 };
+    const raw = onset
+      ? (onset.num / onset.den) / Math.max(Number.EPSILON, measure.num / measure.den)
+      : undefined;
+    units.push({
+      measureIndex,
+      ...(partIndex === undefined ? {} : { partIndex }),
+      ...(staffIndex === undefined ? {} : { staffIndex }),
+      ...(raw === undefined ? {} : { position: Math.max(0, Math.min(1, raw)) })
+    });
+  };
+  for (const member of members) {
+    switch (member.kind) {
+      case 'note':
+      case 'event':
+        push(member.measureIndex, member.partIndex, member.staffIndex, member.onset);
+        break;
+      case 'voiceMeasure':
+      case 'partMeasure':
+        push(member.measureIndex, member.partIndex, member.staffIndex);
+        break;
+      case 'measure':
+        push(member.measureIndex);
+        break;
+      case 'section':
+        for (let measureIndex = member.start; measureIndex < member.end; measureIndex++) {
+          push(measureIndex);
+        }
+        break;
+      case 'score':
+        break;
+    }
+  }
+  // Chords and coincident container members share one presentation anchor.
+  const seen = new Set<string>();
+  return {
+    coverage,
+    units: units.filter(unit => {
+      const key = [unit.measureIndex, unit.partIndex ?? '', unit.staffIndex ?? '', unit.position ?? ''].join(':');
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+  };
+}
 
 @customElement('mnx-scenario-page')
 export class ScenarioPage extends LitElement {
@@ -1456,6 +1527,9 @@ export class ScenarioPage extends LitElement {
       activeEventIndex: null,
       selectedNoteIds: this.cursorHidden ? [] : session.selectedNoteKeys,
       enclosure: this.cursorHidden ? null : ENCLOSURE_BY_LEVEL[session.selectionLevel],
+      span: this.cursorHidden
+        ? null
+        : presentationSpan(session.doc, session.selectionLevel, session.resolvedSelection.members),
       cursor: this.cursorHidden ? null : session.cursorContext(),
       preview: this.previewScope()
     };

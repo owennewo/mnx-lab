@@ -87,8 +87,21 @@
 > fixed while the active cursor reverses through it; note extension skips
 > ghosts, event extension retains rests, bare ←/→ collapses before navigating,
 > and projection changes remap both concrete endpoints. A committed edit trace
-> replays both new intent kinds and asserts its final closure. **Range
-> presentation is next.**
+> replays both new intent kinds and asserts its final closure.
+>
+> **Range presentation complete 2026-08-16.** `SelectionContext` now carries a
+> presentation-only structural span beside the note-key footprint: normalized
+> moments for note/event members and full bar cells for voice/part/global
+> measure members. `drawEnclosure` joins those units into one continuous shape
+> per rendered system/projection, uses the paint's own packing rows plus live
+> staff/barline geometry, and breaks honestly at wraps. Rest-only events and
+> empty voice/part bar copies therefore have visible selection geometry without
+> inventing note ids or changing a primitive/SVG golden. Hands-on review in the
+> navigation playground covered notation and both views, closures at event,
+> voice-measure, part-measure and measure, and a note range crossing three
+> systems. It also settled the wide-range tray shaft: the command tray follows
+> the active edge's system segment (and flips there), rather than anchoring to
+> the bounding box of the whole multi-system range and drifting below it.
 >
 > Two bugs fell out of building it, both the same shape — **an address
 > re-derived instead of carried**. The selection read its voice off the ink
@@ -136,8 +149,7 @@
 > playground keeps the presence-rule bars; the rail groups both under
 > "Editor test beds".
 >
-> **What remains, after the horizontal gesture pass**: range presentation
-> across systems and rest/empty members; the relax/tighten shape TWEEN (each
+> **What remains, after the presentation pass**: the relax/tighten shape TWEEN (each
 > level currently re-renders statically); primary/echo asymmetry (both
 > projections draw at full strength);
 > ghost cells beyond the existing entry ghosts; the container rung (the cursor
@@ -637,12 +649,13 @@ arrow doing nothing beats one doing something arbitrary.
    (previous/next/end), `closeSelection`, Shift+←→, Shift+End, Ctrl+A/Meta+A,
    `KEY_DOCS`, collapse and projection-preservation rules are built and pinned.
    Future mouse drag/click parity must emit these intents — no second path.
-3. **Next — range presentation.** Teach `SelectionContext`/`drawEnclosure` to
-   consume the resolved structural span: one continuous shape per system, with
-   honest breaks at wraps and a representation for rest-only/empty units. Then settle
-   wide-selection tray shaft geometry in the hands-on review. This remains an
-   overlay change; primitive/SVG goldens stay byte-identical.
-4. **Commands.** Wake registry `mixed`, member counts and the section-range/
+3. **Complete 2026-08-16 — range presentation.** `SelectionContext`/
+   `drawEnclosure` consume the resolved structural span as one continuous shape
+   per system/projection, with wrap breaks and rest/empty bar-cell fallbacks.
+   Hands-on review settled wide selections, and the tray shaft now follows the
+   active edge's system segment. Overlay only; primitive/SVG goldens stayed
+   byte-identical.
+4. **Next — commands.** Wake registry `mixed`, member counts and the section-range/
    part-scope tiles. Bulk verbs apply one undoable op/log entry to the resolved
    membership and preserve the selection; the existing spanner anchor remains
    for out-of-scope endpoints.

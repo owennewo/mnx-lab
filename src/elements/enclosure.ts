@@ -14,7 +14,12 @@
 // the both view is one rect spanning the notation+tab pair (the design's
 // "two echoes merge at part-measure") without this file knowing what a
 // projection is.
-import type { CursorGhost, EnclosureKind } from './mnxContext.ts';
+import type {
+  CursorGhost,
+  EnclosureKind,
+  SelectionSpan,
+  SelectionSpanUnit
+} from './mnxContext.ts';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -38,6 +43,15 @@ interface Barline {
   x: number;
   y1: number;
   y2: number;
+}
+
+interface SystemBand {
+  id: number;
+  top: number;
+  bottom: number;
+  x1: number;
+  x2: number;
+  staffIndices: number[];
 }
 
 /**
@@ -168,6 +182,69 @@ function snapToBarlines(
   return { left, right };
 }
 
+function collectSystemBands(staves: StaffBand[]): SystemBand[] {
+  return [...new Set(staves.map(staff => staff.system))]
+    .map(id => {
+      const staffIndices = staves
+        .map((staff, index) => ({ staff, index }))
+        .filter(item => item.staff.system === id)
+        .map(item => item.index);
+      const systemStaves = staffIndices.map(index => staves[index]);
+      return {
+        id,
+        top: Math.min(...systemStaves.map(staff => staff.top)),
+        bottom: Math.max(...systemStaves.map(staff => staff.bottom)),
+        x1: Math.min(...systemStaves.map(staff => staff.x1)),
+        x2: Math.max(...systemStaves.map(staff => staff.x2)),
+        staffIndices
+      };
+    })
+    .sort((a, b) => a.top - b.top);
+}
+
+/** Logical bar boundaries for one rendered row. Repeats/final barlines emit
+ * multiple close strokes, so collapse those clusters before matching them to
+ * the row's measure count. A no-barline style can leave too few visible
+ * dividers; interpolation is the honest last resort for an overlay whose
+ * layout metadata deliberately contains rows, not coordinates. */
+function measureBoundaries(
+  band: SystemBand,
+  barlines: readonly Barline[],
+  measureCount: number,
+  sp: number
+): number[] {
+  const candidates = [
+    band.x1,
+    ...barlines
+      .filter(bar => bar.y1 <= band.bottom + 0.01 && bar.y2 >= band.top - 0.01)
+      .map(bar => bar.x),
+    band.x2
+  ].sort((a, b) => a - b);
+  const clusters: number[][] = [];
+  for (const x of candidates) {
+    const current = clusters[clusters.length - 1];
+    if (current && x - current[current.length - 1] <= 0.8 * sp) current.push(x);
+    else clusters.push([x]);
+  }
+  let xs = clusters.map(cluster => cluster.reduce((sum, x) => sum + x, 0) / cluster.length);
+  const wanted = measureCount + 1;
+  while (xs.length > wanted && xs.length > 2) {
+    let nearest = 0;
+    for (let i = 1; i < xs.length - 1; i++) {
+      if (xs[i + 1] - xs[i] < xs[nearest + 1] - xs[nearest]) nearest = i;
+    }
+    xs.splice(nearest, 2, (xs[nearest] + xs[nearest + 1]) / 2);
+  }
+  if (xs.length !== wanted) {
+    const left = xs[0] ?? band.x1;
+    const right = xs[xs.length - 1] ?? band.x2;
+    xs = Array.from({ length: wanted }, (_, index) =>
+      left + ((right - left) * index) / Math.max(1, measureCount)
+    );
+  }
+  return xs;
+}
+
 /**
  * Options for a SECOND enclosure drawn beside the real one: the selection
  * tray's scope preview (core-selection-tray-mechanism.md). The footprint
@@ -181,6 +258,13 @@ export interface EnclosureOptions {
   preview?: boolean;
   /** The footprint, when it is not the rendered `.selected` set. */
   noteIds?: readonly string[];
+  /** Resolved model coverage, including members with no selected SVG ink. */
+  span?: SelectionSpan | null;
+  /** Measure indices per rendered system, from the packing behind this paint. */
+  systemRows?: readonly (readonly number[])[] | null;
+  /** Projection-specific model staff → rendered staff ordinals. Used only
+   * when a structural unit has no glyph from which to infer its staff. */
+  staffOrdinals?: (unit: SelectionSpanUnit) => readonly number[];
 }
 
 export function drawEnclosure(
@@ -201,7 +285,8 @@ export function drawEnclosure(
         )
       ];
   const boxes = glyphs.map(el => inkBox(el, sp));
-  if (boxes.length === 0 && kind !== 'frame') return;
+  const hasStructuralSpan = Boolean(options.span?.units.length && options.systemRows?.length);
+  if (boxes.length === 0 && kind !== 'frame' && !hasStructuralSpan) return;
 
   const barlines = collectBarlines(svg);
   const staves = assignSystems(collectStaves(svg, sp), barlines);
@@ -239,6 +324,185 @@ export function drawEnclosure(
         : staffIndexOf(staves, boxes[i], notationPool);
       byStaff.set(staff, [...(byStaff.get(staff) ?? []), boxes[i]]);
     });
+  }
+
+  /** Range selections are structural spans, not merely unions of ink. Draw
+   * them as one continuous enclosure on each row/projection and use the row's
+   * measure cells when a rest or empty copy contributes no glyph. */
+  if (hasStructuralSpan && kind !== 'frame') {
+    const span = options.span!;
+    const rows = options.systemRows!;
+    const systems = collectSystemBands(staves);
+    const isRange = span.units.length > 1;
+
+    systems.forEach((system, rowIndex) => {
+      const rowMeasures = rows[rowIndex];
+      if (!rowMeasures?.length) return;
+      const units = span.units.filter(unit => rowMeasures.includes(unit.measureIndex));
+      if (units.length === 0) return;
+      const boundaries = measureBoundaries(system, barlines, rowMeasures.length, sp);
+      const rowRect = (
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        radius: number,
+        stroke: number
+      ) => {
+        rect(x, y, width, height, radius, stroke);
+        (g.lastElementChild as SVGRectElement | null)?.setAttribute('data-system-row', String(rowIndex));
+      };
+      const cellOf = (measureIndex: number) => {
+        const index = rowMeasures.indexOf(measureIndex);
+        return index < 0 ? null : { left: boundaries[index], right: boundaries[index + 1] };
+      };
+      const systemBoxes = system.staffIndices.flatMap(index => byStaff.get(index) ?? []);
+
+      const fallbackTargets = new Set<number>();
+      for (const unit of units) {
+        const ordinals = options.staffOrdinals?.(unit) ?? [];
+        for (const ordinal of ordinals) {
+          const staffIndex = system.staffIndices[ordinal];
+          if (staffIndex !== undefined) fallbackTargets.add(staffIndex);
+        }
+      }
+      const glyphTargets = system.staffIndices.filter(index => (byStaff.get(index)?.length ?? 0) > 0);
+      const targets = new Set<number>([...glyphTargets, ...fallbackTargets]);
+      if (targets.size === 0 && span.coverage !== 'measure') {
+        const first = system.staffIndices[0];
+        if (first !== undefined) targets.add(first);
+      }
+
+      const unitBelongsTo = (unit: SelectionSpanUnit, staffIndex: number) => {
+        if (unit.partIndex === undefined || unit.staffIndex === undefined) return true;
+        const ordinal = system.staffIndices.indexOf(staffIndex);
+        const mapped = options.staffOrdinals?.(unit) ?? [];
+        return mapped.length === 0 || mapped.includes(ordinal);
+      };
+      const boxesInCell = (staffBoxes: Box[], cell: { left: number; right: number }) =>
+        staffBoxes.filter(box => {
+          const centre = box.x + box.w / 2;
+          return centre >= cell.left - 0.01 && centre <= cell.right + 0.01;
+        });
+      const horizontalRange = (staffIndex?: number) => {
+        const relevantUnits = staffIndex === undefined
+          ? units
+          : units.filter(unit => unitBelongsTo(unit, staffIndex));
+        const staffBoxes = staffIndex === undefined ? systemBoxes : byStaff.get(staffIndex) ?? [];
+        const ranges: { left: number; right: number }[] = [];
+        for (const unit of relevantUnits) {
+          const cell = cellOf(unit.measureIndex);
+          if (!cell) continue;
+          const cellBoxes = boxesInCell(staffBoxes, cell);
+          if (span.coverage === 'moment') {
+            for (const box of cellBoxes) ranges.push({ left: box.x, right: box.x + box.w });
+            // A lone ink-bearing point keeps the old glyph-tight geometry.
+            // In a range, onset anchors preserve rest-only endpoints and
+            // intermediate silence; with no ink they also represent a point
+            // selection on a rest.
+            if (isRange || cellBoxes.length === 0) {
+              const width = cell.right - cell.left;
+              const inset = Math.min(1.2 * sp, width * 0.18);
+              const usable = Math.max(0, width - 2 * inset);
+              const x = cell.left + inset + usable * (unit.position ?? 0);
+              ranges.push({ left: x - 0.4 * sp, right: x + 0.4 * sp });
+            }
+          } else if (kind === 'run') {
+            if (cellBoxes.length > 0) {
+              for (const box of cellBoxes) ranges.push({ left: box.x, right: box.x + box.w });
+            } else {
+              // Empty voice-measure: a visible run through the bar, inset so
+              // it cannot be mistaken for the part/global bar ownership.
+              ranges.push({ left: cell.left + 0.7 * sp, right: cell.right - 0.7 * sp });
+            }
+          } else {
+            ranges.push({ left: cell.left, right: cell.right });
+          }
+        }
+        if (ranges.length === 0) return null;
+        return {
+          left: Math.min(...ranges.map(range => range.left)),
+          right: Math.max(...ranges.map(range => range.right))
+        };
+      };
+
+      if (kind === 'panel-wide') {
+        const range = horizontalRange();
+        if (!range) return;
+        const vb = svg.viewBox.baseVal;
+        const previous = systems[rowIndex - 1];
+        const next = systems[rowIndex + 1];
+        const top = previous ? (previous.bottom + system.top) / 2 : vb.y + 0.4 * sp;
+        const bottom = next ? (system.bottom + next.top) / 2 : vb.y + vb.height - 0.4 * sp;
+        const x0 = Math.max(range.left - 0.35 * sp, vb.x + 0.3 * sp);
+        const x1 = Math.min(range.right + 0.35 * sp, vb.x + vb.width - 0.3 * sp);
+        rowRect(x0, top, x1 - x0, bottom - top, 0.4 * sp, 0.07 * sp);
+        return;
+      }
+
+      if (kind === 'panel') {
+        const range = horizontalRange();
+        if (!range) return;
+        const targetStaves = [...targets].map(index => staves[index]);
+        const vertical = targetStaves.length > 0 ? targetStaves : system.staffIndices.map(index => staves[index]);
+        const targetBoxes = [...targets].flatMap(index => byStaff.get(index) ?? []);
+        const topInk = targetBoxes.length ? Math.min(...targetBoxes.map(box => box.y)) - 0.5 * sp : Infinity;
+        const bottomInk = targetBoxes.length
+          ? Math.max(...targetBoxes.map(box => box.y + box.h)) + 0.5 * sp
+          : -Infinity;
+        const top = Math.min(...vertical.map(staff => staff.top), topInk) - 0.4 * sp;
+        const bottom = Math.max(...vertical.map(staff => staff.bottom), bottomInk) + 0.4 * sp;
+        rowRect(
+          range.left + 0.25 * sp,
+          top,
+          Math.max(0.2 * sp, range.right - range.left - 0.5 * sp),
+          bottom - top,
+          0.4 * sp,
+          0.07 * sp
+        );
+        return;
+      }
+
+      for (const staffIndex of targets) {
+        const staff = staves[staffIndex];
+        const range = horizontalRange(staffIndex);
+        if (!range) continue;
+        const staffBoxes = byStaff.get(staffIndex) ?? [];
+        const selectedBox = staffBoxes.length ? union(staffBoxes) : null;
+        if (kind === 'cell' && !isRange && selectedBox) {
+          const side = Math.max(selectedBox.w, selectedBox.h) + 0.7 * sp;
+          rowRect(
+            selectedBox.x + selectedBox.w / 2 - side / 2,
+            selectedBox.y + selectedBox.h / 2 - side / 2,
+            side,
+            side,
+            0.3 * sp,
+            0.12 * sp
+          );
+          continue;
+        }
+        const top = kind === 'cell' && selectedBox
+          ? selectedBox.y - 0.5 * sp
+          : Math.min(staff.top - (kind === 'slice' ? 1.5 : 1) * sp, selectedBox?.y ?? Infinity);
+        const bottom = kind === 'cell' && selectedBox
+          ? selectedBox.y + selectedBox.h + 0.5 * sp
+          : Math.max(
+              staff.bottom + (kind === 'slice' ? 1.5 : 1) * sp,
+              selectedBox ? selectedBox.y + selectedBox.h : -Infinity
+            );
+        rowRect(
+          range.left - 0.4 * sp,
+          top,
+          range.right - range.left + 0.8 * sp,
+          bottom - top,
+          kind === 'cell' ? 0.3 * sp : 0.5 * sp,
+          kind === 'cell' ? 0.12 * sp : 0.1 * sp
+        );
+      }
+    });
+
+    if (g.childElementCount > 0) svg.insertBefore(g, svg.firstChild);
+    return;
   }
 
   switch (kind) {
