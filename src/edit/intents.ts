@@ -26,7 +26,7 @@ export type NavigationIntent =
   | { type: 'lineUp' }
   /** Jump to a bar (0-based), clamped — the go-to grammar's "12" (survey §3.8). */
   | { type: 'goToMeasure'; measureIndex: number }
-  /** The selection ladder (roadmap/inprogress/core-selection-ladder.md): relax
+  /** The selection ladder (roadmap/complete/core-selection-ladder.md): relax
    *  widens one rung (note → … → score; past the top the MOUNT deselects),
    *  tighten narrows back down the same containment chain. Navigation, not
    *  mutation — the ladder changes what the cursor addresses, never the doc. */

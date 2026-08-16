@@ -1,4 +1,4 @@
-// The selection ladder — roadmap/inprogress/core-selection-ladder.md.
+// The selection ladder — roadmap/complete/core-selection-ladder.md.
 //
 // Input modes ARE the selection level: every selection sits on one rung of the
 // document's containment chain, and the options offered at the cursor are that

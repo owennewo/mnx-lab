@@ -1,6 +1,6 @@
 # The selection ladder — progressive selection as the input-mode system
 
-> **Status: in progress (proposed and started 2026-08-09).** Phase 1 built: the
+> **Status: complete 2026-08-16 (proposed and started 2026-08-09).** Phase 1 built: the
 > vertical ladder as session state (`src/edit/selection.ts` — presence rule,
 > relax/tighten intents on Escape/Enter, level-scaled horizontal arrows incl.
 > section jumps, level-aware `selectedNoteKeys` feeding the existing note-keys

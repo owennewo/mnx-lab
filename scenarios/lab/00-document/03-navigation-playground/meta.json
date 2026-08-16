@@ -1,6 +1,6 @@
 {
   "title": "Navigation playground — the selection-ladder test bed",
-  "description": "One document rich enough to exercise every cell of the selection-ladder navigation matrix (roadmap/inprogress/core-selection-ladder.md): eight bars over two sections (Intro/Verse — proposed schema), a two-voice bar, chords for the landing rules, a rest-only bar, an empty-content bar (presence skipping), deep-ledger notes both directions, an eighth run for stride tests, and two parts — a tab-opting Lead with declared strings and a plain-notation Rhythm — so the part-measure rung and the both view's pair-vs-part distinction are both on the page. The standing instrument for the per-level hands-on reviews.",
+  "description": "One document rich enough to exercise every cell of the selection-ladder navigation matrix (roadmap/complete/core-selection-ladder.md): eight bars over two sections (Intro/Verse — proposed schema), a two-voice bar, chords for the landing rules, a rest-only bar, an empty-content bar (presence skipping), deep-ledger notes both directions, an eighth run for stride tests, and two parts — a tab-opting Lead with declared strings and a plain-notation Rhythm — so the part-measure rung and the both view's pair-vs-part distinction are both on the page. The standing instrument for the per-level hands-on reviews.",
   "bars": 8,
   "tags": [
     "editor",

@@ -245,7 +245,7 @@ in-memory sessions, and never writes `scenarios/`.
   Resolving the slot and comparing its key is the honest test, and it turns a
   silent mis-edit into a reported finding. **The ladder owns the fix** — this is
   concrete evidence for a voice component in the cursor, filed to
-  [core-selection-ladder.md](../inprogress/core-selection-ladder.md).
+  [core-selection-ladder.md](../complete/core-selection-ladder.md).
 - **Addressability is projection-dependent.** Two chord members can derive onto the
   same *string* (navigation-playground's first bar puts both on string 1 — itself a
   tab derivation worth a look, since one string cannot sound two notes) while their
@@ -289,7 +289,7 @@ in-memory sessions, and never writes `scenarios/`.
 ## Open questions
 
 - **Do the ladder gaps get fixed here?** Proposed: no. `unaddressable` is recorded and
-  handed to [core-selection-ladder.md](../inprogress/core-selection-ladder.md)'s
+  handed to [core-selection-ladder.md](../complete/core-selection-ladder.md)'s
   per-level pass; the sweep's job is to name them, and 215 notes are already named.
 - **Does an element need one canonical address, or is any that reaches it enough?** The
   report needs a stable per-element key to be diffable across runs; note keys already

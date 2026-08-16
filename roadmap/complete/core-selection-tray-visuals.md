@@ -46,7 +46,7 @@
 > repo's vocabulary; where the two disagree (the tab set, below) this doc wins and
 > says why.
 >
-> Siblings: [core-selection-ladder.md](../inprogress/core-selection-ladder.md) (the
+> Siblings: [core-selection-ladder.md](../complete/core-selection-ladder.md) (the
 > rungs the tabs are), [core-campaign-element-ops.md](core-campaign-element-ops.md)
 > (the verbs the tiles will fire),
 > [core-editor-focus-scope.md](../proposed/core-editor-focus-scope.md) (who owns the keystroke
@@ -85,7 +85,7 @@ the real axis: the selection ladder (`src/edit/selection.ts`), and the tray's ta
 | note | `note` | NOTE | |
 | event | `event` | EVENT | |
 | voice | `voiceMeasure` | — | not in the design; command set drafted below |
-| part | `partMeasure` | PART | the design's part-config **rows** are the closure's properties surface, not a rung of their own — part is deliberately not a rung ([core-selection-ladder.md](../inprogress/core-selection-ladder.md)) |
+| part | `partMeasure` | PART | the design's part-config **rows** are the closure's properties surface, not a rung of their own — part is deliberately not a rung ([core-selection-ladder.md](../complete/core-selection-ladder.md)) |
 | bar | `measure` | BAR | |
 | section | `section` | — | present only when the document declares sections |
 | score | `score` | — | |

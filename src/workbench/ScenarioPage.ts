@@ -286,7 +286,7 @@ function jsonInk(line: string) {
 /** How many object tags to show before collapsing the tail into a count. */
 const DEF_PREVIEW = 9;
 
-/** Ladder level → enclosure shape (roadmap/inprogress/core-selection-ladder.md).
+/** Ladder level → enclosure shape (roadmap/complete/core-selection-ladder.md).
  *  The mapping lives HERE so elements/ knows shapes, never editor levels.
  *  measure and section share panel-wide: the extent difference (one bar vs
  *  the labelled range) comes from the footprint itself. */
@@ -1646,7 +1646,7 @@ export class ScenarioPage extends LitElement {
     if (!intent || !this.session) return;
     event.preventDefault();
     this.followProjection();
-    // The selection ladder (roadmap/inprogress/core-selection-ladder.md): Escape
+    // The selection ladder (roadmap/complete/core-selection-ladder.md): Escape
     // relaxes rung by rung; only a relax that can't widen further — already at
     // score — becomes the old deselect. While deselected, Escape stays inert
     // (and unrecorded — deselection is view chrome, not session history).

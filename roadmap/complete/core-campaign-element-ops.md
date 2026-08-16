@@ -63,7 +63,7 @@ proposal opens with, and is reviewed on:
    (Shift+letter typed grammar) or palette-tier instead. Free-key budget is shared
    across the campaign; claims are recorded here in the index so items don't collide.
 3. **The rung** — which selection-ladder level(s) the ops attach to, decided with the
-   [core-selection-ladder.md](../inprogress/core-selection-ladder.md) per-level review
+   [core-selection-ladder.md](../complete/core-selection-ladder.md) per-level review
    (its navigation map and this campaign are two halves of one set of decisions), and
    landed as `KeyDoc` rows in `src/edit/keymapDocs.ts` in the same change so the
    cheatsheet joins ([core-keymap-cheatsheet.md](../inprogress/core-keymap-cheatsheet.md)
@@ -610,7 +610,7 @@ names no owner. Still recorded, not indexed: transposition, harmonies rendering
     proved the new cascades removed only what they should. Array-shift-aware
     diffing was the trick — splicing a chord member must not read as five changes.
   - Two findings handed onward: the cursor's missing voice component (evidence
-    filed to [core-selection-ladder.md](../inprogress/core-selection-ladder.md)), and a chord in
+    filed to [core-selection-ladder.md](../complete/core-selection-ladder.md)), and a chord in
     navigation-playground deriving two notes onto one string, which no fingerboard
     can play.
 - **2026-08-14 — item 1 closed; what items 2–3 inherit.** The exemplar moves to
@@ -642,7 +642,7 @@ names no owner. Still recorded, not indexed: transposition, harmonies rendering
   - Two threads forwarded rather than dropped: the ops tab on non-scenario
     documents rides item 3's recording surface (indexed on its row), and
     "an empty part draws nothing" is recorded in
-    [core-selection-ladder.md](../inprogress/core-selection-ladder.md) as ghost-vocabulary
+    [core-selection-ladder.md](../complete/core-selection-ladder.md) as ghost-vocabulary
     work (corpus-neutral — no scenario is measureless).
 - **2026-08-14 — destruct tears down to `{}` (revision, stage-5 feedback).**
   The "ink-free terminal" read as principled asymmetry but conflated two

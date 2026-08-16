@@ -67,7 +67,7 @@
 >
 > Incubates in `workbench/` as a sibling of
 > `<mnx-score-viewer>`. Builds on
-> [core-selection-ladder.md](../inprogress/core-selection-ladder.md) (the rungs and the
+> [core-selection-ladder.md](../complete/core-selection-ladder.md) (the rungs and the
 > walk), takes its promotion discipline from
 > [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md), keeps the
 > viewer's prop surface small per [core-viewer-surface.md](core-viewer-surface.md),

@@ -96,7 +96,7 @@ corpus turns out to contain barely at all.
 unaddressable ink at 122 notes.
 
 **The seven navigation failures are closed** (2026-08-15, during
-[core-selection-ladder.md](../inprogress/core-selection-ladder.md)'s pass): three were a hard
+[core-selection-ladder.md](../complete/core-selection-ladder.md)'s pass): three were a hard
 ±16 line clamp an 8va note sat outside of, and four were the ink walk
 re-deriving its anchor voice from the ink under the cursor. The cursor now
 carries `voiceIndex`, completing the address this doc set out to complete —

@@ -24,7 +24,7 @@
 > Original proposal below. The rendering surface builds on
 > [core-score-hud.md](../complete/core-score-hud.md) (the hud panel tab);
 > the data table is the documentation half of the
-> [core-selection-ladder.md](../inprogress/core-selection-ladder.md)
+> [core-selection-ladder.md](../complete/core-selection-ladder.md)
 > **per-level navigation map** — that effort decides what every key means at
 > each rung; this one writes the decisions down as data and renders them.
 

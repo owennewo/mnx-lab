@@ -12,7 +12,7 @@ carries `partIndex`, `staffIndex` and `voiceIndex`, the grid is built per part,
 the sweep drives across all of them, and every removal verb follows the cursor
 where it goes ([core-element-ops-part-addressing.md](../complete/core-element-ops-part-addressing.md),
 [core-note-address.md](../complete/core-note-address.md),
-[core-selection-ladder.md](../inprogress/core-selection-ladder.md)).
+[core-selection-ladder.md](../complete/core-selection-ladder.md)).
 
 **Entry writes to voice 0 of `parts[0]`, staff 1.** `insertNote`,
 `insertPitchNote`, `appendMeasure`, `padMeasureRests` and their neighbours all

@@ -67,7 +67,7 @@ notes past the meter; in `tie-targets` it strands voice 1's note at 1/8.
 
 That is the same coincidence problem the cursor's `slotIndex` fixed for
 *addressing*, now showing up in *walking* — and the fix belongs to
-[core-selection-ladder.md](../inprogress/core-selection-ladder.md)'s per-level pass, which
+[core-selection-ladder.md](../complete/core-selection-ladder.md)'s per-level pass, which
 owns what ←→ means at the note rung. Recorded there.
 
 

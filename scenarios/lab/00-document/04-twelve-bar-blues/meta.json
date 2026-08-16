@@ -1,6 +1,6 @@
 {
   "title": "Twelve-bar blues — the realistic navigation instrument",
-  "description": "A playable 12-bar blues in E minor (one sharp): the guitar carries two REAL voices — an E-minor-pentatonic melody over an alternating root–fifth bass in quarters — and a bass guitar walks the roots underneath in bass clef. The companion to the synthetic navigation-playground (which keeps the deliberately unmusical presence-rule bars): this one is for FEEL — voice jumps against non-aligned onsets, snap-to-ink melody walking, chord landing on the turnaround double-stop, section jumps Head/Turnaround. Built for the selection-ladder per-level hands-on reviews (roadmap/inprogress/core-selection-ladder.md).",
+  "description": "A playable 12-bar blues in E minor (one sharp): the guitar carries two REAL voices — an E-minor-pentatonic melody over an alternating root–fifth bass in quarters — and a bass guitar walks the roots underneath in bass clef. The companion to the synthetic navigation-playground (which keeps the deliberately unmusical presence-rule bars): this one is for FEEL — voice jumps against non-aligned onsets, snap-to-ink melody walking, chord landing on the turnaround double-stop, section jumps Head/Turnaround. Built for the selection-ladder per-level hands-on reviews (roadmap/complete/core-selection-ladder.md).",
   "bars": 12,
   "tags": [
     "editor",

@@ -216,7 +216,8 @@ proposals that name their campaign.
   complete per-rung bare/Ctrl navigation map and Shift-extension/Ctrl-or-Meta closure
   gestures are mirrored here as data, including the container rung and explicit
   rung-first Delete meanings through section.
-- **[core-selection-ladder.md](inprogress/core-selection-ladder.md)** — **progressive selection as
+### complete/
+- **[core-selection-ladder.md](complete/core-selection-ladder.md)** — **progressive selection as
   the input-mode system**: input modes *are* the selection level, and each level offers
   exactly the properties the data model puts there. One containment ladder (note → event →
   [container] → voice-measure → part-measure → measure → [section] → score) walked
@@ -254,10 +255,8 @@ proposals that name their campaign.
   part-measure while preserving roles through the split/merge tween. Generalized ghosts
   now cover silent/rest-only columns from structural row/bar/staff geometry and give a
   measureless part a larger “place for a bar” vacancy until its first measure exists.
-  **The selection ladder is complete. Next:** graduate the separate entry-mode axis
-  (advance mode, digit debounce, letter accelerators) into its own proposal.
-
-### complete/
+  **Completed 2026-08-16. Next:** graduate the separate entry-mode axis (advance mode,
+  digit debounce, letter accelerators) into its own proposal.
 - **[core-vertical-density.md](complete/core-vertical-density.md)** — **systems per page
   without shrinking the staff**: the third axis of
   [core-render-density-zoom.md](complete/core-render-density-zoom.md), proposed and built
@@ -482,7 +481,7 @@ proposals that name their campaign.
   emptied event keeps its id, so the beam beams a rest) — 13 scenarios, fixed in
   `deleteNote`; and an addressability oracle so weak it hid a **wrong-note deletion**
   (the cursor carries no voice, so Delete could remove the other voice's note — evidence
-  now filed to [core-selection-ladder.md](inprogress/core-selection-ladder.md)).
+  now filed to [core-selection-ladder.md](complete/core-selection-ladder.md)).
 - **[core-element-ops-lyrics.md](complete/core-element-ops-lyrics.md)** —
   campaign item 12, **built 2026-08-14**: syllables and verse metadata, and the
   index's proposed "text *mode* that suspends the keymap" is **rejected** — a

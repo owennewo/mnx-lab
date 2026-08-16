@@ -1,5 +1,5 @@
 // The note level of the selection-ladder navigation map
-// (roadmap/inprogress/core-selection-ladder.md): spatial cursor in both
+// (roadmap/complete/core-selection-ladder.md): spatial cursor in both
 // projections, snap-to-ink notation walking, the Ctrl climb at note level,
 // and the notation entry toggle — driven over the navigation playground
 // scenario, the standing test bed for the per-level reviews.
@@ -304,7 +304,7 @@ describe('note-level navigation (tab projection)', () => {
   });
 });
 
-// The rungs ABOVE note (roadmap/inprogress/core-selection-ladder.md, the
+// The rungs ABOVE note (roadmap/complete/core-selection-ladder.md, the
 // per-level navigation map). The vertical axis coarsens as the selection
 // widens — line → voice → staff — and the horizontal climb reaches the section
 // once the bar step is the rung's own move. Driven over the playground, which

@@ -1,4 +1,4 @@
-// The selection ladder (roadmap/inprogress/core-selection-ladder.md), phase 1:
+// The selection ladder (roadmap/complete/core-selection-ladder.md), phase 1:
 // relax/tighten walk the containment chain with the presence rule, the
 // footprint paints exactly the rung's notes, bare arrows move by the rung's
 // unit, and a mutation re-anchors the selection at the note.

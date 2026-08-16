@@ -31,7 +31,7 @@ import { clefAt, staffPositionOfPitch } from './staffSpace.ts';
 
 /**
  * The active projection — which SPACE the cursor's vertical line addresses
- * (roadmap/inprogress/core-selection-ladder.md): 'tab' = the fingerboard (line is
+ * (roadmap/complete/core-selection-ladder.md): 'tab' = the fingerboard (line is
  * a string number, 1 = top), 'notation' = the staff (line is a staff
  * position in half-staff-spaces from the middle line, positive up). Both
  * projections view ONE model; switching remaps the line, never the music.
