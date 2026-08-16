@@ -3015,7 +3015,11 @@ export class ScenarioPage extends LitElement {
       body: html`
         <mnx-score-hud
           .rows=${rows}
-          .parts=${buildHudParts(this.session.doc, index => this.partOverride(index))}
+          .parts=${buildHudParts(
+            this.session.doc,
+            index => this.partOverride(index),
+            this.session.cursor.partIndex ?? 0
+          )}
           .presets=${TUNING_PRESET_NAMES}
           .cheats=${cheatsheet(this.session.selectionLevel, {
             tabPane,

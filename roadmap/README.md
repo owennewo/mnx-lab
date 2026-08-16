@@ -212,9 +212,9 @@ proposals that name their campaign.
   `harness/conformance/keymap-docs.test.ts`: both joins (every binding documented, every doc
   bound) plus guard mirrors (voice jump note-only, toggleNote notation-only, arrows inert at
   score) so the cheatsheet cannot lie. Static meaning, not a live enablement oracle;
-  physical-key labels per the keymap's `KeyboardEvent.code` decision. **Remaining: stage 4**
-  — each [core-selection-ladder.md](inprogress/core-selection-ladder.md) per-level review
-  pass lands its key decisions here as data (event next).
+  physical-key labels per the keymap's `KeyboardEvent.code` decision. The ladder's
+  complete per-rung bare/Ctrl navigation map is mirrored here as data; future
+  extension/closure bindings join it when their state lands.
 - **[core-selection-ladder.md](inprogress/core-selection-ladder.md)** — **progressive selection as
   the input-mode system**: input modes *are* the selection level, and each level offers
   exactly the properties the data model puts there. One containment ladder (note → event →
@@ -236,11 +236,13 @@ proposals that name their campaign.
   (`src/elements/enclosure.ts` — cell → slice → run → panel → panel-wide → frame from
   the rendered SVG's own geometry; the both view's part-measure panel spans the
   notation+tab pair via the shared-barline join; voice-measure revised to a single run
-  hull, part-measure/measure to the ink/space principle). **Next: the per-level
-  navigation map** — decide what every key means at each rung (e.g. ↑↓ at event level =
-  next voice?), built one level at a time with a hands-on review after each. Then:
-  extension/closures, the relax/tighten animation, primary/echo asymmetry, ghost cells,
-  container rungs.
+  hull, part-measure/measure to the ink/space principle). **Navigation complete
+  2026-08-15; address/footprint consistency pass 2026-08-16** — every rung now has
+  bare/Ctrl meanings, container children keep their event identity, global scopes cover
+  every part/staff, Delete is rung-first, and the HUD follows the addressed part/staff.
+  **Next:** the specified anchor/extent/closure state, then range-capable command states;
+  relax/tighten animation, primary/echo asymmetry, wider ghosts and the container rung
+  remain behind it.
 
 ### complete/
 - **[core-vertical-density.md](complete/core-vertical-density.md)** — **systems per page

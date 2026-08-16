@@ -37,8 +37,9 @@
 >   nothing beats one that does something arbitrary.
 > - **The measure rung's ↑↓ and part-measure's Ctrl+↑↓ are resolved by the
 >   MOUNT**, which reads the viewer's system packing and emits the existing
->   `goToMeasure` — the stage-1 pattern the digit debounce established. `edit/`
->   may import only `model/`, so "the nearest bar in the neighbouring system" is
+>   `goToMeasure` — the same stage-1 pattern already chosen for the pending
+>   digit debounce. `edit/` may import only `model/`, so "the nearest bar in
+>   the neighbouring system" is
 >   a fact it structurally cannot see; delivering it as an already-resolved
 >   intent keeps the session deterministic and the trace replayable (a trace
 >   records a bar, never a paint). The geometry lives with the packing that
@@ -53,6 +54,19 @@
 >   in the rail's topic order), not yet as the element's `score-navigate` event —
 >   that belongs with the `elements/` promotion and
 >   [core-viewer-surface.md](../complete/core-viewer-surface.md)'s event contract.
+>
+> **Consistency refresh 2026-08-16.** The later element-ops/addressing work is
+> now folded back into the ladder instead of merely cited from it. Grid
+> positions carry the event they mean (including rests and tuplet/grace/
+> tremolo children), so `presentLevels`, the HUD and mutations no longer
+> re-derive an event with different top-level-only walks. Selection footprints
+> use the canonical `model/noteWalk.ts` enumeration: container ink participates
+> in every ancestor, and global measure/section/score rungs cover every part and
+> staff rather than tinting only the cursor's staff under a whole-score frame.
+> Delete is RUNG-FIRST — a note under a measure enclosure can no longer steal
+> Del from the bar — and score-level removal addresses the cursor's empty part,
+> not `parts[0]`. The HUD reads and marks that same part/staff. Focused
+> selection/navigation/edit-op/registry tests pin the join.
 >
 > Two bugs fell out of building it, both the same shape — **an address
 > re-derived instead of carried**. The selection read its voice off the ink
@@ -100,17 +114,15 @@
 > playground keeps the presence-rule bars; the rail groups both under
 > "Editor test beds".
 >
-> **What remains, after the per-level pass**: lateral extension + closures
-> (Shift+arrows/Ctrl+A), which need
-> selection to become `{level, anchor, extent}` rather than a level plus a
-> cursor; the relax/tighten shape TWEEN (each level currently re-renders
+> **What remains, after the per-level pass and consistency refresh**: lateral
+> extension + closures (Shift+arrows/Ctrl+A), whose exact state contract is
+> specified below; the relax/tighten shape TWEEN (each level currently re-renders
 > statically); primary/echo asymmetry (both projections draw at full strength);
 > ghost cells beyond the existing entry ghosts; the container rung (the cursor
 > descends into containers since element-ops item 11b, but `container` is still
-> not a `SelectionLevel`); the measure rung painting EVERY part's copy of the
-> bar (the footprint follows the cursor's part now, which is honest but still
-> one part); Delete's meaning at voice-measure, part-measure and section
-> (element-ops answered note, measure and score); and trace fixtures asserting
+> not a `SelectionLevel`); Delete's meaning at event, voice-measure,
+> part-measure and section (note, measure and score are rung-first and pinned);
+> range-capable command states/verbs; and trace fixtures asserting
 > selection. The entry-mode axis — advance mode, the stage-1 digit debounce, the
 > letter accelerator — is the other open half; it shares only the cursor with
 > the ladder and is a candidate to graduate into its own proposal. Builds
@@ -161,9 +173,10 @@ document object — voice-measure is the selectable thing; voice continuity is
 emergent by name-matching, so there is nothing above it to select.
 
 **Part is deliberately not a rung** — see the closure move below. Part config
-(strings/capo/staffKind/name) is a properties surface reached from the
-closure selection, consistent with the instrument selector already being
-viewer-level presentation.
+(strings/capo/staffKind/name) belongs on the part row/scope. The HUD already
+exposes presentation-only strings/capo overrides there without pretending a
+closure exists; the closure is what will make whole-part document selection
+and bulk commands honest, not a prerequisite for displaying the row.
 
 ## Two axes, two gesture families
 
@@ -181,12 +194,13 @@ family owns the horizontal.**
   widens until it cancels, Enter narrows until it *does*.
 - **Shift+←→ extends laterally** at the current rung (events → slur/tuplet/
   beam/hairpin material; measures → volta/repeat/multirest material);
-  **Shift+End** to the end of the run; **Ctrl+A is the closure**. The closure
-  at each rung *is* the horizontal axis-mate the ladder can't hold: Ctrl+A at
-  voice-measure = the whole voice, Ctrl+A at part-measure = **the part**,
-  Ctrl+A at measure = the whole timeline. Nothing relational in MNX needs a
-  "pick target" second gesture except the exotic spans (cross-voice slur,
-  cross-jump tie), which get exactly that as the fallback.
+  **Shift+End** reaches the last sibling in that rung's closure.
+  **Ctrl+A (Meta+A on macOS) is the closure** — “select all in this horizontal
+  scope,” while KEEPING the rung so its property vocabulary does not change.
+  The full table and state rules are below. Nothing relational in MNX needs a
+  "pick target" second gesture except spans that cross the selected scope
+  (cross-voice slur, cross-jump tie); the existing press–navigate–press anchor
+  remains their fallback.
 - **Bare arrows navigate by the rung's unit** — notes at note level, bars at
   bar level, sections at section level (Intro → Verse → Chorus: the way
   musicians actually skim, and the reason the section rung earns its place
@@ -199,6 +213,69 @@ allowed to occupy potential positions, shown **ghost** (hollow/dashed — the
 existing entry ghosts generalized): Enter into a rest drops a ghost cell on a
 staff line or string; typing materializes the note. Solid = a thing, ghost = a
 place for a thing.
+
+### Horizontal selection state — refreshed contract (2026-08-16)
+
+The old shorthand `{level, anchor, extent}` was directionally right but too
+small: a closure such as “the whole part” is a live model scope, not merely the
+last bar that happened to exist when Ctrl+A was pressed. The session state is:
+
+```ts
+interface SelectionState {
+  level: SelectionLevel;
+  anchor: EditorCursor;
+  extent:
+    | { kind: 'cursor'; cursor: EditorCursor }
+    | { kind: 'closure'; scope: 'voice' | 'part' | 'timeline' | 'score' };
+}
+```
+
+The ordinary session cursor is the ACTIVE edge and mirrors `extent.cursor`;
+`anchor` is captured on the first Shift gesture. Endpoints are full cursor
+addresses (part, staff, voice, bar, onset, line, coincidence ordinal), never
+note ids. Membership is resolved afresh from the document at `level`, through
+the canonical event/note enumeration; an edit cannot leave a stored list of
+ids masquerading as a current range. A closure is also resolved live, so an
+appended bar joins “whole part/timeline” without rewriting selection state.
+
+| Rung kept by Ctrl+A | Closure membership |
+|---|---|
+| note | every existing note in the active staff/voice across its part timeline |
+| event | every event (rests included) in the active staff/voice timeline |
+| container | every rhythm container in the active staff/voice timeline |
+| voice-measure | every measure-copy belonging to the active staff/voice |
+| part-measure | the whole active part, all its staves and measures |
+| measure | the global timeline — every part's copy of every measure |
+| section | the labelled timeline (all declared section ranges) |
+| score | the score (idempotent; already the limit) |
+
+Range extension follows the current rung's BARE horizontal unit but selects
+only things that exist: note extension is the active voice's ink walk (tab
+ghost columns remain cursor-only), event walks events, voice/part/measure walk
+bar copies, and section walks labelled ranges. Container gets the sibling
+container walk when that rung lands. Score has no lateral extension.
+
+State transitions are fixed before implementation:
+
+- First Shift+←→ captures `anchor`; later Shift presses move only the active
+  extent. Reversing through the anchor grows out the other side, text-editor
+  style. Shift+End resolves the closure's last concrete member.
+- Bare ←/→ collapses a non-closure range to its left/right edge respectively;
+  the next press navigates. A closure collapses to its current cursor because
+  it has no honest geometric edge in a sparse voice.
+- Escape/Enter map BOTH concrete endpoints through relax/tighten, preserving
+  the time span and breadcrumbs. At the part-measure→measure fork, part scope
+  becomes the corresponding global measure range; tightening uses the stored
+  part breadcrumb. A closure changes scope by the table's nearest valid row.
+- Projection changes never change model membership. They only choose the
+  active endpoint's spatial landing and which projection is primary.
+- Bulk mutations preserve the range so mixed/active command state can show the
+  result. Entry into a ghost is the exception: it materializes one thing and
+  re-anchors there. If an edit removes an endpoint, re-resolution uses the same
+  nearest-survivor rule as cursor clamping; if nothing at that rung survives,
+  the presence rule relaxes to the first valid ancestor.
+- Traces record `extendSelection` / `closeSelection` intents, not resolved id
+  lists. Fixtures assert the final `SelectionState` alongside doc and cursor.
 
 **The ink walk re-anchored, and a shared line handed it to the wrong voice —
 decided 2026-08-15: THE CURSOR CARRIES ITS VOICE.** `movePositionInk` took its
@@ -348,13 +425,13 @@ arrows never mutate (survey §3.2), at every level.
 
 | Level | ← → notation | ← → tab | ↑ ↓ notation | ↑ ↓ tab |
 |---|---|---|---|---|
-| note | prev/next position in this voice — landing rule parked: keep the staff position (pure space) vs snap to the voice's nearest-pitch ink | prev/next grid column, ghosts included, staying on the string — **space** | prev/next **staff position** (line/space), occupied or not — **space** | neighbouring string, occupied or not — **space** |
+| note | prev/next position in this voice, snapping to its nearest-pitch ink | prev/next grid column, ghosts included, staying on the string — **space** | prev/next **staff position** (line/space), occupied or not — **space** | neighbouring string, occupied or not — **space** |
 | event | prev/next event in this voice (rests included) | same | same instant, neighbouring **voice**'s event | same |
 | voice-measure | same voice, prev/next bar | same | neighbouring **voice** in this bar | same |
 | part-measure | prev/next bar, same part | same | neighbouring **part/staff** | same |
 | measure | prev/next bar column | same | nearest bar in the neighbouring **system** (text-editor line navigation over the bar-wrap grid) | same |
 | section | prev/next section | same | *(unbound)* | same |
-| score | *(unbound)* | same | **escalates to the host**: the element emits a navigate event (prev/next document) | same |
+| score | *(unbound)* | same | **escalates to the host**: currently the workbench mount navigates the rail; the promoted element will emit the public event | same |
 
 Why the rows are what they are:
 
@@ -363,8 +440,8 @@ Why the rows are what they are:
   the fingerboard — (string × beat) cells, Guitar Pro's box cursor, digits
   type frets. Notation's space is the staff — (staff position × beat) cells:
   ↑↓ steps lines and spaces whether occupied or not, an **entry action key
-  toggles a notehead** at the cell (binding parked — Space collides with the
-  play/pause convention; it may BE Enter's bottom-rung "begin input" job),
+  toggles a notehead** at the cell (Space is the current, still-reviewable
+  binding; it collides with the common play/pause convention),
   and Alt+↑↓ — the existing polymorphic transpose verb — supplies the
   chromatic alteration over the position's diatonic default. **The chord
   argument decided this**: the incumbents (MuseScore/Sibelius/Dorico) enter
@@ -398,13 +475,12 @@ Why the rows are what they are:
 - **Score**: ←→ stays unbound, but ↑↓ **hands off** — the ladder does not end
   at the document, it continues into the host: at score level the vertical
   neighbour is the next document in the HOST's collection, which the element
-  cannot know, so it emits a navigate event (e.g. `score-navigate` with a
-  direction) from the component. The workbench binds it to prev/next
-  scenario in the rail; studio will bind it to prev/next score. This is part
-  of the element's public surface — record it in
-  [core-viewer-surface.md](../complete/core-viewer-surface.md)'s event contract when
-  that lands. Emitted ONLY at score level, so arrows stay inert everywhere
-  they lack meaning.
+  cannot know. **Today the workbench mount handles it directly**, binding
+  prev/next to scenario order in the rail. Promotion turns that already-built
+  host escalation into an element event (e.g. `score-navigate`) for studio to
+  bind to its own collection; [core-viewer-surface.md](../complete/core-viewer-surface.md)
+  owns that public contract. It fires ONLY at score level, so arrows stay inert
+  everywhere they lack meaning.
 
 ### Ctrl+direction — climb to the first meaning change (decided 2026-08-10, BUILT 2026-08-15)
 
@@ -426,7 +502,7 @@ bare map settles into. What it yields today:
 
 Two riders:
 
-- **The note-level ←→ outcome is coupled to the parked landing rule**: only
+- **The note-level ←→ outcome is coupled to the settled nearest-ink landing**:
   *snap-to-ink* makes note's walk degenerate with event's, letting the climb
   reach bar jump — the "Ctrl+→ at a note must jump a bar" requirement is an
   argument FOR snap-to-ink. **Tab's event-skip: RESOLVED by the note-level
@@ -487,44 +563,41 @@ hull honesty), **chords** (landing rules, stack walking), a **rest-only
 bar** and an **empty bar** (presence skipping), **deep-ledger notes**
 (enclosure stretch, staff-assignment), **two parts** with one tab-opting
 part (part-measure ↑↓, the both view's pair-vs-part distinction, projection
-echoes) with declared `strings[]`. Note the implementation gap this exposes
-on purpose: the cursor currently addresses parts[0] staff 1 only — the
-part-measure rung's vertical needs the cursor to grow a part axis.
+echoes) with declared `strings[]`. The gap this originally exposed is closed:
+the cursor now carries part and staff, and the part-measure vertical walks the
+system's actual staff order.
 
-Parked for the hands-on reviews (feel decisions): the notation note-level ←→
-**landing rule** (keep the staff position — pure space, symmetric with tab's
-string-stickiness — vs snap to the voice's nearest-pitch ink, which suits
-walking existing melodies); the entry action key's **binding** (Space vs
-Enter-at-bottom-rung vs other — Space collides with the play/pause
-convention); the **debounce window duration**; and whether per-pane advance
-defaults feel consistent. **Decided 2026-08-15 with the per-level pass**:
+Still parked for hands-on entry review: whether Space remains the entry action
+key (it collides with play/pause), the **debounce window duration**, and whether
+per-pane advance defaults feel consistent. The notation note-level ←→ landing
+is no longer parked: the review chose nearest-pitch ink. **Decided 2026-08-15
+with the per-level pass**:
 voice-switching ↑↓ **stops** at the outermost voice — a wrap across the stack
 reads as a failed press in dense writing, and the rung's own rule is that an
 arrow doing nothing beats one doing something arbitrary.
 
 ## Design questions this item owns
 
-- **The per-level navigation map** — phase 1 only scaled the horizontal
-  arrows; every key deserves per-level thinking. **The bare-arrow map and
-  the Ctrl climb rule are drafted below** (their own sections); Delete,
-  digits, transpose and the palette's command set still need the same
-  treatment (Delete at measure = clear the bar? at section = ?). **Process,
-  agreed 2026-08-10: work ONE level at a time, hands-on review after each
-  level to check it feels natural before starting the next** — the map is a
-  feel decision, not a derivation, so it gets the same review-first
-  treatment as the corpus.
+- ~~**The per-level navigation map**~~ — **complete and mirrored in
+  `keymapDocs.ts`**. The element-ops pass also made digits note-only,
+  transpose footprint-scaled, and the command set scope-filtered. Delete is
+  now rung-first at note/measure/score; event, voice-measure, part-measure and
+  section remain explicit design work. Continue the agreed process for those:
+  one level at a time, hands-on review after each — meanings are feel
+  decisions, not schema derivations.
 - ~~**Escape precedence**~~ — **answered** in `src/edit/keymap.ts`
   (`ESCAPE_PRECEDENCE`): innermost open thing first — popover, then tray or
   palette, then `relaxSelection`, then the mount's deselect. Stated once, in the
   only module that interprets KeyboardEvents, and enforced by the DOM rather
   than by consultation (overlays `preventDefault()` before the page listener
   runs), which is why the ORDER is the whole contract and nothing branches on it.
-- **The voice hull in dense two-voice writing** and **cell size in dense tab**
-  are the two visuals most likely to fail; prototype first.
-- **Selection in the state machine** — today selection is a single position.
-  The ladder makes it `{level, anchor, extent}`; intents (`relax`, `tighten`,
-  `extend`, `closure`) and trace fixtures asserting the expected selection are
-  the natural extension of the intents+traces design already in place.
+- ~~**The voice hull in dense two-voice writing and cell size in dense tab**~~
+  — prototyped and reviewed in the enclosure pass; one run hull won over beads.
+- **Selection in the state machine** — today selection is still a single
+  cursor plus level. Implement the refreshed `SelectionState` contract above;
+  add `extendSelection`/`closeSelection` intents and final-state trace
+  assertions. The command registry already reserves `mixed`, and the tray
+  residue ledger names the UI joins that wake when range membership exists.
 - **The section rung is spec-loop evidence.** It is built on a
   proposed-schema field; if section-nav proves out, that experience belongs in
   `spec/proposals/` as an implementation argument for adoption
@@ -532,6 +605,31 @@ arrow doing nothing beats one doing something arbitrary.
 - **Interaction with the full-bar invariant** — unentered positions ARE beat
   rests; ghost cells and the rest/note-rung skipping must agree with that
   model, not fight it.
+
+## Remaining implementation sequence
+
+1. **State + membership resolver.** Add `SelectionState`, make the current
+   cursor the active edge, resolve concrete ranges/closures at each rung, and
+   expose both structural members and note/kit keys. The structural half is
+   required because rests and empty bar copies are selectable but have no note
+   key to paint. Pin reversal, sparse voices, containers, multi-staff parts,
+   document edits and final trace state before binding keys.
+2. **Gestures as data.** Add `extendSelection` (direction/end) and
+   `closeSelection` intents; bind Shift+←→, Shift+End, Ctrl+A and Meta+A; extend
+   `KEY_DOCS` and its joins. Mouse drag/click parity uses the same intents — no
+   second selection path.
+3. **Range presentation.** Teach `SelectionContext`/`drawEnclosure` to consume
+   the resolved structural span: one continuous shape per system, with honest
+   breaks at wraps and a representation for rest-only/empty units. Then settle
+   wide-selection tray shaft geometry in the hands-on review. This remains an
+   overlay change; primitive/SVG goldens stay byte-identical.
+4. **Commands.** Wake registry `mixed`, member counts and the section-range/
+   part-scope tiles. Bulk verbs apply one undoable op/log entry to the resolved
+   membership and preserve the selection; the existing spanner anchor remains
+   for out-of-scope endpoints.
+5. **Container + remaining rung meanings.** Add the container rung using the
+   event identity already carried by the grid, then review Delete at event,
+   container, voice-measure, part-measure and section one level at a time.
 
 ## Not this
 
@@ -541,9 +639,11 @@ arrow doing nothing beats one doing something arbitrary.
   first ([core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md) keeps its
   own trigger).
 - **Not discontiguous multi-select** (Ctrl+click collections) — the ladder is
-  one contiguous selection at one level; overlap lives in the document's
-  spanners, never in the selection.
-- **Not the properties panels themselves** (part tuning/capo, score layout) —
-  this doc only decides how they are *reached* (closures); their contents sit
-  with [core-viewer-surface.md](../complete/core-viewer-surface.md) and the editor work that needs
-  them.
+  one ordered interval or one derived closure at one level, never an arbitrary
+  bag. Sparse voices may contain silence between members; that is still one
+  logical closure. Overlap lives in document spanners, never in selection.
+- **Not new properties panels.** The HUD/tray now provide the existing surfaces
+  (including per-part presentation overrides); this doc supplies honest range
+  and closure membership for their bulk/document commands. New properties stay
+  with [core-viewer-surface.md](../complete/core-viewer-surface.md) and the editor
+  proposals that need them.

@@ -61,6 +61,104 @@ function makeDoc(withSections = false): MnxStructure {
   };
 }
 
+function containerDoc(): MnxStructure {
+  return {
+    mnx: { version: 1 },
+    global: { measures: [{}] },
+    parts: [
+      {
+        measures: [
+          {
+            sequences: [
+              {
+                content: [
+                  {
+                    type: 'tuplet',
+                    inner: { multiple: 3, duration: { base: 'eighth' } },
+                    outer: { multiple: 2, duration: { base: 'eighth' } },
+                    content: [
+                      {
+                        duration: { base: 'eighth' },
+                        notes: [note('inside-1', 'C', 5, 1)]
+                      },
+                      {
+                        duration: { base: 'eighth' },
+                        notes: [note('inside-2', 'D', 5, 1)]
+                      }
+                    ]
+                  },
+                  {
+                    duration: { base: 'quarter' },
+                    notes: [note('outside', 'E', 5, 1)]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        _x: { mnxLab: { strings: [...STANDARD_GUITAR_STRINGS] } }
+      }
+    ]
+  };
+}
+
+function ensembleDoc(): MnxStructure {
+  return {
+    mnx: { version: 1 },
+    global: { measures: [{ section: { label: 'All' } }] },
+    parts: [
+      {
+        id: 'lead',
+        measures: [
+          { sequences: [{ content: [{ duration: { base: 'whole' }, notes: [note('lead', 'E', 4, 1)] }] }] }
+        ],
+        _x: { mnxLab: { strings: [...STANDARD_GUITAR_STRINGS] } }
+      },
+      {
+        id: 'keys',
+        staves: 2,
+        measures: [
+          {
+            sequences: [
+              { content: [{ duration: { base: 'whole' }, notes: [note('right', 'C', 5, 1)] }] },
+              {
+                staff: 2,
+                content: [{ duration: { base: 'whole' }, notes: [note('left', 'C', 3, 1)] }]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+}
+
+function kitDoc(): MnxStructure {
+  return {
+    mnx: { version: 1 },
+    global: { measures: [{}] },
+    parts: [
+      {
+        kit: { snare: { staffPosition: 0 } },
+        measures: [
+          {
+            sequences: [
+              {
+                content: [
+                  {
+                    duration: { base: 'whole' },
+                    kitNotes: [{ kitComponent: 'snare' }]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  } as unknown as MnxStructure;
+}
+
 const relax = { type: 'relaxSelection' } as const;
 const tighten = { type: 'tightenSelection' } as const;
 
@@ -129,6 +227,70 @@ describe('selection ladder', () => {
     expect(session.selectedNoteKeys.sort()).toEqual(['n1', 'n2', 'n3', 'n4']);
     expect(session.handleIntent(relax)).toBe(true);
     expect(session.selectionLevel).toBe('score');
+  });
+
+  it('keeps container children on the event rung and in every wider footprint', () => {
+    const session = new EditorSession(containerDoc());
+    expect(session.selectedNoteKeys).toEqual(['inside-1']);
+    session.handleIntent(relax);
+    expect(session.selectionLevel).toBe('event');
+    expect(session.selectedNoteKeys).toEqual(['inside-1']);
+    session.handleIntent(relax);
+    expect(session.selectionLevel).toBe('voiceMeasure');
+    expect(session.selectedNoteKeys).toEqual(['inside-1', 'inside-2', 'outside']);
+  });
+
+  it('makes global measure, section and score footprints cross every part and staff', () => {
+    const session = new EditorSession(ensembleDoc());
+    while (session.selectionLevel !== 'partMeasure') session.handleIntent(relax);
+    expect(session.selectedNoteKeys).toEqual(['lead']);
+
+    session.handleIntent(relax);
+    expect(session.selectionLevel).toBe('measure');
+    expect(session.selectedNoteKeys.sort()).toEqual(['lead', 'left', 'right']);
+    session.handleIntent(relax);
+    expect(session.selectionLevel).toBe('section');
+    expect(session.selectedNoteKeys.sort()).toEqual(['lead', 'left', 'right']);
+    session.handleIntent(relax);
+    expect(session.selectionLevel).toBe('score');
+    expect(session.selectedNoteKeys.sort()).toEqual(['lead', 'left', 'right']);
+  });
+
+  it('makes Delete obey the rung before the ink under the cursor', () => {
+    const session = new EditorSession(makeDoc());
+    while (session.selectionLevel !== 'measure') session.handleIntent(relax);
+    const before = session.doc;
+    expect(session.handleIntent({ type: 'delete' })).toBe(false);
+    expect(session.doc).toEqual(before);
+    expect(session.doc.parts[0].measures?.[0].sequences?.[0].content[0].notes).toHaveLength(2);
+  });
+
+  it('counts container children as ink when guarding bar removal', () => {
+    const session = new EditorSession(containerDoc());
+    while (session.selectionLevel !== 'measure') session.handleIntent(relax);
+    expect(session.handleIntent({ type: 'delete' })).toBe(false);
+    expect(session.selectedNoteKeys.sort()).toEqual(['inside-1', 'inside-2', 'outside']);
+  });
+
+  it('routes note-rung Delete through the kit-note operation for percussion', () => {
+    const session = new EditorSession(kitDoc());
+    expect(session.selectedNoteKeys).toEqual(['@m0.v0.e0.k0']);
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    const event = session.doc.parts[0].measures?.[0].sequences?.[0].content[0] as {
+      kitNotes?: unknown[];
+    };
+    expect(event.kitNotes).toBeUndefined();
+  });
+
+  it('removes the addressed empty part at score level and clamps the cursor', () => {
+    const doc = ensembleDoc();
+    doc.parts[1].measures![0].sequences = [];
+    const session = new EditorSession(doc);
+    expect(session.handleIntent({ type: 'setPart', partIndex: 1 })).toBe(true);
+    while (session.selectionLevel !== 'score') session.handleIntent(relax);
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.doc.parts.map(part => part.id)).toEqual(['lead']);
+    expect(session.cursor.partIndex).toBeUndefined();
   });
 
   it('moves by the rung unit: positions at note level, bars at measure level, sections at section level', () => {

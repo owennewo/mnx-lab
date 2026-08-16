@@ -16,10 +16,9 @@
  * every key the renderer emits is one this walk produced. Agreement is checked,
  * not maintained by hand.
  *
- * **This is where container descent will go.** Tuplet, grace and tremolo
- * content is invisible to the editor today because this walk stops at
- * `isTimedEvent`; when it descends, every consumer descends with it, and the
- * nested key form stays an implementation detail of this file.
+ * Container descent lives here too. Tuplet, grace and tremolo children carry
+ * the nested key form below, which remains an implementation detail of this
+ * file rather than a traversal each consumer has to reproduce.
  */
 import type { MnxEvent, MnxNote, MnxSequence, MnxStructure } from './mnx.ts';
 import { isTimedEvent } from './mnx.ts';
@@ -87,9 +86,9 @@ function containerContent(item: unknown): MnxEvent[] | null {
 }
 
 /**
- * Every addressable note of the entry surface (`parts[0]`, staff 1), in
- * document order, with the coordinates that name it. Container content is not
- * yet visited — see the file header.
+ * Every addressable note in the document, in document order, with the
+ * coordinates that name it. Container content is visited recursively one
+ * authored level deep (the schema's tuplet/grace/tremolo content shape).
  */
 export function forEachNoteAddress(
   doc: MnxStructure,

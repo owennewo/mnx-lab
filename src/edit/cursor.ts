@@ -18,10 +18,10 @@
 // empty measure. They hold no slots; they exist so the cursor can stand where
 // the next note will be inserted.
 //
-// The traversal here mirrors the layout engines' (parts[0], staff-1
-// sequences, events in content order) — the contract documented in
-// src/model/noteKeys.ts. edit/ may not import engine/, so the staff filter is
-// restated; noteKeys.ts is the shared spec both sides answer to.
+// The traversal is scoped to the cursor's active part/staff and mirrors the
+// layout engines' event order. edit/ may not import engine/, so the staff
+// filter is restated; model/noteWalk.ts produces the shared keys and the
+// corpus-wide note-key test checks both sides answer to them.
 import type { MnxEvent, MnxSequenceItem, MnxStructure, MnxNote } from '../model/mnx.ts';
 import { isTimedEvent, isTuplet, isTremolo } from '../model/mnx.ts';
 import { forEachNoteAddress, noteKeyAt } from '../model/noteWalk.ts';
@@ -54,7 +54,17 @@ export interface NoteSlot {
   staffPosition: number;
   voiceIndex: number;
   eventIndex: number;
+  /** Inner event index when the note lives in a tuplet/grace/tremolo. */
+  containerIndex?: number;
   noteIndex: number;
+}
+
+/** One event beginning at a grid position. Unlike a note slot this also
+ * represents rests, so the event rung never has to infer presence from ink. */
+export interface EventSlot {
+  voiceIndex: number;
+  eventIndex: number;
+  containerIndex?: number;
 }
 
 /** One stop on the beat grid. Slots are in VISUAL order, top line first, so
@@ -67,6 +77,8 @@ export interface Position {
   /** Voice indices with a TIMED event starting here (rests included) — what
    *  the notation projection's voice-sticky walk stops at. */
   voices: number[];
+  /** The events starting here, including rests and container children. */
+  events: EventSlot[];
 }
 
 export interface EditorCursor {
@@ -184,9 +196,9 @@ export function durationSpan(duration: { base: string; dots?: number } | undefin
   return reduce(base.num * (2 * scale - 1), base.den * scale);
 }
 
-/** Metric width of one sequence item. Containers are opaque to the cursor for
- *  now (their inner notes get no slots) but must still advance the clock so
- *  the positions after them stay honest. Grace content is un-timed → 0. */
+/** Metric width of one sequence item. Container children have their own grid
+ *  slots; this is the outer item's contribution to the enclosing voice clock.
+ *  Grace content is un-timed → 0. */
 export function itemSpan(item: MnxSequenceItem): Onset {
   // The space check comes FIRST, and that ordering is the whole of it: a
   // `space` carries a duration, so `sequenceItemKind` classifies it as an
@@ -244,9 +256,9 @@ function scaleOnset(span: Onset, scale: Onset): Onset {
  *  walk (`model/noteWalk.ts`) so the editor and the layouts cannot drift. */
 export const noteKeyOf = noteKeyAt;
 
-/** Visit every staff-1 note of parts[0] with the selection key the layouts
- *  would give it. This is the addressing scheme EditOps resolve against —
- *  now a thin wrapper over the one enumeration that defines it. */
+/** Visit every note with the selection key the layouts would give it. This is
+ *  the addressing scheme EditOps resolve against — now a thin wrapper over
+ *  the one enumeration that defines it. */
 export function forEachKeyedNote(
   doc: MnxStructure,
   fn: (note: MnxNote, key: string) => void
@@ -286,11 +298,16 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
 
   for (let measureIndex = 0; measureIndex < measureCount; measureIndex++) {
     const clef = clefAt(doc, measureIndex, partIndex, staffIndex);
-    const byOnset: { onset: Onset; raw: RawSlot[]; voices: Set<number> }[] = [];
+    const byOnset: {
+      onset: Onset;
+      raw: RawSlot[];
+      voices: Set<number>;
+      events: EventSlot[];
+    }[] = [];
     const at = (onset: Onset) => {
       let found = byOnset.find(p => onsetsEqual(p.onset, onset));
       if (!found) {
-        found = { onset, raw: [], voices: new Set() };
+        found = { onset, raw: [], voices: new Set(), events: [] };
         byOnset.push(found);
       }
       return found;
@@ -311,6 +328,11 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
         const push = (event: MnxEvent, at_: Onset, containerIndex?: number) => {
           const position = at(at_);
           position.voices.add(voiceIndex);
+          position.events.push({
+            voiceIndex,
+            eventIndex,
+            ...(containerIndex === undefined ? {} : { containerIndex })
+          });
           (event.notes ?? []).forEach((note, noteIndex) => {
             position.raw.push({
               slot: {
@@ -321,6 +343,7 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
                 staffPosition: staffPositionOfPitch(clef, note.pitch),
                 voiceIndex,
                 eventIndex,
+                ...(containerIndex === undefined ? {} : { containerIndex }),
                 noteIndex
               },
               midi: midiOfPitch(note.pitch),
@@ -385,10 +408,10 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
     // what makes an empty bar addressable in the notation projection too.
     const span = spans[measureIndex] ?? { num: 1, den: 1 };
     if (onsetLess(voiceZeroEnd, span) && !byOnset.some(p => onsetsEqual(p.onset, voiceZeroEnd))) {
-      byOnset.push({ onset: voiceZeroEnd, raw: [], voices: new Set([0]) });
+      byOnset.push({ onset: voiceZeroEnd, raw: [], voices: new Set([0]), events: [] });
     }
     if (byOnset.length === 0)
-      byOnset.push({ onset: { num: 0, den: 1 }, raw: [], voices: new Set([0]) });
+      byOnset.push({ onset: { num: 0, den: 1 }, raw: [], voices: new Set([0]), events: [] });
 
     byOnset.sort((a, b) => a.onset.num * b.onset.den - b.onset.num * a.onset.den);
     positions.push(
@@ -398,7 +421,8 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
         slots: p.raw
           .sort((a, b) => a.slot.line - b.slot.line || b.midi - a.midi || a.order - b.order)
           .map(r => r.slot),
-        voices: [...p.voices].sort((a, b) => a - b)
+        voices: [...p.voices].sort((a, b) => a - b),
+        events: p.events
       }))
     );
   }
@@ -439,6 +463,44 @@ export function slotAt(
 ): NoteSlot | undefined {
   const coincident = coincidentSlots(grid, cursor, projection);
   return coincident[cursor.slotIndex ?? 0];
+}
+
+/** The event selected at the cursor. Ink disambiguates coincident container
+ * children; over a rest, the carried voice chooses the event directly. */
+export function eventSlotAt(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  projection: Projection
+): EventSlot | undefined {
+  const note = slotAt(grid, cursor, projection);
+  if (note) {
+    return {
+      voiceIndex: note.voiceIndex,
+      eventIndex: note.eventIndex,
+      ...(note.containerIndex === undefined ? {} : { containerIndex: note.containerIndex })
+    };
+  }
+  const position = positionAt(grid, cursor);
+  const voice = cursor.voiceIndex ?? 0;
+  return position?.events.find(event => event.voiceIndex === voice) ?? position?.events[0];
+}
+
+/** Resolve the event slot against the cursor's active part and staff. */
+export function eventAtCursor(
+  doc: MnxStructure,
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  projection: Projection
+): MnxEvent | undefined {
+  const ref = eventSlotAt(grid, cursor, projection);
+  if (!ref) return undefined;
+  const sequences = (
+    doc.parts?.[cursor.partIndex ?? 0]?.measures?.[cursor.measureIndex]?.sequences ?? []
+  ).filter(sequence => (sequence.staff ?? 1) === (cursor.staffIndex ?? 1));
+  const item = sequences[ref.voiceIndex]?.content?.[ref.eventIndex];
+  if (!item) return undefined;
+  if (ref.containerIndex === undefined) return isTimedEvent(item) ? item : undefined;
+  return containerEvents(item)?.[ref.containerIndex];
 }
 
 /**

@@ -4,7 +4,6 @@
 // drive the exact same object. The session records every intent it handles;
 // that log IS the trace fixture ("recording is the same stream as undo").
 import type { MnxEvent, MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
-import { isTimedEvent } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent } from './intents.ts';
 import type { EditOp, OpLogEntry } from './ops.ts';
@@ -24,20 +23,18 @@ import {
   timeSignatureRemovalFits
 } from './ops.ts';
 import {
-  addOnsets,
   buildGrid,
   clampCursor,
   coincidentSlots,
   cycleSlot,
+  eventAtCursor,
   initialCursor,
-  itemSpan,
   moveLine,
   moveMeasure,
   movePosition,
   movePositionInk,
   moveToMeasure,
   onsetLess,
-  onsetsEqual,
   positionAt,
   slotAt,
   type EditorCursor,
@@ -297,9 +294,17 @@ export class EditorSession {
         return true;
       }
       case 'delete': {
-        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
-        if (slot) {
-          this.apply({ type: 'deleteNote', noteId: slot.noteKey });
+        // Delete belongs to the selected RUNG, not whatever ink happens to be
+        // under the cursor. Checking the slot first made Del at measure/score
+        // silently remove one note while the enclosure claimed a container.
+        if (this.level === 'note') {
+          const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+          if (!slot) return false;
+          this.apply(
+            /\.k\d+$/.test(slot.noteKey)
+              ? { type: 'removeKitNote', noteKey: slot.noteKey }
+              : { type: 'deleteNote', noteId: slot.noteKey }
+          );
           return true;
         }
         // The container rungs' guarded delete (element-ops): a container may
@@ -317,9 +322,10 @@ export class EditorSession {
           return true;
         }
         if (this.level === 'score') {
-          const part = this.doc.parts?.[0];
+          const partIndex = this.cursorState.partIndex ?? 0;
+          const part = this.doc.parts?.[partIndex];
           if (part && !partHasInk(part)) {
-            this.apply({ type: 'removePart' });
+            this.apply({ type: 'removePart', partIndex });
             return true;
           }
           const last = (this.doc.global?.measures?.length ?? 0) - 1;
@@ -1341,10 +1347,24 @@ export class EditorSession {
   /** The grid derives from the document, so every doc change rebuilds it and
    *  re-anchors the cursor (a removed measure must not strand it). */
   private reindex(): void {
+    const partIndex = Math.min(
+      this.cursorState.partIndex ?? 0,
+      Math.max(0, (this.doc.parts?.length ?? 1) - 1)
+    );
+    const staffIndex = Math.min(
+      this.cursorState.staffIndex ?? 1,
+      Math.max(1, this.doc.parts?.[partIndex]?.staves ?? 1)
+    );
+    const { partIndex: _part, staffIndex: _staff, ...position } = this.cursorState;
+    this.cursorState = {
+      ...position,
+      ...(partIndex ? { partIndex } : {}),
+      ...(staffIndex !== 1 ? { staffIndex } : {})
+    };
     this.grid = buildGrid(
       this.doc,
-      this.cursorState.partIndex ?? 0,
-      this.cursorState.staffIndex ?? 1
+      partIndex,
+      staffIndex
     );
     this.cursorState = clampCursor(this.grid, this.cursorState);
   }
@@ -1352,10 +1372,9 @@ export class EditorSession {
   private selectedNote(): MnxNote | undefined {
     const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
     if (!slot) return undefined;
-    const measure = this.doc.parts[0]?.measures?.[this.cursorState.measureIndex];
-    const sequences = (measure?.sequences ?? []).filter(s => (s.staff ?? 1) === 1);
-    const item = sequences[slot.voiceIndex]?.content[slot.eventIndex];
-    return (item as { notes?: MnxNote[] })?.notes?.[slot.noteIndex];
+    return eventAtCursor(this.doc, this.grid, this.cursorState, this.activeProjection)?.notes?.[
+      slot.noteIndex
+    ];
   }
 
   /** The voice-0 timed event starting exactly at the cursor's onset. */
@@ -1368,17 +1387,7 @@ export class EditorSession {
   }
 
   private eventUnderCursor(): MnxEvent | undefined {
-    const measure = this.doc.parts[0]?.measures?.[this.cursorState.measureIndex];
-    const seq = (measure?.sequences ?? []).filter(s => (s.staff ?? 1) === 1)[0];
-    if (!seq) return undefined;
-    let onset = { num: 0, den: 1 };
-    for (const item of seq.content) {
-      if (onsetsEqual(onset, this.cursorState.onset)) {
-        return isTimedEvent(item) ? item : undefined;
-      }
-      onset = addOnsets(onset, itemSpan(item));
-    }
-    return undefined;
+    return eventAtCursor(this.doc, this.grid, this.cursorState, this.activeProjection);
   }
 }
 

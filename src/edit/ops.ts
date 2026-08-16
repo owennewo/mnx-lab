@@ -160,10 +160,11 @@ export type EditOp =
       measureIndex: number;
     }
   | {
-      /** Remove parts[0] (the entry surface — item 13 owns the rest) —
-       *  refused while the part holds any note. Its declarations (name,
+      /** Remove one addressed part (the first when omitted) — refused while
+       *  the part holds any note. Its declarations (name,
        *  tuning, staffKind) go with their container: no tombstones. */
       type: 'removePart';
+      partIndex?: number;
     }
   // The inherited-attribute pair (campaign item 5,
   // roadmap/complete/core-element-ops-clef-key.md). Clef is a PART-measure
@@ -1133,7 +1134,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const item = seq?.content?.[op.eventIndex] as { type?: string; content?: MnxEvent[] } | undefined;
       if (!seq || !item?.type) return next;
       // Ink first: a container goes only when it holds none.
-      const holdsInk = (item.content ?? []).some(event => (event.notes?.length ?? 0) > 0);
+      const holdsInk = (item.content ?? []).some(event => eventHasInk(event));
       if (holdsInk) return next;
 
       seq.content = seq.content.filter((_, i) => i !== op.eventIndex);
@@ -1621,36 +1622,49 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return dissolveIfHollow(next);
     }
     case 'removePart': {
-      const part = next.parts?.[0];
+      const partIndex = op.partIndex ?? 0;
+      const part = next.parts?.[partIndex];
       if (!part || partHasInk(part)) return next;
-      next.parts.shift();
+      next.parts.splice(partIndex, 1);
       return dissolveIfHollow(next);
     }
   }
 }
 
-/** Any note in any part's copy of this bar? (Rests are absence, not ink.) */
+/** Any pitched or kit ink in any part's copy of this bar? */
 export function measureHasInk(doc: MnxStructure, measureIndex: number): boolean {
   for (const part of doc.parts ?? []) {
     for (const seq of part.measures?.[measureIndex]?.sequences ?? []) {
       for (const item of seq.content ?? []) {
-        if (isTimedEvent(item) && (item.notes?.length ?? 0) > 0) return true;
+        if (itemHasInk(item)) return true;
       }
     }
   }
   return false;
 }
 
-/** Any note anywhere in the part? */
+/** Any pitched or kit ink anywhere in the part? */
 export function partHasInk(part: MnxPart): boolean {
   for (const measure of part.measures ?? []) {
     for (const seq of measure.sequences ?? []) {
       for (const item of seq.content ?? []) {
-        if (isTimedEvent(item) && (item.notes?.length ?? 0) > 0) return true;
+        if (itemHasInk(item)) return true;
       }
     }
   }
   return false;
+}
+
+function eventHasInk(event: MnxEvent): boolean {
+  const kitNotes = (event as { kitNotes?: unknown[] }).kitNotes;
+  return (event.notes?.length ?? 0) > 0 || (kitNotes?.length ?? 0) > 0;
+}
+
+/** Ink inside an authored container is still ink owned by its bar and part. */
+function itemHasInk(item: MnxSequenceItem): boolean {
+  if (isTimedEvent(item)) return eventHasInk(item);
+  const content = (item as { content?: MnxEvent[] }).content ?? [];
+  return content.some(event => eventHasInk(event));
 }
 
 /** The skeleton follows the content in BOTH directions: ensureSkeleton

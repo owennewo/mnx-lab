@@ -9,7 +9,6 @@
 // axis; part is the horizontal closure of part-measure), so the part row
 // maps to `partMeasure`, the voice row to `voiceMeasure`.
 import {
-  isTimedEvent,
   type MnxEvent,
   type MnxPitch,
   type MnxSequence,
@@ -17,7 +16,7 @@ import {
   type MnxTuningEntry
 } from '../model/mnx.ts';
 import type { EditorSession } from '../edit/session.ts';
-import { addOnsets, itemSpan, onsetsEqual, slotAt, type Onset } from '../edit/cursor.ts';
+import { eventAtCursor, slotAt } from '../edit/cursor.ts';
 import {
   anchorVoiceIndex,
   presentLevels,
@@ -53,21 +52,9 @@ function fmtDuration(duration: MnxEvent['duration'] | undefined): string {
   return `${duration.base}${'.'.repeat(duration.dots ?? 0)}`;
 }
 
-/** The staff-1 filter, restated from the layouts (see cursor.ts header). */
-function staffOneSequences(sequences: MnxSequence[] | undefined): MnxSequence[] {
-  return (sequences ?? []).filter(seq => (seq.staff ?? 1) === 1);
-}
-
-/** The timed event starting exactly at `onset` in one voice, walking the
- *  content the same way the grid does. */
-function eventAt(sequence: MnxSequence | undefined, onset: Onset): MnxEvent | null {
-  if (!sequence) return null;
-  let at: Onset = { num: 0, den: 1 };
-  for (const item of sequence.content) {
-    if (onsetsEqual(at, onset)) return isTimedEvent(item) ? item : null;
-    at = addOnsets(at, itemSpan(item));
-  }
-  return null;
+/** The cursor's staff filter, matching buildGrid's per-staff voice numbering. */
+function staffSequences(sequences: MnxSequence[] | undefined, staffIndex: number): MnxSequence[] {
+  return (sequences ?? []).filter(seq => (seq.staff ?? 1) === staffIndex);
 }
 
 /** The bar's effective time signature: the last global `time` at or before it. */
@@ -113,7 +100,7 @@ export function buildHudRows(
   // of the document — the ladder's thesis, made readable.
   const measureCount = Math.max(
     doc.global.measures.length,
-    doc.parts[0]?.measures?.length ?? 0
+    ...doc.parts.map(part => part.measures?.length ?? 0)
   );
   const partCount = doc.parts.length;
   row(
@@ -139,13 +126,20 @@ export function buildHudRows(
   // component substitutes it for this placeholder text.
   row('part', 'part', '');
 
-  const sequences = staffOneSequences(doc.parts[0]?.measures?.[cursor.measureIndex]?.sequences);
+  const partIndex = cursor.partIndex ?? 0;
+  const staffIndex = cursor.staffIndex ?? 1;
+  const sequences = staffSequences(
+    doc.parts[partIndex]?.measures?.[cursor.measureIndex]?.sequences,
+    staffIndex
+  );
   const voice = anchorVoiceIndex(cursor);
   if (present.has('voiceMeasure')) {
     row('voice', 'voice', `${voice + 1} of ${sequences.length}`);
   }
 
-  const event = present.has('event') ? eventAt(sequences[voice], cursor.onset) : null;
+  const event = present.has('event')
+    ? eventAtCursor(doc, session.positions, cursor, session.projection)
+    : undefined;
   if (event) {
     const beat = `beat ${cursor.onset.num}/${cursor.onset.den}`;
     const content = event.rest
@@ -156,8 +150,7 @@ export function buildHudRows(
 
   if (present.has('note')) {
     const slot = slotAt(session.positions, cursor, session.projection);
-    const item = slot ? sequences[slot.voiceIndex]?.content[slot.eventIndex] : undefined;
-    const note = slot && item && isTimedEvent(item) ? item.notes?.[slot.noteIndex] : undefined;
+    const note = slot ? event?.notes?.[slot.noteIndex] : undefined;
     const where =
       session.projection === 'tab'
         ? `string ${cursor.line}`
@@ -171,12 +164,12 @@ export function buildHudRows(
 /**
  * The ensemble table: every part with its declared strings/capo and its
  * override state (supplied by the page — presentation-only session state).
- * The cursor marker is only meaningful on multi-part scores (and the cursor
- * lives on parts[0] until multi-part navigation exists).
+ * The cursor marker is only meaningful on multi-part scores.
  */
 export function buildHudParts(
   doc: MnxStructure,
-  overrideOf: (index: number) => { instrument: string; capo: number | null }
+  overrideOf: (index: number) => { instrument: string; capo: number | null },
+  cursorPartIndex = 0
 ): HudPart[] {
   const parts = doc.parts ?? [];
   return parts.map((part, index) => {
@@ -192,7 +185,7 @@ export function buildHudParts(
       declared,
       instrument: override.instrument,
       capo: override.capo,
-      ...(parts.length > 1 && index === 0 ? { cursor: true } : {})
+      ...(parts.length > 1 && index === cursorPartIndex ? { cursor: true } : {})
     };
   });
 }
