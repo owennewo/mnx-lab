@@ -4,7 +4,8 @@ Serves the **implementation loop**. Proposed 2026-08-16 after the completed
 [selection ladder](../complete/core-selection-ladder.md) made every point,
 range and live closure resolve to ordered model members.
 
-> **Status: in progress — stages 1–4 built 2026-08-16.** Stage 1 landed the
+> **Status: in progress — stages 1–4 built 2026-08-16, stage 5 built
+> 2026-08-20.** Stage 1 landed the
 > versioned DOM-free clip union, strict codec, asynchronous string-only store
 > seam and workbench-lifetime memory owner. Stage 2 added pure
 > `extractSelectionClip()` materialization for all nine clip kinds: it resolves
@@ -37,8 +38,25 @@ range and live closure resolve to ordered model members.
 > survives cross-score navigation. `selection-clipboard-actions.test.ts` pins
 > cross-session transfer, one-entry history, note-line and range landing,
 > part/score closures, empty-store refusal and replay after the store changes.
-> Cut and keyboard bindings remain inactive. **Next: stage 5, exact cut
-> removal and write-before-mutate failure semantics.**
+> Stage 5 added `planSelectionCut()` plus the shared
+> `selectionStructuralEdit.ts` helpers (staff-material replacement, part
+> removal with conservative layout/score repair, timeline-column removal with
+> multimeasure-rest rewriting, dangling-reference pruning) — one module used
+> by both paste and cut, so their repair semantics cannot drift. Cut follows
+> the rung table exactly: chord-member removal, clear-to-rests, equal-span
+> container silence, voice/staff-bar removal with their owned declarations,
+> whole-part closure, measure/section timeline closure; score cut refuses.
+> `cutSelectionToStore` extracts and plans first, awaits the store write, and
+> refuses on write failure or a stale session (document, selection or
+> projection changed during the await) before releasing the materialized
+> `applyCutPlan` into history — one entry, selection-aware undo/redo,
+> clipboard-independent trace replay. Extracting the shared module initially
+> dropped staff-bar beam transfer from paste; the regression is fixed and
+> pinned by beam tests on both the paste and cut sides.
+> `selection-cut.test.ts` pins the rung matrix, structural repair,
+> write-before-mutate, stale-session refusal, replay and the score refusal.
+> Keyboard bindings remain inactive. **Next: stage 6, Ctrl+C/X/V through the
+> keymap, focus gate and cheatsheet entries.**
 
 ## The boundary
 

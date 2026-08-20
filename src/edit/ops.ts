@@ -70,6 +70,17 @@ export type EditOp =
       detachedTargetReferences: number;
     }
   | {
+      /** One authoritative, already-captured Cut removal. Clipboard I/O is
+       *  complete before this deterministic history entry is created. */
+      type: 'cutSelection';
+      document: MnxStructure;
+      clipKind: SelectionClipEnvelope['clip']['kind'];
+      selectionBefore: SelectionState;
+      selectionAfter: SelectionState;
+      removedMembers: number;
+      detachedTargetReferences: number;
+    }
+  | {
       /** Shift the selected notes (or every note) by a signed semitone count. */
       type: 'transposeSelection';
       semitones: number;
@@ -734,7 +745,7 @@ function setPitchFromMidi(note: MnxNote, midi: number, fifths = 0, direction: 1 
 /** Pure: returns a new document with the op applied; never mutates `doc`. */
 export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
   if (op.type === 'batch') return op.ops.reduce(applyOp, doc);
-  if (op.type === 'pasteSelection')
+  if (op.type === 'pasteSelection' || op.type === 'cutSelection')
     return JSON.parse(JSON.stringify(op.document)) as MnxStructure;
   const next = JSON.parse(JSON.stringify(doc)) as MnxStructure;
   switch (op.type) {

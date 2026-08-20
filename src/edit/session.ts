@@ -248,7 +248,8 @@ export class EditorSession {
         if (!this.history.canUndo) return false;
         const op = this.history.appliedOps[this.history.appliedOps.length - 1];
         this.history.undo();
-        if (op?.type === 'pasteSelection') this.restoreSelection(op.selectionBefore);
+        if (op?.type === 'pasteSelection' || op?.type === 'cutSelection')
+          this.restoreSelection(op.selectionBefore);
         else this.reindex(true);
         return true;
       }
@@ -256,7 +257,8 @@ export class EditorSession {
         if (!this.history.canRedo) return false;
         const op = this.history.futureEntries[0]?.op;
         this.history.redo();
-        if (op?.type === 'pasteSelection') this.restoreSelection(op.selectionAfter);
+        if (op?.type === 'pasteSelection' || op?.type === 'cutSelection')
+          this.restoreSelection(op.selectionAfter);
         else this.reindex(true);
         return true;
       }
@@ -273,6 +275,25 @@ export class EditorSession {
           clipKind: intent.plan.clipKind,
           selectionBefore,
           selectionAfter,
+          detachedTargetReferences: intent.plan.detachedTargetReferences
+        }, intent);
+        this.restoreSelection(selectionAfter);
+        return true;
+      }
+      case 'applyCutPlan': {
+        const selectionBefore = this.selection;
+        const selectionAfter = cutLandingSelection(
+          intent.plan.document,
+          selectionBefore,
+          this.activeProjection
+        );
+        this.history.apply({
+          type: 'cutSelection',
+          document: intent.plan.document,
+          clipKind: intent.plan.clipKind,
+          selectionBefore,
+          selectionAfter,
+          removedMembers: intent.plan.removedMembers,
           detachedTargetReferences: intent.plan.detachedTargetReferences
         }, intent);
         this.restoreSelection(selectionAfter);
@@ -1880,6 +1901,49 @@ function pasteLandingSelection(
       cursor: pasteLandingCursor(doc, landing, projection, 'last')
     }
   };
+}
+
+/** Re-resolve Cut's former selection against the removed document, matching
+ * applyDestructive's presence rule: retain a surviving rung, otherwise relax
+ * to the nearest present ancestor at the clamped active edge. */
+function cutLandingSelection(
+  doc: MnxStructure,
+  before: SelectionState,
+  projection: Projection
+): SelectionState {
+  const active = before.extent.kind === 'cursor' ? before.extent.cursor : before.anchor;
+  const partIndex = Math.min(
+    active.partIndex ?? 0,
+    Math.max(0, doc.parts.length - 1)
+  );
+  const staffIndex = Math.min(
+    active.staffIndex ?? 1,
+    Math.max(1, doc.parts[partIndex]?.staves ?? 1)
+  );
+  const grid = buildGrid(doc, partIndex, staffIndex);
+  const { partIndex: _part, staffIndex: _staff, ...activePosition } = active;
+  const cursor = clampCursor(grid, {
+    ...activePosition,
+    ...(partIndex ? { partIndex } : {}),
+    ...(staffIndex !== 1 ? { staffIndex } : {})
+  });
+  const point = before.extent.kind === 'cursor' &&
+    cursorAddressesEqual(before.anchor, before.extent.cursor);
+  const candidate: SelectionState = point
+    ? pointSelection(before.level, cursor)
+    : before.extent.kind === 'cursor'
+      ? {
+          ...cloneSelection(before),
+          extent: { kind: 'cursor', cursor: copyCursorAddress(cursor) }
+        }
+      : cloneSelection(before);
+  const present = presentLevels(doc, grid, cursor, projection);
+  if (
+    present.has(candidate.level) &&
+    resolveSelection(doc, candidate, projection).members.length > 0
+  ) return candidate;
+  const ancestor = relaxLevel(present, candidate.level);
+  return pointSelection(ancestor ?? 'score', cursor);
 }
 
 function pasteLandingCursor(

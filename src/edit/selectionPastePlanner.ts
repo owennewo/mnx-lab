@@ -39,6 +39,10 @@ import {
   type SelectionClipEnvelope
 } from './selectionClip.ts';
 import { midiOfPitch } from './tabStrings.ts';
+import {
+  pruneDanglingSelectionReferences,
+  replaceSelectionStaffMaterial
+} from './selectionStructuralEdit.ts';
 
 export type PasteRefusalCode =
   | 'invalid-clip'
@@ -733,44 +737,6 @@ function mergeRelationships(
   });
 }
 
-function replaceStaffMaterial(target: MnxPartMeasure, source: MnxPartMeasure | null, staffIndex: number): void {
-  const removedEventIds = new Set<string>();
-  target.sequences.filter(sequence => (sequence.staff ?? 1) === staffIndex).forEach(sequence =>
-    visitItems(sequence.content, event => { if (event.id) removedEventIds.add(event.id); })
-  );
-  target.sequences = target.sequences.filter(sequence => (sequence.staff ?? 1) !== staffIndex);
-  if (source) {
-    const sequences = cloneJson(source.sequences).map(sequence => ({
-      ...sequence,
-      ...(staffIndex === 1 ? { staff: sequence.staff } : { staff: staffIndex })
-    }));
-    sequences.forEach(sequence => { if (staffIndex === 1 && sequence.staff === undefined) delete sequence.staff; });
-    target.sequences.push(...sequences);
-  }
-  const replaceScoped = <K extends 'clefs' | 'dynamics' | 'directions' | 'ottavas'>(key: K): void => {
-    const existing = target[key] as ({ staff?: number }[] | undefined);
-    const incoming = source?.[key] as ({ staff?: number }[] | undefined);
-    const kept = (existing ?? []).filter(entry => (entry.staff ?? 1) !== staffIndex);
-    const remapped = cloneJson(incoming ?? []).map(entry => {
-      if (staffIndex === 1) delete entry.staff;
-      else entry.staff = staffIndex;
-      return entry;
-    });
-    const next = [...kept, ...remapped];
-    if (next.length) (target as unknown as Record<string, unknown>)[key] = next;
-    else delete (target as unknown as Record<string, unknown>)[key];
-  };
-  replaceScoped('clefs');
-  replaceScoped('dynamics');
-  replaceScoped('directions');
-  replaceScoped('ottavas');
-  if (removedEventIds.size && target.beams) {
-    target.beams = target.beams.filter(beam => !beam.events.some(id => removedEventIds.has(id)));
-    if (!target.beams.length) delete target.beams;
-  }
-  if (source?.beams?.length) target.beams = [...(target.beams ?? []), ...cloneJson(source.beams)];
-}
-
 function rewriteExistingMeasureReferences(doc: MnxStructure, mapping: Map<string, string>): void {
   if (!mapping.size) return;
   doc.parts.forEach(part => part.measures.forEach(measure => measure.ottavas?.forEach(ottava => {
@@ -784,69 +750,6 @@ function rewriteExistingMeasureReferences(doc: MnxStructure, mapping: Map<string
       rest.start = mapping.get(rest.start) ?? rest.start;
     });
   });
-}
-
-function pruneDanglingReferences(doc: MnxStructure): number {
-  const notes = allNotes(doc);
-  const events = allEvents(doc);
-  const noteIds = new Set(notes.flatMap(note => note.id ? [note.id] : []));
-  const eventIds = new Set(events.flatMap(event => event.id ? [event.id] : []));
-  const measureIds = new Set(doc.global.measures.flatMap(measure => measure.id ? [measure.id] : []));
-  let detached = 0;
-  notes.forEach(note => {
-    if (note.ties) {
-      const kept = note.ties.filter(tie => tie.target === undefined || noteIds.has(tie.target) || (++detached, false));
-      if (kept.length) note.ties = kept;
-      else delete note.ties;
-    }
-    const technique = note._x?.mnxLab?.tab?.technique as
-      | Record<string, { target?: string } | boolean | undefined>
-      | undefined;
-    Object.entries(technique ?? {}).forEach(([key, value]) => {
-      if (value && typeof value === 'object' && value.target && !noteIds.has(value.target)) {
-        delete technique![key];
-        detached++;
-      }
-    });
-    const tab = note._x?.mnxLab?.tab;
-    if (tab?.technique && Object.keys(tab.technique).length === 0) delete tab.technique;
-    if (tab && Object.keys(tab).length === 0) delete note._x!.mnxLab!.tab;
-    if (note._x?.mnxLab && Object.keys(note._x.mnxLab).length === 0) delete note._x.mnxLab;
-    if (note._x && Object.keys(note._x).length === 0) delete note._x;
-  });
-  events.forEach(event => {
-    if (!event.slurs) return;
-    const kept = event.slurs.filter(slur => {
-      const closed = eventIds.has(slur.target) &&
-        (!slur.startNote || noteIds.has(slur.startNote)) &&
-        (!slur.endNote || noteIds.has(slur.endNote));
-      if (!closed) detached++;
-      return closed;
-    });
-    if (kept.length) event.slurs = kept;
-    else delete event.slurs;
-  });
-  const pruneBeams = (beams: MnxBeam[]): MnxBeam[] => beams.filter(beam => {
-    const closed = beam.events.every(id => eventIds.has(id));
-    if (!closed) detached++;
-    if (closed && beam.beams) {
-      beam.beams = pruneBeams(beam.beams);
-      if (!beam.beams.length) delete beam.beams;
-    }
-    return closed;
-  });
-  doc.parts.forEach(part => part.measures.forEach(measure => {
-    if (measure.beams) {
-      measure.beams = pruneBeams(measure.beams);
-      if (!measure.beams.length) delete measure.beams;
-    }
-    if (measure.ottavas) {
-      const kept = measure.ottavas.filter(ottava => measureIds.has(ottava.end.measure) || (++detached, false));
-      if (kept.length) measure.ottavas = kept;
-      else delete measure.ottavas;
-    }
-  }));
-  return detached;
 }
 
 function landing(
@@ -1128,7 +1031,11 @@ export function planSelectionPaste(
       for (let offset = 0; offset < clip.span; offset++) {
         const target = after.parts[partIndex].measures[targetStart + offset];
         if (!target) return refuse('missing-staff', 'The destination part has no corresponding bar.');
-        replaceStaffMaterial(target, clip.bars.find(bar => bar.offset === offset)?.measure ?? null, staffIndex);
+        replaceSelectionStaffMaterial(
+          target,
+          clip.bars.find(bar => bar.offset === offset)?.measure ?? null,
+          staffIndex
+        );
       }
       resultLanding = landing(state, 'partMeasure', targetStart, targetStart + clip.span - 1);
       break;
@@ -1257,7 +1164,7 @@ export function planSelectionPaste(
         measureStart: 0, measureEnd: Math.max(0, clip.score.global.measures.length - 1),
         onsetStart: [0, 1], onsetEnd: [0, 1], closure: 'score'
       };
-      const detached = pruneDanglingReferences(clip.score);
+      const detached = pruneDanglingSelectionReferences(clip.score);
       return {
         ok: true,
         clipKind: clip.kind,
@@ -1270,7 +1177,7 @@ export function planSelectionPaste(
   }
 
   applyDependencies(after, merge);
-  const detachedTargetReferences = pruneDanglingReferences(after);
+  const detachedTargetReferences = pruneDanglingSelectionReferences(after);
   return {
     ok: true,
     clipKind: clip.kind,

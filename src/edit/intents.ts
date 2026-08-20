@@ -15,6 +15,7 @@ import type {
 import type { MnxNoteValueBase, MnxTuningEntry } from '../model/mnx.ts';
 import type { PartialContainerSpec } from './setupGrammar.ts';
 import type { PastePlan } from './selectionPastePlanner.ts';
+import type { CutPlan } from './selectionCutPlanner.ts';
 
 /** Navigation: moves the cursor, never mutates the document. */
 export type NavigationIntent =
@@ -66,6 +67,10 @@ export type MutationIntent =
    *  complete deterministic result is recorded in traces, so replay never
    *  consults an app clipboard or replans against later state. */
   | { type: 'applyPastePlan'; plan: PastePlan }
+  /** The resolved half of Cut after its clipboard write succeeded. Like
+   *  paste, traces carry the materialized result rather than replaying an
+   *  environment-dependent clipboard command. */
+  | { type: 'applyCutPlan'; plan: CutPlan }
   /** A fret digit was typed: re-fret the note on the cursor's string, or
    *  INSERT one there (rest / empty space). Consecutive digits on an
    *  unmoved cursor combine into two-digit frets (1,2 → 12). */

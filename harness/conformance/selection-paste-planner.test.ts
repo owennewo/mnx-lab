@@ -170,6 +170,25 @@ describe('pure selection paste planner', () => {
     expect(result.document.global.measures[0].key).toEqual({ fifths: -3 });
   });
 
+  it('carries staff-bar beams across and replaces the target staff beams without detaching', () => {
+    const beamedBar = (prefix: string, doc: MnxStructure): void => {
+      doc.parts[0].measures[0].sequences[0].content = [
+        { id: `${prefix}-event-1`, duration: { base: 'eighth' }, notes: [note(`${prefix}-note-1`)] },
+        { id: `${prefix}-event-1b`, duration: { base: 'eighth' }, notes: [note(`${prefix}-note-1b`, 'F')] }
+      ];
+      doc.parts[0].measures[0].beams = [{ events: [`${prefix}-event-1`, `${prefix}-event-1b`] }];
+    };
+    const source = score('source');
+    beamedBar('source', source);
+    const target = score('target');
+    beamedBar('target', target);
+    const result = accepted(serialized(source, point('partMeasure')), target, point('partMeasure'));
+    expect(result.document.parts[0].measures[0].beams).toEqual([{
+      events: [result.idMap.events['source-event-1'], result.idMap.events['source-event-1b']]
+    }]);
+    expect(result.detachedTargetReferences).toBe(0);
+  });
+
   it('preserves event bar boundaries and sparse timeline gaps', () => {
     const sparse = (prefix: string): MnxStructure => {
       const doc = score(prefix);

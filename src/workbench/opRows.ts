@@ -103,6 +103,8 @@ function opLabel(op: EditOp): string {
       return `${op.ops.length} edits · ${op.ops[0] ? opLabel(op.ops[0]) : 'empty'}${op.ops.length > 1 ? ` · +${op.ops.length - 1} more` : ''}`;
     case 'pasteSelection':
       return `paste ${op.clipKind}${op.detachedTargetReferences ? ` · ${op.detachedTargetReferences} detached ref${op.detachedTargetReferences === 1 ? '' : 's'}` : ''}`;
+    case 'cutSelection':
+      return `cut ${op.clipKind} · ${op.removedMembers} member${op.removedMembers === 1 ? '' : 's'}`;
     case 'transposeSelection':
       return `transpose ${op.semitones > 0 ? '+' : ''}${op.semitones} (${op.noteIds?.length ?? 'all'} notes)`;
     case 'setFret':

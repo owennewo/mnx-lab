@@ -28,6 +28,7 @@ import type { EditorIntent } from '../edit/intents.ts';
 import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import {
   copySelectionToStore,
+  cutSelectionToStore,
   pasteSelectionFromStore
 } from '../edit/selectionClipboardActions.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
@@ -1911,6 +1912,13 @@ export class ScenarioPage extends LitElement {
           shortcut: '',
           label: 'Paste copied selection here',
           state: 'available' as const
+        },
+        {
+          id: `${CHROME_PREFIX}cut-selection`,
+          glyph: { arc: 'slur' } as const,
+          shortcut: '',
+          label: 'Cut current selection',
+          state: session.selectionLevel === 'score' ? 'unavailable' as const : 'available' as const
         }
       ] : []),
       {
@@ -1944,6 +1952,7 @@ export class ScenarioPage extends LitElement {
       this.trayOpen = false;
       if (chrome === 'copy-selection') void this.copyCurrentSelection();
       else if (chrome === 'paste-selection') void this.pasteCurrentSelection();
+      else if (chrome === 'cut-selection') void this.cutCurrentSelection();
       else if (chrome === 'copy-trace') void this.copyTrace();
       else if (chrome === 'revert') this.revertEdits();
       return;
@@ -2273,6 +2282,15 @@ export class ScenarioPage extends LitElement {
   private async pasteCurrentSelection() {
     if (!this.session || !this.selectionClipboard) return;
     const result = await pasteSelectionFromStore(this.session, this.selectionClipboard);
+    if (!result.ok) return;
+    this.cursorHidden = false;
+    this.copied = false;
+    this.syncFromSession();
+  }
+
+  private async cutCurrentSelection() {
+    if (!this.session || !this.selectionClipboard) return;
+    const result = await cutSelectionToStore(this.session, this.selectionClipboard);
     if (!result.ok) return;
     this.cursorHidden = false;
     this.copied = false;

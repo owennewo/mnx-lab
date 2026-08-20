@@ -517,7 +517,7 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // Listed here is what the tray ADDS to reachability: the accidental's
   // display flag, which no binding and no grammar claims, so before the tray
   // the only way to set it was an AI edit or a hand-written file.
-  selectionTray: ['setAccidentalDisplay', 'applyPastePlan'],
+  selectionTray: ['setAccidentalDisplay', 'applyPastePlan', 'applyCutPlan'],
   commandPalette: [
     'undo',
     'redo',
