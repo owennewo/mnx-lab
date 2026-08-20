@@ -244,8 +244,8 @@ shown), derived from committed provenance in `src/workbench/queue.ts`. Every sce
 has a stable deep link: `#/scenario/<id>?view=notation|tab|both` (unspecified ⇒ the
 document's `tab.staffKind` hint); legacy `?view=compare|json` links are honored and
 open the matching tab of the scenario page's **side panel** (description | ops | hud |
-compare | json — roadmap/inprogress/core-score-hud.md created it;
-roadmap/proposed/workbench-score-panel.md cut it from seven to five and gave every tab
+compare | json — roadmap/complete/core-score-hud.md created it;
+roadmap/complete/workbench-score-panel.md cut it from seven to five and gave every tab
 the same five-band frame: tab strip, context bar, ONE scrolling body, footer), which holds
 all page chrome including the selection HUD and the per-part instrument override
 (the HUD's ensemble table → `<mnx-score-viewer>.partTabSetups`; the flat
@@ -365,7 +365,8 @@ literal, parallel to `tempos`) is the global-measure vendor block. Schema:
 `spec/mnx-lab-extensions.schema.json`; register + rationale:
 [docs/mnx-extensions.md](docs/mnx-extensions.md). Blocks are shaped like the standard
 objects they draft (camelCase, `rhythmic-position`, note-id references) so adoption
-deletes the wrapper — see roadmap/proposed/{instrument-position,derived-positions}.md.
+deletes the wrapper — see roadmap/proposed/spec-instrument-position.md and
+roadmap/inprogress/core-derived-positions.md.
 Extend `_x.mnxLab` and its schema — never standard MNX fields.
 Saved documents upgrade v1→v2→v3→v4→v5 on load via `src/model/upgradeTabExtension.ts`.
 
@@ -428,6 +429,15 @@ output names refuse to overwrite).
   aimed upstream), `lab-` (the repo itself: structure, process, corpus machinery).
   Another prefix is acceptable only when it earns its keep: a concern that is
   genuinely separate *and* important enough to name.
+- **`roadmap/rejected/`** holds proposals judged **not worth building** — distinct
+  from `superseded/` (overtaken by reality or a later decision). A rejected doc keeps
+  its full analysis: the point of the bucket is that whoever raises the idea again
+  finds the case against it instead of redoing it. Claude may **demote a `proposed/`
+  item to `rejected/` on its own judgement** when the item is of near-zero value or
+  effectively "will never do" — the doc's own status must state the reason and date,
+  and the index moves with it. Demotion is a filing correction, reversible by moving
+  the doc back; when in doubt (the item has an owner, an active dependency, or a
+  contested judgement), ask instead of demoting.
 - **Campaigns**: a roadmap doc may be a *campaign* — an index over many normal
   proposals that share one goal, named `<prefix>-campaign-<name>.md` and living in the
   same buckets. The campaign carries three things: the **shared contract** its items

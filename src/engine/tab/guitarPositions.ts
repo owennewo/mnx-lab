@@ -1,7 +1,7 @@
 import { MnxNote, MnxPart, MnxPitch, MnxTuningEntry } from '../../model/mnx.ts';
 
 /**
- * Fingerboard position derivation (roadmap/proposed/core-derived-positions.md).
+ * Fingerboard position derivation (roadmap/inprogress/core-derived-positions.md).
  *
  * The authority ladder:
  *   string + fret  → the DERIVED fret renders; a disagreeing stored fret is
@@ -83,7 +83,7 @@ export function resolveTabSetup(
  * per part: a capo-only override rides the document's declared tuning.
  *
  * Returns null when NO strings are known: there is deliberately no assumed
- * instrument (roadmap/proposed/core-derived-positions.md) — a document without a
+ * instrument (roadmap/inprogress/core-derived-positions.md) — a document without a
  * declaration has no fingerboard, and tab views require one from the document
  * or from the surface.
  */

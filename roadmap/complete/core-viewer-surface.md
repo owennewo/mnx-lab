@@ -4,7 +4,7 @@
 > answered, 1 handed on to [core-render-density-zoom.md](../complete/core-render-density-zoom.md),
 > whose own status records the levers landing since). Stage 5 states the ✔
 > condition is met without building here, so nothing is outstanding. Unblocked by the arrival of
-> its consumer: [core-viewer-embedded-app.md](../proposed/core-viewer-embedded-app.md)
+> its consumer: [core-viewer-embedded-app.md](../complete/core-viewer-embedded-app.md)
 > is the read-only player this doc's first symptom describes, and it committed that
 > exact sin — a host string-searching the document JSON
 > (`JSON.stringify(mnxJson).includes('"strings"')`) to decide `hasTab`, then

@@ -12,7 +12,7 @@ import { css } from 'lit';
  * `stroke: var(--paper-line)` computed to `none`, i.e. **the staff lines were
  * not drawn at all**. The public `--mnx-*` overrides were dead there too,
  * since the vars that read them live in this block. See
- * roadmap/proposed/core-viewer-embedded-app.md.
+ * roadmap/complete/core-viewer-embedded-app.md.
  *
  * THEME: the paper now follows the colour scheme, reversing the older "the
  * score always renders on warm paper, even under dark chrome" rule — a dark
@@ -247,7 +247,7 @@ export const designTokens = css`
        one for free. */
     --row-current: color-mix(in oklab, var(--accent), var(--bg) 90%);
     --row-done: var(--line);
-    /* The keyboard-ownership ring (roadmap/proposed/core-editor-focus-scope.md):
+    /* The keyboard-ownership ring (roadmap/complete/core-editor-focus-scope.md):
        drawn while focus is inside the viewer, so "who gets the next keystroke"
        is legible without pressing a key. Public — a host page restyles it.
        Rides --accent-fg so the dark half gets the lightened accent, or the ring

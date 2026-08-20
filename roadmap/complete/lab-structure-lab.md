@@ -568,7 +568,7 @@ at the step-5 checkpoint; 57/57 verifications stand). Deviations, per the handof
   edit-ops.test.ts`), not the planned "hidden toolbar button" — the clean-room shell
   deliberately has no editing chrome yet, and a pinned contract is stronger proof.
 - **`/api/voice-transcribe` was not rebuilt.** The voice stage was never built
-  client-side ([core-open-router.md](../proposed/core-open-router.md)); the route is retrievable
+  client-side ([core-open-router.md](../superseded/core-open-router.md)); the route is retrievable
   from `legacy` when that feature starts.
 - **The clean shell dropped Web Awesome** — plain Lit only; the reading-room's UI-kit
   dependency stayed on `legacy` with the components that used it.

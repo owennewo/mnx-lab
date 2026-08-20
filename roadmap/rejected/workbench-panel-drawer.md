@@ -1,6 +1,11 @@
 # The score panel as a drawer, below 360px
 
-> **Status: POSSIBLE — drafted 2026-08-15, and NOT RECOMMENDED for build.**
+> **Status: REJECTED (2026-08-20; drafted 2026-08-15 as "possible — not
+> recommended").** First occupant of `rejected/` — the doc's own case against
+> building was already decisive, so the filing now says what the analysis says.
+> The two findings under
+> [what to keep](#what-to-keep-even-if-this-is-never-built) remain current
+> regardless.
 > Row 8 of [core-campaign-modernist.md](../complete/core-campaign-modernist.md).
 >
 > This is a design that is ready to build and probably should not be. It is

@@ -1,4 +1,4 @@
-// Keyboard scope (roadmap/proposed/core-editor-focus-scope.md): the rules
+// Keyboard scope (roadmap/complete/core-editor-focus-scope.md): the rules
 // that decide who owns a keystroke, asserted where they are data rather than
 // DOM behavior.
 //

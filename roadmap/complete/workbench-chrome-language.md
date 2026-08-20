@@ -109,7 +109,7 @@ already decided what a stat strip looks like.
 - **Not the command palette.** The campaign parked its skin deliberately
   ("recorded, not indexed"); this item does not un-park it.
 - **Not the selection tray or the HUD.** Both already speak the language.
-- **Not a responsive pass.** [workbench-panel-drawer.md](workbench-panel-drawer.md)
+- **Not a responsive pass.** [workbench-panel-drawer.md](../rejected/workbench-panel-drawer.md)
   remains declined, and nothing here creates a breakpoint.
 - **Not a token change.** If a value looked wrong, that is item 1's business,
   not this item's.

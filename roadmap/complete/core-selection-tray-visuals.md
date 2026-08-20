@@ -49,7 +49,7 @@
 > Siblings: [core-selection-ladder.md](../complete/core-selection-ladder.md) (the
 > rungs the tabs are), [core-campaign-element-ops.md](core-campaign-element-ops.md)
 > (the verbs the tiles will fire),
-> [core-editor-focus-scope.md](../proposed/core-editor-focus-scope.md) (who owns the keystroke
+> [core-editor-focus-scope.md](../complete/core-editor-focus-scope.md) (who owns the keystroke
 > while the tray is open), [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md)
 > (why it incubates in `workbench/`),
 > [core-viewer-surface.md](core-viewer-surface.md) (the one
@@ -146,7 +146,7 @@ apologizes for the codebase.
 
 ## Keyboard, inside the component
 
-Scope-4 region rules ([core-editor-focus-scope.md](../proposed/core-editor-focus-scope.md)):
+Scope-4 region rules ([core-editor-focus-scope.md](../complete/core-editor-focus-scope.md)):
 while the tray is open it owns the keys it names and nothing else.
 
 - `↑ ↓` — move between scope tabs (preview only).

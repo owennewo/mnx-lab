@@ -18,7 +18,7 @@ export interface MnxPitch {
 // only `technique` (pending a general articulations proposal) and `staffKind`
 // (upstream placement undecided) remain under the `tab` sub-namespace. The
 // string is the authoritative choice; the fret derives from string + pitch, and
-// a stored fret is validation-only. See roadmap/proposed/core-derived-positions.md.
+// a stored fret is validation-only. See roadmap/inprogress/core-derived-positions.md.
 
 /** One control point on a bend curve. */
 export interface MnxBendPoint {
@@ -486,7 +486,7 @@ export interface MnxTuningEntry {
 
 /**
  * Standard guitar tuning, as an explicit declaration. NOT a default: since the
- * instrument-neutrality change (roadmap/proposed/core-derived-positions.md) an
+ * instrument-neutrality change (roadmap/inprogress/core-derived-positions.md) an
  * absent `strings[]` means "no fingerboard declared" and tab views are
  * unavailable — no consumer silently assumes guitar. This constant exists for
  * the places that DECLARE standard tuning explicitly: the upgrade shim

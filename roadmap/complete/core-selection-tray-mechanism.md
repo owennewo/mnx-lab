@@ -223,7 +223,7 @@ voice/staff, layout/score authoring, part transposition, mute — enumerated in
   from every input — a shortcut that works most of the time teaches that it
   cannot be trusted. (Revised 2026-08-15, after the tray shipped on Ctrl+K.)
   All of them remain workbench-tier — shell
-  bindings do not travel ([core-editor-focus-scope.md](../proposed/core-editor-focus-scope.md)).
+  bindings do not travel ([core-editor-focus-scope.md](../complete/core-editor-focus-scope.md)).
 - **The tray is a scope-4 region**: while open it consumes exactly the keys the
   visuals doc lists, via the same `keyScope` discipline as the popovers; direct
   command shortcuts stay live underneath because the tray re-dispatches anything it

@@ -3,7 +3,7 @@
 The third app (workbench · studio · **viewer-embedded**), and the embed
 contract's first real consumer. Read-only by design: it views scores, it does
 not edit them. See
-[roadmap/proposed/core-viewer-embedded-app.md](../../roadmap/proposed/core-viewer-embedded-app.md).
+[roadmap/complete/core-viewer-embedded-app.md](../../roadmap/complete/core-viewer-embedded-app.md).
 
 ## The point
 

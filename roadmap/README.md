@@ -20,6 +20,7 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
 | `inprogress/` | Actively being worked / a living contract. |
 | `complete/` | Built and shipped (kept for provenance; may be aspirational in tense). |
 | `superseded/` | Overtaken by reality or a later decision; kept for history, **not current**. |
+| `rejected/` | Judged **not worth building** — kept so the next person to raise the idea finds the case against it instead of redoing the analysis. A `proposed/` item of near-zero value or "will never do" status may be demoted here (by Claude on its own judgement — see CLAUDE.md → Conventions); the doc's status records the reason and date. |
 
 Every doc is prefixed by what it serves (all buckets renamed 2026-08-11):
 
@@ -78,8 +79,10 @@ proposals that name their campaign.
   rehearsal marks (the spec editor asked for a proposal and nobody wrote one), #63 guitar tab,
   #110 fretboard diagrams — all open, all unclaimed. Derives an acceptance template from the
   dynamics rework (#518, proposed → merged in three weeks). **The designs are now built**
-  (`_x.mnxLab` v3 — see [docs/mnx-extensions.md](../docs/mnx-extensions.md)); what is left here
-  is the outward half: join the CG, sign the CLA, and post the three proposals.
+  (as `_x.mnxLab` v3, since evolved to v5 — see [docs/mnx-extensions.md](../docs/mnx-extensions.md));
+  rehearsal/section labels are now drawn, and §3's placement half is superseded by
+  [spec-score-text.md](proposed/spec-score-text.md) — post from there. What is left here
+  is the outward half: join the CG, sign the CLA, and post the proposals.
 - **[spec-score-text.md](proposed/spec-score-text.md)** — **where text belongs in MNX.** v27 allows free
   text in seven places (lyrics, naming, two dynamics decorations) and a bar can carry no text
   at all, so rehearsal marks, section names and performance directions have nowhere to go.
@@ -113,54 +116,17 @@ proposals that name their campaign.
   onto brass (valve combination selects a fundamental, pitch determines the partial) and
   excludes tin whistle by the same rule that excludes storing the fret. Design only — nothing built, nothing
   posted; complements [core-guitar-technique.md](proposed/core-guitar-technique.md) (what the hands do).
-- **[core-derived-positions.md](proposed/core-derived-positions.md)** — the execution half of
-  [spec-instrument-position.md](proposed/spec-instrument-position.md): migrate `_x.mnxLab` to the
-  proposal's shape (v5: string authoritative, `fret` optional and non-authoritative, `fingering`
-  un-nested, `tuning[]` → `strings[]`) **and specify the derivation ladder** so unannotated
-  guitar notation still renders valid tab — lowest-playable-fret assignment, default standard
-  tuning, capo-aware (the current fallback in `guitarPositions.ts` ignores both; MNX pitch is
-  sounding, so no transposition term — `part.transposition` is display-only). The pitch-only
-  assignment is ruled **presentation, not content** — never written back, not proposed as
-  normative spec text; our renderer's determinism is owned by the
-  `lab/tab-derivation` scenario family, so heuristic changes become reviewed golden
-  demotions instead of silent drift. **Stages 2–4 shipped 2026-08-07** — the v5 reshape
-  (schema, v4→v5 upgrade hop, converters, corpus, edit layer, Worker prompt), the
-  hardened derivation (tuning/capo-aware authority ladder, red mismatch/unplayable badges,
-  no silent clamp), and nine rendered scenarios pinning it (bare melody/chord, string-only,
-  partial annotation, drop-D, capo, transposition-is-display-only, out-of-range, fret
-  mismatch); goldens byte-identical throughout. **Instrument neutrality followed the same
-  day**: the assume-standard-guitar default is retired — tab requires declared `strings[]`
-  or a viewer override (`<mnx-score-viewer>` `stringsOverride`/`capoOverride`, surfaced as
-  the workbench's instrument selector with presets incl. open D/bass/uke/mandolin); the
-  shim materializes the old implicit default into saved documents.
-- **[core-editor-focus-scope.md](proposed/core-editor-focus-scope.md)** — **who owns the next
-  keystroke, and how you can tell.** Raised from an embed question (when do PgUp/PgDn reach
-  the component vs the host page?) whose honest answer was "almost always the component":
-  both listeners are `window`-scoped with no focus check, and a custom element isn't even
-  focusable by default — so "while focused" wasn't expressible. Names the four-scope ladder
-  (browser/OS → document → host element → regions within), notes that **shadow DOM retargets
-  but never scopes key events**, and sets one rule: handle a key iff focus is inside the host
-  — `tabindex`, a host-scoped listener, containment tested across shadow roots, and
-  `preventDefault()` only on keys actually consumed. Plus the visible signal (a
-  `:host(:focus-within)` ring on the public `--mnx-focus-ring` token — an unfocused component
-  drawing a cursor is lying about who gets the keystroke) and the rule that **shell bindings
-  don't travel** (an embed must not eat a host page's Ctrl+K). **Stages 1, 3 and 4 built
-  2026-08-12** (the ring + `--mnx-focus-ring` token, `keyScope.ts`'s shared
-  `editorHasKeyboard` predicate driving both the key gate and the overlay's `selection-inactive`
-  fade, the binding-split assertion) and verified in headless Chrome over CDP — `dimmed` and
-  `keyLanded` are exact inverses at every focus step. Records a reusable finding: headless
-  Chrome delivers no focus events to `window` even for real clicks, so ownership is re-read
-  from `activeElement` on the *causes* of focus change. Stage 2 — moving the listener onto
-  the host element — rides
-  [core-editor-element-promotion.md](proposed/core-editor-element-promotion.md).
-- **[core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md)** — the command palette's **third
-  mode**: `Ctrl+K` text routing to `/api/edit-notation` when it reads as a sentence rather than
-  a command (research §6.2), inheriting the `ui/ → assist/` boundary. Owns the deeper
+- **[core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md)** — the **third input
+  mode**: typed text routing to `/api/edit-notation` when it reads as a sentence rather
+  than a command (research §6.2), inheriting the `ui/ → assist/` boundary. Where it
+  lives is a design question the item owns — the original `Ctrl+K` home predates the
+  tray split (`/` = commands, Ctrl+G = go-to; Chrome reclaimed Ctrl+K). Owns the deeper
   convergence `src/edit/ops.ts` has always named: the assist loop emitting **`EditOp[]`
   through `applyOp`** instead of replacing whole documents, so AI edits land in the session's
   undo history and op log like keyboard edits. Split out of
-  [core-editor-input-layer.md](complete/core-editor-input-layer.md); the voice half stays in
-  [core-open-router.md](proposed/core-open-router.md).
+  [core-editor-input-layer.md](complete/core-editor-input-layer.md); absorbed the
+  **voice stage** (two-stage transcribe-review-submit, Worker-side transcription) from
+  the retired [core-open-router.md](superseded/core-open-router.md) on 2026-08-20.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -176,14 +142,14 @@ proposals that name their campaign.
   **ledger of what cannot be wired yet**, each greyed tile with an address. Its first
   retirement wave predates the tray itself: the 2026-08-14/15 vocabulary sweep landed
   adornments, spanners, technique, bar attributes, clef/key/time, lyrics, beams and part
-  declarations, so those rows are already retired into the mechanism's wired tables. What
-  remains: the vocabulary tail (respell, duration dots, the container wrap verbs, entry
-  beyond the first voice/staff, layout/score authoring, part transposition, mute); the
-  ladder's half (mixed state, extension/closure, the container tab, mouse selection —
-  all waiting on `{level, anchor, extent}` and the per-level pass, where the campaign's
-  own seven remaining `no-op` notes also point); and geometry/surface gaps (wide-selection
-  shaft, dark-page colour scheme, the embed/studio tray). Rows retire as unblockers land
-  (registry `blockedBy` keeps table and tiles from drifting); empty table ⇒ `complete/`.
+  declarations, so those rows are already retired into the mechanism's wired tables; the
+  restyle, dark-page, respell/dots and horizontal-selection rows followed on
+  2026-08-15/16. What remains: the vocabulary tail (wrap verbs, entry beyond the first
+  voice/staff, layout/score authoring, part transposition, mute, kit authoring); the
+  ladder's half, now down to mouse parity (click→cursor) and in-place container property
+  edits; and geometry/surface gaps (wider-scope preview, the promoted `score-navigate`
+  event, the embed/studio tray). Rows retire as unblockers land (registry `blockedBy`
+  keeps table and tiles from drifting); empty table ⇒ `complete/`.
 - **[core-tuplets-grace-notes.md](proposed/core-tuplets-grace-notes.md)** — tuplets and grace notes
   **across both converters and on tab**. Split out of
   [core-guitar-pro.md](complete/core-guitar-pro.md) when that closed, at its real scope: the model
@@ -193,9 +159,6 @@ proposals that name their campaign.
   Step zero is a **fixture** — none of the three reference scores contains a tuplet or a
   grace note, which is why the round trips are honestly lossless and still never present
   the case. Import/export follows the collapse-expand precedent already solved for voltas.
-- **[core-open-router.md](proposed/core-open-router.md)** — two-stage **voice** input + structured edit.
-  The *text* edit path shipped (worker `/api/edit-notation` NDJSON self-correcting loop); the
-  **voice/transcription stage was never built**. What's left here is the voice half.
 - **[studio-storage-sync.md](proposed/studio-storage-sync.md)** — **studio's storage, sync
   and sharing**: a hand-rolled op-log sync engine in the Replicache mold (server-authoritative
   rebase over `EditOp`/`applyOp` — CRDTs rejected with reasons), persisted as a SQLite Durable
@@ -208,6 +171,26 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
+- **[core-derived-positions.md](inprogress/core-derived-positions.md)** — the execution half of
+  [spec-instrument-position.md](proposed/spec-instrument-position.md): migrate `_x.mnxLab` to the
+  proposal's shape (v5: string authoritative, `fret` optional and non-authoritative, `fingering`
+  un-nested, `tuning[]` → `strings[]`) **and specify the derivation ladder** so unannotated
+  guitar notation still renders valid tab — lowest-playable-fret assignment, capo-aware
+  (MNX pitch is sounding, so no transposition term — `part.transposition` is display-only).
+  The pitch-only assignment is ruled **presentation, not content** — never written back, not
+  proposed as normative spec text; our renderer's determinism is owned by the
+  `lab/tab-derivation` scenario family, so heuristic changes become reviewed golden
+  demotions instead of silent drift. **All four stages executed 2026-08-07** — the v5 reshape
+  (schema, v4→v5 upgrade hop, converters, corpus, edit layer, Worker prompt), the
+  hardened derivation (tuning/capo-aware authority ladder, red mismatch/unplayable badges,
+  no silent clamp), and the ten-scenario `lab/22-tab-derivation` family pinning it, goldens
+  byte-identical throughout. **Instrument neutrality followed the same day**: the
+  assume-standard-guitar default is retired — tab requires declared `strings[]`
+  or a viewer override (`<mnx-score-viewer>` `stringsOverride`/`capoOverride`, surfaced as
+  the workbench's instrument selector with presets incl. open D/bass/uke/mandolin); the
+  shim materializes the old implicit default into saved documents. **All that remains is
+  the human `/verify` sweep** — the family sits at `status: rendered`; approval closes
+  this to `complete/`.
 - **[workbench-rung-legibility.md](inprogress/workbench-rung-legibility.md)** — knowing
   which selection rung you are in without moving your eyes. The enclosure's two channels
   (extent, fill ratio) are *relative* — read by comparison with the shape just left — and
@@ -249,6 +232,40 @@ proposals that name their campaign.
   gestures are mirrored here as data, including the container rung and explicit
   rung-first Delete meanings through section.
 ### complete/
+- **[core-viewer-embedded-app.md](complete/core-viewer-embedded-app.md)** — the **third
+  app** (`apps/viewer-embedded/`), a read-only foreign host page consuming
+  `dist/embed/mnx-lab.js` only — the embed contract's first real consumer, and the
+  answer to the promotion fork: **embeds view; studio edits**. Built 2026-08-16: the
+  self-locating asset fix (the artifact derives `smuflBase` from its own script URL,
+  registers Bravura via `FontFace`, `smufl-base` attribute as override — before this,
+  "one script tag" was untrue off-origin), the cross-origin `smoke:embed` harness
+  (structural assertions, never the goldens — a browser embed goes through
+  `fitPxPerSp`), and the viewer's own `viewerTokens` split with `light-dark()` paper
+  (on a host page every token was undefined: staff lines simply did not draw). Settled
+  [core-editor-focus-scope.md](complete/core-editor-focus-scope.md)'s stage 2 as
+  *not wanted* and gave [core-viewer-surface.md](complete/core-viewer-surface.md) its
+  consumer.
+- **[core-editor-focus-scope.md](complete/core-editor-focus-scope.md)** — **who owns the next
+  keystroke, and how you can tell.** Raised from an embed question (when do PgUp/PgDn reach
+  the component vs the host page?) whose honest answer was "almost always the component":
+  both listeners were `window`-scoped with no focus check, and a custom element isn't even
+  focusable by default — so "while focused" wasn't expressible. Names the four-scope ladder
+  (browser/OS → document → host element → regions within), notes that **shadow DOM retargets
+  but never scopes key events**, and sets one rule: handle a key iff focus is inside the host
+  — `tabindex`, containment tested across shadow roots, and `preventDefault()` only on keys
+  actually consumed. Plus the visible signal (a `:host(:focus-within)` ring on the public
+  `--mnx-focus-ring` token — an unfocused component drawing a cursor is lying about who gets
+  the keystroke) and the rule that **shell bindings don't travel** (an embed must not eat a
+  host page's Ctrl+K). **Complete for its scope 2026-08-14**: stages 1, 3 and 4 built
+  (the ring + token, `keyScope.ts`'s shared `editorHasKeyboard` predicate driving both the
+  key gate and the overlay's `selection-inactive` fade, the binding-split assertion),
+  verified in headless Chrome over CDP — `dimmed` and `keyLanded` are exact inverses at
+  every focus step; **stage 2 retired as "not wanted"** when
+  [core-viewer-embedded-app.md](complete/core-viewer-embedded-app.md) settled *embeds view;
+  studio edits* (should studio bring the editor into `elements/`, the host-scoped listener
+  returns on the promotion's work list). Records a reusable finding: headless Chrome
+  delivers no focus events to `window` even for real clicks, so ownership is re-read
+  from `activeElement` on the *causes* of focus change.
 - **[core-paste-lands.md](complete/core-paste-lands.md)** — proposed and built
   2026-08-20, D1–D7 as blessed: **a decodable clip always lands**, undo the license as
   it was for cut. Paste is a footprint write — the selection contributes only an
@@ -444,30 +461,6 @@ proposals that name their campaign.
   (`spanByPointer`, ~10 lines) to unlock the selection-scoped view, and the conformance test
   CLAUDE.md's "keep `jsonView` and `noteKeys` in lockstep" rule has always implied. The only
   below-the-boundary change in the campaign, hence the only properly testable one.
-- **[workbench-panel-drawer.md](proposed/workbench-panel-drawer.md)** — item 8 of the
-  Modernist campaign, and the row that was blocked on a design question the mock never
-  answered. **Closing is now decided: Escape, or a click outside.** Neither needs new
-  machinery — the drawer is an `overlay`, which is already slot 2 of `ESCAPE_PRECEDENCE`
-  ("innermost open thing first"), and overlays consume Escape by owning their own keydown
-  rather than by anyone branching on the list; click-away reuses the command palette's
-  `.backdrop`. Records the ruling that **the dismissing click is swallowed**, which is
-  invisible today (clicking the score does nothing — `note-selected` still has no
-  consumer) and becomes a two-actions-from-one-gesture bug the moment the residue
-  ledger's click→cursor row closes. Opening is recommended rather than deferred again:
-  the tab strip stays as a thin rail, so the narrow layout keeps the wide one's
-  addressing and spends none of the element-ops campaign's free-key budget.
-- **[workbench-panel-drawer.md](proposed/workbench-panel-drawer.md)** — item 8 of the
-  Modernist campaign: the score panel as a drawer on narrow windows. **Drafted and
-  explicitly NOT RECOMMENDED.** The design is complete and the need is not — the squeeze
-  only bites below ~1100px, and there Ctrl+B already reclaims the rail's 270px and the
-  drag handle reaches the panel's 360 floor, so a new mode, breakpoint and control buy
-  little. Kept as a *possible* rather than cut so the next person to say "the panel
-  should collapse on a narrow window" finds the analysis instead of repeating it. Two
-  findings outlive the feature either way: **any future overlay gets Escape for free** at
-  slot 2 of `ESCAPE_PRECEDENCE` (it must own its keydown; no keymap change, no
-  arbitration code), and **a dismissing click should be swallowed** — worth deciding
-  before `note-selected` gets a consumer, because afterwards it presents as an
-  intermittent "the cursor jumped" bug.
 - **[workbench-queue-pips.md](complete/workbench-queue-pips.md)** — campaign item 6, the bill
   "red everywhere" runs up. Four status hues and four queue states do not fit through a
   one-accent system, and `--st-verified` (blue) beside a red accent reads as a leftover while
@@ -914,6 +907,28 @@ proposals that name their campaign.
 - **[workbench-ux-layout.md](superseded/workbench-ux-layout.md)** — pre-pivot AI-first glassmorphic UI; replaced by
   the 2026-06 reading-room redesign (`mnx-library-rail` + `mnx-scenario-header` +
   `mnx-assist-drawer`).
+- **[core-open-router.md](superseded/core-open-router.md)** — pre-rebuild two-stage
+  **voice + structured edit** plan (Express proxy, VexFlow, chat panel). Superseded
+  twice, 2026-08-20: its text-edit half shipped long ago in a different shape (the
+  Worker's `/api/edit-notation` NDJSON self-correcting loop), and its surviving idea —
+  the two-stage transcribe-review-submit voice UX — was merged into
+  [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md) as that item's voice
+  stage. Do not build from this document.
+
+### rejected/
+- **[workbench-panel-drawer.md](rejected/workbench-panel-drawer.md)** — item 8 of the
+  Modernist campaign: the score panel as a drawer on narrow windows. Drafted 2026-08-15
+  complete with the closing design (Escape at the `overlay` tier, click-away via the
+  palette's `.backdrop`), and **rejected 2026-08-20** on its own analysis: the squeeze
+  only bites below ~1100px, where Ctrl+B already reclaims the rail's 270px and the drag
+  handle reaches the panel's 360 floor — a new mode, breakpoint and control buy little,
+  and nobody has ever hit the case. The bucket's first occupant; the full design is kept
+  so the next "the panel should collapse on narrow windows" finds the case against it.
+  Two findings outlive the rejection: **any future overlay gets Escape for free** at
+  slot 2 of `ESCAPE_PRECEDENCE` (it must own its keydown; no keymap change, no
+  arbitration code), and **a dismissing click should be swallowed** — worth deciding
+  before `note-selected` gets a consumer, because afterwards it presents as an
+  intermittent "the cursor jumped" bug.
 
 ## Not here (reference docs, left in place)
 

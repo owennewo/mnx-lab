@@ -1,4 +1,4 @@
-// Keyboard scope tests — roadmap/proposed/core-editor-focus-scope.md.
+// Keyboard scope tests — roadmap/complete/core-editor-focus-scope.md.
 //
 // Four nested scopes decide whether a key is ours: browser/OS (unreachable),
 // document, the host element, and regions inside the component. This module

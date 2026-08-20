@@ -123,7 +123,7 @@ rest is a member rather than an unaddressable hole.
 | voice / staff entry beyond the first | voice / part | *addressing* landed with [item 13b](../complete/core-element-ops-part-addressing.md) (cursor `partIndex`/`staffIndex`, Alt+V cycles slots) — the **entry surface** (creating a second voice or staff-2 ink) is the open half; "the ladder can visit voices it cannot create" | item 13b's entry stages |
 | layout / score authoring (system breaks, layouts) | score | removal landed (presentation layer); construction needs a surface that can express a **tree** — the popover grammar cannot, and the palette was ruled out because it cannot see the document. The tray *can* see the document (it is fed from the session), so it is a candidate surface — recorded, not claimed | its own proposal, per the campaign's "beyond" list |
 | transpose (part row: instrument transposition) | part | not a campaign item | the campaign's "beyond" list — needs its own proposal |
-| mute (part row) | part | no audio surface at all (no player element — [core-viewer-embedded-app.md](core-viewer-embedded-app.md) records why); until then the row renders value-less | audio's own decision |
+| mute (part row) | part | no audio surface at all (no player element — [core-viewer-embedded-app.md](../complete/core-viewer-embedded-app.md) records why); until then the row renders value-less | audio's own decision |
 | percussion kit authoring | note | kit removal + grid slots landed with the tail; construction stays beyond the campaign | the campaign's "beyond" list |
 
 ## Selection-model gaps: the ladder's half

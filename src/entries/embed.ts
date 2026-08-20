@@ -4,7 +4,7 @@
 // moonlighting as the component; that conflation is what this face unwinds).
 //
 // THE ARTIFACT LOCATES ITS OWN ASSETS
-// (roadmap/proposed/core-viewer-embedded-app.md). The component needs two
+// (roadmap/complete/core-viewer-embedded-app.md). The component needs two
 // SMuFL metadata files and the Bravura face. Defaulting those to the HOST
 // page's `/smufl` made "one script tag" untrue: an embed on a foreign origin
 // fetched `example.com/smufl/glyphnames.json` (404) and asked the host to

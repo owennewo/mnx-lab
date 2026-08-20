@@ -1,18 +1,28 @@
 # Getting guitar features into MNX proper
 
-> **Status (2026-07-26): the designs below are BUILT; the outward half is not.**
+> **Status (2026-07-26; refreshed 2026-08-20): the designs below are BUILT;
+> the outward half is not.**
 >
 > §2 (house-style fixes), §3 (labels), §4 (chord symbols) and §5's data path all
-> shipped as **`_x.mnxLab` v3** — see [docs/mnx-extensions.md](../../docs/mnx-extensions.md)
-> for the resulting spec and register. The `_x` namespace was corrected, enum
-> values camelCased, bends became curves, and harmonics + palm mute filled the
-> gap that blocked the technique work. Both round trips stay lossless.
+> shipped as `_x.mnxLab` v3 — the extension has since evolved to **v5** (the
+> [derived-positions](../inprogress/core-derived-positions.md) reshape: string
+> authoritative, flat note-level fields) — see
+> [docs/mnx-extensions.md](../../docs/mnx-extensions.md) for the current spec
+> and register. The `_x` namespace was corrected, enum values camelCased, bends
+> became curves, and harmonics + palm mute filled the gap that blocked the
+> technique work. Both round trips stay lossless.
+>
+> **§3's placement design is superseded**: [spec-score-text.md](spec-score-text.md)
+> keeps its separate `rehearsal`/`section` objects but replaces the
+> no-location global-measure attachment with a positioned-direction model —
+> post from that doc, not from §3. Rehearsal marks and section labels are now
+> **drawn** (`src/engine/layout/scoreText.ts`); chord symbols and technique
+> remain undrawn, tracked in [core-chord-symbols.md](core-chord-symbols.md)
+> and [core-guitar-technique.md](core-guitar-technique.md).
 >
 > **What is left is §6 steps 1, 5 and 6**: join the CG and sign the CLA, then
 > post the proposals. Nothing can be contributed upstream until the CLA is
-> signed. Rendering — chord symbols, labels and technique are all still undrawn —
-> is tracked in [core-chord-symbols.md](core-chord-symbols.md) and
-> [core-guitar-technique.md](core-guitar-technique.md).
+> signed.
 >
 > The rest of this doc is the research and the argument each proposal rests on.
 

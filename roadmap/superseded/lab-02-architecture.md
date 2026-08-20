@@ -76,7 +76,7 @@ for the layout and `meta.json` schema.
   is the test surface (seed: `../complete/core-musicxml.md`, `../../converters/musicxml-mnx/`).
 - **C5 — AI edit:** an `AsyncIterable<EditFrame>` NDJSON stream (`progress` / `done`), server
   forces a `tool_choice` function call, validates against `mnx-core`, self-corrects ≤3 attempts
-  (seed: `../proposed/core-open-router.md`).
+  (seed: `../superseded/core-open-router.md`).
 
 ## Cross-cutting (introduced with the editing phase, not v1)
 - **Storage — `DocumentRepository`** (IndexedDB via `idb-keyval`, key prefix `mnx-doc:`).

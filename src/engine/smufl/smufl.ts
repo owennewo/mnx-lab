@@ -41,7 +41,7 @@ export interface SmuflLoadOptions {
  * Where the metadata is fetched from when a caller names no `basePath`.
  * Defaults to the host page's `/smufl` — correct for the workbench, and a 404
  * for an embed on a foreign origin, which is why the embed build face SETS
- * this from its own script URL (roadmap/proposed/core-viewer-embedded-app.md:
+ * this from its own script URL (roadmap/complete/core-viewer-embedded-app.md:
  * the artifact locates its own assets, so one script tag really is enough).
  */
 let defaultBasePath = '/smufl';

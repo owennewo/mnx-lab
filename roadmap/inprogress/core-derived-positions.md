@@ -15,7 +15,7 @@
 > the planned `22-derived-positions` so the ids ride the existing `lab/tab-*`
 > category naming and rail group) — nine scenarios, goldens generated,
 > awaiting the `/verify` sweep. The execution half of
-> [spec-instrument-position.md](spec-instrument-position.md): that doc designs what the *spec*
+> [spec-instrument-position.md](../proposed/spec-instrument-position.md): that doc designs what the *spec*
 > should adopt and stays deliberately upstream-facing; this one migrates the built
 > `_x.mnxLab` extension to the same shape, and gives the renderer a **specified
 > derivation** so a document with no position annotations at all still renders valid
@@ -68,7 +68,7 @@ fingering" is the deliberate quality bar — see
 | neither | assign string and fret by the default algorithm | **presentation** |
 
 Two adjudications worth stating because they are the conflict rule from
-[spec-instrument-position.md](spec-instrument-position.md) made concrete:
+[spec-instrument-position.md](../proposed/spec-instrument-position.md) made concrete:
 
 - **A stored fret never wins.** When both are present and the derived fret differs,
   the derived fret renders and a red, `scope: 'tab'` diagnostic marks the note — a
@@ -157,7 +157,7 @@ the mirror:
 | `note.…tab.fingering` | `note._x.mnxLab.fingering` | `note.fingering` (flat — the piano argument) |
 | `part.…tab.tuning[]` | `part._x.mnxLab.strings[]` | `part.strings[]` (avoids "tuning" / #365) |
 | `part.…tab.capo` | `part._x.mnxLab.capo` | `part.capo` |
-| `note.…tab.technique.*` | unchanged | graduates via [core-guitar-technique.md](core-guitar-technique.md) |
+| `note.…tab.technique.*` | unchanged | graduates via [core-guitar-technique.md](../proposed/core-guitar-technique.md) |
 | `part.…tab.staffKind` | unchanged | upstream placement undecided (staff-source?) |
 
 Migration mechanics:
@@ -167,7 +167,7 @@ Migration mechanics:
   mechanical, same pattern as the existing hops.
 - **Converters keep writing `fret`.** MusicXML and Guitar Pro both store both, the
   lossless round trips depend on it, and the optional non-authoritative field is
-  exactly the migration [spec-instrument-position.md](spec-instrument-position.md)'s tension
+  exactly the migration [spec-instrument-position.md](../proposed/spec-instrument-position.md)'s tension
   section planned. No converter behavior changes.
 - **Worker**: regenerate `worker/generated/` validators
   (`spec/tools/compile-validator.mjs`); audit
@@ -217,6 +217,6 @@ through a `/verify` sweep like any renderer feature
 - **Mid-piece capo/tuning changes** — the positioned-declaration pattern, named in
   the proposal, still out.
 - **Rendering `fingering`** — still schema-only; unblocked but not included.
-- **The CG posting** — [spec-instrument-position.md](spec-instrument-position.md) owns the
+- **The CG posting** — [spec-instrument-position.md](../proposed/spec-instrument-position.md) owns the
   upstream half; nothing here changes what gets proposed, only how much of it we
   already run.

@@ -7,7 +7,7 @@
 > and, just as deliberately, the reasons not to make it yet.
 >
 > **Trigger re-check, 2026-08-14** (prompted by
-> [core-editor-focus-scope.md](core-editor-focus-scope.md), whose stage 2 is
+> [core-editor-focus-scope.md](../complete/core-editor-focus-scope.md), whose stage 2 is
 > blocked on this doc and cannot proceed without it):
 >
 > - **Trigger 1 — the intent vocabulary: MET, on the trigger's literal terms.**
@@ -27,7 +27,7 @@
 > - **Cost 2 is substantially retired.** The doc recorded "the shadow-DOM
 >   focus story comes due immediately" as a reason to wait; that story is now
 >   designed and half-built ahead of the move
->   ([core-editor-focus-scope.md](core-editor-focus-scope.md): the scope
+>   ([core-editor-focus-scope.md](../complete/core-editor-focus-scope.md): the scope
 >   ladder, `keyScope.ts`, the ring, the ownership predicate, the
 >   binding-split assertion). What remains of it *is* item 3 below. The
 >   promotion is therefore **cheaper than when this doc was written** — the
@@ -110,7 +110,7 @@ trace fixtures, root vitest), before and after.
 ## Getting it moving (2026-08-14)
 
 > **Answered the same day**: option 1 was taken —
-> [core-viewer-embedded-app.md](core-viewer-embedded-app.md) establishes
+> [core-viewer-embedded-app.md](../complete/core-viewer-embedded-app.md) establishes
 > **embeds view; studio edits**. So trigger 2 is *not* met by the new
 > `viewer-embedded` app (a read-only consumer needs no editing) and now belongs
 > squarely to **studio**, when studio is real. The gate did not move; what
