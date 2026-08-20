@@ -39,7 +39,7 @@ import {
 } from '../edit/clipboardFeedback.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
 import { cheatsheet } from '../edit/keymapDocs.ts';
-import { buildHudParts, buildHudRows, LEVEL_BY_ROW } from './hudRows.ts';
+import { buildHudParts, buildHudRows, LEVEL_BY_ROW, ROW_BY_LEVEL } from './hudRows.ts';
 import { keyFifthsAt } from '../edit/staffSpace.ts';
 import { buildJsonView } from '../model/jsonView.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
@@ -475,6 +475,12 @@ export class ScenarioPage extends LitElement {
   @state() private trayAnchor: TrayAnchor | null = null;
   @state() private traySearch = '';
 
+  /** The rung chip (workbench-rung-legibility.md): full strength on a rung
+   *  change, settling to a whisper — the level named at the gaze point. */
+  @state() private chipFresh = false;
+  private chipLevel: SelectionLevel | null = null;
+  private chipTimer: ReturnType<typeof setTimeout> | undefined;
+
   /** Side panel width in px — the drag bar on its left edge adjusts it. */
   @state() private panelWidth = storedPanelWidth();
 
@@ -856,6 +862,40 @@ export class ScenarioPage extends LitElement {
       .clipboard-notice.refused {
         border-color: var(--accent);
         color: var(--accent);
+      }
+
+      /* The rung chip (roadmap/inprogress/workbench-rung-legibility.md): the
+         selection's level named at the selection itself, in the clipboard
+         notice's visual voice. Full strength while fresh (the rung just
+         changed), then a whisper — a settled screen stays quiet. Read-only
+         chrome: it must never take the pointer from the paper. */
+      .rung-chip {
+        position: absolute;
+        padding: 0 7px;
+        border: var(--rule-w) solid var(--ink);
+        background: var(--surface);
+        color: var(--ink);
+        font: 11px/1.7 var(--mono);
+        pointer-events: none;
+        z-index: 2;
+        opacity: 0.4;
+        transition: opacity 260ms ease;
+      }
+
+      .rung-chip.fresh {
+        opacity: 1;
+      }
+
+      /* Keyboard elsewhere: follow the enclosure's own inactive fade — the
+         chip reads "where you were", not "where your next keystroke lands". */
+      .rung-chip.inactive {
+        opacity: 0.15;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .rung-chip {
+          transition: none;
+        }
       }
 
       /* THE FIVE-BAND FRAME (roadmap/proposed/workbench-score-panel.md):
@@ -1467,6 +1507,18 @@ export class ScenarioPage extends LitElement {
       this.partSetups = new Map();
       void this.loadScore();
     }
+    // The rung chip's freshness window: any change to the displayed level —
+    // including selection appearing — restarts it. Read here rather than
+    // where intents dispatch, so tray commands, clicks and undo all count.
+    const chipLevel = this.session && !this.cursorHidden ? this.session.selectionLevel : null;
+    if (chipLevel !== this.chipLevel) {
+      this.chipLevel = chipLevel;
+      clearTimeout(this.chipTimer);
+      this.chipFresh = chipLevel !== null;
+      if (chipLevel !== null) {
+        this.chipTimer = setTimeout(() => (this.chipFresh = false), 1200);
+      }
+    }
   }
 
   connectedCallback() {
@@ -1493,6 +1545,7 @@ export class ScenarioPage extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     this.showClipboardNotice(null);
+    clearTimeout(this.chipTimer);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.removeEventListener('mnx-palette-action', this.onPaletteAction);
@@ -1862,6 +1915,32 @@ export class ScenarioPage extends LitElement {
     this.trayOpen = false;
     // The keyboard goes back to the editor, not into the void.
     this.renderRoot.querySelector<HTMLElement>('mnx-score-viewer')?.focus();
+  }
+
+  /**
+   * The rung chip (workbench-rung-legibility.md): the selection's level named
+   * at the gaze point, planted on the tray anchor's top-left corner (the
+   * anchor already follows every render and scroll) and flipping inside the
+   * anchor when the system sits at the pane's top edge. The word is
+   * ROW_BY_LEVEL's — the HUD's own vocabulary, so the two cannot disagree.
+   * Hidden while the tray is open: the tray already names the rung. With no
+   * anchor (deselected, or nothing rendered) there is nothing to plant on.
+   */
+  private rungChip() {
+    if (!this.chipLevel || !this.trayAnchor || this.trayOpen) return nothing;
+    const gap = 5;
+    const flip = this.trayAnchor.y < 30;
+    const top = flip ? this.trayAnchor.y + gap : this.trayAnchor.y - gap;
+    const cls = `rung-chip${this.chipFresh ? ' fresh' : ''}${this.hasKeyboard ? '' : ' inactive'}`;
+    return html`<div
+      class=${cls}
+      style="left:${Math.max(6, this.trayAnchor.x)}px;top:${Math.max(2, top)}px;${flip
+        ? ''
+        : 'transform:translateY(-100%);'}"
+      role="status"
+    >
+      ${ROW_BY_LEVEL[this.chipLevel]}
+    </div>`;
   }
 
   /**
@@ -2611,6 +2690,7 @@ export class ScenarioPage extends LitElement {
                 ${this.clipboardNotice.message}
               </div>`
             : nothing}
+          ${this.rungChip()}
         </div>
         ${this.panelHidden ? nothing : this.sidePanel(entry)}
       </div>

@@ -208,6 +208,16 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
+- **[workbench-rung-legibility.md](inprogress/workbench-rung-legibility.md)** — knowing
+  which selection rung you are in without moving your eyes. The enclosure's two channels
+  (extent, fill ratio) are *relative* — read by comparison with the shape just left — and
+  they degenerate exactly at the confusable trio (voice/part-bar/bar in single-voice,
+  single-part documents). **Phase 1 built 2026-08-20:** the rung chip the ladder doc
+  promised, planted at the selection anchor in the HUD's own `ROW_BY_LEVEL` vocabulary —
+  full strength on a rung change, settling to a whisper. Phase 2 (open): sharpen the three
+  degenerate geometries — capsule hull vs sharp panel, barline ownership at the measure
+  rung, a guaranteed panel-wide margin. Colour ladders, border styles and whole-page scope
+  dimming considered and rejected (reasons in the doc).
 - **[core-selection-clipboard.md](inprogress/core-selection-clipboard.md)** — typed
   copy, cut and paste over every selection rung, range and closure. **Stage 1 built
   2026-08-16:** the versioned DOM-free clip union and strict JSON codec, the

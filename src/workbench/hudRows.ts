@@ -37,7 +37,9 @@ export const LEVEL_BY_ROW: Record<string, SelectionLevel> = {
   note: 'note'
 };
 
-const ROW_BY_LEVEL = Object.fromEntries(
+/** Exported for the rung chip (workbench-rung-legibility.md): the chip, the
+ *  HUD and the tray share ONE rung vocabulary or none of them can be trusted. */
+export const ROW_BY_LEVEL = Object.fromEntries(
   Object.entries(LEVEL_BY_ROW).map(([row, level]) => [level, row])
 ) as Record<SelectionLevel, string>;
 
