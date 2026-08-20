@@ -129,12 +129,61 @@ rate-limit or outage. The selector's ranked output is exactly that array, and
 the free tier's rate limits (~20 req/min, 50–1000 req/day) make fallback a real
 need rather than a flourish.
 
+The **third consumer is the picker surface** below — the same query, run by a
+person at runtime, in both shells.
+
+## The picker surface — the query as UI
+
+The selection mechanism is wanted **in both the workbench and the future
+studio** (2026-08-20 design conversation), which decides its shape before any
+mockup does:
+
+- **Where it sits.** Wherever the assistant lives (in the workbench, the assist
+  tab of the side panel), the top of that surface shows the **currently
+  selected model** and the affordance to switch it. Switching opens a **query
+  dialog**: criteria on top — an effective-price slider (the workload blend
+  above, as one number a slider can sweep), minimum tokens/sec, minimum
+  intelligence index — then *run*, and the **top-n ranked models** come back
+  with the best one pre-selected. The user may take the recommendation or pick
+  another row, and closing the dialog commits the choice. The criteria widgets
+  are the requirements definition wearing controls: slider = price ceiling +
+  weight, minimums = hard floors, so the dialog needs no vocabulary the module
+  doesn't already have.
+- **Persistence is presentation.** The chosen model and the query parameters
+  live in `localStorage` — per-browser preference, the same tier as the
+  remembered theme, never document data and never a committed verdict. The
+  committed roster stays what it was: the reviewed default a fresh browser
+  starts from.
+- **The two-shell claim triggers the promotion rule.** Anything two shells want
+  is first promoted into `elements/` or below — a deliberate, reviewed move,
+  and the picker lands on the same open boundary question
+  [core-editor-ai-prompt.md](core-editor-ai-prompt.md) already carries for the
+  palette: `elements/` may not import `assist/` today. The scoring core being
+  pure and DOM-free is what keeps every resolution of that question cheap; the
+  dialog is the only Lit in the story. Incubating the dialog in `workbench/`
+  against a neutral contract (the score-HUD precedent) and promoting on
+  studio's actual arrival is the expected path.
+- **Where the runtime catalog comes from** is the one real design tension the
+  picker adds. The workbench has no backend by rule, so the dialog either
+  queries OpenRouter's public catalog endpoint live from the browser (fresh,
+  but the result set moves under you and needs the network) or queries the
+  committed snapshot (reviewable, offline, but staleness is the point of the
+  churn problem). The likely answer is both — snapshot as the floor, live
+  refresh as an explicit action in the dialog — but the item should decide,
+  and the intelligence-index priors are committed data either way.
+- **The Worker must honour the choice.** A picked model id reaches
+  `/api/edit-notation` as a parameter; whether the Worker accepts any syntactic
+  model id or insists on the roster is a real decision this item owns (the
+  Worker is a secrets proxy spending the deployment's OpenRouter key, so
+  "anything" has a cost story, not just a validation story).
+
 ## Not in scope
 
 - **A benchmarking harness.** Quality priors stay declared data until the
   edit-loop evals exist; this item does not build them.
-- **Automatic runtime model switching.** Selection output is reviewed and
-  committed like every other verdict in the repo — the module proposes, a
-  human (or at least a diff) disposes.
+- **Automatic (silent) model switching.** A person running the query and
+  committing a choice — the picker above — is in scope; the system swapping
+  models mid-session on its own verdict is not. The committed roster remains
+  the reviewed default; localStorage holds only a per-browser preference.
 - **Other aggregators.** OpenRouter is already the provider abstraction;
   teaching the module a second catalog shape buys nothing today.

@@ -142,8 +142,15 @@ proposals that name their campaign.
   consumer is dev-time — stored queries regenerate
   [worker/models.json](../worker/models.json) so curation is articulated rather than
   embedded; second is the edit loop's ordered `models: []` fallback array, where free-tier
-  rate limits make fallback real. Motivated by the 2026-08-20 free-model question the
-  repo couldn't answer.
+  rate limits make fallback real; third is the **picker surface** both shells want — the
+  assist surface heads with the current model, and switching opens a query dialog whose
+  criteria widgets (effective-price slider, min tokens/sec, min intelligence index) are
+  the requirements definition wearing controls, returning top-n with the best
+  pre-selected. Choice and query params persist in localStorage (presentation, like the
+  theme — the committed roster stays the reviewed default), and the two-shell claim
+  routes the dialog through the promotion rule onto the `elements → assist` boundary
+  question core-editor-ai-prompt already carries. Motivated by the 2026-08-20 free-model
+  question the repo couldn't answer.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
