@@ -218,6 +218,21 @@
 > first-measure transition without console errors. The overlay remains corpus-
 > neutral, so no renderer golden changes.
 >
+> **Scrub alias 2026-08-20.** Hands-on use found Esc/Enter right in meaning
+> but wrong in feel for *bouncing* between rungs: they are terminal keys on
+> opposite corners of the keyboard, Esc sits fourth in a precedence cascade,
+> and Enter will grow an input cliff at the note rung. **Shift+↑/↓ is now the
+> fluency alias** — the `-`/`=` pattern applied to the ladder: the identical
+> relax/tighten intents, so traces, the mount's deselect-past-score and the
+> armed-anchor drop are shared, not forked. It completes both families:
+> Shift+arrows reshape the selection (laterally along the rung, vertically
+> across rungs — widening to the parent IS vertical extension in a containment
+> model), and every modifier on ↑↓ now does something vertical (bare = line,
+> Ctrl = climb, Alt = transpose, Shift = rung). Esc/Enter keep the endpoints'
+> semantic story — Escape widens until it cancels, Enter narrows until it
+> acts. Polarity (up widens) matches Helix's expand/shrink and is pinned in
+> `keymap-docs.test.ts`.
+>
 > **The selection ladder is complete.** Its orthogonal entry-mode axis —
 > advance mode, stage-1 digit resolution and letter accelerators — graduated
 > on 2026-08-16 to

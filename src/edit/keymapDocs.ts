@@ -151,6 +151,17 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: { all: 'narrow the selection one rung (descends to the nearest note)' }
   },
   {
+    keys: 'Shift+↑/↓',
+    strokes: [
+      { code: 'ArrowUp', shift: true },
+      { code: 'ArrowDown', shift: true }
+    ],
+    group: 'selection',
+    // The Esc/Enter fluency alias — same intents, a one-hand scrub pair for
+    // bouncing between rungs (the `-`/`=` pattern applied to the ladder).
+    meaning: { all: 'widen / narrow the selection one rung (the Esc/Enter scrub pair)' }
+  },
+  {
     keys: 'Shift+←/→',
     strokes: [
       { code: 'ArrowLeft', shift: true },

@@ -65,7 +65,16 @@ export const NAVIGATION_LAYER: KeymapLayer = {
     // their Escape/Enter before the window listener sees them.
     { code: 'Escape', intent: { type: 'relaxSelection' } },
     { code: 'Enter', intent: { type: 'tightenSelection' } },
-    { code: 'NumpadEnter', intent: { type: 'tightenSelection' } }
+    { code: 'NumpadEnter', intent: { type: 'tightenSelection' } },
+    // Shift+↑/↓ is the ladder's fluency alias (the `-`/`=` pattern: same
+    // intents, a scrubbable pair). It completes both families: Shift+arrows
+    // reshape the selection — laterally along the rung, vertically across
+    // rungs (widening to the parent IS vertical extension in a containment
+    // model) — and every modifier on ↑↓ now does something vertical (bare =
+    // line, Ctrl = climb, Alt = transpose, Shift = rung). Polarity is the
+    // ladder's own: up widens toward score, down narrows toward note.
+    { code: 'ArrowUp', shift: true, intent: { type: 'relaxSelection' } },
+    { code: 'ArrowDown', shift: true, intent: { type: 'tightenSelection' } }
   ]
 };
 

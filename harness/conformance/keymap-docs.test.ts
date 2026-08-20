@@ -9,6 +9,7 @@ import {
   KEY_DOCS,
   strokeKey
 } from '../../src/edit/keymapDocs.ts';
+import { NAVIGATION_LAYER, resolveIntent } from '../../src/edit/keymap.ts';
 import { EditorSession } from '../../src/edit/session.ts';
 import { planSelectionCut } from '../../src/edit/selectionCutPlanner.ts';
 import type { MnxNote, MnxPitch, MnxStructure } from '../../src/model/mnx.ts';
@@ -61,6 +62,25 @@ describe('keymap docs — the joins', () => {
     const bound = new Set(allBindingStrokes().map(strokeKey));
     const stale = KEY_DOCS.flatMap(d => d.strokes.map(strokeKey)).filter(k => !bound.has(k));
     expect(stale).toEqual([]);
+  });
+
+  it('Shift+↑/↓ is a true Esc/Enter alias — same intents, ladder polarity', () => {
+    // The scrub pair must fire the IDENTICAL intents (the `-`/`=` alias
+    // pattern), and the polarity is the ladder's: up widens, down narrows.
+    // The joins above can't see a silent flip — this pins it.
+    const layers = [NAVIGATION_LAYER];
+    expect(resolveIntent({ code: 'ArrowUp', shift: true }, layers)).toEqual(
+      resolveIntent({ code: 'Escape' }, layers)
+    );
+    expect(resolveIntent({ code: 'ArrowDown', shift: true }, layers)).toEqual(
+      resolveIntent({ code: 'Enter' }, layers)
+    );
+    expect(resolveIntent({ code: 'ArrowUp', shift: true }, layers)).toEqual({
+      type: 'relaxSelection'
+    });
+    expect(resolveIntent({ code: 'ArrowDown', shift: true }, layers)).toEqual({
+      type: 'tightenSelection'
+    });
   });
 });
 
