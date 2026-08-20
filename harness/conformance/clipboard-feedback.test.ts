@@ -147,10 +147,21 @@ describe('clipboard notices', () => {
       message: 'pasted event-run at bar 1'
     });
 
-    // A wrong-rung destination gets the planner's own sentence, verbatim.
+    // The landing invariant (core-paste-lands.md): a different destination
+    // rung is no refusal — the selection contributes only an anchor.
     const wrongRung = new EditorSession(score()); // note level
-    const refusal = pasteSelectionNotice(await pasteSelectionFromStore(wrongRung, store));
-    expect(refusal.ok).toBe(false);
-    expect(refusal.message).toMatch(/^paste refused — /);
+    expect(pasteSelectionNotice(await pasteSelectionFromStore(wrongRung, store))).toEqual({
+      ok: true,
+      message: 'pasted event-run at bar 1'
+    });
+
+    // Accommodations join the notice: a quarter clip onto the half rest
+    // consumes it whole and reports the rest that filled the remainder.
+    const ontoRest = new EditorSession(score());
+    ontoRest.handleIntent({ type: 'goToMeasure', measureIndex: 1 });
+    expect(pasteSelectionNotice(await pasteSelectionFromStore(ontoRest, store))).toEqual({
+      ok: true,
+      message: 'pasted event-run at bar 2 · 1 rest filled in'
+    });
   });
 });

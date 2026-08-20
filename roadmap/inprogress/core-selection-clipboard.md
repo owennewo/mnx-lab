@@ -83,7 +83,11 @@ range and live closure resolve to ordered model members.
 > land-and-flag via the renderer's diagnostics — with undo as the license,
 > as it already is for cut. Contract 3 stays in this doc as the record of
 > what stages 3–6 built and verified; the refusal matrix it pinned becomes
-> the accommodation-record matrix when that proposal lands.
+> the accommodation-record matrix when that proposal lands. **Both built
+> the same day**: the floor axis and the landing paste are in the code, the
+> paste planner's refusals are the decode tier only, and the notice strip
+> reports accommodations. Stage 7's hands-on review now exercises the
+> landing behavior rather than the retired refusal matrix.
 
 ## The boundary
 

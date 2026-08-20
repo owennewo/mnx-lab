@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { extractSelectionClip } from '../../src/edit/selectionClipExtraction.ts';
 import { planSelectionPaste } from '../../src/edit/selectionPastePlanner.ts';
+import { restItemsForDuration } from '../../src/edit/selectionStructuralEdit.ts';
 import type { EditorCursor } from '../../src/edit/cursor.ts';
 import type { SelectionLevel, SelectionState } from '../../src/edit/selection.ts';
 import type { MnxNote, MnxStructure } from '../../src/model/mnx.ts';
@@ -209,11 +210,16 @@ describe('pure selection paste planner', () => {
     expect(result.document.parts[0].measures[1].sequences).toEqual([]);
     expect(result.document.parts[0].measures[2].sequences[0].content).toHaveLength(1);
 
+    // A gap bar makes no statement about its destination bar: the shifted
+    // document keeps its own material there, and where the clip's outer bar
+    // finds no sequence, D4 creates one — counted, never refused.
     const shifted = sparse('shifted');
     shifted.parts[0].measures[1] = shifted.parts[0].measures[2];
     shifted.parts[0].measures[2] = { sequences: [] };
-    expect(planSelectionPaste(clip, shifted, point('event'), 'tab'))
-      .toMatchObject({ ok: false, code: 'metric-span-mismatch' });
+    const landed = accepted(clip, shifted, point('event'));
+    expect(landed.accommodations.createdSequences).toBe(1);
+    expect(landed.document.parts[0].measures[1].sequences[0].content).toHaveLength(1);
+    expect(landed.document.parts[0].measures[2].sequences[0].content).toHaveLength(1);
   });
 
   it('merges dependencies with destination metadata taking precedence', () => {
@@ -231,22 +237,36 @@ describe('pure selection paste planner', () => {
     });
   });
 
-  it('inserts measure and section packages at points and replaces equal ranges', () => {
+  it('overwrites measure and section columns from the anchor, extending the timeline (D1)', () => {
     const source = score('source');
-    const measureInsert = accepted(
+    // One column onto bar 2 of two: an overwrite, not an insert — the
+    // timeline stays two bars and bar 2 becomes the copied column.
+    const overwrite = accepted(
       serialized(source, point('measure')),
       score('target'),
       point('measure', cursor(1))
     );
-    expect(measureInsert.document.global.measures).toHaveLength(3);
-    expect(measureInsert.landing).toMatchObject({ level: 'measure', measureStart: 1, measureEnd: 1 });
+    expect(overwrite.document.global.measures).toHaveLength(2);
+    expect(overwrite.landing).toMatchObject({ level: 'measure', measureStart: 1, measureEnd: 1 });
+    expect(overwrite.accommodations.appendedBars).toBe(0);
 
-    const sectionInsert = accepted(
+    // Two columns anchored at the last bar: one fits, one appends (rule 4).
+    const overrun = accepted(
+      serialized(source, closure('measure')),
+      score('target'),
+      point('measure', cursor(1))
+    );
+    expect(overrun.document.global.measures).toHaveLength(3);
+    expect(overrun.accommodations.appendedBars).toBe(1);
+
+    // A section package lands the same way, labels riding their columns.
+    const section = accepted(
       serialized(source, point('section')),
       score('target', { sections: true }),
       point('section', cursor(1))
     );
-    expect(sectionInsert.document.global.measures).toHaveLength(4);
+    expect(section.document.global.measures).toHaveLength(3);
+    expect(section.document.global.measures[1].section).toEqual({ label: 'A' });
 
     const range: SelectionState = {
       level: 'measure',
@@ -270,7 +290,7 @@ describe('pure selection paste planner', () => {
     expect(empty.document.global.measures[0].key).toEqual({ fifths: 2 });
   });
 
-  it('replaces only an empty document with a complete score and rewrites structural ids', () => {
+  it('a score clip replaces any document, rewriting structural ids (D5)', () => {
     const source = score('source');
     source.layouts = [{
       id: 'source-layout',
@@ -289,45 +309,154 @@ describe('pure selection paste planner', () => {
     expect(result.document.scores?.[0].pages?.[0].systems?.[0].measure)
       .toBe(result.document.global.measures[0].id);
 
-    const refusal = planSelectionPaste(
-      serialized(source, point('score')), score('target'), point('score'), 'tab'
-    );
-    expect(refusal).toMatchObject({ ok: false, code: 'document-not-empty' });
+    // A populated destination is no gate: the footprint of a score is
+    // everything, undo restores everything.
+    const replaced = accepted(serialized(source, point('score')), score('target'), point('score'));
+    expect(replaced.accommodations.replacedDocument).toBe(true);
+    expect(replaced.document.parts).toHaveLength(1);
+    expect(replaced.document.parts[0].id).not.toBe('target-part');
   });
 
-  it('refuses mismatched levels, counts, spans, topology and instruments precisely', () => {
+  it('lands mismatched levels, counts, spans, topology and instruments with counted accommodations', () => {
     const source = score('source');
-    expect(planSelectionPaste(
-      serialized(source, point('note')), score('target'), point('event'), 'tab'
-    )).toMatchObject({ ok: false, code: 'wrong-destination-level' });
+    // A note clip pasted from an event selection lands on the anchor
+    // event's first notehead — the destination rung gates nothing (rule 1).
+    const noteOntoEvent = accepted(
+      serialized(source, point('note')), score('target'), point('event')
+    );
+    const firstItem = noteOntoEvent.document.parts[0].measures[0].sequences[0].content[0];
+    if (!('duration' in firstItem)) throw new Error('wrong item');
+    expect(firstItem.notes?.[0].id).toBe(noteOntoEvent.idMap.notes['source-note-1']);
 
+    // Two copied noteheads onto a one-notehead remainder: the second has
+    // nowhere to land and is counted, not silently dropped.
     const twoNotes = serialized(source, closure('note'));
-    expect(planSelectionPaste(twoNotes, score('target'), point('note'), 'tab'))
-      .toMatchObject({ ok: false, code: 'member-count-mismatch' });
+    const shortTarget = score('target');
+    shortTarget.parts[0].measures[1].sequences = [];
+    const dropped = accepted(twoNotes, shortTarget, point('note'));
+    expect(dropped.accommodations.droppedMembers).toBe(1);
 
+    // A quarter clip onto a half note: the half is consumed whole (rule 3)
+    // and the uncovered remainder fills with one quarter rest.
     const longTarget = score('target');
     const item = longTarget.parts[0].measures[0].sequences[0].content[0];
     if ('duration' in item) item.duration = { base: 'half' };
-    expect(planSelectionPaste(
-      serialized(source, point('event')), longTarget, point('event'), 'tab'
-    )).toMatchObject({ ok: false, code: 'metric-span-mismatch' });
+    const filled = accepted(serialized(source, point('event')), longTarget, point('event'));
+    expect(filled.accommodations.restFills).toBe(1);
+    const content = filled.document.parts[0].measures[0].sequences[0].content;
+    expect(content).toHaveLength(2);
+    expect(content[1]).toMatchObject({ duration: { base: 'quarter' }, rest: {} });
 
+    // A destination part the clip does not cover gets empty columns.
     const topology = score('target');
     topology.parts.push({ measures: topology.global.measures.map(() => ({ sequences: [] })) });
-    expect(planSelectionPaste(
-      serialized(source, point('measure')), topology, point('measure'), 'tab'
-    )).toMatchObject({ ok: false, code: 'part-topology-mismatch' });
+    const uncovered = accepted(serialized(source, point('measure')), topology, point('measure'));
+    expect(uncovered.document.parts[1].measures[0]).toEqual({ sequences: [] });
 
-    expect(planSelectionPaste(
+    // No declared instrument: the annotated note lands and is counted for
+    // the fingerboard diagnostics, never refused.
+    const flagged = accepted(
       serialized(source, point('note')),
       score('target', { strings: false }),
-      point('note'),
-      'tab'
-    )).toMatchObject({ ok: false, code: 'instrument-incompatible' });
+      point('note')
+    );
+    expect(flagged.accommodations.flaggedNotes).toBe(1);
   });
 
   it('rejects malformed serialized clips before considering the destination', () => {
     expect(planSelectionPaste('{', score('target'), point('note'), 'tab'))
       .toMatchObject({ ok: false, code: 'invalid-clip' });
+  });
+
+  it('extends the timeline when an event run overruns it (rule 4)', () => {
+    const clip = serialized(score('source'), closure('event')); // span 2
+    const oneBar = score('target');
+    oneBar.global.measures.pop();
+    oneBar.parts[0].measures.pop();
+    const result = accepted(clip, oneBar, point('event'));
+    expect(result.accommodations.appendedBars).toBe(1);
+    expect(result.accommodations.createdSequences).toBe(1); // the appended bar's voice
+    expect(result.document.global.measures).toHaveLength(2);
+    expect(result.document.parts[0].measures[1].sequences[0].content).toHaveLength(1);
+  });
+
+  it('creates the parts a measures clip carries that the destination lacks (D3)', () => {
+    const source = score('source');
+    source.parts.push({
+      id: 'source-b',
+      name: 'Second',
+      measures: source.global.measures.map(() => ({
+        sequences: [{ content: [{ duration: { base: 'quarter' }, rest: {} }] }]
+      }))
+    });
+    const result = accepted(
+      serialized(source, closure('measure')),
+      score('target'),
+      point('measure')
+    );
+    expect(result.accommodations.createdParts).toBe(1);
+    expect(result.document.parts).toHaveLength(2);
+    expect(result.document.parts[1].name).toBe('Second');
+    expect(result.document.parts[1].measures[0].sequences[0].content).toHaveLength(1);
+  });
+
+  it('a single note inks a rest with the rest’s own duration (D6)', () => {
+    const target = score('target');
+    target.parts[0].measures[0].sequences[0].content = [
+      { id: 'target-rest', duration: { base: 'half' }, rest: {} }
+    ];
+    const result = accepted(serialized(score('source'), point('note')), target, point('note'));
+    const inked = result.document.parts[0].measures[0].sequences[0].content[0];
+    if (!('duration' in inked)) throw new Error('wrong item');
+    expect(inked.rest).toBeUndefined();
+    expect(inked.duration).toEqual({ base: 'half' }); // the destination donates the rhythm
+    expect(inked.notes?.[0].id).toBe(result.idMap.notes['source-note-1']);
+  });
+
+  it('creates the anchor voice for a voice-bars clip when it does not exist (D4)', () => {
+    const target = score('target');
+    target.parts[0].measures[0].sequences = [];
+    const result = accepted(
+      serialized(score('source'), point('voiceMeasure')),
+      target,
+      point('voiceMeasure')
+    );
+    expect(result.accommodations.createdSequences).toBe(1);
+    expect(result.document.parts[0].measures[0].sequences[0].content).toHaveLength(1);
+  });
+
+  it('spells rest fills greedy-binary, falling back to exact authored space', () => {
+    expect(restItemsForDuration(3, 8)).toEqual([
+      { duration: { base: 'quarter' }, rest: {} },
+      { duration: { base: 'eighth' }, rest: {} }
+    ]);
+    expect(restItemsForDuration(1, 2)).toEqual([{ duration: { base: 'half' }, rest: {} }]);
+    expect(restItemsForDuration(0, 4)).toEqual([]);
+    // A non-binary remainder (a consumed unit with a non-binary outer span)
+    // stays exact as authored space rather than approximating.
+    expect(restItemsForDuration(1, 3)).toEqual([{ type: 'space', duration: [1, 3] }]);
+  });
+
+  it('a zero-footprint grace clip inserts at the anchor without consuming', () => {
+    const source = containerScore('source');
+    source.parts[0].measures[0].sequences[0].content = [{
+      type: 'grace',
+      id: 'source-grace',
+      content: [{
+        id: 'source-grace-event',
+        duration: { base: 'eighth' },
+        notes: [note('source-grace-note')]
+      }]
+    }];
+    const result = accepted(
+      serialized(source, point('container')),
+      containerScore('target'),
+      point('container')
+    );
+    expect(result.accommodations.restFills).toBe(0);
+    const content = result.document.parts[0].measures[0].sequences[0].content;
+    expect(content).toHaveLength(2);
+    expect(content[0]).toMatchObject({ type: 'grace' });
+    expect(content[1]).toMatchObject({ type: 'tuplet' });
   });
 });

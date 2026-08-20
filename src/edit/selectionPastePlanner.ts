@@ -1,9 +1,21 @@
-// Pure, conservative clipboard paste planning.
+// Pure clipboard paste planning under the landing invariant
+// (roadmap: core-paste-lands.md): **a decodable clip always lands.**
 //
-// The planner owns all compatibility decisions and builds a complete detached
-// next document. It never mutates the supplied score, reads a clipboard, or
-// writes editor history; selectionClipboardActions/session commit an accepted
-// plan atomically at the environment/history boundary.
+// Paste is a write with a well-defined footprint, not a negotiation: the
+// clip defines what and how much, the anchor defines where, and the document
+// yields — overwriting exactly the footprint (rule 2), consuming partially
+// covered units whole with rests filling the remainder (rule 3), and
+// extending the timeline or the part list rather than clipping (rule 4).
+// The destination selection contributes only an anchor (rule 1); its rung
+// gates nothing and its extent is ignored. Questionable results land and
+// are FLAGGED by the forgiving renderer's diagnostics — never refused.
+// Every yielding move is counted in the plan's accommodation record, which
+// is the notice the author reads before deciding whether to undo.
+//
+// The planner builds a complete detached next document. It never mutates
+// the supplied score, reads a clipboard, or writes editor history;
+// selectionClipboardActions/session commit an accepted plan atomically at
+// the environment/history boundary.
 import type {
   MnxBeam,
   MnxEvent,
@@ -13,6 +25,7 @@ import type {
   MnxOttava,
   MnxPart,
   MnxPartMeasure,
+  MnxSequence,
   MnxSequenceItem,
   MnxStructure
 } from '../model/mnx.ts';
@@ -34,37 +47,58 @@ import {
   SelectionClipDecodeError,
   decodeSelectionClip,
   type ClipBarRelationships,
-  type EventRunClipEntry,
   type SelectionClipDependencies,
   type SelectionClipEnvelope
 } from './selectionClip.ts';
 import { midiOfPitch } from './tabStrings.ts';
 import {
   pruneDanglingSelectionReferences,
-  replaceSelectionStaffMaterial
+  replaceSelectionStaffMaterial,
+  restItemsForDuration
 } from './selectionStructuralEdit.ts';
 
+/** The surviving refusals are the decode tier only — cases with nothing to
+ *  land. Every destination-shape mismatch is an accommodation now. */
 export type PasteRefusalCode =
   | 'invalid-clip'
   | 'unsupported-version'
-  | 'wrong-destination-level'
-  | 'empty-destination'
-  | 'member-count-mismatch'
-  | 'metric-span-mismatch'
-  | 'bar-span-mismatch'
-  | 'partial-container'
-  | 'missing-voice'
-  | 'missing-staff'
-  | 'part-topology-mismatch'
-  | 'measure-count-mismatch'
-  | 'document-not-empty'
-  | 'instrument-incompatible'
   | 'invalid-payload';
 
 export interface PasteRefusal {
   ok: false;
   code: PasteRefusalCode;
   message: string;
+}
+
+/** What the document yielded to let the clip land — the counted record of
+ *  rules 3 and 4, plus the land-and-flag counts. Reported, never silent. */
+export interface PasteAccommodations {
+  /** Bars appended to the global timeline (empty copies in every part). */
+  appendedBars: number;
+  /** Parts created from a measures/section clip's part descriptors. */
+  createdParts: number;
+  /** Sequences created where the anchor voice did not exist (D4). */
+  createdSequences: number;
+  /** Rest/space items inserted where a consumed unit outlived the footprint. */
+  restFills: number;
+  /** Annotated notes landed for the tab diagnostics layer to flag. */
+  flaggedNotes: number;
+  /** Surplus note-set members with no notehead left to land on. */
+  droppedMembers: number;
+  /** A score clip replaced the whole document (D5). */
+  replacedDocument: boolean;
+}
+
+function emptyAccommodations(): PasteAccommodations {
+  return {
+    appendedBars: 0,
+    createdParts: 0,
+    createdSequences: 0,
+    restFills: 0,
+    flaggedNotes: 0,
+    droppedMembers: 0,
+    replacedDocument: false
+  };
 }
 
 export interface PasteIdMap {
@@ -102,6 +136,7 @@ export interface PastePlan {
   landing: PasteLanding;
   dependencyMerge?: SelectionClipDependencies;
   detachedTargetReferences: number;
+  accommodations: PasteAccommodations;
 }
 
 export type PastePlanResult = PastePlan | PasteRefusal;
@@ -112,10 +147,6 @@ function cloneJson<T>(value: T): T {
 
 function refuse(code: PasteRefusalCode, message: string): PasteRefusal {
   return { ok: false, code, message };
-}
-
-function isRefusal<T>(value: T | PasteRefusal): value is PasteRefusal {
-  return typeof value === 'object' && value !== null && 'ok' in value && value.ok === false;
 }
 
 function sameSelectionCursor(state: SelectionState): boolean {
@@ -181,27 +212,6 @@ function sequenceIndexAt(
   return (doc.parts?.[partIndex]?.measures?.[measureIndex]?.sequences ?? [])
     .map((sequence, index) => ({ sequence, index }))
     .filter(entry => (entry.sequence.staff ?? 1) === staffIndex)[voiceIndex]?.index;
-}
-
-function eventForMember(
-  doc: MnxStructure,
-  member: Extract<SelectionMember, { kind: 'note' | 'event' }>
-): { event: MnxEvent; sequenceIndex: number } | null {
-  const sequenceIndex = sequenceIndexAt(
-    doc,
-    member.partIndex,
-    member.staffIndex,
-    member.measureIndex,
-    member.voiceIndex
-  );
-  if (sequenceIndex === undefined) return null;
-  const item = doc.parts[member.partIndex].measures[member.measureIndex]
-    .sequences[sequenceIndex].content[member.eventIndex];
-  if (!item) return null;
-  const event = member.containerIndex === undefined
-    ? (isTimedEvent(item) ? item : null)
-    : ((item as { content?: MnxEvent[] }).content?.[member.containerIndex] ?? null);
-  return event ? { event, sequenceIndex } : null;
 }
 
 function validateEnvelopePayload(envelope: SelectionClipEnvelope): PasteRefusal | null {
@@ -451,33 +461,23 @@ function applyDependencies(doc: MnxStructure, merged: SelectionClipDependencies 
   if (merged.lyrics) doc.global.lyrics = cloneJson(merged.lyrics);
 }
 
-function annotatedNotesCompatible(notes: MnxNote[], part: MnxPart | undefined): PasteRefusal | null {
+/** Land-and-flag (core-paste-lands.md): annotated notes that cannot sound on
+ *  the destination instrument land anyway — the renderer's red `scope:'tab'`
+ *  badges already say so per note. This only COUNTS them for the record. */
+function countUnplayableAnnotations(notes: MnxNote[], part: MnxPart | undefined): number {
   const annotated = notes.filter(note => note._x?.mnxLab?.string !== undefined);
-  if (annotated.length === 0) return null;
+  if (annotated.length === 0) return 0;
   const strings = part?._x?.mnxLab?.strings;
-  if (!strings?.length) {
-    return refuse('instrument-incompatible', 'The copied string annotations need a declared destination instrument.');
-  }
+  if (!strings?.length) return annotated.length;
   const capo = part?._x?.mnxLab?.capo ?? 0;
-  for (const note of annotated) {
+  return annotated.filter(note => {
     const number = note._x!.mnxLab!.string!;
     const string = strings.find(entry => entry.string === number);
-    if (!string) return refuse('instrument-incompatible', `Destination string ${number} is not declared.`);
+    if (!string) return true;
     const fret = midiOfPitch(note.pitch) - (midiOfPitch(string.pitch) + capo);
-    if (fret < 0 || fret > 24 || (note._x!.mnxLab!.fret !== undefined && note._x!.mnxLab!.fret !== fret)) {
-      return refuse('instrument-incompatible', `The copied note is not playable on destination string ${number}.`);
-    }
-  }
-  return null;
-}
-
-function partTopologyMatches(
-  descriptors: { staves?: number }[],
-  target: MnxStructure
-): boolean {
-  return descriptors.length === target.parts.length && descriptors.every(
-    (descriptor, index) => (descriptor.staves ?? 1) === (target.parts[index]?.staves ?? 1)
-  );
+    return fret < 0 || fret > 24 ||
+      (note._x!.mnxLab!.fret !== undefined && note._x!.mnxLab!.fret !== fret);
+  }).length;
 }
 
 function emptyPartMeasure(measure: MnxPartMeasure): boolean {
@@ -526,201 +526,170 @@ function activeVoiceUnits(doc: MnxStructure, state: SelectionState): EventUnit[]
   return units;
 }
 
-function eventUnitKey(unit: Pick<EventUnit, 'measureIndex' | 'sequenceIndex' | 'itemIndex'>): string {
-  return `${unit.measureIndex}:${unit.sequenceIndex}:${unit.itemIndex}`;
+function emptyPartBar(): MnxPartMeasure {
+  return { sequences: [] };
 }
 
-function selectedEventUnits(
-  doc: MnxStructure,
-  state: SelectionState,
-  projection: Projection,
-  sourceBars: EventRunClipEntry[],
-  sourceTimelineSpan: number
-): EventUnit[] | PasteRefusal {
-  const resolved = resolveSelection(doc, state, projection);
-  const members = resolved.members.filter(
-    (member): member is Extract<SelectionMember, { kind: 'event' }> => member.kind === 'event'
-  );
-  if (members.length === 0) return refuse('empty-destination', 'There is no destination event.');
-  const universe = activeVoiceUnits(doc, state);
-  const unitByKey = new Map(universe.map(unit => [eventUnitKey(unit), unit]));
+/** Rule 4: the timeline extends rather than clipping the clip. Appends empty
+ *  global bars through `lastIndex` and pads every part to timeline length. */
+function ensureBars(after: MnxStructure, lastIndex: number, acc: PasteAccommodations): void {
+  while (after.global.measures.length <= lastIndex) {
+    after.global.measures.push({});
+    acc.appendedBars++;
+  }
+  after.parts.forEach(part => {
+    while (part.measures.length < after.global.measures.length) part.measures.push(emptyPartBar());
+  });
+}
 
-  const memberUnit = (member: typeof members[number]): EventUnit | null => {
-    const sequenceIndex = sequenceIndexAt(
-      doc, member.partIndex, member.staffIndex, member.measureIndex, member.voiceIndex
-    );
-    return sequenceIndex === undefined
-      ? null
-      : (unitByKey.get(`${member.measureIndex}:${sequenceIndex}:${member.eventIndex}`) ?? null);
+/** D4 — the narrow sequence-creation policy paste cannot defer: where the
+ *  anchor voice has no sequence, create one holding exactly the pasted
+ *  content. No intermediate empty voices are fabricated; the created
+ *  sequence is simply the staff's next voice, and its index is returned. */
+function ensureSequenceIndex(
+  after: MnxStructure,
+  partIndex: number,
+  staffIndex: number,
+  measureIndex: number,
+  voiceIndex: number,
+  acc: PasteAccommodations
+): number {
+  const existing = sequenceIndexAt(after, partIndex, staffIndex, measureIndex, voiceIndex);
+  if (existing !== undefined) return existing;
+  const measure = after.parts[partIndex].measures[measureIndex];
+  const sequence: MnxSequence = {
+    content: [],
+    ...(staffIndex === 1 ? {} : { staff: staffIndex })
   };
-
-  if (sameSelectionCursor(state)) {
-    const member = members[0];
-    if (member.containerIndex !== undefined) {
-      return refuse('partial-container', 'An event paste cannot anchor inside a rhythm container.');
-    }
-    const first = memberUnit(member);
-    if (!first) return refuse('empty-destination', 'The destination event no longer exists.');
-    const selected: EventUnit[] = [];
-    const firstSource = sourceBars[0];
-    const delta = addOnsets(first.onset, { num: -firstSource.onset[0], den: firstSource.onset[1] });
-    if (state.anchor.measureIndex + sourceTimelineSpan > doc.global.measures.length) {
-      return refuse('bar-span-mismatch', 'The event run extends beyond the destination timeline.');
-    }
-    for (const sourceBar of sourceBars) {
-      const measureIndex = first.measureIndex + sourceBar.offset;
-      const expectedOnset = addOnsets(
-        { num: sourceBar.onset[0], den: sourceBar.onset[1] },
-        delta
-      );
-      const sourceSpan = addSpan(sourceBar.items);
-      const start = universe.findIndex(unit =>
-        unit.measureIndex === measureIndex && onsetsEqual(unit.onset, expectedOnset)
-      );
-      if (start < 0) {
-        return refuse('metric-span-mismatch', 'A destination bar has no event at the required translated onset.');
-      }
-      let span: Onset = { num: 0, den: 1 };
-      for (let index = start; index < universe.length && universe[index].measureIndex === measureIndex; index++) {
-        selected.push(universe[index]);
-        span = addOnsets(span, itemSpan(universe[index].item));
-        const comparison = compareSpan(span, sourceSpan);
-        if (comparison === 0) break;
-        if (comparison > 0) {
-          return refuse('metric-span-mismatch', 'A destination bar does not close to the copied metric span.');
-        }
-      }
-      if (!onsetsEqual(span, sourceSpan)) {
-        return refuse('metric-span-mismatch', 'A destination bar does not close to the copied metric span.');
-      }
-    }
-    return selected;
-  }
-
-  const childCounts = new Map<string, Set<number>>();
-  for (const member of members) {
-    if (member.containerIndex === undefined) continue;
-    const unit = memberUnit(member);
-    if (!unit) return refuse('empty-destination', 'A destination event no longer exists.');
-    const key = eventUnitKey(unit);
-    const selected = childCounts.get(key) ?? new Set<number>();
-    selected.add(member.containerIndex);
-    childCounts.set(key, selected);
-  }
-  for (const [key, children] of childCounts) {
-    const count = ((unitByKey.get(key)?.item as { content?: MnxEvent[] } | undefined)?.content ?? []).length;
-    if (children.size !== count) {
-      return refuse('partial-container', 'The destination range cuts through a rhythm container.');
-    }
-  }
-  const selected = [...new Map(members.flatMap(member => {
-    const unit = memberUnit(member);
-    return unit ? [[eventUnitKey(unit), unit] as const] : [];
-  })).values()];
-  const firstMeasure = selected[0].measureIndex;
-  const targetBars = [...new Set(selected.map(unit => unit.measureIndex))].map(measureIndex => ({
-    offset: measureIndex - firstMeasure,
-    units: selected.filter(unit => unit.measureIndex === measureIndex)
-  }));
-  if (
-    selected[selected.length - 1].measureIndex - firstMeasure + 1 !== sourceTimelineSpan ||
-    targetBars.length !== sourceBars.length ||
-    targetBars.some((bar, index) =>
-      bar.offset !== sourceBars[index].offset ||
-      !onsetsEqual(addSpan(bar.units.map(unit => unit.item)), addSpan(sourceBars[index].items))
-    )
-  ) {
-    return refuse('metric-span-mismatch', 'Destination event bars differ from the copied bar-local spans.');
-  }
-  return selected;
+  measure.sequences.push(sequence);
+  acc.createdSequences++;
+  return measure.sequences.length - 1;
 }
 
-interface EventSlice {
-  measureIndex: number;
-  sequenceIndex: number;
-  from: number;
-  count: number;
-  span: Onset;
-  items: MnxSequenceItem[];
+function subtractOnsets(a: Onset, b: Onset): Onset {
+  return addOnsets(a, { num: -b.num, den: b.den });
 }
 
-function eventSlices(units: EventUnit[], sourceItems: MnxSequenceItem[]): EventSlice[] | PasteRefusal {
-  const slices: EventSlice[] = [];
-  for (const unit of units) {
-    const prior = slices[slices.length - 1];
-    if (prior && prior.measureIndex === unit.measureIndex && prior.sequenceIndex === unit.sequenceIndex &&
-      prior.from + prior.count === unit.itemIndex) {
-      prior.count++;
-      prior.span = addOnsets(prior.span, itemSpan(unit.item));
-    } else {
-      slices.push({
-        measureIndex: unit.measureIndex,
-        sequenceIndex: unit.sequenceIndex,
-        from: unit.itemIndex,
-        count: 1,
-        span: itemSpan(unit.item),
-        items: []
-      });
+/**
+ * Rules 2 and 3 in one move: overwrite the interval `[start, start+span)` of
+ * one voice's bar content with `replacement`. Items partially covered by the
+ * footprint's edges are consumed WHOLE (a tuplet cannot be split), and the
+ * uncovered remainders — before the footprint where consumption began early,
+ * after it where the last consumed unit outlived it — fill with rests via
+ * the shared spelling. Content ending before `start` is padded so the
+ * pasted material sits at its true onset. A zero-span replacement (a grace
+ * clip) inserts without consuming. Zero-width items at the footprint's
+ * start are consumed; at its end they are kept (half-open, like the rule).
+ */
+function overwriteVoiceInterval(
+  content: MnxSequenceItem[],
+  start: Onset,
+  replacement: MnxSequenceItem[],
+  acc: PasteAccommodations
+): MnxSequenceItem[] {
+  const span = addSpan(replacement);
+  if (span.num === 0) {
+    let onset: Onset = { num: 0, den: 1 };
+    let index = 0;
+    for (; index < content.length; index++) {
+      const itemEnd = addOnsets(onset, itemSpan(content[index]));
+      // Stop at the first item the insertion point does not lie strictly
+      // beyond: its own onset reaches start, or it covers start.
+      if (compareSpan(onset, start) >= 0 || compareSpan(itemEnd, start) > 0) break;
+      onset = itemEnd;
     }
+    const pad = index === content.length && compareSpan(onset, start) < 0
+      ? restItemsForDuration(...onsetPair(subtractOnsets(start, onset)))
+      : [];
+    acc.restFills += pad.length;
+    return [...content.slice(0, index), ...pad, ...replacement, ...content.slice(index)];
   }
-  let sourceIndex = 0;
-  for (const slice of slices) {
-    let span: Onset = { num: 0, den: 1 };
-    while (sourceIndex < sourceItems.length && compareSpan(span, slice.span) < 0) {
-      const item = sourceItems[sourceIndex++];
-      slice.items.push(item);
-      span = addOnsets(span, itemSpan(item));
+
+  const end = addOnsets(start, span);
+  const before: MnxSequenceItem[] = [];
+  const tail: MnxSequenceItem[] = [];
+  let consumedStart: Onset | null = null;
+  let consumedEnd: Onset | null = null;
+  let onset: Onset = { num: 0, den: 1 };
+  for (const item of content) {
+    const width = itemSpan(item);
+    const itemEnd = addOnsets(onset, width);
+    const zeroWidth = width.num === 0;
+    const isBefore = zeroWidth
+      ? compareSpan(onset, start) < 0
+      : compareSpan(itemEnd, start) <= 0;
+    const isAfter = compareSpan(onset, end) >= 0;
+    if (isBefore) before.push(item);
+    else if (isAfter) tail.push(item);
+    else {
+      if (consumedStart === null) consumedStart = onset;
+      consumedEnd = itemEnd;
     }
-    if (!onsetsEqual(span, slice.span)) {
-      return refuse('bar-span-mismatch', 'Copied events cannot fill destination bar slices without splitting an item.');
-    }
+    onset = itemEnd;
   }
-  if (sourceIndex !== sourceItems.length) {
-    return refuse('bar-span-mismatch', 'Copied events leave material beyond the destination bar slices.');
-  }
-  return slices;
+  const contentEnd = onset;
+  const leadGap = consumedStart !== null
+    ? subtractOnsets(start, consumedStart)
+    : compareSpan(contentEnd, start) < 0
+      ? subtractOnsets(start, contentEnd)
+      : { num: 0, den: 1 };
+  const trailGap = consumedEnd !== null && compareSpan(consumedEnd, end) > 0
+    ? subtractOnsets(consumedEnd, end)
+    : { num: 0, den: 1 };
+  const leadFill = leadGap.num > 0 ? restItemsForDuration(...onsetPair(leadGap)) : [];
+  const trailFill = trailGap.num > 0 ? restItemsForDuration(...onsetPair(trailGap)) : [];
+  acc.restFills += leadFill.length + trailFill.length;
+  return [...before, ...leadFill, ...replacement, ...trailFill, ...tail];
 }
 
-function eventSlicesByBar(
-  units: EventUnit[],
-  sourceBars: EventRunClipEntry[]
-): EventSlice[] | PasteRefusal {
-  const start = units[0].measureIndex;
-  const slices: EventSlice[] = [];
-  for (const sourceBar of sourceBars) {
-    const target = units.filter(unit => unit.measureIndex === start + sourceBar.offset);
-    const planned = eventSlices(target, sourceBar.items);
-    if (isRefusal(planned)) return planned;
-    slices.push(...planned);
-  }
-  return slices;
+function onsetPair(onset: Onset): [number, number] {
+  return [onset.num, onset.den];
 }
 
-function destinationBarStart(
+/** Rule 1's bar anchor: the selection's FIRST bar, whatever its shape. */
+function anchorBarStart(
   doc: MnxStructure,
   state: SelectionState,
-  projection: Projection,
-  span: number
-): number | PasteRefusal {
+  projection: Projection
+): number {
   if (state.extent.kind === 'cursor' && !sameSelectionCursor(state)) {
-    const start = Math.min(state.anchor.measureIndex, state.extent.cursor.measureIndex);
-    const end = Math.max(state.anchor.measureIndex, state.extent.cursor.measureIndex);
-    return end - start + 1 === span
-      ? start
-      : refuse('bar-span-mismatch', `Destination range must cover exactly ${span} bars.`);
+    return Math.min(state.anchor.measureIndex, state.extent.cursor.measureIndex);
   }
   if (state.extent.kind === 'closure') {
     const measures = resolveSelection(doc, state, projection).members.flatMap(member =>
-      member.kind === 'voiceMeasure' || member.kind === 'partMeasure' ? [member.measureIndex] : []
+      member.kind === 'section'
+        ? [member.start]
+        : 'measureIndex' in member
+          ? [member.measureIndex]
+          : []
     );
-    if (!measures.length) return refuse('empty-destination', 'The destination closure has no bars.');
-    const start = Math.min(...measures);
-    const end = Math.max(...measures);
-    return end - start + 1 === span
-      ? start
-      : refuse('bar-span-mismatch', `Destination closure must cover exactly ${span} bars.`);
+    if (measures.length) return Math.min(...measures);
   }
   return state.anchor.measureIndex;
+}
+
+/** Rule 1's run anchor: the earliest resolved member's own onset at the run
+ *  rungs (its address is exact), the raw cursor onset otherwise — rule 3
+ *  makes a mid-item start safe either way. */
+function runAnchor(
+  doc: MnxStructure,
+  state: SelectionState,
+  projection: Projection
+): { measureIndex: number; onset: Onset } {
+  if (state.level === 'note' || state.level === 'event' || state.level === 'container') {
+    const members = resolveSelection(doc, state, projection).members;
+    let best: { measureIndex: number; onset: Onset } | null = null;
+    for (const member of members) {
+      if (!('onset' in member)) continue;
+      if (
+        best === null ||
+        member.measureIndex < best.measureIndex ||
+        (member.measureIndex === best.measureIndex && compareSpan(member.onset, best.onset) < 0)
+      ) best = { measureIndex: member.measureIndex, onset: { ...member.onset } };
+    }
+    if (best) return best;
+  }
+  return { measureIndex: state.anchor.measureIndex, onset: { ...state.anchor.onset } };
 }
 
 function mergeRelationships(
@@ -802,6 +771,7 @@ export function planSelectionPaste(
   const partIndex = state.anchor.partIndex ?? 0;
   const staffIndex = state.anchor.staffIndex ?? 1;
   const voiceIndex = state.anchor.voiceIndex ?? 0;
+  const accommodations = emptyAccommodations();
   let resultLanding: PasteLanding;
   let merge = envelope.clip.kind === 'score'
     ? undefined
@@ -810,164 +780,142 @@ export function planSelectionPaste(
 
   switch (clip.kind) {
     case 'note-set': {
-      if (state.level !== 'note') return refuse('wrong-destination-level', 'Note clips paste only onto note selections.');
-      const members = resolveSelection(destination, state, projection).members.filter(
-        (member): member is Extract<SelectionMember, { kind: 'note' }> => member.kind === 'note'
-      );
-      if (!members.length) return refuse('empty-destination', 'There is no destination note.');
-      if ((sameSelectionCursor(state) && clip.notes.length !== 1) || members.length !== clip.notes.length) {
-        return refuse('member-count-mismatch', 'Source and destination note selections must have equal counts.');
-      }
-      const compatibility = annotatedNotesCompatible(clip.notes, destination.parts[partIndex]);
-      if (compatibility) return compatibility;
+      accommodations.flaggedNotes += countUnplayableAnnotations(clip.notes, destination.parts[partIndex]);
       clip.notes.forEach(note => rewriteNote(note, ids));
-      members.forEach((member, index) => {
-        const located = eventForMember(after, member);
-        if (!located?.event.notes?.[member.noteIndex]) return;
-        located.event.notes[member.noteIndex] = clip.notes[index];
+      // The landing slots: every notehead of the anchor voice in timeline
+      // order, plus rest events as one slot each — D6 inks a rest with the
+      // rest's own duration (the clip has none to bring), D7 replaces the
+      // resolved chord member when the anchor names one.
+      interface NoteSlot {
+        measureIndex: number;
+        onset: Onset;
+        event: MnxEvent;
+        noteIndex: number | null;
+        itemIndex: number;
+        containerIndex?: number;
+      }
+      const slots: NoteSlot[] = [];
+      activeVoiceUnits(after, state).forEach(unit => {
+        const events: { event: MnxEvent; containerIndex?: number }[] = isTimedEvent(unit.item)
+          ? [{ event: unit.item }]
+          : ((unit.item as { content?: MnxEvent[] }).content ?? [])
+              .map((event, containerIndex) => ({ event, containerIndex }));
+        events.forEach(({ event, containerIndex }) => {
+          if (event.notes?.length) {
+            event.notes.forEach((_, noteIndex) => slots.push({
+              measureIndex: unit.measureIndex, onset: unit.onset, event,
+              noteIndex, itemIndex: unit.itemIndex,
+              ...(containerIndex === undefined ? {} : { containerIndex })
+            }));
+          } else if (event.rest) {
+            slots.push({
+              measureIndex: unit.measureIndex, onset: unit.onset, event,
+              noteIndex: null, itemIndex: unit.itemIndex,
+              ...(containerIndex === undefined ? {} : { containerIndex })
+            });
+          }
+        });
       });
+      const anchor = runAnchor(destination, state, projection);
+      const noteMember = state.level === 'note'
+        ? resolveSelection(destination, state, projection).members.find(
+            (member): member is Extract<SelectionMember, { kind: 'note' }> => member.kind === 'note'
+          )
+        : undefined;
+      let startIndex = noteMember
+        ? slots.findIndex(slot =>
+            slot.measureIndex === noteMember.measureIndex &&
+            slot.itemIndex === noteMember.eventIndex &&
+            slot.containerIndex === noteMember.containerIndex &&
+            slot.noteIndex === noteMember.noteIndex
+          )
+        : slots.findIndex(slot =>
+            slot.measureIndex > anchor.measureIndex ||
+            (slot.measureIndex === anchor.measureIndex && compareSpan(slot.onset, anchor.onset) >= 0)
+          );
+      if (startIndex < 0) startIndex = slots.length;
+      const landed: NoteSlot[] = [];
+      let clipIndex = 0;
+      for (let index = startIndex; index < slots.length && clipIndex < clip.notes.length; index++) {
+        const slot = slots[index];
+        if (slot.noteIndex === null) {
+          delete (slot.event as { rest?: object }).rest;
+          slot.event.notes = [clip.notes[clipIndex++]];
+        } else {
+          slot.event.notes![slot.noteIndex] = clip.notes[clipIndex++];
+        }
+        landed.push(slot);
+      }
+      accommodations.droppedMembers += clip.notes.length - clipIndex;
+      const first = landed[0];
+      const last = landed[landed.length - 1];
       resultLanding = landing(
         state,
         'note',
-        members[0].measureIndex,
-        members[members.length - 1].measureIndex,
-        members[0].onset,
-        members[members.length - 1].onset
+        first?.measureIndex ?? anchor.measureIndex,
+        last?.measureIndex ?? anchor.measureIndex,
+        first?.onset ?? anchor.onset,
+        last?.onset ?? anchor.onset
       );
       break;
     }
-    case 'event-run': {
-      if (state.level !== 'event') return refuse('wrong-destination-level', 'Event clips paste only onto event selections.');
-      const sourceItems = clip.bars.flatMap(bar => bar.items);
-      const compatibility = annotatedNotesCompatible(notesInItems(sourceItems), destination.parts[partIndex]);
-      if (compatibility) return compatibility;
-      if (sourceItems.every(item => itemSpan(item).num === 0))
-        return refuse('metric-span-mismatch', 'Zero-time event runs must paste at container level.');
-      const units = selectedEventUnits(destination, state, projection, clip.bars, clip.span);
-      if (isRefusal(units)) return units;
-      const targetStart = units[0].measureIndex;
-      bindContextMeasures(envelope, after, targetStart, ids);
-      clip.bars.forEach(bar => rewriteItems(bar.items, ids));
-      const slices = eventSlicesByBar(units, clip.bars);
-      if (isRefusal(slices)) return slices;
-      [...slices].reverse().forEach(slice => {
-        after.parts[partIndex].measures[slice.measureIndex].sequences[slice.sequenceIndex]
-          .content.splice(slice.from, slice.count, ...slice.items);
-      });
-      const relationships = rewriteRelationships(envelope.relationships?.measures, ids);
-      mergeRelationships(after, partIndex, targetStart, relationships);
-      const firstSourceBar = clip.bars[0];
-      const lastSourceBar = clip.bars[clip.bars.length - 1];
-      const onsetDelta = addOnsets(
-        units[0].onset,
-        { num: -firstSourceBar.onset[0], den: firstSourceBar.onset[1] }
-      );
-      const lastSourceOnset = lastSourceBar.items.slice(0, -1).reduce(
-        (onset, item) => addOnsets(onset, itemSpan(item)),
-        addOnsets(
-          { num: lastSourceBar.onset[0], den: lastSourceBar.onset[1] },
-          onsetDelta
-        )
-      );
-      resultLanding = landing(
-        state,
-        'event',
-        targetStart,
-        targetStart + lastSourceBar.offset,
-        units[0].onset,
-        lastSourceOnset
-      );
-      break;
-    }
+    case 'event-run':
     case 'container-run': {
-      if (state.level !== 'container') return refuse('wrong-destination-level', 'Container clips paste only onto container selections.');
-      const compatibility = annotatedNotesCompatible(
-        clip.bars.flatMap(bar => bar.containers.flatMap(container => notesInItems([container]))),
+      const level = clip.kind === 'event-run' ? 'event' as const : 'container' as const;
+      const runBars = clip.kind === 'event-run'
+        ? clip.bars.map(bar => ({ offset: bar.offset, onset: bar.onset, items: bar.items }))
+        : clip.bars.map(bar => ({
+            offset: bar.offset, onset: bar.onset,
+            items: bar.containers as MnxSequenceItem[]
+          }));
+      accommodations.flaggedNotes += countUnplayableAnnotations(
+        notesInItems(runBars.flatMap(bar => bar.items)),
         destination.parts[partIndex]
       );
-      if (compatibility) return compatibility;
-      const universe = activeVoiceUnits(destination, state).filter(unit => !isTimedEvent(unit.item));
-      const resolved = resolveSelection(destination, state, projection).members.filter(
-        (member): member is Extract<SelectionMember, { kind: 'container' }> => member.kind === 'container'
-      );
-      if (!resolved.length) return refuse('empty-destination', 'There is no destination container.');
-      let targets = resolved.flatMap(member => universe.filter(unit =>
-        unit.measureIndex === member.measureIndex && unit.sequenceIndex === member.sequenceIndex &&
-        unit.itemIndex === member.eventIndex
-      ));
-      targets = [...new Map(targets.map(unit => [eventUnitKey(unit), unit])).values()];
-      const sourceContainers = clip.bars.flatMap(bar => bar.containers);
-      if (sameSelectionCursor(state)) {
-        const first = targets[0];
-        const firstSource = clip.bars[0];
-        const delta = addOnsets(first.onset, { num: -firstSource.onset[0], den: firstSource.onset[1] });
-        const planned: EventUnit[] = [];
-        for (const sourceBar of clip.bars) {
-          const measureIndex = first.measureIndex + sourceBar.offset;
-          const expectedOnset = addOnsets(
-            { num: sourceBar.onset[0], den: sourceBar.onset[1] },
-            delta
+      const anchor = runAnchor(destination, state, projection);
+      const firstBar = runBars[0];
+      const delta = subtractOnsets(anchor.onset, { num: firstBar.onset[0], den: firstBar.onset[1] });
+      ensureBars(after, anchor.measureIndex + clip.span - 1, accommodations);
+      bindContextMeasures(envelope, after, anchor.measureIndex, ids);
+      runBars.forEach(bar => rewriteItems(bar.items, ids));
+      let lastStartOnset: Onset = anchor.onset;
+      for (const bar of runBars) {
+        const measureIndex = anchor.measureIndex + bar.offset;
+        const sequenceIndex = ensureSequenceIndex(
+          after, partIndex, staffIndex, measureIndex, voiceIndex, accommodations
+        );
+        let startOnset = addOnsets({ num: bar.onset[0], den: bar.onset[1] }, delta);
+        // A negative translated onset means the phrase's pickup would start
+        // before its bar; clamp to the bar start rather than refusing.
+        if (compareSpan(startOnset, { num: 0, den: 1 }) < 0) startOnset = { num: 0, den: 1 };
+        const sequence = after.parts[partIndex].measures[measureIndex].sequences[sequenceIndex];
+        sequence.content = overwriteVoiceInterval(sequence.content, startOnset, bar.items, accommodations);
+        if (bar === runBars[runBars.length - 1]) {
+          lastStartOnset = bar.items.slice(0, -1).reduce(
+            (onset, item) => addOnsets(onset, itemSpan(item)),
+            startOnset
           );
-          const candidates = universe.filter(unit => unit.measureIndex === measureIndex);
-          const start = candidates.findIndex(unit => onsetsEqual(unit.onset, expectedOnset));
-          if (start < 0 || start + sourceBar.containers.length > candidates.length) {
-            return refuse('member-count-mismatch', 'A destination bar lacks the required container run.');
-          }
-          planned.push(...candidates.slice(start, start + sourceBar.containers.length));
         }
-        targets = planned;
-      } else {
-        const firstMeasure = targets[0].measureIndex;
-        const targetBars = [...new Set(targets.map(target => target.measureIndex))].map(measureIndex => ({
-          offset: measureIndex - firstMeasure,
-          targets: targets.filter(target => target.measureIndex === measureIndex)
-        }));
-        if (
-          targets[targets.length - 1].measureIndex - firstMeasure + 1 !== clip.span ||
-          targetBars.length !== clip.bars.length ||
-          targetBars.some((bar, index) =>
-            bar.offset !== clip.bars[index].offset ||
-            bar.targets.length !== clip.bars[index].containers.length
-          )
-        ) return refuse('member-count-mismatch', 'Destination container bars differ from the copied run.');
       }
-      if (targets.length !== sourceContainers.length) {
-        return refuse('member-count-mismatch', 'Source and destination container selections must have equal counts.');
-      }
-      if (targets.some((target, index) => !onsetsEqual(itemSpan(target.item), itemSpan(sourceContainers[index])))) {
-        return refuse('metric-span-mismatch', 'Each destination container must have the copied container span.');
-      }
-      const targetStart = targets[0].measureIndex;
-      bindContextMeasures(envelope, after, targetStart, ids);
-      rewriteItems(sourceContainers, ids);
-      [...targets].reverse().forEach((target, reverseIndex) => {
-        const sourceIndex = targets.length - reverseIndex - 1;
-        after.parts[partIndex].measures[target.measureIndex].sequences[target.sequenceIndex]
-          .content.splice(target.itemIndex, 1, sourceContainers[sourceIndex]);
-      });
       const relationships = rewriteRelationships(envelope.relationships?.measures, ids);
-      mergeRelationships(after, partIndex, targetStart, relationships);
+      mergeRelationships(after, partIndex, anchor.measureIndex, relationships);
       resultLanding = landing(
         state,
-        'container',
-        targetStart,
-        targets[targets.length - 1].measureIndex,
-        targets[0].onset,
-        targets[targets.length - 1].onset
+        level,
+        anchor.measureIndex,
+        anchor.measureIndex + runBars[runBars.length - 1].offset,
+        anchor.onset,
+        lastStartOnset
       );
       break;
     }
     case 'voice-bars': {
-      if (state.level !== 'voiceMeasure') return refuse('wrong-destination-level', 'Voice clips paste only onto voice-bar selections.');
-      const targetStart = destinationBarStart(destination, state, projection, clip.span);
-      if (isRefusal(targetStart)) return targetStart;
-      if (targetStart + clip.span > destination.global.measures.length)
-        return refuse('bar-span-mismatch', 'The voice clip extends beyond the destination timeline.');
-      const compatibility = annotatedNotesCompatible(
+      const targetStart = anchorBarStart(destination, state, projection);
+      ensureBars(after, targetStart + clip.span - 1, accommodations);
+      accommodations.flaggedNotes += countUnplayableAnnotations(
         clip.bars.flatMap(bar => notesInItems(bar.sequence.content)),
         destination.parts[partIndex]
       );
-      if (compatibility) return compatibility;
       bindContextMeasures(envelope, after, targetStart, ids);
       clip.bars.forEach(bar => {
         rewriteItems(bar.sequence.content, ids);
@@ -975,23 +923,28 @@ export function planSelectionPaste(
         bar.declarations?.ottavas?.forEach(ottava => rewriteOttava(ottava, ids));
       });
       for (let offset = 0; offset < clip.span; offset++) {
-        const targetMeasure = after.parts[partIndex]?.measures?.[targetStart + offset];
-        if (!targetMeasure) return refuse('missing-voice', 'The destination part has no bar at the requested offset.');
+        const targetMeasure = after.parts[partIndex].measures[targetStart + offset];
         const targetSequenceIndex = sequenceIndexAt(after, partIndex, staffIndex, targetStart + offset, voiceIndex);
         const source = clip.bars.find(bar => bar.offset === offset);
-        if (source && targetSequenceIndex === undefined)
-          return refuse('missing-voice', 'Paste would need to create a destination voice.');
-        if (targetSequenceIndex !== undefined) {
-          if (source) {
+        if (source) {
+          const replacement = cloneJson(source.sequence);
+          if (staffIndex === 1) delete replacement.staff;
+          else replacement.staff = staffIndex;
+          if (targetSequenceIndex === undefined) {
+            // D4: the voice does not exist here — create it with exactly the
+            // pasted content, keeping the clip's own voice label.
+            targetMeasure.sequences.push(replacement);
+            accommodations.createdSequences++;
+          } else {
             const priorVoice = targetMeasure.sequences[targetSequenceIndex].voice;
-            const replacement = cloneJson(source.sequence);
-            if (staffIndex === 1) delete replacement.staff;
-            else replacement.staff = staffIndex;
             if (priorVoice === undefined) delete replacement.voice;
             else replacement.voice = priorVoice;
             targetMeasure.sequences[targetSequenceIndex] = replacement;
           }
-          else targetMeasure.sequences.splice(targetSequenceIndex, 1);
+        } else if (targetSequenceIndex !== undefined) {
+          // A sparse VOICE clip's gap is a real absence: this voice has no
+          // bar copy there, and absence is silence for a voice.
+          targetMeasure.sequences.splice(targetSequenceIndex, 1);
         }
         if (source?.declarations) {
           const remap = <T extends { staff?: number; voice?: string }>(entries: T[] | undefined): T[] =>
@@ -1014,54 +967,57 @@ export function planSelectionPaste(
       break;
     }
     case 'staff-bars': {
-      if (state.level !== 'partMeasure' || state.extent.kind === 'closure')
-        return refuse('wrong-destination-level', 'Staff clips paste only onto concrete staff-bar selections.');
-      const targetStart = destinationBarStart(destination, state, projection, clip.span);
-      if (isRefusal(targetStart)) return targetStart;
-      const part = destination.parts[partIndex];
-      if (!part || staffIndex > (part.staves ?? 1)) return refuse('missing-staff', 'The destination staff does not exist.');
-      if (targetStart + clip.span > destination.global.measures.length)
-        return refuse('bar-span-mismatch', 'The staff clip extends beyond the destination timeline.');
-      const compatibility = annotatedNotesCompatible(
-        clip.bars.flatMap(bar => notesInMeasure(bar.measure)), part
+      const targetStart = anchorBarStart(destination, state, projection);
+      const part = after.parts[partIndex];
+      // The cursor cannot address a staff a part does not have, but stay
+      // defensive: land on the nearest staff rather than refusing.
+      const targetStaff = Math.min(staffIndex, part?.staves ?? 1);
+      ensureBars(after, targetStart + clip.span - 1, accommodations);
+      accommodations.flaggedNotes += countUnplayableAnnotations(
+        clip.bars.flatMap(bar => notesInMeasure(bar.measure)),
+        destination.parts[partIndex]
       );
-      if (compatibility) return compatibility;
       bindContextMeasures(envelope, after, targetStart, ids);
       clip.bars.forEach(bar => rewriteMeasure(bar.measure, ids));
       for (let offset = 0; offset < clip.span; offset++) {
-        const target = after.parts[partIndex].measures[targetStart + offset];
-        if (!target) return refuse('missing-staff', 'The destination part has no corresponding bar.');
         replaceSelectionStaffMaterial(
-          target,
+          after.parts[partIndex].measures[targetStart + offset],
           clip.bars.find(bar => bar.offset === offset)?.measure ?? null,
-          staffIndex
+          targetStaff
         );
       }
       resultLanding = landing(state, 'partMeasure', targetStart, targetStart + clip.span - 1);
       break;
     }
     case 'part': {
-      if (state.level !== 'partMeasure' && state.level !== 'score')
-        return refuse('wrong-destination-level', 'Part clips paste only at part or score level.');
       const empty = isEmptyDocument(destination);
-      if (!empty && clip.part.measures.length !== destination.global.measures.length)
-        return refuse('measure-count-mismatch', 'The copied part must match the destination timeline length.');
       let globalMeasures: MnxGlobalMeasure[] | null = null;
       if (empty) {
+        // Bootstrap the timeline from the clip's measure context; a context
+        // shorter than the part's bars synthesizes empty globals (rule 4's
+        // spirit — never refuse for missing context).
         const contexts = envelope.context?.measures ?? [];
-        if (contexts.length !== clip.part.measures.length)
-          return refuse('measure-count-mismatch', 'The copied part lacks complete context for an empty destination.');
-        globalMeasures = contexts.map(context => cloneJson({
-          ...(context.id ? { id: context.id } : {}),
-          ...(context.key ? { key: context.key } : {}),
-          ...(context.time ? { time: context.time } : {})
-        }));
+        globalMeasures = clip.part.measures.map((_, index) => {
+          const context = contexts[index];
+          return cloneJson({
+            ...(context?.id ? { id: context.id } : {}),
+            ...(context?.key ? { key: context.key } : {}),
+            ...(context?.time ? { time: context.time } : {})
+          });
+        });
         globalMeasures.forEach(measure => { if (measure.id) measure.id = ids.map('measures', measure.id); });
         contexts.forEach((context, index) => {
-          if (context.id && globalMeasures![index].id) ids.bind('measures', context.id, globalMeasures![index].id!);
+          if (context.id && globalMeasures![index]?.id)
+            ids.bind('measures', context.id, globalMeasures![index].id!);
         });
       } else {
         bindContextMeasures(envelope, after, 0, ids);
+        // Rule 4 both ways: a short part pads to the timeline, a long part
+        // extends the timeline (empty bars land in every other part).
+        while (clip.part.measures.length < after.global.measures.length) {
+          clip.part.measures.push(emptyPartBar());
+        }
+        ensureBars(after, clip.part.measures.length - 1, accommodations);
       }
       rewritePart(clip.part, ids);
       if (empty) {
@@ -1078,87 +1034,60 @@ export function planSelectionPaste(
       };
       break;
     }
-    case 'measures': {
-      if (state.level !== 'measure') return refuse('wrong-destination-level', 'Measure clips paste only onto measure selections.');
-      if (!partTopologyMatches(clip.parts, destination))
-        return refuse('part-topology-mismatch', 'Copied measure columns require the same part/staff topology.');
-      for (let index = 0; index < clip.parts.length; index++) {
-        const compatibility = annotatedNotesCompatible(
-          clip.measures.flatMap(column => notesInMeasure(column.parts[index])),
-          destination.parts[index]
-        );
-        if (compatibility) return compatibility;
-      }
-      const insert = sameSelectionCursor(state);
-      const resolved = resolveSelection(destination, state, projection).members.filter(
-        (member): member is Extract<SelectionMember, { kind: 'measure' }> => member.kind === 'measure'
-      );
-      if (!insert && resolved.length !== clip.measures.length)
-        return refuse('measure-count-mismatch', 'Destination measure range must equal the copied column count.');
-      const start = insert ? state.anchor.measureIndex : resolved[0]?.measureIndex;
-      if (start === undefined) return refuse('empty-destination', 'There is no destination measure.');
-      clip.measures.forEach(column => {
-        if (column.global.id) column.global.id = ids.map('measures', column.global.id);
-        column.parts.forEach(measure => rewriteMeasure(measure, ids));
-      });
-      const oldToNew = new Map<string, string>();
-      if (!insert) resolved.forEach((member, index) => {
-        const oldId = after.global.measures[member.measureIndex]?.id;
-        const newId = clip.measures[index].global.id;
-        if (oldId && newId) oldToNew.set(oldId, newId);
-      });
-      after.global.measures.splice(start, insert ? 0 : clip.measures.length, ...clip.measures.map(column => column.global));
-      after.parts.forEach((part, index) => part.measures.splice(
-        start, insert ? 0 : clip.measures.length, ...clip.measures.map(column => column.parts[index])
-      ));
-      rewriteExistingMeasureReferences(after, oldToNew);
-      resultLanding = landing(state, 'measure', start, start + clip.measures.length - 1);
-      break;
-    }
+    case 'measures':
     case 'section': {
-      if (state.level !== 'section') return refuse('wrong-destination-level', 'Section clips paste only onto section selections.');
-      if (!partTopologyMatches(clip.parts, destination))
-        return refuse('part-topology-mismatch', 'Copied sections require the same part/staff topology.');
-      const columns = clip.sections.flatMap(section => section.measures);
-      for (let index = 0; index < clip.parts.length; index++) {
-        const compatibility = annotatedNotesCompatible(
-          columns.flatMap(column => notesInMeasure(column.parts[index])), destination.parts[index]
-        );
-        if (compatibility) return compatibility;
+      const level = clip.kind === 'measures' ? 'measure' as const : 'section' as const;
+      const columns = clip.kind === 'measures'
+        ? clip.measures
+        : clip.sections.flatMap(section => section.measures);
+      const start = anchorBarStart(destination, state, projection);
+      // D3: positional part mapping, creating what the clip carries and the
+      // destination lacks — dropping a part's material is the one thing
+      // worse than refusing.
+      while (after.parts.length < clip.parts.length) {
+        const descriptor = cloneJson(clip.parts[after.parts.length]);
+        const created = { ...descriptor, measures: [] as MnxPartMeasure[] } as MnxPart;
+        if (created.id) created.id = ids.map('parts', created.id);
+        while (created.measures.length < after.global.measures.length) created.measures.push(emptyPartBar());
+        after.parts.push(created);
+        accommodations.createdParts++;
       }
-      const insert = sameSelectionCursor(state);
-      const resolved = resolveSelection(destination, state, projection).members.filter(
-        (member): member is Extract<SelectionMember, { kind: 'section' }> => member.kind === 'section'
-      );
-      const targetCount = resolved.reduce((count, member) => count + member.end - member.start, 0);
-      if (!insert && targetCount !== columns.length)
-        return refuse('measure-count-mismatch', 'Destination section span must equal the copied section package.');
-      const start = insert ? (resolved[0]?.start ?? state.anchor.measureIndex) : resolved[0]?.start;
-      if (start === undefined) return refuse('empty-destination', 'There is no destination section.');
+      ensureBars(after, start + columns.length - 1, accommodations);
+      clip.parts.forEach((_, index) => {
+        accommodations.flaggedNotes += countUnplayableAnnotations(
+          columns.flatMap(column => notesInMeasure(column.parts[index])),
+          after.parts[index]
+        );
+      });
       columns.forEach(column => {
         if (column.global.id) column.global.id = ids.map('measures', column.global.id);
         column.parts.forEach(measure => rewriteMeasure(measure, ids));
       });
+      // D1: paste overwrites — the insert-before-a-point behavior retired
+      // with the conservative contract; "insert bars" is a future command.
       const oldToNew = new Map<string, string>();
-      if (!insert) Array.from({ length: columns.length }, (_, offset) => offset).forEach(offset => {
+      columns.forEach((column, offset) => {
         const oldId = after.global.measures[start + offset]?.id;
-        const newId = columns[offset].global.id;
+        const newId = column.global.id;
         if (oldId && newId) oldToNew.set(oldId, newId);
       });
-      after.global.measures.splice(start, insert ? 0 : columns.length, ...columns.map(column => column.global));
-      after.parts.forEach((part, index) => part.measures.splice(
-        start, insert ? 0 : columns.length, ...columns.map(column => column.parts[index])
-      ));
+      after.global.measures.splice(start, columns.length, ...columns.map(column => column.global));
+      after.parts.forEach((part, index) => {
+        const replacement = index < clip.parts.length
+          ? columns.map(column => column.parts[index])
+          : columns.map(() => emptyPartBar());
+        part.measures.splice(start, columns.length, ...replacement);
+      });
       rewriteExistingMeasureReferences(after, oldToNew);
-      resultLanding = landing(state, 'section', start, start + columns.length - 1);
+      resultLanding = landing(state, level, start, start + columns.length - 1);
       break;
     }
     case 'score': {
-      if (state.level !== 'score') return refuse('wrong-destination-level', 'Score clips paste only at score level.');
-      if (!isEmptyDocument(destination))
-        return refuse('document-not-empty', 'A complete score can paste only into an explicitly empty document.');
+      // D5: the footprint of a score is everything — paste replaces the
+      // document, and undo restores it. No emptiness precondition.
       rewriteWholeScore(clip.score, ids);
       merge = undefined;
+      accommodations.replacedDocument = true;
       resultLanding = {
         level: 'score', partIndex: 0, staffIndex: 1, voiceIndex: 0,
         measureStart: 0, measureEnd: Math.max(0, clip.score.global.measures.length - 1),
@@ -1171,7 +1100,8 @@ export function planSelectionPaste(
         document: cloneJson(clip.score),
         idMap: cloneJson(ids.maps),
         landing: resultLanding,
-        detachedTargetReferences: detached
+        detachedTargetReferences: detached,
+        accommodations
       };
     }
   }
@@ -1185,6 +1115,7 @@ export function planSelectionPaste(
     idMap: cloneJson(ids.maps),
     landing: resultLanding,
     ...(merge ? { dependencyMerge: cloneJson(merge) } : {}),
-    detachedTargetReferences
+    detachedTargetReferences,
+    accommodations
   };
 }

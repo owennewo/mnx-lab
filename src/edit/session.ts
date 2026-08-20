@@ -1954,8 +1954,14 @@ function pasteLandingSelection(
   if (landing.closure) {
     return { level: landing.level, anchor, extent: { kind: 'closure', scope: landing.closure } };
   }
+  // The floor axis: a note selection is always exactly one notehead, so a
+  // multi-position note landing (a legacy multi-note clip) selects the
+  // covering EVENT range rather than resurrecting the retired note range.
+  const spansTime =
+    landing.measureStart !== landing.measureEnd ||
+    landing.onsetStart[0] * landing.onsetEnd[1] !== landing.onsetEnd[0] * landing.onsetStart[1];
   return {
-    level: landing.level,
+    level: landing.level === 'note' && spansTime ? 'event' : landing.level,
     anchor,
     extent: {
       kind: 'cursor',

@@ -13,6 +13,25 @@ that item built carries over unchanged: the clip format, extraction, the
 pure-plan → typed-result → atomic-op → trace pipeline, cut, the bindings and
 the notice strip. What changes is planner *policy*.
 
+> **Status: built 2026-08-20, the same day, D1–D7 as written.** The planner's
+> refusal codes shrank to the decode tier (`invalid-clip`,
+> `unsupported-version`, `invalid-payload`); every destination-shape branch
+> became an accommodation counted in the plan's new `accommodations` record
+> (appended bars, created parts/sequences, rest fills, flagged notes,
+> dropped members, replaced document), which the stage-6 notice now reads
+> out clause by clause. The exact-span event machinery was replaced by one
+> footprint helper (`overwriteVoiceInterval`) implementing rules 2+3, with
+> `restItemsForDuration` in the shared structural-edit module spelling fills
+> greedy-binary (space fallback for non-binary remainders). Two refinements
+> earned in the build: cut's clear-to-rests keeps each consumed event's OWN
+> duration — the degenerate case of the shared spelling, not a literal
+> shared call — and a multi-note landing selects the covering **event**
+> range, because the floor axis forbids the note range the old landing
+> would have rebuilt. The acceptance matrix inverted in
+> `selection-paste-planner.test.ts`: every former refusal case now lands
+> with its accommodation pinned. Hands-on cross-score exercise rides the
+> clipboard item's stage 7.
+
 ## The invariant
 
 > **A decodable clip always lands.** The only refusals left are an empty

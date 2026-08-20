@@ -5,11 +5,48 @@ import type {
   MnxEvent,
   MnxLayoutContent,
   MnxNote,
+  MnxNoteValueBase,
   MnxPartMeasure,
   MnxSequenceItem,
   MnxStructure
 } from '../model/mnx.ts';
 import { isTimedEvent } from '../model/mnx.ts';
+
+/** Binary note values, largest first, as reduced whole-note fractions. */
+const BINARY_BASES: [MnxNoteValueBase, number][] = [
+  ['whole', 1], ['half', 2], ['quarter', 4], ['eighth', 8], ['16th', 16],
+  ['32nd', 32], ['64th', 64], ['128th', 128], ['256th', 256],
+  ['512th', 512], ['1024th', 1024]
+];
+
+/**
+ * Spell an exact leftover duration as rest events — the fill paste uses when
+ * a footprint edge consumes more than it replaces (core-paste-lands.md rule
+ * 3; Cut's clear-to-rests is the degenerate whole-event case of the same
+ * idea). Greedy largest-first binary decomposition, no dots: 3/8 becomes a
+ * quarter rest then an eighth rest. A non-binary remainder (possible only if
+ * a consumed unit had a non-binary outer span) falls back to authored
+ * `space`, which is exact for any fraction.
+ */
+export function restItemsForDuration(num: number, den: number): MnxSequenceItem[] {
+  const items: MnxSequenceItem[] = [];
+  if (num <= 0) return items;
+  if (den > 0 && 1024 % den === 0) {
+    // Integer 1024th-note units peel to zero against the largest-first
+    // binary ladder, so the binary path is always exact.
+    let units = num * (1024 / den);
+    for (const [base, value] of BINARY_BASES) {
+      const size = 1024 / value;
+      while (units >= size) {
+        items.push({ duration: { base }, rest: {} } as MnxSequenceItem);
+        units -= size;
+      }
+    }
+    return items;
+  }
+  items.push({ type: 'space', duration: [num, den] } as unknown as MnxSequenceItem);
+  return items;
+}
 
 function cloneJson<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;

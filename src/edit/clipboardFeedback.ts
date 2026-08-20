@@ -93,15 +93,34 @@ export function pasteSelectionNotice(result: PasteSelectionResult): ClipboardNot
     }
     return { ok: false, message: `paste refused — ${result.message}` };
   }
-  const { clipKind, landing, detachedTargetReferences } = result.plan;
+  const { clipKind, landing, detachedTargetReferences, accommodations } = result.plan;
   const at =
     landing.measureStart === landing.measureEnd
       ? `bar ${landing.measureStart + 1}`
       : `bars ${landing.measureStart + 1}–${landing.measureEnd + 1}`;
+  // The accommodation report (core-paste-lands.md): what the document
+  // yielded so the clip could land — the author reads this before deciding
+  // whether to Ctrl+Z. Only non-zero clauses appear.
+  const clauses = [
+    accommodations.replacedDocument ? 'replaced the document' : '',
+    accommodations.appendedBars
+      ? `${count(accommodations.appendedBars, 'bar')} appended` : '',
+    accommodations.createdParts
+      ? `${count(accommodations.createdParts, 'part')} created` : '',
+    accommodations.createdSequences
+      ? `${count(accommodations.createdSequences, 'voice')} created` : '',
+    accommodations.restFills
+      ? `${count(accommodations.restFills, 'rest')} filled in` : '',
+    accommodations.flaggedNotes
+      ? `${count(accommodations.flaggedNotes, 'note')} flagged for the fingerboard` : '',
+    accommodations.droppedMembers
+      ? `${count(accommodations.droppedMembers, 'note')} dropped (no notehead left)` : ''
+  ].filter(Boolean);
   return {
     ok: true,
     message:
       `pasted ${clipKind} at ${at}` +
+      clauses.map(clause => ` · ${clause}`).join('') +
       detachedClause(detachedTargetReferences, 'repaired in the score')
   };
 }
