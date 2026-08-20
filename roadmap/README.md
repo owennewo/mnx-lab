@@ -127,6 +127,20 @@ proposals that name their campaign.
   [core-editor-input-layer.md](complete/core-editor-input-layer.md); absorbed the
   **voice stage** (two-stage transcribe-review-submit, Worker-side transcription) from
   the retired [core-open-router.md](superseded/core-open-router.md) on 2026-08-20.
+- **[core-assist-model-selector.md](proposed/core-assist-model-selector.md)** — **the model
+  roster as a query, not a list**: a pure assessment/selection module that takes a
+  requirements definition (hard filters — tool support, context floor, price ceiling,
+  free-only — plus weighted soft preferences) and returns an ordered list of matching
+  OpenRouter models. The ordering is the interesting half: per-dimension *headroom over
+  the requirement* (`log(actual/required)`, so exactly-meeting scores 0), weighted sum,
+  with Pareto dominance as the pinned test invariant and unknown dimensions scoring as
+  "requirement exactly met", flagged. Quality enters first as a curated prior table,
+  later from edit-loop evals (`editLoop.ts` is already factored for them). First
+  consumer is dev-time — stored queries regenerate
+  [worker/models.json](../worker/models.json) so curation is articulated rather than
+  embedded; second is the edit loop's ordered `models: []` fallback array, where free-tier
+  rate limits make fallback real. Motivated by the 2026-08-20 free-model question the
+  repo couldn't answer.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
