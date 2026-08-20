@@ -2487,7 +2487,7 @@ export class ScenarioPage extends LitElement {
   // Tab/both exist only when the strings are KNOWN — declared by the document
   // or supplied through the instrument selector (the viewer override,
   // presentation-only). No instrument is ever assumed
-  // (roadmap/inprogress/core-derived-positions.md): a document without strings has
+  // (roadmap/complete/core-derived-positions.md): a document without strings has
   // no fingerboard until the user names one.
   private docDeclaresStrings(): boolean {
     return (this.doc?.mnxJson.parts ?? []).some(

@@ -185,26 +185,6 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
-- **[core-derived-positions.md](inprogress/core-derived-positions.md)** — the execution half of
-  [spec-instrument-position.md](proposed/spec-instrument-position.md): migrate `_x.mnxLab` to the
-  proposal's shape (v5: string authoritative, `fret` optional and non-authoritative, `fingering`
-  un-nested, `tuning[]` → `strings[]`) **and specify the derivation ladder** so unannotated
-  guitar notation still renders valid tab — lowest-playable-fret assignment, capo-aware
-  (MNX pitch is sounding, so no transposition term — `part.transposition` is display-only).
-  The pitch-only assignment is ruled **presentation, not content** — never written back, not
-  proposed as normative spec text; our renderer's determinism is owned by the
-  `lab/tab-derivation` scenario family, so heuristic changes become reviewed golden
-  demotions instead of silent drift. **All four stages executed 2026-08-07** — the v5 reshape
-  (schema, v4→v5 upgrade hop, converters, corpus, edit layer, Worker prompt), the
-  hardened derivation (tuning/capo-aware authority ladder, red mismatch/unplayable badges,
-  no silent clamp), and the ten-scenario `lab/22-tab-derivation` family pinning it, goldens
-  byte-identical throughout. **Instrument neutrality followed the same day**: the
-  assume-standard-guitar default is retired — tab requires declared `strings[]`
-  or a viewer override (`<mnx-score-viewer>` `stringsOverride`/`capoOverride`, surfaced as
-  the workbench's instrument selector with presets incl. open D/bass/uke/mandolin); the
-  shim materializes the old implicit default into saved documents. **All that remains is
-  the human `/verify` sweep** — the family sits at `status: rendered`; approval closes
-  this to `complete/`.
 - **[workbench-rung-legibility.md](inprogress/workbench-rung-legibility.md)** — knowing
   which selection rung you are in without moving your eyes. The enclosure's two channels
   (extent, fill ratio) are *relative* — read by comparison with the shape just left — and
@@ -246,6 +226,25 @@ proposals that name their campaign.
   gestures are mirrored here as data, including the container rung and explicit
   rung-first Delete meanings through section.
 ### complete/
+- **[core-derived-positions.md](complete/core-derived-positions.md)** — the execution half of
+  [spec-instrument-position.md](proposed/spec-instrument-position.md): migrate `_x.mnxLab` to the
+  proposal's shape (v5: string authoritative, `fret` optional and non-authoritative, `fingering`
+  un-nested, `tuning[]` → `strings[]`) **and specify the derivation ladder** so unannotated
+  guitar notation still renders valid tab — lowest-playable-fret assignment, capo-aware
+  (MNX pitch is sounding, so no transposition term — `part.transposition` is display-only).
+  The pitch-only assignment is ruled **presentation, not content**; the renderer's
+  determinism is owned by the `lab/tab-derivation` scenario family, so heuristic changes
+  become reviewed golden demotions instead of silent drift. **All four stages executed
+  2026-08-07** — the v5 reshape (schema, v4→v5 upgrade hop, converters, corpus, edit
+  layer, Worker prompt), the hardened derivation (tuning/capo-aware authority ladder, red
+  mismatch/unplayable badges, no silent clamp), and the ten-scenario
+  `lab/22-tab-derivation` family pinning it, goldens byte-identical throughout.
+  **Instrument neutrality followed the same day**: the assume-standard-guitar default is
+  retired — tab requires declared `strings[]` or a viewer override, surfaced as the
+  workbench's instrument selector; the shim materializes the old implicit default into
+  saved documents. **Closed 2026-08-20 by decision, without the `/verify` sweep** — the
+  family stays `rendered` and in the attention queue as never-seen; a review that finds
+  issues reopens the item.
 - **[core-viewer-embedded-app.md](complete/core-viewer-embedded-app.md)** — the **third
   app** (`apps/viewer-embedded/`), a read-only foreign host page consuming
   `dist/embed/mnx-lab.js` only — the embed contract's first real consumer, and the

@@ -14,7 +14,7 @@ import {
 } from '../../src/model/mnx.ts';
 
 /**
- * The derivation ladder of roadmap/inprogress/core-derived-positions.md, stage 3:
+ * The derivation ladder of roadmap/complete/core-derived-positions.md, stage 3:
  * string + pitch → fret is arithmetic against the part's declared strings and
  * capo (MNX pitch is SOUNDING — no transposition term); a bare note gets the
  * lowest playable fret; nothing is ever silently clamped — unplayable notes

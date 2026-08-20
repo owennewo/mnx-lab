@@ -5,7 +5,7 @@
 >
 > §2 (house-style fixes), §3 (labels), §4 (chord symbols) and §5's data path all
 > shipped as `_x.mnxLab` v3 — the extension has since evolved to **v5** (the
-> [derived-positions](../inprogress/core-derived-positions.md) reshape: string
+> [derived-positions](../complete/core-derived-positions.md) reshape: string
 > authoritative, flat note-level fields) — see
 > [docs/mnx-extensions.md](../../docs/mnx-extensions.md) for the current spec
 > and register. The `_x` namespace was corrected, enum values camelCased, bends

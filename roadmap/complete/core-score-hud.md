@@ -72,7 +72,7 @@
 > [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md), keeps the
 > viewer's prop surface small per [core-viewer-surface.md](core-viewer-surface.md),
 > and owns the **per-part strings/capo override** gap left open by
-> [core-derived-positions.md](../inprogress/core-derived-positions.md)'s instrument-neutrality work.
+> [core-derived-positions.md](../complete/core-derived-positions.md)'s instrument-neutrality work.
 
 ## The problem, twice over
 

@@ -51,7 +51,7 @@ export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
 /**
  * Documents written while "absent strings[] ⇒ standard guitar" was the
  * documented default relied on it implicitly. That default is retracted
- * (roadmap/inprogress/core-derived-positions.md: no consumer assumes an instrument),
+ * (roadmap/complete/core-derived-positions.md: no consumer assumes an instrument),
  * so the shim stamps the previously-implicit declaration ONCE into any part
  * that carries tab-ish data (a tab view ask, a capo, or note strings) without
  * declaring its strings — no saved document loses meaning, and no new

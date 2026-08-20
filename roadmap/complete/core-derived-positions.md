@@ -1,5 +1,15 @@
 # Derived positions — the extension adopts its own proposal
 
+> **Status: CLOSED 2026-08-20.** All four stages executed 2026-08-07
+> (instrument neutrality the same day). Closed **by decision, without the
+> `/verify` sweep**: the ten-scenario `lab/22-tab-derivation` family sits at
+> `status: rendered`, so the scenarios remain in the attention queue as
+> never-seen — the queue owns that follow-up, and a review that finds issues
+> reopens this item. No verification record was written by hand; approval
+> still arrives only through `/verify`.
+>
+> The header below is the in-execution record as it stood:
+>
 > **Status: in execution (2026-08-07). Stages 2 and 3 are built.** Stage 2 —
 > the v5 reshape: schema, the v4→v5 upgrade hop, both converters, the corpus
 > scores, the edit layer and the Worker prompt all speak the flat shape.

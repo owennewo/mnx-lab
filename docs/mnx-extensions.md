@@ -113,7 +113,7 @@ nothing to verify an implementation against.
   string; fret numbers are relative to the capo. It requires `string` (a bare
   fret is meaningless). Both converters keep writing it, because MusicXML and
   Guitar Pro both store both. See
-  [roadmap/inprogress/core-derived-positions.md](../roadmap/inprogress/core-derived-positions.md).
+  [roadmap/complete/core-derived-positions.md](../roadmap/complete/core-derived-positions.md).
 - A chord must not assign two of its notes the same `string`.
 - Rests never carry a fingerboard annotation.
 
@@ -354,7 +354,7 @@ Cloudflare Workers cannot run `ajv.compile()`.
   general articulations proposal) and `staffKind` (adopted home undecided)
   remain under `tab`. Load-time migration is the v4 → v5 hop in
   `upgradeTabExtension.ts`; execution plan in
-  [roadmap/inprogress/core-derived-positions.md](../roadmap/inprogress/core-derived-positions.md).
+  [roadmap/complete/core-derived-positions.md](../roadmap/complete/core-derived-positions.md).
 - **v4** (2026-07-29): `rehearsal` and `section` graduated out of `_x` into the
   standard MNX objects proposed in
   [roadmap/proposed/spec-score-text.md](../roadmap/proposed/spec-score-text.md); the vendor

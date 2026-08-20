@@ -137,7 +137,7 @@ function fmtRange(lowMidi: number, highMidi: number): string {
  *     plays), TuxGuitar and this renderer draw them on top of each other.
  *
  * Since v5 the string is authoritative and the fret is DERIVED (string + pitch
- * + tuning + capo — roadmap/inprogress/core-derived-positions.md), so this pass also
+ * + tuning + capo — roadmap/complete/core-derived-positions.md), so this pass also
  * checks the derivation itself:
  *
  *   - an annotated string the part never declared     → error

@@ -401,7 +401,7 @@ If the derivation thesis survives CG contact, the migration is to keep `fret` as
 optional non-authoritative field (its validation role) rather than to delete it — the
 converters keep working, and documents stay readable. Recorded here so the divergence
 is a decision rather than a drift. **That migration is now planned** — without waiting
-for the CG — in [core-derived-positions.md](../inprogress/core-derived-positions.md), which also specifies the
+for the CG — in [core-derived-positions.md](../complete/core-derived-positions.md), which also specifies the
 no-annotation fallback (derive string *and* fret from pitch alone, default tuning) as
 renderer presentation rather than spec text.
 

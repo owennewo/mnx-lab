@@ -366,7 +366,7 @@ literal, parallel to `tempos`) is the global-measure vendor block. Schema:
 [docs/mnx-extensions.md](docs/mnx-extensions.md). Blocks are shaped like the standard
 objects they draft (camelCase, `rhythmic-position`, note-id references) so adoption
 deletes the wrapper — see roadmap/proposed/spec-instrument-position.md and
-roadmap/inprogress/core-derived-positions.md.
+roadmap/complete/core-derived-positions.md.
 Extend `_x.mnxLab` and its schema — never standard MNX fields.
 Saved documents upgrade v1→v2→v3→v4→v5 on load via `src/model/upgradeTabExtension.ts`.
 
