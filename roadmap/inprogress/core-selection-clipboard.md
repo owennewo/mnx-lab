@@ -72,6 +72,18 @@ range and live closure resolve to ordered model members.
 > the real actions and asserts the strokes resolve as shell actions while no
 > keymap layer claims them as intents; the keymap-docs joins force the
 > documentation rows. **Next: stage 7, hands-on cross-score review.**
+>
+> **2026-08-20, from the first hands-on pass:** two review verdicts became
+> proposals. The note-rung range proved confusing and valueless — retired by
+> [core-selection-floor-axis.md](../proposed/core-selection-floor-axis.md)
+> (a note selection becomes exactly one notehead; horizontal gestures
+> re-level to the event rung). And **Contract 3 below is superseded** by
+> [core-paste-lands.md](../proposed/core-paste-lands.md): a decodable clip
+> always lands — footprint overwrite, rest fill, timeline/part extension,
+> land-and-flag via the renderer's diagnostics — with undo as the license,
+> as it already is for cut. Contract 3 stays in this doc as the record of
+> what stages 3–6 built and verified; the refusal matrix it pinned becomes
+> the accommodation-record matrix when that proposal lands.
 
 ## The boundary
 

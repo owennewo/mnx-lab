@@ -59,6 +59,25 @@ proposals that name their campaign.
   voice that underfills on every render. Corpus cost is nil (the key grammar already
   spells part and staff, silent for 0 and 1). Acceptance: a construct trace for
   `spec/multiple-voices` and `spec/tie-targets`.
+- **[core-selection-floor-axis.md](proposed/core-selection-floor-axis.md)** — **decided**
+  2026-08-20 out of the clipboard review: the note-rung *range* is retired because it
+  proved valueless and confusing (pixel-identical to an event range, invisibly
+  rhythm-free). The principle: below the event rung there is no temporal extent, so the
+  gesture's axis picks the rung at the ladder's floor — horizontal gestures (Shift+←/→,
+  Shift+End, Ctrl/⌘+A) re-level to the event rung, ↑/↓ at event descends to the
+  notehead. Invariant: **a note selection is always exactly one notehead.** Names its
+  one cost (event-level voice jump moves to two keys) and rejects deleting the note
+  rung structurally.
+- **[core-paste-lands.md](proposed/core-paste-lands.md)** — **a decodable clip always
+  lands**; undo is the license, as it was for cut. Supersedes the conservative
+  Contract 3 of the clipboard item: paste becomes a write with a well-defined
+  footprint — the selection contributes only an anchor, paste overwrites exactly its
+  footprint, partially covered units are consumed with rests filling the remainder
+  (Cut's own spelling), and the document extends (bars, even parts) rather than clips.
+  Metric/fingerboard conflicts land and are **flagged by the forgiving renderer's
+  diagnostics** instead of refused; refusal codes become accommodation records and the
+  stage-6 notice reports what the paste did. Seven named decisions (D1–D7) capture the
+  contentious forks. Depends on core-selection-floor-axis.md.
 - **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
   `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
   (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
