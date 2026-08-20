@@ -2,7 +2,7 @@
 
 Serves the **implementation loop**. Proposed 2026-08-20, from the same
 clipboard review that produced
-[core-selection-floor-axis.md](core-selection-floor-axis.md) — build that
+[core-selection-floor-axis.md](../complete/core-selection-floor-axis.md) — build that
 first: with note ranges gone, the note-set cases below collapse to single-
 notehead rules, which is what keeps this matrix tractable.
 

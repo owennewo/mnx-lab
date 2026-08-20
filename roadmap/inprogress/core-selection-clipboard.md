@@ -75,7 +75,7 @@ range and live closure resolve to ordered model members.
 >
 > **2026-08-20, from the first hands-on pass:** two review verdicts became
 > proposals. The note-rung range proved confusing and valueless — retired by
-> [core-selection-floor-axis.md](../proposed/core-selection-floor-axis.md)
+> [core-selection-floor-axis.md](../complete/core-selection-floor-axis.md)
 > (a note selection becomes exactly one notehead; horizontal gestures
 > re-level to the event rung). And **Contract 3 below is superseded** by
 > [core-paste-lands.md](../proposed/core-paste-lands.md): a decodable clip
