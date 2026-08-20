@@ -430,11 +430,17 @@ export function drawEnclosure(
   svg.querySelector(`:scope > g.${layer}`)?.remove();
 
   const sp = unitsPerSp(svg);
+  // The cell is a position mark on the notehead itself; the run hugs the
+  // voice's MELODIC CONTOUR (workbench-rung-legibility.md) — both read
+  // noteheads/frets only, so a stem or beam (which carries the event-level
+  // `.selected` class) cannot inflate them. Wider rungs take all their ink.
   let glyphs = options.noteIds
     ? previewGlyphs(svg, kind, options.noteIds)
     : [
         ...svg.querySelectorAll<SVGGraphicsElement>(
-          kind === 'cell' ? '.notehead.selected, .fret-number.selected' : '.selected'
+          kind === 'cell' || kind === 'run'
+            ? '.notehead.selected, .fret-number.selected'
+            : '.selected'
         )
       ];
   // Container artifacts do not carry note ids of their own. Once the member
@@ -604,12 +610,15 @@ export function drawEnclosure(
               );
               ranges.push({ left: x - 0.4 * sp, right: x + 0.4 * sp });
             }
-          } else if (kind === 'run') {
+          } else if (kind === 'run' || kind === 'panel') {
+            // The extent ladder's horizontal axis (workbench-rung-legibility.md):
+            // run and panel both own their MUSIC's span, not the bar cell —
+            // only panel-wide (the bar) claims the full cell, furniture and
+            // all. An empty copy has nothing to hug: a visible inset band,
+            // so it cannot be mistaken for the bar's own ownership.
             if (cellBoxes.length > 0) {
               for (const box of cellBoxes) ranges.push({ left: box.x, right: box.x + box.w });
             } else {
-              // Empty voice-measure: a visible run through the bar, inset so
-              // it cannot be mistaken for the part/global bar ownership.
               ranges.push({ left: cell.left + 0.7 * sp, right: cell.right - 0.7 * sp });
             }
           } else {
@@ -649,10 +658,13 @@ export function drawEnclosure(
           : -Infinity;
         const top = Math.min(...vertical.map(staff => staff.top), topInk) - 0.4 * sp;
         const bottom = Math.max(...vertical.map(staff => staff.bottom), bottomInk) + 0.4 * sp;
+        // Horizontal: the ink's own span (horizontalRange already returned
+        // glyph extents), padded OUTWARD — the part-bar owns its music, and
+        // the visible gap to the barlines is what separates it from the bar.
         rowRect(
-          range.left + 0.25 * sp,
+          range.left - 0.4 * sp,
           top,
-          Math.max(0.2 * sp, range.right - range.left - 0.5 * sp),
+          range.right - range.left + 0.8 * sp,
           bottom - top,
           0.4 * sp,
           0.07 * sp
@@ -679,21 +691,34 @@ export function drawEnclosure(
           );
           continue;
         }
-        const top = (kind === 'cell' || kind === 'lasso') && selectedBox
-          ? selectedBox.y - 0.5 * sp
-          : Math.min(staff.top - (kind === 'slice' ? 1.5 : 1) * sp, selectedBox?.y ?? Infinity);
-        const bottom = (kind === 'cell' || kind === 'lasso') && selectedBox
-          ? selectedBox.y + selectedBox.h + 0.5 * sp
-          : Math.max(
-              staff.bottom + (kind === 'slice' ? 1.5 : 1) * sp,
-              selectedBox ? selectedBox.y + selectedBox.h : -Infinity
-            );
+        // Vertical: cell/lasso/run hug their ink — run has NO staff-band
+        // floor, so the hull follows the melodic contour (the axis trade the
+        // rung-legibility doc records: a moment is tall, a run is long). A
+        // run over rest-only/empty copies has nothing to hug: a slim
+        // mid-staff band, the honest "this voice, nothing in it" shape.
+        const hugsInk = kind === 'cell' || kind === 'lasso' || kind === 'run';
+        let top: number;
+        let bottom: number;
+        if (hugsInk && selectedBox) {
+          top = selectedBox.y - 0.5 * sp;
+          bottom = selectedBox.y + selectedBox.h + 0.5 * sp;
+        } else if (kind === 'run') {
+          const mid = (staff.top + staff.bottom) / 2;
+          top = mid - 1.2 * sp;
+          bottom = mid + 1.2 * sp;
+        } else {
+          top = Math.min(staff.top - (kind === 'slice' ? 1.5 : 1) * sp, selectedBox?.y ?? Infinity);
+          bottom = Math.max(
+            staff.bottom + (kind === 'slice' ? 1.5 : 1) * sp,
+            selectedBox ? selectedBox.y + selectedBox.h : -Infinity
+          );
+        }
         rowRect(
           range.left - 0.4 * sp,
           top,
           range.right - range.left + 0.8 * sp,
           bottom - top,
-          kind === 'cell' ? 0.3 * sp : 0.5 * sp,
+          kind === 'cell' ? 0.3 * sp : kind === 'run' ? 0.8 * sp : 0.5 * sp,
           kind === 'cell' ? 0.12 * sp : 0.1 * sp,
           projectionOfStaff(staffIndex)
         );
@@ -763,22 +788,22 @@ export function drawEnclosure(
       break;
     }
     case 'run': {
-      // ONE hull around the voice's run of events, first to last — a single
-      // shape per staff, chosen over per-event beads so the future
+      // ONE hull around the voice's run of NOTEHEADS, first to last — a
+      // single shape per staff, chosen over per-event beads so the
       // relax/tighten tween morphs one object (design revision 2026-08-09;
       // the cost, accepted: in interleaved two-voice writing the hull can
-      // contain the other voice's ink).
+      // contain the other voice's ink). Revised 2026-08-20
+      // (workbench-rung-legibility.md): the hull hugs the melodic contour —
+      // noteheads only (filtered above), no staff-band floor — which is what
+      // separates the voice from the part-bar's staff-height band.
       for (const [i, staffBoxes] of byStaff) {
-        const staff = staves[i];
         const u = union(staffBoxes);
-        const top = Math.min(staff.top - sp, u.y - 0.5 * sp);
-        const bottom = Math.max(staff.bottom + sp, u.y + u.h + 0.5 * sp);
         rect(
           u.x - 0.4 * sp,
-          top,
+          u.y - 0.5 * sp,
           u.w + 0.8 * sp,
-          bottom - top,
-          0.5 * sp,
+          u.h + sp,
+          0.8 * sp,
           0.1 * sp,
           projectionOfStaff(i)
         );
@@ -787,14 +812,17 @@ export function drawEnclosure(
     }
     case 'panel':
     case 'panel-wide': {
-      // A filled band, barline to barline, over each SYSTEM holding selected
-      // ink. The two rungs split on a principle: 'panel' (part-measure) owns
-      // the staff's INK — the staff band plus any ledger notes, nothing of
-      // the space around it, drawn INSIDE the barlines so all four of its
-      // sides read as its own; 'panel-wide' (measure) owns the SPACE — the
+      // A filled band over each SYSTEM holding selected ink. The two rungs
+      // split on the extent ladder (workbench-rung-legibility.md): 'panel'
+      // (part-measure) owns its MUSIC — the ink's own horizontal span
+      // (first glyph to last, leaving the clef/meter gap and trailing
+      // justification space visibly unclaimed) over the staff band plus any
+      // ledger notes; 'panel-wide' (measure) is the first rung allowed the
+      // whole CELL — barline to barline and THROUGH the barlines, and the
       // system's whole vertical slot (to the midpoint of the neighbouring
-      // system, or the page crop edge) and THROUGH the barlines, clamped
-      // just inside the viewBox so no side is ever clipped away.
+      // system, or the page crop edge — the slot covers the strip where the
+      // bar's own tempo/rehearsal marks sit), clamped just inside the
+      // viewBox so no side is ever clipped away.
       const vb = svg.viewBox.baseVal;
       const systemBands = [...new Set(staves.map(s => s.system))]
         .map(id => {
@@ -825,12 +853,12 @@ export function drawEnclosure(
       for (const [sys, sysBoxes] of bySystem) {
         const band = systemBands.find(b => b.id === sys)!;
         const u = union(sysBoxes);
-        const { left, right } = snapToBarlines(band, barlines, u.x, u.x + u.w);
         if (kind === 'panel') {
           const top = Math.min(band.top, u.y - 0.5 * sp) - 0.4 * sp;
           const bottom = Math.max(band.bottom, u.y + u.h + 0.5 * sp) + 0.4 * sp;
-          rect(left + 0.25 * sp, top, right - left - 0.5 * sp, bottom - top, 0.4 * sp, 0.07 * sp);
+          rect(u.x - 0.4 * sp, top, u.w + 0.8 * sp, bottom - top, 0.4 * sp, 0.07 * sp);
         } else {
+          const { left, right } = snapToBarlines(band, barlines, u.x, u.x + u.w);
           const slot = slotOf(band);
           const x0 = Math.max(left - 0.35 * sp, vb.x + 0.3 * sp);
           const x1 = Math.min(right + 0.35 * sp, vb.x + vb.width - 0.3 * sp);
@@ -869,8 +897,9 @@ function previewGlyphs(
   return [...svg.querySelectorAll<SVGGraphicsElement>('[data-source-id]')].filter(el => {
     if (!wanted.has(el.getAttribute('data-source-id') ?? '')) return false;
     // Mirrors the `.selected` selector's split: a cell is a position mark on
-    // the notehead itself, wider rungs take whatever ink they cover.
-    return kind !== 'cell'
+    // the notehead itself, a run hugs the noteheads' contour, wider rungs
+    // take whatever ink they cover.
+    return kind !== 'cell' && kind !== 'run'
       ? true
       : el.classList.contains('notehead') || el.classList.contains('fret-number');
   });

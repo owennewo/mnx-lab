@@ -212,12 +212,15 @@ proposals that name their campaign.
   which selection rung you are in without moving your eyes. The enclosure's two channels
   (extent, fill ratio) are *relative* — read by comparison with the shape just left — and
   they degenerate exactly at the confusable trio (voice/part-bar/bar in single-voice,
-  single-part documents). **Phase 1 built 2026-08-20:** the rung chip the ladder doc
-  promised, planted at the selection anchor in the HUD's own `ROW_BY_LEVEL` vocabulary —
-  full strength on a rung change, settling to a whisper. Phase 2 (open): sharpen the three
-  degenerate geometries — capsule hull vs sharp panel, barline ownership at the measure
-  rung, a guaranteed panel-wide margin. Colour ladders, border styles and whole-page scope
-  dimming considered and rejected (reasons in the doc).
+  single-part documents). **Both phases built 2026-08-20.** Phase 1: the rung chip the
+  ladder doc promised, in the HUD's own `ROW_BY_LEVEL` vocabulary — revised same day into
+  the tray's collapsed handle (below the selection, click = `/`, flips by the tray's own
+  room test). Phase 2: the **extent ladder on both axes** — the voice hull hugs the
+  notehead contour (no staff-band floor), the part-bar owns its music's span, and the bar
+  becomes the first full-width rung; vertical monotonicity deliberately traded at
+  event→voice (*a moment is tall, a run is long*). Remaining: bar vs section. Colour
+  ladders, border styles and whole-page scope dimming considered and rejected (reasons in
+  the doc).
 - **[core-selection-clipboard.md](inprogress/core-selection-clipboard.md)** — typed
   copy, cut and paste over every selection rung, range and closure. **Stage 1 built
   2026-08-16:** the versioned DOM-free clip union and strict JSON codec, the

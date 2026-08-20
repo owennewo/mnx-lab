@@ -233,6 +233,16 @@
 > acts. Polarity (up widens) matches Helix's expand/shrink and is pinned in
 > `keymap-docs.test.ts`.
 >
+> **Enclosure geometry revised 2026-08-20** by
+> [workbench-rung-legibility.md](../inprogress/workbench-rung-legibility.md):
+> the run/panel/panel-wide shapes described below are superseded by the
+> **extent ladder on both axes** — the voice hull hugs the notehead contour
+> (no staff-band floor), the part-bar panel owns its music's horizontal span
+> rather than the bar cell, and the bar is the first full-width rung. That
+> doc also planted the level chip this one promised, as the tray's collapsed
+> handle. The vocabulary's principles (one shape family, geometry over
+> styling, fill fades as the level widens) stand.
+>
 > **The selection ladder is complete.** Its orthogonal entry-mode axis —
 > advance mode, stage-1 digit resolution and letter accelerators — graduated
 > on 2026-08-16 to

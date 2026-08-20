@@ -867,8 +867,11 @@ export class ScenarioPage extends LitElement {
       /* The rung chip (roadmap/inprogress/workbench-rung-legibility.md): the
          selection's level named at the selection itself, in the clipboard
          notice's visual voice. Full strength while fresh (the rung just
-         changed), then a whisper — a settled screen stays quiet. Read-only
-         chrome: it must never take the pointer from the paper. */
+         changed), then a whisper — a settled screen stays quiet. It sits
+         below the selection, where the tray opens, because it IS the tray's
+         collapsed handle: clicking it is the slash key. The one interactive
+         exception to "chrome never takes the pointer" — only over its own
+         small box. */
       .rung-chip {
         position: absolute;
         padding: 0 7px;
@@ -876,20 +879,23 @@ export class ScenarioPage extends LitElement {
         background: var(--surface);
         color: var(--ink);
         font: 11px/1.7 var(--mono);
-        pointer-events: none;
+        cursor: pointer;
         z-index: 2;
         opacity: 0.4;
         transition: opacity 260ms ease;
       }
 
-      .rung-chip.fresh {
-        opacity: 1;
-      }
-
       /* Keyboard elsewhere: follow the enclosure's own inactive fade — the
-         chip reads "where you were", not "where your next keystroke lands". */
+         chip reads "where you were", not "where your next keystroke lands".
+         Hover/focus outranks it below: the chip is still a door to the tray. */
       .rung-chip.inactive {
         opacity: 0.15;
+      }
+
+      .rung-chip.fresh,
+      .rung-chip:hover,
+      .rung-chip:focus-visible {
+        opacity: 1;
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -1883,6 +1889,11 @@ export class ScenarioPage extends LitElement {
   private onTrayIntent = (event: Event) => {
     if (!this.session || !this.hasKeyboard || this.loadState !== 'ready') return;
     event.preventDefault();
+    this.openTray();
+  };
+
+  /** One door for `/` and the rung chip's click — the chip IS the `/` key. */
+  private openTray() {
     // The tray offers a DIALECT — `S` slurs in notation and slides in tab —
     // so it must follow the pane exactly as the keys do. Without this the
     // projection keeps whatever it defaulted to (tab, on a string document)
@@ -1892,9 +1903,10 @@ export class ScenarioPage extends LitElement {
     this.trayTab = null;
     this.traySearch = '';
     this.syncFromSession();
-  };
+  }
 
   /** The viewer's enclosure rect (viewport coords) → `.main` coords. */
+  private mainHeight = 0;
   private onSelectionAnchored = (event: Event) => {
     const rect = (event as CustomEvent<{ rect: DOMRect | null }>).detail.rect;
     const main = this.renderRoot.querySelector('.main');
@@ -1903,6 +1915,7 @@ export class ScenarioPage extends LitElement {
       return;
     }
     const box = main.getBoundingClientRect();
+    this.mainHeight = box.height;
     this.trayAnchor = {
       x: rect.left - box.left,
       y: rect.top - box.top,
@@ -1919,28 +1932,39 @@ export class ScenarioPage extends LitElement {
 
   /**
    * The rung chip (workbench-rung-legibility.md): the selection's level named
-   * at the gaze point, planted on the tray anchor's top-left corner (the
-   * anchor already follows every render and scroll) and flipping inside the
-   * anchor when the system sits at the pane's top edge. The word is
-   * ROW_BY_LEVEL's — the HUD's own vocabulary, so the two cannot disagree.
-   * Hidden while the tray is open: the tray already names the rung. With no
-   * anchor (deselected, or nothing rendered) there is nothing to plant on.
+   * at the gaze point, and the tray's COLLAPSED HANDLE — it sits below the
+   * selection's left edge, exactly where the tray opens, and clicking it is
+   * the `/` key. It flips above by the tray's own room-below test (a
+   * conservative height estimate; the tray measures itself live, so the two
+   * can disagree only in a band a few pixels tall) so the chip is always on
+   * the side the tray has space to expand. The word is ROW_BY_LEVEL's — the
+   * HUD's own vocabulary, so the two cannot disagree. Hidden while the tray
+   * is open: the chip has expanded into it. With no anchor (deselected, or
+   * nothing rendered) there is nothing to plant on.
    */
   private rungChip() {
     if (!this.chipLevel || !this.trayAnchor || this.trayOpen) return nothing;
     const gap = 5;
-    const flip = this.trayAnchor.y < 30;
-    const top = flip ? this.trayAnchor.y + gap : this.trayAnchor.y - gap;
+    const trayEstimate = 230; // SHAFT_H + the tray's own 200px fallback
+    const anchor = this.trayAnchor;
+    const below = anchor.y + anchor.height + gap;
+    const flip =
+      this.mainHeight > 0 &&
+      below + trayEstimate > this.mainHeight &&
+      anchor.y - trayEstimate > 0;
+    const top = flip ? anchor.y - gap : below;
     const cls = `rung-chip${this.chipFresh ? ' fresh' : ''}${this.hasKeyboard ? '' : ' inactive'}`;
-    return html`<div
+    return html`<button
       class=${cls}
-      style="left:${Math.max(6, this.trayAnchor.x)}px;top:${Math.max(2, top)}px;${flip
-        ? ''
-        : 'transform:translateY(-100%);'}"
-      role="status"
+      style="left:${Math.max(6, anchor.x)}px;top:${Math.max(2, top)}px;${flip
+        ? 'transform:translateY(-100%);'
+        : ''}"
+      title="selection commands (/)"
+      aria-live="polite"
+      @click=${() => this.openTray()}
     >
       ${ROW_BY_LEVEL[this.chipLevel]}
-    </div>`;
+    </button>`;
   }
 
   /**
