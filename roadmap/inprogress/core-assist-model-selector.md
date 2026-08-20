@@ -157,7 +157,7 @@ mockup does:
 - **The two-shell claim triggers the promotion rule.** Anything two shells want
   is first promoted into `elements/` or below — a deliberate, reviewed move,
   and the picker lands on the same open boundary question
-  [core-editor-ai-prompt.md](core-editor-ai-prompt.md) already carries for the
+  [core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md) already carries for the
   palette: `elements/` may not import `assist/` today. The scoring core being
   pure and DOM-free is what keeps every resolution of that question cheap; the
   dialog is the only Lit in the story. Incubating the dialog in `workbench/`
@@ -187,3 +187,37 @@ mockup does:
   the reviewed default; localStorage holds only a per-browser preference.
 - **Other aggregators.** OpenRouter is already the provider abstraction;
   teaching the module a second catalog shape buys nothing today.
+
+## Built so far (2026-08-20)
+
+The picker surface and the scoring core landed together, incubating in the
+shell as planned:
+
+- **`src/assist/modelSelect.ts`** — the pure core as specified: requirement-
+  normalized log2 headroom, weighted sum, unknown-passes-flagged, deterministic
+  tie-break. The contract is pinned by
+  `harness/conformance/model-select.test.ts`, including the dominance invariant
+  under multiple weightings and the motivating free-model query against the
+  committed snapshot.
+- **`src/assist/modelCatalog.ts` + `modelCatalog.snapshot.json`** — 413
+  assessable models (router pseudo-models price as −1, "depends on the routed
+  model", and are excluded at the adapter edge, both live and in the snapshot
+  generator); the curated prior table covers 17 model families, matched with
+  `:variant` suffixes stripped so a `:free` endpoint inherits its family's
+  prior.
+- **The workbench assist tab** — sixth panel tab on the scenario page: context
+  bar carries the current model and the switch-model CTA, the body is an honest
+  placeholder (the chat surface belongs to
+  [core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md)), the footer
+  input is disabled and says so. `PANEL_MIN` moved 360 → 410 because the width
+  floor and the tab set are one decision. `<mnx-model-picker>` follows the
+  command palette's modal idiom; its keydown handler stops propagation so the
+  page's window-scoped keymap never sees a dialog keystroke.
+- **Persistence** — `mnx-lab.assist-model` and `mnx-lab.assist-query` in
+  localStorage, presentation-tier as decided. Verified hands-on in headless
+  Chrome over CDP: open tab → open dialog → slide to free-only → pick →
+  header updates and both keys persist.
+
+Remaining: the dev-time roster regeneration script, the `models: []` fallback
+array (blocked on the chat/edit wiring), quality from edit-loop evals
+replacing the prior table, and the `elements/` promotion when studio arrives.

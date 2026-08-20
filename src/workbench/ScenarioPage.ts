@@ -91,6 +91,8 @@ import '../elements/ScoreViewer.ts';
 import './SelectionTray.ts';
 import './ZoomPad.ts';
 import type { ZoomPadChange } from './ZoomPad.ts';
+import './ModelPickerDialog.ts';
+import { modelDisplayName } from '../assist/modelCatalog.ts';
 import {
   MIN_STAFF_SCALE,
   MAX_STAFF_SCALE,
@@ -197,7 +199,7 @@ import './ScoreHud.ts';
  *  scattered chrome — description, badges/defs, the edit strip, the op
  *  queue (core-element-ops-exemplar.md), the HUD, the spec reference, the
  *  raw JSON — consolidated into one rail. */
-type PanelTab = 'description' | 'ops' | 'hud' | 'compare' | 'json';
+type PanelTab = 'description' | 'ops' | 'hud' | 'assist' | 'compare' | 'json';
 
 /** One part's override state — the HUD ensemble table's currency. */
 interface PartOverride {
@@ -215,9 +217,17 @@ const PANEL_WIDTH_KEY = 'mnx-lab.panel-width';
 /** Folded or not — SEPARATE from the width, so unfolding restores the width
  *  that was dragged rather than a default (mirrors `mnx-lab.rail-hidden`). */
 const PANEL_HIDDEN_KEY = 'mnx-lab.panel-hidden';
-const PANEL_MIN = 360;
+/** The floor and the tab set are one decision (the seven-to-five cut set 360
+ *  for five tabs); the assist tab is the sixth, so the floor moves with it. */
+const PANEL_MIN = 410;
 const PANEL_MAX = 560;
 const PANEL_DEFAULT = 420;
+
+/** The assistant's model choice — per-browser preference, like the theme; the
+ *  committed roster (worker/models.json) stays the reviewed default. The
+ *  fallback id mirrors that roster's first row. */
+const ASSIST_MODEL_KEY = 'mnx-lab.assist-model';
+const DEFAULT_ASSIST_MODEL = 'deepseek/deepseek-v4-flash';
 
 /* The zoom pad's two axes (core-zoom-density-pad.md). localStorage, not the
    document store: how big you like the staff is a property of you, not of the
@@ -435,6 +445,11 @@ export class ScenarioPage extends LitElement {
    *  (Named to dodge the DOM's built-in HTMLElement.popover property.) */
   @state() private setupPopover: PopoverKind | null = null;
   @state() private setupPopoverError = '';
+  /** The assist tab's model choice and its query dialog
+   *  (core-assist-model-selector.md's picker surface). */
+  @state() private assistModel: string =
+    localStorage.getItem(ASSIST_MODEL_KEY) ?? DEFAULT_ASSIST_MODEL;
+  @state() private modelPickerOpen = false;
   /** Esc hides the cursor highlight until the next intent (review sense-0). */
   private cursorHidden = false;
 
@@ -1045,6 +1060,10 @@ export class ScenarioPage extends LitElement {
         overflow-y: auto;
         min-height: 0;
         padding: 12px 14px;
+      }
+
+      .assist-dim {
+        color: var(--ink-3);
       }
 
       /* The hud tab's footer inverts: the one deliberately dark band in a
@@ -2706,6 +2725,13 @@ export class ScenarioPage extends LitElement {
             : nothing}
           ${this.trayOpen && this.session ? this.trayOverlay(entry) : nothing}
           ${this.setupPopoverOverlay()}
+          ${this.modelPickerOpen
+            ? html`<mnx-model-picker
+                .currentModel=${this.assistModel}
+                @picker-close=${() => (this.modelPickerOpen = false)}
+                @model-pick=${this.onModelPick}
+              ></mnx-model-picker>`
+            : nothing}
           ${this.clipboardNotice
             ? html`<div
                 class="clipboard-notice${this.clipboardNotice.ok ? '' : ' refused'}"
@@ -2728,7 +2754,7 @@ export class ScenarioPage extends LitElement {
   private panelTabs(): PanelTab[] {
     const tabs: PanelTab[] = ['description'];
     if (this.session) tabs.push('ops', 'hud');
-    tabs.push('compare', 'json');
+    tabs.push('assist', 'compare', 'json');
     return tabs;
   }
 
@@ -2774,11 +2800,55 @@ export class ScenarioPage extends LitElement {
             ? this.panelOps()
             : tab === 'hud'
               ? this.hud(entry)
-              : tab === 'compare'
-                ? this.panelCompare(entry)
-                : this.panelJson()}
+              : tab === 'assist'
+                ? this.panelAssist()
+                : tab === 'compare'
+                  ? this.panelCompare(entry)
+                  : this.panelJson()}
       </aside>
     `;
+  }
+
+  /** The assist tab — the picker surface of core-assist-model-selector.md,
+   *  incubating in the shell ahead of the chat it will front (the prompt
+   *  surface belongs to core-editor-ai-prompt.md; until that lands the body
+   *  is an honest placeholder and the footer input says so). The context bar
+   *  is the CTA: the current model, and the switch that opens the query
+   *  dialog. */
+  private panelAssist() {
+    return this.panelFrame({
+      context: html`<span class="ctx-name">assistant</span>
+        <span class="ctx-dim" title=${this.assistModel}
+          >${modelDisplayName(this.assistModel)}</span
+        >
+        <span class="ctx-actions">
+          <button @click=${() => (this.modelPickerOpen = true)}>switch model</button>
+        </span>`,
+      body: html`
+        <h1>Assistant</h1>
+        <p>
+          Nothing here talks yet — the chat surface lands with the AI-prompt
+          roadmap item. This tab exists so the model choice has a home in the
+          shell.
+        </p>
+        <p class="assist-dim">
+          Edits will stream through the assist layer using the model named
+          above. Switch it any time; the choice and the query criteria are
+          remembered in this browser only.
+        </p>
+      `,
+      footer: html`<span class="prompt">&gt;</span>
+        <input class="tagfilter" disabled placeholder="chat is not implemented yet" />`
+    });
+  }
+
+  private onModelPick(event: CustomEvent<{ id: string }>) {
+    this.assistModel = event.detail.id;
+    try {
+      localStorage.setItem(ASSIST_MODEL_KEY, this.assistModel);
+    } catch {
+      /* private mode — the choice just doesn't persist */
+    }
   }
 
   /** Description, with TAGS FOLDED IN below a rule — the design's seven-to-five

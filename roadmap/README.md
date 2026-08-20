@@ -127,30 +127,6 @@ proposals that name their campaign.
   [core-editor-input-layer.md](complete/core-editor-input-layer.md); absorbed the
   **voice stage** (two-stage transcribe-review-submit, Worker-side transcription) from
   the retired [core-open-router.md](superseded/core-open-router.md) on 2026-08-20.
-- **[core-assist-model-selector.md](proposed/core-assist-model-selector.md)** — **the model
-  roster as a query, not a list**: a pure assessment/selection module that takes a
-  requirements definition (hard filters — tool support, context floor, price ceiling,
-  free-only — plus weighted soft preferences) and returns an ordered list of matching
-  OpenRouter models. The ordering is the interesting half: per-dimension *headroom over
-  the requirement* (`log(actual/required)`, so exactly-meeting scores 0), weighted sum,
-  with Pareto dominance as the pinned test invariant and unknown dimensions scoring as
-  "requirement exactly met", flagged. Effective price is a **workload blend** computed by
-  the module — the catalog is per-meter only (prompt/completion/cache), so the
-  requirements profile declares the expected token mix and the blend is its dot product
-  with the model's meters. Quality enters first as a curated prior table,
-  later from edit-loop evals (`editLoop.ts` is already factored for them). First
-  consumer is dev-time — stored queries regenerate
-  [worker/models.json](../worker/models.json) so curation is articulated rather than
-  embedded; second is the edit loop's ordered `models: []` fallback array, where free-tier
-  rate limits make fallback real; third is the **picker surface** both shells want — the
-  assist surface heads with the current model, and switching opens a query dialog whose
-  criteria widgets (effective-price slider, min tokens/sec, min intelligence index) are
-  the requirements definition wearing controls, returning top-n with the best
-  pre-selected. Choice and query params persist in localStorage (presentation, like the
-  theme — the committed roster stays the reviewed default), and the two-shell claim
-  routes the dialog through the promotion rule onto the `elements → assist` boundary
-  question core-editor-ai-prompt already carries. Motivated by the 2026-08-20 free-model
-  question the repo couldn't answer.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -216,6 +192,37 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
+- **[core-assist-model-selector.md](inprogress/core-assist-model-selector.md)** — **the model
+  roster as a query, not a list**: a pure assessment/selection module that takes a
+  requirements definition (hard filters — tool support, context floor, price ceiling,
+  free-only — plus weighted soft preferences) and returns an ordered list of matching
+  OpenRouter models. The ordering is the interesting half: per-dimension *headroom over
+  the requirement* (`log(actual/required)`, so exactly-meeting scores 0), weighted sum,
+  with Pareto dominance as the pinned test invariant and unknown dimensions scoring as
+  "requirement exactly met", flagged. Effective price is a **workload blend** computed by
+  the module — the catalog is per-meter only (prompt/completion/cache), so the
+  requirements profile declares the expected token mix and the blend is its dot product
+  with the model's meters. Quality enters first as a curated prior table,
+  later from edit-loop evals (`editLoop.ts` is already factored for them). First
+  consumer is dev-time — stored queries regenerate
+  [worker/models.json](../worker/models.json) so curation is articulated rather than
+  embedded; second is the edit loop's ordered `models: []` fallback array, where free-tier
+  rate limits make fallback real; third is the **picker surface** both shells want — the
+  assist surface heads with the current model, and switching opens a query dialog whose
+  criteria widgets (effective-price slider, min tokens/sec, min intelligence index) are
+  the requirements definition wearing controls, returning top-n with the best
+  pre-selected. Choice and query params persist in localStorage (presentation, like the
+  theme — the committed roster stays the reviewed default), and the two-shell claim
+  routes the dialog through the promotion rule onto the `elements → assist` boundary
+  question core-editor-ai-prompt already carries. Motivated by the 2026-08-20 free-model
+  question the repo couldn't answer. **Scoring core and
+  picker surface built 2026-08-20**: `src/assist/modelSelect.ts` (contract pinned by
+  `model-select.test.ts`, dominance invariant included), the 413-model committed catalog
+  snapshot (router pseudo-models excluded — they price as −1), the workbench's sixth
+  panel tab with the switch-model CTA over a placeholder chat, and the
+  `<mnx-model-picker>` dialog, verified hands-on over CDP. Remaining: roster
+  regeneration, the fallback array (blocked on the chat wiring), eval-fed quality, the
+  `elements/` promotion.
 - **[workbench-rung-legibility.md](inprogress/workbench-rung-legibility.md)** — knowing
   which selection rung you are in without moving your eyes. The enclosure's two channels
   (extent, fill ratio) are *relative* — read by comparison with the shape just left — and
