@@ -127,7 +127,7 @@ keymapDocs data change, not a re-litigation of this principle.
   value, and the multi-note seam is where a future chord-member/string-
   selective selection would land if it ever earns its own proposal. The
   Ctrl/⌘+X cheatsheet row's note meaning simplifies to the single notehead.
-- **[core-paste-lands.md](../proposed/core-paste-lands.md)** consumes this: with note
+- **[core-paste-lands.md](../complete/core-paste-lands.md)** consumes this: with note
   ranges gone, its note-set cases collapse to single-notehead rules, which
   is what keeps that proposal's case matrix tractable.
 

@@ -78,7 +78,7 @@ range and live closure resolve to ordered model members.
 > [core-selection-floor-axis.md](../complete/core-selection-floor-axis.md)
 > (a note selection becomes exactly one notehead; horizontal gestures
 > re-level to the event rung). And **Contract 3 below is superseded** by
-> [core-paste-lands.md](../proposed/core-paste-lands.md): a decodable clip
+> [core-paste-lands.md](../complete/core-paste-lands.md): a decodable clip
 > always lands — footprint overwrite, rest fill, timeline/part extension,
 > land-and-flag via the renderer's diagnostics — with undo as the license,
 > as it already is for cut. Contract 3 stays in this doc as the record of

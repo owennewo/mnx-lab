@@ -59,16 +59,6 @@ proposals that name their campaign.
   voice that underfills on every render. Corpus cost is nil (the key grammar already
   spells part and staff, silent for 0 and 1). Acceptance: a construct trace for
   `spec/multiple-voices` and `spec/tie-targets`.
-- **[core-paste-lands.md](proposed/core-paste-lands.md)** — **a decodable clip always
-  lands**; undo is the license, as it was for cut. Supersedes the conservative
-  Contract 3 of the clipboard item: paste becomes a write with a well-defined
-  footprint — the selection contributes only an anchor, paste overwrites exactly its
-  footprint, partially covered units are consumed with rests filling the remainder
-  (Cut's own spelling), and the document extends (bars, even parts) rather than clips.
-  Metric/fingerboard conflicts land and are **flagged by the forgiving renderer's
-  diagnostics** instead of refused; refusal codes become accommodation records and the
-  stage-6 notice reports what the paste did. Seven named decisions (D1–D7) capture the
-  contentious forks. Depends on core-selection-floor-axis.md (complete 2026-08-20).
 - **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
   `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
   (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
@@ -246,6 +236,15 @@ proposals that name their campaign.
   gestures are mirrored here as data, including the container rung and explicit
   rung-first Delete meanings through section.
 ### complete/
+- **[core-paste-lands.md](complete/core-paste-lands.md)** — proposed and built
+  2026-08-20, D1–D7 as blessed: **a decodable clip always lands**, undo the license as
+  it was for cut. Paste is a footprint write — the selection contributes only an
+  anchor, partially covered units are consumed whole with greedy-binary rest fill, and
+  the document extends (bars, even parts) rather than clipping. Metric/fingerboard
+  conflicts land and are flagged by the forgiving renderer's diagnostics; the
+  planner's refusals shrank to the decode tier, every yielded accommodation is
+  counted in the plan, and the notice strip reads the record out clause by clause.
+  Supersedes Contract 3 of the clipboard item.
 - **[core-selection-floor-axis.md](complete/core-selection-floor-axis.md)** — proposed,
   decided and built 2026-08-20 out of the clipboard review: the note-rung *range* proved
   valueless and confusing (pixel-identical to an event range, invisibly rhythm-free), so
