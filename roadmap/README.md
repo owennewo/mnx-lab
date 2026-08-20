@@ -134,7 +134,10 @@ proposals that name their campaign.
   OpenRouter models. The ordering is the interesting half: per-dimension *headroom over
   the requirement* (`log(actual/required)`, so exactly-meeting scores 0), weighted sum,
   with Pareto dominance as the pinned test invariant and unknown dimensions scoring as
-  "requirement exactly met", flagged. Quality enters first as a curated prior table,
+  "requirement exactly met", flagged. Effective price is a **workload blend** computed by
+  the module — the catalog is per-meter only (prompt/completion/cache), so the
+  requirements profile declares the expected token mix and the blend is its dot product
+  with the model's meters. Quality enters first as a curated prior table,
   later from edit-loop evals (`editLoop.ts` is already factored for them). First
   consumer is dev-time — stored queries regenerate
   [worker/models.json](../worker/models.json) so curation is articulated rather than

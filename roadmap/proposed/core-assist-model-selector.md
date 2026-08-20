@@ -61,6 +61,25 @@ design this item proposes:
   is not four times better than 2×. `log(ratio)` makes exactly-meeting a
   requirement score 0, makes surplus and shortfall symmetric, and stops one
   spectacular dimension from drowning three adequate ones.
+- **Price is a workload blend, computed here — the catalog has no single
+  number.** OpenRouter's `pricing` object is strictly per-meter (`prompt`,
+  `completion`, optional `input_cache_read`/`input_cache_write` — most models
+  do not even declare cache pricing), and no "effective price" field exists in
+  the API. Leaderboards blend at a fixed editorial ratio (typically 3:1
+  input:output), but a blend is only meaningful relative to a workload — so the
+  blend lives in the **requirements definition, not the catalog**: the profile
+  declares an expected token mix (input : output : cached), and effective
+  $/Mtok is the dot product of that mix with the model's per-meter prices. A
+  model without cache pricing prices cached tokens at its full `prompt` rate,
+  which is also what it would actually charge. This matters concretely because
+  the edit loop's mix is unusual — a large prompt (document + schema + system
+  prompt) *and* a large completion (the model rewrites the whole document
+  through the tool call), with retries re-sending the prompt — so a generic
+  3:1 blend would genuinely misrank models here, and cache-read pricing counts
+  for more than usual. The profile follows the same declared-then-measured
+  staging as quality: it starts as an estimate, and OpenRouter's per-request
+  usage accounting (`/api/v1/generation` returns realized `total_cost`) lets
+  the measured mix replace it once edit-loop evals exist.
 - **Weighted sum over the logged ratios**, weights from the requirements
   definition with declared defaults. With positive weights and monotone
   per-dimension utilities this scalarization respects **Pareto dominance** — a
