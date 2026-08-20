@@ -332,11 +332,13 @@ describe('command registry — state reads the document', () => {
     const session = new EditorSession(makeDoc());
     const staccato = find('staccato');
     session.handleIntent({ type: 'setMarking', marking: 'staccato' });
+    // Two presses under the floor axis: re-level to the event, then extend.
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
     session.handleIntent({ type: 'extendSelection', direction: 'next' });
     const selection = session.selection;
 
     expect(commandState(staccato, sessionView(session))).toBe('mixed');
-    expect(selectionMemberSummary(sessionView(session))).toBe('2 notes');
+    expect(selectionMemberSummary(sessionView(session))).toBe('2 events');
     expect(staccato.action!(sessionView(session))).toEqual({
       intent: { type: 'setMarking', marking: 'staccato' }
     });
@@ -412,6 +414,8 @@ describe('command registry — state reads the document', () => {
 
   it('a selected run supplies spanner endpoints while point selection keeps the anchor fallback', () => {
     const slur = new EditorSession(makeDoc());
+    // Two presses under the floor axis: re-level to the event, then extend.
+    slur.handleIntent({ type: 'extendSelection', direction: 'next' });
     slur.handleIntent({ type: 'extendSelection', direction: 'next' });
     const selection = slur.selection;
     expect(slur.handleIntent({ type: 'toggleSlur' })).toBe(true);
@@ -431,6 +435,7 @@ describe('command registry — state reads the document', () => {
       if ('duration' in event) event.duration = { base: 'eighth' };
     });
     const beam = new EditorSession(beamDoc);
+    beam.handleIntent({ type: 'extendSelection', direction: 'next' });
     beam.handleIntent({ type: 'extendSelection', direction: 'next' });
     expect(beam.handleIntent({ type: 'toggleBeam' })).toBe(true);
     expect(beam.opQueue.applied[0].op).toMatchObject({ type: 'setBeam', from: 0, to: 1 });

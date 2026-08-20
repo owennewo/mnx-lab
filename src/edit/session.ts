@@ -580,7 +580,15 @@ export class EditorSession {
       // Spanners (campaign item 10): the first session state beyond the
       // cursor and the entry duration — one nullable note key.
       case 'toggleSlur': {
-        const selected = this.selectionState.level === 'note' ? this.selectedNoteKeys : [];
+        // The selected-run form reads an EVENT range (the floor axis moved
+        // ranges there). More than one resolved member, not more than one
+        // note key: a chord event point has two keys but is one member, and
+        // must arm the anchor gesture rather than slur itself.
+        const selected =
+          this.selectionState.level === 'event' &&
+          this.resolvedSelection.members.length > 1
+            ? this.selectedNoteKeys
+            : [];
         if (selected.length > 1) {
           const [fromNoteKey, toNoteKey] = [selected[0], selected[selected.length - 1]];
           this.spanAnchorKey = null;
@@ -846,7 +854,12 @@ export class EditorSession {
         return true;
       }
       case 'toggleBeam': {
-        const selected = this.selectionState.level === 'note' ? this.selectedNoteKeys : [];
+        // The event-range run form, exactly as toggleSlur above.
+        const selected =
+          this.selectionState.level === 'event' &&
+          this.resolvedSelection.members.length > 1
+            ? this.selectedNoteKeys
+            : [];
         if (selected.length > 1) {
           const first = selected[0];
           const existing = beamStartingAt(this.doc, first);
@@ -1131,6 +1144,12 @@ export class EditorSession {
         // The score rung already denotes the whole score; closing it again is
         // semantically and structurally idempotent.
         if (this.selectionState.level === 'score') return false;
+        // The floor axis (core-selection-floor-axis.md): a closure asks for
+        // every member of a timeline — a temporal extent — and below the
+        // event rung there is none, so Ctrl+A on a notehead closes at the
+        // event rung. Without this the multi-notehead selection the floor
+        // axis retires would survive behind one key.
+        if (this.selectionState.level === 'note') this.setSelectionLevel('event');
         const scope = closureScopeForLevel(this.selectionState.level);
         if (
           this.selectionState.extent.kind === 'closure' &&
@@ -1140,7 +1159,10 @@ export class EditorSession {
         }
         this.selectionState = {
           level: this.selectionState.level,
-          anchor: copyCursorAddress(before),
+          // The cursor, not `before`: the note→event re-level above pins the
+          // event slot onto the cursor, and the closure's anchor must carry
+          // the same address a relax-then-close would have produced.
+          anchor: copyCursorAddress(this.cursorState),
           extent: { kind: 'closure', scope }
         };
         return true;
@@ -1241,7 +1263,35 @@ export class EditorSession {
           case 'note':
             this.cursorState = moveLine(this.grid, before, delta, this.activeProjection);
             break;
-          case 'event':
+          // The floor axis (core-selection-floor-axis.md): the vertical axis
+          // at the floor is note-natured, so ↑/↓ at the event rung descends
+          // into the event's noteheads; subsequent presses walk lines at the
+          // note rung. The displaced voice jump stays reachable — descend,
+          // then Ctrl+↑/↓ (the climb's voice jump at note), or Alt+V.
+          case 'event': {
+            const position = positionAt(this.grid, before);
+            const voice = before.voiceIndex ?? 0;
+            const pool = position?.slots.filter(slot => slot.voiceIndex === voice) ?? [];
+            if (pool.length === 0) return false; // a rest has no noteheads
+            const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
+            const lineOf = (slot: (typeof pool)[number]) =>
+              tab ? slot.line : slot.staffPosition;
+            // Nearest to the carried line; ties break in the pressed
+            // direction (down = a larger string number, a smaller staff
+            // position) — the descent itself is the semantic step.
+            let best = pool[0];
+            for (const slot of pool) {
+              const dist = Math.abs(lineOf(slot) - before.line);
+              const bestDist = Math.abs(lineOf(best) - before.line);
+              const towards = (tab === (delta > 0))
+                ? lineOf(slot) > lineOf(best)
+                : lineOf(slot) < lineOf(best);
+              if (dist < bestDist || (dist === bestDist && towards)) best = slot;
+            }
+            this.cursorState = { ...before, line: lineOf(best) };
+            this.reanchorSelection('note');
+            return true;
+          }
           case 'container':
           case 'voiceMeasure':
             if (!this.stepVoice(before, delta)) return false;
@@ -1424,6 +1474,17 @@ export class EditorSession {
   }
 
   private extendSelection(direction: 'previous' | 'next' | 'end'): boolean {
+    // The floor axis (core-selection-floor-axis.md): horizontal extent is
+    // event-natured, so the note rung has no ranges. The first press
+    // performs the re-leveling — one notehead becomes its own ONE event,
+    // never two, so the highlight visibly grows from notehead to chord at
+    // the moment the semantics change. Only subsequent presses extend.
+    // Shift+End re-levels AND extends in the same press: its extent request
+    // is already explicit.
+    if (this.selectionState.level === 'note') {
+      this.setSelectionLevel('event');
+      if (direction !== 'end') return true;
+    }
     // Shift after a live closure starts a fresh concrete range at the active
     // cursor; a closure's sparse scope has no meaningful geometric edge.
     const anchor = copyCursorAddress(

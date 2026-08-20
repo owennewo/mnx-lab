@@ -320,19 +320,22 @@ describe('the per-level navigation map', () => {
     return session;
   };
 
-  it('event ↑↓ steps the voice stack, and stops at the outermost voice', () => {
+  it('event ↑↓ descends to the notehead; the voice stack is a climb away (the floor axis)', () => {
     const session = at('event');
     expect(session.selectedNoteKeys).toEqual(['l1', 'l2']); // voice 0's chord
 
+    // The floor axis (core-selection-floor-axis.md): the vertical axis at
+    // the floor is note-natured, so ↓ descends into the event's noteheads
+    // rather than stepping the voice stack.
     expect(session.handleIntent({ type: 'lineDown' })).toBe(true);
+    expect(session.selectionLevel).toBe('note');
+    expect(session.selectedNoteKeys).toHaveLength(1);
+
+    // The displaced voice jump, reachable from the descended notehead: the
+    // Ctrl climb's voice step (the named cost the floor axis accepted).
+    expect(session.handleIntent({ type: 'jumpDown' })).toBe(true);
     expect(session.cursor.voiceIndex).toBe(1);
     expect(session.selectedNoteKeys).toEqual(['l6']); // voice 1's event
-    // The stop, not a wrap (decided 2026-08-15): there is no voice 2 here.
-    expect(session.handleIntent({ type: 'lineDown' })).toBe(false);
-
-    expect(session.handleIntent({ type: 'lineUp' })).toBe(true);
-    expect(session.selectedNoteKeys).toEqual(['l1', 'l2']);
-    expect(session.handleIntent({ type: 'lineUp' })).toBe(false);
   });
 
   it('event ←→ walks THIS voice’s events, not every column', () => {

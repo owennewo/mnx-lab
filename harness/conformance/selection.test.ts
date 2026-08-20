@@ -602,7 +602,7 @@ describe('selection ladder', () => {
     expect(session.selection.anchor).toEqual(session.cursor);
   });
 
-  it('extends from a fixed anchor, reverses through it, and keeps the cursor at the active edge', () => {
+  it('the first Shift press re-levels to the event, then extends from a fixed anchor through it', () => {
     const doc = makeDoc();
     doc.parts[0].measures![0].sequences![0].content.push({
       duration: { base: 'quarter' },
@@ -610,7 +610,13 @@ describe('selection ladder', () => {
     });
     const session = new EditorSession(doc);
     session.handleIntent({ type: 'nextPosition' }); // n3 — the middle position
-    const anchor = session.cursor;
+
+    // The floor axis (core-selection-floor-axis.md): one notehead becomes
+    // its own ONE event — the first press is the re-level, never a range.
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'previous' })).toBe(true);
+    expect(session.selectionLevel).toBe('event');
+    expect(session.selectedNoteKeys).toEqual(['n3']);
+    const anchor = session.selection.anchor;
 
     expect(session.handleIntent({ type: 'extendSelection', direction: 'previous' })).toBe(true);
     expect(session.selection.anchor).toEqual(anchor);
@@ -624,30 +630,37 @@ describe('selection ladder', () => {
     expect(session.selectedNoteKeys).toEqual(['n3', 'n6']);
   });
 
-  it('Shift+End reaches the last concrete member, skipping note ghosts but retaining event rests', () => {
+  it('Shift+End re-levels a notehead and reaches the voice’s last event, rests retained', () => {
+    // The floor axis: End is an explicit extent request, so at the note rung
+    // it re-levels AND extends in one press — identical to starting at the
+    // event rung, rest included, where the old note range silently stopped
+    // before it.
     const notes = new EditorSession(makeDoc());
     expect(notes.handleIntent({ type: 'extendSelection', direction: 'end' })).toBe(true);
-    expect(notes.cursor.measureIndex).toBe(0); // m1 is a rest; m2 is empty
-    expect(notes.selectedNoteKeys).toEqual(['n1', 'n2', 'n3']);
+    expect(notes.selectionLevel).toBe('event');
+    expect(notes.cursor.measureIndex).toBe(1); // the rest is a real event
+    expect(notes.resolvedSelection.members).toHaveLength(3);
 
     const events = new EditorSession(makeDoc());
     events.handleIntent(relax); // event
     expect(events.handleIntent({ type: 'extendSelection', direction: 'end' })).toBe(true);
-    expect(events.cursor.measureIndex).toBe(1); // the rest is a real event
+    expect(events.cursor.measureIndex).toBe(1);
     expect(events.resolvedSelection.members).toHaveLength(3);
   });
 
   it('closes at the rung scope and remaps that live scope through the ladder', () => {
     const session = new EditorSession(makeDoc());
     expect(session.handleIntent({ type: 'closeSelection' })).toBe(true);
+    // The floor axis: a closure is a temporal extent, so the note rung's
+    // closure IS the event closure — Ctrl+A on a notehead selects events.
+    expect(session.selectionLevel).toBe('event');
     expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'voice' });
     expect(session.selectedNoteKeys).toEqual(['n1', 'n2', 'n3']);
     expect(session.handleIntent({ type: 'extendSelection', direction: 'previous' })).toBe(false);
     expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'voice' });
 
-    session.handleIntent(relax); // event: still voice scope
-    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'voice' });
     session.handleIntent(relax); // voice-measure: still voice scope
+    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'voice' });
     session.handleIntent(relax); // part-measure: fork to part scope
     expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'part' });
     session.handleIntent(relax); // measure: global timeline
@@ -658,15 +671,19 @@ describe('selection ladder', () => {
   });
 
   it('bare horizontal arrows collapse a range to the requested edge before navigating', () => {
+    // Ranges live at the event rung now (the floor axis), so building one
+    // takes two presses: re-level, then extend.
     const right = new EditorSession(makeDoc());
+    right.handleIntent({ type: 'extendSelection', direction: 'next' });
     right.handleIntent({ type: 'extendSelection', direction: 'next' });
     const rightEdge = right.cursor;
     expect(right.handleIntent({ type: 'prevPosition' })).toBe(true);
     expect(right.cursor.measureIndex).toBe(0);
     expect(right.cursor.onset).toEqual({ num: 0, den: 1 });
-    expect(right.selection).toEqual(pointSelection('note', right.cursor));
+    expect(right.selection).toEqual(pointSelection('event', right.cursor));
 
     const left = new EditorSession(makeDoc());
+    left.handleIntent({ type: 'extendSelection', direction: 'next' });
     left.handleIntent({ type: 'extendSelection', direction: 'next' });
     expect(left.handleIntent({ type: 'nextPosition' })).toBe(true);
     expect(left.cursor).toEqual(rightEdge); // collapsed; did not navigate again
@@ -678,7 +695,7 @@ describe('selection ladder', () => {
     const active = closure.cursor;
     expect(closure.handleIntent({ type: 'nextPosition' })).toBe(true);
     expect(closure.cursor).toEqual(active);
-    expect(closure.selection).toEqual(pointSelection('note', active));
+    expect(closure.selection).toEqual(pointSelection('event', active));
   });
 
   it('preserves a concrete range and both endpoints across projection changes', () => {

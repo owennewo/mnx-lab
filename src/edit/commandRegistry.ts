@@ -321,29 +321,27 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ intent: { type: 'toggleTie' } })
   },
   // The two anchor gestures (campaign items 10/11). Both SPAN — note→note and
-  // event→event — but both are armed and closed AT THE NOTE RUNG, which is
-  // where `KEY_DOCS` documents their keys and where the session's guards let
-  // them fire. Offering them a rung up would contradict the cheatsheet on the
-  // same screen; the tray follows the docs, and the docs follow the guards.
+  // event→event. The anchor form is armed and closed at the note rung; the
+  // selected-run form reads an EVENT range, because the floor axis
+  // (core-selection-floor-axis.md) moved ranges there — so both tiles live at
+  // both rungs, and the docs/tray/guards still say the same thing.
   {
     id: 'slur',
-    scopes: ['note'],
+    scopes: NOTE_EVENT,
     glyph: { arc: 'slur' },
     label: 'Slur — press again at the last note',
     shortcut: 'S',
     tier: 'key',
     projection: 'notation',
     isActive: view => {
-      const start = view.level === 'note' && view.noteKeys.length > 1
-        ? view.noteKeys[0]
-        : view.noteKey;
+      const start = view.noteKeys.length > 1 ? view.noteKeys[0] : view.noteKey;
       return start !== null && start !== undefined && hasSlurStartingAt(view.doc, start);
     },
     action: () => ({ intent: { type: 'toggleSlur' } })
   },
   {
     id: 'beam',
-    scopes: ['note'],
+    scopes: NOTE_EVENT,
     glyph: { smufl: 'textCont8thBeamShortStem' },
     label: 'Beam — press again at the last event',
     shortcut: 'B',

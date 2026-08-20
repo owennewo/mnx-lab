@@ -6,6 +6,23 @@ review of the [selection clipboard](../inprogress/core-selection-clipboard.md):
 the typed clipboard made a previously invisible distinction load-bearing, and
 the distinction did not survive contact with a user.
 
+> **Status: built 2026-08-20, the same day.** All four rules landed in
+> `session.ts` as new resolutions of the ordinary intents (extendSelection
+> re-levels before extending, End in the same press; closeSelection closes
+> at the event rung; event ↑/↓ descends to the nearest notehead, ties
+> breaking in the pressed direction), so traces replay unchanged and one
+> committed fixture regenerated exactly along the semantic change. The
+> build surfaced one consequence the proposal had not named: **the spanner
+> selected-run form rode the ranges to the event rung** — `toggleSlur`/
+> `toggleBeam` now read an event range of >1 resolved members (a chord
+> event point has two note keys but is one member, and must arm the anchor
+> gesture rather than slur itself), the tray's slur/beam tiles widened to
+> both rungs, and the S/B cheatsheet rows gained their event meanings.
+> `selection-floor-axis.test.ts` pins the invariant (a note selection is
+> always exactly one notehead), the one-event first press, descent and its
+> rest-event refusal, and replay determinism; the ladder, navigation and
+> command-registry suites were re-pinned to the new semantics.
+
 ## The finding
 
 A note-rung *range* looks exactly like an event range and is not one. Starting

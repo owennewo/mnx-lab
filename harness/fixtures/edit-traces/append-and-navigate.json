@@ -187,7 +187,7 @@
       ]
     },
     "cursor": {
-      "measureIndex": 0,
+      "measureIndex": 1,
       "onset": {
         "num": 0,
         "den": 1
@@ -195,9 +195,9 @@
       "line": 6
     },
     "selection": {
-      "level": "note",
+      "level": "event",
       "anchor": {
-        "measureIndex": 0,
+        "measureIndex": 1,
         "onset": {
           "num": 0,
           "den": 1

@@ -89,7 +89,10 @@ export const KEY_DOCS: KeyDoc[] = [
     // appear unnoticed.
     meaning: {
       note: 'up/down the vertical line (string / staff position)',
-      event: 'the voice above/below, at this instant',
+      // The floor axis (core-selection-floor-axis.md): vertical at the floor
+      // is note-natured — the event rung descends into its noteheads. The
+      // voice jump moved to Ctrl+↑/↓ after descent (a named cost).
+      event: 'descend to the event’s nearest notehead',
       container: 'the voice above/below, at this instant',
       voiceMeasure: 'the voice above/below in this bar',
       partMeasure: 'the staff above/below (this part’s staves, then the next part)',
@@ -154,8 +157,12 @@ export const KEY_DOCS: KeyDoc[] = [
       { code: 'ArrowRight', shift: true }
     ],
     group: 'selection',
+    // The floor axis (core-selection-floor-axis.md): horizontal extent is
+    // event-natured, so the note rung has no ranges — the first press
+    // re-levels the single notehead to its own event, and extension
+    // continues at the event rung.
     meaning: {
-      note: 'extend through this voice’s existing notes',
+      note: 'become an event selection (the note’s own event; press again to extend)',
       event: 'extend through this voice’s events (rests included)',
       container: 'extend through this voice’s rhythm containers',
       voiceMeasure: 'extend through this voice’s existing bar copies',
@@ -169,7 +176,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'End', shift: true }],
     group: 'selection',
     meaning: {
-      note: 'extend to this voice’s last existing note',
+      note: 'become an event range to this voice’s last event',
       event: 'extend to this voice’s last event',
       container: 'extend to this voice’s last rhythm container',
       voiceMeasure: 'extend to this voice’s last existing bar copy',
@@ -186,7 +193,7 @@ export const KEY_DOCS: KeyDoc[] = [
     ],
     group: 'selection',
     meaning: {
-      note: 'select every existing note in this staff/voice timeline',
+      note: 'select every event in this staff/voice timeline (closes at the event rung)',
       event: 'select every event in this staff/voice timeline',
       container: 'select every rhythm container in this staff/voice timeline',
       voiceMeasure: 'select every existing bar copy in this staff/voice',
@@ -314,7 +321,7 @@ export const KEY_DOCS: KeyDoc[] = [
     ],
     group: 'editing',
     meaning: {
-      note: 'cut the notes (an emptied event becomes a rest)',
+      note: 'cut the note (an emptied event becomes a rest)',
       event: 'cut the events to equal-duration rests',
       container: 'cut the containers, leaving equal-span silence',
       voiceMeasure: 'cut this voice’s bar copies (absence is silence)',
@@ -357,7 +364,9 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'KeyB' }],
     group: 'adornments',
     meaning: {
-      note: 'beam: arm at the first note, press again at the last (Esc drops it) — bend in the tab projection'
+      note: 'beam: arm at the first note, press again at the last (Esc drops it) — bend in the tab projection',
+      // The selected-run form rode the ranges to the event rung (the floor axis).
+      event: 'beam the selected event run'
     }
   },
   {
@@ -389,7 +398,8 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'KeyS' }],
     group: 'adornments',
     meaning: {
-      note: 'slur: arm at this note, press again at the far note (Esc drops it) — slide in the tab projection'
+      note: 'slur: arm at this note, press again at the far note (Esc drops it) — slide in the tab projection',
+      event: 'slur the selected event run'
     }
   },
 
