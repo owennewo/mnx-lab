@@ -10,6 +10,7 @@ import {
   strokeKey
 } from '../../src/edit/keymapDocs.ts';
 import { EditorSession } from '../../src/edit/session.ts';
+import { planSelectionCut } from '../../src/edit/selectionCutPlanner.ts';
 import type { MnxNote, MnxPitch, MnxStructure } from '../../src/model/mnx.ts';
 import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
 
@@ -169,6 +170,27 @@ describe('keymap docs — the guard mirrors', () => {
     const session = new EditorSession(makeDoc()); // string mode ⇒ tab projection
     expect(session.projection).toBe('tab');
     expect(session.handleIntent({ type: 'toggleNote' })).toBe(false);
+  });
+
+  it('the clipboard: copy/paste at every rung, cut documented everywhere but score — and the planner refuses there', () => {
+    // The cheatsheet's cut row IS the removal table; its missing score entry
+    // must mirror planSelectionCut's refusal, or the sheet lies about the one
+    // rung where cut is deliberately unavailable.
+    const copy = KEY_DOCS.find(d => d.keys === 'Ctrl/⌘+C')!;
+    expect(copy.meaning.all).toBeTruthy();
+    const paste = KEY_DOCS.find(d => d.keys === 'Ctrl/⌘+V')!;
+    expect(paste.meaning.all).toBeTruthy();
+
+    const cut = KEY_DOCS.find(d => d.keys === 'Ctrl/⌘+X')!;
+    expect(Object.keys(cut.meaning)).toEqual([
+      'note', 'event', 'container', 'voiceMeasure', 'partMeasure', 'measure', 'section'
+    ]);
+    expect(cut.meaning.score).toBeUndefined();
+
+    const session = new EditorSession(makeDoc());
+    while (session.selectionLevel !== 'score') session.handleIntent({ type: 'relaxSelection' });
+    expect(planSelectionCut(session.doc, session.selection, session.projection))
+      .toMatchObject({ ok: false, code: 'score-unavailable' });
   });
 
   it('arrows at score: no documented meaning, and the cursor stays put', () => {

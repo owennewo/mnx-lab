@@ -292,6 +292,50 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: { all: 'undo / redo' }
   },
 
+  // ── The clipboard (core-selection-clipboard.md, stage 6). The rung types
+  // the clip — copy is one meaning because the ladder already scales the
+  // unit; cut spells its removal table because "remove exactly the selected
+  // unit" differs per rung, and its missing score row mirrors the planner's
+  // refusal (document deletion belongs to the library, not the edit session).
+  {
+    keys: 'Ctrl/⌘+C',
+    strokes: [
+      { code: 'KeyC', ctrl: true },
+      { code: 'KeyC', meta: true }
+    ],
+    group: 'editing',
+    meaning: { all: 'copy the selection as a typed clip — the rung decides the unit' }
+  },
+  {
+    keys: 'Ctrl/⌘+X',
+    strokes: [
+      { code: 'KeyX', ctrl: true },
+      { code: 'KeyX', meta: true }
+    ],
+    group: 'editing',
+    meaning: {
+      note: 'cut the notes (an emptied event becomes a rest)',
+      event: 'cut the events to equal-duration rests',
+      container: 'cut the containers, leaving equal-span silence',
+      voiceMeasure: 'cut this voice’s bar copies (absence is silence)',
+      partMeasure: 'cut this staff’s bars; the part closure cuts the whole part',
+      measure: 'cut the global bars — the timeline closes',
+      section: 'cut the named bars — the timeline closes'
+      // score: refused — deleting a document belongs to its library.
+    }
+  },
+  {
+    keys: 'Ctrl/⌘+V',
+    strokes: [
+      { code: 'KeyV', ctrl: true },
+      { code: 'KeyV', meta: true }
+    ],
+    group: 'editing',
+    meaning: {
+      all: 'paste the copied clip at the selection — exact and conservative; a refusal names why'
+    }
+  },
+
   // ── Adornments — the tie today; the technique alphabet (B H S V X O) and
   // articulations land here as they arrive.
   {

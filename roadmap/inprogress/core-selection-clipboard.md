@@ -55,8 +55,23 @@ range and live closure resolve to ordered model members.
 > pinned by beam tests on both the paste and cut sides.
 > `selection-cut.test.ts` pins the rung matrix, structural repair,
 > write-before-mutate, stale-session refusal, replay and the score refusal.
-> Keyboard bindings remain inactive. **Next: stage 6, Ctrl+C/X/V through the
-> keymap, focus gate and cheatsheet entries.**
+> Stage 6 bound Ctrl/⌘+C/X/V as **shell actions**, not EditorIntents — the
+> mount resolves the store I/O and the trace keeps recording the materialized
+> `applyCutPlan`/`applyPastePlan`, never the keypress — behind the existing
+> `keyIsOurs` focus gate (text fields keep native copy/paste via the
+> innermost scope test). The cheatsheet gained the three rows: copy and
+> paste level-independent, cut spelling its per-rung removal table with the
+> score row absent, guard-mirrored against `planSelectionCut`'s refusal.
+> Feedback is a transient notice strip over the score, no clipboard panel:
+> `src/edit/clipboardFeedback.ts` (DOM-free) owns the sentences — clip kind,
+> member count in the rung's own unit, boundary-detached and score-repaired
+> reference counts, landing bars, and the planners' precise refusal text,
+> with cut's write-failure naming the score-unchanged guarantee. The tray's
+> three clipboard tiles now show their shortcuts.
+> `clipboard-feedback.test.ts` pins the notice sentences end-to-end through
+> the real actions and asserts the strokes resolve as shell actions while no
+> keymap layer claims them as intents; the keymap-docs joins force the
+> documentation rows. **Next: stage 7, hands-on cross-score review.**
 
 ## The boundary
 

@@ -31,6 +31,12 @@ import {
   cutSelectionToStore,
   pasteSelectionFromStore
 } from '../edit/selectionClipboardActions.ts';
+import {
+  copySelectionNotice,
+  cutSelectionNotice,
+  pasteSelectionNotice,
+  type ClipboardNotice
+} from '../edit/clipboardFeedback.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
 import { cheatsheet } from '../edit/keymapDocs.ts';
 import { buildHudParts, buildHudRows, LEVEL_BY_ROW } from './hudRows.ts';
@@ -419,6 +425,12 @@ export class ScenarioPage extends LitElement {
   @state() private session: EditorSession | null = null;
   @state() private selection: SelectionContext | null = null;
   @state() private copied = false;
+  /** The clipboard's transient strip over the score (stage 6): clip kind,
+   *  member count and detached references on success, the planner's precise
+   *  sentence on a refusal. It names the last outcome and leaves — there is
+   *  deliberately no clipboard panel. */
+  @state() private clipboardNotice: ClipboardNotice | null = null;
+  private clipboardNoticeTimer: ReturnType<typeof setTimeout> | undefined;
   /** The open setup popover (survey §6.2's Shift+letter tier), if any.
    *  (Named to dodge the DOM's built-in HTMLElement.popover property.) */
   @state() private setupPopover: PopoverKind | null = null;
@@ -821,6 +833,29 @@ export class ScenarioPage extends LitElement {
          sits at, which is why the two read as one decision. */
       mnx-score-viewer {
         padding: 14px;
+      }
+
+      /* The clipboard's transient outcome strip (core-selection-clipboard.md
+         stage 6): the last copy/cut/paste result said once, over the score,
+         at the inset the zoom pad established. Read-only chrome — it must
+         never take the pointer from the paper beneath it. */
+      .clipboard-notice {
+        position: absolute;
+        left: 14px;
+        bottom: 14px;
+        max-width: min(70%, 60ch);
+        padding: 4px 10px;
+        border: var(--rule-w) solid var(--ink);
+        background: var(--surface);
+        color: var(--ink);
+        font: 12px/1.5 var(--mono);
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .clipboard-notice.refused {
+        border-color: var(--accent);
+        color: var(--accent);
       }
 
       /* THE FIVE-BAND FRAME (roadmap/proposed/workbench-score-panel.md):
@@ -1422,6 +1457,7 @@ export class ScenarioPage extends LitElement {
       this.copied = false;
       this.setupPopover = null;
       this.setupPopoverError = '';
+      this.showClipboardNotice(null);
       this.cursorHidden = false;
       this.trayOpen = false;
       this.trayTab = null;
@@ -1456,6 +1492,7 @@ export class ScenarioPage extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this.showClipboardNotice(null);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.removeEventListener('mnx-palette-action', this.onPaletteAction);
@@ -1646,6 +1683,24 @@ export class ScenarioPage extends LitElement {
     if (!keyIsOurs(event, this)) return;
     if (this.session && this.activeLayers().length > 0) {
       const action = resolveShellAction(strokeOf(event));
+      // The clipboard verbs (stage 6): resolved here because the store I/O is
+      // the mount's — the session only ever sees the materialized plan. The
+      // focus gate above is the whole scope story; text fields never reach
+      // this point, so native copy/paste inside inputs is untouched.
+      if (action === 'copySelection' || action === 'cutSelection' || action === 'pasteSelection') {
+        if (!this.selectionClipboard) return;
+        // Innermost open thing first (the Escape doctrine, applied to copy):
+        // a live TEXT selection means the user is addressing the prose, not
+        // the score — unclaimed focus counts as ours, so without this test a
+        // mouse-selected paragraph would Ctrl+C the score instead.
+        const text = window.getSelection();
+        if (action !== 'pasteSelection' && text && !text.isCollapsed) return;
+        event.preventDefault();
+        if (action === 'copySelection') void this.copyCurrentSelection();
+        else if (action === 'cutSelection') void this.cutCurrentSelection();
+        else void this.pasteCurrentSelection();
+        return;
+      }
       if (action && this.openPopover(action)) {
         event.preventDefault();
         return;
@@ -1902,21 +1957,21 @@ export class ScenarioPage extends LitElement {
         {
           id: `${CHROME_PREFIX}copy-selection`,
           glyph: { smufl: 'repeat1Bar' } as const,
-          shortcut: '',
+          shortcut: 'Ctrl+C',
           label: 'Copy current selection',
           state: 'available' as const
         },
         {
           id: `${CHROME_PREFIX}paste-selection`,
           glyph: { smufl: 'arrowBlackLeft' } as const,
-          shortcut: '',
+          shortcut: 'Ctrl+V',
           label: 'Paste copied selection here',
           state: 'available' as const
         },
         {
           id: `${CHROME_PREFIX}cut-selection`,
           glyph: { arc: 'slur' } as const,
-          shortcut: '',
+          shortcut: 'Ctrl+X',
           label: 'Cut current selection',
           state: session.selectionLevel === 'score' ? 'unavailable' as const : 'available' as const
         }
@@ -2272,16 +2327,30 @@ export class ScenarioPage extends LitElement {
     this.copied = true;
   }
 
-  /** Stage 4 clipboard surface: explicit tray actions only. Keyboard bindings
-   *  and detailed success/refusal feedback land together in Stage 6. */
+  /** The clipboard surface: Ctrl/⌘+C/X/V and the tray's explicit actions,
+   *  both landing here. Every outcome — success or precise refusal — becomes
+   *  the transient notice; a refusal must be SAID, or the keystroke reads as
+   *  broken rather than conservative. */
+  private showClipboardNotice(notice: ClipboardNotice | null) {
+    clearTimeout(this.clipboardNoticeTimer);
+    this.clipboardNotice = notice;
+    if (notice) {
+      this.clipboardNoticeTimer = setTimeout(() => {
+        this.clipboardNotice = null;
+      }, 5000);
+    }
+  }
+
   private async copyCurrentSelection() {
     if (!this.session || !this.selectionClipboard) return;
-    await copySelectionToStore(this.session, this.selectionClipboard);
+    const result = await copySelectionToStore(this.session, this.selectionClipboard);
+    this.showClipboardNotice(copySelectionNotice(result));
   }
 
   private async pasteCurrentSelection() {
     if (!this.session || !this.selectionClipboard) return;
     const result = await pasteSelectionFromStore(this.session, this.selectionClipboard);
+    this.showClipboardNotice(pasteSelectionNotice(result));
     if (!result.ok) return;
     this.cursorHidden = false;
     this.copied = false;
@@ -2291,6 +2360,7 @@ export class ScenarioPage extends LitElement {
   private async cutCurrentSelection() {
     if (!this.session || !this.selectionClipboard) return;
     const result = await cutSelectionToStore(this.session, this.selectionClipboard);
+    this.showClipboardNotice(cutSelectionNotice(result));
     if (!result.ok) return;
     this.cursorHidden = false;
     this.copied = false;
@@ -2533,6 +2603,14 @@ export class ScenarioPage extends LitElement {
             : nothing}
           ${this.trayOpen && this.session ? this.trayOverlay(entry) : nothing}
           ${this.setupPopoverOverlay()}
+          ${this.clipboardNotice
+            ? html`<div
+                class="clipboard-notice${this.clipboardNotice.ok ? '' : ' refused'}"
+                role="status"
+              >
+                ${this.clipboardNotice.message}
+              </div>`
+            : nothing}
         </div>
         ${this.panelHidden ? nothing : this.sidePanel(entry)}
       </div>

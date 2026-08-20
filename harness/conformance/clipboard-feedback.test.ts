@@ -1,0 +1,156 @@
+// Stage 6 of core-selection-clipboard.md: the words the workbench shows for
+// every clipboard outcome, and the keymap's claim on Ctrl/⌘+C/X/V. The
+// notice contract — clip kind, member count, detached references, precise
+// refusals — is pinned HERE because the strip itself is workbench chrome and
+// the workbench has no tests; the sentences are the testable surface.
+import { describe, expect, it } from 'vitest';
+import type { MnxStructure } from '../../src/model/mnx.ts';
+import { EditorSession } from '../../src/edit/session.ts';
+import {
+  copySelectionNotice,
+  cutSelectionNotice,
+  pasteSelectionNotice
+} from '../../src/edit/clipboardFeedback.ts';
+import {
+  copySelectionToStore,
+  cutSelectionToStore,
+  pasteSelectionFromStore
+} from '../../src/edit/selectionClipboardActions.ts';
+import {
+  MemorySelectionClipboardStore,
+  type SelectionClipboardStore
+} from '../../src/edit/selectionClipboard.ts';
+import {
+  EDIT_LAYER,
+  NAVIGATION_LAYER,
+  TAB_DIGIT_LAYER,
+  resolveIntent,
+  resolveShellAction
+} from '../../src/edit/keymap.ts';
+
+function score(): MnxStructure {
+  return {
+    mnx: { version: 1 },
+    global: { measures: [{ id: 'm0' }, { id: 'm1' }] },
+    parts: [{
+      id: 'p1',
+      name: 'Guitar',
+      measures: [
+        {
+          sequences: [{ content: [
+            {
+              id: 'e0',
+              duration: { base: 'quarter' },
+              notes: [{ id: 'n0', pitch: { step: 'C', octave: 4 }, ties: [{ target: 'n1' }] }]
+            },
+            {
+              id: 'e1',
+              duration: { base: 'quarter' },
+              notes: [{ id: 'n1', pitch: { step: 'C', octave: 4 } }]
+            }
+          ] }]
+        },
+        { sequences: [{ content: [{ id: 'e2', duration: { base: 'half' }, rest: {} }] }] }
+      ]
+    }]
+  };
+}
+
+describe('the clipboard keys', () => {
+  it('Ctrl and ⌘ variants resolve as shell actions, and no layer claims them as intents', () => {
+    // The shell-action path is what keeps clipboard I/O out of the session:
+    // were one of these strokes also an EditorIntent binding, the mount's
+    // fall-through would hand the session an unresolvable verb.
+    const layers = [TAB_DIGIT_LAYER, NAVIGATION_LAYER, EDIT_LAYER];
+    for (const [code, action] of [
+      ['KeyC', 'copySelection'],
+      ['KeyX', 'cutSelection'],
+      ['KeyV', 'pasteSelection']
+    ] as const) {
+      for (const modifier of [{ ctrl: true }, { meta: true }]) {
+        expect(resolveShellAction({ code, ...modifier })).toBe(action);
+        expect(resolveIntent({ code, ...modifier }, layers)).toBeNull();
+      }
+    }
+  });
+});
+
+describe('clipboard notices', () => {
+  it('copy: clip kind, member count in the rung’s unit, detached boundary references', async () => {
+    const session = new EditorSession(score());
+    const store = new MemorySelectionClipboardStore();
+    // Note point at n0: its tie crosses the clip boundary and detaches.
+    expect(copySelectionNotice(await copySelectionToStore(session, store))).toEqual({
+      ok: true,
+      message: 'copied note-set — 1 note · 1 reference detached at the boundary'
+    });
+
+    session.handleIntent({ type: 'relaxSelection' }); // → event
+    session.handleIntent({ type: 'closeSelection' });
+    expect(copySelectionNotice(await copySelectionToStore(session, store))).toEqual({
+      ok: true,
+      message: 'copied event-run — 3 events across 2 bars'
+    });
+
+    while (session.selectionLevel !== 'partMeasure') session.handleIntent({ type: 'relaxSelection' });
+    session.handleIntent({ type: 'closeSelection' });
+    expect(copySelectionNotice(await copySelectionToStore(session, store))).toEqual({
+      ok: true,
+      message: 'copied part — the part ‘Guitar’ · 2 bars'
+    });
+  });
+
+  it('cut: the captured unit plus what the removal repaired', async () => {
+    const session = new EditorSession(score());
+    session.handleIntent({ type: 'relaxSelection' }); // → event at e0
+    expect(cutSelectionNotice(await cutSelectionToStore(session, new MemorySelectionClipboardStore())))
+      .toEqual({
+        ok: true,
+        // n0's tie points at n1, which stays behind in e1: the clip detaches
+        // it at the boundary, and the surviving score needs no repair (the
+        // removed event held the tie's only end inside the selection).
+        message: 'cut event-run — 1 event · 1 reference detached at the boundary'
+      });
+  });
+
+  it('cut failure names the write-first guarantee', async () => {
+    const session = new EditorSession(score());
+    session.handleIntent({ type: 'relaxSelection' });
+    const rejecting: SelectionClipboardStore = {
+      async write() { throw new Error('store unavailable'); },
+      async read() { return null; }
+    };
+    expect(cutSelectionNotice(await cutSelectionToStore(session, rejecting))).toEqual({
+      ok: false,
+      message: 'cut failed — store unavailable The score is unchanged.'
+    });
+  });
+
+  it('paste: landing bars and repaired references; empty and refused say why', async () => {
+    const empty = pasteSelectionNotice(
+      await pasteSelectionFromStore(new EditorSession(score()), new MemorySelectionClipboardStore())
+    );
+    expect(empty).toEqual({
+      ok: false,
+      message: 'nothing to paste — There is no copied selection to paste.'
+    });
+
+    const source = new EditorSession(score());
+    source.handleIntent({ type: 'relaxSelection' }); // → event
+    const store = new MemorySelectionClipboardStore();
+    await copySelectionToStore(source, store);
+
+    const target = new EditorSession(score());
+    target.handleIntent({ type: 'relaxSelection' });
+    expect(pasteSelectionNotice(await pasteSelectionFromStore(target, store))).toEqual({
+      ok: true,
+      message: 'pasted event-run at bar 1'
+    });
+
+    // A wrong-rung destination gets the planner's own sentence, verbatim.
+    const wrongRung = new EditorSession(score()); // note level
+    const refusal = pasteSelectionNotice(await pasteSelectionFromStore(wrongRung, store));
+    expect(refusal.ok).toBe(false);
+    expect(refusal.message).toMatch(/^paste refused — /);
+  });
+});

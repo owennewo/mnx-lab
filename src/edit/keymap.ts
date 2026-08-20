@@ -164,7 +164,15 @@ export type ShellAction =
   | 'commandPalette'
   | 'goTo'
   | 'toggleRail'
-  | 'togglePanel';
+  | 'togglePanel'
+  // The clipboard verbs are shell actions, not EditorIntents, for the same
+  // reason the popovers are: they cross an environment boundary. The mount
+  // resolves the asynchronous store I/O first, and the trace records the
+  // materialized applyCutPlan/applyPastePlan — never the keypress
+  // (core-selection-clipboard.md, stage 6).
+  | 'copySelection'
+  | 'cutSelection'
+  | 'pasteSelection';
 
 /** Exported for the cheatsheet's join tests (keymapDocs.ts) — resolution
  *  still goes through resolveShellAction only. */
@@ -214,6 +222,16 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // tab while editing, `>` here otherwise
   // (core-selection-tray-global-tab.md, which retired Ctrl+Shift+K).
   { code: 'KeyG', ctrl: true, action: 'goTo' },
+  // Ctrl AND Meta, like Ctrl/⌘+A above: the one clipboard convention every
+  // platform shares. Outside a text field the browser claims none of the
+  // three (text fields keep native copy/paste — they win via the focus
+  // scope's innermost test before any binding resolves).
+  { code: 'KeyC', ctrl: true, action: 'copySelection' },
+  { code: 'KeyC', meta: true, action: 'copySelection' },
+  { code: 'KeyX', ctrl: true, action: 'cutSelection' },
+  { code: 'KeyX', meta: true, action: 'cutSelection' },
+  { code: 'KeyV', ctrl: true, action: 'pasteSelection' },
+  { code: 'KeyV', meta: true, action: 'pasteSelection' },
   // The library rail toggle (VS Code's Ctrl+B sidebar reflex).
   { code: 'KeyB', ctrl: true, action: 'toggleRail' },
   // The score panel folds the same way, and VS Code has already taught the

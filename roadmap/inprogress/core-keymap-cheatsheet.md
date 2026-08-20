@@ -18,6 +18,10 @@
 > the same binding↔documentation joins. The later container/Delete pass added
 > container navigation/range/closure meanings and the rung-first Delete
 > contract through section, with guard mirrors for both arrow families.
+> The 2026-08-20 clipboard pass (core-selection-clipboard.md stage 6) added
+> the Ctrl/⌘+C/X/V rows: copy and paste level-independent, cut spelling its
+> per-rung removal table with the score row absent — guard-mirrored against
+> the cut planner's refusal.
 > **Remaining: stage 4** — later ladder review decisions continue to land here
 > as data.
 >
