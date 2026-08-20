@@ -183,6 +183,27 @@ proposals that name their campaign.
   Step zero is a **fixture** — none of the three reference scores contains a tuplet or a
   grace note, which is why the round trips are honestly lossless and still never present
   the case. Import/export follows the collapse-expand precedent already solved for voltas.
+- **[core-ink-priced-columns.md](proposed/core-ink-priced-columns.md)** — rigid columns are
+  **ink**; price them on the ink scale. The decision `fd6b06e` left open: staff scale grows
+  every glyph dimension on the vertical scale while the plan's columns stay priced
+  horizontally, so above ~1.2 ink ratio the ink outgrows its columns — first seen as the
+  TAB clef running into the time signature (2026-08-20), latent in every rigid column and
+  tighter still on `gClef`. Names the trilemma (ink scales both axes / placement frozen /
+  no collisions — pick two), resolves it with the plan's own rigid-vs-spring taxonomy: an
+  `inkRatio` multiplies rigid ink contributions, springs absorb via the justifier, packing
+  stays square so bars never jump systems under zoom. Goldens byte-identical by the
+  `tightenRows` does-not-run precedent. Appendix planted on
+  [core-zoom-density-pad.md](complete/core-zoom-density-pad.md) (ruling 1's collision
+  guarantee now has a square-scale premise).
+- **[core-ragged-last.md](proposed/core-ragged-last.md)** — the last system borrows its
+  stretch from the page. A sparse final row justifies into the `MAX_STRETCH = 2.5` cap —
+  2.5× the texture of the rows above, still short of the margin. Rule: the last row may
+  not be looser than the loosest other row (`min(computed, max(1, others))`), page-relative
+  rather than a `ragged-last` fill threshold, scoped to multi-system scores so one-system
+  scenarios don't churn. Moves final-system goldens **by design** → `update:primitives`
+  demotes to stale, `/verify` sweep re-approves; global (Knuth–Plass) breaking explicitly
+  not-this. Appendix planted on
+  [core-render-density-zoom.md](complete/core-render-density-zoom.md).
 - **[studio-storage-sync.md](proposed/studio-storage-sync.md)** — **studio's storage, sync
   and sharing**: a hand-rolled op-log sync engine in the Replicache mold (server-authoritative
   rebase over `EditOp`/`applyOp` — CRDTs rejected with reasons), persisted as a SQLite Durable

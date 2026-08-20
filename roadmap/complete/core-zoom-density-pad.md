@@ -299,3 +299,20 @@ a literal, and `git diff -- scenarios/` is clean.
 Not the vertical axis (Ruling 4). Not retuning `MIN_DENSITY` (Ruling 1). Not a
 keystroke (Ruling 5). Not promotion into `elements/`. Not pagination — still
 core-render-density-zoom.md's "Not this", and still true.
+
+## Appendix (2026-08-20): the collision guarantee acquired a premise
+
+Ruling 1 argued collisions are eliminated twice over — density scales springs
+only, and the justifier hands reclaimed width straight back. Both guards price
+widths in **horizontal** staff spaces, and hours after this doc closed,
+`fd6b06e` (*"Staff scale stops dragging the horizontal axis behind it"*) made
+every ink *dimension* follow the **vertical** scale instead, so the guarantee
+now holds **at square scale only**. Under a pinned staff scale on a fitted
+wide score the ink ratio reaches ~1.4 at the arm's first click, and rigid
+columns overflow into their neighbours — first visible as the TAB clef
+running into the time signature (observed 2026-08-20, tab view). The commit
+named this cost and left it *"for a decision"*; the decision is
+[core-ink-priced-columns.md](../proposed/core-ink-priced-columns.md): rigid
+columns are ink and get priced on the ink scale, with packing frozen square
+so this doc's Ruling 2 keeps its substance. The ruling's text above stands as
+written — it was true of the engine it described.
