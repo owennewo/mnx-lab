@@ -1,4 +1,4 @@
-import { LitElement, html, css, svg, nothing } from 'lit';
+import { LitElement, html, css, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, sharedChrome } from '../elements/tokens.ts';
 import {
@@ -9,7 +9,7 @@ import {
 import { MIN_DENSITY, MAX_DENSITY, clampDensity } from '../engine/layout/spacing.ts';
 
 /**
- * The zoom/density pad — roadmap/proposed/core-zoom-density-pad.md, campaign
+ * The zoom/density pad — roadmap/complete/core-zoom-density-pad.md, campaign
  * item 9 of core-campaign-modernist.md, from the design project's
  * `Zoom Control.dc.html`.
  *
@@ -30,11 +30,16 @@ import { MIN_DENSITY, MAX_DENSITY, clampDensity } from '../engine/layout/spacing
  * it emits is clamped by the engine that owns it (`clampStaffScale`,
  * `clampDensity`). The layering rule is docs/core-viewer-surface.md's.
  *
- * The idle mark is the one place the design was revised. Its spec idles the
- * FULL 3×3 grid at 72×72 and opacity 0.28 — about a bar of music, and faint is
- * not absent. Idle here draws the same four-arrow mark as a single 24×24 glyph:
- * 89% less area over the engraving, same identity, and the pad is one hover
- * away.
+ * The quiet state is the place the design was revised, twice. The spec idles
+ * the FULL 3×3 grid at 72×72 and opacity 0.28 — about a bar of music, and
+ * faint is not absent — so the first revision drew the crosshair as a single
+ * 24×24 glyph: 89% less area, same identity. The second (2026-08-20) made the
+ * two states ONE geometry so they morph instead of swapping DOM: the readout
+ * moved from below the grid to its left — where the idle numbers already
+ * sat — and idle is now the same pad with its chrome transparent, its labels
+ * closed and its grid tracks collapsed until the four arms form the 24×24
+ * crosshair. Same buttons in both poses, tracks/transforms/opacity only, and
+ * hover costs 72px of height where the stacked layout cost 100.
  */
 
 /** Design: staff step 5%, spacing step 4%. Both ranges are the ENGINE's.
@@ -113,10 +118,20 @@ export class ZoomPad extends LitElement {
 
   @state() private open = false;
   @state() private dragging = false;
-  /** The axis that just hit its clamp — drives the MIN/MAX chip. */
+  /** The axis that just hit its clamp — drives the MIN/MAX band. */
   @state() private clamped: { axis: ZoomAxis; at: 'min' | 'max' } | null = null;
 
   private repeatTimer: number | null = null;
+  /**
+   * Whether the last COMMITTED render was the expanded pose. The gesture
+   * handlers gate on this rather than on reactive state: on touch,
+   * pointerenter and pointerdown arrive together, so state already says
+   * "expanded" while the screen still shows the 24px mark — and an arm the
+   * user cannot see must not step the score. First contact opens; the next
+   * one operates. (Mouse hover renders the pad long before the click, so the
+   * gate never bites there.)
+   */
+  private renderedExpanded = false;
   private drag: {
     pointerId: number;
     x0: number;
@@ -148,55 +163,156 @@ export class ZoomPad extends LitElement {
         touch-action: none;
       }
 
-      /* ── the quiet state ── */
-      .mark {
-        display: block;
+      /* ── one pad, two poses ──
+         Idle is not a different element: it is this same pad with its chrome
+         transparent, its readout labels closed and its grid tracks collapsed
+         until the four arms form the 24×24 crosshair. Everything between the
+         poses is a transition on tracks, transforms and opacity — that is the
+         whole morph. Right edge is the anchor (margin-left: auto), so the pad
+         grows leftward and downward from the mark. */
+      .pad {
+        display: flex;
+        width: max-content;
         margin-left: auto;
+        box-sizing: border-box;
+        background: transparent;
+        border: var(--rule-w) solid transparent;
+        border-radius: var(--radius-card);
+        box-shadow: 0 10px 26px transparent;
         opacity: 0.28;
-        transition: opacity 0.12s ease;
+        transition:
+          opacity 0.12s ease,
+          background-color 0.16s ease,
+          border-color 0.16s ease,
+          box-shadow 0.16s ease;
       }
 
       /* Off default: the floor rises and the changed arm prints in the accent,
          so the score never lies about its own scale. */
-      :host([data-off]) .mark {
+      :host([data-off]) .pad {
         opacity: 0.55;
       }
 
-      :host([suppressed]) .mark,
+      .pad.expanded {
+        background: var(--surface);
+        border-color: var(--ink);
+        box-shadow: 0 10px 26px var(--shadow-near);
+        opacity: 1;
+      }
+
       :host([suppressed]) .pad {
         opacity: 0.28;
       }
 
-      .mark-row {
+      /* ── the readout: a left-hand column, so the idle numbers and the open
+         readout are the same elements in the same place ── */
+      .readout {
+        box-sizing: border-box;
+        width: 42px;
         display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 5px;
+        flex-direction: column;
+        overflow: hidden;
+        border-right: var(--rule-w) solid transparent;
+        transition:
+          width 0.16s ease,
+          opacity 0.12s ease,
+          border-color 0.16s ease;
       }
 
-      .mark-nums {
-        font: 600 9px/1.15 var(--mono);
-        text-align: right;
+      .pad.expanded .readout {
+        border-color: var(--ink);
+      }
+
+      .pad:not(.expanded) .readout {
+        width: 30px;
+      }
+
+      /* On-default idle shows no numbers at all — the column closes. */
+      .pad:not(.expanded) .readout.empty {
+        width: 0;
+        opacity: 0;
+      }
+
+      .half {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 0 6px;
+        white-space: nowrap;
+        border-top: 1px solid transparent;
+        transition: border-color 0.16s ease;
+      }
+
+      .pad.expanded .half + .half {
+        border-color: var(--line);
+      }
+
+      /* The label closes rather than hides: 9px → 0 is what turns the open
+         STAFF/SPACE pair back into the idle number stack. */
+      .lbl {
+        font: 600 6.5px/1 var(--sans);
+        letter-spacing: 0.1em;
+        color: var(--ink-3);
+        height: 9px;
+        overflow: hidden;
+        transition:
+          height 0.16s ease,
+          opacity 0.12s ease;
+      }
+
+      .pad:not(.expanded) .lbl {
+        height: 0;
+        opacity: 0;
+      }
+
+      .val {
+        font: 600 9px/1.3 var(--mono);
         color: var(--ink);
       }
 
-      .mark-nums .hot {
+      .val.hot {
         color: var(--accent);
       }
 
-      /* ── the pad ── */
-      .pad {
-        width: 76px;
-        box-sizing: border-box;
-        background: var(--surface);
-        border: var(--rule-w) solid var(--ink);
-        border-radius: var(--radius-card);
-        box-shadow: 0 10px 26px var(--shadow-near);
-        margin-left: auto;
+      /* Fitted is not a value the user chose — it reads as derived. */
+      .val.derived {
+        color: var(--ink-3);
       }
 
+      /* The clamp band, now per-axis: the half that hit its wall turns ink and
+         its label becomes the verdict, while the other axis stays readable —
+         which the old full-width chip could not do. Same geometry as the plain
+         half, so nothing reflows. */
+      .half.limit {
+        background: var(--ink);
+      }
+
+      .half.limit .lbl {
+        color: var(--accent-on-ink);
+        letter-spacing: 0.06em;
+      }
+
+      .half.limit .val {
+        color: var(--surface);
+      }
+
+      /* ── the grid ──
+         Collapsed tracks ARE the idle crosshair: 3×8px cells with the arrows
+         scaled down land the four arms on the old single-glyph footprint. The
+         magnifier — mush at 3px of clear centre — waits for the tracks to
+         open. */
       .grid {
         display: grid;
+        grid-template-columns: repeat(3, 8px);
+        grid-template-rows: repeat(3, 8px);
+        transition:
+          grid-template-columns 0.16s ease,
+          grid-template-rows 0.16s ease;
+      }
+
+      .pad.expanded .grid {
         grid-template-columns: repeat(3, 24px);
         grid-template-rows: repeat(3, 24px);
       }
@@ -216,17 +332,36 @@ export class ZoomPad extends LitElement {
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: visible;
         cursor: pointer;
         color: var(--ink);
+        transition:
+          background-color 0.12s ease,
+          color 0.12s ease;
       }
 
-      button.cell:hover:not(:disabled),
-      button.cell:focus-visible {
+      .cell svg {
+        display: block;
+        flex: none;
+        transition: transform 0.16s ease;
+      }
+
+      .pad:not(.expanded) .cell svg {
+        transform: scale(0.62);
+      }
+
+      /* Idle paints a pinned axis in the accent — the arms are the mark now. */
+      .pad:not(.expanded) .cell.hot {
+        color: var(--accent);
+      }
+
+      .pad.expanded button.cell:hover:not(:disabled),
+      .pad.expanded button.cell:focus-visible {
         background: var(--row-current);
         color: var(--accent);
       }
 
-      button.cell:focus-visible {
+      .pad.expanded button.cell:focus-visible {
         outline: var(--rule-w) solid var(--focus-ring);
         outline-offset: -2px;
       }
@@ -234,79 +369,51 @@ export class ZoomPad extends LitElement {
       /* The exhausted arm greys; the live arm keeps the accent. */
       button.cell:disabled {
         cursor: default;
+      }
+
+      .pad.expanded button.cell:disabled {
         background: var(--bg-context);
         color: var(--ink-faint);
       }
 
-      .up { border-bottom: 1px solid var(--line); }
-      .down { border-top: 1px solid var(--line); }
-      .left { border-right: 1px solid var(--line); }
-      .right { border-left: 1px solid var(--line); }
+      .up { border-bottom: 1px solid transparent; }
+      .down { border-top: 1px solid transparent; }
+      .left { border-right: 1px solid transparent; }
+      .right { border-left: 1px solid transparent; }
 
-      /* ── the readout ── */
-      .readout {
-        display: flex;
-        height: 24px;
-        box-sizing: border-box;
-        border-top: var(--rule-w) solid var(--ink);
+      .pad.expanded .up,
+      .pad.expanded .down,
+      .pad.expanded .left,
+      .pad.expanded .right {
+        border-color: var(--line);
       }
 
-      .readout .half {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+      .mag svg {
+        transition:
+          transform 0.16s ease,
+          opacity 0.12s ease;
       }
 
-      .readout .half + .half {
-        border-left: 1px solid var(--line);
+      .pad:not(.expanded) .mag {
+        pointer-events: none;
       }
 
-      .readout .lbl {
-        font: 600 6.5px/1.2 var(--sans);
-        letter-spacing: 0.1em;
-        color: var(--ink-3);
-      }
-
-      .readout .val {
-        font: 600 9px/1.3 var(--mono);
-        color: var(--ink);
-      }
-
-      .readout .val.hot {
-        color: var(--accent);
-      }
-
-      /* Fitted is not a value the user chose — it reads as derived. */
-      .readout .val.derived {
-        color: var(--ink-3);
-      }
-
-      /* Same 24px whether light or ink, so the pad never changes height. */
-      .readout.limit {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        background: var(--ink);
-        white-space: nowrap;
-      }
-
-      .readout.limit .lim-val {
-        font: 600 7px/1.3 var(--sans);
-        letter-spacing: 0.09em;
-        color: var(--surface);
-      }
-
-      .readout.limit .lim-tag {
-        font: 600 7px/1.3 var(--sans);
-        letter-spacing: 0.09em;
-        color: var(--accent-on-ink);
+      .pad:not(.expanded) .mag svg {
+        transform: scale(0.3);
+        opacity: 0;
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .mark { transition: none; }
+        .pad,
+        .readout,
+        .half,
+        .lbl,
+        .grid,
+        button.cell,
+        .cell svg,
+        .mag svg {
+          transition: none;
+        }
       }
     `
   ];
@@ -426,6 +533,10 @@ export class ZoomPad extends LitElement {
   private onArmDown(event: PointerEvent, axis: ZoomAxis, dir: 1 | -1) {
     // Left button only; let anything else fall through to the page.
     if (event.button !== 0) return;
+    if (!this.renderedExpanded) {
+      this.open = true;
+      return;
+    }
     event.preventDefault();
     this.step(axis, dir);
     this.startRepeat(axis, dir);
@@ -467,6 +578,10 @@ export class ZoomPad extends LitElement {
   private onPadDown(event: PointerEvent) {
     // Only bare pad ground — the arms and the magnifier handle their own.
     if (event.button !== 0 || event.target !== event.currentTarget) return;
+    if (!this.renderedExpanded) {
+      this.open = true;
+      return;
+    }
     event.preventDefault();
     this.beginDrag(event);
   }
@@ -535,6 +650,10 @@ export class ZoomPad extends LitElement {
 
   private onMagnifier(event: PointerEvent) {
     if (event.button !== 0) return;
+    if (!this.renderedExpanded) {
+      this.open = true;
+      return;
+    }
     event.preventDefault();
     this.beginDrag(event);
   }
@@ -552,30 +671,10 @@ export class ZoomPad extends LitElement {
 
   updated() {
     this.toggleAttribute('data-off', this.offDefault);
+    this.renderedExpanded = !this.suppressed && (this.open || this.dragging);
   }
 
   // ── marks ───────────────────────────────────────────────────────────────
-
-  /**
-   * The idle mark: the four-arrow crosshair as ONE glyph at 24×24, not the
-   * pad's grid with its borders removed. The magnifier is dropped at this size
-   * — at 3px of clear centre it would be mush — and returns on hover, where it
-   * is also the reset target.
-   */
-  private markGlyph() {
-    const staffHot = this.staffScale !== null;
-    const spaceHot = this.densityH !== null;
-    const hot = 'var(--accent)';
-    const base = 'var(--ink)';
-    return svg`
-      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 0 16 5h-2.5v4h-3V5H8z" fill=${staffHot ? hot : base}></path>
-        <path d="M12 24 8 19h2.5v-4h3v4H16z" fill=${staffHot ? hot : base}></path>
-        <path d="M0 12 5 8v2.5h4v3H5V16z" fill=${spaceHot ? hot : base}></path>
-        <path d="M24 12 19 16v-2.5h-4v-3h4V8z" fill=${spaceHot ? hot : base}></path>
-      </svg>
-    `;
-  }
 
   private arrow(dir: 'up' | 'down' | 'left' | 'right') {
     const paths = {
@@ -613,43 +712,55 @@ export class ZoomPad extends LitElement {
     return String(Math.round(value * 100));
   }
 
-  private renderReadout() {
-    if (this.clamped) {
-      const axis = this.clamped.axis;
+  /**
+   * One axis of the readout, in both poses: open it is label-over-value, idle
+   * the label closes and the bare number remains. A clamp turns THIS half into
+   * the ink band; the other axis stays readable.
+   */
+  private renderHalf(axis: ZoomAxis) {
+    const clamp = this.clamped?.axis === axis ? this.clamped : null;
+    if (clamp) {
       const value = axis === 'staff' ? this.shownStaff : this.shownSpace;
       // MIN/MAX means the ENGINE's wall. The spacing arms can also run out
       // BEFORE it — past the last rung nothing tighter or wider draws anything
       // different — and calling that "MAX" would be claiming a clamp that
-      // isn't there. Same chip, honest word.
-      const bound = this.clamped.at === 'min'
+      // isn't there. Same band, honest word.
+      const bound = clamp.at === 'min'
         ? value <= MIN_DENSITY + RUNG_EPS
         : value >= MAX_DENSITY - RUNG_EPS;
-      const tag = this.clamped.at === 'min'
+      const tag = clamp.at === 'min'
         ? (axis === 'staff' || bound ? 'MIN' : 'TIGHTEST')
         : (axis === 'staff' || bound ? 'MAX' : 'WIDEST');
       return html`
-        <div class="readout limit">
-          <span class="lim-val">${axis === 'staff' ? 'STAFF' : 'SPACE'} ${this.pct(value)}</span>
-          <span class="lim-tag">${tag}</span>
+        <div class="half limit">
+          <div class="lbl">${tag}</div>
+          <div class="val">${this.pct(value)}</div>
         </div>
       `;
     }
-    const fitted = this.staffScale === null;
-    return html`
-      <div class="readout">
+    if (axis === 'staff') {
+      const fitted = this.staffScale === null;
+      return html`
         <div class="half">
           <div class="lbl">${fitted ? 'FIT' : 'STAFF'}</div>
           <div class="val ${fitted ? 'derived' : 'hot'}">${this.pct(this.shownStaff)}</div>
         </div>
-        <div class="half">
-          <div class="lbl">SPACE</div>
-          <div class="val ${this.densityH === null ? '' : 'hot'}">${this.pct(this.shownSpace)}</div>
-        </div>
+      `;
+    }
+    return html`
+      <div class="half">
+        <div class="lbl">SPACE</div>
+        <div class="val ${this.densityH === null ? '' : 'hot'}">${this.pct(this.shownSpace)}</div>
       </div>
     `;
   }
 
-  private renderPad() {
+  render() {
+    // Dragging holds the pad open even when the pointer leaves it, and the
+    // tray's claim on attention beats both.
+    const expanded = !this.suppressed && (this.open || this.dragging);
+    const staffHot = this.staffScale !== null;
+    const spaceHot = this.densityH !== null;
     const atStaffMax = this.shownStaff >= MAX_STAFF_SCALE;
     const atStaffMin = this.shownStaff <= MIN_STAFF_SCALE;
     // Greyed when the arm has nothing left to REACH, which on a ladder can
@@ -660,98 +771,76 @@ export class ZoomPad extends LitElement {
 
     return html`
       <div
-        class="pad"
-        @pointerdown=${this.onPadDown}
-        @pointermove=${this.onPointerMove}
-        @pointerup=${this.onPointerUp}
-        @pointercancel=${this.onPointerUp}
-      >
-        <div class="grid">
-          <div class="gap"></div>
-          <button
-            class="cell up"
-            ?disabled=${atStaffMax}
-            title="Larger staff"
-            aria-label="Larger staff"
-            @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'staff', 1)}
-          >
-            ${this.arrow('up')}
-          </button>
-          <div class="gap"></div>
-
-          <button
-            class="cell left"
-            ?disabled=${atSpaceMin}
-            title="Tighter spacing"
-            aria-label="Tighter spacing"
-            @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'space', -1)}
-          >
-            ${this.arrow('left')}
-          </button>
-          <button
-            class="cell mag"
-            title="Reset zoom and spacing"
-            aria-label="Reset zoom and spacing"
-            @pointerdown=${this.onMagnifier}
-            @pointerup=${this.onMagnifierUp}
-          >
-            ${this.magnifierGlyph()}
-          </button>
-          <button
-            class="cell right"
-            ?disabled=${atSpaceMax}
-            title="Wider spacing"
-            aria-label="Wider spacing"
-            @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'space', 1)}
-          >
-            ${this.arrow('right')}
-          </button>
-
-          <div class="gap"></div>
-          <button
-            class="cell down"
-            ?disabled=${atStaffMin}
-            title="Smaller staff"
-            aria-label="Smaller staff"
-            @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'staff', -1)}
-          >
-            ${this.arrow('down')}
-          </button>
-          <div class="gap"></div>
-        </div>
-        ${this.renderReadout()}
-      </div>
-    `;
-  }
-
-  render() {
-    // Dragging holds the pad open even when the pointer leaves it, and the
-    // tray's claim on attention beats both.
-    const expanded = !this.suppressed && (this.open || this.dragging);
-    return html`
-      <div
         @pointerenter=${() => (this.open = true)}
         @pointerleave=${() => (this.open = false)}
         @focusin=${() => (this.open = true)}
         @focusout=${() => (this.open = false)}
       >
-        ${expanded
-          ? this.renderPad()
-          : html`
-              <div class="mark-row">
-                ${this.offDefault
-                  ? html`<div class="mark-nums">
-                      <div class=${this.staffScale !== null ? 'hot' : ''}>
-                        ${this.pct(this.shownStaff)}
-                      </div>
-                      <div class=${this.densityH !== null ? 'hot' : ''}>
-                        ${this.pct(this.shownSpace)}
-                      </div>
-                    </div>`
-                  : nothing}
-                <div class="mark">${this.markGlyph()}</div>
-              </div>
-            `}
+        <div
+          class="pad ${expanded ? 'expanded' : ''}"
+          @pointerdown=${this.onPadDown}
+          @pointermove=${this.onPointerMove}
+          @pointerup=${this.onPointerUp}
+          @pointercancel=${this.onPointerUp}
+        >
+          <div class="readout ${this.offDefault ? '' : 'empty'}">
+            ${this.renderHalf('staff')}
+            ${this.renderHalf('space')}
+          </div>
+          <div class="grid">
+            <div class="gap"></div>
+            <button
+              class="cell up ${staffHot ? 'hot' : ''}"
+              ?disabled=${atStaffMax}
+              title="Larger staff"
+              aria-label="Larger staff"
+              @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'staff', 1)}
+            >
+              ${this.arrow('up')}
+            </button>
+            <div class="gap"></div>
+
+            <button
+              class="cell left ${spaceHot ? 'hot' : ''}"
+              ?disabled=${atSpaceMin}
+              title="Tighter spacing"
+              aria-label="Tighter spacing"
+              @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'space', -1)}
+            >
+              ${this.arrow('left')}
+            </button>
+            <button
+              class="cell mag"
+              title="Reset zoom and spacing"
+              aria-label="Reset zoom and spacing"
+              @pointerdown=${this.onMagnifier}
+              @pointerup=${this.onMagnifierUp}
+            >
+              ${this.magnifierGlyph()}
+            </button>
+            <button
+              class="cell right ${spaceHot ? 'hot' : ''}"
+              ?disabled=${atSpaceMax}
+              title="Wider spacing"
+              aria-label="Wider spacing"
+              @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'space', 1)}
+            >
+              ${this.arrow('right')}
+            </button>
+
+            <div class="gap"></div>
+            <button
+              class="cell down ${staffHot ? 'hot' : ''}"
+              ?disabled=${atStaffMin}
+              title="Smaller staff"
+              aria-label="Smaller staff"
+              @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'staff', -1)}
+            >
+              ${this.arrow('down')}
+            </button>
+            <div class="gap"></div>
+          </div>
+        </div>
       </div>
     `;
   }

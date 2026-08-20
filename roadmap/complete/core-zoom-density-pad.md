@@ -208,7 +208,7 @@ table takes one cheaply. Should a stroke ever be wanted,
 `harness/conformance/keymap-docs.test.ts` asserts the binding↔`KEY_DOCS` join in
 both directions, so it cannot ship undocumented.
 
-## The idle mark — the one place the design is revised
+## The idle mark — the one place the design is revised (twice — see below)
 
 The mock's idle state is the **full 3×3 grid**, laid out at 72×72 and dropped to
 opacity 0.28. That is roughly a bar of music, and 0.28 opacity makes it faint,
@@ -233,6 +233,24 @@ over 120ms, a 44px hit area so it is grabbable before it is visible, the floor
 rising to 0.55 while either axis is off default with the changed number printed
 in the accent, holding 1.0 while dragging even if the pointer leaves, and
 dropping to 0.28 whenever the selection tray is open.
+
+**Second revision (2026-08-20): the two states became one geometry, so they
+morph.** As built, idle and hover were a hard DOM swap of two unrelated layouts
+(single 24×24 glyph vs grid-over-readout), so no transition between them was
+possible. Revised: the **readout moved from below the grid to its left** —
+exactly where the idle numbers already sat — and idle is now the *same* pad
+with its chrome transparent, its STAFF/SPACE labels closed to 0 height and its
+grid tracks collapsed (3×8px) until the four arrow *buttons* form the 24×24
+crosshair; the separate idle glyph is deleted. Expansion is a transition on
+grid tracks, transforms and opacity — a real morph, not a crossfade — and the
+open pad now costs **72px of height instead of 100**, spending width instead
+(~110px), which is cheap for a right-anchored overlay on a wide score.
+Consequences kept deliberately: the first revision's 24×24 idle footprint is
+preserved exactly (this does *not* reopen the faint-full-grid question); the
+arms exist in both poses so keyboard focus never lands on a vanishing element;
+the clamp band became **per-axis** — the half that hit its wall turns ink while
+the other axis stays readable, which the old full-width chip could not do; and
+`prefers-reduced-motion` snaps between poses with no transition.
 
 ## Where it attaches
 
