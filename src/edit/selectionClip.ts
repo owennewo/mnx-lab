@@ -44,6 +44,13 @@ export interface ClipMeasureContext {
   id?: string;
   key?: MnxGlobalMeasure['key'];
   time?: MnxGlobalMeasure['time'];
+  /** The EFFECTIVE meter at this bar — declared here or inherited from any
+   *  earlier bar — recorded so paste can linearize source distances and flow
+   *  a run across destination barlines (core-paste-lands.md, D8). Absent
+   *  only when no bar at or before this one declares a meter, where both
+   *  sides fall back to the same default. `time` above stays declared-only:
+   *  it is what a bootstrapped document re-declares. */
+  effectiveTime?: { count: number; unit: number };
 }
 
 export interface SelectionClipContext {
@@ -302,7 +309,7 @@ function validateOrigin(value: unknown): void {
 
 function validateMeasureContext(value: unknown, path: string): void {
   const context = objectAt(value, path);
-  exactKeys(context, path, [], ['id', 'key', 'time']);
+  exactKeys(context, path, [], ['id', 'key', 'time', 'effectiveTime']);
   if (context.id !== undefined) stringAt(context.id, `${path}.id`);
   if (context.key !== undefined) {
     const key = objectAt(context.key, `${path}.key`);
@@ -319,6 +326,12 @@ function validateMeasureContext(value: unknown, path: string): void {
       time.display !== 'common' &&
       time.display !== 'cut'
     ) fail(`${path}.time.display`, 'expected common or cut');
+  }
+  if (context.effectiveTime !== undefined) {
+    const time = objectAt(context.effectiveTime, `${path}.effectiveTime`);
+    exactKeys(time, `${path}.effectiveTime`, ['count', 'unit']);
+    integerAt(time.count, `${path}.effectiveTime.count`, 1);
+    integerAt(time.unit, `${path}.effectiveTime.unit`, 1);
   }
 }
 

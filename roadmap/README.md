@@ -254,6 +254,9 @@ proposals that name their campaign.
   conflicts land and are flagged by the forgiving renderer's diagnostics; the
   planner's refusals shrank to the decode tier, every yielded accommodation is
   counted in the plan, and the notice strip reads the record out clause by clause.
+  The same-evening D8 amendment made runs **flow**: source distances linearize against
+  the clip's recorded effective meters and re-bin at the destination's barlines, so
+  four quarters pasted at beat 3 continue into the next bar instead of overfilling.
   Supersedes Contract 3 of the clipboard item.
 - **[core-selection-floor-axis.md](complete/core-selection-floor-axis.md)** — proposed,
   decided and built 2026-08-20 out of the clipboard review: the note-rung *range* proved

@@ -146,13 +146,25 @@ function measureIndices(members: SelectionMember[]): number[] {
 }
 
 function contextFor(doc: MnxStructure, indices: number[]): { measures: ClipMeasureContext[] } {
+  // The effective meter per covered bar — inherited declarations included —
+  // so paste can linearize source distances and flow across destination
+  // barlines (core-paste-lands.md, D8). Absent only when nothing at or
+  // before the bar declares one.
+  const measures = doc.global?.measures ?? [];
+  const effective: ({ count: number; unit: number } | undefined)[] = [];
+  let current: { count: number; unit: number } | undefined;
+  measures.forEach((measure, index) => {
+    if (measure.time) current = { count: measure.time.count, unit: measure.time.unit };
+    effective[index] = current;
+  });
   return {
     measures: indices.map(index => {
-      const global = doc.global?.measures?.[index];
+      const global = measures[index];
       return cloneJson({
         ...(global?.id === undefined ? {} : { id: global.id }),
         ...(global?.key === undefined ? {} : { key: global.key }),
-        ...(global?.time === undefined ? {} : { time: global.time })
+        ...(global?.time === undefined ? {} : { time: global.time }),
+        ...(effective[index] === undefined ? {} : { effectiveTime: effective[index] })
       });
     })
   };

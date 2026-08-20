@@ -268,7 +268,15 @@ describe('selection clip extraction', () => {
   it('collects only referenced lyric metadata plus source support and measure context', () => {
     const result = success(score(), point('event', cursor(0)));
     expect(result.envelope.context).toEqual({
-      measures: [{ id: 'm0', key: { fifths: 2 }, time: { count: 4, unit: 4 } }]
+      // `time` is the DECLARED meter (what a bootstrap re-declares);
+      // `effectiveTime` is the inherited-inclusive meter D8's flow
+      // linearizes source distances with.
+      measures: [{
+        id: 'm0',
+        key: { fifths: 2 },
+        time: { count: 4, unit: 4 },
+        effectiveTime: { count: 4, unit: 4 }
+      }]
     });
     expect(result.envelope.dependencies).toEqual({
       support: { useAccidentalDisplay: true, useBeams: true },

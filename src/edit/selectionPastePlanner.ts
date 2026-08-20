@@ -33,6 +33,7 @@ import { isTimedEvent } from '../model/mnx.ts';
 import {
   addOnsets,
   itemSpan,
+  measureSpans,
   onsetsEqual,
   type Onset,
   type Projection
@@ -692,20 +693,6 @@ function runAnchor(
   return { measureIndex: state.anchor.measureIndex, onset: { ...state.anchor.onset } };
 }
 
-function mergeRelationships(
-  after: MnxStructure,
-  partIndex: number,
-  targetStart: number,
-  relationships: ClipBarRelationships[] | undefined
-): void {
-  relationships?.forEach(source => {
-    const measure = after.parts[partIndex]?.measures?.[targetStart + source.offset];
-    if (!measure) return;
-    if (source.beams?.length) measure.beams = [...(measure.beams ?? []), ...cloneJson(source.beams)];
-    if (source.ottavas?.length) measure.ottavas = [...(measure.ottavas ?? []), ...cloneJson(source.ottavas)];
-  });
-}
-
 function rewriteExistingMeasureReferences(doc: MnxStructure, mapping: Map<string, string>): void {
   if (!mapping.size) return;
   doc.parts.forEach(part => part.measures.forEach(measure => measure.ottavas?.forEach(ottava => {
@@ -873,39 +860,109 @@ export function planSelectionPaste(
         destination.parts[partIndex]
       );
       const anchor = runAnchor(destination, state, projection);
-      const firstBar = runBars[0];
-      const delta = subtractOnsets(anchor.onset, { num: firstBar.onset[0], den: firstBar.onset[1] });
-      ensureBars(after, anchor.measureIndex + clip.span - 1, accommodations);
-      bindContextMeasures(envelope, after, anchor.measureIndex, ids);
       runBars.forEach(bar => rewriteItems(bar.items, ids));
-      let lastStartOnset: Onset = anchor.onset;
+
+      // D8 — FLOW. Linearize the clip against its recorded source meters
+      // (each item's distance from the run's first item, gaps included),
+      // then re-bin every item against the DESTINATION's meters from the
+      // anchor position: barlines fall where the destination says, whole
+      // items crossing them simply land in the bar their onset falls in
+      // (overfull is the diagnostics layer's to flag — D2 intact), and gaps
+      // remain exactly the silent time they were, touching nothing.
+      const sourceCapacity = (offset: number): Onset => {
+        const effective = envelope.context?.measures?.[offset]?.effectiveTime;
+        return effective ? { num: effective.count, den: effective.unit } : { num: 1, den: 1 };
+      };
+      const sourceBarStarts: Onset[] = [{ num: 0, den: 1 }];
+      for (let offset = 1; offset < clip.span; offset++) {
+        sourceBarStarts[offset] = addOnsets(sourceBarStarts[offset - 1], sourceCapacity(offset - 1));
+      }
+      interface FlowItem { item: MnxSequenceItem; stream: Onset }
+      const stream: FlowItem[] = [];
       for (const bar of runBars) {
-        const measureIndex = anchor.measureIndex + bar.offset;
-        const sequenceIndex = ensureSequenceIndex(
-          after, partIndex, staffIndex, measureIndex, voiceIndex, accommodations
-        );
-        let startOnset = addOnsets({ num: bar.onset[0], den: bar.onset[1] }, delta);
-        // A negative translated onset means the phrase's pickup would start
-        // before its bar; clamp to the bar start rather than refusing.
-        if (compareSpan(startOnset, { num: 0, den: 1 }) < 0) startOnset = { num: 0, den: 1 };
-        const sequence = after.parts[partIndex].measures[measureIndex].sequences[sequenceIndex];
-        sequence.content = overwriteVoiceInterval(sequence.content, startOnset, bar.items, accommodations);
-        if (bar === runBars[runBars.length - 1]) {
-          lastStartOnset = bar.items.slice(0, -1).reduce(
-            (onset, item) => addOnsets(onset, itemSpan(item)),
-            startOnset
-          );
+        let position = addOnsets(sourceBarStarts[bar.offset], { num: bar.onset[0], den: bar.onset[1] });
+        for (const item of bar.items) {
+          stream.push({ item, stream: position });
+          position = addOnsets(position, itemSpan(item));
         }
       }
+      const origin = stream[0]?.stream ?? { num: 0, den: 1 };
+
+      const destinationSpans = measureSpans(after);
+      const destinationCapacity = (index: number): Onset =>
+        destinationSpans[index] ?? destinationSpans[destinationSpans.length - 1] ?? { num: 1, den: 1 };
+      interface BinnedItem { item: MnxSequenceItem; measureIndex: number; onset: Onset }
+      const binned: BinnedItem[] = stream.map(({ item, stream: at }) => {
+        let measureIndex = anchor.measureIndex;
+        let onset = addOnsets(anchor.onset, subtractOnsets(at, origin));
+        for (;;) {
+          const capacity = destinationCapacity(measureIndex);
+          if (compareSpan(onset, capacity) < 0) break;
+          onset = subtractOnsets(onset, capacity);
+          measureIndex++;
+        }
+        return { item, measureIndex, onset };
+      });
+      const lastBinned = binned[binned.length - 1];
+      ensureBars(after, lastBinned?.measureIndex ?? anchor.measureIndex, accommodations);
+      bindContextMeasures(envelope, after, anchor.measureIndex, ids);
+
+      // Contiguous items (next onset = previous end, same bar) overwrite as
+      // one cluster, so a mid-stream gap makes no statement about the
+      // destination material it skips.
+      interface Cluster { measureIndex: number; start: Onset; items: MnxSequenceItem[]; end: Onset }
+      const clusters: Cluster[] = [];
+      for (const entry of binned) {
+        const prior = clusters[clusters.length - 1];
+        if (
+          prior && prior.measureIndex === entry.measureIndex &&
+          onsetsEqual(prior.end, entry.onset)
+        ) {
+          prior.items.push(entry.item);
+          prior.end = addOnsets(prior.end, itemSpan(entry.item));
+        } else {
+          clusters.push({
+            measureIndex: entry.measureIndex,
+            start: entry.onset,
+            items: [entry.item],
+            end: addOnsets(entry.onset, itemSpan(entry.item))
+          });
+        }
+      }
+      for (const cluster of clusters) {
+        const sequenceIndex = ensureSequenceIndex(
+          after, partIndex, staffIndex, cluster.measureIndex, voiceIndex, accommodations
+        );
+        const sequence = after.parts[partIndex].measures[cluster.measureIndex].sequences[sequenceIndex];
+        sequence.content = overwriteVoiceInterval(sequence.content, cluster.start, cluster.items, accommodations);
+      }
+
+      // Spanning relationships follow their music: a beam homes at the bar
+      // its first event flowed into; ottavas keep the anchor-bar home their
+      // measure references bind against.
       const relationships = rewriteRelationships(envelope.relationships?.measures, ids);
-      mergeRelationships(after, partIndex, anchor.measureIndex, relationships);
+      const eventBar = new Map<string, number>();
+      binned.forEach(entry => visitItems([entry.item], event => {
+        if (event.id) eventBar.set(event.id, entry.measureIndex);
+      }));
+      relationships?.forEach(source => {
+        source.beams?.forEach(beam => {
+          const home = eventBar.get(beam.events[0]) ?? anchor.measureIndex + source.offset;
+          const measure = after.parts[partIndex]?.measures?.[home];
+          if (measure) measure.beams = [...(measure.beams ?? []), cloneJson(beam)];
+        });
+        if (source.ottavas?.length) {
+          const measure = after.parts[partIndex]?.measures?.[anchor.measureIndex + source.offset];
+          if (measure) measure.ottavas = [...(measure.ottavas ?? []), ...cloneJson(source.ottavas)];
+        }
+      });
       resultLanding = landing(
         state,
         level,
         anchor.measureIndex,
-        anchor.measureIndex + runBars[runBars.length - 1].offset,
+        lastBinned?.measureIndex ?? anchor.measureIndex,
         anchor.onset,
-        lastStartOnset
+        lastBinned?.onset ?? anchor.onset
       );
       break;
     }

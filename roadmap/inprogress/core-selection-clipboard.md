@@ -87,7 +87,12 @@ range and live closure resolve to ordered model members.
 > the same day**: the floor axis and the landing paste are in the code, the
 > paste planner's refusals are the decode tier only, and the notice strip
 > reports accommodations. Stage 7's hands-on review now exercises the
-> landing behavior rather than the retired refusal matrix.
+> landing behavior rather than the retired refusal matrix. The D8 flow
+> amendment grew Contract 1's clip format by one field: the measure
+> context records `effectiveTime` (declared-or-inherited meter per covered
+> bar) so paste can linearize source distances; the strict codec validates
+> it, and clips are app-lifetime memory only, so no stored clip predates
+> the field.
 
 ## The boundary
 

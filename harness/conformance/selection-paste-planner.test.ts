@@ -460,3 +460,92 @@ describe('pure selection paste planner', () => {
     expect(content[1]).toMatchObject({ type: 'tuplet' });
   });
 });
+
+// D8 — a run flows: source distances linearize against the clip's recorded
+// effective meters, and the DESTINATION's meters decide where barlines fall.
+describe('paste flow (D8)', () => {
+  const quarters = (prefix: string, count: number, from = 1) =>
+    Array.from({ length: count }, (_, index) => ({
+      id: `${prefix}${from + index}`,
+      duration: { base: 'quarter' as const },
+      notes: [note(`${prefix}${from + index}-n`)]
+    }));
+
+  const barsOf = (prefix: string, bars: number, time: { count: number; unit: number }): MnxStructure => ({
+    mnx: { version: 1 },
+    global: {
+      measures: Array.from({ length: bars }, (_, index) => index === 0 ? { time } : {})
+    },
+    parts: [{
+      id: `${prefix}-part`,
+      _x: { mnxLab: { strings: [...STANDARD_GUITAR_STRINGS] } },
+      measures: Array.from({ length: bars }, (_, index) => ({
+        sequences: [{ content: quarters(prefix, time.count, index * time.count + 1) }]
+      }))
+    }]
+  });
+
+  const ids = (result: { document: MnxStructure }, measureIndex: number): (string | undefined)[] =>
+    result.document.parts[0].measures[measureIndex].sequences[0].content.map(item =>
+      'id' in item ? item.id : undefined
+    );
+
+  it('four quarters onto beat 3 fill the bar and continue into the next (the motivating case)', () => {
+    const clip = serialized(barsOf('s', 1, { count: 4, unit: 4 }), closure('event'));
+    const result = accepted(
+      clip,
+      barsOf('d', 2, { count: 4, unit: 4 }),
+      point('event', cursor(0, 1, 2)) // beat 3
+    );
+    const pasted = (index: number) => result.idMap.events[`s${index}`];
+    expect(ids(result, 0)).toEqual(['d1', 'd2', pasted(1), pasted(2)]);
+    expect(ids(result, 1)).toEqual([pasted(3), pasted(4), 'd7', 'd8']);
+    expect(result.accommodations.restFills).toBe(0);
+    expect(result.accommodations.appendedBars).toBe(0);
+    expect(result.landing).toMatchObject({
+      measureStart: 0, measureEnd: 1, onsetEnd: [1, 4]
+    });
+  });
+
+  it('cross-meter: a 4/4 bar of quarters flows into 3/4 bars at the destination’s barlines', () => {
+    const clip = serialized(barsOf('s', 1, { count: 4, unit: 4 }), closure('event'));
+    const result = accepted(
+      clip,
+      barsOf('d', 2, { count: 3, unit: 4 }),
+      point('event')
+    );
+    const pasted = (index: number) => result.idMap.events[`s${index}`];
+    expect(ids(result, 0)).toEqual([pasted(1), pasted(2), pasted(3)]);
+    expect(ids(result, 1)).toEqual([pasted(4), 'd5', 'd6']);
+    expect(result.accommodations.restFills).toBe(0);
+  });
+
+  it('flow off the end of the score appends bars (rule 4)', () => {
+    const clip = serialized(barsOf('s', 1, { count: 4, unit: 4 }), closure('event'));
+    const result = accepted(
+      clip,
+      barsOf('d', 1, { count: 4, unit: 4 }),
+      point('event', cursor(0, 1, 2))
+    );
+    expect(result.accommodations.appendedBars).toBe(1);
+    expect(result.accommodations.createdSequences).toBe(1);
+    expect(result.document.parts[0].measures[1].sequences[0].content).toHaveLength(2);
+  });
+
+  it('a duration that straddles the destination barline lands whole in its bar (D2)', () => {
+    const source = barsOf('s', 1, { count: 4, unit: 4 });
+    source.parts[0].measures[0].sequences[0].content = [
+      { id: 'sh1', duration: { base: 'half' }, notes: [note('sh1-n')] },
+      { id: 'sh2', duration: { base: 'half' }, notes: [note('sh2-n')] }
+    ];
+    const result = accepted(
+      serialized(source, closure('event')),
+      barsOf('d', 2, { count: 4, unit: 4 }),
+      point('event', cursor(0, 1, 4)) // beat 2: the second half straddles
+    );
+    // Bar 1 holds d1 + both halves (5 beats) — overfull, flagged by the
+    // renderer's diagnostics, never split-and-tied here.
+    expect(ids(result, 0)).toEqual(['d1', result.idMap.events['sh1'], result.idMap.events['sh2']]);
+    expect(ids(result, 1)).toEqual(['d5', 'd6', 'd7', 'd8']);
+  });
+});
