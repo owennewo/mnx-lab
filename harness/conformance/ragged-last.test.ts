@@ -35,16 +35,16 @@ function doc(id: string): MnxStructure {
 }
 
 /**
- * The packer's own justification, UNCAPPED — a deliberate mirror of
- * `packSystems`' arithmetic (same terms, same order) so a test can say what
- * the last row WOULD have been and show the rule actually bit.
+ * The packer's own justification, UNCAPPED and unruled — a deliberate mirror
+ * of `packSystems`' arithmetic (same terms, same order) so a test can say what
+ * a row WOULD have been and show the rules actually bit.
  */
 function rawStretches(
   packing: PackingInput,
-  rows: readonly { measures: readonly number[]; full: boolean }[]
+  rows: readonly { measures: readonly number[] }[]
 ): number[] {
   const contentRightPad = packing.contentRightPadSp ?? 0.8;
-  return rows.map(({ measures, full }) => {
+  return rows.map(({ measures }) => {
     let rowRigid = 0;
     let rowSpring = 0;
     measures.forEach((k, j) => {
@@ -54,10 +54,26 @@ function rawStretches(
       rowSpring += m.spring + m.lead;
     });
     if (rowSpring <= 0) return 1;
-    const wanted = Math.max(MIN_SQUEEZE, (packing.lineWidthSp - rowRigid) / rowSpring);
-    // MAX_STRETCH caps only a row nobody filled — a full row justifies.
-    return full ? wanted : Math.min(MAX_STRETCH, wanted);
+    return Math.max(MIN_SQUEEZE, (packing.lineWidthSp - rowRigid) / rowSpring);
   });
+}
+
+/**
+ * The whole rule on top of those numbers, mirrored: a FULL row justifies to
+ * the margin, a row nobody filled is held to the loosest full row — the page's
+ * own texture — and `MAX_STRETCH` only stands in when the page has no full row
+ * to read (2026-08-21). Then the page-relative last-row cap.
+ */
+function ruledStretches(
+  packing: PackingInput,
+  rows: readonly { measures: readonly number[]; full: boolean }[]
+): number[] {
+  const raw = rawStretches(packing, rows);
+  const bodies = raw.filter((_, i) => rows[i].full);
+  const ceiling = bodies.length > 0 ? Math.max(...bodies) : MAX_STRETCH;
+  return capLastRowStretch(
+    raw.map((v, i) => (rows[i].full ? v : Math.max(MIN_SQUEEZE, Math.min(v, ceiling))))
+  );
 }
 
 describe('ragged last', () => {
@@ -96,9 +112,7 @@ describe('ragged last', () => {
         expect(rows[rows.length - 1].stretch).toBeLessThanOrEqual(Math.max(1, ...others) + 1e-9);
         // And the single shared helper is what produced it — the packer does
         // not carry a second copy of the rule.
-        expect(rows.map(r => r.stretch)).toEqual(
-          capLastRowStretch(rawStretches(packing, rows))
-        );
+        expect(rows.map(r => r.stretch)).toEqual(ruledStretches(packing, rows));
       }
     }
     expect(multiSystem).toBeGreaterThan(0);
@@ -127,12 +141,32 @@ describe('ragged last', () => {
     expect(bit).toBeGreaterThan(0);
   });
 
+  it('a LOOSE page keeps its leftover row: the ceiling is the page, not the constant', () => {
+    initSmufl();
+    // 18.4sp of line is the staff at 640% on a full-width pane, and 6% density
+    // on top: one bar per system, every full row stretching far past
+    // MAX_STRETCH to reach the margin. The final stranded bar used to be
+    // pinned at 2.5 — the TIGHTEST system on a very loose page, which is the
+    // exact inversion of what this rule exists to prevent — and its stretch
+    // was then the only thing on the page density could still move.
+    const packing = planHorizontal(doc('lab/document/twelve-bar-blues'), 1180 / 64).packing;
+    const rows = packSystems(packing, 0.06);
+    expect(rows.length).toBeGreaterThan(2);
+    const others = rows.slice(0, -1).map(r => r.stretch);
+    // The page IS loose — that is the premise, and the first system being
+    // squeezed against its own ink does not change it.
+    expect(Math.max(...others)).toBeGreaterThan(MAX_STRETCH);
+    const last = rows[rows.length - 1].stretch;
+    expect(last).toBeGreaterThan(MAX_STRETCH);
+    expect(last).toBeLessThanOrEqual(Math.max(...others) + 1e-9);
+  });
+
   it('a single-system score is untouched — one system is not a page', () => {
     initSmufl();
     const packing = planHorizontal(doc('lab/tab-positions/open-strings-chord'), 80).packing;
     const rows = packSystems(packing, 1);
     expect(rows.length).toBe(1);
-    expect(rows[0].stretch).toBe(rawStretches(packing, [rows[0]])[0]);
+    expect(rows[0].stretch).toBe(ruledStretches(packing, [rows[0]])[0]);
   });
 
   it('the ink-priced path applies the same rule', () => {

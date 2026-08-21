@@ -312,7 +312,7 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
   // The score simply ran out: the last row holds what was left, not what fits.
   if (current.length > 0) rows.push({ measures: current, full: false });
 
-  const justified = rows.map(({ measures, full }) => {
+  const wanted = rows.map(({ measures, full }) => {
     let rowRigid = 0;
     let rowSpring = 0;
     measures.forEach((k, j) => {
@@ -321,10 +321,10 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
         (j === 0 ? m.prefixFirst : m.prefixRest) + m.rigid + contentRightPad + m.repeatExtra;
       rowSpring += m.spring * densityH + m.lead * densityH;
     });
-    return { measures, full, stretch: rowStretch(lineWidth - rowRigid, rowSpring, full) };
+    return { measures, full, stretch: rowStretch(lineWidth - rowRigid, rowSpring) };
   });
-  const capped = capLastRowStretch(justified.map(r => r.stretch));
-  return justified.map((r, i) => ({ measures: r.measures, stretch: capped[i], full: r.full }));
+  const capped = justifyRows(wanted);
+  return wanted.map((r, i) => ({ measures: r.measures, stretch: capped[i], full: r.full }));
 }
 
 /**
@@ -375,10 +375,55 @@ export function capLastRowStretch(stretches: readonly number[]): number[] {
  * `MIN_SQUEEZE` is unconditional: an overfull row has to compress whatever
  * ended it.
  */
-function rowStretch(slack: number, rowSpring: number, full: boolean): number {
+function rowStretch(slack: number, rowSpring: number): number {
   if (rowSpring <= 0) return 1;
-  const wanted = Math.max(MIN_SQUEEZE, slack / rowSpring);
-  return full ? wanted : Math.min(MAX_STRETCH, wanted);
+  return Math.max(MIN_SQUEEZE, slack / rowSpring);
+}
+
+/**
+ * The loosest FULL row on the page — the texture the reader is looking at —
+ * or null when no row was filled.
+ *
+ * This is the ceiling for every row that was given its bars rather than filled
+ * with them, and it replaces `MAX_STRETCH` in that job wherever a body exists.
+ * `MAX_STRETCH` was answering "how far may a stranded bar spread?" with a
+ * constant, and a constant cannot know what the rest of the page is doing: on a
+ * LOOSE page — a narrow line, or the staff scaled up, where the full rows
+ * stretch past 2.5 to reach the margin — the cap made the last system the
+ * TIGHTEST thing on the page rather than the loosest, which is the opposite of
+ * the failure it was written to prevent. Reading the ceiling off the page
+ * cannot invert like that: the leftover row is spaced like the rows above it,
+ * ragged at the right, which is what a final system is supposed to look like.
+ *
+ * It also removes a phantom the density control tripped over. A capped row's
+ * `densityH × stretch` moves with density while every full row's is pinned by
+ * justification, so at high staff scales the last system was the ONLY thing
+ * density could still change — and `densityLadder` dutifully reported a rung
+ * every 1%, i.e. a control full of steps that moved one stranded bar at the
+ * bottom of a twelve-system page. Reported from use, 2026-08-21:
+ * *"horizontal space 18, 14, 10 and 6 look near identical"*. They were.
+ */
+function bodyStretch(rows: readonly { full: boolean; stretch: number }[]): number | null {
+  const full = rows.filter(r => r.full);
+  return full.length === 0 ? null : Math.max(...full.map(r => r.stretch));
+}
+
+/**
+ * Every row's final stretch: full rows get what justification asks for, and
+ * the rows that were given their bars get the page's texture as a ceiling,
+ * then the page-relative last-row rule on top.
+ *
+ * Exported-shaped (module-internal) because there are two callers and they
+ * MUST agree — `packSystems` for the square path, and `planHorizontal`'s
+ * ink-ratio re-run, which redoes the same arithmetic over scaled metrics with
+ * the same row membership. Two copies of this rule is exactly the drift this
+ * module exists to prevent.
+ */
+function justifyRows(rows: readonly { full: boolean; stretch: number }[]): number[] {
+  const ceiling = bodyStretch(rows) ?? MAX_STRETCH;
+  return capLastRowStretch(
+    rows.map(r => (r.full ? r.stretch : Math.max(MIN_SQUEEZE, Math.min(r.stretch, ceiling))))
+  );
 }
 
 // ---------- The density ladder ----------
@@ -388,6 +433,11 @@ function rowStretch(slack: number, rowSpring: number, full: boolean): number {
  * a control offers, so no distinct engraving can hide between two grid points.
  */
 const LADDER_GRID = 100;
+
+/** The same grid as a density INCREMENT — exported because a control walking
+ *  the ladder needs it to name a run's top edge: run i is
+ *  `[ladder[i], ladder[i + 1] - DENSITY_GRID]`. */
+export const DENSITY_GRID = 1 / LADDER_GRID;
 
 /**
  * What a density value actually DRAWS, compressed to a string.
@@ -1337,7 +1387,7 @@ export function planHorizontal(
   // packer's numbers are reused untouched.
   let stretches = packed.map(r => r.stretch);
   if (inkRatio !== 1) {
-    stretches = capLastRowStretch(
+    stretches = justifyRows(
       packed.map(packedRow => {
         let rowRigid = 0;
         let rowSpring = 0;
@@ -1351,7 +1401,7 @@ export function planHorizontal(
         // Same rule as the square path, through the same helper — this is the
         // path where the cap actually bit, since ink pricing below 100% staff
         // scale shrinks the rigid columns and pushes the needed stretch up.
-        return rowStretch(lineWidth - rowRigid, rowSpring, packedRow.full);
+        return { full: packedRow.full, stretch: rowStretch(lineWidth - rowRigid, rowSpring) };
       })
     );
   }

@@ -10,6 +10,7 @@ import {
 import {
   MIN_DENSITY,
   MAX_DENSITY,
+  DENSITY_GRID,
   QUARTER_SPRING_SP,
   clampDensity
 } from '../engine/layout/spacing.ts';
@@ -526,11 +527,19 @@ export class ZoomPad extends LitElement {
     }
   }
 
-  /** The ladder to walk, or null when there is nobody to ask (or nothing to
-   *  walk — a score with one distinct engraving across the whole range). */
+  /**
+   * The ladder to walk, or null when there is nobody to ask.
+   *
+   * A ladder of ONE rung is not "nothing to walk", it is the answer: this
+   * score has a single engraving across the entire density range, so both arms
+   * are exhausted and must say so. It used to fall through to the flat step
+   * here, which is how the axis went dead-but-clickable at high staff scales —
+   * where one bar fills a system, every row is justified to the margin and
+   * density has nothing left to move (2026-08-21).
+   */
   private ladder(): number[] | null {
     const steps = this.densitySteps?.() ?? null;
-    return steps && steps.length > 1 ? steps : null;
+    return steps && steps.length > 0 ? steps : null;
   }
 
   /**
@@ -542,6 +551,15 @@ export class ZoomPad extends LitElement {
    * click this walk exists to skip. Hence "the run `from` sits in", not "the
    * nearest rung". Within what is left, the first rung at least SPACE_STEP
    * away wins — a dense ladder must not turn the design's 4% step into 1%.
+   *
+   * Going DOWN, the rung itself is the wrong place to land. A run can be very
+   * wide — at a large staff scale everything from 2% to 66% draws the same
+   * page — and its low edge is the far side of it, so landing on the rung
+   * turned one click of "a bit tighter" into 67 → 2. The arm lands on the near
+   * side instead: as far as it has to go to change the engraving, and no
+   * further, which is `from - SPACE_STEP` when that already sits inside the
+   * run and the run's top edge when it does not. Going up, the rung IS the
+   * near side, so that direction is unchanged.
    */
   private nextSpace(dir: 1 | -1, from: number): number | null {
     const ladder = this.ladder();
@@ -551,11 +569,20 @@ export class ZoomPad extends LitElement {
     }
     let cur = -1;
     while (cur + 1 < ladder.length && ladder[cur + 1] <= from + RUNG_EPS) cur++;
-    const ahead = dir < 0
-      ? ladder.slice(0, Math.max(0, cur)).reverse()
-      : ladder.slice(cur + 1);
-    if (ahead.length === 0) return null;
-    return ahead.find(v => Math.abs(v - from) >= SPACE_STEP - RUNG_EPS) ?? ahead[0];
+    if (dir > 0) {
+      const ahead = ladder.slice(cur + 1);
+      if (ahead.length === 0) return null;
+      return ahead.find(v => v - from >= SPACE_STEP - RUNG_EPS) ?? ahead[0];
+    }
+    const below = ladder.slice(0, Math.max(0, cur));
+    if (below.length === 0) return null;
+    const rung =
+      [...below].reverse().find(v => from - v >= SPACE_STEP - RUNG_EPS) ?? below[below.length - 1];
+    const index = ladder.indexOf(rung);
+    // The top of that run: one grid step under the next rung up. There is
+    // always a next one — `rung` came from strictly below the current run.
+    const top = Math.round((ladder[index + 1] - DENSITY_GRID) * 100) / 100;
+    return Math.max(rung, Math.min(top, Math.round((from - SPACE_STEP) * 100) / 100));
   }
 
   /** `steps` rungs from `from`, stopping where the arm runs out. Absolute from

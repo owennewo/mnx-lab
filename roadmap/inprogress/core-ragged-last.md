@@ -131,3 +131,33 @@ conformance ladder assertions should be re-derived, not patched to pass.
 corpus diff is confined to final systems, the sweep is re-approved, and the
 conformance assertions are mutation-checked (delete the `min`, watch the
 corpus assertion fail).
+
+## Appendix (2026-08-21): the ceiling is the PAGE, not the constant
+
+The rule shipped as "never looser than the loosest other row". That is one half.
+The other half went unnoticed until a reader zoomed in: `MAX_STRETCH` was still
+the *first* ceiling every non-full row met, and on a **loose page** — a narrow
+line, or a big staff scale, where the full rows stretch past 2.5 to reach the
+margin — the leftover row was pinned at 2.5 while the page around it sat at
+8.6. The rule written to stop the last system being the loosest thing on the
+page had made it the **tightest**.
+
+So the ceiling is read off the page in both directions: a row nobody filled is
+held to the loosest FULL row, and `MAX_STRETCH` only stands in when there is no
+full row to read — the single-system score, which is the case the constant was
+always really about. One helper, `justifyRows`, now applies it, and the
+ink-priced re-justification path calls the same helper rather than only
+`capLastRowStretch`.
+
+**Corpus effect: none.** `update:primitives` leaves `git diff -- scenarios/`
+clean, because the change only bites where full rows stretch past 2.5 and the
+goldens' 80sp line never does. No demotions, no new `/verify` debt.
+
+**What it also removed.** A capped row's `densityH × stretch` moves with density
+while every full row's is pinned by justification — so on a page of full rows
+the stranded last bar was the ONLY thing density could still change, and
+`densityLadder` reported a rung for it every 1%. Reported from use: *"if
+vertical is at max (640) then horizontal space 18, 14, 10 and 6 look near
+identical"*. Measured at the time of the report, staff 640%, tab view: page
+widths **2754 / 2747 / 2739 px** — a quarter of one percent apart, and the pad
+was offering all four as steps.

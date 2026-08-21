@@ -42,6 +42,7 @@ import {
   clampDensity,
   clampInkRatio,
   densityLadder,
+  packingSignature,
   packSystems,
   CORE_SP,
   KEY_SIG_GLYPH_ADVANCE_SP,
@@ -219,6 +220,24 @@ describe('zoom / density', () => {
       const above = ladder.find(v => v > 1)!;
       expect(engraving(mnx, below, 80)).not.toBe(engraving(mnx, 1, 80));
       expect(engraving(mnx, above, 80)).not.toBe(engraving(mnx, 1, 80));
+    });
+
+    it('the reported bug at high zoom: a page of full rows is ONE engraving', () => {
+      initSmufl();
+      // Staff 640% on a full-width pane leaves ~18sp of line, which in the tab
+      // view is one bar per system: every row FULL, so every row justifies to
+      // the margin and density is absorbed completely. Reported from use,
+      // 2026-08-21: *"horizontal space 18, 14, 10 and 6 look near identical"*.
+      // They were identical, and the ladder offered them anyway — because the
+      // final stranded bar was pinned at MAX_STRETCH, the one thing on the page
+      // whose spacing still moved with density. With the leftover row spaced
+      // like its page, the whole run collapses to the single rung it is.
+      const packings = layoutTab({ mnx: twelveBars(), widthSp: 1180 / 64 }).packings!;
+      const one = packingSignature(packings, 0.06);
+      for (const density of [0.1, 0.14, 0.18, 0.5]) {
+        expect(packingSignature(packings, density)).toBe(one);
+      }
+      expect(densityLadder(packings).filter(v => v > MIN_DENSITY && v <= 0.5)).toEqual([]);
     });
 
     it('a score every value changes keeps every value', () => {

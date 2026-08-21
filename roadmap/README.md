@@ -52,6 +52,13 @@ proposals that name their campaign.
   core-ink-priced-columns froze packing to keep separated. Four options costed, from "do
   nothing, document it" to "always ink-measured", with coupling-in-the-control carrying
   the best precedent.
+- **[core-density-ladder-ink.md](proposed/core-density-ladder-ink.md)** — the density
+  ladder re-packs a **square** `PackingInput`, so above ratio 1 it both claims changes
+  the reader cannot see (rungs two pixels apart at staff 640%) and misses ones they can.
+  Found 2026-08-21 under the report that the spacing arms do nothing at max zoom, whose
+  engraving half core-ragged-last fixed. Four options costed; pricing the packing at the
+  paint's own density is the likely trade, plus a perceptual tolerance in
+  `packingSignature` that is worth doing on its own.
 - **[core-entry-mode.md](proposed/core-entry-mode.md)** — the orthogonal entry axis
   graduated from the completed selection ladder on 2026-08-16: **advance on/off** as
   recorded session state, stage-1 fret-digit resolution, the notation action binding and
