@@ -6,7 +6,7 @@
 // The workbench has NO backend: everything on screen is committed JSON
 // served statically; verification state is display-only (mutations happen
 // through the harness scripts, in git).
-import { LitElement, html, css, nothing } from 'lit';
+import { LitElement, html, css, svg, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { corpus, corpusManifest, coverage, type ScenarioEntry } from '../corpus/corpus.ts';
 import { groupScenarios } from '../corpus/groups.ts';
@@ -134,6 +134,18 @@ export class WorkbenchApp extends LitElement {
     this.applyTheme();
   }
 
+  /**
+   * The header button walks all THREE settings — auto → light → dark → auto —
+   * rather than flipping two. `auto` ("follow the machine") is a real answer
+   * and the palette has always offered it; a two-state toggle would be the one
+   * control that cannot reach it, and a reader who lands on light would have no
+   * way back to auto except the palette.
+   */
+  private cycleTheme() {
+    const order: ThemeSetting[] = ['auto', 'light', 'dark'];
+    this.setTheme(order[(order.indexOf(this.theme) + 1) % order.length]);
+  }
+
   /** Only meaningful while the setting is `auto`; harmless otherwise. */
   private onSchemeChange = () => {
     if (this.theme === 'auto') this.applyTheme();
@@ -207,6 +219,46 @@ export class WorkbenchApp extends LitElement {
       .rail-toggle:hover {
         color: var(--accent);
         border-color: var(--accent);
+      }
+
+      /* The theme control, restored to the header (2026-08-21). The palette
+         command stays — this is the second door to the same setting, for the
+         reader who does not know the palette exists. It borrows .rail-toggle's
+         idiom exactly (hairline, tab radius, accent on hover) because the two
+         are the same kind of thing: a small chrome switch at the ends of the
+         band. The word is part of the control, not decoration — three settings
+         cannot be read off an icon, and auto has to say which way it currently
+         resolves. */
+      .theme-toggle {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-2);
+        background: transparent;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius-tab);
+        padding: 2px 8px;
+        cursor: pointer;
+      }
+
+      .theme-toggle svg {
+        display: block;
+        flex: none;
+      }
+
+      .theme-toggle:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .theme-toggle:focus-visible {
+        outline: var(--rule-w) solid var(--focus-ring);
+        outline-offset: 2px;
       }
 
       /* THE HEADER AS A BAND (workbench-chrome-language.md). Structurally this
@@ -601,7 +653,8 @@ export class WorkbenchApp extends LitElement {
             }
           ]
         : []),
-      // The theme's only control, and deliberately no keystroke: the free-key
+      // The theme's other control — the header button is the first — and
+      // deliberately no keystroke: the free-key
       // budget belongs to the element-ops campaign, and a theme switch is not
       // a thing you reach for mid-edit. All three settings are offered rather
       // than a toggle, because `auto` is a real third answer — "follow the
@@ -747,6 +800,41 @@ export class WorkbenchApp extends LitElement {
     `;
   }
 
+  /**
+   * One dial, three amounts of ink: the ring is empty for light, half-filled
+   * for auto — the setting that is BOTH, resolved by the machine — and solid
+   * for dark. A sun and a moon would be the conventional pair, but they are
+   * two metaphors for one axis and neither has a third face for auto. The
+   * title says the whole state including where the next click lands.
+   */
+  private themeToggle() {
+    // The lit `svg` tag, not `html` — a fragment parsed as HTML lands in the
+    // wrong namespace and paints nothing inside an <svg>.
+    const glyphs = {
+      auto: svg`<path d="M7 1.5a5.5 5.5 0 0 0 0 11z" fill="currentColor"></path>`,
+      light: nothing,
+      dark: svg`<circle cx="7" cy="7" r="5.5" fill="currentColor"></circle>`
+    };
+    const resolved = this.resolvedTheme();
+    const next = ({ auto: 'light', light: 'dark', dark: 'auto' } as const)[this.theme];
+    return html`
+      <button
+        class="theme-toggle"
+        title="theme: ${this.theme}${this.theme === 'auto'
+          ? ` (now ${resolved})`
+          : ''} — click for ${next}"
+        aria-label="theme: ${this.theme}, click for ${next}"
+        @click=${() => this.cycleTheme()}
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+          <circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.2"></circle>
+          ${glyphs[this.theme]}
+        </svg>
+        ${this.theme}
+      </button>
+    `;
+  }
+
   render() {
     const queue = buildQueue(corpus);
     const attention = queue.blocked.length + queue.stale.length + queue.neverSeen.length;
@@ -782,6 +870,7 @@ export class WorkbenchApp extends LitElement {
             <span class="fact-v">${corpus.length}</span>
           </span>
         </span>
+        ${this.themeToggle()}
       </header>
       <nav>
         <div class="rail-context">

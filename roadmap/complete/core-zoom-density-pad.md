@@ -345,3 +345,16 @@ under it. The open readout column now takes `--bg-context` and the pad a real
 drop shadow (`--shadow-far`, not the white-in-dark `--shadow-near` glow), so the
 numbers sit on a ground of their own. Verified over CDP in both themes across
 the default, off-default, clamped (`TIGHTEST`) and idle poses.
+
+### Second pass, same day: the readout's two greys
+
+Follow-up from the same reader, once the pad was opaque: the STAFF/SPACE labels
+were `--ink-3` — a muted-caption grey spent on the word that says which axis the
+number belongs to, read every time the number is. They are `--ink-2` now, still
+a step under the value.
+
+And the fitted staff value printed in `--ink-3` too (`.val.derived`), so after a
+click on the magnifier the readout said `100` in grey over `100` in full ink,
+though **neither** number had been chosen — the one difference a reader could see
+was the one that meant nothing to them. The dimming is gone; the label already
+carries it by reading `FIT` rather than `STAFF`, which is the honest signal.

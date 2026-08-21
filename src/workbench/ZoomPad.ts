@@ -294,7 +294,11 @@ export class ZoomPad extends LitElement {
       .lbl {
         font: 600 8px/1 var(--sans);
         letter-spacing: 0.09em;
-        color: var(--ink-3);
+        /* --ink-2, not --ink-3. The label names which axis the number belongs
+           to, so it is read every time the number is — a muted-caption grey at
+           8px is the wrong job for it. Still a step under the value, which is
+           what keeps the pair a label-and-value rather than two headlines. */
+        color: var(--ink-2);
         height: 11px;
         overflow: hidden;
         transition:
@@ -327,10 +331,12 @@ export class ZoomPad extends LitElement {
         color: var(--accent);
       }
 
-      /* Fitted is not a value the user chose — it reads as derived. */
-      .val.derived {
-        color: var(--ink-3);
-      }
+      /* Fitted used to also PRINT as derived, in --ink-3. It made the two
+         halves disagree for no reason a reader could act on: reset the pad and
+         the staff number went grey while the spacing number beside it stayed
+         full ink, though neither had been chosen. The word carries it instead —
+         the label reads FIT rather than STAFF, which is the honest signal — and
+         every value in the readout now prints at one strength. */
 
       /* The clamp band, now per-axis: the half that hit its wall turns ink and
          its label becomes the verdict, while the other axis stays readable —
@@ -795,7 +801,7 @@ export class ZoomPad extends LitElement {
       return html`
         <div class="half">
           <div class="lbl">${fitted ? 'FIT' : 'STAFF'}</div>
-          <div class="val ${fitted ? 'derived' : 'hot'}">${this.pct(this.shownStaff)}</div>
+          <div class="val ${fitted ? '' : 'hot'}">${this.pct(this.shownStaff)}</div>
         </div>
       `;
     }

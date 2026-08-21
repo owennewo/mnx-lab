@@ -176,3 +176,20 @@ becomes.
   dark footer still separates from its surroundings.
 - Toggle through all three settings including `auto`, with the OS preference flipped
   underneath, and confirm persistence across reload.
+
+## Appendix (2026-08-21): the optional header button landed
+
+*The control* above offered "a palette command … plus, optionally, a header
+button". The optional half is now built, on the reader's report that the toggle
+they remembered from the pre-rebuild header (`pre-rebuild:src/components/MnxEditorApp.ts`,
+a `Toggle theme` icon button) was missing: a `.theme-toggle` at the right end of
+the header band, borrowing `.rail-toggle`'s idiom exactly.
+
+It walks all **three** settings — auto → light → dark → auto — rather than
+flipping two, because `auto` is a real answer and a two-state toggle would be
+the one control that cannot reach it. The word is part of the control (three
+settings cannot be read off an icon, and `auto` has to say which way it currently
+resolves); the dial beside it is one metaphor with three faces — empty ring for
+light, half-filled for auto, solid for dark — where a sun and a moon would be two
+metaphors for one axis with no third face between them. Still **no keystroke**:
+that ruling stands, and the palette commands stay as the second door.
