@@ -39,7 +39,12 @@ import {
 } from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
 import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barlines.ts';
-import { anchorY, clampPadDensity, tightenRows } from './verticalDensity.ts';
+import {
+  anchorY,
+  clampPadDensity,
+  tightenRows,
+  SEPARATION_CLEAR_SP
+} from './verticalDensity.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import {
   anchorAt,
@@ -106,10 +111,13 @@ const INTER_STAFF_GAP_SP = 6; // between staves of a multi-staff part (grand sta
 // floored at `MIN_STAFF_GAP_SP` so two bare staves still stand apart.
 // Separation, not cohesion: a tab staff does NOT belong to the notation staff
 // above it, which is why this constant is three times the text one.
-/** Clear space between one display staff's lowest ink and the next's highest. */
-export const SEPARATION_CLEAR_SP = 3;
+// SEPARATION_CLEAR_SP lives in verticalDensity.ts: it is ONE relationship —
+// "these two things do not belong to each other" — and since stage D it sets
+// the distance between two systems as well as between two staves, so it
+// cannot live in the module that only knows about the latter.
 /** Floor on the line-to-line gap between display staves, ink or no ink. */
 export const MIN_STAFF_GAP_SP = 4;
+export { SEPARATION_CLEAR_SP };
 /** Primitives that span staves by construction (barlines, braces) or ARE the
  *  staff (its lines) — not content, and never measured as ink in a gap. */
 const STRUCTURAL_CLASSES = new Set(['barline', 'staff-line', 'brace', 'bracket', 'group-label']);

@@ -419,3 +419,120 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
     expect(pairsOf(pair2.real, pair2.probe)).toEqual([]);
   });
 });
+
+// Stage D — the gap BETWEEN systems. The reserved row pads are no longer
+// consulted: a gap is the ink either side plus SEPARATION_CLEAR_SP, the same
+// constant stage C put between two staves of one system. The visible
+// consequence, and the thing that was asked for: a system with a section
+// label above it keeps room for the label, and one without closes up — with
+// nobody encoding "unlabelled rows are closer".
+describe('ink-measured gaps — stage D, between systems', () => {
+  const labelledTabDir = corpus.find(s => s.id.endsWith('twelve-bar-blues'))!.dir;
+
+  /** Ink reach per row, mirroring `tightenRows`' own bucketing. */
+  function rowInk(layout: LayoutResult): { top: number; bottom: number }[] {
+    const rows = layout.rows!;
+    const bounds = rows.slice(0, -1).map((b, r) => (b.staffBottom + rows[r + 1].staffTop) / 2);
+    const buckets: Primitive[][] = rows.map(() => []);
+    for (const p of layout.primitives) {
+      const y = anchorY(p);
+      let r = 0;
+      while (r < bounds.length && y >= bounds[r]) r++;
+      buckets[r].push(p);
+    }
+    return rows.map((b, r) => {
+      const bb = computeBoundsSp(buckets[r]);
+      return {
+        top: Math.min(b.staffTop, bb?.y ?? b.staffTop),
+        bottom: Math.max(b.staffBottom, bb ? bb.y + bb.h : b.staffBottom)
+      };
+    });
+  }
+
+  const gapsOf = (layout: LayoutResult) => {
+    const rows = layout.rows!;
+    const ink = rowInk(layout);
+    return rows.slice(0, -1).map((b, r) => ({
+      lineGap: rows[r + 1].staffTop - b.staffBottom,
+      inkGap: rows[r + 1].staffTop - b.staffBottom
+        - (ink[r].bottom - b.staffBottom)
+        - (rows[r + 1].staffTop - ink[r + 1].top)
+    }));
+  };
+
+  /**
+   * A gap holding a SCORE TITLE is excluded, and the reason is the same one
+   * stage C met with `between` directions: a title sits between two score
+   * blocks and belongs to neither system, so it is content the gap must HOLD
+   * rather than a demand either side makes. `tightenRows` buckets it to one
+   * row by the midpoint rule, and which row that is flips as the gap closes —
+   * so the identity below is not the right claim there. It keeps room for the
+   * title either way, which is what matters; four gaps in two multi-score
+   * scenarios are affected.
+   */
+  const holdsTitle = (layout: LayoutResult, r: number) => {
+    const rows = layout.rows!;
+    return layout.primitives.some(
+      p => cls(p) === 'score-title' && anchorY(p) > rows[r].staffBottom && anchorY(p) < rows[r + 1].staffTop
+    );
+  };
+
+  it('every inter-system gap is the ink either side plus one separation, corpus-wide', () => {
+    initSmufl();
+    let checked = 0;
+    let skipped = 0;
+    for (const s of corpus) {
+      let layout: LayoutResult;
+      try {
+        layout = layoutNotation({ mnx: readDoc(s.dir), widthSp: WIDTH_SP });
+      } catch {
+        continue;
+      }
+      if ((layout.rows?.length ?? 0) < 2) continue;
+      gapsOf(layout).forEach((gap, r) => {
+        if (holdsTitle(layout, r)) {
+          skipped++;
+          // Still bounded: a title never makes a gap TIGHTER than the rule.
+          expect(gap.inkGap).toBeGreaterThan(SEPARATION_CLEAR_SP - 1e-6);
+          return;
+        }
+        checked++;
+        expect(gap.inkGap).toBeCloseTo(SEPARATION_CLEAR_SP, 6);
+      });
+    }
+    expect(checked).toBeGreaterThan(0);
+    // The exclusion is narrow — if it ever starts swallowing ordinary gaps,
+    // this is where that shows up. (Today: 4 title gaps against 14 ordinary
+    // ones, in a corpus where multi-system scores are the minority.)
+    expect(checked).toBeGreaterThan(skipped * 2);
+  });
+
+  it('a system under a section label keeps room for it; one without closes up', () => {
+    initSmufl();
+    // The reported case: twelve-bar-blues as tab, wrapped narrow enough to
+    // put "Head" and "Turnaround" on different systems.
+    const layout = layoutTab({ mnx: readDoc(labelledTabDir), widthSp: 46 });
+    const rows = layout.rows!;
+    expect(rows.length).toBeGreaterThan(3);
+    const labelTops = layout.primitives
+      .filter(p => cls(p) === 'section-label')
+      .map(p => (p as { y: number }).y);
+    // Which rows carry a label: the first row whose top line is below it.
+    const labelled = new Set(
+      labelTops.map(y => {
+        const r = rows.findIndex(b => b.staffTop > y);
+        return r < 0 ? rows.length - 1 : r;
+      })
+    );
+    const gaps = gapsOf(layout);
+    const before = (r: number) => gaps[r - 1].lineGap;
+    const withLabel = [...labelled].filter(r => r > 0);
+    const without = rows.map((_b, r) => r).filter(r => r > 0 && !labelled.has(r));
+    expect(withLabel.length).toBeGreaterThan(0);
+    expect(without.length).toBeGreaterThan(0);
+    // Every labelled row stands further off than every unlabelled one.
+    expect(Math.min(...withLabel.map(before))).toBeGreaterThan(
+      Math.max(...without.map(before)) + 0.5
+    );
+  });
+});

@@ -23,16 +23,21 @@ import { computeBoundsSp } from '../render/bounds.ts';
  * through the system above.
  *
  * This axis therefore tightens toward what each row ACTUALLY contains rather
- * than toward zero. Each gap between systems is
+ * than toward zero. **Since stage D of core-ink-measured-gaps.md the pads are
+ * not consulted at all**: each gap between systems is
  *
- *     max(ink below + ink above + MIN_CLEAR_SP, gapAtDensityOne * padDensity)
+ *     ink below + ink above + SEPARATION_CLEAR_SP * padDensity
  *
- * so `padDensity` walks from today's uniform reservation down to the point
- * where consecutive systems nearly touch, and cannot pass it. A tab row whose
- * staff carries nothing above it collapses almost entirely; a notation row
- * under a rehearsal mark and a two-verse lyric block barely moves. That
- * difference is the feature — the space that disappears is the space nothing
- * was using.
+ * The pads were a prediction of the worst case a row might hold; this is a
+ * measurement of what it does hold, and the two are only ever the same by
+ * luck. A tab row carrying nothing above it closes right up; a row under a
+ * section label keeps exactly the room the label needs. That difference is
+ * the feature — the space that disappears is the space nothing was using —
+ * and it is what makes an unlabelled row sit closer than a labelled one
+ * without anybody encoding "unlabelled rows are closer".
+ *
+ * `padDensity` now scales the CLEARANCE rather than a reservation, which is
+ * what keeps the knob meaning "how much air" once the air is derived.
  *
  * It runs as a POST-PASS over a finished `LayoutResult`, which is why it needs
  * no knowledge of any layout's row arithmetic: `rows[]` says where each system
@@ -42,10 +47,31 @@ import { computeBoundsSp } from '../render/bounds.ts';
  * — the refactor the parent doc expected and this shape sidesteps.
  */
 
-/** Clear space left between one system's lowest ink and the next's highest. */
-const MIN_CLEAR_SP = 1;
+/**
+ * Clear space between two things that do NOT belong to each other: two staves
+ * of one system (stage C), and — since stage D — two systems. Separation, not
+ * cohesion, which is why it is three times the clearance a label keeps from
+ * the staff it names (`COHESION_CLEAR_SP`).
+ */
+export const SEPARATION_CLEAR_SP = 3;
+
+/**
+ * Clear space left between one system's lowest ink and the next's highest —
+ * and, since stage D, the whole of what decides an inter-system gap.
+ *
+ * 1 → `SEPARATION_CLEAR_SP` (3) on 2026-08-21. Two systems do not belong to
+ * each other, so the distance between them is the SAME separation clearance
+ * that stage C put between two staves of one system
+ * (core-ink-measured-gaps.md); one number for one relationship, rather than a
+ * page whose between-staff and between-system air were set by different
+ * constants for no reason a reader could see.
+ */
+const MIN_CLEAR_SP = SEPARATION_CLEAR_SP;
 /** Floor on the page margin above the first system and below the last. */
 const MIN_PAGE_MARGIN_SP = 0.5;
+/** Floor under the scaled inter-system clearance, so `padDensity: 0` closes
+ *  systems up without letting them touch. */
+const MIN_INTER_SYSTEM_CLEAR_SP = 1;
 
 export const MIN_PAD_DENSITY = 0;
 export const MAX_PAD_DENSITY = 2;
@@ -54,7 +80,8 @@ export const MAX_PAD_DENSITY = 2;
  * Bounded like `clampDensity`, and for the same reason: a bad value should
  * degrade to something drawable rather than throw. The floor can be 0 because
  * the ink-derived clearance above does the safety work — asking for zero
- * padding gets you `MIN_CLEAR_SP` between systems, not overlap.
+ * padding gets you `MIN_INTER_SYSTEM_CLEAR_SP` between one system's ink and
+ * the next's, not overlap.
  */
 export function clampPadDensity(value: number | undefined | null): number {
   if (value === undefined || value === null || !Number.isFinite(value)) return 1;
@@ -163,11 +190,20 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
   const offsets: number[] = [newTopGap - topGap];
   for (let r = 0; r + 1 < rows.length; r++) {
     const gap = rows[r + 1].staffTop - rows[r].staffBottom;
+    // STAGE D (core-ink-measured-gaps.md): the gap IS the ink either side plus
+    // the separation clearance — the reserved pads are not consulted. They
+    // were a prediction of the worst case every row might hold; this is the
+    // measurement of what each row actually holds, so a system under a section
+    // label gets room for it and a bare one directly below closes up.
+    //
+    // `padDensity` scales the CLEARANCE, not a pad, which is what keeps the
+    // knob meaning "how much air" now that the air is derived. Floored so a
+    // pad of 0 still leaves a visible line between systems rather than overlap.
     const ink =
       (inkBottom[r] - rows[r].staffBottom) +
       (rows[r + 1].staffTop - inkTop[r + 1]) +
-      MIN_CLEAR_SP;
-    offsets.push(offsets[r] + (Math.max(ink, gap * padDensity) - gap));
+      Math.max(MIN_INTER_SYSTEM_CLEAR_SP, MIN_CLEAR_SP * padDensity);
+    offsets.push(offsets[r] + (ink - gap));
   }
 
   const last = rows.length - 1;

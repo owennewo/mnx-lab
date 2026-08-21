@@ -198,7 +198,24 @@ Each stage is its own landing with its own `update:primitives` diff and
   THIS ROW's primitives (rows are emitted in order, so a row is a slice), and
   clearing the row above is `tightenRows`' job alone. 21 tab goldens moved,
   none verified, nothing else.
-- **Stage D (decision, not code) — density 1 becomes ink-measured** between
+- **Stage D — BUILT 2026-08-21.** `tightenRows` no longer consults the reserved
+  row pads at all: an inter-system gap is `ink below + ink above +
+  SEPARATION_CLEAR_SP`, with `padDensity` scaling the clearance and a 1sp floor
+  under it. The constant moved down a layer into `verticalDensity.ts`, because
+  it is now ONE relationship — "these two things do not belong to each other" —
+  spanning both staves-in-a-system and systems-on-a-page, and could not go on
+  living in the module that only knows the first. Asked for directly: a system
+  under a section label keeps room for the label and one without closes up,
+  with nobody encoding "unlabelled rows are closer". Measured on the reported
+  case (twelve-bar-blues as tab, wrapped): labelled 6.36sp, unlabelled
+  4.07–4.45sp, page 1188px → 1083px. Goldens: **9 multi-system notation
+  scenarios, 1 demotion** — every corpus tab golden is single-system, so the
+  tab views did not move. One honest exclusion in the conformance identity: a
+  gap holding a **score title** is content the gap must hold rather than a
+  demand either side makes (the stage C `between` problem again), and its
+  row attribution flips as the gap closes, so those four gaps are bounded
+  rather than pinned.
+  The original text, now spent: **density 1 becomes ink-measured** between
   systems. *2026-08-21 ruling recorded ahead of it:* the pad axis is **decoupled**
   from `density-h` (see the appendix on core-vertical-density.md) — vertical
   distance follows vertical zoom, which staff scale already supplies by
