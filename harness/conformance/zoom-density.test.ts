@@ -36,15 +36,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
+import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import {
   planHorizontal,
   clampDensity,
+  clampInkRatio,
   densityLadder,
   packSystems,
   CORE_SP,
+  KEY_SIG_GLYPH_ADVANCE_SP,
   MIN_DENSITY,
   MAX_DENSITY
 } from '../../src/engine/layout/spacing.ts';
+import { glyphBBox } from '../../src/engine/smufl/smufl.ts';
+import type { GlyphPrim, Primitive } from '../../src/engine/primitives.ts';
 import {
   BASELINE_PX_PER_SP,
   MIN_STAFF_SCALE,
@@ -312,6 +317,127 @@ describe('zoom / density', () => {
         densityH: 1
       });
       expect(JSON.stringify(explicit.primitives)).toBe(JSON.stringify(plain.primitives));
+    });
+  });
+
+  // Rigid columns are ink (roadmap/proposed/core-ink-priced-columns.md).
+  //
+  // Ruling 1's collision guarantee above prices every width in HORIZONTAL
+  // staff spaces. Staff scale (`pxPerSpY`) made glyph dimensions follow the
+  // VERTICAL scale instead, so the guarantee held at square scale only: under
+  // a pinned staff scale the ink outgrew its columns, first visibly as the TAB
+  // clef running into the time signature. The plan now prices rigid ink by
+  // the ratio and leaves packing square — these assert both halves.
+  describe('ink-priced columns', () => {
+    const blues = () => doc('lab/document/twelve-bar-blues');
+    const keys = () => doc('spec/key-signatures');
+
+    const glyphs = (prims: readonly Primitive[], name: string) =>
+      prims.filter((p): p is GlyphPrim => p.kind === 'glyph' && p.glyph === name);
+    // A glyph's DRAWN ink box in horizontal sp under ink ratio `s`: the anchor
+    // sits on the horizontal scale, the extents grow with the vertical one —
+    // the exact asymmetry svg.ts draws and the plan now prices.
+    const inkSpan = (p: GlyphPrim, s: number): [number, number] => {
+      const bb = glyphBBox(p.glyph)!;
+      const k = (p.scale ?? 1) * s;
+      const left =
+        p.anchor === 'middle' ? p.x - (bb.w * k) / 2
+        : p.anchor === 'end' ? p.x - (bb.x + bb.w) * k
+        : p.x + bb.x * k;
+      return [left, left + bb.w * k];
+    };
+    const rowsOf = (plan: ReturnType<typeof planHorizontal>) => plan.measures.map(m => m.row);
+
+    it('ratio 1 is the untouched path — byte-identical plan and primitives', () => {
+      initSmufl();
+      expect(JSON.stringify(planHorizontal(blues(), 80, { inkRatio: 1 }))).toBe(
+        JSON.stringify(planHorizontal(blues(), 80))
+      );
+      expect(JSON.stringify(layoutTab({ mnx: blues(), widthSp: 80, inkRatio: 1 }).primitives)).toBe(
+        JSON.stringify(layoutTab({ mnx: blues(), widthSp: 80 }).primitives)
+      );
+      // The guard degrades to square rather than throwing.
+      expect(clampInkRatio(Number.NaN)).toBe(1);
+      expect(clampInkRatio(0)).toBe(1);
+      expect(clampInkRatio(-2)).toBe(1);
+      expect(clampInkRatio(1.4)).toBe(1.4);
+    });
+
+    it('packing stays square: row membership is invariant under the ratio', () => {
+      initSmufl();
+      // Ruling 2's substance, asserted rather than assumed: the vertical arm
+      // may re-place a row, never re-break the score.
+      for (const widthSp of [60, 80, 120]) {
+        const notation = rowsOf(planHorizontal(blues(), widthSp));
+        const tab = rowsOf(planHorizontal(blues(), widthSp, { staffKind: 'tab' }));
+        for (const inkRatio of [0.6, 1.4, 1.6, 2.3]) {
+          expect(rowsOf(planHorizontal(blues(), widthSp, { inkRatio }))).toEqual(notation);
+          expect(rowsOf(planHorizontal(blues(), widthSp, { inkRatio, staffKind: 'tab' }))).toEqual(tab);
+        }
+      }
+    });
+
+    it('the TAB clef keeps clear of the time signature at the ratios a wide score reaches', () => {
+      initSmufl();
+      // 1.4 is the arm's FIRST click on a fitted wide score (kx≈7 against the
+      // 10px/sp baseline); 2.3 is that score at staffScale 1.6.
+      for (const s of [1.4, 1.6, 2.3]) {
+        const prims = layoutTab({ mnx: blues(), widthSp: 80, inkRatio: s }).primitives;
+        const [, clefRight] = inkSpan(glyphs(prims, '6stringTabClef')[0], s);
+        const [digitLeft] = inkSpan(glyphs(prims, 'timeSig4')[0], s);
+        expect(digitLeft - clefRight).toBeGreaterThan(0);
+
+        // Not vacuous: the SAME ink on square-priced anchors — the engine
+        // before this change — is strictly worse, and collides outright by
+        // the top of the range.
+        const square = layoutTab({ mnx: blues(), widthSp: 80 }).primitives;
+        const [, sqClefRight] = inkSpan(glyphs(square, '6stringTabClef')[0], s);
+        const [sqDigitLeft] = inkSpan(glyphs(square, 'timeSig4')[0], s);
+        expect(sqDigitLeft - sqClefRight).toBeLessThan(digitLeft - clefRight);
+        if (s >= 2) expect(sqDigitLeft - sqClefRight).toBeLessThan(0);
+      }
+    });
+
+    it('the notation prefix holds too: clef → key-signature run → time signature', () => {
+      initSmufl();
+      const s = 1.6;
+      const plan = planHorizontal(keys(), 80, { inkRatio: s });
+      const prims = layoutNotation({ mnx: keys(), widthSp: 80, inkRatio: s }).primitives;
+      const m0 = plan.measures[0];
+      const inFirstBar = (p: Primitive): p is GlyphPrim =>
+        p.kind === 'glyph' && p.x >= m0.x - 1e-9 && p.x <= m0.x + m0.width;
+      const clef = prims.find(p => inFirstBar(p) && p.className === 'clef')!;
+      const keyGlyphs = prims.filter(p => inFirstBar(p) && p.className === 'key-sig');
+      // Every staff draws the run at the same x's; dedupe to the run itself.
+      const run = [...new Set(keyGlyphs.map(p => p.x))].sort((a, b) => a - b);
+      expect(run.length).toBeGreaterThan(1);
+      // The run's advance is priced like its slot, so it fills the column
+      // instead of clustering at the left edge.
+      for (let i = 1; i < run.length; i++) {
+        expect(run[i] - run[i - 1]).toBeCloseTo(KEY_SIG_GLYPH_ADVANCE_SP * s, 9);
+      }
+      const first = keyGlyphs.find(p => p.x === run[0])!;
+      const last = keyGlyphs.find(p => p.x === run[run.length - 1])!;
+      expect(inkSpan(first, s)[0]).toBeGreaterThan(inkSpan(clef, s)[1]);
+      const digit = prims.find(p => inFirstBar(p) && p.className === 'time-sig-num');
+      if (digit) expect(inkSpan(digit, s)[0]).toBeGreaterThan(inkSpan(last, s)[1]);
+    });
+
+    it('the justifier absorbs the ink: a full row still ends at the margin', () => {
+      initSmufl();
+      const rowRight = (plan: ReturnType<typeof planHorizontal>) => {
+        const row0 = plan.measures.filter(m => m.row === 0 && !m.hidden);
+        const last = row0[row0.length - 1];
+        return last.x + last.width;
+      };
+      const base = planHorizontal(blues(), 80);
+      const priced = planHorizontal(blues(), 80, { inkRatio: 1.4 });
+      // The prefix really grew…
+      expect(priced.measures[0].timeSigCentreX - priced.measures[0].clefX).toBeGreaterThan(
+        base.measures[0].timeSigCentreX - base.measures[0].clefX
+      );
+      // …and the row took it out of the springs rather than past the margin.
+      expect(rowRight(priced)).toBeCloseTo(rowRight(base), 6);
     });
   });
 });

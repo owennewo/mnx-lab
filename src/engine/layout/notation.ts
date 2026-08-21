@@ -424,6 +424,10 @@ export interface LayoutNotationOptions {
    *  staff, and the page margins — floored by the ink each row actually
    *  contains. 1 is today's engraving and skips the pass entirely. */
   densityPad?: number;
+  /** Ink ratio (core-ink-priced-columns.md): the paint's `pxPerSpY/pxPerSp`.
+   *  Rigid columns are ink and re-price by it; packing stays square.
+   *  1/unset = today's layout, untouched. */
+  inkRatio?: number;
 }
 
 /** What a host may hide. Layout-side members must be honored HERE (space
@@ -748,7 +752,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         tabSetup: opts.tabSetup,
         hide: opts.hide ?? [],
         densityH: opts.densityH,
-        densityPad: opts.densityPad
+        densityPad: opts.densityPad,
+        inkRatio: opts.inkRatio
       })
     );
     const jobUsed = Math.max(...rs.map(r => r.usedWidthSp));
@@ -809,6 +814,7 @@ interface RenderSegmentArgs {
   hide: readonly HideableFeature[];
   densityH?: number;
   densityPad?: number;
+  inkRatio?: number;
 }
 
 // Left-of-system geometry: nested decorations step left of their parents,
@@ -828,7 +834,7 @@ function renderSegment(args: RenderSegmentArgs): {
    *  other densities would draw (spacing.ts `densityLadder`). */
   packing: PackingInput;
 } {
-  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH, densityPad } = args;
+  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH, densityPad, inkRatio } = args;
   const primitives: Primitive[] = [];
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
@@ -864,6 +870,7 @@ function renderSegment(args: RenderSegmentArgs): {
   const plan = planHorizontal(mnx, widthSp, {
     densityH,
     densityPad,
+    inkRatio,
     staves: segment.staves,
     leftInsetSp,
     collapse,
@@ -1307,7 +1314,10 @@ function renderSegment(args: RenderSegmentArgs): {
           primitives.push({
             kind: 'glyph',
             glyph: g.glyph,
-            x: m.keySigX + idx * KEY_SIG_GLYPH_ADVANCE_SP,
+            // The run's advance is ink-priced like the slot the plan reserved
+            // for it, so the glyphs fill their column rather than cluster at
+            // its left edge under a non-square scale.
+            x: m.keySigX + idx * KEY_SIG_GLYPH_ADVANCE_SP * plan.inkRatio,
             y: staffTops[s] + g.y + clefShift,
             className: 'key-sig'
           });

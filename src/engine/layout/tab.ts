@@ -67,6 +67,10 @@ export interface LayoutTabOptions {
    *  4sp above it and uses a median of 0.0 — this is the view the axis was
    *  measured on and buys the most. */
   densityPad?: number;
+  /** Ink ratio (core-ink-priced-columns.md): the paint's `pxPerSpY/pxPerSp`.
+   *  Rigid columns are ink and re-price by it; packing stays square.
+   *  1/unset = today's layout, untouched. */
+  inkRatio?: number;
 }
 
 export function layoutTab(opts: LayoutTabOptions): LayoutResult {
@@ -109,6 +113,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   const plan = planHorizontal(mnx, widthSp, {
     densityH: opts.densityH,
     densityPad: opts.densityPad,
+    inkRatio: opts.inkRatio,
     staffKind: 'tab'
   });
 

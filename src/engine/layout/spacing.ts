@@ -193,6 +193,17 @@ export function clampDensity(value: number | undefined): number {
   return Math.min(MAX_DENSITY, Math.max(MIN_DENSITY, value));
 }
 
+/**
+ * Ink-ratio guard: a bad value degrades to square rather than throwing. No
+ * range clamp — the ratio is derived by the renderers from two scales the
+ * engine already bounded (`clampStaffScale`, the fit), so any finite positive
+ * value is one the emitter is genuinely about to draw at.
+ */
+export function clampInkRatio(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value) || value <= 0) return 1;
+  return value;
+}
+
 // ---------- System packing (shared with the density ladder) ----------
 
 /**
@@ -579,6 +590,10 @@ export interface HorizontalPlan {
   /** This plan's packing input, at density 1 — enough to ask what ANOTHER
    *  density would draw without planning it (`densityLadder`). */
   packing: PackingInput;
+  /** The ink ratio this plan was priced at (clamped; 1 = square). Layouts
+   *  read it back for the few glyph-run advances they draw inside a column
+   *  (the key-signature run), so drawn runs fill the columns priced here. */
+  inkRatio: number;
 }
 
 /** One contributor to a rendered staff: a part-staff, optionally with a
@@ -695,6 +710,25 @@ export interface PlanOptions {
    */
   densityPad?: number;
   /**
+   * INK RATIO (roadmap/proposed/core-ink-priced-columns.md): the emitter's
+   * `pxPerSpY / pxPerSp` — how much wider than square this plan's glyphs will
+   * be DRAWN. Rigid columns are ink (a clef occupies the width it occupies at
+   * a given staff size), so under a non-square staff scale they are priced on
+   * the ink scale: every rigid ink contribution — cores, accidental slots,
+   * dots, grace/tremolo advances, mid-clef columns, the prefix glyph slots —
+   * is multiplied by this ratio, and the justifier hands the difference to or
+   * takes it from the springs. Air (springs, pads, margins) and spans (the
+   * multirest H-bar, `EMPTY_CONTENT_SP`) stay on the horizontal scale.
+   *
+   * PACKING STAYS SQUARE: line breaks are computed at ratio 1 and only
+   * placement re-prices, so bars never jump between systems under the zoom
+   * pad's vertical arm (core-zoom-density-pad.md ruling 2's substance). A row
+   * whose scaled rigids alone overrun the line degrades the way overfull rows
+   * always have — `MIN_SQUEEZE`, then ragged-right overflow — never
+   * glyph-on-glyph. 1 (the default) skips every re-pricing branch.
+   */
+  inkRatio?: number;
+  /**
    * What this plan is drawing for. `notation` (the default) reserves the
    * prefix a notation staff needs; `tab` is the STANDALONE tab view, which
    * draws no key signature at all and a narrower clef.
@@ -804,7 +838,7 @@ export function planHorizontal(
   if (planStaves.length === 0) {
     return {
       measures: [], rowCount: 0, numStaves: 1, staffGroups: [], usedWidthSp: widthSp,
-      packing: { measures: [], lineWidthSp: widthSp }
+      packing: { measures: [], lineWidthSp: widthSp }, inkRatio: 1
     };
   }
 
@@ -1115,17 +1149,19 @@ export function planHorizontal(
     return Math.abs(m.keyFifths !== 0 ? m.keyFifths : m.cancelledKeyFifths);
   };
 
-  const prefixWidth = (m: MeasureMetrics, firstInSystem: boolean) => {
+  // The prefix's PADS are air; its glyph SLOTS are ink and scale with the ink
+  // ratio (`ink` = 1 for the packing input — packing stays square).
+  const prefixWidth = (m: MeasureMetrics, firstInSystem: boolean, ink = 1) => {
     const showClef = firstInSystem || m.clefChanged;
     const showTimeSig = m.timeSigShow;
     const keySigCount = keySigGlyphs(m, firstInSystem);
     return (
       contentLeftPad +
       (firstInSystem ? startBarlinePad : 0) +
-      (showClef ? clefWidth : 0) +
-      (keySigCount ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP + keySigRightPad : 0) +
-      (showTimeSig ? TIME_SIG_WIDTH_SP : 0) +
-      (m.hasRepeatStart ? REPEAT_START_WIDTH_SP : 0)
+      (showClef ? clefWidth * ink : 0) +
+      (keySigCount ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP * ink + keySigRightPad : 0) +
+      (showTimeSig ? TIME_SIG_WIDTH_SP * ink : 0) +
+      (m.hasRepeatStart ? REPEAT_START_WIDTH_SP * ink : 0)
     );
   };
 
@@ -1170,6 +1206,38 @@ export function planHorizontal(
     }
   }
 
+  // Ink pricing, applied the same way density is — one pass over the finished
+  // metrics, after the packing input was captured (packing stays square) and
+  // before placement reads anything. Rigid ink scales; air (springs, pads)
+  // and spans (the H-bar, EMPTY_CONTENT_SP) do not.
+  const inkRatio = clampInkRatio(options?.inkRatio);
+  if (inkRatio !== 1) {
+    for (const m of metrics) {
+      for (const staff of m.staves) {
+        for (const voice of staff) {
+          for (const event of voice) {
+            event.leading *= inkRatio;
+            event.core *= inkRatio;
+          }
+        }
+      }
+      // Re-derive the governing rigid/spring pair exactly as pass 1 did —
+      // the widest voice can legitimately change once rigids re-price.
+      let rigid = m.multiRest ? MULTIREST_WIDTH_SP : m.hidden ? 0 : EMPTY_CONTENT_SP;
+      let spring = 0;
+      for (const voice of m.staves.flat()) {
+        const voiceRigid = voice.reduce((sum, e) => sum + e.leading + e.core, 0);
+        const voiceSpring = voiceSpringSum(voice);
+        if (voiceRigid + voiceSpring > rigid + spring) {
+          rigid = voiceRigid;
+          spring = voiceSpring;
+        }
+      }
+      m.rigid = rigid;
+      m.spring = spring;
+    }
+  }
+
   // Pass 2 — greedy system packing on natural widths (hidden measures take no
   // slot; forced breaks from a score's `pages.systems` start new rows), plus
   // each row's justification factor. Both live in packSystems, so the density
@@ -1180,7 +1248,25 @@ export function planHorizontal(
   const measures: MeasurePlan[] = new Array(metrics.length);
   packed.forEach((packedRow, row) => {
     const rowIndices = packedRow.measures.map(k => packing.measures[k].index);
-    const stretch = packedRow.stretch;
+    // Re-priced rigids need a re-justified row: the same arithmetic
+    // packSystems ran, over the scaled metrics, with the SAME (square) row
+    // membership. This is where the springs hand width to the grown ink. At
+    // ratio 1 the square answer is reused untouched.
+    let stretch = packedRow.stretch;
+    if (inkRatio !== 1) {
+      let rowRigid = 0;
+      let rowSpring = 0;
+      rowIndices.forEach((i, j) => {
+        const m = metrics[i];
+        rowRigid +=
+          prefixWidth(m, j === 0, inkRatio) + m.rigid + contentRightPad +
+          (m.repeatEnd ? REPEAT_END_EXTRA_SP * inkRatio : 0);
+        rowSpring += m.spring + m.leadingSpring;
+      });
+      stretch = rowSpring > 0
+        ? Math.min(MAX_STRETCH, Math.max(MIN_SQUEEZE, (lineWidth - rowRigid) / rowSpring))
+        : 1;
+    }
 
     let x = startX;
     for (const i of rowIndices) {
@@ -1191,23 +1277,24 @@ export function planHorizontal(
       const keySigCount = keySigGlyphs(m, firstInSystem);
 
       const clefX = x + contentLeftPad + (firstInSystem ? startBarlinePad : 0);
-      const keySigX = clefX + (showClef ? clefWidth : 0);
+      const keySigX = clefX + (showClef ? clefWidth * inkRatio : 0);
       const keySigWidth = keySigCount
-        ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP + keySigRightPad
+        ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP * inkRatio + keySigRightPad
         : 0;
-      const timeSigCentreX = keySigX + keySigWidth + TIME_SIG_WIDTH_SP / 2;
+      const timeSigCentreX = keySigX + keySigWidth + (TIME_SIG_WIDTH_SP * inkRatio) / 2;
       // A forward repeat (|:) sits between the prefix glyphs and the content.
-      const repeatStartX = keySigX + keySigWidth + (showTimeSig ? TIME_SIG_WIDTH_SP : 0);
+      const repeatStartX =
+        keySigX + keySigWidth + (showTimeSig ? TIME_SIG_WIDTH_SP * inkRatio : 0);
       // Events start after the stretched leading spring — the same justified
       // breathing room every other gap in the bar gets.
       const contentStartX =
-        repeatStartX + (m.hasRepeatStart ? REPEAT_START_WIDTH_SP : 0) +
+        repeatStartX + (m.hasRepeatStart ? REPEAT_START_WIDTH_SP * inkRatio : 0) +
         m.leadingSpring * stretch;
 
       const contentWidth = m.rigid + m.spring * stretch;
       const width =
         contentStartX - x + contentWidth + contentRightPad +
-        (m.repeatEnd ? REPEAT_END_EXTRA_SP : 0);
+        (m.repeatEnd ? REPEAT_END_EXTRA_SP * inkRatio : 0);
 
       // Each voice fills the measure's content span with its own spring factor.
       // Mid-measure clef anchors come from the first voice of the staff that
@@ -1226,7 +1313,7 @@ export function planHorizontal(
               const key = `${s}:${mc.timelineIndex}`;
               if (!midClefXs.has(key)) {
                 midClefXs.set(key, {
-                  x: cursor + k * MID_CLEF_WIDTH_SP + MID_CLEF_LEFT_PAD_SP,
+                  x: cursor + k * MID_CLEF_WIDTH_SP * inkRatio + MID_CLEF_LEFT_PAD_SP,
                   clef: mc.clef,
                   staff: s + 1
                 });
@@ -1235,7 +1322,8 @@ export function planHorizontal(
             // Grace containers: x is the centre of the FIRST small column;
             // the renderer advances by GRACE_NOTE_ADVANCE_SP per inner note.
             const slotX =
-              cursor + e.leading + (e.graceCount ? GRACE_NOTE_ADVANCE_SP : CORE_SP) / 2;
+              cursor + e.leading +
+              ((e.graceCount ? GRACE_NOTE_ADVANCE_SP : CORE_SP) * inkRatio) / 2;
             cursor += e.leading + e.core + e.spring * voiceStretch;
             return { x: slotX };
           });
@@ -1317,5 +1405,5 @@ export function planHorizontal(
   const usedWidthSp = measures.length
     ? Math.max(...measures.map(m => m.x + m.width)) + marginSp
     : widthSp;
-  return { measures, rowCount: packed.length, numStaves, staffGroups, usedWidthSp, packing };
+  return { measures, rowCount: packed.length, numStaves, staffGroups, usedWidthSp, packing, inkRatio };
 }

@@ -31,6 +31,9 @@ export interface LayoutBothOptions {
   densityH?: number;
   /** Vertical/frame density multiplier (core-vertical-density.md). */
   densityPad?: number;
+  /** Ink ratio (core-ink-priced-columns.md) — one ratio serves both staves,
+   *  which is what keeps them column-aligned under a non-square scale. */
+  inkRatio?: number;
 }
 
 export function layoutBothSystem(opts: LayoutBothOptions): LayoutResult {

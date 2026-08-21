@@ -58,7 +58,7 @@ export interface RenderNotationOptions {
 export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutcome {
   const basePxPerSp = opts.pxPerSp ?? DEFAULT_PX_PER_SP;
 
-  const layout = layoutNotation({
+  const layoutArgs = {
     mnx: opts.mnx,
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
@@ -66,13 +66,14 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
     hide: opts.hide,
     densityH: opts.densityH,
     densityPad: opts.densityPad
-  });
+  };
+  const square = layoutNotation(layoutArgs);
 
   // An explicit pxPerSp pins the scale; the default scales short scores up to
   // fill the viewport. Tab derives the same factor from the shared horizontal
   // plan, so the `both` view stays column-aligned.
   const fitted = opts.pxPerSp === undefined;
-  const pxPerSp = fitted ? fitPxPerSp(opts.width, layout.usedWidthSp, basePxPerSp) : basePxPerSp;
+  const pxPerSp = fitted ? fitPxPerSp(opts.width, square.usedWidthSp, basePxPerSp) : basePxPerSp;
   // Staff scale is ABSOLUTE against the baseline, not a multiplier on the
   // horizontal scale — 1.2 means the same size ink whatever the viewport did.
   // A control that seeds its first step from the last painted scale (the pad
@@ -81,6 +82,14 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
   // goldens.
   const staffScale = clampStaffScale(opts.staffScale);
   const pxPerSpY = staffScale === null ? pxPerSp : staffScale * BASELINE_PX_PER_SP;
+
+  // Rigid columns are ink (core-ink-priced-columns.md): under a non-square
+  // scale the plan is re-placed at the ink ratio so glyphs keep their columns.
+  // The fit is NOT redone — the square plan defined it — and packing stays
+  // square inside the plan, so bars never change systems here.
+  const inkRatio = pxPerSpY / pxPerSp;
+  const layout =
+    Math.abs(inkRatio - 1) > 1e-9 ? layoutNotation({ ...layoutArgs, inkRatio }) : square;
 
   const widthSp = fitted ? layout.usedWidthSp : layout.widthSp;
   // Crop the row's fixed ledger/stem headroom to the content's real vertical
