@@ -3,7 +3,7 @@
 // (anything else renders as its text), and links never inherit the page's
 // opener.
 import { html, nothing, type TemplateResult } from 'lit';
-import { parseMarkdown, type Block, type Inline } from '../assist/markdown.ts';
+import { parseMarkdown, type Align, type Block, type Inline } from '../assist/markdown.ts';
 
 const SAFE_HREF = /^https?:\/\//i;
 
@@ -26,6 +26,11 @@ function inlines(nodes: Inline[]): unknown[] {
   });
 }
 
+/** Alignment as an inline style, absent when the column declared none. */
+function alignStyle(a: Align | undefined) {
+  return a ? `text-align:${a}` : nothing;
+}
+
 function block(b: Block): TemplateResult | typeof nothing {
   switch (b.kind) {
     case 'heading': {
@@ -46,6 +51,26 @@ function block(b: Block): TemplateResult | typeof nothing {
         : html`<ul>${b.items.map(i => html`<li>${inlines(i)}</li>`)}</ul>`;
     case 'quote':
       return html`<blockquote>${inlines(b.inlines)}</blockquote>`;
+    case 'table':
+      // The panel is 410–560px and owns exactly ONE scrolling region, so a
+      // wide table scrolls inside its own wrapper rather than making the
+      // panel body scroll sideways.
+      return html`<div class="md-table">
+        <table>
+          <thead>
+            <tr>
+              ${b.header.map((c, i) => html`<th style=${alignStyle(b.align[i])}>${inlines(c)}</th>`)}
+            </tr>
+          </thead>
+          <tbody>
+            ${b.rows.map(
+              r => html`<tr>
+                ${r.map((c, i) => html`<td style=${alignStyle(b.align[i])}>${inlines(c)}</td>`)}
+              </tr>`
+            )}
+          </tbody>
+        </table>
+      </div>`;
     case 'rule':
       return html`<hr />`;
   }

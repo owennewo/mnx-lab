@@ -1242,6 +1242,33 @@ export class ScenarioPage extends LitElement {
         color: var(--accent-fg);
       }
 
+      /* A table scrolls inside itself — the panel body must not go sideways. */
+      .chat-text .md-table {
+        overflow-x: auto;
+        margin: 0 0 8px;
+      }
+
+      .chat-text table {
+        border-collapse: collapse;
+        font-size: 11.5px;
+        white-space: nowrap;
+      }
+
+      .chat-text th,
+      .chat-text td {
+        border: 1px solid var(--line);
+        padding: 3px 8px;
+        text-align: left;
+      }
+
+      .chat-text th {
+        font: 600 10px/1.6 var(--sans);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        background: var(--bg-context);
+      }
+
       .chat-text hr {
         border: none;
         border-top: 1px solid var(--line);

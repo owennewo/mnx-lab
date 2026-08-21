@@ -93,7 +93,14 @@ every visitor.
   small markdown subset parsed to an AST (`src/assist/markdown.ts`, pinned by
   `markdown.test.ts`) and emitted as Lit templates (`workbench/markdownLit.ts`):
   no HTML sink exists, so `<img onerror>` in a reply is text and only http(s)
-  hrefs become links (`rel="noopener noreferrer"`). The conversation persists
+  hrefs become links (`rel="noopener noreferrer"`). **GFM pipe tables** joined
+  the subset the same day — alignments, inline cells, escaped pipes, ragged
+  rows padded to the header's width — with two rules the panel imposed: a
+  table is only a table once its DELIMITER row arrives (mid-stream the header
+  is still a paragraph, the fenced-code flicker again), and it scrolls inside
+  its own wrapper, because the five-band frame allows exactly one scrolling
+  region. A markdown LIBRARY was rejected for this: an HTML-emitting
+  dependency is exactly the sink the hand-rolled subset exists to avoid. The conversation persists
   in sessionStorage — survives switching scenarios, dies with the tab — and
   *clear* in the context bar wipes it. Verified over CDP.
 

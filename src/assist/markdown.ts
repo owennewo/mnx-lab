@@ -6,8 +6,8 @@
 //
 // Subset: ATX headings, fenced code (an unclosed fence while streaming is
 // still a code block), unordered/ordered lists (one level), blockquotes,
-// thematic breaks, paragraphs; inline code, **strong**, *em*/_em_, [links].
-// Anything else is text.
+// GFM pipe tables, thematic breaks, paragraphs; inline code, **strong**,
+// *em*/_em_, [links]. Anything else is text.
 
 export type Inline =
   | { kind: 'text'; text: string }
@@ -16,12 +16,16 @@ export type Inline =
   | { kind: 'em'; children: Inline[] }
   | { kind: 'link'; href: string; children: Inline[] };
 
+/** A column's declared alignment; null is the renderer's default. */
+export type Align = 'left' | 'center' | 'right' | null;
+
 export type Block =
   | { kind: 'heading'; level: number; inlines: Inline[] }
   | { kind: 'paragraph'; inlines: Inline[] }
   | { kind: 'code'; lang: string; text: string }
   | { kind: 'list'; ordered: boolean; items: Inline[][] }
   | { kind: 'quote'; inlines: Inline[] }
+  | { kind: 'table'; align: Align[]; header: Inline[][]; rows: Inline[][][] }
   | { kind: 'rule' };
 
 const FENCE = /^\s*```\s*([\w+-]*)\s*$/;
@@ -30,6 +34,48 @@ const BULLET = /^\s*[-*+]\s+(.*)$/;
 const NUMBERED = /^\s*\d+[.)]\s+(.*)$/;
 const QUOTE = /^\s*>\s?(.*)$/;
 const RULE = /^\s*([-*_])(\s*\1){2,}\s*$/;
+const DELIM_CELL = /^:?-+:?$/;
+
+/** Split one table row into trimmed cells. A `\|` is a literal pipe, so the
+ *  scan is character-wise rather than a `split`. Leading/trailing pipes are
+ *  optional, per GFM. */
+function splitCells(line: string): string[] {
+  let text = line.trim();
+  if (text.startsWith('|')) text = text.slice(1);
+  if (text.endsWith('|') && !text.endsWith('\\|')) text = text.slice(0, -1);
+  const cells: string[] = [];
+  let cur = '';
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '\\' && text[i + 1] === '|') {
+      cur += '|';
+      i++;
+    } else if (ch === '|') {
+      cells.push(cur.trim());
+      cur = '';
+    } else {
+      cur += ch;
+    }
+  }
+  cells.push(cur.trim());
+  return cells;
+}
+
+/** The delimiter row's alignments, or null if this is not one. A pipe is
+ *  REQUIRED — without it `---` is a thematic break, and a table is not worth
+ *  making that ambiguous; a one-column table writes `| --- |`. */
+function parseDelimiter(line: string): Align[] | null {
+  if (!line.includes('|')) return null;
+  const cells = splitCells(line);
+  const align: Align[] = [];
+  for (const cell of cells) {
+    if (!DELIM_CELL.test(cell)) return null;
+    const left = cell.startsWith(':');
+    const right = cell.endsWith(':');
+    align.push(left && right ? 'center' : right ? 'right' : left ? 'left' : null);
+  }
+  return align.length ? align : null;
+}
 
 export function parseMarkdown(src: string): Block[] {
   const lines = src.replace(/\r\n?/g, '\n').split('\n');
@@ -86,6 +132,28 @@ export function parseMarkdown(src: string): Block[] {
       i--;
       blocks.push({ kind: 'list', ordered, items });
       continue;
+    }
+    // A table is only a table once its DELIMITER row exists — mid-stream the
+    // header alone is still a paragraph, and re-renders as a grid when the
+    // second line lands (the fenced-code flicker, deliberately).
+    if (line.includes('|') && i + 1 < lines.length) {
+      const align = parseDelimiter(lines[i + 1]);
+      const header = align ? splitCells(line) : null;
+      if (align && header && header.length === align.length) {
+        flushPara();
+        i += 2;
+        const rows: Inline[][][] = [];
+        while (i < lines.length && lines[i].trim() !== '' && lines[i].includes('|')) {
+          const cells = splitCells(lines[i]);
+          // Ragged rows are padded and truncated to the header's width, so a
+          // model's slightly-off output cannot break the grid.
+          rows.push(Array.from({ length: align.length }, (_, c) => parseInlines(cells[c] ?? '')));
+          i++;
+        }
+        i--;
+        blocks.push({ kind: 'table', align, header: header.map(parseInlines), rows });
+        continue;
+      }
     }
     const quote = QUOTE.exec(line);
     if (quote) {
