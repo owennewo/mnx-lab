@@ -188,9 +188,10 @@ Each stage is its own landing with its own `update:primitives` diff and
   rule for `INTER_STAFF_GAP_SP` between notation staves. Widest radius: every
   multi-staff notation golden. Last, and only after A and B have shown the
   rule reads well in review.
-- *2026-08-21, ahead of D:* the tab row pads were **halved, 4/4 → 2/2** (owner's
-  call — a tab staff has no stems, and 8sp between bare staves read as
-  abandoned). Safe because the frame is no longer the answer: `tightenRows`
+- *2026-08-21, ahead of D:* the tab row pads were retuned by eye, **4/4 → 2/2
+  → 3/3** (owner's call — a tab staff has no stems, so 8sp between bare staves
+  read as abandoned and 4sp read as crowded; **6sp** is where it settled).
+  Safe at any of them because the frame is no longer the answer: `tightenRows`
   widens any row whose ink overruns it. It forced one more honesty: the score
   text's scan used to stop at a geometric floor (`staffTop − pad`), which at
   2sp is closer than a segno's rise; the callers now hand the text exactly

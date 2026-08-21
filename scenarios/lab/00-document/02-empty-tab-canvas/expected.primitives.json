@@ -78,68 +78,68 @@
   },
   "tab": {
     "widthSp": 80,
-    "heightSp": 13.7143,
+    "heightSp": 15.7143,
     "primitives": [
       {
         "kind": "line",
         "x1": 2,
-        "y1": 4,
+        "y1": 5,
         "x2": 11.9,
-        "y2": 4,
+        "y2": 5,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 5.1429,
+        "y1": 6.1429,
         "x2": 11.9,
-        "y2": 5.1429,
+        "y2": 6.1429,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 6.2857,
+        "y1": 7.2857,
         "x2": 11.9,
-        "y2": 6.2857,
+        "y2": 7.2857,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 7.4286,
+        "y1": 8.4286,
         "x2": 11.9,
-        "y2": 7.4286,
+        "y2": 8.4286,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 8.5714,
+        "y1": 9.5714,
         "x2": 11.9,
-        "y2": 8.5714,
+        "y2": 9.5714,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 9.7143,
+        "y1": 10.7143,
         "x2": 11.9,
-        "y2": 9.7143,
+        "y2": 10.7143,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 4,
+        "y1": 5,
         "x2": 2,
-        "y2": 9.7143,
+        "y2": 10.7143,
         "thickness": 0.1,
         "className": "barline barline-start"
       },
@@ -147,22 +147,22 @@
         "kind": "glyph",
         "glyph": "6stringTabClef",
         "x": 3.1,
-        "y": 6.8571,
+        "y": 7.8571,
         "className": "tab-clef"
       },
       {
         "kind": "line",
         "x1": 11.2,
-        "y1": 4,
+        "y1": 5,
         "x2": 11.2,
-        "y2": 9.7143,
+        "y2": 10.7143,
         "thickness": 0.1,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
         "x": 11.5,
-        "y": 4,
+        "y": 5,
         "w": 0.4,
         "h": 5.7143,
         "fill": "currentColor",

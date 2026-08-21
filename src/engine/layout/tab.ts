@@ -33,13 +33,14 @@ import { tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
 
 const STAFF_HEIGHT_SP = TAB_STAFF_HEIGHT_SP;      // top string to bottom string
 
-// The PROVISIONAL frame around a tab staff — halved from 4/4 on 2026-08-21
-// (owner's call: a tab staff has no stems, and 8sp of air between bare staves
-// read as abandoned). Safe because the frame is no longer the answer:
+// The PROVISIONAL frame around a tab staff. 4/4 → 2/2 → 3/3, all on
+// 2026-08-21 and all by eye: a tab staff has no stems, so 8sp between bare
+// staves read as abandoned and 4sp read as crowded. 6sp is where it settled.
+// Safe at any of them because the frame is no longer the answer:
 // `tightenRows` widens any row whose ink overruns it (a capo line, a label
 // stack), and `ensureTopMargin` keeps the first row on the page.
-const ROW_PAD_TOP_SP = 2;
-const ROW_PAD_BOTTOM_SP = 2;
+const ROW_PAD_TOP_SP = 3;
+const ROW_PAD_BOTTOM_SP = 3;
 const ROW_HEIGHT_SP = STAFF_HEIGHT_SP + ROW_PAD_TOP_SP + ROW_PAD_BOTTOM_SP;
 const MARGIN_SP = 2;
 
