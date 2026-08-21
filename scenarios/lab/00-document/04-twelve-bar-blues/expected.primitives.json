@@ -494,17 +494,6 @@
         "className": "barline"
       },
       {
-        "kind": "text",
-        "text": "Head",
-        "x": 2.6,
-        "y": 4.408,
-        "font": "body",
-        "size": 1.8,
-        "weight": "bold",
-        "anchor": "start",
-        "className": "section-label"
-      },
-      {
         "kind": "line",
         "x1": 26.625,
         "y1": 8,
@@ -3678,17 +3667,6 @@
         "className": "barline"
       },
       {
-        "kind": "text",
-        "text": "Turnaround",
-        "x": 2.6,
-        "y": 57.2,
-        "font": "body",
-        "size": 1.8,
-        "weight": "bold",
-        "anchor": "start",
-        "className": "section-label"
-      },
-      {
         "kind": "line",
         "x1": 24.4364,
         "y1": 60,
@@ -4794,6 +4772,28 @@
         "h": 4,
         "fill": "currentColor",
         "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "text",
+        "text": "Head",
+        "x": 2.6,
+        "y": 5.6,
+        "font": "body",
+        "size": 1.8,
+        "weight": "bold",
+        "anchor": "start",
+        "className": "section-label"
+      },
+      {
+        "kind": "text",
+        "text": "Turnaround",
+        "x": 2.6,
+        "y": 57.44,
+        "font": "body",
+        "size": 1.8,
+        "weight": "bold",
+        "anchor": "start",
+        "className": "section-label"
       }
     ]
   }

@@ -209,9 +209,11 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     // Same order as the notation layout, and the order matters: labels scan
     // what already sits over this measure and stack above it.
     const gm = mnx.global.measures[i] ?? {};
-    emitTempoMark({ gm, m, staffTop, primitives });
+    const tempoTop = emitTempoMark({ gm, m, staffTop, rowTop: staffTop - ROW_PAD_TOP_SP, primitives });
     emitNavigationMarkers({ gm, m, stdSequences, staffTop, primitives });
-    emitScoreLabels({ gm, m, staffTop, rowTop: staffTop - ROW_PAD_TOP_SP, primitives });
+    emitScoreLabels({
+      gm, m, staffTop, rowTop: staffTop - ROW_PAD_TOP_SP, clearAbove: tempoTop, primitives
+    });
 
     // End barline — the global measure's style, defaulted per the spec. A tab
     // staff is owed it for the same reason it is owed a section name: the

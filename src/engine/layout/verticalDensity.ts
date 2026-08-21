@@ -102,13 +102,21 @@ export interface TightenedRows {
 
 /**
  * Re-places a finished layout's systems at `padDensity`, translating each
- * row's primitives. Returns null — and touches nothing — at density 1, which
- * is what keeps every committed golden byte-identical: the default path does
- * not merely compute the same numbers, it does not run.
+ * row's primitives. Returns null — and touches nothing — when no row needs to
+ * move.
+ *
+ * It used to return null at density 1 unconditionally, as the golden-safety
+ * clause. Read the gap formula again, though: at density 1 it is
+ * `max(ink, gap)`, which can only ever WIDEN a gap whose ink has overrun the
+ * fixed pads — it is collision insurance with zero effect on every row that
+ * fits, and every committed golden fit. So it runs at every density now
+ * (core-ink-measured-gaps.md, stage A, where labels started clearing stems and
+ * could climb past `ROW_PAD_TOP_SP`); the null return is earned by measuring
+ * rather than assumed from the density, which is the stronger guarantee.
  */
 export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
   const { primitives, rows, heightSp, padDensity } = args;
-  if (padDensity === 1 || rows.length === 0) return null;
+  if (rows.length === 0) return null;
 
   // Which row each primitive belongs to: the bands are ordered and disjoint,
   // so the midpoint between one row's bottom line and the next's top line is
@@ -168,6 +176,10 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
     (inkBottom[last] - rows[last].staffBottom) + MIN_PAGE_MARGIN_SP,
     bottomGap * padDensity
   );
+
+  // Nothing moved and nothing grew: the layout is already the answer. Return
+  // null so callers keep their own objects — byte-identical by measurement.
+  if (offsets.every(o => o === 0) && newBottomGap === bottomGap) return null;
 
   for (const p of primitives) {
     const r = owner.get(p);

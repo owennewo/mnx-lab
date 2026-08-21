@@ -6,9 +6,108 @@ import {
   isTremolo,
   isTuplet
 } from '../../model/mnx.ts';
-import { Primitive } from '../primitives.ts';
+import { Primitive, translatePrimitiveY } from '../primitives.ts';
 import { glyphBBox } from '../smufl/smufl.ts';
+import { computeBoundsSp, type BoundsSp } from '../render/bounds.ts';
 import { durationValue, tremoloDuration, tupletDuration } from './spacing.ts';
+
+// ---------- Ink-measured placement (core-ink-measured-gaps.md, stage A) ----------
+
+/**
+ * The clearance between a thing and the staff it BELONGS to — a label or tempo
+ * mark and the bar it names. Small, because proximity is what says "this is
+ * about that": the text sits this far above whatever ink the bar already
+ * carries over its top staff, stems and beams and brackets included.
+ */
+export const COHESION_CLEAR_SP = 1;
+/**
+ * Where the text's bottom ink sits when NOTHING rises above the top line — a
+ * bare tab staff, a bar of down-stemmed notes. Not zero: text touching a staff
+ * line reads as part of the staff. Replaces the old fixed 2.8sp baseline rise,
+ * which was sized for stems that a tab staff never has.
+ */
+export const TEXT_MIN_RISE_SP = 1.5;
+/** Ink this close to the top line is the line itself (staff lines, barline
+ *  caps), not content rising above it. */
+const ABOVE_LINE_EPS_SP = 0.25;
+/**
+ * A text clears the ink under its OWN footprint, widened by this on each
+ * side — not the whole bar's. A tempo mark at the bar's start has no business
+ * climbing over a segno at its end; "what is under me" is the local question,
+ * and locality is what keeps the text near its staff.
+ */
+export const TEXT_SIDE_CLEAR_SP = 0.5;
+
+/**
+ * Places a run of just-emitted text primitives (drawn at a provisional y of 0)
+ * so their BOTTOM ink sits one cohesion clearance above whatever they would
+ * otherwise cover — measured under their real footprint, which is only known
+ * once they exist. `bottomInkAtZero` is the run's bottom ink in its own
+ * provisional coordinates. Returns the run's top ink after placement.
+ */
+function placeTextRun(
+  primitives: Primitive[],
+  firstNew: number,
+  bottomInkAtZero: number,
+  staffTop: number,
+  rowTop: number,
+  clearAbove: BoundsSp | null | undefined
+): BoundsSp | null {
+  const run = primitives.slice(firstNew);
+  const box = computeBoundsSp(run);
+  if (!box) return null;
+  const x0 = box.x - TEXT_SIDE_CLEAR_SP;
+  const x1 = box.x + box.w + TEXT_SIDE_CLEAR_SP;
+  const overlapsHandoff =
+    clearAbove != null && clearAbove.x + clearAbove.w >= x0 && clearAbove.x <= x1;
+  const bottomInk = Math.min(
+    textBottomAbove(primitives.slice(0, firstNew), x0, x1, staffTop, rowTop),
+    overlapsHandoff ? clearAbove.y - COHESION_CLEAR_SP : Infinity
+  );
+  const dy = bottomInk - bottomInkAtZero;
+  for (const p of run) translatePrimitiveY(p, dy);
+  return { ...box, y: box.y + dy };
+}
+
+/**
+ * The highest ink already drawn over [x0, x1] that rises above `staffTop`,
+ * measured through the same SMuFL boxes the crop and `tightenRows` trust — so
+ * a stem (a `line`, which a `.y` read cannot see) counts exactly as far as it
+ * reaches. Bounded below by `rowTop` so the system above, whose x-range
+ * repeats after a wrap, is never mistaken for this bar's ink. Null when the
+ * space is clear.
+ */
+export function inkTopAbove(
+  primitives: readonly Primitive[],
+  x0: number,
+  x1: number,
+  staffTop: number,
+  rowTop: number
+): number | null {
+  let top: number | null = null;
+  for (const p of primitives) {
+    const b = computeBoundsSp([p]);
+    if (!b) continue;
+    if (b.x + b.w < x0 || b.x > x1) continue;
+    if (b.y >= staffTop - ABOVE_LINE_EPS_SP) continue;
+    if (b.y + b.h <= rowTop) continue;
+    top = top === null ? b.y : Math.min(top, b.y);
+  }
+  return top;
+}
+
+/** Where a piece of score text's BOTTOM ink goes: one cohesion clearance above
+ *  the bar's ink, or the minimum rise above a clear staff. */
+export function textBottomAbove(
+  primitives: readonly Primitive[],
+  x0: number,
+  x1: number,
+  staffTop: number,
+  rowTop: number
+): number {
+  const inkTop = inkTopAbove(primitives, x0, x1, staffTop, rowTop);
+  return inkTop === null ? staffTop - TEXT_MIN_RISE_SP : inkTop - COHESION_CLEAR_SP;
+}
 
 /**
  * SCORE TEXT AND SCORE-WIDE MARKS — everything the GLOBAL measure puts above a
@@ -150,8 +249,7 @@ const SCORE_LABEL_INSET_SP = 0.6; // from the barline, for a label at the top of
 // CAP HEIGHT, not the em. Sizing it to the em leaves the ascender/descender
 // space inside the box and the letter sits visibly low in it.
 const SCORE_LABEL_CAP_RATIO = 0.72;
-const SCORE_LABEL_BASE_RISE_SP = 2.8; // baseline of the innermost label, above the top staff line
-const SCORE_LABEL_GAP_SP = 0.5; // between stacked labels
+const SCORE_LABEL_GAP_SP = 0.5; // between the rehearsal box and the section name
 const REHEARSAL_PAD_X_SP = 0.5; // box padding around the label
 const REHEARSAL_PAD_Y_SP = 0.4;
 const REHEARSAL_BOX_THICKNESS_SP = 0.12;
@@ -168,6 +266,14 @@ export interface EmitScoreLabelsArgs {
    *  SYSTEMS ABOVE and climbs the label to the top of the page (the
    *  twelve-bar-blues "Turnaround over bar 1" bug). */
   rowTop: number;
+  /**
+   * The box of ink this row's own text pass already placed over the bar —
+   * `emitTempoMark`'s return. Handed over explicitly because a tempo mark
+   * lifted over a stem can climb PAST `rowTop`, where the scan would take it
+   * for the system above and the label would land on top of it. Honoured
+   * only where the footprints overlap, like everything else.
+   */
+  clearAbove?: BoundsSp | null;
   primitives: Primitive[];
 }
 
@@ -180,7 +286,7 @@ export interface EmitScoreLabelsArgs {
  * needs no typography at all.
  */
 export function emitScoreLabels(args: EmitScoreLabelsArgs): void {
-  const { gm, m, staffTop, rowTop, primitives } = args;
+  const { gm, m, staffTop, rowTop, clearAbove, primitives } = args;
   if (!gm.rehearsal && !gm.section) return;
 
   // Labels describe the measure rather than a moment in it, so they align to the
@@ -189,21 +295,14 @@ export function emitScoreLabels(args: EmitScoreLabelsArgs): void {
 
   const capH = SCORE_LABEL_SIZE_SP * SCORE_LABEL_CAP_RATIO;
 
-  // A score-wide label goes above everything else over this measure — tempo
-  // marks, navigation marks, part directions — because it labels the bar as a
-  // whole. With the space clear it takes the innermost row rather than floating.
-  let occupiedTop = staffTop;
-  for (const p of primitives) {
-    const py = (p as { y?: number }).y;
-    const px = (p as { x?: number }).x;
-    if (py === undefined || px === undefined) continue;
-    if (px < m.x || px > m.x + m.width || py >= staffTop || py <= rowTop) continue;
-    occupiedTop = Math.min(occupiedTop, py - capH);
-  }
-  const innerY =
-    occupiedTop === staffTop
-      ? staffTop - SCORE_LABEL_BASE_RISE_SP
-      : occupiedTop - SCORE_LABEL_GAP_SP - capH;
+  // A score-wide label goes above everything under its footprint — tempo
+  // marks, navigation marks, part directions, stems, voltas — because it
+  // labels the bar as a whole; and it goes exactly one cohesion clearance
+  // above that ink, because it labels THIS bar. Drawn at a provisional
+  // baseline of 0 and placed once its real extent is known; the box, when
+  // there is one, is the label's bottom ink.
+  const firstNew = primitives.length;
+  const innerY = 0 - (gm.rehearsal ? REHEARSAL_PAD_Y_SP : 0);
 
   // Both labels share one row. "[A] Verse" reads as a single statement — the
   // mark indexes the bar and the name says what it is — and vertical space
@@ -262,12 +361,12 @@ export function emitScoreLabels(args: EmitScoreLabelsArgs): void {
       className: 'section-label'
     });
   }
+
+  placeTextRun(primitives, firstNew, 0, staffTop, rowTop, clearAbove);
 }
 
 
 // ---------- Metronome mark ----------
-
-const TEMPO_BASELINE_RISE_SP = 2.7; // above the top staff line
 
 /** SMuFL note glyph for a metronome mark's beat unit. */
 const METRONOME_GLYPH_BY_BASE: Record<string, string> = {
@@ -284,20 +383,34 @@ const METRONOME_GLYPH_BY_BASE: Record<string, string> = {
 
 export interface EmitTempoMarkArgs {
   gm: MnxGlobalMeasure;
-  m: { showTimeSig: boolean; timeSigCentreX: number; contentStartX: number };
+  m: { x: number; width: number; showTimeSig: boolean; timeSigCentreX: number; contentStartX: number };
   staffTop: number;
+  /** Top of the measure's row band — the ink scan's floor (see `inkTopAbove`). */
+  rowTop: number;
   primitives: Primitive[];
 }
 
-/** Metronome mark above the bar's prefix ("quarter = 200"). */
-export function emitTempoMark(args: EmitTempoMarkArgs): void {
-  const { gm, m, staffTop, primitives } = args;
+/**
+ * Metronome mark above the bar's prefix ("quarter = 200"), one cohesion
+ * clearance above the bar's ink. Callers emit it AFTER the bar's events,
+ * beams and brackets — the mark has to see the stems it must clear.
+ *
+ * Returns the box of the ink it drew (null when there is no tempo), for the
+ * label pass to clear explicitly — see `EmitScoreLabelsArgs.clearAbove`.
+ */
+export function emitTempoMark(args: EmitTempoMarkArgs): BoundsSp | null {
+  const { gm, m, staffTop, rowTop, primitives } = args;
   const tempo = (gm.tempos ?? [])[0];
-  if (!tempo) return;
+  if (!tempo) return null;
+  const firstNew = primitives.length;
 
   const x0 = m.showTimeSig ? m.timeSigCentreX - 1.25 : m.contentStartX - 1.5;
-  const y = staffTop - TEMPO_BASELINE_RISE_SP;
   const metGlyph = METRONOME_GLYPH_BY_BASE[tempo.value.base] ?? 'metNoteQuarterUp';
+  // Drawn at a provisional baseline of 0 and placed once its footprint is
+  // known. The note glyph's head hangs below the baseline — that is the
+  // mark's bottom ink, and it is what meets the clearance.
+  const y = 0;
+  const belowBaseline = Math.max(0, -(glyphBBox(metGlyph)?.y ?? 0));
   primitives.push({ kind: 'glyph', glyph: metGlyph, x: x0, y, className: 'tempo' });
   // Advance past the note glyph's actual right edge (incl. its stem) so the
   // augmentation dots and the "=" never collide with the stem.
@@ -315,4 +428,5 @@ export function emitTempoMark(args: EmitTempoMarkArgs): void {
     size: 1.6,
     className: 'tempo'
   });
+  return placeTextRun(primitives, firstNew, belowBaseline, staffTop, rowTop, null);
 }

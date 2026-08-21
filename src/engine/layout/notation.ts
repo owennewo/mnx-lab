@@ -1293,8 +1293,6 @@ function renderSegment(args: RenderSegmentArgs): {
       }
     }
 
-    emitTempoMark({ gm: mnx.global.measures[i] ?? {}, m, staffTop, primitives });
-
     // Mid-measure clef changes, at the column the plan reserved for them.
     for (const cc of m.clefChanges) {
       primitives.push({
@@ -1757,15 +1755,9 @@ function renderSegment(args: RenderSegmentArgs): {
       staffTop,
       primitives
     });
-    // Last for the measure: the label row is placed above whatever else already
-    // occupies the space over this staff — a tempo mark, a segno, a direction.
-    emitScoreLabels({
-      gm: mnx.global.measures[i] ?? {},
-      m,
-      staffTop,
-      rowTop: staffTop - ROW_PAD_TOP_SP,
-      primitives
-    });
+    // The tempo mark and the label row are emitted after the loop — they are
+    // placed one clearance above the bar's ink, and the beams, voltas and
+    // ottava brackets that ink includes are drawn after the loop too.
 
     if (anchoredTabIssues.length && tabAnchorTd) {
       const tabBottom = displayTopOf(m.row, tabAnchorTd.displayIndex) + TAB_STAFF_HEIGHT_SP;
@@ -1824,6 +1816,21 @@ function renderSegment(args: RenderSegmentArgs): {
 
   emitEndings(mnx, plan, systemHeightSp, primitives);
   if (ottavaOnsets && ottavaSpans.length) emitOttavas(ottavaSpans, plan, staffTopOf, ottavaOnsets, primitives);
+
+  // The score-wide text row, last of all (core-ink-measured-gaps.md, stage A):
+  // a tempo mark and then the labels sit one cohesion clearance above
+  // whatever ink the bar already carries over its top staff — beamed stems,
+  // voltas and ottava brackets included, which is why this runs here rather
+  // than inside the measure loop. Tempo first, so the labels stack over it.
+  for (let i = 0; i < numMeasures; i++) {
+    const m = plan.measures[i];
+    if (m.hidden) continue;
+    const gm = mnx.global.measures[i] ?? {};
+    const staffTop = staffTopOf(m.row, 0);
+    const rowTop = staffTop - ROW_PAD_TOP_SP;
+    const tempoTop = emitTempoMark({ gm, m, staffTop, rowTop, primitives });
+    emitScoreLabels({ gm, m, staffTop, rowTop, clearAbove: tempoTop, primitives });
+  }
 
   const heightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * systemHeightSp;
   const rows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r): RowBandSp => ({

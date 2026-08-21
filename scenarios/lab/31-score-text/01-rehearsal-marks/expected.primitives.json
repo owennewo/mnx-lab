@@ -99,27 +99,6 @@
         "className": "barline"
       },
       {
-        "kind": "rect",
-        "x": 2.1,
-        "y": 3.504,
-        "w": 2.116,
-        "h": 2.096,
-        "stroke": "currentColor",
-        "thickness": 0.12,
-        "className": "rehearsal-box"
-      },
-      {
-        "kind": "text",
-        "text": "A",
-        "x": 2.6,
-        "y": 5.2,
-        "font": "body",
-        "size": 1.8,
-        "weight": "bold",
-        "anchor": "start",
-        "className": "rehearsal-label"
-      },
-      {
         "kind": "line",
         "x1": 20.9,
         "y1": 8,
@@ -244,27 +223,6 @@
         "className": "barline"
       },
       {
-        "kind": "rect",
-        "x": 33.9,
-        "y": 3.504,
-        "w": 2.116,
-        "h": 2.096,
-        "stroke": "currentColor",
-        "thickness": 0.12,
-        "className": "rehearsal-box"
-      },
-      {
-        "kind": "text",
-        "text": "B",
-        "x": 34.4,
-        "y": 5.2,
-        "font": "body",
-        "size": 1.8,
-        "weight": "bold",
-        "anchor": "start",
-        "className": "rehearsal-label"
-      },
-      {
         "kind": "line",
         "x1": 46.7,
         "y1": 8,
@@ -334,6 +292,48 @@
         "h": 4,
         "fill": "currentColor",
         "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "rect",
+        "x": 2.1,
+        "y": 3.512,
+        "w": 2.116,
+        "h": 2.096,
+        "stroke": "currentColor",
+        "thickness": 0.12,
+        "className": "rehearsal-box"
+      },
+      {
+        "kind": "text",
+        "text": "A",
+        "x": 2.6,
+        "y": 5.208,
+        "font": "body",
+        "size": 1.8,
+        "weight": "bold",
+        "anchor": "start",
+        "className": "rehearsal-label"
+      },
+      {
+        "kind": "rect",
+        "x": 33.9,
+        "y": 4.404,
+        "w": 2.116,
+        "h": 2.096,
+        "stroke": "currentColor",
+        "thickness": 0.12,
+        "className": "rehearsal-box"
+      },
+      {
+        "kind": "text",
+        "text": "B",
+        "x": 34.4,
+        "y": 6.1,
+        "font": "body",
+        "size": 1.8,
+        "weight": "bold",
+        "anchor": "start",
+        "className": "rehearsal-label"
       }
     ]
   }

@@ -36,9 +36,6 @@
 <line x1="598.4" y1="128" x2="598.4" y2="192" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="598.4" y1="288" x2="598.4" y2="352" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <text x="193.6" y="89.6" font-family="var(--font-family-sans)" font-size="24" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" font-style="italic" class="direction">solo</text>
-<rect x="33.6" y="12.992" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="41.6" y="40.128" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">A</text>
-<text x="75.456" y="40.128" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Intro</text>
 <line x1="598.4" y1="128" x2="1068.8" y2="128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="598.4" y1="144" x2="1068.8" y2="144" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="598.4" y1="160" x2="1068.8" y2="160" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
@@ -69,4 +66,7 @@
 <rect x="1060.8" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="1056" y1="288" x2="1056" y2="352" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1060.8" y="288" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<rect x="33.6" y="22.064" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="41.6" y="49.2" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">A</text>
+<text x="75.456" y="49.2" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Intro</text>
 </svg>

@@ -58,22 +58,6 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNoteQuarterUp",
-        "x": 6.1,
-        "y": 5.3,
-        "className": "tempo"
-      },
-      {
-        "kind": "text",
-        "text": "= 200",
-        "x": 7.828,
-        "y": 5.3,
-        "font": "body",
-        "size": 1.6,
-        "className": "tempo"
-      },
-      {
-        "kind": "glyph",
         "glyph": "timeSig4",
         "x": 7.35,
         "y": 9,
@@ -313,6 +297,22 @@
         "h": 4,
         "fill": "currentColor",
         "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "metNoteQuarterUp",
+        "x": 6.1,
+        "y": 5.044,
+        "className": "tempo"
+      },
+      {
+        "kind": "text",
+        "text": "= 200",
+        "x": 7.828,
+        "y": 5.044,
+        "font": "body",
+        "size": 1.6,
+        "className": "tempo"
       }
     ]
   }
