@@ -199,7 +199,7 @@ export class ZoomPad extends LitElement {
         background: transparent;
         border: var(--rule-w) solid transparent;
         border-radius: var(--radius-card);
-        box-shadow: 0 10px 26px transparent;
+        box-shadow: 0 2px 4px transparent, 0 12px 30px transparent;
         opacity: 0.28;
         transition:
           opacity 0.12s ease,
@@ -208,16 +208,24 @@ export class ZoomPad extends LitElement {
           box-shadow 0.16s ease;
       }
 
-      /* Off default: the floor rises and the changed arm prints in the accent,
-         so the score never lies about its own scale. */
-      :host([data-off]) .pad {
+      /* Off default: the IDLE floor rises and the changed arm prints in the
+         accent, so the score never lies about its own scale.
+
+         The :not(.expanded) is load-bearing, not decoration. :host([data-off])
+         .pad outweighs .pad.expanded (0,3,0 against 0,2,0), so without it the
+         raised floor also applied to the OPEN pad: hover a pad on a score that
+         had been zoomed or respaced — the only time the readout has numbers
+         worth reading — and the whole card sat at 0.55, i.e. the staff lines
+         and fret digits showed straight through the panel and its type.
+         Scoping the rule to the idle pose says what it always meant. */
+      :host([data-off]) .pad:not(.expanded) {
         opacity: 0.55;
       }
 
       .pad.expanded {
         background: var(--surface);
         border-color: var(--ink);
-        box-shadow: 0 10px 26px var(--shadow-near);
+        box-shadow: 0 2px 4px var(--shadow-far), 0 12px 30px var(--shadow-far);
         opacity: 1;
       }
 
@@ -226,10 +234,19 @@ export class ZoomPad extends LitElement {
       }
 
       /* ── the readout: a left-hand column, so the idle numbers and the open
-         readout are the same elements in the same place ── */
+         readout are the same elements in the same place ──
+
+         Open, the column gets a GROUND of its own (--bg-context) rather than
+         sharing the pad's --surface. The reason is a collision the token
+         sheet makes exactly: --surface and --paper are the same value in both
+         themes (white / oklch(0.23…)), so a pad filled with --surface over the
+         score is a card whose fill is indistinguishable from the paper it
+         covers — the staff lines run up to its edge and read as passing UNDER
+         the numbers. One step of ground under the readout is what stops the
+         digits reading as ink lying on the music. */
       .readout {
         box-sizing: border-box;
-        width: 42px;
+        width: 60px;
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -237,10 +254,12 @@ export class ZoomPad extends LitElement {
         transition:
           width 0.16s ease,
           opacity 0.12s ease,
+          background-color 0.16s ease,
           border-color 0.16s ease;
       }
 
       .pad.expanded .readout {
+        background: var(--bg-context);
         border-color: var(--ink);
       }
 
@@ -270,13 +289,13 @@ export class ZoomPad extends LitElement {
         border-color: var(--line);
       }
 
-      /* The label closes rather than hides: 9px → 0 is what turns the open
+      /* The label closes rather than hides: 11px → 0 is what turns the open
          STAFF/SPACE pair back into the idle number stack. */
       .lbl {
-        font: 600 6.5px/1 var(--sans);
-        letter-spacing: 0.1em;
+        font: 600 8px/1 var(--sans);
+        letter-spacing: 0.09em;
         color: var(--ink-3);
-        height: 9px;
+        height: 11px;
         overflow: hidden;
         transition:
           height 0.16s ease,
@@ -288,9 +307,20 @@ export class ZoomPad extends LitElement {
         opacity: 0;
       }
 
+      /* 9px was the whole readout, in both poses. It is the right size for
+         the idle whisper beside a 24px mark and too small to READ in the pose
+         the pointer is actually in, so the size is now part of the morph:
+         13px open, back to 9px idle. Idle cannot simply inherit 13px — two
+         halves of it stand taller than the 24px crosshair and the mark would
+         stop being 24×24. */
       .val {
-        font: 600 9px/1.3 var(--mono);
+        font: 600 13px/1.25 var(--mono);
         color: var(--ink);
+        transition: font-size 0.16s ease;
+      }
+
+      .pad:not(.expanded) .val {
+        font-size: 9px;
       }
 
       .val.hot {
@@ -429,6 +459,7 @@ export class ZoomPad extends LitElement {
         .readout,
         .half,
         .lbl,
+        .val,
         .grid,
         button.cell,
         .cell svg,

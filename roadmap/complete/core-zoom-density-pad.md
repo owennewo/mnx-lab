@@ -316,3 +316,32 @@ named this cost and left it *"for a decision"*; the decision is
 columns are ink and get priced on the ink scale, with packing frozen square
 so this doc's Ruling 2 keeps its substance. The ruling's text above stands as
 written — it was true of the engine it described.
+
+## Appendix (2026-08-21): the open pad was translucent whenever it had something to say
+
+Reported from use: *"I find the zoom control difficult to read. When hovered the
+numbers are too small to read and the background under the numbers is a
+distraction."* Two causes, one of them a plain CSS defect:
+
+1. **`:host([data-off]) .pad { opacity: 0.55 }` outweighed `.pad.expanded`** —
+   (0,3,0) against (0,2,0) — so the raised idle floor also applied to the OPEN
+   pad. The rule only ever bit **off default**, which is exactly when the
+   readout has numbers worth reading, so hovering a zoomed or respaced score
+   gave a 55%-opaque card: the staff lines and fret digits showed through the
+   panel and through its type. That is the "background under the numbers", and
+   it was the score. Fixed by scoping the floor to `:not(.expanded)`, which is
+   what it always meant.
+2. **9px was the whole readout, in both poses.** Right for the idle whisper
+   beside a 24×24 mark, too small to read in the pose the pointer is in. The
+   size is now part of the morph — 13px open, 9px idle (the label 8px, from
+   6.5px), the column 42px → 60px, which is also what `TIGHTEST` needs. Idle
+   cannot simply inherit 13px: two halves of it stand taller than the crosshair
+   and the mark would stop being 24×24.
+
+Also, while the fill was opaque it was **the same value as the paper**:
+`--surface` and `--paper` are equal in both themes by the token sheet, so the
+card had only its border to distinguish it and the staff lines read as running
+under it. The open readout column now takes `--bg-context` and the pad a real
+drop shadow (`--shadow-far`, not the white-in-dark `--shadow-near` glow), so the
+numbers sit on a ground of their own. Verified over CDP in both themes across
+the default, off-default, clamped (`TIGHTEST`) and idle poses.
