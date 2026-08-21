@@ -1767,7 +1767,7 @@ function assembleSegment(
       emitTabStaffLines(m.x, m.width, tabTop, primitives);
       // Setup instructions (capo, non-standard tuning letters) on the FIRST
       // bar only — same emission as the standalone tab view.
-      if (i === 0) emitTabSystemHeader(td.ctx, m.x, tabTop, primitives);
+      if (i === 0) emitTabSystemHeader(td.ctx, m.x, tabTop, plan.inkRatio, primitives);
       if (m.firstInSystem) emitTabClef(m.clefX, tabTop, primitives);
       if (m.showTimeSig) emitTabTimeSig(m.timeSig, m.timeSigCentreX, tabTop, primitives);
       if (!m.multiRest) {
@@ -1775,6 +1775,7 @@ function assembleSegment(
           voices: resolvedByStaff[td.planStaff]?.map(v => v.seq) ?? [],
           slots: m.staves[td.planStaff] ?? [],
           staffTop: tabTop,
+          ink: plan.inkRatio,
           measureIndex: i,
           activeNoteIds,
           selectedNoteIds,

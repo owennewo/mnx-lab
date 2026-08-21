@@ -113,6 +113,9 @@ export function emitTabSystemHeader(
   ctx: TabPositionContext,
   x: number,
   staffTop: number,
+  /** The plan's ink ratio — the insets either side of the system start are
+   *  text clearances, so they are ink like every other glyph-relative gap. */
+  ink: number,
   primitives: Primitive[]
 ): void {
   const capo = ctx.capo;
@@ -120,7 +123,7 @@ export function emitTabSystemHeader(
     primitives.push({
       kind: 'text',
       text: `Capo ${capo}`,
-      x: x + CAPO_INSET_SP,
+      x: x + CAPO_INSET_SP * ink,
       y: staffTop - CAPO_RISE_SP,
       font: 'body',
       size: CAPO_FONT_SIZE_SP,
@@ -141,7 +144,7 @@ export function emitTabSystemHeader(
     primitives.push({
       kind: 'text',
       text: tuningLetter(entry.pitch),
-      x: x - TUNING_LETTER_INSET_SP,
+      x: x - TUNING_LETTER_INSET_SP * ink,
       y: staffTop + (entry.string - 1) * TAB_STRING_SPACING_SP,
       font: 'body',
       size: TUNING_LETTER_SIZE_SP,
@@ -226,6 +229,15 @@ export interface EmitTabVoicesArgs {
   /** Per voice, per event: the plan's column slot (same table both layouts read). */
   slots: readonly (readonly EventSlot[])[];
   staffTop: number;
+  /**
+   * The plan's ink ratio (core-ink-priced-columns.md). Every offset FROM the
+   * column centre is ink and scales by it — here, the half-width that places
+   * the knock-out rect's left edge. The rect's *width* is emitted on the
+   * vertical scale already (`emitRect` uses `ky` for a non-`spanW` rect), so
+   * leaving the left edge unscaled slid the rect right of the digit it masks
+   * and the fret number read as left-aligned against the string line.
+   */
+  ink: number;
   measureIndex: number;
   activeNoteIds: readonly string[];
   selectedNoteIds: readonly string[];
@@ -253,7 +265,7 @@ export interface EmitTabVoicesArgs {
  */
 export function emitTabVoices(args: EmitTabVoicesArgs): void {
   const {
-    voices, slots, staffTop, measureIndex, positionContext,
+    voices, slots, staffTop, ink, measureIndex, positionContext,
     activeNoteIds, selectedNoteIds, synthesizeKeys, primitives, index, onIssue
   } = args;
 
@@ -308,10 +320,12 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
           const fretStr = String(pos.fret);
           const charWidthSp = FRET_FONT_SIZE_SP * 0.6 * Math.max(1, fretStr.length);
 
-          // Background rect obscures the staff line under the digit
+          // Background rect obscures the staff line under the digit. Its width
+          // is drawn on the ink scale, so its left edge is placed on it too —
+          // otherwise the mask and the digit come apart as the staff grows.
           primitives.push({
             kind: 'rect',
-            x: eventX - charWidthSp / 2,
+            x: eventX - (charWidthSp / 2) * ink,
             y: stringY - FRET_BG_HEIGHT_SP / 2,
             w: charWidthSp,
             h: FRET_BG_HEIGHT_SP,

@@ -562,5 +562,41 @@ describe('zoom / density', () => {
       expect(ledgersSeen).toBeGreaterThan(0);
       expect(squareLedgersOff).toBeGreaterThan(0);
     });
+
+    it('the tab cluster too: the knock-out rect stays centred under its fret digit', () => {
+      initSmufl();
+      // Measured in DRAWN space, because that is where the bug lived: a rect's
+      // width is emitted on the VERTICAL scale (`emitRect`, no `spanW`) while
+      // its x is on the horizontal one, so a left edge computed at square
+      // scale slides right of the digit as the staff grows — the fret number
+      // reads left-aligned against the string line. In sp terms the rect's
+      // drawn centre is `x + w·ink/2`, and it must equal the digit's x.
+      const s = 1.6;
+      const drawnCentres = (prims: readonly Primitive[], ink: number) => {
+        const rects = prims.filter(p => p.kind === 'rect' && p.className === 'fret-bg');
+        const digits = prims.filter(
+          p => p.kind === 'text' && p.className.split(' ')[0] === 'fret-number'
+        );
+        expect(rects.length).toBeGreaterThan(0);
+        expect(rects.length).toBe(digits.length);
+        // Emitted as a pair, rect then digit, so the arrays are aligned.
+        return rects.map((r, i) =>
+          r.kind === 'rect' && digits[i].kind === 'text'
+            ? Math.abs(r.x + (r.w * ink) / 2 - (digits[i] as { x: number }).x)
+            : Number.NaN
+        );
+      };
+      // Tab-bearing scores only: a notation score with no declared strings
+      // draws a bare staff and no frets at all (no instrument is assumed).
+      for (const mnx of [blues(), doc('lab/tab-positions/open-strings-chord')]) {
+        const priced = layoutTab({ mnx, widthSp: 80, inkRatio: s }).primitives;
+        for (const off of drawnCentres(priced, s)) expect(off).toBeLessThan(1e-9);
+        // Not vacuous: the square layout's rect, drawn at the same grown ink,
+        // is off-centre by half the digit's width — the reported symptom.
+        const square = layoutTab({ mnx, widthSp: 80 }).primitives;
+        const worst = Math.max(...drawnCentres(square, s));
+        expect(worst).toBeGreaterThan(0.2);
+      }
+    });
   });
 });

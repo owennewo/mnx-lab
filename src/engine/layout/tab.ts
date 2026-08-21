@@ -154,7 +154,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     // Setup instructions — capo text and (non-standard) tuning letters,
     // above/beside the FIRST bar only.
     if (i === 0 && positionContext) {
-      emitTabSystemHeader(positionContext, m.x, staffTop, primitives);
+      emitTabSystemHeader(positionContext, m.x, staffTop, plan.inkRatio, primitives);
     }
 
     // System-start barline
@@ -198,6 +198,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
         voices: stdSequences,
         slots: m.voices,
         staffTop,
+        ink: plan.inkRatio,
         measureIndex: i,
         activeNoteIds,
         selectedNoteIds,
