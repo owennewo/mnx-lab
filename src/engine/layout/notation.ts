@@ -1448,6 +1448,7 @@ function renderSegment(args: RenderSegmentArgs): {
               emitGraceGroup({
                 grace: event,
                 firstX: slot.x,
+                ink: plan.inkRatio,
                 staffTop: staffTops[s],
                 clef: posClef,
                 useAccidentalDisplay,
@@ -1476,6 +1477,7 @@ function renderSegment(args: RenderSegmentArgs): {
               emitTremoloGroup({
                 tremolo: event,
                 firstX: slot.x,
+                ink: plan.inkRatio,
                 staffTop: staffTops[s],
                 clef: posClef,
                 useAccidentalDisplay,
@@ -1504,6 +1506,7 @@ function renderSegment(args: RenderSegmentArgs): {
               emitTupletGroup({
                 tuplet: event,
                 firstX: slot.x,
+                ink: plan.inkRatio,
                 staffTop: staffTops[s],
                 clef: posClef,
                 useAccidentalDisplay,
@@ -1533,6 +1536,7 @@ function renderSegment(args: RenderSegmentArgs): {
             const stem = emitEvent({
               event,
               eventX: slot.x,
+              ink: plan.inkRatio,
               staffTop: staffTops[s],
               clef: posClef,
               stemOverride,
@@ -2234,7 +2238,7 @@ function emitSlursAndTies(
                 // The tie is encoded but its target isn't renderable (e.g.
                 // organ-layout's pedal tie into a never-encoded next bar) —
                 // draw the outgoing stub rather than dropping the tie.
-                const x0 = start.x + TIE_END_GAP_SP;
+                const x0 = start.x + TIE_END_GAP_SP * plan.inkRatio;
                 curve(x0, noteY + pad, x0 + LV_TIE_LENGTH_SP, noteY + pad, dir, 'tie');
                 continue;
               }
@@ -2244,13 +2248,13 @@ function emitSlursAndTies(
                 // the incoming stub at its target — drawing the full curve
                 // would span the music skipped by the jump, and the source
                 // side already carries the first-time tie.
-                const x1 = target.anchor.x - TIE_END_GAP_SP;
+                const x1 = target.anchor.x - TIE_END_GAP_SP * plan.inkRatio;
                 curve(x1 - LV_TIE_LENGTH_SP, targetY, x1, targetY, dir, 'tie');
                 continue;
               }
               draw(
-                start.x + TIE_END_GAP_SP, noteY + pad, start.row,
-                target.anchor.x - TIE_END_GAP_SP, targetY, target.anchor.row,
+                start.x + TIE_END_GAP_SP * plan.inkRatio, noteY + pad, start.row,
+                target.anchor.x - TIE_END_GAP_SP * plan.inkRatio, targetY, target.anchor.row,
                 dir, 'tie'
               );
             }
@@ -2678,6 +2682,9 @@ interface EmitGraceGroupArgs {
   /** Centre of the first grace-note column (the plan reserves
    *  GRACE_NOTE_ADVANCE_SP per inner note). */
   firstX: number;
+  /** The plan's ink ratio: every glyph-relative x offset in the cluster
+   *  (head, stem, ledger, accidental, dot) is ink and scales by it. */
+  ink: number;
   staffTop: number;
   clef: ActiveClef;
   useAccidentalDisplay: boolean;
@@ -2699,7 +2706,7 @@ interface EmitGraceGroupArgs {
  * principal.
  */
 function emitGraceGroup(args: EmitGraceGroupArgs): void {
-  const { grace, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
+  const { grace, firstX, ink, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
   const rawIndex = new Map<MnxEvent, number>(grace.content.map((e, i) => [e, i]));
   const inner = grace.content.filter(e => !e.rest && (e.notes?.length ?? 0) > 0);
   if (inner.length === 0) return;
@@ -2724,7 +2731,7 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
   const stems: GraceStem[] = [];
 
   inner.forEach((event, j) => {
-    const x = firstX + j * GRACE_NOTE_ADVANCE_SP;
+    const x = firstX + j * GRACE_NOTE_ADVANCE_SP * ink;
     const notes = event.notes!;
     const staffYs = notes.map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
     const headGlyph = NOTEHEAD_GLYPH_BY_BASE[event.duration.base] ?? 'noteheadBlack';
@@ -2732,9 +2739,9 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
     for (const ly of unionLedgerLines(staffYs)) {
       primitives.push({
         kind: 'line',
-        x1: x - headW / 2 - LEDGER_OVERHANG_SP * GRACE_SCALE,
+        x1: x - (headW / 2) * ink - LEDGER_OVERHANG_SP * GRACE_SCALE * ink,
         y1: staffTop + ly,
-        x2: x + headW / 2 + LEDGER_OVERHANG_SP * GRACE_SCALE,
+        x2: x + (headW / 2) * ink + LEDGER_OVERHANG_SP * GRACE_SCALE * ink,
         y2: staffTop + ly,
         thickness: LEDGER_LINE_THICKNESS_SP,
         className: 'ledger-line grace'
@@ -2747,7 +2754,7 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
         primitives.push({
           kind: 'glyph',
           glyph: accGlyph,
-          x: x - headW / 2 - ACCIDENTAL_SLOT_WIDTH_SP * GRACE_SCALE,
+          x: x - (headW / 2) * ink - ACCIDENTAL_SLOT_WIDTH_SP * GRACE_SCALE * ink,
           y: staffTop + staffYs[idx],
           scale: GRACE_SCALE,
           className: 'accidental grace'
@@ -2757,7 +2764,7 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
       primitives.push({
         kind: 'glyph',
         glyph: headGlyph,
-        x: x - headW / 2,
+        x: x - (headW / 2) * ink,
         y: staffTop + staffYs[idx],
         scale: GRACE_SCALE,
         className: 'notehead grace',
@@ -2769,7 +2776,7 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
       dir === 1
         ? glyphAnchor(headGlyph, 'stemUpSE') ?? { x: NOTEHEAD_WIDTH_SP, y: 0.168 }
         : glyphAnchor(headGlyph, 'stemDownNW') ?? { x: 0, y: -0.168 };
-    const stemX = x - headW / 2 + anchor.x * GRACE_SCALE;
+    const stemX = x - (headW / 2) * ink + anchor.x * GRACE_SCALE * ink;
     const attachY =
       staffTop + (dir === 1 ? Math.max(...staffYs) : Math.min(...staffYs)) - anchor.y * GRACE_SCALE;
     const tipBaseY = staffTop + (dir === 1 ? Math.min(...staffYs) : Math.max(...staffYs));
@@ -2806,8 +2813,8 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
       const midY = tipY + 1.1; // crossing the stem through the flag
       primitives.push({
         kind: 'line',
-        x1: stemX - 0.45, y1: midY + 0.55,
-        x2: stemX + 0.85, y2: midY - 0.55,
+        x1: stemX - 0.45 * ink, y1: midY + 0.55,
+        x2: stemX + 0.85 * ink, y2: midY - 0.55,
         thickness: GRACE_SLASH_THICKNESS_SP,
         className: 'grace-slash'
       });
@@ -2881,6 +2888,9 @@ interface EmitTremoloGroupArgs {
   /** Centre of the first written note's column (the plan reserves
    *  TREMOLO_NOTE_ADVANCE_SP between the pair). */
   firstX: number;
+  /** The plan's ink ratio: every glyph-relative x offset in the cluster
+   *  (head, stem, ledger, accidental, dot) is ink and scales by it. */
+  ink: number;
   staffTop: number;
   clef: ActiveClef;
   useAccidentalDisplay: boolean;
@@ -2899,7 +2909,7 @@ interface EmitTremoloGroupArgs {
  * whole notes. Stem direction follows the pair's combined pitches.
  */
 function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
-  const { tremolo, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
+  const { tremolo, firstX, ink, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
   const rawIndex = new Map<MnxEvent, number>(tremolo.content.map((e, i) => [e, i]));
   const inner = tremolo.content.filter(e => (e.notes?.length ?? 0) > 0).slice(0, 2);
   if (inner.length === 0) return;
@@ -2919,7 +2929,7 @@ function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
   const written: WrittenNote[] = [];
 
   inner.forEach((event, j) => {
-    const x = firstX + j * TREMOLO_NOTE_ADVANCE_SP;
+    const x = firstX + j * TREMOLO_NOTE_ADVANCE_SP * ink;
     const notes = event.notes!;
     const staffYs = notes.map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
     const headGlyph = NOTEHEAD_GLYPH_BY_BASE[event.duration.base] ?? 'noteheadBlack';
@@ -2928,9 +2938,9 @@ function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
     for (const ly of unionLedgerLines(staffYs)) {
       primitives.push({
         kind: 'line',
-        x1: x - NOTEHEAD_WIDTH_SP / 2 - LEDGER_OVERHANG_SP,
+        x1: x - (NOTEHEAD_WIDTH_SP / 2) * ink - LEDGER_OVERHANG_SP * ink,
         y1: staffTop + ly,
-        x2: x + NOTEHEAD_WIDTH_SP / 2 + LEDGER_OVERHANG_SP,
+        x2: x + (NOTEHEAD_WIDTH_SP / 2) * ink + LEDGER_OVERHANG_SP * ink,
         y2: staffTop + ly,
         thickness: LEDGER_LINE_THICKNESS_SP,
         className: 'ledger-line'
@@ -2944,7 +2954,7 @@ function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
         primitives.push({
           kind: 'glyph',
           glyph: accGlyph,
-          x: x - NOTEHEAD_WIDTH_SP / 2 - ACCIDENTAL_SLOT_WIDTH_SP,
+          x: x - (NOTEHEAD_WIDTH_SP / 2) * ink - ACCIDENTAL_SLOT_WIDTH_SP * ink,
           y: staffTop + staffYs[idx],
           className: 'accidental'
         });
@@ -2952,7 +2962,7 @@ function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
       primitives.push({
         kind: 'glyph',
         glyph: headGlyph,
-        x: x - NOTEHEAD_WIDTH_SP / 2,
+        x: x - (NOTEHEAD_WIDTH_SP / 2) * ink,
         y: staffTop + staffYs[idx],
         className: 'notehead',
         ...(tremoloKey ? { sourceId: tremoloKey } : {})
@@ -2969,7 +2979,7 @@ function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
       dir === 1
         ? glyphAnchor(headGlyph, 'stemUpSE') ?? { x: NOTEHEAD_WIDTH_SP, y: 0.168 }
         : glyphAnchor(headGlyph, 'stemDownNW') ?? { x: 0, y: -0.168 };
-    const stemX = x - NOTEHEAD_WIDTH_SP / 2 + anchor.x;
+    const stemX = x - (NOTEHEAD_WIDTH_SP / 2) * ink + anchor.x * ink;
     const attachY =
       staffTop + (dir === 1 ? Math.max(...staffYs) : Math.min(...staffYs)) - anchor.y;
     const tipY =
@@ -2992,8 +3002,8 @@ function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
   // line through their noteheads, inset clear of heads and stems, and (when
   // stemmed) nudged toward the stems' side of that line.
   const inset = stemmed ? 1.2 : 1.6;
-  const xA = stemmed ? Math.max(a.x + inset, a.stemX! + 0.4) : a.x + inset;
-  const xB = stemmed ? Math.min(b.x - inset, b.stemX! - 0.4) : b.x - inset;
+  const xA = stemmed ? Math.max(a.x + inset * ink, a.stemX! + 0.4 * ink) : a.x + inset * ink;
+  const xB = stemmed ? Math.min(b.x - inset * ink, b.stemX! - 0.4 * ink) : b.x - inset * ink;
   const lineY = (x: number) =>
     a.headY + ((b.headY - a.headY) * (x - a.x)) / (b.x - a.x || 1);
   const nudge = stemmed ? -dir * 0.6 : 0;
@@ -3021,6 +3031,9 @@ interface EmitTupletGroupArgs {
   /** Centre of the first inner column's core (the plan reserved
    *  tupletColumns() widths for the whole group). */
   firstX: number;
+  /** The plan's ink ratio: every glyph-relative x offset in the cluster
+   *  (head, stem, ledger, accidental, dot) is ink and scales by it. */
+  ink: number;
   staffTop: number;
   clef: ActiveClef;
   useAccidentalDisplay: boolean;
@@ -3040,7 +3053,7 @@ interface EmitTupletGroupArgs {
  * `inner.multiple` number in a gap, as in the spec's reference engraving.
  */
 function emitTupletGroup(args: EmitTupletGroupArgs): void {
-  const { tuplet, firstX, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
+  const { tuplet, firstX, ink, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
   const cols = tupletColumns(tuplet, useAccidentalDisplay, keyFifths);
   const events = tuplet.content;
   if (events.length === 0) return;
@@ -3066,13 +3079,15 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
   }
   const beamStems: InnerStem[] = [];
   let lowestY = staffTop + STAFF_HEIGHT_SP; // bracket clearance (max y seen)
-  let colStart = firstX - CORE_SP / 2;
+  // The inner columns are rigid ink, priced by the plan at the same ratio —
+  // the walk here has to agree with it term for term.
+  let colStart = firstX - (CORE_SP / 2) * ink;
   let lastX = firstX;
 
   events.forEach((event, j) => {
     const col = cols[j] ?? { leading: 0, advance: CORE_SP };
-    const x = colStart + col.leading + CORE_SP / 2;
-    colStart += col.advance;
+    const x = colStart + col.leading * ink + (CORE_SP / 2) * ink;
+    colStart += col.advance * ink;
     lastX = x;
     if (!isTimedEvent(event)) return;
 
@@ -3104,9 +3119,9 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
     for (const ly of unionLedgerLines(staffYs)) {
       primitives.push({
         kind: 'line',
-        x1: x - NOTEHEAD_WIDTH_SP / 2 - LEDGER_OVERHANG_SP,
+        x1: x - (NOTEHEAD_WIDTH_SP / 2) * ink - LEDGER_OVERHANG_SP * ink,
         y1: staffTop + ly,
-        x2: x + NOTEHEAD_WIDTH_SP / 2 + LEDGER_OVERHANG_SP,
+        x2: x + (NOTEHEAD_WIDTH_SP / 2) * ink + LEDGER_OVERHANG_SP * ink,
         y2: staffTop + ly,
         thickness: LEDGER_LINE_THICKNESS_SP,
         className: 'ledger-line'
@@ -3118,7 +3133,7 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
         primitives.push({
           kind: 'glyph',
           glyph: accGlyph,
-          x: x - NOTEHEAD_WIDTH_SP / 2 - ACCIDENTAL_SLOT_WIDTH_SP,
+          x: x - (NOTEHEAD_WIDTH_SP / 2) * ink - ACCIDENTAL_SLOT_WIDTH_SP * ink,
           y: staffTop + staffYs[idx],
           className: 'accidental'
         });
@@ -3126,7 +3141,7 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
       primitives.push({
         kind: 'glyph',
         glyph: headGlyph,
-        x: x - NOTEHEAD_WIDTH_SP / 2,
+        x: x - (NOTEHEAD_WIDTH_SP / 2) * ink,
         y: staffTop + staffYs[idx],
         className: 'notehead',
         ...(keyFor?.(j, idx) ? { sourceId: keyFor(j, idx)! } : {})
@@ -3136,7 +3151,7 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
         primitives.push({
           kind: 'glyph',
           glyph: 'augmentationDot',
-          x: x + NOTEHEAD_WIDTH_SP / 2 + DOT_RIGHT_PAD_SP + d * 0.4,
+          x: x + (NOTEHEAD_WIDTH_SP / 2) * ink + DOT_RIGHT_PAD_SP * ink + d * 0.4 * ink,
           y: staffTop + yDot,
           className: 'dot'
         });
@@ -3149,7 +3164,7 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
       dir === 1
         ? glyphAnchor(headGlyph, 'stemUpSE') ?? { x: NOTEHEAD_WIDTH_SP, y: 0.168 }
         : glyphAnchor(headGlyph, 'stemDownNW') ?? { x: 0, y: -0.168 };
-    const stemX = x - NOTEHEAD_WIDTH_SP / 2 + anchor.x;
+    const stemX = x - (NOTEHEAD_WIDTH_SP / 2) * ink + anchor.x * ink;
     const attachY =
       staffTop + (dir === 1 ? Math.max(...staffYs) : Math.min(...staffYs)) - anchor.y;
     const baseTipY = staffTop + (dir === 1 ? Math.min(...staffYs) : Math.max(...staffYs));
@@ -3269,6 +3284,12 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
 interface EmitEventArgs {
   event: MnxEvent;
   eventX: number;
+  /** The plan's ink ratio (core-ink-priced-columns.md): the column centre is
+   *  a musical position, but every offset FROM it — half a notehead, the stem
+   *  anchor, ledger overhang, accidental and dot clearances — is ink, and ink
+   *  grows with the vertical scale. Scaling them keeps the stem on the head
+   *  and the ledger under it at any staff scale. */
+  ink: number;
   staffTop: number;
   clef: ActiveClef;
   stemOverride: 1 | -1 | null;
@@ -3301,7 +3322,7 @@ interface EmitEventArgs {
 /** Returns the deferred stem when the event is beamed, else null. */
 function emitEvent(args: EmitEventArgs): BeamedStem | null {
   const {
-    event, eventX, staffTop, clef, stemOverride, beamDir, useAccidentalDisplay, keyFifths,
+    event, eventX, ink, staffTop, clef, stemOverride, beamDir, useAccidentalDisplay, keyFifths,
     activeNoteIds, selectedNoteIds,
     primitives, index, measureIndex, voiceIndex, eventIndex,
     row, curveKey, curveAnchors, synthesizeKeys, keyPartIndex, keyStaffIndex
@@ -3332,7 +3353,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       primitives.push({
         kind: 'glyph',
         glyph: 'augmentationDot',
-        x: eventX + 0.7 + d * 0.3,
+        x: eventX + 0.7 * ink + d * 0.3 * ink,
         y: staffTop + (positioned ? yOffset - 0.5 : base === 'whole' ? 1 : 1.5),
         className: 'dot'
       });
@@ -3413,9 +3434,9 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   for (const ly of ledgerYs) {
     primitives.push({
       kind: 'line',
-      x1: eventX - headW / 2 - LEDGER_OVERHANG_SP,
+      x1: eventX - (headW / 2) * ink - LEDGER_OVERHANG_SP * ink,
       y1: staffTop + ly,
-      x2: eventX + headW / 2 + LEDGER_OVERHANG_SP,
+      x2: eventX + (headW / 2) * ink + LEDGER_OVERHANG_SP * ink,
       y2: staffTop + ly,
       thickness: LEDGER_LINE_THICKNESS_SP,
       stroke: fill,
@@ -3437,7 +3458,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
     primitives.push({
       kind: 'glyph',
       glyph: acc.glyph!,
-      x: eventX - NOTEHEAD_WIDTH_SP / 2 - offset,
+      x: eventX - (NOTEHEAD_WIDTH_SP / 2) * ink - offset * ink,
       y: staffTop + acc.staffY,
       fill: noteFill(acc.noteIdx),
       className: 'accidental' + noteColorClass(acc.noteIdx)
@@ -3450,7 +3471,9 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
     primitives.push({
       kind: 'glyph',
       glyph: noteheadGlyph,
-      x: eventX - headW / 2,
+      // The scaled ink stays centred on the column: the plan priced the
+      // column at the same ratio, so the centre is where the ink belongs.
+      x: eventX - (headW / 2) * ink,
       y,
       fill: noteFill(idx),
       className: 'notehead' + noteColorClass(idx),
@@ -3473,13 +3496,13 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
     if (stemDir === 1) {
       // up: from right of lowest notehead (highest y in our coords) upward
       const anchor = glyphAnchor(noteheadGlyph, 'stemUpSE') ?? { x: NOTEHEAD_WIDTH_SP, y: 0.168 };
-      stemX = eventX - NOTEHEAD_WIDTH_SP / 2 + anchor.x;
+      stemX = eventX - (NOTEHEAD_WIDTH_SP / 2) * ink + anchor.x * ink;
       attachY = staffTop + maxStaffY - anchor.y;
       baseTipY = staffTop + minStaffY;
     } else {
       // down: from left of highest notehead downward
       const anchor = glyphAnchor(noteheadGlyph, 'stemDownNW') ?? { x: 0, y: -0.168 };
-      stemX = eventX - NOTEHEAD_WIDTH_SP / 2 + anchor.x;
+      stemX = eventX - (NOTEHEAD_WIDTH_SP / 2) * ink + anchor.x * ink;
       attachY = staffTop + minStaffY - anchor.y;
       baseTipY = staffTop + maxStaffY;
     }
@@ -3557,7 +3580,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
         primitives.push({
           kind: 'glyph',
           glyph: 'augmentationDot',
-          x: eventX + NOTEHEAD_WIDTH_SP / 2 + DOT_RIGHT_PAD_SP + d * 0.4,
+          x: eventX + (NOTEHEAD_WIDTH_SP / 2) * ink + DOT_RIGHT_PAD_SP * ink + d * 0.4 * ink,
           y: staffTop + dotY,
           fill,
           className: 'dot'

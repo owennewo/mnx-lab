@@ -277,8 +277,9 @@ proposals that name their campaign.
   membership (`packSystems` never sees the ratio — bars never jump systems under zoom), the
   renderers derive the ratio after the square fit. Goldens byte-identical; five mutation-
   checked assertions in `zoom-density.test.ts`, including the square-anchor counterfactual
-  colliding. Named residue: within-column note-cluster offsets still draw square around
-  their anchor inside correctly-priced columns. Appendix on
+  colliding. The within-column residue (stems drifting off heads, short ledgers at staff
+  scale) was retired the same day: every head-relative offset in the four emitters is
+  ink-priced too, goldens still byte-identical. Appendix on
   [core-zoom-density-pad.md](complete/core-zoom-density-pad.md) records ruling 1's
   square-scale premise.
 - **[core-derived-positions.md](complete/core-derived-positions.md)** — the execution half of

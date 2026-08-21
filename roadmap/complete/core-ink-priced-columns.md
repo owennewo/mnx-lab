@@ -201,3 +201,31 @@ once and both staves read it. No per-staff ratio exists to disagree.
 row membership is invariant under the vertical arm, `git diff -- scenarios/`
 is clean after `update:primitives`, and the three conformance assertions above
 are mutation-checked (break the ratio plumbing, watch them fail).
+
+## Follow-up (2026-08-21): the clusters — the residue, retired the same day
+
+The "named residue" in the status block lasted one screenshot: at staff scale
+the stems sat inside their noteheads and the ledger lines stopped short of
+them — exactly the within-column drift the first pass had declined to price.
+Retired by the same principle, one level down: the column centre is a musical
+position, but every offset *from* it — half a notehead, the stem anchor, the
+ledger overhang, accidental and dot clearances, grace/tremolo/tuplet run
+advances, tie endpoint gaps — is ink, and now scales by `plan.inkRatio` in the
+four emitters (`emitEvent`, `emitGraceGroup`, `emitTremoloGroup`,
+`emitTupletGroup`) and `emitSlursAndTies`. The scaled notehead is centred on
+its column (the plan priced the column at the same ratio, so the centre is
+where the ink belongs). Every term is multiplied individually, in the original
+order, so at ratio 1 the arithmetic is bit-identical — goldens untouched.
+
+Asserted in `zoom-density.test.ts`: at ratio 1.6 every stem's x lies inside a
+notehead's drawn ink span and every ledger line spans its head's ink, on
+`twelve-bar-blues` and `key-signatures`; and the square layout measured against
+the same grown ink has stems off their heads — the drift, reproduced.
+
+What still draws square, and why that is fine: articulations, rests and
+tremolo glyphs are `anchor: 'middle'` on the column centre, so their ink grows
+symmetrically about a musical position and needs no pricing; beam geometry is
+derived from the (now priced) stem x's; text (lyrics, dynamics, labels) is
+measured on the vertical scale already. Nothing head-relative is left at a
+square offset — `grep 'NOTEHEAD_WIDTH_SP / 2\|headW / 2' | grep -v '\* ink'`
+returns nothing, and that grep is the cheap check for the next person.

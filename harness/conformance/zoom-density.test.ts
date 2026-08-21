@@ -439,5 +439,53 @@ describe('zoom / density', () => {
       // …and the row took it out of the springs rather than past the margin.
       expect(rowRight(priced)).toBeCloseTo(rowRight(base), 6);
     });
+
+    it('the cluster follows the head: stems stay on noteheads and ledgers under them', () => {
+      initSmufl();
+      // The first pass priced the COLUMNS; the reported drift was inside
+      // them — stems and ledger lines placed at square offsets from a head
+      // whose ink had grown rightward. Every head-relative offset is ink now.
+      const s = 1.6;
+      const headSpan = (p: GlyphPrim): [number, number] => inkSpan(p, s);
+      const check = (prims: readonly Primitive[]) => {
+        const heads = prims.filter(
+          (p): p is GlyphPrim => p.kind === 'glyph' && p.className.split(' ')[0] === 'notehead'
+        );
+        const stems = prims.filter(p => p.kind === 'line' && p.className.split(' ')[0] === 'stem');
+        const ledgers = prims.filter(p => p.kind === 'line' && p.className.split(' ')[0] === 'ledger-line');
+        // A stem sits on the head's ink EDGE (Bravura's stemUpSE is the
+        // bbox's right edge, stemDownNW its left) — containment would not do,
+        // because a stem left at its square offset lands INSIDE the grown
+        // head, which is precisely the drift.
+        const EDGE_TOL = 0.1 * s;
+        const stemOff = stems.filter(st => st.kind === 'line' && !heads.some(h => {
+          const [l, r] = headSpan(h);
+          return Math.abs(st.x1 - l) <= EDGE_TOL || Math.abs(st.x1 - r) <= EDGE_TOL;
+        })).length;
+        // A ledger line is centred on its head's ink and overhangs it both ways.
+        const ledgerOff = ledgers.filter(lg => lg.kind === 'line' && !heads.some(h => {
+          const [l, r] = headSpan(h);
+          const centred = Math.abs((lg.x1 + lg.x2) / 2 - (l + r) / 2) <= 1e-6;
+          return centred && l >= lg.x1 - 1e-6 && r <= lg.x2 + 1e-6;
+        })).length;
+        return { stems: stems.length, ledgers: ledgers.length, stemOff, ledgerOff };
+      };
+      let ledgersSeen = 0;
+      let squareLedgersOff = 0;
+      for (const mnx of [blues(), keys()]) {
+        const priced = check(layoutNotation({ mnx, widthSp: 80, inkRatio: s }).primitives);
+        expect(priced.stems).toBeGreaterThan(0);
+        expect(priced).toMatchObject({ stemOff: 0, ledgerOff: 0 });
+        ledgersSeen += priced.ledgers;
+        // Not vacuous: the square layout's offsets, measured against the same
+        // grown ink, is the drift the screenshot showed.
+        const square = check(layoutNotation({ mnx, widthSp: 80 }).primitives);
+        expect(square.stemOff).toBeGreaterThan(0);
+        squareLedgersOff += square.ledgerOff;
+      }
+      // blues has no ledger lines; key-signatures does — the pair covers both.
+      expect(ledgersSeen).toBeGreaterThan(0);
+      expect(squareLedgersOff).toBeGreaterThan(0);
+    });
   });
 });
