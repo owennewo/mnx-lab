@@ -89,6 +89,14 @@ every visitor.
   surfacing the exchange failure on the assist tab. The approval click itself
   is the one step a headless browser cannot take.
 
+- **Markdown and history (same day)** — assistant replies render through a
+  small markdown subset parsed to an AST (`src/assist/markdown.ts`, pinned by
+  `markdown.test.ts`) and emitted as Lit templates (`workbench/markdownLit.ts`):
+  no HTML sink exists, so `<img onerror>` in a reply is text and only http(s)
+  hrefs become links (`rel="noopener noreferrer"`). The conversation persists
+  in sessionStorage — survives switching scenarios, dies with the tab — and
+  *clear* in the context bar wipes it. Verified over CDP.
+
 Remaining: move `editLoop.ts` into `src/assist/` behind this transport; the
 CSP header; the Worker demoted to an explicit demo mode; studio adopts the
 same credentials module.

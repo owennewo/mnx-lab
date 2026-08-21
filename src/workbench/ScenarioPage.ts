@@ -94,6 +94,7 @@ import type { ZoomPadChange } from './ZoomPad.ts';
 import './ModelPickerDialog.ts';
 import { modelDisplayName } from '../assist/modelCatalog.ts';
 import { fetchKeyInfo, keyFingerprint, streamChat, type ChatMessage } from '../assist/openrouter.ts';
+import { renderMarkdown } from './markdownLit.ts';
 import {
   beginPkce,
   forgetApiKey,
@@ -235,6 +236,25 @@ const PANEL_DEFAULT = 420;
  *  committed roster (worker/models.json) stays the reviewed default. The
  *  fallback id mirrors that roster's first row. */
 const ASSIST_MODEL_KEY = 'mnx-lab.assist-model';
+/** The conversation — sessionStorage, so it survives switching scenarios
+ *  in this tab and dies with the tab; *clear* in the context bar wipes it. */
+const ASSIST_CHAT_KEY = 'mnx-lab.assist-chat';
+
+function storedChat(): ChatMessage[] {
+  try {
+    const raw = sessionStorage.getItem(ASSIST_CHAT_KEY);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter(
+          (m): m is ChatMessage =>
+            !!m && typeof m === 'object' && typeof (m as ChatMessage).content === 'string' &&
+            ['user', 'assistant', 'system'].includes((m as ChatMessage).role)
+        )
+      : [];
+  } catch {
+    return [];
+  }
+}
 const DEFAULT_ASSIST_MODEL = 'deepseek/deepseek-v4-flash';
 
 /* The zoom pad's two axes (core-zoom-density-pad.md). localStorage, not the
@@ -465,7 +485,7 @@ export class ScenarioPage extends LitElement {
   @state() private keyFingerprint = '';
   @state() private pasteDraft = '';
   @state() private connectNotice = '';
-  @state() private chat: ChatMessage[] = [];
+  @state() private chat: ChatMessage[] = storedChat();
   @state() private chatDraft = '';
   @state() private chatBusy = false;
   private chatAbort: AbortController | null = null;
@@ -1161,6 +1181,71 @@ export class ScenarioPage extends LitElement {
       .chat-text {
         white-space: pre-wrap;
         overflow-wrap: anywhere;
+      }
+
+      /* The assistant's markdown — compact, the panel's own type. */
+      .chat-msg.assistant .chat-text {
+        white-space: normal;
+      }
+
+      .chat-text p,
+      .chat-text ul,
+      .chat-text ol,
+      .chat-text blockquote,
+      .chat-text pre {
+        margin: 0 0 8px;
+      }
+
+      .chat-text > :last-child {
+        margin-bottom: 0;
+      }
+
+      .chat-text h1,
+      .chat-text h2,
+      .chat-text h3 {
+        font: 600 12.5px/1.4 var(--sans);
+        margin: 10px 0 4px;
+      }
+
+      .chat-text ul,
+      .chat-text ol {
+        padding-left: 18px;
+      }
+
+      .chat-text code {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        background: var(--bg-context);
+        padding: 1px 4px;
+      }
+
+      .chat-text pre {
+        background: var(--bg-context);
+        border: 1px solid var(--line);
+        padding: 8px 10px;
+        overflow-x: auto;
+        white-space: pre;
+      }
+
+      .chat-text pre code {
+        background: none;
+        padding: 0;
+      }
+
+      .chat-text blockquote {
+        border-left: 2px solid var(--line-strong);
+        padding-left: 10px;
+        color: var(--ink-2);
+      }
+
+      .chat-text a {
+        color: var(--accent-fg);
+      }
+
+      .chat-text hr {
+        border: none;
+        border-top: 1px solid var(--line);
+        margin: 8px 0;
       }
 
       /* The hud tab's footer inverts: the one deliberately dark band in a
@@ -2941,6 +3026,9 @@ export class ScenarioPage extends LitElement {
         >
         <span class="ctx-actions">
           <button @click=${() => (this.modelPickerOpen = true)}>switch model</button>
+          ${this.chat.length
+            ? html`<button title="clear the conversation" @click=${() => this.clearChat()}>clear</button>`
+            : nothing}
           ${connected
             ? html`<button title=${`key ${this.keyFingerprint}`} @click=${() => this.disconnect()}>
                 forget key
@@ -3010,7 +3098,15 @@ export class ScenarioPage extends LitElement {
         ${this.chat.map(
           m => html`<div class="chat-msg ${m.role}">
             <span class="chat-role">${m.role}</span>
-            <div class="chat-text">${m.content || (this.chatBusy ? '…' : '')}</div>
+            <div class="chat-text">
+              ${m.role === 'assistant'
+                ? m.content
+                  ? renderMarkdown(m.content)
+                  : this.chatBusy
+                    ? '…'
+                    : ''
+                : m.content}
+            </div>
           </div>`
         )}
       </div>
@@ -3044,10 +3140,26 @@ export class ScenarioPage extends LitElement {
     }
   }
 
+  private setChat(next: ChatMessage[]) {
+    this.chat = next;
+    try {
+      if (next.length) sessionStorage.setItem(ASSIST_CHAT_KEY, JSON.stringify(next));
+      else sessionStorage.removeItem(ASSIST_CHAT_KEY);
+    } catch {
+      /* storage full or private — the conversation just doesn't persist */
+    }
+  }
+
+  private clearChat() {
+    this.chatAbort?.abort();
+    this.setChat([]);
+    this.connectNotice = '';
+  }
+
   private disconnect() {
     this.chatAbort?.abort();
     forgetApiKey();
-    this.chat = [];
+    this.setChat([]);
     this.connectNotice = '';
   }
 
@@ -3057,7 +3169,7 @@ export class ScenarioPage extends LitElement {
     this.chatDraft = '';
     this.connectNotice = '';
     const history: ChatMessage[] = [...this.chat, { role: 'user', content: text }];
-    this.chat = [...history, { role: 'assistant', content: '' }];
+    this.setChat([...history, { role: 'assistant', content: '' }]);
     this.chatBusy = true;
     this.chatAbort = new AbortController();
     try {
@@ -3070,7 +3182,7 @@ export class ScenarioPage extends LitElement {
         title: 'MNX Lab'
       })) {
         const last = this.chat[this.chat.length - 1];
-        this.chat = [...this.chat.slice(0, -1), { ...last, content: last.content + delta }];
+        this.setChat([...this.chat.slice(0, -1), { ...last, content: last.content + delta }]);
       }
     } catch (e) {
       if (!(e instanceof DOMException && e.name === 'AbortError')) {
