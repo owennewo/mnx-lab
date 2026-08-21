@@ -182,7 +182,7 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     remove: ['removePositioned']
   },
   direction: {
-    classes: ['direction'],
+    classes: ['direction', 'direction-between'],
     note: 'A text/symbolic instruction (proposed field).',
     construct: ['setPositioned'],
     remove: ['removePositioned']

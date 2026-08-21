@@ -1,6 +1,25 @@
 # Vertical distance is measured ink to ink — cohesion and separation as two constants
 
-> **Status: IN PROGRESS — stages A and B built 2026-08-21; C and D open.**
+> **Status: IN PROGRESS — stages A, B and C built 2026-08-21; D is the open
+> decision.** The three sweeps this owes: A's 6 demotions, B's 20 both
+> goldens (un-hashed, so approved for the first time), C's 8 demotions.
+>
+> **Stage C.** `isMeasuredGap` returns true for every display gap — the
+> staging was a review device, not a distinction in the rule. Two things the
+> corpus taught on the way: (1) **gap-centred content.** A `between`
+> direction is placed at the gap's midpoint, so it is positioned *by* the gap
+> and cannot be measured as a demand *on* it — the probe put "cantabile"
+> 50sp under its staff and asked for a 55sp gap. It now carries
+> `direction-between`, is collected per gap, and the gap must be
+> `2·max(inkBelow, inkAbove) + 2·SEPARATION + its height` so it clears both
+> sides from the centre. (2) **The test could not attribute honestly either.**
+> Nearest-band attribution misfiles the guitar's second voice (its up-stems
+> are nearer the bass staff than the treble they belong to) and class
+> vocabulary cannot tell a treble stem from a bass one; the test now lays the
+> score out at a probe gap itself (`displayGapProbeSp`, a harness aid the
+> renderers never set), attributes there, and checks the real layout's gaps
+> against arithmetic it derives. Goldens: **12 multi-staff notation
+> scenarios, none single-staff; 8 demoted.**
 >
 > **Stage A (`da6534c`).** Labels and tempo marks sit `COHESION_CLEAR_SP = 1`
 > above the highest ink under their *own footprint* (± `TEXT_SIDE_CLEAR_SP`

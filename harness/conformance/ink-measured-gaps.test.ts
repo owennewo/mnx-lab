@@ -259,30 +259,41 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
 
   interface Pair { lineGap: number; inkGap: number; expected: number; measured: boolean }
 
-  /** Every adjacent display pair of every row, with the gap the rule predicts. */
-  function pairsOf(layout: LayoutResult): Pair[] {
-    const displays = layout.displays!;
-    const rows = layout.rows!;
+  /**
+   * Every adjacent display pair of every row of the REAL layout, with the
+   * gap the rule predicts — the ink reaches measured on a PROBE layout of the
+   * same score. Attribution at the real gap is ambiguous whichever way it is
+   * done: the guitar's second voice sits between the staves and its up-stems
+   * are nearer the bass staff than the treble they belong to, and class
+   * vocabulary cannot tell a treble stem from a bass one. At a 100sp gap
+   * nothing is ambiguous, and ink reaches relative to a staff's own lines are
+   * the same in both layouts. Content positioned BY the gap (`between`
+   * directions) is collected per gap and must fit with a clearance each side.
+   */
+  function pairsOf(real: LayoutResult, probe: LayoutResult): Pair[] {
+    const displays = probe.displays!;
+    const rows = probe.rows!;
     const isTab = (b: { staffTop: number; staffBottom: number }) =>
       Math.abs(b.staffBottom - b.staffTop - TAB_STAFF_HEIGHT_SP) < 1e-6;
     const rowBounds = rows.slice(0, -1).map((b, r) => (b.staffBottom + rows[r + 1].staffTop) / 2);
     const rowOf = (y: number) => { let r = 0; while (r < rowBounds.length && y >= rowBounds[r]) r++; return r; };
     const buckets: Primitive[][][] = displays.map(bands => bands.map(() => []));
-    const distance = (y: number, b: { staffTop: number; staffBottom: number }) =>
-      y < b.staffTop ? b.staffTop - y : y > b.staffBottom ? y - b.staffBottom : 0;
-    for (const p of layout.primitives) {
-      if (STRUCTURAL.has(cls(p))) continue;
+    const held: Primitive[][][] = displays.map(bands => bands.map(() => []));
+    for (const p of probe.primitives) {
+      const tokens = p.className.split(' ');
+      if (STRUCTURAL.has(tokens[0])) continue;
       const y = anchorY(p);
       const r = rowOf(y);
       const bands = displays[r];
-      const kind = TAB_CLASSES.has(cls(p)) ? 'tab' : SHARED_CLASSES.has(cls(p)) ? 'any' : 'notation';
-      let best = -1;
-      bands.forEach((b, d) => {
-        if (kind !== 'any' && isTab(b) !== (kind === 'tab')) return;
-        if (best < 0 || distance(y, b) < distance(y, bands[best])) best = d;
-      });
-      if (best < 0) best = 0;
-      buckets[r][best].push(p);
+      if (tokens.includes('direction-between')) {
+        let d = 1;
+        while (d + 1 < bands.length && y >= bands[d].staffTop) d++;
+        held[r][d].push(p);
+        continue;
+      }
+      let d = 0;
+      while (d + 1 < bands.length && y >= (bands[d].staffBottom + bands[d + 1].staffTop) / 2) d++;
+      buckets[r][d].push(p);
     }
     const out: Pair[] = [];
     displays.forEach((bands, r) => {
@@ -293,50 +304,55 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
         const lo = computeBoundsSp(buckets[r][d]);
         const inkBelow = Math.max(0, (up ? up.y + up.h : upper.staffBottom) - upper.staffBottom);
         const inkAbove = Math.max(0, lower.staffTop - (lo ? lo.y : lower.staffTop));
-        const lineGap = lower.staffTop - upper.staffBottom;
-        const measured = isTab(upper) || isTab(lower);
+        const heldH = computeBoundsSp(held[r][d])?.h ?? 0;
+        const forHeld = heldH > 0 ? 2 * Math.max(inkBelow, inkAbove) + 2 * SEPARATION_CLEAR_SP + heldH : 0;
+        const realBands = real.displays![r];
+        const lineGap = realBands[d].staffTop - realBands[d - 1].staffBottom;
         out.push({
           lineGap,
           inkGap: lineGap - inkBelow - inkAbove,
-          expected: Math.max(inkBelow + inkAbove + SEPARATION_CLEAR_SP, MIN_STAFF_GAP_SP),
-          measured
+          expected: Math.max(inkBelow + inkAbove + SEPARATION_CLEAR_SP, forHeld, MIN_STAFF_GAP_SP),
+          measured: isTab(upper) || isTab(lower)
         });
       }
     });
     return out;
   }
 
+  const PROBE = 100;
+  const bothPair = (mnx: MnxStructure) => ({
+    real: layoutBothSystem({ mnx, widthSp: WIDTH_SP }),
+    probe: layoutBothSystem({ mnx, widthSp: WIDTH_SP, displayGapProbeSp: PROBE })
+  });
+  const notationPair = (mnx: MnxStructure) => ({
+    real: layoutNotation({ mnx, widthSp: WIDTH_SP }),
+    probe: layoutNotation({ mnx, widthSp: WIDTH_SP, displayGapProbeSp: PROBE })
+  });
+
   it('there are both-view scenarios to check', () => {
     expect(withBoth.length).toBeGreaterThan(10);
   });
 
-  it('every gap adjacent to a tab staff is ink + separation (floored), and no other gap moved', () => {
+  it('every display gap in the both view is ink + separation (floored)', () => {
     initSmufl();
     let measured = 0;
     let narrowed = 0;
     let widened = 0;
-    let untouched = 0;
     for (const s of withBoth) {
-      let layout: LayoutResult;
+      let pair2: { real: LayoutResult; probe: LayoutResult };
       try {
-        layout = layoutBothSystem({ mnx: readDoc(s.dir), widthSp: WIDTH_SP });
+        pair2 = bothPair(readDoc(s.dir));
       } catch {
         continue;
       }
-      if (!layout.displays) continue;
-      for (const pair of pairsOf(layout)) {
-        if (pair.measured) {
-          measured++;
-          expect(pair.lineGap).toBeCloseTo(pair.expected, 6);
-          // Separation really holds — and is met exactly unless the floor won.
-          expect(pair.inkGap).toBeGreaterThanOrEqual(SEPARATION_CLEAR_SP - 1e-6);
-          if (pair.lineGap < 6 - 1e-6) narrowed++;
-          if (pair.lineGap > 6 + 1e-6) widened++;
-        } else {
-          // Stage B's scope: notation↔notation gaps keep the provisional 6sp.
-          untouched++;
-          expect(pair.lineGap).toBeCloseTo(6, 6);
-        }
+      if (!pair2.real.displays) continue;
+      for (const pair of pairsOf(pair2.real, pair2.probe)) {
+        measured++;
+        expect(pair.lineGap).toBeCloseTo(pair.expected, 6);
+        // Separation really holds — and is met exactly unless the floor won.
+        expect(pair.inkGap).toBeGreaterThanOrEqual(SEPARATION_CLEAR_SP - 1e-6);
+        if (pair.lineGap < 6 - 1e-6) narrowed++;
+        if (pair.lineGap > 6 + 1e-6) widened++;
       }
     }
     expect(measured).toBeGreaterThan(0);
@@ -344,15 +360,44 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
     // down-stems above one push it away. Neither alone would be the rule.
     expect(narrowed).toBeGreaterThan(0);
     expect(widened).toBeGreaterThan(0);
-    void untouched;
   });
 
-  it('the standalone layouts are not touched: no tab staff, no second pass', () => {
+  // Stage C — the same rule between notation staves (grand staff, ensemble).
+  it('every display gap in plain notation is ink + separation (floored), corpus-wide', () => {
     initSmufl();
-    // A notation-only segment has nothing to measure in stage B and must
-    // return its first pass — the whole standalone golden set is the proof,
-    // and this is the same claim on one score.
-    const layout = layoutNotation({ mnx: readDoc(withBoth[0].dir), widthSp: WIDTH_SP });
-    for (const pair of pairsOf(layout)) expect(pair.lineGap).toBeCloseTo(6, 6);
+    let pairs = 0;
+    let scenarios = 0;
+    for (const s of corpus) {
+      let pair2: { real: LayoutResult; probe: LayoutResult };
+      try {
+        pair2 = notationPair(readDoc(s.dir));
+      } catch {
+        continue;
+      }
+      if (!pair2.real.displays || pair2.real.displays[0].length < 2) continue;
+      scenarios++;
+      for (const pair of pairsOf(pair2.real, pair2.probe)) {
+        pairs++;
+        expect(pair.lineGap).toBeCloseTo(pair.expected, 6);
+        expect(pair.inkGap).toBeGreaterThanOrEqual(SEPARATION_CLEAR_SP - 1e-6);
+      }
+    }
+    expect(scenarios).toBeGreaterThan(0);
+    expect(pairs).toBeGreaterThan(0);
+  });
+
+  it('a single-staff layout takes no second pass: there is no gap to measure', () => {
+    initSmufl();
+    // Same claim the single-staff golden set makes — one staff, one band,
+    // the provisional layout returned as is.
+    const single = corpus.find(s => {
+      try {
+        return layoutNotation({ mnx: readDoc(s.dir), widthSp: WIDTH_SP }).displays?.[0].length === 1;
+      } catch {
+        return false;
+      }
+    })!;
+    const pair2 = notationPair(readDoc(single.dir));
+    expect(pairsOf(pair2.real, pair2.probe)).toEqual([]);
   });
 });

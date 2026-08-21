@@ -172,9 +172,10 @@ proposals that name their campaign.
 
 ### inprogress/
 - **[core-ink-measured-gaps.md](inprogress/core-ink-measured-gaps.md)** — **vertical distance
-  is measured ink to ink**. **Stages A and B built 2026-08-21** (labels/tempo one clearance
-  above the ink under their footprint; tab-adjacent display gaps ink-measured via a probe
-  pass) — 9 text scenarios demoted for the sweep, 20 both goldens re-earned; C and D open.
+  is measured ink to ink**. **Stages A–C built 2026-08-21** (labels/tempo one clearance above the
+  ink under their footprint; every display gap ink-measured via a probe pass, gap-centred
+  `between` directions held with a clearance each side) — 9 text scenarios + 12 multi-staff
+  scenarios demoted for the sweeps, 20 both goldens earned; D (density-1 ruling) open.
   Principle: with two clearance constants: cohesion (label→its staff, ≈1sp)
   and separation (staff→staff, system→system, ≈3sp). Raised 2026-08-21 from two screenshots
   of one score: the section label crowds the treble stems in `both` and floats over a

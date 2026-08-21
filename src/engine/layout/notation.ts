@@ -123,10 +123,12 @@ const STRUCTURAL_CLASSES = new Set(['barline', 'staff-line', 'brace', 'bracket',
  * own staff's lines, the probe's answer is exactly the real layout's.
  */
 const PROBE_GAP_SP = 100;
-/** Which display gaps are ink-measured. Stage B: those adjacent to a tab
- *  staff (stage C widens this to every gap). */
-function isMeasuredGap(d: number, tabDisplayIndexes: ReadonlySet<number>): boolean {
-  return d > 0 && (tabDisplayIndexes.has(d) || tabDisplayIndexes.has(d - 1));
+/** Which display gaps are ink-measured: every one (stage C). Stage B measured
+ *  only the gaps adjacent to a tab staff — the staging was a review device
+ *  (one golden set per sweep), not a distinction in the rule, which is why the
+ *  parameter survives: it documents what the stage was scoped by. */
+function isMeasuredGap(d: number, _tabDisplayIndexes: ReadonlySet<number>): boolean {
+  return d > 0;
 }
 const BRACE_DESIGN_HEIGHT_SP = 3.988; // Bravura `brace` bbox height at scale 1
 const MARGIN_SP = 2;
@@ -463,6 +465,14 @@ export interface LayoutNotationOptions {
    *  Rigid columns are ink and re-price by it; packing stays square.
    *  1/unset = today's layout, untouched. */
   inkRatio?: number;
+  /**
+   * HARNESS AID, not a rendering option: lay out with every ink-measured
+   * display gap fixed at this width and skip the measured pass. The
+   * conformance tests use it to attribute ink to staves unambiguously (the
+   * same reason the engine probes) and then check the real layout's gaps
+   * against arithmetic they derive themselves. Never set by a renderer.
+   */
+  displayGapProbeSp?: number;
 }
 
 /** What a host may hide. Layout-side members must be honored HERE (space
@@ -789,7 +799,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         hide: opts.hide ?? [],
         densityH: opts.densityH,
         densityPad: opts.densityPad,
-        inkRatio: opts.inkRatio
+        inkRatio: opts.inkRatio,
+        displayGapProbeSp: opts.displayGapProbeSp
       })
     );
     const jobUsed = Math.max(...rs.map(r => r.usedWidthSp));
@@ -862,6 +873,7 @@ interface RenderSegmentArgs {
   densityH?: number;
   densityPad?: number;
   inkRatio?: number;
+  displayGapProbeSp?: number;
 }
 
 /** One laid-out segment: what `layoutNotation` stacks. */
@@ -888,11 +900,13 @@ interface SegmentResult {
  * pass untouched — byte-identical by construction, not by arithmetic.
  */
 function renderSegment(args: RenderSegmentArgs): SegmentResult {
+  // A harness asking for the probe itself gets it, and no second pass.
+  if (args.displayGapProbeSp !== undefined) return assembleSegment(args, null, args.displayGapProbeSp);
   // The probe opens only the gaps that will be measured; a segment with none
-  // (no tab staff, in stage B) lays out at its provisional gaps and returns.
-  const probe = assembleSegment(args, null, true);
+  // (a single staff) lays out at its provisional gaps and returns.
+  const probe = assembleSegment(args, null, PROBE_GAP_SP);
   const overrides = measureDisplayGaps(probe, clampPadDensity(args.densityPad));
-  return overrides ? assembleSegment(args, overrides, false) : probe;
+  return overrides ? assembleSegment(args, overrides, null) : probe;
 }
 
 /**
@@ -919,11 +933,22 @@ function measureDisplayGaps(seg: SegmentResult, padK: number): (number | null)[]
     return r;
   };
   const buckets: Primitive[][][] = displays.map(bands => bands.map(() => []));
+  // Content placed BY the gap rather than by a staff — a `between` direction
+  // sits at the gap's midpoint — is not a demand on either side; it is
+  // something the gap must be wide enough to hold, collected per gap.
+  const gapContent: Primitive[][][] = displays.map(bands => bands.map(() => []));
   for (const p of primitives) {
-    if (STRUCTURAL_CLASSES.has((p.className ?? '').split(' ')[0])) continue;
+    const tokens = (p.className ?? '').split(' ');
+    if (STRUCTURAL_CLASSES.has(tokens[0])) continue;
     const y = anchorY(p);
     const r = rowOf(y);
     const bands = displays[r];
+    if (tokens.includes('direction-between')) {
+      let d = 1;
+      while (d + 1 < bands.length && y >= bands[d].staffTop) d++;
+      gapContent[r][d].push(p);
+      continue;
+    }
     let d = 0;
     while (d + 1 < bands.length && y >= (bands[d].staffBottom + bands[d + 1].staffTop) / 2) d++;
     buckets[r][d].push(p);
@@ -941,7 +966,12 @@ function measureDisplayGaps(seg: SegmentResult, padK: number): (number | null)[]
       const lowerInk = computeBoundsSp(buckets[r][d]);
       const inkBelow = Math.max(0, (upperInk ? upperInk.y + upperInk.h : upper.staffBottom) - upper.staffBottom);
       const inkAbove = Math.max(0, band.staffTop - (lowerInk ? lowerInk.y : band.staffTop));
-      return Math.max(inkBelow + inkAbove + sep, minGap);
+      // Gap content is centred on the line-to-line gap, so it clears both
+      // sides only when the gap is twice the larger ink reach plus its own
+      // height, with a clearance on each side.
+      const held = computeBoundsSp(gapContent[r][d])?.h ?? 0;
+      const forContent = held > 0 ? 2 * Math.max(inkBelow, inkAbove) + 2 * sep + held : 0;
+      return Math.max(inkBelow + inkAbove + sep, forContent, minGap);
     })
   );
 }
@@ -959,8 +989,8 @@ function assembleSegment(
   /** Per row, per display: a measured line-to-line gap above the display, or
    *  null to keep the provisional one. Null overall = first pass. */
   gapOverrides: (number | null)[][] | null,
-  /** First pass: open every gap that will be measured to `PROBE_GAP_SP`. */
-  probe: boolean
+  /** Probe pass: open every gap that will be measured to this width. */
+  probeGapSp: number | null
 ): SegmentResult {
   const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH, densityPad, inkRatio } = args;
   const primitives: Primitive[] = [];
@@ -1175,7 +1205,7 @@ function assembleSegment(
   const rowCount = Math.max(1, plan.rowCount);
   const gapAboveSp = (row: number, d: number) =>
     gapOverrides?.[row]?.[d] ??
-    (probe && isMeasuredGap(d, tabDisplayIndexes) ? PROBE_GAP_SP : provisionalGapSp(d));
+    (probeGapSp !== null && isMeasuredGap(d, tabDisplayIndexes) ? probeGapSp : provisionalGapSp(d));
   // Per row, per display: staff tops as prefix sums — the old uniform
   // arithmetic (s * (STAFF_HEIGHT + GAP)) generalized to mixed staff heights
   // and per-row gaps. Without overrides every row's sums are equal term for
@@ -2818,7 +2848,9 @@ function emitDirections(args: EmitDirectionsArgs): void {
             y,
             anchor: 'middle',
             ...(dir.color ? { fill: dir.color } : {}),
-            className: 'direction'
+            // `between` is placed relative to the GAP, not to a staff — the
+            // gap measurement has to know (see measureDisplayGaps).
+            className: between ? 'direction direction-between' : 'direction'
           }
         : {
             kind: 'text',
@@ -2829,7 +2861,9 @@ function emitDirections(args: EmitDirectionsArgs): void {
             size: DIRECTION_SIZE_SP,
             anchor: 'middle',
             ...(dir.color ? { fill: dir.color } : {}),
-            className: 'direction'
+            // `between` is placed relative to the GAP, not to a staff — the
+            // gap measurement has to know (see measureDisplayGaps).
+            className: between ? 'direction direction-between' : 'direction'
           }
     );
   }
