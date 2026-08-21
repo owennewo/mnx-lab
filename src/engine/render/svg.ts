@@ -10,6 +10,36 @@ import { glyphCodepoint } from '../smufl/smufl.ts';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const FONT_FAMILY_BODY = 'var(--font-family-sans)';
+
+/**
+ * MINIMUM DRAWN INK — a hairline is never allowed below one device pixel.
+ *
+ * Ink scales with the STAFF (`pxPerSpY`), which is what keeps a barline's
+ * weight matching the staff lines it crosses at every size. At the small end
+ * of the staff range that arithmetic runs out of pixels rather than out of
+ * correctness: at 60% a tab staff line and a tab barline are both 0.1sp × 6px
+ * = **0.60px**, which a renderer can only draw as a smear of grey. The
+ * reported symptom was an illegible double barline; the giveaway was that the
+ * staff lines were exactly as faint, because the whole engraving had dropped
+ * under a pixel.
+ *
+ * So this is a legibility floor and deliberately NOT a scale rule: it changes
+ * no position, it applies to stroke weights only, and above 100px/sp of staff
+ * it never fires at all. Every committed golden is emitted at 16px/sp where
+ * the thinnest ink is 1.6px, so it cannot move one.
+ *
+ * It also cannot resurrect the overlap it would be easy to fear. Flooring a
+ * stroke widens it about its own centre, so two strokes of a compound barline
+ * close on each other — but at the bottom of the supported staff range (60%)
+ * the double barline still keeps 0.8px of clear space, and the two would only
+ * meet below ~33%, which `MIN_STAFF_SCALE` does not reach.
+ */
+const MIN_INK_PX = 1;
+
+/** A stroke's drawn weight: ink on the vertical scale, floored for legibility. */
+function inkWidth(thicknessSp: number, ky: number): number {
+  return Math.max(thicknessSp * ky, MIN_INK_PX);
+}
 const FONT_FAMILY_MUSIC = 'Bravura';
 
 /** Scale-to-fit ceiling — a one-measure example shouldn't become a poster. */
@@ -192,7 +222,7 @@ function emitLine(p: LinePrim, kx: number, ky: number): SVGElement {
     x2: drawnX(p.x2, p.dx2, kx, ky),
     y2: p.y2 * ky,
     stroke: p.stroke ?? 'currentColor',
-    'stroke-width': p.thickness * ky
+    'stroke-width': inkWidth(p.thickness, ky)
   });
   if (p.dash) node.setAttribute('stroke-dasharray', `${p.dash * ky},${p.dash * ky}`);
   if (p.className) node.setAttribute('class', p.className);
@@ -213,7 +243,7 @@ function emitCurve(p: CurvePrim, kx: number, ky: number): SVGElement {
       d,
       fill: 'none',
       stroke: p.stroke ?? 'currentColor',
-      'stroke-width': p.thickness * ky
+      'stroke-width': inkWidth(p.thickness, ky)
     });
     if (p.className) node.setAttribute('class', p.className);
     if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
@@ -242,7 +272,7 @@ function emitCurve(p: CurvePrim, kx: number, ky: number): SVGElement {
     d,
     fill: p.stroke ?? 'currentColor',
     stroke: p.stroke ?? 'currentColor',
-    'stroke-width': CURVE_END_THICKNESS_SP * ky,
+    'stroke-width': inkWidth(CURVE_END_THICKNESS_SP, ky),
     'stroke-linejoin': 'round'
   });
   if (p.className) node.setAttribute('class', p.className);
@@ -283,7 +313,9 @@ function emitRect(p: RectPrim, kx: number, ky: number): SVGElement {
   }
   if (p.stroke) {
     attrs.stroke = p.stroke;
-    attrs['stroke-width'] = (p.thickness ?? 0) * ky;
+    // A zero thickness means "no border" and stays that way — the floor
+    // makes a hairline legible, it does not invent one.
+    attrs['stroke-width'] = p.thickness ? inkWidth(p.thickness, ky) : 0;
   }
   const node = el('rect', attrs);
   if (p.className) node.setAttribute('class', p.className);

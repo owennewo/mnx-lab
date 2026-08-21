@@ -93,3 +93,32 @@ being touched anyway.
   asymmetry is horizontal only.
 - **Curves keep hand-priced endpoints** (`emitSlursAndTies`). Fewer sites, and
   `points[]` would need a parallel offset array to express it.
+
+## Appendix (2026-08-21): the other end of the range
+
+The same screenshot pair that produced this doc also showed the barlines going
+faint at a SMALL staff, and the first reading was that it was the same bug
+mirrored — vertical zoom changing a horizontal dimension. It is not, and the
+distinction is worth keeping.
+
+A barline's thickness *is* ink, so it scales with the staff, and that is
+correct: staff-line thickness uses the same scale, so the two always match, and
+the alternative (thickness following the horizontal scale) gives a big bold
+staff strung with hairline barlines. The principle is **ink scales with the
+staff, positions scale with the line** — not "vertical never touches
+horizontal".
+
+What was actually wrong is that ink runs out of PIXELS before it runs out of
+correctness. At 60% a tab staff line and a tab barline are both 0.1sp × 6px/sp
+= **0.60px**, which a renderer can only draw as grey. The giveaway was in the
+screenshot: the staff lines were exactly as faint, which no barline-specific
+bug could cause.
+
+So `svg.ts` floors every stroke at one device pixel (`MIN_INK_PX`). It changes
+no position, fires only below ~100px/sp of staff, and cannot move a golden —
+they emit at 16px/sp where the thinnest ink is 1.6px. It also cannot re-close a
+compound barline: flooring widens a stroke about its own centre, but at the
+bottom of the supported range the double barline still keeps 0.8px of clear
+space, and the two would only meet below ~33% staff scale, which
+`MIN_STAFF_SCALE` never reaches. All three claims are asserted, the last one
+against the very geometry this doc's main change fixed.

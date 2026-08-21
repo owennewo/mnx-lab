@@ -21,9 +21,10 @@ import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { glyphBBox } from '../../src/engine/smufl/smufl.ts';
-import { MAX_STAFF_SCALE } from '../../src/engine/render/scale.ts';
+import { MAX_STAFF_SCALE, MIN_STAFF_SCALE } from '../../src/engine/render/scale.ts';
 import type { LayoutResult, Primitive } from '../../src/engine/primitives.ts';
 import { initSmufl, WIDTH_SP } from '../helpers/corpusPrimitives.ts';
+import { renderSvgToString } from '../helpers/svgString.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 // @ts-expect-error — plain .mjs module without type declarations
 import { loadCorpus } from '../verify/check-scenarios.mjs';
@@ -265,5 +266,84 @@ describe('non-square scale — relationships the goldens cannot see', () => {
       }
     }
     expect(checked).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The other end of the range. Everything above is about ink growing; this is
+// about ink running out of pixels. Ink scales with the STAFF, so at the bottom
+// of the staff range a hairline falls under one device pixel and a renderer
+// can only draw it as grey — the reported symptom was an illegible double
+// barline, and the giveaway was that the staff lines were exactly as faint.
+describe('minimum drawn ink — a line is always at least a line', () => {
+  const MIN_INK_PX = 1;
+
+  /** What the emitter actually writes, at a given pair of scales. */
+  const strokeWidths = (mnx: MnxStructure, pxPerSp: number, pxPerSpY: number) => {
+    const layout = layoutTab({ mnx, widthSp: 90, inkRatio: pxPerSpY / pxPerSp });
+    const svg = renderSvgToString({
+      primitives: layout.primitives,
+      widthSp: layout.usedWidthSp,
+      heightSp: layout.heightSp,
+      pxPerSp,
+      pxPerSpY
+    });
+    return [...svg.matchAll(/stroke-width="([\d.]+)"/g)].map(m => Number(m[1]));
+  };
+
+  const blues = () => readDoc(corpus.find(c => c.id.endsWith('twelve-bar-blues'))!.dir);
+
+  it('no stroke renders thinner than a device pixel, anywhere in the staff range', () => {
+    initSmufl();
+    for (const staffScale of [MIN_STAFF_SCALE, 1, MAX_STAFF_SCALE]) {
+      const widths = strokeWidths(blues(), 10, staffScale * 10);
+      expect(widths.length).toBeGreaterThan(0);
+      for (const w of widths) {
+        expect(w, `staff ${staffScale}: stroke below a pixel`).toBeGreaterThanOrEqual(MIN_INK_PX);
+      }
+    }
+  });
+
+  it('and that is not vacuous: unfloored, the smallest staff draws 0.6px hairlines', () => {
+    initSmufl();
+    // The reported case. A tab staff line and a tab barline are both 0.1sp,
+    // and at 60% the staff is 6px/sp.
+    expect(0.1 * MIN_STAFF_SCALE * 10).toBeCloseTo(0.6, 6);
+    expect(0.1 * MIN_STAFF_SCALE * 10).toBeLessThan(MIN_INK_PX);
+    // The floor is what closes that gap, and only there. At 60% the thinnest
+    // stroke comes out exactly at the floor; at 100% a tab hairline is
+    // already exactly a pixel on its own (0.1sp × 10px/sp), which is a neat
+    // reminder of how close to the edge the default sits; and by 640% the
+    // floor is nowhere near firing.
+    expect(Math.min(...strokeWidths(blues(), 10, MIN_STAFF_SCALE * 10))).toBe(MIN_INK_PX);
+    expect(Math.min(...strokeWidths(blues(), 10, 10))).toBe(MIN_INK_PX);
+    expect(Math.min(...strokeWidths(blues(), 10, MAX_STAFF_SCALE * 10))).toBeGreaterThan(
+      MIN_INK_PX * 5
+    );
+  });
+
+  it('flooring cannot close a compound barline up, anywhere in range', () => {
+    initSmufl();
+    // Widening a stroke about its own centre brings the two strokes of a
+    // double barline toward each other, so the floor has to be checked
+    // against the very thing the ink-offset work fixed. At 60% they keep
+    // 0.8px; they would only meet below ~33%, which the clamp never reaches.
+    const layout = layoutTab({ mnx: blues(), widthSp: 90, inkRatio: MIN_STAFF_SCALE });
+    const ky = MIN_STAFF_SCALE * 10;
+    const kx = 10;
+    for (const parts of [...barlineGroups(layout).values()]) {
+      if (parts.length < 2) continue;
+      const spans = parts
+        .map(p => {
+          const line = p as Extract<Primitive, { kind: 'line' }>;
+          const centre = (line.x1 + (line.dx1 ?? 0) * (ky / kx)) * kx;
+          const half = Math.max(line.thickness * ky, MIN_INK_PX) / 2;
+          return { l: centre - half, r: centre + half };
+        })
+        .sort((a, b) => a.l - b.l);
+      for (let i = 1; i < spans.length; i++) {
+        expect(spans[i].l - spans[i - 1].r).toBeGreaterThan(0);
+      }
+    }
   });
 });
