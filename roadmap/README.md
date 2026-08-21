@@ -171,6 +171,19 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
+- **[core-assist-byok.md](inprogress/core-assist-byok.md)** — **bring your own
+  OpenRouter key**, completing the workbench's no-backend rule by deleting its one
+  asterisk ("minus live AI edits"): the key is obtained by **OAuth PKCE** (a distinct
+  per-app key, master never seen) or by **paste**, held in the shell's localStorage —
+  never in `elements/`, the embed runs on foreign pages — and spent browser-direct;
+  OpenRouter permits CORS from any origin including localhost. **Built 2026-08-20**:
+  `src/assist/openrouter.ts` (PKCE pinned to the RFC 7636 vector, SSE delta parser,
+  streamed chat), `workbench/assistCredentials.ts` (the redirect round trip — callback
+  carries no hash, code scrubbed before exchange), and the assist tab's connect block
+  + tool-less chat, verified over CDP against the live API. Dissolves the model
+  selector's "must the Worker honour any model id" question — it is the user's money.
+  Remaining: move the edit loop behind this transport, a CSP header, the Worker as
+  explicit demo mode.
 - **[core-ragged-last.md](inprogress/core-ragged-last.md)** — the last system borrows its
   stretch from the page. **Built 2026-08-21; owes its `/verify` sweep.** A sparse final row
   justified into the `MAX_STRETCH = 2.5` cap — 2.5× the texture of the rows above, still

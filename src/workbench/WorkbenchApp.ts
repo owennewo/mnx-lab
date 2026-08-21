@@ -18,6 +18,7 @@ import type { EditorIntent } from '../edit/intents.ts';
 import { MemorySelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import type { PaletteItem } from './CommandPalette.ts';
 import './CommandPalette.ts';
+import { completePkceLanding, parkLanding } from './assistCredentials.ts';
 import './QueueHome.ts';
 import { SETUP_POPOVER_COMMANDS, type ScenarioPage } from './ScenarioPage.ts';
 import './ObjectsPage.ts';
@@ -478,6 +479,15 @@ export class WorkbenchApp extends LitElement {
 
     this.toggleAttribute('rail-hidden', this.railHidden);
     this.applyTheme();
+    // If this load is OpenRouter's PKCE callback (`?code=` in the search —
+    // the hash router never sees it), exchange the code and return to the
+    // route the connect started from (core-assist-byok.md).
+    void completePkceLanding().then(landing => {
+      if (landing.kind === 'none') return;
+      parkLanding(landing);
+      if (landing.returnHash && landing.returnHash !== location.hash) location.hash = landing.returnHash;
+      else this.onHashChange();
+    });
   }
 
   disconnectedCallback() {

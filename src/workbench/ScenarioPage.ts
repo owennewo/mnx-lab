@@ -93,6 +93,14 @@ import './ZoomPad.ts';
 import type { ZoomPadChange } from './ZoomPad.ts';
 import './ModelPickerDialog.ts';
 import { modelDisplayName } from '../assist/modelCatalog.ts';
+import { fetchKeyInfo, keyFingerprint, streamChat, type ChatMessage } from '../assist/openrouter.ts';
+import {
+  beginPkce,
+  forgetApiKey,
+  storeApiKey,
+  storedApiKey,
+  takeLanding
+} from './assistCredentials.ts';
 import {
   MIN_STAFF_SCALE,
   MAX_STAFF_SCALE,
@@ -450,6 +458,21 @@ export class ScenarioPage extends LitElement {
   @state() private assistModel: string =
     localStorage.getItem(ASSIST_MODEL_KEY) ?? DEFAULT_ASSIST_MODEL;
   @state() private modelPickerOpen = false;
+  /** BYOK state (core-assist-byok.md): the key is read from the shell's
+   *  store and re-read on its change event, so a PKCE landing in the app
+   *  shell reaches this tab without a prop. */
+  @state() private apiKey: string | null = storedApiKey();
+  @state() private keyFingerprint = '';
+  @state() private pasteDraft = '';
+  @state() private connectNotice = '';
+  @state() private chat: ChatMessage[] = [];
+  @state() private chatDraft = '';
+  @state() private chatBusy = false;
+  private chatAbort: AbortController | null = null;
+  private onCredentialsChange = () => {
+    this.apiKey = storedApiKey();
+    void this.refreshFingerprint();
+  };
   /** Esc hides the cursor highlight until the next intent (review sense-0). */
   private cursorHidden = false;
 
@@ -462,6 +485,7 @@ export class ScenarioPage extends LitElement {
   /** The side panel's active tab; falls back when the tab isn't available
    *  (hud/actions need a session). */
   @state() private panelTab: PanelTab = 'hud';
+  private landingFocus = false;
 
   // ── The selection command tray (core-selection-tray-visuals.md), at its
   // VISUALS stage: real tabs and anchor from the session/viewer, DEMO tiles
@@ -1066,6 +1090,79 @@ export class ScenarioPage extends LitElement {
         color: var(--ink-3);
       }
 
+      .connect-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 8px 0 12px;
+      }
+
+      .connect-cta {
+        font: 600 10px/1.2 var(--sans);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent-fg);
+        background: var(--surface);
+        border: 1px solid var(--accent);
+        padding: 7px 10px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .connect-cta:disabled {
+        color: var(--line-strong);
+        border-color: var(--line);
+        cursor: not-allowed;
+      }
+
+      .paste-key {
+        flex: 1;
+        min-width: 0;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ink);
+        background: transparent;
+        border: 1px solid var(--line);
+        padding: 6px 8px;
+        outline: none;
+      }
+
+      .connect-notice {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--ink-2);
+      }
+
+      .chat {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .chat-msg {
+        display: grid;
+        grid-template-columns: 64px 1fr;
+        gap: 8px;
+        font-size: 12.5px;
+        line-height: 1.45;
+      }
+
+      .chat-role {
+        font: 600 10px/1.6 var(--sans);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+      }
+
+      .chat-msg.user .chat-role {
+        color: var(--accent-fg);
+      }
+
+      .chat-text {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+
       /* The hud tab's footer inverts: the one deliberately dark band in a
          light app, because the panel has to say where editing happens without
          growing a control that would contradict "the HUD explains". */
@@ -1504,7 +1601,14 @@ export class ScenarioPage extends LitElement {
       if (this.view === 'compare' || this.view === 'json') this.panelTab = this.view;
     }
     if (changed.has('scenarioId')) {
-      if (this.view !== 'compare' && this.view !== 'json') this.panelTab = 'hud';
+      // A PKCE landing brought us here to show its verdict: the assist tab
+      // wins over the route's default exactly once (core-assist-byok.md).
+      if (this.landingFocus) {
+        this.panelTab = 'assist';
+        this.landingFocus = false;
+      } else if (this.view !== 'compare' && this.view !== 'json') {
+        this.panelTab = 'hud';
+      }
       this.doc = null;
       this.rawScore = '';
       this.pinnedErrors = [];
@@ -1548,6 +1652,16 @@ export class ScenarioPage extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    window.addEventListener('assist-credentials-change', this.onCredentialsChange);
+    void this.refreshFingerprint();
+    const landing = takeLanding();
+    if (landing.kind === 'connected') {
+      this.connectNotice = 'connected to OpenRouter';
+      this.landingFocus = true;
+    } else if (landing.kind === 'failed') {
+      this.connectNotice = `connect failed: ${landing.reason}`;
+      this.landingFocus = true;
+    }
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.addEventListener('mnx-palette-action', this.onPaletteAction);
@@ -1569,6 +1683,8 @@ export class ScenarioPage extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    window.removeEventListener('assist-credentials-change', this.onCredentialsChange);
+    this.chatAbort?.abort();
     this.showClipboardNotice(null);
     clearTimeout(this.chipTimer);
     window.removeEventListener('keydown', this.onKeyDown);
@@ -2809,13 +2925,15 @@ export class ScenarioPage extends LitElement {
     `;
   }
 
-  /** The assist tab — the picker surface of core-assist-model-selector.md,
-   *  incubating in the shell ahead of the chat it will front (the prompt
-   *  surface belongs to core-editor-ai-prompt.md; until that lands the body
-   *  is an honest placeholder and the footer input says so). The context bar
-   *  is the CTA: the current model, and the switch that opens the query
-   *  dialog. */
+  /** The assist tab — the picker surface of core-assist-model-selector.md
+   *  plus the BYOK connect flow of core-assist-byok.md, incubating in the
+   *  shell. The context bar is the CTA pair: the current model and the
+   *  switch that opens the query dialog, then the connection. The body is a
+   *  plain chat against OpenRouter, browser-direct and tool-less — the
+   *  connectivity probe the edit loop will later ride; the real prompt
+   *  surface remains core-editor-ai-prompt.md's. */
   private panelAssist() {
+    const connected = this.apiKey !== null;
     return this.panelFrame({
       context: html`<span class="ctx-name">assistant</span>
         <span class="ctx-dim" title=${this.assistModel}
@@ -2823,23 +2941,80 @@ export class ScenarioPage extends LitElement {
         >
         <span class="ctx-actions">
           <button @click=${() => (this.modelPickerOpen = true)}>switch model</button>
+          ${connected
+            ? html`<button title=${`key ${this.keyFingerprint}`} @click=${() => this.disconnect()}>
+                forget key
+              </button>`
+            : nothing}
         </span>`,
-      body: html`
-        <h1>Assistant</h1>
-        <p>
-          Nothing here talks yet — the chat surface lands with the AI-prompt
-          roadmap item. This tab exists so the model choice has a home in the
-          shell.
-        </p>
-        <p class="assist-dim">
-          Edits will stream through the assist layer using the model named
-          above. Switch it any time; the choice and the query criteria are
-          remembered in this browser only.
-        </p>
-      `,
+      body: connected ? this.assistChat() : this.assistConnect(),
       footer: html`<span class="prompt">&gt;</span>
-        <input class="tagfilter" disabled placeholder="chat is not implemented yet" />`
+        <input
+          class="tagfilter"
+          ?disabled=${!connected || this.chatBusy}
+          placeholder=${connected ? 'say something to the model…' : 'connect OpenRouter to chat'}
+          .value=${this.chatDraft}
+          @input=${(e: Event) => (this.chatDraft = (e.target as HTMLInputElement).value)}
+          @keydown=${(e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              void this.sendChat();
+            }
+          }}
+        />`
     });
+  }
+
+  private assistConnect() {
+    return html`
+      <h1>Connect OpenRouter</h1>
+      <p>
+        Bring your own key — it stays in this browser and calls go straight to
+        OpenRouter; nothing transits this site's server.
+      </p>
+      <div class="connect-row">
+        <button class="connect-cta" @click=${() => void beginPkce()}>connect with OpenRouter</button>
+        <span class="assist-dim">you approve once; OpenRouter issues a key just for this app</span>
+      </div>
+      <div class="rule-strong"></div>
+      <p class="assist-dim">Or paste a key you made yourself (with its own spend limit):</p>
+      <div class="connect-row">
+        <input
+          class="paste-key"
+          type="password"
+          placeholder="sk-or-v1-…"
+          .value=${this.pasteDraft}
+          @input=${(e: Event) => (this.pasteDraft = (e.target as HTMLInputElement).value)}
+          @keydown=${(e: KeyboardEvent) => {
+            if (e.key === 'Enter') void this.pasteKey();
+          }}
+        />
+        <button class="connect-cta" ?disabled=${!this.pasteDraft.trim()} @click=${() => void this.pasteKey()}>
+          use key
+        </button>
+      </div>
+      ${this.connectNotice ? html`<p class="connect-notice">${this.connectNotice}</p>` : nothing}
+    `;
+  }
+
+  private assistChat() {
+    return html`
+      ${this.connectNotice ? html`<p class="connect-notice">${this.connectNotice}</p>` : nothing}
+      ${this.chat.length === 0
+        ? html`<p class="assist-dim">
+            Connected. This is a plain chat — no tools, no document access yet —
+            to prove the browser-direct path. Type below.
+          </p>`
+        : nothing}
+      <div class="chat">
+        ${this.chat.map(
+          m => html`<div class="chat-msg ${m.role}">
+            <span class="chat-role">${m.role}</span>
+            <div class="chat-text">${m.content || (this.chatBusy ? '…' : '')}</div>
+          </div>`
+        )}
+      </div>
+    `;
   }
 
   private onModelPick(event: CustomEvent<{ id: string }>) {
@@ -2848,6 +3023,62 @@ export class ScenarioPage extends LitElement {
       localStorage.setItem(ASSIST_MODEL_KEY, this.assistModel);
     } catch {
       /* private mode — the choice just doesn't persist */
+    }
+  }
+
+  private async refreshFingerprint() {
+    this.keyFingerprint = this.apiKey ? (await keyFingerprint(this.apiKey)).slice(0, 12) : '';
+  }
+
+  private async pasteKey() {
+    const key = this.pasteDraft.trim();
+    if (!key) return;
+    this.connectNotice = 'checking key…';
+    try {
+      const info = await fetchKeyInfo(key);
+      storeApiKey(key);
+      this.pasteDraft = '';
+      this.connectNotice = info.label ? `connected · ${info.label}` : 'connected';
+    } catch (e) {
+      this.connectNotice = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  private disconnect() {
+    this.chatAbort?.abort();
+    forgetApiKey();
+    this.chat = [];
+    this.connectNotice = '';
+  }
+
+  private async sendChat() {
+    const text = this.chatDraft.trim();
+    if (!text || !this.apiKey || this.chatBusy) return;
+    this.chatDraft = '';
+    this.connectNotice = '';
+    const history: ChatMessage[] = [...this.chat, { role: 'user', content: text }];
+    this.chat = [...history, { role: 'assistant', content: '' }];
+    this.chatBusy = true;
+    this.chatAbort = new AbortController();
+    try {
+      for await (const delta of streamChat({
+        apiKey: this.apiKey,
+        model: this.assistModel,
+        messages: history,
+        signal: this.chatAbort.signal,
+        referer: location.origin,
+        title: 'MNX Lab'
+      })) {
+        const last = this.chat[this.chat.length - 1];
+        this.chat = [...this.chat.slice(0, -1), { ...last, content: last.content + delta }];
+      }
+    } catch (e) {
+      if (!(e instanceof DOMException && e.name === 'AbortError')) {
+        this.connectNotice = e instanceof Error ? e.message : String(e);
+      }
+    } finally {
+      this.chatBusy = false;
+      this.chatAbort = null;
     }
   }
 

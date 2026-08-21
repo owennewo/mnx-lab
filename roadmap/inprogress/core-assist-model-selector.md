@@ -176,6 +176,9 @@ mockup does:
   model id or insists on the roster is a real decision this item owns (the
   Worker is a secrets proxy spending the deployment's OpenRouter key, so
   "anything" has a cost story, not just a validation story).
+  **Resolved 2026-08-20 by [core-assist-byok.md](core-assist-byok.md)**: with
+  the user's own key spent browser-direct, any model id is fine — it is their
+  money; the roster allowlist applies only to the server-key demo mode.
 
 ## Not in scope
 
