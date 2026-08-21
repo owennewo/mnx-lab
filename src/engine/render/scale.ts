@@ -61,16 +61,34 @@ export function renderOutcome(
 }
 
 /**
- * Staff-scale bounds, from the design's own 60–160%.
+ * Staff-scale bounds. The design specified 60–160%; the ceiling went to
+ * **640% on 2026-08-21, for low-vision readers** — 160% is a preference knob,
+ * and someone who needs the staff four times larger again was simply told no.
  *
- * Bounded for the same reason `clampDensity` is: a bad value should degrade to
- * the edge of the useful range, not produce a 40,000px SVG or a staff one pixel
- * tall. The clamp lives here rather than in the control so that a host writing
- * `zoom="9"` by hand gets the same answer the pad would give it — the element
- * binds behavior the engine owns.
+ * The ceiling is now bounded by what the engine can still draw HONESTLY rather
+ * than by taste, and that bound moved because
+ * [core-ink-priced-columns.md] made it move: rigid columns are priced on the
+ * ink scale, so at 640% the notehead columns are 6.4× wider too and nothing
+ * collides (measured: tightest column gap 10.09sp against the 9.60sp the ink
+ * needs). Before that work this ceiling could not have been raised at all —
+ * the glyphs would have grown into each other.
+ *
+ * What DOES happen up here is overflow: the horizontal axis stays fitted to
+ * the viewport, so at 640% a system is ~2.6× the line width and the page
+ * scrolls sideways. That is the honest degradation for this architecture —
+ * the music really is 6.4× bigger and really does need the room — and it is
+ * scrollable rather than clipped. Reflowing instead (fewer bars per system as
+ * the ink grows) is a real alternative and a real decision, recorded in
+ * roadmap/proposed/core-lowvision-reflow.md.
+ *
+ * Still bounded, for the reason `clampDensity` is: a bad value should degrade
+ * to the edge of the useful range, not produce a 40,000px SVG or a staff one
+ * pixel tall. The clamp lives here rather than in the control so that a host
+ * writing `zoom="99"` by hand gets the same answer the pad would give it — the
+ * element binds behavior the engine owns.
  */
 export const MIN_STAFF_SCALE = 0.6;
-export const MAX_STAFF_SCALE = 1.6;
+export const MAX_STAFF_SCALE = 6.4;
 
 export function clampStaffScale(value: number | null | undefined): number | null {
   if (value === null || value === undefined || !Number.isFinite(value)) return null;

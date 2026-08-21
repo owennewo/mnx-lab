@@ -291,6 +291,81 @@ describe('zoom / density', () => {
     });
   });
 
+  // The low-vision range (2026-08-21): both ceilings ×4, because 160% and 2
+  // were preference bounds and a reader who needs four times that again was
+  // simply told no. What has to hold for that to be an honest offer rather
+  // than a bigger number: the engine must still DRAW it, and the top of each
+  // range must still DO something.
+  describe('the low-vision range', () => {
+    it('both ceilings are four times what the design specified', () => {
+      expect(MAX_STAFF_SCALE).toBe(6.4);
+      expect(MAX_DENSITY).toBe(8);
+      // The floors are untouched — this raised a ceiling, it did not re-centre
+      // the control.
+      expect(MIN_STAFF_SCALE).toBe(0.6);
+      expect(MIN_DENSITY).toBe(0.02);
+      expect(clampStaffScale(99)).toBe(MAX_STAFF_SCALE);
+      expect(clampDensity(99)).toBe(MAX_DENSITY);
+    });
+
+    it('nothing collides at the top of the staff range — the reason it could be raised', () => {
+      initSmufl();
+      // A fitted paint floors `pxPerSp` at the 10px/sp baseline, so the ink
+      // ratio at the ceiling is MAX_STAFF_SCALE itself — the worst case the
+      // viewer can produce. Ink-priced columns (core-ink-priced-columns.md)
+      // are what make this safe; before that work the glyphs grew into each
+      // other and this ceiling could not have moved at all.
+      const ink = MAX_STAFF_SCALE;
+      for (const staffKind of ['notation', 'tab'] as const) {
+        const plan = planHorizontal(doc('lab/document/twelve-bar-blues'), 90, { inkRatio: ink, staffKind });
+        let tightest = Infinity;
+        for (const measure of plan.measures) {
+          for (const staff of measure.staves) {
+            for (const voice of staff) {
+              for (let i = 1; i < voice.length; i++) {
+                tightest = Math.min(tightest, voice[i].x - voice[i - 1].x);
+              }
+            }
+          }
+        }
+        // Every column is CORE_SP of ink wide at ratio 1, so CORE_SP × ink here.
+        expect(tightest).toBeGreaterThanOrEqual(CORE_SP * ink - 1e-9);
+      }
+    });
+
+    it('the top of the density range still does something the old ceiling could not', () => {
+      initSmufl();
+      // The old ceiling of 2 left twelve-bar-blues at three bars to a system.
+      // A low-vision reader wants one, and now the range reaches it.
+      const barsOnFirstSystem = (densityH: number) =>
+        planHorizontal(doc('lab/document/twelve-bar-blues'), 90, { densityH, staffKind: 'tab' })
+          .measures.filter(m => m.row === 0 && !m.hidden).length;
+      expect(barsOnFirstSystem(2)).toBeGreaterThan(1);
+      expect(barsOnFirstSystem(MAX_DENSITY)).toBe(1);
+      // And one bar per system is the floor of the idea — past it the knob is
+      // honestly inert, which the ladder reports rather than hides.
+      expect(barsOnFirstSystem(MAX_DENSITY / 2)).toBe(1);
+    });
+
+    it('the two arms together keep the music near the line, which is the reading mode', () => {
+      initSmufl();
+      // Staff scale alone overflows: the horizontal axis stays fitted, so at
+      // 640% a system is far wider than the line and the page scrolls
+      // sideways for every system. Adding density puts one bar on a system,
+      // and the same huge ink then very nearly fits the line again — big
+      // glyphs, one bar at a time, scrolling DOWN. That combination is the
+      // accessible reading mode, and it is why the two ceilings moved together.
+      const mnx = doc('lab/document/twelve-bar-blues');
+      const widthSp = 90;
+      const inkOnly = layoutTab({ mnx, widthSp, inkRatio: MAX_STAFF_SCALE }).usedWidthSp;
+      const inkAndSpace =
+        layoutTab({ mnx, widthSp, inkRatio: MAX_STAFF_SCALE, densityH: MAX_DENSITY }).usedWidthSp;
+      expect(inkOnly).toBeGreaterThan(widthSp * 2);
+      expect(inkAndSpace).toBeLessThan(inkOnly / 2);
+      expect(inkAndSpace).toBeLessThan(widthSp * 1.25);
+    });
+  });
+
   describe('the standalone tab view honours density (ruling: the found gap)', () => {
     const tabWidth = (densityH?: number) =>
       layoutTab({ mnx: doc('lab/tab-positions/open-strings-chord'), widthSp: 80, densityH })

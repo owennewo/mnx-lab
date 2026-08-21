@@ -185,8 +185,22 @@ export function tupletDuration(t: MnxTuplet): number {
  * collision guarantee is untouched at any value — asserted at the floor and
  * below it in `zoom-density.test.ts`.
  */
+/**
+ * **Ceiling raised 2 → 8 on 2026-08-21, alongside the staff-scale ceiling, for
+ * low-vision readers.** The floor's retune note above is about how far the
+ * knob keeps *packing*; this end is about how far it keeps *spreading*, and
+ * the honest answer is "until a system holds one bar, then no further" — a
+ * line cannot hold fewer than one bar, and inside a line the justifier
+ * normalizes what density did. So on a long score the top of this range is
+ * inert, the ladder reports it as inert, and the pad's arm greys out; on a
+ * score short enough to sit against `MAX_STRETCH` it keeps spreading all the
+ * way. Both are honest, and neither is a reason for the CONSTANT to stop
+ * short of what some score can use. Measured on `twelve-bar-blues` at the
+ * workbench's own line width: the old ceiling of 2 left three bars on a
+ * system, and 4 is where it reaches one.
+ */
 export const MIN_DENSITY = 0.02;
-export const MAX_DENSITY = 2;
+export const MAX_DENSITY = 8;
 
 export function clampDensity(value: number | undefined): number {
   if (value === undefined || !Number.isFinite(value)) return 1;

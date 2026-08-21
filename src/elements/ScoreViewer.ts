@@ -88,7 +88,9 @@ export class ScoreViewer extends LitElement {
   @property({ type: String, reflect: true }) view: ViewSetting = 'auto';
   /**
    * Staff scale — a multiplier on `pxPerSp`, so line spacing, glyphs, text and
-   * stems all scale together (core-zoom-density-pad.md). Clamped 0.6–1.6.
+   * stems all scale together (core-zoom-density-pad.md). Clamped 0.6–6.4 — the
+   * ceiling is the low-vision range (core-accessible-range, 2026-08-21), not
+   * a preference bound.
    *
    * **`null` (the default) means FITTED, not 1.** Unset defers downward, per
    * the precedence chain: with no `pxPerSp` the renderers fit a short score up

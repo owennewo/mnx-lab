@@ -46,8 +46,19 @@ import { MIN_DENSITY, MAX_DENSITY, clampDensity } from '../engine/layout/spacing
  *
  *  SPACE_STEP is now a MINIMUM rather than the step: with a ladder supplied
  *  (see `densitySteps`) the arm lands on the first rung at least this far away,
- *  so a click never does nothing and never does less than the design asked. */
-const STAFF_STEP = 0.05;
+ *  so a click never does nothing and never does less than the design asked.
+ *
+ *  STAFF_STEP became a RATIO on 2026-08-21, when the staff ceiling went to
+ *  640% for low-vision readers. The design's 5% was additive, which is fine
+ *  across 60–160% and wrong across 60–640%: additively, one click at 640% is a
+ *  0.8% change (invisible) while at 60% it is 8% (coarse), and crossing the
+ *  range takes 108 clicks — which would have made the new ceiling unreachable
+ *  in practice, i.e. a fake fix for the reader it was raised for. A constant
+ *  RATIO is what every zoom control in existence uses, for this reason: equal
+ *  perceptual steps at every scale, and ~25 clicks (or one 150px drag) end to
+ *  end. 1.1 keeps the design's feel at the default — the first click off 100%
+ *  moves 10%, against the old 5% — while staying honest at the top. */
+const STAFF_STEP_RATIO = 1.1;
 const SPACE_STEP = 0.04;
 
 /** Float slack when comparing against ladder rungs (they are 1% grid values). */
@@ -75,6 +86,16 @@ export interface ZoomPadChange {
 /** Round to the step grid so repeated ±0.05 cannot drift into 0.8500000001. */
 function snap(value: number, step: number): number {
   return Math.round(value / step) * step;
+}
+
+/**
+ * `steps` geometric staff steps from `from`, snapped to the 1% grid the
+ * readout prints. Rounding keeps repeated ×1.1 ÷1.1 from drifting, and the
+ * grid is fine enough that a step is never swallowed by it (1% of the 60%
+ * floor is 0.6 of a step).
+ */
+function staffAfterSteps(from: number, steps: number): number {
+  return Math.round(from * Math.pow(STAFF_STEP_RATIO, steps) * 100) / 100;
 }
 
 @customElement('mnx-zoom-pad')
@@ -444,7 +465,7 @@ export class ZoomPad extends LitElement {
   private step(axis: ZoomAxis, steps: number) {
     if (steps === 0) return;
     if (axis === 'staff') {
-      const next = snap(this.shownStaff + steps * STAFF_STEP, STAFF_STEP);
+      const next = staffAfterSteps(this.shownStaff, steps);
       const clampedTo = clampStaffScale(next)!;
       this.noteClamp('staff', next, clampedTo, MIN_STAFF_SCALE, MAX_STAFF_SCALE);
       this.commit({ staffScale: clampedTo, densityH: this.densityH });
@@ -617,7 +638,7 @@ export class ZoomPad extends LitElement {
     const staffSteps = drag.lock === 'space' ? 0 : Math.round(-dy / rate);
     const spaceSteps = drag.lock === 'staff' ? 0 : Math.round(dx / rate);
 
-    const wantStaff = snap(drag.staff0 + staffSteps * STAFF_STEP, STAFF_STEP);
+    const wantStaff = staffAfterSteps(drag.staff0, staffSteps);
     const gotStaff = clampStaffScale(wantStaff)!;
     // Same walk the arms take, so a drag and a click agree on what a step is:
     // rungs, not percentages.
