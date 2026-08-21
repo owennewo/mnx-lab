@@ -876,9 +876,10 @@ export class ScoreViewer extends LitElement {
       // host wants the answer ("which values do something?"), not the input.
       this.lastPackings = drawn.packings;
       this.lastDensityH = densityH;
+      const shrink = this.shrinkToPane();
       this.dispatchEvent(
         new CustomEvent<RenderScale>('render-scale', {
-          detail: { pxPerSp, staffScale: used, fitted },
+          detail: { pxPerSp: pxPerSp * shrink, staffScale: used * shrink, fitted },
           bubbles: true,
           composed: true
         })
@@ -886,6 +887,34 @@ export class ScoreViewer extends LitElement {
     }
 
     this.emitSelectionAnchor();
+  }
+
+  /**
+   * How much the PAGE shrank on its way to the screen — 1 when it did not.
+   *
+   * `#score-container svg` carries `max-width: 100%`, so a drawing wider than
+   * the pane is scaled down by the browser, both axes, before anybody sees it.
+   * That is deliberate (the score fits the pane; nothing scrolls sideways),
+   * but it means the engine's own answer stops being what is on screen exactly
+   * where a reader most needs the truth: rigid columns are ink-priced, so a
+   * large staff scale widens the drawing as well as heightening it, the shrink
+   * grows with the ask, and the two nearly cancel. Measured 2026-08-21, tab
+   * view in a 658px pane: asking 320% draws 268%, asking 640% draws 297% —
+   * *"vertical spacing 320 doesn't seem half of 640"*, and it wasn't.
+   *
+   * So `render-scale` reports the scale the reader is looking at, and a
+   * control can print a number that matches the staff in front of them. The
+   * intrinsic width comes off the `width` attribute the emitter wrote, which
+   * is the pre-CSS size by construction; the rect is post-CSS. Clamped at 1
+   * because only shrinking is possible here (`max-width`, never `width`).
+   */
+  private shrinkToPane(): number {
+    const svg = this.renderRoot.querySelector('#score-container svg');
+    if (!(svg instanceof SVGSVGElement)) return 1;
+    const intrinsic = Number(svg.getAttribute('width'));
+    const onScreen = svg.getBoundingClientRect().width;
+    if (!(intrinsic > 0) || !(onScreen > 0)) return 1;
+    return Math.min(1, onScreen / intrinsic);
   }
 
   /**

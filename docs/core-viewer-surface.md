@@ -197,6 +197,18 @@ readout printing a hard-coded `100%` would be lying on first paint. `fitted`
 is carried rather than inferred so a control can say the value was *derived*
 rather than chosen.
 
+The numbers are the ones **on the screen**, not the ones the engine asked for,
+and above about 200% staff scale those differ. The pane never scrolls
+sideways: `#score-container svg` carries `max-width: 100%`, so a drawing wider
+than the pane is scaled down by the browser — both axes. Rigid columns are
+ink-priced, so a larger staff widens the drawing as well as heightening it, the
+shrink grows with the ask, and the two nearly cancel: measured 2026-08-21 in a
+658px pane, `zoom="3.2"` drew 2.34 and `zoom="6.4"` drew 2.60. The element
+measures that factor per paint and reports the product, because a control that
+printed the request would tell a low-vision reader their staff is 640% while
+they look at 260%. `zoom` itself is unchanged — it is still the request, and
+still what the host set.
+
 `densitySteps()` — a method, not an event — returns the `density-h` values
 that would actually **change** the score as currently drawn, ascending from the
 engine's floor, or `null` before the first successful paint. Same principle as

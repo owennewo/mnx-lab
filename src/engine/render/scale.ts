@@ -74,11 +74,20 @@ export function renderOutcome(
  * the glyphs would have grown into each other.
  *
  * What DOES happen up here is overflow: the horizontal axis stays fitted to
- * the viewport, so at 640% a system is ~2.6× the line width and the page
- * scrolls sideways. That is the honest degradation for this architecture —
- * the music really is 6.4× bigger and really does need the room — and it is
- * scrollable rather than clipped. Reflowing instead (fewer bars per system as
- * the ink grows) is a real alternative and a real decision, recorded in
+ * the viewport, so at 640% a system is ~2.6× the line width. This comment used
+ * to say the page then "scrolls sideways"; it does not, and saying so hid the
+ * consequence for two weeks. `<mnx-score-viewer>`'s own CSS gives the score's
+ * svg `max-width: 100%`, so a drawing wider than the pane is scaled back down
+ * to fit — BOTH axes — and since the ink pricing that widens the drawing is
+ * the same factor that heightens it, the shrink very nearly cancels the ask:
+ * measured in a 658px pane, `zoom="3.2"` draws 2.34 and `zoom="6.4"` draws
+ * 2.60. The ceiling is honest about what the ENGINE will draw; what a reader
+ * gets is that number times the pane's shrink, which is why `render-scale`
+ * reports the product and the pad prints it (reported 2026-08-21 as *"320
+ * doesn't seem half of 640"*).
+ *
+ * Reflowing instead (fewer bars per system as the ink grows) is what would
+ * make the ceiling reachable in full, and it is a real decision, recorded in
  * roadmap/proposed/core-lowvision-reflow.md.
  *
  * Still bounded, for the reason `clampDensity` is: a bad value should degrade

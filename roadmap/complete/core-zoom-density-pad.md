@@ -381,3 +381,37 @@ measured in staff spaces underneath — so each half now carries a title:
   stretches or squeezes every row afterwards — which is also why the readout
   still prints the percentage rather than the sp figure: the request is the
   honest number, the drawn gap is per-row.
+
+### Fourth pass: the readout now prints what is on the screen
+
+*"Vertical spacing 320 doesn't seem half of 640. What is going on?"* — and it
+wasn't half. `staffScale` is absolute (`pxPerSpY = staffScale × 10px`), so the
+engine really does double the ink, but the horizontal axis stays fitted while
+rigid columns are **ink-priced**: a bigger staff makes the drawing wider as
+well as taller. The score's svg carries `max-width: 100%`, so once it outgrows
+the pane the browser scales the whole thing back down — both axes — and the
+shrink grows with the ask. Measured, tab view in a 658px pane: intrinsic
+899px → drawn 658px at 320%, intrinsic 1619px → drawn 658px at 640%, i.e. the
+staff line gap went 26.8px → 29.7px. A ratio of 1.11 where the numbers promised
+2.
+
+Two answers were possible and the second was chosen: **keep fit-to-width, and
+stop the control lying about it.**
+
+- `<mnx-score-viewer>` measures the shrink per paint (`shrinkToPane`) and
+  `render-scale` now reports the product — the scale the reader is looking at.
+  `zoom` is untouched: it is still the request.
+- The pad prints that drawn number (`shownStaff`), and steps from the request
+  (`requestedStaff`) — stepping from the drawn one would walk the request
+  backwards the moment they diverge. The half's title names the gap when there
+  is one: *"You asked for 640%: at that size the page is wider than the pane,
+  and it is scaled down to fit rather than scrolling sideways."*
+- The ↑ arm greys when an increase in the request leaves the drawn number
+  unmoved — discovered, not predicted, since predicting it means laying the
+  score out at the next scale. On the reported document each click still buys
+  ~1.5%, so it stays live to the ceiling; on a narrower pane it will not.
+
+The ceiling itself is unchanged, and the thing that would make it reachable in
+full is [core-lowvision-reflow.md](../proposed/core-lowvision-reflow.md) — the
+open question of measuring the line in ink. `MAX_STAFF_SCALE`'s comment, which
+claimed the page "scrolls sideways" up here, is corrected: it never did.

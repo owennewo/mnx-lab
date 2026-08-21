@@ -145,6 +145,20 @@ export class ZoomPad extends LitElement {
   @property({ type: Boolean, reflect: true }) suppressed = false;
 
   @state() private open = false;
+  /**
+   * The pane has stopped giving the staff axis anything: the last increase in
+   * the REQUEST left the DRAWN scale where it was. Above about 200% on a
+   * narrow pane the shrink-to-fit grows with the ask (see `shownStaff`) and
+   * the two cancel almost exactly, so the arm eventually buys nothing at all —
+   * and an arm that buys nothing should say so, which is the same rule the
+   * spacing arms follow against the density ladder.
+   *
+   * Discovered rather than predicted: predicting it would mean laying the
+   * score out at the next scale to find out. One click that does not move the
+   * number is what greys the arm, and any paint that DOES move the number —
+   * a wider window, another document, a step back down — clears it again.
+   */
+  @state() private staffSaturated = false;
   @state() private dragging = false;
   /** The axis that just hit its clamp — drives the MIN/MAX band. */
   @state() private clamped: { axis: ZoomAxis; at: 'min' | 'max' } | null = null;
@@ -489,8 +503,34 @@ export class ZoomPad extends LitElement {
 
   // ── values ──────────────────────────────────────────────────────────────
 
-  /** What the staff readout prints: the pinned value, else what was drawn. */
+  /**
+   * What the staff readout PRINTS: the scale on the screen, always — never the
+   * one that was asked for.
+   *
+   * They can differ, and the case where they do is the one a reader is most
+   * likely to be in when they care. The pane clips nothing and scrolls
+   * nowhere: a drawing wider than it is scaled down to fit (`max-width: 100%`
+   * on the score's svg), and since a large staff scale prices the rigid
+   * columns wider as well as taller, the shrink grows with the ask and the two
+   * nearly cancel. Asking 320% drew 268%, asking 640% drew 297% — reported as
+   * *"vertical spacing 320 doesn't seem half of 640"*, which it was not.
+   * `<mnx-score-viewer>` measures the shrink and reports the product, so this
+   * number is the staff in front of you.
+   */
   private get shownStaff(): number {
+    return this.effectiveStaffScale;
+  }
+
+  /**
+   * What the ARMS move: the pinned request, else the scale last drawn.
+   *
+   * Deliberately not `shownStaff`. Stepping from the drawn number would walk
+   * the request backwards the moment the two diverge — press ↑ at a pinned
+   * 640% that draws 297% and the next value would be 327%, i.e. a smaller ask
+   * than the one already in force. The reader still sees the truth; the
+   * control still edits what they set.
+   */
+  private get requestedStaff(): number {
     return this.staffScale ?? this.effectiveStaffScale;
   }
 
@@ -506,14 +546,14 @@ export class ZoomPad extends LitElement {
 
   /**
    * Move one axis by `steps`, clamp through the ENGINE's own bounds, and
-   * report a clamp that actually bit. Stepping from `shownStaff` is what makes
+   * report a clamp that actually bit. Stepping from `requestedStaff` is what makes
    * the first click off a fitted score continue from what is on screen rather
    * than jumping to 100%.
    */
   private step(axis: ZoomAxis, steps: number) {
     if (steps === 0) return;
     if (axis === 'staff') {
-      const next = staffAfterSteps(this.shownStaff, steps);
+      const next = staffAfterSteps(this.requestedStaff, steps);
       const clampedTo = clampStaffScale(next)!;
       this.noteClamp('staff', next, clampedTo, MIN_STAFF_SCALE, MAX_STAFF_SCALE);
       this.commit({ staffScale: clampedTo, densityH: this.densityH });
@@ -663,7 +703,7 @@ export class ZoomPad extends LitElement {
       dy: 0,
       lock: null,
       moved: false,
-      staff0: this.shownStaff,
+      staff0: this.requestedStaff,
       space0: this.shownSpace
     };
     this.dragging = true;
@@ -767,6 +807,23 @@ export class ZoomPad extends LitElement {
   updated() {
     this.toggleAttribute('data-off', this.offDefault);
     this.renderedExpanded = !this.suppressed && (this.open || this.dragging);
+    this.noteSaturation();
+  }
+
+  /** Compared at the readout's own precision — a change too small to print is
+   *  too small to have been worth the click. */
+  private lastAsk: { request: number; drawn: string } | null = null;
+
+  private noteSaturation() {
+    const seen = { request: this.requestedStaff, drawn: this.pct(this.effectiveStaffScale) };
+    const previous = this.lastAsk;
+    this.lastAsk = seen;
+    if (!previous) return;
+    if (seen.drawn !== previous.drawn || seen.request < previous.request) {
+      this.staffSaturated = false;
+    } else if (seen.request > previous.request) {
+      this.staffSaturated = true;
+    }
   }
 
   // ── marks ───────────────────────────────────────────────────────────────
@@ -820,9 +877,18 @@ export class ZoomPad extends LitElement {
   private staffTitle(fitted: boolean): string {
     const px = this.shownStaff * BASELINE_PX_PER_SP;
     const size = `${Math.round(px * 10) / 10}px per staff space (100% = ${BASELINE_PX_PER_SP}px)`;
-    return fitted
-      ? `Staff size — ${size}. Fitted to the window, so it moves when the window does.`
-      : `Staff size — ${size}.`;
+    const said = [`Staff size — ${size}.`];
+    if (fitted) {
+      said.push('Fitted to the window, so it moves when the window does.');
+    } else if (this.staffScale !== null && this.pct(this.staffScale) !== this.pct(this.shownStaff)) {
+      // The gap is the whole point of printing the drawn number, so name it
+      // rather than leaving the reader to wonder why 640 says 297.
+      said.push(
+        `You asked for ${this.pct(this.staffScale)}%: at that size the page is wider ` +
+          'than the pane, and it is scaled down to fit rather than scrolling sideways.'
+      );
+    }
+    return said.join(' ');
   }
 
   /**
@@ -891,8 +957,8 @@ export class ZoomPad extends LitElement {
     const expanded = !this.suppressed && (this.open || this.dragging);
     const staffHot = this.staffScale !== null;
     const spaceHot = this.densityH !== null;
-    const atStaffMax = this.shownStaff >= MAX_STAFF_SCALE;
-    const atStaffMin = this.shownStaff <= MIN_STAFF_SCALE;
+    const atStaffMax = this.requestedStaff >= MAX_STAFF_SCALE || this.staffSaturated;
+    const atStaffMin = this.requestedStaff <= MIN_STAFF_SCALE;
     // Greyed when the arm has nothing left to REACH, which on a ladder can
     // happen inside the engine's range: an arm that still moves a number the
     // score ignores is worse than an arm that says it is done.
@@ -922,7 +988,9 @@ export class ZoomPad extends LitElement {
             <button
               class="cell up ${staffHot ? 'hot' : ''}"
               ?disabled=${atStaffMax}
-              title="Larger staff"
+              title=${this.staffSaturated && this.requestedStaff < MAX_STAFF_SCALE
+                ? 'Larger staff — asking for more stopped changing the drawn size: the page is already being scaled down to fit the pane'
+                : 'Larger staff'}
               aria-label="Larger staff"
               @pointerdown=${(e: PointerEvent) => this.onArmDown(e, 'staff', 1)}
             >
