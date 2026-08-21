@@ -87,7 +87,17 @@ describe('every type in the enum draws something distinguishable', () => {
     for (const type of ALL_TYPES.filter(t => t !== 'noBarline')) {
       const ps = drawn(type);
       expect(ps.length, type).toBeGreaterThan(0);
-      const right = Math.max(...ps.map(p => (p.kind === 'rect' ? p.x + p.w : (p as any).x1)));
+      // Positions and ink offsets are separate currencies now (see
+      // `PrimitiveBase`); at the square scale this test works in, the drawn
+      // edge is simply their sum.
+      const right = Math.max(
+        ...ps.map(p =>
+          p.kind === 'rect'
+            ? p.x + (p.dx ?? 0) + p.w
+            : (p as Extract<Primitive, { kind: 'line' }>).x1 +
+              ((p as Extract<Primitive, { kind: 'line' }>).dx1 ?? 0)
+        )
+      );
       expect(right, type).toBeCloseTo(10, 6);
     }
   });

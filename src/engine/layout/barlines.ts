@@ -101,22 +101,32 @@ export function emitEndBarline(args: EmitEndBarlineArgs): void {
   const { type, x, top, bottom, metrics, primitives } = args;
   const { thinSp, thickSp, gapSp } = metrics;
 
-  /** A light line whose ink is centred on `at`. */
-  const light = (at: number, className: string, dash?: number) =>
+  // Every offset below is an INK offset — the width of a stroke, the gap
+  // between two of them — so it travels in `dx`, never subtracted from `x`.
+  // Subtracted from `x` it would scale as a musical position: at 640% staff
+  // scale on a fitted line the strokes are 6.4px wide and the gaps that
+  // should separate them 3px, so a double barline OVERLAPPED ITSELF and drew
+  // as one fat line. See PrimitiveBase's note on the two currencies.
+
+  /** A light line whose ink is centred `dx` of ink from `at`. */
+  const light = (at: number, dx: number, className: string, dash?: number) =>
     primitives.push({
       kind: 'line',
-      x1: at, y1: top, x2: at, y2: bottom,
+      x1: at, dx1: dx, y1: top,
+      x2: at, dx2: dx, y2: bottom,
       thickness: thinSp,
       ...(dash === undefined ? {} : { dash }),
       className
     });
 
-  /** A heavy line whose ink ENDS at `right` — a rect, since it is a band of
-   *  ink rather than a stroke, and that is how `final` has always drawn it. */
-  const heavy = (right: number, className: string) =>
+  /** A heavy band whose ink ENDS `dx` of ink from `right` — a rect, since it
+   *  is a band of ink rather than a stroke, and that is how `final` has always
+   *  drawn it. Its WIDTH is already ink, so placing it by its right edge is
+   *  exactly `dx: dx - thickSp`. */
+  const heavy = (right: number, dx: number, className: string) =>
     primitives.push({
       kind: 'rect',
-      x: right - thickSp, y: top,
+      x: right, dx: dx - thickSp, y: top,
       w: thickSp, h: bottom - top,
       fill: 'currentColor',
       className
@@ -127,43 +137,43 @@ export function emitEndBarline(args: EmitEndBarlineArgs): void {
       return;
 
     case 'regular':
-      light(x, 'barline');
+      light(x, 0, 'barline');
       return;
 
     case 'dashed':
-      light(x, 'barline barline-dashed', DASH_SP);
+      light(x, 0, 'barline barline-dashed', DASH_SP);
       return;
 
     case 'dotted':
-      light(x, 'barline barline-dotted', DOT_SP);
+      light(x, 0, 'barline barline-dotted', DOT_SP);
       return;
 
     case 'heavy':
-      heavy(x, 'barline barline-heavy');
+      heavy(x, 0, 'barline barline-heavy');
       return;
 
     case 'double':
       // Two light lines. Emitted left-to-right so a golden diff reads in the
       // order the reader's eye travels.
-      light(x - gapSp, 'barline barline-double');
-      light(x, 'barline barline-double');
+      light(x, -gapSp, 'barline barline-double');
+      light(x, 0, 'barline barline-double');
       return;
 
     case 'final':
       // Light then heavy. Order and class names are load-bearing: this is the
       // one style that predates the module, and its goldens are committed.
-      light(x - thickSp - gapSp, 'barline barline-final-thin');
-      heavy(x, 'barline barline-final-thick');
+      light(x, -thickSp - gapSp, 'barline barline-final-thin');
+      heavy(x, 0, 'barline barline-final-thick');
       return;
 
     case 'heavyLight':
-      heavy(x - gapSp - thinSp, 'barline barline-heavy-light');
-      light(x, 'barline barline-heavy-light');
+      heavy(x, -gapSp - thinSp, 'barline barline-heavy-light');
+      light(x, 0, 'barline barline-heavy-light');
       return;
 
     case 'heavyHeavy':
-      heavy(x - thickSp - gapSp, 'barline barline-heavy-heavy');
-      heavy(x, 'barline barline-heavy-heavy');
+      heavy(x, -thickSp - gapSp, 'barline barline-heavy-heavy');
+      heavy(x, 0, 'barline barline-heavy-heavy');
       return;
 
     case 'tick':
@@ -193,6 +203,6 @@ export function emitEndBarline(args: EmitEndBarlineArgs): void {
     default:
       // An unknown type is a document from a newer schema than this build.
       // Draw the thing every barline at least is, rather than nothing.
-      light(x, 'barline');
+      light(x, 0, 'barline');
   }
 }

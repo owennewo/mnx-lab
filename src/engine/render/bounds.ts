@@ -62,26 +62,32 @@ export function computeBoundsSp(
     switch (p.kind) {
       case 'glyph': {
         const s = p.scale ?? 1;
+        // Bounds are SQUARE sp — the currency both `x` and `dx` share at
+        // ratio 1 — so an ink offset simply adds. (The emitter is where the
+        // two part company; see PrimitiveBase.)
+        const px = p.x + (p.dx ?? 0);
         const bb = glyphBBox(p.glyph);
         if (bb) {
           // SMuFL bboxes are y-up around the glyph origin; staff coords are y-down.
           const left =
-            p.anchor === 'middle' ? p.x - (bb.w * s) / 2
-            : p.anchor === 'end' ? p.x - (bb.x + bb.w) * s
-            : p.x + bb.x * s;
+            p.anchor === 'middle' ? px - (bb.w * s) / 2
+            : p.anchor === 'end' ? px - (bb.x + bb.w) * s
+            : px + bb.x * s;
           grow(left, p.y - (bb.y + bb.h) * s, left + bb.w * s, p.y - bb.y * s);
         } else {
           const em = GLYPH_FONT_SP * s;
-          grow(p.x - em / 2, p.y - em * TEXT_ASCENT, p.x + em / 2, p.y + em * TEXT_DESCENT);
+          grow(px - em / 2, p.y - em * TEXT_ASCENT, px + em / 2, p.y + em * TEXT_DESCENT);
         }
         break;
       }
       case 'line': {
         const r = p.thickness / 2;
+        const a = p.x1 + (p.dx1 ?? 0);
+        const b = p.x2 + (p.dx2 ?? 0);
         grow(
-          Math.min(p.x1, p.x2) - r,
+          Math.min(a, b) - r,
           Math.min(p.y1, p.y2) - r,
-          Math.max(p.x1, p.x2) + r,
+          Math.max(a, b) + r,
           Math.max(p.y1, p.y2) + r
         );
         break;
@@ -96,7 +102,8 @@ export function computeBoundsSp(
       }
       case 'text': {
         const w = p.text.length * p.size * TEXT_ADVANCE;
-        const left = p.anchor === 'middle' ? p.x - w / 2 : p.anchor === 'end' ? p.x - w : p.x;
+        const tx = p.x + (p.dx ?? 0);
+        const left = p.anchor === 'middle' ? tx - w / 2 : p.anchor === 'end' ? tx - w : tx;
         const top =
           p.baseline === 'middle' ? p.y - p.size / 2
           : p.baseline === 'hanging' ? p.y
@@ -105,7 +112,7 @@ export function computeBoundsSp(
         break;
       }
       case 'rect':
-        grow(p.x, p.y, p.x + p.w, p.y + p.h);
+        grow(p.x + (p.dx ?? 0), p.y, p.x + (p.dx ?? 0) + p.w, p.y + p.h);
         break;
     }
   }

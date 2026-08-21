@@ -153,9 +153,25 @@ function emitPrimitive(p: Primitive, kx: number, ky: number): SVGElement {
   return node;
 }
 
+/**
+ * A primitive's drawn x: the musical position on the horizontal scale plus the
+ * ink offset on the vertical one (see `PrimitiveBase`).
+ *
+ * Written as `(x + dx·ratio)·kx` rather than `x·kx + dx·ky`, which is the same
+ * number in exact arithmetic but NOT the same float. The layouts used to do
+ * this subtraction in staff spaces and multiply once, so associating it the
+ * same way keeps every committed golden byte-identical: at a square scale the
+ * ratio is exactly 1 and this reduces to the arithmetic that produced them.
+ */
+function drawnX(x: number, dx: number | undefined, kx: number, ky: number): number {
+  return dx === undefined ? x * kx : (x + dx * (ky / kx)) * kx;
+}
+
 function emitGlyph(p: GlyphPrim, kx: number, ky: number): SVGElement {
   const node = el('text', {
-    x: p.x * kx,
+    // Position on the horizontal scale, ink offset on the vertical one — the
+    // two currencies of `PrimitiveBase`.
+    x: drawnX(p.x, p.dx, kx, ky),
     y: p.y * ky,
     'font-family': FONT_FAMILY_MUSIC,
     'font-size': 4 * ky * (p.scale ?? 1),
@@ -171,9 +187,9 @@ function emitGlyph(p: GlyphPrim, kx: number, ky: number): SVGElement {
 
 function emitLine(p: LinePrim, kx: number, ky: number): SVGElement {
   const node = el('line', {
-    x1: p.x1 * kx,
+    x1: drawnX(p.x1, p.dx1, kx, ky),
     y1: p.y1 * ky,
-    x2: p.x2 * kx,
+    x2: drawnX(p.x2, p.dx2, kx, ky),
     y2: p.y2 * ky,
     stroke: p.stroke ?? 'currentColor',
     'stroke-width': p.thickness * ky
@@ -237,7 +253,7 @@ function emitCurve(p: CurvePrim, kx: number, ky: number): SVGElement {
 function emitText(p: TextPrim, kx: number, ky: number): SVGElement {
   const family = p.font === 'bodyItalic' ? FONT_FAMILY_BODY : FONT_FAMILY_BODY;
   const node = el('text', {
-    x: p.x * kx,
+    x: drawnX(p.x, p.dx, kx, ky),
     y: p.y * ky,
     'font-family': family,
     'font-size': p.size * ky,
@@ -255,7 +271,7 @@ function emitText(p: TextPrim, kx: number, ky: number): SVGElement {
 
 function emitRect(p: RectPrim, kx: number, ky: number): SVGElement {
   const attrs: Record<string, string | number> = {
-    x: p.x * kx,
+    x: drawnX(p.x, p.dx, kx, ky),
     y: p.y * ky,
     width: p.w * (p.spanW ? kx : ky),
     height: p.h * ky,

@@ -295,6 +295,17 @@ proposals that name their campaign.
   gestures are mirrored here as data, including the container rung and explicit
   rung-first Delete meanings through section.
 ### complete/
+- **[core-ink-offset-fields.md](complete/core-ink-offset-fields.md)** — **ink offsets are a
+  field, not a convention.** Built 2026-08-21 after the same bug class surfaced a fourth
+  time: at 640% staff scale a double barline's two strokes OVERLAPPED and drew as one line,
+  because the strokes are ink (vertical scale) and the gap separating them was a position
+  (horizontal scale). `dx`/`dx1`/`dx2` put the currency in the type, so the call site decides
+  it by which field it types into; the barlines and repeat clusters use it. The other half is
+  a **non-square sweep** over the corpus at ratios 1/4/6.4, asserting scale-invariant
+  RELATIONSHIPS — the goldens are all square and are structurally blind to this class. Two
+  notes worth keeping: `rounded()` folds offsets before rounding, which is what stopped a
+  representation change from moving 158 goldens and demoting 54 approvals for zero visual
+  change; and the three earlier hand-priced fixes stay as they are, deliberately.
 - **[core-ink-priced-columns.md](complete/core-ink-priced-columns.md)** — rigid columns are
   **ink**; price them on the ink scale. **Built 2026-08-21.** The decision `fd6b06e` left
   open: staff scale grows every glyph dimension on the vertical scale while the plan priced

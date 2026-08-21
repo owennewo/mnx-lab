@@ -20,8 +20,49 @@ export function ensureSmufl(glyphnames: unknown, metadata: unknown): void {
   smuflReady = true;
 }
 
+/**
+ * Folds every ink offset into its position — see `PrimitiveBase`.
+ *
+ * Goldens are rendered at a SQUARE scale, where a position and an ink offset
+ * are the same currency and `x + dx` is exactly what gets drawn. Folding is
+ * therefore lossless here, and it is what keeps a golden a statement about the
+ * ENGRAVING rather than about the engine's internal representation: splitting
+ * `x - gap` into `x` and `dx` changed no coordinate a reader could see, and
+ * without this it would have rewritten 99 primitives files, moved 59 SVGs by
+ * float noise in the fifteenth digit, and demoted 54 human approvals for
+ * nothing.
+ *
+ * (It also has to happen BEFORE rounding: rounding the two parts separately
+ * and letting the emitter re-add them is precisely how that float noise got
+ * in.)
+ */
+function foldInkOffsets<T>(value: T): T {
+  const fold = (p: Record<string, unknown>): Record<string, unknown> => {
+    const out = { ...p };
+    for (const [pos, off] of [['x', 'dx'], ['x1', 'dx1'], ['x2', 'dx2']] as const) {
+      if (typeof out[off] === 'number') {
+        out[pos] = (out[pos] as number) + (out[off] as number);
+        delete out[off];
+      }
+    }
+    return out;
+  };
+  const walk = (v: unknown): unknown =>
+    Array.isArray(v)
+      ? v.map(walk)
+      : v && typeof v === 'object'
+        ? fold(
+            Object.fromEntries(
+              Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, walk(x)])
+            )
+          )
+        : v;
+  return walk(value) as T;
+}
+
 /** Rounds every number to 4 decimals so float noise never dirties a snapshot. */
 export function rounded<T>(value: T): T {
+  value = foldInkOffsets(value);
   return JSON.parse(
     JSON.stringify(value, (_k, v) => (typeof v === 'number' ? Math.round(v * 10000) / 10000 : v))
   );

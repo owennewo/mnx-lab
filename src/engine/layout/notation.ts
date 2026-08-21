@@ -1430,7 +1430,11 @@ function assembleSegment(
 
     // Forward repeat |: — thick + thin per group span, dots per staff.
     if (m.repeatStart) {
-      const thinX = m.repeatStartX + FINAL_BARLINE_THICK_SP + FINAL_BARLINE_GAP_SP;
+      // Ink offsets from the repeat's own x, never subtracted into it — the
+      // two currencies of `PrimitiveBase`. `thinDx` is where the thin stroke
+      // sits relative to the cluster's left edge, and the dots sit past it.
+      const thinDx = FINAL_BARLINE_THICK_SP + FINAL_BARLINE_GAP_SP;
+      const dotDx = thinDx + 0.4;
       for (const g of segment.groups) {
         for (const [gTop, gBottom] of groupSpans(g)) {
           primitives.push({
@@ -1442,7 +1446,8 @@ function assembleSegment(
           });
           primitives.push({
             kind: 'line',
-            x1: thinX, y1: gTop, x2: thinX, y2: gBottom,
+            x1: m.repeatStartX, dx1: thinDx, y1: gTop,
+            x2: m.repeatStartX, dx2: thinDx, y2: gBottom,
             thickness: BARLINE_THICKNESS_SP,
             className: 'barline repeat-start'
           });
@@ -1453,7 +1458,7 @@ function assembleSegment(
           primitives.push({
             kind: 'glyph',
             glyph: 'augmentationDot',
-            x: thinX + 0.4,
+            x: m.repeatStartX, dx: dotDx,
             y: top + dotY,
             scale: REPEAT_DOT_SCALE,
             className: 'repeat-dot'
@@ -1469,7 +1474,7 @@ function assembleSegment(
           primitives.push({
             kind: 'glyph',
             glyph: 'augmentationDot',
-            x: thinX + 0.4,
+            x: m.repeatStartX, dx: dotDx,
             y: tabTop + dotY,
             scale: REPEAT_DOT_SCALE,
             className: 'repeat-dot'
@@ -1809,16 +1814,16 @@ function assembleSegment(
           // Backward repeat :| — dots + thin + thick (doubles as a final barline).
           primitives.push({
             kind: 'rect',
-            x: barX - FINAL_BARLINE_THICK_SP, y: gTop,
+            x: barX, dx: -FINAL_BARLINE_THICK_SP, y: gTop,
             w: FINAL_BARLINE_THICK_SP, h: gBottom - gTop,
             fill: 'currentColor',
             className: 'barline repeat-end'
           });
           primitives.push({
             kind: 'line',
-            x1: barX - FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP,
+            x1: barX, dx1: -FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP,
             y1: gTop,
-            x2: barX - FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP,
+            x2: barX, dx2: -FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP,
             y2: gBottom,
             thickness: BARLINE_THICKNESS_SP,
             className: 'barline repeat-end'
@@ -1838,13 +1843,13 @@ function assembleSegment(
       }
     }
     if (m.repeatEnd) {
-      const dotX = barX - FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP - 0.85;
+      const dotDx = -FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP - 0.85;
       for (const top of staffTops) {
         for (const dotY of [1.5, 2.5]) {
           primitives.push({
             kind: 'glyph',
             glyph: 'augmentationDot',
-            x: dotX,
+            x: barX, dx: dotDx,
             y: top + dotY,
             scale: REPEAT_DOT_SCALE,
             className: 'repeat-dot'
@@ -1857,7 +1862,7 @@ function assembleSegment(
           primitives.push({
             kind: 'glyph',
             glyph: 'augmentationDot',
-            x: dotX,
+            x: barX, dx: dotDx,
             y: tabTop + dotY,
             scale: REPEAT_DOT_SCALE,
             className: 'repeat-dot'

@@ -29,6 +29,35 @@ export type Primitive =
   | TextPrim
   | RectPrim;
 
+/**
+ * INK OFFSETS — the fix for a whole class of non-square-scale bugs
+ * (roadmap/complete/core-ink-offset-fields.md).
+ *
+ * Every horizontal distance in a layout is one of two things, and they scale
+ * differently once the staff scale is non-square (`pxPerSpY !== pxPerSp`):
+ *
+ *   - a MUSICAL POSITION — where an event sits on the line. Scales with the
+ *     horizontal scale, because that is what the spacing plan decided.
+ *   - an INK OFFSET — the distance from a position to a mark, or between two
+ *     marks: half a notehead, a stem anchor, the gap between the two strokes
+ *     of a double barline. This is ink, and ink scales with the VERTICAL
+ *     scale so it stays proportional to the staff.
+ *
+ * Written into `x`, an ink offset is silently scaled as a position, and the
+ * mark drifts away from what it belongs to as the staff grows. Every instance
+ * of this we have found — rigid columns, note clusters, the tab fret mask, the
+ * compound barlines — was one subtraction done in the wrong currency, and each
+ * was invisible in the corpus because every committed golden is SQUARE, where
+ * the two scales are equal and the mistake is arithmetically a no-op.
+ *
+ * So the currency is now part of the type: put positions in `x`, put ink
+ * offsets in `dx`, and the emitter scales each correctly with no judgement at
+ * the call site. `x: barlineEnd, dx: -gapSp` rather than `x: barlineEnd - gapSp`.
+ *
+ * Only the HORIZONTAL axis needs this. A vertical position and a vertical ink
+ * offset both scale with the vertical scale, so they coincide and no `dy` is
+ * possible to get wrong.
+ */
 export interface PrimitiveBase {
   /** CSS class added to the emitted element (multiple classes allowed). */
   className?: string;
@@ -43,6 +72,8 @@ export interface GlyphPrim extends PrimitiveBase {
   /** SMuFL canonical name, e.g. `6stringTabClef`, `timeSig4`, `noteheadBlack`. */
   glyph: string;
   x: number;
+  /** Ink offset from `x` — see PrimitiveBase's note. */
+  dx?: number;
   y: number;
   /** Multiplier on the standard 4-sp em (default 1). */
   scale?: number;
@@ -56,8 +87,12 @@ export interface GlyphPrim extends PrimitiveBase {
 export interface LinePrim extends PrimitiveBase {
   kind: 'line';
   x1: number;
+  /** Ink offset from `x1` — see PrimitiveBase's note. */
+  dx1?: number;
   y1: number;
   x2: number;
+  /** Ink offset from `x2`. */
+  dx2?: number;
   y2: number;
   /** Thickness in staff spaces. */
   thickness: number;
@@ -84,6 +119,8 @@ export interface TextPrim extends PrimitiveBase {
   kind: 'text';
   text: string;
   x: number;
+  /** Ink offset from `x` — see PrimitiveBase's note. */
+  dx?: number;
   y: number;
   /** `body` and `bodyItalic` map to project body font via CSS. */
   font: 'body' | 'bodyItalic';
@@ -98,6 +135,9 @@ export interface TextPrim extends PrimitiveBase {
 export interface RectPrim extends PrimitiveBase {
   kind: 'rect';
   x: number;
+  /** Ink offset from `x`. A rect's WIDTH is already ink (see `spanW`), so a
+   *  rect placed by its right edge wants `dx: -w` and nothing else. */
+  dx?: number;
   y: number;
   w: number;
   h: number;
