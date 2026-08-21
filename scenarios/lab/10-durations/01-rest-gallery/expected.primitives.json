@@ -1715,7 +1715,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 72,
-        "x2": 38.0216,
+        "x2": 30.863,
         "y2": 72,
         "thickness": 0.13,
         "className": "staff-line"
@@ -1724,7 +1724,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 73,
-        "x2": 38.0216,
+        "x2": 30.863,
         "y2": 73,
         "thickness": 0.13,
         "className": "staff-line"
@@ -1733,7 +1733,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 74,
-        "x2": 38.0216,
+        "x2": 30.863,
         "y2": 74,
         "thickness": 0.13,
         "className": "staff-line"
@@ -1742,7 +1742,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 75,
-        "x2": 38.0216,
+        "x2": 30.863,
         "y2": 75,
         "thickness": 0.13,
         "className": "staff-line"
@@ -1751,7 +1751,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 76,
-        "x2": 38.0216,
+        "x2": 30.863,
         "y2": 76,
         "thickness": 0.13,
         "className": "staff-line"
@@ -1766,7 +1766,7 @@
       {
         "kind": "glyph",
         "glyph": "restQuarter",
-        "x": 10.4043,
+        "x": 9.2746,
         "y": 74,
         "anchor": "middle",
         "className": "rest"
@@ -1774,14 +1774,14 @@
       {
         "kind": "glyph",
         "glyph": "augmentationDot",
-        "x": 11.1043,
+        "x": 9.9746,
         "y": 73.5,
         "className": "dot"
       },
       {
         "kind": "glyph",
         "glyph": "rest8th",
-        "x": 19.563,
+        "x": 16.1737,
         "y": 74,
         "anchor": "middle",
         "className": "rest"
@@ -1789,7 +1789,7 @@
       {
         "kind": "glyph",
         "glyph": "rest8th",
-        "x": 23.813,
+        "x": 19.5496,
         "y": 74,
         "anchor": "middle",
         "className": "rest"
@@ -1797,14 +1797,14 @@
       {
         "kind": "glyph",
         "glyph": "augmentationDot",
-        "x": 24.513,
+        "x": 20.2496,
         "y": 73.5,
         "className": "dot"
       },
       {
         "kind": "glyph",
         "glyph": "rest16th",
-        "x": 30.2216,
+        "x": 24.5728,
         "y": 74,
         "anchor": "middle",
         "className": "rest"
@@ -1812,23 +1812,23 @@
       {
         "kind": "glyph",
         "glyph": "restQuarter",
-        "x": 33.7216,
+        "x": 27.4371,
         "y": 74,
         "anchor": "middle",
         "className": "rest"
       },
       {
         "kind": "line",
-        "x1": 37.2216,
+        "x1": 30.063,
         "y1": 72,
-        "x2": 37.2216,
+        "x2": 30.063,
         "y2": 76,
         "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
-        "x": 37.5216,
+        "x": 30.363,
         "y": 72,
         "w": 0.5,
         "h": 4,

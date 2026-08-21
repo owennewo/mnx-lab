@@ -86,8 +86,8 @@ const MEASURE_TRAIL_FACTOR = 0.5;  // the last event's spring counts at this fac
                                    // gap symmetric with the post-barline lead
 const SPRING_LOG_FACTOR = 0.5;     // how strongly duration affects the spring
 const MIN_SPRING_SP = 0.8;         // floor for very short notes
-const MAX_STRETCH = 2.5;           // justification cap — beyond this, leave the row ragged
-const MIN_SQUEEZE = 0.35;          // compression floor for overfull rows
+export const MAX_STRETCH = 2.5;    // justification cap — beyond this, leave the row ragged
+export const MIN_SQUEEZE = 0.35;   // compression floor for overfull rows
 const EMPTY_CONTENT_SP = 6;        // content width of a measure with no events
 
 // ---------- Durations ----------
@@ -281,7 +281,7 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
   });
   if (current.length > 0) rows.push(current);
 
-  return rows.map(measures => {
+  const justified = rows.map(measures => {
     let rowRigid = 0;
     let rowSpring = 0;
     measures.forEach((k, j) => {
@@ -295,6 +295,35 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
       : 1;
     return { measures, stretch };
   });
+  const capped = capLastRowStretch(justified.map(r => r.stretch));
+  return justified.map((r, i) => ({ measures: r.measures, stretch: capped[i] }));
+}
+
+/**
+ * The last row may not be stretched looser than the loosest other row on the
+ * page (roadmap/inprogress/core-ragged-last.md).
+ *
+ * Justification exists to reach the right margin, and a sparse final system
+ * cannot: it computes a huge stretch, hits `MAX_STRETCH`, and is drawn at 2.5×
+ * the note spacing of every row above it while still stopping short. The cap
+ * was keeping one bar from spanning the page; it was not keeping the page
+ * consistent. Rather than a `ragged-last` fill threshold — a constant, and a
+ * flip point under resize — the ceiling is read off the score itself:
+ * `min(computed, max(1, …others))`. Rows that reach the margin at 1.1 set the
+ * leftovers at 1.1, which is what "consistent spacing" means.
+ *
+ * Floored at 1 because compression (stretch < 1) is a necessity the full rows
+ * were forced into, not a texture to propagate. Only ever LOWERS a stretch, so
+ * `MIN_SQUEEZE` still governs an overfull last row. Scoped to two or more rows:
+ * one system is not a page, has nothing to disagree with, and keeps today's
+ * justification — which is also what confines the golden churn to
+ * multi-system scenarios.
+ */
+export function capLastRowStretch(stretches: readonly number[]): number[] {
+  if (stretches.length < 2) return [...stretches];
+  const others = stretches.slice(0, -1);
+  const last = stretches[stretches.length - 1];
+  return [...others, Math.min(last, Math.max(1, ...others))];
 }
 
 // ---------- The density ladder ----------
@@ -1243,30 +1272,39 @@ export function planHorizontal(
   // each row's justification factor. Both live in packSystems, so the density
   // ladder asks the same question of the same code.
   const packed = packSystems(packing, densityH);
+  const rowIndicesOf = (packedRow: PackedRow) =>
+    packedRow.measures.map(k => packing.measures[k].index);
+
+  // Row stretches: the packer's square answer, or — under an ink ratio — the
+  // same arithmetic re-run over the scaled metrics with the SAME (square) row
+  // membership, then capped by the same last-row rule the packer applies.
+  // This is where the springs hand width to the grown ink. At ratio 1 the
+  // packer's numbers are reused untouched.
+  let stretches = packed.map(r => r.stretch);
+  if (inkRatio !== 1) {
+    stretches = capLastRowStretch(
+      packed.map(packedRow => {
+        let rowRigid = 0;
+        let rowSpring = 0;
+        rowIndicesOf(packedRow).forEach((i, j) => {
+          const m = metrics[i];
+          rowRigid +=
+            prefixWidth(m, j === 0, inkRatio) + m.rigid + contentRightPad +
+            (m.repeatEnd ? REPEAT_END_EXTRA_SP * inkRatio : 0);
+          rowSpring += m.spring + m.leadingSpring;
+        });
+        return rowSpring > 0
+          ? Math.min(MAX_STRETCH, Math.max(MIN_SQUEEZE, (lineWidth - rowRigid) / rowSpring))
+          : 1;
+      })
+    );
+  }
 
   // Pass 3 — place each row at its justified stretch.
   const measures: MeasurePlan[] = new Array(metrics.length);
   packed.forEach((packedRow, row) => {
-    const rowIndices = packedRow.measures.map(k => packing.measures[k].index);
-    // Re-priced rigids need a re-justified row: the same arithmetic
-    // packSystems ran, over the scaled metrics, with the SAME (square) row
-    // membership. This is where the springs hand width to the grown ink. At
-    // ratio 1 the square answer is reused untouched.
-    let stretch = packedRow.stretch;
-    if (inkRatio !== 1) {
-      let rowRigid = 0;
-      let rowSpring = 0;
-      rowIndices.forEach((i, j) => {
-        const m = metrics[i];
-        rowRigid +=
-          prefixWidth(m, j === 0, inkRatio) + m.rigid + contentRightPad +
-          (m.repeatEnd ? REPEAT_END_EXTRA_SP * inkRatio : 0);
-        rowSpring += m.spring + m.leadingSpring;
-      });
-      stretch = rowSpring > 0
-        ? Math.min(MAX_STRETCH, Math.max(MIN_SQUEEZE, (lineWidth - rowRigid) / rowSpring))
-        : 1;
-    }
+    const rowIndices = rowIndicesOf(packedRow);
+    const stretch = stretches[row];
 
     let x = startX;
     for (const i of rowIndices) {

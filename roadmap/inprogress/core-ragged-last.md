@@ -1,6 +1,33 @@
 # The last system borrows its stretch from the page
 
-> **Status: PROPOSED 2026-08-20.** Found in the same tab-view session as
+> **Status: BUILT 2026-08-21, awaiting the `/verify` sweep.** One exported
+> helper, `capLastRowStretch` in `spacing.ts`, applied in `packSystems` (so
+> the ladder, `packedRowMeasures` and every plan agree by construction) and
+> again on the ink-priced re-justification path, which computes its own row
+> stretches. `MAX_STRETCH`/`MIN_SQUEEZE` are now exported for the harness.
+>
+> **Corpus effect, measured:** `update:primitives` moved **5 scenarios, all
+> multi-system, none single-system** — `lab/00-document/03-navigation-playground`,
+> `lab/10-durations/01-rest-gallery` and `spec/tie-targets` demoted
+> `verified → rendered` (records kept, so the queue reads *stale*);
+> `lab/00-document/04-twelve-bar-blues` and `spec/multimeasure-rests` were
+> already `rendered`. Every changed primitive sits in a final system — with
+> one nuance the proposal did not spell out: `multimeasure-rests` has
+> per-system layouts, and each layout segment is its own packing, so each
+> multi-row **segment's** last row caps independently. That is the rule
+> applied at the unit the packer already works in, not an exception to it.
+> **The three demotions are the `/verify` sweep this item still owes.**
+>
+> Five assertions in `harness/conformance/ragged-last.test.ts`: the rule's
+> own table (floor at 1, never raised, others untouched, one system is not a
+> page); corpus-wide at 40sp and 80sp, including that the packer's numbers
+> equal the helper applied to an uncapped mirror (no second copy of the rule);
+> the reported case on `twelve-bar-blues` swept 50–140sp, asserting the
+> uncapped last row *was* the cap and the rule pulled it to the page; a
+> single-system score byte-equal to the raw formula; and the ink-priced path
+> obeying the same ceiling, read back off the plan through the leading spring.
+>
+> Originally: **PROPOSED 2026-08-20.** Found in the same tab-view session as
 > [core-ink-priced-columns.md](../complete/core-ink-priced-columns.md): a score whose
 > first system runs at stretch ≈ 1 and whose leftover final bar is set at the
 > `MAX_STRETCH = 2.5` cap — two and a half times the note spacing of the row

@@ -560,7 +560,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 24,
-        "x2": 30.775,
+        "x2": 21.3836,
         "y2": 24,
         "thickness": 0.13,
         "className": "staff-line"
@@ -569,7 +569,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 25,
-        "x2": 30.775,
+        "x2": 21.3836,
         "y2": 25,
         "thickness": 0.13,
         "className": "staff-line"
@@ -578,7 +578,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 26,
-        "x2": 30.775,
+        "x2": 21.3836,
         "y2": 26,
         "thickness": 0.13,
         "className": "staff-line"
@@ -587,7 +587,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 27,
-        "x2": 30.775,
+        "x2": 21.3836,
         "y2": 27,
         "thickness": 0.13,
         "className": "staff-line"
@@ -596,7 +596,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 28,
-        "x2": 30.775,
+        "x2": 21.3836,
         "y2": 28,
         "thickness": 0.13,
         "className": "staff-line"
@@ -611,7 +611,7 @@
       {
         "kind": "glyph",
         "glyph": "restQuarter",
-        "x": 9.6,
+        "x": 8.1552,
         "y": 26,
         "anchor": "middle",
         "className": "rest"
@@ -619,16 +619,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadBlack",
-        "x": 16.01,
+        "x": 11.6755,
         "y": 23.5,
         "className": "notehead",
         "sourceId": "ev41n1"
       },
       {
         "kind": "line",
-        "x1": 16.01,
+        "x1": 11.6755,
         "y1": 23.668,
-        "x2": 16.01,
+        "x2": 11.6755,
         "y2": 27,
         "thickness": 0.12,
         "className": "stem"
@@ -636,14 +636,14 @@
       {
         "kind": "glyph",
         "glyph": "flag8thDown",
-        "x": 16.01,
+        "x": 11.6755,
         "y": 27,
         "className": "flag"
       },
       {
         "kind": "glyph",
         "glyph": "rest8th",
-        "x": 20.85,
+        "x": 15.0707,
         "y": 26,
         "anchor": "middle",
         "className": "rest"
@@ -651,23 +651,23 @@
       {
         "kind": "glyph",
         "glyph": "restHalf",
-        "x": 25.1,
+        "x": 17.8759,
         "y": 26,
         "anchor": "middle",
         "className": "rest"
       },
       {
         "kind": "line",
-        "x1": 29.975,
+        "x1": 20.5836,
         "y1": 24,
-        "x2": 29.975,
+        "x2": 20.5836,
         "y2": 28,
         "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
-        "x": 30.275,
+        "x": 20.8836,
         "y": 24,
         "w": 0.5,
         "h": 4,
@@ -933,19 +933,19 @@
         "kind": "curve",
         "points": [
           {
-            "x": 17.45,
+            "x": 13.1155,
             "y": 22.95
           },
           {
-            "x": 17.84,
+            "x": 13.5055,
             "y": 22.435
           },
           {
-            "x": 18.36,
+            "x": 14.0255,
             "y": 22.435
           },
           {
-            "x": 18.75,
+            "x": 14.4155,
             "y": 22.95
           }
         ],

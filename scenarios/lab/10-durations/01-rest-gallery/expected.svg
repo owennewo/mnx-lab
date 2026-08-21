@@ -201,19 +201,19 @@
 <text x="1100.7568" y="920" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="dot"></text>
 <text x="1201.2048" y="928" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
 <line x1="1248" y1="896" x2="1248" y2="960" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="32" y1="1152" x2="608.3456" y2="1152" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1168" x2="608.3456" y2="1168" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1184" x2="608.3456" y2="1184" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1200" x2="608.3456" y2="1200" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1216" x2="608.3456" y2="1216" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1152" x2="493.808" y2="1152" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1168" x2="493.808" y2="1168" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1184" x2="493.808" y2="1184" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1200" x2="493.808" y2="1200" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1216" x2="493.808" y2="1216" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <text x="49.6" y="1200" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="166.4688" y="1184" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
-<text x="177.6688" y="1176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="dot"></text>
-<text x="313.008" y="1184" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
-<text x="381.008" y="1184" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
-<text x="392.208" y="1176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="dot"></text>
-<text x="483.5456" y="1184" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
-<text x="539.5456" y="1184" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
-<line x1="595.5456" y1="1152" x2="595.5456" y2="1216" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="600.3456" y="1152" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<text x="148.3936" y="1184" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="159.5936" y="1176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="dot"></text>
+<text x="258.7792" y="1184" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="312.7936" y="1184" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="323.9936" y="1176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="dot"></text>
+<text x="393.1648" y="1184" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="438.9936" y="1184" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<line x1="481.008" y1="1152" x2="481.008" y2="1216" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="485.808" y="1152" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>
