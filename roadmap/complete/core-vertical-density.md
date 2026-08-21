@@ -197,3 +197,20 @@ clean, and the test pins the mechanism as well as the result.
 - **`compact`** (tighter paper padding, an element-level attribute) now
   overlaps this axis conceptually. Not merged — one is chrome, one is
   engraving — but they should not both grow.
+
+## Appendix (2026-08-21): the coupling is reversed — vertical space follows vertical zoom
+
+The surface coupling (`density-pad` unset ⇒ `√density-h`) was argued as "one
+reader-facing intent over two scalars" and deliberately kept *at the surface
+so it stays reversible*. Reversed today, on the owner's ruling after a tab-only
+score at SPACE 200 drew its systems 11sp apart: the reader does not expect
+vertical air to grow when they open the horizontal spacing, and above 1 the
+coupling did exactly that — multiplied every inter-system pad by √2 on a staff
+with no ink to clear. Vertical distance is a function of **vertical** zoom,
+and the engine already delivers that without any coupling: every gap is in
+staff spaces and staff scale multiplies staff spaces. So `density-pad` unset
+now means 1. `padDensityFor` stays exported (the mapping is still a reasonable
+thing for a host to *choose* to apply, and its tests pin its shape); nothing
+applies it by default. The inter-system distance itself — still the fixed pads
+at density 1 — is stage D of
+[core-ink-measured-gaps.md](../inprogress/core-ink-measured-gaps.md).

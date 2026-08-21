@@ -189,7 +189,13 @@ Each stage is its own landing with its own `update:primitives` diff and
   multi-staff notation golden. Last, and only after A and B have shown the
   rule reads well in review.
 - **Stage D (decision, not code) — density 1 becomes ink-measured** between
-  systems too, i.e. `tightenRows` runs by default with `padDensity` scaling
+  systems. *2026-08-21 ruling recorded ahead of it:* the pad axis is **decoupled**
+  from `density-h` (see the appendix on core-vertical-density.md) — vertical
+  distance follows vertical zoom, which staff scale already supplies by
+  multiplying staff spaces; no horizontal value may move a vertical gap. D
+  inherits that: when the clearances become the default, `density-pad` scales
+  them only when a host sets it.
+  The original text: between systems too, i.e. `tightenRows` runs by default with `padDensity` scaling
   the clearances. Moves every multi-system golden's row pitch. Taken only
   once A–C are verified, on their evidence.
 

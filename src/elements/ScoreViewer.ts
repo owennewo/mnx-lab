@@ -24,7 +24,6 @@ import {
   type RenderScale
 } from '../engine/render/scale.ts';
 import { densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
-import { padDensityFor } from '../engine/layout/verticalDensity.ts';
 import {
   drawCursorGhost,
   drawEnclosure,
@@ -190,13 +189,14 @@ export class ScoreViewer extends LitElement {
    * actually holds, so tightening it can never put one system's stems through
    * the system above.
    *
-   * **Unset is not 1.** Left alone it is DERIVED from the effective
-   * `density-h` through `padDensityFor`, so a host that asks for tighter
-   * spacing gets a tighter page rather than the same page with the music
-   * squeezed inside it. That is the coupling core-vertical-density.md argued
-   * for — one reader-facing intent over two engine scalars — and it lives
-   * here, at the surface, precisely so it stays reversible: set this and it
-   * wins, exactly like `density-h` over `density`.
+   * **Unset is 1, and it is NOT coupled to `density-h`.** It used to be
+   * derived from it (`padDensityFor`, √density-h — core-vertical-density.md's
+   * "one intent over two scalars"), kept at the surface precisely so it stayed
+   * reversible; reversed 2026-08-21 (see that doc's appendix). Vertical
+   * distance is a function of vertical zoom, and staff scale already supplies
+   * that by multiplying staff spaces — a horizontal value must never move a
+   * vertical gap. A host that wants the coupling can still apply
+   * `padDensityFor` itself and set this.
    */
   @property({ type: Number, attribute: 'density-pad' }) densityPad: number | null = null;
   /**
@@ -656,9 +656,9 @@ export class ScoreViewer extends LitElement {
     // re-pack at the value THIS paint used, not at whatever the properties say
     // when it is asked.
     const densityH = this.densityH ?? DENSITY_H[this.density] ?? 1;
-    // Unset couples to the horizontal axis; explicit wins. Same precedence
-    // shape as `density-h` over `density`, one level up.
-    const densityPad = this.densityPad ?? padDensityFor(densityH);
+    // Unset is 1: the vertical axis does not follow the horizontal one (see
+    // the property's doc). Explicit wins, as `density-h` does over `density`.
+    const densityPad = this.densityPad ?? 1;
     // Whichever pane actually drew: `both` is one render, and in the split
     // views notation and tab derive the same factor from the shared plan, so
     // there is never a second, disagreeing answer to report.
