@@ -159,19 +159,6 @@ proposals that name their campaign.
   Step zero is a **fixture** — none of the three reference scores contains a tuplet or a
   grace note, which is why the round trips are honestly lossless and still never present
   the case. Import/export follows the collapse-expand precedent already solved for voltas.
-- **[core-ink-measured-gaps.md](proposed/core-ink-measured-gaps.md)** — **vertical distance
-  is measured ink to ink**, with two clearance constants: cohesion (label→its staff, ≈1sp)
-  and separation (staff→staff, system→system, ≈3sp). Raised 2026-08-21 from two screenshots
-  of one score: the section label crowds the treble stems in `both` and floats over a
-  stemless tab staff in tab-only; the tab crowds the notation while the bass floats below —
-  and those two staff gaps are *geometrically identical* (6sp), one full of ink and one of
-  air. The label scan reads `p.y` and so cannot see stems. The engine already has the
-  principle in `tightenRows` (*"the frame follows the ink"*), confined to between-systems
-  at non-default density; this generalizes it to the label row and the display staves
-  within a system, as the same post-pass one level down. Staged A (labels, 8 scenarios) →
-  B (`both` display gaps, 21 both goldens) → C (grand-staff gaps) → D (a recorded ruling:
-  density 1 becomes ink-measured). Two decisions fixed up front: staff gaps per system,
-  label rises per bar; `padDensity` scales the clearances, not the pads.
 - **[studio-storage-sync.md](proposed/studio-storage-sync.md)** — **studio's storage, sync
   and sharing**: a hand-rolled op-log sync engine in the Replicache mold (server-authoritative
   rebase over `EditOp`/`applyOp` — CRDTs rejected with reasons), persisted as a SQLite Durable
@@ -184,6 +171,22 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
+- **[core-ink-measured-gaps.md](inprogress/core-ink-measured-gaps.md)** — **vertical distance
+  is measured ink to ink**. **Stages A and B built 2026-08-21** (labels/tempo one clearance
+  above the ink under their footprint; tab-adjacent display gaps ink-measured via a probe
+  pass) — 9 text scenarios demoted for the sweep, 20 both goldens re-earned; C and D open.
+  Principle: with two clearance constants: cohesion (label→its staff, ≈1sp)
+  and separation (staff→staff, system→system, ≈3sp). Raised 2026-08-21 from two screenshots
+  of one score: the section label crowds the treble stems in `both` and floats over a
+  stemless tab staff in tab-only; the tab crowds the notation while the bass floats below —
+  and those two staff gaps are *geometrically identical* (6sp), one full of ink and one of
+  air. The label scan reads `p.y` and so cannot see stems. The engine already has the
+  principle in `tightenRows` (*"the frame follows the ink"*), confined to between-systems
+  at non-default density; this generalizes it to the label row and the display staves
+  within a system, as the same post-pass one level down. Staged A (labels, 8 scenarios) →
+  B (`both` display gaps, 21 both goldens) → C (grand-staff gaps) → D (a recorded ruling:
+  density 1 becomes ink-measured). Two decisions fixed up front: staff gaps per system,
+  label rises per bar; `padDensity` scales the clearances, not the pads.
 - **[core-assist-byok.md](inprogress/core-assist-byok.md)** — **bring your own
   OpenRouter key**, completing the workbench's no-backend rule by deleting its one
   asterisk ("minus live AI edits"): the key is obtained by **OAuth PKCE** (a distinct

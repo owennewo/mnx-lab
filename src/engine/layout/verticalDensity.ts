@@ -230,8 +230,9 @@ export function ensureTopMargin(
   };
 }
 
-/** The y a primitive is anchored at, for deciding which row owns it. */
-function anchorY(p: Primitive): number {
+/** The y a primitive is anchored at, for deciding which row (or display
+ *  band) owns it — shared with the display-gap measurement in notation.ts. */
+export function anchorY(p: Primitive): number {
   switch (p.kind) {
     case 'glyph':
     case 'text':

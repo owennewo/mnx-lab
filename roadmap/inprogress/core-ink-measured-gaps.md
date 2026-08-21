@@ -1,6 +1,41 @@
 # Vertical distance is measured ink to ink — cohesion and separation as two constants
 
-> **Status: PROPOSED 2026-08-21.** Raised from two screenshots of the same
+> **Status: IN PROGRESS — stages A and B built 2026-08-21; C and D open.**
+>
+> **Stage A (`da6534c`).** Labels and tempo marks sit `COHESION_CLEAR_SP = 1`
+> above the highest ink under their *own footprint* (± `TEXT_SIDE_CLEAR_SP`
+> = 0.5), or at `TEXT_MIN_RISE_SP = 1.5` over a clear staff — measured through
+> SMuFL boxes, so stems count. Two things the proposal had not spelled out:
+> the window is the text's footprint, not the bar (a tempo mark at the bar's
+> start does not climb over a segno at its end — the whole-bar version was
+> tried and looked exactly that silly); and text is drawn at a provisional
+> baseline then placed once its real extent exists, so engine and test measure
+> the same window. The tempo hands its box to the label pass explicitly,
+> because lifted over a stem it can climb past `rowTop`. `tightenRows` now
+> runs at every density: at 1 its formula only ever widens a gap whose ink
+> overran the pads, and every golden outside the text set staying put is that
+> claim checked corpus-wide. Goldens: exactly the **9** text-bearing scenarios
+> (the estimate said 8; `spec/tempo-markings` is the ninth); **6 demoted** to
+> stale for the `/verify` sweep.
+>
+> **Stage B.** The assembler runs twice: a *probe* pass opens every
+> to-be-measured gap to 100sp — at the real gap, nearest-band attribution
+> misfiles a verse row hanging 7sp under a notation staff as the tab's, and
+> ink extents are translation-invariant so the probe's answer is exact — then
+> a second pass sets each tab-adjacent gap, per row, to
+> `max(inkBelow + inkAbove + SEPARATION_CLEAR_SP (3), MIN_STAFF_GAP_SP (4))`,
+> `padDensity` scaling the two constants. Segments with nothing to measure
+> return the probe pass, which IS the provisional layout. Goldens: **20 of 21
+> `expected.both.svg`**, no standalone golden; **no demotions**, because no
+> record carries a `bothHash` yet — the both system earns its hash only
+> through a real approval, and that approval is what the sweep now gives it.
+> `LayoutResult.displays` (per row, per display band) is new metadata for the
+> harness. Assertions in `ink-measured-gaps.test.ts`: every tab-adjacent gap
+> equals the rule (attributing ink by a *different* method — class vocabulary
+> + nearest band — so the two can only agree by both being right), separation
+> holds, both narrowing and widening occur, notation↔notation gaps stay at 6.
+>
+> Originally: **PROPOSED 2026-08-21.** Raised from two screenshots of the same
 > score: in the `both` view the section label sits almost on the treble
 > stems and the tab staff crowds the notation above it while the bass staff
 > below floats in empty air; in the tab-only view the same label floats high

@@ -195,6 +195,10 @@ export interface LayoutResult {
   diagnostics: LayoutDiagnostic[];
   /** Staff bands per system row, in layout order (see RowBandSp). */
   rows?: RowBandSp[];
+  /** Per row, per display staff (notation staves, then any injected tab
+   *  staff, in display order): the band from its top line to its bottom line.
+   *  Metadata, like `rows` — never serialized into goldens. */
+  displays?: RowBandSp[][];
   /**
    * The system-packing input behind this layout, one per laid-out segment.
    *

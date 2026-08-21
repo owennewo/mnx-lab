@@ -39,7 +39,8 @@ import {
 } from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
 import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barlines.ts';
-import { clampPadDensity, tightenRows } from './verticalDensity.ts';
+import { anchorY, clampPadDensity, tightenRows } from './verticalDensity.ts';
+import { computeBoundsSp } from '../render/bounds.ts';
 import {
   anchorAt,
   emitNavigationMarkers,
@@ -93,6 +94,40 @@ const ROW_PAD_TOP_SP = 6;    // extra room for ledger lines / stems above
 const ROW_PAD_BOTTOM_SP = 6;
 const ROW_HEIGHT_SP = STAFF_HEIGHT_SP + ROW_PAD_TOP_SP + ROW_PAD_BOTTOM_SP;
 const INTER_STAFF_GAP_SP = 6; // between staves of a multi-staff part (grand staff)
+
+// Ink-measured staff gaps (roadmap/proposed/core-ink-measured-gaps.md, stage B).
+//
+// `INTER_STAFF_GAP_SP` is a line-to-line distance, and a reader never sees a
+// line-to-line distance: the notation→tab gap full of down-stems and the
+// tab→bass gap full of air were both 6sp and read as crowded and as empty. The
+// gap that matters is between the INK either side, so the assembler runs
+// twice — once with the provisional constant to find out where the ink goes,
+// once with each gap set to `ink below + ink above + SEPARATION_CLEAR_SP`,
+// floored at `MIN_STAFF_GAP_SP` so two bare staves still stand apart.
+// Separation, not cohesion: a tab staff does NOT belong to the notation staff
+// above it, which is why this constant is three times the text one.
+/** Clear space between one display staff's lowest ink and the next's highest. */
+export const SEPARATION_CLEAR_SP = 3;
+/** Floor on the line-to-line gap between display staves, ink or no ink. */
+export const MIN_STAFF_GAP_SP = 4;
+/** Primitives that span staves by construction (barlines, braces) or ARE the
+ *  staff (its lines) — not content, and never measured as ink in a gap. */
+const STRUCTURAL_CLASSES = new Set(['barline', 'staff-line', 'brace', 'bracket', 'group-label']);
+/**
+ * The PROBE gap the first pass opens between staves whose gap will be
+ * measured. Ink is attributed to the band its anchor is nearest, and at the
+ * real gap that is ambiguous — a verse row hanging 7sp under a notation staff
+ * is nearer the tab staff below it than the staff it belongs to, and counted
+ * as the tab's ink it would stop counting as ink IN the gap at all. At 100sp
+ * nothing is ambiguous; and because every extent is measured relative to its
+ * own staff's lines, the probe's answer is exactly the real layout's.
+ */
+const PROBE_GAP_SP = 100;
+/** Which display gaps are ink-measured. Stage B: those adjacent to a tab
+ *  staff (stage C widens this to every gap). */
+function isMeasuredGap(d: number, tabDisplayIndexes: ReadonlySet<number>): boolean {
+  return d > 0 && (tabDisplayIndexes.has(d) || tabDisplayIndexes.has(d - 1));
+}
 const BRACE_DESIGN_HEIGHT_SP = 3.988; // Bravura `brace` bbox height at scale 1
 const MARGIN_SP = 2;
 
@@ -732,6 +767,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   let cursorY = 0;
   let usedWidthSp = 0;
   const rows: RowBandSp[] = [];
+  const displays: RowBandSp[][] = [];
   // One per laid-out segment: a score with per-system layouts packs each range
   // separately, and a density value is only degenerate when it changes NONE of
   // them.
@@ -780,6 +816,9 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
       for (const band of r.rows) {
         rows.push({ staffTop: band.staffTop + cursorY, staffBottom: band.staffBottom + cursorY });
       }
+      for (const bands of r.displays) {
+        displays.push(bands.map(b => ({ staffTop: b.staffTop + cursorY, staffBottom: b.staffBottom + cursorY })));
+      }
       cursorY += r.heightSp;
     }
     usedWidthSp = Math.max(usedWidthSp, jobUsed);
@@ -795,7 +834,15 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
 
   return {
     primitives, widthSp, heightSp: tightened?.heightSp ?? cursorY, usedWidthSp, index, diagnostics,
-    rows: tightened?.rows ?? rows, packings
+    rows: tightened?.rows ?? rows,
+    // Display bands ride with their rows when the density pass moves them.
+    displays: tightened
+      ? displays.map((bands, r) => {
+          const dy = tightened.rows[r].staffTop - rows[r].staffTop;
+          return bands.map(b => ({ staffTop: b.staffTop + dy, staffBottom: b.staffBottom + dy }));
+        })
+      : displays,
+    packings
   };
 }
 
@@ -817,6 +864,88 @@ interface RenderSegmentArgs {
   inkRatio?: number;
 }
 
+/** One laid-out segment: what `layoutNotation` stacks. */
+interface SegmentResult {
+  primitives: Primitive[];
+  heightSp: number;
+  usedWidthSp: number;
+  rows: RowBandSp[];
+  /** Per row, per display staff (notation staves and injected tab staves in
+   *  display order): the band between its top and bottom line. */
+  displays: RowBandSp[][];
+  /** Display indexes that are injected tab staves. */
+  tabDisplayIndexes: Set<number>;
+  /** This segment's system-packing input — carried up so a host can ask what
+   *  other densities would draw (spacing.ts `densityLadder`). */
+  packing: PackingInput;
+}
+
+/**
+ * Lays a segment out twice when its staff gaps are ink-measured: the first
+ * pass, at the provisional gaps, is where the ink turns out to be; the second
+ * places each display staff `SEPARATION_CLEAR_SP` clear of the ink above it.
+ * Segments with nothing to measure (stage B: no tab staff) return the first
+ * pass untouched — byte-identical by construction, not by arithmetic.
+ */
+function renderSegment(args: RenderSegmentArgs): SegmentResult {
+  // The probe opens only the gaps that will be measured; a segment with none
+  // (no tab staff, in stage B) lays out at its provisional gaps and returns.
+  const probe = assembleSegment(args, null, true);
+  const overrides = measureDisplayGaps(probe, clampPadDensity(args.densityPad));
+  return overrides ? assembleSegment(args, overrides, false) : probe;
+}
+
+/**
+ * Per row, per display: the line-to-line gap above a display staff that keeps
+ * `SEPARATION_CLEAR_SP` between the ink of the two bands, or null where the
+ * gap stays provisional. Null overall when no gap is measured.
+ *
+ * Ink is what the first pass drew, measured through the same SMuFL boxes
+ * `tightenRows` trusts; a primitive belongs to the band its anchor falls in
+ * (midpoints between bands), and structural primitives — barlines, braces,
+ * the staff lines — are not ink. Ownership only matters for something that
+ * straddles a boundary, and those are exactly the structural ones.
+ */
+function measureDisplayGaps(seg: SegmentResult, padK: number): (number | null)[][] | null {
+  const { primitives, rows, displays, tabDisplayIndexes } = seg;
+  const displayCount = displays[0]?.length ?? 0;
+  const measured = (d: number) => isMeasuredGap(d, tabDisplayIndexes);
+  if (!Array.from({ length: displayCount }, (_, d) => d).some(measured)) return null;
+
+  const rowBounds = rows.slice(0, -1).map((b, r) => (b.staffBottom + rows[r + 1].staffTop) / 2);
+  const rowOf = (y: number) => {
+    let r = 0;
+    while (r < rowBounds.length && y >= rowBounds[r]) r++;
+    return r;
+  };
+  const buckets: Primitive[][][] = displays.map(bands => bands.map(() => []));
+  for (const p of primitives) {
+    if (STRUCTURAL_CLASSES.has((p.className ?? '').split(' ')[0])) continue;
+    const y = anchorY(p);
+    const r = rowOf(y);
+    const bands = displays[r];
+    let d = 0;
+    while (d + 1 < bands.length && y >= (bands[d].staffBottom + bands[d + 1].staffTop) / 2) d++;
+    buckets[r][d].push(p);
+  }
+
+  // The pad axis scales the clearances, not the pads (the doc's ruling 2);
+  // floored so a pad of 0 still leaves a visible gap, never overlap.
+  const sep = Math.max(1, SEPARATION_CLEAR_SP * padK);
+  const minGap = Math.max(1, MIN_STAFF_GAP_SP * padK);
+  return displays.map((bands, r) =>
+    bands.map((band, d) => {
+      if (!measured(d)) return null;
+      const upper = bands[d - 1];
+      const upperInk = computeBoundsSp(buckets[r][d - 1]);
+      const lowerInk = computeBoundsSp(buckets[r][d]);
+      const inkBelow = Math.max(0, (upperInk ? upperInk.y + upperInk.h : upper.staffBottom) - upper.staffBottom);
+      const inkAbove = Math.max(0, band.staffTop - (lowerInk ? lowerInk.y : band.staffTop));
+      return Math.max(inkBelow + inkAbove + sep, minGap);
+    })
+  );
+}
+
 // Left-of-system geometry: nested decorations step left of their parents,
 // staff/source labels sit left of all decorations, group labels leftmost.
 const DECOR_BASE_SP = 1.2;
@@ -825,15 +954,14 @@ const BRACE_STAFF_GAP_SP = 0.4; // gap between the brace's belly and the staff/s
 const LABEL_CHAR_SP = 1.0;
 const LABEL_PAD_SP = 0.6;
 
-function renderSegment(args: RenderSegmentArgs): {
-  primitives: Primitive[];
-  heightSp: number;
-  usedWidthSp: number;
-  rows: RowBandSp[];
-  /** This segment's system-packing input — carried up so a host can ask what
-   *  other densities would draw (spacing.ts `densityLadder`). */
-  packing: PackingInput;
-} {
+function assembleSegment(
+  args: RenderSegmentArgs,
+  /** Per row, per display: a measured line-to-line gap above the display, or
+   *  null to keep the provisional one. Null overall = first pass. */
+  gapOverrides: (number | null)[][] | null,
+  /** First pass: open every gap that will be measured to `PROBE_GAP_SP`. */
+  probe: boolean
+): SegmentResult {
   const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH, densityPad, inkRatio } = args;
   const primitives: Primitive[] = [];
 
@@ -1034,30 +1162,45 @@ function renderSegment(args: RenderSegmentArgs): {
     lyricBlockSp && !tabDisplayIndexes.has(displayCount - 1)
       ? Math.max(0, lyricBlockSp - ROW_PAD_BOTTOM_SP)
       : 0;
-  // The gap above each display staff. Constant between notation staves (the
-  // goldens pin that arithmetic); the gap above an injected tab staff is
-  // content-driven — it grows so 2+ verse rows hanging from the notation
-  // staff above stop colliding with the strings.
-  const gapAboveSp = (d: number) =>
+  // The PROVISIONAL gap above each display staff — the first pass's frame.
+  // Constant between notation staves (the goldens pin that arithmetic); above
+  // an injected tab staff it is lyric-aware, so the pass that measures the
+  // ink starts from a layout where verse rows already clear the strings.
+  const provisionalGapSp = (d: number) =>
     tabDisplayIndexes.has(d)
       ? Math.max(INTER_STAFF_GAP_SP, lyricBlockSp + TAB_LYRIC_CLEARANCE_SP)
       : INTER_STAFF_GAP_SP;
-  // Per-display-staff tops as prefix sums — generalizes the old uniform
-  // arithmetic (s * (STAFF_HEIGHT + GAP)) to mixed staff heights. For
-  // all-notation systems the integer sums are equal term for term, so the
-  // goldens cannot move.
-  const displayPrefix: number[] = [];
-  let displayHeightSum = 0;
-  let gapSum = 0;
-  for (const h of displayHeights) {
-    if (displayPrefix.length > 0) gapSum += gapAboveSp(displayPrefix.length);
-    displayPrefix.push(displayHeightSum + gapSum);
-    displayHeightSum += h;
+  // The second pass hands back measured gaps PER ROW: a staff gap has to hold
+  // along its whole system, and each system's ink is its own.
+  const rowCount = Math.max(1, plan.rowCount);
+  const gapAboveSp = (row: number, d: number) =>
+    gapOverrides?.[row]?.[d] ??
+    (probe && isMeasuredGap(d, tabDisplayIndexes) ? PROBE_GAP_SP : provisionalGapSp(d));
+  // Per row, per display: staff tops as prefix sums — the old uniform
+  // arithmetic (s * (STAFF_HEIGHT + GAP)) generalized to mixed staff heights
+  // and per-row gaps. Without overrides every row's sums are equal term for
+  // term to the old single array, so the goldens cannot move.
+  const displayPrefixByRow: number[][] = [];
+  const systemHeightByRow: number[] = [];
+  for (let r = 0; r < rowCount; r++) {
+    const prefix: number[] = [];
+    let heightSum = 0;
+    let gapSum = 0;
+    displayHeights.forEach((h, d) => {
+      if (d > 0) gapSum += gapAboveSp(r, d);
+      prefix.push(heightSum + gapSum);
+      heightSum += h;
+    });
+    displayPrefixByRow.push(prefix);
+    systemHeightByRow.push(ROW_PAD_TOP_SP + heightSum + gapSum + ROW_PAD_BOTTOM_SP + lyricExtraSp);
   }
-  const systemHeightSp =
-    ROW_PAD_TOP_SP + displayHeightSum + gapSum + ROW_PAD_BOTTOM_SP + lyricExtraSp;
+  const rowBaseOf = (row: number) => {
+    let y = MARGIN_SP;
+    for (let r = 0; r < row; r++) y += systemHeightByRow[r];
+    return y;
+  };
   const displayTopOf = (row: number, d: number) =>
-    MARGIN_SP + row * systemHeightSp + ROW_PAD_TOP_SP + displayPrefix[d];
+    rowBaseOf(row) + ROW_PAD_TOP_SP + displayPrefixByRow[row][d];
   const staffTopOf = (row: number, s: number) => displayTopOf(row, displayOfPlan[s]);
 
   // Lyric syllables collected per (staff, line) in document order; hyphens
@@ -1814,7 +1957,7 @@ function renderSegment(args: RenderSegmentArgs): {
     });
   }
 
-  emitEndings(mnx, plan, systemHeightSp, primitives);
+  emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives);
   if (ottavaOnsets && ottavaSpans.length) emitOttavas(ottavaSpans, plan, staffTopOf, ottavaOnsets, primitives);
 
   // The score-wide text row, last of all (core-ink-measured-gaps.md, stage A):
@@ -1832,13 +1975,22 @@ function renderSegment(args: RenderSegmentArgs): {
     emitScoreLabels({ gm, m, staffTop, rowTop, clearAbove: tempoTop, primitives });
   }
 
-  const heightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * systemHeightSp;
-  const rows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r): RowBandSp => ({
+  const heightSp = 2 * MARGIN_SP + systemHeightByRow.reduce((a, b) => a + b, 0);
+  const rows = Array.from({ length: rowCount }, (_, r): RowBandSp => ({
     staffTop: displayTopOf(r, 0),
     staffBottom: displayTopOf(r, displayCount - 1) + displayHeights[displayCount - 1]
   }));
+  const displays = Array.from({ length: rowCount }, (_, r) =>
+    displayHeights.map((h, d): RowBandSp => ({
+      staffTop: displayTopOf(r, d),
+      staffBottom: displayTopOf(r, d) + h
+    }))
+  );
 
-  return { primitives, heightSp, usedWidthSp: plan.usedWidthSp, rows, packing: plan.packing };
+  return {
+    primitives, heightSp, usedWidthSp: plan.usedWidthSp, rows, displays, tabDisplayIndexes,
+    packing: plan.packing
+  };
 }
 
 // ---------- Beams ----------
@@ -2283,7 +2435,8 @@ function emitSlursAndTies(
 function emitEndings(
   mnx: MnxStructure,
   plan: HorizontalPlan,
-  systemHeightSp: number,
+  /** The top staff's top line on a row — rows are no longer a uniform pitch. */
+  rowStaffTop: (row: number) => number,
   primitives: Primitive[]
 ): void {
   (mnx.global.measures ?? []).forEach((gm, i) => {
@@ -2296,7 +2449,7 @@ function emitEndings(
       const row = plan.measures[a].row;
       let b = a;
       while (b + 1 <= last && plan.measures[b + 1].row === row) b++;
-      const staffTop = MARGIN_SP + row * systemHeightSp + ROW_PAD_TOP_SP;
+      const staffTop = rowStaffTop(row);
       const y = staffTop - VOLTA_RISE_SP;
       const x1 = plan.measures[a].x + 0.1;
       const x2 = plan.measures[b].x + plan.measures[b].width - 0.1;

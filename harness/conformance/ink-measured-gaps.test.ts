@@ -14,8 +14,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
-import { layoutNotation } from '../../src/engine/layout/notation.ts';
+import {
+  layoutNotation,
+  MIN_STAFF_GAP_SP,
+  SEPARATION_CLEAR_SP
+} from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
+import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
+import { TAB_STAFF_HEIGHT_SP } from '../../src/engine/layout/tabStaff.ts';
+import { anchorY } from '../../src/engine/layout/verticalDensity.ts';
 import {
   COHESION_CLEAR_SP,
   TEXT_MIN_RISE_SP,
@@ -227,5 +234,125 @@ describe('ink-measured gaps — stage A, the score-text row', () => {
       expect(ink - bottomInkOf(label)).toBeCloseTo(COHESION_CLEAR_SP, 6);
     }
     expect(overInk).toBeGreaterThan(0);
+  });
+});
+
+// Stage B — the display staves of the `both` view. The gap above a tab staff,
+// and above the notation staff that follows one, is no longer a line-to-line
+// constant: it is the ink either side plus SEPARATION_CLEAR_SP, floored. The
+// ink is re-derived here from the primitives — the same bucketing by anchor,
+// the same structural exclusions — so the assembler's measurement and this
+// test can only agree by both being right.
+describe('ink-measured gaps — stage B, display staves in the both view', () => {
+  const STRUCTURAL = new Set(['barline', 'staff-line', 'brace', 'bracket', 'group-label']);
+  // The tab staff's own vocabulary (tabStaff.ts). Everything else is the
+  // notation staff's — attributed to the NEAREST notation band, never to a
+  // tab band, which is the point: a verse row hanging 7sp under a notation
+  // staff belongs to that staff however close the strings below have come.
+  // The engine attributes by a different method (a probe layout with the gap
+  // thrown wide open); the two must agree.
+  const TAB_CLASSES = new Set(['fret-number', 'fret-bg', 'tab-clef', 'tab-capo', 'tab-tuning-letter']);
+  // Drawn on either kind of staff (time signatures, repeat dots, diagnostic
+  // badges): attributed by containment, else to the nearest band of any kind.
+  const SHARED_CLASSES = new Set(['time-sig', 'time-sig-num', 'time-sig-den', 'repeat-dot', 'diagnostic-marker']);
+  const withBoth = corpus.filter(s => fs.existsSync(path.join(s.dir, 'expected.both.svg')));
+
+  interface Pair { lineGap: number; inkGap: number; expected: number; measured: boolean }
+
+  /** Every adjacent display pair of every row, with the gap the rule predicts. */
+  function pairsOf(layout: LayoutResult): Pair[] {
+    const displays = layout.displays!;
+    const rows = layout.rows!;
+    const isTab = (b: { staffTop: number; staffBottom: number }) =>
+      Math.abs(b.staffBottom - b.staffTop - TAB_STAFF_HEIGHT_SP) < 1e-6;
+    const rowBounds = rows.slice(0, -1).map((b, r) => (b.staffBottom + rows[r + 1].staffTop) / 2);
+    const rowOf = (y: number) => { let r = 0; while (r < rowBounds.length && y >= rowBounds[r]) r++; return r; };
+    const buckets: Primitive[][][] = displays.map(bands => bands.map(() => []));
+    const distance = (y: number, b: { staffTop: number; staffBottom: number }) =>
+      y < b.staffTop ? b.staffTop - y : y > b.staffBottom ? y - b.staffBottom : 0;
+    for (const p of layout.primitives) {
+      if (STRUCTURAL.has(cls(p))) continue;
+      const y = anchorY(p);
+      const r = rowOf(y);
+      const bands = displays[r];
+      const kind = TAB_CLASSES.has(cls(p)) ? 'tab' : SHARED_CLASSES.has(cls(p)) ? 'any' : 'notation';
+      let best = -1;
+      bands.forEach((b, d) => {
+        if (kind !== 'any' && isTab(b) !== (kind === 'tab')) return;
+        if (best < 0 || distance(y, b) < distance(y, bands[best])) best = d;
+      });
+      if (best < 0) best = 0;
+      buckets[r][best].push(p);
+    }
+    const out: Pair[] = [];
+    displays.forEach((bands, r) => {
+      for (let d = 1; d < bands.length; d++) {
+        const upper = bands[d - 1];
+        const lower = bands[d];
+        const up = computeBoundsSp(buckets[r][d - 1]);
+        const lo = computeBoundsSp(buckets[r][d]);
+        const inkBelow = Math.max(0, (up ? up.y + up.h : upper.staffBottom) - upper.staffBottom);
+        const inkAbove = Math.max(0, lower.staffTop - (lo ? lo.y : lower.staffTop));
+        const lineGap = lower.staffTop - upper.staffBottom;
+        const measured = isTab(upper) || isTab(lower);
+        out.push({
+          lineGap,
+          inkGap: lineGap - inkBelow - inkAbove,
+          expected: Math.max(inkBelow + inkAbove + SEPARATION_CLEAR_SP, MIN_STAFF_GAP_SP),
+          measured
+        });
+      }
+    });
+    return out;
+  }
+
+  it('there are both-view scenarios to check', () => {
+    expect(withBoth.length).toBeGreaterThan(10);
+  });
+
+  it('every gap adjacent to a tab staff is ink + separation (floored), and no other gap moved', () => {
+    initSmufl();
+    let measured = 0;
+    let narrowed = 0;
+    let widened = 0;
+    let untouched = 0;
+    for (const s of withBoth) {
+      let layout: LayoutResult;
+      try {
+        layout = layoutBothSystem({ mnx: readDoc(s.dir), widthSp: WIDTH_SP });
+      } catch {
+        continue;
+      }
+      if (!layout.displays) continue;
+      for (const pair of pairsOf(layout)) {
+        if (pair.measured) {
+          measured++;
+          expect(pair.lineGap).toBeCloseTo(pair.expected, 6);
+          // Separation really holds — and is met exactly unless the floor won.
+          expect(pair.inkGap).toBeGreaterThanOrEqual(SEPARATION_CLEAR_SP - 1e-6);
+          if (pair.lineGap < 6 - 1e-6) narrowed++;
+          if (pair.lineGap > 6 + 1e-6) widened++;
+        } else {
+          // Stage B's scope: notation↔notation gaps keep the provisional 6sp.
+          untouched++;
+          expect(pair.lineGap).toBeCloseTo(6, 6);
+        }
+      }
+    }
+    expect(measured).toBeGreaterThan(0);
+    // Both directions occur: the air under a tab staff collapses, the
+    // down-stems above one push it away. Neither alone would be the rule.
+    expect(narrowed).toBeGreaterThan(0);
+    expect(widened).toBeGreaterThan(0);
+    void untouched;
+  });
+
+  it('the standalone layouts are not touched: no tab staff, no second pass', () => {
+    initSmufl();
+    // A notation-only segment has nothing to measure in stage B and must
+    // return its first pass — the whole standalone golden set is the proof,
+    // and this is the same claim on one score.
+    const layout = layoutNotation({ mnx: readDoc(withBoth[0].dir), widthSp: WIDTH_SP });
+    for (const pair of pairsOf(layout)) expect(pair.lineGap).toBeCloseTo(6, 6);
   });
 });
