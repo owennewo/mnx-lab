@@ -50,7 +50,7 @@ function placeTextRun(
   firstNew: number,
   bottomInkAtZero: number,
   staffTop: number,
-  rowTop: number,
+  scan: readonly Primitive[],
   clearAbove: BoundsSp | null | undefined
 ): BoundsSp | null {
   const run = primitives.slice(firstNew);
@@ -61,7 +61,7 @@ function placeTextRun(
   const overlapsHandoff =
     clearAbove != null && clearAbove.x + clearAbove.w >= x0 && clearAbove.x <= x1;
   const bottomInk = Math.min(
-    textBottomAbove(primitives.slice(0, firstNew), x0, x1, staffTop, rowTop),
+    textBottomAbove(scan, x0, x1, staffTop),
     overlapsHandoff ? clearAbove.y - COHESION_CLEAR_SP : Infinity
   );
   const dy = bottomInk - bottomInkAtZero;
@@ -73,24 +73,24 @@ function placeTextRun(
  * The highest ink already drawn over [x0, x1] that rises above `staffTop`,
  * measured through the same SMuFL boxes the crop and `tightenRows` trust — so
  * a stem (a `line`, which a `.y` read cannot see) counts exactly as far as it
- * reaches. Bounded below by `rowTop` so the system above, whose x-range
- * repeats after a wrap, is never mistaken for this bar's ink. Null when the
- * space is clear.
+ * reaches. `scan` must hold THIS ROW's primitives and no other row's: after a
+ * system wrap the x-range repeats, and a geometric floor cannot separate a
+ * tall label stack of this row from the hanging ink of the row above once the
+ * pads are small — the callers know which primitives they drew for which row,
+ * so they say. Null when the space is clear.
  */
 export function inkTopAbove(
-  primitives: readonly Primitive[],
+  scan: readonly Primitive[],
   x0: number,
   x1: number,
-  staffTop: number,
-  rowTop: number
+  staffTop: number
 ): number | null {
   let top: number | null = null;
-  for (const p of primitives) {
+  for (const p of scan) {
     const b = computeBoundsSp([p]);
     if (!b) continue;
     if (b.x + b.w < x0 || b.x > x1) continue;
     if (b.y >= staffTop - ABOVE_LINE_EPS_SP) continue;
-    if (b.y + b.h <= rowTop) continue;
     top = top === null ? b.y : Math.min(top, b.y);
   }
   return top;
@@ -99,13 +99,12 @@ export function inkTopAbove(
 /** Where a piece of score text's BOTTOM ink goes: one cohesion clearance above
  *  the bar's ink, or the minimum rise above a clear staff. */
 export function textBottomAbove(
-  primitives: readonly Primitive[],
+  scan: readonly Primitive[],
   x0: number,
   x1: number,
-  staffTop: number,
-  rowTop: number
+  staffTop: number
 ): number {
-  const inkTop = inkTopAbove(primitives, x0, x1, staffTop, rowTop);
+  const inkTop = inkTopAbove(scan, x0, x1, staffTop);
   return inkTop === null ? staffTop - TEXT_MIN_RISE_SP : inkTop - COHESION_CLEAR_SP;
 }
 
@@ -261,15 +260,16 @@ export interface EmitScoreLabelsArgs {
   gm: MnxGlobalMeasure;
   m: { x: number; width: number };
   staffTop: number;
-  /** Top of the measure's own row band. The occupied scan must stop here:
-   *  after a system wrap the x-range repeats, so an unbounded scan sees the
-   *  SYSTEMS ABOVE and climbs the label to the top of the page (the
-   *  twelve-bar-blues "Turnaround over bar 1" bug). */
-  rowTop: number;
+  /** What the label must clear: THIS ROW's primitives drawn so far, and no
+   *  other row's. After a system wrap the x-range repeats, so a scan over
+   *  everything would see the systems above and climb the label to the top of
+   *  the page (the twelve-bar-blues "Turnaround over bar 1" bug); clearance
+   *  from the row above is `tightenRows`' job, not the label's. */
+  scan: readonly Primitive[];
   /**
    * The box of ink this row's own text pass already placed over the bar —
    * `emitTempoMark`'s return. Handed over explicitly because a tempo mark
-   * lifted over a stem can climb PAST `rowTop`, where the scan would take it
+   * lifted over a stem can stand taller than the row pad, where a geometric scan took it
    * for the system above and the label would land on top of it. Honoured
    * only where the footprints overlap, like everything else.
    */
@@ -286,7 +286,7 @@ export interface EmitScoreLabelsArgs {
  * needs no typography at all.
  */
 export function emitScoreLabels(args: EmitScoreLabelsArgs): void {
-  const { gm, m, staffTop, rowTop, clearAbove, primitives } = args;
+  const { gm, m, staffTop, scan, clearAbove, primitives } = args;
   if (!gm.rehearsal && !gm.section) return;
 
   // Labels describe the measure rather than a moment in it, so they align to the
@@ -362,7 +362,7 @@ export function emitScoreLabels(args: EmitScoreLabelsArgs): void {
     });
   }
 
-  placeTextRun(primitives, firstNew, 0, staffTop, rowTop, clearAbove);
+  placeTextRun(primitives, firstNew, 0, staffTop, scan, clearAbove);
 }
 
 
@@ -385,8 +385,8 @@ export interface EmitTempoMarkArgs {
   gm: MnxGlobalMeasure;
   m: { x: number; width: number; showTimeSig: boolean; timeSigCentreX: number; contentStartX: number };
   staffTop: number;
-  /** Top of the measure's row band — the ink scan's floor (see `inkTopAbove`). */
-  rowTop: number;
+  /** This row's primitives drawn so far (see `EmitScoreLabelsArgs.scan`). */
+  scan: readonly Primitive[];
   primitives: Primitive[];
 }
 
@@ -399,7 +399,7 @@ export interface EmitTempoMarkArgs {
  * label pass to clear explicitly — see `EmitScoreLabelsArgs.clearAbove`.
  */
 export function emitTempoMark(args: EmitTempoMarkArgs): BoundsSp | null {
-  const { gm, m, staffTop, rowTop, primitives } = args;
+  const { gm, m, staffTop, scan, primitives } = args;
   const tempo = (gm.tempos ?? [])[0];
   if (!tempo) return null;
   const firstNew = primitives.length;
@@ -428,5 +428,5 @@ export function emitTempoMark(args: EmitTempoMarkArgs): BoundsSp | null {
     size: 1.6,
     className: 'tempo'
   });
-  return placeTextRun(primitives, firstNew, belowBaseline, staffTop, rowTop, null);
+  return placeTextRun(primitives, firstNew, belowBaseline, staffTop, scan, null);
 }

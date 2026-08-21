@@ -33,8 +33,13 @@ import { tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
 
 const STAFF_HEIGHT_SP = TAB_STAFF_HEIGHT_SP;      // top string to bottom string
 
-const ROW_PAD_TOP_SP = 4;
-const ROW_PAD_BOTTOM_SP = 4;
+// The PROVISIONAL frame around a tab staff — halved from 4/4 on 2026-08-21
+// (owner's call: a tab staff has no stems, and 8sp of air between bare staves
+// read as abandoned). Safe because the frame is no longer the answer:
+// `tightenRows` widens any row whose ink overruns it (a capo line, a label
+// stack), and `ensureTopMargin` keeps the first row on the page.
+const ROW_PAD_TOP_SP = 2;
+const ROW_PAD_BOTTOM_SP = 2;
 const ROW_HEIGHT_SP = STAFF_HEIGHT_SP + ROW_PAD_TOP_SP + ROW_PAD_BOTTOM_SP;
 const MARGIN_SP = 2;
 
@@ -133,9 +138,13 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     validationByMeasure.set(v.measureIndex, list);
   }
 
+  // Where each row's primitives begin — rows are emitted in order, so a row's
+  // primitives are exactly the slice from its first measure onward.
+  const rowStart: number[] = [];
   for (let i = 0; i < numMeasures; i++) {
     const partMeasure = part.measures[i] ?? { sequences: [] };
     const m = plan.measures[i];
+    if (rowStart[m.row] === undefined) rowStart[m.row] = primitives.length;
     const staffTop = MARGIN_SP + m.row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP;
     const staffBottom = staffTop + STAFF_HEIGHT_SP;
 
@@ -209,10 +218,13 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     // Same order as the notation layout, and the order matters: labels scan
     // what already sits over this measure and stack above it.
     const gm = mnx.global.measures[i] ?? {};
-    const tempoTop = emitTempoMark({ gm, m, staffTop, rowTop: staffTop - ROW_PAD_TOP_SP, primitives });
+    // The text clears THIS ROW's ink only; the row above is tightenRows' job.
+    const tempoTop = emitTempoMark({
+      gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), primitives
+    });
     emitNavigationMarkers({ gm, m, stdSequences, staffTop, primitives });
     emitScoreLabels({
-      gm, m, staffTop, rowTop: staffTop - ROW_PAD_TOP_SP, clearAbove: tempoTop, primitives
+      gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), clearAbove: tempoTop, primitives
     });
 
     // End barline — the global measure's style, defaulted per the spec. A tab

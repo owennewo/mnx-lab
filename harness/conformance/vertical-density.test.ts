@@ -168,10 +168,13 @@ describe('vertical density — what the axis actually buys', () => {
       layoutNotation({ mnx, widthSp: WIDTH_SP, densityPad: 0 }).heightSp
     );
 
-    // Both are real; tab is the dramatic one. A tab staff's median ink above
-    // it is 0.0sp against a 4sp reservation.
+    // Both are real. Tab used to be the dramatic one (median ink above a tab
+    // staff is 0.0sp against what was a 4sp reservation); on 2026-08-21 the
+    // tab pads were halved to 2sp, so the axis now has less to reclaim there
+    // than from notation's 6sp — and that is the point of the change, not a
+    // regression in the axis.
     expect(notation).toBeGreaterThan(0.1);
-    expect(tab).toBeGreaterThan(notation);
+    expect(tab).toBeGreaterThan(0);
   });
 
   it('scales the page margin too, floored so a system is never flush to the edge', () => {

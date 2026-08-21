@@ -104,27 +104,45 @@ function barsOf(layout: LayoutResult, row: number): [number, number][] {
   return bars;
 }
 
-/** Where this row's space ends and the system above begins: the midpoint of
- *  the inter-row gap — `tightenRows`' own ownership rule, and (at the default
- *  pads) exactly the engine's `rowTop`. */
-const floorOf = (layout: LayoutResult, row: number) =>
-  row > 0 ? (layout.rows[row - 1].staffBottom + layout.rows[row].staffTop) / 2 : -Infinity;
+/**
+ * Which row a primitive belongs to — this test's own rule, independent of the
+ * engine's (which knows by construction what it drew for which row). Score
+ * text sits above its staff, so it belongs to the first row whose top line is
+ * below it; everything else belongs to the row whose band is nearest by the
+ * inter-row midpoint, `tightenRows`' rule. Two methods, one answer.
+ */
+const TEXT_ROW_CLASSES = new Set([...LABEL_CLASSES, 'tempo', ...NAV_CLASSES]);
+function rowPrims(layout: LayoutResult, row: number): Primitive[] {
+  const rows = layout.rows!;
+  const bounds = rows.slice(0, -1).map((b, r) => (b.staffBottom + rows[r + 1].staffTop) / 2);
+  return layout.primitives.filter(p => {
+    const y = anchorY(p);
+    if (TEXT_ROW_CLASSES.has(cls(p))) {
+      let r = rows.findIndex(b => b.staffTop > y);
+      if (r < 0) r = rows.length - 1;
+      return r === row;
+    }
+    let r = 0;
+    while (r < bounds.length && y >= bounds[r]) r++;
+    return r === row;
+  });
+}
 
 interface Checked { labels: number; tempos: number; clear: number; atMinRise: number }
 
 /** Every bar of every row: assert the clearance for each text group found. */
 function checkLayout(layout: LayoutResult): Checked {
   const out: Checked = { labels: 0, tempos: 0, clear: 0, atMinRise: 0 };
-  const prims = layout.primitives;
   layout.rows.forEach((band, row) => {
     const staffTop = band.staffTop;
-    const floor = floorOf(layout, row);
+    const prims = rowPrims(layout, row);
+    const floor = -Infinity;
     for (const [x0, x1] of barsOf(layout, row)) {
       const inBar = (p: Primitive) => {
         const px = (p as { x?: number }).x;
         const py = (p as { y?: number }).y;
         return px !== undefined && py !== undefined &&
-          px >= x0 - 1e-6 && px <= x1 + 1e-6 && py < staffTop && py > floor;
+          px >= x0 - 1e-6 && px <= x1 + 1e-6 && py < staffTop;
       };
       const labels = prims.filter(p => isLabel(p) && inBar(p));
       const tempos = prims.filter(p => isTempo(p) && inBar(p));
@@ -219,8 +237,8 @@ describe('ink-measured gaps — stage A, the score-text row', () => {
       const staffTop = layout.rows[row].staffTop;
       const foot = computeBoundsSp([label])!;
       const ink = inkTopOver(
-        layout.primitives.filter(p => !isLabel(p)),
-        foot.x - TEXT_SIDE_CLEAR_SP, foot.x + foot.w + TEXT_SIDE_CLEAR_SP, staffTop, floorOf(layout, row)
+        rowPrims(layout, row).filter(p => !isLabel(p)),
+        foot.x - TEXT_SIDE_CLEAR_SP, foot.x + foot.w + TEXT_SIDE_CLEAR_SP, staffTop, -Infinity
       );
       // "Head" and "Turnaround" open their systems, so what sits under them
       // is the clef and key signature rising above the top line — not 2.8sp

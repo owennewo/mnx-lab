@@ -1252,9 +1252,13 @@ function assembleSegment(
     : [];
   const ottavaOnsets = ottavaSpans.length ? new Map<number, OnsetX[][]>() : null;
 
+  // Where each row's primitives begin in the measure loop — rows are emitted
+  // in order — so the text pass can scan exactly one row's ink.
+  const rowLoopStart: number[] = [];
   for (let i = 0; i < numMeasures; i++) {
     const m = plan.measures[i];
     if (m.hidden) continue;
+    if (rowLoopStart[m.row] === undefined) rowLoopStart[m.row] = primitives.length;
     const staffTops = Array.from({ length: numStaves }, (_, s) => staffTopOf(m.row, s));
     const staffBottoms = staffTops.map(t => t + STAFF_HEIGHT_SP);
     // The system's top staff / overall bottom — barlines span the lot,
@@ -1953,6 +1957,8 @@ function assembleSegment(
     }
   }
 
+  const loopEnd = primitives.length;
+
   for (const run of beams.runs) emitBeamRun(run, primitives);
 
   emitSlursAndTies(segment, plan, curveAnchors, primitives);
@@ -1995,14 +2001,36 @@ function assembleSegment(
   // whatever ink the bar already carries over its top staff — beamed stems,
   // voltas and ottava brackets included, which is why this runs here rather
   // than inside the measure loop. Tempo first, so the labels stack over it.
+  // Each row's scan: its slice of the measure loop, the post-loop passes'
+  // primitives (beams, curves, lyrics, voltas, ottavas) that its band owns by
+  // anchor — those sit near their staff, so the midpoint rule is safe for
+  // them — and the text this pass has already placed on the row. Never the
+  // row above: clearing it is tightenRows' job.
+  const textPassStart = primitives.length;
+  const rowBoundaries = Array.from({ length: rowCount - 1 }, (_, r) =>
+    (displayTopOf(r, displayCount - 1) + displayHeights[displayCount - 1] + displayTopOf(r + 1, 0)) / 2
+  );
+  const postLoopByRow: Primitive[][] = Array.from({ length: rowCount }, () => []);
+  for (const p of primitives.slice(loopEnd, textPassStart)) {
+    const y = anchorY(p);
+    let r = 0;
+    while (r < rowBoundaries.length && y >= rowBoundaries[r]) r++;
+    postLoopByRow[r].push(p);
+  }
+  const rowTextStart: number[] = [];
   for (let i = 0; i < numMeasures; i++) {
     const m = plan.measures[i];
     if (m.hidden) continue;
+    if (rowTextStart[m.row] === undefined) rowTextStart[m.row] = primitives.length;
     const gm = mnx.global.measures[i] ?? {};
     const staffTop = staffTopOf(m.row, 0);
-    const rowTop = staffTop - ROW_PAD_TOP_SP;
-    const tempoTop = emitTempoMark({ gm, m, staffTop, rowTop, primitives });
-    emitScoreLabels({ gm, m, staffTop, rowTop, clearAbove: tempoTop, primitives });
+    const scan = () => [
+      ...primitives.slice(rowLoopStart[m.row] ?? loopEnd, rowLoopStart[m.row + 1] ?? loopEnd),
+      ...postLoopByRow[m.row],
+      ...primitives.slice(rowTextStart[m.row])
+    ];
+    const tempoTop = emitTempoMark({ gm, m, staffTop, scan: scan(), primitives });
+    emitScoreLabels({ gm, m, staffTop, scan: scan(), clearAbove: tempoTop, primitives });
   }
 
   const heightSp = 2 * MARGIN_SP + systemHeightByRow.reduce((a, b) => a + b, 0);

@@ -188,6 +188,15 @@ Each stage is its own landing with its own `update:primitives` diff and
   rule for `INTER_STAFF_GAP_SP` between notation staves. Widest radius: every
   multi-staff notation golden. Last, and only after A and B have shown the
   rule reads well in review.
+- *2026-08-21, ahead of D:* the tab row pads were **halved, 4/4 → 2/2** (owner's
+  call — a tab staff has no stems, and 8sp between bare staves read as
+  abandoned). Safe because the frame is no longer the answer: `tightenRows`
+  widens any row whose ink overruns it. It forced one more honesty: the score
+  text's scan used to stop at a geometric floor (`staffTop − pad`), which at
+  2sp is closer than a segno's rise; the callers now hand the text exactly
+  THIS ROW's primitives (rows are emitted in order, so a row is a slice), and
+  clearing the row above is `tightenRows`' job alone. 21 tab goldens moved,
+  none verified, nothing else.
 - **Stage D (decision, not code) — density 1 becomes ink-measured** between
   systems. *2026-08-21 ruling recorded ahead of it:* the pad axis is **decoupled**
   from `density-h` (see the appendix on core-vertical-density.md) — vertical
