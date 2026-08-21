@@ -1,6 +1,35 @@
 # Rigid columns are ink — price them on the ink scale
 
-> **Status: PROPOSED 2026-08-20.** This doc is the decision that commit
+> **Status: BUILT 2026-08-21** (`0ebedf9`, *"Price rigid columns on the ink
+> scale"*). `planHorizontal` takes `inkRatio`; every rigid ink contribution
+> re-prices by it and each row re-justifies over the scaled rigids with its
+> **square** membership — `packSystems` never sees the ratio. The three
+> renderers derive the ratio after the square fit and re-place at it (the fit
+> is not redone); the key-signature run reads `plan.inkRatio` so the one
+> prefix glyph *run* fills the column priced for it. Goldens byte-identical
+> (`update:primitives`, clean diff); 844 tests, corpus police and build green.
+>
+> Five conformance assertions in `zoom-density.test.ts`, each mutation-checked
+> against the plumbing it claims: the ratio-1 path is untouched; row
+> membership is invariant across 0.6–2.3 on both staff kinds (breaking the
+> freeze fails exactly this one); the TAB clef clears the time signature at
+> 1.4 / 1.6 / 2.3 **and the square-anchored counterfactual collides by 2.3**;
+> the notation prefix clears through a four-sharp run (dropping the run's
+> ratio fails exactly this one); a full row still ends at the margin after
+> re-pricing — the springs paid, not the page.
+>
+> **Named residue, not a regression:** within-column *note-cluster* offsets —
+> accidental→notehead, grace/tremolo/tuplet run advances, dots, ledger
+> overhang, chord seconds — still draw square around their anchor
+> (`notation.ts` emission helpers). The plan reserves the right scaled column
+> for each; the cluster sits compactly at its left. They are the same family
+> as stem and flag offsets, and threading the ratio through the emission
+> layer is one pass over every glyph-relative x in `notation.ts`, worth doing
+> as its own item if a dense chord at high zoom ever reads as tight. The
+> prefix, which is what the reader's eye lands on at every system start, is
+> fully priced.
+>
+> Originally: **PROPOSED 2026-08-20.** This doc is the decision that commit
 > `fd6b06e` (*"Staff scale stops dragging the horizontal axis behind it"*,
 > 2026-08-15) explicitly left open. Its closing line: *"Known cost, left for a
 > decision: the spacing plan still reserves width for glyphs at square scale,
@@ -9,7 +38,7 @@
 > exactly that — the TAB clef run into the time signature under the pad's
 > vertical arm — and this is the decision.
 >
-> Sibling: [core-ragged-last.md](core-ragged-last.md), found in the same
+> Sibling: [core-ragged-last.md](../proposed/core-ragged-last.md), found in the same
 > session. Different mechanism (the justifier's stretch cap, not the scale),
 > different golden story (that one moves goldens; this one must not), so it is
 > its own item.
@@ -164,7 +193,7 @@ once and both staves read it. No per-staff ratio exists to disagree.
   bars between systems under zoom — exactly what was banned. If extreme-zoom
   overflow ever hurts in practice, that is a *new* decision with its own
   evidence, and this doc's frozen-packing rule is where it would be argued.
-- **Not the last-row stretch** — [core-ragged-last.md](core-ragged-last.md).
+- **Not the last-row stretch** — [core-ragged-last.md](../proposed/core-ragged-last.md).
 - **Not touching `svg.ts`'s dimension rule.** Ink follows `ky`; that half of
   `fd6b06e` is correct and is the premise here, not the patient.
 

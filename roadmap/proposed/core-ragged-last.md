@@ -1,7 +1,7 @@
 # The last system borrows its stretch from the page
 
 > **Status: PROPOSED 2026-08-20.** Found in the same tab-view session as
-> [core-ink-priced-columns.md](core-ink-priced-columns.md): a score whose
+> [core-ink-priced-columns.md](../complete/core-ink-priced-columns.md): a score whose
 > first system runs at stretch ≈ 1 and whose leftover final bar is set at the
 > `MAX_STRETCH = 2.5` cap — two and a half times the note spacing of the row
 > above it, and *still* short of the right margin. Different mechanism than

@@ -197,6 +197,6 @@ page and still misses the margin. Filed as
 [core-ragged-last.md](../proposed/core-ragged-last.md) — the last row borrows its stretch
 ceiling from the loosest other row on the page, a page-relative rule rather than a
 `ragged-last` threshold constant. (Its sibling,
-[core-ink-priced-columns.md](../proposed/core-ink-priced-columns.md), covers the non-square
+[core-ink-priced-columns.md](core-ink-priced-columns.md), covers the non-square
 staff-scale cost `fd6b06e` left open; see the appendix on
 [core-zoom-density-pad.md](core-zoom-density-pad.md).)

@@ -159,18 +159,6 @@ proposals that name their campaign.
   Step zero is a **fixture** — none of the three reference scores contains a tuplet or a
   grace note, which is why the round trips are honestly lossless and still never present
   the case. Import/export follows the collapse-expand precedent already solved for voltas.
-- **[core-ink-priced-columns.md](proposed/core-ink-priced-columns.md)** — rigid columns are
-  **ink**; price them on the ink scale. The decision `fd6b06e` left open: staff scale grows
-  every glyph dimension on the vertical scale while the plan's columns stay priced
-  horizontally, so above ~1.2 ink ratio the ink outgrows its columns — first seen as the
-  TAB clef running into the time signature (2026-08-20), latent in every rigid column and
-  tighter still on `gClef`. Names the trilemma (ink scales both axes / placement frozen /
-  no collisions — pick two), resolves it with the plan's own rigid-vs-spring taxonomy: an
-  `inkRatio` multiplies rigid ink contributions, springs absorb via the justifier, packing
-  stays square so bars never jump systems under zoom. Goldens byte-identical by the
-  `tightenRows` does-not-run precedent. Appendix planted on
-  [core-zoom-density-pad.md](complete/core-zoom-density-pad.md) (ruling 1's collision
-  guarantee now has a square-scale premise).
 - **[core-ragged-last.md](proposed/core-ragged-last.md)** — the last system borrows its
   stretch from the page. A sparse final row justifies into the `MAX_STRETCH = 2.5` cap —
   2.5× the texture of the rows above, still short of the margin. Rule: the last row may
@@ -264,6 +252,20 @@ proposals that name their campaign.
   gestures are mirrored here as data, including the container rung and explicit
   rung-first Delete meanings through section.
 ### complete/
+- **[core-ink-priced-columns.md](complete/core-ink-priced-columns.md)** — rigid columns are
+  **ink**; price them on the ink scale. **Built 2026-08-21.** The decision `fd6b06e` left
+  open: staff scale grows every glyph dimension on the vertical scale while the plan priced
+  its columns horizontally, so above ~1.2 ink ratio the ink outgrew its columns — first seen
+  as the TAB clef running into the time signature, latent in every rigid column. Resolved
+  with the plan's own rigid-vs-spring taxonomy: `planHorizontal` takes an `inkRatio`, rigid
+  ink re-prices by it, each row re-justifies over the scaled rigids with its **square**
+  membership (`packSystems` never sees the ratio — bars never jump systems under zoom), the
+  renderers derive the ratio after the square fit. Goldens byte-identical; five mutation-
+  checked assertions in `zoom-density.test.ts`, including the square-anchor counterfactual
+  colliding. Named residue: within-column note-cluster offsets still draw square around
+  their anchor inside correctly-priced columns. Appendix on
+  [core-zoom-density-pad.md](complete/core-zoom-density-pad.md) records ruling 1's
+  square-scale premise.
 - **[core-derived-positions.md](complete/core-derived-positions.md)** — the execution half of
   [spec-instrument-position.md](proposed/spec-instrument-position.md): migrate `_x.mnxLab` to the
   proposal's shape (v5: string authoritative, `fret` optional and non-authoritative, `fingering`
