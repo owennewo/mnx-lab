@@ -3,6 +3,7 @@ import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from 
 import { validateDocument } from './validate.ts';
 import { dynamicGlyph, dynamicLabel } from './dynamics.ts';
 import {
+  clampDensity,
   planHorizontal,
   resolveStaffVoices,
   PlanStaff,
@@ -784,6 +785,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   // translates by 0 — byte-identical output.
   let cursorY = 0;
   let usedWidthSp = 0;
+  let naturalWidthSp: number | undefined;
   const rows: RowBandSp[] = [];
   const displays: RowBandSp[][] = [];
   // One per laid-out segment: a score with per-system layouts packs each range
@@ -812,6 +814,9 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
       })
     );
     const jobUsed = Math.max(...rs.map(r => r.usedWidthSp));
+    const jobNatural = rs.some(r => r.naturalWidthSp !== undefined)
+      ? Math.max(...rs.map(r => r.naturalWidthSp ?? r.usedWidthSp))
+      : undefined;
     if (job.title !== null) {
       cursorY += TITLE_SIZE_SP + 1;
       primitives.push({
@@ -841,6 +846,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
       cursorY += r.heightSp;
     }
     usedWidthSp = Math.max(usedWidthSp, jobUsed);
+    if (jobNatural !== undefined) naturalWidthSp = Math.max(naturalWidthSp ?? 0, jobNatural);
   }
 
   // Vertical density last, over the finished score: rows are re-placed against
@@ -852,7 +858,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   });
 
   return {
-    primitives, widthSp, heightSp: tightened?.heightSp ?? cursorY, usedWidthSp, index, diagnostics,
+    primitives, widthSp, heightSp: tightened?.heightSp ?? cursorY, usedWidthSp, naturalWidthSp,
+    index, diagnostics,
     rows: tightened?.rows ?? rows,
     // Display bands ride with their rows when the density pass moves them.
     displays: tightened
@@ -898,6 +905,8 @@ interface SegmentResult {
   /** This segment's system-packing input — carried up so a host can ask what
    *  other densities would draw (spacing.ts `densityLadder`). */
   packing: PackingInput;
+  /** This segment's width at density 1 — see `LayoutResult.naturalWidthSp`. */
+  naturalWidthSp?: number;
 }
 
 /**
@@ -1033,7 +1042,7 @@ function assembleSegment(
   // All horizontal decisions (system packing, bar widths, event x positions)
   // come from the shared plan — layoutTab consumes the same one, which is what
   // keeps notation and tab column-aligned in the "both" view.
-  const plan = planHorizontal(mnx, widthSp, {
+  const planOptions = {
     densityH,
     densityPad,
     inkRatio,
@@ -1043,7 +1052,15 @@ function assembleSegment(
     forcedBreaks: segment.forcedBreaks,
     measureRange: segment.range ?? undefined,
     minMeasures: segment.minMeasures
-  });
+  };
+  const plan = planHorizontal(mnx, widthSp, planOptions);
+  // The score's natural extent, for the fit — see `LayoutResult.naturalWidthSp`.
+  // Skipped at density 1 (same number) and on the probe pass, whose only job is
+  // to find where the ink goes.
+  const naturalWidthSp =
+    probeGapSp !== null || clampDensity(densityH) === 1
+      ? undefined
+      : planHorizontal(mnx, widthSp, { ...planOptions, densityH: 1 }).usedWidthSp;
   const numMeasures = plan.measures.length;
 
   // ---- Display staves: the plan's notation staves plus, in the `both` view,
@@ -2060,8 +2077,8 @@ function assembleSegment(
   );
 
   return {
-    primitives, heightSp, usedWidthSp: plan.usedWidthSp, rows, displays, tabDisplayIndexes,
-    packing: plan.packing
+    primitives, heightSp, usedWidthSp: plan.usedWidthSp, naturalWidthSp,
+    rows, displays, tabDisplayIndexes, packing: plan.packing
   };
 }
 

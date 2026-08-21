@@ -1,6 +1,6 @@
 import { MnxStructure } from '../../model/mnx.ts';
 import { Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex } from '../primitives.ts';
-import { planHorizontal, staffOneSequences } from './spacing.ts';
+import { clampDensity, planHorizontal, staffOneSequences } from './spacing.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
 import {
   TAB_STAFF_HEIGHT_SP,
@@ -116,12 +116,20 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   // clef slot for the tab clef. The `both` view goes through layoutNotation
   // instead, where the tab staff shares a system with a notation staff that
   // does draw one, and must keep agreeing with its columns.
-  const plan = planHorizontal(mnx, widthSp, {
+  const planOptions = {
     densityH: opts.densityH,
     densityPad: opts.densityPad,
     inkRatio: opts.inkRatio,
-    staffKind: 'tab'
-  });
+    staffKind: 'tab' as const
+  };
+  const plan = planHorizontal(mnx, widthSp, planOptions);
+  // The score's natural extent, for the fit — see `LayoutResult.naturalWidthSp`.
+  // Only when density has actually moved: at 1 it is the same number, and the
+  // default paint must not pay for a second plan.
+  const naturalWidthSp =
+    clampDensity(opts.densityH) === 1
+      ? undefined
+      : planHorizontal(mnx, widthSp, { ...planOptions, densityH: 1 }).usedWidthSp;
 
   // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
   // into each measure's diagnostic markers alongside renderer-gap issues.
@@ -276,7 +284,8 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   });
 
   return {
-    primitives, widthSp, heightSp: tightened?.heightSp ?? heightSp, usedWidthSp: plan.usedWidthSp,
+    primitives, widthSp, heightSp: tightened?.heightSp ?? heightSp,
+    usedWidthSp: plan.usedWidthSp, naturalWidthSp,
     index, diagnostics, rows: tightened?.rows ?? rows,
     packings: [plan.packing]
   };

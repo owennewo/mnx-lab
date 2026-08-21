@@ -49,6 +49,7 @@ import {
   MAX_DENSITY
 } from '../../src/engine/layout/spacing.ts';
 import { glyphBBox } from '../../src/engine/smufl/smufl.ts';
+import { fitPxPerSp } from '../../src/engine/render/svg.ts';
 import type { GlyphPrim, Primitive } from '../../src/engine/primitives.ts';
 import {
   BASELINE_PX_PER_SP,
@@ -598,5 +599,78 @@ describe('zoom / density', () => {
         expect(worst).toBeGreaterThan(0.2);
       }
     });
+  });
+});
+
+// The fit and the density knob (2026-08-21).
+//
+// `fitPxPerSp` scales a score up when its content is narrower than the
+// viewport — meant for a one-measure example, which should not be drawn at its
+// own tiny natural width. Asked of `usedWidthSp` it also answered about the
+// density KNOB: density squeezed the music, `usedWidthSp` shrank, and the fit
+// zoomed back in to fill the viewport, cancelling the knob and over-cancelling
+// it enough to run BACKWARDS. Reported from the workbench: moving SPACE from 2
+// to 6 made the bars narrower.
+describe('the fit answers about the score, not about the density knob', () => {
+  const VIEWPORT_PX = 1500;
+  const BASE = 10;
+
+  /** Drawn width of the first bar, exactly as a renderer would scale it. */
+  const bar1Px = (densityH: number, useNatural: boolean) => {
+    const layout = layoutTab({
+      mnx: doc('lab/document/twelve-bar-blues'),
+      widthSp: VIEWPORT_PX / BASE,
+      densityH
+    });
+    const forFit = useNatural ? layout.naturalWidthSp ?? layout.usedWidthSp : layout.usedWidthSp;
+    const pxPerSp = fitPxPerSp(VIEWPORT_PX, forFit, BASE);
+    const top = layout.rows![0].staffTop;
+    const xs = [
+      ...new Set(
+        layout.primitives
+          .filter(
+            (p): p is Extract<Primitive, { kind: 'line' }> =>
+              p.kind === 'line' &&
+              p.className.split(' ')[0] === 'barline' &&
+              Math.abs(p.y1 - top) < 1e-6
+          )
+          .map(p => Math.round(p.x1 * 1e4) / 1e4)
+      )
+    ].sort((a, b) => a - b);
+    return (xs[1] - xs[0]) * pxPerSp;
+  };
+
+  const LADDER = [0.02, 0.04, 0.06, 0.1, 0.14, 0.2, 0.3, 0.5, 1];
+
+  it('a bar never gets narrower as the reader asks for more space', () => {
+    initSmufl();
+    for (let i = 1; i < LADDER.length; i++) {
+      expect(
+        bar1Px(LADDER[i], true),
+        `SPACE ${LADDER[i] * 100} should not be tighter than ${LADDER[i - 1] * 100}`
+      ).toBeGreaterThanOrEqual(bar1Px(LADDER[i - 1], true) - 1e-9);
+    }
+    // …and it genuinely moves across the range, so the claim is not trivially
+    // satisfied by a knob that does nothing.
+    expect(bar1Px(1, true)).toBeGreaterThan(bar1Px(0.02, true) * 1.5);
+  });
+
+  it('and that is not vacuous: fitting on the squeezed width ran backwards', () => {
+    initSmufl();
+    // The reported case, reproduced through the old rule.
+    expect(bar1Px(0.3, false)).toBeLessThan(bar1Px(0.02, false));
+  });
+
+  it('a naturally short score is still scaled up — what the fit is for', () => {
+    initSmufl();
+    // The behaviour the fit exists to provide must survive: a one-system
+    // scenario at default density still fills the pane rather than being drawn
+    // at its own natural width.
+    const layout = layoutTab({
+      mnx: doc('lab/tab-positions/open-strings-chord'),
+      widthSp: VIEWPORT_PX / BASE
+    });
+    expect(layout.naturalWidthSp).toBeUndefined(); // density 1: no second plan
+    expect(fitPxPerSp(VIEWPORT_PX, layout.usedWidthSp, BASE)).toBeGreaterThan(BASE);
   });
 });

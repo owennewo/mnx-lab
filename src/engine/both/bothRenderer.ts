@@ -72,7 +72,7 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
   const square = layoutBothSystem(layoutArgs);
 
   const fitted = opts.pxPerSp === undefined;
-  const pxPerSp = fitted ? fitPxPerSp(opts.width, square.usedWidthSp, basePxPerSp) : basePxPerSp;
+  const pxPerSp = fitted ? fitPxPerSp(opts.width, square.naturalWidthSp ?? square.usedWidthSp, basePxPerSp) : basePxPerSp;
   // Staff scale is ABSOLUTE against the baseline, not a multiplier on the
   // horizontal scale — 1.2 means the same size ink whatever the viewport did.
   // A control that seeds its first step from the last painted scale (the pad

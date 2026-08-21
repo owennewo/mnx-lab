@@ -230,6 +230,23 @@ export interface LayoutResult {
    * Lets the renderer scale short scores up to fill the viewport.
    */
   usedWidthSp: number;
+  /**
+   * What `usedWidthSp` would be at horizontal density 1 — the score's NATURAL
+   * extent, and the only honest input to the fit.
+   *
+   * `fitPxPerSp` exists to stop a one-measure example being drawn at its own
+   * tiny natural width ("a one-measure example shouldn't become a poster"), so
+   * the question it means to ask is about the SCORE. Asked of `usedWidthSp` it
+   * accidentally asks about the density KNOB too: density squeezes the music,
+   * `usedWidthSp` shrinks, and the fit zooms straight back in to fill the
+   * viewport — cancelling the knob, and over-cancelling it enough that bar
+   * widths ran BACKWARDS from density 0.02 to 0.3 (measured on
+   * twelve-bar-blues at 1500px: bar 1 went 178px → 158px as density tripled).
+   *
+   * Absent when density is already 1, where it would equal `usedWidthSp` — so
+   * the default path pays nothing for it.
+   */
+  naturalWidthSp?: number;
   index: SpatialIndex;
   /** Non-fatal problems encountered while laying out (forgiving render). */
   diagnostics: LayoutDiagnostic[];

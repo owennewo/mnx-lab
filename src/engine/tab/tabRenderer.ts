@@ -65,11 +65,14 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
   };
   const square = layoutTab(layoutArgs);
 
+  // The fit asks whether the SCORE is narrower than the viewport, so it reads
+  // the natural extent — `usedWidthSp` moves with the density knob and would
+  // have the fit cancel it (see `LayoutResult.naturalWidthSp`).
   // An explicit pxPerSp pins the scale; the default scales short scores up to
   // fill the viewport. Notation derives the same factor from the shared
   // horizontal plan, so the `both` view stays column-aligned.
   const fitted = opts.pxPerSp === undefined;
-  const pxPerSp = fitted ? fitPxPerSp(opts.width, square.usedWidthSp, basePxPerSp) : basePxPerSp;
+  const pxPerSp = fitted ? fitPxPerSp(opts.width, square.naturalWidthSp ?? square.usedWidthSp, basePxPerSp) : basePxPerSp;
   // Staff scale is ABSOLUTE against the baseline, not a multiplier on the
   // horizontal scale — 1.2 means the same size ink whatever the viewport did.
   // A control that seeds its first step from the last painted scale (the pad
