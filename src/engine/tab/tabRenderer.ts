@@ -1,7 +1,7 @@
 import { MnxStructure } from '../../model/mnx.ts';
 import { PartTabSetups } from './guitarPositions.ts';
 import { layoutTab } from '../layout/tab.ts';
-import { computeBoundsSp } from '../render/bounds.ts';
+import { computeBoundsSp, CROP_PAD_SP } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
 import type { RenderedProjection } from '../render/projection.ts';
 import {
@@ -20,8 +20,6 @@ import {
 
 const DEFAULT_PX_PER_SP = 10;
 
-/** Breathing room around the cropped content, in staff spaces. */
-const CROP_PAD_SP = 1;
 
 export interface RenderTabOptions {
   container: HTMLElement;

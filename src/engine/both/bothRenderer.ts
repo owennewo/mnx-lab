@@ -2,7 +2,7 @@ import { MnxStructure } from '../../model/mnx.ts';
 import { PartTabSetups } from '../tab/guitarPositions.ts';
 import { layoutBothSystem } from '../layout/bothSystem.ts';
 import type { HideableFeature } from '../layout/notation.ts';
-import { computeBoundsSp } from '../render/bounds.ts';
+import { computeBoundsSp, CROP_PAD_SP } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
 import {
   projectionForSourceClass,
@@ -23,8 +23,6 @@ import {
 
 const DEFAULT_PX_PER_SP = 10;
 
-/** Breathing room around the cropped content, in staff spaces. */
-const CROP_PAD_SP = 1;
 
 export interface RenderBothOptions {
   container: HTMLElement;

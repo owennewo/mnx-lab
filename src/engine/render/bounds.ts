@@ -10,6 +10,26 @@ import { glyphBBox } from '../smufl/smufl.ts';
  * approximated from the font size (close enough for a crop with padding).
  */
 
+/**
+ * Breathing room a renderer leaves around the cropped content, in staff
+ * spaces — the SVG's own page margin.
+ *
+ * **1 → 0.5 on 2026-08-21**, and defined here rather than three times over in
+ * the three renderers, which is how it came to be doing a job it was not
+ * needed for. The paper card already sets a page margin in CSS (30px), so the
+ * two stacked: the reader saw both. Worse, this one is in staff spaces and so
+ * SCALES WITH ZOOM — 10px at 100%, 20px at 204%, 64px at 640% — so the top
+ * margin grew the further a low-vision reader zoomed in, which is exactly
+ * when they have least screen to spare.
+ *
+ * What it still has to do is cover the error in the measurement it pads:
+ * text extents here are estimated from the font size (`TEXT_ASCENT`), not
+ * measured, so ink can reach slightly past the box. 0.5sp leaves an ascender
+ * a quarter of an em of slack before anything could clip, and matches
+ * `MIN_PAGE_MARGIN_SP`, the floor the layout already uses for the same idea.
+ */
+export const CROP_PAD_SP = 0.5;
+
 export interface BoundsSp {
   x: number;
   y: number;
