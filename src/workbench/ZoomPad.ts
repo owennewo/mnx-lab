@@ -2,11 +2,17 @@ import { LitElement, html, css, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, sharedChrome } from '../elements/tokens.ts';
 import {
+  BASELINE_PX_PER_SP,
   MIN_STAFF_SCALE,
   MAX_STAFF_SCALE,
   clampStaffScale
 } from '../engine/render/scale.ts';
-import { MIN_DENSITY, MAX_DENSITY, clampDensity } from '../engine/layout/spacing.ts';
+import {
+  MIN_DENSITY,
+  MAX_DENSITY,
+  QUARTER_SPRING_SP,
+  clampDensity
+} from '../engine/layout/spacing.ts';
 
 /**
  * The zoom/density pad — roadmap/complete/core-zoom-density-pad.md, campaign
@@ -331,12 +337,16 @@ export class ZoomPad extends LitElement {
         color: var(--accent);
       }
 
-      /* Fitted used to also PRINT as derived, in --ink-3. It made the two
-         halves disagree for no reason a reader could act on: reset the pad and
-         the staff number went grey while the spacing number beside it stayed
-         full ink, though neither had been chosen. The word carries it instead —
-         the label reads FIT rather than STAFF, which is the honest signal — and
-         every value in the readout now prints at one strength. */
+      /* Fitted used to be marked twice — the value in --ink-3 and the label
+         reading FIT — and both are gone. The grey made the two halves disagree
+         for no reason a reader could act on (reset the pad and the staff number
+         went grey while the spacing number beside it stayed full ink, though
+         neither had been chosen); the word made the axis rename itself under a
+         click that was supposed to reset it, and FIT names a mode the reader
+         never asked for rather than the thing the number measures. The labels
+         are now CONSTANT — STAFF and SPACE, always — and .hot carries the whole
+         distinction: accent means you chose this value, plain ink means the
+         renderer did. The title spells the rest out in a sentence. */
 
       /* The clamp band, now per-axis: the half that hit its wall turns ink and
          its label becomes the verdict, while the other axis stays readable —
@@ -771,6 +781,41 @@ export class ZoomPad extends LitElement {
   }
 
   /**
+   * What the numbers MEAN, on hover — because a bare percentage does not say
+   * what it is a percentage OF, and both axes are measured in staff spaces
+   * underneath.
+   *
+   * Staff: 100% is 10 CSS px per staff space (`BASELINE_PX_PER_SP`), so the
+   * percentage IS the staff-space size — a four-space staff is 4× the number
+   * this spells out. Fitted says so too, because that number moves with the
+   * window rather than having been chosen.
+   */
+  private staffTitle(fitted: boolean): string {
+    const px = this.shownStaff * BASELINE_PX_PER_SP;
+    const size = `${Math.round(px * 10) / 10}px per staff space (100% = ${BASELINE_PX_PER_SP}px)`;
+    return fitted
+      ? `Staff size — ${size}. Fitted to the window, so it moves when the window does.`
+      : `Staff size — ${size}.`;
+  }
+
+  /**
+   * Space: a multiplier on the SPRINGS, whose unit is also staff spaces —
+   * the ideal gap after a quarter note is `QUARTER_SPRING_SP` at 100%. The
+   * sentence says "asks for" rather than naming the drawn gap on purpose: the
+   * justifier stretches or squeezes every row to the line width afterwards, so
+   * the sp figure is what the engraver requested, not what you can measure on
+   * the page.
+   */
+  private spaceTitle(): string {
+    const sp = Math.round(this.shownSpace * QUARTER_SPRING_SP * 100) / 100;
+    return (
+      `Note spacing — asks for ${sp} staff spaces after a quarter note ` +
+      `(100% = ${QUARTER_SPRING_SP}), before each system is justified to the ` +
+      `line. Glyph sizes are untouched.`
+    );
+  }
+
+  /**
    * One axis of the readout, in both poses: open it is label-over-value, idle
    * the label closes and the bare number remains. A clamp turns THIS half into
    * the ink band; the other axis stays readable.
@@ -799,14 +844,14 @@ export class ZoomPad extends LitElement {
     if (axis === 'staff') {
       const fitted = this.staffScale === null;
       return html`
-        <div class="half">
-          <div class="lbl">${fitted ? 'FIT' : 'STAFF'}</div>
+        <div class="half" title=${this.staffTitle(fitted)}>
+          <div class="lbl">STAFF</div>
           <div class="val ${fitted ? '' : 'hot'}">${this.pct(this.shownStaff)}</div>
         </div>
       `;
     }
     return html`
-      <div class="half">
+      <div class="half" title=${this.spaceTitle()}>
         <div class="lbl">SPACE</div>
         <div class="val ${this.densityH === null ? '' : 'hot'}">${this.pct(this.shownSpace)}</div>
       </div>

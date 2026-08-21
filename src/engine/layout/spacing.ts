@@ -75,7 +75,10 @@ const MULTIREST_WIDTH_SP = 10;     // content width of a collapsed H-bar measure
 const LYRIC_CHAR_WIDTH_SP = 0.95;  // syllable width estimate per character
 const LYRIC_SIDE_PAD_SP = 0.35;    // clearance either side of a syllable
 const ONSET_EPS = 1e-6;            // float tolerance for metric positions
-const QUARTER_SPRING_SP = 2.2;     // ideal space after a quarter note
+/** Ideal space after a quarter note, in staff spaces, at density 1 — the unit
+ *  the SPACE axis is a multiplier ON, which is why it is exported: a control
+ *  printing a percentage should be able to say what of. */
+export const QUARTER_SPRING_SP = 2.2;
 const MEASURE_LEAD_FACTOR = 0.5;   // barline→first-note spring, as a fraction of
                                    // the first event's spring — it stretches with
                                    // justification like every other gap (the rigid

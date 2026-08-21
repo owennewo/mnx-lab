@@ -358,3 +358,26 @@ click on the magnifier the readout said `100` in grey over `100` in full ink,
 though **neither** number had been chosen — the one difference a reader could see
 was the one that meant nothing to them. The dimming is gone; the label already
 carries it by reading `FIT` rather than `STAFF`, which is the honest signal.
+
+### Third pass: the labels are constant, and they say what they measure
+
+`FIT` is gone. It renamed the axis under a click that was meant to *reset* it —
+press the magnifier and STAFF became FIT — and it named a mode the reader never
+asked for rather than the thing the number measures. The labels are **STAFF and
+SPACE, always**; `.hot` carries the whole chosen/derived distinction, which it
+already did: accent means you picked this value, plain ink means the renderer
+did.
+
+The readout also never said what its percentages were *of*, and both axes are
+measured in staff spaces underneath — so each half now carries a title:
+
+- **STAFF** — 100% is `BASELINE_PX_PER_SP` (10 CSS px) per staff space, so the
+  percentage *is* the staff-space size; a five-line staff is four of them.
+  Fitted adds "moves when the window does".
+- **SPACE** — a multiplier on the springs, whose unit is also staff spaces:
+  `QUARTER_SPRING_SP` (2.2sp) is the ideal gap after a quarter note at 100%,
+  now exported for exactly this. The sentence says the pad *asks for* that gap
+  rather than naming what you can measure on the page, because the justifier
+  stretches or squeezes every row afterwards — which is also why the readout
+  still prints the percentage rather than the sp figure: the request is the
+  honest number, the drawn gap is per-row.
