@@ -3025,13 +3025,13 @@ export class ScenarioPage extends LitElement {
           >${modelDisplayName(this.assistModel)}</span
         >
         <span class="ctx-actions">
-          <button @click=${() => (this.modelPickerOpen = true)}>switch model</button>
+          <button title="switch model" @click=${() => (this.modelPickerOpen = true)}>model</button>
           ${this.chat.length
             ? html`<button title="clear the conversation" @click=${() => this.clearChat()}>clear</button>`
             : nothing}
           ${connected
-            ? html`<button title=${`key ${this.keyFingerprint}`} @click=${() => this.disconnect()}>
-                forget key
+            ? html`<button title=${`forget key ${this.keyFingerprint}`} @click=${() => this.disconnect()}>
+                forget
               </button>`
             : nothing}
         </span>`,
@@ -3098,15 +3098,13 @@ export class ScenarioPage extends LitElement {
         ${this.chat.map(
           m => html`<div class="chat-msg ${m.role}">
             <span class="chat-role">${m.role}</span>
-            <div class="chat-text">
-              ${m.role === 'assistant'
+            <div class="chat-text">${m.role === 'assistant'
                 ? m.content
                   ? renderMarkdown(m.content)
                   : this.chatBusy
                     ? '…'
                     : ''
-                : m.content}
-            </div>
+                : m.content}</div>
           </div>`
         )}
       </div>
