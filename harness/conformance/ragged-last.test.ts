@@ -39,9 +39,12 @@ function doc(id: string): MnxStructure {
  * `packSystems`' arithmetic (same terms, same order) so a test can say what
  * the last row WOULD have been and show the rule actually bit.
  */
-function rawStretches(packing: PackingInput, rows: readonly (readonly number[])[]): number[] {
+function rawStretches(
+  packing: PackingInput,
+  rows: readonly { measures: readonly number[]; full: boolean }[]
+): number[] {
   const contentRightPad = packing.contentRightPadSp ?? 0.8;
-  return rows.map(measures => {
+  return rows.map(({ measures, full }) => {
     let rowRigid = 0;
     let rowSpring = 0;
     measures.forEach((k, j) => {
@@ -50,9 +53,10 @@ function rawStretches(packing: PackingInput, rows: readonly (readonly number[])[
         (j === 0 ? m.prefixFirst : m.prefixRest) + m.rigid + contentRightPad + m.repeatExtra;
       rowSpring += m.spring + m.lead;
     });
-    return rowSpring > 0
-      ? Math.min(MAX_STRETCH, Math.max(MIN_SQUEEZE, (packing.lineWidthSp - rowRigid) / rowSpring))
-      : 1;
+    if (rowSpring <= 0) return 1;
+    const wanted = Math.max(MIN_SQUEEZE, (packing.lineWidthSp - rowRigid) / rowSpring);
+    // MAX_STRETCH caps only a row nobody filled — a full row justifies.
+    return full ? wanted : Math.min(MAX_STRETCH, wanted);
   });
 }
 
@@ -93,7 +97,7 @@ describe('ragged last', () => {
         // And the single shared helper is what produced it — the packer does
         // not carry a second copy of the rule.
         expect(rows.map(r => r.stretch)).toEqual(
-          capLastRowStretch(rawStretches(packing, rows.map(r => r.measures)))
+          capLastRowStretch(rawStretches(packing, rows))
         );
       }
     }
@@ -111,7 +115,7 @@ describe('ragged last', () => {
       const packing = planHorizontal(mnx, widthSp).packing;
       const rows = packSystems(packing, 1);
       if (rows.length < 2) continue;
-      const raw = rawStretches(packing, rows.map(r => r.measures));
+      const raw = rawStretches(packing, rows);
       const last = rows[rows.length - 1].stretch;
       const ceiling = Math.max(1, ...rows.slice(0, -1).map(r => r.stretch));
       if (raw[raw.length - 1] > ceiling + 1e-9) {
@@ -128,7 +132,7 @@ describe('ragged last', () => {
     const packing = planHorizontal(doc('lab/tab-positions/open-strings-chord'), 80).packing;
     const rows = packSystems(packing, 1);
     expect(rows.length).toBe(1);
-    expect(rows[0].stretch).toBe(rawStretches(packing, [rows[0].measures])[0]);
+    expect(rows[0].stretch).toBe(rawStretches(packing, [rows[0]])[0]);
   });
 
   it('the ink-priced path applies the same rule', () => {

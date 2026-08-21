@@ -22,6 +22,7 @@ import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { glyphBBox } from '../../src/engine/smufl/smufl.ts';
 import { MAX_STAFF_SCALE, MIN_STAFF_SCALE } from '../../src/engine/render/scale.ts';
+import { planHorizontal, packSystems } from '../../src/engine/layout/spacing.ts';
 import type { LayoutResult, Primitive } from '../../src/engine/primitives.ts';
 import { initSmufl, WIDTH_SP } from '../helpers/corpusPrimitives.ts';
 import { renderSvgToString } from '../helpers/svgString.ts';
@@ -343,6 +344,84 @@ describe('minimum drawn ink — a line is always at least a line', () => {
         .sort((a, b) => a.l - b.l);
       for (let i = 1; i < spans.length; i++) {
         expect(spans[i].l - spans[i - 1].r).toBeGreaterThan(0);
+      }
+    }
+  });
+});
+
+// A full row justifies, at any staff scale (2026-08-21).
+//
+// `MAX_STRETCH` was applied to every row, including rows packed as tight as
+// the line allows. Below 100% staff scale the rigid columns shrink — they are
+// ink — so the springs must supply more of the line and the needed stretch
+// crosses 2.5. The row was then left short of the margin, and every time
+// density wrapped a bar away the row got SHORTER still: the music narrowed as
+// the reader asked for more space. Invisible to the goldens, which are square.
+describe('a full row reaches the margin, whatever the staff scale', () => {
+  const LADDER = [0.02, 0.03, 0.07, 0.16, 0.27, 0.5, 1];
+
+  const rowWidths = (mnx: MnxStructure, widthSp: number, densityH: number, ink: number) => {
+    const l = layoutTab({ mnx, widthSp, densityH, inkRatio: ink });
+    const packing = planHorizontal(mnx, widthSp, { staffKind: 'tab' }).packing;
+    const rows = packSystems(packing, densityH);
+    return l.rows!.map((b, r) => {
+      const xs = [
+        ...new Set(
+          l.primitives
+            .filter(
+              (p): p is Extract<Primitive, { kind: 'line' }> =>
+                p.kind === 'line' &&
+                cls(p)[0] === 'barline' &&
+                Math.abs(p.y1 - b.staffTop) < 1e-6
+            )
+            .map(p => Math.round(p.x1 * 1e4) / 1e4)
+        )
+      ].sort((a, b2) => a - b2);
+      return { width: xs[xs.length - 1] - xs[0], full: rows[r]?.full ?? false };
+    });
+  };
+
+  it('fills the line at every staff scale, not just at 100%', () => {
+    initSmufl();
+    const mnx = readDoc(corpus.find(c => c.id.endsWith('twelve-bar-blues'))!.dir);
+    const widthSp = 96.6;
+    const line = widthSp - 2 * 2; // the plan's line, inside its page margins
+    let checked = 0;
+    for (const ink of [0.6, 0.8, 1, 1.6]) {
+      for (const d of LADDER) {
+        for (const row of rowWidths(mnx, widthSp, d, ink)) {
+          if (!row.full) continue;
+          checked++;
+          // Reaches the margin or overruns it — never falls short. Overrun is
+          // the documented degradation of freezing packing square
+          // (core-ink-priced-columns.md): at a high ink ratio the row holds
+          // bars chosen at ratio 1 whose grown rigid columns no longer fit, so
+          // it draws past the margin rather than colliding. Falling SHORT is
+          // the thing that has no defence, and the thing that was happening.
+          expect(
+            row.width,
+            `ink ${ink} density ${d}: full row short of the margin`
+          ).toBeGreaterThanOrEqual(line - 1e-4);
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
+
+  it('so the music never narrows as the reader asks for more space', () => {
+    initSmufl();
+    // The reported symptom, at the staff scale that produced it: SPACE 3 → 7
+    // used to take the system from 86.5sp to 80.2sp.
+    const mnx = readDoc(corpus.find(c => c.id.endsWith('twelve-bar-blues'))!.dir);
+    for (const ink of [0.6, 0.8, 1]) {
+      let previous = -Infinity;
+      for (const d of LADDER) {
+        const first = rowWidths(mnx, 96.6, d, ink)[0];
+        if (!first.full) continue;
+        expect(first.width, `ink ${ink}: system 1 narrowed at density ${d}`).toBeGreaterThanOrEqual(
+          previous - 1e-6
+        );
+        previous = first.width;
       }
     }
   });

@@ -261,6 +261,16 @@ export interface PackedRow {
   measures: number[];
   /** The row's common spring factor (justification), already clamped. */
   stretch: number;
+  /**
+   * This row ended because the next bar did not FIT — it holds as much music
+   * as the line can take. A row ended by a forced break, and the last row of
+   * the score, are not full: they hold what they were given.
+   *
+   * The distinction is what `MAX_STRETCH` should always have been asking. A
+   * full row that cannot reach the margin is not "ragged by choice", it is a
+   * justified row being denied its justification.
+   */
+  full: boolean;
 }
 
 /**
@@ -277,15 +287,18 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
   const lineWidth = packing.lineWidthSp;
   const contentRightPad = packing.contentRightPadSp ?? CONTENT_RIGHT_PAD_SP;
 
-  const rows: number[][] = [];
+  const rows: { measures: number[]; full: boolean }[] = [];
   let current: number[] = [];
   let currentWidth = 0;
   packs.forEach((m, k) => {
     const content =
       m.lead * densityH + m.rigid + m.spring * densityH + contentRightPad + m.repeatExtra;
     const natural = (current.length === 0 ? m.prefixFirst : m.prefixRest) + content;
-    if (current.length > 0 && (currentWidth + natural > lineWidth || m.forcedBreak)) {
-      rows.push(current);
+    // Which of the two reasons ended the row is recorded, not just that one
+    // did: only the overflow reason means the row is FULL.
+    const overflows = currentWidth + natural > lineWidth;
+    if (current.length > 0 && (overflows || m.forcedBreak)) {
+      rows.push({ measures: current, full: overflows });
       current = [];
       currentWidth = m.prefixFirst + content;
     } else {
@@ -293,9 +306,10 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
     }
     current.push(k);
   });
-  if (current.length > 0) rows.push(current);
+  // The score simply ran out: the last row holds what was left, not what fits.
+  if (current.length > 0) rows.push({ measures: current, full: false });
 
-  const justified = rows.map(measures => {
+  const justified = rows.map(({ measures, full }) => {
     let rowRigid = 0;
     let rowSpring = 0;
     measures.forEach((k, j) => {
@@ -304,13 +318,10 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
         (j === 0 ? m.prefixFirst : m.prefixRest) + m.rigid + contentRightPad + m.repeatExtra;
       rowSpring += m.spring * densityH + m.lead * densityH;
     });
-    const stretch = rowSpring > 0
-      ? Math.min(MAX_STRETCH, Math.max(MIN_SQUEEZE, (lineWidth - rowRigid) / rowSpring))
-      : 1;
-    return { measures, stretch };
+    return { measures, full, stretch: rowStretch(lineWidth - rowRigid, rowSpring, full) };
   });
   const capped = capLastRowStretch(justified.map(r => r.stretch));
-  return justified.map((r, i) => ({ measures: r.measures, stretch: capped[i] }));
+  return justified.map((r, i) => ({ measures: r.measures, stretch: capped[i], full: r.full }));
 }
 
 /**
@@ -338,6 +349,33 @@ export function capLastRowStretch(stretches: readonly number[]): number[] {
   const others = stretches.slice(0, -1);
   const last = stretches[stretches.length - 1];
   return [...others, Math.min(last, Math.max(1, ...others))];
+}
+
+/**
+ * One row's justification factor.
+ *
+ * `MAX_STRETCH` exists so that a SPARSE row — one stranded bar — does not
+ * spread itself across the page. It was applied to every row, including rows
+ * that are packed as tight as the line allows, and on those it is simply
+ * wrong: a full row that cannot reach the right margin is a justified row
+ * being denied its justification. It showed up as the music getting NARROWER
+ * as the reader asked for more space (at staff scales below 100%, where the
+ * rigid columns shrink and the springs have to supply more of the line, so the
+ * needed stretch crosses 2.5): each time a bar wrapped away, the shortened row
+ * still could not stretch to compensate.
+ *
+ * So the cap now applies only where its own reasoning does — to a row that was
+ * given its bars rather than filled with them, which is the last row of a score
+ * and any row ended by a forced break. `capLastRowStretch` then refines the
+ * last row further, page-relatively.
+ *
+ * `MIN_SQUEEZE` is unconditional: an overfull row has to compress whatever
+ * ended it.
+ */
+function rowStretch(slack: number, rowSpring: number, full: boolean): number {
+  if (rowSpring <= 0) return 1;
+  const wanted = Math.max(MIN_SQUEEZE, slack / rowSpring);
+  return full ? wanted : Math.min(MAX_STRETCH, wanted);
 }
 
 // ---------- The density ladder ----------
@@ -1307,9 +1345,10 @@ export function planHorizontal(
             (m.repeatEnd ? REPEAT_END_EXTRA_SP * inkRatio : 0);
           rowSpring += m.spring + m.leadingSpring;
         });
-        return rowSpring > 0
-          ? Math.min(MAX_STRETCH, Math.max(MIN_SQUEEZE, (lineWidth - rowRigid) / rowSpring))
-          : 1;
+        // Same rule as the square path, through the same helper — this is the
+        // path where the cap actually bit, since ink pricing below 100% staff
+        // scale shrinks the rigid columns and pushes the needed stretch up.
+        return rowStretch(lineWidth - rowRigid, rowSpring, packedRow.full);
       })
     );
   }
