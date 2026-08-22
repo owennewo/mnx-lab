@@ -215,7 +215,9 @@ proposals that name their campaign.
   Opened 2026-08-22 with 37 stale + 8 never-seen in three batches: `core-ink-measured-gaps`
   (33, across stages A/C/D and the tab row pads), the barline-default fix (4, no owning
   doc), and the never-reviewed corpus-closure technique set (8).
-- **[workbench-selection-chip-ladder.md](inprogress/workbench-selection-chip-ladder.md)** —
+
+### complete/
+- **[workbench-selection-chip-ladder.md](complete/workbench-selection-chip-ladder.md)** —
   **the chip is one rung of the ladder.** Built 2026-08-22 from a Claude Design spec drawn
   1:1 over crops of this build. The rung chip and the tray were built two days apart and
   did not know they were the same object: closed, the level read as a lowercase mono word;
@@ -230,8 +232,6 @@ proposals that name their campaign.
   stays, and the readout band becomes a tooltip that captions the keyboard cursor only once it
   has been *moved*. Leaves the spec's two open questions open and adds a third: ▲ now walks
   **down** the drawn column, the inverse of the HUD's.
-
-### complete/
 - **[core-selection-clipboard.md](complete/core-selection-clipboard.md)** — typed
   copy, cut and paste over every selection rung, range and closure. **Stages 1–6 built
   2026-08-16 and 2026-08-20; closed 2026-08-22 without stage 7.** The clip is a

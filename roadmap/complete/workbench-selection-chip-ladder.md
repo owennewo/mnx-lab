@@ -1,12 +1,12 @@
 # The chip is one rung of the ladder
 
-> **Status: built 2026-08-22**, against the Claude Design spec *"SPEC · v1 —
+> **Status: COMPLETE 2026-08-22**, against the Claude Design spec *"SPEC · v1 —
 > SELECTION MODE CHIP → TRAY"*, drawn 1:1 over crops of this build. Supersedes
 > the tab-strip half of
-> [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md)
-> and gives [workbench-rung-legibility.md](../complete/workbench-rung-legibility.md)'s
+> [core-selection-tray-visuals.md](core-selection-tray-visuals.md)
+> and gives [workbench-rung-legibility.md](workbench-rung-legibility.md)'s
 > chip its ▲▼ pair. **No golden moved** — this is workbench chrome only, so
-> there is no debt for [lab-verify.md](lab-verify.md).
+> there is no debt for [lab-verify.md](../inprogress/lab-verify.md).
 
 ## The problem
 
@@ -101,7 +101,7 @@ Kept from the spec's own OPEN QUESTIONS cell, unresolved and deliberately so:
   scope, and ▲ walking into it means the micro buttons can leave the score
   behind. Today it is the last rung and `committable: false`, which is the
   status quo from
-  [core-selection-tray-global-tab.md](../complete/core-selection-tray-global-tab.md).
+  [core-selection-tray-global-tab.md](core-selection-tray-global-tab.md).
 - Whether rungs **above** the current one should show a count of what they
   would select (`bar · 4 events`), which would help the preview state but
   roughly doubles the column's width.

@@ -1,4 +1,4 @@
-// The selection command tray (roadmap/inprogress/workbench-selection-chip-ladder.md,
+// The selection command tray (roadmap/complete/workbench-selection-chip-ladder.md,
 // after core-selection-tray-visuals.md): a command surface planted under the
 // selection — a VERTICAL ladder column whose current rung is the collapsed
 // chip grown in place, a Bravura glyph grid with shortcut and state per tile,
