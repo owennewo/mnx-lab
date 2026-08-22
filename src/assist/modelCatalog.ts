@@ -122,6 +122,44 @@ export async function fetchLiveCatalog(signal?: AbortSignal): Promise<CatalogMod
     .sort((a, b) => a.id.localeCompare(b.id));
 }
 
+/** `:batch` endpoints are OpenRouter's ASYNCHRONOUS batch API — half price and
+ *  hours of latency. They are legitimate catalog rows and they price and rank
+ *  like any other, so nothing in the scorer excludes them; but a surface that
+ *  streams a reply to a waiting person must not offer one. The picker filters
+ *  on this; the roster's canonical rule (roster.ts) already covers it. */
+export function isInteractiveEndpoint(id: string): boolean {
+  return !id.endsWith(':batch');
+}
+
+/** One committed snapshot row: the catalog's own data, priors deliberately
+ *  NOT baked in — the join happens on read so a prior edit never means a
+ *  413-model diff. */
+export type SnapshotRow = Omit<CatalogModel, 'tokensPerSecond' | 'intelligenceIndex'>;
+
+export function toSnapshotRow(model: CatalogModel): SnapshotRow {
+  return {
+    id: model.id,
+    name: model.name,
+    contextLength: model.contextLength,
+    pricing: model.pricing,
+    parameters: model.parameters,
+  };
+}
+
+/** The snapshot's committed byte format: one model per line, id-sorted. JSON
+ *  with a line per row is the only shape in which a catalog refresh reads as a
+ *  reviewable diff rather than a wall. */
+export function serializeSnapshot(models: CatalogModel[], fetchedAt: string): string {
+  const rows = [...models]
+    .sort((a, b) => a.id.localeCompare(b.id))
+    .map(m => `    ${JSON.stringify(toSnapshotRow(m))}`);
+  return (
+    `{\n  ${JSON.stringify('source')}: ${JSON.stringify(CATALOG_URL)},\n` +
+    `  ${JSON.stringify('fetchedAt')}: ${JSON.stringify(fetchedAt)},\n` +
+    `  ${JSON.stringify('models')}: [\n${rows.join(',\n')}\n  ]\n}\n`
+  );
+}
+
 /** Display-name lookup over the snapshot for a stored model id. */
 export function modelDisplayName(id: string): string {
   const hit = snapshotCatalog().find(m => m.id === id);

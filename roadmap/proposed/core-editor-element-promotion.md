@@ -106,6 +106,15 @@ trace fixtures, root vitest), before and after.
    probably should **not** ship an AI prompt; that mode may stay
    workbench-only by configuration). Decide it here if the palette is part of
    what moves.
+7. **So does the model picker** (added 2026-08-22).
+   [core-assist-model-selector.md](../complete/core-assist-model-selector.md) closed with
+   `<mnx-model-picker>` incubating in `workbench/` on exactly this gate — both
+   shells want the selection mechanism, and trigger 2 is unmet for the same
+   reason. It rides the same `elements → assist` decision as the palette and
+   should be decided with it, not separately: one boundary question, one
+   review. Its cost is the lowest of the three, because the scoring core
+   (`src/assist/modelSelect.ts`) is pure, DOM-free and fetchless — whatever
+   the boundary answer, only the dialog moves.
 
 ## Getting it moving (2026-08-14)
 

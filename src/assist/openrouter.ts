@@ -103,8 +103,17 @@ export interface ChatMessage {
 export interface ChatOptions {
   apiKey: string;
   model: string;
+  /** Ordered fallbacks tried in turn when the pick is rate-limited, its
+   *  provider is down, or it refuses — OpenRouter's `models: []`. The
+   *  selector's ranked output IS this array
+   *  (core-assist-model-selector.md's second consumer), and the free tier's
+   *  ~20 req/min makes it a real need rather than a flourish. */
+  fallbacks?: string[];
   messages: ChatMessage[];
   signal?: AbortSignal;
+  /** Called with the model that ACTUALLY served, once. A silent fallback
+   *  would be a lie about what you are reading. */
+  onModel?: (id: string) => void;
   /** Attribution headers OpenRouter shows in the activity log — the page's
    *  origin and a name, so local runs are distinguishable from production. */
   referer?: string;
@@ -121,6 +130,10 @@ export interface ChatDelta {
   toolCallId?: string;
   toolArguments?: string;
   completionTokens?: number;
+  /** The model that actually served this stream, carried on the first frame
+   *  that names it and never again. Under a fallback chain it is not
+   *  necessarily the one asked for, and it is what the request was priced on. */
+  model?: string;
 }
 
 /** Deltas from one SSE body. Pure over the stream so it tests without a
@@ -132,6 +145,7 @@ export interface ChatDelta {
  *  the edit loop reports it as progress rather than content. */
 export async function* sseChatDeltas(body: ReadableStream<Uint8Array>): AsyncGenerator<ChatDelta> {
   const reader = body.getReader();
+  let named = false;
   const decoder = new TextDecoder();
   let buffer = '';
   try {
@@ -147,6 +161,7 @@ export async function* sseChatDeltas(body: ReadableStream<Uint8Array>): AsyncGen
         const data = line.slice(5).trim();
         if (data === '[DONE]') return;
         let frame: {
+          model?: string;
           choices?: {
             delta?: {
               content?: string;
@@ -162,17 +177,30 @@ export async function* sseChatDeltas(body: ReadableStream<Uint8Array>): AsyncGen
           continue;
         }
         if (frame.error) throw new Error(frame.error.message ?? 'stream error');
+        let names: string | undefined;
+        if (!named && frame.model) {
+          named = true;
+          names = frame.model;
+        }
         if (frame.usage?.completion_tokens) {
-          yield { completionTokens: frame.usage.completion_tokens };
+          const usage: ChatDelta = { completionTokens: frame.usage.completion_tokens };
+          if (names) usage.model = names;
+          yield usage;
           continue;
         }
         const delta = frame.choices?.[0]?.delta;
         const toolCall = delta?.tool_calls?.[0];
         const out: ChatDelta = {};
+        if (names) out.model = names;
         if (delta?.content) out.content = delta.content;
         if (toolCall?.id) out.toolCallId = toolCall.id;
         if (toolCall?.function?.arguments) out.toolArguments = toolCall.function.arguments;
-        if (out.content !== undefined || out.toolCallId !== undefined || out.toolArguments !== undefined) {
+        if (
+          out.content !== undefined ||
+          out.toolCallId !== undefined ||
+          out.toolArguments !== undefined ||
+          out.model !== undefined
+        ) {
           yield out;
         }
       }
@@ -189,8 +217,16 @@ export async function* sseTextDeltas(body: ReadableStream<Uint8Array>): AsyncGen
   }
 }
 
+/** With a chain, `models` REPLACES `model`: an ordered list is how OpenRouter
+ *  is told to fall through, and the pick is simply its head. Shared by the
+ *  plain chat and the edit loop's transport, so both fall back the same way. */
+function routing(model: string, fallbacks?: string[]): Record<string, unknown> {
+  return fallbacks?.length ? { models: [model, ...fallbacks] } : { model };
+}
+
 /** One streamed completion, browser-direct. Yields text deltas; throws on an
- *  HTTP error with OpenRouter's message when it gives one. */
+ *  HTTP error with OpenRouter's message when it gives one. `onModel` reports
+ *  which model of the chain actually answered. */
 export async function* streamChat(opts: ChatOptions): AsyncGenerator<string> {
   const fetchImpl = opts.fetchImpl ?? fetch;
   const headers: Record<string, string> = {
@@ -202,7 +238,11 @@ export async function* streamChat(opts: ChatOptions): AsyncGenerator<string> {
   const res = await fetchImpl(CHAT_URL, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ model: opts.model, messages: opts.messages, stream: true }),
+    body: JSON.stringify({
+      ...routing(opts.model, opts.fallbacks),
+      messages: opts.messages,
+      stream: true
+    }),
     signal: opts.signal
   });
   if (!res.ok) {
@@ -216,7 +256,10 @@ export async function* streamChat(opts: ChatOptions): AsyncGenerator<string> {
     throw new Error(`chat failed: ${detail}`);
   }
   if (!res.body) throw new Error('chat failed: empty body');
-  yield* sseTextDeltas(res.body);
+  for await (const delta of sseChatDeltas(res.body)) {
+    if (delta.model) opts.onModel?.(delta.model);
+    if (delta.content) yield delta.content;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -258,7 +301,7 @@ export function openRouterEditTransport(opts: EditTransportOptions): ChatTranspo
 
     const body = (tc: ToolChoice) =>
       JSON.stringify({
-        model: req.model,
+        ...routing(req.model, req.fallbacks),
         messages: req.messages,
         tools: req.tools,
         tool_choice: tc,

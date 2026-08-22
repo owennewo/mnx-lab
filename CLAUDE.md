@@ -32,6 +32,8 @@ npm run check:scenarios    # corpus police
 npm run verify:scenarios   # attention queue / approval writer — drive via /verify
 npm run update:primitives  # regenerate layout goldens; keeps statuses honest
 npm run sync:spec          # pinned spec fixture → scenarios/spec/ (owns that tree)
+npm run update:roster      # worker/models.query.json → worker/models.json (stored queries)
+npm run refresh:catalog    # refetch OpenRouter's catalog snapshot, then regenerate
 npm run build              # validators + boundaries + tsc (app+worker) + vite build
 npm run build:lib          # the mnx-lab library face → dist/lib
 npm run build:embed        # the embed face → dist/embed/mnx-lab.js
@@ -145,6 +147,7 @@ src/                 the apparatus — capability layers (order below)
   assist/stream.ts        the ONE call site for an edit; picks browser-direct vs Worker
 worker/              Hono; a DEMO for visitors with no key of their own, plus reserved seams
   api/                    editNotation, models + reserved 501 seams documents, auth
+  models.json             GENERATED from models.query.json — never hand-edited
   generated/              validators precompiled from spec/ (committed; schema DATA,
                           importable from any layer)
 converters/          npm-workspace sub-packages + fixtures/ (the three scores)
@@ -357,6 +360,17 @@ codebase earns it — no `eval`, no CDN, no HTML sink. `npm run smoke:csp` boots
 workbench under the deployed policy in headless Chrome and fails on any violation; the
 `'unsafe-inline'` in `style-src` is a bounded, documented exception (CSS cannot read
 localStorage). Add a CDN or an inline script and that smoke test is what tells you.
+
+**Which model** is a query, not a list. `src/assist/modelSelect.ts` is the pure scorer
+(hard filters, then a weighted sum over per-dimension *headroom over the requirement*);
+`src/assist/roster.ts` runs the stored queries in `worker/models.query.json` to
+**generate** `worker/models.json`, so hand-editing the roster is a red test — regenerate
+with `npm run update:roster`. Only `npm run refresh:catalog` touches the network. The
+roster governs the **server-key demo mode only**: with BYOK the user's key buys whatever
+`<mnx-model-picker>` was pointed at, and the picker's runners-up ride along as
+OpenRouter's ordered `models: []` fallback chain. Quality is still a declared prior table
+in `modelCatalog.ts` — roadmap/proposed/core-assist-evals.md owns replacing it with
+measured evidence.
 
 ## Rendering (custom SMuFL/SVG engine)
 

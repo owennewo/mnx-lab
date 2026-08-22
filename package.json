@@ -37,6 +37,8 @@
     "sweep:destruct": "UPDATE_DESTRUCT_SWEEP=1 vitest run harness/conformance/destruct-sweep.test.ts",
     "sweep:construct": "UPDATE_CONSTRUCT_COVERAGE=1 vitest run harness/conformance/construct-traces.test.ts",
     "verify:scenarios": "node harness/verify/verify-scenarios.mjs",
+    "update:roster": "UPDATE_ROSTER=1 vitest run harness/conformance/roster.test.ts",
+    "refresh:catalog": "REFRESH_CATALOG=1 UPDATE_ROSTER=1 vitest run harness/conformance/roster.test.ts",
     "test": "vitest run",
     "deploy": "npm run build && wrangler deploy"
   },

@@ -75,6 +75,28 @@ describe('hard constraints', () => {
     expect(speed?.utility).toBe(0);
   });
 
+  it('requireKnown makes no-evidence a failure — what an unattended generator needs', () => {
+    // The default (pass, flag, score neutral) is right for the picker, where a
+    // human reads the '?'; the roster build has no reader, so it says so.
+    const catalog = [model({ id: 'known', intelligenceIndex: 55 }), model({ id: 'unknown' })];
+    expect(selectModels({ minIntelligence: 40 }, catalog).map(r => r.model.id)).toEqual([
+      'known',
+      'unknown'
+    ]);
+    const strict = selectModels(
+      { minIntelligence: 40, requireKnown: ['intelligence'] },
+      catalog
+    );
+    expect(strict.map(r => r.model.id)).toEqual(['known']);
+    expect(strict[0].flags).toEqual([]);
+  });
+
+  it('requireKnown excludes on a dimension even with no floor declared for it', () => {
+    const catalog = [model({ id: 'has-speed', tokensPerSecond: 90 }), model({ id: 'no-speed' })];
+    const out = selectModels({ requireKnown: ['speed'] }, catalog);
+    expect(out.map(r => r.model.id)).toEqual(['has-speed']);
+  });
+
   it('a floor over known prior data is hard', () => {
     const out = selectModels({ minTokensPerSecond: 50 }, [
       model({ id: 'slow', tokensPerSecond: 20 }),

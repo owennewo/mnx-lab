@@ -54,6 +54,13 @@ export interface ModelRequirements {
   maxEffectivePrice?: number;
   minTokensPerSecond?: number;
   minIntelligence?: number;
+  /** Dimensions on which NO EVIDENCE IS NOT GOOD ENOUGH — a model with no
+   *  prior for one of these is excluded rather than passed-and-flagged. The
+   *  default (pass, flag, score neutral) is right for the picker, where a
+   *  human reads the '?' and decides; it is wrong for an unattended generator
+   *  like the roster build, which has no reader. Naming the dimensions here
+   *  is how "the roster admits no unknowns" gets said out loud. */
+  requireKnown?: SoftDimension[];
 
   /** The workload blend the effective price is computed against. */
   tokenMix?: TokenMix;
@@ -137,6 +144,11 @@ function hardFilter(model: CatalogModel, req: ModelRequirements, blended: number
   }
   if (req.maxEffectivePrice !== undefined && blended > req.maxEffectivePrice) {
     return { pass: false, flags };
+  }
+  // Dimensions the caller declared unknowns unacceptable on (see requireKnown).
+  for (const d of req.requireKnown ?? []) {
+    if (d === 'speed' && model.tokensPerSecond === undefined) return { pass: false, flags };
+    if (d === 'intelligence' && model.intelligenceIndex === undefined) return { pass: false, flags };
   }
   // Floors over prior-supplied data: no evidence passes, flagged (an unknown
   // is not a failure — the honest verdict is "no evidence", said out loud).

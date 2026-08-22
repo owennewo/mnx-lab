@@ -97,6 +97,52 @@ describe('SSE deltas', () => {
     const denied = (async () => new Response(JSON.stringify({ error: { message: 'bad key' } }), { status: 401 })) as unknown as typeof fetch;
     await expect(collect(streamChat({ apiKey: 'K', model: 'm', messages: [], fetchImpl: denied }))).rejects.toThrow(/401 — bad key/);
   });
+
+  // The selector's ranked output IS the fallback chain
+  // (core-assist-model-selector.md's second consumer).
+  it('a fallback chain replaces `model` with an ordered `models`, pick first', async () => {
+    let seen: RequestInit | undefined;
+    const fetchImpl = (async (_url: string, init: RequestInit) => {
+      seen = init;
+      return new Response(stream([frame('ok'), 'data: [DONE]\n\n']), { status: 200 });
+    }) as unknown as typeof fetch;
+    await collect(
+      streamChat({ apiKey: 'K', model: 'first', fallbacks: ['second', 'third'], messages: [], fetchImpl })
+    );
+    const body = JSON.parse(String(seen!.body));
+    expect(body.models).toEqual(['first', 'second', 'third']);
+    expect(body.model).toBeUndefined();
+
+    // An empty chain must not change the request at all — the fallback array
+    // is the second consumer's feature, not a new default.
+    await collect(streamChat({ apiKey: 'K', model: 'solo', fallbacks: [], messages: [], fetchImpl }));
+    const plain = JSON.parse(String(seen!.body));
+    expect(plain).toMatchObject({ model: 'solo' });
+    expect(plain.models).toBeUndefined();
+  });
+
+  it('reports the model that actually served, once, from the first frame that names it', async () => {
+    const named = (content: string, model?: string) =>
+      `data: ${JSON.stringify({ ...(model ? { model } : {}), choices: [{ delta: { content } }] })}\n\n`;
+    const served: string[] = [];
+    const fetchImpl = (async () =>
+      new Response(stream([named('a', 'second'), named('b', 'second'), 'data: [DONE]\n\n']), {
+        status: 200
+      })) as unknown as typeof fetch;
+    const out = await collect(
+      streamChat({
+        apiKey: 'K',
+        model: 'first',
+        fallbacks: ['second'],
+        messages: [],
+        onModel: id => served.push(id),
+        fetchImpl
+      })
+    );
+    expect(out).toEqual(['a', 'b']);
+    // Once, not per frame: it is a fact about the stream, not about the text.
+    expect(served).toEqual(['second']);
+  });
 });
 
 // The edit loop's transport. Same client, one face further on: tool-call and

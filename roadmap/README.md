@@ -43,6 +43,19 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-assist-evals.md](proposed/core-assist-evals.md)** — rank models on **our
+  corpus instead of on reputation**. Split out of the model selector (2026-08-22) as
+  the one thing it deliberately did not build. `MODEL_PRIORS` is seventeen families of
+  hand-read leaderboard numbers; `worker/editLoop.ts` was factored for evals and
+  already computes the metric that matters — first-attempt schema-valid rate, retries
+  consumed, terminal failures — because an intelligence index is a claim about a model
+  in general and the edit loop asks something far narrower. `/api/v1/generation`'s
+  realized `total_cost` is also the measured answer to the token-mix estimate
+  `DEFAULT_TOKEN_MIX` currently guesses. Open decisions: what an eval case is (a
+  scenario is a document, not an edit — the edit-op traces are the nearest shape), who
+  pays, how measured numbers land as committed data **distinguishable** from declared
+  priors, and sampling under non-determinism. Not a general benchmark; no automatic
+  promotion.
 - **[core-lowvision-reflow.md](proposed/core-lowvision-reflow.md)** — should the plan's
   line width be measured in **ink**, so growing the staff reflows the music instead of
   overflowing it? Left open by the 2026-08-21 low-vision range (staff ceiling 160% → 640%,

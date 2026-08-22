@@ -236,6 +236,11 @@ const PANEL_DEFAULT = 420;
  *  committed roster (worker/models.json) stays the reviewed default. The
  *  fallback id mirrors that roster's first row. */
 const ASSIST_MODEL_KEY = 'mnx-lab.assist-model';
+/** The runners-up the picker ranked below the choice, sent as OpenRouter's
+ *  ordered `models: []` so a rate-limited or down provider costs a retry
+ *  rather than the turn (core-assist-model-selector.md's second consumer).
+ *  Same presentation tier as the choice itself. */
+const ASSIST_FALLBACKS_KEY = 'mnx-lab.assist-fallbacks';
 /** The conversation — sessionStorage, so it survives switching scenarios
  *  in this tab and dies with the tab; *clear* in the context bar wipes it. */
 const ASSIST_CHAT_KEY = 'mnx-lab.assist-chat';
@@ -256,6 +261,15 @@ function storedChat(): ChatMessage[] {
   }
 }
 const DEFAULT_ASSIST_MODEL = 'deepseek/deepseek-v4-flash';
+
+function storedFallbacks(): string[] {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(ASSIST_FALLBACKS_KEY) ?? '[]') as unknown;
+    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : [];
+  } catch {
+    return [];
+  }
+}
 
 /* The zoom pad's two axes (core-zoom-density-pad.md). localStorage, not the
    document store: how big you like the staff is a property of you, not of the
@@ -477,6 +491,10 @@ export class ScenarioPage extends LitElement {
    *  (core-assist-model-selector.md's picker surface). */
   @state() private assistModel: string =
     localStorage.getItem(ASSIST_MODEL_KEY) ?? DEFAULT_ASSIST_MODEL;
+  @state() private assistFallbacks: string[] = storedFallbacks();
+  /** Which model actually answered — OpenRouter names it in every frame, and
+   *  it is not always the one you picked once a chain is in play. */
+  @state() private servedModel = '';
   @state() private modelPickerOpen = false;
   /** BYOK state (core-assist-byok.md): the key is read from the shell's
    *  store and re-read on its change event, so a PKCE landing in the app
@@ -1107,6 +1125,13 @@ export class ScenarioPage extends LitElement {
       }
 
       .assist-dim {
+        color: var(--ink-3);
+      }
+
+      /* The fallback chain's depth, riding on the model name: a count, not a
+         list — the list is the title, because a context bar has one line. */
+      .assist-chain {
+        margin-left: 3px;
         color: var(--ink-3);
       }
 
@@ -3046,11 +3071,25 @@ export class ScenarioPage extends LitElement {
    *  surface remains core-editor-ai-prompt.md's. */
   private panelAssist() {
     const connected = this.apiKey !== null;
+    const fellBack = this.servedModel !== '' && this.servedModel !== this.assistModel;
     return this.panelFrame({
       context: html`<span class="ctx-name">assistant</span>
-        <span class="ctx-dim" title=${this.assistModel}
-          >${modelDisplayName(this.assistModel)}</span
+        <span
+          class="ctx-dim"
+          title=${this.assistFallbacks.length
+            ? `${this.assistModel}\nthen: ${this.assistFallbacks.join(', ')}`
+            : this.assistModel}
+          >${modelDisplayName(this.assistModel)}${this.assistFallbacks.length
+            ? html`<span class="assist-chain" title="ordered fallbacks"
+                >+${this.assistFallbacks.length}</span
+              >`
+            : nothing}</span
         >
+        ${fellBack
+          ? html`<span class="ctx-dim" title=${this.servedModel}
+              >served by ${modelDisplayName(this.servedModel)}</span
+            >`
+          : nothing}
         <span class="ctx-actions">
           <button title="switch model" @click=${() => (this.modelPickerOpen = true)}>model</button>
           ${this.chat.length
@@ -3138,10 +3177,13 @@ export class ScenarioPage extends LitElement {
     `;
   }
 
-  private onModelPick(event: CustomEvent<{ id: string }>) {
+  private onModelPick(event: CustomEvent<{ id: string; fallbacks?: string[] }>) {
     this.assistModel = event.detail.id;
+    this.assistFallbacks = event.detail.fallbacks ?? [];
+    this.servedModel = '';
     try {
       localStorage.setItem(ASSIST_MODEL_KEY, this.assistModel);
+      localStorage.setItem(ASSIST_FALLBACKS_KEY, JSON.stringify(this.assistFallbacks));
     } catch {
       /* private mode — the choice just doesn't persist */
     }
@@ -3193,6 +3235,7 @@ export class ScenarioPage extends LitElement {
     if (!text || !this.apiKey || this.chatBusy) return;
     this.chatDraft = '';
     this.connectNotice = '';
+    this.servedModel = '';
     const history: ChatMessage[] = [...this.chat, { role: 'user', content: text }];
     this.setChat([...history, { role: 'assistant', content: '' }]);
     this.chatBusy = true;
@@ -3201,6 +3244,8 @@ export class ScenarioPage extends LitElement {
       for await (const delta of streamChat({
         apiKey: this.apiKey,
         model: this.assistModel,
+        fallbacks: this.assistFallbacks,
+        onModel: id => (this.servedModel = id),
         messages: history,
         signal: this.chatAbort.signal,
         referer: location.origin,

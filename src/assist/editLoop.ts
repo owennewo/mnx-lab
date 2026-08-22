@@ -27,6 +27,11 @@ export type ToolChoice = 'required' | 'auto';
 
 export interface ChatCompletionRequest {
   model: string;
+  /** Ordered fallbacks for the transport to fall through to — the selector's
+   *  ranked runners-up (core-assist-model-selector.md). The loop neither
+   *  builds nor reads this; it carries it, because which model answered is
+   *  the transport's business and self-correction is the loop's. */
+  fallbacks?: string[];
   messages: unknown[];
   tools: unknown[];
   signal?: AbortSignal;
@@ -42,6 +47,7 @@ export type ChatTransport = (req: ChatCompletionRequest) => AsyncGenerator<{
   toolCallId?: string;
   toolArguments?: string;
   completionTokens?: number;
+  model?: string;
 }>;
 
 /** The precompiled validators, loaded on FIRST USE rather than at module
@@ -79,6 +85,8 @@ export interface EditLoopInput {
   mnxJson: unknown;
   selectionContext: SelectionContextPayload;
   model: string;
+  /** Ordered runners-up for the transport to fall through to. */
+  fallbacks?: string[];
   attachedImages?: string[];
   /** How the loop talks to a model. The key lives in here, never in the loop. */
   transport: ChatTransport;
@@ -213,6 +221,7 @@ export async function runEditLoop(input: EditLoopInput): Promise<DoneFrame> {
     mnxJson,
     selectionContext,
     model,
+    fallbacks,
     attachedImages = [],
     transport,
     onProgress,
@@ -264,6 +273,7 @@ export async function runEditLoop(input: EditLoopInput): Promise<DoneFrame> {
 
       for await (const delta of transport({
         model,
+        fallbacks,
         messages,
         tools: EDIT_TOOLS,
         signal

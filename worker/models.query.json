@@ -1,0 +1,51 @@
+{
+  "note": "The stored queries that GENERATE worker/models.json (src/assist/roster.ts over src/assist/modelSelect.ts). Regenerate with `npm run update:roster`; refresh the catalog snapshot first with `npm run refresh:catalog`. It lives beside its output because the query and the roster are reviewed as one thing.",
+  "lanes": {
+    "text": {
+      "why": "The server-key demo roster. BYOK (core-assist-byok.md) spends the user's own key on whatever model they picked, so this allowlist governs only the mode where the deployment's key pays — which is why every query here carries a price ceiling and why none of them opts into `:free` promo endpoints: a committed roster must not name an id that rotates on someone else's promotional schedule.",
+      "queries": [
+        {
+          "name": "workhorse",
+          "why": "The default the drawer opens on: tool-calling, a window the document+schema+prompt fits with room to spare, fast enough to watch, and cheap enough to hand a stranger. Speed is weighted level with price here because a demo that stalls reads as broken.",
+          "take": 6,
+          "requirements": {
+            "requiredParameters": ["tools"],
+            "requireKnown": ["intelligence", "speed"],
+            "minContext": 131072,
+            "maxEffectivePrice": 1,
+            "minTokensPerSecond": 100,
+            "minIntelligence": 40
+          }
+        },
+        {
+          "name": "capable",
+          "why": "For the edit the workhorse fumbles. The intelligence floor is the point, so the ceiling rises and the speed floor drops to the slowest a person will sit through; intelligence carries its default weight of 1.5 and duly leads the ranking.",
+          "take": 4,
+          "requirements": {
+            "requiredParameters": ["tools"],
+            "requireKnown": ["intelligence", "speed"],
+            "minContext": 131072,
+            "maxEffectivePrice": 4,
+            "minTokensPerSecond": 40,
+            "minIntelligence": 60
+          }
+        }
+      ]
+    },
+    "transcribe": {
+      "why": "Declared, not derived — and the exception proves the rule. Transcription models are not chat completions and do not appear in /api/v1/models at all, so there is no catalog row to score and no query that could return one. When a transcription catalog exists these become a lane like any other.",
+      "declared": [
+        {
+          "id": "mistralai/voxtral-mini-transcribe",
+          "name": "Voxtral Mini Transcribe",
+          "provider": "Mistral"
+        },
+        {
+          "id": "openai/whisper-large-v3",
+          "name": "Whisper Large V3",
+          "provider": "OpenAI"
+        }
+      ]
+    }
+  }
+}

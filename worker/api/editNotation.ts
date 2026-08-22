@@ -30,7 +30,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const editNotation = new Hono<{ Bindings: Env }>().post('/', async c => {
   const body = (await c.req.json()) as EditRequest;
-  const { userPrompt, mnxJson, selectionContext, model = DEFAULT_MODEL, attachedImages } = body;
+  const { userPrompt, mnxJson, selectionContext, model = DEFAULT_MODEL, fallbacks, attachedImages } = body;
   const env = c.env;
 
   const { readable, writable } = new TransformStream();
@@ -65,6 +65,7 @@ export const editNotation = new Hono<{ Bindings: Env }>().post('/', async c => {
         mnxJson,
         selectionContext,
         model,
+        fallbacks,
         attachedImages,
         transport: openRouterEditTransport({
           apiKey: env.OPENROUTER_API_KEY,

@@ -221,6 +221,108 @@ shell as planned:
   Chrome over CDP: open tab → open dialog → slide to free-only → pick →
   header updates and both keys persist.
 
-Remaining: the dev-time roster regeneration script, the `models: []` fallback
-array (blocked on the chat/edit wiring), quality from edit-loop evals
-replacing the prior table, and the `elements/` promotion when studio arrives.
+## The roster becomes a query (2026-08-22)
+
+The first two remaining consumers landed; the other two turned out not to be
+this item's to build (below).
+
+**The roster is now generated.** `src/assist/roster.ts` runs stored queries
+against a catalog and returns roster rows; `worker/models.query.json` holds
+the queries beside the file they produce, and `worker/models.json` is their
+output. `npm run update:roster` regenerates from the committed snapshot,
+`npm run refresh:catalog` fetches OpenRouter's live catalog first and rewrites
+the snapshot (the only thing in the harness that touches the network, behind
+its own env flag, never in `npm test`). Both live in
+`harness/conformance/roster.test.ts` — `update:primitives`' pattern, the
+generator inside the test that pins its output, so regeneration and
+verification cannot drift apart. In plain `npm test` that file **asserts the
+committed roster is exactly what the queries return**, which makes a
+hand-edited roster a red build: the queries are the source, the roster is
+derived.
+
+**What the hand-curation actually was**, once articulated:
+
+- **The roster admits no unknowns.** `ModelRequirements` gained one hard
+  constraint, `requireKnown: SoftDimension[]`. The module's default — a model
+  with no prior passes, flagged, scoring neutral — is right for the picker,
+  where a human reads the `?` and decides, and wrong for an unattended
+  generator with no reader. That distinction is the whole difference between
+  the two consumers, and it is now said out loud rather than embedded.
+- **Only canonical endpoints.** `:free` is a promo endpoint on someone else's
+  rotation, `:batch` is the asynchronous batch API, and a leading `~` is a
+  floating "latest" alias: all three move under the commit that names them, so
+  a committed roster names none of them. The picker reaches them live, which is
+  the deliberate asymmetry — a person choosing is not a file asserting.
+- **Two queries, each with its sentence.** `workhorse` (tools, ≥128k, ≤$1/Mtok
+  blended, ≥100 t/s, ii ≥ 40, take 6) and `capable` (tools, ≥128k, ≤$4, ≥40
+  t/s, ii ≥ 60, take 4). Every query carries a price ceiling because
+  [core-assist-byok.md](core-assist-byok.md) settled what this roster is *for*:
+  the user's own key buys whatever they pick, so the roster governs only the
+  mode where the deployment's key pays.
+- **`transcribe` is declared, not derived** — and the exception proves the
+  rule. Transcription models are not chat completions and do not appear in
+  `/api/v1/models` at all, so there is no row to score.
+
+**The reproduction test found what it was built to find.** The queries return
+**7 of the 9** hand-picked ids, add three (`nemotron-3-super`, `nemotron-3-nano`,
+`glm-5.2`) and drop two: `claude-3-haiku`, whose prior of ii35 is under the
+workhorse floor and which costs 5× a row that is smarter *and* faster, and
+`qwen3.7-max`, which ranks fifth in a lane four wide. Exact reproduction was
+not achievable, and **that is the result, not a failure of the queries**: no
+monotone criterion separates `claude-3-haiku` from `nemotron-3-super` on any
+dimension the catalog carries, so part of the nine was simply arbitrary. This
+is what "every judgement embedded in the roster decays silently" looks like
+from the inside, and it is visible now only because something finally tried to
+re-derive it.
+
+The wire payload is unchanged. `models.json` grew `generatedBy` and `catalog`
+provenance around a `lanes` object, and `worker/api/models.ts` serves
+`roster.lanes` — a generated file that does not say it is generated is a trap,
+and an API payload is not the place to say it.
+
+**The fallback array is wired.** `streamChat({ fallbacks })` sends OpenRouter's
+ordered `models: []` — which *replaces* `model`, the pick being simply its head
+— and the picker emits the three models ranked **below** the choice as that
+chain: picking row 3 rejects rows 1–2, so falling through to row 4 is the only
+reading that respects the choice. `onModel` reports which model actually
+answered (OpenRouter names it in every frame and prices on it), and the context
+bar says *served by …* whenever that is not the one picked — a silent fallback
+would be a lie about what you are reading. The chain persists at
+`mnx-lab.assist-fallbacks`, the same presentation tier as the choice. Verified
+over CDP: assist tab → dialog → pick row 3 → header reads `+3` with the chain
+in its title, both localStorage keys written, no console errors.
+
+The **edit loop** carries it too, which only became possible mid-item: the loop
+moved out of the Worker and into `src/assist/editLoop.ts` behind a declared
+`ChatTransport` while this was being built, so the chain threads
+`EditRequest` → `EditLoopInput` → `ChatCompletionRequest` → the same
+`routing()` helper the plain chat uses, and both paths fall through
+identically. The loop neither builds nor reads the chain — it carries it,
+because which model answered is the transport's business and self-correction
+is the loop's. No caller drives that path yet; the prompt surface is
+[core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md)'s.
+
+That pass also caught a real defect in the picker: it was offering `:batch`
+endpoints, which are half-price and *hours* of latency. They rank perfectly
+well — they are not worse on any dimension the scorer measures, they are
+answering a different question — so the fix is a filter at the surface
+(`isInteractiveEndpoint`), not a requirement.
+
+## What this item does not build, and who owns it
+
+- **Quality from edit-loop evals.** Out of scope by this item's own terms (*Not
+  in scope: a benchmarking harness*) and gated on evals that do not exist. The
+  prior table is unchanged and still declared data; the successor is
+  [core-assist-evals.md](../proposed/core-assist-evals.md), which owns the join
+  point — first-attempt schema-valid rate and retries-consumed per model,
+  measured on our own corpus, replacing reputation.
+- **The `elements/` promotion.** Gated on studio being real, which is the same
+  gate — trigger 2, a real second consumer — that
+  [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md)
+  already holds for the editor and the palette. The dialog travels with them
+  rather than opening a second promotion conversation; the scoring core being
+  pure, DOM-free and fetchless is what keeps that cheap whichever way the
+  `elements → assist` boundary is resolved.
+
+Closing with both handed off is the honest shape: what remains is not this
+item's work waiting, it is other items' triggers not yet met.

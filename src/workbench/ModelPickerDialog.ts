@@ -21,12 +21,19 @@ import {
 import {
   snapshotCatalog,
   fetchLiveCatalog,
+  isInteractiveEndpoint,
   SNAPSHOT_FETCHED_AT,
 } from '../assist/modelCatalog.ts';
 import type { CatalogModel } from '../assist/modelSelect.ts';
 
 const QUERY_KEY = 'mnx-lab.assist-query';
 const TOP_N = 10;
+
+/** How many runners-up ride along as the request's fallback chain. The models
+ *  ranked BELOW the pick, in order: picking row 3 rejects rows 1–2, so falling
+ *  back to 4 is the only reading that respects the choice. Three deep because
+ *  a chain is insurance against a rate limit, not a shopping list. */
+const FALLBACK_DEPTH = 3;
 
 /** The slider's discrete ceilings, $/Mtok blended; 0 = free-only, last = any.
  *  Logarithmic because price is: each notch roughly 3× the previous. */
@@ -231,7 +238,10 @@ export class ModelPickerDialog extends LitElement {
   }
 
   private results(): ScoredModel[] {
-    return selectModels(this.requirements(), this.catalog).slice(0, TOP_N);
+    // Batch endpoints are filtered here rather than by a requirement: they are
+    // not worse on any dimension, they are answering a different question.
+    const offerable = this.catalog.filter(m => isInteractiveEndpoint(m.id));
+    return selectModels(this.requirements(), offerable).slice(0, TOP_N);
   }
 
   private setQuery(patch: Partial<StoredQuery>) {
@@ -249,9 +259,14 @@ export class ModelPickerDialog extends LitElement {
   }
 
   private pick(result: ScoredModel) {
+    const ranked = this.results();
+    const at = ranked.findIndex(r => r.model.id === result.model.id);
+    const fallbacks = ranked
+      .slice(at + 1, at + 1 + FALLBACK_DEPTH)
+      .map(r => r.model.id);
     this.dispatchEvent(
       new CustomEvent('model-pick', {
-        detail: { id: result.model.id },
+        detail: { id: result.model.id, fallbacks },
         bubbles: true,
         composed: true,
       }),

@@ -17,6 +17,10 @@ export interface EditRequest {
   selectionContext: SelectionContextPayload;
   /** OpenRouter model id; the Worker applies its own default when absent. */
   model?: string;
+  /** Ordered fallbacks for that pick — the models the selector ranked below
+   *  it. Absent means no chain, which is what every caller sent before
+   *  core-assist-model-selector.md's second consumer existed. */
+  fallbacks?: string[];
   /** Data-URL images attached to the instruction (vision models only). */
   attachedImages?: string[];
 }

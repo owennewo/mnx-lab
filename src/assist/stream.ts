@@ -96,6 +96,7 @@ async function* runEditLoopFrames(
     mnxJson: request.mnxJson,
     selectionContext: request.selectionContext,
     model: request.model ?? DEFAULT_MODEL,
+    fallbacks: request.fallbacks,
     attachedImages: request.attachedImages,
     transport: openRouterEditTransport({
       apiKey,
