@@ -256,7 +256,7 @@ derived.
 - **Two queries, each with its sentence.** `workhorse` (tools, ≥128k, ≤$1/Mtok
   blended, ≥100 t/s, ii ≥ 40, take 6) and `capable` (tools, ≥128k, ≤$4, ≥40
   t/s, ii ≥ 60, take 4). Every query carries a price ceiling because
-  [core-assist-byok.md](core-assist-byok.md) settled what this roster is *for*:
+  [core-assist-byok.md](../complete/core-assist-byok.md) settled what this roster is *for*:
   the user's own key buys whatever they pick, so the roster governs only the
   mode where the deployment's key pays.
 - **`transcribe` is declared, not derived** — and the exception proves the

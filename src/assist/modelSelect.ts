@@ -1,5 +1,5 @@
 // The model selector's scoring core — pure, DOM-free, fetchless.
-// roadmap/inprogress/core-assist-model-selector.md: the roster as a query, not a
+// roadmap/complete/core-assist-model-selector.md: the roster as a query, not a
 // list. A requirements definition (hard filters + weighted soft preferences)
 // runs against a catalog and returns an ordered list of matching models.
 //

@@ -215,7 +215,31 @@ proposals that name their campaign.
   Opened 2026-08-22 with 37 stale + 8 never-seen in three batches: `core-ink-measured-gaps`
   (33, across stages A/C/D and the tab row pads), the barline-default fix (4, no owning
   doc), and the never-reviewed corpus-closure technique set (8).
-- **[core-assist-model-selector.md](inprogress/core-assist-model-selector.md)** — **the model
+- **[workbench-rung-legibility.md](inprogress/workbench-rung-legibility.md)** — knowing
+  which selection rung you are in without moving your eyes. The enclosure's two channels
+  (extent, fill ratio) are *relative* — read by comparison with the shape just left — and
+  they degenerate exactly at the confusable trio (voice/part-bar/bar in single-voice,
+  single-part documents). **Both phases built 2026-08-20.** Phase 1: the rung chip the
+  ladder doc promised, in the HUD's own `ROW_BY_LEVEL` vocabulary — revised same day into
+  the tray's collapsed handle (below the selection, click = `/`, flips by the tray's own
+  room test). Phase 2: the **extent ladder on both axes** — the voice hull hugs the
+  notehead contour (no staff-band floor), the part-bar owns its music's span, and the bar
+  becomes the first full-width rung; vertical monotonicity deliberately traded at
+  event→voice (*a moment is tall, a run is long*). Remaining: bar vs section. Colour
+  ladders, border styles and whole-page scope dimming considered and rejected (reasons in
+  the doc).
+- **[core-selection-clipboard.md](inprogress/core-selection-clipboard.md)** — typed
+  copy, cut and paste over every selection rung, range and closure. **Stage 1 built
+  2026-08-16:** the versioned DOM-free clip union and strict JSON codec, the
+  asynchronous string-only memory store, and app-level ownership that survives route,
+  document and session changes without claiming reload persistence. All nine clip kinds
+  (`note-set` through whole score), context/dependency fields and malformed/unknown/
+  cyclic refusals are pinned by `selection-clip.test.ts`. No editor command is live yet;
+  stage 2 is pure extraction from resolved point/range/closure selections. System
+  clipboard support remains deferred, but replacing the store later leaves clip,
+  history and paste semantics untouched.
+### complete/
+- **[core-assist-model-selector.md](complete/core-assist-model-selector.md)** — **the model
   roster as a query, not a list**: a pure assessment/selection module that takes a
   requirements definition (hard filters — tool support, context floor, price ceiling,
   free-only — plus weighted soft preferences) and returns an ordered list of matching
@@ -243,33 +267,25 @@ proposals that name their campaign.
   `model-select.test.ts`, dominance invariant included), the 413-model committed catalog
   snapshot (router pseudo-models excluded — they price as −1), the workbench's sixth
   panel tab with the switch-model CTA over a placeholder chat, and the
-  `<mnx-model-picker>` dialog, verified hands-on over CDP. Remaining: roster
-  regeneration, the fallback array (blocked on the chat wiring), eval-fed quality, the
-  `elements/` promotion.
-- **[workbench-rung-legibility.md](inprogress/workbench-rung-legibility.md)** — knowing
-  which selection rung you are in without moving your eyes. The enclosure's two channels
-  (extent, fill ratio) are *relative* — read by comparison with the shape just left — and
-  they degenerate exactly at the confusable trio (voice/part-bar/bar in single-voice,
-  single-part documents). **Both phases built 2026-08-20.** Phase 1: the rung chip the
-  ladder doc promised, in the HUD's own `ROW_BY_LEVEL` vocabulary — revised same day into
-  the tray's collapsed handle (below the selection, click = `/`, flips by the tray's own
-  room test). Phase 2: the **extent ladder on both axes** — the voice hull hugs the
-  notehead contour (no staff-band floor), the part-bar owns its music's span, and the bar
-  becomes the first full-width rung; vertical monotonicity deliberately traded at
-  event→voice (*a moment is tall, a run is long*). Remaining: bar vs section. Colour
-  ladders, border styles and whole-page scope dimming considered and rejected (reasons in
-  the doc).
-- **[core-selection-clipboard.md](inprogress/core-selection-clipboard.md)** — typed
-  copy, cut and paste over every selection rung, range and closure. **Stage 1 built
-  2026-08-16:** the versioned DOM-free clip union and strict JSON codec, the
-  asynchronous string-only memory store, and app-level ownership that survives route,
-  document and session changes without claiming reload persistence. All nine clip kinds
-  (`note-set` through whole score), context/dependency fields and malformed/unknown/
-  cyclic refusals are pinned by `selection-clip.test.ts`. No editor command is live yet;
-  stage 2 is pure extraction from resolved point/range/closure selections. System
-  clipboard support remains deferred, but replacing the store later leaves clip,
-  history and paste semantics untouched.
-### complete/
+  `<mnx-model-picker>` dialog, verified hands-on over CDP. **Closed 2026-08-22**: the
+  roster is generated — `worker/models.query.json` holds the stored queries, `roster.ts`
+  runs them, `npm run update:roster` writes `worker/models.json` and
+  `harness/conformance/roster.test.ts` asserts the two agree, so hand-editing the roster
+  is a red build. Articulating the curation took one new hard constraint, `requireKnown`
+  (pass-and-flag an unknown is right for a human reading the picker's `?`, wrong for an
+  unattended generator), plus canonical endpoints only (`:free` rotates, `:batch` is the
+  async API, `~x` floats). The queries reproduce **7 of the 9** hand-picks — and the two
+  they drop are the finding, since nothing in the catalog separates `claude-3-haiku` from
+  `nemotron-3-super` on any dimension, so part of the nine was simply arbitrary. The
+  fallback array is wired through both paths (`streamChat` and the edit loop's transport,
+  which became possible when the loop moved to `src/assist/` mid-item): the picker hands
+  over the three ranked *below* the choice, `models: []` replaces `model`, and the context
+  bar says *served by* whenever the answer came from further down. Eval-fed quality and
+  the `elements/` promotion were handed off rather than built — to
+  [core-assist-evals.md](proposed/core-assist-evals.md) and
+  [core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)'s existing
+  gate — because neither was this item's work waiting, but other items' triggers not yet
+  met.
 - **[core-assist-byok.md](complete/core-assist-byok.md)** — **bring your own
   OpenRouter key**, completing the workbench's no-backend rule by deleting its one
   asterisk ("minus live AI edits"): the key is obtained by **OAuth PKCE** (a distinct

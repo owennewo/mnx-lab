@@ -1,5 +1,5 @@
 // The model picker — the selector's query dialog (the picker surface of
-// roadmap/inprogress/core-assist-model-selector.md, incubating in workbench/).
+// roadmap/complete/core-assist-model-selector.md, incubating in workbench/).
 // The criteria widgets ARE the requirements definition wearing controls: the
 // effective-price slider is a ceiling on the workload blend, the minimums are
 // hard floors, and the ranked list below is selectModels() verbatim — top n,
