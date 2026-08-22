@@ -120,7 +120,7 @@ keymapDocs data change, not a re-litigation of this principle.
 - **`src/edit/keymapDocs.ts`** — the Shift+←/→, Shift+End, Ctrl/⌘+A and ↑/↓
   rows change their note/event meanings; the guard-mirror tests in
   `keymap-docs.test.ts` change with them (this is a
-  [cheatsheet stage-4](../inprogress/core-keymap-cheatsheet.md) landing).
+  [cheatsheet stage-4](../complete/core-keymap-cheatsheet.md) landing).
 - **The clipboard** — the UI can now only produce single-note `note-set`
   clips. The clip format **keeps** `notes[]`: the extraction/paste planners
   are pure and tested, single-note repitch (point onto point) remains real

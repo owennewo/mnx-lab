@@ -22,13 +22,20 @@
 > the Ctrl/⌘+C/X/V rows: copy and paste level-independent, cut spelling its
 > per-rung removal table with the score row absent — guard-mirrored against
 > the cut planner's refusal.
-> **Remaining: stage 4** — later ladder review decisions continue to land here
-> as data.
+> **Complete 2026-08-22.** Every stage this doc proposed is built, the honesty test
+> included. What was filed as "stage 4" is not a deliverable but a **standing
+> maintenance obligation** — later ladder review passes land their decisions here as
+> data, in the same change — and it is **machine-enforced, not doc-tracked**:
+> `keymap-docs.test.ts` asserts both directions of the join (every binding
+> documented, every doc bound), so a ladder pass that adds a stroke without a row
+> turns the build red. Three passes have already discharged it while this doc sat
+> open (the horizontal pass, container/Delete, the clipboard's C/X/V). Holding the
+> item open for an obligation a test already enforces tracked nothing.
 >
 > Original proposal below. The rendering surface builds on
-> [core-score-hud.md](../complete/core-score-hud.md) (the hud panel tab);
+> [core-score-hud.md](core-score-hud.md) (the hud panel tab);
 > the data table is the documentation half of the
-> [core-selection-ladder.md](../complete/core-selection-ladder.md)
+> [core-selection-ladder.md](core-selection-ladder.md)
 > **per-level navigation map** — that effort decides what every key means at
 > each rung; this one writes the decisions down as data and renders them.
 

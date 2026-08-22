@@ -38,7 +38,7 @@
 > exactly that — the TAB clef run into the time signature under the pad's
 > vertical arm — and this is the decision.
 >
-> Sibling: [core-ragged-last.md](../inprogress/core-ragged-last.md), found in the same
+> Sibling: [core-ragged-last.md](../complete/core-ragged-last.md), found in the same
 > session. Different mechanism (the justifier's stretch cap, not the scale),
 > different golden story (that one moves goldens; this one must not), so it is
 > its own item.
@@ -193,7 +193,7 @@ once and both staves read it. No per-staff ratio exists to disagree.
   bars between systems under zoom — exactly what was banned. If extreme-zoom
   overflow ever hurts in practice, that is a *new* decision with its own
   evidence, and this doc's frozen-packing rule is where it would be argued.
-- **Not the last-row stretch** — [core-ragged-last.md](../inprogress/core-ragged-last.md).
+- **Not the last-row stretch** — [core-ragged-last.md](../complete/core-ragged-last.md).
 - **Not touching `svg.ts`'s dimension rule.** Ink follows `ky`; that half of
   `fd6b06e` is correct and is the premise here, not the patient.
 

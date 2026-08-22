@@ -1,4 +1,4 @@
-// The keymap meaning table (roadmap/inprogress/core-keymap-cheatsheet.md):
+// The keymap meaning table (roadmap/complete/core-keymap-cheatsheet.md):
 // the joins that keep the cheatsheet honest — every binding documented,
 // every documented stroke bound — and the guard mirrors: a rung ABSENT from
 // a KeyDoc's meaning map must be a session no-op, or the cheatsheet lies.

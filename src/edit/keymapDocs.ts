@@ -1,4 +1,4 @@
-// The keymap's meaning table — roadmap/inprogress/core-keymap-cheatsheet.md.
+// The keymap's meaning table — roadmap/complete/core-keymap-cheatsheet.md.
 //
 // The binding tables (keymap.ts) say which key fires which intent; THIS table
 // says what that means at each rung of the selection ladder — the per-level

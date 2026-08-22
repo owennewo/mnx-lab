@@ -2,7 +2,7 @@
 
 > **Status: PROPOSED 2026-08-21.** Found while chasing a report that the
 > spacing arms do nothing at a large staff scale
-> ([core-ragged-last.md](../inprogress/core-ragged-last.md) appendix fixed the
+> ([core-ragged-last.md](../complete/core-ragged-last.md) appendix fixed the
 > half of that which was a real engraving defect). What is left is this: the
 > ladder answers about a page the renderer does not draw.
 

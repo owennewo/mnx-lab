@@ -213,4 +213,4 @@ now means 1. `padDensityFor` stays exported (the mapping is still a reasonable
 thing for a host to *choose* to apply, and its tests pin its shape); nothing
 applies it by default. The inter-system distance itself — still the fixed pads
 at density 1 — is stage D of
-[core-ink-measured-gaps.md](../inprogress/core-ink-measured-gaps.md).
+[core-ink-measured-gaps.md](../complete/core-ink-measured-gaps.md).

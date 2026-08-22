@@ -1,13 +1,17 @@
 # Vertical distance is measured ink to ink — cohesion and separation as two constants
 
-> **Status: IN PROGRESS — stages A, B and C built 2026-08-21; D is the open
-> decision.** The three sweeps this owes: A's 6 demotions, B's 20 both
-> goldens (un-hashed, so approved for the first time), C's 8 demotions.
+> **Status: COMPLETE 2026-08-22 — all four stages built.** A, B and C landed
+> 2026-08-21 (`da6534c`, stage B, `ddbf5d7`); **D landed the same day** (`018073d`,
+> inter-system gaps ink-measured, `SEPARATION_CLEAR_SP` moved down into
+> `verticalDensity.ts`, two conformance assertions). The header above D as "the open
+> decision" was written before that commit and outlived it; the ruling was taken, on
+> A–C's evidence, exactly as the staging required.
 >
-> **Verification debt is registered** as batch 1 of the standing ledger,
-> [lab-verify.md](lab-verify.md) — 33 stale scenarios as of 2026-08-22, split by
-> stage, with what a reviewer should look for. This doc no longer has to stay open
-> for want of a sweep: it may close owing those approvals, and the ledger keeps them.
+> **Closed owing verification.** The approvals A–D owe are registered as **batch 1**
+> of the standing ledger, [lab-verify.md](../inprogress/lab-verify.md) — 33 stale
+> scenarios as of 2026-08-22, split by stage, with what a reviewer should look for.
+> Per that contract an item may reach `complete/` owing approvals; the debt is the
+> ledger's now, not this doc's. Nothing here is un-built.
 >
 > **Stage C.** `isMeasuredGap` returns true for every display gap — the
 > staging was a review device, not a distinction in the rule. Two things the
@@ -68,13 +72,13 @@
 > — and the answer is one the engine already uses in one of its three
 > vertical decisions.
 >
-> Lineage: [core-vertical-density.md](../complete/core-vertical-density.md)
+> Lineage: [core-vertical-density.md](core-vertical-density.md)
 > built the mechanism (`tightenRows`: *"the frame follows the ink instead of
 > predicting it"*) and confined it to the space **between systems** at
 > non-default density. This doc generalizes it to the two decisions it left
 > out — the label row and the staves within a system — and proposes making it
 > the default. Sibling of the ink-pricing work on the horizontal axis
-> ([core-ink-priced-columns.md](../complete/core-ink-priced-columns.md)):
+> ([core-ink-priced-columns.md](core-ink-priced-columns.md)):
 > that one said rigid *widths* are ink; this one says vertical *distances*
 > are measured from ink.
 

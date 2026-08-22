@@ -1,5 +1,5 @@
 // The last system borrows its stretch from the page
-// (roadmap/inprogress/core-ragged-last.md).
+// (roadmap/complete/core-ragged-last.md).
 //
 // `packSystems` justifies every row toward the full line width, clamped to
 // [MIN_SQUEEZE, MAX_STRETCH]. A full row lands near 1; a sparse FINAL row

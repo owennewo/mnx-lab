@@ -202,23 +202,6 @@ proposals that name their campaign.
   Opened 2026-08-22 with 37 stale + 8 never-seen in three batches: `core-ink-measured-gaps`
   (33, across stages A/C/D and the tab row pads), the barline-default fix (4, no owning
   doc), and the never-reviewed corpus-closure technique set (8).
-- **[core-ink-measured-gaps.md](inprogress/core-ink-measured-gaps.md)** — **vertical distance
-  is measured ink to ink**. **Stages A–C built 2026-08-21** (labels/tempo one clearance above the
-  ink under their footprint; every display gap ink-measured via a probe pass, gap-centred
-  `between` directions held with a clearance each side) — 9 text scenarios + 12 multi-staff
-  scenarios demoted for the sweeps, 20 both goldens earned; D (density-1 ruling) open.
-  Principle: with two clearance constants: cohesion (label→its staff, ≈1sp)
-  and separation (staff→staff, system→system, ≈3sp). Raised 2026-08-21 from two screenshots
-  of one score: the section label crowds the treble stems in `both` and floats over a
-  stemless tab staff in tab-only; the tab crowds the notation while the bass floats below —
-  and those two staff gaps are *geometrically identical* (6sp), one full of ink and one of
-  air. The label scan reads `p.y` and so cannot see stems. The engine already has the
-  principle in `tightenRows` (*"the frame follows the ink"*), confined to between-systems
-  at non-default density; this generalizes it to the label row and the display staves
-  within a system, as the same post-pass one level down. Staged A (labels, 8 scenarios) →
-  B (`both` display gaps, 21 both goldens) → C (grand-staff gaps) → D (a recorded ruling:
-  density 1 becomes ink-measured). Two decisions fixed up front: staff gaps per system,
-  label rises per bar; `padDensity` scales the clearances, not the pads.
 - **[core-assist-byok.md](inprogress/core-assist-byok.md)** — **bring your own
   OpenRouter key**, completing the workbench's no-backend rule by deleting its one
   asterisk ("minus live AI edits"): the key is obtained by **OAuth PKCE** (a distinct
@@ -232,17 +215,6 @@ proposals that name their campaign.
   selector's "must the Worker honour any model id" question — it is the user's money.
   Remaining: move the edit loop behind this transport, a CSP header, the Worker as
   explicit demo mode.
-- **[core-ragged-last.md](inprogress/core-ragged-last.md)** — the last system borrows its
-  stretch from the page. **Built 2026-08-21; owes its `/verify` sweep.** A sparse final row
-  justified into the `MAX_STRETCH = 2.5` cap — 2.5× the texture of the rows above, still
-  short of the margin. Rule, in one exported helper used by the packer and the ink-priced
-  path alike: the last row may not be looser than the loosest other row
-  (`min(computed, max(1, others))`), page-relative rather than a fill threshold, inert on a
-  single system. Measured: 5 multi-system scenarios moved, 0 single-system; 3 demoted to
-  stale (`navigation-playground`, `rest-gallery`, `tie-targets`) — that sweep is what keeps
-  this in `inprogress/`. Per-system layouts cap each multi-row segment's last row. Five
-  corpus-wide assertions in `ragged-last.test.ts`. Appendix on
-  [core-render-density-zoom.md](complete/core-render-density-zoom.md).
 - **[core-assist-model-selector.md](inprogress/core-assist-model-selector.md)** — **the model
   roster as a query, not a list**: a pure assessment/selection module that takes a
   requirements definition (hard filters — tool support, context floor, price ceiling,
@@ -297,7 +269,36 @@ proposals that name their campaign.
   stage 2 is pure extraction from resolved point/range/closure selections. System
   clipboard support remains deferred, but replacing the store later leaves clip,
   history and paste semantics untouched.
-- **[core-keymap-cheatsheet.md](inprogress/core-keymap-cheatsheet.md)** — a **selection-mode-
+### complete/
+- **[core-ink-measured-gaps.md](complete/core-ink-measured-gaps.md)** — **vertical distance
+  is measured ink to ink**. **Stages A–C built 2026-08-21** (labels/tempo one clearance above the
+  ink under their footprint; every display gap ink-measured via a probe pass, gap-centred
+  `between` directions held with a clearance each side) — 9 text scenarios + 12 multi-staff
+  scenarios demoted for the sweeps, 20 both goldens earned; D (density-1 ruling) open.
+  Principle: with two clearance constants: cohesion (label→its staff, ≈1sp)
+  and separation (staff→staff, system→system, ≈3sp). Raised 2026-08-21 from two screenshots
+  of one score: the section label crowds the treble stems in `both` and floats over a
+  stemless tab staff in tab-only; the tab crowds the notation while the bass floats below —
+  and those two staff gaps are *geometrically identical* (6sp), one full of ink and one of
+  air. The label scan reads `p.y` and so cannot see stems. The engine already has the
+  principle in `tightenRows` (*"the frame follows the ink"*), confined to between-systems
+  at non-default density; this generalizes it to the label row and the display staves
+  within a system, as the same post-pass one level down. Staged A (labels, 8 scenarios) →
+  B (`both` display gaps, 21 both goldens) → C (grand-staff gaps) → D (a recorded ruling:
+  density 1 becomes ink-measured). Two decisions fixed up front: staff gaps per system,
+  label rises per bar; `padDensity` scales the clearances, not the pads. **Closed 2026-08-22** owing only its `/verify` sweep, which is registered as batch 1 of [lab-verify.md](inprogress/lab-verify.md); stage D landed 2026-08-21 in `018073d` and the status header simply outlived the commit.
+- **[core-ragged-last.md](complete/core-ragged-last.md)** — the last system borrows its
+  stretch from the page. **Built 2026-08-21; owes its `/verify` sweep.** A sparse final row
+  justified into the `MAX_STRETCH = 2.5` cap — 2.5× the texture of the rows above, still
+  short of the margin. Rule, in one exported helper used by the packer and the ink-priced
+  path alike: the last row may not be looser than the loosest other row
+  (`min(computed, max(1, others))`), page-relative rather than a fill threshold, inert on a
+  single system. Measured: 5 multi-system scenarios moved, 0 single-system; 3 demoted to
+  stale (`navigation-playground`, `rest-gallery`, `tie-targets`) — that sweep is what keeps
+  this in `inprogress/`. Per-system layouts cap each multi-row segment's last row. Five
+  corpus-wide assertions in `ragged-last.test.ts`. Appendix on
+  [core-render-density-zoom.md](complete/core-render-density-zoom.md). **Closed 2026-08-22.** *"BUILT, awaiting the `/verify` sweep"* was its whole remainder; the sweep now lives in [lab-verify.md](inprogress/lab-verify.md) as batch 1's second owner.
+- **[core-keymap-cheatsheet.md](complete/core-keymap-cheatsheet.md)** — a **selection-mode-
   dependent keyboard cheatsheet**, built by making the ladder's per-level navigation map DATA.
   The keymap's binding tables are already data, but the *meaning* of a key at each rung lives
   in `session.navigate` (arrows move by the rung's unit, voice jumps only at note level) — a
@@ -313,8 +314,7 @@ proposals that name their campaign.
   physical-key labels per the keymap's `KeyboardEvent.code` decision. The ladder's
   complete per-rung bare/Ctrl navigation map and Shift-extension/Ctrl-or-Meta closure
   gestures are mirrored here as data, including the container rung and explicit
-  rung-first Delete meanings through section.
-### complete/
+  rung-first Delete meanings through section. **Closed 2026-08-22.** What was filed as stage 4 is a standing maintenance obligation, not a deliverable — and `keymap-docs.test.ts` enforces both directions of the join, so a ladder pass that adds a stroke without a row turns the build red. A test already tracked it.
 - **[core-ink-offset-fields.md](complete/core-ink-offset-fields.md)** — **ink offsets are a
   field, not a convention.** Built 2026-08-21 after the same bug class surfaced a fourth
   time: at 640% staff scale a double barline's two strokes OVERLAPPED and drew as one line,

@@ -66,7 +66,7 @@ proposal opens with, and is reviewed on:
    [core-selection-ladder.md](../complete/core-selection-ladder.md) per-level review
    (its navigation map and this campaign are two halves of one set of decisions), and
    landed as `KeyDoc` rows in `src/edit/keymapDocs.ts` in the same change so the
-   cheatsheet joins ([core-keymap-cheatsheet.md](../inprogress/core-keymap-cheatsheet.md)
+   cheatsheet joins ([core-keymap-cheatsheet.md](../complete/core-keymap-cheatsheet.md)
    stage 4) keep it honest.
 4. **The evidence** — which scenarios the item unlocks, proven by the campaign's two
    harnesses: the constructibility trace (replay from empty, judge against the

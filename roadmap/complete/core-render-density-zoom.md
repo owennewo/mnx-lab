@@ -194,7 +194,7 @@ rows whose springs can no longer reach the margin within `MAX_STRETCH`. The same
 second face that took a tab screenshot to notice: a sparse **final** system is set at the
 full 2.5× cap while the rows above it run near 1×, so the last line disagrees with its own
 page and still misses the margin. Filed as
-[core-ragged-last.md](../inprogress/core-ragged-last.md) — the last row borrows its stretch
+[core-ragged-last.md](../complete/core-ragged-last.md) — the last row borrows its stretch
 ceiling from the loosest other row on the page, a page-relative rule rather than a
 `ragged-last` threshold constant. (Its sibling,
 [core-ink-priced-columns.md](core-ink-priced-columns.md), covers the non-square

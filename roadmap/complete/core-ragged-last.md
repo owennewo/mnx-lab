@@ -1,6 +1,18 @@
 # The last system borrows its stretch from the page
 
-> **Status: BUILT 2026-08-21, awaiting the `/verify` sweep.** One exported
+> **Status: COMPLETE 2026-08-22 — built 2026-08-21 (`7ebcdab`), closed owing the
+> `/verify` sweep.** Its three demotions — `lab/document/navigation-playground`,
+> `lab/durations/rest-gallery` and `spec/tie-targets` — are registered in the standing
+> ledger, [lab-verify.md](../inprogress/lab-verify.md), inside batch 1's stage-D
+> sub-set: `018073d` moved those goldens again after this item did, so the ledger
+> attributes them to the commit that touched them last and names this item alongside.
+> Every other gate is met — the corpus diff stayed inside final systems, and the six
+> assertions in `harness/conformance/ragged-last.test.ts` hold. The density ladder's
+> rung assertions needed no re-derivation after all: `zoom-density.test.ts` derives the
+> ladder from the layout at test time rather than pinning a list, so a legitimate
+> change in the rung set cannot be "patched to pass" there.
+>
+> One exported
 > helper, `capLastRowStretch` in `spacing.ts`, applied in `packSystems` (so
 > the ladder, `packedRowMeasures` and every plan agree by construction) and
 > again on the ink-priced re-justification path, which computes its own row
@@ -28,7 +40,7 @@
 > obeying the same ceiling, read back off the plan through the leading spring.
 >
 > Originally: **PROPOSED 2026-08-20.** Found in the same tab-view session as
-> [core-ink-priced-columns.md](../complete/core-ink-priced-columns.md): a score whose
+> [core-ink-priced-columns.md](core-ink-priced-columns.md): a score whose
 > first system runs at stretch ≈ 1 and whose leftover final bar is set at the
 > `MAX_STRETCH = 2.5` cap — two and a half times the note spacing of the row
 > above it, and *still* short of the right margin. Different mechanism than

@@ -127,7 +127,7 @@
 > the bar jump and the go-to grammar resolve a missing voice by ONE rule.
 > Pinned by eleven new cases in `harness/conformance/navigation.test.ts` and the
 > rung mirrors in `keymap-docs.test.ts`; the cheatsheet
-> ([core-keymap-cheatsheet.md](../inprogress/core-keymap-cheatsheet.md)) states the new
+> ([core-keymap-cheatsheet.md](../complete/core-keymap-cheatsheet.md)) states the new
 > meanings per rung, including which two rungs are the mount's.
 >
 > **Note level built 2026-08-10; its hands-on review same day.** Shipped: the navigation playground scenario

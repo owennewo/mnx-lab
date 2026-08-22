@@ -329,7 +329,7 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
 
 /**
  * The last row may not be stretched looser than the loosest other row on the
- * page (roadmap/inprogress/core-ragged-last.md).
+ * page (roadmap/complete/core-ragged-last.md).
  *
  * Justification exists to reach the right margin, and a sparse final system
  * cannot: it computes a huge stretch, hits `MAX_STRETCH`, and is drawn at 2.5×

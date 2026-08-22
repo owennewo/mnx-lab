@@ -17,11 +17,16 @@ someone's eyes, and the work item that caused the pile cannot honestly call itse
 while the pile stands.
 
 The result was a coupling nobody chose:
-[core-ink-measured-gaps.md](core-ink-measured-gaps.md) has all four of its stages built
-and still says stage D is "taken only once A–C are verified, on their evidence" — the
-engineering is finished and the doc is pinned open by 33 scenarios nobody has reviewed
-yet. Worse, two spec-conformance fixes (`fab5a85`, `ff5ae78`) moved goldens without an
-owning roadmap doc at all, so their debt was recorded nowhere but the queue.
+[core-ink-measured-gaps.md](../complete/core-ink-measured-gaps.md) had all four of its
+stages built and still said stage D was "taken only once A–C are verified, on their
+evidence" — the engineering finished, the doc pinned open by 33 scenarios nobody had
+reviewed. [core-ragged-last.md](../complete/core-ragged-last.md) was blunter still:
+*"BUILT, awaiting the `/verify` sweep"* was its entire remainder. Worse, two
+spec-conformance fixes (`fab5a85`, `ff5ae78`) moved goldens without an owning roadmap
+doc at all, so their debt was recorded nowhere but the queue.
+
+Both items closed on 2026-08-22 the day this ledger opened, owing nothing but the
+approvals below — which is the ledger working as intended, on its first day.
 
 This doc decouples the two. **An item may reach `complete/` owing verification, provided
 the debt is registered here with its cause.** The build work and the looking are separate
@@ -82,9 +87,17 @@ current). Batches are grouped by cause; the commit named for each sub-set is the
 
 ### 1. `core-ink-measured-gaps` — vertical distance measured ink to ink — **33 stale**
 
-Owner: [core-ink-measured-gaps.md](core-ink-measured-gaps.md) (stages A–D all built,
-2026-08-21). This is the doc the ledger exists to unpin: with the batch registered here,
-stage D's density-1 ruling is the only thing left holding it open.
+Owner: [core-ink-measured-gaps.md](../complete/core-ink-measured-gaps.md) (stages A–D all
+built 2026-08-21; **closed 2026-08-22 owing these approvals**). This is the doc the
+ledger exists to unpin, and it is unpinned.
+
+**Second owner, same batch:** [core-ragged-last.md](../complete/core-ragged-last.md)
+(`7ebcdab`, also closed 2026-08-22) demoted `lab/document/navigation-playground`,
+`lab/durations/rest-gallery` and `spec/tie-targets`. Stage D (`018073d`) then moved
+those same three goldens again, so the table below files them under stage D by the
+last-moved rule. **A reviewer approving those three settles both items at once** — and
+must read both rationales: the last system should sit at its page's texture *and* the
+gap above it should be ink-measured.
 
 | Sub-set | Last moved by | Scenarios |
 |---|---|---|
