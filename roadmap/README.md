@@ -4,7 +4,9 @@ Planning docs for MNX Lab, filed by their status **relative to the current codeb
 is an archive of intent, not a live task board. The recent driver — the spec-approval sweep —
 is now complete ([complete/lab-spec-approval.md](complete/lab-spec-approval.md), 57/57 verified); the
 corpus contract is [complete/lab-04-scenario-library.md](complete/lab-04-scenario-library.md), closed
-2026-08-09 — corpus growth now arrives as its own tickets, not through that doc.
+2026-08-09 — corpus growth now arrives as its own tickets, not through that doc. Ongoing
+verification debt is tracked in [inprogress/lab-verify.md](inprogress/lab-verify.md), a
+standing ledger rather than a work item.
 
 The big picture: the `clean_room_impl/` **pivot plan** (library-first: scenarios → gallery →
 render → tab → playback → editing → AI-last) was **executed by refactoring the existing app
@@ -189,6 +191,17 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
+- **[lab-verify.md](inprogress/lab-verify.md)** — **the standing verification ledger**, and
+  the only doc here that never moves to `complete/`. `verified` is a human assertion, so
+  verification is the one gate an agent cannot pass alone, and any change under `model/`,
+  `engine/` or `scenarios/` leaves a pile of demoted scenarios behind it. The contract:
+  **a work item may close owing verification, provided the debt is registered here with its
+  cause** — what moved, which scenarios, and what a reviewer should be looking at. It is
+  deliberately *not* a copy of the queue (that is derived and always current via
+  `npm run verify:scenarios -- --list`); it holds the *why*, which provenance cannot record.
+  Opened 2026-08-22 with 37 stale + 8 never-seen in three batches: `core-ink-measured-gaps`
+  (33, across stages A/C/D and the tab row pads), the barline-default fix (4, no owning
+  doc), and the never-reviewed corpus-closure technique set (8).
 - **[core-ink-measured-gaps.md](inprogress/core-ink-measured-gaps.md)** — **vertical distance
   is measured ink to ink**. **Stages A–C built 2026-08-21** (labels/tempo one clearance above the
   ink under their footprint; every display gap ink-measured via a probe pass, gap-centred

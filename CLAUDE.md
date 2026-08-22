@@ -213,7 +213,13 @@ approval flow is the conversational **`/verify` skill** (`.claude/skills/verify/
 queue → one stable review page → verdicts in sentences; there is no human-facing CLI and
 no checkbox page. The initial 57/57 sweep is recorded in
 [roadmap/complete/lab-spec-approval.md](roadmap/complete/lab-spec-approval.md), still the recipe
-for verifying renderer features.
+for verifying renderer features. **Verification debt is decoupled from the work that
+caused it**: an item may reach `complete/` owing approvals, provided the batch is
+registered in the standing ledger
+[roadmap/inprogress/lab-verify.md](roadmap/inprogress/lab-verify.md) with its cause and what
+a reviewer should look for. The ledger is not a copy of the queue — the queue is derived
+and always current (`npm run verify:scenarios -- --list`); the ledger holds the *why*,
+which provenance cannot record.
 
 **The goldens are the crown jewels.** Any move or refactor of `model/`/`engine/` must
 reproduce them byte-identically (`npm run update:primitives` then a clean
@@ -429,6 +435,13 @@ output names refuse to overwrite).
   aimed upstream), `lab-` (the repo itself: structure, process, corpus machinery).
   Another prefix is acceptable only when it earns its keep: a concern that is
   genuinely separate *and* important enough to name.
+- **Standing docs** live in `inprogress/` and never move to `complete/` — they record an
+  obligation rather than a work item. [roadmap/inprogress/lab-verify.md](roadmap/inprogress/lab-verify.md)
+  is the one that exists: the verification ledger every item hands its demoted scenarios
+  to on the way out. Closing an item that moved a golden means **registering the batch
+  there first** (cause, scenario set, what a reviewer should look for), with a two-way
+  link between the two docs. Registration is not pre-approval, and the hand-edit ban on
+  `status:`/`verification:` is unchanged.
 - **`roadmap/rejected/`** holds proposals judged **not worth building** — distinct
   from `superseded/` (overtaken by reality or a later decision). A rejected doc keeps
   its full analysis: the point of the bucket is that whoever raises the idea again

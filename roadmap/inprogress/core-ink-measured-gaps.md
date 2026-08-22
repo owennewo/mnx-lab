@@ -4,6 +4,11 @@
 > decision.** The three sweeps this owes: A's 6 demotions, B's 20 both
 > goldens (un-hashed, so approved for the first time), C's 8 demotions.
 >
+> **Verification debt is registered** as batch 1 of the standing ledger,
+> [lab-verify.md](lab-verify.md) — 33 stale scenarios as of 2026-08-22, split by
+> stage, with what a reviewer should look for. This doc no longer has to stay open
+> for want of a sweep: it may close owing those approvals, and the ledger keeps them.
+>
 > **Stage C.** `isMeasuredGap` returns true for every display gap — the
 > staging was a review device, not a distinction in the rule. Two things the
 > corpus taught on the way: (1) **gap-centred content.** A `between`
