@@ -84,8 +84,14 @@ import {
 import type {
   TrayAnchor,
   TrayMeta,
-  TrayTab,
+  TrayRung,
   TrayTile
+} from './SelectionTray.ts';
+import {
+  TRAY_EDGE_GAP,
+  TRAY_MIRROR_MARGIN,
+  TRAY_SHAFT_H,
+  TRAY_WIDTH
 } from './SelectionTray.ts';
 import '../elements/ScoreViewer.ts';
 import './SelectionTray.ts';
@@ -569,6 +575,16 @@ export class ScenarioPage extends LitElement {
   private chipLevel: SelectionLevel | null = null;
   private chipTimer: ReturnType<typeof setTimeout> | undefined;
 
+  /** A micro button under the pointer/focus: the rung it would move to, and
+   *  which way it climbs. Drives the destination tag on the chip's far side —
+   *  the label IS the affordance (workbench-selection-chip-ladder.md). */
+  @state() private chipDest: { dir: 'up' | 'down'; label: string } | null = null;
+
+  /** The side the tray hangs from, snapshotted when it opens and held until
+   *  it closes: the spec forbids flipping mid-interaction, and the chip and
+   *  the tray have to agree about the side because they are one object. */
+  @state() private trayMirrored = false;
+
   /** Side panel width in px — the drag bar on its left edge adjusts it. */
   @state() private panelWidth = storedPanelWidth();
 
@@ -952,38 +968,128 @@ export class ScenarioPage extends LitElement {
         color: var(--accent);
       }
 
-      /* The rung chip (roadmap/inprogress/workbench-rung-legibility.md): the
-         selection's level named at the selection itself, in the clipboard
-         notice's visual voice. Full strength while fresh (the rung just
-         changed), then a whisper — a settled screen stays quiet. It sits
-         below the selection, where the tray opens, because it IS the tray's
-         collapsed handle: clicking it is the slash key. The one interactive
+      /* The rung chip (workbench-rung-legibility.md, restyled by
+         workbench-selection-chip-ladder.md): the selection's level named at
+         the selection itself. Full strength while fresh (the rung just
+         changed), then a whisper — a settled screen stays quiet. It sits one
+         tray-gap below the selection, exactly where the ladder's current rung
+         will land, because it IS that rung: the same lowercase mono word, the
+         same 5px/8px box, and on open it does not move. The one interactive
          exception to "chrome never takes the pointer" — only over its own
          small box. */
       .rung-chip {
         position: absolute;
-        padding: 0 7px;
-        border: var(--rule-w) solid var(--ink);
+        display: flex;
+        align-items: stretch;
+        border: 1px solid var(--line-strong);
         background: var(--surface);
-        color: var(--ink);
-        font: 11px/1.7 var(--mono);
-        cursor: pointer;
         z-index: 2;
-        opacity: 0.4;
+        opacity: 0.75;
         transition: opacity 260ms ease;
+      }
+
+      /* Near the score's right edge the whole object mirrors: the chip hangs
+         off the selection's RIGHT edge and the ▲▼ pair crosses to the left of
+         the word, so the pair never leaves the score. */
+      .rung-chip.mirrored {
+        flex-direction: row-reverse;
       }
 
       /* Keyboard elsewhere: follow the enclosure's own inactive fade — the
          chip reads "where you were", not "where your next keystroke lands".
          Hover/focus outranks it below: the chip is still a door to the tray. */
       .rung-chip.inactive {
-        opacity: 0.15;
+        opacity: 0.3;
       }
 
       .rung-chip.fresh,
       .rung-chip:hover,
-      .rung-chip:focus-visible {
+      .rung-chip:focus-within {
         opacity: 1;
+      }
+
+      .chip-word {
+        padding: 5px 8px;
+        border: 0;
+        background: none;
+        color: var(--ink);
+        font: 500 11px/1.2 var(--mono);
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      /* Idle, the chip is JUST the word — the ▲▼ pair is drawn only when the
+         chip is hovered or holds focus, so a settled score carries one lower-
+         case word and nothing else. */
+      .chip-mics {
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid var(--line);
+      }
+
+      .rung-chip.mirrored .chip-mics {
+        border-left: 0;
+        border-right: 1px solid var(--line);
+      }
+
+      .rung-chip:not(:hover):not(:focus-within) .chip-mics {
+        display: none;
+      }
+
+      .mic {
+        width: 16px;
+        height: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--ink-2);
+        cursor: pointer;
+      }
+
+      .mic + .mic {
+        border-top: 1px solid var(--line);
+      }
+
+      .mic:hover:not(:disabled),
+      .mic:focus-visible:not(:disabled) {
+        background: var(--accent);
+        color: var(--surface);
+      }
+
+      /* The exhausted end GREYS rather than disappearing, so the chip never
+         changes width as the ladder is climbed. */
+      .mic:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+
+      .mic svg {
+        display: block;
+      }
+
+      /* Hovering either micro button prints where it would take you, on the
+         chip's far side — the label is the whole affordance, so nobody has to
+         learn what a triangle means. */
+      .chip-dest {
+        position: absolute;
+        top: 0;
+        left: calc(100% + 6px);
+        padding: 3px 5px;
+        background: var(--ink);
+        color: var(--surface);
+        font: 600 8px/1.2 var(--sans);
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+
+      .rung-chip.mirrored .chip-dest {
+        left: auto;
+        right: calc(100% + 6px);
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -2186,11 +2292,15 @@ export class ScenarioPage extends LitElement {
     this.trayOpen = true;
     this.trayTab = null;
     this.traySearch = '';
+    // Decided ONCE, here: the tray must not change sides while it is open,
+    // and the chip it grew out of must have been on that side already.
+    this.trayMirrored = this.trayAnchor ? this.mirrorAt(this.trayAnchor) : false;
     this.syncFromSession();
   }
 
   /** The viewer's enclosure rect (viewport coords) → `.main` coords. */
   private mainHeight = 0;
+  private mainWidth = 0;
   private onSelectionAnchored = (event: Event) => {
     const rect = (event as CustomEvent<{ rect: DOMRect | null }>).detail.rect;
     const main = this.renderRoot.querySelector('.main');
@@ -2200,6 +2310,7 @@ export class ScenarioPage extends LitElement {
     }
     const box = main.getBoundingClientRect();
     this.mainHeight = box.height;
+    this.mainWidth = box.width;
     this.trayAnchor = {
       x: rect.left - box.left,
       y: rect.top - box.top,
@@ -2215,54 +2326,131 @@ export class ScenarioPage extends LitElement {
   }
 
   /**
-   * The rung chip (workbench-rung-legibility.md): the selection's level named
-   * at the gaze point, and the tray's COLLAPSED HANDLE — it sits below the
-   * selection's left edge, exactly where the tray opens, and clicking it is
-   * the `/` key. It flips above by the tray's own room-below test (a
-   * conservative height estimate; the tray measures itself live, so the two
-   * can disagree only in a band a few pixels tall) so the chip is always on
-   * the side the tray has space to expand. The word is ROW_BY_LEVEL's — the
-   * HUD's own vocabulary, so the two cannot disagree. Hidden while the tray
-   * is open: the chip has expanded into it. With no anchor (deselected, or
-   * nothing rendered) there is nothing to plant on.
+   * Which edge does the whole object hang from? The spec's rule, in its own
+   * order: prefer left-anchored, and mirror only when the tray's right edge
+   * would pass the score's right edge minus a margin — and only when there is
+   * actually room to the left, since mirroring into a clamp would move the
+   * word for nothing. The CHIP asks this every render (closed, it is free to
+   * follow the selection); the TRAY is handed the answer once, at open.
    */
-  private rungChip() {
+  private mirrorAt(anchor: TrayAnchor): boolean {
+    if (this.mainWidth <= 0) return false;
+    return (
+      anchor.x + TRAY_WIDTH > this.mainWidth - TRAY_MIRROR_MARGIN &&
+      anchor.x + anchor.width - TRAY_WIDTH >= TRAY_EDGE_GAP
+    );
+  }
+
+  /**
+   * The ladder either side of the current rung, presence-filtered. `up`
+   * climbs (wider), `down` descends (narrower); either may be absent at the
+   * ends, which is what greys a micro button rather than removing it. The
+   * rows come from `buildHudRows` so the chip, the HUD and the tray's own
+   * ladder cannot disagree about which rungs exist or what they are called.
+   */
+  private chipNeighbours(entry: ScenarioEntry): { up: string | null; down: string | null } {
+    if (!this.session || !this.chipLevel) return { up: null, down: null };
+    const ladder = [...buildHudRows(entry.meta.title, this.session, this.cursorHidden)].reverse();
+    const at = ladder.findIndex(row => row.key === ROW_BY_LEVEL[this.chipLevel!]);
+    if (at < 0) return { up: null, down: null };
+    return { up: ladder[at + 1]?.key ?? null, down: ladder[at - 1]?.key ?? null };
+  }
+
+  /**
+   * The rung chip (workbench-rung-legibility.md, given its ▲▼ pair by
+   * workbench-selection-chip-ladder.md): the selection's level named at the
+   * gaze point, and the tray's COLLAPSED HANDLE — it sits one tray-gap below
+   * the selection's leading edge, exactly where the ladder's current rung will
+   * land, and clicking the word is the `/` key. It flips above by the tray's
+   * own room-below test (a conservative height estimate; the tray measures
+   * itself live, so the two can disagree only in a band a few pixels tall) so
+   * the chip is always on the side the tray has space to expand, and mirrors
+   * left/right by the same rule the tray will use.
+   *
+   * The ▲▼ pair is the ladder itself, collapsed to two keys: climbing with ▲
+   * and clicking `voice` in the open tray are the same act, so they walk
+   * through the same `walkToLevel`. Drawn only on hover or focus — idle, the
+   * chip is one lowercase word. The word is ROW_BY_LEVEL's — the HUD's own
+   * vocabulary. Hidden while the tray is open: the chip has expanded into it.
+   * With no anchor (deselected, or nothing rendered) there is nothing to plant
+   * on.
+   */
+  private rungChip(entry: ScenarioEntry) {
     if (!this.chipLevel || !this.trayAnchor || this.trayOpen) return nothing;
-    const gap = 5;
-    const trayEstimate = 230; // SHAFT_H + the tray's own 200px fallback
+    const trayEstimate = TRAY_SHAFT_H + 200; // the tray's own fallback height
     const anchor = this.trayAnchor;
-    const below = anchor.y + anchor.height + gap;
+    const below = anchor.y + anchor.height + TRAY_EDGE_GAP;
     const flip =
       this.mainHeight > 0 &&
       below + trayEstimate > this.mainHeight &&
       anchor.y - trayEstimate > 0;
-    const top = flip ? anchor.y - gap : below;
-    const cls = `rung-chip${this.chipFresh ? ' fresh' : ''}${this.hasKeyboard ? '' : ' inactive'}`;
-    return html`<button
-      class=${cls}
-      style="left:${Math.max(6, anchor.x)}px;top:${Math.max(2, top)}px;${flip
-        ? 'transform:translateY(-100%);'
-        : ''}"
-      title="selection commands (/)"
-      aria-live="polite"
-      @click=${() => this.openTray()}
+    const top = flip ? anchor.y - TRAY_EDGE_GAP : below;
+    const mirrored = this.mirrorAt(anchor);
+    const { up, down } = this.chipNeighbours(entry);
+
+    // Right-anchored, the chip's own width is unknown until it paints, so it
+    // is positioned by its RIGHT edge rather than measured and subtracted.
+    const across = mirrored
+      ? `right:${Math.max(6, this.mainWidth - (anchor.x + anchor.width))}px;`
+      : `left:${Math.max(6, anchor.x)}px;`;
+    const cls =
+      `rung-chip${this.chipFresh ? ' fresh' : ''}` +
+      `${this.hasKeyboard ? '' : ' inactive'}${mirrored ? ' mirrored' : ''}`;
+
+    const mic = (dir: 'up' | 'down', key: string | null) => html`<button
+      class="mic"
+      ?disabled=${key === null}
+      title=${key ? `${dir === 'up' ? 'widen' : 'narrow'} to ${key}` : ''}
+      aria-label=${key ? `${dir === 'up' ? 'widen' : 'narrow'} to ${key}` : ''}
+      @click=${() => key && this.walkToLevel(LEVEL_BY_ROW[key])}
+      @mouseenter=${() => key && (this.chipDest = { dir, label: key })}
+      @focus=${() => key && (this.chipDest = { dir, label: key })}
+      @mouseleave=${() => (this.chipDest = null)}
+      @blur=${() => (this.chipDest = null)}
     >
-      ${ROW_BY_LEVEL[this.chipLevel]}
+      ${dir === 'up'
+        ? html`<svg width="7" height="5" viewBox="0 0 7 5">
+            <path d="M3.5 0 7 5H0z" fill="currentColor"></path>
+          </svg>`
+        : html`<svg width="7" height="5" viewBox="0 0 7 5">
+            <path d="M3.5 5 0 0h7z" fill="currentColor"></path>
+          </svg>`}
     </button>`;
+
+    return html`<div
+      class=${cls}
+      style="${across}top:${Math.max(2, top)}px;${flip ? 'transform:translateY(-100%);' : ''}"
+    >
+      <button
+        class="chip-word"
+        title="selection commands (/)"
+        aria-live="polite"
+        @click=${() => this.openTray()}
+      >
+        ${ROW_BY_LEVEL[this.chipLevel]}
+      </button>
+      <div class="chip-mics">${mic('up', up)}${mic('down', down)}</div>
+      ${this.chipDest
+        ? html`<span class="chip-dest"
+            >${this.chipDest.dir === 'up' ? '▲' : '▼'} ${this.chipDest.label}</span
+          >`
+        : nothing}
+    </div>`;
   }
 
   /**
    * The tray's view model: a pure projection of registry + session, rebuilt
-   * every render. Tabs are the ladder's present rungs (the HUD's rows, so the
-   * tray and the HUD can never disagree about the address); tiles are the
-   * registry filtered to the displayed rung, each drawing its own state from
-   * the document.
+   * every render. The rungs are the ladder's present ones (the HUD's rows, so
+   * the tray and the HUD can never disagree about the address), ordered
+   * narrowest-first so the column reads the way the chip grows out of it;
+   * tiles are the registry filtered to the displayed rung, each drawing its
+   * own state from the document.
    *
-   * The displayed rung is the previewed tab when one is open, else the
+   * The displayed rung is the previewed one when a preview is open, else the
    * session's own level — preview never touches the session.
    */
   private trayView(entry: ScenarioEntry): {
-    tabs: TrayTab[];
+    rungs: TrayRung[];
     meta: TrayMeta | null;
     tiles: TrayTile[];
     commands: EditorCommand[];
@@ -2279,7 +2467,7 @@ export class ScenarioPage extends LitElement {
       key === GLOBAL_TAB || ladder.some(r => r.key === key);
     const displayKey = known(this.trayTab) ? this.trayTab! : baseKey;
 
-    const tabs: TrayTab[] = [
+    const rungs: TrayRung[] = [
       ...ladder.map(r => ({
         key: r.key,
         label: r.label,
@@ -2331,7 +2519,7 @@ export class ScenarioPage extends LitElement {
       count: `${live} command${live === 1 ? '' : 's'}`
     };
 
-    return { tabs, meta, tiles, commands };
+    return { rungs, meta, tiles, commands };
   }
 
   /** Workbench-tier commands for the global tab — the session's own chrome,
@@ -2419,16 +2607,17 @@ export class ScenarioPage extends LitElement {
     if (!view) return nothing;
     return html`
       <mnx-selection-tray
-        .tabs=${view.tabs}
+        .rungs=${view.rungs}
         .meta=${view.meta}
         .tiles=${view.tiles}
         .anchor=${this.trayAnchor}
         .searchText=${this.traySearch}
-        @tray-tab-preview=${(e: CustomEvent<{ key: string }>) => {
+        ?mirrored=${this.trayMirrored}
+        @tray-rung-preview=${(e: CustomEvent<{ key: string }>) => {
           this.trayTab = e.detail.key;
           this.syncFromSession();
         }}
-        @tray-tab-commit=${(e: CustomEvent<{ key: string }>) => {
+        @tray-rung-commit=${(e: CustomEvent<{ key: string }>) => {
           this.walkToLevel(LEVEL_BY_ROW[e.detail.key]);
           this.trayTab = null;
         }}
@@ -2440,7 +2629,7 @@ export class ScenarioPage extends LitElement {
         }}
         @tray-widen=${(e: CustomEvent<{ text: string }>) => {
           // A second `/`: the same question, asked of everything. Since the
-          // global commands are a TAB now, widening moves one scope outward
+          // global commands are a RUNG now, widening moves one scope outward
           // and stays in this surface — no widget switch, no context lost
           // (core-selection-tray-global-tab.md). The typed text carries over.
           this.trayTab = GLOBAL_TAB;
@@ -3005,7 +3194,7 @@ export class ScenarioPage extends LitElement {
                 ${this.clipboardNotice.message}
               </div>`
             : nothing}
-          ${this.rungChip()}
+          ${this.rungChip(entry)}
         </div>
         ${this.panelHidden ? nothing : this.sidePanel(entry)}
       </div>

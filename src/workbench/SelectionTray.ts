@@ -1,9 +1,10 @@
-// The selection command tray (roadmap/inprogress/core-selection-tray-visuals.md):
-// a command surface planted under the selection — scope tabs that are the
-// ladder's rungs, a Bravura glyph grid with shortcut and state per tile, the
-// shaft+plinth connector, hover readout and scoped search.
+// The selection command tray (roadmap/inprogress/workbench-selection-chip-ladder.md,
+// after core-selection-tray-visuals.md): a command surface planted under the
+// selection — a VERTICAL ladder column whose current rung is the collapsed
+// chip grown in place, a Bravura glyph grid with shortcut and state per tile,
+// the accent shaft, and scoped search.
 //
-// The component is deliberately dumb — tabs, tiles and the anchor arrive
+// The component is deliberately dumb — rungs, tiles and the anchor arrive
 // as neutral view-model data, and every interaction leaves as a composed
 // CustomEvent. That is the promotion posture (the ScoreHud precedent):
 // `elements/` never imports `edit/`, so a tray that one day moves there must
@@ -11,13 +12,14 @@
 // free. The one non-model import is the engine's SMuFL name→codepoint lookup,
 // which `elements/` is also allowed.
 //
-// Styling is FAITHFUL to the design spec ("SPEC · v1 — selection command
-// tray") — and since 2026-08-15 it says so in TOKENS rather than in literals.
-// The tray shipped ahead of its system, hard-coding the design's palette
-// because the workbench had not adopted it yet; the Modernist campaign moved
-// the chrome to meet the tray, so the ~55 literals became `var(--ink)`,
-// `var(--accent)` and friends with no visual change. The visuals doc's
-// "deliberately apart from the surrounding chrome" ruling is retired.
+// Styling is FAITHFUL to the design spec — "SPEC · v1 — SELECTION MODE CHIP →
+// TRAY" replaces the older tray spec's horizontal tab strip. Its thesis is
+// that the closed chip and the open tray are ONE object: the chip *is* the
+// current rung, so opening must not re-case the word, move its x, or change
+// its box. That is why the scope selector is now a 74px column of lowercase
+// mono rungs at the tray's leading edge rather than an uppercase tab row
+// across its top. Since 2026-08-15 the palette is spoken in TOKENS rather
+// than literals; a conformance test holds that line.
 //
 // It still does NOT include `designTokens`, and that is now load-bearing for a
 // different reason than before: the tokens reach here by INHERITANCE from
@@ -32,14 +34,15 @@ import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { glyphBBox, glyphCodepoint, isSmuflLoaded } from '../engine/smufl/smufl.ts';
 
-/** One scope tab. `active` = the tab on display; `holdsSelection` marks the
- *  tab still owning the real selection while another is only previewed. */
-export interface TrayTab {
+/** One rung of the ladder. `active` = the rung on display; `holdsSelection`
+ *  marks the rung still owning the real selection while another is only
+ *  previewed. */
+export interface TrayRung {
   key: string;
   label: string;
   active: boolean;
   holdsSelection: boolean;
-  /** Can the selection be moved here? False for a tab that is not a rung —
+  /** Can the selection be moved here? False for a row that is not a rung —
    *  the `global` scope sits outside the ladder, so there is nothing for
    *  Enter to commit and the widen hint would be a lie. Absent = true. */
   committable?: boolean;
@@ -70,8 +73,6 @@ export interface TrayTile {
  */
 const GLYPH_TARGET_PX = 34;
 const GLYPH_MAX_PX_PER_SP = 30;
-/** The readout's copy of the same idea — a row, so it wants a smaller mark. */
-const READOUT_GLYPH_PX = 19;
 
 export interface TrayMeta {
   primary: string;
@@ -87,28 +88,57 @@ export interface TrayAnchor {
   height: number;
 }
 
-const SHAFT_H = 30;
-const PLINTH_H = 6;
-const EDGE_GAP = 8;
-// The design mocks 470, and its tab row held four scopes where ours holds the
-// whole ladder plus `global`, so the tab padding below is a shade tighter
-// than the spec's 13px.
-const TRAY_W = 470;
+/**
+ * The connector, now 8px rather than the old 30: the spec plants the tray one
+ * small gap below the selection's lower bound and lets the shaft fill exactly
+ * that gap, so the ladder reads as growing out of the selection instead of
+ * dangling from it on a thread.
+ */
+export const TRAY_SHAFT_H = 8;
+/** The gap the chip and the tray both sit at, below the selection. */
+export const TRAY_EDGE_GAP = 8;
+/** The ladder column: lowercase mono rungs, the current one lit. */
+const LADDER_W = 74;
+/**
+ * Total tray width. The spec draws a 222px tile panel beside the ladder, which
+ * was enough for the six tiles it mocked; our busiest scope (`event`) carries
+ * eighteen, and at three columns the tray outgrows the score pane it floats
+ * over. So the panel keeps the 470px total the previous tray established —
+ * five columns of the spec's own 60px tiles — and every other metric is the
+ * spec's.
+ */
+export const TRAY_WIDTH = 470;
+/** The spec's mirror trigger: flip when the tray's right edge would pass the
+ *  score's right edge minus this. */
+export const TRAY_MIRROR_MARGIN = 16;
 
 @customElement('mnx-selection-tray')
 export class SelectionTray extends LitElement {
-  @property({ attribute: false }) tabs: TrayTab[] = [];
+  @property({ attribute: false }) rungs: TrayRung[] = [];
   @property({ attribute: false }) meta: TrayMeta | null = null;
   @property({ attribute: false }) tiles: TrayTile[] = [];
   @property({ attribute: false }) anchor: TrayAnchor | null = null;
   @property({ type: String }) searchText = '';
+  /**
+   * Which edge the tray hangs from. Decided by the PAGE, not here, and held
+   * for the life of the open tray — the chip and the tray must agree about the
+   * side (they are one object), and the spec forbids flipping mid-interaction.
+   * The page snapshots it when `/` opens the tray.
+   */
+  @property({ type: Boolean }) mirrored = false;
 
   /** The keyboard tile cursor — an index into the focusable tiles. */
   @state() private cursorIndex = 0;
-  /** The pointer's tile, when hovering; wins over the cursor in the readout. */
-  @state() private hoverId: string | null = null;
-  /** Set when the connector flips above the selection (no room below). */
-  @state() private flipped = false;
+  /**
+   * Has the cursor been MOVED, as opposed to merely defaulting to the first
+   * tile on open? Only then does the cursor caption itself.
+   *
+   * Without this the tooltip is pinned open over the meta line for as long as
+   * the tray is open — the cursor starts somewhere, so something is always
+   * "focused" — which is not what a tooltip is. The ring already marks where
+   * Enter would land; the name is what you ask for by navigating.
+   */
+  @state() private cursorMoved = false;
 
   static styles = css`
     :host {
@@ -127,7 +157,7 @@ export class SelectionTray extends LitElement {
     /* ── connector ── */
     .shaft {
       position: absolute;
-      height: ${SHAFT_H}px;
+      height: ${TRAY_SHAFT_H}px;
       background: var(--accent);
     }
 
@@ -135,97 +165,119 @@ export class SelectionTray extends LitElement {
       bottom: 100%;
     }
 
+    /* Flipped above the selection, the shaft is a capital on the tray's top
+     * edge rather than a footing under it — the spec's rule; the ladder still
+     * reads top-to-bottom either way. */
     :host([data-flipped]) .shaft {
       top: 100%;
     }
 
-    .plinth {
-      height: ${PLINTH_H}px;
-      background: var(--ink);
-    }
-
     .tray {
-      background: var(--surface);
-      border: 2px solid var(--ink);
-      box-shadow: 0 18px 40px color-mix(in oklab, var(--ink), transparent 82%);
-    }
-
-    :host(:not([data-flipped])) .tray {
-      border-top: 0;
-    }
-
-    :host([data-flipped]) .tray {
-      border-bottom: 0;
-    }
-
-    /* ── B · scope tabs ── */
-    .tabs {
       display: flex;
       align-items: stretch;
-      border-bottom: 1px solid var(--line);
+      box-sizing: border-box;
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--ink);
+      box-shadow: 0 14px 34px color-mix(in oklab, var(--ink), transparent 78%);
     }
 
-    .tabs button {
-      font: 600 10px/1 var(--sans);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      background: none;
+    /* Mirrored: the ladder crosses to the far side so the current rung still
+     * lands under the selection's right edge, and the tiles grow leftwards
+     * into the room that exists. Everything mirrors TOGETHER. */
+    :host([data-mirrored]) .tray {
+      flex-direction: row-reverse;
+    }
+
+    /* ── B · the ladder column ── */
+    .ladder {
+      width: ${LADDER_W}px;
+      flex: none;
+      background: var(--bg-context);
+      border-right: 1px solid var(--line);
+    }
+
+    :host([data-mirrored]) .ladder {
+      border-right: 0;
+      border-left: 1px solid var(--line);
+    }
+
+    /* A rung is the chip's own box: the same lowercase mono word, never
+     * re-cased. The uppercase tab strip this replaced broke the one thing the
+     * chip and the tray have to share. */
+    .rung {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      text-align: left;
+      padding: 4px 8px;
       border: 0;
-      padding: 11px 9px;
+      border-left: 2px solid transparent;
+      background: none;
+      font: 500 10.5px/1.35 var(--mono);
+      color: var(--ink-3);
       cursor: pointer;
       white-space: nowrap;
     }
 
-    .tabs button:hover {
+    :host([data-mirrored]) .rung {
+      text-align: right;
+      border-left: 0;
+      border-right: 2px solid transparent;
+    }
+
+    .rung:hover {
       color: var(--ink);
-      background: var(--bg-context);
+      background: var(--surface);
     }
 
-    .tabs button[aria-current='true'] {
-      color: var(--accent);
-      box-shadow: inset 0 -2px 0 var(--accent);
+    .rung[aria-current='true'] {
+      color: var(--accent-fg);
+      background: var(--row-current);
+      border-left-color: var(--accent);
     }
 
-    .tabs .dot {
+    :host([data-mirrored]) .rung[aria-current='true'] {
+      border-left-color: transparent;
+      border-right-color: var(--accent);
+    }
+
+    .rung .dot {
       display: inline-block;
       width: 5px;
       height: 5px;
       background: var(--accent);
-      margin-left: 6px;
+      margin-left: 5px;
       vertical-align: middle;
     }
 
-    .tabs .hint {
-      margin-left: auto;
+    /* ── the tile panel ── */
+    .panel {
+      flex: 1;
+      min-width: 0;
       display: flex;
-      align-items: center;
-      padding: 0 9px;
-      font: 500 10px/1 var(--sans);
-      letter-spacing: 0.06em;
-      color: var(--ink-faint);
-      flex: none;
+      flex-direction: column;
     }
 
     /* ── C · meta line ── */
     .meta {
       display: flex;
       align-items: center;
-      gap: 9px;
-      padding: 9px 13px;
-      border-bottom: 2px solid var(--ink);
+      gap: 7px;
+      padding: 6px 9px;
+      border-bottom: 1px solid var(--line);
       background: var(--bg-context);
       white-space: nowrap;
       overflow: hidden;
     }
 
     .meta .primary {
-      font: 600 11.5px/1 var(--sans);
+      font: 500 10px/1.2 var(--mono);
       color: var(--ink);
     }
 
     .meta .secondary {
-      font: 400 11.5px/1 var(--sans);
+      font: 400 10px/1.2 var(--mono);
       color: var(--ink-3);
       overflow: hidden;
       text-overflow: ellipsis;
@@ -233,33 +285,25 @@ export class SelectionTray extends LitElement {
 
     .meta .count {
       margin-left: auto;
-      font: 500 10px/1 var(--sans);
-      letter-spacing: 0.06em;
+      font: 600 8.5px/1.2 var(--sans);
+      letter-spacing: 0.09em;
       text-transform: uppercase;
       color: var(--ink-3);
+      flex: none;
     }
 
     .meta .count.widen {
-      color: var(--accent);
+      color: var(--accent-fg);
     }
 
     /* ── D · glyph grid ── */
     .grid {
+      flex: 1;
       display: flex;
       flex-wrap: wrap;
-      gap: 7px;
-      padding: 13px;
-    }
-
-    .tile {
-      position: relative;
-      width: 66px;
-      height: 64px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      cursor: pointer;
-      font: inherit;
-      padding: 0;
+      align-content: flex-start;
+      gap: 6px;
+      padding: 9px;
     }
 
     /*
@@ -276,12 +320,19 @@ export class SelectionTray extends LitElement {
      * the markup; the px size comes from GLYPH_TARGET_PX.
      */
     .tile {
+      position: relative;
+      width: 60px;
+      height: 60px;
       display: grid;
       place-items: center;
-      /* The chip owns the bottom-right corner, so the glyph is centred in the
-       * space ABOVE it rather than in the whole tile — otherwise a wide mark
-       * (the accent) runs into its own shortcut. */
-      padding-bottom: 9px;
+      /* The key badge owns the bottom-right corner, so the glyph is centred in
+       * the space ABOVE it rather than in the whole tile — otherwise a wide
+       * mark (the accent) runs into its own shortcut. */
+      padding: 0 0 9px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      cursor: pointer;
+      font: inherit;
     }
 
     .tile .glyph {
@@ -298,19 +349,24 @@ export class SelectionTray extends LitElement {
     }
 
     /* The shortcut sits in the corner rather than under the glyph: it is a
-     * label ON the tile, not a second row competing with it for the eye. */
+     * label ON the tile, not a second row competing with it for the eye. It
+     * overhangs the border by a pixel, so the badge reads as stamped onto the
+     * tile's corner rather than inset from it. */
     .tile .key {
       position: absolute;
-      right: 0;
-      bottom: 0;
+      right: -1px;
+      bottom: -1px;
       pointer-events: none;
-      min-width: 17px;
-      padding: 2px 4px;
+      box-sizing: border-box;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: var(--ink);
       color: var(--surface);
-      font: 600 9.5px/1.2 var(--sans);
-      letter-spacing: 0.04em;
-      text-align: center;
+      font: 600 11px/1 var(--sans);
     }
 
     .tile svg path {
@@ -338,7 +394,7 @@ export class SelectionTray extends LitElement {
       color: var(--surface);
     }
 
-    /* On the accent fill the dark chip would disappear, so it inverts. */
+    /* On the accent fill the dark badge would disappear, so it inverts. */
     .tile[data-state='active'] .key {
       background: var(--surface);
       color: var(--ink);
@@ -356,7 +412,6 @@ export class SelectionTray extends LitElement {
       background: var(--bg-context);
       border-color: var(--line);
       cursor: default;
-      pointer-events: none;
     }
 
     .tile[data-state='unavailable'] .glyph {
@@ -368,67 +423,69 @@ export class SelectionTray extends LitElement {
       color: var(--ink-faint);
     }
 
-    /* ── E · hover readout ── */
-    .readout {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 9px 13px;
+    /*
+     * E · the tile's name, as a tooltip rather than a standing readout band.
+     *
+     * The old tray reserved a whole row under the grid to print the focused
+     * tile's label and shortcut. The shortcut is already stamped on every
+     * tile, so that band was spending a band on the label alone — and the
+     * spec's tray has no room for it. A tooltip says the same thing at the
+     * point of interest and costs nothing when nobody is asking.
+     *
+     * It answers the KEYBOARD cursor as well as the pointer, which a native
+     * title attribute cannot: arrowing the grid must name what is under the
+     * cursor, or the keyboard path loses information the pointer path keeps.
+     * When both are live the pointer wins, so the grid never captions two
+     * tiles at once — and the cursor only captions itself once it has been
+     * MOVED (see cursorMoved), or the tooltip would stand open over the meta
+     * line for the whole life of the tray.
+     */
+    .tile .tip {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 5px);
+      transform: translateX(-50%);
+      z-index: 4;
+      display: none;
+      box-sizing: border-box;
+      max-width: 190px;
+      width: max-content;
+      padding: 3px 6px;
       background: var(--ink);
-    }
-
-    .readout .glyph {
-      /* Drawn into its own bounding box, like the tiles, so a repeat barline
-       * sits on the row's centre line instead of hanging off a text baseline.
-       * The row is a flex box, so centring is then automatic. */
-      flex: none;
-      overflow: visible;
-      font-family: Bravura;
-      font-size: 19px;
-      line-height: 1;
       color: var(--surface);
+      font: 500 10px/1.4 var(--sans);
+      text-align: center;
+      pointer-events: none;
     }
 
-    .readout svg path {
-      stroke: var(--surface);
+    .tile:hover .tip,
+    .tile.cursor-named .tip {
+      display: block;
     }
 
-    .readout .words {
-      font: 500 11.5px/1 var(--sans);
-      color: var(--surface);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .readout .chip {
-      margin-left: auto;
-      font: 600 10px/1 var(--sans);
-      letter-spacing: 0.1em;
-      color: var(--surface);
-      border: 1px solid color-mix(in oklab, var(--ink), var(--surface) 25%);
-      padding: 4px 6px;
-      flex: none;
+    .grid:hover .tile.cursor-named:not(:hover) .tip {
+      display: none;
     }
 
     /* ── F · search ── */
     .search {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 9px 13px;
-      border-top: 2px solid var(--ink);
+      gap: 7px;
+      padding: 6px 9px;
+      border-top: 1px solid var(--line);
       background: var(--bg-context);
     }
 
     .search .prompt {
-      font: 600 12px/1 var(--sans);
-      color: var(--accent);
+      font: 600 11px/1.2 var(--mono);
+      color: var(--accent-fg);
     }
 
     .search input {
       flex: 1;
-      font: 400 12px/1 var(--sans);
+      min-width: 0;
+      font: 400 11px/1.4 var(--mono);
       color: var(--ink);
       background: none;
       border: 0;
@@ -466,21 +523,27 @@ export class SelectionTray extends LitElement {
   }
 
   updated(changed: Map<string | number | symbol, unknown>) {
-    if (changed.has('tabs') || changed.has('tiles')) {
+    if (changed.has('rungs') || changed.has('tiles')) {
       this.cursorIndex = Math.min(this.cursorIndex, Math.max(0, this.entries().length - 1));
     }
     this.place();
   }
 
-  /** Position the tray from the anchor: below the selection, left edge at the
-   *  selection's left edge, clamped inside the offsetParent; flip above when
-   *  there is no room below. Anchor-less (nothing selected / geometry
-   *  unknown): docked bottom-center — the fallback the visuals doc names. */
+  /**
+   * Position the tray from the anchor. Normally its LEFT edge sits on the
+   * selection's left edge, so the ladder column — and therefore the word —
+   * occupies exactly the x the closed chip occupied. Mirrored (decided by the
+   * page, held for the open), its RIGHT edge sits on the selection's right
+   * edge and the ladder crosses over to meet it. Vertically it hangs one
+   * shaft below the selection, flipping above when there is no room.
+   * Anchor-less (nothing selected / geometry unknown): docked bottom-center —
+   * the fallback the visuals doc names.
+   */
   private place() {
     const host = this;
     const parent = this.offsetParent as HTMLElement | null;
     if (!parent) return;
-    const width = TRAY_W;
+    const width = TRAY_WIDTH;
     host.style.setProperty('--tray-w', `${width}px`);
     const pw = parent.clientWidth;
     const ph = parent.clientHeight;
@@ -489,21 +552,27 @@ export class SelectionTray extends LitElement {
     const anchor = this.anchor;
     const shaftEl = this.renderRoot.querySelector<HTMLElement>('.shaft');
     if (!anchor) {
-      this.flipped = false;
       this.removeAttribute('data-flipped');
+      this.removeAttribute('data-mirrored');
       if (shaftEl) shaftEl.style.display = 'none';
-      host.style.left = `${Math.max(EDGE_GAP, (pw - width) / 2)}px`;
-      host.style.top = `${Math.max(EDGE_GAP, ph - trayH - 18)}px`;
+      host.style.left = `${Math.max(TRAY_EDGE_GAP, (pw - width) / 2)}px`;
+      host.style.top = `${Math.max(TRAY_EDGE_GAP, ph - trayH - 18)}px`;
       return;
     }
 
-    const left = Math.min(Math.max(anchor.x, EDGE_GAP), Math.max(EDGE_GAP, pw - width - EDGE_GAP));
-    const below = anchor.y + anchor.height + SHAFT_H;
-    const flip = below + trayH > ph && anchor.y - SHAFT_H - trayH > 0;
-    this.flipped = flip;
+    this.toggleAttribute('data-mirrored', this.mirrored);
+    const wanted = this.mirrored ? anchor.x + anchor.width - width : anchor.x;
+    const left = Math.min(
+      Math.max(wanted, TRAY_EDGE_GAP),
+      Math.max(TRAY_EDGE_GAP, pw - width - TRAY_EDGE_GAP)
+    );
+    const below = anchor.y + anchor.height + TRAY_SHAFT_H;
+    const flip = below + trayH > ph && anchor.y - TRAY_SHAFT_H - trayH > 0;
+    // `data-flipped` alone carries this: nothing in render() reads the side
+    // any more, so a reactive field would only cost a second update pass.
     this.toggleAttribute('data-flipped', flip);
     host.style.left = `${left}px`;
-    host.style.top = `${flip ? anchor.y - SHAFT_H - trayH : below}px`;
+    host.style.top = `${flip ? anchor.y - TRAY_SHAFT_H - trayH : below}px`;
 
     // The shaft: selection width clamped 24–240, centred on the selection's
     // horizontal centre, clamped to the tray's span.
@@ -520,13 +589,13 @@ export class SelectionTray extends LitElement {
 
   // ── keyboard (a scope-4 region: the tray owns the keys it names) ─────────
 
-  /** Is a scope being previewed — i.e. is the tab on display one the
-   *  selection could still move to? A non-committable tab (global) is never a
+  /** Is a scope being previewed — i.e. is the rung on display one the
+   *  selection could still move to? A non-committable row (global) is never a
    *  preview: it is a place to run commands, not a scope to select. */
   private get previewing(): boolean {
-    const active = this.tabs.find(t => t.active);
+    const active = this.rungs.find(r => r.active);
     if (active?.committable === false) return false;
-    return this.tabs.some(t => t.holdsSelection && !t.active);
+    return this.rungs.some(r => r.holdsSelection && !r.active);
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
@@ -549,20 +618,24 @@ export class SelectionTray extends LitElement {
           return;
         }
         if (previewing) {
-          // Escape returns to the tab still holding the selection.
-          const home = this.tabs.find(t => t.holdsSelection);
-          if (home) this.emit('tray-tab-preview', { key: home.key });
+          // Escape returns to the rung still holding the selection.
+          const home = this.rungs.find(r => r.holdsSelection);
+          if (home) this.emit('tray-rung-preview', { key: home.key });
           return;
         }
         this.emit('tray-close', {});
         return;
       }
+      // ↑ climbs the ladder and ↓ descends it, exactly as the chip's own ▲▼
+      // pair does — one axis, two controls (the spec's rule). Climbing is
+      // widening, which is DOWN the drawn column: the ladder reads
+      // narrowest-first so `note` can sit at the top, where the chip grew from.
       case 'ArrowUp':
       case 'ArrowDown': {
         consume();
-        const idx = this.tabs.findIndex(t => t.active);
-        const next = this.tabs[idx + (event.code === 'ArrowUp' ? 1 : -1)];
-        if (next) this.emit('tray-tab-preview', { key: next.key });
+        const idx = this.rungs.findIndex(r => r.active);
+        const next = this.rungs[idx + (event.code === 'ArrowUp' ? 1 : -1)];
+        if (next) this.emit('tray-rung-preview', { key: next.key });
         return;
       }
       case 'ArrowRight':
@@ -573,14 +646,15 @@ export class SelectionTray extends LitElement {
         if (n === 0) return;
         const back = event.code === 'ArrowLeft' || (event.code === 'Tab' && event.shiftKey);
         this.cursorIndex = (this.cursorIndex + (back ? n - 1 : 1)) % n;
+        this.cursorMoved = true;
         return;
       }
       case 'Enter':
       case 'NumpadEnter': {
         consume();
         if (previewing) {
-          const active = this.tabs.find(t => t.active);
-          if (active) this.emit('tray-tab-commit', { key: active.key });
+          const active = this.rungs.find(r => r.active);
+          if (active) this.emit('tray-rung-commit', { key: active.key });
           return;
         }
         const entry = this.entries()[this.cursorIndex];
@@ -681,86 +755,79 @@ export class SelectionTray extends LitElement {
     </svg>`;
   }
 
-  private readout() {
-    const entries = this.entries();
-    const focused =
-      (this.hoverId !== null ? entries.find(e => e.id === this.hoverId) : undefined) ??
-      entries[this.cursorIndex];
-    if (!focused) return nothing;
-    return html`<div class="readout">
-      ${this.glyph(focused.glyph, 'glyph', READOUT_GLYPH_PX)}
-      <span class="words">${focused.label}</span>
-      <span class="chip">${focused.shortcut || '·'}</span>
-    </div>`;
+  /** The tile's caption. The shortcut is already stamped on the tile, so the
+   *  tooltip carries the name — and says so when there is no key to stamp. */
+  private tipText(tile: TrayTile): string {
+    return tile.shortcut ? tile.label : `${tile.label} · unbound`;
   }
 
   render() {
     const previewing = this.previewing;
     const entries = this.entries();
+    const cursorId = entries[this.cursorIndex]?.id;
     return html`
       <div class="shaft" style="display: none"></div>
-      ${this.flipped ? nothing : html`<div class="plinth"></div>`}
       <div class="tray">
-        <div class="tabs">
-          ${this.tabs.map(
-            tab => html`
+        <div class="ladder" role="tablist" aria-label="selection scope">
+          ${this.rungs.map(
+            rung => html`
               <button
-                aria-current=${tab.active ? 'true' : 'false'}
-                @click=${() => this.emit('tray-tab-preview', { key: tab.key })}
+                class="rung"
+                role="tab"
+                aria-current=${rung.active ? 'true' : 'false'}
+                @click=${() => this.emit('tray-rung-preview', { key: rung.key })}
               >
-                ${tab.label}${tab.holdsSelection && !tab.active
+                ${rung.label}${rung.holdsSelection && !rung.active
                   ? html`<span class="dot"></span>`
                   : nothing}
               </button>
             `
           )}
-          <span class="hint">↑↓</span>
         </div>
-        ${this.meta
-          ? html`<div class="meta">
-              <span class="primary">${this.meta.primary}</span>
-              ${this.meta.secondary
-                ? html`<span class="secondary">${this.meta.secondary}</span>`
-                : nothing}
-              ${previewing
-                ? html`<span class="count widen">↵ to widen selection</span>`
-                : this.meta.count
-                  ? html`<span class="count">${this.meta.count}</span>`
+        <div class="panel">
+          ${this.meta
+            ? html`<div class="meta">
+                <span class="primary">${this.meta.primary}</span>
+                ${this.meta.secondary
+                  ? html`<span class="secondary">${this.meta.secondary}</span>`
                   : nothing}
-            </div>`
-          : nothing}
-        ${html`<div class="grid" @mouseleave=${() => (this.hoverId = null)}>
-              ${this.tiles.map(
-                tile => html`
-                  <button
-                    class="tile ${'arc' in tile.glyph ? 'arc-tile' : ''} ${entries[
-                      this.cursorIndex
-                    ]?.id === tile.id
-                      ? 'cursor'
-                      : ''}"
-                    data-state=${tile.state}
-                    tabindex=${tile.state === 'unavailable' ? '-1' : '0'}
-                    title=${tile.label}
-                    @click=${() => this.emit('tray-command', { id: tile.id })}
-                    @mouseenter=${() => (this.hoverId = tile.id)}
-                  >
-                    ${this.glyph(tile.glyph, 'glyph', GLYPH_TARGET_PX)}
-                    <span class="key">${tile.shortcut}</span>
-                  </button>
-                `
-              )}
-            </div>`}
-        ${this.readout()}
-        <div class="search">
-          <span class="prompt">&gt;</span>
-          <input
-            .value=${this.searchText}
-            placeholder="search this scope · / again for everything"
-            @input=${(e: Event) => this.onSearchInput(e)}
-          />
+                ${previewing
+                  ? html`<span class="count widen">↵ to widen selection</span>`
+                  : this.meta.count
+                    ? html`<span class="count">${this.meta.count}</span>`
+                    : nothing}
+              </div>`
+            : nothing}
+          <div class="grid">
+            ${this.tiles.map(
+              tile => html`
+                <button
+                  class="tile ${'arc' in tile.glyph ? 'arc-tile' : ''} ${cursorId === tile.id
+                    ? `cursor${this.cursorMoved ? ' cursor-named' : ''}`
+                    : ''}"
+                  data-state=${tile.state}
+                  ?disabled=${tile.state === 'unavailable'}
+                  tabindex=${tile.state === 'unavailable' ? '-1' : '0'}
+                  aria-label=${tile.label}
+                  @click=${() => this.emit('tray-command', { id: tile.id })}
+                >
+                  ${this.glyph(tile.glyph, 'glyph', GLYPH_TARGET_PX)}
+                  <span class="key">${tile.shortcut}</span>
+                  <span class="tip">${this.tipText(tile)}</span>
+                </button>
+              `
+            )}
+          </div>
+          <div class="search">
+            <span class="prompt">&gt;</span>
+            <input
+              .value=${this.searchText}
+              placeholder="search this scope · / for everything"
+              @input=${(e: Event) => this.onSearchInput(e)}
+            />
+          </div>
         </div>
       </div>
-      ${this.flipped ? html`<div class="plinth"></div>` : nothing}
     `;
   }
 }

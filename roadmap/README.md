@@ -215,6 +215,21 @@ proposals that name their campaign.
   Opened 2026-08-22 with 37 stale + 8 never-seen in three batches: `core-ink-measured-gaps`
   (33, across stages A/C/D and the tab row pads), the barline-default fix (4, no owning
   doc), and the never-reviewed corpus-closure technique set (8).
+- **[workbench-selection-chip-ladder.md](inprogress/workbench-selection-chip-ladder.md)** —
+  **the chip is one rung of the ladder.** Built 2026-08-22 from a Claude Design spec drawn
+  1:1 over crops of this build. The rung chip and the tray were built two days apart and
+  did not know they were the same object: closed, the level read as a lowercase mono word;
+  open, that word came back **re-cased to `NOTE`** in an uppercase tab strip, at a different
+  size and x. So the scope selector becomes a **vertical 74px ladder column** at the tray's
+  leading edge — the current rung occupying the chip's own box and x — and the chip grows the
+  **▲▼ pair** that is that ladder collapsed to two keys (same `walkToLevel`, so ▲ and clicking
+  `voice` are one act). Edge-anchoring, never centring: near the right edge the whole object
+  **mirrors**, decided once by the page at open and held. The connector drops 30px → 8px and
+  the plinth goes with it. Departures from the spec are recorded in the doc — the tile panel
+  stays 396px (the drawn 222px was mocked with six tiles; `event` carries eighteen), search
+  stays, and the readout band becomes a tooltip that captions the keyboard cursor only once it
+  has been *moved*. Leaves the spec's two open questions open and adds a third: ▲ now walks
+  **down** the drawn column, the inverse of the HUD's.
 
 ### complete/
 - **[core-selection-clipboard.md](complete/core-selection-clipboard.md)** — typed
