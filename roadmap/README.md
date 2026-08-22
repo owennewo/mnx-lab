@@ -225,7 +225,17 @@ proposals that name their campaign.
   room test). Phase 2: the **extent ladder on both axes** — the voice hull hugs the
   notehead contour (no staff-band floor), the part-bar owns its music's span, and the bar
   becomes the first full-width rung; vertical monotonicity deliberately traded at
-  event→voice (*a moment is tall, a run is long*). Remaining: bar vs section. Colour
+  event→voice (*a moment is tall, a run is long*). Phase 3 (2026-08-22) settled **bar vs
+  section** by lighting the label: the re-examination found that two of the pair's three
+  supposed channels (the section's own colour, outside-dimming) had never been built, and
+  that the third — extent — is *identical* for the two rungs when a section is exactly one
+  bar. Growing the box cannot fix it, because `panel-wide` already covers the label strip
+  by design (a bar owns its rehearsal mark and tempo there). The label is the channel that
+  does not degenerate with length, and it was the ladder's own unbuilt promise (*"label
+  chip lit"*). A chip on the cap box, in its own layer over the wash and under the ink,
+  claimed by the label's anchor so a long overhanging name still counts; a flag rather than
+  an eighth `EnclosureKind`, since the shape genuinely does not change. No golden moved;
+  one scenario added for the degeneracy nothing exercised. Colour
   ladders, border styles and whole-page scope dimming considered and rejected (reasons in
   the doc).
 - **[core-selection-clipboard.md](inprogress/core-selection-clipboard.md)** — typed

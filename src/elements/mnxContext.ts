@@ -89,6 +89,17 @@ export interface SelectionContext {
   /** Structural coverage, including rests and empty measure copies that have
    *  no note id and therefore cannot be recovered from selected SVG ink. */
   span?: SelectionSpan | null;
+  /**
+   * Light the section labels this enclosure encloses — the promised "label
+   * chip lit" of the ladder's section rung (core-selection-ladder.md),
+   * built by workbench-rung-legibility.md.
+   *
+   * Presentation only, like `enclosure` itself: the host decides that its
+   * widest bar-level rung claims the labels and this one does not, and the
+   * element renders the chip. It is a flag rather than a kind because the
+   * SHAPE does not change — bar and section share `panel-wide` by design.
+   */
+  litLabels?: boolean | null;
   /** The cursor's cell, for the ghost when its position is empty. */
   cursor?: CursorGhost | null;
   /**

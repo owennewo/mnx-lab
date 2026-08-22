@@ -45,3 +45,41 @@ export function emptyPartGhostRect(
     height
   };
 }
+
+/**
+ * The section rung's own channel (workbench-rung-legibility.md): a chip lit
+ * behind each section label the enclosure claims.
+ *
+ * Bar and section share `panel-wide`, and the bar's slot deliberately covers
+ * the strip where score-wide labels sit — so the enclosure's own extent
+ * cannot tell the pair apart, and in a one-bar section the two shapes are
+ * identical. Lighting the label does: the label is what makes a section a
+ * section, and only the section rung claims it.
+ *
+ * A label is claimed by its ANCHOR — the start point engraving put at the
+ * barline — not by its box, because a long name overhangs its cell on
+ * purpose (`emitScoreLabels`) and a box test would drop exactly the sections
+ * whose names are worth reading.
+ */
+export function sectionLabelChips(
+  enclosure: readonly SelectionRectGeometry[],
+  labels: readonly SelectionRectGeometry[],
+  staffSpace: number
+): SelectionRectGeometry[] {
+  const padX = 0.45 * staffSpace;
+  const padY = 0.3 * staffSpace;
+  return labels
+    .filter(label => {
+      const x = label.x;
+      const y = label.y + label.height / 2;
+      return enclosure.some(
+        r => x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height
+      );
+    })
+    .map(label => ({
+      x: label.x - padX,
+      y: label.y - padY,
+      width: label.width + 2 * padX,
+      height: label.height + 2 * padY
+    }));
+}

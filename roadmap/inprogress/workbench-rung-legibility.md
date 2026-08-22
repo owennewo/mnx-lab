@@ -1,12 +1,12 @@
 # Rung legibility — knowing which mode you are in without moving your eyes
 
-> **Status: proposed and phase 1 built 2026-08-20; phase 2 rewritten and
-> built the same day.** The rung chip is live and is now the tray's collapsed
-> handle (below the selection, click = `/`). The geometry pass landed as the
-> **extent ladder on both axes** — hands-on use of the first build replaced
-> the original three sharpenings (capsule styling, painted barlines) with a
-> stronger scheme: horizontal extent climbs the ladder too. Remaining: the
-> bar-vs-section pair, re-examined now that the rest has landed.
+> **Status: COMPLETE 2026-08-22 — all three phases built.** Phase 1 (the rung
+> chip, 2026-08-20) and phase 2 (the extent ladder on both axes, same day) are
+> below. Phase 3 settles the bar-vs-section pair: the section rung **lights the
+> label**, and the re-examination the item was held open for is recorded there.
+> Owes one first approval — `lab/score-text/one-bar-sections`, registered in
+> [lab-verify.md](lab-verify.md) — for a scenario authored to exercise the
+> degeneracy; no existing golden moved.
 
 ## The problem
 
@@ -127,10 +127,77 @@ full-width rung. Implementation notes:
   part-bar box now excludes the clef it owns. Differentiation beat taxonomy.
 - The both-view landmark survives: the part-measure echoes still merge into
   ONE rect spanning the notation+tab pair — it is simply ink-span wide.
-- Still open: **bar vs section** share `panel-wide`; extent, outside-dim and
-  the section's own colour carry the pair. Re-examine with fresh eyes now
-  that the trio below them is fixed. The voice-rung "dim the other voices"
-  idea stays parked as an option if the hull alone proves insufficient.
+- Settled in phase 3 below: **bar vs section**. The voice-rung "dim the other
+  voices" idea stays parked as an option if the hull alone proves insufficient.
+
+## Phase 3 — the section rung lights its label (BUILT 2026-08-22)
+
+The re-examination this item was held open for, and it began by finding that
+two of the three channels the pair was supposed to rest on **did not exist**.
+The ladder doc specifies the section rung as *"the band stretches over the
+range, label chip lit, tinted with the section's own `color`; outside dims"*
+(core-selection-ladder.md). Only the band was ever built: nothing reads
+`MnxMeasureLabel.color` for the enclosure, and there is no scope dimming
+anywhere (`ScoreViewer`'s only dim is the unrelated focus-inactive fade). So
+the pair rested on **extent alone**.
+
+Extent is the wrong channel for it, and not by a little:
+
+- Where a section is several bars long, extent already separates the pair
+  comfortably — no work needed.
+- Where a section is **exactly one bar**, the two enclosures are *identical*:
+  same `panel-wide` kind, same single rect, same geometry. Nothing to read.
+- Growing the section's box to reach the label does not help, because the
+  bar's box **already contains it**. `panel-wide` deliberately takes the
+  system's whole vertical slot, *"the strip where the bar's own
+  tempo/rehearsal marks sit"* — and score-wide labels stack in that same
+  strip. Taking the strip away from the bar would break a real ownership
+  claim: a bar owns its rehearsal mark and its tempo.
+
+So the channel is not the box. **It is the label.** The section name is what
+makes a section a section, and lighting it is the one signal that does not
+degenerate with the section's length — it reads identically at one bar and at
+twenty. It is also the ladder's own unbuilt promise rather than a new
+invention, and the cheapest of the three: the emitter already tags the label
+`section-label`, and `elementWalk` already names that class for the `section`
+element, so the selector is single-sourced and needed no new data.
+
+- **A chip behind the label**, not a restyling of it: the label's ink is
+  already at full strength, so "lit" has to be additive. It is drawn as the
+  **cap box** the emitter drew (`SCORE_LABEL_CAP_RATIO`, now exported), so it
+  lines up with a rehearsal mark's own box beside it instead of floating half
+  a space low the way a text bounding box would put it.
+- **Its own layer** (`g.enclosure-label`), inserted so it paints *over* the
+  0.06 panel-wide wash and *under* the ink — the name it lights stays
+  readable. Not the enclosure group, because the tween pairs that group's
+  rects by index and a chip present at one rung and absent at the next would
+  morph into a wash rather than appear.
+- **Claimed by the label's ANCHOR**, not its box (`sectionLabelChips` in
+  `selectionGeometry.ts`, the pure half, tested). A long name overhangs its
+  cell on purpose — `emitScoreLabels` says so — and a box-containment test
+  would drop exactly the sections whose names are worth reading.
+- **A flag, not a kind** (`SelectionContext.litLabels`, set by
+  `LIT_LABEL_LEVELS` in the workbench). The shape genuinely does not change;
+  inventing an eighth `EnclosureKind` for a rung that draws the same rect
+  would put an editor distinction into the shape vocabulary. The host decides
+  which rung claims labels, `elements/` renders it — the same division
+  `enclosure` itself already follows.
+- **Only the section rung claims them.** A bar owns the rehearsal mark and
+  tempo in that strip; if the bar lit labels too, the channel would say
+  nothing. Rehearsal marks are never lit — they index a bar, not a section.
+
+**Verified over CDP** on the new scenario, climbing the ladder with
+Shift+↑: at `bar` and at `section` the enclosure is byte-for-byte the same
+shape — `enc-panel-wide`, one rect — and the chip count goes 0 → 1. That is
+the degenerate case reproduced and separated.
+
+**Corpus:** `npm run update:primitives` came back **clean** — the item's
+"not a renderer change" claim holds, every existing golden untouched. One
+scenario added, `lab/score-text/11-one-bar-sections` (four bars, each its own
+section), because nothing in the corpus exercised the case: all three existing
+section scenarios use two-bar sections, where extent already works and the
+degeneracy never appears. Its first approval is registered in
+[lab-verify.md](lab-verify.md).
 
 ## Not this
 

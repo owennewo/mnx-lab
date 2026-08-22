@@ -390,6 +390,24 @@ export class ScoreViewer extends LitElement {
         stroke: var(--accent);
       }
 
+      /* The section rung's label chip (workbench-rung-legibility.md). Bar and
+         section share the panel-wide shape, and the bar's slot already covers
+         the strip the label sits in, so extent cannot separate them — in a
+         one-bar section the two shapes are identical. The chip is the channel
+         that does not degenerate: it reads considerably stronger than the
+         0.06 wash beneath it, and sits under the ink so the name it lights
+         stays legible. */
+      #score-container svg .enclosure-label {
+        pointer-events: none;
+      }
+
+      #score-container svg .enclosure-label rect {
+        fill: var(--accent);
+        fill-opacity: 0.22;
+        stroke: var(--accent);
+        stroke-opacity: 0.7;
+      }
+
       /* The scope PREVIEW: the same shapes, drawn as a candidate — no fill,
          a dashed border. It must read as "this is what widening would take",
          never as a second selection, so it takes the accent's outline and
@@ -803,7 +821,8 @@ export class ScoreViewer extends LitElement {
           span: this.selection?.span,
           systemRows: packedRowMeasures(paint.packings, densityH),
           staffOrdinals: renderedStaffOrdinals,
-          primaryProjection
+          primaryProjection,
+          litLabels: this.selection?.litLabels === true
         });
         let cancellation: (() => void) | null = null;
         cancellation = tweenEnclosure(svg, previousEnclosure, () => {

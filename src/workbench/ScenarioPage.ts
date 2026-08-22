@@ -353,7 +353,8 @@ const DEF_PREVIEW = 9;
 /** Ladder level → enclosure shape (roadmap/complete/core-selection-ladder.md).
  *  The mapping lives HERE so elements/ knows shapes, never editor levels.
  *  measure and section share panel-wide: the extent difference (one bar vs
- *  the labelled range) comes from the footprint itself. */
+ *  the labelled range) comes from the footprint itself — and where it
+ *  degenerates, LIT_LABEL_LEVELS below carries the pair instead. */
 const ENCLOSURE_BY_LEVEL: Record<SelectionLevel, EnclosureKind> = {
   note: 'cell',
   event: 'slice',
@@ -364,6 +365,16 @@ const ENCLOSURE_BY_LEVEL: Record<SelectionLevel, EnclosureKind> = {
   section: 'panel-wide',
   score: 'frame'
 };
+
+/** Which rungs claim the section labels they enclose (the ladder's "label
+ *  chip lit"; workbench-rung-legibility.md). Only the section rung does:
+ *  extent separates bar from section whenever the section is longer than a
+ *  bar and not at all when it is exactly one, and the bar's own slot covers
+ *  the label strip either way — so the shared shape needs a channel that does
+ *  not depend on how long the section happens to be. A bar owning the
+ *  rehearsal mark and tempo in that same strip is why the claim is the
+ *  section's alone. */
+const LIT_LABEL_LEVELS = new Set<SelectionLevel>(['section']);
 
 /** Translate editor membership into the deliberately smaller geometry
  * vocabulary accepted by `elements/`. Rests survive as onset-bearing moments;
@@ -1930,6 +1941,7 @@ export class ScenarioPage extends LitElement {
       selectedNoteIds: this.cursorHidden ? [] : session.selectedNoteKeys,
       primaryProjection: session.projection,
       enclosure: this.cursorHidden ? null : ENCLOSURE_BY_LEVEL[session.selectionLevel],
+      litLabels: !this.cursorHidden && LIT_LABEL_LEVELS.has(session.selectionLevel),
       span: this.cursorHidden
         ? null
         : presentationSpan(session.doc, session.selectionLevel, session.resolvedSelection.members),

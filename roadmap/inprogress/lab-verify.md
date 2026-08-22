@@ -81,7 +81,7 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
-*Counts below are the queue as of 2026-08-22 (0 blocked, 37 stale, 8 never-seen, 62
+*Counts below are the queue as of 2026-08-22 (0 blocked, 37 stale, 9 never-seen, 62
 current). Batches are grouped by cause; the commit named for each sub-set is the one that
 **last moved** those goldens, which is not always the one that demoted them.*
 
@@ -142,12 +142,21 @@ declare `regular` and should draw a plain barline where we previously drew thin+
 previously drew a plain thin line. If our render and the reference disagree, the render is
 wrong.
 
-### 3. Never reviewed since authoring — **8 never-seen**
+### 3. Never reviewed since authoring — **9 never-seen**
 
 | Cause | Scenarios |
 |---|---|
 | `75e566b` (2026-08-10) — corpus closure, nine new lab categories | 7 — `lab/tab-fingering/{left-hand-fingers, right-hand-pima}`, `lab/tab-techniques/{bend-and-release, slides, hammer-pull-chain, vibrato-and-palm-mute, natural-harmonics}` |
 | `ff5ae78` (2026-08-15) — score-wide marks stop belonging to the notation staff | 1 — `lab/score-text/labels-on-a-tab-staff` |
+| [workbench-rung-legibility.md](../complete/workbench-rung-legibility.md) (2026-08-22) — a scenario authored to exercise the bar-vs-section degeneracy | 1 — `lab/score-text/one-bar-sections` |
+
+`one-bar-sections` is the odd one out and the easiest: it moved no existing golden (the
+rung-legibility item is chrome, and `update:primitives` came back clean on every other
+scenario), so it is here only because a new scenario has never been read. Four bars, each
+its own section, four labels in a row — the question is whether the label row is engraved
+correctly when every bar carries one, which is also the ink-measured-gaps stage A claim
+under its densest case. The *selection* behaviour it was authored for is overlay chrome
+and is not in any golden; it is pinned by `section-label-chip.test.ts` instead.
 
 **What a reviewer should look for.** These have no approved hash at all, so there is no
 diff to reason from — this is a first reading, and the question is the ordinary one: does

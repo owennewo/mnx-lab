@@ -1,0 +1,53 @@
+{
+  "title": "One-bar sections",
+  "description": "Every bar is its own section. This is the degenerate case behind the selection ladder's bar-vs-section pair (roadmap/inprogress/workbench-rung-legibility.md): the two rungs share the panel-wide enclosure and are told apart by extent, so where a section is exactly one bar long the two shapes coincide exactly and extent says nothing. It is what the section rung's lit label chip exists to separate. Proposed MNX objects, not yet adopted — see roadmap/proposed/spec-score-text.md.",
+  "bars": 4,
+  "tags": [
+    "labels",
+    "section",
+    "proposed"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/112"
+  ],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "event",
+    "fraction",
+    "global",
+    "integer-unsigned",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "positive-integer",
+    "rhythmic-position",
+    "root",
+    "section",
+    "sequence",
+    "staff-position",
+    "step",
+    "string",
+    "time",
+    "time-signature-unit",
+    "version-number"
+  ],
+  "schema": "proposed",
+  "proposal": "score-text",
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

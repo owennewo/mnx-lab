@@ -31,8 +31,10 @@ import {
 } from '../engine/render/projection.ts';
 import {
   emptyPartGhostRect,
-  measurePositionX
+  measurePositionX,
+  sectionLabelChips
 } from '../engine/render/selectionGeometry.ts';
+import { SCORE_LABEL_CAP_RATIO } from '../engine/layout/scoreText.ts';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -281,6 +283,10 @@ export interface EnclosureOptions {
   /** Which of the combined view's two rendered spaces owns input. Fine-rung
    * fragments on the other projection are tagged as the quiet echo. */
   primaryProjection?: RenderedProjection | null;
+  /** Light the section labels the enclosure encloses. The rung that sets it
+   * is the host's call; this module only knows the rendered ink's own class
+   * vocabulary, the same way it knows `.notehead` and `.fret-number`. */
+  litLabels?: boolean;
 }
 
 export type CursorGhostOptions = Pick<EnclosureOptions, 'systemRows' | 'staffOrdinals'>;
@@ -428,6 +434,9 @@ export function drawEnclosure(
   const preview = options.preview === true;
   const layer = preview ? 'enclosure-preview' : 'enclosure';
   svg.querySelector(`:scope > g.${layer}`)?.remove();
+  // The live pass owns the label chips: a rung that does not claim them must
+  // clear the ones the previous rung lit, on every early return below.
+  if (!preview) svg.querySelector(':scope > g.enclosure-label')?.remove();
 
   const sp = unitsPerSp(svg);
   // The cell is a position mark on the notehead itself; the run hugs the
@@ -725,7 +734,10 @@ export function drawEnclosure(
       }
     });
 
-    if (g.childElementCount > 0) svg.insertBefore(g, svg.firstChild);
+    if (g.childElementCount > 0) {
+      if (options.litLabels && !preview) drawLabelChips(svg, g, sp);
+      svg.insertBefore(g, svg.firstChild);
+    }
     return;
   }
 
@@ -883,7 +895,59 @@ export function drawEnclosure(
     }
   }
 
+  if (options.litLabels && !preview) drawLabelChips(svg, g, sp);
   svg.insertBefore(g, svg.firstChild);
+}
+
+/**
+ * The section rung's label chips — the ladder's promised "label chip lit"
+ * (core-selection-ladder.md), built by workbench-rung-legibility.md.
+ *
+ * Its own layer, not the enclosure group: the tween pairs that group's rects
+ * by index, and a chip that exists at one rung and not the next would morph
+ * into a wash rather than appear. Inserted before the enclosure so it paints
+ * ON TOP of the panel-wide wash and UNDER the ink — the label stays readable,
+ * which is the entire point of lighting it.
+ *
+ * The box is the CAP the emitter drew, taken from the node's own font-size
+ * and the shared ratio, so the chip lines up with a rehearsal mark's box
+ * beside it instead of floating half a space low the way a text bounding box
+ * would put it.
+ */
+function drawLabelChips(svg: SVGSVGElement, g: SVGGElement, sp: number): void {
+  svg.querySelector(':scope > g.enclosure-label')?.remove();
+  const enclosure = [...g.querySelectorAll<SVGRectElement>('rect')].map(r => ({
+    x: Number(r.getAttribute('x') ?? 0),
+    y: Number(r.getAttribute('y') ?? 0),
+    width: Number(r.getAttribute('width') ?? 0),
+    height: Number(r.getAttribute('height') ?? 0)
+  }));
+  if (enclosure.length === 0) return;
+
+  const labels = [...svg.querySelectorAll<SVGTextElement>('text.section-label')].map(el => {
+    const box = el.getBBox();
+    const ys = el.y.baseVal;
+    const baseline = ys.numberOfItems > 0 ? ys.getItem(0).value : box.y + box.height;
+    const size = Number(el.getAttribute('font-size')) || box.height;
+    const cap = SCORE_LABEL_CAP_RATIO * size;
+    return { x: box.x, y: baseline - cap, width: box.width, height: cap };
+  });
+  const chips = sectionLabelChips(enclosure, labels, sp);
+  if (chips.length === 0) return;
+
+  const layer = document.createElementNS(SVG_NS, 'g');
+  layer.setAttribute('class', 'enclosure-label');
+  for (const chip of chips) {
+    const r = document.createElementNS(SVG_NS, 'rect');
+    r.setAttribute('x', String(chip.x));
+    r.setAttribute('y', String(chip.y));
+    r.setAttribute('width', String(chip.width));
+    r.setAttribute('height', String(chip.height));
+    r.setAttribute('rx', String(0.3 * sp));
+    r.setAttribute('stroke-width', String(0.09 * sp));
+    layer.appendChild(r);
+  }
+  svg.insertBefore(layer, svg.firstChild);
 }
 
 /** The preview footprint's glyphs, found by the note keys the renderer wrote

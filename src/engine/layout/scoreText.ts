@@ -247,7 +247,10 @@ const SCORE_LABEL_INSET_SP = 0.6; // from the barline, for a label at the top of
 // Body text has no metrics in layout, so the box is drawn around an estimated
 // CAP HEIGHT, not the em. Sizing it to the em leaves the ascender/descender
 // space inside the box and the letter sits visibly low in it.
-const SCORE_LABEL_CAP_RATIO = 0.72;
+/** Exported for the section rung's label chip (workbench-rung-legibility.md):
+ *  the overlay boxes the CAP the emitter drew, so the chip and the rehearsal
+ *  mark's own box share one vertical extent by construction. */
+export const SCORE_LABEL_CAP_RATIO = 0.72;
 const SCORE_LABEL_GAP_SP = 0.5; // between the rehearsal box and the section name
 const REHEARSAL_PAD_X_SP = 0.5; // box padding around the label
 const REHEARSAL_PAD_Y_SP = 0.4;
