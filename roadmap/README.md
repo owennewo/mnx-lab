@@ -202,19 +202,6 @@ proposals that name their campaign.
   Opened 2026-08-22 with 37 stale + 8 never-seen in three batches: `core-ink-measured-gaps`
   (33, across stages A/C/D and the tab row pads), the barline-default fix (4, no owning
   doc), and the never-reviewed corpus-closure technique set (8).
-- **[core-assist-byok.md](inprogress/core-assist-byok.md)** — **bring your own
-  OpenRouter key**, completing the workbench's no-backend rule by deleting its one
-  asterisk ("minus live AI edits"): the key is obtained by **OAuth PKCE** (a distinct
-  per-app key, master never seen) or by **paste**, held in the shell's localStorage —
-  never in `elements/`, the embed runs on foreign pages — and spent browser-direct;
-  OpenRouter permits CORS from any origin including localhost. **Built 2026-08-20**:
-  `src/assist/openrouter.ts` (PKCE pinned to the RFC 7636 vector, SSE delta parser,
-  streamed chat), `workbench/assistCredentials.ts` (the redirect round trip — callback
-  carries no hash, code scrubbed before exchange), and the assist tab's connect block
-  + tool-less chat, verified over CDP against the live API. Dissolves the model
-  selector's "must the Worker honour any model id" question — it is the user's money.
-  Remaining: move the edit loop behind this transport, a CSP header, the Worker as
-  explicit demo mode.
 - **[core-assist-model-selector.md](inprogress/core-assist-model-selector.md)** — **the model
   roster as a query, not a list**: a pure assessment/selection module that takes a
   requirements definition (hard filters — tool support, context floor, price ceiling,
@@ -270,6 +257,19 @@ proposals that name their campaign.
   clipboard support remains deferred, but replacing the store later leaves clip,
   history and paste semantics untouched.
 ### complete/
+- **[core-assist-byok.md](complete/core-assist-byok.md)** — **bring your own
+  OpenRouter key**, completing the workbench's no-backend rule by deleting its one
+  asterisk ("minus live AI edits"): the key is obtained by **OAuth PKCE** (a distinct
+  per-app key, master never seen) or by **paste**, held in the shell's localStorage —
+  never in `elements/`, the embed runs on foreign pages — and spent browser-direct;
+  OpenRouter permits CORS from any origin including localhost. **Built 2026-08-20**:
+  `src/assist/openrouter.ts` (PKCE pinned to the RFC 7636 vector, SSE delta parser,
+  streamed chat), `workbench/assistCredentials.ts` (the redirect round trip — callback
+  carries no hash, code scrubbed before exchange), and the assist tab's connect block
+  + tool-less chat, verified over CDP against the live API. Dissolves the model
+  selector's "must the Worker honour any model id" question — it is the user's money.
+  Remaining: move the edit loop behind this transport, a CSP header, the Worker as
+  explicit demo mode. **Closed 2026-08-22**: the loop moved to `src/assist/editLoop.ts` behind a `ChatTransport` it declares itself (10 network-free tests it could not have had before), `streamEditNotation` picks browser-direct vs Worker from whether a key is held, the CSP shipped in `public/_headers` with a mutation-checked `smoke:csp`, the Worker stamps every frame `demoMode`/`mockMode`, and studio's adoption is a deferred promotion with its trigger named.
 - **[core-ink-measured-gaps.md](complete/core-ink-measured-gaps.md)** — **vertical distance
   is measured ink to ink**. **Stages A–C built 2026-08-21** (labels/tempo one clearance above the
   ink under their footprint; every display gap ink-measured via a probe pass, gap-centred

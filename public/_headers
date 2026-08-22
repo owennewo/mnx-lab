@@ -1,0 +1,25 @@
+# Response headers for the deployed site, applied by Workers Assets in front
+# of the Worker. Vite copies public/ into dist/client/, which is the assets
+# directory wrangler uploads — so this file IS the deploy's header policy.
+#
+# The CSP is the precondition core-assist-byok.md named: once the user's
+# OpenRouter key lives in this origin's localStorage, an injected script is a
+# credential theft rather than a defacement. `script-src 'self'` is the
+# directive that matters, and the codebase already earns it — the only
+# `innerHTML` uses in src/ are clears, everything renders through Lit
+# templates (which escape), assistant markdown is parsed to an AST and emitted
+# as templates with no HTML sink, and the precompiled Ajv validators exist
+# precisely so nothing needs `eval`.
+#
+# `style-src` keeps 'unsafe-inline' and that is a deliberate, bounded
+# exception: index.html carries a six-line inline <style> and Lit templates
+# set `style=` attributes throughout. CSS cannot read localStorage, so it is
+# not on the path this policy exists to close; dropping it would mean
+# nonce-stamping the shell for no gain against this threat.
+#
+# connect-src names openrouter.ai because that is the point of BYOK: the
+# browser talks to the model provider directly, on the user's own key.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://openrouter.ai; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff

@@ -12,7 +12,7 @@ import snapshot from './modelCatalog.snapshot.json';
 
 /** The capability flags the snapshot keeps from supported_parameters — the
  *  ones a requirements definition can filter on. `tools` is the load-bearing
- *  one: worker/editLoop.ts forces the update_document tool call. */
+ *  one: assist/editLoop.ts forces the update_document tool call. */
 export const KNOWN_PARAMETERS = ['tools', 'structured_outputs', 'response_format', 'reasoning'];
 
 /** Curated quality/speed priors — DECLARED DATA, hand-set 2026-08-20 from

@@ -32,7 +32,7 @@ The **requirements definition** is data (versionable, committable), in two
 halves that the algorithm treats differently:
 
 - **Hard constraints** — pass/fail filters. Required capabilities
-  (`tools` is the ever-present one here: [worker/editLoop.ts](../../worker/editLoop.ts)
+  (`tools` is the ever-present one here: [src/assist/editLoop.ts](../../src/assist/editLoop.ts)
   forces the `update_document` tool call, so a model without tool support is
   useless to the edit loop regardless of any score), minimum context length,
   a price ceiling per Mtok (ceiling 0 = free-only), streaming, data-policy
@@ -176,7 +176,7 @@ mockup does:
   model id or insists on the roster is a real decision this item owns (the
   Worker is a secrets proxy spending the deployment's OpenRouter key, so
   "anything" has a cost story, not just a validation story).
-  **Resolved 2026-08-20 by [core-assist-byok.md](core-assist-byok.md)**: with
+  **Resolved 2026-08-20 by [core-assist-byok.md](../complete/core-assist-byok.md)**: with
   the user's own key spent browser-direct, any model id is fine — it is their
   money; the roster allowlist applies only to the server-key demo mode.
 

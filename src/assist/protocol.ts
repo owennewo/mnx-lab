@@ -1,7 +1,12 @@
-// The chat-to-edit wire protocol, shared verbatim by the Worker (producer)
-// and the workbench assist client (consumer). /api/edit-notation streams
-// application/x-ndjson: zero or more progress frames, then exactly one done
-// frame. Change shapes here and both sides move together.
+// The chat-to-edit protocol: zero or more progress frames, then exactly one
+// done frame.
+//
+// It is a WIRE protocol only on the demo path, where /api/edit-notation
+// streams these as application/x-ndjson. On the ordinary BYOK path the same
+// frames are yielded in-process by `runEditLoop` and never serialized — same
+// shapes, same iterator, so a caller cannot tell which one it got except by
+// reading `demoMode`/`mockMode`. Change shapes here and every side moves
+// together.
 
 /** POST body for /api/edit-notation. */
 export interface EditRequest {
@@ -39,6 +44,11 @@ export interface DoneFrame {
   explanation?: string;
   /** True when the offline mock produced the result (no OpenRouter key). */
   mockMode?: boolean;
+  /** True when the WORKER produced the result on the deployment's own key —
+   *  the demo path, spending somebody else's money (core-assist-byok.md). A
+   *  done frame with neither flag was a browser-direct edit on the user's own
+   *  key, which is the ordinary case once they have connected one. */
+  demoMode?: boolean;
   attemptsUsed?: number;
   /** Debug surfaces: the conversation and raw tool-call payloads. */
   messages?: unknown[];

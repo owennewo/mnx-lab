@@ -1,9 +1,15 @@
-// The self-correcting edit loop, factored out of the route so future evals
-// (harness/evals/) can drive it directly: pure async function in, protocol
-// frames out through a callback. No Hono, no streams, no env access here.
+// The self-correcting edit loop. It lives in `assist/` — not the Worker —
+// because the loop is about SELF-CORRECTION, not about who holds the key:
+// the same function runs server-side against the deployment's demo key and
+// browser-side against the user's own BYOK key (core-assist-byok.md). What
+// differs is the `ChatTransport` handed in.
 //
-// One iteration: call OpenRouter with a forced `update_document` tool call,
-// stream the response (surfacing token counts as progress), parse the
+// Factored for future evals (harness/evals/) too: pure async function in,
+// protocol frames out through a callback. No Hono, no streams, no env access,
+// no DOM, no fetch of its own.
+//
+// One iteration: ask the transport for a forced `update_document` tool call,
+// consume its deltas (surfacing token counts as progress), parse the
 // accumulated arguments, then validate TWICE — the official MNX schema and
 // every `_x.mnxLab` vendor dict against the extension schema. On failure the
 // assistant's failed tool_calls message plus a synthetic role:'tool' error
@@ -12,13 +18,61 @@
 // compile-validator.mjs) because Workers disallow runtime codegen — and the
 // PUBLISHED schema only: the LLM must never be taught proposed-schema fields.
 import { buildEditSystemPrompt } from './prompts/editNotation.ts';
-import validateMnx from './generated/validate-mnx.mjs';
-import {
-  validateNoteExt,
-  validatePartExt,
-  validateGlobalMeasureExt
-} from './generated/validate-extensions.mjs';
-import type { DoneFrame, ProgressFrame, SelectionContextPayload } from '../src/assist/protocol.ts';
+import type { DoneFrame, ProgressFrame, SelectionContextPayload } from './protocol.ts';
+
+/** OpenAI-style forced-tool setting. The loop never sets it — the transport
+ *  owns the value and any provider fallback — but the type belongs with the
+ *  request shape. */
+export type ToolChoice = 'required' | 'auto';
+
+export interface ChatCompletionRequest {
+  model: string;
+  messages: unknown[];
+  tools: unknown[];
+  signal?: AbortSignal;
+}
+
+/** What the loop needs from the outside world, and all it needs: one
+ *  streaming tool-capable completion. Declared HERE, by the consumer, so the
+ *  loop depends on no particular provider — `openRouterEditTransport` in
+ *  openrouter.ts is the implementation, and a test can hand over a generator
+ *  with no network at all. */
+export type ChatTransport = (req: ChatCompletionRequest) => AsyncGenerator<{
+  content?: string;
+  toolCallId?: string;
+  toolArguments?: string;
+  completionTokens?: number;
+}>;
+
+/** The precompiled validators, loaded on FIRST USE rather than at module
+ *  scope: in the browser they are a ~196 kB chunk that only an actual edit
+ *  needs, and the same lazy import keeps them out of the workbench's initial
+ *  bundle (model/pinnedErrors.ts loads the same chunk the same way). In the
+ *  Worker this resolves once at first request and is cached thereafter. */
+export interface EditValidators {
+  validateMnx: ((data: unknown) => boolean) & { errors: any[] | null };
+  validateNoteExt: ((data: unknown) => boolean) & { errors: any[] | null };
+  validatePartExt: ((data: unknown) => boolean) & { errors: any[] | null };
+  validateGlobalMeasureExt: ((data: unknown) => boolean) & { errors: any[] | null };
+}
+
+let validatorsPromise: Promise<EditValidators> | null = null;
+
+export function loadEditValidators(): Promise<EditValidators> {
+  validatorsPromise ??= (async () => {
+    const [mnx, ext] = await Promise.all([
+      import('../../worker/generated/validate-mnx.mjs'),
+      import('../../worker/generated/validate-extensions.mjs')
+    ]);
+    return {
+      validateMnx: mnx.default as EditValidators['validateMnx'],
+      validateNoteExt: ext.validateNoteExt as EditValidators['validateNoteExt'],
+      validatePartExt: ext.validatePartExt as EditValidators['validatePartExt'],
+      validateGlobalMeasureExt: ext.validateGlobalMeasureExt as EditValidators['validateGlobalMeasureExt']
+    };
+  })();
+  return validatorsPromise;
+}
 
 export interface EditLoopInput {
   userPrompt: string;
@@ -26,9 +80,11 @@ export interface EditLoopInput {
   selectionContext: SelectionContextPayload;
   model: string;
   attachedImages?: string[];
-  apiKey: string;
+  /** How the loop talks to a model. The key lives in here, never in the loop. */
+  transport: ChatTransport;
   onProgress: (frame: ProgressFrame) => void | Promise<void>;
   maxAttempts?: number;
+  signal?: AbortSignal;
 }
 
 /**
@@ -86,7 +142,7 @@ export function formatValidationErrors(errors: any[]): string {
  * validity is deliberately blind to `_x` content, so this is a separate walk.
  * Returns formatted error strings (empty array = extension-valid).
  */
-export function validateLabExtensions(doc: any): string[] {
+export function validateLabExtensions(doc: any, v: EditValidators): string[] {
   const errors: string[] = [];
   const report = (path: string, subErrors: any[] | null) => {
     for (const err of subErrors ?? []) {
@@ -95,23 +151,23 @@ export function validateLabExtensions(doc: any): string[] {
   };
 
   (doc?.global?.measures ?? []).forEach((measure: any, mIdx: number) => {
-    if (measure?._x?.mnxLab !== undefined && !validateGlobalMeasureExt(measure._x.mnxLab)) {
-      report(`/global/measures/${mIdx}/_x/mnxLab`, validateGlobalMeasureExt.errors);
+    if (measure?._x?.mnxLab !== undefined && !v.validateGlobalMeasureExt(measure._x.mnxLab)) {
+      report(`/global/measures/${mIdx}/_x/mnxLab`, v.validateGlobalMeasureExt.errors);
     }
   });
 
   (doc?.parts ?? []).forEach((part: any, pIdx: number) => {
-    if (part?._x?.mnxLab !== undefined && !validatePartExt(part._x.mnxLab)) {
-      report(`/parts/${pIdx}/_x/mnxLab`, validatePartExt.errors);
+    if (part?._x?.mnxLab !== undefined && !v.validatePartExt(part._x.mnxLab)) {
+      report(`/parts/${pIdx}/_x/mnxLab`, v.validatePartExt.errors);
     }
     (part?.measures ?? []).forEach((measure: any, mIdx: number) => {
       (measure?.sequences ?? []).forEach((seq: any, sIdx: number) => {
         (seq?.content ?? []).forEach((event: any, eIdx: number) => {
           (event?.notes ?? []).forEach((note: any, nIdx: number) => {
-            if (note?._x?.mnxLab !== undefined && !validateNoteExt(note._x.mnxLab)) {
+            if (note?._x?.mnxLab !== undefined && !v.validateNoteExt(note._x.mnxLab)) {
               report(
                 `/parts/${pIdx}/measures/${mIdx}/sequences/${sIdx}/content/${eIdx}/notes/${nIdx}/_x/mnxLab`,
-                validateNoteExt.errors
+                v.validateNoteExt.errors
               );
             }
           });
@@ -158,10 +214,13 @@ export async function runEditLoop(input: EditLoopInput): Promise<DoneFrame> {
     selectionContext,
     model,
     attachedImages = [],
-    apiKey,
+    transport,
     onProgress,
-    maxAttempts = 3
+    maxAttempts = 3,
+    signal
   } = input;
+
+  const validators = await loadEditValidators();
 
   const userText = `Current MNX Score:\n${JSON.stringify(mnxJson, null, 2)}\n\nEditor selection state:\n${JSON.stringify(selectionContext)}\n\nUser Instruction:\n${userPrompt}`;
 
@@ -188,10 +247,6 @@ export async function runEditLoop(input: EditLoopInput): Promise<DoneFrame> {
   // the time it's empty because the model goes straight to the tool call, but
   // some models (or non-vision models receiving an image) emit text instead.
   let assistantContent = '';
-  // OpenAI-style "required" forces a tool call but some OpenRouter providers
-  // (e.g. Qwen) reject any non-default tool_choice with a 404. Start
-  // optimistic; memoize the working value across retries within this request.
-  let workingToolChoice = 'required';
 
   while (attempt < maxAttempts) {
     const retryStatus =
@@ -203,110 +258,35 @@ export async function runEditLoop(input: EditLoopInput): Promise<DoneFrame> {
     );
 
     try {
-      const apiHeaders = {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://mnx-lab.totai.uk',
-        'X-Title': 'MNX Lab'
-      };
-      const buildBody = (tc: string) =>
-        JSON.stringify({ model, messages, tools: EDIT_TOOLS, tool_choice: tc, stream: true });
-
-      // Try the memoized working tool_choice first. If we haven't fallen back
-      // yet (still 'required'), fall back to 'auto' on a tool_choice-specific 404.
-      const toolChoicesToTry =
-        workingToolChoice === 'required' ? ['required', 'auto'] : [workingToolChoice];
-      let response: Response | null = null;
-      let lastErrText: string | null = null;
-      let lastStatus: number | null = null;
-      for (const tc of toolChoicesToTry) {
-        response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: apiHeaders,
-          body: buildBody(tc)
-        });
-        if (response.ok) {
-          workingToolChoice = tc;
-          break;
-        }
-        const errText = await response.text();
-        lastErrText = errText;
-        lastStatus = response.status;
-        // Only fall through to the next value if this was specifically a
-        // tool_choice rejection. Anything else (auth, model-not-found, rate
-        // limit) bubbles up immediately.
-        if (response.status === 404 && errText.includes('tool_choice')) {
-          console.log(`Provider for ${model} rejected tool_choice="${tc}"; trying fallback`);
-          if (tc === 'required') workingToolChoice = 'auto';
-          continue;
-        }
-        throw new Error(`OpenRouter returned status ${response.status}: ${errText}`);
-      }
-      if (!response || !response.ok) {
-        throw new Error(`OpenRouter returned status ${lastStatus}: ${lastErrText}`);
-      }
-
       let accumulatedArguments = '';
       toolCallId = null;
       assistantContent = '';
 
-      const reader = response.body!.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-      let buffer = '';
-
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        if (value) {
-          buffer += decoder.decode(value, { stream: !done });
-          const lines = buffer.split('\n');
-          buffer = lines.pop() || '';
-
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed) continue;
-            if (trimmed === 'data: [DONE]') continue;
-            if (trimmed.startsWith('data: ')) {
-              try {
-                const dataJson = JSON.parse(trimmed.slice(6));
-
-                if (dataJson.usage?.completion_tokens) {
-                  tokensEst = dataJson.usage.completion_tokens;
-                  await onProgress({
-                    type: 'progress',
-                    tokens: tokensEst,
-                    status: retryStatus ?? 'generating...'
-                  });
-                  continue;
-                }
-
-                const choice = dataJson.choices?.[0];
-                const delta = choice?.delta;
-                const toolCall = delta?.tool_calls?.[0];
-
-                if (delta?.content) {
-                  assistantContent += delta.content;
-                }
-
-                if (toolCall?.id) {
-                  toolCallId = toolCall.id;
-                }
-
-                if (toolCall?.function?.arguments) {
-                  accumulatedArguments += toolCall.function.arguments;
-                  tokensEst = Math.max(tokensEst + 1, Math.floor(accumulatedArguments.length / 4));
-                  await onProgress({
-                    type: 'progress',
-                    tokens: tokensEst,
-                    status: retryStatus ?? 'generating...'
-                  });
-                }
-              } catch {
-                // Ignore parse errors in stream chunks
-              }
-            }
-          }
+      for await (const delta of transport({
+        model,
+        messages,
+        tools: EDIT_TOOLS,
+        signal
+      })) {
+        if (delta.completionTokens) {
+          tokensEst = delta.completionTokens;
+          await onProgress({
+            type: 'progress',
+            tokens: tokensEst,
+            status: retryStatus ?? 'generating...'
+          });
+          continue;
+        }
+        if (delta.content) assistantContent += delta.content;
+        if (delta.toolCallId) toolCallId = delta.toolCallId;
+        if (delta.toolArguments) {
+          accumulatedArguments += delta.toolArguments;
+          tokensEst = Math.max(tokensEst + 1, Math.floor(accumulatedArguments.length / 4));
+          await onProgress({
+            type: 'progress',
+            tokens: tokensEst,
+            status: retryStatus ?? 'generating...'
+          });
         }
       }
 
@@ -354,11 +334,11 @@ export async function runEditLoop(input: EditLoopInput): Promise<DoneFrame> {
           } else {
             // Two verdicts: standard MNX schema, then the extension schema
             // over every `_x.mnxLab` dict. Both gate the retry loop.
-            const isValid = validateMnx(updatedMnxJson);
+            const isValid = validators.validateMnx(updatedMnxJson);
             if (!isValid) {
-              validationErrors = formatValidationErrors(validateMnx.errors || []);
+              validationErrors = formatValidationErrors(validators.validateMnx.errors || []);
             } else {
-              const extErrors = validateLabExtensions(updatedMnxJson);
+              const extErrors = validateLabExtensions(updatedMnxJson, validators);
               if (extErrors.length > 0) {
                 validationErrors = extErrors.join('\n');
               }

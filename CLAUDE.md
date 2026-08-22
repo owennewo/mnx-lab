@@ -136,10 +136,15 @@ harness/             every way the evidence is exercised
   helpers/                corpusPrimitives (SMuFL from disk + fixed viewport), svgString
 src/                 the apparatus — capability layers (order below)
   model/  engine/  audio/  edit/  corpus/  storage/  assist/  elements/  workbench/  entries/
-worker/              Hono; a secrets-and-validation proxy for assist ONLY
+  assist/editLoop.ts      the self-correcting loop — transport-injected, so the SAME
+                          function runs in the browser (user's key) and the Worker
+                          (demo key); factored for future evals
+  assist/openrouter.ts    the OpenRouter client: PKCE, key lookup, one SSE parser with
+                          two faces (text chat, and the loop's tool-calling transport)
+  assist/prompts/editNotation.ts  the LLM-facing system prompt (§-numbered, addressable)
+  assist/stream.ts        the ONE call site for an edit; picks browser-direct vs Worker
+worker/              Hono; a DEMO for visitors with no key of their own, plus reserved seams
   api/                    editNotation, models + reserved 501 seams documents, auth
-  editLoop.ts             the self-correcting loop, factored for future evals
-  prompts/editNotation.ts the LLM-facing system prompt (§-numbered, addressable)
   generated/              validators precompiled from spec/ (committed; schema DATA,
                           importable from any layer)
 converters/          npm-workspace sub-packages + fixtures/ (the three scores)
@@ -297,33 +302,61 @@ without the submodule, the pane degrades to a note. The images are the CG's, sho
 attribution and never committed here. The scenario page distinguishes **loading** from
 **failed** (the score is a lazy chunk — a dead dev server must not read as a render bug).
 
-**The workbench has no backend — by rule.** It must stay fully functional (minus live
-AI edits) from static build output alone: the corpus is committed JSON, documents live
-in IndexedDB, and every verification write happens through harness scripts editing repo
-files — git is the database and the audit trail. The Worker is *not* its backend;
-`workbench/` may reach it only through `assist/`. If browser-driven corpus authoring is ever wanted,
+**The workbench has no backend — by rule.** It must stay fully functional from static
+build output alone: the corpus is committed JSON, documents live in IndexedDB, and every
+verification write happens through harness scripts editing repo files — git is the
+database and the audit trail. **Live AI edits are no longer the exception they used to
+be** (core-assist-byok.md): with the user's own OpenRouter key, held in this origin's
+localStorage and obtained by PKCE or paste, `src/assist/editLoop.ts` runs the whole
+self-correcting loop *in the browser* and nothing about the edit reaches a server we run.
+The Worker is *not* the backend and now says so — it is the demo for a visitor who has
+connected no key, spending the deployment's, and every done frame it produces is stamped
+`demoMode` (or `mockMode` with no key at all). `workbench/` may reach it only through
+`assist/`. If browser-driven corpus authoring is ever wanted,
 the pattern is a dev-only Vite middleware writing repo files — never a deployed API.
 The real API layer (documents, auth, sync) belongs to **studio**
 ([apps/studio/README.md](apps/studio/README.md)) on the reserved seams
 (`worker/api/documents|auth` 501 stubs, `storage/cloudRepository.ts`).
 
-## AI editing flow (`/api/edit-notation`)
+## AI editing flow — one loop, two paths
 
-A **self-correcting NDJSON stream**: `src/assist/protocol.ts` defines the frames
-(shared by Worker and client), `worker/editLoop.ts` runs the loop — forced
-`update_document` tool call (with a `required`→`auto` tool_choice fallback), streamed
-accumulation, then **two verdicts**: the official schema and every `_x.mnxLab` dict
+`src/assist/stream.ts` is the **one call site** and it picks the path: hand it the user's
+key and the loop runs browser-direct against OpenRouter; hand it none and it POSTs to
+`/api/edit-notation`, the Worker's demo. Both yield the same
+`src/assist/protocol.ts` frames from the same iterator — on the wire as NDJSON for the
+demo, in-process for BYOK — so a caller tells them apart only by the `demoMode`/`mockMode`
+stamp on the done frame. **An unstamped done frame means the user's own key paid for it.**
+
+`src/assist/editLoop.ts` runs the loop: forced `update_document` tool call, streamed
+accumulation, then **two verdicts** — the official schema and every `_x.mnxLab` dict
 against the extension schema. On failure the failed tool call + a synthetic
 `role: 'tool'` error re-enter the conversation, up to 3 attempts.
 `formatValidationErrors` deliberately filters `anyOf`/`oneOf`/`allOf` noise down to the
-`event` branch — don't "fix" it, that makes errors unusable. With no
-`OPENROUTER_API_KEY` (from `.dev.vars` locally, a Worker secret in prod) the shared
-mock (`src/assist/mock.ts`) keeps the UI demoable. **Workers can't run
-`ajv.compile()`**, so validators are precompiled by `spec/tools/compile-validator.mjs`
-into `worker/generated/` (committed; rebuilt by `npm run build`). **The Worker and the
-retry loop use the published schema only** — never teach the LLM proposed-schema fields.
-When touching `worker/prompts/editNotation.ts` or the tool schema, mirror structural
-rules (plural `notes` array, etc.) — they are the primary defense against schema drift.
+`event` branch — don't "fix" it, that makes errors unusable.
+
+The loop knows nothing about OpenRouter. It declares a **`ChatTransport`** and is handed
+one, which is why `harness/conformance/edit-loop.test.ts` can drive the whole
+self-correction with a scripted generator and no network. The
+`required`→`auto` `tool_choice` fallback lives in `openRouterEditTransport`, not the
+loop: it is a provider quirk, not part of self-correcting. **Never restore a hardcoded
+`fetch` to the loop** — that is what made it Worker-only and untestable.
+
+Validators load **lazily** (`loadEditValidators`), so the browser bundle does not carry
+196 kB of Ajv until an edit actually happens. **Workers can't run `ajv.compile()`**, so
+they are precompiled by `spec/tools/compile-validator.mjs` into `worker/generated/`
+(committed; rebuilt by `npm run build`). **The loop uses the published schema only** —
+never teach the LLM proposed-schema fields. When touching
+`src/assist/prompts/editNotation.ts` or the tool schema, mirror structural rules (plural
+`notes` array, etc.) — they are the primary defense against schema drift. With no
+`OPENROUTER_API_KEY` (from `.dev.vars` locally, a Worker secret in prod) the demo route
+falls back to the shared mock (`src/assist/mock.ts`) so the UI stays demoable.
+
+**The key is a credential, so the deploy carries a CSP** (`public/_headers`, copied into
+`dist/client/` by Vite). `script-src 'self'` is the directive that matters and the
+codebase earns it — no `eval`, no CDN, no HTML sink. `npm run smoke:csp` boots the built
+workbench under the deployed policy in headless Chrome and fails on any violation; the
+`'unsafe-inline'` in `style-src` is a bounded, documented exception (CSS cannot read
+localStorage). Add a CDN or an inline script and that smoke test is what tells you.
 
 ## Rendering (custom SMuFL/SVG engine)
 

@@ -35,6 +35,24 @@ that a red build), and nothing may import studio. Anything both shells want is f
 | Typed sync client | `src/storage/cloudRepository.ts` | stub over the 501 route |
 | Local persistence | `src/storage/indexedDbRepository.ts` | working (the workbench uses it) |
 | Embeddable viewer | `entries/embed.ts` → `dist/embed/` | working |
+| Self-correcting edit loop | `src/assist/editLoop.ts` | working, transport-injected — the same loop runs in a browser or a Worker |
+
+## Assist credentials — a promotion waiting for a second consumer
+
+Studio will want the same BYOK flow the workbench has (core-assist-byok.md): PKCE or a
+pasted OpenRouter key, held in the browser, spent browser-direct. The pieces are already
+split along the line that makes that possible — `src/assist/openrouter.ts` is pure over
+`fetch`/`crypto` and touches no storage, so **studio can consume it today**; only
+`src/workbench/assistCredentials.ts` (localStorage, the PKCE redirect round trip) is
+shell-specific, and studio must not import it — the workbench is a leaf, and
+dependency-cruiser makes trying a red build.
+
+It is **not** promoted into a shared layer yet, on purpose. The repo's rule is that a
+shared surface graduates when a real second consumer needs it, and studio does not exist.
+When it starts, the move is small and known: lift `assistCredentials.ts` down to a layer
+both shells may import, leaving the storage keys and the callback-URL derivation as its
+only decisions. Writing it now would be guessing at studio's routing and its session
+model — the two things the module actually depends on.
 
 The real backend (accounts, storage bindings, sync protocol) is **studio's to build**
 on those seams — the workbench keeps no backend at all, by rule.

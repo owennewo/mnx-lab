@@ -181,7 +181,7 @@ Migration mechanics:
   section planned. No converter behavior changes.
 - **Worker**: regenerate `worker/generated/` validators
   (`spec/tools/compile-validator.mjs`); audit
-  [worker/prompts/editNotation.ts](../../worker/prompts/editNotation.ts) for tab
+  [src/assist/prompts/editNotation.ts](../../src/assist/prompts/editNotation.ts) for tab
   field names.
 - **The golden gate**: the reshape touches inputs only, so `npm run
   update:primitives` must leave `git diff -- scenarios/` clean apart from the

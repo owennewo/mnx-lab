@@ -83,7 +83,7 @@ export interface ScoredModel {
 }
 
 /** Declared estimate of the edit loop's token mix, pending measurement from
- *  edit-loop evals (worker/editLoop.ts is factored for them): a large prompt
+ *  edit-loop evals (assist/editLoop.ts is factored for them): a large prompt
  *  (document + schema + system prompt, partially cacheable across retries)
  *  and a large completion (the model rewrites the whole document through the
  *  forced tool call). */

@@ -18,7 +18,7 @@
 Dorico's Jump Bar has two sub-modes — commands and go-to. MNX Lab's natural third
 is **prompt**: typed text routing to `/api/edit-notation` when it reads as a
 sentence rather than a command. A keyboard-first front door for the assist path
-that already exists (the NDJSON self-correcting loop in `worker/editLoop.ts` —
+that already exists (the self-correcting loop, now `src/assist/editLoop.ts` —
 live endpoint, client reader in `src/assist/stream.ts`, today with zero
 callers), needing no new surface beyond the ones that exist.
 

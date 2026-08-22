@@ -6,10 +6,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   exchangePkceCode,
+  openRouterEditTransport,
   pkceAuthorizeUrl,
   pkceChallenge,
   sseTextDeltas,
-  streamChat
+  streamChat,
+  type ChatDelta
 } from '../../src/assist/openrouter.ts';
 
 function stream(chunks: string[]): ReadableStream<Uint8Array> {
@@ -94,5 +96,85 @@ describe('SSE deltas', () => {
 
     const denied = (async () => new Response(JSON.stringify({ error: { message: 'bad key' } }), { status: 401 })) as unknown as typeof fetch;
     await expect(collect(streamChat({ apiKey: 'K', model: 'm', messages: [], fetchImpl: denied }))).rejects.toThrow(/401 — bad key/);
+  });
+});
+
+// The edit loop's transport. Same client, one face further on: tool-call and
+// usage deltas the plain chat drops, plus the tool_choice fallback that used
+// to live inside the loop (core-assist-byok.md — the loop declares
+// `ChatTransport`, this file implements it, and the provider quirk belongs
+// with the provider).
+describe('the edit transport', () => {
+  const toolFrame = (args: string, id?: string) =>
+    `data: ${JSON.stringify({
+      choices: [{ delta: { tool_calls: [{ ...(id ? { id } : {}), function: { arguments: args } }] } }]
+    })}\n\n`;
+
+  const sse = (...frames: string[]) =>
+    (async () => new Response(stream([...frames, 'data: [DONE]\n\n']), { status: 200 })) as unknown as typeof fetch;
+
+  async function drain(t: ReturnType<typeof openRouterEditTransport>, model = 'm') {
+    const out: ChatDelta[] = [];
+    for await (const d of t({ model, messages: [], tools: [] })) out.push(d);
+    return out;
+  }
+
+  it('yields tool-call id, argument fragments and the usage frame', async () => {
+    const t = openRouterEditTransport({
+      apiKey: 'k',
+      fetchImpl: sse(
+        toolFrame('{"data":', 'call_1'),
+        toolFrame('{}}'),
+        `data: ${JSON.stringify({ usage: { completion_tokens: 42 } })}\n\n`
+      )
+    });
+    expect(await drain(t)).toEqual([
+      { toolCallId: 'call_1', toolArguments: '{"data":' },
+      { toolArguments: '{}}' },
+      { completionTokens: 42 }
+    ]);
+  });
+
+  it('falls back required → auto on a tool_choice 404, and memoizes the survivor', async () => {
+    const sent: string[] = [];
+    const fetchImpl = (async (_url: string, init: RequestInit) => {
+      const tc = JSON.parse(String(init.body)).tool_choice as string;
+      sent.push(tc);
+      if (tc === 'required') return new Response('no tool_choice for you', { status: 404 });
+      return new Response(stream([toolFrame('{}'), 'data: [DONE]\n\n']), { status: 200 });
+    }) as unknown as typeof fetch;
+
+    const t = openRouterEditTransport({ apiKey: 'k', fetchImpl });
+    await drain(t);
+    expect(sent).toEqual(['required', 'auto']);
+    // The second call must not re-pay the discovery: the closure remembers.
+    await drain(t);
+    expect(sent).toEqual(['required', 'auto', 'auto']);
+  });
+
+  it('does NOT retry a non-tool_choice failure — the cause is reported as-is', async () => {
+    const sent: string[] = [];
+    const fetchImpl = (async (_url: string, init: RequestInit) => {
+      sent.push(JSON.parse(String(init.body)).tool_choice as string);
+      return new Response('No auth credentials found', { status: 401 });
+    }) as unknown as typeof fetch;
+    await expect(drain(openRouterEditTransport({ apiKey: 'bad', fetchImpl }))).rejects.toThrow(
+      /status 401.*No auth credentials/s
+    );
+    expect(sent).toEqual(['required']);
+  });
+
+  it('carries the bearer key and attribution the user will see in their own log', async () => {
+    let headers: Record<string, string> = {};
+    const fetchImpl = (async (_url: string, init: RequestInit) => {
+      headers = init.headers as Record<string, string>;
+      return new Response(stream(['data: [DONE]\n\n']), { status: 200 });
+    }) as unknown as typeof fetch;
+    await drain(
+      openRouterEditTransport({ apiKey: 'sk-or-v1-mine', referer: 'http://localhost:5173', title: 'MNX Lab', fetchImpl })
+    );
+    expect(headers.Authorization).toBe('Bearer sk-or-v1-mine');
+    expect(headers['HTTP-Referer']).toBe('http://localhost:5173');
+    expect(headers['X-Title']).toBe('MNX Lab');
   });
 });
