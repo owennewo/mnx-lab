@@ -7,7 +7,7 @@ first: with note ranges gone, the note-set cases below collapse to single-
 notehead rules, which is what keeps this matrix tractable.
 
 **This supersedes Contract 3 of
-[core-selection-clipboard.md](../inprogress/core-selection-clipboard.md)** —
+[core-selection-clipboard.md](../complete/core-selection-clipboard.md)** —
 the conservative compatibility table and its refusal matrix. Everything else
 that item built carries over unchanged: the clip format, extraction, the
 pure-plan → typed-result → atomic-op → trace pipeline, cut, the bindings and
@@ -174,7 +174,7 @@ Each of these was a fork; the choice and its reason are the contract.
 The plan result's refusal codes largely become **accommodation records** —
 the same typed, testable discipline, pointed at what the paste *did*:
 bars appended, parts created, units consumed to rests, annotations flagged.
-The [stage-6 notice strip](../inprogress/core-selection-clipboard.md) pivots
+The [stage-6 notice strip](../complete/core-selection-clipboard.md) pivots
 with it:
 
 > `pasted event-run at bars 3–4 · 1 bar appended · tuplet tail → rests ·

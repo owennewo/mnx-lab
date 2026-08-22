@@ -2,7 +2,7 @@
 
 Serves the **implementation loop**. Proposed 2026-08-20, and **decided** — the
 open questions here are sequencing, not direction. It came out of hands-on
-review of the [selection clipboard](../inprogress/core-selection-clipboard.md):
+review of the [selection clipboard](../complete/core-selection-clipboard.md):
 the typed clipboard made a previously invisible distinction load-bearing, and
 the distinction did not survive contact with a user.
 

@@ -215,18 +215,24 @@ proposals that name their campaign.
   Opened 2026-08-22 with 37 stale + 8 never-seen in three batches: `core-ink-measured-gaps`
   (33, across stages A/C/D and the tab row pads), the barline-default fix (4, no owning
   doc), and the never-reviewed corpus-closure technique set (8).
-- **[core-selection-clipboard.md](inprogress/core-selection-clipboard.md)** — typed
-  copy, cut and paste over every selection rung, range and closure. **Stage 1 built
-  2026-08-16:** the versioned DOM-free clip union and strict JSON codec, the
-  asynchronous string-only memory store, and app-level ownership that survives route,
-  document and session changes without claiming reload persistence. All nine clip kinds
-  (`note-set` through whole score), context/dependency fields and malformed/unknown/
-  cyclic refusals are pinned by `selection-clip.test.ts`. No editor command is live yet;
-  stage 2 is pure extraction from resolved point/range/closure selections. System
-  clipboard support remains deferred, but replacing the store later leaves clip,
-  history and paste semantics untouched.
 
 ### complete/
+- **[core-selection-clipboard.md](complete/core-selection-clipboard.md)** — typed
+  copy, cut and paste over every selection rung, range and closure. **Stages 1–6 built
+  2026-08-16 and 2026-08-20; closed 2026-08-22 without stage 7.** The clip is a
+  versioned DOM-free union behind one strict codec and one asynchronous, string-only
+  store, so replacing the internal transport later leaves clip, extraction, planning,
+  cut ordering, history and trace semantics untouched. Extraction, the paste planner
+  and the cut planner are pure; `selectionStructuralEdit.ts` is the one repair module
+  both mutating sides share, so their semantics cannot drift. Cut writes before it
+  removes and refuses on a stale session. Ctrl/⌘+C/X/V are **shell actions**, not
+  EditorIntents — the trace records the materialized plan, never the keypress — and
+  feedback is a transient notice strip, not a clipboard panel. The first hands-on pass
+  retired two of its own contracts on the spot
+  ([core-selection-floor-axis.md](complete/core-selection-floor-axis.md),
+  [core-paste-lands.md](complete/core-paste-lands.md)). **Stage 7's full cross-score
+  walk was never run** and the doc says so: the item's one unpaid piece of named
+  evidence. System clipboard, reload persistence and paste-special stay deferred.
 - **[workbench-rung-legibility.md](complete/workbench-rung-legibility.md)** — knowing
   which selection rung you are in without moving your eyes. The enclosure's two channels
   (extent, fill ratio) are *relative* — read by comparison with the shape just left — and

@@ -4,8 +4,10 @@ Serves the **implementation loop**. Proposed 2026-08-16 after the completed
 [selection ladder](../complete/core-selection-ladder.md) made every point,
 range and live closure resolve to ordered model members.
 
-> **Status: in progress — stages 1–4 built 2026-08-16, stage 5 built
-> 2026-08-20.** Stage 1 landed the
+> **Status: complete 2026-08-22 — stages 1–6 built (1–4 on 2026-08-16,
+> 5–6 on 2026-08-20). Stage 7, the hands-on cross-score review, was never
+> performed; the item closes without it, deliberately and on the record.**
+> Stage 1 landed the
 > versioned DOM-free clip union, strict codec, asynchronous string-only store
 > seam and workbench-lifetime memory owner. Stage 2 added pure
 > `extractSelectionClip()` materialization for all nine clip kinds: it resolves
@@ -71,7 +73,7 @@ range and live closure resolve to ordered model members.
 > `clipboard-feedback.test.ts` pins the notice sentences end-to-end through
 > the real actions and asserts the strokes resolve as shell actions while no
 > keymap layer claims them as intents; the keymap-docs joins force the
-> documentation rows. **Next: stage 7, hands-on cross-score review.**
+> documentation rows. Stage 7 was the only stage left.
 >
 > **2026-08-20, from the first hands-on pass:** two review verdicts became
 > proposals. The note-rung range proved confusing and valueless — retired by
@@ -93,6 +95,26 @@ range and live closure resolve to ordered model members.
 > bar) so paste can linearize source distances; the strict codec validates
 > it, and clips are app-lifetime memory only, so no stored clip predates
 > the field.
+>
+> **2026-08-22, closing without stage 7.** The item is closed on the
+> evidence stages 1–6 produced — the codec, extraction, planner, paste,
+> cut, binding and notice suites listed under *Evidence when it lands* —
+> plus the one hands-on pass of 2026-08-20, which was the pass that
+> produced the floor-axis and landing-paste amendments rather than a
+> sign-off on the finished behavior. The full stage 7 walk (copy and cut
+> every rung in one score, navigate to another without reloading, paste
+> into compatible and accommodating targets, undo/redo on both sides) has
+> **not** been run against the code as it now stands, so nothing here
+> asserts that it holds end to end for a human. Whoever next touches
+> clipboard behavior should treat that walk as unpaid: it is the only
+> named evidence this doc promised and did not deliver. Note that two of
+> its original axes no longer exist to be reviewed — the note-rung range
+> was retired by the floor axis, and the refusal matrix became the
+> accommodation-record matrix when the landing paste landed. No
+> verification debt is registered in
+> [lab-verify.md](../inprogress/lab-verify.md): the feature changes
+> documents through editor operations, and `scenarios/` is unmodified by
+> every commit in the series.
 
 ## The boundary
 
@@ -344,6 +366,9 @@ design in this stage; switching documents, routes or sessions does not.
 7. **Hands-on cross-score review.** Copy and cut each rung from one score,
    navigate to another score without reloading, paste into compatible and
    incompatible targets, then undo/redo in both source and target sessions.
+   **Not performed** — see the closing note above. Read "incompatible" as
+   "accommodating" if it is ever picked up: the landing paste removed the
+   refusal branch this step was written to exercise.
 
 Stages 1–3 should land before any mutation surface. A clip contract proven by
 round-trip tests is cheaper to revise than document history containing an
