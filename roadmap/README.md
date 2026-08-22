@@ -215,7 +215,19 @@ proposals that name their campaign.
   Opened 2026-08-22 with 37 stale + 8 never-seen in three batches: `core-ink-measured-gaps`
   (33, across stages A/C/D and the tab row pads), the barline-default fix (4, no owning
   doc), and the never-reviewed corpus-closure technique set (8).
-- **[workbench-rung-legibility.md](inprogress/workbench-rung-legibility.md)** — knowing
+- **[core-selection-clipboard.md](inprogress/core-selection-clipboard.md)** — typed
+  copy, cut and paste over every selection rung, range and closure. **Stage 1 built
+  2026-08-16:** the versioned DOM-free clip union and strict JSON codec, the
+  asynchronous string-only memory store, and app-level ownership that survives route,
+  document and session changes without claiming reload persistence. All nine clip kinds
+  (`note-set` through whole score), context/dependency fields and malformed/unknown/
+  cyclic refusals are pinned by `selection-clip.test.ts`. No editor command is live yet;
+  stage 2 is pure extraction from resolved point/range/closure selections. System
+  clipboard support remains deferred, but replacing the store later leaves clip,
+  history and paste semantics untouched.
+
+### complete/
+- **[workbench-rung-legibility.md](complete/workbench-rung-legibility.md)** — knowing
   which selection rung you are in without moving your eyes. The enclosure's two channels
   (extent, fill ratio) are *relative* — read by comparison with the shape just left — and
   they degenerate exactly at the confusable trio (voice/part-bar/bar in single-voice,
@@ -238,17 +250,6 @@ proposals that name their campaign.
   one scenario added for the degeneracy nothing exercised. Colour
   ladders, border styles and whole-page scope dimming considered and rejected (reasons in
   the doc).
-- **[core-selection-clipboard.md](inprogress/core-selection-clipboard.md)** — typed
-  copy, cut and paste over every selection rung, range and closure. **Stage 1 built
-  2026-08-16:** the versioned DOM-free clip union and strict JSON codec, the
-  asynchronous string-only memory store, and app-level ownership that survives route,
-  document and session changes without claiming reload persistence. All nine clip kinds
-  (`note-set` through whole score), context/dependency fields and malformed/unknown/
-  cyclic refusals are pinned by `selection-clip.test.ts`. No editor command is live yet;
-  stage 2 is pure extraction from resolved point/range/closure selections. System
-  clipboard support remains deferred, but replacing the store later leaves clip,
-  history and paste semantics untouched.
-### complete/
 - **[core-assist-model-selector.md](complete/core-assist-model-selector.md)** — **the model
   roster as a query, not a list**: a pure assessment/selection module that takes a
   requirements definition (hard filters — tool support, context floor, price ceiling,

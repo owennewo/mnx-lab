@@ -5,12 +5,12 @@
 > below. Phase 3 settles the bar-vs-section pair: the section rung **lights the
 > label**, and the re-examination the item was held open for is recorded there.
 > Owes one first approval — `lab/score-text/one-bar-sections`, registered in
-> [lab-verify.md](lab-verify.md) — for a scenario authored to exercise the
+> [lab-verify.md](../inprogress/lab-verify.md) — for a scenario authored to exercise the
 > degeneracy; no existing golden moved.
 
 ## The problem
 
-The enclosure vocabulary ([core-selection-ladder.md](../complete/core-selection-ladder.md))
+The enclosure vocabulary ([core-selection-ladder.md](core-selection-ladder.md))
 encodes the selection rung in two channels: **extent** (grows monotonically)
 and **fill/border ratio** (fades as the level widens). Both are *relative*
 channels — they are read by comparison against the shape just left. The 180ms
@@ -197,7 +197,7 @@ scenario added, `lab/score-text/11-one-bar-sections` (four bars, each its own
 section), because nothing in the corpus exercised the case: all three existing
 section scenarios use two-bar sections, where extent already works and the
 degeneracy never appears. Its first approval is registered in
-[lab-verify.md](lab-verify.md).
+[lab-verify.md](../inprogress/lab-verify.md).
 
 ## Not this
 
