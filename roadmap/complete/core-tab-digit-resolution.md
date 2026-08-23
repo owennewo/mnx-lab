@@ -1,13 +1,13 @@
 # Resolved tab digit entry — keystrokes stop at the mount
 
-> **Status: IN PROGRESS 2026-08-23.** Graduated from the selection ladder as
+> **Status: COMPLETE 2026-08-23.** Graduated from the selection ladder as
 > `core-entry-mode` on 2026-08-16, then deliberately narrowed before work
 > began. The proposed persistent `advance: on | off` state does **not** land:
 > this workbench has a minimal input surface, explicit `→` already advances,
 > and a sticky mode would need a control and permanent indication while making
 > chord entry pay for melody-entry convenience. The provisional Space review
-> and A–G accelerators leave with it. What remains is one concrete defect: raw
-> tab digits currently cross the deterministic session boundary.
+> and A–G accelerators leave with it. What remained when work began was one
+> concrete defect: raw tab digits crossed the deterministic session boundary.
 
 Serves the **implementation loop**. This item owns how physical tab digit
 keystrokes become one resolved fret. [core-entry-surface.md](../proposed/core-entry-surface.md)
@@ -15,8 +15,8 @@ separately owns which part, staff and voice receive that fret.
 
 ## The gap
 
-The tab keymap emits `fretDigit {digit}` directly into `EditorSession`. The
-session remembers the previous digit at the cursor, applies the first edit,
+Before this item, the tab keymap emitted `fretDigit {digit}` directly into
+`EditorSession`. The session remembered the previous digit at the cursor, applied the first edit,
 then undoes and replaces it when another digit follows. With no time boundary,
 typing `1`, then `2` at an unmoved cursor always means fret 12; correcting fret
 1 to fret 2 requires an unrelated intervening intent.
@@ -78,7 +78,7 @@ The final fret replaces it as soon as the resolver commits.
 5. Migrate traces from raw digits to resolved frets and review tab entry in the
    navigation playground and twelve-bar blues.
 
-## Evidence when it lands
+## Evidence
 
 - Resolver tests: one digit, `12`, `24`, expiry at 500 ms, invalid extension,
   non-digit flush order, explicit flush and stale-timer cancellation.
@@ -89,6 +89,21 @@ The final fret replaces it as soon as the resolver commits.
   `1`, `12`, `24`, `2` then `5`, arrow-during-pending, focus loss and view
   switching produce no console errors or abandoned-session writes.
 - No primitive/SVG golden movement: the candidate is editor overlay chrome.
+
+## Completion note — 2026-08-23
+
+Landed as `enterFret {fret}` plus a clock-injected `TabDigitResolver` in
+`edit/`. The physical `tabDigit` action is visible to the workbench mount but
+filtered out of the replayable intent API. The mount flushes a candidate before
+recognized editor and shell actions, projection changes, focus loss and session
+lifecycle edges; the score overlay paints the candidate without touching the
+layout primitives.
+
+The browser pass pinned the interaction rather than reopening the removed mode:
+single digits resolve at 500 ms, 12 and 24 resolve immediately, `2,5` commits 2
+before displaying 5, and arrows/focus/view changes preserve ordering. The full
+landing gates passed with 946 tests, 108 scenario checks and a clean production
+build. No scenario or renderer golden changed.
 
 ## Not this
 

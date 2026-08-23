@@ -147,8 +147,8 @@
 > Generalized silent-column and structural ghosts closed its original ink-
 > anchor limitation on 2026-08-16; see the completion note below. Pinned by
 > `harness/conformance/navigation.test.ts`. NOT in this slice: the orthogonal
-> tab-digit resolution work, now narrowed and active in
-> [core-tab-digit-resolution.md](../inprogress/core-tab-digit-resolution.md),
+> tab-digit resolution work, now narrowed and complete in
+> [core-tab-digit-resolution.md](core-tab-digit-resolution.md),
 > or event level and above.
 >
 > **Review findings folded in same-day**: (1) Ctrl+←→ = bar jump in BOTH
@@ -246,8 +246,8 @@
 >
 > **The selection ladder is complete.** Its orthogonal input-resolution axis
 > graduated on 2026-08-16. Before implementation, the minimal-UX review cut
-> advance mode and letter accelerators; the remaining stage-1 tab work lives in
-> [core-tab-digit-resolution.md](../inprogress/core-tab-digit-resolution.md).
+> advance mode and letter accelerators; the remaining stage-1 tab work completed in
+> [core-tab-digit-resolution.md](core-tab-digit-resolution.md).
 > It shares the cursor but no selection membership or rung state with this item. The ladder builds
 > directly on the complete
 > input layer ([core-editor-input-layer.md](../complete/core-editor-input-layer.md)), which
@@ -642,8 +642,8 @@ Two riders:
 
 The graduated proposal originally grouped advance on/off, stage-1 fret-digit
 resolution, the provisional Space binding and letter accelerators. The
-minimal-UX review cut everything except the concrete digit ambiguity. The live
-item is [core-tab-digit-resolution.md](../inprogress/core-tab-digit-resolution.md):
+minimal-UX review cut everything except the concrete digit ambiguity. The completed
+item is [core-tab-digit-resolution.md](core-tab-digit-resolution.md):
 the mount composes physical digits into one resolved fret, and this completed
 ladder continues to own the cursor address it starts from.
 
@@ -664,7 +664,7 @@ system's actual staff order.
 
 Space remains provisional until a real playback surface makes the conflict
 concrete; no entry-mode default is planned. The tab composition window is fixed
-at 500 ms in [core-tab-digit-resolution.md](../inprogress/core-tab-digit-resolution.md).
+at 500 ms in [core-tab-digit-resolution.md](core-tab-digit-resolution.md).
 The notation note-level ←→ landing
 is no longer parked: the review chose nearest-pitch ink. **Decided 2026-08-15
 with the per-level pass**:

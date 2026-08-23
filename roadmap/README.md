@@ -188,15 +188,6 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
-- **[core-tab-digit-resolution.md](inprogress/core-tab-digit-resolution.md)** — raw tab
-  digits stop at the workbench mount and compose for **500 ms** into one deterministic
-  `enterFret {fret}` intent. The current session applies digit 1 immediately, then undoes
-  and replaces it if digit 2 follows at the same cursor; timing therefore leaks into the
-  replayable state machine and correcting 1 to 2 is ambiguous. The replacement buffers
-  one visible candidate at the cursor, commits one- or two-digit frets through one history
-  entry, flushes before non-digit actions and on lifecycle boundaries, and never advances.
-  Narrowed from `core-entry-mode` before implementation: no advance toggle, Space review
-  or A–G layer lands in this minimal UX.
 - **[lab-verify.md](inprogress/lab-verify.md)** — **the standing verification ledger**, and
   the only doc here that never moves to `complete/`. `verified` is a human assertion, so
   verification is the one gate an agent cannot pass alone, and any change under `model/`,
@@ -210,6 +201,14 @@ proposals that name their campaign.
   doc), and the never-reviewed corpus-closure technique set (8).
 
 ### complete/
+- **[core-tab-digit-resolution.md](complete/core-tab-digit-resolution.md)** — physical tab
+  digits now stop at the workbench mount and compose for **500 ms** into one replayable
+  `enterFret {fret}` intent. A visible cursor candidate resolves one digit on expiry,
+  resolves 10–24 immediately on the second digit, and flushes before navigation, focus,
+  projection and lifecycle boundaries; the session has no clock or digit-correction undo.
+  Completed 2026-08-23 with 946 tests, 108 scenario checks and the production build green.
+  Deliberately narrowed from `core-entry-mode`: no advance toggle, Space review or A–G
+  layer landed in the minimal UX.
 - **[workbench-selection-chip-ladder.md](complete/workbench-selection-chip-ladder.md)** —
   **the chip is one rung of the ladder.** Built 2026-08-22 from a Claude Design spec drawn
   1:1 over crops of this build. The rung chip and the tray were built two days apart and
@@ -509,7 +508,7 @@ proposals that name their campaign.
   measureless part a larger “place for a bar” vacancy until its first measure exists.
   **Completed 2026-08-16.** Its separate input-resolution axis graduated the same day;
   advance and letter modes were later cut, leaving
-  [core-tab-digit-resolution.md](inprogress/core-tab-digit-resolution.md).
+  [core-tab-digit-resolution.md](complete/core-tab-digit-resolution.md).
 - **[core-vertical-density.md](complete/core-vertical-density.md)** — **systems per page
   without shrinking the staff**: the third axis of
   [core-render-density-zoom.md](complete/core-render-density-zoom.md), proposed and built
