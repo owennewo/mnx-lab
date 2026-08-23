@@ -47,7 +47,7 @@ function keyLabelFor(type: string): string {
     ...NAVIGATION_LAYER.bindings,
     ...EDIT_LAYER.bindings,
     ...TAB_DIGIT_LAYER.bindings
-  ].find(b => b.intent.type === type);
+  ].find(b => b.intent.type === type || (type === 'enterFret' && b.intent.type === 'tabDigit'));
   if (binding) {
     const stroke = strokeKey(binding);
     const row = KEY_DOCS.find(doc => doc.strokes.some(s => strokeKey(s) === stroke));
@@ -283,8 +283,8 @@ function attributeText(attribute: MeasureAttribute): string {
 
 function intentLabel(intent: EditorIntent): string {
   switch (intent.type) {
-    case 'fretDigit':
-      return `fret digit ${intent.digit}`;
+    case 'enterFret':
+      return `enter fret ${intent.fret}`;
     case 'toggleNote':
       return 'toggle note';
     case 'delete':

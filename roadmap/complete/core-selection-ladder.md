@@ -147,8 +147,9 @@
 > Generalized silent-column and structural ghosts closed its original ink-
 > anchor limitation on 2026-08-16; see the completion note below. Pinned by
 > `harness/conformance/navigation.test.ts`. NOT in this slice: the orthogonal
-> advance/digit/letter work, now graduated to
-> [core-entry-mode.md](../proposed/core-entry-mode.md), or event level and above.
+> tab-digit resolution work, now narrowed and active in
+> [core-tab-digit-resolution.md](../inprogress/core-tab-digit-resolution.md),
+> or event level and above.
 >
 > **Review findings folded in same-day**: (1) Ctrl+←→ = bar jump in BOTH
 > projections — tab's event-skip read as bare → in single-voice music
@@ -243,11 +244,11 @@
 > handle. The vocabulary's principles (one shape family, geometry over
 > styling, fill fades as the level widens) stand.
 >
-> **The selection ladder is complete.** Its orthogonal entry-mode axis —
-> advance mode, stage-1 digit resolution and letter accelerators — graduated
-> on 2026-08-16 to
-> [core-entry-mode.md](../proposed/core-entry-mode.md). It shares the cursor but
-> no selection membership or rung state with this item. The ladder builds
+> **The selection ladder is complete.** Its orthogonal input-resolution axis
+> graduated on 2026-08-16. Before implementation, the minimal-UX review cut
+> advance mode and letter accelerators; the remaining stage-1 tab work lives in
+> [core-tab-digit-resolution.md](../inprogress/core-tab-digit-resolution.md).
+> It shares the cursor but no selection membership or rung state with this item. The ladder builds
 > directly on the complete
 > input layer ([core-editor-input-layer.md](../complete/core-editor-input-layer.md)), which
 > already decided the load-bearing substrate: the cursor is a **rhythmic
@@ -577,12 +578,9 @@ Why the rows are what they are:
   seven presses until the letter layer lands) and a diluted ink-walk (empty
   positions between chord members). Cross-voice movement at an instant stays
   Ctrl+↑↓'s job (event-level voice jump) — which the spatial model makes
-  genuinely distinct in notation, repairing a degenerate Ctrl cell. A
-  **letter accelerator layer** is owned by
-  [core-entry-mode.md](../proposed/core-entry-mode.md), with two candidate semantics:
-  letters-as-entry (incumbent-style, re-imports the chord patch) vs
-  **letters-as-navigation** (letter jumps the cursor to the nearest matching
-  staff position; the action key stays the only mutator) — lean: navigation.
+  genuinely distinct in notation, repairing a degenerate Ctrl cell. A proposed
+  **letter accelerator layer** was considered separately and cut in the
+  2026-08-23 minimal-UX review rather than importing another entry mode.
 - **Event**: widening past note stops addressing *within* the stack, so the
   vertical axis coarsens to the stack's next unit — the **voice**. The same
   meaning carries through voice-measure (continuity: only the horizontal
@@ -640,15 +638,14 @@ Two riders:
   escalation, reachable only as bare arrows at score level — a climb that
   gets there dies instead (no Ctrl+↓-on-a-bar jumping documents).
 
-### Orthogonal entry mode — graduated 2026-08-16
+### Orthogonal entry input — graduated 2026-08-16, narrowed 2026-08-23
 
-Advance on/off, stage-1 fret-digit resolution, the provisional Space binding
-and letter accelerators are now one standalone implementation proposal:
-[core-entry-mode.md](../proposed/core-entry-mode.md). The split preserves this
-item's settled claim: advance is session state, **not** a selection rung or a
-projection property. The new item owns timing, bindings and post-addition cursor
-movement; this completed ladder continues to own the cursor address those actions
-start from.
+The graduated proposal originally grouped advance on/off, stage-1 fret-digit
+resolution, the provisional Space binding and letter accelerators. The
+minimal-UX review cut everything except the concrete digit ambiguity. The live
+item is [core-tab-digit-resolution.md](../inprogress/core-tab-digit-resolution.md):
+the mount composes physical digits into one resolved fret, and this completed
+ladder continues to own the cursor address it starts from.
 
 ### The navigation playground scenario
 
@@ -665,9 +662,10 @@ echoes) with declared `strings[]`. The gap this originally exposed is closed:
 the cursor now carries part and staff, and the part-measure vertical walks the
 system's actual staff order.
 
-Still parked in [core-entry-mode.md](../proposed/core-entry-mode.md)'s hands-on
-entry review: whether Space remains the entry action key, the digit window and
-the single session default. The notation note-level ←→ landing
+Space remains provisional until a real playback surface makes the conflict
+concrete; no entry-mode default is planned. The tab composition window is fixed
+at 500 ms in [core-tab-digit-resolution.md](../inprogress/core-tab-digit-resolution.md).
+The notation note-level ←→ landing
 is no longer parked: the review chose nearest-pitch ink. **Decided 2026-08-15
 with the per-level pass**:
 voice-switching ↑↓ **stops** at the outermost voice — a wrap across the stack

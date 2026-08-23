@@ -63,6 +63,8 @@ export interface CursorGhost {
   staffPosition: number | null;
   /** Tab projection: string number (1 = top line). */
   string: number | null;
+  /** Workbench stage-1 input: an uncommitted fret candidate at this cell. */
+  pendingFret?: number | null;
   /** Structural address used when no rendered note can anchor the column. */
   measureIndex?: number;
   partIndex?: number;

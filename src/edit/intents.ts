@@ -17,6 +17,9 @@ import type { PartialContainerSpec } from './setupGrammar.ts';
 import type { PastePlan } from './selectionPastePlanner.ts';
 import type { CutPlan } from './selectionCutPlanner.ts';
 
+/** Shared constraint for resolved tab-entry intents and their stage-1 resolver. */
+export const MAX_ENTRY_FRET = 24;
+
 /** Navigation: moves the cursor, never mutates the document. */
 export type NavigationIntent =
   | { type: 'nextPosition' }
@@ -71,10 +74,9 @@ export type MutationIntent =
    *  paste, traces carry the materialized result rather than replaying an
    *  environment-dependent clipboard command. */
   | { type: 'applyCutPlan'; plan: CutPlan }
-  /** A fret digit was typed: re-fret the note on the cursor's string, or
-   *  INSERT one there (rest / empty space). Consecutive digits on an
-   *  unmoved cursor combine into two-digit frets (1,2 → 12). */
-  | { type: 'fretDigit'; digit: number }
+  /** A complete fret resolved by the mount's 500 ms digit-composition window:
+   *  re-fret the note on the cursor's string, or INSERT one there. */
+  | { type: 'enterFret'; fret: number }
   /** The notation projection's entry action: toggle a notehead at the
    *  cursor's (staff position × beat) cell — add the key-signature default
    *  pitch, or remove the note already there. The spatial-entry model of the

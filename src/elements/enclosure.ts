@@ -1007,7 +1007,10 @@ export function drawCursorGhost(
     svg.appendChild(group);
     return;
   }
-  if (ghost.occupied) return;
+  if (
+    ghost.occupied &&
+    (ghost.pendingFret === null || ghost.pendingFret === undefined)
+  ) return;
 
   const barlines = collectBarlines(svg);
   const staves = assignSystems(collectStaves(svg, sp), barlines);
@@ -1093,14 +1096,40 @@ export function drawCursorGhost(
   const side = 1.3 * gap;
   const g = document.createElementNS(SVG_NS, 'g');
   g.setAttribute('class', 'cursor-ghost');
-  const rect = document.createElementNS(SVG_NS, 'rect');
-  rect.setAttribute('x', String(x - side / 2));
-  rect.setAttribute('y', String(y - side / 2));
-  rect.setAttribute('width', String(side));
-  rect.setAttribute('height', String(side));
-  rect.setAttribute('rx', String(0.3 * sp));
-  rect.setAttribute('stroke-width', String(0.12 * sp));
-  rect.setAttribute('stroke-dasharray', `${0.4 * sp} ${0.3 * sp}`);
-  g.appendChild(rect);
+  if (!ghost.occupied) {
+    const rect = document.createElementNS(SVG_NS, 'rect');
+    rect.setAttribute('x', String(x - side / 2));
+    rect.setAttribute('y', String(y - side / 2));
+    rect.setAttribute('width', String(side));
+    rect.setAttribute('height', String(side));
+    rect.setAttribute('rx', String(0.3 * sp));
+    rect.setAttribute('stroke-width', String(0.12 * sp));
+    rect.setAttribute('stroke-dasharray', `${0.4 * sp} ${0.3 * sp}`);
+    g.appendChild(rect);
+  }
+  if (ghost.pendingFret !== null && ghost.pendingFret !== undefined) {
+    const textValue = String(ghost.pendingFret);
+    const width = Math.max(1.1, textValue.length * 0.78) * gap;
+    const bg = document.createElementNS(SVG_NS, 'rect');
+    bg.setAttribute('class', 'pending-fret-bg fret-bg');
+    bg.setAttribute('x', String(x - width / 2));
+    bg.setAttribute('y', String(y - 0.58 * gap));
+    bg.setAttribute('width', String(width));
+    bg.setAttribute('height', String(1.16 * gap));
+    bg.setAttribute('rx', String(0.2 * gap));
+    g.appendChild(bg);
+
+    const text = document.createElementNS(SVG_NS, 'text');
+    text.setAttribute('class', 'pending-fret');
+    text.setAttribute('x', String(x));
+    text.setAttribute('y', String(y));
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('font-size', String(1.25 * gap));
+    text.setAttribute('font-family', 'Archivo, sans-serif');
+    text.setAttribute('font-weight', '700');
+    text.textContent = textValue;
+    g.appendChild(text);
+  }
   svg.appendChild(g);
 }

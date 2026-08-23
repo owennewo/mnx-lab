@@ -8,8 +8,8 @@
       "type": "lineDown"
     },
     {
-      "type": "fretDigit",
-      "digit": 5
+      "type": "enterFret",
+      "fret": 5
     },
     {
       "type": "transpose",

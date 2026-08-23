@@ -6,8 +6,8 @@
       "semitones": 2
     },
     {
-      "type": "fretDigit",
-      "digit": 2
+      "type": "enterFret",
+      "fret": 2
     },
     {
       "type": "appendMeasure"

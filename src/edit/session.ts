@@ -5,7 +5,7 @@
 // that log IS the trace fixture ("recording is the same stream as undo").
 import type { MnxEvent, MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
-import { isNavigationIntent } from './intents.ts';
+import { isNavigationIntent, MAX_ENTRY_FRET } from './intents.ts';
 import type { EditOp, EventAddress, OpLogEntry } from './ops.ts';
 import type { PasteLanding } from './selectionPastePlanner.ts';
 import {
@@ -86,8 +86,6 @@ const DURATION_LADDER: MnxNoteValueBase[] = [
   '64th'
 ];
 
-const MAX_FRET = 24;
-
 export class EditorSession {
   private history: EditHistory;
   private grid: PositionGrid;
@@ -100,10 +98,6 @@ export class EditorSession {
    *  dotted quarter stepping to an eighth stays dotted — as it does in every
    *  editor a player has used. */
   private entryDots = 0;
-  /** Digit-combining anchor: consecutive fret digits on an unmoved cursor
-   *  combine (1,2 → 12) — deterministic, no timers, so traces replay. */
-  private lastDigit: { anchor: string; fret: number } | null = null;
-
   /** The armed end of a spanner-in-progress (campaign item 10): a note key, or
    *  null. The keyboard names two places in two presses because the ladder
    *  cannot yet extend laterally; when it can, "slur the selected run" becomes
@@ -238,7 +232,6 @@ export class EditorSession {
    */
   handleIntent(intent: EditorIntent): boolean {
     this.intents.push(intent);
-    if (intent.type !== 'fretDigit') this.lastDigit = null;
     if (isNavigationIntent(intent)) return this.navigate(intent);
     // Provenance for the op queue: apply() stamps the intent being handled
     // into the history entry (forward-recorded, never inferred).
@@ -329,8 +322,8 @@ export class EditorSession {
         this.apply({ type: 'toggleTie', noteId: slot.noteKey });
         return true;
       }
-      case 'fretDigit':
-        return this.fretDigit(intent.digit);
+      case 'enterFret':
+        return this.enterFret(intent.fret);
       case 'toggleNote': {
         // The notation projection's entry action: one (staff position ×
         // beat) cell, one note — remove what is there, else add the key-
@@ -1078,24 +1071,9 @@ export class EditorSession {
     };
   }
 
-  /**
-   * A typed fret digit — the heart of tab entry. On the cursor's string:
-   * an existing note is re-fretted, a rest or empty space gains a note
-   * (insert). A second digit on an unmoved cursor combines to a two-digit
-   * fret by undoing and re-applying — deterministic, so traces replay it.
-   */
-  private fretDigit(digit: number): boolean {
-    const anchor = `${this.cursorState.measureIndex}:${this.cursorState.onset.num}/${this.cursorState.onset.den}:${this.cursorState.line}`;
-    let fret = digit;
-    if (this.lastDigit && this.lastDigit.anchor === anchor) {
-      const combined = this.lastDigit.fret * 10 + digit;
-      if (combined <= MAX_FRET) {
-        this.history.undo();
-        this.reindex();
-        fret = combined;
-      }
-    }
-
+  /** A complete, timer-free fret resolved by the workbench's stage-1 input. */
+  private enterFret(fret: number): boolean {
+    if (!Number.isInteger(fret) || fret < 0 || fret > MAX_ENTRY_FRET) return false;
     const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
     const note = this.selectedNote();
     if (slot && note) {
@@ -1118,7 +1096,6 @@ export class EditorSession {
         duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) }
       });
     }
-    this.lastDigit = { anchor, fret };
     return true;
   }
 

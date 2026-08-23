@@ -58,7 +58,7 @@ const dirById = new Map<string, string>(
 function boundIntentTypes(): Set<string> {
   return new Set(
     [...NAVIGATION_LAYER.bindings, ...EDIT_LAYER.bindings, ...TAB_DIGIT_LAYER.bindings].map(
-      b => b.intent.type
+      b => b.intent.type === 'tabDigit' ? 'enterFret' : b.intent.type
     )
   );
 }

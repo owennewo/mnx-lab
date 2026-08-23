@@ -67,15 +67,6 @@ proposals that name their campaign.
   core-ink-priced-columns froze packing to keep separated. Four options costed, from "do
   nothing, document it" to "always ink-measured", with coupling-in-the-control carrying
   the best precedent.
-- **[core-entry-mode.md](proposed/core-entry-mode.md)** — the orthogonal entry axis
-  graduated from the completed selection ladder on 2026-08-16: **advance on/off** as
-  recorded session state, stage-1 fret-digit resolution, the notation action binding and
-  letter accelerators. Today the session records raw digits, combines every consecutive
-  pair on an unmoved cursor by undoing the first edit, and has no auto-advance. The plan
-  moves timing into the mount so traces receive one resolved fret, advances only after a
-  successful addition, and makes Space/default/window/key-layer choices a hands-on review.
-  Sibling boundary: this owns **when/how keystrokes resolve**;
-  [core-entry-surface.md](proposed/core-entry-surface.md) owns **where the write lands**.
 - **[core-entry-surface.md](proposed/core-entry-surface.md)** — typing anywhere the
   cursor can already go, graduated out of the element-ops campaign (2026-08-15) as the
   last thing holding its index open. The cursor addresses part → staff → voice in full
@@ -197,6 +188,15 @@ proposals that name their campaign.
   whole-document LWW through the existing `DocumentRepository` seam.
 
 ### inprogress/
+- **[core-tab-digit-resolution.md](inprogress/core-tab-digit-resolution.md)** — raw tab
+  digits stop at the workbench mount and compose for **500 ms** into one deterministic
+  `enterFret {fret}` intent. The current session applies digit 1 immediately, then undoes
+  and replaces it if digit 2 follows at the same cursor; timing therefore leaks into the
+  replayable state machine and correcting 1 to 2 is ambiguous. The replacement buffers
+  one visible candidate at the cursor, commits one- or two-digit frets through one history
+  entry, flushes before non-digit actions and on lifecycle boundaries, and never advances.
+  Narrowed from `core-entry-mode` before implementation: no advance toggle, Space review
+  or A–G layer lands in this minimal UX.
 - **[lab-verify.md](inprogress/lab-verify.md)** — **the standing verification ledger**, and
   the only doc here that never moves to `complete/`. `verified` is a human assertion, so
   verification is the one gate an agent cannot pass alone, and any change under `model/`,
@@ -507,8 +507,9 @@ proposals that name their campaign.
   part-measure while preserving roles through the split/merge tween. Generalized ghosts
   now cover silent/rest-only columns from structural row/bar/staff geometry and give a
   measureless part a larger “place for a bar” vacancy until its first measure exists.
-  **Completed 2026-08-16.** The separate advance/digit/letter axis graduated the same day
-  to [core-entry-mode.md](proposed/core-entry-mode.md).
+  **Completed 2026-08-16.** Its separate input-resolution axis graduated the same day;
+  advance and letter modes were later cut, leaving
+  [core-tab-digit-resolution.md](inprogress/core-tab-digit-resolution.md).
 - **[core-vertical-density.md](complete/core-vertical-density.md)** — **systems per page
   without shrinking the staff**: the third axis of
   [core-render-density-zoom.md](complete/core-render-density-zoom.md), proposed and built

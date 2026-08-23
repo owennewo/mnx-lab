@@ -88,8 +88,8 @@
       "type": "lineDown"
     },
     {
-      "type": "fretDigit",
-      "digit": 3
+      "type": "enterFret",
+      "fret": 3
     },
     {
       "type": "setFingering",
@@ -103,8 +103,8 @@
       "type": "lineUp"
     },
     {
-      "type": "fretDigit",
-      "digit": 2
+      "type": "enterFret",
+      "fret": 2
     },
     {
       "type": "setFingering",
@@ -118,8 +118,8 @@
       "type": "lineUp"
     },
     {
-      "type": "fretDigit",
-      "digit": 0
+      "type": "enterFret",
+      "fret": 0
     },
     {
       "type": "nextPosition"
@@ -128,8 +128,8 @@
       "type": "lineUp"
     },
     {
-      "type": "fretDigit",
-      "digit": 1
+      "type": "enterFret",
+      "fret": 1
     },
     {
       "type": "setFingering",

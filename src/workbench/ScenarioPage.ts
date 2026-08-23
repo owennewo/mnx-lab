@@ -47,12 +47,13 @@ import {
   EDIT_LAYER,
   NAVIGATION_LAYER,
   TAB_DIGIT_LAYER,
-  resolveIntent,
+  resolveKeyAction,
   resolveShellAction,
   strokeOf,
   type KeymapLayer,
   type ShellAction
 } from '../edit/keymap.ts';
+import { TabDigitResolver } from '../edit/tabDigitResolver.ts';
 import {
   ADORNMENT_HELP,
   LYRIC_HELP,
@@ -493,6 +494,15 @@ export class ScenarioPage extends LitElement {
   // for testing the editor, not for authoring corpus files.
   @state() private session: EditorSession | null = null;
   @state() private selection: SelectionContext | null = null;
+  /** One uncommitted tab digit, painted at the cursor for the 500 ms window. */
+  @state() private pendingFret: number | null = null;
+  private readonly tabDigits = new TabDigitResolver(
+    fret => this.commitResolvedFret(fret),
+    candidate => {
+      this.pendingFret = candidate;
+      this.syncFromSession();
+    }
+  );
   @state() private copied = false;
   /** The clipboard's transient strip over the score (stage 6): clip kind,
    *  member count and detached references on success, the planner's precise
@@ -1849,6 +1859,7 @@ export class ScenarioPage extends LitElement {
   }
 
   willUpdate(changed: Map<string, unknown>) {
+    if (changed.has('view') || changed.has('scenarioId')) this.flushPendingFret();
     // Legacy ?view=compare|json deep links (the documented contract) open
     // the matching panel tab — the main pane keeps the default score view.
     if (changed.has('view') || changed.has('scenarioId')) {
@@ -1936,6 +1947,7 @@ export class ScenarioPage extends LitElement {
   }
 
   disconnectedCallback() {
+    this.flushPendingFret();
     super.disconnectedCallback();
     window.removeEventListener('assist-credentials-change', this.onCredentialsChange);
     this.chatAbort?.abort();
@@ -1960,7 +1972,9 @@ export class ScenarioPage extends LitElement {
   private onFocusChange = () => {
     setTimeout(() => {
       if (!this.isConnected) return;
-      this.hasKeyboard = editorHasKeyboard(this);
+      const nextHasKeyboard = editorHasKeyboard(this);
+      if (!nextHasKeyboard) this.flushPendingFret();
+      this.hasKeyboard = nextHasKeyboard;
       // The tray goes with the keyboard. It is a surface for acting on the
       // selection with keys it no longer receives, and one that advertises
       // shortcuts it cannot honour is the same lie the dimmed cursor exists
@@ -2031,6 +2045,7 @@ export class ScenarioPage extends LitElement {
       partIndex,
       staffIndex,
       position: Math.max(0, Math.min(1, rawPosition)),
+      pendingFret: session.projection === 'tab' ? this.pendingFret : null,
       ...(
         activePart &&
         (session.doc.global?.measures?.length ?? 0) === 0 &&
@@ -2085,6 +2100,7 @@ export class ScenarioPage extends LitElement {
   ) => {
     const projection = event.detail.projection;
     if (!this.session || !projection || projection === this.session.projection) return;
+    this.flushPendingFret();
     if (this.session.handleIntent({ type: 'setProjection', projection })) {
       this.syncFromSession();
     }
@@ -2120,6 +2136,18 @@ export class ScenarioPage extends LitElement {
     return layers;
   }
 
+  private commitResolvedFret(fret: number) {
+    if (!this.session) return;
+    this.session.handleIntent({ type: 'enterFret', fret });
+    this.cursorHidden = false;
+    this.copied = false;
+    this.syncFromSession();
+  }
+
+  private flushPendingFret(): boolean {
+    return this.tabDigits.flush();
+  }
+
   private onKeyDown = (event: KeyboardEvent) => {
     // Tab moves focus with no pointer event, so a keydown is also a
     // focus-change cause — re-ask after it settles.
@@ -2130,8 +2158,26 @@ export class ScenarioPage extends LitElement {
     // `workbench/`; the promotion moves it onto the host element and this
     // test becomes structural.
     if (!keyIsOurs(event, this)) return;
-    if (this.session && this.activeLayers().length > 0) {
+    const layers = this.activeLayers();
+    const keyAction = this.session && layers.length > 0
+      ? resolveKeyAction(strokeOf(event), layers)
+      : null;
+    if (keyAction?.type === 'tabDigit') {
+      if (!this.session) return;
+      event.preventDefault();
+      if (this.session.projection !== 'tab' && this.session.mode === 'string') {
+        this.session.handleIntent({ type: 'setProjection', projection: 'tab' });
+      } else {
+        this.followProjection();
+      }
+      this.cursorHidden = false;
+      this.copied = false;
+      this.tabDigits.push(keyAction.digit);
+      return;
+    }
+    if (this.session && layers.length > 0) {
       const action = resolveShellAction(strokeOf(event));
+      if (action || keyAction) this.flushPendingFret();
       // The clipboard verbs (stage 6): resolved here because the store I/O is
       // the mount's — the session only ever sees the materialized plan. The
       // focus gate above is the whole scope story; text fields never reach
@@ -2155,7 +2201,7 @@ export class ScenarioPage extends LitElement {
         return;
       }
     }
-    let intent = resolveIntent(strokeOf(event), this.activeLayers());
+    let intent: EditorIntent | null = keyAction;
     if (!intent || !this.session) return;
     event.preventDefault();
     this.followProjection();
@@ -2241,6 +2287,7 @@ export class ScenarioPage extends LitElement {
   }
 
   private openPopover(action: ShellAction): boolean {
+    this.flushPendingFret();
     // Only the popover actions are ours; palette actions belong to the shell.
     const kind = POPOVER_ACTIONS[action];
     if (!kind) return false;
@@ -2266,6 +2313,7 @@ export class ScenarioPage extends LitElement {
   };
 
   private onPaletteAction = (event: Event) => {
+    this.flushPendingFret();
     const action = (event as CustomEvent<string>).detail;
     if (action === 'copyTrace') void this.copyTrace();
     else if (action === 'revert') this.revertEdits();
@@ -2284,6 +2332,7 @@ export class ScenarioPage extends LitElement {
 
   /** One door for `/` and the rung chip's click — the chip IS the `/` key. */
   private openTray() {
+    this.flushPendingFret();
     // The tray offers a DIALECT — `S` slurs in notation and slides in tab —
     // so it must follow the pane exactly as the keys do. Without this the
     // projection keeps whatever it defaulted to (tab, on a string document)
@@ -2870,6 +2919,7 @@ export class ScenarioPage extends LitElement {
    */
   private walkToLevel(target: SelectionLevel | undefined) {
     if (!this.session || !target) return;
+    this.flushPendingFret();
     this.cursorHidden = false;
     for (let guard = 0; guard < SELECTION_LADDER.length; guard++) {
       const current: SelectionLevel = this.session.selectionLevel;
@@ -2891,6 +2941,7 @@ export class ScenarioPage extends LitElement {
    *  recorded in the trace too — a recording must replay clicks as well. */
   private stripIntent(intent: EditorIntent) {
     if (!this.session) return;
+    this.flushPendingFret();
     this.cursorHidden = false;
     this.session.handleIntent(intent);
     this.copied = false;
@@ -3879,6 +3930,7 @@ export class ScenarioPage extends LitElement {
    *  sweep. */
   private runDestructSweep() {
     if (!this.session) return;
+    this.flushPendingFret();
     const result = runDestructWalk(this.session);
     if (result.unaddressed.length > 0) {
       // A campaign finding, not a silent skip — v0 surfaces it to the console
@@ -3894,6 +3946,7 @@ export class ScenarioPage extends LitElement {
    *  handleIntent, so panel clicks are recorded like keys. */
   private jumpToOp(target: number) {
     if (!this.session) return;
+    this.flushPendingFret();
     for (let guard = 0; this.session.opQueue.applied.length > target && this.session.canUndo && guard < 128; guard++) {
       this.session.handleIntent({ type: 'undo' });
     }

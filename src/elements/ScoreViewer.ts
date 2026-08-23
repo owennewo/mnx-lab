@@ -465,6 +465,15 @@ export class ScoreViewer extends LitElement {
         stroke-opacity: 0.8;
       }
 
+      #score-container svg .cursor-ghost .pending-fret-bg {
+        stroke: var(--accent);
+        stroke-opacity: 0.45;
+      }
+
+      #score-container svg .cursor-ghost .pending-fret {
+        fill: var(--accent);
+      }
+
       /* Keyboard elsewhere (core-editor-focus-scope.md): fade the selection
          vocabulary — enclosure, ghost cell, and the accent recolor — so the
          overlay reads as "where you were", not "where your next keystroke
@@ -834,7 +843,7 @@ export class ScoreViewer extends LitElement {
         // is the one structural exception — it receives a panel-shaped vacancy
         // because a note cannot exist until the first bar does.
         const ghost = this.selection?.cursor;
-        if ((kind === 'cell' || ghost?.structuralEmpty) && ghost) {
+        if ((kind === 'cell' || ghost?.structuralEmpty || ghost?.pendingFret != null) && ghost) {
           drawCursorGhost(svg, ghost, {
             systemRows: packedRowMeasures(paint.packings, densityH),
             staffOrdinals: renderedStaffOrdinals

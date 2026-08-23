@@ -221,7 +221,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: digitStrokes,
     group: 'entry',
     requires: 'tabPane',
-    meaning: { note: 'enter a fret on the cursor’s string (digits combine: 1,2 → 12)' }
+    meaning: { note: 'enter a fret on the cursor’s string (digits compose for 500 ms: 1,2 → 12)' }
   },
   {
     keys: 'Space',

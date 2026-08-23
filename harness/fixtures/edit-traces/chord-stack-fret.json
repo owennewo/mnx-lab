@@ -8,8 +8,8 @@
       "type": "lineDown"
     },
     {
-      "type": "fretDigit",
-      "digit": 3
+      "type": "enterFret",
+      "fret": 3
     },
     {
       "type": "lineUp"

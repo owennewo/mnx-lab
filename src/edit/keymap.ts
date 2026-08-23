@@ -16,6 +16,10 @@
 // this module only defines them. Bare arrows never mutate (survey §3.2).
 import type { EditorIntent } from './intents.ts';
 
+/** A physical tab digit stops at stage 1; it is deliberately not an EditorIntent. */
+export type TabDigitAction = { type: 'tabDigit'; digit: number };
+export type KeyAction = EditorIntent | TabDigitAction;
+
 /** What a binding matches on. Unlisted modifiers must be UP. */
 export interface KeyStroke {
   code: string;
@@ -26,7 +30,7 @@ export interface KeyStroke {
 }
 
 export interface KeyBinding extends KeyStroke {
-  intent: EditorIntent;
+  intent: KeyAction;
 }
 
 export interface KeymapLayer {
@@ -131,13 +135,13 @@ export const EDIT_LAYER: KeymapLayer = {
 };
 
 /** The tab pane's digit layer: digits are frets (survey §3.4, unanimous).
- *  Consecutive digits combine into two-digit frets in the session. */
+ *  These raw actions compose into enterFret at the workbench mount. */
 export const TAB_DIGIT_LAYER: KeymapLayer = {
   name: 'tab-pane',
   bindings: [
     ...Array.from({ length: 10 }, (_, digit) => [
-      { code: `Digit${digit}`, intent: { type: 'fretDigit', digit } as EditorIntent },
-      { code: `Numpad${digit}`, intent: { type: 'fretDigit', digit } as EditorIntent }
+      { code: `Digit${digit}`, intent: { type: 'tabDigit', digit } as TabDigitAction },
+      { code: `Numpad${digit}`, intent: { type: 'tabDigit', digit } as TabDigitAction }
     ]).flat(),
     // Tab technique (campaign item 9): the reserved letters live ONLY in this
     // pane layer, which is what makes `B` and `S` polymorphic without a
@@ -296,12 +300,18 @@ function matches(binding: KeyStroke, stroke: KeyStroke): boolean {
 }
 
 /** First match wins, layers in the order given (pane layers before shared). */
-export function resolveIntent(stroke: KeyStroke, layers: KeymapLayer[]): EditorIntent | null {
+export function resolveKeyAction(stroke: KeyStroke, layers: KeymapLayer[]): KeyAction | null {
   for (const layer of layers) {
     const hit = layer.bindings.find(b => matches(b, stroke));
     if (hit) return hit.intent;
   }
   return null;
+}
+
+/** Resolve only deterministic session intents; raw tab digits end at stage 1. */
+export function resolveIntent(stroke: KeyStroke, layers: KeymapLayer[]): EditorIntent | null {
+  const action = resolveKeyAction(stroke, layers);
+  return action?.type === 'tabDigit' ? null : action;
 }
 
 /** The KeyStroke of a DOM KeyboardEvent (typed structurally so this module

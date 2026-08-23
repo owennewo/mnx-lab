@@ -5,11 +5,11 @@ Serves the **implementation loop**. Graduated out of
 2026-08-15 (it was the campaign's item 13c, and the last thing holding its index
 open). The campaign owned *addressing*; this owns *writing*.
 
-Sibling boundary: [core-entry-mode.md](core-entry-mode.md) owns **when** a
-successful addition advances and **how** raw Space/digit/letter keystrokes
-become resolved intents. This item owns **where** those intents write — the
-cursor's part, staff and voice plus the new-sequence policy. They are independent
-and neither is a prerequisite for the other.
+Sibling boundary: [core-tab-digit-resolution.md](../inprogress/core-tab-digit-resolution.md)
+owns how raw tab digits become one resolved fret without moving the cursor.
+This item owns **where** that fret and the notation action write — the cursor's
+part, staff and voice plus the new-sequence policy. They are independent and
+neither is a prerequisite for the other.
 
 ## The gap, exactly
 

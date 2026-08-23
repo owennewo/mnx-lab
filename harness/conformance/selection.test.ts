@@ -447,7 +447,7 @@ describe('selection ladder', () => {
     const session = new EditorSession(makeDoc());
     for (let i = 0; i < 4; i++) session.handleIntent(relax); // → measure
     expect(session.selectionLevel).toBe('measure');
-    session.handleIntent({ type: 'fretDigit', digit: 5 });
+    session.handleIntent({ type: 'enterFret', fret: 5 });
     expect(session.selectionLevel).toBe('note');
     expect(session.selectedNoteKeys).toEqual(['n1']);
   });

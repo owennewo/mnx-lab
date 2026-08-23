@@ -69,29 +69,29 @@
       "type": "lineDown"
     },
     {
-      "type": "fretDigit",
-      "digit": 0
+      "type": "enterFret",
+      "fret": 0
     },
     {
       "type": "nextPosition"
     },
     {
-      "type": "fretDigit",
-      "digit": 3
+      "type": "enterFret",
+      "fret": 3
     },
     {
       "type": "nextPosition"
     },
     {
-      "type": "fretDigit",
-      "digit": 5
+      "type": "enterFret",
+      "fret": 5
     },
     {
       "type": "nextPosition"
     },
     {
-      "type": "fretDigit",
-      "digit": 7
+      "type": "enterFret",
+      "fret": 7
     },
     {
       "type": "appendMeasure"
@@ -103,29 +103,29 @@
       "type": "lineUp"
     },
     {
-      "type": "fretDigit",
-      "digit": 0
+      "type": "enterFret",
+      "fret": 0
     },
     {
       "type": "nextPosition"
     },
     {
-      "type": "fretDigit",
-      "digit": 2
+      "type": "enterFret",
+      "fret": 2
     },
     {
       "type": "nextPosition"
     },
     {
-      "type": "fretDigit",
-      "digit": 3
+      "type": "enterFret",
+      "fret": 3
     },
     {
       "type": "nextPosition"
     },
     {
-      "type": "fretDigit",
-      "digit": 5
+      "type": "enterFret",
+      "fret": 5
     },
     {
       "type": "appendMeasure"
@@ -137,15 +137,15 @@
       "type": "lineDown"
     },
     {
-      "type": "fretDigit",
-      "digit": 0
+      "type": "enterFret",
+      "fret": 0
     },
     {
       "type": "lineUp"
     },
     {
-      "type": "fretDigit",
-      "digit": 2
+      "type": "enterFret",
+      "fret": 2
     },
     {
       "type": "nextPosition"
@@ -154,8 +154,8 @@
       "type": "shorterDuration"
     },
     {
-      "type": "fretDigit",
-      "digit": 0
+      "type": "enterFret",
+      "fret": 0
     },
     {
       "type": "nextPosition"
@@ -164,8 +164,8 @@
       "type": "shorterDuration"
     },
     {
-      "type": "fretDigit",
-      "digit": 2
+      "type": "enterFret",
+      "fret": 2
     },
     {
       "type": "appendMeasure"
@@ -177,12 +177,8 @@
       "type": "lineDown"
     },
     {
-      "type": "fretDigit",
-      "digit": 1
-    },
-    {
-      "type": "fretDigit",
-      "digit": 2
+      "type": "enterFret",
+      "fret": 12
     },
     {
       "type": "longerDuration"
@@ -191,22 +187,22 @@
       "type": "nextPosition"
     },
     {
-      "type": "fretDigit",
-      "digit": 3
+      "type": "enterFret",
+      "fret": 3
     },
     {
       "type": "delete"
     },
     {
-      "type": "fretDigit",
-      "digit": 5
+      "type": "enterFret",
+      "fret": 5
     },
     {
       "type": "nextPosition"
     },
     {
-      "type": "fretDigit",
-      "digit": 5
+      "type": "enterFret",
+      "fret": 5
     },
     {
       "type": "prevPosition"

@@ -85,8 +85,8 @@
       "type": "lineDown"
     },
     {
-      "type": "fretDigit",
-      "digit": 7
+      "type": "enterFret",
+      "fret": 7
     },
     {
       "type": "toggleTechnique",
@@ -96,8 +96,8 @@
       "type": "nextPosition"
     },
     {
-      "type": "fretDigit",
-      "digit": 7
+      "type": "enterFret",
+      "fret": 7
     },
     {
       "type": "toggleTechnique",
