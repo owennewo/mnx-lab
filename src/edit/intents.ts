@@ -95,6 +95,12 @@ export type MutationIntent =
    *  the sign — the §8.11 polymorphic verb (one key, per-type meaning). */
   | { type: 'transpose'; semitones: number }
   | { type: 'appendMeasure' }
+  /** Add a voice to the cursor's bar and staff, and MOVE INTO IT. The voice
+   *  arrives padded to the meter, so what you step into is a bar of rests
+   *  waiting to be typed over — see `addVoiceMeasure` in ops.ts for why that
+   *  is the policy and not a convenience. Creating a voice you then have to
+   *  find would be half a verb, so the move is part of the intent. */
+  | { type: 'addVoiceMeasure' }
   // Setup-as-ops (roadmap: "setup is ops, not chrome"): document genesis
   // choices flow through the same funnel — undoable, traceable, AI-emittable.
   // Construct traces start from the literal `{}` (core-element-ops-exemplar),

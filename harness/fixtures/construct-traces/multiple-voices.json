@@ -1,0 +1,219 @@
+{
+  "target": "spec/multiple-voices",
+  "intents": [
+    {
+      "type": "addPart"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 0
+    },
+    {
+      "type": "addVoiceMeasure"
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "addVoiceMeasure"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    }
+  ]
+}

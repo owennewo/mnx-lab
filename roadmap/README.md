@@ -67,16 +67,6 @@ proposals that name their campaign.
   core-ink-priced-columns froze packing to keep separated. Four options costed, from "do
   nothing, document it" to "always ink-measured", with coupling-in-the-control carrying
   the best precedent.
-- **[core-entry-surface.md](proposed/core-entry-surface.md)** — typing anywhere the
-  cursor can already go, graduated out of the element-ops campaign (2026-08-15) as the
-  last thing holding its index open. The cursor addresses part → staff → voice in full
-  and every removal verb follows it; **entry still writes to voice 0 of `parts[0]`**, so
-  the ladder can visit a voice it cannot create. What makes it a design item rather than
-  a gap: nobody has decided what typing into a second voice MEANS when the bar is
-  already full — create the sequence, pad it with rests nobody asked for, or leave a
-  voice that underfills on every render. Corpus cost is nil (the key grammar already
-  spells part and staff, silent for 0 and 1). Acceptance: a construct trace for
-  `spec/multiple-voices` and `spec/tie-targets`.
 - **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
   `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
   (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
@@ -201,6 +191,25 @@ proposals that name their campaign.
   doc), and the never-reviewed corpus-closure technique set (8).
 
 ### complete/
+- **[core-entry-surface.md](complete/core-entry-surface.md)** — **typing anywhere the
+  cursor can already go**, built 2026-08-23; the last piece of the element-ops campaign,
+  graduated out of it on 2026-08-15. The cursor addressed part → staff → voice in full
+  and every removal verb followed it, while every WRITING verb still resolved to voice 0
+  of `parts[0]`, staff 1 — so the ladder could visit a voice it could not create. Seven
+  verbs took an address (`EntryTarget`, where **absent means the first of its kind**, so
+  no op log or trace moved a byte), and two latent wrong-answer bugs fell out with them:
+  `setFret` sounded frets against part 0's strings, `tieTarget` looked in part 0 staff 1.
+  **The policy — a created voice arrives padded to the meter** — answers the design
+  question the doc existed to ask, and its best consequence was not predicted: because
+  every position in the new voice is real, **there is no ghost voice to invent**, so the
+  selection ladder needed no new vocabulary at all. The unblocking finding was elsewhere:
+  `coincidentSlots` fell back across voices, so standing in voice 2 over its rest
+  resolved to voice 1's note — Delete removed music from a voice you were not in. **THE
+  BAR closed 37/38 → 38/38**: `spec/multiple-voices` and `lab/score-text/directions-multi-staff`
+  trace green, `staves` is covered, and `awaitingEntrySurface` is deleted rather than
+  merely emptied. Corpus cost nil, as predicted — no golden moved, no verification debt.
+  `spec/tie-targets` is still unbuildable, on three gaps in what a TIE can say (a target
+  in another voice, a second tie on one note, `side`) — named, not filed.
 - **[core-tab-digit-resolution.md](complete/core-tab-digit-resolution.md)** — physical tab
   digits now stop at the workbench mount and compose for **500 ms** into one replayable
   `enterFret {fret}` intent. A visible cursor candidate resolves one digit on expiry,
@@ -664,7 +673,7 @@ proposals that name their campaign.
   whole blocked set on its own, because removal was already part-agnostic through the shared
   walk. The key grammar generalized **without moving a byte** — part 0 and staff 1 stay
   silent — so 115 more elements became removable with no golden touched. The writing half
-  became [core-entry-surface.md](proposed/core-entry-surface.md).
+  became [core-entry-surface.md](complete/core-entry-surface.md), built 2026-08-23.
 - **[core-element-ops-the-tail.md](complete/core-element-ops-the-tail.md)** — not an indexed
   item but the sweep of everything the board still called "no verb exists": **26 elements
   across seven kinds in one pass** (space, a beam inside a grace, ottava, kit notes,

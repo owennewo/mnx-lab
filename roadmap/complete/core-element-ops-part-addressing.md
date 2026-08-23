@@ -4,7 +4,7 @@
 > [core-campaign-element-ops.md](core-campaign-element-ops.md), item 13b's
 > **addressing half**. Entry remains on `parts[0]` — deliberately, and it is no
 > longer this campaign's: it graduated out as
-> [core-entry-surface.md](../proposed/core-entry-surface.md), because what is
+> [core-entry-surface.md](../complete/core-entry-surface.md), because what is
 > left of it is a policy question (what typing into a second voice means when
 > the bar is full) rather than a missing verb.
 

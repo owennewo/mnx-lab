@@ -582,7 +582,15 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // Listed here is what the tray ADDS to reachability: the accidental's
   // display flag, which no binding and no grammar claims, so before the tray
   // the only way to set it was an AI edit or a hand-written file.
-  selectionTray: ['setAccidentalDisplay', 'applyPastePlan', 'applyCutPlan'],
+  selectionTray: [
+    'setAccidentalDisplay',
+    'applyPastePlan',
+    'applyCutPlan',
+    // The voice rung's construct half. No key: adding a voice is a structural
+    // decision, and its removal twin (`Del` on an empty voice bar) is already
+    // guarded rather than bound to a bare keystroke.
+    'addVoiceMeasure'
+  ],
   commandPalette: [
     'undo',
     'redo',

@@ -278,27 +278,13 @@ const DEFERRED_KINDS: Record<string, string> = {
   sound: 'roadmap/proposed/core-percussion-kit.md'
 };
 
-/**
- * A scenario today's ENTRY SURFACE cannot build: music in a second staff,
- * voice or part. The cursor reaches all three and every removal verb follows
- * it, but entry still writes to voice 0 of `parts[0]`, staff 1 — the policy
- * question that graduated out as `roadmap/proposed/core-entry-surface.md`.
- *
- * The queue has to know, because a trace is a keyboard performance: proposing
- * one for a grand staff would be proposing work nobody can do.
- */
-function needsEntrySurface(id: string): boolean {
-  const dir = dirById.get(id);
-  if (!dir) return false;
-  const doc = JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8')) as MnxStructure;
-  const parts = doc.parts ?? [];
-  if (parts.length > 1) return true;
-  return parts.some(
-    part =>
-      (part.staves ?? 1) > 1 ||
-      (part.measures ?? []).some(measure => (measure.sequences ?? []).length > 1)
-  );
-}
+// The ENTRY-SURFACE WAIT is over (2026-08-23, core-entry-surface.md). While
+// entry wrote only to voice 0 of `parts[0]`, staff 1, a scenario whose music
+// lived on a second staff, voice or part could not be traced at all — so the
+// queue skipped those and the bar closed against `awaitingEntrySurface`
+// rather than against nothing. Entry now follows the cursor everywhere the
+// cursor can go, `directions-multi-staff` and `multiple-voices` are traced,
+// and the exemption is gone: the bar asserts plainly.
 
 /**
  * THE TRACE BAR (scoping decision, 2026-08-15): kind coverage, not scenario
@@ -342,7 +328,6 @@ function traceQueue(): { scenario: string; elements: number; kinds: string[] }[]
   for (const scenario of scenarios) {
     if (scenario.tier === 'expected-unreachable' || scenario.traced) continue;
     if (scenario.blockedBy.some(kind => kind in DEFERRED_KINDS)) continue;
-    if (needsEntrySurface(scenario.id)) continue;
     const kinds = kindsOf(scenario.id);
     pool.set(scenario.id, kinds);
     const dir = dirById.get(scenario.id)!;
@@ -382,8 +367,9 @@ const coverage = {
     'entries is not a contradiction — those elements are invisible to the primitives ' +
     'oracle (the engine draws the same default anyway), which is itself campaign data. ' +
     '`traceCoverage` is THE BAR (2026-08-15): kind coverage, not scenario coverage — every ' +
-    'kind with a construct verb built at least once from {}. Reported while the queue ' +
-    'drains; when `uncovered` empties it becomes an assertion. `deferredKinds` are the ' +
+    'kind with a construct verb built at least once from {}. `uncovered` emptied on ' +
+    '2026-08-23, so it is an assertion now, and with no exemption — the entry-surface ' +
+    'wait retired with core-entry-surface.md. `deferredKinds` are the ' +
     'kinds formally handed to another roadmap doc, so a `blocked` row with `deferredTo` ' +
     'is not this campaign\'s debt.',
   summary: {
@@ -402,14 +388,6 @@ const coverage = {
     kindsWithAVerb: constructibleKinds.length,
     covered: constructibleKinds.length - uncoveredKinds.length,
     uncovered: uncoveredKinds,
-    /** Uncovered kinds whose every corpus home needs a second staff, voice or
-     *  part — coverable only once `core-entry-surface.md` lands, so the bar
-     *  closes when `uncovered` is a subset of THIS, not when it is empty. */
-    awaitingEntrySurface: uncoveredKinds.filter(kind =>
-      scenarios
-        .filter(s => s.tier !== 'expected-unreachable' && kindsOf(s.id).has(kind))
-        .every(s => needsEntrySurface(s.id))
-    ),
     queue: traceQueue()
   },
   deferredKinds: DEFERRED_KINDS,
@@ -485,49 +463,20 @@ describe('construct coverage (element-ops campaign item 3)', () => {
   });
 
   it('THE BAR: every kind with a construct verb has been built from {} at least once', () => {
-    // The closing condition, now an assertion rather than a report (campaign
-    // item 3, decision 5): the queue is empty and `uncovered` holds nothing
-    // but the kinds waiting on `core-entry-surface.md`. A verb landing without
-    // a trace reddens the build from here on, which is the whole point of
-    // having named a bar.
+    // The closing condition, and since 2026-08-23 it closes against NOTHING:
+    // the `awaitingEntrySurface` exemption retired with core-entry-surface.md,
+    // so this is the plain claim it always wanted to be. A verb landing
+    // without a trace reddens the build, which is the point of naming a bar.
     expect(
-      uncoveredKinds.filter(
-        kind => !coverage.traceCoverage.awaitingEntrySurface.includes(kind)
-      ),
+      uncoveredKinds,
       'a construct verb exists for this kind and no trace has ever built one'
     ).toEqual([]);
   });
 
-  it('the queue plus the entry-surface wait accounts for every uncovered kind', () => {
-    // Nothing may sit uncovered without a reason: either a queued trace will
-    // cover it, or its only homes need an entry surface this campaign does not
-    // own. A third case would be a hole in the bar.
-    const queued = new Set(traceQueue().flatMap(row => row.kinds));
-    const awaiting = new Set(coverage.traceCoverage.awaitingEntrySurface);
-    expect(
-      uncoveredKinds.filter(kind => !queued.has(kind) && !awaiting.has(kind)),
-      'uncovered, unqueued, and not waiting on anything'
-    ).toEqual([]);
-  });
-
-  it('a kind waits on the entry surface only if EVERY home needs it', () => {
-    for (const kind of coverage.traceCoverage.awaitingEntrySurface) {
-      const homes = scenarios.filter(
-        s => s.tier !== 'expected-unreachable' && kindsOf(s.id).has(kind)
-      );
-      expect(homes.length, `${kind} has no corpus home at all`).toBeGreaterThan(0);
-      expect(
-        homes.filter(s => !needsEntrySurface(s.id)).map(s => s.id),
-        `${kind} has a single-staff home and should be queued, not waiting`
-      ).toEqual([]);
-    }
-  });
-
   it('the trace queue would finish the cover', () => {
-    // The bar is reported, not asserted, while the queue drains — but the
-    // QUEUE itself must be complete, or the campaign would be reading a work
-    // list that cannot reach the claim it promises.
-    const reached = new Set([...coveredKinds, ...coverage.traceCoverage.awaitingEntrySurface]);
+    // Belt to the bar's braces: anything uncovered must be reachable by the
+    // queue, so the work list can never promise less than the claim above.
+    const reached = new Set(coveredKinds);
     for (const row of traceQueue()) row.kinds.forEach(kind => reached.add(kind));
     expect(constructibleKinds.filter(kind => !reached.has(kind))).toEqual([]);
   });

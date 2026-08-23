@@ -10,7 +10,7 @@
 > concrete defect: raw tab digits crossed the deterministic session boundary.
 
 Serves the **implementation loop**. This item owns how physical tab digit
-keystrokes become one resolved fret. [core-entry-surface.md](../proposed/core-entry-surface.md)
+keystrokes become one resolved fret. [core-entry-surface.md](../complete/core-entry-surface.md)
 separately owns which part, staff and voice receive that fret.
 
 ## The gap

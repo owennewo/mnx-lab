@@ -140,7 +140,7 @@ Each of these was a fork; the choice and its reason are the contract.
   mapping, descriptor-driven creation, empty columns for uncovered parts.
 - **D4 — voice-bars paste creates the missing sequence.** The old contract
   deferred sequence-creation policy to
-  [core-entry-surface.md](../proposed/core-entry-surface.md); an always-lands paste
+  [core-entry-surface.md](../complete/core-entry-surface.md); an always-lands paste
   cannot defer it. This is deliberately the **narrow** policy — create the
   sequence with exactly the pasted content on write — and it neither
   answers nor prejudges entry-surface's harder question (what *typing* into

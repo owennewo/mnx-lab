@@ -6,7 +6,7 @@
 import type { MnxEvent, MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent, MAX_ENTRY_FRET } from './intents.ts';
-import type { EditOp, EventAddress, OpLogEntry } from './ops.ts';
+import type { EditOp, EntryTarget, EventAddress, OpLogEntry } from './ops.ts';
 import type { PasteLanding } from './selectionPastePlanner.ts';
 import {
   beamRunBetween,
@@ -307,7 +307,8 @@ export class EditorSession {
           type: 'nudgeRest',
           measureIndex: this.cursorState.measureIndex,
           onset: [this.cursorState.onset.num, this.cursorState.onset.den],
-          delta: Math.sign(intent.semitones)
+          delta: Math.sign(intent.semitones),
+          ...this.entryTarget
         });
         return true;
       }
@@ -327,8 +328,9 @@ export class EditorSession {
       case 'toggleNote': {
         // The notation projection's entry action: one (staff position ×
         // beat) cell, one note — remove what is there, else add the key-
-        // signature default pitch. Entry targets voice 0 (the entry surface),
-        // so positions belonging only to other voices refuse.
+        // signature default pitch. It writes into the voice the cursor is
+        // READING, so a position that belongs only to other voices refuses:
+        // the ink would appear somewhere the player was not looking.
         if (this.activeProjection !== 'notation') return false;
         const slot = slotAt(this.grid, this.cursorState, 'notation');
         if (slot) {
@@ -336,15 +338,21 @@ export class EditorSession {
           return true;
         }
         const position = positionAt(this.grid, this.cursorState);
-        if (!position || !position.voices.includes(0)) return false;
-        const clef = clefAt(this.doc, this.cursorState.measureIndex);
+        if (!position || !position.voices.includes(this.cursorState.voiceIndex ?? 0)) return false;
+        const clef = clefAt(
+          this.doc,
+          this.cursorState.measureIndex,
+          this.cursorState.partIndex ?? 0,
+          this.cursorState.staffIndex ?? 1
+        );
         const fifths = keyFifthsAt(this.doc, this.cursorState.measureIndex);
         this.apply({
           type: 'insertPitchNote',
           measureIndex: this.cursorState.measureIndex,
           onset: [this.cursorState.onset.num, this.cursorState.onset.den],
           pitch: pitchAtStaffPosition(clef, this.cursorState.line, fifths),
-          duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) }
+          duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) },
+          ...this.entryTarget
         });
         return true;
       }
@@ -474,7 +482,8 @@ export class EditorSession {
           // Dots survive a re-value: stepping a dotted quarter gives a dotted
           // eighth, not a plain one. The dot is a property of the value the
           // player is writing, and the ladder steps the value.
-          duration: { base: next, ...(event.duration.dots ? { dots: event.duration.dots } : {}) }
+          duration: { base: next, ...(event.duration.dots ? { dots: event.duration.dots } : {}) },
+          ...this.entryTarget
         });
         return true;
       }
@@ -494,7 +503,8 @@ export class EditorSession {
           type: 'setDuration',
           measureIndex: this.cursorState.measureIndex,
           onset: [this.cursorState.onset.num, this.cursorState.onset.den],
-          duration: { base: event.duration.base, ...(dots ? { dots } : {}) }
+          duration: { base: event.duration.base, ...(dots ? { dots } : {}) },
+          ...this.entryTarget
         });
         return true;
       }
@@ -514,12 +524,18 @@ export class EditorSession {
       // is the target, as with setTimeSignature. Clef writes the part
       // measure, key the global one — same rung, two owners.
       case 'setClef': {
+        const partIndex = this.cursorState.partIndex ?? 0;
+        const staffIndex = this.cursorState.staffIndex ?? 1;
         this.apply({
           type: 'setClef',
           measureIndex: this.cursorState.measureIndex,
           sign: intent.sign,
           ...(intent.staffPosition !== undefined ? { staffPosition: intent.staffPosition } : {}),
-          ...(intent.octave ? { octave: intent.octave } : {})
+          ...(intent.octave ? { octave: intent.octave } : {}),
+          // The staff you are reading gets the clef you typed — `removeClef`
+          // below has resolved both of these since item 13b.
+          ...(partIndex ? { partIndex } : {}),
+          ...(staffIndex !== 1 ? { staffIndex } : {})
         });
         return true;
       }
@@ -705,8 +721,13 @@ export class EditorSession {
         })));
       }
       case 'setPartDeclaration': {
-        if (!this.doc.parts?.[this.cursorState.partIndex ?? 0]) return false;
-        this.apply({ type: 'setPartDeclaration', declaration: intent.declaration });
+        const partIndex = this.cursorState.partIndex ?? 0;
+        if (!this.doc.parts?.[partIndex]) return false;
+        this.apply({
+          type: 'setPartDeclaration',
+          declaration: intent.declaration,
+          ...(partIndex ? { partIndex } : {})
+        });
         return true;
       }
       case 'removePartDeclaration': {
@@ -815,18 +836,27 @@ export class EditorSession {
         ));
       }
       case 'setPositioned': {
+        const partIndex = this.cursorState.partIndex ?? 0;
+        const staffIndex = this.cursorState.staffIndex ?? 1;
         this.apply({
           type: 'setPositioned',
           measureIndex: this.cursorState.measureIndex,
           onset: [this.cursorState.onset.num, this.cursorState.onset.den],
-          attribute: intent.attribute
+          attribute: intent.attribute,
+          // The words go beside the staff you are reading. `between` is the
+          // one that belongs to neither, and it says so with `orient` — so it
+          // still records the staff it was typed from, which is the one the
+          // renderer measures the gap DOWN from.
+          ...(partIndex ? { partIndex } : {}),
+          ...(staffIndex !== 1 ? { staffIndex } : {})
         });
         return true;
       }
       case 'removePositioned': {
         // Remove the entry at the cursor's own position — "the dynamic here",
         // which is how a player would name it.
-        const measure = this.doc.parts?.[0]?.measures?.[this.cursorState.measureIndex];
+        const partIndex_ = this.cursorState.partIndex ?? 0;
+        const measure = this.doc.parts?.[partIndex_]?.measures?.[this.cursorState.measureIndex];
         const list =
           (intent.kind === 'dynamic'
             ? measure?.dynamics
@@ -842,7 +872,8 @@ export class EditorSession {
           type: 'removePositioned',
           measureIndex: this.cursorState.measureIndex,
           kind: intent.kind,
-          index
+          index,
+          ...(partIndex_ ? { partIndex: partIndex_ } : {})
         });
         return true;
       }
@@ -863,11 +894,9 @@ export class EditorSession {
           const run = beamRunBetween(this.doc, first, selected[selected.length - 1]);
           if (run) {
             this.spanAnchorKey = null;
-            return this.applyBulk([{
-              type: 'setBeam',
-              ...run,
-              partIndex: this.cursorState.partIndex ?? 0
-            }]);
+            // `run` carries its own part, staff and voice — the beam goes
+            // where the notes are, not where the cursor's default was.
+            return this.applyBulk([{ type: 'setBeam', ...run }]);
           }
           // A beam cannot cross a voice or bar. Keep the established anchor
           // gesture available at the active edge for an endpoint the selected
@@ -890,13 +919,7 @@ export class EditorSession {
           const run = beamRunBetween(this.doc, this.spanAnchorKey, slot.noteKey);
           this.spanAnchorKey = null;
           if (!run) return false;
-          this.apply({
-            type: 'setBeam',
-            measureIndex: run.measureIndex,
-            from: run.from,
-            to: run.to,
-            partIndex: this.cursorState.partIndex ?? 0
-          });
+          this.apply({ type: 'setBeam', ...run });
           return true;
         }
         // 3. Otherwise arm (or disarm, pressing twice in one place).
@@ -912,7 +935,8 @@ export class EditorSession {
           type: 'setRestSpelling',
           measureIndex: this.cursorState.measureIndex,
           onset: [this.cursorState.onset.num, this.cursorState.onset.den],
-          duration: intent.duration
+          duration: intent.duration,
+          ...this.entryTarget
         });
         return JSON.stringify(this.doc) !== before;
       }
@@ -1041,7 +1065,45 @@ export class EditorSession {
         return true;
       }
       case 'appendMeasure': {
-        this.apply({ type: 'appendMeasure' });
+        // The bar is global; its beat rests are not. Give them to the part
+        // being written to — see the op's declaration.
+        const partIndex = this.cursorState.partIndex ?? 0;
+        this.apply({ type: 'appendMeasure', ...(partIndex ? { partIndex } : {}) });
+        return true;
+      }
+      case 'addVoiceMeasure': {
+        const partIndex = this.cursorState.partIndex ?? 0;
+        const staffIndex = this.cursorState.staffIndex ?? 1;
+        const measureIndex = this.cursorState.measureIndex;
+        const measure = this.doc.parts?.[partIndex]?.measures?.[measureIndex];
+        if (!measure) return false;
+        // The new voice's ordinal ON THIS STAFF — read before the op, because
+        // afterwards it is simply the last one.
+        const voiceIndex = (measure.sequences ?? []).filter(
+          sequence => (sequence.staff ?? 1) === staffIndex
+        ).length;
+        this.apply({
+          type: 'addVoiceMeasure',
+          measureIndex,
+          ...(partIndex ? { partIndex } : {}),
+          ...(staffIndex !== 1 ? { staffIndex } : {})
+        });
+        // Step into it. The voice arrived padded, so the bar's first position
+        // is a REAL rest and the next keystroke has somewhere to land —
+        // which is the whole reason the policy pads (ops.ts, addVoiceMeasure).
+        const landing = this.grid.positions.find(
+          position => position.measureIndex === measureIndex && position.voices.includes(voiceIndex)
+        );
+        if (landing)
+          this.cursorState = clampCursor(this.grid, {
+            measureIndex,
+            onset: landing.onset,
+            line: this.cursorState.line,
+            ...(partIndex ? { partIndex } : {}),
+            ...(staffIndex !== 1 ? { staffIndex } : {}),
+            ...(voiceIndex ? { voiceIndex } : {})
+          });
+        this.reanchorSelection();
         return true;
       }
       case 'addPart': {
@@ -1076,12 +1138,13 @@ export class EditorSession {
     if (!Number.isInteger(fret) || fret < 0 || fret > MAX_ENTRY_FRET) return false;
     const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
     const note = this.selectedNote();
+    // The fingerboard is the CURSOR'S part's — its strings and its capo.
+    const part = this.doc.parts?.[this.cursorState.partIndex ?? 0];
     if (slot && note) {
       const string =
         this.grid.mode === 'string'
           ? this.cursorState.line
-          : note._x?.mnxLab?.string ??
-            defaultStringFor(note.pitch, tuningOf(this.doc.parts?.[0]), capoOf(this.doc.parts?.[0]));
+          : note._x?.mnxLab?.string ?? defaultStringFor(note.pitch, tuningOf(part), capoOf(part));
       this.apply({ type: 'setFret', noteId: slot.noteKey, string, fret });
     } else {
       // Nothing on this string at this position: insert. Only meaningful on
@@ -1093,7 +1156,8 @@ export class EditorSession {
         onset: [this.cursorState.onset.num, this.cursorState.onset.den],
         string: this.cursorState.line,
         fret,
-        duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) }
+        duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) },
+        ...this.entryTarget
       });
     }
     return true;
@@ -1765,6 +1829,24 @@ export class EditorSession {
   /** One command over zero or more resolved members. A multi-member command
    * is one history/log entry, and unlike entry gestures it keeps the range so
    * the tray can immediately report its new active/mixed state. */
+  /**
+   * WHERE A WRITE LANDS: the cursor's part, staff and voice, as the ops layer
+   * wants them (roadmap/complete/core-entry-surface.md).
+   *
+   * Defaults are OMITTED, not spelled — an `insertNote` in voice 0 of part 0
+   * carries no address at all, exactly as it did before entry could go
+   * anywhere else. That is what keeps every committed trace fixture and every
+   * op-log row byte-identical while the surface underneath them moved.
+   */
+  private get entryTarget(): EntryTarget {
+    const cursor = this.cursorState;
+    return {
+      ...(cursor.partIndex ? { partIndex: cursor.partIndex } : {}),
+      ...(cursor.staffIndex && cursor.staffIndex !== 1 ? { staffIndex: cursor.staffIndex } : {}),
+      ...(cursor.voiceIndex ? { voiceIndex: cursor.voiceIndex } : {})
+    };
+  }
+
   private applyBulk(ops: EditOp[]): boolean {
     if (ops.length === 0) return false;
     const before = JSON.stringify(this.doc);

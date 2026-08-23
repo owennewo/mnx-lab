@@ -1,0 +1,205 @@
+{
+  "target": "lab/score-text/directions-multi-staff",
+  "intents": [
+    {
+      "type": "addPart",
+      "name": "Piano"
+    },
+    {
+      "type": "setPartDeclaration",
+      "declaration": {
+        "kind": "staves",
+        "value": 2
+      }
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 0
+    },
+    {
+      "type": "setPositioned",
+      "attribute": {
+        "kind": "direction",
+        "text": "R.H.",
+        "orient": "above"
+      }
+    },
+    {
+      "type": "setPositioned",
+      "attribute": {
+        "kind": "direction",
+        "text": "cantabile",
+        "orient": "between"
+      }
+    },
+    {
+      "type": "relaxSelection"
+    },
+    {
+      "type": "relaxSelection"
+    },
+    {
+      "type": "jumpDown"
+    },
+    {
+      "type": "setPositioned",
+      "attribute": {
+        "kind": "direction",
+        "text": "L.H.",
+        "orient": "below"
+      }
+    },
+    {
+      "type": "setClef",
+      "sign": "F",
+      "staffPosition": 2
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    }
+  ]
+}

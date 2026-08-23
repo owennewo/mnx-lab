@@ -32,7 +32,6 @@ import { enharmonicSpellings, keyFifthsAt, midiOfSpelling, spellPitch } from './
 import {
   addOnsets,
   durationSpan,
-  forEachKeyedNote,
   itemSpan,
   onsetLess,
   onsetsEqual,
@@ -44,7 +43,27 @@ import { capoOf, midiOfPitch, tuningOf } from './tabStrings.ts';
 // synthetic positional key (src/model/noteKeys.ts) — most spec mirrors carry
 // no ids, and the cursor must be able to edit them too. Positional ops
 // (insert/setDuration) address (measureIndex, onset-as-whole-note-fraction)
-// in voice 0 of staff 1 — the entry surface phase 2 defines.
+// in the part, staff and voice their `EntryTarget` names — the cursor's,
+// which is the whole of roadmap/complete/core-entry-surface.md.
+/**
+ * WHERE A WRITE LANDS — the cursor's part, staff and voice
+ * (roadmap/complete/core-entry-surface.md). The cursor addressed all three
+ * long before entry could: every REMOVAL verb already followed it, while
+ * every writing verb resolved to voice 0 of `parts[0]`, staff 1. This is the
+ * address that closes the asymmetry.
+ *
+ * Every field is optional and absent means the FIRST of its kind — part 0,
+ * staff 1, voice 0 — which is exactly what these ops meant before they could
+ * say anything else. So an op log written yesterday still says the same
+ * thing, the session omits a default rather than spelling it, and no
+ * committed trace moves a byte.
+ */
+export interface EntryTarget {
+  partIndex?: number;
+  staffIndex?: number;
+  voiceIndex?: number;
+}
+
 export type EditOp =
   | {
       /** One user command over a resolved selection. The children are an
@@ -95,20 +114,21 @@ export type EditOp =
       string: number;
       fret: number;
     }
-  | {
-      /** Insert a note at a metric position in voice 0 (an existing event
-       *  there gains a chord member; a rest there becomes the note; empty
-       *  space gains a new event of `duration`). Pitch derives from
-       *  string+fret against the part's tuning. */
+  | ({
+      /** Insert a note at a metric position in the cursor's voice (an
+       *  existing event there gains a chord member; a rest there becomes the
+       *  note; empty space gains a new event of `duration`). Pitch derives
+       *  from string+fret against THAT PART's tuning — a fret is a place on
+       *  the fingerboard in front of you, not on part 0's. */
       type: 'insertNote';
       measureIndex: number;
       onset: [number, number];
       string: number;
       fret: number;
       duration: { base: MnxNoteValueBase; dots?: number };
-    }
-  | {
-      /** Insert a note BY PITCH at a metric position in voice 0 — the
+    } & EntryTarget)
+  | ({
+      /** Insert a note BY PITCH at a metric position in the cursor's voice — the
        *  notation projection's entry (spatial cursor + toggle; the
        *  selection-ladder navigation map). Same event/rest/insert mechanics
        *  as `insertNote`; a chord member on the same letter+octave is
@@ -119,7 +139,7 @@ export type EditOp =
       onset: [number, number];
       pitch: { step: 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B'; octave: number; alter?: number };
       duration: { base: MnxNoteValueBase; dots?: number };
-    }
+    } & EntryTarget)
   | {
       /** Remove one note; a now-empty event becomes a rest of the same
        *  duration, so the measure's grid does not shift under the cursor. */
@@ -133,22 +153,22 @@ export type EditOp =
       type: 'clearEvent';
       event: EventAddress;
     }
-  | {
-      /** Re-value the voice-0 event at a metric position. */
+  | ({
+      /** Re-value the event at a metric position in the cursor's voice. */
       type: 'setDuration';
       measureIndex: number;
       onset: [number, number];
       duration: { base: MnxNoteValueBase; dots?: number };
-    }
-  | {
-      /** Nudge the voice-0 rest at a metric position vertically —
+    } & EntryTarget)
+  | ({
+      /** Nudge the rest at a metric position in the cursor's voice vertically —
        *  `rest.staffPosition`, in half-staff-spaces, +up. The §8.11
        *  polymorphic verb: Alt+↑↓ re-pitches a note, repositions a rest. */
       type: 'nudgeRest';
       measureIndex: number;
       onset: [number, number];
       delta: number;
-    }
+    } & EntryTarget)
   | {
       /** Tie the note to the SAME pitch in the immediately following event
        *  (same voice, or the next measure's first event); toggles off if the
@@ -180,8 +200,14 @@ export type EditOp =
       kind: 'notation' | 'tab' | 'both';
     }
   | {
-      /** Append an empty measure to every part and the global timeline. */
+      /** Append an empty measure to every part and the global timeline.
+       *
+       *  The bar is GLOBAL; a part's copy of it is not. So the new bar's beat
+       *  rests go into the part being written to — appending while reading
+       *  part 2 used to pad part 1 and leave the bar under the cursor empty.
+       */
       type: 'appendMeasure';
+      partIndex?: number;
     }
   | {
       /** Add a part (id/name both optional — an anonymous part is legal
@@ -216,12 +242,17 @@ export type EditOp =
   // reverts the measure to its predecessor's governance rather than to
   // nothing.
   | {
-      /** Declare the clef governing this measure onward (parts[0], staff 1). */
+      /** Declare the clef governing this measure onward, on the cursor's part
+       *  and staff. `removeClef` has taken both since campaign item 13b; this
+       *  half kept writing to `parts[0]`, staff 1, so a grand staff's lower
+       *  clef could be un-declared and never declared. */
       type: 'setClef';
       measureIndex: number;
       sign: string;
       staffPosition?: number;
       octave?: number;
+      partIndex?: number;
+      staffIndex?: number;
     }
   | {
       /** Drop this measure's clef DECLARATION — the staff keeps drawing a
@@ -351,6 +382,40 @@ export type EditOp =
       sequenceIndex: number;
     }
   | {
+      /**
+       * Create a voice in ONE bar of one staff — the construct half of
+       * `removeVoiceMeasure`, and the answer to the question that made the
+       * entry surface a design item: what does typing into a second voice
+       * mean when the bar is already full?
+       *
+       * The voice arrives **full**, padded to the meter with rests, exactly
+       * as `appendMeasure` gives a new bar its beat rests. Three things fall
+       * out of that and they are the whole argument:
+       *
+       * - Every position in the new voice is REAL, so the cursor addresses
+       *   the whole bar immediately and each keystroke converts a rest. An
+       *   unpadded voice would make beat 3 unreachable until beats 1 and 2
+       *   were typed, because the grid's entry ghost belongs to voice 0.
+       * - There is therefore **no ghost voice to invent** — the ladder needs
+       *   no new vocabulary for "a position with no document behind it",
+       *   because the policy never creates one.
+       * - The bar is legal the instant it exists: an underfilled voice draws
+       *   the duration-mismatch badge on every render, and a verb must never
+       *   manufacture the diagnostic that says you made a mistake.
+       *
+       * Rests you did not type are the price, and the round trip pays it
+       * back: Del at the voice rung (`removeVoiceMeasure`) takes the voice
+       * away again while it is still rests-only, so nothing is stranded.
+       *
+       * Per BAR, like its removal twin — the rung is "this voice in this
+       * bar", not "this voice everywhere".
+       */
+      type: 'addVoiceMeasure';
+      measureIndex: number;
+      partIndex?: number;
+      staffIndex?: number;
+    }
+  | {
       /** Remove the selected staff's part-measure structure, only when that
        * staff holds no ink. A single-staff part drops the whole part-measure;
        * a multi-staff part drops only this staff's sequences and clefs. */
@@ -377,7 +442,13 @@ export type EditOp =
   | { type: 'removeLayout'; index: number }
   | { type: 'removeScore'; index: number }
   | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }
-  | { type: 'setPartDeclaration'; declaration: PartDeclaration }
+  | {
+      /** Declare `staves` or `capo` on the cursor's part. Its removal twin
+       *  has taken `partIndex` since item 13b. */
+      type: 'setPartDeclaration';
+      declaration: PartDeclaration;
+      partIndex?: number;
+    }
   | {
       type: 'removePartDeclaration';
       kind: PartDeclarationKind;
@@ -403,24 +474,30 @@ export type EditOp =
       attributes?: Record<string, string>;
     }
   | { type: 'removeMarking'; noteKey?: string; event?: EventAddress; marking: string }
-  | {
-      /** A dynamic or direction at a metric position in the part measure. */
+  | ({
+      /** A dynamic or direction at a metric position in the part measure —
+       *  on the STAFF the cursor is reading. MNX puts `staff` on the object
+       *  itself, and the renderer places by it (`emitDirections`), so a grand
+       *  staff's "L.H." had no way to say it belongs to the lower staff. It
+       *  is an ADDRESS, not a property of the words, which is why it rides
+       *  with the cursor rather than joining `PositionedAttribute`. */
       type: 'setPositioned';
       measureIndex: number;
       onset: [number, number];
       attribute: PositionedAttribute;
-    }
+    } & EntryTarget)
   | {
       type: 'removePositioned';
       measureIndex: number;
       kind: PositionedAttribute['kind'];
       index: number;
+      partIndex?: number;
     }
   // Rhythm declarations (campaign item 11,
   // roadmap/complete/core-element-ops-rhythm-declarations.md) — the ones
   // that leave ink where it is. The containers that SWALLOW ink (tuplet,
   // grace, tremolo) wait for the grid to descend into them.
-  | {
+  | ({
       /**
        * Beam a run of events, addressed by CONTENT INDEX and minting the ids
        * the beam will reference.
@@ -440,8 +517,7 @@ export type EditOp =
       /** Inclusive content indices of the run; un-timed items are skipped. */
       from: number;
       to: number;
-      partIndex?: number;
-    }
+    } & EntryTarget)
   | {
       /** Un-beam: the *reference* removal class again — a grouping goes, no
        *  ink moves. An emptied `beams` array goes with its last member.
@@ -509,7 +585,7 @@ export type EditOp =
       type: 'respellNote';
       noteId: string;
     }
-  | {
+  | ({
       /**
        * Respell a run of rests as ONE rest of the given value.
        *
@@ -528,7 +604,7 @@ export type EditOp =
       measureIndex: number;
       onset: [number, number];
       duration: { base: MnxNoteValueBase; dots?: number };
-    }
+    } & EntryTarget)
   | {
       /** Insert authored silence. NOT a wrap: a `space` holds no events, so it
        *  shares the containers' shape (a non-event item in content) and none of
@@ -782,20 +858,22 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setFret': {
-      const midi = fingerboardMidi(next, op.string, op.fret);
-      forEachKeyedNote(next, (note, key) => {
-        if (key !== op.noteId) return;
-        const x = ((note._x ??= {}).mnxLab ??= {});
-        x.string = op.string;
-        x.fret = op.fret;
-        if (midi !== undefined) setPitchFromMidi(note, midi);
-      });
+      const address = findNoteAddress(next, op.noteId);
+      if (!address) return next;
+      // The fingerboard is the OWNING part's: a fret is a place on the strings
+      // in front of you, so re-fretting a note in part 2 against part 0's
+      // tuning sounded a pitch nobody played.
+      const midi = fingerboardMidi(next, op.string, op.fret, address.partIndex);
+      const x = ((address.note._x ??= {}).mnxLab ??= {});
+      x.string = op.string;
+      x.fret = op.fret;
+      if (midi !== undefined) setPitchFromMidi(address.note, midi);
       return next;
     }
     case 'insertNote': {
-      const seq = entrySequence(next, op.measureIndex);
+      const seq = entrySequence(next, op.measureIndex, op);
       if (!seq) return next;
-      const midi = fingerboardMidi(next, op.string, op.fret);
+      const midi = fingerboardMidi(next, op.string, op.fret, op.partIndex);
       if (midi === undefined) return next;
       const note: MnxNote = { pitch: { step: 'C', octave: 4 } };
       setPitchFromMidi(note, midi);
@@ -842,12 +920,14 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         });
         // The §8.11 invariant: a touched measure always has content for its
         // full metric duration, so unentered positions are already rests.
-        padMeasureRests(next, op.measureIndex);
+        // Per VOICE, not per staff: the invariant was written when a staff
+        // had one, and a second voice underfilling is the same defect.
+        padMeasureRests(next, op.measureIndex, op);
       }
       return next;
     }
     case 'insertPitchNote': {
-      const seq = entrySequence(next, op.measureIndex);
+      const seq = entrySequence(next, op.measureIndex, op);
       if (!seq) return next;
       const note: MnxNote = { pitch: { ...op.pitch } };
       const target: Onset = { num: op.onset[0], den: op.onset[1] };
@@ -887,7 +967,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           duration: { ...op.duration },
           notes: [note]
         });
-        padMeasureRests(next, op.measureIndex);
+        padMeasureRests(next, op.measureIndex, op);
       }
       return next;
     }
@@ -929,19 +1009,22 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setClef': {
-      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      const staffIndex = op.staffIndex ?? 1;
+      const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
       if (!measure) return next;
       const clef = {
         clef: {
           sign: op.sign,
           ...(op.staffPosition !== undefined ? { staffPosition: op.staffPosition } : {}),
           ...(op.octave ? { octave: op.octave } : {})
-        }
+        },
+        // Named only when it is not the default, as the corpus writes it.
+        ...(staffIndex === 1 ? {} : { staff: staffIndex })
       };
-      // One declaration per measure on the entry surface: overwrite the
-      // staff-1 measure-start clef rather than stacking a second.
+      // One declaration per measure PER STAFF: overwrite this staff's
+      // measure-start clef rather than stacking a second beside it.
       const existing = (measure.clefs ?? []).findIndex(
-        entry => (entry.staff ?? 1) === 1 && entry.position === undefined
+        entry => (entry.staff ?? 1) === staffIndex && entry.position === undefined
       );
       if (existing >= 0) measure.clefs![existing] = clef;
       else measure.clefs = [...(measure.clefs ?? []), clef];
@@ -1007,19 +1090,19 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setDuration': {
-      const seq = entrySequence(next, op.measureIndex);
+      const seq = entrySequence(next, op.measureIndex, op);
       if (!seq) return next;
       const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
       if (found?.event) {
         found.event.duration = { ...op.duration };
         // Shrinking opens a gap at the end (later events slide earlier) —
         // pad it; growing eats trailing rests instead.
-        padMeasureRests(next, op.measureIndex);
+        padMeasureRests(next, op.measureIndex, op);
       }
       return next;
     }
     case 'nudgeRest': {
-      const seq = entrySequence(next, op.measureIndex);
+      const seq = entrySequence(next, op.measureIndex, op);
       if (!seq) return next;
       const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
       if (found?.event?.rest) {
@@ -1239,6 +1322,23 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (remainder.num > 0) seq.content.push(...restsSpanning(remainder));
       return next;
     }
+    case 'addVoiceMeasure': {
+      const staffIndex = op.staffIndex ?? 1;
+      const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
+      if (!measure) return next;
+      measure.sequences ??= [];
+      // The new voice is the next ordinal on ITS staff — appending to the raw
+      // array cannot disturb the other staff's numbering, which counts its own.
+      const voiceIndex = measure.sequences.filter(s => (s.staff ?? 1) === staffIndex).length;
+      measure.sequences.push(newSequence(staffIndex));
+      // Full from birth — the policy, in one line. See the op's declaration.
+      padMeasureRests(next, op.measureIndex, {
+        partIndex: op.partIndex,
+        staffIndex: op.staffIndex,
+        voiceIndex
+      });
+      return next;
+    }
     case 'removeVoiceMeasure': {
       const measure = next.parts?.[op.partIndex]?.measures?.[op.measureIndex];
       const sequence = measure?.sequences?.[op.sequenceIndex];
@@ -1386,7 +1486,9 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setPartDeclaration': {
-      const part = next.parts?.[0];
+      // The part being read, not the first one — `removePartDeclaration` has
+      // taken `partIndex` since item 13b and this half had not caught up.
+      const part = next.parts?.[op.partIndex ?? 0];
       if (!part) return next;
       if (op.declaration.kind === 'staves') part.staves = op.declaration.value;
       else ((part._x ??= {}).mnxLab ??= {}).capo = op.declaration.value;
@@ -1439,9 +1541,11 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setPositioned': {
-      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
       if (!measure) return next;
       const position = { fraction: [op.onset[0], op.onset[1]] as [number, number] };
+      // Named only when it is not the default, as everywhere else.
+      const onStaff = (op.staffIndex ?? 1) === 1 ? {} : { staff: op.staffIndex };
       if (op.attribute.kind === 'ottava') {
         // `end` is required by the schema. A typed span stands in for the
         // press-navigate-press range gesture that spanners have and positioned
@@ -1462,12 +1566,12 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         const measureId = endMeasure.id;
         measure.ottavas = [
           ...(measure.ottavas ?? []),
-          { position, value: op.attribute.value, end: { measure: measureId, position } }
+          { position, value: op.attribute.value, end: { measure: measureId, position }, ...onStaff }
         ];
         return next;
       }
       if (op.attribute.kind === 'dynamic') {
-        const entry: MnxDynamic = { position, type: op.attribute.dynamicType ?? 'immediate' };
+        const entry: MnxDynamic = { position, type: op.attribute.dynamicType ?? 'immediate', ...onStaff };
         if (op.attribute.value) entry.value = op.attribute.value;
         if (op.attribute.glyphs) entry.glyphs = op.attribute.glyphs;
         if (op.attribute.wedgeType) entry.wedgeType = op.attribute.wedgeType;
@@ -1479,14 +1583,15 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           {
             position,
             text: op.attribute.text,
-            ...(op.attribute.orient ? { orient: op.attribute.orient } : {})
+            ...(op.attribute.orient ? { orient: op.attribute.orient } : {}),
+            ...onStaff
           }
         ];
       }
       return next;
     }
     case 'removePositioned': {
-      const measure = next.parts?.[0]?.measures?.[op.measureIndex];
+      const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
       if (!measure) return next;
       const record = measure as unknown as Record<string, unknown[] | undefined>;
       const field =
@@ -1500,7 +1605,12 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
     }
     case 'setBeam': {
       const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
-      const seq = measure?.sequences?.find(sequence => (sequence.staff ?? 1) === 1);
+      // The run's own staff and voice: beaming a grand staff's lower part
+      // used to name staff 1's events, or none at all. `beams` itself stays
+      // on the PART-measure, where MNX puts it — one list, both staves.
+      const seq = (measure?.sequences ?? []).filter(
+        sequence => (sequence.staff ?? 1) === (op.staffIndex ?? 1)
+      )[op.voiceIndex ?? 0];
       if (!measure || !seq) return next;
       const [start, end] = op.from <= op.to ? [op.from, op.to] : [op.to, op.from];
       const events: string[] = [];
@@ -1570,7 +1680,12 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       // eighth), and is a no-op when the wrap restores an exactly-full bar —
       // which is why re-wrapping a corpus container still reproduces it byte
       // for byte.
-      padMeasureRests(next, op.measureIndex);
+      //
+      // It pads THE SEQUENCE THE OP ADDRESSED, which `removeContainer` had to
+      // learn inline: a container lives in any voice, and padding voice 0
+      // instead left voice 2 three beats long in a 4/4 bar.
+      const wrapRemainder = subtractOnsets(meterOf(next, op.measureIndex).span, voiceFill(seq));
+      if (wrapRemainder.num > 0) seq.content.push(...restsSpanning(wrapRemainder));
       return next;
     }
     case 'respellNote': {
@@ -1591,7 +1706,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setRestSpelling': {
-      const seq = entrySequence(next, op.measureIndex);
+      const seq = entrySequence(next, op.measureIndex, op);
       if (!seq) return next;
       const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
       if (!found?.event?.rest) return next;
@@ -1730,8 +1845,11 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         part.measures?.push({ sequences: [{ content: [] }] });
       }
       // New bars arrive pre-filled with beat rests (§8.11: unentered
-      // positions ARE rests; the cursor walks them, digits convert them).
-      padMeasureRests(next, next.global.measures.length - 1);
+      // positions ARE rests; the cursor walks them, digits convert them) —
+      // in the part being written to. The bar is global, a part's copy of it
+      // is not, so appending from part 2 used to pad part 1's copy and hand
+      // the cursor an empty bar.
+      padMeasureRests(next, next.global.measures.length - 1, { partIndex: op.partIndex });
       return next;
     }
     case 'addPart': {
@@ -1922,8 +2040,8 @@ function restsSpanning(span: Onset): MnxEvent[] {
   return rests;
 }
 
-function padMeasureRests(doc: MnxStructure, measureIndex: number): void {
-  const seq = entrySequence(doc, measureIndex);
+function padMeasureRests(doc: MnxStructure, measureIndex: number, target: EntryTarget = {}): void {
+  const seq = entrySequence(doc, measureIndex, target);
   if (!seq || seq.fullMeasure) return; // a full-measure rest is already full
   const { span, beatBase } = meterOf(doc, measureIndex);
   const beat = PAD_LADDER.find(l => l.base === beatBase)?.span ?? { num: 1, den: 4 };
@@ -1951,6 +2069,11 @@ function padMeasureRests(doc: MnxStructure, measureIndex: number): void {
 
 interface LocatedNote {
   seq: MnxSequence;
+  /** Where the note actually lives — carried so the verbs that look at its
+   *  NEIGHBOURS (the next bar's same voice) look in the right part and staff
+   *  rather than assuming the entry surface's old one. */
+  partIndex: number;
+  staffIndex: number;
   measureIndex: number;
   voiceIndex: number;
   eventIndex: number;
@@ -1966,6 +2089,8 @@ function findKeyedNote(doc: MnxStructure, key: string): LocatedNote | null {
   if (!address) return null;
   return {
     seq: address.sequence,
+    partIndex: address.partIndex,
+    staffIndex: address.staffIndex,
     measureIndex: address.measureIndex,
     voiceIndex: address.voiceIndex,
     eventIndex: address.eventIndex,
@@ -2005,15 +2130,20 @@ function samePitch(a: MnxNote, b: MnxNote): boolean {
 }
 
 /** The same pitch in the immediately following timed event — this voice's
- *  next event, else the next measure's same-voice first event. */
+ *  next event, else the next measure's same-voice first event.
+ *
+ *  "Same voice" means the note's OWN part and staff: reading part 0 staff 1
+ *  for a note that lives elsewhere tied it across to a stranger's music. */
 function tieTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined {
   for (let i = located.eventIndex + 1; i < located.seq.content.length; i++) {
     const item = located.seq.content[i];
     if (!isTimedEvent(item)) continue;
     return (item.notes ?? []).find(n => samePitch(n, located.note));
   }
-  const nextMeasure = doc.parts?.[0]?.measures?.[located.measureIndex + 1];
-  const seq = (nextMeasure?.sequences ?? []).filter(s => (s.staff ?? 1) === 1)[located.voiceIndex];
+  const nextMeasure = doc.parts?.[located.partIndex]?.measures?.[located.measureIndex + 1];
+  const seq = (nextMeasure?.sequences ?? []).filter(
+    s => (s.staff ?? 1) === located.staffIndex
+  )[located.voiceIndex];
   for (const item of seq?.content ?? []) {
     if (!isTimedEvent(item)) continue;
     return (item.notes ?? []).find(n => samePitch(n, located.note));
@@ -2247,7 +2377,7 @@ export function beamRunBetween(
   doc: MnxStructure,
   fromNoteKey: string,
   toNoteKey: string
-): { measureIndex: number; from: number; to: number } | null {
+): ({ measureIndex: number; from: number; to: number } & EntryTarget) | null {
   const from = findKeyedNote(doc, fromNoteKey);
   const to = findKeyedNote(doc, toNoteKey);
   if (!from || !to) return null;
@@ -2259,7 +2389,18 @@ export function beamRunBetween(
     const item = from.seq.content[i];
     if (isTimedEvent(item) && (item.notes?.length ?? 0) > 0) beamable++;
   }
-  return beamable >= 2 ? { measureIndex: from.measureIndex, from: start, to: end } : null;
+  return beamable >= 2
+    ? {
+        measureIndex: from.measureIndex,
+        from: start,
+        to: end,
+        // The run carries its OWN address, so the caller never has to guess
+        // it — and defaults stay unspoken, so no committed trace moves.
+        ...(from.partIndex ? { partIndex: from.partIndex } : {}),
+        ...(from.staffIndex !== 1 ? { staffIndex: from.staffIndex } : {}),
+        ...(from.voiceIndex ? { voiceIndex: from.voiceIndex } : {})
+      }
+    : null;
 }
 
 /**
@@ -2378,24 +2519,59 @@ function mintNoteId(doc: MnxStructure): string {
   }
 }
 
-/** What (string, fret) sounds under the part's (or standard) tuning. */
-function fingerboardMidi(doc: MnxStructure, string: number, fret: number): number | undefined {
-  const open = tuningOf(doc.parts?.[0]).find(t => t.string === string);
+/** What (string, fret) sounds under THIS part's (or standard) tuning. */
+function fingerboardMidi(
+  doc: MnxStructure,
+  string: number,
+  fret: number,
+  partIndex = 0
+): number | undefined {
+  const part = doc.parts?.[partIndex];
+  const open = tuningOf(part).find(t => t.string === string);
   // Frets are capo-relative, so the sounding pitch includes the capo shift.
-  return open ? midiOfPitch(open.pitch) + capoOf(doc.parts?.[0]) + fret : undefined;
+  return open ? midiOfPitch(open.pitch) + capoOf(part) + fret : undefined;
 }
 
-/** Voice 0 of staff 1 in a part-0 measure — the entry surface. Created on
- *  demand so entry works in measures that never had a sequence. */
-function entrySequence(doc: MnxStructure, measureIndex: number): MnxSequence | undefined {
-  const measure = doc.parts?.[0]?.measures?.[measureIndex];
+/**
+ * THE ENTRY SURFACE: the sequence a write lands in — `target`'s voice of its
+ * staff in its part's copy of this bar. An absent field means the first of
+ * its kind, so `entrySequence(doc, m)` still means what it always did.
+ *
+ * Voice 0 is created on demand, as it always was, and now for a staff that
+ * has no sequence yet as well: standing on a grand staff's lower staff and
+ * typing must write THERE, not silently into the upper one.
+ *
+ * A voice BEYOND the first is never a side effect of typing —
+ * `addVoiceMeasure` is the verb, and it creates the voice full of rests. That
+ * is the whole of the creation policy: entry finds real events wherever the
+ * cursor can stand, so it never has to decide what an empty voice means.
+ *
+ * Voices are counted PER STAFF (as `buildGrid`, `noteWalk` and the selection
+ * members count them), so a staff-2 sequence never shifts staff 1's voice
+ * numbers — the silent renumbering that would rewrite note keys corpus-wide.
+ */
+function entrySequence(
+  doc: MnxStructure,
+  measureIndex: number,
+  target: EntryTarget = {}
+): MnxSequence | undefined {
+  const staffIndex = target.staffIndex ?? 1;
+  const voiceIndex = target.voiceIndex ?? 0;
+  const measure = doc.parts?.[target.partIndex ?? 0]?.measures?.[measureIndex];
   if (!measure) return undefined;
   measure.sequences ??= [];
-  const existing = measure.sequences.filter(s => (s.staff ?? 1) === 1)[0];
+  const existing = measure.sequences.filter(s => (s.staff ?? 1) === staffIndex)[voiceIndex];
   if (existing) return existing;
-  const created: MnxSequence = { content: [] };
-  measure.sequences.push(created);
-  return created;
+  if (voiceIndex > 0) return undefined;
+  measure.sequences.push(newSequence(staffIndex));
+  return measure.sequences[measure.sequences.length - 1];
+}
+
+/** A sequence on a staff. `staff` is written only when it is not the default
+ *  — the corpus omits it for staff 1 and so do we, so a document built by
+ *  entry reads like one a person wrote. */
+function newSequence(staffIndex: number): MnxSequence {
+  return staffIndex === 1 ? { content: [] } : { staff: staffIndex, content: [] };
 }
 
 /** The timed event starting exactly at `target`, or (event: undefined) with

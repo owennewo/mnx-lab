@@ -276,7 +276,7 @@ The initial compatibility rules are deliberately narrow:
 No initial paste truncates, tiles, rhythmically fits, merges chord tones or
 silently maps incompatible staves/voices. Those are named future commands, not
 hidden branches of Ctrl+V. Paste into a missing voice or staff follows
-[core-entry-surface.md](../proposed/core-entry-surface.md); this item must not invent its
+[core-entry-surface.md](../complete/core-entry-surface.md); this item must not invent its
 own sequence-creation policy.
 
 The destination's projection changes only spatial landing. Notation and tab

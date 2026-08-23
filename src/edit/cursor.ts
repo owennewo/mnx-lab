@@ -549,12 +549,18 @@ export function coincidentSlots(
     projection === 'tab' && grid.mode === 'string'
       ? position.slots.filter(s => s.line === cursor.line)
       : position.slots.filter(s => s.staffPosition === cursor.line);
-  // The cursor's voice scopes what it sees; the ordinal then disambiguates
-  // WITHIN that voice (two chord members derived onto one string). Switching
-  // voice is the voice jump's job, not the cycle key's.
+  // The cursor's voice scopes what it sees, FULL STOP; the ordinal then
+  // disambiguates WITHIN that voice (two chord members derived onto one
+  // string). Switching voice is the voice jump's job, not the cycle key's.
+  //
+  // It used to fall back to the whole line when the cursor's voice had
+  // nothing on it, which read as helpful and was not: standing in voice 2
+  // over its rest resolved to voice 1's note, so Delete removed music from a
+  // voice you were not in and the duration keys re-valued it. Entry found the
+  // same hole from the other side — the pending duration would not step,
+  // because a rest looked like ink. An empty line in YOUR voice is empty.
   const voice = cursor.voiceIndex ?? 0;
-  const mine = onLine.filter(s => s.voiceIndex === voice);
-  return mine.length > 0 ? mine : onLine;
+  return onLine.filter(s => s.voiceIndex === voice);
 }
 
 /** Step to the next note sharing this moment and line, wrapping. Returns the

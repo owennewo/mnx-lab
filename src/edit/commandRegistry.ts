@@ -583,9 +583,9 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'new-voice',
     scopes: ['voiceMeasure'],
     glyph: { smufl: 'arrowBlackDown' },
-    label: 'Add a voice',
+    label: 'Add a voice to this bar',
     tier: 'popover',
-    blockedBy: 'voice-entry'
+    action: () => ({ intent: { type: 'addVoiceMeasure' } })
   },
   {
     id: 'delete-voice-bar',

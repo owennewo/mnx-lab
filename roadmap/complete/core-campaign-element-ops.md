@@ -89,7 +89,7 @@ agreed or candidate claims; **bold** = agreed.
 **Every row is closed and the trace queue is empty.** The campaign's own
 closing condition — every kind with a construct verb built at least once from
 `{}` — is met at **37 of 38**, and the 38th (`staves`) waits on
-[core-entry-surface.md](../proposed/core-entry-surface.md), which graduated out
+[core-entry-surface.md](../complete/core-entry-surface.md), which graduated out
 for exactly that reason. The bar is an assertion now, not a report: a construct
 verb landing without a trace fails the build.
 
@@ -109,7 +109,7 @@ verb landing without a trace fails the build.
 | 11b | [onset granularity, container descent, wrap verbs](core-element-ops-onset-granularity.md) | The half item 11 deferred, with evidence: tuplets, grace, tremolo, `space`. The cursor grid skips non-timed items, so container content is unaddressable — and the same gap stops a plain run of 32nds being entered. Owns `eventAtOnset`/grid descent first, verbs second; rest spelling closed as a VERB (`rest half`) rather than a padding policy. Entry side of [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md). | 32 notes addressable; 9 scenarios unblocked | **Shift+R** rhythm popover | event | **complete 2026-08-15** |
 | 12 | [lyrics](core-element-ops-lyrics.md) | Lyrics, part names, verse labels — a text *mode* that suspends the keymap, not a binding. | 4 (reachable 78 → 82); 34 elements | **Shift+L** popover — the text *mode* is rejected, see the doc | **note / score** | **built 2026-08-14** |
 | 13 | [part declarations](core-element-ops-part-declarations.md) | **Split at build time**: the five keys on `parts[0]` (name, strings, capo, staffKind, staves) get the removal halves their genesis verbs never had, plus constructors for capo and staves. | 2 (reachable 68 → 71); 91 elements | **Shift+P** popover (`capo 3`, `no strings`) | **score** | **built 2026-08-14** |
-| 13b | [part addressing](core-element-ops-part-addressing.md) | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-coded `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changed note keys — which the primitives goldens embed. It cost none in the end: the key grammar spells part and staff silently for 0 and 1. The ENTRY half graduated out on 2026-08-15 as [core-entry-surface.md](../proposed/core-entry-surface.md) — a policy question, not an element-ops gap. | ~15 | `setPart`/`setStaff`; entry keys unchanged | voice/part rungs | **complete 2026-08-15** |
+| 13b | [part addressing](core-element-ops-part-addressing.md) | Voices beyond 0, parts beyond `parts[0]`, staves beyond 1 — plus `layout`, `score` and multimeasure rests (a layout is a tree, a score a presentation; neither is a declaration). **Note the cost**: the ops layer hard-coded `parts[0]` in `findKeyedNote`/`buildGrid`/the note-key traversal, so this changed note keys — which the primitives goldens embed. It cost none in the end: the key grammar spells part and staff silently for 0 and 1. The ENTRY half graduated out on 2026-08-15 as [core-entry-surface.md](../complete/core-entry-surface.md) — a policy question, not an element-ops gap. | ~15 | `setPart`/`setStaff`; entry keys unchanged | voice/part rungs | **complete 2026-08-15** |
 
 Beyond the campaign, and now **formally handed over with owners** (2026-08-15):
 layout documents and multimeasure rests →
@@ -933,7 +933,7 @@ restores an exactly-full bar — is untouched and still reproduces byte for byte
 ### 2026-08-15 — the index closes; the entry surface graduates
 
 Item 13b's remaining half is out of the campaign and into
-[core-entry-surface.md](../proposed/core-entry-surface.md). Everything beneath
+[core-entry-surface.md](../complete/core-entry-surface.md). Everything beneath
 it is built — the cursor carries part, staff and voice, and every removal verb
 follows it — so what is left is a single **policy** question the campaign has no
 special claim on: what typing into a second voice MEANS when the bar is already
@@ -977,7 +977,7 @@ rather than assumed, with each kind keeping the default it had.
 
 **And the queue now knows what it cannot ask for.** `directions-multi-staff`
 was next in line and is unbuildable: its music lives on a second staff, which
-is exactly what [core-entry-surface.md](../proposed/core-entry-surface.md)
+is exactly what [core-entry-surface.md](../complete/core-entry-surface.md)
 owns. The queue skips scenarios needing a second staff, voice or part, and
 `staves` — whose every corpus home is one of those — is reported as
 `awaitingEntrySurface`. So the closing condition is precise: **`uncovered` must
@@ -1048,3 +1048,42 @@ the destruct sweep, which is the campaign's other half and its more complete
 one — removal needs identity, and construction needs ordering, minting,
 validity, vocabulary and policy. A verb table can say a kind is constructible;
 only a performance can say it is *buildable*.
+
+### 2026-08-23 — the bar closes against nothing, from outside the campaign
+
+[core-entry-surface.md](core-entry-surface.md) landed, and with it the one
+exemption this index left behind. **Kinds covered 37 → 38 of 38**; `staves` is
+built, `awaitingEntrySurface` and `needsEntrySurface` are deleted rather than
+merely emptied, and the two tests that guarded the exemption are gone. THE BAR
+now asserts `uncovered` is empty with nothing subtracted from it.
+
+The scenario that closed it is the one this log named as unaskable on
+2026-08-15: **`lab/score-text/directions-multi-staff`**, two staves with
+per-staff clefs and per-staff directions, built from `{}`.
+
+Three things worth keeping, all of them arriving from the item the campaign
+sent away:
+
+- **The graduation was right, and the proof is what the item found.** The
+  entry surface's central question — what a second voice MEANS when the bar is
+  full — was answered with a padding policy, and the policy's best consequence
+  was one nobody predicted: because a created voice is full of real rests,
+  *there is no ghost voice*, so the selection ladder needed no new vocabulary.
+  That is not an element-ops finding; it is the selection-and-entry design item
+  the closing note said it was.
+- **The residue row was load-bearing.** `new-voice` sat in the registry drawn
+  unavailable with `blockedBy: 'voice-entry'`, and it was the only place the
+  gap was visible in the product. It is wired, and the ledger's last row with
+  it — which is the argument for having put the ledger in the tray at all.
+- **A trace still found the defect no report could**, one campaign removed:
+  `coincidentSlots` fell back across voices, so standing in voice 2 over its
+  rest resolved to voice 1's note. Delete removed music from a voice you were
+  not in, and the duration keys re-valued it. Twenty-two traces had never gone
+  near a second voice, so nothing had ever asked.
+
+One boundary discovered rather than decided: **`spec/grand-staff` can never
+trace green.** Its own staff-1 bar 2 sums to 7/8, and §8.11 padding fills any
+bar entry touches, so a spec example that underfills is unreachable by
+construction. A fourth class beside `traced` / `ops-reachable` / `blocked` /
+`expected-unreachable` — not invalid, just not writable by a full-bar editor —
+and it has exactly one member, so it is recorded here rather than given a tier.

@@ -7,7 +7,7 @@
 // same layering as hudRows.ts. An intent with no binding and no surface
 // renders "(no key)" honestly: the panel is a live gap detector.
 import type { EditorIntent } from '../edit/intents.ts';
-import type { EditOp, MeasureAttribute, OpLogEntry } from '../edit/ops.ts';
+import type { EditOp, EntryTarget, MeasureAttribute, OpLogEntry } from '../edit/ops.ts';
 import type { MnxTuningEntry } from '../model/mnx.ts';
 import { EDIT_LAYER, NAVIGATION_LAYER, TAB_DIGIT_LAYER } from '../edit/keymap.ts';
 import { KEY_DOCS, SURFACE_INTENTS, strokeKey } from '../edit/keymapDocs.ts';
@@ -95,6 +95,19 @@ function keyText(fifths: number): string {
 }
 
 const onsetText = (onset: [number, number]) => `${onset[0]}/${onset[1]}`;
+
+/** The write address, spoken only when it is NOT the default one (part 1,
+ *  staff 1, voice 1). The ops panel is provenance, and "which voice did that
+ *  land in" is the question the entry surface made worth asking — but saying
+ *  it on every row would bury the answer in the ordinary case. */
+function whereText(target: EntryTarget): string {
+  const said = [
+    target.partIndex ? `part ${target.partIndex + 1}` : '',
+    target.staffIndex && target.staffIndex !== 1 ? `staff ${target.staffIndex}` : '',
+    target.voiceIndex ? `voice ${target.voiceIndex + 1}` : ''
+  ].filter(Boolean);
+  return said.length > 0 ? ` · ${said.join(' ')}` : '';
+}
 const durationText = (d: { base: string; dots?: number }) => `${d.base}${'·'.repeat(d.dots ?? 0)}`;
 
 function opLabel(op: EditOp): string {
@@ -110,17 +123,17 @@ function opLabel(op: EditOp): string {
     case 'setFret':
       return `fret ${op.fret} on s${op.string} · ${op.noteId}`;
     case 'insertNote':
-      return `insert fret ${op.fret} on s${op.string} @ m${op.measureIndex + 1} ${onsetText(op.onset)} (${durationText(op.duration)})`;
+      return `insert fret ${op.fret} on s${op.string} @ m${op.measureIndex + 1} ${onsetText(op.onset)} (${durationText(op.duration)})${whereText(op)}`;
     case 'insertPitchNote':
-      return `insert ${op.pitch.step}${op.pitch.octave} @ m${op.measureIndex + 1} ${onsetText(op.onset)} (${durationText(op.duration)})`;
+      return `insert ${op.pitch.step}${op.pitch.octave} @ m${op.measureIndex + 1} ${onsetText(op.onset)} (${durationText(op.duration)})${whereText(op)}`;
     case 'deleteNote':
       return `delete note ${op.noteId}`;
     case 'clearEvent':
       return `clear event @ m${op.event.measureIndex + 1}`;
     case 'setDuration':
-      return `duration ${durationText(op.duration)} @ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
+      return `duration ${durationText(op.duration)} @ m${op.measureIndex + 1} ${onsetText(op.onset)}${whereText(op)}`;
     case 'nudgeRest':
-      return `nudge rest ${op.delta > 0 ? 'up' : 'down'} @ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
+      return `nudge rest ${op.delta > 0 ? 'up' : 'down'} @ m${op.measureIndex + 1} ${onsetText(op.onset)}${whereText(op)}`;
     case 'toggleTie':
       return `toggle tie · ${op.noteId}`;
     case 'setTimeSignature':
@@ -132,7 +145,7 @@ function opLabel(op: EditOp): string {
     case 'setStaffKind':
       return `tab staff · ${op.kind}`;
     case 'appendMeasure':
-      return 'append bar';
+      return `append bar${whereText({ partIndex: op.partIndex })}`;
     case 'removeMeasure':
       return `remove bar m${op.measureIndex + 1} (empty)`;
     case 'removePart':
@@ -177,6 +190,8 @@ function opLabel(op: EditOp): string {
       return `no fingering · ${op.noteKey}`;
     case 'removeContainer':
       return `remove container @ m${op.measureIndex + 1} (empty)`;
+    case 'addVoiceMeasure':
+      return `add voice bar @ m${op.measureIndex + 1} (full of rests)${whereText(op)}`;
     case 'removeVoiceMeasure':
       return `remove voice bar @ m${op.measureIndex + 1} (empty)`;
     case 'removePartMeasure':
