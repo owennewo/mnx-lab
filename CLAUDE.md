@@ -482,6 +482,13 @@ output names refuse to overwrite).
   aimed upstream), `lab-` (the repo itself: structure, process, corpus machinery).
   Another prefix is acceptable only when it earns its keep: a concern that is
   genuinely separate *and* important enough to name.
+- **A `proposed/` doc is written only when it is asked for.** Noticing future work
+  during a task is not a mandate to file it: name it in the reply and let the human
+  decide. "Add to the roadmap", "write that up", or picking up a campaign row are the
+  ask; a finished item's own follow-ups, a tempting refactor, and an idea that arrived
+  mid-review are not. `proposed/` is the record of what was *chosen*, so a doc nobody
+  recognises costs the next reader more than the idea was worth — and it makes "what's
+  next" answer with noise.
 - **Standing docs** live in `inprogress/` and never move to `complete/` — they record an
   obligation rather than a work item. [roadmap/inprogress/lab-verify.md](roadmap/inprogress/lab-verify.md)
   is the one that exists: the verification ledger every item hands its demoted scenarios
