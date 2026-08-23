@@ -1,7 +1,11 @@
 # The density ladder is computed on a square page
 
-> **Status: PROPOSED 2026-08-21.** Found while chasing a report that the
-> spacing arms do nothing at a large staff scale
+> **Status: REJECTED 2026-08-23 (proposed 2026-08-21).** The measured mismatch
+> is real, but the density control works well enough in practice and does not
+> justify more planning complexity or paint-time work today. Revisit only if
+> ordinary use produces a concrete navigation failure, rather than to make an
+> intentionally approximate ladder exact at extreme settings. Found while
+> chasing a report that the spacing arms do nothing at a large staff scale
 > ([core-ragged-last.md](../complete/core-ragged-last.md) appendix fixed the
 > half of that which was a real engraving defect). What is left is this: the
 > ladder answers about a page the renderer does not draw.

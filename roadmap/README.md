@@ -67,13 +67,6 @@ proposals that name their campaign.
   core-ink-priced-columns froze packing to keep separated. Four options costed, from "do
   nothing, document it" to "always ink-measured", with coupling-in-the-control carrying
   the best precedent.
-- **[core-density-ladder-ink.md](proposed/core-density-ladder-ink.md)** — the density
-  ladder re-packs a **square** `PackingInput`, so above ratio 1 it both claims changes
-  the reader cannot see (rungs two pixels apart at staff 640%) and misses ones they can.
-  Found 2026-08-21 under the report that the spacing arms do nothing at max zoom, whose
-  engraving half core-ragged-last fixed. Four options costed; pricing the packing at the
-  paint's own density is the likely trade, plus a perceptual tolerance in
-  `packingSignature` that is worth doing on its own.
 - **[core-entry-mode.md](proposed/core-entry-mode.md)** — the orthogonal entry axis
   graduated from the completed selection ladder on 2026-08-16: **advance on/off** as
   recorded session state, stage-1 fret-digit resolution, the notation action binding and
@@ -1105,6 +1098,13 @@ proposals that name their campaign.
   stage. Do not build from this document.
 
 ### rejected/
+- **[core-density-ladder-ink.md](rejected/core-density-ladder-ink.md)** — the density
+  ladder deliberately re-packs a square `PackingInput`, so its rungs become approximate
+  once ink pricing diverges from square packing at extreme staff scales. The mismatch is
+  measured and understood, but the control works well enough in practice; rejected
+  2026-08-23 because correcting it would add planning complexity or paint-time cost
+  without a concrete navigation failure. The measurements and four alternatives remain
+  recorded if real use makes the approximation consequential later.
 - **[workbench-panel-drawer.md](rejected/workbench-panel-drawer.md)** — item 8 of the
   Modernist campaign: the score panel as a drawer on narrow windows. Drafted 2026-08-15
   complete with the closing design (Escape at the `overlay` tier, click-away via the
