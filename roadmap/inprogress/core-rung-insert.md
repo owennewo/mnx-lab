@@ -416,3 +416,34 @@ The cheaper alternatives were considered and refused: snapping the interpolated
 x to the nearest rendered column would have been right-looking rather than
 right, and a fix that is usually correct is harder to debug than one that is
 visibly wrong.
+
+
+### The other half of it — the box was the GHOST, not the enclosure
+
+Giving rests an id fixed the *colour* — the right rest lit up — and left the
+box still drawn on beat 1. Because the box was never the enclosure: it was the
+**cursor ghost**, which locates its column by a completely separate route.
+
+`ghost.anchorKeys` are "note keys at the cursor's beat, used to locate the
+column in the rendered SVG". A rest-only beat sounds nothing, so it offered
+none, so the ghost hit the same `measurePositionX` fallback and landed on the
+wrong beat — the identical failure, one layer over, and invisible while the
+enclosure was the suspect.
+
+Two lines of fix, once the rests had names: the cursor's context appends the
+event key of any rest starting at its beat (notes still lead, because a column
+with ink anchors more precisely than the rest sharing it), and the ghost's
+locator accepts a `.rest` element as an anchor, not only a notehead or a fret
+number.
+
+**The tab staff draws no rest of its own** — rests there consume time silently,
+by convention — so in the `both` view the tab ghost borrows the notation one:
+the two projections share a spacing plan, so it is literally the same column.
+In a tab-ONLY view there is no rest element anywhere in the SVG and the
+fraction fallback still governs. That case is unfixed and named rather than
+hidden.
+
+**Worth keeping:** two overlays drew the same wrong answer for the same reason
+through two different code paths, and fixing the one I could see left the one I
+could not. The fraction fallback is still there, twice, and is still wrong
+wherever it fires — it is now just much harder to reach.

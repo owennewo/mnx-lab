@@ -1071,10 +1071,16 @@ export function drawCursorGhost(
     const candidates = [
       ...svg.querySelectorAll<SVGGraphicsElement>(`[data-source-id="${CSS.escape(key)}"]`)
     ];
+    // A REST anchors a column as well as a notehead does — it is the whole of
+    // that event's ink. The tab staff draws no rest of its own (rests there
+    // consume time silently), so in the BOTH view it borrows the notation
+    // one: the two projections share a spacing plan, so it is the same column.
+    // In a tab-only view there is no rest element at all and the fallback
+    // below still governs.
     const el = candidates.find(candidate =>
       ghost.string !== null
-        ? candidate.classList.contains('fret-number')
-        : candidate.classList.contains('notehead')
+        ? candidate.classList.contains('fret-number') || candidate.classList.contains('rest')
+        : candidate.classList.contains('notehead') || candidate.classList.contains('rest')
     );
     if (!el) continue;
     const b = el.getBBox();

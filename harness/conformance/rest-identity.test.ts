@@ -80,3 +80,33 @@ describe('a rest can be pointed at', () => {
     expect(rests(s.doc, ['ev42'])[0].className).toBe('rest selected');
   });
 });
+
+
+describe('the cursor ghost can find a rest-only column', () => {
+  it('offers the rest\'s event key as an anchor', () => {
+    const s = barWithARestOnBeatTwo();
+    const context = s.cursorContext();
+    // Nothing sounds at this beat, so before the rest had a name there was
+    // NOTHING to anchor on and the ghost fell back to a metric fraction.
+    expect(context.occupied).toBe(false);
+    expect(context.anchorKeys).toContain(
+      syntheticEventKey({ measureIndex: 0, voiceIndex: 0, eventIndex: 1 })
+    );
+  });
+
+  it('still leads with note keys where the beat has ink', () => {
+    // A column with a note anchors more precisely than a rest sharing it, so
+    // notes come first and the ghost's first hit is still a notehead.
+    const s = barWithARestOnBeatTwo();
+    s.handleIntent({ type: 'goToMeasure', measureIndex: 0 });
+    const context = s.cursorContext();
+    expect(context.occupied).toBe(true);
+    expect(context.anchorKeys[0]).toBe('@m0.v0.e0.n0');
+  });
+
+  it('a real event id is preferred, as it is for the sourceId', () => {
+    const s = barWithARestOnBeatTwo();
+    s.doc.parts![0].measures![0].sequences![0].content[1].id = 'ev42';
+    expect(s.cursorContext().anchorKeys).toContain('ev42');
+  });
+});

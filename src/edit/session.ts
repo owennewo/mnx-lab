@@ -47,6 +47,7 @@ import {
   type PositionGrid,
   type Projection
 } from './cursor.ts';
+import { syntheticEventKey } from '../model/noteKeys.ts';
 import { capoOf, defaultStringFor, midiOfPitch, tuningOf } from './tabStrings.ts';
 import { clefAt, keyFifthsAt, pitchAtStaffPosition, spellPitch } from './staffSpace.ts';
 import {
@@ -216,11 +217,30 @@ export class EditorSession {
     anchorKeys: string[];
   } {
     const position = positionAt(this.grid, this.cursorState);
+    // Note keys first, then the EVENT keys of any rests starting here. The
+    // ghost locates its column by finding one of these in the rendered SVG,
+    // and a rest-only beat offered none — so the ghost fell back to
+    // interpolating a metric fraction across the bar and drew itself on the
+    // wrong beat (core-rung-insert.md). Notes lead because a column with ink
+    // anchors more precisely than the rest that shares it.
+    const anchorKeys = position?.slots.map(slot => slot.noteKey) ?? [];
+    for (const event of position?.events ?? []) {
+      const address = {
+        partIndex: this.cursorState.partIndex ?? 0,
+        staffIndex: this.cursorState.staffIndex ?? 1,
+        measureIndex: this.cursorState.measureIndex,
+        voiceIndex: event.voiceIndex,
+        eventIndex: event.eventIndex,
+        ...(event.containerIndex === undefined ? {} : { containerIndex: event.containerIndex })
+      };
+      const resolved = eventAtAddress(this.doc, address);
+      if (resolved?.rest) anchorKeys.push(resolved.id ?? syntheticEventKey(address));
+    }
     return {
       occupied: !!slotAt(this.grid, this.cursorState, this.activeProjection),
       staffPosition: this.activeProjection === 'notation' ? this.cursorState.line : null,
       string: this.activeProjection === 'tab' ? this.cursorState.line : null,
-      anchorKeys: position?.slots.map(s => s.noteKey) ?? []
+      anchorKeys
     };
   }
 
