@@ -149,6 +149,28 @@ export type EditOp =
       noteId: string;
     }
   | {
+      /**
+       * Remove an event outright, splicing its time out of the voice — the
+       * last step of the guarded-removal ladder, and the exact twin of
+       * `insertEvent`.
+       *
+       * REFUSED while the event holds ink, which is the campaign's anti-cheat
+       * rule unchanged: a container may be removed only once it is empty, so
+       * removal never destroys ink implicitly. `clearEvent` is what empties
+       * it, so Delete on a note-bearing event still clears to a rest and a
+       * SECOND Delete takes the rest away. Before this the second press did
+       * nothing at all — `clearEvent` on something already a rest is a no-op,
+       * and the ladder simply stopped there with no way to say "and now go".
+       *
+       * The bar underfills, and that is the same ruling `insertEvent` carries
+       * pointed the other way: §8.11 belongs to entry, the badge names the
+       * state ("underfills the 4/4 bar: notes sum to 3 of 4 beats"), and the
+       * author resolves it with the verbs they have.
+       */
+      type: 'removeEvent';
+      event: EventAddress;
+    }
+  | {
       /** Clear the selected event to an equal-duration rest. This is the
        * event rung's Delete: it removes all event ink and adornments without
        * splicing time out of the voice. */
@@ -1070,6 +1092,26 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       // beam over it would not dangle, it would beam a rest.
       if (emptied?.slurs) delete emptied.slurs;
       if (removedNoteId || emptiedEventId) unlinkReferences(next, removedNoteId, emptiedEventId);
+      return next;
+    }
+    case 'removeEvent': {
+      const address = op.event;
+      const event = eventAtAddress(next, address);
+      if (!event || eventHasInk(event)) return next; // guarded: empty things only
+      const sequences = (
+        next.parts?.[address.partIndex]?.measures?.[address.measureIndex]?.sequences ?? []
+      ).filter(sequence => (sequence.staff ?? 1) === address.staffIndex);
+      const seq = sequences[address.voiceIndex];
+      if (!seq) return next;
+      if (address.containerIndex === undefined) {
+        seq.content.splice(address.eventIndex, 1);
+        return next;
+      }
+      // Inside a tuplet or a tremolo: the CONTAINER owns its own content, and
+      // emptying it is `removeContainer`'s job, not ours.
+      const inner = (seq.content[address.eventIndex] as { content?: MnxSequenceItem[] }).content;
+      if (!inner || inner.length <= 1) return next;
+      inner.splice(address.containerIndex, 1);
       return next;
     }
     case 'clearEvent': {

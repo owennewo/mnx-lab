@@ -370,11 +370,27 @@ export class EditorSession {
           return this.applyDestructive(ops);
         }
         if (this.selectionState.level === 'event') {
-          const ops = this.resolvedSelection.members.flatMap(member =>
-            member.kind === 'event'
-              ? [{ type: 'clearEvent' as const, event: eventAddressOf(member) }]
-              : []
-          );
+          // TWO PRESSES, TWO MEANINGS, and the guarded-removal rule decides
+          // which: an event holding ink is CLEARED to a rest (its time stays,
+          // so the grid does not shift under the cursor), and an event that is
+          // already empty is REMOVED. Before this the second press hit
+          // `clearEvent` on something already a rest and did nothing — the
+          // ladder stopped one rung short of "and now go".
+          //
+          // Reverse document order, as every multi-member removal does: a
+          // splice moves every later event index out from under the ops still
+          // to come.
+          const ops = [...this.resolvedSelection.members].reverse().flatMap(member => {
+            if (member.kind !== 'event') return [];
+            const address = eventAddressOf(member);
+            const event = eventAtAddress(this.doc, address);
+            if (!event) return [];
+            return [
+              (event.notes?.length ?? 0) > 0 || EditorSession.kitCount(event) > 0
+                ? { type: 'clearEvent' as const, event: address }
+                : { type: 'removeEvent' as const, event: address }
+            ];
+          });
           return this.applyDestructive(ops);
         }
         if (this.selectionState.level === 'container') {
@@ -1955,6 +1971,14 @@ export class EditorSession {
       ...fingerboard,
       ...this.entryTarget
     });
+    // AND THE CURSOR GOES TO IT. Inserting `before` puts the new note at the
+    // onset the cursor already holds, so it is standing on it already;
+    // inserting `after` needs one step along this voice's own events, which is
+    // exactly where the new one was spliced.
+    if (side === 'after') {
+      this.cursorState = movePositionInk(this.grid, this.cursorState, 1, 'keep');
+      this.reanchorSelection('note');
+    }
     return true;
   }
 
@@ -2041,6 +2065,12 @@ export class EditorSession {
       });
     this.reanchorSelection();
     return true;
+  }
+
+  /** Percussion ink is ink too: a kit event holds no `notes`, so the emptiness
+   *  test has to ask about both or Delete would remove a drum hit outright. */
+  private static kitCount(event: MnxEvent): number {
+    return ((event as { kitNotes?: unknown[] }).kitNotes ?? []).length;
   }
 
   /** Point selections follow ordinary navigation. Range gestures will move

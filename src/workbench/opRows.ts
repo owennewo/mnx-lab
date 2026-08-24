@@ -128,6 +128,8 @@ function opLabel(op: EditOp): string {
       return `insert ${op.pitch.step}${op.pitch.octave} @ m${op.measureIndex + 1} ${onsetText(op.onset)} (${durationText(op.duration)})${whereText(op)}`;
     case 'deleteNote':
       return `delete note ${op.noteId}`;
+    case 'removeEvent':
+      return `remove event @ m${op.event.measureIndex + 1} (empty)`;
     case 'clearEvent':
       return `clear event @ m${op.event.measureIndex + 1}`;
     case 'setDuration':

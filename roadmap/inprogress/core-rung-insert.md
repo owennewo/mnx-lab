@@ -331,3 +331,44 @@ N-1. Pre-existing, and it surprised the tests before it surprised anyone else.
 at fret 0 — the open string is the honest default there, since the line is a
 string rather than a pitch, and a digit re-frets it exactly as it would any
 other note. The capo is included, because fret 0 is capo-relative.
+
+
+## Two corrections from use — 2026-08-24
+
+Both found by driving the thing rather than testing it, and the second is the
+more interesting.
+
+**The cursor now follows an insert.** It stayed on the note you started from,
+which made `I` feel like it had done nothing. Every other insert in this item
+already moved (a new bar, a new part, a new voice); the event insert was simply
+missed. `before` needs no move — the new note takes the onset the cursor
+already holds — and `after` steps one along this voice's own events, which is
+exactly where the new one was spliced.
+
+**Delete now finishes.** The ladder went: Delete on a note → the note goes and
+the event becomes a rest; Delete again → **nothing**, because `clearEvent`
+clears to a rest and it was already one. The verb to say "and now go" did not
+exist.
+
+`removeEvent` is that verb, and the rule that decides between the two presses
+is one the repo already had: **a container may be removed only once it is
+empty.** An event is a container of notes, so an event holding ink is cleared,
+and an emptied one is removed. No new principle — the ladder just stopped a
+rung short of its own rule.
+
+The bar underfills, and the badge says so. That is the same ruling `insertEvent`
+carries, pointed the other way, and the pair is now symmetric:
+
+| | effect on the bar | what says so |
+|---|---|---|
+| `insertEvent` | may overfill | `overfills the 4/4 bar: notes sum to 5 of 4 beats` |
+| `removeEvent` | may underfill | `underfills the 4/4 bar: notes sum to 3 of 4 beats` |
+
+Both refuse to repair the bar by touching music nobody named, and both leave a
+state the engine can already describe.
+
+Two details the tests pin: percussion counts as ink (a kit event carries
+`kitNotes`, not `notes`, so an emptiness test asking only about `notes` would
+have removed a drum hit outright), and multi-member removals go back-to-front,
+because a splice moves every later event index out from under the ops still to
+come — the same rule the ranged re-value needed.

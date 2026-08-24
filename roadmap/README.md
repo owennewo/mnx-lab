@@ -199,7 +199,10 @@ back up to `proposed/` the moment it is.
   room would mean shortening music nobody named, and this repo refuses that more strongly
   than it insists on a full bar. So the invariant is a property of *entry*, not of the
   document at rest. The duration ladder learned ranges to make the resolution step work,
-  back-to-front because re-valuing an event moves every later onset.
+  back-to-front because re-valuing an event moves every later onset. `removeEvent` is the
+  symmetric twin (Delete on an emptied event removes it, and the bar may underfill) —
+  the ladder had stopped one rung short of the repo's own rule that a container may be
+  removed once it is empty.
 - **[lab-verify.md](inprogress/lab-verify.md)** — **the standing verification ledger**, and
   the only doc here that never moves to `complete/`. `verified` is a human assertion, so
   verification is the one gate an agent cannot pass alone, and any change under `model/`,
