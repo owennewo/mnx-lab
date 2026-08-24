@@ -65,6 +65,16 @@ import {
   emitTabVoices
 } from './tabStaff.ts';
 import {
+  createTechniqueCollector,
+  emitNotationTechnique,
+  emitTabTechnique,
+  hasTechniqueSites,
+  nextOrdinal,
+  recordSite,
+  techniqueOf,
+  type TechniqueCollector
+} from './technique.ts';
+import {
   resolveTabSetup,
   tabPositionContext,
   TabPositionContext,
@@ -1114,6 +1124,9 @@ function assembleSegment(
     planStaff: number;
     displayIndex: number;
     ctx: TabPositionContext;
+    /** Technique sites for THIS tab staff — a mark belongs to the staff whose
+     *  geometry it was measured against, so each keeps its own. */
+    technique: TechniqueCollector;
   }[] = [];
   const tabByAnchorPlan = new Map<number, number>(); // plan staff -> tab display index
   segment.staves.forEach((_st, s) => {
@@ -1129,7 +1142,8 @@ function assembleSegment(
         planStaff: staffOne >= 0 ? staffOne : s,
         displayIndex: displayHeights.length,
         // Non-null by construction: tabParts only admits parts with a context.
-        ctx: tabPositionContext(part, tabSetup)!
+        ctx: tabPositionContext(part, tabSetup)!,
+        technique: createTechniqueCollector()
       });
       tabByAnchorPlan.set(s, displayHeights.length);
       displayHeights.push(TAB_STAFF_HEIGHT_SP);
@@ -1816,7 +1830,10 @@ function assembleSegment(
           primitives,
           index,
           onIssue: message => measureIssues.push({ kind: 'render', message }),
-          positionContext: td.ctx
+          positionContext: td.ctx,
+          row: m.row,
+          measureEndX: m.x + m.width,
+          technique: td.technique
         });
       }
     }
@@ -1993,6 +2010,33 @@ function assembleSegment(
   for (const run of beams.runs) emitBeamRun(run, primitives);
 
   emitSlursAndTies(segment, plan, curveAnchors, primitives);
+
+  // Playing technique, on BOTH staves (core-guitar-technique.md). Like slurs
+  // and ties this waits for the whole segment: a hammer-on names its
+  // destination by note id, and that note may be measures — or a system row —
+  // away. Before the score-text pass, so a tempo mark stacks above a bend
+  // arrow rather than through it.
+  const techniqueRowEdges = rowEdgesOf(plan);
+  for (const td of tabDisplays) {
+    if (!hasTechniqueSites(td.technique)) continue;
+    emitTabTechnique({
+      sites: td.technique.sites,
+      byNoteId: td.technique.byNoteId,
+      rowEdges: techniqueRowEdges,
+      ink: plan.inkRatio,
+      primitives
+    });
+  }
+  const notationTechnique = collectNotationTechnique(segment, plan, curveAnchors, staffTopOf);
+  if (hasTechniqueSites(notationTechnique)) {
+    emitNotationTechnique({
+      sites: notationTechnique.sites,
+      byNoteId: notationTechnique.byNoteId,
+      rowEdges: techniqueRowEdges,
+      ink: plan.inkRatio,
+      primitives
+    });
+  }
 
   // Lyrics: syllables centred under their columns, hyphens joining
   // start/middle syllables to the next one on the same row.
@@ -2511,6 +2555,95 @@ function emitSlursAndTies(
       });
     }
   });
+}
+
+// ---------- Playing technique ----------
+
+/** Clearance between a notation staff (or the event's own highest notehead)
+ *  and the lane its technique marks sit in. */
+const TECHNIQUE_LANE_RISE_SP = 1.2;
+
+/** Per system row, the span a mark may be drawn across — the same row edges
+ *  `emitSlursAndTies` derives for splitting a curve at a system break. */
+function rowEdgesOf(plan: HorizontalPlan): Map<number, { left: number; right: number }> {
+  const edges = new Map<number, { left: number; right: number }>();
+  for (const m of plan.measures) {
+    if (m.hidden) continue;
+    const at = edges.get(m.row);
+    edges.set(m.row, {
+      left: Math.min(at?.left ?? Infinity, m.contentStartX),
+      right: Math.max(at?.right ?? -Infinity, m.x + m.width)
+    });
+  }
+  return edges;
+}
+
+/**
+ * The notation staff's technique sites, gathered from the curve anchors the
+ * event emission already recorded.
+ *
+ * Deliberately a re-walk rather than a fourth thing `emitEvent` collects: the
+ * anchors carry every coordinate a technique mark needs (column, row, one y
+ * per chord member), and the only two facts they lack — where the note's own
+ * duration ends, and which lane clears this event's ink — are arithmetic over
+ * the plan and the anchor itself.
+ *
+ * The walk mirrors `emitSlursAndTies` exactly, and must: an ordinal is
+ * consumed by every TIMED event including rests, which is what lets a rest
+ * break a palm-mute run.
+ */
+function collectNotationTechnique(
+  segment: JobSegment,
+  plan: HorizontalPlan,
+  anchors: CurveAnchors,
+  staffTopOf: (row: number, planStaff: number) => number
+): TechniqueCollector {
+  const collector = createTechniqueCollector();
+  segment.staves.forEach((spec, si) => {
+    for (let mi = 0; mi < plan.measures.length; mi++) {
+      const pm = plan.measures[mi];
+      if (!pm || pm.hidden || pm.multiRest) continue;
+      resolveStaffVoices(spec, mi).forEach((rv, vi) => {
+        const voiceKey = `${si}:${vi}`;
+        rv.seq.content.forEach((item, ei) => {
+          if (!isTimedEvent(item)) return;
+          const ordinal = nextOrdinal(collector, voiceKey);
+          const start = anchors.byKey.get(`${mi}:${si}:${vi}:${ei}`);
+          if (!start) return; // a rest: its ordinal is spent, its site is not
+          // The plan's own slots, not the anchors, so a following REST still
+          // ends the note's duration where it actually ends.
+          const endX = pm.staves[si]?.[vi]?.[ei + 1]?.x ?? pm.x + pm.width;
+          // The lane clears the STAFF, this event's highest notehead, and its
+          // stem tip where the stem points up — a "P.M." run through a row of
+          // stems is not a mark, it is a smudge.
+          const stemTop =
+            start.stemDir === 1 ? Math.min(...start.headYs) - STEM_LENGTH_SP : Infinity;
+          const laneY =
+            Math.min(staffTopOf(start.row, si), Math.min(...start.headYs), stemTop) -
+            TECHNIQUE_LANE_RISE_SP;
+          (item.notes ?? []).forEach((note, ni) => {
+            const y = start.headYs[ni];
+            if (y === undefined) return;
+            const technique = techniqueOf(note);
+            recordSite(collector, {
+              x: start.x,
+              endX,
+              y,
+              laneY,
+              row: start.row,
+              halfWidthSp: NOTEHEAD_WIDTH_SP / 2,
+              voiceKey,
+              ordinal,
+              stemDir: start.stemDir,
+              ...(note.id !== undefined ? { noteId: note.id } : {}),
+              ...(technique ? { technique } : {})
+            });
+          });
+        });
+      });
+    }
+  });
+  return collector;
 }
 
 // ---------- Volta brackets (endings) ----------

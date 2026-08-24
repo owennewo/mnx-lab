@@ -1,6 +1,6 @@
 {
   "title": "Vibrato and palm mute",
-  "description": "The two boolean techniques: a half-note D4 (string 2) with vibrato, then two palm-muted quarter-note chugs on the open low E. Both are flags rather than structured objects because they carry no parameters — vibrato depth and mute intensity are performance, not notation. Palm mute is arguably a span (like ottava) rather than a per-note flag; that open question is recorded in docs/mnx-extensions.md, and this scenario exercises the per-note form v5 actually has. The renderer does not draw either mark yet; the goldens pin the annotated notes rendering cleanly on both staves.",
+  "description": "The two boolean techniques: a half-note D4 (string 2) with vibrato, then two palm-muted quarter-note chugs on the open low E. Both are flags rather than structured objects because they carry no parameters — vibrato depth and mute intensity are performance, not notation. Palm mute is arguably a span (like ottava) rather than a per-note flag; that open question is recorded in docs/mnx-extensions.md, and this scenario exercises the per-note form v5 actually has. Vibrato draws as a wiggle across the note's own duration. Palm mute draws as the SPAN it reads as — \"P.M.\" once over a dashed line to the end of the run of consecutive muted events — which is the reading side of that same open question: the model says per note, the page says span.",
   "bars": 1,
   "tags": [
     "tab",

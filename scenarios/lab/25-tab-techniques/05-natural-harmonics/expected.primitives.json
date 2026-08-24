@@ -123,6 +123,22 @@
         "h": 4,
         "fill": "currentColor",
         "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "stringsHarmonic",
+        "x": 13.475,
+        "y": 6.8,
+        "anchor": "middle",
+        "className": "technique-harmonic"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "stringsHarmonic",
+        "x": 23.225,
+        "y": 5.8,
+        "anchor": "middle",
+        "className": "technique-harmonic"
       }
     ]
   },
@@ -218,9 +234,9 @@
       },
       {
         "kind": "rect",
-        "x": 11.725,
+        "x": 10.975,
         "y": 10.2029,
-        "w": 1.5,
+        "w": 3,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -228,7 +244,7 @@
       },
       {
         "kind": "text",
-        "text": "12",
+        "text": "<12>",
         "x": 12.475,
         "y": 10.7143,
         "font": "body",
@@ -241,9 +257,9 @@
       },
       {
         "kind": "rect",
-        "x": 21.475,
+        "x": 20.725,
         "y": 9.06,
-        "w": 1.5,
+        "w": 3,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
         "className": "fret-bg",
@@ -251,7 +267,7 @@
       },
       {
         "kind": "text",
-        "text": "12",
+        "text": "<12>",
         "x": 22.225,
         "y": 9.5714,
         "font": "body",

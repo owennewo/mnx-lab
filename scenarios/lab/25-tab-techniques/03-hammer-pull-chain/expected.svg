@@ -17,4 +17,10 @@
 <line x1="539.04" y1="112" x2="539.04" y2="165.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="585.6" y1="128" x2="585.6" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="590.4" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<path d="M 193.6 188.8 C 227.2 202.23999999999998, 272 202.23999999999998, 305.6 188.8 C 272 200.96, 227.2 200.96, 193.6 188.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerOn"></path>
+<text x="249.6" y="100.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-hammerOn-label">H</text>
+<path d="M 305.6 188.8 C 339.2 202.23999999999998, 384 202.23999999999998, 417.6 188.8 C 384 200.96, 339.2 200.96, 305.6 188.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-pullOff"></path>
+<text x="361.6" y="92.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-pullOff-label">P</text>
+<path d="M 417.6 188.8 C 451.2 202.23999999999998, 496 202.23999999999998, 529.6 188.8 C 496 200.96, 451.2 200.96, 417.6 188.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerOn"></path>
+<text x="473.6" y="100.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-hammerOn-label">H</text>
 </svg>

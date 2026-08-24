@@ -157,6 +157,48 @@
         "h": 4,
         "fill": "currentColor",
         "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "line",
+        "x1": 12.94,
+        "y1": 10.5,
+        "x2": 18.26,
+        "y2": 9.5,
+        "thickness": 0.12,
+        "className": "technique-slide technique-slide-shift"
+      },
+      {
+        "kind": "line",
+        "x1": 26.94,
+        "y1": 12,
+        "x2": 32.26,
+        "y2": 11,
+        "thickness": 0.12,
+        "className": "technique-slide technique-slide-legato"
+      },
+      {
+        "kind": "curve",
+        "points": [
+          {
+            "x": 26.94,
+            "y": 12.8
+          },
+          {
+            "x": 28.536,
+            "y": 13.6
+          },
+          {
+            "x": 30.664,
+            "y": 13.6
+          },
+          {
+            "x": 32.26,
+            "y": 12.8
+          }
+        ],
+        "thickness": 0.16,
+        "taper": true,
+        "className": "technique-slur technique-slide-legato-slur"
       }
     ]
   },
@@ -359,6 +401,48 @@
         "h": 5.7143,
         "fill": "currentColor",
         "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "line",
+        "x1": 11.725,
+        "y1": 7.5857,
+        "x2": 17.475,
+        "y2": 6.9857,
+        "thickness": 0.12,
+        "className": "technique-slide technique-slide-shift"
+      },
+      {
+        "kind": "line",
+        "x1": 25.725,
+        "y1": 8.7286,
+        "x2": 31.475,
+        "y2": 8.1286,
+        "thickness": 0.12,
+        "className": "technique-slide technique-slide-legato"
+      },
+      {
+        "kind": "curve",
+        "points": [
+          {
+            "x": 25.725,
+            "y": 4.6
+          },
+          {
+            "x": 27.45,
+            "y": 3.8
+          },
+          {
+            "x": 29.75,
+            "y": 3.8
+          },
+          {
+            "x": 31.475,
+            "y": 4.6
+          }
+        ],
+        "thickness": 0.16,
+        "taper": true,
+        "className": "technique-slur technique-slide-legato-slur"
       }
     ]
   }

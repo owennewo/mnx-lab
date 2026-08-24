@@ -13,4 +13,13 @@
 <line x1="362.16" y1="146.688" x2="362.16" y2="200" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="449.6" y1="128" x2="449.6" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="454.4" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<path d="M 229.04 108.8 C 264.24 108.8, 283.44 80, 293.04 80" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
+<text x="293.04" y="99.136" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
+<text x="293.04" y="56.864" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">full</text>
+<line x1="385.04" y1="108.8" x2="385.04" y2="99.136" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-prebend"></line>
+<text x="385.04" y="99.136" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
+<text x="385.04" y="56.864" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">full</text>
+<line x1="385.04" y1="80" x2="414.12" y2="80" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-hold"></line>
+<path d="M 414.12 80 C 430.1136 80, 438.8384 108.8, 443.2 108.8" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<text x="443.2" y="108.8" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 </svg>

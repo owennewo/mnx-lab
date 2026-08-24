@@ -1,6 +1,6 @@
 {
   "title": "Hammer-on / pull-off chain",
-  "description": "The canonical legato exercise on string 3: open G3 hammered to A3 (fret 2), pulled off back to G3, hammered on again. Each technique lives on the source note and names its destination by note id, so a chain is just consecutive annotations — no spanner object, no bracket group. This is the most id-reference-dense technique scenario, which is the point: targets that survive a document edit are what the model must guarantee. The renderer does not draw hammer-ons or pull-offs yet; the goldens pin the annotated notes rendering cleanly on both staves.",
+  "description": "The canonical legato exercise on string 3: open G3 hammered to A3 (fret 2), pulled off back to G3, hammered on again. Each technique lives on the source note and names its destination by note id, so a chain is just consecutive annotations — no spanner object, no bracket group. This is the most id-reference-dense technique scenario, which is the point: targets that survive a document edit are what the model must guarantee. Both draw as a slur with its letter — \"H\" or \"P\", since the curve alone cannot say which. On the notation staff the slur takes the side away from the stem, exactly as an ordinary slur does, while the letter stays above the staff; on the tab staff both live in the lane above, because two digits on one string would put a curve along the very line it was drawn to sit off.",
   "bars": 1,
   "tags": [
     "tab",

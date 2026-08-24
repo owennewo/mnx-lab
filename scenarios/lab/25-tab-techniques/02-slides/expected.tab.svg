@@ -19,4 +19,7 @@
 <text x="513.6" y="134.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n4">5</text>
 <line x1="571.2" y1="80" x2="571.2" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
 <rect x="576" y="80" width="6.4" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="187.6" y1="121.3712" x2="279.6" y2="111.7712" stroke="currentColor" stroke-width="1.92" class="technique-slide technique-slide-shift"></line>
+<line x1="411.6" y1="139.6576" x2="503.6" y2="130.0576" stroke="currentColor" stroke-width="1.92" class="technique-slide technique-slide-legato"></line>
+<path d="M 411.6 73.6 C 439.2 60.16, 476 60.16, 503.6 73.6 C 476 61.44, 439.2 61.44, 411.6 73.6 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-slide-legato-slur"></path>
 </svg>

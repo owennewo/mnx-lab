@@ -14,6 +14,11 @@ import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barli
 import { emitNavigationMarkers, emitScoreLabels, emitTempoMark } from './scoreText.ts';
 import { clampPadDensity, ensureTopMargin, tightenRows } from './verticalDensity.ts';
 import { validateDocument } from './validate.ts';
+import {
+  createTechniqueCollector,
+  emitTabTechnique,
+  hasTechniqueSites
+} from './technique.ts';
 import { tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
 
 /**
@@ -147,6 +152,12 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     validationByMeasure.set(v.measureIndex, list);
   }
 
+  // Playing technique is drawn AFTER the measure walk: a hammer-on names its
+  // destination by note id, and that note may be measures away — so the marks
+  // wait until every digit's geometry is known.
+  const technique = createTechniqueCollector();
+  const rowEdges = new Map<number, { left: number; right: number }>();
+
   // Where each row's primitives begin — rows are emitted in order, so a row's
   // primitives are exactly the slice from its first measure onward.
   const rowStart: number[] = [];
@@ -154,6 +165,11 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     const partMeasure = part.measures[i] ?? { sequences: [] };
     const m = plan.measures[i];
     if (rowStart[m.row] === undefined) rowStart[m.row] = primitives.length;
+    const edges = rowEdges.get(m.row);
+    rowEdges.set(m.row, {
+      left: Math.min(edges?.left ?? Infinity, m.contentStartX),
+      right: Math.max(edges?.right ?? -Infinity, m.x + m.width)
+    });
     const staffTop = MARGIN_SP + m.row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP;
     const staffBottom = staffTop + STAFF_HEIGHT_SP;
 
@@ -215,7 +231,10 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
         primitives,
         index,
         onIssue: message => measureIssues.push({ kind: 'render', message }),
-        positionContext
+        positionContext,
+        row: m.row,
+        measureEndX: m.x + m.width,
+        technique
       });
     }
 
@@ -266,6 +285,19 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       emitMeasureDiagnostics(m.x, staffBottom, measureIssues, primitives);
       for (const issue of measureIssues) diagnostics.push({ measureIndex: i, ...issue });
     }
+  }
+
+  // Before the frame is fitted: the marks are ink like any other, and both
+  // `ensureTopMargin` and `tightenRows` measure ink to decide how much room a
+  // row actually needs. Emitted after, a bend arrow would hang off the page.
+  if (hasTechniqueSites(technique)) {
+    emitTabTechnique({
+      sites: technique.sites,
+      byNoteId: technique.byNoteId,
+      rowEdges,
+      ink: plan.inkRatio,
+      primitives
+    });
   }
 
   const baseHeightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * ROW_HEIGHT_SP;

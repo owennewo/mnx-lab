@@ -8,6 +8,14 @@ import {
 import { Primitive, SpatialIndex } from '../primitives.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
 import { EventSlot } from './spacing.ts';
+import {
+  harmonicFretText,
+  nextOrdinal,
+  recordSite,
+  tabTechniqueLaneY,
+  techniqueOf,
+  type TechniqueCollector
+} from './technique.ts';
 
 /**
  * The tab STAFF: everything needed to draw six string lines, the TAB clef,
@@ -257,6 +265,14 @@ export interface EmitTabVoicesArgs {
    * resolve it first; a staff with no context draws no frets at all.
    */
   positionContext: TabPositionContext;
+  /** This measure's system row, and where its end barline sits: a technique
+   *  mark lasts the note's duration and may travel to a note on another row,
+   *  so both are geometry the post-pass cannot recover from a primitive. */
+  row: number;
+  measureEndX: number;
+  /** Where the technique post-pass's sites are gathered
+   *  (roadmap/complete/core-guitar-technique.md). One collector per tab staff. */
+  technique: TechniqueCollector;
 }
 
 /**
@@ -266,8 +282,10 @@ export interface EmitTabVoicesArgs {
 export function emitTabVoices(args: EmitTabVoicesArgs): void {
   const {
     voices, slots, staffTop, ink, measureIndex, positionContext,
-    activeNoteIds, selectedNoteIds, synthesizeKeys, primitives, index, onIssue
+    activeNoteIds, selectedNoteIds, synthesizeKeys, primitives, index, onIssue,
+    row, measureEndX, technique: techniqueSites
   } = args;
+  const laneY = tabTechniqueLaneY(staffTop);
 
   // A note written in two voices at one fingerboard position is ONE note.
   // Both copies land on the same digit, so drawing the second is redundant
@@ -280,6 +298,11 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       const slot = slots[voiceIndex]?.[eventIndex];
       if (!slot) return;
       const eventX = slot.x;
+      // The event's own duration, in x: where the next column starts, or the
+      // bar's end barline. A vibrato wiggle and a bend curve draw across it.
+      const eventEndX = slots[voiceIndex]?.[eventIndex + 1]?.x ?? measureEndX;
+      const voiceKey = `${voiceIndex}`;
+      const ordinal = isTimedEvent(event) ? nextOrdinal(techniqueSites, voiceKey) : -1;
 
       try {
       // Grace notes and tremolos aren't drawn on tab yet — the plan still
@@ -317,8 +340,33 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
           drawnFrets.add(fretSlot);
 
           const stringY = staffTop + (pos.str - 1) * TAB_STRING_SPACING_SP;
-          const fretStr = String(pos.fret);
+          // A harmonic is the one technique that changes the DIGIT rather than
+          // adding a mark beside it: `<12>` is how a tab reader is told the
+          // fret is a node to touch, not a note to stop. Drawn here, with the
+          // digit, so one mask still covers exactly one text.
+          const note = event.notes[k];
+          const technique = note ? techniqueOf(note) : undefined;
+          const fretStr = technique?.harmonic
+            ? harmonicFretText(String(pos.fret))
+            : String(pos.fret);
           const charWidthSp = FRET_FONT_SIZE_SP * 0.6 * Math.max(1, fretStr.length);
+
+          // The geometry the technique post-pass draws against — recorded even
+          // when this note carries none, because another note's hammer-on may
+          // name it as its destination.
+          recordSite(techniqueSites, {
+            x: eventX,
+            endX: eventEndX,
+            y: stringY,
+            laneY,
+            row,
+            halfWidthSp: charWidthSp / 2,
+            voiceKey,
+            ordinal,
+            fret: pos.fret,
+            ...(note?.id !== undefined ? { noteId: note.id } : {}),
+            ...(technique ? { technique } : {})
+          });
 
           // Background rect obscures the staff line under the digit. Its width
           // is drawn on the ink scale, so its left edge is placed on it too —

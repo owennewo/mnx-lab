@@ -1,10 +1,10 @@
-<svg width="1280" height="526.6096" viewBox="0 0 1280 526.6096" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="557.1888" viewBox="0 0 1280 557.1888" xmlns="http://www.w3.org/2000/svg">
 <line x1="32" y1="128" x2="552.4" y2="128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="144" x2="552.4" y2="144" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="160" x2="552.4" y2="160" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="176" x2="552.4" y2="176" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="192" x2="552.4" y2="192" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="128" x2="32" y2="398.6096" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
+<line x1="32" y1="128" x2="32" y2="429.1888" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
 <text x="49.6" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
 <text x="117.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="117.6" y="176" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
@@ -20,21 +20,53 @@
 <line x1="467.76" y1="240" x2="499.44" y2="240" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
 <text x="474.16" y="248" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
 <line x1="493.04" y1="192" x2="493.04" y2="245.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="32" y1="307.1824" x2="552.4" y2="307.1824" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="325.4672" x2="552.4" y2="325.4672" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="343.7536" x2="552.4" y2="343.7536" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="362.0384" x2="552.4" y2="362.0384" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="380.3248" x2="552.4" y2="380.3248" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="398.6096" x2="552.4" y2="398.6096" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<text x="49.6" y="352.896" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
-<text x="117.6" y="330.0384" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
-<text x="117.6" y="375.7536" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<rect x="209.6" y="317.2848" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
-<text x="215.6" y="325.4672" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e0.n0">3</text>
-<rect x="365.6" y="390.4272" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
-<text x="371.6" y="398.6096" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
-<rect x="477.6" y="390.4272" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
-<text x="483.6" y="398.6096" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e2.n0">0</text>
-<line x1="539.6" y1="128" x2="539.6" y2="398.6096" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="544.4" y="128" width="8" height="270.6096" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="32" y1="337.76" x2="552.4" y2="337.76" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="356.0464" x2="552.4" y2="356.0464" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="374.3312" x2="552.4" y2="374.3312" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="392.6176" x2="552.4" y2="392.6176" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="410.9024" x2="552.4" y2="410.9024" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="429.1888" x2="552.4" y2="429.1888" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
+<text x="49.6" y="383.4736" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
+<text x="117.6" y="360.6176" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
+<text x="117.6" y="406.3312" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
+<rect x="209.6" y="347.8624" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
+<text x="215.6" y="356.0464" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e0.n0">3</text>
+<rect x="365.6" y="421.0064" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
+<text x="371.6" y="429.1888" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
+<rect x="477.6" y="421.0064" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
+<text x="483.6" y="429.1888" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e2.n0">0</text>
+<line x1="539.6" y1="128" x2="539.6" y2="429.1888" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="544.4" y="128" width="8" height="301.1888" fill="currentColor" class="barline barline-final-thick"></rect>
+<text x="225.6" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="235.328" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="245.056" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="254.784" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="264.512" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="274.24" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="283.968" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="293.696" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="303.424" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="313.152" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="322.88" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="332.608" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="342.336" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="352.064" y="331.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="365.6" y="314.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-palm-mute">P.M.</text>
+<line x1="404.16" y1="310.48" x2="548.4" y2="310.48" stroke="currentColor" stroke-width="1.92" stroke-dasharray="4,4" class="technique-palm-mute-line"></line>
+<text x="229.04" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="238.768" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="248.496" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="258.224" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="267.952" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="277.68" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="287.408" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="297.136" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="306.864" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="316.592" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="326.32" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="336.048" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="345.776" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="355.504" y="108.8" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-vibrato"></text>
+<text x="362.16" y="92.24" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="technique-palm-mute">P.M.</text>
+<line x1="400.72" y1="87.92" x2="548.4" y2="87.92" stroke="currentColor" stroke-width="1.92" stroke-dasharray="4,4" class="technique-palm-mute-line"></line>
 </svg>
