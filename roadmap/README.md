@@ -67,14 +67,6 @@ proposals that name their campaign.
   core-ink-priced-columns froze packing to keep separated. Four options costed, from "do
   nothing, document it" to "always ink-measured", with coupling-in-the-control carrying
   the best precedent.
-- **[core-document-rung.md](proposed/core-document-rung.md)** — the selection ladder's top
-  rung is called `score` and means **the whole document**; MNX means a **named presentation**
-  by the word, of which a document holds 0..N (102 of 108 scenarios have none). Four readings
-  of one word in the tree today. Renames the rung to `document`, adds **no** score rung — every
-  rung is a widening range over the timeline and a presentation is a projection over parts —
-  and sends "which score am I reading" to viewer state beside `?view=`. Must land **before**
-  [core-layout-authoring.md](proposed/core-layout-authoring.md), whose `no score 1` grammar
-  puts the other meaning one keystroke away. 93 sites, 21 files, and **zero traces** — checked.
 - **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
   `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
   (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
@@ -199,6 +191,17 @@ proposals that name their campaign.
   doc), and the never-reviewed corpus-closure technique set (8).
 
 ### complete/
+- **[core-document-rung.md](complete/core-document-rung.md)** — **done 2026-08-24.** The
+  ladder's top rung was called `score` and meant **the whole document**; MNX means a **named
+  presentation** by the word (0..N per document; 102 of 108 scenarios have none). Renamed the
+  rung to `document`, added **no** score rung — every rung is a widening range over the
+  timeline, a presentation is a projection over parts — and settled the open question from the
+  code: the rung is a singleton member with no coordinates, so a view has nothing to bound.
+  **Two silent breakages tsc could not see**: `CommandScope` already had a `'document'` scope
+  ABOVE the rung, which the union absorbed (undo/redo leaking onto a selection), now `session`;
+  and the clipboard envelope carries the rung name, so the format moved to v2. Goldens
+  byte-identical. Unblocks the vocabulary
+  [core-layout-authoring.md](proposed/core-layout-authoring.md) needs.
 - **[core-entry-surface.md](complete/core-entry-surface.md)** — **typing anywhere the
   cursor can already go**, built 2026-08-23; the last piece of the element-ops campaign,
   graduated out of it on 2026-08-15. The cursor addressed part → staff → voice in full
