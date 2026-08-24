@@ -156,18 +156,14 @@ export class SelectionTray extends LitElement {
   /** The keyboard tile cursor — an index into the focusable tiles. */
   @state() private cursorIndex = 0;
   /**
-   * Has the cursor been MOVED, as opposed to merely defaulting to the first
-   * tile on open? Only then does the cursor caption itself.
+   * Does the query line hold the keys?
    *
-   * Without this the tooltip is pinned open over the meta line for as long as
-   * the tray is open — the cursor starts somewhere, so something is always
-   * "focused" — which is not what a tooltip is. The ring already marks where
-   * Enter would land; the name is what you ask for by navigating.
+   * It decides what the top band SAYS, which is the band's whole trick: while
+   * you are typing it is the query, and the moment the grid takes the keys it
+   * becomes the readout for the tile under the cursor. One row, two jobs,
+   * never both at once — and never a second band, which is what the old
+   * standing readout cost.
    */
-  @state() private cursorMoved = false;
-
-  /** Does the query line hold the keys? Only the hint's wording rides on it —
-   *  the armed tile is drawn armed either way. */
   @state() private searchFocused = true;
 
   static styles = css`
@@ -521,21 +517,21 @@ export class SelectionTray extends LitElement {
     }
 
     /*
-     * E · the tile's name, as a tooltip rather than a standing readout band.
+     * E · the tile's name — a tooltip for the POINTER, the query line for the
+     * keyboard.
      *
-     * The old tray reserved a whole row under the grid to print the focused
-     * tile's label and shortcut. The shortcut is already stamped on every
-     * tile, so that band was spending a band on the label alone — and the
-     * spec's tray has no room for it. A tooltip says the same thing at the
-     * point of interest and costs nothing when nobody is asking.
+     * The visuals doc killed a standing readout band under the grid on the
+     * grounds that it spent a whole band on a label. That argument still
+     * holds, and this does not reopen it: the top band already exists for the
+     * query, and a row you are not typing into is a row with nothing to say.
+     * So the keyboard's caption moved INTO it (the readout rule below) and costs
+     * no height at all, while the pointer keeps its caption at the point of
+     * interest, where the eyes already are.
      *
-     * It answers the KEYBOARD cursor as well as the pointer, which a native
-     * title attribute cannot: arrowing the grid must name what is under the
-     * cursor, or the keyboard path loses information the pointer path keeps.
-     * When both are live the pointer wins, so the grid never captions two
-     * tiles at once — and the cursor only captions itself once it has been
-     * MOVED (see cursorMoved), or the tooltip would stand open over the meta
-     * line for the whole life of the tray.
+     * That also ends the arbitration this rule used to need. The keyboard no
+     * longer captions a tile in the grid, so the pointer can never be
+     * captioning a second one — the tooltip appears on hover and at no other
+     * time.
      */
     .tile .tip {
       position: absolute;
@@ -555,13 +551,8 @@ export class SelectionTray extends LitElement {
       pointer-events: none;
     }
 
-    .tile:hover .tip,
-    .tile.cursor-named .tip {
+    .tile:hover .tip {
       display: block;
-    }
-
-    .grid:hover .tile.cursor-named:not(:hover) .tip {
-      display: none;
     }
 
     /*
@@ -582,6 +573,37 @@ export class SelectionTray extends LitElement {
       padding: 7px 9px;
       border-bottom: 1px solid var(--line);
       background: var(--surface);
+    }
+
+    /*
+     * The same row, in tile mode. Identical padding and line box to the input
+     * it replaces, so the swap moves nothing under the reader's eyes.
+     *
+     * The live query stays visible as a mono prefix whenever there is one:
+     * the readout is only reached by ↓, which is reached from typing, and a
+     * grid showing two of eighteen tiles with no visible reason why would be
+     * the tray lying about what it is showing.
+     */
+    .search .readout {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      min-width: 0;
+      font: 500 11px/1.4 var(--sans);
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .search .readout .query {
+      flex: none;
+      font: 400 11px/1.4 var(--mono);
+      color: var(--ink-3);
+    }
+
+    .search .readout .none {
+      color: var(--ink-3);
     }
 
     /* Names the one gesture this arrangement adds, and swaps to name the way
@@ -658,7 +680,6 @@ export class SelectionTray extends LitElement {
     // question.
     if (changed.has('searchText')) {
       this.cursorIndex = 0;
-      this.cursorMoved = false;
     } else if (changed.has('rungs') || changed.has('bands')) {
       this.cursorIndex = Math.min(this.cursorIndex, Math.max(0, this.entries().length - 1));
     }
@@ -810,7 +831,6 @@ export class SelectionTray extends LitElement {
         if (n === 0) return;
         const back = event.code === 'ArrowLeft' || (event.code === 'Tab' && event.shiftKey);
         this.cursorIndex = (this.cursorIndex + (back ? n - 1 : 1)) % n;
-        this.cursorMoved = true;
         return;
       }
       case 'Enter':
@@ -842,12 +862,7 @@ export class SelectionTray extends LitElement {
     // refocusing mid-keydown does not retarget the insertion.
     if (!inSearch && event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
       consume();
-      const input = this.renderRoot.querySelector<HTMLInputElement>('.search input');
-      if (input) {
-        input.focus();
-        input.value += event.key;
-        this.emit('tray-search', { text: input.value });
-      }
+      void this.focusSearch(event.key);
     }
   };
 
@@ -885,10 +900,7 @@ export class SelectionTray extends LitElement {
       // The foot of the grid is a wall, but its top edge is a door: ↑ from
       // the first row is the mirror of the ↓ that arrived, and it hands the
       // keys back with the query and the caret intact.
-      if (dir < 0) {
-        const input = this.renderRoot.querySelector<HTMLInputElement>('.search input');
-        if (input) input.focus();
-      }
+      if (dir < 0) void this.focusSearch();
       return;
     }
     const row = dir > 0 ? Math.min(...tops) : Math.max(...tops);
@@ -906,7 +918,6 @@ export class SelectionTray extends LitElement {
     });
     if (best < 0) return;
     this.cursorIndex = best;
-    this.cursorMoved = true;
   }
 
   /**
@@ -977,16 +988,44 @@ export class SelectionTray extends LitElement {
     </svg>`;
   }
 
-  /** The tile's caption. The shortcut is already stamped on the tile, so the
-   *  tooltip carries the name — and says so when there is no key to stamp. */
-  private tipText(tile: TrayTile): string {
+  /**
+   * Hand the keys back to the query line.
+   *
+   * Two-step on purpose: in tile mode the input is not in the DOM at all —
+   * the row is rendering the readout instead — so the flag has to flip and
+   * the render has to land BEFORE there is anything to focus. Anything that
+   * types its way back (a printable character caught by the grid) appends
+   * through here for the same reason.
+   */
+  private async focusSearch(append?: string) {
+    this.searchFocused = true;
+    await this.updateComplete;
+    const input = this.renderRoot.querySelector<HTMLInputElement>('.search input');
+    if (!input) return;
+    input.focus();
+    if (append !== undefined) {
+      input.value += append;
+      this.emit('tray-search', { text: input.value });
+    }
+  }
+
+  /**
+   * The tile's caption, for the tooltip and for the query line's readout.
+   *
+   * Typed to the two fields it reads rather than to `TrayTile`, because the
+   * readout captions an ENTRY — the cursor indexes the focusable tiles, not
+   * the drawn ones — and widening the parameter is cheaper than carrying a
+   * tile through the cursor just to name it.
+   */
+  private tipText(tile: { label: string; shortcut: string }): string {
     return tile.shortcut ? tile.label : `${tile.label} · unbound`;
   }
 
   render() {
     const previewing = this.previewing;
     const entries = this.entries();
-    const cursorId = entries[this.cursorIndex]?.id;
+    const cursorEntry = entries[this.cursorIndex];
+    const cursorId = cursorEntry?.id;
     return html`
       <div class="shaft" style="display: none"></div>
       <div class="tray">
@@ -1022,13 +1061,22 @@ export class SelectionTray extends LitElement {
             : nothing}
           <div class="search">
             <span class="prompt">&gt;</span>
-            <input
-              .value=${this.searchText}
-              placeholder="search this scope · / for everything"
-              @input=${(e: Event) => this.onSearchInput(e)}
-              @focus=${() => (this.searchFocused = true)}
-              @blur=${() => (this.searchFocused = false)}
-            />
+            ${this.searchFocused
+              ? html`<input
+                  .value=${this.searchText}
+                  placeholder="search this scope · / for everything"
+                  @input=${(e: Event) => this.onSearchInput(e)}
+                  @focus=${() => (this.searchFocused = true)}
+                  @blur=${() => (this.searchFocused = false)}
+                />`
+              : html`<span class="readout">
+                  ${this.searchText
+                    ? html`<span class="query">${this.searchText} ·</span>`
+                    : nothing}
+                  ${cursorEntry
+                    ? html`<span>${this.tipText(cursorEntry)}</span>`
+                    : html`<span class="none">nothing matches</span>`}
+                </span>`}
             <span class="hint">${this.searchFocused ? '↓ to the tiles' : '↑ to search'}</span>
           </div>
           <div class="grid">
@@ -1044,8 +1092,9 @@ export class SelectionTray extends LitElement {
                     ${band.tiles.map(
                       tile => html`
                         <button
-                          class="tile ${'arc' in tile.glyph ? 'arc-tile' : ''} ${cursorId === tile.id
-                            ? `cursor${this.cursorMoved ? ' cursor-named' : ''}`
+                          class="tile ${'arc' in tile.glyph ? 'arc-tile' : ''} ${cursorId ===
+                          tile.id
+                            ? 'cursor'
                             : ''}"
                           data-state=${tile.state}
                           data-triage=${tile.untriaged ? 'untriaged' : nothing}

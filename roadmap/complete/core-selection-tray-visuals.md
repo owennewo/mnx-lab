@@ -128,6 +128,30 @@ ink border, **zero border-radius**, one drop shadow.
 - **F · Search line.** Filters this scope's commands; the hint names Ctrl+Shift+K as
   the way to widen to every global command.
 
+### Revision 2026-08-24 — the panel reorders, and E comes back as one row
+
+Two of the six regions above no longer read as this doc drew them, from the note-rung
+grouping review; recorded here because this is where a reader will look for them.
+
+**F moved above D**, so the panel runs meta → query → tiles. At the foot of the panel a
+`↓` from the query line pointed away from the only thing it could reach; on top, the two
+halves are in reading order. The tray now opens with the caret in the query line **and**
+the first tile armed, so letters filter and Enter fires whatever the filter left; a new
+query re-arms on the first survivor.
+
+**E is back — but as F, not as a band of its own.** This doc's ruling was that a standing
+readout spends a whole row on a label, and that stands: the row it now uses already
+exists for the query, and a row you are not typing into has nothing else to say. So the
+KEYBOARD's caption lives there (with the live query kept beside it, or the filter would
+be invisible), while the POINTER keeps the tooltip at the tile, where the eyes already
+are. Nothing captions two tiles at once, which is what the old hover/cursor arbitration
+was for.
+
+**D grew captions.** The note rung's tiles are cut into named bands — spelling, joins,
+articulation, fingerboard, text — from the ordered table in `COMMAND_GROUPS`. Bands are
+cut from the filtered list, so a caption is only drawn over tiles that survived the
+query. Every other rung still draws one bare band, exactly as before.
+
 ## Tile states
 
 Four reads, from the spec's handoff notes, all present in the demo data so the
