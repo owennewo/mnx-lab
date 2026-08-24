@@ -150,12 +150,15 @@ export interface MnxEventLyrics {
   lines?: Record<string, MnxEventLyricLine>;
 }
 
+/** A written note value: the symbol, not the performed time. */
+export interface MnxNoteValue {
+  base: string; // e.g. 'whole', 'half', 'quarter', 'eighth', '16th', '32nd'
+  dots?: number;
+}
+
 export interface MnxEvent {
   id?: string;
-  duration: {
-    base: string; // e.g. 'whole', 'half', 'quarter', 'eighth', '16th', '32nd'
-    dots?: number;
-  };
+  duration: MnxNoteValue;
   lyrics?: MnxEventLyrics;
   notes?: MnxNote[];
   rest?: MnxRest;
@@ -163,8 +166,45 @@ export interface MnxEvent {
   staff?: number;
 }
 
-export interface MnxSequence {
+/** MNX `tuplet` container: `content` performed in the time of `outer`. */
+export interface MnxTuplet {
+  type: 'tuplet';
+  id?: string;
   content: MnxEvent[];
+  inner: { duration: MnxNoteValue; multiple: number };
+  outer: { duration: MnxNoteValue; multiple: number };
+  bracket?: 'yes' | 'no' | 'auto';
+  showNumber?: 'noNumber' | 'inner' | 'both';
+}
+
+/** MNX `grace` container: un-timed events stealing time around a neighbour. */
+export interface MnxGrace {
+  type: 'grace';
+  id?: string;
+  content: MnxEvent[];
+  graceType?: 'makeTime' | 'stealFollowing' | 'stealPrevious';
+  slash?: boolean;
+}
+
+export type MnxSequenceItem = MnxEvent | MnxGrace | MnxTuplet;
+
+export function isGrace(item: MnxSequenceItem): item is MnxGrace {
+  return (item as MnxGrace).type === 'grace';
+}
+
+export function isTuplet(item: MnxSequenceItem): item is MnxTuplet {
+  return (item as MnxTuplet).type === 'tuplet';
+}
+
+/** True for items that occupy metric time and carry a duration. */
+export function isTimedEvent(item: MnxSequenceItem): item is MnxEvent {
+  const type = (item as MnxGrace | MnxTuplet).type;
+  if (type === 'grace' || type === 'tuplet') return false;
+  return (item as MnxEvent).duration !== undefined;
+}
+
+export interface MnxSequence {
+  content: MnxSequenceItem[];
   voice?: string;
   staff?: number;
 }

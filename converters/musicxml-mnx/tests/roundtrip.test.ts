@@ -3,7 +3,8 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { importMusicXML, exportMusicXML } from '../src/index.js';
 import { DOMParser } from '@xmldom/xmldom';
-import { MnxStructure, MnxPitch } from '../src/common/types.js';
+import { MnxStructure, MnxPitch, isGrace, isTuplet } from '../src/common/types.js';
+import { walkSequenceEvents } from '../src/common/utils.js';
 
 /**
  * Structural round-trip guards.
@@ -105,7 +106,7 @@ function tabPitchMismatches(mnx: MnxStructure): number {
     const open = new Map(tuning.map(t => [t.string, t.pitch]));
     for (const measure of part.measures) {
       for (const seq of measure.sequences ?? []) {
-        for (const event of seq.content ?? []) {
+        for (const { event } of walkSequenceEvents(seq.content ?? [], 8)) {
           for (const note of event.notes ?? []) {
             const x = note._x?.mnxLab;
             const pos = x?.string !== undefined && x?.fret !== undefined ? { string: x.string, fret: x.fret } : undefined;
@@ -125,13 +126,15 @@ function everyPitch(mnx: MnxStructure): MnxPitch[] {
   for (const part of mnx.parts)
     for (const measure of part.measures)
       for (const seq of measure.sequences ?? [])
-        for (const event of seq.content ?? []) for (const note of event.notes ?? []) out.push(note.pitch);
+        for (const { event } of walkSequenceEvents(seq.content ?? [], 8))
+          for (const note of event.notes ?? []) out.push(note.pitch);
   return out;
 }
 
 describe.each([
   ['House-of-the-Rising-Sun.xml'],
-  ['Sun-did-glide.xml']
+  ['Sun-did-glide.xml'],
+  ['Triplets-and-graces.xml']
 ])('MusicXML -> MNX -> MusicXML round trip: %s', file => {
   async function roundTrip() {
     const original = await fs.readFile(path.join(SCORES, file), 'utf-8');
@@ -589,3 +592,97 @@ describe.each(['House-of-the-Rising-Sun', 'Sun-did-glide', 'Vestapol'])(
     });
   }
 );
+
+/**
+ * Tuplets and grace notes, both directions.
+ *
+ * The `<note>` rows the round trip above compares would pass on a converter
+ * that dropped a `<time-modification>` and kept the pitches — which is what
+ * "lossless" used to mean here, because none of the older fixtures contained
+ * one. These assert the two constructs directly: the arithmetic on the way out
+ * (a triplet's `<duration>` is two thirds of its written value, and no bar may
+ * overflow because of it) and the containers on the way back in.
+ */
+describe('tuplets and grace notes across MusicXML', () => {
+  async function mnxFixture(): Promise<MnxStructure> {
+    return JSON.parse(
+      await fs.readFile(path.join(SCORES, 'Triplets-and-graces.mnx.json'), 'utf-8')
+    );
+  }
+
+  const voiceOf = (mnx: MnxStructure, measureIndex: number) =>
+    mnx.parts[0].measures[measureIndex].sequences?.[0]?.content ?? [];
+
+  it('raises <divisions> so a triplet duration is a whole number', async () => {
+    const exported = exportMusicXML(await mnxFixture());
+    const doc = new DOMParser().parseFromString(exported, 'text/xml');
+    // The default 8 cannot state a third of anything; 24 can.
+    expect(Number(els(doc as any, 'divisions')[0].textContent) % 3).toBe(0);
+  });
+
+  it('writes <time-modification> on every member and one bracket per group', async () => {
+    const exported = exportMusicXML(await mnxFixture());
+    const doc = new DOMParser().parseFromString(exported, 'text/xml');
+    const parts = els(doc as any, 'part');
+    // Measure 2 (index 1) holds two eighth triplets; the notation staff only.
+    const measure = els(parts[0], 'measure')[1];
+    const flagged = els(measure, 'note').filter(n => els(n, 'time-modification').length > 0);
+    expect(flagged.length).toBe(6);
+    for (const note of flagged) {
+      const mod = els(note, 'time-modification')[0];
+      expect(text(mod, 'actual-notes')).toBe('3');
+      expect(text(mod, 'normal-notes')).toBe('2');
+    }
+    const brackets = els(measure, 'tuplet');
+    expect(brackets.map(t => t.getAttribute('type'))).toEqual([
+      'start', 'stop', 'start', 'stop'
+    ]);
+  });
+
+  it('writes a grace note with no <duration> at all', async () => {
+    const exported = exportMusicXML(await mnxFixture());
+    const doc = new DOMParser().parseFromString(exported, 'text/xml');
+    const graced = els(doc as any, 'note').filter(n => els(n, 'grace').length > 0);
+    expect(graced.length).toBeGreaterThan(0);
+    for (const note of graced) {
+      expect(els(note, 'duration').length).toBe(0);
+      expect(els(note, 'grace')[0].getAttribute('slash')).toBe('yes');
+    }
+  });
+
+  it('keeps every measure full despite the tuplets', async () => {
+    const exported = exportMusicXML(await mnxFixture());
+    expect(malformedMeasures(exported)).toEqual([]);
+  });
+
+  it('reads the containers back: two triplets, a quarter triplet, one grace', async () => {
+    const exported = exportMusicXML(await mnxFixture());
+    const back = importMusicXML(exported, { mergeNotationAndTab: true });
+
+    const eighths = voiceOf(back, 1).filter(isTuplet);
+    expect(eighths.length).toBe(2);
+    expect(eighths.every(t => t.content.length === 3)).toBe(true);
+    expect(eighths[0].inner).toEqual({ duration: { base: 'eighth' }, multiple: 3 });
+    expect(eighths[0].outer).toEqual({ duration: { base: 'eighth' }, multiple: 2 });
+
+    const third = voiceOf(back, 2);
+    expect(isGrace(third[0])).toBe(true);
+    const quarters = third.filter(isTuplet);
+    expect(quarters.length).toBe(1);
+    expect(quarters[0].inner).toEqual({ duration: { base: 'quarter' }, multiple: 3 });
+  });
+
+  it('infers group boundaries when the source writes no <tuplet> bracket', async () => {
+    // The other convention in the wild: `<time-modification>` and nothing else.
+    // Six flagged eighths are TWO triplets, and a converter that trusted only
+    // the brackets would read them as one six-note group at two thirds speed.
+    const exported = exportMusicXML(await mnxFixture());
+    const stripped = exported.replace(/<tuplet\b[^>]*\/>/g, '');
+    expect(stripped).not.toContain('<tuplet');
+
+    const back = importMusicXML(stripped, { mergeNotationAndTab: true });
+    const tuplets = voiceOf(back, 1).filter(isTuplet);
+    expect(tuplets.length).toBe(2);
+    expect(tuplets.every(t => t.content.length === 3)).toBe(true);
+  });
+});

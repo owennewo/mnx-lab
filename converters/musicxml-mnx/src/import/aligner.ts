@@ -2,7 +2,10 @@ import {
   MnxPart,
   MnxPartMeasure,
   MnxSequence,
+  MnxSequenceItem,
   MnxEvent,
+  MnxGrace,
+  MnxTuplet,
   MnxNote,
   MnxPitch,
   MnxGlobalMeasure,
@@ -20,7 +23,13 @@ import {
   stepToText,
   XML_KIND_TO_QUALITY
 } from '../common/harmony.js';
-import { calculateMnxDuration, createPitchKey, reduceFraction } from '../common/utils.js';
+import {
+  calculateMnxDuration,
+  createPitchKey,
+  noteValueInQuarters,
+  reduceFraction,
+  walkSequenceEvents
+} from '../common/utils.js';
 import { findDirectChild, findDirectChildren, getChildText, getChildInt } from './musicxml.js';
 
 /** `getChildFloat` restricted to a direct child (the shared helper searches deep). */
@@ -92,6 +101,171 @@ function spellPitch(midi: number, alterHint: number | null): MnxPitch {
   return { step: 'C', octave: Math.floor(midi / 12) - 1 };
 }
 
+// ---------- Grace and tuplet marks (MusicXML flags every note) ----------
+
+/** A `<grace>` note's shape, shared by every note of one run. */
+interface GraceMark {
+  slash: boolean;
+  graceType?: MnxGrace['graceType'];
+}
+
+/** A `<time-modification>` plus whichever half of the `<tuplet>` bracket
+ *  this note carries. */
+interface TupletMark {
+  actualNotes: number;
+  normalNotes: number;
+  normalType: string;
+  start: boolean;
+  stop: boolean;
+}
+
+/** One note placed on a voice's timeline, with the container marks it carried. */
+interface PendingEvent {
+  onset: number;
+  /** Divisions this event consumes — 0 for a grace, the PERFORMED value in a
+   *  tuplet. Kept rather than recomputed from the MNX duration, which states
+   *  the WRITTEN value and would leave the cursor a third short in a triplet. */
+  span: number;
+  event: MnxEvent;
+  grace?: GraceMark;
+  tuplet?: TupletMark;
+}
+
+/**
+ * `<grace>` → the shape of the MNX container this note belongs in.
+ *
+ * MusicXML says the steal direction three ways and this accepts all of them:
+ * the explicit `steal-time-previous` / `steal-time-following` / `make-time`
+ * attributes when an exporter writes them, and otherwise the near-universal
+ * convention that a SLASHED grace is the acciaccatura crushed in before the
+ * beat while an unslashed one is the appoggiatura that delays what follows.
+ * `slash` defaults to yes in MusicXML, so a bare `<grace/>` reads as the
+ * acciaccatura — which is what it draws as.
+ */
+function parseGrace(noteEl: Element): GraceMark | undefined {
+  const graceEl = findDirectChild(noteEl, 'grace');
+  if (!graceEl) return undefined;
+  // `hasAttribute`, not `getAttribute() !== null`: xmldom answers `''` for an
+  // attribute that is not there, so the null check reads every grace note as
+  // carrying every attribute at once.
+  const slash = graceEl.getAttribute('slash') !== 'no';
+  const graceType = graceEl.hasAttribute('make-time')
+    ? 'makeTime'
+    : graceEl.hasAttribute('steal-time-following')
+      ? 'stealFollowing'
+      : graceEl.hasAttribute('steal-time-previous')
+        ? 'stealPrevious'
+        : slash
+          ? 'stealPrevious'
+          : 'stealFollowing';
+  return { slash, graceType };
+}
+
+/**
+ * `<time-modification>` (+ the `<tuplet>` bracket in `<notations>`) → this
+ * note's tuplet membership.
+ *
+ * `<time-modification>` is the load-bearing half: it is what makes the
+ * arithmetic work, and an exporter that writes no bracket at all still writes
+ * it. `<tuplet>` only says where a group's bracket opens and closes, so its
+ * absence is normal rather than an error — the caller infers the boundaries
+ * from the ratio and the accumulated written time instead.
+ */
+function parseTupletMarks(noteEl: Element): TupletMark | undefined {
+  const modEl = findDirectChild(noteEl, 'time-modification');
+  if (!modEl) return undefined;
+  const actualNotes = getChildInt(modEl, 'actual-notes');
+  const normalNotes = getChildInt(modEl, 'normal-notes');
+  if (!actualNotes || !normalNotes || actualNotes <= 0 || normalNotes <= 0) return undefined;
+
+  // `<normal-type>` is optional; without it the normal notes are the same value
+  // as the written `<type>`, which is what "3 eighths in the time of 2" means
+  // when nobody says otherwise.
+  const normalType =
+    getChildText(modEl, 'normal-type') || getChildText(noteEl, 'type') || 'quarter';
+
+  let start = false;
+  let stop = false;
+  const notationsEl = findDirectChild(noteEl, 'notations');
+  for (const tupletEl of notationsEl ? findDirectChildren(notationsEl, 'tuplet') : []) {
+    const type = tupletEl.getAttribute('type');
+    if (type === 'start') start = true;
+    else if (type === 'stop') stop = true;
+  }
+
+  return { actualNotes, normalNotes, normalType, start, stop };
+}
+
+/** The undotted values a tuplet's two sides may be stated in, longest first. */
+const TUPLET_UNIT_BASES = [
+  'whole', 'half', 'quarter', 'eighth', '16th', '32nd', '64th', '128th'
+];
+
+/** Whole-note fractions as exact integers — every note value is dyadic. */
+const TUPLET_TICKS_PER_QUARTER = 1024;
+
+/**
+ * MusicXML's per-note ratio → MNX's once-per-group `inner`/`outer` pair.
+ *
+ * MNX states each side as a note value × a count, and the count has to be a
+ * whole number — so both sides are measured against ONE unit, and the longest
+ * note value that divides them both is the one an engraver would name.
+ * `<normal-type>` is usually that unit already; it stops being it when the
+ * group is unequal (a quarter and an eighth inside a triplet), which is why
+ * this searches rather than assuming.
+ *
+ * The INNER total comes from the events themselves, not from `actual-notes`:
+ * the ratio says how time is compressed, the notes say how much is written,
+ * and an unequal group is exactly where those two stop agreeing.
+ */
+function tupletSides(
+  events: readonly MnxEvent[],
+  mark: TupletMark
+): { inner: MnxTuplet['inner']; outer: MnxTuplet['outer'] } | null {
+  const innerTicks = events.reduce(
+    (sum, event) =>
+      sum +
+      Math.round(
+        noteValueInQuarters(event.duration.base, event.duration.dots || 0) *
+          TUPLET_TICKS_PER_QUARTER
+      ),
+    0
+  );
+  if (innerTicks <= 0) return null;
+  if ((innerTicks * mark.normalNotes) % mark.actualNotes !== 0) return null;
+  const outerTicks = (innerTicks * mark.normalNotes) / mark.actualNotes;
+
+  for (const base of TUPLET_UNIT_BASES) {
+    const unit = Math.round(noteValueInQuarters(base) * TUPLET_TICKS_PER_QUARTER);
+    if (unit <= 0 || innerTicks % unit !== 0 || outerTicks % unit !== 0) continue;
+    return {
+      inner: { duration: { base }, multiple: innerTicks / unit },
+      outer: { duration: { base }, multiple: outerTicks / unit }
+    };
+  }
+  return null;
+}
+
+/**
+ * Whether a buffered run has accumulated the written time its ratio calls for.
+ *
+ * The fallback boundary for sources that write no `<tuplet>` bracket: six
+ * eighths flagged 3:2 are two triplets, and without this they would collapse
+ * into one six-note tuplet that plays at two thirds of the right length. A run
+ * that DOES carry brackets has already been closed by its `stop` before this
+ * is consulted.
+ */
+function tupletRunIsFull(run: readonly PendingEvent[]): boolean {
+  const mark = run[0]?.tuplet;
+  if (!mark) return false;
+  const written = run.reduce(
+    (sum, item) =>
+      sum + noteValueInQuarters(item.event.duration.base, item.event.duration.dots || 0),
+    0
+  );
+  return written >= mark.actualNotes * noteValueInQuarters(mark.normalType);
+}
+
 export class Aligner {
   /**
    * Notes whose `<pitch>` was unusable in the source and could not be recovered
@@ -102,6 +276,15 @@ export class Aligner {
 
   /** Counts surfaced to the caller via `ImportOptions.onWarning`. */
   public readonly stats = { malformedPitches: 0, recoveredPitches: 0 };
+
+  /**
+   * Things in the source this converter could not carry across whole, in the
+   * caller's words rather than a count. `stats` answers "how many notes were
+   * broken"; this answers "what did you decide to do about a construct MNX
+   * says differently" — a tuplet whose ratio does not reduce, say — which is
+   * one line, not a tally.
+   */
+  public readonly warnings: string[] = [];
 
   /** Raw `<ending>` marks for the part being parsed; collapsed by resolveEndings. */
   private endingMarks: { measureIndex: number; type: string; numbers: number[] }[] = [];
@@ -285,7 +468,9 @@ export class Aligner {
         for (const sequence of measure.sequences ?? []) {
           const voice = sequence.voice ?? 'v1';
           const list = byVoice.get(voice) ?? [];
-          for (const [eventIndex, event] of (sequence.content ?? []).entries()) {
+          let eventIndex = -1;
+          for (const { event } of walkSequenceEvents(sequence.content ?? [], 8)) {
+            eventIndex++;
             for (const [noteIndex, note] of (event.notes ?? []).entries()) {
               if (!note.id) {
                 note.id = `n-${measureIndex + 1}-${voice}-${eventIndex}-${noteIndex}`;
@@ -822,7 +1007,7 @@ export class Aligner {
     let currentTime = 0;
     
     // voiceName -> list of { onset: number, event: MnxEvent }
-    const voiceEvents = new Map<string, Array<{ onset: number; event: MnxEvent }>>();
+    const voiceEvents = new Map<string, Array<PendingEvent>>();
 
     // voiceName -> the most recent note event, so a following `<chord/>` note
     // can be stacked onto it (see the isChord branch below)
@@ -856,10 +1041,19 @@ export class Aligner {
         const isChord = findDirectChild(el, 'chord') !== null;
         const isRest = findDirectChild(el, 'rest') !== null;
         const voice = getChildText(el, 'voice') || '1';
+        // A `<grace>` note carries no `<duration>` at all, so this is 0 and the
+        // time cursor does not move — which is the whole of what "un-timed"
+        // means for the arithmetic below.
         const rawDur = getChildInt(el, 'duration') || 0;
+        const grace = parseGrace(el);
+        const tuplet = parseTupletMarks(el);
 
+        // MNX stores the WRITTEN value, which for a tuplet member is not what
+        // `<duration>` says — `<type>` is, and is used first. The scaling is
+        // undone anyway so the ratio fallback stays right for the exporters
+        // that omit `<type>`.
         const mnxDur = calculateMnxDuration(
-          rawDur,
+          tuplet ? (rawDur * tuplet.actualNotes) / tuplet.normalNotes : rawDur,
           state.divisions,
           getChildText(el, 'type') || undefined,
           findDirectChildren(el, 'dot').length
@@ -878,7 +1072,13 @@ export class Aligner {
             rest: {}
           };
           if (!voiceEvents.has(voice)) voiceEvents.set(voice, []);
-          voiceEvents.get(voice)!.push({ onset: currentTime, event: restEvent });
+          voiceEvents.get(voice)!.push({
+            onset: currentTime,
+            span: rawDur,
+            event: restEvent,
+            ...(grace ? { grace } : {}),
+            ...(tuplet ? { tuplet } : {})
+          });
           currentTime += rawDur;
         } else {
           // Parse Pitch. `<step>` is validated rather than trusted: real-world
@@ -985,7 +1185,13 @@ export class Aligner {
                 notes: [mnxNote]
               };
               if (!voiceEvents.has(voice)) voiceEvents.set(voice, []);
-              voiceEvents.get(voice)!.push({ onset: currentTime, event: chordEvent });
+              voiceEvents.get(voice)!.push({
+                onset: currentTime,
+                span: rawDur,
+                event: chordEvent,
+                ...(grace ? { grace } : {}),
+                ...(tuplet ? { tuplet } : {})
+              });
               lastNoteEventByVoice.set(voice, chordEvent);
             }
           } else {
@@ -996,7 +1202,13 @@ export class Aligner {
               notes: [mnxNote]
             };
             if (!voiceEvents.has(voice)) voiceEvents.set(voice, []);
-            voiceEvents.get(voice)!.push({ onset: currentTime, event: noteEvent });
+            voiceEvents.get(voice)!.push({
+              onset: currentTime,
+              span: rawDur,
+              event: noteEvent,
+              ...(grace ? { grace } : {}),
+              ...(tuplet ? { tuplet } : {})
+            });
             lastNoteEventByVoice.set(voice, noteEvent);
             currentTime += rawDur;
           }
@@ -1007,15 +1219,58 @@ export class Aligner {
     // Convert Map to MnxSequence array
     const sequences: MnxSequence[] = [];
     for (const [voiceName, events] of voiceEvents.entries()) {
-      // Sort events by onset time
+      // A stable sort by onset: grace notes share their principal's onset (they
+      // consume no time), so document order is the only thing that says which
+      // side of it they fall on, and it has to survive the sort.
       events.sort((a, b) => a.onset - b.onset);
 
-      // Insert padding space events for gaps
-      const content: MnxEvent[] = [];
+      // Insert padding space events for gaps, and collapse the runs MusicXML
+      // flags per note back into the containers MNX declares once.
+      const content: MnxSequenceItem[] = [];
       let cursor = 0;
+
+      // Both containers are RUNS of consecutive notes in MusicXML and single
+      // items in MNX, so both are buffered here and flushed when their run
+      // ends. Graces flush ahead of the note they decorate, which is where
+      // document order already put them.
+      let graceRun: PendingEvent[] = [];
+      let tupletRun: PendingEvent[] = [];
+
+      const flushGrace = () => {
+        if (graceRun.length === 0) return;
+        const first = graceRun[0].grace!;
+        content.push({
+          type: 'grace',
+          content: graceRun.map(item => item.event),
+          graceType: first.graceType,
+          ...(first.slash === false ? { slash: false } : {})
+        });
+        graceRun = [];
+      };
+
+      const flushTuplet = () => {
+        if (tupletRun.length === 0) return;
+        const run = tupletRun;
+        tupletRun = [];
+        const mark = run[0].tuplet!;
+        const events = run.map(item => item.event);
+        const sides = tupletSides(events, mark);
+        if (!sides) {
+          this.warnings.push(
+            `measure ${measureIdx + 1}: a ${mark.actualNotes}:${mark.normalNotes} tuplet ` +
+              `could not be stated as a whole number of note values; its notes were ` +
+              `written without it.`
+          );
+          content.push(...events);
+          return;
+        }
+        content.push({ type: 'tuplet', content: events, ...sides });
+      };
 
       for (const item of events) {
         if (item.onset > cursor) {
+          flushTuplet();
+          flushGrace();
           const gap = item.onset - cursor;
           // Calculate space duration fraction
           const spaceDur = calculateMnxDuration(gap, state.divisions);
@@ -1023,13 +1278,44 @@ export class Aligner {
             duration: spaceDur,
             rest: {} // In simple MNX we can pad with rests or space
           });
+          cursor = item.onset;
         }
+
+        if (item.grace) {
+          // A grace inside a tuplet's span is still un-timed, so it neither
+          // joins the group nor ends it.
+          graceRun.push(item);
+          continue;
+        }
+
+        if (item.tuplet) {
+          // Two conventions in the wild, and both are honoured: an exporter
+          // that writes `<tuplet type="start"/>` says where a group begins, and
+          // one that writes only `<time-modification>` leaves the group to be
+          // inferred from where the ratio changes and how much written time has
+          // accumulated. Trusting only the first would merge six triplet
+          // eighths into one six-note tuplet whenever the brackets are absent.
+          const open = tupletRun[0]?.tuplet;
+          const sameRatio =
+            open !== undefined &&
+            open.actualNotes === item.tuplet.actualNotes &&
+            open.normalNotes === item.tuplet.normalNotes &&
+            open.normalType === item.tuplet.normalType;
+          if (tupletRun.length > 0 && (item.tuplet.start || !sameRatio)) flushTuplet();
+          flushGrace();
+          tupletRun.push(item);
+          cursor += item.span;
+          if (item.tuplet.stop || tupletRunIsFull(tupletRun)) flushTuplet();
+          continue;
+        }
+
+        flushTuplet();
+        flushGrace();
         content.push(item.event);
-        // Calculate duration value in divisions
-        // Note: this assumes we can deduce division size of item.event.duration
-        // But since we have chronological stream, cursor just updates to next onset
-        cursor = item.onset + this.getEventDivisionDuration(item.event, state.divisions);
+        cursor += item.span;
       }
+      flushTuplet();
+      flushGrace();
 
       sequences.push({
         voice: `v${voiceName}`,
@@ -1149,22 +1435,29 @@ export class Aligner {
       const correspondingTabSeq = tabSeqs.find(s => s.voice === voice);
       if (!correspondingTabSeq) continue;
 
-      let stdOnset = 0;
       let stdNoteCounter = 1;
 
-      for (let stdEvIdx = 0; stdEvIdx < stdSeq.content.length; stdEvIdx++) {
-        const stdEv = stdSeq.content[stdEvIdx];
+      // Both sides are walked through their containers: a note inside a grace
+      // or a tuplet needs an aligned id and its fingerboard position just as
+      // much as one in the open, and the two staves carry the same containers.
+      for (const { event: stdEv, onset: stdOnset, slot: stdSlot } of walkSequenceEvents(
+        stdSeq.content,
+        8
+      )) {
         if (stdEv.notes) {
-          // Find matching TAB event at same onset time
-          let tabOnset = 0;
+          // Find the TAB event at the same ADDRESS — onset and slot both, so a
+          // grace note cannot answer for the principal it sits in front of.
           let matchingTabEv: MnxEvent | undefined;
 
-          for (const tabEv of correspondingTabSeq.content) {
-            if (tabOnset === stdOnset && tabEv.notes) {
+          for (const { event: tabEv, onset: tabOnset, slot: tabSlot } of walkSequenceEvents(
+            correspondingTabSeq.content,
+            8
+          )) {
+            if (tabOnset === stdOnset && tabSlot === stdSlot && tabEv.notes) {
               matchingTabEv = tabEv;
               break;
             }
-            tabOnset += this.getEventDivisionDuration(tabEv, 8); // use standard division 8 for onset mapping
+            if (tabOnset > stdOnset) break;
           }
 
           for (let nIdx = 0; nIdx < stdEv.notes.length; nIdx++) {
@@ -1206,7 +1499,6 @@ export class Aligner {
             }
           }
         }
-        stdOnset += this.getEventDivisionDuration(stdEv, 8);
       }
     }
   }

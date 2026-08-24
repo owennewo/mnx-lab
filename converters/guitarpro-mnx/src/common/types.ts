@@ -220,6 +220,14 @@ export interface MnxGrace {
 
 export type MnxSequenceItem = MnxEvent | MnxGrace | MnxTuplet;
 
+export function isGrace(item: MnxSequenceItem): item is MnxGrace {
+  return (item as MnxGrace).type === 'grace';
+}
+
+export function isTuplet(item: MnxSequenceItem): item is MnxTuplet {
+  return (item as MnxTuplet).type === 'tuplet';
+}
+
 /** True for items that occupy metric time and carry a duration. */
 export function isTimedEvent(item: MnxSequenceItem): item is MnxEvent {
   const type = (item as MnxGrace | MnxTuplet).type;

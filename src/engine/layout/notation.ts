@@ -1833,7 +1833,10 @@ function assembleSegment(
           positionContext: td.ctx,
           row: m.row,
           measureEndX: m.x + m.width,
-          technique: td.technique
+          technique: td.technique,
+          // The notation staff above draws the bracket over the same columns.
+          showTupletBrackets: false,
+          accidentalContext: { useAccidentalDisplay, keyFifths: m.keyFifths }
         });
       }
     }

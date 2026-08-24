@@ -384,7 +384,11 @@ draws each tab-bearing part's tab staff inside the same system walk — shared b
 interleaved multi-system wrap, columns aligned by shared plan slots. Tab-staff emission
 (lines/clef/timesig/frets) lives ONCE in `src/engine/layout/tabStaff.ts`, used by both
 the standalone tab layout and the native staff — extend it there, never fork it. See
-[roadmap/complete/core-both-view-single-system.md](roadmap/complete/core-both-view-single-system.md). Fret/string assignment uses
+[roadmap/complete/core-both-view-single-system.md](roadmap/complete/core-both-view-single-system.md). Tuplets and grace notes draw on tab
+too: containers are walked from `spacing.ts`'s own column widths so both staves stay in
+column, grace digits are small (0.6), and a tuplet bracket is drawn **once per system** —
+the standalone tab view draws its own, the `both` view lets the notation staff carry it
+(`showTupletBrackets`). Fret/string assignment uses
 the derivation ladder in `src/engine/tab/guitarPositions.ts` (MNX pitch is
 sounding): an annotated `_x.mnxLab.string` derives its fret against the declared
 `strings[]` + capo (a stored `fret` is validation-only — a mismatch renders the
@@ -450,10 +454,16 @@ recipe, the doctools/`uv` setup — is in
 
 `converters/*` are npm workspaces, Node-only, never in the app build. Shared fixtures in
 `converters/fixtures/` — **authored as Guitar Pro** (`.gpx` sources; `.mnx.json` derived
-via `guitarpro-mnx --import`, `.xml` derived via `musicxml-mnx --export`). Both round
-trips are lossless and tested (notes, technique, lyrics, repeats, voltas, tuning, capo,
-key; note ids are legitimately rewritten by the MusicXML split — compare technique
-targets by resolution, not string equality). **Guitar Pro string numbering is inverted**
+via `guitarpro-mnx --import`, `.xml` derived via `musicxml-mnx --export`). The one
+exception is `Triplets-and-graces.gp`, hand-authored as GPIF (Guitar Pro 7/8's own native
+XML) by `converters/fixtures/tools/` because none of the three app-authored scores
+contains a tuplet or a grace note — the reason neither converter carried either until
+roadmap/complete/core-tuplets-grace-notes.md. Both round trips are lossless and tested
+(notes, technique, lyrics, repeats, voltas, tuning, capo, key, tuplets, grace notes; note
+ids are legitimately rewritten by the MusicXML split — compare technique targets by
+resolution, not string equality). Tuplets and grace notes are **containers in MNX and
+per-beat/per-note flags in both file formats**, so each direction collapses or expands a
+run — the same asymmetry as voltas, solved the same way. **Guitar Pro string numbering is inverted**
 relative to `_x.mnxLab` — go through `converters/guitarpro-mnx/src/common/tuning.ts`,
 never open-code it. MusicXML allows `<lyric>` on rests — never assume pitched notes.
 CLI: `npx musicxml-mnx|guitarpro-mnx --import|--export <file> [--output out]` (derived

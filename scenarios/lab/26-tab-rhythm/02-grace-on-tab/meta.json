@@ -1,0 +1,34 @@
+{
+  "title": "Grace notes on the fingerboard",
+  "description": "An acciaccatura before a two-note chord, and a two-note grace run before the closing chord, on a guitar part in staffKind both. Grace digits are drawn small (0.6, matching the notation staff's GRACE_SCALE) so they read as an ornament rather than as part of the beat they decorate, and they sit in the rigid small columns the plan already reserved for them — which is why the tab and notation staves stay in column across a grace. The graces take no technique ordinal: they are never the origin or destination beat of a hammer-on, and numbering them would shift every technique after them.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:rhythm",
+    "grace-notes"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/grace/"
+  ],
+  "coversDefs": [
+    "grace",
+    "grace-type",
+    "vendor-extensions",
+    "event",
+    "note",
+    "clef",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view",
+    "grace-notes"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

@@ -173,3 +173,103 @@ describe('tab fingerboard validation', () => {
     expect(issues[0].message).toMatch(/underfills/);
   });
 });
+
+/**
+ * Inside a container.
+ *
+ * The tab staff draws a tuplet's and a grace's notes now (`tabStaff.ts`,
+ * core-tuplets-grace-notes.md), and an unplayable note draws NOTHING there —
+ * that is the deliberate rule, because a silently clamped digit is a lie about
+ * the fingerboard. The badge is what keeps the omission honest, so the check
+ * has to see inside a container or the note vanishes in both directions at
+ * once. Before the containers were drawn, this walk stopped at the first one
+ * and abandoned the rest of the voice.
+ */
+describe('fingerboard validation inside containers', () => {
+  /** One measure of one voice, from the given sequence content. */
+  function docWithContent(content: unknown[]): MnxStructure {
+    const doc = docWith([[{ string: 1, fret: 0 }]]);
+    doc.parts[0].measures[0].sequences[0].content = content as never;
+    return doc;
+  }
+
+  const eighth = (string: number, fret: number) => ({
+    duration: { base: 'eighth' },
+    notes: [{ pitch: pitchAt(string, fret), _x: { mnxLab: { string, fret } } }]
+  });
+
+  const triplet = (content: unknown[]) => ({
+    type: 'tuplet',
+    inner: { duration: { base: 'eighth' }, multiple: 3 },
+    outer: { duration: { base: 'eighth' }, multiple: 2 },
+    content
+  });
+
+  it('flags a note that no string can reach inside a tuplet', () => {
+    const doc = docWithContent([
+      triplet([
+        eighth(1, 0),
+        // E1, an octave and a bit below the lowest open string.
+        { duration: { base: 'eighth' }, notes: [{ pitch: { step: 'E', octave: 1 } }] },
+        eighth(1, 0)
+      ])
+    ]);
+    const issues = validateDocument(doc).filter(i => i.scope === 'tab');
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe('error');
+    expect(issues[0].message).toMatch(/E1 is not playable/);
+  });
+
+  it('flags an unreachable fret inside a grace container', () => {
+    const doc = docWithContent([
+      {
+        type: 'grace',
+        graceType: 'stealPrevious',
+        content: [
+          {
+            duration: { base: 'eighth' },
+            // String 3, but a pitch 29 frets above its open note.
+            notes: [{ pitch: { step: 'C', octave: 6 }, _x: { mnxLab: { string: 3, fret: 29 } } }]
+          }
+        ]
+      },
+      eighth(1, 0)
+    ]);
+    const issues = validateDocument(doc).filter(i => i.scope === 'tab');
+    expect(issues.some(i => /outside 0–/.test(i.message))).toBe(true);
+  });
+
+  it('keeps counting onsets past a tuplet instead of abandoning the voice', () => {
+    // The second voice's conflicting note sits AFTER a tuplet. The old walk
+    // returned at the container and never reached it.
+    const doc = docWith([
+      [{ string: 1, fret: 0 }],
+      [{ string: 1, fret: 0 }]
+    ]);
+    const [first, second] = doc.parts[0].measures[0].sequences;
+    first.content = [
+      triplet([eighth(2, 0), eighth(2, 1), eighth(2, 2)]),
+      eighth(1, 5)
+    ] as never;
+    second.content = [
+      { duration: { base: 'quarter' }, notes: [{ pitch: pitchAt(6, 0), _x: { mnxLab: { string: 6, fret: 0 } } }] },
+      eighth(1, 7)
+    ] as never;
+    const issues = validateDocument(doc).filter(i => i.scope === 'tab');
+    expect(issues.some(i => /string 1 is fretted at 5 and 7/.test(i.message))).toBe(true);
+  });
+
+  it('does not let an un-timed grace claim a string at any onset', () => {
+    // A grace and the note it decorates are on the same string. That is not a
+    // conflict — the grace is crushed in before the beat, not sounded with it.
+    const doc = docWithContent([
+      {
+        type: 'grace',
+        graceType: 'stealPrevious',
+        content: [eighth(1, 2)]
+      },
+      { duration: { base: 'whole' }, notes: [{ pitch: pitchAt(1, 0), _x: { mnxLab: { string: 1, fret: 0 } } }] }
+    ]);
+    expect(validateDocument(doc).filter(i => i.scope === 'tab')).toEqual([]);
+  });
+});

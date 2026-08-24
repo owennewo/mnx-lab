@@ -1,4 +1,4 @@
-import { MnxNoteValueBase } from './types.js';
+import { MnxNoteValue, MnxNoteValueBase } from './types.js';
 
 /**
  * alphaTab's `Duration` enum is the note-value denominator: Whole = 1,
@@ -68,4 +68,95 @@ export function wholesToFraction(wholes: number): [number, number] {
 function gcd(a: number, b: number): number {
   while (b) [a, b] = [b, a % b];
   return a;
+}
+
+/**
+ * Whole-note fractions as exact integers. Every note value is dyadic (dots
+ * multiply by 3/2 and leave the denominator a power of two), so a whole note of
+ * 4096 ticks is exact down to a triple-dotted 256th — the same scale
+ * `wholesToFraction` reduces against.
+ */
+const TICKS_PER_WHOLE = 4096;
+
+/** The undotted values a tuplet's `inner`/`outer` unit may be stated in,
+ *  longest first: the LONGEST unit that divides both sides evenly is the one
+ *  an engraver would write. */
+const UNIT_BASES: MnxNoteValueBase[] = [
+  'breve', 'whole', 'half', 'quarter', 'eighth',
+  '16th', '32nd', '64th', '128th', '256th'
+];
+
+export interface MnxTupletRatio {
+  inner: { duration: MnxNoteValue; multiple: number };
+  outer: { duration: MnxNoteValue; multiple: number };
+}
+
+/**
+ * Guitar Pro flags EVERY beat of a tuplet with the same `num:den`; MNX states
+ * the group ONCE, as `inner` events performed in the time of `outer`. This is
+ * the same collapse/expand asymmetry as voltas (declared once in MNX, flagged
+ * per bar in Guitar Pro), so it is solved the same way — the flags decide where
+ * a group starts and ends, and the group is what gets written.
+ *
+ * `writtenWholes` is what the inner events are WRITTEN as, in whole notes; the
+ * performed time is that scaled by `den/num`. Both sides are then restated
+ * against one shared unit, because MNX's `multiple` is a count of units and a
+ * triplet whose halves disagree ("3 eighths in the time of 2 eighths") has to
+ * name the eighth twice.
+ *
+ * Returns null when no note value states both sides in whole units — a partial
+ * group (two beats flagged 3:2) performs in a non-dyadic time that MNX's
+ * duration × multiple cannot spell. Callers warn rather than write a wrong
+ * ratio, which is the same standard the rest of this converter holds to.
+ */
+export function tupletRatio(
+  writtenWholes: number[],
+  numerator: number,
+  denominator: number
+): MnxTupletRatio | null {
+  if (writtenWholes.length === 0 || numerator <= 0 || denominator <= 0) return null;
+
+  const innerTicks = writtenWholes.reduce(
+    (sum, wholes) => sum + Math.round(wholes * TICKS_PER_WHOLE),
+    0
+  );
+  if (innerTicks <= 0 || (innerTicks * denominator) % numerator !== 0) return null;
+  const outerTicks = (innerTicks * denominator) / numerator;
+
+  for (const base of UNIT_BASES) {
+    const unit = Math.round(mnxDurationToWholes(base) * TICKS_PER_WHOLE);
+    if (unit <= 0) continue;
+    if (innerTicks % unit !== 0 || outerTicks % unit !== 0) continue;
+    return {
+      inner: { duration: { base }, multiple: innerTicks / unit },
+      outer: { duration: { base }, multiple: outerTicks / unit }
+    };
+  }
+  return null;
+}
+
+/**
+ * The inverse of `tupletRatio`: one MNX container → the num:den Guitar Pro
+ * stamps on every beat of the group. `num` beats are performed in the time of
+ * `den`, so alphaTab scales a flagged beat's ticks by `den/num` — which is
+ * exactly `outer / inner` once both sides are measured in whole notes.
+ *
+ * Returns null when either side measures zero, which is the only way the ratio
+ * has no meaning.
+ */
+export function tupletFlags(tuplet: {
+  inner: { duration: MnxNoteValue; multiple: number };
+  outer: { duration: MnxNoteValue; multiple: number };
+}): { numerator: number; denominator: number } | null {
+  const side = (part: { duration: MnxNoteValue; multiple: number }) =>
+    Math.round(
+      mnxDurationToWholes(part.duration.base, part.duration.dots ?? 0) *
+        part.multiple *
+        TICKS_PER_WHOLE
+    );
+  const inner = side(tuplet.inner);
+  const outer = side(tuplet.outer);
+  if (inner <= 0 || outer <= 0) return null;
+  const divisor = gcd(inner, outer) || 1;
+  return { numerator: inner / divisor, denominator: outer / divisor };
 }

@@ -1,0 +1,37 @@
+{
+  "title": "Unplayable notes inside a tuplet and a grace",
+  "description": "A triplet whose middle note is E1 — below every open string, so no fret reaches it — and a grace note annotated at fret 30, past the fingerboard. The tab staff draws neither digit, and both must still carry a red scope:'tab' badge: a container is not a place where a note may be dropped quietly. Before the tab renderer drew container content at all, the playability check stopped at the first container and abandoned the rest of the voice, so an unplayable note inside one was silent in both directions.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "tab:rhythm",
+    "tab:diagnostics",
+    "tuplet",
+    "grace-notes"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/tuplet/"
+  ],
+  "coversDefs": [
+    "tuplet",
+    "grace",
+    "vendor-extensions",
+    "event",
+    "note",
+    "clef",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view",
+    "tuplets",
+    "grace-notes"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

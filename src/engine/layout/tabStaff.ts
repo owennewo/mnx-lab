@@ -1,4 +1,4 @@
-import { MnxSequence, isTimedEvent } from '../../model/mnx.ts';
+import { MnxEvent, MnxGrace, MnxSequence, MnxTuplet, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import {
   GUITAR_TUNING,
   midiOfMnxPitch,
@@ -7,7 +7,7 @@ import {
 } from '../tab/guitarPositions.ts';
 import { Primitive, SpatialIndex } from '../primitives.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
-import { EventSlot } from './spacing.ts';
+import { CORE_SP, EventSlot, GRACE_NOTE_ADVANCE_SP, tupletColumns } from './spacing.ts';
 import {
   harmonicFretText,
   nextOrdinal,
@@ -87,6 +87,32 @@ const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
 // preview/embed, where it falls back to black and hides the digit). Carries the
 // paper token's own fallback so it resolves even where `--paper` isn't defined.
 const FRET_BG_FILL = 'var(--paper, oklch(0.985 0.006 85))';
+
+// ---------- Grace notes and tuplets on the fingerboard ----------
+
+/**
+ * Grace digits, relative to full size. The notation staff uses 0.6 for the
+ * same job (`GRACE_SCALE`), and matching it is what makes the two staves of a
+ * `both` system read as one gesture rather than two decisions.
+ */
+const GRACE_FRET_SCALE = 0.6;
+
+/**
+ * How far above the top string line a tuplet bracket sits.
+ *
+ * Clear of the technique lane (`tabTechniqueLaneY`, 0.4sp up), because a
+ * hammer-on slur and a triplet bracket are both drawn above the staff and both
+ * belong to the same notes — overlapping them would make each unreadable. The
+ * row frame does not need widening for it: `tightenRows` measures the ink that
+ * is actually there.
+ */
+const TAB_TUPLET_RISE_SP = 2.1;
+const TAB_TUPLET_BRACKET_THICKNESS_SP = 0.1;
+/** Bracket end hooks, pointing down at the staff. */
+const TAB_TUPLET_HOOK_SP = 0.5;
+const TAB_TUPLET_NUMBER_SIZE_SP = 1.1;
+/** Gap either side of the number, where the bracket breaks for it. */
+const TAB_TUPLET_NUMBER_GAP_SP = 0.85;
 
 // ---------- System header: capo + tuning instructions ----------
 
@@ -273,17 +299,151 @@ export interface EmitTabVoicesArgs {
   /** Where the technique post-pass's sites are gathered
    *  (roadmap/complete/core-guitar-technique.md). One collector per tab staff. */
   technique: TechniqueCollector;
+  /**
+   * Whether this staff draws its own tuplet brackets.
+   *
+   * True for the STANDALONE tab view, where the bracket is the only thing
+   * saying a group is a triplet. False in the `both` system: the notation staff
+   * directly above draws the same bracket over the same columns, and printing
+   * it twice is how one gesture starts reading as two.
+   */
+  showTupletBrackets: boolean;
+  /**
+   * The plan's accidental context — `mnx.support.useAccidentalDisplay` and this
+   * measure's key signature.
+   *
+   * Purely notation ink, and a tab staff draws none of it, but the PLAN priced
+   * each of a tuplet's inner columns with an accidental slot where the notation
+   * staff will need one. Walking those columns with a different context would
+   * come out a slot narrower and slide every digit after it out of column with
+   * the notation staff above.
+   */
+  accidentalContext: { useAccidentalDisplay: boolean; keyFifths: number };
 }
 
 /**
  * Fret digits (with their string-line knock-out rects) for one measure of one
  * tab staff, plus index entries for click/highlight.
  */
+/**
+ * Where a container's inner events sit, in absolute x.
+ *
+ * The plan reserved ONE column for the whole container and `slot.x` is the
+ * centre of its FIRST inner core; everything after that is a walk over the
+ * same rigid widths the plan priced. `spacing.ts` owns those widths
+ * (`tupletColumns` for a tuplet, `GRACE_NOTE_ADVANCE_SP` per grace), so this
+ * reads them rather than restating them — the notation layout walks the very
+ * same numbers, and a walk that disagreed by one term would slide the tab out
+ * of column from that note onward.
+ *
+ * `endX` is the next inner column, or the container's own end: a bend curve
+ * drawn across a tuplet member must stop at the next member, not at the bar.
+ */
+function innerColumns(
+  container: MnxGrace | MnxTuplet,
+  firstX: number,
+  ink: number,
+  accidentalContext: { useAccidentalDisplay: boolean; keyFifths: number }
+): { event: MnxEvent; x: number; endX: number }[] {
+  const events = container.content;
+  const xs: number[] = [];
+
+  if (isTuplet(container)) {
+    // The inner columns are rigid ink, priced by the plan at this ratio — so
+    // the accidental leading and the core half-width are both scaled, term for
+    // term as `emitTupletGroup` scales them.
+    const cols = tupletColumns(
+      container,
+      accidentalContext.useAccidentalDisplay,
+      accidentalContext.keyFifths
+    );
+    let colStart = firstX - (CORE_SP / 2) * ink;
+    for (let j = 0; j < events.length; j++) {
+      const col = cols[j] ?? { leading: 0, advance: CORE_SP };
+      xs.push(colStart + col.leading * ink + (CORE_SP / 2) * ink);
+      colStart += col.advance * ink;
+    }
+  } else {
+    for (let j = 0; j < events.length; j++) {
+      xs.push(firstX + j * GRACE_NOTE_ADVANCE_SP * ink);
+    }
+  }
+
+  return events.map((event, j) => ({
+    event,
+    x: xs[j],
+    // The last inner event ends where its own column does; there is no next
+    // slot to ask, and the bar's end would be a lie for a grace note.
+    endX: xs[j + 1] ?? xs[j] + CORE_SP * ink
+  }));
+}
+
+/**
+ * A tuplet's bracket and number over a tab staff.
+ *
+ * Always bracketed, unlike the notation staff — there, a fully beamed group
+ * puts its number on the beam and needs no bracket, but a tab staff draws no
+ * beams at all, so the bracket is the only thing that says where the group
+ * begins and ends. `bracket: 'no'` is still honoured: it is an explicit
+ * instruction, not an inference.
+ */
+function emitTabTupletBracket(
+  tuplet: MnxTuplet,
+  firstX: number,
+  lastX: number,
+  staffTop: number,
+  primitives: Primitive[]
+): void {
+  const y = staffTop - TAB_TUPLET_RISE_SP;
+  const number = tuplet.showNumber === 'noNumber' ? null : String(tuplet.inner.multiple);
+
+  if (number !== null) {
+    primitives.push({
+      kind: 'text',
+      text: number,
+      x: (firstX + lastX) / 2,
+      y,
+      font: 'body',
+      size: TAB_TUPLET_NUMBER_SIZE_SP,
+      anchor: 'middle',
+      baseline: 'central',
+      className: 'tuplet-number'
+    });
+  }
+
+  if (tuplet.bracket === 'no') return;
+
+  const centre = (firstX + lastX) / 2;
+  const gap = number === null ? 0 : TAB_TUPLET_NUMBER_GAP_SP / 2;
+  // Two arms with the number in the break between them, and a hook at each
+  // outer end pointing down at the notes the group covers.
+  for (const [x1, x2] of [
+    [firstX, centre - gap],
+    [centre + gap, lastX]
+  ]) {
+    if (x2 <= x1) continue;
+    primitives.push({
+      kind: 'line',
+      x1, y1: y, x2, y2: y,
+      thickness: TAB_TUPLET_BRACKET_THICKNESS_SP,
+      className: 'tuplet-bracket'
+    });
+  }
+  for (const x of [firstX, lastX]) {
+    primitives.push({
+      kind: 'line',
+      x1: x, y1: y, x2: x, y2: y + TAB_TUPLET_HOOK_SP,
+      thickness: TAB_TUPLET_BRACKET_THICKNESS_SP,
+      className: 'tuplet-bracket'
+    });
+  }
+}
+
 export function emitTabVoices(args: EmitTabVoicesArgs): void {
   const {
     voices, slots, staffTop, ink, measureIndex, positionContext,
     activeNoteIds, selectedNoteIds, synthesizeKeys, primitives, index, onIssue,
-    row, measureEndX, technique: techniqueSites
+    row, measureEndX, technique: techniqueSites, showTupletBrackets, accidentalContext
   } = args;
   const laneY = tabTechniqueLaneY(staffTop);
 
@@ -293,126 +453,209 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
   // so a genuine conflict — different frets, one string — still draws both
   // and stays visible next to its red badge.
   const drawnFrets = new Set<string>();
-  voices.forEach((sequence, voiceIndex) => {
-    sequence.content.forEach((event, eventIndex) => {
-      const slot = slots[voiceIndex]?.[eventIndex];
-      if (!slot) return;
-      const eventX = slot.x;
-      // The event's own duration, in x: where the next column starts, or the
-      // bar's end barline. A vibrato wiggle and a bend curve draw across it.
-      const eventEndX = slots[voiceIndex]?.[eventIndex + 1]?.x ?? measureEndX;
-      const voiceKey = `${voiceIndex}`;
-      const ordinal = isTimedEvent(event) ? nextOrdinal(techniqueSites, voiceKey) : -1;
 
-      try {
-      // Grace notes and tremolos aren't drawn on tab yet — the plan still
-      // reserves their columns, so the staves stay aligned in the "both"
-      // view. Unknown item kinds (tuplet, …) were recorded by the plan.
-      if (!isTimedEvent(event)) {
-        // skip
-      } else if (event.rest) {
-        // Tab convention: rests in tab-only view consume time but aren't
-        // drawn. (When tab pairs with a notation staff, rests live there.)
-      } else if (event.notes && event.notes.length > 0) {
-        const positions = resolveEventPositions(event.notes, positionContext);
-        // Per-note selection keys: real ids, or synthesized positional keys
-        // for id-less documents (see src/utils/noteKeys.ts).
-        const noteIds = event.notes.map((n, idx) =>
-          synthesizeKeys ? noteKeyAt(n, measureIndex, voiceIndex, eventIndex, idx) : n.id
-        );
-        const primaryNoteId = noteIds[0];
+  /**
+   * One event's fret digits, wherever it sits: directly in the sequence, or
+   * inside a grace or tuplet container.
+   *
+   * `containerIndex` and `scale` are the whole of the difference. The key a
+   * digit carries has to be the one `model/noteWalk.ts` produces for that note
+   * — nested for container content — or the editor cannot address what the
+   * renderer drew, and `harness/conformance/note-keys.test.ts` says so over the
+   * whole corpus.
+   */
+  const drawEvent = (input: {
+    event: MnxEvent;
+    eventIndex: number;
+    containerIndex?: number;
+    eventX: number;
+    eventEndX: number;
+    /** Digit size relative to full — < 1 for grace notes. */
+    scale: number;
+    voiceKey: string;
+    ordinal: number;
+    voiceIndex: number;
+  }): void => {
+    const {
+      event, eventIndex, containerIndex, eventX, eventEndX, scale, voiceKey, ordinal, voiceIndex
+    } = input;
+    if (event.rest) {
+      // Tab convention: rests in tab-only view consume time but aren't
+      // drawn. (When tab pairs with a notation staff, rests live there.)
+      return;
+    }
+    if (!event.notes || event.notes.length === 0) return;
 
-        for (let k = 0; k < positions.length; k++) {
-          const pos = positions[k];
-          // Unplayable (no position derivable): draw nothing — the red badge
-          // comes from validate.ts, never a silently clamped digit.
-          if (pos === null) continue;
-          const noteId = noteIds[k] ?? primaryNoteId;
+    const fontSize = FRET_FONT_SIZE_SP * scale;
+    const bgHeight = FRET_BG_HEIGHT_SP * scale;
+    const positions = resolveEventPositions(event.notes, positionContext);
+    // Per-note selection keys: real ids, or synthesized positional keys
+    // for id-less documents (see src/model/noteKeys.ts).
+    const noteIds = event.notes.map((n, idx) =>
+      synthesizeKeys
+        ? noteKeyAt(n, measureIndex, voiceIndex, eventIndex, idx, containerIndex)
+        : n.id
+    );
+    const primaryNoteId = noteIds[0];
 
-          // Per NOTE, not per event: the editor's cursor is one note of a
-          // chord, and highlighting the whole event would erase it.
-          const isActive = noteId !== undefined && activeNoteIds.includes(noteId);
-          const isSelected = noteId !== undefined && selectedNoteIds.includes(noteId);
-          const fretFill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : undefined;
+    for (let k = 0; k < positions.length; k++) {
+      const pos = positions[k];
+      // Unplayable (no position derivable): draw nothing — the red badge
+      // comes from validate.ts, never a silently clamped digit.
+      if (pos === null) continue;
+      const noteId = noteIds[k] ?? primaryNoteId;
 
-          const fretSlot = `${Math.round(eventX * 1e4)}:${pos.str}:${pos.fret}`;
-          if (drawnFrets.has(fretSlot)) continue;
-          drawnFrets.add(fretSlot);
+      // Per NOTE, not per event: the editor's cursor is one note of a
+      // chord, and highlighting the whole event would erase it.
+      const isActive = noteId !== undefined && activeNoteIds.includes(noteId);
+      const isSelected = noteId !== undefined && selectedNoteIds.includes(noteId);
+      const fretFill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : undefined;
 
-          const stringY = staffTop + (pos.str - 1) * TAB_STRING_SPACING_SP;
-          // A harmonic is the one technique that changes the DIGIT rather than
-          // adding a mark beside it: `<12>` is how a tab reader is told the
-          // fret is a node to touch, not a note to stop. Drawn here, with the
-          // digit, so one mask still covers exactly one text.
-          const note = event.notes[k];
-          const technique = note ? techniqueOf(note) : undefined;
-          const fretStr = technique?.harmonic
-            ? harmonicFretText(String(pos.fret))
-            : String(pos.fret);
-          const charWidthSp = FRET_FONT_SIZE_SP * 0.6 * Math.max(1, fretStr.length);
+      const fretSlot = `${Math.round(eventX * 1e4)}:${pos.str}:${pos.fret}`;
+      if (drawnFrets.has(fretSlot)) continue;
+      drawnFrets.add(fretSlot);
 
-          // The geometry the technique post-pass draws against — recorded even
-          // when this note carries none, because another note's hammer-on may
-          // name it as its destination.
-          recordSite(techniqueSites, {
-            x: eventX,
-            endX: eventEndX,
-            y: stringY,
-            laneY,
-            row,
-            halfWidthSp: charWidthSp / 2,
-            voiceKey,
-            ordinal,
-            fret: pos.fret,
-            ...(note?.id !== undefined ? { noteId: note.id } : {}),
-            ...(technique ? { technique } : {})
-          });
+      const stringY = staffTop + (pos.str - 1) * TAB_STRING_SPACING_SP;
+      // A harmonic is the one technique that changes the DIGIT rather than
+      // adding a mark beside it: `<12>` is how a tab reader is told the
+      // fret is a node to touch, not a note to stop. Drawn here, with the
+      // digit, so one mask still covers exactly one text.
+      const note = event.notes[k];
+      const technique = note ? techniqueOf(note) : undefined;
+      const fretStr = technique?.harmonic
+        ? harmonicFretText(String(pos.fret))
+        : String(pos.fret);
+      const charWidthSp = fontSize * 0.6 * Math.max(1, fretStr.length);
 
-          // Background rect obscures the staff line under the digit. Its width
-          // is drawn on the ink scale, so its left edge is placed on it too —
-          // otherwise the mask and the digit come apart as the staff grows.
-          primitives.push({
-            kind: 'rect',
-            x: eventX - (charWidthSp / 2) * ink,
-            y: stringY - FRET_BG_HEIGHT_SP / 2,
-            w: charWidthSp,
-            h: FRET_BG_HEIGHT_SP,
-            fill: FRET_BG_FILL,
-            className: 'fret-bg',
-            sourceId: noteId
-          });
-          primitives.push({
-            kind: 'text',
-            text: fretStr,
-            x: eventX,
-            y: stringY,
-            font: 'body',
-            size: FRET_FONT_SIZE_SP,
-            anchor: 'middle',
-            baseline: 'central',
-            weight: FRET_FONT_WEIGHT,
-            fill: fretFill,
-            className: 'fret-number' +
-              (isActive ? ' active' : '') +
-              (isSelected ? ' selected' : ''),
-            sourceId: noteId
-          });
-        }
+      // The geometry the technique post-pass draws against — recorded even
+      // when this note carries none, because another note's hammer-on may
+      // name it as its destination. A grace takes no ordinal, so it records
+      // no site: it is never a technique's origin or destination beat.
+      if (ordinal >= 0) {
+        recordSite(techniqueSites, {
+          x: eventX,
+          endX: eventEndX,
+          y: stringY,
+          laneY,
+          row,
+          halfWidthSp: charWidthSp / 2,
+          voiceKey,
+          ordinal,
+          fret: pos.fret,
+          ...(note?.id !== undefined ? { noteId: note.id } : {}),
+          ...(technique ? { technique } : {})
+        });
+      }
 
-        if (primaryNoteId) {
-          index.set(primaryNoteId, {
-            measureIndex,
-            voiceIndex,
-            eventIndex
-          });
-          // Also index the chord notes — they all click-target the same event.
-          for (const id of noteIds) {
-            if (id !== undefined && id !== primaryNoteId && !index.has(id)) {
-              index.set(id, { measureIndex, voiceIndex, eventIndex });
-            }
-          }
+      // Background rect obscures the staff line under the digit. Its width
+      // is drawn on the ink scale, so its left edge is placed on it too —
+      // otherwise the mask and the digit come apart as the staff grows.
+      primitives.push({
+        kind: 'rect',
+        x: eventX - (charWidthSp / 2) * ink,
+        y: stringY - bgHeight / 2,
+        w: charWidthSp,
+        h: bgHeight,
+        fill: FRET_BG_FILL,
+        className: 'fret-bg',
+        sourceId: noteId
+      });
+      primitives.push({
+        kind: 'text',
+        text: fretStr,
+        x: eventX,
+        y: stringY,
+        font: 'body',
+        size: fontSize,
+        anchor: 'middle',
+        baseline: 'central',
+        weight: FRET_FONT_WEIGHT,
+        fill: fretFill,
+        className: 'fret-number' +
+          (isActive ? ' active' : '') +
+          (isSelected ? ' selected' : ''),
+        sourceId: noteId
+      });
+    }
+
+    if (primaryNoteId) {
+      index.set(primaryNoteId, { measureIndex, voiceIndex, eventIndex });
+      // Also index the chord notes — they all click-target the same event.
+      for (const id of noteIds) {
+        if (id !== undefined && id !== primaryNoteId && !index.has(id)) {
+          index.set(id, { measureIndex, voiceIndex, eventIndex });
         }
       }
+    }
+  };
+
+  voices.forEach((sequence, voiceIndex) => {
+    sequence.content.forEach((item, eventIndex) => {
+      const slot = slots[voiceIndex]?.[eventIndex];
+      if (!slot) return;
+      const voiceKey = `${voiceIndex}`;
+      // The item's own duration, in x: where the next column starts, or the
+      // bar's end barline. A vibrato wiggle and a bend curve draw across it.
+      const itemEndX = slots[voiceIndex]?.[eventIndex + 1]?.x ?? measureEndX;
+
+      // Containers hold events, and the plan reserved ONE slot for the whole
+      // container — its first inner column. The inner columns are then walked
+      // exactly as the notation layout walks them (`emitTupletGroup`,
+      // `emitGraceGroup`), because both staves read the one plan and a walk
+      // that disagreed with it by a term would slide the tab out of column.
+      if (isGrace(item) || isTuplet(item)) {
+        const inner = innerColumns(item, slot.x, ink, accidentalContext);
+        inner.forEach(({ event, x, endX }, containerIndex) => {
+          try {
+            drawEvent({
+              event,
+              eventIndex,
+              containerIndex,
+              eventX: x,
+              eventEndX: endX,
+              // A grace is small on tab for the same reason it is small on the
+              // notation staff: it is an ornament, and a full-size digit would
+              // read as part of the beat it decorates.
+              scale: isGrace(item) ? GRACE_FRET_SCALE : 1,
+              voiceKey,
+              // Un-timed events take no technique ordinal: the ordinals number
+              // the beats a technique can travel between, and a grace is not
+              // one of them.
+              ordinal: isGrace(item) ? -1 : nextOrdinal(techniqueSites, voiceKey),
+              voiceIndex
+            });
+          } catch (e) {
+            onIssue((e as Error).message);
+          }
+        });
+        if (isTuplet(item) && showTupletBrackets && inner.length > 0) {
+          emitTabTupletBracket(
+            item,
+            inner[0].x,
+            inner[inner.length - 1].x,
+            staffTop,
+            primitives
+          );
+        }
+        return;
+      }
+
+      // Tremolos still aren't drawn on tab — the plan reserves their columns,
+      // so the staves stay aligned in the "both" view. Unknown item kinds were
+      // recorded by the plan.
+      if (!isTimedEvent(item)) return;
+
+      try {
+        drawEvent({
+          event: item,
+          eventIndex,
+          eventX: slot.x,
+          eventEndX: itemEndX,
+          scale: 1,
+          voiceKey,
+          ordinal: nextOrdinal(techniqueSites, voiceKey),
+          voiceIndex
+        });
       } catch (e) {
         onIssue((e as Error).message);
       }

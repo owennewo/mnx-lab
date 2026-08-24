@@ -81,10 +81,10 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
-*Counts below are the queue as of 2026-08-24 (0 blocked, 37 stale, 9 never-seen, 62
-current — unchanged by batch 4, which moved goldens that were never approved). Batches are
-grouped by cause; the commit named for each sub-set is the one that **last moved** those
-goldens, which is not always the one that demoted them.*
+*Counts below are the queue as of 2026-08-24 (0 blocked, 37 stale, 12 never-seen, 62
+current — batches 4 and 5 moved no approved golden, so nothing was demoted for either).
+Batches are grouped by cause; the commit named for each sub-set is the one that **last
+moved** those goldens, which is not always the one that demoted them.*
 
 ### 1. `core-ink-measured-gaps` — vertical distance measured ink to ink — **33 stale**
 
@@ -211,6 +211,48 @@ view a guitarist actually uses, and it is where the two staves' marks have to co
 - **Everywhere:** nothing reserves vertical room for these marks — the ink-measured gaps of
   batch 1 do it — so a system that opened up to fit a bend arrow is the mechanism working,
   not a layout bug.
+
+### 5. `core-tuplets-grace-notes` — rhythm reaches the fingerboard — **3 never-seen**
+
+Owner: [core-tuplets-grace-notes.md](../complete/core-tuplets-grace-notes.md) (built
+2026-08-24; **closed the same day owing these approvals**). Scenarios:
+`lab/tab-rhythm/{triplets-on-tab, grace-on-tab, unplayable-inside-a-tuplet}` — three new
+scenarios in a new category, all four goldens each. Nothing existing moved: the tab staff
+used to reserve a container's columns and draw nothing in them, and no scenario in the
+corpus put a tuplet or a grace on a tab-opting part, so the change was invisible to every
+committed golden until these three arrived.
+
+**What a reviewer should look for.** Like batch 4 this is engraving taste with no spec
+reference to check against — MNX has reference engravings for tuplets and graces on a
+notation staff, and none at all for either on tab. Read `both` first and `tab` second; the
+two views deliberately differ, and that difference is the main thing to agree with.
+
+- **The bracket appears once per system.** In `tab` the tuplet bracket and its number are
+  drawn over the tab staff, because a tab staff has no beams and nothing else can say
+  where a group begins and ends. In `both` they are NOT — the notation staff directly
+  above draws them over the same columns, and printing both would read as two gestures.
+  Check that the one bracket in `both` sits over the notes it covers on both staves.
+- **The quarter triplet is the one to look at.** In `triplets-on-tab` bar 2, its three
+  digits span a half note, so its columns are wider than the eighth triplets' in bar 1 —
+  but narrower than the two plain quarters beside them, because a tuplet's inner columns
+  are RIGID (pre-scaled by the ratio) while a plain event's duration space is a spring
+  that stretches into the justified line. That is inherited from the notation layout
+  rather than decided here, and it is the most likely thing to be judged wrong: the
+  question for a reviewer is whether a rigid triplet reads as cramped next to stretched
+  neighbours, not whether the tab staff differs from the notation staff (it does not).
+- **Grace digits are small — 0.6, the notation staff's own `GRACE_SCALE`.** They sit in
+  the rigid small columns the plan already reserved for them, ahead of the note they
+  decorate. In `grace-on-tab` check the two-note run before the closing chord: two small
+  digits, evenly spaced, then a full-size chord — and check the tab digits still line up
+  with the notation heads across the grace, which is the thing the shared plan buys.
+- **No slash on a tab grace.** The notation staff draws one; the tab staff draws a small
+  digit and nothing else, because there is no stem to slash. Whether a tab reader wants
+  some other mark instead is an open question this item did not answer.
+- **`unplayable-inside-a-tuplet` is the honesty exhibit.** Its triplet's middle note (E1)
+  and its grace's note (fret 30) draw NO digit, and both carry a red badge. Two absences
+  and two badges is the correct reading; a clamped digit at fret 0 or 24 would be the
+  failure. Check the badges are red (error, not warning) and that the surrounding digits
+  did not shift to close the gap.
 
 ## Settled
 

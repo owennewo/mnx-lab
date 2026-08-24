@@ -4,9 +4,13 @@ import * as path from 'path';
 import { importGuitarPro, exportGuitarPro, buildScore } from '../src/index.js';
 import {
   MnxStructure,
+  MnxEvent,
   MnxPitch,
+  MnxSequenceItem,
   MnxTuningEntry,
-  isTimedEvent
+  isGrace,
+  isTimedEvent,
+  isTuplet
 } from '../src/common/types.js';
 import { pitchToMidi } from '../src/common/tuning.js';
 
@@ -18,10 +22,19 @@ import { pitchToMidi } from '../src/common/tuning.js';
  * with two voices. The non-standard tuning is what makes it valuable — MNX and
  * Guitar Pro number strings in OPPOSITE directions (MNX 1 = highest, Guitar Pro
  * 1 = lowest), and with standard tuning alone several of those bugs stay hidden.
+ * `Triplets-and-graces` is the third of them, and it is the only one carrying a
+ * tuplet or a grace note at all: the other two are zero for both, which is
+ * exactly why neither converter used to handle either
+ * (roadmap/.../core-tuplets-grace-notes.md).
+ *
+ * Every row below names the CONTAINER its event came out of, so a round trip
+ * that keeps the pitches and loses the tuplet — the old behaviour, which
+ * flattened a triplet into three plain eighths — reads as a difference rather
+ * than as a pass.
  */
 
 const SCORES = path.resolve(__dirname, '../../fixtures');
-const FIXTURES = ['House-of-the-Rising-Sun', 'Sun-did-glide'];
+const FIXTURES = ['House-of-the-Rising-Sun', 'Sun-did-glide', 'Triplets-and-graces'];
 
 /** Every note/rest flattened in document order, with everything that must survive. */
 interface Row {
@@ -32,6 +45,34 @@ interface Row {
   dots: number;
   string?: number;
   fret?: number;
+  /** The container this event sits in, and where in it — `-` when it sits in
+   *  the sequence directly. A dropped tuplet wrapper changes this and nothing
+   *  else, which is precisely the loss worth catching. */
+  container: string;
+}
+
+/** Every event of a sequence, in document order, labelled with its container. */
+function* walk(
+  content: readonly MnxSequenceItem[]
+): Generator<{ event: MnxEvent; container: string }> {
+  for (const item of content) {
+    if (isTuplet(item)) {
+      const ratio =
+        `tuplet ${item.inner.multiple}×${item.inner.duration.base}` +
+        `:${item.outer.multiple}×${item.outer.duration.base}`;
+      for (const [index, event] of item.content.entries()) {
+        yield { event, container: `${ratio}[${index}/${item.content.length}]` };
+      }
+      continue;
+    }
+    if (isGrace(item)) {
+      for (const [index, event] of item.content.entries()) {
+        yield { event, container: `grace ${item.graceType ?? '-'}[${index}]` };
+      }
+      continue;
+    }
+    if (isTimedEvent(item)) yield { event: item, container: '-' };
+  }
 }
 
 function rows(mnx: MnxStructure): Row[] {
@@ -39,17 +80,22 @@ function rows(mnx: MnxStructure): Row[] {
   for (const part of mnx.parts) {
     part.measures.forEach((measure, measureIndex) => {
       for (const sequence of measure.sequences ?? []) {
-        for (const item of sequence.content ?? []) {
-          if (!isTimedEvent(item)) continue;
-          const base = item.duration.base;
-          const dots = item.duration.dots ?? 0;
-          const common = { measure: measureIndex, voice: sequence.voice, base, dots };
+        for (const { event, container } of walk(sequence.content ?? [])) {
+          const base = event.duration.base;
+          const dots = event.duration.dots ?? 0;
+          const common = {
+            measure: measureIndex,
+            voice: sequence.voice,
+            base,
+            dots,
+            container
+          };
 
-          if (item.rest || !item.notes?.length) {
+          if (event.rest || !event.notes?.length) {
             out.push({ ...common, midi: 'REST' });
             continue;
           }
-          for (const note of item.notes) {
+          for (const note of event.notes) {
             const x = note._x?.mnxLab;
             out.push({
               ...common,
@@ -77,8 +123,8 @@ function everyPitch(mnx: MnxStructure): MnxPitch[] {
   for (const part of mnx.parts)
     for (const measure of part.measures)
       for (const sequence of measure.sequences ?? [])
-        for (const item of sequence.content ?? [])
-          if (isTimedEvent(item)) for (const note of item.notes ?? []) out.push(note.pitch);
+        for (const { event } of walk(sequence.content ?? []))
+          for (const note of event.notes ?? []) out.push(note.pitch);
   return out;
 }
 

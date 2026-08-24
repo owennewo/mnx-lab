@@ -126,6 +126,7 @@ export function importMusicXML(
   aligner.linkTechniqueTargets(finalParts);
 
   // 5. Report source defects that were repaired (or could not be)
+  for (const warning of aligner.warnings) options.onWarning?.(warning);
   const { malformedPitches, recoveredPitches } = aligner.stats;
   if (malformedPitches > 0 && options.onWarning) {
     const unrecovered = malformedPitches - recoveredPitches;

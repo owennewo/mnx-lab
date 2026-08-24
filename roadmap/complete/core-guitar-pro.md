@@ -9,7 +9,7 @@
 > both recorded at "What was left, and where it went" below: gp3/gp4/gp5 reader
 > coverage (alphaTab's code, not ours) and tuplets/grace notes (never
 > Guitar-Pro-specific — split to
-> [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md)).
+> [core-tuplets-grace-notes.md](core-tuplets-grace-notes.md)).
 
 ## What is built
 
@@ -27,7 +27,7 @@
 | Export MNX → `.gp` (GP7) | ✅ verified as a real GP7 zip container (`VERSION` 7.0 + `Content/score.gpif`) |
 | `MNX → .gp → MNX` round trip | ✅ **byte-for-byte identical events** on all three reference scores |
 | `_x.mnxLab.tab.technique` | ✅ **exercised** — Vestapol carries hammer-ons, pull-offs, slides, vibrato, harmonics and palm mute; bends round-trip as **curves** (`points: [{position, alter}]`, semitones ← GP's quarter tones) |
-| Tuplets, grace notes | ➡️ **out of scope here** — both directions `warn()` rather than silently dropping; the feature moved to [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md) |
+| Tuplets, grace notes | ➡️ **out of scope here** — both directions `warn()` rather than silently dropping; the feature moved to [core-tuplets-grace-notes.md](core-tuplets-grace-notes.md) |
 
 **Round-trip results** (`MNX → .gp → MNX`, comparing measure, voice, sounding
 pitch, duration base, dots, string and fret for every event):
@@ -146,7 +146,7 @@ The original list, resolved item by item — three closed, two scoped out.
   *neither* converter handles them (MusicXML doesn't even look) and the tab renderer
   draws neither, while the model and the notation renderer support both. Recording the
   same hole in three places was the actual problem. Now
-  [core-tuplets-grace-notes.md](../proposed/core-tuplets-grace-notes.md), at its real scope, with
+  [core-tuplets-grace-notes.md](core-tuplets-grace-notes.md), at its real scope, with
   the fixture as step zero — no reference score contains a tuplet or a grace note, which
   is why the round trips are honestly lossless and still never present the case.
 

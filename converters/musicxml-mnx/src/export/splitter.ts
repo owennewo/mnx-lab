@@ -1,5 +1,5 @@
 import { MnxPart, MnxPartMeasure, MnxSequence, MnxNote } from '../common/types.js';
-import { addIdSuffix } from '../common/utils.js';
+import { addIdSuffix, mapSequenceEvents } from '../common/utils.js';
 
 /**
  * Synthesizes the MusicXML notation+TAB pair from a SINGLE-SOURCE MNX part
@@ -73,7 +73,7 @@ function copySequenceStd(seq: MnxSequence): MnxSequence {
   return {
     ...seq,
     staff: undefined,
-    content: seq.content.map(event => ({
+    content: mapSequenceEvents(seq.content, event => ({
       ...event,
       notes: event.notes?.map(note => {
         const copyNote: MnxNote = {
@@ -109,7 +109,7 @@ function copySequenceTab(seq: MnxSequence): MnxSequence {
   return {
     ...seq,
     staff: undefined,
-    content: seq.content.map(event => ({
+    content: mapSequenceEvents(seq.content, event => ({
       ...event,
       notes: event.notes?.map(note => {
         const copyNote: MnxNote = {

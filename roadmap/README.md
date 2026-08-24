@@ -76,15 +76,6 @@ proposals that name their campaign.
   (`arpeggio`, `section-colour`) greyed with **no address at all**, which the existing
   test could not see because it asserts a blocker exists, not that it resolves. Both
   halves must close for `complete/`.
-- **[core-tuplets-grace-notes.md](proposed/core-tuplets-grace-notes.md)** — tuplets and grace notes
-  **across both converters and on tab**. Split out of
-  [core-guitar-pro.md](complete/core-guitar-pro.md) when that closed, at its real scope: the model
-  and the notation renderer already support both (`MnxTuplet`/`MnxGrace`, drawn, with spec
-  scenarios), but **neither converter carries them** (Guitar Pro flattens with a `warn()`;
-  MusicXML never looks) and the tab staff reserves their columns without drawing them.
-  Step zero is a **fixture** — none of the three reference scores contains a tuplet or a
-  grace note, which is why the round trips are honestly lossless and still never present
-  the case. Import/export follows the collapse-expand precedent already solved for voltas.
 
 ### proposed/low-priority/
 Still wanted, still described — just not next. Nothing here has been argued against
@@ -210,9 +201,29 @@ back up to `proposed/` the moment it is.
   `npm run verify:scenarios -- --list`); it holds the *why*, which provenance cannot record.
   Opened 2026-08-22 with 37 stale + 8 never-seen in three batches: `core-ink-measured-gaps`
   (33, across stages A/C/D and the tab row pads), the barline-default fix (4, no owning
-  doc), and the never-reviewed corpus-closure technique set (8).
+  doc), and the never-reviewed corpus-closure technique set (8). Batches 4
+  (`core-guitar-technique`, 5) and 5 (`core-tuplets-grace-notes`, 3) followed on
+  2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-tuplets-grace-notes.md](complete/core-tuplets-grace-notes.md)** — tuplets and grace
+  notes **across both converters and on tab**, **finished 2026-08-24**. Split out of
+  [core-guitar-pro.md](complete/core-guitar-pro.md) at its real scope: the model and the
+  notation renderer already drew both, but neither converter carried them and the tab staff
+  reserved their columns without drawing them. Step zero was a **fixture** —
+  `Triplets-and-graces`, the only one not authored in Guitar Pro (hand-written GPIF, the
+  app's own native XML, emitted by a tool that imports nothing from `src/`), because none
+  of the three reference scores contains a tuplet or a grace note and so the round trips
+  were honestly lossless while never presenting the case. Both converters follow the
+  collapse-expand precedent from voltas; MusicXML additionally raises `<divisions>` per
+  document (a triplet eighth is not an integer at 8) and accepts both wild conventions on
+  import (`<tuplet>` brackets, or `<time-modification>` alone). On tab, grace digits are
+  small and a tuplet bracket is drawn **once per system** — the standalone view draws its
+  own, the `both` view lets the notation staff carry it. Uncovered a real bug: `validate.ts`
+  stopped at the first container, so an unplayable note inside one would have drawn nothing
+  AND carried no badge. **Not one committed golden moved** — the corpus could not see this
+  class of content at all until the three new `lab/tab-rhythm/` scenarios arrived, which are
+  ledger batch 5 in [lab-verify.md](inprogress/lab-verify.md).
 - **[core-guitar-technique.md](complete/core-guitar-technique.md)** — playing technique,
   **finished 2026-08-24**. The data path landed 2026-07-26 and then a month passed with
   nothing drawing any of it, which is a failure that *looks like a clean render*: a

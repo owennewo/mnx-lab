@@ -94,6 +94,11 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
 
   const diagnostics: LayoutDiagnostic[] = [];
 
+  // A tab staff draws no accidentals, but the plan reserves their columns
+  // inside a tuplet — so the walk over those columns needs the same answer the
+  // plan gave (spacing.ts reads the same flag).
+  const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
+
   const rowBand = (row: number): RowBandSp => {
     const staffTop = MARGIN_SP + row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP;
     return { staffTop, staffBottom: staffTop + STAFF_HEIGHT_SP };
@@ -234,7 +239,12 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
         positionContext,
         row: m.row,
         measureEndX: m.x + m.width,
-        technique
+        technique,
+        // The standalone view has no notation staff to carry them.
+        showTupletBrackets: true,
+        // The plan priced this measure's tuplet columns with these; the walk
+        // over them has to agree term for term.
+        accidentalContext: { useAccidentalDisplay, keyFifths: m.keyFifths }
       });
     }
 

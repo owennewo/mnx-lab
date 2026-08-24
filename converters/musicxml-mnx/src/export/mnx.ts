@@ -18,7 +18,7 @@ import {
 import { serializeXML } from '../common/xml.js';
 import { splitPart, hasTabContent } from './splitter.js';
 import { flattenSequences, FlatXmlNode } from './flattener.js';
-import { getXmlNoteType } from '../common/utils.js';
+import { divisionsFor, getXmlNoteType } from '../common/utils.js';
 
 // Chromatic semitone offsets for each diatonic step (C=0)
 const STEP_SEMITONES_EXP: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -80,7 +80,9 @@ export function exportMusicXML(
   options: ExportOptions = {}
 ): string {
   const splitNotationAndTab = options.splitNotationAndTab !== false; // default true
-  const divisions = options.divisions || 8;
+  // Raised where the document needs it: a triplet's `<duration>` is a third of
+  // a written value, and only a divisions count divisible by 3 can state it.
+  const divisions = divisionsFor(mnxJson.parts, options.divisions || 8);
   const lyricLineOrder = mnxJson.global?.lyrics?.lineOrder ?? [];
 
   // MNX states a volta once, on the measure it starts, spanning `duration`.
@@ -591,12 +593,27 @@ function buildXmlNode(
   const noteEl = doc.createElement('note');
 
   // MusicXML fixes the child order of <note>:
-  //   chord?, (pitch|rest|unpitched), duration, voice?, type?, dot*,
-  //   accidental?, notations*
-  // so <accidental> and <notations> are built here but appended below, after
-  // <duration>/<voice>/<type>/<dot>.
+  //   grace?, chord?, (pitch|rest|unpitched), duration, voice?, type?, dot*,
+  //   accidental?, time-modification?, notations*
+  // so <accidental>, <time-modification> and <notations> are built here but
+  // appended below, after <duration>/<voice>/<type>/<dot>.
   let accidentalEl: Element | undefined;
   let notationsEl: Element | undefined;
+
+  if (node.grace) {
+    // `<grace>` opens the note and REPLACES `<duration>` — a grace note is
+    // un-timed, and giving it a duration is what makes a bar overflow.
+    //
+    // The steal direction rides on `slash`, which is the universal convention
+    // and the only one real exporters write: a slashed grace is the
+    // acciaccatura crushed in before the beat, an unslashed one the
+    // appoggiatura that delays what follows. MNX names the two independently,
+    // so an unusual pairing normalises here — the same trade this converter
+    // already makes for legato slides, which MusicXML also cannot say directly.
+    const graceEl = doc.createElement('grace');
+    graceEl.setAttribute('slash', node.grace.graceType === 'stealFollowing' ? 'no' : 'yes');
+    noteEl.appendChild(graceEl);
+  }
 
   if (node.isChord) {
     noteEl.appendChild(doc.createElement('chord'));
@@ -725,10 +742,12 @@ function buildXmlNode(
     }
   }
 
-  // Duration
-  const durEl = doc.createElement('duration');
-  durEl.textContent = `${node.duration}`;
-  noteEl.appendChild(durEl);
+  // Duration — omitted for grace notes, which have none by definition.
+  if (!node.grace) {
+    const durEl = doc.createElement('duration');
+    durEl.textContent = `${node.duration}`;
+    noteEl.appendChild(durEl);
+  }
 
   // Voice
   if (node.voice) {
@@ -749,6 +768,40 @@ function buildXmlNode(
   }
 
   if (accidentalEl) noteEl.appendChild(accidentalEl);
+
+  if (node.tuplet) {
+    // The arithmetic half of a tuplet, on EVERY member: `<duration>` is
+    // already the performed value, and `<time-modification>` is what tells a
+    // reader the written `<type>` above it is not a contradiction.
+    const modEl = doc.createElement('time-modification');
+    const actualEl = doc.createElement('actual-notes');
+    actualEl.textContent = `${node.tuplet.actualNotes}`;
+    const normalEl = doc.createElement('normal-notes');
+    normalEl.textContent = `${node.tuplet.normalNotes}`;
+    modEl.appendChild(actualEl);
+    modEl.appendChild(normalEl);
+    // `<normal-type>` is only meaningful when it differs from the written
+    // `<type>`; writing it always is legal and makes the ratio readable on its
+    // own, which matters because importers in the wild lean on it.
+    const normalTypeEl = doc.createElement('normal-type');
+    normalTypeEl.textContent = node.tuplet.normalType;
+    modEl.appendChild(normalTypeEl);
+    noteEl.appendChild(modEl);
+
+    // The visual half: one bracket per group, opened and closed on its outer
+    // notes. `<time-modification>` alone would still play correctly — plenty
+    // of exporters stop there, which is why the importer accepts that form —
+    // but nothing would draw the bracket or the number.
+    if (node.tuplet.start || node.tuplet.stop) {
+      notationsEl = notationsEl ?? doc.createElement('notations');
+      const tupletEl = doc.createElement('tuplet');
+      tupletEl.setAttribute('type', node.tuplet.start ? 'start' : 'stop');
+      tupletEl.setAttribute('number', '1');
+      if (node.tuplet.start) tupletEl.setAttribute('bracket', 'yes');
+      notationsEl.appendChild(tupletEl);
+    }
+  }
+
   if (notationsEl) noteEl.appendChild(notationsEl);
 
   // <lyric> closes the note (after <notations>, per the MusicXML content model).

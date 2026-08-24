@@ -6,12 +6,15 @@ import {
   MnxEvent,
   MnxNote,
   MnxHarmony,
-  isTimedEvent
+  isGrace,
+  isTimedEvent,
+  isTuplet
 } from '../common/types.js';
 import { renderChordSymbol } from '../common/harmony.js';
 import {
   mnxBaseToAlphaTab,
   mnxDurationToWholes,
+  tupletFlags,
   wholesToFraction
 } from '../common/duration.js';
 import {
@@ -410,24 +413,70 @@ function buildVoice(
   }
 
   let onset = 0;
+  /** Adds one beat and (for timed events) advances the metric clock, tagging
+   *  it with any chord symbol that starts where it does. */
+  const addBeat = (beat: alphaTab.model.Beat | null, atOnset: number) => {
+    if (!beat) return;
+    const [numerator, denominator] = wholesToFraction(atOnset);
+    const chord = harmonyText?.get(`${numerator}/${denominator}`);
+    if (chord) beat.text = chord;
+    voice.addBeat(beat);
+  };
+
   for (const item of sequence.content) {
+    if (isGrace(item)) {
+      // MNX declares the container; Guitar Pro flags each beat. The graces sit
+      // ahead of their principal in both models, so the run is simply written
+      // out in place — un-timed, so `onset` does not move.
+      const graceType =
+        item.graceType === 'stealFollowing' ? M.GraceType.OnBeat : M.GraceType.BeforeBeat;
+      for (const inner of item.content) {
+        const beat = buildBeat(inner, tunings, capo, measureIndex, warn, lyricLineOrder, suppressed);
+        if (!beat) continue;
+        beat.graceType = graceType;
+        voice.addBeat(beat);
+      }
+      continue;
+    }
+
+    if (isTuplet(item)) {
+      // The expand half of the same asymmetry the importer collapses: one MNX
+      // container becomes N beats each carrying the SAME num:den, which is how
+      // Guitar Pro says "these belong to one group".
+      const flags = tupletFlags(item);
+      if (!flags) {
+        warn(
+          `measure ${measureIndex + 1}: a tuplet whose ratio Guitar Pro cannot ` +
+            `flag per beat (${item.inner.multiple}:${item.outer.multiple}) was written ` +
+            `without it; its notes keep their written values.`
+        );
+      }
+      for (const inner of item.content) {
+        const beat = buildBeat(inner, tunings, capo, measureIndex, warn, lyricLineOrder, suppressed);
+        if (beat && flags) {
+          beat.tupletNumerator = flags.numerator;
+          beat.tupletDenominator = flags.denominator;
+        }
+        addBeat(beat, onset);
+        onset += mnxDurationToWholes(inner.duration.base, inner.duration.dots ?? 0) *
+          (flags ? flags.denominator / flags.numerator : 1);
+      }
+      continue;
+    }
+
     if (!isTimedEvent(item)) {
-      // Grace notes and tuplets are not modelled yet; dropping them silently
-      // would shift every following beat, so say so.
+      // Containers this converter still does not model (tremolo, …). Dropping
+      // one silently would shift every following beat, so say so.
       warn(
         `measure ${measureIndex + 1}: skipped an unsupported ` +
-          `"${(item as { type?: string }).type ?? 'unknown'}" container ` +
-          `(grace notes and tuplets are not exported yet).`
+          `"${(item as { type?: string }).type ?? 'unknown'}" container.`
       );
       continue;
     }
-    const beat = buildBeat(item, tunings, capo, measureIndex, warn, lyricLineOrder, suppressed);
-    if (beat) {
-      const [numerator, denominator] = wholesToFraction(onset);
-      const chord = harmonyText?.get(`${numerator}/${denominator}`);
-      if (chord) beat.text = chord;
-      voice.addBeat(beat);
-    }
+    addBeat(
+      buildBeat(item, tunings, capo, measureIndex, warn, lyricLineOrder, suppressed),
+      onset
+    );
     onset += mnxDurationToWholes(item.duration.base, item.duration.dots ?? 0);
   }
 

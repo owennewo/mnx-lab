@@ -1,0 +1,33 @@
+{
+  "title": "Triplets on the fingerboard",
+  "description": "Two 3:2 eighth triplets and a 3:2 QUARTER triplet on a guitar part in staffKind both, every note carrying its string and fret. The tab staff draws no beams, so a bracket is the only thing that can say where a group begins and ends — and the standalone tab view draws one where the combined view does not, because there the notation staff above already carries it. The quarter triplet is the case a converter or renderer that assumes tuplets are always eighths gets wrong: its three notes span a half note, and its columns are wider than the eighths above them.",
+  "bars": 2,
+  "tags": [
+    "tab",
+    "tab:rhythm",
+    "tuplet"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/tuplet/"
+  ],
+  "coversDefs": [
+    "tuplet",
+    "vendor-extensions",
+    "event",
+    "note",
+    "clef",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view",
+    "tuplets"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

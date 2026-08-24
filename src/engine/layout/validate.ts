@@ -1,4 +1,4 @@
-import { MnxStructure, MnxPitch, isGrace, isTremolo, isTuplet, isTimedEvent } from '../../model/mnx.ts';
+import { MnxEvent, MnxStructure, MnxPitch, isGrace, isTremolo, isTuplet, isTimedEvent } from '../../model/mnx.ts';
 import { durationValue, tremoloDuration, tupletDuration } from './spacing.ts';
 import { MAX_FRET, midiOfMnxPitch, tabPositionContext, PartTabSetups } from '../tab/guitarPositions.ts';
 
@@ -191,12 +191,20 @@ function validateTabPositions(
 
     (partMeasure.sequences ?? []).forEach((seq, voiceIndex) => {
       let onset = 0;
-      for (const [eventIndex, item] of (seq.content ?? []).entries()) {
-        // Un-timed containers make every later onset in this voice unknowable;
-        // stop rather than report conflicts against invented times.
-        if (!isTimedEvent(item)) return;
-        const at = { voiceIndex, eventIndex };
 
+      /**
+       * One event's notes, checked against the fingerboard.
+       *
+       * `claimOnset` is null for a grace note. A grace is un-timed, so it has
+       * no onset to conflict AT — but it is still ink on the tab staff, and an
+       * unplayable one has to be told about, so it is checked for reach and
+       * left out of the string-conflict map.
+       */
+      const checkEvent = (
+        item: MnxEvent,
+        at: { voiceIndex: number; eventIndex: number },
+        claimOnset: number | null
+      ) => {
         for (const note of item.notes ?? []) {
           const x = note._x?.mnxLab;
           if (x?.string === undefined) {
@@ -244,13 +252,51 @@ function validateTabPositions(
             );
           }
 
-          const key = Math.round(onset * 1e6) / 1e6;
+          if (claimOnset === null) continue;
+          const key = Math.round(claimOnset * 1e6) / 1e6;
           const byString = claims.get(key) ?? new Map<number, PositionClaim[]>();
           const list = byString.get(x.string) ?? [];
           list.push({ fret: derived, voiceIndex });
           byString.set(x.string, list);
           claims.set(key, byString);
         }
+      };
+
+      for (const [eventIndex, item] of (seq.content ?? []).entries()) {
+        const at = { voiceIndex, eventIndex };
+
+        // Containers are descended into, because the tab staff DRAWS their
+        // notes (`tabStaff.ts`) and an unplayable digit that draws nothing must
+        // still carry a badge — a silent drop is the one outcome this whole
+        // module exists to prevent.
+        if (isGrace(item)) {
+          for (const inner of item.content) checkEvent(inner, at, null);
+          continue;
+        }
+        if (isTuplet(item)) {
+          // Inner events are written at one value and performed at another, so
+          // the onset walk inside the group scales by the ratio — otherwise two
+          // voices' triplets would be compared at times neither of them sounds.
+          const written = item.content.reduce(
+            (sum, inner) => sum + (isTimedEvent(inner) ? durationValue(inner.duration) : 0),
+            0
+          );
+          const scale = written > 0 ? tupletDuration(item) / written : 1;
+          let inner = onset;
+          for (const event of item.content) {
+            if (!isTimedEvent(event)) continue;
+            checkEvent(event, at, inner);
+            inner += durationValue(event.duration) * scale;
+          }
+          onset += tupletDuration(item);
+          continue;
+        }
+
+        // Un-timed containers this module still cannot place (tremolo, …) make
+        // every later onset in this voice unknowable; stop rather than report
+        // conflicts against invented times.
+        if (!isTimedEvent(item)) return;
+        checkEvent(item, at, onset);
         onset += durationValue(item.duration);
       }
     });

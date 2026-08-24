@@ -90,6 +90,7 @@
     "lab/tab-fingering": "Fingering",
     "lab/tab-techniques": "Techniques (bends, slides, hammer-ons)",
     "lab/tab-derivation": "Derived positions (string → fret, defaults, diagnostics)",
+    "lab/tab-rhythm": "Rhythm on the fingerboard — tuplets and grace notes",
     "lab/tab-spec-gaps": "Spec gaps — invalid-by-design exhibits",
     "lab/edge-cases": "Edge cases and regressions",
     "lab/score-text": "Score text — rehearsal marks, sections, directions (proposed)"

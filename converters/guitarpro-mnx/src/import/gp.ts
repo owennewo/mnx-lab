@@ -5,7 +5,9 @@ import {
   MnxPartMeasure,
   MnxGlobalMeasure,
   MnxSequence,
+  MnxSequenceItem,
   MnxEvent,
+  MnxGrace,
   MnxNote,
   MnxTabTechnique,
   MnxEventLyricLine,
@@ -16,6 +18,7 @@ import { parseChordSymbol } from '../common/harmony.js';
 import {
   alphaTabDurationToMnx,
   mnxDurationToWholes,
+  tupletRatio,
   wholesToFraction
 } from '../common/duration.js';
 import { alphaTabStringToMnx, alphaTabTuningToMnx, midiToPitch } from '../common/tuning.js';
@@ -346,7 +349,68 @@ function buildSequence(
   warn: (message: string) => void,
   previousChunks: boolean[]
 ): MnxSequence {
-  const content: MnxEvent[] = [];
+  const content: MnxSequenceItem[] = [];
+
+  // Grace beats and tuplet beats are both RUNS in Guitar Pro — a per-beat flag
+  // repeated across neighbours — and both are single CONTAINERS in MNX. So the
+  // walk buffers a run and flushes it when the run ends, the same shape the
+  // volta import already uses for its per-bar flags.
+  let graceRun: MnxEvent[] = [];
+  let tupletRun: { events: MnxEvent[]; group: alphaTab.model.TupletGroup } | null = null;
+
+  /** A finished grace run, emitted immediately BEFORE the beat it decorates —
+   *  which is where MNX puts the container and where Guitar Pro's own
+   *  `BeforeBeat` graces already sit in beat order. */
+  const flushGrace = (beat: alphaTab.model.Beat | null) => {
+    if (graceRun.length === 0) return;
+    if (tupletRun) {
+      // MNX tuplet content is events, not containers, so a grace decorating an
+      // inner note of a tuplet has nowhere to nest. It is emitted ahead of the
+      // whole group instead — the notes survive, their attachment point does
+      // not, and that is worth a line rather than a silent move.
+      warn(
+        `measure ${measureIndex + 1}: a grace note inside a tuplet was moved ahead ` +
+          `of the group (MNX tuplets contain events, not containers).`
+      );
+    }
+    const grace: MnxGrace = { type: 'grace', content: graceRun };
+    // Guitar Pro's two grace kinds say WHERE the time comes from: `BeforeBeat`
+    // is the acciaccatura crushed in ahead of the beat (it borrows from what
+    // came before), `OnBeat` lands on the beat and delays its principal.
+    // MNX names the same two `stealPrevious` and `stealFollowing`. Slash is
+    // left unstated: both render slashed by default, and Guitar Pro carries no
+    // separate flag to contradict that with.
+    if (beat?.graceType === M.GraceType.OnBeat) grace.graceType = 'stealFollowing';
+    else grace.graceType = 'stealPrevious';
+    content.push(grace);
+    graceRun = [];
+  };
+
+  const flushTuplet = () => {
+    if (!tupletRun) return;
+    const { events, group } = tupletRun;
+    tupletRun = null;
+    const first = group.beats[0];
+    const ratio = tupletRatio(
+      events.map(e => mnxDurationToWholes(e.duration.base, e.duration.dots ?? 0)),
+      first.tupletNumerator,
+      first.tupletDenominator
+    );
+    if (!ratio) {
+      // An incomplete group — Guitar Pro will happily leave two beats flagged
+      // 3:2 — performs in a time no MNX duration × multiple spells. Emitting
+      // the events flat keeps the pitches and says what was lost, rather than
+      // inventing a ratio that changes the rhythm silently.
+      warn(
+        `measure ${measureIndex + 1}: a ${first.tupletNumerator}:${first.tupletDenominator} ` +
+          `tuplet of ${events.length} beat(s) does not fill a whole group; its notes ` +
+          `were written without the tuplet.`
+      );
+      content.push(...events);
+      return;
+    }
+    content.push({ type: 'tuplet', content: events, ...ratio });
+  };
 
   for (const beat of voice.beats) {
     const base = alphaTabDurationToMnx(beat.duration as number);
@@ -362,15 +426,6 @@ function buildSequence(
       duration: beat.dots > 0 ? { base, dots: beat.dots } : { base }
     };
 
-    if (beat.tupletNumerator > 1) {
-      // Tuplets are a container in MNX, not a per-beat flag; emitting the beat
-      // flat keeps the pitches but changes its metric value.
-      warn(
-        `measure ${measureIndex + 1}: a ${beat.tupletNumerator}:${beat.tupletDenominator} ` +
-          `tuplet was flattened (MNX tuplet containers are not built yet).`
-      );
-    }
-
     if (beat.notes.length === 0) {
       event.rest = {};
     } else {
@@ -382,8 +437,33 @@ function buildSequence(
     const lyrics = buildLyrics(beat, previousChunks);
     if (lyrics) event.lyrics = lyrics;
 
+    if (beat.graceType !== M.GraceType.None) {
+      // A grace beat inside a tuplet's span is still un-timed, so it neither
+      // joins the group nor ends it — alphaTab's own TupletGroup.check() takes
+      // the same view.
+      graceRun.push(event);
+      continue;
+    }
+
+    // alphaTab has already decided which flagged beats form one group
+    // (`TupletGroup`, filled by written duration, so six flagged eighths are
+    // two triplets and not one six-note tuplet). Following its grouping rather
+    // than re-deriving one from the flags is what keeps the two agreeing.
+    const group = beat.tupletGroup;
+    if (tupletRun && tupletRun.group !== group) flushTuplet();
+    if (group) {
+      flushGrace(beat);
+      if (!tupletRun) tupletRun = { events: [], group };
+      tupletRun.events.push(event);
+      continue;
+    }
+
+    flushGrace(beat);
     content.push(event);
   }
+
+  flushTuplet();
+  flushGrace(null);
 
   return { voice: `v${voiceIndex + 1}`, content };
 }
