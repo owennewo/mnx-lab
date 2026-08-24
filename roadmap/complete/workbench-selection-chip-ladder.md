@@ -120,6 +120,29 @@ And one the spec did not raise, found in the building:
   should win instead, at which point the fix is one `reverse()` and the
   ArrowUp/Down mapping beside it.
 
+  **Resolved 2026-08-24 — the HUD's direction won**, and it was that fix
+  exactly: the `reverse()` dropped from `trayView`, the ArrowUp/Down step
+  negated, `global` moved to the head of the column, and `chipNeighbours`
+  reading the rows widest-first like everything else. The column now runs
+  `global → document → … → event → note`, and **up is wider** in the keys, in
+  the chip's ▲, in the HUD and in the tray at once. Two arguments decided it.
+  The polarity could not move, because the floor axis
+  ([core-selection-floor-axis.md](core-selection-floor-axis.md)) already makes
+  bare ↓ *descend into* an event's noteheads — flip Shift's polarity and two
+  keys one modifier apart would both mean "finer". And every containment idiom
+  in software puts the ancestor up (`cd ..`, tree views, breadcrumbs; the
+  phrase for the other direction is *drill down*). With the polarity fixed,
+  the drawing was the only thing left that could move.
+
+  What it costs is the geometry bullet above: the ladder no longer unrolls
+  downward out of the chip's box, because the chip's rung is now near the
+  BOTTOM of the column. The tray still lands on the chip's x, at the chip's
+  width, with the word in the chip's own casing — only the vertical
+  coincidence of chip-word and top-rung is gone, and it only ever held when
+  the chip stood at `note`. Restoring it means planting the tray by its
+  ACTIVE rung rather than its top edge, which re-opens what the accent shaft
+  connects to; deliberately not done here.
+
 ## What changed
 
 - `src/workbench/SelectionTray.ts` — the tab strip becomes `.ladder`; `TrayTab`

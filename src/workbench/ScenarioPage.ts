@@ -2395,14 +2395,16 @@ export class ScenarioPage extends LitElement {
    * climbs (wider), `down` descends (narrower); either may be absent at the
    * ends, which is what greys a micro button rather than removing it. The
    * rows come from `buildHudRows` so the chip, the HUD and the tray's own
-   * ladder cannot disagree about which rungs exist or what they are called.
+   * ladder cannot disagree about which rungs exist or what they are called —
+   * and they arrive widest-first, so climbing is a step TOWARDS index 0, the
+   * same direction it is in the HUD and in the tray's drawn column.
    */
   private chipNeighbours(entry: ScenarioEntry): { up: string | null; down: string | null } {
     if (!this.session || !this.chipLevel) return { up: null, down: null };
-    const ladder = [...buildHudRows(entry.meta.title, this.session, this.cursorHidden)].reverse();
+    const ladder = buildHudRows(entry.meta.title, this.session, this.cursorHidden);
     const at = ladder.findIndex(row => row.key === ROW_BY_LEVEL[this.chipLevel!]);
     if (at < 0) return { up: null, down: null };
-    return { up: ladder[at + 1]?.key ?? null, down: ladder[at - 1]?.key ?? null };
+    return { up: ladder[at - 1]?.key ?? null, down: ladder[at + 1]?.key ?? null };
   }
 
   /**
@@ -2490,8 +2492,8 @@ export class ScenarioPage extends LitElement {
   /**
    * The tray's view model: a pure projection of registry + session, rebuilt
    * every render. The rungs are the ladder's present ones (the HUD's rows, so
-   * the tray and the HUD can never disagree about the address), ordered
-   * narrowest-first so the column reads the way the chip grows out of it;
+   * the tray and the HUD can never disagree about the address), in the HUD's
+   * own widest-first order so the two columns on screen run the same way;
    * tiles are the registry filtered to the displayed rung, each drawing its
    * own state from the document.
    *
@@ -2505,24 +2507,26 @@ export class ScenarioPage extends LitElement {
     commands: EditorCommand[];
   } | null {
     if (!this.session) return null;
-    const hudRows = buildHudRows(entry.meta.title, this.session, this.cursorHidden);
-    const ladder = [...hudRows].reverse(); // note first, score last
+    // Widest first — `document` at the top, `note` at the bottom, which is the
+    // HUD's own order rather than its inverse. One direction now serves the
+    // whole screen: up is wider in the keys, in the chip's ▲, in the HUD's
+    // column and in this one.
+    const ladder = buildHudRows(entry.meta.title, this.session, this.cursorHidden);
     if (ladder.length === 0) return null;
-    const baseKey = hudRows.find(r => r.active)?.key ?? ladder[0].key;
+    // With nothing selected no row is active, and the rung to fall back on is
+    // the floor — the narrowest, which is now the LAST row rather than the
+    // first. Reading it off the end keeps that independent of the order.
+    const baseKey = ladder.find(r => r.active)?.key ?? ladder[ladder.length - 1].key;
     // `global` is the scope ABOVE the ladder, so unlike the rungs it is never
     // presence-filtered — the document is always there
-    // (core-selection-tray-global-tab.md).
+    // (core-selection-tray-global-tab.md). Above, now literally: it sits at
+    // the head of the column, where a scope wider than the widest rung
+    // belongs.
     const known = (key: string | null) =>
       key === GLOBAL_TAB || ladder.some(r => r.key === key);
     const displayKey = known(this.trayTab) ? this.trayTab! : baseKey;
 
     const rungs: TrayRung[] = [
-      ...ladder.map(r => ({
-        key: r.key,
-        label: r.label,
-        active: r.key === displayKey,
-        holdsSelection: r.key === baseKey
-      })),
       {
         key: GLOBAL_TAB,
         label: GLOBAL_TAB,
@@ -2530,7 +2534,13 @@ export class ScenarioPage extends LitElement {
         holdsSelection: false,
         // Not a rung: there is no selection to widen to the document.
         committable: false
-      }
+      },
+      ...ladder.map(r => ({
+        key: r.key,
+        label: r.label,
+        active: r.key === displayKey,
+        holdsSelection: r.key === baseKey
+      }))
     ];
 
     const view = sessionView(this.session);

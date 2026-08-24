@@ -628,13 +628,14 @@ export class SelectionTray extends LitElement {
       }
       // ↑ climbs the ladder and ↓ descends it, exactly as the chip's own ▲▼
       // pair does — one axis, two controls (the spec's rule). Climbing is
-      // widening, which is DOWN the drawn column: the ladder reads
-      // narrowest-first so `note` can sit at the top, where the chip grew from.
+      // widening, and the column is drawn widest-first, so ↑ also moves the
+      // highlight UP the pixels. Key, triangle, column and the HUD beside it
+      // all point the same way; the walk is simply towards index 0.
       case 'ArrowUp':
       case 'ArrowDown': {
         consume();
         const idx = this.rungs.findIndex(r => r.active);
-        const next = this.rungs[idx + (event.code === 'ArrowUp' ? 1 : -1)];
+        const next = this.rungs[idx + (event.code === 'ArrowUp' ? -1 : 1)];
         if (next) this.emit('tray-rung-preview', { key: next.key });
         return;
       }
