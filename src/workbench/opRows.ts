@@ -326,6 +326,8 @@ function intentLabel(intent: EditorIntent): string {
       return 'append bar';
     case 'insertAtRung':
       return `insert ${intent.side}`;
+    case 'goToEdge':
+      return `go to the ${intent.edge} bar`;
     case 'setTimeSignature':
       return `“${intent.count}/${intent.unit}”`;
     case 'setTuning':

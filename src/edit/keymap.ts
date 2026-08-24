@@ -50,6 +50,12 @@ export const NAVIGATION_LAYER: KeymapLayer = {
     { code: 'ArrowRight', shift: true, intent: { type: 'extendSelection', direction: 'next' } },
     { code: 'ArrowLeft', shift: true, intent: { type: 'extendSelection', direction: 'previous' } },
     { code: 'End', shift: true, intent: { type: 'extendSelection', direction: 'end' } },
+    // Home / End — the timeline's ends, and the reason `Shift+M` is gone: an
+    // "append" key was a special case for a position the cursor can simply go
+    // to. End then `I` is the same act, spelled out of parts that already
+    // exist (core-rung-insert.md).
+    { code: 'Home', intent: { type: 'goToEdge', edge: 'first' } },
+    { code: 'End', intent: { type: 'goToEdge', edge: 'last' } },
     { code: 'KeyA', ctrl: true, intent: { type: 'closeSelection' } },
     { code: 'KeyA', meta: true, intent: { type: 'closeSelection' } },
     // The Ctrl climb (selection-ladder navigation map): the arrow applied at
@@ -91,7 +97,6 @@ export const EDIT_LAYER: KeymapLayer = {
     { code: 'ArrowDown', alt: true, intent: { type: 'transpose', semitones: -1 } },
     { code: 'ArrowUp', alt: true, shift: true, intent: { type: 'transpose', semitones: 12 } },
     { code: 'ArrowDown', alt: true, shift: true, intent: { type: 'transpose', semitones: -12 } },
-    { code: 'KeyM', shift: true, intent: { type: 'appendMeasure' } },
     // Insert at the rung (core-rung-insert.md): `Del` is already "remove at
     // this rung", so `I` is its construct twin, with the SIDE as a modifier
     // rather than a second key to learn. Rung-generic by construction.

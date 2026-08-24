@@ -195,11 +195,8 @@ Three more, each aimed at one risk this doc names:
 ## Built so far — 2026-08-24, the insert half
 
 `I` / `Shift+I` resolve per rung and land where they should. **The ghost past
-the end is NOT built yet**, and `Shift+M` therefore **stays** until it is: the
-doc pairs its retirement with the ghost, and removing the only gesture for
-"append at the end" before its replacement exists would be a regression on the
-way to a fix. `I` on the last bar already appends, so the gap is only
-"append without navigating there first".
+the end is NOT built yet**, but **`Shift+M` is gone anyway** — see the section
+below, which corrects this doc's own plan.
 
 Landed:
 
@@ -215,6 +212,7 @@ Landed:
 - **`widenSpansCovering`** — the silent hazard, closed. A span is widened
   exactly when the new bar lands inside `s … s+d-1`.
 - Tray tiles at the measure and score rungs; the voice tile now names `I` too.
+- **`goToEdge { edge }`** on `Home` / `End`, and `Shift+M` retired.
 
 ### Two things learned in the building
 
@@ -240,3 +238,40 @@ snaps the rung to `note`) and then re-pitch. Pre-existing ladder behaviour that
 this gesture merely walks into; recorded here because it is the one rough edge
 a player will actually meet, and the ghost work is the natural place to judge
 whether it needs anything.
+
+
+## Correction — 2026-08-24: `Shift+M` goes now, not with the ghost
+
+This doc planned to retire the append key *with* the ghost, on the grounds that
+you should not remove a gesture before its replacement exists. That reasoning
+was wrong, and the correction is worth keeping because it is a better statement
+of what the item is for:
+
+**`Shift+M` meant "insert at the end", and "the end" is a place the cursor can
+go.** It never needed a verb of its own — it needed a way to get there. So the
+replacement is not the ghost at all:
+
+    End      →  the last bar
+    I        →  insert after it
+
+which is the append, spelled out of parts that already exist. `Home` comes with
+it, and `goToEdge { edge }` is the intent, because a keymap cannot name the last
+bar — it does not know how many there are, so the *edge* is what gets bound and
+the session resolves the count.
+
+That leaves the ghost to be what it actually is — **"keep typing and the score
+grows"**, a fluency affordance — rather than the replacement for a key. Which
+is a cleaner brief for it, and one it can now be judged on its own merits.
+
+### What `appendMeasure` keeps, and why
+
+The op, the intent and a keyless tray tile all survive, for a reason the tests
+now pin: **genesis**. `insertMeasure` needs a bar to sit beside, so a document
+with none cannot use `I` at all — `addPart` gives a part with an empty measure
+list, and the first bar has to come from somewhere. `appendMeasure` is that
+somewhere.
+
+It matters beyond tidiness: all 28 committed construct traces open with
+`addPart` then `appendMeasure`, and the keyboard-join verdict requires every
+intent in a trace to be bound or named by a documented surface. The palette
+entry is what keeps that true now the key is gone.

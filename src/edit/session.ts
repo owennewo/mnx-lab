@@ -1340,6 +1340,19 @@ export class EditorSession {
       case 'goToMeasure':
         this.cursorState = moveToMeasure(this.grid, before, intent.measureIndex);
         break;
+      case 'goToEdge': {
+        // The keymap cannot name the last bar, so the EDGE is the intent and
+        // the count is read here. `moveToMeasure` clamps and resolves the
+        // anchor voice, so both ends land the same way every other jump does.
+        const last = (this.doc.global?.measures?.length ?? 0) - 1;
+        if (last < 0) return false;
+        this.cursorState = moveToMeasure(
+          this.grid,
+          before,
+          intent.edge === 'first' ? 0 : last
+        );
+        break;
+      }
       case 'setPart': {
         const parts = this.doc.parts ?? [];
         if (intent.partIndex < 0 || intent.partIndex >= parts.length) return false;

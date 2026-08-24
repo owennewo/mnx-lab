@@ -10,6 +10,13 @@ import { replayIntents, type EditorSession } from '../../src/edit/session.ts';
 import type { EditorIntent } from '../../src/edit/intents.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import { computePrimitives } from '../helpers/corpusPrimitives.ts';
+import {
+  EDIT_LAYER,
+  NAVIGATION_LAYER,
+  resolveKeyAction,
+  resolveShellAction,
+  strokeOf
+} from '../../src/edit/keymap.ts';
 
 const EMPTY = () => ({}) as MnxStructure;
 const build = (intents: EditorIntent[]) => replayIntents(EMPTY(), intents);
@@ -113,6 +120,55 @@ describe('insert at the rung', () => {
     expect(s.handleIntent({ type: 'insertAtRung', side: 'before' })).toBe(true);
     expect(s.doc.parts!.map(p => p.name)).toEqual(['A', undefined, 'B']);
     expect(s.cursor.partIndex, 'cursor did not follow the new part').toBe(1);
+  });
+});
+
+describe('End then I replaces the append key', () => {
+  it('Shift+M is bound to nothing at all', () => {
+    const stroke = strokeOf({
+      code: 'KeyM', ctrlKey: false, altKey: false, shiftKey: true, metaKey: false
+    });
+    expect(resolveKeyAction(stroke, [NAVIGATION_LAYER, EDIT_LAYER])).toBeNull();
+    expect(resolveShellAction(stroke)).toBeNull();
+  });
+
+  it('End lands on the last bar, Home on the first', () => {
+    const s = score(4);
+    s.handleIntent({ type: 'goToMeasure', measureIndex: 1 });
+    expect(s.handleIntent({ type: 'goToEdge', edge: 'last' })).toBe(true);
+    expect(s.cursor.measureIndex).toBe(3);
+    expect(s.handleIntent({ type: 'goToEdge', edge: 'first' })).toBe(true);
+    expect(s.cursor.measureIndex).toBe(0);
+  });
+
+  it('End then I appends, exactly as the retired key did', () => {
+    const viaKey = score(2);
+    viaKey.handleIntent({ type: 'appendMeasure' });
+
+    const viaEnd = score(2);
+    relaxTo(viaEnd, 'measure');
+    viaEnd.handleIntent({ type: 'goToEdge', edge: 'last' });
+    expect(viaEnd.handleIntent({ type: 'insertAtRung', side: 'after' })).toBe(true);
+
+    expect(JSON.stringify(viaEnd.doc)).toBe(JSON.stringify(viaKey.doc));
+    expect(viaEnd.cursor.measureIndex, 'the cursor should be IN the new bar').toBe(2);
+  });
+
+  it('GENESIS still needs append: an insert has no bar to sit beside', () => {
+    // The one case End+I cannot express, and the reason `appendMeasure` keeps
+    // its op, its intent and its tray tile.
+    const s = build([{ type: 'addPart' }]);
+    expect(s.doc.global?.measures?.length ?? 0).toBe(0);
+    relaxTo(s, 'document');
+    // There is nowhere to travel to, so End refuses...
+    expect(s.handleIntent({ type: 'goToEdge', edge: 'last' })).toBe(false);
+    // ...and no rung's insert can make the FIRST bar. `I` at the score rung
+    // happily adds another part — that rung's insert is parts — but the
+    // timeline stays empty, which is the point.
+    s.handleIntent({ type: 'insertAtRung', side: 'after' });
+    expect(s.doc.global?.measures?.length ?? 0, 'an insert made a bar from nothing').toBe(0);
+    expect(s.handleIntent({ type: 'appendMeasure' })).toBe(true);
+    expect(s.doc.global!.measures!.length).toBe(1);
   });
 });
 

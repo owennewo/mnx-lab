@@ -679,7 +679,10 @@ export class WorkbenchApp extends LitElement {
       items.push(
         intent('edit: undo', { type: 'undo' }, 'Ctrl+Z'),
         intent('edit: redo', { type: 'redo' }, 'Ctrl+Y'),
-        intent('edit: add bar', { type: 'appendMeasure' }, 'Shift+M'),
+        // No key any more: End then `I` is the append (core-rung-insert.md).
+        // The palette keeps it because genesis still needs it — a document
+        // with no bars has nothing for an insert to sit beside.
+        intent('edit: add bar at the end', { type: 'appendMeasure' }),
         intent('edit: toggle tie', { type: 'toggleTie' }, 'T'),
         action('edit: copy trace', 'copyTrace'),
         action('edit: revert edits', 'revert')

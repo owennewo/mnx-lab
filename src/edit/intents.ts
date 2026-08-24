@@ -31,6 +31,15 @@ export type NavigationIntent =
   | { type: 'lineUp' }
   /** Jump to a bar (0-based), clamped — the go-to grammar's "12" (survey §3.8). */
   | { type: 'goToMeasure'; measureIndex: number }
+  /**
+   * Home / End — the first or last bar of the timeline.
+   *
+   * A keymap cannot name the last bar (it does not know how many there are),
+   * so the edge is the intent and the session resolves it. This is what makes
+   * "append a bar" an ordinary composition rather than its own verb: End puts
+   * you on the last bar, and `I` at the measure rung inserts after it.
+   */
+  | { type: 'goToEdge'; edge: 'first' | 'last' }
   /** The selection ladder (roadmap/complete/core-selection-ladder.md): relax
    *  widens one rung (note → … → score; past the top the MOUNT deselects),
    *  tighten narrows back down the same containment chain. Navigation, not
@@ -219,6 +228,7 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'lineDown',
   'lineUp',
   'goToMeasure',
+  'goToEdge',
   'relaxSelection',
   'tightenSelection',
   'extendSelection',

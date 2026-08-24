@@ -841,12 +841,17 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ intent: { type: 'setStaffKind', kind: 'both' } })
   },
   {
+    // GENESIS ONLY, and that is the whole of its remaining job: `insertMeasure`
+    // needs a bar to sit beside, so a document with none cannot use `I`. Once
+    // one bar exists, End then `I` is the append, and this tile is the same
+    // act reached from the tray. It lost its key with `Shift+M`
+    // (core-rung-insert.md) — an append key was a special case for a position
+    // the cursor can simply travel to.
     id: 'add-bar',
     scopes: ['document', 'measure'],
     glyph: { smufl: 'barlineSingle' },
     label: 'Append a bar at the end',
-    shortcut: 'Shift+M',
-    tier: 'key',
+    tier: 'popover',
     action: () => ({ intent: { type: 'appendMeasure' } })
   },
   {
@@ -948,13 +953,31 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ intent: { type: 'redo' } })
   },
   {
+    // Genesis again — see `add-bar`. Keyless since `Shift+M` retired.
     id: 'doc-add-bar',
     scopes: ['session'],
     glyph: { smufl: 'barlineSingle' },
-    label: 'Append a bar',
-    shortcut: 'Shift+M',
-    tier: 'key',
+    label: 'Append a bar at the end',
+    tier: 'popover',
     action: () => ({ intent: { type: 'appendMeasure' } })
+  },
+  {
+    id: 'doc-go-last',
+    scopes: ['session'],
+    glyph: { smufl: 'barlineFinal' },
+    label: 'Go to the last bar',
+    shortcut: 'End',
+    tier: 'key',
+    action: () => ({ intent: { type: 'goToEdge', edge: 'last' } })
+  },
+  {
+    id: 'doc-go-first',
+    scopes: ['session'],
+    glyph: { smufl: 'barlineSingle' },
+    label: 'Go to the first bar',
+    shortcut: 'Home',
+    tier: 'key',
+    action: () => ({ intent: { type: 'goToEdge', edge: 'first' } })
   },
   {
     id: 'doc-add-part',

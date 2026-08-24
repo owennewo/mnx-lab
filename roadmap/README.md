@@ -189,8 +189,12 @@ back up to `proposed/` the moment it is.
   **deliberately unspecified**. Event-rung insert is out of scope until §8.11 says what
   "make room in a full bar" means. **In progress: the insert half built 2026-08-24**
   (`insertMeasure`, `addPart` position, `insertAtRung`, span widening, 11 tests incl. a
-  commutativity proof and a pickup bar); the ghost is next, and `Shift+M` stays until it
-  lands.
+  commutativity proof and a pickup bar); `Shift+M` is **already gone**: it meant "insert
+  at the end", and the end is a place the cursor can go — `End` then `I`, with `goToEdge`
+  on Home/End, is the same act spelled out of parts that already exist. `appendMeasure`
+  survives keyless for **genesis** (an insert needs a bar to sit beside). The ghost is
+  next, and is now free to be what it is — "keep typing and the score grows" — rather
+  than a replacement for a key.
 - **[lab-verify.md](inprogress/lab-verify.md)** — **the standing verification ledger**, and
   the only doc here that never moves to `complete/`. `verified` is a human assertion, so
   verification is the one gate an agent cannot pass alone, and any change under `model/`,

@@ -294,10 +294,10 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
-    keys: 'Shift+M',
-    strokes: [{ code: 'KeyM', shift: true }],
-    group: 'editing',
-    meaning: { all: 'append a bar at the end' }
+    keys: 'Home / End',
+    strokes: [{ code: 'Home' }, { code: 'End' }],
+    group: 'navigation',
+    meaning: { all: 'the first / last bar of the score' }
   },
   {
     keys: 'I / Shift+I',
