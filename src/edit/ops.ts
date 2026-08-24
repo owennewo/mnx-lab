@@ -335,7 +335,7 @@ export type EditOp =
   // Tab technique + fingering (campaign item 9,
   // roadmap/complete/core-element-ops-technique.md). Both live under the
   // note's vendor block; technique is the ENTRY side of
-  // roadmap/proposed/core-guitar-technique.md, which owns the drawing.
+  // roadmap/complete/core-guitar-technique.md, which owns the drawing.
   | { type: 'setTechnique'; noteKey: string; technique: TechniqueChoice }
   | { type: 'removeTechnique'; noteKey: string; kind: TechniqueChoice['kind'] }
   | {

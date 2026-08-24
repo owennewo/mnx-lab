@@ -221,7 +221,7 @@
     },
     "note-tab": {
       "type": "object",
-      "description": "Stored under note._x.mnxLab.tab. v5 leaves only `technique` here: `string`/`fret`/`fingering` moved flat onto the vendor dict, mirroring the adopted shape they draft (flat on `note` — roadmap/proposed/low-priority/spec-instrument-position.md). `technique` stays until it graduates via a general articulations proposal (roadmap/proposed/core-guitar-technique.md).",
+      "description": "Stored under note._x.mnxLab.tab. v5 leaves only `technique` here: `string`/`fret`/`fingering` moved flat onto the vendor dict, mirroring the adopted shape they draft (flat on `note` — roadmap/proposed/low-priority/spec-instrument-position.md). `technique` stays until it graduates via a general articulations proposal (roadmap/complete/core-guitar-technique.md).",
       "properties": {
         "technique": {
           "$ref": "#/$defs/technique"

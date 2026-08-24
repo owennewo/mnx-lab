@@ -8,14 +8,15 @@ extension block; not yet drafted in the spec fork (no proposed-schema scenarios,
 
 ## Thesis
 
-**Single-source**: music is encoded once; notes carry `tab.position` (string/fret) and
+**Single-source**: music is encoded once; a note carries the STRING it is played on
+(`_x.mnxLab.string`, flat since v5 — the fret is its consequence and is derived) and
 tab-ness is the part-level `tab.staffKind` view flag. There are **no TAB clefs** (invalid
 MNX — `scenarios/lab/24-tab-spec-gaps/tab-clef-rejected` pins the rejection as a spec-gap
 exhibit) and no duplicated tab staves. `tab.technique` covers bends (a **curve** of
 `{position, alter}` points, `alter` in semitones like `pitch.alter`), slides, hammer-ons,
 pull-offs, vibrato, harmonics and palm mute. Design + register:
 [docs/mnx-extensions.md](../../../docs/mnx-extensions.md); narrative:
-[roadmap/proposed/core-guitar-technique.md](../../../roadmap/proposed/core-guitar-technique.md).
+[roadmap/complete/core-guitar-technique.md](../../../roadmap/complete/core-guitar-technique.md).
 
 ## Evidence so far
 
@@ -23,7 +24,12 @@ pull-offs, vibrato, harmonics and palm mute. Design + register:
   scores (`converters/fixtures/`), including bend curves.
 - The tab renderer engraves positions from the extension (or a lowest-reasonable-position
   heuristic) — `scenarios/lab/20-tab-part/`, `lab/21-tab-positions/` are verified.
-- Technique *rendering* (bend arrows, hammer-on slurs …) is not built yet.
+- Technique **rendering**, since 2026-08-24: all seven are engraved, on the notation staff
+  as well as the tab staff — which is the point worth making upstream, because it is the
+  evidence that this block is not a tab feature. A document that declares no strings has no
+  fingerboard and still draws its bends, slurs, wiggles and harmonic circles.
+  `scenarios/lab/25-tab-techniques/` carries the five exhibits (goldens committed, human
+  approval pending).
 
 ## Next
 

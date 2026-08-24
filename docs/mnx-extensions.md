@@ -15,10 +15,10 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 | `string` (+ optional `fret`) | no string/fret anywhere; the clef enum is `C\|F\|G`, so `sign: "TAB"` is invalid | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ tab staff |
 | `strings[]`, `capo` | no instrument tuning of any kind | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ |
 | `tab.staffKind` | no way to say a part prefers a tab view | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ |
-| `tab.technique.bend` | nothing; and MusicXML's own model can't hold a curve | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ❌ |
-| `tab.technique.slide` / `hammerOn` / `pullOff` / `vibrato` | no articulation covers them | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ❌ |
-| `tab.technique.harmonic` | nothing; MusicXML's `<harmonic>` is a redesign candidate | [#179](https://github.com/w3c-cg/mnx/issues/179) | ✅ both converters | ❌ |
-| `tab.technique.palmMute` | nothing; MusicXML smuggles it through generic elements | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ❌ |
+| `tab.technique.bend` | nothing; and MusicXML's own model can't hold a curve | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
+| `tab.technique.slide` / `hammerOn` / `pullOff` / `vibrato` | no articulation covers them | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
+| `tab.technique.harmonic` | nothing; MusicXML's `<harmonic>` is a redesign candidate | [#179](https://github.com/w3c-cg/mnx/issues/179) | ✅ both converters | ✅ both staves |
+| `tab.technique.palmMute` | nothing; MusicXML smuggles it through generic elements | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
 | `fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
 | `harmonies` | **no harmony concept anywhere** — no `root`, no `kind`, no chord | [#109](https://github.com/w3c-cg/mnx/issues/109) | ✅ both converters | ❌ |
 
@@ -327,9 +327,18 @@ Cloudflare Workers cannot run `ajv.compile()`.
 - `palmMute` is per-note here, matching Guitar Pro. In standard MNX it should
   probably be a **span** on the part measure with `position` + `end`, like
   `ottava` and `dynamic-group` — as should `letRing`, which is not carried yet.
+  The renderer already treats it as one: since 2026-08-24 it prints "P.M." once
+  over a dashed line spanning each run of consecutive muted events, so the page
+  says span while the model says flag. That gap is the argument for changing the
+  model, not against the drawing.
 - Techniques arguably belong in standard MNX as articulations and spanners
   rather than inside a tab extension: slides, harmonics and vibrato exist on
-  trombone, violin and harp. Only `position` is genuinely fretboard-specific.
+  trombone, violin and harp. Only the string is genuinely fretboard-specific.
+  The renderer now acts on that reading — every technique draws on the
+  **notation** staff too, so a document that declares no strings, has no
+  fingerboard and no tab staff still engraves all of them
+  ([core-guitar-technique.md](../roadmap/complete/core-guitar-technique.md)). If
+  they were really tab features, that document would have nowhere to put them.
 - Per-string courses (12-string, lute) and partial capos are out of scope.
 - Roman-numeral / Nashville harmonic function is out of scope; a `function`
   field drops into `harmony` cleanly when
