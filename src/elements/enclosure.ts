@@ -32,6 +32,7 @@ import {
 import {
   emptyPartGhostRect,
   measurePositionX,
+  pastEndGhostRect,
   sectionLabelChips
 } from '../engine/render/selectionGeometry.ts';
 import { SCORE_LABEL_CAP_RATIO } from '../engine/layout/scoreText.ts';
@@ -1047,7 +1048,10 @@ export function drawCursorGhost(
   const systems = collectSystemBands(staves);
   const rows = options.systemRows ?? [];
   const measureIndex = ghost.measureIndex ?? -1;
-  const rowIndex = rows.findIndex(row => row.includes(measureIndex));
+  // The bar past the end belongs to no packed row — it is not in the document
+  // — so it takes the LAST system, whose right margin it is drawn in.
+  const pastEnd = ghost.structuralEmpty === 'past-end';
+  const rowIndex = pastEnd ? systems.length - 1 : rows.findIndex(row => row.includes(measureIndex));
   const system = systems[rowIndex] ?? systems[0];
   if (!system) return;
 
@@ -1065,6 +1069,30 @@ export function drawCursorGhost(
   const bandIndex = pool[0] ?? mapped[0] ?? system.staffIndices[0];
   const band = staves[bandIndex];
   if (!band) return;
+
+  if (pastEnd) {
+    // The ghost bar past the end of the score: a vacancy after the final
+    // barline, drawn as a hole rather than a bar — no barline, no staff line
+    // and no rest, because the document holds nothing there until a keystroke
+    // says so. Materialisation is on that keystroke, never on arrival.
+    const view = svg.viewBox.baseVal;
+    const box = pastEndGhostRect(band, view.x + view.width, sp);
+    if (box.width <= 0) return;
+    const group = document.createElementNS(SVG_NS, 'g');
+    group.setAttribute('class', 'cursor-ghost cursor-ghost-panel');
+    const panel = document.createElementNS(SVG_NS, 'rect');
+    panel.dataset.ghostScope = 'past-end';
+    panel.setAttribute('x', String(box.x));
+    panel.setAttribute('y', String(box.y));
+    panel.setAttribute('width', String(box.width));
+    panel.setAttribute('height', String(box.height));
+    panel.setAttribute('rx', String(0.4 * sp));
+    panel.setAttribute('stroke-width', String(0.12 * sp));
+    panel.setAttribute('stroke-dasharray', `${0.5 * sp} ${0.35 * sp}`);
+    group.appendChild(panel);
+    svg.appendChild(group);
+    return;
+  }
 
   // Line spacing within the band (tab and notation staves may differ).
   const lineYs = [...svg.querySelectorAll<SVGLineElement>('line.staff-line')]

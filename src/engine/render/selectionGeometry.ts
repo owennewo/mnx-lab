@@ -47,6 +47,37 @@ export function emptyPartGhostRect(
 }
 
 /**
+ * The GHOST BAR PAST THE END (core-rung-insert.md): a vacancy in the margin
+ * after the score's final barline, on the cursor's own staff.
+ *
+ * It is drawn in the ragged right margin the last system leaves — systems are
+ * not justified (`ragged-last`), so there is normally room. Where there is
+ * not, the width collapses to whatever the margin holds rather than
+ * overflowing: a narrow vacancy still reads as "the next bar goes here", and a
+ * rect hanging off the viewBox reads as a rendering fault.
+ *
+ * It takes the CURSOR'S STAFF, not the whole system, for the same reason every
+ * other cursor ghost does — this is where the next note would go, and the
+ * cursor is in one part and one staff. It also keeps the shape square-ish in a
+ * thin margin, where a system-tall box would be a sliver.
+ */
+export function pastEndGhostRect(
+  band: { top: number; bottom: number; x2: number },
+  viewBoxRight: number,
+  staffSpace: number
+): SelectionRectGeometry {
+  const pad = 0.75 * staffSpace;
+  const x = band.x2 + pad;
+  const available = Math.max(0, viewBoxRight - x - 0.25 * staffSpace);
+  return {
+    x,
+    y: band.top - pad,
+    width: Math.min(6 * staffSpace, available),
+    height: band.bottom - band.top + 2 * pad
+  };
+}
+
+/**
  * The section rung's own channel (workbench-rung-legibility.md): a chip lit
  * behind each section label the enclosure claims.
  *

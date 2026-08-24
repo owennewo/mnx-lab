@@ -1,7 +1,8 @@
 # Insert at the rung — `I`, `Shift+I`, and the ghost past the end
 
-> **Status: in progress. Proposed 2026-08-24; the INSERT half built the same
-> day — see *Built so far* at the foot. The ghost is still to come.** Serves the **implementation loop**. Grew out
+> **Status: complete, 2026-08-24. Proposed, built and closed the same day —
+> the INSERT half first (*Built so far*, at the foot), then the ghost past the
+> end (the final section).** Serves the **implementation loop**. Grew out
 > of hands-on testing of
 > [core-entry-surface.md](../complete/core-entry-surface.md): `Shift+M` appends
 > a bar at the **end of the score**, never at the cursor, and there is no way
@@ -534,3 +535,94 @@ here, in the same numbers:
 The overlay is drawn from the finished SVG's `getBBox()`, so it cannot be
 tested any other way: it needs a layout engine, not a DOM shim. That is
 precisely why it had escaped testing, and precisely why it earned four bugs.
+
+
+## The ghost past the end — built 2026-08-24, and the item closes
+
+Reported from use, and it is this doc's own second half arriving on cue: *"I
+was hoping that clicking right when on the last bar would always do
+something."* It does now, and it does it as **navigation**, exactly as the
+argument above requires — the bare-arrow rule survives, autorepeat is harmless,
+and arrowing away leaves the document untouched.
+
+**`buildGrid` emits one position past the last bar.** Same idiom as the entry
+ghost inside a bar, one scale up: `measureIndex = measureCount`, no slots, and
+`voices` taken from the last real bar so the voice-sticky ink walk carries
+whichever voice you were reading onto it. `PositionGrid.ghostMeasureIndex`
+names it, and `isPastEnd` is the one question every consumer asks.
+
+A score with **no bars gets no ghost** — there the vacancy is structural (the
+mount already draws a panel-shaped one for a measureless part) and
+`appendMeasure` is genesis. That is also what keeps every committed construct
+trace byte-identical: they all open on an empty document.
+
+### Three boundaries the ghost had to respect
+
+**Navigation reaches it; SELECTION does not.** `Shift+→` on the last bar
+refuses, because a range selects things that exist. One flag on `moveMeasure`
+(`ghost: false`) is the whole difference, and it is passed from exactly one
+place — `moveSelectionHorizontal`.
+
+**"Go to bar 99" still means the last bar.** `moveToMeasure` clamps to the last
+REAL bar, so the go-to grammar and `End` cannot land on the vacancy; it is
+reached by *stepping*, which is the only gesture that means "one more".
+
+**The rung survives the step.** `→` at the measure rung lands on the ghost
+still at the measure rung — the property the report actually asked for. Nothing
+resolves there (`resolvedSelection.members` is empty, and the enclosure draws
+nothing because it has no ink and no span), so what you see is the vacancy
+alone.
+
+### Materialisation, and the batch
+
+On the KEYSTROKE, never on arrival. `applyEntry` wraps an entry op in a
+`batch` with the `appendMeasure` that makes room for it whenever the cursor is
+past the end — so `insertNote`/`insertPitchNote` land in a bar that arrives in
+the same history entry, and undo returns the document byte-identically instead
+of leaving an orphaned empty bar behind the note it removed. `I` at the measure
+rung does the same thing without content, and **`before` and `after` are the
+same bar there** — a side has nothing to name past the end.
+
+Once it is real, a fresh ghost appears past the new end, which is the whole
+"keep typing and the score grows" behaviour: `→ 5 → 5 → 5` writes three bars.
+
+### Drawing it, on the CURSOR'S staff
+
+`structuralEmpty` gains `'past-end'` beside `'part-measure'` — the same channel,
+because both say "the cursor is somewhere no bar exists, draw the vacancy
+rather than a fabricated bar". `pastEndGhostRect` puts it in the last system's
+ragged right margin, after the final barline.
+
+It takes the **cursor's own staff band, not the whole system**, and that was a
+correction made by looking at it: system-tall in a thin margin is a *sliver*,
+and the first version drew one. A staff-tall box is square-ish at any margin
+width, and it is what every other cursor ghost already does — the cursor is in
+one part and one staff. The width collapses to whatever the margin holds
+rather than overflowing the viewBox, because a rect hanging off the page reads
+as a rendering fault rather than as a place.
+
+The HUD's bar row says **`new bar 13`** rather than `13 of 12`, with the meter
+the bar would inherit.
+
+### Evidence
+
+Eleven tests in `rung-insert.test.ts`, including the two this doc named in
+advance — **autorepeat** (forty `→` presses land on one ghost and write
+nothing) and **undo-to-byte-identical** after materialisation — plus the
+fingerboard path, where a digit past the end makes the bar and frets it in one
+batch.
+
+And **four assertions in `npm run smoke:selection`**, because the drawing is
+the half that cannot be tested any other way — the lesson this item learned the
+expensive way four bugs ago. The smoke test walks off the end of the twelve-bar
+blues and requires the panel to exist, to sit after the final barline, to stay
+inside the viewBox, and to stand on a staff. The second of those caught the
+sliver: the first assertion measured against the widest system rather than the
+last one, and **the last system is ragged**, so it passed for the wrong reason
+until the numbers were read.
+
+### What stays open
+
+`←` at the start of the score, deliberately, on the same grounds as before:
+`Shift+I` already makes a pickup bar authorable, so a leading ghost would buy
+nothing else offers and should be decided on its own evidence.

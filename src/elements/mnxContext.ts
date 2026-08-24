@@ -72,9 +72,17 @@ export interface CursorGhost {
   /** Cursor onset normalized to this measure's metric span, 0…1. */
   position?: number;
   anchorKeys: string[];
-  /** A part exists but has no measure cell yet: draw one panel-shaped
-   * vacancy rather than pretending a note can be entered without a bar. */
-  structuralEmpty?: 'part-measure';
+  /**
+   * The cursor is somewhere no bar exists, and the vacancy is what gets drawn
+   * rather than a fabricated bar:
+   *
+   *  - `part-measure` — a part exists but has no measure cell at all, so the
+   *    whole viewport holds one panel-shaped vacancy.
+   *  - `past-end` — the ghost bar one past the score's last (core-rung-insert.md),
+   *    drawn in the last system's right margin. A place for the next bar; the
+   *    keystroke that fills it is what writes it.
+   */
+  structuralEmpty?: 'part-measure' | 'past-end';
 }
 
 export interface SelectionContext {

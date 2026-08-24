@@ -141,6 +141,13 @@ export interface PositionGrid {
   mode: 'string' | 'ordinal';
   /** Number of vertical lines in 'string' mode (the tuning's string count). */
   lineCount: number;
+  /**
+   * The GHOST BAR PAST THE END: the index of the one bar beyond the score's
+   * last, which the cursor can stand on and the document does not contain
+   * (core-rung-insert.md). Absent in a score with no bars at all — there the
+   * vacancy is the whole document, and `appendMeasure` is genesis.
+   */
+  ghostMeasureIndex?: number;
 }
 
 function gcd(a: number, b: number): number {
@@ -431,7 +438,38 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
     );
   }
 
-  return { positions, mode, lineCount: tuning.length };
+  // THE GHOST BAR PAST THE END (core-rung-insert.md). One bar beyond the last,
+  // holding one position and no slots: the same idiom as the entry ghost
+  // inside a bar, one scale up. It exists so `→` at the end of the score is
+  // navigation rather than a dead key, and so "keep typing and the score
+  // grows" needs no key of its own — the bar materialises on the KEYSTROKE
+  // that puts something in it, never on arrival, so arrowing away again
+  // leaves the document untouched.
+  //
+  // Its `voices` are the last real bar's, so the voice-sticky ink walk carries
+  // whichever voice you were reading onto it. A score with NO bars gets no
+  // ghost: there the vacancy is structural (the mount draws a panel for a
+  // measureless part) and `appendMeasure` is the genesis verb.
+  if (measureCount > 0) {
+    const voices = new Set<number>([0]);
+    for (const position of positions)
+      if (position.measureIndex === measureCount - 1)
+        for (const voice of position.voices) voices.add(voice);
+    positions.push({
+      measureIndex: measureCount,
+      onset: { num: 0, den: 1 },
+      slots: [],
+      voices: [...voices].sort((a, b) => a - b),
+      events: []
+    });
+  }
+
+  return {
+    positions,
+    mode,
+    lineCount: tuning.length,
+    ...(measureCount > 0 ? { ghostMeasureIndex: measureCount } : {})
+  };
 }
 
 export function initialCursor(grid: PositionGrid): EditorCursor {
@@ -662,17 +700,37 @@ export function movePositionInk(
   return cursor;
 }
 
+/** True when the cursor stands on the ghost bar past the end of the score —
+ *  a place, holding nothing, that the next keystroke turns into a real bar. */
+export function isPastEnd(grid: PositionGrid, cursor: EditorCursor): boolean {
+  return grid.ghostMeasureIndex !== undefined && cursor.measureIndex === grid.ghostMeasureIndex;
+}
+
 /** Jump to the first position of the neighbouring measure. Delegates the
  *  landing to `moveToMeasure` so the bar jump and the go-to grammar resolve the
  *  anchor voice by ONE rule — a bar without your voice used to strand the
- *  cursor when you arrived by Ctrl+→ and fall back when you arrived by "12". */
-export function moveMeasure(grid: PositionGrid, cursor: EditorCursor, delta: 1 | -1): EditorCursor {
+ *  cursor when you arrived by Ctrl+→ and fall back when you arrived by "12".
+ *
+ *  The ghost bar is a step like any other; `ghost: false` refuses it, which is
+ *  what SELECTION extension wants — a range selects things that exist. */
+export function moveMeasure(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  delta: 1 | -1,
+  options: { ghost?: boolean } = {}
+): EditorCursor {
   const target = cursor.measureIndex + delta;
+  if (target === grid.ghostMeasureIndex) {
+    const ghost = grid.positions[grid.positions.length - 1];
+    return options.ghost === false || !ghost ? cursor : toPosition(cursor, ghost);
+  }
   if (!grid.positions.some(p => p.measureIndex === target)) return cursor;
   return moveToMeasure(grid, cursor, target);
 }
 
-/** Jump to the first position of an absolute measure, clamped to the score. */
+/** Jump to the first position of an absolute measure, clamped to the score.
+ *  The clamp stops at the last REAL bar: "go to bar 99" in a twelve-bar score
+ *  means bar 12, never the vacancy past it, which is reached by stepping. */
 export function moveToMeasure(
   grid: PositionGrid,
   cursor: EditorCursor,
@@ -680,7 +738,10 @@ export function moveToMeasure(
 ): EditorCursor {
   const last = grid.positions[grid.positions.length - 1];
   if (!last) return cursor;
-  const target = Math.min(Math.max(measureIndex, 0), last.measureIndex);
+  const lastReal = grid.ghostMeasureIndex !== undefined
+    ? grid.ghostMeasureIndex - 1
+    : last.measureIndex;
+  const target = Math.min(Math.max(measureIndex, 0), lastReal);
   const inMeasure = grid.positions.filter(p => p.measureIndex === target);
   if (inMeasure.length === 0) return cursor;
   // The anchor voice may not exist in this bar. Fall back to the nearest one

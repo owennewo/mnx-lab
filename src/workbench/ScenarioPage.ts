@@ -2103,7 +2103,12 @@ export class ScenarioPage extends LitElement {
         (session.doc.global?.measures?.length ?? 0) === 0 &&
         (activePart.measures?.length ?? 0) === 0
           ? { structuralEmpty: 'part-measure' as const }
-          : {}
+          // The ghost bar past the end (core-rung-insert.md): the cursor is
+          // standing where the next bar would go, and the vacancy is drawn
+          // there instead of a cell in a bar that does not exist.
+          : session.pastEnd
+            ? { structuralEmpty: 'past-end' as const }
+            : {}
       )
     };
     this.selection = {

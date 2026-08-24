@@ -107,11 +107,24 @@ const DUMP = `(() => {
   const box = el => { try { const b = el.getBBox(); return { x: b.x, w: b.width }; } catch { return null; } };
   const ink = sel => [...svg.querySelectorAll(sel)]
     .map(el => ({ cls: el.getAttribute('class'), id: el.getAttribute('data-source-id'), ...box(el) }));
+  const view = svg.viewBox.baseVal;
+  const staffLines = [...svg.querySelectorAll('line.staff-line')];
   return JSON.stringify({
     selected: ink('.selected'),
     rests: ink('.rest'),
     enclosure: [...svg.querySelectorAll('g[class*=enc-] rect')]
-      .map(r => ({ x: +r.getAttribute('x'), w: +r.getAttribute('width') }))
+      .map(r => ({ x: +r.getAttribute('x'), w: +r.getAttribute('width') })),
+    ghostPanels: [...svg.querySelectorAll('g.cursor-ghost rect[data-ghost-scope]')]
+      .map(r => ({
+        scope: r.dataset.ghostScope,
+        x: +r.getAttribute('x'), w: +r.getAttribute('width'),
+        y: +r.getAttribute('y'), h: +r.getAttribute('height')
+      })),
+    staffLines: staffLines.map(l => ({
+      y: l.y1.baseVal.value,
+      right: Math.max(l.x1.baseVal.value, l.x2.baseVal.value)
+    })),
+    viewRight: view.x + view.width
   });
 })()`;
 
@@ -169,11 +182,11 @@ try {
   await cdp.send('Page.navigate', { url });
   await new Promise(r => setTimeout(r, 7000));
 
-  const press = async (key, code, keyCode) => {
+  const press = async (key, code, keyCode, settleMs = 700) => {
     for (const type of ['keyDown', 'keyUp']) {
       await cdp.send('Input.dispatchKeyEvent', { type, key, code, windowsVirtualKeyCode: keyCode });
     }
-    await new Promise(r => setTimeout(r, 700));
+    await new Promise(r => setTimeout(r, settleMs));
   };
 
   console.log('insert a note, then delete it — the cursor lands on a rest mid-bar');
@@ -201,6 +214,55 @@ try {
         '— the box is on the wrong beat'
       );
     }
+  }
+  // THE GHOST BAR PAST THE END. `End` lands on the last bar and `→` walks off
+  // the end of the score onto a bar that does not exist — the arrow must
+  // ALWAYS do something there, and what it does must be visible. Written from
+  // the same lesson as the assertions above: an overlay drawn from the
+  // finished SVG's geometry can only be judged in a browser.
+  console.log('\nwalk off the end of the score onto the ghost bar');
+  await press('End', 'End', 35);
+  const beforeGhost = JSON.parse(await cdp.evaluate(DUMP));
+  for (let i = 0; i < 40; i++) await press('ArrowRight', 'ArrowRight', 39, 60);
+  await new Promise(r => setTimeout(r, 700));
+
+  const past = JSON.parse(await cdp.evaluate(DUMP));
+  const panel = past.ghostPanels.find(rect => rect.scope === 'past-end');
+  if (!panel) {
+    fail('no past-end ghost panel was drawn — `→` past the last bar did nothing visible');
+  } else {
+    pass('the ghost bar is drawn past the end of the score');
+    // It belongs to the RIGHT MARGIN of the LAST system — which is the one
+    // the panel spans, and which is SHORTER than the systems above it, because
+    // the last system is ragged rather than justified. Measuring against the
+    // widest system would pass for the wrong reason.
+    const systemRight = Math.max(0, ...past.staffLines
+      .filter(line => line.y >= panel.y && line.y <= panel.y + panel.h)
+      .map(line => line.right));
+    if (panel.x >= systemRight) pass('it sits after the final barline');
+    else fail(`the ghost panel starts at ${panel.x.toFixed(1)}, inside the last system (ends ${systemRight.toFixed(1)})`);
+    if (panel.w > 0 && panel.x + panel.w <= past.viewRight + 0.5) pass('it stays inside the viewBox');
+    else fail(`the ghost panel runs to ${(panel.x + panel.w).toFixed(1)}, past the viewBox edge ${past.viewRight.toFixed(1)}`);
+    // It stands on a STAFF — the cursor's own — rather than floating in the
+    // margin beside nothing.
+    const onStaff = past.staffLines.filter(line => line.y >= panel.y && line.y <= panel.y + panel.h);
+    if (onStaff.length >= 2) pass(`it stands on the cursor's staff (${onStaff.length} lines)`);
+    else fail(`the ghost panel at y ${panel.y.toFixed(1)}…${(panel.y + panel.h).toFixed(1)} covers no staff`);
+  }
+  // Arriving on the ghost writes NOTHING: the bar materialises on a keystroke.
+  if (past.rests.length === beforeGhost.rests.length) pass('arriving on the ghost changed no music');
+  else fail(`the score grew on arrival: ${beforeGhost.rests.length} rests became ${past.rests.length}`);
+
+  // And stepping back into the score clears it — the vacancy is a place the
+  // cursor is standing, not a mark left on the page. This also puts a real
+  // selection back on screen for the scroll assertions below, which read the
+  // live page rather than a fresh load.
+  await press('ArrowLeft', 'ArrowLeft', 37);
+  const back = JSON.parse(await cdp.evaluate(DUMP));
+  if (back.ghostPanels.some(rect => rect.scope === 'past-end')) {
+    fail('the ghost bar is still drawn after stepping back into the score');
+  } else {
+    pass('stepping back into the score clears it');
   }
   // The viewer scrolls itself, so navigating off the visible systems used to
   // leave the reader looking at music they were no longer editing. Both

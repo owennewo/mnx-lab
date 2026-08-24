@@ -119,10 +119,16 @@ export function buildHudRows(
   }
 
   const time = timeAt(doc, cursor.measureIndex);
+  // Past the end of the score the cursor stands on the ghost bar
+  // (core-rung-insert.md), which the document does not contain — so the row
+  // names the vacancy rather than reading "13 of 12". The meter is the one the
+  // bar would inherit if a keystroke made it real.
   row(
     'bar',
     'bar',
-    `${cursor.measureIndex + 1} of ${measureCount}${time ? ` · ${time.count}/${time.unit}` : ''}`
+    session.pastEnd
+      ? `new bar ${cursor.measureIndex + 1}${time ? ` · ${time.count}/${time.unit}` : ''}`
+      : `${cursor.measureIndex + 1} of ${measureCount}${time ? ` · ${time.count}/${time.unit}` : ''}`
   );
 
   // The part row's value is the ensemble table (buildHudParts) — the

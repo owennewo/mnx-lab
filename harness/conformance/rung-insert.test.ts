@@ -6,9 +6,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
-import { replayIntents, type EditorSession } from '../../src/edit/session.ts';
+import { EditorSession, replayIntents } from '../../src/edit/session.ts';
 import type { EditorIntent } from '../../src/edit/intents.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
+import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
 import { computePrimitives } from '../helpers/corpusPrimitives.ts';
 import { validateDocument } from '../../src/engine/layout/validate.ts';
 import {
@@ -20,6 +21,25 @@ import {
 } from '../../src/edit/keymap.ts';
 
 const EMPTY = () => ({}) as MnxStructure;
+
+/** A one-bar guitar part — the fingerboard the tab entry path needs. */
+const tabDoc = (): MnxStructure => ({
+  mnx: { version: 1 },
+  global: { measures: [{ time: { count: 4, unit: 4 } }] },
+  parts: [{
+    id: 'guitar',
+    _x: {
+      mnxLab: {
+        strings: STANDARD_GUITAR_STRINGS.map(entry => ({
+          ...entry,
+          pitch: { ...entry.pitch }
+        })),
+        tab: { staffKind: 'tab' as const }
+      }
+    },
+    measures: [{ sequences: [{ content: [{ duration: { base: 'whole' }, rest: {} }] }] }]
+  }]
+});
 const build = (intents: EditorIntent[]) => replayIntents(EMPTY(), intents);
 
 /** A one-part document of `bars` empty 4/4 bars, cursor at bar 0. */
@@ -444,6 +464,142 @@ describe('the cursor follows an insert, and Delete finishes the job', () => {
     expect(JSON.stringify(s.doc)).not.toBe(before);
     s.handleIntent({ type: 'undo' });
     s.handleIntent({ type: 'undo' });
+    expect(JSON.stringify(s.doc)).toBe(before);
+  });
+});
+
+
+describe('the ghost bar past the end', () => {
+  /** The document, as text — the only honest way to ask "did anything move?". */
+  const text = (session: EditorSession) => JSON.stringify(session.doc);
+
+  /** Walk `→` to the very end of the grid and report where it stopped. */
+  const toEnd = (session: EditorSession, presses = 12) => {
+    for (let i = 0; i < presses; i++) session.handleIntent({ type: 'nextPosition' });
+    return session.cursor.measureIndex;
+  };
+
+  it('`→` at the last position is no longer a dead key', () => {
+    const s = score(2);
+    const before = text(s);
+    expect(toEnd(s), 'the cursor should stand one bar past the last').toBe(2);
+    expect(text(s), 'arriving on the ghost wrote something').toBe(before);
+  });
+
+  it('AUTOREPEAT is harmless: there is ONE ghost and you stop on it', () => {
+    // The failure the doc names — holding `→` to skim a piece must not
+    // manufacture bars at the key-repeat rate.
+    const s = score(2);
+    const before = text(s);
+    expect(toEnd(s, 40)).toBe(2);
+    expect(s.doc.global!.measures!.length).toBe(2);
+    expect(text(s)).toBe(before);
+  });
+
+  it('arrowing back off it leaves nothing behind', () => {
+    const s = score(3);
+    const before = text(s);
+    const ops = s.appliedOps.length;
+    toEnd(s);
+    expect(s.handleIntent({ type: 'prevPosition' })).toBe(true);
+    expect(s.cursor.measureIndex).toBe(2);
+    expect(text(s)).toBe(before);
+    expect(s.appliedOps, 'navigation put an op in the history').toHaveLength(ops);
+  });
+
+  it('THE RUNG SURVIVES: `→` at the measure rung steps onto it and stays there', () => {
+    const s = score(2);
+    relaxTo(s, 'measure');
+    s.handleIntent({ type: 'goToEdge', edge: 'last' });
+    expect(s.handleIntent({ type: 'nextPosition' })).toBe(true);
+    expect(s.cursor.measureIndex).toBe(2);
+    expect(s.selectionLevel, 'the ladder dropped a rung on arrival').toBe('measure');
+    // Nothing exists there, so the selection resolves to no members at all —
+    // the vacancy is drawn by the cursor ghost, not by an enclosure.
+    expect(s.resolvedSelection.members).toEqual([]);
+  });
+
+  it('a RANGE stops at the last real bar — Shift may not reach the ghost', () => {
+    const s = score(2);
+    relaxTo(s, 'measure');
+    s.handleIntent({ type: 'goToEdge', edge: 'last' });
+    expect(s.handleIntent({ type: 'extendSelection', direction: 'next' })).toBe(false);
+    expect(s.cursor.measureIndex).toBe(1);
+  });
+
+  it('"go to bar 99" still means the last bar, not the vacancy past it', () => {
+    const s = score(3);
+    s.handleIntent({ type: 'goToMeasure', measureIndex: 99 });
+    expect(s.cursor.measureIndex).toBe(2);
+    s.handleIntent({ type: 'goToEdge', edge: 'last' });
+    expect(s.cursor.measureIndex).toBe(2);
+  });
+
+  it('MATERIALISES ON THE KEYSTROKE, and undo returns byte-identically', () => {
+    const s = score(1);
+    const before = text(s);
+    const ops = s.appliedOps.length;
+    toEnd(s);
+    expect(s.cursor.measureIndex).toBe(1);
+    expect(s.handleIntent({ type: 'toggleNote' })).toBe(true);
+    expect(s.doc.global!.measures!.length, 'the bar did not materialise').toBe(2);
+    expect(s.doc.parts![0].measures![1].sequences![0].content.some(
+      item => 'notes' in item
+    ), 'the note did not land in the new bar').toBe(true);
+
+    // ONE batch: the bar and the note it received are a single history entry,
+    // or undo would leave an orphaned empty bar behind the note it removed.
+    expect(s.appliedOps).toHaveLength(ops + 1);
+    expect(s.appliedOps[ops].type).toBe('batch');
+    expect(s.handleIntent({ type: 'undo' })).toBe(true);
+    expect(text(s)).toBe(before);
+  });
+
+  it('and a FRESH ghost appears past the new end — the score keeps growing', () => {
+    const s = score(1);
+    toEnd(s);
+    s.handleIntent({ type: 'toggleNote' });
+    expect(s.cursor.measureIndex, 'the cursor should be in the bar it made').toBe(1);
+    expect(toEnd(s)).toBe(2);
+    s.handleIntent({ type: 'toggleNote' });
+    expect(s.doc.global!.measures!.length).toBe(3);
+  });
+
+  it('`I` on the ghost makes it real, and the rung survives that too', () => {
+    const s = score(2);
+    relaxTo(s, 'measure');
+    s.handleIntent({ type: 'goToEdge', edge: 'last' });
+    s.handleIntent({ type: 'nextPosition' });
+    expect(s.handleIntent({ type: 'insertAtRung', side: 'after' })).toBe(true);
+    expect(s.doc.global!.measures!.length).toBe(3);
+    expect(s.cursor.measureIndex).toBe(2);
+    expect(s.selectionLevel).toBe('measure');
+    // Before and after a bar that does not exist are the same bar.
+    const viaBefore = score(2);
+    relaxTo(viaBefore, 'measure');
+    viaBefore.handleIntent({ type: 'goToEdge', edge: 'last' });
+    viaBefore.handleIntent({ type: 'nextPosition' });
+    viaBefore.handleIntent({ type: 'insertAtRung', side: 'before' });
+    expect(text(viaBefore)).toBe(text(s));
+  });
+
+  it('a score with NO bars has no ghost — genesis is still `appendMeasure`', () => {
+    const s = build([{ type: 'addPart' }]);
+    expect(s.positions.ghostMeasureIndex).toBeUndefined();
+    expect(s.handleIntent({ type: 'nextPosition' })).toBe(false);
+    expect(s.doc.global?.measures?.length ?? 0).toBe(0);
+  });
+
+  it('ON THE FINGERBOARD: a digit past the end makes the bar and frets it', () => {
+    const s = new EditorSession(tabDoc(), 'ghost-tab');
+    const before = JSON.stringify(s.doc);
+    for (let i = 0; i < 4; i++) s.handleIntent({ type: 'nextPosition' });
+    expect(s.cursor.measureIndex).toBe(1);
+    expect(s.handleIntent({ type: 'enterFret', fret: 7 })).toBe(true);
+    expect(s.doc.global!.measures!.length).toBe(2);
+    expect(s.appliedOps).toHaveLength(1);
+    expect(s.appliedOps[0].type).toBe('batch');
+    expect(s.handleIntent({ type: 'undo' })).toBe(true);
     expect(JSON.stringify(s.doc)).toBe(before);
   });
 });

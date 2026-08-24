@@ -32,6 +32,7 @@ import {
   eventAtCursor,
   eventSlotAt,
   initialCursor,
+  isPastEnd,
   moveLine,
   moveMeasure,
   movePosition,
@@ -199,6 +200,16 @@ export class EditorSession {
 
   get projection(): Projection {
     return this.activeProjection;
+  }
+
+  /**
+   * The cursor is standing on the GHOST BAR past the end of the score
+   * (core-rung-insert.md) — a place, not a bar: the document has nothing
+   * there and nothing has been written by arriving. The next keystroke that
+   * puts something in it materialises the bar and the content as ONE batch.
+   */
+  get pastEnd(): boolean {
+    return isPastEnd(this.grid, this.cursorState);
   }
 
   /** Selection keys for the highlight overlay: the current rung's footprint —
@@ -385,7 +396,7 @@ export class EditorSession {
           this.cursorState.staffIndex ?? 1
         );
         const fifths = keyFifthsAt(this.doc, this.cursorState.measureIndex);
-        this.apply({
+        this.applyEntry({
           type: 'insertPitchNote',
           measureIndex: this.cursorState.measureIndex,
           onset: [this.cursorState.onset.num, this.cursorState.onset.den],
@@ -1197,7 +1208,7 @@ export class EditorSession {
       // Nothing on this string at this position: insert. Only meaningful on
       // the fingerboard — in ordinal mode (no tab part) digits need a note.
       if (this.grid.mode !== 'string') return false;
-      this.apply({
+      this.applyEntry({
         type: 'insertNote',
         measureIndex: this.cursorState.measureIndex,
         onset: [this.cursorState.onset.num, this.cursorState.onset.den],
@@ -1666,7 +1677,9 @@ export class EditorSession {
     switch (level) {
       case 'partMeasure':
       case 'measure':
-        return moveMeasure(this.grid, before, delta);
+        // A RANGE selects things that exist, so the bar past the end is not a
+        // member — navigation may stand on the ghost, Shift may not reach it.
+        return moveMeasure(this.grid, before, delta, { ghost: false });
       case 'section':
         return this.sectionStep(before, delta);
       case 'document':
@@ -2024,8 +2037,18 @@ export class EditorSession {
    *  to work in, and it arrives padded, so there is somewhere to type. */
   private insertMeasureHere(side: 'before' | 'after'): boolean {
     const measureIndex = this.cursorState.measureIndex;
-    if (!this.doc.global?.measures?.[measureIndex]) return false;
     const partIndex = this.cursorState.partIndex ?? 0;
+    if (this.pastEnd) {
+      // Standing on the ghost bar, `I` is what makes it real — and the SIDE
+      // has nothing to name, because before and after a bar that does not
+      // exist are the same bar. The rung survives, as it does for every other
+      // structural insert.
+      this.apply({ type: 'appendMeasure', ...(partIndex ? { partIndex } : {}) }, true);
+      this.cursorState = moveToMeasure(this.grid, this.cursorState, measureIndex);
+      this.reanchorSelection();
+      return true;
+    }
+    if (!this.doc.global?.measures?.[measureIndex]) return false;
     // THE RUNG SURVIVES. `apply` re-anchors at note by default, which is right
     // for entry — you typed a note, you are addressing a note — and wrong for
     // a structural verb addressed AT a rung: dropping to note would make the
@@ -2197,6 +2220,28 @@ export class EditorSession {
       return [];
     });
     return [...new Set(indices.length > 0 ? indices : [this.cursorState.measureIndex])];
+  }
+
+  /**
+   * An entry op, materialising the ghost bar under it when the cursor is
+   * standing past the end of the score (core-rung-insert.md).
+   *
+   * The bar and what lands in it go as ONE `batch`, so undo returns the
+   * document byte-identically rather than leaving an orphaned empty bar
+   * behind the note it removed. Materialisation is on the KEYSTROKE, never on
+   * arrival — the same rule `addVoiceMeasure` follows — which is what lets
+   * `→` past the end be pure navigation.
+   */
+  private applyEntry(op: EditOp): void {
+    if (!this.pastEnd) {
+      this.apply(op);
+      return;
+    }
+    const partIndex = this.cursorState.partIndex ?? 0;
+    this.apply({
+      type: 'batch',
+      ops: [{ type: 'appendMeasure', ...(partIndex ? { partIndex } : {}) }, op]
+    });
   }
 
   private apply(op: EditOp, preserveSelection = false): void {
