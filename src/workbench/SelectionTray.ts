@@ -626,19 +626,32 @@ export class SelectionTray extends LitElement {
         this.emit('tray-close', {});
         return;
       }
-      // ↑ climbs the ladder and ↓ descends it, exactly as the chip's own ▲▼
-      // pair does — one axis, two controls (the spec's rule). Climbing is
-      // widening, and the column is drawn widest-first, so ↑ also moves the
-      // highlight UP the pixels. Key, triangle, column and the HUD beside it
-      // all point the same way; the walk is simply towards index 0.
+      // Bare ↑/↓ walk the GRID, because the grid is what the open tray is for:
+      // once you are in here you are choosing a command, and the tiles wrap
+      // over three or four rows, so a linear ←/→ is the wrong instrument for
+      // reaching one. Shift+↑/↓ keeps the ladder — the same chord that walks
+      // the rungs with the tray shut, so the gesture does not change meaning
+      // when the surface opens — and clicking a rung is the pointer's way.
+      //
+      // ↑ still climbs and ↓ still descends: the column is drawn widest-first,
+      // so the walk towards index 0 is also a walk UP the pixels, and key,
+      // chip triangle, column and the HUD beside it all point one way.
       case 'ArrowUp':
       case 'ArrowDown': {
         consume();
-        const idx = this.rungs.findIndex(r => r.active);
-        const next = this.rungs[idx + (event.code === 'ArrowUp' ? -1 : 1)];
-        if (next) this.emit('tray-rung-preview', { key: next.key });
+        if (event.shiftKey) {
+          const idx = this.rungs.findIndex(r => r.active);
+          const next = this.rungs[idx + (event.code === 'ArrowUp' ? -1 : 1)];
+          if (next) this.emit('tray-rung-preview', { key: next.key });
+          return;
+        }
+        this.stepRow(event.code === 'ArrowUp' ? -1 : 1);
         return;
       }
+      // ←/→ stay LINEAR and wrap, which is what makes them the complement of
+      // the row step rather than a duplicate of it: the row step cannot reach
+      // a short last row's tail from a column that has run out, and wrapping
+      // ←/→ can walk the whole scope without thinking about the shape.
       case 'ArrowRight':
       case 'ArrowLeft':
       case 'Tab': {
@@ -687,6 +700,55 @@ export class SelectionTray extends LitElement {
       }
     }
   };
+
+  /**
+   * Move the tile cursor one ROW, measured rather than counted. The grid is
+   * `flex-wrap`, so its column count is whatever the panel width and the
+   * scope's tile count happen to produce — there is no constant to step by,
+   * and a hardcoded five would quietly lie the first time the panel is
+   * resized or a tile grows.
+   *
+   * So the geometry answers it: find the nearest row of tiles in the
+   * requested direction, then take the tile in it whose horizontal centre is
+   * closest to the one we are leaving — which is what makes a column feel
+   * like a column when the last row is short. Rects rather than
+   * `offsetTop`, because `offsetParent` is specified to return null across a
+   * shadow boundary.
+   *
+   * Disabled tiles are absent from the query for the same reason they are
+   * absent from `entries()`: the cursor indexes what it can land on, so the
+   * two lists are the same list, in the same order.
+   */
+  private stepRow(dir: 1 | -1) {
+    const tiles = [...this.renderRoot.querySelectorAll<HTMLElement>('.tile:not([disabled])')];
+    const from = tiles[this.cursorIndex];
+    if (!from) return;
+    const boxes = tiles.map(el => el.getBoundingClientRect());
+    const here = boxes[this.cursorIndex];
+    // Half a tile: comfortably more than sub-pixel drift, comfortably less
+    // than a row's pitch, so rows group without merging.
+    const tolerance = here.height / 2;
+    const tops = boxes
+      .map(box => box.top)
+      .filter(top => (dir > 0 ? top > here.top + tolerance : top < here.top - tolerance));
+    if (tops.length === 0) return; // the end of the grid is a wall, not a wrap
+    const row = dir > 0 ? Math.min(...tops) : Math.max(...tops);
+
+    const centre = here.left + here.width / 2;
+    let best = -1;
+    let nearest = Infinity;
+    boxes.forEach((box, index) => {
+      if (Math.abs(box.top - row) > tolerance) return;
+      const distance = Math.abs(box.left + box.width / 2 - centre);
+      if (distance < nearest) {
+        nearest = distance;
+        best = index;
+      }
+    });
+    if (best < 0) return;
+    this.cursorIndex = best;
+    this.cursorMoved = true;
+  }
 
   /**
    * The search line's own text. A slash ANYWHERE in it is the widen gesture,
