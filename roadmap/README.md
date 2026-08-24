@@ -172,37 +172,6 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
-- **[core-rung-insert.md](inprogress/core-rung-insert.md)** — **`I` / `Shift+I` insert at
-  the cursor's rung, and a ghost bar past the end of the score.** Found by hands-on
-  testing of [core-entry-surface.md](complete/core-entry-surface.md): `Shift+M` appends a
-  bar at the END, never at the cursor, and **there is no `insertMeasure` op at all**, so a
-  pickup bar is unauthorable. Same asymmetry the entry surface just closed one tier down —
-  every structural rung removes positionally and constructs by appending. Insert makes
-  sense at **five rungs, a side at three** (event, measure, part): a chord is an unordered
-  set, a voice ordinal is identity not layout, and a container's construct verb is a wrap
-  that takes a range. The ghost is deliberately **navigation, not mutation** — `→` at the
-  end lands on a drawable ghost bar and the KEYSTROKE materialises it, which keeps the
-  keymap's "bare arrows never mutate" rule and makes autorepeat harmless. Names the one
-  silent hazard: `ending.duration`, `measureRepeat.number` and `multimeasureRests[].duration`
-  are **bar counts anchored at a start bar**, so an insert inside a span re-spans it
-  (everything else is id-based and safe). `←` at the *start* of a rung's list is left
-  **deliberately unspecified**. Event-rung insert is out of scope until §8.11 says what
-  "make room in a full bar" means. **In progress: the insert half built 2026-08-24**
-  (`insertMeasure`, `addPart` position, `insertAtRung`, span widening, 11 tests incl. a
-  commutativity proof and a pickup bar); `Shift+M` is **already gone**: it meant "insert
-  at the end", and the end is a place the cursor can go — `End` then `I`, with `goToEdge`
-  on Home/End, is the same act spelled out of parts that already exist. `appendMeasure`
-  survives keyless for **genesis** (an insert needs a bar to sit beside). The ghost is
-  next, and is now free to be what it is — "keep typing and the score grows" — rather
-  than a replacement for a key. **§8.11 ruled 2026-08-24**: insert MAY overfill the bar
-  and the existing per-voice badge ("notes sum to 5 of 4 beats") is the warning — making
-  room would mean shortening music nobody named, and this repo refuses that more strongly
-  than it insists on a full bar. So the invariant is a property of *entry*, not of the
-  document at rest. The duration ladder learned ranges to make the resolution step work,
-  back-to-front because re-valuing an event moves every later onset. `removeEvent` is the
-  symmetric twin (Delete on an emptied event removes it, and the bar may underfill) —
-  the ladder had stopped one rung short of the repo's own rule that a container may be
-  removed once it is empty.
 - **[lab-verify.md](inprogress/lab-verify.md)** — **the standing verification ledger**, and
   the only doc here that never moves to `complete/`. `verified` is a human assertion, so
   verification is the one gate an agent cannot pass alone, and any change under `model/`,
@@ -218,6 +187,36 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-rung-insert.md](complete/core-rung-insert.md)** — **`I` / `Shift+I` insert at
+  the cursor's rung, and a ghost bar past the end of the score**, **finished 2026-08-24**
+  (proposed, built and closed the same day). Found by hands-on testing of
+  [core-entry-surface.md](complete/core-entry-surface.md): `Shift+M` appended a bar at the
+  END, never at the cursor, and **there was no `insertMeasure` op at all**, so a pickup bar
+  was unauthorable — the same asymmetry the entry surface closed one tier down, where every
+  structural rung removed positionally and constructed by appending. Insert makes sense at
+  **five rungs, a side at three** (event, measure, part): a chord is an unordered set, a
+  voice ordinal is identity not layout, a container's construct verb is a wrap. Landed with
+  `insertMeasure`, an optional `addPart` position, `insertAtRung` (every other rung
+  **refuses rather than climbing**) and `widenSpansCovering` for the one silent hazard —
+  `ending.duration`, `measureRepeat.number` and `multimeasureRests[].duration` are **bar
+  counts anchored at a start bar**, and everything else in the model is id-based and safe.
+  **`Shift+M` retired**: it meant "insert at the end", and the end is a place the cursor can
+  go — `End` then `I`, with `goToEdge` on Home/End, is the same act spelled out of parts
+  that already exist; `appendMeasure` survives keyless for **genesis** (an insert needs a
+  bar to sit beside). **§8.11 ruled**: insert MAY overfill the bar and the existing
+  per-voice badge is the warning — making room would mean shortening music nobody named,
+  which this repo refuses more strongly than it insists on a full bar, so the invariant is
+  a property of *entry*, not of the document at rest. `removeEvent` is the symmetric twin.
+  **The ghost past the end** closes it, and is **navigation, not mutation**: `→` at the last
+  position steps onto a bar the document does not contain, the rung survives the step, and
+  the KEYSTROKE materialises it — bar and content in ONE `batch`, so undo returns
+  byte-identically. Autorepeat is harmless (one ghost, you stop on it), selection extension
+  may not reach it, and "go to bar 99" still means the last bar. Drawn as a vacancy in the
+  last system's **ragged** right margin on the **cursor's own staff** — system-tall in a
+  thin margin is a sliver, a correction the smoke test's numbers made before the screenshot
+  did. Four bugs earlier in this item taught that the overlay layer can only be judged in a
+  browser, so `npm run smoke:selection` walks off the end and asserts the panel's geometry.
+  `←` at the *start* is left **deliberately unspecified**.
 - **[core-tuplets-grace-notes.md](complete/core-tuplets-grace-notes.md)** — tuplets and grace
   notes **across both converters and on tab**, **finished 2026-08-24**. Split out of
   [core-guitar-pro.md](complete/core-guitar-pro.md) at its real scope: the model and the

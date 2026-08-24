@@ -3738,7 +3738,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
     // to enclose and fell back to interpolating a metric fraction across the
     // bar — which drew the box on the wrong beat, because spacing is springs
     // and rods and a first system also carries a clef and a time signature
-    // (roadmap/inprogress/core-rung-insert.md).
+    // (roadmap/complete/core-rung-insert.md).
     const restKey = event.id ?? (synthesizeKeys
       ? syntheticEventKey({
           partIndex: keyPartIndex ?? 0,

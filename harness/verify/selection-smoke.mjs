@@ -1,7 +1,7 @@
 // The selection overlay, driven in a real browser — the first test this layer
 // has ever had, and the reason it needed one: three separate bugs put the
 // selection box on the wrong beat, each invisible until the one in front of it
-// was fixed (roadmap/inprogress/core-rung-insert.md).
+// was fixed (roadmap/complete/core-rung-insert.md).
 //
 // None of them could be caught headlessly. The overlay is drawn from the
 // FINISHED SVG's geometry — `getBBox()` on rendered glyphs — so it needs a

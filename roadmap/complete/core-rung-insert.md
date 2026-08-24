@@ -4,7 +4,7 @@
 > the INSERT half first (*Built so far*, at the foot), then the ghost past the
 > end (the final section).** Serves the **implementation loop**. Grew out
 > of hands-on testing of
-> [core-entry-surface.md](../complete/core-entry-surface.md): `Shift+M` appends
+> [core-entry-surface.md](core-entry-surface.md): `Shift+M` appends
 > a bar at the **end of the score**, never at the cursor, and there is no way
 > to put a bar anywhere else at all. Two gestures come out of that — a
 > rung-aware **insert** (`I` / `Shift+I`) and a **ghost bar past the end** —
@@ -23,7 +23,7 @@ The structural rungs all removed positionally and constructed by appending:
 | measure | `removeMeasure` (indexed) | `appendMeasure` — **end of score** |
 | document | `removePart` (indexed) | `addPart` — **appends** |
 
-This is the same asymmetry [core-entry-surface.md](../complete/core-entry-surface.md)
+This is the same asymmetry [core-entry-surface.md](core-entry-surface.md)
 closed one tier down — removal knew where it was, construction did not — and
 the fix has the same shape: **the verb takes a position, and an absent position
 means what the verb already meant.**
@@ -407,7 +407,7 @@ cross-highlight and a future click-to-select can point at.
 ### The corpus cost, paid
 
 **45 files, 9 verified scenarios demoted** — registered as batch 6 in
-[lab-verify.md](lab-verify.md), queue 37 → 46 stale. The diff is a pure
+[lab-verify.md](../inprogress/lab-verify.md), queue 37 → 46 stale. The diff is a pure
 metadata addition: a `sourceId` key on rest primitives and a `data-source-id`
 attribute in the SVG. **No geometry, glyph or colour moved**, which is exactly
 what the reviewer is asked to confirm — `spec/rest-positions` first, since it

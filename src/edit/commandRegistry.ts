@@ -1059,7 +1059,7 @@ export interface CommandGroup {
  * what does it JOIN → how is it STRUCK → what do the HANDS do → what WORDS
  * ride along. A `chord` band (does it exist at all) comes first the day the
  * rung's insert verb lands — a chord is a set, so that verb has no side
- * (roadmap/inprogress/core-rung-insert.md) and belongs with existence rather
+ * (roadmap/complete/core-rung-insert.md) and belongs with existence rather
  * than with direction.
  *
  * Where the claims are arguable, and deliberately: `beam` is a rhythm
