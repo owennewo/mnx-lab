@@ -81,10 +81,37 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
-*Counts below are the queue as of 2026-08-24 (0 blocked, 37 stale, 12 never-seen, 62
-current — batches 4 and 5 moved no approved golden, so nothing was demoted for either).
+*Counts below are the queue as of 2026-08-24 (0 blocked, **46** stale, 12 never-seen, **53**
+current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
+
+### 6. `core-rung-insert` — rests carry their event's id — **9 stale**
+
+Owner: [core-rung-insert.md](core-rung-insert.md) (in progress). Demoted 2026-08-24.
+
+**Cause.** A rest emitted no `sourceId`, so nothing in the rendered SVG said WHICH rest a
+selection meant. The enclosure fell back to interpolating the metric fraction across the
+bar and drew its box on the wrong beat — visible the moment insert-then-delete left a rest
+mid-bar. Rests now carry their event's id (real `event.id`, else the new
+`syntheticEventKey`), and light with a `selected` class like any other ink.
+
+**Scenarios (9).** `lab/rhythm/appoggiatura`, `lab/rhythm/tuplet-number-hidden`,
+`lab/articulations/unrendered-marks`, `spec/beams`, `spec/beams-across-barlines`,
+`spec/beams-inner-grace-notes`, `spec/beams-secondary-beam-breaks`,
+`spec/beams-secondary-beam-breaks-implied`, `spec/rest-positions`.
+
+**What a reviewer should look for: nothing should have moved.** This is a pure metadata
+addition — a `sourceId` key on rest glyph primitives and a `data-source-id` attribute in
+the SVG. **No geometry, no glyph, no colour changes**, so the render must be
+pixel-identical to the approved one; the diff is entirely `"className": "rest"` gaining a
+sibling key. If anything about a rest's POSITION or SHAPE differs, that is a real
+regression and not this batch.
+
+`spec/rest-positions` is the one to read first — it is the scenario that exists to pin
+where rests sit, so it is where a positional regression would show most plainly. The three
+`beams-*` scenarios are next: their rests break beam groups, and a rest that moved would
+drag beam geometry with it.
 
 ### 1. `core-ink-measured-gaps` — vertical distance measured ink to ink — **33 stale**
 

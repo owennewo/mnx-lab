@@ -372,3 +372,47 @@ Two details the tests pin: percussion counts as ink (a kit event carries
 have removed a drum hit outright), and multi-member removals go back-to-front,
 because a splice moves every later event index out from under the ops still to
 come — the same rule the ranged re-value needed.
+
+
+## A rest is a thing you can select — 2026-08-24
+
+Reported from use: after `I` then Delete, the selection box was drawn on the
+wrong beat. The model was innocent — cursor and member both correctly at onset
+1/4, the right rest selected — and the fault was entirely in the drawing.
+
+**The cause.** `measurePositionX` places a selection with no ink to enclose by
+**interpolating its metric fraction linearly across the bar**. Spacing is
+springs-and-rods and a first system also carries a clef and a time signature,
+so 25% of the way through the music is nowhere near 25% of the way across the
+staff. It only ever bit rest-only moments, because everything else is enclosed
+from real ink: the enclosure reads the finished SVG's `.selected` glyphs, and
+noteheads carry a `sourceId` while **rests carried none**. Nothing in the SVG
+said which rest was meant.
+
+**The fix, stated as the principle it turned out to be: a rest is a thing you
+can select, so it carries a name like every other thing you can select.**
+`syntheticEventKey` is the event-level twin of the note key, in the same
+grammar (`@[p<part>.]m<measure>[.s<staff>].v<voice>.e<event>[.c<container>]`,
+part 0 and staff 1 silent), and it cannot collide with a note key because those
+always end in `.n<i>` or `.k<i>`. A real `event.id` wins where there is one,
+exactly as notes prefer theirs. `selectedEventIds` carries the highlight the
+way `selectedNoteIds` does for notes; the enclosure needed one extra selector
+(`.rest.selected`) and nothing else.
+
+It fixes more than the reported bug: the cursor ghost shares the same fallback,
+so standing on a rest was misdrawn too, and a rest is now something the JSON
+cross-highlight and a future click-to-select can point at.
+
+### The corpus cost, paid
+
+**45 files, 9 verified scenarios demoted** — registered as batch 6 in
+[lab-verify.md](lab-verify.md), queue 37 → 46 stale. The diff is a pure
+metadata addition: a `sourceId` key on rest primitives and a `data-source-id`
+attribute in the SVG. **No geometry, glyph or colour moved**, which is exactly
+what the reviewer is asked to confirm — `spec/rest-positions` first, since it
+is the scenario that exists to pin where rests sit.
+
+The cheaper alternatives were considered and refused: snapping the interpolated
+x to the nearest rendered column would have been right-looking rather than
+right, and a fix that is usually correct is harder to debug than one that is
+visibly wrong.

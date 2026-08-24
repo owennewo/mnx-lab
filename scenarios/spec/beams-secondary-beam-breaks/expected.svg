@@ -23,7 +23,7 @@
 <text x="884.16" y="144" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e13.n0"></text>
 <text x="940.16" y="136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e14.n0"></text>
 <text x="996.16" y="128" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e15.n0"></text>
-<text x="1061.6" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="1061.6" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m0.v0.e16"></text>
 <line x1="1139.6" y1="128" x2="1139.6" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1144.4" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="156.16" y1="154.688" x2="156.16" y2="217.1424" stroke="currentColor" stroke-width="1.92" class="stem"></line>

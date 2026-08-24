@@ -129,7 +129,8 @@
         "x": 33.1,
         "y": 10,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m0.v0.e3"
       },
       {
         "kind": "line",

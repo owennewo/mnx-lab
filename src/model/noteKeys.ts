@@ -79,6 +79,34 @@ export function kitNoteKey(
   return `@${part}m${measureIndex}.v${voiceIndex}.e${eventIndex}.k${kitIndex}`;
 }
 
+/**
+ * An EVENT's own key — the same coordinates with no note segment at all:
+ *
+ *   `@[p<part>.]m<measure>[.s<staff>].v<voice>.e<event>[.c<container>]`
+ *
+ * A rest has no notes, so it had no name, so nothing could point at it: the
+ * selection enclosure fell back to interpolating a metric fraction across the
+ * bar and drew the box on the wrong beat
+ * (roadmap/inprogress/core-rung-insert.md). An event is a thing you can
+ * select, so it needs an identity like every other thing you can select.
+ *
+ * It cannot collide with a note key: those always end in `.n<i>` or `.k<i>`,
+ * and this one always ends at the event (or its container slot).
+ */
+export function syntheticEventKey(coords: {
+  partIndex?: number;
+  measureIndex: number;
+  staffIndex?: number;
+  voiceIndex: number;
+  eventIndex: number;
+  containerIndex?: number;
+}): string {
+  const part = (coords.partIndex ?? 0) > 0 ? `p${coords.partIndex}.` : '';
+  const staff = (coords.staffIndex ?? 1) > 1 ? `.s${coords.staffIndex}` : '';
+  const container = coords.containerIndex === undefined ? '' : `.c${coords.containerIndex}`;
+  return `@${part}m${coords.measureIndex}${staff}.v${coords.voiceIndex}.e${coords.eventIndex}${container}`;
+}
+
 export function isSyntheticNoteKey(key: string): boolean {
   return key.startsWith('@m');
 }

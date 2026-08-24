@@ -95,7 +95,8 @@
         "x": 19.1,
         "y": 9,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m0.v0.e1"
       },
       {
         "kind": "glyph",
@@ -119,7 +120,8 @@
         "x": 34.6,
         "y": 9,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m0.v0.e4"
       },
       {
         "kind": "line",

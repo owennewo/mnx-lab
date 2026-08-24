@@ -161,7 +161,7 @@
 <line x1="974" y1="391.36" x2="1248" y2="391.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="974" y1="407.36" x2="1248" y2="407.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="974" y1="423.36" x2="1248" y2="423.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="1015.0496" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="1015.0496" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m3.v0.e0"></text>
 <text x="1068.5104" y="160" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="l12"></text>
 <line x1="1087.3904" y1="104" x2="1087.3904" y2="157.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="1131.4096" y="144" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="l13"></text>

@@ -713,6 +713,7 @@ export class ScoreViewer extends LitElement {
       width,
       activeNoteIds: this.playbackState?.activeNoteIds ?? [],
       selectedNoteIds: this.selection?.selectedNoteIds ?? [],
+      selectedEventIds: this.selection?.selectedEventIds ?? [],
       onNoteClick,
       // Layout-side hides reach the engine so their space is reclaimed; the
       // tab renderer ignores what it has no concept of (lyrics).

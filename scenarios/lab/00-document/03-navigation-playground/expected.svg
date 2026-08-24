@@ -68,7 +68,7 @@
 <line x1="728.5888" y1="351.232" x2="887.4112" y2="351.232" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="728.5888" y1="367.232" x2="887.4112" y2="367.232" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="728.5888" y1="383.232" x2="887.4112" y2="383.232" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="790.6112" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="790.6112" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m2.v0.e0"></text>
 <text x="777.1072" y="383.232" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="r3"></text>
 <line x1="887.4112" y1="128" x2="887.4112" y2="192" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="887.4112" y1="319.232" x2="887.4112" y2="383.232" stroke="currentColor" stroke-width="2.56" class="barline"></line>

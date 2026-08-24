@@ -610,7 +610,8 @@
         "x": 49.4132,
         "y": 9,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m2.v0.e0"
       },
       {
         "kind": "glyph",

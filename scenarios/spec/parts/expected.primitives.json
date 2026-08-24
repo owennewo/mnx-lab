@@ -223,7 +223,8 @@
         "x": 13.475,
         "y": 20.024,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@p1.m0.v0.e0"
       },
       {
         "kind": "glyph",
@@ -439,7 +440,8 @@
         "x": 44.375,
         "y": 20.024,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@p1.m1.v0.e0"
       },
       {
         "kind": "glyph",

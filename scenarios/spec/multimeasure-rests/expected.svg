@@ -23,7 +23,7 @@
 <line x1="263.1472" y1="212.288" x2="263.1472" y2="265.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="336.64" y="193.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
 <line x1="336.64" y1="196.288" x2="336.64" y2="249.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="199.0928" y="377.984" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="199.0928" y="377.984" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@p1.m0.v0.e0"></text>
 <line x1="408" y1="201.6" x2="408" y2="265.6" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="408" y1="361.984" x2="408" y2="425.984" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="408" y1="201.6" x2="688" y2="201.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
@@ -42,7 +42,7 @@
 <line x1="543.1472" y1="212.288" x2="543.1472" y2="265.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="616.64" y="193.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e2.n0"></text>
 <line x1="616.64" y1="196.288" x2="616.64" y2="249.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="479.0928" y="377.984" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="479.0928" y="377.984" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@p1.m1.v0.e0"></text>
 <line x1="688" y1="201.6" x2="688" y2="265.6" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="688" y1="361.984" x2="688" y2="425.984" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="688" y1="201.6" x2="968" y2="201.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
@@ -55,7 +55,7 @@
 <line x1="688" y1="393.984" x2="968" y2="393.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="688" y1="409.984" x2="968" y2="409.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="688" y1="425.984" x2="968" y2="425.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="759.0928" y="217.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="759.0928" y="217.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m2.v0.e0"></text>
 <text x="749.6528" y="369.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m2.v0.e0.n0"></text>
 <line x1="749.6528" y1="372.672" x2="749.6528" y2="425.984" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="823.1472" y="377.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m2.v0.e1.n0"></text>
@@ -74,7 +74,7 @@
 <line x1="968" y1="393.984" x2="1248" y2="393.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="968" y1="409.984" x2="1248" y2="409.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="968" y1="425.984" x2="1248" y2="425.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="1039.0928" y="217.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="1039.0928" y="217.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m3.v0.e0"></text>
 <text x="1029.6528" y="369.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m3.v0.e0.n0"></text>
 <line x1="1029.6528" y1="372.672" x2="1029.6528" y2="425.984" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="1103.1472" y="377.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m3.v0.e1.n0"></text>
@@ -102,7 +102,7 @@
 <line x1="223.1472" y1="533.056" x2="223.1472" y2="586.368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="296.64" y="514.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m4.v0.e2.n0"></text>
 <line x1="296.64" y1="517.056" x2="296.64" y2="570.368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="159.0928" y="698.752" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="159.0928" y="698.752" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@p1.m4.v0.e0"></text>
 <line x1="368" y1="522.368" x2="368" y2="586.368" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="368" y1="682.752" x2="368" y2="746.752" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="368" y1="522.368" x2="648" y2="522.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
@@ -121,7 +121,7 @@
 <line x1="503.1472" y1="533.056" x2="503.1472" y2="586.368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="576.64" y="514.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m5.v0.e2.n0"></text>
 <line x1="576.64" y1="517.056" x2="576.64" y2="570.368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="439.0928" y="698.752" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="439.0928" y="698.752" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@p1.m5.v0.e0"></text>
 <line x1="648" y1="522.368" x2="648" y2="586.368" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="648" y1="682.752" x2="648" y2="746.752" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="648" y1="522.368" x2="815.8928" y2="522.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>

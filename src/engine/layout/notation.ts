@@ -56,6 +56,7 @@ import {
   type OnsetX
 } from './scoreText.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
+import { syntheticEventKey } from '../../model/noteKeys.ts';
 import {
   TAB_STAFF_HEIGHT_SP,
   emitTabClef,
@@ -454,6 +455,8 @@ export interface LayoutNotationOptions {
   widthSp: number;
   activeNoteIds?: readonly string[];
   selectedNoteIds?: readonly string[];
+  /** Events lit by the selection — a rest has no notes to carry it. */
+  selectedEventIds?: readonly string[];
   /**
    * Append each tab-bearing part's tab staff to its system (the `both` view):
    * one system walk, native shared barlines. Limitation: documents declaring
@@ -775,6 +778,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   const { mnx, widthSp } = opts;
   const activeNoteIds = opts.activeNoteIds ?? [];
   const selectedNoteIds = opts.selectedNoteIds ?? [];
+  const selectedEventIds = opts.selectedEventIds ?? [];
 
   const primitives: Primitive[] = [];
   const index: SpatialIndex = new Map();
@@ -812,6 +816,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         widthSp,
         activeNoteIds,
         selectedNoteIds,
+        selectedEventIds,
         index,
         diagnostics,
         includeTabStaves: opts.includeTabStaves === true && (mnx.scores ?? []).length === 0,
@@ -890,6 +895,7 @@ interface RenderSegmentArgs {
   widthSp: number;
   activeNoteIds: readonly string[];
   selectedNoteIds: readonly string[];
+  selectedEventIds: readonly string[];
   index: SpatialIndex;
   diagnostics: LayoutDiagnostic[];
   includeTabStaves: boolean;
@@ -1019,7 +1025,7 @@ function assembleSegment(
   /** Probe pass: open every gap that will be measured to this width. */
   probeGapSp: number | null
 ): SegmentResult {
-  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH, densityPad, inkRatio } = args;
+  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH, densityPad, inkRatio } = args;
   const primitives: Primitive[] = [];
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
@@ -1764,6 +1770,7 @@ function assembleSegment(
               keyFifths: m.keyFifths,
               activeNoteIds,
               selectedNoteIds,
+              selectedEventIds,
               primitives,
               index,
               measureIndex: i,
@@ -3689,6 +3696,9 @@ interface EmitEventArgs {
   keyFifths: number;
   activeNoteIds: readonly string[];
   selectedNoteIds: readonly string[];
+  /** Events lit by the selection — how a REST is selected, since it has no
+   *  notes to carry the highlight (core-rung-insert.md). */
+  selectedEventIds: readonly string[];
   primitives: Primitive[];
   index: SpatialIndex;
   measureIndex: number;
@@ -3712,7 +3722,7 @@ interface EmitEventArgs {
 function emitEvent(args: EmitEventArgs): BeamedStem | null {
   const {
     event, eventX, ink, staffTop, clef, stemOverride, beamDir, useAccidentalDisplay, keyFifths,
-    activeNoteIds, selectedNoteIds,
+    activeNoteIds, selectedNoteIds, selectedEventIds,
     primitives, index, measureIndex, voiceIndex, eventIndex,
     row, curveKey, curveAnchors, synthesizeKeys, keyPartIndex, keyStaffIndex
   } = args;
@@ -3723,6 +3733,22 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   // ---- Rest ----
   if (event.rest) {
     const glyph = REST_GLYPH_BY_BASE[base] ?? 'restQuarter';
+    // A REST IS A THING YOU CAN SELECT, so it carries a name like every other
+    // thing you can select. Without one the enclosure had nothing in the SVG
+    // to enclose and fell back to interpolating a metric fraction across the
+    // bar — which drew the box on the wrong beat, because spacing is springs
+    // and rods and a first system also carries a clef and a time signature
+    // (roadmap/inprogress/core-rung-insert.md).
+    const restKey = event.id ?? (synthesizeKeys
+      ? syntheticEventKey({
+          partIndex: keyPartIndex ?? 0,
+          measureIndex,
+          staffIndex: keyStaffIndex ?? 1,
+          voiceIndex,
+          eventIndex
+        })
+      : undefined);
+    const restSelected = restKey !== undefined && selectedEventIds.includes(restKey);
     // `rest.staffPosition` (half-spaces from the middle line, +up) overrides the
     // value's default resting place — same convention as full-measure rests.
     const positioned = event.rest.staffPosition !== undefined;
@@ -3735,7 +3761,9 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       x: eventX,
       y: staffTop + yOffset,
       anchor: 'middle',
-      className: 'rest'
+      className: `rest${restSelected ? ' selected' : ''}`,
+      ...(restKey === undefined ? {} : { sourceId: restKey }),
+      ...(restSelected ? { fill: SELECTED_COLOR } : {})
     });
     // Augmentation dots for rests (just above the rest's centre)
     for (let d = 0; d < dots; d++) {

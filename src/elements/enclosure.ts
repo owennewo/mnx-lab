@@ -448,7 +448,10 @@ export function drawEnclosure(
     : [
         ...svg.querySelectorAll<SVGGraphicsElement>(
           kind === 'cell' || kind === 'run'
-            ? '.notehead.selected, .fret-number.selected'
+            // A REST is a notehead's peer here: it is the whole of an
+            // event's ink, so a cell or run on one has nothing else to hug
+            // (core-rung-insert.md gave rests an id so they could be found).
+            ? '.notehead.selected, .fret-number.selected, .rest.selected'
             : '.selected'
         )
       ];

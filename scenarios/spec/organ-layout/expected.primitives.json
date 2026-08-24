@@ -304,7 +304,8 @@
         "x": 19.4793,
         "y": 14.6,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m0.v0.e0"
       },
       {
         "kind": "glyph",
@@ -312,7 +313,8 @@
         "x": 26.4793,
         "y": 14.6,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m0.v0.e1"
       },
       {
         "kind": "glyph",
@@ -358,7 +360,8 @@
         "x": 19.4793,
         "y": 14.6,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m0.v1.e0"
       },
       {
         "kind": "glyph",
@@ -366,7 +369,8 @@
         "x": 26.8975,
         "y": 14.6,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m0.v1.e1"
       },
       {
         "kind": "line",
@@ -441,7 +445,8 @@
         "x": 19.4793,
         "y": 27.8846,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m0.s2.v0.e0"
       },
       {
         "kind": "glyph",

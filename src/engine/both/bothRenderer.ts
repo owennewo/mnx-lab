@@ -31,6 +31,8 @@ export interface RenderBothOptions {
   width: number;
   activeNoteIds?: string[];
   selectedNoteIds?: string[];
+  /** Events lit by the selection — how a REST is highlighted. */
+  selectedEventIds?: string[];
   onNoteClick?: (
     noteId: string,
     measureIdx: number,
@@ -64,6 +66,7 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds,
+    selectedEventIds: opts.selectedEventIds,
     tabSetup: opts.tabSetup,
     hide: opts.hide,
     densityH: opts.densityH,

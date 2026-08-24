@@ -206,7 +206,8 @@
         "x": 66.35,
         "y": 10,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m0.v0.e16"
       },
       {
         "kind": "line",

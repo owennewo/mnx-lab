@@ -216,7 +216,8 @@
         "x": 12.4433,
         "y": 23.624,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@p1.m0.v0.e0"
       },
       {
         "kind": "line",
@@ -383,7 +384,8 @@
         "x": 29.9433,
         "y": 23.624,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@p1.m1.v0.e0"
       },
       {
         "kind": "line",
@@ -499,7 +501,8 @@
         "x": 47.4433,
         "y": 13.6,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m2.v0.e0"
       },
       {
         "kind": "glyph",
@@ -666,7 +669,8 @@
         "x": 64.9433,
         "y": 13.6,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@m3.v0.e0"
       },
       {
         "kind": "glyph",
@@ -907,7 +911,8 @@
         "x": 9.9433,
         "y": 43.672,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@p1.m4.v0.e0"
       },
       {
         "kind": "line",
@@ -1074,7 +1079,8 @@
         "x": 27.4433,
         "y": 43.672,
         "anchor": "middle",
-        "className": "rest"
+        "className": "rest",
+        "sourceId": "@p1.m5.v0.e0"
       },
       {
         "kind": "line",

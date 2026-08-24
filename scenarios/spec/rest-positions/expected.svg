@@ -9,10 +9,10 @@
 <text x="117.6" y="176" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
 <text x="184.16" y="136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
 <line x1="203.04" y1="80" x2="203.04" y2="133.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="305.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="305.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m0.v0.e1"></text>
 <text x="408.16" y="128" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
 <text x="476.16" y="136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
-<text x="553.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="553.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m0.v0.e4"></text>
 <line x1="177.76" y1="208" x2="209.44" y2="208" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
 <text x="184.16" y="208" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v1.e0.n0"></text>
 <line x1="184.16" y1="210.688" x2="184.16" y2="264" stroke="currentColor" stroke-width="1.92" class="stem"></line>

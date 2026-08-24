@@ -22,6 +22,7 @@ export interface LayoutBothOptions {
   widthSp: number;
   activeNoteIds?: readonly string[];
   selectedNoteIds?: readonly string[];
+  selectedEventIds?: readonly string[];
   /** Viewer-supplied instrument (strings/capo) — overrides each part's own
    *  declaration; never written back. */
   tabSetup?: PartTabSetups;

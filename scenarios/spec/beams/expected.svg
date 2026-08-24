@@ -22,7 +22,7 @@
 <line x1="688.984" y1="176" x2="1248" y2="176" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="688.984" y1="192" x2="1248" y2="192" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <text x="722.8064" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
-<text x="799.5696" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="799.5696" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="ev10"></text>
 <text x="857.4528" y="200" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e2.n0"></text>
 <text x="912.96" y="192" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e3.n0"></text>
 <text x="968.4672" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e4.n0"></text>

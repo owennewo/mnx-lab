@@ -17,7 +17,7 @@
 <line x1="158.08" y1="152" x2="233.6" y2="136" stroke="currentColor" stroke-width="8" class="beam"></line>
 <text x="250.56" y="184" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
 <line x1="269.44" y1="128" x2="269.44" y2="181.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="372" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest"></text>
+<text x="372" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m0.v0.e2"></text>
 <line x1="450" y1="128" x2="450" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="454.8" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

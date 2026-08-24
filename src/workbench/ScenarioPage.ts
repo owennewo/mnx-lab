@@ -24,6 +24,8 @@ import {
   type SelectionLevel
 } from '../edit/selection.ts';
 import { measureSpans } from '../edit/cursor.ts';
+import { eventAtAddress } from '../edit/ops.ts';
+import { syntheticEventKey } from '../model/noteKeys.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import {
@@ -397,6 +399,45 @@ const LIT_LABEL_LEVELS = new Set<SelectionLevel>(['section']);
 /** Translate editor membership into the deliberately smaller geometry
  * vocabulary accepted by `elements/`. Rests survive as onset-bearing moments;
  * empty voice/part/global bar copies survive as full-measure units. */
+/**
+ * The keys of the selected events that are RESTS — the only ones that need
+ * this channel, because every other event is lit through its notes.
+ *
+ * Real `event.id` first, exactly as notes prefer their own id; the synthetic
+ * key otherwise, and the layout mints the same one from the same coordinates,
+ * so the two sides meet without a shared table.
+ */
+function selectedRestKeys(
+  doc: MnxStructure,
+  members: readonly SelectionMember[]
+): string[] {
+  const keys: string[] = [];
+  for (const member of members) {
+    if (member.kind !== 'note' && member.kind !== 'event') continue;
+    const event = eventAtAddress(doc, {
+      partIndex: member.partIndex,
+      staffIndex: member.staffIndex,
+      measureIndex: member.measureIndex,
+      voiceIndex: member.voiceIndex,
+      eventIndex: member.eventIndex,
+      ...(member.containerIndex === undefined ? {} : { containerIndex: member.containerIndex })
+    });
+    if (!event?.rest) continue;
+    keys.push(
+      event.id ??
+        syntheticEventKey({
+          partIndex: member.partIndex,
+          measureIndex: member.measureIndex,
+          staffIndex: member.staffIndex,
+          voiceIndex: member.voiceIndex,
+          eventIndex: member.eventIndex,
+          ...(member.containerIndex === undefined ? {} : { containerIndex: member.containerIndex })
+        })
+    );
+  }
+  return keys;
+}
+
 function presentationSpan(
   doc: MnxStructure,
   level: SelectionLevel,
@@ -2071,6 +2112,9 @@ export class ScenarioPage extends LitElement {
       activeVoiceIndex: null,
       activeEventIndex: null,
       selectedNoteIds: this.cursorHidden ? [] : session.selectedNoteKeys,
+      selectedEventIds: this.cursorHidden
+        ? []
+        : selectedRestKeys(session.doc, session.resolvedSelection.members),
       primaryProjection: session.projection,
       enclosure: this.cursorHidden ? null : ENCLOSURE_BY_LEVEL[session.selectionLevel],
       litLabels: !this.cursorHidden && LIT_LABEL_LEVELS.has(session.selectionLevel),

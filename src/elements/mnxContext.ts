@@ -83,6 +83,11 @@ export interface SelectionContext {
   activeVoiceIndex: number | null;
   activeEventIndex: number | null;
   selectedNoteIds: string[];
+  /** Events lit by the selection. A REST has no notes, so it cannot travel in
+   *  `selectedNoteIds` — and without an identity of its own the enclosure had
+   *  nothing to enclose and fell back to interpolating a metric fraction
+   *  across the bar, which drew the box on the wrong beat. */
+  selectedEventIds?: string[];
   /** In the combined view, which rendering owns the input dialect. The same
    * model selection remains visible on the other projection as a dim echo. */
   primaryProjection?: RenderedProjection | null;

@@ -25,6 +25,8 @@ export interface RenderNotationOptions {
   width: number;
   activeNoteIds?: string[];
   selectedNoteIds?: string[];
+  /** Events lit by the selection — how a REST is highlighted. */
+  selectedEventIds?: string[];
   onNoteClick?: (
     noteId: string,
     measureIdx: number,
@@ -61,6 +63,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds,
+    selectedEventIds: opts.selectedEventIds,
     hide: opts.hide,
     densityH: opts.densityH,
     densityPad: opts.densityPad
