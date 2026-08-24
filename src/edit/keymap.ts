@@ -92,6 +92,11 @@ export const EDIT_LAYER: KeymapLayer = {
     { code: 'ArrowUp', alt: true, shift: true, intent: { type: 'transpose', semitones: 12 } },
     { code: 'ArrowDown', alt: true, shift: true, intent: { type: 'transpose', semitones: -12 } },
     { code: 'KeyM', shift: true, intent: { type: 'appendMeasure' } },
+    // Insert at the rung (core-rung-insert.md): `Del` is already "remove at
+    // this rung", so `I` is its construct twin, with the SIDE as a modifier
+    // rather than a second key to learn. Rung-generic by construction.
+    { code: 'KeyI', intent: { type: 'insertAtRung', side: 'after' } },
+    { code: 'KeyI', shift: true, intent: { type: 'insertAtRung', side: 'before' } },
     { code: 'Delete', intent: { type: 'delete' } },
     { code: 'Backspace', intent: { type: 'delete' } },
     // Duration: Alt+←→ is the primary binding (survey §8.5 — Alt means

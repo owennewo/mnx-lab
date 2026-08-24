@@ -1092,41 +1092,10 @@ export class EditorSession {
         this.apply({ type: 'appendMeasure', ...(partIndex ? { partIndex } : {}) });
         return true;
       }
-      case 'addVoiceMeasure': {
-        const partIndex = this.cursorState.partIndex ?? 0;
-        const staffIndex = this.cursorState.staffIndex ?? 1;
-        const measureIndex = this.cursorState.measureIndex;
-        const measure = this.doc.parts?.[partIndex]?.measures?.[measureIndex];
-        if (!measure) return false;
-        // The new voice's ordinal ON THIS STAFF — read before the op, because
-        // afterwards it is simply the last one.
-        const voiceIndex = (measure.sequences ?? []).filter(
-          sequence => (sequence.staff ?? 1) === staffIndex
-        ).length;
-        this.apply({
-          type: 'addVoiceMeasure',
-          measureIndex,
-          ...(partIndex ? { partIndex } : {}),
-          ...(staffIndex !== 1 ? { staffIndex } : {})
-        });
-        // Step into it. The voice arrived padded, so the bar's first position
-        // is a REAL rest and the next keystroke has somewhere to land —
-        // which is the whole reason the policy pads (ops.ts, addVoiceMeasure).
-        const landing = this.grid.positions.find(
-          position => position.measureIndex === measureIndex && position.voices.includes(voiceIndex)
-        );
-        if (landing)
-          this.cursorState = clampCursor(this.grid, {
-            measureIndex,
-            onset: landing.onset,
-            line: this.cursorState.line,
-            ...(partIndex ? { partIndex } : {}),
-            ...(staffIndex !== 1 ? { staffIndex } : {}),
-            ...(voiceIndex ? { voiceIndex } : {})
-          });
-        this.reanchorSelection();
-        return true;
-      }
+      case 'insertAtRung':
+        return this.insertAtRung(intent.side);
+      case 'addVoiceMeasure':
+        return this.addVoiceHere();
       case 'addPart': {
         const op: Extract<EditOp, { type: 'addPart' }> = { type: 'addPart' };
         if (intent.partId !== undefined) op.partId = intent.partId;
@@ -1832,6 +1801,126 @@ export class EditorSession {
           ...(slot.voiceIndex ? { voiceIndex: slot.voiceIndex } : {})
         }
       : landed;
+    return true;
+  }
+
+  /**
+   * INSERT AT THE RUNG (roadmap/proposed/core-rung-insert.md). One key, its
+   * meaning read off the rung the cursor is addressing.
+   *
+   * The refusals are the interesting half, and they fail for three different
+   * reasons — which is why this is a switch and not a lookup:
+   *
+   *  - `note` already HAS an insert, addressed spatially (a pitch, a string);
+   *    a chord is a set, so there is no "before" in it.
+   *  - `event` waits on §8.11: inserting into a full bar has to either take
+   *    time from the rests or push a beat out, and this codebase decides that
+   *    kind of question once, in the open, before it builds the verb.
+   *  - `container` constructs by WRAPPING a range, and `partMeasure`'s staff
+   *    is a part-level declaration rather than a member of this bar. Neither
+   *    has a position for a new sibling to take.
+   *
+   * A refusing rung returns false rather than climbing to a wider one: a key
+   * that quietly acts on something bigger than you were addressing is exactly
+   * what the ladder exists to prevent.
+   */
+  private insertAtRung(side: 'before' | 'after'): boolean {
+    switch (this.selectionState.level) {
+      case 'voiceMeasure':
+        // Voices stack by stem direction, not by index, and note keys embed
+        // the ordinal — so there is no order for `before` to address.
+        return side === 'after' && this.addVoiceHere();
+      case 'measure':
+        return this.insertMeasureHere(side);
+      case 'document':
+        return this.insertPartHere(side);
+      default:
+        return false;
+    }
+  }
+
+  /** A bar beside this one, and the cursor moves into it — you asked for it
+   *  to work in, and it arrives padded, so there is somewhere to type. */
+  private insertMeasureHere(side: 'before' | 'after'): boolean {
+    const measureIndex = this.cursorState.measureIndex;
+    if (!this.doc.global?.measures?.[measureIndex]) return false;
+    const partIndex = this.cursorState.partIndex ?? 0;
+    // THE RUNG SURVIVES. `apply` re-anchors at note by default, which is right
+    // for entry — you typed a note, you are addressing a note — and wrong for
+    // a structural verb addressed AT a rung: dropping to note would make the
+    // second `I` refuse, so inserting two bars would need the ladder walked
+    // again between them.
+    this.apply({
+      type: 'insertMeasure',
+      measureIndex,
+      side,
+      ...(partIndex ? { partIndex } : {})
+    }, true);
+    const at = side === 'before' ? measureIndex : measureIndex + 1;
+    this.cursorState = moveToMeasure(this.grid, this.cursorState, at);
+    this.reanchorSelection();
+    return true;
+  }
+
+  /**
+   * A part beside this one, in score order, with the cursor following it into
+   * the new one.
+   *
+   * The landing is done here rather than by delegating to `setPart`, which
+   * refuses a move to the index it is already on — and inserting BEFORE gives
+   * the new part exactly the index the cursor already holds, so delegating
+   * reported the whole insert as failed while the part sat in the document.
+   */
+  private insertPartHere(side: 'before' | 'after'): boolean {
+    if ((this.doc.parts?.length ?? 0) === 0) return false;
+    const partIndex = (this.cursorState.partIndex ?? 0) + (side === 'after' ? 1 : 0);
+    this.apply({ type: 'addPart', partIndex }, true); // the rung survives, as above
+    // A different part is a different grid — the same rebuild `setPart` does.
+    this.grid = buildGrid(this.doc, partIndex, 1);
+    this.cursorState = {
+      ...initialCursor(this.grid),
+      ...(partIndex ? { partIndex } : {})
+    };
+    this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
+    this.reanchorSelection();
+    return true;
+  }
+
+  /** The voice rung's construct verb, shared by `I` and the tray tile. */
+  private addVoiceHere(): boolean {
+    const partIndex = this.cursorState.partIndex ?? 0;
+    const staffIndex = this.cursorState.staffIndex ?? 1;
+    const measureIndex = this.cursorState.measureIndex;
+    const measure = this.doc.parts?.[partIndex]?.measures?.[measureIndex];
+    if (!measure) return false;
+    // The new voice's ordinal ON THIS STAFF — read before the op, because
+    // afterwards it is simply the last one.
+    const voiceIndex = (measure.sequences ?? []).filter(
+      sequence => (sequence.staff ?? 1) === staffIndex
+    ).length;
+    this.apply({
+      type: 'addVoiceMeasure',
+      measureIndex,
+      ...(partIndex ? { partIndex } : {}),
+      ...(staffIndex !== 1 ? { staffIndex } : {})
+    });
+    // Step into it, at the NOTE rung — unlike the bar and part inserts above,
+    // which keep the rung they were fired from. The voice arrived padded so
+    // its first position is a real rest, and the point of making a voice is to
+    // type into it; a second voice is a rarer want than a second bar.
+    const landing = this.grid.positions.find(
+      position => position.measureIndex === measureIndex && position.voices.includes(voiceIndex)
+    );
+    if (landing)
+      this.cursorState = clampCursor(this.grid, {
+        measureIndex,
+        onset: landing.onset,
+        line: this.cursorState.line,
+        ...(partIndex ? { partIndex } : {}),
+        ...(staffIndex !== 1 ? { staffIndex } : {}),
+        ...(voiceIndex ? { voiceIndex } : {})
+      });
+    this.reanchorSelection();
     return true;
   }
 

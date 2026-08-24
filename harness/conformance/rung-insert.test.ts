@@ -1,0 +1,222 @@
+// Insert at the rung — roadmap/proposed/core-rung-insert.md.
+//
+// `I` / `Shift+I` resolve against the rung the cursor addresses. The refusals
+// matter as much as the inserts: a key that quietly acts on something wider
+// than you were addressing is what the selection ladder exists to prevent.
+import fs from 'node:fs';
+import path from 'node:path';
+import { describe, it, expect } from 'vitest';
+import { replayIntents, type EditorSession } from '../../src/edit/session.ts';
+import type { EditorIntent } from '../../src/edit/intents.ts';
+import type { MnxStructure } from '../../src/model/mnx.ts';
+import { computePrimitives } from '../helpers/corpusPrimitives.ts';
+
+const EMPTY = () => ({}) as MnxStructure;
+const build = (intents: EditorIntent[]) => replayIntents(EMPTY(), intents);
+
+/** A one-part document of `bars` empty 4/4 bars, cursor at bar 0. */
+function score(bars: number): EditorSession {
+  const intents: EditorIntent[] = [{ type: 'addPart' }];
+  for (let i = 0; i < bars; i++) intents.push({ type: 'appendMeasure' });
+  intents.push({ type: 'setTimeSignature', count: 4, unit: 4 });
+  return build(intents);
+}
+
+/** Walk the ladder up to `level` from note. */
+function relaxTo(session: EditorSession, level: string): void {
+  for (let i = 0; i < 8 && session.selectionLevel !== level; i++)
+    session.handleIntent({ type: 'relaxSelection' });
+  expect(session.selectionLevel, `could not reach the ${level} rung`).toBe(level);
+}
+
+const barCount = (session: EditorSession) => session.doc.global?.measures?.length ?? 0;
+
+describe('insert at the rung', () => {
+  it('inserts a bar after and before, and moves into it', () => {
+    const after = score(2);
+    relaxTo(after, 'measure');
+    after.handleIntent({ type: 'goToMeasure', measureIndex: 0 });
+    expect(after.handleIntent({ type: 'insertAtRung', side: 'after' })).toBe(true);
+    expect(barCount(after)).toBe(3);
+    expect(after.cursor.measureIndex, 'cursor did not follow the new bar').toBe(1);
+
+    const before = score(2);
+    relaxTo(before, 'measure');
+    before.handleIntent({ type: 'goToMeasure', measureIndex: 1 });
+    expect(before.handleIntent({ type: 'insertAtRung', side: 'before' })).toBe(true);
+    expect(barCount(before)).toBe(3);
+    expect(before.cursor.measureIndex).toBe(1);
+  });
+
+  it('the new bar arrives padded, like every other bar entry touches', () => {
+    const s = score(1);
+    relaxTo(s, 'measure');
+    s.handleIntent({ type: 'insertAtRung', side: 'after' });
+    const content = s.doc.parts![0].measures![1].sequences![0].content;
+    expect(content.map(e => (e as { duration: { base: string } }).duration.base))
+      .toEqual(['quarter', 'quarter', 'quarter', 'quarter']);
+  });
+
+  it('THE PICKUP BAR: a bar before the first, which appendMeasure cannot reach', () => {
+    const s = score(1);
+    // Put ink in bar 1 so the new bar is provably in FRONT of real music.
+    s.handleIntent({ type: 'toggleNote' });
+    const before = JSON.parse(JSON.stringify(s.doc.parts![0].measures![0])) as unknown;
+    relaxTo(s, 'measure');
+    expect(s.handleIntent({ type: 'insertAtRung', side: 'before' })).toBe(true);
+    expect(barCount(s)).toBe(2);
+    expect(s.cursor.measureIndex, 'the cursor should land in the pickup').toBe(0);
+    // The music moved along intact; the new bar is the empty one.
+    expect(s.doc.parts![0].measures![1]).toEqual(before);
+  });
+
+  it('refuses at every rung with no insert, and never climbs to a wider one', () => {
+    for (const level of ['note', 'event', 'partMeasure', 'section']) {
+      const s = score(2);
+      s.handleIntent({ type: 'toggleNote' });
+      // The ladder skips rungs with no referent, so `section` needs one before
+      // it can be stood on at all.
+      if (level === 'section')
+        s.handleIntent({
+          type: 'setMeasureAttribute',
+          attribute: { kind: 'section', label: 'Head' }
+        });
+      relaxTo(s, level);
+      const bars = barCount(s);
+      for (const side of ['before', 'after'] as const)
+        expect(
+          s.handleIntent({ type: 'insertAtRung', side }),
+          `${level} accepted insert-${side}`
+        ).toBe(false);
+      expect(barCount(s), `${level} silently inserted a bar`).toBe(bars);
+    }
+  });
+
+  it('the voice rung takes `after` only — a voice ordinal is not an order', () => {
+    const s = score(1);
+    relaxTo(s, 'voiceMeasure');
+    expect(s.handleIntent({ type: 'insertAtRung', side: 'before' })).toBe(false);
+    expect(s.doc.parts![0].measures![0].sequences!.length).toBe(1);
+    expect(s.handleIntent({ type: 'insertAtRung', side: 'after' })).toBe(true);
+    expect(s.doc.parts![0].measures![0].sequences!.length).toBe(2);
+  });
+
+  it('the score rung inserts a part in score order', () => {
+    const s = build([
+      { type: 'addPart', name: 'A' },
+      { type: 'appendMeasure' },
+      { type: 'addPart', name: 'B' }
+    ]);
+    relaxTo(s, 'document');
+    s.handleIntent({ type: 'setPart', partIndex: 1 });
+    relaxTo(s, 'document');
+    expect(s.handleIntent({ type: 'insertAtRung', side: 'before' })).toBe(true);
+    expect(s.doc.parts!.map(p => p.name)).toEqual(['A', undefined, 'B']);
+    expect(s.cursor.partIndex, 'cursor did not follow the new part').toBe(1);
+  });
+});
+
+describe('insert and the spans anchored by a bar COUNT', () => {
+  const spanScore = () => {
+    const s = score(4);
+    relaxTo(s, 'measure');
+    return s;
+  };
+
+  it('widens a volta whose reach the new bar lands inside', () => {
+    const s = spanScore();
+    // A 3-bar ending starting at bar 1 (covers bars 1,2,3).
+    s.doc.global!.measures![1].ending = { duration: 3, numbers: [1] };
+    s.handleIntent({ type: 'goToMeasure', measureIndex: 2 });
+    s.handleIntent({ type: 'insertAtRung', side: 'before' }); // lands at index 2
+    expect(s.doc.global!.measures![1].ending!.duration, 'volta silently re-spanned').toBe(4);
+  });
+
+  it('leaves a volta alone when the bar lands outside it', () => {
+    for (const [at, side] of [[1, 'before'], [3, 'after']] as const) {
+      const s = spanScore();
+      s.doc.global!.measures![1].ending = { duration: 2, numbers: [1] }; // bars 1,2
+      s.handleIntent({ type: 'goToMeasure', measureIndex: at });
+      s.handleIntent({ type: 'insertAtRung', side });
+      const ending = s.doc.global!.measures!.find(m => m.ending)!.ending!;
+      expect(ending.duration, `insert ${side} bar ${at} moved the span`).toBe(2);
+    }
+  });
+
+  it('widens a measure repeat and a multimeasure rest the same way', () => {
+    const s = spanScore();
+    (s.doc.parts![0].measures![1] as { measureRepeat?: { number: number } })
+      .measureRepeat = { number: 3 };
+    s.doc.global!.measures![1].id = 'm2';
+    s.doc.scores = [{ multimeasureRests: [{ start: 'm2', duration: 3 }] } as never];
+    s.handleIntent({ type: 'goToMeasure', measureIndex: 2 });
+    s.handleIntent({ type: 'insertAtRung', side: 'after' }); // lands at index 3
+    expect((s.doc.parts![0].measures![1] as { measureRepeat: { number: number } })
+      .measureRepeat.number).toBe(4);
+    expect(s.doc.scores![0].multimeasureRests![0].duration).toBe(4);
+  });
+});
+
+describe('insert is safe in the middle of real music', () => {
+  const FIXTURE = path.join(__dirname, '../fixtures/construct-traces/ties.json');
+
+  it('ROUND TRIP: insert then remove returns the document byte-identically', () => {
+    const intents = (JSON.parse(fs.readFileSync(FIXTURE, 'utf8')) as {
+      intents: EditorIntent[];
+    }).intents;
+    const s = replayIntents(EMPTY(), intents);
+    const before = JSON.stringify(s.doc);
+    relaxTo(s, 'measure');
+    s.handleIntent({ type: 'goToMeasure', measureIndex: 0 });
+    expect(s.handleIntent({ type: 'insertAtRung', side: 'after' })).toBe(true);
+    expect(JSON.stringify(s.doc), 'the insert changed nothing').not.toBe(before);
+    // Del at the measure rung is the removal verb — the bar is rests-only, so
+    // the guard lets it go.
+    expect(s.cursor.measureIndex).toBe(1);
+    expect(s.selectionLevel).toBe('measure');
+    expect(s.handleIntent({ type: 'delete' })).toBe(true);
+    expect(JSON.stringify(s.doc)).toBe(before);
+  });
+
+  it('COMMUTATIVITY: building out of order gives the same engraving', () => {
+    // Three bars of one note each. In order, then with the middle bar
+    // INSERTED after the fact — the same music reached two ways. Staff
+    // positions are absolute, because `goToMeasure` re-aims the line at ink.
+    // The ladder skips rungs with no referent, so it will not descend to
+    // `note` inside a rest-only bar — climb down where there IS ink, then
+    // travel. (Pre-existing ladder behaviour; entry itself works from `event`,
+    // which is why a player never notices.)
+    const descendVia = (session: EditorSession, inkedBar: number) => {
+      session.handleIntent({ type: 'goToMeasure', measureIndex: inkedBar });
+      for (let i = 0; i < 8 && session.selectionLevel !== 'note'; i++)
+        session.handleIntent({ type: 'tightenSelection' });
+      expect(session.selectionLevel).toBe('note');
+    };
+    const noteAt = (session: EditorSession, bar: number, staffPosition: number) => {
+      session.handleIntent({ type: 'goToMeasure', measureIndex: bar });
+      for (let i = 0; i < 40 && session.cursor.line !== staffPosition; i++)
+        session.handleIntent({
+          type: session.cursor.line < staffPosition ? 'lineUp' : 'lineDown'
+        });
+      expect(session.cursor.line).toBe(staffPosition);
+      expect(session.handleIntent({ type: 'toggleNote' })).toBe(true);
+    };
+
+    const inOrder = score(3);
+    noteAt(inOrder, 0, -6);
+    noteAt(inOrder, 1, -2);
+    noteAt(inOrder, 2, 2);
+
+    const inserted = score(2);
+    noteAt(inserted, 0, -6);
+    noteAt(inserted, 1, 2); // the LAST bar's music, written second
+    relaxTo(inserted, 'measure');
+    inserted.handleIntent({ type: 'goToMeasure', measureIndex: 1 });
+    expect(inserted.handleIntent({ type: 'insertAtRung', side: 'before' })).toBe(true);
+    descendVia(inserted, 0);
+    noteAt(inserted, 1, -2); // the middle bar, filled after it was inserted
+
+    expect(JSON.parse(JSON.stringify(computePrimitives(inserted.doc))))
+      .toEqual(JSON.parse(JSON.stringify(computePrimitives(inOrder.doc))));
+  });
+});

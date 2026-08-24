@@ -95,6 +95,19 @@ export type MutationIntent =
    *  the sign — the §8.11 polymorphic verb (one key, per-type meaning). */
   | { type: 'transpose'; semitones: number }
   | { type: 'appendMeasure' }
+  /**
+   * INSERT AT THE RUNG — one intent, resolved by where the cursor is
+   * (roadmap/proposed/core-rung-insert.md). `I` inserts after, `Shift+I`
+   * before, and the same key means bar, part or voice depending on the rung,
+   * which is the ladder's own promise.
+   *
+   * A rung with no insert REFUSES rather than falling back to a wider one: a
+   * key that quietly acts on something bigger than you were addressing is the
+   * failure this whole ladder exists to prevent. Rungs whose siblings have no
+   * visible order (a chord is a set, a voice ordinal is identity) take `after`
+   * only — there is nothing for `before` to mean.
+   */
+  | { type: 'insertAtRung'; side: 'before' | 'after' }
   /** Add a voice to the cursor's bar and staff, and MOVE INTO IT. The voice
    *  arrives padded to the meter, so what you step into is a bar of rests
    *  waiting to be typed over — see `addVoiceMeasure` in ops.ts for why that

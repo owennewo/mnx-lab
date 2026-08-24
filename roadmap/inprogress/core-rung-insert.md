@@ -1,6 +1,7 @@
 # Insert at the rung — `I`, `Shift+I`, and the ghost past the end
 
-> **Status: proposed 2026-08-24.** Serves the **implementation loop**. Grew out
+> **Status: in progress. Proposed 2026-08-24; the INSERT half built the same
+> day — see *Built so far* at the foot. The ghost is still to come.** Serves the **implementation loop**. Grew out
 > of hands-on testing of
 > [core-entry-surface.md](../complete/core-entry-surface.md): `Shift+M` appends
 > a bar at the **end of the score**, never at the cursor, and there is no way
@@ -187,3 +188,55 @@ Three more, each aimed at one risk this doc names:
   already every trace's second verdict, so the harness can see it.
 - A **volta or measure-repeat span that is provably not re-spanned** by an
   insert inside it — the one hazard whose failure mode is silent.
+
+
+---
+
+## Built so far — 2026-08-24, the insert half
+
+`I` / `Shift+I` resolve per rung and land where they should. **The ghost past
+the end is NOT built yet**, and `Shift+M` therefore **stays** until it is: the
+doc pairs its retirement with the ghost, and removing the only gesture for
+"append at the end" before its replacement exists would be a regression on the
+way to a fix. `I` on the last bar already appends, so the gap is only
+"append without navigating there first".
+
+Landed:
+
+- **`insertMeasure { measureIndex, side, partIndex? }`** — the positional twin
+  `removeMeasure` always had and `appendMeasure` never was. The new bar is
+  padded for the cursor's part on the same rule `appendMeasure` follows.
+- **`addPart` takes an optional `partIndex`** — absent appends, the convention
+  `EntryTarget` set, so no committed trace moved.
+- **`insertAtRung { side }`**, one intent read off the rung: bar at `measure`,
+  part at `document`, voice at `voiceMeasure` (`after` only). Every other rung
+  **refuses rather than climbing**, which the tests assert bar-count-unchanged
+  rather than merely by return value.
+- **`widenSpansCovering`** — the silent hazard, closed. A span is widened
+  exactly when the new bar lands inside `s … s+d-1`.
+- Tray tiles at the measure and score rungs; the voice tile now names `I` too.
+
+### Two things learned in the building
+
+**The rung has to survive a structural insert.** `apply()` re-anchors at the
+note rung by default — right for entry, wrong here: it made the *second* `I`
+refuse, so inserting two bars in a row meant walking the ladder again between
+them. Bar and part inserts now preserve the rung; the voice insert deliberately
+does not, because the point of making a voice is to type into it.
+
+**A refusing rung must not delegate upward, and delegation is easy to do by
+accident.** `insertPartHere` first called `setPart` to land the cursor — and
+`setPart` refuses a move to the index it is already on, which is exactly what
+inserting BEFORE produces. The part was added and the verb reported failure.
+Landing is done here now, the same rebuild `setPart` does.
+
+### One friction found, not fixed
+
+After `I` you stand at the **measure rung in an empty bar**, where ↑↓ means
+"the neighbouring system" and the ladder will not descend to `note` because a
+rest-only bar has no note to descend to. So the first pitch in a new bar cannot
+be *aimed* before it is placed — you place it (entry works from `event`, and
+snaps the rung to `note`) and then re-pitch. Pre-existing ladder behaviour that
+this gesture merely walks into; recorded here because it is the one rough edge
+a player will actually meet, and the ghost work is the natural place to judge
+whether it needs anything.

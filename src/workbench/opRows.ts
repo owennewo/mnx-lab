@@ -146,12 +146,16 @@ function opLabel(op: EditOp): string {
       return `tab staff · ${op.kind}`;
     case 'appendMeasure':
       return `append bar${whereText({ partIndex: op.partIndex })}`;
+    case 'insertMeasure':
+      return `insert bar ${op.side} m${op.measureIndex + 1}${whereText({ partIndex: op.partIndex })}`;
     case 'removeMeasure':
       return `remove bar m${op.measureIndex + 1} (empty)`;
     case 'removePart':
       return 'remove part (empty)';
     case 'addPart':
-      return `add part${op.name ? ` “${op.name}”` : op.partId ? ` ${op.partId}` : ' (anonymous)'}`;
+      return `${op.partIndex === undefined ? 'add' : `insert`} part${
+        op.name ? ` “${op.name}”` : op.partId ? ` ${op.partId}` : ' (anonymous)'
+      }${op.partIndex === undefined ? '' : ` at ${op.partIndex + 1}`}`;
     case 'setClef':
       return `clef ${clefText(op)} @ m${op.measureIndex + 1}`;
     case 'removeClef':
@@ -320,6 +324,8 @@ function intentLabel(intent: EditorIntent): string {
       return `transpose ${intent.semitones > 0 ? '+' : ''}${intent.semitones}`;
     case 'appendMeasure':
       return 'append bar';
+    case 'insertAtRung':
+      return `insert ${intent.side}`;
     case 'setTimeSignature':
       return `“${intent.count}/${intent.unit}”`;
     case 'setTuning':

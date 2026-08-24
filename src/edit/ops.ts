@@ -202,6 +202,23 @@ export type EditOp =
       kind: 'notation' | 'tab' | 'both';
     }
   | {
+      /**
+       * Insert an empty bar beside the cursor's — the positional construct
+       * verb `removeMeasure` has always had a twin for and never got
+       * (roadmap/proposed/core-rung-insert.md). `appendMeasure` can only
+       * reach the end, which is why a pickup bar was unauthorable.
+       *
+       * The bar is GLOBAL, so it goes into every part's array at the same
+       * index; only the cursor's part gets the beat rests, on the same rule
+       * `appendMeasure` follows.
+       */
+      type: 'insertMeasure';
+      /** The bar the cursor is on; the new one lands beside it. */
+      measureIndex: number;
+      side: 'before' | 'after';
+      partIndex?: number;
+    }
+  | {
       /** Append an empty measure to every part and the global timeline.
        *
        *  The bar is GLOBAL; a part's copy of it is not. So the new bar's beat
@@ -220,6 +237,10 @@ export type EditOp =
       type: 'addPart';
       partId?: string;
       name?: string;
+      /** The index the new part TAKES; absent appends, which is what this
+       *  verb meant before it could say anything else. Score order is what
+       *  the reader sees, so unlike a voice ordinal it is worth addressing. */
+      partIndex?: number;
     }
   | {
       /** Remove one measure column (the global measure + every part's) —
@@ -1910,11 +1931,25 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         ...(op.name !== undefined ? { name: op.name } : {}),
         measures: next.global.measures.map(() => ({ sequences: [{ content: [] }] }))
       };
-      next.parts.push(part);
+      if (op.partIndex === undefined) next.parts.push(part);
+      else next.parts.splice(Math.min(Math.max(op.partIndex, 0), next.parts.length), 0, part);
       // Only the entry surface (parts[0]) holds the full-bar invariant.
       if (next.parts.length === 1) {
         for (let i = 0; i < next.global.measures.length; i++) padMeasureRests(next, i);
       }
+      return next;
+    }
+    case 'insertMeasure': {
+      const measures = next.global?.measures;
+      if (!measures?.[op.measureIndex]) return next;
+      // The index the new bar TAKES, against the timeline as it stands now —
+      // which is what `widenSpansCovering` has to read, so it runs first.
+      const at = op.side === 'before' ? op.measureIndex : op.measureIndex + 1;
+      widenSpansCovering(next, at);
+      measures.splice(at, 0, {});
+      for (const part of next.parts ?? []) part.measures?.splice(at, 0, { sequences: [{ content: [] }] });
+      // Beat rests for the part being written to (§8.11), as `appendMeasure`.
+      padMeasureRests(next, at, { partIndex: op.partIndex });
       return next;
     }
     case 'removeMeasure': {
@@ -1930,6 +1965,59 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (!part || partHasInk(part)) return next;
       next.parts.splice(partIndex, 1);
       return dissolveIfHollow(next);
+    }
+  }
+}
+
+/**
+ * THE ONE THING AN INSERT CAN BREAK SILENTLY.
+ *
+ * Every cross-reference in the model is id-based and therefore survives a
+ * splice untouched: ties name `note.id`, slurs and beams name event ids, an
+ * ottava's `end.measure` and a score's `systems[].measure` name measure ids.
+ * Three fields are not — each is a **bar count anchored at a start bar**, so a
+ * bar inserted inside its reach would leave it covering one bar less of the
+ * music it was written about, with nothing to say so:
+ *
+ *   - `ending.duration`          how many bars the volta spans
+ *   - `measureRepeat.number`     how many bars are repeated
+ *   - `multimeasureRests[].duration`  how many bars collapse into the H-bar
+ *
+ * A span starting at `s` and lasting `d` covers `s … s+d-1`, so the new bar
+ * lands INSIDE it exactly when `s < at <= s+d-1`, and the span grows by one to
+ * keep covering the same music. Landing before the start needs nothing (the
+ * declaration rides its own measure through the splice) and landing after the
+ * end needs nothing either.
+ *
+ * Read against the PRE-SPLICE timeline, which is why the caller runs this
+ * first. The objects are mutated in place, so they survive the splice.
+ *
+ * `removeMeasure` has the mirror of this gap and does NOT narrow — noted, not
+ * fixed here: removal is guarded on ink but not on spans, which is its own
+ * question and its own change.
+ */
+function widenSpansCovering(doc: MnxStructure, at: number): void {
+  const covers = (start: number, span: number | undefined): boolean =>
+    span !== undefined && start < at && at <= start + span - 1;
+
+  const measures = doc.global?.measures ?? [];
+  measures.forEach((measure, start) => {
+    const ending = measure.ending;
+    if (ending && covers(start, ending.duration)) ending.duration = ending.duration! + 1;
+  });
+
+  for (const part of doc.parts ?? []) {
+    (part.measures ?? []).forEach((measure, start) => {
+      const repeat = (measure as MnxPartMeasure & { measureRepeat?: { number: number } })
+        .measureRepeat;
+      if (repeat && covers(start, repeat.number)) repeat.number += 1;
+    });
+  }
+
+  for (const score of doc.scores ?? []) {
+    for (const rest of score.multimeasureRests ?? []) {
+      const start = measures.findIndex(measure => measure.id === rest.start);
+      if (start >= 0 && covers(start, rest.duration)) rest.duration += 1;
     }
   }
 }

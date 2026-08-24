@@ -586,6 +586,9 @@ export const COMMANDS: readonly EditorCommand[] = [
     scopes: ['voiceMeasure'],
     glyph: { smufl: 'arrowBlackDown' },
     label: 'Add a voice to this bar',
+    // `I` reaches it too (core-rung-insert.md). No `Shift+I`: voices stack by
+    // stem direction, not index, so there is no order for `before` to mean.
+    shortcut: 'I',
     tier: 'popover',
     action: () => ({ intent: { type: 'addVoiceMeasure' } })
   },
@@ -810,10 +813,46 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'add-bar',
     scopes: ['document', 'measure'],
     glyph: { smufl: 'barlineSingle' },
-    label: 'Append a bar',
+    label: 'Append a bar at the end',
     shortcut: 'Shift+M',
     tier: 'key',
     action: () => ({ intent: { type: 'appendMeasure' } })
+  },
+  {
+    id: 'insert-bar-after',
+    scopes: ['measure'],
+    glyph: { smufl: 'barlineSingle' },
+    label: 'Insert a bar after this one',
+    shortcut: 'I',
+    tier: 'key',
+    action: () => ({ intent: { type: 'insertAtRung', side: 'after' } })
+  },
+  {
+    id: 'insert-bar-before',
+    scopes: ['measure'],
+    glyph: { smufl: 'barlineSingle' },
+    label: 'Insert a bar before this one',
+    shortcut: 'Shift+I',
+    tier: 'key',
+    action: () => ({ intent: { type: 'insertAtRung', side: 'before' } })
+  },
+  {
+    id: 'insert-part-after',
+    scopes: ['document'],
+    glyph: { smufl: 'brace' },
+    label: 'Insert a part below this one',
+    shortcut: 'I',
+    tier: 'key',
+    action: () => ({ intent: { type: 'insertAtRung', side: 'after' } })
+  },
+  {
+    id: 'insert-part-before',
+    scopes: ['document'],
+    glyph: { smufl: 'brace' },
+    label: 'Insert a part above this one',
+    shortcut: 'Shift+I',
+    tier: 'key',
+    action: () => ({ intent: { type: 'insertAtRung', side: 'before' } })
   },
   {
     id: 'part-name',

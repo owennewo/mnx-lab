@@ -300,6 +300,16 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: { all: 'append a bar at the end' }
   },
   {
+    keys: 'I / Shift+I',
+    strokes: [{ code: 'KeyI' }, { code: 'KeyI', shift: true }],
+    group: 'editing',
+    meaning: {
+      all: 'insert after / before, at the rung you are addressing — a bar at the ' +
+        'measure rung, a part at the score rung, a voice at the voice-bar rung ' +
+        '(after only: voices have no visible order). Other rungs refuse.'
+    }
+  },
+  {
     keys: 'Ctrl+Z/Y',
     strokes: [
       { code: 'KeyZ', ctrl: true },
