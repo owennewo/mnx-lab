@@ -412,6 +412,6 @@ stop the control lying about it.**
   ~1.5%, so it stays live to the ceiling; on a narrower pane it will not.
 
 The ceiling itself is unchanged, and the thing that would make it reachable in
-full is [core-lowvision-reflow.md](../proposed/core-lowvision-reflow.md) — the
+full is [core-lowvision-reflow.md](../proposed/low-priority/core-lowvision-reflow.md) — the
 open question of measuring the line in ink. `MAX_STAFF_SCALE`'s comment, which
 claimed the page "scrolls sideways" up here, is corrected: it never did.

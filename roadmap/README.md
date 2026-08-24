@@ -60,17 +60,6 @@ proposals that name their campaign.
   (everything else is id-based and safe). `←` at the *start* of a rung's list is left
   **deliberately unspecified**. Event-rung insert is out of scope until §8.11 says what
   "make room in a full bar" means.
-- **[core-lowvision-reflow.md](proposed/core-lowvision-reflow.md)** — should the plan's
-  line width be measured in **ink**, so growing the staff reflows the music instead of
-  overflowing it? Left open by the 2026-08-21 low-vision range (staff ceiling 160% → 640%,
-  density 2 → 8, both landed). Measured: at 640% the vertical arm alone makes a system
-  ×2.6 the line width (sideways scrolling per system); with the horizontal arm too it is
-  ×1.1 (one bar per system, scrolling down) — so the good outcome exists but needs both
-  arms, and reaching only for the obvious one is the worst of the three. The tension is
-  live: reflow re-couples the axes that core-zoom-density-pad ruling 2 separated and that
-  core-ink-priced-columns froze packing to keep separated. Four options costed, from "do
-  nothing, document it" to "always ink-measured", with coupling-in-the-control carrying
-  the best precedent.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -186,6 +175,17 @@ back up to `proposed/` the moment it is.
   Drive as export only). Records the adoption-day snapshot barrier, the worker/`applyOp`
   boundary question, free-tier→$5 cost shape, and a five-stage build order starting with
   whole-document LWW through the existing `DocumentRepository` seam.
+- **[core-lowvision-reflow.md](proposed/low-priority/core-lowvision-reflow.md)** — should the plan's
+  line width be measured in **ink**, so growing the staff reflows the music instead of
+  overflowing it? Left open by the 2026-08-21 low-vision range (staff ceiling 160% → 640%,
+  density 2 → 8, both landed). Measured: at 640% the vertical arm alone makes a system
+  ×2.6 the line width (sideways scrolling per system); with the horizontal arm too it is
+  ×1.1 (one bar per system, scrolling down) — so the good outcome exists but needs both
+  arms, and reaching only for the obvious one is the worst of the three. The tension is
+  live: reflow re-couples the axes that core-zoom-density-pad ruling 2 separated and that
+  core-ink-priced-columns froze packing to keep separated. Four options costed, from "do
+  nothing, document it" to "always ink-measured", with coupling-in-the-control carrying
+  the best precedent.
 
 ### inprogress/
 - **[lab-verify.md](inprogress/lab-verify.md)** — **the standing verification ledger**, and

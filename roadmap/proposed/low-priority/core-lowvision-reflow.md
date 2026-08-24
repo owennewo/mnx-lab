@@ -10,7 +10,7 @@
 The horizontal axis is always **fitted**: `ScoreViewer` sends no `pxPerSp`, so
 the plan is laid out to the viewport width and `fitPxPerSp` floors the scale at
 the 10px/sp baseline. Staff scale then multiplies only the ink. With rigid
-columns priced on the ink scale ([core-ink-priced-columns.md](../complete/core-ink-priced-columns.md))
+columns priced on the ink scale ([core-ink-priced-columns.md](../../complete/core-ink-priced-columns.md))
 nothing collides — but the system gets wider than the line it was packed for:
 
 | setting | system width vs line | what the reader does |
@@ -37,9 +37,9 @@ readable" — is one intent, exactly the shape of argument that produced the
 original pad coupling.
 
 **Against, and this is the live tension:** it re-couples the axes that
-[core-zoom-density-pad.md](../complete/core-zoom-density-pad.md) ruling 2
+[core-zoom-density-pad.md](../../complete/core-zoom-density-pad.md) ruling 2
 deliberately separated, and that
-[core-ink-priced-columns.md](../complete/core-ink-priced-columns.md) went out
+[core-ink-priced-columns.md](../../complete/core-ink-priced-columns.md) went out
 of its way to keep separated by freezing packing at ratio 1 so bars never jump
 systems under the vertical arm. It would also reverse the *direction* of the
 2026-08-21 pad-decoupling ruling (vertical zoom must not move horizontal

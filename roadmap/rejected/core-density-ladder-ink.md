@@ -57,6 +57,6 @@ now, and the ladder is computed per paint.
 
 ## Not this
 
-Not re-coupling the axes — that is [core-lowvision-reflow.md](core-lowvision-reflow.md)'s
+Not re-coupling the axes — that is [core-lowvision-reflow.md](../proposed/low-priority/core-lowvision-reflow.md)'s
 question, and it is a different one: reflow asks whether the LINE should be
 measured in ink, this asks whether the LADDER should be.
