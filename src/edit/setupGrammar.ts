@@ -5,7 +5,13 @@
 // a small prompt whose text parses into an existing setup INTENT. Parsing
 // lives in edit/ — it is input-layer logic, DOM-free and unit-testable; the
 // popover chrome in ui/ only hosts the input box.
-import type { MnxNoteValueBase, MnxPitch, MnxTuningEntry } from '../model/mnx.ts';
+import type {
+  MnxLayoutContent,
+  MnxNoteValueBase,
+  MnxPitch,
+  MnxScore,
+  MnxTuningEntry
+} from '../model/mnx.ts';
 import type {
   MeasureAttribute,
   MeasureAttributeKind,
@@ -82,9 +88,6 @@ function parsePitchToken(token: string): MnxPitch | null {
 export type PartDeclarationResult =
   | { set: PartDeclaration }
   | { remove: PartDeclarationKind }
-  /** The document's presentation layer (campaign item 13b): 1-based, because
-   *  the user is counting what they can see, not indexing an array. */
-  | { removeDocument: 'layout' | 'score' | 'multimeasureRest'; index: number }
   | { support: { key: 'useAccidentalDisplay' | 'useBeams'; value: boolean } }
   | null;
 
@@ -116,14 +119,9 @@ export function parsePartDeclaration(text: string): PartDeclarationResult {
     };
   if (head === 'no') {
     const target = (words[1] ?? '').toLowerCase();
-    const nth = Number(words[2] ?? '1');
-    if (target === 'layout' || target === 'score' || target === 'multimeasure-rest') {
-      if (!Number.isInteger(nth) || nth < 1) return null;
-      return {
-        removeDocument: target === 'multimeasure-rest' ? 'multimeasureRest' : target,
-        index: nth - 1
-      };
-    }
+    // `no layout 2` / `no score 1` / `no mmrest 1` moved to the layout
+    // popover (Shift+S) with core-layout-authoring.md, which owns the whole
+    // presentation layer — construct and destruct in one grammar.
     const kind = PART_REMOVAL_WORDS[target];
     return kind ? { remove: kind } : null;
   }
@@ -792,5 +790,265 @@ export function parseRhythm(text: string): RhythmResult {
       }
     };
   }
+  return null;
+}
+
+// ── The layout popover (Shift+S) — core-layout-authoring.md ────────────────
+//
+// The document's presentation layer is a TREE, not a place in the music, so
+// it gets no rung and no cursor: each sentence names a 1-based slot and
+// supplies the WHOLE value, which is exactly how the removal sentences
+// (`no layout 2`) have always addressed it. Set-or-append, so one verb both
+// creates and replaces.
+//
+//   layout <id>: <content>          layout Choral4Staff: bracket [ soprano, alto ]
+//   score "<name>": <body>          score "Part A": layout PartAAlone
+//   mmrest m3 x2 [in 2]             (1-based score, default 1)
+//
+// content := node ("," node)*
+// node    := group | staff
+// group   := (bracket|brace|group) [unified|individual|instrument|mensurstrich]
+//            ["label"] "[" content "]"
+// staff   := [("label" | @name | @shortName) ":"] source+
+// source  := partId [.staffNumber] [~voiceName] [/up|/down] [@name|@shortName]
+
+export interface LayoutSentence {
+  layout: { index: number; id: string; content: MnxLayoutContent[] };
+}
+export interface ScoreSentence {
+  score: { index: number; value: MnxScore };
+}
+export interface MultimeasureRestSentence {
+  multimeasureRest: { scoreIndex: number; start: string; duration: number };
+}
+export type LayoutGrammarResult =
+  | LayoutSentence
+  | ScoreSentence
+  | MultimeasureRestSentence
+  | { removeDocument: 'layout' | 'score' | 'multimeasureRest'; index: number }
+  | null;
+
+const LABELREFS = new Set(['name', 'shortName']);
+const SYMBOLS: Record<string, MnxLayoutContent['symbol']> = {
+  bracket: 'bracket',
+  brace: 'brace',
+  group: 'noSymbol'
+};
+const BARLINE_STYLES = new Set(['individual', 'instrument', 'unified', 'mensurstrich']);
+
+/** A tiny hand-rolled scanner: the tree is the first popover sentence that
+ *  nests, so a regex cannot do it. Quoted strings survive as single tokens. */
+function tokenizeLayout(text: string): string[] | null {
+  const out: string[] = [];
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+    if (/\s/.test(ch)) { i++; continue; }
+    if (ch === '[' || ch === ']' || ch === ',' || ch === ':') { out.push(ch); i++; continue; }
+    if (ch === '"' || ch === '“' || ch === '”') {
+      const close = /["“”]/.exec(text.slice(i + 1));
+      if (!close) return null;
+      out.push(`"${text.slice(i + 1, i + 1 + close.index)}`);
+      i += close.index + 2;
+      continue;
+    }
+    const word = /^[^\s[\],:"“”]+/.exec(text.slice(i));
+    if (!word) return null;
+    out.push(word[0]);
+    i += word[0].length;
+  }
+  return out;
+}
+
+const isQuoted = (token: string): boolean => token.startsWith('"');
+const unquote = (token: string): string => token.slice(1);
+
+/** `fl1.2~Main/up@shortName` — every part optional but the id. */
+function parseSource(token: string): NonNullable<MnxLayoutContent['sources']>[number] | null {
+  const match = /^([^.~/@]+)(?:\.(\d+))?(?:~([^/@]+))?(?:\/(up|down))?(?:@(\w+))?$/.exec(token);
+  if (!match) return null;
+  const [, part, staff, voice, stem, labelref] = match;
+  if (!part) return null;
+  if (labelref !== undefined && !LABELREFS.has(labelref)) return null;
+  return {
+    part,
+    ...(staff ? { staff: Number(staff) } : {}),
+    ...(voice ? { voice } : {}),
+    ...(stem ? { stem: stem as 'up' | 'down' } : {}),
+    ...(labelref ? { labelref } : {})
+  };
+}
+
+class LayoutTreeParser {
+  private at = 0;
+  constructor(private readonly tokens: string[]) {}
+
+  private peek(): string | undefined { return this.tokens[this.at]; }
+  private take(): string | undefined { return this.tokens[this.at++]; }
+
+  /** A comma-separated sibling list; stops at `]` or the end. */
+  content(): MnxLayoutContent[] | null {
+    const nodes: MnxLayoutContent[] = [];
+    for (;;) {
+      const node = this.node();
+      if (!node) return null;
+      nodes.push(node);
+      if (this.peek() === ',') { this.at++; continue; }
+      return nodes;
+    }
+  }
+
+  private node(): MnxLayoutContent | null {
+    const head = this.peek();
+    if (head === undefined) return null;
+    if (head in SYMBOLS) return this.group();
+    return this.staff();
+  }
+
+  private group(): MnxLayoutContent | null {
+    const symbol = SYMBOLS[this.take()!];
+    const node: MnxLayoutContent = { type: 'group' };
+    // Declared order is symbol → barline style → label → children, but the
+    // JSON key order is fixed by the writer, not by what was typed.
+    if (symbol !== 'noSymbol') node.symbol = symbol;
+    const style = this.peek();
+    if (style !== undefined && BARLINE_STYLES.has(style)) {
+      node.barlineStyle = this.take() as MnxLayoutContent['barlineStyle'];
+    }
+    const label = this.peek();
+    if (label !== undefined && isQuoted(label)) node.label = unquote(this.take()!);
+    if (this.take() !== '[') return null;
+    const content = this.content();
+    if (!content || this.take() !== ']') return null;
+    node.content = content;
+    return node;
+  }
+
+  private staff(): MnxLayoutContent | null {
+    const node: MnxLayoutContent = { type: 'staff' };
+    // A leading `"SA":` or `@name:` labels the staff; without the colon the
+    // same token would be ambiguous with a part id.
+    const head = this.peek();
+    if (head !== undefined && this.tokens[this.at + 1] === ':') {
+      if (isQuoted(head)) node.label = unquote(head);
+      else if (head.startsWith('@') && LABELREFS.has(head.slice(1))) node.labelref = head.slice(1);
+      else return null;
+      this.at += 2;
+    }
+    const sources: NonNullable<MnxLayoutContent['sources']> = [];
+    for (;;) {
+      const token = this.peek();
+      if (token === undefined || token === ',' || token === ']' || token === '[') break;
+      if (isQuoted(token)) return null;
+      const source = parseSource(token);
+      if (!source) return null;
+      sources.push(source);
+      this.at++;
+    }
+    if (sources.length === 0) return null;
+    node.sources = sources;
+    return node;
+  }
+
+  done(): boolean { return this.at === this.tokens.length; }
+}
+
+function parseLayoutBody(text: string): MnxLayoutContent[] | null {
+  const tokens = tokenizeLayout(text);
+  if (!tokens || tokens.length === 0) return null;
+  const parser = new LayoutTreeParser(tokens);
+  const content = parser.content();
+  return content && parser.done() ? content : null;
+}
+
+/** `m1 layout1, m4 layout2` — a comma per SYSTEM, `>` for a layout change
+ *  inside one. A bare `layout <id>` instead sets the score's own default. */
+function parseScoreBody(text: string): MnxScore | null {
+  const body = text.trim();
+  if (body === '') return {};
+  const asDefault = /^layout\s+(\S+)$/.exec(body);
+  if (asDefault) return { layout: asDefault[1] };
+  const systems: NonNullable<NonNullable<MnxScore['pages']>[number]['systems']> = [];
+  for (const chunk of body.split(',')) {
+    const [head, ...changes] = chunk.split('>');
+    const words = head.trim().split(/\s+/).filter(Boolean);
+    if (words.length === 0 || words.length > 2) return null;
+    const system: (typeof systems)[number] = { measure: words[0] };
+    if (words[1]) system.layout = words[1];
+    for (const change of changes) {
+      const parts = change.trim().split(/\s+/).filter(Boolean);
+      if (parts.length !== 2) return null;
+      (system.layoutChanges ??= []).push({
+        layout: parts[1],
+        location: { measure: parts[0], position: { fraction: [0, 1] } }
+      });
+    }
+    systems.push(system);
+  }
+  return { pages: [{ systems }] };
+}
+
+/** The Shift+S grammar. Returns null for anything it cannot read, so the
+ *  popover can show its own help rather than guessing. */
+export function parseLayoutSentence(text: string): LayoutGrammarResult {
+  const trimmed = text.trim();
+  if (trimmed === '') return null;
+  const words = trimmed.split(/\s+/);
+  const head = words[0].toLowerCase();
+
+  if (head === 'no') {
+    const target = (words[1] ?? '').toLowerCase();
+    const nth = Number(words[2] ?? '1');
+    if (!Number.isInteger(nth) || nth < 1) return null;
+    if (target === 'layout') return { removeDocument: 'layout', index: nth - 1 };
+    if (target === 'score') return { removeDocument: 'score', index: nth - 1 };
+    if (target === 'mmrest' || target === 'multimeasure-rest')
+      return { removeDocument: 'multimeasureRest', index: nth - 1 };
+    return null;
+  }
+
+  if (head === 'mmrest') {
+    // `mmrest m3 x2 in 2` — the count carries an `x` so a bare number can
+    // never be mistaken for the score it lands in.
+    const match = /^mmrest\s+(\S+)\s+x(\d+)(?:\s+in\s+(\d+))?$/i.exec(trimmed);
+    if (!match) return null;
+    const duration = Number(match[2]);
+    const scoreIndex = match[3] ? Number(match[3]) - 1 : 0;
+    if (duration < 1 || scoreIndex < 0) return null;
+    return { multimeasureRest: { scoreIndex, start: match[1], duration } };
+  }
+
+  const colon = trimmed.indexOf(':');
+  if (colon < 0) return null;
+  const headWords = trimmed.slice(0, colon).trim().split(/\s+/);
+  const body = trimmed.slice(colon + 1);
+  const kind = headWords[0].toLowerCase();
+
+  if (kind === 'layout') {
+    // `layout <id>:` names it; `layout 2 <id>:` replaces the 2nd slot. An id
+    // that already exists replaces in place, so the id is the primary key and
+    // the index only says where a NEW one goes.
+    if (headWords.length < 2 || headWords.length > 3) return null;
+    const id = headWords[headWords.length - 1];
+    const index = headWords.length === 3 ? Number(headWords[1]) - 1 : Number.NaN;
+    if (headWords.length === 3 && (!Number.isInteger(index) || index < 0)) return null;
+    const content = parseLayoutBody(body);
+    if (!content) return null;
+    return { layout: { index, id, content } };
+  }
+
+  if (kind === 'score') {
+    if (headWords.length < 2) return null;
+    const nameToken = headWords.slice(1).join(' ');
+    const explicit = /^(\d+)\s+(.*)$/.exec(nameToken);
+    const index = explicit ? Number(explicit[1]) - 1 : Number.NaN;
+    const rawName = explicit ? explicit[2] : nameToken;
+    const name = rawName.replace(/^["“]|["”]$/g, '').trim();
+    if (name === '') return null;
+    const value = parseScoreBody(body);
+    if (!value) return null;
+    return { score: { index, value: { name, ...value } } };
+  }
+
   return null;
 }

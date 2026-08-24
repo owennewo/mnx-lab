@@ -173,6 +173,7 @@ export type ShellAction =
   | 'adornmentPopover'
   | 'lyricPopover'
   | 'rhythmPopover'
+  | 'layoutPopover'
   | 'selectionTray'
   | 'commandPalette'
   | 'goTo'
@@ -214,6 +215,9 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // silence — the four things that are content but not events. No anchor
   // gesture: the typed declaration already says how much music it takes.
   { code: 'KeyR', shift: true, action: 'rhythmPopover' },
+  // Shift+S — the document's presentation layer (core-layout-authoring.md).
+  // S for score/system; the plain S is the slur/slide anchor, one layer down.
+  { code: 'KeyS', shift: true, action: 'layoutPopover' },
   // `/` opens a command surface — the selection tray when an editor holds the
   // keyboard, the palette's go-to when none does. Slash rather than Ctrl+K on
   // two grounds. It is the surface used most while editing, so it should cost

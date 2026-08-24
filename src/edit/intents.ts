@@ -12,7 +12,7 @@ import type {
   PositionedAttribute,
   TechniqueChoice
 } from './ops.ts';
-import type { MnxNoteValueBase, MnxTuningEntry } from '../model/mnx.ts';
+import type { MnxLayout, MnxNoteValueBase, MnxScore, MnxTuningEntry } from '../model/mnx.ts';
 import type { PartialContainerSpec } from './setupGrammar.ts';
 import type { PastePlan } from './selectionPastePlanner.ts';
 import type { CutPlan } from './selectionCutPlanner.ts';
@@ -161,6 +161,9 @@ export type MutationIntent =
   // Spelling as a player's choice, not the editor's (campaign item 6).
   | { type: 'respellNote' }
   | { type: 'removeAccidentalDisplay' }
+  | { type: 'setLayout'; index: number; layout: MnxLayout }
+  | { type: 'setScore'; index: number; score: MnxScore }
+  | { type: 'addMultimeasureRest'; scoreIndex: number; start: string; duration: number }
   | { type: 'removeLayout'; index: number }
   | { type: 'removeScore'; index: number }
   | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }

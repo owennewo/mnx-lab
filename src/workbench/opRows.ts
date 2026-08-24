@@ -224,6 +224,12 @@ function opLabel(op: EditOp): string {
       return `accidental ${op.show ? 'shown' : 'hidden'} · ${op.noteKey}`;
     case 'removeAccidentalDisplay':
       return `accidental auto · ${op.noteKey}`;
+    case 'setLayout':
+      return `layout ${op.index + 1} · ${op.layout.id} · ${op.layout.content.length} node${op.layout.content.length === 1 ? '' : 's'}`;
+    case 'setScore':
+      return `score ${op.index + 1} · ${op.score.name ?? 'untitled'}`;
+    case 'addMultimeasureRest':
+      return `multimeasure rest ${op.start} ×${op.duration} (score ${op.scoreIndex + 1})`;
     case 'removeLayout':
       return `remove layout ${op.index + 1}`;
     case 'removeScore':

@@ -480,6 +480,14 @@ export const KEY_DOCS: KeyDoc[] = [
       all: 'bar attribute… (typed popover: barline/repeat/ending/segno/fine/jump/tempo/rehearsal/section; `no X` strips)'
     }
   },
+  {
+    keys: 'Shift+S',
+    strokes: [{ code: 'KeyS', shift: true }],
+    group: 'setup',
+    meaning: {
+      all: 'layout… (typed popover: `layout L1: bracket [ vn1, vn2 ]`, `score "Part A": layout L1`, `mmrest m3 x2`; `no layout 2` strips)'
+    }
+  },
 
   // ── Workbench shell.
   {
@@ -525,17 +533,23 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'addPart',
     'setPartDeclaration',
     'removePartDeclaration',
-    // The document's presentation layer shares the document rung's surface: the
-    // user supplies the index, as `no line 2` does for lyric verses.
-    'removeLayout',
-    'removeScore',
-    'removeMultimeasureRest',
     // Document-level support declarations (`explicit accidentals`): not an
     // element, so neither harness could see it missing — a trace did.
     'setSupport'
   ],
   // One popover per attribute, two intents each: the grammar's `inherit`
   // token emits the removal intent (campaign item 5).
+  // The document's presentation layer, construct and destruct in one grammar
+  // (core-layout-authoring.md). A layout is a TREE, so it has no place in the
+  // music to stand at: the user supplies a 1-based slot and the whole value.
+  layoutPopover: [
+    'setLayout',
+    'setScore',
+    'addMultimeasureRest',
+    'removeLayout',
+    'removeScore',
+    'removeMultimeasureRest'
+  ],
   clefPopover: ['setClef', 'removeClef'],
   keySignaturePopover: ['setKeySignature', 'removeKeySignature'],
   lyricPopover: [

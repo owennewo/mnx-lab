@@ -1,0 +1,500 @@
+{
+  "target": "spec/multimeasure-rests",
+  "intents": [
+    {
+      "type": "addPart",
+      "partId": "PartA"
+    },
+    {
+      "type": "addPart",
+      "partId": "PartB"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 0
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 0
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 2
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 3
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 4
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 5
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 6
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "relaxSelection"
+    },
+    {
+      "type": "jumpDown"
+    },
+    {
+      "type": "tightenSelection"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 0
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 0
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 2
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 3
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 4
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 5
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 6
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "setLayout",
+      "index": 0,
+      "layout": {
+        "id": "PartAAlone",
+        "content": [
+          {
+            "type": "staff",
+            "sources": [
+              {
+                "part": "PartA"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "setLayout",
+      "index": 1,
+      "layout": {
+        "id": "PartBAlone",
+        "content": [
+          {
+            "type": "staff",
+            "sources": [
+              {
+                "part": "PartB"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "setScore",
+      "index": 0,
+      "score": {
+        "name": "Full score",
+        "pages": [
+          {
+            "systems": [
+              {
+                "measure": "m1"
+              },
+              {
+                "measure": "m5"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "setScore",
+      "index": 1,
+      "score": {
+        "name": "Part A",
+        "layout": "PartAAlone"
+      }
+    },
+    {
+      "type": "setScore",
+      "index": 2,
+      "score": {
+        "name": "Part B",
+        "layout": "PartBAlone"
+      }
+    },
+    {
+      "type": "addMultimeasureRest",
+      "scoreIndex": 1,
+      "start": "m3",
+      "duration": 2
+    },
+    {
+      "type": "addMultimeasureRest",
+      "scoreIndex": 2,
+      "start": "m1",
+      "duration": 2
+    },
+    {
+      "type": "addMultimeasureRest",
+      "scoreIndex": 2,
+      "start": "m5",
+      "duration": 2
+    }
+  ]
+}

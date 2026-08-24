@@ -68,6 +68,7 @@ import {
   parseClef,
   parseKeySignature,
   parsePart,
+  parseLayoutSentence,
   parseTimeSignature,
   parseTuning,
   TUNING_PRESET_NAMES
@@ -120,7 +121,8 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
 type PopoverKind =
-  | 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar' | 'adornment' | 'lyric' | 'rhythm';
+  | 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar' | 'adornment' | 'lyric' | 'rhythm'
+  | 'layout';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
   time: {
@@ -135,8 +137,13 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
   },
   part: {
     label: 'part',
-    placeholder: 'Guitar · capo 3 · staves 2 · no strings · no layout 2',
+    placeholder: 'Guitar · capo 3 · staves 2 · no strings',
     hint: 'a name adds a part; capo/staves change this one; “no <thing>” strips · Enter applies · Esc closes'
+  },
+  layout: {
+    label: 'layout',
+    placeholder: 'layout L1: bracket [ vn1, vn2 ] · score "Part A": layout L1 · mmrest m3 x2',
+    hint: 'the presentation layer: a layout groups parts onto staves, a score selects one · “no layout 2” strips · Enter applies · Esc closes'
   },
   clef: {
     label: 'clef',
@@ -179,7 +186,8 @@ const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   barAttributePopover: 'bar',
   adornmentPopover: 'adornment',
   lyricPopover: 'lyric',
-  rhythmPopover: 'rhythm'
+  rhythmPopover: 'rhythm',
+  layoutPopover: 'layout'
 };
 
 /** EVERY setup popover, as a palette row (workbench-score-panel.md, step C).
@@ -2730,6 +2738,44 @@ export class ScenarioPage extends LitElement {
               ...(time.display ? { display: time.display } : {})
             }
       );
+    } else if (this.setupPopover === 'layout') {
+      const sentence = parseLayoutSentence(input.value);
+      if (!sentence) {
+        this.setupPopoverError =
+          'not a layout sentence — try “layout L1: bracket [ vn1, vn2 ]”, “score \u201cPart A\u201d: layout L1”, “mmrest m3 x2”, or “no layout 2”';
+        return;
+      }
+      // The id is the primary key: naming an existing layout replaces it in
+      // place, and only a NEW one needs somewhere to go (the typed slot, else
+      // the end). Same for a score, by name.
+      const doc = this.session?.doc;
+      if ('layout' in sentence) {
+        const existing = (doc?.layouts ?? []).findIndex(l => l.id === sentence.layout.id);
+        const index = existing >= 0 ? existing
+          : Number.isNaN(sentence.layout.index) ? (doc?.layouts?.length ?? 0)
+          : sentence.layout.index;
+        this.stripIntent({
+          type: 'setLayout',
+          index,
+          layout: { id: sentence.layout.id, content: sentence.layout.content }
+        });
+      } else if ('score' in sentence) {
+        const existing = (doc?.scores ?? []).findIndex(sc => sc.name === sentence.score.value.name);
+        const index = existing >= 0 ? existing
+          : Number.isNaN(sentence.score.index) ? (doc?.scores?.length ?? 0)
+          : sentence.score.index;
+        this.stripIntent({ type: 'setScore', index, score: sentence.score.value });
+      } else if ('multimeasureRest' in sentence) {
+        this.stripIntent({ type: 'addMultimeasureRest', ...sentence.multimeasureRest });
+      } else {
+        this.stripIntent(
+          sentence.removeDocument === 'layout'
+            ? { type: 'removeLayout', index: sentence.index }
+            : sentence.removeDocument === 'score'
+              ? { type: 'removeScore', index: sentence.index }
+              : { type: 'removeMultimeasureRest', scoreIndex: 0, index: sentence.index }
+        );
+      }
     } else if (this.setupPopover === 'tuning') {
       const tuning = parseTuning(input.value);
       if (!tuning) {
@@ -2746,13 +2792,7 @@ export class ScenarioPage extends LitElement {
             ? { type: 'setSupport', key: declaration.support.key, value: declaration.support.value }
             : 'set' in declaration
             ? { type: 'setPartDeclaration', declaration: declaration.set }
-            : 'removeDocument' in declaration
-              ? declaration.removeDocument === 'layout'
-                ? { type: 'removeLayout', index: declaration.index }
-                : declaration.removeDocument === 'score'
-                  ? { type: 'removeScore', index: declaration.index }
-                  : { type: 'removeMultimeasureRest', scoreIndex: 0, index: declaration.index }
-              : { type: 'removePartDeclaration', kind: declaration.remove }
+            : { type: 'removePartDeclaration', kind: declaration.remove }
         );
         this.setupPopover = null;
         return;

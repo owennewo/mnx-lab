@@ -620,6 +620,9 @@ export interface MnxLayoutContent {
   sources?: {
     part: string;
     staff?: number;
+    /** Which named voice of the part this staff draws — the spec's
+     *  `staff-source.voice`, used by organ-layout to split manuals. */
+    voice?: string;
     stem?: 'up' | 'down';
     label?: string;
     labelref?: string;
@@ -629,9 +632,12 @@ export interface MnxLayoutContent {
   label?: string;
   /** Pull the label from a part property (e.g. "name" / "shortName"). */
   labelref?: string;
-  /** Group decoration: bracket/brace left of the group. */
-  symbol?: 'bracket' | 'brace' | 'none';
-  barlineStyle?: 'regular' | 'individual' | 'noBarline' | 'mensurstrich';
+  /** Group decoration: bracket/brace left of the group. The values are the
+   *  schema's `staff-symbol` enum — `noSymbol`, NOT `none`. */
+  symbol?: 'bracket' | 'brace' | 'noSymbol';
+  /** The schema's `staff-group-barline-style` enum. `regular`/`noBarline`
+   *  were never in it (core-layout-authoring.md). */
+  barlineStyle?: 'individual' | 'instrument' | 'unified' | 'mensurstrich';
 }
 
 export interface MnxLayout {
@@ -646,9 +652,15 @@ export interface MnxScore {
   /** References a layout id; absent = all parts. */
   layout?: string;
   pages?: {
+    layout?: string;
     systems?: {
       measure: string;
       layout?: string;
+      /** Layout swapped mid-system, at a rhythmic position. */
+      layoutChanges?: {
+        layout: string;
+        location: { measure?: string; position?: { fraction: [number, number] } };
+      }[];
     }[];
   }[];
   multimeasureRests?: {

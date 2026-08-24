@@ -804,14 +804,35 @@ export class EditorSession {
         }
         return true;
       }
+      // The construct halves (core-layout-authoring.md). Same shape as the
+      // removals below: the document is the address, so nothing here consults
+      // the cursor, and a no-op rolls its own history entry back.
+      case 'setLayout':
+      case 'setScore':
+      case 'addMultimeasureRest':
       case 'removeLayout':
       case 'removeScore':
       case 'removeMultimeasureRest': {
         const before_ = JSON.stringify(this.doc);
         this.apply(
-          intent.type === 'removeMultimeasureRest'
-            ? { type: 'removeMultimeasureRest', scoreIndex: intent.scoreIndex, index: intent.index }
-            : { type: intent.type, index: intent.index }
+          intent.type === 'setLayout'
+            ? { type: 'setLayout', index: intent.index, layout: intent.layout }
+            : intent.type === 'setScore'
+              ? { type: 'setScore', index: intent.index, score: intent.score }
+              : intent.type === 'addMultimeasureRest'
+                ? {
+                    type: 'addMultimeasureRest',
+                    scoreIndex: intent.scoreIndex,
+                    start: intent.start,
+                    duration: intent.duration
+                  }
+                : intent.type === 'removeMultimeasureRest'
+                  ? {
+                      type: 'removeMultimeasureRest',
+                      scoreIndex: intent.scoreIndex,
+                      index: intent.index
+                    }
+                  : { type: intent.type, index: intent.index }
         );
         if (JSON.stringify(this.doc) === before_) {
           this.history.undo();

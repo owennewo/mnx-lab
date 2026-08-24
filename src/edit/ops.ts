@@ -9,11 +9,13 @@ import type {
   MnxDynamic,
   MnxDynamicValue,
   MnxGlobalMeasure,
+  MnxLayout,
   MnxEvent,
   MnxGrace,
   MnxTremolo,
   MnxNote,
   MnxNoteValueBase,
+  MnxScore,
   MnxPart,
   MnxPartMeasure,
   MnxSequence,
@@ -439,6 +441,15 @@ export type EditOp =
       parenthesized?: boolean;
     }
   | { type: 'removeAccidentalDisplay'; noteKey: string }
+  /** The construct halves of the document's presentation layer
+   *  (core-layout-authoring.md). A layout is a TREE and a score a
+   *  presentation, so neither has a place in the music to stand at — the
+   *  whole value is set at a 0-based index, which is the same addressing the
+   *  removal halves have always used. An index past the end APPENDS, so one
+   *  op both creates and replaces. */
+  | { type: 'setLayout'; index: number; layout: MnxLayout }
+  | { type: 'setScore'; index: number; score: MnxScore }
+  | { type: 'addMultimeasureRest'; scoreIndex: number; start: string; duration: number }
   | { type: 'removeLayout'; index: number }
   | { type: 'removeScore'; index: number }
   | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }
@@ -819,6 +830,20 @@ function setPitchFromMidi(note: MnxNote, midi: number, fifths = 0, direction: 1 
 
 
 /** Pure: returns a new document with the op applied; never mutates `doc`. */
+
+/** A measure REFERENCE mints its anchor (the paste planner's rule, applied to
+ *  the presentation layer). Scores name measures by id, but a document built
+ *  from `{}` has none — so a bar the user names as `m<N>`, meaning the Nth
+ *  bar, gets that id if it is carrying none. An id that already exists is
+ *  used as it stands, so hand-authored ids are never rewritten. */
+function ensureMeasureRef(doc: MnxStructure, ref: string): void {
+  if (doc.global?.measures?.some(measure => measure.id === ref)) return;
+  const nth = /^m(\d+)$/.exec(ref);
+  if (!nth) return;
+  const measure = doc.global?.measures?.[Number(nth[1]) - 1];
+  if (measure && measure.id === undefined) measure.id = ref;
+}
+
 export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
   if (op.type === 'batch') return op.ops.reduce(applyOp, doc);
   if (op.type === 'pasteSelection' || op.type === 'cutSelection')
@@ -1449,6 +1474,32 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       // The *annotation* class: the note keeps its pitch, and the renderer
       // goes back to deciding whether an accidental is needed.
       delete located.note.accidentalDisplay;
+      return next;
+    }
+    case 'setLayout': {
+      const layouts = (next.layouts ??= []);
+      // Past the end appends: the grammar counts from 1 and a user naming the
+      // next free slot means "make one", not "fail".
+      layouts[Math.min(op.index, layouts.length)] = JSON.parse(JSON.stringify(op.layout)) as MnxLayout;
+      return next;
+    }
+    case 'setScore': {
+      const scores = (next.scores ??= []);
+      const score = JSON.parse(JSON.stringify(op.score)) as MnxScore;
+      for (const page of score.pages ?? [])
+        for (const system of page.systems ?? []) {
+          ensureMeasureRef(next, system.measure);
+          for (const change of system.layoutChanges ?? [])
+            if (change.location.measure) ensureMeasureRef(next, change.location.measure);
+        }
+      scores[Math.min(op.index, scores.length)] = score;
+      return next;
+    }
+    case 'addMultimeasureRest': {
+      const score = next.scores?.[op.scoreIndex];
+      if (!score) return next;
+      ensureMeasureRef(next, op.start);
+      (score.multimeasureRests ??= []).push({ start: op.start, duration: op.duration });
       return next;
     }
     case 'removeLayout': {

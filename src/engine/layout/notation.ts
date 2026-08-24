@@ -615,7 +615,7 @@ function resolveLayoutTree(
   for (const node of content ?? []) {
     if (node.type === 'group') {
       const symbol =
-        node.symbol === 'brace' ? 'brace' : node.symbol === 'none' ? null : 'bracket';
+        node.symbol === 'brace' ? 'brace' : node.symbol === 'noSymbol' ? null : 'bracket';
       const start = out.staves.length;
       resolveLayoutTree(node.content, partById, out, decorDepth + (symbol ? 1 : 0));
       const count = out.staves.length - start;
