@@ -228,6 +228,33 @@ call it on every render of its own. See
 > `selection-anchored`, which predate this contract and are not described here.
 > Documenting the event surface properly is its own small pass.
 
+### Following the selection
+
+The element **scrolls itself** to keep the selection on screen. It is its own
+scroll container (`:host { overflow: auto }`), so a selection that moves to a
+system below the fold — or a re-layout that moves the system out from under a
+selection standing still — would otherwise leave the reader looking at music
+they are no longer editing.
+
+Three rules keep that from becoming a page that moves on its own:
+
+- **Only a property-driven paint follows.** A new `selection`, or a layout
+  input the host changed (`view`, `zoom`, `density-h`, the tab setups). The
+  element's other two repaint triggers — its resize observer and the redraw
+  when Bravura finishes loading — deliberately do not, because nobody asked
+  for them.
+- **Only when the selection is actually off screen.** A selection merely
+  somewhere unusual in the viewport is left where it is; one already spanning
+  the whole viewport is the most in view a selection can be.
+- **The minimum scroll**, plus a little context either side, smoothly unless
+  the reader asked for reduced motion.
+
+There is nothing to configure. A host that wants to place its own chrome on
+the selection listens for `selection-anchored`, which fires on the resulting
+scroll like any other. The arithmetic is
+[`engine/render/revealScroll.ts`](../src/engine/render/revealScroll.ts), where
+the harness can reach it.
+
 ### Evicted
 
 | Was | Why it went |

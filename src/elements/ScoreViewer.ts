@@ -24,6 +24,7 @@ import {
   type RenderScale
 } from '../engine/render/scale.ts';
 import { densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
+import { revealScrollDelta } from '../engine/render/revealScroll.ts';
 import {
   drawCursorGhost,
   drawEnclosure,
@@ -657,6 +658,12 @@ export class ScoreViewer extends LitElement {
       changed.has('capoOverride') ||
       changed.has('partTabSetups')
     ) {
+      // A property moved: either the selection itself, or the layout under
+      // it. Both are the reader acting on the score, so both earn a scroll.
+      // The OTHER two callers of renderScore — the resize observer and the
+      // font-ready redraw — deliberately do not queue one: nobody asked for
+      // them, and a repaint nobody asked for must not move the page.
+      this.followQueued = true;
       this.renderScore();
     }
   }
@@ -917,6 +924,10 @@ export class ScoreViewer extends LitElement {
     }
 
     this.emitSelectionAnchor();
+    if (this.followQueued) {
+      this.followQueued = false;
+      this.revealSelection();
+    }
   }
 
   /**
@@ -996,7 +1007,14 @@ export class ScoreViewer extends LitElement {
    *  geometry only — no editor vocabulary crosses the boundary
    *  (roadmap/inprogress/core-selection-tray-visuals.md). */
   selectionAnchorRect(): DOMRect | null {
-    const enclosure = this.container?.querySelector<SVGGElement>('svg .enclosure');
+    return this.enclosureRect(this.container?.querySelector<SVGGElement>('svg .enclosure') ?? null);
+  }
+
+  /** One enclosure group's box, narrowed to the system row the active measure
+   *  is on. A bar-wide or frame rung is drawn as one fragment per row, and
+   *  their union is a box spanning the whole page — true, and useless to
+   *  anything planting itself on the selection. */
+  private enclosureRect(enclosure: SVGGElement | null): DOMRect | null {
     if (!enclosure) return null;
     const activeMeasure = this.selection?.activeMeasureIndex;
     const rows = this.systemRows();
@@ -1026,6 +1044,51 @@ export class ScoreViewer extends LitElement {
         composed: true
       })
     );
+  }
+
+  /** Context kept either side of a revealed selection, in client pixels —
+   *  about a bar's worth of staff at the default scale, so what arrives is a
+   *  selection in its music rather than a selection on an edge. */
+  private static readonly REVEAL_PAD_PX = 32;
+
+  /** Queued by a property-driven repaint, consumed by that paint. */
+  private followQueued = false;
+
+  /**
+   * Bring the selection back into view, if it left.
+   *
+   * The SETTLED enclosure, not `selectionAnchorRect()`: mid-tween that
+   * getter answers with the transition group, which starts at the geometry
+   * the selection is leaving — following it would scroll to where the
+   * selection just WAS. The tween's target group is already at its final
+   * geometry (drawn, then hidden behind the morph), which is where the
+   * reader is about to be looking.
+   *
+   * The cursor ghost is the fallback, not an afterthought: a cell the cursor
+   * has moved to but nothing occupies draws no enclosure at all, and an empty
+   * bar is somewhere a reader very much moves to on purpose.
+   */
+  private revealSelection() {
+    const svg = this.container?.querySelector<SVGSVGElement>('svg');
+    const settled =
+      svg?.querySelector<SVGGElement>(':scope > g.enclosure:not(.enclosure-transition)') ??
+      svg?.querySelector<SVGGElement>(':scope > g.cursor-ghost');
+    const box = this.enclosureRect(settled ?? null);
+    if (!box) return;
+    const view = this.getBoundingClientRect();
+    const delta = revealScrollDelta(
+      { start: box.top, end: box.bottom },
+      { start: view.top, end: view.bottom },
+      ScoreViewer.REVEAL_PAD_PX
+    );
+    // Sub-pixel deltas are rounding, not a selection off screen.
+    if (Math.abs(delta) < 1) return;
+    this.scrollBy({
+      top: delta,
+      behavior: globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth'
+    });
   }
 
   private anchorScrollQueued = false;

@@ -115,6 +115,34 @@ const DUMP = `(() => {
   });
 })()`;
 
+/** The viewer's scroll state and where the settled enclosure sits in it —
+ *  the geometry behind "the selection stays in view". The SETTLED group, not
+ *  the transition: mid-morph the tween's stand-in is still at the geometry
+ *  the selection is leaving. */
+const IN_VIEW = `(() => {
+  const find = (root, depth) => {
+    if (!root || depth > 12) return null;
+    const hit = root.querySelector('mnx-score-viewer');
+    if (hit) return hit;
+    for (const el of root.querySelectorAll('*')) {
+      if (el.shadowRoot) { const found = find(el.shadowRoot, depth + 1); if (found) return found; }
+    }
+    return null;
+  };
+  const viewer = find(document, 0);
+  if (!viewer) return JSON.stringify({ error: 'no score viewer on the page' });
+  const g = viewer.shadowRoot.querySelector('svg > g.enclosure:not(.enclosure-transition)');
+  if (!g) return JSON.stringify({ error: 'nothing is enclosed — no selection to keep in view' });
+  const box = g.getBoundingClientRect();
+  const view = viewer.getBoundingClientRect();
+  return JSON.stringify({
+    scrollTop: viewer.scrollTop,
+    overflows: viewer.scrollHeight > viewer.clientHeight + 1,
+    box: { top: box.top, bottom: box.bottom },
+    view: { top: view.top, bottom: view.bottom }
+  });
+})()`;
+
 let chrome; let site;
 try {
   if (!fs.existsSync(path.join(DIST, 'index.html'))) {
@@ -173,6 +201,65 @@ try {
         '— the box is on the wrong beat'
       );
     }
+  }
+  // The viewer scrolls itself, so navigating off the visible systems used to
+  // leave the reader looking at music they were no longer editing. Both
+  // directions: the arithmetic reveals a selection below the fold and one
+  // above it through different branches.
+  console.log('the selection stays in view while moving about the score');
+  const settle = async () => {
+    // The scroll is smooth; let it arrive before measuring.
+    await new Promise(r => setTimeout(r, 900));
+    const state = JSON.parse(await cdp.evaluate(IN_VIEW));
+    if (state.error) throw new Error(state.error);
+    return state;
+  };
+  const inView = (state, where) => {
+    if (state.box.top >= state.view.top && state.box.bottom <= state.view.bottom) {
+      pass(`the selection is on screen ${where}`);
+    } else {
+      fail(
+        `the selection is off screen ${where}: it sits at ` +
+        `${state.box.top.toFixed(0)}…${state.box.bottom.toFixed(0)} ` +
+        `in a viewport of ${state.view.top.toFixed(0)}…${state.view.bottom.toFixed(0)}`
+      );
+    }
+  };
+
+  // ZOOMED IN, because that is the only condition under which this can go
+  // wrong: at the fitted scale the engraving is drawn to the pane it has, so
+  // the selection cannot leave a viewport the whole score already fits inside.
+  // Raise the staff scale and the paper outgrows the pane — which is exactly
+  // when a reader is moving about a score bar by bar and needs the thing they
+  // are editing to still be on screen.
+  await cdp.evaluate("localStorage.setItem('mnx-lab.staff-scale', '3'); true");
+  await cdp.send('Emulation.setDeviceMetricsOverride', {
+    width: 1400, height: 500, deviceScaleFactor: 1, mobile: false
+  });
+  await cdp.send('Page.navigate', { url });
+  await new Promise(r => setTimeout(r, 7000));
+
+  const before = await settle();
+  if (!before.overflows) {
+    fail('the score fits the viewport — this case asserts nothing about scrolling');
+  } else {
+    await press('End', 'End', 35);
+    const atEnd = await settle();
+    if (atEnd.scrollTop <= before.scrollTop) {
+      fail(`End reached the last bar but the viewer never scrolled (${atEnd.scrollTop})`);
+    } else {
+      pass(`the viewer followed the selection down (scrollTop ${atEnd.scrollTop.toFixed(0)})`);
+    }
+    inView(atEnd, 'at the last bar');
+
+    await press('Home', 'Home', 36);
+    const atStart = await settle();
+    if (atStart.scrollTop >= atEnd.scrollTop) {
+      fail('Home reached the first bar but the viewer never scrolled back');
+    } else {
+      pass('the viewer followed the selection back up');
+    }
+    inView(atStart, 'at the first bar');
   }
 } catch (error) {
   fail(error.message);
