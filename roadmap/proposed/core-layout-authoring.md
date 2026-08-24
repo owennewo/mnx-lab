@@ -54,6 +54,13 @@ They render, they verify, and their ink is fully destructible. Only their
 The trace machinery does not care which wins: a construct trace records intents,
 and all three emit intents.
 
+**Prerequisite (2026-08-24): the word.** Whichever wins, this item's sentences say
+"score" meaning *one presentation*, while the ladder's top rung says `score`
+meaning *the whole document* — and the destruct half (`no score 1`) already sits
+in a popover typed from that rung. [core-document-rung.md](core-document-rung.md)
+renames the rung to `document` first; it is cheap only until this item records
+traces that stand on it.
+
 ## Not in scope
 
 Page geometry beyond what the corpus documents carry, and any layout *rendering*

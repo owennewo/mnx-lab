@@ -67,6 +67,14 @@ proposals that name their campaign.
   core-ink-priced-columns froze packing to keep separated. Four options costed, from "do
   nothing, document it" to "always ink-measured", with coupling-in-the-control carrying
   the best precedent.
+- **[core-document-rung.md](proposed/core-document-rung.md)** — the selection ladder's top
+  rung is called `score` and means **the whole document**; MNX means a **named presentation**
+  by the word, of which a document holds 0..N (102 of 108 scenarios have none). Four readings
+  of one word in the tree today. Renames the rung to `document`, adds **no** score rung — every
+  rung is a widening range over the timeline and a presentation is a projection over parts —
+  and sends "which score am I reading" to viewer state beside `?view=`. Must land **before**
+  [core-layout-authoring.md](proposed/core-layout-authoring.md), whose `no score 1` grammar
+  puts the other meaning one keystroke away. 93 sites, 21 files, and **zero traces** — checked.
 - **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
   `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
   (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
