@@ -55,14 +55,6 @@ proposals that name their campaign.
   core-ink-priced-columns froze packing to keep separated. Four options costed, from "do
   nothing, document it" to "always ink-measured", with coupling-in-the-control carrying
   the best precedent.
-- **[core-layout-authoring.md](proposed/core-layout-authoring.md)** — the `layout`,
-  `score` and multimeasure-rest kinds, formally handed over by the element-ops campaign
-  (2026-08-15). Not element-ops work because the campaign's verbs all attach to a
-  **place** and a layout is a **tree** — system → group → staff sources, nothing at an
-  onset, so the ladder cannot reach it. The asymmetry is the evidence: removal already
-  works by index, because deletion needs identity and construction needs somewhere to
-  stand. Opens with the addressing question (a ladder rung, a text form, or a panel);
-  blocks six scenarios, all of which render and verify today.
 - **[core-guitar-technique.md](proposed/core-guitar-technique.md)** — playing technique. **Data path
   complete** (2026-07-26): hammer-ons, pull-offs, slides, vibrato, **harmonics** and **palm
   mute** all survive `MNX ⇄ .gp` and `MNX ⇄ MusicXML`, and bends are now **curves**
@@ -198,6 +190,19 @@ back up to `proposed/` the moment it is.
   doc), and the never-reviewed corpus-closure technique set (8).
 
 ### complete/
+- **[core-layout-authoring.md](complete/core-layout-authoring.md)** — **done 2026-08-24.**
+  The `layout`, `score` and multimeasure-rest kinds, handed over by the element-ops campaign
+  (2026-08-15) because its verbs all attach to a **place** and a layout is a **tree**. The
+  addressing question is answered by evidence already in the tree: the destruct sentences
+  (`no layout 2`) had always parsed as typed text at a 1-based slot, so the construct halves
+  are their positive form — **no tree addressing scheme invented, the ladder stays
+  one-dimensional**, and a panel is still possible later since all three candidates emit these
+  intents. All six sentences live in one **Shift+S** popover. Three surprises: a measure
+  reference had **no anchor to point at** (fixed by the paste planner's rule — a reference
+  mints its id), the model types were **wrong about the schema** (`none` vs `noSymbol`, no
+  `unified`), and `setPart` is unbound so a trace crosses parts with Escape then Ctrl+↓.
+  **blocked 7 → 1**, `spec/multimeasure-rests` traced from `{}` in 136 intents, THE BAR closes
+  at 41/41, goldens byte-identical.
 - **[core-document-rung.md](complete/core-document-rung.md)** — **done 2026-08-24.** The
   ladder's top rung was called `score` and meant **the whole document**; MNX means a **named
   presentation** by the word (0..N per document; 102 of 108 scenarios have none). Renamed the
@@ -208,7 +213,7 @@ back up to `proposed/` the moment it is.
   ABOVE the rung, which the union absorbed (undo/redo leaking onto a selection), now `session`;
   and the clipboard envelope carries the rung name, so the format moved to v2. Goldens
   byte-identical. Unblocks the vocabulary
-  [core-layout-authoring.md](proposed/core-layout-authoring.md) needs.
+  [core-layout-authoring.md](complete/core-layout-authoring.md) needs.
 - **[core-entry-surface.md](complete/core-entry-surface.md)** — **typing anywhere the
   cursor can already go**, built 2026-08-23; the last piece of the element-ops campaign,
   graduated out of it on 2026-08-15. The cursor addressed part → staff → voice in full

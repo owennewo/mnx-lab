@@ -128,7 +128,7 @@ scenario* beats *23% of scenarios traced*.
 ### 6. Kinds this campaign will not build name an OWNER (decided 2026-08-15)
 
 Six kinds have no construct verb and are not going to get one here: `layout`,
-`score`, `multimeasure-rest` ([core-layout-authoring.md](../proposed/core-layout-authoring.md))
+`score`, `multimeasure-rest` ([core-layout-authoring.md](../complete/core-layout-authoring.md))
 and `kit-component`, `kit-note`, `sound`
 ([core-percussion-kit.md](../proposed/low-priority/core-percussion-kit.md)). They block
 seven scenarios.

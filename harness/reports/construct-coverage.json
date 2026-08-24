@@ -15,9 +15,6 @@
     "queue": []
   },
   "deferredKinds": {
-    "layout": "roadmap/proposed/core-layout-authoring.md",
-    "score": "roadmap/proposed/core-layout-authoring.md",
-    "multimeasure-rest": "roadmap/proposed/core-layout-authoring.md",
     "kit-component": "roadmap/proposed/low-priority/core-percussion-kit.md",
     "kit-note": "roadmap/proposed/low-priority/core-percussion-kit.md",
     "sound": "roadmap/proposed/low-priority/core-percussion-kit.md"

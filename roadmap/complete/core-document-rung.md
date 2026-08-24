@@ -1,7 +1,7 @@
 # The top rung is named for something else — `score` → `document`
 
 Serves the **implementation loop**. Raised 2026-08-24 while scoping
-[core-layout-authoring.md](../proposed/core-layout-authoring.md)'s addressing question, which
+[core-layout-authoring.md](core-layout-authoring.md)'s addressing question, which
 cannot be answered while the word is ambiguous.
 
 ## The collision
@@ -35,7 +35,7 @@ The word carries four meanings in this codebase today:
 
 ## Why it has to be settled now, not eventually
 
-[core-layout-authoring.md](../proposed/core-layout-authoring.md) owes construct sentences for
+[core-layout-authoring.md](core-layout-authoring.md) owes construct sentences for
 the MNX `score` kind, and its **destruct half already ships**: `no score 1` parses
 in [setupGrammar.ts:117-126](../../src/edit/setupGrammar.ts#L117) and applies in
 [ops.ts:1371](../../src/edit/ops.ts#L1371). That item will therefore put the word
@@ -55,7 +55,7 @@ rename touches no grammar at all.
    measure → section → document. An MNX score is a **projection over parts**: it
    narrows on an axis the ladder does not have, at full width in time. It would be
    the only rung that is not a range, which is the same objection
-   [core-layout-authoring.md](../proposed/core-layout-authoring.md) already raises against a
+   [core-layout-authoring.md](core-layout-authoring.md) already raises against a
    layout rung. **The ladder stays one-dimensional.**
 3. **Which score you are reading becomes viewer state**, beside the projection
    axis that already exists: `#/scenario/<id>?view=both&score=Part%20A`. A picker,
@@ -150,7 +150,7 @@ rename, not after — see the verdict above.
 ## Not in scope
 
 The `?score=` picker itself (named above, deliberately unbuilt). The layout and
-score construct sentences — [core-layout-authoring.md](../proposed/core-layout-authoring.md)
+score construct sentences — [core-layout-authoring.md](core-layout-authoring.md)
 owns those and this item unblocks the vocabulary they need. Renaming
 `score.mnx.json`, `<mnx-score-viewer>` or the `mnx-lab` export surface: those are
 a **public face** (library subpath exports, the embed build, every scenario

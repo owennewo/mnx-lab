@@ -270,9 +270,9 @@ const scenarios = (loadCorpus() as { id: string; dir: string }[])
  * stops implying the campaign owes it.
  */
 const DEFERRED_KINDS: Record<string, string> = {
-  layout: 'roadmap/proposed/core-layout-authoring.md',
-  score: 'roadmap/proposed/core-layout-authoring.md',
-  'multimeasure-rest': 'roadmap/proposed/core-layout-authoring.md',
+  // `layout`, `score` and `multimeasure-rest` retired from this list on
+  // 2026-08-24: core-layout-authoring.md built their construct verbs, so they
+  // are covered kinds now, not owed ones.
   'kit-component': 'roadmap/proposed/low-priority/core-percussion-kit.md',
   'kit-note': 'roadmap/proposed/low-priority/core-percussion-kit.md',
   sound: 'roadmap/proposed/low-priority/core-percussion-kit.md'

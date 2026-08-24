@@ -113,7 +113,7 @@ verb landing without a trace fails the build.
 
 Beyond the campaign, and now **formally handed over with owners** (2026-08-15):
 layout documents and multimeasure rests →
-[core-layout-authoring.md](../proposed/core-layout-authoring.md); the percussion kit →
+[core-layout-authoring.md](../complete/core-layout-authoring.md); the percussion kit →
 [core-percussion-kit.md](../proposed/low-priority/core-percussion-kit.md). Their six kinds carry
 `deferredTo` in `construct-coverage.json`, and a test refuses any verbless kind that
 names no owner. Still recorded, not indexed: transposition, harmonies rendering
