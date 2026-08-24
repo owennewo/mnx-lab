@@ -44,6 +44,22 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-rung-insert.md](proposed/core-rung-insert.md)** — **`I` / `Shift+I` insert at
+  the cursor's rung, and a ghost bar past the end of the score.** Found by hands-on
+  testing of [core-entry-surface.md](complete/core-entry-surface.md): `Shift+M` appends a
+  bar at the END, never at the cursor, and **there is no `insertMeasure` op at all**, so a
+  pickup bar is unauthorable. Same asymmetry the entry surface just closed one tier down —
+  every structural rung removes positionally and constructs by appending. Insert makes
+  sense at **five rungs, a side at three** (event, measure, part): a chord is an unordered
+  set, a voice ordinal is identity not layout, and a container's construct verb is a wrap
+  that takes a range. The ghost is deliberately **navigation, not mutation** — `→` at the
+  end lands on a drawable ghost bar and the KEYSTROKE materialises it, which keeps the
+  keymap's "bare arrows never mutate" rule and makes autorepeat harmless. Names the one
+  silent hazard: `ending.duration`, `measureRepeat.number` and `multimeasureRests[].duration`
+  are **bar counts anchored at a start bar**, so an insert inside a span re-spans it
+  (everything else is id-based and safe). `←` at the *start* of a rung's list is left
+  **deliberately unspecified**. Event-rung insert is out of scope until §8.11 says what
+  "make room in a full bar" means.
 - **[core-lowvision-reflow.md](proposed/core-lowvision-reflow.md)** — should the plan's
   line width be measured in **ink**, so growing the staff reflows the music instead of
   overflowing it? Left open by the 2026-08-21 low-vision range (staff ceiling 160% → 640%,
