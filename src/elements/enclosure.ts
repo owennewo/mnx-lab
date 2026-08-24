@@ -273,6 +273,17 @@ export interface EnclosureOptions {
   preview?: boolean;
   /** The footprint, when it is not the rendered `.selected` set. */
   noteIds?: readonly string[];
+  /**
+   * The EVENT ids in the footprint — how a REST is enclosed, since it carries
+   * no note id of its own.
+   *
+   * It has to be asked for separately, because the viewer always passes
+   * `noteIds` and an EMPTY ARRAY IS TRUTHY: a rest-only selection therefore
+   * took the id-lookup path with nothing to look up, found no ink, and fell
+   * back to interpolating a metric fraction across the bar — which is how the
+   * box came to be drawn on the wrong beat (core-rung-insert.md).
+   */
+  eventIds?: readonly string[];
   /** Resolved model coverage, including members with no selected SVG ink. */
   span?: SelectionSpan | null;
   /** Measure indices per rendered system, from the packing behind this paint. */
@@ -443,8 +454,8 @@ export function drawEnclosure(
   // voice's MELODIC CONTOUR (workbench-rung-legibility.md) — both read
   // noteheads/frets only, so a stem or beam (which carries the event-level
   // `.selected` class) cannot inflate them. Wider rungs take all their ink.
-  let glyphs = options.noteIds
-    ? previewGlyphs(svg, kind, options.noteIds)
+  let glyphs = options.noteIds || options.eventIds
+    ? previewGlyphs(svg, kind, [...(options.noteIds ?? []), ...(options.eventIds ?? [])])
     : [
         ...svg.querySelectorAll<SVGGraphicsElement>(
           kind === 'cell' || kind === 'run'
@@ -609,11 +620,19 @@ export function drawEnclosure(
           const cellBoxes = boxesInCell(staffBoxes, cell);
           if (span.coverage === 'moment') {
             for (const box of cellBoxes) ranges.push({ left: box.x, right: box.x + box.w });
+            // THIS staff may have no ink for the moment even though the system
+            // does: the tab staff draws no rest (rests there consume time
+            // silently), so a selected rest is visible only on its notation
+            // sibling. The projections share ONE spacing plan, so the
+            // sibling's column is this staff's column — a far better answer
+            // than the fraction below, which is linear where the music is not.
+            const borrowed = cellBoxes.length === 0 ? boxesInCell(systemBoxes, cell) : [];
+            for (const box of borrowed) ranges.push({ left: box.x, right: box.x + box.w });
             // A lone ink-bearing point keeps the old glyph-tight geometry.
             // In a range, onset anchors preserve rest-only endpoints and
-            // intermediate silence; with no ink they also represent a point
-            // selection on a rest.
-            if (isRange || cellBoxes.length === 0) {
+            // intermediate silence; with no ink ANYWHERE in the system they
+            // also represent a point selection on a rest.
+            if (isRange || (cellBoxes.length === 0 && borrowed.length === 0)) {
               const x = measurePositionX(
                 cell.left,
                 cell.right,

@@ -1,0 +1,188 @@
+// The selection overlay, driven in a real browser — the first test this layer
+// has ever had, and the reason it needed one: three separate bugs put the
+// selection box on the wrong beat, each invisible until the one in front of it
+// was fixed (roadmap/inprogress/core-rung-insert.md).
+//
+// None of them could be caught headlessly. The overlay is drawn from the
+// FINISHED SVG's geometry — `getBBox()` on rendered glyphs — so it needs a
+// layout engine, not a DOM shim. Hence Chrome, and hence this being a `smoke:`
+// script rather than part of `npm test`: the suite must keep running on a
+// machine with no browser.
+//
+// Usage: npm run smoke:selection   (after npm run build)
+import fs from 'node:fs';
+import http from 'node:http';
+import path from 'node:path';
+import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
+const DIST = path.join(ROOT, 'dist/client');
+const TYPES = {
+  '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8',
+  '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.png': 'image/png',
+  '.map': 'application/json; charset=utf-8'
+};
+
+let failures = 0;
+const fail = message => { console.error(`  ✗ ${message}`); failures++; };
+const pass = message => console.log(`  ✓ ${message}`);
+
+function serve(dir) {
+  const server = http.createServer((req, res) => {
+    const rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    let file = path.join(dir, rel === '/' ? 'index.html' : rel);
+    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(dir, 'index.html');
+    res.writeHead(200, { 'content-type': TYPES[path.extname(file)] ?? 'application/octet-stream' });
+    fs.createReadStream(file).pipe(res);
+  });
+  return new Promise(resolve =>
+    server.listen(0, '127.0.0.1', () => resolve({ server, port: server.address().port })));
+}
+
+async function devtoolsPort(profileDir) {
+  const portFile = path.join(profileDir, 'DevToolsActivePort');
+  for (let attempt = 0; attempt < 80; attempt++) {
+    if (fs.existsSync(portFile)) {
+      const [port] = fs.readFileSync(portFile, 'utf8').split('\n');
+      if (port) return Number(port);
+    }
+    await new Promise(r => setTimeout(r, 250));
+  }
+  throw new Error('Chrome never reported a DevTools port (is CHROME_BIN correct?)');
+}
+
+async function connect(port) {
+  for (let attempt = 0; attempt < 60; attempt++) {
+    try {
+      const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
+      const page = targets.find(t => t.type === 'page');
+      if (page) return page.webSocketDebuggerUrl;
+    } catch { /* still starting */ }
+    await new Promise(r => setTimeout(r, 250));
+  }
+  throw new Error('could not reach Chrome DevTools');
+}
+
+function client(ws) {
+  let id = 0;
+  const pending = new Map();
+  ws.addEventListener('message', event => {
+    const message = JSON.parse(event.data);
+    if (message.id && pending.has(message.id)) {
+      pending.get(message.id)(message);
+      pending.delete(message.id);
+    }
+  });
+  const send = (method, params = {}) => new Promise(resolve => {
+    const messageId = ++id;
+    pending.set(messageId, resolve);
+    ws.send(JSON.stringify({ id: messageId, method, params }));
+  });
+  const evaluate = async expression => {
+    const result = await send('Runtime.evaluate', {
+      expression, awaitPromise: true, returnByValue: true
+    });
+    if (result.result?.exceptionDetails) {
+      throw new Error(result.result.exceptionDetails.exception?.description ?? 'evaluate threw');
+    }
+    return result.result?.result?.value;
+  };
+  return { send, evaluate };
+}
+
+/** The score SVG plus the geometry of everything this smoke test asserts on. */
+const DUMP = `(() => {
+  const svgs = [];
+  const walk = (root, depth) => {
+    if (!root || depth > 12) return;
+    for (const el of root.querySelectorAll('svg')) svgs.push(el);
+    for (const el of root.querySelectorAll('*')) if (el.shadowRoot) walk(el.shadowRoot, depth + 1);
+  };
+  walk(document, 0);
+  const svg = svgs.map(s => ({ s, n: s.querySelectorAll('*').length }))
+                  .sort((a, b) => b.n - a.n)[0]?.s;
+  if (!svg) return JSON.stringify({ error: 'no score SVG on the page' });
+  const box = el => { try { const b = el.getBBox(); return { x: b.x, w: b.width }; } catch { return null; } };
+  const ink = sel => [...svg.querySelectorAll(sel)]
+    .map(el => ({ cls: el.getAttribute('class'), id: el.getAttribute('data-source-id'), ...box(el) }));
+  return JSON.stringify({
+    selected: ink('.selected'),
+    rests: ink('.rest'),
+    enclosure: [...svg.querySelectorAll('g[class*=enc-] rect')]
+      .map(r => ({ x: +r.getAttribute('x'), w: +r.getAttribute('width') }))
+  });
+})()`;
+
+let chrome; let site;
+try {
+  if (!fs.existsSync(path.join(DIST, 'index.html'))) {
+    throw new Error('dist/client/index.html missing — run `npm run build` first');
+  }
+  site = await serve(DIST);
+  const profile = fs.mkdtempSync('/tmp/mnx-selection-smoke-');
+  chrome = spawn(
+    process.env.CHROME_BIN ?? 'google-chrome',
+    ['--headless=new', '--remote-debugging-port=0', '--disable-gpu', '--no-sandbox',
+     `--user-data-dir=${profile}`, 'about:blank'],
+    { stdio: 'ignore' }
+  );
+  const ws = new WebSocket(await connect(await devtoolsPort(profile)));
+  await new Promise(resolve => ws.addEventListener('open', resolve));
+  const cdp = client(ws);
+  await cdp.send('Runtime.enable');
+  await cdp.send('Page.enable');
+
+  // A two-voice guitar part beside a bass part, in the combined view — the
+  // shape that exposed all three bugs, because its voices stop sharing columns
+  // the moment one of them gains an event.
+  const url = `http://127.0.0.1:${site.port}/#/scenario/lab/document/twelve-bar-blues?view=both`;
+  await cdp.send('Page.navigate', { url });
+  await new Promise(r => setTimeout(r, 7000));
+
+  const press = async (key, code, keyCode) => {
+    for (const type of ['keyDown', 'keyUp']) {
+      await cdp.send('Input.dispatchKeyEvent', { type, key, code, windowsVirtualKeyCode: keyCode });
+    }
+    await new Promise(r => setTimeout(r, 700));
+  };
+
+  console.log('insert a note, then delete it — the cursor lands on a rest mid-bar');
+  await press('i', 'KeyI', 73);
+  await press('Delete', 'Delete', 46);
+
+  const state = JSON.parse(await cdp.evaluate(DUMP));
+  if (state.error) throw new Error(state.error);
+
+  const rest = state.selected.find(el => /\brest\b/.test(el.cls ?? ''));
+  if (!rest) {
+    fail('no rest is marked selected — the rest carries no identity, or none was made');
+  } else {
+    pass(`the rest is selected (${rest.id})`);
+    if (state.enclosure.length === 0) fail('no enclosure was drawn at all');
+    // THE ASSERTION. Every rect of the enclosure must bracket the rest it is
+    // enclosing — on BOTH staves of the combined view, since the tab staff
+    // draws no rest of its own and has to borrow its sibling's column.
+    for (const [index, rect] of state.enclosure.entries()) {
+      const brackets = rect.x <= rest.x + 0.5 && rect.x + rect.w >= rest.x + rest.w - 0.5;
+      if (brackets) pass(`enclosure rect ${index} brackets the rest`);
+      else fail(
+        `enclosure rect ${index} is at ${rect.x.toFixed(1)}…${(rect.x + rect.w).toFixed(1)} ` +
+        `but the rest is at ${rest.x.toFixed(1)}…${(rest.x + rest.w).toFixed(1)} ` +
+        '— the box is on the wrong beat'
+      );
+    }
+  }
+} catch (error) {
+  fail(error.message);
+} finally {
+  chrome?.kill();
+  site?.server.close();
+}
+
+if (failures > 0) {
+  console.error(`\nselection smoke: ${failures} failure(s)`);
+  process.exit(1);
+}
+console.log('\nselection smoke: OK');

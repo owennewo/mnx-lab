@@ -26,6 +26,7 @@
     "smoke:lib": "npm run build:lib && node harness/verify/lib-smoke.mjs",
     "smoke:embed": "npm run build:embed && node harness/verify/embed-smoke.mjs",
     "smoke:csp": "npm run build && node harness/verify/csp-smoke.mjs",
+    "smoke:selection": "npm run build && node harness/verify/selection-smoke.mjs",
     "dev:embed-app": "npm run build:embed && node harness/verify/serve-embed-app.mjs",
     "preview": "vite preview",
     "compile-validator": "node spec/tools/compile-validator.mjs",

@@ -477,3 +477,60 @@ the ghost could not either, for a different reason; and the ghost's anchor
 ordering preferred a stranger. Each was invisible until the one in front of it
 was fixed — and the fraction fallback that produced all three wrong answers is
 still there, still wrong wherever it fires, now merely hard to reach.
+
+
+### Fourth, and the actual one: an empty array is truthy
+
+Three fixes in and the box was still on the wrong beat. I had been reading
+screenshots and reasoning about code; the answer came from **driving the real
+app in headless Chrome** and dumping the geometry, which took one attempt:
+
+    rest      class="rest selected selection-echo"  id=@m0.v0.e1   x=129.6
+    encRects  enclosure enc-slice                                   x=68.6  (x2)
+
+The rest was selected. The enclosure was 60 units away. And the enclosure had
+never looked at it, because of this:
+
+```ts
+let glyphs = options.noteIds
+  ? previewGlyphs(svg, kind, options.noteIds)   // resolve by id
+  : [...svg.querySelectorAll('.selected')];      // read the rendered ink
+```
+
+The viewer **always** passes `noteIds`, and `[]` **is truthy**. So a rest-only
+selection took the id-lookup branch with nothing to look up, found no ink, and
+fell through to the metric fraction. The `.selected` branch — the one every
+previous fix was aimed at — is dead whenever the viewer is the caller.
+
+`eventIds` now travels beside `noteIds` and both are resolved together;
+`previewGlyphs` accepts a `.rest` wherever it accepts a notehead.
+
+**And the tab staff borrows its sibling's column.** The tab draws no rest, so
+its own band still had no ink and still guessed. But the projections share ONE
+spacing plan, so when a staff has nothing for a moment the system's other
+staves have the answer — used now in preference to the fraction, which stays
+only as the last resort it should always have been.
+
+### The lesson, and the test that follows from it
+
+**This layer had no test at all.** Four bugs, one root, and each hid the next:
+the layout could not name a rest; the ghost could not anchor on one; the ghost
+preferred a stranger's voice; and the enclosure never read the ink in the first
+place. Every one was a five-line fix and every one took a round trip through a
+human looking at a screenshot.
+
+`npm run smoke:selection` (`harness/verify/selection-smoke.mjs`) drives the
+built workbench in headless Chrome, presses `I` then `Delete` on the two-voice
+scenario, and asserts **every** enclosure rect brackets the selected rest. It
+is a `smoke:` script rather than part of `npm test` for the same reason
+`smoke:csp` is: the suite must keep running where there is no browser.
+
+Verified by reverting the fix — it reports exactly the bug that was reported
+here, in the same numbers:
+
+    ✗ enclosure rect 0 is at 68.6…84.6 but the rest is at 129.6…159.9
+      — the box is on the wrong beat
+
+The overlay is drawn from the finished SVG's `getBBox()`, so it cannot be
+tested any other way: it needs a layout engine, not a DOM shim. That is
+precisely why it had escaped testing, and precisely why it earned four bugs.

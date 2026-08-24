@@ -828,6 +828,7 @@ export class ScoreViewer extends LitElement {
       if (kind && svg) {
         drawEnclosure(svg, kind, {
           noteIds: this.selection?.selectedNoteIds,
+          eventIds: this.selection?.selectedEventIds,
           span: this.selection?.span,
           systemRows: packedRowMeasures(paint.packings, densityH),
           staffOrdinals: renderedStaffOrdinals,
