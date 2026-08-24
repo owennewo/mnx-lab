@@ -146,6 +146,8 @@ function opLabel(op: EditOp): string {
       return `tab staff · ${op.kind}`;
     case 'appendMeasure':
       return `append bar${whereText({ partIndex: op.partIndex })}`;
+    case 'insertEvent':
+      return `insert ${op.pitch.step}${op.pitch.octave} ${op.side} m${op.measureIndex + 1} ${onsetText(op.onset)} (${durationText(op.duration)})${whereText(op)}`;
     case 'insertMeasure':
       return `insert bar ${op.side} m${op.measureIndex + 1}${whereText({ partIndex: op.partIndex })}`;
     case 'removeMeasure':

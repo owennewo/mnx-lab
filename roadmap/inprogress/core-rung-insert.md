@@ -99,7 +99,7 @@ bar before bar 1") is available. **This item does not specify it**, on purpose:
 reach nothing else offers — which is exactly the condition under which it
 should be decided on its own evidence rather than for symmetry. Left open.
 
-## The event rung collides with the full-bar invariant
+## The event rung collides with the full-bar invariant — ANSWERED 2026-08-24
 
 Insert at the event rung runs straight into §8.11: the bar is already full.
 "Insert a quarter before this one" must either steal from neighbouring rests or
@@ -275,3 +275,59 @@ It matters beyond tidiness: all 28 committed construct traces open with
 `addPart` then `appendMeasure`, and the keyboard-join verdict requires every
 intent in a trace to be bound or named by a documented surface. The palette
 entry is what keeps that true now the key is gone.
+
+
+## The §8.11 ruling — 2026-08-24: insert may overfill, and the badge says so
+
+The event rung was deferred here pending a decision on what "make room in a
+full bar" means. **Ruled: it does not make room.** The bar is allowed to
+overfill and the renderer reports it.
+
+The reasoning, which is the codebase's own order of priorities rather than a
+new one: making room would mean shortening or deleting music the author did not
+name. This repo refuses to do that silently — no silent clamp, guarded removal,
+ink is never consumed — and it refuses it *more strongly* than it insists on a
+full bar. Faced with the two, the invariant is the one that yields.
+
+It costs nothing to say so, because **the warning already existed**:
+`validateDocument` has always reported `overfills the 4/4 bar: notes sum to 5
+of 4 beats`, per voice, and the renderer already badges it. Insert did not need
+a new diagnostic — it needed permission to produce a state the engine could
+already describe.
+
+So the invariant is restated, narrower and truer than before:
+
+> §8.11 is a property of **entry**, not of the document at rest. Entry converts
+> rests and keeps the bar full; a re-value pads or eats; a wrap re-pads. Insert
+> suspends it deliberately, and an overfull bar is a legible state with a name
+> — not a corruption.
+
+The author resolves it with verbs they already have. The worked case, now a
+test: a full 4/4 bar, `I` makes it five beats, select two events, `-` halves
+them, the bar comes right and the badge clears.
+
+### What that needed beyond the op
+
+**The duration ladder had to learn ranges.** It re-valued exactly the event
+under the cursor, so "select two notes and make them eighths" changed one of
+them — the resolution step in the use case above did not work. It now steps
+every event in a multi-member selection, each from its own value, so a quarter
+and an eighth become an eighth and a 16th.
+
+**The ops go back-to-front, and that is load-bearing.** `setDuration` addresses
+an event by its ONSET, and re-valuing one moves every later onset — so
+front-to-back the second op would aim at a moment that no longer holds what it
+was aimed at. The delete path learned this first; same rule, same reason.
+
+### One surprise worth knowing
+
+The first `Shift+→` from a note-rung point **promotes to a one-event range**
+rather than selecting two events. So selecting N events takes N presses, not
+N-1. Pre-existing, and it surprised the tests before it surprised anyone else.
+
+### On the fingerboard
+
+`I` in the tab projection inserts on the **string the cursor is standing on**,
+at fret 0 — the open string is the honest default there, since the line is a
+string rather than a pitch, and a digit re-frets it exactly as it would any
+other note. The capo is included, because fret 0 is capo-relative.

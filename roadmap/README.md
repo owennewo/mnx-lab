@@ -194,7 +194,12 @@ back up to `proposed/` the moment it is.
   on Home/End, is the same act spelled out of parts that already exist. `appendMeasure`
   survives keyless for **genesis** (an insert needs a bar to sit beside). The ghost is
   next, and is now free to be what it is — "keep typing and the score grows" — rather
-  than a replacement for a key.
+  than a replacement for a key. **§8.11 ruled 2026-08-24**: insert MAY overfill the bar
+  and the existing per-voice badge ("notes sum to 5 of 4 beats") is the warning — making
+  room would mean shortening music nobody named, and this repo refuses that more strongly
+  than it insists on a full bar. So the invariant is a property of *entry*, not of the
+  document at rest. The duration ladder learned ranges to make the resolution step work,
+  back-to-front because re-valuing an event moves every later onset.
 - **[lab-verify.md](inprogress/lab-verify.md)** — **the standing verification ledger**, and
   the only doc here that never moves to `complete/`. `verified` is a human assertion, so
   verification is the one gate an agent cannot pass alone, and any change under `model/`,

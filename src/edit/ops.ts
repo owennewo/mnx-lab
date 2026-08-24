@@ -201,6 +201,39 @@ export type EditOp =
       type: 'setStaffKind';
       kind: 'notation' | 'tab' | 'both';
     }
+  | ({
+      /**
+       * Insert an event beside the one at `onset`, in the cursor's voice —
+       * the note rung's insert, and the EVENT rung's, which are the same act:
+       * a chord has no order, so "after this note" can only mean after it in
+       * TIME, which is exactly what ←→ already walks at the note rung.
+       *
+       * **This one deliberately breaks §8.11.** Every other writing verb keeps
+       * a touched bar summing to its meter — entry converts rests, a wrap
+       * re-pads, a re-value pads or eats. Insert cannot: making room would
+       * mean shortening or deleting music the author did not name, and this
+       * codebase refuses to do that silently far more strongly than it insists
+       * on a full bar.
+       *
+       * So the bar is allowed to overfill and the renderer SAYS SO — the
+       * duration-mismatch badge already reads "voice 2 overfills the 4/4 bar:
+       * notes sum to 5 beats of 4 beats", per voice, and it is the whole
+       * warning. The author then resolves it with the verbs they already have
+       * (re-value two notes as eighths, say). The invariant is a property of
+       * ENTRY, not of the document at rest; an overfull bar is a legible state
+       * with a name, not a corruption.
+       */
+      type: 'insertEvent';
+      measureIndex: number;
+      onset: [number, number];
+      side: 'before' | 'after';
+      duration: { base: MnxNoteValueBase; dots?: number };
+      pitch: { step: 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B'; octave: number; alter?: number };
+      /** The fingerboard place, when the insert happened in the tab
+       *  projection — the string is the choice, so it travels with the note. */
+      string?: number;
+      fret?: number;
+    } & EntryTarget)
   | {
       /**
        * Insert an empty bar beside the cursor's — the positional construct
@@ -1937,6 +1970,27 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (next.parts.length === 1) {
         for (let i = 0; i < next.global.measures.length; i++) padMeasureRests(next, i);
       }
+      return next;
+    }
+    case 'insertEvent': {
+      const seq = entrySequence(next, op.measureIndex, op);
+      if (!seq) return next;
+      const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
+      if (!found) return next;
+      const note: MnxNote = { pitch: { ...op.pitch } };
+      if (op.string !== undefined)
+        note._x = { mnxLab: { string: op.string, ...(op.fret !== undefined ? { fret: op.fret } : {}) } };
+      // AFTER means past the event AND past any grace container that follows
+      // it — a grace belongs to the note it precedes, so landing in front of
+      // one would steal it from its host (the `pastGraceContainers` rule that
+      // ordinary entry already follows).
+      const at =
+        op.side === 'before' || !found.event
+          ? found.index
+          : pastGraceContainers(seq, found.index + 1);
+      seq.content.splice(at, 0, { duration: { ...op.duration }, notes: [note] });
+      // NO `padMeasureRests` — see the op's declaration. The bar is allowed to
+      // overfill, and the badge is the report.
       return next;
     }
     case 'insertMeasure': {

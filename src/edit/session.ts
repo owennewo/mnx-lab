@@ -13,6 +13,7 @@ import {
   beamStartingAt,
   completeContainerSpec,
   entryContentAt,
+  eventAtAddress,
   wrapExtent,
   EditHistory,
   hasSlurStartingAt,
@@ -46,8 +47,8 @@ import {
   type PositionGrid,
   type Projection
 } from './cursor.ts';
-import { capoOf, defaultStringFor, tuningOf } from './tabStrings.ts';
-import { clefAt, keyFifthsAt, pitchAtStaffPosition } from './staffSpace.ts';
+import { capoOf, defaultStringFor, midiOfPitch, tuningOf } from './tabStrings.ts';
+import { clefAt, keyFifthsAt, pitchAtStaffPosition, spellPitch } from './staffSpace.ts';
 import {
   closureScopeForLevel,
   presentLevels,
@@ -460,6 +461,8 @@ export class EditorSession {
       case 'shorterDuration':
       case 'longerDuration': {
         const step = intent.type === 'shorterDuration' ? 1 : -1;
+        const ranged = this.stepDurationOverRange(step);
+        if (ranged !== null) return ranged;
         const event = this.eventUnderCursor();
         // A REST IS ABSENCE (§8.11), so there is nothing there to re-value:
         // the duration keys step the PENDING entry duration over a rest or an
@@ -1839,6 +1842,12 @@ export class EditorSession {
    */
   private insertAtRung(side: 'before' | 'after'): boolean {
     switch (this.selectionState.level) {
+      case 'note':
+      case 'event':
+        // The rung names the SIZE of what you insert, and a note-sized thing
+        // in a voice is an event. "Before/after" is time here because time is
+        // what ←→ already walks at the note rung.
+        return this.insertEventHere(side);
       case 'voiceMeasure':
         // Voices stack by stem direction, not by index, and note keys embed
         // the ordinal — so there is no order for `before` to address.
@@ -1850,6 +1859,103 @@ export class EditorSession {
       default:
         return false;
     }
+  }
+
+  /**
+   * Re-value EVERY event in a multi-member selection, each stepping from its
+   * own value — so a quarter and an eighth become an eighth and a 16th, which
+   * is what a ladder means. Returns null when the selection is a point, and
+   * the single-event path below takes over unchanged.
+   *
+   * The half that is not obvious: **the ops go in reverse document order.**
+   * `setDuration` addresses an event by its ONSET, and re-valuing one moves
+   * every later event's onset — so front-to-back, the second op would address
+   * a moment that no longer holds what it was aimed at. Back-to-front nothing
+   * moves under the ops still to come. (The delete path learned this first;
+   * this is the same rule for the same reason.)
+   *
+   * Resolving an overfull bar is what this is FOR — insert leaves five beats
+   * in a 4/4 bar, you select two of them and shorten, and the bar comes right.
+   */
+  private stepDurationOverRange(step: 1 | -1): boolean | null {
+    const level = this.selectionState.level;
+    if (level !== 'note' && level !== 'event') return null;
+    const members = this.resolvedSelection.members;
+    if (members.length < 2) return null;
+    const seen = new Set<string>();
+    const ops: EditOp[] = [];
+    for (const member of [...members].reverse()) {
+      if (member.kind !== 'note' && member.kind !== 'event') continue;
+      // Two chord members share one event; re-value it once.
+      const key = `${member.partIndex}/${member.staffIndex}/${member.measureIndex}/${member.voiceIndex}/${member.eventIndex}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const event = eventAtAddress(this.doc, eventAddressOf(member));
+      if (!event || (event.notes?.length ?? 0) === 0) continue; // a rest is absence
+      const next = stepLadder(event.duration.base, step);
+      if (next === event.duration.base) continue; // already at the ladder's end
+      ops.push({
+        type: 'setDuration',
+        measureIndex: member.measureIndex,
+        onset: [member.onset.num, member.onset.den],
+        duration: { base: next, ...(event.duration.dots ? { dots: event.duration.dots } : {}) },
+        ...(member.partIndex ? { partIndex: member.partIndex } : {}),
+        ...(member.staffIndex !== 1 ? { staffIndex: member.staffIndex } : {}),
+        ...(member.voiceIndex ? { voiceIndex: member.voiceIndex } : {})
+      });
+    }
+    return ops.length > 0 ? this.applyBulk(ops) : false;
+  }
+
+  /**
+   * A note beside this one, in time — and the bar is allowed to overfill,
+   * with the duration-mismatch badge as the report (see `insertEvent` in
+   * ops.ts for why that is the policy rather than a lapse).
+   *
+   * The new note takes the cursor's own line, so it arrives where you were
+   * looking: a staff position in the notation projection, the string you are
+   * standing on in tab. The pending entry duration governs, as it does for
+   * every other entry gesture.
+   */
+  private insertEventHere(side: 'before' | 'after'): boolean {
+    const cursor = this.cursorState;
+    const duration = {
+      base: this.entryDuration,
+      ...(this.entryDots ? { dots: this.entryDots } : {})
+    };
+    const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
+    let pitch: { step: 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B'; octave: number; alter?: number };
+    let fingerboard: { string?: number; fret?: number } = {};
+    if (tab) {
+      // On the fingerboard the line is a STRING, not a pitch — so the open
+      // string is the honest default, and a digit re-frets it as usual.
+      const part = this.doc.parts?.[cursor.partIndex ?? 0];
+      const open = tuningOf(part).find(entry => entry.string === cursor.line);
+      if (!open) return false;
+      // Fret 0 is capo-relative, so the OPEN string sounds the capo's pitch.
+      pitch = spellPitch(
+        midiOfPitch(open.pitch) + capoOf(part),
+        keyFifthsAt(this.doc, cursor.measureIndex)
+      );
+      fingerboard = { string: cursor.line, fret: 0 };
+    } else {
+      pitch = pitchAtStaffPosition(
+        clefAt(this.doc, cursor.measureIndex, cursor.partIndex ?? 0, cursor.staffIndex ?? 1),
+        cursor.line,
+        keyFifthsAt(this.doc, cursor.measureIndex)
+      );
+    }
+    this.apply({
+      type: 'insertEvent',
+      measureIndex: cursor.measureIndex,
+      onset: [cursor.onset.num, cursor.onset.den],
+      side,
+      duration,
+      pitch,
+      ...fingerboard,
+      ...this.entryTarget
+    });
+    return true;
   }
 
   /** A bar beside this one, and the cursor moves into it — you asked for it

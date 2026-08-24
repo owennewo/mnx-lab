@@ -10,6 +10,7 @@ import { replayIntents, type EditorSession } from '../../src/edit/session.ts';
 import type { EditorIntent } from '../../src/edit/intents.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import { computePrimitives } from '../helpers/corpusPrimitives.ts';
+import { validateDocument } from '../../src/engine/layout/validate.ts';
 import {
   EDIT_LAYER,
   NAVIGATION_LAYER,
@@ -78,7 +79,9 @@ describe('insert at the rung', () => {
   });
 
   it('refuses at every rung with no insert, and never climbs to a wider one', () => {
-    for (const level of ['note', 'event', 'partMeasure', 'section']) {
+    // `note` and `event` are NOT here: they insert an event (a note-sized
+    // thing in a voice), which core-event-insert built.
+    for (const level of ['partMeasure', 'section']) {
       const s = score(2);
       s.handleIntent({ type: 'toggleNote' });
       // The ladder skips rungs with no referent, so `section` needs one before
@@ -274,5 +277,88 @@ describe('insert is safe in the middle of real music', () => {
 
     expect(JSON.parse(JSON.stringify(computePrimitives(inserted.doc))))
       .toEqual(JSON.parse(JSON.stringify(computePrimitives(inOrder.doc))));
+  });
+});
+
+
+describe('the note rung inserts a note, and may overfill the bar', () => {
+  const overfills = (session: EditorSession) =>
+    validateDocument(session.doc)
+      .filter(issue => /overfills/.test(issue.message))
+      .map(issue => issue.message);
+
+  /** An exactly full 4/4 bar of four quarters, cursor back on the first. */
+  const fullBar = (): EditorSession => {
+    const s = score(1);
+    for (const line of [-6, -4, -2, 0]) {
+      while (s.cursor.line !== line)
+        s.handleIntent({ type: s.cursor.line < line ? 'lineUp' : 'lineDown' });
+      s.handleIntent({ type: 'toggleNote' });
+      s.handleIntent({ type: 'nextPosition' });
+    }
+    s.handleIntent({ type: 'goToMeasure', measureIndex: 0 });
+    while (s.cursor.line !== -6)
+      s.handleIntent({ type: s.cursor.line < -6 ? 'lineUp' : 'lineDown' });
+    expect(overfills(s), 'the bar should start exactly full').toEqual([]);
+    return s;
+  };
+
+  const bases = (session: EditorSession) =>
+    session.doc.parts![0].measures![0].sequences![0].content.map(
+      e => (e as { duration: { base: string } }).duration.base
+    );
+
+  it('inserts after the cursor and says the bar is now too long', () => {
+    const s = fullBar();
+    expect(s.selectionLevel).toBe('note');
+    expect(s.handleIntent({ type: 'insertAtRung', side: 'after' })).toBe(true);
+    expect(bases(s).length, 'no event was inserted').toBe(5);
+    // The warning is the whole point: it counts the beats, per voice.
+    expect(overfills(s)).toEqual(['overfills the 4/4 bar: notes sum to 5 of 4 beats']);
+  });
+
+  it('THE WORKFLOW: insert, then resolve the overflow by re-valuing two notes', () => {
+    const s = fullBar();
+    s.handleIntent({ type: 'insertAtRung', side: 'after' });
+    expect(overfills(s)).toHaveLength(1);
+
+    // Select the first two events and halve them: 5 beats → 4. The FIRST
+    // Shift+→ promotes the note-rung point to a one-event range, so selecting
+    // two events takes two presses, not one.
+    for (let i = 0; i < 2; i++) s.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(s.resolvedSelection.members.length).toBe(2);
+    expect(s.handleIntent({ type: 'shorterDuration' })).toBe(true);
+
+    expect(bases(s)).toEqual(['eighth', 'eighth', 'quarter', 'quarter', 'quarter']);
+    expect(overfills(s), 'the bar should come right').toEqual([]);
+  });
+
+  it('a ranged re-value works back-to-front, so onsets stay addressable', () => {
+    // Front-to-back, re-valuing the FIRST event moves every later onset, and
+    // the next op addresses a moment that no longer holds what it aimed at.
+    const s = fullBar();
+    for (let i = 0; i < 4; i++) s.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(s.resolvedSelection.members.length).toBe(4);
+    expect(s.handleIntent({ type: 'shorterDuration' })).toBe(true);
+    // All four stepped. The bar is now half empty, so `setDuration` re-pads it
+    // — §8.11 still governs a RE-VALUE; only the insert suspends it.
+    const sounded = s.doc.parts![0].measures![0].sequences![0].content.filter(
+      e => ((e as { notes?: unknown[] }).notes?.length ?? 0) > 0
+    );
+    expect(sounded.map(e => (e as { duration: { base: string } }).duration.base))
+      .toEqual(['eighth', 'eighth', 'eighth', 'eighth']);
+    expect(overfills(s)).toEqual([]);
+  });
+
+  it('Shift+I puts the new note in front', () => {
+    const s = score(1);
+    while (s.cursor.line !== -6) s.handleIntent({ type: 'lineDown' });
+    s.handleIntent({ type: 'toggleNote' });
+    while (s.cursor.line !== 2) s.handleIntent({ type: 'lineUp' });
+    expect(s.handleIntent({ type: 'insertAtRung', side: 'before' })).toBe(true);
+    const first = s.doc.parts![0].measures![0].sequences![0].content[0] as {
+      notes?: { pitch: { step: string; octave: number } }[];
+    };
+    expect(first.notes?.[0].pitch).toEqual({ step: 'D', octave: 5 });
   });
 });
