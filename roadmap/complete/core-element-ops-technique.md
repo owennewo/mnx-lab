@@ -63,7 +63,7 @@ unfinished pair: `setFret` wrote a note's string choice and nothing stripped it 
 
 `removeStringAnnotation` closes it, and the model's own rule decides the
 semantics: **the string is the choice, the fret its consequence**
-(roadmap/proposed/spec-instrument-position.md), so the fret leaves with it
+(roadmap/proposed/low-priority/spec-instrument-position.md), so the fret leaves with it
 rather than surviving as a fret belonging to no string. The note falls back to
 the derivation ladder, which is instrument neutrality read from the other
 direction — removing the annotation does not remove the tab, it returns the

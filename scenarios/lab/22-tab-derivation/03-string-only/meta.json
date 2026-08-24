@@ -1,6 +1,6 @@
 {
   "title": "String without fret — the annotation is the choice, the fret is arithmetic",
-  "description": "Two half notes (sounding C3, E3) each annotated with string 6 ONLY — no stored fret. The derived frets are 8 and 12, NOT the lowest-fret defaults (string 5 fret 3, string 4 fret 2): an authored string wins over the assignment heuristic, and the fret needs no storing because it is pitch minus open string. The middle rung of the authority ladder, and the core claim of roadmap/proposed/spec-instrument-position.md in one bar.",
+  "description": "Two half notes (sounding C3, E3) each annotated with string 6 ONLY — no stored fret. The derived frets are 8 and 12, NOT the lowest-fret defaults (string 5 fret 3, string 4 fret 2): an authored string wins over the assignment heuristic, and the fret needs no storing because it is pitch minus open string. The middle rung of the authority ladder, and the core claim of roadmap/proposed/low-priority/spec-instrument-position.md in one bar.",
   "bars": 1,
   "tags": [
     "tab",

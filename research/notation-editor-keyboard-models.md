@@ -704,7 +704,7 @@ Three findings:
    Guitar Pro's section is exactly the pair MNX Lab already models as **two separate
    `{label}` objects** — `_x.mnxLab.rehearsal` (the letter) and `_x.mnxLab.section` (the
    name) — which CLAUDE.md warns not to re-merge, and which
-   [roadmap/proposed/spec-score-text.md](../roadmap/proposed/spec-score-text.md) proposes typing
+   [roadmap/proposed/low-priority/spec-score-text.md](../roadmap/proposed/low-priority/spec-score-text.md) proposes typing
    properly upstream. A TuxGuitar-style marker has no home in MNX at all and should not get
    one: it is **editor state, not document data**, so it would belong beside documents in
    IndexedDB rather than in the score — and it must never enter a scenario's

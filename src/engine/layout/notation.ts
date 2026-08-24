@@ -244,7 +244,7 @@ const ARTICULATIONS: { key: keyof MnxEventMarkings; above: string; below: string
 
 const DYNAMIC_BASELINE_DROP_SP = 3.5; // glyph baseline below the bottom staff line
 
-// ---------- Score text (proposed: roadmap/proposed/spec-score-text.md) ----------
+// ---------- Score text (proposed: roadmap/proposed/low-priority/spec-score-text.md) ----------
 //
 // Rehearsal marks and sections are score-wide, so they stack above the TOP
 // staff of the system, clear of the tempo row. Directions belong to a part and

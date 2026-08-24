@@ -13,7 +13,7 @@
 //
 // Framework-free on purpose: the shell consumes the async iterator and renders
 // progress however it likes. The UI that will call this is
-// roadmap/proposed/core-editor-ai-prompt.md's; this is the surface it consumes.
+// roadmap/proposed/low-priority/core-editor-ai-prompt.md's; this is the surface it consumes.
 import { runEditLoop } from './editLoop.ts';
 import { openRouterEditTransport } from './openrouter.ts';
 import type { EditFrame, EditRequest } from './protocol.ts';

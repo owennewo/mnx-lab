@@ -10,6 +10,6 @@ about the note, not a fretboard-only decoration) and the shape an adopted standa
 field would take. The pinned error is the note's `unevaluatedProperties` rejection.
 
 Position is the founding reason `_x.mnxLab` exists. The proposal to give it a standard
-home is [roadmap/proposed/spec-instrument-position.md](../../../../roadmap/proposed/spec-instrument-position.md);
+home is [roadmap/proposed/low-priority/spec-instrument-position.md](../../../../roadmap/proposed/low-priority/spec-instrument-position.md);
 the derivation rules that make a stored `fret` redundant (and therefore validation-only)
 are exercised by the whole `lab/tab-derivation` category.

@@ -1,7 +1,7 @@
 # Studio: storage, sync and sharing
 
 **Status: proposed (design only — nothing built).** Fills in the biggest blank in
-[apps/studio/README.md](../../apps/studio/README.md): where a user's scores live, how they
+[apps/studio/README.md](../../../apps/studio/README.md): where a user's scores live, how they
 survive, and how they are shared. Everything here builds on the reserved seams
 (`worker/api/documents.ts`/`auth.ts` 501 stubs, `src/storage/cloudRepository.ts`,
 `DocumentRepository`) and starts only when studio starts. Recorded 2026-08-11 from a
@@ -54,7 +54,7 @@ The fork in the road is who merges:
 
 The entry requirements for that model are (1) all edits flow through a typed set of
 deterministic mutators and (2) a mutation can re-apply against a different base state
-sensibly. That is [`src/edit/ops.ts`](../../src/edit/ops.ts) — `EditOp` through one
+sensibly. That is [`src/edit/ops.ts`](../../../src/edit/ops.ts) — `EditOp` through one
 `applyOp` funnel, deterministic by design (the trace fixtures replay it), addressing
 notes by id/positional key, returning false when inapplicable. The hard half of the
 engine already exists; what remains is a few hundred lines of protocol, not a research
@@ -113,7 +113,7 @@ too — with a distinction built in from day one:
   metadata) are **extracted by the doc DO** into the index on every accepted push —
   never typed, never stale, always rebuildable by a re-index sweep. This is the
   authoritative-vs-derived discipline of
-  [derived-positions.md](../complete/core-derived-positions.md) applied to the library layer.
+  [derived-positions.md](../../complete/core-derived-positions.md) applied to the library layer.
 - **Asserted dimensions** (path, setlist) have no source of truth but the user. They
   are first-class data — D1 is their system of record, writes go through auth, and
   offline tag edits join the client's queued-mutation machinery (as LWW rows, not

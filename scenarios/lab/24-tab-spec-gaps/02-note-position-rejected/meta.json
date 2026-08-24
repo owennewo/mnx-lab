@@ -1,6 +1,6 @@
 {
   "title": "String and fret on a note are rejected",
-  "description": "The most basic fact of tablature — WHERE a note is played, string and fret — has no home on the MNX note. This document writes them as the flat note-level fields they would naturally be (the exact shape _x.mnxLab.string/fret drafts) and pins the rejection: the note object refuses unevaluated properties. The workaround is the vendor block; the fix proposed upstream is note-level position — see roadmap/proposed/spec-instrument-position.md.",
+  "description": "The most basic fact of tablature — WHERE a note is played, string and fret — has no home on the MNX note. This document writes them as the flat note-level fields they would naturally be (the exact shape _x.mnxLab.string/fret drafts) and pins the rejection: the note object refuses unevaluated properties. The workaround is the vendor block; the fix proposed upstream is note-level position — see roadmap/proposed/low-priority/spec-instrument-position.md.",
   "bars": 1,
   "tags": [
     "tab",

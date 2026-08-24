@@ -172,7 +172,7 @@ describe.each(FIXTURES)('schema conformance: %s', name => {
     // schemas/mnx-lab-extensions.schema.json.
     //
     // Validated against the PROPOSED schema: the importer writes `rehearsal` and
-    // `section`, which are drafted in roadmap/proposed/spec-score-text.md and not yet
+    // `section`, which are drafted in roadmap/proposed/low-priority/spec-score-text.md and not yet
     // adopted, so the published schema rejects them by design. Swap this import
     // back to validate-mnx.mjs the moment the CG adopts them — the published
     // validator passing is the signal that the proposal has landed.

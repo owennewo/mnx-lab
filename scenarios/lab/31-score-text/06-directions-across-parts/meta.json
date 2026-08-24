@@ -1,6 +1,6 @@
 {
   "title": "Directions across parts",
-  "description": "Rehearsal marks and sections are score-wide: they live on the global measure and apply to every part, so they are stated once however many parts a score has. A direction is part-specific. Here only the first part is told to play the passage solo, while both parts share the rehearsal mark and the section name. Proposed MNX objects, not yet adopted — see roadmap/proposed/spec-score-text.md.",
+  "description": "Rehearsal marks and sections are score-wide: they live on the global measure and apply to every part, so they are stated once however many parts a score has. A direction is part-specific. Here only the first part is told to play the passage solo, while both parts share the rehearsal mark and the section name. Proposed MNX objects, not yet adopted — see roadmap/proposed/low-priority/spec-score-text.md.",
   "bars": 2,
   "tags": [
     "labels",

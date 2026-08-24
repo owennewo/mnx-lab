@@ -14,4 +14,4 @@ additionally allows a literal-text form for symbols that resist structure).
 
 The pinned error is the global measure's `unevaluatedProperties` rejection. The
 proposal work is tracked in
-[roadmap/proposed/core-chord-symbols.md](../../../../roadmap/proposed/core-chord-symbols.md).
+[roadmap/proposed/low-priority/core-chord-symbols.md](../../../../roadmap/proposed/low-priority/core-chord-symbols.md).

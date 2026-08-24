@@ -12,7 +12,7 @@ structured (`root`/`quality`/`bass`/`degrees`) *and* literal (`text`, present on
 the source spelling differs from the canonical rendering). The block is shaped like the
 standard MNX object it drafts, so adoption means deleting the `_x.mnxLab` wrapper, not
 rewriting data. Design + register: [docs/mnx-extensions.md](../../../docs/mnx-extensions.md);
-narrative: [roadmap/proposed/core-chord-symbols.md](../../../roadmap/proposed/core-chord-symbols.md).
+narrative: [roadmap/proposed/low-priority/core-chord-symbols.md](../../../roadmap/proposed/low-priority/core-chord-symbols.md).
 
 ## Evidence so far
 

@@ -1,6 +1,6 @@
 {
   "title": "Sections",
-  "description": "A section names a formal unit of the music. Unlike a rehearsal mark, it states what the music is: renaming \"Chorus\" to \"Verse\" changes the description of the piece's form. A section extends until the next one begins. Proposed MNX objects, not yet adopted — see roadmap/proposed/spec-score-text.md.",
+  "description": "A section names a formal unit of the music. Unlike a rehearsal mark, it states what the music is: renaming \"Chorus\" to \"Verse\" changes the description of the piece's form. A section extends until the next one begins. Proposed MNX objects, not yet adopted — see roadmap/proposed/low-priority/spec-score-text.md.",
   "bars": 4,
   "tags": [
     "labels",

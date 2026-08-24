@@ -11,7 +11,7 @@ import { MnxStructure, MnxTuningEntry, STANDARD_GUITAR_STRINGS } from './mnx.ts'
  *   v3 → v4  `_x.mnxLab.{rehearsal,section}` → the STANDARD `rehearsal` and
  *            `section` objects on the global measure.
  *   v4 → v5  the `tab` sub-namespace flattens to the adopted shape it drafts
- *            (roadmap/proposed/spec-instrument-position.md): `tab.position.{string,
+ *            (roadmap/proposed/low-priority/spec-instrument-position.md): `tab.position.{string,
  *            fret}` → flat `string`/`fret`, `tab.fingering` → `fingering`,
  *            `tab.tuning` → `strings`, `tab.capo` → `capo`. Only `technique`
  *            and `staffKind` stay under `tab`.
@@ -20,7 +20,7 @@ import { MnxStructure, MnxTuningEntry, STANDARD_GUITAR_STRINGS } from './mnx.ts'
  * (w3c-cg/mnx#429) — `_x.tab` squatted a generic token in a shared namespace.
  * The v4 hop exists because an extension is meant to be a *draft* of the
  * standard object: once drafted and proposed, keeping a private copy would mean
- * two spellings of the same fact. See roadmap/proposed/spec-score-text.md, and note
+ * two spellings of the same fact. See roadmap/proposed/low-priority/spec-score-text.md, and note
  * these fields validate only against `schemas/mnx-schema.proposed.json` until
  * the CG adopts them. The v5 hop applies the same draft-mirroring rule to the
  * tab block itself — nesting universal fields under `tab` made them

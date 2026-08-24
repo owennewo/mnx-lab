@@ -267,7 +267,7 @@ export interface MnxGlobalMeasure {
     location?: { fraction: [number, number] };
   }[];
   /** Rehearsal mark and formal section name. **Proposed** standard MNX
-   *  objects, not yet adopted — see roadmap/proposed/spec-score-text.md. */
+   *  objects, not yet adopted — see roadmap/proposed/low-priority/spec-score-text.md. */
   rehearsal?: MnxMeasureLabel;
   section?: MnxMeasureLabel;
   /** Vendor extensions: chord symbols, which standard MNX has no concept of at

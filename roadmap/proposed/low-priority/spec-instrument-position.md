@@ -5,9 +5,9 @@
 > re-derived. The *initial* CG discussion is deliberately narrower than this doc
 > and does not mention the derivation thesis.
 >
-> Sibling docs: [core-guitar-technique.md](core-guitar-technique.md) covers what the *hands
+> Sibling docs: [core-guitar-technique.md](../core-guitar-technique.md) covers what the *hands
 > do* (bends, slides, harmonics); this covers **where the note is played**.
-> [docs/mnx-extensions.md](../../docs/mnx-extensions.md) records what is actually
+> [docs/mnx-extensions.md](../../../docs/mnx-extensions.md) records what is actually
 > built today — and it differs from this design in one important way (see
 > [Tension with what is built](#tension-with-what-is-built)).
 
@@ -358,7 +358,7 @@ the derivation rules and their three preconditions.
   palm mute, let ring, tapping, tremolo bar, dead/ghost notes. None of it is needed to
   render a readable tab staff, and most is not string-specific anyway (slides, harmonics
   and vibrato exist on trombone and violin), so it belongs in a general articulations
-  conversation. See [core-guitar-technique.md](core-guitar-technique.md).
+  conversation. See [core-guitar-technique.md](../core-guitar-technique.md).
 - **The entire right hand** — pick vs fingers, stroke direction, p-i-m-a, strums, rakes,
   rasgueado, pick scrape. MusicXML already splits these (`<fingering>` left, `<pluck>`
   right), so scoping to the left hand follows an existing seam. Strums likely extend the
@@ -401,7 +401,7 @@ If the derivation thesis survives CG contact, the migration is to keep `fret` as
 optional non-authoritative field (its validation role) rather than to delete it — the
 converters keep working, and documents stay readable. Recorded here so the divergence
 is a decision rather than a drift. **That migration is now planned** — without waiting
-for the CG — in [core-derived-positions.md](../complete/core-derived-positions.md), which also specifies the
+for the CG — in [core-derived-positions.md](../../complete/core-derived-positions.md), which also specifies the
 no-annotation fallback (derive string *and* fret from pitch alone, default tuning) as
 renderer presentation rather than spec text.
 

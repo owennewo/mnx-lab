@@ -157,7 +157,7 @@ mockup does:
 - **The two-shell claim triggers the promotion rule.** Anything two shells want
   is first promoted into `elements/` or below — a deliberate, reviewed move,
   and the picker lands on the same open boundary question
-  [core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md) already carries for the
+  [core-editor-ai-prompt.md](../proposed/low-priority/core-editor-ai-prompt.md) already carries for the
   palette: `elements/` may not import `assist/` today. The scoring core being
   pure and DOM-free is what keeps every resolution of that question cheap; the
   dialog is the only Lit in the story. Incubating the dialog in `workbench/`
@@ -211,7 +211,7 @@ shell as planned:
 - **The workbench assist tab** — sixth panel tab on the scenario page: context
   bar carries the current model and the switch-model CTA, the body is an honest
   placeholder (the chat surface belongs to
-  [core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md)), the footer
+  [core-editor-ai-prompt.md](../proposed/low-priority/core-editor-ai-prompt.md)), the footer
   input is disabled and says so. `PANEL_MIN` moved 360 → 410 because the width
   floor and the tab set are one decision. `<mnx-model-picker>` follows the
   command palette's modal idiom; its keydown handler stops propagation so the
@@ -300,7 +300,7 @@ moved out of the Worker and into `src/assist/editLoop.ts` behind a declared
 identically. The loop neither builds nor reads the chain — it carries it,
 because which model answered is the transport's business and self-correction
 is the loop's. No caller drives that path yet; the prompt surface is
-[core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md)'s.
+[core-editor-ai-prompt.md](../proposed/low-priority/core-editor-ai-prompt.md)'s.
 
 That pass also caught a real defect in the picker: it was offering `:batch`
 endpoints, which are half-price and *hours* of latency. They rank perfectly
@@ -313,7 +313,7 @@ answering a different question — so the fix is a filter at the surface
 - **Quality from edit-loop evals.** Out of scope by this item's own terms (*Not
   in scope: a benchmarking harness*) and gated on evals that do not exist. The
   prior table is unchanged and still declared data; the successor is
-  [core-assist-evals.md](../proposed/core-assist-evals.md), which owns the join
+  [core-assist-evals.md](../proposed/low-priority/core-assist-evals.md), which owns the join
   point — first-attempt schema-valid rate and retries-consumed per model,
   measured on our own corpus, replacing reputation.
 - **The `elements/` promotion.** Gated on studio being real, which is the same

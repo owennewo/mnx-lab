@@ -11,7 +11,7 @@
  * a `sourceId`, so the render output cannot address what it draws.
  *
  * Element or structure? *Encode the choice, not the consequence*
- * (roadmap/proposed/spec-instrument-position.md, the same rule that sorts
+ * (roadmap/proposed/low-priority/spec-instrument-position.md, the same rule that sorts
  * string from fret): ink that exists because the document CHOSE it is an
  * element; ink that follows from other data — a stem, a ledger line, the
  * barline every measure ends with — is structure and is never independently

@@ -18,9 +18,9 @@
     "layout": "roadmap/proposed/core-layout-authoring.md",
     "score": "roadmap/proposed/core-layout-authoring.md",
     "multimeasure-rest": "roadmap/proposed/core-layout-authoring.md",
-    "kit-component": "roadmap/proposed/core-percussion-kit.md",
-    "kit-note": "roadmap/proposed/core-percussion-kit.md",
-    "sound": "roadmap/proposed/core-percussion-kit.md"
+    "kit-component": "roadmap/proposed/low-priority/core-percussion-kit.md",
+    "kit-note": "roadmap/proposed/low-priority/core-percussion-kit.md",
+    "sound": "roadmap/proposed/low-priority/core-percussion-kit.md"
   },
   "blockingKinds": {
     "layout": 6,
@@ -94,7 +94,7 @@
         "sound"
       ],
       "deferredTo": [
-        "roadmap/proposed/core-percussion-kit.md"
+        "roadmap/proposed/low-priority/core-percussion-kit.md"
       ]
     },
     "lab/pitches/parenthesized-accidental": {

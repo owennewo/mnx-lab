@@ -273,9 +273,9 @@ const DEFERRED_KINDS: Record<string, string> = {
   layout: 'roadmap/proposed/core-layout-authoring.md',
   score: 'roadmap/proposed/core-layout-authoring.md',
   'multimeasure-rest': 'roadmap/proposed/core-layout-authoring.md',
-  'kit-component': 'roadmap/proposed/core-percussion-kit.md',
-  'kit-note': 'roadmap/proposed/core-percussion-kit.md',
-  sound: 'roadmap/proposed/core-percussion-kit.md'
+  'kit-component': 'roadmap/proposed/low-priority/core-percussion-kit.md',
+  'kit-note': 'roadmap/proposed/low-priority/core-percussion-kit.md',
+  sound: 'roadmap/proposed/low-priority/core-percussion-kit.md'
 };
 
 // The ENTRY-SURFACE WAIT is over (2026-08-23, core-entry-surface.md). While

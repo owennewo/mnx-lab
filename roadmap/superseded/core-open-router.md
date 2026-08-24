@@ -5,7 +5,7 @@
 > self-correcting NDJSON loop (`worker/editLoop.ts`), not an Express proxy,
 > with no VexFlow and no chat panel — and stage 1 (the two-stage voice UX,
 > the part still worth keeping) was merged into
-> [core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md) as its
+> [core-editor-ai-prompt.md](../proposed/low-priority/core-editor-ai-prompt.md) as its
 > voice stage. Kept for history; do not build from this document.
 
 This document defines the research, architecture, and API integration plan for the AI-first capabilities of the MNX Editor via **OpenRouter**. 

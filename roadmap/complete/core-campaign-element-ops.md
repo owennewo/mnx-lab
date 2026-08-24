@@ -40,7 +40,7 @@ attention queue, per `verify-scenarios`) rather than a red build — and if main
 bites, the escape hatch is a trace synthesizer (doc → intents, the planner inverse of
 `applyOp`) regenerating traces the way `update:primitives` regenerates goldens.
 
-Every item serves the same convergence [core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md)
+Every item serves the same convergence [core-editor-ai-prompt.md](../proposed/low-priority/core-editor-ai-prompt.md)
 already names: the assist loop emitting `EditOp[]` through `applyOp`. An op lands for
 the AI loop the moment it exists; its key can bind later. Removal verbs arguably come
 first — corpus documents arrive history-less, so undo can never remove anything from a
@@ -114,10 +114,10 @@ verb landing without a trace fails the build.
 Beyond the campaign, and now **formally handed over with owners** (2026-08-15):
 layout documents and multimeasure rests →
 [core-layout-authoring.md](../proposed/core-layout-authoring.md); the percussion kit →
-[core-percussion-kit.md](../proposed/core-percussion-kit.md). Their six kinds carry
+[core-percussion-kit.md](../proposed/low-priority/core-percussion-kit.md). Their six kinds carry
 `deferredTo` in `construct-coverage.json`, and a test refuses any verbless kind that
 names no owner. Still recorded, not indexed: transposition, harmonies rendering
-([core-chord-symbols.md](../proposed/core-chord-symbols.md)).
+([core-chord-symbols.md](../proposed/low-priority/core-chord-symbols.md)).
 
 ## Progress + learnings
 

@@ -8,7 +8,7 @@
 > `points: [{position, alter}]` in semitones — instead of the single interval
 > that silently flattened anything more elaborate than a ramp. Slide enum values
 > are camelCase (`slideIn` / `slideOut`), matching MNX house style. Design:
-> [spec-mnx-cg-proposals.md](spec-mnx-cg-proposals.md) §5; spec:
+> [spec-mnx-cg-proposals.md](low-priority/spec-mnx-cg-proposals.md) §5; spec:
 > [docs/mnx-extensions.md](../../docs/mnx-extensions.md).
 >
 > **What is left is rendering** — nothing draws any of it. Note that bend-point

@@ -12,7 +12,7 @@ standard field would take. The pinned error is the part's `unevaluatedProperties
 rejection.
 
 The proposal for a standard home is
-[roadmap/proposed/spec-instrument-position.md](../../../../roadmap/proposed/spec-instrument-position.md).
+[roadmap/proposed/low-priority/spec-instrument-position.md](../../../../roadmap/proposed/low-priority/spec-instrument-position.md).
 The "ABSENT MEANS NO FINGERBOARD" rule (no assumed instrument, ever) exists because of
 this gap: a fingerboard someone *declared* is data; a fingerboard we guessed is a lie
 waiting to render.

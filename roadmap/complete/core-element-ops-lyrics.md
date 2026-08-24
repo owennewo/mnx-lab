@@ -61,5 +61,5 @@ Part names, verse *labels* and directions are all "text in a score", but only
 the last two are lyrics; part names landed with the part declarations (item 13)
 and directions with the adornments (item 8). What remains genuinely unbuilt is
 **score-level text** — titles and composer lines — which MNX has no home for yet
-([spec-score-text.md](../proposed/spec-score-text.md) is the argument upstream),
+([spec-score-text.md](../proposed/low-priority/spec-score-text.md) is the argument upstream),
 so there is nothing to write and nothing to strip.

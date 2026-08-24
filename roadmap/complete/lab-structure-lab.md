@@ -133,10 +133,10 @@ spec/proposals/score-text/
   engravings/        our rendered output per scenario — what push:proposal injects
 ```
 
-Seeded from the three live topics: **score-text** ([spec-score-text.md](../proposed/spec-score-text.md)),
+Seeded from the three live topics: **score-text** ([spec-score-text.md](../proposed/low-priority/spec-score-text.md)),
 **chord-symbols** (#109, the `harmonies` block), **guitar-technique** (#63/#179, the
 `tab` block + `24-tab-spec-gaps`). Roadmap docs keep the narrative;
-[spec-mnx-cg-proposals.md](../proposed/spec-mnx-cg-proposals.md) keeps the outward campaign.
+[spec-mnx-cg-proposals.md](../proposed/low-priority/spec-mnx-cg-proposals.md) keeps the outward campaign.
 
 ### The submodule stops double-dutying
 

@@ -130,7 +130,7 @@ scenario* beats *23% of scenarios traced*.
 Six kinds have no construct verb and are not going to get one here: `layout`,
 `score`, `multimeasure-rest` ([core-layout-authoring.md](../proposed/core-layout-authoring.md))
 and `kit-component`, `kit-note`, `sound`
-([core-percussion-kit.md](../proposed/core-percussion-kit.md)). They block
+([core-percussion-kit.md](../proposed/low-priority/core-percussion-kit.md)). They block
 seven scenarios.
 
 **The tempting move is wrong.** Reclassifying them as `expected-unreachable`

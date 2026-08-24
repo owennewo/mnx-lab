@@ -369,7 +369,7 @@ with `npm run update:roster`. Only `npm run refresh:catalog` touches the network
 roster governs the **server-key demo mode only**: with BYOK the user's key buys whatever
 `<mnx-model-picker>` was pointed at, and the picker's runners-up ride along as
 OpenRouter's ordered `models: []` fallback chain. Quality is still a declared prior table
-in `modelCatalog.ts` — roadmap/proposed/core-assist-evals.md owns replacing it with
+in `modelCatalog.ts` — roadmap/proposed/low-priority/core-assist-evals.md owns replacing it with
 measured evidence.
 
 ## Rendering (custom SMuFL/SVG engine)
@@ -418,7 +418,7 @@ literal, parallel to `tempos`) is the global-measure vendor block. Schema:
 `spec/mnx-lab-extensions.schema.json`; register + rationale:
 [docs/mnx-extensions.md](docs/mnx-extensions.md). Blocks are shaped like the standard
 objects they draft (camelCase, `rhythmic-position`, note-id references) so adoption
-deletes the wrapper — see roadmap/proposed/spec-instrument-position.md and
+deletes the wrapper — see roadmap/proposed/low-priority/spec-instrument-position.md and
 roadmap/complete/core-derived-positions.md.
 Extend `_x.mnxLab` and its schema — never standard MNX fields.
 Saved documents upgrade v1→v2→v3→v4→v5 on load via `src/model/upgradeTabExtension.ts`.
@@ -482,6 +482,15 @@ output names refuse to overwrite).
   aimed upstream), `lab-` (the repo itself: structure, process, corpus machinery).
   Another prefix is acceptable only when it earns its keep: a concern that is
   genuinely separate *and* important enough to name.
+- **`roadmap/proposed/low-priority/`** holds proposed items we are **unlikely to work
+  on soon** — still wanted, still described, just not next. It is a priority signal, not
+  a verdict: unlike `rejected/` (not worth building) and `superseded/` (overtaken),
+  nothing here has been argued against, and a doc moves back up the moment it is picked
+  up. Keeping it a subfolder of `proposed/` rather than a sibling bucket is deliberate —
+  the bucket a doc lives in still means what it always meant, so nothing about
+  promotion, prefixes or the index changes. **"What's next" answers from `proposed/`
+  itself**; reach into `low-priority/` only when asked for the whole field, or when
+  something there is a named dependency of the item in hand.
 - **A `proposed/` doc is written only when it is asked for.** Noticing future work
   during a task is not a mandate to file it: name it in the reply and let the human
   decide. "Add to the roadmap", "write that up", or picking up a campaign row are the

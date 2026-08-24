@@ -19,6 +19,7 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
 | Bucket | Meaning |
 |--------|---------|
 | `proposed/` | Described but not built. |
+| `proposed/low-priority/` | Described, still wanted — but **unlikely to be worked on soon**. A priority signal, not a verdict: nothing here has been argued against, and a doc moves back up to `proposed/` the moment it is picked up. "What's next" answers from `proposed/` itself. |
 | `inprogress/` | Actively being worked / a living contract. |
 | `complete/` | Built and shipped (kept for provenance; may be aspirational in tense). |
 | `superseded/` | Overtaken by reality or a later decision; kept for history, **not current**. |
@@ -43,19 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-assist-evals.md](proposed/core-assist-evals.md)** — rank models on **our
-  corpus instead of on reputation**. Split out of the model selector (2026-08-22) as
-  the one thing it deliberately did not build. `MODEL_PRIORS` is seventeen families of
-  hand-read leaderboard numbers; `worker/editLoop.ts` was factored for evals and
-  already computes the metric that matters — first-attempt schema-valid rate, retries
-  consumed, terminal failures — because an intelligence index is a claim about a model
-  in general and the edit loop asks something far narrower. `/api/v1/generation`'s
-  realized `total_cost` is also the measured answer to the token-mix estimate
-  `DEFAULT_TOKEN_MIX` currently guesses. Open decisions: what an eval case is (a
-  scenario is a document, not an edit — the edit-op traces are the nearest shape), who
-  pays, how measured numbers land as committed data **distinguishable** from declared
-  priors, and sampling under non-determinism. Not a general benchmark; no automatic
-  promotion.
 - **[core-lowvision-reflow.md](proposed/core-lowvision-reflow.md)** — should the plan's
   line width be measured in **ink**, so growing the staff reflows the music instead of
   overflowing it? Left open by the 2026-08-21 low-vision range (staff ceiling 160% → 640%,
@@ -75,65 +63,11 @@ proposals that name their campaign.
   works by index, because deletion needs identity and construction needs somewhere to
   stand. Opens with the addressing question (a ladder rung, a text form, or a panel);
   blocks six scenarios, all of which render and verify today.
-- **[core-percussion-kit.md](proposed/core-percussion-kit.md)** — the `kit-component`,
-  `kit-note` and `sound` kinds, handed over alongside it. A kit part has no pitch axis
-  (the vertical axis is a component NAME the document declares, so there is nothing to
-  derive — the no-instrument-assumed rule one level up) and a component is referenced
-  rather than placed, so the verb order is fixed by the reference. One scenario.
-- **[spec-mnx-cg-proposals.md](proposed/spec-mnx-cg-proposals.md)** — **where** chord symbols, section
-  labels and technique should live, designed to be adoptable by the MNX CG rather than to stay
-  private `_x` fields. Checked against the CG's live issues: #109 chord symbols, #112/#377
-  rehearsal marks (the spec editor asked for a proposal and nobody wrote one), #63 guitar tab,
-  #110 fretboard diagrams — all open, all unclaimed. Derives an acceptance template from the
-  dynamics rework (#518, proposed → merged in three weeks). **The designs are now built**
-  (as `_x.mnxLab` v3, since evolved to v5 — see [docs/mnx-extensions.md](../docs/mnx-extensions.md));
-  rehearsal/section labels are now drawn, and §3's placement half is superseded by
-  [spec-score-text.md](proposed/spec-score-text.md) — post from there. What is left here
-  is the outward half: join the CG, sign the CLA, and post the proposals.
-- **[spec-score-text.md](proposed/spec-score-text.md)** — **where text belongs in MNX.** v27 allows free
-  text in seven places (lyrics, naming, two dynamics decorations) and a bar can carry no text
-  at all, so rehearsal marks, section names and performance directions have nowhere to go.
-  Proposes typed `rehearsal`/`section` on the global measure beside `segno`/`fine`/`jump`, plus
-  generic `directions[]` on the part measure shaped like `dynamic-group`. Key argument: typing
-  makes placement derivable, which is why Soundslice needs an inner/outer axis and MNX would
-  not. Includes a round-trip stress test — 3 of 4 directions are destroyed or misclassified
-  today, and the corpus never catches it. Supersedes the placement half of
-  [spec-mnx-cg-proposals.md](proposed/spec-mnx-cg-proposals.md) §3.
-- **[core-chord-symbols.md](proposed/core-chord-symbols.md)** — chord symbols. **Data path shipped**
-  (2026-07-26) as `global.measures[i]._x.mnxLab.harmonies[]`: structured *and* literal, read
-  from Guitar Pro `beat.text` **and** `Chord` objects, written and read as MusicXML
-  `<harmony>`, lossless both ways (`Vestapol` 25, `House-of-the-Rising-Sun` 14). Remaining:
-  **rendering** — nothing draws a chord symbol yet.
 - **[core-guitar-technique.md](proposed/core-guitar-technique.md)** — playing technique. **Data path
   complete** (2026-07-26): hammer-ons, pull-offs, slides, vibrato, **harmonics** and **palm
   mute** all survive `MNX ⇄ .gp` and `MNX ⇄ MusicXML`, and bends are now **curves**
   (`points: [{position, alter}]` in semitones) rather than a single interval that flattened
   anything more elaborate. Remaining: **rendering** — nothing draws technique yet.
-- **[spec-instrument-position.md](proposed/spec-instrument-position.md)** — **where a note is played**:
-  the string declaration, capo, `note.string`, `note.fingering`. Thesis: **the string and the
-  finger are choices, the fret and the hand position are consequences** — given tuning, string
-  and pitch, the fret is arithmetic (and on violin, string + pitch + finger derives the hand
-  position). Argued from the conflict rule MNX already used against MusicXML's duplicated tab
-  staves, not from "derivable data shouldn't be stored". Names are tested against **piano**,
-  which sorts them: only `fingering` is universal, so it must not nest under a `tab` namespace.
-  Records upstream state (#63 open with a standing invitation from the spec editor, **no
-  discussion exists**), natural/artificial harmonic derivation, and the divergence from the
-  built `_x.mnxLab.tab.position`, which stores the fret. Scope is bounded by a principle
-  rather than a list — **encode the choice, not the consequence** — which maps the same shape
-  onto brass (valve combination selects a fundamental, pitch determines the partial) and
-  excludes tin whistle by the same rule that excludes storing the fret. Design only — nothing built, nothing
-  posted; complements [core-guitar-technique.md](proposed/core-guitar-technique.md) (what the hands do).
-- **[core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md)** — the **third input
-  mode**: typed text routing to `/api/edit-notation` when it reads as a sentence rather
-  than a command (research §6.2), inheriting the `ui/ → assist/` boundary. Where it
-  lives is a design question the item owns — the original `Ctrl+K` home predates the
-  tray split (`/` = commands, Ctrl+G = go-to; Chrome reclaimed Ctrl+K). Owns the deeper
-  convergence `src/edit/ops.ts` has always named: the assist loop emitting **`EditOp[]`
-  through `applyOp`** instead of replacing whole documents, so AI edits land in the session's
-  undo history and op log like keyboard edits. Split out of
-  [core-editor-input-layer.md](complete/core-editor-input-layer.md); absorbed the
-  **voice stage** (two-stage transcribe-review-submit, Worker-side transcription) from
-  the retired [core-open-router.md](superseded/core-open-router.md) on 2026-08-20.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -144,7 +78,7 @@ proposals that name their campaign.
   way). The promotion review's work list: the `elements/ → edit/` boundary change, the
   element contract under [core-viewer-surface.md](complete/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
-  [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
+  [core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md).
 - **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3: the
   **ledger of what cannot be wired yet**, each greyed tile with an address. Its first
   retirement wave predates the tray itself: the 2026-08-14/15 vocabulary sweep landed
@@ -166,7 +100,80 @@ proposals that name their campaign.
   Step zero is a **fixture** — none of the three reference scores contains a tuplet or a
   grace note, which is why the round trips are honestly lossless and still never present
   the case. Import/export follows the collapse-expand precedent already solved for voltas.
-- **[studio-storage-sync.md](proposed/studio-storage-sync.md)** — **studio's storage, sync
+
+### proposed/low-priority/
+Still wanted, still described — just not next. Nothing here has been argued against
+(that is `rejected/`); these are the items unlikely to be picked up soon. A doc moves
+back up to `proposed/` the moment it is.
+
+- **[core-assist-evals.md](proposed/low-priority/core-assist-evals.md)** — rank models on **our
+  corpus instead of on reputation**. Split out of the model selector (2026-08-22) as
+  the one thing it deliberately did not build. `MODEL_PRIORS` is seventeen families of
+  hand-read leaderboard numbers; `worker/editLoop.ts` was factored for evals and
+  already computes the metric that matters — first-attempt schema-valid rate, retries
+  consumed, terminal failures — because an intelligence index is a claim about a model
+  in general and the edit loop asks something far narrower. `/api/v1/generation`'s
+  realized `total_cost` is also the measured answer to the token-mix estimate
+  `DEFAULT_TOKEN_MIX` currently guesses. Open decisions: what an eval case is (a
+  scenario is a document, not an edit — the edit-op traces are the nearest shape), who
+  pays, how measured numbers land as committed data **distinguishable** from declared
+  priors, and sampling under non-determinism. Not a general benchmark; no automatic
+  promotion.
+- **[core-percussion-kit.md](proposed/low-priority/core-percussion-kit.md)** — the `kit-component`,
+  `kit-note` and `sound` kinds, handed over alongside it. A kit part has no pitch axis
+  (the vertical axis is a component NAME the document declares, so there is nothing to
+  derive — the no-instrument-assumed rule one level up) and a component is referenced
+  rather than placed, so the verb order is fixed by the reference. One scenario.
+- **[spec-mnx-cg-proposals.md](proposed/low-priority/spec-mnx-cg-proposals.md)** — **where** chord symbols, section
+  labels and technique should live, designed to be adoptable by the MNX CG rather than to stay
+  private `_x` fields. Checked against the CG's live issues: #109 chord symbols, #112/#377
+  rehearsal marks (the spec editor asked for a proposal and nobody wrote one), #63 guitar tab,
+  #110 fretboard diagrams — all open, all unclaimed. Derives an acceptance template from the
+  dynamics rework (#518, proposed → merged in three weeks). **The designs are now built**
+  (as `_x.mnxLab` v3, since evolved to v5 — see [docs/mnx-extensions.md](../docs/mnx-extensions.md));
+  rehearsal/section labels are now drawn, and §3's placement half is superseded by
+  [spec-score-text.md](proposed/low-priority/spec-score-text.md) — post from there. What is left here
+  is the outward half: join the CG, sign the CLA, and post the proposals.
+- **[spec-score-text.md](proposed/low-priority/spec-score-text.md)** — **where text belongs in MNX.** v27 allows free
+  text in seven places (lyrics, naming, two dynamics decorations) and a bar can carry no text
+  at all, so rehearsal marks, section names and performance directions have nowhere to go.
+  Proposes typed `rehearsal`/`section` on the global measure beside `segno`/`fine`/`jump`, plus
+  generic `directions[]` on the part measure shaped like `dynamic-group`. Key argument: typing
+  makes placement derivable, which is why Soundslice needs an inner/outer axis and MNX would
+  not. Includes a round-trip stress test — 3 of 4 directions are destroyed or misclassified
+  today, and the corpus never catches it. Supersedes the placement half of
+  [spec-mnx-cg-proposals.md](proposed/low-priority/spec-mnx-cg-proposals.md) §3.
+- **[core-chord-symbols.md](proposed/low-priority/core-chord-symbols.md)** — chord symbols. **Data path shipped**
+  (2026-07-26) as `global.measures[i]._x.mnxLab.harmonies[]`: structured *and* literal, read
+  from Guitar Pro `beat.text` **and** `Chord` objects, written and read as MusicXML
+  `<harmony>`, lossless both ways (`Vestapol` 25, `House-of-the-Rising-Sun` 14). Remaining:
+  **rendering** — nothing draws a chord symbol yet.
+- **[spec-instrument-position.md](proposed/low-priority/spec-instrument-position.md)** — **where a note is played**:
+  the string declaration, capo, `note.string`, `note.fingering`. Thesis: **the string and the
+  finger are choices, the fret and the hand position are consequences** — given tuning, string
+  and pitch, the fret is arithmetic (and on violin, string + pitch + finger derives the hand
+  position). Argued from the conflict rule MNX already used against MusicXML's duplicated tab
+  staves, not from "derivable data shouldn't be stored". Names are tested against **piano**,
+  which sorts them: only `fingering` is universal, so it must not nest under a `tab` namespace.
+  Records upstream state (#63 open with a standing invitation from the spec editor, **no
+  discussion exists**), natural/artificial harmonic derivation, and the divergence from the
+  built `_x.mnxLab.tab.position`, which stores the fret. Scope is bounded by a principle
+  rather than a list — **encode the choice, not the consequence** — which maps the same shape
+  onto brass (valve combination selects a fundamental, pitch determines the partial) and
+  excludes tin whistle by the same rule that excludes storing the fret. Design only — nothing built, nothing
+  posted; complements [core-guitar-technique.md](proposed/core-guitar-technique.md) (what the hands do).
+- **[core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md)** — the **third input
+  mode**: typed text routing to `/api/edit-notation` when it reads as a sentence rather
+  than a command (research §6.2), inheriting the `ui/ → assist/` boundary. Where it
+  lives is a design question the item owns — the original `Ctrl+K` home predates the
+  tray split (`/` = commands, Ctrl+G = go-to; Chrome reclaimed Ctrl+K). Owns the deeper
+  convergence `src/edit/ops.ts` has always named: the assist loop emitting **`EditOp[]`
+  through `applyOp`** instead of replacing whole documents, so AI edits land in the session's
+  undo history and op log like keyboard edits. Split out of
+  [core-editor-input-layer.md](complete/core-editor-input-layer.md); absorbed the
+  **voice stage** (two-stage transcribe-review-submit, Worker-side transcription) from
+  the retired [core-open-router.md](superseded/core-open-router.md) on 2026-08-20.
+- **[studio-storage-sync.md](proposed/low-priority/studio-storage-sync.md)** — **studio's storage, sync
   and sharing**: a hand-rolled op-log sync engine in the Replicache mold (server-authoritative
   rebase over `EditOp`/`applyOp` — CRDTs rejected with reasons), persisted as a SQLite Durable
   Object per document + D1 library layer + R2 snapshots, IndexedDB demoted to replica. Library
@@ -326,7 +333,7 @@ proposals that name their campaign.
   over the three ranked *below* the choice, `models: []` replaces `model`, and the context
   bar says *served by* whenever the answer came from further down. Eval-fed quality and
   the `elements/` promotion were handed off rather than built — to
-  [core-assist-evals.md](proposed/core-assist-evals.md) and
+  [core-assist-evals.md](proposed/low-priority/core-assist-evals.md) and
   [core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)'s existing
   gate — because neither was this item's work waiting, but other items' triggers not yet
   met.
@@ -415,7 +422,7 @@ proposals that name their campaign.
   [core-zoom-density-pad.md](complete/core-zoom-density-pad.md) records ruling 1's
   square-scale premise.
 - **[core-derived-positions.md](complete/core-derived-positions.md)** — the execution half of
-  [spec-instrument-position.md](proposed/spec-instrument-position.md): migrate `_x.mnxLab` to the
+  [spec-instrument-position.md](proposed/low-priority/spec-instrument-position.md): migrate `_x.mnxLab` to the
   proposal's shape (v5: string authoritative, `fret` optional and non-authoritative, `fingering`
   un-nested, `tuning[]` → `strings[]`) **and specify the derivation ladder** so unannotated
   guitar notation still renders valid tab — lowest-playable-fret assignment, capo-aware
@@ -502,7 +509,7 @@ proposals that name their campaign.
   echo per projection (the active-projection bit also picks the input dialect: ↑↓ = pitch
   vs string). Builds on [core-editor-input-layer.md](complete/core-editor-input-layer.md)'s
   intents/traces/overlay substrate; the section rung is live evidence for
-  [spec-score-text.md](proposed/spec-score-text.md)'s proposed field. **Phases 1–2 built
+  [spec-score-text.md](proposed/low-priority/spec-score-text.md)'s proposed field. **Phases 1–2 built
   2026-08-09**: the vertical ladder as session state (`src/edit/selection.ts`,
   Escape/Enter intents, level-scaled arrows with section jumps) pinned by
   `harness/conformance/selection.test.ts`, and the enclosure vocabulary
@@ -705,7 +712,7 @@ proposals that name their campaign.
   empty→scenario constructibility traces), then the element families ordered by scenarios
   unlocked. Construct traces start from **the literal `{}`**; verdicts ride the committed
   primitives goldens and the byte-identical undo-all contract. Feeds the `EditOp[]`
-  convergence in [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md).
+  convergence in [core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md).
 - **[core-element-ops-destruct-sweep.md](complete/core-element-ops-destruct-sweep.md)** —
   campaign item 2: **the destructibility sweep at corpus scale**, item 1's reverse walk
   over all 106 scenarios and every kind of ink in them. A harness item, so its agreement
@@ -1029,7 +1036,7 @@ proposals that name their campaign.
   (`Ctrl+K` commands / `Ctrl+G` go-to, bar jumps as a traceable `goToMeasure` intent), the
   `lab/document/empty-tab-canvas` template and the from-scratch flagship trace. Both
   descendants live in proposed/: the AI mode
-  ([core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md)) and the `elements/` promotion
+  ([core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md)) and the `elements/` promotion
   ([core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)). Grounded in
   [research/notation-editor-keyboard-models.md](../research/notation-editor-keyboard-models.md).
 - **[core-guitar-pro.md](complete/core-guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion at
@@ -1114,7 +1121,7 @@ proposals that name their campaign.
   twice, 2026-08-20: its text-edit half shipped long ago in a different shape (the
   Worker's `/api/edit-notation` NDJSON self-correcting loop), and its surviving idea —
   the two-stage transcribe-review-submit voice UX — was merged into
-  [core-editor-ai-prompt.md](proposed/core-editor-ai-prompt.md) as that item's voice
+  [core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md) as that item's voice
   stage. Do not build from this document.
 
 ### rejected/

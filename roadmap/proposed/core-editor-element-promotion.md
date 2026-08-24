@@ -101,7 +101,7 @@ trace fixtures, root vitest), before and after.
 5. **Workbench consumes the promoted element** and its own mount code is
    deleted — one editor surface, not two.
 6. **The palette question travels along**:
-   [core-editor-ai-prompt.md](core-editor-ai-prompt.md) already flags that a promoted
+   [core-editor-ai-prompt.md](low-priority/core-editor-ai-prompt.md) already flags that a promoted
    palette pulls the `elements → assist` boundary into question (embeds
    probably should **not** ship an AI prompt; that mode may stay
    workbench-only by configuration). Decide it here if the palette is part of

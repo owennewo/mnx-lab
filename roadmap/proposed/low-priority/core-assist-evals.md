@@ -1,7 +1,7 @@
 # Edit-loop evals — ranking models on our corpus instead of on reputation
 
 > **Status: proposed (2026-08-22).** Split out of
-> [core-assist-model-selector.md](../complete/core-assist-model-selector.md) as the one
+> [core-assist-model-selector.md](../../complete/core-assist-model-selector.md) as the one
 > thing that item deliberately did not build (*"Not in scope: a benchmarking
 > harness"*). That item closed with its selector, roster generator, picker and
 > fallback chain shipped and one seam left open — this doc owns the seam.

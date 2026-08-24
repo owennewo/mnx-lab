@@ -5,9 +5,9 @@
 >
 > §2 (house-style fixes), §3 (labels), §4 (chord symbols) and §5's data path all
 > shipped as `_x.mnxLab` v3 — the extension has since evolved to **v5** (the
-> [derived-positions](../complete/core-derived-positions.md) reshape: string
+> [derived-positions](../../complete/core-derived-positions.md) reshape: string
 > authoritative, flat note-level fields) — see
-> [docs/mnx-extensions.md](../../docs/mnx-extensions.md) for the current spec
+> [docs/mnx-extensions.md](../../../docs/mnx-extensions.md) for the current spec
 > and register. The `_x` namespace was corrected, enum values camelCased, bends
 > became curves, and harmonics + palm mute filled the gap that blocked the
 > technique work. Both round trips stay lossless.
@@ -18,7 +18,7 @@
 > post from that doc, not from §3. Rehearsal marks and section labels are now
 > **drawn** (`src/engine/layout/scoreText.ts`); chord symbols and technique
 > remain undrawn, tracked in [core-chord-symbols.md](core-chord-symbols.md)
-> and [core-guitar-technique.md](core-guitar-technique.md).
+> and [core-guitar-technique.md](../core-guitar-technique.md).
 >
 > **What is left is §6 steps 1, 5 and 6**: join the CG and sign the CLA, then
 > post the proposals. Nothing can be contributed upstream until the CLA is
@@ -112,9 +112,9 @@ checking it against the CG's own rules:
 3. **The bend model can't hold a bend curve.** `technique.bend` is
    `{type, amount, release}` — MusicXML's shape. Guitar Pro stores a bend as an
    array of `(time, value)` points, and
-   [the importer collapses it](../../converters/guitarpro-mnx/src/import/gp.ts)
+   [the importer collapses it](../../../converters/guitarpro-mnx/src/import/gp.ts)
    to `Math.max(...bendPoints)`, while
-   [the exporter](../../converters/guitarpro-mnx/src/export/gp.ts) writes back a
+   [the exporter](../../../converters/guitarpro-mnx/src/export/gp.ts) writes back a
    fixed two-point ramp. The round trip is lossless on our fixtures only because
    both files' bends happen to be simple ramps. A bend that rises, releases and
    rises again — routine in the Hal Leonard tab that #63 was opened about — is
@@ -320,4 +320,4 @@ map them.
 
 Rendering none of this is a prerequisite for any of it — carrying the data
 correctly is independently useful, and drawing it is tracked separately against
-the [lab-spec-approval.md](../complete/lab-spec-approval.md) process.
+the [lab-spec-approval.md](../../complete/lab-spec-approval.md) process.

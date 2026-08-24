@@ -59,7 +59,7 @@
     },
     "string-number": {
       "type": "integer",
-      "description": "Which string the note is played on — the performer's authoritative CHOICE. String 1 is the highest-pitched string (E4 on a standard-tuned guitar), MusicXML's convention and the opposite of the visual tab convention. Drafts `note.string` (roadmap/proposed/spec-instrument-position.md): given the part's string declaration, the capo and the note's sounding pitch, the fret is derived arithmetic.",
+      "description": "Which string the note is played on — the performer's authoritative CHOICE. String 1 is the highest-pitched string (E4 on a standard-tuned guitar), MusicXML's convention and the opposite of the visual tab convention. Drafts `note.string` (roadmap/proposed/low-priority/spec-instrument-position.md): given the part's string declaration, the capo and the note's sounding pitch, the fret is derived arithmetic.",
       "minimum": 1,
       "maximum": 12
     },
@@ -221,7 +221,7 @@
     },
     "note-tab": {
       "type": "object",
-      "description": "Stored under note._x.mnxLab.tab. v5 leaves only `technique` here: `string`/`fret`/`fingering` moved flat onto the vendor dict, mirroring the adopted shape they draft (flat on `note` — roadmap/proposed/spec-instrument-position.md). `technique` stays until it graduates via a general articulations proposal (roadmap/proposed/core-guitar-technique.md).",
+      "description": "Stored under note._x.mnxLab.tab. v5 leaves only `technique` here: `string`/`fret`/`fingering` moved flat onto the vendor dict, mirroring the adopted shape they draft (flat on `note` — roadmap/proposed/low-priority/spec-instrument-position.md). `technique` stays until it graduates via a general articulations proposal (roadmap/proposed/core-guitar-technique.md).",
       "properties": {
         "technique": {
           "$ref": "#/$defs/technique"
@@ -476,7 +476,7 @@
     },
     "global-measure-ext": {
       "type": "object",
-      "description": "The whole vendor dict at global.measures[i]._x.mnxLab. Harmony lives here — on the GLOBAL timeline beside `key` and `tempos` — because two parts cannot legitimately disagree about the chord on a beat, which is the test that put dynamics and ottavas in the part measure and key/time/tempo in the global one. `rehearsal` and `section` were here in v3; v4 removed them in favour of the standard MNX objects proposed in roadmap/proposed/spec-score-text.md — an extension should be a draft of the standard object, so once drafted it stops being an extension.",
+      "description": "The whole vendor dict at global.measures[i]._x.mnxLab. Harmony lives here — on the GLOBAL timeline beside `key` and `tempos` — because two parts cannot legitimately disagree about the chord on a beat, which is the test that put dynamics and ottavas in the part measure and key/time/tempo in the global one. `rehearsal` and `section` were here in v3; v4 removed them in favour of the standard MNX objects proposed in roadmap/proposed/low-priority/spec-score-text.md — an extension should be a draft of the standard object, so once drafted it stops being an extension.",
       "properties": {
         "harmonies": {
           "type": "array",

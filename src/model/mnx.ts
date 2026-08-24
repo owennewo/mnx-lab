@@ -12,7 +12,7 @@ export interface MnxPitch {
 // shared namespace, so another app writing `_x.tab` for something else would
 // have made our own validator reject a legal document.
 //
-// v5 mirrors the adopted shape drafted in roadmap/proposed/spec-instrument-position.md:
+// v5 mirrors the adopted shape drafted in roadmap/proposed/low-priority/spec-instrument-position.md:
 // `string`, `fret` and `fingering` sit FLAT on the vendor dict (peers of `pitch`,
 // as they would be on `note`), the part declares `strings[]` + `capo` flat, and
 // only `technique` (pending a general articulations proposal) and `staffKind`
@@ -116,7 +116,7 @@ export interface MnxMeasureLabel {
  *  "let ring"). Shaped like `dynamic-group`: positioned, optionally scoped to a
  *  staff and voice, oriented above/below/between. Carries no typography — how a
  *  direction is set is the renderer's decision. Exactly one of `text`/`glyphs`.
- *  **Proposed, not adopted** — see roadmap/proposed/spec-score-text.md. */
+ *  **Proposed, not adopted** — see roadmap/proposed/low-priority/spec-score-text.md. */
 export interface MnxDirection {
   position: { fraction: [number, number] };
   text?: string;
@@ -459,7 +459,7 @@ export interface MnxPartMeasure {
   beams?: MnxBeam[];
   dynamics?: MnxDynamic[];
   /** Free-text/symbolic instructions for this part. **Proposed, not adopted** —
-   *  see roadmap/proposed/spec-score-text.md. */
+   *  see roadmap/proposed/low-priority/spec-score-text.md. */
   directions?: MnxDirection[];
   ottavas?: MnxOttava[];
   clefs?: {
@@ -595,7 +595,7 @@ export interface MnxGlobalMeasure {
   /** A rehearsal mark: an arbitrary index into the score ("A", "12"). Score-wide,
    *  so it sits beside `segno`/`fine`/`jump` rather than in a part. **Proposed,
    *  not adopted** — validates against `schemas/mnx-schema.proposed.json` only.
-   *  See roadmap/proposed/spec-score-text.md. */
+   *  See roadmap/proposed/low-priority/spec-score-text.md. */
   rehearsal?: MnxMeasureLabel;
   /** The formal section beginning here ("Intro", "Verse 1"), extending until the
    *  next one. Separate from `rehearsal` because it states what the music *is*

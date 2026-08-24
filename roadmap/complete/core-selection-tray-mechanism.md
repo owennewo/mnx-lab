@@ -257,7 +257,7 @@ everything below the boundary is pinned:
 - **Not `{level, anchor, extent}`** — extension, closure (Ctrl+A), and the mixed
   tile state wait on the ladder's selection-state work; the registry carries the
   shapes so nothing needs redesign when it arrives.
-- **Not the AI mode.** [core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md)'s
+- **Not the AI mode.** [core-editor-ai-prompt.md](../proposed/low-priority/core-editor-ai-prompt.md)'s
   sentence-routing belongs to the global palette; the tray's search filters its own
   scope and widens to the `global` tab on a second `/`, carrying the text.
 

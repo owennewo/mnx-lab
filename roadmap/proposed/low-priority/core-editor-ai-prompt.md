@@ -2,15 +2,15 @@
 
 > **Status: proposed (2026-08-03), not started. Revised 2026-08-20**: absorbed
 > the voice/transcription stage from the retired
-> [core-open-router.md](../superseded/core-open-router.md) (a pre-rebuild doc;
+> [core-open-router.md](../../superseded/core-open-router.md) (a pre-rebuild doc;
 > its text-edit half shipped long ago as the Worker's NDJSON loop, in a
 > different shape than it drew), and re-homed the mode after the palette's
 > rebinding — the original "`Ctrl+K` third sub-mode" framing predates the tray.
 > Split out of
-> [core-editor-input-layer.md](../complete/core-editor-input-layer.md), whose remaining
+> [core-editor-input-layer.md](../../complete/core-editor-input-layer.md), whose remaining
 > palette work is now go-to + commands only; the AI half grew its own design
 > questions and deserves its own decision record. The research grounding is
-> [research/notation-editor-keyboard-models.md](../../research/notation-editor-keyboard-models.md)
+> [research/notation-editor-keyboard-models.md](../../../research/notation-editor-keyboard-models.md)
 > §6.2.
 
 ## The idea
@@ -24,7 +24,7 @@ callers), needing no new surface beyond the ones that exist.
 
 **Where it lives is no longer "the `Ctrl+K` box".** Since this was proposed,
 Chrome reclaimed `Ctrl+K` and the command surface split in two
-([core-selection-tray-global-tab.md](../complete/core-selection-tray-global-tab.md)):
+([core-selection-tray-global-tab.md](../../complete/core-selection-tray-global-tab.md)):
 `/` opens the selection tray (commands, escalating outward) and `Ctrl+G` is
 go-to (destinations). The prompt is a third kind of utterance — neither a
 command nor a destination — so its home is a design decision this item owns:

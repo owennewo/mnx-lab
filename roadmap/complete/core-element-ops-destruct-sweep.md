@@ -111,7 +111,7 @@ machine-checked claim, in the same discipline as the keymap-docs joins and the
 name yet, which is exactly the campaign's ordering evidence.
 
 **Element or structure? The choice/consequence rule.** The repo already owns the
-principle that sorts this, from [spec-instrument-position.md](../proposed/spec-instrument-position.md):
+principle that sorts this, from [spec-instrument-position.md](../proposed/low-priority/spec-instrument-position.md):
 *encode the choice, not the consequence*. Ink whose existence is a **consequence** of
 other data is structure and is never independently removable — staff lines, ledger
 lines, stems, flags, `barline-final-*`, `fret-bg`, `lyric-hyphen`, `multirest-*`,

@@ -1,6 +1,6 @@
 {
   "title": "One-bar sections",
-  "description": "Every bar is its own section. This is the degenerate case behind the selection ladder's bar-vs-section pair (roadmap/inprogress/workbench-rung-legibility.md): the two rungs share the panel-wide enclosure and are told apart by extent, so where a section is exactly one bar long the two shapes coincide exactly and extent says nothing. It is what the section rung's lit label chip exists to separate. Proposed MNX objects, not yet adopted — see roadmap/proposed/spec-score-text.md.",
+  "description": "Every bar is its own section. This is the degenerate case behind the selection ladder's bar-vs-section pair (roadmap/inprogress/workbench-rung-legibility.md): the two rungs share the panel-wide enclosure and are told apart by extent, so where a section is exactly one bar long the two shapes coincide exactly and extent says nothing. It is what the section rung's lit label chip exists to separate. Proposed MNX objects, not yet adopted — see roadmap/proposed/low-priority/spec-score-text.md.",
   "bars": 4,
   "tags": [
     "labels",

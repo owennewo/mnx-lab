@@ -162,7 +162,7 @@ the cause is reported as it happened.
 
 Same frames, same iterator, same union — a caller cannot tell the paths apart except by
 the stamp, which is the point: **the UI that will call this
-([core-editor-ai-prompt.md](../proposed/core-editor-ai-prompt.md)) gets one surface, not a
+([core-editor-ai-prompt.md](../proposed/low-priority/core-editor-ai-prompt.md)) gets one surface, not a
 branch.** The loop reports progress through a callback (for the evals harness); the
 browser-direct adapter queues those frames and drains them between awaits so progress
 still arrives *before* the done frame rather than batched behind it — asserted.

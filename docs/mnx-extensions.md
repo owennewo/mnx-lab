@@ -5,7 +5,7 @@ place: what it is, why standard MNX has no field for it, which CG issue it
 drafts, and how far it has been built.
 
 Schema: [`spec/mnx-lab-extensions.schema.json`](../spec/mnx-lab-extensions.schema.json).
-Strategy and the case for each design: [`roadmap/proposed/spec-mnx-cg-proposals.md`](../roadmap/proposed/spec-mnx-cg-proposals.md).
+Strategy and the case for each design: [`roadmap/proposed/low-priority/spec-mnx-cg-proposals.md`](../roadmap/proposed/low-priority/spec-mnx-cg-proposals.md).
 A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 
 ## The register
@@ -24,7 +24,7 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 
 **Graduated out of `_x` in v4:** `rehearsal` and `section`. They are no longer
 extensions — they are written as the *standard* MNX objects proposed in
-[roadmap/proposed/spec-score-text.md](../roadmap/proposed/spec-score-text.md), and validate
+[roadmap/proposed/low-priority/spec-score-text.md](../roadmap/proposed/low-priority/spec-score-text.md), and validate
 against `spec/mnx-schema.proposed.json` until the CG adopts them. An extension
 is supposed to be a draft of the standard object; keeping a private copy after
 drafting one would mean two spellings of the same fact. The same doc adds
@@ -73,7 +73,7 @@ nothing to verify an implementation against.
    datum, `technique` is meaningful for any instrument, `fingering` is universal.
    v5 makes the separation structural: the universal fields sit **flat** on the
    vendor dict, mirroring the flat-on-`note` adopted shape they draft
-   ([roadmap/proposed/spec-instrument-position.md](../roadmap/proposed/spec-instrument-position.md))
+   ([roadmap/proposed/low-priority/spec-instrument-position.md](../roadmap/proposed/low-priority/spec-instrument-position.md))
    — nesting them under `tab` made them fretboard-scoped by construction.
 
 ## Note level: `note._x.mnxLab`
@@ -234,7 +234,7 @@ only the first two; the other four are Guitar Pro's.
 ### `rehearsal` and `section` left in v4
 
 Both moved out of the vendor dict and into standard MNX shape — see
-[roadmap/proposed/spec-score-text.md](../roadmap/proposed/spec-score-text.md) for the design
+[roadmap/proposed/low-priority/spec-score-text.md](../roadmap/proposed/low-priority/spec-score-text.md) for the design
 and [spec/HISTORY.md](../spec/HISTORY.md) for the version history. The
 argument for keeping them *separate* still holds and now lives in the proposal:
 a rehearsal mark is an arbitrary index into the score, a section name states what
@@ -347,7 +347,7 @@ Cloudflare Workers cannot run `ajv.compile()`.
   their own `<staff-tuning>`. Schema shape unchanged — only the meaning of
   absence.
 - **v5** (2026-08-07): the tab sub-namespace flattened to the adopted shape it
-  drafts ([roadmap/proposed/spec-instrument-position.md](../roadmap/proposed/spec-instrument-position.md)):
+  drafts ([roadmap/proposed/low-priority/spec-instrument-position.md](../roadmap/proposed/low-priority/spec-instrument-position.md)):
   `tab.position.{string,fret}` → flat `string`/`fret` (fret now **optional and
   non-authoritative** — validation only), `tab.fingering` → `fingering`,
   `tab.tuning` → `strings`, `tab.capo` → `capo`. Only `technique` (pending a
@@ -357,7 +357,7 @@ Cloudflare Workers cannot run `ajv.compile()`.
   [roadmap/complete/core-derived-positions.md](../roadmap/complete/core-derived-positions.md).
 - **v4** (2026-07-29): `rehearsal` and `section` graduated out of `_x` into the
   standard MNX objects proposed in
-  [roadmap/proposed/spec-score-text.md](../roadmap/proposed/spec-score-text.md); the vendor
+  [roadmap/proposed/low-priority/spec-score-text.md](../roadmap/proposed/low-priority/spec-score-text.md); the vendor
   dict on a global measure now holds `harmonies` only. Load-time migration is the
   v3 → v4 hop in `upgradeTabExtension.ts`.
 - **v3** (2026-07-26): namespace `_x.tab` / `_x.section` → the single vendor key

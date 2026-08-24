@@ -1,6 +1,6 @@
 {
   "title": "Directions",
-  "description": "A direction is a textual instruction attached to a point in the music, for anything that has no more specific representation. Directions belong to a part rather than to the score, and several may occur in the same measure. A direction carries no typography. How it is set is the renderer's decision, as it is for every other object in MNX. Proposed MNX objects, not yet adopted — see roadmap/proposed/spec-score-text.md.",
+  "description": "A direction is a textual instruction attached to a point in the music, for anything that has no more specific representation. Directions belong to a part rather than to the score, and several may occur in the same measure. A direction carries no typography. How it is set is the renderer's decision, as it is for every other object in MNX. Proposed MNX objects, not yet adopted — see roadmap/proposed/low-priority/spec-score-text.md.",
   "bars": 2,
   "tags": [
     "directions",

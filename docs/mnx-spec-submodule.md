@@ -102,7 +102,7 @@ and [doctools/README.md](https://github.com/w3c-cg/mnx/blob/main/doctools/README
   `main`.)
 - **This is a W3C CG report repo** (`w3c.json`, group 81249). Contributions need CG
   membership and a signed CLA — see
-  [roadmap/proposed/spec-mnx-cg-proposals.md](../roadmap/proposed/spec-mnx-cg-proposals.md) §6.
+  [roadmap/proposed/low-priority/spec-mnx-cg-proposals.md](../roadmap/proposed/low-priority/spec-mnx-cg-proposals.md) §6.
 - **You cannot hand-edit the spec.** Changes are made through the Django admin and
   serialized with `freezedb`; the PR carries `doctools/data.json` (plus, for a new
   example, its `.json` and `.png` — `freezedb` doesn't produce those). Don't regenerate
