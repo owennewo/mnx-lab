@@ -163,7 +163,7 @@ describe('keymap docs — the guard mirrors', () => {
       'voiceMeasure',
       'partMeasure',
       'measure',
-      'score'
+      'document'
     ]);
 
     // A session per rung: the voice step STOPS at the outermost voice, so a
@@ -180,7 +180,7 @@ describe('keymap docs — the guard mirrors', () => {
     expect(handles('voiceMeasure')).toBe(true);
     expect(handles('partMeasure')).toBe(true);
     expect(handles('measure')).toBe(false); // the mount's
-    expect(handles('score')).toBe(false); // the mount's
+    expect(handles('document')).toBe(false); // the mount's
   });
 
   it('toggleNote: documented notation-only, and the tab projection refuses', () => {
@@ -208,7 +208,7 @@ describe('keymap docs — the guard mirrors', () => {
     expect(cut.meaning.score).toBeUndefined();
 
     const session = new EditorSession(makeDoc());
-    while (session.selectionLevel !== 'score') session.handleIntent({ type: 'relaxSelection' });
+    while (session.selectionLevel !== 'document') session.handleIntent({ type: 'relaxSelection' });
     expect(planSelectionCut(session.doc, session.selection, session.projection))
       .toMatchObject({ ok: false, code: 'score-unavailable' });
   });
@@ -219,7 +219,7 @@ describe('keymap docs — the guard mirrors', () => {
     expect(doc.meaning.all).toBeUndefined();
 
     const session = new EditorSession(makeDoc());
-    while (session.selectionLevel !== 'score') {
+    while (session.selectionLevel !== 'document') {
       session.handleIntent({ type: 'relaxSelection' });
     }
     const before = session.cursor;
@@ -252,7 +252,7 @@ describe('the cheatsheet render', () => {
   });
 
   it('groups arrive in display order with no empty groups', () => {
-    const groups = cheatsheet('score', { tabPane: false, projection: 'notation' });
+    const groups = cheatsheet('document', { tabPane: false, projection: 'notation' });
     expect(groups.every(g => g.rows.length > 0)).toBe(true);
     expect(groups.map(g => g.label)).toContain('Workbench');
   });

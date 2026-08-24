@@ -303,7 +303,7 @@ describe('selection cut', () => {
   });
 
   it('keeps score cut unavailable and does not overwrite the store', async () => {
-    const session = selectedSession('score');
+    const session = selectedSession('document');
     const store = new MemorySelectionClipboardStore();
     await store.write('keep me');
     expect(await cutSelectionToStore(session, store)).toMatchObject({

@@ -350,7 +350,7 @@ export interface DestructResult {
 
 /** Relax the selection ladder until `level` (or report failure) — every
  *  step through handleIntent, so the climb is recorded like keys. */
-function climbTo(session: EditorSession, level: 'measure' | 'score'): boolean {
+function climbTo(session: EditorSession, level: 'measure' | 'document'): boolean {
   for (let guard = 0; guard < 12 && session.selectionLevel !== level; guard++) {
     if (!session.handleIntent({ type: 'relaxSelection' })) break;
   }
@@ -392,7 +392,7 @@ export function runDestructWalk(session: EditorSession): DestructResult {
     if (measureCount > 0 && partCount > 0) {
       session.handleIntent({ type: 'goToMeasure', measureIndex: measureCount - 1 });
       if (!climbTo(session, 'measure')) break;
-    } else if (!climbTo(session, 'score')) break;
+    } else if (!climbTo(session, 'document')) break;
     const before = JSON.stringify(session.doc);
     if (!session.handleIntent({ type: 'delete' }) || JSON.stringify(session.doc) === before)
       break;

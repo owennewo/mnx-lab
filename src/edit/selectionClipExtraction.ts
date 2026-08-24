@@ -135,7 +135,7 @@ function measureIndices(members: SelectionMember[]): number[] {
         return [member.measureIndex];
       case 'section':
         return Array.from({ length: member.end - member.start }, (_, index) => member.start + index);
-      case 'score':
+      case 'document':
         return [];
     }
   });
@@ -455,8 +455,8 @@ function buildClip(
         sections
       };
     }
-    case 'score':
-      return { kind: 'score', score: cloneJson(doc) };
+    case 'document':
+      return { kind: 'document', document: cloneJson(doc) };
   }
 }
 
@@ -500,8 +500,8 @@ function clipEvents(envelope: SelectionClipEnvelope): MnxEvent[] {
         section.measures.forEach(column => column.parts.forEach(visitMeasure))
       );
       break;
-    case 'score':
-      clip.score.parts.forEach(visitPart);
+    case 'document':
+      clip.document.parts.forEach(visitPart);
       break;
   }
   return events;
@@ -532,8 +532,8 @@ function relationshipHolders(envelope: SelectionClipEnvelope): RelationshipHolde
         section.measures.forEach(column => column.parts.forEach(addMeasure))
       );
       break;
-    case 'score':
-      clip.score.parts.forEach(addPart);
+    case 'document':
+      clip.document.parts.forEach(addPart);
       break;
     default:
       break;
@@ -569,7 +569,7 @@ function closeReferences(envelope: SelectionClipEnvelope): DetachedSelectionRefe
   if (envelope.clip.kind === 'section') envelope.clip.sections.forEach(section =>
     section.measures.forEach(column => addGlobal(column.global))
   );
-  if (envelope.clip.kind === 'score') envelope.clip.score.global.measures.forEach(addGlobal);
+  if (envelope.clip.kind === 'document') envelope.clip.document.global.measures.forEach(addGlobal);
 
   for (const note of notes) {
     if (note.ties) {
@@ -648,7 +648,7 @@ function dependenciesFor(
   doc: MnxStructure,
   envelope: SelectionClipEnvelope
 ): SelectionClipDependencies | undefined {
-  if (envelope.clip.kind === 'score') return undefined;
+  if (envelope.clip.kind === 'document') return undefined;
   const events = clipEvents(envelope);
   const usedLines: string[] = [];
   for (const event of events) {
@@ -698,7 +698,7 @@ export function extractSelectionClip(
     },
     selection: { level: state.level, shape: selectionShape(state) },
     clip,
-    ...(state.level === 'measure' || state.level === 'section' || state.level === 'score'
+    ...(state.level === 'measure' || state.level === 'section' || state.level === 'document'
       ? {}
       : { context: contextFor(doc, indices) })
   };

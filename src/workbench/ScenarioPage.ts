@@ -370,7 +370,7 @@ const ENCLOSURE_BY_LEVEL: Record<SelectionLevel, EnclosureKind> = {
   partMeasure: 'panel',
   measure: 'panel-wide',
   section: 'panel-wide',
-  score: 'frame'
+  document: 'frame'
 };
 
 /** Which rungs claim the section labels they enclose (the ladder's "label
@@ -391,7 +391,7 @@ function presentationSpan(
   level: SelectionLevel,
   members: readonly SelectionMember[]
 ): SelectionSpan | null {
-  if (level === 'score') return null;
+  if (level === 'document') return null;
   const spans = measureSpans(doc);
   const coverage: SelectionSpan['coverage'] =
     level === 'note' || level === 'event' || level === 'container'
@@ -436,7 +436,7 @@ function presentationSpan(
           push(measureIndex);
         }
         break;
-      case 'score':
+      case 'document':
         break;
     }
   }
@@ -2218,7 +2218,7 @@ export class ScenarioPage extends LitElement {
     // document entirely — there is nothing for a trace to replay.
     if (
       (intent.type === 'lineUp' || intent.type === 'lineDown') &&
-      this.session.selectionLevel === 'score' &&
+      this.session.selectionLevel === 'document' &&
       !this.cursorHidden
     ) {
       this.escalateToRail(intent.type === 'lineDown' ? 1 : -1);
@@ -2536,7 +2536,7 @@ export class ScenarioPage extends LitElement {
     const view = sessionView(this.session);
     const q = this.traySearch.trim().toLowerCase();
     const scope: CommandScope =
-      displayKey === GLOBAL_TAB ? 'document' : LEVEL_BY_ROW[displayKey];
+      displayKey === GLOBAL_TAB ? 'session' : LEVEL_BY_ROW[displayKey];
     const commands = commandsForScope(scope, view).filter(
       command => !q || command.label.toLowerCase().includes(q)
     );
@@ -2560,7 +2560,7 @@ export class ScenarioPage extends LitElement {
     const displayRow = ladder.find(r => r.key === displayKey);
     const live = tiles.filter(t => t.state !== 'unavailable').length;
     const meta: TrayMeta = {
-      primary: displayKey === GLOBAL_TAB ? 'document' : (displayRow?.label ?? ''),
+      primary: displayKey === GLOBAL_TAB ? 'session' : (displayRow?.label ?? ''),
       secondary:
         displayKey === GLOBAL_TAB
           ? entry.meta.title
@@ -2597,7 +2597,7 @@ export class ScenarioPage extends LitElement {
           glyph: { arc: 'slur' } as const,
           shortcut: 'Ctrl+X',
           label: 'Cut current selection',
-          state: session.selectionLevel === 'score' ? 'unavailable' as const : 'available' as const
+          state: session.selectionLevel === 'document' ? 'unavailable' as const : 'available' as const
         }
       ] : []),
       {
@@ -3968,7 +3968,7 @@ export class ScenarioPage extends LitElement {
     const session = this.session;
     if (!session || this.cursorHidden) return null;
     const level = session.selectionLevel;
-    if (level === 'score' || level === 'section') return null;
+    if (level === 'document' || level === 'section') return null;
 
     const key = session.selectedNoteKeys[0];
     const at = key ? findNoteAddress(session.doc, key) : null;

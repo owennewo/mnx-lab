@@ -95,7 +95,7 @@ describe('command registry — the joins', () => {
   });
 
   it('every scope named is a real ladder rung, or `document`', () => {
-    const scopes = new Set<string>([...SELECTION_LADDER, 'document']);
+    const scopes = new Set<string>([...SELECTION_LADDER, 'session']);
     const strays = COMMANDS.flatMap(c => c.scopes.filter(r => !scopes.has(r)));
     expect(strays).toEqual([]);
   });
@@ -106,11 +106,11 @@ describe('command registry — the joins', () => {
     expect(orphans.map(c => c.id)).toEqual([]);
   });
 
-  it('the document scope offers commands, and never mixes with a rung', () => {
+  it('the session scope offers commands, and never mixes with a rung', () => {
     // `document` is the scope ABOVE the ladder (the tray's `global` tab), so a
     // command claiming both it and a rung would appear twice with two
     // different meanings of "here".
-    const global = COMMANDS.filter(c => c.scopes.includes('document'));
+    const global = COMMANDS.filter(c => c.scopes.includes('session'));
     expect(global.length).toBeGreaterThan(0);
     const mixed = global.filter(c => c.scopes.length > 1);
     expect(mixed.map(c => c.id)).toEqual([]);
@@ -243,7 +243,7 @@ describe('command registry — rung filtering', () => {
       if (!doc || doc.meaning.all !== undefined) continue;
       const documented = new Set(Object.keys(doc.meaning));
       // `document` has no rung, so no per-rung meaning can contradict it.
-      for (const rung of command.scopes.filter(s => s !== 'document')) {
+      for (const rung of command.scopes.filter(s => s !== 'session')) {
         if (!documented.has(rung)) contradictions.push(`${command.id} @ ${rung} (${doc.keys})`);
       }
     }

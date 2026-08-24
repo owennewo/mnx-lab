@@ -47,7 +47,7 @@ export type SelectionLevel =
   | 'partMeasure'
   | 'measure'
   | 'section'
-  | 'score';
+  | 'document';
 
 export const SELECTION_LADDER: readonly SelectionLevel[] = [
   'note',
@@ -57,10 +57,10 @@ export const SELECTION_LADDER: readonly SelectionLevel[] = [
   'partMeasure',
   'measure',
   'section',
-  'score'
+  'document'
 ];
 
-export type SelectionClosureScope = 'voice' | 'part' | 'timeline' | 'score';
+export type SelectionClosureScope = 'voice' | 'part' | 'timeline' | 'document';
 
 /** The durable selection state. Concrete ranges carry two cursor addresses;
  * closures carry their live model scope instead of freezing today's last
@@ -122,7 +122,7 @@ export type SelectionMember =
   | { kind: 'partMeasure'; partIndex: number; staffIndex: number; measureIndex: number }
   | { kind: 'measure'; measureIndex: number }
   | { kind: 'section'; start: number; end: number }
-  | { kind: 'score' };
+  | { kind: 'document' };
 
 export interface ResolvedSelection {
   /** Ordered in document/time order, regardless of drag direction. */
@@ -145,8 +145,8 @@ export function closureScopeForLevel(level: SelectionLevel): SelectionClosureSco
     case 'measure':
     case 'section':
       return 'timeline';
-    case 'score':
-      return 'score';
+    case 'document':
+      return 'document';
   }
 }
 
@@ -227,7 +227,7 @@ export function presentLevels(
   cursor: EditorCursor,
   projection: Projection
 ): Set<SelectionLevel> {
-  const present = new Set<SelectionLevel>(['partMeasure', 'measure', 'score']);
+  const present = new Set<SelectionLevel>(['partMeasure', 'measure', 'document']);
   const sequences = staffSequences(
     partMeasures(doc, cursor)[cursor.measureIndex]?.sequences,
     cursor.staffIndex ?? 1
@@ -441,8 +441,8 @@ function universeFor(
       return measureMembers(doc);
     case 'section':
       return sectionMembers(doc);
-    case 'score':
-      return [{ kind: 'score' }];
+    case 'document':
+      return [{ kind: 'document' }];
   }
 }
 
@@ -457,7 +457,7 @@ function memberMeasure(member: SelectionMember): number | null {
       return member.measureIndex;
     case 'section':
       return member.start;
-    case 'score':
+    case 'document':
       return null;
   }
 }
@@ -523,8 +523,8 @@ function exactMemberIndex(
       return members.findIndex(member =>
         member.kind === 'section' && cursor.measureIndex >= member.start && cursor.measureIndex < member.end
       );
-    case 'score':
-      return members.findIndex(member => member.kind === 'score');
+    case 'document':
+      return members.findIndex(member => member.kind === 'document');
   }
 }
 
@@ -652,7 +652,7 @@ function memberContainsInk(member: SelectionMember, address: InkAddress): boolea
       return member.measureIndex === address.measureIndex;
     case 'section':
       return address.measureIndex >= member.start && address.measureIndex < member.end;
-    case 'score':
+    case 'document':
       return true;
   }
 }

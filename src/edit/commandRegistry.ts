@@ -23,12 +23,14 @@ import { eventAtAddress, hasSlurStartingAt, techniqueAt } from './ops.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
 
 /**
- * Where a command applies: a rung of the selection ladder, or `document` —
- * the scope above `score`, which is what the design spec called it and what
- * the tray shows as its `global` tab
- * (roadmap/proposed/core-selection-tray-global-tab.md).
+ * Where a command applies: a rung of the selection ladder, or `session` —
+ * the scope ABOVE the top rung, shown as the tray's `global` tab
+ * (roadmap/proposed/core-selection-tray-global-tab.md). It was called
+ * `document` until core-document-rung.md gave that word to the top rung; the
+ * two must stay distinct, because `SelectionLevel | 'document'` would silently
+ * absorb the scope into the rung and leak undo/redo onto a selection.
  */
-export type CommandScope = SelectionLevel | 'document';
+export type CommandScope = SelectionLevel | 'session';
 
 /** How a command draws: a canonical SMuFL glyph name, or one of the two marks
  *  that have no single glyph and are drawn as arcs by the tray. */
@@ -200,7 +202,7 @@ export function selectionMemberSummary(view: SessionView): string {
     partMeasure: ['part bar', 'part bars'],
     measure: ['bar', 'bars'],
     section: ['section', 'sections'],
-    score: ['score', 'scores']
+    document: ['session', 'scores']
   };
   const [one, many] = noun[view.level];
   return `${view.memberCount} ${view.memberCount === 1 ? one : many}`;
@@ -785,10 +787,10 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ intent: { type: 'delete' } })
   },
 
-  // ── score ───────────────────────────────────────────────────────────────
+  // ── document ───────────────────────────────────────────────────────────────
   {
     id: 'add-part',
-    scopes: ['score'],
+    scopes: ['document'],
     glyph: { smufl: 'brace' },
     label: 'Add a part…',
     shortcut: 'Shift+P',
@@ -797,7 +799,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'staff-kind',
-    scopes: ['score'],
+    scopes: ['document'],
     glyph: { smufl: '6stringTabClef' },
     label: 'Staff kind: notation + tab',
     shortcut: 'Shift+P',
@@ -806,7 +808,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'add-bar',
-    scopes: ['score', 'measure'],
+    scopes: ['document', 'measure'],
     glyph: { smufl: 'barlineSingle' },
     label: 'Append a bar',
     shortcut: 'Shift+M',
@@ -815,7 +817,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'part-name',
-    scopes: ['score'],
+    scopes: ['document'],
     glyph: { smufl: 'textBlackNoteShortStem' },
     label: 'Part name…',
     shortcut: 'Shift+P',
@@ -824,7 +826,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'staves',
-    scopes: ['score'],
+    scopes: ['document'],
     glyph: { smufl: 'brace' },
     label: 'Staves per part…',
     shortcut: 'Shift+P',
@@ -833,7 +835,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'system-break',
-    scopes: ['score'],
+    scopes: ['document'],
     glyph: { smufl: 'systemDivider' },
     label: 'System break',
     tier: 'popover',
@@ -841,17 +843,17 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'multimeasure-rest',
-    scopes: ['score'],
+    scopes: ['document'],
     glyph: { smufl: 'restHBar' },
     label: 'Multimeasure rest',
     tier: 'popover',
     blockedBy: 'layout-authoring'
   },
 
-  // ── document — the scope above `score`, shown as the tray's `global` tab
+  // ── session — the scope above the top rung, shown as the tray's `global` tab
   // (core-selection-tray-global-tab.md). These apply to the session rather
   // than to anything selected, which is exactly why they sit past the top of
-  // the ladder rather than on `score`.
+  // the ladder rather than on `document`.
   //
   // Undo and redo stay AVAILABLE with an empty history on purpose: the tile
   // states say whether a verb exists, not whether it would do something this
@@ -859,7 +861,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   // same way.
   {
     id: 'undo',
-    scopes: ['document'],
+    scopes: ['session'],
     glyph: { smufl: 'arrowBlackLeft' },
     label: 'Undo',
     shortcut: 'Ctrl+Z/Y',
@@ -868,7 +870,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'redo',
-    scopes: ['document'],
+    scopes: ['session'],
     glyph: { smufl: 'arrowBlackRight' },
     label: 'Redo',
     shortcut: 'Ctrl+Z/Y',
@@ -877,7 +879,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'doc-add-bar',
-    scopes: ['document'],
+    scopes: ['session'],
     glyph: { smufl: 'barlineSingle' },
     label: 'Append a bar',
     shortcut: 'Shift+M',
@@ -886,7 +888,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'doc-add-part',
-    scopes: ['document'],
+    scopes: ['session'],
     glyph: { smufl: 'brace' },
     label: 'Add a part…',
     shortcut: 'Shift+P',
@@ -895,7 +897,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'doc-time',
-    scopes: ['document'],
+    scopes: ['session'],
     glyph: { smufl: 'timeSig4' },
     label: 'Time signature…',
     shortcut: 'Shift+T',
@@ -904,7 +906,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'doc-tuning',
-    scopes: ['document'],
+    scopes: ['session'],
     glyph: { smufl: '6stringTabClef' },
     label: 'Tuning…',
     shortcut: 'Shift+U',
@@ -913,7 +915,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'staff-kind-both',
-    scopes: ['document'],
+    scopes: ['session'],
     glyph: { smufl: 'brace' },
     label: 'Staff kind — notation + tab',
     tier: 'popover',
@@ -921,7 +923,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'staff-kind-tab',
-    scopes: ['document'],
+    scopes: ['session'],
     glyph: { smufl: '6stringTabClef' },
     label: 'Staff kind — tab only',
     tier: 'popover',
@@ -929,7 +931,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'staff-kind-notation',
-    scopes: ['document'],
+    scopes: ['session'],
     glyph: { smufl: 'gClef' },
     label: 'Staff kind — notation only',
     tier: 'popover',

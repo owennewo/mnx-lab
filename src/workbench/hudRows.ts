@@ -4,7 +4,7 @@
 // component (ScoreHud.ts) renders row data and knows nothing of the editor;
 // THIS module speaks `edit/` freely — levels, the presence rule, the anchor
 // voice — and flattens them into display rows. Rows are the ADDRESS chain
-// (score → section → bar → part → voice → container → event → note); the highlight is
+// (document → section → bar → part → voice → container → event → note); the highlight is
 // the RUNG. Part is deliberately not a rung (the ladder is the vertical
 // axis; part is the horizontal closure of part-measure), so the part row
 // maps to `partMeasure`, the voice row to `voiceMeasure`.
@@ -27,7 +27,7 @@ import type { HudPart, HudRow } from './ScoreHud.ts';
 
 /** Row key ↔ selection level. The component never sees the right-hand side. */
 export const LEVEL_BY_ROW: Record<string, SelectionLevel> = {
-  score: 'score',
+  document: 'document',
   section: 'section',
   bar: 'measure',
   part: 'partMeasure',
@@ -107,8 +107,8 @@ export function buildHudRows(
   );
   const partCount = doc.parts.length;
   row(
-    'score',
-    'score',
+    'document',
+    'document',
     `${title} · ${measureCount} bar${measureCount === 1 ? '' : 's'} · ${partCount} part${partCount === 1 ? '' : 's'}`
   );
 

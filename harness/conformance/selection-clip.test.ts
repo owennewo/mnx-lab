@@ -64,7 +64,7 @@ const everyKind: SelectionClip[] = [
     parts: [{ id: 'part-1' }],
     sections: [{ measures: [{ global: { section: { label: 'A' } }, parts: [{ sequences: [] }] }] }]
   },
-  { kind: 'score', score }
+  { kind: 'document', document: score }
 ];
 
 describe('selection clip codec', () => {
@@ -107,7 +107,7 @@ describe('selection clip codec', () => {
   it.each([
     ['invalid JSON', '{'],
     ['unknown format', JSON.stringify({ ...envelope(everyKind[0]), format: 'other' })],
-    ['unknown version', JSON.stringify({ ...envelope(everyKind[0]), version: 2 })],
+    ['unknown version', JSON.stringify({ ...envelope(everyKind[0]), version: 3 })],
     [
       'unknown envelope property',
       JSON.stringify({ ...envelope(everyKind[0]), browserClipboard: true })

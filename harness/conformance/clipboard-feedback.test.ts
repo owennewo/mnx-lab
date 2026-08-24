@@ -122,7 +122,7 @@ describe('clipboard notices', () => {
     };
     expect(cutSelectionNotice(await cutSelectionToStore(session, rejecting))).toEqual({
       ok: false,
-      message: 'cut failed — store unavailable The score is unchanged.'
+      message: 'cut failed — store unavailable The document is unchanged.'
     });
   });
 

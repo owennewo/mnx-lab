@@ -178,7 +178,7 @@ describe('selection ladder', () => {
       ['voiceMeasure', ['n1', 'n2', 'n3']],
       ['partMeasure', ['n1', 'n2', 'n3', 'n4']],
       ['measure', ['n1', 'n2', 'n3', 'n4']],
-      ['score', ['n1', 'n2', 'n3', 'n4']]
+      ['document', ['n1', 'n2', 'n3', 'n4']]
     ];
     for (const [level, keys] of walk) {
       expect(session.handleIntent(relax)).toBe(true);
@@ -188,7 +188,7 @@ describe('selection ladder', () => {
 
     // Past the top the session refuses — the mount turns that into deselect.
     expect(session.handleIntent(relax)).toBe(false);
-    expect(session.selectionLevel).toBe('score');
+    expect(session.selectionLevel).toBe('document');
   });
 
   it('tightens back down the same chain — the cursor is the breadcrumb', () => {
@@ -224,14 +224,14 @@ describe('selection ladder', () => {
   it('offers the section rung only when section labels exist, spanning to the next label', () => {
     const plain = new EditorSession(makeDoc(false));
     for (let i = 0; i < 5; i++) plain.handleIntent(relax);
-    expect(plain.selectionLevel).toBe('score'); // no sections → rung absent
+    expect(plain.selectionLevel).toBe('document'); // no sections → rung absent
 
     const session = new EditorSession(makeDoc(true));
     for (let i = 0; i < 5; i++) session.handleIntent(relax);
     expect(session.selectionLevel).toBe('section'); // Intro: m0..m1
     expect(session.selectedNoteKeys.sort()).toEqual(['n1', 'n2', 'n3', 'n4']);
     expect(session.handleIntent(relax)).toBe(true);
-    expect(session.selectionLevel).toBe('score');
+    expect(session.selectionLevel).toBe('document');
   });
 
   it('adds the owning container between its child event and voice bar', () => {
@@ -380,7 +380,7 @@ describe('selection ladder', () => {
     expect(session.selectionLevel).toBe('section');
     expect(session.selectedNoteKeys.sort()).toEqual(['lead', 'left', 'right']);
     session.handleIntent(relax);
-    expect(session.selectionLevel).toBe('score');
+    expect(session.selectionLevel).toBe('document');
     expect(session.selectedNoteKeys.sort()).toEqual(['lead', 'left', 'right']);
   });
 
@@ -415,7 +415,7 @@ describe('selection ladder', () => {
     doc.parts[1].measures![0].sequences = [];
     const session = new EditorSession(doc);
     expect(session.handleIntent({ type: 'setPart', partIndex: 1 })).toBe(true);
-    while (session.selectionLevel !== 'score') session.handleIntent(relax);
+    while (session.selectionLevel !== 'document') session.handleIntent(relax);
     expect(session.handleIntent({ type: 'delete' })).toBe(true);
     expect(session.doc.parts.map(part => part.id)).toEqual(['lead']);
     expect(session.cursor.partIndex).toBeUndefined();
@@ -665,8 +665,8 @@ describe('selection ladder', () => {
     expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'part' });
     session.handleIntent(relax); // measure: global timeline
     expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'timeline' });
-    while (session.selectionLevel !== 'score') session.handleIntent(relax);
-    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'score' });
+    while (session.selectionLevel !== 'document') session.handleIntent(relax);
+    expect(session.selection.extent).toEqual({ kind: 'closure', scope: 'document' });
     expect(session.handleIntent({ type: 'closeSelection' })).toBe(false); // idempotent limit
   });
 

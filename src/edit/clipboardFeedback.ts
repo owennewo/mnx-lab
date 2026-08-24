@@ -47,8 +47,8 @@ export function describeSelectionClip(clip: SelectionClip): string {
       const bars = clip.sections.reduce((sum, section) => sum + section.measures.length, 0);
       return `${count(clip.sections.length, 'section')} · ${count(bars, 'bar')}`;
     }
-    case 'score':
-      return `the whole score · ${count(clip.score.parts.length, 'part')}, ${count(clip.score.global.measures.length, 'bar')}`;
+    case 'document':
+      return `the whole document · ${count(clip.document.parts.length, 'part')}, ${count(clip.document.global.measures.length, 'bar')}`;
   }
 }
 
@@ -70,9 +70,9 @@ export function copySelectionNotice(result: CopySelectionResult): ClipboardNotic
 export function cutSelectionNotice(result: CutSelectionResult): ClipboardNotice {
   if (!result.ok) {
     // The write-first contract's one distinct failure: the clip never made it
-    // into the store, and the score is untouched — say both.
+    // into the store, and the document is untouched — say both.
     if (result.code === 'clipboard-write-failed' || result.code === 'stale-session') {
-      return { ok: false, message: `cut failed — ${result.message} The score is unchanged.` };
+      return { ok: false, message: `cut failed — ${result.message} The document is unchanged.` };
     }
     return { ok: false, message: `cut refused — ${result.message}` };
   }
@@ -82,7 +82,7 @@ export function cutSelectionNotice(result: CutSelectionResult): ClipboardNotice 
     message:
       `cut ${clip.kind} — ${describeSelectionClip(clip)}` +
       detachedClause(result.copied.detached.length, 'detached at the boundary') +
-      detachedClause(result.plan.detachedTargetReferences, 'repaired in the score')
+      detachedClause(result.plan.detachedTargetReferences, 'repaired in the document')
   };
 }
 
@@ -121,6 +121,6 @@ export function pasteSelectionNotice(result: PasteSelectionResult): ClipboardNot
     message:
       `pasted ${clipKind} at ${at}` +
       clauses.map(clause => ` · ${clause}`).join('') +
-      detachedClause(detachedTargetReferences, 'repaired in the score')
+      detachedClause(detachedTargetReferences, 'repaired in the document')
   };
 }

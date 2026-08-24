@@ -72,7 +72,7 @@ export const KEY_DOCS: KeyDoc[] = [
       partMeasure: 'walk bars',
       measure: 'walk bars',
       section: 'jump between section starts'
-      // score: the whole score is selected — nowhere to go.
+      // document: the whole document is selected — nowhere to go.
     }
   },
   {
@@ -97,7 +97,7 @@ export const KEY_DOCS: KeyDoc[] = [
       voiceMeasure: 'the voice above/below in this bar',
       partMeasure: 'the staff above/below (this part’s staves, then the next part)',
       measure: 'the nearest bar in the system above/below',
-      score: 'the previous/next score in the collection'
+      document: 'the previous/next document in the collection'
     }
   },
   {
@@ -142,7 +142,7 @@ export const KEY_DOCS: KeyDoc[] = [
     keys: 'Esc',
     strokes: [{ code: 'Escape' }],
     group: 'selection',
-    meaning: { all: 'widen the selection one rung (past score: deselect)' }
+    meaning: { all: 'widen the selection one rung (past document: deselect)' }
   },
   {
     keys: 'Enter',
@@ -211,7 +211,7 @@ export const KEY_DOCS: KeyDoc[] = [
       partMeasure: 'select this whole part (all staves and bars)',
       measure: 'select the global timeline',
       section: 'select the labelled timeline',
-      score: 'the whole score is already selected'
+      document: 'the whole document is already selected'
     }
   },
 
@@ -246,7 +246,7 @@ export const KEY_DOCS: KeyDoc[] = [
       partMeasure: 'delete this staff’s bar copy — only when it holds no notes',
       measure: 'delete this bar — only when it holds no notes',
       section: 'delete this section boundary (the bars remain)',
-      score: 'delete the part (then trailing bars) — only when no notes remain'
+      document: 'delete the part (then trailing bars) — only when no notes remain'
     }
   },
   {
@@ -313,7 +313,7 @@ export const KEY_DOCS: KeyDoc[] = [
   // ── The clipboard (core-selection-clipboard.md, stage 6). The rung types
   // the clip — copy is one meaning because the ladder already scales the
   // unit; cut spells its removal table because "remove exactly the selected
-  // unit" differs per rung, and its missing score row mirrors the planner's
+  // unit" differs per rung, and its missing document row mirrors the planner's
   // refusal (document deletion belongs to the library, not the edit session).
   {
     keys: 'Ctrl/⌘+C',
@@ -339,7 +339,7 @@ export const KEY_DOCS: KeyDoc[] = [
       partMeasure: 'cut this staff’s bars; the part closure cuts the whole part',
       measure: 'cut the global bars — the timeline closes',
       section: 'cut the named bars — the timeline closes'
-      // score: refused — deleting a document belongs to its library.
+      // document: refused — deleting a document belongs to its library.
     }
   },
   {
@@ -525,7 +525,7 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'addPart',
     'setPartDeclaration',
     'removePartDeclaration',
-    // The document's presentation layer shares the score rung's surface: the
+    // The document's presentation layer shares the document rung's surface: the
     // user supplies the index, as `no line 2` does for lyric verses.
     'removeLayout',
     'removeScore',

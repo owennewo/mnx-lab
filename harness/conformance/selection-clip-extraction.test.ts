@@ -31,8 +31,8 @@ function closure(level: SelectionLevel, at: EditorCursor): SelectionState {
     ? 'part'
     : level === 'measure' || level === 'section'
       ? 'timeline'
-      : level === 'score'
-        ? 'score'
+      : level === 'document'
+        ? 'document'
         : 'voice';
   return { level, anchor: at, extent: { kind: 'closure', scope } };
 }
@@ -163,7 +163,7 @@ describe('selection clip extraction', () => {
       [closure('partMeasure', cursor(0)), 'part'],
       [point('measure', cursor(0)), 'measures'],
       [point('section', cursor(0)), 'section'],
-      [point('score', cursor(0)), 'score']
+      [point('document', cursor(0)), 'document']
     ];
     for (const [state, kind] of cases) {
       const result = success(doc, state);

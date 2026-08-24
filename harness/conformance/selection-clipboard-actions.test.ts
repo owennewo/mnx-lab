@@ -158,13 +158,13 @@ describe('app-scoped selection clipboard actions', () => {
 
     const scoreSource = new EditorSession(score('whole', true));
     const scoreTarget = new EditorSession(emptyScore());
-    relaxTo(scoreSource, 'score');
-    relaxTo(scoreTarget, 'score');
+    relaxTo(scoreSource, 'document');
+    relaxTo(scoreTarget, 'document');
     await copySelectionToStore(scoreSource, store);
     expect((await pasteSelectionFromStore(scoreTarget, store)).ok).toBe(true);
     expect(scoreTarget.selection).toMatchObject({
-      level: 'score',
-      extent: { kind: 'closure', scope: 'score' }
+      level: 'document',
+      extent: { kind: 'closure', scope: 'document' }
     });
     expect(scoreTarget.resolvedSelection.members).toHaveLength(1);
   });

@@ -59,7 +59,7 @@ function clipKindFor(state: SelectionState): CutPlan['clipKind'] {
     case 'partMeasure': return state.extent.kind === 'closure' ? 'part' : 'staff-bars';
     case 'measure': return 'measures';
     case 'section': return 'section';
-    case 'score': return 'score';
+    case 'document': return 'document';
   }
 }
 
@@ -108,7 +108,7 @@ export function planSelectionCut(
   state: SelectionState,
   projection: Projection
 ): CutPlanResult {
-  if (state.level === 'score') {
+  if (state.level === 'document') {
     return refuse(
       'score-unavailable',
       'A complete score cannot be cut; document deletion belongs to its library.'

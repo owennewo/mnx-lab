@@ -429,7 +429,7 @@ export class EditorSession {
           this.apply({ type: 'removeMeasure', measureIndex });
           return true;
         }
-        if (this.selectionState.level === 'score') {
+        if (this.selectionState.level === 'document') {
           const partIndex = this.cursorState.partIndex ?? 0;
           const part = this.doc.parts?.[partIndex];
           if (part && !partHasInk(part)) {
@@ -1184,7 +1184,7 @@ export class EditorSession {
       case 'closeSelection': {
         // The score rung already denotes the whole score; closing it again is
         // semantically and structurally idempotent.
-        if (this.selectionState.level === 'score') return false;
+        if (this.selectionState.level === 'document') return false;
         // The floor axis (core-selection-floor-axis.md): a closure asks for
         // every member of a timeline — a temporal extent — and below the
         // event rung there is none, so Ctrl+A on a notehead closes at the
@@ -1609,7 +1609,7 @@ export class EditorSession {
         return moveMeasure(this.grid, before, delta);
       case 'section':
         return this.sectionStep(before, delta);
-      case 'score':
+      case 'document':
         return before;
     }
   }
@@ -1653,7 +1653,7 @@ export class EditorSession {
         return moveMeasure(this.grid, before, delta);
       case 'section':
         return this.sectionStep(before, delta);
-      case 'score':
+      case 'document':
         return before; // the whole score is selected — nowhere to go
     }
   }
@@ -2069,7 +2069,7 @@ function cutLandingSelection(
     resolveSelection(doc, candidate, projection).members.length > 0
   ) return candidate;
   const ancestor = relaxLevel(present, candidate.level);
-  return pointSelection(ancestor ?? 'score', cursor);
+  return pointSelection(ancestor ?? 'document', cursor);
 }
 
 function pasteLandingCursor(

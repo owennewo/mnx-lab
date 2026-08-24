@@ -30,8 +30,8 @@ function closure(level: SelectionLevel, at = cursor(0)): SelectionState {
     ? 'part'
     : level === 'measure' || level === 'section'
       ? 'timeline'
-      : level === 'score'
-        ? 'score'
+      : level === 'document'
+        ? 'document'
         : 'voice';
   return { level, anchor: at, extent: { kind: 'closure', scope } };
 }
@@ -135,7 +135,7 @@ describe('pure selection paste planner', () => {
       [serialized(source, closure('partMeasure')), score('target'), point('partMeasure')],
       [serialized(source, point('measure')), score('target'), point('measure')],
       [serialized(source, point('section')), score('target'), point('section')],
-      [serialized(source, point('score')), emptyScore(), point('score')]
+      [serialized(source, point('document')), emptyScore(), point('document')]
     ];
     for (const [clip, target, selection] of cases) accepted(clip, target, selection);
 
@@ -301,7 +301,7 @@ describe('pure selection paste planner', () => {
       layout: 'source-layout',
       pages: [{ systems: [{ measure: 'source-m1' }] }]
     }];
-    const result = accepted(serialized(source, point('score')), emptyScore(), point('score'));
+    const result = accepted(serialized(source, point('document')), emptyScore(), point('document'));
     expect(result.document.parts[0].id).not.toBe('source-part');
     expect(result.document.layouts?.[0].id).not.toBe('source-layout');
     expect(result.document.layouts?.[0].content[0].sources?.[0].part)
@@ -311,7 +311,7 @@ describe('pure selection paste planner', () => {
 
     // A populated destination is no gate: the footprint of a score is
     // everything, undo restores everything.
-    const replaced = accepted(serialized(source, point('score')), score('target'), point('score'));
+    const replaced = accepted(serialized(source, point('document')), score('target'), point('document'));
     expect(replaced.accommodations.replacedDocument).toBe(true);
     expect(replaced.document.parts).toHaveLength(1);
     expect(replaced.document.parts[0].id).not.toBe('target-part');

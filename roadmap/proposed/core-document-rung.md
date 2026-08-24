@@ -92,7 +92,50 @@ returns **zero** — no committed trace names the rung, so **no golden and no tr
 fixture moves**. That is the whole reason this is cheap, and it stops being true
 once layout-authoring records traces that stand on the rung.
 
-## The question this item must answer first
+## Built 2026-08-24 — and what the proposal did not foresee
+
+**The question is answered: `document` genuinely is the top.** The rung resolves
+to `[{ kind: 'document' }]` — a **singleton member with no coordinates**, whose
+`memberMeasure` is `null` ([selection.ts:444](../../src/edit/selection.ts#L444)).
+It enumerates no parts, so a presentation has nothing to bound: view-filtering it
+would mean making it enumerate parts, i.e. replacing it with a different kind of
+selection. A part-set rung remains possible later, but it would be a **new
+concept beneath the top**, not a narrowing of it.
+
+**The collision this doc missed.** `CommandScope` was already
+`SelectionLevel | 'document'` — `'document'` naming the scope **above** the top
+rung (undo/redo, the tray's `global` tab). Renaming the rung makes that union
+**silently absorb** the scope: `SelectionLevel | 'document'` becomes
+`SelectionLevel`, undo/redo leak onto a selection, and rung commands leak into
+the global tab — **and `tsc` stays quiet throughout**, because a union absorbing
+a member is not an error. It was caught by a conformance test, not the compiler.
+The above-ladder scope is now **`session`**, which is the word its own comment
+already used ("these apply to the session rather than to anything selected") and
+which collides with neither the rung nor MNX's `global`.
+
+*The general lesson, for the next rename:* a value rename is only compiler-checked
+where the type can still distinguish the two. Union members, `Record<string, _>`
+keys and serialized strings are all outside that fence — `LEVEL_BY_ROW` and the
+clip envelope both broke the same silent way.
+
+**The clipboard format moved to v2.** The envelope carries the rung name twice —
+`selection.level` and the clip's own `kind` — plus a payload field renamed
+`score` → `document`, so a v1 string cannot be read as a v2 one. No upgrader is
+written: a clip is a transient copy rather than a stored document, so a stale one
+is refused with a version message instead of guessed at.
+
+**One correction to the exclusion list below**: `keymapDocs.ts:100`'s *value*
+moved after all, to "the previous/next **document** in the collection". A corpus
+scenario is an MNX document, so the sentence is more accurate in the new
+vocabulary, not less.
+
+**Evidence**: 946 tests pass, `check:scenarios` OK, `npm run build` clean, and
+`update:primitives` leaves `git diff -- scenarios/` **empty** — no golden moved,
+as predicted. Every surviving `'score'` literal in `src/` and `harness/` is the
+MNX `scores[]` sense: `elementWalk`'s `ElementKind`, `destructWalk`'s dispatch on
+it, and `setupGrammar`'s `no score 1`.
+
+## The question this item answered first
 
 **With a presentation picked, what does Escape-to-top select?** Every part in the
 document, or only the parts visible in the active view? Selecting music you cannot
@@ -101,8 +144,8 @@ different things in different views, which is worse. The likely answer is that
 `document` genuinely is the top and the view is a *drawing* filter that selection
 ignores — but that is an assertion to test against the `spec/multimeasure-rests`
 three-score case, not to assume. **It decides whether the rung is named `document`
-or whether a bounded rung belongs beneath it**, so it is answered before the
-rename, not after.
+or whether a bounded rung belongs beneath it**, so it was answered before the
+rename, not after — see the verdict above.
 
 ## Not in scope
 

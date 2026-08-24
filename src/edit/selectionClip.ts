@@ -22,7 +22,7 @@ import type {
 import type { SelectionLevel } from './selection.ts';
 
 export const SELECTION_CLIP_FORMAT = 'mnx-lab-selection-clip' as const;
-export const SELECTION_CLIP_VERSION = 1 as const;
+export const SELECTION_CLIP_VERSION = 2 as const;
 export const MNX_LAB_EXTENSION_VERSION = 5 as const;
 
 export type SelectionClipShape = 'point' | 'range' | 'closure';
@@ -154,9 +154,9 @@ export interface SectionClip {
   sections: SectionClipEntry[];
 }
 
-export interface ScoreClip {
-  kind: 'score';
-  score: MnxStructure;
+export interface DocumentClip {
+  kind: 'document';
+  document: MnxStructure;
 }
 
 /** Relations live beside sequence content in MNX, so narrow clips need an
@@ -180,7 +180,7 @@ export type SelectionClip =
   | PartClip
   | MeasuresClip
   | SectionClip
-  | ScoreClip;
+  | DocumentClip;
 
 export interface SelectionClipEnvelope {
   format: typeof SELECTION_CLIP_FORMAT;
@@ -210,7 +210,7 @@ const LEVELS: ReadonlySet<string> = new Set([
   'partMeasure',
   'measure',
   'section',
-  'score'
+  'document'
 ]);
 
 const SHAPES: ReadonlySet<string> = new Set(['point', 'range', 'closure']);
@@ -497,9 +497,9 @@ function validateClip(value: unknown): void {
         validateMeasureColumns(section.measures, `${path}.measures`);
       });
       return;
-    case 'score':
-      exactKeys(clip, '$.clip', ['kind', 'score']);
-      objectAt(clip.score, '$.clip.score');
+    case 'document':
+      exactKeys(clip, '$.clip', ['kind', 'document']);
+      objectAt(clip.document, '$.clip.document');
       return;
     default:
       fail('$.clip.kind', 'unknown clip kind');
@@ -536,8 +536,12 @@ export function encodeSelectionClip(envelope: SelectionClipEnvelope): string {
   return JSON.stringify(envelope);
 }
 
-/** The version switch is the upgrade seam. Version 1 has no predecessor; an
- * unknown future version is refused instead of guessed. */
+/** The version switch is the upgrade seam. Version 2 renamed the top rung
+ * `score` → `document` (core-document-rung.md), which the envelope carries
+ * twice — `selection.level` and the clip's own `kind` — so a v1 string cannot
+ * be read as a v2 one. No upgrader is written: a clip is a transient copy, not
+ * a stored document, so a stale one is refused with a version message rather
+ * than guessed at. An unknown future version is refused for the same reason. */
 export function decodeSelectionClip(serialized: string): SelectionClipEnvelope {
   let parsed: unknown;
   try {

@@ -385,7 +385,7 @@ describe('the per-level navigation map', () => {
   it('measure and score ↑↓ are the MOUNT’s — the session refuses both', () => {
     // "The neighbouring system" is a fact about the paint and "the next
     // document" one about the host; neither is visible from a DOM-free layer.
-    for (const level of ['measure', 'score'] as SelectionLevel[]) {
+    for (const level of ['measure', 'document'] as SelectionLevel[]) {
       const session = at(level);
       expect(session.handleIntent({ type: 'lineDown' })).toBe(false);
       expect(session.handleIntent({ type: 'lineUp' })).toBe(false);
@@ -415,7 +415,7 @@ describe('the per-level navigation map', () => {
     }
     // Nothing wider has a horizontal unit to climb to.
     expect(at('section').handleIntent({ type: 'jumpNext' })).toBe(false);
-    expect(at('score').handleIntent({ type: 'jumpNext' })).toBe(false);
+    expect(at('document').handleIntent({ type: 'jumpNext' })).toBe(false);
   });
 
   it('Ctrl+↑↓ climbs voice → staff, and dies at the component boundary', () => {
@@ -427,7 +427,7 @@ describe('the per-level navigation map', () => {
 
     // part-measure's climb is the system jump — the mount's, like its bare row.
     expect(at('partMeasure').handleIntent({ type: 'jumpDown' })).toBe(false);
-    expect(at('score').handleIntent({ type: 'jumpDown' })).toBe(false);
+    expect(at('document').handleIntent({ type: 'jumpDown' })).toBe(false);
   });
 
   // The measure rung's ↑↓ and part-measure's Ctrl+↑↓ mean "the neighbouring

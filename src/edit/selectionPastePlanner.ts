@@ -125,7 +125,7 @@ export interface PasteLanding {
   onsetEnd: [number, number];
   /** Structural clips land as their natural live closure: a copied part is
    *  the new part, and a copied score is the whole score. */
-  closure?: 'part' | 'score';
+  closure?: 'part' | 'document';
 }
 
 export interface PastePlan {
@@ -254,8 +254,8 @@ function validateEnvelopePayload(envelope: SelectionClipEnvelope): PasteRefusal 
         section.measures.length === 0 || section.measures.some(column => column.parts.length !== clip.parts.length)
       )) return refuse('invalid-payload', 'The section clip has inconsistent measure columns.');
       break;
-    case 'score':
-      if (!clip.score.mnx || !clip.score.global || !Array.isArray(clip.score.parts))
+    case 'document':
+      if (!clip.document.mnx || !clip.document.global || !Array.isArray(clip.document.parts))
         return refuse('invalid-payload', 'The score clip is not an MNX structure.');
       break;
   }
@@ -760,7 +760,7 @@ export function planSelectionPaste(
   const voiceIndex = state.anchor.voiceIndex ?? 0;
   const accommodations = emptyAccommodations();
   let resultLanding: PasteLanding;
-  let merge = envelope.clip.kind === 'score'
+  let merge = envelope.clip.kind === 'document'
     ? undefined
     : mergedDependencies(destination, envelope.dependencies);
   const clip = cloneJson(envelope.clip);
@@ -1139,22 +1139,22 @@ export function planSelectionPaste(
       resultLanding = landing(state, level, start, start + columns.length - 1);
       break;
     }
-    case 'score': {
+    case 'document': {
       // D5: the footprint of a score is everything — paste replaces the
       // document, and undo restores it. No emptiness precondition.
-      rewriteWholeScore(clip.score, ids);
+      rewriteWholeScore(clip.document, ids);
       merge = undefined;
       accommodations.replacedDocument = true;
       resultLanding = {
-        level: 'score', partIndex: 0, staffIndex: 1, voiceIndex: 0,
-        measureStart: 0, measureEnd: Math.max(0, clip.score.global.measures.length - 1),
-        onsetStart: [0, 1], onsetEnd: [0, 1], closure: 'score'
+        level: 'document', partIndex: 0, staffIndex: 1, voiceIndex: 0,
+        measureStart: 0, measureEnd: Math.max(0, clip.document.global.measures.length - 1),
+        onsetStart: [0, 1], onsetEnd: [0, 1], closure: 'document'
       };
-      const detached = pruneDanglingSelectionReferences(clip.score);
+      const detached = pruneDanglingSelectionReferences(clip.document);
       return {
         ok: true,
         clipKind: clip.kind,
-        document: cloneJson(clip.score),
+        document: cloneJson(clip.document),
         idMap: cloneJson(ids.maps),
         landing: resultLanding,
         detachedTargetReferences: detached,
