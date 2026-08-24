@@ -16,6 +16,13 @@
 > **every tile in the tray is purple** — which is the honest picture and the point.
 > What remains is the ticking, and that is human work: see *Retirement*.
 >
+> **The note rung is grouped and ordered (2026-08-24)**, in `COMMAND_GROUPS` beside the
+> registry: five captioned bands — spelling, joins, articulation, fingerboard, text — with
+> the search line lifted **above** the tiles so the panel reads in palette order, the first
+> tile armed from the moment it opens, and ↓/↑ carrying the keys between the query and the
+> grid. The marks stay **unticked**: a design review settles what belongs with what, and
+> ticking is still the reviewer's to do at the tray.
+>
 > The filename does not change, because a dozen completed docs point at "the residue
 > ledger" as a thing that happened; the appendix keeps those links landing on something
 > true. Third of the trio behind
@@ -123,6 +130,8 @@ order within a rung is **today's display order** — so a rung whose `ordered` c
 fills in without the rows moving is a rung that was already right.
 
 ### note — 19 placements
+
+Banded as of 2026-08-24 (`COMMAND_GROUPS.note`): the rows below are in band order, which is now the tray's order too. `grouped` and `ordered` are still open boxes — the bands are built, not yet vouched for.
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|

@@ -1034,6 +1034,106 @@ export const COMMANDS: readonly EditorCommand[] = [
 
 // ── Selection ──────────────────────────────────────────────────────────────
 
+/**
+ * A captioned band of tiles inside one rung's tab.
+ *
+ * Grouping is a CLAIM — that these verbs answer the same question — so it is
+ * stated in one ordered table rather than as a field per row: the membership,
+ * the order inside the band and the caption are the three things a reviewer
+ * argues about, and they belong where they can be read together. That is also
+ * exactly the `grouped` and `ordered` pair the triage ledger asks for
+ * (roadmap/proposed/core-selection-tray-residue.md).
+ */
+export interface CommandGroup {
+  id: string;
+  /** The band's caption. Absent draws the band with no caption row. */
+  caption?: string;
+  /** Command ids, in the order they should sit inside the band. */
+  commands: readonly string[];
+}
+
+/**
+ * The note rung, in six bands — five of which exist today.
+ *
+ * Ordered concentrically, working outwards from the note: how is it WRITTEN →
+ * what does it JOIN → how is it STRUCK → what do the HANDS do → what WORDS
+ * ride along. A `chord` band (does it exist at all) comes first the day the
+ * rung's insert verb lands — a chord is a set, so that verb has no side
+ * (roadmap/inprogress/core-rung-insert.md) and belongs with existence rather
+ * than with direction.
+ *
+ * Where the claims are arguable, and deliberately: `beam` is a rhythm
+ * declaration rather than a spanner, and sits under `joins` for how it is
+ * used — press once here, press again at the far end — not for how it is
+ * modelled. `breath` is a gap after the note rather than a way of playing it.
+ * `fingering` is arguably a hand verb, and opens the same popover as the
+ * markings; it is under `text` because it puts characters beside the note.
+ *
+ * A scope with no entry here draws one uncaptioned band — the flat grid every
+ * other rung has today.
+ */
+export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[]>> = {
+  note: [
+    { id: 'spelling', caption: 'spelling', commands: ['respell', 'accidental-display'] },
+    { id: 'joins', caption: 'joins', commands: ['tie', 'slur', 'beam'] },
+    {
+      id: 'articulation',
+      caption: 'articulation',
+      commands: ['staccato', 'accent', 'tenuto', 'strong-accent', 'staccatissimo', 'breath']
+    },
+    {
+      id: 'fingerboard',
+      caption: 'fingerboard',
+      commands: ['bend', 'slide', 'hammer-pull', 'vibrato', 'palm-mute', 'harmonic']
+    },
+    { id: 'text', caption: 'text', commands: ['fingering', 'lyric'] }
+  ]
+};
+
+/** One band of commands as the tray draws it. */
+export interface CommandBand {
+  id: string;
+  caption?: string;
+  commands: readonly EditorCommand[];
+}
+
+/**
+ * Partition a scope's commands into bands.
+ *
+ * Takes the list the tray is ALREADY going to draw — projection filtered,
+ * search filtered — so a band whose every member was typed away disappears
+ * caption and all, and a band that survives keeps saying which family the
+ * survivor came from. That is the whole argument for captions over a gutter
+ * label: filtering is when a tile most needs its context, and it is exactly
+ * when a flat grid has none to give.
+ *
+ * Anything the table does not name lands in a trailing uncaptioned band, so a
+ * new command is drawn from the day it is written; the conformance suite is
+ * what stops it staying there unnoticed at a grouped rung.
+ */
+export function bandsForScope(
+  scope: CommandScope,
+  commands: readonly EditorCommand[]
+): readonly CommandBand[] {
+  const table = COMMAND_GROUPS[scope];
+  if (!table) return commands.length > 0 ? [{ id: 'all', commands }] : [];
+  const remaining = new Map(commands.map(command => [command.id, command]));
+  const bands: CommandBand[] = [];
+  for (const group of table) {
+    const members = group.commands
+      .map(id => {
+        const command = remaining.get(id);
+        remaining.delete(id);
+        return command;
+      })
+      .filter((command): command is EditorCommand => command !== undefined);
+    if (members.length > 0) bands.push({ id: group.id, caption: group.caption, commands: members });
+  }
+  const rest = commands.filter(command => remaining.has(command.id));
+  if (rest.length > 0) bands.push({ id: 'ungrouped', commands: rest });
+  return bands;
+}
+
 /** The commands offered in one scope, in declared order: the scope must
  *  match, and a projection-specific command only appears in its own dialect. */
 export function commandsForScope(

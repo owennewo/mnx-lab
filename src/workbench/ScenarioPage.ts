@@ -76,6 +76,7 @@ import {
 import { buildOpRow } from './opRows.ts';
 import { editorHasKeyboard, keyIsOurs } from './keyScope.ts';
 import {
+  bandsForScope,
   commandState,
   commandsForScope,
   isTriaged,
@@ -86,6 +87,7 @@ import {
 } from '../edit/commandRegistry.ts';
 import type {
   TrayAnchor,
+  TrayBand,
   TrayMeta,
   TrayRung,
   TrayTile
@@ -2512,7 +2514,7 @@ export class ScenarioPage extends LitElement {
   private trayView(entry: ScenarioEntry): {
     rungs: TrayRung[];
     meta: TrayMeta | null;
-    tiles: TrayTile[];
+    bands: TrayBand[];
     commands: EditorCommand[];
   } | null {
     if (!this.session) return null;
@@ -2559,7 +2561,7 @@ export class ScenarioPage extends LitElement {
     const commands = commandsForScope(scope, view).filter(
       command => !q || command.label.toLowerCase().includes(q)
     );
-    const tiles: TrayTile[] = commands.map(command => ({
+    const asTile = (command: EditorCommand): TrayTile => ({
       id: command.id,
       glyph: command.glyph,
       shortcut: command.shortcut ?? '',
@@ -2571,19 +2573,30 @@ export class ScenarioPage extends LitElement {
       // tab being drawn, not the command's whole `scopes` list, which is the
       // whole point of the per-scope mark.
       untriaged: !isTriaged(command, scope)
+    });
+    // Bands are cut from the ALREADY-FILTERED list, so a caption is only ever
+    // drawn over tiles that survived the query.
+    const bands: TrayBand[] = bandsForScope(scope, commands).map(band => ({
+      id: band.id,
+      caption: band.caption,
+      tiles: band.commands.map(asTile)
     }));
-    // The page's OWN commands join the global tab as neutral tiles: they act
-    // on the session's history and fixtures rather than on the document, so
-    // `edit/` has no business knowing them. `fireTrayCommand` recognises the
-    // prefix and never consults the registry for them.
+    // The page's OWN commands join the global tab as their own trailing band:
+    // they act on the session's history and fixtures rather than on the
+    // document, so `edit/` has no business knowing them — which is also why
+    // they carry no caption from a table that does not describe them.
+    // `fireTrayCommand` recognises the prefix and never consults the registry.
     if (displayKey === GLOBAL_TAB) {
-      for (const chrome of this.chromeCommands()) {
-        if (!q || chrome.label.toLowerCase().includes(q)) tiles.push(chrome);
-      }
+      const chrome = this.chromeCommands().filter(
+        tile => !q || tile.label.toLowerCase().includes(q)
+      );
+      if (chrome.length > 0) bands.push({ id: 'chrome', tiles: chrome });
     }
 
     const displayRow = ladder.find(r => r.key === displayKey);
-    const live = tiles.filter(t => t.state !== 'unavailable').length;
+    const live = bands
+      .flatMap(band => band.tiles)
+      .filter(t => t.state !== 'unavailable').length;
     const meta: TrayMeta = {
       primary: displayKey === GLOBAL_TAB ? 'session' : (displayRow?.label ?? ''),
       secondary:
@@ -2593,7 +2606,7 @@ export class ScenarioPage extends LitElement {
       count: `${live} command${live === 1 ? '' : 's'}`
     };
 
-    return { rungs, meta, tiles, commands };
+    return { rungs, meta, bands, commands };
   }
 
   /** Workbench-tier commands for the global tab — the session's own chrome,
@@ -2689,7 +2702,7 @@ export class ScenarioPage extends LitElement {
       <mnx-selection-tray
         .rungs=${view.rungs}
         .meta=${view.meta}
-        .tiles=${view.tiles}
+        .bands=${view.bands}
         .anchor=${this.trayAnchor}
         .searchText=${this.traySearch}
         ?mirrored=${this.trayMirrored}

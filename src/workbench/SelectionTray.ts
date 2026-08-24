@@ -74,6 +74,21 @@ export interface TrayTile {
 }
 
 /**
+ * One captioned band of tiles — the tray's unit of grouping.
+ *
+ * The caption is the claim ("these six answer the same question"), and it is
+ * what survives a filter: type three letters and the bands that keep nothing
+ * disappear caption and all, while a lone survivor still says which family it
+ * came from. A band with no caption draws as a bare run of tiles, which is
+ * every rung the group table has nothing to say about yet.
+ */
+export interface TrayBand {
+  id: string;
+  caption?: string;
+  tiles: TrayTile[];
+}
+
+/**
  * How large a tile glyph is drawn, in px along its longest side.
  *
  * A palette normalizes optical size; a score does not. Drawn at one true scale,
@@ -127,7 +142,7 @@ export const TRAY_MIRROR_MARGIN = 16;
 export class SelectionTray extends LitElement {
   @property({ attribute: false }) rungs: TrayRung[] = [];
   @property({ attribute: false }) meta: TrayMeta | null = null;
-  @property({ attribute: false }) tiles: TrayTile[] = [];
+  @property({ attribute: false }) bands: TrayBand[] = [];
   @property({ attribute: false }) anchor: TrayAnchor | null = null;
   @property({ type: String }) searchText = '';
   /**
@@ -150,6 +165,10 @@ export class SelectionTray extends LitElement {
    * Enter would land; the name is what you ask for by navigating.
    */
   @state() private cursorMoved = false;
+
+  /** Does the query line hold the keys? Only the hint's wording rides on it —
+   *  the armed tile is drawn armed either way. */
+  @state() private searchFocused = true;
 
   static styles = css`
     :host {
@@ -307,14 +326,50 @@ export class SelectionTray extends LitElement {
       color: var(--accent-fg);
     }
 
-    /* ── D · glyph grid ── */
+    /* ── D · glyph grid, in captioned bands ── */
     .grid {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 9px;
+    }
+
+    .band {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    /*
+     * The caption is set in the meta line's micro-caps rather than the
+     * ladder's lowercase mono: the ladder's voice says WHERE YOU ARE, and a
+     * band caption says what a run of tiles is about. Borrowing the rung's
+     * voice for a second, unrelated meaning is how two vocabularies become
+     * none. The rule fills the rest of the row so the caption reads as a
+     * section head rather than a stray label.
+     */
+    .caption {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font: 600 8.5px/1.2 var(--sans);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+
+    .caption .rule {
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .band-tiles {
       display: flex;
       flex-wrap: wrap;
       align-content: flex-start;
       gap: 6px;
-      padding: 9px;
     }
 
     /*
@@ -509,14 +564,35 @@ export class SelectionTray extends LitElement {
       display: none;
     }
 
-    /* ── F · search ── */
+    /*
+     * ── F · search, ABOVE the tiles ──
+     *
+     * The palette order: who you are, what you typed, what is left. With the
+     * line at the foot of the panel ↓ pointed away from the only thing it
+     * could usefully reach; here the two halves are in reading order and the
+     * arrow means what it looks like. It is drawn on the panel's own white
+     * rather than the chrome grey the meta line uses, because it is an input
+     * you are typing into, not a readout — and it is ruled off below so it
+     * does not merge into the first band.
+     */
     .search {
       display: flex;
       align-items: center;
       gap: 7px;
-      padding: 6px 9px;
-      border-top: 1px solid var(--line);
-      background: var(--bg-context);
+      padding: 7px 9px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    /* Names the one gesture this arrangement adds, and swaps to name the way
+     * back once the grid has the keys. */
+    .search .hint {
+      margin-left: auto;
+      flex: none;
+      font: 600 8.5px/1.2 var(--sans);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--ink-3);
     }
 
     .search .prompt {
@@ -551,7 +627,15 @@ export class SelectionTray extends LitElement {
   }
 
   firstUpdated() {
-    this.focus();
+    // The caret starts in the query line, and the first tile starts ARMED —
+    // so the tray opens with something to type and something to press, and
+    // the two do not compete: letters filter, Enter fires whatever the filter
+    // left under the cursor. The host still owns the keymap (the listener is
+    // on it and the input's keydowns bubble there), so ↓ hands the keys over
+    // without changing who is listening.
+    const input = this.renderRoot.querySelector<HTMLInputElement>('.search input');
+    if (input) input.focus();
+    else this.focus();
   }
 
   // ── placement ─────────────────────────────────────────────────────────────
@@ -559,13 +643,23 @@ export class SelectionTray extends LitElement {
   /** Focusable entries in display order. Unavailable tiles are skipped (the
    *  spec: not focusable). */
   private entries(): { id: string; label: string; shortcut: string; glyph: TrayGlyph }[] {
-    return this.tiles
+    return this.bands
+      .flatMap(band => band.tiles)
       .filter(t => t.state !== 'unavailable')
       .map(t => ({ id: t.id, label: t.label, shortcut: t.shortcut, glyph: t.glyph }));
   }
 
   updated(changed: Map<string | number | symbol, unknown>) {
-    if (changed.has('rungs') || changed.has('tiles')) {
+    // A new query re-arms the cursor on the FIRST survivor rather than
+    // clamping the old index into the new list. Filtering is a way of
+    // choosing: three letters that leave three tiles have already made the
+    // choice nearly, and Enter should finish it — landing on whatever tile
+    // happens to sit at the old index would be an answer to the previous
+    // question.
+    if (changed.has('searchText')) {
+      this.cursorIndex = 0;
+      this.cursorMoved = false;
+    } else if (changed.has('rungs') || changed.has('bands')) {
       this.cursorIndex = Math.min(this.cursorIndex, Math.max(0, this.entries().length - 1));
     }
     this.place();
@@ -643,7 +737,21 @@ export class SelectionTray extends LitElement {
   private onKeyDown = (event: KeyboardEvent) => {
     const target = event.composedPath()[0] as HTMLElement;
     const inSearch = target instanceof HTMLInputElement;
-    if (inSearch && event.code !== 'Escape') return; // typing stays typing
+    if (inSearch) {
+      // Three keys mean something other than text while the caret is in the
+      // query line; everything else stays typing.
+      if (event.code === 'ArrowDown') {
+        event.preventDefault();
+        event.stopPropagation();
+        // Hand the keys to the grid WITHOUT moving the cursor: it is already
+        // on the first tile, and ↓ meaning "step to the second one" would
+        // make the arming a lie.
+        this.focus();
+        return;
+      }
+      const fires = event.code === 'Enter' || event.code === 'NumpadEnter';
+      if (!fires && event.code !== 'Escape') return; // typing stays typing
+    }
 
     const consume = () => {
       event.preventDefault();
@@ -773,7 +881,16 @@ export class SelectionTray extends LitElement {
     const tops = boxes
       .map(box => box.top)
       .filter(top => (dir > 0 ? top > here.top + tolerance : top < here.top - tolerance));
-    if (tops.length === 0) return; // the end of the grid is a wall, not a wrap
+    if (tops.length === 0) {
+      // The foot of the grid is a wall, but its top edge is a door: ↑ from
+      // the first row is the mirror of the ↓ that arrived, and it hands the
+      // keys back with the query and the caret intact.
+      if (dir < 0) {
+        const input = this.renderRoot.querySelector<HTMLInputElement>('.search input');
+        if (input) input.focus();
+      }
+      return;
+    }
     const row = dir > 0 ? Math.min(...tops) : Math.max(...tops);
 
     const centre = here.left + here.width / 2;
@@ -903,34 +1020,50 @@ export class SelectionTray extends LitElement {
                     : nothing}
               </div>`
             : nothing}
-          <div class="grid">
-            ${this.tiles.map(
-              tile => html`
-                <button
-                  class="tile ${'arc' in tile.glyph ? 'arc-tile' : ''} ${cursorId === tile.id
-                    ? `cursor${this.cursorMoved ? ' cursor-named' : ''}`
-                    : ''}"
-                  data-state=${tile.state}
-                  data-triage=${tile.untriaged ? 'untriaged' : nothing}
-                  ?disabled=${tile.state === 'unavailable'}
-                  tabindex=${tile.state === 'unavailable' ? '-1' : '0'}
-                  aria-label=${tile.label}
-                  @click=${() => this.emit('tray-command', { id: tile.id })}
-                >
-                  ${this.glyph(tile.glyph, 'glyph', GLYPH_TARGET_PX)}
-                  <span class="key">${tile.shortcut}</span>
-                  <span class="tip">${this.tipText(tile)}</span>
-                </button>
-              `
-            )}
-          </div>
           <div class="search">
             <span class="prompt">&gt;</span>
             <input
               .value=${this.searchText}
               placeholder="search this scope · / for everything"
               @input=${(e: Event) => this.onSearchInput(e)}
+              @focus=${() => (this.searchFocused = true)}
+              @blur=${() => (this.searchFocused = false)}
             />
+            <span class="hint">${this.searchFocused ? '↓ to the tiles' : '↑ to search'}</span>
+          </div>
+          <div class="grid">
+            ${this.bands.map(
+              band => html`
+                <div class="band">
+                  ${band.caption
+                    ? html`<div class="caption">
+                        <span>${band.caption}</span><span class="rule"></span>
+                      </div>`
+                    : nothing}
+                  <div class="band-tiles">
+                    ${band.tiles.map(
+                      tile => html`
+                        <button
+                          class="tile ${'arc' in tile.glyph ? 'arc-tile' : ''} ${cursorId === tile.id
+                            ? `cursor${this.cursorMoved ? ' cursor-named' : ''}`
+                            : ''}"
+                          data-state=${tile.state}
+                          data-triage=${tile.untriaged ? 'untriaged' : nothing}
+                          ?disabled=${tile.state === 'unavailable'}
+                          tabindex=${tile.state === 'unavailable' ? '-1' : '0'}
+                          aria-label=${tile.label}
+                          @click=${() => this.emit('tray-command', { id: tile.id })}
+                        >
+                          ${this.glyph(tile.glyph, 'glyph', GLYPH_TARGET_PX)}
+                          <span class="key">${tile.shortcut}</span>
+                          <span class="tip">${this.tipText(tile)}</span>
+                        </button>
+                      `
+                    )}
+                  </div>
+                </div>
+              `
+            )}
           </div>
         </div>
       </div>

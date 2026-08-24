@@ -12,6 +12,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  bandsForScope,
+  COMMAND_GROUPS,
   COMMANDS,
   commandState,
   commandsForScope,
@@ -180,6 +182,82 @@ describe('command registry — the joins', () => {
       else if (!boxes[name]) bad.push(`${command.id}: ${name} (no bounding box)`);
     }
     expect(bad).toEqual([]);
+  });
+
+  it('every band names commands that exist and are offered at that rung', () => {
+    // The group table addresses commands BY ID from a distance, so it rots the
+    // way every id table rots: a rename, a scope narrowed to one projection, a
+    // command deleted. None of those is loud — the tile simply stops being
+    // drawn under its caption and reappears in the trailing ungrouped band,
+    // which is a layout nobody chose.
+    const missing: string[] = [];
+    const misplaced: string[] = [];
+    const repeated: string[] = [];
+    for (const [scope, table] of Object.entries(COMMAND_GROUPS)) {
+      const seen = new Set<string>();
+      for (const group of table ?? []) {
+        for (const id of group.commands) {
+          if (seen.has(id)) repeated.push(`${scope}: ${id}`);
+          seen.add(id);
+          const command = COMMANDS.find(c => c.id === id);
+          if (!command) missing.push(`${scope}: ${id}`);
+          else if (!command.scopes.includes(scope as never)) misplaced.push(`${scope}: ${id}`);
+        }
+      }
+    }
+    expect(missing, 'banded ids with no command').toEqual([]);
+    expect(misplaced, 'banded at a rung the command does not offer').toEqual([]);
+    expect(repeated, 'the same command in two bands').toEqual([]);
+  });
+
+  it('a grouped rung groups ALL of its commands', () => {
+    // The trailing ungrouped band is a mercy for a command written today and
+    // grouped tomorrow, not a place to leave things. At a rung that has a
+    // table, an unbanded command means somebody added a verb and never said
+    // what it belongs with — the exact question the table exists to answer.
+    const stranded: string[] = [];
+    for (const [scope, table] of Object.entries(COMMAND_GROUPS)) {
+      const banded = new Set((table ?? []).flatMap(group => group.commands));
+      // Both projections: `commandsForScope` filters to one dialect, and a
+      // tab-only verb is no less in need of a band.
+      for (const command of COMMANDS) {
+        if (!command.scopes.includes(scope as never)) continue;
+        if (!banded.has(command.id)) stranded.push(`${scope}: ${command.id}`);
+      }
+    }
+    expect(stranded, 'commands at a grouped rung with no band').toEqual([]);
+  });
+
+  it('bands are cut from the filtered list, captions and all', () => {
+    // What the tray depends on when someone types: a band whose every member
+    // was filtered away must not draw its caption over nothing, and a lone
+    // survivor must keep the caption that says where it came from.
+    const all = commandsForScope('note', view());
+    const full = bandsForScope('note', all);
+    expect(full.map(b => b.id)).toEqual(
+      (COMMAND_GROUPS.note ?? [])
+        .filter(g => g.commands.some(id => all.some(c => c.id === id)))
+        .map(g => g.id)
+    );
+    expect(full.every(b => b.commands.length > 0)).toBe(true);
+
+    const survivors = all.filter(c => c.id === 'staccato');
+    const filtered = bandsForScope('note', survivors);
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0].caption).toBe('articulation');
+    expect(filtered[0].commands.map(c => c.id)).toEqual(['staccato']);
+
+    expect(bandsForScope('note', [])).toEqual([]);
+  });
+
+  it('an ungrouped rung draws one bare band', () => {
+    // Every other rung keeps the flat grid it has today, with no caption
+    // invented for it.
+    const commands = commandsForScope('measure', view());
+    const bands = bandsForScope('measure', commands);
+    expect(bands).toHaveLength(1);
+    expect(bands[0].caption).toBeUndefined();
+    expect(bands[0].commands).toEqual(commands);
   });
 
   it('triage marks are well formed, and only where the tile exists', () => {
