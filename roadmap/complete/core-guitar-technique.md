@@ -1,19 +1,100 @@
-# Guitar technique end-to-end (`_x.tab.technique`)
+# Guitar technique end-to-end (`_x.mnxLab.tab.technique`)
 
-> **Status: data path COMPLETE (2026-07-26); rendering not started.**
+> **Status: COMPLETE (2026-08-24).** Data path landed 2026-07-26; **rendering landed
+> 2026-08-24** — every technique is drawn, on **both** staves. Verification debt:
+> [lab-verify.md](../inprogress/lab-verify.md) batch 4.
 >
-> The gaps this doc opens with are closed. `harmonic` and `palmMute` now exist
-> in the schema and travel through both converters (42 harmonics and 2 palm
-> mutes in `Vestapol` that used to be dropped), and **bends are now curves** —
-> `points: [{position, alter}]` in semitones — instead of the single interval
-> that silently flattened anything more elaborate than a ramp. Slide enum values
-> are camelCase (`slideIn` / `slideOut`), matching MNX house style. Design:
-> [spec-mnx-cg-proposals.md](low-priority/spec-mnx-cg-proposals.md) §5; spec:
-> [docs/mnx-extensions.md](../../docs/mnx-extensions.md).
+> The gaps this doc opened with are all closed. `harmonic` and `palmMute` exist in the
+> schema and travel through both converters (42 harmonics and 2 palm mutes in `Vestapol`
+> that used to be dropped), **bends are curves** — `points: [{position, alter}]` in
+> semitones — instead of the single interval that silently flattened anything more
+> elaborate than a ramp, and since this item nothing carries technique that nothing
+> draws. Design: [spec-mnx-cg-proposals.md](../proposed/low-priority/spec-mnx-cg-proposals.md)
+> §5; spec: [docs/mnx-extensions.md](../../docs/mnx-extensions.md); entry half:
+> [core-element-ops-technique.md](core-element-ops-technique.md).
 >
-> **What is left is rendering** — nothing draws any of it. Note that bend-point
-> *timing* does not survive MusicXML (it has no way to state when a point in a
-> curve falls); the sequence of pitches does.
+> Bend-point *timing* still does not survive MusicXML (it has no way to state when a
+> point in a curve falls); the sequence of pitches does.
+>
+> **Historical note.** Everything below the fold is the doc as it stood while the work
+> was open, paths and all — it opens by describing a `schemas/mnx-tab-extension.schema.json`
+> and a `src/types/mnx.ts` that the 2026-07 rebuild renamed. It is left as written; the
+> record of what was believed at the time is the point of `complete/`.
+
+## What the rendering half actually did (2026-08-24)
+
+`src/engine/layout/technique.ts` draws all seven techniques. It is the drawing half this
+doc split off at *Rendering is the expensive half*, and the estimate there held: it cost
+more than the data path did.
+
+| Technique | Tab staff | Notation staff |
+|---|---|---|
+| `bend` | curve off the fret digit to a labelled arrowhead; pre-bend is a vertical arrow, release a downward head | the same gesture in the lane above — no string to watch it climb |
+| `slide` (`shift`/`legato`) | the line between the two digits, **slanted** | the line between the two noteheads |
+| `slide` (`slideIn`/`slideOut`) | the short approach or departure, on the pitch's side | same |
+| `hammerOn` / `pullOff` | slur in the lane, lettered "H"/"P" | slur on the side away from the stem, letter above the staff |
+| `vibrato` | `guitarVibratoStroke` run across the note's duration | same |
+| `palmMute` | "P.M." once per run, over a dashed line | same |
+| `harmonic` | the digit becomes `<12>` | `stringsHarmonic` circle over the note; a non-natural type adds its word |
+
+### Four decisions worth keeping
+
+**1. Both staves — and the model decided it, not taste.** The doc's last open question was
+whether to draw on the notation staff at all. The answer is in the block's own schema
+description: `technique` is drafted for standard MNX, not for tab. None of the seven
+requires a position and none is specific to a fretted instrument, so a document that
+declares no strings has no fingerboard, no tab staff (no instrument is ever assumed —
+[core-derived-positions.md](core-derived-positions.md)), and would have had its technique
+go **unrenderable** rather than merely unfretted. `technique.test.ts` pins exactly that
+document.
+
+**2. A post-pass, for the reason slurs and ties are one.** `hammerOn`, `pullOff` and
+`slide` name their destination by NOTE ID, and that note may be measures — or a system
+row — away. So each layout records a `TechniqueSite` per drawn note while it emits, when
+it still knows where the ink went, and the marks are drawn once the segment's geometry is
+known. Curves whose ends straddle a system break split at the break, the same way
+`emitSlursAndTies` splits them.
+
+**3. Nothing reserves vertical room, and nothing needed to.** A bend arrow reaches 1.8sp
+above the tab staff, which in the `both` view is the gap to the notation staff overhead.
+No constant was added: gaps between staves and between systems have been **ink-measured**
+since [core-ink-measured-gaps.md](core-ink-measured-gaps.md), so the system opens by itself
+and closes again when the bend is deleted. That is the clearest return that item has paid
+— it made room for content it had never seen.
+
+**4. Two engraving rules the first pass got wrong, both caught by looking at a picture
+rather than at a test.**
+
+- **A slide along one string must be slanted.** Two frets on one string sit at the same y,
+  so a line drawn flat between them lands exactly on the string line already there and
+  disappears. Every slide in the corpus — and 17 of 17 in `Vestapol` — is that case, and
+  the primitives were all present and correct while the page showed nothing.
+- **A notation-staff technique slur takes the side away from the stem**, exactly as an
+  ordinary slur does, and its letter stays above the staff. Drawn always-above, every stem
+  it spanned crossed it.
+
+Both are now assertions in `harness/conformance/technique.test.ts`, which is the file that
+exists because the failure this whole item was about — technique carried and not drawn —
+**looks like a clean render**. Every test there is of the form "this technique reaches the
+page".
+
+### What it did NOT solve
+
+- **A harmonic's `<12>` is wider than the column reserved for a fret.** `CORE_SP` is 1.5sp
+  for every notehead and fret digit; a bracketed two-digit fret draws about 3sp of ink.
+  Nothing collides in the corpus, and two-digit frets already overrun the same column, so
+  this was left where it was found rather than made a spacing change. Denser music is
+  where it would show.
+- **Marks above the staff are placed in fixed bands, not stacked.** A note carrying both a
+  bend and a palm mute would put the "P.M." near the bend's label. No corpus scenario does
+  it, and a real stacker is the ottava-bracket problem again.
+- **`slideIn`/`slideOut` and the non-natural harmonic types have no scenario.** They are
+  covered synthetically in `technique.test.ts` instead, and deliberately left unclaimed in
+  the element-ops ink census — a claim there is a statement about the *goldens*.
+- **Phrase slurs are still dropped by the MusicXML importer** (54 in `Sun-did-glide`), as
+  recorded under *Adjacent, deliberately not included* below. Unchanged by this item.
+
+---
 
 ## The goal
 
@@ -24,9 +105,9 @@ an instruction to pick every note.
 
 ## Current state: the model is the only part that exists
 
-`_x.tab.technique` is defined in [schemas/mnx-tab-extension.schema.json](../../schemas/mnx-tab-extension.schema.json)
+`_x.tab.technique` is defined in `schemas/mnx-tab-extension.schema.json`
 (`bend`, `slide`, `hammerOn`, `pullOff`, `vibrato`) and typed in
-[src/types/mnx.ts](../../src/types/mnx.ts). Everything else is missing:
+`src/types/mnx.ts`. Everything else is missing:
 
 | Stage | State |
 |---|---|
@@ -227,9 +308,17 @@ tractable.
 
 This should probably be **split**: land the data path (1–3) first so documents
 stop losing information, then treat rendering as its own item against the
-[lab-spec-approval.md](../complete/lab-spec-approval.md) process. Carrying technique that
+[lab-spec-approval.md](lab-spec-approval.md) process. Carrying technique that
 nothing draws is still a strict improvement — the `.gp` export becomes correct
 for Guitar Pro users immediately, which is the main consumer of this data today.
+
+> **Outcome.** Split, and the split was right — but the second half sat for a month, and
+> the cost of that is the thing to remember: the corpus grew five scenarios whose own
+> descriptions ended "the renderer does not draw this yet", and their goldens dutifully
+> pinned a page with nothing on it. A golden pins what we draw; it cannot notice what we
+> do not. Both halves are now landed, and the estimate above held — the rendering half
+> cost more than the data path, and the expensive part was the drawing, exactly as
+> predicted.
 
 ## Adjacent, deliberately not included
 
@@ -241,14 +330,24 @@ element, worth doing, but not technique.
 Also missing from `<technical>` and out of scope here: harmonics, palm mute,
 tapping, `let ring`, golpe.
 
-## Open questions
+## Open questions — all three answered
 
-- **`harmonic` and `palmMute` need somewhere to live.** `Vestapol.gpx` has 42
-  harmonics — as many as its hammer-ons — and the tab schema has no room for
-  either. This would be the first extension to `_x.tab` since v2, so it wants
-  deciding before more technique work lands, not after.
-- Hammer-on/pull-off direction is derivable from pitch (up = hammer, down =
-  pull), so should the importer trust the source's element, or the pitches, when
-  they disagree?
-- Should the renderer draw technique on the **notation** staff too (slur +
-  "H"/"P" letters), or is tab-only correct for now?
+- ~~**`harmonic` and `palmMute` need somewhere to live.**~~ **Answered 2026-07-26 by
+  the data path**: both are members of `technique` in
+  `spec/mnx-lab-extensions.schema.json` v5, a harmonic identified by TOUCHING PITCH
+  rather than touching fret (which covers fretless instruments and the between-fret
+  nodes w3c-cg/mnx#179 is about, as a fret integer cannot). All 42 of `Vestapol`'s
+  harmonics and both its palm mutes now survive the round trip, and since 2026-08-24
+  they are drawn.
+- ~~Hammer-on/pull-off direction, source element vs pitches.~~ **Answered by the entry
+  side**, [core-element-ops-technique.md](core-element-ops-technique.md): the music
+  picks. `H` is one key for both techniques because you hammer *up* and pull off
+  downward, so the interval decides which one is written — offering two keys would ask
+  the player to name something their fingers already had. The Guitar Pro importer splits
+  its single `hammerPull` flag the same way (32 hammer-ons / 10 pull-offs in `Vestapol`).
+  Where a source states one explicitly and its pitches say the other, we still trust the
+  source: no file has yet been found that disagrees with itself, so the conflict is
+  hypothetical and inventing a policy for it would be inventing the evidence too.
+- ~~Should the renderer draw technique on the **notation** staff too?~~ **Answered
+  2026-08-24: yes, both staves** — see decision 1 above. The reason is not symmetry, it
+  is that a strings-less document has no tab staff to carry it.

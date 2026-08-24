@@ -2,8 +2,9 @@
 
 > **Status: built 2026-08-14.** Campaign:
 > [core-campaign-element-ops.md](core-campaign-element-ops.md), item 9 — the
-> entry half of [core-guitar-technique.md](../proposed/core-guitar-technique.md),
-> which owns the drawing and remains a renderer gap.
+> entry half of [core-guitar-technique.md](core-guitar-technique.md),
+> which owns the drawing — a renderer gap when this item shipped, closed
+> 2026-08-24.
 
 ## The agreement block
 

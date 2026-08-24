@@ -55,11 +55,6 @@ proposals that name their campaign.
   core-ink-priced-columns froze packing to keep separated. Four options costed, from "do
   nothing, document it" to "always ink-measured", with coupling-in-the-control carrying
   the best precedent.
-- **[core-guitar-technique.md](proposed/core-guitar-technique.md)** — playing technique. **Data path
-  complete** (2026-07-26): hammer-ons, pull-offs, slides, vibrato, **harmonics** and **palm
-  mute** all survive `MNX ⇄ .gp` and `MNX ⇄ MusicXML`, and bends are now **curves**
-  (`points: [{position, alter}]` in semitones) rather than a single interval that flattened
-  anything more elaborate. Remaining: **rendering** — nothing draws technique yet.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -153,7 +148,7 @@ back up to `proposed/` the moment it is.
   rather than a list — **encode the choice, not the consequence** — which maps the same shape
   onto brass (valve combination selects a fundamental, pitch determines the partial) and
   excludes tin whistle by the same rule that excludes storing the fret. Design only — nothing built, nothing
-  posted; complements [core-guitar-technique.md](proposed/core-guitar-technique.md) (what the hands do).
+  posted; complements [core-guitar-technique.md](complete/core-guitar-technique.md) (what the hands do).
 - **[core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md)** — the **third input
   mode**: typed text routing to `/api/edit-notation` when it reads as a sentence rather
   than a command (research §6.2), inheriting the `ui/ → assist/` boundary. Where it
@@ -190,6 +185,24 @@ back up to `proposed/` the moment it is.
   doc), and the never-reviewed corpus-closure technique set (8).
 
 ### complete/
+- **[core-guitar-technique.md](complete/core-guitar-technique.md)** — playing technique,
+  **finished 2026-08-24**. The data path landed 2026-07-26 and then a month passed with
+  nothing drawing any of it, which is a failure that *looks like a clean render*: a
+  document carrying 42 harmonics engraved as an instruction to pick every note. All seven
+  are now drawn on **both** staves — bends as curves with a labelled arrowhead (pre-bend a
+  vertical arrow, release a downward head), slides as the line between two positions,
+  hammer/pull as a lettered slur, vibrato as a wiggle, palm mute as the span its run reads
+  as, harmonics as `<12>` in the tab digit and a circle over the notation note. **Both
+  staves was decided by the model, not by taste**: `technique` is drafted for standard MNX,
+  so a document declaring no strings has no tab staff and would have had its technique go
+  unrenderable rather than merely unfretted. Runs as a POST-PASS, like slurs and ties,
+  because three of the seven name their destination by note id. **Nothing reserves vertical
+  room and nothing needed to** — [core-ink-measured-gaps.md](complete/core-ink-measured-gaps.md)
+  opens the system for a bend arrow it has never seen. Two engraving rules the pictures
+  caught and the tests did not: a slide along one string must be SLANTED (flat, it lands on
+  the string line and vanishes — every slide in the corpus is that case), and a notation
+  technique slur takes the side away from the stem. Approvals owed:
+  [lab-verify.md](inprogress/lab-verify.md) batch 4.
 - **[core-layout-authoring.md](complete/core-layout-authoring.md)** — **done 2026-08-24.**
   The `layout`, `score` and multimeasure-rest kinds, handed over by the element-ops campaign
   (2026-08-15) because its verbs all attach to a **place** and a layout is a **tree**. The
@@ -764,8 +777,8 @@ back up to `proposed/` the moment it is.
   layering fact, not a branch. `H` is one key for hammer-on and pull-off because
   the interval decides which — you hammer up and pull off downward. Reachable
   scenarios **71 → 78**, removable elements **1003 → 1022**, goldens untouched
-  (drawing remains [core-guitar-technique.md](proposed/core-guitar-technique.md)'s
-  gap).
+  (drawing was [core-guitar-technique.md](complete/core-guitar-technique.md)'s
+  gap, closed 2026-08-24).
 - **[core-element-ops-accidental-spelling.md](complete/core-element-ops-accidental-spelling.md)** —
   campaign item 6, **built 2026-08-15**: the row was **two questions wearing one name**.
   SPELLING is a policy — `spellPitch` in `staffSpace.ts`, where the key context already

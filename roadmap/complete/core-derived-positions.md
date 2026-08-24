@@ -167,7 +167,7 @@ the mirror:
 | `note.…tab.fingering` | `note._x.mnxLab.fingering` | `note.fingering` (flat — the piano argument) |
 | `part.…tab.tuning[]` | `part._x.mnxLab.strings[]` | `part.strings[]` (avoids "tuning" / #365) |
 | `part.…tab.capo` | `part._x.mnxLab.capo` | `part.capo` |
-| `note.…tab.technique.*` | unchanged | graduates via [core-guitar-technique.md](../proposed/core-guitar-technique.md) |
+| `note.…tab.technique.*` | unchanged | graduates via [core-guitar-technique.md](core-guitar-technique.md) |
 | `part.…tab.staffKind` | unchanged | upstream placement undecided (staff-source?) |
 
 Migration mechanics:

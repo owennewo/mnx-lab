@@ -18,7 +18,7 @@
 > post from that doc, not from §3. Rehearsal marks and section labels are now
 > **drawn** (`src/engine/layout/scoreText.ts`); chord symbols and technique
 > remain undrawn, tracked in [core-chord-symbols.md](core-chord-symbols.md)
-> and [core-guitar-technique.md](../core-guitar-technique.md).
+> and [core-guitar-technique.md](../../complete/core-guitar-technique.md).
 >
 > **What is left is §6 steps 1, 5 and 6**: join the CG and sign the CLA, then
 > post the proposals. Nothing can be contributed upstream until the CLA is

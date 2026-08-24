@@ -87,7 +87,7 @@ should be decided together rather than one at a time:
 | Tab (positions, tuning, capo) | ✅ shipped as `_x.tab` v2 | the whole corpus |
 | Section / rehearsal labels | ✅ shipped as `_x.section` | Sun-did-glide (5), Vestapol (4) |
 | **Chord symbols** | ❌ this doc | Vestapol (25) |
-| **Harmonics, palm mute** | ❌ [core-guitar-technique.md](../core-guitar-technique.md) | Vestapol (42 + 4) |
+| Harmonics, palm mute | ✅ shipped as `_x.mnxLab.tab.technique`; drawn 2026-08-24 by [core-guitar-technique.md](../../complete/core-guitar-technique.md) | Vestapol (42 + 4) |
 
 Worth writing up as input to the MNX CG alongside the tab-clef finding that
 already feeds [w3c-cg/mnx#63](https://github.com/w3c/mnx/issues/63) — "what a

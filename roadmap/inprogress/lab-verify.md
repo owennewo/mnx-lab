@@ -81,9 +81,10 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
-*Counts below are the queue as of 2026-08-22 (0 blocked, 37 stale, 9 never-seen, 62
-current). Batches are grouped by cause; the commit named for each sub-set is the one that
-**last moved** those goldens, which is not always the one that demoted them.*
+*Counts below are the queue as of 2026-08-24 (0 blocked, 37 stale, 9 never-seen, 62
+current — unchanged by batch 4, which moved goldens that were never approved). Batches are
+grouped by cause; the commit named for each sub-set is the one that **last moved** those
+goldens, which is not always the one that demoted them.*
 
 ### 1. `core-ink-measured-gaps` — vertical distance measured ink to ink — **33 stale**
 
@@ -146,7 +147,7 @@ wrong.
 
 | Cause | Scenarios |
 |---|---|
-| `75e566b` (2026-08-10) — corpus closure, nine new lab categories | 7 — `lab/tab-fingering/{left-hand-fingers, right-hand-pima}`, `lab/tab-techniques/{bend-and-release, slides, hammer-pull-chain, vibrato-and-palm-mute, natural-harmonics}` |
+| `75e566b` (2026-08-10) — corpus closure, nine new lab categories | 2 — `lab/tab-fingering/{left-hand-fingers, right-hand-pima}` |
 | `ff5ae78` (2026-08-15) — score-wide marks stop belonging to the notation staff | 1 — `lab/score-text/labels-on-a-tab-staff` |
 | [workbench-rung-legibility.md](../complete/workbench-rung-legibility.md) (2026-08-22) — a scenario authored to exercise the bar-vs-section degeneracy | 1 — `lab/score-text/one-bar-sections` |
 
@@ -158,13 +159,58 @@ correctly when every bar carries one, which is also the ink-measured-gaps stage 
 under its densest case. The *selection* behaviour it was authored for is overlay chrome
 and is not in any golden; it is pinned by `section-label-chip.test.ts` instead.
 
+*The five `lab/tab-techniques` scenarios left this batch on 2026-08-24: their goldens moved
+when technique started being drawn, so they belong to batch 4 and its cause rather than to
+corpus closure.*
+
 **What a reviewer should look for.** These have no approved hash at all, so there is no
 diff to reason from — this is a first reading, and the question is the ordinary one: does
-the engraving say what the scenario's `description` claims it says? The technique set is
-the most likely to surface renderer gaps rather than regressions (bends are curves of
-`{position, alter}` in semitones; harmonics, slides and palm mute each have their own
-notation), and an amber renderer-gap badge is a legitimate thing to approve — the golden
-pins what we draw today, including that we do not yet draw something.
+the engraving say what the scenario's `description` claims it says? The fingering pair is
+still a renderer gap — nothing draws `_x.mnxLab.fingering` — so what is under review there
+is that the annotated notes engrave correctly without it, and an amber renderer-gap badge
+is a legitimate thing to approve.
+
+### 4. `core-guitar-technique` — technique becomes ink — **5 never-seen**
+
+Owner: [core-guitar-technique.md](../complete/core-guitar-technique.md) (`09f5d55`,
+2026-08-24; **closed the same day owing these approvals**). Scenarios:
+`lab/tab-techniques/{bend-and-release, slides, hammer-pull-chain, vibrato-and-palm-mute,
+natural-harmonics}` — all five, all four goldens each (`expected.primitives.json`,
+`expected.svg`, `expected.tab.svg`, `expected.both.svg`).
+
+These were never-seen before this item and are never-seen after it, so nothing was
+demoted — but the reason they are worth reading changed completely. Until 2026-08-24 each
+one's `description` ended "the renderer does not draw X yet; the goldens pin the annotated
+notes rendering cleanly". Now every one of the seven techniques is drawn, on **both**
+staves, and the descriptions say what each mark is.
+
+**What a reviewer should look for.** This is the first sweep in the corpus where the
+question is *engraving taste*, not conformance — there is no spec reference engraving for
+any of it, because none of these marks is standard MNX yet. Read `both` first; it is the
+view a guitarist actually uses, and it is where the two staves' marks have to coexist.
+
+- **Bends.** A bend is a CURVE (`points: [{position, alter}]`), so check the second bar of
+  `bend-and-release`: a pre-bend must print as a vertical arrow with no rise before it,
+  then a flat hold, then a release with a DOWNWARD arrowhead. If the two bars look like
+  the same gesture twice, the curve is being flattened. Labels are in STEPS — "full" is
+  one whole step, i.e. `alter: 2`. The span is deliberately clamped rather than drawn
+  across the note's whole duration: uncapped, bar 1's arrow butted straight into bar 2's.
+- **Slides.** Every slide in `slides` runs along ONE string, so the tab line is slanted on
+  purpose — flat, it would sit on the string line and vanish. The legato pair carries an
+  extra slur (picked once) and the shift pair does not; that difference is the whole
+  scenario.
+- **Hammer/pull.** On the notation staff the slur takes the side away from the stem, like
+  any slur, while "H"/"P" stays above the staff. Check that no stem crosses a slur.
+- **Vibrato and palm mute.** The wiggle should last the note and stop. "P.M." prints once
+  per run of consecutive muted events with a dashed line to the run's end — the reading
+  side of the open question in [docs/mnx-extensions.md](../../docs/mnx-extensions.md) about
+  whether palm mute is a per-note flag or a span.
+- **Harmonics.** The tab digit becomes `<12>`, which is WIDER than the 1.5sp rigid column
+  the plan reserves for a fret. Nothing collides in this scenario; whether that holds in
+  denser music is the open question the item recorded rather than solved.
+- **Everywhere:** nothing reserves vertical room for these marks — the ink-measured gaps of
+  batch 1 do it — so a system that opened up to fit a bend arrow is the mechanism working,
+  not a layout bug.
 
 ## Settled
 
