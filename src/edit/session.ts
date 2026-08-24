@@ -217,13 +217,27 @@ export class EditorSession {
     anchorKeys: string[];
   } {
     const position = positionAt(this.grid, this.cursorState);
-    // Note keys first, then the EVENT keys of any rests starting here. The
-    // ghost locates its column by finding one of these in the rendered SVG,
-    // and a rest-only beat offered none — so the ghost fell back to
-    // interpolating a metric fraction across the bar and drew itself on the
-    // wrong beat (core-rung-insert.md). Notes lead because a column with ink
-    // anchors more precisely than the rest that shares it.
-    const anchorKeys = position?.slots.map(slot => slot.noteKey) ?? [];
+    // Keys the ghost can look up in the rendered SVG to find its COLUMN,
+    // best first. Two rules, and the second was learned the hard way:
+    //
+    //  1. Rests count. A rest-only beat used to offer nothing at all, so the
+    //     ghost fell back to interpolating a metric fraction across the bar
+    //     and drew itself on the wrong beat (core-rung-insert.md).
+    //  2. THE CURSOR'S OWN VOICE WINS, ahead of any note that merely shares
+    //     the beat. Voices normally share columns, which is why "any voice"
+    //     looked sufficient — but they only share them while they agree about
+    //     the bar. Insert one note and this voice has five events where its
+    //     neighbour has four; the onsets still line up and the COLUMNS no
+    //     longer do. The ghost then anchored to the other voice's note and
+    //     drew itself a column away from the rest it was standing on.
+    //
+    // Within a voice, notes lead: a column with ink anchors more precisely
+    // than the rest that shares it.
+    const voice = this.cursorState.voiceIndex ?? 0;
+    const mine: string[] = [];
+    const theirs: string[] = [];
+    for (const slot of position?.slots ?? [])
+      (slot.voiceIndex === voice ? mine : theirs).push(slot.noteKey);
     for (const event of position?.events ?? []) {
       const address = {
         partIndex: this.cursorState.partIndex ?? 0,
@@ -234,8 +248,12 @@ export class EditorSession {
         ...(event.containerIndex === undefined ? {} : { containerIndex: event.containerIndex })
       };
       const resolved = eventAtAddress(this.doc, address);
-      if (resolved?.rest) anchorKeys.push(resolved.id ?? syntheticEventKey(address));
+      if (resolved?.rest)
+        (event.voiceIndex === voice ? mine : theirs).push(
+          resolved.id ?? syntheticEventKey(address)
+        );
     }
+    const anchorKeys = [...mine, ...theirs];
     return {
       occupied: !!slotAt(this.grid, this.cursorState, this.activeProjection),
       staffPosition: this.activeProjection === 'notation' ? this.cursorState.line : null,

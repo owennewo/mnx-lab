@@ -110,3 +110,58 @@ describe('the cursor ghost can find a rest-only column', () => {
     expect(s.cursorContext().anchorKeys).toContain('ev42');
   });
 });
+
+
+describe('the ghost anchors in the cursor\'s own voice', () => {
+  /** Two voices in one 4/4 bar, four quarters each; cursor on voice 0 beat 1. */
+  function twoVoices() {
+    const s = replayIntents({} as MnxStructure, [
+      { type: 'addPart' }, { type: 'appendMeasure' },
+      { type: 'setTimeSignature', count: 4, unit: 4 }
+    ]);
+    const fill = (lines: number[]) => {
+      for (const line of lines) {
+        while (s.cursor.line !== line)
+          s.handleIntent({ type: s.cursor.line < line ? 'lineUp' : 'lineDown' });
+        s.handleIntent({ type: 'toggleNote' });
+        s.handleIntent({ type: 'nextPosition' });
+      }
+    };
+    fill([-6, -4, -2, 0]);
+    s.handleIntent({ type: 'goToMeasure', measureIndex: 0 });
+    for (let i = 0; i < 8 && s.selectionLevel !== 'voiceMeasure'; i++)
+      s.handleIntent({ type: 'relaxSelection' });
+    s.handleIntent({ type: 'insertAtRung', side: 'after' }); // a second voice
+    fill([4, 5, 6, 7]);
+    return s;
+  }
+
+  it('prefers its own voice\'s rest over another voice\'s note on the same beat', () => {
+    const s = twoVoices();
+    // Back to voice 0, beat 1, and make a rest at beat 2.
+    s.handleIntent({ type: 'goToMeasure', measureIndex: 0 });
+    while ((s.cursor.voiceIndex ?? 0) !== 0) s.handleIntent({ type: 'jumpUp' });
+    while (s.cursor.line !== -6)
+      s.handleIntent({ type: s.cursor.line < -6 ? 'lineUp' : 'lineDown' });
+    s.handleIntent({ type: 'insertAtRung', side: 'after' });
+    s.handleIntent({ type: 'delete' });
+
+    const keys = s.cursorContext().anchorKeys;
+    const mine = syntheticEventKey({ measureIndex: 0, voiceIndex: 0, eventIndex: 1 });
+    expect(keys, 'the rest is not offered at all').toContain(mine);
+    // THE BUG: voice 1 still has a note on this beat, and it used to lead —
+    // so the ghost drew itself on the neighbour's column. Once this voice has
+    // five events and its neighbour four, those columns are not the same.
+    expect(keys[0], 'another voice out-ranked the cursor\'s own').toBe(mine);
+    expect(keys.length, 'the neighbour should still be offered, just after').toBeGreaterThan(1);
+  });
+
+  it('a note in the cursor\'s own voice still leads its rest-mates', () => {
+    const s = twoVoices();
+    s.handleIntent({ type: 'goToMeasure', measureIndex: 0 });
+    while ((s.cursor.voiceIndex ?? 0) !== 0) s.handleIntent({ type: 'jumpUp' });
+    while (s.cursor.line !== -6)
+      s.handleIntent({ type: s.cursor.line < -6 ? 'lineUp' : 'lineDown' });
+    expect(s.cursorContext().anchorKeys[0]).toBe('@m0.v0.e0.n0');
+  });
+});

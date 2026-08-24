@@ -447,3 +447,33 @@ hidden.
 through two different code paths, and fixing the one I could see left the one I
 could not. The fraction fallback is still there, twice, and is still wrong
 wherever it fires — it is now just much harder to reach.
+
+
+### Third and last: voices only share columns while they agree about the bar
+
+Still wrong in the `both` view, and the instrumented answer was unambiguous —
+after insert-then-delete, the cursor's anchors came out as:
+
+    anchorKeys = ["l45", "@m0.v0.e1"]
+    rest  @m0.v0.e1   x = 15.6      ← the cursor's own voice
+    note  l45         x = 16.1      ← a DIFFERENT voice, same beat
+
+`anchorKeys` was documented as "note keys at the cursor's beat, **any voice**",
+and notes led. That was sound while it was only ever asking "which column is
+this beat in", because **voices share columns** — but they only share them
+while they agree about the bar. Insert one note and this voice has five events
+where its neighbour has four: the onsets still line up and the columns no
+longer do. The ghost anchored to the neighbour's note and drew itself a column
+away from the rest it was standing on.
+
+**The cursor's own voice wins**, and notes still lead within it. The tab staff
+draws no rest, so in the `both` view the ghost matches the notation rest and
+uses its x — right, because the projections share a spacing plan, and the tab's
+own columns for that voice skip the rest entirely (11.9 … 19.3, with the rest's
+column at 15.6 between them).
+
+**Three bugs, one root, three layers.** The enclosure could not find a rest;
+the ghost could not either, for a different reason; and the ghost's anchor
+ordering preferred a stranger. Each was invisible until the one in front of it
+was fixed — and the fraction fallback that produced all three wrong answers is
+still there, still wrong wherever it fires, now merely hard to reach.
