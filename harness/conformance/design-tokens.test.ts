@@ -233,6 +233,24 @@ describe('design tokens', () => {
       expect(literals, `colour literals in the tray: ${literals.join(', ')}`).toEqual([]);
     });
 
+    it('cites only tokens the app host actually declares', () => {
+      // The companion to "no literals": having sent the tray to the system for
+      // its colours, a MISSPELLED token is now the failure mode — `var(--x)`
+      // computes to nothing, so a purple that never arrives looks exactly like
+      // a tile nobody marked. That is the tray's own version of the historical
+      // embed bug this file opens with.
+      const cites = referenced(stripComments(read(TRAY)));
+      const has = declared(designTokens);
+      const missing = [...cites].filter(
+        name =>
+          !has.has(name) &&
+          // The one local: the tray measures its own width and sets this on
+          // the host from script, with a fallback in the stylesheet.
+          name !== '--tray-w'
+      );
+      expect(missing, `cited by the tray, declared nowhere: ${missing.join(', ')}`).toEqual([]);
+    });
+
     it('inherits the palette instead of re-declaring it', () => {
       // Load-bearing, and for a subtler reason than "don't duplicate": tokens
       // reach the tray by INHERITANCE from <mnx-workbench>'s host, and the dark

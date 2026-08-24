@@ -10,6 +10,12 @@
 > address. The interesting question is no longer *what is missing*. It is whether the
 > tiles that are **already there** are right — and nobody has checked.
 >
+> **The purple half is built (2026-08-24).** The marks are a `triage` field on the
+> registry row, the tray draws an untriaged tile in `--tile-untriaged`, and the
+> conformance suite keeps the field well formed. Since the ledger below is empty,
+> **every tile in the tray is purple** — which is the honest picture and the point.
+> What remains is the ticking, and that is human work: see *Retirement*.
+>
 > The filename does not change, because a dozen completed docs point at "the residue
 > ledger" as a thing that happened; the appendix keeps those links landing on something
 > true. Third of the trio behind
@@ -18,7 +24,7 @@
 
 ## The claim
 
-The registry has **82 rows across 94 placements** — one command in one rung's tab is one
+The registry has **86 rows across 98 placements** — one command in one rung's tab is one
 placement — and the only assertion anyone has ever made about them is mechanical: the
 conformance suite proves each tile fires *an intent through the funnel*, that no tile is
 actionless without a blocker, and that no wired tile carries a stale one. Nothing
@@ -54,50 +60,64 @@ statement about anything — so the honest sequence per rung is group, then orde
 test each tile once the layout it will ship in has stopped moving. Testing first is
 allowed and wastes nothing; a tile's behaviour does not change when it moves.
 
-## Purple
+## Purple — built 2026-08-24
 
-A placement with **none of the three marks renders purple** — a fourth tile state
-beside `available`, `active`, `mixed` and `unavailable`
-([SelectionTray.ts:55](../../src/workbench/SelectionTray.ts#L55)). Purple says *nobody
-has vouched for this tile yet*; it is the tray's own never-seen colour, and it is
-supposed to be embarrassing while it is everywhere.
+A placement with **none of the three marks draws purple**, and today that is every one
+of them. It is not a fifth `TrayTileState` but a flag **orthogonal** to state
+([SelectionTray.ts](../../src/workbench/SelectionTray.ts)): a tile can be untriaged
+*and* already `active`, and folding the two into one enum would make "this marking is
+on" and "nobody has checked this tile" compete for a slot only one of them can win.
+Purple is the tray's own never-seen colour, and it is supposed to be embarrassing while
+it is everywhere.
 
-Decisions this needs, recorded rather than assumed:
+The six decisions, as built:
 
 1. **One purple, not three.** A tile leaves purple only when all three marks are set;
    which axis is outstanding is the *ledger's* business, not the tray's. The
    alternative — three ticks in the tile corner — turns every tile into a progress
    widget and makes the tray about its own construction. Rejected on those grounds, and
    cheap to reverse.
-2. **Purple never overrides `unavailable`.** A blocked tile is already greyed and its
-   verb does not exist; asking a reviewer to test it is asking nonsense. The appendix's
-   seven placements are out of scope until they wire, and they enter triage purple on
-   the day they do.
-3. **The mark lives in the registry, next to `blockedBy`.** A `triage` field on
-   `EditorCommand`, keyed per scope for the twelve rows that appear at more than one
-   rung. One source, above the shell boundary so the harness can read it, and a
-   conformance test can then hold the ledger and the tiles together the way
-   [command-registry.test.ts:184](../../harness/conformance/command-registry.test.ts#L184)
-   already holds the blockers. A side-table of JSON would drift on the first rename.
+2. **Purple never overrides `unavailable`, and the rule is enforced upstream of the
+   CSS.** `isTriaged` returns *true* for a command with no `action`, so a blocked tile
+   never carries the flag at all and the stylesheet never has to arbitrate. A blocked
+   verb does not exist; asking a reviewer to click it is asking nonsense. The appendix's
+   seven placements enter triage purple on the day they wire.
+3. **The mark lives in the registry, next to `blockedBy`** — a `triage` field on
+   `EditorCommand`, `Partial<Record<CommandScope, TriageMark[]>>`. One source, above the
+   shell boundary so the harness can read it, and
+   [command-registry.test.ts](../../harness/conformance/command-registry.test.ts) now
+   holds it honest: marks only for scopes the command offers, no mark outside the three,
+   no `ordered` without `grouped`, and nothing claimed for a blocked tile. A side-table
+   of JSON would have drifted on the first rename.
 4. **A `tested` mark is per placement, not per command.** `slur` at the note rung arms
    an anchor; at the event rung it reads a resolved range. `section` at the bar rung and
    at the section rung are different verbs wearing one label. Twelve rows are in this
    position and each rung must be clicked on its own.
-5. **The colour is a token.** `light-dark()` through the modernist palette, inherited
-   from `<mnx-workbench>`'s host. The tray declares **no** `designTokens` block of its
-   own and carries no colour literals — a conformance assertion holds that line in both
-   directions, and a purple hex would be the first thing to break it.
+5. **The colour is a token** — `--tile-untriaged`, `light-dark()`, declared on the app
+   host in `designTokens` beside the queue's ramp and inherited by the tray. The tray
+   declares **no** `designTokens` block of its own and carries no colour literals; a
+   conformance assertion holds that line in both directions, and a purple hex would have
+   been the first thing to break it. It is the one place the system spends a second hue,
+   because this separates *shipped* from *nobody has looked*, which is a different kind
+   of claim from the four the queue's ramp separates — and it retires with the last row.
+6. **Two cascade exceptions, both to protect information the reader needs.** An `active`
+   tile keeps its inverted glyph (purple ink on the accent fill is unreadable; the
+   border still carries the mark), and hover and the keyboard cursor keep the accent
+   border — with every tile purple, a purple border under the cursor would leave the
+   grid with no visible cursor at all.
+
+The five **session-chrome** tiles (copy/paste/cut, trace, revert) have no registry row
+to declare a mark on, so they are purple unconditionally.
 
 **Open:** does purple ship? A visitor to a published score should probably not be shown
-our QA state, which argues for gating it to the workbench shell (or a dev flag) rather
-than putting it in `elements/`. Left undecided here because the tray does not reach the
-embed or studio yet — see the appendix's promotion row — and the answer is free until it
-does.
+our QA state, which argues for keeping it in the workbench shell (where it is today)
+rather than following the tray into `elements/`. Free to leave undecided while the tray
+does not reach the embed or studio — see the appendix's promotion row.
 
 ## The ledger
 
-87 placements to triage, plus 7 blocked in the appendix. Every box below is empty on
-purpose: this is the state of the tray on 2026-08-24, and it is the whole point of the
+91 placements to triage, 7 blocked in the appendix, and five session-chrome tiles with
+no registry row at all. Every box below is empty on purpose: this is the state of the tray on 2026-08-24, and it is the whole point of the
 doc that not one of them has been ticked yet. Rung order is the ladder's own, and row
 order within a rung is **today's display order** — so a rung whose `ordered` column
 fills in without the rows moving is a rung that was already right.
@@ -171,7 +191,7 @@ fills in without the rows moving is a rung that was already right.
 | `rest-spelling` — Respell the rests… | `Shift+R` | ☐ | ☐ | ☐ |
 | `space` — Insert space… | `Shift+R` | ☐ | ☐ | ☐ |
 | `cycle-voice` — Step to the next voice at this beat | `Alt+V` | ☐ | ☐ | ☐ |
-| `new-voice` — Add a voice to this bar | — | ☐ | ☐ | ☐ |
+| `new-voice` — Add a voice to this bar | `I` | ☐ | ☐ | ☐ |
 | `delete-voice-bar` — Delete this voice bar (only when empty) | `Del` | ☐ | ☐ | ☐ |
 
 ### staff bar — 5 placements (+2 blocked, appendix)
@@ -186,7 +206,7 @@ fills in without the rows moving is a rung that was already right.
 | `mute-part` — Mute the part | — | ⛔ blocked — `mute` | | |
 | `delete-part-bar` — Delete this staff bar (only when empty) | `Del` | ☐ | ☐ | ☐ |
 
-### bar — 15 placements
+### bar — 17 placements
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
@@ -204,7 +224,9 @@ fills in without the rows moving is a rung that was already right.
 | `measure-repeat` — Measure repeat… | `Shift+B` | ☐ | ☐ | ☐ |
 | `delete-bar` — Delete this bar (only when empty) | `Del` | ☐ | ☐ | ☐ |
 | `section` — Section label… | `Shift+B` | ☐ | ☐ | ☐ |
-| `add-bar` — Append a bar | `Shift+M` | ☐ | ☐ | ☐ |
+| `add-bar` — Append a bar at the end | `Shift+M` | ☐ | ☐ | ☐ |
+| `insert-bar-after` — Insert a bar after this one | `I` | ☐ | ☐ | ☐ |
+| `insert-bar-before` — Insert a bar before this one | `Shift+I` | ☐ | ☐ | ☐ |
 
 ### section — 3 placements (+1 blocked, appendix)
 
@@ -215,13 +237,15 @@ fills in without the rows moving is a rung that was already right.
 | `section-range` — Select the section’s range | — | ☐ | ☐ | ☐ |
 | `delete-section-boundary` — Delete this section boundary | `Del` | ☐ | ☐ | ☐ |
 
-### document — 5 placements (+2 blocked, appendix)
+### document — 7 placements (+2 blocked, appendix)
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
 | `add-part` — Add a part… | `Shift+P` | ☐ | ☐ | ☐ |
 | `staff-kind` — Staff kind: notation + tab | `Shift+P` | ☐ | ☐ | ☐ |
-| `add-bar` — Append a bar | `Shift+M` | ☐ | ☐ | ☐ |
+| `add-bar` — Append a bar at the end | `Shift+M` | ☐ | ☐ | ☐ |
+| `insert-part-after` — Insert a part below this one | `I` | ☐ | ☐ | ☐ |
+| `insert-part-before` — Insert a part above this one | `Shift+I` | ☐ | ☐ | ☐ |
 | `part-name` — Part name… | `Shift+P` | ☐ | ☐ | ☐ |
 | `staves` — Staves per part… | `Shift+P` | ☐ | ☐ | ☐ |
 | `system-break` — System break | — | ⛔ blocked — `layout-authoring` | | |
@@ -240,6 +264,21 @@ fills in without the rows moving is a rung that was already right.
 | `staff-kind-both` — Staff kind — notation + tab | — | ☐ | ☐ | ☐ |
 | `staff-kind-tab` — Staff kind — tab only | — | ☐ | ☐ | ☐ |
 | `staff-kind-notation` — Staff kind — notation only | — | ☐ | ☐ | ☐ |
+
+### session chrome — 5 placements, no registry row
+
+The `global` tab also carries the page's own tiles, which act on the session rather than
+on the document and so live in `ScenarioPage`, not in `edit/`. They have nowhere to
+declare a mark, so they are purple unconditionally — and, like a registry row, never
+while unavailable. Three of them appear only when there is something to act on.
+
+| Tile | Key | tested | grouped | ordered |
+|---|---|---|---|---|
+| `copy-selection` — Copy current selection *(when a clipboard exists)* | `Ctrl+C` | ☐ | ☐ | ☐ |
+| `paste-selection` — Paste copied selection here *(when a clipboard exists)* | `Ctrl+V` | ☐ | ☐ | ☐ |
+| `cut-selection` — Cut current selection *(when a clipboard exists)* | `Ctrl+X` | ☐ | ☐ | ☐ |
+| `copy-trace` — Copy this session as a trace fixture | — | ☐ | ☐ | ☐ |
+| `revert` — Revert every edit *(when the session is dirty)* | — | ☐ | ☐ | ☐ |
 
 ## Retirement
 

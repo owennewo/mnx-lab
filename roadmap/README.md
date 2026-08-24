@@ -57,22 +57,25 @@ proposals that name their campaign.
   [core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md).
 - **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3,
   **repurposed 2026-08-24** from the ledger of what cannot be wired yet into the **triage
-  ledger**: the registry's 82 rows across 94 placements, each carrying three marks —
+  ledger**: the registry's 86 rows across 98 placements, each carrying three marks —
   **tested** (clicking it does what the label promises, a human verdict), **grouped** (it
   sits with its relatives; the bar rung's repeat family is one thing and does not read as
   one today), **ordered** (the natural index inside that group, not the order the rows
-  were typed in). A placement with none of the three renders **purple**, a fourth tile
-  state beside available/active/mixed/unavailable — the tray's own *never seen*, in the
-  vocabulary the corpus already uses for `valid` vs `verified`. Five decisions recorded
-  (one purple not three; purple never overrides `unavailable`; the mark lives in the
-  registry beside `blockedBy` so a conformance test can hold ledger and tiles together;
+  were typed in). **The purple half is built**: a placement with none of the three draws
+  in `--tile-untriaged`, a flag deliberately *orthogonal* to `TrayTileState` (a tile can
+  be untriaged and already active), so with the ledger empty **every tile in the tray is
+  purple** — the tray's own *never seen*, in the vocabulary the corpus already uses for
+  `valid` vs `verified`. Six decisions recorded (one purple not three; purple never
+  overrides `unavailable`, enforced upstream in `isTriaged` so the CSS never arbitrates;
+  the mark lives in the registry beside `blockedBy` where conformance can hold it honest;
   `tested` is per placement because twelve rows appear at two rungs; the colour is a
-  palette token, never a literal), one left open (does purple ship to embed/studio, or
-  stay a workbench affordance). Every box is empty on purpose. The old residue survives
-  as an **appendix** of seven blocked placements, so every `blockedBy` id still resolves —
-  and it caught two (`arpeggio`, `section-colour`) greyed with **no address at all**,
-  which the existing test could not see because it asserts a blocker exists, not that it
-  resolves. Both halves must close for `complete/`.
+  `light-dark()` token, never a literal; two cascade exceptions for the active glyph and
+  the keyboard cursor), one left open (does purple ship to embed/studio). What remains is
+  the ticking, which is human work. The old residue survives as an **appendix** of seven
+  blocked placements, so every `blockedBy` id still resolves — and it caught two
+  (`arpeggio`, `section-colour`) greyed with **no address at all**, which the existing
+  test could not see because it asserts a blocker exists, not that it resolves. Both
+  halves must close for `complete/`.
 - **[core-tuplets-grace-notes.md](proposed/core-tuplets-grace-notes.md)** — tuplets and grace notes
   **across both converters and on tab**. Split out of
   [core-guitar-pro.md](complete/core-guitar-pro.md) when that closed, at its real scope: the model

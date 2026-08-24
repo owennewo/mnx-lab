@@ -211,6 +211,20 @@ export const designTokens = css`
     --st-unseen: light-dark(oklch(0.45 0.006 60), oklch(0.56 0.006 60));
     --st-current: light-dark(oklch(0.83 0.004 60), oklch(0.34 0.005 60));
 
+    /* THE TRAY'S UNTRIAGED MARK (roadmap/proposed/core-selection-tray-residue.md).
+       A tile nobody has vouched for yet — untested, ungrouped, unordered —
+       draws in this. It is the ONE place the system spends a second hue, and
+       it is spent deliberately: the queue's ramp separates four states that
+       are all legitimate, while this separates "shipped" from "nobody has
+       looked", which is a different kind of claim and must not read as any
+       shade of the accent. Purple carries no other meaning here, so it cannot
+       be confused with blocked, active or the cursor.
+
+       It is temporary BY CONSTRUCTION: when the ledger is full no tile draws
+       purple, and the token retires with the last row. Declared on the app
+       host only — the tray is a workbench leaf and the viewer has no tiles. */
+    --tile-untriaged: light-dark(oklch(0.52 0.19 305), oklch(0.74 0.15 305));
+
     --bg: var(--mnx-bg, light-dark(oklch(0.962 0.002 60), oklch(0.185 0.004 60)));
     --bg-rail: var(--mnx-bg-rail, light-dark(oklch(0.945 0.002 60), oklch(0.16 0.004 60)));
     --surface: var(--mnx-surface, light-dark(oklch(1 0 0), oklch(0.237 0.004 60)));

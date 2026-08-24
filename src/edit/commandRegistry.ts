@@ -73,6 +73,25 @@ export interface SessionView {
   readonly hasStrings: boolean;
 }
 
+/**
+ * What has been vouched for about ONE PLACEMENT — one command in one rung's
+ * tab (roadmap/proposed/core-selection-tray-residue.md, the triage ledger).
+ *
+ * - `tested`  — a human clicked it and the document changed the way the label
+ *               promised, on more than one member, and undo put it back. The
+ *               conformance suite proves the WIRING; this is the behaviour,
+ *               and like a scenario's `verified` it is a human assertion.
+ * - `grouped` — it sits with its relatives (the bar rung's repeat family is
+ *               one thing; key/time/clef is another).
+ * - `ordered` — it sits at the right index inside that group.
+ *
+ * `ordered` presupposes `grouped`: an index inside a group nobody has drawn
+ * is not a statement about anything.
+ */
+export type TriageMark = 'tested' | 'grouped' | 'ordered';
+
+export const TRIAGE_MARKS: readonly TriageMark[] = ['tested', 'grouped', 'ordered'];
+
 export interface EditorCommand {
   id: string;
   /** Which tabs offer it. A command in no scope renders nowhere. */
@@ -97,6 +116,18 @@ export interface EditorCommand {
   action?: (view: SessionView) => CommandAction | null;
   /** Why an actionless command is not wired; the residue ledger's row id. */
   blockedBy?: string;
+  /**
+   * What has been vouched for, PER SCOPE — twelve rows appear at two rungs and
+   * are different verbs there (`slur` arms an anchor at `note` and reads a
+   * resolved range at `event`; `section` at the bar rung and at the section
+   * rung share a label and nothing else), so a mark earned at one rung says
+   * nothing about the other.
+   *
+   * Absent, or short of all three marks, means the tile draws PURPLE — the
+   * tray's own *never seen*. Every row is in that state today, on purpose: the
+   * ledger is empty and the tray is where that becomes uncomfortable.
+   */
+  triage?: Partial<Record<CommandScope, readonly TriageMark[]>>;
 }
 
 // ── The read surface ───────────────────────────────────────────────────────
@@ -991,6 +1022,19 @@ export function commandsForScope(
     if (command.projection && command.projection !== view.projection) return false;
     return true;
   });
+}
+
+/**
+ * Has anyone vouched for this placement — all three marks, at THIS rung?
+ *
+ * A blocked command is exempt rather than untriaged: its verb does not exist,
+ * so asking a reviewer to click it is asking nonsense, and the tile is already
+ * drawn unavailable. It enters triage purple on the day it wires.
+ */
+export function isTriaged(command: EditorCommand, scope: CommandScope): boolean {
+  if (!command.action) return true;
+  const marks = command.triage?.[scope];
+  return marks !== undefined && TRIAGE_MARKS.every(mark => marks.includes(mark));
 }
 
 /** How a tile should draw: unavailable when the verb does not exist yet, else

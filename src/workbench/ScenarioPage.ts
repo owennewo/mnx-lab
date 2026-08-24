@@ -78,6 +78,7 @@ import { editorHasKeyboard, keyIsOurs } from './keyScope.ts';
 import {
   commandState,
   commandsForScope,
+  isTriaged,
   selectionMemberSummary,
   sessionView,
   type CommandScope,
@@ -2563,7 +2564,13 @@ export class ScenarioPage extends LitElement {
       glyph: command.glyph,
       shortcut: command.shortcut ?? '',
       label: command.label,
-      state: commandState(command, view)
+      state: commandState(command, view),
+      // Purple until the registry says someone vouched for this command AT
+      // THIS RUNG — the triage ledger's one product-visible consequence
+      // (roadmap/proposed/core-selection-tray-residue.md). The scope is the
+      // tab being drawn, not the command's whole `scopes` list, which is the
+      // whole point of the per-scope mark.
+      untriaged: !isTriaged(command, scope)
     }));
     // The page's OWN commands join the global tab as neutral tiles: they act
     // on the session's history and fixtures rather than on the document, so
@@ -2635,7 +2642,13 @@ export class ScenarioPage extends LitElement {
         state: 'available'
       });
     }
-    return tiles;
+    // Chrome tiles are the page's, so there is no registry row to carry their
+    // marks — and no reviewer has clicked them either. They are purple on the
+    // same terms as everything else (the ledger lists them in their own
+    // table), and, like a registry row, never while unavailable.
+    return tiles.map(tile =>
+      tile.state === 'unavailable' ? tile : { ...tile, untriaged: true }
+    );
   }
 
   /** A tile fired: resolve the command against the CURRENT session and send

@@ -60,6 +60,17 @@ export interface TrayTile {
   shortcut: string;
   label: string;
   state: TrayTileState;
+  /**
+   * Has nobody vouched for this tile yet — untested, ungrouped, unordered
+   * (roadmap/proposed/core-selection-tray-residue.md)? It draws purple.
+   *
+   * Deliberately ORTHOGONAL to `state` rather than a fifth member of it: a
+   * tile can be untriaged and already `active`, and collapsing the two would
+   * make "this marking is on" and "nobody has checked this tile" compete for
+   * one slot — losing whichever the enum ordered second. `unavailable` is the
+   * one state that suppresses it, upstream, by never setting the flag.
+   */
+  untriaged?: boolean;
 }
 
 /**
@@ -421,6 +432,37 @@ export class SelectionTray extends LitElement {
     .tile[data-state='unavailable'] .key {
       background: var(--line);
       color: var(--ink-faint);
+    }
+
+    /*
+     * PURPLE · the tile nobody has vouched for.
+     *
+     * Last in the cascade on purpose — it is a claim ABOUT the tile rather
+     * than about the selection, so it outranks the state colours instead of
+     * negotiating with them. Two exceptions, both of which would otherwise
+     * cost information the reader needs:
+     *
+     *  - an ACTIVE tile keeps its inverted glyph. Purple ink on the accent
+     *    fill is unreadable, and the border already carries the mark.
+     *  - hover and the keyboard cursor keep the accent border. That border IS
+     *    the cursor's only affordance; with every tile purple today, dropping
+     *    it would leave the grid with no visible cursor at all.
+     */
+    .tile[data-triage='untriaged'] {
+      border-color: var(--tile-untriaged);
+    }
+
+    .tile[data-triage='untriaged']:not([data-state='active']) .glyph {
+      color: var(--tile-untriaged);
+    }
+
+    .tile[data-triage='untriaged']:not([data-state='active']) svg path {
+      stroke: var(--tile-untriaged);
+    }
+
+    .tile[data-triage='untriaged']:hover,
+    .tile[data-triage='untriaged'].cursor {
+      border-color: var(--accent);
     }
 
     /*
@@ -869,6 +911,7 @@ export class SelectionTray extends LitElement {
                     ? `cursor${this.cursorMoved ? ' cursor-named' : ''}`
                     : ''}"
                   data-state=${tile.state}
+                  data-triage=${tile.untriaged ? 'untriaged' : nothing}
                   ?disabled=${tile.state === 'unavailable'}
                   tabindex=${tile.state === 'unavailable' ? '-1' : '0'}
                   aria-label=${tile.label}

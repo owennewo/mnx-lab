@@ -15,8 +15,10 @@ import {
   COMMANDS,
   commandState,
   commandsForScope,
+  isTriaged,
   selectionMemberSummary,
   sessionView,
+  TRIAGE_MARKS,
   type EditorCommand
 } from '../../src/edit/commandRegistry.ts';
 import { KEY_DOCS, strokeKey, SURFACE_INTENTS } from '../../src/edit/keymapDocs.ts';
@@ -178,6 +180,75 @@ describe('command registry — the joins', () => {
       else if (!boxes[name]) bad.push(`${command.id}: ${name} (no bounding box)`);
     }
     expect(bad).toEqual([]);
+  });
+
+  it('triage marks are well formed, and only where the tile exists', () => {
+    // The triage ledger (roadmap/proposed/core-selection-tray-residue.md) is
+    // DATA on the registry, so it rots the way data does: a mark left behind
+    // by a renamed scope, a typo'd mark that silently never matches, an
+    // `ordered` claimed for a group nobody drew. None of those would show up
+    // as a red tile — the placement would simply stop being purple, which is
+    // the one failure mode the whole mechanism exists to prevent.
+    const orphaned: string[] = [];
+    const unknown: string[] = [];
+    const unordered: string[] = [];
+    const blocked: string[] = [];
+    for (const command of COMMANDS) {
+      if (!command.triage) continue;
+      if (!command.action) blocked.push(command.id);
+      for (const [scope, marks] of Object.entries(command.triage)) {
+        if (!command.scopes.includes(scope as never)) orphaned.push(`${command.id}@${scope}`);
+        for (const mark of marks ?? []) {
+          if (!TRIAGE_MARKS.includes(mark)) unknown.push(`${command.id}@${scope}: ${mark}`);
+        }
+        // `ordered` presupposes `grouped`: an index inside a group nobody has
+        // drawn is not a statement about anything.
+        if ((marks ?? []).includes('ordered') && !(marks ?? []).includes('grouped')) {
+          unordered.push(`${command.id}@${scope}`);
+        }
+      }
+    }
+    expect(orphaned, 'marks for a scope the command does not offer').toEqual([]);
+    expect(unknown, 'marks outside the three').toEqual([]);
+    expect(unordered, 'ordered without grouped').toEqual([]);
+    expect(blocked, 'a blocked tile cannot have been clicked').toEqual([]);
+  });
+
+  it('a blocked tile is exempt from triage rather than purple', () => {
+    // The one precedence rule the tray depends on: purple never overrides
+    // unavailable. `isTriaged` is what enforces it, upstream of the CSS, so a
+    // reviewer is never asked to click a verb that does not exist.
+    const wired = COMMANDS.filter(c => c.action);
+    const unwired = COMMANDS.filter(c => !c.action);
+    expect(unwired.length).toBeGreaterThan(0);
+    for (const command of unwired) {
+      for (const scope of command.scopes) expect(isTriaged(command, scope)).toBe(true);
+    }
+    expect(wired.length).toBeGreaterThan(0);
+  });
+
+  it('a wired placement needs all three marks to stop being purple', () => {
+    // Deliberately asserted against a synthetic row rather than the live
+    // table, so the FIRST person to actually triage a tile does not have to
+    // edit a test to record their work. What must hold forever is the rule,
+    // not the count: absent marks and partial marks both read as untriaged,
+    // which is what makes an empty ledger show up as a wall of purple.
+    const row = (marks?: readonly string[]): EditorCommand => ({
+      id: 'probe',
+      scopes: ['note'],
+      glyph: { smufl: 'noteHalfUp' },
+      label: 'probe',
+      tier: 'key',
+      action: () => null,
+      ...(marks ? { triage: { note: marks as never } } : {})
+    });
+    expect(isTriaged(row(), 'note')).toBe(false);
+    expect(isTriaged(row([]), 'note')).toBe(false);
+    expect(isTriaged(row(['tested']), 'note')).toBe(false);
+    expect(isTriaged(row(['tested', 'grouped']), 'note')).toBe(false);
+    expect(isTriaged(row(['tested', 'grouped', 'ordered']), 'note')).toBe(true);
+    // A mark earned at one rung says nothing about another.
+    expect(isTriaged(row(['tested', 'grouped', 'ordered']), 'event')).toBe(false);
   });
 
   it('an unwired command names its residue row, and a wired one does not', () => {
