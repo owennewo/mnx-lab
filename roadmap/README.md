@@ -71,18 +71,24 @@ proposals that name their campaign.
   element contract under [core-viewer-surface.md](complete/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
   [core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md).
-- **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3: the
-  **ledger of what cannot be wired yet**, each greyed tile with an address. Its first
-  retirement wave predates the tray itself: the 2026-08-14/15 vocabulary sweep landed
-  adornments, spanners, technique, bar attributes, clef/key/time, lyrics, beams and part
-  declarations, so those rows are already retired into the mechanism's wired tables; the
-  restyle, dark-page, respell/dots and horizontal-selection rows followed on
-  2026-08-15/16. What remains: the vocabulary tail (wrap verbs, entry beyond the first
-  voice/staff, layout/score authoring, part transposition, mute, kit authoring); the
-  ladder's half, now down to mouse parity (click→cursor) and in-place container property
-  edits; and geometry/surface gaps (wider-scope preview, the promoted `score-navigate`
-  event, the embed/studio tray). Rows retire as unblockers land (registry `blockedBy`
-  keeps table and tiles from drifting); empty table ⇒ `complete/`.
+- **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3,
+  **repurposed 2026-08-24** from the ledger of what cannot be wired yet into the **triage
+  ledger**: the registry's 82 rows across 94 placements, each carrying three marks —
+  **tested** (clicking it does what the label promises, a human verdict), **grouped** (it
+  sits with its relatives; the bar rung's repeat family is one thing and does not read as
+  one today), **ordered** (the natural index inside that group, not the order the rows
+  were typed in). A placement with none of the three renders **purple**, a fourth tile
+  state beside available/active/mixed/unavailable — the tray's own *never seen*, in the
+  vocabulary the corpus already uses for `valid` vs `verified`. Five decisions recorded
+  (one purple not three; purple never overrides `unavailable`; the mark lives in the
+  registry beside `blockedBy` so a conformance test can hold ledger and tiles together;
+  `tested` is per placement because twelve rows appear at two rungs; the colour is a
+  palette token, never a literal), one left open (does purple ship to embed/studio, or
+  stay a workbench affordance). Every box is empty on purpose. The old residue survives
+  as an **appendix** of seven blocked placements, so every `blockedBy` id still resolves —
+  and it caught two (`arpeggio`, `section-colour`) greyed with **no address at all**,
+  which the existing test could not see because it asserts a blocker exists, not that it
+  resolves. Both halves must close for `complete/`.
 - **[core-tuplets-grace-notes.md](proposed/core-tuplets-grace-notes.md)** — tuplets and grace notes
   **across both converters and on tab**. Split out of
   [core-guitar-pro.md](complete/core-guitar-pro.md) when that closed, at its real scope: the model
