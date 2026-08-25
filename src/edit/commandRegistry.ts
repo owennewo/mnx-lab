@@ -569,7 +569,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-container',
     scopes: ['container'],
     glyph: { smufl: 'tuplet3' },
-    label: 'Delete this container (only when empty)',
+    label: 'Delete this container (clears its notes first)',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -627,7 +627,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-voice-bar',
     scopes: ['voiceMeasure'],
     glyph: { smufl: 'restWhole' },
-    label: 'Delete this voice bar (only when empty)',
+    label: 'Delete this voice bar (clears its notes first)',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -690,7 +690,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-part-bar',
     scopes: ['partMeasure'],
     glyph: { smufl: 'restWhole' },
-    label: 'Delete this staff bar (only when empty)',
+    label: 'Delete this staff bar (clears its notes first)',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -778,7 +778,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-bar',
     scopes: ['measure'],
     glyph: { smufl: 'restWhole' },
-    label: 'Delete this bar (only when empty)',
+    label: 'Delete this bar (clears its notes first)',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })

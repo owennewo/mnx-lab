@@ -236,17 +236,18 @@ export const KEY_DOCS: KeyDoc[] = [
     keys: 'Del/⌫',
     strokes: [{ code: 'Delete' }, { code: 'Backspace' }],
     group: 'editing',
-    // Containers must be EMPTY to be deletable (element-ops: removal never
-    // destroys ink implicitly) — hence the guards in the upper-rung meanings.
+    // TWO PRESSES, ONE RULE: press 1 clears what the rung owns, press 2
+    // removes the rung (core-delete-clears-then-removes.md). Removal never
+    // destroys ink implicitly — it just no longer answers with silence.
     meaning: {
       note: 'delete the note under the cursor (an emptied event becomes a rest)',
-      event: 'clear the event to an equal-duration rest',
-      container: 'delete the rhythm container — only when it holds no notes',
-      voiceMeasure: 'delete this voice’s bar copy — only when it holds no notes',
-      partMeasure: 'delete this staff’s bar copy — only when it holds no notes',
-      measure: 'delete this bar — only when it holds no notes',
-      section: 'delete this section boundary (the bars remain)',
-      document: 'delete the part (then trailing bars) — only when no notes remain'
+      event: 'clear the event to an equal-duration rest, then remove the empty event',
+      container: 'clear the rhythm container’s notes, then remove the empty container',
+      voiceMeasure: 'clear this voice’s bar copy, then remove the empty copy',
+      partMeasure: 'clear this staff’s bar copy, then remove the empty copy',
+      measure: 'clear this bar across every part, then remove the empty bar',
+      section: 'delete this section boundary — the bars remain, and Del then addresses them',
+      document: 'clear the score, then remove the empty part and its trailing bars'
     }
   },
   {

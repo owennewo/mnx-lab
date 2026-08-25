@@ -36,6 +36,7 @@ import {
 import {
   copySelectionNotice,
   cutSelectionNotice,
+  deleteSelectionNotice,
   pasteSelectionNotice,
   type ClipboardNotice
 } from '../edit/clipboardFeedback.ts';
@@ -2301,6 +2302,12 @@ export class ScenarioPage extends LitElement {
     } else {
       this.cursorHidden = false;
     }
+    // Delete is the one verb whose two presses mean different things, so it
+    // says which one this was — including when it declined. Everything else
+    // that returns false is a navigation edge, where silence is the right
+    // answer (core-delete-clears-then-removes.md).
+    const deleted = intent.type === 'delete' ? this.session.lastDelete : null;
+    if (deleted) this.showClipboardNotice(deleteSelectionNotice(deleted));
     this.copied = false;
     this.syncFromSession();
   };

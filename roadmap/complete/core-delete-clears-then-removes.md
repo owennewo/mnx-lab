@@ -1,10 +1,11 @@
 # Delete clears, then removes — the guarded rungs get their second press
 
-> **Status: proposed, 2026-08-25.** Serves the **implementation loop**. Grew
+> **Status: complete, 2026-08-25. Proposed, built and closed the same day.**
+> Serves the **implementation loop**. Grew
 > out of hands-on testing: select a bar, press `Del`, and nothing happens —
 > no removal, no refusal, no message. The verb exists and the guard is
 > correct; what is missing is the *first* press. The `event` rung has had the
-> answer since [core-campaign-element-ops.md](../complete/core-campaign-element-ops.md)
+> answer since [core-campaign-element-ops.md](core-campaign-element-ops.md)
 > — clear the ink, then remove the empty thing — and this item carries that
 > rule up the rest of the ladder.
 
@@ -26,7 +27,7 @@ Every rung has a delete. From `container` outward every one of them is
 
 Five rungs answer a keystroke with silence. The guard is not the bug — the
 rule it enforces is right, and it is argued out at
-[core-campaign-element-ops.md](../complete/core-campaign-element-ops.md)
+[core-campaign-element-ops.md](core-campaign-element-ops.md)
 (2026-08-14): *cascades never delete notes*. The bug is that the guard is a
 **dead end** rather than a **branch**, so the ladder stops one rung above the
 bottom and the user is told nothing.
@@ -226,3 +227,52 @@ and this should use the same one rather than invent a second.
   look in testing.
 - No golden movement is expected — this is editor behaviour, not layout. The
   edit-ops conformance suite is where the change should show.
+
+## Built — 2026-08-25
+
+Landed as proposed, with the section descent exactly as argued. What the build
+taught, beyond the design:
+
+- **`ops.ts` was never touched.** The prediction held: turning each guard from
+  a dead end into a fork is a change in `session.ts` alone, and every op still
+  refuses an inky removal underneath it. The safety net and the branch are now
+  two different things in two different places, which is why the branch could
+  be rewritten without re-arguing any of the removal rules.
+- **`destructWalk.ts` needed no change at all** — the flagged risk did not
+  fire. Phase 1 still strips every element before phase 2 climbs, so phase 2
+  arrives ink-free and its guard-driven loop behaves exactly as before. The
+  `{}` round-trip sweep passed untouched, which is the assertion that would
+  have caught it.
+- **Five tests encoded the dead end, and all five got better.** They asserted
+  `delete → false` at the guarded rungs; they now walk the whole two-press
+  ladder and assert what each press did. `counts container children as ink
+  when guarding bar removal` became `reaches container children when the bar
+  rung clears its ink` — the same fact, one rung further along.
+- **The staff ordinal was the one real trap.** `EventAddress.voiceIndex`
+  counts sequences ON A STAFF, not raw array position, so the walk has to
+  filter by staff before it counts. A grand staff whose second staff carries
+  two voices is the shape that catches it, and it is now a test
+  (`selection-events.test.ts`).
+- **The event rung changed slightly and deliberately.** A mixed range — some
+  events inky, some already rests — used to clear and remove in the same
+  press, one decision per member. It now clears on press 1 and removes on
+  press 2 like every other rung. Strictly safer, and the rule is uniform.
+- **The score rung's press 1 clears the whole score**, so the old "remove this
+  one empty part" behaviour now costs a press to reach. That is consistent
+  with the rung's painted footprint, and the user-facing way to delete a part
+  was never this rung anyway — it is the part closure at `partMeasure`
+  (Ctrl+A), which `Cut` already treats as `clip.kind: 'part'`. **Del at a
+  part closure still only empties the bars rather than removing the part** —
+  a pre-existing gap this item did not touch, and the obvious next question.
+
+### Files
+
+`src/edit/selectionEvents.ts` (new — the member→event walk and the ink test),
+`src/edit/session.ts` (the fork, `deleteSectionLabels`, `DeleteOutcome`),
+`src/edit/clipboardFeedback.ts` (the sentences), `src/workbench/ScenarioPage.ts`
+(three lines of wiring), `src/edit/commandRegistry.ts` + `src/edit/keymapDocs.ts`
+(labels), `harness/conformance/selection-events.test.ts` (new),
+`harness/conformance/selection.test.ts` + `clipboard-feedback.test.ts`.
+
+No golden moved and none could: nothing under `src/model/` or `src/engine/`
+changed, so the corpus carries no verification debt out of this item.

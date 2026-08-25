@@ -305,19 +305,30 @@ describe('selection ladder', () => {
     expect(session.selectionLevel).toBe('event');
   });
 
-  it('deletes an empty container, but refuses one that still owns ink', () => {
+  it('clears a container’s ink on the first press and removes it on the second', () => {
     const session = new EditorSession(containerDoc());
     session.handleIntent(relax); // event
     session.handleIntent(relax); // container
-    expect(session.handleIntent({ type: 'delete' })).toBe(false);
-
-    session.handleIntent(tighten); // first child event
-    expect(session.handleIntent({ type: 'delete' })).toBe(true);
-    expect(session.handleIntent({ type: 'nextPosition' })).toBe(true);
-    expect(session.handleIntent({ type: 'delete' })).toBe(true);
-    session.handleIntent(relax); // container
     expect(session.selectionLevel).toBe('container');
+
+    // Press 1 — the children's ink goes, the container and its time stay.
     expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toEqual({
+      kind: 'cleared', level: 'container', notes: 2, thenRemoves: true
+    });
+    const tuplet = session.doc.parts[0].measures![0].sequences[0].content[0] as {
+      type?: string; content: { notes?: unknown[]; rest?: object; duration: object }[];
+    };
+    expect(tuplet.type).toBe('tuplet');
+    expect(tuplet.content.map(child => child.notes)).toEqual([undefined, undefined]);
+    expect(tuplet.content.map(child => child.duration)).toEqual([
+      { base: 'eighth' }, { base: 'eighth' }
+    ]);
+    expect(session.selectionLevel).toBe('container');
+
+    // Press 2 — the empty container goes, and the ladder relaxes outward.
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toEqual({ kind: 'removed', level: 'container', members: 1 });
     expect(session.selectionLevel).toBe('voiceMeasure');
     expect((session.doc.parts[0].measures![0].sequences[0].content[0] as { type?: string }).type)
       .toBeUndefined();
@@ -341,10 +352,23 @@ describe('selection ladder', () => {
     expect(session.selectedNoteKeys).toEqual(['outside']);
   });
 
-  it('guards voice/staff bar removal by ink and repairs to the surviving ancestor', () => {
+  it('clears a voice bar before removing it, and repairs to the surviving ancestor', () => {
     const voice = new EditorSession(makeDoc());
     while (voice.selectionLevel !== 'voiceMeasure') voice.handleIntent(relax);
-    expect(voice.handleIntent({ type: 'delete' })).toBe(false);
+    // Bar 0 voice 0 holds a chord and a note: press 1 clears, press 2 removes.
+    expect(voice.handleIntent({ type: 'delete' })).toBe(true);
+    expect(voice.lastDelete).toEqual({
+      kind: 'cleared', level: 'voiceMeasure', notes: 3, thenRemoves: true
+    });
+    expect(voice.doc.parts[0].measures![0].sequences[0].content).toEqual([
+      { duration: { base: 'quarter' }, rest: {} },
+      { duration: { base: 'quarter' }, rest: {} }
+    ]);
+    expect(voice.selectionLevel).toBe('voiceMeasure');
+    expect(voice.handleIntent({ type: 'delete' })).toBe(true);
+    expect(voice.lastDelete).toMatchObject({ kind: 'removed', level: 'voiceMeasure' });
+    expect(voice.doc.parts[0].measures![0].sequences).toHaveLength(1);
+
     voice.handleIntent({ type: 'goToMeasure', measureIndex: 1 });
     while (voice.selectionLevel !== 'voiceMeasure') voice.handleIntent(relax);
     expect(voice.handleIntent({ type: 'delete' })).toBe(true);
@@ -363,9 +387,75 @@ describe('selection ladder', () => {
     const session = new EditorSession(makeDoc(true));
     while (session.selectionLevel !== 'section') session.handleIntent(relax);
     expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toEqual({ kind: 'sectionLabels', sections: 1 });
     expect(session.doc.global.measures).toHaveLength(3);
     expect(session.doc.global.measures[0].section).toBeUndefined();
     expect(session.doc.global.measures[2].section?.label).toBe('Verse');
+  });
+
+  it('descends to the bar range the section was standing on, not outward to the score', () => {
+    // A section owns only its label, so removing it removes the RUNG. Relaxing
+    // outward would land on `document`, where the next Del means "clear every
+    // note in the score" — the one dangerous default in the two-press rule.
+    // The footprint must not move: the same bars, one rung down.
+    const session = new EditorSession(makeDoc(true));
+    while (session.selectionLevel !== 'section') session.handleIntent(relax);
+    expect(resolveSelection(session.doc, session.selection, 'notation').members)
+      .toEqual([{ kind: 'section', start: 0, end: 2 }]);
+
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.selectionLevel).toBe('measure');
+    expect(resolveSelection(session.doc, session.selection, 'notation').members).toEqual([
+      { kind: 'measure', measureIndex: 0 },
+      { kind: 'measure', measureIndex: 1 }
+    ]);
+    expect(session.cursor.measureIndex).toBe(0);
+  });
+
+  it('carries on down the ladder once the section label is gone', () => {
+    const session = new EditorSession(makeDoc(true));
+    while (session.selectionLevel !== 'section') session.handleIntent(relax);
+
+    // 1 — the label. 2 — the ink in the bars it covered. 3 — the bars.
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.doc.global.measures).toHaveLength(3);
+
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toEqual({
+      kind: 'cleared', level: 'measure', notes: 4, thenRemoves: true
+    });
+    expect(session.doc.global.measures).toHaveLength(3);
+
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toEqual({ kind: 'removed', level: 'measure', members: 2 });
+    expect(session.doc.global.measures).toHaveLength(1);
+    expect(session.doc.global.measures[0].section?.label).toBe('Verse');
+  });
+
+  it('reports a delete that did nothing instead of answering with silence', () => {
+    // The bug this rule was written against: a keystroke that produced
+    // neither a change nor a sentence.
+    const session = new EditorSession(makeDoc());
+    while (session.selectionLevel !== 'document') session.handleIntent(relax);
+    // Ink, then the emptied part, then the three trailing bars — the skeleton
+    // dissolving in reverse symmetry with skeleton-on-demand.
+    for (let press = 0; press < 5; press++) {
+      expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    }
+    expect(session.doc.parts ?? []).toEqual([]); // dissolved to `{}`
+    expect(session.doc.global?.measures ?? []).toEqual([]);
+
+    // Nothing left to take, so the verb declines — and SAYS it declines.
+    expect(session.handleIntent({ type: 'delete' })).toBe(false);
+    expect(session.lastDelete).toEqual({ kind: 'refused', level: 'document' });
+  });
+
+  it('forgets the delete outcome as soon as another intent runs', () => {
+    const session = new EditorSession(makeDoc());
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toMatchObject({ kind: 'cleared', level: 'note' });
+    session.handleIntent({ type: 'nextPosition' });
+    expect(session.lastDelete).toBeNull();
   });
 
   it('makes global measure, section and score footprints cross every part and staff', () => {
@@ -385,19 +475,41 @@ describe('selection ladder', () => {
   });
 
   it('makes Delete obey the rung before the ink under the cursor', () => {
+    // The bar rung's press 1 clears the WHOLE COLUMN, not the one note the
+    // cursor happens to stand on — the bug this rule was written against.
     const session = new EditorSession(makeDoc());
     while (session.selectionLevel !== 'measure') session.handleIntent(relax);
-    const before = session.doc;
-    expect(session.handleIntent({ type: 'delete' })).toBe(false);
-    expect(session.doc).toEqual(before);
-    expect(session.doc.parts[0].measures?.[0].sequences?.[0].content[0].notes).toHaveLength(2);
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toEqual({
+      kind: 'cleared', level: 'measure', notes: 4, thenRemoves: true
+    });
+    expect(session.selectedNoteKeys).toEqual([]);
+    expect(session.doc.global.measures).toHaveLength(3);
+    expect(session.selectionLevel).toBe('measure');
+
+    // Press 2 — the emptied bar column goes, and the timeline closes up.
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toEqual({ kind: 'removed', level: 'measure', members: 1 });
+    expect(session.doc.global.measures).toHaveLength(2);
   });
 
-  it('counts container children as ink when guarding bar removal', () => {
+  it('reaches container children when the bar rung clears its ink', () => {
+    // The walk descends INTO containers: a bar whose only ink is inside a
+    // tuplet must still clear on press 1, or the rung would report itself
+    // empty and remove a bar that still had notes in it.
     const session = new EditorSession(containerDoc());
     while (session.selectionLevel !== 'measure') session.handleIntent(relax);
-    expect(session.handleIntent({ type: 'delete' })).toBe(false);
     expect(session.selectedNoteKeys.sort()).toEqual(['inside-1', 'inside-2', 'outside']);
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toEqual({
+      kind: 'cleared', level: 'measure', notes: 3, thenRemoves: true
+    });
+    expect(session.selectedNoteKeys).toEqual([]);
+    const content = session.doc.parts[0].measures![0].sequences[0].content as {
+      type?: string; content?: { notes?: unknown[] }[]; notes?: unknown[];
+    }[];
+    expect(content[0].content!.map(child => child.notes)).toEqual([undefined, undefined]);
+    expect(content[1].notes).toBeUndefined();
   });
 
   it('routes note-rung Delete through the kit-note operation for percussion', () => {
@@ -416,7 +528,15 @@ describe('selection ladder', () => {
     const session = new EditorSession(doc);
     expect(session.handleIntent({ type: 'setPart', partIndex: 1 })).toBe(true);
     while (session.selectionLevel !== 'document') session.handleIntent(relax);
+    // The score rung's footprint is the whole score, so press 1 clears every
+    // part's ink — including the parts that are not the one being removed.
+    // Only then is the skeleton free to dissolve.
     expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toMatchObject({ kind: 'cleared', level: 'document' });
+    expect(session.doc.parts.map(part => part.id)).toEqual(['lead', 'keys']);
+
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.lastDelete).toMatchObject({ kind: 'removed', level: 'document' });
     expect(session.doc.parts.map(part => part.id)).toEqual(['lead']);
     expect(session.cursor.partIndex).toBeUndefined();
   });

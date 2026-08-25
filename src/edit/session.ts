@@ -20,7 +20,6 @@ import {
   nextNotePitchPair,
   techniqueAt,
   MEASURE_ATTRIBUTE_FIELDS,
-  measureHasInk,
   partHasInk,
   timeSignatureRemovalFits
 } from './ops.ts';
@@ -49,6 +48,7 @@ import {
   type Projection
 } from './cursor.ts';
 import { syntheticEventKey } from '../model/noteKeys.ts';
+import { eventAddressesUnderSelection, eventHoldsInk } from './selectionEvents.ts';
 import { capoOf, defaultStringFor, midiOfPitch, tuningOf } from './tabStrings.ts';
 import { clefAt, keyFifthsAt, pitchAtStaffPosition, spellPitch } from './staffSpace.ts';
 import {
@@ -89,6 +89,19 @@ const DURATION_LADDER: MnxNoteValueBase[] = [
   '64th'
 ];
 
+/**
+ * What a `delete` intent did — the transient notice's raw material.
+ *
+ * `cleared` is press 1 (`thenRemoves` says whether a press 2 is waiting),
+ * `removed` is press 2, `sectionLabels` is the section rung's single
+ * collapsed press, and `refused` is the case that used to be silence.
+ */
+export type DeleteOutcome =
+  | { kind: 'cleared'; level: SelectionLevel; notes: number; thenRemoves: boolean }
+  | { kind: 'removed'; level: SelectionLevel; members: number }
+  | { kind: 'sectionLabels'; sections: number }
+  | { kind: 'refused'; level: SelectionLevel };
+
 export class EditorSession {
   private history: EditHistory;
   private grid: PositionGrid;
@@ -101,6 +114,7 @@ export class EditorSession {
    *  dotted quarter stepping to an eighth stays dotted — as it does in every
    *  editor a player has used. */
   private entryDots = 0;
+  private lastDeleteOutcome: DeleteOutcome | null = null;
   /** The armed end of a spanner-in-progress (campaign item 10): a note key, or
    *  null. The keyboard names two places in two presses because the ladder
    *  cannot yet extend laterally; when it can, "slur the selected run" becomes
@@ -194,6 +208,14 @@ export class EditorSession {
     return cloneSelection(this.selectionState);
   }
 
+  /** What the last `delete` intent actually did. Delete is the one verb whose
+   *  meaning changes between two identical keystrokes, so it has to be able
+   *  to say which press this was; any other intent clears it, so a stale
+   *  sentence can never be shown for a keystroke that was not a delete. */
+  get lastDelete(): DeleteOutcome | null {
+    return this.lastDeleteOutcome;
+  }
+
   get resolvedSelection(): ResolvedSelection {
     return resolveSelection(this.doc, this.selectionState, this.activeProjection);
   }
@@ -282,6 +304,9 @@ export class EditorSession {
    */
   handleIntent(intent: EditorIntent): boolean {
     this.intents.push(intent);
+    // Delete's outcome describes ONE keystroke, so anything else discards it.
+    // A notice that outlived its keystroke would report the previous press.
+    if (intent.type !== 'delete') this.lastDeleteOutcome = null;
     if (isNavigationIntent(intent)) return this.navigate(intent);
     // Provenance for the op queue: apply() stamps the intent being handled
     // into the history entry (forward-recorded, never inferred).
@@ -410,39 +435,76 @@ export class EditorSession {
         // Delete belongs to the selected RUNG, not whatever ink happens to be
         // under the cursor. Checking the slot first made Del at measure/score
         // silently remove one note while the enclosure claimed a container.
-        if (this.selectionState.level === 'note') {
+        //
+        // TWO PRESSES, ONE RULE, all the way up the ladder: **press 1 clears
+        // what the rung owns, press 2 removes the rung.** The `event` rung has
+        // worked this way since the element-ops campaign; this is that rule
+        // stated so it covers every rung above it, and the five guarded rungs
+        // stop answering a keystroke with silence.
+        //
+        // THE PRESS COUNTER IS THE DOCUMENT. Press 1 visibly takes the ink
+        // away, so press 2 is judged against a genuinely different document by
+        // the SAME guards that always refused an inky removal. Nothing
+        // remembers how many times you pressed, there is no mode to fall out
+        // of, and an interleaved edit, undo or navigation cannot desynchronise
+        // a count that was never kept. The guards in `ops.ts` therefore stay
+        // exactly where they are — this fork decides which press it is, and
+        // they still refuse underneath it.
+        //
+        // The invariant is restated, not abandoned: a wide command may never
+        // destroy ink AND structure in one press. `Cut` remains the deliberate
+        // one-press ink-destroyer, and it pays a clipboard for the privilege.
+        // roadmap/complete/core-delete-clears-then-removes.md.
+        const level = this.selectionState.level;
+
+        // The bottom rung IS ink — there is no structure beneath a note for a
+        // second press to remove.
+        if (level === 'note') {
           const ops = [...this.selectedNoteKeys].reverse().map(noteKey =>
             /\.k\d+$/.test(noteKey)
               ? { type: 'removeKitNote' as const, noteKey }
               : { type: 'deleteNote' as const, noteId: noteKey }
           );
-          return this.applyDestructive(ops);
+          const removed = ops.length;
+          if (!this.applyDestructive(ops)) return this.refuseDelete(level);
+          this.lastDeleteOutcome = { kind: 'cleared', level, notes: removed, thenRemoves: false };
+          return true;
         }
-        if (this.selectionState.level === 'event') {
-          // TWO PRESSES, TWO MEANINGS, and the guarded-removal rule decides
-          // which: an event holding ink is CLEARED to a rest (its time stays,
-          // so the grid does not shift under the cursor), and an event that is
-          // already empty is REMOVED. Before this the second press hit
-          // `clearEvent` on something already a rest and did nothing — the
-          // ladder stopped one rung short of "and now go".
-          //
-          // Reverse document order, as every multi-member removal does: a
-          // splice moves every later event index out from under the ops still
-          // to come.
-          const ops = [...this.resolvedSelection.members].reverse().flatMap(member => {
-            if (member.kind !== 'event') return [];
-            const address = eventAddressOf(member);
+
+        // The section rung owns ONE thing: its label. The bars are borrowed —
+        // `sectionMembers` derives the span by walking boundary to boundary —
+        // so clearing what the rung owns and removing the rung are the same
+        // act, and its two presses collapse into one. What is left standing is
+        // a range of bars, so the ladder descends and Del carries on there.
+        if (level === 'section') return this.deleteSectionLabels();
+
+        // PRESS 1 — wherever the rung still holds ink, clear it to rests.
+        // Time survives, because `clearEvent` keeps the duration: no press
+        // ever reshapes a bar or under-fills a voice. That is the courtesy
+        // `addVoiceMeasure` already pays on the way in, owed back on the way
+        // out — a verb must never manufacture the diagnostic that says you
+        // made a mistake.
+        const inky = eventAddressesUnderSelection(this.doc, this.resolvedSelection.members)
+          .flatMap(address => {
             const event = eventAtAddress(this.doc, address);
-            if (!event) return [];
-            return [
-              (event.notes?.length ?? 0) > 0 || EditorSession.kitCount(event) > 0
-                ? { type: 'clearEvent' as const, event: address }
-                : { type: 'removeEvent' as const, event: address }
-            ];
+            if (!event || !eventHoldsInk(event)) return [];
+            return [{ address, notes: (event.notes?.length ?? 0) + EditorSession.kitCount(event) }];
           });
-          return this.applyDestructive(ops);
+        if (inky.length > 0) {
+          const notes = inky.reduce((sum, entry) => sum + entry.notes, 0);
+          const ops = inky.map(entry => ({ type: 'clearEvent' as const, event: entry.address }));
+          if (!this.applyDestructive(ops)) return this.refuseDelete(level);
+          this.lastDeleteOutcome = { kind: 'cleared', level, notes, thenRemoves: true };
+          return true;
         }
-        if (this.selectionState.level === 'container') {
+
+        // PRESS 2 — the rung holds no ink, so the structure itself goes. Each
+        // removal is footprint-exact: it takes only what the selection covers.
+        // `removeVoiceMeasure` splices one sequence out of one bar and never
+        // touches that voice elsewhere; `removePartMeasure` empties one
+        // staff's copy of one bar and never removes the part. That rule is
+        // also what forbids removing a whole part from a single part-measure.
+        if (level === 'container') {
           const ops = [...this.resolvedSelection.members].reverse().flatMap(member =>
             member.kind === 'container'
               ? [{
@@ -454,10 +516,16 @@ export class EditorSession {
                 }]
               : []
           );
-          return this.applyDestructive(ops);
+          return this.finishDeleteRemoval(level, ops);
         }
-        if (this.selectionState.level === 'voiceMeasure') {
-          const ops = this.resolvedSelection.members.flatMap(member =>
+        if (level === 'event') {
+          const ops = [...this.resolvedSelection.members].reverse().flatMap(member =>
+            member.kind === 'event' ? [{ type: 'removeEvent' as const, event: eventAddressOf(member) }] : []
+          );
+          return this.finishDeleteRemoval(level, ops);
+        }
+        if (level === 'voiceMeasure') {
+          const ops = [...this.resolvedSelection.members].reverse().flatMap(member =>
             member.kind === 'voiceMeasure'
               ? [{
                   type: 'removeVoiceMeasure' as const,
@@ -467,10 +535,10 @@ export class EditorSession {
                 }]
               : []
           );
-          return this.applyDestructive(ops);
+          return this.finishDeleteRemoval(level, ops);
         }
-        if (this.selectionState.level === 'partMeasure') {
-          const ops = this.resolvedSelection.members.flatMap(member =>
+        if (level === 'partMeasure') {
+          const ops = [...this.resolvedSelection.members].reverse().flatMap(member =>
             member.kind === 'partMeasure'
               ? [{
                   type: 'removePartMeasure' as const,
@@ -480,48 +548,33 @@ export class EditorSession {
                 }]
               : []
           );
-          return this.applyDestructive(ops);
+          return this.finishDeleteRemoval(level, ops);
         }
-        // The same guarded-removal rule continues outward: Del at the measure
-        // rung removes the empty bar, and at score it removes the empty part
-        // (then trailing empty bars). No wider command destroys hidden ink.
-        if (this.selectionState.level === 'measure') {
-          const measureIndex = this.cursorState.measureIndex;
-          if (
-            !this.doc.global?.measures?.[measureIndex] ||
-            measureHasInk(this.doc, measureIndex)
-          )
-            return false;
-          this.apply({ type: 'removeMeasure', measureIndex });
-          return true;
+        // The measure rung's footprint is the whole bar COLUMN across every
+        // part — the same one `Cut` uses — so a range removes every bar it
+        // covers, highest index first because a splice moves the rest.
+        if (level === 'measure') {
+          const ops = this.resolvedSelection.members
+            .flatMap(member => (member.kind === 'measure' ? [member.measureIndex] : []))
+            .sort((a, b) => b - a)
+            .map(measureIndex => ({ type: 'removeMeasure' as const, measureIndex }));
+          return this.finishDeleteRemoval(level, ops);
         }
-        if (this.selectionState.level === 'document') {
+        if (level === 'document') {
+          // The skeleton dissolves in reverse symmetry with skeleton-on-demand:
+          // the empty part first, then the trailing bars it leaves behind.
           const partIndex = this.cursorState.partIndex ?? 0;
           const part = this.doc.parts?.[partIndex];
           if (part && !partHasInk(part)) {
-            this.apply({ type: 'removePart', partIndex });
-            return true;
+            return this.finishDeleteRemoval(level, [{ type: 'removePart', partIndex }]);
           }
           const last = (this.doc.global?.measures?.length ?? 0) - 1;
           if (!part && last >= 0) {
-            this.apply({ type: 'removeMeasure', measureIndex: last });
-            return true;
+            return this.finishDeleteRemoval(level, [{ type: 'removeMeasure', measureIndex: last }]);
           }
-          return false;
+          return this.refuseDelete(level);
         }
-        if (this.selectionState.level === 'section') {
-          const ops = [...this.resolvedSelection.members].reverse().flatMap(member =>
-            member.kind === 'section'
-              ? [{
-                  type: 'removeMeasureAttribute' as const,
-                  measureIndex: member.start,
-                  kind: 'section' as const
-                }]
-              : []
-          );
-          return this.applyDestructive(ops);
-        }
-        return false;
+        return this.refuseDelete(level);
       }
       case 'shorterDuration':
       case 'longerDuration': {
@@ -2175,6 +2228,76 @@ export class EditorSession {
     this.history.undo();
     this.reindex(true);
     return false;
+  }
+
+  /** Record a delete that did nothing, so the workbench can SAY so. A
+   *  keystroke that produces neither a change nor a sentence is the bug this
+   *  whole item started from. */
+  private refuseDelete(level: SelectionLevel): false {
+    this.lastDeleteOutcome = { kind: 'refused', level };
+    return false;
+  }
+
+  /** Press 2's shared tail: apply the rung's removal and record what went. */
+  private finishDeleteRemoval(level: SelectionLevel, ops: EditOp[]): boolean {
+    const members = ops.length;
+    if (!this.applyDestructive(ops)) return this.refuseDelete(level);
+    this.lastDeleteOutcome = { kind: 'removed', level, members };
+    return true;
+  }
+
+  /**
+   * The section rung's Del, and the descent that follows it.
+   *
+   * A section IS its label: `presentLevels` adds the rung only when
+   * `sectionRangeAt` finds a boundary covering the cursor, and the span is
+   * derived by walking boundary to boundary. Remove the label and the rung
+   * stops existing — but the MUSIC does not, which is why relaxing outward
+   * would be wrong twice over. `applyDestructive` re-anchors with
+   * `relaxLevel`, which walks UP only, and `section` sits directly below
+   * `document`: a vanished section would land the selection on the whole
+   * score, where the next Del means "clear every note in it". That is the one
+   * genuinely dangerous default in this design, and it arrives silently if
+   * the re-anchor is left alone.
+   *
+   * So this descends instead, carrying the range — the same bars, one rung
+   * down. THE FOOTPRINT DOES NOT MOVE; only the rung name does. Descending is
+   * right here and relaxing stays right everywhere else because every other
+   * rung's disappearance means its container is now the correct address: the
+   * last note goes, and the event is what you were pointing at. Section is
+   * the only rung that is a label on a BORROWED range rather than a container
+   * of music, so when it dies the music survives.
+   *
+   * The active edge is the section's FIRST bar — endpoints are unordered
+   * (`resolveSelection` returns members in document order regardless of drag
+   * direction), so anchoring at the far end costs nothing and leaves the
+   * cursor where the section's identity was.
+   */
+  private deleteSectionLabels(): boolean {
+    const sections = this.resolvedSelection.members.flatMap(member =>
+      member.kind === 'section' ? [member] : []
+    );
+    if (sections.length === 0) return this.refuseDelete('section');
+    const start = Math.min(...sections.map(section => section.start));
+    const end = Math.max(...sections.map(section => section.end));
+    const ops = [...sections].reverse().map(section => ({
+      type: 'removeMeasureAttribute' as const,
+      measureIndex: section.start,
+      kind: 'section' as const
+    }));
+    if (!this.applyBulk(ops)) return this.refuseDelete('section');
+    // `moveToMeasure` clamps and resolves the anchor voice, so both endpoints
+    // land the way every other jump does.
+    const far = withoutEventPin(moveToMeasure(this.grid, this.cursorState, Math.max(start, end - 1)));
+    const near = withoutEventPin(moveToMeasure(this.grid, this.cursorState, start));
+    this.cursorState = near;
+    this.selectionState = {
+      level: 'measure',
+      anchor: far,
+      extent: { kind: 'cursor', cursor: near }
+    };
+    this.lastDeleteOutcome = { kind: 'sectionLabels', sections: sections.length };
+    return true;
   }
 
   private applyDestructive(ops: EditOp[]): boolean {

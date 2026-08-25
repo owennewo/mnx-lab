@@ -44,21 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-delete-clears-then-removes.md](proposed/core-delete-clears-then-removes.md)** —
-  `Del` at the five guarded rungs answers with silence: the guard is a dead end rather
-  than a branch, so selecting a bar and pressing `Del` does nothing at all. Carries the
-  `event` rung's existing two-press rule up the whole ladder — **press 1 clears what the
-  rung owns, press 2 removes the rung** — with the press counter being *the document*, so
-  no hidden state and no mode. The anti-cheat rule from
-  [core-campaign-element-ops.md](complete/core-campaign-element-ops.md) is restated, not
-  abandoned (never ink **and** structure in one press), and a **footprint rule** keeps
-  `removeVoiceMeasure`/`removePartMeasure` — both already footprint-exact, and the former
-  is `addVoiceMeasure`'s declared destruct partner. **Section turns out to need less than
-  any rung**: it owns only its label, so its two presses collapse into one and the ladder
-  falls through to the bar range beneath it. One dangerous default found — `applyDestructive`
-  relaxes *upward*, so a vanished section lands on `document` and the next `Del` would clear
-  the score; it must descend to `measure` carrying the range instead. `ops.ts` guards stay
-  put as defence in depth; `destructWalk.ts`'s phase-2 loop is the thing to watch.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -202,6 +187,23 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-delete-clears-then-removes.md](complete/core-delete-clears-then-removes.md)** —
+  **Delete's two presses, all the way up the ladder**, **finished 2026-08-25** (proposed,
+  built and closed the same day). Found by hands-on testing: select a bar, press `Del`,
+  and nothing happens — the guard at five rungs was a **dead end rather than a branch**,
+  so the verb answered a keystroke with silence. Generalises the `event` rung's existing
+  rule — **press 1 clears what the rung owns, press 2 removes the rung** — with the press
+  counter being *the document*, so there is no hidden state and no mode. The anti-cheat
+  rule from [core-campaign-element-ops.md](complete/core-campaign-element-ops.md) is
+  restated rather than abandoned (never ink **and** structure in one press), and a
+  **footprint rule** keeps `removeVoiceMeasure`/`removePartMeasure`. **Section needed less
+  than any rung**: it owns only its label, so its two presses collapse into one and the
+  ladder *descends* to the bar range beneath it — the one dangerous default found in
+  review, since `applyDestructive` relaxes upward and would have landed a vanished section
+  on `document`, where the next `Del` means *clear the score*. Built without touching
+  `ops.ts` (the guards stay as defence in depth) and without touching `destructWalk.ts`
+  (the flagged risk did not fire — phase 1 still strips ink before phase 2 climbs). The
+  refusal that started it now speaks: `cleared 12 notes — Del again to remove the bar`.
 - **[core-rung-insert.md](complete/core-rung-insert.md)** — **`I` / `Shift+I` insert at
   the cursor's rung, and a ghost bar past the end of the score**, **finished 2026-08-24**
   (proposed, built and closed the same day). Found by hands-on testing of

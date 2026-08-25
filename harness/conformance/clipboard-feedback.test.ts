@@ -9,6 +9,7 @@ import { EditorSession } from '../../src/edit/session.ts';
 import {
   copySelectionNotice,
   cutSelectionNotice,
+  deleteSelectionNotice,
   pasteSelectionNotice
 } from '../../src/edit/clipboardFeedback.ts';
 import {
@@ -162,6 +163,58 @@ describe('clipboard notices', () => {
     expect(pasteSelectionNotice(await pasteSelectionFromStore(ontoRest, store))).toEqual({
       ok: true,
       message: 'pasted event-run at bar 2 · 1 rest filled in'
+    });
+  });
+});
+
+describe('the delete sentences', () => {
+  // core-delete-clears-then-removes.md: the item exists because Del at a
+  // guarded rung produced neither a change nor a sentence. Press 1 must say
+  // what it took AND that press 2 is waiting, or the ladder's most useful
+  // property stays invisible.
+  const notice = (session: EditorSession) => {
+    session.handleIntent({ type: 'delete' });
+    return deleteSelectionNotice(session.lastDelete!);
+  };
+
+  it('names the rung the second press will take', () => {
+    const bar = new EditorSession(score());
+    while (bar.selectionLevel !== 'measure') bar.handleIntent({ type: 'relaxSelection' });
+    expect(notice(bar)).toEqual({
+      ok: true,
+      message: 'cleared 2 notes — Del again to remove the bar'
+    });
+    expect(notice(bar)).toEqual({ ok: true, message: 'removed the bar' });
+  });
+
+  it('says a bare note deletion is finished, with no second press implied', () => {
+    const session = new EditorSession(score()); // note rung
+    expect(notice(session)).toEqual({ ok: true, message: 'deleted 1 note' });
+  });
+
+  it('says where the selection went when a section label goes', () => {
+    const doc = score();
+    doc.global.measures[0].section = { label: 'Intro' };
+    const session = new EditorSession(doc);
+    while (session.selectionLevel !== 'section') session.handleIntent({ type: 'relaxSelection' });
+    expect(notice(session)).toEqual({
+      ok: true,
+      message: 'removed the section label — the bars remain, and Del now addresses them'
+    });
+    expect(session.selectionLevel).toBe('measure');
+  });
+
+  it('says a refusal out loud rather than answering with silence', () => {
+    expect(deleteSelectionNotice({ kind: 'refused', level: 'document' })).toEqual({
+      ok: false,
+      message: 'nothing left to delete at the part rung'
+    });
+  });
+
+  it('pluralises the removed rung', () => {
+    expect(deleteSelectionNotice({ kind: 'removed', level: 'measure', members: 3 })).toEqual({
+      ok: true,
+      message: 'removed 3 bars'
     });
   });
 });

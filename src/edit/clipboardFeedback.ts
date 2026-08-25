@@ -1,4 +1,10 @@
-// One sentence per clipboard outcome — core-selection-clipboard.md, stage 6.
+// One sentence per clipboard outcome — core-selection-clipboard.md, stage 6 —
+// and, since core-delete-clears-then-removes.md, per DELETE outcome too.
+//
+// Delete joined the clipboard's transient-notice channel rather than growing a
+// second one: it is the same problem (a keystroke whose result is invisible
+// needs a sentence) and the same answer, so the words live together where the
+// conformance tests already pin them.
 //
 // The contract asks for clip kind, member count, detached references and the
 // PRECISE refusal, without a clipboard panel: so the workbench shows a
@@ -6,6 +12,8 @@
 // planners it describes, so the texts are pinned by conformance tests rather
 // than read out of a rendered page.
 import type { SelectionClip } from './selectionClip.ts';
+import type { SelectionLevel } from './selection.ts';
+import type { DeleteOutcome } from './session.ts';
 import type {
   CopySelectionResult,
   CutSelectionResult,
@@ -123,4 +131,60 @@ export function pasteSelectionNotice(result: PasteSelectionResult): ClipboardNot
       clauses.map(clause => ` · ${clause}`).join('') +
       detachedClause(detachedTargetReferences, 'repaired in the document')
   };
+}
+
+/** What each rung is CALLED when a sentence has to name the thing that went.
+ *  The score rung's removal is a part (then the trailing bars), which is why
+ *  `document` reads as one. */
+const RUNG_NOUN: Record<SelectionLevel, string> = {
+  note: 'note',
+  event: 'event',
+  container: 'rhythm container',
+  voiceMeasure: 'voice bar',
+  partMeasure: 'staff bar',
+  measure: 'bar',
+  section: 'section',
+  document: 'part'
+};
+
+/**
+ * Delete's sentence — and the reason this item exists.
+ *
+ * The two presses mean different things, so press 1 has to say both what it
+ * took AND that a second press is waiting; otherwise the ladder's most useful
+ * property is invisible. A refusal is said out loud for the same reason: a
+ * keystroke that produces neither a change nor a sentence is the bug the whole
+ * rule was written against.
+ */
+export function deleteSelectionNotice(outcome: DeleteOutcome): ClipboardNotice {
+  switch (outcome.kind) {
+    case 'cleared':
+      return {
+        ok: true,
+        message: outcome.thenRemoves
+          ? `cleared ${count(outcome.notes, 'note')} — Del again to remove the ${RUNG_NOUN[outcome.level]}`
+          : `deleted ${count(outcome.notes, 'note')}`
+      };
+    case 'removed':
+      return {
+        ok: true,
+        message: `removed ${outcome.members === 1
+          ? `the ${RUNG_NOUN[outcome.level]}`
+          : count(outcome.members, RUNG_NOUN[outcome.level])}`
+      };
+    case 'sectionLabels':
+      // Say where the selection WENT. The rung it was standing on no longer
+      // exists, and the next press means something else entirely.
+      return {
+        ok: true,
+        message:
+          `removed ${outcome.sections === 1 ? 'the section label' : count(outcome.sections, 'section label')}` +
+          ' — the bars remain, and Del now addresses them'
+      };
+    case 'refused':
+      return {
+        ok: false,
+        message: `nothing left to delete at the ${RUNG_NOUN[outcome.level]} rung`
+      };
+  }
 }
