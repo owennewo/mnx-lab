@@ -450,6 +450,57 @@ describe('selection ladder', () => {
     expect(session.lastDelete).toEqual({ kind: 'refused', level: 'document' });
   });
 
+  it('lands on the last surviving bar, never past the end of the score', () => {
+    // The ghost bar is a legal place to STAND, but only when you walked
+    // there. Deleting the last bar slid it under a cursor that never moved,
+    // and out there no rung has a member — so the selection was kicked to
+    // `document`, where the next ↑ escalates to a different score.
+    const session = new EditorSession(makeDoc());
+    session.handleIntent({ type: 'goToEdge', edge: 'last' });
+    while (session.selectionLevel !== 'measure') session.handleIntent(relax);
+    expect(session.cursor.measureIndex).toBe(2);
+
+    expect(session.handleIntent({ type: 'delete' })).toBe(true); // bar 2 is empty already
+    expect(session.doc.global.measures).toHaveLength(2);
+    expect(session.pastEnd, 'parked past the end').toBe(false);
+    expect(session.cursor.measureIndex, 'the new last bar').toBe(1);
+    expect(session.selectionLevel, 'the rung survives, so Del repeats').toBe('measure');
+    expect(resolveSelection(session.doc, session.selection, 'notation').members)
+      .toEqual([{ kind: 'measure', measureIndex: 1 }]);
+  });
+
+  it('keeps a mid-score deletion on whatever moved into the gap', () => {
+    // Nothing to repair here: the bars shift down, so the cursor's index
+    // still resolves — and it should land on the bar that took the place.
+    const session = new EditorSession(makeDoc());
+    session.handleIntent({ type: 'goToMeasure', measureIndex: 1 });
+    while (session.selectionLevel !== 'measure') session.handleIntent(relax);
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.doc.global.measures).toHaveLength(2);
+    expect(session.cursor.measureIndex).toBe(1);
+    expect(session.selectionLevel).toBe('measure');
+  });
+
+  it('stops at the bar rung when the last bar goes, so a bar can be made again', () => {
+    // `measure` holds no member in a bar-less score, so the ordinary repair
+    // would climb to `document` — where ↑/↓ leaves for another SCORE and `I`
+    // adds a part. The reader who just deleted their last bar wants a bar.
+    const session = new EditorSession(makeDoc());
+    while (session.selectionLevel !== 'measure') session.handleIntent(relax);
+    for (let press = 0; press < 6 && session.doc.global.measures.length > 0; press++) {
+      session.handleIntent({ type: 'delete' });
+    }
+    expect(session.doc.global.measures).toHaveLength(0);
+    expect(session.selectionLevel).toBe('measure');
+
+    // …and the way back is one key, because `I` at this rung is genesis.
+    expect(session.handleIntent({ type: 'insertAtRung', side: 'after' })).toBe(true);
+    expect(session.doc.global.measures).toHaveLength(1);
+    // makeDoc's part declares strings, so the fingerboard is the entry surface.
+    expect(session.projection).toBe('tab');
+    expect(session.handleIntent({ type: 'enterFret', fret: 3 }), 'entry works again').toBe(true);
+  });
+
   it('opens on the rung a rail-crossing gesture was standing on', () => {
     // The score rung's ↑/↓ is the neighbouring DOCUMENT, and crossing one
     // builds a new session. The mount carries the rung across so the gesture

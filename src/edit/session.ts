@@ -2355,6 +2355,29 @@ export class EditorSession {
   private applyDestructive(ops: EditOp[]): boolean {
     const level = this.selectionState.level;
     if (!this.applyBulk(ops)) return false;
+    // A REMOVAL MUST NOT PARK YOU PAST THE END OF THE SCORE.
+    //
+    // The ghost bar is a legal place to stand — that is core-rung-insert.md's
+    // whole point, and `clampCursor` honours it — but only when you WALKED
+    // there. Deleting the last bar slides it under a cursor that never moved,
+    // and out there no rung has a member: the point selection resolves empty,
+    // so the repair below relaxed all the way to `document`, where the next
+    // ↑/↓ escalates to a different SCORE. Delete the last bar and the ladder
+    // fell out from under you.
+    //
+    // Aim at the last surviving bar instead. A removal in the MIDDLE needs
+    // nothing: the bars shift down, so the cursor's index still resolves and
+    // it lands on whatever moved into the deleted one's place, which is what
+    // it should do.
+    if (this.pastEnd) {
+      const last = (this.doc.global?.measures?.length ?? 0) - 1;
+      if (last >= 0) {
+        this.cursorState = moveToMeasure(this.grid, this.cursorState, last);
+        // A range whose tail was just consumed has no honest extent left, so
+        // this collapses to a point — the same repair a point gets.
+        this.reanchorSelection(level);
+      }
+    }
     const present = presentLevels(
       this.doc,
       this.grid,
@@ -2362,6 +2385,21 @@ export class EditorSession {
       this.activeProjection
     );
     if (present.has(level) && this.resolvedSelection.members.length > 0) return true;
+    // A SCORE WITH NO BARS STOPS AT THE BAR RUNG. `measure` holds no member
+    // there, so the rule above would climb to `document` — honest by the
+    // letter of "relax until something resolves", and wrong here: `document`
+    // is where ↑/↓ leaves for another SCORE, and the reader who just deleted
+    // their last bar wants to make another one, which is what `I` means at
+    // exactly this rung (core-delete-clears-then-removes.md's genesis case).
+    //
+    // The three structural rungs are ALWAYS present (`presentLevels` hardcodes
+    // them) precisely because they are the skeleton rather than content — so
+    // an empty one is not an absent one, and stopping on it is the ladder
+    // behaving as designed rather than a special case.
+    if ((this.doc.global?.measures?.length ?? 0) === 0 && level !== 'document') {
+      this.reanchorSelection('measure');
+      return true;
+    }
     const ancestor = relaxLevel(present, level);
     if (ancestor) this.reanchorSelection(ancestor);
     return true;

@@ -287,6 +287,36 @@ and `Shift+M` stays gone. Recorded at
 `insertEventHere` also stopped reporting success for a bar that does not exist,
 which had been pushing a history entry that changed no bytes.
 
+### Follow-up — 2026-08-25: the cursor landed past the end of the score
+
+Reported the same day: *delete the last bar and the selection is broken —
+feels like it is left on a rung that doesn't exist.* Close: the RUNG was fine,
+the **cursor** was not.
+
+`clampCursor` treats the ghost bar past the end as a legal place to stand,
+which it is — that is [core-rung-insert.md](core-rung-insert.md)'s whole point
+— but only when you WALKED there. Removing the last bar slid the ghost under a
+cursor that had not moved, and out past the end no rung has a member: the
+point selection resolved empty, so `applyDestructive`'s repair relaxed all the
+way to `document`. From there ↑/↓ escalates to a different SCORE
+([core-selection-ladder.md](core-selection-ladder.md)), so the ladder really
+had fallen out from under the reader.
+
+Two repairs, both in `applyDestructive`:
+
+- **Never park past the end.** If the cursor is `pastEnd` after a removal, aim
+  it at the last surviving bar. A removal in the MIDDLE needs nothing — the
+  bars shift down, the cursor's index still resolves, and it lands on whatever
+  moved into the gap, which is what it should do.
+- **A bar-less score stops at the bar rung.** `measure` holds no member there,
+  so the ordinary "relax until something resolves" rule climbed to `document`
+  — honest by the letter, wrong in effect: `document` is where ↑/↓ leaves for
+  another score and `I` adds a part, while the reader who just deleted their
+  last bar wants a bar. `measure` is where `I` means genesis (the follow-up
+  above), so the round trip closes in one key. This is not a special case: the
+  three structural rungs are always present because they are the SKELETON
+  rather than content, so an empty one is not an absent one.
+
 ### Files
 
 `src/edit/selectionEvents.ts` (new — the member→event walk and the ink test),
