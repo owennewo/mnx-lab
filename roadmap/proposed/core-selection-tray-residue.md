@@ -16,6 +16,17 @@
 > **every tile in the tray is purple** — which is the honest picture and the point.
 > What remains is the ticking, and that is human work: see *Retirement*.
 >
+> **The tile cursor follows the scroll (2026-08-25).** The tray's tile cursor is
+> VIRTUAL — an index and a class, never DOM focus, because the search box keeps
+> focus so typing works while the grid is being walked. The browser scrolls what
+> it focuses, so a virtual cursor gets none of that for free, and ↓ past the fold
+> left the cursor on a tile nobody could see. Latent until the tray was bounded,
+> because before that there was no fold to fall past. Scrolled by hand rather
+> than with `scrollIntoView({ block: 'nearest' })`: that scrolls ancestors too —
+> the tray floats over a score that must not move under it — and it knows
+> nothing about the sticky captions, which would swallow a tile parked at
+> `scrollTop`.
+>
 > **The tray is bounded and dismisses itself (2026-08-25).** Banding made a
 > latent bug visible: the tray had **no height limit at all**, so it simply grew
 > with its content — the note rung's six captioned bands ran 699px tall in a

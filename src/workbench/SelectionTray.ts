@@ -729,6 +729,40 @@ export class SelectionTray extends LitElement {
       this.cursorIndex = Math.min(this.cursorIndex, Math.max(0, this.entries().length - 1));
     }
     this.place();
+    this.revealCursor();
+  }
+
+  /**
+   * Keep the cursored tile in view now that the grid scrolls.
+   *
+   * The tile cursor is VIRTUAL — an index and a class, never DOM focus (the
+   * search box keeps that, so typing keeps working while the grid is being
+   * walked). The browser scrolls what it focuses, so a virtual cursor gets
+   * none of that for free, and walking down past the fold left the cursor on
+   * a tile nobody could see. Before the height cap there was no fold to fall
+   * past, which is why this only became a bug once the tray was bounded.
+   *
+   * Done by hand rather than with `scrollIntoView({ block: 'nearest' })` for
+   * two reasons: that would also scroll ancestors — the tray floats over a
+   * score that must not move under it — and it knows nothing about the STICKY
+   * captions, which overlay the top of the grid and would swallow a tile
+   * parked exactly at scrollTop.
+   */
+  private revealCursor(): void {
+    const grid = this.renderRoot.querySelector<HTMLElement>('.grid');
+    const tile = this.renderRoot.querySelectorAll<HTMLElement>('.tile:not([disabled])')[
+      this.cursorIndex
+    ];
+    if (!grid || !tile) return;
+    const view = grid.getBoundingClientRect();
+    const box = tile.getBoundingClientRect();
+    // The caption sitting above this tile is the real ceiling: scrolling to
+    // the tile's own top would tuck it under one.
+    const band = tile.closest('.band');
+    const caption = band?.querySelector<HTMLElement>('.caption');
+    const ceiling = view.top + (caption?.getBoundingClientRect().height ?? 0);
+    if (box.top < ceiling) grid.scrollTop -= ceiling - box.top;
+    else if (box.bottom > view.bottom) grid.scrollTop += box.bottom - view.bottom;
   }
 
   /**
