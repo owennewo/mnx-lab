@@ -547,6 +547,41 @@ export const COMMANDS: readonly EditorCommand[] = [
     blockedBy: 'arpeggio'
   },
   {
+    // `I`/`Shift+I` have inserted an event since core-rung-insert.md, at the
+    // note rung as well as the event one — the rung names the SIZE of what
+    // you insert, and a note-sized thing in a voice is an event — but neither
+    // had a tile, so the verb existed only for readers who already knew the
+    // key. Banding the structure verbs is what made the hole visible.
+    id: 'insert-event-before',
+    scopes: ['note', 'event'],
+    glyph: { smufl: 'noteQuarterUp' },
+    label: 'Insert an event before this one',
+    shortcut: 'Shift+I',
+    tier: 'key',
+    action: () => ({ intent: { type: 'insertAtRung', side: 'before' } })
+  },
+  {
+    id: 'insert-event-after',
+    scopes: ['note', 'event'],
+    glyph: { smufl: 'noteQuarterUp' },
+    label: 'Insert an event after this one',
+    shortcut: 'I',
+    tier: 'key',
+    action: () => ({ intent: { type: 'insertAtRung', side: 'after' } })
+  },
+  {
+    // The note rung's Del had no tile either: every other rung's removal is
+    // drawn and this one was not, which is the sort of gap a flat grid hides
+    // and a captioned band cannot.
+    id: 'delete-note',
+    scopes: ['note'],
+    glyph: { smufl: 'restQuarter' },
+    label: 'Delete this note',
+    shortcut: 'Del',
+    tier: 'key',
+    action: () => ({ intent: { type: 'delete' } })
+  },
+  {
     id: 'clear-event',
     scopes: ['event'],
     glyph: { smufl: 'restQuarter' },
@@ -883,6 +918,18 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ intent: { type: 'insertAtRung', side: 'before' } })
   },
   {
+    // The score rung's Del: the empty part, then the trailing bars — the
+    // skeleton dissolving in reverse symmetry with skeleton-on-demand. It has
+    // always been keyboard-reachable and never drawn.
+    id: 'delete-part',
+    scopes: ['document'],
+    glyph: { smufl: 'restWhole' },
+    label: 'Delete this part (clears its notes first)',
+    shortcut: 'Del',
+    tier: 'key',
+    action: () => ({ intent: { type: 'delete' } })
+  },
+  {
     id: 'insert-part-after',
     scopes: ['document'],
     glyph: { smufl: 'brace' },
@@ -1083,7 +1130,25 @@ export interface CommandGroup {
  * other rung has today.
  */
 export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[]>> = {
+  // EVERY RUNG LEADS WITH `structure`, and it is the same three questions each
+  // time: what goes before this, what goes after it, and how does it go away.
+  // Those verbs were previously scattered among a rung's property tiles — at
+  // the bar rung, three of them among thirteen — which is how the tray came to
+  // hide `new-voice` at the one rung that could still reach it, and how two
+  // insert keys and two deletes came to have no tile at all.
+  //
+  // A rung's structure band holds the unit IT governs. For most rungs that is
+  // a sibling; for `partMeasure` and `document` it is the CHILD, because
+  // neither a staff nor a second document can be inserted at all — the
+  // asymmetry is the domain's, not the tray's (core-rung-insert.md).
   note: [
+    // A chord is a set, so what `I` inserts at the note rung is an EVENT —
+    // hence the same pair the event rung draws, aimed one size up.
+    {
+      id: 'structure',
+      caption: 'structure',
+      commands: ['insert-event-before', 'insert-event-after', 'delete-note']
+    },
     { id: 'spelling', caption: 'spelling', commands: ['respell', 'accidental-display'] },
     { id: 'joins', caption: 'joins', commands: ['tie', 'slur', 'beam'] },
     {
@@ -1097,6 +1162,98 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       commands: ['bend', 'slide', 'hammer-pull', 'vibrato', 'palm-mute', 'harmonic']
     },
     { id: 'text', caption: 'text', commands: ['fingering', 'lyric'] }
+  ],
+  event: [
+    {
+      id: 'structure',
+      caption: 'structure',
+      commands: ['insert-event-before', 'insert-event-after', 'clear-event']
+    },
+    { id: 'duration', caption: 'duration', commands: ['shorter', 'longer', 'dots'] },
+    { id: 'rhythm', caption: 'rhythm containers', commands: ['tuplet', 'grace', 'tremolo'] },
+    { id: 'joins', caption: 'joins', commands: ['slur', 'beam'] },
+    {
+      id: 'articulation',
+      caption: 'articulation',
+      commands: [
+        'staccato', 'accent', 'tenuto', 'strong-accent', 'staccatissimo',
+        'breath', 'fermata', 'arpeggio'
+      ]
+    },
+    {
+      id: 'dynamics',
+      caption: 'dynamics',
+      commands: ['piano', 'mezzo-forte', 'forte', 'crescendo', 'diminuendo']
+    },
+    { id: 'text', caption: 'lines & text', commands: ['ottava', 'direction', 'lyric'] }
+  ],
+  // Two tiles, and the band still earns its caption: it says the one verb
+  // this rung has is a structural one, rather than leaving it beside a
+  // properties popover with nothing to distinguish them.
+  container: [
+    { id: 'structure', caption: 'structure', commands: ['delete-container'] },
+    { id: 'properties', caption: 'properties', commands: ['container-settings'] }
+  ],
+  voiceMeasure: [
+    { id: 'structure', caption: 'structure', commands: ['new-voice', 'delete-voice-bar'] },
+    {
+      id: 'rests',
+      caption: 'rests & spacing',
+      commands: ['full-measure-rest', 'rest-spelling', 'space']
+    },
+    { id: 'voices', caption: 'voices', commands: ['cycle-voice'] }
+  ],
+  partMeasure: [
+    // `new-voice` is the child's construct verb, carried here because
+    // `voiceMeasure` vanishes with the last voice and takes its own copy with
+    // it (core-rung-insert.md, amended 2026-08-25).
+    { id: 'structure', caption: 'structure', commands: ['new-voice', 'delete-part-bar'] },
+    { id: 'staff', caption: 'staff', commands: ['clef'] },
+    {
+      id: 'instrument',
+      caption: 'instrument',
+      commands: ['tuning', 'capo', 'transpose-part', 'mute-part']
+    },
+    { id: 'selection', caption: 'selection', commands: ['part-scope'] }
+  ],
+  measure: [
+    {
+      id: 'structure',
+      caption: 'structure',
+      commands: ['insert-bar-before', 'insert-bar-after', 'add-bar', 'delete-bar']
+    },
+    {
+      id: 'signatures',
+      caption: 'signatures',
+      commands: ['clef', 'key-signature', 'time-signature']
+    },
+    {
+      id: 'repeats',
+      caption: 'repeats & barlines',
+      commands: ['repeat-start', 'repeat-end', 'ending', 'final-barline', 'measure-repeat']
+    },
+    { id: 'jumps', caption: 'jumps', commands: ['segno', 'coda'] },
+    { id: 'marks', caption: 'marks', commands: ['rehearsal', 'tempo', 'section'] }
+  ],
+  section: [
+    { id: 'structure', caption: 'structure', commands: ['delete-section-boundary'] },
+    {
+      id: 'section',
+      caption: 'section',
+      commands: ['section', 'section-range', 'section-colour']
+    }
+  ],
+  document: [
+    // The score rung inserts PARTS: its own unit is the document, and there is
+    // only ever one. `add-bar` sits here because a bar-less score is reachable
+    // by deleting, and this is one of the two rungs that can still make one.
+    {
+      id: 'structure',
+      caption: 'structure',
+      commands: ['insert-part-before', 'insert-part-after', 'add-part', 'add-bar', 'delete-part']
+    },
+    { id: 'part', caption: 'part', commands: ['part-name', 'staves', 'staff-kind'] },
+    { id: 'layout', caption: 'layout', commands: ['system-break', 'multimeasure-rest'] }
   ]
 };
 

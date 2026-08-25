@@ -16,6 +16,16 @@
 > **every tile in the tray is purple** — which is the honest picture and the point.
 > What remains is the ticking, and that is human work: see *Retirement*.
 >
+> **Every rung is banded (2026-08-25)**, each leading with a `structure` band — insert
+> before, insert after, delete — so a rung's structural verbs are drawn together and drawn
+> first instead of scattered among its properties (three among thirteen at the bar rung,
+> which is how the tray came to hide the one voice verb that could still be reached).
+> Banding them surfaced **four verbs with keys and no tile at all** — `insert-event-before`
+> / `insert-event-after` at the note and event rungs, `delete-note`, and `delete-part` —
+> now added, which is why the placement counts below moved. The per-rung tables were
+> **regenerated from the registry** on the same day; the marks stay unticked, because a
+> band being built is not a band being vouched for.
+>
 > **The note rung is grouped and ordered (2026-08-24)**, in `COMMAND_GROUPS` beside the
 > registry: five captioned bands — spelling, joins, articulation, fingerboard, text — with
 > the search line lifted **above** the tiles so the panel reads in palette order, the first
@@ -129,17 +139,18 @@ doc that not one of them has been ticked yet. Rung order is the ladder's own, an
 order within a rung is **today's display order** — so a rung whose `ordered` column
 fills in without the rows moving is a rung that was already right.
 
-### note — 19 placements
-
-Banded as of 2026-08-24 (`COMMAND_GROUPS.note`): the rows below are in band order, which is now the tray's order too. `grouped` and `ordered` are still open boxes — the bands are built, not yet vouched for.
+### note — 22 placements
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
+| `insert-event-before` — Insert an event before this one | `Shift+I` | ☐ | ☐ | ☐ |
+| `insert-event-after` — Insert an event after this one | `I` | ☐ | ☐ | ☐ |
+| `delete-note` — Delete this note | `Del` | ☐ | ☐ | ☐ |
+| `respell` — Respell enharmonically (cycles) | `J` | ☐ | ☐ | ☐ |
+| `accidental-display` — Force the accidental | `Shift+A` | ☐ | ☐ | ☐ |
 | `tie` — Tie to the next note | `T` | ☐ | ☐ | ☐ |
 | `slur` — Slur — press again at the last note *(notation)* | `S` | ☐ | ☐ | ☐ |
 | `beam` — Beam — press again at the last event *(notation)* | `B` | ☐ | ☐ | ☐ |
-| `accidental-display` — Force the accidental | `Shift+A` | ☐ | ☐ | ☐ |
-| `respell` — Respell enharmonically (cycles) | `J` | ☐ | ☐ | ☐ |
 | `staccato` — Staccato | `Shift+A` | ☐ | ☐ | ☐ |
 | `accent` — Accent | `Shift+A` | ☐ | ☐ | ☐ |
 | `tenuto` — Tenuto | `Shift+A` | ☐ | ☐ | ☐ |
@@ -155,10 +166,19 @@ Banded as of 2026-08-24 (`COMMAND_GROUPS.note`): the rows below are in band orde
 | `fingering` — Fingering | `Shift+A` | ☐ | ☐ | ☐ |
 | `lyric` — Lyric syllable… | `Shift+L` | ☐ | ☐ | ☐ |
 
-### event — 24 placements (+1 blocked, appendix)
+### event — 26 placements (+1 blocked, appendix)
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
+| `insert-event-before` — Insert an event before this one | `Shift+I` | ☐ | ☐ | ☐ |
+| `insert-event-after` — Insert an event after this one | `I` | ☐ | ☐ | ☐ |
+| `clear-event` — Clear to an equal-duration rest | `Del` | ☐ | ☐ | ☐ |
+| `shorter` — Shorter duration | `−` | ☐ | ☐ | ☐ |
+| `longer` — Longer duration | `=` | ☐ | ☐ | ☐ |
+| `dots` — Dot the value (cycles 0 → 1 → 2 → none) | `.` | ☐ | ☐ | ☐ |
+| `tuplet` — Triplet | `Shift+R` | ☐ | ☐ | ☐ |
+| `grace` — Grace note | `Shift+R` | ☐ | ☐ | ☐ |
+| `tremolo` — Tremolo | `Shift+R` | ☐ | ☐ | ☐ |
 | `slur` — Slur — press again at the last note *(notation)* | `S` | ☐ | ☐ | ☐ |
 | `beam` — Beam — press again at the last event *(notation)* | `B` | ☐ | ☐ | ☐ |
 | `staccato` — Staccato | `Shift+A` | ☐ | ☐ | ☐ |
@@ -167,12 +187,8 @@ Banded as of 2026-08-24 (`COMMAND_GROUPS.note`): the rows below are in band orde
 | `strong-accent` — Marcato | `Shift+A` | ☐ | ☐ | ☐ |
 | `staccatissimo` — Staccatissimo | `Shift+A` | ☐ | ☐ | ☐ |
 | `breath` — Breath mark | `Shift+A` | ☐ | ☐ | ☐ |
-| `shorter` — Shorter duration | `−` | ☐ | ☐ | ☐ |
-| `longer` — Longer duration | `=` | ☐ | ☐ | ☐ |
-| `dots` — Dot the value (cycles 0 → 1 → 2 → none) | `.` | ☐ | ☐ | ☐ |
-| `tuplet` — Triplet | `Shift+R` | ☐ | ☐ | ☐ |
-| `grace` — Grace note | `Shift+R` | ☐ | ☐ | ☐ |
-| `tremolo` — Tremolo | `Shift+R` | ☐ | ☐ | ☐ |
+| `fermata` — Fermata | `Shift+A` | ☐ | ☐ | ☐ |
+| `arpeggio` — Arpeggio | — | ⛔ blocked — `arpeggio` | | |
 | `piano` — Piano | `Shift+A` | ☐ | ☐ | ☐ |
 | `mezzo-forte` — Mezzo-forte | `Shift+A` | ☐ | ☐ | ☐ |
 | `forte` — Forte | `Shift+A` | ☐ | ☐ | ☐ |
@@ -181,82 +197,81 @@ Banded as of 2026-08-24 (`COMMAND_GROUPS.note`): the rows below are in band orde
 | `ottava` — Ottava alta | `Shift+A` | ☐ | ☐ | ☐ |
 | `direction` — Direction text… | `Shift+A` | ☐ | ☐ | ☐ |
 | `lyric` — Lyric syllable… | `Shift+L` | ☐ | ☐ | ☐ |
-| `fermata` — Fermata | `Shift+A` | ☐ | ☐ | ☐ |
-| `arpeggio` — Arpeggio | — | ⛔ blocked — `arpeggio` | | |
-| `clear-event` — Clear to an equal-duration rest | `Del` | ☐ | ☐ | ☐ |
 
 ### container — 1 placement (+1 blocked, appendix)
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
+| `delete-container` — Delete this container (clears its notes first) | `Del` | ☐ | ☐ | ☐ |
 | `container-settings` — Container settings… | — | ⛔ blocked — `container-properties` | | |
-| `delete-container` — Delete this container (only when empty) | `Del` | ☐ | ☐ | ☐ |
 
 ### voice bar — 6 placements
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
+| `new-voice` — Add a voice to this bar | `I` | ☐ | ☐ | ☐ |
+| `delete-voice-bar` — Delete this voice bar (clears its notes first) | `Del` | ☐ | ☐ | ☐ |
 | `full-measure-rest` — Full-measure rest | `Shift+B` | ☐ | ☐ | ☐ |
 | `rest-spelling` — Respell the rests… | `Shift+R` | ☐ | ☐ | ☐ |
 | `space` — Insert space… | `Shift+R` | ☐ | ☐ | ☐ |
 | `cycle-voice` — Step to the next voice at this beat | `Alt+V` | ☐ | ☐ | ☐ |
-| `new-voice` — Add a voice to this bar | `I` | ☐ | ☐ | ☐ |
-| `delete-voice-bar` — Delete this voice bar (only when empty) | `Del` | ☐ | ☐ | ☐ |
 
-### staff bar — 5 placements (+2 blocked, appendix)
+### staff bar — 6 placements (+2 blocked, appendix)
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
+| `new-voice` — Add a voice to this bar | `I` | ☐ | ☐ | ☐ |
+| `delete-part-bar` — Delete this staff bar (clears its notes first) | `Del` | ☐ | ☐ | ☐ |
 | `clef` — Clef… | `Shift+C` | ☐ | ☐ | ☐ |
 | `tuning` — Tuning… | `Shift+U` | ☐ | ☐ | ☐ |
 | `capo` — Capo… | `Shift+P` | ☐ | ☐ | ☐ |
-| `part-scope` — Select the whole part | `Ctrl+A` | ☐ | ☐ | ☐ |
 | `transpose-part` — Instrument transposition | — | ⛔ blocked — `part-transposition` | | |
 | `mute-part` — Mute the part | — | ⛔ blocked — `mute` | | |
-| `delete-part-bar` — Delete this staff bar (only when empty) | `Del` | ☐ | ☐ | ☐ |
+| `part-scope` — Select the whole part | `Ctrl+A` | ☐ | ☐ | ☐ |
 
 ### bar — 17 placements
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
+| `insert-bar-before` — Insert a bar before this one | `Shift+I` | ☐ | ☐ | ☐ |
+| `insert-bar-after` — Insert a bar after this one | `I` | ☐ | ☐ | ☐ |
+| `add-bar` — Append a bar at the end | — | ☐ | ☐ | ☐ |
+| `delete-bar` — Delete this bar (clears its notes first) | `Del` | ☐ | ☐ | ☐ |
 | `clef` — Clef… | `Shift+C` | ☐ | ☐ | ☐ |
 | `key-signature` — Key signature… | `Shift+K` | ☐ | ☐ | ☐ |
 | `time-signature` — Time signature… | `Shift+T` | ☐ | ☐ | ☐ |
 | `repeat-start` — Repeat start | `Shift+B` | ☐ | ☐ | ☐ |
 | `repeat-end` — Repeat end | `Shift+B` | ☐ | ☐ | ☐ |
+| `ending` — Volta ending… | `Shift+B` | ☐ | ☐ | ☐ |
 | `final-barline` — Final barline | `Shift+B` | ☐ | ☐ | ☐ |
+| `measure-repeat` — Measure repeat… | `Shift+B` | ☐ | ☐ | ☐ |
 | `segno` — Segno | `Shift+B` | ☐ | ☐ | ☐ |
 | `coda` — Jump (D.S. al fine) | `Shift+B` | ☐ | ☐ | ☐ |
-| `ending` — Volta ending… | `Shift+B` | ☐ | ☐ | ☐ |
 | `rehearsal` — Rehearsal mark… | `Shift+B` | ☐ | ☐ | ☐ |
 | `tempo` — Tempo… | `Shift+B` | ☐ | ☐ | ☐ |
-| `measure-repeat` — Measure repeat… | `Shift+B` | ☐ | ☐ | ☐ |
-| `delete-bar` — Delete this bar (only when empty) | `Del` | ☐ | ☐ | ☐ |
 | `section` — Section label… | `Shift+B` | ☐ | ☐ | ☐ |
-| `add-bar` — Append a bar at the end | `Shift+M` | ☐ | ☐ | ☐ |
-| `insert-bar-after` — Insert a bar after this one | `I` | ☐ | ☐ | ☐ |
-| `insert-bar-before` — Insert a bar before this one | `Shift+I` | ☐ | ☐ | ☐ |
 
 ### section — 3 placements (+1 blocked, appendix)
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
-| `section` — Section label… | `Shift+B` | ☐ | ☐ | ☐ |
-| `section-colour` — Section colour | — | ⛔ blocked — `section-colour` | | |
-| `section-range` — Select the section’s range | — | ☐ | ☐ | ☐ |
 | `delete-section-boundary` — Delete this section boundary | `Del` | ☐ | ☐ | ☐ |
+| `section` — Section label… | `Shift+B` | ☐ | ☐ | ☐ |
+| `section-range` — Select the section’s range | — | ☐ | ☐ | ☐ |
+| `section-colour` — Section colour | — | ⛔ blocked — `section-colour` | | |
 
-### document — 7 placements (+2 blocked, appendix)
+### document — 8 placements (+2 blocked, appendix)
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
-| `add-part` — Add a part… | `Shift+P` | ☐ | ☐ | ☐ |
-| `staff-kind` — Staff kind: notation + tab | `Shift+P` | ☐ | ☐ | ☐ |
-| `add-bar` — Append a bar at the end | `Shift+M` | ☐ | ☐ | ☐ |
-| `insert-part-after` — Insert a part below this one | `I` | ☐ | ☐ | ☐ |
 | `insert-part-before` — Insert a part above this one | `Shift+I` | ☐ | ☐ | ☐ |
+| `insert-part-after` — Insert a part below this one | `I` | ☐ | ☐ | ☐ |
+| `add-part` — Add a part… | `Shift+P` | ☐ | ☐ | ☐ |
+| `add-bar` — Append a bar at the end | — | ☐ | ☐ | ☐ |
+| `delete-part` — Delete this part (clears its notes first) | `Del` | ☐ | ☐ | ☐ |
 | `part-name` — Part name… | `Shift+P` | ☐ | ☐ | ☐ |
 | `staves` — Staves per part… | `Shift+P` | ☐ | ☐ | ☐ |
+| `staff-kind` — Staff kind: notation + tab | `Shift+P` | ☐ | ☐ | ☐ |
 | `system-break` — System break | — | ⛔ blocked — `layout-authoring` | | |
 | `multimeasure-rest` — Multimeasure rest | — | ⛔ blocked — `layout-authoring` | | |
 

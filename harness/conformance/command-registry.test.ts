@@ -250,11 +250,26 @@ describe('command registry — the joins', () => {
     expect(bandsForScope('note', [])).toEqual([]);
   });
 
-  it('an ungrouped rung draws one bare band', () => {
-    // Every other rung keeps the flat grid it has today, with no caption
-    // invented for it.
+  it('every rung is banded now, and each leads with its structure verbs', () => {
+    // All eight rungs carry a table as of 2026-08-25, so no rung falls back to
+    // the flat grid any more. What replaced that test is the property the
+    // banding was FOR: wherever a rung can insert or remove its own unit, the
+    // verbs for it are drawn together and drawn FIRST, instead of scattered
+    // among the rung's properties — thirteen of them at the bar rung, which is
+    // how the tray came to hide the one voice verb that could still be reached.
+    for (const scope of SELECTION_LADDER) {
+      const bands = bandsForScope(scope, commandsForScope(scope, view()));
+      expect(bands.length, `${scope}: no bands`).toBeGreaterThan(0);
+      expect(bands[0].caption, `${scope}: does not lead with structure`).toBe('structure');
+      expect(bands.some(band => band.id === 'ungrouped'), `${scope}: stranded tiles`).toBe(false);
+    }
+  });
+
+  it('still falls back to one bare band for a rung with no table', () => {
+    // The fallback is not dead code — it is what draws a rung the day someone
+    // adds one, before anybody has said what belongs with what.
     const commands = commandsForScope('measure', view());
-    const bands = bandsForScope('measure', commands);
+    const bands = bandsForScope('nosuchrung' as unknown as Parameters<typeof bandsForScope>[0], commands);
     expect(bands).toHaveLength(1);
     expect(bands[0].caption).toBeUndefined();
     expect(bands[0].commands).toEqual(commands);
