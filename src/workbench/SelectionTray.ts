@@ -134,6 +134,14 @@ const LADDER_W = 74;
  * spec's.
  */
 export const TRAY_WIDTH = 470;
+
+/**
+ * The shortest the tray is allowed to be squeezed to before it stops giving
+ * ground and simply scrolls. Below roughly this the ladder column — the
+ * tray's spine, and the one thing that says WHERE YOU ARE — starts losing
+ * rungs, which is a worse trade than a shorter list of tiles.
+ */
+const TRAY_MIN_H = 168;
 /** The spec's mirror trigger: flip when the tray's right edge would pass the
  *  score's right edge minus this. */
 export const TRAY_MIRROR_MARGIN = 16;
@@ -203,6 +211,13 @@ export class SelectionTray extends LitElement {
       align-items: stretch;
       box-sizing: border-box;
       width: 100%;
+      /* BOUNDED BY THE ROOM THAT EXISTS. place() measures what is available
+       * on the side it settled on and sets this; without it the tray simply
+       * grew with its content and ran off the viewport, which is what banding
+       * the rungs made visible — the note rung went from a flat grid of 19 to
+       * six captioned bands of 22, and the top of the first band left the
+       * screen. */
+      max-height: var(--tray-max-h, none);
       background: var(--surface);
       border: 1px solid var(--ink);
       box-shadow: 0 14px 34px color-mix(in oklab, var(--ink), transparent 78%);
@@ -281,8 +296,19 @@ export class SelectionTray extends LitElement {
     .panel {
       flex: 1;
       min-width: 0;
+      /* min-height:0 is what lets the grid inside actually shrink and
+       * scroll: a flex item's default min-height:auto refuses to go below
+       * its content, so without this the panel would still push the tray past
+       * its own max-height. */
+      min-height: 0;
       display: flex;
       flex-direction: column;
+    }
+
+    /* The ladder never scrolls with the tiles — it is the tray's spine, and
+     * losing sight of which rung you are on is worse than a short column. */
+    .ladder {
+      overflow: hidden;
     }
 
     /* ── C · meta line ── */
@@ -325,10 +351,29 @@ export class SelectionTray extends LitElement {
     /* ── D · glyph grid, in captioned bands ── */
     .grid {
       flex: 1;
+      min-height: 0;
+      /* ONE scrolling body, the frame the score panel already uses: the meta
+       * line and the search row stay put, and only the tiles move. Scrolling
+       * the whole tray instead would take the search box away exactly when a
+       * long rung most needs it. */
+      overflow-y: auto;
+      overscroll-behavior: contain;
       display: flex;
       flex-direction: column;
       gap: 14px;
       padding: 9px;
+    }
+
+    /* A caption stays legible while its band scrolls under it — the caption is
+     * the claim about the tiles below, so it has to survive the scroll that
+     * separates them. */
+    .caption {
+      position: sticky;
+      top: -9px;
+      z-index: 1;
+      padding: 4px 0;
+      margin-top: -4px;
+      background: var(--surface);
     }
 
     .band {
@@ -704,16 +749,17 @@ export class SelectionTray extends LitElement {
     host.style.setProperty('--tray-w', `${width}px`);
     const pw = parent.clientWidth;
     const ph = parent.clientHeight;
-    const trayH = this.getBoundingClientRect().height || 200;
-
     const anchor = this.anchor;
     const shaftEl = this.renderRoot.querySelector<HTMLElement>('.shaft');
     if (!anchor) {
       this.removeAttribute('data-flipped');
       this.removeAttribute('data-mirrored');
       if (shaftEl) shaftEl.style.display = 'none';
+      const dockH = Math.max(TRAY_MIN_H, ph - TRAY_EDGE_GAP - 18);
+      host.style.setProperty('--tray-max-h', `${dockH}px`);
+      const docked = Math.min(this.getBoundingClientRect().height || 200, dockH);
       host.style.left = `${Math.max(TRAY_EDGE_GAP, (pw - width) / 2)}px`;
-      host.style.top = `${Math.max(TRAY_EDGE_GAP, ph - trayH - 18)}px`;
+      host.style.top = `${Math.max(TRAY_EDGE_GAP, ph - docked - 18)}px`;
       return;
     }
 
@@ -724,12 +770,31 @@ export class SelectionTray extends LitElement {
       Math.max(TRAY_EDGE_GAP, pw - width - TRAY_EDGE_GAP)
     );
     const below = anchor.y + anchor.height + TRAY_SHAFT_H;
-    const flip = below + trayH > ph && anchor.y - TRAY_SHAFT_H - trayH > 0;
+    // How much room each side actually has, decided BEFORE the height is
+    // capped — otherwise the tray measures last frame's clamp and every
+    // re-place shrinks it a little further.
+    const roomBelow = Math.max(0, ph - below - TRAY_EDGE_GAP);
+    const roomAbove = Math.max(0, anchor.y - TRAY_SHAFT_H - TRAY_EDGE_GAP);
+    host.style.setProperty('--tray-max-h', 'none');
+    const wantH = this.getBoundingClientRect().height || 200;
+
+    // Hang below when the tray fits there; otherwise take whichever side has
+    // more room. The old test asked whether the OTHER side could hold the tray
+    // WHOLE, so a tray too tall for both stayed below and ran off the screen —
+    // which is exactly what six captioned bands did to the note rung.
+    const flip = wantH > roomBelow && roomAbove > roomBelow;
+    const room = Math.max(TRAY_MIN_H, flip ? roomAbove : roomBelow);
+    host.style.setProperty('--tray-max-h', `${room}px`);
     // `data-flipped` alone carries this: nothing in render() reads the side
     // any more, so a reactive field would only cost a second update pass.
     this.toggleAttribute('data-flipped', flip);
     host.style.left = `${left}px`;
-    host.style.top = `${flip ? anchor.y - TRAY_SHAFT_H - trayH : below}px`;
+    // The height the tray will REALLY have, so a flipped one's top is not
+    // computed from a box it was never allowed to be.
+    const trayH = Math.min(wantH, room);
+    host.style.top = `${
+      flip ? Math.max(TRAY_EDGE_GAP, anchor.y - TRAY_SHAFT_H - trayH) : below
+    }px`;
 
     // The shaft: selection width clamped 24–240, centred on the selection's
     // horizontal centre, clamped to the tray's span.

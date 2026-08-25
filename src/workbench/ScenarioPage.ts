@@ -2773,6 +2773,14 @@ export class ScenarioPage extends LitElement {
       this.openPopover(action.surface);
       return;
     }
+    // AND THE INTENT BRANCH CLOSES TOO. Both branches above already did — the
+    // popover one because "both want the same keystrokes" — and this one was
+    // simply never given the line. Firing a command is a completed act: the
+    // tray covers the score you just changed, so leaving it up hides the
+    // result and leaves the keyboard aimed at a search box instead of the
+    // music. `closeTray` also hands focus back to the viewer, so the next
+    // keystroke edits.
+    this.closeTray();
     this.stripIntent(action.intent);
   }
 

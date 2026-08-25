@@ -244,9 +244,13 @@ describe('design tokens', () => {
       const missing = [...cites].filter(
         name =>
           !has.has(name) &&
-          // The one local: the tray measures its own width and sets this on
-          // the host from script, with a fallback in the stylesheet.
-          name !== '--tray-w'
+          // The two locals: the tray measures its own geometry and sets these
+          // on the host from script, each with a fallback in the stylesheet.
+          // They are placement, not palette — `place()` owns them, and the
+          // design system has nothing to say about how tall a popover may be
+          // in the room it happens to have.
+          name !== '--tray-w' &&
+          name !== '--tray-max-h'
       );
       expect(missing, `cited by the tray, declared nowhere: ${missing.join(', ')}`).toEqual([]);
     });

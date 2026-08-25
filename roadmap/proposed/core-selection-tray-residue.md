@@ -16,6 +16,20 @@
 > **every tile in the tray is purple** — which is the honest picture and the point.
 > What remains is the ticking, and that is human work: see *Retirement*.
 >
+> **The tray is bounded and dismisses itself (2026-08-25).** Banding made a
+> latent bug visible: the tray had **no height limit at all**, so it simply grew
+> with its content — the note rung's six captioned bands ran 699px tall in a
+> 520px window and the first band left the screen. It now measures the room on
+> the side it settled on, caps itself to it, and scrolls the TILES only (the
+> meta line, the ladder and the search row stay put, and a band caption sticks
+> while its own tiles pass under it). The flip test changed with it: it used to
+> ask whether the other side could hold the tray WHOLE, so a tray too tall for
+> both stayed below and overflowed; it now takes whichever side has more room.
+> And firing a tile closes the tray — two of the three fire paths already did,
+> the popover one because "both want the same keystrokes", and the intent path
+> was simply never given the line. Both are asserted in `smoke:selection`,
+> because a layout bug needs a browser to see it.
+>
 > **Every rung is banded (2026-08-25)**, each leading with a `structure` band — insert
 > before, insert after, delete — so a rung's structural verbs are drawn together and drawn
 > first instead of scattered among its properties (three among thirteen at the bar rung,
