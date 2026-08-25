@@ -841,12 +841,14 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ intent: { type: 'setStaffKind', kind: 'both' } })
   },
   {
-    // GENESIS ONLY, and that is the whole of its remaining job: `insertMeasure`
-    // needs a bar to sit beside, so a document with none cannot use `I`. Once
-    // one bar exists, End then `I` is the append, and this tile is the same
-    // act reached from the tray. It lost its key with `Shift+M`
+    // GENESIS, reached from the tray. `I` now covers the same case from the
+    // keyboard at every rung below the score
+    // (core-delete-clears-then-removes.md), because a bar-less document is
+    // somewhere Delete can leave you and the tile was the only route out. Once
+    // one bar exists, End then `I` is the append, and this tile is that act
+    // reached by mouse. It lost its own key with `Shift+M`
     // (core-rung-insert.md) — an append key was a special case for a position
-    // the cursor can simply travel to.
+    // the cursor can simply travel to, and that argument still holds.
     id: 'add-bar',
     scopes: ['document', 'measure'],
     glyph: { smufl: 'barlineSingle' },

@@ -265,6 +265,28 @@ taught, beyond the design:
   part closure still only empties the bars rather than removing the part** —
   a pre-existing gap this item did not touch, and the obvious next question.
 
+### Follow-up — 2026-08-25: the bar-less dead end
+
+Reported from hands-on use the same day: pressing Del far enough leaves
+`measures: []` with the parts still standing, and from there **there was no
+keyboard route back**. The teardown itself was fine — another press removes
+each part and reaches `{}` — but a user who wanted to *recover* rather than
+finish could not add a bar or a note.
+
+The cause was not in this item's code. It was
+[core-rung-insert.md](core-rung-insert.md)'s knowingly-accepted gap: with zero
+bars `goToEdge` refuses, `buildGrid` withholds the ghost bar past the end, and
+`add-bar` is a popover tile with no shortcut. That was a defensible corner
+while a bar-less score was only ever a starting point; Delete's second press
+turned it into somewhere you can arrive.
+
+Fixed by narrowing that decision rather than reversing it — `I` makes the first
+bar at every rung **below** the score, the score rung keeps parts as its unit,
+and `Shift+M` stays gone. Recorded at
+[core-rung-insert.md](core-rung-insert.md#amended--2026-08-25-genesis-got-its-key-back-at-the-rungs-below-the-score).
+`insertEventHere` also stopped reporting success for a bar that does not exist,
+which had been pushing a history entry that changed no bytes.
+
 ### Files
 
 `src/edit/selectionEvents.ts` (new — the member→event walk and the ink test),

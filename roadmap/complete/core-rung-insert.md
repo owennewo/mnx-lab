@@ -626,3 +626,30 @@ until the numbers were read.
 `←` at the start of the score, deliberately, on the same grounds as before:
 `Shift+I` already makes a pickup bar authorable, so a leading ghost would buy
 nothing else offers and should be decided on its own evidence.
+
+## Amended — 2026-08-25: genesis got its key back, at the rungs below the score
+
+[core-delete-clears-then-removes.md](core-delete-clears-then-removes.md) made
+this item's one knowing gap reachable by accident, so it closed.
+
+The gap was recorded here as *"the one case End+I cannot express, and the
+reason `appendMeasure` keeps its op, its intent and its tray tile"*: a document
+with **no bars at all** has nowhere for `I` to insert beside, `goToEdge`
+refuses, and `buildGrid` withholds the ghost bar past the end. Genesis was
+therefore reachable only through the `add-bar` popover tile, which has no
+shortcut — deliberately, since this item took `Shift+M` away.
+
+That was defensible while a bar-less score was something you could only start
+from. Delete's second press means you can now **delete your way into one**, and
+a user did: bars gone, two parts left, no keyboard route to a first bar.
+
+So `I` at every rung **below** `document` now appends the first bar when the
+score has none. The narrowing matters:
+
+- **The score rung is untouched** — its insert is parts, which stays coherent
+  in a document with no bars, so `I` there still adds a part. The original
+  test's claim survives verbatim, as its own case.
+- **The append-key argument survives too.** `Shift+M` is still gone and should
+  stay gone: with one bar in the score, End+`I` is the append, and that is a
+  position the cursor can travel to. Genesis is the case where it cannot.
+- `add-bar` keeps its tile — the same act by mouse.

@@ -1961,6 +1961,34 @@ export class EditorSession {
    * what the ladder exists to prevent.
    */
   private insertAtRung(side: 'before' | 'after'): boolean {
+    // GENESIS, at every rung whose insert needs a bar to exist first. An event
+    // needs a bar to sit in and a voice needs a bar to fill, so in a score with
+    // NO bars those rungs' inserts have nothing to address — and the honest
+    // reading of "insert at this rung" becomes the bar itself.
+    //
+    // This narrows core-rung-insert.md rather than overturning it. That item
+    // took the append key away on a good argument — an append is just a
+    // position the cursor can travel to — and left `appendMeasure` its tile
+    // for the genesis case it knowingly could not express. What it did not
+    // foresee is that genesis is now REACHABLE BY DELETING
+    // (core-delete-clears-then-removes.md), and there it is a dead end: with
+    // zero bars `goToEdge` refuses, the ghost bar past the end does not exist
+    // (`buildGrid` withholds it), and the only route left is a popover tile
+    // with no keyboard route at all.
+    //
+    // The SCORE rung keeps its own meaning: its insert is parts, which is
+    // coherent with no bars in the document, so `I` there still adds a part.
+    if (
+      this.selectionState.level !== 'document' &&
+      (this.doc.global?.measures?.length ?? 0) === 0
+    ) {
+      const partIndex = this.cursorState.partIndex ?? 0;
+      this.apply({ type: 'appendMeasure', ...(partIndex ? { partIndex } : {}) }, true);
+      if ((this.doc.global?.measures?.length ?? 0) === 0) return false;
+      this.cursorState = moveToMeasure(this.grid, this.cursorState, 0);
+      this.reanchorSelection();
+      return true;
+    }
     switch (this.selectionState.level) {
       case 'note':
       case 'event':
@@ -2039,6 +2067,10 @@ export class EditorSession {
    */
   private insertEventHere(side: 'before' | 'after'): boolean {
     const cursor = this.cursorState;
+    // No bar, no event. Without this the op applied to nothing and still
+    // reported success, pushing a history entry that changed no bytes — an
+    // undo that does nothing is worse than a refusal that says so.
+    if (!this.doc.global?.measures?.[cursor.measureIndex]) return false;
     const duration = {
       base: this.entryDuration,
       ...(this.entryDots ? { dots: this.entryDots } : {})

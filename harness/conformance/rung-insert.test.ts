@@ -177,21 +177,40 @@ describe('End then I replaces the append key', () => {
     expect(viaEnd.cursor.measureIndex, 'the cursor should be IN the new bar').toBe(2);
   });
 
-  it('GENESIS still needs append: an insert has no bar to sit beside', () => {
-    // The one case End+I cannot express, and the reason `appendMeasure` keeps
-    // its op, its intent and its tray tile.
+  it('GENESIS: the score rung still inserts parts, because that is its unit', () => {
+    // End+I cannot express genesis — there is nowhere to travel to, so End
+    // refuses — and the score rung's insert is PARTS, which stays meaningful
+    // in a document with no bars. Both halves survive
+    // core-delete-clears-then-removes.md's genesis case below.
     const s = build([{ type: 'addPart' }]);
     expect(s.doc.global?.measures?.length ?? 0).toBe(0);
     relaxTo(s, 'document');
-    // There is nowhere to travel to, so End refuses...
     expect(s.handleIntent({ type: 'goToEdge', edge: 'last' })).toBe(false);
-    // ...and no rung's insert can make the FIRST bar. `I` at the score rung
-    // happily adds another part — that rung's insert is parts — but the
-    // timeline stays empty, which is the point.
+
     s.handleIntent({ type: 'insertAtRung', side: 'after' });
-    expect(s.doc.global?.measures?.length ?? 0, 'an insert made a bar from nothing').toBe(0);
+    expect(s.doc.global?.measures?.length ?? 0, 'the score rung made a bar').toBe(0);
+    expect(s.doc.parts!.length, 'the score rung inserts parts').toBe(2);
     expect(s.handleIntent({ type: 'appendMeasure' })).toBe(true);
     expect(s.doc.global!.measures!.length).toBe(1);
+  });
+
+  it('GENESIS: every rung BELOW the score makes the first bar, because nothing else can', () => {
+    // The dead end core-delete-clears-then-removes.md opened up: Delete can
+    // now chew a real score down to parts-with-no-bars, and from there the
+    // first bar had no keyboard route at all — `goToEdge` refuses, the ghost
+    // bar past the end is withheld when there are no bars, and `add-bar` is a
+    // popover tile with no shortcut. An event needs a bar to sit in, so at
+    // those rungs `I` means the bar.
+    for (const level of ['note', 'partMeasure', 'measure'] as const) {
+      const s = build([{ type: 'addPart' }]);
+      relaxTo(s, level);
+      expect(s.selectionLevel).toBe(level);
+      expect(s.handleIntent({ type: 'insertAtRung', side: 'after' }), level).toBe(true);
+      expect(s.doc.global!.measures!.length, level).toBe(1);
+      // Every part gets its copy, so the bar is immediately writable.
+      expect(s.doc.parts!.map(part => part.measures!.length), level).toEqual([1]);
+      expect(s.handleIntent({ type: 'toggleNote' }), `${level}: entry after genesis`).toBe(true);
+    }
   });
 });
 
