@@ -561,6 +561,19 @@ export class ScenarioPage extends LitElement {
    *  member count and detached references on success, the planner's precise
    *  sentence on a refusal. It names the last outcome and leaves — there is
    *  deliberately no clipboard panel. */
+  /**
+   * The rung a rail-crossing gesture is CONTINUING, carried across the route
+   * change so the next session opens where the last one stood.
+   *
+   * Deliberately not a `@state`: it is a one-shot baton between
+   * `escalateToRail` and the `loadScore` it causes, not something a render
+   * reads. It is set only by the gesture, so opening a scenario any other way
+   * — a rail click, a deep link, a reload — still opens at the default rung,
+   * which is what those mean. A link that inherited whatever rung the last
+   * page happened to be on would be worse than the bug.
+   */
+  private railRung: SelectionLevel | null = null;
+
   @state() private clipboardNotice: ClipboardNotice | null = null;
   private clipboardNoticeTimer: ReturnType<typeof setTimeout> | undefined;
   /** The open setup popover (survey §6.2's Shift+letter tier), if any.
@@ -2051,6 +2064,11 @@ export class ScenarioPage extends LitElement {
   private async loadScore() {
     const entry = this.entry();
     if (!entry) return;
+    // Read-and-clear up front: a load that fails, or one the reader navigates
+    // away from, must not leave the baton lying around for the NEXT scenario
+    // to pick up as though a gesture had brought it there.
+    const railRung = this.railRung;
+    this.railRung = null;
     try {
       const score = (await entry.loadScore()) as MnxStructure;
       if (entry.id !== this.scenarioId) return; // navigated away meanwhile
@@ -2064,7 +2082,9 @@ export class ScenarioPage extends LitElement {
       if (entry.invalidByDesign) {
         this.pinnedErrors = await resolvePinnedErrors(score, entry.meta.expect.errors ?? []);
       } else {
-        this.session = new EditorSession(score, entry.id);
+        this.session = new EditorSession(score, entry.id, {
+          ...(railRung ? { level: railRung } : {})
+        });
         this.syncFromSession();
       }
       this.loadState = 'ready';
@@ -2350,7 +2370,12 @@ export class ScenarioPage extends LitElement {
     const ordered = [...groupScenarios(corpus, e => e.id).values()].flat();
     const at = ordered.findIndex(e => e.id === this.scenarioId);
     const next = at < 0 ? undefined : ordered[at + delta];
-    if (next) location.hash = scenarioHref(next.id, this.view || undefined);
+    if (!next) return; // both ends stop, like every other rung's arrows
+    // THE RUNG SURVIVES THE STEP, so ↑/↓ is repeatable and this is a walk
+    // rather than a one-shot. Set only on a step that really happens: at the
+    // end of the collection nothing moves, so nothing should be carried.
+    this.railRung = this.session?.selectionLevel ?? null;
+    location.hash = scenarioHref(next.id, this.view || undefined);
   }
 
   private openPopover(action: ShellAction): boolean {

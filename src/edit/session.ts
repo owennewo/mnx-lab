@@ -135,7 +135,27 @@ export class EditorSession {
   constructor(
     doc: MnxStructure,
     /** Corpus scenario id, stamped into traces; '' for non-corpus documents. */
-    readonly scenarioId: string = ''
+    readonly scenarioId: string = '',
+    options: {
+      /**
+       * The rung this session OPENS on, when the host is continuing a ladder
+       * gesture that crossed documents rather than opening a new one.
+       *
+       * The score rung's ↑/↓ is the neighbouring DOCUMENT — a fact about the
+       * host, so the mount resolves it (see `escalateToRail`) — and crossing
+       * a document boundary builds a new session. Without this the new one
+       * opened at `note`, so the second ↑ meant "move a notehead" and walking
+       * a collection meant climbing the whole ladder again between every
+       * step. Every other rung's arrows already survive their own step:
+       * `navigate` ends by re-anchoring at the CURRENT level, which is why
+       * the measure rung's system step is repeatable and this one was not.
+       *
+       * Only pass a rung that structurally exists — `partMeasure`, `measure`
+       * and `document` always do (`presentLevels`), which covers every
+       * gesture that can cross a document.
+       */
+      level?: SelectionLevel;
+    } = {}
   ) {
     // Deep-copy so later external mutation of the argument can't desync the
     // byte-identical undo-all contract.
@@ -143,7 +163,7 @@ export class EditorSession {
     this.history = new EditHistory(this.initial);
     this.grid = buildGrid(this.initial, 0);
     this.cursorState = initialCursor(this.grid);
-    this.selectionState = pointSelection('note', this.cursorState);
+    this.selectionState = pointSelection(options.level ?? 'note', this.cursorState);
     this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
   }
 

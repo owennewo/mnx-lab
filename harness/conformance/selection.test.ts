@@ -450,6 +450,26 @@ describe('selection ladder', () => {
     expect(session.lastDelete).toEqual({ kind: 'refused', level: 'document' });
   });
 
+  it('opens on the rung a rail-crossing gesture was standing on', () => {
+    // The score rung's ↑/↓ is the neighbouring DOCUMENT, and crossing one
+    // builds a new session. The mount carries the rung across so the gesture
+    // is REPEATABLE — `selectionLevel === 'document'` is the exact condition
+    // ScenarioPage tests before escalating again, so a session that opened at
+    // `note` made the second press mean "move a notehead" instead.
+    const carried = new EditorSession(makeDoc(), '', { level: 'document' });
+    expect(carried.selectionLevel).toBe('document');
+    expect(carried.handleIntent(relax), 'already at the top').toBe(false);
+    expect(carried.handleIntent(tighten)).toBe(true);
+    expect(carried.selectionLevel).not.toBe('document');
+  });
+
+  it('still opens at the note rung when nothing was carried', () => {
+    // Opening a score any other way — a rail click, a deep link, a reload —
+    // means "open this", not "keep walking", so the default is untouched.
+    expect(new EditorSession(makeDoc()).selectionLevel).toBe('note');
+    expect(new EditorSession(makeDoc(), 'lab/x').selectionLevel).toBe('note');
+  });
+
   it('forgets the delete outcome as soon as another intent runs', () => {
     const session = new EditorSession(makeDoc());
     expect(session.handleIntent({ type: 'delete' })).toBe(true);

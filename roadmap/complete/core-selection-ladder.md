@@ -235,7 +235,7 @@
 > `keymap-docs.test.ts`.
 >
 > **Enclosure geometry revised 2026-08-20** by
-> [workbench-rung-legibility.md](../inprogress/workbench-rung-legibility.md):
+> [workbench-rung-legibility.md](workbench-rung-legibility.md):
 > the run/panel/panel-wide shapes described below are superseded by the
 > **extent ladder on both axes** — the voice hull hugs the notehead contour
 > (no staff-band floor), the part-bar panel owns its music's horizontal span
@@ -759,3 +759,52 @@ arrow doing nothing beats one doing something arbitrary.
   and closure membership for their bulk/document commands. New properties stay
   with [core-viewer-surface.md](../complete/core-viewer-surface.md) and the editor
   proposals that need them.
+
+## Amended — 2026-08-25: the rung survives the rail step
+
+Reported from hands-on use: at the score rung ↑ moves to the previous
+document, as designed — but the selection came back at **note**, so the second
+↑ meant *move a notehead* and the reader had to climb the whole ladder again
+between every step. A gesture you cannot repeat is not navigation.
+
+The escalation itself was fine. The cause was that crossing a document builds a
+**new `EditorSession`**, and its constructor opened at `note` unconditionally.
+Every other rung's arrows already survive their own step — `navigate` ends with
+`if (changed) this.reanchorSelection()`, which re-anchors at the CURRENT level,
+which is exactly why the measure rung's system step is repeatable. The score
+rung was the sole exception, and only because its step leaves the document.
+
+**THE RUNG SURVIVES**, then — the same rule
+[core-rung-insert.md](core-rung-insert.md) states one tier down for `I`, and
+for the same reason it gives: *"dropping to note would make the second `I`
+refuse, so inserting two bars would need the ladder walked again between
+them."*
+
+Three decisions worth keeping:
+
+- **The rung is carried, not the cursor.** A different document is different
+  content, so a preserved bar index or notehead would land somewhere
+  arbitrary. Only the ladder position means anything across the step.
+- **Only the gesture carries it.** A rail click, a deep link and a reload all
+  still open at `note`, because those mean *open this*, not *keep walking*. A
+  link that inherited whatever rung the previous page happened to be on would
+  be worse than the original bug. The baton is a plain private field on the
+  mount (not `@state`: no render reads it), set only on a step that really
+  happens — at the ends of the collection nothing moves, so nothing is
+  carried — and read-and-cleared at the top of `loadScore` so a failed load
+  cannot leave it for the next scenario.
+- **The session takes the rung as a constructor option**, not as replayed
+  `relaxSelection` intents. The rail step is deliberately not an intent
+  ("there is nothing for a trace to replay"), and replaying climbs would put
+  four phantom entries in every freshly-opened trace.
+
+**The section rung needed nothing.** Its ↑↓ is unbound by design — *no honest
+referent* — so it never had this problem; the two rungs whose arrows leave the
+immediate neighbourhood are `measure` (the mount's system step, already
+repeatable) and `document`.
+
+The mount wiring has no test, per the repo's standing position that the
+workbench does not; what is pinned in `selection.test.ts` is the condition the
+mount actually reads — a session opened with `{ level: 'document' }` reports
+`selectionLevel === 'document'`, which is what makes the next press escalate
+again — and that the default is untouched without it.
