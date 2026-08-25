@@ -614,11 +614,19 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'new-voice',
-    scopes: ['voiceMeasure'],
+    // THE PART RUNG CARRIES IT TOO, and must: `voiceMeasure` is present only
+    // when the staff's bar ALREADY HAS a voice (`presentLevels` asks for a
+    // sequence), so scoping the verb that CREATES one to that rung alone made
+    // it unreachable in the only state that needs it — empty the staff's bar
+    // and the tile vanished with the voice it would have rebuilt. The rung
+    // above is where you stand when there is nothing below, so that is where
+    // the construct verb has to be offered.
+    scopes: ['voiceMeasure', 'partMeasure'],
     glyph: { smufl: 'arrowBlackDown' },
     label: 'Add a voice to this bar',
-    // `I` reaches it too (core-rung-insert.md). No `Shift+I`: voices stack by
-    // stem direction, not index, so there is no order for `before` to mean.
+    // `I` reaches it too (core-rung-insert.md), at both rungs. No `Shift+I`:
+    // voices stack by stem direction, not index, so there is no order for
+    // `before` to mean.
     shortcut: 'I',
     tier: 'popover',
     action: () => ({ intent: { type: 'addVoiceMeasure' } })

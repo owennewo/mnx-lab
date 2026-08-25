@@ -653,3 +653,36 @@ score has none. The narrowing matters:
   stay gone: with one bar in the score, End+`I` is the append, and that is a
   position the cursor can travel to. Genesis is the case where it cannot.
 - `add-bar` keeps its tile — the same act by mouse.
+
+## Amended — 2026-08-25: the part rung inserts voices
+
+A second narrowing from the same source as the genesis one above, and the same
+shape: a construct verb scoped to a rung that its own absence removes.
+
+This item's table gave `partMeasure` **no insert**, and the reason was about
+STAVES — *"a staff exists for the whole part or not at all; `staves` is a
+part-level declaration, not a member of this bar."* That reasoning stands, and
+a staff is still un-insertable.
+
+What it did not consider is the rung BELOW. `voiceMeasure` is present only when
+the staff's bar already holds a sequence (`presentLevels`), so emptying a staff
+bar takes the rung away — **and with it the only route to `addVoiceMeasure`**,
+which was scoped to `voiceMeasure` alone and carried `I` only there. To add a
+voice you had to stand on the rung that exists only once a voice does. Reported
+from hands-on use: *"I can't see addVoiceMeasure option in selection tray when
+in part mode."*
+
+Emptying a staff bar became easy to reach with
+[core-delete-clears-then-removes.md](core-delete-clears-then-removes.md), which
+is why a latent catch-22 turned into a visible one.
+
+So the part rung's insert is the **voice**, and `new-voice` is scoped to both
+rungs. The precedent is already in this item: **the score rung's insert is the
+part** — neither rung's own unit can be inserted, so both insert the child they
+govern. That is a narrower claim than "insert always means a sibling", and it
+is the one the table actually implements.
+
+The original refusal survives as its own test with its own case (a staff bar
+that HAS a voice still refuses to insert a staff, a bar or a part), joined by
+one that walks the catch-22: empty the staff bar, land on `partMeasure`, press
+`I`, get the voice back.

@@ -100,17 +100,17 @@ describe('insert at the rung', () => {
 
   it('refuses at every rung with no insert, and never climbs to a wider one', () => {
     // `note` and `event` are NOT here: they insert an event (a note-sized
-    // thing in a voice), which core-event-insert built.
-    for (const level of ['partMeasure', 'section']) {
+    // thing in a voice), which core-event-insert built. `partMeasure` left
+    // this list in 2026-08-25 — see the test below.
+    for (const level of ['section']) {
       const s = score(2);
       s.handleIntent({ type: 'toggleNote' });
       // The ladder skips rungs with no referent, so `section` needs one before
       // it can be stood on at all.
-      if (level === 'section')
-        s.handleIntent({
-          type: 'setMeasureAttribute',
-          attribute: { kind: 'section', label: 'Head' }
-        });
+      s.handleIntent({
+        type: 'setMeasureAttribute',
+        attribute: { kind: 'section', label: 'Head' }
+      });
       relaxTo(s, level);
       const bars = barCount(s);
       for (const side of ['before', 'after'] as const)
@@ -120,6 +120,46 @@ describe('insert at the rung', () => {
         ).toBe(false);
       expect(barCount(s), `${level} silently inserted a bar`).toBe(bars);
     }
+  });
+
+  it('the part rung inserts VOICES — never a staff, which is still refused', () => {
+    // This item's table said partMeasure has no insert, and the reason it gave
+    // was about STAVES: "a staff exists for the whole part or not at all". That
+    // stands. What it did not consider is that `voiceMeasure` disappears with
+    // the last voice and takes its own `I` with it, leaving the verb that
+    // CREATES a voice unreachable in the one state that needs it — easy to
+    // reach since core-delete-clears-then-removes.md.
+    //
+    // So the part rung's insert is the voice, exactly as the SCORE rung's is
+    // the part: both insert the child they govern, because neither rung's own
+    // unit can be inserted at all.
+    const s = score(2);
+    s.handleIntent({ type: 'toggleNote' });
+    relaxTo(s, 'partMeasure');
+    const bars = barCount(s);
+    const staves = s.doc.parts![0].staves;
+
+    expect(s.handleIntent({ type: 'insertAtRung', side: 'after' })).toBe(true);
+    expect(s.doc.parts![0].measures![0].sequences, 'a voice arrived').toHaveLength(2);
+    expect(barCount(s), 'no bar was inserted').toBe(bars);
+    expect(s.doc.parts![0].staves, 'no staff was inserted').toBe(staves);
+    expect(s.doc.parts!.length, 'no part was inserted').toBe(1);
+  });
+
+  it('reaches the voice verb from the part rung when there is no voice left', () => {
+    // The catch-22 the scoping had: to add a voice you had to stand on
+    // `voiceMeasure`, which exists only when a voice already does.
+    const s = score(2);
+    s.handleIntent({ type: 'toggleNote' });
+    relaxTo(s, 'partMeasure');
+    s.handleIntent({ type: 'delete' }); // clears the staff bar's ink
+    s.handleIntent({ type: 'delete' }); // removes the emptied staff bar
+    expect(s.doc.parts![0].measures![0].sequences).toEqual([]);
+    expect(s.selectionLevel, 'the ladder stops at the part rung').toBe('partMeasure');
+
+    expect(s.handleIntent({ type: 'insertAtRung', side: 'after' })).toBe(true);
+    expect(s.doc.parts![0].measures![0].sequences, 'the voice is back').toHaveLength(1);
+    expect(barCount(s)).toBe(2);
   });
 
   it('the voice rung takes `after` only — a voice ordinal is not an order', () => {

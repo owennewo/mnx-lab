@@ -2020,6 +2020,13 @@ export class EditorSession {
         // Voices stack by stem direction, not by index, and note keys embed
         // the ordinal — so there is no order for `before` to address.
         return side === 'after' && this.addVoiceHere();
+      case 'partMeasure':
+        // The rung's own unit is staff-bars, and inserting one of THOSE is
+        // still refused — a staff exists for the whole part or not at all
+        // (core-rung-insert.md). What `I` means here is the rung BELOW's
+        // construct verb, reachable from above because `voiceMeasure`
+        // disappears with the last voice and takes its own `I` with it.
+        return side === 'after' && this.addVoiceHere();
       case 'measure':
         return this.insertMeasureHere(side);
       case 'document':
