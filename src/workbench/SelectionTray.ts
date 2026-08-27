@@ -30,7 +30,7 @@
 // theme switch would visibly skip it. A workbench leaf should inherit its
 // palette, not restate it.
 // See roadmap/proposed/core-campaign-modernist.md.
-import { LitElement, html, css, nothing, type TemplateResult } from 'lit';
+import { LitElement, html, css, svg, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { glyphBBox, glyphCodepoint, isSmuflLoaded } from '../engine/smufl/smufl.ts';
 
@@ -1218,7 +1218,14 @@ export class SelectionTray extends LitElement {
       aria-hidden="true"
     >
       ${op.sign === 'plus'
-        ? html`<rect x=${mid} y=${near} width=${bar} height=${span} fill="currentColor"></rect>`
+        ? // `svg`, NOT `html`. A nested `html` template is parsed as its own
+          // HTML fragment with no <svg> around it, so the browser builds the
+          // <rect> in the XHTML namespace — a real element, matched by
+          // querySelectorAll('rect'), carrying every attribute you gave it,
+          // and painting NOTHING. The plus loses its upright and renders as a
+          // minus: insert-before and insert-after both drew a removal.
+          // Anything conditional inside an <svg> has to use this tag.
+          svg`<rect x=${mid} y=${near} width=${bar} height=${span} fill="currentColor"></rect>`
         : nothing}
       <rect x=${near} y=${mid} width=${span} height=${bar} fill="currentColor"></rect>
     </svg>`;
