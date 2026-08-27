@@ -1,7 +1,8 @@
 // The command registry — roadmap/inprogress/core-selection-tray-mechanism.md.
 //
 // One flat table of commands, each declaring where it applies (ladder rungs),
-// how it draws (SMuFL glyph name), what key already fires it, whether it is
+// how it draws (a SMuFL mark, optionally with an operator composed onto it —
+// see `CommandOperator`), what key already fires it, whether it is
 // currently ON, and what it fires. The selection tray is a pure function of
 // this table plus the session; nothing else about the tray decides content.
 //
@@ -32,9 +33,42 @@ import { findNoteAddress } from '../model/noteWalk.ts';
  */
 export type CommandScope = SelectionLevel | 'session';
 
-/** How a command draws: a canonical SMuFL glyph name, or one of the two marks
+/** The picture itself: a canonical SMuFL glyph name, or one of the two marks
  *  that have no single glyph and are drawn as arcs by the tray. */
-export type CommandGlyph = { smufl: string } | { arc: 'slur' | 'tie' };
+export type CommandMark = { smufl: string } | { arc: 'slur' | 'tie' };
+
+/**
+ * An operator composed onto a mark, so the PICTURE carries the verb.
+ *
+ * Insert-before and insert-after used to draw the identical glyph at every
+ * rung that offers them — two tiles, one picture, told apart only by the
+ * shortcut badge sitting on top of the picture. And `restWhole` meant three
+ * different things at once (full-measure rest, delete bar, delete part),
+ * because a removal had nothing to draw but the hole it leaves.
+ *
+ * The rule: the MARK names the object, the OPERATOR names what happens to it.
+ * `+` is an insertion and sits where the new thing lands; `−` is a removal and
+ * leads. That frees `restWhole`/`restQuarter` to mean a rest again — the only
+ * tile that still draws one bare is `clear-event`, which literally makes one.
+ *
+ * `at` is a DIRECTION, not a corner: it follows whichever axis the rung is
+ * ordered in. Events and bars run before/after in time, so the operator sits
+ * left or right; parts run above/below on the page, and the registry has
+ * always said so in its labels, so there it stacks.
+ */
+export interface CommandOperator {
+  sign: 'plus' | 'minus';
+  at: 'before' | 'after' | 'above' | 'below';
+}
+
+/** How a command draws: a bare mark, or a mark with an operator composed onto
+ *  it. Bare is still the common case — most tiles name a marking, not a verb. */
+export type CommandGlyph = CommandMark | { mark: CommandMark; op: CommandOperator };
+
+/** The mark inside a glyph, composed or not — the one place that unwraps it,
+ *  so callers that care about the SMuFL name never have to know the shape. */
+export const glyphMark = (glyph: CommandGlyph): CommandMark =>
+  'mark' in glyph ? glyph.mark : glyph;
 
 /**
  * What a command may fire. `intent` goes through `session.handleIntent` — the
@@ -554,7 +588,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     // key. Banding the structure verbs is what made the hole visible.
     id: 'insert-event-before',
     scopes: ['note', 'event'],
-    glyph: { smufl: 'noteQuarterUp' },
+    glyph: { mark: { smufl: 'noteQuarterUp' }, op: { sign: 'plus', at: 'before' } },
     label: 'Insert an event before this one',
     shortcut: 'Shift+I',
     tier: 'key',
@@ -563,7 +597,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   {
     id: 'insert-event-after',
     scopes: ['note', 'event'],
-    glyph: { smufl: 'noteQuarterUp' },
+    glyph: { mark: { smufl: 'noteQuarterUp' }, op: { sign: 'plus', at: 'after' } },
     label: 'Insert an event after this one',
     shortcut: 'I',
     tier: 'key',
@@ -575,13 +609,16 @@ export const COMMANDS: readonly EditorCommand[] = [
     // and a captioned band cannot.
     id: 'delete-note',
     scopes: ['note'],
-    glyph: { smufl: 'restQuarter' },
+    glyph: { mark: { smufl: 'noteQuarterUp' }, op: { sign: 'minus', at: 'before' } },
     label: 'Delete this note',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
   },
   {
+    // The one tile that still draws a bare rest, and the reason the removals
+    // stopped: this verb does not remove anything, it MAKES a rest. Now that
+    // `delete-note` composes over a note, the rest glyph means only this.
     id: 'clear-event',
     scopes: ['event'],
     glyph: { smufl: 'restQuarter' },
@@ -603,7 +640,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   {
     id: 'delete-container',
     scopes: ['container'],
-    glyph: { smufl: 'tuplet3' },
+    glyph: { mark: { smufl: 'tuplet3' }, op: { sign: 'minus', at: 'before' } },
     label: 'Delete this container (clears its notes first)',
     shortcut: 'Del',
     tier: 'key',
@@ -669,7 +706,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   {
     id: 'delete-voice-bar',
     scopes: ['voiceMeasure'],
-    glyph: { smufl: 'restWhole' },
+    glyph: { mark: { smufl: 'restWhole' }, op: { sign: 'minus', at: 'before' } },
     label: 'Delete this voice bar (clears its notes first)',
     shortcut: 'Del',
     tier: 'key',
@@ -732,7 +769,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   {
     id: 'delete-part-bar',
     scopes: ['partMeasure'],
-    glyph: { smufl: 'restWhole' },
+    glyph: { mark: { smufl: 'restWhole' }, op: { sign: 'minus', at: 'before' } },
     label: 'Delete this staff bar (clears its notes first)',
     shortcut: 'Del',
     tier: 'key',
@@ -820,7 +857,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   {
     id: 'delete-bar',
     scopes: ['measure'],
-    glyph: { smufl: 'restWhole' },
+    glyph: { mark: { smufl: 'barlineSingle' }, op: { sign: 'minus', at: 'before' } },
     label: 'Delete this bar (clears its notes first)',
     shortcut: 'Del',
     tier: 'key',
@@ -857,7 +894,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   {
     id: 'delete-section-boundary',
     scopes: ['section'],
-    glyph: { smufl: 'barlineDashed' },
+    glyph: { mark: { smufl: 'barlineDashed' }, op: { sign: 'minus', at: 'before' } },
     label: 'Delete this section boundary',
     shortcut: 'Del',
     tier: 'key',
@@ -902,7 +939,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   {
     id: 'insert-bar-after',
     scopes: ['measure'],
-    glyph: { smufl: 'barlineSingle' },
+    glyph: { mark: { smufl: 'barlineSingle' }, op: { sign: 'plus', at: 'after' } },
     label: 'Insert a bar after this one',
     shortcut: 'I',
     tier: 'key',
@@ -911,7 +948,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   {
     id: 'insert-bar-before',
     scopes: ['measure'],
-    glyph: { smufl: 'barlineSingle' },
+    glyph: { mark: { smufl: 'barlineSingle' }, op: { sign: 'plus', at: 'before' } },
     label: 'Insert a bar before this one',
     shortcut: 'Shift+I',
     tier: 'key',
@@ -923,7 +960,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     // always been keyboard-reachable and never drawn.
     id: 'delete-part',
     scopes: ['document'],
-    glyph: { smufl: 'restWhole' },
+    glyph: { mark: { smufl: 'brace' }, op: { sign: 'minus', at: 'before' } },
     label: 'Delete this part (clears its notes first)',
     shortcut: 'Del',
     tier: 'key',
@@ -932,7 +969,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   {
     id: 'insert-part-after',
     scopes: ['document'],
-    glyph: { smufl: 'brace' },
+    glyph: { mark: { smufl: 'brace' }, op: { sign: 'plus', at: 'below' } },
     label: 'Insert a part below this one',
     shortcut: 'I',
     tier: 'key',
@@ -941,7 +978,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   {
     id: 'insert-part-before',
     scopes: ['document'],
-    glyph: { smufl: 'brace' },
+    glyph: { mark: { smufl: 'brace' }, op: { sign: 'plus', at: 'above' } },
     label: 'Insert a part above this one',
     shortcut: 'Shift+I',
     tier: 'key',

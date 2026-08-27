@@ -17,10 +17,12 @@ import {
   COMMANDS,
   commandState,
   commandsForScope,
+  glyphMark,
   isTriaged,
   selectionMemberSummary,
   sessionView,
   TRIAGE_MARKS,
+  type CommandScope,
   type EditorCommand
 } from '../../src/edit/commandRegistry.ts';
 import { KEY_DOCS, strokeKey, SURFACE_INTENTS } from '../../src/edit/keymapDocs.ts';
@@ -176,12 +178,99 @@ describe('command registry — the joins', () => {
     const boxes = (JSON.parse(metadata) as { glyphBBoxes: Record<string, unknown> }).glyphBBoxes;
     const bad: string[] = [];
     for (const command of COMMANDS) {
-      if (!('smufl' in command.glyph)) continue;
-      const name = command.glyph.smufl;
+      // Through `glyphMark`, so a row that composes an operator onto its mark
+      // is still checked. Reading `command.glyph` directly would make every
+      // composed row silently skip this test rather than fail it.
+      const mark = glyphMark(command.glyph);
+      if (!('smufl' in mark)) continue;
+      const name = mark.smufl;
       if (!glyphnames[name]) bad.push(`${command.id}: ${name} (no such glyph)`);
       else if (!boxes[name]) bad.push(`${command.id}: ${name} (no bounding box)`);
     }
     expect(bad).toEqual([]);
+  });
+
+  it('no two tiles at one rung draw the same picture', () => {
+    // The rule the operator grammar exists to keep. Insert-before and
+    // insert-after used to draw the IDENTICAL glyph at every rung offering
+    // them, and `restWhole` stood for three different verbs — so the shortcut
+    // badge was the only thing telling two tiles apart, which is why it had to
+    // be a slab sitting on top of the picture it was distinguishing.
+    //
+    // Scoped per rung, not globally: two rungs never share a tab, so the same
+    // mark meaning different things at different rungs is fine, and the meta
+    // line says which rung you are on.
+    const picture = (glyph: EditorCommand['glyph']): string =>
+      'mark' in glyph
+        ? `${picture(glyph.mark)} ${glyph.op.sign}@${glyph.op.at}`
+        : 'smufl' in glyph
+          ? glyph.smufl
+          : `arc:${glyph.arc}`;
+    // Seven pairs predate the operator grammar and are NOT insert/delete
+    // pairs — each is two unrelated verbs that happen to have reached for the
+    // same mark, and separating them means choosing seven new pictures, which
+    // is a design decision and not a mechanical one. Listed rather than
+    // ignored so they read as debt for the triage ledger
+    // (roadmap/proposed/core-selection-tray-residue.md) instead of as silence.
+    const KNOWN_TWINS = new Set([
+      'note: articTenutoAbove — tenuto, hammer-pull',
+      'measure: segno — segno, section',
+      'measure: repeat1Bar — rehearsal, measure-repeat',
+      'document: brace — add-part, staves',
+      'session: barlineSingle — doc-add-bar, doc-go-first',
+      'session: brace — doc-add-part, staff-kind-both',
+      'session: 6stringTabClef — doc-tuning, staff-kind-tab'
+    ]);
+    const clashes: string[] = [];
+    const seen = new Set<string>();
+    for (const scope of [...SELECTION_LADDER, 'session'] as CommandScope[]) {
+      const drawn = new Map<string, string[]>();
+      for (const command of COMMANDS) {
+        if (!command.scopes.includes(scope)) continue;
+        const key = picture(command.glyph);
+        drawn.set(key, [...(drawn.get(key) ?? []), command.id]);
+      }
+      for (const [key, ids] of drawn) {
+        if (ids.length < 2) continue;
+        const line = `${scope}: ${key} — ${ids.join(', ')}`;
+        seen.add(line);
+        if (!KNOWN_TWINS.has(line)) clashes.push(line);
+      }
+    }
+    expect(clashes, `tiles sharing a picture at one rung:\n${clashes.join('\n')}`).toEqual([]);
+    const stale = [...KNOWN_TWINS].filter(line => !seen.has(line));
+    expect(stale, `no longer clashing — delete from KNOWN_TWINS:\n${stale.join('\n')}`).toEqual(
+      []
+    );
+  });
+
+  it('an operator points the way its own intent goes', () => {
+    // The operator is not decoration: `+` marks WHERE the new thing lands, so
+    // it has to agree with the side the intent actually inserts at. The two
+    // axes are the rung's own — events and bars run before/after in time,
+    // parts run above/below down the page — so each intent side admits the
+    // one operator placement on either axis.
+    const ALLOWED = {
+      before: ['before', 'above'],
+      after: ['after', 'below']
+    } as const;
+    const wrong: string[] = [];
+    for (const command of COMMANDS) {
+      const action = command.action?.(view());
+      const intent = action && 'intent' in action ? action.intent : null;
+      const composed = 'mark' in command.glyph ? command.glyph.op : null;
+      if (intent?.type === 'insertAtRung') {
+        if (composed?.sign !== 'plus') {
+          wrong.push(`${command.id}: inserts, but draws ${composed?.sign ?? 'a bare mark'}`);
+        } else if (!(ALLOWED[intent.side] as readonly string[]).includes(composed.at)) {
+          wrong.push(`${command.id}: inserts ${intent.side}, but its + sits ${composed.at}`);
+        }
+      }
+      if (composed?.sign === 'minus' && intent?.type !== 'delete') {
+        wrong.push(`${command.id}: draws a minus but does not delete`);
+      }
+    }
+    expect(wrong, `operators disagreeing with their intent:\n${wrong.join('\n')}`).toEqual([]);
   });
 
   it('every band names commands that exist and are offered at that rung', () => {

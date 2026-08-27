@@ -30,7 +30,7 @@
 // theme switch would visibly skip it. A workbench leaf should inherit its
 // palette, not restate it.
 // See roadmap/proposed/core-campaign-modernist.md.
-import { LitElement, html, css, nothing } from 'lit';
+import { LitElement, html, css, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { glyphBBox, glyphCodepoint, isSmuflLoaded } from '../engine/smufl/smufl.ts';
 
@@ -50,7 +50,22 @@ export interface TrayRung {
 
 /** A Bravura glyph by canonical SMuFL name, or one of the two marks that have
  *  no single glyph and are drawn as two-point SVG arcs (slur/tie). */
-export type TrayGlyph = { smufl: string } | { arc: 'slur' | 'tie' };
+export type TrayMark = { smufl: string } | { arc: 'slur' | 'tie' };
+
+/**
+ * An operator composed onto a mark: `+` for an insertion, `−` for a removal.
+ * `at` is the direction the new thing lands in, so it follows whichever axis
+ * the rung is ordered in — before/after along time, above/below down the page.
+ * The registry decides both (`CommandOperator`); the tray only draws them.
+ */
+export interface TrayOperator {
+  sign: 'plus' | 'minus';
+  at: 'before' | 'after' | 'above' | 'below';
+}
+
+/** What a tile draws: a bare mark, or a mark with an operator composed onto
+ *  it, in which case the picture — not the shortcut — carries the verb. */
+export type TrayGlyph = TrayMark | { mark: TrayMark; op: TrayOperator };
 
 export type TrayTileState = 'available' | 'active' | 'mixed' | 'unavailable';
 
@@ -99,6 +114,36 @@ export interface TrayBand {
  */
 const GLYPH_TARGET_PX = 34;
 const GLYPH_MAX_PX_PER_SP = 30;
+
+/**
+ * How large a composed operator is drawn, and how far it stands off its mark.
+ *
+ * The mark is the noun and the operator is a modifier on it, so the operator
+ * must never out-weigh what it modifies: 14px against the glyph's 34. The gap
+ * is the band's own tile gap, which is what makes the pair read as ONE
+ * composed picture rather than two things sharing a tile — wider and it
+ * becomes a row, tighter and the plus fuses onto the notehead.
+ */
+const OPERATOR_PX = 14;
+const OPERATOR_GAP_PX = 5;
+/** Stacked (above/below) the two marks are already separated by the mark's own
+ *  side bearings, so the gap comes down or the pair reads as two rows. */
+const OPERATOR_STACK_GAP_PX = 3;
+
+/**
+ * Stacked, the operator and its mark share the envelope a BARE mark gets —
+ * they do not add up to a taller glyph.
+ *
+ * The shortcut lives below the picture, so the two axes are not alike:
+ * composing sideways costs nothing, and composing downward walks straight into
+ * the corner label (a 14px operator over a 34px brace is 51px in a tile with
+ * 48 to give). So a stacked pair is sized to the same 34, and the operator
+ * comes down with the mark to keep the weight ratio it has in a row — the mark
+ * must still read as the noun.
+ */
+const STACK_OPERATOR_PX = 10;
+const stackedMarkPx = (targetPx: number) =>
+  targetPx - STACK_OPERATOR_PX - OPERATOR_STACK_GAP_PX;
 
 export interface TrayMeta {
   primary: string;
@@ -432,10 +477,14 @@ export class SelectionTray extends LitElement {
       height: 60px;
       display: grid;
       place-items: center;
-      /* The key badge owns the bottom-right corner, so the glyph is centred in
-       * the space ABOVE it rather than in the whole tile — otherwise a wide
-       * mark (the accent) runs into its own shortcut. */
-      padding: 0 0 9px;
+      /* Relief for the shortcut, cut from 9px to 6 rather than dropped. The
+       * old figure held a wide mark off a solid badge running the width of the
+       * tile; the corner label below is far smaller, but it still occupies the
+       * bottom 12px and a 34px glyph centred in the bare tile clears that by
+       * ONE pixel — which the lit badge, growing 2.2px upward, then spends.
+       * Six is what the measured worst case (a stem-up quarter, composed) has
+       * to have, and the glyph keeps the other three. */
+      padding: 0 0 6px;
       background: var(--surface);
       border: 1px solid var(--line);
       cursor: pointer;
@@ -444,6 +493,16 @@ export class SelectionTray extends LitElement {
 
     .tile .glyph {
       color: var(--ink);
+    }
+
+    /* The two halves of a composed glyph inherit their colour from the
+       .glyph wrapper — deliberately NOT restated here, because every state
+       rule below (the active inversion, the untriaged purple) sets it on that
+       wrapper, and a colour declared on the mark would outrank what it
+       inherits and pin the mark to --ink through every state. */
+    .tile .glyph,
+    .tile .mark,
+    .tile .op {
       /* The ink box is the viewBox, and the text inside it carries the font's
          full em box — ascent and descent well beyond the glyph's own ink.
          Visible overflow is what lets that ink paint past the tiny box, but
@@ -455,25 +514,76 @@ export class SelectionTray extends LitElement {
       pointer-events: none;
     }
 
-    /* The shortcut sits in the corner rather than under the glyph: it is a
-     * label ON the tile, not a second row competing with it for the eye. It
-     * overhangs the border by a pixel, so the badge reads as stamped onto the
-     * tile's corner rather than inset from it. */
-    .tile .key {
-      position: absolute;
-      right: -1px;
-      bottom: -1px;
-      pointer-events: none;
-      box-sizing: border-box;
-      min-width: 22px;
-      height: 22px;
-      padding: 0 4px;
+    /*
+     * A composed glyph is one picture, so the operator and its mark are laid
+     * out as a unit and centred as a unit. The axis is the rung's own: along
+     * time for events and bars, down the page for parts.
+     */
+    .tile .composed {
       display: flex;
+      flex-direction: row;
       align-items: center;
       justify-content: center;
-      background: var(--ink);
-      color: var(--surface);
-      font: 600 11px/1 var(--sans);
+      gap: ${OPERATOR_GAP_PX}px;
+    }
+
+    .tile .composed[data-stacked] {
+      flex-direction: column;
+      gap: ${OPERATOR_STACK_GAP_PX}px;
+    }
+
+    /*
+     * THE QUIET CORNER · the shortcut, demoted.
+     *
+     * It was a 22px slab filled with --ink, and on a 60px tile Shift+I
+     * ran it to 51px wide — the label covering the picture it was labelling,
+     * and on the articulation band saying the same word six times over six
+     * different marks. It could not be quieter while it was load-bearing:
+     * on the structure band the badge was the ONLY thing telling two
+     * identical glyphs apart. Composing the verb into the glyph (above) ended
+     * that job, and a footnote that is no longer doing real work can be
+     * whispered.
+     *
+     * Mono rather than the sans the slab used: a shortcut is a literal you
+     * type, and the tray already speaks mono for the things you type — the
+     * ladder rungs and the query line. At 9px the whole of Shift+A fits
+     * inside the tile, so nothing has to be abbreviated into a modifier
+     * symbol that reads differently on each platform.
+     */
+    .tile .key {
+      position: absolute;
+      right: 4px;
+      bottom: 3px;
+      pointer-events: none;
+      /* --ink-3, the tray's own quiet-text colour: the band captions and the
+       * meta line's secondary already speak in it, so the resting key joins a
+       * voice the component has rather than inventing a fourth. --ink-faint
+       * was tried and measured 2.2:1 on the light surface — at 9px that is
+       * decoration, not a label, and a shortcut nobody can read is a shortcut
+       * that is not doing its job. This clears 3.65 light / 4.54 dark, and the
+       * step up to --ink on hover is still a 4.5x jump. */
+      color: var(--ink-3);
+      font: 500 9px/1 var(--mono);
+      letter-spacing: 0.02em;
+      /* The corner it already owns. Pinning the origin there holds the 4px
+       * inset fixed while the label grows, so it reads as stepping forward in
+       * place; growing from the centre would push it out through the tile's
+       * own border, which is 4px away. */
+      transform-origin: 100% 100%;
+      transition:
+        color 130ms ease-out,
+        transform 130ms cubic-bezier(0.2, 0.75, 0.3, 1);
+    }
+
+    /* Scale, not font-size: a font-size transition relayouts the label every
+     * frame and the letters crawl, and the glyph shares this grid cell, so a
+     * relayout would nudge the picture. A transform composites and touches
+     * neither. The keyboard cursor gets the same step forward as the pointer —
+     * the tile cursor is virtual, so this is the only thing that answers it. */
+    .tile:hover .key,
+    .tile.cursor .key {
+      color: var(--ink);
+      transform: scale(1.24);
     }
 
     .tile svg path {
@@ -501,10 +611,23 @@ export class SelectionTray extends LitElement {
       color: var(--surface);
     }
 
-    /* On the accent fill the dark badge would disappear, so it inverts. */
+    /* On the accent fill the ink colours disappear, so the corner takes the
+     * same inverted voice the glyph takes, one step quieter — and reaches the
+     * full inverted colour on hover, so resting and lit stay two steps apart
+     * on this ground too.
+     *
+     * 15% is measured, not chosen: it lands the resting key at 3.37 light /
+     * 4.61 dark, which is where --ink-3 lands it on the plain surface. The
+     * accent is a mid-tone, so its ceiling is 4.2/5.71 with pure --surface —
+     * there is simply nowhere brighter for hover to go, and the scale carries
+     * the rest of the emphasis. */
     .tile[data-state='active'] .key {
-      background: var(--surface);
-      color: var(--ink);
+      color: color-mix(in oklab, var(--surface), transparent 15%);
+    }
+
+    .tile[data-state='active']:hover .key,
+    .tile[data-state='active'].cursor .key {
+      color: var(--surface);
     }
 
     .tile[data-state='active'] svg path {
@@ -525,9 +648,32 @@ export class SelectionTray extends LitElement {
       color: var(--line-strong);
     }
 
+    /* Below the resting key, and it does not answer the pointer at all: a
+     * label that lights up over a tile that cannot be pressed is a promise the
+     * tile will not keep. --ink-faint rather than a line colour, so the three
+     * steps read as one ladder — inert, resting, lit. */
     .tile[data-state='unavailable'] .key {
-      background: var(--line);
       color: var(--ink-faint);
+    }
+
+    .tile[data-state='unavailable']:hover .key {
+      color: var(--ink-faint);
+      transform: none;
+    }
+
+    /* The colour change is what carries the information — which key this tile
+     * answers to — and the growth is only emphasis, so the growth is what
+     * goes. The workbench already runs a 640% staff ceiling for low vision;
+     * that reader is the likeliest to have this set. */
+    @media (prefers-reduced-motion: reduce) {
+      .tile .key {
+        transition: color 130ms ease-out;
+      }
+
+      .tile:hover .key,
+      .tile.cursor .key {
+        transform: none;
+      }
     }
 
     /*
@@ -1047,7 +1193,54 @@ export class SelectionTray extends LitElement {
 
   // ── rendering ─────────────────────────────────────────────────────────────
 
-  private glyph(glyph: TrayGlyph, cls = 'glyph', targetPx?: number) {
+  /**
+   * The operator half of a composed glyph — drawn as SVG bars, never as the
+   * sans font's own `+`.
+   *
+   * The font's plus is optically far lighter than a Bravura stem and reads as
+   * a typo beside one; these bars are cut to the stem's own pen. It is also
+   * why the tile's existing arc marks are SVG rather than characters, so this
+   * follows a precedent rather than setting one.
+   */
+  private operator(op: TrayOperator, sizePx: number) {
+    // The bars are cut as a fraction of the box, so the pen thins with the
+    // operator when a stacked pair shrinks — a 2.2px bar on a 10px plus would
+    // be a blob.
+    const bar = sizePx * (2.2 / OPERATOR_PX);
+    const span = sizePx * (12 / OPERATOR_PX);
+    const near = (sizePx - span) / 2;
+    const mid = (sizePx - bar) / 2;
+    return html`<svg
+      class="op"
+      width=${sizePx}
+      height=${sizePx}
+      viewBox="0 0 ${sizePx} ${sizePx}"
+      aria-hidden="true"
+    >
+      ${op.sign === 'plus'
+        ? html`<rect x=${mid} y=${near} width=${bar} height=${span} fill="currentColor"></rect>`
+        : nothing}
+      <rect x=${near} y=${mid} width=${span} height=${bar} fill="currentColor"></rect>
+    </svg>`;
+  }
+
+  private glyph(glyph: TrayGlyph, cls = 'glyph', targetPx?: number): TemplateResult {
+    if ('mark' in glyph) {
+      // The wrapper carries `cls`, so every colour rule that already targets
+      // `.glyph` — active inversion, unavailable grey, untriaged purple —
+      // reaches the operator and the mark together, through `currentColor`.
+      const stacked = glyph.op.at === 'above' || glyph.op.at === 'below';
+      const first = glyph.op.at === 'before' || glyph.op.at === 'above';
+      const mark = this.glyph(
+        glyph.mark,
+        'mark',
+        stacked && targetPx !== undefined ? stackedMarkPx(targetPx) : targetPx
+      );
+      const op = this.operator(glyph.op, stacked ? STACK_OPERATOR_PX : OPERATOR_PX);
+      return html`<span class="${cls} composed" data-stacked=${stacked ? '' : nothing}>
+        ${first ? op : mark}${first ? mark : op}
+      </span>`;
+    }
     if ('arc' in glyph) {
       // Slur and tie have no single SMuFL glyph — two-point arcs, per spec.
       const d = glyph.arc === 'slur' ? 'M2 11C7 2 19 2 24 11' : 'M3 4C8 11 18 11 23 4';
