@@ -190,6 +190,46 @@ describe('command registry — the joins', () => {
     expect(bad).toEqual([]);
   });
 
+  it('a label is a name, not a sentence', () => {
+    // The label has to work in three places at once — the tooltip, the ONE-LINE
+    // readout the keyboard cursor writes into, and the search haystack — so it
+    // is the tile's name and nothing else. Labels that explained themselves
+    // ("Delete this bar (clears its notes first)", "Insert an event before this
+    // one") were a name and a footnote sharing a field, and it was the footnote
+    // that pushed the name off the end of the readout. `detail` is where a
+    // footnote goes.
+    const tooLong: string[] = [];
+    const deictic: string[] = [];
+    const articled: string[] = [];
+    const prose: string[] = [];
+    for (const { id, label } of COMMANDS) {
+      if (label.length > 30) tooLong.push(`${id}: ${label} (${label.length})`);
+      // The tile is already pointing at the thing; saying so costs a third of
+      // the line and tells the reader what they can see.
+      if (/\bthis\b/i.test(label)) deictic.push(`${id}: ${label}`);
+      if (/^(Insert|Add|Delete|Append|Select|Go|Clear) (a|an|the) /.test(label)) {
+        articled.push(`${id}: ${label}`);
+      }
+      // A parenthetical opening lowercase is prose — "(clears its notes
+      // first)", "(cycles)". One opening uppercase is part of the name a
+      // musician would use, as in "Jump (D.S. al fine)", and stays.
+      if (/\([a-z]/.test(label)) prose.push(`${id}: ${label}`);
+    }
+    expect(tooLong, `labels over 30 chars:\n${tooLong.join('\n')}`).toEqual([]);
+    expect(deictic, `labels saying "this":\n${deictic.join('\n')}`).toEqual([]);
+    expect(articled, `verbs followed by an article:\n${articled.join('\n')}`).toEqual([]);
+    expect(prose, `explanations that belong in detail:\n${prose.join('\n')}`).toEqual([]);
+  });
+
+  it('a detail says something the name does not', () => {
+    const empty = COMMANDS.filter(c => c.detail !== undefined && c.detail.trim() === '');
+    expect(empty.map(c => c.id), 'empty detail strings').toEqual([]);
+    const echoes = COMMANDS.filter(
+      c => c.detail && c.label.toLowerCase().includes(c.detail.toLowerCase())
+    );
+    expect(echoes.map(c => c.id), 'details already said by the label').toEqual([]);
+  });
+
   it('no two tiles at one rung draw the same picture', () => {
     // The rule the operator grammar exists to keep. Insert-before and
     // insert-after used to draw the IDENTICAL glyph at every rung offering

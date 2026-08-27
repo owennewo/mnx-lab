@@ -131,7 +131,30 @@ export interface EditorCommand {
   /** Which tabs offer it. A command in no scope renders nowhere. */
   scopes: readonly CommandScope[];
   glyph: CommandGlyph;
+  /**
+   * The tile's NAME, and only its name: verb plus object, no articles, no
+   * "this one", no parenthetical.
+   *
+   * It has to work in three places at once — the hover tooltip, the readout
+   * line the keyboard cursor writes into, and the string the scoped search
+   * matches on — and the readout is ONE line. Labels that explained themselves
+   * ("Delete this bar (clears its notes first)") were really a name and a
+   * footnote sharing a field, and the footnote is what pushed the name off the
+   * end of the line. Anything that is not the name belongs in `detail`.
+   */
   label: string;
+  /**
+   * The footnote: what the name cannot say and a user would be wrong without.
+   * Two kinds earn it — a verb that does something other than what it says the
+   * first time (Del clears before it removes, core-delete-clears-then-removes.md)
+   * and an interaction with a second step (slur and beam are press-again).
+   *
+   * Drawn under the name in the tooltip, where there is room, and searched
+   * alongside it so nothing became unfindable by being demoted. Deliberately
+   * NOT in the readout line: that line has one line to say which tile the
+   * cursor is on, and a footnote there would crowd out the name again.
+   */
+  detail?: string;
   /** Display form of the key that already fires it, for the tile's chip. */
   shortcut?: string;
   tier: 'key' | 'popover';
@@ -381,7 +404,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'tie',
     scopes: ['note'],
     glyph: { arc: 'tie' },
-    label: 'Tie to the next note',
+    label: 'Tie to next note',
     shortcut: 'T',
     tier: 'key',
     isActive: view => view.tied,
@@ -396,7 +419,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'slur',
     scopes: NOTE_EVENT,
     glyph: { arc: 'slur' },
-    label: 'Slur — press again at the last note',
+    label: 'Slur',
+    detail: 'Press again at the last note',
     shortcut: 'S',
     tier: 'key',
     projection: 'notation',
@@ -410,7 +434,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'beam',
     scopes: NOTE_EVENT,
     glyph: { smufl: 'textCont8thBeamShortStem' },
-    label: 'Beam — press again at the last event',
+    label: 'Beam',
+    detail: 'Press again at the last event',
     shortcut: 'B',
     tier: 'key',
     projection: 'notation',
@@ -420,7 +445,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'accidental-display',
     scopes: ['note'],
     glyph: { smufl: 'accidentalParensLeft' },
-    label: 'Force the accidental',
+    label: 'Force accidental',
     shortcut: 'Shift+A',
     tier: 'popover',
     action: () => ({ intent: { type: 'setAccidentalDisplay', show: true } })
@@ -433,7 +458,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'respell',
     scopes: ['note'],
     glyph: { smufl: 'accidentalEnharmonicEquals' },
-    label: 'Respell enharmonically (cycles)',
+    label: 'Respell enharmonically',
+    detail: 'Cycles',
     shortcut: 'J',
     tier: 'key',
     action: () => ({ intent: { type: 'respellNote' } })
@@ -483,7 +509,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'dots',
     scopes: ['event'],
     glyph: { smufl: 'augmentationDot' },
-    label: 'Dot the value (cycles 0 → 1 → 2 → none)',
+    label: 'Dot the value',
+    detail: 'Cycles 0 → 1 → 2 → none',
     shortcut: '.',
     tier: 'key',
     action: () => ({ intent: { type: 'toggleDots' } })
@@ -586,10 +613,17 @@ export const COMMANDS: readonly EditorCommand[] = [
     // you insert, and a note-sized thing in a voice is an event — but neither
     // had a tile, so the verb existed only for readers who already knew the
     // key. Banding the structure verbs is what made the hole visible.
+    //
+    // The LABEL says "note" even though the id and the intent say event, and
+    // that is a deliberate trade rather than drift. "Event" is the accurate
+    // word and the useless one: it is the model's term for a slot, and the
+    // tile is mostly read at the note rung, where the thing you are about to
+    // get is a note. The accuracy is kept where accuracy is load-bearing —
+    // the id, the intent, the op — and spent where it only confused.
     id: 'insert-event-before',
     scopes: ['note', 'event'],
     glyph: { mark: { smufl: 'noteQuarterUp' }, op: { sign: 'plus', at: 'before' } },
-    label: 'Insert an event before this one',
+    label: 'Insert note before',
     shortcut: 'Shift+I',
     tier: 'key',
     action: () => ({ intent: { type: 'insertAtRung', side: 'before' } })
@@ -598,7 +632,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'insert-event-after',
     scopes: ['note', 'event'],
     glyph: { mark: { smufl: 'noteQuarterUp' }, op: { sign: 'plus', at: 'after' } },
-    label: 'Insert an event after this one',
+    label: 'Insert note after',
     shortcut: 'I',
     tier: 'key',
     action: () => ({ intent: { type: 'insertAtRung', side: 'after' } })
@@ -610,7 +644,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-note',
     scopes: ['note'],
     glyph: { mark: { smufl: 'noteQuarterUp' }, op: { sign: 'minus', at: 'before' } },
-    label: 'Delete this note',
+    label: 'Delete note',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -622,7 +656,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'clear-event',
     scopes: ['event'],
     glyph: { smufl: 'restQuarter' },
-    label: 'Clear to an equal-duration rest',
+    label: 'Clear to rest',
+    detail: 'Keeps the event’s duration',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -641,7 +676,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-container',
     scopes: ['container'],
     glyph: { mark: { smufl: 'tuplet3' }, op: { sign: 'minus', at: 'before' } },
-    label: 'Delete this container (clears its notes first)',
+    label: 'Delete container',
+    detail: 'Clears its notes first',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -661,7 +697,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'rest-spelling',
     scopes: ['voiceMeasure'],
     glyph: { smufl: 'restHalf' },
-    label: 'Respell the rests…',
+    label: 'Respell rests…',
     shortcut: 'Shift+R',
     tier: 'popover',
     action: () => ({ surface: 'rhythmPopover' })
@@ -679,7 +715,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'cycle-voice',
     scopes: ['voiceMeasure'],
     glyph: { smufl: 'arrowBlackUp' },
-    label: 'Step to the next voice at this beat',
+    label: 'Step to next voice',
+    detail: 'At this beat',
     shortcut: 'Alt+V',
     tier: 'key',
     action: () => ({ intent: { type: 'cycleSlot' } })
@@ -695,7 +732,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     // the construct verb has to be offered.
     scopes: ['voiceMeasure', 'partMeasure'],
     glyph: { smufl: 'arrowBlackDown' },
-    label: 'Add a voice to this bar',
+    label: 'Add voice',
     // `I` reaches it too (core-rung-insert.md), at both rungs. No `Shift+I`:
     // voices stack by stem direction, not index, so there is no order for
     // `before` to mean.
@@ -707,7 +744,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-voice-bar',
     scopes: ['voiceMeasure'],
     glyph: { mark: { smufl: 'restWhole' }, op: { sign: 'minus', at: 'before' } },
-    label: 'Delete this voice bar (clears its notes first)',
+    label: 'Delete voice bar',
+    detail: 'Clears its notes first',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -745,7 +783,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'part-scope',
     scopes: ['partMeasure'],
     glyph: { smufl: 'brace' },
-    label: 'Select the whole part',
+    label: 'Select part',
     shortcut: 'Ctrl+A',
     tier: 'key',
     action: () => ({ intent: { type: 'closeSelection' } })
@@ -762,7 +800,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'mute-part',
     scopes: ['partMeasure'],
     glyph: { smufl: 'pluckedDampAll' },
-    label: 'Mute the part',
+    label: 'Mute part',
     tier: 'popover',
     blockedBy: 'mute'
   },
@@ -770,7 +808,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-part-bar',
     scopes: ['partMeasure'],
     glyph: { mark: { smufl: 'restWhole' }, op: { sign: 'minus', at: 'before' } },
-    label: 'Delete this staff bar (clears its notes first)',
+    label: 'Delete staff bar',
+    detail: 'Clears its notes first',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -858,7 +897,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-bar',
     scopes: ['measure'],
     glyph: { mark: { smufl: 'barlineSingle' }, op: { sign: 'minus', at: 'before' } },
-    label: 'Delete this bar (clears its notes first)',
+    label: 'Delete bar',
+    detail: 'Clears its notes first',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -887,7 +927,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'section-range',
     scopes: ['section'],
     glyph: { smufl: 'barlineDashed' },
-    label: 'Select the section’s range',
+    label: 'Select section',
     tier: 'popover',
     action: () => ({ intent: { type: 'selectSectionRange' } })
   },
@@ -895,7 +935,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-section-boundary',
     scopes: ['section'],
     glyph: { mark: { smufl: 'barlineDashed' }, op: { sign: 'minus', at: 'before' } },
-    label: 'Delete this section boundary',
+    label: 'Delete section boundary',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -906,7 +946,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'add-part',
     scopes: ['document'],
     glyph: { smufl: 'brace' },
-    label: 'Add a part…',
+    label: 'Add part…',
     shortcut: 'Shift+P',
     tier: 'popover',
     action: () => ({ surface: 'partPopover' })
@@ -932,7 +972,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'add-bar',
     scopes: ['document', 'measure'],
     glyph: { smufl: 'barlineSingle' },
-    label: 'Append a bar at the end',
+    label: 'Append bar',
     tier: 'popover',
     action: () => ({ intent: { type: 'appendMeasure' } })
   },
@@ -940,7 +980,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'insert-bar-after',
     scopes: ['measure'],
     glyph: { mark: { smufl: 'barlineSingle' }, op: { sign: 'plus', at: 'after' } },
-    label: 'Insert a bar after this one',
+    label: 'Insert bar after',
     shortcut: 'I',
     tier: 'key',
     action: () => ({ intent: { type: 'insertAtRung', side: 'after' } })
@@ -949,7 +989,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'insert-bar-before',
     scopes: ['measure'],
     glyph: { mark: { smufl: 'barlineSingle' }, op: { sign: 'plus', at: 'before' } },
-    label: 'Insert a bar before this one',
+    label: 'Insert bar before',
     shortcut: 'Shift+I',
     tier: 'key',
     action: () => ({ intent: { type: 'insertAtRung', side: 'before' } })
@@ -961,7 +1001,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-part',
     scopes: ['document'],
     glyph: { mark: { smufl: 'brace' }, op: { sign: 'minus', at: 'before' } },
-    label: 'Delete this part (clears its notes first)',
+    label: 'Delete part',
+    detail: 'Clears its notes first',
     shortcut: 'Del',
     tier: 'key',
     action: () => ({ intent: { type: 'delete' } })
@@ -970,7 +1011,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'insert-part-after',
     scopes: ['document'],
     glyph: { mark: { smufl: 'brace' }, op: { sign: 'plus', at: 'below' } },
-    label: 'Insert a part below this one',
+    label: 'Insert part below',
     shortcut: 'I',
     tier: 'key',
     action: () => ({ intent: { type: 'insertAtRung', side: 'after' } })
@@ -979,7 +1020,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'insert-part-before',
     scopes: ['document'],
     glyph: { mark: { smufl: 'brace' }, op: { sign: 'plus', at: 'above' } },
-    label: 'Insert a part above this one',
+    label: 'Insert part above',
     shortcut: 'Shift+I',
     tier: 'key',
     action: () => ({ intent: { type: 'insertAtRung', side: 'before' } })
@@ -1051,7 +1092,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'doc-add-bar',
     scopes: ['session'],
     glyph: { smufl: 'barlineSingle' },
-    label: 'Append a bar at the end',
+    label: 'Append bar',
     tier: 'popover',
     action: () => ({ intent: { type: 'appendMeasure' } })
   },
@@ -1059,7 +1100,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'doc-go-last',
     scopes: ['session'],
     glyph: { smufl: 'barlineFinal' },
-    label: 'Go to the last bar',
+    label: 'Go to last bar',
     shortcut: 'End',
     tier: 'key',
     action: () => ({ intent: { type: 'goToEdge', edge: 'last' } })
@@ -1068,7 +1109,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'doc-go-first',
     scopes: ['session'],
     glyph: { smufl: 'barlineSingle' },
-    label: 'Go to the first bar',
+    label: 'Go to first bar',
     shortcut: 'Home',
     tier: 'key',
     action: () => ({ intent: { type: 'goToEdge', edge: 'first' } })
@@ -1077,7 +1118,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'doc-add-part',
     scopes: ['session'],
     glyph: { smufl: 'brace' },
-    label: 'Add a part…',
+    label: 'Add part…',
     shortcut: 'Shift+P',
     tier: 'popover',
     action: () => ({ surface: 'partPopover' })

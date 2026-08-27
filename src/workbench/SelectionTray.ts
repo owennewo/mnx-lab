@@ -73,7 +73,10 @@ export interface TrayTile {
   id: string;
   glyph: TrayGlyph;
   shortcut: string;
+  /** The tile's name — one line, no footnote. */
   label: string;
+  /** The footnote, drawn under the name in the tooltip only. */
+  detail?: string;
   state: TrayTileState;
   /**
    * Has nobody vouched for this tile yet — untested, ungrouped, unordered
@@ -746,6 +749,17 @@ export class SelectionTray extends LitElement {
       display: block;
     }
 
+    /* The footnote, under the name rather than beside it: the name is what you
+     * came to read, and a clause on the same line makes you read past it to
+     * find out you did not need to. Quieter than the name it hangs from, on
+     * the inverted ground the tip already paints. */
+    .tile .tip-detail {
+      display: block;
+      margin-top: 2px;
+      color: color-mix(in oklab, var(--surface), transparent 35%);
+      font-weight: 400;
+    }
+
     /*
      * ── F · search, ABOVE the tiles ──
      *
@@ -1316,6 +1330,8 @@ export class SelectionTray extends LitElement {
    * the drawn ones — and widening the parameter is cheaper than carrying a
    * tile through the cursor just to name it.
    */
+  /** The tile's name, for the ONE-LINE readout the keyboard cursor writes.
+   *  `detail` is deliberately absent — see the tooltip below. */
   private tipText(tile: { label: string; shortcut: string }): string {
     return tile.shortcut ? tile.label : `${tile.label} · unbound`;
   }
@@ -1404,7 +1420,11 @@ export class SelectionTray extends LitElement {
                         >
                           ${this.glyph(tile.glyph, 'glyph', GLYPH_TARGET_PX)}
                           <span class="key">${tile.shortcut}</span>
-                          <span class="tip">${this.tipText(tile)}</span>
+                          <span class="tip"
+                            >${this.tipText(tile)}${tile.detail
+                              ? html`<span class="tip-detail">${tile.detail}</span>`
+                              : nothing}</span
+                          >
                         </button>
                       `
                     )}

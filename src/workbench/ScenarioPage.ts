@@ -2640,13 +2640,17 @@ export class ScenarioPage extends LitElement {
     const scope: CommandScope =
       displayKey === GLOBAL_TAB ? 'session' : LEVEL_BY_ROW[displayKey];
     const commands = commandsForScope(scope, view).filter(
-      command => !q || command.label.toLowerCase().includes(q)
+      command =>
+        !q ||
+        command.label.toLowerCase().includes(q) ||
+        (command.detail?.toLowerCase().includes(q) ?? false)
     );
     const asTile = (command: EditorCommand): TrayTile => ({
       id: command.id,
       glyph: command.glyph,
       shortcut: command.shortcut ?? '',
       label: command.label,
+      detail: command.detail,
       state: commandState(command, view),
       // Purple until the registry says someone vouched for this command AT
       // THIS RUNG — the triage ledger's one product-visible consequence
