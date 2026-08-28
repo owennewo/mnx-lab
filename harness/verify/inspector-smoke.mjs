@@ -108,11 +108,12 @@ const INSPECTOR = `(() => {
   // Child nodes joined with a space: the pill's word and value are adjacent
   // nodes separated by a flex gap, not by text.
   const text = n => (n ? [...n.childNodes].filter(c => c.nodeType === 1 || c.nodeType === 3).map(c => c.textContent).join(' ').replace(/\\s+/g, ' ').trim() : null);
-  const crumbs = [...sr.querySelectorAll('.line:not(.attrs) .pill.crumb')].map(p => ({
-    label: text(p), active: p.classList.contains('active'), cursor: p.classList.contains('cursor'),
-    open: p.classList.contains('open')
+  // The rung window: three rows, the current rung in the middle (.cur).
+  const crumbs = [...sr.querySelectorAll('.window .rung')].map(p => ({
+    label: text(p), active: p.classList.contains('cur'), cursor: p.classList.contains('cursor'),
+    open: p.classList.contains('open'), row: [...p.classList].find(c => ['above', 'cur', 'below'].includes(c))
   }));
-  const pills = [...sr.querySelectorAll('.line.attrs .pill')].map(p => ({
+  const pills = [...sr.querySelectorAll('.pills .pill')].map(p => ({
     text: text(p), cls: [...p.classList].filter(c => c !== 'pill').join(' ')
   }));
   const menu = [...sr.querySelectorAll('.menu .row')].map(r => ({
@@ -192,9 +193,10 @@ try {
   let s = await state();
   if (!s.open) fail('no inspector after Enter');
   else {
-    pass(`open · ${s.state} · “${s.primary}” · ${s.crumbs.length} crumbs`);
+    pass(`open · ${s.state} · “${s.primary}” · window ${s.crumbs.map(c => c.label).join(' | ')}`);
     if (s.state !== 'walking') fail(`state reads ${s.state}, not walking`);
-    if (!s.crumbs.some(c => c.cursor)) fail('no crumb carries the cursor');
+    if (s.crumbs.length !== 3) fail(`the window shows ${s.crumbs.length} rows, not 3`);
+    if (s.crumbs[1]?.row !== 'cur') fail('the current rung is not the middle row');
     if (s.top < 0 || s.left < 0) fail(`placed off-screen at ${s.left},${s.top}`);
     else pass(`placed at ${s.left.toFixed(0)},${s.top.toFixed(0)} × ${s.width.toFixed(0)}`);
   }
@@ -212,9 +214,9 @@ try {
   const bar = s.crumbs.find(c => c.active);
   if (!bar?.label.startsWith('bar ')) fail(`never reached the bar rung: ${JSON.stringify(s.crumbs.map(c => c.label))}`);
   else {
-    pass(`active crumb “${bar.label}” after ${guard - 1} presses`);
-    if (!bar.cursor) fail('the cursor did not follow the rung it walked to');
-    else pass('the cursor follows the rung');
+    pass(`middle row “${bar.label}” after ${guard - 1} presses · window ${s.crumbs.map(c => c.label).join(' | ')}`);
+    if (s.crumbs[0]?.label !== 'part 1' && s.crumbs[2]?.label !== 'part 1') fail(`the rows either side are not the neighbours: ${s.crumbs.map(c => c.label).join(' | ')}`);
+    else pass('the rows either side are the rung above and below');
     if (!s.pills.some(p => p.text.startsWith('barline:'))) fail(`no barline pill: ${JSON.stringify(s.pills)}`);
     else pass(`pills: ${s.pills.map(p => p.text).join(' · ')}`);
     const hud = JSON.parse(await cdp.evaluate(SELECTION));

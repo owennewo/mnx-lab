@@ -173,7 +173,7 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 - **[workbench-rung-inspector.md](inprogress/workbench-rung-inspector.md)** — **in progress 2026-08-28; all five stages built the same day** (open only on the container verb) — [design canvas](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3);
-  placed over the score where the tray sits, keyboard-first; machinery in `edit/inspector.ts`,
+  placed over the score where the tray sits, keyboard-first — a vertical three-row rung window beside a hard three-row attribute area, identity as floor pills; machinery in `edit/inspector.ts`,
   driven hands-on by `npm run smoke:inspector`. A third editing surface, tried *beside* the tray and the Shift+letter
   popovers so use decides which wins: **Enter opens an inspector on the current rung** —
   the cursor's path as a breadcrumb of identity pills (the HUD's rows, horizontal), the

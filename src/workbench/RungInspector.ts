@@ -29,6 +29,8 @@ import { OVERLAY_SHAFT_H, placeOverlay, type OverlayAnchor } from './overlayPlac
 
 export const INSPECTOR_WIDTH = 470;
 const INSPECTOR_MIN_H = 96;
+/** One row of the body — the window's rows and the attribute rows share it. */
+const ROW_H = 30;
 
 /** What is open for editing: a crumb (go to), a pill (amend) or the slot (add). */
 type Open =
@@ -66,6 +68,8 @@ export class RungInspector extends LitElement {
   @state() private open: Open | null = null;
   @state() private text = '';
   @state() private menuIndex = 0;
+  /** Pills below the fold of rows 2–3, counted after layout for the badge. */
+  @state() private overflow = 0;
 
   static styles = css`
     :host {
@@ -142,25 +146,122 @@ export class RungInspector extends LitElement {
       color: var(--accent-fg);
     }
 
-    .line {
+    /* ── the body: a HARD three rows (the design's rule). Row 1 is the add
+       slot; rows 2–3 hold the existing pills, wrapping, and what does not fit
+       scrolls behind a +N badge. The rung window on the left is the same
+       three rows: the rung above, the CURRENT rung, the rung below. */
+    .body {
+      display: flex;
+      align-items: stretch;
+      height: ${3 * ROW_H}px;
+    }
+
+    .window {
+      width: 118px;
+      flex: none;
+      border-right: 1px solid var(--line);
+      background: var(--bg-context);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .rung {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: ${ROW_H}px;
+      box-sizing: border-box;
+      padding: 0 10px;
+      font: 500 11px/1.2 var(--mono);
+      color: var(--ink-3);
+      white-space: nowrap;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    .rung .idx {
+      color: var(--ink-faint);
+    }
+
+    /* The rows either side are glimpses — they say where ↑↓ will take you —
+       and fade off the edge like a wheel. */
+    .rung.above,
+    .rung.below {
+      opacity: 0.55;
+    }
+
+    .rung.above {
+      mask-image: linear-gradient(to bottom, transparent 0, black 45%);
+    }
+
+    .rung.below {
+      mask-image: linear-gradient(to top, transparent 0, black 45%);
+    }
+
+    .rung.empty {
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    .rung.cur {
+      color: var(--ink);
+      background: var(--row-current);
+      border-left: 3px solid var(--accent);
+      padding-left: 7px;
+      opacity: 1;
+    }
+
+    .rung.cur .idx {
+      color: var(--ink-2);
+    }
+
+    .rung.cur.cursor {
+      outline: 1px solid var(--accent);
+      outline-offset: -1px;
+    }
+
+    .rung.cur.open {
+      background: var(--surface);
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .attrs {
+      flex: 1;
+      min-width: 0;
+      display: grid;
+      grid-template-rows: ${ROW_H}px ${2 * ROW_H}px;
+      position: relative;
+    }
+
+    .slotrow {
+      display: flex;
+      align-items: center;
+      padding: 0 9px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pills {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
-      gap: 5px 3px;
-      padding: 8px 9px;
+      align-content: flex-start;
+      gap: 4px 5px;
+      padding: 5px 9px;
+      overflow-y: auto;
+      scrollbar-width: none;
     }
 
-    .line.attrs {
-      gap: 5px;
-      margin: 0 9px;
-      padding: 7px 0 8px;
-      border-top: 1px dashed var(--line);
-    }
-
-    .sep {
+    .more {
+      position: absolute;
+      right: 6px;
+      bottom: 4px;
+      font: 500 9px/1 var(--mono);
       color: var(--ink-faint);
-      font: 500 11px var(--mono);
-      padding: 0 1px;
+      background: var(--surface);
+      padding: 2px 4px;
+      border: 1px solid var(--line);
+      pointer-events: none;
     }
 
     /* The pill is the rung chip's box: the same lowercase mono word, the
@@ -180,15 +281,6 @@ export class RungInspector extends LitElement {
 
     .pill .k {
       color: var(--ink-3);
-    }
-
-    .pill.crumb {
-      color: var(--ink-2);
-    }
-
-    .pill.crumb.active {
-      border-color: var(--accent);
-      color: var(--ink);
     }
 
     .pill.inherited {
@@ -250,8 +342,8 @@ export class RungInspector extends LitElement {
     .slot {
       display: inline-flex;
       align-items: center;
-      min-width: 96px;
-      padding: 4px 6px;
+      min-width: 120px;
+      padding: 3px 6px;
       border-bottom: 1px solid var(--line-strong);
       color: var(--ink-faint);
       font: 500 11px/1.2 var(--mono);
@@ -274,14 +366,29 @@ export class RungInspector extends LitElement {
     }
 
     .menu {
-      margin: 0 9px 8px;
+      position: absolute;
+      left: 127px;
+      top: ${ROW_H + 6}px;
+      z-index: 2;
       width: max-content;
-      max-width: calc(100% - 18px);
-      min-width: 170px;
+      max-width: calc(100% - 136px);
+      min-width: 150px;
+      max-height: ${5 * ROW_H}px;
+      overflow-y: auto;
       border: 1px solid var(--line-strong);
       background: var(--surface);
+      box-shadow: 0 8px 20px color-mix(in oklab, var(--ink), transparent 80%);
       display: flex;
       flex-direction: column;
+    }
+
+    .menu.for-rung {
+      left: 6px;
+      top: ${2 * ROW_H + 2}px;
+    }
+
+    .menu.for-pill {
+      top: ${2 * ROW_H + 6}px;
     }
 
     .menu .row {
@@ -349,28 +456,19 @@ export class RungInspector extends LitElement {
   }
 
   firstUpdated() {
-    // The cursor starts on the ACTIVE crumb — the rung you are on — so ↑↓
-    // reads as "move from here" and Enter opens where you already are.
-    const active = this.crumbs.findIndex(c => c.active);
-    this.cursor = active >= 0 ? active : 0;
+    // The cursor starts on the ADD slot — the first row, and where bare
+    // typing lands anyway — so the frame opens ready to take an attribute.
+    this.cursor = 1;
     this.focus();
   }
 
-  /** The active crumb's index at the last render, so a change in it — the
-   *  ladder moved — can be told from a re-render that moved nothing. */
-  private lastActive = -1;
-
   updated(changed: Map<string | number | symbol, unknown>) {
     if (changed.has('crumbs') || changed.has('pills')) {
-      const active = this.crumbs.findIndex(c => c.active);
-      const onCrumb = this.cursor < this.crumbs.length;
-      // The ladder moved (↑↓, go to): a cursor that was on a crumb follows
-      // the rung, so the next Enter opens where you now are. A cursor on a
-      // pill stays put — the pills are what you were looking at.
-      if (active >= 0 && active !== this.lastActive && onCrumb) this.cursor = active;
-      this.lastActive = active;
+      // The window always shows the current rung in its middle row, so the
+      // cursor has nothing to follow: item 0 IS "the rung you are on".
       this.cursor = Math.min(this.cursor, this.itemCount() - 1);
     }
+    this.countOverflow();
     placeOverlay(this, {
       anchor: this.anchor,
       mirrored: this.mirrored,
@@ -391,17 +489,32 @@ export class RungInspector extends LitElement {
     }
   }
 
-  // ── the item row: crumbs, pills, slot ────────────────────────────────────
+  private countOverflow(): void {
+    const box = this.renderRoot.querySelector<HTMLElement>('.pills');
+    if (!box) return;
+    const floor = box.getBoundingClientRect().bottom;
+    const hidden = [...box.querySelectorAll<HTMLElement>('.pill')].filter(
+      p => p.getBoundingClientRect().top >= floor - 1
+    ).length;
+    if (hidden !== this.overflow) this.overflow = hidden;
+  }
 
+  // ── the item row: the rung, the slot, the pills ───────────────────────────
+
+  /** Walk order: the current rung's row, then the add slot, then the pills —
+   *  the reading order of the frame (window, row 1, rows 2–3). */
   private itemCount(): number {
-    return this.crumbs.length + this.pills.length + 1;
+    return 2 + this.pills.length;
   }
 
   private itemAt(index: number): { kind: 'crumb' | 'pill' | 'slot'; index: number } {
-    if (index < this.crumbs.length) return { kind: 'crumb', index };
-    if (index < this.crumbs.length + this.pills.length)
-      return { kind: 'pill', index: index - this.crumbs.length };
-    return { kind: 'slot', index: 0 };
+    if (index === 0) return { kind: 'crumb', index: this.activeIndex() };
+    if (index === 1) return { kind: 'slot', index: 0 };
+    return { kind: 'pill', index: index - 2 };
+  }
+
+  private activeIndex(): number {
+    return this.crumbs.findIndex(c => c.active);
   }
 
   // ── candidates for the open thing ─────────────────────────────────────────
@@ -505,7 +618,7 @@ export class RungInspector extends LitElement {
       this.open = { kind: 'slot' };
       this.text = key;
       this.menuIndex = 0;
-      this.cursor = this.itemCount() - 1;
+      this.cursor = 1;
       return true;
     }
     return false;
@@ -624,10 +737,10 @@ export class RungInspector extends LitElement {
     />`;
   }
 
-  private renderMenu() {
+  private renderMenu(where: 'rung' | 'slot' | 'pill') {
     const list = this.candidates();
     if (list.length === 0) return nothing;
-    return html`<div class="menu" role="listbox">
+    return html`<div class="menu for-${where}" role="listbox">
       ${list.map(
         (c, i) => html`<div
           class="row${i === this.menuIndex ? ' cur' : ''}${c.current ? ' current' : ''}"
@@ -643,6 +756,41 @@ export class RungInspector extends LitElement {
         </div>`
       )}
     </div>`;
+  }
+
+  /** The rung window: the row above, the current rung, the row below. */
+  private renderWindow() {
+    const active = this.activeIndex();
+    const open = this.open;
+    const row = (offset: -1 | 0 | 1) => {
+      const crumb = this.crumbs[active + offset];
+      const cls = offset < 0 ? 'above' : offset > 0 ? 'below' : 'cur';
+      if (!crumb) return html`<div class="rung ${cls} empty">—</div>`;
+      const [name, ...rest] = crumb.label.split(' ');
+      const idx = rest.join(' ');
+      if (offset === 0) {
+        const isOpen = open?.kind === 'crumb';
+        const cursorHere = !open && this.itemAt(this.cursor).kind === 'crumb';
+        return html`<div
+          class="rung cur${cursorHere ? ' cursor' : ''}${isOpen ? ' open' : ''}"
+          @click=${() => {
+            this.open = null;
+            this.cursor = 0;
+            this.openUnderCursor();
+          }}
+        >
+          <span class="name">${name}</span>
+          ${isOpen ? this.renderInput() : html`<span class="idx">${idx}</span>`}
+        </div>`;
+      }
+      return html`<div
+        class="rung ${cls}"
+        @click=${() => this.emit('inspector-level', { direction: offset < 0 ? 'relax' : 'tighten' })}
+      >
+        <span class="name">${name}</span><span class="idx">${idx}</span>
+      </div>`;
+    };
+    return html`<div class="window">${row(-1)}${row(0)}${row(1)}</div>`;
   }
 
   private keyLegend() {
@@ -706,27 +854,23 @@ export class RungInspector extends LitElement {
           <span class="secondary">${this.secondary}</span>
           <span class="state${open ? ' editing' : ''}">${stateLabel}</span>
         </div>
-        <div class="line">
-          ${this.crumbs.map((crumb, i) => {
-            const isOpen = open?.kind === 'crumb' && open.index === i;
-            return html`${i > 0 ? html`<span class="sep">›</span>` : nothing}<span
-                class="pill crumb${crumb.active ? ' active' : ''}${cursorAt('crumb', i) ? ' cursor' : ''}${isOpen ? ' open' : ''}"
-                @click=${() => {
-                  this.open = null;
-                  this.cursor = i;
-                  this.openUnderCursor();
-                }}
-              >${isOpen
-                  ? html`<span class="k">${crumb.key}:</span>${this.renderInput()}`
-                  : crumb.label}</span
-              >`;
-          })}
-        </div>
-        ${open?.kind === 'crumb' ? this.renderMenu() : nothing}
-        ${this.note ? html`<div class="note">${this.note}</div>` : nothing}
-        ${this.pills.length === 0 && this.words.length === 0
-          ? nothing
-          : html`<div class="line attrs">
+        <div class="body">
+          ${this.renderWindow()}
+          <div class="attrs">
+            <div class="slotrow">
+              ${this.words.length > 0
+                ? html`<span
+                    class="slot${cursorAt('slot', 0) ? ' cursor' : ''}${open?.kind === 'slot' ? ' open' : ''}"
+                    @click=${() => {
+                      this.open = { kind: 'slot' };
+                      this.text = '';
+                      this.cursor = 1;
+                    }}
+                    >${open?.kind === 'slot' ? this.renderInput() : 'add…'}</span
+                  >`
+                : html`<span class="note" style="padding: 0">${this.note ?? ''}</span>`}
+            </div>
+            <div class="pills">
               ${this.pills.map((pill, i) => {
                 const isOpen = open?.kind === 'pill' && open.index === i;
                 const tail =
@@ -739,7 +883,7 @@ export class RungInspector extends LitElement {
                   class="pill ${pill.pillClass}${pill.partial ? ' half' : ''}${cursorAt('pill', i) ? ' cursor' : ''}${isOpen ? ' open' : ''}"
                   @click=${() => {
                     this.open = null;
-                    this.cursor = this.crumbs.length + i;
+                    this.cursor = 2 + i;
                     this.openUnderCursor();
                   }}
                   ><span class="k">${pill.word}:</span>${isOpen ? this.renderInput() : pill.value}${isOpen
@@ -747,20 +891,15 @@ export class RungInspector extends LitElement {
                     : tail}</span
                 >`;
               })}
-              ${this.words.length > 0
-                ? html`<span
-                    class="slot${cursorAt('slot', 0) ? ' cursor' : ''}${open?.kind === 'slot' ? ' open' : ''}"
-                    @click=${() => {
-                      this.open = { kind: 'slot' };
-                      this.text = '';
-                      this.cursor = this.itemCount() - 1;
-                    }}
-                    >${open?.kind === 'slot' ? this.renderInput() : 'add…'}</span
-                  >`
-                : nothing}
-            </div>`}
-        ${open && open.kind !== 'crumb' ? this.renderMenu() : nothing}
+            </div>
+            ${this.overflow > 0 ? html`<span class="more">+${this.overflow} more · scrolls</span>` : nothing}
+          </div>
+          ${open?.kind === 'crumb' ? this.renderMenu('rung') : nothing}
+          ${open?.kind === 'slot' ? this.renderMenu('slot') : nothing}
+          ${open?.kind === 'pill' ? this.renderMenu('pill') : nothing}
+        </div>
         ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
+        ${this.note && this.words.length > 0 ? html`<div class="note">${this.note}</div>` : nothing}
         ${this.keyLegend()}
       </div>
     `;

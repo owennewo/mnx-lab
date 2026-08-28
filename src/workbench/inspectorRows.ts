@@ -8,7 +8,6 @@
 import type { EditorSession } from '../edit/session.ts';
 import {
   crumbSiblings,
-  partName,
   pillsFor,
   rungNote,
   wordsFor,
@@ -16,6 +15,7 @@ import {
   type InspectorPill,
   type InspectorWord
 } from '../edit/inspector.ts';
+import { sectionRangeAt } from '../edit/selection.ts';
 import { buildHudRows, LEVEL_BY_ROW } from './hudRows.ts';
 
 export interface InspectorView {
@@ -46,18 +46,44 @@ export function buildInspectorView(
   ))].sort((a, b) => a - b);
   const spansBars = measureIndices.length > 1;
 
+  // The window's text: the rung's name and its 1-based index, nothing else
+  // (the design's slot-machine rule). Indices come from the first member
+  // where the HUD's row does not carry one.
+  const first = members[0];
+  const sectionOrdinal = (() => {
+    const range = sectionRangeAt(doc, cursor.measureIndex);
+    if (!range) return null;
+    let n = 0;
+    for (let i = 0; i <= range.start; i++) if (doc.global.measures[i]?.section?.label !== undefined) n++;
+    return n;
+  })();
+  const indexOf = (key: string): string => {
+    switch (key) {
+      case 'bar':
+        return session.pastEnd
+          ? `${cursor.measureIndex + 1} (new)`
+          : spansBars
+            ? `${measureIndices[0]! + 1}–${measureIndices[measureIndices.length - 1]! + 1}`
+            : `${cursor.measureIndex + 1}`;
+      case 'part':
+        return `${(cursor.partIndex ?? 0) + 1}`;
+      case 'voice':
+        return `${(cursor.voiceIndex ?? 0) + 1}`;
+      case 'section':
+        return sectionOrdinal === null ? '' : `${sectionOrdinal}`;
+      case 'event':
+      case 'container':
+        return first && 'eventIndex' in first ? `${first.eventIndex + 1}` : '';
+      case 'note':
+        return first && first.kind === 'note' ? `${first.noteIndex + 1}` : '';
+      default:
+        return '';
+    }
+  };
   const crumbs: InspectorCrumb[] = rows.map(row => {
     const rowLevel = LEVEL_BY_ROW[row.key];
-    let label = row.value ? `${row.label} ${row.value}` : row.label;
-    if (row.key === 'bar')
-      label = session.pastEnd
-        ? row.value
-        : spansBars && row.active
-          ? `bars ${measureIndices[0]! + 1}–${measureIndices[measureIndices.length - 1]! + 1}`
-          : `bar ${row.value}`;
-    else if (row.key === 'part') label = partName(doc, cursor.partIndex ?? 0);
-    else if (row.key === 'section') label = row.value.split(' · ')[0] ?? row.value;
-    else if (row.key === 'document') label = 'document';
+    const index = indexOf(row.key);
+    const label = index ? `${row.label} ${index}` : row.label;
     return {
       key: row.key,
       level: rowLevel,

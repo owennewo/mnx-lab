@@ -8,6 +8,7 @@
 // Stages 3–5: pills at every rung the session can edit, merged over a range.
 import type { MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
+import { midiOfSpelling } from './staffSpace.ts';
 import type { EditorIntent } from './intents.ts';
 import { sectionRangeAt, type SelectionLevel, type SelectionMember } from './selection.ts';
 import {
@@ -91,6 +92,9 @@ export function attributeText(attribute: MeasureAttribute): string {
 export interface InspectorCrumb {
   key: string;
   level: SelectionLevel;
+  /** The rung window's text: the rung's name and its 1-based index — and
+   *  nothing else. Identity (pitch, a section's name, the bar's time) lives
+   *  in the attribute area as floor pills, so the window stays a window. */
   label: string;
   active: boolean;
   siblings: InspectorSibling[] | null;
@@ -143,6 +147,23 @@ export interface InspectorView {
   secondary: string;
   /** Why there are no pills, when there are none by design. */
   note: string | null;
+}
+
+type Step = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
+
+/** `B3`, `F#4`, `Eb2`, `C##5` — the spelling a player types. */
+export function parsePitchText(text: string): { step: Step; alter: number; octave: number } | null {
+  const m = /^([a-g])(#{1,2}|b{1,2}|x)?(-?\d)$/i.exec(text.trim());
+  if (!m) return null;
+  const acc = m[2] ?? '';
+  const alter = acc === 'x' ? 2 : acc.startsWith('#') ? acc.length : -acc.length;
+  return { step: m[1]!.toUpperCase() as Step, alter, octave: Number(m[3]) };
+}
+
+/** The pitch as the same grammar spells it back. */
+export function pitchText(pitch: { step: string; octave: number; alter?: number }): string {
+  const alter = pitch.alter ?? 0;
+  return `${pitch.step}${alter > 0 ? '#'.repeat(alter) : 'b'.repeat(-alter)}${pitch.octave}`;
 }
 
 /** Typed words at the bar rung: the union's kinds spelt as the grammar takes
@@ -448,6 +469,10 @@ export function notePills(doc: MnxStructure, member: Extract<SelectionMember, { 
   if (!located) return [];
   const note: MnxNote = located.note;
   const pills: InspectorPill[] = [];
+  // Identity as a floor pill: the pitch is what the note IS. Amending it is a
+  // transpose by the difference — the session's own verb, so spelling and the
+  // fingerboard follow as they do for Alt+↑/↓.
+  pills.push({ key: 'pitch', word: 'pitch', value: pitchText(note.pitch), pillClass: 'floor', remove: null });
   const x = note._x?.mnxLab;
   if (x?.string !== undefined)
     pills.push(annotation('string', 'string', `${x.string}`, { type: 'removeStringAnnotation' }));
@@ -516,10 +541,16 @@ function pillsOfMember(doc: MnxStructure, level: SelectionLevel, member: Selecti
     case 'measure':
       return measurePills(doc, member.measureIndex);
     case 'section': {
+      // At the section rung the name is identity — a section without one is
+      // not a section — so it is a floor pill: Backspace clears the value,
+      // Enter on empty is refused, and there is no ×.
       const label = doc.global.measures[member.start]?.section?.label;
       return label === undefined
         ? []
-        : [annotation('section', 'section', label, { type: 'removeMeasureAttribute', kind: 'section' })];
+        : [
+            { key: 'name', word: 'name', value: label, pillClass: 'floor', remove: null },
+            reading('bars', 'bars', `${member.start + 1}–${member.end}`)
+          ];
     }
     case 'event':
       return eventPills(doc, member);
@@ -581,6 +612,7 @@ const EVENT_WORDS: InspectorWord[] = [
 ];
 
 const NOTE_WORDS: InspectorWord[] = [
+  { word: 'pitch', hint: 'B3 · F#4 · Eb2' },
   { word: 'accidental', hint: 'show · hide · parens', values: ['show', 'hide', 'parens'] },
   { word: 'finger', hint: '3 · left 2 · right p' },
   { word: 'bend', hint: '2 · release · pre 1 2 release' },
@@ -603,7 +635,7 @@ export function wordsFor(level: SelectionLevel): InspectorWord[] {
     case 'measure':
       return BAR_WORDS;
     case 'section':
-      return BAR_WORDS.filter(w => w.word === 'section');
+      return [{ word: 'name', hint: 'Verse 1' }];
     case 'event':
       return EVENT_WORDS;
     case 'note':
@@ -658,11 +690,30 @@ function parseAdornmentLine(line: string, amend: boolean): InspectorParse {
  * adds only the words the grammars never needed (`duration`, the bare
  * technique kinds, `lyric`).
  */
-export function parseInspectorLine(level: SelectionLevel, word: string | null, text: string): InspectorParse {
-  if (level === 'measure' || level === 'section') return parseBarLine(word, text);
+export function parseInspectorLine(
+  level: SelectionLevel,
+  word: string | null,
+  text: string,
+  context?: { pitch?: { step: string; octave: number; alter?: number } }
+): InspectorParse {
+  if (level === 'measure') return parseBarLine(word, text);
   const line = (word ? `${word} ${text}` : text).trim();
   const head = line.split(/\s+/)[0]?.toLowerCase() ?? '';
   const rest = line.slice(head.length).trim();
+  if (level === 'section') {
+    if (head !== 'name' && head !== 'section') return { error: 'a section has a name — name Verse 1' };
+    if (rest === '') return { error: 'a section needs a name' };
+    return { intent: { type: 'setMeasureAttribute', attribute: { kind: 'section', label: rest } } };
+  }
+  if ((level === 'note' || level === 'event') && head === 'pitch') {
+    const parsed = parsePitchText(rest);
+    if (!parsed) return { error: 'not a pitch — B3 · F#4 · Eb2' };
+    if (!context?.pitch) return { error: 'no note under the cursor to re-pitch' };
+    const from = midiOfSpelling(context.pitch.step as Step, context.pitch.octave, context.pitch.alter ?? 0);
+    const to = midiOfSpelling(parsed.step, parsed.octave, parsed.alter);
+    if (to === from) return { error: 'already that pitch' };
+    return { intent: { type: 'transpose', semitones: to - from } };
+  }
   if (level === 'event' || level === 'note') {
     if (head === 'duration') {
       const m = /^([a-z0-9]+)(\.*)$/i.exec(rest);

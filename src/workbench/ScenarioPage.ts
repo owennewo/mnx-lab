@@ -2595,7 +2595,9 @@ export class ScenarioPage extends LitElement {
    *  read as broken. */
   private applyInspectorLine(word: string | null, text: string) {
     if (!this.session) return;
-    const parsed = parseInspectorLine(this.session.selectionLevel, word, text);
+    const noteKey = this.session.selectedNoteKeys[0];
+    const pitch = noteKey ? findNoteAddress(this.session.doc, noteKey)?.note.pitch : undefined;
+    const parsed = parseInspectorLine(this.session.selectionLevel, word, text, pitch ? { pitch } : undefined);
     if ('error' in parsed) {
       this.inspectorError = parsed.error;
       return;

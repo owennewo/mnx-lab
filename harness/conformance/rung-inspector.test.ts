@@ -329,13 +329,14 @@ describe('event pills', () => {
 describe('note pills', () => {
   it('read string, accidental, fingering and techniques, then the event’s own', () => {
     const session = at('note');
-    expect(pillText(session)).toEqual(['string: 1 [annotation]']);
+    expect(pillText(session)).toEqual(['pitch: E4 [floor]', 'string: 1 [annotation]']);
     for (const text of ['accidental parens', 'finger left 3', 'vibrato', 'bend pre 1 2 release', 'staccato']) {
       const parsed = parseInspectorLine('note', null, text);
       expect(parsed, text).toHaveProperty('intent');
       expect(edit(session, (parsed as { intent: never }).intent), text).toBe(true);
     }
     expect(pillText(session)).toEqual([
+      'pitch: E4 [floor]',
       'string: 1 [annotation]',
       'accidental: parens [annotation]',
       'fingering: left 3 [annotation]',
@@ -375,6 +376,28 @@ describe('note pills', () => {
     expect(released.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
       points: [{ position: 0, alter: 2 }, { position: 0.5, alter: 2 }, { position: 1, alter: 0 }]
     });
+  });
+});
+
+describe('identity pills', () => {
+  it('the pitch is a floor pill amended by transpose, spelt back by the same grammar', () => {
+    const session = at('note');
+    const pitch = { step: 'E', octave: 4 };
+    expect(parseInspectorLine('note', 'pitch', 'G4', { pitch })).toEqual({ intent: { type: 'transpose', semitones: 3 } });
+    expect(parseInspectorLine('note', 'pitch', 'Eb4', { pitch })).toEqual({ intent: { type: 'transpose', semitones: -1 } });
+    expect(parseInspectorLine('note', 'pitch', 'E4', { pitch })).toHaveProperty('error');
+    expect(parseInspectorLine('note', 'pitch', 'H9', { pitch })).toHaveProperty('error');
+    expect(edit(session, { type: 'transpose', semitones: 3 })).toBe(true);
+    expect(pillText(session)[0]).toBe('pitch: G4 [floor]');
+  });
+
+  it('a section’s name is a floor pill: amend sets it, empty is refused', () => {
+    const session = new EditorSession(makeDoc());
+    session.handleIntent({ type: 'goToLevel', level: 'section' });
+    expect(pillText(session)).toEqual(['name: Verse 1 [floor]', 'bars: 1–2 [inherited]']);
+    expect(parseInspectorLine('section', 'name', '')).toHaveProperty('error');
+    expect(parseInspectorLine('section', 'name', 'Intro')).toEqual({ intent: { type: 'setMeasureAttribute', attribute: { kind: 'section', label: 'Intro' } } });
+    expect(wordsFor('section').map(w => w.word)).toEqual(['name']);
   });
 });
 

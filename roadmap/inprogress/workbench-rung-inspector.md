@@ -191,6 +191,29 @@ value selected — and typing with nothing open always lands in the blank slot. 
 pill is a 2px accent border with a caret. Pills with a floor draw ▾; removable pills
 draw ×; crumbs draw neither.
 
+### Redesign (2026-08-28, after stage 5) — the rung window and the three rows
+
+Driven hands-on, the horizontal breadcrumb read as a second HUD. The
+[design canvas](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3)
+(versions `vertical-rung-window`, `three-rows`) replaced it and the build followed:
+
+- **The breadcrumb is a vertical window on the left** — three rows of 30px: the rung
+  above, the **current rung** (accent bar, lit), the rung below, the outer two faded off
+  the edge like a wheel. ↑↓ turn it; Enter on the middle row is go-to. The rows carry
+  **only the rung's name and 1-based index** (`bar 3`, `note 1`, `section 2`) — nothing
+  else, so the window stays 118px and never wraps.
+- **The body is a hard three rows.** Row 1 is the add slot (where the cursor opens and
+  where bare typing lands); rows 2–3 hold the existing pills, wrapping, and what does
+  not fit scrolls behind a `+N more · scrolls` badge counted after layout. Candidate
+  menus float over the frame rather than growing it.
+- **Identity moved out of the window into floor pills.** `pitch: B3` at the note
+  (amended by typing a pitch — parsed, diffed against the note, fired as the session's
+  own `transpose`, so spelling and the fingerboard follow); `name: Head` at the section
+  (empty is refused — a section without a name is not a section — with `bars: 1–8` as a
+  reading); `time`/`barline` at the bar as before.
+- **Walk order is the frame's reading order**: the rung row, the slot, the pills.
+  Tab/←→ walk it; ↑↓ stay the ladder from anywhere in the frame.
+
 ## Agreements before code
 
 1. **Enter opens the inspector in `PENDING_PRECEDENCE`'s last step** (`src/edit/keymap.ts`:
