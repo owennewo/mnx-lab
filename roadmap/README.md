@@ -172,8 +172,9 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
-- **[workbench-rung-inspector.md](inprogress/workbench-rung-inspector.md)** — **in progress 2026-08-28** — [design canvas](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3);
-  placed over the score where the tray sits, keyboard-first. A third editing surface, tried *beside* the tray and the Shift+letter
+- **[workbench-rung-inspector.md](inprogress/workbench-rung-inspector.md)** — **in progress 2026-08-28; stages 1–3 built the same day** — [design canvas](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3);
+  placed over the score where the tray sits, keyboard-first; machinery in `edit/inspector.ts`,
+  driven hands-on by `npm run smoke:inspector`. A third editing surface, tried *beside* the tray and the Shift+letter
   popovers so use decides which wins: **Enter opens an inspector on the current rung** —
   the cursor's path as a breadcrumb of identity pills (the HUD's rows, horizontal), the
   rung's attributes as deletable pills derived from the ops' typed unions, a blank slot

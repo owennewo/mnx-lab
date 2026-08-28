@@ -1,7 +1,8 @@
 # The rung inspector — the cursor's path as a breadcrumb, the rung's state as pills
 
-> **Status: IN PROGRESS 2026-08-28** — picked up the day it was proposed, after the
-> design pass. **Design canvas:** [Rung Inspector](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3)
+> **Status: IN PROGRESS 2026-08-28 — stages 1–3 built and landed the same day**
+> (crumbs, go-to, the bar rung's pills); stages 4–5 (the other families, ranges) are
+> open. Picked up the day it was proposed, after the design pass. **Design canvas:** [Rung Inspector](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3)
 > (seven states over the score: walking, go-to, add, amend, the two-step Backspace,
 > mini-rung, range — plus the key legend). Two decisions came out of that pass and are
 > folded in below: the inspector sits **over the score, where the tray sits**, not in
@@ -190,10 +191,14 @@ draw ×; crumbs draw neither.
 
 ## Agreements before code
 
-1. **Enter goes last in `PENDING_PRECEDENCE`** (`src/edit/keymap.ts`:
-   `popover › overlay › pendingFret › spanAnchor › selection`), so a half-typed fret or
-   an armed spanner never opens an inspector. Escape from the inspector is one more
-   entry in `ESCAPE_PRECEDENCE`, asserted in `key-scope.test.ts` like the others.
+1. **Enter opens the inspector in `PENDING_PRECEDENCE`'s last step** (`src/edit/keymap.ts`:
+   `popover › overlay › pendingFret › spanAnchor › selection`; `handlePending` level 5),
+   so a half-typed fret or an armed spanner never opens one. *Correction from the
+   build:* there is no `ESCAPE_PRECEDENCE` — Escape and Enter share the one list, and
+   the tray is its `overlay` consumer, DOM-enforced (it owns its keydown and
+   `preventDefault`s before the page listener runs). The inspector is the same class of
+   thing, so it needed **no new precedence entry**: once open it owns its keys exactly
+   as the tray does, and the literal list in `key-scope.test.ts` is untouched.
 2. **The inspector fires `session.handleIntent` with the same ops** as the tray and the
    popovers, and registers `rungInspector` as a surface **only** where it genuinely adds
    keyboard reachability (the tray's own rule — the ops panel credits the key, not the
@@ -216,18 +221,53 @@ draw ×; crumbs draw neither.
    enclosure preview the tray uses (`drawEnclosure` over `data-source-id`) is reused for
    an opened crumb, so no layout code moves.
 
+## What the build found (2026-08-28, stages 1–3)
+
+- **The machinery is `edit/`, not shell.** The first cut put pills, siblings, words
+  and the line parser in `workbench/inspectorRows.ts` beside `hudRows.ts` — and the
+  boundary checker refused the harness test (`harness-not-into-shells`). Right call:
+  everything but the crumb *labels* is a pure function of the document and the typed
+  unions, so it lives in **`src/edit/inspector.ts`** and
+  `harness/conformance/rung-inspector.test.ts` joins it headlessly; the shell's
+  `inspectorRows.ts` only glues `buildHudRows`' labels on. `attributeText` (from
+  `opRows`) and `timeAt` (from `hudRows`) moved down with it, plus a new `keyAt`.
+- **`readMeasureAttributes` is the reverse of the op.** Pills are read by the inverse
+  of `measureAttributeValue`, so what the inspector shows is exactly what
+  `setMeasureAttribute` could have written; the test sets one of each kind and reads it
+  back. It made one canonical-form decision: `at` is spelt only when it differs from
+  the kind's default (segno/fine start, jump end), or a `segno` written without one
+  read back with one.
+- **Placement is one function.** `SelectionTray.place()` became
+  `workbench/overlayPlacement.ts`, consumed by both; the tray's behaviour is unchanged
+  and the design-tokens test now runs its three joins over the inspector too.
+- **Hands-on caught what the joins could not.** `npm run smoke:inspector`
+  (`harness/verify/inspector-smoke.mjs`, headless Chrome over CDP on the selection
+  smoke's pattern) drives Enter → ↑×4 → `barline double` ⏎ → ⌫ → Enter-on-crumb ↓ ⏎ →
+  Esc, and asserts the HUD agrees about the rung at each step. It found the cursor
+  **not following the rung** after ↑: the page re-aimed it before the `crumbs` prop had
+  re-rendered. Fixed in the element — `updated()` moves a cursor that was *on a crumb*
+  to the new active crumb, and leaves a cursor on a pill alone.
+- **`/` in the inspector opens the tray** on the same anchor and side; the tray closes
+  the inspector on open. They are never up together.
+- Goldens byte-identical; 1118 tests + the smoke green; `rungInspector` credited in
+  `opRows` (`Enter · inspector`) and listed in `SURFACE_INTENTS`.
+
 ## Stages
 
-1. **Crumbs.** The HUD's active row rendered as the breadcrumb; Enter from the score
-   opens it, ↑/↓ and Shift+↑/↓ walk it, Escape returns. Read-only. This alone is a way to
-   *read* the ladder the HUD's wall of rows does not give.
-2. **Go to.** Enter on a crumb opens its sibling list (↑/↓ cycles, typing filters,
-   Enter commits through the cursor's existing step at that rung). Lower crumbs
-   re-derive.
-3. **Measure-attribute pills.** The first family — the ten-kind union plus `time` and
-   `key` at the bar rung, which is the family the popovers split worst. Add via the blank
-   slot's typeahead, amend via upsert or Enter-on-pill, two-step Backspace with floors.
-   `rungInspector` registered as a surface for what the tray cannot already reach.
+1. ✅ **Crumbs** (2026-08-28). The HUD's rows as the breadcrumb; Enter from the score
+   opens it, ↑/↓ walk it, Escape returns.
+2. ✅ **Go to** (2026-08-28). Bar, part and section crumbs open their sibling lists
+   (↑/↓ cycles, typing filters, Enter commits via `goToMeasure`/`setPart`). Voice has no
+   direct setter in the session (only `cycleSlot`), so its crumb offers none — the
+   score's own ←/→ steps it.
+3. ✅ **Measure-attribute pills** (2026-08-28). `time` (floor when declared here,
+   inherited otherwise), `key` (removable when declared here), `barline` (always
+   present, floor `regular`), and one pill per declared attribute (`tempo#n` for the
+   array). Add via the slot's typeahead, amend via Enter-on-pill (value selected) or
+   upsert, two-step Backspace. Parsing reuses `parseBarAttribute` for the family it
+   already covers; the word list is derived from `MEASURE_ATTRIBUTE_FIELDS`. The
+   rhythm riders (`full-measure rest`, `measure repeat`) are refused with a pointer to
+   Shift+B — they are `voiceMeasure` things and arrive with stage 4.
 4. **The other families**, one per step, in the residue ledger's order: positioned,
    markings, note singletons, technique (after agreement 4), containers as mini-rungs.
 5. **Ranges** — the half-tone pill.

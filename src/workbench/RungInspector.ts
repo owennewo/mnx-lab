@@ -350,8 +350,19 @@ export class RungInspector extends LitElement {
     this.focus();
   }
 
+  /** The active crumb's index at the last render, so a change in it — the
+   *  ladder moved — can be told from a re-render that moved nothing. */
+  private lastActive = -1;
+
   updated(changed: Map<string | number | symbol, unknown>) {
     if (changed.has('crumbs') || changed.has('pills')) {
+      const active = this.crumbs.findIndex(c => c.active);
+      const onCrumb = this.cursor < this.crumbs.length;
+      // The ladder moved (↑↓, go to): a cursor that was on a crumb follows
+      // the rung, so the next Enter opens where you now are. A cursor on a
+      // pill stays put — the pills are what you were looking at.
+      if (active >= 0 && active !== this.lastActive && onCrumb) this.cursor = active;
+      this.lastActive = active;
       this.cursor = Math.min(this.cursor, this.itemCount() - 1);
     }
     placeOverlay(this, {
@@ -385,13 +396,6 @@ export class RungInspector extends LitElement {
     if (index < this.crumbs.length + this.pills.length)
       return { kind: 'pill', index: index - this.crumbs.length };
     return { kind: 'slot', index: 0 };
-  }
-
-  /** Re-aim the cursor at a crumb by level — the page calls this after the
-   *  ladder moves so the cursor follows the rung it just walked to. */
-  aimAtActive(): void {
-    const active = this.crumbs.findIndex(c => c.active);
-    if (active >= 0) this.cursor = active;
   }
 
   // ── candidates for the open thing ─────────────────────────────────────────

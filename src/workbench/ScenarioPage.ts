@@ -2611,8 +2611,6 @@ export class ScenarioPage extends LitElement {
     this.inspectorError = ok ? null : 'the document refused that — nothing to remove, or it does not fit';
     this.copied = false;
     this.syncFromSession();
-    // The ladder may have moved (↑↓, go to): re-aim the cursor at the rung.
-    this.renderRoot.querySelector('mnx-rung-inspector')?.aimAtActive();
   }
 
   /**
