@@ -23,6 +23,7 @@ import {
   sectionRangeAt,
   type SelectionLevel
 } from '../edit/selection.ts';
+import { timeAt } from '../edit/inspector.ts';
 import type { HudPart, HudRow } from './ScoreHud.ts';
 
 /** Row key ↔ selection level. The component never sees the right-hand side. */
@@ -60,15 +61,6 @@ function staffSequences(sequences: MnxSequence[] | undefined, staffIndex: number
   return (sequences ?? []).filter(seq => (seq.staff ?? 1) === staffIndex);
 }
 
-/** The bar's effective time signature: the last global `time` at or before it. */
-function timeAt(doc: MnxStructure, measureIndex: number): { count: number; unit: number } | null {
-  let time: { count: number; unit: number } | null = null;
-  for (let i = 0; i <= measureIndex && i < doc.global.measures.length; i++) {
-    const t = doc.global.measures[i]?.time;
-    if (t) time = t;
-  }
-  return time;
-}
 
 /** Display form of a string set, recited the way players do (low first). */
 export function fmtTuning(strings: readonly MnxTuningEntry[]): string {

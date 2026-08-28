@@ -169,7 +169,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'Escape' }],
     group: 'selection',
     meaning: {
-      all: 'abandon the innermost pending thing — an open popover, a half-typed fret, an armed slur/beam anchor — or deselect when there is none'
+      all: 'abandon the innermost pending thing — an open popover or inspector, a half-typed fret, an armed slur/beam anchor — or deselect when there is none'
     }
   },
   {
@@ -177,7 +177,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'Enter' }, { code: 'NumpadEnter' }],
     group: 'selection',
     meaning: {
-      all: 'commit the innermost pending thing — apply the popover, enter the fret now, complete the armed slur/beam'
+      all: 'commit the innermost pending thing — apply the popover, enter the fret now, complete the armed slur/beam — or, with nothing pending, open the rung inspector'
     }
   },
   {
@@ -557,6 +557,22 @@ export const KEY_DOCS: KeyDoc[] = [
  * here must really emit that intent in the workbench.
  */
 export const SURFACE_INTENTS: Record<string, string[]> = {
+  // The rung inspector (roadmap/inprogress/workbench-rung-inspector.md):
+  // Enter with nothing pending. Its pills at the bar rung fire the two
+  // signatures and the measure-attribute pair; its crumbs go to a bar or a
+  // part; ↑↓ walk the ladder.
+  rungInspector: [
+    'setTimeSignature',
+    'removeTimeSignature',
+    'setKeySignature',
+    'removeKeySignature',
+    'setMeasureAttribute',
+    'removeMeasureAttribute',
+    'goToMeasure',
+    'setPart',
+    'relaxSelection',
+    'tightenSelection'
+  ],
   timeSignaturePopover: ['setTimeSignature', 'removeTimeSignature'],
   tuningPopover: ['setTuning'],
   partPopover: [

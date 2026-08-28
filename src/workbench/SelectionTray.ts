@@ -39,6 +39,13 @@ import { LitElement, html, css, svg, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { glyphBBox, glyphCodepoint, isSmuflLoaded } from '../engine/smufl/smufl.ts';
 
+import {
+  OVERLAY_EDGE_GAP,
+  OVERLAY_MIRROR_MARGIN,
+  OVERLAY_SHAFT_H,
+  placeOverlay,
+  type OverlayAnchor
+} from './overlayPlacement.ts';
 /** One rung of the ladder. `active` = the rung on display; `holdsSelection`
  *  marks the rung still owning the real selection while another is only
  *  previewed. */
@@ -165,12 +172,7 @@ export interface TrayMeta {
 }
 
 /** The selection's box in the coordinate space of the tray's offsetParent. */
-export interface TrayAnchor {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+export type TrayAnchor = OverlayAnchor;
 
 /**
  * The connector, now 8px rather than the old 30: the spec plants the tray one
@@ -178,9 +180,9 @@ export interface TrayAnchor {
  * that gap, so the ladder reads as growing out of the selection instead of
  * dangling from it on a thread.
  */
-export const TRAY_SHAFT_H = 8;
+export const TRAY_SHAFT_H = OVERLAY_SHAFT_H;
 /** The gap the chip and the tray both sit at, below the selection. */
-export const TRAY_EDGE_GAP = 8;
+export const TRAY_EDGE_GAP = OVERLAY_EDGE_GAP;
 /** The ladder column: lowercase mono rungs, the current one lit. */
 const LADDER_W = 74;
 /**
@@ -202,7 +204,7 @@ export const TRAY_WIDTH = 470;
 const TRAY_MIN_H = 168;
 /** The spec's mirror trigger: flip when the tray's right edge would pass the
  *  score's right edge minus this. */
-export const TRAY_MIRROR_MARGIN = 16;
+export const TRAY_MIRROR_MARGIN = OVERLAY_MIRROR_MARGIN;
 
 @customElement('mnx-selection-tray')
 export class SelectionTray extends LitElement {
@@ -978,71 +980,13 @@ export class SelectionTray extends LitElement {
    * the fallback the visuals doc names.
    */
   private place() {
-    const host = this;
-    const parent = this.offsetParent as HTMLElement | null;
-    if (!parent) return;
-    const width = TRAY_WIDTH;
-    host.style.setProperty('--tray-w', `${width}px`);
-    const pw = parent.clientWidth;
-    const ph = parent.clientHeight;
-    const anchor = this.anchor;
-    const shaftEl = this.renderRoot.querySelector<HTMLElement>('.shaft');
-    if (!anchor) {
-      this.removeAttribute('data-flipped');
-      this.removeAttribute('data-mirrored');
-      if (shaftEl) shaftEl.style.display = 'none';
-      const dockH = Math.max(TRAY_MIN_H, ph - TRAY_EDGE_GAP - 18);
-      host.style.setProperty('--tray-max-h', `${dockH}px`);
-      const docked = Math.min(this.getBoundingClientRect().height || 200, dockH);
-      host.style.left = `${Math.max(TRAY_EDGE_GAP, (pw - width) / 2)}px`;
-      host.style.top = `${Math.max(TRAY_EDGE_GAP, ph - docked - 18)}px`;
-      return;
-    }
-
-    this.toggleAttribute('data-mirrored', this.mirrored);
-    const wanted = this.mirrored ? anchor.x + anchor.width - width : anchor.x;
-    const left = Math.min(
-      Math.max(wanted, TRAY_EDGE_GAP),
-      Math.max(TRAY_EDGE_GAP, pw - width - TRAY_EDGE_GAP)
-    );
-    const below = anchor.y + anchor.height + TRAY_SHAFT_H;
-    // How much room each side actually has, decided BEFORE the height is
-    // capped — otherwise the tray measures last frame's clamp and every
-    // re-place shrinks it a little further.
-    const roomBelow = Math.max(0, ph - below - TRAY_EDGE_GAP);
-    const roomAbove = Math.max(0, anchor.y - TRAY_SHAFT_H - TRAY_EDGE_GAP);
-    host.style.setProperty('--tray-max-h', 'none');
-    const wantH = this.getBoundingClientRect().height || 200;
-
-    // Hang below when the tray fits there; otherwise take whichever side has
-    // more room. The old test asked whether the OTHER side could hold the tray
-    // WHOLE, so a tray too tall for both stayed below and ran off the screen —
-    // which is exactly what six captioned bands did to the note rung.
-    const flip = wantH > roomBelow && roomAbove > roomBelow;
-    const room = Math.max(TRAY_MIN_H, flip ? roomAbove : roomBelow);
-    host.style.setProperty('--tray-max-h', `${room}px`);
-    // `data-flipped` alone carries this: nothing in render() reads the side
-    // any more, so a reactive field would only cost a second update pass.
-    this.toggleAttribute('data-flipped', flip);
-    host.style.left = `${left}px`;
-    // The height the tray will REALLY have, so a flipped one's top is not
-    // computed from a box it was never allowed to be.
-    const trayH = Math.min(wantH, room);
-    host.style.top = `${
-      flip ? Math.max(TRAY_EDGE_GAP, anchor.y - TRAY_SHAFT_H - trayH) : below
-    }px`;
-
-    // The shaft: selection width clamped 24–240, centred on the selection's
-    // horizontal centre, clamped to the tray's span.
-    const shaft = shaftEl;
-    if (shaft) {
-      const w = Math.min(240, Math.max(24, anchor.width));
-      const centre = anchor.x + anchor.width / 2 - left;
-      const x = Math.min(Math.max(centre - w / 2, 0), Math.max(0, width - w));
-      shaft.style.left = `${x}px`;
-      shaft.style.width = `${w}px`;
-      shaft.style.display = 'block';
-    }
+    placeOverlay(this, {
+      anchor: this.anchor,
+      mirrored: this.mirrored,
+      width: TRAY_WIDTH,
+      minHeight: TRAY_MIN_H,
+      shaft: this.renderRoot.querySelector<HTMLElement>('.shaft')
+    });
   }
 
   // ── keyboard (a scope-4 region: the tray owns the keys it names) ─────────

@@ -103,6 +103,9 @@ import {
 } from './SelectionTray.ts';
 import '../elements/ScoreViewer.ts';
 import './SelectionTray.ts';
+import './RungInspector.ts';
+import { buildInspectorView } from './inspectorRows.ts';
+import { parseInspectorLine } from '../edit/inspector.ts';
 import './ZoomPad.ts';
 import type { ZoomPadChange } from './ZoomPad.ts';
 import './ModelPickerDialog.ts';
@@ -627,6 +630,12 @@ export class ScenarioPage extends LitElement {
   // from trayDemo.ts, and no intents fired — tab commits and tile flips are
   // page-local so the look and keyboard model can be reviewed before wiring.
   @state() private trayOpen = false;
+  /** The rung inspector (roadmap/inprogress/workbench-rung-inspector.md):
+   *  Enter with nothing pending opens it over the selection, where the tray
+   *  sits. It and the tray are never open together — both want the keys. */
+  @state() private inspectorOpen = false;
+  @state() private inspectorMirrored = false;
+  @state() private inspectorError: string | null = null;
 
   /** The zoom pad's two axes. `null` staff scale means FITTED — the renderer
    *  gets no pxPerSp and sizes the score to the viewport. */
@@ -2064,7 +2073,10 @@ export class ScenarioPage extends LitElement {
       // selection with keys it no longer receives, and one that advertises
       // shortcuts it cannot honour is the same lie the dimmed cursor exists
       // to avoid (core-editor-focus-scope.md, stage 3).
-      if (!this.hasKeyboard) this.trayOpen = false;
+      if (!this.hasKeyboard) {
+        this.trayOpen = false;
+        this.inspectorOpen = false;
+      }
     }, 0);
   };
 
@@ -2073,11 +2085,18 @@ export class ScenarioPage extends LitElement {
    *  that stops propagation and sees through the tray's shadow root — and
    *  nothing is prevented, so the click still reaches whatever it hit. */
   private onPointerDownOutside = (event: Event) => {
-    if (!this.trayOpen) return;
-    const inTray = event
+    if (!this.trayOpen && !this.inspectorOpen) return;
+    const inOverlay = event
       .composedPath()
-      .some(node => node instanceof HTMLElement && node.tagName === 'MNX-SELECTION-TRAY');
-    if (!inTray) this.trayOpen = false;
+      .some(
+        node =>
+          node instanceof HTMLElement &&
+          (node.tagName === 'MNX-SELECTION-TRAY' || node.tagName === 'MNX-RUNG-INSPECTOR')
+      );
+    if (!inOverlay) {
+      this.trayOpen = false;
+      this.inspectorOpen = false;
+    }
   };
 
   private async loadScore() {
@@ -2288,10 +2307,13 @@ export class ScenarioPage extends LitElement {
     }
     // 5. nothing pending. Escape deselects — view chrome, deliberately not
     //    session history, so it is never recorded and never replayed. Enter
-    //    is free here; the note-rung input job will claim it.
+    //    opens the rung inspector — LAST in the walk, so a half-typed fret or
+    //    an armed spanner never opens one (the roadmap's agreement 1).
     if (!commit) {
       this.cursorHidden = true;
       this.syncFromSession();
+    } else {
+      this.openInspector();
     }
   }
 
@@ -2510,6 +2532,7 @@ export class ScenarioPage extends LitElement {
     // and the notation pane would show the fingerboard's commands.
     this.followProjection();
     this.trayOpen = true;
+    this.inspectorOpen = false;
     this.trayTab = null;
     this.traySearch = '';
     // Decided ONCE, here: the tray must not change sides while it is open,
@@ -2543,6 +2566,53 @@ export class ScenarioPage extends LitElement {
     this.trayOpen = false;
     // The keyboard goes back to the editor, not into the void.
     this.renderRoot.querySelector<HTMLElement>('mnx-score-viewer')?.focus();
+  }
+
+  /** Enter's door (handlePending, level 5). The inspector follows the pane
+   *  and takes its side once, exactly as the tray does — it is the tray's
+   *  sibling and hangs off the same anchor. */
+  private openInspector() {
+    if (!this.session || !this.hasKeyboard || this.loadState !== 'ready') return;
+    if (this.cursorHidden) return;
+    this.flushPendingFret();
+    this.followProjection();
+    this.trayOpen = false;
+    this.inspectorError = null;
+    this.inspectorMirrored = this.trayAnchor ? this.mirrorAt(this.trayAnchor) : false;
+    this.inspectorOpen = true;
+    this.syncFromSession();
+  }
+
+  private closeInspector() {
+    this.inspectorOpen = false;
+    this.inspectorError = null;
+    this.renderRoot.querySelector<HTMLElement>('mnx-score-viewer')?.focus();
+  }
+
+  /** The inspector's line, applied: parse, fire, and either clear the error
+   *  or say why not. A refusal by the session (a time signature that does
+   *  not fit, a key nothing declared) is said too — the keystroke must not
+   *  read as broken. */
+  private applyInspectorLine(word: string | null, text: string) {
+    if (!this.session) return;
+    const parsed = parseInspectorLine(word, text);
+    if ('error' in parsed) {
+      this.inspectorError = parsed.error;
+      return;
+    }
+    this.fireFromInspector(parsed.intent);
+  }
+
+  private fireFromInspector(intent: EditorIntent) {
+    if (!this.session) return;
+    this.flushPendingFret();
+    this.cursorHidden = false;
+    const ok = this.session.handleIntent(intent);
+    this.inspectorError = ok ? null : 'the document refused that — nothing to remove, or it does not fit';
+    this.copied = false;
+    this.syncFromSession();
+    // The ladder may have moved (↑↓, go to): re-aim the cursor at the rung.
+    this.renderRoot.querySelector('mnx-rung-inspector')?.aimAtActive();
   }
 
   /**
@@ -2871,6 +2941,45 @@ export class ScenarioPage extends LitElement {
     // keystroke edits.
     this.closeTray();
     this.stripIntent(action.intent);
+  }
+
+  private inspectorOverlay(entry: ScenarioEntry) {
+    if (!this.session) return nothing;
+    const view = buildInspectorView(entry.meta.title, this.session, this.cursorHidden);
+    return html`
+      <mnx-rung-inspector
+        .crumbs=${view.crumbs}
+        .pills=${view.pills}
+        .words=${view.words}
+        .primary=${view.primary}
+        .secondary=${view.secondary}
+        .note=${view.note}
+        .error=${this.inspectorError}
+        .anchor=${this.trayAnchor}
+        ?mirrored=${this.inspectorMirrored}
+        @inspector-level=${(e: CustomEvent<{ direction: 'relax' | 'tighten' }>) => {
+          this.fireFromInspector({
+            type: e.detail.direction === 'relax' ? 'relaxSelection' : 'tightenSelection'
+          });
+        }}
+        @inspector-goto=${(e: CustomEvent<{ intent: EditorIntent }>) => {
+          this.fireFromInspector(e.detail.intent);
+        }}
+        @inspector-apply=${(e: CustomEvent<{ word: string | null; text: string }>) => {
+          this.applyInspectorLine(e.detail.word, e.detail.text);
+        }}
+        @inspector-remove=${(e: CustomEvent<{ key: string; intent: EditorIntent }>) => {
+          this.fireFromInspector(e.detail.intent);
+        }}
+        @inspector-widen=${() => {
+          // `/` in the inspector: the verbs live in the tray. Same anchor,
+          // same side, the other surface.
+          this.inspectorOpen = false;
+          this.openTray();
+        }}
+        @inspector-close=${() => this.closeInspector()}
+      ></mnx-rung-inspector>
+    `;
   }
 
   private trayOverlay(entry: ScenarioEntry) {
@@ -3492,6 +3601,7 @@ export class ScenarioPage extends LitElement {
               ></mnx-zoom-pad>`
             : nothing}
           ${this.trayOpen && this.session ? this.trayOverlay(entry) : nothing}
+          ${this.inspectorOpen && this.session ? this.inspectorOverlay(entry) : nothing}
           ${this.setupPopoverOverlay()}
           ${this.modelPickerOpen
             ? html`<mnx-model-picker

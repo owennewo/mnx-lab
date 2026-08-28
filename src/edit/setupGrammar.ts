@@ -236,7 +236,7 @@ export function parseKeySignature(text: string): { fifths: number } | 'inherit' 
 // ("revert to the predecessor"), an annotation says it is simply not there.
 // The token names the removal CLASS, so the grammar teaches the taxonomy.
 
-const BARLINE_TYPES = [
+export const BARLINE_TYPES = [
   'regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
   'heavyLight', 'heavyHeavy', 'tick', 'short', 'noBarline'
 ] as const;

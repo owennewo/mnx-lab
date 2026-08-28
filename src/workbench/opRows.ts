@@ -7,7 +7,8 @@
 // same layering as hudRows.ts. An intent with no binding and no surface
 // renders "(no key)" honestly: the panel is a live gap detector.
 import type { EditorIntent } from '../edit/intents.ts';
-import type { EditOp, EntryTarget, MeasureAttribute, OpLogEntry } from '../edit/ops.ts';
+import type { EditOp, EntryTarget, OpLogEntry } from '../edit/ops.ts';
+import { attributeText } from '../edit/inspector.ts';
 import type { MnxTuningEntry } from '../model/mnx.ts';
 import { EDIT_LAYER, NAVIGATION_LAYER, TAB_DIGIT_LAYER } from '../edit/keymap.ts';
 import { KEY_DOCS, SURFACE_INTENTS, strokeKey } from '../edit/keymapDocs.ts';
@@ -35,6 +36,7 @@ const SURFACE_LABELS: Record<string, string> = {
   lyricPopover: 'Shift+L · popover',
   rhythmPopover: 'Shift+R · popover',
   selectionTray: '/ · tray',
+  rungInspector: 'Enter · inspector',
   commandPalette: 'Ctrl+G › · palette',
   goTo: 'Ctrl+G · go-to',
   viewSwitcher: 'view tabs'
@@ -284,31 +286,6 @@ function eventAddressText(
   return `p${address.partIndex + 1} s${address.staffIndex} m${address.measureIndex + 1} v${address.voiceIndex + 1} e${address.eventIndex + 1}`;
 }
 
-/** A bar attribute as the popover grammar would have taken it. */
-function attributeText(attribute: MeasureAttribute): string {
-  switch (attribute.kind) {
-    case 'barline':
-      return `barline ${attribute.type}`;
-    case 'repeatStart':
-      return 'repeat start';
-    case 'repeatEnd':
-      return `repeat end${attribute.times !== undefined ? ` ${attribute.times}` : ''}`;
-    case 'ending':
-      return `ending ${(attribute.numbers ?? []).join(',')}${attribute.open ? ' open' : ''}`.trim();
-    case 'segno':
-      return 'segno';
-    case 'fine':
-      return 'fine';
-    case 'jump':
-      return `jump ${attribute.type}`;
-    case 'tempo':
-      return `tempo ${attribute.base}=${attribute.bpm}`;
-    case 'rehearsal':
-      return `rehearsal ${attribute.label}`;
-    case 'section':
-      return `section ${attribute.label}`;
-  }
-}
 
 function intentLabel(intent: EditorIntent): string {
   switch (intent.type) {

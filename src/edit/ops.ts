@@ -892,6 +892,55 @@ function measureAttributeValue(attribute: MeasureAttribute): unknown {
   }
 }
 
+/**
+ * The reverse of `measureAttributeValue`: the attributes a global measure
+ * DECLARES, read back into the typed union. The rung inspector
+ * (roadmap/inprogress/workbench-rung-inspector.md) draws its pills from this,
+ * so what it shows is exactly what `setMeasureAttribute` could have written —
+ * one vocabulary, read and written by the same two functions. `tempos` is the
+ * array, so it yields one attribute per entry, in order (removal takes that
+ * index).
+ */
+export function readMeasureAttributes(measure: MnxGlobalMeasure | undefined): MeasureAttribute[] {
+  if (!measure) return [];
+  const out: MeasureAttribute[] = [];
+  // `at` is spelt only when it differs from the kind's own default — the
+  // canonical form, so a `segno` written with no `at` reads back as none.
+  const at = (
+    location: { fraction: [number, number] } | undefined,
+    fallback: 'start' | 'end'
+  ): { at: 'start' | 'end' } | Record<string, never> => {
+    if (location === undefined) return {};
+    const where = location.fraction[0] === 0 ? 'start' : 'end';
+    return where === fallback ? {} : { at: where };
+  };
+  if (measure.barline?.type) out.push({ kind: 'barline', type: measure.barline.type });
+  if (measure.repeatStart !== undefined) out.push({ kind: 'repeatStart' });
+  if (measure.repeatEnd !== undefined)
+    out.push({
+      kind: 'repeatEnd',
+      ...(measure.repeatEnd.times !== undefined ? { times: measure.repeatEnd.times } : {})
+    });
+  if (measure.ending !== undefined)
+    out.push({
+      kind: 'ending',
+      ...(measure.ending.numbers ? { numbers: measure.ending.numbers } : {}),
+      ...(measure.ending.duration !== undefined ? { duration: measure.ending.duration } : {}),
+      ...(measure.ending.open ? { open: true } : {})
+    });
+  if (measure.segno !== undefined) out.push({ kind: 'segno', ...at(measure.segno.location, 'start') });
+  if (measure.fine !== undefined) out.push({ kind: 'fine', ...at(measure.fine.location, 'start') });
+  if (measure.jump !== undefined)
+    out.push({ kind: 'jump', type: measure.jump.type, ...at(measure.jump.location, 'end') });
+  for (const tempo of measure.tempos ?? [])
+    out.push({ kind: 'tempo', bpm: tempo.bpm, base: tempo.value.base });
+  if (measure.rehearsal?.label !== undefined)
+    out.push({ kind: 'rehearsal', label: measure.rehearsal.label });
+  if (measure.section?.label !== undefined)
+    out.push({ kind: 'section', label: measure.section.label });
+  return out;
+}
+
 function midiOf(note: MnxNote): number {
   const { step, octave, alter = 0 } = note.pitch;
   return midiOfSpelling(step as 'C', octave, alter);

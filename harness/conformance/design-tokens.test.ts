@@ -216,8 +216,12 @@ describe('design tokens', () => {
     });
   });
 
-  describe('the selection tray consumes the system', () => {
-    const TRAY = 'workbench/SelectionTray.ts';
+  // The rung inspector is the tray's sibling — same anchor, same frame, same
+  // inheritance rule — so it sits under the same three joins.
+  describe.each([
+    ['the selection tray', 'workbench/SelectionTray.ts'],
+    ['the rung inspector', 'workbench/RungInspector.ts']
+  ])('%s consumes the system', (_name, TRAY) => {
 
     it('carries no colour literals', () => {
       // The tray shipped ahead of the system, hard-coding the design's palette
