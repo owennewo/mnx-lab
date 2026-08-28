@@ -2620,7 +2620,9 @@ export class ScenarioPage extends LitElement {
       intent.type === 'relaxSelection' ||
       intent.type === 'tightenSelection' ||
       intent.type === 'goToLevel' ||
-      intent.type === 'extendSelection';
+      intent.type === 'extendSelection' ||
+      intent.type === 'nextPosition' ||
+      intent.type === 'prevPosition';
     if (ok && !moved && this.session.selectionLevel !== level)
       this.session.handleIntent({ type: 'goToLevel', level });
     this.copied = false;
@@ -2973,6 +2975,9 @@ export class ScenarioPage extends LitElement {
           this.fireFromInspector({
             type: e.detail.direction === 'relax' ? 'relaxSelection' : 'tightenSelection'
           });
+        }}
+        @inspector-step=${(e: CustomEvent<{ direction: 'previous' | 'next' }>) => {
+          this.fireFromInspector({ type: e.detail.direction === 'next' ? 'nextPosition' : 'prevPosition' });
         }}
         @inspector-extend=${(e: CustomEvent<{ direction: 'previous' | 'next' }>) => {
           this.fireFromInspector({ type: 'extendSelection', direction: e.detail.direction });

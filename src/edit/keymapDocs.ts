@@ -599,7 +599,9 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'setPart',
     'relaxSelection',
     'tightenSelection',
-    'extendSelection'
+    'extendSelection',
+    'nextPosition',
+    'prevPosition'
   ],
   timeSignaturePopover: ['setTimeSignature', 'removeTimeSignature'],
   tuningPopover: ['setTuning'],

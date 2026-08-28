@@ -11,8 +11,9 @@
  *
  * ONE RULE ABOUT BARE TYPING. Two states, always visible by whether a caret
  * sits inside a pill:
- *   walking — ↑↓ the ladder · ←→/Tab walk pills · Enter opens · typing goes
- *             to the blank slot · ⌫ clears then removes · `/` widens · Esc closes
+ *   walking — ↑↓ the ladder · ←→ step siblings at this rung · Tab walks the
+ *             frame · Enter opens · typing goes to the blank slot · ⌫ clears
+ *             then removes · `/` widens · Esc closes
  *   editing — typing filters · ↑↓ cycles candidates · Enter commits · Esc
  *             closes the pill
  * Go-to (a crumb's siblings) and amend (a pill's value) are reached only by
@@ -579,11 +580,18 @@ export class RungInspector extends LitElement {
       this.emit('inspector-extend', { direction: code === 'ArrowLeft' ? 'previous' : 'next' });
       return true;
     }
-    if (code === 'ArrowLeft' || (code === 'Tab' && event.shiftKey)) {
+    if (code === 'ArrowLeft' || code === 'ArrowRight') {
+      // ←→ are the score's own step at this rung — next bar at the bar rung,
+      // next note at the note rung — so the window turns sideways the way it
+      // turns up and down. Tab walks the frame.
+      this.emit('inspector-step', { direction: code === 'ArrowLeft' ? 'previous' : 'next' });
+      return true;
+    }
+    if (code === 'Tab' && event.shiftKey) {
       this.cursor = (this.cursor - 1 + this.itemCount()) % this.itemCount();
       return true;
     }
-    if (code === 'ArrowRight' || code === 'Tab') {
+    if (code === 'Tab') {
       this.cursor = (this.cursor + 1) % this.itemCount();
       return true;
     }
@@ -798,8 +806,9 @@ export class RungInspector extends LitElement {
     const rows: [string, string][] = !open
       ? [
           ['↑↓', 'ladder'],
-          ['←→ Tab', 'walk'],
+          ['←→', 'step'],
           ['⇧←→', 'extend'],
+          ['Tab', 'walk'],
           ['Enter', 'open'],
           ['type', 'add'],
           ['⌫', 'clear · remove'],

@@ -246,7 +246,7 @@ try {
     s = await state();
     const i = s.pills.findIndex(p => p.cls.includes('cursor'));
     if (i >= 0 && s.pills[i].text.startsWith('barline:')) break;
-    await press('ArrowRight', 'ArrowRight', 39, 200);
+    await press('Tab', 'Tab', 9, 200);
   }
   await press('Backspace', 'Backspace', 8, 900);
   s = await state();
@@ -254,13 +254,27 @@ try {
   if (reverted?.text !== 'barline: regular') fail(`barline reads “${reverted?.text}” after ⌫`);
   else pass('barline: regular — press 1 reverted to the floor');
 
+  // ── → steps to the next bar at the bar rung ─────────────────────────────
+  console.log('\n→ steps to the next bar; ← back');
+  s = await state();
+  const here = s.crumbs.find(c => c.active)?.label;
+  await press('ArrowRight', 'ArrowRight', 39, 600);
+  s = await state();
+  const stepped = s.crumbs.find(c => c.active)?.label;
+  if (stepped === here) fail(`→ did not step: still “${here}”`);
+  else pass(`“${here}” → “${stepped}”`);
+  await press('ArrowLeft', 'ArrowLeft', 37, 600);
+  s = await state();
+  if (s.crumbs.find(c => c.active)?.label !== here) fail('← did not step back');
+  else pass('← back');
+
   // ── Enter on the bar crumb goes to a sibling ────────────────────────────
-  console.log('\nEnter on the bar crumb, ↓, Enter goes to the next bar');
+  console.log('\nEnter on the rung row, ↓, Enter goes to the next bar');
   guard = 0;
   while (guard++ < 12) {
     s = await state();
     if (s.crumbs.find(c => c.cursor)?.label.startsWith('bar ')) break;
-    await press('ArrowLeft', 'ArrowLeft', 37, 200);
+    await press('Tab', 'Tab', 9, 200, 8);
   }
   const before = s.crumbs.find(c => c.active)?.label;
   await press('Enter', 'Enter', 13, 600);

@@ -211,8 +211,13 @@ Driven hands-on, the horizontal breadcrumb read as a second HUD. The
   own `transpose`, so spelling and the fingerboard follow); `name: Head` at the section
   (empty is refused — a section without a name is not a section — with `bars: 1–8` as a
   reading); `time`/`barline` at the bar as before.
-- **Walk order is the frame's reading order**: the rung row, the slot, the pills.
-  Tab/←→ walk it; ↑↓ stay the ladder from anywhere in the frame.
+- **←/→ step siblings at the current rung** — next bar at the bar rung, next note at
+  the note rung — through the session's own `nextPosition`/`prevPosition`, so the
+  window turns sideways the way ↑↓ turn it up and down. This reverses the earlier
+  ruling that ←/→ walk pills: with the window in place the collision that ruling
+  avoided is gone (there is one rung row, not a row of crumbs), and stepping is what a
+  hand on the arrows expects. **Tab/Shift+Tab walk the frame** — the rung row, the
+  slot, the pills — and ↑↓ stay the ladder from anywhere in it.
 
 ## Agreements before code
 
