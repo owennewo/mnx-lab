@@ -55,29 +55,6 @@ proposals that name their campaign.
   element contract under [core-viewer-surface.md](complete/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
   [core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md).
-- **[core-rung-addressing.md](proposed/core-rung-addressing.md)** — **Escape stops walking the
-  ladder.** Hands-on, reaching for Escape as "back out of what I'm doing" widens the
-  selection instead, and the reflex being violated is older than the ladder — so the
-  2026-08-20 scrub alias, which added Shift+↑/↓ but kept Esc/Enter on the semantic
-  argument, fixed the feel and left the misfire. Three jobs come apart onto three keys:
-  Shift+↑/↓ steps one rung (unchanged), **Shift+1–8** jumps to a named rung (the last
-  clean global tier — Ctrl/Alt+digit is browser tab selection and not preventable,
-  Alt+letter is the menu accelerators, Ctrl+letter and the bare letters are already
-  spent), and **Escape/Enter become the pending-gesture pair**: abandon and commit the
-  innermost open thing, stated once as a mirror of `ESCAPE_PRECEDENCE`. Two defects fall
-  out of making that possible — the spanner anchor is kindless, so cross-kind completion
-  is reachable (arm with `S`, finish with `B`) and the HUD says "slur from" over an armed
-  beam — plus a third found while closing an open question: `toggleSlur` tests "a slur
-  already starts here" **above** "an anchor is armed elsewhere", so completing onto a note
-  that already carries a slur deletes that slur and throws the anchor away. One gap
-  closes too: `TabDigitResolver.cancel()` finally gets a key, where Escape mid-fret-entry
-  currently *writes* the fret. `walkToLevel` stops parking on an absent
-  rung (a `goToLevel` intent, presence-guarded, one trace entry per keypress), and the
-  tray's ladder column prints the ordinals so the slow surface is the legend for the fast
-  one — and the digits reach **into** the open tray, inheriting the preview/commit split
-  Shift+↑/↓ already has there. `/{n}` rejected with reasons; the AZERTY shifted-digit-row cost accepted with eyes
-  open. Carries the stale-doc sweep: eight normative code comments and four complete
-  roadmap docs needing dated amendment notes.
 - **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3,
   **repurposed 2026-08-24** from the ledger of what cannot be wired yet into the **triage
   ledger**: the registry's 86 rows across 98 placements, each carrying three marks —
@@ -210,6 +187,33 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-rung-addressing.md](complete/core-rung-addressing.md)** — **Escape stops walking the
+  ladder**, **finished 2026-08-28** (proposed, built and closed the same day). Hands-on,
+  reaching for Escape as "back out of what I'm doing" widened the selection instead, and the reflex being violated is older than the ladder — so the
+  2026-08-20 scrub alias, which added Shift+↑/↓ but kept Esc/Enter on the semantic
+  argument, fixed the feel and left the misfire. Three jobs come apart onto three keys:
+  Shift+↑/↓ steps one rung (unchanged), **Shift+1–8** jumps to a named rung (the last
+  clean global tier — Ctrl/Alt+digit is browser tab selection and not preventable,
+  Alt+letter is the menu accelerators, Ctrl+letter and the bare letters are already
+  spent), and **Escape/Enter become the pending-gesture pair**: abandon and commit the
+  innermost open thing, stated once as a mirror of `ESCAPE_PRECEDENCE`. Two defects fall
+  out of making that possible — the spanner anchor is kindless, so cross-kind completion
+  is reachable (arm with `S`, finish with `B`) and the HUD says "slur from" over an armed
+  beam — plus a third found while closing an open question: `toggleSlur` tests "a slur
+  already starts here" **above** "an anchor is armed elsewhere", so completing onto a note
+  that already carries a slur deletes that slur and throws the anchor away. One gap
+  closes too: `TabDigitResolver.cancel()` finally gets a key, where Escape mid-fret-entry
+  currently *writes* the fret. `walkToLevel` stops parking on an absent
+  rung (a `goToLevel` intent, presence-guarded, one trace entry per keypress), and the
+  tray's ladder column prints the ordinals so the slow surface is the legend for the fast
+  one — and the digits reach **into** the open tray, inheriting the preview/commit split
+  Shift+↑/↓ already has there. `/{n}` rejected with reasons; the AZERTY shifted-digit-row cost accepted with eyes
+  open. Carries the stale-doc sweep: eight normative code comments and four complete
+  roadmap docs needing dated amendment notes.
+  Landed with the presence refusal replacing `walkToLevel`'s park, the digits reaching
+  into the open tray, both stale-doc sweeps done (eight code comments, four complete
+  roadmap docs), and no golden moved. The mount's cascade is the part no test can hold —
+  the UI has none by rule — so the doc names what to press by hand.
 - **[core-delete-clears-then-removes.md](complete/core-delete-clears-then-removes.md)** —
   **Delete's two presses, all the way up the ladder**, **finished 2026-08-25** (proposed,
   built and closed the same day). Found by hands-on testing: select a bar, press `Del`,

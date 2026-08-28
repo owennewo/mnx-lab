@@ -211,7 +211,7 @@ voice/staff, layout/score authoring, part transposition, mute — enumerated in
 - Escape during preview returns to the real tab; Escape otherwise closes the tray.
   (**2026-08-28**: outside the tray Escape stopped walking the ladder and became
   the abandon half of the pending-gesture pair —
-  [core-rung-addressing.md](../proposed/core-rung-addressing.md). Nothing in this
+  [core-rung-addressing.md](core-rung-addressing.md). Nothing in this
   section changes: the tray is an overlay and consumes its own Escape before the
   page listener runs, which is exactly what the precedence order always said.
   `ESCAPE_PRECEDENCE` is now `PENDING_PRECEDENCE` and has five entries, the

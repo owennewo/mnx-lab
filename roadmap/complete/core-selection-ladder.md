@@ -235,7 +235,7 @@
 > `keymap-docs.test.ts`.
 >
 > **Esc/Enter left the ladder 2026-08-28** —
-> [core-rung-addressing.md](../proposed/core-rung-addressing.md), which is the
+> [core-rung-addressing.md](core-rung-addressing.md), which is the
 > other half of the note above. The scrub alias fixed the FEEL of bouncing
 > between rungs and left the misfire: reaching for Escape as *back out of what
 > I am in* still widened the selection, and that reflex is older and stronger

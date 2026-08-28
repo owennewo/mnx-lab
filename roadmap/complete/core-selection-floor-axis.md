@@ -71,7 +71,7 @@ axis therefore picks the rung:
 From the event rung upward the ladder stays exactly as decided in
 [core-selection-ladder.md](../complete/core-selection-ladder.md): Esc relaxes,
 Enter tightens, rung changes are explicit. (**2026-08-28**: the rung keys are
-Shift+↑/↓ and Shift+1..8 — [core-rung-addressing.md](../proposed/core-rung-addressing.md).
+Shift+↑/↓ and Shift+1..8 — [core-rung-addressing.md](core-rung-addressing.md).
 "Explicit" is the load-bearing word here and it is unchanged; only the keys moved.) The blur is confined to the floor,
 where the two rungs are visually indistinguishable and mode-tracking is
 precisely what users fail to do.

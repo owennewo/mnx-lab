@@ -1,12 +1,33 @@
 # Rungs get their own keys, and Escape gets its meaning back
 
-> **Status: proposed 2026-08-28.** Amends the ladder's key story from
-> [core-selection-ladder.md](../complete/core-selection-ladder.md) — whose
+> **Status: COMPLETE 2026-08-28**, proposed and built the same day. Amends the
+> ladder's key story from
+> [core-selection-ladder.md](core-selection-ladder.md) — whose
 > **Scrub alias 2026-08-20** note is the direct predecessor and got half of
 > this right — and revises the anchor gesture from
-> [core-element-ops-spanners.md](../complete/core-element-ops-spanners.md).
-> **No golden moves**: this is the input layer plus workbench chrome, so there
-> is no debt for [lab-verify.md](../inprogress/lab-verify.md).
+> [core-element-ops-spanners.md](core-element-ops-spanners.md).
+> **No golden moves**, confirmed: `update:primitives` leaves
+> `git diff -- scenarios/` clean, so there is no debt for
+> [lab-verify.md](../inprogress/lab-verify.md).
+>
+> Every decision below is built, and both stale-doc sweeps are done: eight
+> normative code comments and four complete roadmap docs carry dated notes.
+> New coverage — `goToLevel`'s presence refusal and its equivalence to the walk
+> it replaced (`selection.test.ts`), cross-kind refusal, 5b's ordering and
+> `dropAnchor` (`command-registry.test.ts`), the digit tier's ladder order and
+> its separation from bare fret digits (`keymap-docs.test.ts`), and
+> `PENDING_PRECEDENCE` replacing `ESCAPE_PRECEDENCE` (`key-scope.test.ts`).
+> 1100 tests, `check:scenarios` and `build` all green.
+>
+> **What only a person can check.** The mount's cascade lives in
+> `ScenarioPage.handlePending`, and the UI has no tests by rule — so the
+> machine holds the contract (`PENDING_PRECEDENCE`), the bindings and every
+> session-level verdict, but not the wiring between them. Worth pressing by
+> hand: Escape mid-fret-entry drops the digit instead of writing it; Enter
+> mid-fret-entry commits without the 500 ms wait; Enter completes an armed
+> slur and an armed beam; Escape with nothing pending deselects and does not
+> walk a rung; Shift+1..8 in the score, and again with the tray open, where
+> they should preview rather than jump.
 
 ## The problem
 
@@ -263,16 +284,16 @@ pending fret rather than committing it.
 are records of their moment; the house form is the inline dated note, precedent
 at `core-selection-ladder.md:222` (*Scrub alias 2026-08-20*) and `:239`.
 
-- **[core-selection-ladder.md](../complete/core-selection-ladder.md)** — the big
+- **[core-selection-ladder.md](core-selection-ladder.md)** — the big
   one, and the one this doc answers. A note beside the scrub-alias paragraph
   saying its half-measure went the rest of the way, plus the passages that state
   the old contract outright: `:5`, `:185`, `:308–317`, `:389`, `:512`, `:610`.
-- **[core-element-ops-spanners.md](../complete/core-element-ops-spanners.md)** —
+- **[core-element-ops-spanners.md](core-element-ops-spanners.md)** —
   the gesture table at `:50` gains the kind and Enter, and "one nullable note
   key" is no longer the shape of the state.
-- **[core-selection-tray-mechanism.md](../complete/core-selection-tray-mechanism.md)**
+- **[core-selection-tray-mechanism.md](core-selection-tray-mechanism.md)**
   — the Escape-precedence references at `:211`, `:231`, `:248`, `:272`.
-- **[core-selection-floor-axis.md](../complete/core-selection-floor-axis.md)** —
+- **[core-selection-floor-axis.md](core-selection-floor-axis.md)** —
   "Enter tightens" at `:73`.
 
 Deliberately **left alone** as accurate history or still-true tray-internal

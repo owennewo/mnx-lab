@@ -52,7 +52,7 @@ Escape                → drops the anchor
 ```
 
 > **Revised 2026-08-28** by
-> [core-rung-addressing.md](../proposed/core-rung-addressing.md). The anchor
+> [core-rung-addressing.md](core-rung-addressing.md). The anchor
 > carries its **kind** (`{ key, kind: 'slur' | 'beam' }`), not just a note key.
 > Three things needed it. Enter has no letter to read the kind off. The kind
 > used to be decided at COMPLETION, so arming with `S` and finishing with `B`
