@@ -18,7 +18,7 @@ import type { EditorIntent } from './intents.ts';
 import type { ShellAction } from './keymap.ts';
 import type { ResolvedSelection, SelectionLevel, SelectionMember } from './selection.ts';
 import type { Projection } from './cursor.ts';
-import type { MnxStructure } from '../model/mnx.ts';
+import type { MnxGlobalMeasure, MnxStructure } from '../model/mnx.ts';
 import type { MeasureAttributeKind } from './ops.ts';
 import { eventAtAddress, hasSlurStartingAt, techniqueAt } from './ops.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
@@ -101,11 +101,17 @@ export interface SessionView {
   /** Bar attributes declared on the cursor's global measure. */
   readonly barAttributes: readonly MeasureAttributeKind[];
   readonly memberBarAttributes: readonly (readonly MeasureAttributeKind[])[];
+  /** Exact end-barline styles, kept separate because several tiles share the
+   *  one `barline` attribute kind. */
+  readonly barlineTypes: readonly BarlineType[];
+  readonly memberBarlineTypes: readonly (readonly BarlineType[])[];
   /** Does the note under the cursor start a tie? */
   readonly tied: boolean;
   /** Are there strings to fret — is the tab dialect available at all? */
   readonly hasStrings: boolean;
 }
+
+type BarlineType = NonNullable<NonNullable<MnxGlobalMeasure['barline']>['type']>;
 
 /**
  * What has been vouched for about ONE PLACEMENT — one command in one rung's
@@ -229,6 +235,8 @@ export function sessionView(session: SessionLike): SessionView {
   const barAttributes = measure
     ? BAR_ATTRIBUTE_PROBES.filter(([, field]) => measure[field] !== undefined).map(([kind]) => kind)
     : [];
+  const barlineType = doc.global?.measures?.[measureIndex]?.barline?.type;
+  const barlineTypes = barlineType ? [barlineType] : [];
   const members = resolved.members;
   const selectedMemberMarkings = members.flatMap(member => {
     const event = member.kind === 'note'
@@ -252,6 +260,16 @@ export function sessionView(session: SessionLike): SessionView {
       ? BAR_ATTRIBUTE_PROBES.filter(([, field]) => selected[field] !== undefined).map(([kind]) => kind)
       : []];
   });
+  const selectedMemberBarlineTypes = members.flatMap(member => {
+    const index = member.kind === 'measure'
+      ? member.measureIndex
+      : member.kind === 'section'
+        ? member.start
+        : undefined;
+    if (index === undefined) return [];
+    const type = doc.global?.measures?.[index]?.barline?.type;
+    return [type ? [type] : []];
+  });
   const ties = address?.note.ties;
   return {
     doc,
@@ -268,6 +286,10 @@ export function sessionView(session: SessionLike): SessionView {
     memberBarAttributes: selectedMemberBarAttributes.length > 0
       ? selectedMemberBarAttributes
       : [barAttributes],
+    barlineTypes,
+    memberBarlineTypes: selectedMemberBarlineTypes.length > 0
+      ? selectedMemberBarlineTypes
+      : [barlineTypes],
     tied: Array.isArray(ties) && ties.length > 0,
     hasStrings: (doc.parts ?? []).some(part => (part._x?.mnxLab?.strings?.length ?? 0) > 0)
   };
@@ -364,6 +386,30 @@ function barAttribute(
       intent: memberState(view.memberBarAttributes, kind) === true
         ? { type: 'removeMeasureAttribute', kind }
         : make()
+    })
+  };
+}
+
+/** A style-specific barline tile. Barline styles share one attribute kind,
+ *  so kind-only state would make every style look active at once. */
+function barlineStyle(
+  id: string,
+  smufl: string,
+  label: string,
+  type: BarlineType
+): EditorCommand {
+  return {
+    id,
+    scopes: ['measure'],
+    glyph: { smufl },
+    label,
+    shortcut: 'Shift+B',
+    tier: 'popover',
+    isActive: view => memberState(view.memberBarlineTypes, type),
+    action: view => ({
+      intent: memberState(view.memberBarlineTypes, type) === true
+        ? { type: 'removeMeasureAttribute', kind: 'barline' }
+        : { type: 'setMeasureAttribute', attribute: { kind: 'barline', type } }
     })
   };
 }
@@ -842,10 +888,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     type: 'setMeasureAttribute',
     attribute: { kind: 'repeatEnd' }
   })),
-  barAttribute('final-barline', 'barlineFinal', 'Final barline', 'barline', () => ({
-    type: 'setMeasureAttribute',
-    attribute: { kind: 'barline', type: 'final' }
-  })),
+  barlineStyle('double-barline', 'barlineDouble', 'Double barline', 'double'),
+  barlineStyle('final-barline', 'barlineFinal', 'Final barline', 'final'),
   barAttribute('segno', 'segno', 'Segno', 'segno', () => ({
     type: 'setMeasureAttribute',
     attribute: { kind: 'segno' }
@@ -1283,7 +1327,14 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     {
       id: 'repeats',
       caption: 'repeats & barlines',
-      commands: ['repeat-start', 'repeat-end', 'ending', 'final-barline', 'measure-repeat']
+      commands: [
+        'repeat-start',
+        'repeat-end',
+        'ending',
+        'double-barline',
+        'final-barline',
+        'measure-repeat'
+      ]
     },
     { id: 'jumps', caption: 'jumps', commands: ['segno', 'coda'] },
     { id: 'marks', caption: 'marks', commands: ['rehearsal', 'tempo', 'section'] }

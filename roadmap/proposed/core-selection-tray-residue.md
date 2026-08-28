@@ -66,7 +66,7 @@
 
 ## The claim
 
-The registry has **84 rows across 95 placements** — one command in one rung's tab is one
+The registry has **85 rows across 96 placements** — one command in one rung's tab is one
 placement — and the only assertion anyone has ever made about them is mechanical: the
 conformance suite proves each tile fires *an intent through the funnel*, that no tile is
 actionless without a blocker, and that no wired tile carries a stale one. Nothing
@@ -158,7 +158,7 @@ does not reach the embed or studio — see the appendix's promotion row.
 
 ## The ledger
 
-88 placements to triage, 7 blocked in the appendix, and five session-chrome tiles with
+89 placements to triage, 7 blocked in the appendix, and five session-chrome tiles with
 no registry row at all. Every box below is empty on purpose: this is the state of the tray on 2026-08-24, and it is the whole point of the
 doc that not one of them has been ticked yet. Rung order is the ladder's own, and row
 order within a rung is **today's display order** — so a rung whose `ordered` column
@@ -254,7 +254,7 @@ fills in without the rows moving is a rung that was already right.
 | `mute-part` — Mute the part | — | ⛔ blocked — `mute` | | |
 | `part-scope` — Select the whole part | `Ctrl+A` | ☐ | ☐ | ☐ |
 
-### bar — 16 placements
+### bar — 17 placements
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
@@ -267,6 +267,7 @@ fills in without the rows moving is a rung that was already right.
 | `repeat-start` — Repeat start | `Shift+B` | ☐ | ☐ | ☐ |
 | `repeat-end` — Repeat end | `Shift+B` | ☐ | ☐ | ☐ |
 | `ending` — Volta ending… | `Shift+B` | ☐ | ☐ | ☐ |
+| `double-barline` — Double barline | `Shift+B` | ☐ | ☐ | ☐ |
 | `final-barline` — Final barline | `Shift+B` | ☐ | ☐ | ☐ |
 | `measure-repeat` — Measure repeat… | `Shift+B` | ☐ | ☐ | ☐ |
 | `segno` — Segno | `Shift+B` | ☐ | ☐ | ☐ |

@@ -620,6 +620,37 @@ describe('command registry — state reads the document', () => {
     expect(commandState(repeatEnd, sessionView(session))).toBe('available');
   });
 
+  it('barline tiles track and switch their exact style', () => {
+    const session = new EditorSession(makeDoc());
+    const double = find('double-barline');
+    const final = find('final-barline');
+
+    expect(commandState(double, sessionView(session))).toBe('available');
+    expect(commandState(final, sessionView(session))).toBe('available');
+
+    session.handleIntent((final.action!(sessionView(session)) as { intent: never }).intent);
+    expect(commandState(final, sessionView(session))).toBe('active');
+    expect(commandState(double, sessionView(session))).toBe('available');
+
+    expect(double.action!(sessionView(session))).toEqual({
+      intent: {
+        type: 'setMeasureAttribute',
+        attribute: { kind: 'barline', type: 'double' }
+      }
+    });
+    session.handleIntent((double.action!(sessionView(session)) as { intent: never }).intent);
+    expect(commandState(double, sessionView(session))).toBe('active');
+    expect(commandState(final, sessionView(session))).toBe('available');
+    expect(double.action!(sessionView(session))).toEqual({
+      intent: { type: 'removeMeasureAttribute', kind: 'barline' }
+    });
+  });
+
+  it('groups the double barline with repeats and barlines', () => {
+    const repeats = COMMAND_GROUPS.measure?.find(group => group.id === 'repeats');
+    expect(repeats?.commands).toContain('double-barline');
+  });
+
   it('the tie tile follows the note under the cursor', () => {
     const session = new EditorSession(makeDoc());
     const tie = find('tie');
