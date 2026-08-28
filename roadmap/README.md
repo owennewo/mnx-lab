@@ -44,6 +44,20 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-measure-attributes-gaps.md](proposed/core-measure-attributes-gaps.md)** — **proposed
+  2026-08-28.** A census of every measure-level attribute (`measure-global`, `part-measure`,
+  the three proposed objects the engine draws, `_x.mnxLab.harmonies`) across five columns —
+  render / badge / op / pill / corpus — cited to file and line, then a ranked work list.
+  Prompted by `spec/measure-repeats-with-counters` reading as a regression once the rung
+  inspector named `measure repeat: 1` on an empty bar: it never was one, the engine has
+  never drawn a measure repeat and the verified golden pins an empty staff. The finding
+  above the others: **no measure-level attribute ever produces the amber renderer-gap
+  badge** — four scenarios tagged `renderer-gap` render as bare staves with zero
+  diagnostics. Not rendered at all: measure repeats, arpeggios, fermatas, measure numbers,
+  harmonies. Partial: hairpins and relative dynamics draw nothing, the C clef draws as
+  treble, `tempos[0]` only, tab lacks repeats/voltas/dynamics. Four confirmed bugs, two of
+  them the inspector's (a dropped tempo index, a staff-blind `removePositioned`). Work
+  order: badge first, bugs second, then the engraving items through the ledger.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
