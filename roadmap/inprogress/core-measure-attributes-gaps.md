@@ -10,8 +10,9 @@
 > *cresc.* / *dim.*; badges retired. **Item 5 (tab parity) too** — repeats, voltas,
 > the cut/common symbol, dynamics and directions on the standalone tab staff, through
 > emitters shared with notation (`repeats.ts`, `endings.ts`), goldens byte-identical
-> for the refactor and a new scenario pinning the tab side. Items 6–8 open. A census,
-> then a work list. Prompted by
+> for the refactor and a new scenario pinning the tab side. **Item 6 (the writers)
+> too.** Items 7–8 open — fermata, arpeggios, measure numbers; harmonies stays with
+> core-chord-symbols. A census, then a work list. Prompted by
 > `spec/measure-repeats-with-counters` reading as a regression after the rung inspector
 > ([workbench-rung-inspector.md](workbench-rung-inspector.md)) started
 > naming `measure repeat: 1` on bars whose staff is empty — it was never a regression:
@@ -210,6 +211,14 @@ Found by the sweep and confirmed by hand; each is a one-file fix and a test:
    staff has no written octave) and hairpins (the onset capture is the notation
    layout's — a follow-up if a tab reader wants wedges). The C clef, listed here as
    item 5 originally, landed with the bugs.
+
+6. ✅ **Writers for what already renders** (2026-08-28) — `segno.glyph` (`segno serpent`,
+   `serpent2`, `japanese`, or a SMuFL name), `at N/D` on segno/fine/jump (`MarkAt` widens
+   the two words to any fraction; the reader canonicalises `0/x` and `x/x` back to the
+   words), `tempo.value.dots` (`quarter.=60`), `direction.glyphs` (`symbol [side]
+   <glyph>`, written without `text`), and the `beam` pill at the event rung (the beam
+   starting here, its length; removal is `toggleBeam`'s own path 2). A second tempo
+   landed with the bugs (`index`). No golden moved — these are writers.
 
 Original plan:
 

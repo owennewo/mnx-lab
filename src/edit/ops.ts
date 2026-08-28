@@ -810,6 +810,9 @@ export type PositionedAttribute =
        *  document has to carry (`lab/score-text/directions-stacked`). */
       kind: 'direction';
       text: string;
+      /** A SMuFL symbol instead of words — the renderer draws either; the
+       *  writer could only say text until item 6. */
+      glyphs?: string[];
       orient?: 'above' | 'below' | 'between';
     }
   /** An octave-shift line: same owner and shape as the other two, so it shares
@@ -824,14 +827,21 @@ export type MeasureAttribute =
   | { kind: 'repeatStart' }
   | { kind: 'repeatEnd'; times?: number }
   | { kind: 'ending'; numbers?: number[]; duration?: number; open?: boolean }
-  | { kind: 'segno'; at?: 'start' | 'end' }
-  | { kind: 'fine'; at?: 'start' | 'end' }
-  | { kind: 'jump'; type: 'segno' | 'dsalfine'; at?: 'start' | 'end' }
-  | { kind: 'tempo'; bpm: number; base: MnxNoteValueBase }
+  // `at` is where in the bar the mark sits: the two words, or any fraction
+  // of the bar the document can say (core-measure-attributes-gaps.md, item 6
+  // — the renderer always honoured `location`, the op could only say the
+  // ends). `glyph` is the segno's SMuFL variant, likewise long rendered.
+  | { kind: 'segno'; at?: MarkAt; glyph?: string }
+  | { kind: 'fine'; at?: MarkAt }
+  | { kind: 'jump'; type: 'segno' | 'dsalfine'; at?: MarkAt }
+  | { kind: 'tempo'; bpm: number; base: MnxNoteValueBase; dots?: number }
   | { kind: 'rehearsal'; label: string }
   | { kind: 'section'; label: string };
 
 export type MeasureAttributeKind = MeasureAttribute['kind'];
+
+/** A navigation mark's place in its bar: the start, the end, or a fraction. */
+export type MarkAt = 'start' | 'end' | [number, number];
 
 /** A timed event's stable structural address. Voices are numbered per staff,
  * matching the cursor, selection resolver and canonical note walk. */
@@ -865,7 +875,8 @@ const MEASURE_START = { fraction: [0, 1] as [number, number] };
 
 /** Where in the bar a navigation mark sits: `[0, 1]` at the start, `[1, 1]`
  *  at the end (a whole bar's worth in). */
-function locationOf(at: 'start' | 'end' | undefined, fallback: 'start' | 'end') {
+function locationOf(at: MarkAt | undefined, fallback: 'start' | 'end') {
+  if (Array.isArray(at)) return { fraction: [at[0], at[1]] as [number, number] };
   return (at ?? fallback) === 'end' ? { fraction: [1, 1] as [number, number] } : MEASURE_START;
 }
 
@@ -890,13 +901,19 @@ function measureAttributeValue(attribute: MeasureAttribute): unknown {
     // puts its fine at the start — so the position is offered rather than
     // assumed: `at` says which, and each kind keeps the default it had.
     case 'segno':
-      return { location: locationOf(attribute.at, 'start') };
+      return {
+        location: locationOf(attribute.at, 'start'),
+        ...(attribute.glyph ? { glyph: attribute.glyph } : {})
+      };
     case 'fine':
       return { location: locationOf(attribute.at, 'start') };
     case 'jump':
       return { type: attribute.type, location: locationOf(attribute.at, 'end') };
     case 'tempo':
-      return { bpm: attribute.bpm, value: { base: attribute.base } };
+      return {
+        bpm: attribute.bpm,
+        value: { base: attribute.base, ...(attribute.dots ? { dots: attribute.dots } : {}) }
+      };
     case 'rehearsal':
     case 'section':
       return { label: attribute.label };
@@ -920,9 +937,10 @@ export function readMeasureAttributes(measure: MnxGlobalMeasure | undefined): Me
   const at = (
     location: { fraction: [number, number] } | undefined,
     fallback: 'start' | 'end'
-  ): { at: 'start' | 'end' } | Record<string, never> => {
+  ): { at: MarkAt } | Record<string, never> => {
     if (location === undefined) return {};
-    const where = location.fraction[0] === 0 ? 'start' : 'end';
+    const [num, den] = location.fraction;
+    const where: MarkAt = num === 0 ? 'start' : num === den ? 'end' : [num, den];
     return where === fallback ? {} : { at: where };
   };
   if (measure.barline?.type) out.push({ kind: 'barline', type: measure.barline.type });
@@ -939,12 +957,22 @@ export function readMeasureAttributes(measure: MnxGlobalMeasure | undefined): Me
       ...(measure.ending.duration !== undefined ? { duration: measure.ending.duration } : {}),
       ...(measure.ending.open ? { open: true } : {})
     });
-  if (measure.segno !== undefined) out.push({ kind: 'segno', ...at(measure.segno.location, 'start') });
+  if (measure.segno !== undefined)
+    out.push({
+      kind: 'segno',
+      ...at(measure.segno.location, 'start'),
+      ...(measure.segno.glyph ? { glyph: measure.segno.glyph } : {})
+    });
   if (measure.fine !== undefined) out.push({ kind: 'fine', ...at(measure.fine.location, 'start') });
   if (measure.jump !== undefined)
     out.push({ kind: 'jump', type: measure.jump.type, ...at(measure.jump.location, 'end') });
   for (const tempo of measure.tempos ?? [])
-    out.push({ kind: 'tempo', bpm: tempo.bpm, base: tempo.value.base });
+    out.push({
+      kind: 'tempo',
+      bpm: tempo.bpm,
+      base: tempo.value.base,
+      ...(tempo.value.dots ? { dots: tempo.value.dots } : {})
+    });
   if (measure.rehearsal?.label !== undefined)
     out.push({ kind: 'rehearsal', label: measure.rehearsal.label });
   if (measure.section?.label !== undefined)
@@ -1018,7 +1046,12 @@ export function readPositionedAttributes(
     if (!here(entry)) return;
     out.push({
       index,
-      attribute: { kind: 'direction', text: entry.text ?? '', ...(entry.orient && entry.orient !== 'auto' ? { orient: entry.orient } : {}) }
+      attribute: {
+        kind: 'direction',
+        text: entry.text ?? '',
+        ...((entry as { glyphs?: string[] }).glyphs?.length ? { glyphs: (entry as { glyphs?: string[] }).glyphs } : {}),
+        ...(entry.orient && entry.orient !== 'auto' ? { orient: entry.orient } : {})
+      }
     });
   });
   (measure.ottavas ?? []).forEach((entry, index) => {
@@ -1879,7 +1912,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           ...(measure.directions ?? []),
           {
             position,
-            text: op.attribute.text,
+            ...(op.attribute.glyphs?.length ? { glyphs: op.attribute.glyphs } : { text: op.attribute.text }),
             ...(op.attribute.orient ? { orient: op.attribute.orient } : {}),
             ...onStaff
           }

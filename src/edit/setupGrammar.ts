@@ -241,6 +241,28 @@ export const BARLINE_TYPES = [
   'heavyLight', 'heavyHeavy', 'tick', 'short', 'noBarline'
 ] as const;
 
+/** `start`, `end`, or `N/D` — a mark's place in its bar. */
+function parseMarkAt(token: string): 'start' | 'end' | [number, number] {
+  if (token === 'start' || token === 'end') return token;
+  const [n, d] = token.split('/').map(Number);
+  return [n!, d!];
+}
+
+/** The segno's SMuFL variants, by the word a player would type. */
+const SEGNO_GLYPHS: Record<string, string> = {
+  segno: 'segno',
+  serpent: 'segnoSerpent1',
+  serpent1: 'segnoSerpent1',
+  serpent2: 'segnoSerpent2',
+  japanese: 'segnoJapanese'
+};
+function segnoGlyph(word: string): string | null {
+  const key = word.toLowerCase().replace(/\s+/g, '');
+  if (SEGNO_GLYPHS[key]) return SEGNO_GLYPHS[key]!;
+  // A SMuFL name spelt out (`segnoSerpent2`) is taken as it stands.
+  return /^segno[A-Za-z0-9]*$/.test(word) ? word : null;
+}
+
 const TEMPO_UNITS: Record<string, MnxNoteValueBase> = {
   whole: 'whole', half: 'half', quarter: 'quarter', eighth: 'eighth', '16th': '16th'
 };
@@ -378,26 +400,34 @@ export function parseBarAttribute(text: string): BarAttributeResult {
     // the meaning rather than a nicety (see `measureAttributeValue`).
     case 'segno':
     case 'fine': {
-      const at = /^at\s+(start|end)$/.exec(rest.toLowerCase());
-      if (rest !== '' && !at) return null;
-      return { set: { kind, ...(at ? { at: at[1] as 'start' | 'end' } : {}) } };
+      // `segno`, `segno serpent`, `segno at end`, `segno at 1/2`,
+      // `segno serpent at 3/4` — the variant glyph and any place in the bar,
+      // both long rendered, writable since item 6.
+      const at = /\s*\bat\s+(start|end|\d+\/\d+)$/.exec(rest.toLowerCase());
+      const body = (at ? rest.slice(0, at.index) : rest).trim();
+      const where = at ? { at: parseMarkAt(at[1]!) } : {};
+      if (kind === 'fine') return body === '' ? { set: { kind, ...where } } : null;
+      const glyph = body === '' ? null : segnoGlyph(body);
+      if (body !== '' && !glyph) return null;
+      return { set: { kind, ...where, ...(glyph ? { glyph } : {}) } };
     }
     case 'jump': {
-      const at = /\s+at\s+(start|end)$/.exec(rest.toLowerCase());
+      const at = /\s+at\s+(start|end|\d+\/\d+)$/.exec(rest.toLowerCase());
       const body = (at ? rest.slice(0, at.index) : rest).toLowerCase().replace(/[.\s]/g, '');
-      const where = at ? { at: at[1] as 'start' | 'end' } : {};
+      const where = at ? { at: parseMarkAt(at[1]!) } : {};
       if (body === 'segno' || body === 'ds') return { set: { kind: 'jump', type: 'segno', ...where } };
       if (body === 'dsalfine') return { set: { kind: 'jump', type: 'dsalfine', ...where } };
       return null;
     }
     case 'tempo': {
-      // "120" (quarter implied) or "half=80".
-      const match = /^(?:([a-z0-9]+)\s*=\s*)?(\d{1,3})$/i.exec(rest);
+      // "120" (quarter implied), "half=80", "quarter.=60" (dots on the unit).
+      const match = /^(?:([a-z0-9]+)(\.*)\s*=\s*)?(\d{1,3})$/i.exec(rest);
       if (!match) return null;
       const base = match[1] ? TEMPO_UNITS[match[1].toLowerCase()] : 'quarter';
-      const bpm = Number(match[2]);
+      const dots = match[2]?.length ?? 0;
+      const bpm = Number(match[3]);
       if (!base || bpm < 20 || bpm > 400) return null;
-      return { set: { kind: 'tempo', bpm, base } };
+      return { set: { kind: 'tempo', bpm, base, ...(dots ? { dots } : {}) } };
     }
     case 'rehearsal':
     case 'section':
@@ -475,6 +505,24 @@ export function parseAdornment(text: string): AdornmentResult {
     if (target === 'string' || target === 'fret') return { removeStringAnnotation: true };
     const marking = resolveMarking(words[1] ?? '');
     return marking ? { marking, remove: true } : null;
+  }
+
+  if (head === 'symbol') {
+    // `symbol keyboardPedalPed` / `symbol below keyboardPedalUp` — a direction
+    // that is a SMuFL glyph rather than words (rendered since score-text;
+    // writable since item 6).
+    const side = (words[1] ?? '').toLowerCase();
+    const oriented = side === 'above' || side === 'below' || side === 'between';
+    const glyph = words[oriented ? 2 : 1];
+    if (!glyph || words.length > (oriented ? 3 : 2)) return null;
+    return {
+      positioned: {
+        kind: 'direction',
+        text: '',
+        glyphs: [glyph],
+        ...(oriented ? { orient: side as 'above' | 'below' | 'between' } : {})
+      }
+    };
   }
 
   if (head === 'text') {

@@ -12,11 +12,13 @@ import { midiOfSpelling } from './staffSpace.ts';
 import type { EditorIntent } from './intents.ts';
 import { sectionRangeAt, type SelectionLevel, type SelectionMember } from './selection.ts';
 import {
+  beamStartingAt,
   eventAtAddress,
   MEASURE_ATTRIBUTE_FIELDS,
   readMeasureAttributes,
   readPositionedAttributes,
   readTechniques,
+  type MarkAt,
   type MeasureAttribute,
   type MeasureAttributeKind,
   type PositionedAttribute,
@@ -73,18 +75,40 @@ export function attributeText(attribute: MeasureAttribute): string {
     case 'ending':
       return `ending ${(attribute.numbers ?? []).join(',')}${attribute.open ? ' open' : ''}`.trim();
     case 'segno':
-      return 'segno';
+      return `segno${attribute.glyph ? ` ${segnoWord(attribute.glyph)}` : ''}${markAtText(attribute.at)}`;
     case 'fine':
-      return 'fine';
+      return `fine${markAtText(attribute.at)}`;
     case 'jump':
-      return `jump ${attribute.type}`;
+      return `jump ${attribute.type}${markAtText(attribute.at)}`;
     case 'tempo':
-      return `tempo ${attribute.base}=${attribute.bpm}`;
+      return `tempo ${attribute.base}${'.'.repeat(attribute.dots ?? 0)}=${attribute.bpm}`;
     case 'rehearsal':
       return `rehearsal ${attribute.label}`;
     case 'section':
       return `section ${attribute.label}`;
   }
+}
+
+/** ` at end` / ` at 1/2` — the grammar's own spelling, empty for the default. */
+function markAtText(at: MarkAt | undefined): string {
+  if (at === undefined) return '';
+  return ` at ${Array.isArray(at) ? `${at[0]}/${at[1]}` : at}`;
+}
+
+/** The word the grammar takes for a segno glyph, else the SMuFL name itself. */
+function segnoWord(glyph: string): string {
+  return { segnoSerpent1: 'serpent', segnoSerpent2: 'serpent2', segnoJapanese: 'japanese' }[glyph] ?? glyph;
+}
+
+/** The beam object a `beamStartingAt` result names. */
+function beamAtPath(doc: MnxStructure, at: { measureIndex: number; path: number[]; partIndex: number }) {
+  let list = doc.parts?.[at.partIndex]?.measures?.[at.measureIndex]?.beams;
+  let beam: { events: string[]; beams?: unknown[] } | undefined;
+  for (const index of at.path) {
+    beam = list?.[index] as typeof beam;
+    list = beam?.beams as typeof list;
+  }
+  return beam;
 }
 
 /** One rung on the cursor's path. `siblings` is null where stage 2 has no
@@ -187,10 +211,10 @@ const HINT_OF: Record<MeasureAttributeKind, string> = {
   repeatStart: '',
   repeatEnd: 'times, e.g. 3',
   ending: '1,2 · 3 open',
-  segno: 'at start · at end',
-  fine: 'at start · at end',
-  jump: 'segno · dsalfine',
-  tempo: '120 · half=80',
+  segno: 'serpent · at end · at 1/2',
+  fine: 'at start · at end · at 3/4',
+  jump: 'segno · dsalfine · at 1/2',
+  tempo: '120 · half=80 · quarter.=60',
   rehearsal: 'A · 12',
   section: 'Verse 1'
 };
@@ -396,6 +420,11 @@ export function positionedText(attribute: PositionedAttribute): { word: string; 
       word: attribute.value > 0 ? '8va' : '8vb',
       value: `${Math.abs(attribute.value) === 1 ? '' : `${Math.abs(attribute.value)} `}${attribute.bars ? `${attribute.bars}` : ''}`.trim()
     };
+  if (attribute.glyphs?.length)
+    return {
+      word: 'symbol',
+      value: `${attribute.orient ? `${attribute.orient} ` : ''}${attribute.glyphs[0]}`
+    };
   return {
     word: 'text',
     value: `${attribute.orient && attribute.orient !== 'above' ? `${attribute.orient} ` : ''}${attribute.text}`
@@ -451,6 +480,14 @@ export function eventPills(doc: MnxStructure, member: Extract<SelectionMember, {
   for (const { attribute } of readPositionedAttributes(doc, member, [member.onset.num, member.onset.den])) {
     const { word, value } = positionedText(attribute);
     pills.push(annotation(`positioned:${attribute.kind}`, word, value, { type: 'removePositioned', kind: attribute.kind }));
+  }
+  // A beam that STARTS at this event: one pill, its length; removing it is
+  // the beam key's own toggle on this note (the session's path 2).
+  const firstNoteId = event.notes?.[0]?.id;
+  const beam = firstNoteId ? beamStartingAt(doc, firstNoteId) : null;
+  if (beam) {
+    const list = beamAtPath(doc, beam);
+    pills.push(annotation('beam', 'beam', `${list?.events.length ?? '?'} events`, { type: 'toggleBeam' }));
   }
   for (const [line, syllable] of Object.entries(event.lyrics?.lines ?? {})) {
     // The typed form: the hyphens say where the syllable sits in its word,
@@ -609,6 +646,7 @@ const EVENT_WORDS: InspectorWord[] = [
   { word: 'louder', hint: '' },
   { word: 'softer', hint: '' },
   { word: 'text', hint: 'Play 8x · below cantabile' },
+  { word: 'symbol', hint: 'keyboardPedalPed · below keyboardPedalUp' },
   { word: '8va', hint: 'bars, e.g. 2' },
   { word: '8vb', hint: 'bars, e.g. 2' },
   { word: 'lyric', hint: 'sleep- · -ing · 2: Am' }

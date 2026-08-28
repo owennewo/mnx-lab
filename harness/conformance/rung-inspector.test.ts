@@ -69,9 +69,13 @@ const ONE_OF_EACH: MeasureAttribute[] = [
   { kind: 'repeatEnd', times: 3 },
   { kind: 'ending', numbers: [1, 2] },
   { kind: 'segno' },
+  { kind: 'segno', glyph: 'segnoSerpent2', at: [1, 2] },
   { kind: 'fine' },
+  { kind: 'fine', at: 'end' },
   { kind: 'jump', type: 'dsalfine' },
+  { kind: 'jump', type: 'segno', at: [3, 4] },
   { kind: 'tempo', bpm: 120, base: 'quarter' },
+  { kind: 'tempo', bpm: 60, base: 'quarter', dots: 1 },
   { kind: 'rehearsal', label: 'A' },
   { kind: 'section', label: 'Verse 1' }
 ];
@@ -269,6 +273,53 @@ describe('removePositioned takes the entry on THIS staff (bug 2)', () => {
   });
 });
 
+describe('writers for what already rendered (core-measure-attributes-gaps.md, item 6)', () => {
+  it('a segno variant at a fraction writes the glyph and the location, and reads back', () => {
+    const session = atBar(1);
+    const parsed = parseInspectorLine('measure', null, 'segno serpent at 1/2');
+    expect(parsed).toEqual({ intent: { type: 'setMeasureAttribute', attribute: { kind: 'segno', glyph: 'segnoSerpent1', at: [1, 2] } } });
+    expect(session.handleIntent((parsed as { intent: never }).intent)).toBe(true);
+    expect(session.doc.global.measures[1]!.segno).toEqual({ location: { fraction: [1, 2] }, glyph: 'segnoSerpent1' });
+    expect(measurePills(session.doc, 1).find(p => p.word === 'segno')?.value).toBe('serpent at 1/2');
+    expect(parseInspectorLine('measure', null, 'segno banana')).toHaveProperty('error');
+  });
+
+  it('a dotted tempo unit writes dots', () => {
+    expect(parseInspectorLine('measure', 'tempo', 'quarter.=60')).toEqual({
+      intent: { type: 'setMeasureAttribute', attribute: { kind: 'tempo', bpm: 60, base: 'quarter', dots: 1 } }
+    });
+  });
+
+  it('a symbol direction writes glyphs, not text, and reads back as `symbol`', () => {
+    const session = at('event');
+    const parsed = parseInspectorLine('event', null, 'symbol below keyboardPedalPed');
+    expect(parsed).toEqual({ intent: { type: 'setPositioned', attribute: { kind: 'direction', text: '', glyphs: ['keyboardPedalPed'], orient: 'below' } } });
+    expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
+    const written = session.doc.parts![0]!.measures![0]!.directions![0] as { text?: string; glyphs?: string[] };
+    expect(written.glyphs).toEqual(['keyboardPedalPed']);
+    expect(written.text).toBeUndefined();
+    expect(pillText(session)).toContain('symbol: below keyboardPedalPed [annotation]');
+  });
+
+  it('a beam starting at the event is a pill whose removal is the beam key’s own toggle', () => {
+    const session = at('event');
+    session.handleIntent({ type: 'setProjection', projection: 'notation' });
+    // Beam the two quarters: the beam key, armed on one and closed on the next.
+    session.handleIntent({ type: 'goToLevel', level: 'note' });
+    expect(session.handleIntent({ type: 'toggleBeam' })).toBe(true);
+    session.handleIntent({ type: 'nextPosition' });
+    expect(session.handleIntent({ type: 'toggleBeam' })).toBe(true);
+    session.handleIntent({ type: 'prevPosition' });
+    session.handleIntent({ type: 'goToLevel', level: 'event' });
+    const beam = pillsFor(scope(session)).find(p => p.key === 'beam');
+    expect(beam?.value).toBe('2 events');
+    expect(beam?.remove).toEqual({ type: 'toggleBeam' });
+    session.handleIntent({ type: 'goToLevel', level: 'note' });
+    expect(session.handleIntent(beam!.remove!)).toBe(true);
+    expect(session.doc.parts![0]!.measures![0]!.beams ?? []).toEqual([]);
+  });
+});
+
 describe('the surface is honest about what it emits', () => {
   it('every intent the inspector lists is one the session handles', () => {
     const source = fs.readFileSync(path.join(ROOT, 'src/edit/session.ts'), 'utf8');
@@ -368,6 +419,7 @@ describe('event pills', () => {
   it('readPositionedAttributes is the reverse of setPositioned, for every kind', () => {
     const cases: PositionedAttribute[] = [
       { kind: 'dynamic', value: 'mf' },
+      { kind: 'direction', text: '', glyphs: ['keyboardPedalPed'], orient: 'below' },
       { kind: 'dynamic', dynamicType: 'gradual', wedgeType: 'increasing' },
       { kind: 'direction', text: 'cantabile', orient: 'below' },
       { kind: 'ottava', value: 1, bars: 2 }
