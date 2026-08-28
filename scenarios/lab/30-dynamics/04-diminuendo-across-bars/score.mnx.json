@@ -1,0 +1,145 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      },
+      {
+        "id": "m2"
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "p1",
+      "name": "Music",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "dynamics": [
+            {
+              "type": "immediate",
+              "value": "f",
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "type": "gradual",
+              "wedgeType": "decreasing",
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "end": {
+                "measure": "m2",
+                "position": {
+                  "fraction": [
+                    1,
+                    2
+                  ]
+                }
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dynamics": [
+            {
+              "type": "immediate",
+              "value": "p",
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

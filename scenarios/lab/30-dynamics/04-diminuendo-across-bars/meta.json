@@ -1,0 +1,45 @@
+{
+  "title": "Diminuendo across bars",
+  "description": "A forte, then a decrescendo hairpin whose end names the NEXT bar (an MNX measure-rhythmic-position with a measure id), closing on the piano at that bar's third beat. Pins the decreasing wedge and the cross-bar span — a hairpin's end is a measure reference exactly as an ottava's is, and the engine resolves both on note columns (core-measure-attributes-gaps.md, item 4).",
+  "bars": 2,
+  "tags": [
+    "dynamics",
+    "hairpin"
+  ],
+  "specRefs": [],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "dynamic-group",
+    "dynamic-group-list",
+    "dynamic-group-type",
+    "dynamic-value",
+    "event",
+    "global",
+    "measure-global",
+    "measure-rhythmic-position",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "root",
+    "sequence",
+    "sequence-content",
+    "time",
+    "wedge-type"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": true,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

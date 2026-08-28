@@ -86,7 +86,7 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
-### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **3 stale, 1 never-seen**
+### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **3 stale, 2 never-seen**
 
 Owner: [core-measure-attributes-gaps.md](core-measure-attributes-gaps.md) (in progress,
 items 1–2). Demoted 2026-08-28.
@@ -110,7 +110,10 @@ its badge retired. `lab/dynamics/hairpin-and-relative` likewise: the crescendo w
 the word `cresc.` are drawn (`emitHairpins`, `dynamicLabel`) and its badges retired.
 What to look for on those three changed — see below.
 
-**Never-seen (1).** `lab/pitches/alto-and-tenor-clefs` — new, authored to pin the C clef
+**Never-seen (2).** `lab/dynamics/diminuendo-across-bars` — new: a decreasing wedge
+whose `end` names the next bar, closing on that bar's `p`; the wedge should be open
+(1.5 sp) at bar 1's third beat and come to a point just before bar 2's third beat,
+crossing the barline as one pair of lines. `lab/pitches/alto-and-tenor-clefs` — new, authored to pin the C clef
 (bug 4 of the same doc: a C clef drew as a treble clef and placed every pitch a sixth
 wrong; no scenario had a C clef). Alto in bar 1, tenor in bar 2, the same four pitches.
 
