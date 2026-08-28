@@ -1,6 +1,18 @@
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
 import { emitMeasureRepeat, measureRepeatX, type MeasureRepeatMark } from './measureRepeat.ts';
+import { emitEndings } from './endings.ts';
+import { timeSigDigitDx } from './tabStaff.ts';
+import {
+  emitRepeatDots,
+  emitRepeatEndStrokes,
+  emitRepeatStartStrokes,
+  emitRepeatTimes,
+  NOTATION_REPEAT_DOT_YS,
+  repeatEndDotDx,
+  repeatStartDotDx,
+  TAB_REPEAT_DOT_YS
+} from './repeats.ts';
 import { validateDocument } from './validate.ts';
 import { dynamicGlyph, dynamicLabel } from './dynamics.ts';
 import {
@@ -160,6 +172,8 @@ const STEM_THICKNESS_SP = 0.12;
 const BARLINE_THICKNESS_SP = 0.16;
 const FINAL_BARLINE_THICK_SP = 0.5;
 const FINAL_BARLINE_GAP_SP = 0.3;
+/** The repeat barlines share the final barline's strokes. */
+const REPEAT_METRICS = { thick: FINAL_BARLINE_THICK_SP, gap: FINAL_BARLINE_GAP_SP, thin: BARLINE_THICKNESS_SP };
 const BARLINE_METRICS: BarlineMetrics = {
   thinSp: BARLINE_THICKNESS_SP,
   thickSp: FINAL_BARLINE_THICK_SP,
@@ -272,13 +286,8 @@ const DIRECTION_DROP_SP = 4.2; // baseline below the staff's bottom line, cleari
 const DIRECTION_STACK_SP = 1.9; // extra offset per coincident direction
 
 // Repeat barlines and volta brackets.
-const REPEAT_DOT_SCALE = 1.2;
 // Notation dots straddle the middle line ([1.5, 2.5] on a 4sp staff); the
 // six-line tab staff's middle is 2.5sp, so its dots sit at ±0.5 of that.
-const TAB_REPEAT_DOT_YS = [2, 3];
-const VOLTA_RISE_SP = 3.4;  // bracket line above the top staff line
-const VOLTA_HOOK_SP = 1.3;
-const VOLTA_THICKNESS_SP = 0.13;
 
 // Ottava (octave-shift) lines: "8va"/"8vb"/… label + dashed extent + end hook.
 const OTTAVA_THICKNESS_SP = 0.11;
@@ -1492,53 +1501,18 @@ function assembleSegment(
       // Ink offsets from the repeat's own x, never subtracted into it — the
       // two currencies of `PrimitiveBase`. `thinDx` is where the thin stroke
       // sits relative to the cluster's left edge, and the dots sit past it.
-      const thinDx = FINAL_BARLINE_THICK_SP + FINAL_BARLINE_GAP_SP;
-      const dotDx = thinDx + 0.4;
+      const dotDx = repeatStartDotDx(REPEAT_METRICS);
       for (const g of segment.groups) {
         for (const [gTop, gBottom] of groupSpans(g)) {
-          primitives.push({
-            kind: 'rect',
-            x: m.repeatStartX, y: gTop,
-            w: FINAL_BARLINE_THICK_SP, h: gBottom - gTop,
-            fill: 'currentColor',
-            className: 'barline repeat-start'
-          });
-          primitives.push({
-            kind: 'line',
-            x1: m.repeatStartX, dx1: thinDx, y1: gTop,
-            x2: m.repeatStartX, dx2: thinDx, y2: gBottom,
-            thickness: BARLINE_THICKNESS_SP,
-            className: 'barline repeat-start'
-          });
+          emitRepeatStartStrokes(m.repeatStartX, gTop, gBottom, REPEAT_METRICS, primitives);
         }
       }
-      for (const top of staffTops) {
-        for (const dotY of [1.5, 2.5]) {
-          primitives.push({
-            kind: 'glyph',
-            glyph: 'augmentationDot',
-            x: m.repeatStartX, dx: dotDx,
-            y: top + dotY,
-            scale: REPEAT_DOT_SCALE,
-            className: 'repeat-dot'
-          });
-        }
-      }
+      for (const top of staffTops) emitRepeatDots(m.repeatStartX, dotDx, top, NOTATION_REPEAT_DOT_YS, primitives);
       // Native tab staves carry their own dots (published tab repeats do),
       // straddling the middle of the six-line staff the way the notation
       // dots straddle the middle line.
       for (const td of tabDisplays) {
-        const tabTop = displayTopOf(m.row, td.displayIndex);
-        for (const dotY of TAB_REPEAT_DOT_YS) {
-          primitives.push({
-            kind: 'glyph',
-            glyph: 'augmentationDot',
-            x: m.repeatStartX, dx: dotDx,
-            y: tabTop + dotY,
-            scale: REPEAT_DOT_SCALE,
-            className: 'repeat-dot'
-          });
-        }
+        emitRepeatDots(m.repeatStartX, dotDx, displayTopOf(m.row, td.displayIndex), TAB_REPEAT_DOT_YS, primitives);
       }
     }
 
@@ -1589,17 +1563,27 @@ function assembleSegment(
         }
         const numY = top + 1; // visual centre of upper half (line 2 from top)
         const denY = top + 3; // visual centre of lower half
-        for (const digit of String(m.timeSig.count)) {
+        // Multi-digit figures (12/8) lay their digits side by side; a single
+        // digit sits exactly where it always did.
+        for (const [k, digit] of [...String(m.timeSig.count)].entries()) {
           primitives.push({
             kind: 'glyph', glyph: 'timeSig' + digit,
-            x: m.timeSigCentreX, y: numY, anchor: 'middle',
+            x: m.timeSigCentreX,
+            ...(timeSigDigitDx(k, String(m.timeSig.count).length) !== undefined
+              ? { dx: timeSigDigitDx(k, String(m.timeSig.count).length) }
+              : {}),
+            y: numY, anchor: 'middle',
             className: 'time-sig-num'
           });
         }
-        for (const digit of String(m.timeSig.unit)) {
+        for (const [k, digit] of [...String(m.timeSig.unit)].entries()) {
           primitives.push({
             kind: 'glyph', glyph: 'timeSig' + digit,
-            x: m.timeSigCentreX, y: denY, anchor: 'middle',
+            x: m.timeSigCentreX,
+            ...(timeSigDigitDx(k, String(m.timeSig.unit).length) !== undefined
+              ? { dx: timeSigDigitDx(k, String(m.timeSig.unit).length) }
+              : {}),
+            y: denY, anchor: 'middle',
             className: 'time-sig-den'
           });
         }
@@ -1893,22 +1877,7 @@ function assembleSegment(
       for (const [gTop, gBottom] of groupSpans(g)) {
         if (m.repeatEnd) {
           // Backward repeat :| — dots + thin + thick (doubles as a final barline).
-          primitives.push({
-            kind: 'rect',
-            x: barX, dx: -FINAL_BARLINE_THICK_SP, y: gTop,
-            w: FINAL_BARLINE_THICK_SP, h: gBottom - gTop,
-            fill: 'currentColor',
-            className: 'barline repeat-end'
-          });
-          primitives.push({
-            kind: 'line',
-            x1: barX, dx1: -FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP,
-            y1: gTop,
-            x2: barX, dx2: -FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP,
-            y2: gBottom,
-            thickness: BARLINE_THICKNESS_SP,
-            className: 'barline repeat-end'
-          });
+          emitRepeatEndStrokes(barX, gTop, gBottom, REPEAT_METRICS, primitives);
         } else {
           // The GLOBAL measure owns the barline style; `isLast` only supplies
           // the spec's default when the document is silent about it.
@@ -1924,49 +1893,13 @@ function assembleSegment(
       }
     }
     if (m.repeatEnd) {
-      const dotDx = -FINAL_BARLINE_THICK_SP - FINAL_BARLINE_GAP_SP - 0.85;
-      for (const top of staffTops) {
-        for (const dotY of [1.5, 2.5]) {
-          primitives.push({
-            kind: 'glyph',
-            glyph: 'augmentationDot',
-            x: barX, dx: dotDx,
-            y: top + dotY,
-            scale: REPEAT_DOT_SCALE,
-            className: 'repeat-dot'
-          });
-        }
-      }
+      const dotDx = repeatEndDotDx(REPEAT_METRICS);
+      for (const top of staffTops) emitRepeatDots(barX, dotDx, top, NOTATION_REPEAT_DOT_YS, primitives);
       for (const td of tabDisplays) {
-        const tabTop = displayTopOf(m.row, td.displayIndex);
-        for (const dotY of TAB_REPEAT_DOT_YS) {
-          primitives.push({
-            kind: 'glyph',
-            glyph: 'augmentationDot',
-            x: barX, dx: dotDx,
-            y: tabTop + dotY,
-            scale: REPEAT_DOT_SCALE,
-            className: 'repeat-dot'
-          });
-        }
+        emitRepeatDots(barX, dotDx, displayTopOf(m.row, td.displayIndex), TAB_REPEAT_DOT_YS, primitives);
       }
-    }
-    // Unconventional play counts print above the barline ("4x").
-    if (m.repeatEnd) {
-      const times = m.repeatEnd.times;
-      if (times !== undefined && times !== 2) {
-        primitives.push({
-          kind: 'text',
-          text: `${times}x`,
-          x: barX,
-          y: staffTop - 1.2,
-          font: 'body',
-          size: 1.4,
-          weight: 'bold',
-          anchor: 'end',
-          className: 'repeat-times'
-        });
-      }
+      // Unconventional play counts print above the barline ("4x").
+      emitRepeatTimes(m.repeatEnd.times, barX, staffTop, primitives);
     }
 
     // Full-measure rests (sequence.fullMeasure with empty content): one rest
@@ -2714,70 +2647,6 @@ function collectNotationTechnique(
 
 // ---------- Volta brackets (endings) ----------
 
-/**
- * Draws each global-measure `ending` as a volta bracket: a line above the
- * staff spanning `duration` measures, hooked down at the start (and at the end
- * unless `open`), labelled with its numbers ("1." / "1. 2."). Brackets split
- * at system breaks; only the first segment carries the hook and label.
- */
-function emitEndings(
-  mnx: MnxStructure,
-  plan: HorizontalPlan,
-  /** The top staff's top line on a row — rows are no longer a uniform pitch. */
-  rowStaffTop: (row: number) => number,
-  primitives: Primitive[]
-): void {
-  (mnx.global.measures ?? []).forEach((gm, i) => {
-    const ending = gm?.ending;
-    if (!ending || !plan.measures[i]) return;
-    const last = Math.min(i + Math.max(1, ending.duration ?? 1) - 1, plan.measures.length - 1);
-
-    let a = i;
-    while (a <= last) {
-      const row = plan.measures[a].row;
-      let b = a;
-      while (b + 1 <= last && plan.measures[b + 1].row === row) b++;
-      const staffTop = rowStaffTop(row);
-      const y = staffTop - VOLTA_RISE_SP;
-      const x1 = plan.measures[a].x + 0.1;
-      const x2 = plan.measures[b].x + plan.measures[b].width - 0.1;
-      primitives.push({
-        kind: 'line',
-        x1, y1: y, x2, y2: y,
-        thickness: VOLTA_THICKNESS_SP,
-        className: 'ending'
-      });
-      if (a === i) {
-        primitives.push({
-          kind: 'line',
-          x1, y1: y, x2: x1, y2: y + VOLTA_HOOK_SP,
-          thickness: VOLTA_THICKNESS_SP,
-          className: 'ending'
-        });
-        primitives.push({
-          kind: 'text',
-          text: (ending.numbers ?? []).map(n => `${n}.`).join(' '),
-          x: x1 + 0.5,
-          y: y + 1.4,
-          font: 'body',
-          size: 1.4,
-          weight: 'bold',
-          className: 'ending-label'
-        });
-      }
-      if (!ending.open && b === last) {
-        primitives.push({
-          kind: 'line',
-          x1: x2, y1: y, x2, y2: y + VOLTA_HOOK_SP,
-          thickness: VOLTA_THICKNESS_SP,
-          className: 'ending'
-        });
-      }
-      a = b + 1;
-    }
-  });
-}
-
 // ---------- Ottava (octave-shift) lines ----------
 
 /** Topmost y among noteheads drawn in [x1,x2]; falls back to `ceil`. Lets an
@@ -2974,7 +2843,7 @@ interface EmitDynamicsArgs {
  * composite glyphs; anything else renders as italic text so a novel marking
  * still shows up.
  */
-function emitDynamics(args: EmitDynamicsArgs): void {
+export function emitDynamics(args: EmitDynamicsArgs): void {
   const { partMeasure, m, sequencesByStaff, staffBottoms, primitives } = args;
   const dynamics = partMeasure.dynamics ?? [];
   if (dynamics.length === 0) return;
@@ -3190,7 +3059,7 @@ interface EmitDirectionsArgs {
  * a two-way above/below cannot express — it belongs to the part rather than to
  * either staff. With one staff there is no "between", so it falls back to below.
  */
-function emitDirections(args: EmitDirectionsArgs): void {
+export function emitDirections(args: EmitDirectionsArgs): void {
   const { partMeasure, m, sequencesByStaff, staffTops, staffBottoms, primitives } = args;
   const directions = partMeasure.directions ?? [];
   if (directions.length === 0) return;

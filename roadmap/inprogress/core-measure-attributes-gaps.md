@@ -7,7 +7,11 @@
 > on notation, standalone tab and the both-view tab staves, and the badge retired.
 > **Item 4 too** — hairpins draw as wedges to their end (across bars and system
 > breaks, or to the bar's next dynamic when no end is named), relative dynamics as
-> *cresc.* / *dim.*; badges retired. Items 5–8 open. A census, then a work list. Prompted by
+> *cresc.* / *dim.*; badges retired. **Item 5 (tab parity) too** — repeats, voltas,
+> the cut/common symbol, dynamics and directions on the standalone tab staff, through
+> emitters shared with notation (`repeats.ts`, `endings.ts`), goldens byte-identical
+> for the refactor and a new scenario pinning the tab side. Items 6–8 open. A census,
+> then a work list. Prompted by
 > `spec/measure-repeats-with-counters` reading as a regression after the rung inspector
 > ([workbench-rung-inspector.md](workbench-rung-inspector.md)) started
 > naming `measure repeat: 1` on bars whose staff is empty — it was never a regression:
@@ -195,6 +199,17 @@ Found by the sweep and confirmed by hand; each is a one-file fix and a test:
    the wedge runs to the bar's next dynamic on that staff, else to the bar's content
    end. `dynamicLabel` gives a relative group without a value its word, set small and
    italic like a direction. Notation only — tab parity is item 6.
+
+5. ✅ **Tab parity for bar-owned marks** (2026-08-28) — `repeats.ts` (strokes, dots,
+   `Nx`) and `endings.ts` (voltas) factored out of notation primitive-for-primitive —
+   108 goldens byte-identical — and called from the standalone tab layout; `emitDynamics`
+   and `emitDirections` exported and called under/over the tab staff; `emitTabTimeSig`
+   draws `common`/`cut`; multi-digit time signatures lay their digits side by side on
+   both staves (`timeSigDigitDx`, no offset for one digit so nothing moved). Pinned by
+   `lab/navigation/repeats-and-marks-on-tab`. Not on tab, by design: ottavas (a tab
+   staff has no written octave) and hairpins (the onset capture is the notation
+   layout's — a follow-up if a tab reader wants wedges). The C clef, listed here as
+   item 5 originally, landed with the bugs.
 
 Original plan:
 

@@ -86,7 +86,7 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
-### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **3 stale, 2 never-seen**
+### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **3 stale, 3 never-seen**
 
 Owner: [core-measure-attributes-gaps.md](core-measure-attributes-gaps.md) (in progress,
 items 1–2). Demoted 2026-08-28.
@@ -110,7 +110,13 @@ its badge retired. `lab/dynamics/hairpin-and-relative` likewise: the crescendo w
 the word `cresc.` are drawn (`emitHairpins`, `dynamicLabel`) and its badges retired.
 What to look for on those three changed — see below.
 
-**Never-seen (2).** `lab/dynamics/diminuendo-across-bars` — new: a decreasing wedge
+**Never-seen (3).** `lab/navigation/repeats-and-marks-on-tab` — new (item 5): a
+tab-opting part whose STANDALONE tab staff must now show what the notation staff shows —
+`|:` with dots straddling the middle of the six lines and the cut-time symbol on bar 1,
+a first-ending bracket over bar 2 closed by `:|` with `3x` over the barline, an open
+second-ending bracket over bar 3, a final barline on bar 4, `mf` under bar 1 and `f`
+under bar 4, and *Swing* over bar 1. The notation and both views are the cross-check:
+the same marks at the same columns. `lab/dynamics/diminuendo-across-bars` — new: a decreasing wedge
 whose `end` names the next bar, closing on that bar's `p`; the wedge should be open
 (1.5 sp) at bar 1's third beat and come to a point just before bar 2's third beat,
 crossing the barline as one pair of lines. `lab/pitches/alto-and-tenor-clefs` — new, authored to pin the C clef

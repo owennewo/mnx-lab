@@ -222,32 +222,60 @@ export function emitTabClef(clefX: number, staffTop: number, primitives: Primiti
 }
 
 /** Time signature, tab style: digits centred in the staff's upper/lower halves. */
+/** A SMuFL time-signature digit's advance, so a multi-digit figure (12/8)
+ *  lays its digits side by side instead of on top of each other — the
+ *  overprint core-measure-attributes-gaps.md found on both staves. A single
+ *  digit gets no offset, so every existing golden holds. */
+const TIME_SIG_DIGIT_ADVANCE_SP = 1.8;
+
+export function timeSigDigitDx(k: number, digits: number): number | undefined {
+  if (digits <= 1) return undefined;
+  return (k - (digits - 1) / 2) * TIME_SIG_DIGIT_ADVANCE_SP;
+}
+
 export function emitTabTimeSig(
-  timeSig: { count: number; unit: number },
+  timeSig: { count: number; unit: number; display?: 'common' | 'cut' },
   centreX: number,
   staffTop: number,
   primitives: Primitive[]
 ): void {
+  // `display: common/cut` → the symbol on the staff's middle, as the
+  // notation staff draws it (item 5: the tab staff always drew digits).
+  if (timeSig.display === 'common' || timeSig.display === 'cut') {
+    primitives.push({
+      kind: 'glyph',
+      glyph: timeSig.display === 'cut' ? 'timeSigCutCommon' : 'timeSigCommon',
+      x: centreX,
+      y: staffTop + TAB_STAFF_HEIGHT_SP / 2,
+      anchor: 'middle',
+      className: 'time-sig'
+    });
+    return;
+  }
   const numCenterY = staffTop + TAB_STAFF_HEIGHT_SP / 4;
   const denCenterY = staffTop + (3 * TAB_STAFF_HEIGHT_SP) / 4;
 
   // SMuFL time-sig digits have their alphabetic baseline at the visual
   // centre of the digit, so y = centre directly.
-  for (const digit of String(timeSig.count)) {
+  const count = String(timeSig.count);
+  const unit = String(timeSig.unit);
+  for (const [k, digit] of [...count].entries()) {
     primitives.push({
       kind: 'glyph',
       glyph: 'timeSig' + digit,
       x: centreX,
+      ...(timeSigDigitDx(k, count.length) !== undefined ? { dx: timeSigDigitDx(k, count.length) } : {}),
       y: numCenterY,
       anchor: 'middle',
       className: 'time-sig-num'
     });
   }
-  for (const digit of String(timeSig.unit)) {
+  for (const [k, digit] of [...unit].entries()) {
     primitives.push({
       kind: 'glyph',
       glyph: 'timeSig' + digit,
       x: centreX,
+      ...(timeSigDigitDx(k, unit.length) !== undefined ? { dx: timeSigDigitDx(k, unit.length) } : {}),
       y: denCenterY,
       anchor: 'middle',
       className: 'time-sig-den'

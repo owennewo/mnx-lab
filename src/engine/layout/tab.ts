@@ -11,6 +11,17 @@ import {
   emitTabVoices
 } from './tabStaff.ts';
 import { emitMeasureRepeat, measureRepeatX, type MeasureRepeatMark } from './measureRepeat.ts';
+import { emitEndings } from './endings.ts';
+import { emitDirections, emitDynamics } from './notation.ts';
+import {
+  emitRepeatDots,
+  emitRepeatEndStrokes,
+  emitRepeatStartStrokes,
+  emitRepeatTimes,
+  repeatEndDotDx,
+  repeatStartDotDx,
+  TAB_REPEAT_DOT_YS
+} from './repeats.ts';
 import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barlines.ts';
 import { emitNavigationMarkers, emitScoreLabels, emitTempoMark } from './scoreText.ts';
 import { clampPadDensity, ensureTopMargin, tightenRows } from './verticalDensity.ts';
@@ -53,6 +64,8 @@ const MARGIN_SP = 2;
 const BARLINE_THICKNESS_SP = 0.1;
 const FINAL_BARLINE_THICK_WIDTH_SP = 0.4;
 const FINAL_BARLINE_GAP_SP = 0.3;
+/** The repeat barlines share the final barline's strokes. */
+const REPEAT_METRICS = { thick: FINAL_BARLINE_THICK_WIDTH_SP, gap: FINAL_BARLINE_GAP_SP, thin: BARLINE_THICKNESS_SP };
 const BARLINE_METRICS: BarlineMetrics = {
   thinSp: BARLINE_THICKNESS_SP,
   thickSp: FINAL_BARLINE_THICK_WIDTH_SP,
@@ -170,7 +183,12 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   for (let i = 0; i < numMeasures; i++) {
     const partMeasure = part.measures[i] ?? { sequences: [] };
     const m = plan.measures[i];
-    if (rowStart[m.row] === undefined) rowStart[m.row] = primitives.length;
+    if (rowStart[m.row] === undefined) {
+      rowStart[m.row] = primitives.length;
+      // This row's voltas first, so the labels placed below scan them as ink
+      // and stack above (core-measure-attributes-gaps.md, item 5).
+      emitEndings(mnx, plan, row => MARGIN_SP + row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP, primitives, m.row);
+    }
     const edges = rowEdges.get(m.row);
     rowEdges.set(m.row, {
       left: Math.min(edges?.left ?? Infinity, m.contentStartX),
@@ -195,6 +213,13 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
         thickness: BARLINE_THICKNESS_SP,
         className: 'barline barline-start'
       });
+    }
+
+    // Forward repeat |: — the same strokes and dots the both-view tab staff
+    // gets (core-measure-attributes-gaps.md, item 5: this view drew nothing).
+    if (m.repeatStart) {
+      emitRepeatStartStrokes(m.repeatStartX, staffTop, staffBottom, REPEAT_METRICS, primitives);
+      emitRepeatDots(m.repeatStartX, repeatStartDotDx(REPEAT_METRICS), staffTop, TAB_REPEAT_DOT_YS, primitives);
     }
 
     // Tab clef (the notation clef's slot in the shared plan keeps both views aligned)
@@ -264,6 +289,21 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       });
     }
 
+    // Dynamics and directions under/over the tab staff — the part's, at
+    // their columns, exactly as the notation staff draws them. BEFORE the
+    // score text below, which scans the row's ink to clear it.
+    if (stdSequences.length > 0) {
+      const positionedArgs = {
+        partMeasure,
+        m: { x: m.x, width: m.width, staves: [m.voices] },
+        sequencesByStaff: [stdSequences],
+        staffBottoms: [staffBottom],
+        primitives
+      };
+      emitDynamics(positionedArgs);
+      emitDirections({ ...positionedArgs, staffTops: [staffTop] });
+    }
+
     // Score-wide marks from the GLOBAL measure — the tempo, the navigation
     // marks and the structural labels. They describe the BAR, not a notation
     // staff (MNX gives them a `location`, never a `staff`), so a tab reader is
@@ -286,14 +326,23 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     // staff is owed it for the same reason it is owed a section name: the
     // barline describes the BAR, not a notation staff.
     const isLast = i === numMeasures - 1;
-    emitEndBarline({
-      type: resolveBarlineType(gm.barline, isLast),
-      x: m.x + m.width,
-      top: staffTop,
-      bottom: staffBottom,
-      metrics: BARLINE_METRICS,
-      primitives
-    });
+    if (m.repeatEnd) {
+      // Backward repeat :| — dots + thin + thick, and the "4x" over it.
+      const barX = m.x + m.width;
+      emitRepeatEndStrokes(barX, staffTop, staffBottom, REPEAT_METRICS, primitives);
+      emitRepeatDots(barX, repeatEndDotDx(REPEAT_METRICS), staffTop, TAB_REPEAT_DOT_YS, primitives);
+      emitRepeatTimes(m.repeatEnd.times, barX, staffTop, primitives);
+    } else {
+      emitEndBarline({
+        type: resolveBarlineType(gm.barline, isLast),
+        x: m.x + m.width,
+        top: staffTop,
+        bottom: staffBottom,
+        metrics: BARLINE_METRICS,
+        primitives
+      });
+    }
+
 
     if (anchored.length) {
       const bySlot = new Map<number, MeasureIssue[]>();

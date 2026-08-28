@@ -1,0 +1,63 @@
+{
+  "title": "Repeats and bar marks on a tab staff",
+  "description": "Every bar-owned mark a tab reader is owed, on a tab-opting part: a forward repeat with cut time on bar 1, a first ending closed by a backward repeat played three times (the 3x over the barline), an open second ending, a final barline, and a dynamic (mf, then f) and a direction (Swing) at the columns the notation staff puts them at. Pins the standalone tab staff's repeats, voltas, cut-time symbol, dynamics and directions — before core-measure-attributes-gaps.md item 5 the standalone tab view drew a plain barline where the document said repeat and nothing at all for the rest (the both view already had repeat dots and one volta because the notation layout drew them).",
+  "bars": 4,
+  "tags": [
+    "tab",
+    "repeats",
+    "endings",
+    "dynamics",
+    "labels",
+    "proposed"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/repeats-alternate-endings-simple/"
+  ],
+  "coversDefs": [
+    "barline",
+    "barline-type",
+    "clef",
+    "clef-sign",
+    "dynamic-group",
+    "dynamic-group-list",
+    "dynamic-group-type",
+    "dynamic-value",
+    "ending",
+    "ending-numbers",
+    "ending-open",
+    "event",
+    "global",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "repeat-end",
+    "repeat-start",
+    "repeat-times",
+    "root",
+    "sequence",
+    "sequence-content",
+    "time",
+    "time-signature-display",
+    "time-signature-unit"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered",
+  "schema": "proposed",
+  "proposal": "score-text"
+}
