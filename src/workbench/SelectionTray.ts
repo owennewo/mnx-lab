@@ -18,7 +18,12 @@
 // current rung, so opening must not re-case the word, move its x, or change
 // its box. That is why the scope selector is now a 74px column of lowercase
 // mono rungs at the tray's leading edge rather than an uppercase tab row
-// across its top. Since 2026-08-15 the palette is spoken in TOKENS rather
+// across its top. **The x is the one of those four that no longer holds**
+// (2026-08-28, core-rung-addressing.md): each rung leads with its Shift+digit,
+// which pushes the word right of the chip's 8px indent. Deliberate — an index
+// the eye reaches before the word it indexes is worth the offset — and the
+// other three still hold, as does the alignment the column is actually read
+// down: every WORD lines up with every other, ordinal or not. Since 2026-08-15 the palette is spoken in TOKENS rather
 // than literals; a conformance test holds that line.
 //
 // It still does NOT include `designTokens`, and that is now load-bearing for a
@@ -315,30 +320,36 @@ export class SelectionTray extends LitElement {
       white-space: nowrap;
     }
 
+    /* Mirrored the whole rung sits flush right, but the ordinal still LEADS
+     * the word — it is an index, and an index that swaps sides depending on
+     * which way the tray opened is a worse legend than one that does not.
+     * So the row is pushed right rather than reversed. */
     :host([data-mirrored]) .rung {
-      flex-direction: row-reverse;
+      justify-content: flex-end;
       text-align: right;
       border-left: 0;
       border-right: 2px solid transparent;
     }
 
-    /* The ordinal rides the rung's TRAILING edge, so the word keeps the x it
-     * had in the chip — the one measurement the chip→tray transition may not
-     * move (workbench-selection-chip-ladder.md). Quiet by default: it is a
-     * legend for the keys, not a second label competing with the word. */
+    /* The ordinal leads the word — read "3 container", not "container 3".
+     *
+     * The cost, deliberately paid: the word is no longer at the chip's own
+     * 8px indent, so the ladder column and the collapsed chip no longer share
+     * an x. That was one of the four things
+     * workbench-selection-chip-ladder.md asked to survive the open. The rest
+     * of them — the word itself, its case, its box, the red — still do, and a
+     * legend the eye hits before the word it indexes is worth the pixels.
+     *
+     * A fixed min-width keeps every WORD aligned with every other, which is
+     * the alignment that survived and the one the column is actually read
+     * down. The global row carries an empty ordinal for the same reason. */
     .rung .ord {
-      margin-left: auto;
-      padding-left: 8px;
+      flex: none;
+      min-width: 7px;
+      margin-right: 6px;
       font: 500 8.5px/1.2 var(--mono);
       color: var(--ink-3);
       opacity: 0.6;
-    }
-
-    :host([data-mirrored]) .rung .ord {
-      margin-left: 0;
-      margin-right: auto;
-      padding-left: 0;
-      padding-right: 8px;
     }
 
     .rung[aria-current='true'] .ord {
@@ -1408,10 +1419,9 @@ export class SelectionTray extends LitElement {
                 aria-current=${rung.active ? 'true' : 'false'}
                 @click=${() => this.emit('tray-rung-preview', { key: rung.key })}
               >
-                ${rung.label}${rung.holdsSelection && !rung.active
+                <span class="ord" aria-hidden="true">${rung.ordinal ?? ''}</span
+                >${rung.label}${rung.holdsSelection && !rung.active
                   ? html`<span class="dot"></span>`
-                  : nothing}${rung.ordinal
-                  ? html`<span class="ord" aria-hidden="true">${rung.ordinal}</span>`
                   : nothing}
               </button>
             `

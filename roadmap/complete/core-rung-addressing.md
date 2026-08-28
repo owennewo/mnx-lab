@@ -178,10 +178,24 @@ the current N relax/tighten steps.
 
 ### 8. The tray's ladder column prints the ordinals
 
-Dim `1`–`8` at the rungs' own indent. Nothing in the UI numbers the rungs today,
-which is the one real objection to a numeric tier — so the slow surface becomes
-the legend for the fast one, which is how every palette-plus-shortcut pairing
-works. One render change, no new gesture.
+Dim `1`–`8` **leading** each rung — `1 note`, not `note 1`. Nothing in the UI
+numbers the rungs today, which is the one real objection to a numeric tier — so
+the slow surface becomes the legend for the fast one, which is how every
+palette-plus-shortcut pairing works. One render change, no new gesture.
+
+> **Revised the same day.** The ordinals shipped on the rung's *trailing* edge,
+> to protect the word's x — one of the four things
+> [workbench-selection-chip-ladder.md](workbench-selection-chip-ladder.md) asked
+> to survive the chip opening into the tray. Hands-on that reads as a footnote
+> rather than an index: the eye finds the word first and the number is a thing
+> you go looking for, which is the opposite of a legend's job. Moved to the
+> leading edge, **knowingly spending that x**. The word, its case, its box and
+> the red still cross the transition; a fixed-width ordinal keeps every word
+> aligned with every other, which is the alignment the column is read down, and
+> the global row carries a blank one so it does not fall out of that line.
+> Mirrored, the row is pushed right rather than reversed — an index that swaps
+> sides depending on which way the tray opened is a worse legend than one that
+> does not.
 
 ### 9. Shift+digits work inside the open tray
 
