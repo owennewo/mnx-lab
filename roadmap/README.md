@@ -67,11 +67,15 @@ proposals that name their campaign.
   innermost open thing, stated once as a mirror of `ESCAPE_PRECEDENCE`. Two defects fall
   out of making that possible — the spanner anchor is kindless, so cross-kind completion
   is reachable (arm with `S`, finish with `B`) and the HUD says "slur from" over an armed
-  beam — and one gap closes: `TabDigitResolver.cancel()` finally gets a key, where Escape
-  mid-fret-entry currently *writes* the fret. `walkToLevel` stops parking on an absent
+  beam — plus a third found while closing an open question: `toggleSlur` tests "a slur
+  already starts here" **above** "an anchor is armed elsewhere", so completing onto a note
+  that already carries a slur deletes that slur and throws the anchor away. One gap
+  closes too: `TabDigitResolver.cancel()` finally gets a key, where Escape mid-fret-entry
+  currently *writes* the fret. `walkToLevel` stops parking on an absent
   rung (a `goToLevel` intent, presence-guarded, one trace entry per keypress), and the
   tray's ladder column prints the ordinals so the slow surface is the legend for the fast
-  one. `/{n}` rejected with reasons; the AZERTY shifted-digit-row cost accepted with eyes
+  one — and the digits reach **into** the open tray, inheriting the preview/commit split
+  Shift+↑/↓ already has there. `/{n}` rejected with reasons; the AZERTY shifted-digit-row cost accepted with eyes
   open. Carries the stale-doc sweep: eight normative code comments and four complete
   roadmap docs needing dated amendment notes.
 - **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3,

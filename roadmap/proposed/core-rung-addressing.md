@@ -112,6 +112,24 @@ Two live defects fall out of the same change:
 not a replacement, and it dispatches the armed kind's own intent — so the trace
 still records `toggleSlur` twice and replay is bit-for-bit what it is today.
 
+### 5b. An armed anchor outranks a spanner already at the cursor
+
+`toggleSlur` runs its branches in this order: bulk-slur a selected range → **a
+slur already starts here, remove it and clear the anchor** → an anchor is armed
+elsewhere, complete → otherwise arm. The remove branch sits *above* the complete
+branch, and `toggleBeam` has the identical shape with `beamStartingAt`.
+
+So arming at A, moving to X, and pressing `S` where X already starts a slur
+**deletes X's slur and discards the armed anchor** instead of writing A→X. That
+is live today; Enter does not cause it but makes it indefensible, because a key
+whose whole meaning is "commit what I armed" would silently remove something
+unrelated.
+
+**Reorder: an armed anchor wins.** The gesture then always completes, and
+removing X's own slur is still one more `S` away. This changes `S`'s behaviour
+in a case that exists now, so it is recorded as a decision rather than smuggled
+in as a fix.
+
 ### 6. The fret buffer gets the abandon key it never had
 
 `TabDigitResolver.cancel()` drops a pending digit without touching the document
@@ -143,6 +161,18 @@ Dim `1`–`8` at the rungs' own indent. Nothing in the UI numbers the rungs toda
 which is the one real objection to a numeric tier — so the slow surface becomes
 the legend for the fast one, which is how every palette-plus-shortcut pairing
 works. One render change, no new gesture.
+
+### 9. Shift+digits work inside the open tray
+
+The tray *is* the ladder, so the digits reach it. They need no new semantics:
+Shift+↑/↓ already **previews** inside the tray (`tray-rung-preview`) and jumps
+directly outside it, so Shift+digit inherits that rule unchanged — preview
+inside, jump outside, Enter commits either way.
+
+The one mechanical cost is a carve-out. `SelectionTray.ts:1122` routes any
+printable character to the query line, and `event.key` for Shift+1 is `!` on
+QWERTY (`1` on AZERTY) — length 1 either way — so the digits must be tested for
+ahead of that rule, beside the existing second-`/` widen case.
 
 ## Rejected: `/{n}`
 
@@ -197,7 +227,7 @@ emulation presets `keymap.ts:8` reserves.
 `ESCAPE_PRECEDENCE` block as the two-sided contract.
 
 **2 · `src/edit/intents.ts`, `src/edit/session.ts`** — add `goToLevel` (presence-
-guarded) and `dropAnchor`; kind the anchor and refuse cross-kind completion;
+guarded) and `dropAnchor`; kind the anchor, refuse cross-kind completion and reorder the complete branch above the remove branch in both `toggleSlur` and `toggleBeam` (5b);
 remove the anchor branch from `relaxSelection` (`session.ts:1358`) so Shift+↑
 means widen with no first-press exception; update the `spanAnchor` getter.
 
@@ -207,7 +237,7 @@ onto `goToLevel` with the no-op flash; drop the relax-past-top/`cursorHidden`
 special-casing at `:2293` and `:2320` in favour of an explicit deselect; make the
 `· slur from …` strip and its tooltip kind-aware.
 
-**4 · `src/workbench/SelectionTray.ts`** — ordinals in the ladder column.
+**4 · `src/workbench/SelectionTray.ts`** — ordinals in the ladder column; Shift+digit carved out ahead of the printable-character rule at `:1122` and emitting `tray-rung-preview`, so it lands where Shift+↑/↓ already does.
 
 **5 · Tests.** `keymap-docs.test.ts` runs the binding↔documentation join **both
 ways**, so this cannot be half-done: retire the Escape/Enter ladder rows, add
@@ -252,14 +282,25 @@ behaviour: `core-keymap-cheatsheet.md:58` (describing the problem as it stood),
 
 ## Open questions
 
-- **Do Shift+digits punch through an open tray?** The tray *is* the ladder, so
-  arguably yes — but `event.key` for Shift+1 is `!`, length 1, so it currently
-  reaches type-to-search and would need carving out ahead of that rule. Leaving
-  them to the search box is defensible and cheaper.
-- **Does Enter-completes-a-spanner record `toggleSlur` or a key of its own?**
-  Recommended above as the kind's own intent, so replay is unchanged — but it
-  does mean the trace shows a letter the user did not press, which the spanners
-  doc's "the recorded intent is what was pressed" was written against.
 - **What else earns Escape once it is free?** Deliberately unanswered. The point
   of this item is to stop Escape doing the wrong thing; finding it more work is a
   separate decision and a separate doc.
+
+## Questions raised and closed, 2026-08-28
+
+- ~~**Do Shift+digits punch through an open tray?**~~ **Yes** — decision 9. The
+  preview/commit split the tray already applies to Shift+↑/↓ answers it, so
+  nothing new is being decided, only carved out.
+- ~~**Does Enter-completes-a-spanner record `toggleSlur` or a key of its own?**~~
+  **`toggleSlur`, and the concern was misplaced.** A trace is a log of *intents*,
+  replayable to rebuild a document — not a log of keystrokes. The spanners doc's
+  "the recorded intent is what was pressed" guards against **synthesizing a
+  compound op no keypress produces** (a `createSlur(A, B)` that hides the
+  two-press gesture and makes replay diverge from what a player does);
+  `toggleSlur` is an atomic intent a real key already emits. Resolving a stroke
+  into another intent is the house pattern, stated twice: `ScenarioPage.ts:2308`
+  resolves the system-rung arrows to `goToMeasure` "so the trace records a bar,
+  never a paint", and `keymap.ts:171` has shell actions record "the
+  `setTimeSignature`/`setTuning` intent the popover eventually emits, never the
+  popover opening". Enter is a shell action here, so this *is* the popover
+  pattern. Checking it is what surfaced **5b**, which is the real defect.
