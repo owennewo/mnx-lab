@@ -174,8 +174,8 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     remove: ['removeFullMeasureRest']
   },
   'measure-repeat': {
-    classes: [],
-    note: 'Renderer gap — the repeat sign is not drawn yet.',
+    classes: ['measure-repeat', 'measure-repeat-number', 'measure-repeat-counter'],
+    note: 'The ％ sign on the middle line (two-bar form on the barline), the span number and the counter above (core-measure-attributes-gaps.md, item 3).',
     construct: ['setMeasureRepeat'],
     remove: ['removeMeasureRepeat']
   },

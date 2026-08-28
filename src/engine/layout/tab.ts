@@ -10,6 +10,7 @@ import {
   emitTabTimeSig,
   emitTabVoices
 } from './tabStaff.ts';
+import { emitMeasureRepeat, measureRepeatX, type MeasureRepeatMark } from './measureRepeat.ts';
 import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barlines.ts';
 import { emitNavigationMarkers, emitScoreLabels, emitTempoMark } from './scoreText.ts';
 import { clampPadDensity, ensureTopMargin, tightenRows } from './verticalDensity.ts';
@@ -204,6 +205,21 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     // Time signature (digits centred in upper and lower halves of the staff)
     if (m.showTimeSig) {
       emitTabTimeSig(m.timeSig, m.timeSigCentreX, staffTop, primitives);
+    }
+
+    // A measure repeat: the sign on the tab staff, labels included — this
+    // view has no notation staff to carry them.
+    const repeatMark = (partMeasure as { measureRepeat?: MeasureRepeatMark }).measureRepeat;
+    if (repeatMark) {
+      const spanEnd = plan.measures[i + Math.max(1, repeatMark.number) - 1];
+      emitMeasureRepeat({
+        mark: repeatMark,
+        x: measureRepeatX(repeatMark.number, m, spanEnd && spanEnd.row === m.row ? spanEnd.x + spanEnd.width : undefined),
+        staffTop,
+        staffHeight: STAFF_HEIGHT_SP,
+        labels: true,
+        primitives
+      });
     }
 
     // Events per voice (staff 1 only — the same filter the plan was built from)

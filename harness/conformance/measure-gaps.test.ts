@@ -29,7 +29,6 @@ describe('measureLevelGaps', () => {
       'fermata on the bar — not drawn',
       '2 tempo marks — only the first is drawn',
       'chord symbols (harmonies) — not drawn',
-      'measure repeat — the repeat sign is not drawn',
       'arpeggio — not drawn',
       'non-arpeggio bracket — not drawn',
       'hairpin (gradual dynamic) — not drawn',

@@ -1601,8 +1601,7 @@ export function measureLevelGaps(
     gaps.push('chord symbols (harmonies) — not drawn');
   for (const pm of partMeasures) {
     if (!pm) continue;
-    const extra = pm as MnxPartMeasure & { measureRepeat?: unknown; arpeggios?: unknown[]; nonArpeggios?: unknown[] };
-    if (extra.measureRepeat !== undefined) gaps.push('measure repeat — the repeat sign is not drawn');
+    const extra = pm as MnxPartMeasure & { arpeggios?: unknown[]; nonArpeggios?: unknown[] };
     if ((extra.arpeggios?.length ?? 0) > 0) gaps.push('arpeggio — not drawn');
     if ((extra.nonArpeggios?.length ?? 0) > 0) gaps.push('non-arpeggio bracket — not drawn');
     for (const d of pm.dynamics ?? []) {

@@ -170,29 +170,22 @@
         "className": "barline"
       },
       {
-        "kind": "rect",
-        "x": 29.2,
-        "y": 13.2,
-        "w": 1.1,
-        "h": 1.1,
-        "radius": 0.3,
-        "fill": "#b45309",
-        "className": "diagnostic-marker diagnostic-render",
-        "title": "renderer — measure repeat — the repeat sign is not drawn"
+        "kind": "glyph",
+        "glyph": "repeat1Bar",
+        "x": 32.9,
+        "y": 10,
+        "anchor": "middle",
+        "className": "measure-repeat"
       },
       {
         "kind": "text",
-        "text": "!",
-        "x": 29.75,
-        "y": 13.75,
+        "text": "2",
+        "x": 32.9,
+        "y": 7,
         "font": "body",
-        "size": 0.9,
-        "weight": "bold",
+        "size": 1.2,
         "anchor": "middle",
-        "baseline": "central",
-        "fill": "#fff",
-        "className": "diagnostic-marker diagnostic-render",
-        "title": "renderer — measure repeat — the repeat sign is not drawn"
+        "className": "measure-repeat-counter"
       },
       {
         "kind": "line",
@@ -249,29 +242,22 @@
         "className": "barline"
       },
       {
-        "kind": "rect",
-        "x": 36.6,
-        "y": 13.2,
-        "w": 1.1,
-        "h": 1.1,
-        "radius": 0.3,
-        "fill": "#b45309",
-        "className": "diagnostic-marker diagnostic-render",
-        "title": "renderer — measure repeat — the repeat sign is not drawn"
+        "kind": "glyph",
+        "glyph": "repeat1Bar",
+        "x": 40.3,
+        "y": 10,
+        "anchor": "middle",
+        "className": "measure-repeat"
       },
       {
         "kind": "text",
-        "text": "!",
-        "x": 37.15,
-        "y": 13.75,
+        "text": "3",
+        "x": 40.3,
+        "y": 7,
         "font": "body",
-        "size": 0.9,
-        "weight": "bold",
+        "size": 1.2,
         "anchor": "middle",
-        "baseline": "central",
-        "fill": "#fff",
-        "className": "diagnostic-marker diagnostic-render",
-        "title": "renderer — measure repeat — the repeat sign is not drawn"
+        "className": "measure-repeat-counter"
       },
       {
         "kind": "line",
@@ -337,29 +323,22 @@
         "className": "barline barline-final-thick"
       },
       {
-        "kind": "rect",
-        "x": 44,
-        "y": 13.2,
-        "w": 1.1,
-        "h": 1.1,
-        "radius": 0.3,
-        "fill": "#b45309",
-        "className": "diagnostic-marker diagnostic-render",
-        "title": "renderer — measure repeat — the repeat sign is not drawn"
+        "kind": "glyph",
+        "glyph": "repeat1Bar",
+        "x": 47.7,
+        "y": 10,
+        "anchor": "middle",
+        "className": "measure-repeat"
       },
       {
         "kind": "text",
-        "text": "!",
-        "x": 44.55,
-        "y": 13.75,
+        "text": "4",
+        "x": 47.7,
+        "y": 7,
         "font": "body",
-        "size": 0.9,
-        "weight": "bold",
+        "size": 1.2,
         "anchor": "middle",
-        "baseline": "central",
-        "fill": "#fff",
-        "className": "diagnostic-marker diagnostic-render",
-        "title": "renderer — measure repeat — the repeat sign is not drawn"
+        "className": "measure-repeat-counter"
       }
     ]
   }

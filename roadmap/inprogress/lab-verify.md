@@ -104,14 +104,23 @@ the diff on each golden is the badge primitives (rect, title, glyph) and nothing
 `lab/dynamics/hairpin-and-relative`, `lab/articulations/arpeggiated-chords` (the first
 was `rendered` already, so three demote).
 
+**Moved again the same day (item 3).** The two `spec/measure-repeats*` goldens moved a
+second time: the ％ sign is now drawn (`src/engine/layout/measureRepeat.ts`) and its
+badge retired. What to look for on those two changed — see below.
+
 **Never-seen (1).** `lab/pitches/alto-and-tenor-clefs` — new, authored to pin the C clef
 (bug 4 of the same doc: a C clef drew as a treble clef and placed every pitch a sixth
 wrong; no scenario had a C clef). Alto in bar 1, tenor in bar 2, the same four pitches.
 
-**What a reviewer should look for.** On the four stale ones: the music is unchanged and
-each affected bar now carries an amber badge at its bottom-left whose tooltip names the
-undrawn attribute — one badge per attribute (`measure-repeats-with-counters` gets three
-bars × one badge; `hairpin-and-relative` two). If any *ink* moved, reject. On the clef
+**What a reviewer should look for.** On `hairpin-and-relative` and `arpeggiated-chords`:
+the music is unchanged and each affected bar carries an amber badge at its bottom-left
+whose tooltip names the undrawn attribute — one badge per attribute. If any *ink* moved,
+reject. On the two `measure-repeats*`: both are spec-mirrored, so the CG's reference
+engraving in the compare pane is the verdict. `measure-repeats`: a one-bar ％ on the
+middle line, centred, in bars 2 and 4; the two-bar sign ON the barline between bars 7 and
+8 with `2` above it; no badge anywhere. `measure-repeats-with-counters`: three one-bar
+signs with `2`, `3`, `4` above them. The sign is Bravura's `repeat1Bar`/`repeat2Bars`,
+so its size and slash angle are the font's, not ours. On the clef
 scenario: the alto clef sits on the middle line with middle C on it; the tenor clef on
 the fourth line with middle C there; the E–G–A pattern shifts one line between bars.
 

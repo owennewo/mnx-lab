@@ -495,8 +495,11 @@ function voiceMeasurePills(doc: MnxStructure, member: Extract<SelectionMember, {
   const pills: InspectorPill[] = [];
   if (sequence?.fullMeasure)
     pills.push(annotation('fullMeasureRest', 'full-measure rest', sequence.fullMeasure.visualDuration ? durationText(sequence.fullMeasure.visualDuration) : '', { type: 'removeFullMeasureRest' }));
-  if (measure?.measureRepeat)
-    pills.push(annotation('measureRepeat', 'measure repeat', `${measure.measureRepeat.number}`, { type: 'removeMeasureRepeat' }));
+  if (measure?.measureRepeat) {
+    const mr = measure.measureRepeat as { number: number; counter?: { count: number; orient?: string } };
+    const counter = mr.counter ? ` counter ${mr.counter.count}${mr.counter.orient === 'below' ? ' below' : ''}` : '';
+    pills.push(annotation('measureRepeat', 'measure repeat', `${mr.number}${counter}`, { type: 'removeMeasureRepeat' }));
+  }
   return pills;
 }
 

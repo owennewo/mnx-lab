@@ -15,9 +15,7 @@
 <line x1="289.6" y1="176" x2="408" y2="176" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="289.6" y1="192" x2="408" y2="192" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="408" y1="128" x2="408" y2="192" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<rect x="294.4" y="211.2" width="17.6" height="17.6" fill="#b45309" rx="4.8" ry="4.8" class="diagnostic-marker diagnostic-render">
-<title>renderer — measure repeat — the repeat sign is not drawn</title></rect>
-<text x="303.2" y="220" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-render">!<title>renderer — measure repeat — the repeat sign is not drawn</title></text>
+<text x="353.6" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="measure-repeat"></text>
 <line x1="408" y1="128" x2="569.6" y2="128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="408" y1="144" x2="569.6" y2="144" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="408" y1="160" x2="569.6" y2="160" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
@@ -32,9 +30,7 @@
 <line x1="569.6" y1="192" x2="688" y2="192" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="683.2" y1="128" x2="683.2" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-double"></line>
 <line x1="688" y1="128" x2="688" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-double"></line>
-<rect x="574.4" y="211.2" width="17.6" height="17.6" fill="#b45309" rx="4.8" ry="4.8" class="diagnostic-marker diagnostic-render">
-<title>renderer — measure repeat — the repeat sign is not drawn</title></rect>
-<text x="583.2" y="220" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-render">!<title>renderer — measure repeat — the repeat sign is not drawn</title></text>
+<text x="633.6" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="measure-repeat"></text>
 <line x1="688" y1="128" x2="849.6" y2="128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="688" y1="144" x2="849.6" y2="144" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="688" y1="160" x2="849.6" y2="160" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
@@ -55,9 +51,8 @@
 <line x1="1011.2" y1="176" x2="1129.6" y2="176" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="1011.2" y1="192" x2="1129.6" y2="192" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="1129.6" y1="128" x2="1129.6" y2="192" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<rect x="1016" y="211.2" width="17.6" height="17.6" fill="#b45309" rx="4.8" ry="4.8" class="diagnostic-marker diagnostic-render">
-<title>renderer — measure repeat — the repeat sign is not drawn</title></rect>
-<text x="1024.8" y="220" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-render">!<title>renderer — measure repeat — the repeat sign is not drawn</title></text>
+<text x="1129.6" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="measure-repeat"></text>
+<text x="1129.6" y="112" font-family="var(--font-family-sans)" font-size="19.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="measure-repeat-number">2</text>
 <line x1="1129.6" y1="128" x2="1248" y2="128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="1129.6" y1="144" x2="1248" y2="144" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="1129.6" y1="160" x2="1248" y2="160" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>

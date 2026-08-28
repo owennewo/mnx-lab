@@ -1,5 +1,6 @@
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
+import { emitMeasureRepeat, measureRepeatX, type MeasureRepeatMark } from './measureRepeat.ts';
 import { validateDocument } from './validate.ts';
 import { dynamicGlyph, dynamicLabel } from './dynamics.ts';
 import {
@@ -1834,6 +1835,21 @@ function assembleSegment(
       if (i === 0) emitTabSystemHeader(td.ctx, m.x, tabTop, plan.inkRatio, primitives);
       if (m.firstInSystem) emitTabClef(m.clefX, tabTop, primitives);
       if (m.showTimeSig) emitTabTimeSig(m.timeSig, m.timeSigCentreX, tabTop, primitives);
+      {
+        const tabMark = (td.part.measures?.[i] as { measureRepeat?: MeasureRepeatMark } | undefined)?.measureRepeat;
+        if (tabMark) {
+          const spanEnd = plan.measures[i + Math.max(1, tabMark.number) - 1];
+          emitMeasureRepeat({
+            mark: tabMark,
+            x: measureRepeatX(tabMark.number, m, spanEnd && spanEnd.row === m.row ? spanEnd.x + spanEnd.width : undefined),
+            staffTop: tabTop,
+            staffHeight: TAB_STAFF_HEIGHT_SP,
+            // The notation staff above carries the labels in this view.
+            labels: false,
+            primitives
+          });
+        }
+      }
       if (!m.multiRest) {
         emitTabVoices({
           voices: resolvedByStaff[td.planStaff]?.map(v => v.seq) ?? [],
@@ -1965,6 +1981,24 @@ function assembleSegment(
           className: 'rest rest-full-measure'
         });
       }
+    });
+
+    // Measure repeats: the ％ sign on every staff of the part that declares
+    // one, labels (span number, counter) once per bar on its first staff.
+    segment.staves.forEach((planStaff, s) => {
+      const part = planStaff.sources[planStaff.sources.length - 1]?.part;
+      const mark = (part?.measures?.[i] as { measureRepeat?: MeasureRepeatMark } | undefined)?.measureRepeat;
+      if (!mark) return;
+      const first = segment.staves.findIndex(st => st.sources.some(src => src.part === part));
+      const spanEnd = plan.measures[i + Math.max(1, mark.number) - 1];
+      emitMeasureRepeat({
+        mark,
+        x: measureRepeatX(mark.number, m, spanEnd && spanEnd.row === m.row ? spanEnd.x + spanEnd.width : undefined),
+        staffTop: staffTops[s],
+        staffHeight: STAFF_HEIGHT_SP,
+        labels: s === first,
+        primitives
+      });
     });
 
     if (ottavaOnsets) {

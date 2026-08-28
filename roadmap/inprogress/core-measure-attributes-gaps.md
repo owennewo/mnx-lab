@@ -3,7 +3,9 @@
 > **Status: IN PROGRESS 2026-08-28 — items 1 and 2 built the same day** (the badge; the
 > four bugs, with the C clef pinned by a new scenario). Goldens moved by exactly one badge
 > per undrawn attribute; batch 7 in [lab-verify.md](lab-verify.md) registers them.
-> Items 3–8 open. A census, then a work list. Prompted by
+> **Item 3 built the same day too** — measure repeats engrave (`layout/measureRepeat.ts`),
+> on notation, standalone tab and the both-view tab staves, and the badge retired.
+> Items 4–8 open. A census, then a work list. Prompted by
 > `spec/measure-repeats-with-counters` reading as a regression after the rung inspector
 > ([workbench-rung-inspector.md](workbench-rung-inspector.md)) started
 > naming `measure repeat: 1` on bars whose staff is empty — it was never a regression:
@@ -174,6 +176,15 @@ Found by the sweep and confirmed by hand; each is a one-file fix and a test:
    inspector's `tempo#N` key; `removePositioned` matches the cursor's staff; `clefGlyph`
    gains `cClef` and every clef now honours `staffPosition` (`clefLineY`), pinned by
    `lab/pitches/alto-and-tenor-clefs`.
+
+3. ✅ **Measure repeats** (2026-08-28) — one emitter, `emitMeasureRepeat`: the ％ sign
+   (`repeat1Bar`/`repeat2Bars`/`repeat4Bars` by `number`) on the middle line; the one-bar
+   form centred in the bar, the two-bar form on the barline it covers, longer spans
+   centred over the span; the span number above when > 1 (`displayNumber: false` turns
+   it off); the counter above or below per `orient`. Labels once per bar (the notation
+   staff carries them in the both view), the sign on every staff of the part. The
+   inspector pill grows the counter (`measure repeat: 1 counter 3`). Both spec goldens
+   moved again — batch 7 says what to look for.
 
 Original plan:
 
