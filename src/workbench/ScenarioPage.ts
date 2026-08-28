@@ -2595,7 +2595,7 @@ export class ScenarioPage extends LitElement {
    *  read as broken. */
   private applyInspectorLine(word: string | null, text: string) {
     if (!this.session) return;
-    const parsed = parseInspectorLine(word, text);
+    const parsed = parseInspectorLine(this.session.selectionLevel, word, text);
     if ('error' in parsed) {
       this.inspectorError = parsed.error;
       return;
@@ -2607,8 +2607,20 @@ export class ScenarioPage extends LitElement {
     if (!this.session) return;
     this.flushPendingFret();
     this.cursorHidden = false;
+    const level = this.session.selectionLevel;
     const ok = this.session.handleIntent(intent);
     this.inspectorError = ok ? null : 'the document refused that — nothing to remove, or it does not fit';
+    // A point edit re-anchors the selection at the note (session.apply's
+    // rule). The inspector is a view of ONE rung, so it puts the ladder back
+    // where it was — otherwise applying an event pill would drop you to the
+    // note rung and the pills would change under your cursor.
+    const moved =
+      intent.type === 'relaxSelection' ||
+      intent.type === 'tightenSelection' ||
+      intent.type === 'goToLevel' ||
+      intent.type === 'extendSelection';
+    if (ok && !moved && this.session.selectionLevel !== level)
+      this.session.handleIntent({ type: 'goToLevel', level });
     this.copied = false;
     this.syncFromSession();
   }
@@ -2959,6 +2971,9 @@ export class ScenarioPage extends LitElement {
           this.fireFromInspector({
             type: e.detail.direction === 'relax' ? 'relaxSelection' : 'tightenSelection'
           });
+        }}
+        @inspector-extend=${(e: CustomEvent<{ direction: 'previous' | 'next' }>) => {
+          this.fireFromInspector({ type: 'extendSelection', direction: e.detail.direction });
         }}
         @inspector-goto=${(e: CustomEvent<{ intent: EditorIntent }>) => {
           this.fireFromInspector(e.detail.intent);

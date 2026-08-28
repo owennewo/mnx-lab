@@ -413,12 +413,12 @@ export function parseBarAttribute(text: string): BarAttributeResult {
 // with two owners: a bare marking word, a bare dynamic word, or `text …`.
 // Removal keeps item 7's `no <thing>` token — these are annotations too.
 
-const MARKING_WORDS = [
+export const MARKING_WORDS = [
   'accent', 'breath', 'softAccent', 'spiccato', 'staccatissimo', 'staccato',
   'stress', 'strongAccent', 'tenuto'
 ] as const;
 
-const DYNAMIC_WORDS = [
+export const DYNAMIC_WORDS = [
   'pppppp', 'ppppp', 'pppp', 'ppp', 'pp', 'p', 'mp', 'mf',
   'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff', 'n'
 ] as const;
@@ -435,7 +435,7 @@ export type AdornmentResult =
    *  plain form; a bend that is released, or bent by something other than a
    *  tone, needs words — so the popover carries them, as it does for the
    *  other adornments whose shape exceeds a keystroke. */
-  | { technique: { kind: 'bend'; semitones?: number; release?: boolean } }
+  | { technique: { kind: 'bend'; semitones?: number; release?: boolean; pre?: number } }
   | { fingering: { hand: 'left' | 'right'; finger: string } }
   | { removeFingering: true }
   // The accidental's DISPLAY is note-level ink like the markings, so it lives
@@ -508,6 +508,21 @@ export function parseAdornment(text: string): AdornmentResult {
     return { removeFingering: true };
 
   // `bend`, `bend 3`, `bend release` — the shapes the `B` key cannot say.
+  // `bend pre 1 2 release`: the inspector's dotted form flattened — a
+  // pre-bend of 1, up to 2, let back down (workbench-rung-inspector.md).
+  const bendCurve = /^bend(?:\s+pre\s+(\d+(?:\.\d+)?))?(?:\s+(\d+(?:\.\d+)?))?(?:\s+(release))?$/.exec(
+    trimmed.toLowerCase()
+  );
+  if (bendCurve && (bendCurve[1] !== undefined || (bendCurve[2] !== undefined && bendCurve[3] !== undefined))) {
+    return {
+      technique: {
+        kind: 'bend',
+        ...(bendCurve[2] !== undefined ? { semitones: Number(bendCurve[2]) } : {}),
+        ...(bendCurve[3] ? { release: true } : {}),
+        ...(bendCurve[1] !== undefined ? { pre: Number(bendCurve[1]) } : {})
+      }
+    };
+  }
   const bend = /^bend(?:\s+(release|\d+))?$/.exec(trimmed.toLowerCase());
   if (bend) {
     const qualifier = bend[1];

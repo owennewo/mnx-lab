@@ -21,8 +21,14 @@ import {
   keyWord,
   measurePills,
   parseInspectorLine,
-  timeAt
+  pillsFor,
+  techniqueText,
+  timeAt,
+  wordsFor
 } from '../../src/edit/inspector.ts';
+import { readPositionedAttributes, readTechniques, type PositionedAttribute, type TechniqueChoice } from '../../src/edit/ops.ts';
+import type { SelectionLevel } from '../../src/edit/selection.ts';
+import { parseRhythm } from '../../src/edit/setupGrammar.ts';
 
 const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
 
@@ -171,7 +177,7 @@ describe('the typeahead is derived from the union', () => {
 
   it('every kind’s typed form parses back to the same attribute', () => {
     for (const attribute of ONE_OF_EACH) {
-      const parsed = parseInspectorLine(null, attributeText(attribute));
+      const parsed = parseInspectorLine('measure', null, attributeText(attribute));
       expect(parsed, attribute.kind).toEqual({
         intent: { type: 'setMeasureAttribute', attribute }
       });
@@ -179,22 +185,22 @@ describe('the typeahead is derived from the union', () => {
   });
 
   it('an amend prepends the pill’s word — one op, an upsert', () => {
-    expect(parseInspectorLine('tempo', 'half=80')).toEqual({
+    expect(parseInspectorLine('measure', 'tempo', 'half=80')).toEqual({
       intent: { type: 'setMeasureAttribute', attribute: { kind: 'tempo', bpm: 80, base: 'half' } }
     });
-    expect(parseInspectorLine('time', '3/4')).toEqual({
+    expect(parseInspectorLine('measure', 'time', '3/4')).toEqual({
       intent: { type: 'setTimeSignature', count: 3, unit: 4 }
     });
-    expect(parseInspectorLine('key', keyWord(3))).toEqual({
+    expect(parseInspectorLine('measure', 'key', keyWord(3))).toEqual({
       intent: { type: 'setKeySignature', fifths: 3 }
     });
-    expect(parseInspectorLine('key', 'inherit')).toEqual({ intent: { type: 'removeKeySignature' } });
+    expect(parseInspectorLine('measure', 'key', 'inherit')).toEqual({ intent: { type: 'removeKeySignature' } });
   });
 
   it('says why a line was refused rather than doing nothing', () => {
-    expect(parseInspectorLine(null, 'banana')).toMatchObject({ error: expect.stringContaining('not a bar attribute') });
-    expect(parseInspectorLine('time', 'x')).toMatchObject({ error: expect.stringContaining('time signature') });
-    expect(parseInspectorLine(null, 'full-measure rest')).toMatchObject({ error: expect.stringContaining('Shift+B') });
+    expect(parseInspectorLine('measure', null, 'banana')).toMatchObject({ error: expect.stringContaining('not a bar attribute') });
+    expect(parseInspectorLine('measure', 'time', 'x')).toMatchObject({ error: expect.stringContaining('time signature') });
+    expect(parseInspectorLine('measure', null, 'full-measure rest')).toMatchObject({ error: expect.stringContaining('Shift+B') });
   });
 });
 
@@ -215,5 +221,226 @@ describe('the surface is honest about what it emits', () => {
     for (const type of SURFACE_INTENTS.rungInspector ?? []) {
       expect(handled.has(type), type).toBe(true);
     }
+  });
+});
+
+
+// ── stages 4–5: the other rungs, and ranges ──────────────────────────────────
+
+/** A part with notes to stand on: two quarters and a rest per bar. */
+function makeNoteDoc(): MnxStructure {
+  const bar = (ids: [string, string]) => ({
+    sequences: [
+      {
+        content: [
+          { duration: { base: 'quarter' as const }, notes: [{ id: ids[0], pitch: { step: 'E' as const, octave: 4 }, _x: { mnxLab: { string: 1 } } }] },
+          { duration: { base: 'quarter' as const }, notes: [{ id: ids[1], pitch: { step: 'G' as const, octave: 4 }, _x: { mnxLab: { string: 1 } } }] },
+          { duration: { base: 'half' as const }, rest: {} }
+        ]
+      }
+    ]
+  });
+  return {
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }, {}] },
+    parts: [
+      {
+        id: 'p1',
+        name: 'Guitar',
+        measures: [bar(['a', 'b']), bar(['c', 'd'])],
+        _x: { mnxLab: { strings: [...STANDARD_GUITAR_STRINGS], capo: 2 } }
+      }
+    ]
+  };
+}
+
+const at = (level: SelectionLevel, doc = makeNoteDoc()) => {
+  const session = new EditorSession(doc);
+  session.handleIntent({ type: 'goToLevel', level });
+  return session;
+};
+/** What the page does after every inspector edit: a point edit re-anchors the
+ *  selection at the note, and the inspector puts the rung back. */
+const edit = (session: EditorSession, intent: Parameters<EditorSession['handleIntent']>[0]) => {
+  const level = session.selectionLevel;
+  const ok = session.handleIntent(intent);
+  if (ok && session.selectionLevel !== level) session.handleIntent({ type: 'goToLevel', level });
+  return ok;
+};
+const scope = (session: EditorSession) => ({
+  doc: session.doc,
+  level: session.selectionLevel,
+  members: session.resolvedSelection.members
+});
+const pillText = (session: EditorSession) =>
+  pillsFor(scope(session)).map(p => `${p.word}: ${p.value}${p.partial ? ' ~' : ''} [${p.pillClass}]`);
+
+describe('event pills', () => {
+  it('read the duration as a floor, and each marking, positioned attribute and syllable as removable', () => {
+    const session = at('event');
+    expect(pillText(session)).toEqual(['duration: quarter [floor]']);
+    for (const text of ['staccato', 'breath comma', 'dynamic mf', 'text below cantabile', '8va 2', 'lyric sleep-']) {
+      const parsed = parseInspectorLine('event', null, text);
+      expect(parsed, text).toHaveProperty('intent');
+      expect(edit(session, (parsed as { intent: never }).intent), text).toBe(true);
+    }
+    expect(pillText(session)).toEqual([
+      'duration: quarter [floor]',
+      'staccato:  [annotation]',
+      'breath: comma [annotation]',
+      'dynamic: mf [annotation]',
+      'text: below cantabile [annotation]',
+      '8va: 2 [annotation]',
+      'lyric: sleep- [annotation]'
+    ]);
+    // Every removal lands, and the pill goes.
+    for (const pill of pillsFor(scope(session))) {
+      if (!pill.remove) continue;
+      expect(edit(session, pill.remove), pill.key).toBe(true);
+      expect(pillsFor(scope(session)).find(p => p.key === pill.key)).toBeUndefined();
+    }
+  });
+
+  it('duration is amended by value — one op, refused when unchanged', () => {
+    const session = at('event');
+    expect(parseInspectorLine('event', 'duration', 'quarter')).toEqual({ intent: { type: 'setEventDuration', base: 'quarter' } });
+    expect(session.handleIntent({ type: 'setEventDuration', base: 'quarter' })).toBe(false);
+    expect(edit(session, { type: 'setEventDuration', base: 'eighth', dots: 1 })).toBe(true);
+    expect(pillText(session)[0]).toBe('duration: eighth. [floor]');
+    expect(parseInspectorLine('event', 'duration', 'banana')).toHaveProperty('error');
+  });
+
+  it('readPositionedAttributes is the reverse of setPositioned, for every kind', () => {
+    const cases: PositionedAttribute[] = [
+      { kind: 'dynamic', value: 'mf' },
+      { kind: 'dynamic', dynamicType: 'gradual', wedgeType: 'increasing' },
+      { kind: 'direction', text: 'cantabile', orient: 'below' },
+      { kind: 'ottava', value: 1, bars: 2 }
+    ];
+    for (const attribute of cases) {
+      const session = at('event');
+      expect(session.handleIntent({ type: 'setPositioned', attribute })).toBe(true);
+      const read = readPositionedAttributes(session.doc, { partIndex: 0, staffIndex: 1, measureIndex: 0 }, [0, 1]);
+      expect(read.map(r => r.attribute), attribute.kind).toContainEqual(attribute);
+    }
+  });
+});
+
+describe('note pills', () => {
+  it('read string, accidental, fingering and techniques, then the event’s own', () => {
+    const session = at('note');
+    expect(pillText(session)).toEqual(['string: 1 [annotation]']);
+    for (const text of ['accidental parens', 'finger left 3', 'vibrato', 'bend pre 1 2 release', 'staccato']) {
+      const parsed = parseInspectorLine('note', null, text);
+      expect(parsed, text).toHaveProperty('intent');
+      expect(edit(session, (parsed as { intent: never }).intent), text).toBe(true);
+    }
+    expect(pillText(session)).toEqual([
+      'string: 1 [annotation]',
+      'accidental: parens [annotation]',
+      'fingering: left 3 [annotation]',
+      'bend: pre 1 2 release [annotation]',
+      'vibrato:  [annotation]',
+      'staccato:  [annotation]'
+    ]);
+  });
+
+  it('a bend round-trips through the widened op — pre, peak, release — and amends without toggling', () => {
+    const cases: TechniqueChoice[] = [
+      { kind: 'bend', semitones: 2 },
+      { kind: 'bend', semitones: 2, release: true },
+      { kind: 'bend', semitones: 2, pre: 1 },
+      { kind: 'bend', semitones: 3, release: true, pre: 1 },
+      { kind: 'bend', semitones: 2, pre: 1, release: true }
+    ];
+    for (const technique of cases) {
+      const session = at('note');
+      expect(session.handleIntent({ type: 'setTechnique', technique })).toBe(true);
+      const note = session.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!;
+      expect(readTechniques(note), techniqueText(technique)).toEqual([technique]);
+      // Typed form parses back to the same thing.
+      expect(parseInspectorLine('note', 'bend', techniqueText(technique))).toEqual({ intent: { type: 'setTechnique', technique } });
+      // Amend: a second set replaces rather than removing.
+      expect(session.handleIntent({ type: 'setTechnique', technique: { kind: 'bend', semitones: 4 } })).toBe(true);
+      expect(readTechniques(session.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!)).toEqual([{ kind: 'bend', semitones: 4 }]);
+    }
+    // The pre-widening forms still write byte-identical curves.
+    const plain = at('note');
+    plain.handleIntent({ type: 'toggleTechnique', kind: 'bend' });
+    expect(plain.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
+      points: [{ position: 0, alter: 0 }, { position: 1, alter: 2 }]
+    });
+    const released = at('note');
+    released.handleIntent({ type: 'toggleTechnique', kind: 'bend', release: true });
+    expect(released.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
+      points: [{ position: 0, alter: 2 }, { position: 0.5, alter: 2 }, { position: 1, alter: 0 }]
+    });
+  });
+});
+
+describe('the wider rungs', () => {
+  it('voice-bar: full-measure rest and measure repeat', () => {
+    const session = at('voiceMeasure');
+    expect(pillText(session)).toEqual([]);
+    const parsed = parseInspectorLine('voiceMeasure', null, 'measure repeat 2');
+    expect(parsed).toEqual({ intent: { type: 'setMeasureRepeat', number: 2 } });
+    expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
+    expect(pillText(session)).toEqual(['measure repeat: 2 [annotation]']);
+    expect(parseInspectorLine('voiceMeasure', null, 'staccato')).toHaveProperty('error');
+  });
+
+  it('part-bar: clef and capo, strings as a reading', () => {
+    const session = at('partMeasure');
+    expect(pillText(session)).toEqual(['capo: 2 [annotation]', 'strings: 6 strings [inherited]']);
+    const clef = parseInspectorLine('partMeasure', null, 'clef bass');
+    expect(clef).toHaveProperty('intent');
+    expect(edit(session, (clef as { intent: never }).intent)).toBe(true);
+    expect(pillText(session)[0]).toBe('clef: bass [annotation]');
+    expect(parseInspectorLine('partMeasure', 'capo', '5')).toEqual({ intent: { type: 'setPartDeclaration', declaration: { kind: 'capo', value: 5 } } });
+  });
+
+  it('container: read-only pills, no words', () => {
+    // Three quarters fill "3 quarter in 2 quarter" exactly; a grace steals no
+    // time, so it has no position of its own to stand on.
+    const q = (id: string) => ({ duration: { base: 'quarter' as const }, notes: [{ id, pitch: { step: 'E' as const, octave: 4 } }] });
+    const session = new EditorSession({
+      mnx: { version: 1 },
+      global: { measures: [{ time: { count: 4, unit: 4 } }] },
+      parts: [{ id: 'p1', measures: [{ sequences: [{ content: [q('a'), q('b'), q('c'), { duration: { base: 'quarter' as const }, rest: {} }] }] }] }]
+    });
+    session.handleIntent({ type: 'setProjection', projection: 'notation' });
+    const wrap = parseRhythm('3:2') as { wrap: never };
+    expect(session.handleIntent({ type: 'wrapInContainer', spec: wrap.wrap })).toBe(true);
+    expect(session.handleIntent({ type: 'goToLevel', level: 'container' })).toBe(true);
+    const pills = pillsFor(scope(session));
+    expect(pills.map(p => `${p.word}: ${p.value}`)).toEqual(['tuplet: 3:2 quarter']);
+    expect(pills.every(p => p.pillClass === 'inherited' && p.remove === null)).toBe(true);
+    expect(wordsFor('container')).toEqual([]);
+    expect(parseInspectorLine('container', null, 'bracket yes')).toHaveProperty('error');
+  });
+});
+
+describe('ranges', () => {
+  it('a pill on some members is partial; on all, solid — and removal strips it from the ones that have it', () => {
+    const session = at('event');
+    edit(session, { type: 'setMarking', marking: 'staccato' });
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(session.resolvedSelection.members.length).toBe(2);
+    const pills = pillsFor(scope(session));
+    expect(pills.find(p => p.key === 'marking:staccato')?.partial).toBe(true);
+    expect(pills.find(p => p.key === 'duration')?.partial).toBeUndefined();
+    session.handleIntent({ type: 'setMarking', marking: 'accent' });
+    expect(pillsFor(scope(session)).find(p => p.key === 'marking:accent')?.partial).toBeUndefined();
+    expect(session.handleIntent({ type: 'removeMarking', marking: 'staccato' })).toBe(true);
+    expect(pillsFor(scope(session)).find(p => p.key === 'marking:staccato')).toBeUndefined();
+  });
+
+  it('bars: attributes set on one of two selected bars read half-tone', () => {
+    const session = atBar(0);
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(session.resolvedSelection.members.length).toBe(2);
+    const pills = pillsFor(scope(session));
+    expect(pills.find(p => p.key === 'section')?.partial).toBe(true);
+    expect(pills.find(p => p.key === 'barline')?.partial).toBeUndefined();
   });
 });

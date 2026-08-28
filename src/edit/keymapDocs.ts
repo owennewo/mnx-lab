@@ -562,16 +562,44 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // signatures and the measure-attribute pair; its crumbs go to a bar or a
   // part; ↑↓ walk the ladder.
   rungInspector: [
+    // bar and section
     'setTimeSignature',
     'removeTimeSignature',
     'setKeySignature',
     'removeKeySignature',
     'setMeasureAttribute',
     'removeMeasureAttribute',
+    // event
+    'setEventDuration',
+    'setMarking',
+    'removeMarking',
+    'setPositioned',
+    'removePositioned',
+    'setSyllable',
+    'removeSyllable',
+    // note
+    'setAccidentalDisplay',
+    'removeAccidentalDisplay',
+    'setFingering',
+    'removeFingering',
+    'removeStringAnnotation',
+    'setTechnique',
+    'toggleTechnique',
+    // voice-bar and part-bar
+    'setFullMeasureRest',
+    'removeFullMeasureRest',
+    'setMeasureRepeat',
+    'removeMeasureRepeat',
+    'setClef',
+    'removeClef',
+    'setPartDeclaration',
+    'removePartDeclaration',
+    // the crumbs and the ladder
     'goToMeasure',
     'setPart',
     'relaxSelection',
-    'tightenSelection'
+    'tightenSelection',
+    'extendSelection'
   ],
   timeSignaturePopover: ['setTimeSignature', 'removeTimeSignature'],
   tuningPopover: ['setTuning'],

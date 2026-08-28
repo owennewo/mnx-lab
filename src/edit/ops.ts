@@ -749,7 +749,16 @@ export type TechniqueChoice =
   /** A bend's shape: straight up by `semitones`, or — with `release` — bent
    *  before the note sounds, held, and let back down
    *  (`lab/tab-techniques/bend-and-release`, the second half of its name). */
-  | { kind: 'bend'; semitones?: number; release?: boolean }
+  | {
+      kind: 'bend';
+      semitones?: number;
+      release?: boolean;
+      /** The bend the note STARTS at, in semitones — a pre-bend. Absent, a
+       *  released bend starts at `semitones` (bent before it sounds) and a
+       *  plain one at 0 (the roadmap's agreement 4: the inspector's
+       *  `bend.pre`, which the op could not say before). */
+      pre?: number;
+    }
   | { kind: 'slide' }
   | { kind: 'hammerOn' }
   | { kind: 'pullOff' }
@@ -938,6 +947,87 @@ export function readMeasureAttributes(measure: MnxGlobalMeasure | undefined): Me
     out.push({ kind: 'rehearsal', label: measure.rehearsal.label });
   if (measure.section?.label !== undefined)
     out.push({ kind: 'section', label: measure.section.label });
+  return out;
+}
+
+/**
+ * The techniques a note DECLARES, read back into `TechniqueChoice` — the
+ * reverse of the `setTechnique` writer, for the inspector's pills. A bend
+ * curve is read as the three numbers the writer takes: `semitones` is the
+ * peak, `release` says the curve comes back down, `pre` is spelt only when the
+ * start differs from the form's own default.
+ */
+export function readTechniques(note: MnxNote | undefined): TechniqueChoice[] {
+  const technique = note?._x?.mnxLab?.tab?.technique;
+  if (!technique) return [];
+  const out: TechniqueChoice[] = [];
+  const bend = technique.bend;
+  if (bend && bend.points.length > 0) {
+    const alters = bend.points.map(p => p.alter);
+    const semitones = Math.max(...alters);
+    const start = alters[0] ?? 0;
+    const release = (alters[alters.length - 1] ?? 0) < semitones;
+    const defaultStart = release ? semitones : 0;
+    out.push({
+      kind: 'bend',
+      semitones,
+      ...(release ? { release: true } : {}),
+      ...(start !== defaultStart ? { pre: start } : {})
+    });
+  }
+  for (const kind of ['slide', 'hammerOn', 'pullOff', 'vibrato', 'palmMute', 'harmonic'] as const) {
+    if (technique[kind] !== undefined && technique[kind] !== false) out.push({ kind });
+  }
+  return out;
+}
+
+/**
+ * The positioned attributes at ONE metric position of a part-measure, read
+ * back into the typed union with their index in the owning array — the
+ * reverse of the `setPositioned` writer, for the inspector's pills.
+ */
+export function readPositionedAttributes(
+  doc: MnxStructure,
+  address: { partIndex: number; staffIndex: number; measureIndex: number },
+  onset: [number, number]
+): { attribute: PositionedAttribute; index: number }[] {
+  const measure = doc.parts?.[address.partIndex]?.measures?.[address.measureIndex];
+  if (!measure) return [];
+  const here = (entry: { position?: { fraction: [number, number] }; staff?: number }) => {
+    const [num, den] = entry.position?.fraction ?? [0, 1];
+    return num * onset[1] === onset[0] * den && (entry.staff ?? 1) === address.staffIndex;
+  };
+  const out: { attribute: PositionedAttribute; index: number }[] = [];
+  (measure.dynamics ?? []).forEach((entry, index) => {
+    if (!here(entry)) return;
+    out.push({
+      index,
+      attribute: {
+        kind: 'dynamic',
+        ...(entry.value ? { value: entry.value } : {}),
+        ...(entry.glyphs ? { glyphs: entry.glyphs } : {}),
+        ...(entry.type !== 'immediate' ? { dynamicType: entry.type } : {}),
+        ...(entry.wedgeType ? { wedgeType: entry.wedgeType } : {}),
+        ...(entry.relativeValue ? { relativeValue: entry.relativeValue } : {})
+      }
+    });
+  });
+  (measure.directions ?? []).forEach((entry, index) => {
+    if (!here(entry)) return;
+    out.push({
+      index,
+      attribute: { kind: 'direction', text: entry.text ?? '', ...(entry.orient && entry.orient !== 'auto' ? { orient: entry.orient } : {}) }
+    });
+  });
+  (measure.ottavas ?? []).forEach((entry, index) => {
+    if (!here(entry)) return;
+    const endIndex = doc.global?.measures?.findIndex(m => m.id === entry.end?.measure) ?? -1;
+    const bars = endIndex >= 0 ? endIndex - address.measureIndex + 1 : 1;
+    out.push({
+      index,
+      attribute: { kind: 'ottava', value: entry.value as 1 | 2 | 3 | -1 | -2 | -3, ...(bars > 1 ? { bars } : {}) }
+    });
+  });
   return out;
 }
 
@@ -1401,15 +1491,18 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           // common one: straight up by a tone over the note's length.
           {
             const alter = op.technique.semitones ?? 2;
+            // Where the curve starts: an explicit pre-bend, else the shape
+            // each form always had (a release is bent before it sounds).
+            const start = op.technique.pre ?? (op.technique.release ? alter : 0);
             technique.bend = {
               points: op.technique.release
                 ? [
-                    { position: 0, alter },
+                    { position: 0, alter: start },
                     { position: 0.5, alter },
                     { position: 1, alter: 0 }
                   ]
                 : [
-                    { position: 0, alter: 0 },
+                    { position: 0, alter: start },
                     { position: 1, alter }
                   ]
             };

@@ -1,8 +1,10 @@
 # The rung inspector — the cursor's path as a breadcrumb, the rung's state as pills
 
-> **Status: IN PROGRESS 2026-08-28 — stages 1–3 built and landed the same day**
-> (crumbs, go-to, the bar rung's pills); stages 4–5 (the other families, ranges) are
-> open. Picked up the day it was proposed, after the design pass. **Design canvas:** [Rung Inspector](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3)
+> **Status: IN PROGRESS 2026-08-28 — all five stages built and landed the same day.**
+> What stays open is not a stage but a dependency: the container rung reads its spec
+> and cannot write it until the session grows a `setContainerProperties`-class verb
+> ([core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md),
+> `container-properties`). Picked up the day it was proposed, after the design pass. **Design canvas:** [Rung Inspector](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3)
 > (seven states over the score: walking, go-to, add, amend, the two-step Backspace,
 > mini-rung, range — plus the key legend). Two decisions came out of that pass and are
 > folded in below: the inspector sits **over the score, where the tray sits**, not in
@@ -252,6 +254,44 @@ draw ×; crumbs draw neither.
 - Goldens byte-identical; 1118 tests + the smoke green; `rungInspector` credited in
   `opRows` (`Enter · inspector`) and listed in `SURFACE_INTENTS`.
 
+## What the build found (2026-08-28, stages 4–5)
+
+- **Two readers and two verbs were the whole model-side cost.** `readTechniques` and
+  `readPositionedAttributes` are the inverses of the `setTechnique`/`setPositioned`
+  writers (the test sets one of each and reads it back); `setTechnique` is the
+  non-toggle verb an *amend* needs (`toggleTechnique` on a present bend removes it),
+  and `setEventDuration` types a value where the ladder keys only step. **Bend widened
+  to `pre`** (agreement 4): the curve's start is an explicit pre-bend, else the shape
+  each form always had — every pre-widening call still writes byte-identical points,
+  and the reader spells `pre` only when it differs from that default. The grammar
+  takes the flattened dotted form: `bend pre 1 2 release`.
+- **A point edit re-anchors the selection at the note** (`session.apply`'s rule), so
+  applying an event pill would have dropped the inspector to the note rung with the
+  pills changing under the cursor. The page puts the ladder back (`goToLevel` to the
+  rung it was on) after any edit that moved it — recorded in the trace, which is
+  honest: the inspector *is* holding a rung the session would otherwise leave.
+- **Ranges cost nothing new.** `pillsFor` reads one member at a time through
+  `resolvedSelection.members` and merges by key: on every member → solid, on some →
+  `partial` (half-tone). Removal fans out where the session already fans out
+  (markings, measure attributes, fingering, accidentals, strings) and acts at the
+  cursor elsewhere (techniques, positioned, syllables) — the doc lists which. From
+  inside the inspector **Shift+←/→ extends** exactly as on the score, floor-axis rule
+  included: at the note rung the first press re-levels to event, the second extends.
+- **The pills' words are nouns, the grammars' are values.** `dynamic: mf`, `fingering:
+  left 3` compose an amend as `dynamic mf` / `fingering left 3`; the parser strips the
+  noun before handing the value to `parseAdornment`. A syllable pill spells its
+  hyphens back from `syllableType` so `sleep-` round-trips.
+- **Read-only is a class, not an absence.** Container pills (`tuplet: 3:2 quarter`,
+  `bracket`, `number`) and inherited readings (`strings: 6 strings`) draw dotted with
+  no × and refuse Enter; the meta note says why. This is the honest form of the
+  residue ledger's `container-properties` row on the same screen as the container.
+- **Known gap, unchanged:** `setFullMeasureRest` / `setMeasureRepeat` write
+  `parts[0].sequences[0]` regardless of the cursor's part and voice — a pre-existing
+  op limitation the voice-bar pills now expose. Not fixed here; it is an ops item.
+- `npm run smoke:inspector` now also walks ↓ to the event rung, adds `staccato`,
+  asserts the rung held, reads the note rung, and extends to a two-event range to see
+  the pill go half-tone. 1128 tests + the smoke green; goldens byte-identical.
+
 ## Stages
 
 1. ✅ **Crumbs** (2026-08-28). The HUD's rows as the breadcrumb; Enter from the score
@@ -268,9 +308,15 @@ draw ×; crumbs draw neither.
    already covers; the word list is derived from `MEASURE_ATTRIBUTE_FIELDS`. The
    rhythm riders (`full-measure rest`, `measure repeat`) are refused with a pointer to
    Shift+B — they are `voiceMeasure` things and arrive with stage 4.
-4. **The other families**, one per step, in the residue ledger's order: positioned,
-   markings, note singletons, technique (after agreement 4), containers as mini-rungs.
-5. **Ranges** — the half-tone pill.
+4. ✅ **The other families** (2026-08-28). Event: `duration` (floor, amend by value),
+   markings, positioned (dynamic/cresc/dim/louder/softer/text/8va/8vb), syllables.
+   Note: string annotation (removable; the value is chosen with the tab digits),
+   accidental display, fingering, techniques (bend with `pre`/peak/`release`), then
+   the event's own. Voice-bar: full-measure rest, measure repeat. Part-bar: clef,
+   capo, strings (reading). Container: read-only spec pills — the mini-rung waits on
+   the missing verb, and the dotted typed form (`bend pre 1 2 release`) covers the
+   one structured value that exists today.
+5. ✅ **Ranges** (2026-08-28) — the half-tone pill, Shift+←/→ from inside.
 
 Each stage lands with its registry join and a hands-on pass over CDP like the tray's;
 the popover it makes redundant is **not** removed in the same change — retirement is a

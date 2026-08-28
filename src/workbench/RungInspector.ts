@@ -205,6 +205,12 @@ export class RungInspector extends LitElement {
       outline-offset: 1px;
     }
 
+    /* Over a range: the mixed-checkbox convention — set on some members. */
+    .pill.half {
+      opacity: 0.55;
+      border-style: dashed;
+    }
+
     .pill.open {
       border: 2px solid var(--accent);
       padding: 3px 6px;
@@ -454,6 +460,12 @@ export class RungInspector extends LitElement {
       this.emit('inspector-level', { direction: code === 'ArrowUp' ? 'relax' : 'tighten' });
       return true;
     }
+    if ((code === 'ArrowLeft' || code === 'ArrowRight') && event.shiftKey) {
+      // The score's own range gesture, kept: a range is what the half-tone
+      // pills are FOR, so the inspector must be able to make one.
+      this.emit('inspector-extend', { direction: code === 'ArrowLeft' ? 'previous' : 'next' });
+      return true;
+    }
     if (code === 'ArrowLeft' || (code === 'Tab' && event.shiftKey)) {
       this.cursor = (this.cursor - 1 + this.itemCount()) % this.itemCount();
       return true;
@@ -639,6 +651,7 @@ export class RungInspector extends LitElement {
       ? [
           ['↑↓', 'ladder'],
           ['←→ Tab', 'walk'],
+          ['⇧←→', 'extend'],
           ['Enter', 'open'],
           ['type', 'add'],
           ['⌫', 'clear · remove'],
@@ -710,8 +723,9 @@ export class RungInspector extends LitElement {
           })}
         </div>
         ${open?.kind === 'crumb' ? this.renderMenu() : nothing}
-        ${this.note
-          ? html`<div class="note">${this.note}</div>`
+        ${this.note ? html`<div class="note">${this.note}</div>` : nothing}
+        ${this.pills.length === 0 && this.words.length === 0
+          ? nothing
           : html`<div class="line attrs">
               ${this.pills.map((pill, i) => {
                 const isOpen = open?.kind === 'pill' && open.index === i;
@@ -722,7 +736,7 @@ export class RungInspector extends LitElement {
                       ? X_GLYPH
                       : nothing;
                 return html`<span
-                  class="pill ${pill.pillClass}${cursorAt('pill', i) ? ' cursor' : ''}${isOpen ? ' open' : ''}"
+                  class="pill ${pill.pillClass}${pill.partial ? ' half' : ''}${cursorAt('pill', i) ? ' cursor' : ''}${isOpen ? ' open' : ''}"
                   @click=${() => {
                     this.open = null;
                     this.cursor = this.crumbs.length + i;

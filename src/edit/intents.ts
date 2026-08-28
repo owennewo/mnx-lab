@@ -203,6 +203,14 @@ export type MutationIntent =
   | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }
   | { type: 'setMarking'; marking: string; attributes?: Record<string, string> }
   | { type: 'removeMarking'; marking: string }
+  // The inspector's amend of a technique (roadmap/inprogress/workbench-rung-inspector.md):
+  // `toggleTechnique` on a present bend REMOVES it, so re-valuing one needs a
+  // verb that sets without asking what is there.
+  | { type: 'setTechnique'; technique: TechniqueChoice }
+  // The inspector's `duration` pill, typed to a value rather than stepped.
+  // Same split as the ladder keys: an event with ink is re-valued, a rest or
+  // an entry ghost re-values the PENDING entry duration.
+  | { type: 'setEventDuration'; base: MnxNoteValueBase; dots?: number }
   | { type: 'setPositioned'; attribute: PositionedAttribute }
   | { type: 'removePositioned'; kind: PositionedAttribute['kind'] }
   // The rhythm-declaration family (campaign item 11b): one wrap for the three

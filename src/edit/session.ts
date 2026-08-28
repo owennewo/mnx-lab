@@ -830,6 +830,40 @@ export class EditorSession {
         }
         return true;
       }
+      case 'setTechnique': {
+        // The inspector's amend: set what was typed, whether or not one is
+        // there. Refused only when the document does not move (a slide with
+        // no note to travel to, a value already in place).
+        const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        if (!slot) return false;
+        const before = JSON.stringify(this.doc);
+        this.apply({ type: 'setTechnique', noteKey: slot.noteKey, technique: intent.technique });
+        if (JSON.stringify(this.doc) === before) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
+      case 'setEventDuration': {
+        const event = this.eventUnderCursor();
+        const duration = { base: intent.base, ...(intent.dots ? { dots: intent.dots } : {}) };
+        if (!event || (event.notes?.length ?? 0) === 0) {
+          if (this.entryDuration === intent.base) return false;
+          this.entryDuration = intent.base;
+          return true;
+        }
+        if (event.duration.base === intent.base && (event.duration.dots ?? 0) === (intent.dots ?? 0))
+          return false;
+        this.apply({
+          type: 'setDuration',
+          measureIndex: this.cursorState.measureIndex,
+          onset: [this.cursorState.onset.num, this.cursorState.onset.den],
+          duration,
+          ...this.entryTarget
+        });
+        return true;
+      }
       case 'toggleTechnique': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;

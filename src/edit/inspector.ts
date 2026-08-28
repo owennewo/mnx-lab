@@ -5,20 +5,32 @@
 // typed unions — the shell (workbench/inspectorRows.ts) only glues it to the
 // HUD's row labels, and the harness exercises THIS, headlessly.
 //
-// Stage 3 of the roadmap: pills exist at the MEASURE rung only.
-import type { MnxStructure } from '../model/mnx.ts';
+// Stages 3–5: pills at every rung the session can edit, merged over a range.
+import type { MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
+import { findNoteAddress } from '../model/noteWalk.ts';
 import type { EditorIntent } from './intents.ts';
-import { sectionRangeAt, type SelectionLevel } from './selection.ts';
+import { sectionRangeAt, type SelectionLevel, type SelectionMember } from './selection.ts';
 import {
+  eventAtAddress,
   MEASURE_ATTRIBUTE_FIELDS,
   readMeasureAttributes,
+  readPositionedAttributes,
+  readTechniques,
   type MeasureAttribute,
-  type MeasureAttributeKind
+  type MeasureAttributeKind,
+  type PositionedAttribute,
+  type TechniqueChoice
 } from './ops.ts';
 import {
   BARLINE_TYPES,
+  CLEF_NAME_LIST,
+  DYNAMIC_WORDS,
+  MARKING_WORDS,
+  parseAdornment,
   parseBarAttribute,
+  parseClef,
   parseKeySignature,
+  parseLyric,
   parseTimeSignature
 } from './setupGrammar.ts';
 
@@ -109,6 +121,9 @@ export interface InspectorPill {
   /** What Backspace fires on a floor pill / the × on an annotation; null on
    *  an inherited reading. */
   remove: EditorIntent | null;
+  /** Over a range: set on SOME members, not all — drawn half-tone. Adding
+   *  applies to all; removing strips it from the ones that have it. */
+  partial?: boolean;
 }
 
 /** A word the blank slot can complete to, with a hint at its value. */
@@ -299,7 +314,7 @@ export type InspectorParse = { intent: EditorIntent } | { error: string };
  * word. The bar-attribute grammar is reused for the family it already
  * parses; the two signatures have their own parsers.
  */
-export function parseInspectorLine(word: string | null, text: string): InspectorParse {
+function parseBarLine(word: string | null, text: string): InspectorParse {
   const line = (word ? `${word} ${text}` : text).trim();
   const head = line.split(/\s+/)[0]?.toLowerCase() ?? '';
   const rest = line.slice(head.length).trim();
@@ -327,4 +342,370 @@ export function parseInspectorLine(word: string | null, text: string): Inspector
   if ('set' in parsed) return { intent: { type: 'setMeasureAttribute', attribute: parsed.set } };
   if ('rhythm' in parsed) return { error: 'rhythm declarations stay with Shift+B for now' };
   return { intent: { type: 'removeMeasureAttribute', kind: parsed.remove } };
+}
+
+
+// ── the other rungs (stage 4) and ranges (stage 5) ──────────────────────────
+
+/** What one pill-reader needs: the document and the selection's members. */
+export interface InspectorScope {
+  doc: MnxStructure;
+  level: SelectionLevel;
+  members: readonly SelectionMember[];
+}
+
+const DURATION_WORDS: MnxNoteValueBase[] = ['whole', 'half', 'quarter', 'eighth', '16th', '32nd', '64th'];
+const TECHNIQUE_WORDS: TechniqueChoice['kind'][] = ['bend', 'slide', 'hammerOn', 'pullOff', 'vibrato', 'palmMute', 'harmonic'];
+
+function durationText(duration: { base: MnxNoteValueBase; dots?: number }): string {
+  return `${duration.base}${'.'.repeat(duration.dots ?? 0)}`;
+}
+
+/** A positioned attribute's typed value — what `parseAdornment` takes back. */
+export function positionedText(attribute: PositionedAttribute): { word: string; value: string } {
+  if (attribute.kind === 'dynamic') {
+    if (attribute.dynamicType === 'gradual')
+      return { word: attribute.wedgeType === 'decreasing' ? 'dim' : 'cresc', value: '' };
+    if (attribute.dynamicType === 'relative')
+      return { word: attribute.relativeValue === 'softer' ? 'softer' : 'louder', value: '' };
+    return { word: 'dynamic', value: attribute.value ?? (attribute.glyphs ?? []).join(' ') };
+  }
+  if (attribute.kind === 'ottava')
+    return {
+      word: attribute.value > 0 ? '8va' : '8vb',
+      value: `${Math.abs(attribute.value) === 1 ? '' : `${Math.abs(attribute.value)} `}${attribute.bars ? `${attribute.bars}` : ''}`.trim()
+    };
+  return {
+    word: 'text',
+    value: `${attribute.orient && attribute.orient !== 'above' ? `${attribute.orient} ` : ''}${attribute.text}`
+  };
+}
+
+/** A technique's typed value — the inspector's flattened dotted form. */
+export function techniqueText(technique: TechniqueChoice): string {
+  if (technique.kind !== 'bend') return '';
+  return [
+    technique.pre !== undefined ? `pre ${technique.pre}` : '',
+    technique.semitones !== undefined ? `${technique.semitones}` : '',
+    technique.release ? 'release' : ''
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+function clefText(clef: { sign: string; staffPosition?: number; octave?: number }): string {
+  for (const name of CLEF_NAME_LIST) {
+    const parsed = parseClef(name);
+    if (
+      parsed &&
+      parsed !== 'inherit' &&
+      parsed.sign === clef.sign &&
+      parsed.staffPosition === (clef.staffPosition ?? parsed.staffPosition) &&
+      (parsed.octave ?? 0) === (clef.octave ?? 0)
+    )
+      return name;
+  }
+  return clef.sign;
+}
+
+const annotation = (key: string, word: string, value: string, remove: EditorIntent): InspectorPill => ({
+  key, word, value, pillClass: 'annotation', remove
+});
+const reading = (key: string, word: string, value: string): InspectorPill => ({
+  key, word, value, pillClass: 'inherited', remove: null
+});
+
+/** The pills on ONE event: its duration (a floor), its markings, the
+ *  positioned attributes at its onset, its lyric lines. */
+export function eventPills(doc: MnxStructure, member: Extract<SelectionMember, { kind: 'event' | 'note' }>): InspectorPill[] {
+  const event = eventAtAddress(doc, member);
+  if (!event) return [];
+  const pills: InspectorPill[] = [];
+  if (event.duration)
+    pills.push({ key: 'duration', word: 'duration', value: durationText(event.duration), pillClass: 'floor', remove: null });
+  for (const [name, attrs] of Object.entries(event.markings ?? {})) {
+    const detail = attrs && typeof attrs === 'object' ? Object.values(attrs as Record<string, unknown>).join(' ') : '';
+    pills.push(annotation(`marking:${name}`, name, detail, { type: 'removeMarking', marking: name }));
+  }
+  for (const { attribute } of readPositionedAttributes(doc, member, [member.onset.num, member.onset.den])) {
+    const { word, value } = positionedText(attribute);
+    pills.push(annotation(`positioned:${attribute.kind}`, word, value, { type: 'removePositioned', kind: attribute.kind }));
+  }
+  for (const [line, syllable] of Object.entries(event.lyrics?.lines ?? {})) {
+    // The typed form: the hyphens say where the syllable sits in its word,
+    // so the pill spells them back and the value round-trips.
+    const { text = '', type } = syllable as { text?: string; type?: string };
+    const spelt = `${type === 'middle' || type === 'end' ? '-' : ''}${text}${type === 'start' || type === 'middle' ? '-' : ''}`;
+    pills.push(annotation(`lyric:${line}`, line === '1' ? 'lyric' : `lyric ${line}`, spelt, { type: 'removeSyllable', line }));
+  }
+  return pills;
+}
+
+/** The pills on ONE note: string, accidental display, fingering, techniques —
+ *  then its event's, since a note is where you stand to read them. */
+export function notePills(doc: MnxStructure, member: Extract<SelectionMember, { kind: 'note' }>): InspectorPill[] {
+  const located = findNoteAddress(doc, member.noteKey);
+  if (!located) return [];
+  const note: MnxNote = located.note;
+  const pills: InspectorPill[] = [];
+  const x = note._x?.mnxLab;
+  if (x?.string !== undefined)
+    pills.push(annotation('string', 'string', `${x.string}`, { type: 'removeStringAnnotation' }));
+  if (note.accidentalDisplay) {
+    const enclosed = (note.accidentalDisplay as { enclosure?: unknown }).enclosure !== undefined;
+    pills.push(annotation('accidental', 'accidental', enclosed ? 'parens' : note.accidentalDisplay.show ? 'show' : 'hide', { type: 'removeAccidentalDisplay' }));
+  }
+  if (x?.fingering)
+    pills.push(annotation('fingering', 'fingering', `${x.fingering.hand} ${x.fingering.finger}`, { type: 'removeFingering' }));
+  for (const technique of readTechniques(note))
+    pills.push(annotation(`technique:${technique.kind}`, technique.kind, techniqueText(technique), { type: 'toggleTechnique', kind: technique.kind }));
+  return [...pills, ...eventPills(doc, member).filter(p => p.key !== 'duration')];
+}
+
+function voiceMeasurePills(doc: MnxStructure, member: Extract<SelectionMember, { kind: 'voiceMeasure' }>): InspectorPill[] {
+  const measure = doc.parts?.[member.partIndex]?.measures?.[member.measureIndex] as
+    | (NonNullable<NonNullable<MnxStructure['parts']>[number]['measures']>[number] & { measureRepeat?: { number: number } })
+    | undefined;
+  const sequence = measure?.sequences?.[member.sequenceIndex];
+  const pills: InspectorPill[] = [];
+  if (sequence?.fullMeasure)
+    pills.push(annotation('fullMeasureRest', 'full-measure rest', sequence.fullMeasure.visualDuration ? durationText(sequence.fullMeasure.visualDuration) : '', { type: 'removeFullMeasureRest' }));
+  if (measure?.measureRepeat)
+    pills.push(annotation('measureRepeat', 'measure repeat', `${measure.measureRepeat.number}`, { type: 'removeMeasureRepeat' }));
+  return pills;
+}
+
+function partMeasurePills(doc: MnxStructure, member: Extract<SelectionMember, { kind: 'partMeasure' }>): InspectorPill[] {
+  const part = doc.parts?.[member.partIndex];
+  const measure = part?.measures?.[member.measureIndex];
+  const pills: InspectorPill[] = [];
+  const clef = measure?.clefs?.find(c => (c.staff ?? 1) === member.staffIndex)?.clef;
+  if (clef) pills.push(annotation('clef', 'clef', clefText(clef), { type: 'removeClef' }));
+  const x = part?._x?.mnxLab;
+  if (x?.capo !== undefined)
+    pills.push(annotation('capo', 'capo', `${x.capo}`, { type: 'removePartDeclaration', kind: 'capo' }));
+  if (x?.strings?.length)
+    pills.push(reading('strings', 'strings', `${x.strings.length} strings`));
+  return pills;
+}
+
+function containerPills(doc: MnxStructure, member: Extract<SelectionMember, { kind: 'container' }>): InspectorPill[] {
+  const sequence = doc.parts?.[member.partIndex]?.measures?.[member.measureIndex]?.sequences?.[member.sequenceIndex];
+  const container = sequence?.content?.[member.eventIndex] as
+    | { type: 'tuplet'; inner: { duration: { base: MnxNoteValueBase; dots?: number }; multiple: number }; outer: { duration: { base: MnxNoteValueBase; dots?: number }; multiple: number }; bracket?: string; showNumber?: string }
+    | { type: 'grace'; graceType?: string; slash?: boolean }
+    | { type: 'tremolo'; marks?: number }
+    | undefined;
+  if (!container) return [];
+  // READ-ONLY: the session has no verb that rewrites a container in place
+  // (core-selection-tray-residue.md, `container-properties`). Until it does,
+  // the inspector shows the spec and cannot take a value.
+  if (container.type === 'tuplet')
+    return [
+      reading('tuplet', 'tuplet', `${container.inner.multiple}:${container.outer.multiple} ${durationText(container.inner.duration)}`),
+      ...(container.bracket ? [reading('bracket', 'bracket', container.bracket)] : []),
+      ...(container.showNumber ? [reading('showNumber', 'number', container.showNumber)] : [])
+    ];
+  if (container.type === 'grace')
+    return [reading('grace', 'grace', `${container.graceType ?? ''}${container.slash ? ' slash' : ''}`.trim())];
+  return [reading('tremolo', 'tremolo', `${container.marks ?? ''}`)];
+}
+
+function pillsOfMember(doc: MnxStructure, level: SelectionLevel, member: SelectionMember): InspectorPill[] {
+  switch (member.kind) {
+    case 'measure':
+      return measurePills(doc, member.measureIndex);
+    case 'section': {
+      const label = doc.global.measures[member.start]?.section?.label;
+      return label === undefined
+        ? []
+        : [annotation('section', 'section', label, { type: 'removeMeasureAttribute', kind: 'section' })];
+    }
+    case 'event':
+      return eventPills(doc, member);
+    case 'note':
+      return level === 'event' ? eventPills(doc, member) : notePills(doc, member);
+    case 'voiceMeasure':
+      return voiceMeasurePills(doc, member);
+    case 'partMeasure':
+      return partMeasurePills(doc, member);
+    case 'container':
+      return containerPills(doc, member);
+    case 'document':
+      return [];
+  }
+}
+
+/**
+ * The pills for the selection: one reader per member, merged by key. A pill
+ * on every member is solid; on some, `partial` (half-tone). The value shown
+ * is the first member's. Removal intents already fan out over the session's
+ * selection for the families that support it (markings, measure attributes,
+ * fingering, accidentals, strings); the rest act at the cursor.
+ */
+export function pillsFor(scope: InspectorScope): InspectorPill[] {
+  const { doc, level, members } = scope;
+  if (members.length === 0) return [];
+  const merged = new Map<string, { pill: InspectorPill; count: number }>();
+  const order: string[] = [];
+  for (const member of members) {
+    for (const pill of pillsOfMember(doc, level, member)) {
+      const seen = merged.get(pill.key);
+      if (seen) seen.count++;
+      else {
+        merged.set(pill.key, { pill, count: 1 });
+        order.push(pill.key);
+      }
+    }
+  }
+  return order.map(key => {
+    const { pill, count } = merged.get(key)!;
+    return count < members.length ? { ...pill, partial: true } : pill;
+  });
+}
+
+const EVENT_WORDS: InspectorWord[] = [
+  { word: 'duration', hint: DURATION_WORDS.join(' · '), values: [...DURATION_WORDS] },
+  ...MARKING_WORDS.map(word => ({ word, hint: '' })),
+  { word: 'breath', hint: 'comma · tick · upbow · salzedo' },
+  { word: 'bow', hint: 'up · down' },
+  { word: 'dynamic', hint: DYNAMIC_WORDS.slice(3, 11).join(' · '), values: [...DYNAMIC_WORDS] },
+  { word: 'cresc', hint: '' },
+  { word: 'dim', hint: '' },
+  { word: 'louder', hint: '' },
+  { word: 'softer', hint: '' },
+  { word: 'text', hint: 'Play 8x · below cantabile' },
+  { word: '8va', hint: 'bars, e.g. 2' },
+  { word: '8vb', hint: 'bars, e.g. 2' },
+  { word: 'lyric', hint: 'sleep- · -ing · 2: Am' }
+];
+
+const NOTE_WORDS: InspectorWord[] = [
+  { word: 'accidental', hint: 'show · hide · parens', values: ['show', 'hide', 'parens'] },
+  { word: 'finger', hint: '3 · left 2 · right p' },
+  { word: 'bend', hint: '2 · release · pre 1 2 release' },
+  ...TECHNIQUE_WORDS.filter(k => k !== 'bend').map(word => ({ word, hint: '' })),
+  ...EVENT_WORDS.filter(w => w.word !== 'duration')
+];
+
+const VOICE_WORDS: InspectorWord[] = [
+  { word: 'full-measure rest', hint: 'whole · half' },
+  { word: 'measure repeat', hint: '1 · 2 counter 3' }
+];
+
+const PART_WORDS: InspectorWord[] = [
+  { word: 'clef', hint: 'treble · bass · treble8vb', values: [...CLEF_NAME_LIST] },
+  { word: 'capo', hint: '3' }
+];
+
+export function wordsFor(level: SelectionLevel): InspectorWord[] {
+  switch (level) {
+    case 'measure':
+      return BAR_WORDS;
+    case 'section':
+      return BAR_WORDS.filter(w => w.word === 'section');
+    case 'event':
+      return EVENT_WORDS;
+    case 'note':
+      return NOTE_WORDS;
+    case 'voiceMeasure':
+      return VOICE_WORDS;
+    case 'partMeasure':
+      return PART_WORDS;
+    default:
+      return [];
+  }
+}
+
+/** Why a rung has no editable pills, when that is by design. */
+export function rungNote(level: SelectionLevel): string | null {
+  if (level === 'container') return 'a container is read here, not written — the session has no verb that rewrites one in place';
+  if (level === 'document') return 'the document has no attributes to inspect yet — the crumbs walk and go to';
+  return null;
+}
+
+function parseAdornmentLine(line: string, amend: boolean): InspectorParse {
+  const parsed = parseAdornment(line);
+  if (!parsed) return { error: `not an adornment — ${wordsFor('note').map(w => w.word).join(' · ')}` };
+  if ('fingering' in parsed)
+    return { intent: { type: 'setFingering', hand: parsed.fingering.hand, finger: parsed.fingering.finger } };
+  if ('removeFingering' in parsed) return { intent: { type: 'removeFingering' } };
+  if ('technique' in parsed) return { intent: { type: 'setTechnique', technique: parsed.technique } };
+  if ('accidental' in parsed)
+    return {
+      intent:
+        parsed.accidental === 'remove'
+          ? { type: 'removeAccidentalDisplay' }
+          : { type: 'setAccidentalDisplay', show: parsed.accidental.show, ...(parsed.accidental.parenthesized ? { parenthesized: true } : {}) }
+    };
+  if ('removeStringAnnotation' in parsed) return { intent: { type: 'removeStringAnnotation' } };
+  if ('marking' in parsed)
+    return {
+      intent: parsed.remove
+        ? { type: 'removeMarking', marking: parsed.marking }
+        : { type: 'setMarking', marking: parsed.marking, ...(parsed.attributes ? { attributes: parsed.attributes } : {}) }
+    };
+  if ('positioned' in parsed) return { intent: { type: 'setPositioned', attribute: parsed.positioned } };
+  void amend;
+  return { intent: { type: 'removePositioned', kind: parsed.removePositioned } };
+}
+
+/**
+ * The typed line → an intent, per rung. `word` is set when a pill was opened
+ * (amend): the text is then the VALUE alone and the pill's word is
+ * prepended — an upsert, one op. From the blank slot the text carries its own
+ * word. Each rung reuses the grammar its popover already had; the inspector
+ * adds only the words the grammars never needed (`duration`, the bare
+ * technique kinds, `lyric`).
+ */
+export function parseInspectorLine(level: SelectionLevel, word: string | null, text: string): InspectorParse {
+  if (level === 'measure' || level === 'section') return parseBarLine(word, text);
+  const line = (word ? `${word} ${text}` : text).trim();
+  const head = line.split(/\s+/)[0]?.toLowerCase() ?? '';
+  const rest = line.slice(head.length).trim();
+  if (level === 'event' || level === 'note') {
+    if (head === 'duration') {
+      const m = /^([a-z0-9]+)(\.*)$/i.exec(rest);
+      const base = m && (DURATION_WORDS as string[]).includes(m[1]!) ? (m[1] as MnxNoteValueBase) : null;
+      if (!base) return { error: `not a duration — ${DURATION_WORDS.join(' · ')}` };
+      return { intent: { type: 'setEventDuration', base, ...(m![2] ? { dots: m![2].length } : {}) } };
+    }
+    if (head === 'lyric' || /^lyric$/i.test(word ?? '') || /^lyric \d+$/i.test(word ?? '')) {
+      const lineId = /^lyric (\d+)$/i.exec(word ?? '')?.[1];
+      const parsed = parseLyric(lineId ? `${lineId}: ${rest}` : rest);
+      if (!parsed || !('syllable' in parsed)) return { error: 'not a syllable — sleep- · -ing · 2: Am' };
+      return { intent: { type: 'setSyllable', line: parsed.line, text: parsed.syllable, ...(parsed.syllableType ? { syllableType: parsed.syllableType } : {}) } };
+    }
+    if (head === 'string') return { error: 'the string is chosen with the digits on the tab staff' };
+    if ((TECHNIQUE_WORDS as string[]).includes(head) && head !== 'bend' && rest === '')
+      return { intent: { type: 'setTechnique', technique: { kind: head as TechniqueChoice['kind'] } as TechniqueChoice } };
+    // The pills' words are nouns; the grammar's are bare values (`mf`,
+    // `left 3`). Strip the noun so an amend composes what the grammar takes.
+    if (head === 'fingering' || head === 'finger')
+      return parseAdornmentLine(/^(left|right)\b/.test(rest) ? rest : `finger ${rest}`, word !== null);
+    if (head === 'dynamic') return parseAdornmentLine(rest, word !== null);
+    return parseAdornmentLine(line, word !== null);
+  }
+  if (level === 'voiceMeasure') {
+    const parsed = parseBarAttribute(line);
+    if (!parsed || !('rhythm' in parsed)) return { error: 'not a rhythm declaration — full-measure rest · measure repeat 2' };
+    if (parsed.rhythm === 'fullMeasureRest')
+      return { intent: parsed.remove ? { type: 'removeFullMeasureRest' } : { type: 'setFullMeasureRest', ...(parsed.visualDuration ? { visualDuration: parsed.visualDuration } : {}) } };
+    return { intent: parsed.remove ? { type: 'removeMeasureRepeat' } : { type: 'setMeasureRepeat', number: parsed.number ?? 1, ...(parsed.counter ? { counter: parsed.counter } : {}) } };
+  }
+  if (level === 'partMeasure') {
+    if (head === 'clef') {
+      const clef = parseClef(rest);
+      if (!clef) return { error: 'not a clef — treble · bass · treble8vb · inherit' };
+      if (clef === 'inherit') return { intent: { type: 'removeClef' } };
+      return { intent: { type: 'setClef', sign: clef.sign, ...(clef.staffPosition !== undefined ? { staffPosition: clef.staffPosition } : {}), ...(clef.octave ? { octave: clef.octave } : {}) } };
+    }
+    if (head === 'capo') {
+      const n = Number(rest);
+      if (!Number.isInteger(n) || n < 0) return { error: 'capo takes a fret number' };
+      return { intent: { type: 'setPartDeclaration', declaration: { kind: 'capo', value: n } } };
+    }
+    return { error: 'not a part declaration — clef · capo' };
+  }
+  return { error: rungNote(level) ?? 'nothing to set at this rung' };
 }

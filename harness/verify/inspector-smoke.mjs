@@ -273,6 +273,51 @@ try {
   else if (after === before) fail(`still on “${after}” after go-to`);
   else pass(`“${before}” → “${after}”`);
 
+  // ── the event rung: a marking pill, and the rung survives the edit ──────
+  console.log('\n↓ to the event rung, type staccato — the pill appears and the rung holds');
+  guard = 0;
+  while (guard++ < 8) {
+    s = await state();
+    if (s.crumbs.find(c => c.active)?.label.startsWith('event')) break;
+    await press('ArrowDown', 'ArrowDown', 40, 400);
+  }
+  s = await state();
+  const eventCrumb = s.crumbs.find(c => c.active)?.label;
+  if (!eventCrumb?.startsWith('event')) fail(`never reached the event rung: ${JSON.stringify(s.crumbs.map(c => c.label))}`);
+  else {
+    pass(`at “${eventCrumb}” · pills: ${s.pills.map(p => p.text).join(' · ') || '(none)'}`);
+    if (!s.pills.some(p => p.text.startsWith('duration:'))) fail('no duration pill at the event rung');
+    await type('staccato');
+    await press('Enter', 'Enter', 13, 900);
+    s = await state();
+    if (!s.pills.some(p => p.text.startsWith('staccato'))) fail(`no staccato pill after applying (error: ${s.error}; pills ${JSON.stringify(s.pills.map(p => p.text))})`);
+    else pass('staccato pill added');
+    if (!s.crumbs.find(c => c.active)?.label.startsWith('event')) fail('the rung dropped after the edit — the inspector should hold it');
+    else pass('still at the event rung after the edit');
+  }
+
+  // ── the note rung reads the string ──────────────────────────────────────
+  console.log('\n↓ to the note rung');
+  await press('ArrowDown', 'ArrowDown', 40, 500);
+  s = await state();
+  if (!s.crumbs.find(c => c.active)?.label.startsWith('note')) fail(`not at the note rung: ${s.crumbs.find(c => c.active)?.label}`);
+  // This document's strings are DERIVED (no `_x.mnxLab.string`), so there is
+  // no string annotation to show; the event's marking rides along.
+  else if (!s.pills.some(p => p.text.startsWith('staccato'))) fail(`the event's marking is not read at the note: ${JSON.stringify(s.pills.map(p => p.text))}`);
+  else pass(`note pills: ${s.pills.map(p => p.text).join(' · ')}`);
+
+  // ── a range: the marking on one of two notes reads half-tone ────────────
+  console.log('\nShift+→ twice: the first re-levels note→event (the floor axis), the second extends — staccato is on one of two, so it reads half-tone');
+  await press('ArrowRight', 'ArrowRight', 39, 500, 8);
+  await press('ArrowRight', 'ArrowRight', 39, 500, 8);
+  s = await state();
+  const half = s.pills.find(p => p.text.startsWith('staccato'));
+
+  if (!s.crumbs.find(c => c.active)) fail('no active crumb over the range');
+  if (!half) fail(`no staccato pill over the range: ${JSON.stringify(s.pills.map(p => p.text))}`);
+  else if (!half.cls.includes('half')) fail(`staccato is not half-tone over a range where one member has it (${half.cls})`);
+  else pass('staccato reads half-tone over the range');
+
   // ── Esc closes; the score has the keys again ────────────────────────────
   console.log('\nEsc closes it');
   await press('Escape', 'Escape', 27, 700);
