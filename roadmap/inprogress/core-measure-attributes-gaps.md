@@ -5,7 +5,9 @@
 > per undrawn attribute; batch 7 in [lab-verify.md](lab-verify.md) registers them.
 > **Item 3 built the same day too** — measure repeats engrave (`layout/measureRepeat.ts`),
 > on notation, standalone tab and the both-view tab staves, and the badge retired.
-> Items 4–8 open. A census, then a work list. Prompted by
+> **Item 4 too** — hairpins draw as wedges to their end (across bars and system
+> breaks, or to the bar's next dynamic when no end is named), relative dynamics as
+> *cresc.* / *dim.*; badges retired. Items 5–8 open. A census, then a work list. Prompted by
 > `spec/measure-repeats-with-counters` reading as a regression after the rung inspector
 > ([workbench-rung-inspector.md](workbench-rung-inspector.md)) started
 > naming `measure repeat: 1` on bars whose staff is empty — it was never a regression:
@@ -185,6 +187,14 @@ Found by the sweep and confirmed by hand; each is a one-file fix and a test:
    staff carries them in the both view), the sign on every staff of the part. The
    inspector pill grows the counter (`measure repeat: 1 counter 3`). Both spec goldens
    moved again — batch 7 says what to look for.
+
+4. ✅ **Hairpins and relative dynamics** (2026-08-28) — `emitHairpins` is a post-pass on
+   the ottava's pattern (spans collected before the measure loop, ends resolved on note
+   columns from the shared onset capture, split at system breaks with the opening
+   growing linearly along the whole span); an `end` may name a later bar; with no `end`
+   the wedge runs to the bar's next dynamic on that staff, else to the bar's content
+   end. `dynamicLabel` gives a relative group without a value its word, set small and
+   italic like a direction. Notation only — tab parity is item 6.
 
 Original plan:
 

@@ -1309,7 +1309,15 @@ function assembleSegment(
   const ottavaSpans = (mnx.parts ?? []).some(p => (p.measures ?? []).some(pm => pm?.ottavas?.length))
     ? collectOttavaSpans(mnx, segment)
     : [];
-  const ottavaOnsets = ottavaSpans.length ? new Map<number, OnsetX[][]>() : null;
+  // Hairpins are the same shape of thing — a span between two note columns
+  // that may cross a system break — so they ride the same onset capture
+  // (core-measure-attributes-gaps.md, item 4).
+  const hairpinSpans = (mnx.parts ?? []).some(p =>
+    (p.measures ?? []).some(pm => pm?.dynamics?.some(d => d.type === 'gradual'))
+  )
+    ? collectHairpinSpans(mnx, segment)
+    : [];
+  const ottavaOnsets = ottavaSpans.length || hairpinSpans.length ? new Map<number, OnsetX[][]>() : null;
 
   // Where each row's primitives begin in the measure loop — rows are emitted
   // in order — so the text pass can scan exactly one row's ink.
@@ -2127,6 +2135,7 @@ function assembleSegment(
 
   emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives);
   if (ottavaOnsets && ottavaSpans.length) emitOttavas(ottavaSpans, plan, staffTopOf, ottavaOnsets, primitives);
+  if (ottavaOnsets && hairpinSpans.length) emitHairpins(hairpinSpans, plan, staffTopOf, ottavaOnsets, primitives);
 
   // The score-wide text row, last of all (core-ink-measured-gaps.md, stage A):
   // a tempo mark and then the labels sit one cohesion clearance above
@@ -2982,6 +2991,8 @@ function emitDynamics(args: EmitDynamicsArgs): void {
   };
 
   for (const dyn of dynamics) {
+    // A hairpin is a span, drawn by emitHairpins after the measure loop.
+    if (dyn.type === 'gradual') continue;
     const s = Math.min(Math.max((dyn.staff ?? 1) - 1, 0), staffBottoms.length - 1);
     const f = dyn.position?.fraction;
     if (!Array.isArray(f) || !f[1]) continue;
@@ -3006,17 +3017,157 @@ function emitDynamics(args: EmitDynamicsArgs): void {
     } else {
       const label = dynamicLabel(dyn);
       if (!label) continue;
+      const relative = dyn.type === 'relative';
       primitives.push({
         kind: 'text',
         text: label,
         x,
         y,
         font: 'bodyItalic',
-        size: 1.8,
-        weight: 'bold',
-        anchor: 'middle',
-        className: 'dynamic'
+        // A relative mark is a word ("cresc."), set like a direction rather
+        // than a dynamic letter — smaller and not bold.
+        size: relative ? 1.3 : 1.8,
+        ...(relative ? {} : { weight: 'bold' as const }),
+        anchor: relative ? ('start' as const) : ('middle' as const),
+        className: relative ? 'dynamic dynamic-relative' : 'dynamic'
       });
+    }
+  }
+}
+
+// ---------- Hairpins ----------
+
+interface HairpinSpan {
+  staff: number;
+  startIdx: number;
+  startT: number;
+  endIdx: number;
+  /** `null` = no `end` was given: run to the next dynamic in the bar, else
+   *  to the bar's content end. */
+  endT: number | null;
+  wedge: 'increasing' | 'decreasing';
+}
+
+/** The wedge's half-opening at its wide end, and where its centre line sits
+ *  relative to the dynamic glyph baseline so a hairpin and an `mf` read as
+ *  one row. */
+const HAIRPIN_HALF_OPENING_SP = 0.75;
+const HAIRPIN_CENTRE_RISE_SP = 0.7;
+const HAIRPIN_THICKNESS_SP = 0.12;
+const HAIRPIN_END_INSET_SP = 0.4;
+
+function collectHairpinSpans(
+  mnx: MnxStructure,
+  segment: { staves: { sources: { part: MnxPart; staff: number }[] }[] }
+): HairpinSpan[] {
+  const indexById = new Map<string, number>();
+  (mnx.global.measures ?? []).forEach((gm, i) => {
+    if (gm?.id) indexById.set(gm.id, i);
+  });
+  const staffIndexOf = new Map<MnxPart, Map<number, number>>();
+  segment.staves.forEach((st, s) => {
+    for (const src of st.sources) {
+      let byStaff = staffIndexOf.get(src.part);
+      if (!byStaff) { byStaff = new Map(); staffIndexOf.set(src.part, byStaff); }
+      if (!byStaff.has(src.staff)) byStaff.set(src.staff, s);
+    }
+  });
+  const frac = (f?: [number, number]) => (Array.isArray(f) && f[1] ? f[0] / f[1] : null);
+  const spans: HairpinSpan[] = [];
+  for (const part of mnx.parts ?? []) {
+    const byStaff = staffIndexOf.get(part);
+    if (!byStaff) continue;
+    (part.measures ?? []).forEach((pm, startIdx) => {
+      const dynamics = pm?.dynamics ?? [];
+      dynamics.forEach(dyn => {
+        if (dyn.type !== 'gradual') return;
+        const startT = frac(dyn.position?.fraction);
+        if (startT === null) return;
+        const end = (dyn as { end?: { measure?: string; position?: { fraction: [number, number] } } }).end;
+        let endIdx = startIdx;
+        let endT: number | null = null;
+        if (end) {
+          endIdx = indexById.get(end.measure ?? '') ?? startIdx;
+          endT = frac(end.position?.fraction) ?? frac((end as { fraction?: [number, number] }).fraction);
+        }
+        if (endT === null) {
+          // No end named: the wedge runs to the next dynamic in this bar on
+          // this staff, which is what a player reads it as.
+          const next = dynamics
+            .filter(d => d !== dyn && (d.staff ?? 1) === (dyn.staff ?? 1))
+            .map(d => frac(d.position?.fraction))
+            .filter((t): t is number => t !== null && t > startT + 1e-6)
+            .sort((a, b) => a - b)[0];
+          if (next !== undefined) {
+            endIdx = startIdx;
+            endT = next;
+          }
+        }
+        spans.push({
+          staff: byStaff.get(dyn.staff ?? 1) ?? 0,
+          startIdx,
+          startT,
+          endIdx,
+          endT,
+          wedge: dyn.wedgeType === 'decreasing' ? 'decreasing' : 'increasing'
+        });
+      });
+    });
+  }
+  return spans;
+}
+
+/**
+ * Draws each hairpin as the two lines of a wedge under its staff, from the
+ * start column to the end column (in a later bar if the end names one),
+ * splitting at system breaks: the opening grows linearly along the whole
+ * span, so a wedge cut by a break continues at the width it had reached.
+ */
+function emitHairpins(
+  spans: HairpinSpan[],
+  plan: HorizontalPlan,
+  staffTopOf: (row: number, s: number) => number,
+  onsets: Map<number, OnsetX[][]>,
+  primitives: Primitive[]
+): void {
+  for (const sp of spans) {
+    const s = sp.staff;
+    const start = plan.measures[sp.startIdx];
+    const end = plan.measures[sp.endIdx];
+    if (!start || !end) continue;
+    const startX = anchorAt(onsets.get(sp.startIdx)?.[s] ?? [], sp.startT, start).x;
+    const endX =
+      sp.endT === null
+        ? end.x + end.width - 1.2
+        : anchorAt(onsets.get(sp.endIdx)?.[s] ?? [], sp.endT, end).x - HAIRPIN_END_INSET_SP;
+    if (endX <= startX + 0.5) continue;
+    const total = endX - startX;
+    const openingAt = (x: number) => {
+      const p = Math.min(1, Math.max(0, (x - startX) / total));
+      return HAIRPIN_HALF_OPENING_SP * (sp.wedge === 'increasing' ? p : 1 - p);
+    };
+    let a = sp.startIdx;
+    let first = true;
+    while (a <= sp.endIdx) {
+      const row = plan.measures[a].row;
+      let b = a;
+      while (b + 1 <= sp.endIdx && plan.measures[b + 1].row === row) b++;
+      const last = b === sp.endIdx;
+      const x1 = first ? startX : plan.measures[a].x + 0.1;
+      const x2 = last ? endX : plan.measures[b].x + plan.measures[b].width - 0.1;
+      const y = staffTopOf(row, s) + STAFF_HEIGHT_SP + DYNAMIC_BASELINE_DROP_SP - HAIRPIN_CENTRE_RISE_SP;
+      const o1 = openingAt(x1);
+      const o2 = openingAt(x2);
+      for (const sign of [-1, 1]) {
+        primitives.push({
+          kind: 'line',
+          x1, y1: y + sign * o1, x2, y2: y + sign * o2,
+          thickness: HAIRPIN_THICKNESS_SP,
+          className: `hairpin hairpin-${sp.wedge}`
+        });
+      }
+      first = false;
+      a = b + 1;
     }
   }
 }

@@ -30,9 +30,7 @@ describe('measureLevelGaps', () => {
       '2 tempo marks — only the first is drawn',
       'chord symbols (harmonies) — not drawn',
       'arpeggio — not drawn',
-      'non-arpeggio bracket — not drawn',
-      'hairpin (gradual dynamic) — not drawn',
-      'relative dynamic (softer) — not drawn'
+      'non-arpeggio bracket — not drawn'
     ]);
   });
 });

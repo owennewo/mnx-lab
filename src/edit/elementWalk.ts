@@ -192,8 +192,8 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     remove: ['removeBeam']
   },
   dynamic: {
-    classes: ['dynamic'],
-    note: 'A dynamic group at a metric position.',
+    classes: ['dynamic', 'dynamic-relative', 'hairpin', 'hairpin-increasing', 'hairpin-decreasing'],
+    note: 'A dynamic group at a metric position: a letter, a relative word (cresc./dim.), or a hairpin wedge to its end (core-measure-attributes-gaps.md, item 4).',
     construct: ['setPositioned'],
     remove: ['removePositioned']
   },

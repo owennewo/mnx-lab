@@ -47,7 +47,8 @@ export const DYNAMIC_GLYPH_BY_VALUE: Record<string, string> = {
 
 type DynamicMark = Pick<
   MnxDynamic,
-  'type' | 'value' | 'glyphs' | 'prefix' | 'suffix' | 'accentPrefix' | 'accentSuffix' | 'residualValue'
+  | 'type' | 'value' | 'glyphs' | 'prefix' | 'suffix' | 'accentPrefix' | 'accentSuffix'
+  | 'residualValue' | 'relativeValue'
 >;
 
 /**
@@ -89,6 +90,10 @@ export function dynamicGlyph(dyn: DynamicMark): string | null {
 export function dynamicLabel(dyn: DynamicMark): string {
   const accent = accentMnemonic(dyn);
   if (accent) return [dyn.prefix, accent, dyn.suffix].filter(Boolean).join('');
+  // A relative group without a value is the word a player reads: "cresc." /
+  // "dim." (core-measure-attributes-gaps.md, item 4).
+  if (dyn.type === 'relative' && !dyn.value)
+    return dyn.relativeValue === 'softer' ? 'dim.' : 'cresc.';
   return [dyn.prefix, dyn.value, dyn.suffix].filter(Boolean).join('');
 }
 

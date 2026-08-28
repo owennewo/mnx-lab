@@ -1604,10 +1604,6 @@ export function measureLevelGaps(
     const extra = pm as MnxPartMeasure & { arpeggios?: unknown[]; nonArpeggios?: unknown[] };
     if ((extra.arpeggios?.length ?? 0) > 0) gaps.push('arpeggio — not drawn');
     if ((extra.nonArpeggios?.length ?? 0) > 0) gaps.push('non-arpeggio bracket — not drawn');
-    for (const d of pm.dynamics ?? []) {
-      if (d.type === 'gradual') gaps.push('hairpin (gradual dynamic) — not drawn');
-      else if (d.type === 'relative') gaps.push(`relative dynamic (${d.relativeValue ?? 'louder'}) — not drawn`);
-    }
   }
   return gaps;
 }
