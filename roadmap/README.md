@@ -44,18 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-rung-inspector.md](proposed/workbench-rung-inspector.md)** — **proposed
-  2026-08-28.** A third editing surface, tried *beside* the tray and the Shift+letter
-  popovers so use decides which wins: **Enter opens an inspector on the current rung** —
-  the cursor's path as a breadcrumb of identity pills (the HUD's rows, horizontal), the
-  rung's attributes as deletable pills derived from the ops' typed unions, a blank slot
-  with typeahead. One rule resolves the add/go-to/amend collision: bare typing always
-  adds, everything else is reached by opening a pill first (crumbs are pills whose value
-  is a reference, so go-to is Enter-arrow-Enter). Two-step Backspace maps onto the
-  removal classes — annotation pills clear then remove, modifier pills revert to a floor.
-  Verbs stay in the tray (`/` widens to it); Ctrl+G's contract untouched. Records that the
-  popovers are feature-first by accident of campaign order and that adornments are five
-  op shapes, not one; bend's op must widen to the model's curve before technique pills.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -184,6 +172,18 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[workbench-rung-inspector.md](inprogress/workbench-rung-inspector.md)** — **in progress 2026-08-28** — [design canvas](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3);
+  placed over the score where the tray sits, keyboard-first. A third editing surface, tried *beside* the tray and the Shift+letter
+  popovers so use decides which wins: **Enter opens an inspector on the current rung** —
+  the cursor's path as a breadcrumb of identity pills (the HUD's rows, horizontal), the
+  rung's attributes as deletable pills derived from the ops' typed unions, a blank slot
+  with typeahead. One rule resolves the add/go-to/amend collision: bare typing always
+  adds, everything else is reached by opening a pill first (crumbs are pills whose value
+  is a reference, so go-to is Enter-arrow-Enter). Two-step Backspace maps onto the
+  removal classes — annotation pills clear then remove, modifier pills revert to a floor.
+  Verbs stay in the tray (`/` widens to it); Ctrl+G's contract untouched. Records that the
+  popovers are feature-first by accident of campaign order and that adornments are five
+  op shapes, not one; bend's op must widen to the model's curve before technique pills.
 - **[lab-verify.md](inprogress/lab-verify.md)** — **the standing verification ledger**, and
   the only doc here that never moves to `complete/`. `verified` is a human assertion, so
   verification is the one gate an agent cannot pass alone, and any change under `model/`,

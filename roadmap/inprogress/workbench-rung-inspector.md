@@ -1,6 +1,13 @@
 # The rung inspector — the cursor's path as a breadcrumb, the rung's state as pills
 
-> **Status: PROPOSED 2026-08-28.** A third editing surface, to be tried *beside* the
+> **Status: IN PROGRESS 2026-08-28** — picked up the day it was proposed, after the
+> design pass. **Design canvas:** [Rung Inspector](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3)
+> (seven states over the score: walking, go-to, add, amend, the two-step Backspace,
+> mini-rung, range — plus the key legend). Two decisions came out of that pass and are
+> folded in below: the inspector sits **over the score, where the tray sits**, not in
+> the side panel; and it is **keyboard-first with the cursor always drawn**.
+>
+> A third editing surface, to be tried *beside* the
 > selection tray and the Shift+letter popovers so that use decides which wins — not a
 > replacement for either yet. Ends [core-selection-tray-mechanism.md](../complete/core-selection-tray-mechanism.md)'s
 > line of surfaces at three: **the tray is a command palette, the popovers are typed
@@ -155,12 +162,31 @@ mandatory pills name their floor).
   from the members that have it. Ops are per object already, so the range is a fan-out
   in the surface, not new ops.
 
-### Where it lives
+### Where it lives — over the score, in the tray's frame
 
-The side panel's **hud tab**, not a new overlay: the rows are already there with one
-`active`; Enter makes the active row editable, ↑/↓ moves `active` through the shared
-`walkToLevel`. The rung chip's ▲▼ beside the score stays the mini version. The only thing
-an overlay would buy is proximity to the score, and the chip already has that.
+**Where the tray sits**: one tray-gap below the selection's enclosure, joined by the
+accent shaft, in the tray's own frame (`--tray-w` 470px, 1px ink border, the meta line on
+top, mirrored/flipped by the same `place()` rules) — see the
+[design canvas](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3).
+The first draft put it in the side panel's hud tab, because the HUD's rows are its
+data; the design pass moved it: the inspector is *about the selection*, so it belongs
+at the selection, and the tray already solved that placement (anchor rect, mirroring
+near the right edge, flipping when there is no room below). The HUD stays the
+read-only, always-visible form of the same rows; the rung chip's ▲▼ stays the mini
+version. The two share `hudRows.ts` and nothing else.
+
+Inside the frame, the line **wraps to two rows** at 470px — crumbs, a hairline, then
+attributes — rather than one long scrolling row. The meta line names the state
+(`bar 3 of 12 · walking · cursor on the bar crumb`, `… · editing tempo`, `… · go to`),
+and a strip along the bottom is the **key legend for the current state**, the way the
+tray's meta line is — so the arbiter of keys is on the same screen as the keys.
+
+**Keyboard-first, cursor always drawn.** One cursor (accent outline, `--row-current`
+fill) walks crumbs and attributes as a single row: **Tab / Shift+Tab and ←/→**. Enter
+opens the pill under it — a crumb opens its sibling list, an attribute opens with its
+value selected — and typing with nothing open always lands in the blank slot. An open
+pill is a 2px accent border with a caret. Pills with a floor draw ▾; removable pills
+draw ×; crumbs draw neither.
 
 ## Agreements before code
 
