@@ -238,9 +238,8 @@ describe('End then I replaces the append key', () => {
     // The dead end core-delete-clears-then-removes.md opened up: Delete can
     // now chew a real score down to parts-with-no-bars, and from there the
     // first bar had no keyboard route at all — `goToEdge` refuses, the ghost
-    // bar past the end is withheld when there are no bars, and `add-bar` is a
-    // popover tile with no shortcut. An event needs a bar to sit in, so at
-    // those rungs `I` means the bar.
+    // bar past the end is withheld when there are no bars. An event needs a
+    // bar to sit in, so at those rungs `I` means the bar.
     for (const level of ['note', 'partMeasure', 'measure'] as const) {
       const s = build([{ type: 'addPart' }]);
       relaxTo(s, level);

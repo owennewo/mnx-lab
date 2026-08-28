@@ -961,22 +961,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ intent: { type: 'setStaffKind', kind: 'both' } })
   },
   {
-    // GENESIS, reached from the tray. `I` now covers the same case from the
-    // keyboard at every rung below the score
-    // (core-delete-clears-then-removes.md), because a bar-less document is
-    // somewhere Delete can leave you and the tile was the only route out. Once
-    // one bar exists, End then `I` is the append, and this tile is that act
-    // reached by mouse. It lost its own key with `Shift+M`
-    // (core-rung-insert.md) — an append key was a special case for a position
-    // the cursor can simply travel to, and that argument still holds.
-    id: 'add-bar',
-    scopes: ['document', 'measure'],
-    glyph: { smufl: 'barlineSingle' },
-    label: 'Append bar',
-    tier: 'popover',
-    action: () => ({ intent: { type: 'appendMeasure' } })
-  },
-  {
     id: 'insert-bar-after',
     scopes: ['measure'],
     glyph: { mark: { smufl: 'barlineSingle' }, op: { sign: 'plus', at: 'after' } },
@@ -1086,15 +1070,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     shortcut: 'Ctrl+Z/Y',
     tier: 'key',
     action: () => ({ intent: { type: 'redo' } })
-  },
-  {
-    // Genesis again — see `add-bar`. Keyless since `Shift+M` retired.
-    id: 'doc-add-bar',
-    scopes: ['session'],
-    glyph: { smufl: 'barlineSingle' },
-    label: 'Append bar',
-    tier: 'popover',
-    action: () => ({ intent: { type: 'appendMeasure' } })
   },
   {
     id: 'doc-go-last',
@@ -1298,7 +1273,7 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     {
       id: 'structure',
       caption: 'structure',
-      commands: ['insert-bar-before', 'insert-bar-after', 'add-bar', 'delete-bar']
+      commands: ['insert-bar-before', 'insert-bar-after', 'delete-bar']
     },
     {
       id: 'signatures',
@@ -1323,12 +1298,11 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
   ],
   document: [
     // The score rung inserts PARTS: its own unit is the document, and there is
-    // only ever one. `add-bar` sits here because a bar-less score is reachable
-    // by deleting, and this is one of the two rungs that can still make one.
+    // only ever one.
     {
       id: 'structure',
       caption: 'structure',
-      commands: ['insert-part-before', 'insert-part-after', 'add-part', 'add-bar', 'delete-part']
+      commands: ['insert-part-before', 'insert-part-after', 'add-part', 'delete-part']
     },
     { id: 'part', caption: 'part', commands: ['part-name', 'staves', 'staff-kind'] },
     { id: 'layout', caption: 'layout', commands: ['system-break', 'multimeasure-rest'] }

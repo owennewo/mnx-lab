@@ -66,7 +66,7 @@
 
 ## The claim
 
-The registry has **86 rows across 98 placements** — one command in one rung's tab is one
+The registry has **84 rows across 95 placements** — one command in one rung's tab is one
 placement — and the only assertion anyone has ever made about them is mechanical: the
 conformance suite proves each tile fires *an intent through the funnel*, that no tile is
 actionless without a blocker, and that no wired tile carries a stale one. Nothing
@@ -158,7 +158,7 @@ does not reach the embed or studio — see the appendix's promotion row.
 
 ## The ledger
 
-91 placements to triage, 7 blocked in the appendix, and five session-chrome tiles with
+88 placements to triage, 7 blocked in the appendix, and five session-chrome tiles with
 no registry row at all. Every box below is empty on purpose: this is the state of the tray on 2026-08-24, and it is the whole point of the
 doc that not one of them has been ticked yet. Rung order is the ladder's own, and row
 order within a rung is **today's display order** — so a rung whose `ordered` column
@@ -254,13 +254,12 @@ fills in without the rows moving is a rung that was already right.
 | `mute-part` — Mute the part | — | ⛔ blocked — `mute` | | |
 | `part-scope` — Select the whole part | `Ctrl+A` | ☐ | ☐ | ☐ |
 
-### bar — 17 placements
+### bar — 16 placements
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
 | `insert-bar-before` — Insert a bar before this one | `Shift+I` | ☐ | ☐ | ☐ |
 | `insert-bar-after` — Insert a bar after this one | `I` | ☐ | ☐ | ☐ |
-| `add-bar` — Append a bar at the end | — | ☐ | ☐ | ☐ |
 | `delete-bar` — Delete this bar (clears its notes first) | `Del` | ☐ | ☐ | ☐ |
 | `clef` — Clef… | `Shift+C` | ☐ | ☐ | ☐ |
 | `key-signature` — Key signature… | `Shift+K` | ☐ | ☐ | ☐ |
@@ -285,14 +284,13 @@ fills in without the rows moving is a rung that was already right.
 | `section-range` — Select the section’s range | — | ☐ | ☐ | ☐ |
 | `section-colour` — Section colour | — | ⛔ blocked — `section-colour` | | |
 
-### document — 8 placements (+2 blocked, appendix)
+### document — 7 placements (+2 blocked, appendix)
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
 | `insert-part-before` — Insert a part above this one | `Shift+I` | ☐ | ☐ | ☐ |
 | `insert-part-after` — Insert a part below this one | `I` | ☐ | ☐ | ☐ |
 | `add-part` — Add a part… | `Shift+P` | ☐ | ☐ | ☐ |
-| `add-bar` — Append a bar at the end | — | ☐ | ☐ | ☐ |
 | `delete-part` — Delete this part (clears its notes first) | `Del` | ☐ | ☐ | ☐ |
 | `part-name` — Part name… | `Shift+P` | ☐ | ☐ | ☐ |
 | `staves` — Staves per part… | `Shift+P` | ☐ | ☐ | ☐ |
@@ -300,13 +298,12 @@ fills in without the rows moving is a rung that was already right.
 | `system-break` — System break | — | ⛔ blocked — `layout-authoring` | | |
 | `multimeasure-rest` — Multimeasure rest | — | ⛔ blocked — `layout-authoring` | | |
 
-### session (the `global` tab) — 9 placements
+### session (the `global` tab) — 8 placements
 
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
 | `undo` — Undo | `Ctrl+Z/Y` | ☐ | ☐ | ☐ |
 | `redo` — Redo | `Ctrl+Z/Y` | ☐ | ☐ | ☐ |
-| `doc-add-bar` — Append a bar | `Shift+M` | ☐ | ☐ | ☐ |
 | `doc-add-part` — Add a part… | `Shift+P` | ☐ | ☐ | ☐ |
 | `doc-time` — Time signature… | `Shift+T` | ☐ | ☐ | ☐ |
 | `doc-tuning` — Tuning… | `Shift+U` | ☐ | ☐ | ☐ |

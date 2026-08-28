@@ -257,7 +257,6 @@ describe('command registry — the joins', () => {
       'measure: segno — segno, section',
       'measure: repeat1Bar — rehearsal, measure-repeat',
       'document: brace — add-part, staves',
-      'session: barlineSingle — doc-add-bar, doc-go-first',
       'session: brace — doc-add-part, staff-kind-both',
       'session: 6stringTabClef — doc-tuning, staff-kind-tab'
     ]);
@@ -337,6 +336,14 @@ describe('command registry — the joins', () => {
     expect(missing, 'banded ids with no command').toEqual([]);
     expect(misplaced, 'banded at a rung the command does not offer').toEqual([]);
     expect(repeated, 'the same command in two bands').toEqual([]);
+  });
+
+  it('does not offer append-bar as a tray command', () => {
+    const appendCommands = COMMANDS.filter(command => {
+      const action = command.action?.(view());
+      return action && 'intent' in action && action.intent.type === 'appendMeasure';
+    });
+    expect(appendCommands.map(command => command.id)).toEqual([]);
   });
 
   it('a grouped rung groups ALL of its commands', () => {
