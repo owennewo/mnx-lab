@@ -240,9 +240,10 @@ export function presentLevels(
   return present;
 }
 
-/** One rung up, skipping absent rungs; null at the top (the mount turns that
- *  into the conventional deselect — Escape never changes meaning, it just
- *  becomes gradual). */
+/** One rung up, skipping absent rungs; null at the top, which is simply where
+ *  widening stops. It used to fall through to the mount's deselect, back when
+ *  Escape was the widen key and had to keep its universal meaning somehow;
+ *  Escape owns deselect outright now (core-rung-addressing.md). */
 export function relaxLevel(
   present: ReadonlySet<SelectionLevel>,
   from: SelectionLevel

@@ -11,11 +11,12 @@
 import { describe, it, expect } from 'vitest';
 import {
   EDIT_LAYER,
-  ESCAPE_PRECEDENCE,
   NAVIGATION_LAYER,
+  PENDING_PRECEDENCE,
   SHELL_BINDINGS,
   TAB_DIGIT_LAYER,
   resolveIntent,
+  resolveShellAction,
   type KeymapLayer
 } from '../../src/edit/keymap.ts';
 
@@ -65,38 +66,52 @@ describe('keyboard scope', () => {
   });
 });
 
-describe('escape precedence', () => {
+describe('the pending-gesture contract', () => {
   // The selection ladder left this open ("popovers and the palette already
-  // consume Escape"); core-selection-tray-mechanism.md answers it once, in
-  // the keymap layer. The order is the contract — innermost open thing
-  // first — so it is asserted rather than left to each surface's habits.
-  it('is innermost-first: popover, then overlay, then the ladder', () => {
-    expect([...ESCAPE_PRECEDENCE]).toEqual([
+  // consume Escape"); core-selection-tray-mechanism.md answered it once, in
+  // the keymap layer, and core-rung-addressing.md widened it to a PAIR —
+  // Escape abandons the innermost pending thing, Enter commits it. The order
+  // is the contract, so it is asserted rather than left to each surface.
+  it('is innermost-first: overlays, then the fret, then the anchor, then the selection', () => {
+    expect([...PENDING_PRECEDENCE]).toEqual([
       'popover',
       'overlay',
-      'relaxSelection',
-      'deselect'
+      'pendingFret',
+      'spanAnchor',
+      'selection'
     ]);
   });
 
-  it('puts every overlay ahead of the ladder walk', () => {
-    // A regression here would mean Escape widening the selection *behind* an
-    // open tray — the selection moving while the user was backing out of a
-    // menu, which is the exact confusion the ordering exists to prevent.
-    const ladder = ESCAPE_PRECEDENCE.indexOf('relaxSelection');
-    expect(ESCAPE_PRECEDENCE.indexOf('popover')).toBeLessThan(ladder);
-    expect(ESCAPE_PRECEDENCE.indexOf('overlay')).toBeLessThan(ladder);
-    expect(ESCAPE_PRECEDENCE.indexOf('deselect')).toBeGreaterThan(ladder);
+  it('puts every overlay ahead of everything the mount arbitrates', () => {
+    // A regression here would mean Escape dropping a fret or an anchor
+    // *behind* an open tray — state changing while the user was backing out
+    // of a menu, which is the confusion the ordering exists to prevent.
+    const mount = PENDING_PRECEDENCE.indexOf('pendingFret');
+    expect(PENDING_PRECEDENCE.indexOf('popover')).toBeLessThan(mount);
+    expect(PENDING_PRECEDENCE.indexOf('overlay')).toBeLessThan(mount);
+    // Deselection is the LAST resort, after every pending thing has declined.
+    expect(PENDING_PRECEDENCE.indexOf('selection')).toBe(PENDING_PRECEDENCE.length - 1);
   });
 
-  it('Escape is bound to the ladder, not to any overlay', () => {
-    // The overlays consume Escape by owning their own keydown and calling
-    // preventDefault — they are NOT keymap bindings. If one ever became a
-    // binding, two handlers would race for the same key.
-    const escapeBindings = SHELL_BINDINGS.filter(b => b.code === 'Escape');
-    expect(escapeBindings).toEqual([]);
-    expect(resolveIntent({ code: 'Escape' }, EDITOR_LAYERS)).toEqual({
-      type: 'relaxSelection'
-    });
+  it('Escape and Enter are shell actions, and carry no editor intent', () => {
+    // They stopped being ladder bindings in core-rung-addressing.md: the
+    // back-out reflex was firing against a rung walk and winning every time.
+    // Shell actions because abandoning or committing spans the mount's fret
+    // resolver, the session's anchor and deselection — no layer below the
+    // mount can see all three.
+    expect(resolveIntent({ code: 'Escape' }, EDITOR_LAYERS)).toBeNull();
+    expect(resolveIntent({ code: 'Enter' }, EDITOR_LAYERS)).toBeNull();
+    expect(resolveIntent({ code: 'NumpadEnter' }, EDITOR_LAYERS)).toBeNull();
+    expect(resolveShellAction({ code: 'Escape' })).toBe('abandonPending');
+    expect(resolveShellAction({ code: 'Enter' })).toBe('commitPending');
+    expect(resolveShellAction({ code: 'NumpadEnter' })).toBe('commitPending');
+  });
+
+  it('leaves the overlays to consume Escape themselves', () => {
+    // The overlays own their own keydown and call preventDefault — they are
+    // NOT keymap bindings, and the ONE Escape binding is the fallthrough the
+    // mount arbitrates. If an overlay ever became a binding, two handlers
+    // would race for the same key.
+    expect(SHELL_BINDINGS.filter(b => b.code === 'Escape')).toHaveLength(1);
   });
 });

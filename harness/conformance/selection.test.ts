@@ -186,7 +186,10 @@ describe('selection ladder', () => {
       expect(session.selectedNoteKeys.sort()).toEqual(keys);
     }
 
-    // Past the top the session refuses — the mount turns that into deselect.
+    // Past the top the session simply refuses. This used to fall through to
+    // the mount's deselect, because Escape was the widen key and had to keep
+    // its universal meaning somehow; deselect is Escape's outright now
+    // (core-rung-addressing.md), so the top rung is just where widening stops.
     expect(session.handleIntent(relax)).toBe(false);
     expect(session.selectionLevel).toBe('document');
   });
@@ -200,8 +203,55 @@ describe('selection ladder', () => {
       expect(session.selectionLevel).toBe(level);
     }
     expect(session.selectedNoteKeys).toEqual(['n1']);
-    // At the bottom, tighten refuses (Enter's future job is to begin input).
+    // At the bottom, tighten refuses — there is no rung below `note`.
     expect(session.handleIntent(tighten)).toBe(false);
+  });
+
+  it('jumps straight to a rung by name, and refuses one this score has not got', () => {
+    // The absolute address (core-rung-addressing.md 2, Shift+1..8). The
+    // presence rule lives in the session, so a rung the document does not
+    // present is a REFUSAL — never a walk that parks at whatever it could
+    // reach, which is what the mount's old step-until-stuck loop did and what
+    // made "Shift+3" a lie in a score with no tuplet.
+    const session = new EditorSession(makeDoc());
+    expect(session.selectionLevel).toBe('note');
+
+    expect(session.handleIntent({ type: 'goToLevel', level: 'measure' })).toBe(true);
+    expect(session.selectionLevel).toBe('measure');
+    // Back down in one press, not four.
+    expect(session.handleIntent({ type: 'goToLevel', level: 'note' })).toBe(true);
+    expect(session.selectionLevel).toBe('note');
+
+    // `container` needs a tuplet or a grace group; makeDoc has neither.
+    expect(session.handleIntent({ type: 'goToLevel', level: 'container' })).toBe(false);
+    expect(session.selectionLevel).toBe('note'); // did NOT park on `event`
+
+    // `section` needs declared section labels.
+    expect(session.handleIntent({ type: 'goToLevel', level: 'section' })).toBe(false);
+    const sectioned = new EditorSession(makeDoc(true));
+    expect(sectioned.handleIntent({ type: 'goToLevel', level: 'section' })).toBe(true);
+    expect(sectioned.selectionLevel).toBe('section');
+  });
+
+  it('lands the same place a walk would, and records ONE intent doing it', () => {
+    // A jump must not be a different kind of arrival from a step, or the two
+    // ways of reaching a rung would drift. What differs is the TRACE: one
+    // gesture, one entry, rather than however many steps the walk took.
+    const walked = new EditorSession(makeDoc());
+    for (let i = 0; i < 3; i++) walked.handleIntent(relax);
+    const jumped = new EditorSession(makeDoc());
+    expect(jumped.handleIntent({ type: 'goToLevel', level: 'partMeasure' })).toBe(true);
+
+    expect(jumped.selectionLevel).toBe(walked.selectionLevel);
+    expect(jumped.selection).toEqual(walked.selection);
+    expect(jumped.selectedNoteKeys.sort()).toEqual(walked.selectedNoteKeys.sort());
+    expect(jumped.trace().intents).toHaveLength(1);
+    expect(walked.trace().intents).toHaveLength(3);
+  });
+
+  it('refuses a jump to the rung already held', () => {
+    const session = new EditorSession(makeDoc());
+    expect(session.handleIntent({ type: 'goToLevel', level: 'note' })).toBe(false);
   });
 
   it('skips the note rung under a rest — presence rule', () => {

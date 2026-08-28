@@ -46,12 +46,26 @@ presses:
 S at the start note   → arms a pending anchor (session state, shown in the edit strip)
 navigate anywhere     → ordinary cursor movement, the anchor holds
 S at the end note     → writes the slur, clears the anchor
+Enter at the end note → the same, without having to recall which letter armed it
 S on a slur's start   → removes that slur (toggle)
 Escape                → drops the anchor
 ```
 
+> **Revised 2026-08-28** by
+> [core-rung-addressing.md](../proposed/core-rung-addressing.md). The anchor
+> carries its **kind** (`{ key, kind: 'slur' | 'beam' }`), not just a note key.
+> Three things needed it. Enter has no letter to read the kind off. The kind
+> used to be decided at COMPLETION, so arming with `S` and finishing with `B`
+> silently produced a beam. And the edit strip captioned every armed anchor
+> "slur from …", including beams. Two ordering rules came with it: a mismatched
+> letter **refuses** rather than switching kind, and an armed anchor now
+> **outranks** a spanner already starting at the far note — that branch used to
+> be tested first, so completing onto a note that happened to carry its own
+> slur deleted that slur and threw the gesture away. Escape's drop is its own
+> `dropAnchor` intent now rather than a branch inside `relaxSelection`.
+
 This is **the first session state beyond the cursor and the entry duration**, and
-it is deliberately small: one nullable note key. Traces stay honest because the
+it is deliberately small: one note key and its kind. Traces stay honest because the
 recorded intent is what was pressed (`toggleSlur` twice), not a synthesized
 "create slur from A to B" — replay reconstructs the anchor exactly as a player
 would.

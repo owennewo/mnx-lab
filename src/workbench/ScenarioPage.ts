@@ -18,7 +18,6 @@ import { EditorSession, replayIntents } from '../edit/session.ts';
 import { elementKeys, runDestructWalk } from '../edit/destructWalk.ts';
 import { constructTraceByTarget, type ConstructTrace } from './constructTraces.ts';
 import {
-  SELECTION_LADDER,
   selectionNoteKeys,
   type SelectionMember,
   type SelectionLevel
@@ -57,6 +56,7 @@ import {
   type ShellAction
 } from '../edit/keymap.ts';
 import { TabDigitResolver } from '../edit/tabDigitResolver.ts';
+import { LADDER_JUMP_LEVELS } from '../edit/keymap.ts';
 import {
   ADORNMENT_HELP,
   LYRIC_HELP,
@@ -243,6 +243,10 @@ interface PartOverride {
  *  frame was drawn at, and the floor matters because the tab strip is flush
  *  left and MUST NOT WRAP — that is why the width change and the seven-to-five
  *  tab cut are one change and not two. */
+/** How long the chip wears a refusal. Long enough to register as an answer,
+ *  short enough that the next keypress is not waiting on it. */
+const RUNG_REFUSAL_MS = 600;
+
 const PANEL_WIDTH_KEY = 'mnx-lab.panel-width';
 /** Folded or not — SEPARATE from the width, so unfolding restores the width
  *  that was dragged rather than a default (mirrors `mnx-lab.rail-hidden`). */
@@ -650,6 +654,13 @@ export class ScenarioPage extends LitElement {
   @state() private chipFresh = false;
   private chipLevel: SelectionLevel | null = null;
   private chipTimer: ReturnType<typeof setTimeout> | undefined;
+
+  /** A rung was asked for by name and this document does not present it
+   *  (core-rung-addressing.md 7). The chip says so for a beat, because an
+   *  absolute key that silently does nothing is indistinguishable from one
+   *  that is broken. */
+  @state() private rungRefused = false;
+  private rungRefusalTimer: number | undefined;
 
   /** A micro button under the pointer/focus: the rung it would move to, and
    *  which way it climbs. Drives the destination tag on the chip's far side —
@@ -1082,6 +1093,14 @@ export class ScenarioPage extends LitElement {
       .rung-chip:hover,
       .rung-chip:focus-within {
         opacity: 1;
+      }
+
+      /* Asked for a rung this document has not got. Full strength so the key
+         is visibly heard, and the border carries the refusal rather than the
+         word — the word is still true, it just did not change. */
+      .rung-chip.refused {
+        opacity: 1;
+        border-color: var(--danger-fg, var(--line-strong));
       }
 
       .chip-word {
@@ -2229,6 +2248,53 @@ export class ScenarioPage extends LitElement {
     return this.tabDigits.flush();
   }
 
+  /**
+   * Escape and Enter — the pending-gesture pair (`PENDING_PRECEDENCE` in
+   * keymap.ts, which states the contract). Escape abandons the innermost
+   * pending thing, Enter commits it, and they walk the same list in the same
+   * order so neither can drift from the other.
+   *
+   * Levels 1–2 (popovers, tray, palette) never arrive here: overlays own
+   * their keydown and `preventDefault()` before the page listener runs. This
+   * is levels 3–5, and it is the whole reason these are shell actions rather
+   * than intents — the fret resolver is the MOUNT's, the anchor is the
+   * SESSION's, and deselection is neither.
+   */
+  private handlePending(action: 'abandonPending' | 'commitPending') {
+    if (!this.session) return;
+    const commit = action === 'commitPending';
+    // 3. a half-typed fret. Enter ends the 500 ms window early rather than
+    //    making the player wait it out; Escape drops the digit, the one path
+    //    `TabDigitResolver.cancel()` has been waiting for a key to reach.
+    if (this.tabDigits.pending !== null) {
+      if (commit) this.flushPendingFret();
+      else this.tabDigits.cancel();
+      return;
+    }
+    // 4. an armed spanner anchor. Enter dispatches the intent the anchor's
+    //    OWN letter would have — which is why the anchor carries its kind —
+    //    so the trace records `toggleSlur` twice exactly as two presses of
+    //    `S` do, and replay is unchanged.
+    const anchor = this.session.spanAnchor;
+    if (anchor) {
+      this.stripIntent(
+        commit
+          ? anchor.kind === 'slur'
+            ? { type: 'toggleSlur' }
+            : { type: 'toggleBeam' }
+          : { type: 'dropAnchor' }
+      );
+      return;
+    }
+    // 5. nothing pending. Escape deselects — view chrome, deliberately not
+    //    session history, so it is never recorded and never replayed. Enter
+    //    is free here; the note-rung input job will claim it.
+    if (!commit) {
+      this.cursorHidden = true;
+      this.syncFromSession();
+    }
+  }
+
   private onKeyDown = (event: KeyboardEvent) => {
     // Tab moves focus with no pointer event, so a keydown is also a
     // focus-change cause — re-ask after it settles.
@@ -2258,7 +2324,17 @@ export class ScenarioPage extends LitElement {
     }
     if (this.session && layers.length > 0) {
       const action = resolveShellAction(strokeOf(event));
-      if (action || keyAction) this.flushPendingFret();
+      // The pending pair is excluded from the blanket flush: abandoning a
+      // half-typed fret is the whole point of Escape, and flushing here would
+      // commit it before Escape ever ran. Enter flushes too, but as its OWN
+      // act (`handlePending` below), not as a side effect of arriving.
+      const pending = action === 'abandonPending' || action === 'commitPending';
+      if ((action || keyAction) && !pending) this.flushPendingFret();
+      if (pending && action) {
+        event.preventDefault();
+        this.handlePending(action);
+        return;
+      }
       // The clipboard verbs (stage 6): resolved here because the store I/O is
       // the mount's — the session only ever sees the materialized plan. The
       // focus gate above is the whole scope story; text fields never reach
@@ -2286,11 +2362,6 @@ export class ScenarioPage extends LitElement {
     if (!intent || !this.session) return;
     event.preventDefault();
     this.followProjection();
-    // The selection ladder (roadmap/complete/core-selection-ladder.md): Escape
-    // relaxes rung by rung; only a relax that can't widen further — already at
-    // score — becomes the old deselect. While deselected, Escape stays inert
-    // (and unrecorded — deselection is view chrome, not session history).
-    if (intent.type === 'relaxSelection' && this.cursorHidden) return;
     // The ladder does not end at the document (the navigation map's score
     // row): at the top rung the vertical neighbour is the next SCORE, which
     // the session cannot know and the element must not assume. The workbench
@@ -2311,17 +2382,25 @@ export class ScenarioPage extends LitElement {
     // deterministic and the trace records a bar, never a paint. `src/edit` may
     // import only `src/model`, so where the renderer wrapped the score is a
     // fact it structurally cannot see.
+    // The absolute rung keys land in the SAME funnel as the chip's ▲▼, the
+    // HUD's rows and the tray's ladder — `walkToLevel` — so a refusal flashes
+    // identically however the rung was asked for.
+    if (intent.type === 'goToLevel') {
+      this.walkToLevel(intent.level);
+      return;
+    }
     const systemStep = this.resolveSystemStep(intent);
     if (systemStep !== undefined) {
       if (systemStep === null) return; // no neighbouring system — the arrow dies here
       intent = systemStep;
     }
-    const handled = this.session.handleIntent(intent);
-    if (intent.type === 'relaxSelection') {
-      if (!handled) this.cursorHidden = true;
-    } else {
-      this.cursorHidden = false;
-    }
+    this.session.handleIntent(intent);
+    // Every intent re-shows the cursor. Widening past the top used to fall
+    // through to deselect here, because Escape was the widen key and had to
+    // keep its universal meaning somehow; deselect is Escape's outright now
+    // (`handlePending`), so relaxing is just navigation like the rest and the
+    // top rung is simply where it stops (core-rung-addressing.md).
+    this.cursorHidden = false;
     // Delete is the one verb whose two presses mean different things, so it
     // says which one this was — including when it declined. Everything else
     // that returns false is a navigation edge, where silence is the right
@@ -2537,7 +2616,7 @@ export class ScenarioPage extends LitElement {
       ? `right:${Math.max(6, this.mainWidth - (anchor.x + anchor.width))}px;`
       : `left:${Math.max(6, anchor.x)}px;`;
     const cls =
-      `rung-chip${this.chipFresh ? ' fresh' : ''}` +
+      `rung-chip${this.chipFresh ? ' fresh' : ''}${this.rungRefused ? ' refused' : ''}` +
       `${this.hasKeyboard ? '' : ' inactive'}${mirrored ? ' mirrored' : ''}`;
 
     const mic = (dir: 'up' | 'down', key: string | null) => html`<button
@@ -2631,7 +2710,13 @@ export class ScenarioPage extends LitElement {
         key: r.key,
         label: r.label,
         active: r.key === displayKey,
-        holdsSelection: r.key === baseKey
+        holdsSelection: r.key === baseKey,
+        // The digit that JUMPS here, read off the ladder itself — not this
+        // row's position in the column. The column is presence-filtered, so
+        // counting the rows on screen would print a different number for the
+        // same rung in a different document, which is the one thing an
+        // absolute address may not do (core-rung-addressing.md 8).
+        ordinal: LADDER_JUMP_LEVELS.indexOf(LEVEL_BY_ROW[r.key]) + 1
       }))
     ];
 
@@ -3077,28 +3162,37 @@ export class ScenarioPage extends LitElement {
   };
 
   /**
-   * Move the selection to a rung by walking relax/tighten intents until it
-   * matches — the ladder has no "go to level" verb, and inventing one would
-   * put a second way to change the selection beside Escape/Enter.
+   * Move the selection to a rung by NAME. The ladder grew a `goToLevel` verb
+   * in core-rung-addressing.md, because Shift+1..8 addresses a rung directly
+   * and a walk cannot honestly express that — see the body.
    *
-   * Shared by the HUD's rows and the tray's scope commit: both are mouse
-   * parity for the same keys, so both are recorded in the trace as the ladder
-   * moves they are. Bounded by the ladder's own length, and it stops early
-   * when a step doesn't move (the presence rule skipped the target).
+   * The one funnel for every absolute rung move: the HUD's rows, the tray's
+   * scope commit, the chip's ▲▼ and the digit keys. All four are recorded in
+   * the trace as the one ladder move they are.
    */
   private walkToLevel(target: SelectionLevel | undefined) {
     if (!this.session || !target) return;
     this.flushPendingFret();
     this.cursorHidden = false;
-    for (let guard = 0; guard < SELECTION_LADDER.length; guard++) {
-      const current: SelectionLevel = this.session.selectionLevel;
-      if (current === target) break;
-      const widen = SELECTION_LADDER.indexOf(target) > SELECTION_LADDER.indexOf(current);
-      this.session.handleIntent({ type: widen ? 'relaxSelection' : 'tightenSelection' });
-      if (this.session.selectionLevel === current) break;
-    }
+    // One intent, not a walk. The loop this replaced stepped relax/tighten
+    // until a step failed to move, which PARKED on the nearest reachable rung
+    // when the target was absent — tolerable while every caller was stepping
+    // anyway, a lie once Shift+3 claims to address `container` directly. The
+    // session owns the presence rule now and refuses; a refusal flashes the
+    // chip, because a dead key with no feedback is what teaches people a
+    // shortcut cannot be trusted. The trace gets one jump per gesture.
+    if (!this.session.handleIntent({ type: 'goToLevel', level: target })) this.flashRungRefusal();
     this.copied = false;
     this.syncFromSession();
+  }
+
+  /** A rung this document does not present, asked for by name. */
+  private flashRungRefusal() {
+    this.rungRefused = true;
+    window.clearTimeout(this.rungRefusalTimer);
+    this.rungRefusalTimer = window.setTimeout(() => {
+      this.rungRefused = false;
+    }, RUNG_REFUSAL_MS);
   }
 
   private onHudPartSetup = (event: Event) => {
@@ -4037,8 +4131,9 @@ export class ScenarioPage extends LitElement {
         ${session.spanAnchor
           ? html`<span
               class="span-anchor"
-              title="press S again at the far note to complete the slur · Esc drops it"
-              >· slur from ${session.spanAnchor}…</span
+              title=${`press ${session.spanAnchor.kind === 'slur' ? 'S' : 'B'} at the far note` +
+              ` or Enter to complete the ${session.spanAnchor.kind} · Esc drops it`}
+              >· ${session.spanAnchor.kind} from ${session.spanAnchor.key}…</span
             >`
           : nothing}
       </div>

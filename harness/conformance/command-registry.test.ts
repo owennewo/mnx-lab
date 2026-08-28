@@ -736,7 +736,86 @@ describe('command registry — state reads the document', () => {
 
     const anchor = new EditorSession(makeDoc());
     expect(anchor.handleIntent({ type: 'toggleSlur' })).toBe(true);
-    expect(anchor.spanAnchor).toBe('n1');
+    // The anchor carries its KIND from the moment it is armed
+    // (core-rung-addressing.md 5): the kind used to be decided at completion
+    // by whichever letter was pressed, so a `S` gesture could finish as a beam.
+    expect(anchor.spanAnchor).toEqual({ key: 'n1', kind: 'slur' });
     expect(anchor.opQueue.applied).toHaveLength(0);
+  });
+
+  it('never completes an armed anchor as the other kind of spanner', () => {
+    // The anchor used to be a bare note key, so the kind was decided by
+    // whichever letter finished the gesture: arm with `S`, press `B` at the
+    // far note, get a beam (core-rung-addressing.md 5). Refuse instead — and
+    // keep the anchor, so the strip still explains what is waiting.
+    const doc = makeDoc();
+    const events = doc.parts[0].measures?.[0].sequences?.[0].content ?? [];
+    events.forEach(event => {
+      if ('duration' in event) event.duration = { base: 'eighth' };
+    });
+    const session = new EditorSession(doc);
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
+    expect(session.spanAnchor).toEqual({ key: 'n1', kind: 'slur' });
+
+    session.handleIntent({ type: 'nextPosition' });
+    expect(session.handleIntent({ type: 'toggleBeam' })).toBe(false);
+    expect(session.opQueue.applied).toHaveLength(0);
+    expect(session.spanAnchor).toEqual({ key: 'n1', kind: 'slur' });
+
+    // The anchor's OWN letter still completes it.
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
+    expect(session.opQueue.applied[0].op).toMatchObject({
+      type: 'setSlur',
+      fromNoteKey: 'n1',
+      toNoteKey: 'n2'
+    });
+    expect(session.spanAnchor).toBeNull();
+  });
+
+  it('an armed anchor outranks a spanner already starting at the far note', () => {
+    // The remove branch used to be tested FIRST, so completing onto a note
+    // that already started a slur deleted that slur and threw the armed
+    // anchor away — the gesture the user was two presses into, lost to a
+    // coincidence (core-rung-addressing.md 5b).
+    const session = new EditorSession(makeDoc());
+    // Give n2 a slur of its own, from the far end of the bar.
+    session.handleIntent({ type: 'nextPosition' });
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true); // arms at n2
+    session.handleIntent({ type: 'prevPosition' });
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true); // n2 → n1
+    expect(session.opQueue.applied).toHaveLength(1);
+
+    // Now arm at n1 and complete onto n2, which now starts a slur.
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true); // arms at n1
+    expect(session.spanAnchor).toEqual({ key: 'n1', kind: 'slur' });
+    session.handleIntent({ type: 'nextPosition' });
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
+    expect(session.spanAnchor).toBeNull();
+    // The armed gesture won: a slur was WRITTEN, not removed.
+    expect(session.opQueue.applied).toHaveLength(2);
+    expect(session.opQueue.applied[1].op).toMatchObject({
+      type: 'setSlur',
+      fromNoteKey: 'n1',
+      toNoteKey: 'n2'
+    });
+  });
+
+  it('drops an armed anchor without touching the document, and only when one is armed', () => {
+    // Escape's job (core-rung-addressing.md 4). It used to ride inside
+    // `relaxSelection`, which meant Shift+↑ spent its first press after a `S`
+    // cancelling rather than widening — an exception nobody could see.
+    const session = new EditorSession(makeDoc());
+    expect(session.handleIntent({ type: 'dropAnchor' })).toBe(false); // nothing armed
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
+    expect(session.spanAnchor).not.toBeNull();
+    expect(session.handleIntent({ type: 'dropAnchor' })).toBe(true);
+    expect(session.spanAnchor).toBeNull();
+    expect(session.opQueue.applied).toHaveLength(0);
+
+    // And widening is now unconditionally widening.
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
+    expect(session.handleIntent({ type: 'relaxSelection' })).toBe(true);
+    expect(session.selectionLevel).toBe('event');
+    expect(session.spanAnchor).not.toBeNull();
   });
 });

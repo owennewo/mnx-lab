@@ -234,6 +234,26 @@
 > acts. Polarity (up widens) matches Helix's expand/shrink and is pinned in
 > `keymap-docs.test.ts`.
 >
+> **Esc/Enter left the ladder 2026-08-28** —
+> [core-rung-addressing.md](../proposed/core-rung-addressing.md), which is the
+> other half of the note above. The scrub alias fixed the FEEL of bouncing
+> between rungs and left the misfire: reaching for Escape as *back out of what
+> I am in* still widened the selection, and that reflex is older and stronger
+> than any semantic argument, so a better key never stopped the worse one
+> firing. The ladder is now **Shift+↑/↓** (relative, unchanged) and
+> **Shift+1..8** (absolute, one rung per digit in `SELECTION_LADDER` order),
+> and Escape/Enter became the **pending-gesture pair** — abandon and commit
+> the innermost open thing, `PENDING_PRECEDENCE` in `keymap.ts`. Also gone
+> with them: the mount's *relax-past-the-top becomes deselect* fallthrough
+> (deselect is Escape's outright now, so widening simply stops at the top),
+> and the anchor drop that hid inside `relaxSelection` (its own `dropAnchor`
+> intent, so Shift+↑ has no silent first-press exception). What follows this
+> line still describes Esc/Enter as the ladder keys — the semantic story in
+> the paragraph above, the resolution and the per-rung map further down, the
+> Esc-dir-Enter composition, and the animation note. Read those as history:
+> the CONTAINMENT model, the polarity and the presence rule are all unchanged,
+> only the two keys carrying them moved.
+>
 > **Enclosure geometry revised 2026-08-20** by
 > [workbench-rung-legibility.md](workbench-rung-legibility.md):
 > the run/panel/panel-wide shapes described below are superseded by the

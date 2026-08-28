@@ -16,6 +16,7 @@ import type { MnxLayout, MnxNoteValueBase, MnxScore, MnxTuningEntry } from '../m
 import type { PartialContainerSpec } from './setupGrammar.ts';
 import type { PastePlan } from './selectionPastePlanner.ts';
 import type { CutPlan } from './selectionCutPlanner.ts';
+import type { SelectionLevel } from './selection.ts';
 
 /** Shared constraint for resolved tab-entry intents and their stage-1 resolver. */
 export const MAX_ENTRY_FRET = 24;
@@ -46,6 +47,17 @@ export type NavigationIntent =
    *  mutation — the ladder changes what the cursor addresses, never the doc. */
   | { type: 'relaxSelection' }
   | { type: 'tightenSelection' }
+  /** The ladder's ABSOLUTE address (core-rung-addressing.md): go straight to a
+   *  named rung, Shift+1..8 and every pointer surface alike. One intent per
+   *  gesture, so the trace records the jump the user made rather than the N
+   *  relax/tighten steps a walk happened to take — and the presence rule is
+   *  enforced ONCE, here: a rung the document does not present is a refusal,
+   *  never a walk that parks at whatever it could reach. */
+  | { type: 'goToLevel'; level: SelectionLevel }
+  /** Abandon an armed spanner anchor without touching the document. Escape's,
+   *  and only Escape's: it used to ride inside `relaxSelection`, which meant
+   *  Shift+↑ silently spent its first press cancelling instead of widening. */
+  | { type: 'dropAnchor' }
   /** Horizontal selection is data too: Shift extends the active edge by the
    * rung's concrete unit (or to its end), while Ctrl/Meta+A records a live
    * closure rather than a frozen list of members. */
@@ -231,6 +243,8 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'goToEdge',
   'relaxSelection',
   'tightenSelection',
+  'goToLevel',
+  'dropAnchor',
   'extendSelection',
   'closeSelection',
   'selectSectionRange',

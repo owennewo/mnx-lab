@@ -81,9 +81,10 @@ export function fmtTuning(strings: readonly MnxTuningEntry[]): string {
 /**
  * The containment chain at the cursor. Presence rule honored: a level the
  * ladder would skip (no sections anywhere, no event/note under the cursor)
- * gets NO row — the column always matches what Escape/Enter can reach.
- * `cursorHidden` (Esc past the top = the conventional deselect) drops the
- * highlight but keeps the address readable.
+ * gets NO row — the column always matches what the ladder keys can reach,
+ * which is also what Shift+1..8 will refuse to jump to. `cursorHidden`
+ * (Escape with nothing pending = deselect) drops the highlight but keeps the
+ * address readable.
  */
 export function buildHudRows(
   title: string,

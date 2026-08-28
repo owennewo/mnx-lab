@@ -12,6 +12,7 @@
 // modelled; chasing it would couple this table to every session invariant.
 import {
   EDIT_LAYER,
+  LADDER_JUMP_LEVELS,
   NAVIGATION_LAYER,
   SHELL_BINDINGS,
   TAB_DIGIT_LAYER,
@@ -137,19 +138,10 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
 
-  // ── Selection — the ladder walk.
-  {
-    keys: 'Esc',
-    strokes: [{ code: 'Escape' }],
-    group: 'selection',
-    meaning: { all: 'widen the selection one rung (past document: deselect)' }
-  },
-  {
-    keys: 'Enter',
-    strokes: [{ code: 'Enter' }, { code: 'NumpadEnter' }],
-    group: 'selection',
-    meaning: { all: 'narrow the selection one rung (descends to the nearest note)' }
-  },
+  // ── Selection — the ladder walk. Escape and Enter left it in
+  // core-rung-addressing.md; the ladder is Shift+arrows (relative) and
+  // Shift+digits (absolute), and the two terminal keys went back to meaning
+  // what they mean everywhere else.
   {
     keys: 'Shift+↑/↓',
     strokes: [
@@ -157,9 +149,36 @@ export const KEY_DOCS: KeyDoc[] = [
       { code: 'ArrowDown', shift: true }
     ],
     group: 'selection',
-    // The Esc/Enter fluency alias — same intents, a one-hand scrub pair for
-    // bouncing between rungs (the `-`/`=` pattern applied to the ladder).
-    meaning: { all: 'widen / narrow the selection one rung (the Esc/Enter scrub pair)' }
+    meaning: { all: 'widen / narrow the selection one rung' }
+  },
+  {
+    keys: 'Shift+1…8',
+    // The LABEL names the position, never the glyph: shifted Digit1 prints
+    // `!` on QWERTY but `1` on AZERTY, where the whole digit row is shifted.
+    strokes: LADDER_JUMP_LEVELS.map((_, index) => ({
+      code: `Digit${index + 1}`,
+      shift: true
+    })),
+    group: 'selection',
+    meaning: {
+      all: 'jump straight to a rung — 1 note, 2 event, 3 container, 4 voice, 5 part, 6 bar, 7 section, 8 document (a rung this score has not got refuses)'
+    }
+  },
+  {
+    keys: 'Esc',
+    strokes: [{ code: 'Escape' }],
+    group: 'selection',
+    meaning: {
+      all: 'abandon the innermost pending thing — an open popover, a half-typed fret, an armed slur/beam anchor — or deselect when there is none'
+    }
+  },
+  {
+    keys: 'Enter',
+    strokes: [{ code: 'Enter' }, { code: 'NumpadEnter' }],
+    group: 'selection',
+    meaning: {
+      all: 'commit the innermost pending thing — apply the popover, enter the fret now, complete the armed slur/beam'
+    }
   },
   {
     keys: 'Shift+←/→',

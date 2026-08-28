@@ -102,6 +102,14 @@ export type DeleteOutcome =
   | { kind: 'sectionLabels'; sections: number }
   | { kind: 'refused'; level: SelectionLevel };
 
+/** A half-finished spanner gesture: the note it started on, and which kind of
+ *  spanner it will become. The kind is fixed when the anchor is ARMED, not
+ *  when it is completed — see the `spanAnchor` getter. */
+export interface SpanAnchor {
+  key: string;
+  kind: 'slur' | 'beam';
+}
+
 export class EditorSession {
   private history: EditHistory;
   private grid: PositionGrid;
@@ -119,7 +127,7 @@ export class EditorSession {
    *  null. The keyboard names two places in two presses because the ladder
    *  cannot yet extend laterally; when it can, "slur the selected run" becomes
    *  a second route to the same op rather than a replacement. */
-  private spanAnchorKey: string | null = null;
+  private spanAnchorState: SpanAnchor | null = null;
   /** The intent currently being handled — stamped into history entries by
    *  apply() as the op queue's provenance (forward-recorded at apply time). */
   private applyingIntent: EditorIntent | null = null;
@@ -741,7 +749,7 @@ export class EditorSession {
             : [];
         if (selected.length > 1) {
           const [fromNoteKey, toNoteKey] = [selected[0], selected[selected.length - 1]];
-          this.spanAnchorKey = null;
+          this.spanAnchorState = null;
           return this.applyBulk([
             hasSlurStartingAt(this.doc, fromNoteKey)
               ? { type: 'removeSlur', noteKey: fromNoteKey }
@@ -750,21 +758,33 @@ export class EditorSession {
         }
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
-        // 1. A slur already starting here? Toggle it off.
-        if (hasSlurStartingAt(this.doc, slot.noteKey)) {
-          this.spanAnchorKey = null;
-          this.apply({ type: 'removeSlur', noteKey: slot.noteKey });
-          return true;
-        }
-        // 2. An armed anchor? Complete the slur.
-        if (this.spanAnchorKey !== null && this.spanAnchorKey !== slot.noteKey) {
-          const from = this.spanAnchorKey;
-          this.spanAnchorKey = null;
+        // 1. An armed anchor elsewhere? Complete the slur.
+        //
+        //    This OUTRANKS the remove branch below, and the order is the whole
+        //    point (core-rung-addressing.md 5b): an armed anchor is a promise
+        //    the user made two presses ago, so a far note that happens to
+        //    start a slur of its own must not eat the gesture and throw the
+        //    anchor away. Removing that note's own slur is still one more `S`.
+        if (this.spanAnchorState !== null && this.spanAnchorState.key !== slot.noteKey) {
+          // Refuse rather than switch kind: an anchor armed with `B` is a
+          // beam gesture, and completing it as a slur would be inventing an
+          // instruction. The strip still names what is armed, so the refusal
+          // is legible on screen rather than mysterious.
+          if (this.spanAnchorState.kind !== 'slur') return false;
+          const from = this.spanAnchorState.key;
+          this.spanAnchorState = null;
           this.apply({ type: 'setSlur', fromNoteKey: from, toNoteKey: slot.noteKey });
           return true;
         }
+        // 2. A slur already starting here? Toggle it off.
+        if (hasSlurStartingAt(this.doc, slot.noteKey)) {
+          this.spanAnchorState = null;
+          this.apply({ type: 'removeSlur', noteKey: slot.noteKey });
+          return true;
+        }
         // 3. Otherwise arm (or disarm, pressing twice in one place).
-        this.spanAnchorKey = this.spanAnchorKey === slot.noteKey ? null : slot.noteKey;
+        this.spanAnchorState =
+          this.spanAnchorState?.key === slot.noteKey ? null : { key: slot.noteKey, kind: 'slur' };
         return true;
       }
       case 'setSyllable':
@@ -1050,12 +1070,12 @@ export class EditorSession {
           const first = selected[0];
           const existing = beamStartingAt(this.doc, first);
           if (existing) {
-            this.spanAnchorKey = null;
+            this.spanAnchorState = null;
             return this.applyBulk([{ type: 'removeBeam', ...existing }]);
           }
           const run = beamRunBetween(this.doc, first, selected[selected.length - 1]);
           if (run) {
-            this.spanAnchorKey = null;
+            this.spanAnchorState = null;
             // `run` carries its own part, staff and voice — the beam goes
             // where the notes are, not where the cursor's default was.
             return this.applyBulk([{ type: 'setBeam', ...run }]);
@@ -1066,26 +1086,30 @@ export class EditorSession {
         }
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
-        // 1. A beam already starting here? Toggle it off.
-        const existing = beamStartingAt(this.doc, slot.noteKey);
-        if (existing) {
-          this.spanAnchorKey = null;
-          this.apply({ type: 'removeBeam', ...existing });
-          return true;
-        }
-        // 2. An armed anchor? Beam the run between it and here.
-        if (this.spanAnchorKey !== null && this.spanAnchorKey !== slot.noteKey) {
+        // 1. An armed anchor elsewhere? Beam the run between it and here.
+        //    Ordered above the remove branch for the reason spelled out in
+        //    `toggleSlur` — the armed gesture wins (core-rung-addressing.md 5b).
+        if (this.spanAnchorState !== null && this.spanAnchorState.key !== slot.noteKey) {
+          if (this.spanAnchorState.kind !== 'beam') return false; // never switch kind
           // Indices, not ids: the op mints what the beam will reference, so
           // reading the document here cannot change it and the ids the beam
           // names are the ids the document actually carries.
-          const run = beamRunBetween(this.doc, this.spanAnchorKey, slot.noteKey);
-          this.spanAnchorKey = null;
+          const run = beamRunBetween(this.doc, this.spanAnchorState.key, slot.noteKey);
+          this.spanAnchorState = null;
           if (!run) return false;
           this.apply({ type: 'setBeam', ...run });
           return true;
         }
+        // 2. A beam already starting here? Toggle it off.
+        const existing = beamStartingAt(this.doc, slot.noteKey);
+        if (existing) {
+          this.spanAnchorState = null;
+          this.apply({ type: 'removeBeam', ...existing });
+          return true;
+        }
         // 3. Otherwise arm (or disarm, pressing twice in one place).
-        this.spanAnchorKey = this.spanAnchorKey === slot.noteKey ? null : slot.noteKey;
+        this.spanAnchorState =
+          this.spanAnchorState?.key === slot.noteKey ? null : { key: slot.noteKey, kind: 'beam' };
         return true;
       }
       case 'setRestSpelling': {
@@ -1300,9 +1324,14 @@ export class EditorSession {
     return coincidentSlots(this.grid, this.cursorState, this.activeProjection).length;
   }
 
-  /** The armed spanner anchor, for the HUD and the ops panel. */
-  get spanAnchor(): string | null {
-    return this.spanAnchorKey;
+  /** The armed spanner anchor, for the HUD and the ops panel. Carries its
+   *  KIND as well as its note: the kind used to be decided at completion by
+   *  whichever letter was pressed, which let a `S`-armed gesture finish as a
+   *  beam and left the strip captioning every anchor "slur from …"
+   *  (core-rung-addressing.md 5). Enter needs it too — it has no letter to
+   *  read the kind off. */
+  get spanAnchor(): SpanAnchor | null {
+    return this.spanAnchorState;
   }
 
   private navigate(intent: EditorIntent): boolean {
@@ -1353,13 +1382,26 @@ export class EditorSession {
         };
         return true;
       }
+      // Abandoning an armed anchor is its OWN intent now. It used to ride
+      // inside `relaxSelection` and shadow it, which meant Shift+↑ spent its
+      // first press after a `S` cancelling rather than widening — an
+      // exception nobody could see, hidden by Escape always arriving first.
+      case 'dropAnchor': {
+        if (this.spanAnchorState === null) return false;
+        this.spanAnchorState = null;
+        return true;
+      }
+      // The ladder's absolute address. The presence rule lives HERE and only
+      // here: a rung this document does not present is a refusal, so callers
+      // never have to walk toward one and park at whatever they could reach.
+      case 'goToLevel': {
+        const present = presentLevels(this.doc, this.grid, before, this.activeProjection);
+        if (!present.has(intent.level)) return false;
+        if (this.selectionState.level === intent.level) return false;
+        this.setSelectionLevel(intent.level);
+        return true;
+      }
       case 'relaxSelection': {
-        // Escape drops an armed spanner anchor before it does anything else —
-        // the gesture must be abandonable without touching the document.
-        if (this.spanAnchorKey !== null) {
-          this.spanAnchorKey = null;
-          return true;
-        }
         const next = relaxLevel(
           presentLevels(this.doc, this.grid, before, this.activeProjection),
           this.selectionState.level
@@ -1377,7 +1419,7 @@ export class EditorSession {
           this.setSelectionLevel(next);
           return true;
         }
-        if (this.selectionState.level === 'note') return false; // the bottom — Enter's input job, later
+        if (this.selectionState.level === 'note') return false; // the bottom of the ladder
         // The breadcrumb (the carried line) didn't resolve to a note —
         // moving while relaxed left it pointing at an empty cell. Descend to
         // the NEAREST child instead of refusing (the corresponding-child

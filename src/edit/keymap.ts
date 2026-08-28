@@ -15,6 +15,12 @@
 // views in the review shell). The mount point picks which layers are active;
 // this module only defines them. Bare arrows never mutate (survey §3.2).
 import type { EditorIntent } from './intents.ts';
+import { SELECTION_LADDER, type SelectionLevel } from './selection.ts';
+
+/** The rungs Shift+1..8 address, in ladder order (narrowest first). Derived,
+ *  never retyped: adding a rung to the ladder gives it a digit, and the
+ *  keymap-docs join then demands a documentation row for it. */
+export const LADDER_JUMP_LEVELS: readonly SelectionLevel[] = SELECTION_LADDER;
 
 /** A physical tab digit stops at stage 1; it is deliberately not an EditorIntent. */
 export type TabDigitAction = { type: 'tabDigit'; digit: number };
@@ -68,23 +74,42 @@ export const NAVIGATION_LAYER: KeymapLayer = {
     // Down/up the vertical axis: strings in a tab part, the note stack else.
     { code: 'ArrowDown', intent: { type: 'lineDown' } },
     { code: 'ArrowUp', intent: { type: 'lineUp' } },
-    // The selection ladder: Escape relaxes toward score (the mount turns a
-    // relax past the top into the conventional deselect, so Escape's meaning
-    // never changes — it just becomes gradual), Enter tightens toward note.
-    // Overlays keep precedence mechanically: popovers/palette preventDefault
-    // their Escape/Enter before the window listener sees them.
-    { code: 'Escape', intent: { type: 'relaxSelection' } },
-    { code: 'Enter', intent: { type: 'tightenSelection' } },
-    { code: 'NumpadEnter', intent: { type: 'tightenSelection' } },
-    // Shift+↑/↓ is the ladder's fluency alias (the `-`/`=` pattern: same
-    // intents, a scrubbable pair). It completes both families: Shift+arrows
-    // reshape the selection — laterally along the rung, vertically across
-    // rungs (widening to the parent IS vertical extension in a containment
-    // model) — and every modifier on ↑↓ now does something vertical (bare =
-    // line, Ctrl = climb, Alt = transpose, Shift = rung). Polarity is the
-    // ladder's own: up widens toward score, down narrows toward note.
+    // The selection ladder, RELATIVE: Shift+↑/↓ steps one rung. It completes
+    // both families — Shift+arrows reshape the selection, laterally along the
+    // rung and vertically across rungs (widening to the parent IS vertical
+    // extension in a containment model) — and every modifier on ↑↓ does
+    // something vertical (bare = line, Ctrl = climb, Alt = transpose, Shift =
+    // rung). Polarity is the ladder's own: up widens toward document, down
+    // narrows toward note.
+    //
+    // These were Escape/Enter's fluency alias until core-rung-addressing.md;
+    // they are now the only relative binding. Escape and Enter left the ladder
+    // because the reflex they were competing with — back out of what I am in —
+    // is older and stronger than any semantic argument for widening, so
+    // reaching for Escape kept moving a selection nobody asked to move. They
+    // are shell actions now (see SHELL_BINDINGS): abandon and commit.
     { code: 'ArrowUp', shift: true, intent: { type: 'relaxSelection' } },
-    { code: 'ArrowDown', shift: true, intent: { type: 'tightenSelection' } }
+    { code: 'ArrowDown', shift: true, intent: { type: 'tightenSelection' } },
+    // The selection ladder, ABSOLUTE: Shift+1..8 jumps straight to a rung,
+    // in SELECTION_LADDER order — 1 = `note`, the tightest thing you can
+    // select, 8 = `document`. The tray draws its column widest-first, so the
+    // digits count UP it rather than down; that is why the tray PRINTS them
+    // beside the rungs (core-rung-addressing.md 8) instead of leaving the
+    // reader to infer a direction. Data order wins over drawn order because
+    // it is the one that survives a rung being added at either end.
+    //
+    // Shift+digit is the last unclaimed global tier: Ctrl/⌘+digit and Alt+digit
+    // are browser tab selection and are NOT preventable, Alt+letter reaches the
+    // menu accelerators, Ctrl+letter is claimed across most of the alphabet,
+    // and the bare letters are spent on the technique and adornment dialects.
+    // The `code` discipline makes the STROKE layout-proof; the label must name
+    // the position ("Shift+1"), never the glyph — shifted Digit1 prints `!` on
+    // QWERTY but `1` on AZERTY, where the digit row is shifted throughout.
+    ...LADDER_JUMP_LEVELS.map((level, index) => ({
+      code: `Digit${index + 1}`,
+      shift: true,
+      intent: { type: 'goToLevel', level } as EditorIntent
+    }))
   ]
 };
 
@@ -196,7 +221,15 @@ export type ShellAction =
   // (core-selection-clipboard.md, stage 6).
   | 'copySelection'
   | 'cutSelection'
-  | 'pasteSelection';
+  | 'pasteSelection'
+  // Escape and Enter (core-rung-addressing.md). Shell actions for the same
+  // reason the clipboard verbs are: abandoning or committing the innermost
+  // pending thing has to consult the MOUNT-owned fret resolver, then session
+  // state, then fall through to deselect — which is view chrome, not session
+  // history. No single layer below the mount can see all three, so the mount
+  // arbitrates and dispatches the RESOLVED intent downward.
+  | 'abandonPending'
+  | 'commitPending';
 
 /** Exported for the cheatsheet's join tests (keymapDocs.ts) — resolution
  *  still goes through resolveShellAction only. */
@@ -259,6 +292,13 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   { code: 'KeyX', meta: true, action: 'cutSelection' },
   { code: 'KeyV', ctrl: true, action: 'pasteSelection' },
   { code: 'KeyV', meta: true, action: 'pasteSelection' },
+  // Escape and Enter, the pending-gesture pair. They are bound HERE rather
+  // than in the navigation layer because they no longer name one behaviour:
+  // what they do depends on what is open or half-typed at the moment they are
+  // pressed. See PENDING_PRECEDENCE below for the whole contract.
+  { code: 'Escape', action: 'abandonPending' },
+  { code: 'Enter', action: 'commitPending' },
+  { code: 'NumpadEnter', action: 'commitPending' },
   // The library rail toggle (VS Code's Ctrl+B sidebar reflex).
   { code: 'KeyB', ctrl: true, action: 'toggleRail' },
   // The score panel folds the same way, and VS Code has already taught the
@@ -274,34 +314,53 @@ export function resolveShellAction(stroke: KeyStroke): ShellAction | null {
 }
 
 /**
- * ESCAPE PRECEDENCE — the selection ladder's open question, answered here
- * because this module is the only interpreter of KeyboardEvents and the
- * answer must be stated once rather than per surface.
+ * THE PENDING-GESTURE CONTRACT — stated here because this module is the only
+ * interpreter of KeyboardEvents, and because the answer must be given once
+ * rather than per surface.
  *
- * **Innermost open thing first.** Escape means "back out of the thing I am
- * in", and the overlays are inside the editor, so they consume it before the
- * ladder ever sees it:
+ *   **Escape abandons the innermost pending thing. Enter commits it.**
  *
- *   1. a typed popover (Shift+letter grammar) — closes, nothing applied
- *   2. the selection tray / the command palette — closes, selection intact
- *      (inside the tray, a previewed scope returns to the real one first:
- *      the preview is a thing you are in too)
- *   3. otherwise `relaxSelection` — the ladder widens one rung
- *   4. past `score` — the mount's deselect
+ * A "pending thing" is a gesture the user has begun and not finished, which
+ * lives outside the document until it is: an open overlay, a half-typed fret,
+ * an armed spanner anchor. They nest, so the pair walks them innermost-first:
  *
- * The rule is enforced mechanically rather than by consultation: overlays own
- * their own keydown and `preventDefault()` before the page-level listener
- * runs, so this list is a description of what the DOM already guarantees —
- * which is why the ORDER is the whole contract and no code branches on it.
+ *   1. a typed popover (Shift+letter grammar) — Escape closes it applying
+ *      nothing; Enter applies it. Both are the overlay's own.
+ *   2. the selection tray / the command palette — same, and inside the tray a
+ *      previewed rung returns to the real one first: the preview is a thing
+ *      you are in too.
+ *   3. a pending fret digit (TabDigitResolver) — Escape drops it without
+ *      touching the document; Enter commits it now rather than waiting out
+ *      ENTRY_DIGIT_WINDOW_MS.
+ *   4. an armed spanner anchor — Escape drops it; Enter completes the spanner
+ *      of the kind that armed it.
+ *   5. nothing pending — Escape deselects; Enter is free (the note-rung input
+ *      job the session already reserves).
+ *
+ * Levels 1–2 are enforced mechanically rather than by consultation: overlays
+ * own their own keydown and `preventDefault()` before the page-level listener
+ * runs, so those two are a description of what the DOM already guarantees.
+ * Levels 3–5 are the mount's cascade, in this order.
+ *
+ * WHAT CHANGED, and why it is worth the churn (core-rung-addressing.md):
+ * Escape used to relax the selection one rung at step 3, and Enter used to
+ * tighten it. That competed with the reflex Escape has everywhere else — back
+ * out of what I am in — and the reflex won every time, so reaching for Escape
+ * moved a selection nobody had asked to move. Adding Shift+↑/↓ as a fluency
+ * alias in 2026-08 fixed the FEEL of bouncing between rungs and left the
+ * misfire untouched, because a better key does not stop a worse one firing.
+ * The ladder now owns Shift+↑/↓ (relative) and Shift+1..8 (absolute), and
+ * Escape and Enter are back to meaning what they mean everywhere else.
  */
-export const ESCAPE_PRECEDENCE = [
+export const PENDING_PRECEDENCE = [
   'popover',
   'overlay',
-  'relaxSelection',
-  'deselect'
+  'pendingFret',
+  'spanAnchor',
+  'selection'
 ] as const;
 
-export type EscapeConsumer = (typeof ESCAPE_PRECEDENCE)[number];
+export type PendingConsumer = (typeof PENDING_PRECEDENCE)[number];
 
 function matches(binding: KeyStroke, stroke: KeyStroke): boolean {
   return (

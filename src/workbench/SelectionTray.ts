@@ -46,6 +46,11 @@ export interface TrayRung {
    *  the `global` scope sits outside the ladder, so there is nothing for
    *  Enter to commit and the widen hint would be a lie. Absent = true. */
   committable?: boolean;
+  /** The Shift+digit that addresses this rung, printed on it. Supplied by the
+   *  page from the ladder's own indices, never counted off the column: the
+   *  column is presence-filtered and the address is not. Absent for `global`,
+   *  which is not a rung and has no digit. */
+  ordinal?: number;
 }
 
 /** A Bravura glyph by canonical SMuFL name, or one of the two marks that have
@@ -295,7 +300,8 @@ export class SelectionTray extends LitElement {
      * re-cased. The uppercase tab strip this replaced broke the one thing the
      * chip and the tray have to share. */
     .rung {
-      display: block;
+      display: flex;
+      align-items: center;
       box-sizing: border-box;
       width: 100%;
       text-align: left;
@@ -310,9 +316,34 @@ export class SelectionTray extends LitElement {
     }
 
     :host([data-mirrored]) .rung {
+      flex-direction: row-reverse;
       text-align: right;
       border-left: 0;
       border-right: 2px solid transparent;
+    }
+
+    /* The ordinal rides the rung's TRAILING edge, so the word keeps the x it
+     * had in the chip — the one measurement the chip→tray transition may not
+     * move (workbench-selection-chip-ladder.md). Quiet by default: it is a
+     * legend for the keys, not a second label competing with the word. */
+    .rung .ord {
+      margin-left: auto;
+      padding-left: 8px;
+      font: 500 8.5px/1.2 var(--mono);
+      color: var(--ink-3);
+      opacity: 0.6;
+    }
+
+    :host([data-mirrored]) .rung .ord {
+      margin-left: 0;
+      margin-right: auto;
+      padding-left: 0;
+      padding-right: 8px;
+    }
+
+    .rung[aria-current='true'] .ord {
+      color: var(--accent-fg);
+      opacity: 0.8;
     }
 
     .rung:hover {
@@ -1017,6 +1048,28 @@ export class SelectionTray extends LitElement {
   private onKeyDown = (event: KeyboardEvent) => {
     const target = event.composedPath()[0] as HTMLElement;
     const inSearch = target instanceof HTMLInputElement;
+    // Shift+1..8 reaches the ladder from anywhere in the tray, the query line
+    // included (core-rung-addressing.md 9). It is tested BEFORE the search
+    // line's "typing stays typing" rule because a shifted digit is a chord,
+    // not typing — and before the printable-character rule at the bottom,
+    // which would otherwise swallow it as `!` on QWERTY, `1` on AZERTY.
+    //
+    // It PREVIEWS rather than jumps, which is not a special case: Shift+↑/↓
+    // already previews in here and commits outside, so the digits inherit the
+    // surface's rule rather than bringing one of their own. Enter commits.
+    if (event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+      const digit = /^Digit([1-9])$/.exec(event.code);
+      if (digit) {
+        event.preventDefault();
+        event.stopPropagation();
+        // A rung this document does not present simply is not in the column,
+        // and asking for it does nothing — the same refusal the session makes
+        // for the same key with the tray shut.
+        const rung = this.rungs.find(r => r.ordinal === Number(digit[1]));
+        if (rung) this.emit('tray-rung-preview', { key: rung.key });
+        return;
+      }
+    }
     if (inSearch) {
       // Three keys mean something other than text while the caret is in the
       // query line; everything else stays typing.
@@ -1062,6 +1115,8 @@ export class SelectionTray extends LitElement {
       // reaching one. Shift+↑/↓ keeps the ladder — the same chord that walks
       // the rungs with the tray shut, so the gesture does not change meaning
       // when the surface opens — and clicking a rung is the pointer's way.
+      // Shift+1..8 is the absolute form of the same thing, handled at the top
+      // of this listener because the search line would otherwise eat it.
       //
       // ↑ still climbs and ↓ still descends: the column is drawn widest-first,
       // so the walk towards index 0 is also a walk UP the pixels, and key,
@@ -1355,6 +1410,8 @@ export class SelectionTray extends LitElement {
               >
                 ${rung.label}${rung.holdsSelection && !rung.active
                   ? html`<span class="dot"></span>`
+                  : nothing}${rung.ordinal
+                  ? html`<span class="ord" aria-hidden="true">${rung.ordinal}</span>`
                   : nothing}
               </button>
             `

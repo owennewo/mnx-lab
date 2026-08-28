@@ -9,7 +9,14 @@ import {
   KEY_DOCS,
   strokeKey
 } from '../../src/edit/keymapDocs.ts';
-import { NAVIGATION_LAYER, resolveIntent } from '../../src/edit/keymap.ts';
+import {
+  LADDER_JUMP_LEVELS,
+  NAVIGATION_LAYER,
+  TAB_DIGIT_LAYER,
+  resolveIntent,
+  resolveKeyAction
+} from '../../src/edit/keymap.ts';
+import { SELECTION_LADDER } from '../../src/edit/selection.ts';
 import { EditorSession } from '../../src/edit/session.ts';
 import { planSelectionCut } from '../../src/edit/selectionCutPlanner.ts';
 import type { MnxNote, MnxPitch, MnxStructure } from '../../src/model/mnx.ts';
@@ -64,22 +71,48 @@ describe('keymap docs — the joins', () => {
     expect(stale).toEqual([]);
   });
 
-  it('Shift+↑/↓ is a true Esc/Enter alias — same intents, ladder polarity', () => {
-    // The scrub pair must fire the IDENTICAL intents (the `-`/`=` alias
-    // pattern), and the polarity is the ladder's: up widens, down narrows.
-    // The joins above can't see a silent flip — this pins it.
+  it('Shift+↑/↓ keeps the ladder polarity: up widens, down narrows', () => {
+    // The joins above can't see a silent flip — this pins it. Escape and
+    // Enter used to be the other half of this assertion; they left the ladder
+    // in core-rung-addressing.md and key-scope.test.ts holds them to it.
     const layers = [NAVIGATION_LAYER];
-    expect(resolveIntent({ code: 'ArrowUp', shift: true }, layers)).toEqual(
-      resolveIntent({ code: 'Escape' }, layers)
-    );
-    expect(resolveIntent({ code: 'ArrowDown', shift: true }, layers)).toEqual(
-      resolveIntent({ code: 'Enter' }, layers)
-    );
     expect(resolveIntent({ code: 'ArrowUp', shift: true }, layers)).toEqual({
       type: 'relaxSelection'
     });
     expect(resolveIntent({ code: 'ArrowDown', shift: true }, layers)).toEqual({
       type: 'tightenSelection'
+    });
+  });
+
+  it('Shift+1..8 addresses the ladder absolutely, in ladder order', () => {
+    // The ORDER is the whole contract of an absolute address: 1 is the
+    // tightest rung and 8 the widest, matching SELECTION_LADDER rather than
+    // the tray's drawn column (which runs the other way and prints the
+    // ordinals precisely so the two cannot be confused).
+    const layers = [NAVIGATION_LAYER];
+    expect(LADDER_JUMP_LEVELS).toEqual(SELECTION_LADDER);
+    expect(LADDER_JUMP_LEVELS).toHaveLength(8);
+    for (const [index, level] of LADDER_JUMP_LEVELS.entries()) {
+      expect(resolveIntent({ code: `Digit${index + 1}`, shift: true }, layers)).toEqual({
+        type: 'goToLevel',
+        level
+      });
+    }
+    expect(LADDER_JUMP_LEVELS[0]).toBe('note');
+    expect(LADDER_JUMP_LEVELS[7]).toBe('document');
+  });
+
+  it('leaves the BARE digit row to the frets', () => {
+    // Digits are owned by the pane (keymap.ts's layer discipline). The rung
+    // jump is the shifted stroke and must not shadow fret entry — which is
+    // also the AZERTY cost this accepted, since that layout types digits WITH
+    // shift; recorded in core-rung-addressing.md, asserted here as the shape
+    // it takes in the tables.
+    const layers = [TAB_DIGIT_LAYER, NAVIGATION_LAYER];
+    expect(resolveKeyAction({ code: 'Digit1' }, layers)).toEqual({ type: 'tabDigit', digit: 1 });
+    expect(resolveKeyAction({ code: 'Digit1', shift: true }, layers)).toEqual({
+      type: 'goToLevel',
+      level: 'note'
     });
   });
 });

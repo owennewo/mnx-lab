@@ -59,7 +59,10 @@ export class TabDigitResolver {
     return true;
   }
 
-  /** Drop transient input without touching the document. Used only by tests. */
+  /** Drop transient input without touching the document — Escape's, via the
+   *  mount's pending cascade (core-rung-addressing.md 6). Until then this had
+   *  no key at all, and Escape mid-entry went through the blanket flush and
+   *  WROTE the fret it was meant to abandon. */
   cancel(): boolean {
     if (this.candidate === null) return false;
     this.clearCandidate();
