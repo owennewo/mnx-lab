@@ -1079,9 +1079,15 @@ export class EditorSession {
             : intent.kind === 'ottava'
               ? measure?.ottavas
               : measure?.directions) ?? [];
+        // The entry HERE: this onset, and this staff — a grand staff's two
+        // dynamics at one beat are two entries (core-measure-attributes-gaps.md, bug 2).
+        const staffHere = this.cursorState.staffIndex ?? 1;
         const index = list.findIndex(entry => {
           const [num, den] = entry.position?.fraction ?? [0, 1];
-          return num * this.cursorState.onset.den === this.cursorState.onset.num * den;
+          return (
+            num * this.cursorState.onset.den === this.cursorState.onset.num * den &&
+            ((entry as { staff?: number }).staff ?? 1) === staffHere
+          );
         });
         if (index < 0) return false;
         this.apply({
@@ -1261,7 +1267,8 @@ export class EditorSession {
         return this.applyBulk(this.selectedMeasureIndices().map(measureIndex => ({
           type: 'setMeasureAttribute',
           measureIndex,
-          attribute: intent.attribute
+          attribute: intent.attribute,
+          ...(intent.index !== undefined ? { index: intent.index } : {})
         })));
       }
       case 'removeMeasureAttribute': {
@@ -1275,7 +1282,8 @@ export class EditorSession {
           return measure?.[field] === undefined ? [] : [{
             type: 'removeMeasureAttribute',
             measureIndex,
-            kind: intent.kind
+            kind: intent.kind,
+            ...(intent.index !== undefined ? { index: intent.index } : {})
           } as const];
         });
         return this.applyBulk(ops);

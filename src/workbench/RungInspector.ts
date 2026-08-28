@@ -706,7 +706,7 @@ export class RungInspector extends LitElement {
       if (this.text.trim() === '') {
         if (pill.remove) this.emit('inspector-remove', { key: pill.key, intent: pill.remove });
       } else {
-        this.emit('inspector-apply', { word: pill.word, text: pick && !pick.word ? pick.label : this.text });
+        this.emit('inspector-apply', { word: pill.word, key: pill.key, text: pick && !pick.word ? pick.label : this.text });
       }
       this.open = null;
       this.text = '';

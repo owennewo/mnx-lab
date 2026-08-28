@@ -153,8 +153,13 @@ export type MutationIntent =
   | { type: 'removeTimeSignature' }
   // The bar-attribute family (campaign item 7): ten kinds, one verb, because
   // they are all one thing — a key on the global measure.
-  | { type: 'setMeasureAttribute'; attribute: MeasureAttribute }
-  | { type: 'removeMeasureAttribute'; kind: MeasureAttributeKind }
+  // `index` addresses the one array, `tempos`: absent, set replaces the
+  // first entry and remove strips it — the popover's behaviour; given, it
+  // names the entry (an index equal to the length appends). The inspector's
+  // `tempo#N` pills are what made the second entry addressable
+  // (core-measure-attributes-gaps.md, bug 1).
+  | { type: 'setMeasureAttribute'; attribute: MeasureAttribute; index?: number }
+  | { type: 'removeMeasureAttribute'; kind: MeasureAttributeKind; index?: number }
   // Spanners (campaign item 10): ONE intent, three meanings decided by
   // session state — remove the slur starting here, complete a pending one, or
   // arm the anchor. Traces record what was pressed, so replay rebuilds the

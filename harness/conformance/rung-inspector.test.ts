@@ -214,6 +214,61 @@ describe('readMeasureAttributes is the reverse of the op', () => {
   });
 });
 
+describe('the tempos array is addressable by index (core-measure-attributes-gaps.md, bug 1)', () => {
+  it('an add from the slot appends; an amend of tempo#N sets that entry; removing tempo#1 keeps tempo#0', () => {
+    const session = atBar(1);
+    // Bar 2 declares one tempo (quarter=120). Add a second from the slot.
+    const add = parseInspectorLine('measure', null, 'tempo half=80', { tempoCount: 1 });
+    expect(add).toEqual({ intent: { type: 'setMeasureAttribute', attribute: { kind: 'tempo', bpm: 80, base: 'half' }, index: 1 } });
+    expect(session.handleIntent((add as { intent: never }).intent)).toBe(true);
+    expect(measurePills(session.doc, 1).filter(p => p.word === 'tempo').map(p => `${p.key} ${p.value}`)).toEqual([
+      'tempo#0 quarter=120',
+      'tempo#1 half=80'
+    ]);
+    // Amend the second by its key.
+    const amend = parseInspectorLine('measure', 'tempo', 'half=60', { key: 'tempo#1' });
+    expect(amend).toEqual({ intent: { type: 'setMeasureAttribute', attribute: { kind: 'tempo', bpm: 60, base: 'half' }, index: 1 } });
+    expect(session.handleIntent((amend as { intent: never }).intent)).toBe(true);
+    expect(session.doc.global.measures[1]!.tempos!.map(t => t.bpm)).toEqual([120, 60]);
+    // Remove the second: the first survives (this is the bug that was there).
+    const second = measurePills(session.doc, 1).find(p => p.key === 'tempo#1')!;
+    expect(second.remove).toEqual({ type: 'removeMeasureAttribute', kind: 'tempo', index: 1 });
+    expect(session.handleIntent(second.remove!)).toBe(true);
+    expect(session.doc.global.measures[1]!.tempos!.map(t => t.bpm)).toEqual([120]);
+    // Without an index the popover's behaviour holds: the first is replaced.
+    expect(session.handleIntent({ type: 'setMeasureAttribute', attribute: { kind: 'tempo', bpm: 90, base: 'quarter' } })).toBe(true);
+    expect(session.doc.global.measures[1]!.tempos!.map(t => t.bpm)).toEqual([90]);
+  });
+});
+
+describe('removePositioned takes the entry on THIS staff (bug 2)', () => {
+  it('a grand staff with a dynamic on each staff at one beat removes only the cursor’s', () => {
+    const q = (id: string, octave: number) => ({ duration: { base: 'quarter' as const }, notes: [{ id, pitch: { step: 'C' as const, octave } }] });
+    const doc: MnxStructure = {
+      mnx: { version: 1 },
+      global: { measures: [{ time: { count: 4, unit: 4 } }] },
+      parts: [{
+        id: 'p1',
+        staves: 2,
+        measures: [{
+          clefs: [{ clef: { sign: 'G', staffPosition: -2 } }, { clef: { sign: 'F', staffPosition: 2 }, staff: 2 }],
+          sequences: [{ content: [q('a', 5)] }, { staff: 2, content: [q('b', 3)] }],
+          dynamics: [
+            { position: { fraction: [0, 1] }, type: 'immediate', value: 'f' },
+            { position: { fraction: [0, 1] }, type: 'immediate', value: 'p', staff: 2 }
+          ]
+        }]
+      }]
+    };
+    const session = new EditorSession(doc);
+    session.handleIntent({ type: 'setProjection', projection: 'notation' });
+    session.handleIntent({ type: 'setStaff', staffIndex: 2 });
+    expect(session.cursor.staffIndex).toBe(2);
+    expect(session.handleIntent({ type: 'removePositioned', kind: 'dynamic' })).toBe(true);
+    expect(session.doc.parts![0]!.measures![0]!.dynamics!.map(d => d.value)).toEqual(['f']);
+  });
+});
+
 describe('the surface is honest about what it emits', () => {
   it('every intent the inspector lists is one the session handles', () => {
     const source = fs.readFileSync(path.join(ROOT, 'src/edit/session.ts'), 'utf8');

@@ -2593,11 +2593,16 @@ export class ScenarioPage extends LitElement {
    *  or say why not. A refusal by the session (a time signature that does
    *  not fit, a key nothing declared) is said too — the keystroke must not
    *  read as broken. */
-  private applyInspectorLine(word: string | null, text: string) {
+  private applyInspectorLine(word: string | null, text: string, key?: string) {
     if (!this.session) return;
     const noteKey = this.session.selectedNoteKeys[0];
     const pitch = noteKey ? findNoteAddress(this.session.doc, noteKey)?.note.pitch : undefined;
-    const parsed = parseInspectorLine(this.session.selectionLevel, word, text, pitch ? { pitch } : undefined);
+    const tempoCount = this.session.doc.global?.measures?.[this.session.cursor.measureIndex]?.tempos?.length ?? 0;
+    const parsed = parseInspectorLine(this.session.selectionLevel, word, text, {
+      ...(pitch ? { pitch } : {}),
+      ...(key ? { key } : {}),
+      tempoCount
+    });
     if ('error' in parsed) {
       this.inspectorError = parsed.error;
       return;
@@ -2985,8 +2990,8 @@ export class ScenarioPage extends LitElement {
         @inspector-goto=${(e: CustomEvent<{ intent: EditorIntent }>) => {
           this.fireFromInspector(e.detail.intent);
         }}
-        @inspector-apply=${(e: CustomEvent<{ word: string | null; text: string }>) => {
-          this.applyInspectorLine(e.detail.word, e.detail.text);
+        @inspector-apply=${(e: CustomEvent<{ word: string | null; key?: string; text: string }>) => {
+          this.applyInspectorLine(e.detail.word, e.detail.text, e.detail.key);
         }}
         @inspector-remove=${(e: CustomEvent<{ key: string; intent: EditorIntent }>) => {
           this.fireFromInspector(e.detail.intent);

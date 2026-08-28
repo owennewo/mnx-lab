@@ -727,6 +727,8 @@ export type EditOp =
   | { type: 'removeMeasureRepeat'; measureIndex: number }
   | {
       type: 'setMeasureAttribute';
+      /** For `tempos` only: which entry (the length appends). */
+      index?: number;
       measureIndex: number;
       attribute: MeasureAttribute;
     }
@@ -1328,8 +1330,14 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const field = MEASURE_ATTRIBUTE_FIELDS[op.attribute.kind];
       const value = measureAttributeValue(op.attribute);
       // `tempos` is an array of marks; everything else is a single object.
-      if (field === 'tempos') measure.tempos = [value];
-      else measure[field] = value;
+      // Without an index the first entry is replaced (what the popover always
+      // did); with one, that entry — and the length appends a new mark.
+      if (field === 'tempos') {
+        const tempos = [...((measure.tempos as unknown[] | undefined) ?? [])];
+        const at = Math.min(op.index ?? 0, tempos.length);
+        tempos[at] = value;
+        measure.tempos = tempos;
+      } else measure[field] = value;
       return next;
     }
     case 'removeMeasureAttribute': {

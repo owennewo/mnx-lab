@@ -1,8 +1,11 @@
 # Measure-level attributes — the coverage census, and what is missing
 
-> **Status: PROPOSED 2026-08-28.** A census, then a work list. Prompted by
+> **Status: IN PROGRESS 2026-08-28 — items 1 and 2 built the same day** (the badge; the
+> four bugs, with the C clef pinned by a new scenario). Goldens moved by exactly one badge
+> per undrawn attribute; batch 7 in [lab-verify.md](lab-verify.md) registers them.
+> Items 3–8 open. A census, then a work list. Prompted by
 > `spec/measure-repeats-with-counters` reading as a regression after the rung inspector
-> ([workbench-rung-inspector.md](../inprogress/workbench-rung-inspector.md)) started
+> ([workbench-rung-inspector.md](workbench-rung-inspector.md)) started
 > naming `measure repeat: 1` on bars whose staff is empty — it was never a regression:
 > **the engine has never drawn a measure repeat**, and the verified golden (2026-08-07)
 > pins an empty staff. The inspector made a silent gap loud, and this doc asks how many
@@ -18,7 +21,7 @@
 CLAUDE.md, *Rendering*: layouts render **forgivingly** — unsupported content degrades
 to a placeholder and per-measure `!` badges, red = user-fixable, blue = warning,
 **amber = renderer gap**. And the verification ledger's own precedent
-([lab-verify.md](../inprogress/lab-verify.md), on fingering): "still a renderer gap —
+([lab-verify.md](lab-verify.md), on fingering): "still a renderer gap —
 nothing draws `_x.mnxLab.fingering` … an amber renderer-gap badge" is what a reviewer
 should expect to see. So a measure-level attribute has five things it can have, and each
 is a column below:
@@ -87,7 +90,7 @@ draws (`rehearsal`, `section`, `directions`), and the one `_x.mnxLab` measure bl
 extension in v4). **Nothing reads it, nothing writes it, nothing shows it** — it is the
 only `ElementKind` with neither `construct` nor `remove` (`elementWalk.ts:215`), and the
 only scenario that mentions it is a schema-rejection exhibit with no golden.
-[core-chord-symbols.md](low-priority/core-chord-symbols.md) owns the drawing half; noted
+[core-chord-symbols.md](../proposed/low-priority/core-chord-symbols.md) owns the drawing half; noted
 here for completeness, not claimed.
 
 ### Does tab mirror notation?
@@ -163,12 +166,23 @@ Found by the sweep and confirmed by hand; each is a one-file fix and a test:
 
 ## The work, in order
 
+1. ✅ **The badge** (2026-08-28) — `measureLevelGaps` in `spacing.ts`, one render issue per
+   undrawn attribute per bar, consumed by notation and tab alike; `measure-gaps.test.ts`
+   holds the list. Ledger batch 7.
+2. ✅ **The four bugs** (2026-08-28) — `index` on the set/remove intents and the set op
+   (absent = the popover's replace-first; the length appends), threaded from the
+   inspector's `tempo#N` key; `removePositioned` matches the cursor's staff; `clefGlyph`
+   gains `cClef` and every clef now honours `staffPosition` (`clefLineY`), pinned by
+   `lab/pitches/alto-and-tenor-clefs`.
+
+Original plan:
+
 1. **The badge.** A measure-level pass beside `spacing.ts:1213`: for each attribute the
    engine does not draw (`measureRepeat`, `arpeggios`, `nonArpeggios`, `fermata`,
    `harmonies`, a `gradual`/`relative` dynamic, a `C` clef until fixed, a second tempo),
    push an amber `render` issue on that bar. Moves the goldens of every scenario in the
    "bare staff" list by exactly one badge primitive each — register the batch in
-   [lab-verify.md](../inprogress/lab-verify.md). After this, a reviewer can see a gap
+   [lab-verify.md](lab-verify.md). After this, a reviewer can see a gap
    without reading `meta.json`.
 2. **The four bugs.** Each with a test that would have caught it; the tempo-index one
    also gets a corpus scenario with two tempos in one bar, which is the case the sweep
@@ -194,13 +208,13 @@ mistaken for a regression.
 
 ## Related
 
-- [workbench-rung-inspector.md](../inprogress/workbench-rung-inspector.md) — what made
+- [workbench-rung-inspector.md](workbench-rung-inspector.md) — what made
   the gaps visible; bugs 1 and 2 are its.
 - [core-element-ops-rhythm-declarations.md](../complete/core-element-ops-rhythm-declarations.md)
   — the ops half of measure repeats and full-measure rests, which explicitly left the ink
   where it was.
 - [core-element-ops-bar-attributes.md](../complete/core-element-ops-bar-attributes.md) —
   the op family for the global measure.
-- [lab-verify.md](../inprogress/lab-verify.md) — the fingering precedent for the badge,
+- [lab-verify.md](lab-verify.md) — the fingering precedent for the badge,
   and where the golden batches from items 1 and 3–6 register.
-- [core-chord-symbols.md](low-priority/core-chord-symbols.md) — owns `harmonies`.
+- [core-chord-symbols.md](../proposed/low-priority/core-chord-symbols.md) — owns `harmonies`.

@@ -170,6 +170,31 @@
         "className": "barline"
       },
       {
+        "kind": "rect",
+        "x": 29.2,
+        "y": 13.2,
+        "w": 1.1,
+        "h": 1.1,
+        "radius": 0.3,
+        "fill": "#b45309",
+        "className": "diagnostic-marker diagnostic-render",
+        "title": "renderer — measure repeat — the repeat sign is not drawn"
+      },
+      {
+        "kind": "text",
+        "text": "!",
+        "x": 29.75,
+        "y": 13.75,
+        "font": "body",
+        "size": 0.9,
+        "weight": "bold",
+        "anchor": "middle",
+        "baseline": "central",
+        "fill": "#fff",
+        "className": "diagnostic-marker diagnostic-render",
+        "title": "renderer — measure repeat — the repeat sign is not drawn"
+      },
+      {
         "kind": "line",
         "x1": 36.3,
         "y1": 8,
@@ -222,6 +247,31 @@
         "y2": 12,
         "thickness": 0.16,
         "className": "barline"
+      },
+      {
+        "kind": "rect",
+        "x": 36.6,
+        "y": 13.2,
+        "w": 1.1,
+        "h": 1.1,
+        "radius": 0.3,
+        "fill": "#b45309",
+        "className": "diagnostic-marker diagnostic-render",
+        "title": "renderer — measure repeat — the repeat sign is not drawn"
+      },
+      {
+        "kind": "text",
+        "text": "!",
+        "x": 37.15,
+        "y": 13.75,
+        "font": "body",
+        "size": 0.9,
+        "weight": "bold",
+        "anchor": "middle",
+        "baseline": "central",
+        "fill": "#fff",
+        "className": "diagnostic-marker diagnostic-render",
+        "title": "renderer — measure repeat — the repeat sign is not drawn"
       },
       {
         "kind": "line",
@@ -285,6 +335,31 @@
         "h": 4,
         "fill": "currentColor",
         "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "rect",
+        "x": 44,
+        "y": 13.2,
+        "w": 1.1,
+        "h": 1.1,
+        "radius": 0.3,
+        "fill": "#b45309",
+        "className": "diagnostic-marker diagnostic-render",
+        "title": "renderer — measure repeat — the repeat sign is not drawn"
+      },
+      {
+        "kind": "text",
+        "text": "!",
+        "x": 44.55,
+        "y": 13.75,
+        "font": "body",
+        "size": 0.9,
+        "weight": "bold",
+        "anchor": "middle",
+        "baseline": "central",
+        "fill": "#fff",
+        "className": "diagnostic-marker diagnostic-render",
+        "title": "renderer — measure repeat — the repeat sign is not drawn"
       }
     ]
   }

@@ -10,7 +10,9 @@ import {
   isTremolo,
   isTuplet,
   isTimedEvent,
-  sequenceItemKind
+  sequenceItemKind,
+  type MnxGlobalMeasure,
+  type MnxPartMeasure
 } from '../../model/mnx.ts';
 import { dynamicWidthSp } from './dynamics.ts';
 import { clampPadDensity } from './verticalDensity.ts';
@@ -645,6 +647,11 @@ export function tupletColumns(
 export interface ActiveClef {
   sign: 'G' | 'F' | 'C';
   octave: number; // MNX clef.octave: -1 = sounds 8vb, +1 = sounds 8va
+  /** MNX `clef.staffPosition`: half-spaces from the middle line, up positive
+   *  — the line the glyph pinches. Absent = the sign's conventional line
+   *  (G −2, F +2, C 0), which is what the engine assumed for every clef
+   *  before the C clef arrived (core-measure-attributes-gaps.md). */
+  staffPosition?: number;
 }
 
 export interface EventSlot {
@@ -1060,14 +1067,23 @@ export function planHorizontal(
           const oct = c.clef.octave ?? (sign === current.sign ? current.octave : 0);
           const f = c.position?.fraction;
           const t = Array.isArray(f) && f[1] ? f[0] / f[1] : 0;
-          return { t, clef: { sign, octave: oct } };
+          return {
+            t,
+            clef: {
+              sign,
+              octave: oct,
+              ...(c.clef.staffPosition !== undefined ? { staffPosition: c.clef.staffPosition } : {})
+            }
+          };
         })
         .sort((a, b) => a.t - b.t);
 
       const startClef = measureClefs.find(c => c.t <= ONSET_EPS);
       if (
         startClef &&
-        (startClef.clef.sign !== current.sign || startClef.clef.octave !== current.octave)
+        (startClef.clef.sign !== current.sign ||
+          startClef.clef.octave !== current.octave ||
+          startClef.clef.staffPosition !== current.staffPosition)
       ) {
         clefState[s] = startClef.clef;
         if (i > 0) clefChanged = true;
@@ -1106,6 +1122,12 @@ export function planHorizontal(
     }
 
     const issues: string[] = [];
+    // Measure-level attributes this renderer does not draw yet say so on the
+    // bar — the amber badge the rendering contract promises for a gap. Until
+    // core-measure-attributes-gaps.md these were recorded only in prose, and
+    // a verified empty staff read as a regression the moment something named
+    // the attribute. One list, in one place, so "not drawn" is never silent.
+    issues.push(...measureLevelGaps(globalMeasure, uniquePartsOf(planStaves).map(part => part.measures?.[i])));
     // Forgiving render: an item the model doesn't understand (or that throws)
     // degrades to a quarter-sized placeholder column and a measure diagnostic
     // — one bad item must not take down the whole score.
@@ -1550,4 +1572,43 @@ export function planHorizontal(
     ? Math.max(...measures.map(m => m.x + m.width)) + marginSp
     : widthSp;
   return { measures, rowCount: packed.length, numStaves, staffGroups, usedWidthSp, packing, inkRatio };
+}
+
+
+/** The parts a plan's staves draw from, once each, in staff order. */
+function uniquePartsOf(planStaves: PlanStaff[]): MnxPart[] {
+  const seen = new Set<MnxPart>();
+  for (const staff of planStaves) seen.add(staff.sources[staff.sources.length - 1]!.part);
+  return [...seen];
+}
+
+/**
+ * Measure-level attributes the engine does not engrave (yet). Each entry is a
+ * renderer-gap issue for the bar. The list IS the census
+ * (core-measure-attributes-gaps.md §"not rendered"): remove a line here when
+ * the ink arrives, and the badge goes with it.
+ */
+export function measureLevelGaps(
+  globalMeasure: MnxGlobalMeasure | undefined,
+  partMeasures: readonly (MnxPartMeasure | undefined)[]
+): string[] {
+  const gaps: string[] = [];
+  if ((globalMeasure as { fermata?: unknown } | undefined)?.fermata !== undefined)
+    gaps.push('fermata on the bar — not drawn');
+  if ((globalMeasure?.tempos?.length ?? 0) > 1)
+    gaps.push(`${globalMeasure!.tempos!.length} tempo marks — only the first is drawn`);
+  if ((globalMeasure?._x?.mnxLab?.harmonies?.length ?? 0) > 0)
+    gaps.push('chord symbols (harmonies) — not drawn');
+  for (const pm of partMeasures) {
+    if (!pm) continue;
+    const extra = pm as MnxPartMeasure & { measureRepeat?: unknown; arpeggios?: unknown[]; nonArpeggios?: unknown[] };
+    if (extra.measureRepeat !== undefined) gaps.push('measure repeat — the repeat sign is not drawn');
+    if ((extra.arpeggios?.length ?? 0) > 0) gaps.push('arpeggio — not drawn');
+    if ((extra.nonArpeggios?.length ?? 0) > 0) gaps.push('non-arpeggio bracket — not drawn');
+    for (const d of pm.dynamics ?? []) {
+      if (d.type === 'gradual') gaps.push('hairpin (gradual dynamic) — not drawn');
+      else if (d.type === 'relative') gaps.push(`relative dynamic (${d.relativeValue ?? 'louder'}) — not drawn`);
+    }
+  }
+  return gaps;
 }

@@ -694,9 +694,18 @@ export function parseInspectorLine(
   level: SelectionLevel,
   word: string | null,
   text: string,
-  context?: { pitch?: { step: string; octave: number; alter?: number } }
+  context?: { pitch?: { step: string; octave: number; alter?: number }; key?: string; tempoCount?: number }
 ): InspectorParse {
-  if (level === 'measure') return parseBarLine(word, text);
+  if (level === 'measure') {
+    const parsed = parseBarLine(word, text);
+    // An amend of `tempo#N` names its entry; an add from the slot appends.
+    const index = context?.key ? Number(/^tempo#(\d+)$/.exec(context.key)?.[1]) : NaN;
+    if ('intent' in parsed && parsed.intent.type === 'setMeasureAttribute' && parsed.intent.attribute.kind === 'tempo') {
+      if (!Number.isNaN(index)) return { intent: { ...parsed.intent, index } };
+      if (word === null && context?.tempoCount !== undefined) return { intent: { ...parsed.intent, index: context.tempoCount } };
+    }
+    return parsed;
+  }
   const line = (word ? `${word} ${text}` : text).trim();
   const head = line.split(/\s+/)[0]?.toLowerCase() ?? '';
   const rest = line.slice(head.length).trim();

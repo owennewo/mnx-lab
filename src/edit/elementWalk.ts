@@ -380,6 +380,8 @@ export const STRUCTURAL_CLASSES: Record<string, string> = {
   grace: 'a modifier token on grace-sized ink, not ink of its own',
   'diagnostic-marker': 'renderer diagnostics — our output, not the document’s content',
   'diagnostic-validation': 'renderer diagnostics — our output, not the document’s content',
+  'diagnostic-warning': 'renderer diagnostics — our output, not the document’s content',
+  'diagnostic-render': 'renderer diagnostics — the amber gap badge (core-measure-attributes-gaps.md), our output, not the document’s content',
   'mnx-tab-svg': 'the tab staff’s root group'
 };
 

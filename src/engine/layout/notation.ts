@@ -327,21 +327,37 @@ function diatonicStepIndex(step: string, octave: number): number {
  * staffTop). Lower y = higher pitch. Clef.octave compensates so the WRITTEN
  * position appears on the staff at the conventional place.
  */
+/** The pitch each sign pinches: G4, F3, C4 — and its conventional line as
+ *  MNX `staffPosition` (half-spaces from the middle line, up positive). */
+const CLEF_REFERENCE: Record<ActiveClef['sign'], { step: string; octave: number; staffPosition: number }> = {
+  G: { step: 'G', octave: 4, staffPosition: -2 },
+  F: { step: 'F', octave: 3, staffPosition: 2 },
+  C: { step: 'C', octave: 4, staffPosition: 0 }
+};
+
+/** The line the clef sits on, as y from staffTop: the middle line is 2, and
+ *  each staffPosition step is half a space. */
+function clefLineY(clef: ActiveClef): number {
+  const position = clef.staffPosition ?? CLEF_REFERENCE[clef.sign].staffPosition;
+  return 2 - position / 2;
+}
+
 function pitchToStaffY(step: string, octave: number, clef: ActiveClef): number {
   // MNX stores sounding pitch. Treble 8vb (clef.octave=-1) shifts written +1.
   const writtenOctave = octave - clef.octave;
   const noteIndex = diatonicStepIndex(step, writtenOctave);
-  if (clef.sign === 'F') {
-    const refIndex = diatonicStepIndex('F', 3); // F3 sits on the 4th line from bottom = y=1
-    return 1 - (noteIndex - refIndex) * 0.5;
-  }
-  // Default: treble. G4 sits on the 2nd line from bottom = y=3
-  const refIndex = diatonicStepIndex('G', 4);
-  return 3 - (noteIndex - refIndex) * 0.5;
+  // The clef's reference pitch sits on the clef's line; every diatonic step
+  // is half a space. Treble: G4 on y=3; bass: F3 on y=1; alto: C4 on y=2;
+  // tenor: C4 on y=1 (staffPosition 2) — the C clef was drawn as a treble
+  // clef, pitches and all, until core-measure-attributes-gaps.md.
+  const ref = CLEF_REFERENCE[clef.sign];
+  const refIndex = diatonicStepIndex(ref.step, ref.octave);
+  return clefLineY(clef) - (noteIndex - refIndex) * 0.5;
 }
 
 function clefGlyph(clef: ActiveClef): string {
   if (clef.sign === 'F') return 'fClef';
+  if (clef.sign === 'C') return 'cClef';
   if (clef.octave === -1) return 'gClef8vb';
   if (clef.octave === 1) return 'gClef8va';
   return 'gClef';
@@ -349,10 +365,7 @@ function clefGlyph(clef: ActiveClef): string {
 
 function clefY(clef: ActiveClef, staffTop: number): number {
   // SMuFL clef glyph origin = the staff line the clef pinches around.
-  // Treble (and 8vb/8va variants): G4 line = y=3 from staffTop.
-  // Bass: F3 line = y=1.
-  if (clef.sign === 'F') return staffTop + 1;
-  return staffTop + 3;
+  return staffTop + clefLineY(clef);
 }
 
 /** Convention: clef changes are drawn smaller than the system-start clef. */

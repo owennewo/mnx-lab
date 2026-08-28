@@ -1,0 +1,40 @@
+{
+  "title": "Alto and tenor clefs",
+  "description": "The C clef on its two common lines: alto (staffPosition 0, middle line) in bar 1 and tenor (staffPosition 2, fourth line) in bar 2, the same four pitches under each so the shift is visible. Middle C sits on the clef's line in both bars. Pins the C clef's glyph and its pitch placement — before core-measure-attributes-gaps.md a C clef drew as a treble clef and placed every pitch a sixth wrong, and no scenario said so.",
+  "bars": 2,
+  "tags": [
+    "clef",
+    "pitches"
+  ],
+  "specRefs": [],
+  "coversDefs": [
+    "clef",
+    "clef-sign",
+    "positioned-clef",
+    "staff-position",
+    "event",
+    "global",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "root",
+    "sequence",
+    "sequence-content",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

@@ -44,20 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-measure-attributes-gaps.md](proposed/core-measure-attributes-gaps.md)** — **proposed
-  2026-08-28.** A census of every measure-level attribute (`measure-global`, `part-measure`,
-  the three proposed objects the engine draws, `_x.mnxLab.harmonies`) across five columns —
-  render / badge / op / pill / corpus — cited to file and line, then a ranked work list.
-  Prompted by `spec/measure-repeats-with-counters` reading as a regression once the rung
-  inspector named `measure repeat: 1` on an empty bar: it never was one, the engine has
-  never drawn a measure repeat and the verified golden pins an empty staff. The finding
-  above the others: **no measure-level attribute ever produces the amber renderer-gap
-  badge** — four scenarios tagged `renderer-gap` render as bare staves with zero
-  diagnostics. Not rendered at all: measure repeats, arpeggios, fermatas, measure numbers,
-  harmonies. Partial: hairpins and relative dynamics draw nothing, the C clef draws as
-  treble, `tempos[0]` only, tab lacks repeats/voltas/dynamics. Four confirmed bugs, two of
-  them the inspector's (a dropped tempo index, a staff-blind `removePositioned`). Work
-  order: badge first, bugs second, then the engraving items through the ledger.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -186,6 +172,19 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-measure-attributes-gaps.md](inprogress/core-measure-attributes-gaps.md)** — **in progress 2026-08-28; items 1–2 (badge, four bugs) built the same day.** A census of every measure-level attribute (`measure-global`, `part-measure`,
+  the three proposed objects the engine draws, `_x.mnxLab.harmonies`) across five columns —
+  render / badge / op / pill / corpus — cited to file and line, then a ranked work list.
+  Prompted by `spec/measure-repeats-with-counters` reading as a regression once the rung
+  inspector named `measure repeat: 1` on an empty bar: it never was one, the engine has
+  never drawn a measure repeat and the verified golden pins an empty staff. The finding
+  above the others: **no measure-level attribute ever produces the amber renderer-gap
+  badge** — four scenarios tagged `renderer-gap` render as bare staves with zero
+  diagnostics. Not rendered at all: measure repeats, arpeggios, fermatas, measure numbers,
+  harmonies. Partial: hairpins and relative dynamics draw nothing, the C clef draws as
+  treble, `tempos[0]` only, tab lacks repeats/voltas/dynamics. Four confirmed bugs, two of
+  them the inspector's (a dropped tempo index, a staff-blind `removePositioned`). Work
+  order: badge first, bugs second, then the engraving items through the ledger.
 - **[workbench-rung-inspector.md](inprogress/workbench-rung-inspector.md)** — **in progress 2026-08-28; all five stages built the same day** (open only on the container verb) — [design canvas](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3);
   placed over the score where the tray sits, keyboard-first — a vertical three-row rung window beside a hard three-row attribute area, identity as floor pills; machinery in `edit/inspector.ts`,
   driven hands-on by `npm run smoke:inspector`. A third editing surface, tried *beside* the tray and the Shift+letter
