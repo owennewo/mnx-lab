@@ -66,7 +66,7 @@ draws (`rehearsal`, `section`, `directions`), and the one `_x.mnxLab` measure bl
 | `tempos[]` | ⚠️ **`tempos[0]` only** (`scoreText.ts:406`); **`location` ignored** — pinned to the bar prefix (`:410`); `dots` honoured | ✗ for the dropped entries | ⚠️ **writes `tempos = [value]`, replacing the array** (`ops.ts:1331`); no `dots`, no `location` | ⚠️ one pill per entry, keyed `tempo#N` — **but see bug 1** | 3; **no scenario has two tempos or a `location`** |
 | `key` | ✅ notation incl. cancellation naturals; tab none by design | — | ✅ | ✅ | 5, inked |
 | `time` | ✅ numerals and `common`/`cut` glyphs on notation. ❌ **`display` ignored on tab** (`tabStaff.ts:225` takes `{count, unit}`); 🐛 **multi-digit counts overprint** — every digit at one `x`, `anchor: middle` (`notation.ts:1569`, `tabStaff.ts:236`) | ✗ | ✅ | ✅ floor pill | 100+; **no `12/8`-class scenario**, so the overprint is unpinned |
-| `fermata` | ❌ **not read anywhere** (nor the event-level one) | ✗ | ❌ | ❌ | 0 on the measure; `lab/32-articulations/03-fermata` (event form) is a **bare-staff golden** |
+| `fermata` | ✅ since item 7 — bar form over the closing barline, event form over its note or rest (`fermata.ts`) | — | ✅ `fermata [symbol] [duration] [above\|below]` on both rungs | ✅ | `lab/32-articulations/03-fermata`, `05-fermatas-on-bars-and-rests` |
 | `number` | ❌ not read; not even in `MnxGlobalMeasure` | ✗ | ❌ | ❌ | 0 — **measure numbers are never engraved** |
 | colours (`ending`, `key`, `segno`, `fine`) | ❌ unread (only `rehearsal`/`section`/`direction` colour is honoured) | ✗ | ❌ | ❌ | 0 |
 | `id` | reference target only (ottava `end`, mmrests, layouts); minted, never set | — | implicit | — | many |
@@ -129,7 +129,7 @@ verified empty staff came to read as a regression.
 
 1. `measureRepeat` — full op pair, an inspector pill, two spec scenarios, empty goldens.
 2. `arpeggios` / `nonArpeggios` — a scenario, no code, no ops, no pills.
-3. `fermata` (measure and event forms) — no code, no ops, no pills, no `ElementKind`.
+3. ~~`fermata` (measure and event forms)~~ — item 7.
 4. `harmonies` — see above.
 5. `number` — measure numbers are never engraved.
 6. The colour properties on `ending`/`key`/`segno`/`fine`/`clef`; `clef.glyph`,
@@ -220,6 +220,20 @@ Found by the sweep and confirmed by hand; each is a one-file fix and a test:
    starting here, its length; removal is `toggleBeam`'s own path 2). A second tempo
    landed with the bugs (`index`). No golden moved — these are writers.
 
+7. ✅ **Fermatas** (2026-08-29) — one glyph table (`src/engine/layout/fermata.ts`:
+   `symbol` → Bravura's sign, `Above`/`Below` by `orient`, else by `pointing`; the
+   curlew is one glyph; `doubleDot` has none and draws as normal). The event form is
+   the outermost sign in `emitEvent`'s articulation stack — above the staff whatever
+   the stem does, clearing the articulations, the stem tip and the staff by 1.5 sp;
+   on a rest, 2 sp over it — and the bar form sits over the closing barline level
+   with the navigation marks (under the staff for `orient: below`), on the tab staff
+   too. One word grammar for both rungs (`fermata square long below`, any order —
+   the three enums are disjoint), `no fermata`; `setFermata`/`removeFermata` are
+   their own pair because MNX gives the event fermata its own key, the bar form is a
+   `MeasureAttribute`. One `ElementKind` for both. The badge line retires. Moves
+   `lab/articulations/fermata`; `fermatas-on-bars-and-rests` pins the rest — batch 7.
+   Not drawn: the event form on tab (like the articulations), `duration` (a hint).
+
 Original plan:
 
 1. **The badge.** A measure-level pass beside `spacing.ts:1213`: for each attribute the
@@ -244,8 +258,8 @@ Original plan:
 7. **Writers for what already renders**: `segno.glyph`, `direction.glyphs`,
    `tempo.dots`, arbitrary `location`, a second tempo (an `index` on the set op), and
    the `beams` pill.
-8. **The rest of (a)** — fermata, arpeggios, measure numbers — each as its own small
-   engraving item; `harmonies` stays with core-chord-symbols.
+8. **The rest of (a)** — fermata (done, item 7 above), arpeggios, measure numbers — each
+   as its own small engraving item; `harmonies` stays with core-chord-symbols.
 
 Items 3–6 move goldens and go through the ledger; 1 and 2 are the ones to do first,
 because they change what a reviewer *sees* and stop the next inspector pill from being

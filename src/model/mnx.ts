@@ -204,6 +204,18 @@ export interface MnxSlur {
   lineType?: string;
 }
 
+/** MNX `fermata`: on an event (over that note or rest) or on a global measure
+ *  (over the bar's closing barline). `symbol` picks the sign, `duration` is a
+ *  performance hint, `orient` the side; `pointing: down` also reads as the
+ *  below-staff form when no side is given. */
+export interface MnxFermata {
+  duration?: 'auto' | 'none' | 'veryLong' | 'long' | 'normal' | 'short' | 'veryShort';
+  orient?: 'above' | 'below' | 'auto';
+  pointing?: 'up' | 'down' | 'auto';
+  symbol?: 'normal' | 'angled' | 'square' | 'doubleAngled' | 'doubleSquare' | 'doubleDot' | 'halfCurve' | 'curlew';
+  color?: string;
+}
+
 export interface MnxEvent {
   /** Referenced by beams and slurs. */
   id?: string;
@@ -215,6 +227,7 @@ export interface MnxEvent {
   lyrics?: {
     lines?: Record<string, MnxEventLyricLine>;
   };
+  fermata?: MnxFermata;
   markings?: MnxEventMarkings;
   notes?: MnxNote[];
   rest?: MnxRest;
@@ -567,6 +580,8 @@ export interface MnxGlobalMeasure {
     };
     glyph?: string;
   };
+  /** A fermata over the bar's closing barline. */
+  fermata?: MnxFermata;
   /** "fine" marking at a metric position. */
   fine?: {
     location: {

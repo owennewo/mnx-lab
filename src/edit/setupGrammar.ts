@@ -7,6 +7,7 @@
 // popover chrome in ui/ only hosts the input box.
 import type {
   MnxLayoutContent,
+  MnxFermata,
   MnxNoteValueBase,
   MnxPitch,
   MnxScore,
@@ -269,7 +270,7 @@ const TEMPO_UNITS: Record<string, MnxNoteValueBase> = {
 
 export const BAR_ATTRIBUTE_HELP =
   'barline double · repeat start · repeat end 3 · ending 1,2 · ending 3 for 1 open · ' +
-  'segno · fine · ' +
+  'segno · fine · fermata · fermata square long below · ' +
   'jump dsalfine · jump segno at start · fine at end · tempo 120 · rehearsal A · section Verse 1 · full-measure rest · ' +
   'measure repeat 2 · measure repeat counter 3 · no <attribute>';
 
@@ -295,6 +296,7 @@ const ATTRIBUTE_WORDS: Record<string, MeasureAttributeKind> = {
   volta: 'ending',
   segno: 'segno',
   fine: 'fine',
+  fermata: 'fermata',
   jump: 'jump',
   tempo: 'tempo',
   rehearsal: 'rehearsal',
@@ -350,6 +352,12 @@ export function parseBarAttribute(text: string): BarAttributeResult {
     const count = rest[0] !== undefined ? Number(rest[0]) : 1;
     if (!Number.isInteger(count) || count < 1 || count > 4) return null;
     return { rhythm: 'measureRepeat', number: count, ...(counter ? { counter } : {}) };
+  }
+
+  // `fermata` / `fermata square long below` — over the bar's closing barline.
+  if (head === 'fermata') {
+    const fermata = parseFermataWords(words.slice(1));
+    return fermata ? { set: { kind: 'fermata', ...fermata } } : null;
   }
 
   // `repeat start` / `repeat end` / `repeat end 3` — one word, two kinds.
@@ -456,11 +464,15 @@ export const DYNAMIC_WORDS = [
 export const ADORNMENT_HELP =
   'accent · staccato · tenuto · strongAccent · … · a dynamic (pp, mf, fff) · ' +
   'text Play 8x · text below cantabile · 8va 2 · bend release · finger 3 · right p · cresc · dim · louder · softer · breath comma · bow up · ' +
-  'accidental · accidental parens · ' +
-  'no accent · no dynamic · no text · no string · no accidental';
+  'fermata · fermata square long below · accidental · accidental parens · ' +
+  'no accent · no fermata · no dynamic · no text · no string · no accidental';
 
 export type AdornmentResult =
   | { marking: string; remove?: boolean; attributes?: Record<string, string> }
+  /** The event's fermata (`fermata`, `fermata angled short below`); `no
+   *  fermata` removes it. Not a marking: MNX gives it its own key. */
+  | { fermata: MnxFermata }
+  | { removeFermata: true }
   /** Tab technique with a SHAPE. The single letters (B H S V X O) toggle the
    *  plain form; a bend that is released, or bent by something other than a
    *  tone, needs words — so the popover carries them, as it does for the
@@ -498,6 +510,7 @@ export function parseAdornment(text: string): AdornmentResult {
   if (head === 'no') {
     const target = (words[1] ?? '').toLowerCase();
     if (target === 'accidental') return { accidental: 'remove' };
+    if (target === 'fermata') return { removeFermata: true };
     if (target === 'dynamic') return { removePositioned: 'dynamic' };
     if (target === 'text' || target === 'direction') return { removePositioned: 'direction' };
     // The string choice is a note-level annotation like the markings, so it
@@ -505,6 +518,11 @@ export function parseAdornment(text: string): AdornmentResult {
     if (target === 'string' || target === 'fret') return { removeStringAnnotation: true };
     const marking = resolveMarking(words[1] ?? '');
     return marking ? { marking, remove: true } : null;
+  }
+
+  if (head === 'fermata') {
+    const fermata = parseFermataWords(words.slice(1));
+    return fermata ? { fermata } : null;
   }
 
   if (head === 'symbol') {
@@ -1114,4 +1132,40 @@ export function parseLayoutSentence(text: string): LayoutGrammarResult {
   }
 
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// Fermata words (core-measure-attributes-gaps.md, item 8). The same words
+// serve the event and the bar: `fermata`, then any of a SYMBOL (the sign),
+// a DURATION (the performance hint) and a SIDE, in any order — each enum is
+// disjoint from the others, so the words need no labels.
+
+export const FERMATA_SYMBOLS = [
+  'normal', 'angled', 'square', 'doubleAngled', 'doubleSquare', 'doubleDot', 'halfCurve', 'curlew'
+] as const;
+export const FERMATA_DURATIONS = ['auto', 'none', 'veryLong', 'long', 'normal', 'short', 'veryShort'] as const;
+
+/** The words after `fermata` → the object, or null for a word none of the
+ *  enums own. `normal` is a symbol AND a duration; it means the symbol. */
+export function parseFermataWords(words: readonly string[]): MnxFermata | null {
+  const fermata: MnxFermata = {};
+  for (const raw of words) {
+    const lower = raw.toLowerCase();
+    const symbol = FERMATA_SYMBOLS.find(s => s.toLowerCase() === lower);
+    const duration = FERMATA_DURATIONS.find(d => d.toLowerCase() === lower);
+    if (lower === 'above' || lower === 'below') fermata.orient = lower;
+    else if (symbol && fermata.symbol === undefined) fermata.symbol = symbol;
+    else if (duration && fermata.duration === undefined) fermata.duration = duration;
+    else return null;
+  }
+  return fermata;
+}
+
+/** The typed form back: the value half after the word `fermata`. */
+export function fermataText(fermata: MnxFermata): string {
+  return [
+    fermata.symbol,
+    fermata.duration,
+    fermata.orient === 'below' ? 'below' : fermata.orient === 'above' ? 'above' : undefined
+  ].filter((w): w is string => w !== undefined).join(' ');
 }

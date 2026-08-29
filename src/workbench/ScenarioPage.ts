@@ -3214,6 +3214,10 @@ export class ScenarioPage extends LitElement {
               }
           : 'removeStringAnnotation' in parsed
           ? { type: 'removeStringAnnotation' }
+          : 'fermata' in parsed
+          ? { type: 'setFermata', fermata: parsed.fermata }
+          : 'removeFermata' in parsed
+          ? { type: 'removeFermata' }
           : 'marking' in parsed
           ? parsed.remove
             ? { type: 'removeMarking', marking: parsed.marking }

@@ -573,6 +573,8 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'setEventDuration',
     'setMarking',
     'removeMarking',
+    'setFermata',
+    'removeFermata',
     'setPositioned',
     'removePositioned',
     'setSyllable',
@@ -637,6 +639,8 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   adornmentPopover: [
     'setMarking',
     'removeMarking',
+    'setFermata',
+    'removeFermata',
     'setPositioned',
     'removePositioned',
     'removeStringAnnotation',

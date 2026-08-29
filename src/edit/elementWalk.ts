@@ -28,7 +28,7 @@ import { kitNoteKey } from '../model/noteKeys.ts';
 
 export type ElementKind =
   // note & event level
-  | 'note' | 'kit-note' | 'tie' | 'slur' | 'lyric' | 'articulation'
+  | 'note' | 'kit-note' | 'tie' | 'slur' | 'lyric' | 'articulation' | 'fermata'
   | 'accidental-display' | 'string-annotation' | 'fingering' | 'technique'
   // sequence containers
   | 'tuplet' | 'grace' | 'tremolo' | 'space' | 'full-measure-rest' | 'measure-repeat'
@@ -250,6 +250,12 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     note: 'A segno sign at a metric position.',
     construct: ['setMeasureAttribute'],
     remove: ['removeMeasureAttribute']
+  },
+  fermata: {
+    classes: ['fermata', 'fermata-measure'],
+    note: 'A fermata over an event (its own key, not a marking) or over a bar\'s closing barline.',
+    construct: ['setFermata', 'setMeasureAttribute'],
+    remove: ['removeFermata', 'removeMeasureAttribute']
   },
   fine: {
     classes: ['fine'],
@@ -564,6 +570,8 @@ function walkEvent(
       [...jsonPath, 'lyrics', 'lines', line],
       keyOf?.(0, notes[0] ?? {})
     );
+  if (event.fermata !== undefined)
+    pushOnNote(out, 'fermata', `${path}/fermata`, [...jsonPath, 'fermata'], keyOf?.(0, notes[0] ?? {}));
   for (const marking of Object.keys((event.markings ?? {}) as Record<string, unknown>))
     pushOnNote(
       out,
@@ -654,6 +662,7 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
     at('ending', 'ending');
     at('segno', 'segno');
     at('fine', 'fine');
+    at('fermata', 'fermata');
     at('jump', 'jump');
     at('rehearsal', 'rehearsal');
     at('section', 'section');

@@ -1051,6 +1051,16 @@ export class EditorSession {
             : { type: 'removeMarking' as const, event, marking: intent.marking }
         ));
       }
+      case 'setFermata':
+      case 'removeFermata': {
+        const targets = this.selectedEventAddresses();
+        if (targets.length === 0) return false;
+        return this.applyBulk(targets.map(event =>
+          intent.type === 'setFermata'
+            ? { type: 'setFermata' as const, event, fermata: intent.fermata }
+            : { type: 'removeFermata' as const, event }
+        ));
+      }
       case 'setPositioned': {
         const partIndex = this.cursorState.partIndex ?? 0;
         const staffIndex = this.cursorState.staffIndex ?? 1;

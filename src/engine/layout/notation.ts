@@ -1,5 +1,6 @@
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
+import { emitMeasureFermata, fermataBelow, fermataGlyph } from './fermata.ts';
 import { emitMeasureRepeat, measureRepeatX, type MeasureRepeatMark } from './measureRepeat.ts';
 import { emitEndings } from './endings.ts';
 import { timeSigDigitDx } from './tabStaff.ts';
@@ -1978,6 +1979,13 @@ function assembleSegment(
       staffTop,
       primitives
     });
+    emitMeasureFermata({
+      gm: mnx.global.measures[i] ?? {},
+      m,
+      staffTop,
+      staffHeight: STAFF_HEIGHT_SP,
+      primitives
+    });
     // The tempo mark and the label row are emitted after the loop — they are
     // placed one clearance above the bar's ink, and the beams, voltas and
     // ottava brackets that ink includes are drawn after the loop too.
@@ -3842,6 +3850,18 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
         className: 'dot'
       });
     }
+    if (event.fermata) {
+      const below = fermataBelow(event.fermata);
+      primitives.push({
+        kind: 'glyph',
+        glyph: fermataGlyph(event.fermata, below),
+        x: eventX,
+        y: staffTop + (below ? Math.max(STAFF_HEIGHT_SP + 1.5, yOffset + 2) : Math.min(-1.5, yOffset - 2)),
+        anchor: 'middle',
+        ...(event.fermata.color ? { fill: event.fermata.color } : {}),
+        className: 'fermata'
+      });
+    }
     return null;
   }
 
@@ -3967,6 +3987,9 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
 
   // Stem
   let deferredStem: BeamedStem | null = null;
+  // The stem's tip, relative to staffTop, for the fermata to clear (a beamed
+  // stem's real tip is the beam's — the unbeamed length is the estimate).
+  let stemTipRelY: number | null = null;
   if (hasStem) {
     const minStaffY = Math.min(...staffYs);
     const maxStaffY = Math.max(...staffYs);
@@ -3991,6 +4014,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       baseTipY = staffTop + maxStaffY;
     }
     const tipY = baseTipY - stemDir * STEM_LENGTH_SP;
+    stemTipRelY = tipY - staffTop;
 
     // Single-note tremolo: `marks` slashes through the stem (the SMuFL
     // combining glyphs are designed centred on the stem).
@@ -4075,9 +4099,9 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
 
   // Articulations — on the side opposite the stem, stacking outward from the
   // extreme notehead, snapped off staff lines; strongAccent always sits above.
+  let yAbove = Math.min(...staffYs) - 1;
+  let yBelow = Math.max(...staffYs) + 1;
   if (event.markings) {
-    let yAbove = Math.min(...staffYs) - 1;
-    let yBelow = Math.max(...staffYs) + 1;
     for (const art of ARTICULATIONS) {
       if (!event.markings[art.key]) continue;
       const above = art.forceAbove || stemDir === -1;
@@ -4097,6 +4121,25 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       if (above) yAbove = y - 1;
       else yBelow = y + 1;
     }
+  }
+
+  // The fermata is the outermost sign: above the staff by default (whatever
+  // the stem does), clear of the articulations, the stem tip and the staff
+  // itself; `orient: below` (or a down-pointing sign) mirrors it underneath.
+  if (event.fermata) {
+    const below = fermataBelow(event.fermata);
+    const y = below
+      ? Math.max(yBelow, STAFF_HEIGHT_SP + 1.5, stemDir === -1 && stemTipRelY !== null ? stemTipRelY + 1 : -Infinity)
+      : Math.min(yAbove, -1.5, stemDir === 1 && stemTipRelY !== null ? stemTipRelY - 1 : Infinity);
+    primitives.push({
+      kind: 'glyph',
+      glyph: fermataGlyph(event.fermata, below),
+      x: eventX,
+      y: staffTop + y,
+      anchor: 'middle',
+      ...(event.fermata.color ? { fill: event.fermata.color } : {}),
+      className: 'fermata'
+    });
   }
 
   // Index

@@ -12,7 +12,8 @@ import type {
   PositionedAttribute,
   TechniqueChoice
 } from './ops.ts';
-import type { MnxLayout, MnxNoteValueBase, MnxScore, MnxTuningEntry } from '../model/mnx.ts';
+import type {
+  MnxFermata, MnxLayout, MnxNoteValueBase, MnxScore, MnxTuningEntry } from '../model/mnx.ts';
 import type { PartialContainerSpec } from './setupGrammar.ts';
 import type { PastePlan } from './selectionPastePlanner.ts';
 import type { CutPlan } from './selectionCutPlanner.ts';
@@ -208,6 +209,8 @@ export type MutationIntent =
   | { type: 'removeMultimeasureRest'; scoreIndex: number; index: number }
   | { type: 'setMarking'; marking: string; attributes?: Record<string, string> }
   | { type: 'removeMarking'; marking: string }
+  | { type: 'setFermata'; fermata: MnxFermata }
+  | { type: 'removeFermata' }
   // The inspector's amend of a technique (roadmap/inprogress/workbench-rung-inspector.md):
   // `toggleTechnique` on a present bend REMOVES it, so re-valuing one needs a
   // verb that sets without asking what is there.

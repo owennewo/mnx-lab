@@ -72,6 +72,8 @@ const ONE_OF_EACH: MeasureAttribute[] = [
   { kind: 'segno', glyph: 'segnoSerpent2', at: [1, 2] },
   { kind: 'fine' },
   { kind: 'fine', at: 'end' },
+  { kind: 'fermata' },
+  { kind: 'fermata', symbol: 'square', duration: 'long', orient: 'below' },
   { kind: 'jump', type: 'dsalfine' },
   { kind: 'jump', type: 'segno', at: [3, 4] },
   { kind: 'tempo', bpm: 120, base: 'quarter' },

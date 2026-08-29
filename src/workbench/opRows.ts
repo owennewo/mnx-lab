@@ -6,6 +6,7 @@
 // workbench-tier, receiving editor types and producing display strings, the
 // same layering as hudRows.ts. An intent with no binding and no surface
 // renders "(no key)" honestly: the panel is a live gap detector.
+import { fermataText } from '../edit/setupGrammar.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import type { EditOp, EntryTarget, OpLogEntry } from '../edit/ops.ts';
 import { attributeText } from '../edit/inspector.ts';
@@ -254,6 +255,10 @@ function opLabel(op: EditOp): string {
       return `${op.marking} · ${op.noteKey ?? eventAddressText(op.event)}`;
     case 'removeMarking':
       return `no ${op.marking} · ${op.noteKey ?? eventAddressText(op.event)}`;
+    case 'setFermata':
+      return `fermata ${fermataText(op.fermata)} · ${op.noteKey ?? eventAddressText(op.event)}`.replace('  ', ' ');
+    case 'removeFermata':
+      return `no fermata · ${op.noteKey ?? eventAddressText(op.event)}`;
     case 'setPositioned': {
       const where = `@ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
       if (op.attribute.kind === 'dynamic')

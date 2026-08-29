@@ -86,10 +86,10 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
-### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **3 stale, 3 never-seen**
+### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **4 stale, 4 never-seen**
 
 Owner: [core-measure-attributes-gaps.md](core-measure-attributes-gaps.md) (in progress,
-items 1–2). Demoted 2026-08-28.
+items 1–7). Demoted 2026-08-28; grown 2026-08-29 (item 7).
 
 **Cause.** No measure-level attribute ever produced the amber renderer-gap badge: the
 badge machinery was fed only by unsupported sequence-content kinds, so a bar whose
@@ -122,6 +122,17 @@ whose `end` names the next bar, closing on that bar's `p`; the wedge should be o
 crossing the barline as one pair of lines. `lab/pitches/alto-and-tenor-clefs` — new, authored to pin the C clef
 (bug 4 of the same doc: a C clef drew as a treble clef and placed every pitch a sixth
 wrong; no scenario had a C clef). Alto in bar 1, tenor in bar 2, the same four pitches.
+
+**Fermatas (item 7, 2026-08-29).** `lab/articulations/fermata` is **stale**: the whole
+note now carries the plain sign 1.5 sp above the staff, centred on the note, and its
+badge-less staff is otherwise unchanged. `lab/articulations/fermatas-on-bars-and-rests`
+is **never-seen**: bar 1 — a stem-down C5 with an accent AND a fermata (the accent
+nearest the head, the fermata outside it), an angled fermata over the quarter rest, a
+square fermata over the stem-up half note CLEAR OF THE STEM TIP, and the plain sign over
+the barline between the bars; bar 2 — a fermata UNDER the half note (`orient: below`,
+the inverted sign), the curlew under the half rest (`pointing: down` reads as
+the below form), and a square sign under the final barline. Nothing on any tab view but
+the two bar-form signs.
 
 **What a reviewer should look for.** On `arpeggiated-chords`: the music is unchanged and
 the bar carries two amber badges at its bottom-left (arpeggio, non-arpeggio). If any

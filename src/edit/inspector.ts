@@ -31,6 +31,7 @@ import {
   MARKING_WORDS,
   parseAdornment,
   parseBarAttribute,
+  fermataText,
   parseClef,
   parseKeySignature,
   parseLyric,
@@ -78,6 +79,10 @@ export function attributeText(attribute: MeasureAttribute): string {
       return `segno${attribute.glyph ? ` ${segnoWord(attribute.glyph)}` : ''}${markAtText(attribute.at)}`;
     case 'fine':
       return `fine${markAtText(attribute.at)}`;
+    case 'fermata': {
+      const { kind: _kind, ...fermata } = attribute;
+      return `fermata ${fermataText(fermata)}`.trim();
+    }
     case 'jump':
       return `jump ${attribute.type}${markAtText(attribute.at)}`;
     case 'tempo':
@@ -200,6 +205,7 @@ const WORD_OF: Record<MeasureAttributeKind, string> = {
   ending: 'ending',
   segno: 'segno',
   fine: 'fine',
+  fermata: 'fermata',
   jump: 'jump',
   tempo: 'tempo',
   rehearsal: 'rehearsal',
@@ -213,6 +219,7 @@ const HINT_OF: Record<MeasureAttributeKind, string> = {
   ending: '1,2 · 3 open',
   segno: 'serpent · at end · at 1/2',
   fine: 'at start · at end · at 3/4',
+  fermata: 'square · long · below',
   jump: 'segno · dsalfine · at 1/2',
   tempo: '120 · half=80 · quarter.=60',
   rehearsal: 'A · 12',
@@ -477,6 +484,8 @@ export function eventPills(doc: MnxStructure, member: Extract<SelectionMember, {
     const detail = attrs && typeof attrs === 'object' ? Object.values(attrs as Record<string, unknown>).join(' ') : '';
     pills.push(annotation(`marking:${name}`, name, detail, { type: 'removeMarking', marking: name }));
   }
+  if (event.fermata)
+    pills.push(annotation('fermata', 'fermata', fermataText(event.fermata), { type: 'removeFermata' }));
   for (const { attribute } of readPositionedAttributes(doc, member, [member.onset.num, member.onset.den])) {
     const { word, value } = positionedText(attribute);
     pills.push(annotation(`positioned:${attribute.kind}`, word, value, { type: 'removePositioned', kind: attribute.kind }));
@@ -712,6 +721,8 @@ function parseAdornmentLine(line: string, amend: boolean): InspectorParse {
           : { type: 'setAccidentalDisplay', show: parsed.accidental.show, ...(parsed.accidental.parenthesized ? { parenthesized: true } : {}) }
     };
   if ('removeStringAnnotation' in parsed) return { intent: { type: 'removeStringAnnotation' } };
+  if ('fermata' in parsed) return { intent: { type: 'setFermata', fermata: parsed.fermata } };
+  if ('removeFermata' in parsed) return { intent: { type: 'removeFermata' } };
   if ('marking' in parsed)
     return {
       intent: parsed.remove

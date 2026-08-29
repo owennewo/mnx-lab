@@ -8,6 +8,7 @@
 <text x="117.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="117.6" y="176" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
 <text x="224.096" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
+<text x="237.6" y="104" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="fermata"></text>
 <line x1="321.6" y1="128" x2="321.6" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="326.4" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

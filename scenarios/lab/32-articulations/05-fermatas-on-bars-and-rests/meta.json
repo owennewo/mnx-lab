@@ -1,0 +1,50 @@
+{
+  "title": "Fermatas on bars, rests and stems",
+  "description": "Every place a fermata can sit, drawn once each: over a stem-down note beside its accent (the fermata is the outermost sign), over a rest (angled, short), over a stem-up half note clearing the stem tip (square, long); then the bar form over the closing barline of each measure — the plain sign on bar 1, a square sign under bar 2's final barline. Bar 2 shows the below side on a note (orient below) and a down-pointing curlew on a rest, which reads as the below form when no side is given. Not on tab: the bar form draws under the tab staff too, the event form stays notation-only like the articulations (core-measure-attributes-gaps.md, item 8).",
+  "bars": 2,
+  "tags": [
+    "articulations",
+    "fermata"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/fermata/"
+  ],
+  "coversDefs": [
+    "barline",
+    "barline-type",
+    "clef",
+    "clef-sign",
+    "event",
+    "event-markings",
+    "fermata",
+    "fermata-duration",
+    "fermata-symbol",
+    "global",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "orientation",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "rest",
+    "root",
+    "sequence",
+    "sequence-content",
+    "time",
+    "up-down-auto"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

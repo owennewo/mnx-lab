@@ -11,6 +11,7 @@ import type {
   MnxGlobalMeasure,
   MnxLayout,
   MnxEvent,
+  MnxFermata,
   MnxGrace,
   MnxTremolo,
   MnxNote,
@@ -561,6 +562,10 @@ export type EditOp =
       attributes?: Record<string, string>;
     }
   | { type: 'removeMarking'; noteKey?: string; event?: EventAddress; marking: string }
+  /** The event's fermata — its own key in MNX, not a marking, so its own
+   *  pair; the set is an upsert (one fermata per event). */
+  | { type: 'setFermata'; noteKey?: string; event?: EventAddress; fermata: MnxFermata }
+  | { type: 'removeFermata'; noteKey?: string; event?: EventAddress }
   | ({
       /** A dynamic or direction at a metric position in the part measure —
        *  on the STAFF the cursor is reading. MNX puts `staff` on the object
@@ -833,6 +838,7 @@ export type MeasureAttribute =
   // ends). `glyph` is the segno's SMuFL variant, likewise long rendered.
   | { kind: 'segno'; at?: MarkAt; glyph?: string }
   | { kind: 'fine'; at?: MarkAt }
+  | ({ kind: 'fermata' } & MnxFermata)
   | { kind: 'jump'; type: 'segno' | 'dsalfine'; at?: MarkAt }
   | { kind: 'tempo'; bpm: number; base: MnxNoteValueBase; dots?: number }
   | { kind: 'rehearsal'; label: string }
@@ -863,6 +869,7 @@ export const MEASURE_ATTRIBUTE_FIELDS: Record<MeasureAttributeKind, string> = {
   ending: 'ending',
   segno: 'segno',
   fine: 'fine',
+  fermata: 'fermata',
   jump: 'jump',
   tempo: 'tempos',
   rehearsal: 'rehearsal',
@@ -907,6 +914,10 @@ function measureAttributeValue(attribute: MeasureAttribute): unknown {
       };
     case 'fine':
       return { location: locationOf(attribute.at, 'start') };
+    case 'fermata': {
+      const { kind: _kind, ...fermata } = attribute;
+      return fermata;
+    }
     case 'jump':
       return { type: attribute.type, location: locationOf(attribute.at, 'end') };
     case 'tempo':
@@ -964,6 +975,7 @@ export function readMeasureAttributes(measure: MnxGlobalMeasure | undefined): Me
       ...(measure.segno.glyph ? { glyph: measure.segno.glyph } : {})
     });
   if (measure.fine !== undefined) out.push({ kind: 'fine', ...at(measure.fine.location, 'start') });
+  if (measure.fermata !== undefined) out.push({ kind: 'fermata', ...measure.fermata });
   if (measure.jump !== undefined)
     out.push({ kind: 'jump', type: measure.jump.type, ...at(measure.jump.location, 'end') });
   for (const tempo of measure.tempos ?? [])
@@ -1860,6 +1872,18 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       ((event.markings ??= {}) as Record<string, unknown>)[op.marking] = { ...(op.attributes ?? {}) };
       return next;
     }
+    case 'setFermata': {
+      const event = markingEvent(next, op);
+      if (!event) return next;
+      event.fermata = { ...op.fermata };
+      return next;
+    }
+    case 'removeFermata': {
+      const event = markingEvent(next, op);
+      if (!event || event.fermata === undefined) return next;
+      delete event.fermata;
+      return next;
+    }
     case 'removeMarking': {
       const event = markingEvent(next, op);
       if (!event) return next;
@@ -2533,7 +2557,7 @@ export function eventAtAddress(doc: MnxStructure, address: EventAddress): MnxEve
 
 function markingEvent(
   doc: MnxStructure,
-  op: Extract<EditOp, { type: 'setMarking' | 'removeMarking' }>
+  op: Extract<EditOp, { type: 'setMarking' | 'removeMarking' | 'setFermata' | 'removeFermata' }>
 ): MnxEvent | null {
   if (op.event) return eventAtAddress(doc, op.event);
   return op.noteKey ? findKeyedNote(doc, op.noteKey)?.event ?? null : null;

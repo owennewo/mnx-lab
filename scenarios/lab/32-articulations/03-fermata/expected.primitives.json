@@ -81,6 +81,14 @@
         "sourceId": "@m0.v0.e0.n0"
       },
       {
+        "kind": "glyph",
+        "glyph": "fermataAbove",
+        "x": 14.85,
+        "y": 6.5,
+        "anchor": "middle",
+        "className": "fermata"
+      },
+      {
         "kind": "line",
         "x1": 20.1,
         "y1": 8,

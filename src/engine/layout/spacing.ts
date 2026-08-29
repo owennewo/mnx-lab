@@ -1593,8 +1593,6 @@ export function measureLevelGaps(
   partMeasures: readonly (MnxPartMeasure | undefined)[]
 ): string[] {
   const gaps: string[] = [];
-  if ((globalMeasure as { fermata?: unknown } | undefined)?.fermata !== undefined)
-    gaps.push('fermata on the bar — not drawn');
   if ((globalMeasure?.tempos?.length ?? 0) > 1)
     gaps.push(`${globalMeasure!.tempos!.length} tempo marks — only the first is drawn`);
   if ((globalMeasure?._x?.mnxLab?.harmonies?.length ?? 0) > 0)

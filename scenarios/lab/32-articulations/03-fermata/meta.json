@@ -1,11 +1,10 @@
 {
   "title": "A fermata on a whole note",
-  "description": "One whole-note G4 with an event-level fermata carrying both optional refinements: symbol normal (the ordinary arc-and-dot) and duration long (a performance hint from the veryShort-to-veryLong enum). Fermatas can also sit on global measures and full-measure rests; the event form is the common case. The renderer does not draw fermatas yet — the golden pins the bare note and is the golden that moves when they land.",
+  "description": "One whole-note G4 with an event-level fermata carrying both optional refinements: symbol normal (the ordinary arc-and-dot) and duration long (a performance hint from the veryShort-to-veryLong enum). Fermatas can also sit on global measures and full-measure rests; the event form is the common case. Drawn since core-measure-attributes-gaps.md item 7: the plain sign 1.5 sp above the staff over the note; `duration` is a hint and changes no ink.",
   "bars": 1,
   "tags": [
     "articulations",
-    "fermata",
-    "renderer-gap"
+    "fermata"
   ],
   "specRefs": [
     "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/fermata/"
@@ -26,7 +25,7 @@
   "idRefs": false,
   "source": "hand-written",
   "origin": "local",
-  "status": "verified",
+  "status": "rendered",
   "verification": {
     "at": "2026-08-14",
     "primitivesHash": "sha256:eb4bb16b9fb22734",

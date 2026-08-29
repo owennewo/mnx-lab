@@ -21,12 +21,10 @@ describe('measureLevelGaps', () => {
       ]
     } as unknown as MnxPartMeasure;
     const gm = {
-      fermata: {},
       tempos: [{ bpm: 120, value: { base: 'quarter' } }, { bpm: 60, value: { base: 'half' } }],
       _x: { mnxLab: { harmonies: [{ location: { fraction: [0, 1] }, quality: 'major', root: { step: 'C' } }] } }
     } as never;
     expect(measureLevelGaps(gm, [pm])).toEqual([
-      'fermata on the bar — not drawn',
       '2 tempo marks — only the first is drawn',
       'chord symbols (harmonies) — not drawn',
       'arpeggio — not drawn',

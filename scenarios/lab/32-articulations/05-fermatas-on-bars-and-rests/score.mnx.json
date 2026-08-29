@@ -1,0 +1,126 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        },
+        "fermata": {}
+      },
+      {
+        "fermata": {
+          "symbol": "square",
+          "orient": "below"
+        },
+        "barline": {
+          "type": "final"
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "name": "Music",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      }
+                    }
+                  ],
+                  "fermata": {},
+                  "markings": {
+                    "accent": {}
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "rest": {},
+                  "fermata": {
+                    "duration": "short",
+                    "symbol": "angled"
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 4
+                      }
+                    }
+                  ],
+                  "fermata": {
+                    "symbol": "square",
+                    "duration": "long"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 4
+                      }
+                    }
+                  ],
+                  "fermata": {
+                    "orient": "below"
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "rest": {},
+                  "fermata": {
+                    "pointing": "down",
+                    "symbol": "curlew"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
