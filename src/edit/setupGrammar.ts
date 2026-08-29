@@ -270,7 +270,7 @@ const TEMPO_UNITS: Record<string, MnxNoteValueBase> = {
 
 export const BAR_ATTRIBUTE_HELP =
   'barline double · repeat start · repeat end 3 · ending 1,2 · ending 3 for 1 open · ' +
-  'segno · fine · fermata · fermata square long below · ' +
+  'segno · fine · fermata · fermata square long below · number 12 · ' +
   'jump dsalfine · jump segno at start · fine at end · tempo 120 · rehearsal A · section Verse 1 · full-measure rest · ' +
   'measure repeat 2 · measure repeat counter 3 · no <attribute>';
 
@@ -297,6 +297,7 @@ const ATTRIBUTE_WORDS: Record<string, MeasureAttributeKind> = {
   segno: 'segno',
   fine: 'fine',
   fermata: 'fermata',
+  number: 'number',
   jump: 'jump',
   tempo: 'tempo',
   rehearsal: 'rehearsal',
@@ -352,6 +353,12 @@ export function parseBarAttribute(text: string): BarAttributeResult {
     const count = rest[0] !== undefined ? Number(rest[0]) : 1;
     if (!Number.isInteger(count) || count < 1 || count > 4) return null;
     return { rhythm: 'measureRepeat', number: count, ...(counter ? { counter } : {}) };
+  }
+
+  // `number 12` — the bar's displayed number.
+  if (head === 'number') {
+    const value = Number(words[1]);
+    return words.length === 2 && Number.isInteger(value) ? { set: { kind: 'number', value } } : null;
   }
 
   // `fermata` / `fermata square long below` — over the bar's closing barline.
@@ -464,8 +471,8 @@ export const DYNAMIC_WORDS = [
 export const ADORNMENT_HELP =
   'accent · staccato · tenuto · strongAccent · … · a dynamic (pp, mf, fff) · ' +
   'text Play 8x · text below cantabile · 8va 2 · bend release · finger 3 · right p · cresc · dim · louder · softer · breath comma · bow up · ' +
-  'fermata · fermata square long below · accidental · accidental parens · ' +
-  'no accent · no fermata · no dynamic · no text · no string · no accidental';
+  'fermata · fermata square long below · arpeggio · arpeggio down arrow · non-arpeggio · accidental · accidental parens · ' +
+  'no accent · no fermata · no arpeggio · no dynamic · no text · no string · no accidental';
 
 export type AdornmentResult =
   | { marking: string; remove?: boolean; attributes?: Record<string, string> }
@@ -511,6 +518,8 @@ export function parseAdornment(text: string): AdornmentResult {
     const target = (words[1] ?? '').toLowerCase();
     if (target === 'accidental') return { accidental: 'remove' };
     if (target === 'fermata') return { removeFermata: true };
+    if (target === 'arpeggio') return { removePositioned: 'arpeggio' };
+    if (target === 'non-arpeggio' || target === 'nonarpeggio') return { removePositioned: 'nonArpeggio' };
     if (target === 'dynamic') return { removePositioned: 'dynamic' };
     if (target === 'text' || target === 'direction') return { removePositioned: 'direction' };
     // The string choice is a note-level annotation like the markings, so it
@@ -524,6 +533,20 @@ export function parseAdornment(text: string): AdornmentResult {
     const fermata = parseFermataWords(words.slice(1));
     return fermata ? { fermata } : null;
   }
+
+  // `arpeggio` / `arpeggio down` / `arpeggio up arrow` — the chord under the
+  // cursor, rolled; `non-arpeggio` brackets it instead.
+  if (head === 'arpeggio') {
+    const attribute: Extract<PositionedAttribute, { kind: 'arpeggio' }> = { kind: 'arpeggio' };
+    for (const word of words.slice(1).map(w => w.toLowerCase())) {
+      if ((word === 'up' || word === 'down') && !attribute.direction) attribute.direction = word;
+      else if (word === 'arrow' && !attribute.arrow) attribute.arrow = true;
+      else return null;
+    }
+    return { positioned: attribute };
+  }
+  if ((head === 'non-arpeggio' || head === 'nonarpeggio') && words.length === 1)
+    return { positioned: { kind: 'nonArpeggio' } };
 
   if (head === 'symbol') {
     // `symbol keyboardPedalPed` / `symbol below keyboardPedalUp` — a direction

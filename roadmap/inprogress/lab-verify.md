@@ -86,10 +86,10 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
-### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **4 stale, 4 never-seen**
+### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **4 stale, 5 never-seen**
 
 Owner: [core-measure-attributes-gaps.md](core-measure-attributes-gaps.md) (in progress,
-items 1–7). Demoted 2026-08-28; grown 2026-08-29 (item 7).
+items 1–8). Demoted 2026-08-28; grown 2026-08-29 (items 7–8).
 
 **Cause.** No measure-level attribute ever produced the amber renderer-gap badge: the
 badge machinery was fed only by unsupported sequence-content kinds, so a bar whose
@@ -133,6 +133,16 @@ the barline between the bars; bar 2 — a fermata UNDER the half note (`orient: 
 the inverted sign), the curlew under the half rest (`pointing: down` reads as
 the below form), and a square sign under the final barline. Nothing on any tab view but
 the two bar-form signs.
+
+**Arpeggios and numbers (item 8, 2026-08-29).** `lab/articulations/arpeggiated-chords`
+moved again: the badges are gone and the marks are drawn — a wavy line up the left of
+the first chord from just below its bottom note to just above its top, an arrowhead at
+the top (the roll is `up` with `arrow`), and a square bracket `[` to the left of the
+second chord, its hooks pointing at the notes. Neither may touch a notehead. The
+paragraph below about two amber badges on this scenario is superseded.
+`lab/navigation/numbered-bars` is **never-seen**: `17`, `18`, `19` in small upright
+figures just above the top line at the start of bars 1–3, nothing on bar 4; the segno
+over bar 2 and the metronome mark over bar 3 sit higher, clear of their numbers.
 
 **What a reviewer should look for.** On `arpeggiated-chords`: the music is unchanged and
 the bar carries two amber badges at its bottom-left (arpeggio, non-arpeggio). If any

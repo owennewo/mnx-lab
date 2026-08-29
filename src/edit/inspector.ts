@@ -83,6 +83,8 @@ export function attributeText(attribute: MeasureAttribute): string {
       const { kind: _kind, ...fermata } = attribute;
       return `fermata ${fermataText(fermata)}`.trim();
     }
+    case 'number':
+      return `number ${attribute.value}`;
     case 'jump':
       return `jump ${attribute.type}${markAtText(attribute.at)}`;
     case 'tempo':
@@ -206,6 +208,7 @@ const WORD_OF: Record<MeasureAttributeKind, string> = {
   segno: 'segno',
   fine: 'fine',
   fermata: 'fermata',
+  number: 'number',
   jump: 'jump',
   tempo: 'tempo',
   rehearsal: 'rehearsal',
@@ -220,6 +223,7 @@ const HINT_OF: Record<MeasureAttributeKind, string> = {
   segno: 'serpent · at end · at 1/2',
   fine: 'at start · at end · at 3/4',
   fermata: 'square · long · below',
+  number: '12',
   jump: 'segno · dsalfine · at 1/2',
   tempo: '120 · half=80 · quarter.=60',
   rehearsal: 'A · 12',
@@ -422,6 +426,9 @@ export function positionedText(attribute: PositionedAttribute): { word: string; 
       return { word: attribute.relativeValue === 'softer' ? 'softer' : 'louder', value: '' };
     return { word: 'dynamic', value: attribute.value ?? (attribute.glyphs ?? []).join(' ') };
   }
+  if (attribute.kind === 'arpeggio')
+    return { word: 'arpeggio', value: [attribute.direction, attribute.arrow ? 'arrow' : undefined].filter(Boolean).join(' ') };
+  if (attribute.kind === 'nonArpeggio') return { word: 'non-arpeggio', value: '' };
   if (attribute.kind === 'ottava')
     return {
       word: attribute.value > 0 ? '8va' : '8vb',
@@ -656,6 +663,8 @@ const EVENT_WORDS: InspectorWord[] = [
   { word: 'softer', hint: '' },
   { word: 'text', hint: 'Play 8x · below cantabile' },
   { word: 'symbol', hint: 'keyboardPedalPed · below keyboardPedalUp' },
+  { word: 'arpeggio', hint: 'up · down · arrow' },
+  { word: 'non-arpeggio', hint: '' },
   { word: '8va', hint: 'bars, e.g. 2' },
   { word: '8vb', hint: 'bars, e.g. 2' },
   { word: 'lyric', hint: 'sleep- · -ing · 2: Am' }

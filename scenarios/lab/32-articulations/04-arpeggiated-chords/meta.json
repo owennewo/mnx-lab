@@ -1,11 +1,10 @@
 {
   "title": "An arpeggiated chord and a non-arpeggio bracket",
-  "description": "Two half-note triads: the first arpeggiated upward with an arrow (the wavy line), the second explicitly NOT arpeggiated (the square bracket that cancels a prevailing arpeggiation). Both live on the part measure, positioned rhythmically and spanning note ids from bottom to top — the id-pair span is what lets one chord of a multi-voice stack arpeggiate without the others. Neither mark is drawn yet; the goldens pin the plain chords and move when arpeggio rendering lands.",
+  "description": "Two half-note triads: the first arpeggiated upward with an arrow (the wavy line), the second explicitly NOT arpeggiated (the square bracket that cancels a prevailing arpeggiation). Both live on the part measure, positioned rhythmically and spanning note ids from bottom to top — the id-pair span is what lets one chord of a multi-voice stack arpeggiate without the others. Both drawn since core-measure-attributes-gaps.md item 8: the wave (a run of curves — Bravura's wiggles are horizontal) with its arrowhead at the top, and the bracket, each beside the chord's leftmost ink.",
   "bars": 1,
   "tags": [
     "articulations",
-    "arpeggio",
-    "renderer-gap"
+    "arpeggio"
   ],
   "specRefs": [
     "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/arpeggio/"

@@ -452,6 +452,23 @@ export interface MnxDynamic {
  *  `position` in this measure through `end` (a measure id + metric position)
  *  sound `value` octaves off the written pitch — +1/+2/+3 = 8va/15ma/22ma above,
  *  −1/−2/−3 = below. `orient` overrides the above/below default. */
+/** MNX `arpeggio`: a chord rolled from `span.start` to `span.end` (note ids,
+ *  bottom to top), at a rhythmic position in the part measure. */
+export interface MnxArpeggio {
+  position: { fraction: [number, number] };
+  span: { start: string; end: string };
+  direction?: 'up' | 'down' | 'auto';
+  arrow?: boolean;
+  color?: string;
+}
+
+/** MNX `non-arpeggio`: the bracket that says "do NOT roll this chord". */
+export interface MnxNonArpeggio {
+  position: { fraction: [number, number] };
+  span: { start: string; end: string };
+  color?: string;
+}
+
 export interface MnxOttava {
   position: {
     fraction: [number, number];
@@ -469,6 +486,8 @@ export interface MnxOttava {
 }
 
 export interface MnxPartMeasure {
+  arpeggios?: MnxArpeggio[];
+  nonArpeggios?: MnxNonArpeggio[];
   beams?: MnxBeam[];
   dynamics?: MnxDynamic[];
   /** Free-text/symbolic instructions for this part. **Proposed, not adopted** —
@@ -582,6 +601,8 @@ export interface MnxGlobalMeasure {
   };
   /** A fermata over the bar's closing barline. */
   fermata?: MnxFermata;
+  /** The bar's displayed number, when the document says one. */
+  number?: number;
   /** "fine" marking at a metric position. */
   fine?: {
     location: {

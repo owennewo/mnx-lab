@@ -1,6 +1,7 @@
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
 import { emitMeasureFermata, fermataBelow, fermataGlyph } from './fermata.ts';
+import { collectSpanMarks, emitMeasureNumber, emitSpanMarks, type SpanMarks } from './arpeggio.ts';
 import { emitMeasureRepeat, measureRepeatX, type MeasureRepeatMark } from './measureRepeat.ts';
 import { emitEndings } from './endings.ts';
 import { timeSigDigitDx } from './tabStaff.ts';
@@ -1189,6 +1190,7 @@ function assembleSegment(
   // measure) and split at system breaks. Beamed events defer their stems —
   // collected per run during emission, drawn against the beam line after.
   const beams = buildBeamRuns(mnx, segment, plan);
+  const spanMarks = collectSpanMarks(mnx.parts ?? []);
 
   // Slur/tie endpoints can live anywhere in the document (later measures,
   // other voices), so emission records every note-carrying event's geometry
@@ -1790,7 +1792,8 @@ function assembleSegment(
               // mirrors; other staves use real ids only.
               synthesizeKeys: synthesizePartForStaff[s] !== null,
               keyPartIndex: synthesizePartForStaff[s]?.partIndex ?? 0,
-              keyStaffIndex: synthesizePartForStaff[s]?.staffIndex ?? 1
+              keyStaffIndex: synthesizePartForStaff[s]?.staffIndex ?? 1,
+              spanMarks
             });
             if (beamRun && stem && event.id) beamRun.stems.set(event.id, stem);
             const lyricLines = event.lyrics?.lines;
@@ -1986,6 +1989,7 @@ function assembleSegment(
       staffHeight: STAFF_HEIGHT_SP,
       primitives
     });
+    emitMeasureNumber(mnx.global.measures[i] ?? {}, m, staffTop, primitives);
     // The tempo mark and the label row are emitted after the loop — they are
     // placed one clearance above the bar's ink, and the beams, voltas and
     // ottava brackets that ink includes are drawn after the loop too.
@@ -3791,6 +3795,8 @@ interface EmitEventArgs {
   keyPartIndex?: number;
   /** Which staff of it (13c). */
   keyStaffIndex?: number;
+  /** Arpeggio / non-arpeggio by the note id that starts the span. */
+  spanMarks?: ReadonlyMap<string, SpanMarks>;
 }
 
 /** Returns the deferred stem when the event is beamed, else null. */
@@ -4140,6 +4146,30 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       ...(event.fermata.color ? { fill: event.fermata.color } : {}),
       className: 'fermata'
     });
+  }
+
+  // Arpeggio / non-arpeggio: the event holding the span's first note draws
+  // it beside the chord's leftmost ink, from that note to the span's end
+  // (the event's outermost note when the end is not here).
+  if (args.spanMarks) {
+    const startIdx = notes.findIndex(n => n.id !== undefined && args.spanMarks!.has(n.id));
+    if (startIdx >= 0) {
+      const marks = args.spanMarks.get(notes[startIdx].id!)!;
+      const endId = marks.arpeggio?.span.end ?? marks.nonArpeggio?.span.end;
+      const endIdx = notes.findIndex(n => n.id === endId);
+      const ys = [staffYs[startIdx], endIdx >= 0 ? staffYs[endIdx] : (staffYs[startIdx] === Math.max(...staffYs) ? Math.min(...staffYs) : Math.max(...staffYs))];
+      const leftInkX =
+        eventX - (headW / 2) * ink -
+        (accidentalsToLeft > 0 ? (accidentalsToLeft * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP) * ink : 0);
+      emitSpanMarks({
+        leftInkX,
+        yTop: staffTop + Math.min(...ys),
+        yBottom: staffTop + Math.max(...ys),
+        marks,
+        fill,
+        primitives
+      });
+    }
   }
 
   // Index

@@ -1,0 +1,47 @@
+{
+  "title": "Numbered bars",
+  "description": "Four bars, the first three carrying a declared measure `number` (17, 18, 19) and the fourth none — an excerpt whose bars keep their numbers from the full score. The number is drawn small at the bar's start, above the top line; bar 2 also carries a segno and bar 3 a tempo mark, so the number sits beside the segno and under the tempo (which scans the ink beneath it and rises). Only DECLARED numbers draw: an engraver's number-every-system is a presentation choice the document does not carry, and bar 4 shows the absence (core-measure-attributes-gaps.md, item 8).",
+  "bars": 4,
+  "tags": [
+    "navigation",
+    "measure-number"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/measure-global/"
+  ],
+  "coversDefs": [
+    "barline",
+    "barline-type",
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "measure-global",
+    "measure-number",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "root",
+    "segno",
+    "sequence",
+    "sequence-content",
+    "tempo",
+    "tempos",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

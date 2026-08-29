@@ -824,9 +824,24 @@ export type PositionedAttribute =
    *  their verb — item 7's family test, applied once more. `bars` is how many
    *  bars it spans (1 = this one), the same shape item 7 gave a volta's
    *  duration, and the stand-in for a press-navigate-press range gesture. */
-  | { kind: 'ottava'; value: 1 | 2 | 3 | -1 | -2 | -3; bars?: number };
+  | { kind: 'ottava'; value: 1 | 2 | 3 | -1 | -2 | -3; bars?: number }
+  /** A rolled chord — the same owner (the part measure) and shape (a
+   *  rhythmic position) as the others, so the same verb. The span is the
+   *  chord under the cursor: its bottom and top note ids, minted if absent,
+   *  exactly as `setBeam` mints the event ids it references. */
+  | { kind: 'arpeggio'; direction?: 'up' | 'down'; arrow?: boolean }
+  | { kind: 'nonArpeggio' };
 
-/** The ten bar attributes, each carrying exactly what its MNX object needs. */
+/** The part-measure list each positioned kind lives in. */
+export const POSITIONED_FIELDS: Record<PositionedAttribute['kind'], 'dynamics' | 'directions' | 'ottavas' | 'arpeggios' | 'nonArpeggios'> = {
+  dynamic: 'dynamics',
+  direction: 'directions',
+  ottava: 'ottavas',
+  arpeggio: 'arpeggios',
+  nonArpeggio: 'nonArpeggios'
+};
+
+/** The bar attributes, each carrying exactly what its MNX object needs. */
 export type MeasureAttribute =
   | { kind: 'barline'; type: NonNullable<NonNullable<MnxGlobalMeasure['barline']>['type']> }
   | { kind: 'repeatStart' }
@@ -839,6 +854,7 @@ export type MeasureAttribute =
   | { kind: 'segno'; at?: MarkAt; glyph?: string }
   | { kind: 'fine'; at?: MarkAt }
   | ({ kind: 'fermata' } & MnxFermata)
+  | { kind: 'number'; value: number }
   | { kind: 'jump'; type: 'segno' | 'dsalfine'; at?: MarkAt }
   | { kind: 'tempo'; bpm: number; base: MnxNoteValueBase; dots?: number }
   | { kind: 'rehearsal'; label: string }
@@ -870,6 +886,7 @@ export const MEASURE_ATTRIBUTE_FIELDS: Record<MeasureAttributeKind, string> = {
   segno: 'segno',
   fine: 'fine',
   fermata: 'fermata',
+  number: 'number',
   jump: 'jump',
   tempo: 'tempos',
   rehearsal: 'rehearsal',
@@ -918,6 +935,8 @@ function measureAttributeValue(attribute: MeasureAttribute): unknown {
       const { kind: _kind, ...fermata } = attribute;
       return fermata;
     }
+    case 'number':
+      return attribute.value;
     case 'jump':
       return { type: attribute.type, location: locationOf(attribute.at, 'end') };
     case 'tempo':
@@ -976,6 +995,7 @@ export function readMeasureAttributes(measure: MnxGlobalMeasure | undefined): Me
     });
   if (measure.fine !== undefined) out.push({ kind: 'fine', ...at(measure.fine.location, 'start') });
   if (measure.fermata !== undefined) out.push({ kind: 'fermata', ...measure.fermata });
+  if (measure.number !== undefined) out.push({ kind: 'number', value: measure.number });
   if (measure.jump !== undefined)
     out.push({ kind: 'jump', type: measure.jump.type, ...at(measure.jump.location, 'end') });
   for (const tempo of measure.tempos ?? [])
@@ -1065,6 +1085,20 @@ export function readPositionedAttributes(
         ...(entry.orient && entry.orient !== 'auto' ? { orient: entry.orient } : {})
       }
     });
+  });
+  (measure.arpeggios ?? []).forEach((entry, index) => {
+    if (!here(entry)) return;
+    out.push({
+      index,
+      attribute: {
+        kind: 'arpeggio',
+        ...(entry.direction === 'up' || entry.direction === 'down' ? { direction: entry.direction } : {}),
+        ...(entry.arrow ? { arrow: true } : {})
+      }
+    });
+  });
+  (measure.nonArpeggios ?? []).forEach((entry, index) => {
+    if (here(entry)) out.push({ index, attribute: { kind: 'nonArpeggio' } });
   });
   (measure.ottavas ?? []).forEach((entry, index) => {
     if (!here(entry)) return;
@@ -1924,6 +1958,32 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         ];
         return next;
       }
+      if (op.attribute.kind === 'arpeggio' || op.attribute.kind === 'nonArpeggio') {
+        // The chord at the cursor: this staff's voice, the timed event at
+        // this onset. A rest or an empty slot has nothing to roll.
+        const seq = (measure.sequences ?? []).filter(
+          sequence => (sequence.staff ?? 1) === (op.staffIndex ?? 1)
+        )[op.voiceIndex ?? 0];
+        const found = seq ? eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] }) : undefined;
+        const chord = found?.event?.notes;
+        if (!chord || chord.length === 0) return next;
+        // Bottom to top, as MNX spells the span.
+        const ordered = [...chord].sort((a, b) => midiOf(a) - midiOf(b));
+        for (const note of [ordered[0], ordered[ordered.length - 1]]) note.id ??= mintNoteId(next);
+        const span = { start: ordered[0].id!, end: ordered[ordered.length - 1].id! };
+        if (op.attribute.kind === 'arpeggio') {
+          measure.arpeggios = [
+            ...(measure.arpeggios ?? []),
+            {
+              position,
+              span,
+              ...(op.attribute.direction ? { direction: op.attribute.direction } : {}),
+              ...(op.attribute.arrow ? { arrow: true } : {})
+            }
+          ];
+        } else measure.nonArpeggios = [...(measure.nonArpeggios ?? []), { position, span }];
+        return next;
+      }
       if (op.attribute.kind === 'dynamic') {
         const entry: MnxDynamic = { position, type: op.attribute.dynamicType ?? 'immediate', ...onStaff };
         if (op.attribute.value) entry.value = op.attribute.value;
@@ -1948,8 +2008,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
       if (!measure) return next;
       const record = measure as unknown as Record<string, unknown[] | undefined>;
-      const field =
-        op.kind === 'dynamic' ? 'dynamics' : op.kind === 'ottava' ? 'ottavas' : 'directions';
+      const field = POSITIONED_FIELDS[op.kind];
       const list = record[field];
       if (!list?.[op.index]) return next;
       const kept = list.filter((_, i) => i !== op.index);

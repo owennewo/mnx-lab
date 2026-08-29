@@ -1597,11 +1597,6 @@ export function measureLevelGaps(
     gaps.push(`${globalMeasure!.tempos!.length} tempo marks — only the first is drawn`);
   if ((globalMeasure?._x?.mnxLab?.harmonies?.length ?? 0) > 0)
     gaps.push('chord symbols (harmonies) — not drawn');
-  for (const pm of partMeasures) {
-    if (!pm) continue;
-    const extra = pm as MnxPartMeasure & { arpeggios?: unknown[]; nonArpeggios?: unknown[] };
-    if ((extra.arpeggios?.length ?? 0) > 0) gaps.push('arpeggio — not drawn');
-    if ((extra.nonArpeggios?.length ?? 0) > 0) gaps.push('non-arpeggio bracket — not drawn');
-  }
+  void partMeasures;
   return gaps;
 }

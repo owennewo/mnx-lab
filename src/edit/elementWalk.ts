@@ -33,10 +33,11 @@ export type ElementKind =
   // sequence containers
   | 'tuplet' | 'grace' | 'tremolo' | 'space' | 'full-measure-rest' | 'measure-repeat'
   // part-measure level
-  | 'clef' | 'beam' | 'dynamic' | 'direction' | 'ottava'
+  | 'clef' | 'beam' | 'dynamic' | 'direction' | 'ottava' | 'arpeggio' | 'non-arpeggio'
   // global-measure level
   | 'time-signature' | 'key-signature' | 'barline' | 'repeat-start' | 'repeat-end'
   | 'ending' | 'segno' | 'fine' | 'jump' | 'tempo' | 'rehearsal' | 'section' | 'harmony'
+  | 'measure-number'
   // part level
   | 'part-name' | 'strings' | 'capo' | 'staff-kind' | 'kit-component' | 'staves'
   // document level
@@ -256,6 +257,24 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     note: 'A fermata over an event (its own key, not a marking) or over a bar\'s closing barline.',
     construct: ['setFermata', 'setMeasureAttribute'],
     remove: ['removeFermata', 'removeMeasureAttribute']
+  },
+  'measure-number': {
+    classes: ['measure-number'],
+    note: 'The bar\'s declared number, drawn at its start (undeclared bars draw none).',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  arpeggio: {
+    classes: ['arpeggio', 'arpeggio-arrow', 'arpeggio-arrowhead'],
+    note: 'A rolled chord: the wave beside the chord the span names, with an optional arrowhead.',
+    construct: ['setPositioned'],
+    remove: ['removePositioned']
+  },
+  'non-arpeggio': {
+    classes: ['non-arpeggio'],
+    note: 'The bracket that cancels arpeggiation on one chord.',
+    construct: ['setPositioned'],
+    remove: ['removePositioned']
   },
   fine: {
     classes: ['fine'],
@@ -663,6 +682,7 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
     at('segno', 'segno');
     at('fine', 'fine');
     at('fermata', 'fermata');
+    at('measure-number', 'number');
     at('jump', 'jump');
     at('rehearsal', 'rehearsal');
     at('section', 'section');
@@ -730,6 +750,24 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
           [...measureJson, 'directions', directionIndex],
           partIndex === 0 ? measureIndex : undefined,
           direction.position?.fraction
+        );
+      for (const [arpeggioIndex, arpeggio] of (measure.arpeggios ?? []).entries())
+        pushPositioned(
+          out,
+          'arpeggio',
+          `${measurePath}/arp${arpeggioIndex}`,
+          [...measureJson, 'arpeggios', arpeggioIndex],
+          partIndex === 0 ? measureIndex : undefined,
+          arpeggio.position?.fraction
+        );
+      for (const [nonIndex, nonArpeggio] of (measure.nonArpeggios ?? []).entries())
+        pushPositioned(
+          out,
+          'non-arpeggio',
+          `${measurePath}/nonarp${nonIndex}`,
+          [...measureJson, 'nonArpeggios', nonIndex],
+          partIndex === 0 ? measureIndex : undefined,
+          nonArpeggio.position?.fraction
         );
       for (const [ottavaIndex, ottava] of (measure.ottavas ?? []).entries())
         pushPositioned(

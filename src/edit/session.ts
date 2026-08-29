@@ -9,6 +9,7 @@ import { isNavigationIntent, MAX_ENTRY_FRET } from './intents.ts';
 import type { EditOp, EntryTarget, EventAddress, OpLogEntry } from './ops.ts';
 import type { PasteLanding } from './selectionPastePlanner.ts';
 import {
+  POSITIONED_FIELDS,
   beamRunBetween,
   beamStartingAt,
   completeContainerSpec,
@@ -1083,12 +1084,7 @@ export class EditorSession {
         // which is how a player would name it.
         const partIndex_ = this.cursorState.partIndex ?? 0;
         const measure = this.doc.parts?.[partIndex_]?.measures?.[this.cursorState.measureIndex];
-        const list =
-          (intent.kind === 'dynamic'
-            ? measure?.dynamics
-            : intent.kind === 'ottava'
-              ? measure?.ottavas
-              : measure?.directions) ?? [];
+        const list = (measure?.[POSITIONED_FIELDS[intent.kind]] ?? []) as { position?: { fraction: [number, number] } }[];
         // The entry HERE: this onset, and this staff — a grand staff's two
         // dynamics at one beat are two entries (core-measure-attributes-gaps.md, bug 2).
         const staffHere = this.cursorState.staffIndex ?? 1;

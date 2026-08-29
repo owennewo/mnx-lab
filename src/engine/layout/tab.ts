@@ -25,6 +25,7 @@ import {
 import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barlines.ts';
 import { emitNavigationMarkers, emitScoreLabels, emitTempoMark } from './scoreText.ts';
 import { emitMeasureFermata } from './fermata.ts';
+import { emitMeasureNumber } from './arpeggio.ts';
 import { clampPadDensity, ensureTopMargin, tightenRows } from './verticalDensity.ts';
 import { validateDocument } from './validate.ts';
 import {
@@ -320,6 +321,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     });
     emitNavigationMarkers({ gm, m, stdSequences, staffTop, primitives });
     emitMeasureFermata({ gm, m, staffTop, staffHeight: STAFF_HEIGHT_SP, primitives });
+    emitMeasureNumber(gm, m, staffTop, primitives);
     emitScoreLabels({
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), clearAbove: tempoTop, primitives
     });

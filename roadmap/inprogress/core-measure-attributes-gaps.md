@@ -67,7 +67,7 @@ draws (`rehearsal`, `section`, `directions`), and the one `_x.mnxLab` measure bl
 | `key` | ✅ notation incl. cancellation naturals; tab none by design | — | ✅ | ✅ | 5, inked |
 | `time` | ✅ numerals and `common`/`cut` glyphs on notation. ❌ **`display` ignored on tab** (`tabStaff.ts:225` takes `{count, unit}`); 🐛 **multi-digit counts overprint** — every digit at one `x`, `anchor: middle` (`notation.ts:1569`, `tabStaff.ts:236`) | ✗ | ✅ | ✅ floor pill | 100+; **no `12/8`-class scenario**, so the overprint is unpinned |
 | `fermata` | ✅ since item 7 — bar form over the closing barline, event form over its note or rest (`fermata.ts`) | — | ✅ `fermata [symbol] [duration] [above\|below]` on both rungs | ✅ | `lab/32-articulations/03-fermata`, `05-fermatas-on-bars-and-rests` |
-| `number` | ❌ not read; not even in `MnxGlobalMeasure` | ✗ | ❌ | ❌ | 0 — **measure numbers are never engraved** |
+| `number` | ✅ since item 8 — a DECLARED number draws small at the bar's start (`arpeggio.ts`); undeclared bars draw none, by design | — | ✅ `number 12` | ✅ | `lab/40-navigation/03-numbered-bars` |
 | colours (`ending`, `key`, `segno`, `fine`) | ❌ unread (only `rehearsal`/`section`/`direction` colour is honoured) | ✗ | ❌ | ❌ | 0 |
 | `id` | reference target only (ottava `end`, mmrests, layouts); minted, never set | — | implicit | — | many |
 | `_c` | unread | — | — | — | 0 |
@@ -82,7 +82,7 @@ draws (`rehearsal`, `section`, `directions`), and the one `_x.mnxLab` measure bl
 | `dynamics` | ⚠️ **`immediate` only**. `gradual` (hairpins) and `relative` draw **nothing** — `wedgeType`, `end`, `relativeValue`, `orient`, `voice`, `staffEnd` unread (`notation.ts:2963`; `mnx.ts:406` says "Renderer gap"). Lead part of a group only (`:1968`); priced from part 0 only (`spacing.ts:1120`). ❌ never on tab | ✗ | ✅ full union | ✅ | 5; `lab/30-dynamics/03-hairpin-and-relative` is a **bare-staff golden** |
 | `ottavas` | ✅ label, dashed line, hook, split at breaks, and the pitch shift (`:2795–2834`). `voice` unread. ❌ never on tab | — | ✅ (mints the end bar's id) | ✅ | **1 scenario, `value: 1` only** — ±2, ±3, −1 have zero coverage |
 | `measureRepeat` | ❌ **not read anywhere** (`elementWalk.ts:107` records it: "Renderer gap — the repeat sign is not drawn yet") — `number`, `counter`, `displayNumber`, `staffPosition` all unread | ✗ | ✅ `setMeasureRepeat {number, counter}` | ⚠️ pill shows `number` only, not the counter | 2 spec scenarios, **both bare-staff goldens** — `measure-repeats-with-counters` pins nothing but the meter |
-| `arpeggios` | ❌ not read anywhere in `src` | ✗ | ❌ | ❌ | `lab/32-articulations/04-arpeggiated-chords` — **bare-staff golden** |
+| `arpeggios` / `nonArpeggios` | ✅ since item 8 — the wave (curves; Bravura's wiggles are horizontal and primitives have no rotation) with its arrowhead, and the bracket, beside the chord's leftmost ink | — | ✅ `setPositioned {arpeggio\|nonArpeggio}` spans the chord under the cursor, minting the ids | ✅ | `lab/32-articulations/04-arpeggiated-chords` |
 | `nonArpeggios` | ❌ not read; not even an `ElementKind` | ✗ | ❌ | ❌ | same scenario, same golden |
 
 ### Proposed-schema objects the engine already draws
@@ -128,10 +128,10 @@ verified empty staff came to read as a regression.
 **(a) Not rendered at all**
 
 1. `measureRepeat` — full op pair, an inspector pill, two spec scenarios, empty goldens.
-2. `arpeggios` / `nonArpeggios` — a scenario, no code, no ops, no pills.
+2. ~~`arpeggios` / `nonArpeggios`~~ — item 8.
 3. ~~`fermata` (measure and event forms)~~ — item 7.
 4. `harmonies` — see above.
-5. `number` — measure numbers are never engraved.
+5. ~~`number`~~ — item 8 (declared numbers only).
 6. The colour properties on `ending`/`key`/`segno`/`fine`/`clef`; `clef.glyph`,
    `clef.showOctave`, `clef.staffPosition`; `_c`.
 
@@ -234,6 +234,21 @@ Found by the sweep and confirmed by hand; each is a one-file fix and a test:
    `lab/articulations/fermata`; `fermatas-on-bars-and-rests` pins the rest — batch 7.
    Not drawn: the event form on tab (like the articulations), `duration` (a hint).
 
+8. ✅ **Arpeggios and measure numbers** (2026-08-29) — `src/engine/layout/arpeggio.ts`.
+   The event holding a span's first note draws the mark beside its leftmost ink
+   (accidental column included): the wave is a run of cubic curves, one per half
+   period, because Bravura's arpeggio wiggles are horizontal and the primitives have
+   no rotation; `arrow` puts an arrowhead at the end the roll points to; the
+   non-arpeggio is a three-line bracket. Both are `PositionedAttribute` kinds on the
+   existing verb — the span is the chord under the cursor, bottom to top, its end
+   notes' ids minted as `setBeam` mints — with `arpeggio [up|down] [arrow]`,
+   `non-arpeggio`, `no arpeggio`. Measure numbers draw **only when declared**: number-
+   every-system is a presentation choice the document does not carry, and drawing it
+   unasked would have moved every golden; `number 12` is a `MeasureAttribute`. The two
+   badge lines retire. Moves `lab/articulations/arpeggiated-chords`; adds
+   `lab/navigation/numbered-bars` — batch 7. Remaining from (a): `harmonies`
+   (core-chord-symbols) and the colour/clef-glyph properties in (a) 6.
+
 Original plan:
 
 1. **The badge.** A measure-level pass beside `spacing.ts:1213`: for each attribute the
@@ -258,8 +273,8 @@ Original plan:
 7. **Writers for what already renders**: `segno.glyph`, `direction.glyphs`,
    `tempo.dots`, arbitrary `location`, a second tempo (an `index` on the set op), and
    the `beams` pill.
-8. **The rest of (a)** — fermata (done, item 7 above), arpeggios, measure numbers — each
-   as its own small engraving item; `harmonies` stays with core-chord-symbols.
+8. **The rest of (a)** — fermata, arpeggios, measure numbers (done, items 7–8 above);
+   `harmonies` stays with core-chord-symbols.
 
 Items 3–6 move goldens and go through the ledger; 1 and 2 are the ones to do first,
 because they change what a reviewer *sees* and stop the next inspector pill from being

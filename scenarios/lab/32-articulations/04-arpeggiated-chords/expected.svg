@@ -12,16 +12,18 @@
 <text x="206.16" y="192" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="a2"></text>
 <text x="206.16" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="a3"></text>
 <line x1="225.04" y1="120" x2="225.04" y2="205.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<path d="M 196.56 177.6 C 201.36 181.8672, 201.36 186.1328, 196.56 190.4" fill="none" stroke="currentColor" stroke-width="2.56" class="arpeggio arpeggio-arrow"></path>
+<path d="M 196.56 190.4 C 191.76 194.6672, 191.76 198.9328, 196.56 203.2" fill="none" stroke="currentColor" stroke-width="2.56" class="arpeggio arpeggio-arrow"></path>
+<path d="M 196.56 203.2 C 201.36 207.4672, 201.36 211.7328, 196.56 216" fill="none" stroke="currentColor" stroke-width="2.56" class="arpeggio arpeggio-arrow"></path>
+<line x1="189.36" y1="177.6" x2="196.56" y2="168" stroke="currentColor" stroke-width="2.56" class="arpeggio arpeggio-arrowhead"></line>
+<line x1="203.76" y1="177.6" x2="196.56" y2="168" stroke="currentColor" stroke-width="2.56" class="arpeggio arpeggio-arrowhead"></line>
 <text x="362.16" y="200" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="b1"></text>
 <text x="362.16" y="184" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="b2"></text>
 <text x="362.16" y="168" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="b3"></text>
 <line x1="381.04" y1="112" x2="381.04" y2="197.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="352.56" y1="160" x2="352.56" y2="208" stroke="currentColor" stroke-width="2.08" class="non-arpeggio"></line>
+<line x1="352.56" y1="160" x2="363.76" y2="160" stroke="currentColor" stroke-width="2.08" class="non-arpeggio"></line>
+<line x1="352.56" y1="208" x2="363.76" y2="208" stroke="currentColor" stroke-width="2.08" class="non-arpeggio"></line>
 <line x1="449.6" y1="128" x2="449.6" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="454.4" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<rect x="36.8" y="211.2" width="17.6" height="17.6" fill="#b45309" rx="4.8" ry="4.8" class="diagnostic-marker diagnostic-render">
-<title>renderer — arpeggio — not drawn</title></rect>
-<text x="45.6" y="220" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-render">!<title>renderer — arpeggio — not drawn</title></text>
-<rect x="59.2" y="211.2" width="17.6" height="17.6" fill="#b45309" rx="4.8" ry="4.8" class="diagnostic-marker diagnostic-render">
-<title>renderer — non-arpeggio bracket — not drawn</title></rect>
-<text x="68" y="220" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-render">!<title>renderer — non-arpeggio bracket — not drawn</title></text>
 </svg>

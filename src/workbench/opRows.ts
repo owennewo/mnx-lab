@@ -263,6 +263,9 @@ function opLabel(op: EditOp): string {
       const where = `@ m${op.measureIndex + 1} ${onsetText(op.onset)}`;
       if (op.attribute.kind === 'dynamic')
         return `dynamic ${op.attribute.value ?? (op.attribute.glyphs ?? []).join(' ')} ${where}`;
+      if (op.attribute.kind === 'arpeggio')
+        return `arpeggio ${[op.attribute.direction, op.attribute.arrow ? 'arrow' : ''].filter(Boolean).join(' ')} ${where}`.replace('  ', ' ');
+      if (op.attribute.kind === 'nonArpeggio') return `non-arpeggio ${where}`;
       if (op.attribute.kind === 'ottava')
         return `ottava ${op.attribute.value > 0 ? '+' : ''}${op.attribute.value} ${where}`;
       return `text “${op.attribute.text}” ${where}`;

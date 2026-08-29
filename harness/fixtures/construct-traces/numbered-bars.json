@@ -1,0 +1,118 @@
+{
+  "target": "lab/navigation/numbered-bars",
+  "intents": [
+    {
+      "type": "addPart",
+      "name": "Music"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "number",
+        "value": 17
+      }
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "number",
+        "value": 18
+      }
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "segno"
+      }
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 2
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "number",
+        "value": 19
+      }
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "tempo",
+        "bpm": 96,
+        "base": "quarter"
+      }
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 3
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "barline",
+        "type": "final"
+      }
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    }
+  ]
+}
