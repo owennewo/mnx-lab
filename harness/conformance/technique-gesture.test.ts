@@ -64,6 +64,17 @@ const techniqueOf = (session: EditorSession, id: string): MnxTabTechnique | unde
   return undefined;
 };
 
+/** The same bar with NO string annotations: pitches only, on a declared
+ *  guitar — the derivation ladder's territory. */
+function bareBar(items: { string: number; fret: number; id: string }[]): MnxStructure {
+  const doc = bar(items) as { parts: { measures?: { sequences?: { content: { notes?: { _x?: unknown }[] }[] }[] }[] }[] };
+  for (const measure of doc.parts[0].measures ?? [])
+    for (const sequence of measure.sequences ?? [])
+      for (const event of sequence.content)
+        for (const note of event.notes ?? []) delete note._x;
+  return doc as unknown as MnxStructure;
+}
+
 describe('the hammer-pull key resolves ANY next pitch, same string first', () => {
   it('h on an ascending pair writes the hammerPull adornment — the case that used to refuse', () => {
     const session = new EditorSession(bar([
@@ -112,6 +123,26 @@ describe('the hammer-pull key resolves ANY next pitch, same string first', () =>
     ]));
     expect(session.handleIntent({ type: 'toggleTechnique', kind: 'hammerPull' })).toBe(false);
     expect(techniqueOf(session, 'a')).toBeUndefined();
+  });
+
+  it('a BARE note uses its DERIVED string — the ladder, not just the annotation', () => {
+    // No annotations anywhere: E2 derives to string 6, D3 to string 4, G2 to
+    // string 6 fret 3. h on the E2 must skip the D3 and bridge to the G2.
+    const session = new EditorSession(bareBar([
+      { string: 6, fret: 0, id: 'a' },
+      { string: 4, fret: 0, id: 'b' },
+      { string: 6, fret: 3, id: 'c' }
+    ]));
+    expect(session.handleIntent({ type: 'toggleTechnique', kind: 'hammerPull' })).toBe(true);
+    expect(techniqueOf(session, 'a')).toEqual({ hammerPull: { target: 'c' } });
+
+    // And the equal-fret refusal holds on derived strings too.
+    const equal = new EditorSession(bareBar([
+      { string: 6, fret: 0, id: 'a' },
+      { string: 4, fret: 0, id: 'b' },
+      { string: 6, fret: 0, id: 'c' }
+    ]));
+    expect(equal.handleIntent({ type: 'toggleTechnique', kind: 'hammerPull' })).toBe(false);
   });
 
   it('a slide travels to a different fret too', () => {

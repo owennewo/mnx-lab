@@ -42,7 +42,7 @@ import {
   onsetsEqual,
   type Onset
 } from './cursor.ts';
-import { capoOf, midiOfPitch, tuningOf } from './tabStrings.ts';
+import { capoOf, defaultStringFor, midiOfPitch, tuningOf } from './tabStrings.ts';
 
 // Note addressing: every `noteId(s)` field accepts a note's real `id` OR its
 // synthetic positional key (src/model/noteKeys.ts) — most spec mirrors carry
@@ -2793,13 +2793,23 @@ function tieTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined
  *  hammer-on while classifying the meaningless equal-fret case as a pull-off
  *  (found hands-on, 2026-08-30). */
 function techniqueTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined {
-  const string = located.note._x?.mnxLab?.string;
-  // With a string annotation the search is BY STRING, as far forward as it
+  // On a declared fingerboard the search is BY STRING, as far forward as it
   // takes: a hammer-on, pull-off or slide is one finger staying on one
   // string, so an intervening event on another string is skipped, not
   // targeted (found hands-on, 2026-08-30 — `h` grabbed the next event's
-  // other-string note). Without the annotation, the next event decides:
-  // same pitch preferred, else its first note.
+  // other-string note). The string is the note's EFFECTIVE one — the
+  // annotation when stored, else the derivation ladder's lowest-playable
+  // choice (`defaultStringFor`, the renderer's own rule), because a bare
+  // note has a string on the page even though the document never wrote it
+  // (second hands-on find, same day). Without a fingerboard, the next event
+  // decides: same pitch preferred, else its first note.
+  const part = doc.parts?.[located.partIndex];
+  const tuning = tuningOf(part);
+  const capo = capoOf(part);
+  const effectiveString = (note: MnxNote): number | undefined =>
+    note._x?.mnxLab?.string ??
+    (tuning.length > 0 ? defaultStringFor(note.pitch, tuning, capo) : undefined);
+  const string = effectiveString(located.note);
   const sequencesOf = (measureIndex: number) =>
     (doc.parts?.[located.partIndex]?.measures?.[measureIndex]?.sequences ?? []).filter(
       s => (s.staff ?? 1) === located.staffIndex
@@ -2812,7 +2822,7 @@ function techniqueTarget(doc: MnxStructure, located: LocatedNote): MnxNote | und
       for (let i = from; i < (seq?.content.length ?? 0); i++) {
         const item = seq!.content[i];
         if (!isTimedEvent(item)) continue;
-        const sameString = (item.notes ?? []).find(n => n._x?.mnxLab?.string === string);
+        const sameString = (item.notes ?? []).find(n => effectiveString(n) === string);
         if (sameString) return sameString;
       }
     }
