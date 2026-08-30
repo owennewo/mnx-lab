@@ -255,6 +255,7 @@ describe('command registry — the joins', () => {
     const KNOWN_TWINS = new Set([
       'note: articTenutoAbove — tenuto, hammer-pull',
       'measure: segno — segno, section',
+      'measure: coda — coda, section-colour',
       'measure: repeat1Bar — rehearsal, measure-repeat',
       'document: brace — add-part, staves',
       'session: brace — doc-add-part, staff-kind-both',
@@ -686,19 +687,7 @@ describe('command registry — state reads the document', () => {
     expect(session.selection).toEqual(selection);
   });
 
-  it('the section and part scope tiles commit structural ranges through intents', () => {
-    const doc = makeDoc();
-    doc.global!.measures![0].section = { label: 'A' };
-    const section = new EditorSession(doc);
-    while (section.selectionLevel !== 'section') {
-      section.handleIntent({ type: 'relaxSelection' });
-    }
-    const sectionRange = find('section-range').action!(sessionView(section));
-    expect(sectionRange).toEqual({ intent: { type: 'selectSectionRange' } });
-    section.handleIntent((sectionRange as { intent: never }).intent);
-    expect(section.selectionLevel).toBe('measure');
-    expect(section.resolvedSelection.members).toHaveLength(2);
-
+  it('the part scope tile commits the whole-part closure through an intent', () => {
     const part = new EditorSession(makeDoc());
     while (part.selectionLevel !== 'partMeasure') {
       part.handleIntent({ type: 'relaxSelection' });

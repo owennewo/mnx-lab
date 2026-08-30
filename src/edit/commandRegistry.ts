@@ -249,11 +249,7 @@ export function sessionView(session: SessionLike): SessionView {
       : [];
   });
   const selectedMemberBarAttributes = members.flatMap(member => {
-    const index = member.kind === 'measure'
-      ? member.measureIndex
-      : member.kind === 'section'
-        ? member.start
-        : undefined;
+    const index = member.kind === 'measure' ? member.measureIndex : undefined;
     if (index === undefined) return [];
     const selected = doc.global?.measures?.[index] as Record<string, unknown> | undefined;
     return [selected
@@ -261,11 +257,7 @@ export function sessionView(session: SessionLike): SessionView {
       : []];
   });
   const selectedMemberBarlineTypes = members.flatMap(member => {
-    const index = member.kind === 'measure'
-      ? member.measureIndex
-      : member.kind === 'section'
-        ? member.start
-        : undefined;
+    const index = member.kind === 'measure' ? member.measureIndex : undefined;
     if (index === undefined) return [];
     const type = doc.global?.measures?.[index]?.barline?.type;
     return [type ? [type] : []];
@@ -311,7 +303,6 @@ export function selectionMemberSummary(view: SessionView): string {
     voiceMeasure: ['voice bar', 'voice bars'],
     partMeasure: ['part bar', 'part bars'],
     measure: ['bar', 'bars'],
-    section: ['section', 'sections'],
     document: ['session', 'scores']
   };
   const [one, many] = noun[view.level];
@@ -951,7 +942,7 @@ export const COMMANDS: readonly EditorCommand[] = [
   // ── section ─────────────────────────────────────────────────────────────
   {
     id: 'section',
-    scopes: ['section', 'measure'],
+    scopes: ['measure'],
     glyph: { smufl: 'segno' },
     label: 'Section label…',
     shortcut: 'Shift+B',
@@ -961,28 +952,27 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
   {
     id: 'section-colour',
-    scopes: ['section'],
+    scopes: ['measure'],
     glyph: { smufl: 'coda' },
     label: 'Section colour',
     tier: 'popover',
     blockedBy: 'section-colour'
   },
   {
-    id: 'section-range',
-    scopes: ['section'],
-    glyph: { smufl: 'barlineDashed' },
-    label: 'Select section',
-    tier: 'popover',
-    action: () => ({ intent: { type: 'selectSectionRange' } })
-  },
-  {
+    // The bar-rung verb the section rung's Del used to be
+    // (core-selection-range-grain.md): strip the label on THIS bar — the bars
+    // remain, exactly as `no section` does in the setup grammar.
     id: 'delete-section-boundary',
-    scopes: ['section'],
-    glyph: { mark: { smufl: 'barlineDashed' }, op: { sign: 'minus', at: 'before' } },
+    scopes: ['measure'],
+    // A bare mark, not a minus-composed one: the operator contract reserves
+    // `minus` for the rung's own `delete` intent, and this strips an
+    // attribute instead.
+    glyph: { smufl: 'barlineDashed' },
     label: 'Delete section boundary',
-    shortcut: 'Del',
-    tier: 'key',
-    action: () => ({ intent: { type: 'delete' } })
+    detail: 'The bars remain',
+    tier: 'popover',
+    isActive: view => view.barAttributes.includes('section'),
+    action: () => ({ intent: { type: 'removeMeasureAttribute', kind: 'section' } })
   },
 
   // ── document ───────────────────────────────────────────────────────────────
@@ -1337,14 +1327,10 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       ]
     },
     { id: 'jumps', caption: 'jumps', commands: ['segno', 'coda'] },
-    { id: 'marks', caption: 'marks', commands: ['rehearsal', 'tempo', 'section'] }
-  ],
-  section: [
-    { id: 'structure', caption: 'structure', commands: ['delete-section-boundary'] },
     {
-      id: 'section',
-      caption: 'section',
-      commands: ['section', 'section-range', 'section-colour']
+      id: 'marks',
+      caption: 'marks',
+      commands: ['rehearsal', 'tempo', 'section', 'section-colour', 'delete-section-boundary']
     }
   ],
   document: [

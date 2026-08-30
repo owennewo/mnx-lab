@@ -102,7 +102,7 @@ describe('the events beneath a selection member', () => {
     ])).toEqual([shared]);
   });
 
-  it('spans a section’s whole bar range', () => {
+  it('the document member spans every bar', () => {
     const doc = {
       mnx: { version: 1 },
       global: { measures: [{}, {}, {}] },
@@ -112,8 +112,6 @@ describe('the events beneath a selection member', () => {
         }))
       }]
     } as unknown as MnxStructure;
-    expect(eventAddressesUnderMember(doc, { kind: 'section', start: 0, end: 2 })
-      .map(address => address.measureIndex)).toEqual([0, 1]);
     expect(eventAddressesUnderMember(doc, { kind: 'document' })
       .map(address => address.measureIndex)).toEqual([0, 1, 2]);
   });

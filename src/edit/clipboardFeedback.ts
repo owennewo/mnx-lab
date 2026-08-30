@@ -51,10 +51,6 @@ export function describeSelectionClip(clip: SelectionClip): string {
       return `the part${clip.part.name ? ` ‘${clip.part.name}’` : ''} · ${count(clip.part.measures.length, 'bar')}`;
     case 'measures':
       return `${count(clip.measures.length, 'bar')} · ${count(clip.parts.length, 'part')}`;
-    case 'section': {
-      const bars = clip.sections.reduce((sum, section) => sum + section.measures.length, 0);
-      return `${count(clip.sections.length, 'section')} · ${count(bars, 'bar')}`;
-    }
     case 'document':
       return `the whole document · ${count(clip.document.parts.length, 'part')}, ${count(clip.document.global.measures.length, 'bar')}`;
   }
@@ -143,7 +139,6 @@ const RUNG_NOUN: Record<SelectionLevel, string> = {
   voiceMeasure: 'voice bar',
   partMeasure: 'staff bar',
   measure: 'bar',
-  section: 'section',
   document: 'part'
 };
 
@@ -171,15 +166,6 @@ export function deleteSelectionNotice(outcome: DeleteOutcome): ClipboardNotice {
         message: `removed ${outcome.members === 1
           ? `the ${RUNG_NOUN[outcome.level]}`
           : count(outcome.members, RUNG_NOUN[outcome.level])}`
-      };
-    case 'sectionLabels':
-      // Say where the selection WENT. The rung it was standing on no longer
-      // exists, and the next press means something else entirely.
-      return {
-        ok: true,
-        message:
-          `removed ${outcome.sections === 1 ? 'the section label' : count(outcome.sections, 'section label')}` +
-          ' — the bars remain, and Del now addresses them'
       };
     case 'refused':
       return {

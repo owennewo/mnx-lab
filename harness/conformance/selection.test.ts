@@ -226,11 +226,6 @@ describe('selection ladder', () => {
     expect(session.handleIntent({ type: 'goToLevel', level: 'container' })).toBe(false);
     expect(session.selectionLevel).toBe('note'); // did NOT park on `event`
 
-    // `section` needs declared section labels.
-    expect(session.handleIntent({ type: 'goToLevel', level: 'section' })).toBe(false);
-    const sectioned = new EditorSession(makeDoc(true));
-    expect(sectioned.handleIntent({ type: 'goToLevel', level: 'section' })).toBe(true);
-    expect(sectioned.selectionLevel).toBe('section');
   });
 
   it('lands the same place a walk would, and records ONE intent doing it', () => {
@@ -271,17 +266,12 @@ describe('selection ladder', () => {
     expect(session.selectionLevel).toBe('partMeasure');
   });
 
-  it('offers the section rung only when section labels exist, spanning to the next label', () => {
-    const plain = new EditorSession(makeDoc(false));
-    for (let i = 0; i < 5; i++) plain.handleIntent(relax);
-    expect(plain.selectionLevel).toBe('document'); // no sections → rung absent
-
-    const session = new EditorSession(makeDoc(true));
-    for (let i = 0; i < 5; i++) session.handleIntent(relax);
-    expect(session.selectionLevel).toBe('section'); // Intro: m0..m1
-    expect(session.selectedNoteKeys.sort()).toEqual(['n1', 'n2', 'n3', 'n4']);
-    expect(session.handleIntent(relax)).toBe(true);
-    expect(session.selectionLevel).toBe('document');
+  it('tops out at document — a section is a label, not a rung (core-selection-range-grain.md)', () => {
+    for (const withSections of [false, true]) {
+      const session = new EditorSession(makeDoc(withSections));
+      for (let i = 0; i < 5; i++) session.handleIntent(relax);
+      expect(session.selectionLevel).toBe('document');
+    }
   });
 
   it('adds the owning container between its child event and voice bar', () => {
@@ -433,53 +423,46 @@ describe('selection ladder', () => {
     expect(staff.selectionLevel).toBe('partMeasure');
   });
 
-  it('deletes a section boundary without deleting any bars', () => {
-    const session = new EditorSession(makeDoc(true));
-    while (session.selectionLevel !== 'section') session.handleIntent(relax);
-    expect(session.handleIntent({ type: 'delete' })).toBe(true);
-    expect(session.lastDelete).toEqual({ kind: 'sectionLabels', sections: 1 });
-    expect(session.doc.global.measures).toHaveLength(3);
-    expect(session.doc.global.measures[0].section).toBeUndefined();
-    expect(session.doc.global.measures[2].section?.label).toBe('Verse');
-  });
-
-  it('descends to the bar range the section was standing on, not outward to the score', () => {
-    // A section owns only its label, so removing it removes the RUNG. Relaxing
-    // outward would land on `document`, where the next Del means "clear every
-    // note in the score" — the one dangerous default in the two-press rule.
-    // The footprint must not move: the same bars, one rung down.
-    const session = new EditorSession(makeDoc(true));
-    while (session.selectionLevel !== 'section') session.handleIntent(relax);
-    expect(resolveSelection(session.doc, session.selection, 'notation').members)
-      .toEqual([{ kind: 'section', start: 0, end: 2 }]);
-
-    expect(session.handleIntent({ type: 'delete' })).toBe(true);
-    expect(session.selectionLevel).toBe('measure');
+  it('Ctrl+Shift+→ extends to the section boundary; again crosses into the next section', () => {
+    const session = new EditorSession(makeDoc(true)); // Intro: m0–m1, Verse: m2
+    while (session.selectionLevel !== 'measure') session.handleIntent(relax);
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'sectionEnd' })).toBe(true);
+    expect(session.cursor.measureIndex).toBe(1); // Intro's last bar
     expect(resolveSelection(session.doc, session.selection, 'notation').members).toEqual([
       { kind: 'measure', measureIndex: 0 },
       { kind: 'measure', measureIndex: 1 }
     ]);
-    expect(session.cursor.measureIndex).toBe(0);
+    // Already at the boundary: the press crosses into Verse.
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'sectionEnd' })).toBe(true);
+    expect(session.cursor.measureIndex).toBe(2);
+    expect(resolveSelection(session.doc, session.selection, 'notation').members).toHaveLength(3);
+    // The piece's end: nothing further to take.
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'sectionEnd' })).toBe(false);
   });
 
-  it('carries on down the ladder once the section label is gone', () => {
+  it('Ctrl+Shift+← mirrors it: the section’s first bar, then the previous section', () => {
     const session = new EditorSession(makeDoc(true));
-    while (session.selectionLevel !== 'section') session.handleIntent(relax);
+    session.handleIntent({ type: 'goToMeasure', measureIndex: 2 });
+    while (session.selectionLevel !== 'measure') session.handleIntent(relax);
+    // m2 is Verse's first bar already, so ← crosses into Intro.
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'sectionStart' })).toBe(true);
+    expect(session.cursor.measureIndex).toBe(0);
+    expect(resolveSelection(session.doc, session.selection, 'notation').members).toHaveLength(3);
+  });
 
-    // 1 — the label. 2 — the ink in the bars it covered. 3 — the bars.
-    expect(session.handleIntent({ type: 'delete' })).toBe(true);
-    expect(session.doc.global.measures).toHaveLength(3);
+  it('with no sections the boundary is the piece’s ends — the gesture degrades to Shift+End', () => {
+    const session = new EditorSession(makeDoc(false));
+    while (session.selectionLevel !== 'measure') session.handleIntent(relax);
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'sectionEnd' })).toBe(true);
+    expect(session.cursor.measureIndex).toBe(2);
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'sectionEnd' })).toBe(false);
+  });
 
-    expect(session.handleIntent({ type: 'delete' })).toBe(true);
-    expect(session.lastDelete).toEqual({
-      kind: 'cleared', level: 'measure', notes: 4, thenRemoves: true
-    });
-    expect(session.doc.global.measures).toHaveLength(3);
-
-    expect(session.handleIntent({ type: 'delete' })).toBe(true);
-    expect(session.lastDelete).toEqual({ kind: 'removed', level: 'measure', members: 2 });
-    expect(session.doc.global.measures).toHaveLength(1);
-    expect(session.doc.global.measures[0].section?.label).toBe('Verse');
+  it('refuses the boundary extension off the bar rungs', () => {
+    const session = new EditorSession(makeDoc(true)); // note rung
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'sectionEnd' })).toBe(false);
+    while (session.selectionLevel !== 'document') session.handleIntent(relax);
+    expect(session.handleIntent({ type: 'extendSelection', direction: 'sectionStart' })).toBe(false);
   });
 
   it('reports a delete that did nothing instead of answering with silence', () => {
@@ -579,16 +562,13 @@ describe('selection ladder', () => {
     expect(session.lastDelete).toBeNull();
   });
 
-  it('makes global measure, section and score footprints cross every part and staff', () => {
+  it('makes global measure and document footprints cross every part and staff', () => {
     const session = new EditorSession(ensembleDoc());
     while (session.selectionLevel !== 'partMeasure') session.handleIntent(relax);
     expect(session.selectedNoteKeys).toEqual(['lead']);
 
     session.handleIntent(relax);
     expect(session.selectionLevel).toBe('measure');
-    expect(session.selectedNoteKeys.sort()).toEqual(['lead', 'left', 'right']);
-    session.handleIntent(relax);
-    expect(session.selectionLevel).toBe('section');
     expect(session.selectedNoteKeys.sort()).toEqual(['lead', 'left', 'right']);
     session.handleIntent(relax);
     expect(session.selectionLevel).toBe('document');
@@ -662,7 +642,7 @@ describe('selection ladder', () => {
     expect(session.cursor.partIndex).toBeUndefined();
   });
 
-  it('moves by the rung unit: positions at note level, bars at measure level, sections at section level', () => {
+  it('moves by the rung unit: positions at note level, bars at measure level', () => {
     const session = new EditorSession(makeDoc(true));
     session.handleIntent({ type: 'nextPosition' });
     expect(session.cursor.measureIndex).toBe(0);
@@ -674,13 +654,7 @@ describe('selection ladder', () => {
     expect(session.cursor.measureIndex).toBe(1);
     session.handleIntent({ type: 'prevPosition' });
 
-    session.handleIntent(relax); // → section
-    session.handleIntent({ type: 'nextPosition' });
-    expect(session.cursor.measureIndex).toBe(2); // Intro → Verse
-    session.handleIntent({ type: 'prevPosition' });
-    expect(session.cursor.measureIndex).toBe(0);
-
-    session.handleIntent(relax); // → score
+    session.handleIntent(relax); // → document
     expect(session.handleIntent({ type: 'nextPosition' })).toBe(false);
   });
 

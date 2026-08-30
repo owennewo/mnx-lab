@@ -58,7 +58,6 @@ import {
   pointSelection,
   relaxLevel,
   resolveSelection,
-  sectionRangeAt,
   sectionStarts,
   tightenLevel,
   type ResolvedSelection,
@@ -94,13 +93,11 @@ const DURATION_LADDER: MnxNoteValueBase[] = [
  * What a `delete` intent did — the transient notice's raw material.
  *
  * `cleared` is press 1 (`thenRemoves` says whether a press 2 is waiting),
- * `removed` is press 2, `sectionLabels` is the section rung's single
- * collapsed press, and `refused` is the case that used to be silence.
+ * `removed` is press 2, and `refused` is the case that used to be silence.
  */
 export type DeleteOutcome =
   | { kind: 'cleared'; level: SelectionLevel; notes: number; thenRemoves: boolean }
   | { kind: 'removed'; level: SelectionLevel; members: number }
-  | { kind: 'sectionLabels'; sections: number }
   | { kind: 'refused'; level: SelectionLevel };
 
 /** A half-finished spanner gesture: the note it started on, and which kind of
@@ -499,13 +496,6 @@ export class EditorSession {
           this.lastDeleteOutcome = { kind: 'cleared', level, notes: removed, thenRemoves: false };
           return true;
         }
-
-        // The section rung owns ONE thing: its label. The bars are borrowed —
-        // `sectionMembers` derives the span by walking boundary to boundary —
-        // so clearing what the rung owns and removing the rung are the same
-        // act, and its two presses collapse into one. What is left standing is
-        // a range of bars, so the ladder descends and Del carries on there.
-        if (level === 'section') return this.deleteSectionLabels();
 
         // PRESS 1 — wherever the rung still holds ink, clear it to rests.
         // Time survives, because `clearEvent` keeps the duration: no press
@@ -1428,20 +1418,6 @@ export class EditorSession {
         };
         return true;
       }
-      case 'selectSectionRange': {
-        if (this.selectionState.level !== 'section') return false;
-        const range = sectionRangeAt(this.doc, before.measureIndex);
-        if (!range || range.end <= range.start) return false;
-        const start = moveToMeasure(this.grid, before, range.start);
-        const end = moveToMeasure(this.grid, before, range.end - 1);
-        this.cursorState = end;
-        this.selectionState = {
-          level: 'measure',
-          anchor: copyCursorAddress(start),
-          extent: { kind: 'cursor', cursor: copyCursorAddress(end) }
-        };
-        return true;
-      }
       // Abandoning an armed anchor is its OWN intent now. It used to ride
       // inside `relaxSelection` and shadow it, which meant Shift+↑ spent its
       // first press after a `S` cancelling rather than widening — an
@@ -1508,7 +1484,7 @@ export class EditorSession {
         return true;
       }
       // Bare arrows move by the rung's unit: positions/events/containers at
-      // the fine rungs, bars at the bar rungs, sections at section, nothing at score.
+      // the fine rungs, bars at the bar rungs, nothing at document.
       case 'nextPosition':
         if (this.collapseHorizontal(1)) return true;
         this.cursorState = this.moveHorizontal(before, 1);
@@ -1576,7 +1552,7 @@ export class EditorSession {
             this.reanchorSelection();
             return true;
           default:
-            return false; // section: unbound (no honest referent); measure/score: the mount's
+            return false; // measure/document: the mount's
         }
         break;
       }
@@ -1691,7 +1667,7 @@ export class EditorSession {
             this.cursorState = this.sectionStep(before, delta);
             break;
           default:
-            return false; // section/score: no wider horizontal unit to climb to
+            return false; // document: no wider horizontal unit to climb to
         }
         const changed = this.cursorState !== before;
         if (changed) this.reanchorSelection();
@@ -1760,7 +1736,12 @@ export class EditorSession {
     return true;
   }
 
-  private extendSelection(direction: 'previous' | 'next' | 'end'): boolean {
+  private extendSelection(
+    direction: 'previous' | 'next' | 'end' | 'sectionStart' | 'sectionEnd'
+  ): boolean {
+    if (direction === 'sectionStart' || direction === 'sectionEnd') {
+      return this.extendToSectionBoundary(direction === 'sectionEnd' ? 1 : -1);
+    }
     // The floor axis (core-selection-floor-axis.md): horizontal extent is
     // event-natured, so the note rung has no ranges. The first press
     // performs the re-leveling — one notehead becomes its own ONE event,
@@ -1800,9 +1781,57 @@ export class EditorSession {
     return true;
   }
 
+  /** Ctrl+Shift+←/→ (core-selection-range-grain.md): extend the active edge
+   * to the current section's boundary bar — the text editor's select-to-word-
+   * edge, with sections as the words. Pressed at the boundary it crosses into
+   * the neighbouring section. Bars before the first label form an anonymous
+   * span, and with no sections at all the boundary is the piece's ends, so
+   * the gesture degrades to Shift+Home/End rather than dying. Bar rungs only:
+   * an arrow that does nothing beats one that does something arbitrary. */
+  private extendToSectionBoundary(delta: 1 | -1): boolean {
+    const level = this.selectionState.level;
+    if (level !== 'voiceMeasure' && level !== 'partMeasure' && level !== 'measure') return false;
+    const last = (this.doc.global?.measures?.length ?? 0) - 1;
+    if (last < 0) return false;
+    const at = Math.min(this.cursorState.measureIndex, last);
+    // Segment bounds: section starts plus the piece's own ends. A segment is
+    // [bound, nextBound), so the boundary bar rightward is nextBound - 1.
+    const bounds = [...new Set([0, ...sectionStarts(this.doc), last + 1])]
+      .filter(bound => bound >= 0 && bound <= last + 1)
+      .sort((a, b) => a - b);
+    let target: number;
+    if (delta === 1) {
+      const hi = bounds.find(bound => bound > at) ?? last + 1;
+      target = Math.min(hi - 1, last);
+      if (target === at) {
+        const next = bounds.find(bound => bound > at + 1) ?? last + 1;
+        target = Math.min(next - 1, last);
+      }
+    } else {
+      const lo = [...bounds].reverse().find(bound => bound <= at) ?? 0;
+      target = lo;
+      if (target === at) target = [...bounds].reverse().find(bound => bound < at) ?? 0;
+    }
+    if (target === at) return false;
+    const anchor = copyCursorAddress(
+      this.selectionState.extent.kind === 'closure'
+        ? this.cursorState
+        : this.selectionState.anchor
+    );
+    const next = withoutEventPin(moveToMeasure(this.grid, this.cursorState, target));
+    if (cursorAddressesEqual(next, this.cursorState)) return false;
+    this.cursorState = next;
+    this.selectionState = {
+      level,
+      anchor,
+      extent: { kind: 'cursor', cursor: copyCursorAddress(next) }
+    };
+    return true;
+  }
+
   /** The horizontal RANGE unit. Note and event extension deliberately skip
    * entry ghosts; they select existing notes/events only. Wider rungs follow
-   * the same bar/section units as their bare horizontal navigation. */
+   * the same bar units as their bare horizontal navigation. */
   private moveSelectionHorizontal(before: EditorCursor, delta: 1 | -1): EditorCursor {
     const level = this.selectionState.level;
     if (level === 'container') return this.containerStep(before, delta);
@@ -1855,8 +1884,6 @@ export class EditorSession {
         // A RANGE selects things that exist, so the bar past the end is not a
         // member — navigation may stand on the ghost, Shift may not reach it.
         return moveMeasure(this.grid, before, delta, { ghost: false });
-      case 'section':
-        return this.sectionStep(before, delta);
       case 'document':
         return before;
     }
@@ -1899,16 +1926,15 @@ export class EditorSession {
       case 'partMeasure':
       case 'measure':
         return moveMeasure(this.grid, before, delta);
-      case 'section':
-        return this.sectionStep(before, delta);
       case 'document':
         return before; // the whole document is selected — nowhere to go
     }
   }
 
   /** Prev/next section START; prev from mid-section goes to this section's own
-   *  start first (the audio-player convention). Shared by the section rung's
-   *  bare arrows and the section jump the bar rungs climb to. */
+   *  start first (the audio-player convention). The bar rungs' Ctrl climb —
+   *  sections are a jump/extend unit, not a rung
+   *  (core-selection-range-grain.md). */
   private sectionStep(before: EditorCursor, delta: 1 | -1): EditorCursor {
     const starts = sectionStarts(this.doc);
     const target =
@@ -2407,60 +2433,6 @@ export class EditorSession {
     return true;
   }
 
-  /**
-   * The section rung's Del, and the descent that follows it.
-   *
-   * A section IS its label: `presentLevels` adds the rung only when
-   * `sectionRangeAt` finds a boundary covering the cursor, and the span is
-   * derived by walking boundary to boundary. Remove the label and the rung
-   * stops existing — but the MUSIC does not, which is why relaxing outward
-   * would be wrong twice over. `applyDestructive` re-anchors with
-   * `relaxLevel`, which walks UP only, and `section` sits directly below
-   * `document`: a vanished section would land the selection on the whole
-   * score, where the next Del means "clear every note in it". That is the one
-   * genuinely dangerous default in this design, and it arrives silently if
-   * the re-anchor is left alone.
-   *
-   * So this descends instead, carrying the range — the same bars, one rung
-   * down. THE FOOTPRINT DOES NOT MOVE; only the rung name does. Descending is
-   * right here and relaxing stays right everywhere else because every other
-   * rung's disappearance means its container is now the correct address: the
-   * last note goes, and the event is what you were pointing at. Section is
-   * the only rung that is a label on a BORROWED range rather than a container
-   * of music, so when it dies the music survives.
-   *
-   * The active edge is the section's FIRST bar — endpoints are unordered
-   * (`resolveSelection` returns members in document order regardless of drag
-   * direction), so anchoring at the far end costs nothing and leaves the
-   * cursor where the section's identity was.
-   */
-  private deleteSectionLabels(): boolean {
-    const sections = this.resolvedSelection.members.flatMap(member =>
-      member.kind === 'section' ? [member] : []
-    );
-    if (sections.length === 0) return this.refuseDelete('section');
-    const start = Math.min(...sections.map(section => section.start));
-    const end = Math.max(...sections.map(section => section.end));
-    const ops = [...sections].reverse().map(section => ({
-      type: 'removeMeasureAttribute' as const,
-      measureIndex: section.start,
-      kind: 'section' as const
-    }));
-    if (!this.applyBulk(ops)) return this.refuseDelete('section');
-    // `moveToMeasure` clamps and resolves the anchor voice, so both endpoints
-    // land the way every other jump does.
-    const far = withoutEventPin(moveToMeasure(this.grid, this.cursorState, Math.max(start, end - 1)));
-    const near = withoutEventPin(moveToMeasure(this.grid, this.cursorState, start));
-    this.cursorState = near;
-    this.selectionState = {
-      level: 'measure',
-      anchor: far,
-      extent: { kind: 'cursor', cursor: near }
-    };
-    this.lastDeleteOutcome = { kind: 'sectionLabels', sections: sections.length };
-    return true;
-  }
-
   private applyDestructive(ops: EditOp[]): boolean {
     const level = this.selectionState.level;
     if (!this.applyBulk(ops)) return false;
@@ -2538,7 +2510,6 @@ export class EditorSession {
   private selectedMeasureIndices(): number[] {
     const indices = this.resolvedSelection.members.flatMap(member => {
       if (member.kind === 'measure') return [member.measureIndex];
-      if (member.kind === 'section') return [member.start];
       return [];
     });
     return [...new Set(indices.length > 0 ? indices : [this.cursorState.measureIndex])];

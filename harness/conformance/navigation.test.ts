@@ -392,15 +392,6 @@ describe('the per-level navigation map', () => {
     }
   });
 
-  it('section ↑↓ stays unbound, and ←→ walks section starts', () => {
-    const session = at('section');
-    expect(session.handleIntent({ type: 'lineDown' })).toBe(false);
-    session.handleIntent({ type: 'nextPosition' });
-    expect(session.cursor.measureIndex).toBe(4); // Intro → Verse
-    session.handleIntent({ type: 'prevPosition' });
-    expect(session.cursor.measureIndex).toBe(0);
-  });
-
   it('Ctrl+←→ climbs from the bar to the SECTION once the bar is the rung’s own step', () => {
     for (const level of ['note', 'event'] as SelectionLevel[]) {
       const session = at(level);
@@ -414,7 +405,6 @@ describe('the per-level navigation map', () => {
       expect(session.handleIntent({ type: 'jumpNext' })).toBe(false); // no third section
     }
     // Nothing wider has a horizontal unit to climb to.
-    expect(at('section').handleIntent({ type: 'jumpNext' })).toBe(false);
     expect(at('document').handleIntent({ type: 'jumpNext' })).toBe(false);
   });
 

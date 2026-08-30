@@ -379,10 +379,7 @@ function jsonInk(line: string) {
 const DEF_PREVIEW = 9;
 
 /** Ladder level → enclosure shape (roadmap/complete/core-selection-ladder.md).
- *  The mapping lives HERE so elements/ knows shapes, never editor levels.
- *  measure and section share panel-wide: the extent difference (one bar vs
- *  the labelled range) comes from the footprint itself — and where it
- *  degenerates, LIT_LABEL_LEVELS below carries the pair instead. */
+ *  The mapping lives HERE so elements/ knows shapes, never editor levels. */
 const ENCLOSURE_BY_LEVEL: Record<SelectionLevel, EnclosureKind> = {
   note: 'cell',
   event: 'slice',
@@ -390,19 +387,13 @@ const ENCLOSURE_BY_LEVEL: Record<SelectionLevel, EnclosureKind> = {
   voiceMeasure: 'run',
   partMeasure: 'panel',
   measure: 'panel-wide',
-  section: 'panel-wide',
   document: 'frame'
 };
 
-/** Which rungs claim the section labels they enclose (the ladder's "label
- *  chip lit"; workbench-rung-legibility.md). Only the section rung does:
- *  extent separates bar from section whenever the section is longer than a
- *  bar and not at all when it is exactly one, and the bar's own slot covers
- *  the label strip either way — so the shared shape needs a channel that does
- *  not depend on how long the section happens to be. A bar owning the
- *  rehearsal mark and tempo in that same strip is why the claim is the
- *  section's alone. */
-const LIT_LABEL_LEVELS = new Set<SelectionLevel>(['section']);
+/** Which rungs claim the section labels they enclose. Empty since the
+ *  section rung retired (core-selection-range-grain.md); the channel stays
+ *  for any future rung that owns a label strip. */
+const LIT_LABEL_LEVELS = new Set<SelectionLevel>();
 
 /** Translate editor membership into the deliberately smaller geometry
  * vocabulary accepted by `elements/`. Rests survive as onset-bearing moments;
@@ -490,11 +481,6 @@ function presentationSpan(
         break;
       case 'measure':
         push(member.measureIndex);
-        break;
-      case 'section':
-        for (let measureIndex = member.start; measureIndex < member.end; measureIndex++) {
-          push(measureIndex);
-        }
         break;
       case 'document':
         break;
@@ -4367,7 +4353,7 @@ export class ScenarioPage extends LitElement {
     const session = this.session;
     if (!session || this.cursorHidden) return null;
     const level = session.selectionLevel;
-    if (level === 'document' || level === 'section') return null;
+    if (level === 'document') return null;
 
     const key = session.selectedNoteKeys[0];
     const at = key ? findNoteAddress(session.doc, key) : null;

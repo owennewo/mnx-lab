@@ -56,6 +56,10 @@ export const NAVIGATION_LAYER: KeymapLayer = {
     { code: 'ArrowRight', shift: true, intent: { type: 'extendSelection', direction: 'next' } },
     { code: 'ArrowLeft', shift: true, intent: { type: 'extendSelection', direction: 'previous' } },
     { code: 'End', shift: true, intent: { type: 'extendSelection', direction: 'end' } },
+    // Ctrl+Shift+←/→ — select-to-word-edge with sections as the words
+    // (core-selection-range-grain.md): bar rungs only, boundary then across.
+    { code: 'ArrowRight', ctrl: true, shift: true, intent: { type: 'extendSelection', direction: 'sectionEnd' } },
+    { code: 'ArrowLeft', ctrl: true, shift: true, intent: { type: 'extendSelection', direction: 'sectionStart' } },
     // Home / End — the timeline's ends, and the reason `Shift+M` is gone: an
     // "append" key was a special case for a position the cursor can simply go
     // to. End then `I` is the same act, spelled out of parts that already

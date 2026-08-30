@@ -249,11 +249,6 @@ function validateEnvelopePayload(envelope: SelectionClipEnvelope): PasteRefusal 
       if (clip.measures.length === 0 || clip.measures.some(column => column.parts.length !== clip.parts.length))
         return refuse('invalid-payload', 'The measure clip has inconsistent part columns.');
       break;
-    case 'section':
-      if (clip.sections.length === 0 || clip.sections.some(section =>
-        section.measures.length === 0 || section.measures.some(column => column.parts.length !== clip.parts.length)
-      )) return refuse('invalid-payload', 'The section clip has inconsistent measure columns.');
-      break;
     case 'document':
       if (!clip.document.mnx || !clip.document.global || !Array.isArray(clip.document.parts))
         return refuse('invalid-payload', 'The score clip is not an MNX structure.');
@@ -658,11 +653,7 @@ function anchorBarStart(
   }
   if (state.extent.kind === 'closure') {
     const measures = resolveSelection(doc, state, projection).members.flatMap(member =>
-      member.kind === 'section'
-        ? [member.start]
-        : 'measureIndex' in member
-          ? [member.measureIndex]
-          : []
+      'measureIndex' in member ? [member.measureIndex] : []
     );
     if (measures.length) return Math.min(...measures);
   }
@@ -1091,12 +1082,9 @@ export function planSelectionPaste(
       };
       break;
     }
-    case 'measures':
-    case 'section': {
-      const level = clip.kind === 'measures' ? 'measure' as const : 'section' as const;
-      const columns = clip.kind === 'measures'
-        ? clip.measures
-        : clip.sections.flatMap(section => section.measures);
+    case 'measures': {
+      const level = 'measure' as const;
+      const columns = clip.measures;
       const start = anchorBarStart(destination, state, projection);
       // D3: positional part mapping, creating what the clip carries and the
       // destination lacks — dropping a part's material is the one thing

@@ -59,11 +59,6 @@ const everyKind: SelectionClip[] = [
     parts: [{ id: 'part-1' }],
     measures: [{ global: {}, parts: [{ sequences: [] }] }]
   },
-  {
-    kind: 'section',
-    parts: [{ id: 'part-1' }],
-    sections: [{ measures: [{ global: { section: { label: 'A' } }, parts: [{ sequences: [] }] }] }]
-  },
   { kind: 'document', document: score }
 ];
 

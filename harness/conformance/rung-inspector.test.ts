@@ -110,11 +110,9 @@ describe('the crumbs’ siblings', () => {
     expect(session.cursor.partIndex).toBe(1);
   });
 
-  it('sections list every section with its range; the narrow rungs offer none', () => {
+  it('only bars and parts have siblings — sections are a bar attribute, not a rung', () => {
     const session = atBar(0);
-    const section = crumbSiblings(session.doc, 'section', session.cursor)!;
-    expect(section.map(s => `${s.label} ${s.detail}`)).toEqual(['Verse 1 m1–2', 'Chorus m3–3']);
-    for (const key of ['voice', 'container', 'event', 'note', 'document'])
+    for (const key of ['voice', 'container', 'event', 'note', 'section', 'document'])
       expect(crumbSiblings(session.doc, key, session.cursor)).toBeNull();
   });
 });
@@ -638,14 +636,6 @@ describe('identity pills', () => {
     expect(pillText(session)[0]).toBe('pitch: G4 [floor]');
   });
 
-  it('a section’s name is a floor pill: amend sets it, empty is refused', () => {
-    const session = new EditorSession(makeDoc());
-    session.handleIntent({ type: 'goToLevel', level: 'section' });
-    expect(pillText(session)).toEqual(['name: Verse 1 [floor]', 'bars: 1–2 [inherited]']);
-    expect(parseInspectorLine('section', 'name', '')).toHaveProperty('error');
-    expect(parseInspectorLine('section', 'name', 'Intro')).toEqual({ intent: { type: 'setMeasureAttribute', attribute: { kind: 'section', label: 'Intro' } } });
-    expect(wordsFor('section').map(w => w.word)).toEqual(['name']);
-  });
 });
 
 describe('the wider rungs', () => {

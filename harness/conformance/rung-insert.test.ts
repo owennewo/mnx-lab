@@ -98,30 +98,6 @@ describe('insert at the rung', () => {
     expect(s.doc.parts![0].measures![1]).toEqual(before);
   });
 
-  it('refuses at every rung with no insert, and never climbs to a wider one', () => {
-    // `note` and `event` are NOT here: they insert an event (a note-sized
-    // thing in a voice), which core-event-insert built. `partMeasure` left
-    // this list in 2026-08-25 — see the test below.
-    for (const level of ['section']) {
-      const s = score(2);
-      s.handleIntent({ type: 'toggleNote' });
-      // The ladder skips rungs with no referent, so `section` needs one before
-      // it can be stood on at all.
-      s.handleIntent({
-        type: 'setMeasureAttribute',
-        attribute: { kind: 'section', label: 'Head' }
-      });
-      relaxTo(s, level);
-      const bars = barCount(s);
-      for (const side of ['before', 'after'] as const)
-        expect(
-          s.handleIntent({ type: 'insertAtRung', side }),
-          `${level} accepted insert-${side}`
-        ).toBe(false);
-      expect(barCount(s), `${level} silently inserted a bar`).toBe(bars);
-    }
-  });
-
   it('the part rung inserts VOICES — never a staff, which is still refused', () => {
     // This item's table said partMeasure has no insert, and the reason it gave
     // was about STAVES: "a staff exists for the whole part or not at all". That

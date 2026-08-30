@@ -71,8 +71,7 @@ export const KEY_DOCS: KeyDoc[] = [
       container: 'walk this voice’s rhythm containers',
       voiceMeasure: 'walk bars',
       partMeasure: 'walk bars',
-      measure: 'walk bars',
-      section: 'jump between section starts'
+      measure: 'walk bars'
       // document: the whole document is selected — nowhere to go.
     }
   },
@@ -82,7 +81,7 @@ export const KEY_DOCS: KeyDoc[] = [
     group: 'navigation',
     // The vertical axis coarsens as the rung widens: the staff's own space,
     // then the voice stack, then the system's staves, then the systems
-    // themselves. Section is deliberately unbound (no honest referent). This
+    // themselves. This
     // table states what the READER gets, so the last two rows are here even
     // though the session refuses them — both are resolved by the mount (a fact
     // about the paint, and one about the host) and arrive as a resolved intent
@@ -152,7 +151,7 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: { all: 'widen / narrow the selection one rung' }
   },
   {
-    keys: 'Shift+1…8',
+    keys: 'Shift+1…7',
     // The LABEL names the position, never the glyph: shifted Digit1 prints
     // `!` on QWERTY but `1` on AZERTY, where the whole digit row is shifted.
     strokes: LADDER_JUMP_LEVELS.map((_, index) => ({
@@ -161,7 +160,7 @@ export const KEY_DOCS: KeyDoc[] = [
     })),
     group: 'selection',
     meaning: {
-      all: 'jump straight to a rung — 1 note, 2 event, 3 container, 4 voice, 5 part, 6 bar, 7 section, 8 document (a rung this score has not got refuses)'
+      all: 'jump straight to a rung — 1 note, 2 event, 3 container, 4 voice, 5 part, 6 bar, 7 document (a rung this score has not got refuses)'
     }
   },
   {
@@ -197,8 +196,7 @@ export const KEY_DOCS: KeyDoc[] = [
       container: 'extend through this voice’s rhythm containers',
       voiceMeasure: 'extend through this voice’s existing bar copies',
       partMeasure: 'extend through bars on this staff',
-      measure: 'extend through global bars',
-      section: 'extend through labelled sections'
+      measure: 'extend through global bars'
     }
   },
   {
@@ -211,8 +209,24 @@ export const KEY_DOCS: KeyDoc[] = [
       container: 'extend to this voice’s last rhythm container',
       voiceMeasure: 'extend to this voice’s last existing bar copy',
       partMeasure: 'extend to the last bar on this staff',
-      measure: 'extend to the last global bar',
-      section: 'extend to the last labelled section'
+      measure: 'extend to the last global bar'
+    }
+  },
+  {
+    keys: 'Ctrl/⌘+Shift+←/→',
+    strokes: [
+      { code: 'ArrowLeft', ctrl: true, shift: true },
+      { code: 'ArrowRight', ctrl: true, shift: true }
+    ],
+    group: 'selection',
+    // Select-to-word-edge with sections as the words
+    // (core-selection-range-grain.md): → extends to the last bar of the
+    // current section (again: through the next); ← to its first bar. With no
+    // sections the boundary is the piece's ends.
+    meaning: {
+      voiceMeasure: 'extend to the section boundary (again: the next section)',
+      partMeasure: 'extend to the section boundary (again: the next section)',
+      measure: 'extend to the section boundary (again: the next section)'
     }
   },
   {
@@ -229,7 +243,6 @@ export const KEY_DOCS: KeyDoc[] = [
       voiceMeasure: 'select every existing bar copy in this staff/voice',
       partMeasure: 'select this whole part (all staves and bars)',
       measure: 'select the global timeline',
-      section: 'select the labelled timeline',
       document: 'the whole document is already selected'
     }
   },
@@ -265,7 +278,6 @@ export const KEY_DOCS: KeyDoc[] = [
       voiceMeasure: 'clear this voice’s bar copy, then remove the empty copy',
       partMeasure: 'clear this staff’s bar copy, then remove the empty copy',
       measure: 'clear this bar across every part, then remove the empty bar',
-      section: 'delete this section boundary — the bars remain, and Del then addresses them',
       document: 'clear the score, then remove the empty part and its trailing bars'
     }
   },
@@ -367,8 +379,7 @@ export const KEY_DOCS: KeyDoc[] = [
       container: 'cut the containers, leaving equal-span silence',
       voiceMeasure: 'cut this voice’s bar copies (absence is silence)',
       partMeasure: 'cut this staff’s bars; the part closure cuts the whole part',
-      measure: 'cut the global bars — the timeline closes',
-      section: 'cut the named bars — the timeline closes'
+      measure: 'cut the global bars — the timeline closes'
       // document: refused — deleting a document belongs to its library.
     }
   },
@@ -562,7 +573,7 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // signatures and the measure-attribute pair; its crumbs go to a bar or a
   // part; ↑↓ walk the ladder.
   rungInspector: [
-    // bar and section
+    // bar
     'setTimeSignature',
     'removeTimeSignature',
     'setKeySignature',

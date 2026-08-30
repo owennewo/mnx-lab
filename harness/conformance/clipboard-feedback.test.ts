@@ -192,18 +192,6 @@ describe('the delete sentences', () => {
     expect(notice(session)).toEqual({ ok: true, message: 'deleted 1 note' });
   });
 
-  it('says where the selection went when a section label goes', () => {
-    const doc = score();
-    doc.global.measures[0].section = { label: 'Intro' };
-    const session = new EditorSession(doc);
-    while (session.selectionLevel !== 'section') session.handleIntent({ type: 'relaxSelection' });
-    expect(notice(session)).toEqual({
-      ok: true,
-      message: 'removed the section label — the bars remain, and Del now addresses them'
-    });
-    expect(session.selectionLevel).toBe('measure');
-  });
-
   it('says a refusal out loud rather than answering with silence', () => {
     expect(deleteSelectionNotice({ kind: 'refused', level: 'document' })).toEqual({
       ok: false,

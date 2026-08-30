@@ -133,10 +133,6 @@ export function eventAddressesUnderMember(
         .flatMap(addressesInVoice);
     case 'measure':
       return addressesInMeasure(doc, member.measureIndex);
-    case 'section':
-      return Array.from({ length: Math.max(0, member.end - member.start) }, (_, offset) =>
-        member.start + offset
-      ).flatMap(measureIndex => addressesInMeasure(doc, measureIndex));
     case 'document':
       return Array.from({ length: measureCount(doc) }, (_, measureIndex) => measureIndex)
         .flatMap(measureIndex => addressesInMeasure(doc, measureIndex));

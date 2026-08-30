@@ -15,7 +15,6 @@ import {
   type InspectorPill,
   type InspectorWord
 } from '../edit/inspector.ts';
-import { sectionRangeAt } from '../edit/selection.ts';
 import { buildHudRows, LEVEL_BY_ROW } from './hudRows.ts';
 
 export interface InspectorView {
@@ -41,7 +40,7 @@ export function buildInspectorView(
   const members = session.resolvedSelection.members;
   // A range: the measures the selection spans, for the bar crumb's label.
   const measureIndices = [...new Set(members.flatMap(m =>
-    m.kind === 'section' ? [m.start] : 'measureIndex' in m ? [m.measureIndex] : []
+    'measureIndex' in m ? [m.measureIndex] : []
   ))].sort((a, b) => a - b);
   const spansBars = measureIndices.length > 1;
 
@@ -49,13 +48,6 @@ export function buildInspectorView(
   // (the design's slot-machine rule). Indices come from the first member
   // where the HUD's row does not carry one.
   const first = members[0];
-  const sectionOrdinal = (() => {
-    const range = sectionRangeAt(doc, cursor.measureIndex);
-    if (!range) return null;
-    let n = 0;
-    for (let i = 0; i <= range.start; i++) if (doc.global.measures[i]?.section?.label !== undefined) n++;
-    return n;
-  })();
   const indexOf = (key: string): string => {
     switch (key) {
       case 'bar':
@@ -68,8 +60,6 @@ export function buildInspectorView(
         return `${(cursor.partIndex ?? 0) + 1}`;
       case 'voice':
         return `${(cursor.voiceIndex ?? 0) + 1}`;
-      case 'section':
-        return sectionOrdinal === null ? '' : `${sectionOrdinal}`;
       case 'event':
       case 'container':
         return first && 'eventIndex' in first ? `${first.eventIndex + 1}` : '';
@@ -92,8 +82,6 @@ export function buildInspectorView(
         return doc.parts?.length ?? 0;
       case 'voice':
         return partMeasure?.sequences?.length ?? 0;
-      case 'section':
-        return doc.global.measures.filter(m => m.section?.label !== undefined).length;
       case 'event':
       case 'container':
         return sequence?.content?.length ?? 0;

@@ -157,8 +157,7 @@ describe('selection cut', () => {
       { level: 'voiceMeasure', kind: 'voice-bars' },
       { level: 'partMeasure', kind: 'staff-bars' },
       { level: 'partMeasure', closure: true, kind: 'part' },
-      { level: 'measure', kind: 'measures' },
-      { level: 'section', kind: 'section' }
+      { level: 'measure', kind: 'measures' }
     ];
     for (const item of cases) {
       const session = selectedSession(item.level, item.doc ?? score(), item.closure);
@@ -243,10 +242,6 @@ describe('selection cut', () => {
     expect(result.document.parts[0].measures.flatMap(measure => measure.ottavas ?? [])).toEqual([]);
     expect(result.document.scores?.[0].pages?.[0].systems).toEqual([{ measure: 'm2' }]);
     expect(result.document.scores?.[0].multimeasureRests).toEqual([{ start: 'm0', duration: 2 }]);
-
-    const section = accepted(selectedSession('section'));
-    expect(section.document.global.measures.map(measure => measure.id)).toEqual(['m2']);
-    expect(section.document.global.measures[0].section).toEqual({ label: 'B' });
   });
 
   it('writes before mutation, and a failed or stale write leaves history and document untouched', async () => {

@@ -266,8 +266,8 @@ function valueOf(attribute: MeasureAttribute): string {
 }
 
 
-/** The siblings a crumb can go to: bars, parts, sections. Null where the
- *  score's own ←/→ is the only way (voice, container, event, note). */
+/** The siblings a crumb can go to: bars and parts. Null where the score's
+ *  own ←/→ is the only way (voice, container, event, note). */
 export function crumbSiblings(
   doc: MnxStructure,
   rowKey: string,
@@ -294,21 +294,6 @@ export function crumbSiblings(
       current: index === current,
       intent: { type: 'setPart', partIndex: index }
     }));
-  }
-  if (rowKey === 'section') {
-    const here = sectionRangeAt(doc, cursor.measureIndex);
-    return doc.global.measures.flatMap((measure, index) => {
-      if (measure.section?.label === undefined) return [];
-      const range = sectionRangeAt(doc, index);
-      return [
-        {
-          label: measure.section.label,
-          detail: range ? `m${range.start + 1}–${range.end}` : '',
-          current: here?.start === index,
-          intent: { type: 'goToMeasure', measureIndex: index } as EditorIntent
-        }
-      ];
-    });
   }
   return null;
 }
@@ -653,18 +638,6 @@ function pillsOfMember(doc: MnxStructure, level: SelectionLevel, member: Selecti
   switch (member.kind) {
     case 'measure':
       return measurePills(doc, member.measureIndex);
-    case 'section': {
-      // At the section rung the name is identity — a section without one is
-      // not a section — so it is a floor pill: Backspace clears the value,
-      // Enter on empty is refused, and there is no ×.
-      const label = doc.global.measures[member.start]?.section?.label;
-      return label === undefined
-        ? []
-        : [
-            { key: 'name', word: 'name', value: label, pillClass: 'floor', remove: null },
-            reading('bars', 'bars', `${member.start + 1}–${member.end}`)
-          ];
-    }
     case 'event':
       return eventPills(doc, member);
     case 'note':
@@ -752,8 +725,6 @@ export function wordsFor(level: SelectionLevel): InspectorWord[] {
   switch (level) {
     case 'measure':
       return BAR_WORDS;
-    case 'section':
-      return [{ word: 'name', hint: 'Verse 1' }];
     case 'event':
       return EVENT_WORDS;
     case 'note':
@@ -841,11 +812,6 @@ export function parseInspectorLine(
   const line = (word ? `${word} ${text}` : text).trim();
   const head = line.split(/\s+/)[0]?.toLowerCase() ?? '';
   const rest = line.slice(head.length).trim();
-  if (level === 'section') {
-    if (head !== 'name' && head !== 'section') return { error: 'a section has a name — name Verse 1' };
-    if (rest === '') return { error: 'a section needs a name' };
-    return { intent: { type: 'setMeasureAttribute', attribute: { kind: 'section', label: rest } } };
-  }
   if ((level === 'note' || level === 'event') && head === 'pitch') {
     const parsed = parsePitchText(rest);
     if (!parsed) return { error: 'not a pitch — B3 · F#4 · Eb2' };

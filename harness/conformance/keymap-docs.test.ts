@@ -84,14 +84,14 @@ describe('keymap docs — the joins', () => {
     });
   });
 
-  it('Shift+1..8 addresses the ladder absolutely, in ladder order', () => {
+  it('Shift+1..7 addresses the ladder absolutely, in ladder order', () => {
     // The ORDER is the whole contract of an absolute address: 1 is the
-    // tightest rung and 8 the widest, matching SELECTION_LADDER rather than
+    // tightest rung and 7 the widest, matching SELECTION_LADDER rather than
     // the tray's drawn column (which runs the other way and prints the
     // ordinals precisely so the two cannot be confused).
     const layers = [NAVIGATION_LAYER];
     expect(LADDER_JUMP_LEVELS).toEqual(SELECTION_LADDER);
-    expect(LADDER_JUMP_LEVELS).toHaveLength(8);
+    expect(LADDER_JUMP_LEVELS).toHaveLength(7);
     for (const [index, level] of LADDER_JUMP_LEVELS.entries()) {
       expect(resolveIntent({ code: `Digit${index + 1}`, shift: true }, layers)).toEqual({
         type: 'goToLevel',
@@ -99,7 +99,7 @@ describe('keymap docs — the joins', () => {
       });
     }
     expect(LADDER_JUMP_LEVELS[0]).toBe('note');
-    expect(LADDER_JUMP_LEVELS[7]).toBe('document');
+    expect(LADDER_JUMP_LEVELS[6]).toBe('document');
   });
 
   it('leaves the BARE digit row to the frets', () => {
@@ -236,7 +236,7 @@ describe('keymap docs — the guard mirrors', () => {
 
     const cut = KEY_DOCS.find(d => d.keys === 'Ctrl/⌘+X')!;
     expect(Object.keys(cut.meaning)).toEqual([
-      'note', 'event', 'container', 'voiceMeasure', 'partMeasure', 'measure', 'section'
+      'note', 'event', 'container', 'voiceMeasure', 'partMeasure', 'measure'
     ]);
     expect(cut.meaning.score).toBeUndefined();
 

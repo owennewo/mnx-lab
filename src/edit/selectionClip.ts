@@ -144,16 +144,6 @@ export interface MeasuresClip {
   measures: MeasureClipColumn[];
 }
 
-export interface SectionClipEntry {
-  measures: MeasureClipColumn[];
-}
-
-export interface SectionClip {
-  kind: 'section';
-  parts: ClipPartDescriptor[];
-  sections: SectionClipEntry[];
-}
-
 export interface DocumentClip {
   kind: 'document';
   document: MnxStructure;
@@ -179,7 +169,6 @@ export type SelectionClip =
   | StaffBarsClip
   | PartClip
   | MeasuresClip
-  | SectionClip
   | DocumentClip;
 
 export interface SelectionClipEnvelope {
@@ -209,7 +198,6 @@ const LEVELS: ReadonlySet<string> = new Set([
   'voiceMeasure',
   'partMeasure',
   'measure',
-  'section',
   'document'
 ]);
 
@@ -487,15 +475,6 @@ function validateClip(value: unknown): void {
       exactKeys(clip, '$.clip', ['kind', 'parts', 'measures']);
       objectArrayAt(clip.parts, '$.clip.parts');
       validateMeasureColumns(clip.measures, '$.clip.measures');
-      return;
-    case 'section':
-      exactKeys(clip, '$.clip', ['kind', 'parts', 'sections']);
-      objectArrayAt(clip.parts, '$.clip.parts');
-      objectArrayAt(clip.sections, '$.clip.sections').forEach((section, index) => {
-        const path = `$.clip.sections[${index}]`;
-        exactKeys(section, path, ['measures']);
-        validateMeasureColumns(section.measures, `${path}.measures`);
-      });
       return;
     case 'document':
       exactKeys(clip, '$.clip', ['kind', 'document']);

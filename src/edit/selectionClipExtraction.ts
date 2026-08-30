@@ -133,8 +133,6 @@ function measureIndices(members: SelectionMember[]): number[] {
       case 'partMeasure':
       case 'measure':
         return [member.measureIndex];
-      case 'section':
-        return Array.from({ length: member.end - member.start }, (_, index) => member.start + index);
       case 'document':
         return [];
     }
@@ -442,19 +440,6 @@ function buildClip(
         measures: indices.map(index => columnAt(doc, index))
       };
     }
-    case 'section': {
-      const sections = members.flatMap(member => member.kind === 'section'
-        ? [{ measures: Array.from(
-            { length: member.end - member.start },
-            (_, offset) => columnAt(doc, member.start + offset)
-          ) }]
-        : []);
-      return {
-        kind: 'section',
-        parts: (doc.parts ?? []).map(partDescriptor),
-        sections
-      };
-    }
     case 'document':
       return { kind: 'document', document: cloneJson(doc) };
   }
@@ -495,11 +480,6 @@ function clipEvents(envelope: SelectionClipEnvelope): MnxEvent[] {
     case 'measures':
       clip.measures.forEach(column => column.parts.forEach(visitMeasure));
       break;
-    case 'section':
-      clip.sections.forEach(section =>
-        section.measures.forEach(column => column.parts.forEach(visitMeasure))
-      );
-      break;
     case 'document':
       clip.document.parts.forEach(visitPart);
       break;
@@ -526,11 +506,6 @@ function relationshipHolders(envelope: SelectionClipEnvelope): RelationshipHolde
       break;
     case 'measures':
       clip.measures.forEach(column => column.parts.forEach(addMeasure));
-      break;
-    case 'section':
-      clip.sections.forEach(section =>
-        section.measures.forEach(column => column.parts.forEach(addMeasure))
-      );
       break;
     case 'document':
       clip.document.parts.forEach(addPart);
@@ -566,9 +541,6 @@ function closeReferences(envelope: SelectionClipEnvelope): DetachedSelectionRefe
   addMeasureIds(envelope.context?.measures);
   const addGlobal = (global: { id?: string }): void => { if (global.id !== undefined) measureIds.add(global.id); };
   if (envelope.clip.kind === 'measures') envelope.clip.measures.forEach(column => addGlobal(column.global));
-  if (envelope.clip.kind === 'section') envelope.clip.sections.forEach(section =>
-    section.measures.forEach(column => addGlobal(column.global))
-  );
   if (envelope.clip.kind === 'document') envelope.clip.document.global.measures.forEach(addGlobal);
 
   for (const note of notes) {
@@ -698,7 +670,7 @@ export function extractSelectionClip(
     },
     selection: { level: state.level, shape: selectionShape(state) },
     clip,
-    ...(state.level === 'measure' || state.level === 'section' || state.level === 'document'
+    ...(state.level === 'measure' || state.level === 'document'
       ? {}
       : { context: contextFor(doc, indices) })
   };

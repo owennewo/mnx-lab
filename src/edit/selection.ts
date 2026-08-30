@@ -37,8 +37,10 @@ import {
   type Projection
 } from './cursor.ts';
 
-/** Bottom to top. 'section' exists only when the document declares section
- *  labels (a proposed-schema field — spec-loop evidence, see the roadmap doc). */
+/** Bottom to top. Every rung is a schema object and a range grain
+ *  (core-selection-range-grain.md): the section rung was retired — a section
+ *  is a label whose range is emergent, the same shape as the voice-continuity
+ *  argument below — and lives on as the bar rungs' jump/extend unit. */
 export type SelectionLevel =
   | 'note'
   | 'event'
@@ -46,7 +48,6 @@ export type SelectionLevel =
   | 'voiceMeasure'
   | 'partMeasure'
   | 'measure'
-  | 'section'
   | 'document';
 
 export const SELECTION_LADDER: readonly SelectionLevel[] = [
@@ -56,7 +57,6 @@ export const SELECTION_LADDER: readonly SelectionLevel[] = [
   'voiceMeasure',
   'partMeasure',
   'measure',
-  'section',
   'document'
 ];
 
@@ -121,7 +121,6 @@ export type SelectionMember =
     }
   | { kind: 'partMeasure'; partIndex: number; staffIndex: number; measureIndex: number }
   | { kind: 'measure'; measureIndex: number }
-  | { kind: 'section'; start: number; end: number }
   | { kind: 'document' };
 
 export interface ResolvedSelection {
@@ -143,7 +142,6 @@ export function closureScopeForLevel(level: SelectionLevel): SelectionClosureSco
     case 'partMeasure':
       return 'part';
     case 'measure':
-    case 'section':
       return 'timeline';
     case 'document':
       return 'document';
@@ -188,7 +186,9 @@ export function anchorVoiceIndex(cursor: EditorCursor): number {
   return cursor.voiceIndex ?? 0;
 }
 
-/** Measure indices where a section label sits (proposed `global.measure.section`). */
+/** Measure indices where a section label sits (proposed `global.measure.section`).
+ *  Not a rung: sections are the bar rungs' JUMP and EXTEND unit
+ *  (core-selection-range-grain.md). */
 export function sectionStarts(doc: MnxStructure): number[] {
   const starts: number[] = [];
   (doc.global?.measures ?? []).forEach((measure, index) => {
@@ -236,7 +236,6 @@ export function presentLevels(
   if (eventSlotAt(grid, cursor, projection)) present.add('event');
   if (eventSlotAt(grid, cursor, projection)?.containerIndex !== undefined) present.add('container');
   if (slotAt(grid, cursor, projection)) present.add('note');
-  if (sectionRangeAt(doc, cursor.measureIndex)) present.add('section');
   return present;
 }
 
@@ -415,13 +414,6 @@ function measureMembers(doc: MnxStructure): SelectionMember[] {
   }));
 }
 
-function sectionMembers(doc: MnxStructure): SelectionMember[] {
-  return sectionStarts(doc).map(start => {
-    const range = sectionRangeAt(doc, start);
-    return { kind: 'section' as const, start, end: range?.end ?? start + 1 };
-  });
-}
-
 function universeFor(
   doc: MnxStructure,
   state: SelectionState,
@@ -440,8 +432,6 @@ function universeFor(
       return partMeasureMembers(doc, state.anchor, closure);
     case 'measure':
       return measureMembers(doc);
-    case 'section':
-      return sectionMembers(doc);
     case 'document':
       return [{ kind: 'document' }];
   }
@@ -456,8 +446,6 @@ function memberMeasure(member: SelectionMember): number | null {
     case 'partMeasure':
     case 'measure':
       return member.measureIndex;
-    case 'section':
-      return member.start;
     case 'document':
       return null;
   }
@@ -520,10 +508,6 @@ function exactMemberIndex(
       );
     case 'measure':
       return members.findIndex(member => member.kind === 'measure' && member.measureIndex === cursor.measureIndex);
-    case 'section':
-      return members.findIndex(member =>
-        member.kind === 'section' && cursor.measureIndex >= member.start && cursor.measureIndex < member.end
-      );
     case 'document':
       return members.findIndex(member => member.kind === 'document');
   }
@@ -651,8 +635,6 @@ function memberContainsInk(member: SelectionMember, address: InkAddress): boolea
       );
     case 'measure':
       return member.measureIndex === address.measureIndex;
-    case 'section':
-      return address.measureIndex >= member.start && address.measureIndex < member.end;
     case 'document':
       return true;
   }

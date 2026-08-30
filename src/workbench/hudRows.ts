@@ -20,7 +20,6 @@ import { eventAtCursor, eventSlotAt, slotAt } from '../edit/cursor.ts';
 import {
   anchorVoiceIndex,
   presentLevels,
-  sectionRangeAt,
   type SelectionLevel
 } from '../edit/selection.ts';
 import { timeAt } from '../edit/inspector.ts';
@@ -29,7 +28,6 @@ import type { HudPart, HudRow } from './ScoreHud.ts';
 /** Row key ↔ selection level. The component never sees the right-hand side. */
 export const LEVEL_BY_ROW: Record<string, SelectionLevel> = {
   document: 'document',
-  section: 'section',
   bar: 'measure',
   part: 'partMeasure',
   voice: 'voiceMeasure',
@@ -104,12 +102,6 @@ export function buildHudRows(
     'document',
     `${title} · ${measureCount} bar${measureCount === 1 ? '' : 's'} · ${partCount} part${partCount === 1 ? '' : 's'}`
   );
-
-  if (present.has('section')) {
-    const range = sectionRangeAt(doc, cursor.measureIndex)!;
-    const label = doc.global.measures[range.start]?.section?.label ?? '—';
-    row('section', 'section', `${label} · m${range.start + 1}–${range.end}`);
-  }
 
   const time = timeAt(doc, cursor.measureIndex);
   // Past the end of the score the cursor stands on the ghost bar

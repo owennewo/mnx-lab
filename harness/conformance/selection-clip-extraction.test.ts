@@ -29,7 +29,7 @@ function point(level: SelectionLevel, at: EditorCursor): SelectionState {
 function closure(level: SelectionLevel, at: EditorCursor): SelectionState {
   const scope = level === 'partMeasure'
     ? 'part'
-    : level === 'measure' || level === 'section'
+    : level === 'measure'
       ? 'timeline'
       : level === 'document'
         ? 'document'
@@ -162,7 +162,6 @@ describe('selection clip extraction', () => {
       [point('partMeasure', cursor(0)), 'staff-bars'],
       [closure('partMeasure', cursor(0)), 'part'],
       [point('measure', cursor(0)), 'measures'],
-      [point('section', cursor(0)), 'section'],
       [point('document', cursor(0)), 'document']
     ];
     for (const [state, kind] of cases) {
@@ -287,18 +286,13 @@ describe('selection clip extraction', () => {
     });
   });
 
-  it('copies complete measure columns and section spans across every part', () => {
+  it('copies complete measure columns across every part', () => {
     const doc = score();
     const measure = success(doc, point('measure', cursor(1)));
     expect(measure.envelope.clip).toMatchObject({
       kind: 'measures',
       parts: [{ id: 'p1', name: 'Lead', staves: 2 }, { id: 'p2' }],
       measures: [{ global: { id: 'm1' }, parts: [{ sequences: [] }, { sequences: [] }] }]
-    });
-    const section = success(doc, point('section', cursor(0)));
-    expect(section.envelope.clip).toMatchObject({
-      kind: 'section',
-      sections: [{ measures: [{ global: { id: 'm0' } }, { global: { id: 'm1' } }] }]
     });
   });
 

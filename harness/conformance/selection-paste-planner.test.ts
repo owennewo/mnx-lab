@@ -28,7 +28,7 @@ function point(level: SelectionLevel, at = cursor(0)): SelectionState {
 function closure(level: SelectionLevel, at = cursor(0)): SelectionState {
   const scope = level === 'partMeasure'
     ? 'part'
-    : level === 'measure' || level === 'section'
+    : level === 'measure'
       ? 'timeline'
       : level === 'document'
         ? 'document'
@@ -134,7 +134,6 @@ describe('pure selection paste planner', () => {
       [serialized(source, point('partMeasure')), score('target'), point('partMeasure')],
       [serialized(source, closure('partMeasure')), score('target'), point('partMeasure')],
       [serialized(source, point('measure')), score('target'), point('measure')],
-      [serialized(source, point('section')), score('target'), point('section')],
       [serialized(source, point('document')), emptyScore(), point('document')]
     ];
     for (const [clip, target, selection] of cases) accepted(clip, target, selection);
@@ -237,7 +236,7 @@ describe('pure selection paste planner', () => {
     });
   });
 
-  it('overwrites measure and section columns from the anchor, extending the timeline (D1)', () => {
+  it('overwrites measure columns from the anchor, extending the timeline (D1)', () => {
     const source = score('source');
     // One column onto bar 2 of two: an overwrite, not an insert — the
     // timeline stays two bars and bar 2 becomes the copied column.
@@ -258,15 +257,6 @@ describe('pure selection paste planner', () => {
     );
     expect(overrun.document.global.measures).toHaveLength(3);
     expect(overrun.accommodations.appendedBars).toBe(1);
-
-    // A section package lands the same way, labels riding their columns.
-    const section = accepted(
-      serialized(source, point('section')),
-      score('target', { sections: true }),
-      point('section', cursor(1))
-    );
-    expect(section.document.global.measures).toHaveLength(3);
-    expect(section.document.global.measures[1].section).toEqual({ label: 'A' });
 
     const range: SelectionState = {
       level: 'measure',

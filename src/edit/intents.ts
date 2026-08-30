@@ -62,11 +62,15 @@ export type NavigationIntent =
   /** Horizontal selection is data too: Shift extends the active edge by the
    * rung's concrete unit (or to its end), while Ctrl/Meta+A records a live
    * closure rather than a frozen list of members. */
-  | { type: 'extendSelection'; direction: 'previous' | 'next' | 'end' }
+  | {
+      type: 'extendSelection';
+      /** `sectionStart`/`sectionEnd` are the bar rungs' Ctrl+Shift+←/→
+       *  (core-selection-range-grain.md): extend to the current section's
+       *  boundary bar, crossing into the neighbouring section when already
+       *  there; with no sections the boundary is the piece's ends. */
+      direction: 'previous' | 'next' | 'end' | 'sectionStart' | 'sectionEnd';
+    }
   | { type: 'closeSelection' }
-  /** Turn the current derived section into the concrete measure interval it
-   * names, so measure-rung commands can act on that range. */
-  | { type: 'selectSectionRange' }
   /** The active projection: which SPACE the vertical line addresses (string
    *  vs staff position). Recorded so traces replay navigation faithfully. */
   | { type: 'setProjection'; projection: 'notation' | 'tab' }
@@ -264,7 +268,6 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'dropAnchor',
   'extendSelection',
   'closeSelection',
-  'selectSectionRange',
   'setProjection',
   'cycleSlot',
   'setPart',

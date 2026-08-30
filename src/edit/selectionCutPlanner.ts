@@ -58,7 +58,6 @@ function clipKindFor(state: SelectionState): CutPlan['clipKind'] {
     case 'voiceMeasure': return 'voice-bars';
     case 'partMeasure': return state.extent.kind === 'closure' ? 'part' : 'staff-bars';
     case 'measure': return 'measures';
-    case 'section': return 'section';
     case 'document': return 'document';
   }
 }
@@ -198,15 +197,6 @@ export function planSelectionCut(
     }
     case 'measure': {
       const indices = resolved.members.flatMap(member => member.kind === 'measure' ? [member.measureIndex] : []);
-      detachedTargetReferences += removeSelectionMeasureColumns(next, indices);
-      break;
-    }
-    case 'section': {
-      const indices = resolved.members.flatMap(member =>
-        member.kind === 'section'
-          ? Array.from({ length: member.end - member.start }, (_, offset) => member.start + offset)
-          : []
-      );
       detachedTargetReferences += removeSelectionMeasureColumns(next, indices);
       break;
     }
