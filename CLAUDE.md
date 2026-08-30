@@ -271,7 +271,9 @@ with the keyboard must not move the panel out from under what you were reading.
 **Document focus** is transient workbench composition: `Ctrl+Alt+F` removes the app and
 scenario-page chrome without changing remembered rail/panel preferences, while `F11`
 remains browser-owned (the palette's separate browser-fullscreen action uses the Fullscreen
-API when available). It is never a property of `<mnx-document-viewer>`.
+API when available). The zoom pad remains over the document surface and carries a permanent
+focus/exit toggle, so the mode never hides both its control and its escape route. It is never
+a property of `<mnx-document-viewer>`.
 **Theming is `light-dark()`, never an attribute** — the shell resolves `auto|light|dark`
 (remembered per browser, palette-switchable) onto `color-scheme`, and every token
 follows because `color-scheme` is inherited and crosses shadow roots. An

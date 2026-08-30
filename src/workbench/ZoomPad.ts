@@ -137,6 +137,12 @@ export class ZoomPad extends LitElement {
    */
   @property({ attribute: false }) densitySteps: (() => number[] | null) | null = null;
 
+  /** Workbench composition state. The pad does not own focus mode; it only
+   *  reflects the host's state so its adjacent control can request the
+   *  opposite. This remains chrome around, not API on, the document viewer. */
+  @property({ type: Boolean, reflect: true, attribute: 'document-focus' })
+  documentFocus = false;
+
   /**
    * The tray is open over the score. The design: *"the pad drops to 0.28 for
    * as long as the tray is open — the selection is the more urgent thing."*
@@ -203,6 +209,60 @@ export class ZoomPad extends LitElement {
         user-select: none;
         -webkit-user-select: none;
         touch-action: none;
+      }
+
+      .cluster {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+      }
+
+      /* A focus mode must carry its own visible way out. This button is a
+         sibling of the zoom geometry rather than part of the viewer: both are
+         workbench chrome composed over ScenarioPage's document surface. */
+      button.focus-toggle {
+        appearance: none;
+        box-sizing: border-box;
+        width: 26px;
+        height: 26px;
+        margin: 0;
+        padding: 0;
+        border: var(--rule-w) solid var(--line);
+        border-radius: var(--radius-control);
+        display: grid;
+        place-items: center;
+        background: var(--surface);
+        color: var(--ink);
+        opacity: 0.55;
+        cursor: pointer;
+        box-shadow: 0 2px 4px var(--shadow-far);
+        transition:
+          opacity 0.12s ease,
+          color 0.12s ease,
+          border-color 0.12s ease,
+          background-color 0.12s ease;
+      }
+
+      :host([document-focus]) button.focus-toggle {
+        opacity: 1;
+        border-color: var(--ink);
+      }
+
+      button.focus-toggle:hover,
+      button.focus-toggle:focus-visible {
+        opacity: 1;
+        color: var(--accent);
+        background: var(--row-current);
+      }
+
+      button.focus-toggle:focus-visible {
+        outline: var(--rule-w) solid var(--focus-ring);
+        outline-offset: 2px;
+      }
+
+      button.focus-toggle svg {
+        display: block;
       }
 
       /* ── one pad, two poses ──
@@ -495,6 +555,10 @@ export class ZoomPad extends LitElement {
         button.cell,
         .cell svg,
         .mag svg {
+          transition: none;
+        }
+
+        button.focus-toggle {
           transition: none;
         }
       }
@@ -858,6 +922,29 @@ export class ZoomPad extends LitElement {
     `;
   }
 
+  private focusGlyph() {
+    const path = this.documentFocus
+      ? 'M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5'
+      : 'M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5';
+    return svg`
+      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d=${path}
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="square"
+        ></path>
+      </svg>
+    `;
+  }
+
+  private requestDocumentFocusToggle() {
+    this.dispatchEvent(
+      new CustomEvent('document-focus-request', { bubbles: true, composed: true })
+    );
+  }
+
   // ── render ──────────────────────────────────────────────────────────────
 
   private pct(value: number) {
@@ -967,6 +1054,7 @@ export class ZoomPad extends LitElement {
 
     return html`
       <div
+        class="cluster"
         @pointerenter=${() => (this.open = true)}
         @pointerleave=${() => (this.open = false)}
         @focusin=${() => (this.open = true)}
@@ -1039,6 +1127,17 @@ export class ZoomPad extends LitElement {
             <div class="gap"></div>
           </div>
         </div>
+        <button
+          class="focus-toggle"
+          title=${this.documentFocus
+            ? 'Exit document focus (Ctrl+Alt+F)'
+            : 'Focus document (Ctrl+Alt+F)'}
+          aria-label=${this.documentFocus ? 'Exit document focus' : 'Focus document'}
+          aria-pressed=${this.documentFocus}
+          @click=${this.requestDocumentFocusToggle}
+        >
+          ${this.focusGlyph()}
+        </button>
       </div>
     `;
   }

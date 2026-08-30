@@ -9,13 +9,18 @@
 >
 > **Built verdict.** Landed in `07fd891`. `Ctrl+Alt+F`, the scenario-page focus button and
 > `view: focus document` all toggle one transient shell-owned state; only the document
-> surface and invoked editing overlays remain. `Ctrl+B` and `Ctrl+Alt+B` reveal their panes
+> surface, its zoom/focus pad and invoked editing overlays remain. `Ctrl+B` and `Ctrl+Alt+B`
+> reveal their panes
 > immediately, scenario-to-scenario navigation preserves focus, and non-scenario navigation
 > exits it without mutating remembered pane preferences. Native `F11` remains browser-owned;
 > a separate feature-detected palette action drives the Fullscreen API and follows
 > `fullscreenchange`. Evidence: 1,214 tests, the 120-scenario checker, production build,
 > primitive regeneration with an empty scenario diff, and a real-Chrome smoke covering
 > viewport geometry, two-axis resize/repacking, overlays, restoration and route transitions.
+> A same-day usability refinement keeps the zoom pad visible in focus mode and gives it a
+> permanent, state-aware focus/exit button: the mode no longer hides both a useful document
+> control and its own escape route, while the control remains ScenarioPage chrome rather than
+> moving into `<mnx-document-viewer>`.
 
 ## Two levels, two owners
 
@@ -23,7 +28,7 @@
 
 | Level | Owner | Meaning | Control |
 |---|---|---|---|
-| **document focus** | workbench | hide workbench header, scenario rail, view strip, side panel and persistent controls; the document surface occupies the browser viewport | `Ctrl+Alt+F` |
+| **document focus** | workbench | hide workbench header, scenario rail, view strip and side panel; the document surface occupies the browser viewport with its zoom/focus pad retained | `Ctrl+Alt+F` or the pad's focus toggle |
 | **browser fullscreen** | browser | hide tabs/address bar/window chrome as the platform permits | native `F11`; optional command/button through the Fullscreen API |
 
 The names matter. Calling level 1 “fullscreen” would make the UI claim browser chrome has
@@ -43,15 +48,18 @@ On a normal render in document focus mode the viewport contains one persistent c
 ```
 mnx-workbench
 └─ mnx-scenario-page
-   └─ mnx-document-viewer   fills the available viewport
+   ├─ mnx-document-viewer   fills the available viewport
+   └─ mnx-zoom-pad          retained document controls + focus/exit toggle
 ```
 
 The viewer's selection/enclosure remains because it is part of the document surface. Page-
 level interaction UI may appear **transiently when invoked**: selection tray, rung inspector,
-setup popover, clipboard notice and command/model dialogs. The zoom pad, app header, rail,
-view tabs, panel toggle and side panel are persistent chrome and disappear. “Only the
-viewer” describes the resting state, not a mode that disables editing by deleting every
-overlay the editor needs.
+setup popover, clipboard notice and command/model dialogs. The zoom pad remains because
+document scale and density are still useful here; its adjacent focus icon is a permanent,
+discoverable exit that changes to “focus document” outside the mode. The app header, rail,
+view tabs, panel toggle and side panel disappear. The resting state is therefore the viewer
+plus its compact document-control cluster, not a mode that disables editing or hides its own
+escape route.
 
 Loading, failed and invalid-by-design scenarios are exceptions to the literal element tree.
 The scenario page already omits the viewer for an invalid-by-design exhibit. Focus mode must
@@ -63,7 +71,8 @@ targets the scenario page's **main region**, not “find this tag and fullscreen
 `WorkbenchApp` owns `documentFocus`: it is the only layer that can remove both its own
 header/rail and the scenario page's chrome. It reflects a host attribute for the outer grid
 and passes a boolean property to `ScenarioPage`, which suppresses its head, side panel and
-zoom pad and makes `.body` one column.
+makes `.body` one column. The page passes that state to its retained zoom pad so the pad's
+focus button presents the correct enter/exit action.
 
 The state is deliberately:
 
@@ -97,15 +106,16 @@ its own box with `ResizeObserver`:
    column, `header` and `nav` are not rendered (or are `display: none`), and `main` occupies
    `100vh`/the fullscreen host.
 3. Pass `.documentFocus` to `mnx-scenario-page`. In that state omit `.head`, force `.body`
-   to `1fr`, omit the side panel and persistent zoom pad, and let `.main`/the viewer retain
+   to `1fr`, omit the side panel, retain the zoom pad, and let `.main`/the viewer retain
    `min-width: 0`, `min-height: 0` and overflow ownership.
 4. Decide the focus-mode gutter deliberately. The element must fill the viewport, but the
    paper need not touch glass: retaining the workbench's 14px viewer padding preserves a
    legible bench; zeroing it is accepted only after a visual comparison, not as a consequence
    of the word fullscreen.
-5. Add a normal-mode button beside the existing view/panel controls and a palette row
-   `view: focus document`. On entry show a short non-interactive hint — “Ctrl+Alt+F to exit”
-   — which fades so the resting picture returns to one viewer.
+5. Add a normal-mode button beside the existing view/panel controls, a palette row
+   `view: focus document`, and a state-aware focus/exit button beside the zoom pad that
+   remains present in both modes. On entry show a short non-interactive hint —
+   “Ctrl+Alt+F to exit” — which fades while the permanent pad control remains.
 
 No `fullscreen`, `focusMode` or `hideWorkbench` property is added to
 `<mnx-document-viewer>`. The viewer contract's rule remains intact: element knobs bind
@@ -135,9 +145,9 @@ does what?” is not a shortcut a reader can predict.
 - Extend keymap conformance: `Ctrl+Alt+F` resolves only to the shell action, collides with no
   editor layer and appears in the generated key documentation/palette hint.
 - Add a focused browser smoke: record rail-hidden/panel-hidden preferences, enter the mode,
-  assert header/nav/page head/panel/zoom pad are absent, and assert the main surface and
-  viewer bounding boxes occupy the viewport. Exit and prove the exact prior pane state
-  returns.
+  assert header/nav/page head/panel are absent, assert the zoom pad and its state-aware exit
+  are visible, and assert the main surface and viewer bounding boxes occupy the viewport.
+  Exercise the pad toggle in both directions, then prove the exact prior pane state returns.
 - In the same smoke, resize through both width and height while focused and assert the
   viewer's rendered system packing updates — the existing container observer is the seam,
   not a synthetic window-resize call.

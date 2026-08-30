@@ -3650,12 +3650,13 @@ export class ScenarioPage extends LitElement {
       >
         <div class="main">
           ${this.viewer(entry, view)}
-          ${!this.documentFocus && this.loadState === 'ready' && !entry.invalidByDesign
+          ${this.loadState === 'ready' && !entry.invalidByDesign
             ? html`<mnx-zoom-pad
                 .staffScale=${this.staffScale}
                 .densityH=${this.densityH}
                 .densitySteps=${this.densitySteps}
                 .effectiveStaffScale=${this.effectiveStaffScale}
+                .documentFocus=${this.documentFocus}
                 ?suppressed=${this.trayOpen}
                 @zoom-change=${this.onZoomChange}
               ></mnx-zoom-pad>`

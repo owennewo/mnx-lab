@@ -230,11 +230,12 @@ back up to `proposed/` the moment it is.
 ### complete/
 - **[workbench-document-focus-mode.md](complete/workbench-document-focus-mode.md)** — **finished
   2026-08-30** with two honest fullscreen levels. `Ctrl+Alt+F` toggles transient **document
-  focus**: header, rail, view strip, panel and persistent controls disappear while the
-  document viewer fills the browser viewport; invoked editing overlays remain usable and
-  remembered pane preferences remain untouched. Native `F11` stays browser-owned, with a
-  separate feature-detected Fullscreen API palette action. A real-Chrome smoke holds the
-  viewport geometry, resizing/repacking, overlay, restoration and route contracts.
+  focus**: header, rail, view strip and panel disappear while the document viewer fills the
+  browser viewport; the zoom pad remains, with a permanent focus/exit toggle, and invoked
+  editing overlays stay usable. Remembered pane preferences remain untouched. Native `F11`
+  stays browser-owned, with a separate feature-detected Fullscreen API palette action. A
+  real-Chrome smoke holds the viewport geometry, resizing/repacking, controls, restoration
+  and route contracts.
 - **[core-bend-stops.md](complete/core-bend-stops.md)** — **finished 2026-08-30**
   (proposed and built the same day). Bends typed as the curve they are:
   `bend 0>full>1/2>0` — every stop explicit (a non-zero first stop *is* the pre-bend),

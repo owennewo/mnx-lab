@@ -108,6 +108,8 @@ const DUMP = `(() => {
   const page = appRoot?.querySelector('mnx-scenario-page');
   const pageRoot = page?.shadowRoot;
   const viewer = pageRoot?.querySelector('mnx-document-viewer');
+  const zoomPad = pageRoot?.querySelector('mnx-zoom-pad');
+  const zoomFocus = zoomPad?.shadowRoot?.querySelector('.focus-toggle');
   const rect = element => {
     if (!element) return null;
     const box = element.getBoundingClientRect();
@@ -132,7 +134,10 @@ const DUMP = `(() => {
       : null,
     pageHead: !!pageRoot?.querySelector('.head'),
     panel: !!pageRoot?.querySelector('.panel'),
-    zoom: !!pageRoot?.querySelector('mnx-zoom-pad'),
+    zoom: !!zoomPad,
+    zoomRect: rect(zoomPad),
+    zoomFocusLabel: zoomFocus?.getAttribute('aria-label') ?? null,
+    zoomFocusPressed: zoomFocus?.getAttribute('aria-pressed') ?? null,
     popover: !!pageRoot?.querySelector('.popover-layer'),
     focusButton: !!pageRoot?.querySelector('.focus-toggle'),
     appRect: rect(app),
@@ -202,6 +207,15 @@ try {
     await new Promise(resolve => setTimeout(resolve, settleMs));
   };
   const focusKey = () => press('f', 'KeyF', 70, 3);
+  const clickZoomFocus = async () => {
+    await cdp.evaluate(
+      "document.querySelector('mnx-workbench').shadowRoot" +
+        ".querySelector('mnx-scenario-page').shadowRoot" +
+        ".querySelector('mnx-zoom-pad').shadowRoot" +
+        ".querySelector('.focus-toggle').click()"
+    );
+    await new Promise(resolve => setTimeout(resolve, 400));
+  };
 
   let state = await dump();
   check(state.focusButton, 'normal mode exposes the document-focus button');
@@ -232,8 +246,28 @@ try {
   state = await dump();
   check(state.appFocus && state.pageFocus, 'Ctrl+Alt+F reflects focus state on shell and page');
   check(
-    !state.header && !state.nav && !state.pageHead && !state.panel && !state.zoom,
-    'focus mode removes every persistent workbench and scenario-page control'
+    !state.header && !state.nav && !state.pageHead && !state.panel && state.zoom,
+    'focus mode removes the shell panes but retains the document zoom pad'
+  );
+  check(
+    state.zoomRect?.width > 0 && state.zoomRect?.height > 0,
+    'the retained zoom pad is visibly laid out in focus mode'
+  );
+  check(
+    state.zoomFocusLabel === 'Exit document focus' && state.zoomFocusPressed === 'true',
+    'the zoom pad carries a permanent, state-aware exit from document focus'
+  );
+  await clickZoomFocus();
+  state = await dump();
+  check(
+    !state.appFocus && state.zoomFocusLabel === 'Focus document',
+    'the zoom-pad control exits document focus without the shortcut'
+  );
+  await clickZoomFocus();
+  state = await dump();
+  check(
+    state.appFocus && state.zoomFocusLabel === 'Exit document focus',
+    'the same zoom-pad control re-enters document focus'
   );
   check(
     state.railPreference === '1' && state.panelPreference === '1',

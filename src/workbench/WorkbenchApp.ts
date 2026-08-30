@@ -126,7 +126,10 @@ export class WorkbenchApp extends LitElement {
     this.setDocumentFocus(!this.documentFocus);
   }
 
-  private requestDocumentFocus = () => this.setDocumentFocus(true);
+  /** Page chrome and the zoom pad emit the same request. The former exists
+   *  only outside focus; the latter remains present inside it, so one event is
+   *  an honest toggle at both entry points. */
+  private requestDocumentFocus = () => this.toggleDocumentFocus();
 
   private toggleRailFromShell() {
     if (this.documentFocus) {
