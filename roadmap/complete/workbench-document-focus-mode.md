@@ -1,11 +1,21 @@
 # Document focus mode — the viewer, then the browser
 
-> **Status: proposed (2026-08-30).** Serves the **implementation loop** in the
+> **Status: COMPLETE (2026-08-30).** Serves the **implementation loop** in the
 > **workbench shell**. Adds one workbench presentation state around the renamed
 > `<mnx-document-viewer>` from
 > [core-document-viewer-rename.md](../complete/core-document-viewer-rename.md). It does not add a
 > fullscreen property to the embeddable element: hiding host chrome and sizing a host are
 > composition, not rendering options.
+>
+> **Built verdict.** Landed in `07fd891`. `Ctrl+Alt+F`, the scenario-page focus button and
+> `view: focus document` all toggle one transient shell-owned state; only the document
+> surface and invoked editing overlays remain. `Ctrl+B` and `Ctrl+Alt+B` reveal their panes
+> immediately, scenario-to-scenario navigation preserves focus, and non-scenario navigation
+> exits it without mutating remembered pane preferences. Native `F11` remains browser-owned;
+> a separate feature-detected palette action drives the Fullscreen API and follows
+> `fullscreenchange`. Evidence: 1,214 tests, the 120-scenario checker, production build,
+> primitive regeneration with an empty scenario diff, and a real-Chrome smoke covering
+> viewport geometry, two-axis resize/repacking, overlays, restoration and route transitions.
 
 ## Two levels, two owners
 

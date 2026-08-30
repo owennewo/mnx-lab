@@ -6,7 +6,7 @@
 > public-face rename; the corpus filename moves separately in
 > [lab-corpus-document-filename.md](lab-corpus-document-filename.md), and the workbench mode
 > that exposes only the renamed viewer lives in
-> [workbench-document-focus-mode.md](../proposed/workbench-document-focus-mode.md).
+> [workbench-document-focus-mode.md](workbench-document-focus-mode.md).
 >
 > **Built verdict.** Landed as a clean pre-1.0 break in `4039904`, with the package
 > version advanced to `0.3.0`: `DocumentViewer`, `<mnx-document-viewer>`,

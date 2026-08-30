@@ -44,12 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-document-focus-mode.md](proposed/workbench-document-focus-mode.md)** — two honest
-  fullscreen levels: `Ctrl+Alt+F` toggles transient **document focus** (header, rail, view
-  strip, panel and persistent controls gone; the document viewer fills the browser viewport),
-  while native `F11` or an optional Fullscreen API command remains browser-owned. The mode
-  overrides rather than mutates remembered pane preferences, keeps invoked editing overlays,
-  exits off non-scenario routes, and never becomes a viewer property.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -234,6 +228,13 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-document-focus-mode.md](complete/workbench-document-focus-mode.md)** — **finished
+  2026-08-30** with two honest fullscreen levels. `Ctrl+Alt+F` toggles transient **document
+  focus**: header, rail, view strip, panel and persistent controls disappear while the
+  document viewer fills the browser viewport; invoked editing overlays remain usable and
+  remembered pane preferences remain untouched. Native `F11` stays browser-owned, with a
+  separate feature-detected Fullscreen API palette action. A real-Chrome smoke holds the
+  viewport geometry, resizing/repacking, overlay, restoration and route contracts.
 - **[core-bend-stops.md](complete/core-bend-stops.md)** — **finished 2026-08-30**
   (proposed and built the same day). Bends typed as the curve they are:
   `bend 0>full>1/2>0` — every stop explicit (a non-zero first stop *is* the pre-bend),
