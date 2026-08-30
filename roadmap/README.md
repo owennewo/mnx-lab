@@ -44,6 +44,24 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-document-viewer-rename.md](proposed/core-document-viewer-rename.md)** — finish the
+  vocabulary correction begun by the document rung at the public boundary:
+  `ScoreViewer` / `<mnx-score-viewer>` → `DocumentViewer` /
+  `<mnx-document-viewer>`. The element consumes the MNX root, not one optional member of
+  `scores[]`; `score` is reserved for that genuine presentation, while rendered output is a
+  projection/engraving. A semantic audit rather than a global replace, with a clean pre-1.0
+  break by default and a bounded one-release alias only if pickup finds a real external host.
+- **[lab-corpus-document-filename.md](proposed/lab-corpus-document-filename.md)** — rename all
+  119 scenario roots `score.mnx.json` → `document.mnx.json`. A separate lab item because
+  `scenarios/spec/` is generator-owned: change the sync writer first, regenerate rather than
+  hand-move the mirror, migrate runtime/harness/proposal consumers atomically, and prove an
+  id→JSON-hash map is unchanged. No dual filename period, no golden/status/verification move.
+- **[workbench-document-focus-mode.md](proposed/workbench-document-focus-mode.md)** — two honest
+  fullscreen levels: `Ctrl+Alt+F` toggles transient **document focus** (header, rail, view
+  strip, panel and persistent controls gone; the document viewer fills the browser viewport),
+  while native `F11` or an optional Fullscreen API command remains browser-owned. The mode
+  overrides rather than mutates remembered pane preferences, keeps invoked editing overlays,
+  exits off non-scenario routes, and never becomes a viewer property.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
