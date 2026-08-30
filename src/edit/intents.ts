@@ -189,6 +189,8 @@ export type MutationIntent =
   | { type: 'setFingering'; hand: 'left' | 'right'; finger: string }
   | { type: 'removeFingering' }
   | { type: 'removeStringAnnotation' }
+  /** Play the note on this string, pitch kept (the inspector's string pill). */
+  | { type: 'setStringAnnotation'; string: number }
   | { type: 'setPartDeclaration'; declaration: PartDeclaration }
   | { type: 'removePartDeclaration'; kind: PartDeclarationKind }
   // Document-level presentation: no cursor involved, the document IS the

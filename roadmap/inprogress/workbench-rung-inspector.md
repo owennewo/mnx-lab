@@ -1,6 +1,6 @@
 # The rung inspector — the cursor's path as a breadcrumb, the rung's state as pills
 
-> **Status: IN PROGRESS 2026-08-28 — all five stages built and landed the same day.**
+> **Status: IN PROGRESS 2026-08-28 — all five stages built and landed the same day; fingerboard pills + four-row frame landed 2026-08-30.**
 > What stays open is not a stage but a dependency: the container rung reads its spec
 > and cannot write it until the session grows a `setContainerProperties`-class verb
 > ([core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md),
@@ -319,6 +319,41 @@ Driven hands-on, the horizontal breadcrumb read as a second HUD. The
 - `npm run smoke:inspector` now also walks ↓ to the event rung, adds `staccato`,
   asserts the rung held, reads the note rung, and extends to a two-event range to see
   the pill go half-tone. 1128 tests + the smoke green; goldens byte-identical.
+
+## The fingerboard pills and the four-row frame (2026-08-30)
+
+Driven hands-on again, the note rung's header read `note G4 · staff position 5` in the
+notation view and `note G4 · string 1` in the tab view — the HUD's `cursor.line`, a
+**projection coordinate**, not a document field. Staff position is always derived
+(pitch under the clef; nothing to write). The string is *derived-or-chosen*, and the
+header drew both the same way, so a reader could not tell the ladder's guess from the
+document's choice — and `fret` had no pill and no word, so the slot's search found
+nothing. The discussion settled the model's own answer: **pitch is the truth, string is
+the one optional choice, fret is its consequence** (`ops.ts`: `setFret` writes pitch;
+`removeStringAnnotation` takes the fret with the string). What landed:
+
+- **`derived` is a fourth pill class.** Dotted like `inherited`, but full ink and
+  openable: a value the renderer worked out that the player may override. On any part
+  with a fingerboard the note rung always carries `string: N` (annotation when the
+  document chose it, derived otherwise) and `fret: N` (always derived; `—` when the
+  pitch is not playable on that string — the badge's job, never a clamp). They show in
+  every projection: the document does not change when the view does, and hiding the
+  choice in notation view is how a stale annotation gets missed.
+- **`string N` keeps the pitch** — a new `setStringAnnotation` op/intent (the string
+  is written, any stored `fret` dropped as derived; the session refuses a string the
+  part lacks, the parser refuses one the pitch cannot reach and says why). **`fret N`
+  is the digit layer's own `enterFret`** on the current string, so the pitch follows,
+  exactly as the tab digits do — now discoverable from the inspector.
+- **The guess is never frozen.** A derived pill opened and committed unchanged writes
+  nothing (`already on string 1`); there is no "make this explicit" gesture, because
+  the guess is correct until the player chooses otherwise, and a written guess would
+  only stop following the pitch.
+- **The header row is gone — five rows to four.** With identity in the window and
+  position in the pills, the meta line had only the state word left; that moved to the
+  **foot** beside the range note, with a `?` button. **The key legend is on request**:
+  `?` typed in either state (no grammar takes one) or the button toggles it. The HUD's
+  own row still prints the projection coordinate — it is a coordinate readout, which
+  is what the HUD is for.
 
 ## Stages
 

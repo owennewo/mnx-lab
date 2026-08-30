@@ -910,6 +910,17 @@ export class EditorSession {
           noteKey
         })));
       }
+      case 'setStringAnnotation': {
+        // Only a string the part declares: the fingerboard is the cursor's
+        // part's, and a string it does not have is not a place.
+        const part = this.doc.parts?.[this.cursorState.partIndex ?? 0];
+        if (!tuningOf(part).some(entry => entry.string === intent.string)) return false;
+        return this.applyBulk(this.selectedNoteKeys.map(noteKey => ({
+          type: 'setStringAnnotation',
+          noteKey,
+          string: intent.string
+        })));
+      }
       case 'removeFingering': {
         return this.applyBulk(this.selectedNoteKeys.map(noteKey => ({
           type: 'removeFingering',

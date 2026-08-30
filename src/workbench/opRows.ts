@@ -193,6 +193,8 @@ function opLabel(op: EditOp): string {
       return `${op.technique.kind} · ${op.noteKey}`;
     case 'removeTechnique':
       return `no ${op.kind} · ${op.noteKey}`;
+    case 'setStringAnnotation':
+      return `string ${op.string} · pitch kept`;
     case 'removeStringAnnotation':
       return `no string · ${op.noteKey}`;
     case 'setFingering':

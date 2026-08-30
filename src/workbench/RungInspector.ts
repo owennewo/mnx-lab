@@ -56,7 +56,6 @@ export class RungInspector extends LitElement {
   @property({ attribute: false }) crumbs: InspectorCrumb[] = [];
   @property({ attribute: false }) pills: InspectorPill[] = [];
   @property({ attribute: false }) words: InspectorWord[] = [];
-  @property({ type: String }) primary = '';
   @property({ type: String }) secondary = '';
   @property({ attribute: false }) note: string | null = null;
   @property({ attribute: false }) error: string | null = null;
@@ -71,6 +70,8 @@ export class RungInspector extends LitElement {
   @state() private menuIndex = 0;
   /** Pills below the fold of rows 2–3, counted after layout for the badge. */
   @state() private overflow = 0;
+  /** The key legend is on request: `?` (typed, or the foot's button). */
+  @state() private showKeys = false;
 
   static styles = css`
     :host {
@@ -111,31 +112,22 @@ export class RungInspector extends LitElement {
       flex-direction: column;
     }
 
-    .meta {
+    /* ── the foot: the state word, the range note, and the ? that shows the
+       key legend. The old header line said the rung's name and a projection
+       coordinate ("staff position 5", "string 1") — the name is the window's,
+       and the coordinate is now a pill that says whether it was chosen. */
+    .foot {
       display: flex;
       align-items: center;
-      gap: 7px;
-      padding: 6px 9px;
-      border-bottom: 1px solid var(--line);
+      gap: 9px;
+      padding: 5px 9px;
+      border-top: 1px solid var(--line);
       background: var(--bg-context);
       white-space: nowrap;
       overflow: hidden;
     }
 
-    .meta .primary {
-      font: 500 10px/1.2 var(--mono);
-      color: var(--ink);
-    }
-
-    .meta .secondary {
-      font: 400 10px/1.2 var(--mono);
-      color: var(--ink-3);
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .meta .state {
-      margin-left: auto;
+    .foot .state {
       font: 600 8.5px/1.2 var(--sans);
       letter-spacing: 0.09em;
       text-transform: uppercase;
@@ -143,8 +135,31 @@ export class RungInspector extends LitElement {
       flex: none;
     }
 
-    .meta .state.editing {
+    .foot .state.editing {
       color: var(--accent-fg);
+    }
+
+    .foot .secondary {
+      font: 400 10px/1.2 var(--mono);
+      color: var(--ink-3);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .foot .help {
+      margin-left: auto;
+      flex: none;
+      font: 500 10px/1 var(--mono);
+      color: var(--ink-3);
+      background: none;
+      border: 1px solid var(--line-strong);
+      padding: 2px 5px;
+      cursor: pointer;
+    }
+
+    .foot .help.on {
+      color: var(--ink);
+      border-color: var(--accent);
     }
 
     /* ── the body: a HARD three rows (the design's rule). Row 1 is the add
@@ -289,6 +304,12 @@ export class RungInspector extends LitElement {
       border-style: dotted;
     }
 
+    /* Derived: the renderer's answer, not the document's — dotted like a
+       reading, but in full ink because it can be opened and overridden. */
+    .pill.derived {
+      border-style: dotted;
+    }
+
     /* The cursor is ALWAYS drawn: the tile cursor's own fill and border,
        plus a ring so it survives on a crumb that is already accent-bordered. */
     .pill.cursor {
@@ -422,8 +443,7 @@ export class RungInspector extends LitElement {
       display: flex;
       flex-wrap: wrap;
       gap: 0 14px;
-      padding: 6px 9px;
-      border-top: 1px solid var(--line);
+      padding: 0 9px 6px;
       background: var(--bg-context);
       font: 400 10px/1.5 var(--mono);
       color: var(--ink-3);
@@ -620,6 +640,10 @@ export class RungInspector extends LitElement {
       this.emit('inspector-widen', { text: '' });
       return true;
     }
+    if (key === '?') {
+      this.showKeys = !this.showKeys;
+      return true;
+    }
     if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
       // Bare typing ALWAYS adds: it goes to the blank slot, wherever the
       // cursor was.
@@ -656,6 +680,11 @@ export class RungInspector extends LitElement {
     const open = this.open!;
     const { code } = event;
     const list = this.candidates();
+    if (event.key === '?') {
+      // No grammar takes a `?`, so it is the legend's key in both states.
+      this.showKeys = !this.showKeys;
+      return true;
+    }
     if (code === 'Escape') {
       this.open = null;
       this.text = '';
@@ -703,7 +732,10 @@ export class RungInspector extends LitElement {
       }
       const pill = this.pills[open.index];
       if (!pill) return true;
-      if (this.text.trim() === '') {
+      if (this.text.trim() === '' || (pill.pillClass === 'derived' && this.text.trim() === pill.value)) {
+        // Empty: press 2 removes. A derived value committed unchanged writes
+        // NOTHING — the guess was already right, and freezing it is not a
+        // thing this editor does.
         if (pill.remove) this.emit('inspector-remove', { key: pill.key, intent: pill.remove });
       } else {
         this.emit('inspector-apply', { word: pill.word, key: pill.key, text: pick && !pick.word ? pick.label : this.text });
@@ -858,11 +890,6 @@ export class RungInspector extends LitElement {
     return html`
       <div class="shaft"></div>
       <div class="box" role="dialog" aria-label="rung inspector">
-        <div class="meta">
-          <span class="primary">${this.primary}</span>
-          <span class="secondary">${this.secondary}</span>
-          <span class="state${open ? ' editing' : ''}">${stateLabel}</span>
-        </div>
         <div class="body">
           ${this.renderWindow()}
           <div class="attrs">
@@ -909,7 +936,20 @@ export class RungInspector extends LitElement {
         </div>
         ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
         ${this.note && this.words.length > 0 ? html`<div class="note">${this.note}</div>` : nothing}
-        ${this.keyLegend()}
+        <div class="foot">
+          <span class="state${open ? ' editing' : ''}">${stateLabel}</span>
+          <span class="secondary">${this.secondary}</span>
+          <button
+            class="help${this.showKeys ? ' on' : ''}"
+            title="keys (?)"
+            tabindex="-1"
+            @pointerdown=${(e: Event) => {
+              e.preventDefault();
+              this.showKeys = !this.showKeys;
+            }}
+          >?</button>
+        </div>
+        ${this.showKeys ? this.keyLegend() : nothing}
       </div>
     `;
   }

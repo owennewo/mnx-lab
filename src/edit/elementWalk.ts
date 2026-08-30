@@ -113,7 +113,7 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   'string-annotation': {
     classes: [],
     note: 'Modifier: chooses which string a note is played on. Removing it hands the note back to the derivation ladder — and takes the `fret` with it, since the fret is the choice’s consequence, not a second choice.',
-    construct: ['setFret'],
+    construct: ['setFret', 'setStringAnnotation'],
     remove: ['removeStringAnnotation']
   },
   fingering: {

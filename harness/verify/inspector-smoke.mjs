@@ -121,7 +121,7 @@ const INSPECTOR = `(() => {
   }));
   const box = el.getBoundingClientRect();
   return JSON.stringify({
-    open: true, state: text(sr.querySelector('.state')), primary: text(sr.querySelector('.primary')),
+    open: true, state: text(sr.querySelector('.state')),
     crumbs, pills, menu, error: text(sr.querySelector('.error')), note: text(sr.querySelector('.note')),
     input: sr.querySelector('input')?.value ?? null,
     hasFocus: sr.activeElement !== null || document.activeElement?.tagName === 'MNX-RUNG-INSPECTOR',
@@ -193,7 +193,7 @@ try {
   let s = await state();
   if (!s.open) fail('no inspector after Enter');
   else {
-    pass(`open · ${s.state} · “${s.primary}” · window ${s.crumbs.map(c => c.label).join(' | ')}`);
+    pass(`open · ${s.state} · window ${s.crumbs.map(c => c.label).join(' | ')}`);
     if (s.state !== 'walking') fail(`state reads ${s.state}, not walking`);
     if (s.crumbs.length !== 3) fail(`the window shows ${s.crumbs.length} rows, not 3`);
     if (s.crumbs[1]?.row !== 'cur') fail('the current rung is not the middle row');

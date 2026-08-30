@@ -9,6 +9,7 @@
 import type { MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
 import { midiOfSpelling } from './staffSpace.ts';
+import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
 import type { EditorIntent } from './intents.ts';
 import { sectionRangeAt, type SelectionLevel, type SelectionMember } from './selection.ts';
 import {
@@ -145,8 +146,13 @@ export interface InspectorSibling {
  * - `annotation` — × removes it; Backspace clears the value first.
  * - `floor` — ▾: Backspace reverts to the floor value, and that is the end.
  * - `inherited` — a reading from an earlier bar; nothing here to remove.
+ * - `derived` — a value the document did not say and the renderer worked out
+ *   (the string the ladder chose, the fret that string implies). Drawn
+ *   dotted like a reading, but OPENABLE: typing a different value is the
+ *   choice being made. Committing it unchanged writes nothing — the guess is
+ *   correct until the player says otherwise, so there is no "freeze".
  */
-export type PillClass = 'annotation' | 'floor' | 'inherited';
+export type PillClass = 'annotation' | 'floor' | 'inherited' | 'derived';
 
 export interface InspectorPill {
   /** Unique within the rung: the attribute kind, `#n` for the tempos array. */
@@ -482,6 +488,43 @@ const annotation = (key: string, word: string, value: string, remove: EditorInte
 const reading = (key: string, word: string, value: string): InspectorPill => ({
   key, word, value, pillClass: 'inherited', remove: null
 });
+const derived = (key: string, word: string, value: string): InspectorPill => ({
+  key, word, value, pillClass: 'derived', remove: null
+});
+
+/** Where a note sits on its part's fingerboard: the string (chosen by the
+ *  document, else the ladder's default) and the fret that string implies for
+ *  the pitch — `null` when the pitch is not playable there. Null altogether
+ *  when the part has no fingerboard: no instrument is ever assumed. */
+export interface Fingerboard {
+  string: number;
+  /** The document chose the string (an annotation), as opposed to derived. */
+  chosen: boolean;
+  fret: number | null;
+  tuning: ReturnType<typeof tuningOf>;
+  capo: number;
+}
+
+export const MAX_FRET = 24;
+
+export function fretOn(fb: Pick<Fingerboard, 'tuning' | 'capo'>, string: number, pitch: MnxNote['pitch']): number | null {
+  const entry = fb.tuning.find(t => t.string === string);
+  if (!entry) return null;
+  const fret = midiOfPitch(pitch) - (midiOfPitch(entry.pitch) + fb.capo);
+  return fret < 0 || fret > MAX_FRET ? null : fret;
+}
+
+export function fingerboardOf(doc: MnxStructure, noteKey: string): Fingerboard | null {
+  const located = findNoteAddress(doc, noteKey);
+  if (!located) return null;
+  const part = doc.parts?.[located.partIndex];
+  if (!isTabPart(part)) return null;
+  const tuning = tuningOf(part);
+  const capo = capoOf(part);
+  const annotated = located.note._x?.mnxLab?.string;
+  const string = annotated ?? defaultStringFor(located.note.pitch, tuning, capo);
+  return { string, chosen: annotated !== undefined, fret: fretOn({ tuning, capo }, string, located.note.pitch), tuning, capo };
+}
 
 /** The pills on ONE event: its duration (a floor), its markings, the
  *  positioned attributes at its onset, its lyric lines. */
@@ -531,8 +574,16 @@ export function notePills(doc: MnxStructure, member: Extract<SelectionMember, { 
   // fingerboard follow as they do for Alt+↑/↓.
   pills.push({ key: 'pitch', word: 'pitch', value: pitchText(note.pitch), pillClass: 'floor', remove: null });
   const x = note._x?.mnxLab;
-  if (x?.string !== undefined)
-    pills.push(annotation('string', 'string', `${x.string}`, { type: 'removeStringAnnotation' }));
+  // The fingerboard: the string is the one CHOICE (solid, removable, when the
+  // document made it; dotted-derived when the ladder did), and the fret is
+  // its consequence — always derived, never stored as a second choice.
+  const fb = fingerboardOf(doc, member.noteKey);
+  if (fb) {
+    pills.push(fb.chosen
+      ? annotation('string', 'string', `${fb.string}`, { type: 'removeStringAnnotation' })
+      : derived('string', 'string', `${fb.string}`));
+    pills.push(derived('fret', 'fret', fb.fret === null ? '—' : `${fb.fret}`));
+  }
   if (note.accidentalDisplay) {
     const enclosed = (note.accidentalDisplay as { enclosure?: unknown }).enclosure !== undefined;
     pills.push(annotation('accidental', 'accidental', enclosed ? 'parens' : note.accidentalDisplay.show ? 'show' : 'hide', { type: 'removeAccidentalDisplay' }));
@@ -676,6 +727,8 @@ const EVENT_WORDS: InspectorWord[] = [
 
 const NOTE_WORDS: InspectorWord[] = [
   { word: 'pitch', hint: 'B3 · F#4 · Eb2' },
+  { word: 'string', hint: '1 = highest · pitch kept' },
+  { word: 'fret', hint: '0 · 12 · on the current string' },
   { word: 'accidental', hint: 'show · hide · parens', values: ['show', 'hide', 'parens'] },
   { word: 'finger', hint: '3 · left 2 · right p' },
   { word: 'bend', hint: '2 · release · pre 1 2 release' },
@@ -761,6 +814,8 @@ export function parseInspectorLine(
   text: string,
   context?: {
     pitch?: { step: string; octave: number; alter?: number };
+    /** The note's place on its part's strings, when the part has any. */
+    fingerboard?: Fingerboard | null;
     key?: string;
     tempoCount?: number;
     harmonyCount?: number;
@@ -811,7 +866,24 @@ export function parseInspectorLine(
       if (!parsed || !('syllable' in parsed)) return { error: 'not a syllable — sleep- · -ing · 2: Am' };
       return { intent: { type: 'setSyllable', line: parsed.line, text: parsed.syllable, ...(parsed.syllableType ? { syllableType: parsed.syllableType } : {}) } };
     }
-    if (head === 'string') return { error: 'the string is chosen with the digits on the tab staff' };
+    if (head === 'string' || head === 'fret') {
+      const fb = context?.fingerboard;
+      if (!fb) return { error: 'this part declares no strings — nothing to fret' };
+      if (!context?.pitch) return { error: 'no note under the cursor' };
+      const n = /^\d+$/.test(rest) ? Number(rest) : NaN;
+      if (head === 'string') {
+        if (!fb.tuning.some(t => t.string === n))
+          return { error: `not a string — 1 to ${fb.tuning.length}` };
+        // Unchanged is a no-op, chosen or derived: the guess is not frozen.
+        if (n === fb.string) return { error: `already on string ${n}` };
+        const fret = fretOn(fb, n, context.pitch as MnxNote['pitch']);
+        if (fret === null) return { error: `${pitchText(context.pitch)} is not playable on string ${n}` };
+        return { intent: { type: 'setStringAnnotation', string: n } };
+      }
+      if (!Number.isInteger(n) || n > MAX_FRET) return { error: `not a fret — 0 to ${MAX_FRET}` };
+      if (n === fb.fret) return { error: `already at fret ${n}` };
+      return { intent: { type: 'enterFret', fret: n } };
+    }
     if ((TECHNIQUE_WORDS as string[]).includes(head) && head !== 'bend' && rest === '')
       return { intent: { type: 'setTechnique', technique: { kind: head as TechniqueChoice['kind'] } as TechniqueChoice } };
     // The pills' words are nouns; the grammar's are bare values (`mf`,

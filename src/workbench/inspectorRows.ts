@@ -22,8 +22,7 @@ export interface InspectorView {
   crumbs: InspectorCrumb[];
   pills: InspectorPill[];
   words: InspectorWord[];
-  /** What the meta line says about the rung. */
-  primary: string;
+  /** What the foot says about a range (empty for one member). */
   secondary: string;
   /** Why there are no pills, when there are none by design. */
   note: string | null;
@@ -96,13 +95,11 @@ export function buildInspectorView(
   const live = !cursorHidden && !session.pastEnd;
   const pills = live ? pillsFor({ doc, level, members }) : [];
   const words = live ? wordsFor(level) : [];
-  const active = rows.find(r => r.active);
   const count = members.length;
   return {
     crumbs,
     pills,
     words,
-    primary: active ? `${active.label}${active.value ? ` ${active.value}` : ''}` : 'no rung',
     secondary: count > 1 ? `${count} ${level === 'measure' ? 'bars' : 'members'} · half-tone = on some` : '',
     note: session.pastEnd
       ? 'a bar that does not exist yet has nothing to inspect'

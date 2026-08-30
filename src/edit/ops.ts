@@ -425,6 +425,18 @@ export type EditOp =
       type: 'removeStringAnnotation';
       noteKey: string;
     }
+  | {
+      /** Choose the string a note is played on, KEEPING its pitch — the
+       *  inspector's amend of a string pill. The stored `fret` is dropped:
+       *  it is the consequence of (pitch, string, tuning) and the renderer
+       *  derives it; an unplayable place draws the red badge, never a clamp.
+       *  Contrast `setFret`, which chooses (string, fret) and lets the pitch
+       *  follow. Nothing here freezes a derived guess: a caller that wants
+       *  the string the ladder already chose has nothing to write. */
+      type: 'setStringAnnotation';
+      noteKey: string;
+      string: number;
+    }
   | { type: 'setFingering'; noteKey: string; hand: 'left' | 'right'; finger: string }
   | { type: 'removeFingering'; noteKey: string }
   // Part declarations (campaign item 13,
@@ -1678,6 +1690,14 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       delete x.fret; // the consequence leaves with the choice
       if (Object.keys(x).length === 0) delete located.note._x!.mnxLab;
       if (Object.keys(located.note._x!).length === 0) delete located.note._x;
+      return next;
+    }
+    case 'setStringAnnotation': {
+      const located = findKeyedNote(next, op.noteKey);
+      if (!located) return next;
+      const x = ((located.note._x ??= {}).mnxLab ??= {});
+      x.string = op.string;
+      delete x.fret; // derived from the choice, so never stored beside it
       return next;
     }
     case 'setFingering': {

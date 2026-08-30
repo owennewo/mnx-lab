@@ -585,6 +585,8 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'setFingering',
     'removeFingering',
     'removeStringAnnotation',
+    'setStringAnnotation',
+    'enterFret',
     'setTechnique',
     'toggleTechnique',
     // voice-bar and part-bar

@@ -105,7 +105,7 @@ import '../elements/DocumentViewer.ts';
 import './SelectionTray.ts';
 import './RungInspector.ts';
 import { buildInspectorView } from './inspectorRows.ts';
-import { parseInspectorLine } from '../edit/inspector.ts';
+import { fingerboardOf, parseInspectorLine } from '../edit/inspector.ts';
 import './ZoomPad.ts';
 import type { ZoomPadChange } from './ZoomPad.ts';
 import './ModelPickerDialog.ts';
@@ -2602,6 +2602,7 @@ export class ScenarioPage extends LitElement {
     const harmonyCount = bar?._x?.mnxLab?.harmonies?.length ?? 0;
     const parsed = parseInspectorLine(this.session.selectionLevel, word, text, {
       ...(pitch ? { pitch } : {}),
+      fingerboard: noteKey ? fingerboardOf(this.session.doc, noteKey) : null,
       ...(key ? { key } : {}),
       tempoCount,
       harmonyCount
@@ -2973,7 +2974,6 @@ export class ScenarioPage extends LitElement {
         .crumbs=${view.crumbs}
         .pills=${view.pills}
         .words=${view.words}
-        .primary=${view.primary}
         .secondary=${view.secondary}
         .note=${view.note}
         .error=${this.inspectorError}

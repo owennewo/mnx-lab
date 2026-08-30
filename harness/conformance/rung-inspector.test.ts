@@ -13,10 +13,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
+import { findNoteAddress } from '../../src/model/noteWalk.ts';
 import {
   attributeText,
   BAR_WORDS,
   crumbSiblings,
+  fingerboardOf,
   keyAt,
   keyWord,
   measurePills,
@@ -442,7 +444,9 @@ describe('event pills', () => {
 describe('note pills', () => {
   it('read string, accidental, fingering and techniques, then the event’s own', () => {
     const session = at('note');
-    expect(pillText(session)).toEqual(['pitch: E4 [floor]', 'string: 1 [annotation]']);
+    // The fixture's capo 2 puts an open E4 below string 1's open — the fret is
+    // honestly unplayable, and the pill says so rather than clamping.
+    expect(pillText(session)).toEqual(['pitch: E4 [floor]', 'string: 1 [annotation]', 'fret: — [derived]']);
     for (const text of ['accidental parens', 'finger left 3', 'vibrato', 'bend pre 1 2 release', 'staccato']) {
       const parsed = parseInspectorLine('note', null, text);
       expect(parsed, text).toHaveProperty('intent');
@@ -451,6 +455,7 @@ describe('note pills', () => {
     expect(pillText(session)).toEqual([
       'pitch: E4 [floor]',
       'string: 1 [annotation]',
+      'fret: — [derived]',
       'accidental: parens [annotation]',
       'fingering: left 3 [annotation]',
       'bend: pre 1 2 release [annotation]',
@@ -489,6 +494,94 @@ describe('note pills', () => {
     expect(released.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
       points: [{ position: 0, alter: 2 }, { position: 0.5, alter: 2 }, { position: 1, alter: 0 }]
     });
+  });
+});
+
+describe('the fingerboard pills (string is the choice, fret its consequence)', () => {
+  /** No capo, one G4 — bare, or chosen onto string 2 (with the fret stored). */
+  const fretDoc = (chosen = false): MnxStructure => ({
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }] },
+    parts: [
+      {
+        id: 'p1',
+        name: 'Guitar',
+        measures: [
+          {
+            sequences: [
+              {
+                content: [
+                  { duration: { base: 'quarter' }, notes: [{ id: 'n', pitch: { step: 'G', octave: 4 }, ...(chosen ? { _x: { mnxLab: { string: 2, fret: 8 } } } : {}) }] },
+                  { duration: { base: 'half' }, rest: {} },
+                  { duration: { base: 'quarter' }, rest: {} }
+                ]
+              }
+            ]
+          }
+        ],
+        _x: { mnxLab: { strings: [...STANDARD_GUITAR_STRINGS] } }
+      },
+      { id: 'p2', name: 'Voice', measures: [{ sequences: [{ content: [{ duration: { base: 'whole' }, rest: {} }] }] }] }
+    ]
+  });
+  const ctx = (session: EditorSession) => {
+    const noteKey = session.selectedNoteKeys[0]!;
+    const note = findNoteAddress(session.doc, noteKey)!.note;
+    return { pitch: note.pitch, fingerboard: fingerboardOf(session.doc, noteKey) };
+  };
+
+  it('a bare note reads a DERIVED string and fret; a chosen one reads the string as an annotation', () => {
+    const session = at('note', fretDoc());
+    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 1 [derived]', 'fret: 3 [derived]']);
+    expect(pillText(at('note', fretDoc(true)))).toEqual(['pitch: G4 [floor]', 'string: 2 [annotation]', 'fret: 8 [derived]']);
+  });
+
+  it('a part with no strings has no fingerboard pills, and the words are refused with a reason', () => {
+    const session = at('note', fretDoc());
+    session.handleIntent({ type: 'setPart', partIndex: 1 });
+    expect(pillsFor(scope(session)).some(p => p.key === 'string' || p.key === 'fret')).toBe(false);
+    expect(parseInspectorLine('note', null, 'string 2', { pitch: { step: 'G', octave: 4 }, fingerboard: null })).toHaveProperty('error');
+  });
+
+  it('`string N` keeps the pitch, writes the choice, and drops any stored fret', () => {
+    const session = at('note', fretDoc());
+    const parsed = parseInspectorLine('note', 'string', '2', ctx(session));
+    expect(parsed).toHaveProperty('intent', { type: 'setStringAnnotation', string: 2 });
+    expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
+    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 2 [annotation]', 'fret: 8 [derived]']);
+    const note = findNoteAddress(session.doc, session.selectedNoteKeys[0]!)!.note;
+    expect(note.pitch).toEqual({ step: 'G', octave: 4 });
+    expect(note._x?.mnxLab).toEqual({ string: 2 });
+  });
+
+  it('the derived guess is never frozen: the current string, typed back, is refused as unchanged', () => {
+    const session = at('note', fretDoc());
+    expect(parseInspectorLine('note', 'string', '1', ctx(session))).toEqual({ error: 'already on string 1' });
+    expect(parseInspectorLine('note', 'fret', '3', ctx(session))).toEqual({ error: 'already at fret 3' });
+    expect(findNoteAddress(session.doc, session.selectedNoteKeys[0]!)!.note._x).toBeUndefined();
+  });
+
+  it('an unplayable string, a string the part lacks, and a fret off the neck are refused with a reason', () => {
+    const session = at('note', fretDoc());
+    expect(parseInspectorLine('note', 'string', '6', ctx(session))).toEqual({ error: 'G4 is not playable on string 6' });
+    expect(parseInspectorLine('note', 'string', '7', ctx(session))).toEqual({ error: 'not a string — 1 to 6' });
+    expect(parseInspectorLine('note', 'fret', '25', ctx(session))).toEqual({ error: 'not a fret — 0 to 24' });
+    expect(session.handleIntent({ type: 'setStringAnnotation', string: 9 })).toBe(false);
+  });
+
+  it('`fret N` is the digit layer’s own entry on the current string: the pitch follows', () => {
+    const session = at('note', fretDoc());
+    const parsed = parseInspectorLine('note', 'fret', '5', ctx(session));
+    expect(parsed).toHaveProperty('intent', { type: 'enterFret', fret: 5 });
+    expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
+    expect(pillText(session)).toEqual(['pitch: A4 [floor]', 'string: 1 [annotation]', 'fret: 5 [derived]']);
+  });
+
+  it('removing the choice hands the note back to the ladder: the pill turns derived', () => {
+    const session = at('note', fretDoc(true));
+    const pill = pillsFor(scope(session)).find(p => p.key === 'string')!;
+    expect(edit(session, pill.remove!)).toBe(true);
+    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 1 [derived]', 'fret: 3 [derived]']);
   });
 });
 
