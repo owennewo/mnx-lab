@@ -33,7 +33,7 @@ import { validateDocument } from '../../src/engine/layout/validate.ts';
 const SCENARIOS = path.join(ROOT, 'scenarios/lab/26-tab-rhythm');
 
 function score(name: string): MnxStructure {
-  return JSON.parse(fs.readFileSync(path.join(SCENARIOS, name, 'score.mnx.json'), 'utf8'));
+  return JSON.parse(fs.readFileSync(path.join(SCENARIOS, name, 'document.mnx.json'), 'utf8'));
 }
 
 /** Every primitive whose className matches, flattened out of the system. */

@@ -181,7 +181,7 @@ consumer needing independent versioning — a check, not a debate.
 
 ## The corpus: one format, two axes
 
-Each scenario is a directory (`meta.json`, `score.mnx.json`, optional
+Each scenario is a directory (`meta.json`, `document.mnx.json`, optional
 `expected.primitives.json` + `expected.svg` (+ `expected.tab.svg` + `expected.both.svg`)
 goldens and `notes.md`) with **two orthogonal axes** in meta:
 

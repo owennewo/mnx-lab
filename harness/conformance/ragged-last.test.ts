@@ -31,7 +31,7 @@ const dirById = new Map(corpus.map(s => [s.id, s.dir]));
 function doc(id: string): MnxStructure {
   const dir = dirById.get(id);
   if (!dir) throw new Error(`unknown scenario id: ${id}`);
-  return JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8')) as MnxStructure;
+  return JSON.parse(fs.readFileSync(path.join(dir, 'document.mnx.json'), 'utf8')) as MnxStructure;
 }
 
 /**
@@ -96,7 +96,7 @@ describe('ragged last', () => {
     let multiSystem = 0;
     for (const s of corpus) {
       const mnx = JSON.parse(
-        fs.readFileSync(path.join(s.dir, 'score.mnx.json'), 'utf8')
+        fs.readFileSync(path.join(s.dir, 'document.mnx.json'), 'utf8')
       ) as MnxStructure;
       for (const widthSp of [40, 80]) {
         let packing: PackingInput;

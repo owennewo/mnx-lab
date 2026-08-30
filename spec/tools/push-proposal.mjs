@@ -78,7 +78,7 @@ function loadTopicScenarios(topic) {
       out.push({
         slug: dirName.replace(/^\d+-/, ''),
         meta,
-        doc: JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8'))
+        doc: JSON.parse(fs.readFileSync(path.join(dir, 'document.mnx.json'), 'utf8'))
       });
     }
   }

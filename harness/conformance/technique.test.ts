@@ -26,7 +26,7 @@ import { initSmufl, WIDTH_SP } from '../helpers/corpusPrimitives.ts';
 const SCENARIOS = path.resolve(__dirname, '../../scenarios/lab/25-tab-techniques');
 
 function readScenario(name: string): MnxStructure {
-  return JSON.parse(fs.readFileSync(path.join(SCENARIOS, name, 'score.mnx.json'), 'utf8'));
+  return JSON.parse(fs.readFileSync(path.join(SCENARIOS, name, 'document.mnx.json'), 'utf8'));
 }
 
 const cls = (p: Primitive) => (p.className ?? '').split(' ');

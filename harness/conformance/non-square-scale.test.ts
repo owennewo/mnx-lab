@@ -32,7 +32,7 @@ import { loadCorpus } from '../verify/check-scenarios.mjs';
 
 const corpus: { id: string; dir: string }[] = loadCorpus();
 const readDoc = (dir: string) =>
-  JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8')) as MnxStructure;
+  JSON.parse(fs.readFileSync(path.join(dir, 'document.mnx.json'), 'utf8')) as MnxStructure;
 
 /**
  * The ratios swept. 1 proves the sweep agrees with the goldens; 4 is a

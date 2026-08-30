@@ -18,7 +18,7 @@ import type { EditFrame, ProgressFrame } from '../../src/assist/protocol.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const VALID = JSON.parse(
-  fs.readFileSync(path.join(ROOT, 'scenarios/spec/hello-world/score.mnx.json'), 'utf8')
+  fs.readFileSync(path.join(ROOT, 'scenarios/spec/hello-world/document.mnx.json'), 'utf8')
 );
 
 /** A document that is structurally MNX but wrong in the exact way the prompt

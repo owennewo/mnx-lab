@@ -39,7 +39,7 @@ import { loadCorpus } from '../verify/check-scenarios.mjs';
 const corpus: { id: string; dir: string }[] = loadCorpus();
 
 function readDoc(dir: string): MnxStructure {
-  return JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8')) as MnxStructure;
+  return JSON.parse(fs.readFileSync(path.join(dir, 'document.mnx.json'), 'utf8')) as MnxStructure;
 }
 
 const hasScoreText = (mnx: MnxStructure) =>

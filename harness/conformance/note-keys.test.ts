@@ -44,7 +44,7 @@ describe('note-key agreement (the walk vs the renderer)', () => {
   for (const scenario of corpus) {
     it(`${scenario.id}: every drawn key is one the walk produced`, () => {
       const doc = JSON.parse(
-        fs.readFileSync(path.join(scenario.dir, 'score.mnx.json'), 'utf8')
+        fs.readFileSync(path.join(scenario.dir, 'document.mnx.json'), 'utf8')
       ) as MnxStructure;
       const walked = new Set(noteKeysOf(doc));
       const drawn = renderedKeys(scenario.dir);
@@ -63,7 +63,7 @@ describe('note-key agreement (the walk vs the renderer)', () => {
     const offenders: string[] = [];
     for (const scenario of corpus) {
       const doc = JSON.parse(
-        fs.readFileSync(path.join(scenario.dir, 'score.mnx.json'), 'utf8')
+        fs.readFileSync(path.join(scenario.dir, 'document.mnx.json'), 'utf8')
       ) as MnxStructure;
       const keys = noteKeysOf(doc);
       if (new Set(keys).size !== keys.length) offenders.push(scenario.id);

@@ -31,7 +31,7 @@ const dirById = new Map<string, string>(
 function doc(id: string): MnxStructure {
   const dir = dirById.get(id);
   if (!dir) throw new Error(`unknown scenario id: ${id}`);
-  return JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8')) as MnxStructure;
+  return JSON.parse(fs.readFileSync(path.join(dir, 'document.mnx.json'), 'utf8')) as MnxStructure;
 }
 
 describe('viewer surface', () => {

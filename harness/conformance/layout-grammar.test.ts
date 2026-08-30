@@ -13,7 +13,7 @@ import type { MnxStructure } from '../../src/model/mnx.ts';
 
 const load = (id: string): MnxStructure =>
   JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../../scenarios', id, 'score.mnx.json'), 'utf8')
+    fs.readFileSync(path.join(__dirname, '../../scenarios', id, 'document.mnx.json'), 'utf8')
   ) as MnxStructure;
 
 /** scenario → the sentence for each of its layouts, in document order. */

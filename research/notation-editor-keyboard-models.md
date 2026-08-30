@@ -708,7 +708,7 @@ Three findings:
    properly upstream. A TuxGuitar-style marker has no home in MNX at all and should not get
    one: it is **editor state, not document data**, so it would belong beside documents in
    IndexedDB rather than in the score — and it must never enter a scenario's
-   `score.mnx.json`, where it would corrupt the corpus goldens with workspace noise.
+   `document.mnx.json`, where it would corrupt the corpus goldens with workspace noise.
 
 ### 3.9 Edit mode vs view mode (sense 6) — a web/desktop split
 

@@ -7,7 +7,7 @@ import * as path from 'path';
  * MNX documents are JSON, and the project writes them as `.mnx.json` — the
  * double extension keeps them recognisable as MNX while still being opened,
  * syntax-highlighted and schema-validated as JSON by every editor and tool.
- * The scenario corpus (`scenarios/**\/score.mnx.json`) already uses it.
+ * The scenario corpus (`scenarios/**\/document.mnx.json`) already uses it.
  *
  * `.json` and `.mnx` are accepted on READ so third-party documents and older
  * files still load, but nothing in this repo should write them.

@@ -72,7 +72,7 @@ describe(`scenario layout snapshots${UPDATE ? ' (UPDATING)' : ''}`, () => {
     if (UPDATE) {
       it(`${scenario.id} [write]`, () => {
         const doc = JSON.parse(
-          fs.readFileSync(path.join(scenario.dir, 'score.mnx.json'), 'utf8')
+          fs.readFileSync(path.join(scenario.dir, 'document.mnx.json'), 'utf8')
         ) as MnxStructure;
         const status = (scenario as any).meta.status as string;
         let computed;
@@ -131,7 +131,7 @@ describe(`scenario layout snapshots${UPDATE ? ' (UPDATING)' : ''}`, () => {
     } else if (hasSnapshot) {
       it(scenario.id, () => {
         const doc = JSON.parse(
-          fs.readFileSync(path.join(scenario.dir, 'score.mnx.json'), 'utf8')
+          fs.readFileSync(path.join(scenario.dir, 'document.mnx.json'), 'utf8')
         ) as MnxStructure;
         const stored = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
         const computed = computePrimitives(doc);

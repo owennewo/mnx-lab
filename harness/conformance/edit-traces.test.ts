@@ -45,7 +45,7 @@ const dirById = new Map<string, string>(
 function loadScenarioDoc(scenarioId: string): MnxStructure {
   const dir = dirById.get(scenarioId);
   if (!dir) throw new Error(`fixture names unknown scenario id: ${scenarioId}`);
-  return JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8')) as MnxStructure;
+  return JSON.parse(fs.readFileSync(path.join(dir, 'document.mnx.json'), 'utf8')) as MnxStructure;
 }
 
 describe(`edit traces${UPDATE ? ' (UPDATING)' : ''}`, () => {

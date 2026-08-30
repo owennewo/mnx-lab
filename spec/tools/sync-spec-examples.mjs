@@ -120,18 +120,19 @@ function main() {
     const dir = path.join(SPEC_DIR, slug);
     fs.mkdirSync(dir, { recursive: true });
 
-    const scorePath = path.join(dir, 'score.mnx.json');
-    const newScore = JSON.stringify(doc, null, 2) + '\n';
-    const scoreUnchanged = fs.existsSync(scorePath) && fs.readFileSync(scorePath, 'utf8') === newScore;
-    fs.writeFileSync(scorePath, newScore);
-    if (!scoreUnchanged) updated++;
+    const documentPath = path.join(dir, 'document.mnx.json');
+    const newDocument = JSON.stringify(doc, null, 2) + '\n';
+    const documentUnchanged =
+      fs.existsSync(documentPath) && fs.readFileSync(documentPath, 'utf8') === newDocument;
+    fs.writeFileSync(documentPath, newDocument);
+    if (!documentUnchanged) updated++;
 
     // Preserve status AND verification provenance across re-syncs when the
     // document hasn't changed — a re-sync must not erase a human approval.
     const metaPath = path.join(dir, 'meta.json');
     let status = 'valid';
     let verification;
-    if (scoreUnchanged && fs.existsSync(metaPath)) {
+    if (documentUnchanged && fs.existsSync(metaPath)) {
       const prev = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
       status = prev.status ?? 'valid';
       verification = prev.verification;
@@ -159,7 +160,9 @@ function main() {
     };
     fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2) + '\n');
 
-    console.log(`  ${slug}: ${standardOk ? 'valid' : 'INVALID'}${scoreUnchanged ? '' : ' (updated)'}`);
+    console.log(
+      `  ${slug}: ${standardOk ? 'valid' : 'INVALID'}${documentUnchanged ? '' : ' (updated)'}`
+    );
   }
 
   // A slug that disappeared upstream would otherwise linger as a stale scenario.

@@ -82,7 +82,7 @@ describe('ink census (element-ops campaign)', () => {
   it('walks every scenario without throwing, and addresses only the entry surface', () => {
     for (const scenario of corpus) {
       const doc = JSON.parse(
-        fs.readFileSync(path.join(scenario.dir, 'score.mnx.json'), 'utf8')
+        fs.readFileSync(path.join(scenario.dir, 'document.mnx.json'), 'utf8')
       ) as MnxStructure;
       const elements = walkElements(doc);
       // Element paths are the report's row keys: they must be unique.

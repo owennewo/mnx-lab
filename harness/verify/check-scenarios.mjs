@@ -17,7 +17,7 @@ const SCENARIOS_DIR = path.join(ROOT, 'scenarios');
 
 const ALLOWED_FILES = new Set([
   'meta.json',
-  'score.mnx.json',
+  'document.mnx.json',
   'expected.primitives.json',
   // The emitter golden, and its tab/both companions when the part declares
   // a tab view (expected.both.svg pins the combined notation+tab system).
@@ -179,13 +179,13 @@ export function checkScenario(scenario, ctx) {
     }
   }
 
-  // score.mnx.json
+  // document.mnx.json
   let doc = null;
-  const scorePath = path.join(scenario.dir, 'score.mnx.json');
-  if (!fs.existsSync(scorePath)) {
-    fail('missing score.mnx.json');
+  const documentPath = path.join(scenario.dir, 'document.mnx.json');
+  if (!fs.existsSync(documentPath)) {
+    fail('missing document.mnx.json');
   } else {
-    doc = checkJsonFile(scorePath, 'score.mnx.json', fail);
+    doc = checkJsonFile(documentPath, 'document.mnx.json', fail);
   }
 
   // expected.primitives.json (generated, but still kept canonical)

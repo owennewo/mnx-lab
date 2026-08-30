@@ -13,7 +13,7 @@ import type { MnxEvent, MnxStructure } from '../../src/model/mnx.ts';
 
 const REPO = path.join(__dirname, '../..');
 const load = (id: string): MnxStructure =>
-  JSON.parse(fs.readFileSync(path.join(REPO, 'scenarios', id, 'score.mnx.json'), 'utf8'));
+  JSON.parse(fs.readFileSync(path.join(REPO, 'scenarios', id, 'document.mnx.json'), 'utf8'));
 
 /** Walk to the bar and onset a cursor must reach, using intents only. */
 function driveTo(session: EditorSession, measureIndex: number, steps: number): void {

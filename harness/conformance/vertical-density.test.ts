@@ -46,7 +46,7 @@ initSmufl();
 
 function load(id: string): MnxStructure {
   return JSON.parse(
-    fs.readFileSync(path.join(ROOT, 'scenarios', id, 'score.mnx.json'), 'utf8')
+    fs.readFileSync(path.join(ROOT, 'scenarios', id, 'document.mnx.json'), 'utf8')
   ) as MnxStructure;
 }
 

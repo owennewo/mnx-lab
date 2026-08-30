@@ -14,7 +14,7 @@ const doc = (): MnxStructure =>
     fs.readFileSync(
       path.join(
         __dirname,
-        '../../scenarios/lab/00-document/01-minimal-single-note/score.mnx.json'
+        '../../scenarios/lab/00-document/01-minimal-single-note/document.mnx.json'
       ),
       'utf8'
     )

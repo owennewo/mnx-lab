@@ -28,7 +28,7 @@ const playground = (): MnxStructure =>
     fs.readFileSync(
       path.join(
         __dirname,
-        '../../scenarios/lab/00-document/03-navigation-playground/score.mnx.json'
+        '../../scenarios/lab/00-document/03-navigation-playground/document.mnx.json'
       ),
       'utf8'
     )

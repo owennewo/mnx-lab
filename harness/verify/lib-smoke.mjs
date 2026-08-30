@@ -43,7 +43,7 @@ try {
     ensureSmufl(glyphnames, metadata);
 
     const score = ${JSON.stringify(
-      fs.readFileSync(path.join(ROOT, 'scenarios/spec/hello-world/score.mnx.json'), 'utf8')
+      fs.readFileSync(path.join(ROOT, 'scenarios/spec/hello-world/document.mnx.json'), 'utf8')
     )};
     const prims = computePrimitives(JSON.parse(score), 80);
     if (!prims.notation.primitives.length) throw new Error('no primitives');

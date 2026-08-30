@@ -188,7 +188,7 @@ function removedIds(doc: MnxStructure, element: ElementRef): string[] {
 
 function sweepScenario(scenario: Scenario): ScenarioResult {
   const loaded = JSON.parse(
-    fs.readFileSync(path.join(scenario.dir, 'score.mnx.json'), 'utf8')
+    fs.readFileSync(path.join(scenario.dir, 'document.mnx.json'), 'utf8')
   ) as MnxStructure;
   const loadedBytes = JSON.stringify(loaded);
   const baseline = {
@@ -364,7 +364,7 @@ describe('destruct sweep (element-ops campaign item 2)', () => {
   for (const id of EXEMPLARS) {
     it(`${id}: two orders commute, teardown reaches {}`, () => {
       const dir = corpus.find(s => s.id === id)?.dir;
-      const loadedBytes = fs.readFileSync(path.join(dir!, 'score.mnx.json'), 'utf8');
+      const loadedBytes = fs.readFileSync(path.join(dir!, 'document.mnx.json'), 'utf8');
       const loaded = JSON.stringify(JSON.parse(loadedBytes));
       const terminals = [false, true].map(reversed => {
         const session = new EditorSession(JSON.parse(loaded) as MnxStructure, id);

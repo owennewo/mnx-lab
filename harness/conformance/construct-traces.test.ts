@@ -22,7 +22,7 @@
 //      id-less, so both sides normalize to positional keys before comparing
 //
 // Plus one INFORMATIONAL report, never asserted: raw doc deep-equality vs
-// the target's score.mnx.json. Where it fails (ids the entry surface does
+// the target's document.mnx.json. Where it fails (ids the entry surface does
 // not mint) is itself campaign data, logged for the learnings ledger.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -161,7 +161,7 @@ describe('construct traces (element-ops exemplar)', () => {
       const session = replayIntents(JSON.parse(JSON.stringify(empty)), fixture.intents);
 
       const targetDoc = JSON.parse(
-        fs.readFileSync(path.join(dir!, 'score.mnx.json'), 'utf8')
+        fs.readFileSync(path.join(dir!, 'document.mnx.json'), 'utf8')
       ) as MnxStructure;
 
       // 1. Schema validity, RELATIVE to the target — the same widening item 2
@@ -191,7 +191,7 @@ describe('construct traces (element-ops exemplar)', () => {
       // Informational: the raw doc delta — reported, never asserted.
       const delta = diffPaths(session.doc, targetDoc);
       if (delta.length > 0) {
-        console.warn(`${file}: doc delta vs score.mnx.json (informational): ${delta.join(', ')}`);
+        console.warn(`${file}: doc delta vs document.mnx.json (informational): ${delta.join(', ')}`);
       }
 
       // 2. Undo-all returns to `{}` byte-identically.
@@ -240,7 +240,7 @@ const scenarios = (loadCorpus() as { id: string; dir: string }[])
       expect?: { standard?: string };
     };
     const doc = JSON.parse(
-      fs.readFileSync(path.join(scenario.dir, 'score.mnx.json'), 'utf8')
+      fs.readFileSync(path.join(scenario.dir, 'document.mnx.json'), 'utf8')
     ) as MnxStructure;
     // Blocking kinds are the ordering evidence for items 4–13: the kinds that
     // stand between today's vocabulary and this scenario existing at all.
@@ -310,7 +310,7 @@ const constructibleKinds = [...new Set(Object.keys(ELEMENT_KINDS))]
 const kindsOf = (id: string): Set<string> => {
   const dir = dirById.get(id);
   if (!dir) return new Set();
-  const doc = JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8')) as MnxStructure;
+  const doc = JSON.parse(fs.readFileSync(path.join(dir, 'document.mnx.json'), 'utf8')) as MnxStructure;
   return new Set(walkElements(doc).map(e => e.kind).filter(kind => kindHasConstructOp(kind)));
 };
 
@@ -331,7 +331,7 @@ function traceQueue(): { scenario: string; elements: number; kinds: string[] }[]
     const kinds = kindsOf(scenario.id);
     pool.set(scenario.id, kinds);
     const dir = dirById.get(scenario.id)!;
-    const doc = JSON.parse(fs.readFileSync(path.join(dir, 'score.mnx.json'), 'utf8')) as MnxStructure;
+    const doc = JSON.parse(fs.readFileSync(path.join(dir, 'document.mnx.json'), 'utf8')) as MnxStructure;
     size.set(scenario.id, walkElements(doc).length);
   }
   const need = new Set(uncoveredKinds);

@@ -518,7 +518,7 @@ export class ScenarioPage extends LitElement {
   @property({ type: String }) scenarioId = '';
   @property({ type: String }) view = '';
   /** App-lifetime transport injected by WorkbenchApp: route/session changes
-   *  replace this page's score but deliberately retain the copied clip. */
+   *  replace this page's document but deliberately retain the copied clip. */
   @property({ attribute: false }) selectionClipboard: SelectionClipboardStore | null = null;
 
   /** Per-part instrument overrides (roadmap/inprogress/core-score-hud.md),
@@ -529,14 +529,14 @@ export class ScenarioPage extends LitElement {
   @state() private partSetups = new Map<number, PartOverride>();
 
   @state() private doc: MnxDocument | null = null;
-  @state() private rawScore = '';
+  @state() private rawDocument = '';
   @state() private pinnedErrors: PinnedError[] = [];
   /** Which pinned error the json tab is highlighting — workbench chrome, and
    *  since stage 3 of the viewer surface it lives here rather than on the
    *  element (docs/core-viewer-surface.md). */
   @state() private errorPointer: string | null = null;
   @state() private referenceFailed = false;
-  // Three states, not two: the score arrives over a lazy import, so "nothing
+  // Three states, not two: the document arrives over a lazy import, so "nothing
   // on screen" is either still-in-flight or a dead fetch. Collapsing them
   // into one empty pane is how a stopped dev server reads as a render bug.
   @state() private loadState: 'loading' | 'ready' | 'failed' = 'loading';
@@ -573,7 +573,7 @@ export class ScenarioPage extends LitElement {
    * change so the next session opens where the last one stood.
    *
    * Deliberately not a `@state`: it is a one-shot baton between
-   * `escalateToRail` and the `loadScore` it causes, not something a render
+   * `escalateToRail` and the `loadDocument` it causes, not something a render
    * reads. It is set only by the gesture, so opening a scenario any other way
    * — a rail click, a deep link, a reload — still opens at the default rung,
    * which is what those mean. A link that inherited whatever rung the last
@@ -1969,7 +1969,7 @@ export class ScenarioPage extends LitElement {
         this.panelTab = 'hud';
       }
       this.doc = null;
-      this.rawScore = '';
+      this.rawDocument = '';
       this.pinnedErrors = [];
       this.referenceFailed = false;
       this.loadState = 'loading';
@@ -1993,7 +1993,7 @@ export class ScenarioPage extends LitElement {
       // Overrides are per-part by INDEX, so carrying them to a different
       // document would misapply them.
       this.partSetups = new Map();
-      void this.loadScore();
+      void this.loadDocument();
     }
     // The rung chip's freshness window: any change to the displayed level —
     // including selection appearing — restarts it. Read here rather than
@@ -2099,7 +2099,7 @@ export class ScenarioPage extends LitElement {
     }
   };
 
-  private async loadScore() {
+  private async loadDocument() {
     const entry = this.entry();
     if (!entry) return;
     // Read-and-clear up front: a load that fails, or one the reader navigates
@@ -2108,26 +2108,26 @@ export class ScenarioPage extends LitElement {
     const railRung = this.railRung;
     this.railRung = null;
     try {
-      const score = (await entry.loadScore()) as MnxStructure;
+      const document = (await entry.loadDocument()) as MnxStructure;
       if (entry.id !== this.scenarioId) return; // navigated away meanwhile
       this.doc = {
         id: entry.id,
         name: entry.meta.title,
         lastUpdated: 0,
-        mnxJson: score
+        mnxJson: document
       };
-      this.rawScore = JSON.stringify(score, null, 2);
+      this.rawDocument = JSON.stringify(document, null, 2);
       if (entry.invalidByDesign) {
-        this.pinnedErrors = await resolvePinnedErrors(score, entry.meta.expect.errors ?? []);
+        this.pinnedErrors = await resolvePinnedErrors(document, entry.meta.expect.errors ?? []);
       } else {
-        this.session = new EditorSession(score, entry.id, {
+        this.session = new EditorSession(document, entry.id, {
           ...(railRung ? { level: railRung } : {})
         });
         this.syncFromSession();
       }
       this.loadState = 'ready';
     } catch (e) {
-      // The score is a lazy chunk: a dead dev server, an offline reload or a
+      // The document is a lazy chunk: a dead dev server, an offline reload or a
       // half-deployed build all land here. Surfacing the reason is the whole
       // point — silently leaving the pane blank blames the renderer.
       if (entry.id !== this.scenarioId) return;
@@ -2141,7 +2141,7 @@ export class ScenarioPage extends LitElement {
     const session = this.session;
     if (!session || !this.doc) return;
     this.doc = { ...this.doc, mnxJson: session.doc };
-    this.rawScore = JSON.stringify(session.doc, null, 2);
+    this.rawDocument = JSON.stringify(session.doc, null, 2);
     const cursor = session.cursor;
     const partIndex = cursor.partIndex ?? 0;
     const staffIndex = cursor.staffIndex ?? 1;
@@ -3490,11 +3490,11 @@ export class ScenarioPage extends LitElement {
     }
     if (this.loadState === 'failed') {
       return html`<div class="load-state failed">
-        <strong>Could not load this scenario's score.</strong>
+        <strong>Could not load this scenario's document.</strong>
         <p>
-          <code>score.mnx.json</code> is fetched as a lazy chunk, so this is a transport failure,
-          not a rendering one — most often a stopped <code>npm run dev</code> server or a stale
-          tab against a redeployed build. Reload once the server is back.
+          <code>document.mnx.json</code> is fetched as a lazy chunk, so this is a transport
+          failure, not a rendering one — most often a stopped <code>npm run dev</code> server
+          or a stale tab against a redeployed build. Reload once the server is back.
         </p>
         <p class="detail">${this.loadError}</p>
       </div>`;
@@ -4394,10 +4394,10 @@ export class ScenarioPage extends LitElement {
   private panelJson() {
     if (this.loadState !== 'ready') {
       return this.panelFrame({
-        body: html`<div class="ref-missing">The score has not loaded (${this.loadState}).</div>`
+        body: html`<div class="ref-missing">The document has not loaded (${this.loadState}).</div>`
       });
     }
-    const source = this.session?.doc ?? this.parsedScore();
+    const source = this.session?.doc ?? this.parsedDocument();
     const view = buildJsonView(source);
 
     const pointer = this.selectionPointer();
@@ -4476,9 +4476,9 @@ export class ScenarioPage extends LitElement {
   }
 
   /** The committed file, for scenarios with no edit session. */
-  private parsedScore(): unknown {
+  private parsedDocument(): unknown {
     try {
-      return this.rawScore ? JSON.parse(this.rawScore) : null;
+      return this.rawDocument ? JSON.parse(this.rawDocument) : null;
     } catch {
       return null;
     }

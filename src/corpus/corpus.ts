@@ -5,7 +5,7 @@ import { isPlumbingDef } from './plumbingDefs.ts';
 /**
  * The scenario corpus as the front-end sees it (see
  * roadmap/complete/lab-04-scenario-library.md). Metadata is bundled eagerly (it is
- * small and drives the rail, facets, and the coverage dashboard); score
+ * small and drives the rail, facets, and the coverage dashboard); MNX
  * documents and notes.md load on demand. The data model is deliberately FLAT:
  * "category" is just the default grouping facet — shelving by status, source,
  * or schema $def regroups the same filtered list.
@@ -57,7 +57,7 @@ export interface ScenarioEntry {
   issueRef: string | null;
   invalidByDesign: boolean;
   hasTab: boolean;
-  loadScore: () => Promise<unknown>;
+  loadDocument: () => Promise<unknown>;
   loadNotes: (() => Promise<string>) | null;
 }
 
@@ -66,7 +66,7 @@ const metaModules = import.meta.glob('../../scenarios/{lab,spec}/**/meta.json', 
   import: 'default'
 }) as Record<string, ScenarioMeta>;
 
-const scoreModules = import.meta.glob('../../scenarios/{lab,spec}/**/score.mnx.json', {
+const documentModules = import.meta.glob('../../scenarios/{lab,spec}/**/document.mnx.json', {
   import: 'default'
 }) as Record<string, () => Promise<unknown>>;
 
@@ -80,8 +80,8 @@ function buildEntries(): ScenarioEntry[] {
   for (const metaPath of Object.keys(metaModules).sort()) {
     const rel = metaPath.replace(/^.*?scenarios\//, '').replace(/\/meta\.json$/, '');
     const segments = rel.split('/').map(s => s.replace(/^\d+-/, ''));
-    const scorePath = metaPath.replace(/meta\.json$/, 'score.mnx.json');
-    const loader = scoreModules[scorePath];
+    const documentPath = metaPath.replace(/meta\.json$/, 'document.mnx.json');
+    const loader = documentModules[documentPath];
     if (!loader) continue;
     const meta = metaModules[metaPath];
     const ns = segments[0] as 'lab' | 'spec';
@@ -99,7 +99,7 @@ function buildEntries(): ScenarioEntry[] {
       issueRef,
       invalidByDesign: meta.expect.standard === 'invalid' || meta.expect.extension === 'invalid',
       hasTab: meta.expect.extension !== 'n/a',
-      loadScore: loader,
+      loadDocument: loader,
       loadNotes: notesModules[notesPath] ?? null
     });
   }

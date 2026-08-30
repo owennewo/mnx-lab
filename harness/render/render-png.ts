@@ -7,7 +7,7 @@
 // viewport is sized to the drawing so the PNG is cropped to the music.
 //
 // Usage:
-//   npx tsx harness/render/render-png.ts <score.mnx.json> <out.png> [--px-per-sp N]
+//   npx tsx harness/render/render-png.ts <document.mnx.json> <out.png> [--px-per-sp N]
 //   npx tsx harness/render/render-png.ts --all <dir-of-scenarios> <out-dir>
 import fs from 'node:fs';
 import path from 'node:path';
@@ -83,13 +83,13 @@ const args = process.argv.slice(2);
 if (args[0] === '--all') {
   const [, dir, outDir] = args;
   for (const entry of fs.readdirSync(dir).sort()) {
-    const score = path.join(dir, entry, 'score.mnx.json');
+    const score = path.join(dir, entry, 'document.mnx.json');
     if (fs.existsSync(score)) renderToPng(score, path.join(outDir, `${entry}.png`));
   }
 } else if (args.length >= 2) {
   const idx = args.indexOf('--px-per-sp');
   renderToPng(args[0], args[1], idx >= 0 ? Number(args[idx + 1]) : 14);
 } else {
-  console.error('usage: render-png.ts <score.mnx.json> <out.png> | --all <dir> <out-dir>');
+  console.error('usage: render-png.ts <document.mnx.json> <out.png> | --all <dir> <out-dir>');
   process.exit(1);
 }

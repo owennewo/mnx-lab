@@ -20,7 +20,7 @@ import type { MnxSequence, MnxStructure } from '../../src/model/mnx.ts';
 
 const REPO = path.join(__dirname, '../..');
 const load = (id: string): MnxStructure =>
-  JSON.parse(fs.readFileSync(path.join(REPO, 'scenarios', id, 'score.mnx.json'), 'utf8'));
+  JSON.parse(fs.readFileSync(path.join(REPO, 'scenarios', id, 'document.mnx.json'), 'utf8'));
 
 /** Where a scenario's first container sits, and what it holds. */
 function firstContainer(doc: MnxStructure): {
