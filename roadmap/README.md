@@ -44,6 +44,13 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-bend-stops.md](proposed/core-bend-stops.md)** — bends typed as the curve they
+  are: `bend 0>full>1/2>0` — every stop explicit (a non-zero first stop *is* the
+  pre-bend), equal neighbours a hold, `>>` a slower segment; fractions/`full` at the
+  keyboard, semitones in storage (the schema already carries all of it, positions
+  included). The op widens to write points and the old `pre/semitones/release` form
+  retires. Engraving half: `bendSegment` arrives flat, so every arrowhead sits on a
+  horizontal — arrive vertical, label every non-zero arrival.
 - **[workbench-document-focus-mode.md](proposed/workbench-document-focus-mode.md)** — two honest
   fullscreen levels: `Ctrl+Alt+F` toggles transient **document focus** (header, rail, view
   strip, panel and persistent controls gone; the document viewer fills the browser viewport),
