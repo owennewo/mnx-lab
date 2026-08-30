@@ -68,6 +68,16 @@ bend 0>1/2>0>1/2>0        double bend
 bend full>1/2>full        pre-bend full, dip to 1/2, back up
 ```
 
+**Amended 2026-08-30, same day:** a LONE stop is accepted as shorthand for the plain
+rise — `bend 1` reads as `0>1`, the overwhelmingly common case. This reverses the
+"no shortcut" ruling under agreement-preserving guards: the shorthand applies to
+exactly one stop and never to a list (a list's first stop is always the strike
+position, so `1>0` stays a pre-bend release), and the spell-back always writes the
+canonical full form — lenient in, canonical out, the parser's existing convention
+(`1` for `full`, tolerated `≈`). The trap this trades away is self-announcing:
+`1>0` mis-typed for a bend-release renders as a visibly different gesture and
+spells back `1>0`.
+
 Why explicit rather than `[pre] stop>stop` or letter codes (`p1 2 r1`) — both were
 argued through and lost:
 
@@ -104,9 +114,10 @@ inverse over the same fields, and the old three-field form retires from the inte
 toggle keeps its own default, `0>full`). `techniqueText` spells the stop list in
 fractions. `toggleTechnique` on a present bend still removes it.
 
-Validation, all said in the error: at least two stops; a first stop may be non-zero
-(pre-bend); values are fractions or `full` (semitone decimals are **not** accepted at
-the keyboard — one unit at the keyboard); `0>0` is nothing.
+Validation, all said in the error: at least two stops (a lone stop is the `0>N`
+shorthand, per the amendment above); a first stop may be non-zero (pre-bend); values
+are fractions or `full` (semitone decimals are **not** accepted at the keyboard — one
+unit at the keyboard); `0>0` is nothing.
 
 ## B. The engraving: heads that point where the curve goes
 

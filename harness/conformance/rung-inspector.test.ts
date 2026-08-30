@@ -512,9 +512,27 @@ describe('note pills', () => {
     });
   });
 
+  it('a lone stop is shorthand for the plain rise: bend 1 reads as 0>1 — lists never get the implicit 0', () => {
+    for (const [text, alters] of [
+      ['1', [0, 2]],
+      ['full', [0, 2]],
+      ['1/2', [0, 1]]
+    ] as const) {
+      expect(parseInspectorLine('note', 'bend', text)).toEqual({
+        intent: { type: 'setTechnique', technique: { kind: 'bend', alters: [...alters] } }
+      });
+    }
+    // A list's first stop is the strike position — 1>0 is a pre-bend release.
+    expect(parseInspectorLine('note', 'bend', '1>0')).toEqual({
+      intent: { type: 'setTechnique', technique: { kind: 'bend', alters: [2, 0] } }
+    });
+    // The spell-back stays canonical, so the short form is input-only.
+    expect(techniqueText({ kind: 'bend', alters: [0, 2] })).toBe('0>full');
+  });
+
   it('the grammar refuses what a bend cannot be, with the reason', () => {
     for (const [text, error] of [
-      ['1/2', 'a bend needs at least two stops — 0>full (a held pre-bend is 1/2>1/2)'],
+      ['0', 'a bend of nothing — no stop leaves 0'],
       ['0>0', 'a bend of nothing — no stop leaves 0'],
       ['0>fill', 'not a bend stop — 0 · 1/4 · 1/2 · 3/4 · full · 1 1/2 · 2'],
       ['', 'a bend is typed as its stops — 0>full · 1/2>0 · 0>full>1/2>0']

@@ -540,6 +540,16 @@ export function parseBendStops(
     if (stop === null) return { error: `not a bend stop — ${HINT}` };
     alters.push(stop);
   }
+  // ONE stop is the shorthand for the overwhelmingly common case: `bend 1`
+  // reads as `0>1` — a peak, struck from the written pitch. Only a lone
+  // stop; a LIST's first stop is always the strike position, no exceptions
+  // (`1>0` is a pre-bend release, not a bend-release). Lenient in, canonical
+  // out: the spell-back always writes the full form (core-bend-stops.md,
+  // amended 2026-08-30).
+  if (alters.length === 1) {
+    if (alters[0] === 0) return { error: 'a bend of nothing — no stop leaves 0' };
+    return { alters: [0, alters[0]!] };
+  }
   if (alters.length < 2) return { error: 'a bend needs at least two stops — 0>full (a held pre-bend is 1/2>1/2)' };
   if (alters.every(a => a === 0)) return { error: 'a bend of nothing — no stop leaves 0' };
   return { alters, ...(weights.some(w => w > 1) ? { weights } : {}) };
