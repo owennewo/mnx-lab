@@ -1354,16 +1354,19 @@ export class EditorSession {
     const note = this.selectedNote();
     // The fingerboard is the CURSOR'S part's — its strings and its capo.
     const part = this.doc.parts?.[this.cursorState.partIndex ?? 0];
+    const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
     if (slot && note) {
-      const string =
-        this.grid.mode === 'string'
-          ? this.cursorState.line
-          : note._x?.mnxLab?.string ?? defaultStringFor(note.pitch, tuningOf(part), capoOf(part));
+      // The cursor's line is a string only in the TAB projection: in
+      // notation it is a staff position, and reading it as a string wrote
+      // `string: 0` when a fret was typed from the inspector there.
+      const string = tab
+        ? this.cursorState.line
+        : note._x?.mnxLab?.string ?? defaultStringFor(note.pitch, tuningOf(part), capoOf(part));
       this.apply({ type: 'setFret', noteId: slot.noteKey, string, fret });
     } else {
       // Nothing on this string at this position: insert. Only meaningful on
       // the fingerboard — in ordinal mode (no tab part) digits need a note.
-      if (this.grid.mode !== 'string') return false;
+      if (!tab) return false;
       this.applyEntry({
         type: 'insertNote',
         measureIndex: this.cursorState.measureIndex,

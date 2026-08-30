@@ -577,6 +577,15 @@ describe('the fingerboard pills (string is the choice, fret its consequence)', (
     expect(pillText(session)).toEqual(['pitch: A4 [floor]', 'string: 1 [annotation]', 'fret: 5 [derived]']);
   });
 
+  it('`fret N` from the NOTATION projection frets the note’s own string, not the staff position', () => {
+    const session = at('note', fretDoc());
+    expect(session.handleIntent({ type: 'setProjection', projection: 'notation' })).toBe(true);
+    expect(edit(session, { type: 'enterFret', fret: 2 })).toBe(true);
+    const note = findNoteAddress(session.doc, session.selectedNoteKeys[0]!)!.note;
+    expect(note._x?.mnxLab).toEqual({ string: 1, fret: 2 });
+    expect(note.pitch).toEqual({ step: 'F', octave: 4, alter: 1 });
+  });
+
   it('removing the choice hands the note back to the ladder: the pill turns derived', () => {
     const session = at('note', fretDoc(true));
     const pill = pillsFor(scope(session)).find(p => p.key === 'string')!;
