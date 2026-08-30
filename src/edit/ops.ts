@@ -1706,9 +1706,10 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           technique.harmonic = { type: 'natural' };
           break;
         default: {
-          // hammerOn / pullOff / slide travel to the following note, so they
-          // mint its id the way `toggleTie` does.
-          const target = tieTarget(next, located);
+          // hammerOn / pullOff / slide travel to the FOLLOWING note — any
+          // pitch; same string preferred (`techniqueTarget`) — minting its id
+          // the way `toggleTie` does.
+          const target = techniqueTarget(next, located);
           if (!target) return next;
           target.id ??= mintNoteId(next);
           technique[op.technique.kind] =
@@ -2781,6 +2782,42 @@ function tieTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined
   return undefined;
 }
 
+/** The note a TECHNIQUE travels to: the first timed event after this note in
+ *  its own voice (crossing the barline like `tieTarget`), choosing the next
+ *  event's note on the SAME STRING when both carry the annotation — a
+ *  hammer-on, pull-off or slide is one finger staying on one string — else a
+ *  same-pitch note, else the event's first note.
+ *
+ *  This is deliberately NOT `tieTarget`: a tie connects equal pitches, but a
+ *  technique's whole point is travelling between different frets, and
+ *  resolving through the tie rule made `h` refuse the canonical ascending
+ *  hammer-on while classifying the meaningless equal-fret case as a pull-off
+ *  (found hands-on, 2026-08-30). */
+function techniqueTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined {
+  const pick = (notes: MnxNote[]): MnxNote | undefined => {
+    const string = located.note._x?.mnxLab?.string;
+    if (string !== undefined) {
+      const sameString = notes.find(n => n._x?.mnxLab?.string === string);
+      if (sameString) return sameString;
+    }
+    return notes.find(n => samePitch(n, located.note)) ?? notes[0];
+  };
+  for (let i = located.eventIndex + 1; i < located.seq.content.length; i++) {
+    const item = located.seq.content[i];
+    if (!isTimedEvent(item)) continue;
+    return pick(item.notes ?? []);
+  }
+  const nextMeasure = doc.parts?.[located.partIndex]?.measures?.[located.measureIndex + 1];
+  const seq = (nextMeasure?.sequences ?? []).filter(
+    s => (s.staff ?? 1) === located.staffIndex
+  )[located.voiceIndex];
+  for (const item of seq?.content ?? []) {
+    if (!isTimedEvent(item)) continue;
+    return pick(item.notes ?? []);
+  }
+  return undefined;
+}
+
 /** A fresh deterministic note id: t1, t2, … skipping anything taken. */
 /** The index of the beam whose run STARTS at this note's event, or -1. The
  *  toggle asks before applying, so a no-op never reaches the op queue. */
@@ -3079,7 +3116,7 @@ export function nextNotePitchPair(
 ): { current: number; next: number } | null {
   const located = findKeyedNote(doc, noteKey);
   if (!located) return null;
-  const target = tieTarget(doc, located);
+  const target = techniqueTarget(doc, located);
   if (!target) return null;
   return { current: midiOf(located.note), next: midiOf(target) };
 }

@@ -2628,10 +2628,13 @@ export class EditorSession {
 
   /** The voice-0 timed event starting exactly at the cursor's onset. */
   /** Hammer-on or pull-off? The interval to the next note decides — up is a
-   *  hammer, down a pull. Returns null when there is no next note to travel to. */
+   *  hammer, down a pull. Null when there is no next note to travel to, and
+   *  null for an EQUAL pitch too: a hammer or pull to the same fret is not a
+   *  thing fingers can do, and the old classifier's "equal means pull-off"
+   *  drew a P nobody asked for (found hands-on, 2026-08-30). */
   private hammerOrPull(noteKey: string): 'hammerOn' | 'pullOff' | null {
     const pair = nextNotePitchPair(this.doc, noteKey);
-    if (!pair) return null;
+    if (!pair || pair.next === pair.current) return null;
     return pair.next > pair.current ? 'hammerOn' : 'pullOff';
   }
 
