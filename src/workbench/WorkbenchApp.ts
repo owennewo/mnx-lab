@@ -95,11 +95,73 @@ export class WorkbenchApp extends LitElement {
   /** Rail visibility (Ctrl+B / the header chevron) — remembered per browser;
    *  a UI preference, so localStorage, not the document store. */
   @state() private railHidden = localStorage.getItem(RAIL_HIDDEN_KEY) === '1';
+  /** Transient shell composition: no storage and no URL representation. */
+  @state() private documentFocus = false;
+  @state() private focusHint = false;
+  @state() private browserFullscreen = document.fullscreenElement !== null;
+  private focusHintTimer: ReturnType<typeof setTimeout> | undefined;
+
+  private setRailHidden(hidden: boolean) {
+    this.railHidden = hidden;
+    localStorage.setItem(RAIL_HIDDEN_KEY, hidden ? '1' : '0');
+    this.toggleAttribute('rail-hidden', this.railHidden);
+  }
 
   private toggleRail() {
-    this.railHidden = !this.railHidden;
-    localStorage.setItem(RAIL_HIDDEN_KEY, this.railHidden ? '1' : '0');
-    this.toggleAttribute('rail-hidden', this.railHidden);
+    this.setRailHidden(!this.railHidden);
+  }
+
+  private setDocumentFocus(focused: boolean) {
+    if (focused && this.route.page !== 'scenario') return;
+    this.documentFocus = focused;
+    this.toggleAttribute('document-focus', focused);
+    clearTimeout(this.focusHintTimer);
+    this.focusHint = focused;
+    if (focused) {
+      this.focusHintTimer = setTimeout(() => (this.focusHint = false), 2200);
+    }
+  }
+
+  private toggleDocumentFocus() {
+    this.setDocumentFocus(!this.documentFocus);
+  }
+
+  private requestDocumentFocus = () => this.setDocumentFocus(true);
+
+  private toggleRailFromShell() {
+    if (this.documentFocus) {
+      this.setDocumentFocus(false);
+      this.setRailHidden(false);
+      return;
+    }
+    this.toggleRail();
+  }
+
+  private togglePanelFromShell() {
+    const page = this.scenarioPage();
+    if (!page) return;
+    if (this.documentFocus) {
+      this.setDocumentFocus(false);
+      page.showPanel();
+      return;
+    }
+    page.togglePanel();
+  }
+
+  private onFullscreenChange = () => {
+    this.browserFullscreen = document.fullscreenElement !== null;
+  };
+
+  private async toggleBrowserFullscreen() {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else if (typeof this.requestFullscreen === 'function') await this.requestFullscreen();
+    } catch {
+      // Fullscreen is permission/user-activation gated. A refused palette
+      // request leaves both presentation levels exactly where they were.
+    } finally {
+      this.onFullscreenChange();
+    }
   }
 
   /** THE THEME (roadmap/proposed/core-modernist-dark.md).
@@ -152,7 +214,9 @@ export class WorkbenchApp extends LitElement {
   };
 
   private onHashChange = () => {
-    this.route = parseHash(location.hash);
+    const route = parseHash(location.hash);
+    this.route = route;
+    if (route.page !== 'scenario' && this.documentFocus) this.setDocumentFocus(false);
     // #/objects/<def> IS the filter: the URL drives the rail so that "show me
     // this object's examples" is deep-linkable rather than transient state.
     // Only ever clobber a def: query — a hand-typed search survives navigation.
@@ -202,6 +266,14 @@ export class WorkbenchApp extends LitElement {
 
       :host([rail-hidden]) nav {
         display: none;
+      }
+
+      /* Focus is an override, not a pane preference. Keep this after the rail
+         fold so a remembered hidden rail cannot collapse the only column. */
+      :host([document-focus]) {
+        grid-template-rows: 1fr;
+        grid-template-columns: 1fr;
+        grid-template-areas: 'main';
       }
 
       .rail-toggle {
@@ -374,6 +446,30 @@ export class WorkbenchApp extends LitElement {
         grid-area: main;
         overflow: hidden;
         min-width: 0;
+        min-height: 0;
+      }
+
+      .focus-hint {
+        position: fixed;
+        top: 14px;
+        right: 14px;
+        z-index: 100;
+        pointer-events: none;
+        padding: 5px 10px;
+        border: var(--rule-w) solid var(--ink);
+        background: var(--surface);
+        color: var(--ink);
+        font: 11px/1.4 var(--mono);
+        animation: focus-hint-away 2.2s ease forwards;
+      }
+
+      @keyframes focus-hint-away {
+        0%, 58% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .focus-hint { animation: none; }
       }
 
       /* Inside the band, so it carries the band's own surface rather than a
@@ -527,9 +623,11 @@ export class WorkbenchApp extends LitElement {
     super.connectedCallback();
     window.addEventListener('hashchange', this.onHashChange);
     window.addEventListener('keydown', this.onKeyDown);
+    document.addEventListener('fullscreenchange', this.onFullscreenChange);
     this.darkQuery.addEventListener('change', this.onSchemeChange);
 
     this.toggleAttribute('rail-hidden', this.railHidden);
+    this.onFullscreenChange();
     this.applyTheme();
     // If this load is OpenRouter's PKCE callback (`?code=` in the search —
     // the hash router never sees it), exchange the code and return to the
@@ -547,13 +645,14 @@ export class WorkbenchApp extends LitElement {
     this.darkQuery.removeEventListener('change', this.onSchemeChange);
     window.removeEventListener('hashchange', this.onHashChange);
     window.removeEventListener('keydown', this.onKeyDown);
-
+    document.removeEventListener('fullscreenchange', this.onFullscreenChange);
+    clearTimeout(this.focusHintTimer);
   }
 
   /** The shell's keys: `/` opens a command surface (the tray, else go-to),
    *  Ctrl+G opens go-to (whose `>` prefix reaches commands), Ctrl+B folds
    *  the rail — all resolved through the keymap module's shell table, which
-   *  stays the sole KeyboardEvent interpreter. Everything score-shaped is the
+   *  stays the sole KeyboardEvent interpreter. Everything document-editing-shaped is the
    *  scenario page's keymap, not ours. */
   private onKeyDown = (event: KeyboardEvent) => {
     // The SHELL's bindings are page-level by nature (the rail, the palette,
@@ -585,19 +684,24 @@ export class WorkbenchApp extends LitElement {
       this.palette = action === 'commandPalette' ? 'commands' : 'goto';
       return;
     }
+    if (action === 'toggleDocumentFocus') {
+      if (this.route.page !== 'scenario') return;
+      event.preventDefault();
+      this.toggleDocumentFocus();
+      return;
+    }
     if (action === 'toggleRail') {
       event.preventDefault();
-      this.toggleRail();
+      this.toggleRailFromShell();
       return;
     }
     if (action === 'togglePanel') {
       // The panel belongs to the scenario page, so the shell asks it rather
       // than mirroring its state — and a no-op anywhere else is right: on
       // #/objects there is no panel to fold.
-      const page = this.scenarioPage();
-      if (!page) return;
+      if (!this.scenarioPage()) return;
       event.preventDefault();
-      page.togglePanel();
+      this.togglePanelFromShell();
       return;
     }
   };
@@ -638,18 +742,36 @@ export class WorkbenchApp extends LitElement {
       nav('go: attention queue', '#/'),
       nav('go: objects coverage', objectsHref()),
       {
-        label: `view: ${this.railHidden ? 'show' : 'hide'} scenario rail`,
+        label: `view: ${this.documentFocus || this.railHidden ? 'show' : 'hide'} scenario rail`,
         hint: 'Ctrl+B',
-        run: () => this.toggleRail()
+        run: () => this.toggleRailFromShell()
       },
       // Offered only where there is a panel to fold — the palette lists what
       // it can actually do, and on #/objects this row would be a dead entry.
       ...(this.scenarioPage()
         ? [
             {
-              label: `view: ${this.scenarioPage()!.panelIsHidden ? 'show' : 'hide'} document panel`,
+              label: `view: ${
+                this.documentFocus || this.scenarioPage()!.panelIsHidden ? 'show' : 'hide'
+              } document panel`,
               hint: 'Ctrl+Alt+B',
-              run: () => this.scenarioPage()?.togglePanel()
+              run: () => this.togglePanelFromShell()
+            },
+            {
+              label: `view: ${this.documentFocus ? 'exit' : 'focus'} document`,
+              hint: 'Ctrl+Alt+F',
+              run: () => this.toggleDocumentFocus()
+            }
+          ]
+        : []),
+      ...(typeof this.requestFullscreen === 'function'
+        ? [
+            {
+              label: `view: ${
+                this.browserFullscreen ? 'exit browser fullscreen' : 'browser fullscreen'
+              }`,
+              hint: 'F11 is browser-owned',
+              run: () => void this.toggleBrowserFullscreen()
             }
           ]
         : []),
@@ -844,7 +966,9 @@ export class WorkbenchApp extends LitElement {
     const active = (this.route.page === 'scenario' ? this.route.id : null) ?? null;
 
     return html`
-      <header>
+      ${this.documentFocus
+        ? nothing
+        : html`<header>
         <button
           class="rail-toggle"
           title="${this.railHidden ? 'show' : 'hide'} the scenario rail (Ctrl+B)"
@@ -874,8 +998,8 @@ export class WorkbenchApp extends LitElement {
           </span>
         </span>
         ${this.themeToggle()}
-      </header>
-      <nav>
+          </header>
+          <nav>
         <div class="rail-context">
           <a class="queue-link" href="#/">
             Attention queue —
@@ -900,18 +1024,23 @@ export class WorkbenchApp extends LitElement {
             `
           )}
         </div>
-      </nav>
+          </nav>`}
       <main>
         ${this.route.page === 'scenario'
           ? html`<mnx-scenario-page
               .scenarioId=${this.route.id ?? ''}
               .view=${this.route.view ?? ''}
+              .documentFocus=${this.documentFocus}
               .selectionClipboard=${this.selectionClipboard}
+              @document-focus-request=${this.requestDocumentFocus}
             ></mnx-scenario-page>`
           : this.route.page === 'objects'
             ? html`<mnx-objects-page .def=${this.route.def ?? ''}></mnx-objects-page>`
             : html`<mnx-queue-home></mnx-queue-home>`}
       </main>
+      ${this.focusHint
+        ? html`<div class="focus-hint" role="status">Ctrl+Alt+F to exit document focus</div>`
+        : nothing}
       ${this.palette
         ? html`<mnx-command-palette
             .provider=${this.paletteItems}

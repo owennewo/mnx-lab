@@ -218,6 +218,7 @@ export type ShellAction =
   | 'goTo'
   | 'toggleRail'
   | 'togglePanel'
+  | 'toggleDocumentFocus'
   // The clipboard verbs are shell actions, not EditorIntents, for the same
   // reason the popovers are: they cross an environment boundary. The mount
   // resolves the asynchronous store I/O first, and the trace records the
@@ -309,7 +310,10 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // chord for the OTHER side: Ctrl+Alt+B is its secondary sidebar. Adding a
   // modifier to the pane toggle beats inventing an unrelated letter, and the
   // browser claims neither.
-  { code: 'KeyB', ctrl: true, alt: true, action: 'togglePanel' }
+  { code: 'KeyB', ctrl: true, alt: true, action: 'togglePanel' },
+  // Workbench document focus: hide the shell around the document without
+  // claiming F11, which remains the browser/OS fullscreen shortcut.
+  { code: 'KeyF', ctrl: true, alt: true, action: 'toggleDocumentFocus' }
 ];
 
 export function resolveShellAction(stroke: KeyStroke): ShellAction | null {

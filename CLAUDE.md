@@ -268,6 +268,10 @@ presentation only). Tab/both exist only when the strings are KNOWN — declared 
 the document, or supplied through that override. No instrument is ever assumed.
 The setup popovers are a **page-level overlay over the score**, not a tab: opening one
 with the keyboard must not move the panel out from under what you were reading.
+**Document focus** is transient workbench composition: `Ctrl+Alt+F` removes the app and
+scenario-page chrome without changing remembered rail/panel preferences, while `F11`
+remains browser-owned (the palette's separate browser-fullscreen action uses the Fullscreen
+API when available). It is never a property of `<mnx-document-viewer>`.
 **Theming is `light-dark()`, never an attribute** — the shell resolves `auto|light|dark`
 (remembered per browser, palette-switchable) onto `color-scheme`, and every token
 follows because `color-scheme` is inherited and crosses shadow roots. An

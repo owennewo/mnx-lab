@@ -511,6 +511,10 @@ function presentationSpan(
 export class ScenarioPage extends LitElement {
   @property({ type: String }) scenarioId = '';
   @property({ type: String }) view = '';
+  /** Host-owned composition state: removes this page's persistent chrome but
+   *  leaves the viewer and invoked editor overlays intact. */
+  @property({ type: Boolean, reflect: true, attribute: 'document-focus' })
+  documentFocus = false;
   /** App-lifetime transport injected by WorkbenchApp: route/session changes
    *  replace this page's document but deliberately retain the copied clip. */
   @property({ attribute: false }) selectionClipboard: SelectionClipboardStore | null = null;
@@ -700,6 +704,20 @@ export class ScenarioPage extends LitElement {
     localStorage.setItem(PANEL_HIDDEN_KEY, this.panelHidden ? '1' : '0');
   }
 
+  /** Used by the shell when Ctrl+Alt+B is pressed from document focus: the
+   *  same gesture exits focus and makes its target visible immediately. */
+  showPanel() {
+    if (!this.panelHidden) return;
+    this.panelHidden = false;
+    localStorage.setItem(PANEL_HIDDEN_KEY, '0');
+  }
+
+  private requestDocumentFocus() {
+    this.dispatchEvent(
+      new CustomEvent('document-focus-request', { bubbles: true, composed: true })
+    );
+  }
+
   /** The drag bar: pointer capture keeps the gesture on the handle; width is
    *  measured from the body's right edge so the math is anchor-independent. */
   private onPanelDrag = (down: PointerEvent) => {
@@ -735,6 +753,10 @@ export class ScenarioPage extends LitElement {
         overflow: hidden;
       }
 
+      :host([document-focus]) {
+        grid-template-rows: 1fr;
+      }
+
       /* The page head is the panel's tab strip in the same vocabulary: flush
          left, no padding of its own (the tabs carry it), and a full 2px ink
          rule under it. Band 2 for the score exactly as .panel-tabs is band 2
@@ -762,7 +784,15 @@ export class ScenarioPage extends LitElement {
          chevron-points-where-it-goes rule. The head spans the panel too, so
          this button stays put — and stays reachable — whichever state it is
          in, which a control living inside the panel could not do. */
-      .panel-toggle {
+      .head-actions {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-right: 12px;
+      }
+
+      .panel-toggle,
+      .focus-toggle {
         font-family: var(--mono);
         font-size: 12px;
         color: var(--ink-2);
@@ -777,17 +807,26 @@ export class ScenarioPage extends LitElement {
            also lines it up with .rail-toggle, its mirror in the app header,
            which already centred itself. */
         align-self: center;
-        margin-right: 12px;
         cursor: pointer;
         flex: none;
       }
 
-      .panel-toggle:hover {
+      .focus-toggle {
+        font-family: var(--sans);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .panel-toggle:hover,
+      .focus-toggle:hover {
         color: var(--accent);
         border-color: var(--accent);
       }
 
-      .panel-toggle:focus-visible {
+      .panel-toggle:focus-visible,
+      .focus-toggle:focus-visible {
         outline: var(--rule-w) solid var(--focus-ring);
         outline-offset: 2px;
       }
@@ -1016,6 +1055,7 @@ export class ScenarioPage extends LitElement {
       .body {
         display: grid;
         overflow: hidden;
+        min-width: 0;
         min-height: 0;
       }
 
@@ -1033,6 +1073,7 @@ export class ScenarioPage extends LitElement {
          sits at, which is why the two read as one decision. */
       mnx-document-viewer {
         padding: 14px;
+        box-sizing: border-box;
       }
 
       /* The clipboard's transient outcome strip (core-selection-clipboard.md
@@ -3572,31 +3613,44 @@ export class ScenarioPage extends LitElement {
     const views = this.availableViews();
 
     return html`
-      <div class="head">
-        <div class="tabs">
-          ${views.map(
-            v => html`
-              <a href=${scenarioHref(entry.id, v)} aria-current=${v === view}>${v}</a>
-            `
-          )}
-        </div>
-        <button
-          class="panel-toggle"
-          title="${this.panelHidden ? 'show' : 'hide'} the document panel (Ctrl+Alt+B)"
-          aria-label="${this.panelHidden ? 'show' : 'hide'} the document panel"
-          aria-expanded=${!this.panelHidden}
-          @click=${() => this.togglePanel()}
-        >
-          ${this.panelHidden ? '⟨' : '⟩'}
-        </button>
-      </div>
+      ${this.documentFocus
+        ? nothing
+        : html`<div class="head">
+            <div class="tabs">
+              ${views.map(
+                v => html`
+                  <a href=${scenarioHref(entry.id, v)} aria-current=${v === view}>${v}</a>
+                `
+              )}
+            </div>
+            <div class="head-actions">
+              <button
+                class="focus-toggle"
+                title="focus the document (Ctrl+Alt+F)"
+                @click=${this.requestDocumentFocus}
+              >
+                focus
+              </button>
+              <button
+                class="panel-toggle"
+                title="${this.panelHidden ? 'show' : 'hide'} the document panel (Ctrl+Alt+B)"
+                aria-label="${this.panelHidden ? 'show' : 'hide'} the document panel"
+                aria-expanded=${!this.panelHidden}
+                @click=${() => this.togglePanel()}
+              >
+                ${this.panelHidden ? '⟨' : '⟩'}
+              </button>
+            </div>
+          </div>`}
       <div
         class="body"
-        style="grid-template-columns: 1fr ${this.panelHidden ? 0 : this.panelWidth}px"
+        style="grid-template-columns: 1fr ${
+          this.documentFocus || this.panelHidden ? 0 : this.panelWidth
+        }px"
       >
         <div class="main">
           ${this.viewer(entry, view)}
-          ${this.loadState === 'ready' && !entry.invalidByDesign
+          ${!this.documentFocus && this.loadState === 'ready' && !entry.invalidByDesign
             ? html`<mnx-zoom-pad
                 .staffScale=${this.staffScale}
                 .densityH=${this.densityH}
@@ -3626,7 +3680,7 @@ export class ScenarioPage extends LitElement {
             : nothing}
           ${this.rungChip(entry)}
         </div>
-        ${this.panelHidden ? nothing : this.sidePanel(entry)}
+        ${this.documentFocus || this.panelHidden ? nothing : this.sidePanel(entry)}
       </div>
     `;
   }

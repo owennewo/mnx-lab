@@ -28,6 +28,7 @@
     "smoke:csp": "npm run build && node harness/verify/csp-smoke.mjs",
     "smoke:selection": "npm run build && node harness/verify/selection-smoke.mjs",
     "smoke:inspector": "npm run build && node harness/verify/inspector-smoke.mjs",
+    "smoke:focus": "npm run build && node harness/verify/focus-mode-smoke.mjs",
     "dev:embed-app": "npm run build:embed && node harness/verify/serve-embed-app.mjs",
     "preview": "vite preview",
     "compile-validator": "node spec/tools/compile-validator.mjs",

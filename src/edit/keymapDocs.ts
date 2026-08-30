@@ -547,6 +547,12 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'KeyB', ctrl: true, alt: true }],
     group: 'workbench',
     meaning: { all: 'toggle the document panel (the other pane, VS Code’s chord)' }
+  },
+  {
+    keys: 'Ctrl+Alt+F',
+    strokes: [{ code: 'KeyF', ctrl: true, alt: true }],
+    group: 'workbench',
+    meaning: { all: 'toggle document focus (workbench chrome only; F11 remains browser fullscreen)' }
   }
 ];
 

@@ -64,6 +64,13 @@ describe('keyboard scope', () => {
     );
     expect(dead).toEqual([]);
   });
+
+  it('owns document focus only at shell scope and leaves F11 unbound', () => {
+    const focus = { code: 'KeyF', ctrl: true, alt: true } as const;
+    expect(resolveShellAction(focus)).toBe('toggleDocumentFocus');
+    expect(resolveIntent(focus, EDITOR_LAYERS)).toBeNull();
+    expect(SHELL_BINDINGS.some(binding => binding.code === 'F11')).toBe(false);
+  });
 });
 
 describe('the pending-gesture contract', () => {
