@@ -13,12 +13,17 @@
 > `S`/`B` over a range wholly covering a slur/beam now REMOVE it from any
 > covered position, and the slur/beam tiles read active over the covering
 > range — pinned by `harness/conformance/spanner-coincidence.test.ts`.
-> **Remaining**: the time-positioned family (ottavas, dynamics — interval
-> arithmetic, not an id join); the partial-coverage tray hint; and the two
-> add-model gestures, which are BLOCKED on a UX decision the doc did not
-> settle — model 1 ("S slurs to the next event") collides with the armed
-> two-press anchor `S` ships today, and whether the bare press changes
-> meaning is the user's call, not this implementation's.
+> **The add-model gestures landed 2026-08-30** — the user ruled: the
+> two-press armed anchor is RETIRED in favour of the models. Bare `S`/`B`
+> attach to the next note (model 1, visible immediately); pressed at a
+> spanner's END they extend it (model 2 — `retargetSlur`/`extendBeam` ops,
+> extension refused across the barline for beams); at its START they still
+> toggle it off; ranges set the extent (model 3, unchanged). `dropAnchor`,
+> `spanAnchor` and the pending-precedence entry are gone; the two construct
+> traces that used the two-press gesture were rewritten as extend chains
+> and replay to the same goldens. **Remaining**: the time-positioned family
+> (ottavas, dynamics — interval arithmetic, not an id join) and the
+> partial-coverage tray hint.
 
 Serves the **implementation loop**. Proposed 2026-08-30, out of a rung-by-rung review
 of the selection ladder ([core-selection-ladder.md](../complete/core-selection-ladder.md)):

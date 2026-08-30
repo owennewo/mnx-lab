@@ -127,7 +127,7 @@
       "type": "nextPosition"
     },
     {
-      "type": "nextPosition"
+      "type": "toggleSlur"
     },
     {
       "type": "nextPosition"
@@ -149,13 +149,19 @@
       "type": "lineDown"
     },
     {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
       "type": "toggleSlur"
     },
     {
       "type": "nextPosition"
     },
     {
-      "type": "nextPosition"
+      "type": "toggleSlur"
     },
     {
       "type": "nextPosition"

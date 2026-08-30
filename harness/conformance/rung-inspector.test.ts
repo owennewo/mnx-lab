@@ -310,12 +310,10 @@ describe('writers for what already rendered (core-measure-attributes-gaps.md, it
   it('a beam starting at the event is a pill whose removal is the beam key’s own toggle', () => {
     const session = at('event');
     session.handleIntent({ type: 'setProjection', projection: 'notation' });
-    // Beam the two quarters: the beam key, armed on one and closed on the next.
+    // Beam the two quarters: one press — the point gesture beams to the
+    // next note (core-selection-range-grain.md decision 5).
     session.handleIntent({ type: 'goToLevel', level: 'note' });
     expect(session.handleIntent({ type: 'toggleBeam' })).toBe(true);
-    session.handleIntent({ type: 'nextPosition' });
-    expect(session.handleIntent({ type: 'toggleBeam' })).toBe(true);
-    session.handleIntent({ type: 'prevPosition' });
     session.handleIntent({ type: 'goToLevel', level: 'event' });
     const beam = pillsFor(scope(session)).find(p => p.key === 'beam');
     expect(beam?.value).toBe('2 events');

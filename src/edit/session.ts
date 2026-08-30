@@ -11,6 +11,7 @@ import type { PasteLanding } from './selectionPastePlanner.ts';
 import {
   POSITIONED_FIELDS,
   beamRunBetween,
+  beamEndingAt,
   beamStartingAt,
   completeContainerSpec,
   entryContentAt,
@@ -18,6 +19,7 @@ import {
   wrapExtent,
   EditHistory,
   hasSlurStartingAt,
+  slurEndingAt,
   nextNotePitchPair,
   techniqueAt,
   MEASURE_ATTRIBUTE_FIELDS,
@@ -102,13 +104,11 @@ export type DeleteOutcome =
   | { kind: 'removed'; level: SelectionLevel; members: number }
   | { kind: 'refused'; level: SelectionLevel };
 
-/** A half-finished spanner gesture: the note it started on, and which kind of
- *  spanner it will become. The kind is fixed when the anchor is ARMED, not
- *  when it is completed — see the `spanAnchor` getter. */
-export interface SpanAnchor {
-  key: string;
-  kind: 'slur' | 'beam';
-}
+/** RETIRED 2026-08-30 (core-selection-range-grain.md decision 5, by the
+ *  user's call): the two-press armed anchor gave way to the model gestures —
+ *  a bare press attaches to the NEXT note, a press at a spanner's end
+ *  extends it, a range sets the extent. Kept as a doc pointer only. */
+
 
 export class EditorSession {
   private history: EditHistory;
@@ -127,7 +127,6 @@ export class EditorSession {
    *  null. The keyboard names two places in two presses because the ladder
    *  cannot yet extend laterally; when it can, "slur the selected run" becomes
    *  a second route to the same op rather than a replacement. */
-  private spanAnchorState: SpanAnchor | null = null;
   /** The intent currently being handled — stamped into history entries by
    *  apply() as the op queue's provenance (forward-recorded at apply time). */
   private applyingIntent: EditorIntent | null = null;
@@ -748,7 +747,7 @@ export class EditorSession {
         // The selected-run form reads an EVENT range (the floor axis moved
         // ranges there). More than one resolved member, not more than one
         // note key: a chord event point has two keys but is one member, and
-        // must arm the anchor gesture rather than slur itself.
+        // takes the point gesture rather than slurring itself.
         const selected =
           this.selectionState.level === 'event' &&
           this.resolvedSelection.members.length > 1
@@ -756,7 +755,6 @@ export class EditorSession {
             : [];
         if (selected.length > 1) {
           const [fromNoteKey, toNoteKey] = [selected[0], selected[selected.length - 1]];
-          this.spanAnchorState = null;
           // Delete from any covered position (core-selection-range-grain.md
           // decision 5): a range WHOLLY covering existing slurs removes them,
           // wherever in the range each slur starts — the coincidence rule's
@@ -778,33 +776,31 @@ export class EditorSession {
         }
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
-        // 1. An armed anchor elsewhere? Complete the slur.
-        //
-        //    This OUTRANKS the remove branch below, and the order is the whole
-        //    point (core-rung-addressing.md 5b): an armed anchor is a promise
-        //    the user made two presses ago, so a far note that happens to
-        //    start a slur of its own must not eat the gesture and throw the
-        //    anchor away. Removing that note's own slur is still one more `S`.
-        if (this.spanAnchorState !== null && this.spanAnchorState.key !== slot.noteKey) {
-          // Refuse rather than switch kind: an anchor armed with `B` is a
-          // beam gesture, and completing it as a slur would be inventing an
-          // instruction. The strip still names what is armed, so the refusal
-          // is legible on screen rather than mysterious.
-          if (this.spanAnchorState.kind !== 'slur') return false;
-          const from = this.spanAnchorState.key;
-          this.spanAnchorState = null;
-          this.apply({ type: 'setSlur', fromNoteKey: from, toNoteKey: slot.noteKey });
-          return true;
-        }
-        // 2. A slur already starting here? Toggle it off.
+        // The point gestures (core-selection-range-grain.md decision 5; the
+        // two-press anchor retired by the user's call). Order matters: a
+        // note can start one slur and end another, and the start's toggle is
+        // the older, stronger meaning.
+        // 1. A slur already starting here? Toggle it off.
         if (hasSlurStartingAt(this.doc, slot.noteKey)) {
-          this.spanAnchorState = null;
           this.apply({ type: 'removeSlur', noteKey: slot.noteKey });
           return true;
         }
-        // 3. Otherwise arm (or disarm, pressing twice in one place).
-        this.spanAnchorState =
-          this.spanAnchorState?.key === slot.noteKey ? null : { key: slot.noteKey, kind: 'slur' };
+        // 2. A slur ENDING here? Extend it to the next note — press the same
+        //    key at the end and the attachment grows (model 2).
+        const endingSlur = slurEndingAt(this.doc, slot.noteKey);
+        if (endingSlur) {
+          const extendTo = this.nextNoteKeyInVoice();
+          if (!extendTo) return false;
+          const beforeDoc = JSON.stringify(this.doc);
+          this.apply({ type: 'retargetSlur', noteKey: endingSlur.ownerNoteKey, toNoteKey: extendTo });
+          return JSON.stringify(this.doc) !== beforeDoc;
+        }
+        // 3. Otherwise slur to the NEXT note (model 1): the end is implied,
+        //    the result is visible immediately, and one more press at that
+        //    end extends. Long slurs are the range form's job.
+        const slurTo = this.nextNoteKeyInVoice();
+        if (!slurTo) return false;
+        this.apply({ type: 'setSlur', fromNoteKey: slot.noteKey, toNoteKey: slurTo });
         return true;
       }
       case 'setSyllable':
@@ -1146,7 +1142,6 @@ export class EditorSession {
           const covered = spannersUnderSelection(this.doc, this.resolvedSelection.members)
             .beams.filter(hit => hit.coverage === 'whole');
           if (covered.length > 0) {
-            this.spanAnchorState = null;
             return this.applyBulk(covered.map(hit => ({
               type: 'removeBeam' as const,
               measureIndex: hit.measureIndex,
@@ -1157,46 +1152,42 @@ export class EditorSession {
           const first = selected[0];
           const existing = beamStartingAt(this.doc, first);
           if (existing) {
-            this.spanAnchorState = null;
             return this.applyBulk([{ type: 'removeBeam', ...existing }]);
           }
           const run = beamRunBetween(this.doc, first, selected[selected.length - 1]);
           if (run) {
-            this.spanAnchorState = null;
             // `run` carries its own part, staff and voice — the beam goes
             // where the notes are, not where the cursor's default was.
             return this.applyBulk([{ type: 'setBeam', ...run }]);
           }
-          // A beam cannot cross a voice or bar. Keep the established anchor
-          // gesture available at the active edge for an endpoint the selected
-          // run cannot express.
+          // A beam cannot cross a voice or bar: fall through to the point
+          // gesture at the active edge.
         }
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
-        // 1. An armed anchor elsewhere? Beam the run between it and here.
-        //    Ordered above the remove branch for the reason spelled out in
-        //    `toggleSlur` — the armed gesture wins (core-rung-addressing.md 5b).
-        if (this.spanAnchorState !== null && this.spanAnchorState.key !== slot.noteKey) {
-          if (this.spanAnchorState.kind !== 'beam') return false; // never switch kind
-          // Indices, not ids: the op mints what the beam will reference, so
-          // reading the document here cannot change it and the ids the beam
-          // names are the ids the document actually carries.
-          const run = beamRunBetween(this.doc, this.spanAnchorState.key, slot.noteKey);
-          this.spanAnchorState = null;
-          if (!run) return false;
-          this.apply({ type: 'setBeam', ...run });
-          return true;
-        }
-        // 2. A beam already starting here? Toggle it off.
+        // The point gestures, mirroring `toggleSlur` above.
+        // 1. A beam already starting here? Toggle it off.
         const existing = beamStartingAt(this.doc, slot.noteKey);
         if (existing) {
-          this.spanAnchorState = null;
           this.apply({ type: 'removeBeam', ...existing });
           return true;
         }
-        // 3. Otherwise arm (or disarm, pressing twice in one place).
-        this.spanAnchorState =
-          this.spanAnchorState?.key === slot.noteKey ? null : { key: slot.noteKey, kind: 'beam' };
+        // 2. A beam ENDING here? Extend it by the next note-bearing event
+        //    (refused across the barline by the op — a beam lives in one bar).
+        const endingBeam = beamEndingAt(this.doc, slot.noteKey);
+        if (endingBeam) {
+          const extendTo = this.nextNoteKeyInVoice();
+          if (!extendTo) return false;
+          const beforeDoc = JSON.stringify(this.doc);
+          this.apply({ type: 'extendBeam', ...endingBeam, toNoteKey: extendTo });
+          return JSON.stringify(this.doc) !== beforeDoc;
+        }
+        // 3. Otherwise beam to the NEXT note (model 1).
+        const beamTo = this.nextNoteKeyInVoice();
+        if (!beamTo) return false;
+        const pair = beamRunBetween(this.doc, slot.noteKey, beamTo);
+        if (!pair) return false;
+        this.apply({ type: 'setBeam', ...pair });
         return true;
       }
       case 'setRestSpelling': {
@@ -1416,16 +1407,6 @@ export class EditorSession {
     return coincidentSlots(this.grid, this.cursorState, this.activeProjection).length;
   }
 
-  /** The armed spanner anchor, for the HUD and the ops panel. Carries its
-   *  KIND as well as its note: the kind used to be decided at completion by
-   *  whichever letter was pressed, which let a `S`-armed gesture finish as a
-   *  beam and left the strip captioning every anchor "slur from …"
-   *  (core-rung-addressing.md 5). Enter needs it too — it has no letter to
-   *  read the kind off. */
-  get spanAnchor(): SpanAnchor | null {
-    return this.spanAnchorState;
-  }
-
   private navigate(intent: EditorIntent): boolean {
     const before = this.cursorState;
     switch (intent.type) {
@@ -1458,15 +1439,6 @@ export class EditorSession {
           anchor: copyCursorAddress(this.cursorState),
           extent: { kind: 'closure', scope }
         };
-        return true;
-      }
-      // Abandoning an armed anchor is its OWN intent now. It used to ride
-      // inside `relaxSelection` and shadow it, which meant Shift+↑ spent its
-      // first press after a `S` cancelling rather than widening — an
-      // exception nobody could see, hidden by Escape always arriving first.
-      case 'dropAnchor': {
-        if (this.spanAnchorState === null) return false;
-        this.spanAnchorState = null;
         return true;
       }
       // The ladder's absolute address. The presence rule lives HERE and only
@@ -2026,6 +1998,23 @@ export class EditorSession {
    * which is the whole point of the rung. The anchor voice does not — voice
    * numbering is per-sequence and means nothing in another part.
    */
+  /** The next note-bearing event in the cursor's voice — the implied end of
+   *  the point spanner gestures (models 1 and 2). Rests are stepped over (a
+   *  slur or beam needs a note to land on); null when the voice runs out. */
+  private nextNoteKeyInVoice(): string | null {
+    let cursor = this.cursorState;
+    for (let guard = 0; guard < this.grid.positions.length + 1; guard++) {
+      const stepped = movePositionInk(this.grid, cursor, 1, 'keep');
+      if (cursorAddressesEqual(stepped, cursor)) return null;
+      cursor = stepped;
+      const slot = positionAt(this.grid, cursor)?.slots.find(
+        candidate => candidate.voiceIndex === (cursor.voiceIndex ?? 0)
+      );
+      if (slot) return slot.noteKey;
+    }
+    return null;
+  }
+
   /** The part-measure rung's vertical: the next part, first staff — the
    *  member covers all of the part's staves, so walking its staves would
    *  step inside one selection. */

@@ -77,14 +77,13 @@ describe('the pending-gesture contract', () => {
       'popover',
       'overlay',
       'pendingFret',
-      'spanAnchor',
       'selection'
     ]);
   });
 
   it('puts every overlay ahead of everything the mount arbitrates', () => {
-    // A regression here would mean Escape dropping a fret or an anchor
-    // *behind* an open tray — state changing while the user was backing out
+    // A regression here would mean Escape dropping a fret *behind* an open
+    // tray — state changing while the user was backing out
     // of a menu, which is the confusion the ordering exists to prevent.
     const mount = PENDING_PRECEDENCE.indexOf('pendingFret');
     expect(PENDING_PRECEDENCE.indexOf('popover')).toBeLessThan(mount);

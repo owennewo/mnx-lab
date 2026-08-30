@@ -177,6 +177,8 @@ function opLabel(op: EditOp): string {
       return `no ${op.kind} @ m${op.measureIndex + 1}`;
     case 'setSlur':
       return `slur ${op.fromNoteKey} → ${op.toNoteKey}`;
+    case 'retargetSlur':
+      return `extend slur ${op.noteKey} → ${op.toNoteKey}`;
     case 'removeSlur':
       return `remove slur at ${op.noteKey}`;
     case 'setTieVariant':
@@ -276,6 +278,8 @@ function opLabel(op: EditOp): string {
       return `no ${op.kind} @ m${op.measureIndex + 1}`;
     case 'setBeam':
       return `beam events ${op.from}–${op.to} @ m${op.measureIndex + 1}`;
+    case 'extendBeam':
+      return `extend beam @ m${op.measureIndex + 1} + ${op.toNoteKey}`;
     case 'removeBeam':
       return `remove beam @ m${op.measureIndex + 1}`;
     case 'setFullMeasureRest':

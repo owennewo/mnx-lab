@@ -733,7 +733,7 @@ describe('command registry — state reads the document', () => {
     expect(bars.selection).toEqual(barSelection);
   });
 
-  it('a selected run supplies spanner endpoints while point selection keeps the anchor fallback', () => {
+  it('a selected run supplies spanner endpoints; a point slurs to the NEXT note', () => {
     const slur = new EditorSession(makeDoc());
     // Two presses under the floor axis: re-level to the event, then extend.
     slur.handleIntent({ type: 'extendSelection', direction: 'next' });
@@ -746,7 +746,6 @@ describe('command registry — state reads the document', () => {
       fromNoteKey: 'n1',
       toNoteKey: 'n2'
     });
-    expect(slur.spanAnchor).toBeNull();
     expect(slur.selection).toEqual(selection);
     expect(commandState(find('slur'), sessionView(slur))).toBe('active');
 
@@ -760,90 +759,66 @@ describe('command registry — state reads the document', () => {
     beam.handleIntent({ type: 'extendSelection', direction: 'next' });
     expect(beam.handleIntent({ type: 'toggleBeam' })).toBe(true);
     expect(beam.opQueue.applied[0].op).toMatchObject({ type: 'setBeam', from: 0, to: 1 });
-    expect(beam.spanAnchor).toBeNull();
 
-    const anchor = new EditorSession(makeDoc());
-    expect(anchor.handleIntent({ type: 'toggleSlur' })).toBe(true);
-    // The anchor carries its KIND from the moment it is armed
-    // (core-rung-addressing.md 5): the kind used to be decided at completion
-    // by whichever letter was pressed, so a `S` gesture could finish as a beam.
-    expect(anchor.spanAnchor).toEqual({ key: 'n1', kind: 'slur' });
-    expect(anchor.opQueue.applied).toHaveLength(0);
+    // The point form: no anchor to arm any more (the two-press gesture
+    // retired by the user's call — core-selection-range-grain.md decision 5).
+    // One press slurs to the next note, immediately.
+    const point = new EditorSession(makeDoc());
+    expect(point.handleIntent({ type: 'toggleSlur' })).toBe(true);
+    expect(point.opQueue.applied[0].op).toMatchObject({
+      type: 'setSlur',
+      fromNoteKey: 'n1',
+      toNoteKey: 'n2'
+    });
   });
 
-  it('never completes an armed anchor as the other kind of spanner', () => {
-    // The anchor used to be a bare note key, so the kind was decided by
-    // whichever letter finished the gesture: arm with `S`, press `B` at the
-    // far note, get a beam (core-rung-addressing.md 5). Refuse instead — and
-    // keep the anchor, so the strip still explains what is waiting.
+  it('S at a slur’s end extends it; at its start removes it', () => {
+    const doc = makeDoc();
+    // A third note in bar 1 gives the extension somewhere to go.
+    doc.parts[0].measures?.[0].sequences?.[0].content.push(
+      { duration: { base: 'quarter' }, notes: [note('n3', 'E', 4, 1)] }
+    );
+    const session = new EditorSession(doc);
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true); // n1 → n2
+    session.handleIntent({ type: 'nextPosition' }); // on n2, the slur's END
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true); // extend → n3
+    expect(session.opQueue.applied[1].op).toMatchObject({
+      type: 'retargetSlur',
+      noteKey: 'n1',
+      toNoteKey: 'n3'
+    });
+    const first = session.doc.parts![0].measures![0].sequences![0].content[0] as {
+      slurs?: { target: string }[];
+    };
+    const third = session.doc.parts![0].measures![0].sequences![0].content[2] as { id?: string };
+    expect(first.slurs?.[0].target).toBe(third.id);
+
+    // Back at the START, the press still toggles the slur off.
+    session.handleIntent({ type: 'prevPosition' });
+    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
+    expect((session.doc.parts![0].measures![0].sequences![0].content[0] as {
+      slurs?: unknown[];
+    }).slurs).toBeUndefined();
+  });
+
+  it('B at a beam’s end extends it by the next event, never across the barline', () => {
     const doc = makeDoc();
     const events = doc.parts[0].measures?.[0].sequences?.[0].content ?? [];
     events.forEach(event => {
       if ('duration' in event) event.duration = { base: 'eighth' };
     });
+    events.push({ duration: { base: 'eighth' }, notes: [note('n3', 'E', 4, 1)] });
     const session = new EditorSession(doc);
-    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
-    expect(session.spanAnchor).toEqual({ key: 'n1', kind: 'slur' });
+    expect(session.handleIntent({ type: 'toggleBeam' })).toBe(true); // n1..n2
+    session.handleIntent({ type: 'nextPosition' }); // on n2, the beam's END
+    expect(session.handleIntent({ type: 'toggleBeam' })).toBe(true); // extend
+    const beam = session.doc.parts![0].measures![0].beams![0];
+    expect(beam.events).toHaveLength(3);
 
+    // At the new end with nothing after it in the bar but silence — and the
+    // next bar out of reach — the press refuses rather than acting wide.
     session.handleIntent({ type: 'nextPosition' });
     expect(session.handleIntent({ type: 'toggleBeam' })).toBe(false);
-    expect(session.opQueue.applied).toHaveLength(0);
-    expect(session.spanAnchor).toEqual({ key: 'n1', kind: 'slur' });
-
-    // The anchor's OWN letter still completes it.
-    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
-    expect(session.opQueue.applied[0].op).toMatchObject({
-      type: 'setSlur',
-      fromNoteKey: 'n1',
-      toNoteKey: 'n2'
-    });
-    expect(session.spanAnchor).toBeNull();
   });
 
-  it('an armed anchor outranks a spanner already starting at the far note', () => {
-    // The remove branch used to be tested FIRST, so completing onto a note
-    // that already started a slur deleted that slur and threw the armed
-    // anchor away — the gesture the user was two presses into, lost to a
-    // coincidence (core-rung-addressing.md 5b).
-    const session = new EditorSession(makeDoc());
-    // Give n2 a slur of its own, from the far end of the bar.
-    session.handleIntent({ type: 'nextPosition' });
-    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true); // arms at n2
-    session.handleIntent({ type: 'prevPosition' });
-    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true); // n2 → n1
-    expect(session.opQueue.applied).toHaveLength(1);
-
-    // Now arm at n1 and complete onto n2, which now starts a slur.
-    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true); // arms at n1
-    expect(session.spanAnchor).toEqual({ key: 'n1', kind: 'slur' });
-    session.handleIntent({ type: 'nextPosition' });
-    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
-    expect(session.spanAnchor).toBeNull();
-    // The armed gesture won: a slur was WRITTEN, not removed.
-    expect(session.opQueue.applied).toHaveLength(2);
-    expect(session.opQueue.applied[1].op).toMatchObject({
-      type: 'setSlur',
-      fromNoteKey: 'n1',
-      toNoteKey: 'n2'
-    });
-  });
-
-  it('drops an armed anchor without touching the document, and only when one is armed', () => {
-    // Escape's job (core-rung-addressing.md 4). It used to ride inside
-    // `relaxSelection`, which meant Shift+↑ spent its first press after a `S`
-    // cancelling rather than widening — an exception nobody could see.
-    const session = new EditorSession(makeDoc());
-    expect(session.handleIntent({ type: 'dropAnchor' })).toBe(false); // nothing armed
-    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
-    expect(session.spanAnchor).not.toBeNull();
-    expect(session.handleIntent({ type: 'dropAnchor' })).toBe(true);
-    expect(session.spanAnchor).toBeNull();
-    expect(session.opQueue.applied).toHaveLength(0);
-
-    // And widening is now unconditionally widening.
-    expect(session.handleIntent({ type: 'toggleSlur' })).toBe(true);
-    expect(session.handleIntent({ type: 'relaxSelection' })).toBe(true);
-    expect(session.selectionLevel).toBe('event');
-    expect(session.spanAnchor).not.toBeNull();
-  });
 });

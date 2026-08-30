@@ -360,7 +360,6 @@ export const PENDING_PRECEDENCE = [
   'popover',
   'overlay',
   'pendingFret',
-  'spanAnchor',
   'selection'
 ] as const;
 

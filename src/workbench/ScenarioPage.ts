@@ -2284,25 +2284,12 @@ export class ScenarioPage extends LitElement {
       else this.tabDigits.cancel();
       return;
     }
-    // 4. an armed spanner anchor. Enter dispatches the intent the anchor's
-    //    OWN letter would have — which is why the anchor carries its kind —
-    //    so the trace records `toggleSlur` twice exactly as two presses of
-    //    `S` do, and replay is unchanged.
-    const anchor = this.session.spanAnchor;
-    if (anchor) {
-      this.stripIntent(
-        commit
-          ? anchor.kind === 'slur'
-            ? { type: 'toggleSlur' }
-            : { type: 'toggleBeam' }
-          : { type: 'dropAnchor' }
-      );
-      return;
-    }
-    // 5. nothing pending. Escape deselects — view chrome, deliberately not
-    //    session history, so it is never recorded and never replayed. Enter
-    //    opens the rung inspector — LAST in the walk, so a half-typed fret or
-    //    an armed spanner never opens one (the roadmap's agreement 1).
+    // 4. nothing pending. (The armed spanner anchor that used to sit here
+    //    retired with the two-press gesture — core-selection-range-grain.md
+    //    decision 5, the user's call.) Escape deselects — view chrome,
+    //    deliberately not session history, so it is never recorded and never
+    //    replayed. Enter opens the rung inspector — LAST in the walk, so a
+    //    half-typed fret never opens one (the roadmap's agreement 1).
     if (!commit) {
       this.cursorHidden = true;
       this.syncFromSession();
@@ -4257,14 +4244,6 @@ export class ScenarioPage extends LitElement {
       <div class="entry-state">
         entry duration:
         ${session.entryDurationBase}${'.'.repeat(session.entryDurationDots)}
-        ${session.spanAnchor
-          ? html`<span
-              class="span-anchor"
-              title=${`press ${session.spanAnchor.kind === 'slur' ? 'S' : 'B'} at the far note` +
-              ` or Enter to complete the ${session.spanAnchor.kind} · Esc drops it`}
-              >· ${session.spanAnchor.kind} from ${session.spanAnchor.key}…</span
-            >`
-          : nothing}
       </div>
       <ol class="ops">
         <li

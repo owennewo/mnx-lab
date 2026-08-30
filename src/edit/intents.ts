@@ -55,10 +55,6 @@ export type NavigationIntent =
    *  enforced ONCE, here: a rung the document does not present is a refusal,
    *  never a walk that parks at whatever it could reach. */
   | { type: 'goToLevel'; level: SelectionLevel }
-  /** Abandon an armed spanner anchor without touching the document. Escape's,
-   *  and only Escape's: it used to ride inside `relaxSelection`, which meant
-   *  Shift+↑ silently spent its first press cancelling instead of widening. */
-  | { type: 'dropAnchor' }
   /** Horizontal selection is data too: Shift extends the active edge by the
    * rung's concrete unit (or to its end), while Ctrl/Meta+A records a live
    * closure rather than a frozen list of members. */
@@ -265,7 +261,6 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'relaxSelection',
   'tightenSelection',
   'goToLevel',
-  'dropAnchor',
   'extendSelection',
   'closeSelection',
   'setProjection',

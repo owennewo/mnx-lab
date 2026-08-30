@@ -29,6 +29,7 @@ import type { EditorIntent } from './intents.ts';
 import type { SelectionState } from './selection.ts';
 import type { SelectionClipEnvelope } from './selectionClip.ts';
 import type { PartialContainerSpec } from './setupGrammar.ts';
+import { syntheticNoteKey } from '../model/noteKeys.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import { parseChordSymbol, renderChordSymbol } from '../model/harmony.ts';
 import { findNoteAddress, forEachNoteAddress } from '../model/noteWalk.ts';
@@ -396,6 +397,15 @@ export type EditOp =
       noteKey: string;
     }
   | {
+      /** Move an existing slur's far end to another note's event, keeping
+       *  side/lineType in place — the press-at-the-end EXTEND half of
+       *  core-selection-range-grain.md decision 5. `noteKey` names the
+       *  slur's START note exactly as `removeSlur` does. */
+      type: 'retargetSlur';
+      noteKey: string;
+      toNoteKey: string;
+    }
+  | {
       /** Re-type an existing tie (`crossVoice`, `arpeggio`, `crossJump`) or
        *  make a target-less `lv` tie. `toggleTie` remains the removal half. */
       type: 'setTieVariant';
@@ -633,6 +643,17 @@ export type EditOp =
       measureIndex: number;
       path: number[];
       partIndex?: number;
+    }
+  | {
+      /** Append one event to an existing beam — the press-at-the-end extend.
+       *  The path addresses the beam exactly as `removeBeam` does; the new
+       *  member's event id is minted if absent. Refuses across a barline —
+       *  a beam lives in one measure. */
+      type: 'extendBeam';
+      measureIndex: number;
+      path: number[];
+      partIndex?: number;
+      toNoteKey: string;
     }
   | {
       /**
@@ -1576,6 +1597,24 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       else delete event.slurs;
       return next;
     }
+    case 'retargetSlur': {
+      const located = findKeyedNote(next, op.noteKey);
+      const to = findKeyedNote(next, op.toNoteKey);
+      if (!located || !to) return next;
+      const event = located.event;
+      const slur = (event.slurs ?? []).find(candidate => slurStartsAt(candidate, event, located.note));
+      if (!slur || to.event === event) return next;
+      to.event.id ??= mintEventId(next);
+      slur.target = to.event.id;
+      // Re-pin or un-pin the far end to match the new target's shape.
+      if (slur.endNote !== undefined || (to.event.notes?.length ?? 0) > 1) {
+        to.note.id ??= mintNoteId(next);
+        slur.endNote = to.note.id;
+      } else {
+        delete slur.endNote;
+      }
+      return next;
+    }
     case 'setTieVariant': {
       const located = findKeyedNote(next, op.noteId);
       if (!located) return next;
@@ -2127,6 +2166,24 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const kept = owner.beams.filter((_, i) => i !== index);
       if (kept.length > 0) owner.beams = kept;
       else delete owner.beams; // no tombstone
+      return next;
+    }
+    case 'extendBeam': {
+      const measure = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
+      const to = findKeyedNote(next, op.toNoteKey);
+      if (!measure?.beams || op.path.length === 0 || !to) return next;
+      if (to.measureIndex !== op.measureIndex) return next; // one measure per beam
+      let owner: { beams?: MnxBeam[] } = measure;
+      for (const step of op.path.slice(0, -1)) {
+        const child = owner.beams?.[step];
+        if (!child) return next;
+        owner = child;
+      }
+      const beam = owner.beams?.[op.path[op.path.length - 1]];
+      if (!beam) return next;
+      to.event.id ??= mintEventId(next);
+      if (beam.events.includes(to.event.id)) return next;
+      beam.events = [...beam.events, to.event.id];
       return next;
     }
     case 'setSupport': {
@@ -3034,6 +3091,81 @@ export function hasSlurStartingAt(doc: MnxStructure, noteKey: string): boolean {
   if (!located) return false;
   const event = located.event;
   return (event.slurs ?? []).some(slur => slurStartsAt(slur, event, located.note));
+}
+
+/** Does a slur END at this note's event? Returns the start-note key that
+ *  `removeSlur`/`retargetSlur` address, so the press-at-the-end gesture can
+ *  find its owner (core-selection-range-grain.md decision 5). */
+export function slurEndingAt(
+  doc: MnxStructure,
+  noteKey: string
+): { ownerNoteKey: string } | null {
+  const located = findKeyedNote(doc, noteKey);
+  const targetId = located?.event.id;
+  if (!targetId) return null;
+  let found: { ownerNoteKey: string } | null = null;
+  const visitEvent = (
+    event: MnxEvent,
+    measureIndex: number,
+    voiceIndex: number,
+    eventIndex: number,
+    inContainer: boolean
+  ): void => {
+    for (const slur of event.slurs ?? []) {
+      if (slur.target !== targetId) continue;
+      // The owner key `removeSlur`/`retargetSlur` resolve: an id when the
+      // note has one, else the layouts' own synthetic key. The synthetic
+      // form encodes the top-level staff-1 walk, so an id-less note inside
+      // a container cannot be addressed here and is skipped.
+      const owner =
+        slur.startNote ??
+        event.notes?.[0]?.id ??
+        (inContainer ? undefined : syntheticNoteKey(measureIndex, voiceIndex, eventIndex, 0));
+      if (owner !== undefined) found = { ownerNoteKey: owner };
+    }
+  };
+  for (const part of doc.parts ?? []) {
+    for (const measure of part.measures ?? []) {
+      const measureIndex = part.measures!.indexOf(measure);
+      const voiceByStaff = new Map<number, number>();
+      for (const sequence of measure.sequences ?? []) {
+        const staffIndex = sequence.staff ?? 1;
+        const voiceIndex = (voiceByStaff.get(staffIndex) ?? -1) + 1;
+        voiceByStaff.set(staffIndex, voiceIndex);
+        sequence.content.forEach((item, eventIndex) => {
+          if (isTimedEvent(item)) visitEvent(item, measureIndex, voiceIndex, eventIndex, false);
+          else for (const child of (item as { content?: MnxSequenceItem[] }).content ?? []) {
+            if (isTimedEvent(child)) visitEvent(child, measureIndex, voiceIndex, eventIndex, true);
+          }
+        });
+      }
+    }
+  }
+  return found;
+}
+
+/** Does a beam END at this note's event? The removal/extension address, the
+ *  mirror of `beamStartingAt` below. */
+export function beamEndingAt(
+  doc: MnxStructure,
+  noteKey: string
+): { measureIndex: number; path: number[]; partIndex: number } | null {
+  const located = findKeyedNote(doc, noteKey);
+  if (!located?.event.id) return null;
+  const eventId = located.event.id;
+  const partIndex = findNoteAddress(doc, noteKey)?.partIndex ?? 0;
+  const beams = doc.parts?.[partIndex]?.measures?.[located.measureIndex]?.beams ?? [];
+  let best: number[] | null = null;
+  const visit = (list: MnxBeam[], prefix: number[]): void => {
+    list.forEach((beam, index) => {
+      const path = [...prefix, index];
+      const last = beam.events?.[beam.events.length - 1];
+      if (last === eventId && (best === null || path.length > best.length)) best = path;
+      visit(beam.beams ?? [], path);
+    });
+  };
+  visit(beams, []);
+  return best === null ? null : { measureIndex: located.measureIndex, path: best, partIndex };
 }
 
 /** Does this slur start at `note`? With chord pins the `startNote` names it;

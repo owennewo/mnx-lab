@@ -164,7 +164,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'Escape' }],
     group: 'selection',
     meaning: {
-      all: 'abandon the innermost pending thing — an open popover or inspector, a half-typed fret, an armed slur/beam anchor — or deselect when there is none'
+      all: 'abandon the innermost pending thing — an open popover or inspector, or a half-typed fret — or deselect when there is none'
     }
   },
   {
@@ -407,7 +407,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'KeyB' }],
     group: 'adornments',
     meaning: {
-      note: 'beam: arm at the first note, press again at the last (Esc drops it) — bend in the tab projection',
+      note: 'beam to the next note; at a beam’s end extends it, at its start removes it — bend in the tab projection',
       // The selected-run form rode the ranges to the event rung (the floor axis).
       event: 'beam the selected event run'
     }
@@ -441,7 +441,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'KeyS' }],
     group: 'adornments',
     meaning: {
-      note: 'slur: arm at this note, press again at the far note (Esc drops it) — slide in the tab projection',
+      note: 'slur to the next note; at a slur’s end extends it, at its start removes it — slide in the tab projection',
       event: 'slur the selected event run'
     }
   },
