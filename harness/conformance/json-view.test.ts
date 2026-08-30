@@ -6,7 +6,7 @@
 // model/noteKeys.ts and model/jsonView.ts mirroring the same traversal — keep
 // them in lockstep" — and until now nothing checked that. It also had no UI
 // consumer, so the traversal could have drifted for months without anyone
-// noticing; the score panel's json tab is about to depend on it heavily
+// noticing; the document panel's json tab is about to depend on it heavily
 // (roadmap/proposed/core-json-view.md), which is what makes the gap urgent
 // rather than theoretical.
 //

@@ -46,7 +46,7 @@ const TOKENS_SRC = read('elements/tokens.ts');
 
 /**
  * The body of `export const <name> = css\`…\``, with any `${other}`
- * composition expanded — which is how `viewerTokens` picks up `scoreTokens`
+ * composition expanded — which is how `viewerTokens` picks up `notationTokens`
  * and `radiusTokens`. Without the expansion every composed token would read
  * as undeclared.
  */
@@ -92,7 +92,7 @@ const radiusTokens = block('radiusTokens');
 // Components that carry their own token block and can be checked in isolation.
 // SelectionTray is deliberately absent: it ships self-contained literal styles
 // (core-selection-tray-visuals.md), and campaign item 4 is what folds it in.
-const VIEWER = 'elements/ScoreViewer.ts';
+const VIEWER = 'elements/DocumentViewer.ts';
 
 describe('design tokens', () => {
   describe('the embed is self-sufficient', () => {

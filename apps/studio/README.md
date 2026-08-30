@@ -17,7 +17,7 @@ Studio's framework is **deliberately undecided** — React, Svelte, Lit, or what
 right *when it starts*. That choice stays open because studio may consume only
 framework-neutral surfaces:
 
-- the **`elements/`** custom elements (score viewer, playback surface) via the embed
+- the **`elements/`** custom elements (document viewer, playback surface) via the embed
   artifact or the `mnx-lab` package's subpath exports;
 - the **`mnx-lab` library** (`mnx-lab/model`, `mnx-lab/engine`, `mnx-lab/audio`);
 - the **Worker origin's** reserved API seams.

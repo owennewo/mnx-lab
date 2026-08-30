@@ -1,12 +1,12 @@
 import { css } from 'lit';
 
 /**
- * THE SCORE'S OWN TOKENS — the paper, its ink, its rules, and the accent.
+ * THE NOTATION'S OWN TOKENS — the paper, its ink, its rules, and the accent.
  *
  * Split out of `designTokens` (2026-08-14) because the viewer must be
  * SELF-SUFFICIENT. `designTokens` is declared on the *app component's* host and
  * inherits down through the workbench's shadow roots; an embedded
- * `<mnx-score-viewer>` has no such ancestor, so every one of these was
+ * `<mnx-document-viewer>` has no such ancestor, so every one of these was
  * UNDEFINED on a host page — `background: var(--paper)` fell back to
  * transparent, ink inherited the host's text colour, and
  * `stroke: var(--paper-line)` computed to `none`, i.e. **the staff lines were
@@ -15,15 +15,15 @@ import { css } from 'lit';
  * roadmap/complete/core-viewer-embedded-app.md.
  *
  * THEME: the paper now follows the colour scheme, reversing the older "the
- * score always renders on warm paper, even under dark chrome" rule — a dark
- * page with a blazing white score is the thing the embed app made obvious.
+ * notation always renders on warm paper, even under dark chrome" rule — a dark
+ * page with a blazing white paper is the thing the embed app made obvious.
  * Resolution is automatic and needs no API: `light-dark()` resolves against
  * the *used* `color-scheme`, which is an inherited property, so the component
  * honours whatever the host page declared (and, for a page that says
- * `light dark`, the reader's OS preference). `<mnx-score-viewer theme="…">`
- * overrides explicitly — see ScoreViewer.
+ * `light dark`, the reader's OS preference). `<mnx-document-viewer theme="…">`
+ * overrides explicitly — see DocumentViewer.
  */
-export const scoreTokens = css`
+export const notationTokens = css`
   :host {
     /* ACCENT vs the engine's frozen error red — read this before retuning.
        The Modernist accent (#ec3013) and the diagnostic red that
@@ -86,8 +86,8 @@ export const radiusTokens = css`
 `;
 
 /**
- * The tokens `<mnx-score-viewer>` needs to stand ALONE on a stranger's page:
- * the score tokens plus the handful of chrome vars its own stylesheet (and
+ * The tokens `<mnx-document-viewer>` needs to stand ALONE on a stranger's page:
+ * the notation tokens plus the handful of chrome vars its own stylesheet (and
  * `sharedChrome`/`scrollbars`) reference. Declared on the viewer's own host, so
  * an embed is fully styled with zero host setup, and `--mnx-*` overrides work
  * there for the first time.
@@ -99,7 +99,7 @@ export const radiusTokens = css`
  * light there until someone deliberately opts the app in.
  */
 export const viewerTokens = css`
-  ${scoreTokens}
+  ${notationTokens}
   ${radiusTokens}
   :host {
     /* TWO VOICES, STRICTLY: Archivo for anything a person wrote or reads as
@@ -161,11 +161,11 @@ export const viewerTokens = css`
  * they inherit through every child shadow root; embedders can override via the
  * public --mnx-* custom properties (P4: no styles on `document`).
  *
- * Composes `scoreTokens` so the app chrome and the score agree on paper and
+ * Composes `notationTokens` so the app chrome and the notation agree on paper and
  * accent without either duplicating the values.
  */
 export const designTokens = css`
-  ${scoreTokens}
+  ${notationTokens}
   ${radiusTokens}
   :host {
     /* TWO VOICES, STRICTLY: Archivo for anything a person wrote or reads as
@@ -504,4 +504,3 @@ export const scrollbars = css`
     background: transparent;
   }
 `;
-

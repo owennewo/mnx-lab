@@ -7,7 +7,7 @@
 
 ## The gap, measured
 
-The horizontal axis is always **fitted**: `ScoreViewer` sends no `pxPerSp`, so
+The horizontal axis is always **fitted**: `DocumentViewer` sends no `pxPerSp`, so
 the plan is laid out to the viewport width and `fitPxPerSp` floors the scale at
 the 10px/sp baseline. Staff scale then multiplies only the ink. With rigid
 columns priced on the ink scale ([core-ink-priced-columns.md](../../complete/core-ink-priced-columns.md))

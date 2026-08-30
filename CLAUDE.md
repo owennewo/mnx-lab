@@ -262,7 +262,7 @@ compare | json — roadmap/complete/core-score-hud.md created it;
 roadmap/complete/workbench-score-panel.md cut it from seven to five and gave every tab
 the same five-band frame: tab strip, context bar, ONE scrolling body, footer), which holds
 all page chrome including the selection HUD and the per-part instrument override
-(the HUD's ensemble table → `<mnx-score-viewer>.partTabSetups`; the flat
+(the HUD's ensemble table → `<mnx-document-viewer>.partTabSetups`; the flat
 `stringsOverride`/`capoOverride` pair remains for single-instrument embeds —
 presentation only). Tab/both exist only when the strings are KNOWN — declared in
 the document, or supplied through that override. No instrument is ever assumed.

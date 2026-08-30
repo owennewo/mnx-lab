@@ -188,7 +188,7 @@ const LADDER_W = 74;
 /**
  * Total tray width. The spec draws a 222px tile panel beside the ladder, which
  * was enough for the six tiles it mocked; our busiest scope (`event`) carries
- * eighteen, and at three columns the tray outgrows the score pane it floats
+ * eighteen, and at three columns the tray outgrows the document pane it floats
  * over. So the panel keeps the 470px total the previous tray established —
  * five columns of the spec's own 60px tiles — and every other metric is the
  * spec's.
@@ -444,7 +444,7 @@ export class SelectionTray extends LitElement {
     .grid {
       flex: 1;
       min-height: 0;
-      /* ONE scrolling body, the frame the score panel already uses: the meta
+      /* ONE scrolling body, the frame the document panel already uses: the meta
        * line and the search row stay put, and only the tiles move. Scrolling
        * the whole tray instead would take the search box away exactly when a
        * long rung most needs it. */

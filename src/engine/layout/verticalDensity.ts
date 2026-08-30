@@ -101,7 +101,7 @@ export function clampPadDensity(value: number | undefined | null): number {
  * arm's travel and sit there for the rest of it, which reads as a broken
  * control rather than an exhausted one.
  *
- * Held in the ENGINE as a mapping and applied by the SURFACE (`ScoreViewer`
+ * Held in the ENGINE as a mapping and applied by the SURFACE (`DocumentViewer`
  * derives `densityPad` from the effective `densityH` only when the host has
  * not set one). core-vertical-density.md's own ruling: coupling in the control
  * is reversible, conflating the scalars in the engine would not be.

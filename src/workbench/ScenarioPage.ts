@@ -2,7 +2,7 @@
 // The compare view is the review surface — our render beside the spec's
 // reference engraving (served by a dev-only middleware from the pinned
 // vendor/mnx checkout; in a static deploy the reference pane degrades to a
-// note). Rendering goes through the elements/ score viewer, property-driven.
+// note). Rendering goes through the elements/ document viewer, property-driven.
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { corpus, type ScenarioEntry } from '../corpus/corpus.ts';
@@ -12,7 +12,7 @@ import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
-import type { ScoreViewer, ViewMode } from '../elements/ScoreViewer.ts';
+import type { DocumentViewer, ViewMode } from '../elements/DocumentViewer.ts';
 import type { EnclosureKind, SelectionContext, SelectionSpan } from '../elements/mnxContext.ts';
 import { EditorSession, replayIntents } from '../edit/session.ts';
 import { elementKeys, runDestructWalk } from '../edit/destructWalk.ts';
@@ -101,7 +101,7 @@ import {
   TRAY_SHAFT_H,
   TRAY_WIDTH
 } from './SelectionTray.ts';
-import '../elements/ScoreViewer.ts';
+import '../elements/DocumentViewer.ts';
 import './SelectionTray.ts';
 import './RungInspector.ts';
 import { buildInspectorView } from './inspectorRows.ts';
@@ -751,7 +751,7 @@ export class ScenarioPage extends LitElement {
          lower. The two read as one control because they are the same shape and
          the same mark, not because they share a baseline.
 
-         The ground stays the score pane's --bg rather than --bg-context,
+         The ground stays the document pane's --bg rather than --bg-context,
          because a tab strip takes the ground of the REGION IT HEADS — which is
          why .panel-tabs sits on the panel's --surface and this one does not. */
       .head {
@@ -1037,7 +1037,7 @@ export class ScenarioPage extends LitElement {
          call rather than the element's 5px embed default (an outer rule beats
          the shadow root's own :host). 14px is the inset the zoom pad already
          sits at, which is why the two read as one decision. */
-      mnx-score-viewer {
+      mnx-document-viewer {
         padding: 14px;
       }
 
@@ -2452,7 +2452,7 @@ export class ScenarioPage extends LitElement {
       (level === 'partMeasure' && (intent.type === 'jumpUp' || intent.type === 'jumpDown'));
     if (!vertical) return undefined;
 
-    const rows = this.renderRoot?.querySelector<ScoreViewer>('mnx-score-viewer')?.systemRows();
+    const rows = this.renderRoot?.querySelector<DocumentViewer>('mnx-document-viewer')?.systemRows();
     if (!rows || rows.length === 0) return null; // nothing painted yet
     const delta = intent.type === 'lineDown' || intent.type === 'jumpDown' ? 1 : -1;
     const target = neighbourSystemMeasure(rows, session.cursor.measureIndex, delta);
@@ -2565,7 +2565,7 @@ export class ScenarioPage extends LitElement {
   private closeTray() {
     this.trayOpen = false;
     // The keyboard goes back to the editor, not into the void.
-    this.renderRoot.querySelector<HTMLElement>('mnx-score-viewer')?.focus();
+    this.renderRoot.querySelector<HTMLElement>('mnx-document-viewer')?.focus();
   }
 
   /** Enter's door (handlePending, level 5). The inspector follows the pane
@@ -2586,7 +2586,7 @@ export class ScenarioPage extends LitElement {
   private closeInspector() {
     this.inspectorOpen = false;
     this.inspectorError = null;
-    this.renderRoot.querySelector<HTMLElement>('mnx-score-viewer')?.focus();
+    this.renderRoot.querySelector<HTMLElement>('mnx-document-viewer')?.focus();
   }
 
   /** The inspector's line, applied: parse, fire, and either clear the error
@@ -3507,7 +3507,7 @@ export class ScenarioPage extends LitElement {
     if (entry.invalidByDesign) return this.exhibit();
 
     return html`
-      <mnx-score-viewer
+      <mnx-document-viewer
         .mnxDoc=${this.doc}
         .view=${viewMode}
         .zoom=${this.staffScale}
@@ -3518,7 +3518,7 @@ export class ScenarioPage extends LitElement {
         @note-selected=${this.onNoteSelected}
         @selection-anchored=${this.onSelectionAnchored}
         @render-scale=${this.onRenderScale}
-      ></mnx-score-viewer>
+      ></mnx-document-viewer>
     `;
   }
 
@@ -3531,7 +3531,7 @@ export class ScenarioPage extends LitElement {
    *  justifier absorbs. Asked live rather than pushed: it moves with the
    *  viewport, and the viewer caches it per paint. */
   private densitySteps = () =>
-    this.renderRoot?.querySelector<ScoreViewer>('mnx-score-viewer')?.densitySteps() ?? null;
+    this.renderRoot?.querySelector<DocumentViewer>('mnx-document-viewer')?.densitySteps() ?? null;
 
   private onZoomChange(event: CustomEvent<ZoomPadChange>) {
     const { staffScale, densityH } = event.detail;
@@ -3608,8 +3608,8 @@ export class ScenarioPage extends LitElement {
         </div>
         <button
           class="panel-toggle"
-          title="${this.panelHidden ? 'show' : 'hide'} the score panel (Ctrl+Alt+B)"
-          aria-label="${this.panelHidden ? 'show' : 'hide'} the score panel"
+          title="${this.panelHidden ? 'show' : 'hide'} the document panel (Ctrl+Alt+B)"
+          aria-label="${this.panelHidden ? 'show' : 'hide'} the document panel"
           aria-expanded=${!this.panelHidden}
           @click=${() => this.togglePanel()}
         >
@@ -4145,7 +4145,7 @@ export class ScenarioPage extends LitElement {
                   ? // The score failed to fetch too, so this image 404'd for the same
                     // reason. Don't send them chasing the submodule.
                     html`Reference engraving unavailable — the same transport failure as the
-                    score pane, not a missing image.`
+                    document pane, not a missing image.`
                   : html`Reference engraving unavailable — the images come from the pinned
                     <code>vendor/mnx</code> checkout, copied into the build when one is present.
                     This build was made without the submodule; run
@@ -4285,7 +4285,7 @@ export class ScenarioPage extends LitElement {
           title="undo everything — back to the start"
           @click=${() => this.jumpToOp(0)}
         >
-          <span class="op-what">start · ${startIsEmpty ? 'the empty document {}' : 'the score as loaded'}</span>
+          <span class="op-what">start · ${startIsEmpty ? 'the empty document {}' : 'the document as loaded'}</span>
           <span class="op-keys">—</span>
           <span class="op-intent">before any op</span>
         </li>
@@ -4432,7 +4432,7 @@ export class ScenarioPage extends LitElement {
             selection
           </button>
           <button aria-current=${!scoped} @click=${() => (this.jsonScope = 'whole')}>
-            whole score
+            whole document
           </button>
         </span>
         <span class="ctx-dim"

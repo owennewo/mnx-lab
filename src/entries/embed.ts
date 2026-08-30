@@ -16,7 +16,7 @@
 // the font itself. A host may still override with the `smufl-base` attribute
 // on the script tag (assets mirrored elsewhere, or split to a CDN).
 import { setSmuflBasePath } from '../engine/smufl/smufl.ts';
-import '../elements/ScoreViewer.ts';
+import '../elements/DocumentViewer.ts';
 
 /** The directory this script was loaded from, or null outside a browser. */
 function scriptDirectory(): string | null {

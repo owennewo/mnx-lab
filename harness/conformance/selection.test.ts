@@ -552,7 +552,7 @@ describe('selection ladder', () => {
   });
 
   it('opens on the rung a rail-crossing gesture was standing on', () => {
-    // The score rung's ↑/↓ is the neighbouring DOCUMENT, and crossing one
+    // The document rung's ↑/↓ is the neighbouring DOCUMENT, and crossing one
     // builds a new session. The mount carries the rung across so the gesture
     // is REPEATABLE — `selectionLevel === 'document'` is the exact condition
     // ScenarioPage tests before escalating again, so a session that opened at
@@ -649,7 +649,7 @@ describe('selection ladder', () => {
     const session = new EditorSession(doc);
     expect(session.handleIntent({ type: 'setPart', partIndex: 1 })).toBe(true);
     while (session.selectionLevel !== 'document') session.handleIntent(relax);
-    // The score rung's footprint is the whole score, so press 1 clears every
+    // The document rung's footprint is the whole document, so press 1 clears every
     // part's ink — including the parts that are not the one being removed.
     // Only then is the skeleton free to dissolve.
     expect(session.handleIntent({ type: 'delete' })).toBe(true);

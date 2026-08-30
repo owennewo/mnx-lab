@@ -150,7 +150,7 @@ export class EditorSession {
        * The rung this session OPENS on, when the host is continuing a ladder
        * gesture that crossed documents rather than opening a new one.
        *
-       * The score rung's ↑/↓ is the neighbouring DOCUMENT — a fact about the
+       * The document rung's ↑/↓ is the neighbouring DOCUMENT — a fact about the
        * host, so the mount resolves it (see `escalateToRail`) — and crossing
        * a document boundary builds a new session. Without this the new one
        * opened at `note`, so the second ↑ meant "move a notehead" and walking
@@ -1390,7 +1390,7 @@ export class EditorSession {
       case 'extendSelection':
         return this.extendSelection(intent.direction);
       case 'closeSelection': {
-        // The score rung already denotes the whole score; closing it again is
+        // The document rung already denotes the whole document; closing it again is
         // semantically and structurally idempotent.
         if (this.selectionState.level === 'document') return false;
         // The floor axis (core-selection-floor-axis.md): a closure asks for
@@ -1514,7 +1514,7 @@ export class EditorSession {
       // The vertical axis belongs to the RUNG, not always to the line (the
       // per-level navigation map): the staff/fingerboard at note level, the
       // voice stack at the event/container rungs, the system's staves at part-measure.
-      // The measure and score rungs are resolved by the MOUNT — "the
+      // The measure and document rungs are resolved by the MOUNT — "the
       // neighbouring system" is a fact about the paint and "the next document"
       // one about the host, neither visible from this DOM-free layer, so both
       // arrive here as an already-resolved intent (`goToMeasure`) or not at all.
@@ -1890,7 +1890,7 @@ export class EditorSession {
       case 'section':
         return this.sectionStep(before, delta);
       case 'document':
-        return before; // the whole score is selected — nowhere to go
+        return before; // the whole document is selected — nowhere to go
     }
   }
 

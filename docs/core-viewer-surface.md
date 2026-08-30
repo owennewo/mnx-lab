@@ -1,4 +1,4 @@
-# The viewer surface — `<mnx-score-viewer>`'s public contract
+# The viewer surface — `<mnx-document-viewer>`'s public contract
 
 The embed face's product is one custom element. This document is its contract:
 what a host page may set, what it must never need to compute, and where a new
@@ -7,14 +7,14 @@ the layer diagram in CLAUDE.md — **the review question "does this belong on
 the surface?" made answerable.**
 
 Design rationale and staging live in
-[roadmap/inprogress/core-viewer-surface.md](../roadmap/inprogress/core-viewer-surface.md).
+[roadmap/complete/core-viewer-surface.md](../roadmap/complete/core-viewer-surface.md).
 
 ## The layering rule
 
 ```
 engine RenderOptions        pure, Node-safe — the behavior ground truth
    ↑ bound by
-element props/attributes    <mnx-score-viewer> — a BINDING, not a second implementation
+element props/attributes    <mnx-document-viewer> — a BINDING, not a second implementation
    ↑ composed by
 workbench chrome            toolbar, URL ?view=, palette — explicitly NOT the surface
 ```
@@ -32,7 +32,7 @@ attribute, so a passive host needs no JavaScript at all:
 
 ```html
 <script type="module" src="https://…/mnx-lab.esm.js"></script>
-<mnx-score-viewer view="tab" theme="dark"></mnx-score-viewer>
+<mnx-document-viewer view="tab" theme="dark"></mnx-document-viewer>
 ```
 
 Only genuinely complex values (the document, selection, playback state) are
@@ -199,7 +199,7 @@ rather than chosen.
 
 The numbers are the ones **on the screen**, not the ones the engine asked for,
 and above about 200% staff scale those differ. The pane never scrolls
-sideways: `#score-container svg` carries `max-width: 100%`, so a drawing wider
+sideways: `#projection-container svg` carries `max-width: 100%`, so a drawing wider
 than the pane is scaled down by the browser — both axes. Rigid columns are
 ink-priced, so a larger staff widens the drawing as well as heightening it, the
 shrink grows with the ask, and the two nearly cancel: measured 2026-08-21 in a

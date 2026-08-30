@@ -4,7 +4,7 @@
  * The viewer is its own scroll container (`:host { overflow: auto }`), so a
  * selection that moves to the next system — or a re-layout that moves the
  * system out from under a selection standing still — can leave the reader
- * looking at music they are no longer editing. `elements/ScoreViewer.ts` owns
+ * looking at music they are no longer editing. `elements/DocumentViewer.ts` owns
  * the DOM half of the fix: which box, which scroller, when to ask.
  *
  * The rule it applies is pure arithmetic, and it lives here beside
@@ -12,7 +12,7 @@
  * machinery headlessly and may not reach into `elements/`, so presentation
  * geometry worth pinning is kept where a test can reach it.
  *
- * One axis, on purpose: `#score-container svg` carries `max-width: 100%`, so
+ * One axis, on purpose: `#projection-container svg` carries `max-width: 100%`, so
  * the drawing is scaled down to the pane rather than scrolled sideways. There
  * is no horizontal scroll to follow.
  */

@@ -779,7 +779,7 @@ back up to `proposed/` the moment it is.
   parts, 32 in containers, 22 on staff 2) — the `parts[0]`/staff-1 assumption,
   which is items 13b and 11b, not coincidence.
 - **[core-viewer-surface.md](complete/core-viewer-surface.md)** — name and define **the viewer
-  surface**: `<mnx-score-viewer>`'s public contract (props/attributes/events), today an
+  surface**: `<mnx-document-viewer>`'s public contract (props/attributes/events), today an
   undesigned accretion. Layered rule (engine `RenderOptions` → element bindings → workbench
   chrome), attribute-first, the `view="auto"` precedence chain (user > host > document
   `staffKind` hint > default), a set-valued `hide` knob, and eviction of workbench leakage

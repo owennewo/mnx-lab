@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Score reader — an MNX Lab embed</title>
+    <title>Document reader — an MNX Lab embed</title>
     <!--
       A deliberately FOREIGN host page (roadmap/proposed/core-viewer-embedded-app.md).
       It knows three things and no more: the URL of the embed artifact, the URLs
@@ -115,13 +115,13 @@
         background: canvas;
       }
 
-      mnx-score-viewer {
+      mnx-document-viewer {
         height: 460px;
       }
 
       /* The host restyles the component through its public custom properties
          — the only styling seam a shadow-DOM element offers. */
-      mnx-score-viewer {
+      mnx-document-viewer {
         --mnx-accent: #7a4a2f;
       }
 
@@ -139,13 +139,13 @@
   </head>
   <body>
     <main>
-      <h1>Score reader</h1>
+      <h1>Document reader</h1>
       <p class="lede">
-        A plain web page that embeds <code>&lt;mnx-score-viewer&gt;</code> from the
+        A plain web page that embeds <code>&lt;mnx-document-viewer&gt;</code> from the
         MNX Lab embed artifact. Read-only: no editing, no workbench.
       </p>
 
-      <nav id="scores"></nav>
+      <nav id="documents"></nav>
 
       <div class="themes">
         <span class="group">
@@ -155,10 +155,10 @@
           <button data-page="dark">dark</button>
         </span>
         <span class="group">
-          <span>score</span>
-          <button data-score="auto" aria-current="true">auto</button>
-          <button data-score="light">light</button>
-          <button data-score="dark">dark</button>
+          <span>viewer</span>
+          <button data-viewer="auto" aria-current="true">auto</button>
+          <button data-viewer="light">light</button>
+          <button data-viewer="dark">dark</button>
         </span>
         <span class="group">
           <span>density</span>
@@ -176,7 +176,7 @@
       </div>
 
       <div class="frame">
-        <mnx-score-viewer id="viewer"></mnx-score-viewer>
+        <mnx-document-viewer id="viewer"></mnx-document-viewer>
       </div>
 
       <footer id="status"></footer>

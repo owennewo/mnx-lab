@@ -301,7 +301,7 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   { code: 'NumpadEnter', action: 'commitPending' },
   // The library rail toggle (VS Code's Ctrl+B sidebar reflex).
   { code: 'KeyB', ctrl: true, action: 'toggleRail' },
-  // The score panel folds the same way, and VS Code has already taught the
+  // The document panel folds the same way, and VS Code has already taught the
   // chord for the OTHER side: Ctrl+Alt+B is its secondary sidebar. Adding a
   // modifier to the pane toggle beats inventing an unrelated letter, and the
   // browser claims neither.

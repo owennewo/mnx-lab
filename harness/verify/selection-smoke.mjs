@@ -180,7 +180,7 @@ const DUMP = `(() => {
 const IN_VIEW = `(() => {
   const find = (root, depth) => {
     if (!root || depth > 12) return null;
-    const hit = root.querySelector('mnx-score-viewer');
+    const hit = root.querySelector('mnx-document-viewer');
     if (hit) return hit;
     for (const el of root.querySelectorAll('*')) {
       if (el.shadowRoot) { const found = find(el.shadowRoot, depth + 1); if (found) return found; }
@@ -188,7 +188,7 @@ const IN_VIEW = `(() => {
     return null;
   };
   const viewer = find(document, 0);
-  if (!viewer) return JSON.stringify({ error: 'no score viewer on the page' });
+  if (!viewer) return JSON.stringify({ error: 'no document viewer on the page' });
   const g = viewer.shadowRoot.querySelector('svg > g.enclosure:not(.enclosure-transition)');
   if (!g) return JSON.stringify({ error: 'nothing is enclosed — no selection to keep in view' });
   const box = g.getBoundingClientRect();
@@ -335,7 +335,7 @@ try {
 
   // ZOOMED IN, because that is the only condition under which this can go
   // wrong: at the fitted scale the engraving is drawn to the pane it has, so
-  // the selection cannot leave a viewport the whole score already fits inside.
+  // the selection cannot leave a viewport the whole document already fits inside.
   // Raise the staff scale and the paper outgrows the pane — which is exactly
   // when a reader is moving about a score bar by bar and needs the thing they
   // are editing to still be on screen.

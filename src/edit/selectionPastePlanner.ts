@@ -124,7 +124,7 @@ export interface PasteLanding {
   onsetStart: [number, number];
   onsetEnd: [number, number];
   /** Structural clips land as their natural live closure: a copied part is
-   *  the new part, and a copied score is the whole score. */
+   *  the new part, and a copied document is the whole document. */
   closure?: 'part' | 'document';
 }
 

@@ -147,9 +147,12 @@ try {
 
   // 1. The custom element upgraded — the artifact loaded and registered.
   const upgraded = await cdp.evaluate(
-    `!!customElements.get('mnx-score-viewer') && document.getElementById('viewer').constructor.name !== 'HTMLElement'`
+    `!!customElements.get('mnx-document-viewer') && document.getElementById('viewer').constructor.name !== 'HTMLElement'`
   );
-  if (!upgraded) fail('<mnx-score-viewer> did not upgrade (artifact failed to load/register)');
+  if (!upgraded) fail('<mnx-document-viewer> did not upgrade (artifact failed to load/register)');
+  const obsoleteRegistered = await cdp.evaluate(`!!customElements.get('mnx-score-viewer')`);
+  if (obsoleteRegistered)
+    fail('<mnx-score-viewer> is still registered — the clean pre-1.0 rename grew an alias');
 
   // 2. SMuFL resolved FROM THE ARTIFACT'S OWN ORIGIN. The host serves no
   // /smufl, so a rendered stave proves the self-locating base worked.
@@ -217,7 +220,7 @@ try {
     (async () => {
       const v = document.getElementById('viewer');
       // The tab score, selected the way a reader would — by clicking a link.
-      document.querySelectorAll('#scores button')[1].click();
+      document.querySelectorAll('#documents button')[1].click();
       await new Promise(r => setTimeout(r, 1800));
       const svg = v.shadowRoot.querySelector('svg');
       return JSON.stringify({
@@ -248,7 +251,7 @@ try {
   const second = await cdp.evaluate(`
     (async () => {
       const first = document.getElementById('viewer');
-      const clone = document.createElement('mnx-score-viewer');
+      const clone = document.createElement('mnx-document-viewer');
       clone.style.height = '300px';
       document.querySelector('main').append(clone);
       clone.mnxDoc = first.mnxDoc;

@@ -1,6 +1,6 @@
 // The EMBED build face: `npm run build:embed` → dist/embed/mnx-lab.js — one
 // script tag that registers the elements/ custom elements. Self-contained
-// (Lit bundled): a host page adds the tag and uses <mnx-score-viewer>.
+// (Lit bundled): a host page adds the tag and uses <mnx-document-viewer>.
 //
 // LOAD-BEARING: Vite copies `public/` into outDir, which is what puts
 // `smufl/` (metadata + Bravura) NEXT TO the artifact. The embed entry derives

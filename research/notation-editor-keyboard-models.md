@@ -793,7 +793,7 @@ Two observations about the split:
 
 MNX Lab currently sits on the architectural side of that line by construction rather than by
 decision: the workbench is review-first with no editing at all, and the **embed face**
-(`src/entries/embed.ts` → `elements/ScoreViewer.ts`) is a pure viewer shipped as a separate
+(`src/entries/embed.ts` → `elements/DocumentViewer.ts`) is a pure viewer shipped as a separate
 build artifact. The `#/scenario/<id>?view=…` axis is a *presentation* selector in Soundslice's
 sense of page-view options, not an access mode — nothing in the workbench is mutable, so
 there is presently no second state for it to be distinguished from.
@@ -1192,7 +1192,7 @@ tab-first by charter:
   `:focus-visible` all need an explicit story there, and shadow roots are where a naive
   document-level listener silently breaks.
 - Does the review keymap belong in `workbench/` (shell-only, leaf) or `elements/` (so an embedded
-  `ScoreViewer` is keyboard-navigable too)? The embed face arguably needs score navigation
+  `DocumentViewer` is keyboard-navigable too)? The embed face arguably needs score navigation
   more than the workbench does — an embedded score with no keyboard access is inaccessible
   on someone else's site.
 

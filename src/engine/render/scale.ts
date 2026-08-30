@@ -76,7 +76,7 @@ export function renderOutcome(
  * What DOES happen up here is overflow: the horizontal axis stays fitted to
  * the viewport, so at 640% a system is ~2.6× the line width. This comment used
  * to say the page then "scrolls sideways"; it does not, and saying so hid the
- * consequence for two weeks. `<mnx-score-viewer>`'s own CSS gives the score's
+ * consequence for two weeks. `<mnx-document-viewer>`'s own CSS gives the score's
  * svg `max-width: 100%`, so a drawing wider than the pane is scaled back down
  * to fit — BOTH axes — and since the ink pricing that widens the drawing is
  * the same factor that heightens it, the shrink very nearly cancels the ask:

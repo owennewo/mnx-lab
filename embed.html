@@ -33,7 +33,7 @@
         background: #fff;
       }
 
-      mnx-score-viewer {
+      mnx-document-viewer {
         height: 420px;
       }
     </style>
@@ -42,18 +42,18 @@
     <main>
       <h1>A third-party page embedding MNX Lab</h1>
       <p>
-        Everything inside the card is the <code>&lt;mnx-score-viewer&gt;</code> custom element,
+        Everything inside the card is the <code>&lt;mnx-document-viewer&gt;</code> custom element,
         registered by the embed script and fed a document as a property. Shadow DOM keeps the
         styles from leaking in either direction.
       </p>
       <div class="card">
-        <mnx-score-viewer compact></mnx-score-viewer>
+        <mnx-document-viewer compact></mnx-document-viewer>
       </div>
     </main>
     <script type="module">
       import '/src/entries/embed.ts';
       import score from '/scenarios/spec/beams/score.mnx.json';
-      const viewer = document.querySelector('mnx-score-viewer');
+      const viewer = document.querySelector('mnx-document-viewer');
       viewer.mnxDoc = { id: 'embed-demo', name: 'Beams', lastUpdated: 0, mnxJson: score };
     </script>
   </body>

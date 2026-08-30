@@ -1,7 +1,7 @@
 # viewer-embedded — a foreign host page
 
 The third app (workbench · studio · **viewer-embedded**), and the embed
-contract's first real consumer. Read-only by design: it views scores, it does
+contract's first real consumer. Read-only by design: it views documents, it does
 not edit them. See
 [roadmap/complete/core-viewer-embedded-app.md](../../roadmap/complete/core-viewer-embedded-app.md).
 
@@ -13,7 +13,7 @@ tree would test nothing about what a stranger's website actually receives. This
 page knows three things and no more:
 
 1. the URL of the embed artifact,
-2. the URLs of its own score files,
+2. the URLs of its own document files,
 3. the element's public attributes and properties.
 
 It declares no `@font-face` and hosts no SMuFL metadata. If it ever needs to,
@@ -23,19 +23,19 @@ origin root, so any real embed 404'd).
 
 ## The two theme axes
 
-The buttons switch **page** and **score** independently, because all four
+The buttons switch **page** and **viewer** independently, because all four
 combinations have to look right and a host locked to the component's scheme
 can only show two of them.
 
 - **page** flips `color-scheme` on `:root` — the standard declaration, and the
   very signal the component reads when its theme is `auto`. No bespoke
   handshake.
-- **score** sets `<mnx-score-viewer theme>`. `auto` follows the page (because
+- **viewer** sets `<mnx-document-viewer theme>`. `auto` follows the page (because
   `color-scheme` is inherited and the component resolves `light-dark()`
   against it); `light`/`dark` override — a dark site that still wants white
   paper, say.
 
-That second finding was the app's first real catch: on a dark page the score
+That second finding was the app's first real catch: on a dark page the document viewer
 had no styles at all — transparent paper, the host's ink, and staff lines
 with `stroke: none`, i.e. not drawn. The viewer now carries its own tokens.
 
@@ -58,7 +58,7 @@ and inventing a relative one would just tempt someone to serve the artifact
 same-origin. A real host hard-codes its CDN URL in `ARTIFACT_BASE` (`app.js`);
 here, `?base=<url>` supplies it.
 
-The scores in `scores/` are copies, deliberately: a host serves its own
+The documents in `documents/` are copies, deliberately: a host serves its own
 documents. They are not read from `scenarios/` at runtime — coupling the demo
 to the corpus would make it a second workbench.
 

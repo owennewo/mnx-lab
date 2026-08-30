@@ -2,7 +2,7 @@
 // (roadmap/proposed/core-viewer-embedded-app.md)
 //
 // It does exactly what a stranger's site would: load the artifact from a URL,
-// fetch its OWN score files, and set them on the element. Everything else —
+// fetch its OWN document files, and set them on the element. Everything else —
 // fonts, SMuFL metadata, layout, shadow DOM — is the component's problem. That
 // asymmetry is the test: if this file ever grows a workaround, the embed
 // contract has a hole in it.
@@ -24,15 +24,15 @@ const ARTIFACT_BASE = null;
 const params = new URLSearchParams(location.search);
 const base = (params.get('base') ?? ARTIFACT_BASE)?.replace(/\/+$/, '');
 
-/** The scores THIS host serves — its own files, not the lab's corpus. */
-const SCORES = [
-  { id: 'blues', label: 'Twelve-bar blues', file: 'scores/twelve-bar-blues.mnx.json' },
-  { id: 'chord', label: 'Open strings (tab)', file: 'scores/open-strings-chord.mnx.json' },
-  { id: 'lyrics', label: 'Song with lyrics', file: 'scores/lyrics.mnx.json' }
+/** The documents THIS host serves — its own files, not the lab's corpus. */
+const DOCUMENTS = [
+  { id: 'blues', label: 'Twelve-bar blues', file: 'documents/twelve-bar-blues.mnx.json' },
+  { id: 'chord', label: 'Open strings (tab)', file: 'documents/open-strings-chord.mnx.json' },
+  { id: 'lyrics', label: 'Song with lyrics', file: 'documents/lyrics.mnx.json' }
 ];
 
 const viewer = document.getElementById('viewer');
-const nav = document.getElementById('scores');
+const nav = document.getElementById('documents');
 const status = document.getElementById('status');
 
 function setStatus(text, ok = true) {
@@ -40,40 +40,40 @@ function setStatus(text, ok = true) {
   status.dataset.state = ok ? 'ok' : 'error';
 }
 
-async function show(score) {
+async function show(entry) {
   for (const button of nav.children) {
-    button.setAttribute('aria-current', String(button.dataset.id === score.id));
+    button.setAttribute('aria-current', String(button.dataset.id === entry.id));
   }
   try {
-    const response = await fetch(score.file);
+    const response = await fetch(entry.file);
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
     const mnxJson = await response.json();
-    // The host supplies the score and nothing else. `view` stays unset, so the
-    // element resolves the author's own `staffKind` hint — the tab scores come
+    // The host supplies the document and nothing else. `view` stays unset, so the
+    // element resolves the author's own `staffKind` hint — the tab documents come
     // up as tab, the rest as notation, with no host JavaScript deciding.
     // This used to be two lines of homework here, including a string-search of
     // the document JSON for '"strings"' (docs/core-viewer-surface.md: derived
     // data a host must compute is a defect in the surface, not in the host).
-    viewer.mnxDoc = { id: score.id, name: score.label, lastUpdated: 0, mnxJson };
-    setStatus(`${score.label} — rendered by the embed artifact at ${base}`);
+    viewer.mnxDoc = { id: entry.id, name: entry.label, lastUpdated: 0, mnxJson };
+    setStatus(`${entry.label} — rendered by the embed artifact at ${base}`);
   } catch (error) {
-    setStatus(`could not load ${score.file}: ${error.message}`, false);
+    setStatus(`could not load ${entry.file}: ${error.message}`, false);
   }
 }
 
-for (const score of SCORES) {
+for (const entry of DOCUMENTS) {
   const button = document.createElement('button');
-  button.textContent = score.label;
-  button.dataset.id = score.id;
-  button.addEventListener('click', () => show(score));
+  button.textContent = entry.label;
+  button.dataset.id = entry.id;
+  button.addEventListener('click', () => show(entry));
   nav.append(button);
 }
 
-// The two theme axes, deliberately independent: page light/dark × score
+// The two theme axes, deliberately independent: page light/dark × viewer
 // light/dark are four combinations that all have to look right, and a host
 // whose own scheme is locked to the component's could never show three of
 // them. The page moves via `color-scheme` (the standard declaration, and the
-// very signal the component reads when its theme is `auto`); the score moves
+// very signal the component reads when its theme is `auto`); the viewer moves
 // via the element's `theme` attribute.
 function wireThemeButtons(attribute, apply) {
   const buttons = [...document.querySelectorAll(`.themes button[data-${attribute}]`)];
@@ -94,7 +94,7 @@ wireThemeButtons('page', value => {
 });
 
 // The precedence chain made visible: `auto` defers to the document's
-// staffKind, anything else is the host outranking it. Setting tab on a score
+// staffKind, anything else is the host outranking it. Setting tab on a document
 // whose parts declare no strings still yields notation — no instrument is
 // ever assumed, so the element declines rather than drawing a guessed
 // fretboard.
@@ -104,14 +104,14 @@ wireThemeButtons('view', value => viewer.setAttribute('view', value));
 // with zoom rather than duplicating it — that independence is the point.
 wireThemeButtons('density', value => viewer.setAttribute('density', value));
 
-wireThemeButtons('score', value => {
+wireThemeButtons('viewer', value => {
   // `auto` is the element's default: it follows the page, because
   // color-scheme is inherited. Setting it explicitly is how a host overrides
-  // that — e.g. a dark site that still wants the score on white paper.
+  // that — e.g. a dark site that still wants the document on white paper.
   viewer.setAttribute('theme', value);
 });
 
-// Load the artifact, then the first score. `whenDefined` is the honest wait:
+// Load the artifact, then the first document. `whenDefined` is the honest wait:
 // the element is usable only once the custom element registry has it.
 if (!base) {
   setStatus(
@@ -121,7 +121,7 @@ if (!base) {
 } else {
   setStatus('loading the embed artifact…');
   import(/* @vite-ignore */ `${base}/mnx-lab.esm.js`)
-    .then(() => customElements.whenDefined('mnx-score-viewer'))
-    .then(() => show(SCORES[0]))
+    .then(() => customElements.whenDefined('mnx-document-viewer'))
+    .then(() => show(DOCUMENTS[0]))
     .catch(error => setStatus(`could not load the embed artifact: ${error.message}`, false));
 }

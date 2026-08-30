@@ -198,7 +198,7 @@ only the first two; the other four are Guitar Pro's.
   not a command — interactive consumers may expose a view toggle that overrides
   it. It stays under `tab` because its adopted home is undecided (possibly
   `staff-source` — presentation, not part setup).
-  **Who consults it**: `<mnx-score-viewer view="auto">` (the default) resolves
+  **Who consults it**: `<mnx-document-viewer view="auto">` (the default) resolves
   it — `both` → the composed system, `tab` → tab, absent/`notation` →
   notation — so a bare element plus a document shows the author's intended
   view with no host code. The precedence is
@@ -349,7 +349,7 @@ Cloudflare Workers cannot run `ajv.compile()`.
 - **v5.1** (2026-08-07, same day): **instrument neutrality** — the
   "absent `strings[]` ⇒ standard guitar" default is retired. Absent strings
   now mean *no fingerboard*: tab rendering requires a document declaration or
-  a viewer-level override (`<mnx-score-viewer>` `stringsOverride`/
+  a viewer-level override (`<mnx-document-viewer>` `stringsOverride`/
   `capoOverride`). The upgrade shim materializes an explicit standard
   declaration into older tab documents (staffKind/capo/note-strings present,
   strings absent), and the MusicXML importer writes it for TAB parts without

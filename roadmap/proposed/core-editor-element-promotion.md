@@ -77,7 +77,7 @@ trace fixtures, root vitest), before and after.
 - **Moves**: mount-point code only — the edit strip, the cursor/selection
   overlay, the copy-trace control, the keymap's event wiring — today mounted by
   the workbench scenario page. It becomes an editor element (or an editing mode
-  of `<mnx-score-viewer>` — a real design decision, see below).
+  of `<mnx-document-viewer>` — a real design decision, see below).
 - **Does not move**: stages 1–2 (`src/edit/{intents,keymap,cursor,session}.ts`
   and friends) stay in `edit/` as pure modules. The promotion relocates DOM
   wiring, not logic — that was the incubation design's whole point.
@@ -89,7 +89,7 @@ trace fixtures, root vitest), before and after.
    `model`/`engine`/`audio`). This is the deliberate, reviewed move the layer
    docs prescribe — the review *is* this list.
 2. **The element contract**: editor element vs editing mode on
-   `<mnx-score-viewer>`; its attributes/properties/events, designed under
+   `<mnx-document-viewer>`; its attributes/properties/events, designed under
    [core-viewer-surface.md](../complete/core-viewer-surface.md)'s layered rule (engine options →
    element bindings → workbench chrome). Intents become the event vocabulary;
    the op log / trace capture needs a host-visible seam.
@@ -141,7 +141,7 @@ the choice is a product call:
    already delivers**. Either answer unblocks something; only silence leaves
    both docs open forever.
 2. **Scope-only promotion** (if the answer is "maybe, later"): give
-   `<mnx-score-viewer>` ownership of *input scope* without the editor —
+   `<mnx-document-viewer>` ownership of *input scope* without the editor —
    it already has `tabindex` and the ring, so it listens on itself and
    re-emits scoped key events; the workbench keeps the session and consumes
    those instead of `window`. Buys per-element correctness (two viewers on a

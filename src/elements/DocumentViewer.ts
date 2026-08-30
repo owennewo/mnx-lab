@@ -55,15 +55,15 @@ import { sharedChrome, scrollbars, viewerTokens } from './tokens.ts';
 import type { HideableFeature } from '../engine/layout/notation.ts';
 
 /**
- * The score area: a scrollable bench with a warm PAPER card at its centre.
+ * The document viewer: a scrollable bench with a warm PAPER card at its centre.
  * The paper carries the engraved SVG (the rendering engine is a black box
  * here), or one of two honest state panels:
  *  - invalid-by-design → the spec-gap exhibit (oxide, pinned-error table)
  *  - valid-but-unrendered → the "validates, doesn't render yet" panel
  * Paper never inverts with the theme (DIRECTION.md §4).
  */
-@customElement('mnx-score-viewer')
-export class ScoreViewer extends LitElement {
+@customElement('mnx-document-viewer')
+export class DocumentViewer extends LitElement {
   @consume({ context: mnxDocumentContext, subscribe: true })
   @property({ attribute: false })
   mnxDoc!: MnxDocument | null;
@@ -82,7 +82,7 @@ export class ScoreViewer extends LitElement {
    * `auto` is NOT a synonym for `notation`: unset means *defer to the layer
    * below*, so it resolves the document's own `_x.mnxLab.tab.staffKind`
    * (docs/core-viewer-surface.md, the precedence chain). That is what makes a
-   * bare `<mnx-score-viewer>` plus a document show the AUTHOR's intended view
+   * bare `<mnx-document-viewer>` plus a document show the AUTHOR's intended view
    * with no host JavaScript — the read-only player's whole story. A host that
    * names a view outranks the document, always: the hint is a hint.
    */
@@ -214,12 +214,12 @@ export class ScoreViewer extends LitElement {
   @property({ type: Boolean, reflect: true, attribute: 'selection-inactive' })
   selectionInactive = false;
 
-  @query('#score-container')
+  @query('#projection-container')
   container!: HTMLElement;
 
   @state() private renderErrors: { pane: string; message: string }[] = [];
 
-  private resizeHandler = () => this.renderScore();
+  private resizeHandler = () => this.renderProjection();
 
   /**
    * Re-lay-out when the CONTAINER's width changes, not just the window's.
@@ -334,7 +334,7 @@ export class ScoreViewer extends LitElement {
       /* Honor the engine's intrinsic size — fitPxPerSp already fills the
          width up to FIT_MAX_PX_PER_SP; stretching past it would defeat the
          cap and turn one-bar scenarios into posters. */
-      #score-container svg {
+      #projection-container svg {
         display: block;
         max-width: 100%;
         height: auto;
@@ -343,30 +343,30 @@ export class ScoreViewer extends LitElement {
         color: var(--paper-ink);
       }
 
-      #score-container svg .staff-line {
+      #projection-container svg .staff-line {
         stroke: var(--paper-line);
       }
 
-      #score-container svg .notehead {
+      #projection-container svg .notehead {
         cursor: pointer;
         transition: fill 0.12s;
       }
 
       /* Selection/active recolor to the accent — overrides the engine's
          presentation attributes (CSS wins over attributes). */
-      #score-container svg .notehead.selected,
-      #score-container svg .notehead.active,
-      #score-container svg .accidental.selected,
-      #score-container svg .accidental.active {
+      #projection-container svg .notehead.selected,
+      #projection-container svg .notehead.active,
+      #projection-container svg .accidental.selected,
+      #projection-container svg .accidental.active {
         fill: var(--accent) !important;
       }
 
-      #score-container svg .fret-number {
+      #projection-container svg .fret-number {
         cursor: pointer;
       }
 
-      #score-container svg .fret-number.selected,
-      #score-container svg .fret-number.active {
+      #projection-container svg .fret-number.selected,
+      #projection-container svg .fret-number.active {
         fill: var(--accent) !important;
       }
 
@@ -374,19 +374,19 @@ export class ScoreViewer extends LitElement {
          owns the input dialect stays full strength; the other remains visible
          as an echo. From part-measure upward the enclosure is one merged rect,
          so no child carries this class and the asymmetry resolves itself. */
-      #score-container svg .selected.selection-echo,
-      #score-container svg .enclosure rect.selection-echo {
+      #projection-container svg .selected.selection-echo,
+      #projection-container svg .enclosure rect.selection-echo {
         opacity: 0.4;
       }
 
       /* The selection-ladder enclosure (enclosure.ts): one vocabulary, fill
          fading and border firming as the level widens — cell → slice → beads
          → panel → panel-wide → frame. Behind the ink, never clickable. */
-      #score-container svg .enclosure {
+      #projection-container svg .enclosure {
         pointer-events: none;
       }
 
-      #score-container svg .enclosure rect {
+      #projection-container svg .enclosure rect {
         fill: var(--accent);
         stroke: var(--accent);
       }
@@ -398,11 +398,11 @@ export class ScoreViewer extends LitElement {
          that does not degenerate: it reads considerably stronger than the
          0.06 wash beneath it, and sits under the ink so the name it lights
          stays legible. */
-      #score-container svg .enclosure-label {
+      #projection-container svg .enclosure-label {
         pointer-events: none;
       }
 
-      #score-container svg .enclosure-label rect {
+      #projection-container svg .enclosure-label rect {
         fill: var(--accent);
         fill-opacity: 0.22;
         stroke: var(--accent);
@@ -413,65 +413,65 @@ export class ScoreViewer extends LitElement {
          a dashed border. It must read as "this is what widening would take",
          never as a second selection, so it takes the accent's outline and
          none of its weight. */
-      #score-container svg .enclosure-preview {
+      #projection-container svg .enclosure-preview {
         pointer-events: none;
       }
 
-      #score-container svg .enclosure-preview rect {
+      #projection-container svg .enclosure-preview rect {
         fill: none;
         stroke: var(--accent);
         stroke-opacity: 0.85;
         stroke-dasharray: 4 3;
       }
 
-      #score-container svg .enc-cell rect {
+      #projection-container svg .enc-cell rect {
         fill-opacity: 0.16;
         stroke-opacity: 0.9;
       }
 
-      #score-container svg .enc-slice rect {
+      #projection-container svg .enc-slice rect {
         fill-opacity: 0.13;
         stroke-opacity: 0.6;
       }
 
-      #score-container svg .enc-lasso rect,
-      #score-container svg .enc-run rect {
+      #projection-container svg .enc-lasso rect,
+      #projection-container svg .enc-run rect {
         fill-opacity: 0.13;
         stroke-opacity: 0.55;
       }
 
-      #score-container svg .enc-panel rect {
+      #projection-container svg .enc-panel rect {
         fill-opacity: 0.09;
         stroke-opacity: 0.45;
       }
 
-      #score-container svg .enc-panel-wide rect {
+      #projection-container svg .enc-panel-wide rect {
         fill-opacity: 0.06;
         stroke-opacity: 0.5;
       }
 
-      #score-container svg .enc-frame rect {
+      #projection-container svg .enc-frame rect {
         fill-opacity: 0;
         stroke-opacity: 0.75;
       }
 
       /* The cursor's ghost cell: hollow, dashed — a place for a thing. */
-      #score-container svg .cursor-ghost {
+      #projection-container svg .cursor-ghost {
         pointer-events: none;
       }
 
-      #score-container svg .cursor-ghost rect {
+      #projection-container svg .cursor-ghost rect {
         fill: none;
         stroke: var(--accent);
         stroke-opacity: 0.8;
       }
 
-      #score-container svg .cursor-ghost .pending-fret-bg {
+      #projection-container svg .cursor-ghost .pending-fret-bg {
         stroke: var(--accent);
         stroke-opacity: 0.45;
       }
 
-      #score-container svg .cursor-ghost .pending-fret {
+      #projection-container svg .cursor-ghost .pending-fret {
         fill: var(--accent);
       }
 
@@ -480,14 +480,14 @@ export class ScoreViewer extends LitElement {
          overlay reads as "where you were", not "where your next keystroke
          lands". Faded, not hidden: losing the place entirely makes refocus
          disorienting, and the point is to stop the CLAIM, not the memory. */
-      :host([selection-inactive]) #score-container svg .enclosure,
-      :host([selection-inactive]) #score-container svg .cursor-ghost {
+      :host([selection-inactive]) #projection-container svg .enclosure,
+      :host([selection-inactive]) #projection-container svg .cursor-ghost {
         opacity: 0.3;
       }
 
-      :host([selection-inactive]) #score-container svg .notehead.selected,
-      :host([selection-inactive]) #score-container svg .accidental.selected,
-      :host([selection-inactive]) #score-container svg .fret-number.selected {
+      :host([selection-inactive]) #projection-container svg .notehead.selected,
+      :host([selection-inactive]) #projection-container svg .accidental.selected,
+      :host([selection-inactive]) #projection-container svg .fret-number.selected {
         fill: color-mix(in oklab, var(--accent), var(--paper-ink) 65%) !important;
       }
 
@@ -495,12 +495,12 @@ export class ScoreViewer extends LitElement {
          in the margin and reclaim no space, so CSS is the honest tool. A
          layout-side feature must never be hidden this way — it would leave a
          gap where the content used to be. */
-      :host([hide~='badges']) #score-container svg .diagnostic-marker {
+      :host([hide~='badges']) #projection-container svg .diagnostic-marker {
         display: none;
       }
 
       /* The tab fret knock-out must match the paper, not the app bg. */
-      #score-container svg .fret-bg {
+      #projection-container svg .fret-bg {
         fill: var(--paper) !important;
       }
 
@@ -638,7 +638,7 @@ export class ScoreViewer extends LitElement {
       // Sub-pixel jitter is not a new line width; ignore it rather than
       // re-engraving the score on a rounding difference.
       if (Math.abs(width - this.renderedWidth) < 1) return;
-      this.renderScore();
+      this.renderProjection();
     });
     this.containerObserver.observe(this.container);
   }
@@ -660,21 +660,21 @@ export class ScoreViewer extends LitElement {
     ) {
       // A property moved: either the selection itself, or the layout under
       // it. Both are the reader acting on the score, so both earn a scroll.
-      // The OTHER two callers of renderScore — the resize observer and the
+      // The OTHER two callers of renderProjection — the resize observer and the
       // font-ready redraw — deliberately do not queue one: nobody asked for
       // them, and a repaint nobody asked for must not move the page.
       this.followQueued = true;
-      this.renderScore();
+      this.renderProjection();
     }
   }
 
-  renderScore() {
+  renderProjection() {
     if (!this.container || !this.mnxDoc) return;
 
     // Embeds can reach here before the SMuFL metadata fetch resolves (the
     // full app usually renders after a user gesture). Defer one round trip.
     if (!isSmuflLoaded()) {
-      loadSmufl().then(() => this.renderScore());
+      loadSmufl().then(() => this.renderProjection());
       return;
     }
 
@@ -860,7 +860,7 @@ export class ScoreViewer extends LitElement {
         }
         if (!this.fontRedrawQueued && !document.fonts.check('4px Bravura')) {
           this.fontRedrawQueued = true;
-          void document.fonts.ready.then(() => this.renderScore());
+          void document.fonts.ready.then(() => this.renderProjection());
         }
       }
     };
@@ -933,7 +933,7 @@ export class ScoreViewer extends LitElement {
   /**
    * How much the PAGE shrank on its way to the screen — 1 when it did not.
    *
-   * `#score-container svg` carries `max-width: 100%`, so a drawing wider than
+   * `#projection-container svg` carries `max-width: 100%`, so a drawing wider than
    * the pane is scaled down by the browser, both axes, before anybody sees it.
    * That is deliberate (the score fits the pane; nothing scrolls sideways),
    * but it means the engine's own answer stops being what is on screen exactly
@@ -950,7 +950,7 @@ export class ScoreViewer extends LitElement {
    * because only shrinking is possible here (`max-width`, never `width`).
    */
   private shrinkToPane(): number {
-    const svg = this.renderRoot.querySelector('#score-container svg');
+    const svg = this.renderRoot.querySelector('#projection-container svg');
     if (!(svg instanceof SVGSVGElement)) return 1;
     const intrinsic = Number(svg.getAttribute('width'));
     const onScreen = svg.getBoundingClientRect().width;
@@ -1079,7 +1079,7 @@ export class ScoreViewer extends LitElement {
     const delta = revealScrollDelta(
       { start: box.top, end: box.bottom },
       { start: view.top, end: view.bottom },
-      ScoreViewer.REVEAL_PAD_PX
+      DocumentViewer.REVEAL_PAD_PX
     );
     // Sub-pixel deltas are rounding, not a selection off screen.
     if (Math.abs(delta) < 1) return;
@@ -1177,11 +1177,11 @@ export class ScoreViewer extends LitElement {
               </div>
             `
           : nothing}
-        <div id="score-container"></div>
+        <div id="projection-container"></div>
       </div>
     `;
   }
 
 }
 
-export default ScoreViewer;
+export default DocumentViewer;

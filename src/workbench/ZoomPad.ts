@@ -32,7 +32,7 @@ import {
  *
  * The magnifier where the arms cross resets both.
  *
- * **This is chrome, not surface.** It composes `<mnx-score-viewer>`'s
+ * **This is chrome, not surface.** It composes `<mnx-document-viewer>`'s
  * attributes and implements no presentation behavior of its own — every value
  * it emits is clamped by the engine that owns it (`clampStaffScale`,
  * `clampDensity`). The layering rule is docs/core-viewer-surface.md's.
@@ -121,7 +121,7 @@ export class ZoomPad extends LitElement {
 
   /**
    * The spacing values that actually change the score on screen, ascending —
-   * `<mnx-score-viewer>.densitySteps()`, passed in as a getter because it moves
+   * `<mnx-document-viewer>.densitySteps()`, passed in as a getter because it moves
    * with every paint (viewport width, staff scale, the document itself).
    *
    * The ← → arms walk THIS, not a fixed percentage. The reason is the whole
@@ -514,7 +514,7 @@ export class ZoomPad extends LitElement {
    * columns wider as well as taller, the shrink grows with the ask and the two
    * nearly cancel. Asking 320% drew 268%, asking 640% drew 297% — reported as
    * *"vertical spacing 320 doesn't seem half of 640"*, which it was not.
-   * `<mnx-score-viewer>` measures the shrink and reports the product, so this
+   * `<mnx-document-viewer>` measures the shrink and reports the product, so this
    * number is the staff in front of you.
    */
   private get shownStaff(): number {

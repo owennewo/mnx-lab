@@ -544,7 +544,7 @@ export const KEY_DOCS: KeyDoc[] = [
     keys: 'Ctrl+Alt+B',
     strokes: [{ code: 'KeyB', ctrl: true, alt: true }],
     group: 'workbench',
-    meaning: { all: 'toggle the score panel (the other pane, VS Code’s chord)' }
+    meaning: { all: 'toggle the document panel (the other pane, VS Code’s chord)' }
   }
 ];
 

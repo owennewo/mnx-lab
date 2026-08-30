@@ -76,8 +76,8 @@ function readTheme(): ThemeSetting {
   return v === 'light' || v === 'dark' || v === 'auto' ? v : 'auto';
 }
 
-/** Same three-value vocabulary as `<mnx-score-viewer>.theme`, deliberately —
- *  two names for one idea is how a chrome and its score end up disagreeing. */
+/** Same three-value vocabulary as `<mnx-document-viewer>.theme`, deliberately —
+ *  two names for one idea is how chrome and its notation end up disagreeing. */
 export type ThemeSetting = 'auto' | 'light' | 'dark';
 
 @customElement('mnx-workbench')
@@ -112,8 +112,8 @@ export class WorkbenchApp extends LitElement {
    *  block — an ATTRIBUTE, so `auto` has to be resolved here rather than left
    *  to a media query. `color-scheme` (declared in CSS off the same attribute)
    *  then re-resolves every `light-dark()` pair below us, which is what carries
-   *  the SCORE with the chrome: `color-scheme` is an inherited property and
-   *  crosses shadow boundaries, so `<mnx-score-viewer theme="auto">` picks up
+   *  the NOTATION with the chrome: `color-scheme` is an inherited property and
+   *  crosses shadow boundaries, so `<mnx-document-viewer theme="auto">` picks up
    *  the app's choice without a single prop being threaded. It also pins native
    *  widgets — the HUD's instrument `<select>` and capo input, and scrollbars —
    *  which would otherwise stay light under dark chrome. */
@@ -181,10 +181,10 @@ export class WorkbenchApp extends LitElement {
         font-family: var(--sans);
       }
 
-      /* Declaring color-scheme is what carries the SCORE with the chrome:
+      /* Declaring color-scheme is what carries the NOTATION with the chrome:
          light-dark() resolves against the used scheme, and the property is
-         inherited, so it crosses into <mnx-score-viewer>'s shadow root and
-         re-resolves scoreTokens in one stroke. It also pins native widgets —
+         inherited, so it crosses into <mnx-document-viewer>'s shadow root and
+         re-resolves notationTokens in one stroke. It also pins native widgets —
          the HUD's <select> and capo input, and the scrollbars. */
       :host([resolved-theme='light']) {
         color-scheme: light;
@@ -647,7 +647,7 @@ export class WorkbenchApp extends LitElement {
       ...(this.scenarioPage()
         ? [
             {
-              label: `view: ${this.scenarioPage()!.panelIsHidden ? 'show' : 'hide'} score panel`,
+              label: `view: ${this.scenarioPage()!.panelIsHidden ? 'show' : 'hide'} document panel`,
               hint: 'Ctrl+Alt+B',
               run: () => this.scenarioPage()?.togglePanel()
             }
