@@ -1598,18 +1598,17 @@ function uniquePartsOf(planStaves: PlanStaff[]): MnxPart[] {
 }
 
 /**
- * Measure-level attributes the engine does not engrave (yet). Each entry is a
- * renderer-gap issue for the bar. The list IS the census
- * (core-measure-attributes-gaps.md §"not rendered"): remove a line here when
- * the ink arrives, and the badge goes with it.
+ * Measure-level attributes the engine does not engrave. The list IS the
+ * census (core-measure-attributes-gaps.md §"not rendered"): a line here is a
+ * renderer-gap badge on the bar, and it is removed when the ink arrives. It
+ * emptied on 2026-08-29 with chord symbols (core-chord-symbols.md) — the seam
+ * stays so the next undrawn attribute has somewhere to be declared.
  */
 export function measureLevelGaps(
   globalMeasure: MnxGlobalMeasure | undefined,
   partMeasures: readonly (MnxPartMeasure | undefined)[]
 ): string[] {
-  const gaps: string[] = [];
-  if ((globalMeasure?._x?.mnxLab?.harmonies?.length ?? 0) > 0)
-    gaps.push('chord symbols (harmonies) — not drawn');
+  void globalMeasure;
   void partMeasures;
-  return gaps;
+  return [];
 }

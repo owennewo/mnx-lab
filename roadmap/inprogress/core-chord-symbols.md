@@ -1,17 +1,21 @@
 # Chord symbols (`_x.mnxLab.harmonies`)
 
-> **Status: data path SHIPPED (2026-07-26); rendering not started.**
+> **Status: data path SHIPPED (2026-07-26); rendering SHIPPED (2026-08-29).** Picked up
+> from `proposed/low-priority/` the day the measure-attribute census
+> ([core-measure-attributes-gaps.md](core-measure-attributes-gaps.md)) ran out of
+> everything else undrawn — `harmonies` was its last badge.
 >
 > Built as `global.measures[i]._x.mnxLab.harmonies[]` — the design argued in
-> [spec-mnx-cg-proposals.md](spec-mnx-cg-proposals.md) §4 and specified in
-> [docs/mnx-extensions.md](../../../docs/mnx-extensions.md). What landed:
+> [spec-mnx-cg-proposals.md](../proposed/low-priority/spec-mnx-cg-proposals.md) §4 and specified in
+> [docs/mnx-extensions.md](../../docs/mnx-extensions.md). What landed:
 >
 > | | |
 > |---|---|
 > | Guitar Pro import/export | ✅ both `beat.text` and `Chord` objects |
 > | MusicXML import/export | ✅ proper `<harmony>` both ways |
 > | Round trips | ✅ lossless, with one documented normalisation (below) |
-> | Rendering | ❌ nothing draws a chord symbol yet |
+> | Rendering | ✅ `emitHarmonies` (`src/engine/layout/scoreText.ts`): each symbol over its column, closest to the staff of all the score text; tempo and labels stack above it. Notation and tab. |
+> | Editing | ✅ `chord Am7` / `chord D/F# at 1/2` / `no chord` — a `harmony` bar attribute writing the vendor block structured (`src/model/harmony.ts`, promoted from the converters' copies); `harmony#N` pills |
 >
 > **The design questions below are all answered.** (1) Structured *and* literal:
 > `root`/`quality`/`bass`/`degrees` plus a `text` override kept only when the
@@ -25,6 +29,12 @@
 > is how one chord in House of the Rising Sun really is spelled — normalises to
 > `C/G` through MusicXML. The structure survives exactly; Guitar Pro keeps the
 > literal.
+>
+> **What the page shows** (`lab/score-text/chord-symbols`): the structure spelt by
+> `renderChordSymbol` with real ♯/♭ on the root and bass (`chordSymbolDisplay`), the
+> quality suffix in letters as charts print it (`Bm7b5`), `N.C.` for `none`, and a
+> `text` override verbatim. Fretboard diagrams and the transposition of a symbol with
+> the notes remain open — the latter is what the structure was kept for.
 >
 > The rest of this doc is the evidence the design rests on.
 

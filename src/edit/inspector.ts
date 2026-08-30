@@ -93,6 +93,8 @@ export function attributeText(attribute: MeasureAttribute): string {
       return `rehearsal ${attribute.label}`;
     case 'section':
       return `section ${attribute.label}`;
+    case 'harmony':
+      return `chord ${attribute.text}${markAtText(attribute.at)}`;
   }
 }
 
@@ -212,7 +214,8 @@ const WORD_OF: Record<MeasureAttributeKind, string> = {
   jump: 'jump',
   tempo: 'tempo',
   rehearsal: 'rehearsal',
-  section: 'section'
+  section: 'section',
+  harmony: 'chord'
 };
 
 const HINT_OF: Record<MeasureAttributeKind, string> = {
@@ -227,7 +230,8 @@ const HINT_OF: Record<MeasureAttributeKind, string> = {
   jump: 'segno · dsalfine · at 1/2',
   tempo: '120 · half=80 · quarter.=60 · 96 at 1/2',
   rehearsal: 'A · 12',
-  section: 'Verse 1'
+  section: 'Verse 1',
+  harmony: 'Am7 · D/F# at 1/2 · N.C.'
 };
 
 export const BAR_WORDS: InspectorWord[] = [
@@ -342,10 +346,10 @@ export function measurePills(doc: MnxStructure, measureIndex: number): Inspector
     pillClass: 'floor',
     remove: barline ? { type: 'removeMeasureAttribute', kind: 'barline' } : null
   });
-  let tempoIndex = 0;
+  const counters: Partial<Record<MeasureAttributeKind, number>> = {};
   for (const attribute of declared) {
     if (attribute.kind === 'barline') continue;
-    const index = attribute.kind === 'tempo' ? tempoIndex++ : undefined;
+    const index = attribute.kind === 'tempo' || attribute.kind === 'harmony' ? (counters[attribute.kind] = (counters[attribute.kind] ?? 0) + 1) - 1 : undefined;
     pills.push({
       key: index === undefined ? attribute.kind : `${attribute.kind}#${index}`,
       word: WORD_OF[attribute.kind],
@@ -755,15 +759,25 @@ export function parseInspectorLine(
   level: SelectionLevel,
   word: string | null,
   text: string,
-  context?: { pitch?: { step: string; octave: number; alter?: number }; key?: string; tempoCount?: number }
+  context?: {
+    pitch?: { step: string; octave: number; alter?: number };
+    key?: string;
+    tempoCount?: number;
+    harmonyCount?: number;
+  }
 ): InspectorParse {
   if (level === 'measure') {
     const parsed = parseBarLine(word, text);
-    // An amend of `tempo#N` names its entry; an add from the slot appends.
-    const index = context?.key ? Number(/^tempo#(\d+)$/.exec(context.key)?.[1]) : NaN;
-    if ('intent' in parsed && parsed.intent.type === 'setMeasureAttribute' && parsed.intent.attribute.kind === 'tempo') {
-      if (!Number.isNaN(index)) return { intent: { ...parsed.intent, index } };
-      if (word === null && context?.tempoCount !== undefined) return { intent: { ...parsed.intent, index: context.tempoCount } };
+    // An amend of `tempo#N` / `harmony#N` names its entry; an add from the
+    // slot appends — the two array-valued kinds.
+    const index = context?.key ? Number(/^(?:tempo|harmony)#(\d+)$/.exec(context.key)?.[1]) : NaN;
+    if ('intent' in parsed && parsed.intent.type === 'setMeasureAttribute') {
+      const kind = parsed.intent.attribute.kind;
+      const count = kind === 'tempo' ? context?.tempoCount : kind === 'harmony' ? context?.harmonyCount : undefined;
+      if (kind === 'tempo' || kind === 'harmony') {
+        if (!Number.isNaN(index)) return { intent: { ...parsed.intent, index } };
+        if (word === null && count !== undefined) return { intent: { ...parsed.intent, index: count } };
+      }
     }
     return parsed;
   }

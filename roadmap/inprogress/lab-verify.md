@@ -86,10 +86,10 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
-### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **4 stale, 7 never-seen**
+### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **4 stale, 8 never-seen**
 
 Owner: [core-measure-attributes-gaps.md](core-measure-attributes-gaps.md) (in progress,
-items 1–9). Demoted 2026-08-28; grown 2026-08-29 (items 7–9).
+items 1–9, and core-chord-symbols.md's rendering half). Demoted 2026-08-28; grown 2026-08-29 (items 7–9, chords).
 
 **Cause.** No measure-level attribute ever produced the amber renderer-gap badge: the
 badge machinery was fed only by unsupported sequence-content kinds, so a bar whose
@@ -153,6 +153,12 @@ red segno and a red *fine*, a purple treble clef with NO `8` under it (the D4/E4
 written a step above the middle line, an octave up — the clef sounds 8vb), a bass
 clef WITH an `8`; bar 2 a treble clef with `15` over it and a plain bass clef (the
 `fClefChange` glyph, drawn as declared) — verify no clef in bar 2 carries an `8`.
+
+**Chord symbols (core-chord-symbols.md, 2026-08-29).** `lab/score-text/chord-symbols`
+is **never-seen**: bold `D`, `A7/C♯`, `Bm7b5`, `N.C.`, `E♭Δ7` just above the staff, each
+starting a touch left of its note's column, the sharp and flat as real signs on the root
+and bass only; ♩ = 100 on bar 1 sits ABOVE the `D`. Nothing on the tab views but the same
+symbols in the same columns.
 
 **What a reviewer should look for.** On `arpeggiated-chords`: the music is unchanged and
 the bar carries two amber badges at its bottom-left (arpeggio, non-arpeggio). If any

@@ -119,11 +119,6 @@ back up to `proposed/` the moment it is.
   not. Includes a round-trip stress test — 3 of 4 directions are destroyed or misclassified
   today, and the corpus never catches it. Supersedes the placement half of
   [spec-mnx-cg-proposals.md](proposed/low-priority/spec-mnx-cg-proposals.md) §3.
-- **[core-chord-symbols.md](proposed/low-priority/core-chord-symbols.md)** — chord symbols. **Data path shipped**
-  (2026-07-26) as `global.measures[i]._x.mnxLab.harmonies[]`: structured *and* literal, read
-  from Guitar Pro `beat.text` **and** `Chord` objects, written and read as MusicXML
-  `<harmony>`, lossless both ways (`Vestapol` 25, `House-of-the-Rising-Sun` 14). Remaining:
-  **rendering** — nothing draws a chord symbol yet.
 - **[spec-instrument-position.md](proposed/low-priority/spec-instrument-position.md)** — **where a note is played**:
   the string declaration, capo, `note.string`, `note.fingering`. Thesis: **the string and the
   finger are choices, the fret and the hand position are consequences** — given tuning, string
@@ -185,6 +180,10 @@ back up to `proposed/` the moment it is.
   treble, `tempos[0]` only, tab lacks repeats/voltas/dynamics. Four confirmed bugs, two of
   them the inspector's (a dropped tempo index, a staff-blind `removePositioned`). Work
   order: badge first, bugs second, then the engraving items through the ledger.
+- **[core-chord-symbols.md](inprogress/core-chord-symbols.md)** — chord symbols. **Data path
+  shipped** (2026-07-26) as `global.measures[i]._x.mnxLab.harmonies[]`, lossless through both
+  converters; **rendering and editing shipped** (2026-08-29): each symbol over its column,
+  `chord Am7` writes one. Open: fretboard diagrams, transposing a symbol with the notes.
 - **[workbench-rung-inspector.md](inprogress/workbench-rung-inspector.md)** — **in progress 2026-08-28; all five stages built the same day** (open only on the container verb) — [design canvas](https://claude.ai/code/artifact/6d09ff2a-d82a-4cba-a653-3d4245fa26a3);
   placed over the score where the tray sits, keyboard-first — a vertical three-row rung window beside a hard three-row attribute area, identity as floor pills; machinery in `edit/inspector.ts`,
   driven hands-on by `npm run smoke:inspector`. A third editing surface, tried *beside* the tray and the Shift+letter

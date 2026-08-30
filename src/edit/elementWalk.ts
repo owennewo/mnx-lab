@@ -306,7 +306,12 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     construct: ['setMeasureAttribute'],
     remove: ['removeMeasureAttribute']
   },
-  harmony: { classes: [], note: 'Renderer gap — core-chord-symbols.md owns the drawing half.' },
+  harmony: {
+    classes: ['harmony'],
+    note: 'A chord symbol over its column (`_x.mnxLab.harmonies`, core-chord-symbols.md).',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
   'part-name': {
     classes: ['staff-label'],
     note: 'The name drawn left of the part’s staff. `addPart` takes it; `removePartDeclaration` strips it — `removePart` is the CONTAINER’s verb, not this element’s.',

@@ -1,0 +1,153 @@
+{
+  "target": "lab/score-text/chord-symbols",
+  "intents": [
+    {
+      "type": "addPart",
+      "name": "Music"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "tempo",
+        "bpm": 100,
+        "base": "quarter"
+      }
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "harmony",
+        "text": "D"
+      }
+    },
+    {
+      "type": "setMeasureAttribute",
+      "index": 1,
+      "attribute": {
+        "kind": "harmony",
+        "text": "A7/C#",
+        "at": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "transpose",
+      "semitones": 1
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "harmony",
+        "text": "Bm7b5"
+      }
+    },
+    {
+      "type": "setMeasureAttribute",
+      "index": 1,
+      "attribute": {
+        "kind": "harmony",
+        "text": "N.C.",
+        "at": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "type": "setMeasureAttribute",
+      "index": 2,
+      "attribute": {
+        "kind": "harmony",
+        "text": "E\u266d\u03947",
+        "at": [
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "barline",
+        "type": "final"
+      }
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "toggleNote"
+    },
+    {
+      "type": "transpose",
+      "semitones": -1
+    }
+  ]
+}

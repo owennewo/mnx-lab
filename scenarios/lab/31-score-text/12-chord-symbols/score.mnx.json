@@ -1,0 +1,201 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        },
+        "tempos": [
+          {
+            "bpm": 100,
+            "value": {
+              "base": "quarter"
+            }
+          }
+        ],
+        "_x": {
+          "mnxLab": {
+            "harmonies": [
+              {
+                "location": {
+                  "fraction": [
+                    0,
+                    1
+                  ]
+                },
+                "root": {
+                  "step": "D"
+                },
+                "quality": "major"
+              },
+              {
+                "location": {
+                  "fraction": [
+                    1,
+                    2
+                  ]
+                },
+                "root": {
+                  "step": "A"
+                },
+                "quality": "dominantSeventh",
+                "bass": {
+                  "step": "C",
+                  "alter": 1
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "_x": {
+          "mnxLab": {
+            "harmonies": [
+              {
+                "location": {
+                  "fraction": [
+                    0,
+                    1
+                  ]
+                },
+                "root": {
+                  "step": "B"
+                },
+                "quality": "halfDiminished"
+              },
+              {
+                "location": {
+                  "fraction": [
+                    1,
+                    2
+                  ]
+                },
+                "quality": "none"
+              },
+              {
+                "location": {
+                  "fraction": [
+                    3,
+                    4
+                  ]
+                },
+                "root": {
+                  "step": "E",
+                  "alter": -1
+                },
+                "quality": "majorSeventh",
+                "text": "E♭Δ7"
+              }
+            ]
+          }
+        },
+        "barline": {
+          "type": "final"
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "name": "Music",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 5
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5,
+                        "alter": 1
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "B",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 5
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 5,
+                        "alter": -1
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

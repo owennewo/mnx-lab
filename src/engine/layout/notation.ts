@@ -64,6 +64,7 @@ import {
 import { computeBoundsSp } from '../render/bounds.ts';
 import {
   anchorAt,
+  emitHarmonies,
   emitNavigationMarkers,
   emitScoreLabels,
   emitTempoMark,
@@ -2145,6 +2146,7 @@ function assembleSegment(
     const topSequence = (topSource?.part.measures?.[i]?.sequences ?? []).find(
       seq => (seq.staff ?? 1) === (topSource?.staff ?? 1)
     );
+    emitHarmonies({ gm, m, stdSequences: topSequence ? [topSequence] : [], staffTop, scan: scan(), primitives });
     const tempoTop = emitTempoMark({
       gm, m, staffTop, scan: scan(), primitives,
       onsetXs: measureOnsetXs(topSequence, m.voices[0] ?? [])

@@ -1,0 +1,45 @@
+{
+  "title": "Chord symbols",
+  "description": "Five `_x.mnxLab.harmonies` over two bars, drawn from their structure: D, A7/C♯ (a slash bass, spelt with a real sharp), Bm7b5 (the quality suffix keeps its letters, as charts print it), N.C. (quality `none`), and one with a `text` override — E♭Δ7 — shown as written. Each sits just above the staff over its own column; the tempo mark on bar 1 stacks ABOVE the first chord because a player reads the chord with the notes (core-chord-symbols.md, the rendering half).",
+  "bars": 2,
+  "tags": [
+    "score-text",
+    "harmony",
+    "chord-symbols",
+    "extension"
+  ],
+  "specRefs": [],
+  "coversDefs": [
+    "barline",
+    "barline-type",
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "root",
+    "sequence",
+    "sequence-content",
+    "tempo",
+    "tempos",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

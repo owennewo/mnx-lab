@@ -2597,11 +2597,14 @@ export class ScenarioPage extends LitElement {
     if (!this.session) return;
     const noteKey = this.session.selectedNoteKeys[0];
     const pitch = noteKey ? findNoteAddress(this.session.doc, noteKey)?.note.pitch : undefined;
-    const tempoCount = this.session.doc.global?.measures?.[this.session.cursor.measureIndex]?.tempos?.length ?? 0;
+    const bar = this.session.doc.global?.measures?.[this.session.cursor.measureIndex];
+    const tempoCount = bar?.tempos?.length ?? 0;
+    const harmonyCount = bar?._x?.mnxLab?.harmonies?.length ?? 0;
     const parsed = parseInspectorLine(this.session.selectionLevel, word, text, {
       ...(pitch ? { pitch } : {}),
       ...(key ? { key } : {}),
-      tempoCount
+      tempoCount,
+      harmonyCount
     });
     if ('error' in parsed) {
       this.inspectorError = parsed.error;

@@ -30,6 +30,7 @@ import type { SelectionState } from './selection.ts';
 import type { SelectionClipEnvelope } from './selectionClip.ts';
 import type { PartialContainerSpec } from './setupGrammar.ts';
 import { isTimedEvent } from '../model/mnx.ts';
+import { parseChordSymbol, renderChordSymbol } from '../model/harmony.ts';
 import { findNoteAddress, forEachNoteAddress } from '../model/noteWalk.ts';
 import { enharmonicSpellings, keyFifthsAt, midiOfSpelling, spellPitch } from './staffSpace.ts';
 import {
@@ -858,7 +859,12 @@ export type MeasureAttribute =
   | { kind: 'jump'; type: 'segno' | 'dsalfine'; at?: MarkAt }
   | { kind: 'tempo'; bpm: number; base: MnxNoteValueBase; dots?: number; at?: MarkAt }
   | { kind: 'rehearsal'; label: string }
-  | { kind: 'section'; label: string };
+  | { kind: 'section'; label: string }
+  /** A chord symbol (`_x.mnxLab.harmonies`, core-chord-symbols.md): typed as
+   *  written (`Am7`, `F#m7b5/A`, `N.C.`), stored structured through
+   *  `parseChordSymbol` so it transposes; `at` is its moment in the bar. An
+   *  array, like `tempos` — `index` names the entry. */
+  | { kind: 'harmony'; text: string; at?: MarkAt };
 
 export type MeasureAttributeKind = MeasureAttribute['kind'];
 
@@ -890,7 +896,8 @@ export const MEASURE_ATTRIBUTE_FIELDS: Record<MeasureAttributeKind, string> = {
   jump: 'jump',
   tempo: 'tempos',
   rehearsal: 'rehearsal',
-  section: 'section'
+  section: 'section',
+  harmony: 'harmonies'
 };
 
 /** The measure-start position these three carry (mid-bar placement is item
@@ -950,6 +957,11 @@ function measureAttributeValue(attribute: MeasureAttribute): unknown {
     case 'rehearsal':
     case 'section':
       return { label: attribute.label };
+    case 'harmony':
+      return {
+        location: locationOf(attribute.at, 'start'),
+        ...(parseChordSymbol(attribute.text) ?? { quality: 'other', text: attribute.text })
+      };
   }
 }
 
@@ -1008,6 +1020,12 @@ export function readMeasureAttributes(measure: MnxGlobalMeasure | undefined): Me
       base: tempo.value.base,
       ...(tempo.value.dots ? { dots: tempo.value.dots } : {}),
       ...at(tempo.location, 'start')
+    });
+  for (const harmony of measure._x?.mnxLab?.harmonies ?? [])
+    out.push({
+      kind: 'harmony',
+      text: harmony.text ?? renderChordSymbol(harmony),
+      ...at(harmony.location, 'start')
     });
   if (measure.rehearsal?.label !== undefined)
     out.push({ kind: 'rehearsal', label: measure.rehearsal.label });
@@ -1420,6 +1438,13 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         const at = Math.min(op.index ?? 0, tempos.length);
         tempos[at] = value;
         measure.tempos = tempos;
+      } else if (field === 'harmonies') {
+        // The vendor block: `_x.mnxLab.harmonies`, an array like `tempos`.
+        const x = ((measure._x ??= {}) as { mnxLab?: { harmonies?: unknown[] } });
+        const lab = (x.mnxLab ??= {});
+        const harmonies = [...(lab.harmonies ?? [])];
+        harmonies[Math.min(op.index ?? 0, harmonies.length)] = value;
+        lab.harmonies = harmonies;
       } else measure[field] = value;
       return next;
     }
@@ -1435,6 +1460,19 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         // No tombstone: an emptied array goes with its last member.
         if (kept.length > 0) measure.tempos = kept;
         else delete measure.tempos;
+        return next;
+      }
+      if (field === 'harmonies') {
+        const x = measure._x as { mnxLab?: { harmonies?: unknown[] } } | undefined;
+        const kept = (x?.mnxLab?.harmonies ?? []).filter((_, i) => i !== (op.index ?? 0));
+        if (!x?.mnxLab) return next;
+        if (kept.length > 0) x.mnxLab.harmonies = kept;
+        else {
+          // No tombstones: emptied vendor containers go with their last key.
+          delete x.mnxLab.harmonies;
+          if (Object.keys(x.mnxLab).length === 0) delete x.mnxLab;
+          if (Object.keys(x).length === 0) delete measure._x;
+        }
         return next;
       }
       delete measure[field];

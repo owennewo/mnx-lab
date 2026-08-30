@@ -23,7 +23,7 @@ import {
   TAB_REPEAT_DOT_YS
 } from './repeats.ts';
 import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barlines.ts';
-import { emitNavigationMarkers, emitScoreLabels, emitTempoMark, measureOnsetXs } from './scoreText.ts';
+import { emitHarmonies, emitNavigationMarkers, emitScoreLabels, emitTempoMark, measureOnsetXs } from './scoreText.ts';
 import { emitMeasureFermata } from './fermata.ts';
 import { emitMeasureNumber } from './arpeggio.ts';
 import { clampPadDensity, ensureTopMargin, tightenRows } from './verticalDensity.ts';
@@ -316,6 +316,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     // what already sits over this measure and stack above it.
     const gm = mnx.global.measures[i] ?? {};
     // The text clears THIS ROW's ink only; the row above is tightenRows' job.
+    emitHarmonies({ gm, m, stdSequences, staffTop, scan: primitives.slice(rowStart[m.row]), primitives });
     const tempoTop = emitTempoMark({
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), primitives,
       onsetXs: measureOnsetXs(stdSequences[0], m.voices[0] ?? [])

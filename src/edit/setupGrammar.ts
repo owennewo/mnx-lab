@@ -271,7 +271,7 @@ const TEMPO_UNITS: Record<string, MnxNoteValueBase> = {
 export const BAR_ATTRIBUTE_HELP =
   'barline double · repeat start · repeat end 3 · ending 1,2 · ending 3 for 1 open · ' +
   'segno · fine · fermata · fermata square long below · number 12 · ' +
-  'jump dsalfine · jump segno at start · fine at end · tempo 120 · tempo 96 at 1/2 · rehearsal A · section Verse 1 · full-measure rest · ' +
+  'jump dsalfine · jump segno at start · fine at end · tempo 120 · tempo 96 at 1/2 · chord Am7 · chord D/F# at 1/2 · rehearsal A · section Verse 1 · full-measure rest · ' +
   'measure repeat 2 · measure repeat counter 3 · no <attribute>';
 
 export type BarAttributeResult =
@@ -301,7 +301,9 @@ const ATTRIBUTE_WORDS: Record<string, MeasureAttributeKind> = {
   jump: 'jump',
   tempo: 'tempo',
   rehearsal: 'rehearsal',
-  section: 'section'
+  section: 'section',
+  chord: 'harmony',
+  harmony: 'harmony'
 };
 
 export function parseBarAttribute(text: string): BarAttributeResult {
@@ -353,6 +355,16 @@ export function parseBarAttribute(text: string): BarAttributeResult {
     const count = rest[0] !== undefined ? Number(rest[0]) : 1;
     if (!Number.isInteger(count) || count < 1 || count > 4) return null;
     return { rhythm: 'measureRepeat', number: count, ...(counter ? { counter } : {}) };
+  }
+
+  // `chord Am7` / `chord F#m7b5/A at 1/2` / `chord N.C.` — a chord symbol as
+  // written; the structure is parsed on the way in (core-chord-symbols.md).
+  if (head === 'chord' || head === 'harmony') {
+    const located = /^(.*?)\s+at\s+(\S+)$/i.exec(words.slice(1).join(' '));
+    const at = located ? parseMarkAt(located[2]) : undefined;
+    if (Array.isArray(at) && !(at[0] >= 0 && at[1] > 0)) return null;
+    const text = (located ? located[1] : words.slice(1).join(' ')).trim();
+    return text === '' ? null : { set: { kind: 'harmony', text, ...(at ? { at } : {}) } };
   }
 
   // `number 12` — the bar's displayed number.

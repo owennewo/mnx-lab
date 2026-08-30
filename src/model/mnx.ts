@@ -101,6 +101,7 @@ export interface MnxHarmony {
   /** Display override; present only when the source's literal spelling differs
    *  from what a consumer would render from the structure. */
   text?: string;
+  color?: string;
 }
 
 /** A label on a global measure: `rehearsal` is an index into the score ("A"),

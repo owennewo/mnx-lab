@@ -11,7 +11,7 @@
 > the cut/common symbol, dynamics and directions on the standalone tab staff, through
 > emitters shared with notation (`repeats.ts`, `endings.ts`), goldens byte-identical
 > for the refactor and a new scenario pinning the tab side. **Item 6 (the writers)
-> too.** Items 7–8 open — fermata, arpeggios, measure numbers; harmonies stays with
+> too.** Items 1–9 all landed by 2026-08-29; harmonies drew under
 > core-chord-symbols. A census, then a work list. Prompted by
 > `spec/measure-repeats-with-counters` reading as a regression after the rung inspector
 > ([workbench-rung-inspector.md](workbench-rung-inspector.md)) started
@@ -130,7 +130,7 @@ verified empty staff came to read as a regression.
 1. `measureRepeat` — full op pair, an inspector pill, two spec scenarios, empty goldens.
 2. ~~`arpeggios` / `nonArpeggios`~~ — item 8.
 3. ~~`fermata` (measure and event forms)~~ — item 7.
-4. `harmonies` — see above.
+4. ~~`harmonies`~~ — core-chord-symbols.md, 2026-08-29.
 5. ~~`number`~~ — item 8 (declared numbers only).
 6. ~~The colour properties on `ending`/`key`/`segno`/`fine`/`clef`; `clef.glyph`,
    `clef.showOctave`, `clef.staffPosition`~~ — items 2 and 9. `_c` (a comment) is not ink.
@@ -259,9 +259,15 @@ Found by the sweep and confirmed by hand; each is a one-file fix and a test:
    with a new glyph changes it. `emitTempoMark` draws **every** mark: one without a
    `location` at the bar's start as before, a located one at its onset column, each
    its own text run; `tempo 96 at 1/2` writes it. The last two badge lines but
-   `harmonies` retire. No golden moved; pinned by `lab/navigation/tempo-change-mid-bar`
+   `harmonies` retired. No golden moved; pinned by `lab/navigation/tempo-change-mid-bar`
    and `lab/layout/coloured-marks-and-clef-forms` — batch 7. Not written: colours
    (no verb) and `clef.glyph`/`showOctave` (`setClef` says neither yet).
+
+**The census is closed** (2026-08-29): with chord symbols drawn by
+[core-chord-symbols.md](core-chord-symbols.md), `measureLevelGaps` names nothing — every
+measure-level attribute the sweep listed has ink, and the seam stays for the next one.
+What remains is writers, not ink: colours have no verb, `setClef` says neither `glyph`
+nor `showOctave`, and `_c` is a comment.
 
 Original plan:
 

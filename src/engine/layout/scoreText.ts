@@ -10,6 +10,7 @@ import { Primitive, translatePrimitiveY } from '../primitives.ts';
 import { glyphBBox } from '../smufl/smufl.ts';
 import { computeBoundsSp, type BoundsSp } from '../render/bounds.ts';
 import { durationValue, tremoloDuration, tupletDuration } from './spacing.ts';
+import { chordSymbolDisplay } from '../../model/harmony.ts';
 
 // ---------- Ink-measured placement (core-ink-measured-gaps.md, stage A) ----------
 
@@ -459,4 +460,51 @@ function emitOneTempo(
     className: 'tempo'
   });
   return placeTextRun(primitives, firstNew, belowBaseline, staffTop, scan, null);
+}
+
+// ---------- Chord symbols (`_x.mnxLab.harmonies`) ----------
+//
+// A chord symbol names the harmony from a moment on, so it sits over that
+// moment's column like a dynamic sits under it — closest to the staff of all
+// the score text, because a player reads the chord and the notes together;
+// the tempo and the labels stack above it (they are emitted after it and scan
+// its ink). core-chord-symbols.md.
+const HARMONY_SIZE_SP = 1.8;
+const HARMONY_LEAD_SP = 0.6; // the symbol starts a touch left of the column
+
+export interface EmitHarmoniesArgs {
+  gm: MnxGlobalMeasure;
+  m: { voices: { x: number }[][]; x: number; width: number };
+  stdSequences: MnxSequence[];
+  staffTop: number;
+  scan: readonly Primitive[];
+  primitives: Primitive[];
+}
+
+/** Every chord symbol on the bar, each its own run over its column. */
+export function emitHarmonies(args: EmitHarmoniesArgs): void {
+  const { gm, m, stdSequences, staffTop, scan, primitives } = args;
+  const harmonies = gm._x?.mnxLab?.harmonies ?? [];
+  if (harmonies.length === 0) return;
+  const onsetXs = measureOnsetXs(stdSequences[0], m.voices[0] ?? []);
+  const before = primitives.length;
+  for (const harmony of harmonies) {
+    const f = harmony.location?.fraction;
+    const t = Array.isArray(f) && f[1] ? f[0] / f[1] : 0;
+    const p = anchorAt(onsetXs, t, m);
+    const firstNew = primitives.length;
+    primitives.push({
+      kind: 'text',
+      text: chordSymbolDisplay(harmony),
+      x: p.anchor === 'end' ? p.x : p.x - HARMONY_LEAD_SP,
+      y: 0,
+      font: 'body',
+      size: HARMONY_SIZE_SP,
+      weight: 'bold',
+      anchor: p.anchor === 'end' ? 'end' : 'start',
+      ...(harmony.color ? { fill: harmony.color } : {}),
+      className: 'harmony'
+    });
+    placeTextRun(primitives, firstNew, 0, staffTop, [...scan, ...primitives.slice(before, firstNew)], null);
+  }
 }
