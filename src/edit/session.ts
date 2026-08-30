@@ -24,6 +24,7 @@ import {
   partHasInk,
   timeSignatureRemovalFits
 } from './ops.ts';
+import { spannersUnderSelection } from './spannerCoincidence.ts';
 import {
   buildGrid,
   clampCursor,
@@ -756,6 +757,19 @@ export class EditorSession {
         if (selected.length > 1) {
           const [fromNoteKey, toNoteKey] = [selected[0], selected[selected.length - 1]];
           this.spanAnchorState = null;
+          // Delete from any covered position (core-selection-range-grain.md
+          // decision 5): a range WHOLLY covering existing slurs removes them,
+          // wherever in the range each slur starts — the coincidence rule's
+          // removal half. A slur merely starting at the range's first note
+          // keeps the old toggle; otherwise the press creates.
+          const covered = spannersUnderSelection(this.doc, this.resolvedSelection.members)
+            .slurs.filter(hit => hit.coverage === 'whole' && hit.ownerNoteKey !== null);
+          if (covered.length > 0) {
+            return this.applyBulk(covered.map(hit => ({
+              type: 'removeSlur' as const,
+              noteKey: hit.ownerNoteKey!
+            })));
+          }
           return this.applyBulk([
             hasSlurStartingAt(this.doc, fromNoteKey)
               ? { type: 'removeSlur', noteKey: fromNoteKey }
@@ -1127,6 +1141,19 @@ export class EditorSession {
             ? this.selectedNoteKeys
             : [];
         if (selected.length > 1) {
+          // The same removal half as toggleSlur above: a range wholly
+          // covering existing beams un-beams them from any covered position.
+          const covered = spannersUnderSelection(this.doc, this.resolvedSelection.members)
+            .beams.filter(hit => hit.coverage === 'whole');
+          if (covered.length > 0) {
+            this.spanAnchorState = null;
+            return this.applyBulk(covered.map(hit => ({
+              type: 'removeBeam' as const,
+              measureIndex: hit.measureIndex,
+              path: hit.path,
+              partIndex: hit.partIndex
+            })));
+          }
           const first = selected[0];
           const existing = beamStartingAt(this.doc, first);
           if (existing) {

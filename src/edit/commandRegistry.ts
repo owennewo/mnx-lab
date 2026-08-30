@@ -23,6 +23,7 @@ import type {
   SelectionMember
 } from './selection.ts';
 import { containerCoincidence } from './selection.ts';
+import { spannersUnderSelection, type SpannerCoincidence } from './spannerCoincidence.ts';
 import type { Projection } from './cursor.ts';
 import type { MnxGlobalMeasure, MnxStructure } from '../model/mnx.ts';
 import type { MeasureAttributeKind } from './ops.ts';
@@ -120,6 +121,10 @@ export interface SessionView {
    *  through one — the tray's channel for offering container properties on
    *  the range that IS the container, and for the honest partial hint. */
   readonly containerCoincidence: ContainerCoincidence;
+  /** The spanner half (core-selection-range-grain.md decision 5): slurs and
+   *  beams the resolved range touches, whole or partial — the tray's channel
+   *  for the range-IS-the-spanner offer and the honest partial hint. */
+  readonly spannerCoincidence: SpannerCoincidence;
 }
 
 type BarlineType = NonNullable<NonNullable<MnxGlobalMeasure['barline']>['type']>;
@@ -295,7 +300,8 @@ export function sessionView(session: SessionLike): SessionView {
       : [barlineTypes],
     tied: Array.isArray(ties) && ties.length > 0,
     hasStrings: (doc.parts ?? []).some(part => (part._x?.mnxLab?.strings?.length ?? 0) > 0),
-    containerCoincidence: containerCoincidence(doc, members)
+    containerCoincidence: containerCoincidence(doc, members),
+    spannerCoincidence: spannersUnderSelection(doc, members)
   };
 }
 
@@ -473,6 +479,8 @@ export const COMMANDS: readonly EditorCommand[] = [
     tier: 'key',
     projection: 'notation',
     isActive: view => {
+      // A range wholly covering a slur IS that slur (the coincidence rule).
+      if (view.spannerCoincidence.slurs.some(hit => hit.coverage === 'whole')) return true;
       const start = view.noteKeys.length > 1 ? view.noteKeys[0] : view.noteKey;
       return start !== null && start !== undefined && hasSlurStartingAt(view.doc, start);
     },
@@ -487,6 +495,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     shortcut: 'B',
     tier: 'key',
     projection: 'notation',
+    isActive: view => view.spannerCoincidence.beams.some(hit => hit.coverage === 'whole'),
     action: () => ({ intent: { type: 'toggleBeam' } })
   },
   {

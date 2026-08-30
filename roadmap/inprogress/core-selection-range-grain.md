@@ -6,10 +6,19 @@
 > `SessionView`, Del groups whole containers, container-run clip retired;
 > f68181b staff off partMeasure identity, part-bars clip, ↑↓ walks parts).
 > The ladder is now `note → event → voiceMeasure → partMeasure → measure →
-> document`, all suites green at each landing. **Remaining: decision 5** —
-> the three spanner add models, delete-from-any-reference, the reverse
-> item→spanner index, and the coincidence rule generalized to slurs, beams
-> and ottavas (the tray hint for partial coverage also still to surface).
+> document`, all suites green at each landing. **Decision 5 started**: the
+> reverse item→spanner index and coincidence probe for the id-referenced
+> families landed as `src/edit/spannerCoincidence.ts` (slurs + beams,
+> whole/partial coverage, on `SessionView` beside `containerCoincidence`);
+> `S`/`B` over a range wholly covering a slur/beam now REMOVE it from any
+> covered position, and the slur/beam tiles read active over the covering
+> range — pinned by `harness/conformance/spanner-coincidence.test.ts`.
+> **Remaining**: the time-positioned family (ottavas, dynamics — interval
+> arithmetic, not an id join); the partial-coverage tray hint; and the two
+> add-model gestures, which are BLOCKED on a UX decision the doc did not
+> settle — model 1 ("S slurs to the next event") collides with the armed
+> two-press anchor `S` ships today, and whether the bare press changes
+> meaning is the user's call, not this implementation's.
 
 Serves the **implementation loop**. Proposed 2026-08-30, out of a rung-by-rung review
 of the selection ladder ([core-selection-ladder.md](../complete/core-selection-ladder.md)):
