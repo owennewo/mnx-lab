@@ -188,6 +188,9 @@ function keepScoped<T extends { staff?: number }>(
   return kept && kept.length > 0 ? kept : undefined;
 }
 
+/** One staff's view of a part-measure — the voice-bars clip still narrows
+ *  to its own staff's declarations, though the part-bars clip no longer
+ *  filters (the member is the whole part's bar). */
 function staffMeasure(source: MnxPartMeasure | undefined, staffIndex: number): MnxPartMeasure | null {
   if (!source) return null;
   const measure = cloneJson(source);
@@ -388,20 +391,17 @@ function buildClip(
           ? { kind: 'part', part: cloneJson(part) }
           : refuse('missing-source-member', 'The selected part no longer exists.');
       }
-      const staffMembers = members.filter(
+      const barMembers = members.filter(
         (member): member is Extract<SelectionMember, { kind: 'partMeasure' }> =>
           member.kind === 'partMeasure'
       );
-      const start = Math.min(...staffMembers.map(member => member.measureIndex));
-      const end = Math.max(...staffMembers.map(member => member.measureIndex));
-      const bars = staffMembers.flatMap(member => {
-        const measure = staffMeasure(
-          doc.parts?.[member.partIndex]?.measures?.[member.measureIndex],
-          member.staffIndex
-        );
-        return measure ? [{ offset: member.measureIndex - start, measure }] : [];
+      const start = Math.min(...barMembers.map(member => member.measureIndex));
+      const end = Math.max(...barMembers.map(member => member.measureIndex));
+      const bars = barMembers.flatMap(member => {
+        const measure = doc.parts?.[member.partIndex]?.measures?.[member.measureIndex];
+        return measure ? [{ offset: member.measureIndex - start, measure: cloneJson(measure) }] : [];
       });
-      return { kind: 'staff-bars', span: end - start + 1, bars };
+      return { kind: 'part-bars', span: end - start + 1, bars };
     }
     case 'measure': {
       const indices = members.flatMap(member => member.kind === 'measure' ? [member.measureIndex] : []);
@@ -439,7 +439,7 @@ function clipEvents(envelope: SelectionClipEnvelope): MnxEvent[] {
     case 'voice-bars':
       clip.bars.forEach(bar => visitItems(bar.sequence.content, event => events.push(event)));
       break;
-    case 'staff-bars':
+    case 'part-bars':
       clip.bars.forEach(bar => visitMeasure(bar.measure));
       break;
     case 'part':
@@ -466,7 +466,7 @@ function relationshipHolders(envelope: SelectionClipEnvelope): RelationshipHolde
     case 'voice-bars':
       clip.bars.forEach(bar => { if (bar.declarations) holders.push(bar.declarations); });
       break;
-    case 'staff-bars':
+    case 'part-bars':
       clip.bars.forEach(bar => addMeasure(bar.measure));
       break;
     case 'part':

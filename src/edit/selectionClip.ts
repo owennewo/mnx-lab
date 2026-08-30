@@ -94,16 +94,17 @@ export interface VoiceBarsClip {
   bars: VoiceBarClipEntry[];
 }
 
-export interface StaffBarClipEntry {
-  /** Relative bar offset; the measure is already filtered to one staff. */
+export interface PartBarClipEntry {
+  /** Relative bar offset; the measure is the part's WHOLE bar — every
+   *  staff (core-selection-range-grain.md decision 4). */
   offset: number;
   measure: MnxPartMeasure;
 }
 
-export interface StaffBarsClip {
-  kind: 'staff-bars';
+export interface PartBarsClip {
+  kind: 'part-bars';
   span: number;
-  bars: StaffBarClipEntry[];
+  bars: PartBarClipEntry[];
 }
 
 export interface PartClip {
@@ -148,7 +149,7 @@ export type SelectionClip =
   | NoteSetClip
   | EventRunClip
   | VoiceBarsClip
-  | StaffBarsClip
+  | PartBarsClip
   | PartClip
   | MeasuresClip
   | DocumentClip;
@@ -426,7 +427,7 @@ function validateClip(value: unknown): void {
       integerAt(clip.span, '$.clip.span', 1);
       validateOffsetEntries(clip.bars, '$.clip.bars', 'sequence');
       return;
-    case 'staff-bars':
+    case 'part-bars':
       exactKeys(clip, '$.clip', ['kind', 'span', 'bars']);
       integerAt(clip.span, '$.clip.span', 1);
       validateOffsetEntries(clip.bars, '$.clip.bars', 'measure');

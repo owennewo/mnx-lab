@@ -41,8 +41,8 @@ export function describeSelectionClip(clip: SelectionClip): string {
     }
     case 'voice-bars':
       return count(clip.bars.length, 'voice bar');
-    case 'staff-bars':
-      return count(clip.bars.length, 'staff bar');
+    case 'part-bars':
+      return count(clip.bars.length, 'part bar');
     case 'part':
       return `the part${clip.part.name ? ` ‘${clip.part.name}’` : ''} · ${count(clip.part.measures.length, 'bar')}`;
     case 'measures':
@@ -132,7 +132,7 @@ const RUNG_NOUN: Record<SelectionLevel, string> = {
   note: 'note',
   event: 'event',
   voiceMeasure: 'voice bar',
-  partMeasure: 'staff bar',
+  partMeasure: 'part bar',
   measure: 'bar',
   document: 'part'
 };

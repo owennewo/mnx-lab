@@ -474,8 +474,18 @@ function presentationSpan(
         push(member.measureIndex, member.partIndex, member.staffIndex, member.onset);
         break;
       case 'voiceMeasure':
-      case 'partMeasure':
         push(member.measureIndex, member.partIndex, member.staffIndex);
+        break;
+      case 'partMeasure':
+        // The whole part's bar: one unit per staff, so the enclosure's
+        // barline join merges them into ONE panel (the both-view precedent).
+        for (
+          let staff = 1;
+          staff <= Math.max(1, doc.parts?.[member.partIndex]?.staves ?? 1);
+          staff++
+        ) {
+          push(member.measureIndex, member.partIndex, staff);
+        }
         break;
       case 'measure':
         push(member.measureIndex);

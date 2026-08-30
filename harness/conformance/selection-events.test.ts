@@ -34,25 +34,18 @@ function grandStaff(): MnxStructure {
 }
 
 describe('the events beneath a selection member', () => {
-  it('numbers voices per STAFF, not by raw sequence index', () => {
-    // `sequences[2]` is staff 2's SECOND voice, so its address is
-    // voiceIndex 1 — the convention `eventAtAddress` reads back. Taking the
-    // raw index would address a voice that does not exist on that staff.
+  it('covers every staff of the part bar, numbering voices per STAFF', () => {
+    // The member is the WHOLE part's bar (core-selection-range-grain.md
+    // decision 4). `sequences[2]` is staff 2's SECOND voice, so its address
+    // is voiceIndex 1 — the convention `eventAtAddress` reads back; the raw
+    // index would address a voice that does not exist on that staff.
     const doc = grandStaff();
     expect(eventAddressesUnderMember(doc, {
-      kind: 'partMeasure', partIndex: 0, staffIndex: 2, measureIndex: 0
+      kind: 'partMeasure', partIndex: 0, measureIndex: 0
     })).toEqual([
+      { partIndex: 0, staffIndex: 1, measureIndex: 0, voiceIndex: 0, eventIndex: 0 },
       { partIndex: 0, staffIndex: 2, measureIndex: 0, voiceIndex: 0, eventIndex: 0 },
       { partIndex: 0, staffIndex: 2, measureIndex: 0, voiceIndex: 1, eventIndex: 0 }
-    ]);
-  });
-
-  it('keeps a staff bar to its own staff', () => {
-    const doc = grandStaff();
-    expect(eventAddressesUnderMember(doc, {
-      kind: 'partMeasure', partIndex: 0, staffIndex: 1, measureIndex: 0
-    })).toEqual([
-      { partIndex: 0, staffIndex: 1, measureIndex: 0, voiceIndex: 0, eventIndex: 0 }
     ]);
   });
 
@@ -98,8 +91,12 @@ describe('the events beneath a selection member', () => {
     expect(eventAddressesUnderSelection(doc, [
       { kind: 'note', ...shared, onset: { num: 0, den: 1 }, noteIndex: 0, noteKey: 'rh' },
       { kind: 'event', ...shared, onset: { num: 0, den: 1 } },
-      { kind: 'partMeasure', partIndex: 0, staffIndex: 1, measureIndex: 0 }
-    ])).toEqual([shared]);
+      { kind: 'partMeasure', partIndex: 0, measureIndex: 0 }
+    ])).toEqual([
+      shared,
+      { partIndex: 0, staffIndex: 2, measureIndex: 0, voiceIndex: 0, eventIndex: 0 },
+      { partIndex: 0, staffIndex: 2, measureIndex: 0, voiceIndex: 1, eventIndex: 0 }
+    ]);
   });
 
   it('the document member spans every bar', () => {

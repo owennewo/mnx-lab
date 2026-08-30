@@ -103,7 +103,11 @@ export type SelectionMember =
       voiceIndex: number;
       sequenceIndex: number;
     }
-  | { kind: 'partMeasure'; partIndex: number; staffIndex: number; measureIndex: number }
+  /** The whole part's bar — every staff. Staff is a cursor attribute, not a
+   *  selection identity (core-selection-range-grain.md decision 4): a staff
+   *  is an address other things point at, never a thing anyone composes
+   *  with, so the member covers the part's staves as one unit. */
+  | { kind: 'partMeasure'; partIndex: number; measureIndex: number }
   | { kind: 'measure'; measureIndex: number }
   | { kind: 'document' };
 
@@ -324,26 +328,16 @@ function voiceMeasureMembers(doc: MnxStructure, cursor: EditorCursor): Selection
   return members;
 }
 
-function partMeasureMembers(
-  doc: MnxStructure,
-  cursor: EditorCursor,
-  wholePart: boolean
-): SelectionMember[] {
+function partMeasureMembers(doc: MnxStructure, cursor: EditorCursor): SelectionMember[] {
   const partIndex = cursor.partIndex ?? 0;
   const part = doc.parts?.[partIndex];
   if (!part) return [];
   const measureCount = Math.max(doc.global?.measures?.length ?? 0, part.measures?.length ?? 0);
-  const staves = wholePart
-    ? Array.from({ length: Math.max(1, part.staves ?? 1) }, (_, index) => index + 1)
-    : [cursor.staffIndex ?? 1];
-  return staves.flatMap(staffIndex =>
-    Array.from({ length: measureCount }, (_, measureIndex) => ({
-      kind: 'partMeasure' as const,
-      partIndex,
-      staffIndex,
-      measureIndex
-    }))
-  );
+  return Array.from({ length: measureCount }, (_, measureIndex) => ({
+    kind: 'partMeasure' as const,
+    partIndex,
+    measureIndex
+  }));
 }
 
 function measureMembers(doc: MnxStructure): SelectionMember[] {
@@ -353,11 +347,7 @@ function measureMembers(doc: MnxStructure): SelectionMember[] {
   }));
 }
 
-function universeFor(
-  doc: MnxStructure,
-  state: SelectionState,
-  closure: boolean
-): SelectionMember[] {
+function universeFor(doc: MnxStructure, state: SelectionState): SelectionMember[] {
   switch (state.level) {
     case 'note':
       return noteMembers(doc, state.anchor);
@@ -366,7 +356,7 @@ function universeFor(
     case 'voiceMeasure':
       return voiceMeasureMembers(doc, state.anchor);
     case 'partMeasure':
-      return partMeasureMembers(doc, state.anchor, closure);
+      return partMeasureMembers(doc, state.anchor);
     case 'measure':
       return measureMembers(doc);
     case 'document':
@@ -427,7 +417,6 @@ function exactMemberIndex(
       return members.findIndex(member =>
         member.kind === 'partMeasure' &&
         member.partIndex === partIndex &&
-        member.staffIndex === staffIndex &&
         member.measureIndex === cursor.measureIndex
       );
     case 'measure':
@@ -543,9 +532,9 @@ function memberContainsInk(member: SelectionMember, address: InkAddress): boolea
         member.voiceIndex === address.voiceIndex
       );
     case 'partMeasure':
+      // Every staff of the part: staff is an address, not an identity.
       return (
         member.partIndex === address.partIndex &&
-        member.staffIndex === address.staffIndex &&
         member.measureIndex === address.measureIndex
       );
     case 'measure':
@@ -568,10 +557,10 @@ export function resolveSelection(
     if (state.extent.scope !== closureScopeForLevel(state.level)) {
       return { members: [], noteKeys: [] };
     }
-    const universe = universeFor(doc, state, true);
+    const universe = universeFor(doc, state);
     members = universe;
   } else {
-    const universe = universeFor(doc, state, false);
+    const universe = universeFor(doc, state);
     if (universe.length === 0) return { members: [], noteKeys: [] };
     // A collapsed point on an absent rung stays empty; it does not borrow a
     // neighbouring note. Endpoint fallback is for a real range surviving a

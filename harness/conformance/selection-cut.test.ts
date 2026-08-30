@@ -154,7 +154,7 @@ describe('selection cut', () => {
       { level: 'note', kind: 'note-set' },
       { level: 'event', kind: 'event-run' },
       { level: 'voiceMeasure', kind: 'voice-bars' },
-      { level: 'partMeasure', kind: 'staff-bars' },
+      { level: 'partMeasure', kind: 'part-bars' },
       { level: 'partMeasure', closure: true, kind: 'part' },
       { level: 'measure', kind: 'measures' }
     ];
@@ -194,14 +194,14 @@ describe('selection cut', () => {
     expect(voice.document.parts[0].measures[0].sequences.map(sequence => sequence.staff))
       .toEqual([2]);
 
-    const staff = accepted(selectedSession('partMeasure'));
-    const staffMeasure = staff.document.parts[0].measures[0];
-    expect(staffMeasure.sequences.map(sequence => sequence.staff)).toEqual([2]);
-    expect(staffMeasure.clefs).toEqual([{
-      clef: { sign: 'F', staffPosition: 2 },
-      staff: 2
-    }]);
-    expect(staffMeasure.dynamics).toMatchObject([{ value: 'p', staff: 2 }]);
+    // The part-bar member covers EVERY staff (core-selection-range-grain.md
+    // decision 4): the cut empties the whole bar, both staves' declarations
+    // included.
+    const partBar = accepted(selectedSession('partMeasure'));
+    const partBarMeasure = partBar.document.parts[0].measures[0];
+    expect(partBarMeasure.sequences).toEqual([]);
+    expect(partBarMeasure.clefs).toBeUndefined();
+    expect(partBarMeasure.dynamics).toBeUndefined();
 
     const part = accepted(selectedSession('partMeasure', score(), true));
     expect(part.document.parts.map(candidate => candidate.id)).toEqual(['p2']);

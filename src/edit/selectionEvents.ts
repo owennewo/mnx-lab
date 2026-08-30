@@ -107,7 +107,8 @@ export function eventAddressesUnderMember(
       return voice ? addressesInVoice(voice) : [];
     }
     case 'partMeasure':
-      return staffVoices(doc, member.partIndex, member.measureIndex, member.staffIndex)
+      // All staves: the member is the part's bar (core-selection-range-grain.md).
+      return staffVoices(doc, member.partIndex, member.measureIndex)
         .flatMap(addressesInVoice);
     case 'measure':
       return addressesInMeasure(doc, member.measureIndex);

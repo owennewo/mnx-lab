@@ -602,8 +602,11 @@ function partMeasurePills(doc: MnxStructure, member: Extract<SelectionMember, { 
   const part = doc.parts?.[member.partIndex];
   const measure = part?.measures?.[member.measureIndex];
   const pills: InspectorPill[] = [];
-  const clef = measure?.clefs?.find(c => (c.staff ?? 1) === member.staffIndex)?.clef;
-  if (clef) pills.push(annotation('clef', 'clef', clefText(clef), { type: 'removeClef' }));
+  // The member is the whole part's bar, so every staff's clef reads here.
+  (measure?.clefs ?? []).forEach(entry => {
+    const staff = entry.staff ?? 1;
+    pills.push(annotation(`clef${staff}`, 'clef', clefText(entry.clef), { type: 'removeClef' }));
+  });
   const x = part?._x?.mnxLab;
   if (x?.capo !== undefined)
     pills.push(annotation('capo', 'capo', `${x.capo}`, { type: 'removePartDeclaration', kind: 'capo' }));

@@ -849,7 +849,7 @@ export const COMMANDS: readonly EditorCommand[] = [
     id: 'delete-part-bar',
     scopes: ['partMeasure'],
     glyph: { mark: { smufl: 'restWhole' }, op: { sign: 'minus', at: 'before' } },
-    label: 'Delete staff bar',
+    label: 'Delete part bar',
     detail: 'Clears its notes first',
     shortcut: 'Del',
     tier: 'key',

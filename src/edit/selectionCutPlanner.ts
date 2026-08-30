@@ -55,7 +55,7 @@ function clipKindFor(state: SelectionState): CutPlan['clipKind'] {
     case 'note': return 'note-set';
     case 'event': return 'event-run';
     case 'voiceMeasure': return 'voice-bars';
-    case 'partMeasure': return state.extent.kind === 'closure' ? 'part' : 'staff-bars';
+    case 'partMeasure': return state.extent.kind === 'closure' ? 'part' : 'part-bars';
     case 'measure': return 'measures';
     case 'document': return 'document';
   }
@@ -167,8 +167,11 @@ export function planSelectionCut(
         );
         for (const member of members) {
           const measure = next.parts[member.partIndex]?.measures[member.measureIndex];
-          if (!measure) return refuse('missing-source-member', 'A selected staff bar no longer exists.');
-          replaceSelectionStaffMaterial(measure, null, member.staffIndex);
+          if (!measure) return refuse('missing-source-member', 'A selected part bar no longer exists.');
+          const staves = Math.max(1, next.parts[member.partIndex]?.staves ?? 1);
+          for (let staff = staves; staff >= 1; staff--) {
+            replaceSelectionStaffMaterial(measure, null, staff);
+          }
         }
       }
       break;

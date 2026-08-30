@@ -54,7 +54,6 @@ import {
 import { midiOfPitch } from './tabStrings.ts';
 import {
   pruneDanglingSelectionReferences,
-  replaceSelectionStaffMaterial,
   restItemsForDuration
 } from './selectionStructuralEdit.ts';
 
@@ -232,9 +231,9 @@ function validateEnvelopePayload(envelope: SelectionClipEnvelope): PasteRefusal 
       if (clip.span < 1 || clip.bars.some(bar => bar.offset < 0 || bar.offset >= clip.span))
         return refuse('invalid-payload', 'The voice clip has invalid bar offsets.');
       break;
-    case 'staff-bars':
+    case 'part-bars':
       if (clip.span < 1 || clip.bars.some(bar => bar.offset < 0 || bar.offset >= clip.span))
-        return refuse('invalid-payload', 'The staff clip has invalid bar offsets.');
+        return refuse('invalid-payload', 'The part-bar clip has invalid bar offsets.');
       break;
     case 'part':
       if (!Array.isArray(clip.part.measures)) return refuse('invalid-payload', 'The part clip has no measures.');
@@ -1002,12 +1001,8 @@ export function planSelectionPaste(
       resultLanding = landing(state, 'voiceMeasure', targetStart, targetStart + clip.span - 1);
       break;
     }
-    case 'staff-bars': {
+    case 'part-bars': {
       const targetStart = anchorBarStart(destination, state, projection);
-      const part = after.parts[partIndex];
-      // The cursor cannot address a staff a part does not have, but stay
-      // defensive: land on the nearest staff rather than refusing.
-      const targetStaff = Math.min(staffIndex, part?.staves ?? 1);
       ensureBars(after, targetStart + clip.span - 1, accommodations);
       accommodations.flaggedNotes += countUnplayableAnnotations(
         clip.bars.flatMap(bar => notesInMeasure(bar.measure)),
@@ -1015,12 +1010,12 @@ export function planSelectionPaste(
       );
       bindContextMeasures(envelope, after, targetStart, ids);
       clip.bars.forEach(bar => rewriteMeasure(bar.measure, ids));
+      // The clip bar is the part's WHOLE bar, so paste replaces the whole
+      // destination bar — sparse offsets leave an empty copy, mirroring cut.
       for (let offset = 0; offset < clip.span; offset++) {
-        replaceSelectionStaffMaterial(
-          after.parts[partIndex].measures[targetStart + offset],
-          clip.bars.find(bar => bar.offset === offset)?.measure ?? null,
-          targetStaff
-        );
+        const source = clip.bars.find(bar => bar.offset === offset)?.measure;
+        after.parts[partIndex].measures[targetStart + offset] =
+          source ? cloneJson(source) : emptyPartBar();
       }
       resultLanding = landing(state, 'partMeasure', targetStart, targetStart + clip.span - 1);
       break;

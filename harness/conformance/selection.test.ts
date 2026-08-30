@@ -769,7 +769,7 @@ describe('selection ladder', () => {
       extent: { kind: 'closure', scope: 'part' }
     };
     const part = resolveSelection(doc, partClosure, 'notation');
-    expect(part.members).toHaveLength(4); // two staves × two bars, including both empty copies
+    expect(part.members).toHaveLength(2); // two bars — each part-bar member covers BOTH staves
     expect(part.noteKeys.sort()).toEqual(['left', 'right']);
 
     const timeline: SelectionState = {

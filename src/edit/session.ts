@@ -570,16 +570,18 @@ export class EditorSession {
           return this.finishDeleteRemoval(level, ops);
         }
         if (level === 'partMeasure') {
-          const ops = [...this.resolvedSelection.members].reverse().flatMap(member =>
-            member.kind === 'partMeasure'
-              ? [{
-                  type: 'removePartMeasure' as const,
-                  partIndex: member.partIndex,
-                  measureIndex: member.measureIndex,
-                  staffIndex: member.staffIndex
-                }]
-              : []
-          );
+          // The member is the whole part's bar (core-selection-range-grain.md
+          // decision 4), so the removal covers every staff's copy.
+          const ops = [...this.resolvedSelection.members].reverse().flatMap(member => {
+            if (member.kind !== 'partMeasure') return [];
+            const staves = Math.max(1, this.doc.parts?.[member.partIndex]?.staves ?? 1);
+            return Array.from({ length: staves }, (_, index) => ({
+              type: 'removePartMeasure' as const,
+              partIndex: member.partIndex,
+              measureIndex: member.measureIndex,
+              staffIndex: staves - index
+            }));
+          });
           return this.finishDeleteRemoval(level, ops);
         }
         // The measure rung's footprint is the whole bar COLUMN across every
@@ -1560,7 +1562,10 @@ export class EditorSession {
             this.reanchorSelection();
             return true;
           case 'partMeasure':
-            if (!this.stepStaff(before, delta)) return false;
+            // ↑↓ walks PARTS: the member is the whole part's bar, and the
+            // staff stays a cursor attribute for the finer rungs
+            // (core-selection-range-grain.md decision 4).
+            if (!this.stepPart(before, delta)) return false;
             this.reanchorSelection();
             return true;
           default:
@@ -1994,6 +1999,39 @@ export class EditorSession {
    * which is the whole point of the rung. The anchor voice does not — voice
    * numbering is per-sequence and means nothing in another part.
    */
+  /** The part-measure rung's vertical: the next part, first staff — the
+   *  member covers all of the part's staves, so walking its staves would
+   *  step inside one selection. */
+  private stepPart(before: EditorCursor, delta: 1 | -1): boolean {
+    const parts = this.doc.parts ?? [];
+    const target = (before.partIndex ?? 0) + delta;
+    if (target < 0 || target >= parts.length) return false;
+    this.grid = buildGrid(this.doc, target, 1);
+    if (this.grid.positions.length === 0) return false;
+    if (this.activeProjection === 'tab' && this.grid.mode !== 'string') {
+      this.activeProjection = 'notation';
+    }
+    const landed = clampCursor(this.grid, {
+      measureIndex: before.measureIndex,
+      onset: before.onset,
+      line: before.line,
+      ...(target ? { partIndex: target } : {})
+    });
+    // Same landing rule as stepStaff below: the line means a different space
+    // per grid, so land on this staff's ink for an honest line and voice.
+    const slot = positionAt(this.grid, landed)?.slots[0];
+    this.cursorState = slot
+      ? {
+          ...landed,
+          line: this.activeProjection === 'tab' && this.grid.mode === 'string'
+            ? slot.line
+            : slot.staffPosition,
+          ...(slot.voiceIndex ? { voiceIndex: slot.voiceIndex } : {})
+        }
+      : landed;
+    return true;
+  }
+
   private stepStaff(before: EditorCursor, delta: 1 | -1): boolean {
     const staves = (this.doc.parts ?? []).flatMap((part, partIndex) =>
       Array.from({ length: Math.max(1, part.staves ?? 1) }, (_, k) => ({

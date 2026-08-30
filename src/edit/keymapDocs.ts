@@ -93,7 +93,7 @@ export const KEY_DOCS: KeyDoc[] = [
       // voice jump moved to Ctrl+↑/↓ after descent (a named cost).
       event: 'descend to the event’s nearest notehead',
       voiceMeasure: 'the voice above/below in this bar',
-      partMeasure: 'the staff above/below (this part’s staves, then the next part)',
+      partMeasure: 'the part above/below (the whole part bar travels)',
       measure: 'the nearest bar in the system above/below',
       document: 'the previous/next document in the collection'
     }
@@ -190,7 +190,7 @@ export const KEY_DOCS: KeyDoc[] = [
       note: 'become an event selection (the note’s own event; press again to extend)',
       event: 'extend through this voice’s events (rests included)',
       voiceMeasure: 'extend through this voice’s existing bar copies',
-      partMeasure: 'extend through bars on this staff',
+      partMeasure: 'extend through this part’s bars',
       measure: 'extend through global bars'
     }
   },
@@ -202,7 +202,7 @@ export const KEY_DOCS: KeyDoc[] = [
       note: 'become an event range to this voice’s last event',
       event: 'extend to this voice’s last event',
       voiceMeasure: 'extend to this voice’s last existing bar copy',
-      partMeasure: 'extend to the last bar on this staff',
+      partMeasure: 'extend to this part’s last bar',
       measure: 'extend to the last global bar'
     }
   },
@@ -268,7 +268,7 @@ export const KEY_DOCS: KeyDoc[] = [
       note: 'delete the note under the cursor (an emptied event becomes a rest)',
       event: 'clear the event to an equal-duration rest, then remove the empty event',
       voiceMeasure: 'clear this voice’s bar copy, then remove the empty copy',
-      partMeasure: 'clear this staff’s bar copy, then remove the empty copy',
+      partMeasure: 'clear this part’s bar, then remove the empty bar copy on every staff',
       measure: 'clear this bar across every part, then remove the empty bar',
       document: 'clear the score, then remove the empty part and its trailing bars'
     }
@@ -369,7 +369,7 @@ export const KEY_DOCS: KeyDoc[] = [
       note: 'cut the note (an emptied event becomes a rest)',
       event: 'cut the events to equal-duration rests',
       voiceMeasure: 'cut this voice’s bar copies (absence is silence)',
-      partMeasure: 'cut this staff’s bars; the part closure cuts the whole part',
+      partMeasure: 'cut this part’s bars; the part closure cuts the whole part',
       measure: 'cut the global bars — the timeline closes'
       // document: refused — deleting a document belongs to its library.
     }

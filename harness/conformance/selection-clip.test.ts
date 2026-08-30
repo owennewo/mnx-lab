@@ -44,7 +44,7 @@ const everyKind: SelectionClip[] = [
     bars: [{ offset: 1, sequence: { content: [] } }]
   },
   {
-    kind: 'staff-bars',
+    kind: 'part-bars',
     span: 1,
     bars: [{ offset: 0, measure: { sequences: [] } }]
   },

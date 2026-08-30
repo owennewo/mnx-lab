@@ -354,7 +354,7 @@ describe('the per-level navigation map', () => {
     expect(session.selectedNoteKeys).toEqual(['l6', 'l7']); // voice 1's whole bar
   });
 
-  it('part-measure ↑↓ walks the staves, and the BAR travels', () => {
+  it('part-measure ↑↓ walks the parts, and the BAR travels', () => {
     const session = at('partMeasure');
     session.handleIntent({ type: 'nextPosition' }); // bar 2, so the bar has something to keep
     expect(session.cursor.measureIndex).toBe(1);

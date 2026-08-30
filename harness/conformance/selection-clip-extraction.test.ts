@@ -159,7 +159,7 @@ describe('selection clip extraction', () => {
       [point('note', cursor(0)), 'note-set'],
       [point('event', cursor(0)), 'event-run'],
       [point('voiceMeasure', cursor(0)), 'voice-bars'],
-      [point('partMeasure', cursor(0)), 'staff-bars'],
+      [point('partMeasure', cursor(0)), 'part-bars'],
       [closure('partMeasure', cursor(0)), 'part'],
       [point('measure', cursor(0)), 'measures'],
       [point('document', cursor(0)), 'document']
@@ -189,17 +189,18 @@ describe('selection clip extraction', () => {
       anchor: cursor(2),
       extent: { kind: 'cursor', cursor: cursor(0) }
     };
-    const staff = success(doc, staffRange);
-    expect(staff.envelope.selection.shape).toBe('range');
-    expect(staff.envelope.clip).toMatchObject({
-      kind: 'staff-bars',
+    const partBars = success(doc, staffRange);
+    expect(partBars.envelope.selection.shape).toBe('range');
+    expect(partBars.envelope.clip).toMatchObject({
+      kind: 'part-bars',
       span: 3,
       bars: [{ offset: 0 }, { offset: 1 }, { offset: 2 }]
     });
-    if (staff.envelope.clip.kind !== 'staff-bars') throw new Error('wrong clip');
-    expect(staff.envelope.clip.bars[0].measure.sequences).toHaveLength(1);
-    expect(staff.envelope.clip.bars[0].measure.clefs).toHaveLength(1);
-    expect(staff.envelope.clip.bars[1].measure).toEqual({ sequences: [] });
+    if (partBars.envelope.clip.kind !== 'part-bars') throw new Error('wrong clip');
+    // The whole part's bar travels: both staves' sequences and clefs.
+    expect(partBars.envelope.clip.bars[0].measure.sequences).toHaveLength(2);
+    expect(partBars.envelope.clip.bars[0].measure.clefs).toHaveLength(2);
+    expect(partBars.envelope.clip.bars[1].measure).toEqual({ sequences: [] });
   });
 
   it('orders reversed ranges in document order and clones owned data', () => {
