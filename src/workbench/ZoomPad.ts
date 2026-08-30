@@ -37,16 +37,17 @@ import {
  * it emits is clamped by the engine that owns it (`clampStaffScale`,
  * `clampDensity`). The layering rule is docs/core-viewer-surface.md's.
  *
- * The quiet state is the place the design was revised, twice. The spec idles
+ * The quiet state is the place the design was revised three times. The spec idles
  * the FULL 3×3 grid at 72×72 and opacity 0.28 — about a bar of music, and
  * faint is not absent — so the first revision drew the crosshair as a single
  * 24×24 glyph: 89% less area, same identity. The second (2026-08-20) made the
  * two states ONE geometry so they morph instead of swapping DOM: the readout
- * moved from below the grid to its left — where the idle numbers already
- * sat — and idle is now the same pad with its chrome transparent, its labels
- * closed and its grid tracks collapsed until the four arms form the 24×24
- * crosshair. Same buttons in both poses, tracks/transforms/opacity only, and
- * hover costs 72px of height where the stacked layout cost 100.
+ * moved from below the grid to its left and the grid tracks collapse until the
+ * four arms form the 24×24 crosshair. The third closes the numeric column
+ * completely at rest, even off-default, so the adjacent focus and zoom marks
+ * are comparable squares. Same buttons in both poses, tracks/transforms/
+ * opacity only, and hover costs 72px of height where the stacked layout cost
+ * 100.
  */
 
 /** Design: staff step 5%, spacing step 4%. Both ranges are the ENGINE's.
@@ -315,8 +316,7 @@ export class ZoomPad extends LitElement {
         opacity: 0.28;
       }
 
-      /* ── the readout: a left-hand column, so the idle numbers and the open
-         readout are the same elements in the same place ──
+      /* ── the readout: an open-state left-hand column ──
 
          Open, the column gets a GROUND of its own (--bg-context) rather than
          sharing the pad's --surface. The reason is a collision the token
@@ -329,12 +329,14 @@ export class ZoomPad extends LitElement {
       .readout {
         box-sizing: border-box;
         width: 60px;
+        height: 72px;
         display: flex;
         flex-direction: column;
         overflow: hidden;
         border-right: var(--rule-w) solid transparent;
         transition:
           width 0.16s ease,
+          height 0.16s ease,
           opacity 0.12s ease,
           background-color 0.16s ease,
           border-color 0.16s ease;
@@ -346,12 +348,9 @@ export class ZoomPad extends LitElement {
       }
 
       .pad:not(.expanded) .readout {
-        width: 30px;
-      }
-
-      /* On-default idle shows no numbers at all — the column closes. */
-      .pad:not(.expanded) .readout.empty {
         width: 0;
+        height: 0;
+        border-right-width: 0;
         opacity: 0;
       }
 
@@ -371,8 +370,8 @@ export class ZoomPad extends LitElement {
         border-color: var(--line);
       }
 
-      /* The label closes rather than hides: 11px → 0 is what turns the open
-         STAFF/SPACE pair back into the idle number stack. */
+      /* The labels collapse with the readout so the open pose still morphs
+         from the square mark rather than appearing as unrelated DOM. */
       .lbl {
         font: 600 8px/1 var(--sans);
         letter-spacing: 0.09em;
@@ -393,20 +392,11 @@ export class ZoomPad extends LitElement {
         opacity: 0;
       }
 
-      /* 9px was the whole readout, in both poses. It is the right size for
-         the idle whisper beside a 24px mark and too small to READ in the pose
-         the pointer is actually in, so the size is now part of the morph:
-         13px open, back to 9px idle. Idle cannot simply inherit 13px — two
-         halves of it stand taller than the 24px crosshair and the mark would
-         stop being 24×24. */
+      /* The readout exists only in the expanded pose, where 13px is the size
+         at which the two percentages are actually legible. */
       .val {
         font: 600 13px/1.25 var(--mono);
         color: var(--ink);
-        transition: font-size 0.16s ease;
-      }
-
-      .pad:not(.expanded) .val {
-        font-size: 9px;
       }
 
       .val.hot {
@@ -1066,7 +1056,7 @@ export class ZoomPad extends LitElement {
           @pointerup=${this.onPointerUp}
           @pointercancel=${this.onPointerUp}
         >
-          <div class="readout ${this.offDefault ? '' : 'empty'}">
+          <div class="readout">
             ${this.renderHalf('staff')}
             ${this.renderHalf('space')}
           </div>

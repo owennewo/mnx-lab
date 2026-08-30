@@ -13,8 +13,8 @@
 > from 1004px to 1105px tall; dragging left to the floor drops the score from
 > 1004px to 744px (the music genuinely repacks) and shows `SPACE 50 MIN` on the
 > ink band with the exhausted arm greyed; the magnifier returns both to fitted;
-> idle-off-default prints `100 / 50` beside the mark with the changed axis in
-> the accent; values survive a reload and a stored `99` **clamps to 1.6 rather
+> idle-off-default raises the mark and accents the changed axis without widening
+> the square; values survive a reload and a stored `99` **clamps to 1.6 rather
 > than resetting**; and opening the tray drops the pad to 0.28 and keeps it
 > there even under the pointer.
 >
@@ -208,7 +208,7 @@ table takes one cheaply. Should a stroke ever be wanted,
 `harness/conformance/keymap-docs.test.ts` asserts the binding↔`KEY_DOCS` join in
 both directions, so it cannot ship undocumented.
 
-## The idle mark — the one place the design is revised (twice — see below)
+## The idle mark — the one place the design is revised (three times — see below)
 
 The mock's idle state is the **full 3×3 grid**, laid out at 72×72 and dropped to
 opacity 0.28. That is roughly a bar of music, and 0.28 opacity makes it faint,
@@ -230,9 +230,12 @@ Why this and not the alternatives:
 
 Everything else about the quiet states is kept verbatim: 0.28 idle, 1.0 on hover
 over 120ms, a 44px hit area so it is grabbable before it is visible, the floor
-rising to 0.55 while either axis is off default with the changed number printed
-in the accent, holding 1.0 while dragging even if the pointer leaves, and
-dropping to 0.28 whenever the selection tray is open.
+rising to 0.55 while either axis is off default with the changed arms in the
+accent, holding 1.0 while dragging even if the pointer leaves, and dropping to
+0.28 whenever the selection tray is open. A 2026-08-30 refinement fully closes
+the numeric column while idle even off-default, so the zoom and adjacent focus
+controls present as two comparable squares; STAFF/SPACE return on hover or
+keyboard focus.
 
 **Second revision (2026-08-20): the two states became one geometry, so they
 morph.** As built, idle and hover were a hard DOM swap of two unrelated layouts
@@ -251,6 +254,13 @@ arms exist in both poses so keyboard focus never lands on a vanishing element;
 the clamp band became **per-axis** — the half that hit its wall turns ink while
 the other axis stays readable, which the old full-width chip could not do; and
 `prefers-reduced-motion` snaps between poses with no transition.
+
+**Third revision (2026-08-30): the idle numbers close completely.** Once the
+focus toggle joined the zoom mark as its left-hand neighbour, the off-default
+numeric whisper made one control a rectangle and the other a square. The idle
+readout now closes to zero width and height in every state. The changed arms
+retain the off-default accent; hovering or keyboard-focusing zoom restores the
+full STAFF/SPACE column.
 
 ## Where it attaches
 
@@ -331,12 +341,11 @@ distraction."* Two causes, one of them a plain CSS defect:
    panel and through its type. That is the "background under the numbers", and
    it was the score. Fixed by scoping the floor to `:not(.expanded)`, which is
    what it always meant.
-2. **9px was the whole readout, in both poses.** Right for the idle whisper
-   beside a 24×24 mark, too small to read in the pose the pointer is in. The
-   size is now part of the morph — 13px open, 9px idle (the label 8px, from
-   6.5px), the column 42px → 60px, which is also what `TIGHTEST` needs. Idle
-   cannot simply inherit 13px: two halves of it stand taller than the crosshair
-   and the mark would stop being 24×24.
+2. **9px was the whole readout, in both poses.** It was too small to read in
+   the pose where the reader actually uses it. The open readout therefore grew
+   to 13px and 60px wide, which is also what `TIGHTEST` needs. The later square-
+   idle refinement removes the idle whisper entirely: the readout closes to
+   zero until hover/focus, while the arm accent retains the off-default signal.
 
 Also, while the fill was opaque it was **the same value as the paper**:
 `--surface` and `--paper` are equal in both themes by the token sheet, so the

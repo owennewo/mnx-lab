@@ -111,6 +111,7 @@ const DUMP = `(() => {
   const zoomPad = pageRoot?.querySelector('mnx-zoom-pad');
   const zoomRoot = zoomPad?.shadowRoot;
   const zoomControl = zoomRoot?.querySelector('.pad');
+  const zoomReadout = zoomRoot?.querySelector('.readout');
   const zoomFocus = zoomRoot?.querySelector('.focus-toggle');
   const rect = element => {
     if (!element) return null;
@@ -140,6 +141,8 @@ const DUMP = `(() => {
     zoomRect: rect(zoomPad),
     zoomControlRect: rect(zoomControl),
     zoomExpanded: zoomControl?.classList.contains('expanded') ?? false,
+    zoomReadoutRect: rect(zoomReadout),
+    zoomReadoutOpacity: zoomReadout ? Number(getComputedStyle(zoomReadout).opacity) : null,
     zoomFocusRect: rect(zoomFocus),
     zoomFocusLabel: zoomFocus?.getAttribute('aria-label') ?? null,
     zoomFocusPressed: zoomFocus?.getAttribute('aria-pressed') ?? null,
@@ -190,7 +193,8 @@ try {
   await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
     source:
       "localStorage.setItem('mnx-lab.rail-hidden','1');" +
-      "localStorage.setItem('mnx-lab.panel-hidden','1');"
+      "localStorage.setItem('mnx-lab.panel-hidden','1');" +
+      "localStorage.setItem('mnx-lab.staff-scale','1.2');"
   });
 
   const url =
@@ -227,6 +231,10 @@ try {
       x: focusRect.x + focusRect.width / 2,
       y: focusRect.y + focusRect.height / 2
     });
+    await new Promise(resolve => setTimeout(resolve, 300));
+  };
+  const movePointer = async (x, y) => {
+    await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
     await new Promise(resolve => setTimeout(resolve, 300));
   };
 
@@ -274,6 +282,12 @@ try {
     state.zoomFocusRect.x + state.zoomFocusRect.width <= state.zoomControlRect.x,
     'the document-focus toggle sits to the left of the collapsed zoom mark'
   );
+  check(
+    near(state.zoomControlRect.width, state.zoomControlRect.height) &&
+      state.zoomReadoutRect.width < 1 &&
+      state.zoomReadoutOpacity === 0,
+    'the off-default zoom control idles as a square with no numeric readout'
+  );
   const restingFocusRect = state.zoomFocusRect;
   const restingZoomRect = state.zoomControlRect;
   await hoverZoomFocus(restingFocusRect);
@@ -285,6 +299,23 @@ try {
       near(state.zoomControlRect.width, restingZoomRect.width) &&
       near(state.zoomControlRect.height, restingZoomRect.height),
     'hovering the focus toggle neither opens zoom nor moves either control'
+  );
+  await movePointer(
+    state.zoomControlRect.x + state.zoomControlRect.width / 2,
+    state.zoomControlRect.y + state.zoomControlRect.height / 2
+  );
+  state = await dump();
+  check(
+    state.zoomExpanded && state.zoomReadoutRect.width >= 59 && state.zoomReadoutOpacity === 1,
+    'hovering zoom restores the STAFF and SPACE readout'
+  );
+  await movePointer(0, 0);
+  state = await dump();
+  check(
+    !state.zoomExpanded &&
+      near(state.zoomControlRect.width, state.zoomControlRect.height) &&
+      state.zoomReadoutRect.width < 1,
+    'leaving zoom returns it to the numberless square'
   );
   await clickZoomFocus();
   state = await dump();
