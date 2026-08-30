@@ -656,7 +656,10 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     // the ops; item 3's trace queue found they had no way in).
     'setFingering',
     'removeFingering',
-    'toggleTechnique'
+    'toggleTechnique',
+    // A shaped bend types its stops and SETS them — an upsert, not a toggle
+    // (core-bend-stops.md).
+    'setTechnique'
   ],
   // The rhythm declarations (campaign item 11b): the three containers share
   // one wrap verb, silence is inserted, and rest spelling is a verb rather

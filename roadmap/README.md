@@ -44,13 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-bend-stops.md](proposed/core-bend-stops.md)** — bends typed as the curve they
-  are: `bend 0>full>1/2>0` — every stop explicit (a non-zero first stop *is* the
-  pre-bend), equal neighbours a hold, `>>` a slower segment; fractions/`full` at the
-  keyboard, semitones in storage (the schema already carries all of it, positions
-  included). The op widens to write points and the old `pre/semitones/release` form
-  retires. Engraving half: `bendSegment` arrives flat, so every arrowhead sits on a
-  horizontal — arrive vertical, label every non-zero arrival.
 - **[workbench-document-focus-mode.md](proposed/workbench-document-focus-mode.md)** — two honest
   fullscreen levels: `Ctrl+Alt+F` toggles transient **document focus** (header, rail, view
   strip, panel and persistent controls gone; the document viewer fills the browser viewport),
@@ -240,6 +233,15 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-bend-stops.md](complete/core-bend-stops.md)** — **finished 2026-08-30**
+  (proposed and built the same day). Bends typed as the curve they are:
+  `bend 0>full>1/2>0` — every stop explicit (a non-zero first stop *is* the pre-bend),
+  equal neighbours a hold, `>>` a slower segment; fractions/`full` at the keyboard,
+  semitones in storage. The op widened to `{alters[], weights?[]}`, the reader marks
+  foreign curves `≈`, and the old `pre/semitones/release` forms retired. Engraving:
+  bend curves now arrive VERTICALLY so the arrowheads sit on their own tangent, and
+  every arrival off the written pitch is labelled — a partial release reads as what it
+  is. Scenario `06-bend-shapes` covers the newly sayable shapes; ledger batch 8.
 - **[core-rung-addressing.md](complete/core-rung-addressing.md)** — **Escape stops walking the
   ladder**, **finished 2026-08-28** (proposed, built and closed the same day). Hands-on,
   reaching for Escape as "back out of what I'm doing" widened the selection instead, and the reflex being violated is older than the ladder — so the

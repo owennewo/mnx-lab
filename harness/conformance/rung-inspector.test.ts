@@ -447,7 +447,7 @@ describe('note pills', () => {
     // The fixture's capo 2 puts an open E4 below string 1's open — the fret is
     // honestly unplayable, and the pill says so rather than clamping.
     expect(pillText(session)).toEqual(['pitch: E4 [floor]', 'string: 1 [annotation]', 'fret: — [derived]']);
-    for (const text of ['accidental parens', 'finger left 3', 'vibrato', 'bend pre 1 2 release', 'staccato']) {
+    for (const text of ['accidental parens', 'finger left 3', 'vibrato', 'bend 1/2>full>0', 'staccato']) {
       const parsed = parseInspectorLine('note', null, text);
       expect(parsed, text).toHaveProperty('intent');
       expect(edit(session, (parsed as { intent: never }).intent), text).toBe(true);
@@ -458,19 +458,21 @@ describe('note pills', () => {
       'fret: — [derived]',
       'accidental: parens [annotation]',
       'fingering: left 3 [annotation]',
-      'bend: pre 1 2 release [annotation]',
+      'bend: 1/2>full>0 [annotation]',
       'vibrato:  [annotation]',
       'staccato:  [annotation]'
     ]);
   });
 
-  it('a bend round-trips through the widened op — pre, peak, release — and amends without toggling', () => {
+  it('a bend round-trips as its stops — pre-bend, hold, partial release, double bend, weights', () => {
     const cases: TechniqueChoice[] = [
-      { kind: 'bend', semitones: 2 },
-      { kind: 'bend', semitones: 2, release: true },
-      { kind: 'bend', semitones: 2, pre: 1 },
-      { kind: 'bend', semitones: 3, release: true, pre: 1 },
-      { kind: 'bend', semitones: 2, pre: 1, release: true }
+      { kind: 'bend', alters: [0, 2] },
+      { kind: 'bend', alters: [2, 2, 0] },
+      { kind: 'bend', alters: [1, 3, 0] },
+      { kind: 'bend', alters: [0, 2, 1] },
+      { kind: 'bend', alters: [0, 1, 1, 0] },
+      { kind: 'bend', alters: [0, 1, 0, 1, 0] },
+      { kind: 'bend', alters: [0, 1, 0], weights: [1, 2] }
     ];
     for (const technique of cases) {
       const session = at('note');
@@ -480,20 +482,50 @@ describe('note pills', () => {
       // Typed form parses back to the same thing.
       expect(parseInspectorLine('note', 'bend', techniqueText(technique))).toEqual({ intent: { type: 'setTechnique', technique } });
       // Amend: a second set replaces rather than removing.
-      expect(session.handleIntent({ type: 'setTechnique', technique: { kind: 'bend', semitones: 4 } })).toBe(true);
-      expect(readTechniques(session.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!)).toEqual([{ kind: 'bend', semitones: 4 }]);
+      expect(session.handleIntent({ type: 'setTechnique', technique: { kind: 'bend', alters: [0, 4] } })).toBe(true);
+      expect(readTechniques(session.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!)).toEqual([{ kind: 'bend', alters: [0, 4] }]);
     }
-    // The pre-widening forms still write byte-identical curves.
+    // The toggle's plain form writes the curve it always wrote.
     const plain = at('note');
     plain.handleIntent({ type: 'toggleTechnique', kind: 'bend' });
     expect(plain.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
       points: [{ position: 0, alter: 0 }, { position: 1, alter: 2 }]
     });
-    const released = at('note');
-    released.handleIntent({ type: 'toggleTechnique', kind: 'bend', release: true });
-    expect(released.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
-      points: [{ position: 0, alter: 2 }, { position: 0.5, alter: 2 }, { position: 1, alter: 0 }]
+    // Weights place the points: 1:2 puts the peak a third of the way in.
+    const weighted = at('note');
+    weighted.handleIntent({ type: 'setTechnique', technique: { kind: 'bend', alters: [0, 2, 0], weights: [1, 2] } });
+    expect(weighted.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
+      points: [{ position: 0, alter: 0 }, { position: 1 / 3, alter: 2 }, { position: 1, alter: 0 }]
     });
+  });
+
+  it('a foreign curve whose positions fit no small weights reads ≈, and the ≈ is tolerated on the way back in', () => {
+    const doc = makeNoteDoc();
+    const note = doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!;
+    note._x = { mnxLab: { ...note._x!.mnxLab, tab: { technique: { bend: { points: [
+      { position: 0, alter: 0 }, { position: 0.57, alter: 2 }, { position: 1, alter: 0 }
+    ] } } } } };
+    const read = readTechniques(note);
+    expect(read).toEqual([{ kind: 'bend', alters: [0, 2, 0], approx: true }]);
+    expect(techniqueText(read[0]!)).toBe('≈0>full>0');
+    // Amending the approximated pill regularises — the mark's warning.
+    expect(parseInspectorLine('note', 'bend', '≈0>full>0')).toEqual({
+      intent: { type: 'setTechnique', technique: { kind: 'bend', alters: [0, 2, 0] } }
+    });
+  });
+
+  it('the grammar refuses what a bend cannot be, with the reason', () => {
+    for (const [text, error] of [
+      ['1/2', 'a bend needs at least two stops — 0>full (a held pre-bend is 1/2>1/2)'],
+      ['0>0', 'a bend of nothing — no stop leaves 0'],
+      ['0>fill', 'not a bend stop — 0 · 1/4 · 1/2 · 3/4 · full · 1 1/2 · 2'],
+      ['', 'a bend is typed as its stops — 0>full · 1/2>0 · 0>full>1/2>0']
+    ] as const) {
+      expect(parseInspectorLine('note', 'bend', text)).toEqual({ error });
+    }
+    // The retired keyword forms no longer parse.
+    expect(parseInspectorLine('note', 'bend', 'pre 1 2 release')).toHaveProperty('error');
+    expect(parseInspectorLine('note', 'bend', 'release')).toHaveProperty('error');
   });
 });
 

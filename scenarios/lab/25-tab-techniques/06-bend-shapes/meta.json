@@ -1,0 +1,31 @@
+{
+  "title": "Bend shapes: partial release, double bend, hold, slow release",
+  "description": "Four half notes on string 3, one bend shape each — the shapes the stop grammar makes sayable (core-bend-stops.md). Bar 1: a partial release (0>full>1/2 — the landing is labelled '1/2', because without it a partial release reads as a full one) and a double bend (0>1/2>0>1/2>0). Bar 2: a hold (0>1/2>1/2>0 — the flat segment carries no head) and a slow release (0>full>>>0 — the rise takes a quarter of the note, the release the rest; segment weights are positions in the stored curve, no schema change). Every moving segment arrives VERTICALLY with its arrowhead on the arrival tangent; every arrival off the written pitch is labelled.",
+  "bars": 2,
+  "tags": [
+    "tab",
+    "technique",
+    "technique:bend"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/63"
+  ],
+  "coversDefs": [
+    "event",
+    "note",
+    "notes",
+    "pitch",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-techniques"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

@@ -484,9 +484,70 @@ export const DYNAMIC_WORDS = [
   'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff', 'n'
 ] as const;
 
+/**
+ * One bend stop, in the unit players share: FRACTIONS OF A WHOLE STEP —
+ * `1/4` · `1/2` · `3/4` · `full` · `1 1/2` · `2` — parsed to semitones (the
+ * storage unit, MNX's own `pitch.alter`). The inverse of the engraver's
+ * `bendLabel` (src/engine/layout/technique.ts), which edit/ may not import —
+ * the same deliberate echo as `defaultStringFor` (core-bend-stops.md).
+ */
+export function parseBendStop(text: string): number | null {
+  if (text === '0') return 0;
+  if (text === 'full') return 2;
+  const m = /^(?:(\d+)(?:\s+(1\/4|1\/2|3\/4))?|(1\/4|1\/2|3\/4))$/.exec(text);
+  if (!m) return null;
+  const whole = m[1] ? Number(m[1]) : 0;
+  const frac = m[2] ?? m[3] ?? '';
+  const quarters = whole * 4 + (frac === '1/4' ? 1 : frac === '1/2' ? 2 : frac === '3/4' ? 3 : 0);
+  return quarters === 0 && whole === 0 ? null : quarters / 2;
+}
+
+/** A semitone value spelt back as the stop the parser takes. */
+export function bendStopText(semitones: number): string {
+  if (semitones === 0) return '0';
+  const quarters = Math.round((semitones / 2) * 4);
+  if (quarters === 4) return 'full';
+  const whole = Math.floor(quarters / 4);
+  const rem = quarters % 4;
+  const parts: string[] = [];
+  if (whole > 0) parts.push(String(whole));
+  if (rem > 0) parts.push(['', '1/4', '1/2', '3/4'][rem]!);
+  return parts.join(' ');
+}
+
+/**
+ * `0>full>1/2>0` → the curve's stops. Each `>` is "then move to"; a doubled
+ * `>>` weights that segment 2 against 1 (up to `>>>>`), so `0>1/2>>0` is a
+ * rise over a third of the note and a release over two thirds. The FIRST stop
+ * is where the string is when the note is struck — a non-zero first stop IS
+ * the pre-bend (the schema's own definition), so no keyword exists.
+ */
+export function parseBendStops(
+  text: string
+): { alters: number[]; weights?: number[] } | { error: string } {
+  const HINT = '0 · 1/4 · 1/2 · 3/4 · full · 1 1/2 · 2';
+  if (text === '') return { error: `a bend is typed as its stops — 0>full · 1/2>0 · 0>full>1/2>0` };
+  const tokens = text.toLowerCase().split(/(>{1,4})/);
+  const alters: number[] = [];
+  const weights: number[] = [];
+  for (const [i, raw] of tokens.entries()) {
+    const token = raw.trim();
+    if (i % 2 === 1) {
+      weights.push(token.length);
+      continue;
+    }
+    const stop = parseBendStop(token);
+    if (stop === null) return { error: `not a bend stop — ${HINT}` };
+    alters.push(stop);
+  }
+  if (alters.length < 2) return { error: 'a bend needs at least two stops — 0>full (a held pre-bend is 1/2>1/2)' };
+  if (alters.every(a => a === 0)) return { error: 'a bend of nothing — no stop leaves 0' };
+  return { alters, ...(weights.some(w => w > 1) ? { weights } : {}) };
+}
+
 export const ADORNMENT_HELP =
   'accent · staccato · tenuto · strongAccent · … · a dynamic (pp, mf, fff) · ' +
-  'text Play 8x · text below cantabile · 8va 2 · bend release · finger 3 · right p · cresc · dim · louder · softer · breath comma · bow up · ' +
+  'text Play 8x · text below cantabile · 8va 2 · bend 0>full>0 · finger 3 · right p · cresc · dim · louder · softer · breath comma · bow up · ' +
   'fermata · fermata square long below · arpeggio · arpeggio down arrow · non-arpeggio · accidental · accidental parens · ' +
   'no accent · no fermata · no arpeggio · no dynamic · no text · no string · no accidental';
 
@@ -497,10 +558,9 @@ export type AdornmentResult =
   | { fermata: MnxFermata }
   | { removeFermata: true }
   /** Tab technique with a SHAPE. The single letters (B H S V X O) toggle the
-   *  plain form; a bend that is released, or bent by something other than a
-   *  tone, needs words — so the popover carries them, as it does for the
-   *  other adornments whose shape exceeds a keystroke. */
-  | { technique: { kind: 'bend'; semitones?: number; release?: boolean; pre?: number } }
+   *  plain form; a bend is a curve, so the typed surfaces carry it as its
+   *  stops (core-bend-stops.md): `bend 0>full>1/2>0`. */
+  | { technique: { kind: 'bend'; alters: number[]; weights?: number[] } }
   | { fingering: { hand: 'left' | 'right'; finger: string } }
   | { removeFingering: true }
   // The accidental's DISPLAY is note-level ink like the markings, so it lives
@@ -612,29 +672,12 @@ export function parseAdornment(text: string): AdornmentResult {
   if (trimmed.toLowerCase() === 'no finger' || trimmed.toLowerCase() === 'no fingering')
     return { removeFingering: true };
 
-  // `bend`, `bend 3`, `bend release` — the shapes the `B` key cannot say.
-  // `bend pre 1 2 release`: the inspector's dotted form flattened — a
-  // pre-bend of 1, up to 2, let back down (workbench-rung-inspector.md).
-  const bendCurve = /^bend(?:\s+pre\s+(\d+(?:\.\d+)?))?(?:\s+(\d+(?:\.\d+)?))?(?:\s+(release))?$/.exec(
-    trimmed.toLowerCase()
-  );
-  if (bendCurve && (bendCurve[1] !== undefined || (bendCurve[2] !== undefined && bendCurve[3] !== undefined))) {
-    return {
-      technique: {
-        kind: 'bend',
-        ...(bendCurve[2] !== undefined ? { semitones: Number(bendCurve[2]) } : {}),
-        ...(bendCurve[3] ? { release: true } : {}),
-        ...(bendCurve[1] !== undefined ? { pre: Number(bendCurve[1]) } : {})
-      }
-    };
-  }
-  const bend = /^bend(?:\s+(release|\d+))?$/.exec(trimmed.toLowerCase());
-  if (bend) {
-    const qualifier = bend[1];
-    if (qualifier === 'release') return { technique: { kind: 'bend', release: true } };
-    return {
-      technique: { kind: 'bend', ...(qualifier ? { semitones: Number(qualifier) } : {}) }
-    };
+  // `bend 0>full>1/2>0` — the curve typed as its stops (core-bend-stops.md).
+  // The retired keyword forms (`bend 3`, `bend release`, `bend pre 1 2
+  // release`) do not parse: every stop is explicit, so nothing is implicit.
+  if (/^bend\b/i.test(trimmed)) {
+    const parsed = parseBendStops(trimmed.slice(4).trim());
+    return 'error' in parsed ? null : { technique: { kind: 'bend', ...parsed } };
   }
 
   // The octave lines had an op and an intent and NO WAY IN — the keyboard join

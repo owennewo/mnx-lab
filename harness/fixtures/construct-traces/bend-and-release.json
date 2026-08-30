@@ -100,9 +100,11 @@
       "fret": 7
     },
     {
-      "type": "toggleTechnique",
-      "kind": "bend",
-      "release": true
+      "type": "setTechnique",
+      "technique": {
+        "kind": "bend",
+        "alters": [2, 2, 0]
+      }
     }
   ]
 }

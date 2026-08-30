@@ -86,6 +86,26 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
+### 8. `core-bend-stops` — stop-grammar bends, vertical arrivals, arrival labels — **2 never-seen**
+
+Owner: [core-bend-stops.md](../complete/core-bend-stops.md) (2026-08-30; **closed the
+same day owing these approvals**). Scenarios: `lab/tab-techniques/bend-and-release`
+(golden moved — it leaves batch 4 for this one, the same way the technique five left
+batch 3) and `lab/tab-techniques/06-bend-shapes` (new). Both never-seen.
+
+**What a reviewer should look for.** One cause, two visible effects. (1) **Geometry**:
+every bend curve now arrives VERTICALLY — the rise ends straight up under its label,
+the release lands straight down on the string line — so each arrowhead sits on the
+curve's own tangent instead of being glued vertically onto a flat arrival (the old
+`bendSegment` put its last control point at the arrival height). (2) **Labels**: every
+arrival OFF the written pitch is labelled, rising or falling, so `0>full>1/2` reads
+`full` then `1/2` — before, a partial release was indistinguishable from a full one; a
+landing at 0 still carries no label. In `06-bend-shapes` also check: the double bend's
+two peaks both labelled; the hold's flat segment carries NO arrowhead; the weighted
+release (`0>full>>>0`) rises over the first quarter of the note and falls over the
+rest. Agreement 5's two-batch split (geometry, then labels) was not kept — both landed
+in one pass — so this one batch carries both questions.
+
 ### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **4 stale, 8 never-seen**
 
 Owner: [core-measure-attributes-gaps.md](core-measure-attributes-gaps.md) (in progress,
@@ -291,7 +311,9 @@ Owner: [core-guitar-technique.md](../complete/core-guitar-technique.md) (`09f5d5
 2026-08-24; **closed the same day owing these approvals**). Scenarios:
 `lab/tab-techniques/{bend-and-release, slides, hammer-pull-chain, vibrato-and-palm-mute,
 natural-harmonics}` — all five, all four goldens each (`expected.primitives.json`,
-`expected.svg`, `expected.tab.svg`, `expected.both.svg`).
+`expected.svg`, `expected.tab.svg`, `expected.both.svg`). *`bend-and-release` left this
+batch on 2026-08-30: its goldens moved again for the bend geometry, so it belongs to
+batch 8 and its cause; the other four stay here.*
 
 These were never-seen before this item and are never-seen after it, so nothing was
 demoted — but the reason they are worth reading changed completely. Until 2026-08-24 each

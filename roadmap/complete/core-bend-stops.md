@@ -1,12 +1,18 @@
 # Bends as a list of stops — one typed form, the curve itself, and honest arrowheads
 
-> **Status: proposed 2026-08-30.** Written from an inspector design conversation (the
-> thread that landed the fingerboard pills in
-> [workbench-rung-inspector.md](../inprogress/workbench-rung-inspector.md)). Two halves,
-> shippable separately: **(A)** the authoring side — a grammar that *is* the model's
-> curve, the op widened to write it, the pill reading it back; **(B)** the engraving
-> side — arrowheads that point where the curve goes, labels on every arrival. Neither
-> touches the schema: `bend-point {position, alter}` already says everything below.
+> **Status: COMPLETE 2026-08-30 — proposed and built the same day.** Both halves landed
+> together: **(A)** the stop grammar (`parseBendStops`/`bendStopText` in
+> `setupGrammar.ts`), the op widened to `{alters[], weights?[]}` writing points
+> directly, the reader recovering weights and marking foreign curves `≈`, the old
+> `pre/semitones/release` forms retired from op, intent and grammar; **(B)**
+> `bendSegment` arrives vertically and every non-zero arrival is labelled. One
+> deviation from agreement 5: geometry and labels landed as ONE ledger batch, not two —
+> built in one pass, the reviewer guidance covers both. New scenario
+> `lab/tab-techniques/06-bend-shapes` (partial release, double bend, hold, weighted
+> slow release); goldens moved only in `01-bend-and-release`; batch 8 in
+> [lab-verify.md](../inprogress/lab-verify.md). Schema untouched, as promised. Not
+> built: the mini-rung editing surface (stays with the inspector roadmap) and any `>>`
+> spell-back beyond weight 4.
 
 ## What is settled, and the evidence
 

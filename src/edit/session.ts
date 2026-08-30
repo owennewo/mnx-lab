@@ -882,11 +882,9 @@ export class EditorSession {
             : {
                 type: 'setTechnique',
                 noteKey: slot.noteKey,
-                technique: {
-                  kind,
-                  ...(intent.semitones !== undefined ? { semitones: intent.semitones } : {}),
-                  ...(intent.release ? { release: true } : {})
-                } as never
+                // The toggle's bend is the plain 0>full; every other shape is
+                // typed as stops through `setTechnique` (core-bend-stops.md).
+                technique: (kind === 'bend' ? { kind, alters: [0, 2] } : { kind }) as never
               }
         );
         if (JSON.stringify(this.doc) === before) {

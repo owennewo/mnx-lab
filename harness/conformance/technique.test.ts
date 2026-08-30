@@ -179,6 +179,27 @@ describe('technique marks say what the technique is', () => {
     }
   });
 
+  it('a partial release labels BOTH arrivals — the peak and where it lands', () => {
+    const doc = bar([
+      { string: 3, technique: { bend: { points: [
+        { position: 0, alter: 0 }, { position: 0.5, alter: 2 }, { position: 1, alter: 1 }
+      ] } } }
+    ]);
+    const p = projections(doc);
+    expect(texts(p.tab, 'technique-bend-label')).toEqual(['full', '1/2']);
+    expect(texts(p.notation, 'technique-bend-label')).toEqual(['full', '1/2']);
+  });
+
+  it('a bend curve arrives VERTICALLY, so the head sits on its own tangent', () => {
+    const p = projections(readScenario('01-bend-and-release'));
+    const curves = marks(p.tab, 'technique-bend').filter(x => x.kind === 'curve');
+    expect(curves.length).toBeGreaterThan(0);
+    for (const curve of curves) {
+      const pts = (curve as { points: { x: number; y: number }[] }).points;
+      expect(pts[2]!.x).toBe(pts[3]!.x);
+    }
+  });
+
   it('a bend of zero draws nothing at all', () => {
     const doc = bar([
       { string: 3, technique: { bend: { points: [{ position: 0, alter: 0 }, { position: 1, alter: 0 }] } } }

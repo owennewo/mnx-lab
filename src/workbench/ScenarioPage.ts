@@ -3199,14 +3199,7 @@ export class ScenarioPage extends LitElement {
           : 'removeFingering' in parsed
             ? { type: 'removeFingering' }
             : 'technique' in parsed
-          ? {
-              type: 'toggleTechnique',
-              kind: parsed.technique.kind,
-              ...(parsed.technique.semitones !== undefined
-                ? { semitones: parsed.technique.semitones }
-                : {}),
-              ...(parsed.technique.release ? { release: true } : {})
-            }
+          ? { type: 'setTechnique', technique: parsed.technique }
           : 'accidental' in parsed
           ? parsed.accidental === 'remove'
             ? { type: 'removeAccidentalDisplay' }

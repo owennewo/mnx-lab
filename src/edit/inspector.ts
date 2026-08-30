@@ -32,6 +32,8 @@ import {
   MARKING_WORDS,
   parseAdornment,
   parseBarAttribute,
+  bendStopText,
+  parseBendStops,
   fermataText,
   parseClef,
   parseKeySignature,
@@ -455,16 +457,16 @@ export function positionedText(attribute: PositionedAttribute): { word: string; 
   };
 }
 
-/** A technique's typed value — the inspector's flattened dotted form. */
+/** A technique's typed value: a bend as its stops, `≈`-marked when the
+ *  stored positions are only approximated by the spelt weights. */
 export function techniqueText(technique: TechniqueChoice): string {
   if (technique.kind !== 'bend') return '';
-  return [
-    technique.pre !== undefined ? `pre ${technique.pre}` : '',
-    technique.semitones !== undefined ? `${technique.semitones}` : '',
-    technique.release ? 'release' : ''
-  ]
-    .filter(Boolean)
-    .join(' ');
+  let out = technique.approx ? '≈' : '';
+  technique.alters.forEach((alter, i) => {
+    if (i > 0) out += '>'.repeat(technique.weights?.[i - 1] ?? 1);
+    out += bendStopText(alter);
+  });
+  return out;
 }
 
 function clefText(clef: { sign: string; staffPosition?: number; octave?: number }): string {
@@ -731,7 +733,7 @@ const NOTE_WORDS: InspectorWord[] = [
   { word: 'fret', hint: '0 · 12 · on the current string' },
   { word: 'accidental', hint: 'show · hide · parens', values: ['show', 'hide', 'parens'] },
   { word: 'finger', hint: '3 · left 2 · right p' },
-  { word: 'bend', hint: '2 · release · pre 1 2 release' },
+  { word: 'bend', hint: '0>full · 1/2>0 · 0>full>1/2 · 0>1/2>1/2>0' },
   ...TECHNIQUE_WORDS.filter(k => k !== 'bend').map(word => ({ word, hint: '' })),
   ...EVENT_WORDS.filter(w => w.word !== 'duration')
 ];
@@ -886,6 +888,13 @@ export function parseInspectorLine(
     }
     if ((TECHNIQUE_WORDS as string[]).includes(head) && head !== 'bend' && rest === '')
       return { intent: { type: 'setTechnique', technique: { kind: head as TechniqueChoice['kind'] } as TechniqueChoice } };
+    if (head === 'bend') {
+      // The stops, with a spelt-back `≈` tolerated: amending an approximated
+      // pill regularises the curve, which is what the mark warns.
+      const parsed = parseBendStops(rest.replace(/^≈/, ''));
+      if ('error' in parsed) return { error: parsed.error };
+      return { intent: { type: 'setTechnique', technique: { kind: 'bend', ...parsed } } };
+    }
     // The pills' words are nouns; the grammar's are bare values (`mf`,
     // `left 3`). Strip the noun so an amend composes what the grammar takes.
     if (head === 'fingering' || head === 'finger')

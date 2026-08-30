@@ -766,18 +766,18 @@ export type EditOp =
 /** What a technique key writes. `hammerOn`/`pullOff`/`slide` name the note they
  *  travel to; the rest are flags or curves. */
 export type TechniqueChoice =
-  /** A bend's shape: straight up by `semitones`, or — with `release` — bent
-   *  before the note sounds, held, and let back down
-   *  (`lab/tab-techniques/bend-and-release`, the second half of its name). */
+  /** A bend as its STOPS (core-bend-stops.md): `alters` in semitones, in
+   *  order, the first being where the string is when the note is struck — a
+   *  non-zero first stop is a pre-bend, equal neighbours a hold. `weights`
+   *  (when present, one per segment) are relative segment lengths; absent,
+   *  segments are even. `approx` is READER-ONLY: the stored curve's positions
+   *  do not fit small integer weights, so the spelt form is the nearest
+   *  approximation and an amend would regularise it. The writer ignores it. */
   | {
       kind: 'bend';
-      semitones?: number;
-      release?: boolean;
-      /** The bend the note STARTS at, in semitones — a pre-bend. Absent, a
-       *  released bend starts at `semitones` (bent before it sounds) and a
-       *  plain one at 0 (the roadmap's agreement 4: the inspector's
-       *  `bend.pre`, which the op could not say before). */
-      pre?: number;
+      alters: number[];
+      weights?: number[];
+      approx?: true;
     }
   | { kind: 'slide' }
   | { kind: 'hammerOn' }
@@ -1049,9 +1049,9 @@ export function readMeasureAttributes(measure: MnxGlobalMeasure | undefined): Me
 /**
  * The techniques a note DECLARES, read back into `TechniqueChoice` — the
  * reverse of the `setTechnique` writer, for the inspector's pills. A bend
- * curve is read as the three numbers the writer takes: `semitones` is the
- * peak, `release` says the curve comes back down, `pre` is spelt only when the
- * start differs from the form's own default.
+ * curve reads as its stops; segment weights are recovered as the smallest
+ * integer ratio (capped at 4), and when the stored positions do not fit one —
+ * a curve authored elsewhere — the choice is marked `approx`.
  */
 export function readTechniques(note: MnxNote | undefined): TechniqueChoice[] {
   const technique = note?._x?.mnxLab?.tab?.technique;
@@ -1059,16 +1059,30 @@ export function readTechniques(note: MnxNote | undefined): TechniqueChoice[] {
   const out: TechniqueChoice[] = [];
   const bend = technique.bend;
   if (bend && bend.points.length > 0) {
-    const alters = bend.points.map(p => p.alter);
-    const semitones = Math.max(...alters);
-    const start = alters[0] ?? 0;
-    const release = (alters[alters.length - 1] ?? 0) < semitones;
-    const defaultStart = release ? semitones : 0;
+    const points = [...bend.points].sort((a, b) => a.position - b.position);
+    // A lone point is not a curve; read it as the rise it means.
+    const alters = points.length === 1 ? [0, points[0]!.alter] : points.map(p => p.alter);
+    const spans = points.length === 1
+      ? [1]
+      : points.slice(1).map((p, i) => p.position - points[i]!.position);
+    const smallest = Math.min(...spans.filter(d => d > 0));
+    const weights = spans.map(d =>
+      d <= 0 ? 1 : Math.max(1, Math.min(4, Math.round(d / smallest)))
+    );
+    // Would the writer, handed these weights, land the points where they are?
+    const total = weights.reduce((a, b) => a + b, 0);
+    let cum = 0;
+    const approx =
+      points.length > 1 &&
+      points.slice(1).some((p, i) => {
+        cum += weights[i]!;
+        return Math.abs(cum / total - p.position) > 1e-6;
+      });
     out.push({
       kind: 'bend',
-      semitones,
-      ...(release ? { release: true } : {}),
-      ...(start !== defaultStart ? { pre: start } : {})
+      alters,
+      ...(weights.some(w => w > 1) ? { weights } : {}),
+      ...(approx ? { approx: true } : {})
     });
   }
   for (const kind of ['slide', 'hammerOn', 'pullOff', 'vibrato', 'palmMute', 'harmonic'] as const) {
@@ -1628,24 +1642,20 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       switch (op.technique.kind) {
         case 'bend':
           // A bend is a CURVE (points in semitones), never a single interval —
-          // the shape core-guitar-technique.md settled. The keyboard writes the
-          // common one: straight up by a tone over the note's length.
+          // the shape core-guitar-technique.md settled, written as its stops
+          // (core-bend-stops.md). Positions come from the cumulative segment
+          // weights; absent weights, segments are even.
           {
-            const alter = op.technique.semitones ?? 2;
-            // Where the curve starts: an explicit pre-bend, else the shape
-            // each form always had (a release is bent before it sounds).
-            const start = op.technique.pre ?? (op.technique.release ? alter : 0);
+            const alters = op.technique.alters;
+            if (alters.length < 2) return next;
+            const weights = op.technique.weights ?? alters.slice(1).map(() => 1);
+            const total = weights.reduce((a, b) => a + b, 0);
+            let cum = 0;
             technique.bend = {
-              points: op.technique.release
-                ? [
-                    { position: 0, alter: start },
-                    { position: 0.5, alter },
-                    { position: 1, alter: 0 }
-                  ]
-                : [
-                    { position: 0, alter: start },
-                    { position: 1, alter }
-                  ]
+              points: alters.map((alter, i) => ({
+                position: i === 0 ? 0 : (cum += weights[i - 1] ?? 1) / total,
+                alter
+              }))
             };
           }
           break;

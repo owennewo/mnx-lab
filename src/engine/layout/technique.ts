@@ -220,13 +220,17 @@ export function harmonicLabel(type: string): string {
 // ---------- Shared drawing helpers ----------
 
 /** A cubic through two points that leaves `from` flat and arrives at `to`
- *  steeply — the shape a bent string actually makes. */
+ *  VERTICALLY — the bent string rising into its label, or landing back on the
+ *  string line. The vertical arrival is what lets a straight up/down
+ *  arrowhead sit honestly on the curve's end: the previous control point sat
+ *  at `to.y`, so every curve arrived horizontal with a vertical head glued to
+ *  a flat landing (core-bend-stops.md, part B). */
 function bendSegment(from: Point, to: Point): [Point, Point, Point, Point] {
   const dx = to.x - from.x;
   return [
     from,
     { x: from.x + dx * 0.55, y: from.y },
-    { x: to.x - dx * 0.15, y: to.y },
+    { x: to.x, y: to.y + (from.y - to.y) * 0.4 },
     to
   ];
 }
@@ -522,10 +526,12 @@ function emitBend(
     // moves gets one: a rise that is followed by a release has still arrived,
     // and printed editions draw both heads.
     arrowhead(rising ? 'up' : 'down', to.x, 0, to.y, primitives);
-    if (rising) {
-      laneLabel(bendLabel(b.alter), to.x, to.y - ARROWHEAD_SP - LABEL_GAP_SP,
-        'technique-bend-label', primitives);
-    }
+    // Every arrival OFF the written pitch is labelled, rising or falling —
+    // without the falling label a partial release reads as a full one
+    // (core-bend-stops.md, part B; bendLabel is '' at 0, so a landing on the
+    // string carries no label).
+    laneLabel(bendLabel(b.alter), to.x, to.y - ARROWHEAD_SP - LABEL_GAP_SP,
+      'technique-bend-label', primitives);
   }
 }
 
