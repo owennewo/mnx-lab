@@ -3,7 +3,7 @@
 > **Status: proposed (2026-08-30).** Serves the **implementation loop** in the
 > **workbench shell**. Adds one workbench presentation state around the renamed
 > `<mnx-document-viewer>` from
-> [core-document-viewer-rename.md](core-document-viewer-rename.md). It does not add a
+> [core-document-viewer-rename.md](../complete/core-document-viewer-rename.md). It does not add a
 > fullscreen property to the embeddable element: hiding host chrome and sizing a host are
 > composition, not rendering options.
 

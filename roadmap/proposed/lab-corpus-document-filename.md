@@ -3,7 +3,7 @@
 > **Status: proposed (2026-08-30).** Serves the **implementation loop** by changing **lab
 > machinery**, not MNX data. Follows the vocabulary settled by
 > [core-document-rung.md](../complete/core-document-rung.md) and the public element rename in
-> [core-document-viewer-rename.md](core-document-viewer-rename.md). Kept separate because
+> [core-document-viewer-rename.md](../complete/core-document-viewer-rename.md). Kept separate because
 > `scenarios/spec/` is generator-owned, 119 paths move, and the corpus/goldens require a
 > stronger diff verdict than a class rename.
 

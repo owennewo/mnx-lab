@@ -44,13 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-document-viewer-rename.md](proposed/core-document-viewer-rename.md)** — finish the
-  vocabulary correction begun by the document rung at the public boundary:
-  `ScoreViewer` / `<mnx-score-viewer>` → `DocumentViewer` /
-  `<mnx-document-viewer>`. The element consumes the MNX root, not one optional member of
-  `scores[]`; `score` is reserved for that genuine presentation, while rendered output is a
-  projection/engraving. A semantic audit rather than a global replace, with a clean pre-1.0
-  break by default and a bounded one-release alias only if pickup finds a real external host.
 - **[lab-corpus-document-filename.md](proposed/lab-corpus-document-filename.md)** — rename all
   119 scenario roots `score.mnx.json` → `document.mnx.json`. A separate lab item because
   `scenarios/spec/` is generator-owned: change the sync writer first, regenerate rather than
@@ -784,6 +777,13 @@ back up to `proposed/` the moment it is.
   chrome), attribute-first, the `view="auto"` precedence chain (user > host > document
   `staffKind` hint > default), a set-valued `hide` knob, and eviction of workbench leakage
   (`pinnedErrors` et al). Subsumes render-density-zoom's "where do the levers live" question.
+- **[core-document-viewer-rename.md](complete/core-document-viewer-rename.md)** — the public
+  face now names the unit it consumes: `DocumentViewer` / `<mnx-document-viewer>`, with
+  `score` reserved for genuine `MnxScore` presentations and rendered output named as a
+  projection/engraving. Clean `0.3.0` break (no external host required an alias), all in-repo
+  embeds/demos/contracts updated, `renderProjection()` / `#projection-container` /
+  `notationTokens` behind it, and the obsolete tag rejected by browser smoke. **Landed
+  2026-08-30** at `4039904`; goldens byte-identical.
 - **[core-score-hud.md](complete/core-score-hud.md)** — a **HUD companion** beside the viewer:
   the selection ladder's missing *property surface* as one row per containment level (score /
   section / bar / part / voice / event / note), active rung highlighted, rows clickable for

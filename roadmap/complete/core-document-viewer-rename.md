@@ -1,12 +1,22 @@
 # The viewer consumes an MNX document — `score` → `document` on the public face
 
-> **Status: proposed (2026-08-30).** Serves the **implementation loop**. Follows
-> [core-document-rung.md](../complete/core-document-rung.md), which settled the semantic
+> **Status: COMPLETE (2026-08-30).** Serves the **implementation loop**. Follows
+> [core-document-rung.md](core-document-rung.md), which settled the semantic
 > distinction and deliberately left the public element out of scope. This item owns that
 > public-face rename; the corpus filename moves separately in
-> [lab-corpus-document-filename.md](lab-corpus-document-filename.md), and the workbench mode
+> [lab-corpus-document-filename.md](../proposed/lab-corpus-document-filename.md), and the workbench mode
 > that exposes only the renamed viewer lives in
-> [workbench-document-focus-mode.md](workbench-document-focus-mode.md).
+> [workbench-document-focus-mode.md](../proposed/workbench-document-focus-mode.md).
+>
+> **Built verdict.** Landed as a clean pre-1.0 break in `4039904`, with the package
+> version advanced to `0.3.0`: `DocumentViewer`, `<mnx-document-viewer>`,
+> `renderProjection()`, `#projection-container` and `notationTokens`; every in-repo host,
+> current contract, embed demo and smoke follows. The external-host audit found no separate
+> consumer, so no compatibility subclass was introduced, and the browser smoke explicitly
+> fails if the obsolete tag is registered. The embedded app's own fixtures moved from
+> `scores/` to `documents/` byte-identically. Evidence: 1,189 tests, 119-scenario check,
+> build/lib/embed builds, lib/embed smokes, and primitive regeneration with an empty
+> scenario diff.
 
 ## The collision is now on the public surface
 
