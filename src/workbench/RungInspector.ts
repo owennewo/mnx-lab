@@ -322,6 +322,13 @@ export class RungInspector extends LitElement {
       background: var(--surface);
     }
 
+    .pill .x {
+      display: inline-flex;
+      padding: 2px;
+      margin: -2px -4px -2px -2px;
+      cursor: pointer;
+    }
+
     .pill svg {
       width: 8px;
       height: 8px;
@@ -725,11 +732,14 @@ export class RungInspector extends LitElement {
       }
       const pill = this.pills[open.index];
       if (!pill) return true;
-      if (this.text.trim() === '' || (pill.pillClass === 'derived' && this.text.trim() === pill.value)) {
-        // Empty: press 2 removes. A derived value committed unchanged writes
-        // NOTHING — the guess was already right, and freezing it is not a
-        // thing this editor does.
+      if (this.text.trim() === '') {
+        // Empty: press 2 removes (or a floor reverts).
         if (pill.remove) this.emit('inspector-remove', { key: pill.key, intent: pill.remove });
+      } else if (this.text.trim() === pill.value) {
+        // Committed unchanged: close silently, whatever the class. Re-firing
+        // the same value would hit the session's no-op refusal and read as an
+        // error; on a derived pill it would also be the freeze this editor
+        // refuses to offer.
       } else {
         this.emit('inspector-apply', { word: pill.word, key: pill.key, text: pick && !pick.word ? pick.label : this.text });
       }
@@ -917,7 +927,19 @@ export class RungInspector extends LitElement {
                   pill.pillClass === 'floor'
                     ? FLOOR_GLYPH
                     : pill.pillClass === 'annotation'
-                      ? X_GLYPH
+                      ? html`<span
+                          class="x"
+                          title="remove"
+                          @click=${(e: Event) => {
+                            // The × removes — it must not fall through to the
+                            // pill's own click, which OPENS (the amend state
+                            // a delete gesture should never land in).
+                            e.stopPropagation();
+                            this.open = null;
+                            if (pill.remove) this.emit('inspector-remove', { key: pill.key, intent: pill.remove });
+                          }}
+                          >${X_GLYPH}</span
+                        >`
                       : nothing;
                 return html`<span
                   class="pill ${pill.pillClass}${pill.partial ? ' half' : ''}${cursorAt('pill', i) ? ' cursor' : ''}${isOpen ? ' open' : ''}"

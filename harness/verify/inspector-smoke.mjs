@@ -310,6 +310,35 @@ try {
     else pass('staccato pill added');
     if (!s.crumbs.find(c => c.active)?.label.startsWith('event')) fail('the rung dropped after the edit — the inspector should hold it');
     else pass('still at the event rung after the edit');
+
+    // ── the pill's × removes on click — it must NOT open the pill ─────────
+    console.log('\nclicking the staccato pill\'s × removes it (no amend state)');
+    await cdp.evaluate(`(() => {
+      const find = (root, tag, depth) => {
+        if (!root || depth > 12) return null;
+        const hit = root.querySelector(tag);
+        if (hit) return hit;
+        for (const el of root.querySelectorAll('*')) {
+          const deeper = el.shadowRoot && find(el.shadowRoot, tag, depth + 1);
+          if (deeper) return deeper;
+        }
+        return null;
+      };
+      const sr = find(document, 'mnx-rung-inspector', 0)?.shadowRoot;
+      const pill = [...(sr?.querySelectorAll('.pills .pill') ?? [])].find(p => p.textContent.includes('staccato'));
+      pill?.querySelector('.x')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+    })()`);
+    await new Promise(r => setTimeout(r, 600));
+    s = await state();
+    if (s.pills.some(p => p.text.startsWith('staccato'))) fail(`the × did not remove the pill (state ${s.state}; error: ${s.error})`);
+    else if (s.state !== 'walking') fail(`the × opened the pill instead of removing — state reads ${s.state}`);
+    else if (s.error) fail(`the × left an error showing: ${s.error}`);
+    else pass('× removed the pill; still walking, no error');
+    // Put it back so the note-rung step below still reads the marking.
+    await type('staccato');
+    await press('Enter', 'Enter', 13, 900);
+    s = await state();
+    if (!s.pills.some(p => p.text.startsWith('staccato'))) fail('could not re-add staccato after the × test');
   }
 
   // ── the note rung reads the string ──────────────────────────────────────
