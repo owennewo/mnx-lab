@@ -104,7 +104,13 @@ landing at 0 still carries no label. In `06-bend-shapes` also check: the double 
 two peaks both labelled; the hold's flat segment carries NO arrowhead; the weighted
 release (`0>full>>>0`) rises over the first quarter of the note and falls over the
 rest. Agreement 5's two-batch split (geometry, then labels) was not kept — both landed
-in one pass — so this one batch carries both questions.
+in one pass — so this one batch carries both questions. *Follow-up, same day: each
+arriving curve now ENDS at its arrowhead's base-centre instead of running to the tip
+underneath the glyph (the way an SVG marker shortens a path, and the way the
+pre-bend's vertical line always did) — the joint is the glyph's own anchor, so it
+cannot drift when the vertical zoom makes the scale non-square. Departures still
+leave from the stop itself. Check: no gap and no overlap where a curve meets a head,
+at any staff scale.*
 
 ### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **4 stale, 8 never-seen**
 

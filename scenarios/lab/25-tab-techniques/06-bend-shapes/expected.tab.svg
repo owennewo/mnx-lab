@@ -26,31 +26,31 @@
 <text x="690" y="137.7072" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="b4">7</text>
 <line x1="769.6" y1="101.136" x2="769.6" y2="192.5648" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
 <rect x="774.4" y="101.136" width="6.4" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
-<path d="M 209.6 137.7072 C 227.2 137.7072, 241.6 94.6448, 241.6 65.936" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
+<path d="M 209.6 137.7072 C 227.2 137.7072, 241.6 106.1264, 241.6 85.072" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
 <text x="241.6" y="85.072" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 <text x="241.6" y="42.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">full</text>
-<path d="M 241.6 65.936 C 259.2 65.936, 273.6 87.4672, 273.6 101.8224" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<path d="M 241.6 65.936 C 259.2 65.936, 273.6 75.9856, 273.6 82.6864" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
 <text x="273.6" y="101.8224" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 <text x="273.6" y="78.6864" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">1/2</text>
-<path d="M 365.6 137.7072 C 374.0704 137.7072, 381 94.6448, 381 65.936" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
+<path d="M 365.6 137.7072 C 374.0704 137.7072, 381 106.1264, 381 85.072" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
 <text x="381" y="85.072" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 <text x="381" y="42.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">1/2</text>
-<path d="M 381 65.936 C 389.4704 65.936, 396.4 108.9984, 396.4 137.7072" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<path d="M 381 65.936 C 389.4704 65.936, 396.4 97.5168, 396.4 118.5712" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
 <text x="396.4" y="137.7072" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
-<path d="M 396.4 137.7072 C 404.8704 137.7072, 411.8 94.6448, 411.8 65.936" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
+<path d="M 396.4 137.7072 C 404.8704 137.7072, 411.8 106.1264, 411.8 85.072" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
 <text x="411.8" y="85.072" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 <text x="411.8" y="42.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">1/2</text>
-<path d="M 411.8 65.936 C 420.2704 65.936, 427.2 108.9984, 427.2 137.7072" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<path d="M 411.8 65.936 C 420.2704 65.936, 427.2 97.5168, 427.2 118.5712" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
 <text x="427.2" y="137.7072" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
-<path d="M 544 137.7072 C 552.8 137.7072, 560 94.6448, 560 65.936" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
+<path d="M 544 137.7072 C 552.8 137.7072, 560 106.1264, 560 85.072" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
 <text x="560" y="85.072" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 <text x="560" y="42.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">1/2</text>
 <line x1="560" y1="65.936" x2="592" y2="65.936" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-hold"></line>
-<path d="M 592 65.936 C 600.8 65.936, 608 108.9984, 608 137.7072" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<path d="M 592 65.936 C 600.8 65.936, 608 97.5168, 608 118.5712" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
 <text x="608" y="137.7072" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
-<path d="M 700 137.7072 C 708.4704 137.7072, 715.4 94.6448, 715.4 65.936" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
+<path d="M 700 137.7072 C 708.4704 137.7072, 715.4 106.1264, 715.4 85.072" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
 <text x="715.4" y="85.072" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 <text x="715.4" y="42.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">full</text>
-<path d="M 715.4 65.936 C 740.8096 65.936, 761.6 108.9984, 761.6 137.7072" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<path d="M 715.4 65.936 C 740.8096 65.936, 761.6 97.5168, 761.6 118.5712" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
 <text x="761.6" y="137.7072" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 </svg>

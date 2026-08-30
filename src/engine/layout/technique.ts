@@ -516,9 +516,20 @@ function emitBend(
       continue;
     }
     const rising = b.alter > a.alter;
+    // The curve ENDS at the arrowhead's base-centre, not at its tip — the
+    // way an arrow is drawn (SVG markers shorten the path identically), and
+    // the pre-bend's vertical line always has. The joint is then the glyph's
+    // own anchor point, so it cannot drift under a non-square scale: a glyph
+    // is unsheared ink, and any curve overlapping it enters its base
+    // off-centre by kx/ky (core-bend-stops.md follow-up). The segment still
+    // DEPARTS from the stop itself — the head marks arrival AT the pitch,
+    // and the next gesture leaves FROM it. Clamped for segments shorter than
+    // the head, which the head then all but covers.
+    const shorten = Math.min(ARROWHEAD_SP, Math.abs(to.y - from.y));
+    const drawnTo = { x: to.x, y: to.y + (rising ? shorten : -shorten) };
     primitives.push({
       kind: 'curve',
-      points: bendSegment(from, to),
+      points: bendSegment(from, drawnTo),
       thickness: STROKE_SP,
       className: 'technique-bend' + (rising ? '' : ' technique-bend-release')
     });
