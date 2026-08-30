@@ -1,5 +1,16 @@
 # The range-grain ladder — rungs are range grains; coinciding objects are offered on them
 
+> **Status: in progress — decisions 1–4 built and landed 2026-08-30** (three
+> slices on `main`: d909a49 section rung retired + Ctrl+Shift+←/→ boundary
+> extend; e100184 container rung retired, `containerCoincidence()` probe on
+> `SessionView`, Del groups whole containers, container-run clip retired;
+> f68181b staff off partMeasure identity, part-bars clip, ↑↓ walks parts).
+> The ladder is now `note → event → voiceMeasure → partMeasure → measure →
+> document`, all suites green at each landing. **Remaining: decision 5** —
+> the three spanner add models, delete-from-any-reference, the reverse
+> item→spanner index, and the coincidence rule generalized to slurs, beams
+> and ottavas (the tray hint for partial coverage also still to surface).
+
 Serves the **implementation loop**. Proposed 2026-08-30, out of a rung-by-rung review
 of the selection ladder ([core-selection-ladder.md](../complete/core-selection-ladder.md)):
 have we missed a rung, and have we introduced an artificial one? The answer became a

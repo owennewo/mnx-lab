@@ -83,20 +83,6 @@ proposals that name their campaign.
   test could not see because it asserts a blocker exists, not that it resolves. Both
   halves must close for `complete/`.
 
-- **[core-selection-range-grain.md](proposed/core-selection-range-grain.md)** — the
-  ladder's rungs re-read as **range grains**, out of a 2026-08-30 rung-by-rung review:
-  the `section` rung goes (a label with an emergent span, the same test that excludes
-  `voice`) with its value reabsorbed at the bar rungs — Ctrl+Shift+←/→ extends to the
-  section boundary; the `container` rung goes via the **coincidence rule** (an event
-  range exactly covering a tuplet's content offers its settings/unwrap; partial
-  coverage says "part of a tuplet"); `staffIndex` comes off partMeasure's identity
-  (staff is an address, not a thing — the member covers all staves as one panel, ↑↓
-  walks parts, part-wide tiles become honest); spanners get three add models (implied
-  next-item end, press-again-to-extend, range-sets-extent), delete from any referenced
-  position, and the coincidence rule generalized — a container is just a spanner the
-  schema promoted into the tree. The voiceMeasure/partMeasure collapse was considered
-  and parked: do nothing, the doc records why. Resulting ladder:
-  `note → event → voiceMeasure → partMeasure → measure → document`.
 
 ### proposed/low-priority/
 Still wanted, still described — just not next. Nothing here has been argued against
@@ -188,6 +174,21 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-selection-range-grain.md](inprogress/core-selection-range-grain.md)** — **decisions 1–4 built 2026-08-30** (section and container rungs retired, staff off
+  partMeasure identity; spanner work remains); the
+  ladder's rungs re-read as **range grains**, out of a 2026-08-30 rung-by-rung review:
+  the `section` rung goes (a label with an emergent span, the same test that excludes
+  `voice`) with its value reabsorbed at the bar rungs — Ctrl+Shift+←/→ extends to the
+  section boundary; the `container` rung goes via the **coincidence rule** (an event
+  range exactly covering a tuplet's content offers its settings/unwrap; partial
+  coverage says "part of a tuplet"); `staffIndex` comes off partMeasure's identity
+  (staff is an address, not a thing — the member covers all staves as one panel, ↑↓
+  walks parts, part-wide tiles become honest); spanners get three add models (implied
+  next-item end, press-again-to-extend, range-sets-extent), delete from any referenced
+  position, and the coincidence rule generalized — a container is just a spanner the
+  schema promoted into the tree. The voiceMeasure/partMeasure collapse was considered
+  and parked: do nothing, the doc records why. Resulting ladder:
+  `note → event → voiceMeasure → partMeasure → measure → document`.
 - **[core-measure-attributes-gaps.md](inprogress/core-measure-attributes-gaps.md)** — **in progress 2026-08-28; items 1–2 (badge, four bugs) built the same day.** A census of every measure-level attribute (`measure-global`, `part-measure`,
   the three proposed objects the engine draws, `_x.mnxLab.harmonies`) across five columns —
   render / badge / op / pill / corpus — cited to file and line, then a ranked work list.
