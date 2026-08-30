@@ -94,12 +94,13 @@ into ONE `hammerPull`, drawn as a slur with NO `H`/`P` letter — the direction
 is implicit in the two pitches. Scenario: `lab/tab-techniques/03-hammer-pull-chain`
 (all four goldens moved).
 
-**What a reviewer should look for.** The three arcs of the chain are unchanged
-in shape and placement; what changed is that the `H` and `P` letters above them
-are GONE, on every staff (tab, notation, both). A curve that moved, or an arc
-missing entirely, is a failure; absent letters are the point. Check also that
-the arcs still sit above the tab staff (never running along the string line)
-and hug the noteheads on the notation staff.
+**What a reviewer should look for.** Two changes, one cause. (1) The `H` and
+`P` letters above the arcs are GONE, on every staff (tab, notation, both) —
+absent letters are the point. (2) On the TAB staff the arcs moved DOWN: each
+now springs from just above its two digits and hugs the string the finger is
+on (~0.85sp above the line), instead of being parked in the technique lane at
+the top of the staff. On the notation staff the arcs still hug the noteheads.
+An arc missing entirely, or one running along a string line, is a failure.
 
 ### 8. `core-bend-stops` — stop-grammar bends, vertical arrivals, arrival labels — **2 never-seen**
 

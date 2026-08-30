@@ -92,6 +92,28 @@ describe('the hammer-pull key resolves ANY next pitch, same string first', () =>
     expect(techniqueOf(session, 'a')).toBeUndefined();
   });
 
+  it('the target is the next note ON THE SAME STRING — an intervening string is skipped', () => {
+    // h on string 6 with the next event on string 5: the hammer stays on its
+    // string, so the arc bridges to the string-6 note two events away.
+    const session = new EditorSession(bar([
+      { string: 6, fret: 0, id: 'a' },
+      { string: 5, fret: 2, id: 'b' },
+      { string: 6, fret: 3, id: 'c' }
+    ]));
+    expect(session.handleIntent({ type: 'toggleTechnique', kind: 'hammerPull' })).toBe(true);
+    expect(techniqueOf(session, 'a')).toEqual({ hammerPull: { target: 'c' } });
+  });
+
+  it('refuses when the next same-string note is the same fret, whatever lies between', () => {
+    const session = new EditorSession(bar([
+      { string: 6, fret: 0, id: 'a' },
+      { string: 5, fret: 2, id: 'b' },
+      { string: 6, fret: 0, id: 'c' }
+    ]));
+    expect(session.handleIntent({ type: 'toggleTechnique', kind: 'hammerPull' })).toBe(false);
+    expect(techniqueOf(session, 'a')).toBeUndefined();
+  });
+
   it('a slide travels to a different fret too', () => {
     const session = new EditorSession(bar([
       { string: 1, fret: 0, id: 'a' }, { string: 1, fret: 3, id: 'b' }

@@ -157,6 +157,9 @@ const SLUR_END_PAD_SP = 0.8;
 /** A dangling hammer-pull (target off the page) draws a short slur stub —
  *  the mark must not vanish just because its far end cannot be placed. */
 const DANGLING_STUB_SP = 2;
+/** How far above the string line a tab hammer-pull arc springs from: clear of
+ *  the digit's ink, but hugging the string the finger is on. */
+const TAB_HP_LIFT_SP = 0.85;
 /** Vertical reach of a slide-in / slide-out stub. */
 const SLIDE_STUB_RISE_SP = 0.7;
 /**
@@ -680,12 +683,12 @@ export function emitTabTechnique(input: TechniqueInput): void {
       );
     }
 
-    // Hammer-on / pull-off: a letterless slur in the lane (ONE adornment,
-    // extension v6, the Soundslice convention — the direction is implicit in
-    // the two pitches). Drawn ABOVE the staff rather than between the digits,
-    // because on a tab staff the two digits are usually on the SAME string
-    // line and a curve between them would run along the very line it was
-    // drawn to sit off.
+    // Hammer-on / pull-off: a letterless slur HUGGING THE STRING (ONE
+    // adornment, extension v6, the Soundslice convention — the direction is
+    // implicit in the two pitches). The two digits sit on one string line, so
+    // the arc springs from just above them and bulges up — close to the
+    // gesture, not parked in the technique lane at the top of the staff
+    // (found hands-on, 2026-08-30).
     if (t.hammerPull) {
       const target = byNoteId.get(t.hammerPull.target);
       if (!target) {
@@ -694,14 +697,14 @@ export function emitTabTechnique(input: TechniqueInput): void {
         // dropping it: a short stub of the slur, over the note that carries
         // it.
         slur(
-          site.x, lane, site.x + DANGLING_STUB_SP, lane, -1,
+          site.x, site.y - TAB_HP_LIFT_SP, site.x + DANGLING_STUB_SP, site.y - TAB_HP_LIFT_SP, -1,
           'technique-slur technique-hammerPull', primitives
         );
       } else {
         drawSplit(
           input,
-          { x: site.x, y: lane, row: site.row },
-          { x: target.x, y: target.laneY, row: target.row },
+          { x: site.x, y: site.y - TAB_HP_LIFT_SP, row: site.row },
+          { x: target.x, y: target.y - TAB_HP_LIFT_SP, row: target.row },
           (x0, y0, x1, y1) => {
             slur(x0, y0, x1, y1, -1, 'technique-slur technique-hammerPull', primitives);
           }

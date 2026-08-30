@@ -2793,24 +2793,39 @@ function tieTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined
  *  hammer-on while classifying the meaningless equal-fret case as a pull-off
  *  (found hands-on, 2026-08-30). */
 function techniqueTarget(doc: MnxStructure, located: LocatedNote): MnxNote | undefined {
-  const pick = (notes: MnxNote[]): MnxNote | undefined => {
-    const string = located.note._x?.mnxLab?.string;
-    if (string !== undefined) {
-      const sameString = notes.find(n => n._x?.mnxLab?.string === string);
-      if (sameString) return sameString;
+  const string = located.note._x?.mnxLab?.string;
+  // With a string annotation the search is BY STRING, as far forward as it
+  // takes: a hammer-on, pull-off or slide is one finger staying on one
+  // string, so an intervening event on another string is skipped, not
+  // targeted (found hands-on, 2026-08-30 — `h` grabbed the next event's
+  // other-string note). Without the annotation, the next event decides:
+  // same pitch preferred, else its first note.
+  const sequencesOf = (measureIndex: number) =>
+    (doc.parts?.[located.partIndex]?.measures?.[measureIndex]?.sequences ?? []).filter(
+      s => (s.staff ?? 1) === located.staffIndex
+    )[located.voiceIndex];
+  if (string !== undefined) {
+    const measureCount = doc.parts?.[located.partIndex]?.measures?.length ?? 0;
+    for (let measureIndex = located.measureIndex; measureIndex < measureCount; measureIndex++) {
+      const seq = measureIndex === located.measureIndex ? located.seq : sequencesOf(measureIndex);
+      const from = measureIndex === located.measureIndex ? located.eventIndex + 1 : 0;
+      for (let i = from; i < (seq?.content.length ?? 0); i++) {
+        const item = seq!.content[i];
+        if (!isTimedEvent(item)) continue;
+        const sameString = (item.notes ?? []).find(n => n._x?.mnxLab?.string === string);
+        if (sameString) return sameString;
+      }
     }
-    return notes.find(n => samePitch(n, located.note)) ?? notes[0];
-  };
+    return undefined;
+  }
+  const pick = (notes: MnxNote[]): MnxNote | undefined =>
+    notes.find(n => samePitch(n, located.note)) ?? notes[0];
   for (let i = located.eventIndex + 1; i < located.seq.content.length; i++) {
     const item = located.seq.content[i];
     if (!isTimedEvent(item)) continue;
     return pick(item.notes ?? []);
   }
-  const nextMeasure = doc.parts?.[located.partIndex]?.measures?.[located.measureIndex + 1];
-  const seq = (nextMeasure?.sequences ?? []).filter(
-    s => (s.staff ?? 1) === located.staffIndex
-  )[located.voiceIndex];
-  for (const item of seq?.content ?? []) {
+  for (const item of sequencesOf(located.measureIndex + 1)?.content ?? []) {
     if (!isTimedEvent(item)) continue;
     return pick(item.notes ?? []);
   }
