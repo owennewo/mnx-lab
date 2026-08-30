@@ -16,7 +16,13 @@
 // decided those; this table is where they become something a user can see.
 import type { EditorIntent } from './intents.ts';
 import type { ShellAction } from './keymap.ts';
-import type { ResolvedSelection, SelectionLevel, SelectionMember } from './selection.ts';
+import type {
+  ContainerCoincidence,
+  ResolvedSelection,
+  SelectionLevel,
+  SelectionMember
+} from './selection.ts';
+import { containerCoincidence } from './selection.ts';
 import type { Projection } from './cursor.ts';
 import type { MnxGlobalMeasure, MnxStructure } from '../model/mnx.ts';
 import type { MeasureAttributeKind } from './ops.ts';
@@ -109,6 +115,11 @@ export interface SessionView {
   readonly tied: boolean;
   /** Are there strings to fret — is the tab dialect available at all? */
   readonly hasStrings: boolean;
+  /** The coincidence probe (core-selection-range-grain.md): which whole
+   *  rhythm containers the resolved event range covers, and whether it cuts
+   *  through one — the tray's channel for offering container properties on
+   *  the range that IS the container, and for the honest partial hint. */
+  readonly containerCoincidence: ContainerCoincidence;
 }
 
 type BarlineType = NonNullable<NonNullable<MnxGlobalMeasure['barline']>['type']>;
@@ -283,7 +294,8 @@ export function sessionView(session: SessionLike): SessionView {
       ? selectedMemberBarlineTypes
       : [barlineTypes],
     tied: Array.isArray(ties) && ties.length > 0,
-    hasStrings: (doc.parts ?? []).some(part => (part._x?.mnxLab?.strings?.length ?? 0) > 0)
+    hasStrings: (doc.parts ?? []).some(part => (part._x?.mnxLab?.strings?.length ?? 0) > 0),
+    containerCoincidence: containerCoincidence(doc, members)
   };
 }
 
@@ -299,7 +311,6 @@ export function selectionMemberSummary(view: SessionView): string {
   const noun: Record<SelectionLevel, [string, string]> = {
     note: ['note', 'notes'],
     event: ['event', 'events'],
-    container: ['container', 'containers'],
     voiceMeasure: ['voice bar', 'voice bars'],
     partMeasure: ['part bar', 'part bars'],
     measure: ['bar', 'bars'],
@@ -700,24 +711,17 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ intent: { type: 'delete' } })
   },
 
-  // ── container ───────────────────────────────────────────────────────────
+  // ── containers (the coincidence rule, core-selection-range-grain.md) ─────
   {
+    // A container is coextensive with the event range covering its children,
+    // so its properties are offered THERE — no rung of its own.
     id: 'container-settings',
-    scopes: ['container'],
+    scopes: ['event'],
     glyph: { smufl: 'tuplet3' },
     label: 'Container settings…',
+    detail: 'For a range covering a whole tuplet, grace group or tremolo',
     tier: 'popover',
     blockedBy: 'container-properties'
-  },
-  {
-    id: 'delete-container',
-    scopes: ['container'],
-    glyph: { mark: { smufl: 'tuplet3' }, op: { sign: 'minus', at: 'before' } },
-    label: 'Delete container',
-    detail: 'Clears its notes first',
-    shortcut: 'Del',
-    tier: 'key',
-    action: () => ({ intent: { type: 'delete' } })
   },
 
   // ── voice-measure ───────────────────────────────────────────────────────
@@ -1257,7 +1261,7 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       commands: ['insert-event-before', 'insert-event-after', 'clear-event']
     },
     { id: 'duration', caption: 'duration', commands: ['shorter', 'longer', 'dots'] },
-    { id: 'rhythm', caption: 'rhythm containers', commands: ['tuplet', 'grace', 'tremolo'] },
+    { id: 'rhythm', caption: 'rhythm containers', commands: ['tuplet', 'grace', 'tremolo', 'container-settings'] },
     { id: 'joins', caption: 'joins', commands: ['slur', 'beam'] },
     {
       id: 'articulation',
@@ -1277,10 +1281,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
   // Two tiles, and the band still earns its caption: it says the one verb
   // this rung has is a structural one, rather than leaving it beside a
   // properties popover with nothing to distinguish them.
-  container: [
-    { id: 'structure', caption: 'structure', commands: ['delete-container'] },
-    { id: 'properties', caption: 'properties', commands: ['container-settings'] }
-  ],
   voiceMeasure: [
     { id: 'structure', caption: 'structure', commands: ['new-voice', 'delete-voice-bar'] },
     {

@@ -39,10 +39,6 @@ export function describeSelectionClip(clip: SelectionClip): string {
       const items = clip.bars.reduce((sum, bar) => sum + bar.items.length, 0);
       return count(items, 'event') + (clip.span > 1 ? ` across ${count(clip.span, 'bar')}` : '');
     }
-    case 'container-run': {
-      const containers = clip.bars.reduce((sum, bar) => sum + bar.containers.length, 0);
-      return count(containers, 'rhythm container');
-    }
     case 'voice-bars':
       return count(clip.bars.length, 'voice bar');
     case 'staff-bars':
@@ -135,7 +131,6 @@ export function pasteSelectionNotice(result: PasteSelectionResult): ClipboardNot
 const RUNG_NOUN: Record<SelectionLevel, string> = {
   note: 'note',
   event: 'event',
-  container: 'rhythm container',
   voiceMeasure: 'voice bar',
   partMeasure: 'staff bar',
   measure: 'bar',

@@ -26,9 +26,7 @@ import { forEachNoteAddress } from '../model/noteWalk.ts';
 import { kitNoteKey } from '../model/noteKeys.ts';
 import {
   buildGrid,
-  addOnsets,
   eventSlotAt,
-  itemSpan,
   onsetsEqual,
   slotAt,
   type EditorCursor,
@@ -44,7 +42,6 @@ import {
 export type SelectionLevel =
   | 'note'
   | 'event'
-  | 'container'
   | 'voiceMeasure'
   | 'partMeasure'
   | 'measure'
@@ -53,7 +50,6 @@ export type SelectionLevel =
 export const SELECTION_LADDER: readonly SelectionLevel[] = [
   'note',
   'event',
-  'container',
   'voiceMeasure',
   'partMeasure',
   'measure',
@@ -100,18 +96,6 @@ export type SelectionMember =
       containerIndex?: number;
     }
   | {
-      kind: 'container';
-      partIndex: number;
-      staffIndex: number;
-      measureIndex: number;
-      onset: Onset;
-      voiceIndex: number;
-      /** Raw sequence index and content index: the owning container object. */
-      sequenceIndex: number;
-      eventIndex: number;
-      containerType: 'tuplet' | 'grace' | 'tremolo';
-    }
-  | {
       kind: 'voiceMeasure';
       partIndex: number;
       staffIndex: number;
@@ -136,7 +120,6 @@ export function closureScopeForLevel(level: SelectionLevel): SelectionClosureSco
   switch (level) {
     case 'note':
     case 'event':
-    case 'container':
     case 'voiceMeasure':
       return 'voice';
     case 'partMeasure':
@@ -234,7 +217,6 @@ export function presentLevels(
   );
   if (sequences.length > 0) present.add('voiceMeasure');
   if (eventSlotAt(grid, cursor, projection)) present.add('event');
-  if (eventSlotAt(grid, cursor, projection)?.containerIndex !== undefined) present.add('container');
   if (slotAt(grid, cursor, projection)) present.add('note');
   return present;
 }
@@ -320,49 +302,6 @@ function eventMembers(doc: MnxStructure, cursor: EditorCursor): SelectionMember[
   );
 }
 
-function containerType(item: MnxSequenceItem): 'tuplet' | 'grace' | 'tremolo' | null {
-  const type = (item as { type?: string }).type;
-  return type === 'tuplet' || type === 'grace' || type === 'tremolo' ? type : null;
-}
-
-/** Containers in the active part/staff/voice timeline. Their top-level
- * content index is already carried by every inner EventSlot; enumeration here
- * adds the raw sequence index needed by the guarded removal op. */
-function containerMembers(doc: MnxStructure, cursor: EditorCursor): SelectionMember[] {
-  const partIndex = cursor.partIndex ?? 0;
-  const staffIndex = cursor.staffIndex ?? 1;
-  const voiceIndex = anchorVoiceIndex(cursor);
-  const members: SelectionMember[] = [];
-  (doc.parts?.[partIndex]?.measures ?? []).forEach((measure, measureIndex) => {
-    const voiceByStaff = new Map<number, number>();
-    (measure.sequences ?? []).forEach((sequence, sequenceIndex) => {
-      const sequenceStaff = sequence.staff ?? 1;
-      const sequenceVoice = (voiceByStaff.get(sequenceStaff) ?? -1) + 1;
-      voiceByStaff.set(sequenceStaff, sequenceVoice);
-      if (sequenceStaff !== staffIndex || sequenceVoice !== voiceIndex) return;
-      let onset: Onset = { num: 0, den: 1 };
-      sequence.content.forEach((item, eventIndex) => {
-        const type = containerType(item);
-        if (type) {
-          members.push({
-            kind: 'container',
-            partIndex,
-            staffIndex,
-            measureIndex,
-            onset: { ...onset },
-            voiceIndex,
-            sequenceIndex,
-            eventIndex,
-            containerType: type
-          });
-        }
-        onset = addOnsets(onset, itemSpan(item));
-      });
-    });
-  });
-  return members;
-}
-
 function voiceMeasureMembers(doc: MnxStructure, cursor: EditorCursor): SelectionMember[] {
   const partIndex = cursor.partIndex ?? 0;
   const staffIndex = cursor.staffIndex ?? 1;
@@ -424,8 +363,6 @@ function universeFor(
       return noteMembers(doc, state.anchor);
     case 'event':
       return eventMembers(doc, state.anchor);
-    case 'container':
-      return containerMembers(doc, state.anchor);
     case 'voiceMeasure':
       return voiceMeasureMembers(doc, state.anchor);
     case 'partMeasure':
@@ -441,7 +378,6 @@ function memberMeasure(member: SelectionMember): number | null {
   switch (member.kind) {
     case 'note':
     case 'event':
-    case 'container':
     case 'voiceMeasure':
     case 'partMeasure':
     case 'measure':
@@ -477,18 +413,6 @@ function exactMemberIndex(
         member.voiceIndex === event?.voiceIndex &&
         member.eventIndex === event?.eventIndex &&
         member.containerIndex === event?.containerIndex
-      );
-    }
-    case 'container': {
-      const event = eventSlotAt(grid, cursor, projection);
-      return members.findIndex(member =>
-        member.kind === 'container' &&
-        member.partIndex === partIndex &&
-        member.staffIndex === staffIndex &&
-        member.measureIndex === cursor.measureIndex &&
-        member.voiceIndex === event?.voiceIndex &&
-        member.eventIndex === event?.eventIndex &&
-        event?.containerIndex !== undefined
       );
     }
     case 'voiceMeasure':
@@ -611,15 +535,6 @@ function memberContainsInk(member: SelectionMember, address: InkAddress): boolea
         member.eventIndex === address.eventIndex &&
         member.containerIndex === address.containerIndex
       );
-    case 'container':
-      return (
-        member.partIndex === address.partIndex &&
-        member.staffIndex === address.staffIndex &&
-        member.measureIndex === address.measureIndex &&
-        member.voiceIndex === address.voiceIndex &&
-        member.eventIndex === address.eventIndex &&
-        address.containerIndex !== undefined
-      );
     case 'voiceMeasure':
       return (
         member.partIndex === address.partIndex &&
@@ -695,4 +610,106 @@ export function selectionNoteKeys(
   projection: Projection
 ): string[] {
   return resolveSelection(doc, pointSelection(level, cursor), projection).noteKeys;
+}
+
+// ── Container coincidence (core-selection-range-grain.md) ──────────────────
+//
+// The container rung retired: a tuplet/grace/tremolo is coextensive with the
+// range of its children, so the selection that means "this tuplet" is the
+// event range exactly covering its content. This probe is the ONE reader of
+// that fact — the tray offers container properties on an exact coincidence,
+// the hint names a partial one, and Del groups whole containers back into
+// `removeContainer` so no empty wrapper is left beyond the ladder's reach.
+
+export interface CoincidentContainer {
+  partIndex: number;
+  staffIndex: number;
+  measureIndex: number;
+  voiceIndex: number;
+  /** Raw sequence index and top-level content index: the owning object. */
+  sequenceIndex: number;
+  eventIndex: number;
+  containerType: 'tuplet' | 'grace' | 'tremolo';
+  /** `eventMemberKey`s of the child events that cover it. */
+  memberKeys: string[];
+}
+
+export interface ContainerCoincidence {
+  /** Containers whose every timed child is among the members. */
+  whole: CoincidentContainer[];
+  /** Some touched container is only partly covered — the honest hint. */
+  partial: boolean;
+  /** The members are exactly whole containers' children and nothing else. */
+  exact: boolean;
+}
+
+/** One address for an event member, container children included. */
+export function eventMemberKey(
+  member: Extract<SelectionMember, { kind: 'event' }>
+): string {
+  return [
+    member.partIndex,
+    member.staffIndex,
+    member.measureIndex,
+    member.voiceIndex,
+    member.eventIndex,
+    member.containerIndex ?? ''
+  ].join(':');
+}
+
+export function containerCoincidence(
+  doc: MnxStructure,
+  members: readonly SelectionMember[]
+): ContainerCoincidence {
+  const eventMembers = members.filter(
+    (member): member is Extract<SelectionMember, { kind: 'event' }> => member.kind === 'event'
+  );
+  const byContainer = new Map<string, Extract<SelectionMember, { kind: 'event' }>[]>();
+  let topLevel = 0;
+  for (const member of eventMembers) {
+    if (member.containerIndex === undefined) {
+      topLevel++;
+      continue;
+    }
+    const key = [
+      member.partIndex, member.staffIndex, member.measureIndex,
+      member.voiceIndex, member.eventIndex
+    ].join(':');
+    byContainer.set(key, [...(byContainer.get(key) ?? []), member]);
+  }
+  const whole: CoincidentContainer[] = [];
+  let partial = false;
+  for (const children of byContainer.values()) {
+    const first = children[0];
+    const sequenceIndex = (doc.parts?.[first.partIndex]?.measures?.[first.measureIndex]?.sequences ?? [])
+      .map((sequence, index) => ({ sequence, index }))
+      .filter(entry => (entry.sequence.staff ?? 1) === first.staffIndex)[first.voiceIndex]?.index;
+    if (sequenceIndex === undefined) continue;
+    const item = doc.parts?.[first.partIndex]?.measures?.[first.measureIndex]
+      ?.sequences?.[sequenceIndex]?.content?.[first.eventIndex] as
+      | { type?: string; content?: MnxSequenceItem[] }
+      | undefined;
+    const type = item?.type;
+    if (type !== 'tuplet' && type !== 'grace' && type !== 'tremolo') continue;
+    const timedChildren = (item?.content ?? []).filter(isTimedEvent).length;
+    if (children.length === timedChildren && timedChildren > 0) {
+      whole.push({
+        partIndex: first.partIndex,
+        staffIndex: first.staffIndex,
+        measureIndex: first.measureIndex,
+        voiceIndex: first.voiceIndex,
+        sequenceIndex,
+        eventIndex: first.eventIndex,
+        containerType: type,
+        memberKeys: children.map(eventMemberKey)
+      });
+    } else {
+      partial = true;
+    }
+  }
+  return {
+    whole,
+    partial,
+    exact: whole.length > 0 && !partial && topLevel === 0
+  };
 }

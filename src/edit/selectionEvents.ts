@@ -101,28 +101,6 @@ export function eventAddressesUnderMember(
         eventIndex: member.eventIndex,
         ...(member.containerIndex === undefined ? {} : { containerIndex: member.containerIndex })
       }];
-    case 'container': {
-      // The member's `sequenceIndex` is raw and its `voiceIndex` is the
-      // staff ordinal; the address wants the latter, the document wants the
-      // former. Read through the raw one, address with the staff one.
-      const sequence = doc.parts?.[member.partIndex]?.measures?.[member.measureIndex]
-        ?.sequences?.[member.sequenceIndex];
-      const item = sequence?.content?.[member.eventIndex] as
-        | { content?: MnxSequenceItem[] }
-        | undefined;
-      return (item?.content ?? []).flatMap((child, containerIndex) =>
-        isTimedEvent(child)
-          ? [{
-              partIndex: member.partIndex,
-              staffIndex: member.staffIndex,
-              measureIndex: member.measureIndex,
-              voiceIndex: member.voiceIndex,
-              eventIndex: member.eventIndex,
-              containerIndex
-            }]
-          : []
-      );
-    }
     case 'voiceMeasure': {
       const voice = staffVoices(doc, member.partIndex, member.measureIndex, member.staffIndex)
         .find(candidate => candidate.voiceIndex === member.voiceIndex);

@@ -659,25 +659,6 @@ describe('the wider rungs', () => {
     expect(parseInspectorLine('partMeasure', 'capo', '5')).toEqual({ intent: { type: 'setPartDeclaration', declaration: { kind: 'capo', value: 5 } } });
   });
 
-  it('container: read-only pills, no words', () => {
-    // Three quarters fill "3 quarter in 2 quarter" exactly; a grace steals no
-    // time, so it has no position of its own to stand on.
-    const q = (id: string) => ({ duration: { base: 'quarter' as const }, notes: [{ id, pitch: { step: 'E' as const, octave: 4 } }] });
-    const session = new EditorSession({
-      mnx: { version: 1 },
-      global: { measures: [{ time: { count: 4, unit: 4 } }] },
-      parts: [{ id: 'p1', measures: [{ sequences: [{ content: [q('a'), q('b'), q('c'), { duration: { base: 'quarter' as const }, rest: {} }] }] }] }]
-    });
-    session.handleIntent({ type: 'setProjection', projection: 'notation' });
-    const wrap = parseRhythm('3:2') as { wrap: never };
-    expect(session.handleIntent({ type: 'wrapInContainer', spec: wrap.wrap })).toBe(true);
-    expect(session.handleIntent({ type: 'goToLevel', level: 'container' })).toBe(true);
-    const pills = pillsFor(scope(session));
-    expect(pills.map(p => `${p.word}: ${p.value}`)).toEqual(['tuplet: 3:2 quarter']);
-    expect(pills.every(p => p.pillClass === 'inherited' && p.remove === null)).toBe(true);
-    expect(wordsFor('container')).toEqual([]);
-    expect(parseInspectorLine('container', null, 'bracket yes')).toHaveProperty('error');
-  });
 });
 
 describe('ranges', () => {

@@ -39,11 +39,6 @@ const everyKind: SelectionClip[] = [
     }]
   },
   {
-    kind: 'container-run',
-    span: 1,
-    bars: [{ offset: 0, onset: [0, 1], containers: [{ type: 'grace', content: [], slash: true }] }]
-  },
-  {
     kind: 'voice-bars',
     span: 2,
     bars: [{ offset: 1, sequence: { content: [] } }]

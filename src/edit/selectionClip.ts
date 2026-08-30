@@ -7,7 +7,6 @@
 // where the string is kept is a separate boundary (selectionClipboard.ts).
 import type {
   MnxGlobalMeasure,
-  MnxGrace,
   MnxBeam,
   MnxOttava,
   MnxPart,
@@ -15,9 +14,7 @@ import type {
   MnxNote,
   MnxSequence,
   MnxSequenceItem,
-  MnxStructure,
-  MnxTremolo,
-  MnxTuplet
+  MnxStructure
 } from '../model/mnx.ts';
 import type { SelectionLevel } from './selection.ts';
 
@@ -80,20 +77,6 @@ export interface EventRunClip {
   kind: 'event-run';
   span: number;
   bars: EventRunClipEntry[];
-}
-
-export type MnxRhythmContainer = MnxGrace | MnxTremolo | MnxTuplet;
-
-export interface ContainerRunClipEntry {
-  offset: number;
-  onset: [number, number];
-  containers: MnxRhythmContainer[];
-}
-
-export interface ContainerRunClip {
-  kind: 'container-run';
-  span: number;
-  bars: ContainerRunClipEntry[];
 }
 
 export interface VoiceBarClipEntry {
@@ -164,7 +147,6 @@ export interface SelectionClipRelationships {
 export type SelectionClip =
   | NoteSetClip
   | EventRunClip
-  | ContainerRunClip
   | VoiceBarsClip
   | StaffBarsClip
   | PartClip
@@ -194,7 +176,6 @@ type JsonObject = Record<string, unknown>;
 const LEVELS: ReadonlySet<string> = new Set([
   'note',
   'event',
-  'container',
   'voiceMeasure',
   'partMeasure',
   'measure',
@@ -413,7 +394,7 @@ function validateMeasureColumns(value: unknown, path: string): void {
 function validateRunBars(
   value: unknown,
   path: string,
-  payloadKey: 'items' | 'containers'
+  payloadKey: 'items'
 ): void {
   objectArrayAt(value, path).forEach((bar, index) => {
     const barPath = `${path}[${index}]`;
@@ -439,23 +420,6 @@ function validateClip(value: unknown): void {
       exactKeys(clip, '$.clip', ['kind', 'span', 'bars']);
       integerAt(clip.span, '$.clip.span', 1);
       validateRunBars(clip.bars, '$.clip.bars', 'items');
-      return;
-    case 'container-run':
-      exactKeys(clip, '$.clip', ['kind', 'span', 'bars']);
-      integerAt(clip.span, '$.clip.span', 1);
-      validateRunBars(clip.bars, '$.clip.bars', 'containers');
-      objectArrayAt(clip.bars, '$.clip.bars').forEach((bar, barIndex) =>
-        objectArrayAt(bar.containers, `$.clip.bars[${barIndex}].containers`)
-          .forEach((container, index) => {
-            if (!['tuplet', 'grace', 'tremolo'].includes(stringAt(
-              container.type,
-              `$.clip.bars[${barIndex}].containers[${index}].type`
-            ))) fail(
-              `$.clip.bars[${barIndex}].containers[${index}].type`,
-              'unknown rhythm container'
-            );
-          })
-      );
       return;
     case 'voice-bars':
       exactKeys(clip, '$.clip', ['kind', 'span', 'bars']);

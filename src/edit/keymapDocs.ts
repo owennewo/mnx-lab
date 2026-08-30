@@ -68,7 +68,6 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'walk positions (notation: this voice’s ink, nearest pitch)',
       event: 'walk this voice’s events (rests included)',
-      container: 'walk this voice’s rhythm containers',
       voiceMeasure: 'walk bars',
       partMeasure: 'walk bars',
       measure: 'walk bars'
@@ -93,7 +92,6 @@ export const KEY_DOCS: KeyDoc[] = [
       // is note-natured — the event rung descends into its noteheads. The
       // voice jump moved to Ctrl+↑/↓ after descent (a named cost).
       event: 'descend to the event’s nearest notehead',
-      container: 'the voice above/below, at this instant',
       voiceMeasure: 'the voice above/below in this bar',
       partMeasure: 'the staff above/below (this part’s staves, then the next part)',
       measure: 'the nearest bar in the system above/below',
@@ -113,7 +111,6 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'bar jump (the Ctrl climb)',
       event: 'bar jump, keeping the voice',
-      container: 'bar jump, keeping the voice',
       voiceMeasure: 'jump to the prev/next section',
       partMeasure: 'jump to the prev/next section',
       measure: 'jump to the prev/next section'
@@ -131,7 +128,6 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'jump to the voice above/below (the event sounding at this beat)',
       event: 'jump to the staff above/below',
-      container: 'jump to the staff above/below',
       voiceMeasure: 'jump to the staff above/below',
       partMeasure: 'jump to the system above/below'
     }
@@ -151,7 +147,7 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: { all: 'widen / narrow the selection one rung' }
   },
   {
-    keys: 'Shift+1…7',
+    keys: 'Shift+1…6',
     // The LABEL names the position, never the glyph: shifted Digit1 prints
     // `!` on QWERTY but `1` on AZERTY, where the whole digit row is shifted.
     strokes: LADDER_JUMP_LEVELS.map((_, index) => ({
@@ -160,7 +156,7 @@ export const KEY_DOCS: KeyDoc[] = [
     })),
     group: 'selection',
     meaning: {
-      all: 'jump straight to a rung — 1 note, 2 event, 3 container, 4 voice, 5 part, 6 bar, 7 document (a rung this score has not got refuses)'
+      all: 'jump straight to a rung — 1 note, 2 event, 3 voice, 4 part, 5 bar, 6 document (a rung this score has not got refuses)'
     }
   },
   {
@@ -193,7 +189,6 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'become an event selection (the note’s own event; press again to extend)',
       event: 'extend through this voice’s events (rests included)',
-      container: 'extend through this voice’s rhythm containers',
       voiceMeasure: 'extend through this voice’s existing bar copies',
       partMeasure: 'extend through bars on this staff',
       measure: 'extend through global bars'
@@ -206,7 +201,6 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'become an event range to this voice’s last event',
       event: 'extend to this voice’s last event',
-      container: 'extend to this voice’s last rhythm container',
       voiceMeasure: 'extend to this voice’s last existing bar copy',
       partMeasure: 'extend to the last bar on this staff',
       measure: 'extend to the last global bar'
@@ -239,7 +233,6 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'select every event in this staff/voice timeline (closes at the event rung)',
       event: 'select every event in this staff/voice timeline',
-      container: 'select every rhythm container in this staff/voice timeline',
       voiceMeasure: 'select every existing bar copy in this staff/voice',
       partMeasure: 'select this whole part (all staves and bars)',
       measure: 'select the global timeline',
@@ -274,7 +267,6 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'delete the note under the cursor (an emptied event becomes a rest)',
       event: 'clear the event to an equal-duration rest, then remove the empty event',
-      container: 'clear the rhythm container’s notes, then remove the empty container',
       voiceMeasure: 'clear this voice’s bar copy, then remove the empty copy',
       partMeasure: 'clear this staff’s bar copy, then remove the empty copy',
       measure: 'clear this bar across every part, then remove the empty bar',
@@ -376,7 +368,6 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: {
       note: 'cut the note (an emptied event becomes a rest)',
       event: 'cut the events to equal-duration rests',
-      container: 'cut the containers, leaving equal-span silence',
       voiceMeasure: 'cut this voice’s bar copies (absence is silence)',
       partMeasure: 'cut this staff’s bars; the part closure cuts the whole part',
       measure: 'cut the global bars — the timeline closes'

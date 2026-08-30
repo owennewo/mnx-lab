@@ -170,8 +170,6 @@ describe('selection clip extraction', () => {
       expect(JSON.parse(result.serialized)).toEqual(result.envelope);
     }
 
-    const container = success(containers(), point('container', cursor(0)));
-    expect(container.envelope.clip.kind).toBe('container-run');
   });
 
   it('freezes closures, sparse bar offsets, complete parts and empty bar copies', () => {

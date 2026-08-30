@@ -61,7 +61,6 @@ export function buildInspectorView(
       case 'voice':
         return `${(cursor.voiceIndex ?? 0) + 1}`;
       case 'event':
-      case 'container':
         return first && 'eventIndex' in first ? `${first.eventIndex + 1}` : '';
       case 'note':
         return first && first.kind === 'note' ? `${first.noteIndex + 1}` : '';
@@ -83,7 +82,6 @@ export function buildInspectorView(
       case 'voice':
         return partMeasure?.sequences?.length ?? 0;
       case 'event':
-      case 'container':
         return sequence?.content?.length ?? 0;
       case 'note': {
         const event = first && 'eventIndex' in first ? sequence?.content?.[first.eventIndex] : undefined;

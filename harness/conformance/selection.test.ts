@@ -5,6 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { EditorSession } from '../../src/edit/session.ts';
 import {
+  containerCoincidence,
   pointSelection,
   resolveSelection,
   type SelectionState
@@ -222,10 +223,6 @@ describe('selection ladder', () => {
     expect(session.handleIntent({ type: 'goToLevel', level: 'note' })).toBe(true);
     expect(session.selectionLevel).toBe('note');
 
-    // `container` needs a tuplet or a grace group; makeDoc has neither.
-    expect(session.handleIntent({ type: 'goToLevel', level: 'container' })).toBe(false);
-    expect(session.selectionLevel).toBe('note'); // did NOT park on `event`
-
   });
 
   it('lands the same place a walk would, and records ONE intent doing it', () => {
@@ -274,44 +271,42 @@ describe('selection ladder', () => {
     }
   });
 
-  it('adds the owning container between its child event and voice bar', () => {
+  it('steps from an event inside a container straight to the voice bar — no container rung', () => {
     const session = new EditorSession(containerDoc());
     expect(session.selectedNoteKeys).toEqual(['inside-1']);
     session.handleIntent(relax);
     expect(session.selectionLevel).toBe('event');
     expect(session.selectedNoteKeys).toEqual(['inside-1']);
     session.handleIntent(relax);
-    expect(session.selectionLevel).toBe('container');
-    expect(session.resolvedSelection.members).toMatchObject([
-      { kind: 'container', containerType: 'tuplet', sequenceIndex: 0, eventIndex: 0 }
-    ]);
-    expect(session.selectedNoteKeys).toEqual(['inside-1', 'inside-2']);
-    session.handleIntent(relax);
     expect(session.selectionLevel).toBe('voiceMeasure');
     expect(session.selectedNoteKeys).toEqual(['inside-1', 'inside-2', 'outside']);
   });
 
-  it('walks and ranges by authored containers, not by their child events', () => {
-    const doc = containerDoc();
-    doc.parts[0].measures![0].sequences[0].content.push({
-      type: 'grace',
-      content: [{ duration: { base: 'eighth' }, notes: [note('grace', 'F', 5, 1)] }]
-    });
-    const session = new EditorSession(doc);
-    session.handleIntent(relax); // event
-    session.handleIntent(relax); // container
-    expect(session.selectionLevel).toBe('container');
-    expect(session.selectedNoteKeys).toEqual(['inside-1', 'inside-2']);
-
+  it('reports the coincidence: an event range covering a whole tuplet IS the tuplet', () => {
+    const session = new EditorSession(containerDoc());
+    session.handleIntent(relax); // event, on inside-1
     expect(session.handleIntent({ type: 'extendSelection', direction: 'next' })).toBe(true);
-    expect(session.resolvedSelection.members.map(member =>
-      member.kind === 'container' ? member.containerType : null
-    )).toEqual(['tuplet', 'grace']);
-    expect(session.selectedNoteKeys).toEqual(['inside-1', 'inside-2', 'grace']);
+    expect(session.selectedNoteKeys).toEqual(['inside-1', 'inside-2']);
+    const exact = containerCoincidence(session.doc, session.resolvedSelection.members);
+    expect(exact.exact).toBe(true);
+    expect(exact.partial).toBe(false);
+    expect(exact.whole).toMatchObject([
+      { containerType: 'tuplet', sequenceIndex: 0, eventIndex: 0 }
+    ]);
 
-    expect(session.handleIntent({ type: 'prevPosition' })).toBe(true); // collapse to first edge
-    expect(session.handleIntent({ type: 'nextPosition' })).toBe(true);
-    expect(session.selectedNoteKeys).toEqual(['grace']);
+    // One child only: partial — the honest hint, never a silent offer.
+    const point = new EditorSession(containerDoc());
+    point.handleIntent(relax);
+    const partial = containerCoincidence(point.doc, point.resolvedSelection.members);
+    expect(partial.exact).toBe(false);
+    expect(partial.partial).toBe(true);
+    expect(partial.whole).toEqual([]);
+
+    // The whole tuplet plus the event after it: covered, but not exact.
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    const wider = containerCoincidence(session.doc, session.resolvedSelection.members);
+    expect(wider.exact).toBe(false);
+    expect(wider.whole).toHaveLength(1);
   });
 
   it('clears an event to an equal-duration rest and unlinks its ink', () => {
@@ -345,31 +340,26 @@ describe('selection ladder', () => {
     expect(session.selectionLevel).toBe('event');
   });
 
-  it('clears a container’s ink on the first press and removes it on the second', () => {
+  it('a coinciding event range deletes the container itself, not child by child', () => {
     const session = new EditorSession(containerDoc());
     session.handleIntent(relax); // event
-    session.handleIntent(relax); // container
-    expect(session.selectionLevel).toBe('container');
+    session.handleIntent({ type: 'extendSelection', direction: 'next' }); // both children
 
     // Press 1 — the children's ink goes, the container and its time stay.
     expect(session.handleIntent({ type: 'delete' })).toBe(true);
     expect(session.lastDelete).toEqual({
-      kind: 'cleared', level: 'container', notes: 2, thenRemoves: true
+      kind: 'cleared', level: 'event', notes: 2, thenRemoves: true
     });
     const tuplet = session.doc.parts[0].measures![0].sequences[0].content[0] as {
-      type?: string; content: { notes?: unknown[]; rest?: object; duration: object }[];
+      type?: string; content: { notes?: unknown[]; duration: object }[];
     };
     expect(tuplet.type).toBe('tuplet');
     expect(tuplet.content.map(child => child.notes)).toEqual([undefined, undefined]);
-    expect(tuplet.content.map(child => child.duration)).toEqual([
-      { base: 'eighth' }, { base: 'eighth' }
-    ]);
-    expect(session.selectionLevel).toBe('container');
 
-    // Press 2 — the empty container goes, and the ladder relaxes outward.
+    // Press 2 — the WHOLE container goes as one removal (the coincidence
+    // rule): no empty wrapper is left beyond the ladder's reach.
     expect(session.handleIntent({ type: 'delete' })).toBe(true);
-    expect(session.lastDelete).toEqual({ kind: 'removed', level: 'container', members: 1 });
-    expect(session.selectionLevel).toBe('voiceMeasure');
+    expect(session.lastDelete).toEqual({ kind: 'removed', level: 'event', members: 1 });
     expect((session.doc.parts[0].measures![0].sequences[0].content[0] as { type?: string }).type)
       .toBeUndefined();
   });
@@ -385,10 +375,13 @@ describe('selection ladder', () => {
     expect(session.handleIntent({ type: 'delete' })).toBe(true);
     expect(session.selectionLevel).toBe('event');
     expect(session.selectedNoteKeys).toEqual([]);
-    session.handleIntent(relax);
-    expect(session.selectionLevel).toBe('container');
+    // The empty grace group is a one-child coincidence: press 2 removes IT,
+    // and the selection re-resolves at the event rung onto the coincident
+    // host that remains.
     expect(session.handleIntent({ type: 'delete' })).toBe(true);
-    expect(session.selectionLevel).toBe('voiceMeasure');
+    expect((session.doc.parts[0].measures![0].sequences[0].content[0] as { type?: string }).type)
+      .toBeUndefined();
+    expect(session.selectionLevel).toBe('event');
     expect(session.selectedNoteKeys).toEqual(['outside']);
   });
 

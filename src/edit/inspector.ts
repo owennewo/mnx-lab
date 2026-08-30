@@ -612,28 +612,6 @@ function partMeasurePills(doc: MnxStructure, member: Extract<SelectionMember, { 
   return pills;
 }
 
-function containerPills(doc: MnxStructure, member: Extract<SelectionMember, { kind: 'container' }>): InspectorPill[] {
-  const sequence = doc.parts?.[member.partIndex]?.measures?.[member.measureIndex]?.sequences?.[member.sequenceIndex];
-  const container = sequence?.content?.[member.eventIndex] as
-    | { type: 'tuplet'; inner: { duration: { base: MnxNoteValueBase; dots?: number }; multiple: number }; outer: { duration: { base: MnxNoteValueBase; dots?: number }; multiple: number }; bracket?: string; showNumber?: string }
-    | { type: 'grace'; graceType?: string; slash?: boolean }
-    | { type: 'tremolo'; marks?: number }
-    | undefined;
-  if (!container) return [];
-  // READ-ONLY: the session has no verb that rewrites a container in place
-  // (core-selection-tray-residue.md, `container-properties`). Until it does,
-  // the inspector shows the spec and cannot take a value.
-  if (container.type === 'tuplet')
-    return [
-      reading('tuplet', 'tuplet', `${container.inner.multiple}:${container.outer.multiple} ${durationText(container.inner.duration)}`),
-      ...(container.bracket ? [reading('bracket', 'bracket', container.bracket)] : []),
-      ...(container.showNumber ? [reading('showNumber', 'number', container.showNumber)] : [])
-    ];
-  if (container.type === 'grace')
-    return [reading('grace', 'grace', `${container.graceType ?? ''}${container.slash ? ' slash' : ''}`.trim())];
-  return [reading('tremolo', 'tremolo', `${container.marks ?? ''}`)];
-}
-
 function pillsOfMember(doc: MnxStructure, level: SelectionLevel, member: SelectionMember): InspectorPill[] {
   switch (member.kind) {
     case 'measure':
@@ -646,8 +624,6 @@ function pillsOfMember(doc: MnxStructure, level: SelectionLevel, member: Selecti
       return voiceMeasurePills(doc, member);
     case 'partMeasure':
       return partMeasurePills(doc, member);
-    case 'container':
-      return containerPills(doc, member);
     case 'document':
       return [];
   }
@@ -740,7 +716,6 @@ export function wordsFor(level: SelectionLevel): InspectorWord[] {
 
 /** Why a rung has no editable pills, when that is by design. */
 export function rungNote(level: SelectionLevel): string | null {
-  if (level === 'container') return 'a container is read here, not written — the session has no verb that rewrites one in place';
   if (level === 'document') return 'the document has no attributes to inspect yet — the crumbs walk and go to';
   return null;
 }

@@ -30,7 +30,6 @@ import {
   coincidentSlots,
   cycleSlot,
   eventAtCursor,
-  eventSlotAt,
   initialCursor,
   isPastEnd,
   moveLine,
@@ -59,6 +58,8 @@ import {
   relaxLevel,
   resolveSelection,
   sectionStarts,
+  containerCoincidence,
+  eventMemberKey,
   tightenLevel,
   type ResolvedSelection,
   type SelectionState,
@@ -523,24 +524,36 @@ export class EditorSession {
         // touches that voice elsewhere; `removePartMeasure` empties one
         // staff's copy of one bar and never removes the part. That rule is
         // also what forbids removing a whole part from a single part-measure.
-        if (level === 'container') {
-          const ops = [...this.resolvedSelection.members].reverse().flatMap(member =>
-            member.kind === 'container'
-              ? [{
-                  type: 'removeContainer' as const,
-                  partIndex: member.partIndex,
-                  measureIndex: member.measureIndex,
-                  sequenceIndex: member.sequenceIndex,
-                  eventIndex: member.eventIndex
-                }]
-              : []
-          );
-          return this.finishDeleteRemoval(level, ops);
-        }
         if (level === 'event') {
-          const ops = [...this.resolvedSelection.members].reverse().flatMap(member =>
-            member.kind === 'event' ? [{ type: 'removeEvent' as const, event: eventAddressOf(member) }] : []
-          );
+          // Whole containers go AS containers (core-selection-range-grain.md,
+          // the coincidence rule): removing a tuplet's children one by one
+          // would leave an empty wrapper nothing on the ladder can address.
+          // A range covering all of a container's children removes the
+          // container; partial coverage removes the child events themselves.
+          // Members arrive in document order, so the reverse walk keeps every
+          // splice index valid across both op kinds.
+          const coincidence = containerCoincidence(this.doc, this.resolvedSelection.members);
+          const wholeByMember = new Map<string, (typeof coincidence.whole)[number]>();
+          for (const whole of coincidence.whole) {
+            for (const key of whole.memberKeys) wholeByMember.set(key, whole);
+          }
+          const emitted = new Set<(typeof coincidence.whole)[number]>();
+          const ops: EditOp[] = [...this.resolvedSelection.members].reverse().flatMap((member): EditOp[] => {
+            if (member.kind !== 'event') return [];
+            const whole = wholeByMember.get(eventMemberKey(member));
+            if (whole) {
+              if (emitted.has(whole)) return [];
+              emitted.add(whole);
+              return [{
+                type: 'removeContainer' as const,
+                partIndex: whole.partIndex,
+                measureIndex: whole.measureIndex,
+                sequenceIndex: whole.sequenceIndex,
+                eventIndex: whole.eventIndex
+              }];
+            }
+            return [{ type: 'removeEvent' as const, event: eventAddressOf(member) }];
+          });
           return this.finishDeleteRemoval(level, ops);
         }
         if (level === 'voiceMeasure') {
@@ -1542,7 +1555,6 @@ export class EditorSession {
             this.reanchorSelection('note');
             return true;
           }
-          case 'container':
           case 'voiceMeasure':
             if (!this.stepVoice(before, delta)) return false;
             this.reanchorSelection();
@@ -1658,7 +1670,6 @@ export class EditorSession {
         switch (this.selectionState.level) {
           case 'note':
           case 'event':
-          case 'container':
             this.cursorState = moveMeasure(this.grid, before, delta);
             break;
           case 'voiceMeasure':
@@ -1686,7 +1697,6 @@ export class EditorSession {
             this.reanchorSelection();
             return true;
           case 'event':
-          case 'container':
           case 'voiceMeasure':
             if (!this.stepStaff(before, delta)) return false;
             this.reanchorSelection();
@@ -1703,7 +1713,7 @@ export class EditorSession {
 
   private setSelectionLevel(level: SelectionLevel): void {
     const pin = (cursor: EditorCursor) =>
-      level === 'event' || level === 'container'
+      level === 'event'
         ? pinEventSlot(this.grid, cursor, this.activeProjection)
         : withoutEventPin(cursor);
     this.cursorState = pin(this.cursorState);
@@ -1834,7 +1844,6 @@ export class EditorSession {
    * the same bar units as their bare horizontal navigation. */
   private moveSelectionHorizontal(before: EditorCursor, delta: 1 | -1): EditorCursor {
     const level = this.selectionState.level;
-    if (level === 'container') return this.containerStep(before, delta);
     if (level === 'note' || level === 'event') {
       const at = this.grid.positions.findIndex(position =>
         position.measureIndex === before.measureIndex && onsetsEqual(position.onset, before.onset)
@@ -1920,8 +1929,6 @@ export class EditorSession {
         // the event rung has nothing to address there: the slice went blank at
         // a position the cursor had just been told to select.
         return movePositionInk(this.grid, before, delta, 'keep');
-      case 'container':
-        return this.containerStep(before, delta);
       case 'voiceMeasure':
       case 'partMeasure':
       case 'measure':
@@ -1942,62 +1949,6 @@ export class EditorSession {
         ? starts.find(s => s > before.measureIndex)
         : [...starts].reverse().find(s => s < before.measureIndex);
     return target === undefined ? before : moveToMeasure(this.grid, before, target);
-  }
-
-  /** Prev/next authored rhythm container in this staff/voice. Inner events
-   * already carry their parent's content index in the grid; this walk merely
-   * deduplicates that identity and lands on the target's first child. */
-  private containerStep(before: EditorCursor, delta: 1 | -1): EditorCursor {
-    const members = resolveSelection(this.doc, {
-      level: 'container',
-      anchor: copyCursorAddress(before),
-      extent: { kind: 'closure', scope: 'voice' }
-    }, this.activeProjection).members.filter(member => member.kind === 'container');
-    const current = eventSlotAt(this.grid, before, this.activeProjection);
-    if (!current || current.containerIndex === undefined) return before;
-    const at = members.findIndex(member =>
-      member.measureIndex === before.measureIndex &&
-      member.voiceIndex === current.voiceIndex &&
-      member.eventIndex === current.eventIndex
-    );
-    const target = members[at + delta];
-    if (at < 0 || !target) return before;
-    const position = this.grid.positions.find(candidate =>
-      candidate.measureIndex === target.measureIndex &&
-      candidate.events.some(event =>
-        event.voiceIndex === target.voiceIndex &&
-        event.eventIndex === target.eventIndex &&
-        event.containerIndex !== undefined
-      )
-    );
-    if (!position) return before;
-    const targetSlots = position.slots.filter(slot =>
-      slot.voiceIndex === target.voiceIndex &&
-      slot.eventIndex === target.eventIndex &&
-      slot.containerIndex !== undefined
-    );
-    const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
-    const line = targetSlots.length > 0 ? nearestSlotLine(targetSlots, before.line, tab) : before.line;
-    const landed = cursorAtPosition(
-      { ...before, ...(target.voiceIndex ? { voiceIndex: target.voiceIndex } : {}) },
-      position,
-      line
-    );
-    const ordinal = coincidentSlots(this.grid, landed, this.activeProjection).findIndex(slot =>
-      slot.voiceIndex === target.voiceIndex &&
-      slot.eventIndex === target.eventIndex &&
-      slot.containerIndex !== undefined
-    );
-    const eventSlotIndex = position.events.findIndex(event =>
-      event.voiceIndex === target.voiceIndex &&
-      event.eventIndex === target.eventIndex &&
-      event.containerIndex !== undefined
-    );
-    return {
-      ...landed,
-      ...(ordinal > 0 ? { slotIndex: ordinal } : {}),
-      ...(eventSlotIndex >= 0 ? { eventSlotIndex } : {})
-    };
   }
 
   /**
@@ -2100,9 +2051,8 @@ export class EditorSession {
    *  - `event` waits on §8.11: inserting into a full bar has to either take
    *    time from the rests or push a beat out, and this codebase decides that
    *    kind of question once, in the open, before it builds the verb.
-   *  - `container` constructs by WRAPPING a range, and `partMeasure`'s staff
-   *    is a part-level declaration rather than a member of this bar. Neither
-   *    has a position for a new sibling to take.
+   *  - `partMeasure`'s staff is a part-level declaration rather than a
+   *    member of this bar, so it has no position for a new sibling to take.
    *
    * A refusing rung returns false rather than climbing to a wider one: a key
    * that quietly acts on something bigger than you were addressing is exactly
@@ -2378,7 +2328,7 @@ export class EditorSession {
    * only the active extent; until those intents exist, every cursor move is a
    * conventional collapse/re-anchor at the current rung. */
   private reanchorSelection(level: SelectionLevel = this.selectionState.level): void {
-    if (level === 'event' || level === 'container') {
+    if (level === 'event') {
       this.cursorState = pinEventSlot(this.grid, this.cursorState, this.activeProjection);
     } else {
       this.cursorState = withoutEventPin(this.cursorState);

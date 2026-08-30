@@ -138,11 +138,6 @@ describe('pure selection paste planner', () => {
     ];
     for (const [clip, target, selection] of cases) accepted(clip, target, selection);
 
-    accepted(
-      serialized(containerScore('source'), point('container')),
-      containerScore('target'),
-      point('container')
-    );
   });
 
   it('rewrites retained references to fresh ids and keeps destination context', () => {
@@ -428,6 +423,9 @@ describe('pure selection paste planner', () => {
   });
 
   it('a zero-footprint grace clip inserts at the anchor without consuming', () => {
+    // The container clip kind retired with the container rung
+    // (core-selection-range-grain.md): the same wrapper now travels inside an
+    // event-run — a structurally closed event range carries whole wrappers.
     const source = containerScore('source');
     source.parts[0].measures[0].sequences[0].content = [{
       type: 'grace',
@@ -439,9 +437,9 @@ describe('pure selection paste planner', () => {
       }]
     }];
     const result = accepted(
-      serialized(source, point('container')),
+      serialized(source, closure('event')),
       containerScore('target'),
-      point('container')
+      point('event')
     );
     expect(result.accommodations.restFills).toBe(0);
     const content = result.document.parts[0].measures[0].sequences[0].content;

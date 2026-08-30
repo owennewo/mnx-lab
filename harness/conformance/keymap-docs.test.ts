@@ -84,14 +84,14 @@ describe('keymap docs — the joins', () => {
     });
   });
 
-  it('Shift+1..7 addresses the ladder absolutely, in ladder order', () => {
+  it('Shift+1..6 addresses the ladder absolutely, in ladder order', () => {
     // The ORDER is the whole contract of an absolute address: 1 is the
-    // tightest rung and 7 the widest, matching SELECTION_LADDER rather than
+    // tightest rung and 6 the widest, matching SELECTION_LADDER rather than
     // the tray's drawn column (which runs the other way and prints the
     // ordinals precisely so the two cannot be confused).
     const layers = [NAVIGATION_LAYER];
     expect(LADDER_JUMP_LEVELS).toEqual(SELECTION_LADDER);
-    expect(LADDER_JUMP_LEVELS).toHaveLength(7);
+    expect(LADDER_JUMP_LEVELS).toHaveLength(6);
     for (const [index, level] of LADDER_JUMP_LEVELS.entries()) {
       expect(resolveIntent({ code: `Digit${index + 1}`, shift: true }, layers)).toEqual({
         type: 'goToLevel',
@@ -99,7 +99,7 @@ describe('keymap docs — the joins', () => {
       });
     }
     expect(LADDER_JUMP_LEVELS[0]).toBe('note');
-    expect(LADDER_JUMP_LEVELS[6]).toBe('document');
+    expect(LADDER_JUMP_LEVELS[5]).toBe('document');
   });
 
   it('leaves the BARE digit row to the frets', () => {
@@ -154,7 +154,7 @@ describe('keymap docs — the guard mirrors', () => {
     // not visible from a DOM-free layer. Nothing wider has a vertical unit.
     const doc = KEY_DOCS.find(d => d.keys === 'Ctrl+↑/↓')!;
     expect(Object.keys(doc.meaning)).toEqual([
-      'note', 'event', 'container', 'voiceMeasure', 'partMeasure'
+      'note', 'event', 'voiceMeasure', 'partMeasure'
     ]);
 
     const session = new EditorSession(makeTwoPartDoc());
@@ -167,13 +167,6 @@ describe('keymap docs — the guard mirrors', () => {
     expect(session.handleIntent({ type: 'jumpDown' })).toBe(true); // the second part
     expect(session.cursor.partIndex).toBe(1);
     expect(session.cursor.measureIndex).toBe(0); // the bar travels; the voice does not
-
-    const container = new EditorSession(makeTwoPartContainerDoc());
-    container.handleIntent({ type: 'relaxSelection' });
-    container.handleIntent({ type: 'relaxSelection' });
-    expect(container.selectionLevel).toBe('container');
-    expect(container.handleIntent({ type: 'jumpDown' })).toBe(true);
-    expect(container.cursor.partIndex).toBe(1);
 
     while (session.selectionLevel !== 'partMeasure') {
       session.handleIntent({ type: 'relaxSelection' });
@@ -192,7 +185,6 @@ describe('keymap docs — the guard mirrors', () => {
     expect(Object.keys(doc.meaning)).toEqual([
       'note',
       'event',
-      'container',
       'voiceMeasure',
       'partMeasure',
       'measure',
@@ -202,14 +194,11 @@ describe('keymap docs — the guard mirrors', () => {
     // A session per rung: the voice step STOPS at the outermost voice, so a
     // shared session would arrive at the next rung already pressed against it.
     const handles = (level: string): boolean => {
-      const session = new EditorSession(
-        level === 'container' ? makeTwoPartContainerDoc() : makeTwoPartDoc()
-      );
+      const session = new EditorSession(makeTwoPartDoc());
       while (session.selectionLevel !== level) session.handleIntent({ type: 'relaxSelection' });
       return session.handleIntent({ type: 'lineDown' });
     };
     expect(handles('event')).toBe(true);
-    expect(handles('container')).toBe(true);
     expect(handles('voiceMeasure')).toBe(true);
     expect(handles('partMeasure')).toBe(true);
     expect(handles('measure')).toBe(false); // the mount's
@@ -236,7 +225,7 @@ describe('keymap docs — the guard mirrors', () => {
 
     const cut = KEY_DOCS.find(d => d.keys === 'Ctrl/⌘+X')!;
     expect(Object.keys(cut.meaning)).toEqual([
-      'note', 'event', 'container', 'voiceMeasure', 'partMeasure', 'measure'
+      'note', 'event', 'voiceMeasure', 'partMeasure', 'measure'
     ]);
     expect(cut.meaning.score).toBeUndefined();
 

@@ -153,7 +153,6 @@ describe('selection cut', () => {
     }> = [
       { level: 'note', kind: 'note-set' },
       { level: 'event', kind: 'event-run' },
-      { level: 'container', doc: containerScore(), kind: 'container-run' },
       { level: 'voiceMeasure', kind: 'voice-bars' },
       { level: 'partMeasure', kind: 'staff-bars' },
       { level: 'partMeasure', closure: true, kind: 'part' },
@@ -190,13 +189,6 @@ describe('selection cut', () => {
     const eventCut = accepted(selectedSession('event'));
     expect(eventCut.document.parts[0].measures[0].sequences[0].content[0])
       .toMatchObject({ duration: { base: 'quarter' }, rest: {} });
-
-    const container = accepted(selectedSession('container', containerScore()));
-    expect(container.document.parts[0].measures[0].sequences[0].content[0])
-      .toEqual({ type: 'space', duration: [1, 8] });
-    const grace = accepted(selectedSession('container', containerScore('grace')));
-    expect(grace.document.parts[0].measures[0].sequences[0].content)
-      .toMatchObject([{ id: 'after' }]);
 
     const voice = accepted(selectedSession('voiceMeasure'));
     expect(voice.document.parts[0].measures[0].sequences.map(sequence => sequence.staff))

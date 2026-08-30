@@ -4,7 +4,7 @@
 // component (ScoreHud.ts) renders row data and knows nothing of the editor;
 // THIS module speaks `edit/` freely — levels, the presence rule, the anchor
 // voice — and flattens them into display rows. Rows are the ADDRESS chain
-// (document → section → bar → part → voice → container → event → note); the highlight is
+// (document → bar → part → voice → event → note); the highlight is
 // the RUNG. Part is deliberately not a rung (the ladder is the vertical
 // axis; part is the horizontal closure of part-measure), so the part row
 // maps to `partMeasure`, the voice row to `voiceMeasure`.
@@ -16,7 +16,7 @@ import {
   type MnxTuningEntry
 } from '../model/mnx.ts';
 import type { EditorSession } from '../edit/session.ts';
-import { eventAtCursor, eventSlotAt, slotAt } from '../edit/cursor.ts';
+import { eventAtCursor, slotAt } from '../edit/cursor.ts';
 import {
   anchorVoiceIndex,
   presentLevels,
@@ -31,7 +31,6 @@ export const LEVEL_BY_ROW: Record<string, SelectionLevel> = {
   bar: 'measure',
   part: 'partMeasure',
   voice: 'voiceMeasure',
-  container: 'container',
   event: 'event',
   note: 'note'
 };
@@ -129,22 +128,6 @@ export function buildHudRows(
   const voice = anchorVoiceIndex(cursor);
   if (present.has('voiceMeasure')) {
     row('voice', 'voice', `${voice + 1} of ${sequences.length}`);
-  }
-
-  if (present.has('container')) {
-    const slot = eventSlotAt(session.positions, cursor, session.projection);
-    const item = slot?.containerIndex === undefined
-      ? undefined
-      : sequences[slot.voiceIndex]?.content[slot.eventIndex] as
-          | { type?: string; content?: unknown[] }
-          | undefined;
-    const type = item?.type ?? 'container';
-    const children = item?.content?.length ?? 0;
-    row(
-      'container',
-      'container',
-      `${type} · ${children} event${children === 1 ? '' : 's'}`
-    );
   }
 
   const event = present.has('event')

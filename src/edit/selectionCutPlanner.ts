@@ -3,8 +3,8 @@
 // Unlike ordinary Delete, this planner may remove captured ink. It returns a
 // complete detached result or a typed refusal and never writes a clipboard or
 // editor history.
-import type { MnxSequenceItem, MnxStructure } from '../model/mnx.ts';
-import { itemSpan, type Projection } from './cursor.ts';
+import type { MnxStructure } from '../model/mnx.ts';
+import { type Projection } from './cursor.ts';
 import { applyOp, type EditOp, type EventAddress } from './ops.ts';
 import {
   resolveSelection,
@@ -54,7 +54,6 @@ function clipKindFor(state: SelectionState): CutPlan['clipKind'] {
   switch (state.level) {
     case 'note': return 'note-set';
     case 'event': return 'event-run';
-    case 'container': return 'container-run';
     case 'voiceMeasure': return 'voice-bars';
     case 'partMeasure': return state.extent.kind === 'closure' ? 'part' : 'staff-bars';
     case 'measure': return 'measures';
@@ -144,27 +143,6 @@ export function planSelectionCut(
           : []
       );
       next = applyOp(next, ops.length === 1 ? ops[0] : { type: 'batch', ops });
-      break;
-    }
-    case 'container': {
-      const members = [...resolved.members].reverse().filter(
-        (member): member is Extract<SelectionMember, { kind: 'container' }> => member.kind === 'container'
-      );
-      for (const member of members) {
-        const sequence = next.parts[member.partIndex]?.measures[member.measureIndex]
-          ?.sequences[member.sequenceIndex];
-        const item = sequence?.content[member.eventIndex];
-        if (!sequence || !item) return refuse('missing-source-member', 'A selected container no longer exists.');
-        const span = itemSpan(item);
-        if (!Number.isFinite(span.num) || !Number.isFinite(span.den) || span.den <= 0 || span.num < 0) {
-          return refuse('unrepresentable-silence', 'The selected container has no exact representable duration.');
-        }
-        if (span.num === 0) sequence.content.splice(member.eventIndex, 1);
-        else sequence.content.splice(member.eventIndex, 1, {
-          type: 'space',
-          duration: [span.num, span.den]
-        } as unknown as MnxSequenceItem);
-      }
       break;
     }
     case 'voiceMeasure': {

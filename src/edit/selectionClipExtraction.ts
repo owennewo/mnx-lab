@@ -32,7 +32,6 @@ import {
   type ClipMeasureContext,
   type ClipPartDescriptor,
   type MeasureClipColumn,
-  type MnxRhythmContainer,
   type SelectionClip,
   type SelectionClipDependencies,
   type SelectionClipEnvelope,
@@ -128,7 +127,6 @@ function measureIndices(members: SelectionMember[]): number[] {
     switch (member.kind) {
       case 'note':
       case 'event':
-      case 'container':
       case 'voiceMeasure':
       case 'partMeasure':
       case 'measure':
@@ -354,33 +352,6 @@ function buildClip(
       return eventItems(doc, members.filter(
         (member): member is Extract<SelectionMember, { kind: 'event' }> => member.kind === 'event'
       ));
-    case 'container': {
-      const entries: {
-        member: Extract<SelectionMember, { kind: 'container' }>;
-        container: MnxRhythmContainer;
-      }[] = [];
-      for (const member of members) {
-        if (member.kind !== 'container') continue;
-        const item = doc.parts?.[member.partIndex]?.measures?.[member.measureIndex]
-          ?.sequences?.[member.sequenceIndex]?.content?.[member.eventIndex];
-        if (!item || isTimedEvent(item)) {
-          return refuse('missing-source-member', 'A selected rhythm container no longer exists.');
-        }
-        entries.push({ member, container: cloneJson(item) });
-      }
-      const start = Math.min(...entries.map(entry => entry.member.measureIndex));
-      const end = Math.max(...entries.map(entry => entry.member.measureIndex));
-      const bars = [...new Set(entries.map(entry => entry.member.measureIndex))].map(measureIndex => {
-        const inMeasure = entries.filter(entry => entry.member.measureIndex === measureIndex);
-        const onset = inMeasure[0].member.onset;
-        return {
-          offset: measureIndex - start,
-          onset: [onset.num, onset.den] as [number, number],
-          containers: inMeasure.map(entry => entry.container)
-        };
-      });
-      return { kind: 'container-run', span: end - start + 1, bars };
-    }
     case 'voiceMeasure': {
       const voiceMembers = members.filter(
         (member): member is Extract<SelectionMember, { kind: 'voiceMeasure' }> =>
@@ -464,9 +435,6 @@ function clipEvents(envelope: SelectionClipEnvelope): MnxEvent[] {
       return [];
     case 'event-run':
       clip.bars.forEach(bar => visitItems(bar.items, event => events.push(event)));
-      break;
-    case 'container-run':
-      clip.bars.forEach(bar => visitItems(bar.containers, event => events.push(event)));
       break;
     case 'voice-bars':
       clip.bars.forEach(bar => visitItems(bar.sequence.content, event => events.push(event)));
@@ -674,7 +642,7 @@ export function extractSelectionClip(
       ? {}
       : { context: contextFor(doc, indices) })
   };
-  if (state.level === 'event' || state.level === 'container') {
+  if (state.level === 'event') {
     const relationships = narrowRelationships(
       doc,
       state.anchor.partIndex ?? 0,

@@ -118,7 +118,7 @@ export interface PasteLanding {
   measureStart: number;
   measureEnd: number;
   /** Exact metric edges of the pasted material. Bar-and-above rungs use the
-   *  start of their edge bars; event/container ranges retain their real
+   *  start of their edge bars; event ranges retain their real
    *  onsets so Stage 4 can select the whole result without re-reading the
    *  source clip. */
   onsetStart: [number, number];
@@ -227,12 +227,6 @@ function validateEnvelopePayload(envelope: SelectionClipEnvelope): PasteRefusal 
       if (clip.span < 1 || clip.bars.length === 0 || clip.bars.some(bar =>
         bar.offset < 0 || bar.offset >= clip.span || bar.items.length === 0
       )) return refuse('invalid-payload', 'The event clip has invalid bar runs.');
-      break;
-    case 'container-run':
-      if (clip.span < 1 || clip.bars.length === 0 || clip.bars.some(bar =>
-        bar.offset < 0 || bar.offset >= clip.span || bar.containers.length === 0 ||
-        bar.containers.some(container => !['tuplet', 'grace', 'tremolo'].includes(container.type))
-      )) return refuse('invalid-payload', 'The container clip has invalid bar runs.');
       break;
     case 'voice-bars':
       if (clip.span < 1 || clip.bars.some(bar => bar.offset < 0 || bar.offset >= clip.span))
@@ -668,7 +662,7 @@ function runAnchor(
   state: SelectionState,
   projection: Projection
 ): { measureIndex: number; onset: Onset } {
-  if (state.level === 'note' || state.level === 'event' || state.level === 'container') {
+  if (state.level === 'note' || state.level === 'event') {
     const members = resolveSelection(doc, state, projection).members;
     let best: { measureIndex: number; onset: Onset } | null = null;
     for (const member of members) {
@@ -837,15 +831,9 @@ export function planSelectionPaste(
       );
       break;
     }
-    case 'event-run':
-    case 'container-run': {
-      const level = clip.kind === 'event-run' ? 'event' as const : 'container' as const;
-      const runBars = clip.kind === 'event-run'
-        ? clip.bars.map(bar => ({ offset: bar.offset, onset: bar.onset, items: bar.items }))
-        : clip.bars.map(bar => ({
-            offset: bar.offset, onset: bar.onset,
-            items: bar.containers as MnxSequenceItem[]
-          }));
+    case 'event-run': {
+      const level = 'event' as const;
+      const runBars = clip.bars.map(bar => ({ offset: bar.offset, onset: bar.onset, items: bar.items }));
       accommodations.flaggedNotes += countUnplayableAnnotations(
         notesInItems(runBars.flatMap(bar => bar.items)),
         destination.parts[partIndex]
