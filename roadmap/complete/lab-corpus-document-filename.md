@@ -1,11 +1,19 @@
 # The corpus fixture is a document — `score.mnx.json` → `document.mnx.json`
 
-> **Status: proposed (2026-08-30).** Serves the **implementation loop** by changing **lab
+> **Status: COMPLETE (2026-08-30).** Serves the **implementation loop** by changing **lab
 > machinery**, not MNX data. Follows the vocabulary settled by
 > [core-document-rung.md](../complete/core-document-rung.md) and the public element rename in
 > [core-document-viewer-rename.md](../complete/core-document-viewer-rename.md). Kept separate because
 > `scenarios/spec/` is generator-owned, 119 paths move, and the corpus/goldens require a
 > stronger diff verdict than a class rename.
+>
+> **Built verdict.** Landed in `8502e3f`. All 119 corpus roots are now
+> `document.mnx.json`; Git records every fixture as a 100% rename. The normalized
+> id-to-content digest stayed `3d28226f262a2d576955a3ea9dac679133eca8ebbe6945b51d3fc6fa14851797`
+> across 552,016 bytes, with zero legacy filenames and no metadata or golden changes.
+> `sync:spec` is idempotent. Evidence: 1,189 tests, 119-scenario check, both converter
+> suites, app/lib/embed builds, lib/embed smokes, and primitive regeneration with an empty
+> post-commit scenario diff.
 
 ## The file names the wrong thing
 

@@ -4,7 +4,7 @@
 > [core-document-rung.md](core-document-rung.md), which settled the semantic
 > distinction and deliberately left the public element out of scope. This item owns that
 > public-face rename; the corpus filename moves separately in
-> [lab-corpus-document-filename.md](../proposed/lab-corpus-document-filename.md), and the workbench mode
+> [lab-corpus-document-filename.md](lab-corpus-document-filename.md), and the workbench mode
 > that exposes only the renamed viewer lives in
 > [workbench-document-focus-mode.md](../proposed/workbench-document-focus-mode.md).
 >

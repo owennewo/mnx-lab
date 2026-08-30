@@ -44,11 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[lab-corpus-document-filename.md](proposed/lab-corpus-document-filename.md)** — rename all
-  119 scenario roots `score.mnx.json` → `document.mnx.json`. A separate lab item because
-  `scenarios/spec/` is generator-owned: change the sync writer first, regenerate rather than
-  hand-move the mirror, migrate runtime/harness/proposal consumers atomically, and prove an
-  id→JSON-hash map is unchanged. No dual filename period, no golden/status/verification move.
 - **[workbench-document-focus-mode.md](proposed/workbench-document-focus-mode.md)** — two honest
   fullscreen levels: `Ctrl+Alt+F` toggles transient **document focus** (header, rail, view
   strip, panel and persistent controls gone; the document viewer fills the browser viewport),
@@ -784,6 +779,11 @@ back up to `proposed/` the moment it is.
   embeds/demos/contracts updated, `renderProjection()` / `#projection-container` /
   `notationTokens` behind it, and the obsolete tag rejected by browser smoke. **Landed
   2026-08-30** at `4039904`; goldens byte-identical.
+- **[lab-corpus-document-filename.md](complete/lab-corpus-document-filename.md)** — all 119
+  scenario roots now use `document.mnx.json`, including the generator-owned spec mirror and
+  every runtime, harness and proposal consumer. Every fixture is a 100% rename, the normalized
+  id→JSON digest and 552,016 bytes are unchanged, and no golden or verification record moved.
+  **Landed 2026-08-30** at `8502e3f`.
 - **[core-score-hud.md](complete/core-score-hud.md)** — a **HUD companion** beside the viewer:
   the selection ladder's missing *property surface* as one row per containment level (score /
   section / bar / part / voice / event / note), active rung highlighted, rows clickable for
