@@ -830,8 +830,12 @@ export function parseInspectorLine(
       if (n === fb.fret) return { error: `already at fret ${n}` };
       return { intent: { type: 'enterFret', fret: n } };
     }
-    if ((TECHNIQUE_WORDS as string[]).includes(head) && head !== 'bend' && rest === '')
-      return { intent: { type: 'setTechnique', technique: { kind: head as TechniqueChoice['kind'] } as TechniqueChoice } };
+    // Case-insensitively: `head` is lowercased above, and the camelCase
+    // words (`hammerPull`, `palmMute`) never matched themselves — found
+    // hands-on 2026-08-30, latent since the words list was born.
+    const techniqueKind = TECHNIQUE_WORDS.find(k => k.toLowerCase() === head);
+    if (techniqueKind && techniqueKind !== 'bend' && rest === '')
+      return { intent: { type: 'setTechnique', technique: { kind: techniqueKind } as TechniqueChoice } };
     if (head === 'bend') {
       // The stops, with a spelt-back `≈` tolerated: amending an approximated
       // pill regularises the curve, which is what the mark warns.

@@ -437,6 +437,25 @@ describe('event pills', () => {
   });
 });
 
+describe('typed technique words', () => {
+  it('the camelCase words match case-insensitively — hammerPull and palmMute included', () => {
+    // The typed head is lowercased, so the camelCase words never matched
+    // themselves (latent since the words list was born; found hands-on
+    // 2026-08-30 when `hammerPull` — offered by the error hint itself — was
+    // refused).
+    for (const typed of ['hammerPull', 'hammerpull', 'HAMMERPULL']) {
+      expect(parseInspectorLine('note', null, typed), typed).toEqual({
+        intent: { type: 'setTechnique', technique: { kind: 'hammerPull' } }
+      });
+    }
+    expect(parseInspectorLine('note', null, 'palmmute')).toEqual({
+      intent: { type: 'setTechnique', technique: { kind: 'palmMute' } }
+    });
+    // A trailing value still refuses — these words take none.
+    expect(parseInspectorLine('note', null, 'hammerPull now')).toHaveProperty('error');
+  });
+});
+
 describe('note pills', () => {
   it('read string, accidental, fingering and techniques, then the event’s own', () => {
     const session = at('note');

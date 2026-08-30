@@ -852,6 +852,12 @@ export class EditorSession {
         // no note to travel to, a value already in place).
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
+        // The typed word obeys the same physics as the `h` key: a hammer or
+        // pull to the SAME fret is refused, not written.
+        if (intent.technique.kind === 'hammerPull') {
+          const pair = nextNotePitchPair(this.doc, slot.noteKey);
+          if (!pair || pair.next === pair.current) return false;
+        }
         const before = JSON.stringify(this.doc);
         this.apply({ type: 'setTechnique', noteKey: slot.noteKey, technique: intent.technique });
         if (JSON.stringify(this.doc) === before) {
