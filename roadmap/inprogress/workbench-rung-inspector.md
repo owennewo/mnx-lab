@@ -354,6 +354,11 @@ the one optional choice, fret is its consequence** (`ops.ts`: `setFret` writes p
   `?` typed in either state (no grammar takes one) or the button toggles it. The HUD's
   own row still prints the projection coordinate — it is a coordinate readout, which
   is what the HUD is for.
+- **Three rows, then** (same day, hands-on): the foot went too — the state word and
+  the `?` float right on the slot row, so the frame is window + three rows until the
+  legend is asked for. Derived pills draw in the key's muted ink (a value the document
+  did not say reads quieter than one it did), and the current rung says its size
+  (`note 1 of 4`, `bar 3 of 12`) — the faded rows stay plain names.
 
 ## Stages
 

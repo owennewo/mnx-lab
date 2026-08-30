@@ -112,43 +112,32 @@ export class RungInspector extends LitElement {
       flex-direction: column;
     }
 
-    /* ── the foot: the state word, the range note, and the ? that shows the
-       key legend. The old header line said the rung's name and a projection
-       coordinate ("staff position 5", "string 1") — the name is the window's,
-       and the coordinate is now a pill that says whether it was chosen. */
-    .foot {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 5px 9px;
-      border-top: 1px solid var(--line);
-      background: var(--bg-context);
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    .foot .state {
+    /* ── the state word and the ? sit at the right of the slot row: no row
+       of their own, so the frame is three rows until the legend is asked for. */
+    .slotrow .state {
+      margin-left: auto;
+      flex: none;
       font: 600 8.5px/1.2 var(--sans);
       letter-spacing: 0.09em;
       text-transform: uppercase;
       color: var(--ink-3);
-      flex: none;
     }
 
-    .foot .state.editing {
+    .slotrow .state.editing {
       color: var(--accent-fg);
     }
 
-    .foot .secondary {
+    .slotrow .secondary {
+      flex: none;
       font: 400 10px/1.2 var(--mono);
       color: var(--ink-3);
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .foot .help {
-      margin-left: auto;
+    .slotrow .help {
       flex: none;
+      margin-left: 8px;
       font: 500 10px/1 var(--mono);
       color: var(--ink-3);
       background: none;
@@ -157,7 +146,7 @@ export class RungInspector extends LitElement {
       cursor: pointer;
     }
 
-    .foot .help.on {
+    .slotrow .help.on {
       color: var(--ink);
       border-color: var(--accent);
     }
@@ -254,6 +243,7 @@ export class RungInspector extends LitElement {
     .slotrow {
       display: flex;
       align-items: center;
+      gap: 9px;
       padding: 0 9px;
       border-bottom: 1px solid var(--line);
     }
@@ -307,6 +297,7 @@ export class RungInspector extends LitElement {
     /* Derived: the renderer's answer, not the document's — dotted like a
        reading, but in full ink because it can be opened and overridden. */
     .pill.derived {
+      color: var(--ink-3);
       border-style: dotted;
     }
 
@@ -443,7 +434,9 @@ export class RungInspector extends LitElement {
       display: flex;
       flex-wrap: wrap;
       gap: 0 14px;
-      padding: 0 9px 6px;
+      padding: 5px 9px 6px;
+      border-top: 1px solid var(--line);
+      background: var(--bg-context);
       background: var(--bg-context);
       font: 400 10px/1.5 var(--mono);
       color: var(--ink-3);
@@ -905,6 +898,17 @@ export class RungInspector extends LitElement {
                     >${open?.kind === 'slot' ? this.renderInput() : 'add…'}</span
                   >`
                 : html`<span class="note" style="padding: 0">${this.note ?? ''}</span>`}
+          <span class="state${open ? ' editing' : ''}">${stateLabel}</span>
+          <span class="secondary">${this.secondary}</span>
+          <button
+            class="help${this.showKeys ? ' on' : ''}"
+            title="keys (?)"
+            tabindex="-1"
+            @pointerdown=${(e: Event) => {
+              e.preventDefault();
+              this.showKeys = !this.showKeys;
+            }}
+          >?</button>
             </div>
             <div class="pills">
               ${this.pills.map((pill, i) => {
@@ -936,19 +940,6 @@ export class RungInspector extends LitElement {
         </div>
         ${this.error ? html`<div class="error">${this.error}</div>` : nothing}
         ${this.note && this.words.length > 0 ? html`<div class="note">${this.note}</div>` : nothing}
-        <div class="foot">
-          <span class="state${open ? ' editing' : ''}">${stateLabel}</span>
-          <span class="secondary">${this.secondary}</span>
-          <button
-            class="help${this.showKeys ? ' on' : ''}"
-            title="keys (?)"
-            tabindex="-1"
-            @pointerdown=${(e: Event) => {
-              e.preventDefault();
-              this.showKeys = !this.showKeys;
-            }}
-          >?</button>
-        </div>
         ${this.showKeys ? this.keyLegend() : nothing}
       </div>
     `;

@@ -79,10 +79,37 @@ export function buildInspectorView(
         return '';
     }
   };
+  // How many siblings the rung has — said on the CURRENT row only
+  // (`note 1 of 4`), so the faded rows stay plain names.
+  const partIndex = cursor.partIndex ?? 0;
+  const partMeasure = doc.parts?.[partIndex]?.measures?.[cursor.measureIndex];
+  const sequence = partMeasure?.sequences?.[cursor.voiceIndex ?? 0];
+  const countOf = (key: string): number => {
+    switch (key) {
+      case 'bar':
+        return doc.global.measures.length;
+      case 'part':
+        return doc.parts?.length ?? 0;
+      case 'voice':
+        return partMeasure?.sequences?.length ?? 0;
+      case 'section':
+        return doc.global.measures.filter(m => m.section?.label !== undefined).length;
+      case 'event':
+      case 'container':
+        return sequence?.content?.length ?? 0;
+      case 'note': {
+        const event = first && 'eventIndex' in first ? sequence?.content?.[first.eventIndex] : undefined;
+        return (event as { notes?: unknown[] } | undefined)?.notes?.length ?? 0;
+      }
+      default:
+        return 0;
+    }
+  };
   const crumbs: InspectorCrumb[] = rows.map(row => {
     const rowLevel = LEVEL_BY_ROW[row.key];
     const index = indexOf(row.key);
-    const label = index ? `${row.label} ${index}` : row.label;
+    const count = row.active && /^\d+$/.test(index) ? countOf(row.key) : 0;
+    const label = index ? `${row.label} ${index}${count > 1 ? ` of ${count}` : ''}` : row.label;
     return {
       key: row.key,
       level: rowLevel,
