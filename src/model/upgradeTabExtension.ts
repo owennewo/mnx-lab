@@ -26,7 +26,12 @@ import { MnxStructure, MnxTuningEntry, STANDARD_GUITAR_STRINGS } from './mnx.ts'
  * tab block itself — nesting universal fields under `tab` made them
  * fretboard-scoped by construction.
  *
- * Already-v5 documents come back unchanged. See docs/mnx-extensions.md.
+ *   v5 → v6  `technique.hammerOn`/`pullOff` merge into ONE `hammerPull`
+ *            (the Soundslice convention): the direction is implicit in the
+ *            two pitches, so the split stored a second spelling of a fact
+ *            the music already states.
+ *
+ * Already-v6 documents come back unchanged. See docs/mnx-extensions.md.
  */
 export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
   if (
@@ -34,6 +39,7 @@ export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
     !needsNamespaceUpgrade(mnxJson) &&
     !needsLabelUpgrade(mnxJson) &&
     !needsFlattenUpgrade(mnxJson) &&
+    !needsHammerPullMerge(mnxJson) &&
     !needsStringsMaterialized(mnxJson)
   ) {
     return mnxJson;
@@ -44,6 +50,7 @@ export function upgradeTabExtension(mnxJson: MnxStructure): MnxStructure {
   upgradeV2(doc);
   upgradeV3(doc);
   upgradeV4(doc);
+  upgradeV5(doc);
   materializeStrings(doc);
   return doc as MnxStructure;
 }
@@ -153,6 +160,39 @@ function needsFlattenUpgrade(doc: any): boolean {
           for (const note of event.notes ?? []) {
             const nTab = note._x?.mnxLab?.tab;
             if (nTab && (nTab.position !== undefined || nTab.fingering !== undefined)) return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
+}
+
+/** v5 → v6: merge `technique.hammerOn`/`pullOff` into one `hammerPull`. When
+ *  a note carries both (the register's own example once did), one survives —
+ *  they name the same gesture and the direction is derived at render. */
+function upgradeV5(doc: any): void {
+  for (const part of doc.parts ?? []) {
+    forEachNote(part, (note: any) => {
+      const technique = note._x?.mnxLab?.tab?.technique;
+      if (!technique || (technique.hammerOn === undefined && technique.pullOff === undefined)) return;
+      const { hammerOn, pullOff, ...rest } = technique;
+      note._x.mnxLab.tab.technique = {
+        ...rest,
+        hammerPull: hammerOn ?? pullOff
+      };
+    });
+  }
+}
+
+function needsHammerPullMerge(doc: any): boolean {
+  for (const part of doc.parts ?? []) {
+    for (const measure of part.measures ?? []) {
+      for (const seq of measure.sequences ?? []) {
+        for (const event of seq.content ?? []) {
+          for (const note of event.notes ?? []) {
+            const technique = note._x?.mnxLab?.tab?.technique;
+            if (technique?.hammerOn !== undefined || technique?.pullOff !== undefined) return true;
           }
         }
       }

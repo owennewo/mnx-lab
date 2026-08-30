@@ -430,7 +430,6 @@ function technique(
   kind: 'bend' | 'slide' | 'hammerPull' | 'vibrato' | 'palmMute' | 'harmonic',
   shortcut: string
 ): EditorCommand {
-  const probe = kind === 'hammerPull' ? 'hammerOn' : kind;
   return {
     id,
     scopes: ['note'],
@@ -440,7 +439,7 @@ function technique(
     tier: 'key',
     projection: 'tab',
     isActive: view =>
-      view.noteKey !== null && techniqueAt(view.doc, view.noteKey, probe) !== undefined,
+      view.noteKey !== null && techniqueAt(view.doc, view.noteKey, kind) !== undefined,
     action: () => ({ intent: { type: 'toggleTechnique', kind } })
   };
 }

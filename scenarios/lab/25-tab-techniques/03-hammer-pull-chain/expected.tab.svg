@@ -19,10 +19,7 @@
 <text x="513.6" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n4">2</text>
 <line x1="571.2" y1="80" x2="571.2" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
 <rect x="576" y="80" width="6.4" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
-<path d="M 177.6 73.6 C 211.2 60.16, 256 60.16, 289.6 73.6 C 256 61.44, 211.2 61.44, 177.6 73.6 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerOn"></path>
-<text x="233.6" y="56.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-hammerOn-label">H</text>
-<path d="M 289.6 73.6 C 323.2 60.16, 368 60.16, 401.6 73.6 C 368 61.44, 323.2 61.44, 289.6 73.6 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-pullOff"></path>
-<text x="345.6" y="56.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-pullOff-label">P</text>
-<path d="M 401.6 73.6 C 435.2 60.16, 480 60.16, 513.6 73.6 C 480 61.44, 435.2 61.44, 401.6 73.6 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerOn"></path>
-<text x="457.6" y="56.8" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-hammerOn-label">H</text>
+<path d="M 177.6 73.6 C 211.2 60.16, 256 60.16, 289.6 73.6 C 256 61.44, 211.2 61.44, 177.6 73.6 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
+<path d="M 289.6 73.6 C 323.2 60.16, 368 60.16, 401.6 73.6 C 368 61.44, 323.2 61.44, 289.6 73.6 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
+<path d="M 401.6 73.6 C 435.2 60.16, 480 60.16, 513.6 73.6 C 480 61.44, 435.2 61.44, 401.6 73.6 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
 </svg>

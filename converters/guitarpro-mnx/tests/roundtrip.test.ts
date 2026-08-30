@@ -812,8 +812,7 @@ describe('technique', () => {
       palmMute: 2,
       bend: 11,
       slide: 17,
-      hammerOn: 32,
-      pullOff: 10
+      hammerPull: 42
     });
   });
 

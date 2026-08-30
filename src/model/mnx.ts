@@ -37,8 +37,10 @@ export interface MnxTabTechnique {
     direction?: 'up' | 'down';
     target?: string;
   };
-  hammerOn?: { target: string };
-  pullOff?: { target: string };
+  /** Hammer-on or pull-off to `target` — one adornment (v6, the Soundslice
+   *  convention): direction is implicit in the two pitches, so storing it
+   *  would be a second spelling of a fact the music already states. */
+  hammerPull?: { target: string };
   vibrato?: boolean;
   /** Identified by touching pitch, not touching fret — that covers fretless
    *  instruments and between-fret nodes (w3c-cg/mnx#179). */
@@ -49,7 +51,7 @@ export interface MnxTabTechnique {
   palmMute?: boolean;
 }
 
-/** note._x.mnxLab.tab — v5 keeps only `technique` here. */
+/** note._x.mnxLab.tab — v5+ keeps only `technique` here. */
 export interface MnxTabNoteExtension {
   technique?: MnxTabTechnique;
 }

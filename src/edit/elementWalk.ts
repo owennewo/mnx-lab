@@ -132,15 +132,14 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
       'technique-bend', 'technique-bend-prebend', 'technique-bend-hold',
       'technique-bend-release', 'technique-bend-arrow', 'technique-bend-label',
       'technique-slur',
-      'technique-hammerOn', 'technique-hammerOn-label',
-      'technique-pullOff', 'technique-pullOff-label',
+      'technique-hammerPull',
       'technique-slide', 'technique-slide-shift', 'technique-slide-legato',
       'technique-slide-legato-slur',
       'technique-vibrato',
       'technique-palm-mute', 'technique-palm-mute-line',
       'technique-harmonic'
     ],
-    note: 'Playing technique, drawn on BOTH staves since core-guitar-technique.md closed: bends as curves with a labelled arrowhead, slides as the line between two positions, hammer/pull as a lettered slur, vibrato as a wiggle, palm mute as the span its run reads as, harmonics as `<12>` in the tab digit and a circle over the notation note.',
+    note: 'Playing technique, drawn on BOTH staves since core-guitar-technique.md closed: bends as curves with a labelled arrowhead, slides as the line between two positions, hammer/pull as a letterless slur (one adornment — direction implicit in the pitches), vibrato as a wiggle, palm mute as the span its run reads as, harmonics as `<12>` in the tab digit and a circle over the notation note.',
     construct: ['setTechnique'],
     remove: ['removeTechnique']
   },

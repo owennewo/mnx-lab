@@ -39,8 +39,8 @@ export interface MnxHarmonic {
 export interface MnxTabTechnique {
   bend?: MnxBend;
   slide?: MnxSlide;
-  hammerOn?: { target: string };
-  pullOff?: { target: string };
+  /** Hammer-on or pull-off — one adornment (v6); direction implicit in the pitches. */
+  hammerPull?: { target: string };
   vibrato?: boolean;
   harmonic?: MnxHarmonic;
   palmMute?: boolean;

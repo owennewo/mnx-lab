@@ -1354,7 +1354,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n760"
                               }
                             }
@@ -1806,7 +1806,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n778"
                               }
                             }
@@ -2078,7 +2078,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n789"
                               }
                             }
@@ -2350,7 +2350,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n800"
                               }
                             }
@@ -2670,7 +2670,7 @@
                           "fret": 2,
                           "tab": {
                             "technique": {
-                              "pullOff": {
+                              "hammerPull": {
                                 "target": "n812"
                               }
                             }
@@ -2757,7 +2757,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n816"
                               }
                             }
@@ -2960,7 +2960,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n824"
                               }
                             }
@@ -3047,7 +3047,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n828"
                               }
                             }
@@ -3486,7 +3486,7 @@
                           "fret": 2,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n845"
                               }
                             }
@@ -3677,7 +3677,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n852"
                               }
                             }
@@ -3750,7 +3750,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n855"
                               }
                             }
@@ -3953,7 +3953,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n863"
                               }
                             }
@@ -4040,7 +4040,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n867"
                               }
                             }
@@ -5236,7 +5236,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n916"
                               }
                             }
@@ -5535,7 +5535,7 @@
                           "fret": 9,
                           "tab": {
                             "technique": {
-                              "pullOff": {
+                              "hammerPull": {
                                 "target": "n927"
                               }
                             }
@@ -5794,7 +5794,7 @@
                           "fret": 9,
                           "tab": {
                             "technique": {
-                              "pullOff": {
+                              "hammerPull": {
                                 "target": "n937"
                               }
                             }
@@ -6053,7 +6053,7 @@
                           "fret": 9,
                           "tab": {
                             "technique": {
-                              "pullOff": {
+                              "hammerPull": {
                                 "target": "n947"
                               }
                             }
@@ -6435,7 +6435,7 @@
                           "fret": 9,
                           "tab": {
                             "technique": {
-                              "pullOff": {
+                              "hammerPull": {
                                 "target": "n961"
                               }
                             }
@@ -6694,7 +6694,7 @@
                           "fret": 9,
                           "tab": {
                             "technique": {
-                              "pullOff": {
+                              "hammerPull": {
                                 "target": "n971"
                               }
                             }
@@ -7328,7 +7328,7 @@
                           "fret": 2,
                           "tab": {
                             "technique": {
-                              "pullOff": {
+                              "hammerPull": {
                                 "target": "n995"
                               }
                             }
@@ -7435,7 +7435,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1000"
                               }
                             }
@@ -7624,7 +7624,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1007"
                               }
                             }
@@ -8344,7 +8344,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1036"
                               }
                             }
@@ -8417,7 +8417,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1039"
                               }
                             }
@@ -8606,7 +8606,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1046"
                               }
                             }
@@ -10937,7 +10937,7 @@
                           "fret": 9,
                           "tab": {
                             "technique": {
-                              "pullOff": {
+                              "hammerPull": {
                                 "target": "n1139"
                               }
                             }
@@ -11196,7 +11196,7 @@
                           "fret": 9,
                           "tab": {
                             "technique": {
-                              "pullOff": {
+                              "hammerPull": {
                                 "target": "n1149"
                               }
                             }
@@ -11916,7 +11916,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1177"
                               }
                             }
@@ -12105,7 +12105,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1184"
                               }
                             }
@@ -12825,7 +12825,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1213"
                               }
                             }
@@ -12912,7 +12912,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1217"
                               }
                             }
@@ -13115,7 +13115,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1225"
                               }
                             }
@@ -14928,7 +14928,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1298"
                               }
                             }
@@ -16379,7 +16379,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1353"
                               }
                             }
@@ -16406,7 +16406,7 @@
                           "fret": 1,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1354"
                               }
                             }
@@ -16629,7 +16629,7 @@
                           "fret": 2,
                           "tab": {
                             "technique": {
-                              "pullOff": {
+                              "hammerPull": {
                                 "target": "n1363"
                               }
                             }
@@ -16682,7 +16682,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1365"
                               }
                             }
@@ -17348,7 +17348,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1391"
                               }
                             }
@@ -17435,7 +17435,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1395"
                               }
                             }
@@ -17638,7 +17638,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1403"
                               }
                             }
@@ -17725,7 +17725,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1407"
                               }
                             }
@@ -18881,7 +18881,7 @@
                           "fret": 0,
                           "tab": {
                             "technique": {
-                              "hammerOn": {
+                              "hammerPull": {
                                 "target": "n1452"
                               }
                             }

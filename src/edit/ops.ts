@@ -784,7 +784,7 @@ export type EditOp =
       index?: number;
     };
 
-/** What a technique key writes. `hammerOn`/`pullOff`/`slide` name the note they
+/** What a technique key writes. `hammerPull`/`slide` name the note they
  *  travel to; the rest are flags or curves. */
 export type TechniqueChoice =
   /** A bend as its STOPS (core-bend-stops.md): `alters` in semitones, in
@@ -801,8 +801,7 @@ export type TechniqueChoice =
       approx?: true;
     }
   | { kind: 'slide' }
-  | { kind: 'hammerOn' }
-  | { kind: 'pullOff' }
+  | { kind: 'hammerPull' }
   | { kind: 'vibrato' }
   | { kind: 'palmMute' }
   | { kind: 'harmonic' };
@@ -1106,7 +1105,7 @@ export function readTechniques(note: MnxNote | undefined): TechniqueChoice[] {
       ...(approx ? { approx: true } : {})
     });
   }
-  for (const kind of ['slide', 'hammerOn', 'pullOff', 'vibrato', 'palmMute', 'harmonic'] as const) {
+  for (const kind of ['slide', 'hammerPull', 'vibrato', 'palmMute', 'harmonic'] as const) {
     if (technique[kind] !== undefined && technique[kind] !== false) out.push({ kind });
   }
   return out;
@@ -1706,9 +1705,9 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           technique.harmonic = { type: 'natural' };
           break;
         default: {
-          // hammerOn / pullOff / slide travel to the FOLLOWING note — any
-          // pitch; same string preferred (`techniqueTarget`) — minting its id
-          // the way `toggleTie` does.
+          // hammerPull / slide travel to the FOLLOWING note — any pitch;
+          // same string preferred (`techniqueTarget`) — minting its id the
+          // way `toggleTie` does.
           const target = techniqueTarget(next, located);
           if (!target) return next;
           target.id ??= mintNoteId(next);

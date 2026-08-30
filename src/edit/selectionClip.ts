@@ -20,7 +20,7 @@ import type { SelectionLevel } from './selection.ts';
 
 export const SELECTION_CLIP_FORMAT = 'mnx-lab-selection-clip' as const;
 export const SELECTION_CLIP_VERSION = 2 as const;
-export const MNX_LAB_EXTENSION_VERSION = 5 as const;
+export const MNX_LAB_EXTENSION_VERSION = 6 as const;
 
 export type SelectionClipShape = 'point' | 'range' | 'closure';
 

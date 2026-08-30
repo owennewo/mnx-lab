@@ -416,7 +416,7 @@ export const KEY_DOCS: KeyDoc[] = [
     keys: 'H',
     strokes: [{ code: 'KeyH' }],
     group: 'adornments',
-    meaning: { note: 'tab: hammer-on or pull-off to the next note — the interval decides which' }
+    meaning: { note: 'tab: hammer-on / pull-off to the next note — one adornment, drawn as a letterless slur' }
   },
   {
     keys: 'V',

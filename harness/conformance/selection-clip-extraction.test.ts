@@ -41,7 +41,7 @@ function score(): MnxStructure {
   const first = note('n1', 'C');
   first.ties = [{ target: 'n2' }];
   first._x!.mnxLab!.tab = {
-    technique: { hammerOn: { target: 'n2' } }
+    technique: { hammerPull: { target: 'n2' } }
   };
   return {
     mnx: { version: 1, support: { useAccidentalDisplay: true, useBeams: true } },

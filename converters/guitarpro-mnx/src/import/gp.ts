@@ -561,11 +561,11 @@ function readTechniques(note: alphaTab.model.Note): MnxTabTechnique | undefined 
     found = true;
   }
   if (note.isHammerPullOrigin) {
-    // Direction is decided by pitch: up = hammer-on, down = pull-off.
+    // ONE adornment (extension v6): the direction stays implicit in the two
+    // pitches, exactly as alphaTab's own single origin flag has it.
     const destination = note.hammerPullDestination;
     if (destination) {
-      const key = destination.realValue > note.realValue ? 'hammerOn' : 'pullOff';
-      technique[key] = { target: noteId(destination) };
+      technique.hammerPull = { target: noteId(destination) };
       found = true;
     }
   }

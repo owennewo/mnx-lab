@@ -23,7 +23,7 @@ import type { Primitive, Point } from '../primitives.ts';
  * threaded through every measurement.
  *
  * **Everything runs as a POST-PASS**, for the reason slurs and ties do: three
- * of these techniques (`hammerOn`, `pullOff`, `slide`) name their destination
+ * of these techniques (`hammerPull`, `slide`) name their destination
  * by NOTE ID, and that note may sit in a later measure or on a later system
  * row. So each layout records a `TechniqueSite` per drawn note while it emits,
  * when it still knows where the ink went, and the marks are drawn once the
@@ -154,6 +154,9 @@ const SLUR_BULGE_SP = 0.8;
 /** Clearance between a notehead and a technique slur's endpoint — the same
  *  distance `notation.ts` keeps for an ordinary slur. */
 const SLUR_END_PAD_SP = 0.8;
+/** A dangling hammer-pull (target off the page) draws a short slur stub —
+ *  the mark must not vanish just because its far end cannot be placed. */
+const DANGLING_STUB_SP = 2;
 /** Vertical reach of a slide-in / slide-out stub. */
 const SLIDE_STUB_RISE_SP = 0.7;
 /**
@@ -677,33 +680,33 @@ export function emitTabTechnique(input: TechniqueInput): void {
       );
     }
 
-    // Hammer-on / pull-off: a slur in the lane, lettered. Drawn ABOVE the
-    // staff rather than between the digits, because on a tab staff the two
-    // digits are usually on the SAME string line and a curve between them
-    // would run along the very line it was drawn to sit off.
-    for (const [kind, letter] of [['hammerOn', 'H'], ['pullOff', 'P']] as const) {
-      const spec = t[kind];
-      if (!spec) continue;
-      const target = byNoteId.get(spec.target);
+    // Hammer-on / pull-off: a letterless slur in the lane (ONE adornment,
+    // extension v6, the Soundslice convention — the direction is implicit in
+    // the two pitches). Drawn ABOVE the staff rather than between the digits,
+    // because on a tab staff the two digits are usually on the SAME string
+    // line and a curve between them would run along the very line it was
+    // drawn to sit off.
+    if (t.hammerPull) {
+      const target = byNoteId.get(t.hammerPull.target);
       if (!target) {
-        // The target is not on the page — an id naming nothing, or a note this
-        // staff could not place. Say the technique happened rather than
-        // dropping it: the letter alone, over the note that carries it.
-        laneLabel(letter, site.x, lane - LANE_LABEL_DROP_SP, `technique-${kind}-label`, primitives);
-        continue;
+        // The target is not on the page — an id naming nothing, or a note
+        // this staff could not place. Say the technique happened rather than
+        // dropping it: a short stub of the slur, over the note that carries
+        // it.
+        slur(
+          site.x, lane, site.x + DANGLING_STUB_SP, lane, -1,
+          'technique-slur technique-hammerPull', primitives
+        );
+      } else {
+        drawSplit(
+          input,
+          { x: site.x, y: lane, row: site.row },
+          { x: target.x, y: target.laneY, row: target.row },
+          (x0, y0, x1, y1) => {
+            slur(x0, y0, x1, y1, -1, 'technique-slur technique-hammerPull', primitives);
+          }
+        );
       }
-      drawSplit(
-        input,
-        { x: site.x, y: lane, row: site.row },
-        { x: target.x, y: target.laneY, row: target.row },
-        (x0, y0, x1, y1) => {
-          slur(x0, y0, x1, y1, -1, `technique-slur technique-${kind}`, primitives);
-          laneLabel(
-            letter, (x0 + x1) / 2, Math.min(y0, y1) - SLUR_BULGE_SP - LABEL_GAP_SP,
-            `technique-${kind}-label`, primitives
-          );
-        }
-      );
     }
 
     if (t.slide) {
@@ -769,36 +772,33 @@ export function emitNotationTechnique(input: TechniqueInput): void {
       );
     }
 
-    for (const [kind, letter] of [['hammerOn', 'H'], ['pullOff', 'P']] as const) {
-      const spec = t[kind];
-      if (!spec) continue;
-      const target = byNoteId.get(spec.target);
+    if (t.hammerPull) {
+      const target = byNoteId.get(t.hammerPull.target);
       if (!target) {
-        laneLabel(letter, site.x, lane - LANE_LABEL_DROP_SP, `technique-${kind}-label`, primitives);
-        continue;
+        const dir = slurSide(site);
+        const edge = dir === -1 ? site.y - SLUR_END_PAD_SP : site.y + SLUR_END_PAD_SP;
+        slur(
+          site.x, edge, site.x + DANGLING_STUB_SP, edge, dir,
+          'technique-slur technique-hammerPull', primitives
+        );
+      } else {
+        drawSplit(
+          input,
+          { x: site.x, y: site.y, row: site.row },
+          { x: target.x, y: target.y, row: target.row },
+          (x0, y0, x1, y1) => {
+            // Away from the stem, hugging the outermost of the two noteheads
+            // on that side — the placement an ordinary slur takes. No letter:
+            // the adornment is one gesture and the pitches say which way.
+            const dir = slurSide(site);
+            const edge =
+              dir === -1
+                ? Math.min(y0, y1) - SLUR_END_PAD_SP
+                : Math.max(y0, y1) + SLUR_END_PAD_SP;
+            slur(x0, edge, x1, edge, dir, 'technique-slur technique-hammerPull', primitives);
+          }
+        );
       }
-      drawSplit(
-        input,
-        { x: site.x, y: site.y, row: site.row },
-        { x: target.x, y: target.y, row: target.row },
-        (x0, y0, x1, y1) => {
-          // Away from the stem, hugging the outermost of the two noteheads on
-          // that side — the placement an ordinary slur takes.
-          const dir = slurSide(site);
-          const edge =
-            dir === -1
-              ? Math.min(y0, y1) - SLUR_END_PAD_SP
-              : Math.max(y0, y1) + SLUR_END_PAD_SP;
-          slur(x0, edge, x1, edge, dir, `technique-slur technique-${kind}`, primitives);
-          // The LETTER stays above the staff whichever side the slur took —
-          // "H" under a downward slur would read as belonging to the staff
-          // below it.
-          laneLabel(
-            letter, (x0 + x1) / 2, lane,
-            `technique-${kind}-label`, primitives
-          );
-        }
-      );
     }
 
     if (t.slide) {

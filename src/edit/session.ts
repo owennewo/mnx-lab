@@ -883,12 +883,16 @@ export class EditorSession {
       case 'toggleTechnique': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
         if (!slot) return false;
-        // Hammer-on vs pull-off is decided by the interval to the next note,
-        // because it is decided by the fingers: you hammer UP and pull OFF
-        // downward. One key, and the music picks the name.
-        const kind =
-          intent.kind === 'hammerPull' ? this.hammerOrPull(slot.noteKey) : intent.kind;
-        if (!kind) return false;
+        // hammerPull is ONE adornment (extension v6, the Soundslice
+        // convention): the direction is implicit in the two pitches, so
+        // nothing is derived or stored — but a hammer or pull to the SAME
+        // fret is not a thing fingers can do, so the equal-pitch pair still
+        // refuses.
+        const kind = intent.kind;
+        if (kind === 'hammerPull') {
+          const pair = nextNotePitchPair(this.doc, slot.noteKey);
+          if (!pair || pair.next === pair.current) return false;
+        }
         const existing = techniqueAt(this.doc, slot.noteKey, kind);
         const before = JSON.stringify(this.doc);
         this.apply(
@@ -2627,17 +2631,6 @@ export class EditorSession {
   }
 
   /** The voice-0 timed event starting exactly at the cursor's onset. */
-  /** Hammer-on or pull-off? The interval to the next note decides — up is a
-   *  hammer, down a pull. Null when there is no next note to travel to, and
-   *  null for an EQUAL pitch too: a hammer or pull to the same fret is not a
-   *  thing fingers can do, and the old classifier's "equal means pull-off"
-   *  drew a P nobody asked for (found hands-on, 2026-08-30). */
-  private hammerOrPull(noteKey: string): 'hammerOn' | 'pullOff' | null {
-    const pair = nextNotePitchPair(this.doc, noteKey);
-    if (!pair || pair.next === pair.current) return null;
-    return pair.next > pair.current ? 'hammerOn' : 'pullOff';
-  }
-
   private eventUnderCursor(): MnxEvent | undefined {
     return eventAtCursor(this.doc, this.grid, this.cursorState, this.activeProjection);
   }

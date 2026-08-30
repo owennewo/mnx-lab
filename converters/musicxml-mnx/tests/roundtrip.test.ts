@@ -492,7 +492,7 @@ describe.each(['House-of-the-Rising-Sun', 'Sun-did-glide', 'Vestapol'])(
               }
               for (const note of event.notes) {
                 const t = note._x?.mnxLab?.tab?.technique;
-                const at = (k: 'hammerOn' | 'pullOff' | 'slide') =>
+                const at = (k: 'hammerPull' | 'slide') =>
                   t?.[k]?.target !== undefined ? `@${ordinal.get(t[k]!.target!) ?? '?'}` : '';
                 // Bend points are compared by their ALTER sequence, not their
                 // positions: MusicXML has no way to say when a point falls, so
@@ -500,8 +500,7 @@ describe.each(['House-of-the-Rising-Sun', 'Sun-did-glide', 'Vestapol'])(
                 // round trip does not preserve — docs/mnx-extensions.md).
                 const tech = t
                   ? [
-                      t.hammerOn ? 'H' + at('hammerOn') : '',
-                      t.pullOff ? 'P' + at('pullOff') : '',
+                      t.hammerPull ? 'HP' + at('hammerPull') : '',
                       t.slide ? `S:${t.slide.type}${t.slide.direction ?? ''}${at('slide')}` : '',
                       t.bend ? `B:${t.bend.points.map(pt => pt.alter).join('>')}` : '',
                       t.vibrato ? 'V' : '',
@@ -585,7 +584,7 @@ describe.each(['House-of-the-Rising-Sun', 'Sun-did-glide', 'Vestapol'])(
               for (const note of event.notes ?? []) {
                 if (note.id) ids.add(note.id);
                 const t = note._x?.mnxLab?.tab?.technique;
-                for (const k of ['hammerOn', 'pullOff', 'slide'] as const)
+                for (const k of ['hammerPull', 'slide'] as const)
                   if (t?.[k]?.target) targets.push(t[k]!.target!);
               }
       expect(targets.filter(t => !ids.has(t))).toEqual([]);

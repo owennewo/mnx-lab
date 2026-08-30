@@ -57,8 +57,8 @@ export interface MnxTabTechnique {
     direction?: 'up' | 'down';
     target?: string;
   };
-  hammerOn?: { target: string };
-  pullOff?: { target: string };
+  /** Hammer-on or pull-off — one adornment (v6); direction implicit in the pitches. */
+  hammerPull?: { target: string };
   vibrato?: boolean;
   harmonic?: {
     type: MnxHarmonicType;

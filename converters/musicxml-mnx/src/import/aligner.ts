@@ -497,11 +497,12 @@ export class Aligner {
               ? notes.slice(index + 1).find(n => n._x?.mnxLab?.string === string)
               : undefined) ?? notes[index + 1];
 
-          for (const kind of ['hammerOn', 'pullOff'] as const) {
-            const block = technique[kind];
-            if (!block || block.target) continue;
-            if (next?.id) block.target = next.id;
-            else delete technique[kind];
+          {
+            const block = technique.hammerPull;
+            if (block && !block.target) {
+              if (next?.id) block.target = next.id;
+              else delete technique.hammerPull;
+            }
           }
           if (technique.slide && !technique.slide.target && next?.id) {
             technique.slide.target = next.id;
@@ -533,14 +534,12 @@ export class Aligner {
     let found = false;
 
     if (techEl) {
-      // Direction is derivable from pitch, but trust the source's own element.
+      // ONE adornment (extension v6): either MusicXML element reads as the
+      // same hammerPull — the direction is implicit in the two pitches.
       const hammerOn = findDirectChild(techEl, 'hammer-on');
       const pullOff = findDirectChild(techEl, 'pull-off');
-      if (hammerOn?.getAttribute('type') === 'start') {
-        technique.hammerOn = { target: '' };
-        found = true;
-      } else if (pullOff?.getAttribute('type') === 'start') {
-        technique.pullOff = { target: '' };
+      if (hammerOn?.getAttribute('type') === 'start' || pullOff?.getAttribute('type') === 'start') {
+        technique.hammerPull = { target: '' };
         found = true;
       }
 

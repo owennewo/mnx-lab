@@ -180,18 +180,7 @@
         ],
         "thickness": 0.16,
         "taper": true,
-        "className": "technique-slur technique-hammerOn"
-      },
-      {
-        "kind": "text",
-        "text": "H",
-        "x": 15.6,
-        "y": 6.3,
-        "font": "body",
-        "size": 0.9,
-        "anchor": "middle",
-        "baseline": "alphabetic",
-        "className": "technique-hammerOn-label"
+        "className": "technique-slur technique-hammerPull"
       },
       {
         "kind": "curve",
@@ -215,18 +204,7 @@
         ],
         "thickness": 0.16,
         "taper": true,
-        "className": "technique-slur technique-pullOff"
-      },
-      {
-        "kind": "text",
-        "text": "P",
-        "x": 22.6,
-        "y": 5.8,
-        "font": "body",
-        "size": 0.9,
-        "anchor": "middle",
-        "baseline": "alphabetic",
-        "className": "technique-pullOff-label"
+        "className": "technique-slur technique-hammerPull"
       },
       {
         "kind": "curve",
@@ -250,18 +228,7 @@
         ],
         "thickness": 0.16,
         "taper": true,
-        "className": "technique-slur technique-hammerOn"
-      },
-      {
-        "kind": "text",
-        "text": "H",
-        "x": 29.6,
-        "y": 6.3,
-        "font": "body",
-        "size": 0.9,
-        "anchor": "middle",
-        "baseline": "alphabetic",
-        "className": "technique-hammerOn-label"
+        "className": "technique-slur technique-hammerPull"
       }
     ]
   },
@@ -487,18 +454,7 @@
         ],
         "thickness": 0.16,
         "taper": true,
-        "className": "technique-slur technique-hammerOn"
-      },
-      {
-        "kind": "text",
-        "text": "H",
-        "x": 14.6,
-        "y": 3.55,
-        "font": "body",
-        "size": 0.9,
-        "anchor": "middle",
-        "baseline": "alphabetic",
-        "className": "technique-hammerOn-label"
+        "className": "technique-slur technique-hammerPull"
       },
       {
         "kind": "curve",
@@ -522,18 +478,7 @@
         ],
         "thickness": 0.16,
         "taper": true,
-        "className": "technique-slur technique-pullOff"
-      },
-      {
-        "kind": "text",
-        "text": "P",
-        "x": 21.6,
-        "y": 3.55,
-        "font": "body",
-        "size": 0.9,
-        "anchor": "middle",
-        "baseline": "alphabetic",
-        "className": "technique-pullOff-label"
+        "className": "technique-slur technique-hammerPull"
       },
       {
         "kind": "curve",
@@ -557,18 +502,7 @@
         ],
         "thickness": 0.16,
         "taper": true,
-        "className": "technique-slur technique-hammerOn"
-      },
-      {
-        "kind": "text",
-        "text": "H",
-        "x": 28.6,
-        "y": 3.55,
-        "font": "body",
-        "size": 0.9,
-        "anchor": "middle",
-        "baseline": "alphabetic",
-        "className": "technique-hammerOn-label"
+        "className": "technique-slur technique-hammerPull"
       }
     ]
   }

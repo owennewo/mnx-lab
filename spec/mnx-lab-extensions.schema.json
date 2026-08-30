@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://mnx-lab.totai.uk/schemas/mnx-lab-extensions.schema.json/v5",
-  "title": "MNX Lab vendor extensions (`_x.mnxLab`) — v5",
+  "$id": "https://mnx-lab.totai.uk/schemas/mnx-lab-extensions.schema.json/v6",
+  "title": "MNX Lab vendor extensions (`_x.mnxLab`) — v6",
   "description": "Everything MNX Lab carries that W3C MNX v19 cannot express: fretted-instrument tablature, section/rehearsal labels, and chord symbols. All of it lives under the single vendor key `_x.mnxLab`, which is how the MNX spec says extensions are namespaced (w3c-cg/mnx#63/#429: the `_x` key identifies an agent, vendor or community). Documents using these extensions remain fully valid against the official MNX schema. Each block is shaped like the standard MNX object it is a draft of, so adopting any of them upstream means deleting the `_x.mnxLab` wrapper rather than rewriting the data. Rationale and the proposals these draft: docs/mnx-extensions.md.",
   "type": "object",
   "$defs": {
@@ -139,20 +139,9 @@
           ],
           "additionalProperties": false
         },
-        "hammerOn": {
+        "hammerPull": {
           "type": "object",
-          "properties": {
-            "target": {
-              "$ref": "#/$defs/note-id"
-            }
-          },
-          "required": [
-            "target"
-          ],
-          "additionalProperties": false
-        },
-        "pullOff": {
-          "type": "object",
+          "description": "Hammer-on or pull-off to `target` — ONE adornment, the Soundslice convention (v6): the direction is implicit in the two pitches (up hammers, down pulls), so storing it would be a second spelling of a fact the music already states. Drawn as a letterless slur.",
           "properties": {
             "target": {
               "$ref": "#/$defs/note-id"

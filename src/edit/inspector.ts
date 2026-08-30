@@ -408,7 +408,7 @@ export interface InspectorScope {
 }
 
 const DURATION_WORDS: MnxNoteValueBase[] = ['whole', 'half', 'quarter', 'eighth', '16th', '32nd', '64th'];
-const TECHNIQUE_WORDS: TechniqueChoice['kind'][] = ['bend', 'slide', 'hammerOn', 'pullOff', 'vibrato', 'palmMute', 'harmonic'];
+const TECHNIQUE_WORDS: TechniqueChoice['kind'][] = ['bend', 'slide', 'hammerPull', 'vibrato', 'palmMute', 'harmonic'];
 
 function durationText(duration: { base: MnxNoteValueBase; dots?: number }): string {
   return `${duration.base}${'.'.repeat(duration.dots ?? 0)}`;

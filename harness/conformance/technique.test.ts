@@ -117,8 +117,7 @@ describe('every technique in the corpus is drawn, on both staves', () => {
   const CASES: { scenario: string; token: string; what: string }[] = [
     { scenario: '01-bend-and-release', token: 'technique-bend', what: 'a bend curve' },
     { scenario: '02-slides', token: 'technique-slide', what: 'a slide line' },
-    { scenario: '03-hammer-pull-chain', token: 'technique-hammerOn', what: 'a hammer-on' },
-    { scenario: '03-hammer-pull-chain', token: 'technique-pullOff', what: 'a pull-off' },
+    { scenario: '03-hammer-pull-chain', token: 'technique-hammerPull', what: 'a hammer-on/pull-off slur' },
     { scenario: '04-vibrato-and-palm-mute', token: 'technique-vibrato', what: 'a vibrato wiggle' },
     { scenario: '04-vibrato-and-palm-mute', token: 'technique-palm-mute', what: 'a palm mute' },
     { scenario: '05-natural-harmonics', token: 'technique-harmonic', what: 'a harmonic' }
@@ -209,11 +208,14 @@ describe('technique marks say what the technique is', () => {
     expect(marks(p.notation, 'technique-bend')).toHaveLength(0);
   });
 
-  it('hammer-on and pull-off are told apart by their letter, not their curve', () => {
+  it('hammer-on and pull-off are ONE letterless adornment — a slur, no H or P', () => {
+    // Extension v6, the Soundslice convention: the direction is implicit in
+    // the two pitches, so the mark is the curve alone.
     const p = projections(readScenario('03-hammer-pull-chain'));
     for (const [name, layout] of Object.entries(p)) {
-      expect(texts(layout, 'technique-hammerOn-label'), name).toContain('H');
-      expect(texts(layout, 'technique-pullOff-label'), name).toContain('P');
+      expect(marks(layout, 'technique-hammerPull').length, name).toBeGreaterThan(0);
+      const labels = layout.primitives.filter(pr => cls(pr).some(c => c.includes('hammer') && c.includes('label')));
+      expect(labels, name).toHaveLength(0);
     }
   });
 
@@ -326,29 +328,28 @@ describe('technique survives where there is no fingerboard', () => {
   it('a document with no strings still draws its technique on the notation staff', () => {
     const doc = bar(
       [
-        { string: 3, id: 'a', technique: { hammerOn: { target: 'b' } } },
+        { string: 3, id: 'a', technique: { hammerPull: { target: 'b' } } },
         { string: 3, id: 'b', technique: { vibrato: true } }
       ],
       { strings: false }
     );
     initSmufl();
     const notation = layoutNotation({ mnx: doc, widthSp: WIDTH_SP });
-    expect(marks(notation, 'technique-hammerOn').length).toBeGreaterThan(0);
+    expect(marks(notation, 'technique-hammerPull').length).toBeGreaterThan(0);
     expect(marks(notation, 'technique-vibrato').length).toBeGreaterThan(0);
     // And there is genuinely no tab staff to have carried it.
     expect(layoutBothSystem({ mnx: doc, widthSp: WIDTH_SP }).primitives
       .filter(p => cls(p).includes('tab-clef'))).toHaveLength(0);
   });
 
-  it('a hammer-on whose target does not exist still says a hammer-on happened', () => {
-    const doc = bar([{ string: 3, id: 'a', technique: { hammerOn: { target: 'nowhere' } } }]);
+  it('a hammer-pull whose target does not exist still leaves a mark', () => {
+    const doc = bar([{ string: 3, id: 'a', technique: { hammerPull: { target: 'nowhere' } } }]);
     const p = projections(doc);
     for (const [name, layout] of Object.entries(p)) {
-      // No curve to draw — but the letter is not optional. Dropping the mark
-      // is how a dangling id reference turns into a silently plainer score,
-      // which is the failure this whole item exists to end.
-      expect(texts(layout, 'technique-hammerOn-label'), name).toContain('H');
-      expect(marks(layout, 'technique-slur'), name).toHaveLength(0);
+      // No far end to reach — but the mark is not optional. A short stub of
+      // the slur says the technique happened; dropping it is how a dangling
+      // id turns into a silently plainer score.
+      expect(marks(layout, 'technique-hammerPull').length, name).toBeGreaterThan(0);
     }
   });
 });

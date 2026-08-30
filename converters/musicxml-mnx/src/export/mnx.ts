@@ -98,6 +98,32 @@ export function exportMusicXML(
     endingStopsAt.set(index + Math.max(1, ending.duration ?? 1) - 1, ending);
   });
 
+  // Sounding-pitch midi per note id — the hammerPull adornment stores no
+  // direction (extension v6), so the MusicXML element (<hammer-on> vs
+  // <pull-off>) is derived at this boundary from the two pitches.
+  const noteMidiById = new Map<string, number>();
+  for (const part of mnxJson.parts ?? []) {
+    for (const measure of part.measures ?? []) {
+      for (const sequence of measure.sequences ?? []) {
+        const walk = (items: typeof sequence.content): void => {
+          for (const item of items) {
+            const content = (item as { content?: typeof sequence.content }).content;
+            if (content) { walk(content); continue; }
+            for (const note of (item as { notes?: { id?: string; pitch?: MnxPitch }[] }).notes ?? []) {
+              if (note.id && note.pitch) {
+                noteMidiById.set(
+                  note.id,
+                  note.pitch.octave * 12 + STEP_SEMITONES_EXP[note.pitch.step] + (note.pitch.alter ?? 0)
+                );
+              }
+            }
+          }
+        };
+        walk(sequence.content ?? []);
+      }
+    }
+  }
+
   const doc = new DOMParser().parseFromString(
     '<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"></score-partwise>',
     'text/xml'
@@ -376,7 +402,7 @@ export function exportMusicXML(
         while (pending.length > 0 && pending[0].position <= cursor) {
           measureEl.appendChild(buildHarmonyElement(doc, pending.shift()!.harmony, 0));
         }
-        measureEl.appendChild(buildXmlNode(doc, node, part.transposition, lyricLineOrder));
+        measureEl.appendChild(buildXmlNode(doc, node, part.transposition, lyricLineOrder, noteMidiById));
         if (node.type === 'backup') cursor -= node.duration;
         else if (!node.isChord) cursor += node.duration;
       }
@@ -573,7 +599,8 @@ function buildXmlNode(
   doc: Document,
   node: FlatXmlNode,
   transposition?: MnxPart['transposition'],
-  lineOrder: string[] = []
+  lineOrder: string[] = [],
+  noteMidiById: Map<string, number> = new Map()
 ): Element {
   if (node.type === 'backup') {
     const el = doc.createElement('backup');
@@ -695,14 +722,19 @@ function buildXmlNode(
         techEl.appendChild(stringEl);
       }
 
-      if (technique?.hammerOn) {
-        const el = doc.createElement('hammer-on');
-        el.setAttribute('type', 'start');
-        el.setAttribute('number', '1');
-        techEl.appendChild(el);
-      }
-      if (technique?.pullOff) {
-        const el = doc.createElement('pull-off');
+      if (technique?.hammerPull) {
+        // ONE adornment in the extension (v6); MusicXML wants the direction
+        // named, so derive it here: up hammers, down pulls. An unresolvable
+        // target defaults to hammer-on — the commoner gesture.
+        const here = node.note.pitch
+          ? node.note.pitch.octave * 12 +
+            STEP_SEMITONES_EXP[node.note.pitch.step] +
+            (node.note.pitch.alter ?? 0)
+          : undefined;
+        const there = noteMidiById.get(technique.hammerPull.target);
+        const el = doc.createElement(
+          here !== undefined && there !== undefined && there < here ? 'pull-off' : 'hammer-on'
+        );
         el.setAttribute('type', 'start');
         el.setAttribute('number', '1');
         techEl.appendChild(el);

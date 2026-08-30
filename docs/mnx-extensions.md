@@ -16,7 +16,7 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 | `strings[]`, `capo` | no instrument tuning of any kind | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ |
 | `tab.staffKind` | no way to say a part prefers a tab view | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ |
 | `tab.technique.bend` | nothing; and MusicXML's own model can't hold a curve | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
-| `tab.technique.slide` / `hammerOn` / `pullOff` / `vibrato` | no articulation covers them | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
+| `tab.technique.slide` / `hammerPull` / `vibrato` | no articulation covers them | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
 | `tab.technique.harmonic` | nothing; MusicXML's `<harmonic>` is a redesign candidate | [#179](https://github.com/w3c-cg/mnx/issues/179) | ✅ both converters | ✅ both staves |
 | `tab.technique.palmMute` | nothing; MusicXML smuggles it through generic elements | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
 | `fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
@@ -91,8 +91,7 @@ nothing to verify an implementation against.
         "technique": {
           "bend":     { "points": [{ "position": 0, "alter": 0 }, { "position": 1, "alter": 2 }] },
           "slide":    { "type": "legato", "direction": "up", "target": "n-2-1-1" },
-          "hammerOn": { "target": "n-2-1-1" },
-          "pullOff":  { "target": "n-2-1-1" },
+          "hammerPull": { "target": "n-2-1-1" },
           "vibrato":  true,
           "harmonic": { "type": "natural" },
           "palmMute": true
@@ -271,8 +270,7 @@ structure, so most chords carry none.
 | `<capo>` | `Staff.capo` | `capo` |
 | `<technical><string>` / `<fret>` | `Note.string` / `Note.fret` | flat `string` / `fret` |
 | run of `<bend>` gestures | `Note.bendPoints` | `technique.bend.points` |
-| `<hammer-on type="start\|stop">` pair | `Note.isHammerPullOrigin` | `technique.hammerOn.target` (note id) |
-| `<pull-off type="start\|stop">` pair | (same, split by pitch direction) | `technique.pullOff.target` |
+| `<hammer-on>` / `<pull-off>` `type="start\|stop"` pairs | `Note.isHammerPullOrigin` | `technique.hammerPull.target` (note id) — ONE adornment; export derives the MusicXML element from the pitch direction |
 | `<notations><slide>` pair / `<glissando>` | `Note.slideOutType` / `slideInType` | `technique.slide` |
 | `<ornaments><wavy-line>` | `Note.vibrato` | `technique.vibrato` |
 | `<technical><harmonic>` | `Note.harmonicType` | `technique.harmonic` |
@@ -374,6 +372,13 @@ Cloudflare Workers cannot run `ajv.compile()`.
   with a `label`; added `harmonies`, `technique.harmonic`, `technique.palmMute`;
   bends became curves in semitones; slide enum values camelCased
   (`slide-in` → `slideIn`).
+- **v6** (2026-08-30): `technique.hammerOn`/`pullOff` re-merged into ONE
+  `hammerPull` (the Soundslice convention, reversing part of the v2 split):
+  the direction is implicit in the two pitches, so the split stored a second
+  spelling of a fact the music already states — and it let a repitch strand a
+  stale letter, or a second press stack both keys on one note. Drawn as a
+  letterless slur; MusicXML export derives `<hammer-on>` vs `<pull-off>` from
+  the pitch direction at the boundary.
 - **v2** (2026-06): namespace `_x.guitar` → `_x.tab`; split note annotation into
   `position`/`technique`/`fingering`; explicit string numbers in tuning; added
   `staffKind`, removed TAB-clef usage; `hammerOnPullOff` split into `hammerOn` /
@@ -382,5 +387,5 @@ Cloudflare Workers cannot run `ajv.compile()`.
 - **v1** (`guitar-tab-extension.schema.json`, deprecated): flat `_x.guitar`
   object, positional tuning array, TAB clefs carried over from MusicXML.
 
-Saved documents are upgraded v1 → v2 → v3 on load by
-[`src/utils/upgradeTabExtension.ts`](../src/utils/upgradeTabExtension.ts).
+Saved documents are upgraded v1 → … → v6 on load by
+[`src/model/upgradeTabExtension.ts`](../src/model/upgradeTabExtension.ts).

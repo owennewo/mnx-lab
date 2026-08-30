@@ -124,7 +124,7 @@ a habit. An item is not complete while its worktree is still on disk.
 spec/                the standard + our proposals against it
   mnx-schema.json         verbatim copy of the pinned upstream release — never edited
   mnx-schema.proposed.json generated from a proposal worktree — transient, dev-time only
-  mnx-lab-extensions.schema.json  the _x.mnxLab vendor schema (v5)
+  mnx-lab-extensions.schema.json  the _x.mnxLab vendor schema (v6)
   guitar-tab-extension.schema.json (v2 legacy, kept for upgrade tests), spec-prose.json,
   HISTORY.md
   proposals/<topic>/      evidence bundles: README, schema.diff, scenarios.md, engravings/
@@ -406,12 +406,12 @@ shadow DOM. Do **not** reintroduce VexFlow or any notation library. The note↔J
 cross-highlight depends on `model/noteKeys.ts` and `model/jsonView.ts` mirroring the
 same traversal — keep them in lockstep.
 
-## MNX types and `_x.mnxLab` (v5)
+## MNX types and `_x.mnxLab` (v6)
 
 Types: `src/model/mnx.ts`. **Documents are written as `.mnx.json`** (`.json`/`.mnx`
 accepted on read; helpers in `converters/musicxml-mnx/src/common/mnxFile.ts`).
 Everything MNX v19 can't express lives under the one vendor key **`_x.mnxLab`** (the
-`_x` sub-key names a vendor, not a feature). v5 shape: note-level **flat**
+`_x` sub-key names a vendor, not a feature). v6 shape: note-level **flat**
 `string`/`fret`/`fingering` (the string is the authoritative choice; `fret` is
 optional and non-authoritative — validation only; single-source — no TAB clefs, no
 duplicated staves), part-level flat `strings[]`/`capo`; only `tab.technique` (bends
@@ -425,7 +425,7 @@ objects they draft (camelCase, `rhythmic-position`, note-id references) so adopt
 deletes the wrapper — see roadmap/proposed/low-priority/spec-instrument-position.md and
 roadmap/complete/core-derived-positions.md.
 Extend `_x.mnxLab` and its schema — never standard MNX fields.
-Saved documents upgrade v1→v2→v3→v4→v5 on load via `src/model/upgradeTabExtension.ts`.
+Saved documents upgrade v1→v2→v3→v4→v5→v6 on load via `src/model/upgradeTabExtension.ts`.
 
 ## The spec loop: sync down, push up
 

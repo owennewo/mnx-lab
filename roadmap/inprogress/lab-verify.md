@@ -86,6 +86,21 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
+### 9. Hammer-on/pull-off merged into one letterless adornment — **1 stale**
+
+Owner: no roadmap doc — a user-directed schema change (extension v5 → v6,
+2026-08-30, the Soundslice convention): `technique.hammerOn`/`pullOff` merged
+into ONE `hammerPull`, drawn as a slur with NO `H`/`P` letter — the direction
+is implicit in the two pitches. Scenario: `lab/tab-techniques/03-hammer-pull-chain`
+(all four goldens moved).
+
+**What a reviewer should look for.** The three arcs of the chain are unchanged
+in shape and placement; what changed is that the `H` and `P` letters above them
+are GONE, on every staff (tab, notation, both). A curve that moved, or an arc
+missing entirely, is a failure; absent letters are the point. Check also that
+the arcs still sit above the tab staff (never running along the string line)
+and hug the noteheads on the notation staff.
+
 ### 8. `core-bend-stops` — stop-grammar bends, vertical arrivals, arrival labels — **2 never-seen**
 
 Owner: [core-bend-stops.md](../complete/core-bend-stops.md) (2026-08-30; **closed the

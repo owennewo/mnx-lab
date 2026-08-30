@@ -65,23 +65,23 @@ const techniqueOf = (session: EditorSession, id: string): MnxTabTechnique | unde
 };
 
 describe('the hammer-pull key resolves ANY next pitch, same string first', () => {
-  it('h on an ascending pair writes a hammer-on — the case that used to refuse', () => {
+  it('h on an ascending pair writes the hammerPull adornment — the case that used to refuse', () => {
     const session = new EditorSession(bar([
       { string: 1, fret: 0, id: 'a' }, { string: 1, fret: 3, id: 'b' }
     ]));
     expect(session.handleIntent({ type: 'toggleTechnique', kind: 'hammerPull' })).toBe(true);
-    expect(techniqueOf(session, 'a')).toEqual({ hammerOn: { target: 'b' } });
+    expect(techniqueOf(session, 'a')).toEqual({ hammerPull: { target: 'b' } });
     // The same press toggles it back off.
     expect(session.handleIntent({ type: 'toggleTechnique', kind: 'hammerPull' })).toBe(true);
     expect(techniqueOf(session, 'a')).toBeUndefined();
   });
 
-  it('h on a descending pair writes a pull-off', () => {
+  it('h on a descending pair writes the same adornment — direction lives in the pitches', () => {
     const session = new EditorSession(bar([
       { string: 1, fret: 3, id: 'a' }, { string: 1, fret: 0, id: 'b' }
     ]));
     expect(session.handleIntent({ type: 'toggleTechnique', kind: 'hammerPull' })).toBe(true);
-    expect(techniqueOf(session, 'a')).toEqual({ pullOff: { target: 'b' } });
+    expect(techniqueOf(session, 'a')).toEqual({ hammerPull: { target: 'b' } });
   });
 
   it('h between equal frets refuses — fingers cannot hammer or pull to the same fret', () => {

@@ -152,8 +152,7 @@ Standard W3C MNX has no model for fret numbers, string assignments, playing tech
       "technique": {
         "bend":     { "points": [{ "position": 0, "alter": 0 }, { "position": 1, "alter": 2 }] },
         "slide":    { "type": "legato", "direction": "up", "target": "<note-id>" },
-        "hammerOn": { "target": "<note-id>" },
-        "pullOff":  { "target": "<note-id>" },
+        "hammerPull": { "target": "<note-id>" },
         "vibrato":  true,
         "harmonic": { "type": "natural" },
         "palmMute": true
@@ -181,8 +180,7 @@ Standard W3C MNX has no model for fret numbers, string assignments, playing tech
 | "half bend" / "half-step bend" | same with \`alter: 1\` on the last point. |
 | "pre-bend" | first point already bent: \`{points: [{position: 0, alter: 2}, {position: 1, alter: 2}]}\`. |
 | "bend and release" | three points: \`0 → 2 → 0\`, e.g. \`[{position:0,alter:0},{position:0.5,alter:2},{position:1,alter:0}]\`. |
-| "hammer-on to fret N" | \`technique.hammerOn: {target: "<next-note-id>"}\` — also add the target note with the new fret/pitch. |
-| "pull-off" | \`technique.pullOff: {target: "<id>"}\`. |
+| "hammer-on to fret N" / "pull-off" | \`technique.hammerPull: {target: "<next-note-id>"}\` — ONE adornment; the direction is implicit in the two pitches. Also add the target note with the new fret/pitch. |
 | "slide up to fret N" | \`technique.slide: {type: "shift", direction: "up", target: "<id>"}\`. |
 | "legato slide" | \`technique.slide: {type: "legato", direction, target}\`. |
 | "vibrato" | \`technique.vibrato: true\`. |
