@@ -20,7 +20,9 @@
 > A same-day usability refinement keeps the zoom pad visible in focus mode and gives it a
 > permanent, state-aware focus/exit button: the mode no longer hides both a useful document
 > control and its own escape route, while the control remains ScenarioPage chrome rather than
-> moving into `<mnx-document-viewer>`.
+> moving into `<mnx-document-viewer>`. The focus button is a separate hit target to the left
+> of the collapsed zoom mark: hovering it cannot expand zoom or move the button out from under
+> the pointer.
 
 ## Two levels, two owners
 

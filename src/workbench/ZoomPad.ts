@@ -213,8 +213,7 @@ export class ZoomPad extends LitElement {
 
       .cluster {
         display: flex;
-        flex-direction: column;
-        align-items: flex-end;
+        align-items: flex-start;
         gap: 5px;
       }
 
@@ -222,6 +221,8 @@ export class ZoomPad extends LitElement {
          sibling of the zoom geometry rather than part of the viewer: both are
          workbench chrome composed over ScenarioPage's document surface. */
       button.focus-toggle {
+        order: -1;
+        flex: none;
         appearance: none;
         box-sizing: border-box;
         width: 26px;
@@ -1053,15 +1054,13 @@ export class ZoomPad extends LitElement {
     const atSpaceMin = this.nextSpace(-1, this.shownSpace) === null;
 
     return html`
-      <div
-        class="cluster"
-        @pointerenter=${() => (this.open = true)}
-        @pointerleave=${() => (this.open = false)}
-        @focusin=${() => (this.open = true)}
-        @focusout=${() => (this.open = false)}
-      >
+      <div class="cluster">
         <div
           class="pad ${expanded ? 'expanded' : ''}"
+          @pointerenter=${() => (this.open = true)}
+          @pointerleave=${() => (this.open = false)}
+          @focusin=${() => (this.open = true)}
+          @focusout=${() => (this.open = false)}
           @pointerdown=${this.onPadDown}
           @pointermove=${this.onPointerMove}
           @pointerup=${this.onPointerUp}

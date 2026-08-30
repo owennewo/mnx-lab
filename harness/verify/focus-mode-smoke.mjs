@@ -109,7 +109,9 @@ const DUMP = `(() => {
   const pageRoot = page?.shadowRoot;
   const viewer = pageRoot?.querySelector('mnx-document-viewer');
   const zoomPad = pageRoot?.querySelector('mnx-zoom-pad');
-  const zoomFocus = zoomPad?.shadowRoot?.querySelector('.focus-toggle');
+  const zoomRoot = zoomPad?.shadowRoot;
+  const zoomControl = zoomRoot?.querySelector('.pad');
+  const zoomFocus = zoomRoot?.querySelector('.focus-toggle');
   const rect = element => {
     if (!element) return null;
     const box = element.getBoundingClientRect();
@@ -136,6 +138,9 @@ const DUMP = `(() => {
     panel: !!pageRoot?.querySelector('.panel'),
     zoom: !!zoomPad,
     zoomRect: rect(zoomPad),
+    zoomControlRect: rect(zoomControl),
+    zoomExpanded: zoomControl?.classList.contains('expanded') ?? false,
+    zoomFocusRect: rect(zoomFocus),
     zoomFocusLabel: zoomFocus?.getAttribute('aria-label') ?? null,
     zoomFocusPressed: zoomFocus?.getAttribute('aria-pressed') ?? null,
     popover: !!pageRoot?.querySelector('.popover-layer'),
@@ -216,6 +221,14 @@ try {
     );
     await new Promise(resolve => setTimeout(resolve, 400));
   };
+  const hoverZoomFocus = async focusRect => {
+    await cdp.send('Input.dispatchMouseEvent', {
+      type: 'mouseMoved',
+      x: focusRect.x + focusRect.width / 2,
+      y: focusRect.y + focusRect.height / 2
+    });
+    await new Promise(resolve => setTimeout(resolve, 300));
+  };
 
   let state = await dump();
   check(state.focusButton, 'normal mode exposes the document-focus button');
@@ -256,6 +269,22 @@ try {
   check(
     state.zoomFocusLabel === 'Exit document focus' && state.zoomFocusPressed === 'true',
     'the zoom pad carries a permanent, state-aware exit from document focus'
+  );
+  check(
+    state.zoomFocusRect.x + state.zoomFocusRect.width <= state.zoomControlRect.x,
+    'the document-focus toggle sits to the left of the collapsed zoom mark'
+  );
+  const restingFocusRect = state.zoomFocusRect;
+  const restingZoomRect = state.zoomControlRect;
+  await hoverZoomFocus(restingFocusRect);
+  state = await dump();
+  check(
+    !state.zoomExpanded &&
+      near(state.zoomFocusRect.x, restingFocusRect.x) &&
+      near(state.zoomFocusRect.y, restingFocusRect.y) &&
+      near(state.zoomControlRect.width, restingZoomRect.width) &&
+      near(state.zoomControlRect.height, restingZoomRect.height),
+    'hovering the focus toggle neither opens zoom nor moves either control'
   );
   await clickZoomFocus();
   state = await dump();
