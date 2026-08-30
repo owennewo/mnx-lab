@@ -1,0 +1,184 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        },
+        "key": {
+          "fifths": 2,
+          "color": "#1b7f3b"
+        },
+        "segno": {
+          "location": {
+            "fraction": [
+              0,
+              1
+            ]
+          },
+          "color": "#c0392b"
+        },
+        "ending": {
+          "duration": 1,
+          "numbers": [
+            1
+          ],
+          "color": "#2a5db0"
+        }
+      },
+      {
+        "fine": {
+          "location": {
+            "fraction": [
+              1,
+              1
+            ]
+          },
+          "color": "#c0392b"
+        },
+        "barline": {
+          "type": "final"
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "name": "Music",
+      "staves": 2,
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2,
+                "octave": -1,
+                "showOctave": false,
+                "color": "#7d3c98"
+              }
+            },
+            {
+              "staff": 2,
+              "clef": {
+                "sign": "F",
+                "staffPosition": 2,
+                "octave": -1
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "staff": 2,
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 2
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2,
+                "octave": 2
+              }
+            },
+            {
+              "staff": 2,
+              "clef": {
+                "sign": "F",
+                "staffPosition": 2,
+                "glyph": "fClefChange"
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 6
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "staff": 2,
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 3
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

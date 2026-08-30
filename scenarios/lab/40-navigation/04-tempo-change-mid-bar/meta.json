@@ -1,0 +1,47 @@
+{
+  "title": "A tempo change mid-bar",
+  "description": "Bar 1 carries two tempo marks: quarter = 120 with no location (the bar's start, as every mark was drawn before) and quarter = 60 located at the half-bar, over the third beat. Bar 2's only mark is located at the second beat (half = 90), so a bar's first tempo need not sit at its start. Every mark draws (core-measure-attributes-gaps.md, item 9; the census found only the first was), each its own run above the staff, clearing whatever it sits over.",
+  "bars": 2,
+  "tags": [
+    "navigation",
+    "tempo"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/tempo/"
+  ],
+  "coversDefs": [
+    "barline",
+    "barline-type",
+    "bpm",
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "rhythmic-position",
+    "root",
+    "sequence",
+    "sequence-content",
+    "tempo",
+    "tempos",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

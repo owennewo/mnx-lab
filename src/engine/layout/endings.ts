@@ -51,6 +51,7 @@ function emitEndings(
         kind: 'line',
         x1, y1: y, x2, y2: y,
         thickness: VOLTA_THICKNESS_SP,
+        ...(ending.color ? { stroke: ending.color } : {}),
         className: 'ending'
       });
       if (a === i) {
@@ -58,6 +59,7 @@ function emitEndings(
           kind: 'line',
           x1, y1: y, x2: x1, y2: y + VOLTA_HOOK_SP,
           thickness: VOLTA_THICKNESS_SP,
+          ...(ending.color ? { stroke: ending.color } : {}),
           className: 'ending'
         });
         primitives.push({
@@ -68,6 +70,7 @@ function emitEndings(
           font: 'body',
           size: 1.4,
           weight: 'bold',
+          ...(ending.color ? { fill: ending.color } : {}),
           className: 'ending-label'
         });
       }
@@ -76,6 +79,7 @@ function emitEndings(
           kind: 'line',
           x1: x2, y1: y, x2, y2: y + VOLTA_HOOK_SP,
           thickness: VOLTA_THICKNESS_SP,
+          ...(ending.color ? { stroke: ending.color } : {}),
           className: 'ending'
         });
       }

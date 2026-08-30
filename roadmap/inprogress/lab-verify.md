@@ -86,10 +86,10 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
-### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **4 stale, 5 never-seen**
+### 7. `core-measure-attributes-gaps` — the amber badge for undrawn measure attributes — **4 stale, 7 never-seen**
 
 Owner: [core-measure-attributes-gaps.md](core-measure-attributes-gaps.md) (in progress,
-items 1–8). Demoted 2026-08-28; grown 2026-08-29 (items 7–8).
+items 1–9). Demoted 2026-08-28; grown 2026-08-29 (items 7–9).
 
 **Cause.** No measure-level attribute ever produced the amber renderer-gap badge: the
 badge machinery was fed only by unsupported sequence-content kinds, so a bar whose
@@ -143,6 +143,16 @@ paragraph below about two amber badges on this scenario is superseded.
 `lab/navigation/numbered-bars` is **never-seen**: `17`, `18`, `19` in small upright
 figures just above the top line at the start of bars 1–3, nothing on bar 4; the segno
 over bar 2 and the metronome mark over bar 3 sit higher, clear of their numbers.
+
+**Colours, clef forms, every tempo (item 9, 2026-08-29).** Two **never-seen**.
+`lab/navigation/tempo-change-mid-bar`: ♩ = 120 over bar 1's start, ♩ = 60 over its
+third beat, 𝅗𝅥 = 90 over bar 2's second beat — three marks, none overlapping, each
+just clear of the ink under it. `lab/layout/coloured-marks-and-clef-forms`: a grand
+staff; green sharps in both key signatures, a blue first-ending bracket and `1.`, a
+red segno and a red *fine*, a purple treble clef with NO `8` under it (the D4/E4 are
+written a step above the middle line, an octave up — the clef sounds 8vb), a bass
+clef WITH an `8`; bar 2 a treble clef with `15` over it and a plain bass clef (the
+`fClefChange` glyph, drawn as declared) — verify no clef in bar 2 carries an `8`.
 
 **What a reviewer should look for.** On `arpeggiated-chords`: the music is unchanged and
 the bar carries two amber badges at its bottom-left (arpeggio, non-arpeggio). If any

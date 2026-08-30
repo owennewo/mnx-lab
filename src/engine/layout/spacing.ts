@@ -652,6 +652,11 @@ export interface ActiveClef {
    *  (G −2, F +2, C 0), which is what the engine assumed for every clef
    *  before the C clef arrived (core-measure-attributes-gaps.md). */
   staffPosition?: number;
+  /** MNX `clef.glyph`: an explicit SMuFL glyph — drawn as given. */
+  glyph?: string;
+  /** MNX `clef.showOctave`: false hides the octave figure. */
+  showOctave?: boolean;
+  color?: string;
 }
 
 export interface EventSlot {
@@ -1072,18 +1077,28 @@ export function planHorizontal(
             clef: {
               sign,
               octave: oct,
-              ...(c.clef.staffPosition !== undefined ? { staffPosition: c.clef.staffPosition } : {})
+              ...(c.clef.staffPosition !== undefined ? { staffPosition: c.clef.staffPosition } : {}),
+              ...(c.clef.glyph ? { glyph: c.clef.glyph } : {}),
+              ...(c.clef.showOctave !== undefined ? { showOctave: c.clef.showOctave } : {}),
+              ...(c.clef.color ? { color: c.clef.color } : {})
             }
           };
         })
         .sort((a, b) => a.t - b.t);
 
       const startClef = measureClefs.find(c => c.t <= ONSET_EPS);
+      // Any visible difference is a change: the sign, the octave, the line —
+      // and the glyph, the octave figure and the colour, which the census
+      // found were never compared, so a bar restating the sign with a new
+      // glyph kept the old one.
       if (
         startClef &&
         (startClef.clef.sign !== current.sign ||
           startClef.clef.octave !== current.octave ||
-          startClef.clef.staffPosition !== current.staffPosition)
+          startClef.clef.staffPosition !== current.staffPosition ||
+          startClef.clef.glyph !== current.glyph ||
+          startClef.clef.showOctave !== current.showOctave ||
+          startClef.clef.color !== current.color)
       ) {
         clefState[s] = startClef.clef;
         if (i > 0) clefChanged = true;
@@ -1593,8 +1608,6 @@ export function measureLevelGaps(
   partMeasures: readonly (MnxPartMeasure | undefined)[]
 ): string[] {
   const gaps: string[] = [];
-  if ((globalMeasure?.tempos?.length ?? 0) > 1)
-    gaps.push(`${globalMeasure!.tempos!.length} tempo marks — only the first is drawn`);
   if ((globalMeasure?._x?.mnxLab?.harmonies?.length ?? 0) > 0)
     gaps.push('chord symbols (harmonies) — not drawn');
   void partMeasures;

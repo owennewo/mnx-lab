@@ -856,7 +856,7 @@ export type MeasureAttribute =
   | ({ kind: 'fermata' } & MnxFermata)
   | { kind: 'number'; value: number }
   | { kind: 'jump'; type: 'segno' | 'dsalfine'; at?: MarkAt }
-  | { kind: 'tempo'; bpm: number; base: MnxNoteValueBase; dots?: number }
+  | { kind: 'tempo'; bpm: number; base: MnxNoteValueBase; dots?: number; at?: MarkAt }
   | { kind: 'rehearsal'; label: string }
   | { kind: 'section'; label: string };
 
@@ -942,7 +942,10 @@ function measureAttributeValue(attribute: MeasureAttribute): unknown {
     case 'tempo':
       return {
         bpm: attribute.bpm,
-        value: { base: attribute.base, ...(attribute.dots ? { dots: attribute.dots } : {}) }
+        value: { base: attribute.base, ...(attribute.dots ? { dots: attribute.dots } : {}) },
+        // A tempo without a location sits at the bar's start; `at` names a
+        // mid-bar change, and the renderer draws every mark (item 9).
+        ...(attribute.at !== undefined ? { location: locationOf(attribute.at, 'start') } : {})
       };
     case 'rehearsal':
     case 'section':
@@ -1003,7 +1006,8 @@ export function readMeasureAttributes(measure: MnxGlobalMeasure | undefined): Me
       kind: 'tempo',
       bpm: tempo.bpm,
       base: tempo.value.base,
-      ...(tempo.value.dots ? { dots: tempo.value.dots } : {})
+      ...(tempo.value.dots ? { dots: tempo.value.dots } : {}),
+      ...at(tempo.location, 'start')
     });
   if (measure.rehearsal?.label !== undefined)
     out.push({ kind: 'rehearsal', label: measure.rehearsal.label });

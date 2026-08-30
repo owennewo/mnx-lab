@@ -88,7 +88,7 @@ export function attributeText(attribute: MeasureAttribute): string {
     case 'jump':
       return `jump ${attribute.type}${markAtText(attribute.at)}`;
     case 'tempo':
-      return `tempo ${attribute.base}${'.'.repeat(attribute.dots ?? 0)}=${attribute.bpm}`;
+      return `tempo ${attribute.base}${'.'.repeat(attribute.dots ?? 0)}=${attribute.bpm}${markAtText(attribute.at)}`;
     case 'rehearsal':
       return `rehearsal ${attribute.label}`;
     case 'section':
@@ -225,7 +225,7 @@ const HINT_OF: Record<MeasureAttributeKind, string> = {
   fermata: 'square · long · below',
   number: '12',
   jump: 'segno · dsalfine · at 1/2',
-  tempo: '120 · half=80 · quarter.=60',
+  tempo: '120 · half=80 · quarter.=60 · 96 at 1/2',
   rehearsal: 'A · 12',
   section: 'Verse 1'
 };

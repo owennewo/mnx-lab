@@ -68,7 +68,7 @@ draws (`rehearsal`, `section`, `directions`), and the one `_x.mnxLab` measure bl
 | `time` | ✅ numerals and `common`/`cut` glyphs on notation. ❌ **`display` ignored on tab** (`tabStaff.ts:225` takes `{count, unit}`); 🐛 **multi-digit counts overprint** — every digit at one `x`, `anchor: middle` (`notation.ts:1569`, `tabStaff.ts:236`) | ✗ | ✅ | ✅ floor pill | 100+; **no `12/8`-class scenario**, so the overprint is unpinned |
 | `fermata` | ✅ since item 7 — bar form over the closing barline, event form over its note or rest (`fermata.ts`) | — | ✅ `fermata [symbol] [duration] [above\|below]` on both rungs | ✅ | `lab/32-articulations/03-fermata`, `05-fermatas-on-bars-and-rests` |
 | `number` | ✅ since item 8 — a DECLARED number draws small at the bar's start (`arpeggio.ts`); undeclared bars draw none, by design | — | ✅ `number 12` | ✅ | `lab/40-navigation/03-numbered-bars` |
-| colours (`ending`, `key`, `segno`, `fine`) | ❌ unread (only `rehearsal`/`section`/`direction` colour is honoured) | ✗ | ❌ | ❌ | 0 |
+| colours (`ending`, `key`, `segno`, `fine`, `clef`) | ✅ since item 9 — every `color` the schema allows on a bar-owned mark is honoured on its ink | — | ❌ no verb (a colour is not something the keyboard says yet) | ❌ | `lab/60-layout/02-coloured-marks-and-clef-forms` |
 | `id` | reference target only (ottava `end`, mmrests, layouts); minted, never set | — | implicit | — | many |
 | `_c` | unread | — | — | — | 0 |
 
@@ -132,15 +132,15 @@ verified empty staff came to read as a regression.
 3. ~~`fermata` (measure and event forms)~~ — item 7.
 4. `harmonies` — see above.
 5. ~~`number`~~ — item 8 (declared numbers only).
-6. The colour properties on `ending`/`key`/`segno`/`fine`/`clef`; `clef.glyph`,
-   `clef.showOctave`, `clef.staffPosition`; `_c`.
+6. ~~The colour properties on `ending`/`key`/`segno`/`fine`/`clef`; `clef.glyph`,
+   `clef.showOctave`, `clef.staffPosition`~~ — items 2 and 9. `_c` (a comment) is not ink.
 
 **(b) Rendered partially**
 
 1. **Hairpins and relative dynamics draw nothing** — the biggest musical hole.
 2. **The C clef is drawn as a treble clef and mis-places every pitch** — and the grammar
    will write one.
-3. `tempos`: index 0 only, `location` ignored.
+3. ~~`tempos`: index 0 only, `location` ignored.~~ — item 9.
 4. `repeatEnd` discards an explicit `barline.type`.
 5. `time.display` ignored on tab; multi-digit time signatures overprint on both staves.
 6. `clef.octave` ±2/±3 fall back to a plain G clef.
@@ -248,6 +248,20 @@ Found by the sweep and confirmed by hand; each is a one-file fix and a test:
    badge lines retire. Moves `lab/articulations/arpeggiated-chords`; adds
    `lab/navigation/numbered-bars` — batch 7. Remaining from (a): `harmonies`
    (core-chord-symbols) and the colour/clef-glyph properties in (a) 6.
+
+9. ✅ **Colours, clef forms, every tempo** (2026-08-29) — the last of the census. Every
+   `color` the schema allows on a bar-owned mark is honoured on its ink (key
+   signature, volta bracket and label, segno, fine, clef — rehearsal/section/direction/
+   fermata/arpeggio already were). `clefGlyph` reads `clef.glyph` as given, hides the
+   octave figure for `showOctave: false` (the clef still sounds at `octave`), and
+   knows Bravura's 15ma/15mb and F/C octave forms; the bar-start clef comparison
+   in `spacing.ts` now sees glyph, figure and colour, so a bar restating the sign
+   with a new glyph changes it. `emitTempoMark` draws **every** mark: one without a
+   `location` at the bar's start as before, a located one at its onset column, each
+   its own text run; `tempo 96 at 1/2` writes it. The last two badge lines but
+   `harmonies` retire. No golden moved; pinned by `lab/navigation/tempo-change-mid-bar`
+   and `lab/layout/coloured-marks-and-clef-forms` — batch 7. Not written: colours
+   (no verb) and `clef.glyph`/`showOctave` (`setClef` says neither yet).
 
 Original plan:
 

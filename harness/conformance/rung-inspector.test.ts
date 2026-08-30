@@ -75,6 +75,7 @@ const ONE_OF_EACH: MeasureAttribute[] = [
   { kind: 'fermata' },
   { kind: 'fermata', symbol: 'square', duration: 'long', orient: 'below' },
   { kind: 'number', value: 12 },
+  { kind: 'tempo', bpm: 96, base: 'quarter', at: [1, 2] },
   { kind: 'jump', type: 'dsalfine' },
   { kind: 'jump', type: 'segno', at: [3, 4] },
   { kind: 'tempo', bpm: 120, base: 'quarter' },

@@ -25,7 +25,6 @@ describe('measureLevelGaps', () => {
       _x: { mnxLab: { harmonies: [{ location: { fraction: [0, 1] }, quality: 'major', root: { step: 'C' } }] } }
     } as never;
     expect(measureLevelGaps(gm, [pm])).toEqual([
-      '2 tempo marks — only the first is drawn',
       'chord symbols (harmonies) — not drawn'
     ]);
   });

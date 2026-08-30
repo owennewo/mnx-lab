@@ -202,6 +202,7 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
       x: p.x,
       y,
       anchor: p.anchor,
+      ...(gm.segno.color ? { fill: gm.segno.color } : {}),
       className: 'segno'
     });
   }
@@ -215,6 +216,7 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
       font: 'bodyItalic',
       size: 1.6,
       anchor: p.anchor,
+      ...(gm.fine.color ? { fill: gm.fine.color } : {}),
       className: 'fine'
     });
   }
@@ -391,6 +393,9 @@ export interface EmitTempoMarkArgs {
   /** This row's primitives drawn so far (see `EmitScoreLabelsArgs.scan`). */
   scan: readonly Primitive[];
   primitives: Primitive[];
+  /** The bar's onset columns, for a tempo with a `location` (the first
+   *  tempo without one sits at the bar's start as it always did). */
+  onsetXs?: OnsetX[];
 }
 
 /**
@@ -402,12 +407,34 @@ export interface EmitTempoMarkArgs {
  * label pass to clear explicitly — see `EmitScoreLabelsArgs.clearAbove`.
  */
 export function emitTempoMark(args: EmitTempoMarkArgs): BoundsSp | null {
-  const { gm, m, staffTop, scan, primitives } = args;
-  const tempo = (gm.tempos ?? [])[0];
-  if (!tempo) return null;
-  const firstNew = primitives.length;
-
+  const { gm, m, staffTop, scan, primitives, onsetXs } = args;
+  const tempos = gm.tempos ?? [];
+  if (tempos.length === 0) return null;
   const x0 = m.showTimeSig ? m.timeSigCentreX - 1.25 : m.contentStartX - 1.5;
+  let top: BoundsSp | null = null;
+  const before = primitives.length;
+  // Every mark draws (core-measure-attributes-gaps.md: only the first used
+  // to). One without a location sits at the bar's start; one with a location
+  // starts at that column — a mid-bar tempo change. Each is its own run, so a
+  // later mark clears the earlier ones like any other text over this bar.
+  tempos.forEach((tempo, index) => {
+    const f = tempo.location?.fraction;
+    const t = Array.isArray(f) && f[1] ? f[0] / f[1] : 0;
+    const x = tempo.location && onsetXs ? anchorAt(onsetXs, t, m).x - 0.6 : index === 0 ? x0 : x0 + 6 * index;
+    const placed = emitOneTempo(tempo, x, staffTop, [...scan, ...primitives.slice(before)], primitives);
+    if (placed && (!top || placed.y < top.y)) top = placed;
+  });
+  return top;
+}
+
+function emitOneTempo(
+  tempo: NonNullable<MnxGlobalMeasure['tempos']>[number],
+  x0: number,
+  staffTop: number,
+  scan: readonly Primitive[],
+  primitives: Primitive[]
+): BoundsSp | null {
+  const firstNew = primitives.length;
   const metGlyph = METRONOME_GLYPH_BY_BASE[tempo.value.base] ?? 'metNoteQuarterUp';
   // Drawn at a provisional baseline of 0 and placed once its footprint is
   // known. The note glyph's head hangs below the baseline — that is the

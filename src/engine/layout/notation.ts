@@ -367,12 +367,33 @@ function pitchToStaffY(step: string, octave: number, clef: ActiveClef): number {
   return clefLineY(clef) - (noteIndex - refIndex) * 0.5;
 }
 
+/** The SMuFL glyph for a clef: an explicit `glyph` as given; else the sign,
+ *  with the octave figure Bravura has for it (8/15, above or below) unless
+ *  `showOctave` is false — the clef still SOUNDS at `octave` either way. */
 function clefGlyph(clef: ActiveClef): string {
-  if (clef.sign === 'F') return 'fClef';
-  if (clef.sign === 'C') return 'cClef';
-  if (clef.octave === -1) return 'gClef8vb';
-  if (clef.octave === 1) return 'gClef8va';
-  return 'gClef';
+  if (clef.glyph) return clef.glyph;
+  const base = clef.sign === 'F' ? 'fClef' : clef.sign === 'C' ? 'cClef' : 'gClef';
+  if (clef.showOctave === false || !clef.octave) return base;
+  // Bravura's names: 8va/8vb for the octave, 15ma/15mb for two.
+  const suffix = Math.abs(clef.octave) >= 2 ? (clef.octave > 0 ? '15ma' : '15mb') : clef.octave > 0 ? '8va' : '8vb';
+  const named = `${base}${suffix}`;
+  return CLEF_OCTAVE_GLYPHS.has(named) ? named : base;
+}
+
+/** The octave-bearing clef glyphs Bravura carries. */
+const CLEF_OCTAVE_GLYPHS = new Set([
+  'gClef8vb', 'gClef8va', 'gClef15mb', 'gClef15ma',
+  'fClef8vb', 'fClef8va', 'fClef15mb', 'fClef15ma',
+  'cClef8vb'
+]);
+
+/** The declared key signature in force at bar `i`, for its colour. */
+function keyColorAt(mnx: MnxStructure, i: number): string | undefined {
+  for (let k = i; k >= 0; k--) {
+    const key = mnx.global.measures[k]?.key;
+    if (key) return key.color;
+  }
+  return undefined;
 }
 
 function clefY(clef: ActiveClef, staffTop: number): number {
@@ -1476,6 +1497,7 @@ function assembleSegment(
           glyph: clefGlyph(staffClef),
           x: m.clefX,
           y: clefY(staffClef, staffTops[s]),
+          ...(staffClef.color ? { fill: staffClef.color } : {}),
           className: 'clef'
         });
       }
@@ -1527,11 +1549,14 @@ function assembleSegment(
         x: cc.x,
         y: clefY(cc.clef, staffTops[cc.staff - 1] ?? staffTop),
         scale: CLEF_CHANGE_SCALE,
+        ...(cc.clef.color ? { fill: cc.clef.color } : {}),
         className: 'clef clef-change'
       });
     }
 
     if (m.showKeySig) {
+      // The colour of the key in force — declared on this bar or inherited.
+      const keyColor = keyColorAt(mnx, i);
       for (let s = 0; s < numStaves; s++) {
         const clefShift = KEY_SIG_CLEF_OFFSET[m.clefTimelines[s][0].clef.sign];
         keySignatureGlyphs(m.keyFifths, m.cancelledKeyFifths).forEach((g, idx) => {
@@ -1543,6 +1568,7 @@ function assembleSegment(
             // its left edge under a non-square scale.
             x: m.keySigX + idx * KEY_SIG_GLYPH_ADVANCE_SP * plan.inkRatio,
             y: staffTops[s] + g.y + clefShift,
+            ...(keyColor ? { fill: keyColor } : {}),
             className: 'key-sig'
           });
         });
@@ -2115,7 +2141,14 @@ function assembleSegment(
       ...postLoopByRow[m.row],
       ...primitives.slice(rowTextStart[m.row])
     ];
-    const tempoTop = emitTempoMark({ gm, m, staffTop, scan: scan(), primitives });
+    const topSource = segment.staves[0]?.sources[segment.staves[0].sources.length - 1];
+    const topSequence = (topSource?.part.measures?.[i]?.sequences ?? []).find(
+      seq => (seq.staff ?? 1) === (topSource?.staff ?? 1)
+    );
+    const tempoTop = emitTempoMark({
+      gm, m, staffTop, scan: scan(), primitives,
+      onsetXs: measureOnsetXs(topSequence, m.voices[0] ?? [])
+    });
     emitScoreLabels({ gm, m, staffTop, scan: scan(), clearAbove: tempoTop, primitives });
   }
 

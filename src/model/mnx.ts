@@ -499,6 +499,12 @@ export interface MnxPartMeasure {
       sign: string;
       staffPosition?: number;
       octave?: number;
+      /** An explicit SMuFL glyph, overriding the sign+octave choice. */
+      glyph?: string;
+      /** `false` hides the octave figure on a transposing clef (the sign
+       *  still SOUNDS at `octave`). */
+      showOctave?: boolean;
+      color?: string;
     };
     /** Metric onset within the measure as a whole-note fraction
      *  [numerator, denominator]; absent = the start of the measure. */
@@ -568,6 +574,7 @@ export interface MnxGlobalMeasure {
   id?: string;
   key?: {
     fifths: number;
+    color?: string;
   };
   time?: {
     count: number;
@@ -591,6 +598,7 @@ export interface MnxGlobalMeasure {
     duration?: number;
     numbers?: number[];
     open?: boolean;
+    color?: string;
   };
   /** Segno sign at a metric position; `glyph` may pick a SMuFL variant. */
   segno?: {
@@ -598,6 +606,7 @@ export interface MnxGlobalMeasure {
       fraction: [number, number];
     };
     glyph?: string;
+    color?: string;
   };
   /** A fermata over the bar's closing barline. */
   fermata?: MnxFermata;
@@ -608,6 +617,7 @@ export interface MnxGlobalMeasure {
     location: {
       fraction: [number, number];
     };
+    color?: string;
   };
   /** Jump instruction — MNX v17 knows only D.S. (`segno`) and D.S. al Fine
    *  (`dsalfine`); there is no coda / D.C. vocabulary yet. */

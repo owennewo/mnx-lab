@@ -271,7 +271,7 @@ const TEMPO_UNITS: Record<string, MnxNoteValueBase> = {
 export const BAR_ATTRIBUTE_HELP =
   'barline double · repeat start · repeat end 3 · ending 1,2 · ending 3 for 1 open · ' +
   'segno · fine · fermata · fermata square long below · number 12 · ' +
-  'jump dsalfine · jump segno at start · fine at end · tempo 120 · rehearsal A · section Verse 1 · full-measure rest · ' +
+  'jump dsalfine · jump segno at start · fine at end · tempo 120 · tempo 96 at 1/2 · rehearsal A · section Verse 1 · full-measure rest · ' +
   'measure repeat 2 · measure repeat counter 3 · no <attribute>';
 
 export type BarAttributeResult =
@@ -435,14 +435,18 @@ export function parseBarAttribute(text: string): BarAttributeResult {
       return null;
     }
     case 'tempo': {
-      // "120" (quarter implied), "half=80", "quarter.=60" (dots on the unit).
-      const match = /^(?:([a-z0-9]+)(\.*)\s*=\s*)?(\d{1,3})$/i.exec(rest);
+      // "120" (quarter implied), "half=80", "quarter.=60" (dots on the unit),
+      // and `… at 1/2` for a change mid-bar.
+      const located = /^(.*?)\s+at\s+(\S+)$/i.exec(rest);
+      const at = located ? parseMarkAt(located[2]) : undefined;
+      if (Array.isArray(at) && !(at[0] >= 0 && at[1] > 0)) return null;
+      const match = /^(?:([a-z0-9]+)(\.*)\s*=\s*)?(\d{1,3})$/i.exec(located ? located[1] : rest);
       if (!match) return null;
       const base = match[1] ? TEMPO_UNITS[match[1].toLowerCase()] : 'quarter';
       const dots = match[2]?.length ?? 0;
       const bpm = Number(match[3]);
       if (!base || bpm < 20 || bpm > 400) return null;
-      return { set: { kind: 'tempo', bpm, base, ...(dots ? { dots } : {}) } };
+      return { set: { kind: 'tempo', bpm, base, ...(dots ? { dots } : {}), ...(at ? { at } : {}) } };
     }
     case 'rehearsal':
     case 'section':

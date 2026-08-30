@@ -1,0 +1,55 @@
+{
+  "title": "Coloured marks and clef forms",
+  "description": "The `color` the schema allows on a key, an ending, a segno, a fine and a clef, each honoured on its own ink (green key signature, blue volta, red segno and fine, purple treble clef); and the clef properties the engine used to ignore: `octave: -1` with `showOctave: false` draws a plain treble clef that still sounds an octave down (MNX pitch is sounding, so the D4 and E4 are written a step above the middle line), the bass clef with `octave: -1` takes Bravura's fClef8vb, `octave: 2` in bar 2 takes gClef15ma, and an explicit `glyph` (fClefChange) is drawn as given. Nothing here is writable from the keyboard yet — colours have no verb, and `setClef` says neither `glyph` nor `showOctave` (core-measure-attributes-gaps.md, item 9).",
+  "bars": 2,
+  "tags": [
+    "layout",
+    "color",
+    "clef"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/clef/"
+  ],
+  "coversDefs": [
+    "barline",
+    "barline-type",
+    "clef",
+    "clef-sign",
+    "color",
+    "ending",
+    "ending-duration",
+    "ending-numbers",
+    "event",
+    "fine",
+    "global",
+    "key",
+    "measure-global",
+    "mnx",
+    "note",
+    "note-value",
+    "note-value-base",
+    "octave",
+    "ottava-amount-or-zero",
+    "part",
+    "part-measure",
+    "pitch",
+    "positioned-clef",
+    "root",
+    "rhythmic-position",
+    "segno",
+    "sequence",
+    "sequence-content",
+    "smufl-glyph",
+    "staff-position",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}
