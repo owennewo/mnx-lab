@@ -1,7 +1,7 @@
 # One editing surface — retire the popovers and the tray into the inspector
 
 > **Status: COMPLETE 2026-08-31 — the index is exhausted.** Eleven items (one split), all built; every popover and the tray retired onto the rung inspector, the keymap and the palette; proposed and finished inside one day, across two concurrent sessions.
-> [workbench-rung-inspector.md](workbench-rung-inspector.md) ("a third
+> [workbench-rung-inspector.md](../inprogress/workbench-rung-inspector.md) ("a third
 > editing surface, to be tried *beside* the tray and the popovers so that use decides
 > which wins") has its verdict: **the inspector wins.** The user's ruling, 2026-08-31:
 > all `Shift+letter` popovers and the selection tray retire — but only once the
@@ -78,18 +78,18 @@ is one popover or the tray, and one work item.
 
 | # | Surface (key) | Inspector coverage today | What the item must close | Status |
 |---|---|---|---|---|
-| 1 | **Key signature** (~~`Shift+K`~~ freed) | `key` pill, stage 3 — reuses `parseKeySignature`, `inherit` = Backspace floor | census + removal sweep only | ✅ [built 2026-08-31](../complete/workbench-one-surface-key.md) |
-| 2 | **Time signature** (~~`Shift+T`~~ freed) | `time` pill, stage 3 — reuses `parseTimeSignature`, floor when declared | census + removal sweep only | ✅ [built 2026-08-31](../complete/workbench-one-surface-time.md) |
-| 3 | **Clef** (~~`Shift+C`~~ freed) | `clef` pill at partMeasure, stage 4 — reuses `parseClef` | verify the registry's `measure` cross-listing loses nothing; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-clef.md) |
-| 4 | **Bar attributes** (~~`Shift+B`~~ freed) | one pill per declared attribute, stage 3 — reuses `parseBarAttribute`; the rhythm riders live as voiceMeasure pills | verify all ten kinds + `tempo#n` array + segno/fine `at` forms; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-bar.md) |
-| 5 | **Adornments** (~~`Shift+A`~~ freed) | markings/positioned pills, stage 4 — reuses `parseAdornment` | verify breadth (all markings, dynamics, directions incl. glyphs); sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-adornment.md) |
-| 6 | **Lyrics** (`Shift+L` → the text editor) | syllable pills per line (`lyric 2: Am`), stage 4 — reuses `parseLyric` | line management, the text surface and the pass model, in three phases | ✅ [built 2026-08-31](../complete/workbench-one-surface-lyrics.md) |
-| 7 | **Tuning** (~~`Shift+U`~~ freed) | `capo` pill writable; `strings` is a **read-only** reading | **gap: the tuning write path** — `parseTuning`'s sentence has no inspector form; a strings pill that writes (part rung), refusals for strings in use; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-tuning.md) |
-| 8 | **Rhythm** (~~`Shift+R`~~ freed) | container pills are **read-only** (`tuplet: 3:2`, dotted, refuse Enter); full-measure rest / measure repeat pills exist at voiceMeasure | **gap: the missing verb** — the `setContainerProperties`-class op the residue ledger names, plus a construction story for tuplet/grace/authored-silence declarations (contract §2: construction is a verb) | ✅ [built 2026-08-31](../complete/workbench-one-surface-rhythm.md) |
-| 9 | **Part** (~~`Shift+P`~~ freed) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | ✅ [built 2026-08-31](../complete/workbench-one-surface-part.md) |
-| 10 | **Layout** (~~`Shift+S`~~ freed → **shift slide**) | nothing — no document-rung pills exist | the document rung grows its pill families from `parseLayoutSentence`'s grammar (sources, systems, quoted names — the largest parser in the file); likely splits into sub-items when picked up | ✅ [built 2026-08-31](../complete/workbench-one-surface-layout.md) |
-| 11a | **The tray's attribute tiles** | every set/remove/toggle tile is a mouse-spelling of a word, key or pill the inspector already has (markings, dynamics, techniques, bar toggles, accidental/ottava/dots/tie, duration steppers, respell, staff-kind ×4, slur/beam) | item-1-shaped: census each tile's intent → point at the covering surface → delete; no new ops expected | ✅ [built 2026-08-31](../complete/workbench-one-surface-tray-attrs.md) |
-| 11b | **The tray's verbs + shell** (`/`) | the verb tiles collapse into rung-generic gestures the keymap already owns: insert-sibling (`I`/`Shift+I` = `insertAtRung`, cursor follows), delete/clear (`Del`'s ladder), closures (Home/End/Ctrl+A/Alt+V), history | test the thesis; build the one missing generic — **construct the missing child** (`new-voice` → a `voice` declaration word at partMeasure); dispose the four blocked-residue rows (the `arpeggio` blocker looks stale — verify first); demolish the uninhabited popover frame; retire the tray shell + `/`, discoverability to the `?` legend + palette `>`; settle the triage ledger (../proposed/core-selection-tray-residue.md) | ✅ [built 2026-08-31](../complete/workbench-one-surface-tray-verbs.md) — **the index is exhausted** |
+| 1 | **Key signature** (~~`Shift+K`~~ freed) | `key` pill, stage 3 — reuses `parseKeySignature`, `inherit` = Backspace floor | census + removal sweep only | ✅ [built 2026-08-31](workbench-one-surface-key.md) |
+| 2 | **Time signature** (~~`Shift+T`~~ freed) | `time` pill, stage 3 — reuses `parseTimeSignature`, floor when declared | census + removal sweep only | ✅ [built 2026-08-31](workbench-one-surface-time.md) |
+| 3 | **Clef** (~~`Shift+C`~~ freed) | `clef` pill at partMeasure, stage 4 — reuses `parseClef` | verify the registry's `measure` cross-listing loses nothing; sweep | ✅ [built 2026-08-31](workbench-one-surface-clef.md) |
+| 4 | **Bar attributes** (~~`Shift+B`~~ freed) | one pill per declared attribute, stage 3 — reuses `parseBarAttribute`; the rhythm riders live as voiceMeasure pills | verify all ten kinds + `tempo#n` array + segno/fine `at` forms; sweep | ✅ [built 2026-08-31](workbench-one-surface-bar.md) |
+| 5 | **Adornments** (~~`Shift+A`~~ freed) | markings/positioned pills, stage 4 — reuses `parseAdornment` | verify breadth (all markings, dynamics, directions incl. glyphs); sweep | ✅ [built 2026-08-31](workbench-one-surface-adornment.md) |
+| 6 | **Lyrics** (`Shift+L` → the text editor) | syllable pills per line (`lyric 2: Am`), stage 4 — reuses `parseLyric` | line management, the text surface and the pass model, in three phases | ✅ [built 2026-08-31](workbench-one-surface-lyrics.md) |
+| 7 | **Tuning** (~~`Shift+U`~~ freed) | `capo` pill writable; `strings` is a **read-only** reading | **gap: the tuning write path** — `parseTuning`'s sentence has no inspector form; a strings pill that writes (part rung), refusals for strings in use; sweep | ✅ [built 2026-08-31](workbench-one-surface-tuning.md) |
+| 8 | **Rhythm** (~~`Shift+R`~~ freed) | container pills are **read-only** (`tuplet: 3:2`, dotted, refuse Enter); full-measure rest / measure repeat pills exist at voiceMeasure | **gap: the missing verb** — the `setContainerProperties`-class op the residue ledger names, plus a construction story for tuplet/grace/authored-silence declarations (contract §2: construction is a verb) | ✅ [built 2026-08-31](workbench-one-surface-rhythm.md) |
+| 9 | **Part** (~~`Shift+P`~~ freed) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | ✅ [built 2026-08-31](workbench-one-surface-part.md) |
+| 10 | **Layout** (~~`Shift+S`~~ freed → **shift slide**) | nothing — no document-rung pills exist | the document rung grows its pill families from `parseLayoutSentence`'s grammar (sources, systems, quoted names — the largest parser in the file); likely splits into sub-items when picked up | ✅ [built 2026-08-31](workbench-one-surface-layout.md) |
+| 11a | **The tray's attribute tiles** | every set/remove/toggle tile is a mouse-spelling of a word, key or pill the inspector already has (markings, dynamics, techniques, bar toggles, accidental/ottava/dots/tie, duration steppers, respell, staff-kind ×4, slur/beam) | item-1-shaped: census each tile's intent → point at the covering surface → delete; no new ops expected | ✅ [built 2026-08-31](workbench-one-surface-tray-attrs.md) |
+| 11b | **The tray's verbs + shell** (`/`) | the verb tiles collapse into rung-generic gestures the keymap already owns: insert-sibling (`I`/`Shift+I` = `insertAtRung`, cursor follows), delete/clear (`Del`'s ladder), closures (Home/End/Ctrl+A/Alt+V), history | test the thesis; build the one missing generic — **construct the missing child** (`new-voice` → a `voice` declaration word at partMeasure); dispose the four blocked-residue rows (the `arpeggio` blocker looks stale — verify first); demolish the uninhabited popover frame; retire the tray shell + `/`, discoverability to the `?` legend + palette `>`; settle the triage ledger (../superseded/core-selection-tray-residue.md) | ✅ [built 2026-08-31](workbench-one-surface-tray-verbs.md) — **the index is exhausted** |
 
 The order inside 1–5 is near-arbitrary (all five are census-and-sweep); they are
 ranked by grammar size. 6–7 each carry one bounded gap. 8–10 each need design and at
@@ -98,16 +98,16 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Relations
 
-- [workbench-rung-inspector.md](workbench-rung-inspector.md) — the
+- [workbench-rung-inspector.md](../inprogress/workbench-rung-inspector.md) — the
   surface everything consolidates onto; its "What this does not decide → whether the
   popovers retire" is decided here. Its container-verb dependency is item 8's core.
-- [core-selection-tray-mechanism.md](../complete/core-selection-tray-mechanism.md),
-  [core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md) — the tray trio;
+- [core-selection-tray-mechanism.md](core-selection-tray-mechanism.md),
+  [core-selection-tray-residue.md](../superseded/core-selection-tray-residue.md) — the tray trio;
   item 11 is their sunset, and the residue doc's triage ledger must be settled by it.
-- [core-element-ops-bar-attributes.md](../complete/core-element-ops-bar-attributes.md)
+- [core-element-ops-bar-attributes.md](core-element-ops-bar-attributes.md)
   and siblings — the campaign that built the popovers; this one retires their
   surfaces while keeping their ops and (mostly) their grammars.
-- [core-rung-insert.md](../complete/core-rung-insert.md) — the
+- [core-rung-insert.md](core-rung-insert.md) — the
   parent-constructs-child rule and the ghost bar; item 9's precedent.
 
 ## Progress + learnings log

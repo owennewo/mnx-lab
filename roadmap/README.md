@@ -44,12 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-tray-verbs.md](proposed/workbench-one-surface-tray-verbs.md)** —
-  one-surface campaign item 11b, **built 2026-08-31 — the campaign's closing item**: the
-  voice construct word, the blocked-tile class extinct, then the demolition — tray,
-  registry, popover frame and `popover` precedence class deleted; `/` reverted to go-to;
-  the chip's click opens the inspector; the triage ledger superseded; three op-gaps
-  carried forward by name.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -174,16 +168,6 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
-- **[workbench-campaign-one-surface.md](inprogress/workbench-campaign-one-surface.md)** —
-  **campaign**, item 1 built 2026-08-31: retire the ten `Shift+letter` popovers and the
-  selection tray onto the rung inspector, one surface per item, ordered simplest to
-  hardest. Every retirement is gated on demonstrated coverage: census before coverage,
-  coverage before removal, ops before surfaces. Items 1–5 (key ✅, time ✅, clef ✅, bar
-  attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics ✅
-  in three phases, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part ✅, layout ✅) need new ops or a construct story; 11 — split into 11a (attribute
-  tiles ✅) and 11b (verbs + shell ✅) — **the campaign is COMPLETE 2026-08-31**: one
-  editing surface, every grammar in the inspector, every verb on a rung-generic key.
-  1: freed keys are freed, not accelerators.
 - **[core-selection-range-grain.md](inprogress/core-selection-range-grain.md)** — **decisions 1–4 built 2026-08-30** (section and container rungs retired, staff off
   partMeasure identity; spanner work remains); the
   ladder's rungs re-read as **range grains**, out of a 2026-08-30 rung-by-rung review:
@@ -244,6 +228,22 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-campaign-one-surface.md](complete/workbench-campaign-one-surface.md)** —
+  **campaign**, item 1 built 2026-08-31: retire the ten `Shift+letter` popovers and the
+  selection tray onto the rung inspector, one surface per item, ordered simplest to
+  hardest. Every retirement is gated on demonstrated coverage: census before coverage,
+  coverage before removal, ops before surfaces. Items 1–5 (key ✅, time ✅, clef ✅, bar
+  attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics ✅
+  in three phases, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part ✅, layout ✅) need new ops or a construct story; 11 — split into 11a (attribute
+  tiles ✅) and 11b (verbs + shell ✅) — **the campaign is COMPLETE 2026-08-31**: one
+  editing surface, every grammar in the inspector, every verb on a rung-generic key.
+  1: freed keys are freed, not accelerators.
+- **[workbench-one-surface-tray-verbs.md](complete/workbench-one-surface-tray-verbs.md)** —
+  one-surface campaign item 11b, **built 2026-08-31 — the campaign's closing item**: the
+  voice construct word, the blocked-tile class extinct, then the demolition — tray,
+  registry, popover frame and `popover` precedence class deleted; `/` reverted to go-to;
+  the chip's click opens the inspector; the triage ledger superseded; three op-gaps
+  carried forward by name.
 - **[workbench-one-surface-tray-attrs.md](complete/workbench-one-surface-tray-attrs.md)** —
   one-surface campaign item 11a, **built 2026-08-31**: the tray's 34 attribute tiles,
   five factory helpers, twelve bands and two more glyph twins retired — every tile a

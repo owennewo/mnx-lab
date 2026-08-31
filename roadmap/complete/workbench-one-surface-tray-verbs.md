@@ -1,7 +1,7 @@
 # Retire the tray's verbs and shell — one-surface campaign item 11b
 
 > **Status: proposed and built 2026-08-31, in two slices.** Campaign:
-> [workbench-campaign-one-surface.md](../inprogress/workbench-campaign-one-surface.md),
+> [workbench-campaign-one-surface.md](workbench-campaign-one-surface.md),
 > item 11b — the closing item: the campaign's contract run against the shell
 > itself, and the generalization thesis confirmed.
 
