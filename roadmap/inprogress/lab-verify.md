@@ -86,6 +86,28 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
+### 12. Lyric width split around the note — **4 stale**
+
+Owner: no roadmap doc — a user-reported occlusion (2026-08-31): a wide
+syllable's width was priced entirely to the RIGHT of its note's anchor while
+the text draws centred, so "extraordinarily" reached back over the word
+before it. `spacing.ts` now splits the lyric requirement around the anchor —
+half into the column's leading, half into its core. The total rigid width is
+unchanged by construction, so bar widths and wrapping cannot move; only
+lyric-bearing anchors shift right by half the syllable's overhang.
+Scenarios: `spec/lyrics-basic`, `spec/lyrics-multi-line`,
+`spec/lyric-line-metadata`, `lab/lyrics/verse-labels` (all four demoted
+verified → rendered; `lab/lyrics/tab-verses` moved too but was never seen —
+it stays in batch 10). Pinned by `harness/conformance/lyric-spacing.test.ts`,
+which reproduces the occlusion against the old pricing.
+
+**What a reviewer should look for.** Syllables still CENTRED under their
+notes (the fix moved the note, not the text's anchor); adjacent words with
+clear air between them, wide ones included; hyphens still midway between
+their syllables; and bar widths visually identical to the previous
+approvals — only the horizontal position of lyric-bearing notes inside
+their columns moved, by half a syllable's overhang at most.
+
 ### 11. Barline weights unified across staff kinds — **27 tab goldens moved, all already `rendered`**
 
 Owner: no roadmap doc — the audit-cleanup sweep (2026-08-31). The standalone tab

@@ -1228,14 +1228,22 @@ export function planHorizontal(
               const accidentals = (event.notes ?? []).filter(
                 n => noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths) !== null
               ).length;
+              // A syllable is CENTRED on the note, but the anchor sits a
+              // fixed half-core from the column start — so lyric width added
+              // only to `core` lands entirely to the RIGHT of the note, and
+              // the centred text spills back over the previous column
+              // (found on "extraordinarily"). Split the requirement around
+              // the anchor instead: half into leading, half into core — the
+              // same total rigid width, redistributed, so bar widths and
+              // wrapping cannot move; only the wide event's own anchor does.
+              const lyricW = lyricCoreSp(event);
               return withColumnExtras({
-                leading: accidentals
+                leading: (accidentals
                   ? accidentals * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP
-                  : 0,
-                // Wide syllables widen their column (centred under the note).
+                  : 0) + Math.max(0, (lyricW - CORE_SP) / 2),
                 core: Math.max(
                   CORE_SP + (event.duration.dots ?? 0) * DOT_SP,
-                  lyricCoreSp(event)
+                  (CORE_SP + lyricW) / 2
                 ),
                 spring: springSp(durationValue(event.duration))
               });

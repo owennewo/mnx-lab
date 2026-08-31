@@ -9,14 +9,14 @@
 <text x="49.6" y="125.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
 <text x="101.6" y="102.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="101.6" y="148.5712" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<rect x="162.6496" y="126.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
-<text x="168.6496" y="134.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e0.n0">2</text>
-<rect x="304.7504" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
-<text x="310.7504" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
-<rect x="446.8496" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
-<text x="452.8496" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e2.n0">2</text>
-<rect x="604.1504" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
-<text x="610.1504" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e3.n0">0</text>
+<rect x="186.6496" y="126.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
+<text x="192.6496" y="134.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e0.n0">2</text>
+<rect x="328.7504" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
+<text x="334.7504" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
+<rect x="478.4496" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
+<text x="484.4496" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e2.n0">2</text>
+<rect x="628.1504" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
+<text x="634.1504" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e3.n0">0</text>
 <line x1="718" y1="80" x2="718" y2="171.4288" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="718" y1="80" x2="1248" y2="80" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="718" y1="98.2864" x2="1248" y2="98.2864" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
@@ -24,14 +24,14 @@
 <line x1="718" y1="134.8576" x2="1248" y2="134.8576" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="718" y1="153.1424" x2="1248" y2="153.1424" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="718" y1="171.4288" x2="1248" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<rect x="768.6496" y="126.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e0.n0"></rect>
-<text x="774.6496" y="134.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m1.v0.e0.n0">2</text>
-<rect x="880.3504" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e1.n0"></rect>
-<text x="886.3504" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m1.v0.e1.n0">0</text>
-<rect x="1007.2496" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e2.n0"></rect>
-<text x="1013.2496" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m1.v0.e2.n0">2</text>
-<rect x="1134.1504" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e3.n0"></rect>
-<text x="1140.1504" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m1.v0.e3.n0">0</text>
+<rect x="777.4496" y="126.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e0.n0"></rect>
+<text x="783.4496" y="134.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m1.v0.e0.n0">2</text>
+<rect x="896.7504" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e1.n0"></rect>
+<text x="902.7504" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m1.v0.e1.n0">0</text>
+<rect x="1023.6496" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e2.n0"></rect>
+<text x="1029.6496" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m1.v0.e2.n0">2</text>
+<rect x="1158.1504" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e3.n0"></rect>
+<text x="1164.1504" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m1.v0.e3.n0">0</text>
 <line x1="1248" y1="80" x2="1248" y2="171.4288" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="32" y1="336.6096" x2="617.2" y2="336.6096" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="354.896" x2="617.2" y2="354.896" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
@@ -41,14 +41,14 @@
 <line x1="32" y1="428.0384" x2="617.2" y2="428.0384" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="336.6096" x2="32" y2="428.0384" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
 <text x="49.6" y="382.3248" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
-<rect x="122.6496" y="383.2848" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e0.n0"></rect>
-<text x="128.6496" y="391.4672" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m2.v0.e0.n0">2</text>
-<rect x="264.7504" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e1.n0"></rect>
-<text x="270.7504" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m2.v0.e1.n0">0</text>
-<rect x="391.6496" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e2.n0"></rect>
-<text x="397.6496" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m2.v0.e2.n0">2</text>
-<rect x="533.7504" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e3.n0"></rect>
-<text x="539.7504" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m2.v0.e3.n0">0</text>
+<rect x="146.6496" y="383.2848" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e0.n0"></rect>
+<text x="152.6496" y="391.4672" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m2.v0.e0.n0">2</text>
+<rect x="281.1504" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e1.n0"></rect>
+<text x="287.1504" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m2.v0.e1.n0">0</text>
+<rect x="415.6496" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e2.n0"></rect>
+<text x="421.6496" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m2.v0.e2.n0">2</text>
+<rect x="542.5504" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e3.n0"></rect>
+<text x="548.5504" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m2.v0.e3.n0">0</text>
 <line x1="617.2" y1="336.6096" x2="617.2" y2="428.0384" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="617.2" y1="336.6096" x2="1192.8" y2="336.6096" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="617.2" y1="354.896" x2="1192.8" y2="354.896" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
@@ -56,54 +56,54 @@
 <line x1="617.2" y1="391.4672" x2="1192.8" y2="391.4672" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="617.2" y1="409.7536" x2="1192.8" y2="409.7536" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="617.2" y1="428.0384" x2="1192.8" y2="428.0384" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<rect x="667.8496" y="383.2848" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e0.n0"></rect>
-<text x="673.8496" y="391.4672" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m3.v0.e0.n0">2</text>
-<rect x="809.9504" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e1.n0"></rect>
-<text x="815.9504" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m3.v0.e1.n0">0</text>
-<rect x="952.0496" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e2.n0"></rect>
-<text x="958.0496" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m3.v0.e2.n0">2</text>
-<rect x="1063.7504" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e3.n0"></rect>
-<text x="1069.7504" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m3.v0.e3.n0">0</text>
+<rect x="691.8496" y="383.2848" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e0.n0"></rect>
+<text x="697.8496" y="391.4672" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m3.v0.e0.n0">2</text>
+<rect x="833.9504" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e1.n0"></rect>
+<text x="839.9504" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m3.v0.e1.n0">0</text>
+<rect x="960.8496" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e2.n0"></rect>
+<text x="966.8496" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m3.v0.e2.n0">2</text>
+<rect x="1095.3504" y="364.9984" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e3.n0"></rect>
+<text x="1101.3504" y="373.1824" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m3.v0.e3.n0">0</text>
 <line x1="1180" y1="336.6096" x2="1180" y2="428.0384" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1184.8" y="336.6096" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="168.6496" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Sun</text>
-<text x="310.7504" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">did</text>
-<text x="452.8496" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">glide</text>
-<text x="610.1504" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">down</text>
-<text x="774.6496" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">on</text>
-<text x="886.3504" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">the</text>
-<text x="1013.2496" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">riv</text>
-<text x="1076.6992" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="1140.1504" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">er</text>
-<text x="128.6496" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">wa</text>
-<text x="199.7008" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="270.7504" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ter</text>
-<text x="397.6496" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">car</text>
-<text x="468.7008" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="539.7504" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ry</text>
-<text x="673.8496" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">me</text>
-<text x="815.9504" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">safe</text>
-<text x="887" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="958.0496" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ly</text>
-<text x="1069.7504" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">home</text>
-<text x="168.6496" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Moon</text>
-<text x="310.7504" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">will</text>
-<text x="452.8496" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">drift</text>
-<text x="610.1504" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">by</text>
-<text x="774.6496" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">un</text>
-<text x="830.4992" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="886.3504" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">der</text>
-<text x="1013.2496" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">wil</text>
-<text x="1076.6992" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="1140.1504" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">lows</text>
-<text x="128.6496" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">shad</text>
-<text x="199.7008" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="270.7504" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ows</text>
-<text x="397.6496" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">soft</text>
-<text x="468.7008" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="539.7504" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ly</text>
-<text x="673.8496" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">sing</text>
-<text x="815.9504" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">me</text>
-<text x="958.0496" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">to</text>
-<text x="1069.7504" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">sleep</text>
+<text x="192.6496" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Sun</text>
+<text x="334.7504" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">did</text>
+<text x="484.4496" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">glide</text>
+<text x="634.1504" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">down</text>
+<text x="783.4496" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">on</text>
+<text x="902.7504" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">the</text>
+<text x="1029.6496" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">riv</text>
+<text x="1096.8992" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="1164.1504" y="243.4288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">er</text>
+<text x="152.6496" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">wa</text>
+<text x="219.9008" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="287.1504" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ter</text>
+<text x="421.6496" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">car</text>
+<text x="485.1008" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="548.5504" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ry</text>
+<text x="697.8496" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">me</text>
+<text x="839.9504" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">safe</text>
+<text x="903.4" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="966.8496" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ly</text>
+<text x="1101.3504" y="500.0384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">home</text>
+<text x="192.6496" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Moon</text>
+<text x="334.7504" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">will</text>
+<text x="484.4496" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">drift</text>
+<text x="634.1504" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">by</text>
+<text x="783.4496" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">un</text>
+<text x="843.1008" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="902.7504" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">der</text>
+<text x="1029.6496" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">wil</text>
+<text x="1096.8992" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="1164.1504" y="278.6288" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">lows</text>
+<text x="152.6496" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">shad</text>
+<text x="219.9008" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="287.1504" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ows</text>
+<text x="421.6496" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">soft</text>
+<text x="485.1008" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="548.5504" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ly</text>
+<text x="697.8496" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">sing</text>
+<text x="839.9504" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">me</text>
+<text x="966.8496" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">to</text>
+<text x="1101.3504" y="535.2384" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">sleep</text>
 </svg>

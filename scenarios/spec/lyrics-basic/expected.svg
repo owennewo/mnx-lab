@@ -7,19 +7,19 @@
 <text x="49.6" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
 <text x="117.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="117.6" y="176" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<text x="184.16" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
-<line x1="184.16" y1="154.688" x2="184.16" y2="208" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="328.96" y="144" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
-<line x1="328.96" y1="146.688" x2="328.96" y2="200" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="473.76" y="136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
-<line x1="473.76" y1="138.688" x2="473.76" y2="192" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="648.96" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
-<line x1="648.96" y1="154.688" x2="648.96" y2="208" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<text x="200.56" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
+<line x1="200.56" y1="154.688" x2="200.56" y2="208" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<text x="345.36" y="144" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
+<line x1="345.36" y1="146.688" x2="345.36" y2="200" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<text x="505.36" y="136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
+<line x1="505.36" y1="138.688" x2="505.36" y2="192" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<text x="672.96" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
+<line x1="672.96" y1="154.688" x2="672.96" y2="208" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="762.4" y1="128" x2="762.4" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="767.2" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="193.6" y="264" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Are</text>
-<text x="338.4" y="264" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">you</text>
-<text x="483.2" y="264" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">sleep</text>
-<text x="570.8" y="264" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="658.4" y="264" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ing?</text>
+<text x="210" y="264" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Are</text>
+<text x="354.8" y="264" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">you</text>
+<text x="514.8" y="264" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">sleep</text>
+<text x="598.6" y="264" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="682.4" y="264" font-family="var(--font-family-sans)" font-size="27.2" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ing?</text>
 </svg>

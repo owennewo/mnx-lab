@@ -75,16 +75,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadHalf",
-        "x": 12.885,
+        "x": 13.91,
         "y": 11,
         "className": "notehead",
         "sourceId": "@m0.v0.e0.n0"
       },
       {
         "kind": "line",
-        "x1": 14.065,
+        "x1": 15.09,
         "y1": 7.5,
-        "x2": 14.065,
+        "x2": 15.09,
         "y2": 10.832,
         "thickness": 0.12,
         "className": "stem"
@@ -92,16 +92,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadHalf",
-        "x": 24.685,
+        "x": 25.71,
         "y": 11,
         "className": "notehead",
         "sourceId": "@m0.v0.e1.n0"
       },
       {
         "kind": "line",
-        "x1": 25.865,
+        "x1": 26.89,
         "y1": 7.5,
-        "x2": 25.865,
+        "x2": 26.89,
         "y2": 10.832,
         "thickness": 0.12,
         "className": "stem"
@@ -163,7 +163,7 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 39.006,
+        "x": 40.981,
         "y": 9.5,
         "className": "notehead",
         "sourceId": "@m1.v0.e0.n0"
@@ -189,7 +189,7 @@
       {
         "kind": "text",
         "text": "I",
-        "x": 13.475,
+        "x": 14.5,
         "y": 16.5,
         "font": "body",
         "size": 1.7,
@@ -199,7 +199,7 @@
       {
         "kind": "text",
         "text": "am",
-        "x": 25.275,
+        "x": 26.3,
         "y": 16.5,
         "font": "body",
         "size": 1.7,
@@ -209,7 +209,7 @@
       {
         "kind": "text",
         "text": "John!",
-        "x": 39.85,
+        "x": 41.825,
         "y": 16.5,
         "font": "body",
         "size": 1.7,
@@ -219,7 +219,7 @@
       {
         "kind": "text",
         "text": "Ik",
-        "x": 13.475,
+        "x": 14.5,
         "y": 18.7,
         "font": "body",
         "size": 1.7,
@@ -229,7 +229,7 @@
       {
         "kind": "text",
         "text": "ben",
-        "x": 25.275,
+        "x": 26.3,
         "y": 18.7,
         "font": "body",
         "size": 1.7,
@@ -239,7 +239,7 @@
       {
         "kind": "text",
         "text": "Jan!",
-        "x": 39.85,
+        "x": 41.825,
         "y": 18.7,
         "font": "body",
         "size": 1.7,
@@ -249,7 +249,7 @@
       {
         "kind": "text",
         "text": "Я",
-        "x": 13.475,
+        "x": 14.5,
         "y": 20.9,
         "font": "body",
         "size": 1.7,
@@ -259,7 +259,7 @@
       {
         "kind": "text",
         "text": "І",
-        "x": 25.275,
+        "x": 26.3,
         "y": 20.9,
         "font": "body",
         "size": 1.7,
@@ -269,7 +269,7 @@
       {
         "kind": "text",
         "text": "-",
-        "x": 32.5625,
+        "x": 34.0625,
         "y": 20.9,
         "font": "body",
         "size": 1.7,
@@ -279,7 +279,7 @@
       {
         "kind": "text",
         "text": "ван!",
-        "x": 39.85,
+        "x": 41.825,
         "y": 20.9,
         "font": "body",
         "size": 1.7,
@@ -289,7 +289,7 @@
       {
         "kind": "text",
         "text": "¡Yo",
-        "x": 13.475,
+        "x": 14.5,
         "y": 23.1,
         "font": "body",
         "size": 1.7,
@@ -299,7 +299,7 @@
       {
         "kind": "text",
         "text": "soy",
-        "x": 25.275,
+        "x": 26.3,
         "y": 23.1,
         "font": "body",
         "size": 1.7,
@@ -309,7 +309,7 @@
       {
         "kind": "text",
         "text": "Juan!",
-        "x": 39.85,
+        "x": 41.825,
         "y": 23.1,
         "font": "body",
         "size": 1.7,
