@@ -44,11 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-clef.md](proposed/workbench-one-surface-clef.md)** — one-surface
-  campaign item 3, **built 2026-08-31**: the clef popover retired; the partMeasure rung's
-  per-staff pills and typed `clef` word cover the grammar (`inherit` and the octave forms
-  now asserted). First rung casualty — the tile's `measure` cross-listing dies, and the
-  cursor-staff wart on multi-staff parts is logged as ops residue, popover parity held.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -242,6 +237,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-one-surface-clef.md](complete/workbench-one-surface-clef.md)** — one-surface
+  campaign item 3, **built 2026-08-31**: the clef popover retired; the partMeasure rung's
+  per-staff pills and typed `clef` word cover the grammar (`inherit` and the octave forms
+  now asserted). First rung casualty — the tile's `measure` cross-listing dies, and the
+  cursor-staff wart on multi-staff parts is logged as ops residue, popover parity held.
 - **[workbench-one-surface-time.md](complete/workbench-one-surface-time.md)** — one-surface
   campaign item 2, **built 2026-08-31**: the time-signature popover retired; coverage
   pre-existed (the `time` pill's floor semantics plus the typed branch's full grammar,
