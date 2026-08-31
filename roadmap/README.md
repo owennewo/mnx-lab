@@ -44,12 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-rhythm.md](proposed/workbench-one-surface-rhythm.md)** —
-  one-surface campaign item 8, **built 2026-08-31**: the rhythm popover retired on the
-  campaign's first new verb — `setContainerProperties` (presentation fields only,
-  address-free, resolved from the coincidence), closing the residue ledger's
-  `container-properties` row; construction landed as typed declarations at the honest
-  rungs, plus two derived readings: `at` on events, `fill` on voice-bars.
 - **[workbench-one-surface-lyrics.md](proposed/workbench-one-surface-lyrics.md)** —
   one-surface campaign item 6, **proposed 2026-08-31, design open**: the lyric popover's
   retirement plan — the line-metadata gap is the minimum bar, and two investigations are
@@ -250,6 +244,12 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-one-surface-rhythm.md](complete/workbench-one-surface-rhythm.md)** —
+  one-surface campaign item 8, **built 2026-08-31**: the rhythm popover retired on the
+  campaign's first new verb — `setContainerProperties` (presentation fields only,
+  address-free, resolved from the coincidence), closing the residue ledger's
+  `container-properties` row; construction landed as typed declarations at the honest
+  rungs, plus two derived readings: `at` on events, `fill` on voice-bars.
 - **[workbench-one-surface-tuning.md](complete/workbench-one-surface-tuning.md)** —
   one-surface campaign item 7, **built 2026-08-31**: the tuning popover retired after the
   write path was built — a `tuning` word (presets or pitch lists) offered on any part, the
