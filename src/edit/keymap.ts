@@ -205,7 +205,6 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
 export type ShellAction =
   | 'tuningPopover'
   | 'partPopover'
-  | 'barAttributePopover'
   | 'adornmentPopover'
   | 'lyricPopover'
   | 'rhythmPopover'
@@ -240,9 +239,6 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // Part genesis (element-ops exemplar): construct traces start from {},
   // so "add part" needs a keyboard surface — setup tier like its siblings.
   { code: 'KeyP', shift: true, action: 'partPopover' },
-  // The bar-attribute family (campaign item 7): ten kinds behind one
-  // popover, because they are all keys on the global measure.
-  { code: 'KeyB', shift: true, action: 'barAttributePopover' },
   // Event adornments (campaign item 8): one popover for markings,
   // dynamics and directions — single-letter accelerators are a later
   // pass, since keys are the unstable layer and the ops are not.

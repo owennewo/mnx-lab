@@ -44,6 +44,11 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[workbench-one-surface-bar.md](proposed/workbench-one-surface-bar.md)** — one-surface
+  campaign item 4, **built 2026-08-31**: the bar-attribute popover retired — the largest
+  census of the easy five (every measure-attribute kind plus the two rhythm riders), six
+  popover-tier tiles deleted, and the seam repaired: the measure rung's rider refusal now
+  signposts the voice rung instead of the deleted Shift+B.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -173,7 +178,7 @@ back up to `proposed/` the moment it is.
   selection tray onto the rung inspector, one surface per item, ordered simplest to
   hardest. Every retirement is gated on demonstrated coverage: census before coverage,
   coverage before removal, ops before surfaces. Items 1–5 (key ✅, time ✅, clef ✅, bar
-  attributes, adornments) are census-and-sweep; 6–7 (lyrics, tuning) each close one
+  attributes ✅, adornments) are census-and-sweep; 6–7 (lyrics, tuning) each close one
   bounded gap; 8–10 (rhythm, part, layout) need new ops or a construct story; 11 (the
   tray) retires a charter, re-homes the verbs, and goes last. Standing ruling from item
   1: freed keys are freed, not accelerators.

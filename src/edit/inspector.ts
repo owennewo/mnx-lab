@@ -393,7 +393,7 @@ function parseBarLine(word: string | null, text: string): InspectorParse {
   const parsed = parseBarAttribute(line);
   if (!parsed) return { error: `not a bar attribute — ${BAR_WORDS.map(w => w.word).join(' · ')}` };
   if ('set' in parsed) return { intent: { type: 'setMeasureAttribute', attribute: parsed.set } };
-  if ('rhythm' in parsed) return { error: 'rhythm declarations stay with Shift+B for now' };
+  if ('rhythm' in parsed) return { error: 'a voice-bar thing — tighten to the voice rung: full-measure rest · measure repeat 2' };
   return { intent: { type: 'removeMeasureAttribute', kind: parsed.remove } };
 }
 

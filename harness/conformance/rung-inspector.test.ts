@@ -216,7 +216,8 @@ describe('the typeahead is derived from the union', () => {
   it('says why a line was refused rather than doing nothing', () => {
     expect(parseInspectorLine('measure', null, 'banana')).toMatchObject({ error: expect.stringContaining('not a bar attribute') });
     expect(parseInspectorLine('measure', 'time', 'x')).toMatchObject({ error: expect.stringContaining('time signature') });
-    expect(parseInspectorLine('measure', null, 'full-measure rest')).toMatchObject({ error: expect.stringContaining('Shift+B') });
+    // The refusal is a signpost now, not a popover pointer (item 4 retired Shift+B).
+    expect(parseInspectorLine('measure', null, 'full-measure rest')).toMatchObject({ error: expect.stringContaining('voice rung') });
   });
 });
 

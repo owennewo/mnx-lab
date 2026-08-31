@@ -487,14 +487,6 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
-    keys: 'Shift+B',
-    strokes: [{ code: 'KeyB', shift: true }],
-    group: 'setup',
-    meaning: {
-      all: 'bar attribute… (typed popover: barline/repeat/ending/segno/fine/jump/tempo/rehearsal/section; `no X` strips)'
-    }
-  },
-  {
     keys: 'Shift+S',
     strokes: [{ code: 'KeyS', shift: true }],
     group: 'setup',
@@ -652,16 +644,6 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // one wrap verb, silence is inserted, and rest spelling is a verb rather
   // than a padding policy.
   rhythmPopover: ['wrapInContainer', 'insertSpace', 'setRestSpelling'],
-  barAttributePopover: [
-    'setMeasureAttribute',
-    'removeMeasureAttribute',
-    // The popover is a SURFACE, not a data-owner: it writes part-measure
-    // rhythm declarations beside the global-measure keys (item 11).
-    'setFullMeasureRest',
-    'removeFullMeasureRest',
-    'setMeasureRepeat',
-    'removeMeasureRepeat'
-  ],
   // The selection tray (core-selection-tray-mechanism.md) fires the registry's
   // commands through the same funnel as keys, so most of what it offers is
   // already reachable — bound to a key or owned by a popover grammar above.

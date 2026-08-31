@@ -387,7 +387,6 @@ function barAttribute(
     scopes: ['measure'],
     glyph: { smufl },
     label,
-    shortcut: 'Shift+B',
     tier: 'popover',
     isActive: view => memberState(view.memberBarAttributes, kind),
     action: view => ({
@@ -411,7 +410,6 @@ function barlineStyle(
     scopes: ['measure'],
     glyph: { smufl },
     label,
-    shortcut: 'Shift+B',
     tier: 'popover',
     isActive: view => memberState(view.memberBarlineTypes, type),
     action: view => ({
@@ -734,15 +732,6 @@ export const COMMANDS: readonly EditorCommand[] = [
 
   // ── voice-measure ───────────────────────────────────────────────────────
   {
-    id: 'full-measure-rest',
-    scopes: ['voiceMeasure'],
-    glyph: { smufl: 'restWhole' },
-    label: 'Full-measure rest',
-    shortcut: 'Shift+B',
-    tier: 'popover',
-    action: () => ({ surface: 'barAttributePopover' })
-  },
-  {
     id: 'rest-spelling',
     scopes: ['voiceMeasure'],
     glyph: { smufl: 'restHalf' },
@@ -875,45 +864,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     attribute: { kind: 'jump', type: 'dsalfine' }
   })),
   {
-    id: 'ending',
-    scopes: ['measure'],
-    glyph: { smufl: 'repeat2Bars' },
-    label: 'Volta ending…',
-    shortcut: 'Shift+B',
-    tier: 'popover',
-    isActive: view => view.barAttributes.includes('ending'),
-    action: () => ({ surface: 'barAttributePopover' })
-  },
-  {
-    id: 'rehearsal',
-    scopes: ['measure'],
-    glyph: { smufl: 'repeat1Bar' },
-    label: 'Rehearsal mark…',
-    shortcut: 'Shift+B',
-    tier: 'popover',
-    isActive: view => view.barAttributes.includes('rehearsal'),
-    action: () => ({ surface: 'barAttributePopover' })
-  },
-  {
-    id: 'tempo',
-    scopes: ['measure'],
-    glyph: { smufl: 'metNoteQuarterUp' },
-    label: 'Tempo…',
-    shortcut: 'Shift+B',
-    tier: 'popover',
-    isActive: view => view.barAttributes.includes('tempo'),
-    action: () => ({ surface: 'barAttributePopover' })
-  },
-  {
-    id: 'measure-repeat',
-    scopes: ['measure'],
-    glyph: { smufl: 'repeat1Bar' },
-    label: 'Measure repeat…',
-    shortcut: 'Shift+B',
-    tier: 'popover',
-    action: () => ({ surface: 'barAttributePopover' })
-  },
-  {
     id: 'delete-bar',
     scopes: ['measure'],
     glyph: { mark: { smufl: 'barlineSingle' }, op: { sign: 'minus', at: 'before' } },
@@ -925,16 +875,6 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
 
   // ── section ─────────────────────────────────────────────────────────────
-  {
-    id: 'section',
-    scopes: ['measure'],
-    glyph: { smufl: 'segno' },
-    label: 'Section label…',
-    shortcut: 'Shift+B',
-    tier: 'popover',
-    isActive: view => view.barAttributes.includes('section'),
-    action: () => ({ surface: 'barAttributePopover' })
-  },
   {
     id: 'section-colour',
     scopes: ['measure'],
@@ -1258,7 +1198,7 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     {
       id: 'rests',
       caption: 'rests & spacing',
-      commands: ['full-measure-rest', 'rest-spelling', 'space']
+      commands: ['rest-spelling', 'space']
     },
     { id: 'voices', caption: 'voices', commands: ['cycle-voice'] }
   ],
@@ -1283,20 +1223,13 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     {
       id: 'repeats',
       caption: 'repeats & barlines',
-      commands: [
-        'repeat-start',
-        'repeat-end',
-        'ending',
-        'double-barline',
-        'final-barline',
-        'measure-repeat'
-      ]
+      commands: ['repeat-start', 'repeat-end', 'double-barline', 'final-barline']
     },
     { id: 'jumps', caption: 'jumps', commands: ['segno', 'coda'] },
     {
       id: 'marks',
       caption: 'marks',
-      commands: ['rehearsal', 'tempo', 'section', 'section-colour', 'delete-section-boundary']
+      commands: ['section-colour', 'delete-section-boundary']
     }
   ],
   document: [

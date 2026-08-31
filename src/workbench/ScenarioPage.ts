@@ -62,10 +62,8 @@ import {
   LYRIC_HELP,
   parseLyric,
   parsePartDeclaration,
-  BAR_ATTRIBUTE_HELP,
   RHYTHM_HELP,
   parseAdornment,
-  parseBarAttribute,
   parseRhythm,
   parsePart,
   parseLayoutSentence,
@@ -126,7 +124,7 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
 type PopoverKind =
-  | 'tuning' | 'part' | 'bar' | 'adornment' | 'lyric' | 'rhythm'
+  | 'tuning' | 'part' | 'adornment' | 'lyric' | 'rhythm'
   | 'layout';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
@@ -160,17 +158,11 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
     placeholder: '3:2 · 3 eighth in 1 quarter, no number · grace · tremolo 2 · rest half · space 1/4',
     hint: 'wraps from the cursor — the declaration says how much music it takes · Enter applies · Esc closes'
   },
-  bar: {
-    label: 'bar attribute',
-    placeholder: 'barline double · repeat end · ending 1,2 · tempo 120 · full-measure rest',
-    hint: 'this bar only · “no <attribute>” strips it · Enter applies · Esc closes'
-  }
 };
 
 const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   tuningPopover: 'tuning',
   partPopover: 'part',
-  barAttributePopover: 'bar',
   adornmentPopover: 'adornment',
   lyricPopover: 'lyric',
   rhythmPopover: 'rhythm',
@@ -194,7 +186,6 @@ export const SETUP_POPOVER_COMMANDS: {
   needsTab?: boolean;
 }[] = [
   { label: 'setup: add part…', action: 'partPopover', stroke: 'Shift+P' },
-  { label: 'setup: bar attribute…', action: 'barAttributePopover', stroke: 'Shift+B' },
   { label: 'setup: adornment…', action: 'adornmentPopover', stroke: 'Shift+A' },
   { label: 'setup: lyric…', action: 'lyricPopover', stroke: 'Shift+L' },
   { label: 'setup: rhythm…', action: 'rhythmPopover', stroke: 'Shift+R' },
@@ -3189,36 +3180,6 @@ export class ScenarioPage extends LitElement {
             ? { type: 'setPositioned', attribute: parsed.positioned }
             : { type: 'removePositioned', kind: parsed.removePositioned }
       );
-    } else if (this.setupPopover === 'bar') {
-      const parsed = parseBarAttribute(input.value);
-      if (!parsed) {
-        this.setupPopoverError = `not a bar attribute — ${BAR_ATTRIBUTE_HELP}`;
-        return;
-      }
-      if ('rhythm' in parsed) {
-        this.stripIntent(
-          parsed.rhythm === 'fullMeasureRest'
-            ? parsed.remove
-              ? { type: 'removeFullMeasureRest' }
-              : {
-                  type: 'setFullMeasureRest',
-                  ...(parsed.visualDuration ? { visualDuration: parsed.visualDuration } : {})
-                }
-            : parsed.remove
-              ? { type: 'removeMeasureRepeat' }
-              : {
-                type: 'setMeasureRepeat',
-                number: parsed.number ?? 1,
-                ...(parsed.counter ? { counter: parsed.counter } : {})
-              }
-        );
-      } else {
-        this.stripIntent(
-          'set' in parsed
-            ? { type: 'setMeasureAttribute', attribute: parsed.set }
-            : { type: 'removeMeasureAttribute', kind: parsed.remove }
-        );
-      }
     } else if (this.setupPopover === 'rhythm') {
       const parsed = parseRhythm(input.value);
       if (!parsed) {

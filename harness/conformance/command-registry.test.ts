@@ -255,9 +255,7 @@ describe('command registry — the joins', () => {
     const KNOWN_TWINS = new Set([
       'note: articTenutoAbove — tenuto, hammer-pull',
       'event: tuplet3 — tuplet, container-settings',
-      'measure: segno — segno, section',
       'measure: coda — coda, section-colour',
-      'measure: repeat1Bar — rehearsal, measure-repeat',
       'document: brace — add-part, staves',
       'session: brace — doc-add-part, staff-kind-both',
       'session: 6stringTabClef — doc-tuning, staff-kind-tab'
