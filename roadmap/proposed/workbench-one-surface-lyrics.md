@@ -1,11 +1,12 @@
 # Retire the lyric popover — one-surface campaign item 6
 
-> **Status: proposed 2026-08-31 — design open, no sweep yet.** Campaign:
+> **Status: proposed 2026-08-31 — design settled 2026-08-31, build not started.**
+> Campaign:
 > [workbench-campaign-one-surface.md](../inprogress/workbench-campaign-one-surface.md),
-> item 6 — the first item that is not a sweep. Two design investigations are
-> deliberately unresolved here; the doc is written so a fresh conversation can
-> pick them up without re-deriving the ground. **The popover stays until the
-> design lands and coverage is demonstrated** (contract §1 unchanged).
+> item 6. The first draft of this doc left two investigations open; a design
+> conversation (2026-08-31) settled both, and this rewrite records the
+> decisions. **The popover stays until phase 1 lands and coverage is
+> demonstrated** (contract §1 unchanged).
 
 ## The census (contract §1)
 
@@ -25,89 +26,146 @@
   add/amend through the same parser, hyphen round-trip. **Gap: the `line …`
   and `no line …` arms are refused** — line metadata has no pill and no word.
 
-## The minimum to retire (independent of the investigations)
+## The ground: where lyrics live in the spec
 
-A `lines` surface for verse metadata. The natural shape, if nothing better
-comes out of investigation A: the *document* rung (where `lineOrder` and the
-labels actually live) grows `line` pills — `line 2: Nederlands (nl)`,
-removable, with the typed `line …` arm routed there. That alone closes the
-census. Everything below is about doing better than the minimum.
+`event.lyrics.lines` is a map of line id → `{text, type}` (`type` ∈
+`start|middle|end|whole` — the syllable role); `global.lyrics` holds the verse
+metadata — `lineOrder` (stacking) and `lineMetadata` (id → `{label, lang}`).
+Line ids are arbitrary strings; nothing in the schema ties a line to a repeat
+pass. Two consequences the design leans on: the `line` concept really is
+document-level (the minimum bar below goes to the document rung), and **MNX
+cannot encode a melisma extender** — `event-lyric-line` is `{text, type}`
+only (MusicXML has `<extend>`; MNX has nothing), so a held syllable is
+representable only as following events *with no lyric entry*, and the
+extender line must be derived by the renderer. Noted for the spec loop; not
+pursued now.
 
-## Investigation A — lyric lines × bar repeats
+## Decision A — the pass model: derived, shared, no new data
 
-The reason verse lines exist at all is repetition: line 1 is sung on the first
-pass, line 2 on the second. Today the two systems don't know about each other:
+Verse lines exist because of repetition, and the connection is **derivable**:
+pass count per measure is a pure function of the global measure attributes
+(`repeatStart`/`repeatEnd` with `times` defaulting to 2, `ending` with
+`numbers`/`open`, `jump` `dsalfine|segno`, `fine`, `segno`). The ruling:
 
-- Repeats (`repeatStart`/`repeatEnd`, voltas via `ending`) are bar attributes;
-  lines are event-keyed text stacked by `lineOrder`. Nothing connects a line
-  to a pass.
-- Engraving convention *implies* the connection (stacked verses under a
-  repeated strain; volta bars often carry only the later verse's text).
-- Questions for the design pass:
-  1. Should the workbench *say* which pass a line belongs to — line labels
-     defaulting to pass numbers inside a repeated span, a HUD/inspector
-     reading, or nothing?
-  2. Do voltas gate lines? A bar under ending 2 carrying `line 1` text is
-     arguably a smell the diagnostics lane (blue, not red) could name.
-  3. Is any of this *data* (a `line ↔ pass` declaration — which would be an
-     `_x.mnxLab` draft and a spec-loop conversation) or purely *presentation*
-     (derived at render/inspect time from repeat structure)? The repo's prior
-     (derived positions, no-instrument-assumed) leans derived.
-- Grounding: `src/engine/layout/notation.ts` (lyric stacking, `:1826`;
-  repeats), `spacing.ts:786` (lyric width pricing), the repeat/volta
-  scenarios under `scenarios/`, and playback's repeat handling in `audio/` if
-  pass-awareness is to be more than ink.
+- **No `line ↔ pass` data declaration** — no `_x.mnxLab` block, no spec
+  conversation. The repo's prior (derived positions, no instrument assumed)
+  holds here too.
+- The pass-linearization walk becomes **one shared pure function in the model
+  layer** — not private to `audio/` — because three consumers must agree at
+  the edges (D.S. returns not taking repeats, open endings): the future
+  player (per-bar play index, and a "show only the current pass's line"
+  option), lyric entry (the cursor gains a pass index; a typed syllable
+  routes to the pass's line), and diagnostics.
+- **pass → line resolves by ordinal within a language group of `lineOrder`**
+  (group by `lineMetadata.lang`; absent lang = the primary group), never by
+  id. Translations are the confound that forces this: an English and a Dutch
+  line are sung on the *same* pass, so a flat ordinal breaks on bilingual
+  documents. Lab authoring mints numeric ids (`"1"`, `"2"`, …) matching pass
+  order as a readability convention, but resolution never depends on it —
+  foreign documents work unmodified.
+- The diagnostic is a **bound, not an equality**, and it is blue: fewer lines
+  than passes is a chorus (normal); more *same-language* lines than a bar's
+  pass count is the smell worth naming. Volta bars get this per measure
+  (a bar under `ending [2]` carrying pass-1 text is detectable).
 
-## Investigation B — WYTIWYG lyric entry
+## Decision B — the lyric text surface (paste-and-tweak)
 
-The wish: typing lyrics should feel like writing under the staff — type a
-word, it lands under the note; `-` or space advances to the next note
-(the Finale/MuseScore convention), instead of one popover/pill round-trip per
-syllable.
+The WYTIWYG per-note lane the first draft investigated is **not built**.
+Lyrics usually already exist as text; the winning surface is a modal text
+editor — paste, tweak, apply — which covers what the lane promised at a
+fraction of the cost (one overlay owning the keyboard via the existing
+`PENDING_PRECEDENCE` machinery, not per-note cells with focus management).
+Item 12's popover-not-a-mode ruling is reopened only this far: one modal
+overlay, entered and left deliberately.
 
-What the design must reckon with, honestly:
+**Mechanics.** The canonical direction is document → text: a serializer
+projects the stored lyrics into the format deterministically, so regenerating
+is always safe and the format is a projection, never a second store. The
+buffer is workbench state — the document is never invalid, because it only
+changes on apply. A live parse produces a ghost preview under the score and
+bar-anchored diagnostics ("bar 6: 5 syllables, 4 events"); **apply diffs the
+parse against the document and emits ordinary `setSyllable`/`removeSyllable`/
+`setLyricLine` ops through the one funnel** (traces record syllables, not
+keystrokes; undo and the edit loop stay honest), and is refused while errors
+stand — bar checks make fixes local and fast.
 
-- **The standing decision it reopens**: campaign item 12 ruled "text entry as
-  a popover, not a mode — a syllable is one short string attached to one
-  note" (`keymap.ts`'s old comment; the popover carried it). A WYTIWYG lane IS
-  a mode: while it holds the keyboard, letters stop being commands (`S` must
-  type an S, not arm a slur).
-- **The precedents that make it plausible anyway**: the digit layer already
-  owns bare keys transiently (`pendingFret`); an open inspector pill already
-  owns the whole keyboard DOM-side (`PENDING_PRECEDENCE`'s `overlay`
-  consumer); Escape/Enter arbitration is built. A "lyric lane" could be an
-  overlay of per-note text cells over the score — Enter opens it at the
-  cursor's note, typing fills the cell, space/hyphen commits `setSyllable`
-  and moves right, Escape leaves. Each commit is an ordinary op through the
-  one funnel, so traces stay honest (the recorded intents are the syllables,
-  not the keystrokes).
-- **Open questions**: which line the lane edits (the active `lyric N` pill?);
-  melisma/extender handling (a syllable held over notes — skip with →?);
-  whether the lane generalizes (fingering and harmonies are also per-note
-  text — is this a lyric feature or a *text lane* feature?); and whether it
-  lives in `elements/` (embeddable) or stays workbench chrome.
+**The format** (locked 2026-08-31; kin to LilyPond lyric mode, and every
+token mirrors what engravers draw):
 
-## The Shift+L question (contract §5)
+| Token | Meaning |
+|---|---|
+| syllables | separated by runs of whitespace — one boundary; **whitespace is never otherwise semantic** (invisible syntax dies in transit through editors and chat) |
+| `-` | word split; a run of *n* hyphens = split + (*n*−1) held events for the preceding syllable (`fant--as-tic`) — the engraved repeated hyphen |
+| `_` | one event each. Suffix run = word-final melisma (`day__ next` — the engraved extender); standalone run = untexted events (`____` = 4 skips); leading standalone reaches a mid-bar start. LilyPond's spaced `_ _` is accepted and normalized on serialize. Today both spellings compile identically (the spec gap above); if an extender marker is ever added they gain distinct meanings with zero grammar change — the reason there is no separate skip character |
+| `~` | elision, two words on one event (`you~are`) — LilyPond's character |
+| `\|` / `6\|` | bar check / numbered bar check: asserts position, resyncs on mismatch (errors stay local), and a jumped-to number auto-skips the untexted bars between — long skip runs are never needed; `_` is bounded by events-per-bar |
+| `nl 2:` | line header, optional, order-free tokens before a colon — an integer (pass) and/or a 2–3 letter language code, shape-distinguished (the `parseLyric` trick). Each text line is the next pass within its language group; a header overrides. `\` escapes a first syllable that would parse as a header |
 
-Items 1–5 freed their keys. Lyrics was flagged from the start as the possible
-exception: if investigation B lands, `Shift+L` (or bare typing in some state)
-may deserve to *open the lane* — an accelerator into the WYTIWYG surface
-rather than a resurrected popover. Decide with the design, not before.
+Rests, tie continuations and grace notes skip automatically — most pasted
+text needs no special tokens at all, which is the test of the format. Held in
+reserve, unbuilt: a count suffix (`_4`), and a voice-selection header token
+(convention: voice 1 carries lyrics).
 
-## Exit criteria
+**Cross-highlight.** The text surface is a third projection of the event
+keys: the parse maps every syllable token to its event, so selection
+highlights bidirectionally — caret in a syllable lights the note, selecting
+an event lights its **column** of syllables (one per text line, stacked in
+`lineOrder` order, exactly as engraved). Same lockstep pattern as
+`model/noteKeys.ts` ↔ `model/jsonView.ts`; keep all three on one traversal.
 
-1. Line metadata editable somewhere the census can point at (minimum bar).
-2. A decision recorded on A (even "derived-only, diagnostics later") and B
-   (build the lane / don't, with reasons).
-3. Then, and only then, the standard sweep: popover, tile, binding, docs —
-   with `parseLyric` surviving wherever the winning surface consumes it.
+## Decision C — both surfaces, divided
+
+Inspector = *see and point-tweak*; text editor = *entry and restructuring*;
+both compile to the same ops, so neither is a second source of truth.
+
+- **Minimum bar (unchanged from the first draft, still phase 1):** the
+  document rung grows `line` pills — `line 2: Nederlands (nl)`, removable —
+  and the typed `line …` / `no line …` arms route there. That alone closes
+  the census.
+- **Inspector collapse:** 1–2 lines (the overwhelming majority of events)
+  show syllable pills exactly as today. Beyond that, show the *active* line's
+  syllable (the cursor's pass) plus one summary pill — `lyrics · 6 lines /
+  2 langs` — whose activation opens the text editor focused at the event,
+  where the "all 12 things" are one coherent column. The typed grammar
+  routes regardless of what is displayed, so collapsing costs no census
+  coverage.
+- The editor is workbench chrome first; nothing in the format prevents a
+  later promotion to `elements/` if embedders want it.
+
+## The Shift+L question (contract §5) — answered
+
+The exception the campaign flagged is confirmed, in the text surface's
+favor: when the editor exists, **`Shift+L` opens the lyric text editor at the
+cursor's event** — an accelerator into a surface, not a resurrected popover.
+Until phase 2 lands the key is simply freed at the sweep, like items 1–5;
+the campaign log records the earmark.
+
+## Phases + exit criteria
+
+1. **Minimum bar:** document-rung `line` pills + typed routing; census reads
+   covered; then the standard sweep (popover, tile, binding, docs — with
+   `parseLyric` surviving as the inspector's shared arm). **The popover
+   retires here.**
+2. **Text surface:** serializer + parser + overlay editor + apply-as-ops +
+   cross-highlight; `Shift+L` reassigned to it.
+3. **Pass model:** the shared walk in `model/`, pass-aware line resolution,
+   default labels, the blue bound diagnostic. The player itself is *not*
+   this item — the walk is built to be its foundation.
+
+Phases 2–3 may land as follow-on efforts under this doc; the campaign item
+itself closes with phase 1's sweep, and the design above is recorded so the
+later phases start without re-deriving it.
 
 ## Relations
 
 - [core-element-ops-lyrics.md](../complete/core-element-ops-lyrics.md) — campaign
-  item 12: the ops and the popover-not-a-mode ruling this item may partially
-  reopen.
+  item 12: the ops, and the popover-not-a-mode ruling that decision B reopens
+  narrowly (one modal overlay) rather than wholesale.
 - [workbench-rung-inspector.md](../inprogress/workbench-rung-inspector.md) —
-  the pill/word machinery the minimum bar extends.
+  the pill/word machinery phase 1 extends; the collapse rule lives by its
+  charter.
 - [core-selection-range-grain.md](../inprogress/core-selection-range-grain.md)
-  — rung discipline; where document-level line pills would sit.
+  — rung discipline; where the document-level line pills sit.
+- The extender gap is a candidate spec-loop topic (an `_x.mnxLab` extender
+  draft would slot into the format without grammar changes) — deliberately
+  not filed; derivation is expected to suffice.
