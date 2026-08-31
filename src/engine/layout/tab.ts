@@ -15,6 +15,7 @@ import {
   LYRIC_FIRST_BASELINE_DROP_SP,
   LYRIC_LINE_SPACING_SP,
   emitLyricRuns,
+  lyricBlockSpFor,
   orderedLyricLineIds,
   type LyricSyllable
 } from './lyricRuns.ts';
@@ -132,8 +133,16 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   // plan gave (spacing.ts reads the same flag).
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
 
+  // The row height this DOCUMENT needs: the frame constant, plus the verse
+  // block when lyrics exist — the reservation is explicit, exactly as the
+  // notation layout's `lyricExtraSp`, because the fit passes attribute ink
+  // to rows by the frame's own bands and cannot grow a row for content that
+  // already trespasses into the next one. Assigned once lyricLineIds is
+  // known below; every per-row coordinate reads it.
+  let rowHeightSp = ROW_HEIGHT_SP;
+
   const rowBand = (row: number): RowBandSp => {
-    const staffTop = MARGIN_SP + row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP;
+    const staffTop = MARGIN_SP + row * rowHeightSp + ROW_PAD_TOP_SP;
     return { staffTop, staffBottom: staffTop + STAFF_HEIGHT_SP };
   };
 
@@ -194,8 +203,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   // view draws them itself — it has no notation staff to carry them, the same
   // reasoning as showTupletBrackets — and the shared plan already priced
   // syllable widths into these columns, so nothing moves horizontally. Drawn
-  // even with no fingerboard: words are not frets. `tightenRows` grows any
-  // row the verse block overruns.
+  // even with no fingerboard: words are not frets.
   const lyricLineIds = (() => {
     if ((opts.hide ?? []).includes('lyrics')) return [] as string[];
     const used = new Set<string>();
@@ -212,6 +220,10 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     return orderedLyricLineIds(mnx, used);
   })();
   const lyricRuns = new Map<string, LyricSyllable[]>();
+  // The verse block eats the bottom pad first and claims the rest as extra
+  // row height, so the system below starts clear of the words.
+  const lyricBlockSp = lyricBlockSpFor(lyricLineIds.length);
+  rowHeightSp += Math.max(0, lyricBlockSp - ROW_PAD_BOTTOM_SP);
 
   // Playing technique is drawn AFTER the measure walk: a hammer-on names its
   // destination by note id, and that note may be measures away — so the marks
@@ -229,14 +241,14 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       rowStart[m.row] = primitives.length;
       // This row's voltas first, so the labels placed below scan them as ink
       // and stack above (core-measure-attributes-gaps.md, item 5).
-      emitEndings(mnx, plan, row => MARGIN_SP + row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP, primitives, m.row);
+      emitEndings(mnx, plan, row => MARGIN_SP + row * rowHeightSp + ROW_PAD_TOP_SP, primitives, m.row);
     }
     const edges = rowEdges.get(m.row);
     rowEdges.set(m.row, {
       left: Math.min(edges?.left ?? Infinity, m.contentStartX),
       right: Math.max(edges?.right ?? -Infinity, m.x + m.width)
     });
-    const staffTop = MARGIN_SP + m.row * ROW_HEIGHT_SP + ROW_PAD_TOP_SP;
+    const staffTop = MARGIN_SP + m.row * rowHeightSp + ROW_PAD_TOP_SP;
     const staffBottom = staffTop + STAFF_HEIGHT_SP;
 
     emitTabStaffLines(m.x, m.width, staffTop, primitives);
@@ -457,7 +469,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     });
   }
 
-  const baseHeightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * ROW_HEIGHT_SP;
+  const baseHeightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * rowHeightSp;
   const baseRows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r) => rowBand(r));
 
   // ROW_PAD_TOP_SP is sized for a capo line, and the score-wide labels stack
@@ -469,7 +481,10 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   const rows = fitted?.rows ?? baseRows;
 
   const tightened = tightenRows({
-    primitives, rows, heightSp, padDensity: clampPadDensity(opts.densityPad)
+    primitives, rows, heightSp, padDensity: clampPadDensity(opts.densityPad),
+    // The verse block belongs to the row it hangs from — without this the
+    // midpoint attribution files a deep verse row with the system below.
+    reservedBelowSp: lyricBlockSp
   });
 
   return {

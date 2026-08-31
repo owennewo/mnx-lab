@@ -9,7 +9,9 @@ import {
   LYRIC_FIRST_BASELINE_DROP_SP,
   LYRIC_LINE_SPACING_SP,
   TAB_LYRIC_CLEARANCE_SP,
+  documentLyricLineCount,
   emitLyricRuns,
+  lyricBlockSpFor,
   orderedLyricLineIds,
   type LyricSyllable
 } from './lyricRuns.ts';
@@ -921,7 +923,12 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   // pass returns null and nothing moves — which is what keeps the goldens
   // byte-identical by construction rather than by arithmetic.
   const tightened = tightenRows({
-    primitives, rows, heightSp: cursorY, padDensity: clampPadDensity(opts.densityPad)
+    primitives, rows, heightSp: cursorY, padDensity: clampPadDensity(opts.densityPad),
+    // Verse blocks hang deep below their staff; without the reservation the
+    // midpoint attribution files them with the system below (lyricRuns.ts).
+    reservedBelowSp: (opts.hide ?? []).includes('lyrics')
+      ? 0
+      : lyricBlockSpFor(documentLyricLineCount(mnx))
   });
 
   return {

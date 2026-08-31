@@ -1,7 +1,7 @@
 {
-  "title": "Two verses under a tab part — every view carries the words",
-  "description": "Four quarter notes on a six-string guitar part (staffKind both) with two verse lines: verse one is whole words, verse two splits \"Rising\" and \"water\" across note pairs so hyphens are derived on every staff kind. Pins the standalone tab view drawing verse rows below the strings (the shared plan already priced the syllable widths, so the digits' columns do not move), the notation view drawing them as it always has, and the both view carrying them once, between the staves.",
-  "bars": 1,
+  "title": "Two verses under a tab part, across two systems",
+  "description": "Four bars of quarters on a six-string guitar part (staffKind both) with two verse lines, split words in both. Sized to wrap into two systems at the harness viewport, which pins the thing a one-bar version could not: each row explicitly reserves the verse block below its strings (the notation layout's lyricExtraSp rule, applied to the tab frame), so the system below starts clear of the words. Also pins syllables centred under fret digits, derived hyphens on every staff kind, and the both view carrying the verses once, between the staves.",
+  "bars": 4,
   "tags": [
     "lyrics",
     "tab"

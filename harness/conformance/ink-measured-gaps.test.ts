@@ -22,7 +22,8 @@ import {
 import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { TAB_STAFF_HEIGHT_SP } from '../../src/engine/layout/tabStaff.ts';
-import { anchorY } from '../../src/engine/layout/verticalDensity.ts';
+import { anchorY, rowBoundariesSp } from '../../src/engine/layout/verticalDensity.ts';
+import { documentLyricLineCount, lyricBlockSpFor } from '../../src/engine/layout/lyricRuns.ts';
 import {
   COHESION_CLEAR_SP,
   TEXT_MIN_RISE_SP,
@@ -429,10 +430,13 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
 describe('ink-measured gaps — stage D, between systems', () => {
   const labelledTabDir = corpus.find(s => s.id.endsWith('twelve-bar-blues'))!.dir;
 
-  /** Ink reach per row, mirroring `tightenRows`' own bucketing. */
-  function rowInk(layout: LayoutResult): { top: number; bottom: number }[] {
+  /** Ink reach per row, mirroring `tightenRows`' own bucketing — the SAME
+   *  boundary rule, reservation included, or a deep verse row measures as
+   *  the next system's ink and the identity below reads broken when it is
+   *  not (found by lab/lyrics/tab-verses, the first wrapped lyric doc). */
+  function rowInk(layout: LayoutResult, reservedBelowSp = 0): { top: number; bottom: number }[] {
     const rows = layout.rows!;
-    const bounds = rows.slice(0, -1).map((b, r) => (b.staffBottom + rows[r + 1].staffTop) / 2);
+    const bounds = rowBoundariesSp(rows, reservedBelowSp);
     const buckets: Primitive[][] = rows.map(() => []);
     for (const p of layout.primitives) {
       const y = anchorY(p);
@@ -449,9 +453,9 @@ describe('ink-measured gaps — stage D, between systems', () => {
     });
   }
 
-  const gapsOf = (layout: LayoutResult) => {
+  const gapsOf = (layout: LayoutResult, reservedBelowSp = 0) => {
     const rows = layout.rows!;
-    const ink = rowInk(layout);
+    const ink = rowInk(layout, reservedBelowSp);
     return rows.slice(0, -1).map((b, r) => ({
       lineGap: rows[r + 1].staffTop - b.staffBottom,
       inkGap: rows[r + 1].staffTop - b.staffBottom
@@ -483,13 +487,16 @@ describe('ink-measured gaps — stage D, between systems', () => {
     let skipped = 0;
     for (const s of corpus) {
       let layout: LayoutResult;
+      let reservedBelowSp = 0;
       try {
-        layout = layoutNotation({ mnx: readDoc(s.dir), widthSp: WIDTH_SP });
+        const doc = readDoc(s.dir);
+        reservedBelowSp = lyricBlockSpFor(documentLyricLineCount(doc));
+        layout = layoutNotation({ mnx: doc, widthSp: WIDTH_SP });
       } catch {
         continue;
       }
       if ((layout.rows?.length ?? 0) < 2) continue;
-      gapsOf(layout).forEach((gap, r) => {
+      gapsOf(layout, reservedBelowSp).forEach((gap, r) => {
         if (holdsTitle(layout, r)) {
           skipped++;
           // Still bounded: a title never makes a gap TIGHTER than the rule.

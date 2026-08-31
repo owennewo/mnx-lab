@@ -16,6 +16,34 @@ export const LYRIC_DESCENDER_PAD_SP = 0.8;
 // (the both view's content-driven inter-staff gap).
 export const TAB_LYRIC_CLEARANCE_SP = 1;
 
+/** The vertical band a verse stack claims below its staff. */
+export function lyricBlockSpFor(lineCount: number): number {
+  return lineCount > 0
+    ? LYRIC_FIRST_BASELINE_DROP_SP + (lineCount - 1) * LYRIC_LINE_SPACING_SP + LYRIC_DESCENDER_PAD_SP
+    : 0;
+}
+
+/** How many lyric lines the document uses anywhere — the row count every
+ *  staff's verse stack shares (line ids are document-global). */
+export function documentLyricLineCount(mnx: MnxStructure): number {
+  const used = new Set<string>();
+  for (const part of mnx.parts ?? []) {
+    for (const pm of part.measures ?? []) {
+      for (const seq of pm.sequences ?? []) {
+        for (const item of seq.content ?? []) {
+          const record = item as { content?: unknown[]; lyrics?: { lines?: Record<string, unknown> } };
+          const events = Array.isArray(record.content) ? record.content : [item];
+          for (const event of events) {
+            const lines = (event as { lyrics?: { lines?: Record<string, unknown> } }).lyrics?.lines;
+            for (const id of Object.keys(lines ?? {})) used.add(id);
+          }
+        }
+      }
+    }
+  }
+  return used.size;
+}
+
 export interface LyricSyllable {
   x: number;
   y: number;

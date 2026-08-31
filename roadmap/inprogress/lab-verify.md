@@ -115,16 +115,21 @@ Owner: no roadmap doc — a user-directed renderer follow-up to
 strings (the shared emitter extracted to `engine/layout/lyricRuns.ts`; the
 plan already priced syllable widths, so no digit column moved and **no
 existing golden moved** — the lyrics×tab corpus intersection was empty).
-Scenario: `lab/lyrics/tab-verses` (new; all four goldens are first
-snapshots).
+Scenario: `lab/lyrics/tab-verses` (new; never approved — its goldens moved
+freely while the geometry settled).
 
-**What a reviewer should look for.** Three views, one document (four quarter
-notes, two verses, verse 2 split `Ri-sing wa-ter`). (1) TAB view: two verse
-rows below the strings, syllables centred under their fret digits, hyphens
-between the split pairs; the row grew to hold the block (`tightenRows`), so
-nothing clips. (2) NOTATION view: the same two rows exactly as the existing
-lyric scenarios draw them. (3) BOTH view: the verses appear ONCE, between
-the notation staff and the tab staff, never duplicated below the strings.
+**What a reviewer should look for.** Three views, one document (four bars of
+quarters, two verses with split words, wrapping into TWO systems at the
+harness viewport — resized 2026-08-31 after a one-bar first cut let an
+inter-system overlap ship: each tab row now reserves the verse block
+explicitly, notation's own `lyricExtraSp` rule, and `tightenRows` is told
+the reservation so it attributes a deep verse row to the system it hangs
+from, not the one below). (1) TAB view: verse rows below EACH system's
+strings, syllables centred under their fret digits, hyphens between split
+pairs, and the second system starting clear of the first system's verses.
+(2) NOTATION view: the same rows as the existing lyric scenarios draw them.
+(3) BOTH view: the verses appear ONCE per system, between the notation
+staff and the tab staff, never duplicated below the strings.
 Known deliberate roughness: verse 1's baseline (+4.5sp) sits close to where
 dynamics would draw (+3.5sp) — this document has none; the collision is
 pre-existing and unarbitrated in every view.

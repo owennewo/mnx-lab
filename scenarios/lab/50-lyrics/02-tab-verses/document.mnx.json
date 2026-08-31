@@ -15,7 +15,10 @@
           "count": 4,
           "unit": 4
         }
-      }
+      },
+      {},
+      {},
+      {}
     ]
   },
   "parts": [
@@ -74,14 +77,6 @@
       },
       "measures": [
         {
-          "clefs": [
-            {
-              "clef": {
-                "sign": "G",
-                "staffPosition": -2
-              }
-            }
-          ],
           "sequences": [
             {
               "content": [
@@ -104,8 +99,8 @@
                         "type": "whole"
                       },
                       "2": {
-                        "text": "Ri",
-                        "type": "start"
+                        "text": "Moon",
+                        "type": "whole"
                       }
                     }
                   }
@@ -129,8 +124,8 @@
                         "type": "whole"
                       },
                       "2": {
-                        "text": "sing",
-                        "type": "end"
+                        "text": "will",
+                        "type": "whole"
                       }
                     }
                   }
@@ -154,8 +149,8 @@
                         "type": "whole"
                       },
                       "2": {
-                        "text": "wa",
-                        "type": "start"
+                        "text": "drift",
+                        "type": "whole"
                       }
                     }
                   }
@@ -179,8 +174,340 @@
                         "type": "whole"
                       },
                       "2": {
+                        "text": "by",
+                        "type": "whole"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "on",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "un",
+                        "type": "start"
+                      }
+                    }
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "the",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "der",
+                        "type": "end"
+                      }
+                    }
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "riv",
+                        "type": "start"
+                      },
+                      "2": {
+                        "text": "wil",
+                        "type": "start"
+                      }
+                    }
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "er",
+                        "type": "end"
+                      },
+                      "2": {
+                        "text": "lows",
+                        "type": "end"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "wa",
+                        "type": "start"
+                      },
+                      "2": {
+                        "text": "shad",
+                        "type": "start"
+                      }
+                    }
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
                         "text": "ter",
                         "type": "end"
+                      },
+                      "2": {
+                        "text": "ows",
+                        "type": "end"
+                      }
+                    }
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "car",
+                        "type": "start"
+                      },
+                      "2": {
+                        "text": "soft",
+                        "type": "start"
+                      }
+                    }
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "ry",
+                        "type": "end"
+                      },
+                      "2": {
+                        "text": "ly",
+                        "type": "end"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "me",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "sing",
+                        "type": "whole"
+                      }
+                    }
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "safe",
+                        "type": "start"
+                      },
+                      "2": {
+                        "text": "me",
+                        "type": "whole"
+                      }
+                    }
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "ly",
+                        "type": "end"
+                      },
+                      "2": {
+                        "text": "to",
+                        "type": "whole"
+                      }
+                    }
+                  }
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 3
+                      }
+                    }
+                  ],
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "home",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "sleep",
+                        "type": "whole"
                       }
                     }
                   }

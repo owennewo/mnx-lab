@@ -120,6 +120,13 @@ export interface TightenRowsArgs {
   /** The finished total height. */
   heightSp: number;
   padDensity: number;
+  /** Below-staff space each row RESERVES for content that belongs to it — a
+   *  lyric verse block. Row attribution is by the gap's midpoint, which
+   *  mis-files a deep verse row with the system BELOW (it then translates
+   *  with the wrong row). The reservation pushes the boundary past the
+   *  block. Uniform per layout; thread per-row data if a layout ever needs
+   *  to mix reserved and unreserved rows. */
+  reservedBelowSp?: number;
 }
 
 export interface TightenedRows {
@@ -150,10 +157,7 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
   // an unambiguous boundary. Derived from `rows` rather than from a row pitch,
   // because a notation layout stacks several segments (per-system layouts,
   // titled score blocks) whose rows are NOT uniformly spaced.
-  const boundaries: number[] = [];
-  for (let r = 0; r + 1 < rows.length; r++) {
-    boundaries.push((rows[r].staffBottom + rows[r + 1].staffTop) / 2);
-  }
+  const boundaries = rowBoundariesSp(rows, args.reservedBelowSp ?? 0);
   const rowOf = (y: number): number => {
     let r = 0;
     while (r < boundaries.length && y >= boundaries[r]) r++;
@@ -264,6 +268,20 @@ export function ensureTopMargin(
     heightSp: heightSp + dy,
     rows: rows.map(b => ({ staffTop: b.staffTop + dy, staffBottom: b.staffBottom + dy }))
   };
+}
+
+/** Row-ownership boundaries between consecutive bands: the gap's midpoint,
+ *  pushed past any below-staff reservation (a lyric verse block) so deep
+ *  content stays with the row it hangs from. ONE rule, used by tightenRows
+ *  and by the conformance measurement that checks its identity — the two
+ *  diverging is exactly the bug the reservation exists to prevent. */
+export function rowBoundariesSp(rows: readonly RowBandSp[], reservedBelowSp = 0): number[] {
+  const boundaries: number[] = [];
+  for (let r = 0; r + 1 < rows.length; r++) {
+    const mid = (rows[r].staffBottom + rows[r + 1].staffTop) / 2;
+    boundaries.push(Math.min(rows[r + 1].staffTop, Math.max(mid, rows[r].staffBottom + reservedBelowSp)));
+  }
+  return boundaries;
 }
 
 /** The y a primitive is anchored at, for deciding which row (or display
