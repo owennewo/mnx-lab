@@ -395,7 +395,7 @@ const pillText = (session: EditorSession) =>
 describe('event pills', () => {
   it('read the duration as a floor, and each marking, positioned attribute and syllable as removable', () => {
     const session = at('event');
-    expect(pillText(session)).toEqual(['duration: quarter [floor]']);
+    expect(pillText(session)).toEqual(['duration: quarter [floor]', 'at: 0 → 1/4 [derived]']);
     for (const text of ['staccato', 'breath comma', 'dynamic mf', 'text below cantabile', '8va 2', 'lyric sleep-']) {
       const parsed = parseInspectorLine('event', null, text);
       expect(parsed, text).toHaveProperty('intent');
@@ -403,6 +403,7 @@ describe('event pills', () => {
     }
     expect(pillText(session)).toEqual([
       'duration: quarter [floor]',
+      'at: 0 → 1/4 [derived]',
       'staccato:  [annotation]',
       'breath: comma [annotation]',
       'dynamic: mf [annotation]',
@@ -468,7 +469,7 @@ describe('note pills', () => {
     const session = at('note');
     // The fixture's capo 2 puts an open E4 below string 1's open — the fret is
     // honestly unplayable, and the pill says so rather than clamping.
-    expect(pillText(session)).toEqual(['pitch: E4 [floor]', 'string: 1 [annotation]', 'fret: — [derived]']);
+    expect(pillText(session)).toEqual(['pitch: E4 [floor]', 'string: 1 [annotation]', 'fret: — [derived]', 'at: 0 → 1/4 [derived]']);
     for (const text of ['accidental parens', 'finger left 3', 'vibrato', 'bend 1/2>full>0', 'staccato']) {
       const parsed = parseInspectorLine('note', null, text);
       expect(parsed, text).toHaveProperty('intent');
@@ -482,6 +483,7 @@ describe('note pills', () => {
       'fingering: left 3 [annotation]',
       'bend: 1/2>full>0 [annotation]',
       'vibrato:  [annotation]',
+      'at: 0 → 1/4 [derived]',
       'staccato:  [annotation]'
     ]);
   });
@@ -604,8 +606,8 @@ describe('the fingerboard pills (string is the choice, fret its consequence)', (
 
   it('a bare note reads a DERIVED string and fret; a chosen one reads the string as an annotation', () => {
     const session = at('note', fretDoc());
-    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 1 [derived]', 'fret: 3 [derived]']);
-    expect(pillText(at('note', fretDoc(true)))).toEqual(['pitch: G4 [floor]', 'string: 2 [annotation]', 'fret: 8 [derived]']);
+    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 1 [derived]', 'fret: 3 [derived]', 'at: 0 → 1/4 [derived]']);
+    expect(pillText(at('note', fretDoc(true)))).toEqual(['pitch: G4 [floor]', 'string: 2 [annotation]', 'fret: 8 [derived]', 'at: 0 → 1/4 [derived]']);
   });
 
   it('a part with no strings has no fingerboard pills, and the words are refused with a reason', () => {
@@ -620,7 +622,7 @@ describe('the fingerboard pills (string is the choice, fret its consequence)', (
     const parsed = parseInspectorLine('note', 'string', '2', ctx(session));
     expect(parsed).toHaveProperty('intent', { type: 'setStringAnnotation', string: 2 });
     expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
-    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 2 [annotation]', 'fret: 8 [derived]']);
+    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 2 [annotation]', 'fret: 8 [derived]', 'at: 0 → 1/4 [derived]']);
     const note = findNoteAddress(session.doc, session.selectedNoteKeys[0]!)!.note;
     expect(note.pitch).toEqual({ step: 'G', octave: 4 });
     expect(note._x?.mnxLab).toEqual({ string: 2 });
@@ -646,7 +648,7 @@ describe('the fingerboard pills (string is the choice, fret its consequence)', (
     const parsed = parseInspectorLine('note', 'fret', '5', ctx(session));
     expect(parsed).toHaveProperty('intent', { type: 'enterFret', fret: 5 });
     expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
-    expect(pillText(session)).toEqual(['pitch: A4 [floor]', 'string: 1 [annotation]', 'fret: 5 [derived]']);
+    expect(pillText(session)).toEqual(['pitch: A4 [floor]', 'string: 1 [annotation]', 'fret: 5 [derived]', 'at: 0 → 1/4 [derived]']);
   });
 
   it('`fret N` from the NOTATION projection frets the note’s own string, not the staff position', () => {
@@ -662,7 +664,7 @@ describe('the fingerboard pills (string is the choice, fret its consequence)', (
     const session = at('note', fretDoc(true));
     const pill = pillsFor(scope(session)).find(p => p.key === 'string')!;
     expect(edit(session, pill.remove!)).toBe(true);
-    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 1 [derived]', 'fret: 3 [derived]']);
+    expect(pillText(session)).toEqual(['pitch: G4 [floor]', 'string: 1 [derived]', 'fret: 3 [derived]', 'at: 0 → 1/4 [derived]']);
   });
 });
 
@@ -683,12 +685,69 @@ describe('identity pills', () => {
 describe('the wider rungs', () => {
   it('voice-bar: full-measure rest and measure repeat', () => {
     const session = at('voiceMeasure');
-    expect(pillText(session)).toEqual([]);
+    // The fill reading (one-surface item 8): the voice's clock vs the meter.
+    expect(pillText(session)).toEqual(['fill: 1 of 4/4 [derived]']);
     const parsed = parseInspectorLine('voiceMeasure', null, 'measure repeat 2');
     expect(parsed).toEqual({ intent: { type: 'setMeasureRepeat', number: 2 } });
     expect(edit(session, (parsed as { intent: never }).intent)).toBe(true);
-    expect(pillText(session)).toEqual(['measure repeat: 2 [annotation]']);
+    expect(pillText(session)).toEqual(['fill: 1 of 4/4 [derived]', 'measure repeat: 2 [annotation]']);
     expect(parseInspectorLine('voiceMeasure', null, 'staccato')).toHaveProperty('error');
+  });
+
+  it('rhythm declarations and container properties (one-surface item 8)', () => {
+    // Construction is a declaration: the typed text carries its own extent.
+    expect(parseInspectorLine('event', null, '3:2')).toMatchObject({
+      intent: { type: 'wrapInContainer', spec: { type: 'tuplet', inner: { multiple: 3 }, outer: { multiple: 2 } } }
+    });
+    expect(parseInspectorLine('event', null, 'grace')).toMatchObject({
+      intent: { type: 'wrapInContainer', spec: { type: 'grace' } }
+    });
+    // The riders are voice-bar things, and the refusals signpost the rung.
+    expect(parseInspectorLine('event', null, 'space 1/4')).toMatchObject({ error: expect.stringContaining('voice rung') });
+    expect(parseInspectorLine('voiceMeasure', null, 'space 1/4')).toEqual({ intent: { type: 'insertSpace', duration: [1, 4] } });
+    expect(parseInspectorLine('voiceMeasure', null, 'rest half')).toEqual({ intent: { type: 'setRestSpelling', duration: { base: 'half' } } });
+    expect(parseInspectorLine('voiceMeasure', null, '3:2')).toMatchObject({ error: expect.stringContaining('event rung') });
+
+    // The coincidence resolves the address: a range that IS the tuplet takes
+    // setContainerProperties; presentation only, cleared by the pill's ×.
+    const doc = makeNoteDoc();
+    doc.parts![0]!.measures![0]!.sequences![0]!.content = [
+      {
+        type: 'tuplet',
+        inner: { duration: { base: 'eighth' }, multiple: 3 },
+        outer: { duration: { base: 'quarter' }, multiple: 1 },
+        content: [
+          { duration: { base: 'eighth' }, notes: [{ id: 't1', pitch: { step: 'E', octave: 4 } }] },
+          { duration: { base: 'eighth' }, notes: [{ id: 't2', pitch: { step: 'F', octave: 4 } }] },
+          { duration: { base: 'eighth' }, notes: [{ id: 't3', pitch: { step: 'G', octave: 4 } }] }
+        ]
+      } as never,
+      { duration: { base: 'half' }, rest: {} },
+      { duration: { base: 'quarter' }, rest: {} }
+    ];
+    const session = at('event', doc);
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    session.handleIntent({ type: 'extendSelection', direction: 'next' });
+    expect(session.handleIntent({ type: 'setContainerProperties', properties: { bracket: 'yes' } })).toBe(true);
+    const tupletOf = (d: MnxStructure) => d.parts![0]!.measures![0]!.sequences![0]!.content![0] as { bracket?: string };
+    expect(tupletOf(session.doc).bracket).toBe('yes');
+    // A point edit re-anchors the selection (session.apply's rule) — the page
+    // puts the ladder back; the test does the same before reading pills.
+    session.handleIntent({ type: 'goToLevel', level: 'event' });
+    // The re-anchor left the cursor on the LAST child, so the range grows left.
+    session.handleIntent({ type: 'extendSelection', direction: 'previous' });
+    session.handleIntent({ type: 'extendSelection', direction: 'previous' });
+    const shown = pillsFor({ doc: session.doc, level: 'event', members: session.resolvedSelection.members }).map(
+      pill => `${pill.word}: ${pill.value} [${pill.pillClass}]`
+    );
+    expect(shown).toContain('tuplet: 3:1 eighth [derived]');
+    expect(shown).toContain('bracket: yes [annotation]');
+    expect(session.handleIntent({ type: 'setContainerProperties', clear: ['bracket'] })).toBe(true);
+    session.handleIntent({ type: 'goToLevel', level: 'event' });
+    expect(tupletOf(session.doc).bracket).toBeUndefined();
+    // With no covering range there is nothing to amend — refused, not guessed.
+    const bare = at('event');
+    expect(bare.handleIntent({ type: 'setContainerProperties', properties: { bracket: 'no' } })).toBe(false);
   });
 
   it('part-bar: clef, capo, and the tuning pill (one-surface item 7)', () => {

@@ -1200,6 +1200,29 @@ export class EditorSession {
         this.apply({ type: 'setBeam', ...pair });
         return true;
       }
+      case 'setContainerProperties': {
+        // The address is the coincidence's: the range that IS the container
+        // (core-selection-range-grain.md decision 5, generalized).
+        const coincidence = containerCoincidence(this.doc, this.resolvedSelection.members);
+        if (!coincidence.exact || coincidence.whole.length !== 1) return false;
+        const hit = coincidence.whole[0];
+        const before = JSON.stringify(this.doc);
+        this.apply({
+          type: 'setContainerProperties',
+          measureIndex: hit.measureIndex,
+          sequenceIndex: hit.sequenceIndex,
+          index: hit.eventIndex,
+          ...(hit.partIndex ? { partIndex: hit.partIndex } : {}),
+          ...(intent.properties ? { properties: intent.properties } : {}),
+          ...(intent.clear ? { clear: intent.clear } : {})
+        });
+        if (JSON.stringify(this.doc) === before) {
+          this.history.undo();
+          this.reindex();
+          return false;
+        }
+        return true;
+      }
       case 'setRestSpelling': {
         // Addressed by ONSET, not by note key: a rest is absence, so there is
         // no slot under the cursor to name — which is exactly why the cursor

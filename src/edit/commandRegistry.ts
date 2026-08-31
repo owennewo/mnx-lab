@@ -557,33 +557,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     tier: 'key',
     action: () => ({ intent: { type: 'toggleDots' } })
   },
-  {
-    id: 'tuplet',
-    scopes: ['event'],
-    glyph: { smufl: 'tuplet3' },
-    label: 'Triplet',
-    shortcut: 'Shift+R',
-    tier: 'popover',
-    action: () => ({ surface: 'rhythmPopover' })
-  },
-  {
-    id: 'grace',
-    scopes: ['event'],
-    glyph: { smufl: 'graceNoteAcciaccaturaStemUp' },
-    label: 'Grace note',
-    shortcut: 'Shift+R',
-    tier: 'popover',
-    action: () => ({ surface: 'rhythmPopover' })
-  },
-  {
-    id: 'tremolo',
-    scopes: ['event'],
-    glyph: { smufl: 'tremolo3' },
-    label: 'Tremolo',
-    shortcut: 'Shift+R',
-    tier: 'popover',
-    action: () => ({ surface: 'rhythmPopover' })
-  },
   dynamic('piano', 'dynamicPiano', 'Piano', 'p'),
   dynamic('mezzo-forte', 'dynamicMF', 'Mezzo-forte', 'mf'),
   dynamic('forte', 'dynamicForte', 'Forte', 'f'),
@@ -669,37 +642,8 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
 
   // ── containers (the coincidence rule, core-selection-range-grain.md) ─────
-  {
-    // A container is coextensive with the event range covering its children,
-    // so its properties are offered THERE — no rung of its own.
-    id: 'container-settings',
-    scopes: ['event'],
-    glyph: { smufl: 'tuplet3' },
-    label: 'Container settings…',
-    detail: 'For a range covering a whole tuplet, grace group or tremolo',
-    tier: 'popover',
-    blockedBy: 'container-properties'
-  },
 
   // ── voice-measure ───────────────────────────────────────────────────────
-  {
-    id: 'rest-spelling',
-    scopes: ['voiceMeasure'],
-    glyph: { smufl: 'restHalf' },
-    label: 'Respell rests…',
-    shortcut: 'Shift+R',
-    tier: 'popover',
-    action: () => ({ surface: 'rhythmPopover' })
-  },
-  {
-    id: 'space',
-    scopes: ['voiceMeasure'],
-    glyph: { smufl: 'restQuarter' },
-    label: 'Insert space…',
-    shortcut: 'Shift+R',
-    tier: 'popover',
-    action: () => ({ surface: 'rhythmPopover' })
-  },
   {
     id: 'cycle-voice',
     scopes: ['voiceMeasure'],
@@ -1106,7 +1050,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       commands: ['insert-event-before', 'insert-event-after', 'clear-event']
     },
     { id: 'duration', caption: 'duration', commands: ['shorter', 'longer', 'dots'] },
-    { id: 'rhythm', caption: 'rhythm containers', commands: ['tuplet', 'grace', 'tremolo', 'container-settings'] },
     { id: 'joins', caption: 'joins', commands: ['slur', 'beam'] },
     {
       id: 'articulation',
@@ -1128,11 +1071,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
   // properties popover with nothing to distinguish them.
   voiceMeasure: [
     { id: 'structure', caption: 'structure', commands: ['new-voice', 'delete-voice-bar'] },
-    {
-      id: 'rests',
-      caption: 'rests & spacing',
-      commands: ['rest-spelling', 'space']
-    },
     { id: 'voices', caption: 'voices', commands: ['cycle-voice'] }
   ],
   partMeasure: [

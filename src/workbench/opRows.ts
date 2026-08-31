@@ -29,7 +29,6 @@ export interface OpRow {
 const SURFACE_LABELS: Record<string, string> = {
   partPopover: 'Shift+P · popover',
   lyricPopover: 'Shift+L · popover',
-  rhythmPopover: 'Shift+R · popover',
   selectionTray: '/ · tray',
   rungInspector: 'Enter · inspector',
   commandPalette: 'Ctrl+G › · palette',
@@ -205,6 +204,8 @@ function opLabel(op: EditOp): string {
       return `remove voice bar @ m${op.measureIndex + 1} (empty)`;
     case 'removePartMeasure':
       return `remove staff bar @ m${op.measureIndex + 1} (empty)`;
+    case 'setContainerProperties':
+      return `container properties @ m${op.measureIndex + 1}${op.clear?.length ? ` · clear ${op.clear.join(' ')}` : ''}${op.properties ? ` · ${Object.entries(op.properties).map(([k, v]) => `${k} ${v}`).join(' ')}` : ''}`;
     case 'wrapInContainer': {
       const span = op.to - op.from + 1;
       const what =

@@ -228,7 +228,6 @@ fills in without the rows moving is a rung that was already right.
 | Tile | Key | tested | grouped | ordered |
 |---|---|---|---|---|
 | `delete-container` — Delete this container (clears its notes first) | `Del` | ☐ | ☐ | ☐ |
-| `container-settings` — Container settings… | — | ⛔ blocked — `container-properties` | | |
 
 ### voice bar — 6 placements
 
@@ -363,7 +362,7 @@ wire.
 | `blockedBy` | Tile(s) | Rung | Unblocked when |
 |---|---|---|---|
 | `arpeggio` | `arpeggio` | event | **no address recorded** — the tile was greyed without an owner, and the ledger never caught it because the conformance test asserts a blocker *exists*, not that it resolves. Either find its verb an owner on the campaign's "beyond" list or cut the tile |
-| `container-properties` | `container-settings` | container | a `setContainerProperties`-class op plus a rhythm-popover edit mode; the existing grammar constructs a wrapper but cannot rewrite one in place |
+| ~~`container-properties`~~ | ~~`container-settings`~~ | container | **CLOSED 2026-08-31** by [workbench-one-surface-rhythm.md](../complete/workbench-one-surface-rhythm.md): `setContainerProperties` landed (presentation fields only — re-timing stays a wrap request), surfaced as coincidence pills in the rung inspector; the tile retired with the rhythm popover, so the row leaves the triage tables |
 | `part-transposition` | `transpose-part` | staff bar | not a campaign item — needs its own proposal from the campaign's "beyond" list |
 | `mute` | `mute-part` | staff bar | audio's own decision: there is no player element at all ([core-viewer-embedded-app.md](../complete/core-viewer-embedded-app.md) records why), so the row renders value-less until there is |
 | `section-colour` | `section-colour` | section | **no address recorded** — same hole as `arpeggio`; decide whether section colour is a document property or a viewer preference before giving it a verb |

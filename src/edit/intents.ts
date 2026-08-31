@@ -5,6 +5,8 @@
 // or EditOps. Trace fixtures are written in intents, NEVER keys, so they
 // survive every rebinding and every future emulation preset.
 import type {
+  ContainerPropertyField,
+  ContainerPropertyPatch,
   MeasureAttribute,
   MeasureAttributeKind,
   PartDeclaration,
@@ -230,6 +232,9 @@ export type MutationIntent =
   | { type: 'wrapInContainer'; spec: PartialContainerSpec; count?: number }
   | { type: 'insertSpace'; duration: [number, number] }
   | { type: 'setRestSpelling'; duration: { base: MnxNoteValueBase; dots?: number } }
+  /** Amend the container the selection exactly covers (the coincidence rule
+   *  resolves the address in the session — the typed line stays pure). */
+  | { type: 'setContainerProperties'; properties?: ContainerPropertyPatch; clear?: ContainerPropertyField[] }
   // Dots (campaign item 4). One key, two targets, mirroring the duration
   // ladder exactly: an event with ink is re-valued, and over a rest or an
   // entry ghost the PENDING duration is what changes — because a rest is

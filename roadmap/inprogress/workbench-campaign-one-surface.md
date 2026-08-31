@@ -1,6 +1,6 @@
 # One editing surface — retire the popovers and the tray into the inspector
 
-> **Status: in progress 2026-08-31 — campaign; items 1–5 and 7 built the same day, item 6 proposed (design open).** The three-surface experiment run by
+> **Status: in progress 2026-08-31 — campaign; items 1–5 and 7–8 built the same day, item 6 proposed (design open).** The three-surface experiment run by
 > [workbench-rung-inspector.md](workbench-rung-inspector.md) ("a third
 > editing surface, to be tried *beside* the tray and the popovers so that use decides
 > which wins") has its verdict: **the inspector wins.** The user's ruling, 2026-08-31:
@@ -85,7 +85,7 @@ is one popover or the tray, and one work item.
 | 5 | **Adornments** (~~`Shift+A`~~ freed) | markings/positioned pills, stage 4 — reuses `parseAdornment` | verify breadth (all markings, dynamics, directions incl. glyphs); sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-adornment.md) |
 | 6 | **Lyrics** (`Shift+L`) | syllable pills per line (`lyric 2: Am`), stage 4 — reuses `parseLyric` | **gap: line management** — plus two design investigations (lines × repeats, WYTIWYG entry) | 📝 [proposed 2026-08-31](../proposed/workbench-one-surface-lyrics.md) — design open |
 | 7 | **Tuning** (~~`Shift+U`~~ freed) | `capo` pill writable; `strings` is a **read-only** reading | **gap: the tuning write path** — `parseTuning`'s sentence has no inspector form; a strings pill that writes (part rung), refusals for strings in use; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-tuning.md) |
-| 8 | **Rhythm** (`Shift+R`) | container pills are **read-only** (`tuplet: 3:2`, dotted, refuse Enter); full-measure rest / measure repeat pills exist at voiceMeasure | **gap: the missing verb** — the `setContainerProperties`-class op the residue ledger names, plus a construction story for tuplet/grace/authored-silence declarations (contract §2: construction is a verb) | row |
+| 8 | **Rhythm** (~~`Shift+R`~~ freed) | container pills are **read-only** (`tuplet: 3:2`, dotted, refuse Enter); full-measure rest / measure repeat pills exist at voiceMeasure | **gap: the missing verb** — the `setContainerProperties`-class op the residue ledger names, plus a construction story for tuplet/grace/authored-silence declarations (contract §2: construction is a verb) | ✅ [built 2026-08-31](../complete/workbench-one-surface-rhythm.md) |
 | 9 | **Part** (`Shift+P`) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | row |
 | 10 | **Layout** (`Shift+E`, moved from `Shift+S`) | nothing — no document-rung pills exist | the document rung grows its pill families from `parseLayoutSentence`'s grammar (sources, systems, quoted names — the largest parser in the file); likely splits into sub-items when picked up | row |
 | 11 | **The selection tray** (`/`) | verbs are excluded from the inspector by charter; the `global` tab and the triage ledger (../proposed/core-selection-tray-residue.md) have no inspector form | **last, and gated by 1–10** (its popover-tier tiles open the popovers). Re-home the verbs (keymap + the `?` legend + palette), decide the `global` tab's successor, absorb or retire the triage ledger, free `/` | row |
@@ -111,6 +111,19 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Progress + learnings log
 
+- **2026-08-31 — item 8 (rhythm) built.** The campaign's first new verb:
+  `setContainerProperties` (presentation only — re-timing stays a wrap
+  request), **address-free** — the session resolves the container from the
+  coincidence over the live selection, refusing on ambiguity; item 11 can
+  reuse that shape. The row's premise needed correcting: the read-only
+  container pills died with the container rung, so the offer was built from
+  nothing. Construction landed as declaration (`3:2` at event; `space`/`rest`
+  at voice-bar; cross-rung signposts both ways). Two derived readings from
+  the proposing conversation: `at: 0 → 1/4` on events, `fill: 1 of 4/4` on
+  voice-bars. The residue ledger's `container-properties` row is closed in
+  the same change. Test learning: `session.apply` re-anchors the selection —
+  rebuild the range (leftward: the anchor lands on the last child) before
+  reading pills.
 - **2026-08-31 — item 7 (tuning) built.** First coverage-building item, and the
   census caught a bug parity would have carried: `setTuning` wrote `parts[0]`
   unconditionally — fixed (op takes `partIndex`, session passes the cursor's

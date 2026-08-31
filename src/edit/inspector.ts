@@ -11,7 +11,8 @@ import { findNoteAddress } from '../model/noteWalk.ts';
 import { midiOfSpelling } from './staffSpace.ts';
 import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
 import type { EditorIntent } from './intents.ts';
-import { sectionRangeAt, type SelectionLevel, type SelectionMember } from './selection.ts';
+import { addOnsets, durationSpan, itemSpan } from './cursor.ts';
+import { containerCoincidence, sectionRangeAt, type SelectionLevel, type SelectionMember } from './selection.ts';
 import {
   beamStartingAt,
   eventAtAddress,
@@ -39,7 +40,9 @@ import {
   parseKeySignature,
   parseLyric,
   parseTimeSignature,
-  parseTuning
+  parseTuning,
+  parseRhythm,
+  RHYTHM_HELP
 } from './setupGrammar.ts';
 
 /** The bar's effective time signature: the last global `time` at or before it.
@@ -411,6 +414,11 @@ export interface InspectorScope {
 const DURATION_WORDS: MnxNoteValueBase[] = ['whole', 'half', 'quarter', 'eighth', '16th', '32nd', '64th'];
 const TECHNIQUE_WORDS: TechniqueChoice['kind'][] = ['bend', 'slide', 'hammerPull', 'vibrato', 'palmMute', 'harmonic'];
 
+/** A bar-relative fraction, whole-note units — `0`, `1/4`, `3/8`. */
+function fractionText(onset: { num: number; den: number }): string {
+  return onset.num === 0 ? '0' : onset.den === 1 ? `${onset.num}` : `${onset.num}/${onset.den}`;
+}
+
 function durationText(duration: { base: MnxNoteValueBase; dots?: number }): string {
   return `${duration.base}${'.'.repeat(duration.dots ?? 0)}`;
 }
@@ -517,8 +525,13 @@ export function eventPills(doc: MnxStructure, member: Extract<SelectionMember, {
   const event = eventAtAddress(doc, member);
   if (!event) return [];
   const pills: InspectorPill[] = [];
-  if (event.duration)
+  if (event.duration) {
     pills.push({ key: 'duration', word: 'duration', value: durationText(event.duration), pillClass: 'floor', remove: null });
+    // Where the event sits in its bar (whole-note fractions) — a reading, so
+    // over/underfull bars can be audited event by event (one-surface item 8).
+    const ends = addOnsets(member.onset, durationSpan(event.duration));
+    pills.push(derived('at', 'at', `${fractionText(member.onset)} → ${fractionText(ends)}`));
+  }
   for (const [name, attrs] of Object.entries(event.markings ?? {})) {
     const detail = attrs && typeof attrs === 'object' ? Object.values(attrs as Record<string, unknown>).join(' ') : '';
     pills.push(annotation(`marking:${name}`, name, detail, { type: 'removeMarking', marking: name }));
@@ -588,6 +601,14 @@ function voiceMeasurePills(doc: MnxStructure, member: Extract<SelectionMember, {
   const pills: InspectorPill[] = [];
   if (sequence?.fullMeasure)
     pills.push(annotation('fullMeasureRest', 'full-measure rest', sequence.fullMeasure.visualDuration ? durationText(sequence.fullMeasure.visualDuration) : '', { type: 'removeFullMeasureRest' }));
+  if (sequence) {
+    // The voice's clock against the bar's meter — the adds-up-to-the-time-
+    // signature check at a glance. itemSpan is the enclosing voice clock, so
+    // container children don't double-count and grace content reads 0.
+    const total = (sequence.content ?? []).reduce((sum, item) => addOnsets(sum, itemSpan(item)), { num: 0, den: 1 });
+    const time = timeAt(doc, member.measureIndex);
+    if (time) pills.push(derived('fill', 'fill', `${fractionText(total)} of ${time.count}/${time.unit}`));
+  }
   if (measure?.measureRepeat) {
     const mr = measure.measureRepeat as { number: number; counter?: { count: number; orient?: string } };
     const counter = mr.counter ? ` counter ${mr.counter.count}${mr.counter.orient === 'below' ? ' below' : ''}` : '';
@@ -656,14 +677,45 @@ export function pillsFor(scope: InspectorScope): InspectorPill[] {
       }
     }
   }
-  return order.map(key => {
+  const pills = order.map(key => {
     const { pill, count } = merged.get(key)!;
     return count < members.length ? { ...pill, partial: true } : pill;
   });
+  // The coincidence rule's settings offer (range-grain decision 5): a range
+  // that IS a container carries that container's presentation pills. The
+  // session re-resolves the address when a pill fires, so these intents stay
+  // address-free like every other typed line.
+  if (level === 'event') {
+    const coincidence = containerCoincidence(doc, members);
+    if (coincidence.exact && coincidence.whole.length === 1) {
+      const hit = coincidence.whole[0];
+      const item = doc.parts?.[hit.partIndex]?.measures?.[hit.measureIndex]
+        ?.sequences?.[hit.sequenceIndex]?.content?.[hit.eventIndex];
+      if (item && 'type' in item && item.type === 'tuplet') {
+        pills.push(derived('container', 'tuplet', `${item.inner.multiple}:${item.outer.multiple} ${item.inner.duration.base}`));
+        if (item.bracket) pills.push(annotation('bracket', 'bracket', item.bracket, { type: 'setContainerProperties', clear: ['bracket'] }));
+        if (item.showNumber) pills.push(annotation('number', 'number', item.showNumber, { type: 'setContainerProperties', clear: ['showNumber'] }));
+      } else if (item && 'type' in item && item.type === 'grace') {
+        pills.push(derived('container', 'grace', item.graceType ?? 'stealFollowing'));
+        if (item.slash !== undefined) pills.push(annotation('slash', 'slash', item.slash ? 'yes' : 'no', { type: 'setContainerProperties', clear: ['slash'] }));
+      } else if (item && 'type' in item && item.type === 'tremolo') {
+        pills.push(derived('container', 'tremolo', `${item.marks ?? 3} marks`));
+        if (item.marks !== undefined) pills.push(annotation('marks', 'marks', `${item.marks}`, { type: 'setContainerProperties', clear: ['marks'] }));
+      }
+    }
+  }
+  return pills;
 }
 
 const EVENT_WORDS: InspectorWord[] = [
   { word: 'duration', hint: DURATION_WORDS.join(' · '), values: [...DURATION_WORDS] },
+  { word: 'tuplet', hint: '3:2 · 3 eighth in 1 quarter, no number' },
+  { word: 'grace', hint: 'grace · grace 2 · appoggiatura · acciaccatura' },
+  { word: 'tremolo', hint: '2 · 3 in 2 half' },
+  { word: 'bracket', hint: 'yes · no · auto', values: ['yes', 'no', 'auto'] },
+  { word: 'number', hint: 'inner · both · none', values: ['inner', 'both', 'none'] },
+  { word: 'slash', hint: 'yes · no', values: ['yes', 'no'] },
+  { word: 'marks', hint: '2 · 3' },
   ...MARKING_WORDS.map(word => ({ word, hint: '' })),
   { word: 'breath', hint: 'comma · tick · upbow · salzedo' },
   { word: 'bow', hint: 'up · down' },
@@ -694,7 +746,9 @@ const NOTE_WORDS: InspectorWord[] = [
 
 const VOICE_WORDS: InspectorWord[] = [
   { word: 'full-measure rest', hint: 'whole · half' },
-  { word: 'measure repeat', hint: '1 · 2 counter 3' }
+  { word: 'measure repeat', hint: '1 · 2 counter 3' },
+  { word: 'space', hint: '1/4 · 3/8' },
+  { word: 'rest', hint: 'half · quarter.' }
 ];
 
 const PART_WORDS: InspectorWord[] = [
@@ -848,6 +902,38 @@ export function parseInspectorLine(
       if ('error' in parsed) return { error: parsed.error };
       return { intent: { type: 'setTechnique', technique: { kind: 'bend', ...parsed } } };
     }
+    // Container construction is a DECLARATION, not a verb: the typed text
+    // carries its own extent (`wrapExtent`), the rhythm popover's founding
+    // argument, so the wrap belongs to the slot like any other attribute.
+    const rhythmish = /^\d+\s*[:\d]/.test(line) || ['tuplet', 'grace', 'appoggiatura', 'acciaccatura', 'tremolo', 'space', 'rest'].includes(head);
+    if (rhythmish) {
+      const declared = parseRhythm(head === 'tuplet' ? (rest || line) : line);
+      if (declared && 'wrap' in declared)
+        return { intent: { type: 'wrapInContainer', spec: declared.wrap, ...(declared.count === undefined ? {} : { count: declared.count }) } };
+      if (declared && ('space' in declared || 'rest' in declared))
+        return { error: 'a voice-bar thing — tighten to the voice rung: space 1/4 · rest half' };
+      return { error: `not a rhythm declaration — ${RHYTHM_HELP}` };
+    }
+    // Container properties: the session resolves WHICH container from the
+    // coincidence, so the parse stays address-free.
+    if (head === 'bracket') {
+      if (!['yes', 'no', 'auto'].includes(rest)) return { error: 'bracket is yes · no · auto' };
+      return { intent: { type: 'setContainerProperties', properties: { bracket: rest as 'yes' | 'no' | 'auto' } } };
+    }
+    if (head === 'number') {
+      const showNumber = rest === 'none' ? 'noNumber' : rest;
+      if (!['noNumber', 'inner', 'both'].includes(showNumber)) return { error: 'number is inner · both · none' };
+      return { intent: { type: 'setContainerProperties', properties: { showNumber: showNumber as 'noNumber' | 'inner' | 'both' } } };
+    }
+    if (head === 'slash') {
+      if (!['yes', 'no', 'on', 'off'].includes(rest)) return { error: 'slash is yes · no' };
+      return { intent: { type: 'setContainerProperties', properties: { slash: rest === 'yes' || rest === 'on' } } };
+    }
+    if (head === 'marks') {
+      const n = Number(rest);
+      if (!Number.isInteger(n) || n < 1 || n > 8) return { error: 'marks takes a small count — 2 · 3' };
+      return { intent: { type: 'setContainerProperties', properties: { marks: n } } };
+    }
     // The pills' words are nouns; the grammar's are bare values (`mf`,
     // `left 3`). Strip the noun so an amend composes what the grammar takes.
     if (head === 'fingering' || head === 'finger')
@@ -857,10 +943,21 @@ export function parseInspectorLine(
   }
   if (level === 'voiceMeasure') {
     const parsed = parseBarAttribute(line);
-    if (!parsed || !('rhythm' in parsed)) return { error: 'not a rhythm declaration — full-measure rest · measure repeat 2' };
-    if (parsed.rhythm === 'fullMeasureRest')
-      return { intent: parsed.remove ? { type: 'removeFullMeasureRest' } : { type: 'setFullMeasureRest', ...(parsed.visualDuration ? { visualDuration: parsed.visualDuration } : {}) } };
-    return { intent: parsed.remove ? { type: 'removeMeasureRepeat' } : { type: 'setMeasureRepeat', number: parsed.number ?? 1, ...(parsed.counter ? { counter: parsed.counter } : {}) } };
+    if (parsed && 'rhythm' in parsed) {
+      if (parsed.rhythm === 'fullMeasureRest')
+        return { intent: parsed.remove ? { type: 'removeFullMeasureRest' } : { type: 'setFullMeasureRest', ...(parsed.visualDuration ? { visualDuration: parsed.visualDuration } : {}) } };
+      return { intent: parsed.remove ? { type: 'removeMeasureRepeat' } : { type: 'setMeasureRepeat', number: parsed.number ?? 1, ...(parsed.counter ? { counter: parsed.counter } : {}) } };
+    }
+    // Authored silence and rest spelling (the rhythm popover's voice-bar
+    // half): a point insertion and a respelling, both at the cursor.
+    const declared = parseRhythm(line);
+    if (declared && 'space' in declared)
+      return { intent: { type: 'insertSpace', duration: declared.space } };
+    if (declared && 'rest' in declared)
+      return { intent: { type: 'setRestSpelling', duration: declared.rest } };
+    if (declared && 'wrap' in declared)
+      return { error: 'an event thing — tighten to the event rung to wrap a run' };
+    return { error: 'not a rhythm declaration — full-measure rest · measure repeat 2 · space 1/4 · rest half' };
   }
   if (level === 'partMeasure') {
     if (head === 'clef') {

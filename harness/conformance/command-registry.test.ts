@@ -254,7 +254,6 @@ describe('command registry — the joins', () => {
     // (roadmap/proposed/core-selection-tray-residue.md) instead of as silence.
     const KNOWN_TWINS = new Set([
       'note: articTenutoAbove — tenuto, hammer-pull',
-      'event: tuplet3 — tuplet, container-settings',
       'measure: coda — coda, section-colour',
       'document: brace — add-part, staves',
       'session: brace — doc-add-part, staff-kind-both',

@@ -700,6 +700,22 @@ export type EditOp =
       partIndex?: number;
     }
   | {
+      /** Amend a container's PRESENTATION fields in place — tuplet
+       *  bracket/showNumber, grace slash/graceType, tremolo marks. Timing
+       *  (the ratio) is deliberately not amendable: re-timing is a wrap
+       *  request, the same ground on which unwrapping is refused
+       *  (one-surface campaign item 8; closes the residue ledger's
+       *  `container-properties` row). */
+      type: 'setContainerProperties';
+      measureIndex: number;
+      sequenceIndex: number;
+      /** Content index of the container in its sequence. */
+      index: number;
+      partIndex?: number;
+      properties?: ContainerPropertyPatch;
+      clear?: ContainerPropertyField[];
+    }
+  | {
       /**
        * Write the same sound a different way: the next enharmonic spelling,
        * cycling back round. The SOUND is fixed (the MIDI number never moves),
@@ -2199,6 +2215,28 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       }
       return next;
     }
+    case 'setContainerProperties': {
+      const item = next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex]
+        ?.sequences?.[op.sequenceIndex]?.content?.[op.index];
+      if (!item || !('type' in item)) return next;
+      const patch = op.properties ?? {};
+      const clear = new Set(op.clear ?? []);
+      if (item.type === 'tuplet') {
+        if (patch.bracket !== undefined) item.bracket = patch.bracket;
+        if (patch.showNumber !== undefined) item.showNumber = patch.showNumber;
+        if (clear.has('bracket')) delete item.bracket;
+        if (clear.has('showNumber')) delete item.showNumber;
+      } else if (item.type === 'grace') {
+        if (patch.slash !== undefined) item.slash = patch.slash;
+        if (patch.graceType !== undefined) item.graceType = patch.graceType;
+        if (clear.has('slash')) delete item.slash;
+        if (clear.has('graceType')) delete item.graceType;
+      } else if (item.type === 'tremolo') {
+        if (patch.marks !== undefined) item.marks = patch.marks;
+        if (clear.has('marks')) delete item.marks;
+      }
+      return next;
+    }
     case 'wrapInContainer': {
       const seq =
         next.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex]?.sequences?.[op.sequenceIndex];
@@ -3037,6 +3075,17 @@ export function containerRunAt(
  *
  * Null = refuse: the run overshoots the inner value, or runs out of bar.
  */
+export type ContainerPropertyField = 'bracket' | 'showNumber' | 'slash' | 'graceType' | 'marks';
+
+/** The amendable (presentation) fields of the three containers. */
+export interface ContainerPropertyPatch {
+  bracket?: 'yes' | 'no' | 'auto';
+  showNumber?: 'noNumber' | 'inner' | 'both';
+  slash?: boolean;
+  graceType?: 'makeTime' | 'stealFollowing' | 'stealPrevious';
+  marks?: number;
+}
+
 export function wrapExtent(
   seq: MnxSequence,
   eventIndex: number,

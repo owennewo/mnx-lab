@@ -61,8 +61,6 @@ import {
   LYRIC_HELP,
   parseLyric,
   parsePartDeclaration,
-  RHYTHM_HELP,
-  parseRhythm,
   parsePart,
   parseLayoutSentence,
   // Still consumed by the VIEWER's instrument-override overlay (TabSetup) —
@@ -124,7 +122,7 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
 type PopoverKind =
-  | 'part' | 'lyric' | 'rhythm'
+  | 'part' | 'lyric'
   | 'layout';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
@@ -143,17 +141,11 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
     placeholder: 'sleep- · -ing · 2: Am · line 2 Nederlands nl',
     hint: 'a syllable at the cursor’s note; trailing/leading “-” joins a word · “no lyric” strips · Enter applies'
   },
-  rhythm: {
-    label: 'rhythm',
-    placeholder: '3:2 · 3 eighth in 1 quarter, no number · grace · tremolo 2 · rest half · space 1/4',
-    hint: 'wraps from the cursor — the declaration says how much music it takes · Enter applies · Esc closes'
-  },
 };
 
 const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   partPopover: 'part',
   lyricPopover: 'lyric',
-  rhythmPopover: 'rhythm',
   layoutPopover: 'layout'
 };
 
@@ -171,7 +163,6 @@ export const SETUP_POPOVER_COMMANDS: {
 }[] = [
   { label: 'setup: add part…', action: 'partPopover', stroke: 'Shift+P' },
   { label: 'setup: lyric…', action: 'lyricPopover', stroke: 'Shift+L' },
-  { label: 'setup: rhythm…', action: 'rhythmPopover', stroke: 'Shift+R' },
 ];
 
 import './ScoreHud.ts';
@@ -3113,23 +3104,6 @@ export class ScenarioPage extends LitElement {
                   ...(parsed.label !== undefined ? { label: parsed.label } : {}),
                   ...(parsed.lang !== undefined ? { lang: parsed.lang } : {})
                 }
-      );
-    } else if (this.setupPopover === 'rhythm') {
-      const parsed = parseRhythm(input.value);
-      if (!parsed) {
-        this.setupPopoverError = `not a rhythm declaration — ${RHYTHM_HELP}`;
-        return;
-      }
-      this.stripIntent(
-        'space' in parsed
-          ? { type: 'insertSpace', duration: parsed.space }
-          : 'rest' in parsed
-            ? { type: 'setRestSpelling', duration: parsed.rest }
-          : {
-              type: 'wrapInContainer',
-              spec: parsed.wrap,
-              ...(parsed.count === undefined ? {} : { count: parsed.count })
-            }
       );
     }
     this.setupPopover = null;

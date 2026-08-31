@@ -205,7 +205,6 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
 export type ShellAction =
   | 'partPopover'
   | 'lyricPopover'
-  | 'rhythmPopover'
   | 'layoutPopover'
   | 'selectionTray'
   | 'commandPalette'
@@ -239,10 +238,6 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // Lyrics (campaign item 12): text entry as a popover, not a mode —
   // a syllable is one short string attached to one note.
   { code: 'KeyL', shift: true, action: 'lyricPopover' },
-  // Rhythm declarations (campaign item 11b): the containers and authored
-  // silence — the four things that are content but not events. No anchor
-  // gesture: the typed declaration already says how much music it takes.
-  { code: 'KeyR', shift: true, action: 'rhythmPopover' },
   // Shift+S — the document's presentation layer (core-layout-authoring.md).
   // S for score/system; the plain S is the slur/slide anchor, one layer down.
   { code: 'KeyS', shift: true, action: 'layoutPopover' },

@@ -465,14 +465,6 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
-    keys: 'Shift+R',
-    strokes: [{ code: 'KeyR', shift: true }],
-    group: 'setup',
-    meaning: {
-      all: 'rhythm… (typed popover: `3:2`, `3 eighth in 1 quarter, no number`, `grace`, `appoggiatura`, `tremolo 2`, `space 1/4`)'
-    }
-  },
-  {
     keys: 'Shift+S',
     strokes: [{ code: 'KeyS', shift: true }],
     group: 'setup',
@@ -560,6 +552,10 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     // voice-bar and part-bar
     'setFullMeasureRest',
     'removeFullMeasureRest',
+    'wrapInContainer',
+    'insertSpace',
+    'setRestSpelling',
+    'setContainerProperties',
     'setMeasureRepeat',
     'removeMeasureRepeat',
     'setClef',
@@ -606,7 +602,6 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // The rhythm declarations (campaign item 11b): the three containers share
   // one wrap verb, silence is inserted, and rest spelling is a verb rather
   // than a padding policy.
-  rhythmPopover: ['wrapInContainer', 'insertSpace', 'setRestSpelling'],
   // The selection tray (core-selection-tray-mechanism.md) fires the registry's
   // commands through the same funnel as keys, so most of what it offers is
   // already reachable — bound to a key or owned by a popover grammar above.
