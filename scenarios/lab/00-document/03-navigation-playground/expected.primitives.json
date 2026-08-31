@@ -281,16 +281,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadHalf",
-        "x": 20.6811,
+        "x": 19.3389,
         "y": 11,
         "className": "notehead",
         "sourceId": "l7"
       },
       {
         "kind": "line",
-        "x1": 20.6811,
+        "x1": 19.3389,
         "y1": 11.168,
-        "x2": 20.6811,
+        "x2": 19.3389,
         "y2": 14.5,
         "thickness": 0.12,
         "className": "stem"

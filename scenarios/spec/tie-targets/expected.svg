@@ -9,12 +9,12 @@
 <text x="117.6" y="176" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
 <text x="161.0432" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="ev21n1"></text>
 <line x1="179.9232" y1="120" x2="179.9232" y2="173.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="248.7632" y="168" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="ev22n1"></text>
-<line x1="267.6432" y1="112" x2="267.6432" y2="165.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="336.4832" y="160" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="ev23n1"></text>
-<line x1="355.3632" y1="104" x2="355.3632" y2="157.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="424.2032" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="ev24n1"></text>
-<line x1="443.0832" y1="96" x2="443.0832" y2="149.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<text x="226.808" y="168" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="ev22n1"></text>
+<line x1="245.688" y1="112" x2="245.688" y2="165.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<text x="334.9744" y="160" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="ev23n1"></text>
+<line x1="353.8544" y1="104" x2="353.8544" y2="157.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<text x="400.7392" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="ev24n1"></text>
+<line x1="419.6192" y1="96" x2="419.6192" y2="149.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="226.808" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="ev26n1"></text>
 <text x="271.6912" y="184" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="accidental"></text>
 <text x="290.0912" y="184" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="ev27n1"></text>
@@ -86,7 +86,7 @@
 <line x1="808.4048" y1="149.312" x2="808.4048" y2="96" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="717.68" y1="112" x2="809.3648" y2="96" stroke="currentColor" stroke-width="8" class="beam"></line>
 <path d="M 184.0832 184.8 C 195.6528 194.99466666666666, 211.0784 194.99466666666666, 222.648 184.8 C 211.0784 192.86133333333333, 195.6528 192.86133333333333, 184.0832 184.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
-<path d="M 447.2432 160.8 C 468.8256 172.66346666666666, 497.6032 172.66346666666666, 519.1856 160.8 C 497.6032 170.53013333333334, 468.8256 170.53013333333334, 447.2432 160.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
+<path d="M 423.7792 160.8 C 452.4016 173.83626666666666, 490.5648 173.83626666666666, 519.1856 160.8 C 490.5648 171.70293333333333, 452.4016 171.70293333333333, 423.7792 160.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 722.8 200.8 C 768.0192 216.60266666666666, 828.312 216.60266666666666, 873.5312 200.8 C 828.312 214.46933333333334, 768.0192 214.46933333333334, 722.8 200.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 1070.8272 200.8 C 1077.0672 210.10666666666665, 1085.3872 210.10666666666665, 1091.6272 200.8 C 1085.3872 207.97333333333333, 1077.0672 207.97333333333333, 1070.8272 200.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 767.6832 184.8 C 799.4368 198.35946666666666, 841.776 198.35946666666666, 873.5312 184.8 C 841.776 196.22613333333334, 799.4368 196.22613333333334, 767.6832 184.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>

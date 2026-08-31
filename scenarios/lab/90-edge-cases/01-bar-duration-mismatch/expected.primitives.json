@@ -150,16 +150,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadBlack",
-        "x": 26.8538,
+        "x": 22.635,
         "y": 9,
         "className": "notehead",
         "sourceId": "@m0.v1.e1.n0"
       },
       {
         "kind": "line",
-        "x1": 28.0338,
+        "x1": 23.815,
         "y1": 5.5,
-        "x2": 28.0338,
+        "x2": 23.815,
         "y2": 8.832,
         "thickness": 0.12,
         "className": "stem"

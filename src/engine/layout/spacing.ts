@@ -874,6 +874,10 @@ interface EventMetrics {
   leading: number; // rigid: mid-measure clefs + accidental columns
   core: number;    // rigid: notehead/fret + dots
   spring: number;  // stretchable: duration space
+  /** Metric position within the bar (whole-note fraction) — the shared
+   *  column identity for the cross-voice merge. Absent on grace containers,
+   *  which are un-timed and keep private columns glued to their successor. */
+  onset?: number;
   /** Set on grace containers: number of inner notes (all rigid, no spring). */
   graceCount?: number;
   /** Mid-measure clefs drawn immediately before this event's column,
@@ -924,6 +928,221 @@ function voiceSpringSum(voice: EventMetrics[]): number {
     (sum, e, i) => sum + e.spring * (i === voice.length - 1 ? MEASURE_TRAIL_FACTOR : 1),
     0
   );
+}
+
+// ---------- Onset-aligned columns across voices ----------
+//
+// Voices used to be spaced INDEPENDENTLY — each its own cursor walk, its own
+// justification stretch. Same-onset events across voices (and staves, and
+// parts) lined up only when the voices' rigid-and-spring demands happened to
+// be proportional; an accidental in one voice skewed the others by ~1sp, and
+// a wide lyric syllable inverted x-order against onset-order outright — a
+// note drawn AFTER one it sounds before.
+//
+// The merge is the classic engraving model: every distinct onset in the bar
+// is ONE shared column. Anchors at the same onset share an x by
+// construction; consecutive columns must clear each other's widest rigid
+// halves (so a sharp or a wide syllable in ANY voice makes room in all of
+// them); and each voice's own [post + spring + pre] demands run as chain
+// constraints between its consecutive entries. Anchor positions are the
+// longest path over those constraints, and the bar's justification stretch
+// is solved so the merged width lands exactly on the width the packer gave.
+//
+// Single-voice measures keep the legacy walk verbatim, and a multi-voice
+// measure whose merged positions coincide with the legacy ones (within
+// 1e-6) emits the LEGACY floats — alignment that was already right stays
+// byte-identical in the goldens rather than churning by arithmetic order.
+
+interface MergedVoice {
+  staff: number;
+  voice: number;
+  entries: EventMetrics[];
+}
+
+interface MergedEdge {
+  from: number; // -1 = the bar's content start
+  to: number;
+  rigid: number;
+  spring: number;
+}
+
+interface MergedModel {
+  /** Anchor x per (flattened voice, entry), relative to content start, plus
+   *  the merged content width, at one justification stretch. */
+  solve(stretch: number): { anchors: number[][]; width: number };
+  /** The same anchors with the stretch SOLVED so the merged width lands on
+   *  `width` exactly — parametric (no bisection), so positions respond to
+   *  width with the same smooth linear arithmetic the legacy walk has, and
+   *  the engraving stays a pure function of the packing signature. */
+  solveFor(width: number): { anchors: number[][]; width: number };
+  voices: MergedVoice[];
+}
+
+function halfCoreSp(e: EventMetrics, ink: number): number {
+  return ((e.graceCount ? GRACE_NOTE_ADVANCE_SP : CORE_SP) * ink) / 2;
+}
+
+/** Null when fewer than two voices carry entries — the legacy walk owns the
+ *  single-voice case, floats and all. */
+function mergedModelOf(staves: EventMetrics[][][], ink: number): MergedModel | null {
+  const voices: MergedVoice[] = [];
+  staves.forEach((staff, staffIndex) =>
+    staff.forEach((entries, voiceIndex) => {
+      if (entries.length > 0) voices.push({ staff: staffIndex, voice: voiceIndex, entries });
+    })
+  );
+  if (voices.length < 2) return null;
+
+  // Shared columns: the distinct onsets, EPS-grouped.
+  const allOnsets = voices
+    .flatMap(v => v.entries.map(e => e.onset))
+    .filter((t): t is number => t !== undefined)
+    .sort((a, b) => a - b);
+  const nodeOnsets: number[] = [];
+  for (const t of allOnsets) {
+    if (nodeOnsets.length === 0 || t - nodeOnsets[nodeOnsets.length - 1] > ONSET_EPS) nodeOnsets.push(t);
+  }
+  const sharedNodeOf = (t: number): number => {
+    let lo = 0;
+    let hi = nodeOnsets.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (nodeOnsets[mid] < t - ONSET_EPS) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  };
+
+  // Nodes: shared columns, then one private node per grace container (glued
+  // to its successor by its own chain edges only), then the content end.
+  let nodeCount = nodeOnsets.length;
+  const entryNode: number[][] = voices.map(v =>
+    v.entries.map(e => (e.onset !== undefined ? sharedNodeOf(e.onset) : nodeCount++))
+  );
+  const endNode = nodeCount++;
+
+  // The widest rigid halves at each shared column, across every voice.
+  const maxPre = new Array<number>(nodeOnsets.length).fill(0);
+  const maxPost = new Array<number>(nodeOnsets.length).fill(0);
+  voices.forEach((v, vi) =>
+    v.entries.forEach((e, k) => {
+      if (e.onset === undefined) return;
+      const node = entryNode[vi][k];
+      maxPre[node] = Math.max(maxPre[node], e.leading + halfCoreSp(e, ink));
+      maxPost[node] = Math.max(maxPost[node], e.core - halfCoreSp(e, ink));
+    })
+  );
+
+  const edges: MergedEdge[] = [];
+  // Chain constraints: each voice's own column arithmetic, between its
+  // consecutive entries — exactly the legacy cursor walk, as inequalities.
+  voices.forEach((v, vi) => {
+    let prev: { node: number; e: EventMetrics } | null = null;
+    v.entries.forEach((e, k) => {
+      const node = entryNode[vi][k];
+      const pre = e.leading + halfCoreSp(e, ink);
+      if (prev === null) {
+        edges.push({ from: -1, to: node, rigid: pre, spring: 0 });
+      } else {
+        edges.push({
+          from: prev.node,
+          to: node,
+          rigid: prev.e.core - halfCoreSp(prev.e, ink) + pre,
+          spring: prev.e.spring
+        });
+      }
+      prev = { node, e };
+    });
+    if (prev !== null) {
+      const last = prev as { node: number; e: EventMetrics };
+      edges.push({
+        from: last.node,
+        to: endNode,
+        rigid: last.e.core - halfCoreSp(last.e, ink),
+        spring: last.e.spring * MEASURE_TRAIL_FACTOR
+      });
+    }
+  });
+  // Ordering constraints: a later column clears the widest rigid halves
+  // between it and the one before — the cross-voice guarantee that x stays
+  // monotone in onset whatever any single voice demands.
+  for (let j = 1; j < nodeOnsets.length; j++) {
+    edges.push({ from: j - 1, to: j, rigid: maxPost[j - 1] + maxPre[j], spring: 0 });
+  }
+  if (nodeOnsets.length > 0) {
+    edges.push({ from: nodeOnsets.length - 1, to: endNode, rigid: maxPost[nodeOnsets.length - 1], spring: 0 });
+  }
+
+  // Longest path by relaxation over (rigid, spring) PAIRS compared at one
+  // stretch: the graph is a DAG (edges follow onset and entry order) and
+  // tiny, so passes-until-stable is simplest and safe. Carrying the pair
+  // instead of a scalar is what lets `solveFor` solve the stretch exactly.
+  const relax = (stretch: number) => {
+    const rigidAt = new Array<number>(nodeCount).fill(0);
+    const springAt = new Array<number>(nodeCount).fill(0);
+    for (let pass = 0; pass < nodeCount + 1; pass++) {
+      let moved = false;
+      for (const edge of edges) {
+        const fromRigid = edge.from === -1 ? 0 : rigidAt[edge.from];
+        const fromSpring = edge.from === -1 ? 0 : springAt[edge.from];
+        const rigid = fromRigid + edge.rigid;
+        const spring = fromSpring + edge.spring;
+        if (rigid + spring * stretch > rigidAt[edge.to] + springAt[edge.to] * stretch + 1e-12) {
+          rigidAt[edge.to] = rigid;
+          springAt[edge.to] = spring;
+          moved = true;
+        }
+      }
+      if (!moved) break;
+    }
+    return { rigidAt, springAt };
+  };
+  const anchorsFrom = (rigidAt: number[], springAt: number[], stretch: number) => ({
+    anchors: voices.map((v, vi) =>
+      v.entries.map((_, k) => rigidAt[entryNode[vi][k]] + springAt[entryNode[vi][k]] * stretch)
+    ),
+    width: rigidAt[endNode] + springAt[endNode] * stretch
+  });
+
+  const solve = (stretch: number) => {
+    const { rigidAt, springAt } = relax(stretch);
+    return anchorsFrom(rigidAt, springAt, stretch);
+  };
+
+  const solveFor = (width: number) => {
+    // Parametric critical path: at the current stretch the end node carries
+    // the binding (rigid, spring) pair; solving that pair for `width` and
+    // re-relaxing converges in a few steps (the path set is finite and
+    // monotone in stretch). Positions come out LINEAR in width per regime —
+    // no bisection quantization to cross a rounding boundary.
+    let stretch = 0;
+    let state = relax(stretch);
+    for (let iter = 0; iter < 12; iter++) {
+      const rigid = state.rigidAt[endNode];
+      const spring = state.springAt[endNode];
+      const next = spring > 1e-12 ? Math.max(0, (width - rigid) / spring) : stretch;
+      const settled = Math.abs(next - stretch) < 1e-12;
+      stretch = next;
+      state = relax(stretch);
+      if (settled) break;
+    }
+    return anchorsFrom(state.rigidAt, state.springAt, stretch);
+  };
+
+  return { solve, solveFor, voices };
+}
+
+/** The merged natural (rigid, spring-at-1) pair — what packing must reserve
+ *  when the cross-voice constraints bind beyond the widest single voice. */
+function mergedNaturalWidth(
+  staves: EventMetrics[][][],
+  ink: number
+): { rigid: number; spring: number } | null {
+  const model = mergedModelOf(staves, ink);
+  if (!model) return null;
+  const rigid = model.solve(0).width;
+  const atOne = model.solve(1).width;
+  return { rigid, spring: Math.max(0, atOne - rigid) };
 }
 
 export function planHorizontal(
@@ -1168,12 +1387,16 @@ export function planHorizontal(
                 nextDynamic++;
               }
             }
+            const columnOnset = onset;
             const withColumnExtras = (m: EventMetrics): EventMetrics => {
               let out = m;
               if (dynamicWidth > out.core) out = { ...out, core: dynamicWidth };
               if (midHere.length) {
                 out = { ...out, leading: out.leading + midHere.length * MID_CLEF_WIDTH_SP, midClefs: midHere };
               }
+              // Un-timed grace containers keep no onset — they are private
+              // columns glued to their successor, not shared-column members.
+              if (out.graceCount === undefined) out = { ...out, onset: columnOnset };
               return out;
             };
             try {
@@ -1257,7 +1480,10 @@ export function planHorizontal(
       );
     }
 
-    // The widest voice across ALL staves governs the measure's natural width.
+    // The widest voice across ALL staves governs the measure's natural width
+    // — raised by the merged cross-voice constraints when they bind (a
+    // mixed path through shared onset columns can be longer than any single
+    // voice's chain; without this the bar would overflow its packed width).
     const allVoices = staves.flat();
     let rigid = multiRest ? MULTIREST_WIDTH_SP : collapsed ? 0 : EMPTY_CONTENT_SP;
     let spring = 0;
@@ -1267,6 +1493,13 @@ export function planHorizontal(
       if (voiceRigid + voiceSpring > rigid + spring) {
         rigid = voiceRigid;
         spring = voiceSpring;
+      }
+    }
+    {
+      const merged = mergedNaturalWidth(staves, 1);
+      if (merged && (merged.rigid > rigid + 1e-6 || merged.rigid + merged.spring > rigid + spring + 1e-6)) {
+        rigid = Math.max(rigid, merged.rigid);
+        spring = Math.max(spring, merged.spring);
       }
     }
 
@@ -1383,6 +1616,11 @@ export function planHorizontal(
           spring = voiceSpring;
         }
       }
+      const merged = mergedNaturalWidth(m.staves, inkRatio);
+      if (merged && (merged.rigid > rigid + 1e-6 || merged.rigid + merged.spring > rigid + spring + 1e-6)) {
+        rigid = Math.max(rigid, merged.rigid);
+        spring = Math.max(spring, merged.spring);
+      }
       m.rigid = rigid;
       m.spring = spring;
     }
@@ -1460,34 +1698,88 @@ export function planHorizontal(
       // Mid-measure clef anchors come from the first voice of the staff that
       // reserved the column (its voices agree on the metric onset).
       const midClefXs = new Map<string, { x: number; clef: ActiveClef; staff: number }>();
-      const staves = m.staves.map((staffVoices, s) =>
+      // Legacy per-voice walk — the single-voice truth, and the byte-
+      // stability reference for multi-voice bars the merge leaves in place.
+      // Grace containers: x is the centre of the FIRST small column; the
+      // renderer advances by GRACE_NOTE_ADVANCE_SP per inner note.
+      const legacyAt = (start: number, width: number) => m.staves.map(staffVoices =>
         staffVoices.map(voice => {
           const voiceRigid = voice.reduce((sum, e) => sum + e.leading + e.core, 0);
           const voiceSpring = voiceSpringSum(voice);
           const voiceStretch = voiceSpring > 0
-            ? Math.max(0, (contentWidth - voiceRigid) / voiceSpring)
+            ? Math.max(0, (width - voiceRigid) / voiceSpring)
             : 1;
-          let cursor = contentStartX;
-          return voice.map((e): EventSlot => {
-            (e.midClefs ?? []).forEach((mc, k) => {
+          let cursor = start;
+          return voice.map(e => {
+            const colStart = cursor;
+            const slotX =
+              cursor + e.leading +
+              ((e.graceCount ? GRACE_NOTE_ADVANCE_SP : CORE_SP) * inkRatio) / 2;
+            cursor += e.leading + e.core + e.spring * voiceStretch;
+            return { x: slotX, colStart };
+          });
+        })
+      );
+      const legacy = legacyAt(contentStartX, contentWidth);
+
+      // The onset-aligned overlay: shared columns across every voice and
+      // staff of the bar, at a stretch solved against the packed width.
+      const model = mergedModelOf(m.staves, inkRatio);
+      const mergedAt = (start: number, width: number) => {
+        const solved = model!.solveFor(width);
+        const anchorsBy = new Map<string, number[]>();
+        model!.voices.forEach((v, vi) => anchorsBy.set(`${v.staff}:${v.voice}`, solved.anchors[vi]));
+        return m.staves.map((staffVoices, sIdx) =>
+          staffVoices.map((voice, vIdx) => {
+            const anchors = anchorsBy.get(`${sIdx}:${vIdx}`);
+            return voice.map((e, k) => {
+              if (!anchors) return legacyAt(start, width)[sIdx][vIdx][k];
+              // Snapped to 1e-9: the packer's cursor carries ~1e-14 float
+              // noise across densities, and merged anchors are dyadic-clean
+              // values that land exactly on rounding half-way points — the
+              // combination flips a printed digit between densities that
+              // must engrave identically. Half a nanospace is far below
+              // anything drawable; determinism is not.
+              const x = Math.round((start + anchors[k]) * 1e9) / 1e9;
+              const half = ((e.graceCount ? GRACE_NOTE_ADVANCE_SP : CORE_SP) * inkRatio) / 2;
+              return { x, colStart: x - e.leading - half };
+            });
+          })
+        );
+      };
+      // Adopted only when it MOVES something — decided ONCE, at the bar's
+      // natural width, so the choice cannot flip with the row's density (the
+      // engraving must stay a pure function of the packing signature, which
+      // is the density ladder's whole contract). A bar whose voices already
+      // agree keeps the legacy floats, so its goldens cannot churn.
+      let chosen = legacy;
+      if (model) {
+        const naturalWidth = m.rigid + m.spring;
+        const legacyNat = legacyAt(0, naturalWidth);
+        const mergedNat = mergedAt(0, naturalWidth);
+        const moved = mergedNat.some((sv, si) =>
+          sv.some((vv, vi) => vv.some((slot, ki) => Math.abs(slot.x - legacyNat[si][vi][ki].x) > 1e-6))
+        );
+        if (moved) chosen = mergedAt(contentStartX, contentWidth);
+      }
+
+      const staves = m.staves.map((staffVoices, s) =>
+        staffVoices.map((voice, v) =>
+          voice.map((e, k): EventSlot => {
+            const placed = chosen[s][v][k];
+            (e.midClefs ?? []).forEach((mc, j) => {
               const key = `${s}:${mc.timelineIndex}`;
               if (!midClefXs.has(key)) {
                 midClefXs.set(key, {
-                  x: cursor + k * MID_CLEF_WIDTH_SP * inkRatio + MID_CLEF_LEFT_PAD_SP,
+                  x: placed.colStart + j * MID_CLEF_WIDTH_SP * inkRatio + MID_CLEF_LEFT_PAD_SP,
                   clef: mc.clef,
                   staff: s + 1
                 });
               }
             });
-            // Grace containers: x is the centre of the FIRST small column;
-            // the renderer advances by GRACE_NOTE_ADVANCE_SP per inner note.
-            const slotX =
-              cursor + e.leading +
-              ((e.graceCount ? GRACE_NOTE_ADVANCE_SP : CORE_SP) * inkRatio) / 2;
-            cursor += e.leading + e.core + e.spring * voiceStretch;
-            return { x: slotX };
-          });
-        })
+            return { x: placed.x };
+          })
+        )
       );
 
       measures[i] = {

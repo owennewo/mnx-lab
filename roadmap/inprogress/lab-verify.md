@@ -86,6 +86,34 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
+### 13. Onset-aligned columns across voices — **2 stale, 10 re-moved**
+
+Owner: no roadmap doc — the user-chosen fix (2026-08-31, option A of the
+report) for cross-voice mis-ordering: each voice used to be spaced by its
+own independent walk, so a wide syllable (or an accidental) in one voice
+could draw an earlier note AFTER a later note of another voice. Every
+distinct onset in a bar is now ONE shared column across all voices and
+staves: same-onset events share an anchor, x is monotone in onset, and one
+voice's rigid demands make room in all of them. Single-voice bars keep the
+legacy arithmetic byte-for-byte; multi-voice bars whose voices already
+agreed also keep it (the merge is adopted per bar only when it moves
+something). Pinned by `harness/conformance/onset-columns.test.ts`.
+Demoted: `spec/multiple-voices`, `lab/edge-cases/bar-duration-mismatch`.
+Ten more scenarios moved that were ALREADY in the queue (grand-staff,
+organ-layout, parts, rest-positions, tie-targets, multiple-layouts,
+twelve-bar-blues, navigation-playground, coloured-marks-and-clef-forms,
+lyrics/tab-verses) — their earlier what-to-look-for notes still apply, plus
+this batch's.
+
+**What a reviewer should look for.** In every multi-voice or multi-staff
+bar: notes that sound together sit exactly on one vertical line (grand
+staff and organ pedal parts included — this is the fix's bonus); notes that
+sound later sit strictly right of everything earlier, whatever voice they
+are in; an accidental or a wide syllable in one voice opens the same gap in
+all voices. Bars may read slightly wider where the merge binds. Density
+side-effect, deliberate: below ~0.1 this corpus's packing no longer
+changes — extreme squeeze pins merged bars at their rigid floor.
+
 ### 12. Lyric width split around the note — **4 stale**
 
 Owner: no roadmap doc — a user-reported occlusion (2026-08-31): a wide

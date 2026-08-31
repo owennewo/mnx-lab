@@ -371,9 +371,9 @@
       },
       {
         "kind": "line",
-        "x1": 43.081,
+        "x1": 44.231,
         "y1": 17.632,
-        "x2": 45.569,
+        "x2": 46.719,
         "y2": 17.632,
         "thickness": 0.16,
         "className": "ledger-line"
@@ -381,7 +381,7 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 43.481,
+        "x": 44.631,
         "y": 17.132,
         "className": "notehead",
         "sourceId": "@m1.s2.v0.e0.n0"

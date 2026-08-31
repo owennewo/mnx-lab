@@ -262,7 +262,13 @@ describe('zoom / density', () => {
         planHorizontal(twelveBars(), 80, { densityH }).measures.filter(m => m.row === 0).length;
       expect(rows(0.5)).toBe(rows(1));
       expect(rows(MIN_DENSITY)).toBeLessThan(rows(0.5));
-      expect(firstRow(MIN_DENSITY)).toBeGreaterThan(firstRow(0.1));
+      // 0.1 → 0.15 when onset-aligned columns landed (2026-08-31): merging
+      // voices raised the multi-voice bars' rigid floor, so this score's
+      // packing now bottoms out by ~0.1 instead of at the floor itself. The
+      // floor still buys packing over the mid-range, which was the ruling's
+      // point; whether it should RISE to the new bottom-out is a product
+      // retune deliberately left open.
+      expect(firstRow(MIN_DENSITY)).toBeGreaterThan(firstRow(0.15));
       expect(MIN_DENSITY).toBeLessThan(0.5);
     });
 
@@ -276,14 +282,17 @@ describe('zoom / density', () => {
       // Nothing left to gain below the floor: the line already holds every bar
       // its rigid notehead columns will fit.
       expect(bars(MIN_DENSITY)).toEqual(bars(MIN_DENSITY / 4));
-      // And the floor really is the value that gets there — one bar further
-      // onto the first system than the intermediate 0.1 manages.
-      expect(bars(MIN_DENSITY)[0]).toBeGreaterThan(bars(0.1)[0]);
-      // What still changes below it is raggedness, not packing: the springs
-      // can no longer reach the right margin within MAX_STRETCH. Real changes,
-      // honestly reported by the ladder — just not ones worth offering, which
-      // is why a floor still exists at all.
-      expect(engraving(twelveBars(), MIN_DENSITY, 80)).not.toBe(
+      // And the floor's region really is where the last bar arrives — one
+      // further onto the first system than 0.15 manages. (0.1 until the
+      // onset-aligned column merge raised the multi-voice rigid floor and
+      // pulled this score's bottom-out up to ~0.1 — see the sibling test.)
+      expect(bars(MIN_DENSITY)[0]).toBeGreaterThan(bars(0.15)[0]);
+      // Below the floor NOTHING changes any more on this score — since the
+      // onset-aligned column merge, an extreme squeeze pins the multi-voice
+      // bars at their merged rigid floor and the raggedness that used to
+      // wiggle under it is gone too. The floor now hides literally nothing,
+      // which is the strongest form of the claim that chose it.
+      expect(engraving(twelveBars(), MIN_DENSITY, 80)).toBe(
         engraving(twelveBars(), MIN_DENSITY + 0.01, 80)
       );
     });

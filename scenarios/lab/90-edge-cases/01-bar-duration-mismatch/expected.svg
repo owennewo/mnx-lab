@@ -16,8 +16,8 @@
 <text x="474.16" y="224" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="flag"></text>
 <text x="206.16" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v1.e0.n0"></text>
 <line x1="225.04" y1="96" x2="225.04" y2="149.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="429.6608" y="144" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v1.e1.n0"></text>
-<line x1="448.5408" y1="88" x2="448.5408" y2="141.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<text x="362.16" y="144" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v1.e1.n0"></text>
+<line x1="381.04" y1="88" x2="381.04" y2="141.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="530.4" y1="128" x2="530.4" y2="192" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <rect x="36.8" y="211.2" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
 <title>validation — voice 1 underfills the 4/4 bar: notes sum to 3.5 of 4 beats</title></rect>

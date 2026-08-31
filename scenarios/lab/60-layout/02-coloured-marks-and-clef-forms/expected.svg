@@ -42,8 +42,8 @@
 <text x="561.2" y="314.112" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
 <text x="699.76" y="184" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="accidental"></text>
 <text x="714.096" y="184" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
-<line x1="689.296" y1="282.112" x2="729.104" y2="282.112" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
-<text x="695.696" y="274.112" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.s2.v0.e0.n0"></text>
+<line x1="707.696" y1="282.112" x2="747.504" y2="282.112" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
+<text x="714.096" y="274.112" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.s2.v0.e0.n0"></text>
 <line x1="793.2" y1="128" x2="793.2" y2="362.112" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="798" y="128" width="8" height="234.112" fill="currentColor" class="barline barline-final-thick"></rect>
 <text x="806" y="88" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="#c0392b" font-style="italic" class="fine">fine</text>
