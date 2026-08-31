@@ -86,16 +86,17 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
-### 11. Barline weights unified across staff kinds — **26 tab goldens moved, all already `rendered`**
+### 11. Barline weights unified across staff kinds — **27 tab goldens moved, all already `rendered`**
 
 Owner: no roadmap doc — the audit-cleanup sweep (2026-08-31). The standalone tab
 layout carried its own lighter barline strokes (thin 0.1sp / thick 0.4sp) while the
 notation layout — which also draws the native tab staff in the `both` view — used
 0.16/0.5, so the same tab staff rendered with different line weights depending on
 view. Both layouts now consume ONE `STANDARD_BARLINE_METRICS` (0.16/0.5/0.3) from
-`src/engine/layout/barlines.ts`. 26 scenarios moved, `expected.primitives.json` +
+`src/engine/layout/barlines.ts`. 27 scenarios moved, `expected.primitives.json` +
 `expected.tab.svg` only — **no notation or both golden moved**, which is itself the
-check that the fix touched exactly the forked half. Every affected scenario was
+check that the fix touched exactly the forked half (the 27th,
+`lab/50-lyrics/02-tab-verses`, landed upstream mid-audit and joined on rebase). Every affected scenario was
 already `rendered` (owed to earlier batches), so no `verified` approval was
 invalidated; this note records the additional cause a reviewer will see.
 
