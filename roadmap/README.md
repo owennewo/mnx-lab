@@ -183,8 +183,8 @@ back up to `proposed/` the moment it is.
   hardest. Every retirement is gated on demonstrated coverage: census before coverage,
   coverage before removal, ops before surfaces. Items 1–5 (key ✅, time ✅, clef ✅, bar
   attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics 🔧 phase 1
-  built, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part ✅, layout ✅) need new ops or a construct story; 11 (the
-  tray) retires a charter, re-homes the verbs, and goes last. Standing ruling from item
+  built, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part ✅, layout ✅) need new ops or a construct story; 11 — split into 11a (attribute
+  tiles, pure sweep) and 11b (verbs + shell, the generalization thesis) — goes last.
   1: freed keys are freed, not accelerators.
 - **[core-selection-range-grain.md](inprogress/core-selection-range-grain.md)** — **decisions 1–4 built 2026-08-30** (section and container rungs retired, staff off
   partMeasure identity; spanner work remains); the
