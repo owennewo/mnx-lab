@@ -44,11 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-adornment.md](proposed/workbench-one-surface-adornment.md)** —
-  one-surface campaign item 5, **built 2026-08-31**: the adornment popover retired — the
-  broadest grammar of the easy five (eight parser arms, thirteen intents) and the purest
-  sweep, with parity automatic through `parseAdornmentLine`. Five tiles deleted, four
-  stray badges stripped pre-emptively; the census-and-sweep half of the campaign closes.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -242,6 +237,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-one-surface-adornment.md](complete/workbench-one-surface-adornment.md)** —
+  one-surface campaign item 5, **built 2026-08-31**: the adornment popover retired — the
+  broadest grammar of the easy five (eight parser arms, thirteen intents) and the purest
+  sweep, with parity automatic through `parseAdornmentLine`. Five tiles deleted, four
+  stray badges stripped pre-emptively; the census-and-sweep half of the campaign closes.
 - **[workbench-one-surface-bar.md](complete/workbench-one-surface-bar.md)** — one-surface
   campaign item 4, **built 2026-08-31**: the bar-attribute popover retired — the largest
   census of the easy five (every measure-attribute kind plus the two rhythm riders), six
