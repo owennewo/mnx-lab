@@ -44,6 +44,13 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[workbench-one-surface-lyrics.md](proposed/workbench-one-surface-lyrics.md)** —
+  one-surface campaign item 6, **proposed 2026-08-31, design open**: the lyric popover's
+  retirement plan — the line-metadata gap is the minimum bar, and two investigations are
+  framed for a follow-up design pass: verse lines × bar repeats (data or derived?), and a
+  WYTIWYG lyric lane (typed syllables landing under successive notes — which would
+  partially reopen the popover-not-a-mode ruling). Shift+L's accelerator exception is
+  decided with the design, not before; the popover stays until coverage lands.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)

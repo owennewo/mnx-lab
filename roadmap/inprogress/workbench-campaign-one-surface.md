@@ -83,7 +83,7 @@ is one popover or the tray, and one work item.
 | 3 | **Clef** (~~`Shift+C`~~ freed) | `clef` pill at partMeasure, stage 4 — reuses `parseClef` | verify the registry's `measure` cross-listing loses nothing; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-clef.md) |
 | 4 | **Bar attributes** (~~`Shift+B`~~ freed) | one pill per declared attribute, stage 3 — reuses `parseBarAttribute`; the rhythm riders live as voiceMeasure pills | verify all ten kinds + `tempo#n` array + segno/fine `at` forms; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-bar.md) |
 | 5 | **Adornments** (~~`Shift+A`~~ freed) | markings/positioned pills, stage 4 — reuses `parseAdornment` | verify breadth (all markings, dynamics, directions incl. glyphs); sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-adornment.md) |
-| 6 | **Lyrics** (`Shift+L`) | syllable pills per line (`lyric 2: Am`), stage 4 — reuses `parseLyric` | **gap: line management** — `setLyricLine`/`removeLyricLine` (labels, lang) has no pill or word; close it, then sweep | row |
+| 6 | **Lyrics** (`Shift+L`) | syllable pills per line (`lyric 2: Am`), stage 4 — reuses `parseLyric` | **gap: line management** — plus two design investigations (lines × repeats, WYTIWYG entry) | 📝 [proposed 2026-08-31](../proposed/workbench-one-surface-lyrics.md) — design open |
 | 7 | **Tuning** (`Shift+U`) | `capo` pill writable; `strings` is a **read-only** reading | **gap: the tuning write path** — `parseTuning`'s sentence has no inspector form; a strings pill that writes (part rung), refusals for strings in use; sweep | row |
 | 8 | **Rhythm** (`Shift+R`) | container pills are **read-only** (`tuplet: 3:2`, dotted, refuse Enter); full-measure rest / measure repeat pills exist at voiceMeasure | **gap: the missing verb** — the `setContainerProperties`-class op the residue ledger names, plus a construction story for tuplet/grace/authored-silence declarations (contract §2: construction is a verb) | row |
 | 9 | **Part** (`Shift+P`) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | row |
@@ -111,6 +111,13 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Progress + learnings log
 
+- **2026-08-31 — item 6 (lyrics) proposal written, design open.** Not a sweep:
+  beyond the line-metadata gap, the doc frames two investigations for a fresh
+  conversation — how verse lines relate to repeat passes/voltas (data vs
+  derived), and a WYTIWYG lyric lane (which would partially reopen item 12's
+  popover-not-a-mode ruling; precedents and open questions recorded). The
+  Shift+L accelerator exception is explicitly deferred to that design. The
+  popover stays until coverage is demonstrated.
 - **2026-08-31 — item 5 (adornments) built.** The census-and-sweep five are
   done. Broadest grammar (eight parser arms, thirteen intents), purest sweep —
   parity automatic through `parseAdornmentLine`, zero new assertions needed.
