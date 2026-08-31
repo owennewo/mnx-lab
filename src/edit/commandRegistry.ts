@@ -866,15 +866,6 @@ export const COMMANDS: readonly EditorCommand[] = [
 
   // ── measure (the global bar) ────────────────────────────────────────────
   {
-    id: 'key-signature',
-    scopes: ['measure'],
-    glyph: { smufl: 'accidentalSharp' },
-    label: 'Key signature…',
-    shortcut: 'Shift+K',
-    tier: 'popover',
-    action: () => ({ surface: 'keySignaturePopover' })
-  },
-  {
     id: 'time-signature',
     scopes: ['measure'],
     glyph: { smufl: 'timeSig4' },
@@ -1320,7 +1311,7 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     {
       id: 'signatures',
       caption: 'signatures',
-      commands: ['clef', 'key-signature', 'time-signature']
+      commands: ['clef', 'time-signature']
     },
     {
       id: 'repeats',

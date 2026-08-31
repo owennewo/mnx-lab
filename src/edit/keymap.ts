@@ -207,7 +207,6 @@ export type ShellAction =
   | 'tuningPopover'
   | 'partPopover'
   | 'clefPopover'
-  | 'keySignaturePopover'
   | 'barAttributePopover'
   | 'adornmentPopover'
   | 'lyricPopover'
@@ -244,11 +243,12 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // Part genesis (element-ops exemplar): construct traces start from {},
   // so "add part" needs a keyboard surface — setup tier like its siblings.
   { code: 'KeyP', shift: true, action: 'partPopover' },
-  // The inherited-attribute pair (campaign item 5): setup tier like their
+  // The inherited-attribute popover (element-ops item 5): setup tier like its
   // siblings, and the same grammar hosts removal via the `inherit` token,
   // because Del at the measure rung already means "remove the empty bar".
+  // Its pair, key signature (Shift+K), retired to the inspector's `key`
+  // pill/word — one-surface campaign item 1; the key is deliberately FREE.
   { code: 'KeyC', shift: true, action: 'clefPopover' },
-  { code: 'KeyK', shift: true, action: 'keySignaturePopover' },
   // The bar-attribute family (campaign item 7): ten kinds behind one
   // popover, because they are all keys on the global measure.
   { code: 'KeyB', shift: true, action: 'barAttributePopover' },

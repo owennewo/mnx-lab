@@ -1,7 +1,7 @@
 # One editing surface — retire the popovers and the tray into the inspector
 
-> **Status: proposed 2026-08-31 — campaign.** The three-surface experiment run by
-> [workbench-rung-inspector.md](../inprogress/workbench-rung-inspector.md) ("a third
+> **Status: in progress 2026-08-31 — campaign; item 1 built the same day.** The three-surface experiment run by
+> [workbench-rung-inspector.md](workbench-rung-inspector.md) ("a third
 > editing surface, to be tried *beside* the tray and the popovers so that use decides
 > which wins") has its verdict: **the inspector wins.** The user's ruling, 2026-08-31:
 > all `Shift+letter` popovers and the selection tray retire — but only once the
@@ -78,7 +78,7 @@ is one popover or the tray, and one work item.
 
 | # | Surface (key) | Inspector coverage today | What the item must close | Status |
 |---|---|---|---|---|
-| 1 | **Key signature** (`Shift+K`) | `key` pill, stage 3 — reuses `parseKeySignature`, `inherit` = Backspace floor | census + removal sweep only | row |
+| 1 | **Key signature** (~~`Shift+K`~~ freed) | `key` pill, stage 3 — reuses `parseKeySignature`, `inherit` = Backspace floor | census + removal sweep only | ✅ [built 2026-08-31](../proposed/workbench-one-surface-key.md) |
 | 2 | **Time signature** (`Shift+T`) | `time` pill, stage 3 — reuses `parseTimeSignature`, floor when declared | census + removal sweep only | row |
 | 3 | **Clef** (`Shift+C`) | `clef` pill at partMeasure, stage 4 — reuses `parseClef` | verify the registry's `measure` cross-listing loses nothing; sweep | row |
 | 4 | **Bar attributes** (`Shift+B`) | one pill per declared attribute, stage 3 — reuses `parseBarAttribute`; the rhythm riders live as voiceMeasure pills | verify all ten kinds + `tempo#n` array + segno/fine `at` forms; sweep | row |
@@ -88,7 +88,7 @@ is one popover or the tray, and one work item.
 | 8 | **Rhythm** (`Shift+R`) | container pills are **read-only** (`tuplet: 3:2`, dotted, refuse Enter); full-measure rest / measure repeat pills exist at voiceMeasure | **gap: the missing verb** — the `setContainerProperties`-class op the residue ledger names, plus a construction story for tuplet/grace/authored-silence declarations (contract §2: construction is a verb) | row |
 | 9 | **Part** (`Shift+P`) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | row |
 | 10 | **Layout** (`Shift+E`, moved from `Shift+S`) | nothing — no document-rung pills exist | the document rung grows its pill families from `parseLayoutSentence`'s grammar (sources, systems, quoted names — the largest parser in the file); likely splits into sub-items when picked up | row |
-| 11 | **The selection tray** (`/`) | verbs are excluded from the inspector by charter; the `global` tab and the triage ledger (core-selection-tray-residue.md) have no inspector form | **last, and gated by 1–10** (its popover-tier tiles open the popovers). Re-home the verbs (keymap + the `?` legend + palette), decide the `global` tab's successor, absorb or retire the triage ledger, free `/` | row |
+| 11 | **The selection tray** (`/`) | verbs are excluded from the inspector by charter; the `global` tab and the triage ledger (../proposed/core-selection-tray-residue.md) have no inspector form | **last, and gated by 1–10** (its popover-tier tiles open the popovers). Re-home the verbs (keymap + the `?` legend + palette), decide the `global` tab's successor, absorb or retire the triage ledger, free `/` | row |
 
 The order inside 1–5 is near-arbitrary (all five are census-and-sweep); they are
 ranked by grammar size. 6–7 each carry one bounded gap. 8–10 each need design and at
@@ -97,11 +97,11 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Relations
 
-- [workbench-rung-inspector.md](../inprogress/workbench-rung-inspector.md) — the
+- [workbench-rung-inspector.md](workbench-rung-inspector.md) — the
   surface everything consolidates onto; its "What this does not decide → whether the
   popovers retire" is decided here. Its container-verb dependency is item 8's core.
 - [core-selection-tray-mechanism.md](../complete/core-selection-tray-mechanism.md),
-  [core-selection-tray-residue.md](core-selection-tray-residue.md) — the tray trio;
+  [core-selection-tray-residue.md](../proposed/core-selection-tray-residue.md) — the tray trio;
   item 11 is their sunset, and the residue doc's triage ledger must be settled by it.
 - [core-element-ops-bar-attributes.md](../complete/core-element-ops-bar-attributes.md)
   and siblings — the campaign that built the popovers; this one retires their
@@ -111,6 +111,15 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Progress + learnings log
 
+- **2026-08-31 — item 1 (key signature) built.** Ruling: freed keys are **freed,
+  not accelerators** — no inspector pre-fill on the retired mnemonic; a key edit
+  is Enter → bar rung → `key Bb`. The ruling is the campaign default for items
+  2–10 (lyrics flagged as the possible exception), so later items inherit it
+  rather than re-ask. Learnings: coverage evidence for the stage-3/4 families
+  largely pre-exists in `rung-inspector.test.ts` — check before writing new
+  smoke; the inspector's full-measure-rest refusal message says "Shift+B", which
+  item 4 must rewrite; the `ElementKind` names (`key-signature`) look like
+  surface ids but are the document census — leave them.
 - **2026-08-31 — campaign created.** Standing key decisions folded in from the
   proposing conversation: layout's popover moves `Shift+S` → `Shift+E` immediately
   (independent of item 10) so `Shift+S` can become the tab projection's shift slide;

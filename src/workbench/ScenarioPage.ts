@@ -69,7 +69,6 @@ import {
   parseBarAttribute,
   parseRhythm,
   parseClef,
-  parseKeySignature,
   parsePart,
   parseLayoutSentence,
   parseTimeSignature,
@@ -130,7 +129,7 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
 type PopoverKind =
-  | 'time' | 'tuning' | 'part' | 'clef' | 'key' | 'bar' | 'adornment' | 'lyric' | 'rhythm'
+  | 'time' | 'tuning' | 'part' | 'clef' | 'bar' | 'adornment' | 'lyric' | 'rhythm'
   | 'layout';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
@@ -157,11 +156,6 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
   clef: {
     label: 'clef',
     placeholder: 'treble · bass · treble8vb · inherit',
-    hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
-  },
-  key: {
-    label: 'key signature',
-    placeholder: 'C · Bb · F# · -3 · inherit',
     hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
   },
   lyric: {
@@ -191,7 +185,6 @@ const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   tuningPopover: 'tuning',
   partPopover: 'part',
   clefPopover: 'clef',
-  keySignaturePopover: 'key',
   barAttributePopover: 'bar',
   adornmentPopover: 'adornment',
   lyricPopover: 'lyric',
@@ -218,7 +211,6 @@ export const SETUP_POPOVER_COMMANDS: {
   { label: 'setup: time signature…', action: 'timeSignaturePopover', stroke: 'Shift+T' },
   { label: 'setup: add part…', action: 'partPopover', stroke: 'Shift+P' },
   { label: 'setup: clef…', action: 'clefPopover', stroke: 'Shift+C' },
-  { label: 'setup: key signature…', action: 'keySignaturePopover', stroke: 'Shift+K' },
   { label: 'setup: bar attribute…', action: 'barAttributePopover', stroke: 'Shift+B' },
   { label: 'setup: adornment…', action: 'adornmentPopover', stroke: 'Shift+A' },
   { label: 'setup: lyric…', action: 'lyricPopover', stroke: 'Shift+L' },
@@ -3294,15 +3286,6 @@ export class ScenarioPage extends LitElement {
               spec: parsed.wrap,
               ...(parsed.count === undefined ? {} : { count: parsed.count })
             }
-      );
-    } else if (this.setupPopover === 'key') {
-      const key = parseKeySignature(input.value);
-      if (!key) {
-        this.setupPopoverError = 'not a key — C, Bb, F#, a fifths count like -3, or “inherit”';
-        return;
-      }
-      this.stripIntent(
-        key === 'inherit' ? { type: 'removeKeySignature' } : { type: 'setKeySignature', fifths: key.fifths }
       );
     }
     this.setupPopover = null;

@@ -44,16 +44,12 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-campaign-one-surface.md](proposed/workbench-campaign-one-surface.md)** —
-  **campaign**: retire the ten `Shift+letter` popovers and the selection tray onto the
-  rung inspector, one surface per item, ordered simplest to hardest. The
-  three-surface experiment ([workbench-rung-inspector.md](inprogress/workbench-rung-inspector.md))
-  is called — the inspector wins — but every retirement is gated on demonstrated
-  coverage: census before coverage, coverage before removal, ops before surfaces.
-  Items 1–5 (key, time, clef, bar attributes, adornments) are census-and-sweep; 6–7
-  (lyrics, tuning) each close one bounded gap; 8–10 (rhythm, part, layout) need new
-  ops or a construct story; 11 (the tray) retires a charter, re-homes the verbs, and
-  cannot start until the popover-tier tiles have nothing left to open.
+- **[workbench-one-surface-key.md](proposed/workbench-one-surface-key.md)** — one-surface
+  campaign item 1, **built 2026-08-31**: the key-signature popover retired — the
+  inspector's `key` pill/word already covered the whole grammar (evidence pre-existed in
+  `rung-inspector.test.ts`), so the item is the pure sweep, plus the campaign's standing
+  ruling: freed keys are **freed, not accelerators** (`Shift+K` is unbound; lyrics may
+  later argue the exception).
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -178,6 +174,15 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[workbench-campaign-one-surface.md](inprogress/workbench-campaign-one-surface.md)** —
+  **campaign**, item 1 built 2026-08-31: retire the ten `Shift+letter` popovers and the
+  selection tray onto the rung inspector, one surface per item, ordered simplest to
+  hardest. Every retirement is gated on demonstrated coverage: census before coverage,
+  coverage before removal, ops before surfaces. Items 1–5 (key ✅, time, clef, bar
+  attributes, adornments) are census-and-sweep; 6–7 (lyrics, tuning) each close one
+  bounded gap; 8–10 (rhythm, part, layout) need new ops or a construct story; 11 (the
+  tray) retires a charter, re-homes the verbs, and goes last. Standing ruling from item
+  1: freed keys are freed, not accelerators.
 - **[core-selection-range-grain.md](inprogress/core-selection-range-grain.md)** — **decisions 1–4 built 2026-08-30** (section and container rungs retired, staff off
   partMeasure identity; spanner work remains); the
   ladder's rungs re-read as **range grains**, out of a 2026-08-30 rung-by-rung review:
