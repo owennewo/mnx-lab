@@ -44,12 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-layout.md](proposed/workbench-one-surface-layout.md)** —
-  one-surface campaign item 10, **built 2026-08-31**: the LAST popover retired — the
-  layout grammar moved wholesale to the document rung (summary pills, sentence amends,
-  slot/id resolution via the parse context; the `layout-authoring` residue row closes) —
-  and the campaign's founding debt is paid: **`Shift+S` is the shift slide**, with
-  `slideType` on the technique union and typed `slide shift`/`slide legato` forms.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -252,6 +246,12 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-one-surface-layout.md](complete/workbench-one-surface-layout.md)** —
+  one-surface campaign item 10, **built 2026-08-31**: the LAST popover retired — the
+  layout grammar moved wholesale to the document rung (summary pills, sentence amends,
+  slot/id resolution via the parse context; the `layout-authoring` residue row closes) —
+  and the campaign's founding debt is paid: **`Shift+S` is the shift slide**, with
+  `slideType` on the technique union and typed `slide shift`/`slide legato` forms.
 - **[workbench-one-surface-part.md](complete/workbench-one-surface-part.md)** —
   one-surface campaign item 9, **built 2026-08-31**: the part popover retired; part facts
   (name — the rename that never existed — staves, staff kind) live at the part-bar rung,
