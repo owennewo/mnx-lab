@@ -44,11 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-time.md](proposed/workbench-one-surface-time.md)** — one-surface
-  campaign item 2, **built 2026-08-31**: the time-signature popover retired; coverage
-  pre-existed (the `time` pill's floor semantics plus the typed branch's full grammar,
-  `common`/`cut`/`inherit` included — two assertions added). First global-tab casualty:
-  the `doc-time` tile went with the measure tile.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -242,6 +237,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-one-surface-time.md](complete/workbench-one-surface-time.md)** — one-surface
+  campaign item 2, **built 2026-08-31**: the time-signature popover retired; coverage
+  pre-existed (the `time` pill's floor semantics plus the typed branch's full grammar,
+  `common`/`cut`/`inherit` included — two assertions added). First global-tab casualty:
+  the `doc-time` tile went with the measure tile.
 - **[workbench-one-surface-key.md](complete/workbench-one-surface-key.md)** — one-surface
   campaign item 1, **built 2026-08-31**: the key-signature popover retired — the
   inspector's `key` pill/word already covered the whole grammar (evidence pre-existed in
