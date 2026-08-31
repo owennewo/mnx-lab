@@ -44,11 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-tray-attrs.md](proposed/workbench-one-surface-tray-attrs.md)** —
-  one-surface campaign item 11a, **built 2026-08-31**: the tray's 34 attribute tiles,
-  five factory helpers, twelve bands and two more glyph twins retired — every tile a
-  redundant spelling of an existing inspector word, key or pill. The tray is verbs-only
-  now; 11b inherits the shell-demolition bill.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -243,6 +238,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-one-surface-tray-attrs.md](complete/workbench-one-surface-tray-attrs.md)** —
+  one-surface campaign item 11a, **built 2026-08-31**: the tray's 34 attribute tiles,
+  five factory helpers, twelve bands and two more glyph twins retired — every tile a
+  redundant spelling of an existing inspector word, key or pill. The tray is verbs-only
+  now; 11b inherits the shell-demolition bill.
 - **[workbench-one-surface-layout.md](complete/workbench-one-surface-layout.md)** —
   one-surface campaign item 10, **built 2026-08-31**: the LAST popover retired — the
   layout grammar moved wholesale to the document rung (summary pills, sentence amends,
