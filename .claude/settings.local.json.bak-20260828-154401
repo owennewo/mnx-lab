@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check index.js)",
+      "Bash(node --check prompts/editNotation.js)",
+      "Bash(node -e \"import\\('./prompts/editNotation.js'\\).then\\(m => { const s = m.buildEditSystemPrompt\\({}\\); console.log\\('Prompt length:', s.length, 'chars'\\); console.log\\('Sections found:', \\(s.match\\(/^## §/gm\\) || []\\).length\\); console.log\\('---'\\); console.log\\(s.slice\\(0, 400\\)\\); console.log\\('...'\\); console.log\\(s.slice\\(-400\\)\\); }\\);\")",
+      "Bash(lsof -iTCP:3000 -sTCP:LISTEN -n -P)",
+      "Bash(ps -fp 18148)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"---exit $?---\")",
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('server/models.json','utf8'\\)\\); console.log\\('models.json valid'\\);\")",
+      "Bash(node --check server/index.js)",
+      "Bash(echo \"--- ESTABLISHED outbound \\(to OpenRouter\\):\"; lsof -p 38073 -i -n -P 2>/dev/null | grep -v LISTEN; echo \"--- model selectors in localStorage on disk? \\(chromium-default profile\\):\"; find ~/.config -path '*Local Storage*' -name '*.ldb' 2>/dev/null | head -3)",
+      "Read(//home/williao/.config/**)",
+      "Bash(node -e \"const m=JSON.parse\\(require\\('fs'\\).readFileSync\\('server/models.json','utf8'\\)\\); console.log\\(m.text.map\\(x=>x.id\\).join\\('\\\\n'\\)\\);\")",
+      "mcp__chrome-devtools__list_pages",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__evaluate_script",
+      "Bash(node --check /home/williao/dev/mnx-editor/server/index.js)",
+      "Bash(curl -sSL -o Bravura.woff2 \"https://raw.githubusercontent.com/steinbergmedia/bravura/master/redist/woff/Bravura.woff2\")",
+      "Bash(curl -sSL -o bravura_metadata.json \"https://raw.githubusercontent.com/steinbergmedia/bravura/master/redist/bravura_metadata.json\")",
+      "Bash(curl -sSL -o glyphnames.json \"https://raw.githubusercontent.com/w3c-cg/smufl/gh-pages/metadata/glyphnames.json\")",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('glyphnames.json'\\)\\); print\\('glyphs:', len\\(d\\)\\); print\\('gClef:', d.get\\('gClef'\\)\\); print\\('6stringTabClef:', d.get\\('6stringTabClef'\\)\\); print\\('repeatDots:', d.get\\('repeatDots'\\)\\); print\\('timeSig4:', d.get\\('timeSig4'\\)\\)\")",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('bravura_metadata.json'\\)\\); print\\('top keys:', list\\(d.keys\\(\\)\\)[:10]\\); print\\('engravingDefaults present:', 'engravingDefaults' in d\\); print\\('glyphsWithAnchors present:', 'glyphsWithAnchors' in d\\)\")",
+      "Bash(python3 -c ' *)",
+      "mcp__chrome-devtools__take_screenshot",
+      "Bash(pkill -f \"vite\")",
+      "Bash(kill 16915)",
+      "Bash(kill 16959)",
+      "Bash(curl -sS -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(curl -sS -o /dev/null -w \"vite=%{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(grep -n '^\\\\s*\"\\\\$id\"\\\\|^\\\\s*\"\\\\$comment\"\\\\|^\\\\s*\"title\"' /home/williao/dev/mnx-editor/schemas/mnx-schema.json)",
+      "WebSearch",
+      "WebFetch(domain:developers.cloudflare.com)",
+      "Bash(npm install *)"
+    ]
+  }
+}

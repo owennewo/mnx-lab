@@ -1,6 +1,6 @@
 # MusicXML & MNX Bi-directional Conversion Assessment
 
-This document assesses the feasibility, mappings, and challenges of bi-directional conversion between guitar-oriented MusicXML files (specifically based on the analysis of [House-of-the-Rising-Sun.xml](file:///home/williao/dev/mnx-editor/server/scores/House-of-the-Rising-Sun.xml)) and the W3C MNX format.
+This document assesses the feasibility, mappings, and challenges of bi-directional conversion between guitar-oriented MusicXML files (specifically based on the analysis of [House-of-the-Rising-Sun.xml](../../converters/fixtures/House-of-the-Rising-Sun.xml)) and the W3C MNX format.
 
 The goal of this assessment is to prepare for the development of a TypeScript-based internal package (`converters/musicxml-mnx`) that performs import (MusicXML $\rightarrow$ MNX) and export (MNX $\rightarrow$ MusicXML).
 
@@ -11,13 +11,13 @@ Bi-directional conversion is **highly feasible** but asymmetric:
 1. **MusicXML $\rightarrow$ MNX (Import)**: Requires stateful parsing to thread flat note streams into parallel sequences, aligning standard and TAB parts, and storing guitar-specific tablature details in the `_x` vendor extension.
 2. **MNX $\rightarrow$ MusicXML (Export)**: Requires splitting combined representations back into separate standard and TAB parts (note duplication), re-transposing pitches, and flattening sequences back into a single stream with `<backup>` and `<forward>` commands.
 3. **Roundtripping & ID Preservation**: Unique IDs must be deterministically mapped and suffixes added/stripped during splitting to avoid XML ID collisions while ensuring full roundtrip integrity.
-4. **Guitar Extension JSON Schema**: Stored under [guitar-tab-extension.schema.json](file:///home/williao/dev/mnx-editor/schemas/guitar-tab-extension.schema.json) to formally specify and validate note-level and part-level tab parameters under the `_x.guitar` property.
+4. **Guitar Extension JSON Schema**: Stored under [guitar-tab-extension.schema.json](../../spec/guitar-tab-extension.schema.json) to formally specify and validate note-level and part-level tab parameters under the `_x.guitar` property.
 
 ---
 
 ## 2. Common Type & Element Mappings
 
-Below is the complete mapping of all 56 unique XML element types found in [House-of-the-Rising-Sun.xml](file:///home/williao/dev/mnx-editor/server/scores/House-of-the-Rising-Sun.xml) to their equivalents in the MNX schema or the project's Typescript definition. This mapping serves as the foundation for both import and export.
+Below is the complete mapping of all 56 unique XML element types found in [House-of-the-Rising-Sun.xml](../../converters/fixtures/House-of-the-Rising-Sun.xml) to their equivalents in the MNX schema or the project's Typescript definition. This mapping serves as the foundation for both import and export.
 
 ### Document & Metadata Structure
 | MusicXML Element | MNX Schema Location | Supported Natively? | Mapping Logic & Suggested `_x` Extension |
@@ -118,7 +118,7 @@ graph TD
 ## 4. MusicXML $\rightarrow$ MNX (Import) Challenges
 
 ### 1. Merging Notation & Tablature Parts
-In [House-of-the-Rising-Sun.xml](file:///home/williao/dev/mnx-editor/server/scores/House-of-the-Rising-Sun.xml), there are two distinct parts:
+In [House-of-the-Rising-Sun.xml](../../converters/fixtures/House-of-the-Rising-Sun.xml), there are two distinct parts:
 * **Part `P1`**: Standard treble clef staff.
 * **Part `P2`**: Guitar tablature staff.
 
@@ -354,6 +354,6 @@ export function exportMusicXML(
 
 ## 9. Decoupling Renderer from Document Representation
 By separating the **document schema** from the **rendering engine**:
-1. **Lossless Conversion**: The CLI tool can fully preserve annotations, harmonies, dynamics, and guitar specifics in the exported/imported files, even if the current frontend renderer ([mnxToVexflow.ts](file:///home/williao/dev/mnx-editor/src/utils/mnxToVexflow.ts)) does not yet support drawing them. Fortunately, the project's [mnx.ts](file:///home/williao/dev/mnx-editor/src/types/mnx.ts) type definitions already include a custom `_x` schema for guitar frets, strings, fingerings, and bends. To formally define these structures, a JSON Schema has been designed at [guitar-tab-extension.schema.json](file:///home/williao/dev/mnx-editor/schemas/guitar-tab-extension.schema.json) which defines the `guitar` extensions at both the Note level (`_x.guitar` note extension) and the Part/Staff level (`_x.guitar` part/tuning extension).
+1. **Lossless Conversion**: The CLI tool can fully preserve annotations, harmonies, dynamics, and guitar specifics in the exported/imported files, even if the current frontend renderer (`mnxToVexflow.ts` (removed — VexFlow retired)) does not yet support drawing them. Fortunately, the project's [mnx.ts](../../src/model/mnx.ts) type definitions already include a custom `_x` schema for guitar frets, strings, fingerings, and bends. To formally define these structures, a JSON Schema has been designed at [guitar-tab-extension.schema.json](../../spec/guitar-tab-extension.schema.json) which defines the `guitar` extensions at both the Note level (`_x.guitar` note extension) and the Part/Staff level (`_x.guitar` part/tuning extension).
 2. **Modular Upgrades**: VexFlow rendering support for TAB staves and `_x.guitar` can be implemented incrementally in the editor app without changing the underlying document conversion engine.
 3. **No Intermediate Loss**: We avoid treating VexFlow as an intermediate format. The score is preserved cleanly as W3C MNX at rest, and only mapped to VexFlow at the view level during browser rendering.

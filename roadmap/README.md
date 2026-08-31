@@ -44,12 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-key.md](proposed/workbench-one-surface-key.md)** — one-surface
-  campaign item 1, **built 2026-08-31**: the key-signature popover retired — the
-  inspector's `key` pill/word already covered the whole grammar (evidence pre-existed in
-  `rung-inspector.test.ts`), so the item is the pure sweep, plus the campaign's standing
-  ruling: freed keys are **freed, not accelerators** (`Shift+K` is unbound; lyrics may
-  later argue the exception).
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -243,6 +237,12 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-one-surface-key.md](complete/workbench-one-surface-key.md)** — one-surface
+  campaign item 1, **built 2026-08-31**: the key-signature popover retired — the
+  inspector's `key` pill/word already covered the whole grammar (evidence pre-existed in
+  `rung-inspector.test.ts`), so the item is the pure sweep, plus the campaign's standing
+  ruling: freed keys are **freed, not accelerators** (`Shift+K` is unbound; lyrics may
+  later argue the exception).
 - **[workbench-document-focus-mode.md](complete/workbench-document-focus-mode.md)** — **finished
   2026-08-30** with two honest fullscreen levels. `Ctrl+Alt+F` toggles transient **document
   focus**: header, rail, view strip and panel disappear while the document viewer fills the

@@ -78,7 +78,7 @@ is one popover or the tray, and one work item.
 
 | # | Surface (key) | Inspector coverage today | What the item must close | Status |
 |---|---|---|---|---|
-| 1 | **Key signature** (~~`Shift+K`~~ freed) | `key` pill, stage 3 — reuses `parseKeySignature`, `inherit` = Backspace floor | census + removal sweep only | ✅ [built 2026-08-31](../proposed/workbench-one-surface-key.md) |
+| 1 | **Key signature** (~~`Shift+K`~~ freed) | `key` pill, stage 3 — reuses `parseKeySignature`, `inherit` = Backspace floor | census + removal sweep only | ✅ [built 2026-08-31](../complete/workbench-one-surface-key.md) |
 | 2 | **Time signature** (`Shift+T`) | `time` pill, stage 3 — reuses `parseTimeSignature`, floor when declared | census + removal sweep only | row |
 | 3 | **Clef** (`Shift+C`) | `clef` pill at partMeasure, stage 4 — reuses `parseClef` | verify the registry's `measure` cross-listing loses nothing; sweep | row |
 | 4 | **Bar attributes** (`Shift+B`) | one pill per declared attribute, stage 3 — reuses `parseBarAttribute`; the rhythm riders live as voiceMeasure pills | verify all ten kinds + `tempo#n` array + segno/fine `at` forms; sweep | row |
