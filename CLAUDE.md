@@ -32,6 +32,7 @@ npm run check:scenarios    # corpus police
 npm run verify:scenarios   # attention queue / approval writer — drive via /verify
 npm run update:primitives  # regenerate layout goldens; keeps statuses honest
 npm run sync:spec          # pinned spec fixture → scenarios/spec/ (owns that tree)
+npm run push:proposal -- <topic>   # inject a topic's evidence into the proposal branch
 npm run update:roster      # worker/models.query.json → worker/models.json (stored queries)
 npm run refresh:catalog    # refetch OpenRouter's catalog snapshot, then regenerate
 npm run build              # validators + boundaries + tsc (app+worker) + vite build
@@ -44,7 +45,7 @@ npm run deploy             # build + wrangler deploy (mnx-lab.totai.uk)
 ## Working in parallel: one worktree per agent
 
 **Assume other agents are working in this repo right now.** Sessions run concurrently and
-independently, so `main` in the primary checkout (`/home/williao/dev/mnx-labs`) is
+independently, so `main` in the primary checkout (`/home/williao/dev/mnx-lab`) is
 **shared integration space, not a workspace** — leave it on `main` and clean. Every
 session that will change a tracked file takes its own worktree *first*, before the first
 edit, including for "small" changes: the cost of a collision is paid by whoever discovers
@@ -52,7 +53,7 @@ it, not whoever caused it. Read-only sessions (answering questions, reading the 
 stay where they are and change nothing.
 
 ```bash
-git -C ~/dev/mnx-labs worktree add ~/dev/mnx-labs-worktrees/<task> -b <task> main
+git -C ~/dev/mnx-lab worktree add ~/dev/mnx-labs-worktrees/<task> -b <task> main
 cd ~/dev/mnx-labs-worktrees/<task> && npm ci     # worktrees do NOT share node_modules
 ```
 
@@ -88,7 +89,7 @@ when concurrent work actually collides, so it runs to a fixed order:
    human — which is the correct outcome.
 5. Gates, all of them, in the worktree after the rebase: `npm test`,
    `npm run check:scenarios`, `npm run build`.
-6. `git -C ~/dev/mnx-labs merge --ff-only <task>`. **Fast-forward only** — a refusal
+6. `git -C ~/dev/mnx-lab merge --ff-only <task>`. **Fast-forward only** — a refusal
    means `main` moved while you were testing, so return to step 2 and run the whole
    sequence again. Never `--no-ff`, never force-push `main`, never rewrite a commit
    already on `main`.
@@ -104,9 +105,9 @@ it is clearly not wanted, whichever comes first.** Abandoned, superseded, and
 turned-out-to-be-a-no-op all count as "not wanted": remove it then, not later.
 
 ```bash
-git -C ~/dev/mnx-labs worktree remove ~/dev/mnx-labs-worktrees/<task>
-git -C ~/dev/mnx-labs branch -d <task>       # -d, not -D — it must already be merged
-git -C ~/dev/mnx-labs worktree prune
+git -C ~/dev/mnx-lab worktree remove ~/dev/mnx-labs-worktrees/<task>
+git -C ~/dev/mnx-lab branch -d <task>       # -d, not -D — it must already be merged
+git -C ~/dev/mnx-lab worktree prune
 ```
 
 `worktree remove` refusing on a dirty tree is information, not an obstacle — go look at
@@ -125,9 +126,10 @@ spec/                the standard + our proposals against it
   mnx-schema.json         verbatim copy of the pinned upstream release — never edited
   mnx-schema.proposed.json generated from a proposal worktree — transient, dev-time only
   mnx-lab-extensions.schema.json  the _x.mnxLab vendor schema (v6)
-  guitar-tab-extension.schema.json (v2 legacy, kept for upgrade tests), spec-prose.json,
-  HISTORY.md
-  proposals/<topic>/      evidence bundles: README, schema.diff, scenarios.md, engravings/
+  guitar-tab-extension.schema.json (v2 legacy, kept as the record of that shape — no
+  test loads it; the upgrade tests use inline objects), spec-prose.json, HISTORY.md
+  proposals/<topic>/      evidence bundles: README always; schema.diff, scenarios.md and
+                          engravings/ as the proposal matures (score-text has all four)
   tools/                  sync-spec-examples, specSource, push-proposal, compile-validator
 scenarios/           ONE corpus format, two axes (below); manifest.json, meta.schema.json
 harness/             every way the evidence is exercised
@@ -144,7 +146,9 @@ src/                 the apparatus — capability layers (order below)
   assist/openrouter.ts    the OpenRouter client: PKCE, key lookup, one SSE parser with
                           two faces (text chat, and the loop's tool-calling transport)
   assist/prompts/editNotation.ts  the LLM-facing system prompt (§-numbered, addressable)
-  assist/stream.ts        the ONE call site for an edit; picks browser-direct vs Worker
+  assist/stream.ts        the designated single entry for an edit; picks browser-direct
+                          vs Worker. Today only the harness calls it — the prompt surface
+                          that will (core-editor-ai-prompt.md) is not built yet
 worker/              Hono; a DEMO for visitors with no key of their own, plus reserved seams
   api/                    editNotation, models + reserved 501 seams documents, auth
   models.json             GENERATED from models.query.json — never hand-edited
@@ -152,6 +156,8 @@ worker/              Hono; a DEMO for visitors with no key of their own, plus re
                           importable from any layer)
 converters/          npm-workspace sub-packages + fixtures/ (the three scores)
 apps/studio/         README only — the future consumer product's reserved seam
+apps/viewer-embedded/ the third app: a mock host page for the embed face
+                     (core-viewer-embedded-app.md; smoke:embed / dev:embed-app)
 roadmap/ docs/ research/ vendor/mnx    unchanged at root
 ```
 
@@ -258,8 +264,8 @@ shown), derived from committed provenance in `src/workbench/queue.ts`. Every sce
 has a stable deep link: `#/scenario/<id>?view=notation|tab|both` (unspecified ⇒ the
 document's `tab.staffKind` hint); legacy `?view=compare|json` links are honored and
 open the matching tab of the scenario page's **side panel** (description | ops | hud |
-compare | json — roadmap/complete/core-score-hud.md created it;
-roadmap/complete/workbench-score-panel.md cut it from seven to five and gave every tab
+assist | compare | json — roadmap/complete/core-score-hud.md created it;
+roadmap/complete/workbench-score-panel.md cut it down and gave every tab
 the same five-band frame: tab strip, context bar, ONE scrolling body, footer), which holds
 all page chrome including the selection HUD and the per-part instrument override
 (the HUD's ensemble table → `<mnx-document-viewer>.partTabSetups`; the flat
@@ -295,7 +301,7 @@ at nine with a `+N more`.
 The rail groups by **topic**, not by authoring category — `src/corpus/groups.ts`, an
 ordered name→regex table matched on the scenario id, **first match wins**. The spec has
 no taxonomy to inherit (its own index is a flat alphabetical list of 52 "example
-documents"), and our nine categories held one scenario each, so both halves read badly;
+documents"), and most of our authoring categories held a single scenario, so both halves read badly;
 topic groups interleave them instead. The grouping is OURS and display-only — never in
 `scenarios/spec/` or a meta.json. Order is load-bearing, so
 `harness/conformance/groups.test.ts` asserts nothing is ungrouped **and no group is
@@ -312,7 +318,9 @@ attribution and never committed here. The scenario page distinguishes **loading*
 **failed** (the score is a lazy chunk — a dead dev server must not read as a render bug).
 
 **The workbench has no backend — by rule.** It must stay fully functional from static
-build output alone: the corpus is committed JSON, documents live in IndexedDB, and every
+build output alone: the corpus is committed JSON, the only browser persistence is
+localStorage UI preferences (document storage is a reserved seam —
+`storage/cloudRepository.ts`), and every
 verification write happens through harness scripts editing repo files — git is the
 database and the audit trail. **Live AI edits are no longer the exception they used to
 be** (core-assist-byok.md): with the user's own OpenRouter key, held in this origin's
@@ -329,9 +337,13 @@ The real API layer (documents, auth, sync) belongs to **studio**
 
 ## AI editing flow — one loop, two paths
 
-`src/assist/stream.ts` is the **one call site** and it picks the path: hand it the user's
-key and the loop runs browser-direct against OpenRouter; hand it none and it POSTs to
-`/api/edit-notation`, the Worker's demo. Both yield the same
+`src/assist/stream.ts` is the **designated single entry point** and it picks the path:
+hand it the user's key and the loop runs browser-direct against OpenRouter; hand it none
+and it POSTs to `/api/edit-notation`, the Worker's demo. Today only
+`harness/conformance/edit-loop.test.ts` calls it — the workbench UI that will
+(the AI prompt surface, roadmap/proposed/low-priority/core-editor-ai-prompt.md) is not
+built yet; the assist drawer's text chat goes through `openrouter.ts`'s `streamChat`
+instead. Both of stream.ts's paths yield the same
 `src/assist/protocol.ts` frames from the same iterator — on the wire as NDJSON for the
 demo, in-process for BYOK — so a caller tells them apart only by the `demoMode`/`mockMode`
 stamp on the done frame. **An unstamped done frame means the user's own key paid for it.**

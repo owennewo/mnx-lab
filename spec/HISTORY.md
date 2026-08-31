@@ -96,7 +96,7 @@ Two findings that a schema diff alone does **not** show:
 `"\"z\""` and two `"\"\""`. They are the only 5 of the spec's 155 enum rows
 stored that way, and they contradict the prose ("for a `sfz` dynamic, the prefix
 is `s`"). Consequence: `accentPrefix: "s"` is **rejected** and `accentPrefix:
-"\"s\""` is accepted. `MnxDynamic` in [src/types/mnx.ts](../src/types/mnx.ts)
+"\"s\""` is accepted. `MnxDynamic` in [src/model/mnx.ts](../src/model/mnx.ts)
 types these as the spec intends, not as it validates.
 
 ## Key Architecture & Features
@@ -110,12 +110,22 @@ The downloaded schema enforces the core concepts of the MNX format:
 
 ## Extension schema
 
-`mnx-lab-extensions.schema.json` (**v3**) holds everything this project carries that MNX cannot
+`mnx-lab-extensions.schema.json` (**v6**) holds everything this project carries that MNX cannot
 express, under the single vendor key `_x.mnxLab`. It is a `$defs` library, not a document schema:
-`scripts/compile-validator.mjs` compiles three sub-validators from it (`note-ext`, `part-ext`,
+`spec/tools/compile-validator.mjs` compiles three sub-validators from it (`note-ext`, `part-ext`,
 `global-measure-ext`) and consumers walk the document. Register + rationale:
 [docs/mnx-extensions.md](../docs/mnx-extensions.md).
 
+- **v6.1 (2026-08-31)** — additive: `harmony.color` (the standard's `simple-color` shape).
+  The renderer honored the field before the schema admitted it. `$id` stays `/v6`.
+- **v6 (2026-08-30)** — `technique.hammerOn`/`pullOff` re-merged into ONE `hammerPull`
+  (the Soundslice convention): the direction is implicit in the two pitches. Drawn as a
+  letterless slur; the MusicXML exporter derives `<hammer-on>` vs `<pull-off>` from the
+  pitch direction. Migration: the v5 → v6 hop in `upgradeTabExtension.ts`.
+- **v5.1 (2026-08-07)** — instrument neutrality: absent `strings[]` now means *no
+  fingerboard*, never "assume standard guitar". Schema shape unchanged — only the meaning
+  of absence; the upgrade shim materializes an explicit standard declaration into older
+  tab documents.
 - **v5 (2026-08-07)** — the tab sub-namespace flattened to the adopted shape it drafts
   (roadmap/proposed/low-priority/spec-instrument-position.md): `tab.position.{string,fret}` → flat `string`/`fret`
   (fret now optional and non-authoritative — validation only, `dependentRequired` on `string`),

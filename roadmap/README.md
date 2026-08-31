@@ -55,27 +55,6 @@ proposals that name their campaign.
   element contract under [core-viewer-surface.md](complete/core-viewer-surface.md)'s layered rule,
   focus story, code-splitting, and the palette's `elements → assist` question from
   [core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md).
-- **[core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)** — part 3,
-  **repurposed 2026-08-24** from the ledger of what cannot be wired yet into the **triage
-  ledger**: the registry's 86 rows across 98 placements, each carrying three marks —
-  **tested** (clicking it does what the label promises, a human verdict), **grouped** (it
-  sits with its relatives; the bar rung's repeat family is one thing and does not read as
-  one today), **ordered** (the natural index inside that group, not the order the rows
-  were typed in). **The purple half is built**: a placement with none of the three draws
-  in `--tile-untriaged`, a flag deliberately *orthogonal* to `TrayTileState` (a tile can
-  be untriaged and already active), so with the ledger empty **every tile in the tray is
-  purple** — the tray's own *never seen*, in the vocabulary the corpus already uses for
-  `valid` vs `verified`. Six decisions recorded (one purple not three; purple never
-  overrides `unavailable`, enforced upstream in `isTriaged` so the CSS never arbitrates;
-  the mark lives in the registry beside `blockedBy` where conformance can hold it honest;
-  `tested` is per placement because twelve rows appear at two rungs; the colour is a
-  `light-dark()` token, never a literal; two cascade exceptions for the active glyph and
-  the keyboard cursor), one left open (does purple ship to embed/studio). What remains is
-  the ticking, which is human work. The old residue survives as an **appendix** of seven
-  blocked placements, so every `blockedBy` id still resolves — and it caught two
-  (`arpeggio`, `section-colour`) greyed with **no address at all**, which the existing
-  test could not see because it asserts a blocker exists, not that it resolves. Both
-  halves must close for `complete/`.
 
 
 ### proposed/low-priority/
@@ -838,7 +817,7 @@ back up to `proposed/` the moment it is.
   [core-vertical-density.md](complete/core-vertical-density.md).
 - **[core-campaign-modernist.md](complete/core-campaign-modernist.md)** — **campaign**: the
   workbench restyle the tray's art direction leads, plus the score panel it was drawn for.
-  Fills the slot [core-selection-tray-residue.md](proposed/core-selection-tray-residue.md)
+  Fills the slot [core-selection-tray-residue.md](superseded/core-selection-tray-residue.md)
   reserved for it ("its own future proposal, raised only if the tray's look wins the
   review") and retires that row plus the dark-page one. Four decisions taken up front:
   **workbench-wide token flip** (the tray drops its hexes and consumes `designTokens` again
@@ -1215,7 +1194,8 @@ back up to `proposed/` the moment it is.
   where a score must not) and **the shortcut as a corner chip** on 66×64 tiles. Parts 2–3
   ([mechanism](complete/core-selection-tray-mechanism.md) and its
   [global tab](complete/core-selection-tray-global-tab.md) also complete; the
-  [residue ledger](proposed/core-selection-tray-residue.md) stays open).
+  [residue ledger](superseded/core-selection-tray-residue.md) was later superseded with
+  the tray's demolition).
 - **[core-selection-tray-mechanism.md](complete/core-selection-tray-mechanism.md)** — part 2:
   the tray wired, **stages 1–4 built 2026-08-15** (hands-on review open). One ruling — tiles
   fire **intents through `session.handleIntent`, nothing else** — so tray clicks land in the
@@ -1354,6 +1334,14 @@ back up to `proposed/` the moment it is.
   `converters/musicxml-mnx/`.
 
 ### superseded/
+- **[core-selection-tray-residue.md](superseded/core-selection-tray-residue.md)** — part 3 of the
+  tray series: first the residue ledger of unwirable tiles, repurposed 2026-08-24 into the
+  triage ledger (86 rows, tested/grouped/ordered marks, the purple *never seen* state).
+  **Superseded 2026-08-31 by the one-surface campaign's item 11b**
+  ([workbench-one-surface-tray-verbs.md](complete/workbench-one-surface-tray-verbs.md)):
+  the tray it triaged is demolished. Kept as the historical record of the placements; the
+  three obligations that outlive the surface (`part-transposition`, `mute`,
+  `section-colour`) are op-gaps named in the campaign's closing entry.
 - **Structure sketches** — three of the four self-contained restructuring sketches
   (alternatives for a single decision), superseded by the adopted
   [lab-structure-lab.md](complete/lab-structure-lab.md), which composes two of them:

@@ -21,7 +21,7 @@ are records, not files:
 
 | We want | Upstream source |
 |---|---|
-| Example documents (49) | `doctools/media/examples/json/*.json` via `exampledocument.document_path` |
+| Example documents (52 at the current pin) | `doctools/media/examples/json/*.json` via `exampledocument.document_path` |
 | Reference engravings | `doctools/media/examples/*.png` via `exampledocument.image_url` |
 | Titles + blurbs | `exampledocument.name` / `.blurb` |
 | `coversDefs` | the `exampledocumentobject` join |
@@ -35,11 +35,12 @@ read the engravings straight off disk (dev-only), so review works offline.
 Three things worth knowing, all learned the hard way when this replaced HTML scraping:
 
 - **Source documents carry `_x.mnxdocs`** — the doc generator's own vendor dict
-  (`{highlight: [...]}`), telling the spec site which keys to emphasise. 81 occurrences
-  across the 49 examples. It is presentation metadata, stripped on import by vendor key
+  (`{highlight: [...]}`), telling the spec site which keys to emphasise — dozens of
+  occurrences across the examples. It is presentation metadata, stripped on import by
+  vendor key
   (not by dropping `_x` wholesale — same `_x.<vendor>` convention as our `_x.mnxLab`).
 - **`blurb` is a string or an array of lines** — `freezedb` splits multi-line text
-  fields into line arrays. 33 of 49 examples have no blurb at all and get a synthetic
+  fields into line arrays. Most examples have no blurb at all and get a synthetic
   description.
 - **`coversDefs` is authoritative, not a guess.** `ExampleDocumentObject` is a derived
   cache built by `accumulate_used_json_objects()`, which walks each example's JSON
@@ -55,7 +56,7 @@ reversed what `dynamic-group.value` means for an accent (see
 enum value that had been legal and unmentioned since v19. A schema diff shows neither.
 
 `spec/spec-prose.json` fingerprints every documented object, relationship and enum
-(651 items, ~31 KB) — hashes, not text, so we report *which* items moved without copying
+(663 items at the current pin, ~33 KB) — hashes, not text, so we report *which* items moved without copying
 upstream's documentation into this repo. `npm run sync:spec` diffs against it, prints
 what changed, and rewrites it, so the delta lands in the same commit as the pin move.
 

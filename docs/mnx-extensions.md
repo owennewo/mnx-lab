@@ -1,4 +1,4 @@
-# MNX Lab extensions (`_x.mnxLab`) — v5
+# MNX Lab extensions (`_x.mnxLab`) — v6
 
 Everything this project carries that **W3C MNX v19 cannot express**, in one
 place: what it is, why standard MNX has no field for it, which CG issue it
@@ -20,7 +20,7 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 | `tab.technique.harmonic` | nothing; MusicXML's `<harmonic>` is a redesign candidate | [#179](https://github.com/w3c-cg/mnx/issues/179) | ✅ both converters | ✅ both staves |
 | `tab.technique.palmMute` | nothing; MusicXML smuggles it through generic elements | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
 | `fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
-| `harmonies` | **no harmony concept anywhere** — no `root`, no `kind`, no chord | [#109](https://github.com/w3c-cg/mnx/issues/109) | ✅ both converters | ❌ |
+| `harmonies` | **no harmony concept anywhere** — no `root`, no `kind`, no chord | [#109](https://github.com/w3c-cg/mnx/issues/109) | ✅ both converters | ✅ |
 
 **Graduated out of `_x` in v4:** `rehearsal` and `section`. They are no longer
 extensions — they are written as the *standard* MNX objects proposed in
@@ -180,7 +180,7 @@ only the first two; the other four are Guitar Pro's.
   fingerboard positions, and `staffKind` declares the preferred presentation.
   Consequently there is **no TAB clef**: a clef is a pitch-to-line mapping, and
   a tab staff has no pitch axis. (`{"sign": "TAB"}` is also invalid against the
-  MNX schema's `C|F|G` enum — see the `lab/tab-spec-gaps` scenario.)
+  MNX schema's `C|F|G` enum — see the `lab/24-tab-spec-gaps` scenarios.)
 - `strings` entries carry **explicit string numbers**; array order is
   meaningless. Sounding pitches, before the capo. **Absent ⇒ no fingerboard**:
   no consumer assumes an instrument — tab views require a declaration, or a
@@ -222,7 +222,8 @@ only the first two; the other four are Guitar Pro's.
           "quality":  "minorSeventh",
           "bass":     { "step": "G" },
           "degrees":  [{ "value": 9, "alter": -1, "type": "alter" }],
-          "text":     "Am7b5/G"
+          "text":     "Am7b5/G",
+          "color":    "#c0392b"
         }
       ]
     }
@@ -240,7 +241,7 @@ a rehearsal mark is an arbitrary index into the score, a section name states wha
 the music is, and they co-occur (`[A] Verse`).
 
 Saved documents are migrated by the v3 → v4 hop in
-[src/utils/upgradeTabExtension.ts](../src/utils/upgradeTabExtension.ts), which
+[src/model/upgradeTabExtension.ts](../src/model/upgradeTabExtension.ts), which
 promotes both and drops `_x` when nothing else is left in it.
 
 ### `harmonies` is on the global timeline
@@ -344,6 +345,17 @@ Cloudflare Workers cannot run `ajv.compile()`.
 
 ## History
 
+- **v6.1** (2026-08-31): additive — `harmony.color` (the standard's
+  `simple-color` shape). The renderer honored the field before the schema
+  admitted it; the schema catches up. `$id` stays at `/v6`, the v5.1
+  precedent for point releases.
+- **v6** (2026-08-30): `technique.hammerOn`/`pullOff` re-merged into ONE
+  `hammerPull` (the Soundslice convention, reversing part of the v2 split):
+  the direction is implicit in the two pitches, so the split stored a second
+  spelling of a fact the music already states — and it let a repitch strand a
+  stale letter, or a second press stack both keys on one note. Drawn as a
+  letterless slur; MusicXML export derives `<hammer-on>` vs `<pull-off>` from
+  the pitch direction at the boundary.
 - **v5.1** (2026-08-07, same day): **instrument neutrality** — the
   "absent `strings[]` ⇒ standard guitar" default is retired. Absent strings
   now mean *no fingerboard*: tab rendering requires a document declaration or
@@ -372,13 +384,6 @@ Cloudflare Workers cannot run `ajv.compile()`.
   with a `label`; added `harmonies`, `technique.harmonic`, `technique.palmMute`;
   bends became curves in semitones; slide enum values camelCased
   (`slide-in` → `slideIn`).
-- **v6** (2026-08-30): `technique.hammerOn`/`pullOff` re-merged into ONE
-  `hammerPull` (the Soundslice convention, reversing part of the v2 split):
-  the direction is implicit in the two pitches, so the split stored a second
-  spelling of a fact the music already states — and it let a repitch strand a
-  stale letter, or a second press stack both keys on one note. Drawn as a
-  letterless slur; MusicXML export derives `<hammer-on>` vs `<pull-off>` from
-  the pitch direction at the boundary.
 - **v2** (2026-06): namespace `_x.guitar` → `_x.tab`; split note annotation into
   `position`/`technique`/`fingering`; explicit string numbers in tuning; added
   `staffKind`, removed TAB-clef usage; `hammerOnPullOff` split into `hammerOn` /
