@@ -1,8 +1,9 @@
 # Retire the lyric popover — one-surface campaign item 6
 
-> **Status: in progress 2026-08-31 — phases 1–2 built (popover retired, the
-> lyric text surface live on `Shift+L`); phase 3 (the pass model) designed,
-> not started.** Campaign:
+> **Status: built 2026-08-31 — all three phases complete.** Phase 1 retired
+> the popover, phase 2 built the lyric text surface on `Shift+L`, phase 3
+> the derived pass model and its blue bound. The recorded deferrals at the
+> end are follow-up material, not open work. Campaign:
 > [workbench-campaign-one-surface.md](workbench-campaign-one-surface.md),
 > item 6. The first draft of this doc left two investigations open; a design
 > conversation (2026-08-31) settled both, and the rewrite recorded the
@@ -211,6 +212,40 @@ later phases start without re-deriving it.
   pass-aware labels if wanted); the score→text column highlight exists only
   as open-at-cursor token selection; the voice-selection header token stays
   reserved (voice 1 is the convention).
+
+## What shipped — phase 3, 2026-08-31
+
+- **The shared walk** — `src/model/passes.ts`: `linearizePasses(doc)` over
+  the global measures only (no part consulted, no instrument assumed) →
+  `order` (the player's timeline), `passCounts`, `soundingPasses` (the
+  1-based strain iterations each bar sounds on — the numbers stacked verses
+  map onto), `truncated` (a malformed graph caps instead of spinning).
+  Conventions encoded: `times` defaults 2, unmatched `:|` repeats from the
+  start, numbered voltas skip wholesale on other passes (their own `:|`
+  included), a jump fires once at the end of its bar, the return takes no
+  repeats, only `dsalfine` stops at `fine`, a resolved strain resets the
+  music after it to pass 1. One simplification recorded in the header: a
+  D.S. return re-enters numbered voltas as iteration 1 (convention would
+  take the final ending) — revisit with the player.
+- **The blue bound** — `lyricPassWarnings(doc, partIndex, parsed)` in
+  `lyricText.ts`: verse ordinal *k* carrying text on a bar whose
+  `soundingPasses` lack *k* — ONE rule covering both smells (a third verse
+  on a twice-played strain, verse-1 text under ending 2). Silent when the
+  document declares no repeat structure (`hasRepeatStructure`) — stacked
+  verses over unrepeated music are the hymn convention, with nothing written
+  down to disagree with. Translations exempt by construction (ordinals run
+  per language group). Surfaced in the text editor as a blue,
+  **non-blocking** lane beside the red parse errors; `ParsedLyricLine` grew
+  `ordinal` and `textLine` to carry the anchoring.
+- **Evidence**: `harness/conformance/passes.test.ts` (plain, ×2/×N strains,
+  unmatched `:|`, voltas with exit reset, D.S. al fine, plain D.S., the
+  truncation guard) and a pass-bound block in `lyric-text.test.ts`
+  (suppression, the bound, the translation exemption, the volta smell).
+- **Deferred, recorded**: renderer-derived default verse labels and an
+  engine diagnostics badge would move goldens — outside this campaign's
+  contract (§6); they and audio/player adoption of the walk are follow-up
+  material for whenever the player lands. The cursor pass index for entry
+  receded: the text surface made per-line entry explicit.
 
 ## Relations
 

@@ -26,6 +26,7 @@
 import type { MnxEvent, MnxSequenceItem, MnxStructure } from '../model/mnx.ts';
 import { isTimedEvent } from '../model/mnx.ts';
 import { noteKeyAt } from '../model/noteWalk.ts';
+import { hasRepeatStructure, linearizePasses } from '../model/passes.ts';
 
 export type SyllableType = 'start' | 'middle' | 'end' | 'whole';
 
@@ -234,6 +235,9 @@ export interface LyricTextDiagnostic {
   /** 1-based bar, when the problem is bar-anchored. */
   bar?: number;
   message: string;
+  /** Absent = error (blocks apply). `warning` is the blue lane — the pass
+   *  bound (decision A): worth naming, never worth refusing over. */
+  severity?: 'warning';
 }
 
 export interface ParsedLyricLine {
@@ -241,6 +245,11 @@ export interface ParsedLyricLine {
   lineId: string;
   minted: boolean;
   lang?: string;
+  /** 1-based ordinal within the line's language group — the pass number the
+   *  verse maps onto (decision A). */
+  ordinal: number;
+  /** The 0-based buffer line this came from, for anchoring diagnostics. */
+  textLine: number;
   /** walk index → syllable. */
   syllables: Map<number, { text: string; type?: SyllableType }>;
 }
@@ -424,9 +433,52 @@ export function parseLyricText(doc: MnxStructure, partIndex: number, text: strin
 
     if (trailingHyphenOpen(rawTokens, header?.consumed ?? 0))
       diagnostics.push({ textLine, message: 'the line ends mid-word (a trailing hyphen with nothing after)' });
-    lines.push({ lineId, minted: wasMinted, ...(header?.lang ? { lang: header.lang } : {}), syllables });
+    lines.push({ lineId, minted: wasMinted, ...(header?.lang ? { lang: header.lang } : {}), ordinal, textLine, syllables });
   }
   return { lines, diagnostics, tokens };
+}
+
+// ── The pass bound (phase 3, decision A) ───────────────────────────────────
+
+/**
+ * The blue diagnostic: a verse whose pass number the repeat structure never
+ * sounds for its bar. Fewer verses than passes is a chorus (normal, silent);
+ * a verse on a bar that only sounds on other passes — volta text on the
+ * wrong ending, a third verse on a twice-played strain — is worth naming.
+ * Silent when the document declares no repeat structure at all: stacked
+ * verses over unrepeated music carry the repetition implicitly, and there is
+ * nothing written down to disagree with. Translations are exempt by
+ * construction — ordinals run within a language group.
+ */
+export function lyricPassWarnings(
+  doc: MnxStructure,
+  partIndex: number,
+  parsed: ParsedLyricText
+): LyricTextDiagnostic[] {
+  if (!hasRepeatStructure(doc)) return [];
+  const model = linearizePasses(doc);
+  const walk = lyricEventWalk(doc, partIndex);
+  const warnings: LyricTextDiagnostic[] = [];
+  for (const line of parsed.lines) {
+    const flagged = new Set<number>();
+    for (const entryIndex of line.syllables.keys()) {
+      const measureIndex = walk[entryIndex]?.measureIndex;
+      if (measureIndex === undefined || flagged.has(measureIndex)) continue;
+      const sounding = model.soundingPasses[measureIndex] ?? [];
+      if (sounding.includes(line.ordinal)) continue;
+      flagged.add(measureIndex);
+      const verse = `verse ${line.ordinal}${line.lang ? ` (${line.lang})` : ''}`;
+      warnings.push({
+        textLine: line.textLine,
+        bar: measureIndex + 1,
+        severity: 'warning',
+        message: sounding.length === 0
+          ? `${verse} has text on a bar the repeat structure never sounds`
+          : `${verse} has text, but this bar only sounds on pass${sounding.length === 1 ? '' : 'es'} ${sounding.join(', ')}`
+      });
+    }
+  }
+  return warnings;
 }
 
 /** Does the line's last word token end with a hyphen (an unfinished word)? */

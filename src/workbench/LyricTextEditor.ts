@@ -13,10 +13,12 @@ import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import {
   lyricEventWalk,
+  lyricPassWarnings,
   parseLyricText,
   planLyricEdits,
   serializeLyricText,
   type LyricPlanEdit,
+  type LyricTextDiagnostic,
   type ParsedLyricText
 } from '../edit/lyricText.ts';
 
@@ -34,6 +36,8 @@ export class LyricTextEditor extends LitElement {
 
   @state() private text = '';
   @state() private parsed: ParsedLyricText = { lines: [], diagnostics: [], tokens: [] };
+  /** The pass bound (phase 3): blue, live, never blocks apply. */
+  @state() private warnings: LyricTextDiagnostic[] = [];
   @state() private edits: LyricPlanEdit[] = [];
 
   static styles = [
@@ -103,6 +107,12 @@ export class LyricTextEditor extends LitElement {
         font-size: 12px;
         color: var(--accent);
       }
+      /* The blue lane (decision A): worth naming, never worth refusing over.
+         No blue token exists in the shared palette yet, so the pair is local
+         — matched to the renderer's warning-badge hue. */
+      .diagnostic.warning {
+        color: light-dark(oklch(0.45 0.13 250), oklch(0.72 0.11 250));
+      }
       footer {
         display: flex;
         align-items: center;
@@ -160,6 +170,7 @@ export class LyricTextEditor extends LitElement {
   private reparse() {
     if (!this.doc) return;
     this.parsed = parseLyricText(this.doc, this.partIndex, this.text);
+    this.warnings = lyricPassWarnings(this.doc, this.partIndex, this.parsed);
     this.edits = this.parsed.diagnostics.length === 0
       ? planLyricEdits(this.doc, this.partIndex, this.parsed)
       : [];
@@ -218,6 +229,7 @@ export class LyricTextEditor extends LitElement {
 
   render() {
     const blocked = this.parsed.diagnostics.length > 0;
+    const shown = [...this.parsed.diagnostics, ...this.warnings];
     return html`
       <div class="backdrop" @click=${() => this.close()}></div>
       <div class="card" tabindex="-1" @keydown=${this.onKey}>
@@ -233,8 +245,8 @@ export class LyricTextEditor extends LitElement {
           @click=${this.onCaretMove}
         ></textarea>
         <div class="diagnostics">
-          ${this.parsed.diagnostics.map(d => html`
-            <span class="diagnostic">
+          ${shown.map(d => html`
+            <span class="diagnostic${d.severity === 'warning' ? ' warning' : ''}">
               ${d.bar !== undefined ? `bar ${d.bar} — ` : `line ${d.textLine + 1} — `}${d.message}
             </span>
           `)}

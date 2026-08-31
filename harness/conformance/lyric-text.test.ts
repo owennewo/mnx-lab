@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 import { EditorSession } from '../../src/edit/session.ts';
 import {
   lyricEventWalk,
+  lyricPassWarnings,
   parseLyricText,
   planLyricEdits,
   serializeLyricText
@@ -158,6 +159,47 @@ function appliedSongDoc(): MnxStructure {
   expect(session.handleIntent({ type: 'applyLyricPlan', edits })).toBe(true);
   return session.doc;
 }
+
+describe('the pass bound (phase 3)', () => {
+  it('stays silent when the document declares no repeat structure', () => {
+    const doc = makeSongDoc();
+    const parsed = parseLyricText(doc, 0, 'one two\nthree four\nfive six');
+    expect(lyricPassWarnings(doc, 0, parsed)).toEqual([]);
+  });
+
+  it('flags a verse whose pass the strain never sounds; enough passes stay silent', () => {
+    const doc = makeSongDoc();
+    doc.global!.measures![0]!.repeatStart = {};
+    doc.global!.measures![2]!.repeatEnd = {};
+    const okay = parseLyricText(doc, 0, 'one two\nthree four');
+    expect(lyricPassWarnings(doc, 0, okay)).toEqual([]);
+    const spilled = parseLyricText(doc, 0, 'one two\nthree four\nfive six');
+    expect(lyricPassWarnings(doc, 0, spilled)).toMatchObject([
+      { textLine: 2, bar: 1, severity: 'warning', message: expect.stringContaining('passes 1, 2') }
+    ]);
+  });
+
+  it('translations are exempt by construction — ordinals run per language', () => {
+    const doc = makeSongDoc();
+    doc.global!.measures![0]!.repeatStart = {};
+    doc.global!.measures![2]!.repeatEnd = {};
+    const parsed = parseLyricText(doc, 0, 'one two\nnl: een twee');
+    expect(lyricPassWarnings(doc, 0, parsed)).toEqual([]);
+  });
+
+  it('names volta text on the wrong ending', () => {
+    const doc = makeSongDoc();
+    doc.global!.measures![0]!.repeatStart = {};
+    doc.global!.measures![1]!.ending = { numbers: [1], duration: 1 };
+    doc.global!.measures![1]!.repeatEnd = {};
+    doc.global!.measures![2]!.ending = { numbers: [2], duration: 1 };
+    // Verse 1 text on the second ending's bar: it only sounds on pass 2.
+    const parsed = parseLyricText(doc, 0, '3| last');
+    expect(lyricPassWarnings(doc, 0, parsed)).toMatchObject([
+      { textLine: 0, bar: 3, severity: 'warning', message: expect.stringContaining('pass 2') }
+    ]);
+  });
+});
 
 describe('the plan and its application', () => {
   it('diffs buffer vs document: sets, removals, and minted-line metadata', () => {
