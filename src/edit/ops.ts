@@ -221,12 +221,14 @@ export type EditOp =
       partIndex?: number;
     }
   | {
-      /** Declare the part's tab staff preference (`_x.mnxLab.tab.staffKind`).
+      /** Declare the part's tab staff preference (`_x.mnxLab.tab.staffKind`)
+       *  — on the part being read (one-surface item 9's widening).
        *  Presentation, but document-level: it gates the tab/both projections
        *  (engine/headless), so the goldens — and the construct-trace verdict
        *  — see it. Discovered by the element-ops exemplar. */
       type: 'setStaffKind';
       kind: 'notation' | 'tab' | 'both';
+      partIndex?: number;
     }
   | ({
       /**
@@ -841,7 +843,11 @@ export type ContainerSpec =
   | { type: 'grace'; graceType?: MnxGrace['graceType']; slash?: boolean }
   | { type: 'tremolo'; marks?: number; outer?: MnxTremolo['outer'] };
 
-export type PartDeclaration = { kind: 'capo'; value: number } | { kind: 'staves'; value: number };
+export type PartDeclaration =
+  | { kind: 'capo'; value: number }
+  | { kind: 'staves'; value: number }
+  // The rename arm (one-surface item 9): removal existed, the setter never did.
+  | { kind: 'name'; value: string };
 
 export type PartDeclarationKind = 'name' | 'staves' | 'strings' | 'capo' | 'staffKind';
 
@@ -1996,6 +2002,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const part = next.parts?.[op.partIndex ?? 0];
       if (!part) return next;
       if (op.declaration.kind === 'staves') part.staves = op.declaration.value;
+      else if (op.declaration.kind === 'name') part.name = op.declaration.value;
       else ((part._x ??= {}).mnxLab ??= {}).capo = op.declaration.value;
       return next;
     }
@@ -2414,7 +2421,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setStaffKind': {
-      const part = next.parts?.[0];
+      const part = next.parts?.[op.partIndex ?? 0];
       if (!part) return next;
       const x = ((part._x ??= {}).mnxLab ??= {});
       (x.tab ??= {}).staffKind = op.kind;

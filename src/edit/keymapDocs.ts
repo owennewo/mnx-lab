@@ -449,14 +449,6 @@ export const KEY_DOCS: KeyDoc[] = [
   // ── Setup — the typed popovers (shell actions: a trace records the intent
   // the popover emits, never its opening).
   {
-    keys: 'Shift+P',
-    strokes: [{ code: 'KeyP', shift: true }],
-    group: 'setup',
-    meaning: {
-      all: 'part… (typed popover: a name adds one; `capo 3`/`staves 2` change it; `no <thing>` strips)'
-    }
-  },
-  {
     keys: 'Shift+L',
     strokes: [{ code: 'KeyL', shift: true }],
     group: 'setup',
@@ -563,6 +555,10 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'setPartDeclaration',
     'removePartDeclaration',
     'setTuning',
+    'setStaffKind',
+    // document
+    'addPart',
+    'setSupport',
     // the crumbs and the ladder
     'goToMeasure',
     'setPart',
@@ -571,14 +567,6 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'extendSelection',
     'nextPosition',
     'prevPosition'
-  ],
-  partPopover: [
-    'addPart',
-    'setPartDeclaration',
-    'removePartDeclaration',
-    // Document-level support declarations (`explicit accidentals`): not an
-    // element, so neither harness could see it missing — a trace did.
-    'setSupport'
   ],
   // One popover per attribute, two intents each: the grammar's `inherit`
   // token emits the removal intent (campaign item 5).

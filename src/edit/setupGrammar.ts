@@ -80,7 +80,7 @@ function parsePitchToken(token: string): MnxPitch | null {
   return pitch;
 }
 
-/** Part genesis grammar (the Shift+P popover): a display name, with the id
+/** Part genesis grammar (now the inspector's document-rung `part` word): a display name, with the id
  *  derived as its slug ("Lead Guitar" → lead-guitar). Empty input is an
  *  ANONYMOUS part — legal MNX, and what the minimal scenarios carry. */
 /** The part popover's second job (campaign item 13): change the part you are

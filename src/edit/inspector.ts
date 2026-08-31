@@ -41,6 +41,8 @@ import {
   parseLyric,
   parseTimeSignature,
   parseTuning,
+  parsePart,
+  parsePartDeclaration,
   parseRhythm,
   RHYTHM_HELP
 } from './setupGrammar.ts';
@@ -626,7 +628,13 @@ function partMeasurePills(doc: MnxStructure, member: Extract<SelectionMember, { 
     const staff = entry.staff ?? 1;
     pills.push(annotation(`clef${staff}`, 'clef', clefText(entry.clef), { type: 'removeClef' }));
   });
+  if (part?.name)
+    pills.push(annotation('name', 'name', part.name, { type: 'removePartDeclaration', kind: 'name' }));
+  if (part?.staves !== undefined)
+    pills.push(annotation('staves', 'staves', `${part.staves}`, { type: 'removePartDeclaration', kind: 'staves' }));
   const x = part?._x?.mnxLab;
+  if (x?.tab?.staffKind)
+    pills.push(annotation('staffKind', 'staff kind', x.tab.staffKind, { type: 'removePartDeclaration', kind: 'staffKind' }));
   if (x?.capo !== undefined)
     pills.push(annotation('capo', 'capo', `${x.capo}`, { type: 'removePartDeclaration', kind: 'capo' }));
   if (x?.strings?.length) {
@@ -651,8 +659,20 @@ function pillsOfMember(doc: MnxStructure, level: SelectionLevel, member: Selecti
     case 'partMeasure':
       return partMeasurePills(doc, member);
     case 'document':
-      return [];
+      return documentPills(doc);
   }
+}
+
+/** The document rung's pills: the explicit-marking support flags
+ *  (`mnx.support`) — declared-only, like every other pill family. */
+function documentPills(doc: MnxStructure): InspectorPill[] {
+  const support = doc.mnx?.support ?? {};
+  const pills: InspectorPill[] = [];
+  if (support.useAccidentalDisplay)
+    pills.push(annotation('explicitAccidentals', 'explicit accidentals', 'on', { type: 'setSupport', key: 'useAccidentalDisplay', value: false }));
+  if (support.useBeams)
+    pills.push(annotation('explicitBeams', 'explicit beams', 'on', { type: 'setSupport', key: 'useBeams', value: false }));
+  return pills;
 }
 
 /**
@@ -752,11 +772,22 @@ const VOICE_WORDS: InspectorWord[] = [
 ];
 
 const PART_WORDS: InspectorWord[] = [
+  { word: 'name', hint: 'Lead Guitar — `no name` makes it anonymous' },
+  { word: 'staves', hint: '1 · 2' },
+  { word: 'staff kind', hint: 'tab · notation · both', values: ['tab', 'notation', 'both'] },
   { word: 'clef', hint: 'treble · bass · treble8vb', values: [...CLEF_NAME_LIST] },
   { word: 'capo', hint: '3' },
   // Offered on ANY part: declaring a fingerboard is the user's call — the
   // no-instrument-assumed rule governs derivation, never declaration.
   { word: 'tuning', hint: 'standard · drop-d · D2 A2 D3 G3 A3 D4' }
+];
+
+const DOC_WORDS: InspectorWord[] = [
+  // Construction as declaration (contract §2, argued at items 7–8): the name
+  // declares the member; empty is the anonymous part MNX allows.
+  { word: 'part', hint: 'Lead Guitar — adds a part; empty = anonymous' },
+  { word: 'explicit accidentals', hint: 'print what each note asks; `no explicit accidentals` reverts' },
+  { word: 'explicit beams', hint: 'beam exactly as written' }
 ];
 
 export function wordsFor(level: SelectionLevel): InspectorWord[] {
@@ -771,6 +802,8 @@ export function wordsFor(level: SelectionLevel): InspectorWord[] {
       return VOICE_WORDS;
     case 'partMeasure':
       return PART_WORDS;
+    case 'document':
+      return DOC_WORDS;
     default:
       return [];
   }
@@ -778,7 +811,9 @@ export function wordsFor(level: SelectionLevel): InspectorWord[] {
 
 /** Why a rung has no editable pills, when that is by design. */
 export function rungNote(level: SelectionLevel): string | null {
-  if (level === 'document') return 'the document has no attributes to inspect yet — the crumbs walk and go to';
+  // The document rung earned its pills with one-surface item 9 (part
+  // construction and the support flags), so it no longer pleads empty.
+  void level;
   return null;
 }
 
@@ -976,7 +1011,37 @@ export function parseInspectorLine(
       if (!tuning) return { error: 'not a tuning — standard · drop-d · pitches low→high like D2 A2 D3 G3 A3 D4' };
       return { intent: { type: 'setTuning', tuning } };
     }
-    return { error: 'not a part declaration — clef · capo · tuning' };
+    if (head === 'name') {
+      if (!rest) return { error: 'name takes the part’s name — `no name` makes it anonymous' };
+      return { intent: { type: 'setPartDeclaration', declaration: { kind: 'name', value: rest } } };
+    }
+    if (line.toLowerCase().startsWith('staff kind')) {
+      const kind = line.slice('staff kind'.length).trim().toLowerCase();
+      if (kind !== 'tab' && kind !== 'notation' && kind !== 'both') return { error: 'staff kind is tab · notation · both' };
+      return { intent: { type: 'setStaffKind', kind } };
+    }
+    // `staves 2`, `no capo`, `no name` … — the part popover's own arms; a
+    // support flag typed here signposts the rung that owns it (item 4's
+    // pattern).
+    const declaration = parsePartDeclaration(line);
+    if (declaration && 'set' in declaration)
+      return { intent: { type: 'setPartDeclaration', declaration: declaration.set } };
+    if (declaration && 'remove' in declaration)
+      return { intent: { type: 'removePartDeclaration', kind: declaration.remove } };
+    if (declaration && 'support' in declaration)
+      return { error: 'a document thing — widen to the document rung: explicit accidentals · explicit beams' };
+    return { error: 'not a part declaration — name · staves · staff kind · clef · capo · tuning' };
+  }
+  if (level === 'document') {
+    const declaration = parsePartDeclaration(line);
+    if (declaration && 'support' in declaration)
+      return { intent: { type: 'setSupport', key: declaration.support.key, value: declaration.support.value } };
+    if (head === 'part') {
+      // parsePart never fails: an empty rest is the anonymous part MNX allows.
+      const named = parsePart(rest);
+      return { intent: { type: 'addPart', ...(named.partId !== undefined ? { partId: named.partId } : {}), ...(named.name !== undefined ? { name: named.name } : {}) } };
+    }
+    return { error: 'not a document declaration — part <name> · explicit accidentals · explicit beams' };
   }
   return { error: rungNote(level) ?? 'nothing to set at this rung' };
 }

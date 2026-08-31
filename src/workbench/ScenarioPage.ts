@@ -60,8 +60,6 @@ import { LADDER_JUMP_LEVELS } from '../edit/keymap.ts';
 import {
   LYRIC_HELP,
   parseLyric,
-  parsePartDeclaration,
-  parsePart,
   parseLayoutSentence,
   // Still consumed by the VIEWER's instrument-override overlay (TabSetup) —
   // presentation, not document editing; it outlived the tuning popover.
@@ -122,15 +120,10 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
 type PopoverKind =
-  | 'part' | 'lyric'
+  | 'lyric'
   | 'layout';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
-  part: {
-    label: 'part',
-    placeholder: 'Guitar · capo 3 · staves 2 · no strings',
-    hint: 'a name adds a part; capo/staves change this one; “no <thing>” strips · Enter applies · Esc closes'
-  },
   layout: {
     label: 'layout',
     placeholder: 'layout L1: bracket [ vn1, vn2 ] · score "Part A": layout L1 · mmrest m3 x2',
@@ -144,7 +137,6 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
 };
 
 const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
-  partPopover: 'part',
   lyricPopover: 'lyric',
   layoutPopover: 'layout'
 };
@@ -161,7 +153,6 @@ export const SETUP_POPOVER_COMMANDS: {
   action: ShellAction;
   stroke: string;
 }[] = [
-  { label: 'setup: add part…', action: 'partPopover', stroke: 'Shift+P' },
   { label: 'setup: lyric…', action: 'lyricPopover', stroke: 'Shift+L' },
 ];
 
@@ -3060,26 +3051,6 @@ export class ScenarioPage extends LitElement {
               : { type: 'removeMultimeasureRest', scoreIndex: 0, index: sentence.index }
         );
       }
-    } else if (this.setupPopover === 'part') {
-      // "capo 3" / "no strings" change THIS part; anything else names a new one.
-      const declaration = parsePartDeclaration(input.value);
-      if (declaration) {
-        this.stripIntent(
-          'support' in declaration
-            ? { type: 'setSupport', key: declaration.support.key, value: declaration.support.value }
-            : 'set' in declaration
-            ? { type: 'setPartDeclaration', declaration: declaration.set }
-            : { type: 'removePartDeclaration', kind: declaration.remove }
-        );
-        this.setupPopover = null;
-        return;
-      }
-      // parsePart never fails: empty input is an anonymous part (legal MNX).
-      const part = parsePart(input.value);
-      const intent: Extract<EditorIntent, { type: 'addPart' }> = { type: 'addPart' };
-      if (part.partId !== undefined) intent.partId = part.partId;
-      if (part.name !== undefined) intent.name = part.name;
-      this.stripIntent(intent);
     } else if (this.setupPopover === 'lyric') {
       const parsed = parseLyric(input.value);
       if (!parsed) {

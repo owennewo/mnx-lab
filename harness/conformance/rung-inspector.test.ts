@@ -694,6 +694,40 @@ describe('the wider rungs', () => {
     expect(parseInspectorLine('voiceMeasure', null, 'staccato')).toHaveProperty('error');
   });
 
+  it('part identity, staff kind and the document rung (one-surface item 9)', () => {
+    // The rename that never existed: the part-name tile opened a grammar
+    // whose only name arm ADDED a part. The setter is the new declaration.
+    const session = at('partMeasure');
+    const renamed = parseInspectorLine('partMeasure', 'name', 'Lead Guitar');
+    expect(renamed).toEqual({ intent: { type: 'setPartDeclaration', declaration: { kind: 'name', value: 'Lead Guitar' } } });
+    expect(edit(session, (renamed as { intent: never }).intent)).toBe(true);
+    expect(session.doc.parts![0]!.name).toBe('Lead Guitar');
+    expect(parseInspectorLine('partMeasure', null, 'staves 2')).toEqual({
+      intent: { type: 'setPartDeclaration', declaration: { kind: 'staves', value: 2 } }
+    });
+    expect(parseInspectorLine('partMeasure', null, 'no capo')).toEqual({ intent: { type: 'removePartDeclaration', kind: 'capo' } });
+    expect(parseInspectorLine('partMeasure', null, 'explicit accidentals')).toMatchObject({ error: expect.stringContaining('document rung') });
+    // staff kind writes the part being READ (the setTuning widening, again).
+    const twoParts = makeNoteDoc();
+    twoParts.parts!.push(JSON.parse(JSON.stringify(twoParts.parts![0])));
+    const ensemble = new EditorSession(twoParts);
+    ensemble.handleIntent({ type: 'goToLevel', level: 'partMeasure' });
+    ensemble.handleIntent({ type: 'setPart', partIndex: 1 });
+    expect(ensemble.handleIntent({ type: 'setStaffKind', kind: 'tab' })).toBe(true);
+    expect(ensemble.doc.parts![1]!._x!.mnxLab!.tab!.staffKind).toBe('tab');
+    expect(ensemble.doc.parts![0]!._x!.mnxLab!.tab?.staffKind).toBeUndefined();
+    // The document rung's first words: construction as declaration, and the
+    // support flags with their removable pills.
+    expect(parseInspectorLine('document', null, 'part Bass')).toEqual({
+      intent: { type: 'addPart', partId: 'bass', name: 'Bass' }
+    });
+    const doc = at('document');
+    expect(edit(doc, { type: 'setSupport', key: 'useAccidentalDisplay', value: true })).toBe(true);
+    expect(pillsFor({ doc: doc.doc, level: 'document', members: [{ kind: 'document' }] }).map(
+      pill => `${pill.word}: ${pill.value} [${pill.pillClass}]`
+    )).toEqual(['explicit accidentals: on [annotation]']);
+  });
+
   it('rhythm declarations and container properties (one-surface item 8)', () => {
     // Construction is a declaration: the typed text carries its own extent.
     expect(parseInspectorLine('event', null, '3:2')).toMatchObject({
@@ -752,7 +786,7 @@ describe('the wider rungs', () => {
 
   it('part-bar: clef, capo, and the tuning pill (one-surface item 7)', () => {
     const session = at('partMeasure');
-    expect(pillText(session)).toEqual(['capo: 2 [annotation]', 'tuning: E2 A2 D3 G3 B3 E4 [annotation]']);
+    expect(pillText(session)).toEqual(['name: Guitar [annotation]', 'capo: 2 [annotation]', 'tuning: E2 A2 D3 G3 B3 E4 [annotation]']);
     // The popover's whole grammar reaches setTuning through the typed word —
     // a preset names the entries the explicit list would.
     const tuned = parseInspectorLine('partMeasure', null, 'tuning drop-d');
@@ -770,7 +804,7 @@ describe('the wider rungs', () => {
       }
     });
     expect(edit(session, (tuned as { intent: never }).intent)).toBe(true);
-    expect(pillText(session)[1]).toBe('tuning: D2 A2 D3 G3 B3 E4 [annotation]');
+    expect(pillText(session)[2]).toBe('tuning: D2 A2 D3 G3 B3 E4 [annotation]');
     // setTuning writes the part being READ — the popover retuned parts[0]
     // regardless; the op widened with partIndex (contract §3, ops first).
     const twoParts = makeNoteDoc();

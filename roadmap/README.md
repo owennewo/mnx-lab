@@ -44,6 +44,12 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[workbench-one-surface-part.md](proposed/workbench-one-surface-part.md)** —
+  one-surface campaign item 9, **built 2026-08-31**: the part popover retired; part facts
+  (name — the rename that never existed — staves, staff kind) live at the part-bar rung,
+  the document rung earns its first words (`part <name>` as construction-by-declaration,
+  the explicit-marking flags as pills), and `setStaffKind` joins the parts[0]-widening
+  family; five tiles and two glyph twins retire with it.
 - **[workbench-one-surface-lyrics.md](proposed/workbench-one-surface-lyrics.md)** —
   one-surface campaign item 6, **proposed 2026-08-31, design open**: the lyric popover's
   retirement plan — the line-metadata gap is the minimum bar, and two investigations are
@@ -181,7 +187,7 @@ back up to `proposed/` the moment it is.
   hardest. Every retirement is gated on demonstrated coverage: census before coverage,
   coverage before removal, ops before surfaces. Items 1–5 (key ✅, time ✅, clef ✅, bar
   attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics 📝 design
-  open, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part, layout) need new ops or a construct story; 11 (the
+  open, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part ✅, layout) need new ops or a construct story; 11 (the
   tray) retires a charter, re-homes the verbs, and goes last. Standing ruling from item
   1: freed keys are freed, not accelerators.
 - **[core-selection-range-grain.md](inprogress/core-selection-range-grain.md)** — **decisions 1–4 built 2026-08-30** (section and container rungs retired, staff off

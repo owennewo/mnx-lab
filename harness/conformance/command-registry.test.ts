@@ -255,8 +255,6 @@ describe('command registry — the joins', () => {
     const KNOWN_TWINS = new Set([
       'note: articTenutoAbove — tenuto, hammer-pull',
       'measure: coda — coda, section-colour',
-      'document: brace — add-part, staves',
-      'session: brace — doc-add-part, staff-kind-both',
     ]);
     const clashes: string[] = [];
     const seen = new Set<string>();

@@ -1385,7 +1385,8 @@ export class EditorSession {
         return true;
       }
       case 'setStaffKind': {
-        this.apply({ type: 'setStaffKind', kind: intent.kind });
+        const partIndex = this.cursorState.partIndex ?? 0;
+        this.apply({ type: 'setStaffKind', kind: intent.kind, ...(partIndex ? { partIndex } : {}) });
         return true;
       }
     }

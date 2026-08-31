@@ -1,6 +1,6 @@
 # One editing surface — retire the popovers and the tray into the inspector
 
-> **Status: in progress 2026-08-31 — campaign; items 1–5 and 7–8 built the same day, item 6 proposed (design settled, build not started).** The three-surface experiment run by
+> **Status: in progress 2026-08-31 — campaign; items 1–5 and 7–9 built the same day, item 6 proposed (design settled, build not started).** The three-surface experiment run by
 > [workbench-rung-inspector.md](workbench-rung-inspector.md) ("a third
 > editing surface, to be tried *beside* the tray and the popovers so that use decides
 > which wins") has its verdict: **the inspector wins.** The user's ruling, 2026-08-31:
@@ -86,7 +86,7 @@ is one popover or the tray, and one work item.
 | 6 | **Lyrics** (`Shift+L`) | syllable pills per line (`lyric 2: Am`), stage 4 — reuses `parseLyric` | **gap: line management** (phase 1, retires the popover) — then the lyric text surface and the derived pass model, both designed | 📝 [proposed 2026-08-31](../proposed/workbench-one-surface-lyrics.md) — design settled 2026-08-31 |
 | 7 | **Tuning** (~~`Shift+U`~~ freed) | `capo` pill writable; `strings` is a **read-only** reading | **gap: the tuning write path** — `parseTuning`'s sentence has no inspector form; a strings pill that writes (part rung), refusals for strings in use; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-tuning.md) |
 | 8 | **Rhythm** (~~`Shift+R`~~ freed) | container pills are **read-only** (`tuplet: 3:2`, dotted, refuse Enter); full-measure rest / measure repeat pills exist at voiceMeasure | **gap: the missing verb** — the `setContainerProperties`-class op the residue ledger names, plus a construction story for tuplet/grace/authored-silence declarations (contract §2: construction is a verb) | ✅ [built 2026-08-31](../complete/workbench-one-surface-rhythm.md) |
-| 9 | **Part** (`Shift+P`) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | row |
+| 9 | **Part** (~~`Shift+P`~~ freed) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | ✅ [built 2026-08-31](../complete/workbench-one-surface-part.md) |
 | 10 | **Layout** (`Shift+E`, moved from `Shift+S`) | nothing — no document-rung pills exist | the document rung grows its pill families from `parseLayoutSentence`'s grammar (sources, systems, quoted names — the largest parser in the file); likely splits into sub-items when picked up | row |
 | 11 | **The selection tray** (`/`) | verbs are excluded from the inspector by charter; the `global` tab and the triage ledger (../proposed/core-selection-tray-residue.md) have no inspector form | **last, and gated by 1–10** (its popover-tier tiles open the popovers). Re-home the verbs (keymap + the `?` legend + palette), decide the `global` tab's successor, absorb or retire the triage ledger, free `/` | row |
 
@@ -111,6 +111,16 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Progress + learnings log
 
+- **2026-08-31 — item 9 (part) built.** Construction landed as declaration
+  (`part <name>` at the document rung — no ghost part needed), and the census
+  found the campaign's best bug: the `part-name` tile opened a grammar with no
+  rename arm, so typing a name ADDED a part; `PartDeclaration` gained `name`,
+  and `setStaffKind` got the parts[0] widening (third member of the family).
+  The document rung earned its first pills (the support flags) and words.
+  Learnings: count tiles by grep, not memory (a fifth tile — `capo` at
+  partMeasure — surfaced via the `not in registry` assertion; make it
+  standard), and ask of every popover tile "what does typing into this
+  actually fire?" — the label can promise an op that does not exist.
 - **2026-08-31 — item 6 (lyrics) design settled.** Both investigations
   closed in one conversation, doc rewritten to record it. Lines × repeats:
   **derived, no data** — a shared pass-linearization walk in `model/`

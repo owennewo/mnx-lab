@@ -686,15 +686,6 @@ export const COMMANDS: readonly EditorCommand[] = [
 
   // ── part-measure ────────────────────────────────────────────────────────
   {
-    id: 'capo',
-    scopes: ['partMeasure'],
-    glyph: { smufl: 'fingering0' },
-    label: 'Capo…',
-    shortcut: 'Shift+P',
-    tier: 'popover',
-    action: () => ({ surface: 'partPopover' })
-  },
-  {
     id: 'part-scope',
     scopes: ['partMeasure'],
     glyph: { smufl: 'brace' },
@@ -788,20 +779,10 @@ export const COMMANDS: readonly EditorCommand[] = [
 
   // ── document ───────────────────────────────────────────────────────────────
   {
-    id: 'add-part',
-    scopes: ['document'],
-    glyph: { smufl: 'brace' },
-    label: 'Add part…',
-    shortcut: 'Shift+P',
-    tier: 'popover',
-    action: () => ({ surface: 'partPopover' })
-  },
-  {
     id: 'staff-kind',
     scopes: ['document'],
     glyph: { smufl: '6stringTabClef' },
     label: 'Staff kind: notation + tab',
-    shortcut: 'Shift+P',
     tier: 'popover',
     action: () => ({ intent: { type: 'setStaffKind', kind: 'both' } })
   },
@@ -853,24 +834,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     shortcut: 'Shift+I',
     tier: 'key',
     action: () => ({ intent: { type: 'insertAtRung', side: 'before' } })
-  },
-  {
-    id: 'part-name',
-    scopes: ['document'],
-    glyph: { smufl: 'textBlackNoteShortStem' },
-    label: 'Part name…',
-    shortcut: 'Shift+P',
-    tier: 'popover',
-    action: () => ({ surface: 'partPopover' })
-  },
-  {
-    id: 'staves',
-    scopes: ['document'],
-    glyph: { smufl: 'brace' },
-    label: 'Staves per part…',
-    shortcut: 'Shift+P',
-    tier: 'popover',
-    action: () => ({ surface: 'partPopover' })
   },
   {
     id: 'system-break',
@@ -933,15 +896,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     shortcut: 'Home',
     tier: 'key',
     action: () => ({ intent: { type: 'goToEdge', edge: 'first' } })
-  },
-  {
-    id: 'doc-add-part',
-    scopes: ['session'],
-    glyph: { smufl: 'brace' },
-    label: 'Add part…',
-    shortcut: 'Shift+P',
-    tier: 'popover',
-    action: () => ({ surface: 'partPopover' })
   },
   {
     id: 'staff-kind-both',
@@ -1081,7 +1035,7 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     {
       id: 'instrument',
       caption: 'instrument',
-      commands: ['capo', 'transpose-part', 'mute-part']
+      commands: ['transpose-part', 'mute-part']
     },
     { id: 'selection', caption: 'selection', commands: ['part-scope'] }
   ],
@@ -1109,9 +1063,9 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     {
       id: 'structure',
       caption: 'structure',
-      commands: ['insert-part-before', 'insert-part-after', 'add-part', 'delete-part']
+      commands: ['insert-part-before', 'insert-part-after', 'delete-part']
     },
-    { id: 'part', caption: 'part', commands: ['part-name', 'staves', 'staff-kind'] },
+    { id: 'part', caption: 'part', commands: ['staff-kind'] },
     { id: 'layout', caption: 'layout', commands: ['system-break', 'multimeasure-rest'] }
   ]
 };
