@@ -29,7 +29,6 @@ export interface OpRow {
 const SURFACE_LABELS: Record<string, string> = {
   tuningPopover: 'Shift+U · popover',
   partPopover: 'Shift+P · popover',
-  adornmentPopover: 'Shift+A · popover',
   lyricPopover: 'Shift+L · popover',
   rhythmPopover: 'Shift+R · popover',
   selectionTray: '/ · tray',

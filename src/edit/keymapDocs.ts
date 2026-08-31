@@ -463,14 +463,6 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
-    keys: 'Shift+A',
-    strokes: [{ code: 'KeyA', shift: true }],
-    group: 'setup',
-    meaning: {
-      all: 'adornment… (typed popover: accent/staccato/…, a dynamic like mf, or `text …`; `no X` strips)'
-    }
-  },
-  {
     keys: 'Shift+L',
     strokes: [{ code: 'KeyL', shift: true }],
     group: 'setup',
@@ -616,29 +608,6 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'removeSyllable',
     'setLyricLine',
     'removeLyricLine'
-  ],
-  adornmentPopover: [
-    'setMarking',
-    'removeMarking',
-    'setFermata',
-    'removeFermata',
-    'setPositioned',
-    'removePositioned',
-    'removeStringAnnotation',
-    // The accidental's DISPLAY is note-level ink like the markings beside it
-    // (campaign item 6); its SPELLING is `J`, a key, because that is a
-    // different question.
-    'setAccidentalDisplay',
-    'removeAccidentalDisplay',
-    // Fingering and a shaped bend: note-level ink whose VALUE exceeds a
-    // keystroke, so the typed surface carries them (campaign item 9 shipped
-    // the ops; item 3's trace queue found they had no way in).
-    'setFingering',
-    'removeFingering',
-    'toggleTechnique',
-    // A shaped bend types its stops and SETS them — an upsert, not a toggle
-    // (core-bend-stops.md).
-    'setTechnique'
   ],
   // The rhythm declarations (campaign item 11b): the three containers share
   // one wrap verb, silence is inserted, and rest spelling is a verb rather

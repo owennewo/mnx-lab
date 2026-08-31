@@ -205,7 +205,6 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
 export type ShellAction =
   | 'tuningPopover'
   | 'partPopover'
-  | 'adornmentPopover'
   | 'lyricPopover'
   | 'rhythmPopover'
   | 'layoutPopover'
@@ -239,10 +238,6 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // Part genesis (element-ops exemplar): construct traces start from {},
   // so "add part" needs a keyboard surface — setup tier like its siblings.
   { code: 'KeyP', shift: true, action: 'partPopover' },
-  // Event adornments (campaign item 8): one popover for markings,
-  // dynamics and directions — single-letter accelerators are a later
-  // pass, since keys are the unstable layer and the ops are not.
-  { code: 'KeyA', shift: true, action: 'adornmentPopover' },
   // Lyrics (campaign item 12): text entry as a popover, not a mode —
   // a syllable is one short string attached to one note.
   { code: 'KeyL', shift: true, action: 'lyricPopover' },

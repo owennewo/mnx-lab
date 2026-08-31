@@ -343,7 +343,6 @@ function marking(
     scopes: NOTE_EVENT,
     glyph: { smufl },
     label,
-    shortcut: 'Shift+A',
     tier: 'popover',
     isActive: view => memberState(view.memberMarkings, markingName),
     action: view => ({
@@ -363,7 +362,6 @@ function dynamic(id: string, smufl: string, label: string, value: string): Edito
     scopes: ['event'],
     glyph: { smufl },
     label,
-    shortcut: 'Shift+A',
     tier: 'popover',
     action: () => ({
       intent: {
@@ -500,7 +498,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     scopes: ['note'],
     glyph: { smufl: 'accidentalParensLeft' },
     label: 'Force accidental',
-    shortcut: 'Shift+A',
     tier: 'popover',
     action: () => ({ intent: { type: 'setAccidentalDisplay', show: true } })
   },
@@ -530,15 +527,6 @@ export const COMMANDS: readonly EditorCommand[] = [
   technique('vibrato', 'wiggleVibratoMediumFast', 'Vibrato', 'vibrato', 'V'),
   technique('palm-mute', 'pluckedDampAll', 'Palm mute', 'palmMute', 'X'),
   technique('harmonic', 'stringsHarmonic', 'Natural harmonic', 'harmonic', 'O'),
-  {
-    id: 'fingering',
-    scopes: ['note'],
-    glyph: { smufl: 'fingering1' },
-    label: 'Fingering',
-    shortcut: 'Shift+A',
-    tier: 'popover',
-    action: () => ({ surface: 'adornmentPopover' })
-  },
 
   // ── event ───────────────────────────────────────────────────────────────
   {
@@ -600,40 +588,12 @@ export const COMMANDS: readonly EditorCommand[] = [
   dynamic('mezzo-forte', 'dynamicMF', 'Mezzo-forte', 'mf'),
   dynamic('forte', 'dynamicForte', 'Forte', 'f'),
   {
-    id: 'crescendo',
-    scopes: ['event'],
-    glyph: { smufl: 'dynamicCrescendoHairpin' },
-    label: 'Crescendo',
-    shortcut: 'Shift+A',
-    tier: 'popover',
-    action: () => ({ surface: 'adornmentPopover' })
-  },
-  {
-    id: 'diminuendo',
-    scopes: ['event'],
-    glyph: { smufl: 'dynamicDiminuendoHairpin' },
-    label: 'Diminuendo',
-    shortcut: 'Shift+A',
-    tier: 'popover',
-    action: () => ({ surface: 'adornmentPopover' })
-  },
-  {
     id: 'ottava',
     scopes: ['event'],
     glyph: { smufl: 'ottavaAlta' },
     label: 'Ottava alta',
-    shortcut: 'Shift+A',
     tier: 'popover',
     action: () => ({ intent: { type: 'setPositioned', attribute: { kind: 'ottava', value: 1 } } })
-  },
-  {
-    id: 'direction',
-    scopes: ['event'],
-    glyph: { smufl: 'textBlackNoteShortStem' },
-    label: 'Direction text…',
-    shortcut: 'Shift+A',
-    tier: 'popover',
-    action: () => ({ surface: 'adornmentPopover' })
   },
   {
     id: 'lyric',
@@ -643,15 +603,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     shortcut: 'Shift+L',
     tier: 'popover',
     action: () => ({ surface: 'lyricPopover' })
-  },
-  {
-    id: 'fermata',
-    scopes: ['event'],
-    glyph: { smufl: 'fermataAbove' },
-    label: 'Fermata',
-    shortcut: 'Shift+A',
-    tier: 'popover',
-    action: () => ({ surface: 'adornmentPopover' })
   },
   {
     id: 'arpeggio',
@@ -1164,7 +1115,7 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       caption: 'fingerboard',
       commands: ['bend', 'slide', 'hammer-pull', 'vibrato', 'palm-mute', 'harmonic']
     },
-    { id: 'text', caption: 'text', commands: ['fingering', 'lyric'] }
+    { id: 'text', caption: 'text', commands: ['lyric'] }
   ],
   event: [
     {
@@ -1180,15 +1131,15 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       caption: 'articulation',
       commands: [
         'staccato', 'accent', 'tenuto', 'strong-accent', 'staccatissimo',
-        'breath', 'fermata', 'arpeggio'
+        'breath', 'arpeggio'
       ]
     },
     {
       id: 'dynamics',
       caption: 'dynamics',
-      commands: ['piano', 'mezzo-forte', 'forte', 'crescendo', 'diminuendo']
+      commands: ['piano', 'mezzo-forte', 'forte']
     },
-    { id: 'text', caption: 'lines & text', commands: ['ottava', 'direction', 'lyric'] }
+    { id: 'text', caption: 'lines & text', commands: ['ottava', 'lyric'] }
   ],
   // Two tiles, and the band still earns its caption: it says the one verb
   // this rung has is a structural one, rather than leaving it beside a

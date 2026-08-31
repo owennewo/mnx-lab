@@ -58,12 +58,10 @@ import {
 import { TabDigitResolver } from '../edit/tabDigitResolver.ts';
 import { LADDER_JUMP_LEVELS } from '../edit/keymap.ts';
 import {
-  ADORNMENT_HELP,
   LYRIC_HELP,
   parseLyric,
   parsePartDeclaration,
   RHYTHM_HELP,
-  parseAdornment,
   parseRhythm,
   parsePart,
   parseLayoutSentence,
@@ -124,7 +122,7 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
 type PopoverKind =
-  | 'tuning' | 'part' | 'adornment' | 'lyric' | 'rhythm'
+  | 'tuning' | 'part' | 'lyric' | 'rhythm'
   | 'layout';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
@@ -148,11 +146,6 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
     placeholder: 'sleep- · -ing · 2: Am · line 2 Nederlands nl',
     hint: 'a syllable at the cursor’s note; trailing/leading “-” joins a word · “no lyric” strips · Enter applies'
   },
-  adornment: {
-    label: 'adornment',
-    placeholder: 'accent · staccato · mf · text Play 8x · accidental parens',
-    hint: 'at the cursor’s position · “no <adornment>” strips it · Enter applies · Esc closes'
-  },
   rhythm: {
     label: 'rhythm',
     placeholder: '3:2 · 3 eighth in 1 quarter, no number · grace · tremolo 2 · rest half · space 1/4',
@@ -163,7 +156,6 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
 const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   tuningPopover: 'tuning',
   partPopover: 'part',
-  adornmentPopover: 'adornment',
   lyricPopover: 'lyric',
   rhythmPopover: 'rhythm',
   layoutPopover: 'layout'
@@ -186,7 +178,6 @@ export const SETUP_POPOVER_COMMANDS: {
   needsTab?: boolean;
 }[] = [
   { label: 'setup: add part…', action: 'partPopover', stroke: 'Shift+P' },
-  { label: 'setup: adornment…', action: 'adornmentPopover', stroke: 'Shift+A' },
   { label: 'setup: lyric…', action: 'lyricPopover', stroke: 'Shift+L' },
   { label: 'setup: rhythm…', action: 'rhythmPopover', stroke: 'Shift+R' },
   { label: 'setup: tuning…', action: 'tuningPopover', stroke: 'Shift+U', needsTab: true }
@@ -3140,45 +3131,6 @@ export class ScenarioPage extends LitElement {
                   ...(parsed.label !== undefined ? { label: parsed.label } : {}),
                   ...(parsed.lang !== undefined ? { lang: parsed.lang } : {})
                 }
-      );
-    } else if (this.setupPopover === 'adornment') {
-      const parsed = parseAdornment(input.value);
-      if (!parsed) {
-        this.setupPopoverError = `not an adornment — ${ADORNMENT_HELP}`;
-        return;
-      }
-      this.stripIntent(
-        'fingering' in parsed
-          ? { type: 'setFingering', hand: parsed.fingering.hand, finger: parsed.fingering.finger }
-          : 'removeFingering' in parsed
-            ? { type: 'removeFingering' }
-            : 'technique' in parsed
-          ? { type: 'setTechnique', technique: parsed.technique }
-          : 'accidental' in parsed
-          ? parsed.accidental === 'remove'
-            ? { type: 'removeAccidentalDisplay' }
-            : {
-                type: 'setAccidentalDisplay',
-                show: parsed.accidental.show,
-                ...(parsed.accidental.parenthesized ? { parenthesized: true } : {})
-              }
-          : 'removeStringAnnotation' in parsed
-          ? { type: 'removeStringAnnotation' }
-          : 'fermata' in parsed
-          ? { type: 'setFermata', fermata: parsed.fermata }
-          : 'removeFermata' in parsed
-          ? { type: 'removeFermata' }
-          : 'marking' in parsed
-          ? parsed.remove
-            ? { type: 'removeMarking', marking: parsed.marking }
-            : {
-                type: 'setMarking',
-                marking: parsed.marking,
-                ...(parsed.attributes ? { attributes: parsed.attributes } : {})
-              }
-          : 'positioned' in parsed
-            ? { type: 'setPositioned', attribute: parsed.positioned }
-            : { type: 'removePositioned', kind: parsed.removePositioned }
       );
     } else if (this.setupPopover === 'rhythm') {
       const parsed = parseRhythm(input.value);
