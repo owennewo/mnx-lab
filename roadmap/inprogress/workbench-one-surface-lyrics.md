@@ -1,12 +1,11 @@
 # Retire the lyric popover — one-surface campaign item 6
 
-> **Status: proposed 2026-08-31 — design settled 2026-08-31, build not started.**
-> Campaign:
-> [workbench-campaign-one-surface.md](../inprogress/workbench-campaign-one-surface.md),
+> **Status: in progress 2026-08-31 — phase 1 built (the popover is retired);
+> phases 2–3 designed, not started.** Campaign:
+> [workbench-campaign-one-surface.md](workbench-campaign-one-surface.md),
 > item 6. The first draft of this doc left two investigations open; a design
-> conversation (2026-08-31) settled both, and this rewrite records the
-> decisions. **The popover stays until phase 1 lands and coverage is
-> demonstrated** (contract §1 unchanged).
+> conversation (2026-08-31) settled both, and the rewrite recorded the
+> decisions. Phase 1 landed the same day — see *What shipped* below.
 
 ## The census (contract §1)
 
@@ -156,15 +155,38 @@ Phases 2–3 may land as follow-on efforts under this doc; the campaign item
 itself closes with phase 1's sweep, and the design above is recorded so the
 later phases start without re-deriving it.
 
+## What shipped — phase 1, 2026-08-31
+
+- **Document-rung `line` pills**: one per `lineMetadata` entry
+  (`line 2: Nederlands (nl)`, removable), recited in `lineOrder` with
+  unlisted ids after — mirroring the renderer's stacking rule. The typed
+  `line …` / `no line …` arms route through `parseLyric`'s own arms at the
+  document rung; a pill amend composes (`line 2` + `Chorus`). Typed at the
+  event/note rung, both arms signpost the document rung (item 4's pattern).
+- **The sweep**: `Shift+L` binding + `ShellAction` arm, `KEY_DOCS` row,
+  `SURFACE_INTENTS.lyricPopover` (its two line intents credited to
+  `rungInspector` first — the construct-traces join enforces the order),
+  popover spec/actions/submit arm + palette row, the op-queue surface label,
+  the registry's `lyric` tile. The note rung's `text` band was the campaign's
+  first band retirement — the tile was its only member. `KNOWN_TWINS` billed
+  nothing. `parseLyric` survives whole; the grammar's header comment now
+  names its two consumers.
+- **Coverage evidence**: `rung-inspector.test.ts` — "lyric verse lines live
+  at the document rung (one-surface item 6)": both typed arms, the amend
+  composition, both signposts, pill recital incl. `lineOrder`, removal via ×.
+- **`Shift+L` is freed, not reassigned** — the earmark (reopen the phase-2
+  editor) is recorded at the unbound slot in `keymap.ts` and in the campaign
+  log.
+
 ## Relations
 
 - [core-element-ops-lyrics.md](../complete/core-element-ops-lyrics.md) — campaign
   item 12: the ops, and the popover-not-a-mode ruling that decision B reopens
   narrowly (one modal overlay) rather than wholesale.
-- [workbench-rung-inspector.md](../inprogress/workbench-rung-inspector.md) —
+- [workbench-rung-inspector.md](workbench-rung-inspector.md) —
   the pill/word machinery phase 1 extends; the collapse rule lives by its
   charter.
-- [core-selection-range-grain.md](../inprogress/core-selection-range-grain.md)
+- [core-selection-range-grain.md](core-selection-range-grain.md)
   — rung discipline; where the document-level line pills sit.
 - The extender gap is a candidate spec-loop topic (an `_x.mnxLab` extender
   draft would slot into the format without grammar changes) — deliberately

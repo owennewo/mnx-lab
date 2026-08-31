@@ -203,7 +203,6 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
  * Shift+letter is the popover tier (survey §6.2, Dorico's discipline).
  */
 export type ShellAction =
-  | 'lyricPopover'
   | 'layoutPopover'
   | 'selectionTray'
   | 'commandPalette'
@@ -231,9 +230,9 @@ export type ShellAction =
 /** Exported for the cheatsheet's join tests (keymapDocs.ts) — resolution
  *  still goes through resolveShellAction only. */
 export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
-  // Lyrics (campaign item 12): text entry as a popover, not a mode —
-  // a syllable is one short string attached to one note.
-  { code: 'KeyL', shift: true, action: 'lyricPopover' },
+  // Shift+L is deliberately unbound: freed by one-surface item 6, earmarked
+  // to open the lyric text surface when that phase lands (the campaign's one
+  // accelerator exception, decided with the design).
   // Shift+S — the document's presentation layer (core-layout-authoring.md).
   // S for score/system; the plain S is the slur/slide anchor, one layer down.
   { code: 'KeyS', shift: true, action: 'layoutPopover' },

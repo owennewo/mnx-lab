@@ -664,7 +664,8 @@ function pillsOfMember(doc: MnxStructure, level: SelectionLevel, member: Selecti
 }
 
 /** The document rung's pills: the explicit-marking support flags
- *  (`mnx.support`) — declared-only, like every other pill family. */
+ *  (`mnx.support`) and the lyric verse lines (`global.lyrics.lineMetadata`) —
+ *  declared-only, like every other pill family. */
 function documentPills(doc: MnxStructure): InspectorPill[] {
   const support = doc.mnx?.support ?? {};
   const pills: InspectorPill[] = [];
@@ -672,6 +673,19 @@ function documentPills(doc: MnxStructure): InspectorPill[] {
     pills.push(annotation('explicitAccidentals', 'explicit accidentals', 'on', { type: 'setSupport', key: 'useAccidentalDisplay', value: false }));
   if (support.useBeams)
     pills.push(annotation('explicitBeams', 'explicit beams', 'on', { type: 'setSupport', key: 'useBeams', value: false }));
+  // Verse-line metadata is document-level in MNX (labels + languages live
+  // under global.lyrics, stacked by lineOrder), so its pills sit here — the
+  // one-surface item 6 minimum bar. Recited in lineOrder, unlisted ids after,
+  // mirroring the renderer's stacking rule.
+  const lyrics = doc.global?.lyrics;
+  const metadata = lyrics?.lineMetadata ?? {};
+  const order = lyrics?.lineOrder ?? [];
+  const ids = [...order.filter(id => id in metadata), ...Object.keys(metadata).filter(id => !order.includes(id)).sort()];
+  for (const id of ids) {
+    const { label, lang } = metadata[id]!;
+    const value = [label, lang ? `(${lang})` : ''].filter(Boolean).join(' ');
+    pills.push(annotation(`line:${id}`, `line ${id}`, value, { type: 'removeLyricLine', line: id }));
+  }
   return pills;
 }
 
@@ -787,7 +801,8 @@ const DOC_WORDS: InspectorWord[] = [
   // declares the member; empty is the anonymous part MNX allows.
   { word: 'part', hint: 'Lead Guitar — adds a part; empty = anonymous' },
   { word: 'explicit accidentals', hint: 'print what each note asks; `no explicit accidentals` reverts' },
-  { word: 'explicit beams', hint: 'beam exactly as written' }
+  { word: 'explicit beams', hint: 'beam exactly as written' },
+  { word: 'line', hint: 'line 2 Nederlands nl — a verse line’s label + language; `no line 2` removes' }
 ];
 
 export function wordsFor(level: SelectionLevel): InspectorWord[] {
@@ -903,9 +918,15 @@ export function parseInspectorLine(
     if (head === 'lyric' || /^lyric$/i.test(word ?? '') || /^lyric \d+$/i.test(word ?? '')) {
       const lineId = /^lyric (\d+)$/i.exec(word ?? '')?.[1];
       const parsed = parseLyric(lineId ? `${lineId}: ${rest}` : rest);
+      if (parsed && !('syllable' in parsed) && ('line' in parsed || 'removeLine' in parsed))
+        return { error: 'a document thing — widen to the document rung: line 2 Nederlands nl · no line 2' };
       if (!parsed || !('syllable' in parsed)) return { error: 'not a syllable — sleep- · -ing · 2: Am' };
       return { intent: { type: 'setSyllable', line: parsed.line, text: parsed.syllable, ...(parsed.syllableType ? { syllableType: parsed.syllableType } : {}) } };
     }
+    // Verse-line metadata typed at the wrong rung signposts the rung that
+    // owns it (item 4's pattern) — the arm itself lives at the document rung.
+    if (head === 'line' || (head === 'no' && /^line\b/i.test(rest)))
+      return { error: 'a document thing — widen to the document rung: line 2 Nederlands nl · no line 2' };
     if (head === 'string' || head === 'fret') {
       const fb = context?.fingerboard;
       if (!fb) return { error: 'this part declares no strings — nothing to fret' };
@@ -1041,7 +1062,24 @@ export function parseInspectorLine(
       const named = parsePart(rest);
       return { intent: { type: 'addPart', ...(named.partId !== undefined ? { partId: named.partId } : {}), ...(named.name !== undefined ? { name: named.name } : {}) } };
     }
-    return { error: 'not a document declaration — part <name> · explicit accidentals · explicit beams' };
+    // Verse-line metadata (one-surface item 6): `line 2 Nederlands nl` and
+    // `no line 2` through parseLyric's own arms — a pill amend composes the
+    // same way (`line 2` + the typed rest).
+    if (head === 'line' || (head === 'no' && /^line\b/i.test(rest))) {
+      const parsed = parseLyric(line);
+      if (parsed && 'removeLine' in parsed) return { intent: { type: 'removeLyricLine', line: parsed.removeLine } };
+      if (parsed && 'line' in parsed && !('syllable' in parsed))
+        return {
+          intent: {
+            type: 'setLyricLine',
+            line: parsed.line,
+            ...(parsed.label !== undefined ? { label: parsed.label } : {}),
+            ...(parsed.lang !== undefined ? { lang: parsed.lang } : {})
+          }
+        };
+      return { error: 'not a verse line — line 2 Nederlands nl · no line 2' };
+    }
+    return { error: 'not a document declaration — part <name> · explicit accidentals · explicit beams · line 2 Nederlands nl' };
   }
   return { error: rungNote(level) ?? 'nothing to set at this rung' };
 }

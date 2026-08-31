@@ -44,13 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-lyrics.md](proposed/workbench-one-surface-lyrics.md)** —
-  one-surface campaign item 6, **proposed 2026-08-31, design open**: the lyric popover's
-  retirement plan — the line-metadata gap is the minimum bar, and two investigations are
-  framed for a follow-up design pass: verse lines × bar repeats (data or derived?), and a
-  WYTIWYG lyric lane (typed syllables landing under successive notes — which would
-  partially reopen the popover-not-a-mode ruling). Shift+L's accelerator exception is
-  decided with the design, not before; the popover stays until coverage lands.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -175,13 +168,22 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[workbench-one-surface-lyrics.md](inprogress/workbench-one-surface-lyrics.md)** —
+  one-surface campaign item 6, **phase 1 built 2026-08-31** (design settled the same
+  day): the lyric popover retired — verse-line metadata (`line 2 Nederlands nl`) lives as
+  document-rung pills, syllables stay at the event rung, and `Shift+L` is freed,
+  earmarked for the phase-2 surface. Remaining: phase 2, a paste-and-tweak lyric **text
+  surface** (LilyPond-kin format — hyphen/underscore runs, `~` elision, bar checks,
+  language headers — applied as ordinary ops); phase 3, the derived **pass model** (a
+  shared repeat-linearization walk feeding pass-aware line resolution, labels and a blue
+  diagnostic — the future player's foundation).
 - **[workbench-campaign-one-surface.md](inprogress/workbench-campaign-one-surface.md)** —
   **campaign**, item 1 built 2026-08-31: retire the ten `Shift+letter` popovers and the
   selection tray onto the rung inspector, one surface per item, ordered simplest to
   hardest. Every retirement is gated on demonstrated coverage: census before coverage,
   coverage before removal, ops before surfaces. Items 1–5 (key ✅, time ✅, clef ✅, bar
-  attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics 📝 design
-  open, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part ✅, layout) need new ops or a construct story; 11 (the
+  attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics 🔧 phase 1
+  built, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part ✅, layout) need new ops or a construct story; 11 (the
   tray) retires a charter, re-homes the verbs, and goes last. Standing ruling from item
   1: freed keys are freed, not accelerators.
 - **[core-selection-range-grain.md](inprogress/core-selection-range-grain.md)** — **decisions 1–4 built 2026-08-30** (section and container rungs retired, staff off

@@ -739,10 +739,11 @@ function resolveMarking(word: string): string | null {
 }
 
 // ---------------------------------------------------------------------------
-// Lyrics (campaign item 12, roadmap/complete/core-element-ops-lyrics.md).
-// Text entry is a MODE in most editors; here it is the same typed popover the
-// rest of the campaign uses, because a syllable is one short string attached to
-// one note — and the popover already knows how to be a text field.
+// Lyrics (campaign item 12, roadmap/complete/core-element-ops-lyrics.md; the
+// popover retired with one-surface item 6). The grammar outlived its surface:
+// the rung inspector speaks it at two rungs — syllables at the event, `line …`
+// verse metadata at the document — and the planned lyric text surface
+// (workbench-one-surface-lyrics.md phase 2) consumes it for headers.
 
 export const LYRIC_HELP =
   'sleep- · -ing · 2: Am · line 2 Nederlands nl · no lyric · no line 2';

@@ -728,6 +728,54 @@ describe('the wider rungs', () => {
     )).toEqual(['explicit accidentals: on [annotation]']);
   });
 
+  it('lyric verse lines live at the document rung (one-surface item 6)', () => {
+    // The typed arms route through parseLyric's own `line …` / `no line …`.
+    expect(parseInspectorLine('document', null, 'line 2 Nederlands nl')).toEqual({
+      intent: { type: 'setLyricLine', line: '2', label: 'Nederlands', lang: 'nl' }
+    });
+    expect(parseInspectorLine('document', null, 'no line 2')).toEqual({
+      intent: { type: 'removeLyricLine', line: '2' }
+    });
+    // A pill amend composes its word (`line 2`) with the typed rest.
+    expect(parseInspectorLine('document', 'line 2', 'Chorus')).toEqual({
+      intent: { type: 'setLyricLine', line: '2', label: 'Chorus' }
+    });
+    expect(parseInspectorLine('document', null, 'line')).toMatchObject({
+      error: expect.stringContaining('verse line')
+    });
+    // Typed at the event rung, the arms signpost the rung that owns them
+    // (item 4's pattern) — from the blank slot and from the lyric word.
+    expect(parseInspectorLine('event', null, 'line 2 Nederlands nl')).toMatchObject({
+      error: expect.stringContaining('document rung')
+    });
+    expect(parseInspectorLine('event', null, 'no line 2')).toMatchObject({
+      error: expect.stringContaining('document rung')
+    });
+    expect(parseInspectorLine('event', 'lyric', 'line 2 Nederlands nl')).toMatchObject({
+      error: expect.stringContaining('document rung')
+    });
+    // Pills: one per declared line, removable through the ×.
+    const session = at('document');
+    expect(edit(session, { type: 'setLyricLine', line: '2', label: 'Nederlands', lang: 'nl' })).toBe(true);
+    expect(edit(session, { type: 'setLyricLine', line: '1', label: 'English', lang: 'en' })).toBe(true);
+    const documentScope = (doc: typeof session.doc) =>
+      ({ doc, level: 'document', members: [{ kind: 'document' }] }) as Parameters<typeof pillsFor>[0];
+    const pills = pillsFor(documentScope(session.doc)).filter(p => p.key.startsWith('line:'));
+    expect(pills.map(p => `${p.word}: ${p.value} [${p.pillClass}]`)).toEqual([
+      'line 1: English (en) [annotation]',
+      'line 2: Nederlands (nl) [annotation]'
+    ]);
+    // The recital honors lineOrder when the document declares one, mirroring
+    // the renderer's stacking rule.
+    const ordered = JSON.parse(JSON.stringify(session.doc)) as typeof session.doc;
+    ordered.global!.lyrics!.lineOrder = ['2', '1'];
+    expect(pillsFor(documentScope(ordered)).filter(p => p.key.startsWith('line:')).map(p => p.word))
+      .toEqual(['line 2', 'line 1']);
+    expect(edit(session, pills.find(p => p.key === 'line:2')!.remove!)).toBe(true);
+    expect(pillsFor(documentScope(session.doc)).filter(p => p.key.startsWith('line:')).map(p => p.key))
+      .toEqual(['line:1']);
+  });
+
   it('rhythm declarations and container properties (one-surface item 8)', () => {
     // Construction is a declaration: the typed text carries its own extent.
     expect(parseInspectorLine('event', null, '3:2')).toMatchObject({

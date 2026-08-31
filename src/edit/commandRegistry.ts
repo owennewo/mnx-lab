@@ -569,15 +569,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ intent: { type: 'setPositioned', attribute: { kind: 'ottava', value: 1 } } })
   },
   {
-    id: 'lyric',
-    scopes: ['note', 'event'],
-    glyph: { smufl: 'lyricsElisionNarrow' },
-    label: 'Lyric syllable…',
-    shortcut: 'Shift+L',
-    tier: 'popover',
-    action: () => ({ surface: 'lyricPopover' })
-  },
-  {
     id: 'arpeggio',
     scopes: ['event'],
     glyph: { smufl: 'arpeggiato' },
@@ -994,8 +985,10 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       id: 'fingerboard',
       caption: 'fingerboard',
       commands: ['bend', 'slide', 'hammer-pull', 'vibrato', 'palm-mute', 'harmonic']
-    },
-    { id: 'text', caption: 'text', commands: ['lyric'] }
+    }
+    // The `text` band retired with the lyric tile (one-surface item 6): the
+    // tile was its only member, and an empty band is the conformance join's
+    // own red flag.
   ],
   event: [
     {
@@ -1018,7 +1011,7 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       caption: 'dynamics',
       commands: ['piano', 'mezzo-forte', 'forte']
     },
-    { id: 'text', caption: 'lines & text', commands: ['ottava', 'lyric'] }
+    { id: 'text', caption: 'lines & text', commands: ['ottava'] }
   ],
   // Two tiles, and the band still earns its caption: it says the one verb
   // this rung has is a structural one, rather than leaving it beside a

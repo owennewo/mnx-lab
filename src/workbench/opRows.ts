@@ -27,7 +27,6 @@ export interface OpRow {
 
 /** Human labels for the shell surfaces SURFACE_INTENTS names. */
 const SURFACE_LABELS: Record<string, string> = {
-  lyricPopover: 'Shift+L · popover',
   selectionTray: '/ · tray',
   rungInspector: 'Enter · inspector',
   commandPalette: 'Ctrl+G › · palette',

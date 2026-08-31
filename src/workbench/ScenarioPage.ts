@@ -58,8 +58,6 @@ import {
 import { TabDigitResolver } from '../edit/tabDigitResolver.ts';
 import { LADDER_JUMP_LEVELS } from '../edit/keymap.ts';
 import {
-  LYRIC_HELP,
-  parseLyric,
   parseLayoutSentence,
   // Still consumed by the VIEWER's instrument-override overlay (TabSetup) —
   // presentation, not document editing; it outlived the tuning popover.
@@ -120,7 +118,6 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
 type PopoverKind =
-  | 'lyric'
   | 'layout';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
@@ -128,16 +125,10 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
     label: 'layout',
     placeholder: 'layout L1: bracket [ vn1, vn2 ] · score "Part A": layout L1 · mmrest m3 x2',
     hint: 'the presentation layer: a layout groups parts onto staves, a score selects one · “no layout 2” strips · Enter applies · Esc closes'
-  },
-  lyric: {
-    label: 'lyric',
-    placeholder: 'sleep- · -ing · 2: Am · line 2 Nederlands nl',
-    hint: 'a syllable at the cursor’s note; trailing/leading “-” joins a word · “no lyric” strips · Enter applies'
-  },
+  }
 };
 
 const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
-  lyricPopover: 'lyric',
   layoutPopover: 'layout'
 };
 
@@ -152,9 +143,7 @@ export const SETUP_POPOVER_COMMANDS: {
   label: string;
   action: ShellAction;
   stroke: string;
-}[] = [
-  { label: 'setup: lyric…', action: 'lyricPopover', stroke: 'Shift+L' },
-];
+}[] = [];
 
 import './ScoreHud.ts';
 
@@ -3051,31 +3040,6 @@ export class ScenarioPage extends LitElement {
               : { type: 'removeMultimeasureRest', scoreIndex: 0, index: sentence.index }
         );
       }
-    } else if (this.setupPopover === 'lyric') {
-      const parsed = parseLyric(input.value);
-      if (!parsed) {
-        this.setupPopoverError = `not a lyric — ${LYRIC_HELP}`;
-        return;
-      }
-      this.stripIntent(
-        'syllable' in parsed
-          ? {
-              type: 'setSyllable',
-              line: parsed.line,
-              text: parsed.syllable,
-              ...(parsed.syllableType ? { syllableType: parsed.syllableType } : {})
-            }
-          : 'removeSyllable' in parsed
-            ? { type: 'removeSyllable', line: parsed.removeSyllable }
-            : 'removeLine' in parsed
-              ? { type: 'removeLyricLine', line: parsed.removeLine }
-              : {
-                  type: 'setLyricLine',
-                  line: parsed.line,
-                  ...(parsed.label !== undefined ? { label: parsed.label } : {}),
-                  ...(parsed.lang !== undefined ? { lang: parsed.lang } : {})
-                }
-      );
     }
     this.setupPopover = null;
   }

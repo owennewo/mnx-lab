@@ -449,14 +449,6 @@ export const KEY_DOCS: KeyDoc[] = [
   // ── Setup — the typed popovers (shell actions: a trace records the intent
   // the popover emits, never its opening).
   {
-    keys: 'Shift+L',
-    strokes: [{ code: 'KeyL', shift: true }],
-    group: 'setup',
-    meaning: {
-      all: 'lyric… (typed popover: `sleep-`, `-ing`, `2: Am`, `line 2 Nederlands nl`; `no lyric` strips)'
-    }
-  },
-  {
     keys: 'Shift+S',
     strokes: [{ code: 'KeyS', shift: true }],
     group: 'setup',
@@ -559,6 +551,8 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     // document
     'addPart',
     'setSupport',
+    'setLyricLine',
+    'removeLyricLine',
     // the crumbs and the ladder
     'goToMeasure',
     'setPart',
@@ -580,12 +574,6 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'removeLayout',
     'removeScore',
     'removeMultimeasureRest'
-  ],
-  lyricPopover: [
-    'setSyllable',
-    'removeSyllable',
-    'setLyricLine',
-    'removeLyricLine'
   ],
   // The rhythm declarations (campaign item 11b): the three containers share
   // one wrap verb, silence is inserted, and rest spelling is a verb rather
