@@ -900,16 +900,25 @@ export class EditorSession {
           if (!pair || pair.next === pair.current) return false;
         }
         const existing = techniqueAt(this.doc, slot.noteKey, kind);
+        // Shift+S vs S: same slide type toggles OFF; the other retypes in
+        // place (an upsert — setTechnique replaces by kind).
+        const wantedSlide = kind === 'slide' ? (intent.slideType ?? 'legato') : undefined;
+        const existingSlide = kind === 'slide' && existing ? ((existing as { type?: string }).type ?? 'legato') : undefined;
+        const retype = kind === 'slide' && existing !== undefined && existingSlide !== wantedSlide;
         const before = JSON.stringify(this.doc);
         this.apply(
-          existing
+          existing && !retype
             ? { type: 'removeTechnique', noteKey: slot.noteKey, kind }
             : {
                 type: 'setTechnique',
                 noteKey: slot.noteKey,
                 // The toggle's bend is the plain 0>full; every other shape is
                 // typed as stops through `setTechnique` (core-bend-stops.md).
-                technique: (kind === 'bend' ? { kind, alters: [0, 2] } : { kind }) as never
+                technique: (kind === 'bend'
+                  ? { kind, alters: [0, 2] }
+                  : kind === 'slide'
+                    ? { kind, ...(wantedSlide === 'shift' ? { slideType: 'shift' } : {}) }
+                    : { kind }) as never
               }
         );
         if (JSON.stringify(this.doc) === before) {

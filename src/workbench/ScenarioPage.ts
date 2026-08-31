@@ -58,7 +58,6 @@ import {
 import { TabDigitResolver } from '../edit/tabDigitResolver.ts';
 import { LADDER_JUMP_LEVELS } from '../edit/keymap.ts';
 import {
-  parseLayoutSentence,
   // Still consumed by the VIEWER's instrument-override overlay (TabSetup) —
   // presentation, not document editing; it outlived the tuning popover.
   parseTuning,
@@ -117,19 +116,14 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
-type PopoverKind =
-  | 'layout';
+// Every setup popover has retired into the rung inspector (one-surface
+// campaign items 1–10). The kind is deliberately uninhabited: the overlay
+// machinery idles empty until item 11 decides whether to demolish the frame.
+type PopoverKind = never;
 
-const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
-  layout: {
-    label: 'layout',
-    placeholder: 'layout L1: bracket [ vn1, vn2 ] · score "Part A": layout L1 · mmrest m3 x2',
-    hint: 'the presentation layer: a layout groups parts onto staves, a score selects one · “no layout 2” strips · Enter applies · Esc closes'
-  }
-};
+const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {};
 
 const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
-  layoutPopover: 'layout'
 };
 
 /** EVERY setup popover, as a palette row (workbench-score-panel.md, step C).
@@ -2544,7 +2538,9 @@ export class ScenarioPage extends LitElement {
       fingerboard: noteKey ? fingerboardOf(this.session.doc, noteKey) : null,
       ...(key ? { key } : {}),
       tempoCount,
-      harmonyCount
+      harmonyCount,
+      layoutIds: (this.session.doc.layouts ?? []).map(layout => layout.id),
+      scoreNames: (this.session.doc.scores ?? []).map(score => score.name)
     });
     if ('error' in parsed) {
       this.inspectorError = parsed.error;
@@ -2994,7 +2990,6 @@ export class ScenarioPage extends LitElement {
   }
 
   private onPopoverKey(event: KeyboardEvent) {
-    const input = event.target as HTMLInputElement;
     if (event.code === 'Escape') {
       event.preventDefault();
       this.setupPopover = null;
@@ -3002,45 +2997,6 @@ export class ScenarioPage extends LitElement {
     }
     if (event.code !== 'Enter') return;
     event.preventDefault();
-    if (this.setupPopover === 'layout') {
-      const sentence = parseLayoutSentence(input.value);
-      if (!sentence) {
-        this.setupPopoverError =
-          'not a layout sentence — try “layout L1: bracket [ vn1, vn2 ]”, “score \u201cPart A\u201d: layout L1”, “mmrest m3 x2”, or “no layout 2”';
-        return;
-      }
-      // The id is the primary key: naming an existing layout replaces it in
-      // place, and only a NEW one needs somewhere to go (the typed slot, else
-      // the end). Same for a score, by name.
-      const doc = this.session?.doc;
-      if ('layout' in sentence) {
-        const existing = (doc?.layouts ?? []).findIndex(l => l.id === sentence.layout.id);
-        const index = existing >= 0 ? existing
-          : Number.isNaN(sentence.layout.index) ? (doc?.layouts?.length ?? 0)
-          : sentence.layout.index;
-        this.stripIntent({
-          type: 'setLayout',
-          index,
-          layout: { id: sentence.layout.id, content: sentence.layout.content }
-        });
-      } else if ('score' in sentence) {
-        const existing = (doc?.scores ?? []).findIndex(sc => sc.name === sentence.score.value.name);
-        const index = existing >= 0 ? existing
-          : Number.isNaN(sentence.score.index) ? (doc?.scores?.length ?? 0)
-          : sentence.score.index;
-        this.stripIntent({ type: 'setScore', index, score: sentence.score.value });
-      } else if ('multimeasureRest' in sentence) {
-        this.stripIntent({ type: 'addMultimeasureRest', ...sentence.multimeasureRest });
-      } else {
-        this.stripIntent(
-          sentence.removeDocument === 'layout'
-            ? { type: 'removeLayout', index: sentence.index }
-            : sentence.removeDocument === 'score'
-              ? { type: 'removeScore', index: sentence.index }
-              : { type: 'removeMultimeasureRest', scoreIndex: 0, index: sentence.index }
-        );
-      }
-    }
     this.setupPopover = null;
   }
 
@@ -3856,8 +3812,11 @@ export class ScenarioPage extends LitElement {
    *  Anchored bottom-left of `.main`, deliberately clear of the tray's own
    *  bottom-centre dock so the two overlays cannot collide. */
   private setupPopoverOverlay() {
+    // PopoverKind is uninhabited since items 1–10 retired every grammar into
+    // the inspector; the guard makes the whole overlay unreachable, and the
+    // frame awaits item 11's demolition decision.
     if (!this.setupPopover) return nothing;
-    const spec = POPOVER_SPECS[this.setupPopover];
+    const spec = POPOVER_SPECS[this.setupPopover as never] as { label: string; placeholder: string; hint: string };
     return html`
       <div class="popover-layer">
         <div class="popover">

@@ -826,22 +826,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     tier: 'key',
     action: () => ({ intent: { type: 'insertAtRung', side: 'before' } })
   },
-  {
-    id: 'system-break',
-    scopes: ['document'],
-    glyph: { smufl: 'systemDivider' },
-    label: 'System break',
-    tier: 'popover',
-    blockedBy: 'layout-authoring'
-  },
-  {
-    id: 'multimeasure-rest',
-    scopes: ['document'],
-    glyph: { smufl: 'restHBar' },
-    label: 'Multimeasure rest',
-    tier: 'popover',
-    blockedBy: 'layout-authoring'
-  },
 
   // ── session — the scope above the top rung, shown as the tray's `global` tab
   // (core-selection-tray-global-tab.md). These apply to the session rather
@@ -1059,7 +1043,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       commands: ['insert-part-before', 'insert-part-after', 'delete-part']
     },
     { id: 'part', caption: 'part', commands: ['staff-kind'] },
-    { id: 'layout', caption: 'layout', commands: ['system-break', 'multimeasure-rest'] }
   ]
 };
 

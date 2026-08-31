@@ -820,7 +820,7 @@ export type TechniqueChoice =
       weights?: number[];
       approx?: true;
     }
-  | { kind: 'slide' }
+  | { kind: 'slide'; slideType?: 'shift' | 'legato' }
   | { kind: 'hammerPull' }
   | { kind: 'vibrato' }
   | { kind: 'palmMute' }
@@ -1129,7 +1129,14 @@ export function readTechniques(note: MnxNote | undefined): TechniqueChoice[] {
       ...(approx ? { approx: true } : {})
     });
   }
-  for (const kind of ['slide', 'hammerPull', 'vibrato', 'palmMute', 'harmonic'] as const) {
+  const slide = technique.slide;
+  if (slide) {
+    // slideIn/slideOut read as a bare slide: the typed surface writes only
+    // the two targeted kinds, so the others stay JSON-authored for now.
+    const slideType = slide.type === 'shift' ? 'shift' as const : slide.type === 'legato' ? 'legato' as const : undefined;
+    out.push({ kind: 'slide', ...(slideType ? { slideType } : {}) });
+  }
+  for (const kind of ['hammerPull', 'vibrato', 'palmMute', 'harmonic'] as const) {
     if (technique[kind] !== undefined && technique[kind] !== false) out.push({ kind });
   }
   return out;
@@ -1737,7 +1744,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           target.id ??= mintNoteId(next);
           technique[op.technique.kind] =
             op.technique.kind === 'slide'
-              ? { type: 'legato', target: target.id }
+              ? { type: op.technique.slideType ?? 'legato', target: target.id }
               : { target: target.id };
         }
       }

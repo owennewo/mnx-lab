@@ -295,8 +295,6 @@ fills in without the rows moving is a rung that was already right.
 | `part-name` — Part name… | `Shift+P` | ☐ | ☐ | ☐ |
 | `staves` — Staves per part… | `Shift+P` | ☐ | ☐ | ☐ |
 | `staff-kind` — Staff kind: notation + tab | `Shift+P` | ☐ | ☐ | ☐ |
-| `system-break` — System break | — | ⛔ blocked — `layout-authoring` | | |
-| `multimeasure-rest` — Multimeasure rest | — | ⛔ blocked — `layout-authoring` | | |
 
 ### session (the `global` tab) — 8 placements
 
@@ -366,7 +364,7 @@ wire.
 | `part-transposition` | `transpose-part` | staff bar | not a campaign item — needs its own proposal from the campaign's "beyond" list |
 | `mute` | `mute-part` | staff bar | audio's own decision: there is no player element at all ([core-viewer-embedded-app.md](../complete/core-viewer-embedded-app.md) records why), so the row renders value-less until there is |
 | `section-colour` | `section-colour` | section | **no address recorded** — same hole as `arpeggio`; decide whether section colour is a document property or a viewer preference before giving it a verb |
-| `layout-authoring` | `system-break`, `multimeasure-rest` | document | removal already landed; construction needs a surface that can express a **tree**, which the popover grammar cannot and the palette cannot (it does not see the document). The tray *can* see the document, so it is a candidate surface — recorded, not claimed |
+| ~~`layout-authoring`~~ | ~~`system-break`, `multimeasure-rest`~~ | document | **CLOSED 2026-08-31** by [workbench-one-surface-layout.md](../complete/workbench-one-surface-layout.md): the surface that sees the document turned out to be the rung inspector's document rung — `parseLayoutSentence` wholesale (upsert-by-id via context), summary pills with slot-addressed removals; the two blocked tiles retired with the layout popover |
 
 Three surface gaps outlive the tiles and are not triage rows either: the dashed
 on-score preview of a scope **wider** than the enclosure can draw; the promoted

@@ -451,9 +451,9 @@ export const KEY_DOCS: KeyDoc[] = [
   {
     keys: 'Shift+S',
     strokes: [{ code: 'KeyS', shift: true }],
-    group: 'setup',
+    group: 'adornments',
     meaning: {
-      all: 'layout… (typed popover: `layout L1: bracket [ vn1, vn2 ]`, `score "Part A": layout L1`, `mmrest m3 x2`; `no layout 2` strips)'
+      all: 'shift slide to the next note — tab projection; plain S is the legato slide, same type toggles off, the other retypes'
     }
   },
 
@@ -553,6 +553,12 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'setSupport',
     'setLyricLine',
     'removeLyricLine',
+    'setLayout',
+    'setScore',
+    'addMultimeasureRest',
+    'removeLayout',
+    'removeScore',
+    'removeMultimeasureRest',
     // the crumbs and the ladder
     'goToMeasure',
     'setPart',
@@ -562,22 +568,6 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'nextPosition',
     'prevPosition'
   ],
-  // One popover per attribute, two intents each: the grammar's `inherit`
-  // token emits the removal intent (campaign item 5).
-  // The document's presentation layer, construct and destruct in one grammar
-  // (core-layout-authoring.md). A layout is a TREE, so it has no place in the
-  // music to stand at: the user supplies a 1-based slot and the whole value.
-  layoutPopover: [
-    'setLayout',
-    'setScore',
-    'addMultimeasureRest',
-    'removeLayout',
-    'removeScore',
-    'removeMultimeasureRest'
-  ],
-  // The rhythm declarations (campaign item 11b): the three containers share
-  // one wrap verb, silence is inserted, and rest spelling is a verb rather
-  // than a padding policy.
   // The selection tray (core-selection-tray-mechanism.md) fires the registry's
   // commands through the same funnel as keys, so most of what it offers is
   // already reachable — bound to a key or owned by a popover grammar above.

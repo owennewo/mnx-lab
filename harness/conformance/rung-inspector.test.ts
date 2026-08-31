@@ -694,6 +694,44 @@ describe('the wider rungs', () => {
     expect(parseInspectorLine('voiceMeasure', null, 'staccato')).toHaveProperty('error');
   });
 
+  it('layout sentences and the shift slide (one-surface item 10)', () => {
+    // The layout grammar reaches its intents from the document rung; the
+    // upsert-by-id rule rides the context, as the popover resolved it.
+    expect(parseInspectorLine('document', null, 'layout L1: bracket [ p1 ]', { layoutIds: [] })).toMatchObject({
+      intent: { type: 'setLayout', index: 0, layout: { id: 'L1' } }
+    });
+    expect(parseInspectorLine('document', null, 'layout L1: brace [ p1 ]', { layoutIds: ['L0', 'L1'] })).toMatchObject({
+      intent: { type: 'setLayout', index: 1 }
+    });
+    expect(parseInspectorLine('document', null, 'mmrest m3 x2')).toEqual({
+      intent: { type: 'addMultimeasureRest', scoreIndex: 0, start: 'm3', duration: 2 }
+    });
+    expect(parseInspectorLine('document', null, 'no layout 2')).toEqual({ intent: { type: 'removeLayout', index: 1 } });
+    // Declared presentation reads back as removable summary pills.
+    const doc = makeNoteDoc();
+    doc.layouts = [{ id: 'L1', content: [{ type: 'bracket', sources: [{ part: 'p1' }] } as never] }];
+    doc.scores = [{ name: 'Part A', multimeasureRests: [{ start: 'm3', duration: 2 }] } as never];
+    const session = at('document', doc);
+    expect(pillsFor({ doc: session.doc, level: 'document', members: [{ kind: 'document' }] }).map(
+      pill => `${pill.word}: ${pill.value}`
+    )).toEqual(['layout: 1 «L1» · bracket · 1 sources', 'score: 1 «Part A»', 'mmrest: m3 ×2']);
+
+    // Shift+S's dialect: same type toggles OFF, the other retypes in place.
+    const tab = at('note');
+    expect(edit(tab, { type: 'toggleTechnique', kind: 'slide', slideType: 'shift' })).toBe(true);
+    const slideOf = () =>
+      (tab.doc.parts![0]!.measures![0]!.sequences![0]!.content![0] as { notes?: { _x?: { mnxLab?: { tab?: { technique?: { slide?: { type?: string } } } } } }[] }).notes![0]!._x?.mnxLab?.tab?.technique?.slide;
+    expect(slideOf()?.type).toBe('shift');
+    expect(edit(tab, { type: 'toggleTechnique', kind: 'slide' })).toBe(true);
+    expect(slideOf()?.type).toBe('legato');
+    expect(edit(tab, { type: 'toggleTechnique', kind: 'slide' })).toBe(true);
+    expect(slideOf()).toBeUndefined();
+    // The typed form the founding conversation asked for.
+    expect(parseInspectorLine('note', 'slide', 'shift')).toEqual({
+      intent: { type: 'setTechnique', technique: { kind: 'slide', slideType: 'shift' } }
+    });
+  });
+
   it('part identity, staff kind and the document rung (one-surface item 9)', () => {
     // The rename that never existed: the part-name tile opened a grammar
     // whose only name arm ADDED a part. The setter is the new declaration.

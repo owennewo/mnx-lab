@@ -189,6 +189,9 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
     { code: 'KeyB', intent: { type: 'toggleTechnique', kind: 'bend' } as EditorIntent },
     { code: 'KeyH', intent: { type: 'toggleTechnique', kind: 'hammerPull' } as EditorIntent },
     { code: 'KeyS', intent: { type: 'toggleTechnique', kind: 'slide' } as EditorIntent },
+    // The key the one-surface campaign was founded to free (item 10): the
+    // popover is gone, so capital S is the slide that re-picks.
+    { code: 'KeyS', shift: true, intent: { type: 'toggleTechnique', kind: 'slide', slideType: 'shift' } as EditorIntent },
     { code: 'KeyV', intent: { type: 'toggleTechnique', kind: 'vibrato' } as EditorIntent },
     { code: 'KeyX', intent: { type: 'toggleTechnique', kind: 'palmMute' } as EditorIntent },
     { code: 'KeyO', intent: { type: 'toggleTechnique', kind: 'harmonic' } as EditorIntent }
@@ -203,7 +206,6 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
  * Shift+letter is the popover tier (survey §6.2, Dorico's discipline).
  */
 export type ShellAction =
-  | 'layoutPopover'
   | 'selectionTray'
   | 'commandPalette'
   | 'goTo'
@@ -233,9 +235,8 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   // Shift+L is deliberately unbound: freed by one-surface item 6, earmarked
   // to open the lyric text surface when that phase lands (the campaign's one
   // accelerator exception, decided with the design).
-  // Shift+S — the document's presentation layer (core-layout-authoring.md).
-  // S for score/system; the plain S is the slur/slide anchor, one layer down.
-  { code: 'KeyS', shift: true, action: 'layoutPopover' },
+  // Shift+S carries the shift slide in the tab projection (item 10) — an
+  // editor-layer binding now, not a shell popover.
   // `/` opens a command surface — the selection tray when an editor holds the
   // keyboard, the palette's go-to when none does. Slash rather than Ctrl+K on
   // two grounds. It is the surface used most while editing, so it should cost

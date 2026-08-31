@@ -186,6 +186,9 @@ export type MutationIntent =
   | {
       type: 'toggleTechnique';
       kind: TechniqueChoice['kind'] | 'hammerPull';
+      /** Shift+S's dialect: the slide that re-picks. Toggle semantics stay
+       *  physical — same type removes, the other type retypes in place. */
+      slideType?: 'shift' | 'legato';
     }
   | { type: 'setFingering'; hand: 'left' | 'right'; finger: string }
   | { type: 'removeFingering' }

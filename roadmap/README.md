@@ -44,6 +44,12 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[workbench-one-surface-layout.md](proposed/workbench-one-surface-layout.md)** —
+  one-surface campaign item 10, **built 2026-08-31**: the LAST popover retired — the
+  layout grammar moved wholesale to the document rung (summary pills, sentence amends,
+  slot/id resolution via the parse context; the `layout-authoring` residue row closes) —
+  and the campaign's founding debt is paid: **`Shift+S` is the shift slide**, with
+  `slideType` on the technique union and typed `slide shift`/`slide legato` forms.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -183,7 +189,7 @@ back up to `proposed/` the moment it is.
   hardest. Every retirement is gated on demonstrated coverage: census before coverage,
   coverage before removal, ops before surfaces. Items 1–5 (key ✅, time ✅, clef ✅, bar
   attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics 🔧 phase 1
-  built, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part ✅, layout) need new ops or a construct story; 11 (the
+  built, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part ✅, layout ✅) need new ops or a construct story; 11 (the
   tray) retires a charter, re-homes the verbs, and goes last. Standing ruling from item
   1: freed keys are freed, not accelerators.
 - **[core-selection-range-grain.md](inprogress/core-selection-range-grain.md)** — **decisions 1–4 built 2026-08-30** (section and container rungs retired, staff off

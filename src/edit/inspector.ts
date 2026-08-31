@@ -43,6 +43,7 @@ import {
   parseTuning,
   parsePart,
   parsePartDeclaration,
+  parseLayoutSentence,
   parseRhythm,
   RHYTHM_HELP
 } from './setupGrammar.ts';
@@ -456,6 +457,7 @@ export function positionedText(attribute: PositionedAttribute): { word: string; 
 /** A technique's typed value: a bend as its stops, `≈`-marked when the
  *  stored positions are only approximated by the spelt weights. */
 export function techniqueText(technique: TechniqueChoice): string {
+  if (technique.kind === 'slide') return technique.slideType ?? '';
   if (technique.kind !== 'bend') return '';
   let out = technique.approx ? '≈' : '';
   technique.alters.forEach((alter, i) => {
@@ -686,7 +688,28 @@ function documentPills(doc: MnxStructure): InspectorPill[] {
     const value = [label, lang ? `(${lang})` : ''].filter(Boolean).join(' ');
     pills.push(annotation(`line:${id}`, `line ${id}`, value, { type: 'removeLyricLine', line: id }));
   }
+  // The presentation layer, summarized — amend is retyping the sentence
+  // (upsert by id/slot, the popover's own model), so no tree round-trip.
+  (doc.layouts ?? []).forEach((layout, index) => {
+    const kinds = (layout.content ?? []).map(entry => entry.type).join(' ');
+    pills.push(annotation(`layout#${index}`, 'layout', `${index + 1}${layout.id ? ` «${layout.id}»` : ''} · ${kinds || 'empty'} · ${countLayoutSources(layout.content)} sources`, { type: 'removeLayout', index }));
+  });
+  (doc.scores ?? []).forEach((score, index) => {
+    pills.push(annotation(`score#${index}`, 'score', `${index + 1}${score.name ? ` «${score.name}»` : ''}`, { type: 'removeScore', index }));
+    (score.multimeasureRests ?? []).forEach((rest, restIndex) => {
+      pills.push(annotation(`mmrest#${index}:${restIndex}`, 'mmrest', `${rest.start} ×${rest.duration}${index > 0 ? ` in ${index + 1}` : ''}`, { type: 'removeMultimeasureRest', scoreIndex: index, index: restIndex }));
+    });
+  });
   return pills;
+}
+
+function countLayoutSources(content: readonly { content?: unknown; sources?: unknown[] }[] | undefined): number {
+  let count = 0;
+  for (const entry of content ?? []) {
+    count += entry.sources?.length ?? 0;
+    if (Array.isArray(entry.content)) count += countLayoutSources(entry.content as never);
+  }
+  return count;
 }
 
 /**
@@ -774,7 +797,7 @@ const NOTE_WORDS: InspectorWord[] = [
   { word: 'accidental', hint: 'show · hide · parens', values: ['show', 'hide', 'parens'] },
   { word: 'finger', hint: '3 · left 2 · right p' },
   { word: 'bend', hint: '0>full · 1/2>0 · 0>full>1/2 · 0>1/2>1/2>0' },
-  ...TECHNIQUE_WORDS.filter(k => k !== 'bend').map(word => ({ word, hint: '' })),
+  ...TECHNIQUE_WORDS.filter(k => k !== 'bend').map(word => ({ word, hint: word === 'slide' ? 'shift · legato — bare = legato' : '' })),
   ...EVENT_WORDS.filter(w => w.word !== 'duration')
 ];
 
@@ -802,7 +825,10 @@ const DOC_WORDS: InspectorWord[] = [
   { word: 'part', hint: 'Lead Guitar — adds a part; empty = anonymous' },
   { word: 'explicit accidentals', hint: 'print what each note asks; `no explicit accidentals` reverts' },
   { word: 'explicit beams', hint: 'beam exactly as written' },
-  { word: 'line', hint: 'line 2 Nederlands nl — a verse line’s label + language; `no line 2` removes' }
+  { word: 'line', hint: 'line 2 Nederlands nl — a verse line’s label + language; `no line 2` removes' },
+  { word: 'layout', hint: 'L1: bracket [ vn1, vn2 ] — upsert by id, `no layout 2` strips' },
+  { word: 'score', hint: '"Part A": layout L1' },
+  { word: 'mmrest', hint: 'm3 x2 · m3 x2 in 2' }
 ];
 
 export function wordsFor(level: SelectionLevel): InspectorWord[] {
@@ -879,6 +905,10 @@ export function parseInspectorLine(
     key?: string;
     tempoCount?: number;
     harmonyCount?: number;
+    /** Declared layout ids / score names, in slot order — the document
+     *  rung's upsert-by-id resolution (the popover's own rule). */
+    layoutIds?: (string | undefined)[];
+    scoreNames?: (string | undefined)[];
   }
 ): InspectorParse {
   if (level === 'measure') {
@@ -949,6 +979,8 @@ export function parseInspectorLine(
     // words (`hammerPull`, `palmMute`) never matched themselves — found
     // hands-on 2026-08-30, latent since the words list was born.
     const techniqueKind = TECHNIQUE_WORDS.find(k => k.toLowerCase() === head);
+    if (techniqueKind === 'slide' && ['', 'shift', 'legato'].includes(rest))
+      return { intent: { type: 'setTechnique', technique: { kind: 'slide', ...(rest === 'shift' ? { slideType: 'shift' } : rest === 'legato' ? { slideType: 'legato' } : {}) } as TechniqueChoice } };
     if (techniqueKind && techniqueKind !== 'bend' && rest === '')
       return { intent: { type: 'setTechnique', technique: { kind: techniqueKind } as TechniqueChoice } };
     if (head === 'bend') {
@@ -1054,6 +1086,31 @@ export function parseInspectorLine(
     return { error: 'not a part declaration — name · staves · staff kind · clef · capo · tuning' };
   }
   if (level === 'document') {
+    const sentence = parseLayoutSentence(line);
+    if (sentence) {
+      if ('layout' in sentence) {
+        const ids = context?.layoutIds ?? [];
+        const existing = sentence.layout.id !== undefined ? ids.indexOf(sentence.layout.id) : -1;
+        const index = existing >= 0 ? existing : Number.isNaN(sentence.layout.index) ? ids.length : sentence.layout.index;
+        return { intent: { type: 'setLayout', index, layout: { id: sentence.layout.id, content: sentence.layout.content } } };
+      }
+      if ('score' in sentence) {
+        const names = context?.scoreNames ?? [];
+        const existing = sentence.score.value.name !== undefined ? names.indexOf(sentence.score.value.name) : -1;
+        const index = existing >= 0 ? existing : Number.isNaN(sentence.score.index) ? names.length : sentence.score.index;
+        return { intent: { type: 'setScore', index, score: sentence.score.value } };
+      }
+      if ('multimeasureRest' in sentence)
+        return { intent: { type: 'addMultimeasureRest', ...sentence.multimeasureRest } };
+      return {
+        intent:
+          sentence.removeDocument === 'layout'
+            ? { type: 'removeLayout', index: sentence.index }
+            : sentence.removeDocument === 'score'
+              ? { type: 'removeScore', index: sentence.index }
+              : { type: 'removeMultimeasureRest', scoreIndex: 0, index: sentence.index }
+      };
+    }
     const declaration = parsePartDeclaration(line);
     if (declaration && 'support' in declaration)
       return { intent: { type: 'setSupport', key: declaration.support.key, value: declaration.support.value } };
@@ -1079,7 +1136,7 @@ export function parseInspectorLine(
         };
       return { error: 'not a verse line — line 2 Nederlands nl · no line 2' };
     }
-    return { error: 'not a document declaration — part <name> · explicit accidentals · explicit beams · line 2 Nederlands nl' };
+    return { error: 'not a document declaration — part <name> · layout L1: bracket [ vn1, vn2 ] · score "A": layout L1 · mmrest m3 x2 · line 2 Nederlands nl · explicit accidentals' };
   }
   return { error: rungNote(level) ?? 'nothing to set at this rung' };
 }
