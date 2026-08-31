@@ -219,7 +219,6 @@ describe('design tokens', () => {
   // The rung inspector is the tray's sibling — same anchor, same frame, same
   // inheritance rule — so it sits under the same three joins.
   describe.each([
-    ['the selection tray', 'workbench/SelectionTray.ts'],
     ['the rung inspector', 'workbench/RungInspector.ts']
   ])('%s consumes the system', (_name, TRAY) => {
 

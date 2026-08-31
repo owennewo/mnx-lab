@@ -1,6 +1,6 @@
 # One editing surface — retire the popovers and the tray into the inspector
 
-> **Status: in progress 2026-08-31 — campaign; items 1–10 all built the same day (item 6 in three phases). Every popover is gone; item 11, the tray, remains.** The three-surface experiment run by
+> **Status: COMPLETE 2026-08-31 — the index is exhausted.** Eleven items (one split), all built; every popover and the tray retired onto the rung inspector, the keymap and the palette; proposed and finished inside one day, across two concurrent sessions.
 > [workbench-rung-inspector.md](workbench-rung-inspector.md) ("a third
 > editing surface, to be tried *beside* the tray and the popovers so that use decides
 > which wins") has its verdict: **the inspector wins.** The user's ruling, 2026-08-31:
@@ -89,7 +89,7 @@ is one popover or the tray, and one work item.
 | 9 | **Part** (~~`Shift+P`~~ freed) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | ✅ [built 2026-08-31](../complete/workbench-one-surface-part.md) |
 | 10 | **Layout** (~~`Shift+S`~~ freed → **shift slide**) | nothing — no document-rung pills exist | the document rung grows its pill families from `parseLayoutSentence`'s grammar (sources, systems, quoted names — the largest parser in the file); likely splits into sub-items when picked up | ✅ [built 2026-08-31](../complete/workbench-one-surface-layout.md) |
 | 11a | **The tray's attribute tiles** | every set/remove/toggle tile is a mouse-spelling of a word, key or pill the inspector already has (markings, dynamics, techniques, bar toggles, accidental/ottava/dots/tie, duration steppers, respell, staff-kind ×4, slur/beam) | item-1-shaped: census each tile's intent → point at the covering surface → delete; no new ops expected | ✅ [built 2026-08-31](../complete/workbench-one-surface-tray-attrs.md) |
-| 11b | **The tray's verbs + shell** (`/`) | the verb tiles collapse into rung-generic gestures the keymap already owns: insert-sibling (`I`/`Shift+I` = `insertAtRung`, cursor follows), delete/clear (`Del`'s ladder), closures (Home/End/Ctrl+A/Alt+V), history | test the thesis; build the one missing generic — **construct the missing child** (`new-voice` → a `voice` declaration word at partMeasure); dispose the four blocked-residue rows (the `arpeggio` blocker looks stale — verify first); demolish the uninhabited popover frame; retire the tray shell + `/`, discoverability to the `?` legend + palette `>`; settle the triage ledger (../proposed/core-selection-tray-residue.md) | row (split 2026-08-31) |
+| 11b | **The tray's verbs + shell** (`/`) | the verb tiles collapse into rung-generic gestures the keymap already owns: insert-sibling (`I`/`Shift+I` = `insertAtRung`, cursor follows), delete/clear (`Del`'s ladder), closures (Home/End/Ctrl+A/Alt+V), history | test the thesis; build the one missing generic — **construct the missing child** (`new-voice` → a `voice` declaration word at partMeasure); dispose the four blocked-residue rows (the `arpeggio` blocker looks stale — verify first); demolish the uninhabited popover frame; retire the tray shell + `/`, discoverability to the `?` legend + palette `>`; settle the triage ledger (../proposed/core-selection-tray-residue.md) | ✅ [built 2026-08-31](../complete/workbench-one-surface-tray-verbs.md) — **the index is exhausted** |
 
 The order inside 1–5 is near-arbitrary (all five are census-and-sweep); they are
 ranked by grammar size. 6–7 each carry one bounded gap. 8–10 each need design and at
@@ -112,6 +112,19 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Progress + learnings log
 
+- **2026-08-31 — item 11b built; THE CAMPAIGN CLOSES.** The generalization
+  thesis held to the end: every verb tile was a rung-generic gesture's costume
+  (sideways = `I`/`Shift+I`, downward = a declaration word, removal = `Del`'s
+  ladder, closures/history on their keys), so the demolition deleted rather
+  than moved — the tray, the registry, the popover frame, the `popover`
+  precedence class, ~1,400 lines net. `/` REVERTED to its pre-tray job
+  (go-to — the unclaimed fallback was always the muscle memory); the chip's
+  click opens the inspector. Carried forward as op-gaps, not surface debts:
+  `part-transposition`, `mute` (audio's player question), `section-colour`
+  (document property vs viewer preference). What the campaign proved, for
+  whoever builds studio's surfaces: a command surface earns its keep only
+  while some grammar has no truer home — build the home first and the surface
+  retires itself.
 - **2026-08-31 — item 11b slice 1 (gaps closed).** The `voice` construct word
   landed at both bar rungs (`addVoiceMeasure` — the last bespoke construct
   verb, now a declaration); the four blocked tiles retired, and with them the

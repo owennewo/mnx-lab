@@ -80,8 +80,9 @@ describe('the pending-gesture contract', () => {
   // Escape abandons the innermost pending thing, Enter commits it. The order
   // is the contract, so it is asserted rather than left to each surface.
   it('is innermost-first: overlays, then the fret, then the anchor, then the selection', () => {
+    // 'popover' left the list with the last popover (one-surface 11b): the
+    // setup-popover class is extinct, so nothing can be pending in it.
     expect([...PENDING_PRECEDENCE]).toEqual([
-      'popover',
       'overlay',
       'pendingFret',
       'selection'
@@ -93,7 +94,6 @@ describe('the pending-gesture contract', () => {
     // tray — state changing while the user was backing out
     // of a menu, which is the confusion the ordering exists to prevent.
     const mount = PENDING_PRECEDENCE.indexOf('pendingFret');
-    expect(PENDING_PRECEDENCE.indexOf('popover')).toBeLessThan(mount);
     expect(PENDING_PRECEDENCE.indexOf('overlay')).toBeLessThan(mount);
     // Deselection is the LAST resort, after every pending thing has declined.
     expect(PENDING_PRECEDENCE.indexOf('selection')).toBe(PENDING_PRECEDENCE.length - 1);

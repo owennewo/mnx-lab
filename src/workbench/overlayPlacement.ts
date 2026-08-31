@@ -22,6 +22,9 @@ export interface OverlayAnchor {
 
 /** The connector: the spec plants the overlay one small gap below the
  *  selection's lower bound and lets the shaft fill exactly that gap. */
+/** The overlays' shared frame width (the `--tray-w` fallback). */
+export const OVERLAY_WIDTH = 470;
+
 export const OVERLAY_SHAFT_H = 8;
 /** The gap the chip and the overlays all sit at, below the selection. */
 export const OVERLAY_EDGE_GAP = 8;

@@ -18,7 +18,6 @@ import { EditorSession, replayIntents } from '../edit/session.ts';
 import { elementKeys, runDestructWalk } from '../edit/destructWalk.ts';
 import { constructTraceByTarget, type ConstructTrace } from './constructTraces.ts';
 import {
-  selectionNoteKeys,
   type SelectionMember,
   type SelectionLevel
 } from '../edit/selection.ts';
@@ -56,7 +55,6 @@ import {
   type ShellAction
 } from '../edit/keymap.ts';
 import { TabDigitResolver } from '../edit/tabDigitResolver.ts';
-import { LADDER_JUMP_LEVELS } from '../edit/keymap.ts';
 import {
   // Still consumed by the VIEWER's instrument-override overlay (TabSetup) —
   // presentation, not document editing; it outlived the tuning popover.
@@ -66,30 +64,13 @@ import {
 import { buildOpRow } from './opRows.ts';
 import { editorHasKeyboard, keyIsOurs } from './keyScope.ts';
 import {
-  bandsForScope,
-  commandState,
-  commandsForScope,
-  isTriaged,
-  selectionMemberSummary,
-  sessionView,
-  type CommandScope,
-  type EditorCommand
-} from '../edit/commandRegistry.ts';
-import type {
-  TrayAnchor,
-  TrayBand,
-  TrayMeta,
-  TrayRung,
-  TrayTile
-} from './SelectionTray.ts';
-import {
-  TRAY_EDGE_GAP,
-  TRAY_MIRROR_MARGIN,
-  TRAY_SHAFT_H,
-  TRAY_WIDTH
-} from './SelectionTray.ts';
+  OVERLAY_EDGE_GAP,
+  OVERLAY_MIRROR_MARGIN,
+  OVERLAY_SHAFT_H,
+  OVERLAY_WIDTH,
+  type OverlayAnchor
+} from './overlayPlacement.ts';
 import '../elements/DocumentViewer.ts';
-import './SelectionTray.ts';
 import './RungInspector.ts';
 import { buildInspectorView } from './inspectorRows.ts';
 import { fingerboardOf, parseInspectorLine } from '../edit/inspector.ts';
@@ -118,16 +99,6 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
-// Every setup popover has retired into the rung inspector (one-surface
-// campaign items 1–10). The kind is deliberately uninhabited: the overlay
-// machinery idles empty until item 11 decides whether to demolish the frame.
-type PopoverKind = never;
-
-const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {};
-
-const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
-};
-
 /** EVERY setup popover, as a palette row (workbench-score-panel.md, step C).
  *
  *  The `actions` tab used to be the only place several of these could be
@@ -256,13 +227,6 @@ function fmtKey(fifths: number): string {
   const n = Math.abs(fifths);
   return `${n}${fifths > 0 ? '♯' : '♭'}`;
 }
-
-/** The tray tab for the `document` scope — the one that is not a ladder rung
- *  (core-selection-tray-global-tab.md). */
-const GLOBAL_TAB = 'global';
-
-/** Tile ids the PAGE owns rather than the registry; see `chromeCommands`. */
-const CHROME_PREFIX = 'page:';
 
 /**
  * One JSON line, split into the design's THREE inks and nothing more: keys in
@@ -500,8 +464,6 @@ export class ScenarioPage extends LitElement {
   private clipboardNoticeTimer: ReturnType<typeof setTimeout> | undefined;
   /** The open setup popover (survey §6.2's Shift+letter tier), if any.
    *  (Named to dodge the DOM's built-in HTMLElement.popover property.) */
-  @state() private setupPopover: PopoverKind | null = null;
-  @state() private setupPopoverError = '';
   /** The assist tab's model choice and its query dialog
    *  (core-assist-model-selector.md's picker surface). */
   @state() private assistModel: string =
@@ -545,11 +507,6 @@ export class ScenarioPage extends LitElement {
   @state() private panelTab: PanelTab = 'hud';
   private landingFocus = false;
 
-  // ── The selection command tray (core-selection-tray-visuals.md), at its
-  // VISUALS stage: real tabs and anchor from the session/viewer, DEMO tiles
-  // from trayDemo.ts, and no intents fired — tab commits and tile flips are
-  // page-local so the look and keyboard model can be reviewed before wiring.
-  @state() private trayOpen = false;
   /** The rung inspector (roadmap/inprogress/workbench-rung-inspector.md):
    *  Enter with nothing pending opens it over the selection, where the tray
    *  sits. It and the tray are never open together — both want the keys. */
@@ -573,10 +530,8 @@ export class ScenarioPage extends LitElement {
    *  a true number instead of assuming 100%. */
   @state() private effectiveStaffScale = 1;
   /** Previewed tab (row key), or null = the tab holding the selection. */
-  @state() private trayTab: string | null = null;
   /** The selection's box in `.main` coordinates, from `selection-anchored`. */
-  @state() private trayAnchor: TrayAnchor | null = null;
-  @state() private traySearch = '';
+  @state() private trayAnchor: OverlayAnchor | null = null;
 
   /** The rung chip (workbench-rung-legibility.md): full strength on a rung
    *  change, settling to a whisper — the level named at the gaze point. */
@@ -599,7 +554,6 @@ export class ScenarioPage extends LitElement {
   /** The side the tray hangs from, snapshotted when it opens and held until
    *  it closes: the spec forbids flipping mid-interaction, and the chip and
    *  the tray have to agree about the side because they are one object. */
-  @state() private trayMirrored = false;
 
   /** Side panel width in px — the drag bar on its left edge adjusts it. */
   @state() private panelWidth = storedPanelWidth();
@@ -1940,12 +1894,8 @@ export class ScenarioPage extends LitElement {
       this.session = null;
       this.selection = null;
       this.copied = false;
-      this.setupPopover = null;
-      this.setupPopoverError = '';
       this.showClipboardNotice(null);
       this.cursorHidden = false;
-      this.trayOpen = false;
-      this.trayTab = null;
       this.trayAnchor = null;
       // Overrides are per-part by INDEX, so carrying them to a different
       // document would misapply them.
@@ -1981,7 +1931,6 @@ export class ScenarioPage extends LitElement {
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.addEventListener('mnx-palette-action', this.onPaletteAction);
-    window.addEventListener('mnx-tray-intent', this.onTrayIntent);
     // Keyboard-ownership tracking re-reads `document.activeElement`, which is
     // always accurate; the only question is WHEN. Focus events are the
     // obvious trigger but are not dependable everywhere (headless Chrome
@@ -2007,7 +1956,6 @@ export class ScenarioPage extends LitElement {
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.removeEventListener('mnx-palette-action', this.onPaletteAction);
-    window.removeEventListener('mnx-tray-intent', this.onTrayIntent);
     window.removeEventListener('focusin', this.onFocusChange);
     window.removeEventListener('focusout', this.onFocusChange);
     window.removeEventListener('focus', this.onFocusChange, true);
@@ -2031,7 +1979,6 @@ export class ScenarioPage extends LitElement {
       // shortcuts it cannot honour is the same lie the dimmed cursor exists
       // to avoid (core-editor-focus-scope.md, stage 3).
       if (!this.hasKeyboard) {
-        this.trayOpen = false;
         this.inspectorOpen = false;
       }
     }, 0);
@@ -2042,16 +1989,15 @@ export class ScenarioPage extends LitElement {
    *  that stops propagation and sees through the tray's shadow root — and
    *  nothing is prevented, so the click still reaches whatever it hit. */
   private onPointerDownOutside = (event: Event) => {
-    if (!this.trayOpen && !this.inspectorOpen) return;
+    if (!this.inspectorOpen) return;
     const inOverlay = event
       .composedPath()
       .some(
         node =>
           node instanceof HTMLElement &&
-          (node.tagName === 'MNX-SELECTION-TRAY' || node.tagName === 'MNX-RUNG-INSPECTOR')
+          node.tagName === 'MNX-RUNG-INSPECTOR'
       );
     if (!inOverlay) {
-      this.trayOpen = false;
       this.inspectorOpen = false;
     }
   };
@@ -2159,19 +2105,7 @@ export class ScenarioPage extends LitElement {
       return this.lyricPreviewKeys.length > 0
         ? { enclosure: ENCLOSURE_BY_LEVEL['note'], noteIds: this.lyricPreviewKeys }
         : null;
-    if (!session || !this.trayOpen || this.cursorHidden) return null;
-    const level = this.trayTab ? LEVEL_BY_ROW[this.trayTab] : undefined;
-    if (!level || level === session.selectionLevel) return null;
-    return {
-      enclosure: ENCLOSURE_BY_LEVEL[level],
-      noteIds: selectionNoteKeys(
-        session.doc,
-        session.positions,
-        session.cursor,
-        level,
-        session.projection
-      )
-    };
+    return null;
   }
 
   /** A click in the combined score chooses which rendering owns subsequent
@@ -2330,10 +2264,6 @@ export class ScenarioPage extends LitElement {
         this.openLyricEditor();
         return;
       }
-      if (action && this.openPopover(action)) {
-        event.preventDefault();
-        return;
-      }
     }
     let intent: EditorIntent | null = keyAction;
     if (!intent || !this.session) return;
@@ -2434,19 +2364,6 @@ export class ScenarioPage extends LitElement {
     location.hash = scenarioHref(next.id, this.view || undefined);
   }
 
-  private openPopover(action: ShellAction): boolean {
-    this.flushPendingFret();
-    // Only the popover actions are ours; palette actions belong to the shell.
-    const kind = POPOVER_ACTIONS[action];
-    if (!kind) return false;
-    this.setupPopover = kind;
-    this.setupPopoverError = '';
-    // No panel tab to switch to any more: the popover is a page-level overlay
-    // over the score (setupPopoverOverlay), so it is visible wherever the panel
-    // happens to be — and opening one no longer moves the panel out from under
-    // whatever you were reading.
-    return true;
-  }
 
   /** Palette items act on the editor through the same funnels as keys: the
    *  intent channel feeds the session (recorded in traces), the action
@@ -2454,7 +2371,7 @@ export class ScenarioPage extends LitElement {
   private onPaletteIntent = (event: Event) => {
     // The palette took over (a global command ran from go-to's `>` list):
     // two overlays wanting the same keys is one too many.
-    this.trayOpen = false;
+    this.inspectorOpen = false;
     this.stripIntent((event as CustomEvent<EditorIntent>).detail);
   };
 
@@ -2464,7 +2381,6 @@ export class ScenarioPage extends LitElement {
     if (action === 'copyTrace') void this.copyTrace();
     else if (action === 'revert') this.revertEdits();
     else if (action === 'lyricTextEditor') this.openLyricEditor();
-    else this.openPopover(action as ShellAction);
   };
 
   // ── The lyric text editor's mount (one-surface item 6, phase 2) ──────────
@@ -2475,7 +2391,6 @@ export class ScenarioPage extends LitElement {
   private openLyricEditor() {
     if (!this.session || this.loadState !== 'ready') return;
     this.flushPendingFret();
-    this.trayOpen = false;
     this.inspectorOpen = false;
     this.lyricEditorOpen = true;
   }
@@ -2504,32 +2419,6 @@ export class ScenarioPage extends LitElement {
 
   // ── The selection command tray's mount ─────────────────────────────────────
 
-  /** The shell's cancelable `/` intent: claim it while an editor session holds
-   *  the keyboard; unclaimed, the shell opens go-to instead. */
-  private onTrayIntent = (event: Event) => {
-    if (!this.session || !this.hasKeyboard || this.loadState !== 'ready') return;
-    event.preventDefault();
-    this.openTray();
-  };
-
-  /** One door for `/` and the rung chip's click — the chip IS the `/` key. */
-  private openTray() {
-    this.flushPendingFret();
-    // The tray offers a DIALECT — `S` slurs in notation and slides in tab —
-    // so it must follow the pane exactly as the keys do. Without this the
-    // projection keeps whatever it defaulted to (tab, on a string document)
-    // and the notation pane would show the fingerboard's commands.
-    this.followProjection();
-    this.trayOpen = true;
-    this.inspectorOpen = false;
-    this.trayTab = null;
-    this.traySearch = '';
-    // Decided ONCE, here: the tray must not change sides while it is open,
-    // and the chip it grew out of must have been on that side already.
-    this.trayMirrored = this.trayAnchor ? this.mirrorAt(this.trayAnchor) : false;
-    this.syncFromSession();
-  }
-
   /** The viewer's enclosure rect (viewport coords) → `.main` coords. */
   private mainHeight = 0;
   private mainWidth = 0;
@@ -2551,12 +2440,6 @@ export class ScenarioPage extends LitElement {
     };
   };
 
-  private closeTray() {
-    this.trayOpen = false;
-    // The keyboard goes back to the editor, not into the void.
-    this.renderRoot.querySelector<HTMLElement>('mnx-document-viewer')?.focus();
-  }
-
   /** Enter's door (handlePending, level 5). The inspector follows the pane
    *  and takes its side once, exactly as the tray does — it is the tray's
    *  sibling and hangs off the same anchor. */
@@ -2565,7 +2448,6 @@ export class ScenarioPage extends LitElement {
     if (this.cursorHidden) return;
     this.flushPendingFret();
     this.followProjection();
-    this.trayOpen = false;
     this.inspectorError = null;
     this.inspectorMirrored = this.trayAnchor ? this.mirrorAt(this.trayAnchor) : false;
     this.inspectorOpen = true;
@@ -2637,11 +2519,11 @@ export class ScenarioPage extends LitElement {
    * word for nothing. The CHIP asks this every render (closed, it is free to
    * follow the selection); the TRAY is handed the answer once, at open.
    */
-  private mirrorAt(anchor: TrayAnchor): boolean {
+  private mirrorAt(anchor: OverlayAnchor): boolean {
     if (this.mainWidth <= 0) return false;
     return (
-      anchor.x + TRAY_WIDTH > this.mainWidth - TRAY_MIRROR_MARGIN &&
-      anchor.x + anchor.width - TRAY_WIDTH >= TRAY_EDGE_GAP
+      anchor.x + OVERLAY_WIDTH > this.mainWidth - OVERLAY_MIRROR_MARGIN &&
+      anchor.x + anchor.width - OVERLAY_WIDTH >= OVERLAY_EDGE_GAP
     );
   }
 
@@ -2682,15 +2564,15 @@ export class ScenarioPage extends LitElement {
    * on.
    */
   private rungChip(entry: ScenarioEntry) {
-    if (!this.chipLevel || !this.trayAnchor || this.trayOpen) return nothing;
-    const trayEstimate = TRAY_SHAFT_H + 200; // the tray's own fallback height
+    if (!this.chipLevel || !this.trayAnchor) return nothing;
+    const trayEstimate = OVERLAY_SHAFT_H + 200; // the tray's own fallback height
     const anchor = this.trayAnchor;
-    const below = anchor.y + anchor.height + TRAY_EDGE_GAP;
+    const below = anchor.y + anchor.height + OVERLAY_EDGE_GAP;
     const flip =
       this.mainHeight > 0 &&
       below + trayEstimate > this.mainHeight &&
       anchor.y - trayEstimate > 0;
-    const top = flip ? anchor.y - TRAY_EDGE_GAP : below;
+    const top = flip ? anchor.y - OVERLAY_EDGE_GAP : below;
     const mirrored = this.mirrorAt(anchor);
     const { up, down } = this.chipNeighbours(entry);
 
@@ -2729,9 +2611,9 @@ export class ScenarioPage extends LitElement {
     >
       <button
         class="chip-word"
-        title="selection commands (/)"
+        title="inspect this rung (Enter)"
         aria-live="polite"
-        @click=${() => this.openTray()}
+        @click=${() => this.openInspector()}
       >
         ${ROW_BY_LEVEL[this.chipLevel]}
       </button>
@@ -2742,219 +2624,6 @@ export class ScenarioPage extends LitElement {
           >`
         : nothing}
     </div>`;
-  }
-
-  /**
-   * The tray's view model: a pure projection of registry + session, rebuilt
-   * every render. The rungs are the ladder's present ones (the HUD's rows, so
-   * the tray and the HUD can never disagree about the address), in the HUD's
-   * own widest-first order so the two columns on screen run the same way;
-   * tiles are the registry filtered to the displayed rung, each drawing its
-   * own state from the document.
-   *
-   * The displayed rung is the previewed one when a preview is open, else the
-   * session's own level — preview never touches the session.
-   */
-  private trayView(entry: ScenarioEntry): {
-    rungs: TrayRung[];
-    meta: TrayMeta | null;
-    bands: TrayBand[];
-    commands: EditorCommand[];
-  } | null {
-    if (!this.session) return null;
-    // Widest first — `document` at the top, `note` at the bottom, which is the
-    // HUD's own order rather than its inverse. One direction now serves the
-    // whole screen: up is wider in the keys, in the chip's ▲, in the HUD's
-    // column and in this one.
-    const ladder = buildHudRows(entry.meta.title, this.session, this.cursorHidden);
-    if (ladder.length === 0) return null;
-    // With nothing selected no row is active, and the rung to fall back on is
-    // the floor — the narrowest, which is now the LAST row rather than the
-    // first. Reading it off the end keeps that independent of the order.
-    const baseKey = ladder.find(r => r.active)?.key ?? ladder[ladder.length - 1].key;
-    // `global` is the scope ABOVE the ladder, so unlike the rungs it is never
-    // presence-filtered — the document is always there
-    // (core-selection-tray-global-tab.md). Above, now literally: it sits at
-    // the head of the column, where a scope wider than the widest rung
-    // belongs.
-    const known = (key: string | null) =>
-      key === GLOBAL_TAB || ladder.some(r => r.key === key);
-    const displayKey = known(this.trayTab) ? this.trayTab! : baseKey;
-
-    const rungs: TrayRung[] = [
-      {
-        key: GLOBAL_TAB,
-        label: GLOBAL_TAB,
-        active: displayKey === GLOBAL_TAB,
-        holdsSelection: false,
-        // Not a rung: there is no selection to widen to the document.
-        committable: false
-      },
-      ...ladder.map(r => ({
-        key: r.key,
-        label: r.label,
-        active: r.key === displayKey,
-        holdsSelection: r.key === baseKey,
-        // The digit that JUMPS here, read off the ladder itself — not this
-        // row's position in the column. The column is presence-filtered, so
-        // counting the rows on screen would print a different number for the
-        // same rung in a different document, which is the one thing an
-        // absolute address may not do (core-rung-addressing.md 8).
-        ordinal: LADDER_JUMP_LEVELS.indexOf(LEVEL_BY_ROW[r.key]) + 1
-      }))
-    ];
-
-    const view = sessionView(this.session);
-    const q = this.traySearch.trim().toLowerCase();
-    const scope: CommandScope =
-      displayKey === GLOBAL_TAB ? 'session' : LEVEL_BY_ROW[displayKey];
-    const commands = commandsForScope(scope, view).filter(
-      command =>
-        !q ||
-        command.label.toLowerCase().includes(q) ||
-        (command.detail?.toLowerCase().includes(q) ?? false)
-    );
-    const asTile = (command: EditorCommand): TrayTile => ({
-      id: command.id,
-      glyph: command.glyph,
-      shortcut: command.shortcut ?? '',
-      label: command.label,
-      detail: command.detail,
-      state: commandState(command, view),
-      // Purple until the registry says someone vouched for this command AT
-      // THIS RUNG — the triage ledger's one product-visible consequence
-      // (roadmap/proposed/core-selection-tray-residue.md). The scope is the
-      // tab being drawn, not the command's whole `scopes` list, which is the
-      // whole point of the per-scope mark.
-      untriaged: !isTriaged(command, scope)
-    });
-    // Bands are cut from the ALREADY-FILTERED list, so a caption is only ever
-    // drawn over tiles that survived the query.
-    const bands: TrayBand[] = bandsForScope(scope, commands).map(band => ({
-      id: band.id,
-      caption: band.caption,
-      tiles: band.commands.map(asTile)
-    }));
-    // The page's OWN commands join the global tab as their own trailing band:
-    // they act on the session's history and fixtures rather than on the
-    // document, so `edit/` has no business knowing them — which is also why
-    // they carry no caption from a table that does not describe them.
-    // `fireTrayCommand` recognises the prefix and never consults the registry.
-    if (displayKey === GLOBAL_TAB) {
-      const chrome = this.chromeCommands().filter(
-        tile => !q || tile.label.toLowerCase().includes(q)
-      );
-      if (chrome.length > 0) bands.push({ id: 'chrome', tiles: chrome });
-    }
-
-    const displayRow = ladder.find(r => r.key === displayKey);
-    const live = bands
-      .flatMap(band => band.tiles)
-      .filter(t => t.state !== 'unavailable').length;
-    const meta: TrayMeta = {
-      primary: displayKey === GLOBAL_TAB ? 'session' : (displayRow?.label ?? ''),
-      secondary:
-        displayKey === GLOBAL_TAB
-          ? entry.meta.title
-          : [selectionMemberSummary(view), displayRow?.value ?? ''].filter(Boolean).join(' · '),
-      count: `${live} command${live === 1 ? '' : 's'}`
-    };
-
-    return { rungs, meta, bands, commands };
-  }
-
-  /** Workbench-tier commands for the global tab — the session's own chrome,
-   *  which is the page's to run and not the registry's to describe. */
-  private chromeCommands(): TrayTile[] {
-    const session = this.session;
-    if (!session) return [];
-    const tiles: TrayTile[] = [
-      ...(this.selectionClipboard ? [
-        {
-          id: `${CHROME_PREFIX}copy-selection`,
-          glyph: { smufl: 'repeat1Bar' } as const,
-          shortcut: 'Ctrl+C',
-          label: 'Copy current selection',
-          state: 'available' as const
-        },
-        {
-          id: `${CHROME_PREFIX}paste-selection`,
-          glyph: { smufl: 'arrowBlackLeft' } as const,
-          shortcut: 'Ctrl+V',
-          label: 'Paste copied selection here',
-          state: 'available' as const
-        },
-        {
-          id: `${CHROME_PREFIX}cut-selection`,
-          glyph: { arc: 'slur' } as const,
-          shortcut: 'Ctrl+X',
-          label: 'Cut current selection',
-          state: session.selectionLevel === 'document' ? 'unavailable' as const : 'available' as const
-        }
-      ] : []),
-      {
-        id: `${CHROME_PREFIX}copy-trace`,
-        glyph: { smufl: 'repeat1Bar' },
-        shortcut: '',
-        label: 'Copy this session as a trace fixture',
-        state: session.intentLog.length === 0 ? 'unavailable' : 'available'
-      }
-    ];
-    if (session.dirty) {
-      tiles.push({
-        id: `${CHROME_PREFIX}revert`,
-        glyph: { smufl: 'arrowBlackLeft' },
-        shortcut: '',
-        label: 'Revert every edit',
-        state: 'available'
-      });
-    }
-    // Chrome tiles are the page's, so there is no registry row to carry their
-    // marks — and no reviewer has clicked them either. They are purple on the
-    // same terms as everything else (the ledger lists them in their own
-    // table), and, like a registry row, never while unavailable.
-    return tiles.map(tile =>
-      tile.state === 'unavailable' ? tile : { ...tile, untriaged: true }
-    );
-  }
-
-  /** A tile fired: resolve the command against the CURRENT session and send
-   *  what it asks for through the one funnel — an intent to the session, or a
-   *  typed popover to open. Never `applyOp`, so every tray edit lands in the
-   *  op queue with provenance and replays in a trace. */
-  private fireTrayCommand(entry: ScenarioEntry, id: string) {
-    if (!this.session) return;
-    if (id.startsWith(CHROME_PREFIX)) {
-      const chrome = id.slice(CHROME_PREFIX.length);
-      this.trayOpen = false;
-      if (chrome === 'copy-selection') void this.copyCurrentSelection();
-      else if (chrome === 'paste-selection') void this.pasteCurrentSelection();
-      else if (chrome === 'cut-selection') void this.cutCurrentSelection();
-      else if (chrome === 'copy-trace') void this.copyTrace();
-      else if (chrome === 'revert') this.revertEdits();
-      return;
-    }
-    const command = this.trayView(entry)?.commands.find(c => c.id === id);
-    if (!command?.action) return;
-    const action = command.action(sessionView(this.session));
-    if (!action) return;
-    if ('surface' in action) {
-      // The tray is where a typed grammar becomes discoverable; it does not
-      // reimplement one. Opening the popover closes the tray, because both
-      // want the same keystrokes.
-      this.trayOpen = false;
-      this.openPopover(action.surface);
-      return;
-    }
-    // AND THE INTENT BRANCH CLOSES TOO. Both branches above already did — the
-    // popover one because "both want the same keystrokes" — and this one was
-    // simply never given the line. Firing a command is a completed act: the
-    // tray covers the score you just changed, so leaving it up hides the
-    // result and leaves the keyboard aimed at a search box instead of the
-    // music. `closeTray` also hands focus back to the viewer, so the next
-    // keystroke edits.
-    this.closeTray();
-    this.stripIntent(action.intent);
   }
 
   private inspectorOverlay(entry: ScenarioEntry) {
@@ -2991,69 +2660,13 @@ export class ScenarioPage extends LitElement {
           this.fireFromInspector(e.detail.intent);
         }}
         @inspector-widen=${() => {
-          // `/` in the inspector: the verbs live in the tray. Same anchor,
-          // same side, the other surface.
-          this.inspectorOpen = false;
-          this.openTray();
+          // `/` used to widen to the tray; the tray is gone (one-surface
+          // 11b) and every verb has its key, so widening now has nowhere
+          // truer to go than staying put.
         }}
         @inspector-close=${() => this.closeInspector()}
       ></mnx-rung-inspector>
     `;
-  }
-
-  private trayOverlay(entry: ScenarioEntry) {
-    const view = this.trayView(entry);
-    if (!view) return nothing;
-    return html`
-      <mnx-selection-tray
-        .rungs=${view.rungs}
-        .meta=${view.meta}
-        .bands=${view.bands}
-        .anchor=${this.trayAnchor}
-        .searchText=${this.traySearch}
-        ?mirrored=${this.trayMirrored}
-        @tray-rung-preview=${(e: CustomEvent<{ key: string }>) => {
-          this.trayTab = e.detail.key;
-          this.syncFromSession();
-        }}
-        @tray-rung-commit=${(e: CustomEvent<{ key: string }>) => {
-          this.walkToLevel(LEVEL_BY_ROW[e.detail.key]);
-          this.trayTab = null;
-        }}
-        @tray-command=${(e: CustomEvent<{ id: string }>) => {
-          this.fireTrayCommand(entry, e.detail.id);
-        }}
-        @tray-search=${(e: CustomEvent<{ text: string }>) => {
-          this.traySearch = e.detail.text;
-        }}
-        @tray-widen=${(e: CustomEvent<{ text: string }>) => {
-          // A second `/`: the same question, asked of everything. Since the
-          // global commands are a RUNG now, widening moves one scope outward
-          // and stays in this surface — no widget switch, no context lost
-          // (core-selection-tray-global-tab.md). The typed text carries over.
-          this.trayTab = GLOBAL_TAB;
-          this.traySearch = e.detail.text;
-        }}
-        @tray-close=${() => this.closeTray()}
-      ></mnx-selection-tray>
-    `;
-  }
-
-  updated() {
-    if (this.setupPopover) {
-      this.renderRoot.querySelector<HTMLInputElement>('.popover input')?.focus();
-    }
-  }
-
-  private onPopoverKey(event: KeyboardEvent) {
-    if (event.code === 'Escape') {
-      event.preventDefault();
-      this.setupPopover = null;
-      return;
-    }
-    if (event.code !== 'Enter') return;
-    event.preventDefault();
-    this.setupPopover = null;
   }
 
   /** A HUD row click moves the selection to that row's level by walking
@@ -3405,13 +3018,10 @@ export class ScenarioPage extends LitElement {
                 .densitySteps=${this.densitySteps}
                 .effectiveStaffScale=${this.effectiveStaffScale}
                 .documentFocus=${this.documentFocus}
-                ?suppressed=${this.trayOpen}
-                @zoom-change=${this.onZoomChange}
+                    @zoom-change=${this.onZoomChange}
               ></mnx-zoom-pad>`
             : nothing}
-          ${this.trayOpen && this.session ? this.trayOverlay(entry) : nothing}
           ${this.inspectorOpen && this.session ? this.inspectorOverlay(entry) : nothing}
-          ${this.setupPopoverOverlay()}
           ${this.modelPickerOpen
             ? html`<mnx-model-picker
                 .currentModel=${this.assistModel}
@@ -3867,38 +3477,6 @@ export class ScenarioPage extends LitElement {
     `;
   }
 
-  /** THE SETUP POPOVER, REHOMED (roadmap/proposed/workbench-score-panel.md, step A).
-   *
-   *  It used to render inside the `actions` tab, and `openPopover()` force-switched
-   *  the panel there so a keyboard-opened popover would be visible — which meant
-   *  pressing Shift+K yanked the panel away from whatever you were reading. It is
-   *  a page-level overlay now, so the popover appears over the score where the
-   *  edit is happening and the panel keeps its place. Worth doing on its own
-   *  merits; retiring the tab is what forced the issue.
-   *
-   *  Anchored bottom-left of `.main`, deliberately clear of the tray's own
-   *  bottom-centre dock so the two overlays cannot collide. */
-  private setupPopoverOverlay() {
-    // PopoverKind is uninhabited since items 1–10 retired every grammar into
-    // the inspector; the guard makes the whole overlay unreachable, and the
-    // frame awaits item 11's demolition decision.
-    if (!this.setupPopover) return nothing;
-    const spec = POPOVER_SPECS[this.setupPopover as never] as { label: string; placeholder: string; hint: string };
-    return html`
-      <div class="popover-layer">
-        <div class="popover">
-          <span class="pop-label">${spec.label}</span>
-          <input
-            placeholder=${spec.placeholder}
-            @keydown=${(e: KeyboardEvent) => this.onPopoverKey(e)}
-          />
-          ${this.setupPopoverError
-            ? html`<span class="pop-error">${this.setupPopoverError}</span>`
-            : html`<span class="pop-hint">${spec.hint}</span>`}
-        </div>
-      </div>
-    `;
-  }
 
   /** The spec's reference engraving — the main pane is always "our render",
    *  so showing the reference beside it IS the comparison. */

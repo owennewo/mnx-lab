@@ -5,7 +5,6 @@
 import { describe, it, expect } from 'vitest';
 import { EditorSession } from '../../src/edit/session.ts';
 import { spannersUnderSelection } from '../../src/edit/spannerCoincidence.ts';
-import { sessionView, COMMANDS, commandState } from '../../src/edit/commandRegistry.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 
 /** One bar, one voice: four beamed-and-slurred quarters would not beam, so

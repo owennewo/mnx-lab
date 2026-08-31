@@ -652,8 +652,8 @@ export class WorkbenchApp extends LitElement {
     clearTimeout(this.focusHintTimer);
   }
 
-  /** The shell's keys: `/` opens a command surface (the tray, else go-to),
-   *  Ctrl+G opens go-to (whose `>` prefix reaches commands), Ctrl+B folds
+  /** The shell's keys: `/` and Ctrl+G open go-to (whose `>` prefix reaches
+   *  commands — `/` reverted to this pre-tray job with one-surface 11b), Ctrl+B folds
    *  the rail — all resolved through the keymap module's shell table, which
    *  stays the sole KeyboardEvent interpreter. Everything document-editing-shaped is the
    *  scenario page's keymap, not ours. */
@@ -664,24 +664,6 @@ export class WorkbenchApp extends LitElement {
     // which is why they live here and not in an element-tier layer).
     if (!keyIsOurs(event, null)) return;
     const action = resolveShellAction(strokeOf(event));
-    if (action === 'selectionTray') {
-      // `/` belongs to the selection (core-selection-tray-visuals.md): a
-      // scenario page whose editor holds the keyboard claims this cancelable
-      // intent and opens the tray.
-      //
-      // Unclaimed — the queue, the coverage map, a scenario with no session —
-      // it opens go-to instead. That is deliberately the SAME job slash used
-      // to do from the rail: type a few letters, land on a scenario. The
-      // mechanism changes (a jump, not a filter) and the reach widens (bars
-      // and objects too), but the muscle memory survives, which is the whole
-      // reason slash was worth taking.
-      event.preventDefault();
-      const claimed = !window.dispatchEvent(
-        new CustomEvent('mnx-tray-intent', { cancelable: true })
-      );
-      if (!claimed) this.palette = 'goto';
-      return;
-    }
     if (action === 'commandPalette' || action === 'goTo') {
       event.preventDefault();
       this.palette = action === 'commandPalette' ? 'commands' : 'goto';

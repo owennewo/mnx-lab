@@ -207,7 +207,6 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
  */
 export type ShellAction =
   | 'lyricTextEditor'
-  | 'selectionTray'
   | 'commandPalette'
   | 'goTo'
   | 'toggleRail'
@@ -239,20 +238,12 @@ export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
   { code: 'KeyL', shift: true, action: 'lyricTextEditor' },
   // Shift+S carries the shift slide in the tab projection (item 10) — an
   // editor-layer binding now, not a shell popover.
-  // `/` opens a command surface — the selection tray when an editor holds the
-  // keyboard, the palette's go-to when none does. Slash rather than Ctrl+K on
-  // two grounds. It is the surface used most while editing, so it should cost
-  // no modifier; and Ctrl+K is the browser's own (Chrome sends it to the
-  // omnibox), which a page can only take back by consuming the event — and we
-  // deliberately do NOT consume keys typed into text fields, so Ctrl+K worked
-  // from the score and escaped to Google from every input. A key that works
-  // most of the time teaches that it cannot be trusted.
-  //
-  // Slash was the rail filter's; that job moves to Ctrl+G, which already
-  // matches scenarios through the same `matchesQuery` and can also reach bars
-  // and objects. So `/` keeps meaning "search or command" — the mechanism
-  // just changes from narrowing a list to picking from one.
-  { code: 'Slash', action: 'selectionTray' },
+  // `/` reverts to its PRE-TRAY shell job (one-surface 11b): go-to. The tray
+  // it opened for editors retired once every command had a truer home — the
+  // inspector for state, the keymap for verbs, the palette for the rest —
+  // and the unclaimed fallback (type a few letters, land on a scenario) was
+  // always go-to, so the muscle memory survives the tray it outlived.
+  { code: 'Slash', action: 'goTo' },
   // Go-to (survey §3.8: typed grammar over scenarios, bars and objects) is
   // the DESTINATION surface — the counterpart to `/`, which is the command
   // one. Its `>` prefix still reaches the global command list, so the list
@@ -334,7 +325,6 @@ export function resolveShellAction(stroke: KeyStroke): ShellAction | null {
  * Escape and Enter are back to meaning what they mean everywhere else.
  */
 export const PENDING_PRECEDENCE = [
-  'popover',
   'overlay',
   'pendingFret',
   'selection'

@@ -1,5 +1,13 @@
 # The selection tray — the triage ledger
 
+> **SUPERSEDED 2026-08-31 by the one-surface campaign's item 11b**
+> ([workbench-one-surface-tray-verbs.md](../complete/workbench-one-surface-tray-verbs.md)):
+> the tray this ledger triaged is gone — attributes into the inspector (11a),
+> verbs to their rung-generic keys, the shell demolished. The tables below are
+> the historical record of the placements. The three obligations that outlive
+> the surface are **op-gaps, not tray rows** — `part-transposition`, `mute`,
+> `section-colour` — named in the campaign's closing entry and in 11b's doc.
+
 > **Status: repurposed 2026-08-24.** This doc was *the residue* — the ledger of tray
 > tiles that could not be wired yet, each row naming its unblocker. That job is
 > essentially done: [the campaign's](../complete/core-campaign-element-ops.md) vocabulary

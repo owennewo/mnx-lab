@@ -28,7 +28,7 @@ export interface OpRow {
 /** Human labels for the shell surfaces SURFACE_INTENTS names. */
 const SURFACE_LABELS: Record<string, string> = {
   lyricTextEditor: 'Shift+L · lyric editor',
-  selectionTray: '/ · tray',
+  clipboard: 'Ctrl+C/X/V · clipboard',
   rungInspector: 'Enter · inspector',
   commandPalette: 'Ctrl+G › · palette',
   goTo: 'Ctrl+G · go-to',

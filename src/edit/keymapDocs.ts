@@ -471,7 +471,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'Slash' }],
     group: 'workbench',
     meaning: {
-      all: 'command tray for what is selected; again widens to the `global` tab (go-to, with no editor)'
+      all: 'go to — scenarios, bars, objects (the pre-tray job `/` reverted to; `>` reaches commands)'
     }
   },
   {
@@ -544,6 +544,7 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     // voice-bar and part-bar
     'setFullMeasureRest',
     'removeFullMeasureRest',
+    'addVoiceMeasure',
     'wrapInContainer',
     'insertSpace',
     'setRestSpelling',
@@ -586,15 +587,9 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
   // Listed here is what the tray ADDS to reachability: the accidental's
   // display flag, which no binding and no grammar claims, so before the tray
   // the only way to set it was an AI edit or a hand-written file.
-  selectionTray: [
-    'setAccidentalDisplay',
-    'applyPastePlan',
-    'applyCutPlan',
-    // The voice rung's construct half. No key: adding a voice is a structural
-    // decision, and its removal twin (`Del` on an empty voice bar) is already
-    // guarded rather than bound to a bare keystroke.
-    'addVoiceMeasure'
-  ],
+  // The clipboard plans are resolved by the mount (async store I/O) and the
+  // materialized plan is what the trace records — the keys are the surface.
+  clipboard: ['applyCutPlan', 'applyPastePlan'],
   commandPalette: [
     'undo',
     'redo',

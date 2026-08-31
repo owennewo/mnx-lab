@@ -93,50 +93,6 @@ function client(ws) {
 }
 
 /** The score SVG plus the geometry of everything this smoke test asserts on. */
-/**
- * The tray's geometry, from inside the shadow root that owns it. Reported in
- * VIEWPORT coordinates, because "does it fit" is a question about the window
- * and nothing else.
- */
-const TRAY = `(() => {
-  const find = (root, depth) => {
-    if (!root || depth > 12) return null;
-    const hit = root.querySelector('mnx-selection-tray');
-    if (hit) return hit;
-    for (const el of root.querySelectorAll('*')) {
-      const deeper = el.shadowRoot && find(el.shadowRoot, depth + 1);
-      if (deeper) return deeper;
-    }
-    return null;
-  };
-  const tray = find(document, 0);
-  if (!tray) return JSON.stringify({ open: false });
-  const box = tray.getBoundingClientRect();
-  const grid = tray.shadowRoot?.querySelector('.grid');
-  const captions = [...(tray.shadowRoot?.querySelectorAll('.caption') ?? [])]
-    .map(el => el.textContent.trim());
-  // The cursored tile, measured against the SCROLL PORT it lives in: the
-  // cursor is virtual (a class, not focus), so nothing scrolls it into view
-  // unless the tray does it by hand.
-  const cursor = tray.shadowRoot?.querySelector('.tile.cursor');
-  const view = grid?.getBoundingClientRect();
-  const cbox = cursor?.getBoundingClientRect();
-  return JSON.stringify({
-    open: true,
-    top: box.top, bottom: box.bottom, height: box.height,
-    viewport: window.innerHeight,
-    captions,
-    grid: grid
-      ? { scrollHeight: grid.scrollHeight, clientHeight: grid.clientHeight,
-          scrollTop: grid.scrollTop, overflowY: getComputedStyle(grid).overflowY }
-      : null,
-    cursor: cursor && view && cbox
-      ? { label: cursor.getAttribute('aria-label') ?? '',
-          top: cbox.top - view.top, bottom: cbox.bottom - view.top,
-          portHeight: view.height }
-      : null
-  });
-})()`;
 
 const DUMP = `(() => {
   const svgs = [];
@@ -368,95 +324,9 @@ try {
     }
     inView(atStart, 'at the first bar');
   }
-  // ── the tray fits the window it is drawn in ───────────────────────────
-  //
-  // Banding the rungs (core-selection-tray-structure-band) turned the note
-  // rung from a flat grid of 19 tiles into six captioned bands of 22, and the
-  // tray — which had no height bound at all — grew straight off the screen.
-  // A layout bug, so a real browser is the only thing that can see it.
-  console.log('\nthe command tray fits the window, however many tiles a rung has');
-  {
-    // Small enough that the tallest rung cannot possibly fit whole.
-    await cdp.send('Emulation.setDeviceMetricsOverride', {
-      width: 1280, height: 520, deviceScaleFactor: 1, mobile: false
-    });
-    await new Promise(r => setTimeout(r, 800));
-    await press('Home', 'Home', 36);
-    await press('/', 'Slash', 191, 1200); // the tray's own key
-
-    const tray = JSON.parse(await cdp.evaluate(TRAY));
-    if (!tray.open) {
-      fail('the tray never opened, so this case asserts nothing');
-    } else {
-      // THE assertion, and it is checked first so an unbounded tray reports
-      // the thing that is actually wrong. Every other line here explains HOW
-      // it fits; this one is whether it does.
-      if (tray.top < 0 || tray.bottom > tray.viewport) {
-        fail(
-          `the tray runs off the window: ${tray.top.toFixed(0)}…${tray.bottom.toFixed(0)} ` +
-          `(${tray.height.toFixed(0)}px tall) in a window of 0…${tray.viewport}`
-        );
-      } else {
-        pass(`it stays inside the window (${tray.top.toFixed(0)}…${tray.bottom.toFixed(0)})`);
-      }
-      // …and it fits by SCROLLING, not by the rung happening to be short. The
-      // viewport above is small enough that the note rung cannot fit whole, so
-      // a panel that is not overflowing means the cap never engaged.
-      if (tray.grid?.scrollHeight <= tray.grid?.clientHeight) {
-        fail(
-          `the panel is not overflowing (${tray.grid?.scrollHeight} in ` +
-          `${tray.grid?.clientHeight}) — the height cap never engaged`
-        );
-      } else {
-        pass(`the rung overflows its panel (${tray.grid.scrollHeight} into ${tray.grid.clientHeight})`);
-      }
-      if (tray.grid && tray.grid.overflowY !== 'auto' && tray.grid.overflowY !== 'scroll') {
-        fail(`the tiles are not the scrolling body (overflow-y: ${tray.grid.overflowY})`);
-      } else {
-        pass('the tiles are the one scrolling body');
-      }
-      if (tray.captions.length === 0) fail('no band captions — the rung is not banded');
-      else pass(`${tray.captions.length} bands drawn (${tray.captions[0]} first)`);
-    }
-
-    // ── walking below the fold brings the cursor with it ───────────────
-    console.log('\nthe tile cursor stays visible when it walks below the fold');
-    {
-      const seen = [];
-      let offScreen = null;
-      // Down the whole rung: 22 tiles at the note rung, far more rows than a
-      // 111px port can hold, so this crosses the fold several times.
-      for (let step = 0; step < 12 && !offScreen; step++) {
-        await press('ArrowDown', 'ArrowDown', 40, 220);
-        const at = JSON.parse(await cdp.evaluate(TRAY));
-        if (!at.open || !at.cursor) break;
-        seen.push(at.grid.scrollTop);
-        if (at.cursor.top < -0.5 || at.cursor.bottom > at.cursor.portHeight + 0.5) {
-          offScreen = at;
-        }
-      }
-      if (offScreen) {
-        fail(
-          `the cursor left the panel on “${offScreen.cursor.label}”: ` +
-          `${offScreen.cursor.top.toFixed(0)}…${offScreen.cursor.bottom.toFixed(0)} ` +
-          `in a port of 0…${offScreen.cursor.portHeight.toFixed(0)}`
-        );
-      } else if (!seen.some(top => top > 0)) {
-        fail('the panel never scrolled — this case never reached the fold');
-      } else {
-        pass(`the panel followed the cursor down (scrollTop ${Math.max(...seen).toFixed(0)})`);
-        pass('the cursored tile stayed inside the panel the whole way');
-      }
-    }
-
-    // ── and choosing a tile puts it away ────────────────────────────────
-    console.log('\nchoosing a tile dismisses the tray');
-    await press('Enter', 'Enter', 13, 1200);
-    const after = JSON.parse(await cdp.evaluate(TRAY));
-    if (after.open) fail('the tray is still up after firing a command');
-    else pass('the tray closed, so the score it covers is visible again');
-    await cdp.send('Emulation.clearDeviceMetricsOverride');
-  }
+  // The command-tray act retired with the tray itself (one-surface 11b);
+  // the inspector smoke (`npm run smoke:inspector`) covers the surviving
+  // overlay's geometry and keyboard ownership.
 } catch (error) {
   fail(error.message);
 } finally {
