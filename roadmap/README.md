@@ -44,12 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-tuning.md](proposed/workbench-one-surface-tuning.md)** —
-  one-surface campaign item 7, **built 2026-08-31**: the tuning popover retired after the
-  write path was built — a `tuning` word (presets or pitch lists) offered on any part, the
-  read-only strings pill made a removable annotation, and the `setTuning` parts[0] bug
-  fixed with a partIndex widening before the surface shipped; both tiles and the
-  `needsTab` machinery died with it.
 - **[workbench-one-surface-lyrics.md](proposed/workbench-one-surface-lyrics.md)** —
   one-surface campaign item 6, **proposed 2026-08-31, design open**: the lyric popover's
   retirement plan — the line-metadata gap is the minimum bar, and two investigations are
@@ -250,6 +244,12 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-one-surface-tuning.md](complete/workbench-one-surface-tuning.md)** —
+  one-surface campaign item 7, **built 2026-08-31**: the tuning popover retired after the
+  write path was built — a `tuning` word (presets or pitch lists) offered on any part, the
+  read-only strings pill made a removable annotation, and the `setTuning` parts[0] bug
+  fixed with a partIndex widening before the surface shipped; both tiles and the
+  `needsTab` machinery died with it.
 - **[workbench-one-surface-adornment.md](complete/workbench-one-surface-adornment.md)** —
   one-surface campaign item 5, **built 2026-08-31**: the adornment popover retired — the
   broadest grammar of the easy five (eight parser arms, thirteen intents) and the purest
