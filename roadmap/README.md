@@ -169,20 +169,20 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 - **[workbench-one-surface-lyrics.md](inprogress/workbench-one-surface-lyrics.md)** —
-  one-surface campaign item 6, **phase 1 built 2026-08-31** (design settled the same
-  day): the lyric popover retired — verse-line metadata (`line 2 Nederlands nl`) lives as
-  document-rung pills, syllables stay at the event rung, and `Shift+L` is freed,
-  earmarked for the phase-2 surface. Remaining: phase 2, a paste-and-tweak lyric **text
-  surface** (LilyPond-kin format — hyphen/underscore runs, `~` elision, bar checks,
-  language headers — applied as ordinary ops); phase 3, the derived **pass model** (a
-  shared repeat-linearization walk feeding pass-aware line resolution, labels and a blue
-  diagnostic — the future player's foundation).
+  one-surface campaign item 6, **phases 1–2 built 2026-08-31**: the lyric popover
+  retired (verse-line metadata as document-rung pills, syllables at the event rung),
+  and the paste-and-tweak lyric **text surface** live on `Shift+L` — a part's whole
+  lyric as text (LilyPond-kin format: hyphen/underscore runs, `~` elision, bar checks,
+  language headers), diffed into one `applyLyricPlan` batch through the funnel.
+  Remaining: phase 3, the derived **pass model** (a shared repeat-linearization walk
+  feeding pass-aware line resolution, labels and a blue diagnostic — the future
+  player's foundation).
 - **[workbench-campaign-one-surface.md](inprogress/workbench-campaign-one-surface.md)** —
   **campaign**, item 1 built 2026-08-31: retire the ten `Shift+letter` popovers and the
   selection tray onto the rung inspector, one surface per item, ordered simplest to
   hardest. Every retirement is gated on demonstrated coverage: census before coverage,
   coverage before removal, ops before surfaces. Items 1–5 (key ✅, time ✅, clef ✅, bar
-  attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics 🔧 phase 1
+  attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics 🔧 phases 1–2
   built, tuning ✅) each close one bounded gap; 8–10 (rhythm ✅, part ✅, layout ✅) need new ops or a construct story; 11 — split into 11a (attribute
   tiles, pure sweep) and 11b (verbs + shell, the generalization thesis) — goes last.
   1: freed keys are freed, not accelerators.

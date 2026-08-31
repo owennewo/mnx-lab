@@ -1,7 +1,8 @@
 # Retire the lyric popover — one-surface campaign item 6
 
-> **Status: in progress 2026-08-31 — phase 1 built (the popover is retired);
-> phases 2–3 designed, not started.** Campaign:
+> **Status: in progress 2026-08-31 — phases 1–2 built (popover retired, the
+> lyric text surface live on `Shift+L`); phase 3 (the pass model) designed,
+> not started.** Campaign:
 > [workbench-campaign-one-surface.md](workbench-campaign-one-surface.md),
 > item 6. The first draft of this doc left two investigations open; a design
 > conversation (2026-08-31) settled both, and the rewrite recorded the
@@ -177,6 +178,39 @@ later phases start without re-deriving it.
 - **`Shift+L` is freed, not reassigned** — the earmark (reopen the phase-2
   editor) is recorded at the unbound slot in `keymap.ts` and in the campaign
   log.
+
+## What shipped — phase 2, 2026-08-31
+
+- **The format engine** — `src/edit/lyricText.ts`: `lyricEventWalk` (staff-1
+  voice 1, tuplet/tremolo content sung, grace content and rests and `space`
+  items and tie continuations skipped; events outside the walk keep their
+  lyrics untouched), `serializeLyricText` (canonical projection: stacking
+  order, `lang`/ordinal headers only when needed, bar checks between texted
+  bars, gaps > 3 jump by number, skips after a bar's last syllable never
+  emitted), `parseLyricText` (the full token set + bar-anchored diagnostics +
+  token→entry spans), `planLyricEdits` (the diff; `whole` ≡ absent type;
+  elision stored as a plain space in `text`, spelt `~` both ways).
+- **`applyLyricPlan`** — one intent carrying the note-addressed diff (the
+  clipboard's materialized-plan shape), applied via the session's batch
+  envelope: one undo gesture, syllables in the trace, the element census's
+  named ops unchanged.
+- **`<mnx-lyric-text-editor>`** — a modal over the score (ModelPickerDialog's
+  modality + RungInspector's focus handoff): opens on the serialization,
+  parses live, refuses apply while diagnostics stand, `Ctrl+Enter` applies,
+  Esc closes. Caret → notehead over the selection context's **preview
+  channel**; opening at the cursor's note selects its token.
+- **`Shift+L` reopened** as the earmark promised — a surface, not a popover —
+  plus a palette row, the `KEY_DOCS` row, `SURFACE_INTENTS.lyricTextEditor`,
+  and the op-queue label.
+- **Evidence**: `harness/conformance/lyric-text.test.ts` (walk, parse,
+  serialize, round-trip `plan(parse(serialize(doc))) = []`, diff, batch
+  apply/undo); `smoke:inspector` grew a real-browser lap — open, type a
+  verse, apply, reopen on the document's own serialization, Esc.
+- **Recorded deviations**: no ghost preview under the staff yet (live
+  diagnostics + caret highlight carry that weight; revisit with phase 3's
+  pass-aware labels if wanted); the score→text column highlight exists only
+  as open-at-cursor token selection; the voice-selection header token stays
+  reserved (voice 1 is the convention).
 
 ## Relations
 

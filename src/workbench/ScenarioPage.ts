@@ -96,6 +96,8 @@ import { fingerboardOf, parseInspectorLine } from '../edit/inspector.ts';
 import './ZoomPad.ts';
 import type { ZoomPadChange } from './ZoomPad.ts';
 import './ModelPickerDialog.ts';
+import './LyricTextEditor.ts';
+import type { LyricPlanEdit } from '../edit/lyricText.ts';
 import { modelDisplayName } from '../assist/modelCatalog.ts';
 import { fetchKeyInfo, keyFingerprint, streamChat, type ChatMessage } from '../assist/openrouter.ts';
 import { renderMarkdown } from './markdownLit.ts';
@@ -137,7 +139,9 @@ export const SETUP_POPOVER_COMMANDS: {
   label: string;
   action: ShellAction;
   stroke: string;
-}[] = [];
+}[] = [
+  { label: 'lyrics: text editor…', action: 'lyricTextEditor', stroke: 'Shift+L' }
+];
 
 import './ScoreHud.ts';
 
@@ -507,6 +511,11 @@ export class ScenarioPage extends LitElement {
    *  it is not always the one you picked once a chain is in play. */
   @state() private servedModel = '';
   @state() private modelPickerOpen = false;
+  /** The lyric text editor (one-surface item 6 phase 2): a modal over the
+   *  score; the buffer is its own state, so the page only owns the boolean
+   *  and the caret's preview keys. */
+  @state() private lyricEditorOpen = false;
+  @state() private lyricPreviewKeys: string[] = [];
   /** BYOK state (core-assist-byok.md): the key is read from the shell's
    *  store and re-read on its change event, so a PKCE landing in the app
    *  shell reaches this tab without a prop. */
@@ -2144,6 +2153,12 @@ export class ScenarioPage extends LitElement {
    *  other than the selection's own is on display. */
   private previewScope(): SelectionContext['preview'] {
     const session = this.session;
+    // The lyric editor's caret lights its note through the same channel the
+    // tray previews rungs with (one-surface item 6, phase 2).
+    if (session && this.lyricEditorOpen)
+      return this.lyricPreviewKeys.length > 0
+        ? { enclosure: ENCLOSURE_BY_LEVEL['note'], noteIds: this.lyricPreviewKeys }
+        : null;
     if (!session || !this.trayOpen || this.cursorHidden) return null;
     const level = this.trayTab ? LEVEL_BY_ROW[this.trayTab] : undefined;
     if (!level || level === session.selectionLevel) return null;
@@ -2310,6 +2325,11 @@ export class ScenarioPage extends LitElement {
         else void this.pasteCurrentSelection();
         return;
       }
+      if (action === 'lyricTextEditor') {
+        event.preventDefault();
+        this.openLyricEditor();
+        return;
+      }
       if (action && this.openPopover(action)) {
         event.preventDefault();
         return;
@@ -2443,7 +2463,43 @@ export class ScenarioPage extends LitElement {
     const action = (event as CustomEvent<string>).detail;
     if (action === 'copyTrace') void this.copyTrace();
     else if (action === 'revert') this.revertEdits();
+    else if (action === 'lyricTextEditor') this.openLyricEditor();
     else this.openPopover(action as ShellAction);
+  };
+
+  // ── The lyric text editor's mount (one-surface item 6, phase 2) ──────────
+
+  /** One door for Shift+L and the palette row. A modal over the score: the
+   *  tray and inspector close first — two overlays wanting the keyboard is
+   *  one too many. */
+  private openLyricEditor() {
+    if (!this.session || this.loadState !== 'ready') return;
+    this.flushPendingFret();
+    this.trayOpen = false;
+    this.inspectorOpen = false;
+    this.lyricEditorOpen = true;
+  }
+
+  private onLyricEditorClose = () => {
+    this.lyricEditorOpen = false;
+    this.lyricPreviewKeys = [];
+    this.syncFromSession();
+    this.renderRoot.querySelector<HTMLElement>('mnx-document-viewer')?.focus();
+  };
+
+  /** The buffer's diff lands as ONE intent through the same funnel as keys —
+   *  the trace records the syllables, never the keystrokes. */
+  private onLyricEditorApply = (event: Event) => {
+    const { edits } = (event as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
+    this.stripIntent({ type: 'applyLyricPlan', edits });
+    this.onLyricEditorClose();
+  };
+
+  /** Caret → notehead, over the selection context's preview channel: costs
+   *  the session nothing, and closing has nothing to undo. */
+  private onLyricEditorPreview = (event: Event) => {
+    this.lyricPreviewKeys = (event as CustomEvent<{ noteKeys: string[] }>).detail.noteKeys;
+    this.syncFromSession();
   };
 
   // ── The selection command tray's mount ─────────────────────────────────────
@@ -3362,6 +3418,17 @@ export class ScenarioPage extends LitElement {
                 @picker-close=${() => (this.modelPickerOpen = false)}
                 @model-pick=${this.onModelPick}
               ></mnx-model-picker>`
+            : nothing}
+          ${this.lyricEditorOpen && this.session
+            ? html`<mnx-lyric-text-editor
+                .doc=${this.session.doc}
+                .partIndex=${this.session.cursor.partIndex ?? 0}
+                .partLabel=${this.session.doc.parts?.[this.session.cursor.partIndex ?? 0]?.name ?? ''}
+                .focusNoteKey=${this.session.selectedNoteKeys[0] ?? ''}
+                @lyric-editor-close=${this.onLyricEditorClose}
+                @lyric-editor-apply=${this.onLyricEditorApply}
+                @lyric-editor-preview=${this.onLyricEditorPreview}
+              ></mnx-lyric-text-editor>`
             : nothing}
           ${this.clipboardNotice
             ? html`<div

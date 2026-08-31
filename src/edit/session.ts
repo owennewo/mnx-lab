@@ -826,6 +826,29 @@ export class EditorSession {
         }
         return true;
       }
+      // The lyric text surface's apply (one-surface item 6, phase 2): the
+      // edits arrive note-addressed — computed by planLyricEdits outside the
+      // session, like the clipboard's materialized plans — and land as one
+      // batch, so undo is one gesture and provenance keeps the envelope.
+      case 'applyLyricPlan': {
+        return this.applyBulk(intent.edits.map(edit =>
+          edit.op === 'setSyllable'
+            ? {
+                type: 'setSyllable' as const,
+                noteKey: edit.noteKey,
+                line: edit.line,
+                text: edit.text,
+                ...(edit.syllableType ? { syllableType: edit.syllableType } : {})
+              }
+            : edit.op === 'removeSyllable'
+              ? { type: 'removeSyllable' as const, noteKey: edit.noteKey, line: edit.line }
+              : {
+                  type: 'setLyricLine' as const,
+                  line: edit.line,
+                  ...(edit.lang !== undefined ? { lang: edit.lang } : {})
+                }
+        ));
+      }
       case 'setLyricLine':
       case 'removeLyricLine': {
         const before = JSON.stringify(this.doc);

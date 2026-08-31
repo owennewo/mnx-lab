@@ -446,8 +446,16 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
 
-  // ── Setup — the typed popovers (shell actions: a trace records the intent
-  // the popover emits, never its opening).
+  // ── Setup — the typed popovers and the lyric text editor (shell actions:
+  // a trace records the intent the surface emits, never its opening).
+  {
+    keys: 'Shift+L',
+    strokes: [{ code: 'KeyL', shift: true }],
+    group: 'setup',
+    meaning: {
+      all: 'lyrics… (text editor: a part’s whole lyric as paste-and-tweak text — `-` splits, `--`/`__` hold, `_` skips, `~` joins, `|`/`6|` bar checks, `nl 2:` verse headers)'
+    }
+  },
   {
     keys: 'Shift+S',
     strokes: [{ code: 'KeyS', shift: true }],
@@ -568,6 +576,10 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'nextPosition',
     'prevPosition'
   ],
+  // The lyric text editor (one-surface item 6, phase 2): the whole buffer's
+  // diff arrives as one note-addressed plan — the syllables travel inside
+  // it, so this is the only type the surface adds to reachability.
+  lyricTextEditor: ['applyLyricPlan'],
   // The selection tray (core-selection-tray-mechanism.md) fires the registry's
   // commands through the same funnel as keys, so most of what it offers is
   // already reachable — bound to a key or owned by a popover grammar above.

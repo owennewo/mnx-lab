@@ -1,6 +1,6 @@
 # One editing surface — retire the popovers and the tray into the inspector
 
-> **Status: in progress 2026-08-31 — campaign; items 1–5 and 7–10 built the same day, item 6 phase 1 built (popover retired; text-surface and pass-model phases remain). Every popover is gone; item 11, the tray, remains.** The three-surface experiment run by
+> **Status: in progress 2026-08-31 — campaign; items 1–5 and 7–10 built the same day, item 6 phases 1–2 built (popover retired, lyric text surface live; the pass-model phase remains). Every popover is gone; item 11, the tray, remains.** The three-surface experiment run by
 > [workbench-rung-inspector.md](workbench-rung-inspector.md) ("a third
 > editing surface, to be tried *beside* the tray and the popovers so that use decides
 > which wins") has its verdict: **the inspector wins.** The user's ruling, 2026-08-31:
@@ -83,7 +83,7 @@ is one popover or the tray, and one work item.
 | 3 | **Clef** (~~`Shift+C`~~ freed) | `clef` pill at partMeasure, stage 4 — reuses `parseClef` | verify the registry's `measure` cross-listing loses nothing; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-clef.md) |
 | 4 | **Bar attributes** (~~`Shift+B`~~ freed) | one pill per declared attribute, stage 3 — reuses `parseBarAttribute`; the rhythm riders live as voiceMeasure pills | verify all ten kinds + `tempo#n` array + segno/fine `at` forms; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-bar.md) |
 | 5 | **Adornments** (~~`Shift+A`~~ freed) | markings/positioned pills, stage 4 — reuses `parseAdornment` | verify breadth (all markings, dynamics, directions incl. glyphs); sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-adornment.md) |
-| 6 | **Lyrics** (~~`Shift+L`~~ freed, earmarked) | syllable pills per line (`lyric 2: Am`), stage 4 — reuses `parseLyric` | ~~gap: line management~~ closed — phases 2–3 (text surface, pass model) remain designed-not-built | 🔧 [phase 1 built 2026-08-31](workbench-one-surface-lyrics.md) — popover retired |
+| 6 | **Lyrics** (`Shift+L` → the text editor) | syllable pills per line (`lyric 2: Am`), stage 4 — reuses `parseLyric` | ~~gap: line management~~ closed; ~~text surface~~ built — phase 3 (the pass model) remains designed-not-built | 🔧 [phases 1–2 built 2026-08-31](workbench-one-surface-lyrics.md) |
 | 7 | **Tuning** (~~`Shift+U`~~ freed) | `capo` pill writable; `strings` is a **read-only** reading | **gap: the tuning write path** — `parseTuning`'s sentence has no inspector form; a strings pill that writes (part rung), refusals for strings in use; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-tuning.md) |
 | 8 | **Rhythm** (~~`Shift+R`~~ freed) | container pills are **read-only** (`tuplet: 3:2`, dotted, refuse Enter); full-measure rest / measure repeat pills exist at voiceMeasure | **gap: the missing verb** — the `setContainerProperties`-class op the residue ledger names, plus a construction story for tuplet/grace/authored-silence declarations (contract §2: construction is a verb) | ✅ [built 2026-08-31](../complete/workbench-one-surface-rhythm.md) |
 | 9 | **Part** (~~`Shift+P`~~ freed) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | ✅ [built 2026-08-31](../complete/workbench-one-surface-part.md) |
@@ -144,6 +144,19 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
   partMeasure — surfaced via the `not in registry` assertion; make it
   standard), and ask of every popover tile "what does typing into this
   actually fire?" — the label can promise an op that does not exist.
+- **2026-08-31 — item 6 (lyrics) phase 2 built.** The paste-and-tweak text
+  surface: `src/edit/lyricText.ts` (walk/serialize/parse/diff, pure and
+  conformance-tested), a new `applyLyricPlan` intent (note-addressed edits in
+  one batch — the clipboard's materialized-plan shape; undo is one gesture,
+  traces record syllables), and `<mnx-lyric-text-editor>` as a modal over the
+  score. **`Shift+L` lives again** — the earmark cashed as designed: it opens
+  the editor, and the campaign's freed-keys ruling stands unbroken for every
+  other item. Learnings: the `SelectionContext.preview` channel is the right
+  vehicle for any overlay's transient highlight (second consumer after the
+  tray); a modal with a `<textarea>` needs no PENDING_PRECEDENCE wiring at
+  all — `keyScope.isTextEntry` already yields the page keymap; and
+  `smoke:inspector` absorbed a lyric-editor lap cheaply because its probe
+  helpers are generic over shadow roots.
 - **2026-08-31 — item 6 (lyrics) phase 1 built.** The popover is retired: verse-line
   metadata lands as document-rung `line` pills (recited in `lineOrder`, unlisted ids
   after — the renderer's own stacking rule), the typed `line …`/`no line …` arms

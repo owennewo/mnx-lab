@@ -179,6 +179,11 @@ export type MutationIntent =
   | { type: 'removeSyllable'; line: string }
   | { type: 'setLyricLine'; line: string; label?: string; lang?: string }
   | { type: 'removeLyricLine'; line: string }
+  // The lyric text surface (one-surface item 6, phase 2): a whole buffer's
+  // diff in one intent, each edit note-addressed — the clipboard's
+  // materialized-plan shape, batched like every other multi-member command,
+  // so the trace records the syllables and undo is one gesture.
+  | { type: 'applyLyricPlan'; edits: import('./lyricText.ts').LyricPlanEdit[] }
   // Tab technique (campaign item 9): one toggle per technique, and `hammerPull`
   // is ONE intent — which of the pair you get is physics, not a choice. A
   // SHAPED bend goes through `setTechnique` with its stops (core-bend-stops.md);

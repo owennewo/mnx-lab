@@ -206,6 +206,7 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
  * Shift+letter is the popover tier (survey §6.2, Dorico's discipline).
  */
 export type ShellAction =
+  | 'lyricTextEditor'
   | 'selectionTray'
   | 'commandPalette'
   | 'goTo'
@@ -232,9 +233,10 @@ export type ShellAction =
 /** Exported for the cheatsheet's join tests (keymapDocs.ts) — resolution
  *  still goes through resolveShellAction only. */
 export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
-  // Shift+L is deliberately unbound: freed by one-surface item 6, earmarked
-  // to open the lyric text surface when that phase lands (the campaign's one
-  // accelerator exception, decided with the design).
+  // Shift+L reopens as the lyric text editor (one-surface item 6, phase 2) —
+  // the accelerator exception earmarked at the phase-1 sweep, decided with
+  // the design: a surface, not a resurrected popover.
+  { code: 'KeyL', shift: true, action: 'lyricTextEditor' },
   // Shift+S carries the shift slide in the tab projection (item 10) — an
   // editor-layer binding now, not a shell popover.
   // `/` opens a command surface — the selection tray when an editor holds the
