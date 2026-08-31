@@ -1,5 +1,11 @@
 import type { MnxStructure } from '../model/mnx.ts';
 import { upgradeTabExtension } from '../model/upgradeTabExtension.ts';
+import {
+  GUITAR_PRO_IMPORT_COMMAND,
+  GUITAR_PRO_IMPORT_RESULT,
+  type GuitarProWorkerReply,
+  type GuitarProWorkerRequest
+} from './guitarProImporterProtocol.ts';
 
 export const LOCAL_FILE_ACCEPT = '.mnx.json,.mnx,.json,.gp,.gpx,.gp3,.gp4,.gp5';
 
@@ -14,13 +20,6 @@ export interface LocalDocumentSource {
   format: 'MNX' | 'Guitar Pro';
   document: MnxStructure;
   warnings: string[];
-}
-
-interface GuitarProWorkerReply {
-  ok: boolean;
-  document?: MnxStructure;
-  warnings?: string[];
-  error?: string;
 }
 
 function extensionIn(name: string, extensions: readonly string[]): boolean {
@@ -52,8 +51,9 @@ function importGuitarPro(buffer: ArrayBuffer): Promise<{ document: MnxStructure;
       type: 'module'
     });
     worker.onmessage = (event: MessageEvent<GuitarProWorkerReply>) => {
-      worker.terminate();
       const reply = event.data;
+      if (reply?.cmd !== GUITAR_PRO_IMPORT_RESULT) return;
+      worker.terminate();
       if (!reply.ok || !reply.document) {
         reject(new Error(reply.error || 'Guitar Pro conversion failed.'));
         return;
@@ -64,7 +64,11 @@ function importGuitarPro(buffer: ArrayBuffer): Promise<{ document: MnxStructure;
       worker.terminate();
       reject(new Error(event.message || 'The Guitar Pro converter could not start.'));
     };
-    worker.postMessage(buffer, [buffer]);
+    const request: GuitarProWorkerRequest = {
+      cmd: GUITAR_PRO_IMPORT_COMMAND,
+      buffer
+    };
+    worker.postMessage(request, [buffer]);
   });
 }
 

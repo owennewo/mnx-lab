@@ -1,29 +1,39 @@
 import * as alphaTab from '@coderline/alphatab';
 import { scoreToMnx } from '../../converters/guitarpro-mnx/src/import/gp.ts';
+import type { MnxStructure } from '../model/mnx.ts';
+import {
+  GUITAR_PRO_IMPORT_COMMAND,
+  GUITAR_PRO_IMPORT_RESULT,
+  type GuitarProWorkerReply,
+  type GuitarProWorkerRequest
+} from './guitarProImporterProtocol.ts';
 
-interface GuitarProWorkerReply {
-  ok: boolean;
-  document?: ReturnType<typeof scoreToMnx>;
-  warnings?: string[];
-  error?: string;
-}
-
-globalThis.onmessage = (event: MessageEvent<ArrayBuffer>) => {
+globalThis.onmessage = (event: MessageEvent<GuitarProWorkerRequest>) => {
+  const request = event.data;
+  if (request?.cmd !== GUITAR_PRO_IMPORT_COMMAND || !(request.buffer instanceof ArrayBuffer)) {
+    return;
+  }
   const warnings: string[] = [];
   let reply: GuitarProWorkerReply;
   try {
     const settings = new alphaTab.Settings();
     const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
-      new Uint8Array(event.data),
+      new Uint8Array(request.buffer),
       settings
     );
     reply = {
+      cmd: GUITAR_PRO_IMPORT_RESULT,
       ok: true,
-      document: scoreToMnx(score, { onWarning: warning => warnings.push(warning) }),
+      // The converter keeps its Node package types independent of src/model;
+      // the shape is checked again by localFile before it reaches the editor.
+      document: scoreToMnx(score, {
+        onWarning: warning => warnings.push(warning)
+      }) as unknown as MnxStructure,
       warnings
     };
   } catch (error) {
     reply = {
+      cmd: GUITAR_PRO_IMPORT_RESULT,
       ok: false,
       error: error instanceof Error ? error.message : String(error)
     };
