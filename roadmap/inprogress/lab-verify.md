@@ -86,6 +86,28 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
+### 10. Lyrics reach the standalone tab view — **1 never-seen**
+
+Owner: no roadmap doc — a user-directed renderer follow-up to
+[workbench-one-surface-lyrics.md](../complete/workbench-one-surface-lyrics.md)
+(2026-08-31): the standalone tab layout now draws verse rows below the
+strings (the shared emitter extracted to `engine/layout/lyricRuns.ts`; the
+plan already priced syllable widths, so no digit column moved and **no
+existing golden moved** — the lyrics×tab corpus intersection was empty).
+Scenario: `lab/lyrics/tab-verses` (new; all four goldens are first
+snapshots).
+
+**What a reviewer should look for.** Three views, one document (four quarter
+notes, two verses, verse 2 split `Ri-sing wa-ter`). (1) TAB view: two verse
+rows below the strings, syllables centred under their fret digits, hyphens
+between the split pairs; the row grew to hold the block (`tightenRows`), so
+nothing clips. (2) NOTATION view: the same two rows exactly as the existing
+lyric scenarios draw them. (3) BOTH view: the verses appear ONCE, between
+the notation staff and the tab staff, never duplicated below the strings.
+Known deliberate roughness: verse 1's baseline (+4.5sp) sits close to where
+dynamics would draw (+3.5sp) — this document has none; the collision is
+pre-existing and unarbitrated in every view.
+
 ### 9. Hammer-on/pull-off merged into one letterless adornment — **1 stale**
 
 Owner: no roadmap doc — a user-directed schema change (extension v5 → v6,

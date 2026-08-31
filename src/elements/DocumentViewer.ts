@@ -722,8 +722,8 @@ export class DocumentViewer extends LitElement {
       selectedNoteIds: this.selection?.selectedNoteIds ?? [],
       selectedEventIds: this.selection?.selectedEventIds ?? [],
       onNoteClick,
-      // Layout-side hides reach the engine so their space is reclaimed; the
-      // tab renderer ignores what it has no concept of (lyrics).
+      // Layout-side hides reach the engine so their space is reclaimed —
+      // every view honors them (the tab layout draws lyrics too).
       hide: this.hiddenFeatures(),
       // The preset resolves to the engine's multiplier here — the element
       // binds a behavior it does not implement (docs/core-viewer-surface.md).

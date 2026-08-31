@@ -1,11 +1,17 @@
 // The lyric text editor — the paste-and-tweak surface of one-surface item 6
-// phase 2 (roadmap/inprogress/workbench-one-surface-lyrics.md). The buffer is
+// phase 2 (roadmap/complete/workbench-one-surface-lyrics.md). The buffer is
 // WORKBENCH STATE, not the document: it opens on the canonical projection
 // (serializeLyricText), parses live into bar-anchored diagnostics, and Apply
 // hands the host a computed plan (planLyricEdits) to fire as ONE intent —
-// nothing here writes the document. Modality follows ModelPickerDialog
-// (backdrop, stopPropagation, a *-close event; the host owns the boolean);
-// the caret→score cross-highlight rides the selection context's preview
+// nothing here writes the document.
+//
+// A bottom DRAWER, not a centered modal: the score stays visible above and
+// the host renders the buffer's parse onto it live (lyric-editor-edits →
+// a scratch document through the same lyricPlanOps the session applies), so
+// typing reads as writing under the staff. Keyboard ownership needs no
+// precedence wiring — a focused textarea is isTextEntry and the page keymap
+// yields; clicking the score hands the keys back without closing the drawer.
+// The caret→score cross-highlight rides the selection context's preview
 // channel via the lyric-editor-preview event.
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -47,21 +53,20 @@ export class LyricTextEditor extends LitElement {
     css`
       :host {
         position: fixed;
-        inset: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         z-index: 40;
-      }
-      .backdrop {
-        position: absolute;
-        inset: 0;
-        background: color-mix(in oklab, var(--bg), transparent 35%);
       }
       .card {
         position: relative;
-        margin: 12vh auto 0;
-        width: min(720px, calc(100vw - 48px));
+        margin: 0 auto;
+        width: min(960px, 100vw);
+        max-height: 44vh;
         background: var(--surface);
         border: 1px solid var(--line-strong);
-        border-radius: var(--radius-card);
+        border-bottom: none;
+        border-radius: var(--radius-card) var(--radius-card) 0 0;
         box-shadow: var(--shadow);
         overflow: hidden;
         outline: none;
@@ -83,8 +88,8 @@ export class LyricTextEditor extends LitElement {
         font-size: 12px;
       }
       textarea {
-        margin: 12px 14px 8px;
-        min-height: 9em;
+        margin: 10px 14px 6px;
+        min-height: 5em;
         resize: vertical;
         font: 13px/1.7 var(--mono);
         color: var(--ink);
@@ -174,6 +179,17 @@ export class LyricTextEditor extends LitElement {
     this.edits = this.parsed.diagnostics.length === 0
       ? planLyricEdits(this.doc, this.partIndex, this.parsed)
       : [];
+    // The live preview: a clean parse hands the host the current diff so the
+    // score above redraws as if applied. While errors stand, the last clean
+    // preview holds — flickering back to the committed text mid-word would
+    // punish typing the very hyphen the parser is complaining about.
+    if (this.parsed.diagnostics.length === 0) {
+      this.dispatchEvent(new CustomEvent('lyric-editor-edits', {
+        detail: { edits: this.edits },
+        bubbles: true,
+        composed: true
+      }));
+    }
   }
 
   /** Caret → walk entry → the note to light, over the preview channel. */
@@ -216,7 +232,9 @@ export class LyricTextEditor extends LitElement {
   }
 
   private onKey = (event: KeyboardEvent) => {
-    // A modal owns its keystrokes: nothing it sees may reach the page keymap.
+    // The drawer owns its keystrokes: nothing it sees may reach the page
+    // keymap. (The reverse door stays open — clicking the score moves focus
+    // out and the score keys work with the drawer still up.)
     event.stopPropagation();
     if (event.key === 'Escape') {
       event.preventDefault();
@@ -231,7 +249,6 @@ export class LyricTextEditor extends LitElement {
     const blocked = this.parsed.diagnostics.length > 0;
     const shown = [...this.parsed.diagnostics, ...this.warnings];
     return html`
-      <div class="backdrop" @click=${() => this.close()}></div>
       <div class="card" tabindex="-1" @keydown=${this.onKey}>
         <header>
           <span class="title">lyrics</span>

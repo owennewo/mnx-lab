@@ -367,7 +367,7 @@ export interface EmitTabVoicesArgs {
  * `endX` is the next inner column, or the container's own end: a bend curve
  * drawn across a tuplet member must stop at the next member, not at the bar.
  */
-function innerColumns(
+export function innerColumns(
   container: MnxGrace | MnxTuplet,
   firstX: number,
   ink: number,

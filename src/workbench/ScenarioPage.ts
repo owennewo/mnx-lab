@@ -78,7 +78,8 @@ import './ZoomPad.ts';
 import type { ZoomPadChange } from './ZoomPad.ts';
 import './ModelPickerDialog.ts';
 import './LyricTextEditor.ts';
-import type { LyricPlanEdit } from '../edit/lyricText.ts';
+import { lyricPlanOps, type LyricPlanEdit } from '../edit/lyricText.ts';
+import { applyOp } from '../edit/ops.ts';
 import { modelDisplayName } from '../assist/modelCatalog.ts';
 import { fetchKeyInfo, keyFingerprint, streamChat, type ChatMessage } from '../assist/openrouter.ts';
 import { renderMarkdown } from './markdownLit.ts';
@@ -478,6 +479,13 @@ export class ScenarioPage extends LitElement {
    *  and the caret's preview keys. */
   @state() private lyricEditorOpen = false;
   @state() private lyricPreviewKeys: string[] = [];
+  /** The drawer's live render: the buffer's current diff applied to a
+   *  SCRATCH document (the same lyricPlanOps the session would apply), shown
+   *  by the viewer while the drawer is open. Never touches the session.
+   *  Stored as the COMPLETE wrapper the viewer binds, built once per diff —
+   *  minting it in render() gave the viewer a fresh identity every pass,
+   *  and relayout → render-scale → state → render is a loop. */
+  @state() private lyricPreviewDoc: MnxDocument | null = null;
   /** BYOK state (core-assist-byok.md): the key is read from the shell's
    *  store and re-read on its change event, so a PKCE landing in the app
    *  shell reaches this tab without a prop. */
@@ -2385,7 +2393,7 @@ export class ScenarioPage extends LitElement {
 
   // ── The lyric text editor's mount (one-surface item 6, phase 2) ──────────
 
-  /** One door for Shift+L and the palette row. A modal over the score: the
+  /** One door for Shift+L and the palette row. A drawer under the score: the
    *  tray and inspector close first — two overlays wanting the keyboard is
    *  one too many. */
   private openLyricEditor() {
@@ -2398,8 +2406,21 @@ export class ScenarioPage extends LitElement {
   private onLyricEditorClose = () => {
     this.lyricEditorOpen = false;
     this.lyricPreviewKeys = [];
+    this.lyricPreviewDoc = null;
     this.syncFromSession();
     this.renderRoot.querySelector<HTMLElement>('mnx-document-viewer')?.focus();
+  };
+
+  /** The drawer's clean parses render live: apply the diff to a scratch copy
+   *  through the very ops the session would use, and let the viewer draw it.
+   *  An empty diff clears the scratch — the committed document IS the
+   *  preview then, and holding a stale copy would hide real edits. */
+  private onLyricEditorEdits = (event: Event) => {
+    if (!this.session || !this.doc) return;
+    const { edits } = (event as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
+    this.lyricPreviewDoc = edits.length === 0
+      ? null
+      : { ...this.doc, mnxJson: lyricPlanOps(edits).reduce(applyOp, this.session.doc) };
   };
 
   /** The buffer's diff lands as ONE intent through the same funnel as keys —
@@ -2882,9 +2903,14 @@ export class ScenarioPage extends LitElement {
     // never want.
     if (entry.invalidByDesign) return this.exhibit();
 
+    // While the lyric drawer previews, the viewer draws the scratch document
+    // — the committed one is untouched underneath and returns on close. The
+    // wrapper's identity is stable per diff (see lyricPreviewDoc), so the
+    // viewer relayouts only when the preview actually changes.
+    const shownDoc = (this.lyricEditorOpen && this.lyricPreviewDoc) || this.doc;
     return html`
       <mnx-document-viewer
-        .mnxDoc=${this.doc}
+        .mnxDoc=${shownDoc}
         .view=${viewMode}
         .zoom=${this.staffScale}
         .densityH=${this.densityH}
@@ -3038,6 +3064,7 @@ export class ScenarioPage extends LitElement {
                 @lyric-editor-close=${this.onLyricEditorClose}
                 @lyric-editor-apply=${this.onLyricEditorApply}
                 @lyric-editor-preview=${this.onLyricEditorPreview}
+                @lyric-editor-edits=${this.onLyricEditorEdits}
               ></mnx-lyric-text-editor>`
             : nothing}
           ${this.clipboardNotice

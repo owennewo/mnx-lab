@@ -4,6 +4,15 @@ import { emitMeasureFermata, fermataBelow, fermataGlyph } from './fermata.ts';
 import { collectSpanMarks, emitMeasureNumber, emitSpanMarks, type SpanMarks } from './arpeggio.ts';
 import { emitMeasureRepeat, measureRepeatX, type MeasureRepeatMark } from './measureRepeat.ts';
 import { emitEndings } from './endings.ts';
+import {
+  LYRIC_DESCENDER_PAD_SP,
+  LYRIC_FIRST_BASELINE_DROP_SP,
+  LYRIC_LINE_SPACING_SP,
+  TAB_LYRIC_CLEARANCE_SP,
+  emitLyricRuns,
+  orderedLyricLineIds,
+  type LyricSyllable
+} from './lyricRuns.ts';
 import { timeSigDigitDx } from './tabStaff.ts';
 import {
   emitRepeatDots,
@@ -552,14 +561,8 @@ export type HideableFeature = 'lyrics' | 'badges';
 const TITLE_SIZE_SP = 2.4;
 const TITLE_GAP_SP = 1.2;
 
-// Lyrics: verse rows stacked below the staff.
-const LYRIC_FIRST_BASELINE_DROP_SP = 4.5; // first verse baseline below bottom line
-const LYRIC_LINE_SPACING_SP = 2.2;
-const LYRIC_SIZE_SP = 1.7;
-const LYRIC_DESCENDER_PAD_SP = 0.8;
-// Air between the last verse row's descenders and a native tab staff below it
-// (the both view's content-driven inter-staff gap).
-const TAB_LYRIC_CLEARANCE_SP = 1;
+// Lyrics: verse rows stacked below the staff — geometry and emission shared
+// with the standalone tab layout (lyricRuns.ts).
 
 /** All lyric line ids a segment's parts use, in global lineOrder (then sorted). */
 function collectLyricLineIds(mnx: MnxStructure, segment: JobSegment): string[] {
@@ -576,10 +579,7 @@ function collectLyricLineIds(mnx: MnxStructure, segment: JobSegment): string[] {
       }
     }
   }
-  const order = mnx.global.lyrics?.lineOrder ?? [];
-  const ordered = order.filter(id => used.has(id));
-  const rest = [...used].filter(id => !order.includes(id)).sort();
-  return [...ordered, ...rest];
+  return orderedLyricLineIds(mnx, used);
 }
 
 /** A run of staves decorated together: bracket/brace + barline style. */
@@ -1328,12 +1328,6 @@ function assembleSegment(
 
   // Lyric syllables collected per (staff, line) in document order; hyphens
   // join start/middle syllables to their successor after the loop.
-  interface LyricSyllable {
-    x: number;
-    y: number;
-    text: string;
-    continues: boolean;
-  }
   const lyricRuns = new Map<string, LyricSyllable[]>();
 
   // Ottava lines are a post-pass (they cross measures/system breaks), but their
@@ -2075,35 +2069,9 @@ function assembleSegment(
     });
   }
 
-  // Lyrics: syllables centred under their columns, hyphens joining
-  // start/middle syllables to the next one on the same row.
-  for (const run of lyricRuns.values()) {
-    run.forEach((syl, k) => {
-      primitives.push({
-        kind: 'text',
-        text: syl.text,
-        x: syl.x,
-        y: syl.y,
-        font: 'body',
-        size: LYRIC_SIZE_SP,
-        anchor: 'middle',
-        className: 'lyric'
-      });
-      const next = run[k + 1];
-      if (syl.continues && next && next.y === syl.y && next.x > syl.x) {
-        primitives.push({
-          kind: 'text',
-          text: '-',
-          x: (syl.x + next.x) / 2,
-          y: syl.y,
-          font: 'body',
-          size: LYRIC_SIZE_SP,
-          anchor: 'middle',
-          className: 'lyric-hyphen'
-        });
-      }
-    });
-  }
+  // Lyrics: the shared emitter (lyricRuns.ts) — syllables centred under
+  // their columns, hyphens joining start/middle syllables on the same row.
+  emitLyricRuns(lyricRuns.values(), primitives);
 
   emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives);
   if (ottavaOnsets && ottavaSpans.length) emitOttavas(ottavaSpans, plan, staffTopOf, ottavaOnsets, primitives);

@@ -27,6 +27,7 @@ import {
   timeSignatureRemovalFits
 } from './ops.ts';
 import { spannersUnderSelection } from './spannerCoincidence.ts';
+import { lyricPlanOps } from './lyricText.ts';
 import {
   buildGrid,
   clampCursor,
@@ -831,23 +832,7 @@ export class EditorSession {
       // session, like the clipboard's materialized plans — and land as one
       // batch, so undo is one gesture and provenance keeps the envelope.
       case 'applyLyricPlan': {
-        return this.applyBulk(intent.edits.map(edit =>
-          edit.op === 'setSyllable'
-            ? {
-                type: 'setSyllable' as const,
-                noteKey: edit.noteKey,
-                line: edit.line,
-                text: edit.text,
-                ...(edit.syllableType ? { syllableType: edit.syllableType } : {})
-              }
-            : edit.op === 'removeSyllable'
-              ? { type: 'removeSyllable' as const, noteKey: edit.noteKey, line: edit.line }
-              : {
-                  type: 'setLyricLine' as const,
-                  line: edit.line,
-                  ...(edit.lang !== undefined ? { lang: edit.lang } : {})
-                }
-        ));
+        return this.applyBulk(lyricPlanOps(intent.edits));
       }
       case 'setLyricLine':
       case 'removeLyricLine': {

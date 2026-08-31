@@ -111,8 +111,7 @@ describe('removal from any covered position', () => {
   });
 });
 
-describe('the tiles read the coincidence', () => {
-  // The slur/beam TILES retired with 11a (one-surface campaign); the
-  // coincidence read they exercised survives as the inspector's pills,
-  // pinned in rung-inspector.test.ts.
-});
+// The slur/beam TILES retired with 11a (one-surface campaign); the
+// coincidence read they exercised survives as the inspector's pills, pinned
+// in rung-inspector.test.ts. (An empty describe is a failed suite to vitest,
+// so the note lives here rather than in one.)

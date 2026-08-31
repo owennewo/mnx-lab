@@ -1,4 +1,4 @@
-import { MnxStructure } from '../../model/mnx.ts';
+import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import { Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex } from '../primitives.ts';
 import { clampDensity, planHorizontal, staffOneSequences } from './spacing.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
@@ -8,8 +8,17 @@ import {
   emitTabStaffLines,
   emitTabSystemHeader,
   emitTabTimeSig,
-  emitTabVoices
+  emitTabVoices,
+  innerColumns
 } from './tabStaff.ts';
+import {
+  LYRIC_FIRST_BASELINE_DROP_SP,
+  LYRIC_LINE_SPACING_SP,
+  emitLyricRuns,
+  orderedLyricLineIds,
+  type LyricSyllable
+} from './lyricRuns.ts';
+import type { HideableFeature } from './notation.ts';
 import { emitMeasureRepeat, measureRepeatX, type MeasureRepeatMark } from './measureRepeat.ts';
 import { emitEndings } from './endings.ts';
 import { emitDirections, emitDynamics } from './notation.ts';
@@ -98,6 +107,9 @@ export interface LayoutTabOptions {
    *  Rigid columns are ink and re-price by it; packing stays square.
    *  1/unset = today's layout, untouched. */
   inkRatio?: number;
+  /** Features the host asked to hide — honored here so `hide="lyrics"` means
+   *  the same thing it means on the notation view. */
+  hide?: readonly HideableFeature[];
 }
 
 export function layoutTab(opts: LayoutTabOptions): LayoutResult {
@@ -172,6 +184,29 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     });
     validationByMeasure.set(v.measureIndex, list);
   }
+
+  // Verse rows below the staff (shared rules: lyricRuns.ts). The standalone
+  // view draws them itself — it has no notation staff to carry them, the same
+  // reasoning as showTupletBrackets — and the shared plan already priced
+  // syllable widths into these columns, so nothing moves horizontally. Drawn
+  // even with no fingerboard: words are not frets. `tightenRows` grows any
+  // row the verse block overruns.
+  const lyricLineIds = (() => {
+    if ((opts.hide ?? []).includes('lyrics')) return [] as string[];
+    const used = new Set<string>();
+    for (const pm of part.measures) {
+      for (const seq of staffOneSequences(pm.sequences)) {
+        for (const item of seq.content) {
+          const record = item as { content?: MnxEvent[] };
+          const events = isGrace(item) || isTuplet(item) ? (record.content ?? []) : isTimedEvent(item) ? [item as MnxEvent] : [];
+          for (const event of events)
+            for (const id of Object.keys(event.lyrics?.lines ?? {})) used.add(id);
+        }
+      }
+    }
+    return orderedLyricLineIds(mnx, used);
+  })();
+  const lyricRuns = new Map<string, LyricSyllable[]>();
 
   // Playing technique is drawn AFTER the measure walk: a hammer-on names its
   // destination by note id, and that note may be measures away — so the marks
@@ -251,6 +286,38 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
 
     // Events per voice (staff 1 only — the same filter the plan was built from)
     const stdSequences = staffOneSequences(partMeasure.sequences);
+
+    // Gather this bar's syllables at their plan columns — the same
+    // event↔slot pairing emitTabVoices walks, containers through the same
+    // innerColumns the digits use, so words sit exactly under their frets.
+    if (lyricLineIds.length > 0) {
+      const addSyllables = (event: MnxEvent, x: number) => {
+        for (const [lineId, line] of Object.entries(event.lyrics?.lines ?? {})) {
+          const verse = lyricLineIds.indexOf(lineId);
+          if (verse < 0) continue;
+          const run = lyricRuns.get(lineId) ?? [];
+          run.push({
+            x,
+            y: staffBottom + LYRIC_FIRST_BASELINE_DROP_SP + verse * LYRIC_LINE_SPACING_SP,
+            text: line.text,
+            continues: line.type === 'start' || line.type === 'middle'
+          });
+          lyricRuns.set(lineId, run);
+        }
+      };
+      stdSequences.forEach((sequence, voiceIndex) => {
+        sequence.content.forEach((item, eventIndex) => {
+          const slot = m.voices[voiceIndex]?.[eventIndex];
+          if (!slot) return;
+          if (isGrace(item) || isTuplet(item)) {
+            innerColumns(item, slot.x, plan.inkRatio, { useAccidentalDisplay, keyFifths: m.keyFifths })
+              .forEach(({ event, x }) => addSyllables(event, x));
+            return;
+          }
+          if (isTimedEvent(item)) addSyllables(item as MnxEvent, slot.x);
+        });
+      });
+    }
 
     // Validation issues (user-fixable), the plan's issues (unsupported items),
     // plus anything an individual event throws (forgiving render) — one bad
@@ -367,6 +434,10 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       for (const issue of measureIssues) diagnostics.push({ measureIndex: i, ...issue });
     }
   }
+
+  // Verse rows flush before the frame is fitted, for the same reason as the
+  // technique marks below: they are ink, and the fit passes measure ink.
+  emitLyricRuns(lyricRuns.values(), primitives);
 
   // Before the frame is fitted: the marks are ink like any other, and both
   // `ensureTopMargin` and `tightenRows` measure ink to decide how much room a

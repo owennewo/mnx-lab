@@ -498,6 +498,29 @@ export type LyricPlanEdit =
   | { op: 'removeSyllable'; noteKey: string; line: string }
   | { op: 'setLyricLine'; line: string; lang?: string };
 
+/** The plan's edits as EditOps — ONE mapping, shared by the session's
+ *  `applyLyricPlan` arm and the editor's live preview (`applyOp` over a
+ *  scratch document), so what the preview shows is what apply commits. */
+export function lyricPlanOps(edits: LyricPlanEdit[]): import('./ops.ts').EditOp[] {
+  return edits.map(edit =>
+    edit.op === 'setSyllable'
+      ? {
+          type: 'setSyllable' as const,
+          noteKey: edit.noteKey,
+          line: edit.line,
+          text: edit.text,
+          ...(edit.syllableType ? { syllableType: edit.syllableType } : {})
+        }
+      : edit.op === 'removeSyllable'
+        ? { type: 'removeSyllable' as const, noteKey: edit.noteKey, line: edit.line }
+        : {
+            type: 'setLyricLine' as const,
+            line: edit.line,
+            ...(edit.lang !== undefined ? { lang: edit.lang } : {})
+          }
+  );
+}
+
 const normalizeType = (type?: string) => (type === 'whole' ? undefined : type);
 
 /**

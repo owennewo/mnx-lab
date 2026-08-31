@@ -260,3 +260,25 @@ later phases start without re-deriving it.
 - The extender gap is a candidate spec-loop topic (an `_x.mnxLab` extender
   draft would slot into the format without grammar changes) — deliberately
   not filed; derivation is expected to suffice.
+
+## Follow-ups built — 2026-08-31, user-directed
+
+Two gaps the first use surfaced, closed the same day (outside the campaign,
+ordinary core work):
+
+- **The editor became a bottom drawer with a live preview.** The centered
+  modal covered the score and nothing moved until apply. Now the score stays
+  visible above, and every clean parse renders onto a scratch document —
+  `lyricPlanOps` (one mapping, shared with the session's `applyLyricPlan`
+  arm) applied through the pure `applyOp`, so what the preview shows is what
+  apply commits. The "no ghost preview" deviation recorded above is closed
+  by this: the whole score IS the preview. Errors hold the last clean frame
+  rather than flickering back to the committed text.
+- **Lyrics reach the standalone tab view.** The verse-row geometry and
+  syllable/hyphen emission were extracted to `engine/layout/lyricRuns.ts`
+  (all existing goldens byte-identical) and the tab layout gathers its own
+  runs at the shared plan's columns — which had priced syllable widths all
+  along, so no digit moved. `hide="lyrics"` now threads through
+  `RenderTabOptions` and means the same thing in every view. New scenario
+  `lab/lyrics/tab-verses` pins all three projections; its approvals are
+  registered as batch 10 in [lab-verify.md](../inprogress/lab-verify.md).

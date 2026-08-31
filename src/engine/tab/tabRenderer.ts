@@ -49,6 +49,9 @@ export interface RenderTabOptions {
   densityH?: number;
   /** Vertical/frame density multiplier (core-vertical-density.md). */
   densityPad?: number;
+  /** Features the host asked to hide — forwarded to the layout, so
+   *  `hide="lyrics"` means the same thing in every view. */
+  hide?: readonly import('../layout/notation.ts').HideableFeature[];
 }
 
 export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
@@ -61,7 +64,8 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
     selectedNoteIds: opts.selectedNoteIds,
     tabSetup: opts.tabSetup,
     densityH: opts.densityH,
-    densityPad: opts.densityPad
+    densityPad: opts.densityPad,
+    hide: opts.hide
   };
   const square = layoutTab(layoutArgs);
 
