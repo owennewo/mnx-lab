@@ -9,7 +9,7 @@
 //   §3  User vocabulary → MNX terms (general)
 //   §4  Edit-operation recipes
 //   §5  Validation gotchas
-//   §6  Vendor extensions: tab, labels, chord symbols (`_x.mnxLab`, v5)
+//   §6  Vendor extensions: tab, labels, chord symbols (`_x.mnxLab`, v6)
 //   §7  Preservation rules
 //   §8  Selection context interpretation
 //   §9  Ambiguity policy
@@ -106,7 +106,7 @@ const VALIDATION_GOTCHAS = `## §5 — Validation gotchas / "if X, remember Y"
 - **\`time.unit\` must be a power of 2 ≤ 128:** 1, 2, 4, 8, 16, 32, 64, 128.
 - **Clef \`sign\` is \`"C" | "F" | "G"\` only. There is NO TAB clef in MNX — never emit \`{sign: "TAB"}\`.** A part's tab presentation is declared by \`part._x.mnxLab.tab.staffKind\` (see §6), not by a clef and not by a second staff.`;
 
-const GUITAR = `## §6 — Vendor extensions (\`_x.mnxLab\`, v5)
+const GUITAR = `## §6 — Vendor extensions (\`_x.mnxLab\`, v6)
 
 Standard W3C MNX has no model for fret numbers, string assignments, playing technique, capo, alternate tunings, rehearsal marks, section names or chord symbols. This project adds all of them under a SINGLE vendor key, \`_x.mnxLab\`. The MNX schema permits arbitrary subkeys under \`_x\`, so this stays fully valid MNX. The extension content is ALSO schema-validated, so follow these shapes exactly.
 
@@ -241,7 +241,7 @@ Chord symbols live on \`global.measures[i]._x.mnxLab.harmonies\` — an array, o
 - **\`fret: 0\` = open string** (a valid playable position, not "no fret").
 - **Never create a TAB clef or a duplicate tab staff.** Older documents did this; current ones never do. If you somehow receive one, leave its structure alone unless asked to change it.
 - **No fingerboard data on rest events** — \`string\`/\`fret\`/\`fingering\`/\`tab\` apply only to notes.
-- **Legacy note:** the deprecated v1 namespace \`_x.guitar\`, the v2 spellings \`_x.tab\` / \`_x.section\`, and the v4 nested shapes \`tab.position\` / \`tab.tuning\` / \`tab.capo\` / \`tab.fingering\` must never be emitted. Always use the flat v5 shapes above.`;
+- **Legacy note:** the deprecated v1 namespace \`_x.guitar\`, the v2 spellings \`_x.tab\` / \`_x.section\`, and the v4 nested shapes \`tab.position\` / \`tab.tuning\` / \`tab.capo\` / \`tab.fingering\` must never be emitted. Always use the current flat shapes above (flat since v5).`;
 
 const PRESERVATION = `## §7 — Preservation rules
 

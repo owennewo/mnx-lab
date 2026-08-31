@@ -4,7 +4,7 @@ export interface MnxPitch {
   alter?: number;
 }
 
-// ---- MNX Lab extensions v4 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
+// ---- MNX Lab extensions v6 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
 
 export interface MnxFingering {
   hand: 'left' | 'right';
@@ -46,12 +46,12 @@ export interface MnxTabTechnique {
   palmMute?: boolean;
 }
 
-/** v5: only `technique` remains under `tab`. */
+/** Since v5 only `technique` remains under `tab`. */
 export interface MnxTabNoteExtension {
   technique?: MnxTabTechnique;
 }
 
-/** The whole vendor dict at note._x.mnxLab — v5 flat shape. `fret` is
+/** The whole vendor dict at note._x.mnxLab — flat shape (v5+). `fret` is
  *  optional and non-authoritative (validation only); converters keep writing
  *  it because the source formats store both. */
 export interface MnxNoteExtension {
@@ -240,13 +240,13 @@ export const STANDARD_GUITAR_STRINGS: MnxTuningEntry[] = [
   { string: 6, pitch: { step: 'E', octave: 2 } }
 ];
 
-/** v5: only `staffKind` remains under `tab`. */
+/** Since v5 only `staffKind` remains under `tab`. */
 export interface MnxTabPartExtension {
   /** The part's preferred presentation; tab-ness is a view, not content. */
   staffKind?: 'notation' | 'tab' | 'both';
 }
 
-/** The whole vendor dict at part._x.mnxLab — v5 flat shape. */
+/** The whole vendor dict at part._x.mnxLab — flat shape (v5+). */
 export interface MnxPartExtension {
   /** Sounding open-string pitches, before the capo. Absent ⇒ no fingerboard
    *  declared (no consumer assumes an instrument). */

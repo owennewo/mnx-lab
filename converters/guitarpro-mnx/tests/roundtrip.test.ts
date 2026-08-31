@@ -212,10 +212,10 @@ describe.each(FIXTURES)('MNX -> Guitar Pro -> MNX: %s', name => {
 
 describe.each(FIXTURES)('schema conformance: %s', name => {
   it('produces MNX that validates against the project schemas', async () => {
-    // The local interfaces in src/common/types.ts mirror src/types/mnx.ts by
+    // The local interfaces in src/common/types.ts mirror src/model/mnx.ts by
     // hand, so THIS is the guard that actually catches drift: the precompiled
     // Ajv validators built from the MNX schema and
-    // schemas/mnx-lab-extensions.schema.json.
+    // spec/mnx-lab-extensions.schema.json.
     //
     // Validated against the PROPOSED schema: the importer writes `rehearsal` and
     // `section`, which are drafted in roadmap/proposed/low-priority/spec-score-text.md and not yet

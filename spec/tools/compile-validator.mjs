@@ -4,10 +4,10 @@
 //
 // Outputs (committed; regenerate on schema bump):
 //   worker/generated/validate-mnx.mjs         — official MNX schema (default export)
-//   worker/generated/validate-extensions.mjs  — `_x.mnxLab` extension v4 sub-validators
+//   worker/generated/validate-extensions.mjs  — `_x.mnxLab` extension sub-validators
 //     (named exports: validateNoteExt, validatePartExt, validateGlobalMeasureExt)
 //   worker/generated/validate-mnx-proposed.mjs — ONLY while a spec proposal is in
-//     flight (schemas/mnx-schema.proposed.json present). For dev-time checks —
+//     flight (spec/mnx-schema.proposed.json present). For dev-time checks —
 //     tests and tooling — that a proposal-shaped document is well formed.
 //     **The Worker must never import it**: /api/edit-notation validates against
 //     the published spec, or the LLM learns to emit fields that do not exist.
@@ -55,7 +55,7 @@ function writeModule(rel, code) {
   }
 }
 
-// 2. `_x.mnxLab` extensions v4 → named-export sub-validators for the three
+// 2. `_x.mnxLab` extensions → named-export sub-validators for the three
 //    placement points (note, part, global measure). The extension schema is a
 //    $defs library; the worker walks the document and validates each vendor
 //    dict. Validating the WHOLE dict rather than each feature block also

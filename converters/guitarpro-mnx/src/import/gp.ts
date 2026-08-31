@@ -145,7 +145,7 @@ function buildGlobalMeasures(
     // arbitrary index into the score while a section name states what the music
     // IS. Written as the PROPOSED standard objects — see
     // roadmap/proposed/low-priority/spec-score-text.md; they validate against
-    // schemas/mnx-schema.proposed.json until the CG adopts them.
+    // spec/mnx-schema.proposed.json until the CG adopts them.
     const marker = masterBar.section?.marker?.trim();
     const sectionText = masterBar.section?.text?.trim();
     if (marker) measure.rehearsal = { label: marker };

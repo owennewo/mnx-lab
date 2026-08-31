@@ -1,15 +1,15 @@
 /**
  * MNX types used by this converter.
  *
- * These MIRROR the canonical definitions in `src/types/mnx.ts`. They are
+ * These MIRROR the canonical definitions in `src/model/mnx.ts`. They are
  * duplicated rather than imported because this is a standalone npm package and
  * TypeScript's `rootDir` will not emit declarations for sources outside it.
  *
  * The duplication is deliberately NOT the safety mechanism — `tests/` validates
  * every document this converter produces against the precompiled JSON Schemas
- * (`worker/generated/validate-mnx.mjs` + `validate-tab.mjs`), which is the real
+ * (`worker/generated/validate-mnx.mjs` + `validate-extensions.mjs`), which is the real
  * contract and catches drift these interfaces never could. If you extend these,
- * mirror `src/types/mnx.ts` exactly; do not invent shapes here.
+ * mirror `src/model/mnx.ts` exactly; do not invent shapes here.
  */
 
 export type MnxStep = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
@@ -31,8 +31,8 @@ export interface MnxNoteValue {
   dots?: number;
 }
 
-// ---- MNX Lab extensions v5 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
-// v5: `string`/`fret`/`fingering` sit FLAT on the vendor dict (`fret` is
+// ---- MNX Lab extensions v6 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
+// Since v5, `string`/`fret`/`fingering` sit FLAT on the vendor dict (`fret` is
 // optional and non-authoritative — validation only; converters keep writing it
 // because the source formats store both). Only `technique` and `staffKind`
 // remain under `tab`.

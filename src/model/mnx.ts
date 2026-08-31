@@ -4,7 +4,7 @@ export interface MnxPitch {
   alter?: number;
 }
 
-// ---- MNX Lab extensions v5 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
+// ---- MNX Lab extensions v6 (`_x.mnxLab`) — see docs/mnx-extensions.md ----
 //
 // Everything this project carries that W3C MNX v19 cannot express lives under
 // ONE vendor key, `mnxLab`. The `_x` sub-key names an agent/vendor/community
@@ -12,7 +12,7 @@ export interface MnxPitch {
 // shared namespace, so another app writing `_x.tab` for something else would
 // have made our own validator reject a legal document.
 //
-// v5 mirrors the adopted shape drafted in roadmap/proposed/low-priority/spec-instrument-position.md:
+// The flat shape (v5+) mirrors the draft in roadmap/proposed/low-priority/spec-instrument-position.md:
 // `string`, `fret` and `fingering` sit FLAT on the vendor dict (peers of `pitch`,
 // as they would be on `note`), the part declares `strings[]` + `capo` flat, and
 // only `technique` (pending a general articulations proposal) and `staffKind`
@@ -542,7 +542,7 @@ export const STANDARD_GUITAR_STRINGS: readonly MnxTuningEntry[] = [
   { string: 6, pitch: { step: 'E', octave: 2 } }
 ];
 
-/** part._x.mnxLab.tab — v5 keeps only `staffKind` here. */
+/** part._x.mnxLab.tab — v5+ keeps only `staffKind` here. */
 export interface MnxTabPartExtension {
   /** The part's preferred presentation; tab-ness is a view, not content. */
   staffKind?: 'notation' | 'tab' | 'both';

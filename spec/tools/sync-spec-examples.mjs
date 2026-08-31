@@ -100,7 +100,7 @@ function main() {
   const localVersion = ctx.mnxSchemaVersion;
   if (localVersion && schemaVersion && localVersion !== schemaVersion) {
     console.warn(
-      `\n  WARNING: schemas/mnx-schema.json is version ${localVersion} but the pinned spec is ` +
+      `\n  WARNING: spec/mnx-schema.json is version ${localVersion} but the pinned spec is ` +
         `version ${schemaVersion}.\n  The corpus will be generated from examples the local ` +
         `validator does not match. Re-vendor the schema or move the submodule pin.\n`
     );

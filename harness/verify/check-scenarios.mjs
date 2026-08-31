@@ -66,6 +66,8 @@ export function createContext() {
     mnxDefs: new Set(Object.keys(mnxSchema.$defs ?? {})),
     // The trailing segment of the schema's $id: ".../mnx-schema.json/version/19".
     mnxSchemaVersion: /\/version\/(\d+)$/.exec(mnxSchema.$id ?? '')?.[1] ?? null,
+    // The extension schema's major version, from its $id: ".../v6".
+    extensionVersion: /\/v(\d+)$/.exec(extSchema.$id ?? '')?.[1] ?? null,
     validateMnx: ajv.compile(mnxSchema),
     validateMeta: ajv.compile(metaSchema),
     validateNoteExt: ajv.getSchema(`${extSchema.$id}#/$defs/note-ext`),
@@ -324,6 +326,20 @@ function main() {
   let allWarnings = [];
   const statusCounts = {};
   const coveredDefs = new Set();
+
+  // The manifest restates both schema versions for the workbench's facts
+  // panel; a restated number nothing checks is how the corpus shipped
+  // "extensionVersion: 5" for a v6 schema. Assert both against the $ids.
+  if (String(ctx.manifest.mnxSchemaVersion) !== String(ctx.mnxSchemaVersion)) {
+    allErrors.push(
+      `manifest.json: mnxSchemaVersion is ${ctx.manifest.mnxSchemaVersion} but spec/mnx-schema.json's $id says ${ctx.mnxSchemaVersion}`
+    );
+  }
+  if (String(ctx.manifest.extensionVersion) !== String(ctx.extensionVersion)) {
+    allErrors.push(
+      `manifest.json: extensionVersion is ${ctx.manifest.extensionVersion} but spec/mnx-lab-extensions.schema.json's $id says ${ctx.extensionVersion}`
+    );
+  }
 
   for (const scenario of corpus) {
     const { errors, warnings, meta } = checkScenario(scenario, ctx);

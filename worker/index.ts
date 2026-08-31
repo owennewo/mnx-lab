@@ -2,11 +2,11 @@
 // build) are served by Workers Assets in front of this Worker; any request
 // not matching an asset invokes it.
 //
-// The Worker is NOT the workbench's backend — it is a secrets-and-validation
-// proxy for the assist loop (the OpenRouter key and the validating retry loop
-// belong server-side), plus two reserved 501 seams for the future studio
-// product. The workbench must stay fully functional (minus live AI edits)
-// from static build output alone.
+// The Worker is NOT the workbench's backend — it is the DEMO for a visitor
+// with no OpenRouter key of their own (core-assist-byok: with a key the whole
+// edit loop runs in the browser), plus two reserved 501 seams for the future
+// studio product. Every done frame it produces is stamped demoMode/mockMode.
+// The workbench must stay fully functional from static build output alone.
 import { Hono } from 'hono';
 import { editNotation } from './api/editNotation.ts';
 import { modelsRoute } from './api/models.ts';
