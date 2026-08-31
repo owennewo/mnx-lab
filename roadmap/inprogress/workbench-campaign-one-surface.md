@@ -88,7 +88,7 @@ is one popover or the tray, and one work item.
 | 8 | **Rhythm** (~~`Shift+R`~~ freed) | container pills are **read-only** (`tuplet: 3:2`, dotted, refuse Enter); full-measure rest / measure repeat pills exist at voiceMeasure | **gap: the missing verb** — the `setContainerProperties`-class op the residue ledger names, plus a construction story for tuplet/grace/authored-silence declarations (contract §2: construction is a verb) | ✅ [built 2026-08-31](../complete/workbench-one-surface-rhythm.md) |
 | 9 | **Part** (~~`Shift+P`~~ freed) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | ✅ [built 2026-08-31](../complete/workbench-one-surface-part.md) |
 | 10 | **Layout** (~~`Shift+S`~~ freed → **shift slide**) | nothing — no document-rung pills exist | the document rung grows its pill families from `parseLayoutSentence`'s grammar (sources, systems, quoted names — the largest parser in the file); likely splits into sub-items when picked up | ✅ [built 2026-08-31](../complete/workbench-one-surface-layout.md) |
-| 11a | **The tray's attribute tiles** | every set/remove/toggle tile is a mouse-spelling of a word, key or pill the inspector already has (markings, dynamics, techniques, bar toggles, accidental/ottava/dots/tie, duration steppers, respell, staff-kind ×4, slur/beam) | item-1-shaped: census each tile's intent → point at the covering surface → delete; no new ops expected | row (split 2026-08-31) |
+| 11a | **The tray's attribute tiles** | every set/remove/toggle tile is a mouse-spelling of a word, key or pill the inspector already has (markings, dynamics, techniques, bar toggles, accidental/ottava/dots/tie, duration steppers, respell, staff-kind ×4, slur/beam) | item-1-shaped: census each tile's intent → point at the covering surface → delete; no new ops expected | ✅ [built 2026-08-31](../complete/workbench-one-surface-tray-attrs.md) |
 | 11b | **The tray's verbs + shell** (`/`) | the verb tiles collapse into rung-generic gestures the keymap already owns: insert-sibling (`I`/`Shift+I` = `insertAtRung`, cursor follows), delete/clear (`Del`'s ladder), closures (Home/End/Ctrl+A/Alt+V), history | test the thesis; build the one missing generic — **construct the missing child** (`new-voice` → a `voice` declaration word at partMeasure); dispose the four blocked-residue rows (the `arpeggio` blocker looks stale — verify first); demolish the uninhabited popover frame; retire the tray shell + `/`, discoverability to the `?` legend + palette `>`; settle the triage ledger (../proposed/core-selection-tray-residue.md) | row (split 2026-08-31) |
 
 The order inside 1–5 is near-arbitrary (all five are census-and-sweep); they are
@@ -112,6 +112,15 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Progress + learnings log
 
+- **2026-08-31 — item 11a (tray attribute tiles) built.** 34 tiles, five
+  factory helpers, twelve bands, two more glyph twins — all gone, no new ops,
+  as the split predicted. The honest work was in the tests: six retired with
+  their subjects, five re-fixtured (they tested session semantics through
+  tile fixtures — mixed state now reads off the document), one retired with a
+  pointer at the inspector pills that inherited its read. 11b inherits a
+  verbs-only tray, a global tab of four, and an itemized shell-demolition
+  bill (`SessionView`'s attribute fields and the projection filter have zero
+  registry consumers left).
 - **2026-08-31 — item 11 split into 11a/11b** (user decision, census-grounded).
   The tray's ~40 surviving tiles divide cleanly: **11a** = attribute tiles,
   every one a redundant spelling of an existing word/key/pill — a pure sweep;

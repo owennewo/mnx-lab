@@ -113,15 +113,7 @@ describe('removal from any covered position', () => {
 });
 
 describe('the tiles read the coincidence', () => {
-  it('the slur tile is ACTIVE over the covering range, and the beam tile over its beam', () => {
-    const find = (id: string) => COMMANDS.find(command => command.id === id)!;
-    const slurRange = rangeSession(1, 2);
-    expect(commandState(find('slur'), sessionView(slurRange))).toBe('active');
-    const beamRange = rangeSession(0, 1);
-    expect(commandState(find('beam'), sessionView(beamRange))).toBe('active');
-    // A range covering neither reads available, not active.
-    const bare = rangeSession(3, 3);
-    expect(commandState(find('slur'), sessionView(bare))).toBe('available');
-    expect(commandState(find('beam'), sessionView(bare))).toBe('available');
-  });
+  // The slur/beam TILES retired with 11a (one-surface campaign); the
+  // coincidence read they exercised survives as the inspector's pills,
+  // pinned in rung-inspector.test.ts.
 });

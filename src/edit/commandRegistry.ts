@@ -27,7 +27,7 @@ import { spannersUnderSelection, type SpannerCoincidence } from './spannerCoinci
 import type { Projection } from './cursor.ts';
 import type { MnxGlobalMeasure, MnxStructure } from '../model/mnx.ts';
 import type { MeasureAttributeKind } from './ops.ts';
-import { eventAtAddress, hasSlurStartingAt, techniqueAt } from './ops.ts';
+import { eventAtAddress } from './ops.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
 
 /**
@@ -305,13 +305,6 @@ export function sessionView(session: SessionLike): SessionView {
   };
 }
 
-function memberState<T>(members: readonly (readonly T[])[], value: T): boolean | 'mixed' {
-  if (members.length === 0) return false;
-  const active = members.filter(values => values.includes(value)).length;
-  if (active === 0) return false;
-  return active === members.length ? true : 'mixed';
-}
-
 /** Short, selection-honest quantity for the tray meta line. */
 export function selectionMemberSummary(view: SessionView): string {
   const noun: Record<SelectionLevel, [string, string]> = {
@@ -328,118 +321,6 @@ export function selectionMemberSummary(view: SessionView): string {
 
 // ── The table ──────────────────────────────────────────────────────────────
 
-const NOTE_EVENT: readonly CommandScope[] = ['note', 'event'];
-
-/** A marking tile: on when the event carries it, and the same tile removes it
- *  (the design's rule — an active tile IS the remove). */
-function marking(
-  id: string,
-  smufl: string,
-  label: string,
-  markingName: string
-): EditorCommand {
-  return {
-    id,
-    scopes: NOTE_EVENT,
-    glyph: { smufl },
-    label,
-    tier: 'popover',
-    isActive: view => memberState(view.memberMarkings, markingName),
-    action: view => ({
-      intent: memberState(view.memberMarkings, markingName) === true
-        ? { type: 'removeMarking', marking: markingName }
-        : { type: 'setMarking', marking: markingName }
-    })
-  };
-}
-
-/** A dynamic tile: the part-measure's positioned family (item 8's second op
- *  pair). Activeness needs an onset-scan the view does not carry, so these
- *  stay stateless — pressing sets, and removal goes through the popover. */
-function dynamic(id: string, smufl: string, label: string, value: string): EditorCommand {
-  return {
-    id,
-    scopes: ['event'],
-    glyph: { smufl },
-    label,
-    tier: 'popover',
-    action: () => ({
-      intent: {
-        type: 'setPositioned',
-        attribute: { kind: 'dynamic', value: value as never }
-      }
-    })
-  };
-}
-
-/** A bar-attribute tile: item 7's ten kinds, one verb, `no X` strips. */
-function barAttribute(
-  id: string,
-  smufl: string,
-  label: string,
-  kind: MeasureAttributeKind,
-  make: () => EditorIntent
-): EditorCommand {
-  return {
-    id,
-    scopes: ['measure'],
-    glyph: { smufl },
-    label,
-    tier: 'popover',
-    isActive: view => memberState(view.memberBarAttributes, kind),
-    action: view => ({
-      intent: memberState(view.memberBarAttributes, kind) === true
-        ? { type: 'removeMeasureAttribute', kind }
-        : make()
-    })
-  };
-}
-
-/** A style-specific barline tile. Barline styles share one attribute kind,
- *  so kind-only state would make every style look active at once. */
-function barlineStyle(
-  id: string,
-  smufl: string,
-  label: string,
-  type: BarlineType
-): EditorCommand {
-  return {
-    id,
-    scopes: ['measure'],
-    glyph: { smufl },
-    label,
-    tier: 'popover',
-    isActive: view => memberState(view.memberBarlineTypes, type),
-    action: view => ({
-      intent: memberState(view.memberBarlineTypes, type) === true
-        ? { type: 'removeMeasureAttribute', kind: 'barline' }
-        : { type: 'setMeasureAttribute', attribute: { kind: 'barline', type } }
-    })
-  };
-}
-
-/** A tab-technique tile (item 9): its reserved letter, tab projection only. */
-function technique(
-  id: string,
-  smufl: string,
-  label: string,
-  kind: 'bend' | 'slide' | 'hammerPull' | 'vibrato' | 'palmMute' | 'harmonic',
-  shortcut: string
-): EditorCommand {
-  return {
-    id,
-    scopes: ['note'],
-    glyph: { smufl },
-    label,
-    shortcut,
-    tier: 'key',
-    projection: 'tab',
-    isActive: view =>
-      view.noteKey !== null && techniqueAt(view.doc, view.noteKey, kind) !== undefined,
-    action: () => ({ intent: { type: 'toggleTechnique', kind } })
-  };
-}
-
 /**
  * The registry. Order is display order within a rung.
  *
@@ -449,125 +330,17 @@ function technique(
  */
 export const COMMANDS: readonly EditorCommand[] = [
   // ── note ────────────────────────────────────────────────────────────────
-  {
-    id: 'tie',
-    scopes: ['note'],
-    glyph: { arc: 'tie' },
-    label: 'Tie to next note',
-    shortcut: 'T',
-    tier: 'key',
-    isActive: view => view.tied,
-    action: () => ({ intent: { type: 'toggleTie' } })
-  },
   // The two anchor gestures (campaign items 10/11). Both SPAN — note→note and
   // event→event. The anchor form is armed and closed at the note rung; the
   // selected-run form reads an EVENT range, because the floor axis
   // (core-selection-floor-axis.md) moved ranges there — so both tiles live at
   // both rungs, and the docs/tray/guards still say the same thing.
-  {
-    id: 'slur',
-    scopes: NOTE_EVENT,
-    glyph: { arc: 'slur' },
-    label: 'Slur',
-    detail: 'To the next note; at a slur’s end, extends it',
-    shortcut: 'S',
-    tier: 'key',
-    projection: 'notation',
-    isActive: view => {
-      // A range wholly covering a slur IS that slur (the coincidence rule).
-      if (view.spannerCoincidence.slurs.some(hit => hit.coverage === 'whole')) return true;
-      const start = view.noteKeys.length > 1 ? view.noteKeys[0] : view.noteKey;
-      return start !== null && start !== undefined && hasSlurStartingAt(view.doc, start);
-    },
-    action: () => ({ intent: { type: 'toggleSlur' } })
-  },
-  {
-    id: 'beam',
-    scopes: NOTE_EVENT,
-    glyph: { smufl: 'textCont8thBeamShortStem' },
-    label: 'Beam',
-    detail: 'To the next note; at a beam’s end, extends it',
-    shortcut: 'B',
-    tier: 'key',
-    projection: 'notation',
-    isActive: view => view.spannerCoincidence.beams.some(hit => hit.coverage === 'whole'),
-    action: () => ({ intent: { type: 'toggleBeam' } })
-  },
-  {
-    id: 'accidental-display',
-    scopes: ['note'],
-    glyph: { smufl: 'accidentalParensLeft' },
-    label: 'Force accidental',
-    tier: 'popover',
-    action: () => ({ intent: { type: 'setAccidentalDisplay', show: true } })
-  },
   // ONE tile, not the pick-flat/pick-sharp pair this table first drafted:
   // campaign item 6 made spelling a CYCLE (D♯ → E♭ → …, same sound), because
   // "the other spelling" has no single answer. A pair of tiles would promise
   // a choice the verb does not offer.
-  {
-    id: 'respell',
-    scopes: ['note'],
-    glyph: { smufl: 'accidentalEnharmonicEquals' },
-    label: 'Respell enharmonically',
-    detail: 'Cycles',
-    shortcut: 'J',
-    tier: 'key',
-    action: () => ({ intent: { type: 'respellNote' } })
-  },
-  marking('staccato', 'articStaccatoAbove', 'Staccato', 'staccato'),
-  marking('accent', 'articAccentAbove', 'Accent', 'accent'),
-  marking('tenuto', 'articTenutoAbove', 'Tenuto', 'tenuto'),
-  marking('strong-accent', 'articMarcatoAbove', 'Marcato', 'strongAccent'),
-  marking('staccatissimo', 'articStaccatissimoAbove', 'Staccatissimo', 'staccatissimo'),
-  marking('breath', 'breathMarkComma', 'Breath mark', 'breath'),
-  technique('bend', 'brassBend', 'Bend', 'bend', 'B'),
-  technique('slide', 'guitarShake', 'Slide', 'slide', 'S'),
-  technique('hammer-pull', 'articTenutoAbove', 'Hammer-on / pull-off', 'hammerPull', 'H'),
-  technique('vibrato', 'wiggleVibratoMediumFast', 'Vibrato', 'vibrato', 'V'),
-  technique('palm-mute', 'pluckedDampAll', 'Palm mute', 'palmMute', 'X'),
-  technique('harmonic', 'stringsHarmonic', 'Natural harmonic', 'harmonic', 'O'),
 
   // ── event ───────────────────────────────────────────────────────────────
-  {
-    id: 'shorter',
-    scopes: ['event'],
-    glyph: { smufl: 'note8thUp' },
-    label: 'Shorter duration',
-    shortcut: '−',
-    tier: 'key',
-    action: () => ({ intent: { type: 'shorterDuration' } })
-  },
-  {
-    id: 'longer',
-    scopes: ['event'],
-    glyph: { smufl: 'noteHalfUp' },
-    label: 'Longer duration',
-    shortcut: '=',
-    tier: 'key',
-    action: () => ({ intent: { type: 'longerDuration' } })
-  },
-  {
-    id: 'dots',
-    scopes: ['event'],
-    glyph: { smufl: 'augmentationDot' },
-    label: 'Dot the value',
-    detail: 'Cycles 0 → 1 → 2 → none',
-    shortcut: '.',
-    tier: 'key',
-    action: () => ({ intent: { type: 'toggleDots' } })
-  },
-  dynamic('piano', 'dynamicPiano', 'Piano', 'p'),
-  dynamic('mezzo-forte', 'dynamicMF', 'Mezzo-forte', 'mf'),
-  dynamic('forte', 'dynamicForte', 'Forte', 'f'),
-  {
-    id: 'ottava',
-    scopes: ['event'],
-    glyph: { smufl: 'ottavaAlta' },
-    label: 'Ottava alta',
-    tier: 'popover',
-    action: () => ({ intent: { type: 'setPositioned', attribute: { kind: 'ottava', value: 1 } } })
-  },
   {
     id: 'arpeggio',
     scopes: ['event'],
@@ -713,24 +486,6 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
 
   // ── measure (the global bar) ────────────────────────────────────────────
-  barAttribute('repeat-start', 'repeatLeft', 'Repeat start', 'repeatStart', () => ({
-    type: 'setMeasureAttribute',
-    attribute: { kind: 'repeatStart' }
-  })),
-  barAttribute('repeat-end', 'repeatRight', 'Repeat end', 'repeatEnd', () => ({
-    type: 'setMeasureAttribute',
-    attribute: { kind: 'repeatEnd' }
-  })),
-  barlineStyle('double-barline', 'barlineDouble', 'Double barline', 'double'),
-  barlineStyle('final-barline', 'barlineFinal', 'Final barline', 'final'),
-  barAttribute('segno', 'segno', 'Segno', 'segno', () => ({
-    type: 'setMeasureAttribute',
-    attribute: { kind: 'segno' }
-  })),
-  barAttribute('coda', 'coda', 'Jump (D.S. al fine)', 'jump', () => ({
-    type: 'setMeasureAttribute',
-    attribute: { kind: 'jump', type: 'dsalfine' }
-  })),
   {
     id: 'delete-bar',
     scopes: ['measure'],
@@ -769,14 +524,6 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
 
   // ── document ───────────────────────────────────────────────────────────────
-  {
-    id: 'staff-kind',
-    scopes: ['document'],
-    glyph: { smufl: '6stringTabClef' },
-    label: 'Staff kind: notation + tab',
-    tier: 'popover',
-    action: () => ({ intent: { type: 'setStaffKind', kind: 'both' } })
-  },
   {
     id: 'insert-bar-after',
     scopes: ['measure'],
@@ -871,30 +618,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     shortcut: 'Home',
     tier: 'key',
     action: () => ({ intent: { type: 'goToEdge', edge: 'first' } })
-  },
-  {
-    id: 'staff-kind-both',
-    scopes: ['session'],
-    glyph: { smufl: 'brace' },
-    label: 'Staff kind — notation + tab',
-    tier: 'popover',
-    action: () => ({ intent: { type: 'setStaffKind', kind: 'both' } })
-  },
-  {
-    id: 'staff-kind-tab',
-    scopes: ['session'],
-    glyph: { smufl: '6stringTabClef' },
-    label: 'Staff kind — tab only',
-    tier: 'popover',
-    action: () => ({ intent: { type: 'setStaffKind', kind: 'tab' } })
-  },
-  {
-    id: 'staff-kind-notation',
-    scopes: ['session'],
-    glyph: { smufl: 'gClef' },
-    label: 'Staff kind — notation only',
-    tier: 'popover',
-    action: () => ({ intent: { type: 'setStaffKind', kind: 'notation' } })
   }
 ];
 
@@ -958,18 +681,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       caption: 'structure',
       commands: ['insert-event-before', 'insert-event-after', 'delete-note']
     },
-    { id: 'spelling', caption: 'spelling', commands: ['respell', 'accidental-display'] },
-    { id: 'joins', caption: 'joins', commands: ['tie', 'slur', 'beam'] },
-    {
-      id: 'articulation',
-      caption: 'articulation',
-      commands: ['staccato', 'accent', 'tenuto', 'strong-accent', 'staccatissimo', 'breath']
-    },
-    {
-      id: 'fingerboard',
-      caption: 'fingerboard',
-      commands: ['bend', 'slide', 'hammer-pull', 'vibrato', 'palm-mute', 'harmonic']
-    }
     // The `text` band retired with the lyric tile (one-surface item 6): the
     // tile was its only member, and an empty band is the conformance join's
     // own red flag.
@@ -980,22 +691,11 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       caption: 'structure',
       commands: ['insert-event-before', 'insert-event-after', 'clear-event']
     },
-    { id: 'duration', caption: 'duration', commands: ['shorter', 'longer', 'dots'] },
-    { id: 'joins', caption: 'joins', commands: ['slur', 'beam'] },
     {
       id: 'articulation',
       caption: 'articulation',
-      commands: [
-        'staccato', 'accent', 'tenuto', 'strong-accent', 'staccatissimo',
-        'breath', 'arpeggio'
-      ]
+      commands: ['arpeggio']
     },
-    {
-      id: 'dynamics',
-      caption: 'dynamics',
-      commands: ['piano', 'mezzo-forte', 'forte']
-    },
-    { id: 'text', caption: 'lines & text', commands: ['ottava'] }
   ],
   // Two tiles, and the band still earns its caption: it says the one verb
   // this rung has is a structural one, rather than leaving it beside a
@@ -1023,12 +723,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       commands: ['insert-bar-before', 'insert-bar-after', 'delete-bar']
     },
     {
-      id: 'repeats',
-      caption: 'repeats & barlines',
-      commands: ['repeat-start', 'repeat-end', 'double-barline', 'final-barline']
-    },
-    { id: 'jumps', caption: 'jumps', commands: ['segno', 'coda'] },
-    {
       id: 'marks',
       caption: 'marks',
       commands: ['section-colour', 'delete-section-boundary']
@@ -1042,7 +736,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       caption: 'structure',
       commands: ['insert-part-before', 'insert-part-after', 'delete-part']
     },
-    { id: 'part', caption: 'part', commands: ['staff-kind'] },
   ]
 };
 

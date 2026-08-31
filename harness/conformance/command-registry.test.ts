@@ -253,8 +253,6 @@ describe('command registry — the joins', () => {
     // ignored so they read as debt for the triage ledger
     // (roadmap/proposed/core-selection-tray-residue.md) instead of as silence.
     const KNOWN_TWINS = new Set([
-      'note: articTenutoAbove — tenuto, hammer-pull',
-      'measure: coda — coda, section-colour',
     ]);
     const clashes: string[] = [];
     const seen = new Set<string>();
@@ -373,11 +371,11 @@ describe('command registry — the joins', () => {
     );
     expect(full.every(b => b.commands.length > 0)).toBe(true);
 
-    const survivors = all.filter(c => c.id === 'staccato');
+    const survivors = all.filter(c => c.id === 'delete-note');
     const filtered = bandsForScope('note', survivors);
     expect(filtered).toHaveLength(1);
-    expect(filtered[0].caption).toBe('articulation');
-    expect(filtered[0].commands.map(c => c.id)).toEqual(['staccato']);
+    expect(filtered[0].caption).toBe('structure');
+    expect(filtered[0].commands.map(c => c.id)).toEqual(['delete-note']);
 
     expect(bandsForScope('note', [])).toEqual([]);
   });
@@ -496,19 +494,17 @@ describe('command registry — the funnel', () => {
     // ever reached `applyOp` directly, the op would arrive with no intent
     // stamped and this would catch it.
     const session = new EditorSession(makeDoc());
-    const staccato = COMMANDS.find(c => c.id === 'staccato')!;
-    const action = staccato.action!(sessionView(session));
+    const newVoice = COMMANDS.find(c => c.id === 'new-voice')!;
+    const action = newVoice.action!(sessionView(session));
     session.handleIntent((action as { intent: never }).intent);
 
     const applied = session.opQueue.applied;
     expect(applied).toHaveLength(1);
-    expect(applied[0].op.type).toBe('setMarking');
-    expect(applied[0].intent).toEqual({ type: 'setMarking', marking: 'staccato' });
+    expect(applied[0].intent).toMatchObject({ type: (action as { intent: { type: string } }).intent.type });
 
     // …and it is undoable, like every other edit.
     expect(session.canUndo).toBe(true);
-    session.handleIntent({ type: 'undo' });
-    expect(sessionView(session).markings).toEqual([]);
+    expect(session.handleIntent({ type: 'undo' })).toBe(true);
   });
 
   it('every wired intent command is replayable from a trace', () => {
@@ -553,24 +549,6 @@ describe('command registry — rung filtering', () => {
     expect(empty).toEqual([]);
   });
 
-  it('a projection-specific command appears only in its own dialect', () => {
-    // `S` slurs in notation and slides in tab (campaign items 9/10 resolved
-    // the collision by projection) — the tray must not offer both at once.
-    const session = new EditorSession(makeDoc());
-    // A document with strings opens in the tab projection, so notation is the
-    // deliberate move here rather than the default.
-    session.handleIntent({ type: 'setProjection', projection: 'notation' });
-    const notation = sessionView(session);
-    expect(notation.projection).toBe('notation');
-    const inNotation = commandsForScope('note', notation).map(c => c.id);
-    expect(inNotation).toContain('slur');
-    expect(inNotation).not.toContain('slide');
-
-    session.handleIntent({ type: 'setProjection', projection: 'tab' });
-    const inTab = commandsForScope('note', sessionView(session)).map(c => c.id);
-    expect(inTab).toContain('slide');
-    expect(inTab).not.toContain('slur');
-  });
 });
 
 describe('command registry — state reads the document', () => {
@@ -582,103 +560,36 @@ describe('command registry — state reads the document', () => {
     expect(commandState(find('arpeggio'), view())).toBe('unavailable');
   });
 
-  it('a marking tile turns active once the mark is on the event, and removes it', () => {
-    const session = new EditorSession(makeDoc());
-    const staccato = find('staccato');
-    expect(commandState(staccato, sessionView(session))).toBe('available');
 
-    const before = sessionView(session);
-    const action = staccato.action!(before);
-    expect(action).toEqual({ intent: { type: 'setMarking', marking: 'staccato' } });
-    session.handleIntent((action as { intent: never }).intent);
 
-    const after = sessionView(session);
-    expect(commandState(staccato, after)).toBe('active');
-    // The active tile IS the remove (the design's rule).
-    expect(staccato.action!(after)).toEqual({
-      intent: { type: 'removeMarking', marking: 'staccato' }
-    });
-  });
 
-  it('a bar attribute turns active on the cursor’s own bar', () => {
-    const session = new EditorSession(makeDoc());
-    const repeatEnd = find('repeat-end');
-    expect(commandState(repeatEnd, sessionView(session))).toBe('available');
 
-    session.handleIntent({
-      type: 'setMeasureAttribute',
-      attribute: { kind: 'repeatEnd' }
-    });
-    expect(commandState(repeatEnd, sessionView(session))).toBe('active');
-
-    // Bar 2 is a different bar: the same command reads available there.
-    session.handleIntent({ type: 'goToMeasure', measureIndex: 1 });
-    expect(commandState(repeatEnd, sessionView(session))).toBe('available');
-  });
-
-  it('barline tiles track and switch their exact style', () => {
-    const session = new EditorSession(makeDoc());
-    const double = find('double-barline');
-    const final = find('final-barline');
-
-    expect(commandState(double, sessionView(session))).toBe('available');
-    expect(commandState(final, sessionView(session))).toBe('available');
-
-    session.handleIntent((final.action!(sessionView(session)) as { intent: never }).intent);
-    expect(commandState(final, sessionView(session))).toBe('active');
-    expect(commandState(double, sessionView(session))).toBe('available');
-
-    expect(double.action!(sessionView(session))).toEqual({
-      intent: {
-        type: 'setMeasureAttribute',
-        attribute: { kind: 'barline', type: 'double' }
-      }
-    });
-    session.handleIntent((double.action!(sessionView(session)) as { intent: never }).intent);
-    expect(commandState(double, sessionView(session))).toBe('active');
-    expect(commandState(final, sessionView(session))).toBe('available');
-    expect(double.action!(sessionView(session))).toEqual({
-      intent: { type: 'removeMeasureAttribute', kind: 'barline' }
-    });
-  });
-
-  it('groups the double barline with repeats and barlines', () => {
-    const repeats = COMMAND_GROUPS.measure?.find(group => group.id === 'repeats');
-    expect(repeats?.commands).toContain('double-barline');
-  });
-
-  it('the tie tile follows the note under the cursor', () => {
-    const session = new EditorSession(makeDoc());
-    const tie = find('tie');
-    expect(commandState(tie, sessionView(session))).toBe('available');
-    session.handleIntent({ type: 'toggleTie' });
-    expect(commandState(tie, sessionView(session))).toBe('active');
-  });
 
   it('a partial range is mixed, applies to all in one undo entry, and keeps the range', () => {
     const session = new EditorSession(makeDoc());
-    const staccato = find('staccato');
     session.handleIntent({ type: 'setMarking', marking: 'staccato' });
     // Two presses under the floor axis: re-level to the event, then extend.
     session.handleIntent({ type: 'extendSelection', direction: 'next' });
     session.handleIntent({ type: 'extendSelection', direction: 'next' });
     const selection = session.selection;
 
-    expect(commandState(staccato, sessionView(session))).toBe('mixed');
+    // Mixed: the first event carries the mark, the second does not (the
+    // tray's tile read retired with 11a; the inspector's partial pill and
+    // this doc-level read are the surviving witnesses).
+    const marked = (index: number) =>
+      (session.doc.parts?.[0].measures?.[0].sequences?.[0].content?.[index] as { markings?: object })?.markings !== undefined;
+    expect([marked(0), marked(1)]).toEqual([true, false]);
     expect(selectionMemberSummary(sessionView(session))).toBe('2 events');
-    expect(staccato.action!(sessionView(session))).toEqual({
-      intent: { type: 'setMarking', marking: 'staccato' }
-    });
 
     const entries = session.opQueue.applied.length;
     session.handleIntent({ type: 'setMarking', marking: 'staccato' });
     expect(session.opQueue.applied).toHaveLength(entries + 1);
     expect(session.opQueue.applied.at(-1)?.op).toMatchObject({ type: 'batch' });
-    expect(commandState(staccato, sessionView(session))).toBe('active');
+    expect([marked(0), marked(1)]).toEqual([true, true]);
     expect(session.selection).toEqual(selection);
 
     session.handleIntent({ type: 'undo' });
-    expect(commandState(staccato, sessionView(session))).toBe('mixed');
+    expect([marked(0), marked(1)]).toEqual([true, false]);
     expect(session.selection).toEqual(selection);
   });
 
@@ -716,7 +627,6 @@ describe('command registry — state reads the document', () => {
     });
     bars.handleIntent({ type: 'extendSelection', direction: 'next' });
     const barSelection = bars.selection;
-    expect(commandState(find('repeat-end'), sessionView(bars))).toBe('mixed');
     expect(bars.handleIntent({
       type: 'setMeasureAttribute',
       attribute: { kind: 'repeatEnd' }
@@ -741,7 +651,6 @@ describe('command registry — state reads the document', () => {
       toNoteKey: 'n2'
     });
     expect(slur.selection).toEqual(selection);
-    expect(commandState(find('slur'), sessionView(slur))).toBe('active');
 
     const beamDoc = makeDoc();
     const events = beamDoc.parts[0].measures?.[0].sequences?.[0].content ?? [];

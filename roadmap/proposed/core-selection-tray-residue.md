@@ -64,6 +64,13 @@
 > [core-selection-tray-visuals.md](../complete/core-selection-tray-visuals.md) and
 > [core-selection-tray-mechanism.md](../complete/core-selection-tray-mechanism.md).
 
+
+> **2026-08-31 — 11a note:** the one-surface campaign retired every attribute
+> tile ([workbench-one-surface-tray-attrs.md](../complete/workbench-one-surface-tray-attrs.md)),
+> so the triage tables below now list many placements that no longer exist.
+> The ledger's settlement — tick, trim, or retire — is item 11b's, per the
+> campaign's split.
+
 ## The claim
 
 The registry has **85 rows across 96 placements** — one command in one rung's tab is one
