@@ -50,10 +50,6 @@ export function setSmuflBasePath(base: string): void {
   defaultBasePath = base.replace(/\/+$/, '');
 }
 
-export function smuflBasePath(): string {
-  return defaultBasePath;
-}
-
 export function loadSmufl(options: SmuflLoadOptions = {}): Promise<void> {
   if (loadPromise) return loadPromise;
   const base = options.basePath ?? defaultBasePath;
@@ -134,12 +130,4 @@ export function glyphBBox(
     w: neX - swX,
     h: neY - swY
   };
-}
-
-/**
- * Default engraving values from the font (line thicknesses, etc.) in staff spaces.
- * Falls back to a SMuFL-recommended default if the key is missing.
- */
-export function engravingDefault(key: string, fallback = 0): number {
-  return metadata?.engravingDefaults?.[key] ?? fallback;
 }

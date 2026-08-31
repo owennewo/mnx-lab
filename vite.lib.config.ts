@@ -19,7 +19,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // Consumers bring their own Lit; everything else is self-contained.
-      external: [/^lit/, /^@lit\//, /^tone$/]
+      external: [/^lit/, /^@lit\//]
     }
   }
 });

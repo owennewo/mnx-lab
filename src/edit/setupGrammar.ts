@@ -745,9 +745,6 @@ function resolveMarking(word: string): string | null {
 // verse metadata at the document — and the planned lyric text surface
 // (workbench-one-surface-lyrics.md phase 2) consumes it for headers.
 
-export const LYRIC_HELP =
-  'sleep- · -ing · 2: Am · line 2 Nederlands nl · no lyric · no line 2';
-
 export type LyricResult =
   | { syllable: string; line: string; syllableType?: 'start' | 'middle' | 'end' | 'whole' }
   | { removeSyllable: string }
@@ -822,8 +819,6 @@ const NOTE_VALUES: Record<string, MnxNoteValueBase> = {
   '64th': '64th',
   '128th': '128th'
 };
-
-export const NOTE_VALUE_NAMES = Object.keys(NOTE_VALUES);
 
 /** A wrap whose note values may still be blank — the parser cannot see the
  *  document, and an unqualified `3:2` means "at whatever value the cursor is

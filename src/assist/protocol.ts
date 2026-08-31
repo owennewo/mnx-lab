@@ -61,7 +61,3 @@ export interface DoneFrame {
 }
 
 export type EditFrame = ProgressFrame | DoneFrame;
-
-export function isDoneFrame(frame: EditFrame): frame is DoneFrame {
-  return frame.type === 'done';
-}

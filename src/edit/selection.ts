@@ -588,19 +588,6 @@ export function resolveSelection(
   return { members, noteKeys: [...new Set(noteKeys)] };
 }
 
-/** Compatibility surface for the existing overlay callers. New range-aware
- * consumers should retain the full `ResolvedSelection`, including structural
- * members for rests and empty bar copies. */
-export function selectionNoteKeys(
-  doc: MnxStructure,
-  _grid: PositionGrid,
-  cursor: EditorCursor,
-  level: SelectionLevel,
-  projection: Projection
-): string[] {
-  return resolveSelection(doc, pointSelection(level, cursor), projection).noteKeys;
-}
-
 // ── Container coincidence (core-selection-range-grain.md) ──────────────────
 //
 // The container rung retired: a tuplet/grace/tremolo is coextensive with the

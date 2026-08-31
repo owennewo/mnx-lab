@@ -43,12 +43,6 @@ export function techniqueOf(note: MnxNote): MnxTabTechnique | undefined {
   return note._x?.mnxLab?.tab?.technique;
 }
 
-/** Does this note carry any technique at all? (Cheap gate for the walks.) */
-export function hasTechnique(note: MnxNote): boolean {
-  const t = techniqueOf(note);
-  return t !== undefined && Object.keys(t).length > 0;
-}
-
 // ---------- Sites: what a layout records as it emits ----------
 
 /**

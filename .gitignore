@@ -6,3 +6,7 @@ dist/
 *.log
 .DS_Store
 .claude/settings.local.json*
+
+# Codex-agent mirrors, untracked by decision (audit-cleanup): .claude/ is canonical
+AGENTS.md
+.agents/

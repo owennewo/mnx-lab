@@ -20,27 +20,6 @@ export function syntheticNoteKey(
 }
 
 /**
- * The key for a note inside a CONTAINER (tuplet, grace, tremolo): the
- * container's own slot, then the inner event's index within it.
- *
- * A container holds several events at one `content` index, so the flat form
- * above would give all of them the same name — the collision that made
- * container content unaddressable (campaign item 11b). One extra segment fixes
- * it, and because `model/noteWalk.ts` is now the only place coordinates are
- * produced, this shape is that module's business rather than a five-file
- * contract.
- */
-export function syntheticContainerNoteKey(
-  measureIndex: number,
-  voiceIndex: number,
-  eventIndex: number,
-  containerIndex: number,
-  noteIndex: number
-): string {
-  return `@m${measureIndex}.v${voiceIndex}.e${eventIndex}.c${containerIndex}.n${noteIndex}`;
-}
-
-/**
  * The general positional key. Every segment is OPTIONAL except the ones the
  * original form always carried, so keys written before parts and staves became
  * addressable are byte-identical under the new grammar:
@@ -105,8 +84,4 @@ export function syntheticEventKey(coords: {
   const staff = (coords.staffIndex ?? 1) > 1 ? `.s${coords.staffIndex}` : '';
   const container = coords.containerIndex === undefined ? '' : `.c${coords.containerIndex}`;
   return `@${part}m${coords.measureIndex}${staff}.v${coords.voiceIndex}.e${coords.eventIndex}${container}`;
-}
-
-export function isSyntheticNoteKey(key: string): boolean {
-  return key.startsWith('@m');
 }

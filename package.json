@@ -35,6 +35,7 @@
     "check:scenarios": "node harness/verify/check-scenarios.mjs",
     "check:boundaries": "depcruise src worker harness --config .dependency-cruiser.cjs",
     "sync:spec": "node spec/tools/sync-spec-examples.mjs",
+    "push:proposal": "node spec/tools/push-proposal.mjs",
     "update:primitives": "UPDATE_PRIMITIVES=1 vitest run harness/conformance/primitives.test.ts",
     "update:edit-traces": "UPDATE_EDIT_TRACES=1 vitest run harness/conformance/edit-traces.test.ts",
     "sweep:destruct": "UPDATE_DESTRUCT_SWEEP=1 vitest run harness/conformance/destruct-sweep.test.ts",
@@ -46,14 +47,11 @@
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
-    "@awesome.me/webawesome": "^3.7.0",
     "@coderline/alphatab": "^1.8.4",
     "@fontsource/archivo": "^5.3.0",
     "@lit/context": "^1.1.3",
     "hono": "^4.12.25",
-    "idb-keyval": "^6.2.4",
-    "lit": "^3.3.3",
-    "tone": "^15.1.22"
+    "lit": "^3.3.3"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.40.1",

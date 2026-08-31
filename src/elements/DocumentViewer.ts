@@ -1183,5 +1183,3 @@ export class DocumentViewer extends LitElement {
   }
 
 }
-
-export default DocumentViewer;

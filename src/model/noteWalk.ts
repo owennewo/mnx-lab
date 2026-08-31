@@ -49,11 +49,6 @@ export interface NoteAddress {
   sequence: MnxSequence;
 }
 
-/** The staff-1 filter, in one place rather than restated per traversal. */
-export function isEntryStaff(sequence: MnxSequence): boolean {
-  return (sequence.staff ?? 1) === 1;
-}
-
 /** The key a note carries at these coordinates: its id, else positional. */
 export function noteKeyAt(
   note: MnxNote,

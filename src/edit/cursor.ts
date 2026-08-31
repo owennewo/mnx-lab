@@ -263,10 +263,6 @@ function scaleOnset(span: Onset, scale: Onset): Onset {
   return reduce(span.num * scale.num, span.den * scale.den);
 }
 
-/** The key a note carries at these coordinates. Re-exported from the canonical
- *  walk (`model/noteWalk.ts`) so the editor and the layouts cannot drift. */
-export const noteKeyOf = noteKeyAt;
-
 /** Visit every note with the selection key the layouts would give it. This is
  *  the addressing scheme EditOps resolve against — now a thin wrapper over
  *  the one enumeration that defines it. */

@@ -155,39 +155,3 @@ export function pointerToDisplayPath(pointer: string): string {
     .join('')
     .replace(/^\./, '');
 }
-
-const SHARP = '♯';
-const FLAT = '♭';
-
-export interface NoteDescription {
-  /** e.g. G♯4 */
-  label: string;
-  /** 1-based measure number. */
-  measure: number;
-}
-
-/** Finds a note by selection key and describes it for the status bar. */
-export function describeNote(doc: unknown, key: string): NoteDescription | null {
-  const parts = (doc as MnxDocish)?.parts ?? [];
-  let found: NoteDescription | null = null;
-  (parts[0]?.measures ?? []).forEach((measure, m) => {
-    let voiceIndex = -1;
-    (measure?.sequences ?? []).forEach(seq => {
-      if (!(seq?.staff === 1 || seq?.staff === undefined)) return;
-      voiceIndex++;
-      (seq?.content ?? []).forEach((event, e) => {
-        (event?.notes ?? []).forEach((note, n) => {
-          const k = noteKeyAt(note as never, m, voiceIndex, e, n);
-          if (k !== key || found) return;
-          const p = note?.pitch;
-          const acc = p?.alter === 1 ? SHARP : p?.alter === -1 ? FLAT : '';
-          found = {
-            label: p ? `${p.step ?? '?'}${acc}${p.octave ?? ''}` : key,
-            measure: m + 1
-          };
-        });
-      });
-    });
-  });
-  return found;
-}

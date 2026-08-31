@@ -1,8 +1,9 @@
 // Reserved seam — STUB by design (structure-lab). The workbench must never
-// use this: it has no backend by rule (documents live in IndexedDB, the
-// corpus is committed JSON). CloudRepository exists so the future studio
-// product has a typed client for the equally-reserved /api/documents route
-// (worker/api/documents.ts, currently 501) when it starts.
+// use this: it has no backend by rule (the corpus is committed JSON, and the
+// only browser persistence today is localStorage UI preferences).
+// CloudRepository exists so the future studio product has a typed client for
+// the equally-reserved /api/documents route (worker/api/documents.ts,
+// currently 501) when it starts.
 import type { MnxDocument } from '../model/mnx.ts';
 import type { DocumentRepository } from './repository.ts';
 

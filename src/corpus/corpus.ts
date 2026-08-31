@@ -118,66 +118,6 @@ export const corpusManifest = {
   specSynced: (manifest.specExamples as { synced?: string }).synced ?? ''
 };
 
-// ---------- filtering (one flat filter feeds every shelving facet) ----------
-
-export type StatusFilter = 'all' | 'verified' | 'rendered' | 'needs' | 'gaps';
-export type Facet = 'category' | 'status' | 'source' | 'def';
-
-export interface LibraryFilter {
-  status: StatusFilter;
-  query: string;
-  idRefsOnly: boolean;
-}
-
-export function matchesFilter(e: ScenarioEntry, f: LibraryFilter): boolean {
-  if (f.idRefsOnly && !e.meta.idRefs) return false;
-  const st = e.meta.status;
-  if (f.status === 'verified' && st !== 'verified') return false;
-  if (f.status === 'rendered' && !(st === 'rendered' || st === 'verified')) return false;
-  if (f.status === 'needs' && !((st === 'valid' || st === 'draft') && !e.invalidByDesign)) return false;
-  if (f.status === 'gaps' && !e.invalidByDesign) return false;
-  if (f.query) {
-    const q = f.query.toLowerCase();
-    if (
-      !e.meta.title.toLowerCase().includes(q) &&
-      !e.id.toLowerCase().includes(q) &&
-      !(e.meta.tags ?? []).some(t => t.toLowerCase().includes(q)) &&
-      !(e.meta.coversDefs ?? []).some(d => d.toLowerCase().includes(q))
-    ) {
-      return false;
-    }
-  }
-  return true;
-}
-
-export function filterCorpus(f: LibraryFilter): ScenarioEntry[] {
-  return corpus.filter(e => matchesFilter(e, f));
-}
-
-export interface StatusCounts {
-  all: number;
-  verified: number;
-  rendered: number;
-  needs: number;
-  gaps: number;
-  idRefs: number;
-}
-
-/** Counts for the rail's filter chips — always global, never post-filter. */
-export function statusCounts(): StatusCounts {
-  const all = corpus;
-  return {
-    all: all.length,
-    verified: all.filter(e => e.meta.status === 'verified').length,
-    rendered: all.filter(e => e.meta.status === 'rendered' || e.meta.status === 'verified').length,
-    needs: all.filter(
-      e => (e.meta.status === 'valid' || e.meta.status === 'draft') && !e.invalidByDesign
-    ).length,
-    gaps: all.filter(e => e.invalidByDesign).length,
-    idRefs: all.filter(e => e.meta.idRefs).length
-  };
-}
-
 // ---------- feature-def coverage (the dashboard's progress metric) ----------
 
 export interface Coverage {

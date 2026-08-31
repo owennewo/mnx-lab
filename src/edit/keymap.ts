@@ -330,8 +330,6 @@ export const PENDING_PRECEDENCE = [
   'selection'
 ] as const;
 
-export type PendingConsumer = (typeof PENDING_PRECEDENCE)[number];
-
 function matches(binding: KeyStroke, stroke: KeyStroke): boolean {
   return (
     binding.code === stroke.code &&

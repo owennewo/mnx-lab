@@ -289,7 +289,3 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
 export function isNavigationIntent(intent: EditorIntent): intent is NavigationIntent {
   return NAVIGATION_TYPES.has(intent.type);
 }
-
-export function isHistoryIntent(intent: EditorIntent): intent is HistoryIntent {
-  return intent.type === 'undo' || intent.type === 'redo';
-}
