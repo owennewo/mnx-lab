@@ -865,15 +865,6 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
 
   // ── measure (the global bar) ────────────────────────────────────────────
-  {
-    id: 'time-signature',
-    scopes: ['measure'],
-    glyph: { smufl: 'timeSig4' },
-    label: 'Time signature…',
-    shortcut: 'Shift+T',
-    tier: 'popover',
-    action: () => ({ surface: 'timeSignaturePopover' })
-  },
   barAttribute('repeat-start', 'repeatLeft', 'Repeat start', 'repeatStart', () => ({
     type: 'setMeasureAttribute',
     attribute: { kind: 'repeatStart' }
@@ -1136,15 +1127,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ surface: 'partPopover' })
   },
   {
-    id: 'doc-time',
-    scopes: ['session'],
-    glyph: { smufl: 'timeSig4' },
-    label: 'Time signature…',
-    shortcut: 'Shift+T',
-    tier: 'popover',
-    action: () => ({ surface: 'timeSignaturePopover' })
-  },
-  {
     id: 'doc-tuning',
     scopes: ['session'],
     glyph: { smufl: '6stringTabClef' },
@@ -1311,7 +1293,7 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     {
       id: 'signatures',
       caption: 'signatures',
-      commands: ['clef', 'time-signature']
+      commands: ['clef']
     },
     {
       id: 'repeats',

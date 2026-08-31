@@ -1,6 +1,6 @@
 # One editing surface — retire the popovers and the tray into the inspector
 
-> **Status: in progress 2026-08-31 — campaign; item 1 built the same day.** The three-surface experiment run by
+> **Status: in progress 2026-08-31 — campaign; items 1–2 built the same day.** The three-surface experiment run by
 > [workbench-rung-inspector.md](workbench-rung-inspector.md) ("a third
 > editing surface, to be tried *beside* the tray and the popovers so that use decides
 > which wins") has its verdict: **the inspector wins.** The user's ruling, 2026-08-31:
@@ -79,7 +79,7 @@ is one popover or the tray, and one work item.
 | # | Surface (key) | Inspector coverage today | What the item must close | Status |
 |---|---|---|---|---|
 | 1 | **Key signature** (~~`Shift+K`~~ freed) | `key` pill, stage 3 — reuses `parseKeySignature`, `inherit` = Backspace floor | census + removal sweep only | ✅ [built 2026-08-31](../complete/workbench-one-surface-key.md) |
-| 2 | **Time signature** (`Shift+T`) | `time` pill, stage 3 — reuses `parseTimeSignature`, floor when declared | census + removal sweep only | row |
+| 2 | **Time signature** (~~`Shift+T`~~ freed) | `time` pill, stage 3 — reuses `parseTimeSignature`, floor when declared | census + removal sweep only | ✅ [built 2026-08-31](../complete/workbench-one-surface-time.md) |
 | 3 | **Clef** (`Shift+C`) | `clef` pill at partMeasure, stage 4 — reuses `parseClef` | verify the registry's `measure` cross-listing loses nothing; sweep | row |
 | 4 | **Bar attributes** (`Shift+B`) | one pill per declared attribute, stage 3 — reuses `parseBarAttribute`; the rhythm riders live as voiceMeasure pills | verify all ten kinds + `tempo#n` array + segno/fine `at` forms; sweep | row |
 | 5 | **Adornments** (`Shift+A`) | markings/positioned pills, stage 4 — reuses `parseAdornment` | verify breadth (all markings, dynamics, directions incl. glyphs); sweep | row |
@@ -111,6 +111,12 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Progress + learnings log
 
+- **2026-08-31 — item 2 (time signature) built.** First global-tab casualty:
+  `doc-time` (scope `session`) deleted along with the measure tile — the
+  session-scope `doc-*` tiles are ungrouped, so removal is tile-only; items 7
+  and 9 meet the same shape (`doc-tuning`, `doc-add-part`). Two assertions
+  added for the display/`inherit` forms; otherwise coverage pre-existed, as
+  item 1 predicted.
 - **2026-08-31 — item 1 (key signature) built.** Ruling: freed keys are **freed,
   not accelerators** — no inspector pre-fill on the retired mnemonic; a key edit
   is Enter → bar rung → `key Bb`. The ruling is the campaign default for items

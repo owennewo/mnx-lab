@@ -201,6 +201,12 @@ describe('the typeahead is derived from the union', () => {
     expect(parseInspectorLine('measure', 'time', '3/4')).toEqual({
       intent: { type: 'setTimeSignature', count: 3, unit: 4 }
     });
+    // The popover's whole grammar reaches the ops through this line — the
+    // retirement (one-surface campaign item 2) leans on these two forms.
+    expect(parseInspectorLine('measure', 'time', 'common')).toEqual({
+      intent: { type: 'setTimeSignature', count: 4, unit: 4, display: 'common' }
+    });
+    expect(parseInspectorLine('measure', 'time', 'inherit')).toEqual({ intent: { type: 'removeTimeSignature' } });
     expect(parseInspectorLine('measure', 'key', keyWord(3))).toEqual({
       intent: { type: 'setKeySignature', fifths: 3 }
     });

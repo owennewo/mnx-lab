@@ -449,12 +449,6 @@ export const KEY_DOCS: KeyDoc[] = [
   // ── Setup — the typed popovers (shell actions: a trace records the intent
   // the popover emits, never its opening).
   {
-    keys: 'Shift+T',
-    strokes: [{ code: 'KeyT', shift: true }],
-    group: 'setup',
-    meaning: { all: 'time signature… (typed popover: 4/4, 6/8; `inherit` un-declares)' }
-  },
-  {
     keys: 'Shift+U',
     strokes: [{ code: 'KeyU', shift: true }],
     group: 'setup',
@@ -609,7 +603,6 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'nextPosition',
     'prevPosition'
   ],
-  timeSignaturePopover: ['setTimeSignature', 'removeTimeSignature'],
   tuningPopover: ['setTuning'],
   partPopover: [
     'addPart',

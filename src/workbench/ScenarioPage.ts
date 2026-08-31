@@ -71,7 +71,6 @@ import {
   parseClef,
   parsePart,
   parseLayoutSentence,
-  parseTimeSignature,
   parseTuning,
   TUNING_PRESET_NAMES
 } from '../edit/setupGrammar.ts';
@@ -129,15 +128,10 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
 type PopoverKind =
-  | 'time' | 'tuning' | 'part' | 'clef' | 'bar' | 'adornment' | 'lyric' | 'rhythm'
+  | 'tuning' | 'part' | 'clef' | 'bar' | 'adornment' | 'lyric' | 'rhythm'
   | 'layout';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
-  time: {
-    label: 'time signature',
-    placeholder: '4/4 · 6/8 · common · 2/2 cut · inherit',
-    hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
-  },
   tuning: {
     label: 'tuning',
     placeholder: 'standard · drop-d · D2 A2 D3 G3 A3 D4',
@@ -181,7 +175,6 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
 };
 
 const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
-  timeSignaturePopover: 'time',
   tuningPopover: 'tuning',
   partPopover: 'part',
   clefPopover: 'clef',
@@ -208,7 +201,6 @@ export const SETUP_POPOVER_COMMANDS: {
   stroke: string;
   needsTab?: boolean;
 }[] = [
-  { label: 'setup: time signature…', action: 'timeSignaturePopover', stroke: 'Shift+T' },
   { label: 'setup: add part…', action: 'partPopover', stroke: 'Shift+P' },
   { label: 'setup: clef…', action: 'clefPopover', stroke: 'Shift+C' },
   { label: 'setup: bar attribute…', action: 'barAttributePopover', stroke: 'Shift+B' },
@@ -3077,23 +3069,7 @@ export class ScenarioPage extends LitElement {
     }
     if (event.code !== 'Enter') return;
     event.preventDefault();
-    if (this.setupPopover === 'time') {
-      const time = parseTimeSignature(input.value);
-      if (!time) {
-        this.setupPopoverError = 'not a time signature — try 4/4, 6/8, common, 2/2 cut, or “inherit”';
-        return;
-      }
-      this.stripIntent(
-        time === 'inherit'
-          ? { type: 'removeTimeSignature' }
-          : {
-              type: 'setTimeSignature',
-              count: time.count,
-              unit: time.unit,
-              ...(time.display ? { display: time.display } : {})
-            }
-      );
-    } else if (this.setupPopover === 'layout') {
+    if (this.setupPopover === 'layout') {
       const sentence = parseLayoutSentence(input.value);
       if (!sentence) {
         this.setupPopoverError =
