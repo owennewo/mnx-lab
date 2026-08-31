@@ -38,7 +38,8 @@ import {
   parseClef,
   parseKeySignature,
   parseLyric,
-  parseTimeSignature
+  parseTimeSignature,
+  parseTuning
 } from './setupGrammar.ts';
 
 /** The bar's effective time signature: the last global `time` at or before it.
@@ -472,9 +473,6 @@ function clefText(clef: { sign: string; staffPosition?: number; octave?: number 
 const annotation = (key: string, word: string, value: string, remove: EditorIntent): InspectorPill => ({
   key, word, value, pillClass: 'annotation', remove
 });
-const reading = (key: string, word: string, value: string): InspectorPill => ({
-  key, word, value, pillClass: 'inherited', remove: null
-});
 const derived = (key: string, word: string, value: string): InspectorPill => ({
   key, word, value, pillClass: 'derived', remove: null
 });
@@ -610,8 +608,12 @@ function partMeasurePills(doc: MnxStructure, member: Extract<SelectionMember, { 
   const x = part?._x?.mnxLab;
   if (x?.capo !== undefined)
     pills.push(annotation('capo', 'capo', `${x.capo}`, { type: 'removePartDeclaration', kind: 'capo' }));
-  if (x?.strings?.length)
-    pills.push(reading('strings', 'strings', `${x.strings.length} strings`));
+  if (x?.strings?.length) {
+    // Recited low string first, the way parseTuning takes it back — string N
+    // is the lowest, so declared entries read in descending string order.
+    const recited = [...x.strings].sort((a, b) => b.string - a.string).map(entry => pitchText(entry.pitch));
+    pills.push(annotation('strings', 'tuning', recited.join(' '), { type: 'removePartDeclaration', kind: 'strings' }));
+  }
   return pills;
 }
 
@@ -697,7 +699,10 @@ const VOICE_WORDS: InspectorWord[] = [
 
 const PART_WORDS: InspectorWord[] = [
   { word: 'clef', hint: 'treble · bass · treble8vb', values: [...CLEF_NAME_LIST] },
-  { word: 'capo', hint: '3' }
+  { word: 'capo', hint: '3' },
+  // Offered on ANY part: declaring a fingerboard is the user's call — the
+  // no-instrument-assumed rule governs derivation, never declaration.
+  { word: 'tuning', hint: 'standard · drop-d · D2 A2 D3 G3 A3 D4' }
 ];
 
 export function wordsFor(level: SelectionLevel): InspectorWord[] {
@@ -869,7 +874,12 @@ export function parseInspectorLine(
       if (!Number.isInteger(n) || n < 0) return { error: 'capo takes a fret number' };
       return { intent: { type: 'setPartDeclaration', declaration: { kind: 'capo', value: n } } };
     }
-    return { error: 'not a part declaration — clef · capo' };
+    if (head === 'tuning') {
+      const tuning = parseTuning(rest);
+      if (!tuning) return { error: 'not a tuning — standard · drop-d · pitches low→high like D2 A2 D3 G3 A3 D4' };
+      return { intent: { type: 'setTuning', tuning } };
+    }
+    return { error: 'not a part declaration — clef · capo · tuning' };
   }
   return { error: rungNote(level) ?? 'nothing to set at this rung' };
 }

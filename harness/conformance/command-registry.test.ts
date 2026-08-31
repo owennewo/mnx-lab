@@ -258,7 +258,6 @@ describe('command registry — the joins', () => {
       'measure: coda — coda, section-colour',
       'document: brace — add-part, staves',
       'session: brace — doc-add-part, staff-kind-both',
-      'session: 6stringTabClef — doc-tuning, staff-kind-tab'
     ]);
     const clashes: string[] = [];
     const seen = new Set<string>();

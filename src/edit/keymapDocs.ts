@@ -449,12 +449,6 @@ export const KEY_DOCS: KeyDoc[] = [
   // ── Setup — the typed popovers (shell actions: a trace records the intent
   // the popover emits, never its opening).
   {
-    keys: 'Shift+U',
-    strokes: [{ code: 'KeyU', shift: true }],
-    group: 'setup',
-    meaning: { all: 'tuning… (typed popover)' }
-  },
-  {
     keys: 'Shift+P',
     strokes: [{ code: 'KeyP', shift: true }],
     group: 'setup',
@@ -572,6 +566,7 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'removeClef',
     'setPartDeclaration',
     'removePartDeclaration',
+    'setTuning',
     // the crumbs and the ladder
     'goToMeasure',
     'setPart',
@@ -581,7 +576,6 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'nextPosition',
     'prevPosition'
   ],
-  tuningPopover: ['setTuning'],
   partPopover: [
     'addPart',
     'setPartDeclaration',

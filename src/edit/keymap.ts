@@ -203,7 +203,6 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
  * Shift+letter is the popover tier (survey §6.2, Dorico's discipline).
  */
 export type ShellAction =
-  | 'tuningPopover'
   | 'partPopover'
   | 'lyricPopover'
   | 'rhythmPopover'
@@ -234,7 +233,6 @@ export type ShellAction =
 /** Exported for the cheatsheet's join tests (keymapDocs.ts) — resolution
  *  still goes through resolveShellAction only. */
 export const SHELL_BINDINGS: (KeyStroke & { action: ShellAction })[] = [
-  { code: 'KeyU', shift: true, action: 'tuningPopover' },
   // Part genesis (element-ops exemplar): construct traces start from {},
   // so "add part" needs a keyboard surface — setup tier like its siblings.
   { code: 'KeyP', shift: true, action: 'partPopover' },

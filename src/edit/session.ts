@@ -1337,7 +1337,10 @@ export class EditorSession {
         return this.applyBulk(ops);
       }
       case 'setTuning': {
-        this.apply({ type: 'setTuning', tuning: intent.tuning });
+        // The cursor's part, not parts[0] — the popover wrote the first part
+        // regardless; the inspector's word acts where its pills read.
+        const partIndex = this.cursorState.partIndex ?? 0;
+        this.apply({ type: 'setTuning', tuning: intent.tuning, ...(partIndex ? { partIndex } : {}) });
         return true;
       }
       case 'appendMeasure': {

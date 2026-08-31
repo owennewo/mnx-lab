@@ -44,6 +44,12 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[workbench-one-surface-tuning.md](proposed/workbench-one-surface-tuning.md)** —
+  one-surface campaign item 7, **built 2026-08-31**: the tuning popover retired after the
+  write path was built — a `tuning` word (presets or pitch lists) offered on any part, the
+  read-only strings pill made a removable annotation, and the `setTuning` parts[0] bug
+  fixed with a partIndex widening before the surface shipped; both tiles and the
+  `needsTab` machinery died with it.
 - **[workbench-one-surface-lyrics.md](proposed/workbench-one-surface-lyrics.md)** —
   one-surface campaign item 6, **proposed 2026-08-31, design open**: the lyric popover's
   retirement plan — the line-metadata gap is the minimum bar, and two investigations are
@@ -180,8 +186,8 @@ back up to `proposed/` the moment it is.
   selection tray onto the rung inspector, one surface per item, ordered simplest to
   hardest. Every retirement is gated on demonstrated coverage: census before coverage,
   coverage before removal, ops before surfaces. Items 1–5 (key ✅, time ✅, clef ✅, bar
-  attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics, tuning) each close one
-  bounded gap; 8–10 (rhythm, part, layout) need new ops or a construct story; 11 (the
+  attributes ✅, adornments ✅) are census-and-sweep — all five done; 6–7 (lyrics 📝 design
+  open, tuning ✅) each close one bounded gap; 8–10 (rhythm, part, layout) need new ops or a construct story; 11 (the
   tray) retires a charter, re-homes the verbs, and goes last. Standing ruling from item
   1: freed keys are freed, not accelerators.
 - **[core-selection-range-grain.md](inprogress/core-selection-range-grain.md)** — **decisions 1–4 built 2026-08-30** (section and container rungs retired, staff off

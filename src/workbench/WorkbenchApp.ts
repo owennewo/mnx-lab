@@ -818,7 +818,6 @@ export class WorkbenchApp extends LitElement {
       // tab; that tab is retired, so the gap had to close first — and driving
       // both from one list is what stops it reopening.
       for (const p of SETUP_POPOVER_COMMANDS) {
-        if (p.needsTab && !entry.hasTab) continue;
         items.push(action(p.label, p.action, p.stroke));
       }
       if (entry.hasTab)

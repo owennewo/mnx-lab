@@ -1,6 +1,6 @@
 # One editing surface — retire the popovers and the tray into the inspector
 
-> **Status: in progress 2026-08-31 — campaign; items 1–5 built the same day.** The three-surface experiment run by
+> **Status: in progress 2026-08-31 — campaign; items 1–5 and 7 built the same day, item 6 proposed (design open).** The three-surface experiment run by
 > [workbench-rung-inspector.md](workbench-rung-inspector.md) ("a third
 > editing surface, to be tried *beside* the tray and the popovers so that use decides
 > which wins") has its verdict: **the inspector wins.** The user's ruling, 2026-08-31:
@@ -84,7 +84,7 @@ is one popover or the tray, and one work item.
 | 4 | **Bar attributes** (~~`Shift+B`~~ freed) | one pill per declared attribute, stage 3 — reuses `parseBarAttribute`; the rhythm riders live as voiceMeasure pills | verify all ten kinds + `tempo#n` array + segno/fine `at` forms; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-bar.md) |
 | 5 | **Adornments** (~~`Shift+A`~~ freed) | markings/positioned pills, stage 4 — reuses `parseAdornment` | verify breadth (all markings, dynamics, directions incl. glyphs); sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-adornment.md) |
 | 6 | **Lyrics** (`Shift+L`) | syllable pills per line (`lyric 2: Am`), stage 4 — reuses `parseLyric` | **gap: line management** — plus two design investigations (lines × repeats, WYTIWYG entry) | 📝 [proposed 2026-08-31](../proposed/workbench-one-surface-lyrics.md) — design open |
-| 7 | **Tuning** (`Shift+U`) | `capo` pill writable; `strings` is a **read-only** reading | **gap: the tuning write path** — `parseTuning`'s sentence has no inspector form; a strings pill that writes (part rung), refusals for strings in use; sweep | row |
+| 7 | **Tuning** (~~`Shift+U`~~ freed) | `capo` pill writable; `strings` is a **read-only** reading | **gap: the tuning write path** — `parseTuning`'s sentence has no inspector form; a strings pill that writes (part rung), refusals for strings in use; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-tuning.md) |
 | 8 | **Rhythm** (`Shift+R`) | container pills are **read-only** (`tuplet: 3:2`, dotted, refuse Enter); full-measure rest / measure repeat pills exist at voiceMeasure | **gap: the missing verb** — the `setContainerProperties`-class op the residue ledger names, plus a construction story for tuplet/grace/authored-silence declarations (contract §2: construction is a verb) | row |
 | 9 | **Part** (`Shift+P`) | nothing — part genesis is a pure construct verb | a construct affordance with the ghost-bar's shape (a ghost part the inspector's window can stand on), or a keymap verb; `parsePartDeclaration` migrates or retires with it | row |
 | 10 | **Layout** (`Shift+E`, moved from `Shift+S`) | nothing — no document-rung pills exist | the document rung grows its pill families from `parseLayoutSentence`'s grammar (sources, systems, quoted names — the largest parser in the file); likely splits into sub-items when picked up | row |
@@ -111,6 +111,16 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Progress + learnings log
 
+- **2026-08-31 — item 7 (tuning) built.** First coverage-building item, and the
+  census caught a bug parity would have carried: `setTuning` wrote `parts[0]`
+  unconditionally — fixed (op takes `partIndex`, session passes the cursor's
+  part, two-part pin added) rather than logged, because contract §3 makes the
+  moment before a surface exists the cheap moment to fix its op. The typed
+  `tuning` word is offered on ANY part (the `needsTab` guard was surface-only;
+  declaring a fingerboard is the user's call), so the inspector ends strictly
+  more capable than the popover. Learning: grammar consumers are not all
+  editing surfaces — the viewer's TabSetup overlay imports `parseTuning` too;
+  sweep by reference, not module (items 9–10 take note).
 - **2026-08-31 — item 6 (lyrics) proposal written, design open.** Not a sweep:
   beyond the line-metadata gap, the doc frames two investigations for a fresh
   conversation — how verse lines relate to repeat passes/voltas (data vs

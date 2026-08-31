@@ -742,15 +742,6 @@ export const COMMANDS: readonly EditorCommand[] = [
 
   // ── part-measure ────────────────────────────────────────────────────────
   {
-    id: 'tuning',
-    scopes: ['partMeasure'],
-    glyph: { smufl: '6stringTabClef' },
-    label: 'Tuning…',
-    shortcut: 'Shift+U',
-    tier: 'popover',
-    action: () => ({ surface: 'tuningPopover' })
-  },
-  {
     id: 'capo',
     scopes: ['partMeasure'],
     glyph: { smufl: 'fingering0' },
@@ -1009,15 +1000,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ surface: 'partPopover' })
   },
   {
-    id: 'doc-tuning',
-    scopes: ['session'],
-    glyph: { smufl: '6stringTabClef' },
-    label: 'Tuning…',
-    shortcut: 'Shift+U',
-    tier: 'popover',
-    action: () => ({ surface: 'tuningPopover' })
-  },
-  {
     id: 'staff-kind-both',
     scopes: ['session'],
     glyph: { smufl: 'brace' },
@@ -1161,7 +1143,7 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     {
       id: 'instrument',
       caption: 'instrument',
-      commands: ['tuning', 'capo', 'transpose-part', 'mute-part']
+      commands: ['capo', 'transpose-part', 'mute-part']
     },
     { id: 'selection', caption: 'selection', commands: ['part-scope'] }
   ],

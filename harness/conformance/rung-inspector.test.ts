@@ -691,9 +691,41 @@ describe('the wider rungs', () => {
     expect(parseInspectorLine('voiceMeasure', null, 'staccato')).toHaveProperty('error');
   });
 
-  it('part-bar: clef and capo, strings as a reading', () => {
+  it('part-bar: clef, capo, and the tuning pill (one-surface item 7)', () => {
     const session = at('partMeasure');
-    expect(pillText(session)).toEqual(['capo: 2 [annotation]', 'strings: 6 strings [inherited]']);
+    expect(pillText(session)).toEqual(['capo: 2 [annotation]', 'tuning: E2 A2 D3 G3 B3 E4 [annotation]']);
+    // The popover's whole grammar reaches setTuning through the typed word —
+    // a preset names the entries the explicit list would.
+    const tuned = parseInspectorLine('partMeasure', null, 'tuning drop-d');
+    expect(tuned).toEqual({
+      intent: {
+        type: 'setTuning',
+        tuning: [
+          { string: 6, pitch: { step: 'D', octave: 2 } },
+          { string: 5, pitch: { step: 'A', octave: 2 } },
+          { string: 4, pitch: { step: 'D', octave: 3 } },
+          { string: 3, pitch: { step: 'G', octave: 3 } },
+          { string: 2, pitch: { step: 'B', octave: 3 } },
+          { string: 1, pitch: { step: 'E', octave: 4 } }
+        ]
+      }
+    });
+    expect(edit(session, (tuned as { intent: never }).intent)).toBe(true);
+    expect(pillText(session)[1]).toBe('tuning: D2 A2 D3 G3 B3 E4 [annotation]');
+    // setTuning writes the part being READ — the popover retuned parts[0]
+    // regardless; the op widened with partIndex (contract §3, ops first).
+    const twoParts = makeNoteDoc();
+    twoParts.parts!.push(JSON.parse(JSON.stringify(twoParts.parts![0])));
+    const ensemble = new EditorSession(twoParts);
+    ensemble.handleIntent({ type: 'goToLevel', level: 'partMeasure' });
+    ensemble.handleIntent({ type: 'setPart', partIndex: 1 });
+    ensemble.handleIntent({ type: 'setTuning', tuning: [
+      { string: 3, pitch: { step: 'G', octave: 4 } },
+      { string: 2, pitch: { step: 'C', octave: 4 } },
+      { string: 1, pitch: { step: 'E', octave: 4 } }
+    ] });
+    expect(ensemble.doc.parts![1]!._x!.mnxLab!.strings!.length).toBe(3);
+    expect(ensemble.doc.parts![0]!._x!.mnxLab!.strings!.length).toBe(6);
     const clef = parseInspectorLine('partMeasure', null, 'clef bass');
     expect(clef).toHaveProperty('intent');
     expect(edit(session, (clef as { intent: never }).intent)).toBe(true);

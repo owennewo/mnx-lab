@@ -214,9 +214,11 @@ export type EditOp =
       time: { count: number; unit: number; display?: 'common' | 'cut' };
     }
   | {
-      /** Declare the part's string tuning (`_x.mnxLab.strings`). */
+      /** Declare the part's string tuning (`_x.mnxLab.strings`) — on the
+       *  part being read (item-13b's widening, one-surface item 7). */
       type: 'setTuning';
       tuning: MnxTuningEntry[];
+      partIndex?: number;
     }
   | {
       /** Declare the part's tab staff preference (`_x.mnxLab.tab.staffKind`).
@@ -2367,7 +2369,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       return next;
     }
     case 'setTuning': {
-      const part = next.parts?.[0];
+      const part = next.parts?.[op.partIndex ?? 0];
       if (!part) return next;
       const x = ((part._x ??= {}).mnxLab ??= {});
       x.strings = op.tuning.map(t => ({ string: t.string, pitch: { ...t.pitch } }));

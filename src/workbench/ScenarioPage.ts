@@ -65,6 +65,8 @@ import {
   parseRhythm,
   parsePart,
   parseLayoutSentence,
+  // Still consumed by the VIEWER's instrument-override overlay (TabSetup) —
+  // presentation, not document editing; it outlived the tuning popover.
   parseTuning,
   TUNING_PRESET_NAMES
 } from '../edit/setupGrammar.ts';
@@ -122,15 +124,10 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
 type PopoverKind =
-  | 'tuning' | 'part' | 'lyric' | 'rhythm'
+  | 'part' | 'lyric' | 'rhythm'
   | 'layout';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
-  tuning: {
-    label: 'tuning',
-    placeholder: 'standard · drop-d · D2 A2 D3 G3 A3 D4',
-    hint: 'low string first · Enter applies · Esc closes'
-  },
   part: {
     label: 'part',
     placeholder: 'Guitar · capo 3 · staves 2 · no strings',
@@ -154,7 +151,6 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
 };
 
 const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
-  tuningPopover: 'tuning',
   partPopover: 'part',
   lyricPopover: 'lyric',
   rhythmPopover: 'rhythm',
@@ -167,20 +163,15 @@ const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
  *  reached by mouse; the palette hard-coded four of the nine. Retiring the tab
  *  without closing that gap would have removed a working surface, so the two
  *  now come from ONE table — `WorkbenchApp` maps over this rather than keeping
- *  its own list, which is what stops them drifting apart again.
- *
- *  `needsTab` mirrors `openPopover`'s own guard: tuning is meaningless without
- *  a fingerboard. */
+ *  its own list, which is what stops them drifting apart again. */
 export const SETUP_POPOVER_COMMANDS: {
   label: string;
   action: ShellAction;
   stroke: string;
-  needsTab?: boolean;
 }[] = [
   { label: 'setup: add part…', action: 'partPopover', stroke: 'Shift+P' },
   { label: 'setup: lyric…', action: 'lyricPopover', stroke: 'Shift+L' },
   { label: 'setup: rhythm…', action: 'rhythmPopover', stroke: 'Shift+R' },
-  { label: 'setup: tuning…', action: 'tuningPopover', stroke: 'Shift+U', needsTab: true }
 ];
 
 import './ScoreHud.ts';
@@ -2463,8 +2454,6 @@ export class ScenarioPage extends LitElement {
     // Only the popover actions are ours; palette actions belong to the shell.
     const kind = POPOVER_ACTIONS[action];
     if (!kind) return false;
-    const entry = this.entry();
-    if (kind === 'tuning' && !entry?.hasTab) return false;
     this.setupPopover = kind;
     this.setupPopoverError = '';
     // No panel tab to switch to any more: the popover is a page-level overlay
@@ -3080,13 +3069,6 @@ export class ScenarioPage extends LitElement {
               : { type: 'removeMultimeasureRest', scoreIndex: 0, index: sentence.index }
         );
       }
-    } else if (this.setupPopover === 'tuning') {
-      const tuning = parseTuning(input.value);
-      if (!tuning) {
-        this.setupPopoverError = `not a tuning — a preset (${TUNING_PRESET_NAMES.join(', ')}) or pitches low→high like D2 A2 D3 G3 A3 D4`;
-        return;
-      }
-      this.stripIntent({ type: 'setTuning', tuning });
     } else if (this.setupPopover === 'part') {
       // "capo 3" / "no strings" change THIS part; anything else names a new one.
       const declaration = parsePartDeclaration(input.value);
