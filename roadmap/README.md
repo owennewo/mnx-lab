@@ -168,13 +168,6 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
-- **[workbench-one-surface-lyrics.md](inprogress/workbench-one-surface-lyrics.md)** —
-  one-surface campaign item 6, **built 2026-08-31 in three phases**: the lyric popover
-  retired (verse-line metadata as document-rung pills), the paste-and-tweak lyric
-  **text surface** on `Shift+L` (LilyPond-kin format, diffed into one `applyLyricPlan`
-  batch), and the derived **pass model** (`src/model/passes.ts` linearizes the repeat
-  structure once for player, verse↔pass resolution and the blue non-blocking bound in
-  the editor).
 - **[workbench-campaign-one-surface.md](inprogress/workbench-campaign-one-surface.md)** —
   **campaign**, item 1 built 2026-08-31: retire the ten `Shift+letter` popovers and the
   selection tray onto the rung inspector, one surface per item, ordered simplest to
@@ -250,6 +243,13 @@ back up to `proposed/` the moment it is.
   slot/id resolution via the parse context; the `layout-authoring` residue row closes) —
   and the campaign's founding debt is paid: **`Shift+S` is the shift slide**, with
   `slideType` on the technique union and typed `slide shift`/`slide legato` forms.
+- **[workbench-one-surface-lyrics.md](complete/workbench-one-surface-lyrics.md)** —
+  one-surface campaign item 6, **built 2026-08-31 in three phases**: the lyric popover
+  retired (verse-line metadata as document-rung pills), the paste-and-tweak lyric
+  **text surface** on `Shift+L` (LilyPond-kin format, diffed into one `applyLyricPlan`
+  batch), and the derived **pass model** (`src/model/passes.ts` linearizes the repeat
+  structure once for player, verse↔pass resolution and the blue non-blocking bound in
+  the editor).
 - **[workbench-one-surface-part.md](complete/workbench-one-surface-part.md)** —
   one-surface campaign item 9, **built 2026-08-31**: the part popover retired; part facts
   (name — the rename that never existed — staves, staff kind) live at the part-bar rung,

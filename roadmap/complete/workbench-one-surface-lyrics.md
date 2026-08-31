@@ -4,7 +4,7 @@
 > the popover, phase 2 built the lyric text surface on `Shift+L`, phase 3
 > the derived pass model and its blue bound. The recorded deferrals at the
 > end are follow-up material, not open work. Campaign:
-> [workbench-campaign-one-surface.md](workbench-campaign-one-surface.md),
+> [workbench-campaign-one-surface.md](../inprogress/workbench-campaign-one-surface.md),
 > item 6. The first draft of this doc left two investigations open; a design
 > conversation (2026-08-31) settled both, and the rewrite recorded the
 > decisions. Phase 1 landed the same day — see *What shipped* below.
@@ -249,13 +249,13 @@ later phases start without re-deriving it.
 
 ## Relations
 
-- [core-element-ops-lyrics.md](../complete/core-element-ops-lyrics.md) — campaign
+- [core-element-ops-lyrics.md](core-element-ops-lyrics.md) — campaign
   item 12: the ops, and the popover-not-a-mode ruling that decision B reopens
   narrowly (one modal overlay) rather than wholesale.
-- [workbench-rung-inspector.md](workbench-rung-inspector.md) —
+- [workbench-rung-inspector.md](../inprogress/workbench-rung-inspector.md) —
   the pill/word machinery phase 1 extends; the collapse rule lives by its
   charter.
-- [core-selection-range-grain.md](core-selection-range-grain.md)
+- [core-selection-range-grain.md](../inprogress/core-selection-range-grain.md)
   — rung discipline; where the document-level line pills sit.
 - The extender gap is a candidate spec-loop topic (an `_x.mnxLab` extender
   draft would slot into the format without grammar changes) — deliberately
