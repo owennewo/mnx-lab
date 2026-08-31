@@ -805,7 +805,11 @@ const VOICE_WORDS: InspectorWord[] = [
   { word: 'full-measure rest', hint: 'whole · half' },
   { word: 'measure repeat', hint: '1 · 2 counter 3' },
   { word: 'space', hint: '1/4 · 3/8' },
-  { word: 'rest', hint: 'half · quarter.' }
+  { word: 'rest', hint: 'half · quarter.' },
+  // Construction as declaration, the campaign's proven move (items 7–10):
+  // the last bespoke construct verb becomes a word. Offered at the part rung
+  // too — the voice rung does not exist until a voice does.
+  { word: 'voice', hint: 'adds the next voice to this bar' }
 ];
 
 const PART_WORDS: InspectorWord[] = [
@@ -816,7 +820,8 @@ const PART_WORDS: InspectorWord[] = [
   { word: 'capo', hint: '3' },
   // Offered on ANY part: declaring a fingerboard is the user's call — the
   // no-instrument-assumed rule governs derivation, never declaration.
-  { word: 'tuning', hint: 'standard · drop-d · D2 A2 D3 G3 A3 D4' }
+  { word: 'tuning', hint: 'standard · drop-d · D2 A2 D3 G3 A3 D4' },
+  { word: 'voice', hint: 'adds the next voice to this bar' }
 ];
 
 const DOC_WORDS: InspectorWord[] = [
@@ -1036,6 +1041,8 @@ export function parseInspectorLine(
         return { intent: parsed.remove ? { type: 'removeFullMeasureRest' } : { type: 'setFullMeasureRest', ...(parsed.visualDuration ? { visualDuration: parsed.visualDuration } : {}) } };
       return { intent: parsed.remove ? { type: 'removeMeasureRepeat' } : { type: 'setMeasureRepeat', number: parsed.number ?? 1, ...(parsed.counter ? { counter: parsed.counter } : {}) } };
     }
+    if (head === 'voice' && rest === '')
+      return { intent: { type: 'addVoiceMeasure' } };
     // Authored silence and rest spelling (the rhythm popover's voice-bar
     // half): a point insertion and a respelling, both at the cursor.
     const declared = parseRhythm(line);
@@ -1064,6 +1071,8 @@ export function parseInspectorLine(
       if (!tuning) return { error: 'not a tuning — standard · drop-d · pitches low→high like D2 A2 D3 G3 A3 D4' };
       return { intent: { type: 'setTuning', tuning } };
     }
+    if (head === 'voice' && rest === '')
+      return { intent: { type: 'addVoiceMeasure' } };
     if (head === 'name') {
       if (!rest) return { error: 'name takes the part’s name — `no name` makes it anonymous' };
       return { intent: { type: 'setPartDeclaration', declaration: { kind: 'name', value: rest } } };

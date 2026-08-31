@@ -112,6 +112,14 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Progress + learnings log
 
+- **2026-08-31 — item 11b slice 1 (gaps closed).** The `voice` construct word
+  landed at both bar rungs (`addVoiceMeasure` — the last bespoke construct
+  verb, now a declaration); the four blocked tiles retired, and with them the
+  **blocked-tile class is extinct**: `arpeggio`'s blocker was stale (the
+  adornment grammar already spoke it), and `part-transposition` / `mute` /
+  `section-colour` carry forward as op-gaps for the closing entry, not tray
+  rows. The tray now holds only verbs whose keys the joins pin — slice 2 is
+  pure demolition.
 - **2026-08-31 — item 11a (tray attribute tiles) built.** 34 tiles, five
   factory helpers, twelve bands, two more glyph twins — all gone, no new ops,
   as the split predicted. The honest work was in the tests: six retired with

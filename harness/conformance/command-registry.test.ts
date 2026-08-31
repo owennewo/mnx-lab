@@ -93,6 +93,10 @@ function boundStrokeLabels(): Set<string> {
   return labels;
 }
 
+// The blocked-tile class is EXTINCT as of one-surface 11b slice 1: every
+// `blockedBy` placement was either stale (arpeggio) or retired with its
+// op-gap carried to the campaign's closing entry. The exemption/unavailable
+// tests went with the class.
 describe('command registry — the joins', () => {
   it('every id is unique', () => {
     const seen = new Map<string, number>();
@@ -437,18 +441,6 @@ describe('command registry — the joins', () => {
     expect(blocked, 'a blocked tile cannot have been clicked').toEqual([]);
   });
 
-  it('a blocked tile is exempt from triage rather than purple', () => {
-    // The one precedence rule the tray depends on: purple never overrides
-    // unavailable. `isTriaged` is what enforces it, upstream of the CSS, so a
-    // reviewer is never asked to click a verb that does not exist.
-    const wired = COMMANDS.filter(c => c.action);
-    const unwired = COMMANDS.filter(c => !c.action);
-    expect(unwired.length).toBeGreaterThan(0);
-    for (const command of unwired) {
-      for (const scope of command.scopes) expect(isTriaged(command, scope)).toBe(true);
-    }
-    expect(wired.length).toBeGreaterThan(0);
-  });
 
   it('a wired placement needs all three marks to stop being purple', () => {
     // Deliberately asserted against a synthetic row rather than the live
@@ -554,11 +546,6 @@ describe('command registry — rung filtering', () => {
 describe('command registry — state reads the document', () => {
   const find = (id: string): EditorCommand => COMMANDS.find(c => c.id === id)!;
 
-  it('an unwired command always draws unavailable', () => {
-    // `arpeggio` has no op yet and names its residue row; respell used to sit
-    // here and now fires, which is the ledger doing its job.
-    expect(commandState(find('arpeggio'), view())).toBe('unavailable');
-  });
 
 
 

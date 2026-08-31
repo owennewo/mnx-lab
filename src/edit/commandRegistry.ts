@@ -342,14 +342,6 @@ export const COMMANDS: readonly EditorCommand[] = [
 
   // ── event ───────────────────────────────────────────────────────────────
   {
-    id: 'arpeggio',
-    scopes: ['event'],
-    glyph: { smufl: 'arpeggiato' },
-    label: 'Arpeggio',
-    tier: 'popover',
-    blockedBy: 'arpeggio'
-  },
-  {
     // `I`/`Shift+I` have inserted an event since core-rung-insert.md, at the
     // note rung as well as the event one — the rung names the SIZE of what
     // you insert, and a note-sized thing in a voice is an event — but neither
@@ -459,22 +451,6 @@ export const COMMANDS: readonly EditorCommand[] = [
     action: () => ({ intent: { type: 'closeSelection' } })
   },
   {
-    id: 'transpose-part',
-    scopes: ['partMeasure'],
-    glyph: { smufl: 'ottava' },
-    label: 'Instrument transposition',
-    tier: 'popover',
-    blockedBy: 'part-transposition'
-  },
-  {
-    id: 'mute-part',
-    scopes: ['partMeasure'],
-    glyph: { smufl: 'pluckedDampAll' },
-    label: 'Mute part',
-    tier: 'popover',
-    blockedBy: 'mute'
-  },
-  {
     id: 'delete-part-bar',
     scopes: ['partMeasure'],
     glyph: { mark: { smufl: 'restWhole' }, op: { sign: 'minus', at: 'before' } },
@@ -498,14 +474,6 @@ export const COMMANDS: readonly EditorCommand[] = [
   },
 
   // ── section ─────────────────────────────────────────────────────────────
-  {
-    id: 'section-colour',
-    scopes: ['measure'],
-    glyph: { smufl: 'coda' },
-    label: 'Section colour',
-    tier: 'popover',
-    blockedBy: 'section-colour'
-  },
   {
     // The bar-rung verb the section rung's Del used to be
     // (core-selection-range-grain.md): strip the label on THIS bar — the bars
@@ -691,11 +659,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       caption: 'structure',
       commands: ['insert-event-before', 'insert-event-after', 'clear-event']
     },
-    {
-      id: 'articulation',
-      caption: 'articulation',
-      commands: ['arpeggio']
-    },
   ],
   // Two tiles, and the band still earns its caption: it says the one verb
   // this rung has is a structural one, rather than leaving it beside a
@@ -709,11 +672,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     // `voiceMeasure` vanishes with the last voice and takes its own copy with
     // it (core-rung-insert.md, amended 2026-08-25).
     { id: 'structure', caption: 'structure', commands: ['new-voice', 'delete-part-bar'] },
-    {
-      id: 'instrument',
-      caption: 'instrument',
-      commands: ['transpose-part', 'mute-part']
-    },
     { id: 'selection', caption: 'selection', commands: ['part-scope'] }
   ],
   measure: [
@@ -725,7 +683,7 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     {
       id: 'marks',
       caption: 'marks',
-      commands: ['section-colour', 'delete-section-boundary']
+      commands: ['delete-section-boundary']
     }
   ],
   document: [

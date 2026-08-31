@@ -694,6 +694,17 @@ describe('the wider rungs', () => {
     expect(parseInspectorLine('voiceMeasure', null, 'staccato')).toHaveProperty('error');
   });
 
+  it('the voice construct word (one-surface item 11b, slice 1)', () => {
+    // The last bespoke construct verb becomes a declaration, offered at the
+    // part rung too — the voice rung does not exist until a voice does.
+    expect(parseInspectorLine('voiceMeasure', null, 'voice')).toEqual({ intent: { type: 'addVoiceMeasure' } });
+    expect(parseInspectorLine('partMeasure', null, 'voice')).toEqual({ intent: { type: 'addVoiceMeasure' } });
+    const session = at('partMeasure');
+    const before = session.doc.parts![0]!.measures![0]!.sequences!.length;
+    expect(edit(session, { type: 'addVoiceMeasure' })).toBe(true);
+    expect(session.doc.parts![0]!.measures![0]!.sequences!.length).toBe(before + 1);
+  });
+
   it('layout sentences and the shift slide (one-surface item 10)', () => {
     // The layout grammar reaches its intents from the document rung; the
     // upsert-by-id rule rides the context, as the popover resolved it.
