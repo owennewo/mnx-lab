@@ -1,5 +1,5 @@
 // Hand-written declaration for the generated `_x.mnxLab` extension validators
-// (see scripts/compile-validator.mjs).
+// (see spec/tools/compile-validator.mjs).
 import type { MnxValidationError } from './validate-mnx.d.mts';
 
 type SubValidator = ((data: unknown) => boolean) & {

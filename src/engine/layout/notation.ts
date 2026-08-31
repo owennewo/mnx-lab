@@ -63,7 +63,12 @@ import {
   Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex, translatePrimitiveY
 } from '../primitives.ts';
 import { glyphAnchor, glyphBBox } from '../smufl/smufl.ts';
-import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barlines.ts';
+import {
+  emitEndBarline,
+  resolveBarlineType,
+  STANDARD_BARLINE_METRICS,
+  type BarlineMetrics
+} from './barlines.ts';
 import {
   anchorY,
   clampPadDensity,
@@ -181,16 +186,16 @@ const MARGIN_SP = 2;
 const STAFF_LINE_THICKNESS_SP = 0.13;
 const LEDGER_LINE_THICKNESS_SP = 0.16;
 const STEM_THICKNESS_SP = 0.12;
-const BARLINE_THICKNESS_SP = 0.16;
-const FINAL_BARLINE_THICK_SP = 0.5;
-const FINAL_BARLINE_GAP_SP = 0.3;
+// Barline stroke weights come from the shared set in barlines.ts, so the
+// standalone tab layout and this one cannot drift apart again.
+const BARLINE_THICKNESS_SP = STANDARD_BARLINE_METRICS.thinSp;
 /** The repeat barlines share the final barline's strokes. */
-const REPEAT_METRICS = { thick: FINAL_BARLINE_THICK_SP, gap: FINAL_BARLINE_GAP_SP, thin: BARLINE_THICKNESS_SP };
-const BARLINE_METRICS: BarlineMetrics = {
-  thinSp: BARLINE_THICKNESS_SP,
-  thickSp: FINAL_BARLINE_THICK_SP,
-  gapSp: FINAL_BARLINE_GAP_SP
+const REPEAT_METRICS = {
+  thick: STANDARD_BARLINE_METRICS.thickSp,
+  gap: STANDARD_BARLINE_METRICS.gapSp,
+  thin: STANDARD_BARLINE_METRICS.thinSp
 };
+const BARLINE_METRICS: BarlineMetrics = STANDARD_BARLINE_METRICS;
 
 const STEM_LENGTH_SP = 3.5;
 const BEAM_THICKNESS_SP = 0.5;

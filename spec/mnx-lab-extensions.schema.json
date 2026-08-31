@@ -65,7 +65,7 @@
     },
     "fret-number": {
       "type": "integer",
-      "description": "Fret number; 0 = open string, counted from the capo when one is declared. OPTIONAL and NON-AUTHORITATIVE: the rendered fret is always derived from string + pitch, and a stored fret's only job is validation — a mismatch with the derived fret is a diagnostic (typically a broken importer), never a rendering input. See roadmap/proposed/core-derived-positions.md.",
+      "description": "Fret number; 0 = open string, counted from the capo when one is declared. OPTIONAL and NON-AUTHORITATIVE: the rendered fret is always derived from string + pitch, and a stored fret's only job is validation — a mismatch with the derived fret is a diagnostic (typically a broken importer), never a rendering input. See roadmap/complete/core-derived-positions.md.",
       "minimum": 0,
       "maximum": 36
     },
@@ -210,7 +210,7 @@
     },
     "note-tab": {
       "type": "object",
-      "description": "Stored under note._x.mnxLab.tab. v5 leaves only `technique` here: `string`/`fret`/`fingering` moved flat onto the vendor dict, mirroring the adopted shape they draft (flat on `note` — roadmap/proposed/low-priority/spec-instrument-position.md). `technique` stays until it graduates via a general articulations proposal (roadmap/complete/core-guitar-technique.md).",
+      "description": "Stored under note._x.mnxLab.tab. Since v5 only `technique` lives here: `string`/`fret`/`fingering` moved flat onto the vendor dict, mirroring the adopted shape they draft (flat on `note` — roadmap/proposed/low-priority/spec-instrument-position.md). `technique` stays until it graduates via a general articulations proposal (roadmap/complete/core-guitar-technique.md).",
       "properties": {
         "technique": {
           "$ref": "#/$defs/technique"
@@ -239,7 +239,7 @@
     },
     "part-tab": {
       "type": "object",
-      "description": "Stored under part._x.mnxLab.tab. v5 leaves only `staffKind` here: `strings`/`capo` moved flat onto the vendor dict (drafting flat `part.strings[]`/`part.capo`). Tab-ness is a VIEW declaration — there is no tab clef and no duplicated tab staff; notation and tab are both derived from the same note stream.",
+      "description": "Stored under part._x.mnxLab.tab. Since v5 only `staffKind` lives here: `strings`/`capo` moved flat onto the vendor dict (drafting flat `part.strings[]`/`part.capo`). Tab-ness is a VIEW declaration — there is no tab clef and no duplicated tab staff; notation and tab are both derived from the same note stream.",
       "properties": {
         "staffKind": {
           "enum": [
@@ -368,6 +368,11 @@
         "text": {
           "type": "string",
           "description": "Display override. Present ONLY when the source's literal spelling differs from what a consumer would render from the structure — so most chords carry none."
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9a-f]{6}$",
+          "description": "Display color for the symbol — the standard's `simple-color` shape, mirrored here because most standard MNX text-bearing objects carry it. Added in v6.1: the renderer honored it before the schema admitted it."
         }
       },
       "required": [

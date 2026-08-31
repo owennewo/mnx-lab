@@ -72,6 +72,18 @@ export interface BarlineMetrics {
   gapSp: number;
 }
 
+/**
+ * The one set of stroke weights, owned here so every staff kind draws the
+ * same barline. The standalone tab layout once carried its own lighter pair
+ * (0.1/0.4), which made the same tab staff render differently in the `tab`
+ * and `both` views — the fork this constant closes.
+ */
+export const STANDARD_BARLINE_METRICS: BarlineMetrics = {
+  thinSp: 0.16,
+  thickSp: 0.5,
+  gapSp: 0.3
+};
+
 export interface EmitEndBarlineArgs {
   type: BarlineType;
   /** The measure's end x — every style's right edge. */

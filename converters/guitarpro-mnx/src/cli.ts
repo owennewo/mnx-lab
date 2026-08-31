@@ -60,7 +60,9 @@ async function main() {
     const mnx = importGuitarPro(new Uint8Array(data), {
       onWarning: msg => console.warn(`  warning: ${msg}`)
     });
-    await fs.writeFile(outputPath, JSON.stringify(mnx, null, 2), 'utf-8');
+    // Trailing newline: the corpus police's canonical form (check-scenarios),
+    // so CLI output can land in scenarios/ unmodified.
+    await fs.writeFile(outputPath, JSON.stringify(mnx, null, 2) + '\n', 'utf-8');
     console.log(`Conversion complete. Written to MNX: ${outputPath}`);
   } else if (exportIndex !== -1 && args[exportIndex + 1]) {
     const inputPath = resolveInputPath(

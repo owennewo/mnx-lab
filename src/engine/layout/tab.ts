@@ -31,7 +31,12 @@ import {
   repeatStartDotDx,
   TAB_REPEAT_DOT_YS
 } from './repeats.ts';
-import { emitEndBarline, resolveBarlineType, type BarlineMetrics } from './barlines.ts';
+import {
+  emitEndBarline,
+  resolveBarlineType,
+  STANDARD_BARLINE_METRICS,
+  type BarlineMetrics
+} from './barlines.ts';
 import { emitHarmonies, emitNavigationMarkers, emitScoreLabels, emitTempoMark, measureOnsetXs } from './scoreText.ts';
 import { emitMeasureFermata } from './fermata.ts';
 import { emitMeasureNumber } from './arpeggio.ts';
@@ -72,16 +77,16 @@ const ROW_PAD_BOTTOM_SP = 3;
 const ROW_HEIGHT_SP = STAFF_HEIGHT_SP + ROW_PAD_TOP_SP + ROW_PAD_BOTTOM_SP;
 const MARGIN_SP = 2;
 
-const BARLINE_THICKNESS_SP = 0.1;
-const FINAL_BARLINE_THICK_WIDTH_SP = 0.4;
-const FINAL_BARLINE_GAP_SP = 0.3;
+// Stroke weights are the shared set from barlines.ts — the same tab staff
+// must not render lighter here than it does inside the `both` view.
+const BARLINE_THICKNESS_SP = STANDARD_BARLINE_METRICS.thinSp;
 /** The repeat barlines share the final barline's strokes. */
-const REPEAT_METRICS = { thick: FINAL_BARLINE_THICK_WIDTH_SP, gap: FINAL_BARLINE_GAP_SP, thin: BARLINE_THICKNESS_SP };
-const BARLINE_METRICS: BarlineMetrics = {
-  thinSp: BARLINE_THICKNESS_SP,
-  thickSp: FINAL_BARLINE_THICK_WIDTH_SP,
-  gapSp: FINAL_BARLINE_GAP_SP
+const REPEAT_METRICS = {
+  thick: STANDARD_BARLINE_METRICS.thickSp,
+  gap: STANDARD_BARLINE_METRICS.gapSp,
+  thin: STANDARD_BARLINE_METRICS.thinSp
 };
+const BARLINE_METRICS: BarlineMetrics = STANDARD_BARLINE_METRICS;
 
 // ---------- Public API ----------
 

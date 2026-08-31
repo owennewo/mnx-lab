@@ -6,7 +6,7 @@
 <line x1="32" y1="153.1424" x2="600.8" y2="153.1424" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="171.4288" x2="600.8" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <text x="38.4" y="56" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="start" dominant-baseline="central" fill="currentColor" font-weight="600" class="tab-capo">Capo 2</text>
-<line x1="32" y1="80" x2="32" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-start"></line>
+<line x1="32" y1="80" x2="32" y2="171.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
 <text x="49.6" y="125.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
 <text x="101.6" y="102.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="101.6" y="148.5712" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
@@ -18,6 +18,6 @@
 <text x="420" y="134.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e2.n0">0</text>
 <rect x="526" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
 <text x="532" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e3.n0">0</text>
-<line x1="589.6" y1="80" x2="589.6" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
-<rect x="594.4" y="80" width="6.4" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="588" y1="80" x2="588" y2="171.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="592.8" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

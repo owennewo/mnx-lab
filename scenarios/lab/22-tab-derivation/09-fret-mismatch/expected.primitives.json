@@ -173,7 +173,7 @@
         "y1": 5,
         "x2": 2,
         "y2": 10.7143,
-        "thickness": 0.1,
+        "thickness": 0.16,
         "className": "barline barline-start"
       },
       {
@@ -224,18 +224,18 @@
       },
       {
         "kind": "line",
-        "x1": 19.2,
+        "x1": 19.1,
         "y1": 5,
-        "x2": 19.2,
+        "x2": 19.1,
         "y2": 10.7143,
-        "thickness": 0.1,
+        "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
-        "x": 19.5,
+        "x": 19.4,
         "y": 5,
-        "w": 0.4,
+        "w": 0.5,
         "h": 5.7143,
         "fill": "currentColor",
         "className": "barline barline-final-thick"

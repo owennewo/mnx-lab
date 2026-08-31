@@ -5,12 +5,12 @@
 <line x1="32" y1="134.8576" x2="446.4" y2="134.8576" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="153.1424" x2="446.4" y2="153.1424" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="171.4288" x2="446.4" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="80" x2="32" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-start"></line>
+<line x1="32" y1="80" x2="32" y2="171.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
 <text x="49.6" y="125.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
 <text x="101.6" y="102.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
 <text x="101.6" y="148.5712" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<line x1="435.2" y1="80" x2="435.2" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="barline barline-final-thin"></line>
-<rect x="440" y="80" width="6.4" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="433.6" y1="80" x2="433.6" y2="171.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="438.4" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 <rect x="190.8" y="190.6288" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
 <title>validation — C2 is not playable on the declared strings (reachable range E2–E6)</title></rect>
 <text x="199.6" y="199.4288" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="central" fill="#fff" font-weight="bold" class="diagnostic-marker diagnostic-validation">!<title>validation — C2 is not playable on the declared strings (reachable range E2–E6)</title></text>

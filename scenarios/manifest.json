@@ -1,6 +1,6 @@
 {
   "mnxSchemaVersion": 27,
-  "extensionVersion": 5,
+  "extensionVersion": 6,
   "plumbingDefs": {
     "note": "Schema $defs excluded from the feature-def coverage denominator: the structural skeleton every document passes through, scalar/utility types, and aggregate wrappers (plural array/dict defs whose singular item def is the real feature — the schema names most of them *-list, caught by the suffix rule, but some are plain plurals listed here). A curation choice, not derived from the schema — rationale in src/corpus/plumbingDefs.ts, which consumes this list, as does harness/verify/check-scenarios.mjs.",
     "defs": [

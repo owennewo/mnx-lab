@@ -1,5 +1,5 @@
 // Hand-written declaration for the generated standalone Ajv validator
-// (see scripts/compile-validator.mjs).
+// (see spec/tools/compile-validator.mjs).
 export interface MnxValidationError {
   instancePath: string;
   schemaPath: string;
