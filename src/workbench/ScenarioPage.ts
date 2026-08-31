@@ -1,4 +1,6 @@
-// One scenario, deep-linkable: #/scenario/<id>?view=notation|tab|both|compare|json.
+// One workbench document: either a deep-linked corpus scenario or the shell's
+// transient local file. Scenario-only provenance and compare chrome stay out
+// of the local-file presentation.
 // The compare view is the review surface — our render beside the spec's
 // reference engraving (served by a dev-only middleware from the pinned
 // vendor/mnx checkout; in a static deploy the reference pane degrades to a
@@ -9,7 +11,7 @@ import { corpus, type ScenarioEntry } from '../corpus/corpus.ts';
 import { groupScenarios } from '../corpus/groups.ts';
 import { classify } from './queue.ts';
 import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
-import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
+import { scenarioHref, documentHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
 import type { DocumentViewer, ViewMode } from '../elements/DocumentViewer.ts';
@@ -96,6 +98,7 @@ import {
   type RenderScale
 } from '../engine/render/scale.ts';
 import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layout/spacing.ts';
+import type { LocalDocumentSource } from './localFile.ts';
 
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
@@ -393,6 +396,9 @@ function presentationSpan(
 export class ScenarioPage extends LitElement {
   @property({ type: String }) scenarioId = '';
   @property({ type: String }) view = '';
+  /** A one-shot local file supplied by the shell. It is never persisted and
+   *  never becomes a corpus scenario. */
+  @property({ attribute: false }) localDocument: LocalDocumentSource | null = null;
   /** Host-owned composition state: removes this page's persistent chrome but
    *  leaves the viewer and invoked editor overlays intact. */
   @property({ type: Boolean, reflect: true, attribute: 'document-focus' })
@@ -1646,6 +1652,18 @@ export class ScenarioPage extends LitElement {
         text-wrap: pretty;
       }
 
+      .import-warnings {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--warning-fg, var(--ink-2));
+        font-size: 11.5px;
+        line-height: 1.45;
+      }
+
+      .import-warnings li + li {
+        margin-top: 5px;
+      }
+
       .side-cap {
         font-family: var(--mono);
         font-size: 10px;
@@ -1868,17 +1886,47 @@ export class ScenarioPage extends LitElement {
   ];
 
   private entry(): ScenarioEntry | null {
+    const local = this.localDocument;
+    if (local && local.id === this.scenarioId) {
+      const hasTab = local.document.parts.some(
+        part => (part._x?.mnxLab?.strings?.length ?? 0) > 0
+      );
+      return {
+        id: local.id,
+        ns: 'lab',
+        category: `${local.format} file`,
+        meta: {
+          title: local.name,
+          description: `Opened from ${local.fileName}.`,
+          expect: { standard: 'valid', extension: hasTab ? 'valid' : 'n/a' },
+          source: local.fileName,
+          status: 'valid'
+        },
+        featureDefs: [],
+        specRef: null,
+        issueRef: null,
+        invalidByDesign: false,
+        hasTab,
+        loadDocument: async () => local.document,
+        loadNotes: null
+      };
+    }
     return corpus.find(e => e.id === this.scenarioId) ?? null;
   }
 
+  private isLocalDocument(): boolean {
+    return this.localDocument?.id === this.scenarioId;
+  }
+
   willUpdate(changed: Map<string, unknown>) {
-    if (changed.has('view') || changed.has('scenarioId')) this.flushPendingFret();
+    const sourceChanged = changed.has('scenarioId') || changed.has('localDocument');
+    if (changed.has('view') || sourceChanged) this.flushPendingFret();
     // Legacy ?view=compare|json deep links (the documented contract) open
     // the matching panel tab — the main pane keeps the default score view.
-    if (changed.has('view') || changed.has('scenarioId')) {
+    if (changed.has('view') || sourceChanged) {
       if (this.view === 'compare' || this.view === 'json') this.panelTab = this.view;
     }
-    if (changed.has('scenarioId')) {
+    if (sourceChanged) {
       // A PKCE landing brought us here to show its verdict: the assist tab
       // wins over the route's default exactly once (core-assist-byok.md).
       if (this.landingFocus) {
@@ -2013,6 +2061,7 @@ export class ScenarioPage extends LitElement {
   private async loadDocument() {
     const entry = this.entry();
     if (!entry) return;
+    const sourceId = this.scenarioId;
     // Read-and-clear up front: a load that fails, or one the reader navigates
     // away from, must not leave the baton lying around for the NEXT scenario
     // to pick up as though a gesture had brought it there.
@@ -2020,7 +2069,7 @@ export class ScenarioPage extends LitElement {
     this.railRung = null;
     try {
       const document = (await entry.loadDocument()) as MnxStructure;
-      if (entry.id !== this.scenarioId) return; // navigated away meanwhile
+      if (sourceId !== this.scenarioId) return; // navigated away meanwhile
       this.doc = {
         id: entry.id,
         name: entry.meta.title,
@@ -2041,7 +2090,7 @@ export class ScenarioPage extends LitElement {
       // The document is a lazy chunk: a dead dev server, an offline reload or a
       // half-deployed build all land here. Surfacing the reason is the whole
       // point — silently leaving the pane blank blames the renderer.
-      if (entry.id !== this.scenarioId) return;
+      if (sourceId !== this.scenarioId) return;
       this.loadState = 'failed';
       this.loadError = e instanceof Error ? e.message : String(e);
     }
@@ -2871,6 +2920,10 @@ export class ScenarioPage extends LitElement {
     return this.defaultView();
   }
 
+  private viewHref(entry: ScenarioEntry, view: ViewMode): string {
+    return this.isLocalDocument() ? documentHref(view) : scenarioHref(entry.id, view);
+  }
+
   /** The document's preferred view when the URL names none: its `staffKind`
    *  hint when tab is possible, else notation. */
   private defaultView(): ViewMode {
@@ -2887,12 +2940,14 @@ export class ScenarioPage extends LitElement {
     }
     if (this.loadState === 'failed') {
       return html`<div class="load-state failed">
-        <strong>Could not load this scenario's document.</strong>
-        <p>
-          <code>document.mnx.json</code> is fetched as a lazy chunk, so this is a transport
-          failure, not a rendering one — most often a stopped <code>npm run dev</code> server
-          or a stale tab against a redeployed build. Reload once the server is back.
-        </p>
+        <strong>Could not load this document.</strong>
+        ${this.isLocalDocument()
+          ? html`<p>The selected file could not be prepared for the workbench.</p>`
+          : html`<p>
+              <code>document.mnx.json</code> is fetched as a lazy chunk, so this is a transport
+              failure, not a rendering one — most often a stopped <code>npm run dev</code> server
+              or a stale tab against a redeployed build. Reload once the server is back.
+            </p>`}
         <p class="detail">${this.loadError}</p>
       </div>`;
     }
@@ -3006,7 +3061,7 @@ export class ScenarioPage extends LitElement {
             <div class="tabs">
               ${views.map(
                 v => html`
-                  <a href=${scenarioHref(entry.id, v)} aria-current=${v === view}>${v}</a>
+                  <a href=${this.viewHref(entry, v)} aria-current=${v === view}>${v}</a>
                 `
               )}
             </div>
@@ -3089,7 +3144,9 @@ export class ScenarioPage extends LitElement {
   private panelTabs(): PanelTab[] {
     const tabs: PanelTab[] = ['description'];
     if (this.session) tabs.push('ops', 'hud');
-    tabs.push('assist', 'compare', 'json');
+    tabs.push('assist');
+    if (!this.isLocalDocument()) tabs.push('compare');
+    tabs.push('json');
     return tabs;
   }
 
@@ -3350,6 +3407,30 @@ export class ScenarioPage extends LitElement {
    *  cut. They were always one idea split across two tabs: what this scenario
    *  is, and what the repo knows about it. */
   private panelDescription(entry: ScenarioEntry) {
+    if (this.isLocalDocument() && this.localDocument) {
+      const local = this.localDocument;
+      return this.panelFrame({
+        context: html`<span class="ctx-name">${local.name}</span>
+          <span class="ctx-dim">${local.format} · local file</span>`,
+        body: html`
+          <h1>${local.name}</h1>
+          <div class="idline"><span class="id">${local.fileName}</span></div>
+          <p class="description">
+            Opened directly from this computer. The workbench keeps it only in this page;
+            it is not stored, uploaded, or written back to the file.
+          </p>
+          ${this.scoreFacts(entry)}
+          ${local.warnings.length
+            ? html`<div class="rule-strong"></div>
+                <div class="tag-group">import warnings</div>
+                <ul class="import-warnings">
+                  ${local.warnings.map(warning => html`<li>${warning}</li>`)}
+                </ul>`
+            : nothing}
+        `,
+        footer: html`<span class="ctx-dim">transient · reopen after a reload</span>`
+      });
+    }
     return this.panelFrame({
       context: html`<span class="ctx-name">${entry.meta.title}</span>
         <span class="ctx-dim">${entry.category}</span>`,
@@ -3396,7 +3477,9 @@ export class ScenarioPage extends LitElement {
         ${cell('bars', String(entry.meta.bars ?? doc?.global.measures.length ?? '—'))}
         ${cell('parts', String(doc?.parts.length ?? '—'))}
         ${cell('key', doc ? fmtKey(keyFifthsAt(doc, 0)) : '—')}
-        ${cell('approved', approved ? approved.slice(0, 10) : 'never')}
+        ${this.isLocalDocument()
+          ? cell('source', this.localDocument?.format ?? 'file')
+          : cell('approved', approved ? approved.slice(0, 10) : 'never')}
         ${this.session?.dirty
           ? cell('edits', String(this.session.appliedOps.length))
           : nothing}

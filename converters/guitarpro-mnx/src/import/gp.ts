@@ -301,7 +301,6 @@ function buildPart(
         buildSequence(
           voice,
           voiceIndex,
-          tunings,
           stringCount,
           fifths,
           index,
@@ -342,7 +341,6 @@ function buildPart(
 function buildSequence(
   voice: alphaTab.model.Voice,
   voiceIndex: number,
-  tunings: number[],
   stringCount: number,
   fifths: number,
   measureIndex: number,
@@ -430,7 +428,7 @@ function buildSequence(
       event.rest = {};
     } else {
       event.notes = beat.notes.map(note =>
-        buildNote(note, tunings, stringCount, fifths)
+        buildNote(note, stringCount, fifths)
       );
     }
 
@@ -514,7 +512,6 @@ function buildLyrics(
 
 function buildNote(
   note: alphaTab.model.Note,
-  tunings: number[],
   stringCount: number,
   fifths: number
 ): MnxNote {

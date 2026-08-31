@@ -3,9 +3,10 @@
 // deep-linkable URL (#/scenario/<id>?view=…). The shell is a leaf: it
 // consumes corpus/ and elements/, and nothing imports it.
 //
-// The workbench has NO backend: everything on screen is committed JSON
-// served statically; verification state is display-only (mutations happen
-// through the harness scripts, in git).
+// The workbench has NO backend: corpus content is committed JSON served
+// statically, while an explicitly opened local file remains in memory only.
+// Verification state is display-only (mutations happen through harness
+// scripts, in git).
 import { LitElement, html, css, svg, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { corpus, corpusManifest, coverage, type ScenarioEntry } from '../corpus/corpus.ts';
@@ -22,9 +23,14 @@ import { completePkceLanding, parkLanding } from './assistCredentials.ts';
 import './QueueHome.ts';
 import { SETUP_POPOVER_COMMANDS, type ScenarioPage } from './ScenarioPage.ts';
 import './ObjectsPage.ts';
+import {
+  LOCAL_FILE_ACCEPT,
+  openLocalFile,
+  type LocalDocumentSource
+} from './localFile.ts';
 
 export interface Route {
-  page: 'home' | 'scenario' | 'objects';
+  page: 'home' | 'scenario' | 'document' | 'objects';
   id?: string;
   view?: string;
   /** The schema object on #/objects/<def>; absent on the index itself. */
@@ -34,6 +40,8 @@ export interface Route {
 export function parseHash(hash: string): Route {
   const scenario = /^#\/scenario\/([^?]+)(?:\?view=([a-z-]+))?$/.exec(hash);
   if (scenario) return { page: 'scenario', id: decodeURIComponent(scenario[1]), view: scenario[2] };
+  const document = /^#\/document(?:\?view=([a-z-]+))?$/.exec(hash);
+  if (document) return { page: 'document', view: document[1] };
   const objects = /^#\/objects(?:\/([a-z0-9-]+))?$/.exec(hash);
   if (objects) return { page: 'objects', def: objects[1] };
   return { page: 'home' };
@@ -41,6 +49,10 @@ export function parseHash(hash: string): Route {
 
 export function scenarioHref(id: string, view?: string): string {
   return `#/scenario/${encodeURIComponent(id).replace(/%2F/g, '/')}${view ? `?view=${view}` : ''}`;
+}
+
+export function documentHref(view?: string): string {
+  return `#/document${view ? `?view=${view}` : ''}`;
 }
 
 export function objectsHref(def?: string): string {
@@ -99,6 +111,11 @@ export class WorkbenchApp extends LitElement {
   @state() private documentFocus = false;
   @state() private focusHint = false;
   @state() private browserFullscreen = document.fullscreenElement !== null;
+  /** The current user-selected file. Deliberately transient: no IndexedDB,
+   *  file handle, save path, or reload restoration. */
+  @state() private localDocument: LocalDocumentSource | null = null;
+  @state() private openingLocalFile = false;
+  @state() private localFileError = '';
   private focusHintTimer: ReturnType<typeof setTimeout> | undefined;
 
   private setRailHidden(hidden: boolean) {
@@ -112,7 +129,7 @@ export class WorkbenchApp extends LitElement {
   }
 
   private setDocumentFocus(focused: boolean) {
-    if (focused && this.route.page !== 'scenario') return;
+    if (focused && this.route.page !== 'scenario' && this.route.page !== 'document') return;
     this.documentFocus = focused;
     this.toggleAttribute('document-focus', focused);
     clearTimeout(this.focusHintTimer);
@@ -219,7 +236,9 @@ export class WorkbenchApp extends LitElement {
   private onHashChange = () => {
     const route = parseHash(location.hash);
     this.route = route;
-    if (route.page !== 'scenario' && this.documentFocus) this.setDocumentFocus(false);
+    if (route.page !== 'scenario' && route.page !== 'document' && this.documentFocus) {
+      this.setDocumentFocus(false);
+    }
     // #/objects/<def> IS the filter: the URL drives the rail so that "show me
     // this object's examples" is deep-linkable rather than transient state.
     // Only ever clobber a def: query — a hand-typed search survives navigation.
@@ -334,6 +353,76 @@ export class WorkbenchApp extends LitElement {
       .theme-toggle:focus-visible {
         outline: var(--rule-w) solid var(--focus-ring);
         outline-offset: 2px;
+      }
+
+      .file-open {
+        border: 1px solid var(--line-strong);
+        background: var(--surface);
+        color: var(--ink-2);
+        padding: 5px 9px;
+        font: 600 10px/1 var(--sans);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .file-open:hover:not(:disabled),
+      .file-open:focus-visible {
+        color: var(--accent-fg);
+        border-color: var(--accent);
+      }
+
+      .file-open:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      .local-file-input {
+        display: none;
+      }
+
+      .file-error {
+        position: fixed;
+        z-index: 50;
+        top: 54px;
+        left: 50%;
+        translate: -50% 0;
+        max-width: min(680px, calc(100vw - 32px));
+        padding: 10px 12px;
+        border: var(--rule-w) solid var(--danger-fg, var(--accent));
+        background: var(--surface);
+        color: var(--ink);
+        box-shadow: var(--shadow);
+        font-size: 12px;
+      }
+
+      .file-error button {
+        margin-left: 12px;
+        border: 0;
+        background: none;
+        color: var(--accent-fg);
+        cursor: pointer;
+      }
+
+      .local-empty {
+        min-height: 100%;
+        display: grid;
+        place-content: center;
+        justify-items: start;
+        gap: 10px;
+        padding: 40px;
+        box-sizing: border-box;
+        color: var(--ink-2);
+      }
+
+      .local-empty h1,
+      .local-empty p {
+        margin: 0;
+      }
+
+      .local-empty h1 {
+        color: var(--ink);
+        font: 600 22px/1.2 var(--sans);
       }
 
       /* THE HEADER AS A BAND (workbench-chrome-language.md). Structurally this
@@ -652,6 +741,31 @@ export class WorkbenchApp extends LitElement {
     clearTimeout(this.focusHintTimer);
   }
 
+  private chooseLocalFile() {
+    this.renderRoot.querySelector<HTMLInputElement>('#local-file')?.click();
+  }
+
+  private onLocalFileSelected = async (event: Event) => {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    // Permit choosing the same file twice; the change event otherwise does
+    // not fire after a failed conversion or a later re-open.
+    input.value = '';
+    if (!file) return;
+
+    this.openingLocalFile = true;
+    this.localFileError = '';
+    try {
+      this.localDocument = await openLocalFile(file);
+      if (location.hash === documentHref()) this.route = parseHash(location.hash);
+      else location.hash = documentHref();
+    } catch (error) {
+      this.localFileError = error instanceof Error ? error.message : String(error);
+    } finally {
+      this.openingLocalFile = false;
+    }
+  };
+
   /** The shell's keys: `/` and Ctrl+G open go-to (whose `>` prefix reaches
    *  commands — `/` reverted to this pre-tray job with one-surface 11b), Ctrl+B folds
    *  the rail — all resolved through the keymap module's shell table, which
@@ -670,7 +784,7 @@ export class WorkbenchApp extends LitElement {
       return;
     }
     if (action === 'toggleDocumentFocus') {
-      if (this.route.page !== 'scenario') return;
+      if (this.route.page !== 'scenario' && this.route.page !== 'document') return;
       event.preventDefault();
       this.toggleDocumentFocus();
       return;
@@ -691,7 +805,7 @@ export class WorkbenchApp extends LitElement {
     }
   };
 
-  /** The mounted scenario page, when one is routed. */
+  /** The mounted document editor, whether fed by a scenario or a local file. */
   private scenarioPage(): ScenarioPage | null {
     return this.renderRoot?.querySelector<ScenarioPage>('mnx-scenario-page') ?? null;
   }
@@ -724,6 +838,11 @@ export class WorkbenchApp extends LitElement {
     });
 
     const items: PaletteItem[] = [
+      {
+        label: 'file: open local document…',
+        hint: 'MNX or Guitar Pro',
+        run: () => this.chooseLocalFile()
+      },
       nav('go: attention queue', '#/'),
       nav('go: objects coverage', objectsHref()),
       {
@@ -818,7 +937,7 @@ export class WorkbenchApp extends LitElement {
   private goToItems(q: string): PaletteItem[] {
     const items: PaletteItem[] = [];
     const bar = /^(\d+)$/.exec(q);
-    if (bar && this.route.page === 'scenario') {
+    if (bar && (this.route.page === 'scenario' || this.route.page === 'document')) {
       const n = Number(bar[1]);
       if (n >= 1) {
         items.push({
@@ -961,6 +1080,14 @@ export class WorkbenchApp extends LitElement {
           ${this.railHidden ? '⟩' : '⟨'}
         </button>
         <span class="brand"><a href="#/">MNX Lab — workbench</a></span>
+        <button
+          class="file-open"
+          ?disabled=${this.openingLocalFile}
+          title="open an MNX or Guitar Pro file from this computer"
+          @click=${() => this.chooseLocalFile()}
+        >
+          ${this.openingLocalFile ? 'opening…' : 'open…'}
+        </button>
         <span class="facts">
           <span class="fact">
             <span class="fact-k">MNX</span>
@@ -1018,6 +1145,24 @@ export class WorkbenchApp extends LitElement {
               .selectionClipboard=${this.selectionClipboard}
               @document-focus-request=${this.requestDocumentFocus}
             ></mnx-scenario-page>`
+          : this.route.page === 'document'
+            ? this.localDocument
+              ? html`<mnx-scenario-page
+                  .scenarioId=${this.localDocument.id}
+                  .view=${this.route.view ?? ''}
+                  .localDocument=${this.localDocument}
+                  .documentFocus=${this.documentFocus}
+                  .selectionClipboard=${this.selectionClipboard}
+                  @document-focus-request=${this.requestDocumentFocus}
+                ></mnx-scenario-page>`
+              : html`<section class="local-empty">
+                  <h1>Open a local document</h1>
+                  <p>
+                    Choose an MNX JSON or Guitar Pro file. It is read into this page only and is
+                    not stored or uploaded.
+                  </p>
+                  <button class="file-open" @click=${() => this.chooseLocalFile()}>open…</button>
+                </section>`
           : this.route.page === 'objects'
             ? html`<mnx-objects-page .def=${this.route.def ?? ''}></mnx-objects-page>`
             : html`<mnx-queue-home></mnx-queue-home>`}
@@ -1031,6 +1176,19 @@ export class WorkbenchApp extends LitElement {
             .initialQuery=${this.palette === 'commands' ? '> ' : ''}
             @palette-close=${() => (this.palette = null)}
           ></mnx-command-palette>`
+        : nothing}
+      <input
+        id="local-file"
+        class="local-file-input"
+        type="file"
+        accept=${LOCAL_FILE_ACCEPT}
+        @change=${this.onLocalFileSelected}
+      />
+      ${this.localFileError
+        ? html`<div class="file-error" role="alert">
+            ${this.localFileError}
+            <button @click=${() => (this.localFileError = '')}>dismiss</button>
+          </div>`
         : nothing}
     `;
   }
