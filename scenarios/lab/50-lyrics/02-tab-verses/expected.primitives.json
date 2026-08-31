@@ -2,13 +2,13 @@
   "widthSp": 80,
   "notation": {
     "widthSp": 80,
-    "heightSp": 21.5,
+    "heightSp": 37.017,
     "primitives": [
       {
         "kind": "line",
         "x1": 2,
         "y1": 8,
-        "x2": 49.4,
+        "x2": 45.375,
         "y2": 8,
         "thickness": 0.13,
         "className": "staff-line"
@@ -17,7 +17,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 9,
-        "x2": 49.4,
+        "x2": 45.375,
         "y2": 9,
         "thickness": 0.13,
         "className": "staff-line"
@@ -26,7 +26,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 10,
-        "x2": 49.4,
+        "x2": 45.375,
         "y2": 10,
         "thickness": 0.13,
         "className": "staff-line"
@@ -35,7 +35,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 11,
-        "x2": 49.4,
+        "x2": 45.375,
         "y2": 11,
         "thickness": 0.13,
         "className": "staff-line"
@@ -44,7 +44,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 12,
-        "x2": 49.4,
+        "x2": 45.375,
         "y2": 12,
         "thickness": 0.13,
         "className": "staff-line"
@@ -75,16 +75,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadBlack",
-        "x": 11.51,
+        "x": 10.8881,
         "y": 12,
         "className": "notehead",
         "sourceId": "@m0.v0.e0.n0"
       },
       {
         "kind": "line",
-        "x1": 12.69,
+        "x1": 12.0681,
         "y1": 8.5,
-        "x2": 12.69,
+        "x2": 12.0681,
         "y2": 11.832,
         "thickness": 0.12,
         "className": "stem"
@@ -92,16 +92,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadBlack",
-        "x": 20.56,
+        "x": 19.6444,
         "y": 11,
         "className": "notehead",
         "sourceId": "@m0.v0.e1.n0"
       },
       {
         "kind": "line",
-        "x1": 21.74,
+        "x1": 20.8244,
         "y1": 7.5,
-        "x2": 21.74,
+        "x2": 20.8244,
         "y2": 10.832,
         "thickness": 0.12,
         "className": "stem"
@@ -109,16 +109,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadBlack",
-        "x": 30.56,
+        "x": 28.4006,
         "y": 10.5,
         "className": "notehead",
         "sourceId": "@m0.v0.e2.n0"
       },
       {
         "kind": "line",
-        "x1": 31.74,
+        "x1": 29.5806,
         "y1": 7,
-        "x2": 31.74,
+        "x2": 29.5806,
         "y2": 10.332,
         "thickness": 0.12,
         "className": "stem"
@@ -126,33 +126,406 @@
       {
         "kind": "glyph",
         "glyph": "noteheadBlack",
-        "x": 41.51,
+        "x": 38.1069,
         "y": 11,
         "className": "notehead",
         "sourceId": "@m0.v0.e3.n0"
       },
       {
         "kind": "line",
-        "x1": 42.69,
+        "x1": 39.2869,
         "y1": 7.5,
-        "x2": 42.69,
+        "x2": 39.2869,
         "y2": 10.832,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
-        "x1": 48.6,
+        "x1": 45.375,
         "y1": 8,
-        "x2": 48.6,
+        "x2": 45.375,
         "y2": 12,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 45.375,
+        "y1": 8,
+        "x2": 78,
+        "y2": 8,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 45.375,
+        "y1": 9,
+        "x2": 78,
+        "y2": 9,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 45.375,
+        "y1": 10,
+        "x2": 78,
+        "y2": 10,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 45.375,
+        "y1": 11,
+        "x2": 78,
+        "y2": 11,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 45.375,
+        "y1": 12,
+        "x2": 78,
+        "y2": 12,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 48.2631,
+        "y": 12,
+        "className": "notehead",
+        "sourceId": "@m1.v0.e0.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 49.4431,
+        "y1": 8.5,
+        "x2": 49.4431,
+        "y2": 11.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 55.1194,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "@m1.v0.e1.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 56.2994,
+        "y1": 7.5,
+        "x2": 56.2994,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 62.9256,
+        "y": 10.5,
+        "className": "notehead",
+        "sourceId": "@m1.v0.e2.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 64.1056,
+        "y1": 7,
+        "x2": 64.1056,
+        "y2": 10.332,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 70.7319,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "@m1.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 71.9119,
+        "y1": 7.5,
+        "x2": 71.9119,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 78,
+        "y1": 8,
+        "x2": 78,
+        "y2": 12,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 23.517,
+        "x2": 39.075,
+        "y2": 23.517,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 24.517,
+        "x2": 39.075,
+        "y2": 24.517,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 25.517,
+        "x2": 39.075,
+        "y2": 25.517,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 26.517,
+        "x2": 39.075,
+        "y2": 26.517,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 27.517,
+        "x2": 39.075,
+        "y2": 27.517,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef8vb",
+        "x": 3.1,
+        "y": 26.517,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 8.3881,
+        "y": 27.517,
+        "className": "notehead",
+        "sourceId": "@m2.v0.e0.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 9.5681,
+        "y1": 24.017,
+        "x2": 9.5681,
+        "y2": 27.349,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 17.1444,
+        "y": 26.517,
+        "className": "notehead",
+        "sourceId": "@m2.v0.e1.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 18.3244,
+        "y1": 23.017,
+        "x2": 18.3244,
+        "y2": 26.349,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 24.9506,
+        "y": 26.017,
+        "className": "notehead",
+        "sourceId": "@m2.v0.e2.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 26.1306,
+        "y1": 22.517,
+        "x2": 26.1306,
+        "y2": 25.849,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 33.7069,
+        "y": 26.517,
+        "className": "notehead",
+        "sourceId": "@m2.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 34.8869,
+        "y1": 23.017,
+        "x2": 34.8869,
+        "y2": 26.349,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 39.075,
+        "y1": 23.517,
+        "x2": 39.075,
+        "y2": 27.517,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 39.075,
+        "y1": 23.517,
+        "x2": 74.55,
+        "y2": 23.517,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 39.075,
+        "y1": 24.517,
+        "x2": 74.55,
+        "y2": 24.517,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 39.075,
+        "y1": 25.517,
+        "x2": 74.55,
+        "y2": 25.517,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 39.075,
+        "y1": 26.517,
+        "x2": 74.55,
+        "y2": 26.517,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 39.075,
+        "y1": 27.517,
+        "x2": 74.55,
+        "y2": 27.517,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 41.9631,
+        "y": 27.517,
+        "className": "notehead",
+        "sourceId": "@m3.v0.e0.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 43.1431,
+        "y1": 24.017,
+        "x2": 43.1431,
+        "y2": 27.349,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 50.7194,
+        "y": 26.517,
+        "className": "notehead",
+        "sourceId": "@m3.v0.e1.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 51.8994,
+        "y1": 23.017,
+        "x2": 51.8994,
+        "y2": 26.349,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 59.4756,
+        "y": 26.017,
+        "className": "notehead",
+        "sourceId": "@m3.v0.e2.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 60.6556,
+        "y1": 22.517,
+        "x2": 60.6556,
+        "y2": 25.849,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 66.3319,
+        "y": 26.517,
+        "className": "notehead",
+        "sourceId": "@m3.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 67.5119,
+        "y1": 23.017,
+        "x2": 67.5119,
+        "y2": 26.349,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 73.75,
+        "y1": 23.517,
+        "x2": 73.75,
+        "y2": 27.517,
         "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
-        "x": 48.9,
-        "y": 8,
+        "x": 74.05,
+        "y": 23.517,
         "w": 0.5,
         "h": 4,
         "fill": "currentColor",
@@ -161,7 +534,7 @@
       {
         "kind": "text",
         "text": "Sun",
-        "x": 12.1,
+        "x": 11.4781,
         "y": 16.5,
         "font": "body",
         "size": 1.7,
@@ -171,7 +544,7 @@
       {
         "kind": "text",
         "text": "did",
-        "x": 21.15,
+        "x": 20.2344,
         "y": 16.5,
         "font": "body",
         "size": 1.7,
@@ -181,7 +554,7 @@
       {
         "kind": "text",
         "text": "glide",
-        "x": 31.15,
+        "x": 28.9906,
         "y": 16.5,
         "font": "body",
         "size": 1.7,
@@ -191,7 +564,7 @@
       {
         "kind": "text",
         "text": "down",
-        "x": 42.1,
+        "x": 38.6969,
         "y": 16.5,
         "font": "body",
         "size": 1.7,
@@ -200,9 +573,29 @@
       },
       {
         "kind": "text",
-        "text": "Ri",
-        "x": 12.1,
-        "y": 18.7,
+        "text": "on",
+        "x": 48.8531,
+        "y": 16.5,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "the",
+        "x": 55.7094,
+        "y": 16.5,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "riv",
+        "x": 63.5156,
+        "y": 16.5,
         "font": "body",
         "size": 1.7,
         "anchor": "middle",
@@ -211,8 +604,8 @@
       {
         "kind": "text",
         "text": "-",
-        "x": 16.625,
-        "y": 18.7,
+        "x": 67.4188,
+        "y": 16.5,
         "font": "body",
         "size": 1.7,
         "anchor": "middle",
@@ -220,9 +613,9 @@
       },
       {
         "kind": "text",
-        "text": "sing",
-        "x": 21.15,
-        "y": 18.7,
+        "text": "er",
+        "x": 71.3219,
+        "y": 16.5,
         "font": "body",
         "size": 1.7,
         "anchor": "middle",
@@ -231,7 +624,157 @@
       {
         "kind": "text",
         "text": "wa",
-        "x": 31.15,
+        "x": 8.9781,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 13.3563,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "ter",
+        "x": 17.7344,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "car",
+        "x": 25.5406,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 29.9188,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "ry",
+        "x": 34.2969,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "me",
+        "x": 42.5531,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "safe",
+        "x": 51.3094,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 55.6875,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "ly",
+        "x": 60.0656,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "home",
+        "x": 66.9219,
+        "y": 32.017,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "Moon",
+        "x": 11.4781,
+        "y": 18.7,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "will",
+        "x": 20.2344,
+        "y": 18.7,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "drift",
+        "x": 28.9906,
+        "y": 18.7,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "by",
+        "x": 38.6969,
+        "y": 18.7,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "un",
+        "x": 48.8531,
         "y": 18.7,
         "font": "body",
         "size": 1.7,
@@ -241,7 +784,7 @@
       {
         "kind": "text",
         "text": "-",
-        "x": 36.625,
+        "x": 52.2813,
         "y": 18.7,
         "font": "body",
         "size": 1.7,
@@ -250,9 +793,139 @@
       },
       {
         "kind": "text",
-        "text": "ter",
-        "x": 42.1,
+        "text": "der",
+        "x": 55.7094,
         "y": 18.7,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "wil",
+        "x": 63.5156,
+        "y": 18.7,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 67.4188,
+        "y": 18.7,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "lows",
+        "x": 71.3219,
+        "y": 18.7,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "shad",
+        "x": 8.9781,
+        "y": 34.217,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 13.3563,
+        "y": 34.217,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "ows",
+        "x": 17.7344,
+        "y": 34.217,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "soft",
+        "x": 25.5406,
+        "y": 34.217,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 29.9188,
+        "y": 34.217,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "ly",
+        "x": 34.2969,
+        "y": 34.217,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "sing",
+        "x": 42.5531,
+        "y": 34.217,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "me",
+        "x": 51.3094,
+        "y": 34.217,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "to",
+        "x": 60.0656,
+        "y": 34.217,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "sleep",
+        "x": 66.9219,
+        "y": 34.217,
         "font": "body",
         "size": 1.7,
         "anchor": "middle",
@@ -262,13 +935,13 @@
   },
   "tab": {
     "widthSp": 80,
-    "heightSp": 18.3393,
+    "heightSp": 36.2524,
     "primitives": [
       {
         "kind": "line",
         "x1": 2,
         "y1": 5,
-        "x2": 48.4,
+        "x2": 44.875,
         "y2": 5,
         "thickness": 0.1,
         "className": "staff-line"
@@ -277,7 +950,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 6.1429,
-        "x2": 48.4,
+        "x2": 44.875,
         "y2": 6.1429,
         "thickness": 0.1,
         "className": "staff-line"
@@ -286,7 +959,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 7.2857,
-        "x2": 48.4,
+        "x2": 44.875,
         "y2": 7.2857,
         "thickness": 0.1,
         "className": "staff-line"
@@ -295,7 +968,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 8.4286,
-        "x2": 48.4,
+        "x2": 44.875,
         "y2": 8.4286,
         "thickness": 0.1,
         "className": "staff-line"
@@ -304,7 +977,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 9.5714,
-        "x2": 48.4,
+        "x2": 44.875,
         "y2": 9.5714,
         "thickness": 0.1,
         "className": "staff-line"
@@ -313,7 +986,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 10.7143,
-        "x2": 48.4,
+        "x2": 44.875,
         "y2": 10.7143,
         "thickness": 0.1,
         "className": "staff-line"
@@ -352,7 +1025,7 @@
       },
       {
         "kind": "rect",
-        "x": 10.725,
+        "x": 10.1656,
         "y": 7.9171,
         "w": 0.75,
         "h": 1.0229,
@@ -363,7 +1036,7 @@
       {
         "kind": "text",
         "text": "2",
-        "x": 11.1,
+        "x": 10.5406,
         "y": 8.4286,
         "font": "body",
         "size": 1.25,
@@ -375,7 +1048,7 @@
       },
       {
         "kind": "rect",
-        "x": 19.775,
+        "x": 19.0469,
         "y": 6.7743,
         "w": 0.75,
         "h": 1.0229,
@@ -386,7 +1059,7 @@
       {
         "kind": "text",
         "text": "0",
-        "x": 20.15,
+        "x": 19.4219,
         "y": 7.2857,
         "font": "body",
         "size": 1.25,
@@ -398,7 +1071,7 @@
       },
       {
         "kind": "rect",
-        "x": 29.775,
+        "x": 27.9281,
         "y": 6.7743,
         "w": 0.75,
         "h": 1.0229,
@@ -409,7 +1082,7 @@
       {
         "kind": "text",
         "text": "2",
-        "x": 30.15,
+        "x": 28.3031,
         "y": 7.2857,
         "font": "body",
         "size": 1.25,
@@ -421,7 +1094,7 @@
       },
       {
         "kind": "rect",
-        "x": 40.725,
+        "x": 37.7594,
         "y": 6.7743,
         "w": 0.75,
         "h": 1.0229,
@@ -432,7 +1105,7 @@
       {
         "kind": "text",
         "text": "0",
-        "x": 41.1,
+        "x": 38.1344,
         "y": 7.2857,
         "font": "body",
         "size": 1.25,
@@ -444,17 +1117,498 @@
       },
       {
         "kind": "line",
-        "x1": 47.6,
+        "x1": 44.875,
         "y1": 5,
-        "x2": 47.6,
+        "x2": 44.875,
         "y2": 10.7143,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 44.875,
+        "y1": 5,
+        "x2": 78,
+        "y2": 5,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 44.875,
+        "y1": 6.1429,
+        "x2": 78,
+        "y2": 6.1429,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 44.875,
+        "y1": 7.2857,
+        "x2": 78,
+        "y2": 7.2857,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 44.875,
+        "y1": 8.4286,
+        "x2": 78,
+        "y2": 8.4286,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 44.875,
+        "y1": 9.5714,
+        "x2": 78,
+        "y2": 9.5714,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 44.875,
+        "y1": 10.7143,
+        "x2": 78,
+        "y2": 10.7143,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "rect",
+        "x": 48.0406,
+        "y": 7.9171,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m1.v0.e0.n0"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 48.4156,
+        "y": 8.4286,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m1.v0.e0.n0"
+      },
+      {
+        "kind": "rect",
+        "x": 55.0219,
+        "y": 6.7743,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m1.v0.e1.n0"
+      },
+      {
+        "kind": "text",
+        "text": "0",
+        "x": 55.3969,
+        "y": 7.2857,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m1.v0.e1.n0"
+      },
+      {
+        "kind": "rect",
+        "x": 62.9531,
+        "y": 6.7743,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m1.v0.e2.n0"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 63.3281,
+        "y": 7.2857,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m1.v0.e2.n0"
+      },
+      {
+        "kind": "rect",
+        "x": 70.8844,
+        "y": 6.7743,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m1.v0.e3.n0"
+      },
+      {
+        "kind": "text",
+        "text": "0",
+        "x": 71.2594,
+        "y": 7.2857,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m1.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 78,
+        "y1": 5,
+        "x2": 78,
+        "y2": 10.7143,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 21.0381,
+        "x2": 38.575,
+        "y2": 21.0381,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 22.181,
+        "x2": 38.575,
+        "y2": 22.181,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 23.3239,
+        "x2": 38.575,
+        "y2": 23.3239,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 24.4667,
+        "x2": 38.575,
+        "y2": 24.4667,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 25.6096,
+        "x2": 38.575,
+        "y2": 25.6096,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 26.7524,
+        "x2": 38.575,
+        "y2": 26.7524,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 21.0381,
+        "x2": 2,
+        "y2": 26.7524,
+        "thickness": 0.16,
+        "className": "barline barline-start"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "6stringTabClef",
+        "x": 3.1,
+        "y": 23.8953,
+        "className": "tab-clef"
+      },
+      {
+        "kind": "rect",
+        "x": 7.6656,
+        "y": 23.9553,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m2.v0.e0.n0"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 8.0406,
+        "y": 24.4667,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m2.v0.e0.n0"
+      },
+      {
+        "kind": "rect",
+        "x": 16.5469,
+        "y": 22.8124,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m2.v0.e1.n0"
+      },
+      {
+        "kind": "text",
+        "text": "0",
+        "x": 16.9219,
+        "y": 23.3239,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m2.v0.e1.n0"
+      },
+      {
+        "kind": "rect",
+        "x": 24.4781,
+        "y": 22.8124,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m2.v0.e2.n0"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 24.8531,
+        "y": 23.3239,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m2.v0.e2.n0"
+      },
+      {
+        "kind": "rect",
+        "x": 33.3594,
+        "y": 22.8124,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m2.v0.e3.n0"
+      },
+      {
+        "kind": "text",
+        "text": "0",
+        "x": 33.7344,
+        "y": 23.3239,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m2.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 38.575,
+        "y1": 21.0381,
+        "x2": 38.575,
+        "y2": 26.7524,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 38.575,
+        "y1": 21.0381,
+        "x2": 74.55,
+        "y2": 21.0381,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 38.575,
+        "y1": 22.181,
+        "x2": 74.55,
+        "y2": 22.181,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 38.575,
+        "y1": 23.3239,
+        "x2": 74.55,
+        "y2": 23.3239,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 38.575,
+        "y1": 24.4667,
+        "x2": 74.55,
+        "y2": 24.4667,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 38.575,
+        "y1": 25.6096,
+        "x2": 74.55,
+        "y2": 25.6096,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 38.575,
+        "y1": 26.7524,
+        "x2": 74.55,
+        "y2": 26.7524,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "rect",
+        "x": 41.7406,
+        "y": 23.9553,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m3.v0.e0.n0"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 42.1156,
+        "y": 24.4667,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m3.v0.e0.n0"
+      },
+      {
+        "kind": "rect",
+        "x": 50.6219,
+        "y": 22.8124,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m3.v0.e1.n0"
+      },
+      {
+        "kind": "text",
+        "text": "0",
+        "x": 50.9969,
+        "y": 23.3239,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m3.v0.e1.n0"
+      },
+      {
+        "kind": "rect",
+        "x": 59.5031,
+        "y": 22.8124,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m3.v0.e2.n0"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 59.8781,
+        "y": 23.3239,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m3.v0.e2.n0"
+      },
+      {
+        "kind": "rect",
+        "x": 66.4844,
+        "y": 22.8124,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "@m3.v0.e3.n0"
+      },
+      {
+        "kind": "text",
+        "text": "0",
+        "x": 66.8594,
+        "y": 23.3239,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "@m3.v0.e3.n0"
+      },
+      {
+        "kind": "line",
+        "x1": 73.75,
+        "y1": 21.0381,
+        "x2": 73.75,
+        "y2": 26.7524,
         "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
-        "x": 47.9,
-        "y": 5,
+        "x": 74.05,
+        "y": 21.0381,
         "w": 0.5,
         "h": 5.7143,
         "fill": "currentColor",
@@ -463,7 +1617,7 @@
       {
         "kind": "text",
         "text": "Sun",
-        "x": 11.1,
+        "x": 10.5406,
         "y": 15.2143,
         "font": "body",
         "size": 1.7,
@@ -473,7 +1627,7 @@
       {
         "kind": "text",
         "text": "did",
-        "x": 20.15,
+        "x": 19.4219,
         "y": 15.2143,
         "font": "body",
         "size": 1.7,
@@ -483,7 +1637,7 @@
       {
         "kind": "text",
         "text": "glide",
-        "x": 30.15,
+        "x": 28.3031,
         "y": 15.2143,
         "font": "body",
         "size": 1.7,
@@ -493,7 +1647,7 @@
       {
         "kind": "text",
         "text": "down",
-        "x": 41.1,
+        "x": 38.1344,
         "y": 15.2143,
         "font": "body",
         "size": 1.7,
@@ -502,9 +1656,29 @@
       },
       {
         "kind": "text",
-        "text": "Ri",
-        "x": 11.1,
-        "y": 17.4143,
+        "text": "on",
+        "x": 48.4156,
+        "y": 15.2143,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "the",
+        "x": 55.3969,
+        "y": 15.2143,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "riv",
+        "x": 63.3281,
+        "y": 15.2143,
         "font": "body",
         "size": 1.7,
         "anchor": "middle",
@@ -513,8 +1687,8 @@
       {
         "kind": "text",
         "text": "-",
-        "x": 15.625,
-        "y": 17.4143,
+        "x": 67.2937,
+        "y": 15.2143,
         "font": "body",
         "size": 1.7,
         "anchor": "middle",
@@ -522,9 +1696,9 @@
       },
       {
         "kind": "text",
-        "text": "sing",
-        "x": 20.15,
-        "y": 17.4143,
+        "text": "er",
+        "x": 71.2594,
+        "y": 15.2143,
         "font": "body",
         "size": 1.7,
         "anchor": "middle",
@@ -533,7 +1707,157 @@
       {
         "kind": "text",
         "text": "wa",
-        "x": 30.15,
+        "x": 8.0406,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 12.4813,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "ter",
+        "x": 16.9219,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "car",
+        "x": 24.8531,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 29.2938,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "ry",
+        "x": 33.7344,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "me",
+        "x": 42.1156,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "safe",
+        "x": 50.9969,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 55.4375,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "ly",
+        "x": 59.8781,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "home",
+        "x": 66.8594,
+        "y": 31.2524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "Moon",
+        "x": 10.5406,
+        "y": 17.4143,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "will",
+        "x": 19.4219,
+        "y": 17.4143,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "drift",
+        "x": 28.3031,
+        "y": 17.4143,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "by",
+        "x": 38.1344,
+        "y": 17.4143,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "un",
+        "x": 48.4156,
         "y": 17.4143,
         "font": "body",
         "size": 1.7,
@@ -543,7 +1867,7 @@
       {
         "kind": "text",
         "text": "-",
-        "x": 35.625,
+        "x": 51.9062,
         "y": 17.4143,
         "font": "body",
         "size": 1.7,
@@ -552,9 +1876,139 @@
       },
       {
         "kind": "text",
-        "text": "ter",
-        "x": 41.1,
+        "text": "der",
+        "x": 55.3969,
         "y": 17.4143,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "wil",
+        "x": 63.3281,
+        "y": 17.4143,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 67.2937,
+        "y": 17.4143,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "lows",
+        "x": 71.2594,
+        "y": 17.4143,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "shad",
+        "x": 8.0406,
+        "y": 33.4524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 12.4813,
+        "y": 33.4524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "ows",
+        "x": 16.9219,
+        "y": 33.4524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "soft",
+        "x": 24.8531,
+        "y": 33.4524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "-",
+        "x": 29.2938,
+        "y": 33.4524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric-hyphen"
+      },
+      {
+        "kind": "text",
+        "text": "ly",
+        "x": 33.7344,
+        "y": 33.4524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "sing",
+        "x": 42.1156,
+        "y": 33.4524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "me",
+        "x": 50.9969,
+        "y": 33.4524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "to",
+        "x": 59.8781,
+        "y": 33.4524,
+        "font": "body",
+        "size": 1.7,
+        "anchor": "middle",
+        "className": "lyric"
+      },
+      {
+        "kind": "text",
+        "text": "sleep",
+        "x": 66.8594,
+        "y": 33.4524,
         "font": "body",
         "size": 1.7,
         "anchor": "middle",
