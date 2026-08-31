@@ -44,12 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-part.md](proposed/workbench-one-surface-part.md)** —
-  one-surface campaign item 9, **built 2026-08-31**: the part popover retired; part facts
-  (name — the rename that never existed — staves, staff kind) live at the part-bar rung,
-  the document rung earns its first words (`part <name>` as construction-by-declaration,
-  the explicit-marking flags as pills), and `setStaffKind` joins the parts[0]-widening
-  family; five tiles and two glyph twins retire with it.
 - **[workbench-one-surface-lyrics.md](proposed/workbench-one-surface-lyrics.md)** —
   one-surface campaign item 6, **proposed 2026-08-31, design open**: the lyric popover's
   retirement plan — the line-metadata gap is the minimum bar, and two investigations are
@@ -250,6 +244,12 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-one-surface-part.md](complete/workbench-one-surface-part.md)** —
+  one-surface campaign item 9, **built 2026-08-31**: the part popover retired; part facts
+  (name — the rename that never existed — staves, staff kind) live at the part-bar rung,
+  the document rung earns its first words (`part <name>` as construction-by-declaration,
+  the explicit-marking flags as pills), and `setStaffKind` joins the parts[0]-widening
+  family; five tiles and two glyph twins retire with it.
 - **[workbench-one-surface-rhythm.md](complete/workbench-one-surface-rhythm.md)** —
   one-surface campaign item 8, **built 2026-08-31**: the rhythm popover retired on the
   campaign's first new verb — `setContainerProperties` (presentation fields only,
