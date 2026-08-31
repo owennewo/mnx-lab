@@ -44,11 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[workbench-one-surface-bar.md](proposed/workbench-one-surface-bar.md)** — one-surface
-  campaign item 4, **built 2026-08-31**: the bar-attribute popover retired — the largest
-  census of the easy five (every measure-attribute kind plus the two rhythm riders), six
-  popover-tier tiles deleted, and the seam repaired: the measure rung's rider refusal now
-  signposts the voice rung instead of the deleted Shift+B.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -242,6 +237,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[workbench-one-surface-bar.md](complete/workbench-one-surface-bar.md)** — one-surface
+  campaign item 4, **built 2026-08-31**: the bar-attribute popover retired — the largest
+  census of the easy five (every measure-attribute kind plus the two rhythm riders), six
+  popover-tier tiles deleted, and the seam repaired: the measure rung's rider refusal now
+  signposts the voice rung instead of the deleted Shift+B.
 - **[workbench-one-surface-clef.md](complete/workbench-one-surface-clef.md)** — one-surface
   campaign item 3, **built 2026-08-31**: the clef popover retired; the partMeasure rung's
   per-staff pills and typed `clef` word cover the grammar (`inherit` and the octave forms
