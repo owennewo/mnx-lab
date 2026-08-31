@@ -463,12 +463,6 @@ export const KEY_DOCS: KeyDoc[] = [
     }
   },
   {
-    keys: 'Shift+C',
-    strokes: [{ code: 'KeyC', shift: true }],
-    group: 'setup',
-    meaning: { all: 'clef… (typed popover: treble/bass/alto/tenor/…; `inherit` un-declares)' }
-  },
-  {
     keys: 'Shift+A',
     strokes: [{ code: 'KeyA', shift: true }],
     group: 'setup',
@@ -625,7 +619,6 @@ export const SURFACE_INTENTS: Record<string, string[]> = {
     'removeScore',
     'removeMultimeasureRest'
   ],
-  clefPopover: ['setClef', 'removeClef'],
   lyricPopover: [
     'setSyllable',
     'removeSyllable',

@@ -802,15 +802,6 @@ export const COMMANDS: readonly EditorCommand[] = [
 
   // ── part-measure ────────────────────────────────────────────────────────
   {
-    id: 'clef',
-    scopes: ['partMeasure', 'measure'],
-    glyph: { smufl: 'gClef' },
-    label: 'Clef…',
-    shortcut: 'Shift+C',
-    tier: 'popover',
-    action: () => ({ surface: 'clefPopover' })
-  },
-  {
     id: 'tuning',
     scopes: ['partMeasure'],
     glyph: { smufl: '6stringTabClef' },
@@ -1276,7 +1267,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
     // `voiceMeasure` vanishes with the last voice and takes its own copy with
     // it (core-rung-insert.md, amended 2026-08-25).
     { id: 'structure', caption: 'structure', commands: ['new-voice', 'delete-part-bar'] },
-    { id: 'staff', caption: 'staff', commands: ['clef'] },
     {
       id: 'instrument',
       caption: 'instrument',
@@ -1289,11 +1279,6 @@ export const COMMAND_GROUPS: Partial<Record<CommandScope, readonly CommandGroup[
       id: 'structure',
       caption: 'structure',
       commands: ['insert-bar-before', 'insert-bar-after', 'delete-bar']
-    },
-    {
-      id: 'signatures',
-      caption: 'signatures',
-      commands: ['clef']
     },
     {
       id: 'repeats',

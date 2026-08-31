@@ -65,10 +65,8 @@ import {
   BAR_ATTRIBUTE_HELP,
   RHYTHM_HELP,
   parseAdornment,
-  CLEF_NAME_LIST,
   parseBarAttribute,
   parseRhythm,
-  parseClef,
   parsePart,
   parseLayoutSentence,
   parseTuning,
@@ -128,7 +126,7 @@ import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layo
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
  *  the whole difference between them; parsing lives in edit/setupGrammar.ts. */
 type PopoverKind =
-  | 'tuning' | 'part' | 'clef' | 'bar' | 'adornment' | 'lyric' | 'rhythm'
+  | 'tuning' | 'part' | 'bar' | 'adornment' | 'lyric' | 'rhythm'
   | 'layout';
 
 const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; hint: string }> = {
@@ -146,11 +144,6 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
     label: 'layout',
     placeholder: 'layout L1: bracket [ vn1, vn2 ] · score "Part A": layout L1 · mmrest m3 x2',
     hint: 'the presentation layer: a layout groups parts onto staves, a score selects one · “no layout 2” strips · Enter applies · Esc closes'
-  },
-  clef: {
-    label: 'clef',
-    placeholder: 'treble · bass · treble8vb · inherit',
-    hint: 'governs this bar onward · “inherit” un-declares it · Enter applies · Esc closes'
   },
   lyric: {
     label: 'lyric',
@@ -177,7 +170,6 @@ const POPOVER_SPECS: Record<PopoverKind, { label: string; placeholder: string; h
 const POPOVER_ACTIONS: Partial<Record<ShellAction, PopoverKind>> = {
   tuningPopover: 'tuning',
   partPopover: 'part',
-  clefPopover: 'clef',
   barAttributePopover: 'bar',
   adornmentPopover: 'adornment',
   lyricPopover: 'lyric',
@@ -202,7 +194,6 @@ export const SETUP_POPOVER_COMMANDS: {
   needsTab?: boolean;
 }[] = [
   { label: 'setup: add part…', action: 'partPopover', stroke: 'Shift+P' },
-  { label: 'setup: clef…', action: 'clefPopover', stroke: 'Shift+C' },
   { label: 'setup: bar attribute…', action: 'barAttributePopover', stroke: 'Shift+B' },
   { label: 'setup: adornment…', action: 'adornmentPopover', stroke: 'Shift+A' },
   { label: 'setup: lyric…', action: 'lyricPopover', stroke: 'Shift+L' },
@@ -3134,24 +3125,6 @@ export class ScenarioPage extends LitElement {
       if (part.partId !== undefined) intent.partId = part.partId;
       if (part.name !== undefined) intent.name = part.name;
       this.stripIntent(intent);
-    } else if (this.setupPopover === 'clef') {
-      const clef = parseClef(input.value);
-      if (!clef) {
-        this.setupPopoverError = `not a clef — one of ${CLEF_NAME_LIST.join(', ')}, or “inherit”`;
-        return;
-      }
-      // `inherit` is removal: the bar reverts to the predecessor's governance
-      // (campaign item 5's inherited-attribute class), never to "no clef".
-      this.stripIntent(
-        clef === 'inherit'
-          ? { type: 'removeClef' }
-          : {
-              type: 'setClef',
-              sign: clef.sign,
-              staffPosition: clef.staffPosition,
-              ...(clef.octave ? { octave: clef.octave } : {})
-            }
-      );
     } else if (this.setupPopover === 'lyric') {
       const parsed = parseLyric(input.value);
       if (!parsed) {

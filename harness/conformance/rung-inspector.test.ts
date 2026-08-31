@@ -697,6 +697,12 @@ describe('the wider rungs', () => {
     expect(clef).toHaveProperty('intent');
     expect(edit(session, (clef as { intent: never }).intent)).toBe(true);
     expect(pillText(session)[0]).toBe('clef: bass [annotation]');
+    // The popover's whole grammar reaches the ops through this line — the
+    // retirement (one-surface campaign item 3) leans on these two forms.
+    expect(parseInspectorLine('partMeasure', 'clef', 'inherit')).toEqual({ intent: { type: 'removeClef' } });
+    expect(parseInspectorLine('partMeasure', 'clef', 'treble8vb')).toEqual({
+      intent: { type: 'setClef', sign: 'G', staffPosition: -2, octave: -1 }
+    });
     expect(parseInspectorLine('partMeasure', 'capo', '5')).toEqual({ intent: { type: 'setPartDeclaration', declaration: { kind: 'capo', value: 5 } } });
   });
 

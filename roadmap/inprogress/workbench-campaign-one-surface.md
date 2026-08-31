@@ -1,6 +1,6 @@
 # One editing surface — retire the popovers and the tray into the inspector
 
-> **Status: in progress 2026-08-31 — campaign; items 1–2 built the same day.** The three-surface experiment run by
+> **Status: in progress 2026-08-31 — campaign; items 1–3 built the same day.** The three-surface experiment run by
 > [workbench-rung-inspector.md](workbench-rung-inspector.md) ("a third
 > editing surface, to be tried *beside* the tray and the popovers so that use decides
 > which wins") has its verdict: **the inspector wins.** The user's ruling, 2026-08-31:
@@ -80,7 +80,7 @@ is one popover or the tray, and one work item.
 |---|---|---|---|---|
 | 1 | **Key signature** (~~`Shift+K`~~ freed) | `key` pill, stage 3 — reuses `parseKeySignature`, `inherit` = Backspace floor | census + removal sweep only | ✅ [built 2026-08-31](../complete/workbench-one-surface-key.md) |
 | 2 | **Time signature** (~~`Shift+T`~~ freed) | `time` pill, stage 3 — reuses `parseTimeSignature`, floor when declared | census + removal sweep only | ✅ [built 2026-08-31](../complete/workbench-one-surface-time.md) |
-| 3 | **Clef** (`Shift+C`) | `clef` pill at partMeasure, stage 4 — reuses `parseClef` | verify the registry's `measure` cross-listing loses nothing; sweep | row |
+| 3 | **Clef** (~~`Shift+C`~~ freed) | `clef` pill at partMeasure, stage 4 — reuses `parseClef` | verify the registry's `measure` cross-listing loses nothing; sweep | ✅ [built 2026-08-31](../complete/workbench-one-surface-clef.md) |
 | 4 | **Bar attributes** (`Shift+B`) | one pill per declared attribute, stage 3 — reuses `parseBarAttribute`; the rhythm riders live as voiceMeasure pills | verify all ten kinds + `tempo#n` array + segno/fine `at` forms; sweep | row |
 | 5 | **Adornments** (`Shift+A`) | markings/positioned pills, stage 4 — reuses `parseAdornment` | verify breadth (all markings, dynamics, directions incl. glyphs); sweep | row |
 | 6 | **Lyrics** (`Shift+L`) | syllable pills per line (`lyric 2: Am`), stage 4 — reuses `parseLyric` | **gap: line management** — `setLyricLine`/`removeLyricLine` (labels, lang) has no pill or word; close it, then sweep | row |
@@ -111,6 +111,14 @@ grammar — and cannot start until the popover-tier tiles have nothing left to o
 
 ## Progress + learnings log
 
+- **2026-08-31 — item 3 (clef) built.** The first rung casualty: the tile's
+  `measure` cross-listing dies with it — a clef edit from the bar rung is one ↓
+  first, the rung discipline applied. A two-scope tile costs two group entries
+  (`staff` at partMeasure, `signatures` at measure). Ops residue recorded, not
+  fixed: on a multi-staff part the inspector's per-staff clef pills all
+  set/remove at the *cursor's* staff — the popover had the identical
+  limitation, so parity held; fixing it means staff-addressed `setClef`/
+  `removeClef` intents, an ops item beside the `parts[0]` full-measure-rest gap.
 - **2026-08-31 — item 2 (time signature) built.** First global-tab casualty:
   `doc-time` (scope `session`) deleted along with the measure tile — the
   session-scope `doc-*` tiles are ungrouped, so removal is tile-only; items 7
