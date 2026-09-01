@@ -1,4 +1,4 @@
-import { inflateRawSync } from 'node:zlib';
+import { inflateRawSync, crc32 } from 'node:zlib';
 
 /**
  * Guitar Pro GPIF containers, clean-room.
@@ -66,6 +66,75 @@ export function extractScoreGpif(data: Uint8Array): string {
 
 function decodeXml(bytes: Uint8Array): string {
   return new TextDecoder('utf-8').decode(bytes);
+}
+
+/**
+ * Wraps GPIF XML as a `.gp`: a stored-only zip of `VERSION` + `Content/score.gpif`
+ * — the minimal container Guitar Pro and alphaTab both accept (the
+ * `Triplets-and-graces` fixture is the proof). Stored entries with fixed
+ * timestamps keep the bytes a pure function of the score.
+ */
+export function writeGpContainer(gpifXml: string): Uint8Array {
+  return writeStoredZip([
+    { name: 'VERSION', data: new TextEncoder().encode('7.0') },
+    { name: 'Content/score.gpif', data: new TextEncoder().encode(gpifXml) }
+  ]);
+}
+
+function writeStoredZip(entries: { name: string; data: Uint8Array }[]): Uint8Array {
+  const chunks: Uint8Array[] = [];
+  const central: Uint8Array[] = [];
+  let offset = 0;
+
+  for (const { name, data } of entries) {
+    const nameBytes = new TextEncoder().encode(name);
+    const sum = crc32(data);
+
+    const local = new Uint8Array(30);
+    const localView = new DataView(local.buffer);
+    localView.setUint32(0, ZIP_LOCAL, true);
+    localView.setUint16(4, 10, true); // version needed
+    localView.setUint16(10, 0, true); // mod time — fixed, so bytes are stable
+    localView.setUint16(12, 33, true); // mod date — 1980-01-01
+    localView.setUint32(14, sum, true);
+    localView.setUint32(18, data.length, true);
+    localView.setUint32(22, data.length, true);
+    localView.setUint16(26, nameBytes.length, true);
+
+    const header = new Uint8Array(46);
+    const headerView = new DataView(header.buffer);
+    headerView.setUint32(0, ZIP_CENTRAL, true);
+    headerView.setUint16(4, 20, true); // version made by
+    headerView.setUint16(6, 10, true);
+    headerView.setUint16(14, 33, true);
+    headerView.setUint32(16, sum, true);
+    headerView.setUint32(20, data.length, true);
+    headerView.setUint32(24, data.length, true);
+    headerView.setUint16(28, nameBytes.length, true);
+    headerView.setUint32(42, offset, true);
+
+    chunks.push(local, nameBytes, data);
+    central.push(header, nameBytes);
+    offset += local.length + nameBytes.length + data.length;
+  }
+
+  const directorySize = central.reduce((sum, part) => sum + part.length, 0);
+  const end = new Uint8Array(22);
+  const endView = new DataView(end.buffer);
+  endView.setUint32(0, ZIP_EOCD, true);
+  endView.setUint16(8, entries.length, true);
+  endView.setUint16(10, entries.length, true);
+  endView.setUint32(12, directorySize, true);
+  endView.setUint32(16, offset, true);
+
+  const parts = [...chunks, ...central, end];
+  const out = new Uint8Array(parts.reduce((sum, part) => sum + part.length, 0));
+  let at = 0;
+  for (const part of parts) {
+    out.set(part, at);
+    at += part.length;
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------

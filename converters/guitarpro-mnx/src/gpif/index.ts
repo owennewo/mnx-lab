@@ -1,11 +1,18 @@
 import { MnxStructure } from '../common/types.js';
-import { extractScoreGpif, sniffContainer, decompressBcfz, GpContainerKind } from './container.js';
+import {
+  extractScoreGpif,
+  sniffContainer,
+  decompressBcfz,
+  writeGpContainer,
+  GpContainerKind
+} from './container.js';
 import { parseGpif, GpifDocument } from './document.js';
 import { gpifToMnx, GpifImportOptions } from './toMnx.js';
+import { exportGuitarProGpif, mnxToGpifXml, GpifExportOptions } from './fromMnx.js';
 
-export { extractScoreGpif, sniffContainer, decompressBcfz };
-export type { GpContainerKind, GpifDocument, GpifImportOptions };
-export { parseGpif, gpifToMnx };
+export { extractScoreGpif, sniffContainer, decompressBcfz, writeGpContainer };
+export type { GpContainerKind, GpifDocument, GpifImportOptions, GpifExportOptions };
+export { parseGpif, gpifToMnx, exportGuitarProGpif, mnxToGpifXml };
 
 /**
  * The clean-room GPIF import path: reads any `.gp` (GP7/8 zip) or `.gpx`

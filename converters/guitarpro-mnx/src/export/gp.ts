@@ -5,12 +5,17 @@ import {
   MnxSequence,
   MnxEvent,
   MnxNote,
-  MnxHarmony,
   isGrace,
   isTimedEvent,
   isTuplet
 } from '../common/types.js';
-import { renderChordSymbol } from '../common/harmony.js';
+import {
+  resolveLyricLineOrder,
+  lyricSlots,
+  tempoReference,
+  harmonyTextByOnset,
+  planUnisonCollapse
+} from '../common/exportPlan.js';
 import {
   mnxBaseToAlphaTab,
   mnxDurationToWholes,
@@ -50,114 +55,6 @@ export interface ExportOptions {
    * ambiguity. Set false to reproduce the document literally.
    */
   collapseTabUnisons?: boolean;
-}
-
-/**
- * Verse order for lyric lines: the document's declared `lineOrder` when present,
- * otherwise the line ids in first-appearance order. Guitar Pro identifies verses
- * only by position, so this ordering IS the mapping.
- */
-function resolveLyricLineOrder(mnx: MnxStructure): string[] {
-  const declared = mnx.global?.lyrics?.lineOrder;
-  if (declared?.length) return [...declared];
-
-  const seen: string[] = [];
-  for (const part of mnx.parts)
-    for (const measure of part.measures)
-      for (const sequence of measure.sequences ?? [])
-        for (const item of sequence.content ?? [])
-          if (isTimedEvent(item))
-            for (const id of Object.keys(item.lyrics?.lines ?? {}))
-              if (!seen.includes(id)) seen.push(id);
-  return seen;
-}
-
-/**
- * Decides which notes to drop so no string is claimed twice at one instant.
- *
- * Only exact unisons are collapsed (same string AND same fret) — those are one
- * note written twice. Two *different* frets on one string is unplayable however
- * it renders, so it is left alone and reported rather than silently "fixed".
- *
- * Which copy survives matters: dropping the melody's note would leave a hole in
- * the melodic line. So the keeper is the one standing alone in its event, over
- * one that is a member of a chord (which keeps its other notes either way);
- * ties go to the lower voice.
- */
-function planUnisonCollapse(
-  sequences: MnxSequence[],
-  onCollapse: (stringNumber: number, fret: number) => void
-): Set<MnxNote> {
-  interface Claim {
-    note: MnxNote;
-    fret: number;
-    voiceIndex: number;
-    chordSize: number;
-  }
-
-  const byOnsetAndString = new Map<string, Claim[]>();
-
-  sequences.forEach((sequence, voiceIndex) => {
-    let onset = 0;
-    for (const item of sequence.content ?? []) {
-      if (!isTimedEvent(item)) return; // timing unknowable from here on
-      for (const note of item.notes ?? []) {
-        const x = note._x?.mnxLab;
-        if (x?.string !== undefined && x?.fret !== undefined) {
-          const key = `${Math.round(onset * 1e6)}:${x.string}`;
-          const list = byOnsetAndString.get(key) ?? [];
-          list.push({
-            note,
-            fret: x.fret,
-            voiceIndex,
-            chordSize: item.notes?.length ?? 1
-          });
-          byOnsetAndString.set(key, list);
-        }
-      }
-      onset += mnxDurationToWholes(item.duration.base, item.duration.dots ?? 0);
-    }
-  });
-
-  const suppressed = new Set<MnxNote>();
-  for (const claims of byOnsetAndString.values()) {
-    if (claims.length < 2) continue;
-    if (new Set(claims.map(c => c.fret)).size > 1) continue; // real conflict — leave it
-
-    const keeper = [...claims].sort(
-      (a, b) => a.chordSize - b.chordSize || a.voiceIndex - b.voiceIndex
-    )[0];
-    for (const claim of claims) {
-      if (claim.note !== keeper.note && !suppressed.has(claim.note)) {
-        suppressed.add(claim.note);
-        onCollapse(claim.note._x!.mnxLab!.string!, claim.fret);
-      }
-    }
-  }
-  return suppressed;
-}
-
-/**
- * The `reference` argument of `Automation.buildTempoAutomation` is an INDEX
- * into alphaTab's multiplier table `[1, .5, 1, 1.5, 2, 3]`, not a note-value
- * denominator — it says which note value the BPM counts. Passing the
- * denominator (4 for a quarter) selects multiplier 2 and silently DOUBLES the
- * tempo: 180 bpm became 360.
- *
- *   1 → ×0.5  (eighth)        2 → ×1    (quarter, the default)
- *   3 → ×1.5  (dotted quarter) 4 → ×2   (half)      5 → ×3 (dotted half)
- */
-function tempoReference(value: { base?: string; dots?: number } | undefined): number {
-  const dotted = (value?.dots ?? 0) > 0;
-  switch (value?.base) {
-    case 'eighth':
-      return 1;
-    case 'half':
-      return dotted ? 5 : 4;
-    case 'quarter':
-    default:
-      return dotted ? 3 : 2;
-  }
 }
 
 /** MNX clef sign → alphaTab Clef. */
@@ -381,20 +278,6 @@ function makeRestBeat(duration: number, dots = 0): alphaTab.model.Beat {
   return beat; // a beat with no notes IS a rest in alphaTab
 }
 
-/** Chord symbols for one measure, keyed by the `location` fraction they sit at,
- *  so a beat can look up whether a chord starts on it. */
-function harmonyTextByOnset(
-  harmonies: MnxHarmony[] | undefined
-): Map<string, string> | undefined {
-  if (!harmonies?.length) return undefined;
-  const map = new Map<string, string>();
-  for (const harmony of harmonies) {
-    const [numerator, denominator] = harmony.location.fraction;
-    map.set(`${numerator}/${denominator}`, harmony.text ?? renderChordSymbol(harmony));
-  }
-  return map;
-}
-
 function buildVoice(
   sequence: MnxSequence,
   tunings: number[],
@@ -559,22 +442,8 @@ function applyLyrics(
   event: MnxEvent,
   lyricLineOrder: string[]
 ): void {
-  const lines = event.lyrics?.lines;
-  if (!lines || lyricLineOrder.length === 0) return;
-
-  const slots = new Array<string>(lyricLineOrder.length).fill('');
-  let any = false;
-
-  for (const [lineId, line] of Object.entries(lines)) {
-    const index = lyricLineOrder.indexOf(lineId);
-    if (index < 0 || !line?.text) continue;
-    const continues = line.type === 'start' || line.type === 'middle';
-    // A space inside a syllable would be read as a syllable break.
-    slots[index] = line.text.replace(/\s+/g, '+') + (continues ? '-' : '');
-    any = true;
-  }
-
-  if (any) beat.lyrics = slots;
+  const slots = lyricSlots(event, lyricLineOrder);
+  if (slots) beat.lyrics = slots;
 }
 
 function applyTechniques(

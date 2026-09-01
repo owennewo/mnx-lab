@@ -305,7 +305,13 @@ The whammy-bar family on the beat uses the same value/offset system.
 vocabulary `Natural | Artificial | Pinch | Tap | Semi | Feedback` — a 1:1 match for
 `MnxHarmonicType` (keep Feedback distinct; scorelib folding it into Pinch is its
 choice, not the file's). `Property HarmonicFret` → `<HFret>`, the touch fret, possibly
-fractional (e.g. 3.2).
+fractional (e.g. 3.2). **`HarmonicFret` is load-bearing on write** (CONFIRMED by
+differential testing 2026-09-01): Guitar Pro states it on every natural harmonic
+(equal to `Fret` there), and alphaTab's reader mis-pitches a harmonic note that
+lacks it by an octave — alphaTab's own `Gp7Exporter` omits it, which is a real
+round-trip octave loss in the alphaTab path (Vestapol's 42 naturals; unseen until
+the clean-room writer's parity tests, because Vestapol was never pitch-checked
+through a round trip). A GPIF writer must emit both properties.
 
 ## 9. The GP8 diffing worklist
 
