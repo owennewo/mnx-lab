@@ -9,6 +9,7 @@ export {
   buildScore,
   ExportOptions
 };
+export * from './gpif/index.js';
 export * from './common/types.js';
 export * from './common/tuning.js';
 export * from './common/duration.js';

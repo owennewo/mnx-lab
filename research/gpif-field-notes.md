@@ -75,7 +75,11 @@ Beat ──────Rhythm ref─▶ Rhythm     durations are SHARED, by refe
 ```
 
 - All ids are non-negative integers; `-1` in a voice list means "no voice in this
-  slot." Text content is routinely CDATA-wrapped.
+  slot." Text content is routinely CDATA-wrapped. **An empty slot still counts**
+  (CONFIRMED by differential testing 2026-09-01): alphaTab materializes every
+  declared slot as a voice holding a single quarter rest, so a four-slot bar
+  with two `-1`s imports as four MNX sequences — `converters/guitarpro-mnx`'s
+  clean-room reader mirrors this, and the committed fixtures embed it.
 - `MasterBar/Bars` is the track join: the *n*-th id belongs to the *n*-th `Track`.
   One MasterBar per measure of the piece.
 - `Rhythm` objects are deduplicated — hundreds of beats reference a handful of
@@ -311,7 +315,7 @@ author the feature, unzip, diff.
 | # | Question | What the sources say |
 |---|---|---|
 | 1 | **Accent encoding** (DIVERGENT) | ruxguitar tests equality (1 = staccato, 4 = heavy, 8 = accent); scorelib treats it as a bitmask and also maps `0x02`. Author staccato + accent together and read the int. |
-| 2 | **Bend middle-offset 12 sentinel** (OPEN) | TuxGuitar lineage skips `MiddleOffset == 12`; scorelib ignores middles entirely. Author a bend-release-bend and check what offset GP writes for an unused middle. |
+| 2 | **Bend middle-offset 12 sentinel** (OPEN, narrowed) | TuxGuitar lineage skips `MiddleOffset == 12`; scorelib ignores middles entirely. Differential testing against alphaTab (2026-09-01, Vestapol note 388: origin 0 / middle 50 / destination 100, no offsets) established one rule: **a middle value with no explicit offset is dropped** — it sits at the default midpoint of a linear ramp and carries nothing. Whether an offset of literal `12` is additionally a sentinel remains open. |
 | 3 | **Tempo unit enum** (OPEN) | `2` = quarter is confirmed. Author eighth-, dotted-quarter- and half-based tempos to fill the table. |
 | 4 | **Slide bits ≥ 0x40** (OPEN) | Neither reader handles pick slides. Author one. |
 | 5 | **NoteValue extremes** (OPEN) | `128th` (scorelib only), longa/breve unknown. |

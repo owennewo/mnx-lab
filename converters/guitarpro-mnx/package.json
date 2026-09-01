@@ -16,7 +16,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@coderline/alphatab": "^1.8.4"
+    "@coderline/alphatab": "^1.8.4",
+    "@xmldom/xmldom": "^0.8.15"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
