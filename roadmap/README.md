@@ -44,6 +44,13 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-guitarpro-binary-import.md](proposed/core-guitarpro-binary-import.md)** — the clean-room
+  gp3/gp4/gp5 reader: the third leg of the clean-room Guitar Pro converter effort, after the
+  landed GPIF importer and writer. Docs-first this time (PyGuitarPro's format reference + the
+  official GP4 spec), fixtures authored with PyGuitarPro under the `make-triplets` pattern and
+  verified in real consumers, binary normalized into the landed `GpifDocument` intermediate so
+  `gpifToMnx` is reused, and differential parity against alphaTab as the proof — three phased
+  landings (gp5, gp4, gp3), with the alphaTab flip named as the follow-up.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
