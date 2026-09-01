@@ -135,7 +135,6 @@ const DUMP = `(() => {
     navDisplay: appRoot?.querySelector('nav')
       ? getComputedStyle(appRoot.querySelector('nav')).display
       : null,
-    pageHead: !!pageRoot?.querySelector('.head'),
     panel: !!pageRoot?.querySelector('.panel'),
     zoom: !!zoomPad,
     zoomRect: rect(zoomPad),
@@ -147,7 +146,7 @@ const DUMP = `(() => {
     zoomFocusLabel: zoomFocus?.getAttribute('aria-label') ?? null,
     zoomFocusPressed: zoomFocus?.getAttribute('aria-pressed') ?? null,
     popover: !!pageRoot?.querySelector('.popover-layer'),
-    focusButton: !!pageRoot?.querySelector('.focus-toggle'),
+    focusButton: !!zoomFocus,
     appRect: rect(app),
     mainRect: rect(appRoot?.querySelector('main')),
     pageRect: rect(page),
@@ -251,12 +250,9 @@ try {
   );
   check(state.fullscreenStateMatches, 'fullscreenchange state mirrors the browser-owned element');
 
-  await cdp.evaluate(
-    "document.querySelector('mnx-workbench').shadowRoot" +
-      ".querySelector('mnx-scenario-page').shadowRoot" +
-      ".querySelector('.focus-toggle').click()"
-  );
-  await new Promise(resolve => setTimeout(resolve, 400));
+  // The page head retired (2026-09-01): the zoom cluster's toggle is the one
+  // focus button, in normal mode and inside focus alike.
+  await clickZoomFocus();
   state = await dump();
   check(state.appFocus && state.pageFocus, 'the normal-mode focus button enters document focus');
   await focusKey();
@@ -267,7 +263,7 @@ try {
   state = await dump();
   check(state.appFocus && state.pageFocus, 'Ctrl+Alt+F reflects focus state on shell and page');
   check(
-    !state.header && !state.nav && !state.pageHead && !state.panel && state.zoom,
+    !state.header && !state.nav && !state.panel && state.zoom,
     'focus mode removes the shell panes but retains the document zoom pad'
   );
   check(

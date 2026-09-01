@@ -144,9 +144,6 @@ interface PartOverride {
 const RUNG_REFUSAL_MS = 600;
 
 const PANEL_WIDTH_KEY = 'mnx-lab.panel-width';
-/** Folded or not — SEPARATE from the width, so unfolding restores the width
- *  that was dragged rather than a default (mirrors `mnx-lab.rail-hidden`). */
-const PANEL_HIDDEN_KEY = 'mnx-lab.panel-hidden';
 /** The floor and the tab set are one decision (the seven-to-five cut set 360
  *  for five tabs); the assist tab is the sixth, so the floor moves with it. */
 const PANEL_MIN = 410;
@@ -574,40 +571,15 @@ export class ScenarioPage extends LitElement {
   @state() private panelWidth = storedPanelWidth();
 
   /**
-   * The panel folds away, like the rail (`Ctrl+Alt+B`, or the chevron at the
-   * right of the view tabs) — the score takes the whole page.
-   *
-   * Remembered per browser, next to the width it does not disturb: folding is
-   * not resizing to zero, and a reader who folds the panel expects their 480px
-   * back when they unfold it. Same reasoning as the zoom pad's two keys.
+   * The panel folds away, like the rail (`Ctrl+Alt+B`, or the chevron in the
+   * app header) — the score takes the whole page. The SHELL owns this state
+   * now, exactly as it owns the rail's and document focus's: the page head
+   * that used to carry the fold chevron is retired, so the control moved to
+   * the app header and the remembered preference moved with it
+   * (`mnx-lab.panel-hidden`, same key, WorkbenchApp). The width stays here,
+   * next to the drag bar that edits it.
    */
-  @state() private panelHidden = localStorage.getItem(PANEL_HIDDEN_KEY) === '1';
-
-  /** Read by the shell's palette, which labels the row show-or-hide. */
-  get panelIsHidden(): boolean {
-    return this.panelHidden;
-  }
-
-  /** Public because the shell's Ctrl+Alt+B reaches it the way the rail's
-   *  Ctrl+B reaches `toggleRail` — one handler, one keymap, two panes. */
-  togglePanel() {
-    this.panelHidden = !this.panelHidden;
-    localStorage.setItem(PANEL_HIDDEN_KEY, this.panelHidden ? '1' : '0');
-  }
-
-  /** Used by the shell when Ctrl+Alt+B is pressed from document focus: the
-   *  same gesture exits focus and makes its target visible immediately. */
-  showPanel() {
-    if (!this.panelHidden) return;
-    this.panelHidden = false;
-    localStorage.setItem(PANEL_HIDDEN_KEY, '0');
-  }
-
-  private requestDocumentFocus() {
-    this.dispatchEvent(
-      new CustomEvent('document-focus-request', { bubbles: true, composed: true })
-    );
-  }
+  @property({ attribute: false }) panelHidden = false;
 
   /** The drag bar: pointer capture keeps the gesture on the handle; width is
    *  measured from the body's right edge so the math is anchor-independent. */
@@ -637,90 +609,18 @@ export class ScenarioPage extends LitElement {
     sharedChrome,
     scrollbars,
     css`
+      /* The page head is RETIRED (2026-09-01): its view tabs became the
+         settings pad in the score corner, its focus button was a duplicate of
+         the cluster's, and its panel chevron moved to the app header beside
+         its rail mirror. The page is the body alone now. */
       :host {
         display: grid;
-        grid-template-rows: auto 1fr;
+        grid-template-rows: 1fr;
         height: 100%;
         overflow: hidden;
       }
 
-      :host([document-focus]) {
-        grid-template-rows: 1fr;
-      }
-
-      /* The page head kept its band-2 ink rule (workbench-chrome-language.md)
-         but lost the view tabs to the settings pad in the score corner — the
-         view choice now lives with the other document-display controls, and
-         stays reachable in document focus, which the head never was. What
-         remains here is the page-level actions pair on the right; the vertical
-         padding stands in for the height the tabs used to carry, so the band
-         does not collapse around the buttons.
-
-         The ground stays the document pane's --bg rather than --bg-context,
-         because a strip takes the ground of the REGION IT HEADS — which is
-         why .panel-tabs sits on the panel's --surface and this one does not. */
-      .head {
-        padding: 5px 0;
-        border-bottom: var(--rule-w) solid var(--ink);
-        display: flex;
-        align-items: stretch;
-        justify-content: flex-end;
-        gap: 12px;
-      }
-
-      /* The panel's fold control, and deliberately the app header's rail
-         chevron in a mirror: same glyphs, same borrowed-outline styling, same
-         chevron-points-where-it-goes rule. The head spans the panel too, so
-         this button stays put — and stays reachable — whichever state it is
-         in, which a control living inside the panel could not do. */
-      .head-actions {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        margin-right: 12px;
-      }
-
-      .panel-toggle,
-      .focus-toggle {
-        font-family: var(--mono);
-        font-size: 12px;
-        color: var(--ink-2);
-        background: transparent;
-        border: 1px solid var(--line-strong);
-        border-radius: var(--radius-tab);
-        padding: 1px 8px;
-        /* Centred in the band rather than dropped to its baseline: the head
-           lost its own padding when it became band 2
-           (workbench-chrome-language.md), so the old margin-bottom: 6px
-           against align-items: flex-end no longer has a gap to sit in. This
-           also lines it up with .rail-toggle, its mirror in the app header,
-           which already centred itself. */
-        align-self: center;
-        cursor: pointer;
-        flex: none;
-      }
-
-      .focus-toggle {
-        font-family: var(--sans);
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .panel-toggle:hover,
-      .focus-toggle:hover {
-        color: var(--accent);
-        border-color: var(--accent);
-      }
-
-      .panel-toggle:focus-visible,
-      .focus-toggle:focus-visible {
-        outline: var(--rule-w) solid var(--focus-ring);
-        outline-offset: 2px;
-      }
-
-      /* Title + id live in the description tab now — the head is tabs only. */
+      /* Title + id live in the description tab. */
       .panel-body h1 {
         font-family: var(--sans);
         font-weight: 500;
@@ -3020,28 +2920,6 @@ export class ScenarioPage extends LitElement {
     const views = this.availableViews();
 
     return html`
-      ${this.documentFocus
-        ? nothing
-        : html`<div class="head">
-            <div class="head-actions">
-              <button
-                class="focus-toggle"
-                title="focus the document (Ctrl+Alt+F)"
-                @click=${this.requestDocumentFocus}
-              >
-                focus
-              </button>
-              <button
-                class="panel-toggle"
-                title="${this.panelHidden ? 'show' : 'hide'} the document panel (Ctrl+Alt+B)"
-                aria-label="${this.panelHidden ? 'show' : 'hide'} the document panel"
-                aria-expanded=${!this.panelHidden}
-                @click=${() => this.togglePanel()}
-              >
-                ${this.panelHidden ? '⟨' : '⟩'}
-              </button>
-            </div>
-          </div>`}
       <div
         class="body"
         style="grid-template-columns: 1fr ${

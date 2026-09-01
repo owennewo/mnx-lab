@@ -81,6 +81,12 @@ export function matchesQuery(entry: ScenarioEntry, query: string): boolean {
 }
 
 const RAIL_HIDDEN_KEY = 'mnx-lab.rail-hidden';
+/** Folded or not — SEPARATE from the panel's width (which stays with the
+ *  page's drag bar), so unfolding restores the width that was dragged rather
+ *  than a default. Shell-owned since the page head retired: the fold chevron
+ *  lives in the app header beside its rail mirror, and the shell passes the
+ *  state down to the scenario page. */
+const PANEL_HIDDEN_KEY = 'mnx-lab.panel-hidden';
 const THEME_KEY = 'mnx-lab.theme';
 
 function readTheme(): ThemeSetting {
@@ -107,6 +113,9 @@ export class WorkbenchApp extends LitElement {
   /** Rail visibility (Ctrl+B / the header chevron) — remembered per browser;
    *  a UI preference, so localStorage, not the document store. */
   @state() private railHidden = localStorage.getItem(RAIL_HIDDEN_KEY) === '1';
+  /** Document-panel visibility (Ctrl+Alt+B / the header's right chevron) —
+   *  the rail's mirror on the other side of the page. */
+  @state() private panelHidden = localStorage.getItem(PANEL_HIDDEN_KEY) === '1';
   /** Transient shell composition: no storage and no URL representation. */
   @state() private documentFocus = false;
   @state() private focusHint = false;
@@ -143,9 +152,9 @@ export class WorkbenchApp extends LitElement {
     this.setDocumentFocus(!this.documentFocus);
   }
 
-  /** Page chrome and the zoom pad emit the same request. The former exists
-   *  only outside focus; the latter remains present inside it, so one event is
-   *  an honest toggle at both entry points. */
+  /** The zoom cluster's focus button emits this from inside AND outside
+   *  focus mode, so one event is an honest toggle. (The page head's duplicate
+   *  button retired with the head, 2026-09-01.) */
   private requestDocumentFocus = () => this.toggleDocumentFocus();
 
   private toggleRailFromShell() {
@@ -157,15 +166,22 @@ export class WorkbenchApp extends LitElement {
     this.toggleRail();
   }
 
+  private setPanelHidden(hidden: boolean) {
+    this.panelHidden = hidden;
+    localStorage.setItem(PANEL_HIDDEN_KEY, hidden ? '1' : '0');
+  }
+
   private togglePanelFromShell() {
-    const page = this.scenarioPage();
-    if (!page) return;
+    // Only meaningful where a document panel exists — the scenario pages.
+    if (this.route.page !== 'scenario' && this.route.page !== 'document') return;
     if (this.documentFocus) {
+      // Ctrl+Alt+B from document focus: the same gesture exits focus and
+      // makes its target visible immediately.
       this.setDocumentFocus(false);
-      page.showPanel();
+      this.setPanelHidden(false);
       return;
     }
-    page.togglePanel();
+    this.setPanelHidden(!this.panelHidden);
   }
 
   private onFullscreenChange = () => {
@@ -795,9 +811,8 @@ export class WorkbenchApp extends LitElement {
       return;
     }
     if (action === 'togglePanel') {
-      // The panel belongs to the scenario page, so the shell asks it rather
-      // than mirroring its state — and a no-op anywhere else is right: on
-      // #/objects there is no panel to fold.
+      // A no-op away from the scenario pages is right: on #/objects there is
+      // no panel to fold. togglePanelFromShell carries the route guard.
       if (!this.scenarioPage()) return;
       event.preventDefault();
       this.togglePanelFromShell();
@@ -856,7 +871,7 @@ export class WorkbenchApp extends LitElement {
         ? [
             {
               label: `view: ${
-                this.documentFocus || this.scenarioPage()!.panelIsHidden ? 'show' : 'hide'
+                this.documentFocus || this.panelHidden ? 'show' : 'hide'
               } document panel`,
               hint: 'Ctrl+Alt+B',
               run: () => this.togglePanelFromShell()
@@ -1109,6 +1124,17 @@ export class WorkbenchApp extends LitElement {
           </span>
         </span>
         ${this.themeToggle()}
+        ${this.route.page === 'scenario' || this.route.page === 'document'
+          ? html`<button
+              class="rail-toggle"
+              title="${this.panelHidden ? 'show' : 'hide'} the document panel (Ctrl+Alt+B)"
+              aria-label="${this.panelHidden ? 'show' : 'hide'} the document panel"
+              aria-expanded=${!this.panelHidden}
+              @click=${() => this.togglePanelFromShell()}
+            >
+              ${this.panelHidden ? '⟨' : '⟩'}
+            </button>`
+          : nothing}
           </header>
           <nav>
         <div class="rail-context">
@@ -1142,6 +1168,7 @@ export class WorkbenchApp extends LitElement {
               .scenarioId=${this.route.id ?? ''}
               .view=${this.route.view ?? ''}
               .documentFocus=${this.documentFocus}
+              .panelHidden=${this.panelHidden}
               .selectionClipboard=${this.selectionClipboard}
               @document-focus-request=${this.requestDocumentFocus}
             ></mnx-scenario-page>`
@@ -1152,6 +1179,7 @@ export class WorkbenchApp extends LitElement {
                   .view=${this.route.view ?? ''}
                   .localDocument=${this.localDocument}
                   .documentFocus=${this.documentFocus}
+                  .panelHidden=${this.panelHidden}
                   .selectionClipboard=${this.selectionClipboard}
                   @document-focus-request=${this.requestDocumentFocus}
                 ></mnx-scenario-page>`
