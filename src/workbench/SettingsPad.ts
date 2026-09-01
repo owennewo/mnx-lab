@@ -25,13 +25,21 @@ import type { ViewMode } from '../elements/DocumentViewer.ts';
  * transparent bridge (`.drop`'s padding) so the pointer can cross the gap
  * without the whole thing closing underneath it.
  */
+/** The full view vocabulary, in display order — what the SHOW row prints
+ *  regardless of what this document can offer. */
+const ALL_VIEWS: readonly ViewMode[] = ['notation', 'tab', 'both'];
+
 @customElement('mnx-settings-pad')
 export class SettingsPad extends LitElement {
   /** The view the score is drawing now. */
   @property({ type: String }) view: ViewMode = 'notation';
 
   /** The views this document can support — ['notation'] when no strings are
-   *  known, all three otherwise. The host decides; the pad only renders. */
+   *  known, all three otherwise. The host decides; the pad only renders.
+   *  The SHOW row always prints all three: an unavailable view draws greyed
+   *  with the reason in its tooltip, because a row holding a single live
+   *  option reads as a broken control rather than as "this document has no
+   *  fingerboard" — the fact the grey options exist to teach. */
   @property({ attribute: false }) views: ViewMode[] = ['notation'];
 
   /** Href for a view option, from whoever owns the routing. Options render as
@@ -162,6 +170,19 @@ export class SettingsPad extends LitElement {
         outline-offset: -2px;
       }
 
+      /* A view this document cannot offer: same slot, greyed, the reason in
+         its tooltip. Not display:none — absence reads as a broken control,
+         grey reads as "possible, not here". */
+      .options .off {
+        font: 600 10px/1 var(--sans);
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        padding: 6px 8px;
+        white-space: nowrap;
+        cursor: help;
+      }
+
       @media (prefers-reduced-motion: reduce) {
         button.gear {
           transition: none;
@@ -218,13 +239,21 @@ export class SettingsPad extends LitElement {
                   <div class="setting">
                     <span class="lbl">Show</span>
                     <span class="options">
-                      ${this.views.map(
-                        v => html`
-                          <a
-                            href=${this.hrefFor?.(v) ?? '#'}
-                            aria-current=${v === this.view}
-                          >${v}</a>
-                        `
+                      ${ALL_VIEWS.map(v =>
+                        this.views.includes(v)
+                          ? html`
+                              <a
+                                href=${this.hrefFor?.(v) ?? '#'}
+                                aria-current=${v === this.view}
+                              >${v}</a>
+                            `
+                          : html`
+                              <span
+                                class="off"
+                                title="Needs known strings — declare strings[] in the document, or set a part's instrument override in the HUD"
+                                aria-disabled="true"
+                              >${v}</span>
+                            `
                       )}
                     </span>
                   </div>
