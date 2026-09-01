@@ -218,6 +218,19 @@ export class ZoomPad extends LitElement {
         gap: 5px;
       }
 
+      /* The cluster is the score corner's chrome shelf, not just the zoom
+         geometry: the host slots further marks in (today the settings pad),
+         and they sit leftmost — settings, focus, zoom — with the pad's
+         leftward hover-growth pushing the whole row, never covering it. */
+      slot {
+        display: contents;
+      }
+
+      ::slotted(*) {
+        order: -2;
+        flex: none;
+      }
+
       /* A focus mode must carry its own visible way out. This button is a
          sibling of the zoom geometry rather than part of the viewer: both are
          workbench chrome composed over ScenarioPage's document surface. */
@@ -1045,6 +1058,7 @@ export class ZoomPad extends LitElement {
 
     return html`
       <div class="cluster">
+        <slot></slot>
         <div
           class="pad ${expanded ? 'expanded' : ''}"
           @pointerenter=${() => (this.open = true)}

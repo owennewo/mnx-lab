@@ -78,6 +78,7 @@ import { buildInspectorView } from './inspectorRows.ts';
 import { fingerboardOf, parseInspectorLine } from '../edit/inspector.ts';
 import './ZoomPad.ts';
 import type { ZoomPadChange } from './ZoomPad.ts';
+import './SettingsPad.ts';
 import './ModelPickerDialog.ts';
 import './LyricTextEditor.ts';
 import { lyricPlanOps, type LyricPlanEdit } from '../edit/lyricText.ts';
@@ -647,25 +648,23 @@ export class ScenarioPage extends LitElement {
         grid-template-rows: 1fr;
       }
 
-      /* The page head is the panel's tab strip in the same vocabulary: flush
-         left, no padding of its own (the tabs carry it), and a full 2px ink
-         rule under it. Band 2 for the score exactly as .panel-tabs is band 2
-         for the panel (workbench-chrome-language.md).
-
-         They do NOT line up horizontally, and cannot: .head spans the whole
-         page ABOVE .body, so the panel's strip necessarily sits one band
-         lower. The two read as one control because they are the same shape and
-         the same mark, not because they share a baseline.
+      /* The page head kept its band-2 ink rule (workbench-chrome-language.md)
+         but lost the view tabs to the settings pad in the score corner — the
+         view choice now lives with the other document-display controls, and
+         stays reachable in document focus, which the head never was. What
+         remains here is the page-level actions pair on the right; the vertical
+         padding stands in for the height the tabs used to carry, so the band
+         does not collapse around the buttons.
 
          The ground stays the document pane's --bg rather than --bg-context,
-         because a tab strip takes the ground of the REGION IT HEADS — which is
+         because a strip takes the ground of the REGION IT HEADS — which is
          why .panel-tabs sits on the panel's --surface and this one does not. */
       .head {
-        padding: 0;
+        padding: 5px 0;
         border-bottom: var(--rule-w) solid var(--ink);
         display: flex;
         align-items: stretch;
-        justify-content: space-between;
+        justify-content: flex-end;
         gap: 12px;
       }
 
@@ -807,12 +806,6 @@ export class ScenarioPage extends LitElement {
         font-size: 10px;
       }
 
-      .tabs {
-        display: flex;
-        gap: 0;
-        align-items: stretch;
-      }
-
       /* The actions tab — the former edit strip, stacked for the panel. */
       .actions {
         font-family: var(--mono);
@@ -911,34 +904,6 @@ export class ScenarioPage extends LitElement {
 
       .popover .pop-error {
         color: var(--accent-fg);
-      }
-
-      /* Identical to .panel-tabs button, deliberately: the view tabs and the
-         panel tabs are the same control doing the same job on two sides of one
-         page, and before this they were a boxed 12px link and an uppercase
-         10px label. The active one is marked by a 2px inset underline rather
-         than by an outlined box — nothing floats in this system, so the mark
-         goes under the word instead of around it. */
-      .tabs a {
-        font: 600 10px/1 var(--sans);
-        letter-spacing: 0.11em;
-        text-transform: uppercase;
-        color: var(--ink-3);
-        padding: 11px 12px;
-        text-decoration: none;
-        white-space: nowrap;
-        display: flex;
-        align-items: center;
-      }
-
-      .tabs a:hover[aria-current='false'] {
-        color: var(--ink);
-        background: var(--bg-context);
-      }
-
-      .tabs a[aria-current='true'] {
-        color: var(--accent-fg);
-        box-shadow: inset 0 -2px 0 var(--accent);
       }
 
       /* Score pane + the side panel (columns set inline — the drag bar). */
@@ -3058,13 +3023,6 @@ export class ScenarioPage extends LitElement {
       ${this.documentFocus
         ? nothing
         : html`<div class="head">
-            <div class="tabs">
-              ${views.map(
-                v => html`
-                  <a href=${this.viewHref(entry, v)} aria-current=${v === view}>${v}</a>
-                `
-              )}
-            </div>
             <div class="head-actions">
               <button
                 class="focus-toggle"
@@ -3100,7 +3058,13 @@ export class ScenarioPage extends LitElement {
                 .effectiveStaffScale=${this.effectiveStaffScale}
                 .documentFocus=${this.documentFocus}
                     @zoom-change=${this.onZoomChange}
-              ></mnx-zoom-pad>`
+              >
+                <mnx-settings-pad
+                  .view=${view}
+                  .views=${views}
+                  .hrefFor=${(v: ViewMode) => this.viewHref(entry, v)}
+                ></mnx-settings-pad>
+              </mnx-zoom-pad>`
             : nothing}
           ${this.inspectorOpen && this.session ? this.inspectorOverlay(entry) : nothing}
           ${this.modelPickerOpen
