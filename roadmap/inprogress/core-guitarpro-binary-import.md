@@ -1,22 +1,27 @@
 # Clean-room gp3/gp4/gp5 reader — the Ultimate Guitar range
 
-> **Status: IN PROGRESS (2026-09-03).** Phase 1 has started: the docs-first field
-> notes, bounds-checked little-endian cursor, exact GP3/4/5 version dispatch, and
-> the GP5 structural body reader are landed. Generated GP5.00/5.10 fixtures cover
+> **Status: IN PROGRESS — SESSION CHECKPOINT LANDED (2026-09-03, `4bd5d48`).**
+> Phase 1 (GP5) is partly complete: the docs-first field notes, bounds-checked
+> little-endian cursor, exact GP3/4/5 version dispatch, and GP5 body reader are
+> on `main`. Generated GP5.00/5.10 fixtures cover
 > metadata, measures, tracks, tunings/capo, two voices, notes/rests, dots, tuplets,
 > time/key changes, repeats, double bars, markers, beat-text chords, track-level
 > lyrics, hammer/pull, palm mute, vibrato, slides, and natural/pinch harmonics;
 > both revisions reach EOF and produce MNX exactly equal to AlphaTab. Remaining
 > Phase 1 work is the variable-length effect surface (notably bends and graces),
-> chord diagrams, mix changes, and tied/dead-note behavior. The third leg of the clean-room Guitar Pro
-> converter effort. The first two are landed and green: the GPIF importer
-> (`f2752bf` — `.gp`/`.gpx` without alphaTab, held to differential parity) and
-> the GPIF writer (`096f792` — held to losslessness through both readers, and
-> stricter than alphaTab's own exporter). This doc plans the same method for
-> the **legacy binary family** — gp3.00, gp4.00/4.06, gp5.00/5.10, the formats
-> *before* the XML era. Naming care: these are not "`.gpx`" (that is GP6's
-> container, already handled); they are the flat binary lineage that dominates
-> the wild corpus.
+> chord diagrams, mix changes, and tied/dead-note behavior. The production
+> `importGuitarPro` entry point remains AlphaTab-backed until the legacy family
+> is broad enough for the explicit follow-up flip.
+
+This is the third leg of the clean-room Guitar Pro converter effort. The first
+two are landed and green: the GPIF importer
+(`f2752bf` — `.gp`/`.gpx` without alphaTab, held to differential parity) and
+the GPIF writer (`096f792` — held to losslessness through both readers, and
+stricter than alphaTab's own exporter). This doc plans the same method for
+the **legacy binary family** — gp3.00, gp4.00/4.06, gp5.00/5.10, the formats
+*before* the XML era. Naming care: these are not "`.gpx`" (that is GP6's
+container, already handled); they are the flat binary lineage that dominates
+the wild corpus.
 
 Implementation evidence lives in `src/gp345/`, `src/cleanRoom.ts`,
 `tests/gp345-*.test.ts`, and
@@ -24,6 +29,51 @@ Implementation evidence lives in `src/gp345/`, `src/cleanRoom.ts`,
 `converters/fixtures/tools/make-gp5-basics.py`; PyGuitarPro is a fixture-writing
 tool only and is not a project dependency. It currently emits a structural pair
 and a lyrics/simple-techniques pair in both GP5 revisions.
+
+## Session handoff
+
+Landed checkpoint: **`4bd5d48` — “Add clean-room GP5 binary reader”.** At that
+commit, the converter package has **125 passing tests**, and its TypeScript build
+and `git diff --check` pass.
+
+Current callable boundary:
+
+- `importGuitarProCleanRoom` imports the fixture-proven GP5.00/5.10 subset and
+  dispatches GP6–GP8 containers through the existing clean-room GPIF reader.
+- GP3 and GP4 are recognized by exact version but still fail with a deliberate,
+  version-specific “not implemented” error.
+- `importGuitarPro` and the CLI/browser production surfaces still use AlphaTab.
+  AlphaTab therefore remains a runtime dependency as well as the parity oracle.
+- Unsupported GP5 variable records fail at their musical location and byte
+  offset. Unrepresentable fixed flags warn; they are not silently discarded.
+
+Progress checklist:
+
+- [x] Binary cursor, Windows-1252 strings, strict bounds and version sniffing.
+- [x] GP5.00/5.10 preamble, measure headers, tracks and exact EOF traversal.
+- [x] Two voices, notes/rests, dots, tuplets, repeats, markers and beat text.
+- [x] Track-level lyric redistribution with offsets, hyphenation and rest skipping.
+- [x] Hammer/pull, palm mute, vibrato, slides, natural/pinch harmonics and
+      sounding-pitch parity.
+- [ ] Finish GP5 variable records and note types.
+- [ ] Implement GP4.00/4.06, then GP3.00, each with revision fixtures and parity.
+- [ ] Run a non-committed wild-corpus smoke and harden malformed-input behavior.
+- [ ] Flip production import dispatch and remove AlphaTab from runtime dependencies.
+
+**Recommended next session slice:** add paired GP5.00/5.10 fixtures for bend point
+lists and grace notes, then extend `gp5.ts` and the shared `GpifDocument`
+intermediate only as far as those fixtures require. Preserve complete bend curves
+(positions 0–60, values converted to MNX semitones), grace placement/duration, exact
+normalized AlphaTab parity, and exact EOF consumption. After that, take chord
+diagrams/beat effects/mix changes and tied/dead notes as separate bounded slices.
+
+Restart verification commands:
+
+```sh
+npm test --workspace @mnx-editor/guitarpro-mnx
+npm run build --workspace @mnx-editor/guitarpro-mnx
+git diff --check
+```
 
 ## Why this range matters
 
