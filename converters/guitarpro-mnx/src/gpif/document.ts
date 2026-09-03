@@ -104,6 +104,9 @@ export interface GpifNote {
   fret: number | null;
   /** Sounding MIDI (capo applied) when stated (GP7+ always, GP6 sometimes). */
   midi: number | null;
+  /** Legacy formats can state a technique whose sounding pitch differs from
+   *  its fingerboard position. This wins over the normal pitch arithmetic. */
+  soundingMidiOverride?: number | null;
   /** GP6 pitch alternative. */
   tone: number | null;
   octave: number | null;

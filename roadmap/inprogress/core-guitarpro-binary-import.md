@@ -1,6 +1,14 @@
 # Clean-room gp3/gp4/gp5 reader — the Ultimate Guitar range
 
-> **Status: proposed (2026-09-01).** The third leg of the clean-room Guitar Pro
+> **Status: IN PROGRESS (2026-09-03).** Phase 1 has started: the docs-first field
+> notes, bounds-checked little-endian cursor, exact GP3/4/5 version dispatch, and
+> the GP5 structural body reader are landed. Generated GP5.00/5.10 fixtures cover
+> metadata, measures, tracks, tunings/capo, two voices, notes/rests, dots, tuplets,
+> time/key changes, repeats, double bars, markers, beat-text chords, track-level
+> lyrics, hammer/pull, palm mute, vibrato, slides, and natural/pinch harmonics;
+> both revisions reach EOF and produce MNX exactly equal to AlphaTab. Remaining
+> Phase 1 work is the variable-length effect surface (notably bends and graces),
+> chord diagrams, mix changes, and tied/dead-note behavior. The third leg of the clean-room Guitar Pro
 > converter effort. The first two are landed and green: the GPIF importer
 > (`f2752bf` — `.gp`/`.gpx` without alphaTab, held to differential parity) and
 > the GPIF writer (`096f792` — held to losslessness through both readers, and
@@ -9,6 +17,13 @@
 > *before* the XML era. Naming care: these are not "`.gpx`" (that is GP6's
 > container, already handled); they are the flat binary lineage that dominates
 > the wild corpus.
+
+Implementation evidence lives in `src/gp345/`, `src/cleanRoom.ts`,
+`tests/gp345-*.test.ts`, and
+`research/gp-binary-field-notes.md`. The fixture generator is
+`converters/fixtures/tools/make-gp5-basics.py`; PyGuitarPro is a fixture-writing
+tool only and is not a project dependency. It currently emits a structural pair
+and a lyrics/simple-techniques pair in both GP5 revisions.
 
 ## Why this range matters
 

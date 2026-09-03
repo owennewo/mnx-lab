@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { importGuitarPro } from '../src/index.js';
+import { importGuitarPro, importGuitarProCleanRoom } from '../src/index.js';
 import {
   importGuitarProGpif,
   extractScoreGpif,
@@ -47,6 +47,7 @@ describe.each(FIXTURES)('clean-room GPIF importer parity: %s', name => {
     const cleanRoom = normalizeIds(importGuitarProGpif(data));
     const alphaTab = normalizeIds(importGuitarPro(data));
     expect(cleanRoom).toEqual(alphaTab);
+    expect(normalizeIds(importGuitarProCleanRoom(data))).toEqual(alphaTab);
   });
 });
 

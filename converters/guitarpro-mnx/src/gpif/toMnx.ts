@@ -616,6 +616,9 @@ function buildNote(
  * the stated `Midi`, then GP6's `Tone`/`Octave` pair.
  */
 function soundingMidi(note: GpifNote, track: GpifTrack): number {
+  if (note.soundingMidiOverride !== null && note.soundingMidiOverride !== undefined) {
+    return note.soundingMidiOverride;
+  }
   if (note.string !== null && note.fret !== null) {
     const open = track.tuningLowToHigh[note.string];
     if (open !== undefined) return open + note.fret + track.capo;

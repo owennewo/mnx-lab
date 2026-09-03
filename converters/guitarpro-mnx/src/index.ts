@@ -10,6 +10,8 @@ export {
   ExportOptions
 };
 export * from './gpif/index.js';
+export * from './gp345/index.js';
+export * from './cleanRoom.js';
 export * from './common/types.js';
 export * from './common/tuning.js';
 export * from './common/duration.js';

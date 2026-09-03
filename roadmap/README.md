@@ -44,13 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-guitarpro-binary-import.md](proposed/core-guitarpro-binary-import.md)** — the clean-room
-  gp3/gp4/gp5 reader: the third leg of the clean-room Guitar Pro converter effort, after the
-  landed GPIF importer and writer. Docs-first this time (PyGuitarPro's format reference + the
-  official GP4 spec), fixtures authored with PyGuitarPro under the `make-triplets` pattern and
-  verified in real consumers, binary normalized into the landed `GpifDocument` intermediate so
-  `gpifToMnx` is reused, and differential parity against alphaTab as the proof — three phased
-  landings (gp5, gp4, gp3), with the alphaTab flip named as the follow-up.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -154,6 +147,12 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-guitarpro-binary-import.md](inprogress/core-guitarpro-binary-import.md)** — the
+  clean-room gp3/gp4/gp5 reader, now in Phase 1 (GP5). The docs-first field notes,
+  binary cursor/version dispatch, GP5.00/5.10 structural body reader, unified clean-room
+  dispatch, and exact AlphaTab parity are built for metadata, measure/track structure,
+  two voices, notes/rests, dots, tuplets, track lyrics, hammer/pull, palm mute, vibrato,
+  slides and basic harmonics. Variable-length effects remain before GP4/GP3.
 - **[core-selection-range-grain.md](inprogress/core-selection-range-grain.md)** — **decisions 1–4 built 2026-08-30** (section and container rungs retired, staff off
   partMeasure identity; spanner work remains); the
   ladder's rungs re-read as **range grains**, out of a 2026-08-30 rung-by-rung review:
