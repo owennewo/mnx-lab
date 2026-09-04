@@ -1,4 +1,3 @@
-import { DOMParser } from '@xmldom/xmldom';
 import {
   MnxBeam,
   MnxBend,
@@ -17,7 +16,7 @@ import {
   stepToText,
   QUALITY_TO_XML_KIND
 } from '../common/harmony.js';
-import { serializeXML } from '../common/xml.js';
+import { parseXML, serializeXML, type Element, type Document } from '../common/xml.js';
 import { splitPart, hasTabContent } from './splitter.js';
 import { flattenSequences, FlatXmlNode } from './flattener.js';
 import { divisionsFor, getXmlNoteType } from '../common/utils.js';
@@ -267,11 +266,10 @@ export function exportMusicXML(
     }
   }
 
-  const doc = new DOMParser().parseFromString(
-    '<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"></score-partwise>',
-    'text/xml'
+  const doc = parseXML(
+    '<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"></score-partwise>'
   );
-  const scoreEl = doc.documentElement;
+  const scoreEl = doc.documentElement!;
 
   // 1. Add Identification/Metadata
   const identificationEl = doc.createElement('identification');

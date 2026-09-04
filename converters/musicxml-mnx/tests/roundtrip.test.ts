@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { importMusicXML, exportMusicXML } from '../src/index.js';
-import { DOMParser } from '@xmldom/xmldom';
+// The converter's own reader, which is also what these assertions exercise.
+import { parseXML } from '../src/common/xml.js';
 import { MnxStructure, MnxPitch, isGrace, isTuplet } from '../src/common/types.js';
 import { walkSequenceEvents } from '../src/common/utils.js';
 
@@ -31,7 +32,7 @@ const text = (el: Element, tag: string) => els(el, tag)[0]?.textContent ?? null;
 
 /** Every note of every voice, in document order, per part. */
 function noteRows(xml: string) {
-  const doc = new DOMParser().parseFromString(xml, 'text/xml');
+  const doc = parseXML(xml);
   return els(doc as any, 'part').map(part => {
     const divisions = Number(text(els(part, 'measure')[0], 'divisions'));
     const rows: string[] = [];
@@ -59,7 +60,7 @@ function noteRows(xml: string) {
 
 /** Measures whose voices do not add up to the time signature. */
 function malformedMeasures(xml: string): string[] {
-  const doc = new DOMParser().parseFromString(xml, 'text/xml');
+  const doc = parseXML(xml);
   const bad: string[] = [];
   for (const part of els(doc as any, 'part')) {
     let divisions = 1;
@@ -167,7 +168,7 @@ describe.each([
     const { original, exported } = await roundTrip();
     const count = (xml: string) => {
       const seen: Record<string, number> = {};
-      for (const t of els(new DOMParser().parseFromString(xml, 'text/xml') as any, 'type')) {
+      for (const t of els(parseXML(xml) as any, 'type')) {
         seen[t.textContent!] = (seen[t.textContent!] || 0) + 1;
       }
       return seen;
@@ -184,7 +185,7 @@ describe.each([
   it('keeps chords stacked so measures still add up to the time signature', async () => {
     const { original, exported } = await roundTrip();
     const chords = (xml: string) =>
-      els(new DOMParser().parseFromString(xml, 'text/xml') as any, 'chord').length;
+      els(parseXML(xml) as any, 'chord').length;
 
     expect(chords(original)).toBeGreaterThan(0); // fixture must actually exercise this
     expect(chords(exported)).toBe(chords(original));
@@ -319,7 +320,7 @@ describe('lyrics', () => {
     const exported = exportMusicXML(importMusicXML(original, { mergeNotationAndTab: true }));
 
     const lyricsOf = (xml: string, partId: string) => {
-      const doc = new DOMParser().parseFromString(xml, 'text/xml');
+      const doc = parseXML(xml);
       const part = els(doc as any, 'part').find(p => p.getAttribute('id') === partId)!;
       const byVerse: Record<string, string[]> = {};
       for (const note of els(part, 'note'))
@@ -407,7 +408,7 @@ describe('repeats and alternate endings', () => {
   it('round-trips repeats and the volta back to MusicXML', async () => {
     const original = await fs.readFile(path.join(SCORES, 'Sun-did-glide.xml'), 'utf-8');
     const exported = exportMusicXML(importMusicXML(original, { mergeNotationAndTab: true }));
-    const doc = new DOMParser().parseFromString(exported, 'text/xml');
+    const doc = parseXML(exported);
     const part = els(doc as any, 'part').find(p => p.getAttribute('id') === 'P1-std')!;
 
     const marks: string[] = [];
@@ -614,14 +615,14 @@ describe('tuplets and grace notes across MusicXML', () => {
 
   it('raises <divisions> so a triplet duration is a whole number', async () => {
     const exported = exportMusicXML(await mnxFixture());
-    const doc = new DOMParser().parseFromString(exported, 'text/xml');
+    const doc = parseXML(exported);
     // The default 8 cannot state a third of anything; 24 can.
     expect(Number(els(doc as any, 'divisions')[0].textContent) % 3).toBe(0);
   });
 
   it('writes <time-modification> on every member and one bracket per group', async () => {
     const exported = exportMusicXML(await mnxFixture());
-    const doc = new DOMParser().parseFromString(exported, 'text/xml');
+    const doc = parseXML(exported);
     const parts = els(doc as any, 'part');
     // Measure 2 (index 1) holds two eighth triplets; the notation staff only.
     const measure = els(parts[0], 'measure')[1];
@@ -640,7 +641,7 @@ describe('tuplets and grace notes across MusicXML', () => {
 
   it('writes a grace note with no <duration> at all', async () => {
     const exported = exportMusicXML(await mnxFixture());
-    const doc = new DOMParser().parseFromString(exported, 'text/xml');
+    const doc = parseXML(exported);
     const graced = els(doc as any, 'note').filter(n => els(n, 'grace').length > 0);
     expect(graced.length).toBeGreaterThan(0);
     for (const note of graced) {

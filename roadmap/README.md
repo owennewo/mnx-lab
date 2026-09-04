@@ -161,6 +161,16 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-zero-dep.md](inprogress/core-musicxml-zero-dep.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 10, **built 2026-09-04**,
+  and the first serving the campaign's *other* objective: **`converters/musicxml-mnx` now
+  has no runtime dependency at all**, and the oracle (24/27) and matrix (36 supported) did
+  not move by a cell. The inherited plan — an isomorphic `DOMParser` adapter — was wrong
+  twice: Node has no global `DOMParser`, so it keeps xmldom forever, and the real
+  divergence is in *serialization*, which an adapter does not touch. The bar was **byte
+  equality** with the previous writer, not validity, because `converters/fixtures/*.xml`
+  are committed derived files; meeting it needed the `<?xml …?>` declaration preserved
+  verbatim. Converter suite 86 → 98 tests, runtime 5.4s → 2.7s.
 - **[core-musicxml-export-crash.md](inprogress/core-musicxml-export-crash.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 9, **built 2026-09-04**:
   `id` and `name` are **optional** on an MNX part and the exporter assumed neither was —

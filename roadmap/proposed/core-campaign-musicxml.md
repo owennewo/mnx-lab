@@ -138,7 +138,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 9 | [Export crash on anonymous parts](../inprogress/core-musicxml-export-crash.md) | `id` and `name` are optional on an MNX part and the exporter assumed neither was — it threw on two corpus scenarios and wrote `<part-name>undefined</part-name>` for a third case. Found by the matrix on its first run. **Matrix supported 24 → 36**, because a crash costs every cell that document could have proved. | accuracy | the matrix | **built 2026-09-04** |
 | 10 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite`. **License verified before a byte lands** — the MIT claim is unchecked and the LilyPond lineage makes it worth confirming. Assertions per file: parses, drops no notes, measure durations sum to the meter, part/voice counts correct. | accuracy | itself | proposed |
 | 11 | Aligner generalization | Separate general part/measure/voice parsing from the guitar standard+TAB merge in `aligner.ts`; multi-part ensembles (N parts), grand staff (2 staves, 1 part). The largest single item, and item 1 gates it — `parts` and `multiple-voices` are both in the 27. | accuracy | 1 + 3 | proposed |
-| 12 | Zero-dep XML layer | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | 1 + 3 as regression | proposed |
+| 10b | [Zero-dep XML layer](../inprogress/core-musicxml-zero-dep.md) | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | the oracle and matrix, required unmoved | **built 2026-09-04** |
 | 13 | `.mxl` container | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | round trip + item 3's `9x` files | proposed |
 | 14 | Differential oracle | music21 as a dev-only subprocess emitting a note table (part, voice, onset, duration, pitch, tie, lyric), diffed against the same table from our MNX. The independent implementation the campaign otherwise lacks. Dev/test only, never shipped. | accuracy | itself | proposed |
 | 15 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document in CI. A floor, explicitly not counted as an accuracy tier. | accuracy | itself | proposed |
@@ -176,6 +176,29 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-04 — item 10: zero dependencies, and nothing moved
+
+**`converters/musicxml-mnx` has no runtime dependency at all**, and the oracle (24/27) and
+matrix (36 supported) are unchanged to the cell
+([core-musicxml-zero-dep.md](../inprogress/core-musicxml-zero-dep.md)).
+
+- **The inherited plan was wrong twice, and this is the item that proved it.** An
+  isomorphic `DOMParser` adapter keeps xmldom as a Node dependency forever (Node has no
+  global `DOMParser`), and it does nothing about serialization, which is where the real
+  divergence lives. Writing both halves was less work than the adapter would have been.
+- **The bar was byte equality, not validity.** `converters/fixtures/*.xml` are committed
+  derived files, so a writer that produced merely valid XML would have shown the corpus as
+  wholly changed on the next re-derivation. Meeting it required preserving the `<?xml …?>`
+  declaration verbatim rather than regenerating it — 37 bytes, and the entire difference on
+  the first attempt.
+- **"Nothing moved" is the result, and only the instruments make it meaningful.** A month
+  ago the same claim would have rested on 46 round-trip assertions over three guitar
+  scores. It now rests on 27 layout comparisons against human-verified goldens and a
+  125-document support matrix, both required to be unchanged.
+- **The API survey missed `nodeName` because it only looked at `src/`.** The tests used
+  it, four failed, and the failure mode is the quiet one: a missing DOM member does not
+  throw, it reads `undefined` and takes the other branch. **Survey the tests too.**
 
 ### 2026-09-04 — item 9: the matrix pays for itself in one run
 

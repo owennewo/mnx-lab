@@ -19,6 +19,7 @@ import {
   MnxTuplet,
   STANDARD_GUITAR_STRINGS
 } from '../common/types.js';
+import type { Element, Document } from '../common/xml.js';
 import {
   renderChordSymbol,
   stepToText,
