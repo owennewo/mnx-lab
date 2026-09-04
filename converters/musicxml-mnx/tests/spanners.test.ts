@@ -336,3 +336,35 @@ describe('note ids', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 });
+
+describe('parts without an id or a name', () => {
+  const bare = {
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }] },
+    parts: [
+      {
+        measures: [
+          {
+            clefs: [{ clef: { sign: 'G', staffPosition: -2 } }],
+            sequences: [
+              { content: [{ duration: { base: 'whole' }, notes: [{ pitch: { step: 'C', octave: 4 } }] }] }
+            ]
+          }
+        ]
+      }
+    ]
+  } as unknown as MnxStructure;
+
+  it('exports rather than throwing', () => {
+    // `id` and `name` are both optional in MNX; the exporter used to call
+    // .replace on an absent id and write <part-name>undefined</part-name>.
+    const xml = exportMusicXML(bare);
+    expect(xml).toContain('<part-list>');
+    expect(xml).not.toContain('undefined');
+  });
+
+  it('mints a positional id the way the importer does', () => {
+    expect(exportMusicXML(bare)).toContain('id="P1"');
+    expect(importMusicXML(exportMusicXML(bare)).parts[0].id).toBe('P1');
+  });
+});

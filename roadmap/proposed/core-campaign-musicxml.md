@@ -135,13 +135,14 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 6 | [Jumps](../inprogress/core-musicxml-jumps.md) | Segno, Fine and D.S., read from `<sound>` rather than the printed caption. MusicXML writes the same `<sound dalsegno>` whether or not it is *al Fine*; the score settles it — a D.S. is al Fine exactly when there is a Fine. Export needs `<offset>`, since a D.S. sits at the end of its measure. | accuracy | item 1 + round trip | **built 2026-09-04** |
 | 7 | [Ottavas, tuplet units, note ids](../inprogress/core-musicxml-ottavas-tuplets.md) | Ottava sign flip and an end that names the last shifted note's ONSET; tuplet units taken from `<normal-type>` so 6:4 does not print as 3:2; and note ids made document-unique — `parts` was minting 14 ids over 9 values. | accuracy | item 1 + round trip | **built 2026-09-04** |
 | 8 | [Converter support matrix](../inprogress/lab-converter-matrix.md) | Rows = MNX `$def` (193, minus plumbing) + `_x.mnxLab` keys; columns = converter × direction. **Cells derived, never declared** (below). Generated, committed artifact; hand-edit is a red test. Extends `src/corpus/defIndex.ts` and the `#/objects` page rather than building a second thing. | both | the corpus itself | **built 2026-09-04** |
-| 9 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite`. **License verified before a byte lands** — the MIT claim is unchecked and the LilyPond lineage makes it worth confirming. Assertions per file: parses, drops no notes, measure durations sum to the meter, part/voice counts correct. | accuracy | itself | proposed |
-| 10 | Aligner generalization | Separate general part/measure/voice parsing from the guitar standard+TAB merge in `aligner.ts`; multi-part ensembles (N parts), grand staff (2 staves, 1 part). The largest single item, and item 1 gates it — `parts` and `multiple-voices` are both in the 27. | accuracy | 1 + 3 | proposed |
-| 11 | Zero-dep XML layer | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | 1 + 3 as regression | proposed |
-| 12 | `.mxl` container | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | round trip + item 3's `9x` files | proposed |
-| 13 | Differential oracle | music21 as a dev-only subprocess emitting a note table (part, voice, onset, duration, pitch, tie, lyric), diffed against the same table from our MNX. The independent implementation the campaign otherwise lacks. Dev/test only, never shipped. | accuracy | itself | proposed |
-| 14 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document in CI. A floor, explicitly not counted as an accuracy tier. | accuracy | itself | proposed |
-| 15 | Browser import surface | MusicXML file import in the workbench, parallel to the Guitar Pro worker; `.xml`/`.musicxml`/`.mxl` through the CLI and `localFile.ts`. Depends on 5 and 6 — it is the item that makes the zero-dep objective pay. | zero-dep | `smoke:csp` + existing import path | proposed |
+| 9 | [Export crash on anonymous parts](../inprogress/core-musicxml-export-crash.md) | `id` and `name` are optional on an MNX part and the exporter assumed neither was — it threw on two corpus scenarios and wrote `<part-name>undefined</part-name>` for a third case. Found by the matrix on its first run. **Matrix supported 24 → 36**, because a crash costs every cell that document could have proved. | accuracy | the matrix | **built 2026-09-04** |
+| 10 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite`. **License verified before a byte lands** — the MIT claim is unchecked and the LilyPond lineage makes it worth confirming. Assertions per file: parses, drops no notes, measure durations sum to the meter, part/voice counts correct. | accuracy | itself | proposed |
+| 11 | Aligner generalization | Separate general part/measure/voice parsing from the guitar standard+TAB merge in `aligner.ts`; multi-part ensembles (N parts), grand staff (2 staves, 1 part). The largest single item, and item 1 gates it — `parts` and `multiple-voices` are both in the 27. | accuracy | 1 + 3 | proposed |
+| 12 | Zero-dep XML layer | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | 1 + 3 as regression | proposed |
+| 13 | `.mxl` container | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | round trip + item 3's `9x` files | proposed |
+| 14 | Differential oracle | music21 as a dev-only subprocess emitting a note table (part, voice, onset, duration, pitch, tie, lyric), diffed against the same table from our MNX. The independent implementation the campaign otherwise lacks. Dev/test only, never shipped. | accuracy | itself | proposed |
+| 15 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document in CI. A floor, explicitly not counted as an accuracy tier. | accuracy | itself | proposed |
+| 16 | Browser import surface | MusicXML file import in the workbench, parallel to the Guitar Pro worker; `.xml`/`.musicxml`/`.mxl` through the CLI and `localFile.ts`. Depends on 5 and 6 — it is the item that makes the zero-dep objective pay. | zero-dep | `smoke:csp` + existing import path | proposed |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -175,6 +176,25 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-04 — item 9: the matrix pays for itself in one run
+
+**Matrix supported 24 → 36**
+([core-musicxml-export-crash.md](../inprogress/core-musicxml-export-crash.md)).
+
+- **`id` and `name` are optional on an MNX part, and the exporter assumed neither was.**
+  It threw on two corpus scenarios and would have written
+  `<part-name>undefined</part-name>` for any nameless part that got past it. Both are now
+  minted positionally, which is what the importer already did — the two halves disagreed
+  about what an anonymous part is called and nothing had ever asked them.
+- **Nothing had caught it because nothing had pointed the converter at the corpus.** Its
+  own tests use `converters/fixtures/`, all authored in Guitar Pro where parts always have
+  names; the corpus belongs to the renderer. The matrix is the first thing that ran one
+  through the other.
+- **A crash is not one red cell, it is every cell that document could have proved.**
+  Twelve rows moved from lossy to supported on this one fix, because a document that
+  throws counts as losing everything it carried. That is why `error` sorts above `lossy`
+  on the page.
 
 ### 2026-09-04 — item 8: the matrix, and the answer to the question that started this
 

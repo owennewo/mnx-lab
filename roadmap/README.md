@@ -161,6 +161,15 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-export-crash.md](inprogress/core-musicxml-export-crash.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 9, **built 2026-09-04**:
+  `id` and `name` are **optional** on an MNX part and the exporter assumed neither was —
+  it threw outright on two corpus scenarios and would write
+  `<part-name>undefined</part-name>` otherwise. Both are now minted positionally, which is
+  what the importer already did. Found by the matrix on its first run, because nothing had
+  ever pointed the converter at the corpus (its own tests use Guitar-Pro-authored
+  fixtures, where parts always have names). **Matrix supported 24 → 36 on this one fix** —
+  a crash is not one red cell, it is every cell that document could have proved.
 - **[lab-converter-matrix.md](inprogress/lab-converter-matrix.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 8, **built 2026-09-04**, and
   the only `lab-` item in it: **feature-by-feature converter support, derived rather than

@@ -289,17 +289,27 @@ export function exportMusicXML(
   const finalParts: MnxPart[] = [];
   const partMap = new Map<string, string>(); // partId -> partName
 
-  for (const part of mnxJson.parts) {
+  // `id` and `name` are both OPTIONAL on an MNX part, and plenty of documents
+  // carry neither — the corpus alone has two. MusicXML needs an id to reference
+  // a part at all, so one is minted positionally, the same way the importer
+  // mints one for a `<part>` without an id. Without this the exporter threw on
+  // the first such document (`basePartId(undefined)`), and a missing name wrote
+  // a literal `<part-name>undefined</part-name>`.
+  mnxJson.parts.forEach((source, index) => {
+    const part: MnxPart =
+      source.id && source.name !== undefined
+        ? source
+        : { ...source, id: source.id ?? `P${index + 1}`, name: source.name ?? '' };
     if (splitNotationAndTab && hasTabContent(part)) {
       const { standardPart, tabPart } = splitPart(part);
       finalParts.push(standardPart, tabPart);
-      partMap.set(standardPart.id, `${part.name}`);
-      partMap.set(tabPart.id, `${part.name} (TAB)`);
+      partMap.set(standardPart.id, part.name);
+      partMap.set(tabPart.id, part.name ? `${part.name} (TAB)` : 'TAB');
     } else {
       finalParts.push(part);
       partMap.set(part.id, part.name);
     }
-  }
+  });
 
   // 3. Create <part-list>
   const partListEl = doc.createElement('part-list');

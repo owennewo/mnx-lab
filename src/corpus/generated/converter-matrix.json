@@ -7,8 +7,8 @@
       "key": "musicxml",
       "label": "MusicXML",
       "counts": {
-        "supported": 24,
-        "lossy": 82,
+        "supported": 36,
+        "lossy": 70,
         "extension": 6,
         "error": 0,
         "untested": 3
@@ -75,10 +75,9 @@
           "evidence": "lab/32-articulations/02-unrendered-marks"
         },
         "bpm": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 10,
-          "survived": 9,
-          "evidence": "lab/31-score-text/10-labels-on-a-tab-staff"
+          "survived": 10
         },
         "breath-mark": {
           "verdict": "lossy",
@@ -95,7 +94,7 @@
         "clef-sign": {
           "verdict": "lossy",
           "carried": 119,
-          "survived": 116,
+          "survived": 118,
           "evidence": "lab/24-tab-spec-gaps/01-tab-clef-rejected"
         },
         "dynamic-group": {
@@ -150,16 +149,14 @@
           "survived": 4
         },
         "event-lyric-line": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 6,
-          "survived": 5,
-          "evidence": "lab/50-lyrics/02-tab-verses"
+          "survived": 6
         },
         "event-lyric-line-type": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 6,
-          "survived": 5,
-          "evidence": "lab/50-lyrics/02-tab-verses"
+          "survived": 6
         },
         "event-markings": {
           "verdict": "lossy",
@@ -191,10 +188,9 @@
           "survived": 10
         },
         "fine": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 5,
-          "survived": 4,
-          "evidence": "lab/31-score-text/10-labels-on-a-tab-staff"
+          "survived": 5
         },
         "full-measure-rest": {
           "verdict": "lossy",
@@ -254,10 +250,9 @@
           "verdict": "untested"
         },
         "lyric-line-id": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 4,
-          "survived": 3,
-          "evidence": "lab/50-lyrics/02-tab-verses"
+          "survived": 4
         },
         "lyric-line-label": {
           "verdict": "lossy",
@@ -272,16 +267,14 @@
           "evidence": "lab/50-lyrics/01-verse-labels"
         },
         "lyrics": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 6,
-          "survived": 5,
-          "evidence": "lab/50-lyrics/02-tab-verses"
+          "survived": 6
         },
         "lyrics-global": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 4,
-          "survived": 3,
-          "evidence": "lab/50-lyrics/02-tab-verses"
+          "survived": 4
         },
         "measure-repeat": {
           "verdict": "lossy",
@@ -354,10 +347,9 @@
           "evidence": "lab/60-layout/01-group-barline-individual"
         },
         "part-name": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 63,
-          "survived": 62,
-          "evidence": "lab/50-lyrics/02-tab-verses"
+          "survived": 63
         },
         "part-short-name": {
           "verdict": "lossy",
@@ -373,7 +365,7 @@
         "positioned-clef": {
           "verdict": "lossy",
           "carried": 119,
-          "survived": 116,
+          "survived": 118,
           "evidence": "lab/24-tab-spec-gaps/01-tab-clef-rejected"
         },
         "relative-dynamic-value": {
@@ -403,10 +395,9 @@
           "survived": 23
         },
         "segno": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 7,
-          "survived": 6,
-          "evidence": "lab/31-score-text/10-labels-on-a-tab-staff"
+          "survived": 7
         },
         "slur": {
           "verdict": "lossy",
@@ -553,16 +544,14 @@
           "evidence": "lab/60-layout/01-group-barline-individual"
         },
         "tempo": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 10,
-          "survived": 9,
-          "evidence": "lab/31-score-text/10-labels-on-a-tab-staff"
+          "survived": 10
         },
         "tempos": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 10,
-          "survived": 9,
-          "evidence": "lab/31-score-text/10-labels-on-a-tab-staff"
+          "survived": 10
         },
         "tenuto": {
           "verdict": "lossy",
@@ -589,10 +578,9 @@
           "evidence": "lab/40-navigation/02-repeats-and-marks-on-tab"
         },
         "time-signature-unit": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 116,
-          "survived": 114,
-          "evidence": "lab/31-score-text/10-labels-on-a-tab-staff"
+          "survived": 116
         },
         "tremolo-single": {
           "verdict": "lossy",
@@ -620,7 +608,7 @@
         "vendor-extensions": {
           "verdict": "lossy",
           "carried": 34,
-          "survived": 30,
+          "survived": 32,
           "evidence": "lab/00-document/03-navigation-playground"
         },
         "wedge-type": {
@@ -662,20 +650,17 @@
         "_x.mnxLab.strings": {
           "verdict": "extension",
           "carried": 32,
-          "survived": 28,
+          "survived": 30,
           "evidence": "lab/00-document/03-navigation-playground"
         },
         "_x.mnxLab.tab": {
           "verdict": "extension",
           "carried": 31,
-          "survived": 29,
-          "evidence": "lab/31-score-text/10-labels-on-a-tab-staff"
+          "survived": 31,
+          "evidence": "fixtures/House-of-the-Rising-Sun"
         }
       },
-      "failures": [
-        "lab/31-score-text/10-labels-on-a-tab-staff: Cannot read properties of undefined (reading 'replace')",
-        "lab/50-lyrics/02-tab-verses: Cannot read properties of undefined (reading 'replace')"
-      ]
+      "failures": []
     }
   ]
 }

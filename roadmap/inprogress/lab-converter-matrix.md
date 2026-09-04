@@ -46,19 +46,22 @@ entry**, and this exists not to be one.
 
 ## What it found on its first run
 
-| MusicXML | |
-|---|---|
-| supported | 24 |
-| lossy | **82** |
-| extension | 6 |
-| untested | 3 |
+| MusicXML | first run | after the crash it found |
+|---|---|---|
+| supported | 24 | **36** |
+| lossy | 82 | **70** |
+| extension | 6 | 6 |
+| untested | 3 | 3 |
 
-Two documents **cannot be converted at all** —
+Two documents **could not be converted at all** —
 `lab/31-score-text/10-labels-on-a-tab-staff` and `lab/50-lyrics/02-tab-verses`, both
-`Cannot read properties of undefined (reading 'replace')`. That is a crash in the
-exporter that nothing else had noticed, found by pointing the corpus at it.
+`Cannot read properties of undefined (reading 'replace')`. That was a crash in the
+exporter that nothing else had noticed, found by pointing the whole corpus at it
+([core-musicxml-export-crash.md](core-musicxml-export-crash.md)), and fixing it moved
+**twelve rows** from lossy to supported: a single crash was distorting a dozen verdicts,
+because every def those two documents carried counted as lost.
 
-The 82 is not 82 problems: the evidence column groups them, and the largest clusters are
+The 70 is not 70 problems: the evidence column groups them, and the largest clusters are
 one document each (`lab/60-layout/01-group-barline-individual` accounts for 8,
 `lab/32-articulations/01-rare-articulations` for 5). It is a work queue with starting
 points, which a coverage fraction never is.
