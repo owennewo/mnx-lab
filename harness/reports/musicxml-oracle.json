@@ -3,9 +3,9 @@
   "summary": {
     "comparisons": 27,
     "verdicts": {
-      "match": 16,
+      "match": 18,
       "spacing": 1,
-      "content": 10,
+      "content": 8,
       "import-failed": 0,
       "layout-failed": 0
     }
@@ -103,17 +103,11 @@
     },
     {
       "slug": "repeats-alternate-endings-advanced",
-      "verdict": "content",
-      "glyphsExtra": [
-        "rect"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "repeats-alternate-endings-simple",
-      "verdict": "content",
-      "glyphsExtra": [
-        "rect"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "repeats-implied-start-repeat",

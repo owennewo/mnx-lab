@@ -197,3 +197,21 @@ describe('beams', () => {
     expect(importMusicXML(exportMusicXML(first))).toEqual(first);
   });
 });
+
+describe('repeat barlines', () => {
+  it.each(['repeats-alternate-endings-simple', 'repeats-alternate-endings-advanced'])(
+    'states a repeat once in %s, without a barline beside it',
+    async slug => {
+      // MusicXML draws a repeat with <bar-style>heavy-light</bar-style> plus
+      // <repeat direction="forward"/> on the SAME <barline>. The bar-style is
+      // how the repeat is drawn, not a barline of its own, and MNX says it once.
+      const mnx = await load(slug);
+      for (const measure of mnx.global.measures) {
+        if (measure.repeatStart || measure.repeatEnd) {
+          expect(measure.barline, 'a repeat measure carries no separate barline').toBeUndefined();
+        }
+      }
+      expect(mnx.global.measures.some(m => m.repeatStart || m.repeatEnd)).toBe(true);
+    }
+  );
+});

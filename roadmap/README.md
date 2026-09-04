@@ -161,6 +161,17 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-repeat-barlines.md](inprogress/core-musicxml-repeat-barlines.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 4, **built 2026-09-04**:
+  **the oracle 16 → 18 of 27**. Five scenarios shared one symptom (an extra `rect`) and had
+  two causes. The bug: MusicXML draws a repeat with a `<bar-style>` *and* a `<repeat>` on
+  one `<barline>`, and we emitted both, drawing a thick bar over the repeat. The non-bug:
+  the final-barline default, where **the fix was written, measured and reverted — it took
+  18 match down to 10**, fixing 3 scenarios and breaking 8. The spec's own examples resolve
+  an absent final barline two ways (3 write `regular`, ~15 write nothing and engrave
+  thick), so no importer rule satisfies both. **The campaign's first spec-loop finding, and
+  not a vocabulary gap** — an ambiguity in MNX's defaults rather than something it cannot
+  say.
 - **[core-musicxml-beams.md](inprogress/core-musicxml-beams.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 3, **built 2026-09-04**:
   beams, both directions — **the oracle 11 → 16 of 27**. The models are the same

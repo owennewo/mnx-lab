@@ -1173,18 +1173,26 @@ export class Aligner {
       // volta (ending) brackets.
       const barlineEls = findDirectChildren(mEl, 'barline');
       for (const bar of barlineEls) {
+        const repeatOnThisBarline = findDirectChild(bar, 'repeat');
         const style = getChildText(bar, 'bar-style');
-        if (style) {
-          const mapped = this.mapBarlineStyle(style);
-          if (mapped !== 'regular') {
-            globalM.barline = { type: mapped };
-          }
+        // A `<bar-style>` sitting on a barline that also carries a `<repeat>`
+        // is HOW THE REPEAT IS DRAWN — heavy-light for a forward repeat,
+        // light-heavy for a backward one — not a barline of its own. MNX says
+        // that once, with repeatStart/repeatEnd, and the spec's own examples
+        // carry no `barline` beside them. Emitting both draws the repeat and
+        // then a thick bar over it.
+        // An explicit `regular` is kept rather than dropped as "the default":
+        // the two formats do not agree on what an absent barline means (see
+        // core-musicxml-repeat-barlines.md), so a source that says which one it
+        // wants is stating something worth carrying.
+        if (style && !repeatOnThisBarline) {
+          globalM.barline = { type: this.mapBarlineStyle(style) };
         }
 
         // `<repeat direction="forward">` opens a section, `"backward"` closes
         // it. `times` on a backward repeat is the number of PLAYS (Soundslice
         // writes times="3"); MNX carries the same meaning in `repeatEnd.times`.
-        const repeatEl = findDirectChild(bar, 'repeat');
+        const repeatEl = repeatOnThisBarline;
         if (repeatEl) {
           const direction = repeatEl.getAttribute('direction');
           if (direction === 'forward') {
