@@ -17,6 +17,8 @@ export interface LocalDocumentSource {
   id: string;
   fileName: string;
   name: string;
+  title?: string;
+  artist?: string;
   format: 'MNX' | 'Guitar Pro';
   document: MnxStructure;
   warnings: string[];
@@ -45,7 +47,12 @@ function assertDocumentShape(value: unknown): asserts value is MnxStructure {
   }
 }
 
-function importGuitarPro(buffer: ArrayBuffer): Promise<{ document: MnxStructure; warnings: string[] }> {
+function importGuitarPro(buffer: ArrayBuffer): Promise<{
+  document: MnxStructure;
+  title?: string;
+  artist?: string;
+  warnings: string[];
+}> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(new URL('./guitarProImporter.worker.ts', import.meta.url), {
       type: 'module'
@@ -58,7 +65,12 @@ function importGuitarPro(buffer: ArrayBuffer): Promise<{ document: MnxStructure;
         reject(new Error(reply.error || 'Guitar Pro conversion failed.'));
         return;
       }
-      resolve({ document: reply.document, warnings: reply.warnings ?? [] });
+      resolve({
+        document: reply.document,
+        ...(reply.title ? { title: reply.title } : {}),
+        ...(reply.artist ? { artist: reply.artist } : {}),
+        warnings: reply.warnings ?? []
+      });
     };
     worker.onerror = event => {
       worker.terminate();
@@ -75,6 +87,8 @@ function importGuitarPro(buffer: ArrayBuffer): Promise<{ document: MnxStructure;
 /** Read one user-selected file into an in-memory workbench document. */
 export async function openLocalFile(file: File): Promise<LocalDocumentSource> {
   let document: MnxStructure;
+  let title: string | undefined;
+  let artist: string | undefined;
   let warnings: string[] = [];
   let format: LocalDocumentSource['format'];
 
@@ -91,7 +105,7 @@ export async function openLocalFile(file: File): Promise<LocalDocumentSource> {
     document = parsed;
   } else if (extensionIn(file.name, GUITAR_PRO_EXTENSIONS)) {
     format = 'Guitar Pro';
-    ({ document, warnings } = await importGuitarPro(await file.arrayBuffer()));
+    ({ document, title, artist, warnings } = await importGuitarPro(await file.arrayBuffer()));
     assertDocumentShape(document);
   } else {
     throw new Error(
@@ -103,6 +117,8 @@ export async function openLocalFile(file: File): Promise<LocalDocumentSource> {
     id: `local:${crypto.randomUUID()}`,
     fileName: file.name,
     name: withoutKnownExtension(file.name) || file.name,
+    ...(title ? { title } : {}),
+    ...(artist ? { artist } : {}),
     format,
     document: upgradeTabExtension(document),
     warnings

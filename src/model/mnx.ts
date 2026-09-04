@@ -747,6 +747,11 @@ export interface MnxStructure {
 
 export interface MnxDocument {
   id: string;
+  /** Host/importer presentation metadata. MNX v27 has no document-title or
+   *  artist fields yet, so these belong to the wrapper rather than mnxJson. */
+  title?: string;
+  artist?: string;
+  /** Host-owned fallback label: scenario name, filename, or library title. */
   name: string;
   lastUpdated: number;
   mnxJson: MnxStructure;

@@ -21,6 +21,8 @@ globalThis.onmessage = (event: MessageEvent<GuitarProWorkerRequest>) => {
       new Uint8Array(request.buffer),
       settings
     );
+    const title = score.title.trim();
+    const artist = score.artist.trim();
     reply = {
       cmd: GUITAR_PRO_IMPORT_RESULT,
       ok: true,
@@ -29,6 +31,8 @@ globalThis.onmessage = (event: MessageEvent<GuitarProWorkerRequest>) => {
       document: scoreToMnx(score, {
         onWarning: warning => warnings.push(warning)
       }) as unknown as MnxStructure,
+      ...(title ? { title } : {}),
+      ...(artist ? { artist } : {}),
       warnings
     };
   } catch (error) {

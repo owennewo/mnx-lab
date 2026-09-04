@@ -62,6 +62,14 @@ The documents in `documents/` are copies, deliberately: a host serves its own
 documents. They are not read from `scenarios/` at runtime — coupling the demo
 to the corpus would make it a second workbench.
 
+## Document heading
+
+The viewer always shows a heading. `mnxDoc.name` is its required fallback (a
+filename, scenario name, or host-library label); optional `mnxDoc.artist` and
+`mnxDoc.title` produce `Artist: Title`. These are wrapper metadata, not fields
+inside `mnxJson`: MNX v27 still marks document title and composer metadata as
+planned for 1.0 rather than part of the schema.
+
 ## Tested by
 
 `npm run smoke:embed` — builds the artifact, serves it and this page on **two

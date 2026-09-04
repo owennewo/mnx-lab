@@ -24,6 +24,7 @@ import {
   type RenderScale
 } from '../engine/render/scale.ts';
 import { densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
+import { SCORE_LABEL_SIZE_SP } from '../engine/layout/scoreText.ts';
 import { revealScrollDelta } from '../engine/render/revealScroll.ts';
 import {
   drawCursorGhost,
@@ -329,6 +330,38 @@ export class DocumentViewer extends LitElement {
       :host([compact]) .paper {
         padding: 16px 14px;
         border-radius: var(--radius-control);
+      }
+
+      .document-heading {
+        /* Centred over the page, engraving-style, and pulled up into the
+           paper's padding so the title reads from the top margin rather than
+           floating a full pad below it. The pull is FIXED px against the
+           paper's fixed padding — scaled with the heading it would swallow
+           the whole pad at high staff scales and touch the paper's edge. */
+        margin: -14px 0 calc(var(--mnx-document-heading-size, 18px) * 1.333);
+        text-align: center;
+        color: var(--paper-ink);
+        font-family: var(--sans);
+        font-size: var(--mnx-document-heading-size, 18px);
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        overflow-wrap: anywhere;
+      }
+
+      .document-artist {
+        font-weight: 400;
+      }
+
+      .document-separator {
+        color: var(--ink-3);
+        font-weight: 400;
+      }
+
+      :host([compact]) .document-heading {
+        /* The compact paper's pad is 16px, so the pull shrinks with it. */
+        margin-top: -8px;
+        margin-bottom: calc(var(--mnx-document-heading-size, 18px) * 0.9);
       }
 
       /* Honor the engine's intrinsic size — fitPxPerSp already fills the
@@ -914,6 +947,13 @@ export class DocumentViewer extends LitElement {
       this.lastPackings = drawn.packings;
       this.lastDensityH = densityH;
       const shrink = this.shrinkToPane();
+      // A section label is 1.8sp in the SVG. The heading lives in ordinary
+      // DOM above it, so give it the same em converted through the EXACT
+      // on-screen vertical scale (including max-width's final shrink).
+      this.style.setProperty(
+        '--mnx-document-heading-size',
+        `${SCORE_LABEL_SIZE_SP * pxPerSp * shrink}px`
+      );
       this.dispatchEvent(
         new CustomEvent<RenderScale>('render-scale', {
           detail: { pxPerSp: pxPerSp * shrink, staffScale: used * shrink, fitted },
@@ -1140,6 +1180,18 @@ export class DocumentViewer extends LitElement {
       .filter((name): name is HideableFeature => name === 'lyrics' || name === 'badges');
   }
 
+  /** MNX v27 deliberately has no document title/composer fields yet. The
+   *  wrapper carries importer/host metadata and a required source-name
+   *  fallback, keeping speculative properties out of the MNX payload. */
+  private documentHeading(): { title: string; artist: string | null } {
+    const clean = (value: string | undefined) => value?.trim() || null;
+    const title = clean(this.mnxDoc?.title) ?? clean(this.mnxDoc?.name) ?? clean(this.mnxDoc?.id);
+    return {
+      title: title ?? 'Untitled document',
+      artist: clean(this.mnxDoc?.artist)
+    };
+  }
+
   private appendPane(): HTMLElement {
     const pane = document.createElement('div');
     this.container.appendChild(pane);
@@ -1160,8 +1212,14 @@ export class DocumentViewer extends LitElement {
       `;
     }
 
+    const heading = this.documentHeading();
     return html`
       <div class="paper">
+        <h1 class="document-heading">
+          ${heading.artist
+            ? html`<span class="document-artist">${heading.artist}</span><span class="document-separator">: </span>`
+            : nothing}<span class="document-title">${heading.title}</span>
+        </h1>
         ${this.renderErrors.length
           ? html`
               <div class="state-panel">

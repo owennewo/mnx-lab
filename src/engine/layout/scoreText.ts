@@ -245,7 +245,10 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
 // typing them: a rehearsal mark reads as the outermost index, the section name
 // sits under it, and part-level text sits closest to the notes. Nothing in the
 // document says so. (roadmap/proposed/low-priority/spec-score-text.md)
-const SCORE_LABEL_SIZE_SP = 1.8;
+/** The shared em size for rehearsal and section labels. Exported so document
+ *  chrome that sits beside the SVG can match the engraving's typography at
+ *  the actual on-screen staff scale. */
+export const SCORE_LABEL_SIZE_SP = 1.8;
 const SCORE_LABEL_INSET_SP = 0.6; // from the barline, for a label at the top of the bar
 // Body text has no metrics in layout, so the box is drawn around an estimated
 // CAP HEIGHT, not the em. Sizing it to the em leaves the ascender/descender

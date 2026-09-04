@@ -18,6 +18,8 @@ export interface GuitarProWorkerReply {
   cmd: typeof GUITAR_PRO_IMPORT_RESULT;
   ok: boolean;
   document?: MnxStructure;
+  title?: string;
+  artist?: string;
   warnings?: string[];
   error?: string;
 }

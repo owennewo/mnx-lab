@@ -178,6 +178,57 @@ try {
     console.log(`rendered: viewBox="${viewBox}", ${glyphs} glyphs, ${lines} staff primitives`);
   }
 
+  // 2a. DOCUMENT IDENTITY. MNX v27 has no title/artist fields, so the public
+  // wrapper owns presentation metadata: name is the reliable host fallback,
+  // while an importer or library may supply artist + title.
+  const fallbackHeading = await cdp.evaluate(
+    `document.getElementById('viewer').shadowRoot.querySelector('.document-heading')?.textContent.trim()`
+  );
+  if (fallbackHeading !== 'Twelve-bar blues')
+    fail(`name fallback heading is "${fallbackHeading}" instead of "Twelve-bar blues"`);
+  const metadataHeading = await cdp.evaluate(`
+    (async () => {
+      const v = document.getElementById('viewer');
+      v.mnxDoc = { ...v.mnxDoc, artist: 'Example Artist', title: 'Example Title' };
+      await v.updateComplete;
+      return v.shadowRoot.querySelector('.document-heading')?.textContent.trim();
+    })()
+  `);
+  if (metadataHeading !== 'Example Artist: Example Title')
+    fail(`artist/title heading is "${metadataHeading}" instead of "Example Artist: Example Title"`);
+
+  const headingScale = JSON.parse(await cdp.evaluate(`
+    (async () => {
+      const v = document.getElementById('viewer');
+      const measure = () => {
+        const heading = v.shadowRoot.querySelector('.document-heading');
+        const svg = v.shadowRoot.querySelector('svg');
+        const section = svg?.querySelector('.section-label');
+        const shrink = svg
+          ? Math.min(1, svg.getBoundingClientRect().width / Number(svg.getAttribute('width')))
+          : 1;
+        return {
+          headingPx: heading ? parseFloat(getComputedStyle(heading).fontSize) : 0,
+          sectionPx: section ? Number(section.getAttribute('font-size')) * shrink : 0
+        };
+      };
+      const fitted = measure();
+      v.zoom = 1.4;
+      await v.updateComplete;
+      await new Promise(requestAnimationFrame);
+      const zoomed = measure();
+      v.zoom = null;
+      await v.updateComplete;
+      return JSON.stringify({ fitted, zoomed });
+    })()
+  `));
+  for (const [state, sizes] of Object.entries(headingScale)) {
+    if (!sizes.headingPx || Math.abs(sizes.headingPx - sizes.sectionPx) > 0.05)
+      fail(`${state} heading is ${sizes.headingPx}px but section text is ${sizes.sectionPx}px`);
+  }
+  if (Math.abs(headingScale.fitted.headingPx - headingScale.zoomed.headingPx) < 0.5)
+    fail('heading size did not follow a change to vertical zoom');
+
   // 2b. THE TOKENS ARE THE VIEWER'S OWN. In an embed there is no app ancestor
   // to inherit design tokens from, and the failure is silent-looking but
   // total: `background: var(--paper)` falls back to transparent, ink inherits

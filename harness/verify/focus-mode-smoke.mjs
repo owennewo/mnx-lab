@@ -145,13 +145,14 @@ const DUMP = `(() => {
     zoomFocusRect: rect(zoomFocus),
     zoomFocusLabel: zoomFocus?.getAttribute('aria-label') ?? null,
     zoomFocusPressed: zoomFocus?.getAttribute('aria-pressed') ?? null,
-    popover: !!pageRoot?.querySelector('.popover-layer'),
+    inspector: !!pageRoot?.querySelector('mnx-rung-inspector'),
     focusButton: !!zoomFocus,
     appRect: rect(app),
     mainRect: rect(appRoot?.querySelector('main')),
     pageRect: rect(page),
     pageMainRect: rect(pageRoot?.querySelector('.main')),
     viewerRect: rect(viewer),
+    documentHeading: viewer?.shadowRoot?.querySelector('.document-heading')?.textContent.trim() ?? null,
     viewBox: svg?.getAttribute('viewBox') ?? null,
     railPreference: localStorage.getItem('mnx-lab.rail-hidden'),
     panelPreference: localStorage.getItem('mnx-lab.panel-hidden'),
@@ -238,6 +239,10 @@ try {
   };
 
   let state = await dump();
+  check(
+    state.documentHeading === 'Twelve-bar blues — the realistic navigation instrument',
+    'the workbench supplies the scenario name as the document heading fallback'
+  );
   check(state.focusButton, 'normal mode exposes the document-focus button');
   check(
     state.focusItems.some(item => item.hint === 'Ctrl+Alt+F'),
@@ -371,12 +376,12 @@ try {
       ".querySelector('mnx-scenario-page').shadowRoot" +
       ".querySelector('mnx-document-viewer').focus()"
   );
-  await press('K', 'KeyK', 75, 8);
+  await press('Enter', 'Enter', 13);
   state = await dump();
-  check(state.appFocus && state.popover, 'an invoked setup popover remains usable in focus mode');
+  check(state.appFocus && state.inspector, 'an invoked rung inspector remains usable in focus mode');
   await press('Escape', 'Escape', 27);
   state = await dump();
-  check(state.appFocus && !state.popover, 'closing the popover returns to focused document-only rest');
+  check(state.appFocus && !state.inspector, 'closing the inspector returns to focused document-only rest');
 
   await focusKey();
   state = await dump();

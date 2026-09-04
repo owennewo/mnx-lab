@@ -55,8 +55,8 @@ mnx-workbench
 ```
 
 The viewer's selection/enclosure remains because it is part of the document surface. Page-
-level interaction UI may appear **transiently when invoked**: selection tray, rung inspector,
-setup popover, clipboard notice and command/model dialogs. The zoom pad remains because
+level interaction UI may appear **transiently when invoked**: rung inspector, lyric editor,
+clipboard notice and command/model dialogs. The zoom pad remains because
 document scale and density are still useful here; its adjacent focus icon is a permanent,
 discoverable exit that changes to “focus document” outside the mode. The app header, rail,
 view tabs, panel toggle and side panel disappear. The resting state is therefore the viewer
@@ -153,8 +153,8 @@ does what?” is not a shortcut a reader can predict.
 - In the same smoke, resize through both width and height while focused and assert the
   viewer's rendered system packing updates — the existing container observer is the seam,
   not a synthetic window-resize call.
-- Exercise a tray or setup shortcut in focus mode and prove the transient overlay remains
-  usable, then closes back to the viewer-only resting state.
+- Exercise the rung inspector in focus mode and prove the transient overlay remains usable,
+  then closes back to the viewer-only resting state.
 - Exercise queue navigation to prove it exits the mode, and scenario→scenario go-to to prove
   the mode can remain active.
 - Feature-detect the Fullscreen API in browser smoke; test its state helper without making a

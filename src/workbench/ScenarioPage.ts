@@ -1935,9 +1935,12 @@ export class ScenarioPage extends LitElement {
     try {
       const document = (await entry.loadDocument()) as MnxStructure;
       if (sourceId !== this.scenarioId) return; // navigated away meanwhile
+      const local = this.isLocalDocument() ? this.localDocument : null;
       this.doc = {
         id: entry.id,
         name: entry.meta.title,
+        ...(local?.title ? { title: local.title } : {}),
+        ...(local?.artist ? { artist: local.artist } : {}),
         lastUpdated: 0,
         mnxJson: document
       };
