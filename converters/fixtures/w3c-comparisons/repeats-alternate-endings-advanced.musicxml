@@ -37,7 +37,7 @@
         </measure>
         <measure number="2">
             <barline location="left">
-                <metadiff><ending number="1,2" type="start"/></metadiff>
+                <ending number="1,2" type="start"/>
             </barline>
             <note>
                 <pitch>
@@ -68,13 +68,13 @@
             </note>
             <barline location="right">
                 <bar-style>light-heavy</bar-style>
-                <metadiff><ending number="1,2" type="stop"/></metadiff>
+                <ending number="1,2" type="stop"/>
                 <repeat direction="backward"/>
             </barline>
         </measure>
         <measure number="4">
             <barline location="left">
-                <metadiff><ending number="3" type="start"/></metadiff>
+                <ending number="3" type="start"/>
             </barline>
             <note>
                 <pitch>
@@ -104,7 +104,7 @@
                 <type>quarter</type>
             </note>
             <barline location="right">
-                <metadiff><ending number="3" type="discontinue"/></metadiff>
+                <ending number="3" type="discontinue"/>
             </barline>
         </measure>
         <measure number="6">

@@ -34,11 +34,11 @@
                     <octave>5</octave>
                 </pitch>
                 <duration>256</duration>
-                <metadiff><tie type="start"/></metadiff>
+                <tie type="start"/>
                 <type>quarter</type>
-                <metadiff><notations>
+                <notations>
                     <tied type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -46,11 +46,11 @@
                     <octave>5</octave>
                 </pitch>
                 <duration>256</duration>
-                <metadiff><tie type="stop"/></metadiff>
+                <tie type="stop"/>
                 <type>quarter</type>
-                <metadiff><notations>
+                <notations>
                     <tied type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -58,11 +58,11 @@
                     <octave>5</octave>
                 </pitch>
                 <duration>256</duration>
-                <metadiff><tie type="start"/></metadiff>
+                <tie type="start"/>
                 <type>quarter</type>
-                <metadiff><notations>
+                <notations>
                     <tied type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
         </measure>
         <measure number="2">
@@ -72,13 +72,13 @@
                     <octave>5</octave>
                 </pitch>
                 <duration>512</duration>
-                <metadiff><tie type="stop"/>
-                <tie type="start"/></metadiff>
+                <tie type="stop"/>
+                <tie type="start"/>
                 <type>half</type>
-                <metadiff><notations>
+                <notations>
                     <tied type="start"/>
                     <tied type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -86,11 +86,11 @@
                     <octave>5</octave>
                 </pitch>
                 <duration>512</duration>
-                <metadiff><tie type="stop"/></metadiff>
+                <tie type="stop"/>
                 <type>half</type>
-                <metadiff><notations>
+                <notations>
                     <tied type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
         </measure>
     </part>

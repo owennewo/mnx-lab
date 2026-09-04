@@ -36,11 +36,11 @@
                 <duration>256</duration>
                 <type>quarter</type>
             </note>
-            <metadiff><direction>
+            <direction>
                 <direction-type>
                     <octave-shift size="8" type="down"/>
                 </direction-type>
-            </direction></metadiff>
+            </direction>
             <note>
                 <pitch>
                     <step>C</step>
@@ -67,11 +67,11 @@
                 <duration>256</duration>
                 <type>quarter</type>
             </note>
-            <metadiff><direction>
+            <direction>
                 <direction-type>
                     <octave-shift size="8" type="stop"/>
                 </direction-type>
-            </direction></metadiff>
+            </direction>
             <note>
                 <pitch>
                     <step>C</step>

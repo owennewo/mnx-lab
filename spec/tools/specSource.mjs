@@ -212,6 +212,16 @@ export function pinIsUpstream() {
  *
  * `document` is an array of lines (freezedb's multi-line text convention, the
  * same one `describeExample` handles for blurbs).
+ *
+ * `<metadiff>` is UNWRAPPED. It is the docs site's diff-highlighting wrapper —
+ * it marks which elements changed relative to a related example so the page can
+ * highlight them — and it is not MusicXML: 24 of the 27 documents carry it, 116
+ * occurrences in all, around exactly the elements that matter most here
+ * (`<beam>` 48, `<notations>` 17, `<barline>` 11, `<time-modification>` 11).
+ * Leaving it in hides `<notations>` from any parser that looks for it as a
+ * child of `<note>`, so a converter reads as having dropped the feature when it
+ * never saw it. This is the XML twin of `stripDocsAnnotations` on the MNX side,
+ * and for the same reason: the fixture carries presentation the format does not.
  */
 export function loadMusicXmlComparisons() {
   requireSubmodule();
@@ -227,7 +237,11 @@ export function loadMusicXmlComparisons() {
     const slug = slugByExample.get(fields.example);
     if (!slug) continue;
     const lines = Array.isArray(fields.document) ? fields.document : [fields.document ?? ''];
-    comparisons.push({ slug, xml: lines.join('\n').replace(/\s*$/, '') + '\n' });
+    const xml = lines
+      .join('\n')
+      .replace(/<\/?metadiff>/g, '')
+      .replace(/\s*$/, '');
+    comparisons.push({ slug, xml: `${xml}\n` });
   }
 
   comparisons.sort((a, b) => a.slug.localeCompare(b.slug));

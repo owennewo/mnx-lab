@@ -29,9 +29,9 @@
                 </pitch>
                 <duration>256</duration>
                 <type>quarter</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="1" placement="above" type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <chord/>
@@ -83,9 +83,9 @@
                 </pitch>
                 <duration>256</duration>
                 <type>quarter</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="1" type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <chord/>

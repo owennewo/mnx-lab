@@ -38,7 +38,7 @@
                 <duration>1</duration>
                 <type>eighth</type>
                 <stem>down</stem>
-                <metadiff><beam number="1">begin</beam></metadiff>
+                <beam number="1">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -48,7 +48,7 @@
                 <duration>1</duration>
                 <type>eighth</type>
                 <stem>down</stem>
-                <metadiff><beam number="1">continue</beam></metadiff>
+                <beam number="1">continue</beam>
             </note>
         </measure>
         <measure number="2">
@@ -60,7 +60,7 @@
                 <duration>1</duration>
                 <type>eighth</type>
                 <stem>down</stem>
-                <metadiff><beam number="1">continue</beam></metadiff>
+                <beam number="1">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -70,7 +70,7 @@
                 <duration>1</duration>
                 <type>eighth</type>
                 <stem>down</stem>
-                <metadiff><beam number="1">end</beam></metadiff>
+                <beam number="1">end</beam>
             </note>
             <note>
                 <rest/>

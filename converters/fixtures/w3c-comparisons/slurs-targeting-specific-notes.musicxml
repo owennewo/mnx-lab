@@ -29,9 +29,9 @@
                 </pitch>
                 <duration>512</duration>
                 <type>half</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="1" placement="below" type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <chord/>
@@ -41,9 +41,9 @@
                 </pitch>
                 <duration>512</duration>
                 <type>half</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="2" placement="above" type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <chord/>
@@ -53,9 +53,9 @@
                 </pitch>
                 <duration>512</duration>
                 <type>half</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="3" placement="above" type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -64,9 +64,9 @@
                 </pitch>
                 <duration>512</duration>
                 <type>half</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="1" type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <chord/>
@@ -76,9 +76,9 @@
                 </pitch>
                 <duration>512</duration>
                 <type>half</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="2" type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <chord/>
@@ -88,9 +88,9 @@
                 </pitch>
                 <duration>512</duration>
                 <type>half</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="3" type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
         </measure>
     </part>

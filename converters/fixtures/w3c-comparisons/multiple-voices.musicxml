@@ -5,7 +5,7 @@
         </score-part>
     </part-list>
     <part id="P1">
-        <metadiff><measure number="1">
+        <measure number="1">
             <attributes>
                 <divisions>256</divisions>
                 <key>
@@ -118,6 +118,6 @@
                 <voice>2</voice>
                 <type>half</type>
             </note>
-        </measure></metadiff>
+        </measure>
     </part>
 </score-partwise>

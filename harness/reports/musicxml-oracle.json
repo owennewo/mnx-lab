@@ -3,9 +3,9 @@
   "summary": {
     "comparisons": 27,
     "verdicts": {
-      "match": 0,
-      "spacing": 1,
-      "content": 26,
+      "match": 7,
+      "spacing": 0,
+      "content": 20,
       "import-failed": 0,
       "layout-failed": 0
     }
@@ -132,7 +132,7 @@
     },
     {
       "slug": "dotted-notes",
-      "verdict": "spacing"
+      "verdict": "match"
     },
     {
       "slug": "hello-world",
@@ -160,29 +160,11 @@
     },
     {
       "slug": "key-signatures",
-      "verdict": "content",
-      "glyphsMissing": [
-        "glyph:accidentalFlat",
-        "glyph:accidentalSharp"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "multiple-voices",
-      "verdict": "content",
-      "glyphsMissing": [
-        "glyph:gClef",
-        "glyph:noteheadBlack",
-        "glyph:noteheadBlack",
-        "glyph:noteheadBlack",
-        "glyph:noteheadBlack",
-        "glyph:noteheadBlack",
-        "glyph:noteheadBlack",
-        "glyph:noteheadHalf",
-        "glyph:noteheadHalf",
-        "glyph:noteheadHalf",
-        "glyph:noteheadWhole",
-        "glyph:timeSig4"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "ottavas-8va",
@@ -215,28 +197,11 @@
     },
     {
       "slug": "repeats",
-      "verdict": "content",
-      "glyphsMissing": [
-        "glyph:augmentationDot",
-        "glyph:augmentationDot",
-        "glyph:augmentationDot",
-        "glyph:augmentationDot",
-        "line",
-        "rect"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "repeats-alternate-endings-advanced",
       "verdict": "content",
-      "glyphsMissing": [
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "text:1. 2.",
-        "text:3."
-      ],
       "glyphsExtra": [
         "rect"
       ]
@@ -244,37 +209,17 @@
     {
       "slug": "repeats-alternate-endings-simple",
       "verdict": "content",
-      "glyphsMissing": [
-        "glyph:augmentationDot",
-        "glyph:augmentationDot",
-        "glyph:augmentationDot",
-        "glyph:augmentationDot",
-        "glyph:augmentationDot",
-        "glyph:augmentationDot",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line"
+      "glyphsExtra": [
+        "rect"
       ]
     },
     {
       "slug": "repeats-implied-start-repeat",
-      "verdict": "content",
-      "glyphsMissing": [
-        "glyph:augmentationDot",
-        "glyph:augmentationDot"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "repeats-more-once-repeated",
-      "verdict": "content",
-      "glyphsMissing": [
-        "glyph:augmentationDot",
-        "glyph:augmentationDot",
-        "text:4x"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "slurs",
@@ -303,14 +248,6 @@
     {
       "slug": "three-note-chord-and-half-rest",
       "verdict": "content",
-      "glyphsMissing": [
-        "glyph:noteheadHalf",
-        "glyph:noteheadHalf",
-        "glyph:noteheadHalf",
-        "glyph:restHalf",
-        "line",
-        "line"
-      ],
       "glyphsExtra": [
         "rect"
       ]
@@ -326,43 +263,16 @@
     },
     {
       "slug": "time-signatures",
-      "verdict": "content",
-      "glyphsMissing": [
-        "glyph:timeSig2",
-        "glyph:timeSig4",
-        "glyph:timeSig4",
-        "glyph:timeSig4"
-      ],
-      "glyphsExtra": [
-        "rect",
-        "text:!"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "tuplets",
       "verdict": "content",
       "glyphsMissing": [
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "text:3",
-        "text:3",
         "text:6"
       ],
       "glyphsExtra": [
-        "glyph:flag8thUp",
-        "glyph:flag8thUp",
-        "glyph:flag8thUp",
-        "rect",
-        "rect",
-        "text:!",
-        "text:!"
+        "text:3"
       ]
     },
     {

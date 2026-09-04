@@ -45,7 +45,7 @@
                 </pitch>
                 <duration>256</duration>
                 <type>quarter</type>
-                <metadiff><accidental>sharp</accidental></metadiff>
+                <accidental>sharp</accidental>
             </note>
             <note>
                 <pitch>
@@ -74,7 +74,7 @@
                 </pitch>
                 <duration>256</duration>
                 <type>quarter</type>
-                <metadiff><accidental>flat</accidental></metadiff>
+                <accidental>flat</accidental>
             </note>
             <note>
                 <pitch>
@@ -94,7 +94,7 @@
                 </pitch>
                 <duration>1024</duration>
                 <type>whole</type>
-                <metadiff><accidental>natural</accidental></metadiff>
+                <accidental>natural</accidental>
             </note>
         </measure>
     </part>

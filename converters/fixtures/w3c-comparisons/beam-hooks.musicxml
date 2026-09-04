@@ -27,8 +27,8 @@
                 </pitch>
                 <duration>2</duration>
                 <type>16th</type>
-                <metadiff><beam number="1">begin</beam>
-                <beam number="2">forward hook</beam></metadiff>
+                <beam number="1">begin</beam>
+                <beam number="2">forward hook</beam>
             </note>
             <note>
                 <pitch>
@@ -37,7 +37,7 @@
                 </pitch>
                 <duration>4</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">continue</beam></metadiff>
+                <beam number="1">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -46,8 +46,8 @@
                 </pitch>
                 <duration>2</duration>
                 <type>16th</type>
-                <metadiff><beam number="1">end</beam>
-                <beam number="2">backward hook</beam></metadiff>
+                <beam number="1">end</beam>
+                <beam number="2">backward hook</beam>
             </note>
             <note>
                 <pitch>
@@ -56,8 +56,8 @@
                 </pitch>
                 <duration>2</duration>
                 <type>16th</type>
-                <metadiff><beam number="1">begin</beam>
-                <beam number="2">forward hook</beam></metadiff>
+                <beam number="1">begin</beam>
+                <beam number="2">forward hook</beam>
             </note>
             <note>
                 <pitch>
@@ -66,7 +66,7 @@
                 </pitch>
                 <duration>4</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">continue</beam></metadiff>
+                <beam number="1">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -75,8 +75,8 @@
                 </pitch>
                 <duration>2</duration>
                 <type>16th</type>
-                <metadiff><beam number="1">end</beam>
-                <beam number="2">backward hook</beam></metadiff>
+                <beam number="1">end</beam>
+                <beam number="2">backward hook</beam>
             </note>
             <note>
                 <pitch>
@@ -85,8 +85,8 @@
                 </pitch>
                 <duration>2</duration>
                 <type>16th</type>
-                <metadiff><beam number="1">begin</beam>
-                <beam number="2">forward hook</beam></metadiff>
+                <beam number="1">begin</beam>
+                <beam number="2">forward hook</beam>
             </note>
             <note>
                 <pitch>
@@ -95,7 +95,7 @@
                 </pitch>
                 <duration>4</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">continue</beam></metadiff>
+                <beam number="1">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -104,8 +104,8 @@
                 </pitch>
                 <duration>2</duration>
                 <type>16th</type>
-                <metadiff><beam number="1">end</beam>
-                <beam number="2">backward hook</beam></metadiff>
+                <beam number="1">end</beam>
+                <beam number="2">backward hook</beam>
             </note>
             <note>
                 <pitch>

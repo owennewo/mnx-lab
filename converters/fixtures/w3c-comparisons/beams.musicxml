@@ -28,7 +28,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">begin</beam></metadiff>
+                <beam number="1">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -37,7 +37,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">continue</beam></metadiff>
+                <beam number="1">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -46,7 +46,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">continue</beam></metadiff>
+                <beam number="1">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -55,7 +55,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">end</beam></metadiff>
+                <beam number="1">end</beam>
             </note>
             <note>
                 <pitch>
@@ -64,7 +64,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">begin</beam></metadiff>
+                <beam number="1">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -73,7 +73,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">continue</beam></metadiff>
+                <beam number="1">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -82,7 +82,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">continue</beam></metadiff>
+                <beam number="1">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -91,7 +91,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">end</beam></metadiff>
+                <beam number="1">end</beam>
             </note>
         </measure>
         <measure number="2">
@@ -102,13 +102,13 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">begin</beam></metadiff>
+                <beam number="1">begin</beam>
             </note>
             <note>
                 <rest/>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">continue</beam></metadiff>
+                <beam number="1">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -117,8 +117,8 @@
                 </pitch>
                 <duration>64</duration>
                 <type>16th</type>
-                <metadiff><beam number="1">continue</beam>
-                <beam number="2">begin</beam></metadiff>
+                <beam number="1">continue</beam>
+                <beam number="2">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -127,8 +127,8 @@
                 </pitch>
                 <duration>64</duration>
                 <type>16th</type>
-                <metadiff><beam number="1">continue</beam>
-                <beam number="2">end</beam></metadiff>
+                <beam number="1">continue</beam>
+                <beam number="2">end</beam>
             </note>
             <note>
                 <pitch>
@@ -137,7 +137,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">end</beam></metadiff>
+                <beam number="1">end</beam>
             </note>
             <note>
                 <pitch>
@@ -146,7 +146,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">begin</beam></metadiff>
+                <beam number="1">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -155,7 +155,7 @@
                 </pitch>
                 <duration>128</duration>
                 <type>eighth</type>
-                <metadiff><beam number="1">end</beam></metadiff>
+                <beam number="1">end</beam>
             </note>
             <note>
                 <pitch>

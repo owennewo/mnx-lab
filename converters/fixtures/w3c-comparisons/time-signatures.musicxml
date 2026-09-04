@@ -6,7 +6,7 @@
     </part-list>
     <part id="P1">
         <measure number="1">
-            <metadiff><attributes>
+            <attributes>
                 <divisions>256</divisions>
                 <key>
                     <fifths>0</fifths>
@@ -19,7 +19,7 @@
                     <sign>G</sign>
                     <line>2</line>
                 </clef>
-            </attributes></metadiff>
+            </attributes>
             <note>
                 <pitch>
                     <step>C</step>
@@ -88,12 +88,12 @@
             </note>
         </measure>
         <measure number="3">
-            <metadiff><attributes>
+            <attributes>
                 <time>
                     <beats>2</beats>
                     <beat-type>4</beat-type>
                 </time>
-            </attributes></metadiff>
+            </attributes>
             <note>
                 <pitch>
                     <step>B</step>

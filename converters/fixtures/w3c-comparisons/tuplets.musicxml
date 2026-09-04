@@ -28,14 +28,14 @@
                 </pitch>
                 <duration>170</duration>
                 <type>quarter</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>3</actual-notes>
                     <normal-notes>2</normal-notes>
                     <normal-type>eighth</normal-type>
                 </time-modification>
                 <notations>
                     <tuplet number="1" type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -44,14 +44,14 @@
                 </pitch>
                 <duration>85</duration>
                 <type>eighth</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>3</actual-notes>
                     <normal-notes>2</normal-notes>
                     <normal-type>eighth</normal-type>
                 </time-modification>
                 <notations>
                     <tuplet number="1" type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -60,14 +60,14 @@
                 </pitch>
                 <duration>85</duration>
                 <type>eighth</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>3</actual-notes>
                     <normal-notes>2</normal-notes>
                 </time-modification>
                 <beam number="1">begin</beam>
                 <notations>
                     <tuplet number="1" type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -76,10 +76,10 @@
                 </pitch>
                 <duration>85</duration>
                 <type>eighth</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>3</actual-notes>
                     <normal-notes>2</normal-notes>
-                </time-modification></metadiff>
+                </time-modification>
                 <beam number="1">continue</beam>
             </note>
             <note>
@@ -89,14 +89,14 @@
                 </pitch>
                 <duration>85</duration>
                 <type>eighth</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>3</actual-notes>
                     <normal-notes>2</normal-notes>
                 </time-modification>
                 <beam number="1">end</beam>
                 <notations>
                     <tuplet number="1" type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -123,13 +123,13 @@
                 </pitch>
                 <duration>170</duration>
                 <type>quarter</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>6</actual-notes>
                     <normal-notes>4</normal-notes>
                 </time-modification>
                 <notations>
                     <tuplet number="1" type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -138,10 +138,10 @@
                 </pitch>
                 <duration>170</duration>
                 <type>quarter</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>6</actual-notes>
                     <normal-notes>4</normal-notes>
-                </time-modification></metadiff>
+                </time-modification>
             </note>
             <note>
                 <pitch>
@@ -150,10 +150,10 @@
                 </pitch>
                 <duration>170</duration>
                 <type>quarter</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>6</actual-notes>
                     <normal-notes>4</normal-notes>
-                </time-modification></metadiff>
+                </time-modification>
             </note>
             <note>
                 <pitch>
@@ -162,10 +162,10 @@
                 </pitch>
                 <duration>170</duration>
                 <type>quarter</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>6</actual-notes>
                     <normal-notes>4</normal-notes>
-                </time-modification></metadiff>
+                </time-modification>
             </note>
             <note>
                 <pitch>
@@ -174,10 +174,10 @@
                 </pitch>
                 <duration>170</duration>
                 <type>quarter</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>6</actual-notes>
                     <normal-notes>4</normal-notes>
-                </time-modification></metadiff>
+                </time-modification>
             </note>
             <note>
                 <pitch>
@@ -186,13 +186,13 @@
                 </pitch>
                 <duration>170</duration>
                 <type>quarter</type>
-                <metadiff><time-modification>
+                <time-modification>
                     <actual-notes>6</actual-notes>
                     <normal-notes>4</normal-notes>
                 </time-modification>
                 <notations>
                     <tuplet number="1" type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
         </measure>
     </part>

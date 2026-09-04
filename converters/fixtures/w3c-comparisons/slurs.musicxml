@@ -27,9 +27,9 @@
                 </pitch>
                 <duration>256</duration>
                 <type>quarter</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="1" placement="above" type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -54,9 +54,9 @@
                 </pitch>
                 <duration>256</duration>
                 <type>quarter</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="1" type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
         </measure>
         <measure number="2">
@@ -67,9 +67,9 @@
                 </pitch>
                 <duration>256</duration>
                 <type>quarter</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="1" placement="below" type="start"/>
-                </notations></metadiff>
+                </notations>
             </note>
             <note>
                 <pitch>
@@ -94,9 +94,9 @@
                 </pitch>
                 <duration>256</duration>
                 <type>quarter</type>
-                <metadiff><notations>
+                <notations>
                     <slur number="1" type="stop"/>
-                </notations></metadiff>
+                </notations>
             </note>
         </measure>
     </part>

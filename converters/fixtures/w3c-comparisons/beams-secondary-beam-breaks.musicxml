@@ -27,9 +27,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">begin</beam>
+                <beam number="1">begin</beam>
                 <beam number="2">begin</beam>
-                <beam number="3">begin</beam></metadiff>
+                <beam number="3">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -38,9 +38,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">continue</beam>
-                <beam number="3">continue</beam></metadiff>
+                <beam number="3">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -49,9 +49,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">continue</beam>
-                <beam number="3">continue</beam></metadiff>
+                <beam number="3">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -60,9 +60,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">end</beam>
-                <beam number="3">end</beam></metadiff>
+                <beam number="3">end</beam>
             </note>
             <note>
                 <pitch>
@@ -71,9 +71,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">begin</beam>
-                <beam number="3">begin</beam></metadiff>
+                <beam number="3">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -82,9 +82,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">continue</beam>
-                <beam number="3">continue</beam></metadiff>
+                <beam number="3">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -93,9 +93,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">continue</beam>
-                <beam number="3">continue</beam></metadiff>
+                <beam number="3">continue</beam>
             </note>
             <note>
                 <pitch>
@@ -104,9 +104,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">end</beam>
+                <beam number="1">end</beam>
                 <beam number="2">end</beam>
-                <beam number="3">end</beam></metadiff>
+                <beam number="3">end</beam>
             </note>
             <note>
                 <pitch>
@@ -115,9 +115,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">begin</beam>
+                <beam number="1">begin</beam>
                 <beam number="2">begin</beam>
-                <beam number="3">begin</beam></metadiff>
+                <beam number="3">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -126,9 +126,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">continue</beam>
-                <beam number="3">end</beam></metadiff>
+                <beam number="3">end</beam>
             </note>
             <note>
                 <pitch>
@@ -137,9 +137,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">continue</beam>
-                <beam number="3">begin</beam></metadiff>
+                <beam number="3">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -148,9 +148,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">end</beam>
-                <beam number="3">end</beam></metadiff>
+                <beam number="3">end</beam>
             </note>
             <note>
                 <pitch>
@@ -159,9 +159,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">begin</beam>
-                <beam number="3">begin</beam></metadiff>
+                <beam number="3">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -170,9 +170,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">continue</beam>
-                <beam number="3">end</beam></metadiff>
+                <beam number="3">end</beam>
             </note>
             <note>
                 <pitch>
@@ -181,9 +181,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">continue</beam>
+                <beam number="1">continue</beam>
                 <beam number="2">continue</beam>
-                <beam number="3">begin</beam></metadiff>
+                <beam number="3">begin</beam>
             </note>
             <note>
                 <pitch>
@@ -192,9 +192,9 @@
                 </pitch>
                 <duration>1</duration>
                 <type>32nd</type>
-                <metadiff><beam number="1">end</beam>
+                <beam number="1">end</beam>
                 <beam number="2">end</beam>
-                <beam number="3">end</beam></metadiff>
+                <beam number="3">end</beam>
             </note>
             <note>
                 <rest/>

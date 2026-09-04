@@ -46,12 +46,14 @@ bijection: ids, voice numbering and ordering, beam nesting and sequence splittin
 admit several correct encodings. An assertion that fails for reasons nobody cares about
 gets weakened until it means nothing.
 
-**Compare through the layout engine instead.** `expected.primitives.json` carries no
-ids at all — it is geometry plus SMuFL glyph names. So the comparison is: import the
-MusicXML, run `layoutNotation` through `engine/headless.ts`, diff against the
-scenario's existing golden. **Identical primitives ⇒ musically identical**, immune to
-id choice and JSON shape. It reuses the goldens, the headless entry and the human
-verdicts that already exist.
+**Compare through the layout engine instead.** Primitives are geometry plus SMuFL glyph
+names. So the comparison is: import the MusicXML, run `layoutNotation` through
+`engine/headless.ts`, diff against the scenario's existing golden. **Identical
+primitives ⇒ musically identical**, immune to id choice and JSON shape. It reuses the
+goldens, the headless entry and the human verdicts that already exist.
+
+The one id primitives *do* carry is `sourceId` (the cross-highlight hook), which is
+**normalised** by an order-preserving bijection rather than ignored — see item 1.
 
 Its one limit, stated up front so no item forgets it: the comparison is
 *renderer-mediated* and cannot see what layout ignores. It is the primary gate, not the
@@ -170,15 +172,34 @@ committed to the repo, like `worker/models.json`.
 
 ### 2026-09-04 — item 1 lands, and both of the campaign's arguments are proven on live code
 
-**Baseline: 0 match, 1 spacing, 26 content, 0 crashes** over the 27
+**Baseline: 7 match, 20 content, 0 crashes** over the 27
 ([core-musicxml-w3c-oracle.md](../inprogress/core-musicxml-w3c-oracle.md)). No converter
 code was touched — a measuring instrument is built before the thing it measures.
 
-- **The 26 are about eight causes, not 26 problems.** `<beam>` unimported accounts for
-  7, `<tied>`/`<slur>` for 4, augmentation dots for 4. Three scenarios
-  (`hello-world`, `two-bar-c-major-scale`, `repeats-alternate-endings-advanced`) differ
-  by a single extra `rect` with nothing missing — the music imported correctly and the
-  renderer is flagging something. Those are the cheapest wins in the set.
+That number arrived in three steps, and the first two are the story: the oracle's first
+reading was **0 match / 1 spacing / 26 content**, and almost all of the gap was the
+instrument, not the converter.
+
+- **The fixtures carried the docs site's own diff markup, and it inflated everything.**
+  24 of the 27 wrap elements in `<metadiff>` — 116 occurrences, around exactly the
+  elements that matter: `<beam>` 48, `<notations>` 17, `<barline>` 11,
+  `<time-modification>` 11. A `<notations>` nested inside it is invisible to a parser
+  looking for a child of `<note>`, so **the converter read as having dropped features it
+  was never shown.** Unwrapping it took the baseline from 0 match to 7. The MNX side of
+  the same fixture has always had `stripDocsAnnotations` for the identical reason — the
+  precedent was there and went unread. **A fixture from a documentation system carries
+  the documentation's presentation, and an oracle's first job is to be right about its
+  own inputs.**
+- **The goldens are not id-free, and the claim that they were came from one grep.** They
+  carry `sourceId` on 450 primitives. Eleven scenarios sat at `spacing` with
+  byte-identical coordinates and different ids alone — a verdict reading "the spacing
+  moved" when it had not. Normalising `sourceId` by order-preserving bijection (the
+  Guitar Pro parity precedent, cited in this campaign's own opening entry and then not
+  applied) resolved them. **A negative established by one grep is not established** —
+  `"id"` does not match `sourceId`.
+- **What actually remains is fewer, larger causes.** `<beam>` unimported is 6 scenarios;
+  the final-barline default is 5; jumps 2; ottava, accidental spelling and tuplet
+  numbering 1 each.
 - **The symmetric-blind-spot argument is not theoretical.** `tied` appears **zero
   times** in the converter's source, import *and* export; `beam` once, export only. And
   none of the three guitar fixtures contains a tie. So 46 round-trip invariant tests
@@ -191,13 +212,11 @@ code was touched — a measuring instrument is built before the thing it measure
   "structurally matching" — a number that felt like good news and was mostly an artifact
   of a counter that did not descend into containers. It could not distinguish a
   flattened tuplet from its own blind spot; the reference documents had to be opened by
-  hand to tell which. The primitives comparison has no such ambiguity, and the contrast
-  between 22/27 and the real 0/27 is the clearest possible argument for
-  **not** asserting on document shape. **A comparison you have to interpret is a
-  comparison at the wrong layer.**
-- **`spacing` earns its place as a verdict.** `dotted-notes` draws the right glyphs in
-  the right order at different positions. Collapsing that into "fail" would have hidden
-  the one scenario where the importer is already musically correct.
+  hand to tell which. The primitives comparison has no such ambiguity. **A comparison you
+  have to interpret is a comparison at the wrong layer.**
+- **The graded verdict paid for itself twice.** `spacing` — right glyphs, wrong
+  positions — is what made both corrections visible: a plain pass/fail would have shown
+  26 failures before and 20 after and taught nothing about why.
 - **Committed fixtures, not submodule reads.** `git worktree add` leaves `vendor/mnx`
   empty, so an oracle reading the submodule directly is an oracle most checkouts skip.
   Same reasoning that has `sync:spec` commit its output.

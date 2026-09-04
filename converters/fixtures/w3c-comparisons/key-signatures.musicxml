@@ -8,9 +8,9 @@
         <measure number="1">
             <attributes>
                 <divisions>256</divisions>
-                <metadiff><key>
+                <key>
                     <fifths>4</fifths>
-                </key></metadiff>
+                </key>
                 <time>
                     <beats>4</beats>
                     <beat-type>4</beat-type>
@@ -68,9 +68,9 @@
         </measure>
         <measure number="3">
             <attributes>
-                <metadiff><key>
+                <key>
                     <fifths>-4</fifths>
-                </key></metadiff>
+                </key>
             </attributes>
             <note>
                 <pitch>

@@ -29,10 +29,10 @@
                 <duration>1024</duration>
                 <type>whole</type>
             </note>
-            <metadiff><barline location="right">
+            <barline location="right">
                 <bar-style>light-heavy</bar-style>
                 <repeat direction="backward"/>
-            </barline></metadiff>
+            </barline>
         </measure>
     </part>
 </score-partwise>

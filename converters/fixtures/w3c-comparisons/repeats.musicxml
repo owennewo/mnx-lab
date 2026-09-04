@@ -6,10 +6,10 @@
     </part-list>
     <part id="P1">
         <measure number="1">
-            <metadiff><barline location="left">
+            <barline location="left">
                 <bar-style>heavy-light</bar-style>
                 <repeat direction="forward"/>
-            </barline></metadiff>
+            </barline>
             <attributes>
                 <divisions>256</divisions>
                 <key>
@@ -33,10 +33,10 @@
                 <duration>1024</duration>
                 <type>whole</type>
             </note>
-            <metadiff><barline location="right">
+            <barline location="right">
                 <bar-style>light-heavy</bar-style>
                 <repeat direction="backward"/>
-            </barline></metadiff>
+            </barline>
         </measure>
     </part>
 </score-partwise>

@@ -20,7 +20,7 @@
                     <line>2</line>
                 </clef>
             </attributes>
-            <metadiff><note>
+            <note>
                 <pitch>
                     <step>C</step>
                     <octave>4</octave>
@@ -50,7 +50,7 @@
                 <rest/>
                 <duration>2</duration>
                 <type>half</type>
-            </note></metadiff>
+            </note>
         </measure>
     </part>
 </score-partwise>

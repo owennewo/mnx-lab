@@ -6,10 +6,10 @@
     </part-list>
     <part id="P1">
         <measure number="1">
-            <metadiff><barline location="left">
+            <barline location="left">
                 <bar-style>heavy-light</bar-style>
                 <repeat direction="forward"/>
-            </barline></metadiff>
+            </barline>
             <attributes>
                 <divisions>256</divisions>
                 <key>
@@ -35,9 +35,9 @@
             </note>
         </measure>
         <measure number="2">
-            <metadiff><barline location="left">
+            <barline location="left">
                 <ending number="1" type="start"/>
-            </barline></metadiff>
+            </barline>
             <note>
                 <pitch>
                     <step>E</step>
@@ -46,16 +46,16 @@
                 <duration>1024</duration>
                 <type>whole</type>
             </note>
-            <metadiff><barline location="right">
+            <barline location="right">
                 <bar-style>light-heavy</bar-style>
                 <ending number="1" type="stop"/>
                 <repeat direction="backward"/>
-            </barline></metadiff>
+            </barline>
         </measure>
         <measure number="3">
-            <metadiff><barline location="left">
+            <barline location="left">
                 <ending number="2" type="start"/>
-            </barline></metadiff>
+            </barline>
             <note>
                 <pitch>
                     <step>G</step>
@@ -64,16 +64,16 @@
                 <duration>1024</duration>
                 <type>whole</type>
             </note>
-            <metadiff><barline location="right">
+            <barline location="right">
                 <bar-style>light-heavy</bar-style>
                 <ending number="2" type="stop"/>
                 <repeat direction="backward"/>
-            </barline></metadiff>
+            </barline>
         </measure>
         <measure number="4">
-            <metadiff><barline location="left">
+            <barline location="left">
                 <ending number="3" type="start"/>
-            </barline></metadiff>
+            </barline>
             <note>
                 <pitch>
                     <step>C</step>
@@ -82,10 +82,10 @@
                 <duration>1024</duration>
                 <type>whole</type>
             </note>
-            <metadiff><barline location="right">
+            <barline location="right">
                 <bar-style>light-heavy</bar-style>
                 <ending number="3" type="discontinue"/>
-            </barline></metadiff>
+            </barline>
         </measure>
     </part>
 </score-partwise>
