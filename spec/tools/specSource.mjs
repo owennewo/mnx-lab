@@ -195,3 +195,41 @@ export function pinIsUpstream() {
     return false;
   }
 }
+
+/**
+ * The MusicXML side of the spec's worked examples.
+ *
+ * `spectools.exampledocumentcomparison` is upstream's own pairing of an MNX
+ * example with the same music in another format — the data behind the
+ * side-by-side on each example's reference page. Only MusicXML exists as a
+ * `documentformat` today, and 27 of the 52 examples carry one.
+ *
+ * These are the W3C CG's canonical answer to "what does this MNX document look
+ * like in MusicXML", written by the people who wrote both formats. That makes
+ * them the strongest available oracle for our importer, and the pairing is
+ * exact: every comparison's slug is a `scenarios/spec/<slug>/` scenario, with
+ * the goldens and human verdicts that come with it.
+ *
+ * `document` is an array of lines (freezedb's multi-line text convention, the
+ * same one `describeExample` handles for blurbs).
+ */
+export function loadMusicXmlComparisons() {
+  requireSubmodule();
+  const records = JSON.parse(fs.readFileSync(DATA_JSON, 'utf8'));
+  const of = model => records.filter(r => r.model === model);
+
+  const slugByExample = new Map(of('spectools.exampledocument').map(r => [r.pk, r.fields.slug]));
+  const formatSlug = new Map(of('spectools.documentformat').map(r => [r.pk, r.fields.slug]));
+
+  const comparisons = [];
+  for (const { fields } of of('spectools.exampledocumentcomparison')) {
+    if (formatSlug.get(fields.doc_format) !== 'musicxml') continue;
+    const slug = slugByExample.get(fields.example);
+    if (!slug) continue;
+    const lines = Array.isArray(fields.document) ? fields.document : [fields.document ?? ''];
+    comparisons.push({ slug, xml: lines.join('\n').replace(/\s*$/, '') + '\n' });
+  }
+
+  comparisons.sort((a, b) => a.slug.localeCompare(b.slug));
+  return comparisons;
+}

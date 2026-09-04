@@ -125,7 +125,7 @@ deliberately **not** enumerated in advance: item 2 decides them from evidence.
 
 | # | Item | Scope | Objective | Oracle | Status |
 |---|------|-------|-----------|--------|--------|
-| 1 | Tier-1 W3C oracle | Extract the 27 comparisons from `data.json` (a script beside `spec/tools/sync-spec-examples.mjs`), pair each with its `scenarios/spec/<slug>/`, and assert **through the layout engine**: import → `layoutNotation` → diff `expected.primitives.json`. Report the initial pass rate as the campaign's baseline. | accuracy | itself | proposed |
+| 1 | [Tier-1 W3C oracle](../inprogress/core-musicxml-w3c-oracle.md) | The 27 comparisons mirrored into committed fixtures (`sync:musicxml-comparisons`) and judged **through the layout engine**: import → `layoutNotation` → diff `expected.primitives.json`, graded `match`/`spacing`/`content`. Baseline committed at `harness/reports/musicxml-oracle.json`; moving it either way is a red test. | accuracy | itself | **built 2026-09-04** |
 | 2 | Converter support matrix (`lab-converter-matrix.md`) | Rows = MNX `$def` (193, minus plumbing) + `_x.mnxLab` keys; columns = converter × direction. **Cells derived, never declared** (below). Generated, committed artifact; hand-edit is a red test. Extends `src/corpus/defIndex.ts` and the `#/objects` page rather than building a second thing. | both | the corpus itself | proposed |
 | 3 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite`. **License verified before a byte lands** — the MIT claim is unchecked and the LilyPond lineage makes it worth confirming. Assertions per file: parses, drops no notes, measure durations sum to the meter, part/voice counts correct. | accuracy | itself | proposed |
 | 4 | Aligner generalization | Separate general part/measure/voice parsing from the guitar standard+TAB merge in `aligner.ts`; multi-part ensembles (N parts), grand staff (2 staves, 1 part). The largest single item, and item 1 gates it — `parts` and `multiple-voices` are both in the 27. | accuracy | 1 + 3 | proposed |
@@ -167,6 +167,41 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-04 — item 1 lands, and both of the campaign's arguments are proven on live code
+
+**Baseline: 0 match, 1 spacing, 26 content, 0 crashes** over the 27
+([core-musicxml-w3c-oracle.md](../inprogress/core-musicxml-w3c-oracle.md)). No converter
+code was touched — a measuring instrument is built before the thing it measures.
+
+- **The 26 are about eight causes, not 26 problems.** `<beam>` unimported accounts for
+  7, `<tied>`/`<slur>` for 4, augmentation dots for 4. Three scenarios
+  (`hello-world`, `two-bar-c-major-scale`, `repeats-alternate-endings-advanced`) differ
+  by a single extra `rect` with nothing missing — the music imported correctly and the
+  renderer is flagging something. Those are the cheapest wins in the set.
+- **The symmetric-blind-spot argument is not theoretical.** `tied` appears **zero
+  times** in the converter's source, import *and* export; `beam` once, export only. And
+  none of the three guitar fixtures contains a tie. So 46 round-trip invariant tests
+  pass over a feature implemented in neither direction. The campaign asserted that a
+  round trip cannot see a symmetric omission, and that genre-bound fixtures cannot find
+  what the genre lacks; the oracle demonstrated both the same day the arguments were
+  written down.
+- **The layer choice was load-bearing, and nearly went the other way.** Before item 1
+  existed, an ad-hoc probe counted parts/measures/events/notes and reported 22/27
+  "structurally matching" — a number that felt like good news and was mostly an artifact
+  of a counter that did not descend into containers. It could not distinguish a
+  flattened tuplet from its own blind spot; the reference documents had to be opened by
+  hand to tell which. The primitives comparison has no such ambiguity, and the contrast
+  between 22/27 and the real 0/27 is the clearest possible argument for
+  **not** asserting on document shape. **A comparison you have to interpret is a
+  comparison at the wrong layer.**
+- **`spacing` earns its place as a verdict.** `dotted-notes` draws the right glyphs in
+  the right order at different positions. Collapsing that into "fail" would have hidden
+  the one scenario where the importer is already musically correct.
+- **Committed fixtures, not submodule reads.** `git worktree add` leaves `vendor/mnx`
+  empty, so an oracle reading the submodule directly is an oracle most checkouts skip.
+  Same reasoning that has `sync:spec` commit its output.
+
 
 ### 2026-09-04 — the campaign opens: two objectives, opposite failure modes
 

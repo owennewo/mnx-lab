@@ -161,6 +161,18 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-w3c-oracle.md](inprogress/core-musicxml-w3c-oracle.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 1, **built 2026-09-04**: the
+  spec's own 27 MusicXML↔MNX comparisons turned into an oracle, judged **through the layout
+  engine** (import → `layoutNotation` → diff the paired `expected.primitives.json`) because
+  the mapping is not a bijection and the primitives goldens carry no ids. Committed fixtures
+  (`sync:musicxml-comparisons`) so it runs without the submodule; committed baseline
+  (`update:musicxml-oracle`) that is a red test in **either** direction. **Baseline 0 match /
+  1 spacing / 26 content, 0 crashes** — and the 26 collapse into ~8 causes, with `<beam>`
+  worth 7 and `<tied>`/`<slur>` worth 4. Found that `tied` appears **zero times** in the
+  converter, import and export, while 46 round-trip tests pass over it: a symmetric omission
+  is invisible to a round trip, and three guitar fixtures cannot find what guitar music
+  lacks. No converter code changed — the instrument is built before the thing it measures.
 - **[core-guitarpro-binary-import.md](inprogress/core-guitarpro-binary-import.md)** — the
   clean-room gp3/gp4/gp5 reader, now in Phase 1 (GP5). The docs-first field notes,
   binary cursor/version dispatch, GP5.00/5.10 structural body reader, unified clean-room
