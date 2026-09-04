@@ -136,13 +136,13 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 7 | [Ottavas, tuplet units, note ids](../inprogress/core-musicxml-ottavas-tuplets.md) | Ottava sign flip and an end that names the last shifted note's ONSET; tuplet units taken from `<normal-type>` so 6:4 does not print as 3:2; and note ids made document-unique — `parts` was minting 14 ids over 9 values. | accuracy | item 1 + round trip | **built 2026-09-04** |
 | 8 | [Converter support matrix](../inprogress/lab-converter-matrix.md) | Rows = MNX `$def` (193, minus plumbing) + `_x.mnxLab` keys; columns = converter × direction. **Cells derived, never declared** (below). Generated, committed artifact; hand-edit is a red test. Extends `src/corpus/defIndex.ts` and the `#/objects` page rather than building a second thing. | both | the corpus itself | **built 2026-09-04** |
 | 9 | [Export crash on anonymous parts](../inprogress/core-musicxml-export-crash.md) | `id` and `name` are optional on an MNX part and the exporter assumed neither was — it threw on two corpus scenarios and wrote `<part-name>undefined</part-name>` for a third case. Found by the matrix on its first run. **Matrix supported 24 → 36**, because a crash costs every cell that document could have proved. | accuracy | the matrix | **built 2026-09-04** |
-| 10 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite`. **License verified before a byte lands** — the MIT claim is unchecked and the LilyPond lineage makes it worth confirming. Assertions per file: parses, drops no notes, measure durations sum to the meter, part/voice counts correct. | accuracy | itself | proposed |
-| 12 | [Multi-staff parts](../inprogress/core-musicxml-staves.md) | Separate general part/measure/voice parsing from the guitar standard+TAB merge in `aligner.ts`; multi-part ensembles (N parts), grand staff (2 staves, 1 part). The largest single item, and item 1 gates it — `parts` and `multiple-voices` are both in the 27. | accuracy | the corpus, via spec/grand-staff | **built 2026-09-04** |
-| 10b | [Zero-dep XML layer](../inprogress/core-musicxml-zero-dep.md) | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | the oracle and matrix, required unmoved | **built 2026-09-04** |
+| 10 | [Zero-dep XML layer](../inprogress/core-musicxml-zero-dep.md) | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | the oracle and matrix, required unmoved | **built 2026-09-04** |
 | 11 | [`.mxl` container](../inprogress/core-musicxml-mxl.md) | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | cross-checked against Python's zipfile, both directions | **built 2026-09-04** |
-| 14 | Differential oracle | music21 as a dev-only subprocess emitting a note table (part, voice, onset, duration, pitch, tie, lyric), diffed against the same table from our MNX. The independent implementation the campaign otherwise lacks. Dev/test only, never shipped. | accuracy | itself | proposed |
-| 15 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document in CI. A floor, explicitly not counted as an accuracy tier. | accuracy | itself | proposed |
-| 16 | Browser import surface | MusicXML file import in the workbench, parallel to the Guitar Pro worker; `.xml`/`.musicxml`/`.mxl` through the CLI and `localFile.ts`. Depends on 5 and 6 — it is the item that makes the zero-dep objective pay. | zero-dep | `smoke:csp` + existing import path | proposed |
+| 12 | [Multi-staff parts](../inprogress/core-musicxml-staves.md) | `<staves>`, a `<clef number>` per staff tracked independently, `<staff>` per note. Grand staff round trips. The matrix did **not** move, because `staff` is shared with `layouts` — a def used by two features scores as the worse of them. | accuracy | the corpus, via spec/grand-staff | **built 2026-09-04** |
+| 13 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite` (~100 categorised files, Kainhofer's, originally for LilyPond). Widens what the matrix can score. | accuracy | itself | **not started — license unverified**, and vendoring third-party fixtures without checking is the one thing item 1 says not to do |
+| 14 | Differential oracle | music21 as a dev-only subprocess emitting a note table, diffed against the same table from our MNX — the one tier that is genuinely independent of us. | accuracy | itself | **not started — music21 is not installed here**; needs a deliberate dev-environment decision, not a silent `pip install` |
+| 15 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document. | accuracy | itself | **not started — no `xmllint` available**, and it would need a new dev dependency for what this campaign already calls *a floor, not an accuracy tier* |
+| 16 | Browser import surface | MusicXML file import in the workbench, parallel to the Guitar Pro worker. The converter is now platform-independent; nothing in the shell calls it. | zero-dep | `smoke:csp` | **not started — BLOCKED**: `src/workbench/localFile.ts` and `guitarProImporter.worker.ts` are held uncommitted by another session, and these are exactly the files it touches |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -176,6 +176,40 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-04 — where the campaign stands
+
+**Twelve of sixteen items built, both objectives substantially met.**
+
+| | |
+|---|---|
+| Oracle | **24 of 27 exact matches** against human-verified goldens, from a baseline of 0 |
+| Matrix | 36 supported / 70 lossy / 6 extension / 3 untested, over 125 documents, at `#/converters` |
+| Runtime dependencies | **zero**, in Node and the browser, including `.mxl` |
+| Converter suite | 49 → **107** tests |
+
+The three scenarios the oracle still faults are all the **final-barline default**, which
+item 4 measured and proved is a question for upstream rather than a bug here: the fix
+gains 3 and costs 8, because the spec's own examples resolve it two ways.
+
+**The four unbuilt items are not next-in-line, they are blocked or unwarranted**, and the
+index says which for each: two need resources this environment does not have (music21,
+`xmllint`), one needs a license verified before vendoring anyone else's fixtures, and one
+is blocked by a live collision — `src/workbench/localFile.ts` is held uncommitted by
+another session, and that is exactly the file the browser surface touches. That last one
+is the parallel-work contract doing its job rather than an obstacle.
+
+**What the campaign actually demonstrated**, beyond the numbers:
+
+- **Instruments before features.** Nine of the twelve items were chosen by the oracle or
+  the matrix rather than by intuition, and both instruments found things the other could
+  not — the oracle has no grand staff, the matrix has no notion of *correct*.
+- **Measure, then decide.** Two items reversed a decision that was locally sound: the
+  barline default (18 match down to 10) and the Guitar Pro zip reuse (would have undone
+  the platform independence just won). Both cost minutes because something scored them.
+- **A green round trip is not evidence of support**, and this campaign has the receipts:
+  `tied` appeared zero times in the converter while 46 round-trip tests passed over it.
+
 
 ### 2026-09-04 — item 12: multi-staff parts, and a limit of the matrix worth more than the feature
 
