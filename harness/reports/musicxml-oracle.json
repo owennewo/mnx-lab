@@ -3,9 +3,9 @@
   "summary": {
     "comparisons": 27,
     "verdicts": {
-      "match": 18,
+      "match": 19,
       "spacing": 1,
-      "content": 8,
+      "content": 7,
       "import-failed": 0,
       "layout-failed": 0
     }
@@ -13,13 +13,7 @@
   "rows": [
     {
       "slug": "accidentals",
-      "verdict": "content",
-      "glyphsMissing": [
-        "glyph:accidentalNatural"
-      ],
-      "glyphsExtra": [
-        "glyph:accidentalFlat"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "beam-hooks",

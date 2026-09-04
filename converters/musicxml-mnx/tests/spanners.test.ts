@@ -215,3 +215,26 @@ describe('repeat barlines', () => {
     }
   );
 });
+
+describe('what the document states', () => {
+  it('declares useAccidentalDisplay when it read any <accidental>', async () => {
+    // MusicXML's <accidental> IS the statement of what prints. Undeclared, a
+    // renderer infers accidentals instead and reprints one the source chose to
+    // leave off a repeated note.
+    const mnx = await load('accidentals');
+    expect(mnx.mnx.support?.useAccidentalDisplay).toBe(true);
+    expect(notes(mnx).some(n => n.accidentalDisplay)).toBe(true);
+  });
+
+  it('declares useBeams when it read any <beam>', async () => {
+    const mnx = await load('beams');
+    expect(mnx.mnx.support?.useBeams).toBe(true);
+  });
+
+  it('declares neither when the source states neither', async () => {
+    // A source that wrote no <accidental> and no <beam> is better served by
+    // inference than by being told it has none.
+    const mnx = await load('hello-world');
+    expect(mnx.mnx.support).toBeUndefined();
+  });
+});

@@ -1,5 +1,6 @@
 import { parseXML } from '../common/xml.js';
 import { MnxStructure, MnxGlobalMeasure, MnxPart, MnxPitch } from '../common/types.js';
+import { walkSequenceEvents } from '../common/utils.js';
 import { Aligner } from './aligner.js';
 
 // Helper functions for XML DOM parsing
@@ -128,6 +129,26 @@ export function importMusicXML(
   aligner.linkSpannerTargets(finalParts);
   aligner.linkBeams(finalParts);
 
+  // MusicXML states accidentals and beams outright — `<accidental>` prints one,
+  // `<beam>` draws one — so a document converted from it is stating them too,
+  // and must say so. Left undeclared, a renderer infers both and overrules the
+  // source: `accidentals` gains a flat on a repeated note the source chose not
+  // to reprint. Declared only when we actually read some, because a source that
+  // wrote none is better served by inference than by being told it has none.
+  const support: { useAccidentalDisplay?: boolean; useBeams?: boolean } = {};
+  for (const part of finalParts) {
+    for (const measure of part.measures ?? []) {
+      if (measure.beams?.length) support.useBeams = true;
+      for (const sequence of measure.sequences ?? []) {
+        for (const { event } of walkSequenceEvents(sequence.content ?? [], 8)) {
+          if ((event.notes ?? []).some(note => note.accidentalDisplay)) {
+            support.useAccidentalDisplay = true;
+          }
+        }
+      }
+    }
+  }
+
   // 5. Report source defects that were repaired (or could not be)
   for (const warning of aligner.warnings) options.onWarning?.(warning);
   const { malformedPitches, recoveredPitches } = aligner.stats;
@@ -144,7 +165,8 @@ export function importMusicXML(
 
   return {
     mnx: {
-      version: 1
+      version: 1,
+      ...(Object.keys(support).length ? { support } : {})
     },
     global: {
       measures: globalMeasures,

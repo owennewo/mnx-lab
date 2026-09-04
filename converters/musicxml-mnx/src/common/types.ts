@@ -359,6 +359,20 @@ export interface MnxGlobalMeasure {
 export interface MnxStructure {
   mnx: {
     version: number;
+    /**
+     * What this document states rather than leaves to be inferred.
+     *
+     * Without `useAccidentalDisplay`, a renderer works out for itself which
+     * accidentals to print; with it, `accidentalDisplay` on the notes is the
+     * whole answer. `useBeams` says the same about `beams`. MusicXML always
+     * states both explicitly — `<accidental>` and `<beam>` ARE the statement —
+     * so an import that read them has to say so, or the renderer will
+     * second-guess the source.
+     */
+    support?: {
+      useAccidentalDisplay?: boolean;
+      useBeams?: boolean;
+    };
   };
   global: {
     measures: MnxGlobalMeasure[];

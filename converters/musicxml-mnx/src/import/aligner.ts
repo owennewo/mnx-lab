@@ -1440,13 +1440,17 @@ export class Aligner {
               }
             }
             technique = this.parseTechnique(notationsEl, techEl);
+          }
 
-            const accEl = findDirectChild(el, 'accidental');
-            if (accEl) {
-              accidentalDisplay = { show: true };
-              if (accEl.textContent?.includes('parentheses')) {
-                accidentalDisplay.enclosure = { symbol: 'parentheses' };
-              }
+          // `<accidental>` is a child of `<note>`, not of `<notations>` — and
+          // most notes that print one carry no `<notations>` at all, so reading
+          // it inside that guard found it only on notes that happened to have
+          // some other notation too. Same trap as `<beam>`.
+          const accEl = findDirectChild(el, 'accidental');
+          if (accEl) {
+            accidentalDisplay = { show: true };
+            if (accEl.textContent?.includes('parentheses')) {
+              accidentalDisplay.enclosure = { symbol: 'parentheses' };
             }
           }
 

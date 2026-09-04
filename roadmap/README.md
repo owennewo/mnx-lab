@@ -161,6 +161,15 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-support-flags.md](inprogress/core-musicxml-support-flags.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 5, **built 2026-09-04**:
+  **the oracle 18 → 19 of 27**. Two bugs behind one scenario. `<accidental>` was read
+  inside an `if (notationsEl)` guard although it is a child of `<note>` — the campaign's
+  **third wrong-parent bug**, after `<beam>` and beamed rests, all of which failed only on
+  the subset lacking the assumed parent. And `mnx.support` was never emitted, so the
+  renderer **inferred accidentals and overruled the source**, reprinting one the reference
+  deliberately omits; two documents byte-identical apart from ids rendered differently on
+  one absent declaration. Declared only when the source actually stated some.
 - **[core-musicxml-repeat-barlines.md](inprogress/core-musicxml-repeat-barlines.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 4, **built 2026-09-04**:
   **the oracle 16 → 18 of 27**. Five scenarios shared one symptom (an extra `rect`) and had
