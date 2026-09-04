@@ -44,6 +44,20 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-campaign-musicxml.md](proposed/core-campaign-musicxml.md)** — **campaign**: MusicXML
+  with zero runtime dependencies and provable accuracy. Opens on the discovery that
+  `vendor/mnx/doctools/data.json` already holds **27 MusicXML 3.1 comparisons** whose slugs
+  all exist as mirrored `scenarios/spec/` scenarios (18 of them `verified`) — an unused
+  canonical oracle. The assertion is the campaign's founding correction: **compare through
+  the layout engine**, not by deep-equality on the MNX, because the mapping is not a
+  bijection and the primitives goldens carry no ids. Nine items, ordered oracle → matrix →
+  corpus → generalization → zero-dep; feature parity is deliberately unenumerated because
+  item 2 ranks it from evidence. Records why a LilyPond converter is **rejected as an
+  accuracy measure** (an oracle must be independent; its *corpus* is wanted) and why
+  round-trip invariance ranks below a third-party oracle (symmetric bugs survive it).
+  Contract clause 2 makes every item declare standard-object-vs-`_x.mnxLab` before code, so
+  the "implemented as extension" cell feeds `spec/proposals/` instead of accumulating
+  silently.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
