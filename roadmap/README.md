@@ -161,6 +161,16 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-mxl.md](inprogress/core-musicxml-mxl.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 11, **built 2026-09-04**:
+  `.mxl`, the container MuseScore/Sibelius/Dorico/Finale export by default — **still zero
+  runtime dependencies**. The campaign's own plan said to reuse the Guitar Pro zip reader
+  and that was **wrong**: it is `node:zlib`, synchronous, Node-only, and reusing it would
+  have undone item 10 in the name of not repeating code. `DecompressionStream('deflate-raw')`
+  is what both platforms have; the async ripple stops at the container (`importMusicXML`
+  stays sync). Writing uses **stored entries**, so no compressor at all — just CRC-32.
+  Validated across an implementation boundary in both directions with Python's `zipfile`,
+  including its per-member `testzip()` CRC check.
 - **[core-musicxml-zero-dep.md](inprogress/core-musicxml-zero-dep.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 10, **built 2026-09-04**,
   and the first serving the campaign's *other* objective: **`converters/musicxml-mnx` now

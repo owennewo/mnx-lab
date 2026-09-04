@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { importMusicXML, exportMusicXML } from './index.js';
+import { importMusicXML, exportMusicXML, importMxl, exportMxl } from './index.js';
 import {
   MNX_EXTENSION,
   MNX_READ_EXTENSIONS,
@@ -62,8 +62,11 @@ async function main() {
     if (extWarning) console.warn(`  warning: ${extWarning}`);
 
     console.log(`Importing MusicXML: ${inputPath}...`);
-    const xmlContent = await fs.readFile(inputPath, 'utf-8');
-    const mnx = importMusicXML(xmlContent, {
+    // Read as BYTES and sniff: `.mxl` is a zip, and it is what most editors
+    // export by default, so deciding from the extension alone would refuse
+    // files that are perfectly readable (and accept ones that are not).
+    const bytes = new Uint8Array(await fs.readFile(inputPath));
+    const mnx = await importMxl(bytes, {
       onWarning: msg => console.warn(`  warning: ${msg}`)
     });
     // Trailing newline: the corpus police's canonical form (check-scenarios),
@@ -79,8 +82,13 @@ async function main() {
     console.log(`Exporting MNX: ${inputPath}...`);
     const mnxContent = await fs.readFile(inputPath, 'utf-8');
     const mnx = JSON.parse(mnxContent);
-    const xml = exportMusicXML(mnx);
-    await fs.writeFile(outputPath, xml, 'utf-8');
+    // `--output something.mxl` asks for the container; anything else is plain.
+    if (outputPath.toLowerCase().endsWith('.mxl')) {
+      const name = `${path.basename(outputPath, path.extname(outputPath))}.musicxml`;
+      await fs.writeFile(outputPath, exportMxl(mnx, { scoreName: name }));
+    } else {
+      await fs.writeFile(outputPath, exportMusicXML(mnx), 'utf-8');
+    }
     console.log(`Conversion complete. Written to MusicXML: ${outputPath}`);
   } else {
     usage();
