@@ -23,6 +23,7 @@ import { completePkceLanding, parkLanding } from './assistCredentials.ts';
 import './QueueHome.ts';
 import { SETUP_POPOVER_COMMANDS, type ScenarioPage } from './ScenarioPage.ts';
 import './ObjectsPage.ts';
+import './ConvertersPage.ts';
 import {
   LOCAL_FILE_ACCEPT,
   openLocalFile,
@@ -30,7 +31,7 @@ import {
 } from './localFile.ts';
 
 export interface Route {
-  page: 'home' | 'scenario' | 'document' | 'objects';
+  page: 'home' | 'scenario' | 'document' | 'objects' | 'converters';
   id?: string;
   view?: string;
   /** The schema object on #/objects/<def>; absent on the index itself. */
@@ -44,6 +45,7 @@ export function parseHash(hash: string): Route {
   if (document) return { page: 'document', view: document[1] };
   const objects = /^#\/objects(?:\/([a-z0-9-]+))?$/.exec(hash);
   if (objects) return { page: 'objects', def: objects[1] };
+  if (/^#\/converters$/.test(hash)) return { page: 'converters' };
   return { page: 'home' };
 }
 
@@ -57,6 +59,10 @@ export function documentHref(view?: string): string {
 
 export function objectsHref(def?: string): string {
   return def ? `#/objects/${def}` : '#/objects';
+}
+
+export function convertersHref(): string {
+  return '#/converters';
 }
 
 /**
@@ -860,6 +866,7 @@ export class WorkbenchApp extends LitElement {
       },
       nav('go: attention queue', '#/'),
       nav('go: objects coverage', objectsHref()),
+      nav('go: converter support', convertersHref()),
       {
         label: `view: ${this.documentFocus || this.railHidden ? 'show' : 'hide'} scenario rail`,
         hint: 'Ctrl+B',
@@ -1193,7 +1200,9 @@ export class WorkbenchApp extends LitElement {
                 </section>`
           : this.route.page === 'objects'
             ? html`<mnx-objects-page .def=${this.route.def ?? ''}></mnx-objects-page>`
-            : html`<mnx-queue-home></mnx-queue-home>`}
+            : this.route.page === 'converters'
+              ? html`<mnx-converters-page></mnx-converters-page>`
+              : html`<mnx-queue-home></mnx-queue-home>`}
       </main>
       ${this.focusHint
         ? html`<div class="focus-hint" role="status">Ctrl+Alt+F to exit document focus</div>`

@@ -134,7 +134,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 5 | [Support flags](../inprogress/core-musicxml-support-flags.md) | `<accidental>` was read inside an `if (notationsEl)` guard though it is a child of `<note>` — the third wrong-parent bug of the campaign. And `mnx.support` was never emitted, so the renderer inferred accidentals and beams and **overruled the source**. Declared when we actually read some. | accuracy | item 1 | **built 2026-09-04** |
 | 6 | [Jumps](../inprogress/core-musicxml-jumps.md) | Segno, Fine and D.S., read from `<sound>` rather than the printed caption. MusicXML writes the same `<sound dalsegno>` whether or not it is *al Fine*; the score settles it — a D.S. is al Fine exactly when there is a Fine. Export needs `<offset>`, since a D.S. sits at the end of its measure. | accuracy | item 1 + round trip | **built 2026-09-04** |
 | 7 | [Ottavas, tuplet units, note ids](../inprogress/core-musicxml-ottavas-tuplets.md) | Ottava sign flip and an end that names the last shifted note's ONSET; tuplet units taken from `<normal-type>` so 6:4 does not print as 3:2; and note ids made document-unique — `parts` was minting 14 ids over 9 values. | accuracy | item 1 + round trip | **built 2026-09-04** |
-| 8 | Converter support matrix (`lab-converter-matrix.md`) | Rows = MNX `$def` (193, minus plumbing) + `_x.mnxLab` keys; columns = converter × direction. **Cells derived, never declared** (below). Generated, committed artifact; hand-edit is a red test. Extends `src/corpus/defIndex.ts` and the `#/objects` page rather than building a second thing. | both | the corpus itself | proposed |
+| 8 | [Converter support matrix](../inprogress/lab-converter-matrix.md) | Rows = MNX `$def` (193, minus plumbing) + `_x.mnxLab` keys; columns = converter × direction. **Cells derived, never declared** (below). Generated, committed artifact; hand-edit is a red test. Extends `src/corpus/defIndex.ts` and the `#/objects` page rather than building a second thing. | both | the corpus itself | **built 2026-09-04** |
 | 9 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite`. **License verified before a byte lands** — the MIT claim is unchecked and the LilyPond lineage makes it worth confirming. Assertions per file: parses, drops no notes, measure durations sum to the meter, part/voice counts correct. | accuracy | itself | proposed |
 | 10 | Aligner generalization | Separate general part/measure/voice parsing from the guitar standard+TAB merge in `aligner.ts`; multi-part ensembles (N parts), grand staff (2 staves, 1 part). The largest single item, and item 1 gates it — `parts` and `multiple-voices` are both in the 27. | accuracy | 1 + 3 | proposed |
 | 11 | Zero-dep XML layer | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | 1 + 3 as regression | proposed |
@@ -175,6 +175,34 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-04 — item 8: the matrix, and the answer to the question that started this
+
+**MusicXML: 24 supported, 82 lossy, 6 extension, 3 untested**, over 125 documents
+([lab-converter-matrix.md](../inprogress/lab-converter-matrix.md)). `#/converters` renders
+it.
+
+- **Derived beats declared, and the campaign had already proved why.** Item 5 showed a
+  green round trip is not evidence of support; item 2 showed 46 passing tests over a
+  feature implemented in neither direction. A typed table would have said "ties: ✅" that
+  whole time. Every cell here is a round trip over committed documents, and hand-editing
+  the file is a red test.
+- **It needed its own answer to "what does this document contain".** `coversDefs` exists
+  only for spec scenarios, so the matrix could not use it. The walker that replaces it is
+  held to upstream's join across all 52 mirrored scenarios — and is deliberately
+  **stricter**: upstream credits what a used object *could* carry, this credits what is
+  written. For "did it survive", only what was written can survive.
+- **It found a crash on its first run.** Two lab scenarios cannot be exported at all
+  (`Cannot read properties of undefined (reading 'replace')`, on tab labels and tab
+  verses). Nothing else had pointed the whole corpus at the converter, so nothing else
+  could have found it.
+- **The two gap kinds separate by construction, as designed.** Six `extension` rows —
+  `capo`, `fret`, `harmonies`, `string`, `strings`, `tab` — are the things MNX cannot say,
+  arrived at from evidence rather than from `docs/mnx-extensions.md`, and they agree. That
+  agreement is the argument that the derivation is sound.
+- **Evidence is what makes it a queue.** Every non-supported cell names a document. 82
+  lossy rows sounds like a wall; grouped by the document that first lost them, the largest
+  cluster is 8. **A cell without evidence is a scoreboard entry.**
 
 ### 2026-09-04 — item 7: the oracle finds a bug it cannot see, and the feature gaps close
 

@@ -161,6 +161,17 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[lab-converter-matrix.md](inprogress/lab-converter-matrix.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 8, **built 2026-09-04**, and
+  the only `lab-` item in it: **feature-by-feature converter support, derived rather than
+  declared.** All 125 committed MNX documents go through each converter's round trip and
+  what comes back is compared with what went in; hand-editing the result is a red test.
+  Five verdicts, and **the two kinds of gap separate by construction** — `extension` means
+  the *standard* cannot hold it (feeding `spec/proposals/`), `lossy`/`error` mean our code
+  cannot. Every non-supported cell names a document, because a cell without evidence is a
+  scoreboard entry. First run: **24 supported, 82 lossy, 6 extension, 3 untested** for
+  MusicXML — and it found a crash nothing else had, two lab scenarios that cannot be
+  exported at all. Rendered at `#/converters`.
 - **[core-musicxml-ottavas-tuplets.md](inprogress/core-musicxml-ottavas-tuplets.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 7, **built 2026-09-04**:
   **the oracle 21 → 24 of 27 and `spacing` to zero**, leaving only the deferred barline

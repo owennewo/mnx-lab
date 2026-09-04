@@ -39,6 +39,7 @@
     "push:proposal": "node spec/tools/push-proposal.mjs",
     "update:primitives": "UPDATE_PRIMITIVES=1 vitest run harness/conformance/primitives.test.ts",
     "update:musicxml-oracle": "UPDATE_MUSICXML_ORACLE=1 vitest run harness/conformance/musicxml-oracle.test.ts",
+    "update:converter-matrix": "UPDATE_CONVERTER_MATRIX=1 vitest run harness/conformance/converter-matrix.test.ts",
     "update:edit-traces": "UPDATE_EDIT_TRACES=1 vitest run harness/conformance/edit-traces.test.ts",
     "sweep:destruct": "UPDATE_DESTRUCT_SWEEP=1 vitest run harness/conformance/destruct-sweep.test.ts",
     "sweep:construct": "UPDATE_CONSTRUCT_COVERAGE=1 vitest run harness/conformance/construct-traces.test.ts",
