@@ -23,7 +23,7 @@ architecture was dropped. The older pre-pivot docs (AI-first UI, VexFlow stack) 
 | `inprogress/` | Actively being worked / a living contract. |
 | `complete/` | Built and shipped (kept for provenance; may be aspirational in tense). |
 | `superseded/` | Overtaken by reality or a later decision; kept for history, **not current**. |
-| `rejected/` | Judged **not worth building** — kept so the next person to raise the idea finds the case against it instead of redoing the analysis. A `proposed/` item of near-zero value or "will never do" status may be demoted here (by Claude on its own judgement — see CLAUDE.md → Conventions); the doc's status records the reason and date. |
+| `rejected/` | Judged **not worth building** — kept so the next person to raise the idea finds the case against it instead of redoing the analysis. A `proposed/` item of near-zero value or "will never do" status may be demoted here (by Claude on its own judgement — see CLAUDE.md → Roadmap-driven development); the doc's status records the reason and date. |
 
 Every doc is prefixed by what it serves (all buckets renamed 2026-08-11):
 
@@ -38,7 +38,7 @@ Another prefix is admitted only when it earns its keep: separate *and* important
 
 A doc named `<prefix>-campaign-<name>.md` is a **campaign**: an index over many normal
 proposals sharing one goal, carrying their shared contract and a running progress +
-learnings log (convention: CLAUDE.md → Conventions). Indexed items are ordinary
+learnings log (convention: CLAUDE.md → Roadmap-driven development). Indexed items are ordinary
 proposals that name their campaign.
 
 ## Contents
