@@ -274,6 +274,29 @@ export class Aligner {
    */
   private unresolvedPitches = new WeakSet<MnxNote>();
 
+  /**
+   * Spanner pairs found during parsing, resolved to ids by
+   * `linkSpannerTargets` once the parts are assembled.
+   *
+   * Same shape of problem as `linkTechniqueTargets`: MNX states a tie or a
+   * slur as an id REFERENCE from the first element to the last, and MusicXML
+   * states it as start/stop markers on a pair. The destination is not knowable
+   * while parsing (it may be measures away, and note ids are not minted until
+   * the part is final), so parsing records object references and the final
+   * pass turns them into ids.
+   */
+  private tieLinks: { from: MnxNote; to: MnxNote }[] = [];
+  private slurLinks: {
+    from: { event: MnxEvent; note: MnxNote };
+    to: { event: MnxEvent; note: MnxNote };
+    side?: 'up' | 'down';
+  }[] = [];
+
+  /** Open spanner starts, per part. Ties key on voice + pitch because that is
+   *  what a tie joins; slurs key on MusicXML's own `number` attribute. */
+  private openTies = new Map<string, MnxNote>();
+  private openSlurs = new Map<string, { event: MnxEvent; note: MnxNote; side?: 'up' | 'down' }>();
+
   /** Counts surfaced to the caller via `ImportOptions.onWarning`. */
   public readonly stats = { malformedPitches: 0, recoveredPitches: 0 };
 
@@ -526,6 +549,139 @@ export class Aligner {
    * exporter reconstructs. Where a target id is required by the schema it is
    * filled in by `linkTechniqueTargets` once the voice is assembled.
    */
+  /**
+   * Pairs up `<tied>` and `<slur>` start/stop markers into spanner links.
+   *
+   * Both are recorded as object references, not ids: ids are not minted until
+   * `linkTechniqueTargets` runs over the finished parts, and a spanner can
+   * cross a barline, so nothing here can name its destination yet.
+   *
+   * A tie joins two notes OF THE SAME PITCH in the same voice, which is what
+   * the key is built from — MusicXML does not number ties, so pitch is the
+   * only thing that pairs them when several are open at once (a tied chord).
+   * Slurs carry their own `number`, so they key on that.
+   *
+   * `<tie>` (the sound element) is read only as a fallback for `<tied>` (the
+   * notation), because a document may carry either or both and MNX has one
+   * concept for the pair.
+   */
+  private collectSpanners(
+    notationsEl: Element,
+    noteEl: Element,
+    voice: string,
+    event: MnxEvent,
+    note: MnxNote
+  ): void {
+    const pitchKey = `${voice}|${note.pitch.step}${note.pitch.alter ?? 0}${note.pitch.octave}`;
+
+    const tiedEls = findDirectChildren(notationsEl, 'tied');
+    const tieEls = tiedEls.length ? tiedEls : findDirectChildren(noteEl, 'tie');
+    // A note can stop one tie and start another (a chain), and the stop must
+    // be handled first so the chain links end-to-end rather than to itself.
+    for (const type of ['stop', 'start'] as const) {
+      for (const tieEl of tiedEls.length ? tiedEls : tieEls) {
+        if (tieEl.getAttribute('type') !== type) continue;
+        if (type === 'stop') {
+          const from = this.openTies.get(pitchKey);
+          if (from) {
+            this.tieLinks.push({ from, to: note });
+            this.openTies.delete(pitchKey);
+          }
+        } else {
+          this.openTies.set(pitchKey, note);
+        }
+      }
+    }
+
+    for (const slurEl of findDirectChildren(notationsEl, 'slur')) {
+      const type = slurEl.getAttribute('type');
+      const key = `${voice}|${slurEl.getAttribute('number') ?? '1'}`;
+      if (type === 'start') {
+        const placement = slurEl.getAttribute('placement');
+        this.openSlurs.set(key, {
+          event,
+          note,
+          ...(placement === 'above' ? { side: 'up' as const } : {}),
+          ...(placement === 'below' ? { side: 'down' as const } : {})
+        });
+      } else if (type === 'stop') {
+        const from = this.openSlurs.get(key);
+        // An unmatched stop is dropped rather than guessed at. So is an
+        // unmatched START, by never being resolved — which is what keeps our
+        // own exporter's legato-slide marker (a `<slur type="start">` with no
+        // stop, written to distinguish a picked slide) from inventing a slur.
+        if (from) {
+          this.slurLinks.push({
+            from: { event: from.event, note: from.note },
+            to: { event, note },
+            ...(from.side ? { side: from.side } : {})
+          });
+          this.openSlurs.delete(key);
+        }
+      }
+    }
+  }
+
+  /**
+   * Turns the collected spanner pairs into MNX id references.
+   *
+   * Runs after `linkTechniqueTargets`, which mints every note id, so notes can
+   * simply be named. Events are only given ids HERE and only when a slur
+   * actually references them: an id nothing points at is noise in the output.
+   *
+   * A slur is stated event-to-event unless it has to be narrower. It has to be
+   * when the same event starts more than one slur, or when the slur hangs off
+   * a note that is not the event's first — both of which mean "this chord
+   * member", and that is exactly when the spec's own examples use
+   * `startNote`/`endNote`.
+   */
+  public linkSpannerTargets(parts: MnxPart[]): void {
+    if (!this.tieLinks.length && !this.slurLinks.length) return;
+
+    const needsId = new Set<MnxEvent>();
+    for (const link of this.slurLinks) {
+      needsId.add(link.from.event);
+      needsId.add(link.to.event);
+    }
+    for (const part of parts) {
+      part.measures.forEach((measure, measureIndex) => {
+        for (const sequence of measure.sequences ?? []) {
+          const voice = sequence.voice ?? 'v1';
+          let eventIndex = -1;
+          for (const { event } of walkSequenceEvents(sequence.content ?? [], 8)) {
+            eventIndex++;
+            if (needsId.has(event) && !event.id) {
+              event.id = `e-${measureIndex + 1}-${voice}-${eventIndex}`;
+            }
+          }
+        }
+      });
+    }
+
+    for (const { from, to } of this.tieLinks) {
+      if (!to.id) continue; // a dangling reference is worse than an absent one
+      (from.ties ??= []).push({ target: to.id });
+    }
+
+    const startsPerEvent = new Map<MnxEvent, number>();
+    for (const link of this.slurLinks) {
+      startsPerEvent.set(link.from.event, (startsPerEvent.get(link.from.event) ?? 0) + 1);
+    }
+    for (const link of this.slurLinks) {
+      const target = link.to.event.id;
+      if (!target) continue;
+      const noteSpecific =
+        (startsPerEvent.get(link.from.event) ?? 0) > 1 ||
+        link.from.event.notes?.[0] !== link.from.note;
+      (link.from.event.slurs ??= []).push({
+        ...(link.side ? { side: link.side } : {}),
+        target,
+        ...(noteSpecific && link.from.note.id ? { startNote: link.from.note.id } : {}),
+        ...(noteSpecific && link.to.note.id ? { endNote: link.to.note.id } : {})
+      });
+    }
+  }
+
   private parseTechnique(
     notationsEl: Element,
     techEl: Element | null
@@ -1165,6 +1321,10 @@ export class Aligner {
 
           if (pitchUnresolved) this.unresolvedPitches.add(mnxNote);
 
+          // The event this note ends up on, whichever branch below builds it —
+          // a slur is stated on the EVENT, so it has to be known here.
+          let owningEvent: MnxEvent | undefined;
+
           if (isChord) {
             // `<chord/>` means "sounds with the previous note of this voice".
             // Attach to that note's event directly — the time cursor has
@@ -1174,6 +1334,7 @@ export class Aligner {
             const target = lastNoteEventByVoice.get(voice);
             if (target && target.notes) {
               target.notes.push(mnxNote);
+              owningEvent = target;
               // A lyric on a chord member belongs to the chord's event.
               if (lyrics && !target.lyrics) target.lyrics = lyrics;
             } else {
@@ -1192,6 +1353,7 @@ export class Aligner {
                 ...(tuplet ? { tuplet } : {})
               });
               lastNoteEventByVoice.set(voice, chordEvent);
+              owningEvent = chordEvent;
             }
           } else {
             // New Note event
@@ -1209,7 +1371,12 @@ export class Aligner {
               ...(tuplet ? { tuplet } : {})
             });
             lastNoteEventByVoice.set(voice, noteEvent);
+            owningEvent = noteEvent;
             currentTime += rawDur;
+          }
+
+          if (notationsEl && owningEvent) {
+            this.collectSpanners(notationsEl, el, voice, owningEvent, mnxNote);
           }
         }
       }

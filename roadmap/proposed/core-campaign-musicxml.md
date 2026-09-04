@@ -108,7 +108,7 @@ proposal opens with, and is reviewed on:
    dependencies for oracles and fixtures are fine and expected. An item that believes
    it needs a runtime dependency stops and argues the case here first.
 4. **The matrix row** — every item that changes what a converter supports regenerates
-   the support matrix (item 2), and **never hand-edits a cell**. Cells are derived from
+   the support matrix (item 3), and **never hand-edits a cell**. Cells are derived from
    evidence or they are not written.
 5. **The losslessness bar** — the item states what "done" means as an assertion, in the
    shape the Guitar Pro work used ("held to losslessness through both readers"). An
@@ -123,22 +123,23 @@ reader reads 3.0 and 3.1 without branching).
 
 The oracle first — it reports the real pass rate and re-ranks everything under it —
 then the matrix, which turns fixtures into a map of what to build. Feature items are
-deliberately **not** enumerated in advance: item 2 decides them from evidence.
+deliberately **not** enumerated in advance: item 3 decides them from evidence.
 
 | # | Item | Scope | Objective | Oracle | Status |
 |---|------|-------|-----------|--------|--------|
 | 1 | [Tier-1 W3C oracle](../inprogress/core-musicxml-w3c-oracle.md) | The 27 comparisons mirrored into committed fixtures (`sync:musicxml-comparisons`) and judged **through the layout engine**: import → `layoutNotation` → diff `expected.primitives.json`, graded `match`/`spacing`/`content`. Baseline committed at `harness/reports/musicxml-oracle.json`; moving it either way is a red test. | accuracy | itself | **built 2026-09-04** |
-| 2 | Converter support matrix (`lab-converter-matrix.md`) | Rows = MNX `$def` (193, minus plumbing) + `_x.mnxLab` keys; columns = converter × direction. **Cells derived, never declared** (below). Generated, committed artifact; hand-edit is a red test. Extends `src/corpus/defIndex.ts` and the `#/objects` page rather than building a second thing. | both | the corpus itself | proposed |
-| 3 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite`. **License verified before a byte lands** — the MIT claim is unchecked and the LilyPond lineage makes it worth confirming. Assertions per file: parses, drops no notes, measure durations sum to the meter, part/voice counts correct. | accuracy | itself | proposed |
-| 4 | Aligner generalization | Separate general part/measure/voice parsing from the guitar standard+TAB merge in `aligner.ts`; multi-part ensembles (N parts), grand staff (2 staves, 1 part). The largest single item, and item 1 gates it — `parts` and `multiple-voices` are both in the 27. | accuracy | 1 + 3 | proposed |
-| 5 | Zero-dep XML layer | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | 1 + 3 as regression | proposed |
-| 6 | `.mxl` container | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | round trip + item 3's `9x` files | proposed |
-| 7 | Differential oracle | music21 as a dev-only subprocess emitting a note table (part, voice, onset, duration, pitch, tie, lyric), diffed against the same table from our MNX. The independent implementation the campaign otherwise lacks. Dev/test only, never shipped. | accuracy | itself | proposed |
-| 8 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document in CI. A floor, explicitly not counted as an accuracy tier. | accuracy | itself | proposed |
-| 9 | Browser import surface | MusicXML file import in the workbench, parallel to the Guitar Pro worker; `.xml`/`.musicxml`/`.mxl` through the CLI and `localFile.ts`. Depends on 5 and 6 — it is the item that makes the zero-dep objective pay. | zero-dep | `smoke:csp` + existing import path | proposed |
-| — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 2 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
+| 2 | [Ties and slurs](../inprogress/core-musicxml-spanners.md) | The first features the oracle asked for, both directions. MNX states a spanner once as an id reference; MusicXML states both ends and numbers its slurs. Import pairs markers and resolves in a final pass (the `linkTechniqueTargets` idiom); export inverts and allocates numbers by interval colouring. Narrowing to `startNote`/`endNote` only when the source narrows. | accuracy | item 1 + round trip | **built 2026-09-04** |
+| 3 | Converter support matrix (`lab-converter-matrix.md`) | Rows = MNX `$def` (193, minus plumbing) + `_x.mnxLab` keys; columns = converter × direction. **Cells derived, never declared** (below). Generated, committed artifact; hand-edit is a red test. Extends `src/corpus/defIndex.ts` and the `#/objects` page rather than building a second thing. | both | the corpus itself | proposed |
+| 4 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite`. **License verified before a byte lands** — the MIT claim is unchecked and the LilyPond lineage makes it worth confirming. Assertions per file: parses, drops no notes, measure durations sum to the meter, part/voice counts correct. | accuracy | itself | proposed |
+| 5 | Aligner generalization | Separate general part/measure/voice parsing from the guitar standard+TAB merge in `aligner.ts`; multi-part ensembles (N parts), grand staff (2 staves, 1 part). The largest single item, and item 1 gates it — `parts` and `multiple-voices` are both in the 27. | accuracy | 1 + 3 | proposed |
+| 6 | Zero-dep XML layer | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | 1 + 3 as regression | proposed |
+| 7 | `.mxl` container | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | round trip + item 3's `9x` files | proposed |
+| 8 | Differential oracle | music21 as a dev-only subprocess emitting a note table (part, voice, onset, duration, pitch, tie, lyric), diffed against the same table from our MNX. The independent implementation the campaign otherwise lacks. Dev/test only, never shipped. | accuracy | itself | proposed |
+| 9 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document in CI. A floor, explicitly not counted as an accuracy tier. | accuracy | itself | proposed |
+| 10 | Browser import surface | MusicXML file import in the workbench, parallel to the Guitar Pro worker; `.xml`/`.musicxml`/`.mxl` through the CLI and `localFile.ts`. Depends on 5 and 6 — it is the item that makes the zero-dep objective pay. | zero-dep | `smoke:csp` + existing import path | proposed |
+| — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 3 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
-### Item 2's derivation rule
+### Item 3's derivation rule
 
 The reason the matrix is worth building is that **it can be derived, and a declared
 support table is a lie within two weeks.** Every status is mechanically observable from
@@ -169,6 +170,31 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-04 — item 2: ties and slurs, and the argument stops being an argument
+
+**Oracle 7 → 11 of 27 match**, both directions, round trip held
+([core-musicxml-spanners.md](../inprogress/core-musicxml-spanners.md)).
+
+- **The features were absent from the data model, not merely unimported.** `MnxNote` had
+  no `ties` field and `MnxEvent` no `slurs`; `tied` appeared zero times in the converter.
+  So the round-trip suite was not lax — it was *structurally unable* to notice, because
+  both directions dropped the same thing and no guitar fixture contains a tie. The
+  campaign asserted that on day one from a grep; this item is the repair.
+- **The oracle chose the item.** Not intuition, not a feature list — four named
+  scenarios with `curve` primitives missing. And it chose the *next* one too: `<beam>`
+  is now the largest single cause at 6 scenarios. This is what item 1 was for.
+- **The judgement call was narrowing, and both answers were already pinned.**
+  `slurs-chords` puts one `<slur>` on the first note of a chord and means the chord;
+  `slurs-targeting-specific-notes` puts three on three members and means the members.
+  A rule of "narrow when it's a chord" gets the first wrong; "never narrow" gets the
+  second wrong. **When two fixtures disagree about the obvious rule, the rule is the
+  deliverable** — here: narrow when the event starts more than one slur, or when the
+  slur hangs off a note that is not the first.
+- **Our own exporter set the trap.** It writes an unmatched `<slur type="start">` to mark
+  a legato slide; reading it as a musical slur would have invented one in every guitar
+  score. Pairing-based resolution avoids it for free — an unmatched start resolves to
+  nothing — but it is now a test rather than an accident.
 
 ### 2026-09-04 — item 1 lands, and both of the campaign's arguments are proven on live code
 

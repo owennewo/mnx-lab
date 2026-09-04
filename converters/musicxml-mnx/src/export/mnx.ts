@@ -1,14 +1,15 @@
 import { DOMParser } from '@xmldom/xmldom';
 import {
-  MnxStructure,
+  MnxBend,
+  MnxEvent,
+  MnxGlobalMeasure,
+  MnxHarmony,
+  MnxHarmonyStep,
+  MnxNote,
   MnxPart,
   MnxPartMeasure,
-  MnxGlobalMeasure,
   MnxPitch,
-  MnxNote,
-  MnxBend,
-  MnxHarmony,
-  MnxHarmonyStep
+  MnxStructure
 } from '../common/types.js';
 import {
   renderChordSymbol,
@@ -121,6 +122,76 @@ export function exportMusicXML(
         };
         walk(sequence.content ?? []);
       }
+    }
+  }
+
+  // MusicXML spanner markers per note id, derived from MNX's id references.
+  //
+  // MNX states a tie or slur ONCE, on the element it starts from, pointing at
+  // where it ends. MusicXML states both ends, and numbers its slurs so that
+  // overlapping ones can be told apart. So this inverts the references, and
+  // allocates slur numbers by interval colouring: the smallest number whose
+  // previous slur has already closed. Ties need no number — `<tied>` pairs by
+  // pitch and voice, which is exactly what the importer relies on.
+  const spannerMarks = new Map<string, SpannerMarks>();
+  const markNote = (id: string, apply: (m: SpannerMarks) => void): void => {
+    const marks = spannerMarks.get(id) ?? {};
+    apply(marks);
+    spannerMarks.set(id, marks);
+  };
+  for (const part of mnxJson.parts ?? []) {
+    const eventById = new Map<string, ExportEvent>();
+    const noteOrder = new Map<string, number>();
+    const events: ExportEvent[] = [];
+    let ordinal = 0;
+    const collect = (items: ExportEvent[]): void => {
+      for (const item of items) {
+        const content = (item as { content?: ExportEvent[] }).content;
+        if (content) { collect(content); continue; }
+        if (item.id) eventById.set(item.id, item);
+        events.push(item);
+        for (const note of item.notes ?? []) {
+          if (note.id) noteOrder.set(note.id, ordinal);
+          ordinal++;
+        }
+      }
+    };
+    for (const measure of part.measures ?? []) {
+      for (const sequence of measure.sequences ?? []) collect((sequence.content ?? []) as ExportEvent[]);
+    }
+
+    for (const event of events) {
+      for (const note of event.notes ?? []) {
+        for (const tie of note.ties ?? []) {
+          if (!note.id || !tie.target) continue;
+          markNote(note.id, m => { m.tieStart = true; });
+          markNote(tie.target, m => { m.tieStop = true; });
+        }
+      }
+    }
+
+    const pairs: { start: string; end: string; side?: 'up' | 'down'; from: number }[] = [];
+    for (const event of events) {
+      for (const slur of event.slurs ?? []) {
+        const target = eventById.get(slur.target);
+        const start = slur.startNote ?? event.notes?.[0]?.id;
+        const end = slur.endNote ?? target?.notes?.[0]?.id;
+        // A slur pointing at an event that is not there is dropped, not
+        // guessed at — the same rule the technique targets follow.
+        if (!target || !start || !end) continue;
+        pairs.push({ start, end, ...(slur.side ? { side: slur.side } : {}), from: noteOrder.get(start) ?? 0 });
+      }
+    }
+    pairs.sort((a, b) => a.from - b.from);
+    const freeAfter = new Map<number, number>();
+    for (const pair of pairs) {
+      let number = 1;
+      while ((freeAfter.get(number) ?? -1) >= pair.from) number++;
+      freeAfter.set(number, noteOrder.get(pair.end) ?? pair.from);
+      markNote(pair.start, m => {
+        (m.slurStarts ??= []).push({ number, ...(pair.side ? { side: pair.side } : {}) });
+      });
+      markNote(pair.end, m => { (m.slurStops ??= []).push(number); });
     }
   }
 
@@ -402,7 +473,9 @@ export function exportMusicXML(
         while (pending.length > 0 && pending[0].position <= cursor) {
           measureEl.appendChild(buildHarmonyElement(doc, pending.shift()!.harmony, 0));
         }
-        measureEl.appendChild(buildXmlNode(doc, node, part.transposition, lyricLineOrder, noteMidiById));
+        measureEl.appendChild(
+          buildXmlNode(doc, node, part.transposition, lyricLineOrder, noteMidiById, spannerMarks)
+        );
         if (node.type === 'backup') cursor -= node.duration;
         else if (!node.isChord) cursor += node.duration;
       }
@@ -577,6 +650,18 @@ function buildBendElements(doc: Document, bend: MnxBend | undefined): Element[] 
   return elements;
 }
 
+/** The MusicXML spanner markers one note carries, inverted from MNX's
+ *  single-ended id references. */
+interface SpannerMarks {
+  tieStart?: boolean;
+  tieStop?: boolean;
+  slurStarts?: { number: number; side?: 'up' | 'down' }[];
+  slurStops?: number[];
+}
+
+/** The event shape this file walks: MNX events, possibly nested in containers. */
+type ExportEvent = MnxEvent & { content?: ExportEvent[] };
+
 /** MNX barline type → MusicXML bar-style (inverse of the importer's mapping). */
 function mapBarlineStyleToXml(type?: string): string {
   switch (type) {
@@ -600,7 +685,8 @@ function buildXmlNode(
   node: FlatXmlNode,
   transposition?: MnxPart['transposition'],
   lineOrder: string[] = [],
-  noteMidiById: Map<string, number> = new Map()
+  noteMidiById: Map<string, number> = new Map(),
+  spannerMarks: Map<string, SpannerMarks> = new Map()
 ): Element {
   if (node.type === 'backup') {
     const el = doc.createElement('backup');
@@ -781,6 +867,22 @@ function buildXmlNode(
     noteEl.appendChild(durEl);
   }
 
+  // `<tie>` is the SOUND of a tie and belongs here, immediately after
+  // `<duration>` and before `<voice>`, per MusicXML's fixed child order; its
+  // notated twin `<tied>` goes in `<notations>` below. Writing both is what
+  // the spec's own examples do, and readers differ on which one they trust.
+  const marks = node.note?.id ? spannerMarks.get(node.note.id) : undefined;
+  if (marks?.tieStop) {
+    const tieEl = doc.createElement('tie');
+    tieEl.setAttribute('type', 'stop');
+    noteEl.appendChild(tieEl);
+  }
+  if (marks?.tieStart) {
+    const tieEl = doc.createElement('tie');
+    tieEl.setAttribute('type', 'start');
+    noteEl.appendChild(tieEl);
+  }
+
   // Voice
   if (node.voice) {
     const voiceEl = doc.createElement('voice');
@@ -800,6 +902,32 @@ function buildXmlNode(
   }
 
   if (accidentalEl) noteEl.appendChild(accidentalEl);
+
+  // Stop before start on both, so a chain reads end-then-begin the way every
+  // MusicXML writer emits it.
+  if (marks?.tieStop || marks?.tieStart || marks?.slurStops || marks?.slurStarts) {
+    notationsEl = notationsEl ?? doc.createElement('notations');
+    for (const type of ['stop', 'start'] as const) {
+      if (type === 'stop' ? marks.tieStop : marks.tieStart) {
+        const tiedEl = doc.createElement('tied');
+        tiedEl.setAttribute('type', type);
+        notationsEl.appendChild(tiedEl);
+      }
+    }
+    for (const number of marks.slurStops ?? []) {
+      const slurEl = doc.createElement('slur');
+      slurEl.setAttribute('number', `${number}`);
+      slurEl.setAttribute('type', 'stop');
+      notationsEl.appendChild(slurEl);
+    }
+    for (const start of marks.slurStarts ?? []) {
+      const slurEl = doc.createElement('slur');
+      slurEl.setAttribute('number', `${start.number}`);
+      if (start.side) slurEl.setAttribute('placement', start.side === 'up' ? 'above' : 'below');
+      slurEl.setAttribute('type', 'start');
+      notationsEl.appendChild(slurEl);
+    }
+  }
 
   if (node.tuplet) {
     // The arithmetic half of a tuplet, on EVERY member: `<duration>` is

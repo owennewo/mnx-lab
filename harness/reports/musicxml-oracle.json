@@ -3,9 +3,9 @@
   "summary": {
     "comparisons": 27,
     "verdicts": {
-      "match": 7,
+      "match": 11,
       "spacing": 0,
-      "content": 20,
+      "content": 16,
       "import-failed": 0,
       "layout-failed": 0
     }
@@ -223,27 +223,15 @@
     },
     {
       "slug": "slurs",
-      "verdict": "content",
-      "glyphsMissing": [
-        "curve",
-        "curve"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "slurs-chords",
-      "verdict": "content",
-      "glyphsMissing": [
-        "curve"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "slurs-targeting-specific-notes",
-      "verdict": "content",
-      "glyphsMissing": [
-        "curve",
-        "curve",
-        "curve"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "three-note-chord-and-half-rest",
@@ -254,12 +242,7 @@
     },
     {
       "slug": "ties",
-      "verdict": "content",
-      "glyphsMissing": [
-        "curve",
-        "curve",
-        "curve"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "time-signatures",

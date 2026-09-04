@@ -161,15 +161,28 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-spanners.md](inprogress/core-musicxml-spanners.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 2, **built 2026-09-04**:
+  ties and slurs, both directions — **the oracle 7 → 11 of 27**. They were not
+  unimplemented but **absent from the data model** (`tied` appeared zero times in the
+  converter; `MnxNote` had no `ties`), which is exactly why 46 round-trip tests passed
+  over them: a round trip cannot see a symmetric omission and no guitar fixture has a
+  tie. MNX states a spanner once as an id reference, MusicXML states both ends and
+  numbers its slurs, so import pairs markers and resolves in a final pass while export
+  inverts and allocates numbers by interval colouring. The judgement call is when a slur
+  means the chord rather than the note — the spec pins both cases, so the **rule** is the
+  deliverable. Also pins that our own legato-slide marker (an unmatched `<slur>`) must
+  not read as a musical slur.
 - **[core-musicxml-w3c-oracle.md](inprogress/core-musicxml-w3c-oracle.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 1, **built 2026-09-04**: the
   spec's own 27 MusicXML↔MNX comparisons turned into an oracle, judged **through the layout
   engine** (import → `layoutNotation` → diff the paired `expected.primitives.json`) because
   the mapping is not a bijection and the primitives goldens carry no ids. Committed fixtures
   (`sync:musicxml-comparisons`) so it runs without the submodule; committed baseline
-  (`update:musicxml-oracle`) that is a red test in **either** direction. **Baseline 0 match /
-  1 spacing / 26 content, 0 crashes** — and the 26 collapse into ~8 causes, with `<beam>`
-  worth 7 and `<tied>`/`<slur>` worth 4. Found that `tied` appears **zero times** in the
+  (`update:musicxml-oracle`) that is a red test in **either** direction. **Corrected twice the same day by using it**: the fixtures carried the
+  docs site's `<metadiff>` diff markup (24 of 27 files, hiding `<beam>`/`<notations>`/
+  `<barline>` from the parser) and the goldens are not id-free after all (`sourceId`, now
+  normalised by bijection) — together 0 → 7 match with no converter change. Found that `tied` appears **zero times** in the
   converter, import and export, while 46 round-trip tests pass over it: a symmetric omission
   is invisible to a round trip, and three guitar fixtures cannot find what guitar music
   lacks. No converter code changed — the instrument is built before the thing it measures.

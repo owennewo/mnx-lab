@@ -124,6 +124,8 @@ export function importMusicXML(
   // Technique targets are id references; resolve them once ids are final
   // (after any notation/TAB merge has assigned them).
   aligner.linkTechniqueTargets(finalParts);
+  // After the technique pass, which is what mints the note ids spanners name.
+  aligner.linkSpannerTargets(finalParts);
 
   // 5. Report source defects that were repaired (or could not be)
   for (const warning of aligner.warnings) options.onWarning?.(warning);

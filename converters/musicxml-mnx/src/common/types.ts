@@ -122,9 +122,19 @@ export interface MnxGlobalMeasureExtension {
   harmonies?: MnxHarmony[];
 }
 
+/** A tie from the note that carries it to `target`, the note it ties into.
+ *  MNX states a tie as a reference on the FIRST note; MusicXML states it as
+ *  start/stop markers on a pair, so the target is only knowable once the part
+ *  is assembled and ids are final — see `linkSpannerTargets`. */
+export interface MnxTie {
+  target?: string;
+  side?: MnxSlurSide;
+}
+
 export interface MnxNote {
   id?: string;
   pitch: MnxPitch;
+  ties?: MnxTie[];
   accidentalDisplay?: {
     show: boolean;
     enclosure?: {
@@ -156,9 +166,23 @@ export interface MnxNoteValue {
   dots?: number;
 }
 
+export type MnxSlurSide = 'up' | 'down';
+
+/** A slur from the event that carries it to `target`, another event.
+ *  `startNote`/`endNote` narrow it to particular chord members; they are
+ *  omitted for the ordinary event-to-event case, which is how the spec's own
+ *  examples encode a slur between two chords. */
+export interface MnxSlur {
+  target: string;
+  side?: MnxSlurSide;
+  startNote?: string;
+  endNote?: string;
+}
+
 export interface MnxEvent {
   id?: string;
   duration: MnxNoteValue;
+  slurs?: MnxSlur[];
   lyrics?: MnxEventLyrics;
   notes?: MnxNote[];
   rest?: MnxRest;

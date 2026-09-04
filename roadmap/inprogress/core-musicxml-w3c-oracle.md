@@ -82,8 +82,10 @@ would be a test that most checkouts skip. This is the same reasoning that has
 
 ## The baseline, and what it found
 
-**7 match, 20 content, 0 crashes** — every one of the 27 parses and lays out, and seven
-reproduce a human-verified golden byte for byte after `sourceId` normalisation.
+**7 match, 20 content, 0 crashes** at the time this item closed — every one of the 27
+parses and lays out, and seven reproduce a human-verified golden byte for byte after
+`sourceId` normalisation. Item 2 closed the four ties/slurs scenarios the same day,
+taking it to **11 match / 16 content**; the table below is what remained after that.
 
 That number is the *second* baseline. The first was 0 match / 1 spacing / 26 content,
 and most of the gap was **not the converter** — see the two corrections below. What
@@ -91,7 +93,6 @@ remains:
 
 | Cause | Scenarios | Evidence |
 |---|---|---|
-| **ties and slurs not imported** | 4 — `ties`, `slurs`, `slurs-chords`, `slurs-targeting-specific-notes` | `curve` primitives missing outright. Closed by [core-musicxml-spanners.md](core-musicxml-spanners.md) |
 | **`<beam>` not imported** | 6 — `beams`, `beam-hooks`, `beams-across-barlines`, `beams-inner-grace-notes`, `beams-secondary-beam-breaks`, `parts` | beam `line`s missing, flag glyphs in their place. The single biggest remaining cause |
 | **final-barline default** | 5 — `hello-world`, `two-bar-c-major-scale`, `three-note-chord-and-half-rest`, `repeats-alternate-endings-simple`, `repeats-alternate-endings-advanced` | one extra `rect`, nothing missing (below) |
 | **jumps** | 2 — `jumps-dal-segno`, `jumps-ds-al-fine` | `segno` glyph and *D.S.* / *fine* text missing |
