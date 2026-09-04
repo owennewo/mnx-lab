@@ -238,3 +238,41 @@ describe('what the document states', () => {
     expect(mnx.mnx.support).toBeUndefined();
   });
 });
+
+describe('jumps', () => {
+  it('reads a D.S. from <sound>, not from the words above it', async () => {
+    const mnx = await load('jumps-dal-segno');
+    const segno = mnx.global.measures.find(m => m.segno);
+    const jump = mnx.global.measures.find(m => m.jump);
+    expect(segno).toBeDefined();
+    expect(jump?.jump?.type).toBe('segno');
+    // The D.S. is at the END of its measure, not the start.
+    expect(jump?.jump?.location.fraction).toEqual([1, 1]);
+  });
+
+  it('calls it dsalfine exactly when there is a Fine to stop at', async () => {
+    // MusicXML writes the same <sound dalsegno> either way; the score settles it.
+    const withFine = await load('jumps-ds-al-fine');
+    expect(withFine.global.measures.some(m => m.fine)).toBe(true);
+    expect(withFine.global.measures.find(m => m.jump)?.jump?.type).toBe('dsalfine');
+
+    const withoutFine = await load('jumps-dal-segno');
+    expect(withoutFine.global.measures.some(m => m.fine)).toBe(false);
+    expect(withoutFine.global.measures.find(m => m.jump)?.jump?.type).toBe('segno');
+  });
+
+  it('does not mistake a jump caption for a section name', async () => {
+    // "Fine" and "D.S. al Fine" are <words>, and <words> before the first note
+    // is otherwise read as a section label.
+    const mnx = await load('jumps-ds-al-fine');
+    expect(mnx.global.measures.some(m => m.section)).toBe(false);
+  });
+
+  it.each(['jumps-dal-segno', 'jumps-ds-al-fine'])(
+    'preserves %s through MNX → MusicXML → MNX',
+    async slug => {
+      const first = await load(slug);
+      expect(importMusicXML(exportMusicXML(first))).toEqual(first);
+    }
+  );
+});

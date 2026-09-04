@@ -468,6 +468,54 @@ export function exportMusicXML(
         measureEl.appendChild(directionEl);
       }
 
+      // Navigation marks. MNX says each one once as a structural object; a
+      // MusicXML reader wants it twice — printed (`<words>`, or the `<segno/>`
+      // glyph) and played (`<sound>`) — so both halves are written. The words
+      // are the conventional spellings, since MNX carries no text of its own.
+      const jumpDirections: {
+        print: Element;
+        sound: Record<string, string>;
+        location?: { fraction: [number, number] };
+      }[] = [];
+      if (globalM.segno) {
+        const typeEl = doc.createElement('direction-type');
+        typeEl.appendChild(doc.createElement('segno'));
+        jumpDirections.push({ print: typeEl, sound: { segno: 'segno' }, location: globalM.segno.location });
+      }
+      if (globalM.fine) {
+        const typeEl = doc.createElement('direction-type');
+        const wordsEl = doc.createElement('words');
+        wordsEl.textContent = 'Fine';
+        typeEl.appendChild(wordsEl);
+        jumpDirections.push({ print: typeEl, sound: { fine: 'yes' }, location: globalM.fine.location });
+      }
+      if (globalM.jump) {
+        const typeEl = doc.createElement('direction-type');
+        const wordsEl = doc.createElement('words');
+        wordsEl.textContent = globalM.jump.type === 'dsalfine' ? 'D.S. al Fine' : 'D.S.';
+        typeEl.appendChild(wordsEl);
+        jumpDirections.push({ print: typeEl, sound: { dalsegno: 'segno' }, location: globalM.jump.location });
+      }
+      for (const jump of jumpDirections) {
+        const directionEl = doc.createElement('direction');
+        directionEl.appendChild(jump.print);
+        // These directions are written at the head of the measure, so anything
+        // that belongs later in the bar says so with `<offset>` — a D.S. sits at
+        // the END of its measure, and emitting it at 0 would move the jump.
+        // MNX fractions are of a WHOLE note; MusicXML divisions count quarters.
+        const [numerator, denominator] = jump.location?.fraction ?? [0, 1];
+        const offset = Math.round((numerator / denominator) * divisions * 4);
+        if (offset !== 0) {
+          const offsetEl = doc.createElement('offset');
+          offsetEl.textContent = `${offset}`;
+          directionEl.appendChild(offsetEl);
+        }
+        const soundEl = doc.createElement('sound');
+        for (const [name, value] of Object.entries(jump.sound)) soundEl.setAttribute(name, value);
+        directionEl.appendChild(soundEl);
+        measureEl.appendChild(directionEl);
+      }
+
       // Left barline: a forward repeat and the opening of a volta bracket sit
       // BEFORE the measure's notes.
       const openingEnding = endingStartsAt.get(m);

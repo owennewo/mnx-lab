@@ -3,9 +3,9 @@
   "summary": {
     "comparisons": 27,
     "verdicts": {
-      "match": 19,
+      "match": 21,
       "spacing": 1,
-      "content": 7,
+      "content": 5,
       "import-failed": 0,
       "layout-failed": 0
     }
@@ -48,20 +48,11 @@
     },
     {
       "slug": "jumps-dal-segno",
-      "verdict": "content",
-      "glyphsMissing": [
-        "glyph:segno",
-        "text:D.S."
-      ]
+      "verdict": "match"
     },
     {
       "slug": "jumps-ds-al-fine",
-      "verdict": "content",
-      "glyphsMissing": [
-        "glyph:segno",
-        "text:D.S. al Fine",
-        "text:fine"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "key-signatures",

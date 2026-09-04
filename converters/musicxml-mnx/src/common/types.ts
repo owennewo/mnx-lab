@@ -314,7 +314,18 @@ export interface MnxPart {
   };
 }
 
+/** A point in a measure, as a fraction of a whole note. */
+export interface MnxRhythmicPosition {
+  fraction: [number, number];
+}
+
 export interface MnxGlobalMeasure {
+  /** The sign a D.S. returns to. */
+  segno?: { location: MnxRhythmicPosition };
+  /** Where an al-Fine jump stops. */
+  fine?: { location: MnxRhythmicPosition };
+  /** A navigation jump. `dsalfine` stops at the `fine`; `segno` plays to the end. */
+  jump?: { type: 'dsalfine' | 'segno'; location: MnxRhythmicPosition };
   key?: {
     fifths: number;
   };

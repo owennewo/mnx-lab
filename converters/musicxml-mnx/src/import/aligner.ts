@@ -324,6 +324,21 @@ export class Aligner {
   private endingMarks: { measureIndex: number; type: string; numbers: number[] }[] = [];
 
   /** Chord symbols seen while walking measures; placed by resolveHarmonies. */
+  /**
+   * Segno / Fine / D.S. marks, with their position in the measure.
+   *
+   * MusicXML states a jump twice — once as printed text (`<words>D.S.</words>`)
+   * and once as playback (`<sound dalsegno="...">`) — and MNX states it once, as
+   * a structural object on the global measure. The `<sound>` half is the one to
+   * trust: the words are free text and say nothing a machine can rely on.
+   */
+  private jumpMarks: {
+    measureIndex: number;
+    position: number;
+    divisions: number;
+    kind: 'segno' | 'fine' | 'dalsegno';
+  }[] = [];
+
   private harmonyMarks: {
     measureIndex: number;
     /** Position within the measure, in MusicXML divisions (per quarter note). */
@@ -451,6 +466,45 @@ export class Aligner {
 
     const literal = `${stepToText(root)}${displayed}${bass ? `/${stepToText(bass)}` : ''}`;
     return literal === renderChordSymbol(harmony) ? harmony : { ...harmony, text: literal };
+  }
+
+  /**
+   * Which navigation mark, if any, a `<direction>` carries.
+   *
+   * Read from `<sound>` rather than from the printed `<words>`: "D.S.",
+   * "D.S. al Fine", "Dal Segno" and a dozen other spellings all mean the same
+   * thing, and `<sound dalsegno>` means it unambiguously. `<segno/>` is the one
+   * case that is also a `<direction-type>`, because it prints a glyph.
+   */
+  private classifyJumpDirection(directionEl: Element): 'segno' | 'fine' | 'dalsegno' | null {
+    const soundEl = findDirectChild(directionEl, 'sound');
+    if (soundEl?.getAttribute('dalsegno')) return 'dalsegno';
+    if (soundEl?.getAttribute('fine')) return 'fine';
+    if (soundEl?.getAttribute('segno')) return 'segno';
+    const typeEl = findDirectChild(directionEl, 'direction-type');
+    if (typeEl && findDirectChild(typeEl, 'segno')) return 'segno';
+    return null;
+  }
+
+  /**
+   * Navigation marks → `segno` / `fine` / `jump` on the global measure.
+   *
+   * The jump's TYPE is not stated by MusicXML: `<sound dalsegno>` is the same
+   * element whether the player stops at a Fine or plays to the end. MNX
+   * distinguishes them (`dsalfine` vs `segno`), and the score itself settles
+   * it — a D.S. is *al Fine* exactly when there is a Fine to stop at.
+   */
+  private resolveJumps(globalMeasures: MnxGlobalMeasure[]): void {
+    const hasFine = this.jumpMarks.some(mark => mark.kind === 'fine');
+    for (const mark of this.jumpMarks) {
+      // MusicXML `divisions` counts per QUARTER; MNX fractions are of a WHOLE.
+      const location = { fraction: reduceFraction(mark.position, mark.divisions * 4) };
+      if (!globalMeasures[mark.measureIndex]) globalMeasures[mark.measureIndex] = {};
+      const measure = globalMeasures[mark.measureIndex];
+      if (mark.kind === 'segno') measure.segno ??= { location };
+      else if (mark.kind === 'fine') measure.fine ??= { location };
+      else measure.jump ??= { type: hasFine ? 'dsalfine' : 'segno', location };
+    }
   }
 
   /**
@@ -1132,6 +1186,9 @@ export class Aligner {
 
         const typeEl = findDirectChild(el, 'direction-type');
         if (!typeEl) continue;
+        // A jump's printed text ("Fine", "D.S. al Fine") is a navigation mark,
+        // not the name of a formal section.
+        if (this.classifyJumpDirection(el)) continue;
         const marker = getChildText(typeEl, 'rehearsal');
         const sectionText = getChildText(typeEl, 'words');
         if (marker) globalM.rehearsal = { label: marker };
@@ -1245,6 +1302,7 @@ export class Aligner {
 
     this.resolveEndings(globalMeasures);
     this.resolveHarmonies(globalMeasures);
+    this.resolveJumps(globalMeasures);
 
     const labExtension: any = {};
     if (state.tuning) {
@@ -1332,6 +1390,18 @@ export class Aligner {
       const node = measureEl.childNodes[i];
       if (node.nodeType !== 1) continue;
       const el = node as Element;
+
+      if (el.tagName === 'direction') {
+        const kind = this.classifyJumpDirection(el);
+        if (kind) {
+          this.jumpMarks.push({
+            measureIndex: measureIdx,
+            position: currentTime + (getChildInt(el, 'offset') || 0),
+            divisions: state.divisions,
+            kind
+          });
+        }
+      }
 
       if (el.tagName === 'harmony') {
         // `<harmony>` sits in the stream just before the note it belongs to,

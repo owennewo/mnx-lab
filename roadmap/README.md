@@ -161,6 +161,15 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-jumps.md](inprogress/core-musicxml-jumps.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 6, **built 2026-09-04**:
+  segno, Fine and D.S. — **the oracle 19 → 21 of 27**. MusicXML states a jump twice, as
+  printed `<words>` and as `<sound dalsegno>`; the words are free text in any language, so
+  the classifier reads the sound. MNX's `dsalfine` vs `segno` distinction is one MusicXML
+  cannot make at all — the same `<sound dalsegno>` serves both — so the score settles it: a
+  D.S. is *al Fine* exactly when there is a Fine. Export needs `<offset>` because a D.S.
+  sits at the end of its measure, and without it the round trip silently moved every jump
+  to the downbeat.
 - **[core-musicxml-support-flags.md](inprogress/core-musicxml-support-flags.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 5, **built 2026-09-04**:
   **the oracle 18 → 19 of 27**. Two bugs behind one scenario. `<accidental>` was read
