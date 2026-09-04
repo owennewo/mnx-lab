@@ -233,7 +233,26 @@ export interface MnxSequence {
   staff?: number;
 }
 
+/**
+ * One beam, at one level.
+ *
+ * MNX nests: the top level is the primary beam, `beams` inside it are the
+ * secondary beams over sub-runs of the same events, and so on. A nested beam
+ * holding ONE event with a `direction` is a hook — MusicXML's `forward hook`
+ * (right) and `backward hook` (left).
+ *
+ * A group lives on the measure of its FIRST event and may name events in later
+ * measures, which is how the spec encodes a beam across a barline.
+ */
+export interface MnxBeam {
+  events: string[];
+  beams?: MnxBeam[];
+  direction?: 'left' | 'right';
+}
+
 export interface MnxPartMeasure {
+  /** Beam groups starting in this measure. */
+  beams?: MnxBeam[];
   /** Free-text/symbolic instructions for this part. **Proposed**, not adopted. */
   directions?: MnxDirection[];
   clefs?: {

@@ -1,5 +1,6 @@
 import { DOMParser } from '@xmldom/xmldom';
 import {
+  MnxBeam,
   MnxBend,
   MnxEvent,
   MnxGlobalMeasure,
@@ -122,6 +123,39 @@ export function exportMusicXML(
         };
         walk(sequence.content ?? []);
       }
+    }
+  }
+
+  // MusicXML `<beam>` flags per event id, flattened from MNX's nested groups.
+  //
+  // The inverse of the importer's scan: MNX nests, MusicXML numbers. A group at
+  // nesting depth N is beam number N; first/last/middle of a group become
+  // begin/end/continue; a one-event nested group with a direction is a hook.
+  const beamFlags = new Map<string, { number: number; value: string }[]>();
+  const flagEvent = (id: string, number: number, value: string): void => {
+    const list = beamFlags.get(id) ?? [];
+    list.push({ number, value });
+    beamFlags.set(id, list);
+  };
+  const walkBeams = (beams: MnxBeam[], level: number): void => {
+    for (const beam of beams) {
+      if (beam.direction && beam.events.length === 1) {
+        flagEvent(beam.events[0], level, beam.direction === 'right' ? 'forward hook' : 'backward hook');
+      } else {
+        beam.events.forEach((id, index) => {
+          flagEvent(
+            id,
+            level,
+            index === 0 ? 'begin' : index === beam.events.length - 1 ? 'end' : 'continue'
+          );
+        });
+      }
+      if (beam.beams?.length) walkBeams(beam.beams, level + 1);
+    }
+  };
+  for (const part of mnxJson.parts ?? []) {
+    for (const measure of part.measures ?? []) {
+      if (measure.beams?.length) walkBeams(measure.beams, 1);
     }
   }
 
@@ -474,7 +508,15 @@ export function exportMusicXML(
           measureEl.appendChild(buildHarmonyElement(doc, pending.shift()!.harmony, 0));
         }
         measureEl.appendChild(
-          buildXmlNode(doc, node, part.transposition, lyricLineOrder, noteMidiById, spannerMarks)
+          buildXmlNode(
+            doc,
+            node,
+            part.transposition,
+            lyricLineOrder,
+            noteMidiById,
+            spannerMarks,
+            beamFlags
+          )
         );
         if (node.type === 'backup') cursor -= node.duration;
         else if (!node.isChord) cursor += node.duration;
@@ -686,7 +728,8 @@ function buildXmlNode(
   transposition?: MnxPart['transposition'],
   lineOrder: string[] = [],
   noteMidiById: Map<string, number> = new Map(),
-  spannerMarks: Map<string, SpannerMarks> = new Map()
+  spannerMarks: Map<string, SpannerMarks> = new Map(),
+  beamFlags: Map<string, { number: number; value: string }[]> = new Map()
 ): Element {
   if (node.type === 'backup') {
     const el = doc.createElement('backup');
@@ -960,6 +1003,17 @@ function buildXmlNode(
       if (node.tuplet.start) tupletEl.setAttribute('bracket', 'yes');
       notationsEl.appendChild(tupletEl);
     }
+  }
+
+  // `<beam>` sits after `<staff>` and before `<notations>` in MusicXML's fixed
+  // child order, and is written on the principal note only — a chord member
+  // repeating it would draw the beam once per voice of the chord.
+  for (const flag of (node.eventId ? beamFlags.get(node.eventId) : undefined) ?? []) {
+    if (node.isChord) break;
+    const beamEl = doc.createElement('beam');
+    beamEl.setAttribute('number', `${flag.number}`);
+    beamEl.textContent = flag.value;
+    noteEl.appendChild(beamEl);
   }
 
   if (notationsEl) noteEl.appendChild(notationsEl);

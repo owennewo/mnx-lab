@@ -16,6 +16,11 @@ export interface FlatXmlNode {
   voice?: string;
   note?: MnxNote;
   isChord?: boolean;
+  /** The id of the event this node came from, when it has one. Beam membership
+   *  is stated by event id in MNX and by per-note flags in MusicXML, so the
+   *  writer needs to know which event a note belongs to. Principal notes only —
+   *  a chord repeats `<beam>` on no member but the first. */
+  eventId?: string;
   /**
    * The MNX duration base/dots this node came from. `<duration>` alone is not
    * enough to write MusicXML: `<type>`/`<dot>` carry the *notated* symbol
@@ -200,6 +205,7 @@ export function flattenSequences(
           voice: voiceName,
           base,
           dots,
+          ...(item.event.id ? { eventId: item.event.id } : {}),
           ...container,
           // Rests carry lyrics too — MusicXML allows `<lyric>` on any `<note>`,
           // and most of Sun-did-glide's syllables sit on rests.
@@ -219,6 +225,7 @@ export function flattenSequences(
             isChord,
             base,
             dots,
+            ...(!isChord && item.event.id ? { eventId: item.event.id } : {}),
             ...container,
             // The `<tuplet>` bracket opens and closes ONCE per group, on its
             // principal note — repeating it on every member of a chord would

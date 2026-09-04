@@ -122,3 +122,78 @@ describe('round trip', () => {
     expect(events(mnx).some(e => e.slurs?.length)).toBe(false);
   });
 });
+
+describe('beams', () => {
+  it('groups a run, and does not beam a lone note', async () => {
+    const mnx = await load('beams');
+    const groups = (mnx.parts[0].measures ?? []).flatMap(m => m.beams ?? []);
+    expect(groups.length).toBeGreaterThan(0);
+    // A beam joins notes; one event with nothing nested under it is a flag.
+    expect(groups.every(b => b.events.length > 1 || b.beams?.length || b.direction)).toBe(true);
+  });
+
+  it('keeps a beamed rest inside its group', async () => {
+    // measure 2 of `beams` is begin/continue/continue/continue/end where the
+    // second event is a <rest/>. Miss it and the group splits in two.
+    const mnx = await load('beams');
+    const groups = (mnx.parts[0].measures ?? []).flatMap(m => m.beams ?? []);
+    expect(groups.some(b => b.events.length === 5)).toBe(true);
+  });
+
+  it('nests secondary beams inside the primary', async () => {
+    const mnx = await load('beams-secondary-beam-breaks');
+    const groups = (mnx.parts[0].measures ?? []).flatMap(m => m.beams ?? []);
+    const nested = groups.filter(b => b.beams?.length);
+    expect(nested.length).toBeGreaterThan(0);
+    // A secondary covers a SUB-run of its parent, never more.
+    for (const parent of nested) {
+      for (const child of parent.beams ?? []) {
+        expect(child.events.every(id => parent.events.includes(id))).toBe(true);
+      }
+    }
+  });
+
+  it('reads hooks as one-event groups with a direction', async () => {
+    const mnx = await load('beam-hooks');
+    const hooks = (mnx.parts[0].measures ?? [])
+      .flatMap(m => m.beams ?? [])
+      .flatMap(b => b.beams ?? [])
+      .filter(b => b.direction);
+    expect(hooks.length).toBeGreaterThan(0);
+    expect(hooks.every(h => h.events.length === 1)).toBe(true);
+    expect(new Set(hooks.map(h => h.direction))).toEqual(new Set(['left', 'right']));
+  });
+
+  it('files a cross-barline group on the measure its first event is in', async () => {
+    const mnx = await load('beams-across-barlines');
+    const measures = mnx.parts[0].measures ?? [];
+    const withBeams = measures.filter(m => m.beams?.length);
+    expect(withBeams).toHaveLength(1);
+    // ...and it names events that live in the NEXT measure.
+    const ids = new Set(
+      (measures[0].sequences ?? []).flatMap(s => (s.content ?? []).map(e => (e as MnxEvent).id))
+    );
+    const group = withBeams[0].beams![0];
+    expect(group.events.some(id => !ids.has(id))).toBe(true);
+  });
+
+  it('leaves a grace note out of the beam it sits inside', async () => {
+    // The spec's own fixture beams ev1, ev3, ev4, ev5 and says so in a comment:
+    // the grace note interrupts nothing.
+    const mnx = await load('beams-inner-grace-notes');
+    const groups = (mnx.parts[0].measures ?? []).flatMap(m => m.beams ?? []);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].events).toHaveLength(4);
+  });
+
+  it.each([
+    'beams',
+    'beam-hooks',
+    'beams-across-barlines',
+    'beams-secondary-beam-breaks',
+    'beams-inner-grace-notes'
+  ])('preserves %s through MNX → MusicXML → MNX', async slug => {
+    const first = await load(slug);
+    expect(importMusicXML(exportMusicXML(first))).toEqual(first);
+  });
+});

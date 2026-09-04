@@ -1,21 +1,22 @@
 import {
-  MnxPart,
-  MnxPartMeasure,
-  MnxSequence,
-  MnxSequenceItem,
-  MnxEvent,
-  MnxGrace,
-  MnxTuplet,
-  MnxNote,
-  MnxPitch,
-  MnxGlobalMeasure,
-  MnxEventLyrics,
-  MnxEventLyricLine,
-  MnxTabTechnique,
+  MnxBeam,
   MnxBendPoint,
+  MnxEvent,
+  MnxEventLyricLine,
+  MnxEventLyrics,
+  MnxGlobalMeasure,
+  MnxGrace,
   MnxHarmonic,
   MnxHarmony,
   MnxHarmonyStep,
+  MnxNote,
+  MnxPart,
+  MnxPartMeasure,
+  MnxPitch,
+  MnxSequence,
+  MnxSequenceItem,
+  MnxTabTechnique,
+  MnxTuplet,
   STANDARD_GUITAR_STRINGS
 } from '../common/types.js';
 import {
@@ -291,6 +292,16 @@ export class Aligner {
     to: { event: MnxEvent; note: MnxNote };
     side?: 'up' | 'down';
   }[] = [];
+
+  /**
+   * MusicXML `<beam>` values per event, by beam number (1 = primary).
+   *
+   * Collected while parsing and turned into MNX's nested groups by `linkBeams`,
+   * for the same reason the other spanners wait: a beam group can cross a
+   * barline, and MNX puts it on the measure of its FIRST event while naming
+   * events in later ones.
+   */
+  private beamMarks = new Map<MnxEvent, Map<number, string>>();
 
   /** Open spanner starts, per part. Ties key on voice + pitch because that is
    *  what a tie joins; slurs key on MusicXML's own `number` attribute. */
@@ -621,6 +632,146 @@ export class Aligner {
       }
     }
   }
+
+  /**
+   * Records the `<beam>` flags on one note or rest.
+   *
+   * `<beam>` is a child of `<note>`, not of `<notations>`. A chord repeats it on
+   * every member, so only the principal note is offered here — the rest would
+   * fight over the same event to no effect.
+   */
+  private collectBeams(noteEl: Element, event: MnxEvent): void {
+    const beamEls = findDirectChildren(noteEl, 'beam');
+    if (!beamEls.length) return;
+    const values = new Map<number, string>();
+    for (const beamEl of beamEls) {
+      const number = Number(beamEl.getAttribute('number') ?? '1');
+      const value = (beamEl.textContent ?? '').trim();
+      if (Number.isFinite(number) && value) values.set(number, value);
+    }
+    if (values.size) this.beamMarks.set(event, values);
+  }
+
+  /**
+   * Turns MusicXML's per-note beam flags into MNX's nested beam groups.
+   *
+   * The two models are the same shape at different addresses. MusicXML numbers
+   * beams per note — `<beam number="2">begin</beam>` — and MNX nests them: the
+   * top level is the primary beam, `beams` inside it are the secondaries over
+   * sub-runs of the same events, and a nested group of ONE event with a
+   * `direction` is a hook. So beam number N maps to nesting depth N, and the
+   * whole conversion is one recursive scan.
+   *
+   * It runs over the part rather than the measure because a beam can cross a
+   * barline: the group is attached to the measure holding its FIRST event and
+   * names events in later ones, exactly as `beams-across-barlines` encodes it.
+   */
+  public linkBeams(parts: MnxPart[]): void {
+    if (!this.beamMarks.size) return;
+
+    for (const part of parts) {
+      // Events in playing order per voice, each remembering the measure it
+      // lives in — the group is filed under its first event's measure.
+      const byVoice = new Map<string, { event: MnxEvent; measureIndex: number; grace: boolean }[]>();
+      part.measures.forEach((measure, measureIndex) => {
+        for (const sequence of measure.sequences ?? []) {
+          const voice = sequence.voice ?? 'v1';
+          const list = byVoice.get(voice) ?? [];
+          for (const { event, spanDivisions } of walkSequenceEvents(sequence.content ?? [], 8)) {
+            // Grace events are the un-timed ones, which is what makes them
+            // separable here.
+            list.push({ event, measureIndex, grace: spanDivisions === 0 });
+          }
+          byVoice.set(voice, list);
+        }
+      });
+
+      for (const entries of byVoice.values()) {
+        // A grace note sits INSIDE the beam of the notes around it without
+        // joining it — the spec's own `beams-inner-grace-notes` beams ev1, ev3,
+        // ev4, ev5 and says so in a comment. So the principal beam is scanned
+        // over the timed events only, and any grace run is scanned as its own.
+        const emit = (groups: { beam: MnxBeam; measureIndex: number }[]): void => {
+          for (const group of groups) {
+            const measure = part.measures[group.measureIndex];
+            if (!measure) continue;
+            (measure.beams ??= []).push(group.beam);
+          }
+        };
+        emit(this.scanBeamLevel(entries.filter(e => !e.grace), 1));
+        emit(this.scanBeamLevel(entries.filter(e => e.grace), 1));
+      }
+    }
+  }
+
+  /**
+   * One beam level over a run of events, recursing into the next.
+   *
+   * `begin` opens, `continue` extends, `end` closes; a hook is its own
+   * one-event group. An unterminated run is still emitted — a truncated group
+   * is closer to the source than no beam at all, and dropping it would lose
+   * every note in it.
+   */
+  private scanBeamLevel(
+    entries: { event: MnxEvent; measureIndex: number }[],
+    level: number
+  ): { beam: MnxBeam; measureIndex: number }[] {
+    const groups: { beam: MnxBeam; measureIndex: number }[] = [];
+    let run: { event: MnxEvent; measureIndex: number }[] = [];
+
+    const close = (): void => {
+      if (!run.length) return;
+      const nested = this.scanBeamLevel(run, level + 1);
+      // One event with nothing under it is a FLAG, not a beam — a beam needs
+      // two notes to join. Emitting it would draw a stub the source never had.
+      if (run.length === 1 && !nested.length) {
+        run = [];
+        return;
+      }
+      const beam: MnxBeam = { events: run.map(e => this.beamEventId(e.event)) };
+      if (nested.length) beam.beams = nested.map(n => n.beam);
+      groups.push({ beam, measureIndex: run[0].measureIndex });
+      run = [];
+    };
+
+    for (const entry of entries) {
+      const value = this.beamMarks.get(entry.event)?.get(level);
+      if (value === 'forward hook' || value === 'backward hook') {
+        // A hook belongs to no run: it is a stub on one event, and it must not
+        // interrupt the run around it.
+        groups.push({
+          beam: {
+            events: [this.beamEventId(entry.event)],
+            direction: value === 'forward hook' ? 'right' : 'left'
+          },
+          measureIndex: entry.measureIndex
+        });
+        continue;
+      }
+      if (value === 'begin') {
+        close();
+        run.push(entry);
+      } else if (value === 'continue') {
+        run.push(entry);
+      } else if (value === 'end') {
+        run.push(entry);
+        close();
+      } else {
+        // No flag at this level ends any run in progress.
+        close();
+      }
+    }
+    close();
+    return groups;
+  }
+
+  /** Beam membership is stated by id, so every beamed event needs one. */
+  private beamEventId(event: MnxEvent): string {
+    if (!event.id) event.id = `e-beam-${++this.beamIdCounter}`;
+    return event.id;
+  }
+
+  private beamIdCounter = 0;
 
   /**
    * Turns the collected spanner pairs into MNX id references.
@@ -1226,6 +1377,9 @@ export class Aligner {
             ...(lyrics ? { lyrics } : {}),
             rest: {}
           };
+          // A rest carries `<beam>` too, and a beamed rest sits INSIDE a beam
+          // group — miss it and the group splits in two around it.
+          this.collectBeams(el, restEvent);
           if (!voiceEvents.has(voice)) voiceEvents.set(voice, []);
           voiceEvents.get(voice)!.push({
             onset: currentTime,
@@ -1378,6 +1532,7 @@ export class Aligner {
           if (notationsEl && owningEvent) {
             this.collectSpanners(notationsEl, el, voice, owningEvent, mnxNote);
           }
+          if (owningEvent && !isChord) this.collectBeams(el, owningEvent);
         }
       }
     }

@@ -161,6 +161,16 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-beams.md](inprogress/core-musicxml-beams.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 3, **built 2026-09-04**:
+  beams, both directions — **the oracle 11 → 16 of 27**. The models are the same
+  information at different addresses (MNX nests, MusicXML numbers), so **beam number N is
+  nesting depth N** and each direction is one recursive scan; that part was right first
+  time. Three edges were not, and all three were found by fixtures rather than review: a
+  **beamed rest** split its group (rests are built in another importer branch), a **grace
+  note** must sit inside a beam without joining it (the spec's document says so in a
+  comment), and a **one-event group is a flag, not a beam** — except a hook, which is
+  exactly that. Leaves `parts` as the campaign's first genuine *layout* disagreement.
 - **[core-musicxml-spanners.md](inprogress/core-musicxml-spanners.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 2, **built 2026-09-04**:
   ties and slurs, both directions — **the oracle 7 → 11 of 27**. They were not

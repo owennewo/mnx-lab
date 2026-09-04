@@ -126,6 +126,7 @@ export function importMusicXML(
   aligner.linkTechniqueTargets(finalParts);
   // After the technique pass, which is what mints the note ids spanners name.
   aligner.linkSpannerTargets(finalParts);
+  aligner.linkBeams(finalParts);
 
   // 5. Report source defects that were repaired (or could not be)
   for (const warning of aligner.warnings) options.onWarning?.(warning);

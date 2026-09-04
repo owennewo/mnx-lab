@@ -3,9 +3,9 @@
   "summary": {
     "comparisons": 27,
     "verdicts": {
-      "match": 11,
-      "spacing": 0,
-      "content": 16,
+      "match": 16,
+      "spacing": 1,
+      "content": 10,
       "import-failed": 0,
       "layout-failed": 0
     }
@@ -23,112 +23,23 @@
     },
     {
       "slug": "beam-hooks",
-      "verdict": "content",
-      "glyphsMissing": [
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line"
-      ],
-      "glyphsExtra": [
-        "glyph:flag16thDown",
-        "glyph:flag16thDown",
-        "glyph:flag16thDown",
-        "glyph:flag16thDown",
-        "glyph:flag16thDown",
-        "glyph:flag16thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "beams",
-      "verdict": "content",
-      "glyphsMissing": [
-        "line",
-        "line",
-        "line",
-        "line",
-        "line"
-      ],
-      "glyphsExtra": [
-        "glyph:flag16thUp",
-        "glyph:flag16thUp",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thUp",
-        "glyph:flag8thUp",
-        "glyph:flag8thUp",
-        "glyph:flag8thUp",
-        "glyph:flag8thUp",
-        "glyph:flag8thUp"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "beams-across-barlines",
-      "verdict": "content",
-      "glyphsMissing": [
-        "line"
-      ],
-      "glyphsExtra": [
-        "glyph:flag8thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "beams-inner-grace-notes",
-      "verdict": "content",
-      "glyphsMissing": [
-        "line"
-      ],
-      "glyphsExtra": [
-        "glyph:flag8thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "beams-secondary-beam-breaks",
-      "verdict": "content",
-      "glyphsMissing": [
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line"
-      ],
-      "glyphsExtra": [
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown",
-        "glyph:flag32ndDown"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "dotted-notes",
@@ -184,16 +95,7 @@
     },
     {
       "slug": "parts",
-      "verdict": "content",
-      "glyphsMissing": [
-        "line"
-      ],
-      "glyphsExtra": [
-        "glyph:flag8thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown",
-        "glyph:flag8thDown"
-      ]
+      "verdict": "spacing"
     },
     {
       "slug": "repeats",
