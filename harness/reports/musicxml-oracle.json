@@ -3,9 +3,9 @@
   "summary": {
     "comparisons": 27,
     "verdicts": {
-      "match": 21,
-      "spacing": 1,
-      "content": 5,
+      "match": 24,
+      "spacing": 0,
+      "content": 3,
       "import-failed": 0,
       "layout-failed": 0
     }
@@ -64,23 +64,11 @@
     },
     {
       "slug": "ottavas-8va",
-      "verdict": "content",
-      "glyphsMissing": [
-        "text:8va"
-      ],
-      "glyphsExtra": [
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line",
-        "line"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "parts",
-      "verdict": "spacing"
+      "verdict": "match"
     },
     {
       "slug": "repeats",
@@ -131,13 +119,7 @@
     },
     {
       "slug": "tuplets",
-      "verdict": "content",
-      "glyphsMissing": [
-        "text:6"
-      ],
-      "glyphsExtra": [
-        "text:3"
-      ]
+      "verdict": "match"
     },
     {
       "slug": "two-bar-c-major-scale",

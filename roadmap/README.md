@@ -161,6 +161,16 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-ottavas-tuplets.md](inprogress/core-musicxml-ottavas-tuplets.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 7, **built 2026-09-04**:
+  **the oracle 21 → 24 of 27 and `spacing` to zero**, leaving only the deferred barline
+  question. Ottavas flip sign (MusicXML names the *written* direction) and end at the
+  **onset** of the last shifted note, not past it. Tuplet units come from `<normal-type>`,
+  because six-in-the-time-of-four reduces to three-in-two arithmetically but prints a
+  different number. And note ids were **not document-unique** — `parts` minted 14 ids over
+  9 values, which would break every id reference — a bug the oracle surfaced *without
+  being able to see ids*, through the sharing structure of `sourceId`: had that been
+  stripped rather than normalised, `parts` would have read as a clean match.
 - **[core-musicxml-jumps.md](inprogress/core-musicxml-jumps.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 6, **built 2026-09-04**:
   segno, Fine and D.S. — **the oracle 19 → 21 of 27**. MusicXML states a jump twice, as

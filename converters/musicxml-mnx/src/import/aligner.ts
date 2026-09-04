@@ -236,7 +236,16 @@ function tupletSides(
   if ((innerTicks * mark.normalNotes) % mark.actualNotes !== 0) return null;
   const outerTicks = (innerTicks * mark.normalNotes) / mark.actualNotes;
 
-  for (const base of TUPLET_UNIT_BASES) {
+  // `<normal-type>` FIRST, then longest-first as the fallback.
+  //
+  // Several units can state the same ratio — six quarters in the time of four
+  // is also three halves in the time of two — and they are equal arithmetic but
+  // not equal notation: the first prints a 6 over the bracket, the second a 3.
+  // The source already said which one it means, so preferring the longest unit
+  // silently renumbers the tuplet. The search remains for unequal groups, where
+  // `<normal-type>` does not divide the written total and no single unit is
+  // implied by the source.
+  for (const base of [mark.normalType, ...TUPLET_UNIT_BASES]) {
     const unit = Math.round(noteValueInQuarters(base) * TUPLET_TICKS_PER_QUARTER);
     if (unit <= 0 || innerTicks % unit !== 0 || outerTicks % unit !== 0) continue;
     return {
@@ -337,6 +346,14 @@ export class Aligner {
     position: number;
     divisions: number;
     kind: 'segno' | 'fine' | 'dalsegno';
+  }[] = [];
+
+  /** `<octave-shift>` starts and stops, with their place in the part. */
+  private ottavaMarks: {
+    measureIndex: number;
+    position: number;
+    divisions: number;
+    value: number | null;
   }[] = [];
 
   private harmonyMarks: {
@@ -469,6 +486,58 @@ export class Aligner {
   }
 
   /**
+   * `<octave-shift>` → MNX's signed octave count, or null for a stop.
+   *
+   * MusicXML names the direction the WRITTEN notes move, so an 8va — which
+   * sounds an octave above what is printed — is `type="down"`. MNX states the
+   * shift in sounding terms, so the sign flips.
+   */
+  private ottavaValue(shiftEl: Element): number | null {
+    const type = shiftEl.getAttribute('type');
+    if (type === 'stop') return null;
+    const size = Number(shiftEl.getAttribute('size') ?? '8');
+    const octaves = size === 15 ? 2 : size === 22 ? 3 : 1;
+    return type === 'down' ? octaves : -octaves;
+  }
+
+  /**
+   * Pairs `<octave-shift>` starts with their stops and files them on the part.
+   *
+   * MNX states an ottava once, on the measure it STARTS in, with an `end` that
+   * names the measure it finishes in — so the end measure needs an id, and
+   * MusicXML measures have none we can reuse. One is minted, but only for a
+   * measure something actually points at: an id nothing references is noise.
+   *
+   * An unpaired start is dropped rather than run to the end of the part; a
+   * dangling spanner is worse than an absent one, as with technique targets.
+   */
+  private resolveOttavas(measures: MnxPartMeasure[], globalMeasures: MnxGlobalMeasure[]): void {
+    const fractionOf = (mark: { position: number; divisions: number }): [number, number] =>
+      reduceFraction(mark.position, mark.divisions * 4);
+
+    let open: (typeof this.ottavaMarks)[number] | null = null;
+    for (const mark of this.ottavaMarks) {
+      if (mark.value !== null) {
+        open = mark;
+        continue;
+      }
+      if (!open) continue;
+      const start = measures[open.measureIndex];
+      if (start) {
+        const endMeasure = globalMeasures[mark.measureIndex] ?? (globalMeasures[mark.measureIndex] = {});
+        endMeasure.id ??= `m${mark.measureIndex + 1}`;
+        (start.ottavas ??= []).push({
+          value: open.value as number,
+          position: { fraction: fractionOf(open) },
+          end: { measure: endMeasure.id, position: { fraction: fractionOf(mark) } }
+        });
+      }
+      open = null;
+    }
+    this.ottavaMarks = [];
+  }
+
+  /**
    * Which navigation mark, if any, a `<direction>` carries.
    *
    * Read from `<sound>` rather than from the printed `<words>`: "D.S.",
@@ -548,7 +617,7 @@ export class Aligner {
    * pointing at nothing: a dangling reference is worse than an absent one.
    */
   public linkTechniqueTargets(parts: MnxPart[]): void {
-    for (const part of parts) {
+    parts.forEach((part, partIndex) => {
       // Flatten each voice across the whole part — a hammer-on can cross a
       // barline.
       const byVoice = new Map<string, MnxNote[]>();
@@ -561,7 +630,12 @@ export class Aligner {
             eventIndex++;
             for (const [noteIndex, note] of (event.notes ?? []).entries()) {
               if (!note.id) {
-                note.id = `n-${measureIndex + 1}-${voice}-${eventIndex}-${noteIndex}`;
+                // The part has to be in the id. Without it a two-part score
+                // mints `n-1-v1-0-0` twice, and an MNX id is document-wide:
+                // colliding ids break every reference that names one (ties,
+                // slurs, technique targets) and the note↔JSON highlight with
+                // them. `parts` was 14 ids over 9 distinct values.
+                note.id = `n-${partIndex + 1}-${measureIndex + 1}-${voice}-${eventIndex}-${noteIndex}`;
               }
               list.push(note);
             }
@@ -598,7 +672,7 @@ export class Aligner {
           if (Object.keys(technique).length === 0) delete note._x!.mnxLab!.tab!.technique;
         }
       }
-    }
+    });
   }
 
   /**
@@ -1303,6 +1377,7 @@ export class Aligner {
     this.resolveEndings(globalMeasures);
     this.resolveHarmonies(globalMeasures);
     this.resolveJumps(globalMeasures);
+    this.resolveOttavas(measures, globalMeasures);
 
     const labExtension: any = {};
     if (state.tuning) {
@@ -1385,6 +1460,10 @@ export class Aligner {
     // can be stacked onto it (see the isChord branch below)
     const lastNoteEventByVoice = new Map<string, MnxEvent>();
 
+    // The onset of the most recently STARTED event. An `<octave-shift>` stop
+    // sits after the last note it covers, while MNX names that note's onset.
+    let lastEventOnset = 0;
+
     // We iterate through XML child nodes to preserve exact document order
     for (let i = 0; i < measureEl.childNodes.length; i++) {
       const node = measureEl.childNodes[i];
@@ -1392,6 +1471,24 @@ export class Aligner {
       const el = node as Element;
 
       if (el.tagName === 'direction') {
+        const shiftEl = findDirectChild(
+          findDirectChild(el, 'direction-type') ?? el,
+          'octave-shift'
+        );
+        if (shiftEl) {
+          const value = this.ottavaValue(shiftEl);
+          // A start sits BEFORE the first note it covers, so the cursor is
+          // already that note's onset. A stop sits AFTER the last one, and MNX
+          // names that note's onset — not the point past it.
+          const position =
+            (value === null ? lastEventOnset : currentTime) + (getChildInt(el, 'offset') || 0);
+          this.ottavaMarks.push({
+            measureIndex: measureIdx,
+            position,
+            divisions: state.divisions,
+            value
+          });
+        }
         const kind = this.classifyJumpDirection(el);
         if (kind) {
           this.jumpMarks.push({
@@ -1458,6 +1555,7 @@ export class Aligner {
           // A rest carries `<beam>` too, and a beamed rest sits INSIDE a beam
           // group — miss it and the group splits in two around it.
           this.collectBeams(el, restEvent);
+          lastEventOnset = currentTime;
           if (!voiceEvents.has(voice)) voiceEvents.set(voice, []);
           voiceEvents.get(voice)!.push({
             onset: currentTime,
@@ -1608,6 +1706,7 @@ export class Aligner {
             });
             lastNoteEventByVoice.set(voice, noteEvent);
             owningEvent = noteEvent;
+            lastEventOnset = currentTime;
             currentTime += rawDur;
           }
 

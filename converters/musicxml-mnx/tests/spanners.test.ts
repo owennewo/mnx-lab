@@ -276,3 +276,63 @@ describe('jumps', () => {
     }
   );
 });
+
+describe('ottavas', () => {
+  it('flips the sign, because MusicXML names the written direction', async () => {
+    // An 8va sounds an octave ABOVE what is printed, so MusicXML calls it
+    // type="down" (the written notes move down) and MNX calls it value: 1.
+    const mnx = await load('ottavas-8va');
+    const ottavas = (mnx.parts[0].measures ?? []).flatMap(m => m.ottavas ?? []);
+    expect(ottavas).toHaveLength(1);
+    expect(ottavas[0].value).toBe(1);
+  });
+
+  it('ends at the onset of the last shifted note, not past it', async () => {
+    // MusicXML's stop direction sits AFTER the last note it covers; MNX names
+    // that note's onset. Measuring from the cursor would land a quarter late.
+    const mnx = await load('ottavas-8va');
+    const ottava = (mnx.parts[0].measures ?? []).flatMap(m => m.ottavas ?? [])[0];
+    expect(ottava.position.fraction).toEqual([1, 2]);
+    expect(ottava.end.position.fraction).toEqual([1, 2]);
+    // The end names a measure, so that measure had to be given an id.
+    expect(mnx.global.measures.some(m => m.id === ottava.end.measure)).toBe(true);
+  });
+
+  it('preserves ottavas-8va through MNX → MusicXML → MNX', async () => {
+    const first = await load('ottavas-8va');
+    expect(importMusicXML(exportMusicXML(first))).toEqual(first);
+  });
+});
+
+describe('tuplet units', () => {
+  it('keeps the ratio the source printed rather than the shortest equal one', async () => {
+    // Six quarters in the time of four is arithmetically three halves in the
+    // time of two, but it prints a 6, not a 3. <normal-type> says which.
+    const mnx = await load('tuplets');
+    const tuplets = (mnx.parts[0].measures ?? [])
+      .flatMap(m => m.sequences ?? [])
+      .flatMap(s => (s.content ?? []) as { type?: string; inner?: { multiple: number }; outer?: { multiple: number } }[])
+      .filter(item => item.type === 'tuplet');
+    expect(tuplets.some(t => t.inner?.multiple === 6 && t.outer?.multiple === 4)).toBe(true);
+  });
+});
+
+describe('note ids', () => {
+  it('are unique across the whole document, not just within a part', async () => {
+    // An MNX id is document-wide: two parts minting `n-1-v1-0-0` would break
+    // every reference that names one, and the note↔JSON highlight with them.
+    const mnx = await load('parts');
+    const ids: string[] = [];
+    for (const part of mnx.parts) {
+      for (const measure of part.measures ?? []) {
+        for (const sequence of measure.sequences ?? []) {
+          for (const event of (sequence.content ?? []) as MnxEvent[]) {
+            for (const note of event.notes ?? []) if (note.id) ids.push(note.id);
+          }
+        }
+      }
+    }
+    expect(ids.length).toBeGreaterThan(1);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+});

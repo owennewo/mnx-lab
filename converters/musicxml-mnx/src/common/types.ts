@@ -250,9 +250,19 @@ export interface MnxBeam {
   direction?: 'left' | 'right';
 }
 
+/** An octave-transposition bracket, stated on the measure it starts in and
+ *  ending at a named measure. `value` is in SOUNDING octaves: 1 is 8va. */
+export interface MnxOttava {
+  value: number;
+  position: MnxRhythmicPosition;
+  end: { measure: string; position: MnxRhythmicPosition };
+}
+
 export interface MnxPartMeasure {
   /** Beam groups starting in this measure. */
   beams?: MnxBeam[];
+  /** Octave brackets starting in this measure. */
+  ottavas?: MnxOttava[];
   /** Free-text/symbolic instructions for this part. **Proposed**, not adopted. */
   directions?: MnxDirection[];
   clefs?: {
@@ -320,6 +330,8 @@ export interface MnxRhythmicPosition {
 }
 
 export interface MnxGlobalMeasure {
+  /** Minted only when something references this measure (an ottava end). */
+  id?: string;
   /** The sign a D.S. returns to. */
   segno?: { location: MnxRhythmicPosition };
   /** Where an al-Fine jump stops. */

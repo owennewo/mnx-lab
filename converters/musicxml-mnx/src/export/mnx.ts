@@ -126,6 +126,44 @@ export function exportMusicXML(
     }
   }
 
+  // `<octave-shift>` directions per measure index.
+  //
+  // MNX states an ottava once, on the measure it starts in, naming the measure
+  // it ends in; MusicXML states both ends as directions in their own measures.
+  // Both are written at the head of their measure with an `<offset>`, which is
+  // what makes them read back at the right place: the importer measures a start
+  // from the cursor (0 at the head) and a stop from the last event's onset
+  // (also 0 before any note), so offset alone carries the position either way.
+  const measureIndexById = new Map<string, number>();
+  (mnxJson.global?.measures ?? []).forEach((measure, index) => {
+    if (measure.id) measureIndexById.set(measure.id, index);
+  });
+  const octaveShifts = new Map<number, { type: string; size: number; offset: number }[]>();
+  const addShift = (index: number, shift: { type: string; size: number; offset: number }): void => {
+    const list = octaveShifts.get(index) ?? [];
+    list.push(shift);
+    octaveShifts.set(index, list);
+  };
+  const offsetOf = (fraction: [number, number]): number =>
+    Math.round((fraction[0] / fraction[1]) * divisions * 4);
+  for (const part of mnxJson.parts ?? []) {
+    (part.measures ?? []).forEach((measure, index) => {
+      for (const ottava of measure.ottavas ?? []) {
+        const size = Math.abs(ottava.value) === 3 ? 22 : Math.abs(ottava.value) === 2 ? 15 : 8;
+        // MusicXML names the direction the WRITTEN notes move, so the sign flips.
+        addShift(index, {
+          type: ottava.value > 0 ? 'down' : 'up',
+          size,
+          offset: offsetOf(ottava.position.fraction)
+        });
+        const endIndex = measureIndexById.get(ottava.end.measure);
+        if (endIndex !== undefined) {
+          addShift(endIndex, { type: 'stop', size, offset: offsetOf(ottava.end.position.fraction) });
+        }
+      }
+    });
+  }
+
   // MusicXML `<beam>` flags per event id, flattened from MNX's nested groups.
   //
   // The inverse of the importer's scan: MNX nests, MusicXML numbers. A group at
@@ -513,6 +551,22 @@ export function exportMusicXML(
         const soundEl = doc.createElement('sound');
         for (const [name, value] of Object.entries(jump.sound)) soundEl.setAttribute(name, value);
         directionEl.appendChild(soundEl);
+        measureEl.appendChild(directionEl);
+      }
+
+      for (const shift of octaveShifts.get(m) ?? []) {
+        const directionEl = doc.createElement('direction');
+        const typeEl = doc.createElement('direction-type');
+        const shiftEl = doc.createElement('octave-shift');
+        shiftEl.setAttribute('type', shift.type);
+        shiftEl.setAttribute('size', `${shift.size}`);
+        typeEl.appendChild(shiftEl);
+        directionEl.appendChild(typeEl);
+        if (shift.offset !== 0) {
+          const offsetEl = doc.createElement('offset');
+          offsetEl.textContent = `${shift.offset}`;
+          directionEl.appendChild(offsetEl);
+        }
         measureEl.appendChild(directionEl);
       }
 
