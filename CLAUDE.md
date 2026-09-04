@@ -55,6 +55,7 @@ stay where they are and change nothing.
 ```bash
 git -C ~/dev/mnx-lab worktree add ~/dev/mnx-labs-worktrees/<task> -b <task> main
 cd ~/dev/mnx-labs-worktrees/<task> && npm ci     # worktrees do NOT share node_modules
+ln -s CLAUDE.md AGENTS.md                        # Codex + agy read AGENTS.md; gitignored
 ```
 
 `<task>` is the roadmap doc's slug where the work has one (`core-vertical-density`),
@@ -122,38 +123,25 @@ a habit. An item is not complete while its worktree is still on disk.
 ## Repository shape
 
 ```
-spec/                the standard + our proposals against it
-  mnx-schema.json         verbatim copy of the pinned upstream release — never edited
-  mnx-schema.proposed.json generated from a proposal worktree — transient, dev-time only
-  mnx-lab-extensions.schema.json  the _x.mnxLab vendor schema (v6)
-  guitar-tab-extension.schema.json (v2 legacy, kept as the record of that shape — no
-  test loads it; the upgrade tests use inline objects), spec-prose.json, HISTORY.md
-  proposals/<topic>/      evidence bundles: README always; schema.diff, scenarios.md and
-                          engravings/ as the proposal matures (score-text has all four)
-  tools/                  sync-spec-examples, specSource, push-proposal, compile-validator
+spec/                the standard + our proposals against it. mnx-schema.json is a
+                     verbatim copy of the pinned upstream release — never edited;
+                     mnx-schema.proposed.json is transient, dev-time only;
+                     mnx-lab-extensions.schema.json is the _x.mnxLab vendor schema (v6);
+                     guitar-tab-extension.schema.json is v2 legacy, kept as the record of
+                     that shape — no test loads it. proposals/<topic>/ are evidence
+                     bundles (README always; schema.diff, scenarios.md and engravings/ as
+                     the proposal matures); tools/ syncs down and pushes up
 scenarios/           ONE corpus format, two axes (below); manifest.json, meta.schema.json
-harness/             every way the evidence is exercised
-  conformance/            scenarios/primitives/tab-validation/upgrade/edit-ops tests
-  verify/                 check-scenarios, verify-scenarios (the ONLY status writers),
-                          lib-smoke
-  render/                 render-png.ts (engravings for proposals; needs google-chrome)
-  helpers/                corpusPrimitives (SMuFL from disk + fixed viewport), svgString
+harness/             every way the evidence is exercised — conformance/, verify/
+                     (check-scenarios + verify-scenarios are the ONLY status writers),
+                     render/ (PNG engravings for proposals; needs google-chrome),
+                     helpers/ (corpusPrimitives, corpusSvg, svgString)
 src/                 the apparatus — capability layers (order below)
   model/  engine/  audio/  edit/  corpus/  storage/  assist/  elements/  workbench/  entries/
-  assist/editLoop.ts      the self-correcting loop — transport-injected, so the SAME
-                          function runs in the browser (user's key) and the Worker
-                          (demo key); factored for future evals
-  assist/openrouter.ts    the OpenRouter client: PKCE, key lookup, one SSE parser with
-                          two faces (text chat, and the loop's tool-calling transport)
-  assist/prompts/editNotation.ts  the LLM-facing system prompt (§-numbered, addressable)
-  assist/stream.ts        the designated single entry for an edit; picks browser-direct
-                          vs Worker. Today only the harness calls it — the prompt surface
-                          that will (core-editor-ai-prompt.md) is not built yet
-worker/              Hono; a DEMO for visitors with no key of their own, plus reserved seams
-  api/                    editNotation, models + reserved 501 seams documents, auth
-  models.json             GENERATED from models.query.json — never hand-edited
-  generated/              validators precompiled from spec/ (committed; schema DATA,
-                          importable from any layer)
+worker/              Hono; a DEMO for visitors with no key of their own, plus reserved
+                     501 seams. models.json is GENERATED from models.query.json — never
+                     hand-edited; generated/ is schema DATA precompiled from spec/,
+                     importable from any layer
 converters/          npm-workspace sub-packages + fixtures/ (the three scores)
 apps/studio/         README only — the future consumer product's reserved seam
 apps/viewer-embedded/ the third app: a mock host page for the embed face
@@ -210,219 +198,75 @@ goldens and `notes.md`) with **two orthogonal axes** in meta:
 
 **Verification is a human assertion with provenance.** `status: verified` and the
 `verification: {at, primitivesHash, renderHash, bothHash}` record are written **only** by
-`harness/verify/verify-scenarios.mjs`; the record is *kept through demotion*, so the
-attention queue distinguishes **stale** (approved once, output changed) from **never
-seen** (no record). `npm run update:primitives` keeps statuses honest: a successful
-snapshot write promotes `valid`→`rendered`, a changed snapshot demotes
-`verified`→`rendered`, a layout crash demotes to `valid` (removing the snapshots). A
-golden appearing for the **first** time is never a change — that is how a new golden is
-introduced without mass-demoting the corpus. `renderHash` and `bothHash` are **optional**
-in a record for the same reason: approvals predating a golden were real assertions made
-on the evidence that existed, so their absence is not staleness; `--backfill-render`
-stamps the former (what that asserts is spelled out at the flag), and `bothHash` has
-**no backfill** — the combined system earns its hash only through a real approval.
-`renderHash`'s file set is **frozen** at the two standalone SVGs; `expected.both.svg`
-hashes separately, or adding it would have moved every committed digest at once. The
-approval flow is the conversational **`/verify` skill** (`.claude/skills/verify/`) —
-queue → one stable review page → verdicts in sentences; there is no human-facing CLI and
-no checkbox page. The initial 57/57 sweep is recorded in
-[roadmap/complete/lab-spec-approval.md](roadmap/complete/lab-spec-approval.md), still the recipe
-for verifying renderer features. **Verification debt is decoupled from the work that
-caused it**: an item may reach `complete/` owing approvals, provided the batch is
-registered in the standing ledger
-[roadmap/inprogress/lab-verify.md](roadmap/inprogress/lab-verify.md) with its cause and what
-a reviewer should look for. The ledger is not a copy of the queue — the queue is derived
-and always current (`npm run verify:scenarios -- --list`); the ledger holds the *why*,
-which provenance cannot record.
+`harness/verify/verify-scenarios.mjs` — never by hand, in a rebase conflict or anywhere
+else; hand-editing one forges a human assertion. The approval flow is the conversational
+**`/verify` skill** (`.claude/skills/verify/`) — queue → one stable review page →
+verdicts in sentences; there is no human-facing CLI and no checkbox page.
+**Verification debt is decoupled from the work that caused it**: an item may reach
+`complete/` owing approvals, provided the batch is registered in the standing ledger
+[roadmap/inprogress/lab-verify.md](roadmap/inprogress/lab-verify.md) with its cause and
+what a reviewer should look for.
 
 **The goldens are the crown jewels.** Any move or refactor of `model/`/`engine/` must
 reproduce them byte-identically (`npm run update:primitives` then a clean
 `git diff -- scenarios/`); a mismatch stops the line — diff against `pre-rebuild`, never
-"close enough".
+"close enough". `npm run update:primitives` keeps statuses honest, promoting and
+demoting as the snapshots move.
 
-The goldens per scenario cover different code.
-`expected.primitives.json` pins layout, and stops at staff-space coordinates and SMuFL
-glyph *names*. `expected.svg` puts those primitives through the real emitter
-(`harness/helpers/corpusSvg.ts` → `src/engine/render/svg.ts`), pinning what
-`expected.primitives.json` structurally cannot see: the glyph name→codepoint lookup, the
-five emit branches, sp→px, the viewBox. Map `gClef` to the wrong codepoint and the
-primitives hash does not move. `expected.both.svg` (tab-opting scenarios) pins the
-combined notation+tab system — vertical composition, spanning barlines, interleaved
-wrap — which the standalone projections structurally cannot see; it is deliberately
-**not** a third `RenderedSystem` in the primitives file, so introducing it rewrote no
-committed golden. It is **text, not pixels, on purpose** — a PNG hash would
-absorb the local Chrome build, font hinting and antialiasing, so a browser upgrade would
-demote every approval at once and the queue would stop meaning "the renderer changed".
-`GOLDEN_PX_PER_SP` is a **power of two** so sp→px adds no float noise. PNGs stay what
-they always were: proposal engravings and a review aid (`harness/render/render-png.ts`),
-never a golden and never hashed.
+How the status transitions work, what each golden pins that the others structurally
+cannot see, and why `expected.both.svg` is text rather than pixels:
+[docs/corpus.md](docs/corpus.md). The initial 57/57 sweep in
+[roadmap/complete/lab-spec-approval.md](roadmap/complete/lab-spec-approval.md) is still
+the recipe for verifying renderer features.
 
 ## The workbench (`src/workbench/`) — review-first, no backend
 
-Home is the **attention queue** (blocked → stale → never-seen; current counted, not
-shown), derived from committed provenance in `src/workbench/queue.ts`. Every scenario + view
-has a stable deep link: `#/scenario/<id>?view=notation|tab|both` (unspecified ⇒ the
-document's `tab.staffKind` hint); legacy `?view=compare|json` links are honored and
-open the matching tab of the scenario page's **side panel** (description | ops | hud |
-assist | compare | json — roadmap/complete/core-score-hud.md created it;
-roadmap/complete/workbench-score-panel.md cut it down and gave every tab
-the same five-band frame: tab strip, context bar, ONE scrolling body, footer), which holds
-all page chrome including the selection HUD and the per-part instrument override
-(the HUD's ensemble table → `<mnx-document-viewer>.partTabSetups`; the flat
-`stringsOverride`/`capoOverride` pair remains for single-instrument embeds —
-presentation only). Tab/both exist only when the strings are KNOWN — declared in
-the document, or supplied through that override. No instrument is ever assumed.
-The setup popovers are a **page-level overlay over the score**, not a tab: opening one
-with the keyboard must not move the panel out from under what you were reading.
-**Document focus** is transient workbench composition: `Ctrl+Alt+F` removes the app and
-scenario-page chrome without changing remembered rail/panel preferences, while `F11`
-remains browser-owned (the palette's separate browser-fullscreen action uses the Fullscreen
-API when available). The zoom pad remains over the document surface and carries a permanent
-focus/exit toggle, so the mode never hides both its control and its escape route. It is never
-a property of `<mnx-document-viewer>`.
-**Theming is `light-dark()`, never an attribute** — the shell resolves `auto|light|dark`
-(remembered per browser, palette-switchable) onto `color-scheme`, and every token
-follows because `color-scheme` is inherited and crosses shadow roots. An
-attribute-selected theme block only reaches the host that carries it, so it would leave
-every component that declares `designTokens` pinned to one theme —
-roadmap/complete/core-modernist-dark.md.
-
-**`#/objects`** is the coverage map — every non-plumbing `$def` against the scenarios
-exercising it (`src/corpus/defIndex.ts`, inverting the spec's own `coversDefs` join),
-tiered **never exercised → one example → covered**. Counts read *verified / total*, so an
-object covered only by unapproved scenarios reads as exercised-but-not-evidence; the
-header's coverage fraction links here, because a fraction is a scoreboard and the tiers
-are a work queue. **`#/objects/<def>`** is both the per-object page and the rail filter:
-it writes `def:<name>` into the rail's search box, so filtering is deep-linkable, visible
-and clearable by the one control that already exists — there is no second filter mode.
-A scenario page tags its `featureDefs` (plumbing stripped: median 5, vs 25 raw), capped
-at nine with a `+N more`.
-
-The rail groups by **topic**, not by authoring category — `src/corpus/groups.ts`, an
-ordered name→regex table matched on the scenario id, **first match wins**. The spec has
-no taxonomy to inherit (its own index is a flat alphabetical list of 52 "example
-documents"), and most of our authoring categories held a single scenario, so both halves read badly;
-topic groups interleave them instead. The grouping is OURS and display-only — never in
-`scenarios/spec/` or a meta.json. Order is load-bearing, so
-`harness/conformance/groups.test.ts` asserts nothing is ungrouped **and no group is
-empty** — an empty group is the signature of a broad rule above stealing a narrow rule's
-scenarios. A rail row carries two orthogonal signals: the **dot** is queue state via the
-shared `classify()` (shape as well as colour, so *stale* stops looking like *never
-seen*), and the **tags** are provenance — `spec` for mirrored (hand-edits forbidden),
-`proposed` for schema probes. The
-**compare** view shows our render beside the spec's reference engraving at
-`/spec-media/<slug>.png` — read-only from the pinned `vendor/mnx` by Vite middleware in
-dev, and copied into `dist/client/spec-media/` by the same plugin at build time. Built
-without the submodule, the pane degrades to a note. The images are the CG's, shown with
-attribution and never committed here. The scenario page distinguishes **loading** from
-**failed** (the score is a lazy chunk — a dead dev server must not read as a render bug).
+Home is the **attention queue**; every scenario + view has a stable deep link
+(`#/scenario/<id>?view=notation|tab|both`); `#/objects` is the coverage map. Tab views
+exist only when the strings are KNOWN — **no instrument is ever assumed**. Theming is
+`light-dark()`, never an attribute.
 
 **The workbench has no backend — by rule.** It must stay fully functional from static
 build output alone: the corpus is committed JSON, the only browser persistence is
-localStorage UI preferences (document storage is a reserved seam —
-`storage/cloudRepository.ts`), and every
-verification write happens through harness scripts editing repo files — git is the
-database and the audit trail. **Live AI edits are no longer the exception they used to
-be** (core-assist-byok.md): with the user's own OpenRouter key, held in this origin's
-localStorage and obtained by PKCE or paste, `src/assist/editLoop.ts` runs the whole
-self-correcting loop *in the browser* and nothing about the edit reaches a server we run.
-The Worker is *not* the backend and now says so — it is the demo for a visitor who has
-connected no key, spending the deployment's, and every done frame it produces is stamped
-`demoMode` (or `mockMode` with no key at all). `workbench/` may reach it only through
-`assist/`. If browser-driven corpus authoring is ever wanted,
-the pattern is a dev-only Vite middleware writing repo files — never a deployed API.
-The real API layer (documents, auth, sync) belongs to **studio**
-([apps/studio/README.md](apps/studio/README.md)) on the reserved seams
-(`worker/api/documents|auth` 501 stubs, `storage/cloudRepository.ts`).
+localStorage UI preferences, and every verification write happens through harness
+scripts editing repo files — git is the database and the audit trail. If browser-driven
+corpus authoring is ever wanted, the pattern is a dev-only Vite middleware writing repo
+files — never a deployed API. The real API layer (documents, auth, sync) belongs to
+**studio** ([apps/studio/README.md](apps/studio/README.md)) on the reserved seams.
+
+The queue, the panel's five-band frame, `#/objects`, the topic grouping, document focus,
+the compare pane and the theming rationale: [docs/workbench.md](docs/workbench.md).
 
 ## AI editing flow — one loop, two paths
 
 `src/assist/stream.ts` is the **designated single entry point** and it picks the path:
-hand it the user's key and the loop runs browser-direct against OpenRouter; hand it none
-and it POSTs to `/api/edit-notation`, the Worker's demo. Today only
-`harness/conformance/edit-loop.test.ts` calls it — the workbench UI that will
-(the AI prompt surface, roadmap/proposed/low-priority/core-editor-ai-prompt.md) is not
-built yet; the assist drawer's text chat goes through `openrouter.ts`'s `streamChat`
-instead. Both of stream.ts's paths yield the same
-`src/assist/protocol.ts` frames from the same iterator — on the wire as NDJSON for the
-demo, in-process for BYOK — so a caller tells them apart only by the `demoMode`/`mockMode`
-stamp on the done frame. **An unstamped done frame means the user's own key paid for it.**
+the user's key runs `src/assist/editLoop.ts` browser-direct against OpenRouter; no key
+POSTs to the Worker's demo. Both paths yield the same `src/assist/protocol.ts` frames,
+so a caller tells them apart only by the `demoMode`/`mockMode` stamp on the done frame.
+**An unstamped done frame means the user's own key paid for it.**
 
-`src/assist/editLoop.ts` runs the loop: forced `update_document` tool call, streamed
-accumulation, then **two verdicts** — the official schema and every `_x.mnxLab` dict
-against the extension schema. On failure the failed tool call + a synthetic
-`role: 'tool'` error re-enter the conversation, up to 3 attempts.
-`formatValidationErrors` deliberately filters `anyOf`/`oneOf`/`allOf` noise down to the
-`event` branch — don't "fix" it, that makes errors unusable.
+Three rules that outlive the details: **never restore a hardcoded `fetch` to the loop**
+(the injected `ChatTransport` is what makes it testable); **the loop uses the published
+schema only** — never teach the LLM proposed-schema fields; and **`worker/models.json`
+is generated** — hand-editing the roster is a red test (`npm run update:roster`).
+`workbench/` may reach the Worker only through `assist/`.
 
-The loop knows nothing about OpenRouter. It declares a **`ChatTransport`** and is handed
-one, which is why `harness/conformance/edit-loop.test.ts` can drive the whole
-self-correction with a scripted generator and no network. The
-`required`→`auto` `tool_choice` fallback lives in `openRouterEditTransport`, not the
-loop: it is a provider quirk, not part of self-correcting. **Never restore a hardcoded
-`fetch` to the loop** — that is what made it Worker-only and untestable.
-
-Validators load **lazily** (`loadEditValidators`), so the browser bundle does not carry
-196 kB of Ajv until an edit actually happens. **Workers can't run `ajv.compile()`**, so
-they are precompiled by `spec/tools/compile-validator.mjs` into `worker/generated/`
-(committed; rebuilt by `npm run build`). **The loop uses the published schema only** —
-never teach the LLM proposed-schema fields. When touching
-`src/assist/prompts/editNotation.ts` or the tool schema, mirror structural rules (plural
-`notes` array, etc.) — they are the primary defense against schema drift. With no
-`OPENROUTER_API_KEY` (from `.dev.vars` locally, a Worker secret in prod) the demo route
-falls back to the shared mock (`src/assist/mock.ts`) so the UI stays demoable.
-
-**The key is a credential, so the deploy carries a CSP** (`public/_headers`, copied into
-`dist/client/` by Vite). `script-src 'self'` is the directive that matters and the
-codebase earns it — no `eval`, no CDN, no HTML sink. `npm run smoke:csp` boots the built
-workbench under the deployed policy in headless Chrome and fails on any violation; the
-`'unsafe-inline'` in `style-src` is a bounded, documented exception (CSS cannot read
-localStorage). Add a CDN or an inline script and that smoke test is what tells you.
-
-**Which model** is a query, not a list. `src/assist/modelSelect.ts` is the pure scorer
-(hard filters, then a weighted sum over per-dimension *headroom over the requirement*);
-`src/assist/roster.ts` runs the stored queries in `worker/models.query.json` to
-**generate** `worker/models.json`, so hand-editing the roster is a red test — regenerate
-with `npm run update:roster`. Only `npm run refresh:catalog` touches the network. The
-roster governs the **server-key demo mode only**: with BYOK the user's key buys whatever
-`<mnx-model-picker>` was pointed at, and the picker's runners-up ride along as
-OpenRouter's ordered `models: []` fallback chain. Quality is still a declared prior table
-in `modelCatalog.ts` — roadmap/proposed/low-priority/core-assist-evals.md owns replacing it with
-measured evidence.
+The self-correction loop, the validator/CSP/model-selection machinery and the
+`anyOf` error filtering: [docs/assist-loop.md](docs/assist-loop.md).
 
 ## Rendering (custom SMuFL/SVG engine)
 
 Pipeline: layout → primitives → SVG. `src/engine/layout/{notation,tab}.ts` are pure
 functions emitting staff-space primitives; `src/engine/render/svg.ts` is the dumb
-emitter. **All horizontal spacing** lives in `src/engine/layout/spacing.ts` (springs-
-and-rods; tune the named knobs, never per-renderer grid math) — both layouts consume one
-plan so notation and tab stay column-aligned. The `both` view is **one native system**:
-`layoutNotation({includeTabStaves: true})` (seam: `src/engine/layout/bothSystem.ts`)
-draws each tab-bearing part's tab staff inside the same system walk — shared barlines,
-interleaved multi-system wrap, columns aligned by shared plan slots. Tab-staff emission
-(lines/clef/timesig/frets) lives ONCE in `src/engine/layout/tabStaff.ts`, used by both
-the standalone tab layout and the native staff — extend it there, never fork it. See
-[roadmap/complete/core-both-view-single-system.md](roadmap/complete/core-both-view-single-system.md). Tuplets and grace notes draw on tab
-too: containers are walked from `spacing.ts`'s own column widths so both staves stay in
-column, grace digits are small (0.6), and a tuplet bracket is drawn **once per system** —
-the standalone tab view draws its own, the `both` view lets the notation staff carry it
-(`showTupletBrackets`). Fret/string assignment uses
-the derivation ladder in `src/engine/tab/guitarPositions.ts` (MNX pitch is
-sounding): an annotated `_x.mnxLab.string` derives its fret against the declared
-`strings[]` + capo (a stored `fret` is validation-only — a mismatch renders the
-derived fret plus a red badge), bare notes get the lowest-playable-fret
-assignment, and unplayable notes draw nothing plus a red `scope: 'tab'` badge —
-never a silent clamp. **No instrument is assumed**: absent `strings[]` means no
-fingerboard (the shim materializes standard into older tab documents); a viewer
-override (`TabSetup`) may supply strings/capo as presentation. Layouts render **forgivingly**:
-unsupported content degrades to a placeholder and per-measure "!" badges
-(`src/engine/layout/diagnostics.ts`) — red = user-fixable error, blue = warning, amber =
-renderer gap. `ValidationIssue.scope: 'tab'` marks fingerboard-only constraints (the
-notation renderer drops them; severity matters — a warning must not read as "you made a
-mistake", and the schema validators must never see these). Everything renders into
-shadow DOM. Do **not** reintroduce VexFlow or any notation library. The note↔JSON
-cross-highlight depends on `model/noteKeys.ts` and `model/jsonView.ts` mirroring the
-same traversal — keep them in lockstep.
+emitter. **All horizontal spacing** lives in `src/engine/layout/spacing.ts` — tune the
+named knobs, never per-renderer grid math. Tab-staff emission lives ONCE in
+`src/engine/layout/tabStaff.ts` — extend it there, never fork it. Layouts render
+**forgivingly**: unsupported content degrades to a placeholder plus a per-measure badge,
+never a silent clamp. Everything renders into shadow DOM. Do **not** reintroduce VexFlow
+or any notation library.
+
+The `both` single-system walk, the fret/string derivation ladder, diagnostic severities
+and the note↔JSON cross-highlight: [docs/rendering.md](docs/rendering.md).
 
 ## MNX types and `_x.mnxLab` (v6)
 
@@ -448,21 +292,18 @@ Saved documents upgrade v1→v2→v3→v4→v5→v6 on load via `src/model/upgra
 ## The spec loop: sync down, push up
 
 `vendor/mnx` is the spec repo as a submodule, **pin only**, and it is never checked out
-to a proposal branch. A build **may read it but must never require it**: the only build
-that touches it is the `spec-media` copy above, which skips with a warning when the
-submodule is absent, so `npm run build` still succeeds in a fresh clone (the compare pane
-degrades). Nothing else in a build or deploy reads it. Upstream is a
-*generated* site (Django fixture `doctools/data.json`); a spec change edits the fixture,
-never `mnx-schema.json` by hand. Everything — reading it, moving the pin, the worktree
-recipe, the doctools/`uv` setup — is in
+to a proposal branch. A build **may read it but must never require it** — only the
+`spec-media` copy touches it, and that skips with a warning when the submodule is
+absent. Upstream is a *generated* site (Django fixture `doctools/data.json`); a spec
+change edits the fixture, never `mnx-schema.json` by hand. Everything — reading it,
+moving the pin, the worktree recipe, the doctools/`uv` setup — is in
 [docs/mnx-spec-submodule.md](docs/mnx-spec-submodule.md).
 
 - **`npm run sync:spec` (down)**: pinned fixture → `scenarios/spec/` mirrored scenarios
   (+ prose-drift tripwire in `spec/spec-prose.json`).
 - **`node spec/tools/push-proposal.mjs <topic>` (up)**: injects a topic's scenarios,
   our engravings and `coversDefs` joins into the proposal branch's fixture, byte-stable.
-  Proposal branches live in **git worktrees** (`~/dev/mnx-proposals/<branch>`), where
-  `makesite` verifies the result and `mnx-schema.proposed.json` is generated from.
+  Proposal branches live in **git worktrees** (`~/dev/mnx-proposals/<branch>`).
 - **On adoption**: move the pin, re-vendor, `sync:spec` mirrors the examples back down,
   the local scenarios retire, and `mnx-schema.proposed.json` + every
   `"schema": "proposed"` declaration are deleted.
@@ -470,22 +311,22 @@ recipe, the doctools/`uv` setup — is in
 
 ## Converters
 
-`converters/*` are npm workspaces, Node-only, never in the app build. Shared fixtures in
+`converters/*` are npm workspaces, Node-only, never in the app build. alphaTab is
+confined to `converters/guitarpro-mnx` and must never reach `src/`. Shared fixtures in
 `converters/fixtures/` — **authored as Guitar Pro** (`.gpx` sources; `.mnx.json` derived
-via `guitarpro-mnx --import`, `.xml` derived via `musicxml-mnx --export`). The one
-exception is `Triplets-and-graces.gp`, hand-authored as GPIF (Guitar Pro 7/8's own native
-XML) by `converters/fixtures/tools/` because none of the three app-authored scores
-contains a tuplet or a grace note — the reason neither converter carried either until
-roadmap/complete/core-tuplets-grace-notes.md. Both round trips are lossless and tested
-(notes, technique, lyrics, repeats, voltas, tuning, capo, key, tuplets, grace notes; note
-ids are legitimately rewritten by the MusicXML split — compare technique targets by
-resolution, not string equality). Tuplets and grace notes are **containers in MNX and
-per-beat/per-note flags in both file formats**, so each direction collapses or expands a
-run — the same asymmetry as voltas, solved the same way. **Guitar Pro string numbering is inverted**
-relative to `_x.mnxLab` — go through `converters/guitarpro-mnx/src/common/tuning.ts`,
-never open-code it. MusicXML allows `<lyric>` on rests — never assume pitched notes.
-CLI: `npx musicxml-mnx|guitarpro-mnx --import|--export <file> [--output out]` (derived
-output names refuse to overwrite).
+via `guitarpro-mnx --import`, `.xml` derived via `musicxml-mnx --export`); the one
+exception is `Triplets-and-graces.gp`, hand-authored as GPIF because none of the three
+app-authored scores contains a tuplet or a grace note. Both round trips are lossless and
+tested (roadmap/complete/core-tuplets-grace-notes.md) — note ids are legitimately
+rewritten by the MusicXML split, so compare technique
+targets by resolution, not string equality. Tuplets and grace notes are **containers in
+MNX and per-beat/per-note flags in both file formats**, so each direction collapses or
+expands a run — the same asymmetry as voltas, solved the same way. **Guitar Pro string
+numbering is inverted** relative to `_x.mnxLab` — go through
+`converters/guitarpro-mnx/src/common/tuning.ts`, never open-code it. MusicXML allows
+`<lyric>` on rests — never assume pitched notes. CLI:
+`npx musicxml-mnx|guitarpro-mnx --import|--export <file> [--output out]` (derived output
+names refuse to overwrite).
 
 ## Conventions
 
