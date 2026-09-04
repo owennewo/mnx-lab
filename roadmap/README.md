@@ -161,6 +161,17 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-musicxml-staves.md](inprogress/core-musicxml-staves.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 12, **built 2026-09-04**:
+  multi-staff parts — `<staves>`, a `<clef number>` per staff tracked independently, and
+  `<staff>` per note, both directions. Grand staff round trips. **The matrix score did not
+  move, and that is the finding**: `staff` is used both by sequences/clefs (now supported)
+  and inside `layouts` (untouched), so the row scores as the worse of the two — **a flat
+  `lossy` cell can hide a feature that works** when a def is shared. The oracle could not
+  have found this either, since none of the 27 comparisons is a grand staff; the corpus
+  had the case. Also: where one format expresses a distinction the other cannot (MNX tells
+  sequences apart by staff alone, MusicXML only by voice), the conversion has to
+  manufacture the carrier.
 - **[core-musicxml-mxl.md](inprogress/core-musicxml-mxl.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 11, **built 2026-09-04**:
   `.mxl`, the container MuseScore/Sibelius/Dorico/Finale export by default — **still zero

@@ -331,6 +331,8 @@ export function exportMusicXML(
     let activeTimeCount: number | null = null;
     let activeTimeUnit: number | null = null;
     let activeClefSign: string | null = null;
+    /** Clef in force per staff, so a grand staff's two change independently. */
+    const activeClefByStaff = new Map<number, string>();
 
     const numMeasures = part.measures.length;
 
@@ -378,18 +380,31 @@ export function exportMusicXML(
         attributesChanged = true;
       }
 
-      // Clef
-      const firstClef = measure.clefs?.[0]?.clef;
-      if (firstClef && firstClef.sign !== activeClefSign) {
-        activeClefSign = firstClef.sign;
+      // `<staves>` before the clefs, which is where MusicXML's attribute order
+      // puts it and how a reader knows how many `<clef number>` to expect.
+      if (m === 0 && (part.staves ?? 1) > 1) {
+        const stavesEl = doc.createElement('staves');
+        stavesEl.textContent = `${part.staves}`;
+        attributesEl.appendChild(stavesEl);
+        attributesChanged = true;
+      }
+
+      // Clefs, one per staff. A grand staff states two and they change
+      // independently, so "has the clef changed" is a question per staff.
+      for (const [index, entry] of (measure.clefs ?? []).entries()) {
+        const clef = entry.clef;
+        const staff = entry.staff ?? index + 1;
+        if (!clef || clef.sign === activeClefByStaff.get(staff)) continue;
+        activeClefByStaff.set(staff, clef.sign);
+        if (staff === 1) activeClefSign = clef.sign;
         const clefEl = doc.createElement('clef');
+        if ((part.staves ?? 1) > 1) clefEl.setAttribute('number', `${staff}`);
         const signEl = doc.createElement('sign');
-        signEl.textContent = activeClefSign;
+        signEl.textContent = clef.sign;
         clefEl.appendChild(signEl);
-        
-        if (firstClef.staffPosition !== undefined) {
+        if (clef.staffPosition !== undefined) {
           const lineEl = doc.createElement('line');
-          lineEl.textContent = `${Math.abs(firstClef.staffPosition)}`;
+          lineEl.textContent = `${Math.abs(clef.staffPosition)}`;
           clefEl.appendChild(lineEl);
         }
         attributesEl.appendChild(clefEl);
@@ -1113,6 +1128,13 @@ function buildXmlNode(
       if (node.tuplet.start) tupletEl.setAttribute('bracket', 'yes');
       notationsEl.appendChild(tupletEl);
     }
+  }
+
+  // `<staff>` sits after `<stem>`/`<notehead>` and before `<beam>`.
+  if (node.staff !== undefined) {
+    const staffEl = doc.createElement('staff');
+    staffEl.textContent = `${node.staff}`;
+    noteEl.appendChild(staffEl);
   }
 
   // `<beam>` sits after `<staff>` and before `<notations>` in MusicXML's fixed

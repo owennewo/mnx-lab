@@ -137,7 +137,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 8 | [Converter support matrix](../inprogress/lab-converter-matrix.md) | Rows = MNX `$def` (193, minus plumbing) + `_x.mnxLab` keys; columns = converter × direction. **Cells derived, never declared** (below). Generated, committed artifact; hand-edit is a red test. Extends `src/corpus/defIndex.ts` and the `#/objects` page rather than building a second thing. | both | the corpus itself | **built 2026-09-04** |
 | 9 | [Export crash on anonymous parts](../inprogress/core-musicxml-export-crash.md) | `id` and `name` are optional on an MNX part and the exporter assumed neither was — it threw on two corpus scenarios and wrote `<part-name>undefined</part-name>` for a third case. Found by the matrix on its first run. **Matrix supported 24 → 36**, because a crash costs every cell that document could have proved. | accuracy | the matrix | **built 2026-09-04** |
 | 10 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite`. **License verified before a byte lands** — the MIT claim is unchecked and the LilyPond lineage makes it worth confirming. Assertions per file: parses, drops no notes, measure durations sum to the meter, part/voice counts correct. | accuracy | itself | proposed |
-| 11 | Aligner generalization | Separate general part/measure/voice parsing from the guitar standard+TAB merge in `aligner.ts`; multi-part ensembles (N parts), grand staff (2 staves, 1 part). The largest single item, and item 1 gates it — `parts` and `multiple-voices` are both in the 27. | accuracy | 1 + 3 | proposed |
+| 12 | [Multi-staff parts](../inprogress/core-musicxml-staves.md) | Separate general part/measure/voice parsing from the guitar standard+TAB merge in `aligner.ts`; multi-part ensembles (N parts), grand staff (2 staves, 1 part). The largest single item, and item 1 gates it — `parts` and `multiple-voices` are both in the 27. | accuracy | the corpus, via spec/grand-staff | **built 2026-09-04** |
 | 10b | [Zero-dep XML layer](../inprogress/core-musicxml-zero-dep.md) | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | the oracle and matrix, required unmoved | **built 2026-09-04** |
 | 11 | [`.mxl` container](../inprogress/core-musicxml-mxl.md) | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | cross-checked against Python's zipfile, both directions | **built 2026-09-04** |
 | 14 | Differential oracle | music21 as a dev-only subprocess emitting a note table (part, voice, onset, duration, pitch, tie, lyric), diffed against the same table from our MNX. The independent implementation the campaign otherwise lacks. Dev/test only, never shipped. | accuracy | itself | proposed |
@@ -176,6 +176,26 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-04 — item 12: multi-staff parts, and a limit of the matrix worth more than the feature
+
+Grand staff round trips ([core-musicxml-staves.md](../inprogress/core-musicxml-staves.md)).
+**The matrix score did not move**, and that is the finding.
+
+- **`staff` is used by two features, so it scores as the worse of them.** It appears on
+  sequences and clefs — now supported — and inside `layouts`, which the converter does not
+  touch at all. The row cannot improve until both work. That is the honest consequence of
+  choosing schema objects as rows, the same choice that makes the two *kinds* of gap
+  separate cleanly, and it means **a flat `lossy` cell can hide a feature that works.**
+  Recorded so the next reader does not conclude the work did nothing.
+- **The oracle could not have found this either** — none of the 27 comparisons is a grand
+  staff. The corpus had the case (`spec/grand-staff`) and the matrix pointed at it. The
+  two instruments cover different ground, which is the argument for having both.
+- **Where one format can express a distinction the other cannot, the conversion has to
+  manufacture the carrier.** MNX tells two sequences apart by staff alone; MusicXML only
+  by voice. Exporting both hands with no voice merged them, and eleven notes came back as
+  one stream. Third time this shape has appeared, after the jump `<offset>` and beam
+  nesting.
 
 ### 2026-09-04 — item 11: `.mxl`, and why not reusing code was the right call
 

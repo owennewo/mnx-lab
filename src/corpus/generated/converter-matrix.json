@@ -468,8 +468,8 @@
         "staff-count": {
           "verdict": "lossy",
           "carried": 6,
-          "survived": 0,
-          "evidence": "lab/31-score-text/07-directions-multi-staff"
+          "survived": 4,
+          "evidence": "spec/orchestral-layout"
         },
         "staff-group": {
           "verdict": "lossy",
@@ -498,8 +498,8 @@
         "staff-number": {
           "verdict": "lossy",
           "carried": 6,
-          "survived": 0,
-          "evidence": "lab/31-score-text/07-directions-multi-staff"
+          "survived": 4,
+          "evidence": "spec/orchestral-layout"
         },
         "staff-source": {
           "verdict": "lossy",

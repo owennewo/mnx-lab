@@ -1,8 +1,9 @@
 import {
-  MnxSequence,
   MnxEvent,
   MnxGrace,
   MnxNote,
+  MnxSequence,
+  MnxSequenceItem,
   MnxTuplet,
   isGrace,
   isTimedEvent,
@@ -16,6 +17,8 @@ export interface FlatXmlNode {
   voice?: string;
   note?: MnxNote;
   isChord?: boolean;
+  /** Which staff this note is written on, for multi-staff parts. */
+  staff?: number;
   /** The id of the event this node came from, when it has one. Beam membership
    *  is stated by event id in MNX and by per-note flags in MusicXML, so the
    *  writer needs to know which event a note belongs to. Principal notes only —
@@ -78,8 +81,29 @@ export function flattenSequences(
   // 1. Group events into timed voices
   const voiceTracks = new Map<string, Array<TimedEvent>>();
 
+  // Staff lives on the SEQUENCE in MNX and on every note in MusicXML, so it is
+  // carried down here; an event may override it where a voice crosses staves.
+  const sequenceStaff = new Map<MnxEvent, number>();
+  const staffOf = (event: MnxEvent): number | undefined =>
+    event.staff ?? sequenceStaff.get(event);
+
   for (const seq of sequences) {
-    const rawVoice = seq.voice || '1';
+    if (seq.staff !== undefined) {
+      const mark = (items: MnxSequenceItem[]): void => {
+        for (const item of items) {
+          const content = (item as { content?: MnxSequenceItem[] }).content;
+          if (content) mark(content);
+          else sequenceStaff.set(item as MnxEvent, seq.staff!);
+        }
+      };
+      mark(seq.content);
+    }
+    // MNX can tell two sequences apart by STAFF alone — a grand staff's two
+    // hands often carry no voice at all. MusicXML has no such notion: voices
+    // are what separate simultaneous streams, so a staff-only distinction has
+    // to become one, or both hands merge into a single voice and the music is
+    // re-read as one stream of eleven notes.
+    const rawVoice = seq.voice || (seq.staff !== undefined ? `${seq.staff}` : '1');
     // Clean up voice name to just digits if possible (e.g. 'v1' -> '1')
     const voiceName = rawVoice.replace(/^v/, '');
     
@@ -205,6 +229,7 @@ export function flattenSequences(
           voice: voiceName,
           base,
           dots,
+          ...(staffOf(item.event) ? { staff: staffOf(item.event) } : {}),
           ...(item.event.id ? { eventId: item.event.id } : {}),
           ...container,
           // Rests carry lyrics too — MusicXML allows `<lyric>` on any `<note>`,
@@ -225,6 +250,7 @@ export function flattenSequences(
             isChord,
             base,
             dots,
+            ...(staffOf(item.event) ? { staff: staffOf(item.event) } : {}),
             ...(!isChord && item.event.id ? { eventId: item.event.id } : {}),
             ...container,
             // The `<tuplet>` bracket opens and closes ONCE per group, on its

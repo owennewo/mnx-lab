@@ -368,3 +368,50 @@ describe('parts without an id or a name', () => {
     expect(importMusicXML(exportMusicXML(bare)).parts[0].id).toBe('P1');
   });
 });
+
+describe('multi-staff parts', () => {
+  const grandStaff = () =>
+    fs
+      .readFile(
+        path.resolve(__dirname, '../../../scenarios/spec/grand-staff/document.mnx.json'),
+        'utf-8'
+      )
+      .then(text => JSON.parse(text) as MnxStructure);
+
+  it('keeps both staves through MNX → MusicXML → MNX', async () => {
+    const source = await grandStaff();
+    const back = importMusicXML(exportMusicXML(source));
+
+    expect(source.parts[0].staves).toBe(2);
+    expect(back.parts[0].staves).toBe(2);
+
+    // Both hands survive as separate sequences on their own staves — the whole
+    // point. Collapsing them would re-read the music as one stream.
+    const staffOf = (mnx: MnxStructure) =>
+      (mnx.parts[0].measures[0].sequences ?? []).map(s => ({
+        staff: s.staff,
+        events: (s.content ?? []).length
+      }));
+    expect(staffOf(back)).toEqual(staffOf(source));
+  });
+
+  it('states a clef per staff, and they are independent', async () => {
+    const source = await grandStaff();
+    const xml = exportMusicXML(source);
+    expect(xml).toContain('<staves>2</staves>');
+    expect(xml).toContain('<clef number="1">');
+    expect(xml).toContain('<clef number="2">');
+    expect(importMusicXML(xml).parts[0].measures[0].clefs).toEqual(
+      source.parts[0].measures[0].clefs
+    );
+  });
+
+  it('says nothing about staves on a single-staff part', async () => {
+    // `staves: 1` and `staff: 1` are the defaults, and the spec's own
+    // single-staff examples omit both.
+    const mnx = await load('ties');
+    expect(mnx.parts[0].staves).toBeUndefined();
+    expect((mnx.parts[0].measures[0].sequences ?? [])[0].staff).toBeUndefined();
+    expect(exportMusicXML(mnx)).not.toContain('<staves>');
+  });
+});

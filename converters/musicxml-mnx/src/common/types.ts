@@ -271,6 +271,8 @@ export interface MnxPartMeasure {
       staffPosition?: number;
       octave?: number;
     };
+    /** Which staff of a multi-staff part this clef belongs to (1-based). */
+    staff?: number;
   }[];
   sequences: MnxSequence[];
 }

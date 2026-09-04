@@ -50,6 +50,11 @@ interface AttributeState {
   transposeDiatonic: number;
   clefSign: string | null;
   clefLine: number | null;
+  /** How many staves this part prints on — `<staves>`, 1 unless stated. */
+  staves: number;
+  /** Clef per staff. A grand staff states two, and `state.clefSign` alone
+   *  cannot hold both — it kept only whichever came first. */
+  clefByStaff: Map<number, { sign: string | null; line: number | null }>;
   staffLines: number;
   tuning: MnxPitch[] | null;
   capo: number;
@@ -1146,6 +1151,8 @@ export class Aligner {
       transposeDiatonic: 0,
       clefSign: null,
       clefLine: null,
+      staves: 1,
+      clefByStaff: new Map(),
       staffLines: 5,
       tuning: null,
       capo: 0
@@ -1157,7 +1164,7 @@ export class Aligner {
     // courtesy-signature display request.
     let lastEmittedFifths: number | null = null;
     let lastEmittedTime: string | null = null;
-    let lastEmittedClef: string | null = null;
+    const lastEmittedClefs = new Map<number, string>();
 
     for (let mIdx = 0; mIdx < measureEls.length; mIdx++) {
       const mEl = measureEls[mIdx];
@@ -1180,10 +1187,21 @@ export class Aligner {
           state.beatType = getChildInt(timeEl, 'beat-type');
         }
 
-        const clefEl = findDirectChild(attributesEl, 'clef');
-        if (clefEl) {
-          state.clefSign = getChildText(clefEl, 'sign');
-          state.clefLine = getChildInt(clefEl, 'line');
+        const stavesDeclared = getChildInt(attributesEl, 'staves');
+        if (stavesDeclared && stavesDeclared > 0) state.staves = stavesDeclared;
+
+        // EVERY `<clef>`, keyed by its `number` — a grand staff states one per
+        // staff, and reading only the first left the bass staff with the treble
+        // clef. `state.clefSign` stays as staff 1 for the single-staff path.
+        for (const clefEl of findDirectChildren(attributesEl, 'clef')) {
+          const staff = Number(clefEl.getAttribute('number') ?? '1') || 1;
+          const sign = getChildText(clefEl, 'sign');
+          const line = getChildInt(clefEl, 'line');
+          state.clefByStaff.set(staff, { sign, line });
+          if (staff === 1) {
+            state.clefSign = sign;
+            state.clefLine = line;
+          }
         }
 
         const transposeEl = findDirectChild(attributesEl, 'transpose');
@@ -1356,17 +1374,27 @@ export class Aligner {
       // (_x.mnxLab.tab.staffKind), not a clef. See docs/mnx-extensions.md.
       // Real clefs are emitted change-only (first appearance + changes).
       const clefsList: any[] = [];
-      const clefKey = state.clefSign ? `${state.clefSign}/${state.clefLine}` : null;
-      if (state.clefSign && state.clefSign !== 'TAB' && clefKey !== lastEmittedClef) {
-        clefsList.push({
-          clef: {
-            sign: state.clefSign,
-            staffPosition: state.clefLine ? -(state.clefLine) : undefined
-          }
-        });
-      }
-      if (clefKey !== null) {
-        lastEmittedClef = clefKey;
+      const multiStaff = state.staves > 1;
+      const staffClefs = state.clefByStaff.size
+        ? [...state.clefByStaff.entries()].sort((a, b) => a[0] - b[0])
+        : ([[1, { sign: state.clefSign, line: state.clefLine }]] as [
+            number,
+            { sign: string | null; line: number | null }
+          ][]);
+      for (const [staff, clef] of staffClefs) {
+        const key = clef.sign ? `${staff}:${clef.sign}/${clef.line}` : null;
+        if (clef.sign && clef.sign !== 'TAB' && key !== lastEmittedClefs.get(staff)) {
+          clefsList.push({
+            clef: {
+              sign: clef.sign,
+              staffPosition: clef.line ? -clef.line : undefined
+            },
+            // Only stated when there is more than one staff to tell apart —
+            // `staff: 1` on a single-staff part is noise the spec omits.
+            ...(multiStaff ? { staff } : {})
+          });
+        }
+        if (key !== null) lastEmittedClefs.set(staff, key);
       }
 
       measures.push({
@@ -1421,6 +1449,9 @@ export class Aligner {
     return {
       id: partId,
       name: partName,
+      // Stated only when it is more than one: `staves: 1` is the default and
+      // the spec's own single-staff examples omit it.
+      ...(state.staves > 1 ? { staves: state.staves } : {}),
       measures,
       ...transpositionBlock,
       ...(Object.keys(labExtension).length > 0
@@ -1464,6 +1495,9 @@ export class Aligner {
     // The onset of the most recently STARTED event. An `<octave-shift>` stop
     // sits after the last note it covers, while MNX names that note's onset.
     let lastEventOnset = 0;
+
+    /** Which staff each event was written on, for multi-staff parts. */
+    const eventStaves = new Map<MnxEvent, number>();
 
     // We iterate through XML child nodes to preserve exact document order
     for (let i = 0; i < measureEl.childNodes.length; i++) {
@@ -1556,6 +1590,10 @@ export class Aligner {
           // A rest carries `<beam>` too, and a beamed rest sits INSIDE a beam
           // group — miss it and the group splits in two around it.
           this.collectBeams(el, restEvent);
+          if (state.staves > 1) {
+            const staff = getChildInt(el, 'staff');
+            if (staff) eventStaves.set(restEvent, staff);
+          }
           lastEventOnset = currentTime;
           if (!voiceEvents.has(voice)) voiceEvents.set(voice, []);
           voiceEvents.get(voice)!.push({
@@ -1715,6 +1753,13 @@ export class Aligner {
             this.collectSpanners(notationsEl, el, voice, owningEvent, mnxNote);
           }
           if (owningEvent && !isChord) this.collectBeams(el, owningEvent);
+          // `<staff>` is per NOTE in MusicXML and per sequence in MNX. Recorded
+          // here and reconciled below, because a voice that stays on one staff
+          // (the normal case) should say so once rather than on every event.
+          if (owningEvent && !isChord && state.staves > 1) {
+            const staff = getChildInt(el, 'staff');
+            if (staff) eventStaves.set(owningEvent, staff);
+          }
         }
       }
     }
@@ -1820,8 +1865,20 @@ export class Aligner {
       flushTuplet();
       flushGrace();
 
+      // A voice normally lives on one staff for the whole measure; when it
+      // does, MNX states that on the sequence. A voice that crosses staves
+      // (cross-staff piano writing) keeps the fact on its events instead of
+      // being averaged into a single wrong answer.
+      const staves = new Set(events.map(e => eventStaves.get(e.event)).filter(Boolean));
+      if (staves.size > 1) {
+        for (const { event } of events) {
+          const staff = eventStaves.get(event);
+          if (staff) event.staff = staff;
+        }
+      }
       sequences.push({
         voice: `v${voiceName}`,
+        ...(staves.size === 1 ? { staff: [...staves][0] as number } : {}),
         content
       });
     }
