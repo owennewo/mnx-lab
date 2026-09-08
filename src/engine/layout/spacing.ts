@@ -1538,7 +1538,7 @@ export function planHorizontal(
   // How many key-signature glyphs this measure's prefix draws — none ever, on
   // a standalone tab staff.
   const keySigGlyphs = (m: MeasureMetrics, firstInSystem: boolean) => {
-    if (isTabOnly) return 0;
+    if (isTabOnly || display.clefs === 'hide') return 0;
     const showKeySig = (firstInSystem && m.keyFifths !== 0) || m.keyChanged;
     if (!showKeySig) return 0;
     return Math.abs(m.keyFifths !== 0 ? m.keyFifths : m.cancelledKeyFifths);

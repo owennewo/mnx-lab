@@ -67,6 +67,28 @@ describe('score display settings', () => {
     expect(width('hide')).toBeLessThanOrEqual(width('current'));
   });
 
+  for (const [name, layout] of Object.entries({ notation: layoutNotation, both: layoutBothSystem })) {
+    it(`${name}: hides initial, repeated, changed and cancelled key signatures with clefs`, () => {
+      initSmufl();
+      const mnx = fixture('spec/key-signatures');
+      mnx.global.measures[3].key = { fifths: 0 };
+      const before = JSON.stringify(mnx);
+      const shownPlan = planHorizontal(mnx, 500);
+      const hiddenPlan = planHorizontal(mnx, 500, { display: { clefs: 'hide' } });
+      expect(hiddenPlan.usedWidthSp).toBeLessThan(shownPlan.usedWidthSp);
+      expect(hiddenPlan.measures.map(m => m.keyFifths)).toEqual(shownPlan.measures.map(m => m.keyFifths));
+      expect(hiddenPlan.measures.every(m => !m.showKeySig)).toBe(true);
+      // Narrow rows exercise repeated signatures as well as declarations.
+      for (const widthSp of [500, 30]) {
+        const shown = layout({ mnx, widthSp });
+        const hidden = layout({ mnx, widthSp, display: { clefs: 'hide' } });
+        expect(shown.primitives.some(p => p.className === 'key-sig')).toBe(true);
+        expect(hidden.primitives.filter(p => p.className === 'key-sig')).toHaveLength(0);
+      }
+      expect(JSON.stringify(mnx)).toBe(before);
+    });
+  }
+
   it('hides changed clefs while preserving the effective pitch timeline', () => {
     initSmufl();
     const mnx = fixture('spec/clef-changes');

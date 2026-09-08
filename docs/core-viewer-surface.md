@@ -308,7 +308,8 @@ Filtering happens before lyric widths and rows are allocated.
 
 A **system** is one horizontal row of music, including notation and tab together
 in Both. Bar labels follow displayed score order, with declared numbers resetting
-the sequence (including pickup number 0). Clef visibility never changes pitch
+the sequence (including pickup number 0). Hiding clefs also hides key signatures,
+including changes and cancellations, and reclaims their spacing. Clef visibility never changes pitch
 mapping; time-signature visibility never changes duration or playback.
 
 The workbench owns localStorage key `mnx-lab:display`, shared across documents.

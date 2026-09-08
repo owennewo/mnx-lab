@@ -38,7 +38,8 @@ same traversal — keep them in lockstep.
 
 Score display controls enter each layout as `display: DisplayOptions` and
 are normalized in `src/engine/displayOptions.ts`. Lyrics are filtered before
-horizontal measurement and row allocation; hidden clefs/time signatures lose
+horizontal measurement and row allocation; hiding clefs also hides key signatures,
+including changes and cancellations. Hidden clefs/key signatures/time signatures lose
 their prefix slots while the effective pitch/rhythm state remains unchanged.
 Part-name gutters may differ between the first and subsequent systems, and
 `PackingInput` carries both widths so the density ladder uses the same breaks.
