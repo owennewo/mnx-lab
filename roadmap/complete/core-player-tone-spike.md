@@ -1,6 +1,6 @@
 # Audio backend spike — Tone.js versus a native Web Audio sink, measured
 
-> **Status: measured 2026-09-08; landing checks in progress.** Campaign:
+> **Status: complete 2026-09-08.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 4. **Research, not a
 > feature.** Runs any time, lands before item 6. Output: a findings entry in the
 > campaign log, the `Sink` interface, and a backend decision. Any code is thrown away;
@@ -54,3 +54,8 @@ Tone adds 57,612/65,184. Tone Sampler exposes no public per-voice detune.
 See [the complete measurement report](../../research/player-backend-spike.md) and
 [the Sink interface](../../src/audio/sink.ts). Prototype code is discarded; no
 runtime dependency is added. Item 6 owns the production backend and durable smoke.
+
+Landing checks: 1,356 tests, scenario validation, production build and library smoke
+passed after rebasing. Renderer changes on main were re-earned with primitive
+regeneration and a clean scenario diff. The implementation worktree was retired
+before this document moved to complete.

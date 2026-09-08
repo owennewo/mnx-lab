@@ -44,11 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-player-tone-spike.md](proposed/core-player-tone-spike.md)** — campaign item 4,
-  **research only**: Tone.js **versus a native Web Audio sink** — Node import, browser
-  `OfflineAudioContext` render, per-voice detune and re-pitch without re-attack, size on
-  **both** embed formats (the IIFE cannot split), what Tone saves once the transport is
-  ours. Output: a log entry, the `Sink` interface, a recommendation.
 - **[core-player-performance.md](proposed/core-player-performance.md)** — campaign item 5:
   **the compiler** — two linked lists, rational time, ties merged after unrolling, nested
   tuplets (with the `noteWalk.ts` identity change tested first), grace/tremolo/fermata per
@@ -405,6 +400,10 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-player-tone-spike.md](complete/core-player-tone-spike.md)** — campaign item 4:
+  **native Web Audio selected** after Node/offline/pitch/cancellation checks and
+  measured IIFE/ESM builds. Type-only `Sink` contract shipped; no runtime dependency.
+  [Measurements](../research/player-backend-spike.md) record versions and limits.
 - **[core-player-pass-cursor.md](complete/core-player-pass-cursor.md)** — campaign item 2:
   a host-owned **playback context** (replacing the dormant `PlaybackState` shape the viewer
   already consumes) carrying ordinal and iteration; the chip reads `iteration 2 of 3` or
