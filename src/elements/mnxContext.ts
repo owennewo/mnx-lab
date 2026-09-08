@@ -1,13 +1,25 @@
+import { initialPlaybackPosition, type PlaybackPositionState } from '../model/playback.ts';
 import { createContext } from '@lit/context';
 import { MnxDocument } from '../model/mnx.ts';
 import type { RenderedProjection } from '../engine/render/projection.ts';
 
-export interface PlaybackState {
-  playing: boolean;
-  tempo: number;
-  volume: number; // in dB
-  playheadTime: number; // visual tick position
-  activeNoteIds: string[];
+/** Presentation identity, independent of the compiler's timed occurrences. */
+export interface PlaybackOccurrence {
+  noteKey: string;
+  ordinal: number;
+}
+
+export interface PlaybackState extends PlaybackPositionState {
+  highlight: PlaybackOccurrence[];
+}
+/** Item 7 emits this from the player. Its common ancestor owns the provider. */
+export interface PlaybackUpdate {
+  documentId: string;
+  ordinal: number | null;
+  highlight: PlaybackOccurrence[];
+}
+export function initialPlaybackState(): PlaybackState {
+  return { ...initialPlaybackPosition(), highlight: [] };
 }
 
 export const mnxDocumentContext = createContext<MnxDocument | null>(Symbol('mnx-document'));

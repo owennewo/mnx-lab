@@ -161,7 +161,7 @@ run any time before 6.
 | # | Item | Scope | Serves | Proof | Status |
 |---|------|-------|--------|-------|--------|
 | 1 | [Traversal](../complete/core-player-traversal.md) | **Extend `model/passes.ts`**, keeping its consumers and suite: performed entries with ordinal, occurrence and iteration; partial-measure bounds for mid-bar segno/Fine/D.S.; diagnostics; the D.S.-into-voltas simplification resolved. | reviewer | the existing suite + hand-stated orders for the 14 navigation scenarios + a committed corpus report | complete; new engraving review pending |
-| 2 | [Playback context and the iteration cursor](../proposed/core-player-pass-cursor.md) | A host-owned playback context (replacing the dormant `PlaybackState` shape) carrying ordinal and iteration; the chip ladder shows `iteration 2 of 3` / *not performed*; changeable; feeds `selected-verse`. The edit session is untouched. | reviewer | conformance tests on the pure resolver; no golden moves | proposed |
+| 2 | [Playback context and the iteration cursor](../proposed/core-player-pass-cursor.md) | A host-owned playback context (replacing the dormant `PlaybackState` shape) carrying ordinal and iteration; the chip ladder shows `iteration 2 of 3` / *not performed*; changeable; feeds `selected-verse`. The edit session is untouched. | reviewer | conformance tests on the pure resolver; no golden moves | implemented; landing checks |
 | 3 | [Timing and pitch contracts](../complete/core-player-timing-pitch.md) | `audio/time.ts` (rational arithmetic, tempo map, `secondsAt`); the pitch rule as tests over transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata (incl. `duration` hints and cross-part sync) and tie conventions written down with numbers; the performance golden's format. | reviewer | conformance tests | complete |
 | 4 | [Audio backend spike](../proposed/core-player-tone-spike.md) | Tone.js **versus a native Web Audio sink**, measured: Node import, browser Offline render, per-voice detune ramps, both embed formats' size, what Tone saves once the transport is ours. Output: a log entry and the `Sink` interface. | both | its findings | proposed |
 | 5 | [Performance compiler and MIDI export](../proposed/core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | proposed |
@@ -306,3 +306,18 @@ The conventions adopted for the compiler (lab choices, not new MNX requirements)
 | Tie | target extends the source's sounding event; the target keeps its **written occurrence** (the cursor still lands on it) | contract §3 / decision 2 |
 | `lv` tie | rings for one whole note or until the string is re-struck | fretted-instrument convention |
 | Tremolo | subdivided by `marks` within the container's performed value | model semantics |
+
+### 2026-09-08 — item 2: playback context and inspection cursor
+
+- The common host provides live ordinal/iteration and independent inspection state.
+  Inspection disables Follow without seeking or touching editor history/selection.
+  Stopping falls back to inspection; absent verse indexes explicitly clear the hook.
+- Iteration queries retain every D.S. candidate. Candidate selection only wraps on
+  explicit seek; repeated clicks can cycle. Structural domains drive chip cycling,
+  while navigation retains skipped iterations as “not performed.”
+- The source embed demonstrates a plain ancestor provider. The library exports the
+  context and pure helpers; item 7 must invalidate compiled revisions on document
+  changes and emit updates on the audio clock. Highlighted-ink reveal is available;
+  the public position/rest reveal remains that item's responsibility.
+- 21 pure conformance tests cover the navigation corpus and state transitions.
+  No golden or verification record changed; no new approval batch is needed.

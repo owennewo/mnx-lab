@@ -52,9 +52,29 @@
     </main>
     <script type="module">
       import '/src/entries/embed.ts';
-      import score from '/scenarios/spec/beams/document.mnx.json';
+      import { ContextProvider } from '@lit/context';
+      import { playbackStateContext, initialPlaybackState } from '/src/elements/mnxContext.ts';
+      import { linearizePasses } from '/src/model/passes.ts';
+      import { inspectIteration, nextInspectionIteration, verseForIteration } from '/src/model/playback.ts';
+      import { documentLyricLineIds } from '/src/engine/layout/lyricRuns.ts';
+      import score from '/scenarios/spec/repeats-alternate-endings-simple/document.mnx.json';
       const viewer = document.querySelector('mnx-document-viewer');
-      viewer.mnxDoc = { id: 'embed-demo', name: 'Beams', lastUpdated: 0, mnxJson: score };
+      // The common host provides context; a sibling player cannot provide to this viewer.
+      const host = document.querySelector('.card');
+      let state = initialPlaybackState();
+      const provider = new ContextProvider(host, { context: playbackStateContext, initialValue: state });
+      provider.hostConnected(); // plain DOM has no Lit controller lifecycle
+      const passes = linearizePasses(score);
+      const button = document.createElement('button');
+      button.textContent = 'Inspection iteration 1';
+      button.addEventListener('click', () => {
+        state = inspectIteration(state, nextInspectionIteration(passes, 0, state.inspectionIteration));
+        provider.setValue(state);
+        viewer.selectedVerse = verseForIteration(documentLyricLineIds(score), state);
+        button.textContent = `Inspection iteration ${state.inspectionIteration}`;
+      });
+      host.prepend(button);
+      viewer.mnxDoc = { id: 'embed-demo', name: 'Repeats', lastUpdated: 0, mnxJson: score };
     </script>
   </body>
 </html>

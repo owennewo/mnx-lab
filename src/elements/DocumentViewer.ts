@@ -776,7 +776,7 @@ export class DocumentViewer extends LitElement {
     const commonOpts = {
       mnx: this.mnxDoc.mnxJson,
       width,
-      activeNoteIds: this.playbackState?.activeNoteIds ?? [],
+      activeNoteIds: this.playbackState?.highlight.map(occurrence => occurrence.noteKey) ?? [],
       selectedNoteIds: this.selection?.selectedNoteIds ?? [],
       selectedEventIds: this.selection?.selectedEventIds ?? [],
       onNoteClick,
@@ -989,10 +989,11 @@ export class DocumentViewer extends LitElement {
       );
     }
 
+    if (this.playbackState?.followPlayback && this.playbackState.ordinal !== null) this.revealPlayback();
     this.emitSelectionAnchor();
     if (this.followQueued) {
       this.followQueued = false;
-      this.revealSelection();
+      if (!this.playbackState?.followPlayback || this.playbackState.ordinal === null) this.revealSelection();
     }
   }
 
@@ -1119,6 +1120,19 @@ export class DocumentViewer extends LitElement {
 
   /** Queued by a property-driven repaint, consumed by that paint. */
   private followQueued = false;
+
+  /** Follow the live ink without touching the selection or editor cursor. */
+  private revealPlayback() {
+    const keys = new Set(this.playbackState?.highlight.map(occurrence => occurrence.noteKey) ?? []);
+    const ink = [...(this.container?.querySelectorAll<SVGElement>('[data-source-id]') ?? [])]
+      .find(node => keys.has(node.getAttribute('data-source-id') ?? ''));
+    if (!ink) return;
+    const box = ink.getBoundingClientRect();
+    const view = this.getBoundingClientRect();
+    const top = revealScrollDelta({ start: box.top, end: box.bottom },
+      { start: view.top, end: view.bottom }, DocumentViewer.REVEAL_PAD_PX);
+    if (Math.abs(top) >= 1) this.scrollBy({ top, behavior: 'auto' });
+  }
 
   /**
    * Bring the selection back into view, if it left.

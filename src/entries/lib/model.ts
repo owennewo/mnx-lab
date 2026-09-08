@@ -1,5 +1,7 @@
 // mnx-lab/model — document types, upgrades and key derivation.
 export * from '../../model/mnx.ts';
+export * from '../../model/passes.ts';
+export * from '../../model/playback.ts';
 export { upgradeTabExtension } from '../../model/upgradeTabExtension.ts';
 export { syntheticNoteKey } from '../../model/noteKeys.ts';
 

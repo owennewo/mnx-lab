@@ -1,3 +1,8 @@
+import { ContextProvider } from '@lit/context';
+import { playbackStateContext, initialPlaybackState, type PlaybackState, type PlaybackUpdate } from '../elements/mnxContext.ts';
+import { linearizePasses, hasRepeatStructure, type PassModel } from '../model/passes.ts';
+import { resolveIteration, inspectIteration, followPlayback, withPlaybackOrdinal, nextInspectionIteration, verseForIteration } from '../model/playback.ts';
+import { documentLyricLineIds } from '../engine/layout/lyricRuns.ts';
 import { readDisplayPreferences, writeDisplayPreferences } from './displayPreferences.ts';
 import type { DisplayOptions } from '../engine/displayOptions.ts';
 // One workbench document: either a deep-linked corpus scenario or the shell's
@@ -442,6 +447,36 @@ export class ScenarioPage extends LitElement {
   // for testing the editor, not for authoring corpus files.
   @state() private session: EditorSession | null = null;
   @state() private selection: SelectionContext | null = null;
+  @state() private playback: PlaybackState = initialPlaybackState();
+  private readonly playbackProvider = new ContextProvider(this, {
+    context: playbackStateContext, initialValue: this.playback
+  });
+  private passDocument: MnxStructure | null = null;
+  private passModel: PassModel | null = null;
+
+  private setPlayback(state: PlaybackState) {
+    this.playback = state;
+    this.playbackProvider.setValue(state);
+  }
+  private refreshPassModel(document: MnxStructure) {
+    if (this.passDocument === document) return;
+    this.passDocument = document;
+    this.passModel = linearizePasses(document);
+    // Ordinals belong to one document revision. Inspection is a preference,
+    // retained through edits; live playback must be recompiled by item 7.
+    this.setPlayback({ ...withPlaybackOrdinal(this.playback, this.passModel, null), highlight: [] });
+  }
+  private onPlaybackUpdate = (event: Event) => {
+    const update = (event as CustomEvent<PlaybackUpdate>).detail;
+    if (!this.passModel || update.documentId !== this.scenarioId) return;
+    const state = withPlaybackOrdinal(this.playback, this.passModel, update.ordinal);
+    this.setPlayback({ ...state, highlight: state.ordinal === null ? []
+      : update.highlight.filter(occurrence => occurrence.ordinal === state.ordinal) });
+  };
+  private chooseInspection(iteration: number) {
+    this.setPlayback(inspectIteration(this.playback, iteration));
+  }
+
   /** One uncommitted tab digit, painted at the cursor for the 500 ms window. */
   @state() private pendingFret: number | null = null;
   private readonly tabDigits = new TabDigitResolver(
@@ -881,6 +916,20 @@ export class ScenarioPage extends LitElement {
       /* Near the score's right edge the whole object mirrors: the chip hangs
          off the selection's RIGHT edge and the ▲▼ pair crosses to the left of
          the word, so the pair never leaves the score. */
+      .iteration-chip, .follow-playback, .playback-label {
+        border: 0;
+        border-left: 1px solid var(--line-strong);
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        font-size: 11px;
+        padding: 4px 7px;
+        white-space: nowrap;
+      }
+      .iteration-chip, .follow-playback { cursor: pointer; }
+      .iteration-chip.not-performed { color: var(--ink-3); }
+      .follow-playback[aria-pressed="true"] { text-decoration: underline; }
+      .iteration-chip:focus-visible, .follow-playback:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
       .rung-chip.mirrored {
         flex-direction: row-reverse;
       }
@@ -1818,6 +1867,9 @@ export class ScenarioPage extends LitElement {
       this.jsonFind = '';
       this.session = null;
       this.selection = null;
+      this.passDocument = null;
+      this.passModel = null;
+      this.setPlayback(initialPlaybackState());
       this.copied = false;
       this.showClipboardNotice(null);
       this.cursorHidden = false;
@@ -1843,6 +1895,7 @@ export class ScenarioPage extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    this.addEventListener('playback-state-change', this.onPlaybackUpdate);
     window.addEventListener('assist-credentials-change', this.onCredentialsChange);
     void this.refreshFingerprint();
     const landing = takeLanding();
@@ -1874,6 +1927,7 @@ export class ScenarioPage extends LitElement {
   disconnectedCallback() {
     this.flushPendingFret();
     super.disconnectedCallback();
+    this.removeEventListener('playback-state-change', this.onPlaybackUpdate);
     window.removeEventListener('assist-credentials-change', this.onCredentialsChange);
     this.chatAbort?.abort();
     this.showClipboardNotice(null);
@@ -1972,6 +2026,7 @@ export class ScenarioPage extends LitElement {
   private syncFromSession() {
     const session = this.session;
     if (!session || !this.doc) return;
+    this.refreshPassModel(session.doc);
     this.doc = { ...this.doc, mnxJson: session.doc };
     this.rawDocument = JSON.stringify(session.doc, null, 2);
     const cursor = session.cursor;
@@ -2408,6 +2463,19 @@ export class ScenarioPage extends LitElement {
    *  read as broken. */
   private applyInspectorLine(word: string | null, text: string, key?: string) {
     if (!this.session) return;
+    const command = word === 'iteration' ? `iteration ${text}` : text.trim();
+    if (/^iteration\b/i.test(command)) {
+      const match = /^iteration\s+([1-9]\d*)$/i.exec(command);
+      const iteration = match ? Number(match[1]) : NaN;
+      if (!hasRepeatStructure(this.session.doc) || !Number.isSafeInteger(iteration)
+          || !this.passModel?.availableIterations.some(available => available.includes(iteration))) {
+        this.inspectorError = 'Use iteration N with an iteration declared in this document.';
+        return;
+      }
+      this.chooseInspection(iteration);
+      this.inspectorError = null;
+      return;
+    }
     const noteKey = this.session.selectedNoteKeys[0];
     const pitch = noteKey ? findNoteAddress(this.session.doc, noteKey)?.note.pitch : undefined;
     const bar = this.session.doc.global?.measures?.[this.session.cursor.measureIndex];
@@ -2560,6 +2628,7 @@ export class ScenarioPage extends LitElement {
         ${ROW_BY_LEVEL[this.chipLevel]}
       </button>
       <div class="chip-mics">${mic('up', up)}${mic('down', down)}</div>
+      ${this.iterationChip()}
       ${this.chipDest
         ? html`<span class="chip-dest"
             >${this.chipDest.dir === 'up' ? '▲' : '▼'} ${this.chipDest.label}</span
@@ -2568,9 +2637,32 @@ export class ScenarioPage extends LitElement {
     </div>`;
   }
 
+  private iterationChip() {
+    if (!this.session || !this.passModel || !hasRepeatStructure(this.session.doc)) return nothing;
+    const measure = this.session.cursor.measureIndex;
+    const iteration = this.playback.inspectionIteration;
+    const available = this.passModel.availableIterations[measure] ?? [1];
+    const { performed } = resolveIteration(this.passModel, measure, iteration);
+    return html`
+      <button class="iteration-chip ${performed ? '' : 'not-performed'}"
+        aria-label=${`Inspection iteration ${iteration}${performed ? '' : ', not performed'}. Click to cycle.`}
+        title="Inspection iteration; change here or type iteration N in the inspector"
+        @click=${() => this.chooseInspection(nextInspectionIteration(this.passModel!, measure, iteration))}>
+        iteration ${iteration}${available.includes(iteration) ? ` of ${available.length}` : ''}${performed ? '' : ' · not performed'}
+      </button>
+      ${this.playback.ordinal !== null ? html`<span class="playback-label">playback iteration ${this.playback.playbackIteration}</span>` : nothing}
+      <button class="follow-playback" aria-pressed=${this.playback.followPlayback}
+        title="Follow live playback for verse and scrolling; keep inspection iteration"
+        @click=${() => this.setPlayback(followPlayback(this.playback))}>Follow</button>`;
+  }
+
   private inspectorOverlay(entry: ScenarioEntry) {
     if (!this.session) return nothing;
     const view = buildInspectorView(entry.meta.title, this.session, this.cursorHidden);
+    if (hasRepeatStructure(this.session.doc) && this.passModel) {
+      const iterations = [...new Set(this.passModel.availableIterations.flat())];
+      view.words = [...view.words, { word: 'iteration', hint: 'inspection iteration (does not seek)', values: iterations.map(String) }];
+    }
     return html`
       <mnx-rung-inspector
         .crumbs=${view.crumbs}
@@ -2843,6 +2935,7 @@ export class ScenarioPage extends LitElement {
         .scoreTitle=${this.displayPreferences.title}
         .barNumbers=${this.displayPreferences.barNumbers}
         .instrumentNames=${this.displayPreferences.instrumentNames}
+        .selectedVerse=${shownDoc ? verseForIteration(documentLyricLineIds(shownDoc.mnxJson), this.playback) : undefined}
         .mnxDoc=${shownDoc}
         .view=${viewMode}
         .zoom=${this.staffScale}
