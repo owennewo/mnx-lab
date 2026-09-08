@@ -548,6 +548,7 @@ export interface LayoutNotationOptions {
    *  springs — 1 is today's engraving, <1 packs more bars per system. Glyphs
    *  keep their size; only the air between them changes, which is what makes
    *  this independent of zoom. */
+  spacingMode?: 'natural' | 'fill';
   densityH?: number;
   /** Vertical/frame density (core-vertical-density.md): a multiplier on the
    *  fixed whitespace every system reserves — the row pads above and below a
@@ -891,7 +892,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         selectedLyrics,
         measureNumbers,
         firstScoreSegment: segmentIndex === 0,
-        densityH: opts.densityH,
+        spacingMode: opts.spacingMode,
+    densityH: opts.densityH,
         densityPad: opts.densityPad,
         inkRatio: opts.inkRatio,
         displayGapProbeSp: opts.displayGapProbeSp
@@ -977,6 +979,7 @@ interface RenderSegmentArgs {
   selectedLyrics?: string[];
   measureNumbers: number[];
   firstScoreSegment: boolean;
+  spacingMode?: 'natural' | 'fill';
   densityH?: number;
   densityPad?: number;
   inkRatio?: number;
@@ -1101,7 +1104,7 @@ function assembleSegment(
   /** Probe pass: open every gap that will be measured to this width. */
   probeGapSp: number | null
 ): SegmentResult {
-  const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio } = args;
+  const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio, spacingMode } = args;
   const labelParts = originalSegment.staves.map((staff, s) => staff.sources.map(source => source.part).filter((part, index, parts) =>
     parts.indexOf(part) === index && !originalSegment.staves.slice(0, s).some(previous => previous.sources.some(source => source.part === part))));
   const segment = display.instrumentNames === undefined ? originalSegment : {
@@ -1150,6 +1153,7 @@ function assembleSegment(
   const planOptions = {
     display,
     lyricLineIds: selectedLyrics,
+    spacingMode,
     densityH,
     densityPad,
     inkRatio,

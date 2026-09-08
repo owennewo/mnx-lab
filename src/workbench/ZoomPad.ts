@@ -111,6 +111,7 @@ export class ZoomPad extends LitElement {
   /** Staff scale, or null for fitted. Mirrors the viewer's `zoom`. */
   @property({ type: Number }) staffScale: number | null = null;
   /** Spacing multiplier, or null for the preset. Mirrors `density-h`. */
+  @property() spacingMode: 'natural' | 'fill' = 'fill';
   @property({ type: Number }) densityH: number | null = null;
 
   /**
@@ -341,7 +342,7 @@ export class ZoomPad extends LitElement {
          digits reading as ink lying on the music. */
       .readout {
         box-sizing: border-box;
-        width: 60px;
+        width: 72px;
         height: 72px;
         display: flex;
         flex-direction: column;
@@ -952,7 +953,7 @@ export class ZoomPad extends LitElement {
   // ── render ──────────────────────────────────────────────────────────────
 
   private pct(value: number) {
-    return String(Math.round(value * 100));
+    return `${Math.round(value * 100)}%`;
   }
 
   /**
@@ -975,7 +976,7 @@ export class ZoomPad extends LitElement {
       // The gap is the whole point of printing the drawn number, so name it
       // rather than leaving the reader to wonder why 640 says 297.
       said.push(
-        `You asked for ${this.pct(this.staffScale)}%: at that size the page is wider ` +
+        `You asked for ${this.pct(this.staffScale)}: at that size the page is wider ` +
           'than the pane, and it is scaled down to fit rather than scrolling sideways.'
       );
     }
@@ -994,8 +995,9 @@ export class ZoomPad extends LitElement {
     const sp = Math.round(this.shownSpace * QUARTER_SPRING_SP * 100) / 100;
     return (
       `Note spacing — asks for ${sp} staff spaces after a quarter note ` +
-      `(100% = ${QUARTER_SPRING_SP}), before each system is justified to the ` +
-      `line. Glyph sizes are untouched.`
+      `(100% = ${QUARTER_SPRING_SP}). ` +
+      (this.spacingMode === 'natural' ? 'Natural spacing keeps this allowance unless a bar overflows. ' : 'Fill width stretches this allowance; the percentage is requested, not measured. ') +
+      `Symbol widths are additional and depend on staff size.`
     );
   }
 

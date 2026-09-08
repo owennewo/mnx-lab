@@ -31,6 +31,7 @@ export interface LayoutBothOptions {
   /** Features the host hid — layout-side ones reflow (core-viewer-surface). */
   hide?: readonly HideableFeature[];
   /** Horizontal density multiplier (core-render-density-zoom.md). */
+  spacingMode?: 'natural' | 'fill';
   densityH?: number;
   /** Vertical/frame density multiplier (core-vertical-density.md). */
   densityPad?: number;

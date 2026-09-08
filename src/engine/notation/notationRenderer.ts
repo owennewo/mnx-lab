@@ -52,6 +52,7 @@ export interface RenderNotationOptions {
   display?: DisplayOptions;
   hide?: readonly HideableFeature[];
   /** Horizontal density multiplier (core-render-density-zoom.md). */
+  spacingMode?: 'natural' | 'fill';
   densityH?: number;
   /** Vertical/frame density multiplier (core-vertical-density.md). */
   densityPad?: number;
@@ -68,6 +69,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
     selectedEventIds: opts.selectedEventIds,
     display: opts.display,
     hide: opts.hide,
+    spacingMode: opts.spacingMode,
     densityH: opts.densityH,
     densityPad: opts.densityPad
   };
@@ -80,7 +82,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
   // fill the viewport. Tab derives the same factor from the shared horizontal
   // plan, so the `both` view stays column-aligned.
   const fitted = opts.pxPerSp === undefined;
-  const pxPerSp = fitted ? fitPxPerSp(opts.width, square.naturalWidthSp ?? square.usedWidthSp, basePxPerSp) : basePxPerSp;
+  const pxPerSp = fitted && opts.spacingMode !== 'natural' ? fitPxPerSp(opts.width, square.naturalWidthSp ?? square.usedWidthSp, basePxPerSp) : basePxPerSp;
   // Staff scale is ABSOLUTE against the baseline, not a multiplier on the
   // horizontal scale — 1.2 means the same size ink whatever the viewport did.
   // A control that seeds its first step from the last painted scale (the pad
@@ -98,7 +100,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
   const layout =
     Math.abs(inkRatio - 1) > 1e-9 ? layoutNotation({ ...layoutArgs, inkRatio }) : square;
 
-  const widthSp = fitted ? layout.usedWidthSp : layout.widthSp;
+  const widthSp = fitted && opts.spacingMode !== 'natural' ? layout.usedWidthSp : layout.widthSp;
   // Crop the row's fixed ledger/stem headroom to the content's real vertical
   // extent. y only — the x window stays the full plan width so notation and
   // tab keep their shared left edge and column alignment in the `both` view.

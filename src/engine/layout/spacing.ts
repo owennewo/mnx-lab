@@ -225,6 +225,7 @@ export interface MeasurePack {
 }
 
 export interface PackingInput {
+  spacingMode?: 'natural' | 'fill';
   measures: MeasurePack[];
   lineWidthSp: number;
   /** Available width after the first system (part-name gutter can change). */
@@ -300,7 +301,7 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
     });
     return { measures, full, stretch: rowStretch(widthAt(row) - rowRigid, rowSpring) };
   });
-  const capped = justifyRows(wanted);
+  const capped = justifyRows(wanted, packing.spacingMode);
   return wanted.map((r, i) => ({ measures: r.measures, stretch: capped[i], full: r.full }));
 }
 
@@ -396,7 +397,9 @@ function bodyStretch(rows: readonly { full: boolean; stretch: number }[]): numbe
  * the same row membership. Two copies of this rule is exactly the drift this
  * module exists to prevent.
  */
-function justifyRows(rows: readonly { full: boolean; stretch: number }[]): number[] {
+function justifyRows(rows: readonly { full: boolean; stretch: number }[], mode?: 'natural' | 'fill'): number[] {
+  // Natural rows retain their springs; only overfull rows need compression.
+  if (mode === 'natural') return rows.map(row => Math.min(1, row.stretch));
   const ceiling = bodyStretch(rows) ?? MAX_STRETCH;
   return capLastRowStretch(
     rows.map(r => (r.full ? r.stretch : Math.max(MIN_SQUEEZE, Math.min(r.stretch, ceiling))))
@@ -823,6 +826,7 @@ export interface PlanOptions {
    * That is what keeps this axis independent of zoom — density changes how
    * much air sits between glyphs; zoom changes how big the glyphs are.
    */
+  spacingMode?: 'natural' | 'fill';
   densityH?: number;
   /**
    * FRAME DENSITY (roadmap/complete/core-vertical-density.md): a multiplier on
@@ -1570,6 +1574,7 @@ export function planHorizontal(
   // The packer's input, captured BEFORE density is applied — the ladder needs
   // density-1 naturals to ask what any other value would draw.
   const packing: PackingInput = {
+    spacingMode: options?.spacingMode,
     lineWidthSp: lineWidth,
     ...(options?.subsequentLeftInsetSp === undefined ? {} : { subsequentLineWidthSp: widthSp - 2 * marginSp - subsequentLeftInset }),
     contentRightPadSp: contentRightPad,
@@ -1677,7 +1682,7 @@ export function planHorizontal(
         // path where the cap actually bit, since ink pricing below 100% staff
         // scale shrinks the rigid columns and pushes the needed stretch up.
         return { full: packedRow.full, stretch: rowStretch(widthAt(row) - rowRigid, rowSpring) };
-      })
+      }), options?.spacingMode
     );
   }
 

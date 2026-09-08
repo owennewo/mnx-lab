@@ -202,6 +202,7 @@ function storedFallbacks(): string[] {
    ABSENCE rather than a sentinel, because unset genuinely differs from any
    value: no staff scale means FITTED, which no number can express. */
 const STAFF_SCALE_KEY = 'mnx-lab.staff-scale';
+const SPACING_MODE_KEY = 'mnx-lab.spacing-mode';
 const DENSITY_H_KEY = 'mnx-lab.density-h';
 
 function storedScale(key: string, min: number, max: number): number | null {
@@ -572,6 +573,7 @@ export class ScenarioPage extends LitElement {
     MIN_STAFF_SCALE,
     MAX_STAFF_SCALE
   );
+  @state() private spacingMode: 'natural' | 'fill' = localStorage.getItem(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';
   @state() private densityH: number | null = storedScale(
     DENSITY_H_KEY,
     MIN_DENSITY,
@@ -2940,6 +2942,7 @@ export class ScenarioPage extends LitElement {
         .view=${viewMode}
         .zoom=${this.staffScale}
         .densityH=${this.densityH}
+        .spacingMode=${this.spacingMode}
         .partTabSetups=${this.partTabSetups()}
         .selection=${this.selection}
         .selectionInactive=${!this.hasKeyboard}
@@ -3038,12 +3041,18 @@ export class ScenarioPage extends LitElement {
             ? html`<mnx-zoom-pad
                 .staffScale=${this.staffScale}
                 .densityH=${this.densityH}
+                .spacingMode=${this.spacingMode}
                 .densitySteps=${this.densitySteps}
                 .effectiveStaffScale=${this.effectiveStaffScale}
                 .documentFocus=${this.documentFocus}
                     @zoom-change=${this.onZoomChange}
               >
                 <mnx-settings-pad
+                  .spacingMode=${this.spacingMode}
+                  @spacing-mode-change=${(event: CustomEvent<'natural' | 'fill'>) => {
+                    this.spacingMode = event.detail;
+                    localStorage.setItem(SPACING_MODE_KEY, this.spacingMode);
+                  }}
                   .display=${this.displayPreferences}
                   @display-change=${(event: CustomEvent<DisplayOptions>) => {
                     this.displayPreferences = writeDisplayPreferences(event.detail);

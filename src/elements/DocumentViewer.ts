@@ -201,6 +201,8 @@ export class DocumentViewer extends LitElement {
    * (core-zoom-density-pad.md) is what needed it. Clamped by the engine's own
    * `clampDensity`, so a host and the pad get the same floor.
    */
+  @property({ attribute: 'spacing-mode' }) spacingMode: 'natural' | 'fill' = 'fill';
+
   @property({ type: Number, attribute: 'density-h' }) densityH: number | null = null;
   /**
    * Vertical/frame density (roadmap/complete/core-vertical-density.md): a
@@ -702,6 +704,7 @@ export class DocumentViewer extends LitElement {
       changed.has('view') ||
       changed.has('density') ||
       changed.has('densityH') ||
+      changed.has('spacingMode') ||
       changed.has('densityPad') ||
       changed.has('lyrics') ||
       changed.has('timeSignatures') ||
@@ -787,6 +790,7 @@ export class DocumentViewer extends LitElement {
       // The preset resolves to the engine's multiplier here — the element
       // binds a behavior it does not implement (docs/core-viewer-surface.md).
       // A numeric `density-h` outranks the preset; unset, the preset decides.
+      spacingMode: this.spacingMode,
       densityH,
       densityPad,
       // Always undefined — the horizontal axis FITS, at every zoom level

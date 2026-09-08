@@ -55,6 +55,7 @@ export interface RenderBothOptions {
   display?: DisplayOptions;
   hide?: readonly HideableFeature[];
   /** Horizontal density multiplier (core-render-density-zoom.md). */
+  spacingMode?: 'natural' | 'fill';
   densityH?: number;
   /** Vertical/frame density multiplier (core-vertical-density.md). */
   densityPad?: number;
@@ -72,13 +73,14 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
     tabSetup: opts.tabSetup,
     display: opts.display,
     hide: opts.hide,
+    spacingMode: opts.spacingMode,
     densityH: opts.densityH,
     densityPad: opts.densityPad
   };
   const square = layoutBothSystem(layoutArgs);
 
   const fitted = opts.pxPerSp === undefined;
-  const pxPerSp = fitted ? fitPxPerSp(opts.width, square.naturalWidthSp ?? square.usedWidthSp, basePxPerSp) : basePxPerSp;
+  const pxPerSp = fitted && opts.spacingMode !== 'natural' ? fitPxPerSp(opts.width, square.naturalWidthSp ?? square.usedWidthSp, basePxPerSp) : basePxPerSp;
   // Staff scale is ABSOLUTE against the baseline, not a multiplier on the
   // horizontal scale — 1.2 means the same size ink whatever the viewport did.
   // A control that seeds its first step from the last painted scale (the pad
@@ -97,7 +99,7 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
   const layout =
     Math.abs(inkRatio - 1) > 1e-9 ? layoutBothSystem({ ...layoutArgs, inkRatio }) : square;
 
-  const widthSp = fitted ? layout.usedWidthSp : layout.widthSp;
+  const widthSp = fitted && opts.spacingMode !== 'natural' ? layout.usedWidthSp : layout.widthSp;
   // Crop the rows' fixed headroom to the content's real vertical extent.
   // y only — the x window stays the full plan width (see the other renderers).
   const bounds = computeBoundsSp(layout.primitives, CROP_PAD_SP);

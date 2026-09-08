@@ -320,3 +320,13 @@ values are validated, invalid JSON falls back to defaults, and selected-verse
 context is never stored. The element itself never reads workbench storage.
 The compare panel shares the main live viewer beside a static reference image,
 so the live engraving receives the same preferences and retains its projection.
+
+
+The viewer's `spacing-mode` attribute (`spacingMode` property) accepts `fill`
+(default) or `natural`. Fill stretches full systems to their available width.
+Natural keeps the duration spacing allowance, compressing only overfull systems;
+it uses the baseline horizontal scale rather than enlarging short scores to fit.
+The workbench exposes this under Settings → Spacing and remembers the choice.
+Zoom readouts include `%`: spacing is a requested multiplier on duration spacing,
+not a measured gap. At 100%, a quarter-note spring is 2.2 staff spaces; symbol
+columns are additional. Fill-width justification can change the drawn allowance.

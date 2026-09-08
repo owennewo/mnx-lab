@@ -115,6 +115,7 @@ export interface LayoutTabOptions {
    *  spring scaling notation gets. The standalone tab view shipped without
    *  this and so ignored `density` entirely; core-zoom-density-pad.md found
    *  it when the pad had to drive all three views. */
+  spacingMode?: 'natural' | 'fill';
   densityH?: number;
   /** Vertical/frame density (core-vertical-density.md). A tab staff reserves
    *  4sp above it and uses a median of 0.0 — this is the view the axis was
@@ -207,6 +208,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     subsequentLeftInsetSp: display.instrumentNames === undefined ? undefined : display.instrumentNames === 'every-system' ? instrumentLabelInset([instrumentName(part, false)]) : 0,
     display,
     lyricLineIds: selectedLyrics,
+    spacingMode: opts.spacingMode,
     densityH: opts.densityH,
     densityPad: opts.densityPad,
     inkRatio: opts.inkRatio,
@@ -579,7 +581,8 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
       const planOptions: PlanOptions = {
         staves: sources.map(source => ({ sources: [source] })),
         staffKind: 'tab', display, lyricLineIds: selectedLyricLineIds(mnx, display),
-        densityH: opts.densityH, densityPad: opts.densityPad, inkRatio: opts.inkRatio,
+        spacingMode: opts.spacingMode,
+    densityH: opts.densityH, densityPad: opts.densityPad, inkRatio: opts.inkRatio,
         forcedBreaks: segment.forcedBreaks, measureRange: segment.range ?? undefined,
         minMeasures: segment.minMeasures, collapse: job.collapse,
         leftInsetSp: names ? instrumentLabelInset(parts.map(part => instrumentName(part, first))) : 0,

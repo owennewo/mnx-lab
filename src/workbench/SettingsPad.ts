@@ -48,6 +48,7 @@ export class SettingsPad extends LitElement {
   @property({ attribute: false }) hrefFor: ((view: ViewMode) => string) | null = null;
 
   @property({ attribute: false }) display: DisplayOptions = {};
+  @property() spacingMode: 'natural' | 'fill' = 'fill';
   @state() private open = false;
 
   private clickAway = (event: PointerEvent) => {
@@ -312,6 +313,17 @@ export class SettingsPad extends LitElement {
                       )}
                     </span>
                   </div>
+                  <div class="setting" role="group" aria-label="Spacing">
+                    <span class="lbl">Spacing</span>
+                    <span class="options">
+                      ${(['natural', 'fill'] as const).map(mode => html`
+                        <button aria-pressed=${this.spacingMode === mode}
+                          @click=${() => this.dispatchEvent(new CustomEvent('spacing-mode-change', { detail: mode, bubbles: true, composed: true }))}
+                        >${mode === 'natural' ? 'Natural' : 'Fill width'}</button>
+                      `)}
+                    </span>
+                  </div>
+                  <p class="help">Natural preserves requested spacing. Fill width stretches each full system to the available width.</p>
                   ${this.displayRow('lyrics', 'Lyrics', ['All verses', 'Current verse', 'Hide'])}
                   ${this.displayRow('timeSignatures', 'Time signatures', ['Show', 'Hide'])}
                   ${this.displayRow('clefs', 'Clefs', ['Show', 'Hide'])}

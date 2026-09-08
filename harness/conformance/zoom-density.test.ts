@@ -702,3 +702,27 @@ describe('the fit answers about the score, not about the density knob', () => {
     expect(fitPxPerSp(VIEWPORT_PX, layout.usedWidthSp, BASE)).toBeGreaterThan(BASE);
   });
 });
+
+
+describe('natural spacing', () => {
+  it('keeps springs unstretched, including at non-square staff scales', () => {
+    const mnx = doc('lab/document/twelve-bar-blues');
+    for (const inkRatio of [0.6, 1, 1.5]) {
+      const tight = planHorizontal(mnx, 120, { spacingMode: 'natural', densityH: 0.25, inkRatio });
+      const loose = planHorizontal(mnx, 120, { spacingMode: 'natural', densityH: 0.5, inkRatio });
+      // Both settings fit the first measure on the first row; its actual width
+      // must change rather than being restored by full-width justification.
+      expect(tight.measures[0].width).toBeLessThan(loose.measures[0].width);
+      expect(packSystems(tight.packing, 0.25).every(row => row.stretch <= 1)).toBe(true);
+    }
+  });
+  it('reaches notation and tab through their public layout options', async () => {
+    await initSmufl();
+    const mnx = doc('lab/document/twelve-bar-blues');
+    for (const layout of [layoutNotation, layoutTab]) {
+      const natural = layout({ mnx, widthSp: 120, densityH: 0.25, spacingMode: 'natural' });
+      expect(natural.packings?.length).toBeGreaterThan(0);
+      expect(natural.packings?.every(p => p.spacingMode === 'natural')).toBe(true);
+    }
+  });
+});
