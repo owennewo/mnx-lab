@@ -168,6 +168,29 @@ describe('multi-part display systems and score blocks', () => {
       expect(texts(hidden, 'score-title')).toHaveLength(0);
       expect(hidden.heightSp).toBeLessThan(shown.heightSp);
     });
+    it(`${name}: current-verse hyphens stay within their verse and system`, () => {
+      initSmufl();
+      const mnx = ensemble();
+      for (const part of mnx.parts) for (const measure of part.measures) for (const seq of measure.sequences) for (const item of seq.content) {
+        if ('lyrics' in item) for (const line of Object.values(item.lyrics?.lines ?? {})) line.type = 'start';
+      }
+      const result = layout({ mnx, widthSp: 80, display: { lyrics: 'current', selectedVerse: 'verse2' } });
+      const syllables = texts(result, 'lyric');
+      const hyphens = texts(result, 'lyric-hyphen');
+      const byRow = new Map<number, number>();
+      for (const syllable of syllables) {
+        if (syllable.kind !== 'text') continue;
+        expect(['Morn', 'ing']).toContain(syllable.text);
+        byRow.set(syllable.y, (byRow.get(syllable.y) ?? 0) + 1);
+      }
+      expect(byRow.size).toBeGreaterThan(1);
+      expect(hyphens).toHaveLength(syllables.length - byRow.size);
+      for (const hyphen of hyphens) {
+        if (hyphen.kind !== 'text') continue;
+        expect(syllables.some(p => p.kind === 'text' && p.y === hyphen.y && p.x < hyphen.x)).toBe(true);
+        expect(syllables.some(p => p.kind === 'text' && p.y === hyphen.y && p.x > hyphen.x)).toBe(true);
+      }
+    });
     it(`${name}: collapsed measures get one label per displayed position`, () => {
       initSmufl();
       const mnx = ensemble();
