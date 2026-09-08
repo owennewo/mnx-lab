@@ -81,6 +81,24 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Beaming events without IDs (2026-09-08)
+
+Owner: user-reported GPX engraving bug, branch `core-idless-beaming`; no roadmap doc.
+The engine now infers beams and collects their stems by render position, allowing
+schema-valid events without IDs to beam. Explicit beam references keep using
+source IDs. See the [rendering contract](../../docs/rendering.md) and
+[`beaming.test.ts`](../../harness/conformance/beaming.test.ts) for the regression
+coverage, including Guitar Pro and MusicXML imports.
+
+Affected scenarios: `lab/00-document/03-navigation-playground` and
+`lab/00-document/04-twelve-bar-blues`. Only `expected.primitives.json` and
+`expected.svg` changed; other scenario goldens are byte-identical. Review the new
+inferred beam groups replacing individual flags, especially that stems connect
+to the correct notes, groups respect metric boundaries and rests, and separate
+voices remain separate. Existing verification provenance is untouched; this entry
+records expected output changes, not human approval.
+
+
 ### Section and capo heading alignment (2026-09-08)
 
 Owner: user-requested visual adjustment, branch `core-header-alignment`; no roadmap doc.

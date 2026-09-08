@@ -256,11 +256,7 @@
 <line x1="385.1632" y1="839.68" x2="682.328" y2="839.68" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <line x1="385.1632" y1="855.68" x2="682.328" y2="855.68" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
 <text x="416.6688" y="576.32" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="l19"></text>
-<line x1="435.5488" y1="520.32" x2="435.5488" y2="573.632" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="435.5488" y="520.32" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="flag"></text>
 <text x="460.0144" y="568.32" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="l20"></text>
-<line x1="478.8944" y1="512.32" x2="478.8944" y2="565.632" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="478.8944" y="512.32" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="flag"></text>
 <text x="503.36" y="576.32" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="l21"></text>
 <line x1="522.24" y1="520.32" x2="522.24" y2="573.632" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <text x="566.0512" y="592.32" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="l22"></text>
@@ -548,6 +544,9 @@
 <rect x="1209.7248" y="1014.24" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="1204.9248" y1="1248.16" x2="1204.9248" y2="1312.16" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1209.7248" y="1248.16" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="435.5488" y1="573.632" x2="435.5488" y2="520.32" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="478.8944" y1="565.632" x2="478.8944" y2="512.32" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="434.5888" y1="520.32" x2="479.8544" y2="512.32" stroke="currentColor" stroke-width="8" class="beam"></line>
 <text x="121.6" y="104" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Head</text>
 <text x="117.0496" y="949.28" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Turnaround</text>
 </svg>

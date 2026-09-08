@@ -63,3 +63,11 @@ Packing and placement both omit the empty prefix padding.
 
 At a forward repeat, the shared section/tempo/capo heading anchor is the music
 content start, clearing the complete repeat cluster including its dots.
+
+Inferred beams use render positions (measure, staff, voice and event), so an event
+needs no authored `id` to beam. Explicit MNX beam references still resolve through
+authored IDs before joining that same positional map. `support.useBeams: true`
+and measures with explicit beam groups retain their encoded behavior. Rendering
+never writes IDs back into the document; reference-creating editor operations mint
+them when needed. The initial correction's two engraving changes are registered in
+[the verification ledger](../roadmap/inprogress/lab-verify.md#beaming-events-without-ids-2026-09-08).

@@ -1827,7 +1827,7 @@ function assembleSegment(
               keyStaffIndex: synthesizePartForStaff[s]?.staffIndex ?? 1,
               spanMarks
             });
-            if (beamRun && stem && event.id) beamRun.stems.set(event.id, stem);
+            if (beamRun && stem) beamRun.stems.set(`${i}:${s}:${voiceIndex}:${eventIndex}`, stem);
             const lyricLines = event.lyrics?.lines;
             if (lyricLines) {
               for (const [lineId, line] of Object.entries(lyricLines)) {
@@ -2169,7 +2169,7 @@ interface BeamedStem {
 /** One drawable beam: a group (or the part of it on one system row). */
 interface BeamRun {
   dir: 1 | -1;
-  /** Member event ids in document order. */
+  /** Member render-position keys in document order; never requires authored IDs. */
   memberIds: string[];
   segments: BeamSegmentSpec[];
   hooks: BeamHookSpec[];
@@ -2195,10 +2195,14 @@ function buildBeamRuns(
     stem: 1 | -1 | null;
   }
 
-  // Locate events through the SAME voice resolution emission uses (merged
-  // chord staves keep the first source's event ids).
-  const locById = new Map<string, Loc>();
+  // Use the same render positions as event emission. Authored IDs are only
+  // needed to resolve explicit MNX beam references; inference must also work
+  // for valid, ID-less events and chord-merged staff sources.
+  const locByKey = new Map<string, Loc>();
   const info = new Map<string, BeamEventInfo>();
+  const keyById = new Map<string, string>();
+  const infoById = new Map<string, BeamEventInfo>();
+  const inferenceVoices: { mi: number; si: number; vi: number; seq: MnxSequence }[] = [];
   const partsSeen = new Set<MnxPart>();
   segment.staves.forEach((spec, si) => {
     for (const src of spec.sources) partsSeen.add(src.part);
@@ -2207,88 +2211,108 @@ function buildBeamRuns(
       if (!pm || pm.hidden || pm.multiRest) continue;
       const voices = resolveStaffVoices(spec, mi);
       const defaultStems = rankVoiceStems(voices, pm.clefTimelines[si][0].clef);
+      const sourceMeasures = spec.sources.map(src => src.part.measures[mi]);
       voices.forEach((rv, vi) => {
+        // Unmerged voices retain their source sequence. A chord-merged voice
+        // has a fresh sequence and must respect explicit beams from its sources.
+        const source = sourceMeasures.find(measure => measure?.sequences?.includes(rv.seq));
+        const hasExplicitBeams = source
+          ? !!source.beams?.length
+          : sourceMeasures.some(measure => !!measure?.beams?.length);
+        if (!hasExplicitBeams) inferenceVoices.push({ mi, si, vi, seq: rv.seq });
         rv.seq.content.forEach((event, ei) => {
-          // Grace containers don't join measure-level beam groups: their inner
-          // notes beam among themselves (emitGraceGroup), as in the spec's
-          // beams-inner-grace-notes example where the grace sits out the beam.
-          // Unknown item kinds (tuplet, tremolo, …) can't carry beams either.
-          if (!isTimedEvent(event) || !event.id) return;
-          locById.set(event.id, { mi, si, vi, ei, event, stem: defaultStems[vi] });
-          info.set(event.id, {
+          // Containers beam their inner notes separately, not at measure level.
+          if (!isTimedEvent(event)) return;
+          const key = `${mi}:${si}:${vi}:${ei}`;
+          const eventInfo = {
             levels: BEAM_LEVELS_BY_BASE[event.duration.base] ?? 0,
             ticks: Math.round(durationValue(event.duration) * WHOLE_NOTE_TICKS)
-          });
+          };
+          locByKey.set(key, { mi, si, vi, ei, event, stem: defaultStems[vi] });
+          info.set(key, eventInfo);
+          if (event.id) {
+            keyById.set(event.id, key);
+            infoById.set(event.id, eventInfo);
+          }
         });
       });
     }
   });
 
   const groups: BeamGroupSpec[] = [];
-  for (const part of partsSeen) groups.push(...resolveBeamGroups(part.measures, info));
+  const keysOf = (ids: string[]) => ids.flatMap(id => {
+    const key = keyById.get(id);
+    return key === undefined ? [] : [key];
+  });
+  for (const part of partsSeen) {
+    for (const group of resolveBeamGroups(part.measures, infoById)) {
+      groups.push({
+        eventIds: keysOf(group.eventIds),
+        segments: group.segments.map(segment => ({ ...segment, eventIds: keysOf(segment.eventIds) })),
+        hooks: group.hooks.flatMap(hook => {
+          const key = keyById.get(hook.eventId);
+          return key === undefined ? [] : [{ ...hook, eventId: key }];
+        })
+      });
+    }
+  }
 
   // Documents that don't declare support.useBeams leave beaming to the
   // renderer: consecutive beamable note events of a sequence beam together
-  // within the conventional metric unit — the half-bar in even simple meters
-  // (pairs the spec's reference engravings group eighths into), the beat in
-  // odd ones, the dotted quarter in compound time. Measures carrying explicit
-  // `beams` stay as encoded, as do events some other measure already beamed.
+  // within the conventional metric unit — the half-bar in even simple meters,
+  // the whole bar in simple triple, the beat in odd meters, and the dotted
+  // quarter in compound time. Explicit beam membership always wins.
   if (mnx.mnx?.support?.useBeams !== true) {
-    const explicitIds = new Set(groups.flatMap(g => g.eventIds));
-    for (const part of partsSeen) {
-      part.measures.forEach((pm, mi) => {
-        if (pm.beams?.length) return;
-        const ts = plan.measures[mi]?.timeSig ?? { count: 4, unit: 4 };
-        const beatTicks =
-          ts.unit === 8 && ts.count % 3 === 0
-            ? (3 * WHOLE_NOTE_TICKS) / 8
-            : ts.count % 3 === 0
-            ? ts.count * (WHOLE_NOTE_TICKS / ts.unit) // simple triple: whole bar
-            : (WHOLE_NOTE_TICKS / ts.unit) * (ts.count % 2 === 0 ? 2 : 1);
-        for (const seq of pm.sequences ?? []) {
-          let t = 0; // onset in ticks
-          let run: string[] = [];
-          const flush = () => {
-            if (run.length >= 2) groups.push(impliedBeamGroup(run, info));
-            run = [];
-          };
-          for (const item of seq.content) {
-            if (isGrace(item)) continue; // graces sit out beams without breaking the run
-            if (isTremolo(item) || isTuplet(item)) {
-              flush();
-              t += Math.round(
-                (isTremolo(item) ? tremoloDuration(item) : tupletDuration(item)) * WHOLE_NOTE_TICKS
-              );
-              continue;
-            }
-            if (!isTimedEvent(item)) {
-              flush();
-              continue;
-            }
-            const beamable =
-              !item.rest &&
-              (item.notes?.length ?? 0) > 0 &&
-              (BEAM_LEVELS_BY_BASE[item.duration.base] ?? 0) >= 1 &&
-              !!item.id &&
-              !explicitIds.has(item.id);
-            if (!beamable) {
-              flush();
-            } else {
-              if (run.length > 0 && t % beatTicks === 0) flush();
-              run.push(item.id!);
-            }
-            t += Math.round(durationValue(item.duration) * WHOLE_NOTE_TICKS);
-          }
+    const explicitKeys = new Set(groups.flatMap(g => g.eventIds));
+    for (const { mi, si, vi, seq } of inferenceVoices) {
+      const ts = plan.measures[mi]?.timeSig ?? { count: 4, unit: 4 };
+      const beatTicks =
+        ts.unit === 8 && ts.count % 3 === 0
+          ? (3 * WHOLE_NOTE_TICKS) / 8
+          : ts.count % 3 === 0
+          ? ts.count * (WHOLE_NOTE_TICKS / ts.unit)
+          : (WHOLE_NOTE_TICKS / ts.unit) * (ts.count % 2 === 0 ? 2 : 1);
+      let t = 0;
+      let run: string[] = [];
+      const flush = () => {
+        if (run.length >= 2) groups.push(impliedBeamGroup(run, info));
+        run = [];
+      };
+      seq.content.forEach((item, ei) => {
+        if (isGrace(item)) return; // graces sit out beams without breaking the run
+        if (isTremolo(item) || isTuplet(item)) {
           flush();
+          t += Math.round(
+            (isTremolo(item) ? tremoloDuration(item) : tupletDuration(item)) * WHOLE_NOTE_TICKS
+          );
+          return;
         }
+        if (!isTimedEvent(item)) {
+          flush();
+          return;
+        }
+        const key = `${mi}:${si}:${vi}:${ei}`;
+        const beamable =
+          !item.rest &&
+          (item.notes?.length ?? 0) > 0 &&
+          (BEAM_LEVELS_BY_BASE[item.duration.base] ?? 0) >= 1 &&
+          !explicitKeys.has(key);
+        if (!beamable) {
+          flush();
+        } else {
+          if (run.length > 0 && t % beatTicks === 0) flush();
+          run.push(key);
+        }
+        t += Math.round(durationValue(item.duration) * WHOLE_NOTE_TICKS);
       });
+      flush();
     }
   }
 
   for (const group of groups) {
     // Members that exist, carry notes, and can hold a beam.
     const members = group.eventIds.filter(id => {
-      const loc = locById.get(id);
+      const loc = locByKey.get(id);
       return (
         !!loc &&
         !loc.event.rest &&
@@ -2298,7 +2322,7 @@ function buildBeamRuns(
     });
 
     // A beam can't span a system break — split and re-beam each side.
-    const rowOf = (id: string) => plan.measures[locById.get(id)!.mi].row;
+    const rowOf = (id: string) => plan.measures[locByKey.get(id)!.mi].row;
     const rowRuns: string[][] = [];
     let current: string[] = [];
     for (const id of members) {
@@ -2315,14 +2339,14 @@ function buildBeamRuns(
 
       // Stem direction: a forced or pitch-ranked voice stem wins; otherwise
       // the note furthest from the middle line across the whole run decides.
-      const firstLoc = locById.get(ids[0])!;
+      const firstLoc = locByKey.get(ids[0])!;
       let dir: 1 | -1;
       if (firstLoc.stem !== null) {
         dir = firstLoc.stem;
       } else {
         const ys: number[] = [];
         for (const id of ids) {
-          const loc = locById.get(id)!;
+          const loc = locByKey.get(id)!;
           const clef = plan.measures[loc.mi].clefTimelines[loc.si][0].clef;
           for (const n of loc.event.notes ?? []) {
             ys.push(pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
@@ -2352,7 +2376,7 @@ function buildBeamRuns(
       const run: BeamRun = { dir, memberIds: ids, segments, hooks, stems: new Map() };
       runs.push(run);
       for (const id of ids) {
-        const loc = locById.get(id)!;
+        const loc = locByKey.get(id)!;
         byEventKey.set(`${loc.mi}:${loc.si}:${loc.vi}:${loc.ei}`, run);
       }
     }
