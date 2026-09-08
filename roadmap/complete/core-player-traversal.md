@@ -1,7 +1,7 @@
 # Traversal — extend the pass model with ordinal, occurrence and bounds
 
-> **Status: implemented 2026-09-08; landing checks and worktree retirement in progress.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 1. First, because every
+> **Status: complete 2026-09-08. Implementation landed and its worktree retired; new engraving approval remains in the standing ledger.** Campaign:
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 1. First, because every
 > other item consumes it and it can be verified with no audio.
 > **This extends `src/model/passes.ts`; it does not write a second walker.**
 
@@ -112,4 +112,11 @@ still offers iteration 3. These are corpus/spec findings, not new spec proposals
 
 Existing engraving goldens reproduce byte-identically. The new
 `lab/navigation/ds-final-ending` engraving has been generated but is **not human
-approved**; its review batch is registered in [lab-verify.md](lab-verify.md#player-traversal--2026-09-08).
+approved**; its review batch is registered in [lab-verify.md](../inprogress/lab-verify.md#player-traversal--2026-09-08).
+
+
+Landing validation: all 1,282 tests passed (two workers to avoid contention),
+`check:scenarios` and `build` passed after rebase, and `update:primitives` left a
+clean scenario diff. The new fixture's entries also flow through regenerated
+construct/destruct coverage and the converter support matrix. The implementation
+worktree was removed before this document moved to `complete/`.

@@ -555,7 +555,7 @@ retire what settled, and adjust the counts in *Open debt* with the date you took
 
 ## Player traversal — 2026-09-08
 
-Cause: [core-player-traversal.md](core-player-traversal.md), player campaign item 1.
+Cause: [core-player-traversal.md](../complete/core-player-traversal.md), player campaign item 1.
 New scenario: **`lab/navigation/ds-final-ending`**
 (`scenarios/lab/40-navigation/05-ds-final-ending/`). Existing scenario goldens did not
 move. This is new engraving evidence, not an approval of playback (no player exists yet).

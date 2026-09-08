@@ -227,11 +227,7 @@ back up to `proposed/` the moment it is.
   ownership, MIDI channel-per-string a **bounded export**. Eight-clause contract, incl.
   *the cursor follows the audio clock*. Thirteen items; the first reviewer milestone is
   sound over the **written** score, the unrolled engraving after it.
-- **[core-player-traversal.md](inprogress/core-player-traversal.md)** — campaign item 1:
-  **extend `model/passes.ts`**, keeping its consumers and suite unchanged — performed
-  entries with ordinal, occurrence and iteration; partial-bar bounds for mid-bar
-  segno/Fine/D.S.; diagnostics; its recorded D.S.-into-voltas simplification resolved.
-  Hand-stated entries for the 14 navigation scenarios plus a committed corpus report.
+
 
 - **[core-musicxml-staves.md](inprogress/core-musicxml-staves.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 12, **built 2026-09-04**:
@@ -418,6 +414,12 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-player-traversal.md](complete/core-player-traversal.md)** — campaign item 1:
+  **extend `model/passes.ts`**, keeping its consumers and suite unchanged — performed
+  entries with ordinal, occurrence and iteration; partial-bar bounds for mid-bar
+  segno/Fine/D.S.; diagnostics; its recorded D.S.-into-voltas simplification resolved.
+  Hand-stated entries for the 14 navigation scenarios plus a committed corpus report.
+
 
 - **[core-guitarpro-binary-import.md](complete/core-guitarpro-binary-import.md)** — clean-room
   GP3.00, GP4.00/4.06 and GP5.00/5.10 import, shared GPIF normalization, effect/tie/grace

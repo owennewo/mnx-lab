@@ -25,7 +25,7 @@ Playback is **not in the spec loop** for now. Items will find gaps (no coda or D
 vocabulary; grace steal timing loose) and record them in the log; filing a
 `spec/proposals/` topic is a separate human decision.
 
-## What is true today
+## Baseline at campaign opening
 
 - **A traversal exists.** `src/model/passes.ts` (`linearizePasses`) already walks
   repeats with counts, implied start repeats, numbered voltas, D.S. and D.S. al Fine,
@@ -161,7 +161,7 @@ run any time before 6.
 
 | # | Item | Scope | Serves | Proof | Status |
 |---|------|-------|--------|-------|--------|
-| 1 | [Traversal](core-player-traversal.md) | **Extend `model/passes.ts`**, keeping its consumers and suite: performed entries with ordinal, occurrence and iteration; partial-measure bounds for mid-bar segno/Fine/D.S.; diagnostics; the D.S.-into-voltas simplification resolved. | reviewer | the existing suite + hand-stated orders for the 14 navigation scenarios + a committed corpus report | implemented; new engraving review pending |
+| 1 | [Traversal](../complete/core-player-traversal.md) | **Extend `model/passes.ts`**, keeping its consumers and suite: performed entries with ordinal, occurrence and iteration; partial-measure bounds for mid-bar segno/Fine/D.S.; diagnostics; the D.S.-into-voltas simplification resolved. | reviewer | the existing suite + hand-stated orders for the 14 navigation scenarios + a committed corpus report | complete; new engraving review pending |
 | 2 | [Playback context and the iteration cursor](../proposed/core-player-pass-cursor.md) | A host-owned playback context (replacing the dormant `PlaybackState` shape) carrying ordinal and iteration; the chip ladder shows `iteration 2 of 3` / *not performed*; changeable; feeds `selected-verse`. The edit session is untouched. | reviewer | conformance tests on the pure resolver; no golden moves | proposed |
 | 3 | [Timing and pitch contracts](../proposed/core-player-timing-pitch.md) | `audio/time.ts` (rational arithmetic, tempo map, `secondsAt`); the pitch rule as tests over transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata (incl. `duration` hints and cross-part sync) and tie conventions written down with numbers; the performance golden's format. | reviewer | conformance tests | proposed |
 | 4 | [Audio backend spike](../proposed/core-player-tone-spike.md) | Tone.js **versus a native Web Audio sink**, measured: Node import, browser Offline render, per-voice detune ramps, both embed formats' size, what Tone saves once the transport is ours. Output: a log entry and the `Sink` interface. | both | its findings | proposed |
