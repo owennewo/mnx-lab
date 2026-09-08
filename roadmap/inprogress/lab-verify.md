@@ -551,3 +551,16 @@ harness script. There is no human-facing CLI and no checkbox page, by design.
 Point the sweep at a batch from the register rather than at the raw queue, and read that
 batch's *what a reviewer should look for* first. When the sweep ends, update this file:
 retire what settled, and adjust the counts in *Open debt* with the date you took them.
+
+
+## Player traversal — 2026-09-08
+
+Cause: [core-player-traversal.md](core-player-traversal.md), player campaign item 1.
+New scenario: **`lab/navigation/ds-final-ending`**
+(`scenarios/lab/40-navigation/05-ds-final-ending/`). Existing scenario goldens did not
+move. This is new engraving evidence, not an approval of playback (no player exists yet).
+
+Look for: repeat start and mid-bar segno in bar 1; first ending/repeat end in bar 2;
+second ending with Fine at 3/4 in bar 3; D.S. al Fine at 1/2 in bar 4. The hand-stated
+performed order is 1, 2, 1, 3, 4, 1, 3; the return enters bar 1 at 1/4 and exits bar 3
+at 3/4. Approve through `/verify`; no verification record has been written.

@@ -1,0 +1,5864 @@
+{
+  "spec/accidentals": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "passCounts": [
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/articulations": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/beam-hooks": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/beams": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/beams-across-barlines": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/beams-inner-grace-notes": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/beams-secondary-beam-breaks": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/beams-secondary-beam-breaks-implied": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/clef-changes": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/dotted-notes": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/dynamic-accents": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/dynamics": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/full-measure-rests": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/grace-note": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/grace-notes-beamed": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/grand-staff": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/hello-world": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/jumps-dal-segno": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      1,
+      2,
+      3,
+      4
+    ],
+    "passCounts": [
+      1,
+      2,
+      2,
+      2,
+      2
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1,
+        "until": [
+          1,
+          1
+        ]
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 1,
+        "occurrence": 2,
+        "iteration": 1,
+        "from": [
+          0,
+          1
+        ],
+        "via": "jump"
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 2,
+        "occurrence": 2,
+        "iteration": 1
+      },
+      {
+        "ordinal": 7,
+        "measureIndex": 3,
+        "occurrence": 2,
+        "iteration": 1
+      },
+      {
+        "ordinal": 8,
+        "measureIndex": 4,
+        "occurrence": 2,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/jumps-ds-al-fine": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      1,
+      2
+    ],
+    "passCounts": [
+      1,
+      2,
+      2,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1,
+        "until": [
+          1,
+          1
+        ]
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 1,
+        "occurrence": 2,
+        "iteration": 1,
+        "from": [
+          0,
+          1
+        ],
+        "via": "jump"
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 2,
+        "occurrence": 2,
+        "iteration": 1,
+        "until": [
+          1,
+          1
+        ],
+        "via": "fine"
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/key-signatures": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/lyric-line-metadata": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/lyrics-basic": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/lyrics-multi-line": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/measure-repeats": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 5,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 6,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 7,
+        "measureIndex": 7,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/measure-repeats-with-counters": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/multimeasure-rests": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 5,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 6,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/multiple-layouts": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/multiple-voices": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/orchestral-layout": {
+    "order": [],
+    "passCounts": [],
+    "soundingPasses": [],
+    "truncated": false,
+    "entries": [],
+    "diagnostics": [],
+    "availableIterations": []
+  },
+  "spec/organ-layout": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/ottavas-8va": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/parts": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/repeats": {
+    "order": [
+      0,
+      0
+    ],
+    "passCounts": [
+      2
+    ],
+    "soundingPasses": [
+      [
+        1,
+        2
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 0,
+        "occurrence": 2,
+        "iteration": 2,
+        "via": "loop"
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1,
+        2
+      ]
+    ]
+  },
+  "spec/repeats-alternate-endings-advanced": {
+    "order": [
+      0,
+      1,
+      2,
+      0,
+      1,
+      2,
+      5
+    ],
+    "passCounts": [
+      2,
+      2,
+      2,
+      0,
+      0,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [],
+      [],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 0,
+        "occurrence": 2,
+        "iteration": 2,
+        "via": "loop"
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 1,
+        "occurrence": 2,
+        "iteration": 2
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 2,
+        "occurrence": 2,
+        "iteration": 2
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 5,
+        "occurrence": 1,
+        "iteration": 1,
+        "via": "ending"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "unmatched-ending",
+        "measureIndex": 3,
+        "message": "Ending numbers exceed the strain's 2 iterations."
+      }
+    ],
+    "availableIterations": [
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/repeats-alternate-endings-simple": {
+    "order": [
+      0,
+      1,
+      0,
+      2
+    ],
+    "passCounts": [
+      2,
+      1,
+      1,
+      0
+    ],
+    "soundingPasses": [
+      [
+        1,
+        2
+      ],
+      [
+        1
+      ],
+      [
+        2
+      ],
+      []
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 0,
+        "occurrence": 2,
+        "iteration": 2,
+        "via": "loop"
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 2,
+        "via": "ending"
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "unmatched-ending",
+        "measureIndex": 3,
+        "message": "Ending numbers exceed the strain's 2 iterations."
+      }
+    ],
+    "availableIterations": [
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ]
+    ]
+  },
+  "spec/repeats-implied-start-repeat": {
+    "order": [
+      0,
+      0
+    ],
+    "passCounts": [
+      2
+    ],
+    "soundingPasses": [
+      [
+        1,
+        2
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 0,
+        "occurrence": 2,
+        "iteration": 2,
+        "via": "loop"
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1,
+        2
+      ]
+    ]
+  },
+  "spec/repeats-more-once-repeated": {
+    "order": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "passCounts": [
+      4
+    ],
+    "soundingPasses": [
+      [
+        1,
+        2,
+        3,
+        4
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 0,
+        "occurrence": 2,
+        "iteration": 2,
+        "via": "loop"
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 0,
+        "occurrence": 3,
+        "iteration": 3,
+        "via": "loop"
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 0,
+        "occurrence": 4,
+        "iteration": 4,
+        "via": "loop"
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1,
+        2,
+        3,
+        4
+      ]
+    ]
+  },
+  "spec/rest-positions": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/single-note-tremolos": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/slurs": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/slurs-chords": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/slurs-targeting-specific-notes": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/system-layouts": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 5,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 6,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/tempo-markings": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/three-note-chord-and-half-rest": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "spec/tie-targets": {
+    "order": [
+      0,
+      1,
+      2,
+      0,
+      1,
+      3,
+      4
+    ],
+    "passCounts": [
+      2,
+      2,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1
+      ],
+      [
+        2
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 0,
+        "occurrence": 2,
+        "iteration": 2,
+        "via": "loop"
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 1,
+        "occurrence": 2,
+        "iteration": 2
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 2,
+        "via": "ending"
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/ties": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/time-signature-glyphs": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/time-signatures": {
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "passCounts": [
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/tremolos-multi-note": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/tuplets": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "spec/two-bar-c-major-scale": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/document/minimal-single-note": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/document/empty-tab-canvas": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/document/navigation-playground": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 5,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 6,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 7,
+        "measureIndex": 7,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/document/twelve-bar-blues": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 5,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 6,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 7,
+        "measureIndex": 7,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 8,
+        "measureIndex": 8,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 9,
+        "measureIndex": 9,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 10,
+        "measureIndex": 10,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 11,
+        "measureIndex": 11,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/pitches/parenthesized-accidental": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/pitches/alto-and-tenor-clefs": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/durations/rest-gallery": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 5,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 6,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 7,
+        "measureIndex": 7,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 8,
+        "measureIndex": 8,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 9,
+        "measureIndex": 9,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 10,
+        "measureIndex": 10,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 11,
+        "measureIndex": 11,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 12,
+        "measureIndex": 12,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 13,
+        "measureIndex": 13,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 14,
+        "measureIndex": 14,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 15,
+        "measureIndex": 15,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 16,
+        "measureIndex": 16,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/rhythm/appoggiatura": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/rhythm/tuplet-number-hidden": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/rhythm/sequence-space": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-part/standard-tuning-both": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-positions/open-strings-chord": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-derivation/bare-melody": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-derivation/bare-chord": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-derivation/string-only": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-derivation/partial-annotation": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-derivation/drop-d": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-derivation/capo": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-derivation/transposition-display-only": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-derivation/out-of-range": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-derivation/fret-mismatch": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-derivation/undeclared-strings": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-fingering/left-hand-fingers": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-fingering/right-hand-pima": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-spec-gaps/tab-clef-rejected": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-spec-gaps/note-position-rejected": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-spec-gaps/part-tuning-rejected": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-spec-gaps/fingering-rejected": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-spec-gaps/harmony-rejected": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-techniques/bend-and-release": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-techniques/slides": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-techniques/hammer-pull-chain": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-techniques/vibrato-and-palm-mute": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-techniques/natural-harmonics": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-techniques/bend-shapes": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-rhythm/triplets-on-tab": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-rhythm/grace-on-tab": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/tab-rhythm/unplayable-inside-a-tuplet": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/dynamics/all-dynamic-marks": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 5,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 6,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/dynamics/accent-prefix-suffix": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/dynamics/hairpin-and-relative": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/dynamics/diminuendo-across-bars": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/rehearsal-marks": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/sections": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/sections-with-rehearsal-marks": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/directions": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/directions-symbolic": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/directions-across-parts": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/directions-multi-staff": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/directions-stacked": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/labels-with-navigation": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/labels-on-a-tab-staff": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/one-bar-sections": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/score-text/chord-symbols": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/articulations/rare-articulations": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/articulations/unrendered-marks": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/articulations/fermata": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/articulations/arpeggiated-chords": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/articulations/fermatas-on-bars-and-rests": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/navigation/jumps-and-signs": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "passCounts": [
+      1,
+      2,
+      2,
+      2,
+      2,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1,
+        "until": [
+          1,
+          1
+        ]
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 1,
+        "occurrence": 2,
+        "iteration": 1,
+        "from": [
+          0,
+          1
+        ],
+        "via": "jump"
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 2,
+        "occurrence": 2,
+        "iteration": 1
+      },
+      {
+        "ordinal": 7,
+        "measureIndex": 3,
+        "occurrence": 2,
+        "iteration": 1
+      },
+      {
+        "ordinal": 8,
+        "measureIndex": 4,
+        "occurrence": 2,
+        "iteration": 1
+      },
+      {
+        "ordinal": 9,
+        "measureIndex": 5,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/navigation/repeats-and-marks-on-tab": {
+    "order": [
+      0,
+      1,
+      0,
+      2,
+      3
+    ],
+    "passCounts": [
+      2,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1,
+        2
+      ],
+      [
+        1
+      ],
+      [
+        2
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 0,
+        "occurrence": 2,
+        "iteration": 2,
+        "via": "loop"
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 2,
+        "via": "ending"
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/navigation/numbered-bars": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/navigation/tempo-change-mid-bar": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/navigation/ds-final-ending": {
+    "order": [
+      0,
+      1,
+      0,
+      2,
+      3,
+      0,
+      2
+    ],
+    "passCounts": [
+      3,
+      1,
+      2,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1,
+        2
+      ],
+      [
+        1
+      ],
+      [
+        2
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 0,
+        "occurrence": 2,
+        "iteration": 2,
+        "via": "loop"
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 2,
+        "via": "ending"
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1,
+        "until": [
+          1,
+          2
+        ]
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 0,
+        "occurrence": 3,
+        "iteration": 2,
+        "from": [
+          1,
+          4
+        ],
+        "via": "jump"
+      },
+      {
+        "ordinal": 6,
+        "measureIndex": 2,
+        "occurrence": 2,
+        "iteration": 2,
+        "via": "fine",
+        "until": [
+          3,
+          4
+        ]
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/lyrics/verse-labels": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/lyrics/tab-verses": {
+    "order": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/layout/group-barline-individual": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/layout/coloured-marks-and-clef-forms": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "unmatched-ending",
+        "measureIndex": 0,
+        "message": "Ending has no enclosing repeated strain."
+      }
+    ],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
+  "lab/percussion/minimal-kit": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
+  "lab/edge-cases/bar-duration-mismatch": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  }
+}

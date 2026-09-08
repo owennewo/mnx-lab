@@ -1,7 +1,7 @@
 # The player element over the written score — the first reviewer milestone
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 7. Needs items 2, 5 and
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 7. Needs items 2, 5 and
 > 6. Deliberately **not** waiting for the unrolled engraving (item 10): the written
 > score, a performed-order table and sound prove the player with far less layout work.
 

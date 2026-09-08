@@ -1,7 +1,7 @@
 # Transport — play, pause, seek and loop, with the cursor on the audio clock
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 6. Needs items 4 and 5.
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 6. Needs items 4 and 5.
 
 ## Agreement block (campaign contract)
 

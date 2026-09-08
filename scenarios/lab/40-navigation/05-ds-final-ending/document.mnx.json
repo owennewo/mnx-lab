@@ -1,0 +1,159 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        },
+        "repeatStart": {},
+        "segno": {
+          "location": {
+            "fraction": [
+              1,
+              4
+            ]
+          }
+        }
+      },
+      {
+        "ending": {
+          "numbers": [
+            1
+          ],
+          "duration": 1
+        },
+        "repeatEnd": {}
+      },
+      {
+        "ending": {
+          "numbers": [
+            2
+          ],
+          "duration": 1
+        },
+        "fine": {
+          "location": {
+            "fraction": [
+              3,
+              4
+            ]
+          }
+        }
+      },
+      {
+        "jump": {
+          "type": "dsalfine",
+          "location": {
+            "fraction": [
+              1,
+              2
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "name": "Music",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "B",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

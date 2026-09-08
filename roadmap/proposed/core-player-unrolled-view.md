@@ -1,7 +1,7 @@
 # The unrolled engraving — an occurrence-aware layout plan
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 10. Needs items 1, 2 and 7.
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 10. Needs items 1, 2 and 7.
 > **Moved after the player** on review: this is a layout-plan change, not an
 > emission-loop change, and the reviewer hears trustworthy playback sooner without
 > it. Still a **toggle**, not a fourth view mode.

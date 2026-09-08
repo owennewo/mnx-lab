@@ -1,6 +1,6 @@
 # Traversal — extend the pass model with ordinal, occurrence and bounds
 
-> **Status: proposed 2026-09-08, revised the same day.** Campaign:
+> **Status: implemented 2026-09-08; landing checks and worktree retirement in progress.** Campaign:
 > [core-campaign-player.md](core-campaign-player.md), item 1. First, because every
 > other item consumes it and it can be verified with no audio.
 > **This extends `src/model/passes.ts`; it does not write a second walker.**
@@ -86,3 +86,30 @@ D.S. return takes the final ending or any repeat; ending numbers versus `times`.
 - `passes.test.ts` green unchanged; the 14 hand-stated entry lists pass; the report
   covers every corpus document; `update:primitives` leaves `scenarios/` clean.
 - `lyricText.ts` untouched and its tests green.
+
+
+## Implementation — 2026-09-08
+
+`PassModel` now also exposes `entries`, `diagnostics` and `availableIterations`.
+The old fields and signature remain; `passes.test.ts` and `edit/lyricText.ts` are
+unchanged. `via` records arrival by loop/jump/skipped ending; a terminating Fine
+wins when both apply. Bounds preserve the declared metric fraction, including
+explicit start/end bounds, and are copied rather than shared with the document.
+Ending membership covers every bar of a span, so a jump into its interior cannot
+bypass the final-ending rule. Plain strains without endings retain return iteration 1.
+
+`harness/conformance/traversal.test.ts` states 16 navigation examples by hand:
+the campaign's 14, the otherwise plain mid-bar-tempo example under `40-navigation/`,
+and the new D.S. scenario. `npm run update:traversal` writes the whole-corpus report;
+normal tests require byte-identical evidence. The iteration domain is derived from
+written strains, capped by the traversal resource bound with a diagnostic.
+
+The two mirrored alternate-ending examples label an ending 3 while declaring the
+default two repeat iterations. Their existing orders are preserved and diagnosed;
+we neither infer `times` from ending labels nor edit mirrored scenarios. The tab
+showcase declares three iterations but exits through ending 2; its inspection domain
+still offers iteration 3. These are corpus/spec findings, not new spec proposals.
+
+Existing engraving goldens reproduce byte-identically. The new
+`lab/navigation/ds-final-ending` engraving has been generated but is **not human
+approved**; its review batch is registered in [lab-verify.md](lab-verify.md#player-traversal--2026-09-08).

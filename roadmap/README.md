@@ -44,25 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-campaign-player.md](proposed/core-campaign-player.md)** — **campaign**: the player,
-  **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
-  iteration, the performed order as a golden — with studio practice as indexed follow-ups.
-  Opened 2026-09-08 and **revised the same day on an independent review** that found three
-  errors of fact before a line was written: the traversal already existed
-  (`model/passes.ts`), MNX `pitch` is the *sounded* pitch, and PPQ 960 is not divisible by 7.
-  Decisions as revised: **rational musical time**, ticks only at MIDI export; **written
-  occurrences and sounding events as two linked lists** (ties and tremolos break either
-  alone); **three identities** — performed ordinal, occurrence, iteration — never one
-  "pass"; the backend (Tone.js vs a native Web Audio sink) **decided by a measured spike**
-  with the transport ours either way; independently addressable voices with string
-  ownership, MIDI channel-per-string a **bounded export**. Eight-clause contract, incl.
-  *the cursor follows the audio clock*. Thirteen items; the first reviewer milestone is
-  sound over the **written** score, the unrolled engraving after it.
-- **[core-player-traversal.md](proposed/core-player-traversal.md)** — campaign item 1:
-  **extend `model/passes.ts`**, keeping its consumers and suite unchanged — performed
-  entries with ordinal, occurrence and iteration; partial-bar bounds for mid-bar
-  segno/Fine/D.S.; diagnostics; its recorded D.S.-into-voltas simplification resolved.
-  Hand-stated entries for the 14 navigation scenarios plus a committed corpus report.
 - **[core-player-pass-cursor.md](proposed/core-player-pass-cursor.md)** — campaign item 2:
   a host-owned **playback context** (replacing the dormant `PlaybackState` shape the viewer
   already consumes) carrying ordinal and iteration; the chip reads `iteration 2 of 3` or
@@ -232,6 +213,26 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
+  **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
+  iteration, the performed order as a golden — with studio practice as indexed follow-ups.
+  Opened 2026-09-08 and **revised the same day on an independent review** that found three
+  errors of fact before a line was written: the traversal already existed
+  (`model/passes.ts`), MNX `pitch` is the *sounded* pitch, and PPQ 960 is not divisible by 7.
+  Decisions as revised: **rational musical time**, ticks only at MIDI export; **written
+  occurrences and sounding events as two linked lists** (ties and tremolos break either
+  alone); **three identities** — performed ordinal, occurrence, iteration — never one
+  "pass"; the backend (Tone.js vs a native Web Audio sink) **decided by a measured spike**
+  with the transport ours either way; independently addressable voices with string
+  ownership, MIDI channel-per-string a **bounded export**. Eight-clause contract, incl.
+  *the cursor follows the audio clock*. Thirteen items; the first reviewer milestone is
+  sound over the **written** score, the unrolled engraving after it.
+- **[core-player-traversal.md](inprogress/core-player-traversal.md)** — campaign item 1:
+  **extend `model/passes.ts`**, keeping its consumers and suite unchanged — performed
+  entries with ordinal, occurrence and iteration; partial-bar bounds for mid-bar
+  segno/Fine/D.S.; diagnostics; its recorded D.S.-into-voltas simplification resolved.
+  Hand-stated entries for the 14 navigation scenarios plus a committed corpus report.
+
 - **[core-musicxml-staves.md](inprogress/core-musicxml-staves.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 12, **built 2026-09-04**:
   multi-staff parts — `<staves>`, a `<clef number>` per staff tracked independently, and

@@ -140,7 +140,7 @@ proposal opens with, and is reviewed on:
    engraving approval does not approve newly added evidence: a missing new hash is
    unseen evidence in the queue, while the older approval remains intact. "Add a
    hash" is not an item. Moved batches register in
-   [lab-verify.md](../inprogress/lab-verify.md).
+   [lab-verify.md](lab-verify.md).
 5. **The dependency budget.** At most **one** runtime audio dependency, chosen by item
    4's spike, confined to `src/audio/<backend>/` by a dependency-cruiser rule, never
    reachable from `engine/headless.ts` or Node conformance imports. Browser harness
@@ -161,19 +161,19 @@ run any time before 6.
 
 | # | Item | Scope | Serves | Proof | Status |
 |---|------|-------|--------|-------|--------|
-| 1 | [Traversal](core-player-traversal.md) | **Extend `model/passes.ts`**, keeping its consumers and suite: performed entries with ordinal, occurrence and iteration; partial-measure bounds for mid-bar segno/Fine/D.S.; diagnostics; the D.S.-into-voltas simplification resolved. | reviewer | the existing suite + hand-stated orders for the 14 navigation scenarios + a committed corpus report | proposed |
-| 2 | [Playback context and the iteration cursor](core-player-pass-cursor.md) | A host-owned playback context (replacing the dormant `PlaybackState` shape) carrying ordinal and iteration; the chip ladder shows `iteration 2 of 3` / *not performed*; changeable; feeds `selected-verse`. The edit session is untouched. | reviewer | conformance tests on the pure resolver; no golden moves | proposed |
-| 3 | [Timing and pitch contracts](core-player-timing-pitch.md) | `audio/time.ts` (rational arithmetic, tempo map, `secondsAt`); the pitch rule as tests over transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata (incl. `duration` hints and cross-part sync) and tie conventions written down with numbers; the performance golden's format. | reviewer | conformance tests | proposed |
-| 4 | [Audio backend spike](core-player-tone-spike.md) | Tone.js **versus a native Web Audio sink**, measured: Node import, browser Offline render, per-voice detune ramps, both embed formats' size, what Tone saves once the transport is ours. Output: a log entry and the `Sink` interface. | both | its findings | proposed |
-| 5 | [Performance compiler and MIDI export](core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | proposed |
-| 6 | [Transport](core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | proposed |
-| 7 | [Player element, written view](core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | proposed |
-| 8 | [Expression and technique](core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | proposed |
-| 9 | [MIDI oracle](core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | proposed — **needs a dev-environment decision** |
-| 10 | [Unrolled engraving](core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | proposed — after 7 |
-| 11 | [WebMIDI out](core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | proposed — after reviewer items 1–10 |
-| 12 | [Sampled guitar](core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | proposed — after reviewer items 1–10 |
-| 13 | [Practice mode](studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
+| 1 | [Traversal](core-player-traversal.md) | **Extend `model/passes.ts`**, keeping its consumers and suite: performed entries with ordinal, occurrence and iteration; partial-measure bounds for mid-bar segno/Fine/D.S.; diagnostics; the D.S.-into-voltas simplification resolved. | reviewer | the existing suite + hand-stated orders for the 14 navigation scenarios + a committed corpus report | implemented; new engraving review pending |
+| 2 | [Playback context and the iteration cursor](../proposed/core-player-pass-cursor.md) | A host-owned playback context (replacing the dormant `PlaybackState` shape) carrying ordinal and iteration; the chip ladder shows `iteration 2 of 3` / *not performed*; changeable; feeds `selected-verse`. The edit session is untouched. | reviewer | conformance tests on the pure resolver; no golden moves | proposed |
+| 3 | [Timing and pitch contracts](../proposed/core-player-timing-pitch.md) | `audio/time.ts` (rational arithmetic, tempo map, `secondsAt`); the pitch rule as tests over transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata (incl. `duration` hints and cross-part sync) and tie conventions written down with numbers; the performance golden's format. | reviewer | conformance tests | proposed |
+| 4 | [Audio backend spike](../proposed/core-player-tone-spike.md) | Tone.js **versus a native Web Audio sink**, measured: Node import, browser Offline render, per-voice detune ramps, both embed formats' size, what Tone saves once the transport is ours. Output: a log entry and the `Sink` interface. | both | its findings | proposed |
+| 5 | [Performance compiler and MIDI export](../proposed/core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | proposed |
+| 6 | [Transport](../proposed/core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | proposed |
+| 7 | [Player element, written view](../proposed/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | proposed |
+| 8 | [Expression and technique](../proposed/core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | proposed |
+| 9 | [MIDI oracle](../proposed/core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | proposed — **needs a dev-environment decision** |
+| 10 | [Unrolled engraving](../proposed/core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | proposed — after 7 |
+| 11 | [WebMIDI out](../proposed/core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | proposed — after reviewer items 1–10 |
+| 12 | [Sampled guitar](../proposed/core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | proposed — after reviewer items 1–10 |
+| 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
 
 ### Decisions still open
 
@@ -247,3 +247,26 @@ closes remaining ambiguities. No implementation or scenario approval is implied.
 
 The backend spike can start independently of musical implementation. The later practice
 items retain the campaign-wide prerequisite that reviewer items 1–10 are verified.
+
+
+### 2026-09-08 — item 1: traversal implementation
+
+- Extended the existing walker with performed ordinal, occurrence, iteration,
+  metric bounds, diagnostics and a structural inspection-iteration domain. The
+  existing seven pass tests and lyric consumer are unchanged; 16 hand-stated
+  navigation examples and a whole-corpus report pin the new evidence.
+- D.S. returns take the final declared iteration in strains with endings and do
+  not retake repeats. Ending membership includes interior bars. A Fine before the
+  return's segno offset does not terminate that return. Plain strains retain
+  iteration 1 on D.S.; no visit invents a new verse.
+- The mirrored simple/advanced ending examples label ending 3 with default
+  `times: 2`; preserve existing orders and report unmatched endings. The tab marks
+  showcase offers three inspection iterations even though its second ending exits
+  the walk on iteration 2. **Lesson:** declared strain iterations and observed
+  visits are different evidence; neither can substitute for the other.
+- MNX's pinned jump types still provide no coda/D.C. vocabulary or rule for
+  repeats/endings after D.S. The chosen final-ending behavior is a lab convention;
+  no upstream proposal was filed.
+- Existing engravings are unchanged. The new D.S./mid-bar fixture is queued in
+  [lab-verify.md](lab-verify.md#player-traversal--2026-09-08); implementation completion
+  does not imply its engraving has human approval or release the practice gate.

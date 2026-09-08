@@ -1,7 +1,7 @@
 # Expression and technique — what the marks mean, as numbers
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 8. Needs items 5 and 6;
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 8. Needs items 5 and 6;
 > bends are audible only through item 6's per-string voices — the tab-fidelity
 > dependency on the sound source the campaign called out.
 

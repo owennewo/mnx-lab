@@ -1,0 +1,28 @@
+{
+  "title": "D.S. al Fine returns through the final ending",
+  "description": "Two endings, then a mid-bar D.S. al Fine: return to the mid-bar segno without repeats, take ending 2 and stop at its mid-bar Fine. Pins the player traversal convention independently of the written engraving.",
+  "bars": 4,
+  "tags": [
+    "navigation",
+    "repeats",
+    "endings"
+  ],
+  "specRefs": [],
+  "coversDefs": [
+    "repeat-start",
+    "repeat-end",
+    "ending",
+    "segno",
+    "fine",
+    "jump"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

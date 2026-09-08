@@ -1,7 +1,7 @@
 # Audio backend spike — Tone.js versus a native Web Audio sink, measured
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 4. **Research, not a
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 4. **Research, not a
 > feature.** Runs any time, lands before item 6. Output: a findings entry in the
 > campaign log, the `Sink` interface, and a backend decision. Any code is thrown away;
 > `package.json` on `main` does not change.

@@ -1,7 +1,7 @@
 # WebMIDI out — the export's channel plan, on the wire
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 11. Needs item 7. A
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 11. Needs item 7. A
 > practice item.
 
 ## Agreement block (campaign contract)

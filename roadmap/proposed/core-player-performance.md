@@ -1,7 +1,7 @@
 # The performance compiler and the MIDI export
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 5. Needs items 1 and 3.
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 5. Needs items 1 and 3.
 > None of it makes a sound, and it is where the player is won or lost.
 
 ## Agreement block (campaign contract)

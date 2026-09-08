@@ -1,7 +1,7 @@
 # Timing and pitch contracts — the numbers, written down before the compiler
 
 > **Status: proposed 2026-09-08.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 3. Needs nothing;
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 3. Needs nothing;
 > item 5 builds on it. Exists because the first draft got both time and pitch wrong
 > on paper, and the cheap place to be wrong is a test file.
 

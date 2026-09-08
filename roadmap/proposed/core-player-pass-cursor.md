@@ -1,7 +1,7 @@
 # Playback context and the iteration cursor — a position that knows its repeat index
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 2. Needs item 1;
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 2. Needs item 1;
 > independent of everything else. **The edit session and the selection are not
 > touched**; this is a separate, host-coordinated playback context.
 

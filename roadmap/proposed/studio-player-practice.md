@@ -1,7 +1,7 @@
 # Practice mode — loop it, slow it, count it in
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 13. Needs items 7 and 8.
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 13. Needs items 7 and 8.
 > **Studio's first player feature**, built in `elements/` so the workbench gets it
 > too; the `studio-` prefix records who it serves.
 

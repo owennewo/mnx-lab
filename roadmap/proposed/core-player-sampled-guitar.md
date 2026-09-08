@@ -1,7 +1,7 @@
 # A sampled guitar — timbre, and the asset question that is the whole item
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 12. Needs item 7. A
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 12. Needs item 7. A
 > practice item.
 
 ## Agreement block (campaign contract)

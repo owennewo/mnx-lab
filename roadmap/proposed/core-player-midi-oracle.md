@@ -1,7 +1,7 @@
 # The MIDI oracle — someone else's performance of the same score
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 9. **A small experiment
+> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 9. **A small experiment
 > as soon as a tool is chosen** — before item 5 is finished, so the writer is not
 > the only reader of its own bytes — and the full baseline after item 5.
 > **Not startable until a dev-environment decision**: neither MuseScore nor Verovio is
