@@ -162,36 +162,51 @@ notation editing, staff-line visibility, new instrument assumptions, a new
 settings framework or a backend. It uses the existing score data and host
 preference architecture.
 
-## Implementation log
+## Implementation and verification record
 
-- 2026-09-08: isolated worktree `core-display-settings`. Pure option normalization,
-  document-global current verse resolution, lyric filtering before width/row
-  allocation, clef/time-signature suppression in the shared spacing plan, and
-  engraved-title suppression implemented. Focused engine tests pass (18 including
-  the existing viewer-surface suite); regeneration passes 116 golden cases with
-  no scenario diff.
-- Default audit: existing bar labels render **only declared global measure
-  numbers**, which does not match any proposed menu choice. Existing default
-  staff layouts emit **no part names**; explicit score layouts instead honor
-  their labels and labelrefs on each system. Omitted engine label options must
-  retain these historical paths. The host's explicit menu defaults must be
-  documented separately; do not quietly rewrite default goldens.
-- Remaining: bar-number/instrument-name modes (including multipart Tab and
-  score-block boundaries), viewer scalar bindings and invalidation, settings
-  rows/accessibility, validated host persistence and compare propagation,
-  public documentation/exports, expanded acceptance tests and browser checks,
-  full landing gates, landing and worktree retirement.
+Implementation is complete in the `core-display-settings` worktree; landing
+and retirement remain. No corpus verification records were edited.
 
-- 2026-09-08, second implementation pass: viewer scalar attributes/properties,
-  renderer forwarding, seven-row card, validated host persistence and library
-  exports implemented. Bar modes honor declared-number resets; name modes
-  support first/subsequent system gutters and short names. TypeScript passes;
-  14 display tests plus 116 default golden cases pass. Browser checked dark
-  card layout, selected-state announcements, title hiding, current-verse choice,
-  Escape dismissal and preference reload. Restored the test page's defaults.
-  Compare is a static reference beside the SAME live viewer, not a second viewer.
-- Still required before landing: multipart/grand-staff/score-block acceptance,
-  especially standalone Tab (currently still the historical first-part walk),
-  complete name grouping and empty-lyric cases, narrow/light/focus/compare browser
-  checks, immutability/playback/selection evidence, public face checks and the
-  complete landing sequence. No work has landed on main yet.
+- Pure normalized options are shared by spacing, notation, Tab and Both.
+  Current verse resolves a document-global ID; filtering releases horizontal
+  and vertical space. Clef visibility preserves pitch timelines and time
+  signature visibility preserves timing. Titles retain accessible names.
+- Explicit label modes honor declared measure-number resets, pickups,
+  reflow, part identity, full/short names, score blocks, and collapsed bars.
+  Standalone Tab composes all visible known-string sources with one spacing
+  plan; the default no-options path stays byte-identical. Both retains its
+  native system walk and one notation-anchored lyric block.
+- Default audit: legacy engine output numbers only explicitly numbered bars
+  and emits the labels supplied by score layouts (none on the default staff
+  layout). These do not match the menu choices. The workbench explicitly
+  defaults to Every system bar numbers and First system instrument names;
+  all other controls preserve their previous default. This mismatch is
+  documented, not a rewrite of the default goldens.
+- Viewer scalar properties/attributes bind the pure options. Explicit
+  `hide="lyrics,badges"` is authoritative and badges remain independent.
+  The host validates stored preferences and never stores selected-verse
+  context. Compare uses the same live viewer beside its reference image.
+- Harness: 29 focused display tests cover all projections, two widths,
+  multiple verses, missing syllables, nonnumeric ordering, unknown IDs,
+  empty lyrics, clef timelines, multi-part/grand-staff layouts, unnamed
+  parts, multiple score blocks, collapsed numbering, serialization, audio
+  timing, and selection inputs. The full harness passed 1,241 tests before
+  the final collapsed-bar and binding additions; landing gates below must
+  supersede this intermediate total.
+- Default golden regeneration: 116 cases pass with `git diff -- scenarios/`
+  empty. No verification-debt batch is required.
+- Browser: actual card checked in dark and light themes, document focus,
+  compare, Notation/Tab/Both, at desktop and 390px widths. At 390×320 the
+  card stays within x=18.8–299.2, y=60–280 and scrolls (393px content in a
+  217px viewport). Fixed the narrow card's initial left-edge clipping.
+  Selected-state announcements, preference reload, Escape, click-away,
+  and retained selection were checked; the undo panel remains “no ops.”
+- A temporary public-viewer acceptance page passed: explicit hide precedence,
+  independent badges, selected verse and hyphen, reflected property writes,
+  last-write attribute precedence, invalid enum recovery, ID title fallback
+  and accessible name, unchanged document/selection references and playback
+  time 42. The temporary page was removed from the worktree.
+- Preference recovery was checked against invalid stored JSON/enums, valid
+  persistence, and exclusion of transient verse context using isolated
+  storage. Library and embed builds passed; final public-face and landing
+  checks will be recorded after rebase.

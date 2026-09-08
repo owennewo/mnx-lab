@@ -1,5 +1,12 @@
+import { emitMultirest } from './multirest.ts';
+import type { MnxPart } from '../../model/mnx.ts';
+import type { HorizontalPlan, PlanOptions } from './spacing.ts';
+import { buildScoreJobs, layoutNotation } from './notation.ts';
+import { translatePrimitiveY } from '../primitives.ts';
+import { computeBoundsSp } from '../render/bounds.ts';
+import { anchorY, rowBoundariesSp } from './verticalDensity.ts';
 import { instrumentLabelInset, LABEL_PAD_SP } from './spacing.ts';
-import { selectedLyricLineIds } from './lyricRuns.ts';
+import { documentLyricLineIds, selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import { Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex } from '../primitives.ts';
@@ -122,7 +129,26 @@ export interface LayoutTabOptions {
   hide?: readonly HideableFeature[];
 }
 
+interface TabStaffContext {
+  part: MnxPart;
+  staffIndex: number;
+  plan: HorizontalPlan;
+  naturalWidthSp?: number;
+  globalLabels: boolean;
+  firstScoreSegment: boolean;
+  partLabel: boolean;
+}
+
 export function layoutTab(opts: LayoutTabOptions): LayoutResult {
+  // The no-options entry preserves corpus verdicts. Explicit display controls
+  // compose every visible part through the same score jobs and horizontal plan.
+  if (opts.display && ((opts.mnx.parts?.length ?? 0) > 1 || opts.mnx.scores?.length || (opts.mnx.parts?.[0]?.staves ?? 1) > 1)) {
+    return (opts.mnx.parts ?? []).some(part => tabPositionContext(part, opts.tabSetup) !== null) ? layoutTabSystems(opts) : layoutNotation(opts);
+  }
+  return layoutTabStaff(opts);
+}
+
+function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): LayoutResult {
   const { mnx, widthSp } = opts;
   const display = normalizeDisplayOptions(opts.display, opts.hide);
   const selectedLyrics = selectedLyricLineIds(mnx, display);
@@ -153,7 +179,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     return { staffTop, staffBottom: staffTop + STAFF_HEIGHT_SP };
   };
 
-  const part = mnx.parts?.[0];
+  const part = context?.part ?? mnx.parts?.[0];
   if (!part) {
     return {
       primitives, widthSp, heightSp: ROW_HEIGHT_SP + 2 * MARGIN_SP,
@@ -161,7 +187,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     };
   }
 
-  const numMeasures = part.measures.length;
+  const numMeasures = context?.plan.measures.length ?? part.measures.length;
   // Effective string set (document declaration, unless the viewer overrides;
   // capo applied) — one context for every fret this layout derives. Null when
   // no strings are known ANYWHERE: no instrument is assumed, so the staff
@@ -186,11 +212,11 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     inkRatio: opts.inkRatio,
     staffKind: 'tab' as const
   };
-  const plan = planHorizontal(mnx, widthSp, planOptions);
+  const plan = context?.plan ?? planHorizontal(mnx, widthSp, planOptions);
   // The score's natural extent, for the fit — see `LayoutResult.naturalWidthSp`.
   // Only when density has actually moved: at 1 it is the same number, and the
   // default paint must not pay for a second plan.
-  const naturalWidthSp =
+  const naturalWidthSp = context ? context.naturalWidthSp :
     clampDensity(opts.densityH) === 1
       ? undefined
       : planHorizontal(mnx, widthSp, { ...planOptions, densityH: 1 }).usedWidthSp;
@@ -220,7 +246,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     if (selectedLyrics) return selectedLyrics;
     const used = new Set<string>();
     for (const pm of part.measures) {
-      for (const seq of staffOneSequences(pm.sequences)) {
+      for (const seq of (context ? (pm.sequences ?? []).filter(seq => (seq.staff ?? 1) === context.staffIndex) : staffOneSequences(pm.sequences))) {
         for (const item of seq.content) {
           const record = item as { content?: MnxEvent[] };
           const events = isGrace(item) || isTuplet(item) ? (record.content ?? []) : isTimedEvent(item) ? [item as MnxEvent] : [];
@@ -249,11 +275,12 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   for (let i = 0; i < numMeasures; i++) {
     const partMeasure = part.measures[i] ?? { sequences: [] };
     const m = plan.measures[i];
+    if (m.hidden) continue;
     if (rowStart[m.row] === undefined) {
       rowStart[m.row] = primitives.length;
       // This row's voltas first, so the labels placed below scan them as ink
       // and stack above (core-measure-attributes-gaps.md, item 5).
-      emitEndings(mnx, plan, row => MARGIN_SP + row * rowHeightSp + ROW_PAD_TOP_SP, primitives, m.row);
+      if (!context || context.globalLabels) emitEndings(mnx, plan, row => MARGIN_SP + row * rowHeightSp + ROW_PAD_TOP_SP, primitives, m.row);
     }
     const edges = rowEdges.get(m.row);
     rowEdges.set(m.row, {
@@ -264,8 +291,8 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     const staffBottom = staffTop + STAFF_HEIGHT_SP;
 
     emitTabStaffLines(m.x, m.width, staffTop, primitives);
-    if (m.firstInSystem && showNames && (display.instrumentNames === 'every-system' || m.row === 0)) {
-      const name = instrumentName(part, m.row === 0);
+    if (m.firstInSystem && showNames && context?.partLabel !== false && (display.instrumentNames === 'every-system' || (m.row === 0 && context?.firstScoreSegment !== false))) {
+      const name = instrumentName(part, m.row === 0 && context?.firstScoreSegment !== false);
       if (name) primitives.push({ kind: 'text', text: name, x: m.x - LABEL_PAD_SP,
         y: staffTop + STAFF_HEIGHT_SP / 2 + 0.6, font: 'body', size: 1.6,
         anchor: 'end', className: 'staff-label' });
@@ -319,8 +346,10 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       });
     }
 
+    if (m.multiRest) emitMultirest(m, [staffTop + 0.5], primitives);
+
     // Events per voice (staff 1 only — the same filter the plan was built from)
-    const stdSequences = staffOneSequences(partMeasure.sequences);
+    const stdSequences = m.multiRest ? [] : (context ? (partMeasure.sequences ?? []).filter(seq => (seq.staff ?? 1) === context.staffIndex) : staffOneSequences(partMeasure.sequences));
 
     // Gather this bar's syllables at their plan columns — the same
     // event↔slot pairing emitTabVoices walks, containers through the same
@@ -378,6 +407,8 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
         selectedNoteIds,
         // This layout IS the staff-1-of-first-part traversal jsonView mirrors.
         synthesizeKeys: true,
+        keyPartIndex: context ? mnx.parts.indexOf(part) : 0,
+        keyStaffIndex: context?.staffIndex,
         primitives,
         index,
         onIssue: message => measureIssues.push({ kind: 'render', message }),
@@ -418,6 +449,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     // what already sits over this measure and stack above it.
     const gm = mnx.global.measures[i] ?? {};
     // The text clears THIS ROW's ink only; the row above is tightenRows' job.
+    if (!context || context.globalLabels) {
     emitHarmonies({ gm, m, stdSequences, staffTop, scan: primitives.slice(rowStart[m.row]), primitives });
     const tempoTop = emitTempoMark({
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), primitives,
@@ -430,10 +462,12 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), clearAbove: tempoTop, primitives
     });
 
+    }
+
     // End barline — the global measure's style, defaulted per the spec. A tab
     // staff is owed it for the same reason it is owed a section name: the
     // barline describes the BAR, not a notation staff.
-    const isLast = i === numMeasures - 1;
+    const isLast = i === numMeasures - 1 || plan.measures.slice(i + 1).every(measure => measure.hidden);
     if (m.repeatEnd) {
       // Backward repeat :| — dots + thin + thick, and the "4x" over it.
       const barX = m.x + m.width;
@@ -511,4 +545,93 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     index, diagnostics, rows: tightened?.rows ?? rows,
     packings: [plan.packing]
   };
+}
+
+/** Compose tab systems from the existing staff emitter, using ONE packing plan.
+ * Each staff's ink is measured before stacking, so lyrics and technique marks
+ * cannot be clipped by a fixed-height gutter. No document copies or rewritten IDs. */
+function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
+  const { mnx, widthSp } = opts;
+  const display = normalizeDisplayOptions(opts.display, opts.hide);
+  const primitives: Primitive[] = [];
+  const index: SpatialIndex = new Map();
+  const diagnostics: LayoutDiagnostic[] = [];
+  const rows: RowBandSp[] = [];
+  const displays: RowBandSp[][] = [];
+  const packings: NonNullable<LayoutResult['packings']> = [];
+  let cursorY = MARGIN_SP;
+  let usedWidthSp = 0;
+  let naturalWidthSp: number | undefined;
+  for (const job of buildScoreJobs(mnx)) {
+    if (job.title !== null && display.title !== 'hide') {
+      cursorY += 2.4;
+      primitives.push({ kind: 'text', text: job.title, x: widthSp / 2, y: cursorY,
+        font: 'body', size: 2.4, anchor: 'middle', className: 'score-title' });
+      cursorY += 3;
+    }
+    job.segments.forEach((segment, segmentIndex) => {
+      const sources = segment.staves.flatMap(staff => staff.sources).filter(source => tabPositionContext(source.part, opts.tabSetup) !== null).filter((source, i, all) =>
+        all.findIndex(candidate => candidate.part === source.part && candidate.staff === source.staff) === i);
+      if (!sources.length) return;
+      const parts = [...new Set(sources.map(source => source.part))];
+      const first = segmentIndex === 0;
+      const names = display.instrumentNames === 'every-system' || (display.instrumentNames === 'first-system' && first);
+      const planOptions: PlanOptions = {
+        staves: sources.map(source => ({ sources: [source] })),
+        staffKind: 'tab', display, lyricLineIds: selectedLyricLineIds(mnx, display),
+        densityH: opts.densityH, densityPad: opts.densityPad, inkRatio: opts.inkRatio,
+        forcedBreaks: segment.forcedBreaks, measureRange: segment.range ?? undefined,
+        minMeasures: segment.minMeasures, collapse: job.collapse,
+        leftInsetSp: names ? instrumentLabelInset(parts.map(part => instrumentName(part, first))) : 0,
+        subsequentLeftInsetSp: display.instrumentNames === 'every-system' ? instrumentLabelInset(parts.map(part => instrumentName(part, false))) : 0
+      };
+      const plan = planHorizontal(mnx, widthSp, planOptions);
+      const natural = clampDensity(opts.densityH) === 1 ? undefined : planHorizontal(mnx, widthSp, { ...planOptions, densityH: 1 }).usedWidthSp;
+      packings.push(plan.packing);
+      usedWidthSp = Math.max(usedWidthSp, plan.usedWidthSp);
+      if (natural !== undefined) naturalWidthSp = Math.max(naturalWidthSp ?? 0, natural);
+      const staffs = sources.map((source, staff) => {
+        const result = layoutTabStaff(opts, {
+          part: source.part, staffIndex: source.staff, globalLabels: staff === 0,
+          firstScoreSegment: first, partLabel: sources.findIndex(candidate => candidate.part === source.part) === staff,
+          naturalWidthSp: natural,
+          plan: { ...plan, measures: plan.measures.map(measure => ({ ...measure, voices: measure.staves[staff] ?? [] })) }
+        });
+        for (const [key, location] of result.index) index.set(key, location);
+        for (const diagnostic of result.diagnostics) {
+          if (!diagnostics.some(existing => existing.measureIndex === diagnostic.measureIndex && existing.message === diagnostic.message)) diagnostics.push(diagnostic);
+        }
+        const bands = result.rows ?? [];
+        const lyricCount = selectedLyricLineIds(mnx, display)?.length ?? documentLyricLineIds(mnx).length;
+        const boundaries = rowBoundariesSp(bands, lyricBlockSpFor(lyricCount));
+        const bins: Primitive[][] = bands.map(() => []);
+        for (const primitive of result.primitives) {
+          let row = 0;
+          while (row < boundaries.length && anchorY(primitive) >= boundaries[row]) row++;
+          bins[row].push(primitive);
+        }
+        return { bands, bins };
+      });
+      for (let row = 0; row < plan.rowCount; row++) {
+        const system: RowBandSp[] = [];
+        for (const staff of staffs) {
+          const band = staff.bands[row];
+          const ink = computeBoundsSp(staff.bins[row]);
+          const top = Math.min(band.staffTop, ink?.y ?? band.staffTop);
+          const bottom = Math.max(band.staffBottom, ink ? ink.y + ink.h : band.staffBottom);
+          const dy = cursorY - top;
+          for (const primitive of staff.bins[row]) {
+            translatePrimitiveY(primitive, dy);
+            primitives.push(primitive);
+          }
+          system.push({ staffTop: band.staffTop + dy, staffBottom: band.staffBottom + dy });
+          cursorY += bottom - top + Math.max(1, 3 * clampPadDensity(opts.densityPad));
+        }
+        displays.push(system);
+        rows.push({ staffTop: system[0].staffTop, staffBottom: system[system.length - 1].staffBottom });
+      }
+    });
+  }
+  return { primitives, index, diagnostics, rows, displays, packings,
+    widthSp, usedWidthSp, naturalWidthSp, heightSp: cursorY + MARGIN_SP };
 }

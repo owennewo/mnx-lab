@@ -78,3 +78,13 @@ the pattern is a dev-only Vite middleware writing repo files — never a deploye
 The real API layer (documents, auth, sync) belongs to **studio**
 ([apps/studio/README.md](../apps/studio/README.md)) on the reserved seams
 (`worker/api/documents|auth` 501 stubs, `storage/cloudRepository.ts`).
+
+
+The score-corner settings card has seven rows: Show, Lyrics, Time signatures,
+Clefs, Title, Bar numbers, and Instrument names. Its six display preferences
+are validated and stored under `mnx-lab:display`, across documents; projection
+remains URL-owned. Current verse uses the first used verse in established order
+until a host supplies a selected verse. That transient input is not persisted.
+A system means one horizontal row of music, including both staves in Both.
+The card stays available in document focus, supports keyboard navigation and
+Escape/focus return, dismisses on click-away, and scrolls on short screens.

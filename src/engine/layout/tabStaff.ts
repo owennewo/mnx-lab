@@ -309,6 +309,8 @@ export interface EmitTabVoicesArgs {
    * elsewhere id-less notes simply aren't clickable.
    */
   synthesizeKeys: boolean;
+  keyPartIndex?: number;
+  keyStaffIndex?: number;
   primitives: Primitive[];
   index: SpatialIndex;
   /** Forgiving render: a throwing event reports here, never kills the bar. */
@@ -521,7 +523,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
     // for id-less documents (see src/model/noteKeys.ts).
     const noteIds = event.notes.map((n, idx) =>
       synthesizeKeys
-        ? noteKeyAt(n, measureIndex, voiceIndex, eventIndex, idx, containerIndex)
+        ? noteKeyAt(n, measureIndex, voiceIndex, eventIndex, idx, containerIndex, args.keyPartIndex, args.keyStaffIndex)
         : n.id
     );
     const primaryNoteId = noteIds[0];

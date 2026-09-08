@@ -1,3 +1,4 @@
+import { emitMultirest } from './multirest.ts';
 import { instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
@@ -726,7 +727,7 @@ function resolveLayoutTree(
   }
 }
 
-function buildScoreJobs(mnx: MnxStructure): ScoreJob[] {
+export function buildScoreJobs(mnx: MnxStructure): ScoreJob[] {
   const allParts = mnx.parts ?? [];
   if (allParts.length === 0) return [];
   const scores = mnx.scores ?? [];
@@ -880,9 +881,10 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         selectedEventIds,
         index,
         diagnostics,
-        includeTabStaves: opts.includeTabStaves === true && (mnx.scores ?? []).length === 0,
+        includeTabStaves: opts.includeTabStaves === true && (opts.display !== undefined || (mnx.scores ?? []).length === 0),
         tabSetup: opts.tabSetup,
         display,
+        explicitDisplay: opts.display !== undefined,
         selectedLyrics,
         measureNumbers,
         firstScoreSegment: segmentIndex === 0,
@@ -968,6 +970,7 @@ interface RenderSegmentArgs {
   includeTabStaves: boolean;
   tabSetup?: PartTabSetups;
   display: DisplayOptions;
+  explicitDisplay: boolean;
   selectedLyrics?: string[];
   measureNumbers: number[];
   firstScoreSegment: boolean;
@@ -1095,13 +1098,13 @@ function assembleSegment(
   probeGapSp: number | null
 ): SegmentResult {
   const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio } = args;
+  const labelParts = originalSegment.staves.map((staff, s) => staff.sources.map(source => source.part).filter((part, index, parts) =>
+    parts.indexOf(part) === index && !originalSegment.staves.slice(0, s).some(previous => previous.sources.some(source => source.part === part))));
   const segment = display.instrumentNames === undefined ? originalSegment : {
     ...originalSegment,
-    labels: originalSegment.staves.map((staff, s) => {
+    labels: originalSegment.staves.map((_, s) => {
       if (display.instrumentNames === 'hide' || (display.instrumentNames === 'first-system' && !firstScoreSegment)) return null;
-      const parts = staff.sources.map(source => source.part).filter((part, index, parts) =>
-        parts.indexOf(part) === index && !originalSegment.staves.slice(0, s).some(previous => previous.sources.some(source => source.part === part)));
-      return parts.map(part => instrumentName(part, firstScoreSegment)).filter(Boolean).join(' / ') || null;
+      return labelParts[s].map(part => instrumentName(part, firstScoreSegment)).filter(Boolean).join(' / ') || null;
     }),
     sourceLabels: originalSegment.sourceLabels.map(() => null),
     groups: originalSegment.groups.map(group => ({ ...group, label: null }))
@@ -1135,8 +1138,7 @@ function assembleSegment(
   const groupLabelW = groupLabelLen ? groupLabelLen * LABEL_CHAR_SP + LABEL_PAD_SP : 0;
   const leftInsetSp = decorWidthSp + staffLabelW + groupLabelW;
   const subsequentLeftInsetSp = display.instrumentNames === undefined ? undefined :
-    decorWidthSp + (display.instrumentNames === 'every-system' ? instrumentLabelInset(segment.staves.map((staff, s) =>
-      segment.labels[s] ? staff.sources.map(source => instrumentName(source.part, false)).filter(Boolean).join(' / ') : null)) : 0);
+    decorWidthSp + (display.instrumentNames === 'every-system' ? instrumentLabelInset(labelParts.map(parts => parts.map(part => instrumentName(part, false)).filter(Boolean).join(' / '))) : 0);
 
   // All horizontal decisions (system packing, bar widths, event x positions)
   // come from the shared plan — layoutTab consumes the same one, which is what
@@ -1469,7 +1471,7 @@ function assembleSegment(
       segment.labels.forEach((label, s) => {
         if (!label || (display.instrumentNames === 'first-system' && m.row !== 0)) return;
         if (display.instrumentNames === 'every-system' && (m.row > 0 || !firstScoreSegment)) {
-          label = segment.staves[s].sources.map(source => instrumentName(source.part, false)).filter(Boolean).join(' / ');
+          label = labelParts[s].map(part => instrumentName(part, false)).filter(Boolean).join(' / ');
         }
         const srcW = srcLabelW(s);
         primitives.push({
@@ -1665,40 +1667,7 @@ function assembleSegment(
 
     // The H-bar multimeasure rest: thick bar with end caps on every staff,
     // count in time-signature digits above.
-    if (m.multiRest) {
-      const x1 = m.contentStartX + 0.6;
-      const x2 = m.x + m.width - 1.0;
-      for (const top of staffTops) {
-        primitives.push({
-          kind: 'rect',
-          x: x1, y: top + 1.5, w: x2 - x1, h: 1,
-          // The bar spans the measure: its width is x2 − x1, so it has to
-          // scale with x or it would stop meeting its own end caps.
-          spanW: true,
-          fill: 'currentColor',
-          className: 'multirest-bar'
-        });
-        for (const xe of [x1, x2]) {
-          primitives.push({
-            kind: 'line',
-            x1: xe, y1: top + 1, x2: xe, y2: top + 3,
-            thickness: 0.25,
-            className: 'multirest-cap'
-          });
-        }
-        const digits = String(m.multiRest).split('');
-        digits.forEach((d, di) => {
-          primitives.push({
-            kind: 'glyph',
-            glyph: 'timeSig' + d,
-            x: (x1 + x2) / 2 + (di - (digits.length - 1) / 2) * 1.9,
-            y: top - 0.8,
-            anchor: 'middle',
-            className: 'multirest-count'
-          });
-        });
-      }
-    }
+    emitMultirest(m, staffTops, primitives);
 
     // Validation issues (user-fixable), the plan's issues (unsupported items),
     // plus anything an individual event throws (forgiving render) — one bad
@@ -1921,7 +1890,9 @@ function assembleSegment(
           // Synthetic keys encode the staff-1-of-first-part traversal jsonView
           // mirrors — the tab staff may reuse them only when its notation
           // sibling is exactly that staff (cross-highlight then works on both).
-          synthesizeKeys: td.planStaff === 0 && synthesizeKeysForStaff0,
+          synthesizeKeys: args.explicitDisplay ? synthesizePartForStaff[td.planStaff] !== null : td.planStaff === 0 && synthesizeKeysForStaff0,
+          keyPartIndex: args.explicitDisplay ? synthesizePartForStaff[td.planStaff]?.partIndex : undefined,
+          keyStaffIndex: args.explicitDisplay ? synthesizePartForStaff[td.planStaff]?.staffIndex : undefined,
           primitives,
           index,
           onIssue: message => measureIssues.push({ kind: 'render', message }),

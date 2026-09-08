@@ -34,3 +34,20 @@ mistake", and the schema validators must never see these). Everything renders in
 shadow DOM. Do **not** reintroduce VexFlow or any notation library. The note↔JSON
 cross-highlight depends on `model/noteKeys.ts` and `model/jsonView.ts` mirroring the
 same traversal — keep them in lockstep.
+
+
+Score display controls enter each layout as `display: DisplayOptions` and
+are normalized in `src/engine/displayOptions.ts`. Lyrics are filtered before
+horizontal measurement and row allocation; hidden clefs/time signatures lose
+their prefix slots while the effective pitch/rhythm state remains unchanged.
+Part-name gutters may differ between the first and subsequent systems, and
+`PackingInput` carries both widths so the density ladder uses the same breaks.
+
+For explicit display options, standalone Tab composes the visible, known-string
+part/staff sources of each score job with one shared horizontal plan. The staff
+emitter remains `tabStaff.ts`; per-staff ink bounds determine vertical stacking.
+Unknown instruments are not inferred. Both uses the existing native system walk
+and draws lyrics on notation only. Omitted options preserve the historical
+first-part Tab path and the corpus's byte-identical default output. Public
+bindings and the workbench's explicit defaults are documented in
+[core-viewer-surface.md](core-viewer-surface.md#score-display-preferences).

@@ -57,7 +57,7 @@ export interface LyricSyllable {
  *  unlisted ids after, sorted — the renderer's one stacking rule. */
 export function orderedLyricLineIds(mnx: MnxStructure, used: ReadonlySet<string>): string[] {
   const order = mnx.global.lyrics?.lineOrder ?? [];
-  const ordered = order.filter(id => used.has(id));
+  const ordered = [...new Set(order)].filter(id => used.has(id));
   const rest = [...used].filter(id => !order.includes(id)).sort();
   return [...ordered, ...rest];
 }
@@ -115,8 +115,9 @@ export function documentLyricLineIds(mnx: MnxStructure): string[] {
 /** undefined means preserve all historical rows; [] means allocate none. */
 export function selectedLyricLineIds(mnx: MnxStructure, display: DisplayOptions): string[] | undefined {
   if (display.lyrics === 'hide') return [];
-  if (display.lyrics !== 'current') return undefined;
   const used = documentLyricLineIds(mnx);
+  if (used.length === 0) return [];
+  if (display.lyrics !== 'current') return undefined;
   const selected = display.selectedVerse ?? used[0];
   return selected && used.includes(selected) ? [selected] : [];
 }

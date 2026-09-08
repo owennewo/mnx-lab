@@ -545,7 +545,7 @@ export class DocumentViewer extends LitElement {
          in the margin and reclaim no space, so CSS is the honest tool. A
          layout-side feature must never be hidden this way — it would leave a
          gap where the content used to be. */
-      :host([hide~='badges']) #projection-container svg .diagnostic-marker {
+      :host([data-hide-badges]) #projection-container svg .diagnostic-marker {
         display: none;
       }
 
@@ -694,6 +694,7 @@ export class DocumentViewer extends LitElement {
   }
 
   updated(changed: Map<string | number | symbol, unknown>) {
+    this.toggleAttribute('data-hide-badges', this.hiddenFeatures().includes('badges'));
     if (
       changed.has('mnxDoc') ||
       changed.has('playbackState') ||

@@ -140,7 +140,7 @@ export class SettingsPad extends LitElement {
 
       .card {
         box-sizing: border-box;
-        width: min(460px, calc(100vw - 24px));
+        width: min(460px, calc(100vw - 110px));
         max-height: min(540px, calc(100dvh - 100px));
         overflow: auto;
         background: var(--surface);
