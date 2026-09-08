@@ -44,6 +44,7 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-display-settings.md](proposed/core-display-settings.md)** — score display controls: lyrics, time signatures, clefs, title, bar numbers and instrument names; shared layout options, viewer bindings and persisted settings, using system terminology. Current verse initially selects the first ordered verse; repeat tracking is deferred.
 - **[core-campaign-musicxml.md](proposed/core-campaign-musicxml.md)** — **campaign**: MusicXML
   with zero runtime dependencies and provable accuracy. Opens on the discovery that
   `vendor/mnx/doctools/data.json` already holds **27 MusicXML 3.1 comparisons** whose slugs
