@@ -1,6 +1,6 @@
 # The performance compiler and the MIDI export
 
-> **Status: implemented 2026-09-09; landing checks in progress.** Campaign:
+> **Status: complete 2026-09-09; performance evidence awaits human review.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 5. Needs items 1 and 3.
 > None of it makes a sound, and it is where the player is won or lost.
 
@@ -116,3 +116,8 @@ stages, resource bounds, recursive key compatibility and bounded MIDI convention
 registered; existing engraving keys/goldens and approval records are unchanged.
 `voices[]` adds explicit allocation metadata to the previously unapproved v1 shape.
 No audio dependency, transport, expression implementation or human approval is added.
+
+Implementation landed as `dbf3950`; its worktree was retired before this closeout.
+Post-rebase validation: 1,412 tests passed, scenario checks and production build passed,
+and regeneration left all engraving/performance goldens unchanged. Library (including
+bare-Node audio compile/export), embed and inspector smoke checks also passed.

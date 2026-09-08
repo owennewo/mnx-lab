@@ -656,7 +656,7 @@ at 3/4. Approve through `/verify`; no verification record has been written.
 
 ## Player performance — 2026-09-09
 
-Cause: [core-player-performance.md](../proposed/core-player-performance.md),
+Cause: [core-player-performance.md](../complete/core-player-performance.md),
 [player campaign](core-campaign-player.md) item 5. **New performance/MIDI evidence**
 for 32 scenarios; existing engraving output and its approval records are unchanged.
 No performance approval is implied. Use `/verify` and the generated presentation

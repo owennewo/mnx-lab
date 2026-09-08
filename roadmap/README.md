@@ -44,13 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-player-performance.md](proposed/core-player-performance.md)** — campaign item 5:
-  **the compiler** — two linked lists, rational time, ties merged after unrolling, nested
-  tuplets (with the `noteWalk.ts` identity change tested first), grace/tremolo/fermata per
-  item 3, `pitch` read as sounded. `expected.performance.json` with the **verification path
-  owned** (schema, stale rule, writer, review page). **MIDI as a bounded export**: PPQ 960
-  at export only, preflight channel allocation with degraded curves or explicit export refusal, ±12 bend
-  range, collapsed quantized boundaries diagnosed.
 - **[core-player-transport.md](proposed/core-player-transport.md)** — campaign item 6:
   `audio/transport.ts` pure over an injected clock and sink; onsets **timestamped on the
   audio clock**; seek reconstructs sustained notes and controller state; loops across ties;
@@ -400,6 +393,10 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-player-performance.md](complete/core-player-performance.md)** — player campaign item 5,
+  complete 2026-09-09: exact performance compiler, recursive note identities, bounded
+  MIDI export and the full evidence review path. 32 performance/MIDI baselines await
+  human review in the standing verification ledger; engraving approvals are preserved.
 - **[core-player-tone-spike.md](complete/core-player-tone-spike.md)** — campaign item 4:
   **native Web Audio selected** after Node/offline/pitch/cancellation checks and
   measured IIFE/ESM builds. Type-only `Sink` contract shipped; no runtime dependency.
