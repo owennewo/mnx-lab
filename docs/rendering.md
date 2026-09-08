@@ -72,8 +72,8 @@ never writes IDs back into the document; reference-creating editor operations mi
 them when needed. The initial correction's two engraving changes are registered in
 [the verification ledger](../roadmap/inprogress/lab-verify.md#beaming-events-without-ids-2026-09-08).
 
-The paired notation-to-tab gap has a 3.5sp line-to-line minimum and keeps 2.5sp
-clear between content on either side (half a space tighter than independent
+The paired notation-to-tab gap has a 3sp line-to-line minimum and keeps 2sp
+clear between content on either side (one space tighter than independent
 staves). The existing per-system ink measurement still expands the gap for low
 notes, downward stems, lyrics, capo advice and other markings. All measures in
 a system share the resulting staff position. Gaps to other instruments and

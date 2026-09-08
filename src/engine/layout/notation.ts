@@ -165,9 +165,9 @@ const INTER_STAFF_GAP_SP = 6; // between staves of a multi-staff part (grand sta
 // cannot live in the module that only knows about the latter.
 /** Floor on the line-to-line gap between display staves, ink or no ink. */
 export const MIN_STAFF_GAP_SP = 4;
-/** Paired notation/tab views: half a space less air, still measured ink to ink. */
-export const NOTATION_TAB_CLEAR_SP = 2.5;
-export const MIN_NOTATION_TAB_GAP_SP = 3.5;
+/** Paired notation/tab views: one space less air, still measured ink to ink. */
+export const NOTATION_TAB_CLEAR_SP = 2;
+export const MIN_NOTATION_TAB_GAP_SP = 3;
 export { SEPARATION_CLEAR_SP };
 /** Primitives that span staves by construction (barlines, braces) or ARE the
  *  staff (its lines) — not content, and never measured as ink in a gap. */

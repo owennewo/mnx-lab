@@ -85,7 +85,10 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 Owner: user-requested spacing trial, branch `core-tighter-tab-gap`; no roadmap doc.
 The [rendering contract](../../docs/rendering.md) now gives paired notation/tab
-staves a 3.5sp minimum line gap and 2.5sp ink clearance, both reduced by 0.5sp.
+staves a 3sp minimum line gap and 2sp ink clearance, both reduced by 1sp
+from the original values. The initial half-space trial (`e2cd07e`) was followed
+by a user-requested second half-space reduction (`core-tab-gap-second-step`);
+this same batch covers the resulting engravings.
 The existing whole-system ink measurement still expands for notes, downward
 stems, lyrics, capo advice and other markings. Independent-staff and inter-system
 clearances retain their existing values.
