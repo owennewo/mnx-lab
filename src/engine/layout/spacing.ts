@@ -1906,3 +1906,8 @@ export function instrumentLabelInset(names: readonly (string | null)[]): number 
 
 export const LABEL_CHAR_SP = 1.0;
 export const LABEL_PAD_SP = 0.6;
+
+/** Shared left edge for the measure's tempo, section and capo headings. */
+export function measureHeadingX(m: Pick<MeasurePlan, 'showTimeSig' | 'timeSigCentreX' | 'contentStartX'>): number {
+  return m.showTimeSig ? m.timeSigCentreX - 1.25 : m.contentStartX - 1.5;
+}

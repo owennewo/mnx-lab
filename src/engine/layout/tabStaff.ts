@@ -118,7 +118,6 @@ const TAB_TUPLET_NUMBER_GAP_SP = 0.85;
 
 const CAPO_FONT_SIZE_SP = 1.1;
 const CAPO_RISE_SP = 1.5; // above the top string line
-const CAPO_INSET_SP = 0.4; // clear of the system-start barline
 const TUNING_LETTER_SIZE_SP = 0.85;
 const TUNING_LETTER_INSET_SP = 0.35; // gap between letter and the system start
 
@@ -150,14 +149,15 @@ export function emitTabSystemHeader(
   /** The plan's ink ratio — the insets either side of the system start are
    *  text clearances, so they are ink like every other glyph-relative gap. */
   ink: number,
-  primitives: Primitive[]
+  primitives: Primitive[],
+  headingX: number
 ): void {
   const capo = ctx.capo;
   if (capo > 0) {
     primitives.push({
       kind: 'text',
       text: `Capo ${capo}`,
-      x: x + CAPO_INSET_SP * ink,
+      x: headingX,
       y: staffTop - CAPO_RISE_SP,
       font: 'body',
       size: CAPO_FONT_SIZE_SP,

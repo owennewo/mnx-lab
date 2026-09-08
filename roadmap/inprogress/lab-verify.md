@@ -81,6 +81,25 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Section and capo heading alignment (2026-09-08)
+
+Owner: user-requested visual adjustment, branch `core-header-alignment`; no roadmap doc.
+Section labels (and an accompanying rehearsal box) and capo advice now share the
+measure-start tempo anchor instead of the system barline. Standalone rehearsal
+marks retain their existing anchor. This applies in Notation, Tab and Both.
+
+Affected scenarios under `scenarios/lab/`: `00-document/{03-navigation-playground,
+04-twelve-bar-blues}`, `22-tab-derivation/06-capo`, and `31-score-text/{02-sections,
+03-sections-with-rehearsal-marks,06-directions-across-parts,09-labels-with-navigation,
+10-labels-on-a-tab-staff,11-one-bar-sections}`. Regenerated primitives and the
+corresponding SVG views capture this intentional horizontal move and any resulting
+ink-measured vertical clearance changes.
+
+Review: section/capo headings should align with the start of the tempo mark, clear
+of the initial clef; section/rehearsal pairs stay together. Check navigation and
+adjacent-section clearance, including Tab and Both. Tempo and tuning-letter anchors
+are unchanged. Human approval is still outstanding.
+
 *Counts below are the queue as of 2026-08-24 (0 blocked, **46** stale, 12 never-seen, **53**
 current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last

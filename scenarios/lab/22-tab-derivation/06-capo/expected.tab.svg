@@ -5,7 +5,7 @@
 <line x1="32" y1="134.8576" x2="600.8" y2="134.8576" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="153.1424" x2="600.8" y2="153.1424" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="171.4288" x2="600.8" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<text x="38.4" y="56" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="start" dominant-baseline="central" fill="currentColor" font-weight="600" class="tab-capo">Capo 2</text>
+<text x="81.6" y="56" font-family="var(--font-family-sans)" font-size="17.6" text-anchor="start" dominant-baseline="central" fill="currentColor" font-weight="600" class="tab-capo">Capo 2</text>
 <line x1="32" y1="80" x2="32" y2="171.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
 <text x="49.6" y="125.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
 <text x="101.6" y="102.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>

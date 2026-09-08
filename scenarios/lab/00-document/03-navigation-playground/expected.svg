@@ -201,6 +201,6 @@
 <rect x="945.5152" y="537.344" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="940.7152" y1="735.616" x2="940.7152" y2="799.616" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="945.5152" y="735.616" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="41.6" y="89.728" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Intro</text>
-<text x="1055.832" y="96" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Verse</text>
+<text x="97.6" y="89.728" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Intro</text>
+<text x="1072.2528" y="96" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Verse</text>
 </svg>

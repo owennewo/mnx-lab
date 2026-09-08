@@ -5,7 +5,7 @@ import { buildScoreJobs, layoutNotation } from './notation.ts';
 import { translatePrimitiveY } from '../primitives.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { anchorY, rowBoundariesSp } from './verticalDensity.ts';
-import { instrumentLabelInset, LABEL_PAD_SP } from './spacing.ts';
+import { measureHeadingX, instrumentLabelInset, LABEL_PAD_SP } from './spacing.ts';
 import { documentLyricLineIds, selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
@@ -301,7 +301,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     // Setup instructions — capo text and (non-standard) tuning letters,
     // above/beside the FIRST bar only.
     if (i === 0 && positionContext) {
-      emitTabSystemHeader(positionContext, m.x, staffTop, plan.inkRatio, primitives);
+      emitTabSystemHeader(positionContext, m.x, staffTop, plan.inkRatio, primitives, measureHeadingX(m));
     }
 
     // System-start barline

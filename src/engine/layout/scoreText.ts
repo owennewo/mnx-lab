@@ -9,7 +9,7 @@ import {
 import { Primitive, translatePrimitiveY } from '../primitives.ts';
 import { glyphBBox } from '../smufl/smufl.ts';
 import { computeBoundsSp, type BoundsSp } from '../render/bounds.ts';
-import { durationValue, tremoloDuration, tupletDuration } from './spacing.ts';
+import { durationValue, tremoloDuration, tupletDuration, measureHeadingX } from './spacing.ts';
 import { chordSymbolDisplay } from '../../model/harmony.ts';
 
 // ---------- Ink-measured placement (core-ink-measured-gaps.md, stage A) ----------
@@ -249,7 +249,6 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
  *  chrome that sits beside the SVG can match the engraving's typography at
  *  the actual on-screen staff scale. */
 export const SCORE_LABEL_SIZE_SP = 1.8;
-const SCORE_LABEL_INSET_SP = 0.6; // from the barline, for a label at the top of the bar
 // Body text has no metrics in layout, so the box is drawn around an estimated
 // CAP HEIGHT, not the em. Sizing it to the em leaves the ascender/descender
 // space inside the box and the letter sits visibly low in it.
@@ -267,7 +266,7 @@ const DIRECTION_CHAR_SP = 0.62;
 
 export interface EmitScoreLabelsArgs {
   gm: MnxGlobalMeasure;
-  m: { x: number; width: number };
+  m: EmitTempoMarkArgs['m'];
   staffTop: number;
   /** What the label must clear: THIS ROW's primitives drawn so far, and no
    *  other row's. After a system wrap the x-range repeats, so a scan over
@@ -298,9 +297,8 @@ export function emitScoreLabels(args: EmitScoreLabelsArgs): void {
   const { gm, m, staffTop, scan, clearAbove, primitives } = args;
   if (!gm.rehearsal && !gm.section) return;
 
-  // Labels describe the measure rather than a moment in it, so they align to the
-  // barline — which is where engravers put them.
-  const labelX = m.x + SCORE_LABEL_INSET_SP;
+  // Share the tempo heading edge, clear of the clef and system-start barline.
+  const labelX = gm.section ? measureHeadingX(m) : m.x + 0.6;
 
   const capH = SCORE_LABEL_SIZE_SP * SCORE_LABEL_CAP_RATIO;
 
@@ -414,7 +412,7 @@ export function emitTempoMark(args: EmitTempoMarkArgs): BoundsSp | null {
   const { gm, m, staffTop, scan, primitives, onsetXs } = args;
   const tempos = gm.tempos ?? [];
   if (tempos.length === 0) return null;
-  const x0 = m.showTimeSig ? m.timeSigCentreX - 1.25 : m.contentStartX - 1.5;
+  const x0 = measureHeadingX(m);
   let top: BoundsSp | null = null;
   const before = primitives.length;
   // Every mark draws (core-measure-attributes-gaps.md: only the first used

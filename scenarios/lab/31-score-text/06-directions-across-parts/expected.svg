@@ -66,7 +66,7 @@
 <rect x="1060.8" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="1056" y1="288.384" x2="1056" y2="352.384" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1060.8" y="288.384" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<rect x="33.6" y="22.064" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="41.6" y="49.2" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">A</text>
-<text x="75.456" y="49.2" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Intro</text>
+<rect x="89.6" y="22.064" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="97.6" y="49.2" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">A</text>
+<text x="131.456" y="49.2" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Intro</text>
 </svg>

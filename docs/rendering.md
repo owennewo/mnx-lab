@@ -52,3 +52,7 @@ and draws lyrics on notation only. Omitted options preserve the historical
 first-part Tab path and the corpus's byte-identical default output. Public
 bindings and the workbench's explicit defaults are documented in
 [core-viewer-surface.md](core-viewer-surface.md#score-display-preferences).
+
+Section headings and capo advice share the measure-start tempo anchor, including
+when no tempo is printed. Section/rehearsal pairs stay together; a standalone
+rehearsal mark retains its barline inset. Tuning letters stay beside the strings.

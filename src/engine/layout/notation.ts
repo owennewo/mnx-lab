@@ -1,5 +1,5 @@
 import { emitMultirest } from './multirest.ts';
-import { instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
+import { measureHeadingX, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
@@ -1860,7 +1860,7 @@ function assembleSegment(
       emitTabStaffLines(m.x, m.width, tabTop, primitives);
       // Setup instructions (capo, non-standard tuning letters) on the FIRST
       // bar only — same emission as the standalone tab view.
-      if (i === 0) emitTabSystemHeader(td.ctx, m.x, tabTop, plan.inkRatio, primitives);
+      if (i === 0) emitTabSystemHeader(td.ctx, m.x, tabTop, plan.inkRatio, primitives, measureHeadingX(m));
       if (m.firstInSystem && display.clefs !== 'hide') emitTabClef(m.clefX, tabTop, primitives);
       if (m.showTimeSig) emitTabTimeSig(m.timeSig, m.timeSigCentreX, tabTop, primitives);
       {
