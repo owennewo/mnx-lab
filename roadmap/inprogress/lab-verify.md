@@ -123,6 +123,32 @@ current — batch 6 demoted 9).
 Batches are grouped by cause; the commit named for each sub-set is the one that **last
 moved** those goldens, which is not always the one that demoted them.*
 
+### 14. Metronome mark sized as text — **6 moved, all already `rendered`**
+
+Owner: no roadmap doc — a user-reported proportion (2026-09-08): the tempo's
+note glyph was drawn at the full 4-sp music em (a staff-sized head with a
+full-height stem) and its "= N" at 1.6 sp regular, so the mark outweighed
+the section label above it and the capo line below. `scoreText.ts` now
+draws the `met*` glyph at 0.55 of the em (SMuFL sizes these to the text they
+sit in; Gould wants the value a little smaller than the score's notes), the
+number at 1.3 sp / weight 600 (the capo's weight, between the capo and the
+section label), and closes the glyph-to-"=" gap from 0.4 to 0.2 sp. The dot
+advance and the glyph's below-baseline ink scale with the glyph. Scenarios:
+`spec/tempo-markings`, `lab/score-text/labels-with-navigation`,
+`lab/score-text/labels-on-a-tab-staff`, `lab/score-text/chord-symbols`,
+`lab/navigation/numbered-bars`, `lab/navigation/tempo-change-mid-bar` — all
+six were already `rendered`, so the earlier what-to-look-for notes for their
+batches still apply, plus this one.
+
+**What a reviewer should look for.** The metronome note reads as part of the
+text run, not as a stray staff note: its head is about half a notehead wide,
+its stem shorter than the number is tall. The number sits tight against the
+note with clear air, never touching the stem; a dotted value keeps its dot
+between the note and the "=". The mark sits visibly lighter than the section
+label above it and a step heavier than the capo line below. Because the mark
+is shorter, the row above the staff may close up by about a space — labels
+and navigation markers should have moved down with it, never overlapping.
+
 ### 13. Onset-aligned columns across voices — **2 stale, 10 re-moved**
 
 Owner: no roadmap doc — the user-chosen fix (2026-08-31, option A of the

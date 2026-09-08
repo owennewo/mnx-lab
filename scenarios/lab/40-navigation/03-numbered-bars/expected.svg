@@ -35,6 +35,6 @@
 <text x="843.296" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m3.v0.e0.n0"></text>
 <line x1="940.8" y1="128" x2="940.8" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="945.6" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="614.4" y="94.976" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tempo"></text>
-<text x="642.048" y="94.976" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tempo">= 96</text>
+<text x="614.4" y="99.0368" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tempo"></text>
+<text x="629.2864" y="99.0368" font-family="var(--font-family-sans)" font-size="20.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="600" class="tempo">= 96</text>
 </svg>

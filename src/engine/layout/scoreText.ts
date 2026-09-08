@@ -388,6 +388,18 @@ const METRONOME_GLYPH_BY_BASE: Record<string, string> = {
   '128th': 'metNote128thUp'
 };
 
+// The metronome note is TEXT, not a staff note: SMuFL's `met*` glyphs are
+// designed to be scaled to the text they sit in, and Gould wants the value a
+// little smaller than the notes in the score. Drawn at the full 4-sp music em
+// it is a staff-sized head with a full-height stem — visibly heavier than the
+// section label above it and the capo line below. Sized to sit between the
+// two: section label (1.8 bold) > tempo (1.3 semi-bold) > capo (1.1 semi-bold).
+const TEMPO_GLYPH_SCALE = 0.55; // multiplier on the 4-sp em
+const TEMPO_TEXT_SIZE_SP = 1.3;
+const TEMPO_TEXT_WEIGHT = 600; // matches the capo line
+const TEMPO_GLYPH_TEXT_GAP_SP = 0.2; // between the note's right ink and the "="
+const TEMPO_DOT_ADVANCE_SP = 0.45; // at scale 1
+
 export interface EmitTempoMarkArgs {
   gm: MnxGlobalMeasure;
   m: { x: number; width: number; showTimeSig: boolean; timeSigCentreX: number; contentStartX: number; repeatStart: boolean };
@@ -442,14 +454,16 @@ function emitOneTempo(
   // known. The note glyph's head hangs below the baseline — that is the
   // mark's bottom ink, and it is what meets the clearance.
   const y = 0;
-  const belowBaseline = Math.max(0, -(glyphBBox(metGlyph)?.y ?? 0));
-  primitives.push({ kind: 'glyph', glyph: metGlyph, x: x0, y, className: 'tempo' });
+  const scale = TEMPO_GLYPH_SCALE;
+  // Every metric read off the glyph box scales with the glyph.
+  const belowBaseline = Math.max(0, -(glyphBBox(metGlyph)?.y ?? 0)) * scale;
+  primitives.push({ kind: 'glyph', glyph: metGlyph, x: x0, y, scale, className: 'tempo' });
   // Advance past the note glyph's actual right edge (incl. its stem) so the
   // augmentation dots and the "=" never collide with the stem.
-  let cursor = x0 + (glyphBBox(metGlyph)?.w ?? 1.33) + 0.4;
+  let cursor = x0 + (glyphBBox(metGlyph)?.w ?? 1.33) * scale + TEMPO_GLYPH_TEXT_GAP_SP;
   for (let d = 0; d < (tempo.value.dots ?? 0); d++) {
-    primitives.push({ kind: 'glyph', glyph: 'metAugmentationDot', x: cursor, y, className: 'tempo' });
-    cursor += 0.45;
+    primitives.push({ kind: 'glyph', glyph: 'metAugmentationDot', x: cursor, y, scale, className: 'tempo' });
+    cursor += TEMPO_DOT_ADVANCE_SP * scale;
   }
   primitives.push({
     kind: 'text',
@@ -457,7 +471,8 @@ function emitOneTempo(
     x: cursor,
     y,
     font: 'body',
-    size: 1.6,
+    size: TEMPO_TEXT_SIZE_SP,
+    weight: TEMPO_TEXT_WEIGHT,
     className: 'tempo'
   });
   return placeTextRun(primitives, firstNew, belowBaseline, staffTop, scan, null);
