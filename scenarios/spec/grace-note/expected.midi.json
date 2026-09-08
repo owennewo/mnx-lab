@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "sha256": "5be512e51fafe4594b54a9c0f259f0b06ca7b59c14a1179588f33805d231b287",
+  "allocation": [
+    {
+      "partIndex": 0,
+      "channels": [
+        0
+      ],
+      "independent": true
+    }
+  ],
+  "diagnostics": []
+}

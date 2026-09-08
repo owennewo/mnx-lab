@@ -1,4 +1,4 @@
-import { mnxToAudioEvents } from '../../src/audio/mnxToAudio.ts';
+import { compilePerformance } from '../../src/audio/performance.ts';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { MnxStructure } from '../../src/model/mnx.ts';
@@ -245,12 +245,12 @@ describe('multi-part display systems and score blocks', () => {
     it(`${name}: display choices preserve audio timing and selection inputs`, () => {
       initSmufl();
       const mnx = ensemble();
-      const audio = mnxToAudioEvents(mnx);
+      const audio = compilePerformance(mnx);
       const activeNoteIds = Object.freeze(['@p1.m0.v0.e0.n0']);
       const selectedNoteIds = Object.freeze(['@m0.v0.e0.n0']);
       const result = layout({ mnx, widthSp: 100, activeNoteIds, selectedNoteIds,
         display: { lyrics: 'hide', clefs: 'hide', timeSignatures: 'hide', instrumentNames: 'hide', title: 'hide', barNumbers: 'hide' } });
-      expect(mnxToAudioEvents(mnx)).toEqual(audio);
+      expect(compilePerformance(mnx)).toEqual(audio);
       expect(activeNoteIds).toEqual(['@p1.m0.v0.e0.n0']);
       expect(selectedNoteIds).toEqual(['@m0.v0.e0.n0']);
       expect(result.primitives.some(p => /(?:clef|time-sig)/.test(p.className ?? ''))).toBe(false);

@@ -1,3 +1,5 @@
+import { eventAtContainer, containerEventsWithPaths } from '../model/noteWalk.ts';
+import { containerPath } from '../model/noteKeys.ts';
 // Pure selection -> clipboard materialization.
 //
 // This module resolves a live SelectionState exactly once, copies the owned
@@ -118,8 +120,7 @@ function eventForMember(
 ): MnxEvent | undefined {
   const item = sequenceForMember(doc, member)?.content?.[member.eventIndex];
   if (!item) return undefined;
-  if (member.containerIndex === undefined) return isTimedEvent(item) ? item : undefined;
-  return (item as { content?: MnxEvent[] }).content?.[member.containerIndex];
+  return eventAtContainer(item, member.containerIndex);
 }
 
 function measureIndices(members: SelectionMember[]): number[] {
@@ -231,7 +232,7 @@ function eventItems(
   doc: MnxStructure,
   members: Extract<SelectionMember, { kind: 'event' }>[]
 ): SelectionClip | SelectionClipExtractionRefusal {
-  const selectedChildren = new Map<string, Set<number>>();
+  const selectedChildren = new Map<string, Set<string>>();
   for (const member of members) {
     if (member.containerIndex === undefined) continue;
     const key = [
@@ -241,11 +242,11 @@ function eventItems(
       member.voiceIndex,
       member.eventIndex
     ].join(':');
-    const set = selectedChildren.get(key) ?? new Set<number>();
-    set.add(member.containerIndex);
+    const set = selectedChildren.get(key) ?? new Set<string>();
+    set.add(containerPath(member.containerIndex).join('.'));
     selectedChildren.set(key, set);
     const item = sequenceForMember(doc, member)?.content?.[member.eventIndex];
-    const count = (item as { content?: MnxEvent[] } | undefined)?.content?.length ?? 0;
+    const count = item ? containerEventsWithPaths(item).length : 0;
     if (count === 0) {
       return refuse('missing-source-member', 'The selected container no longer exists.');
     }
@@ -259,7 +260,7 @@ function eventItems(
       member.eventIndex
     ].join(':') === key)!;
     const item = sequenceForMember(doc, first)?.content?.[first.eventIndex];
-    const count = (item as { content?: MnxEvent[] } | undefined)?.content?.length ?? 0;
+    const count = item ? containerEventsWithPaths(item).length : 0;
     if (children.size !== count) {
       return refuse(
         'partial-container',

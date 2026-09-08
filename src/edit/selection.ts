@@ -1,3 +1,6 @@
+import { containerEventsWithPaths } from '../model/noteWalk.ts';
+import { sameContainerIndex } from '../model/noteKeys.ts';
+import type { ContainerIndex } from '../model/noteKeys.ts';
 // The selection ladder — roadmap/complete/core-selection-ladder.md.
 //
 // Input modes ARE the selection level: every selection sits on one rung of the
@@ -81,7 +84,7 @@ export type SelectionMember =
       onset: Onset;
       voiceIndex: number;
       eventIndex: number;
-      containerIndex?: number;
+      containerIndex?: ContainerIndex;
       noteIndex: number;
       noteKey: string;
     }
@@ -93,7 +96,7 @@ export type SelectionMember =
       onset: Onset;
       voiceIndex: number;
       eventIndex: number;
-      containerIndex?: number;
+      containerIndex?: ContainerIndex;
     }
   | {
       kind: 'voiceMeasure';
@@ -402,7 +405,7 @@ function exactMemberIndex(
         member.measureIndex === cursor.measureIndex &&
         member.voiceIndex === event?.voiceIndex &&
         member.eventIndex === event?.eventIndex &&
-        member.containerIndex === event?.containerIndex
+        sameContainerIndex(member.containerIndex, event?.containerIndex)
       );
     }
     case 'voiceMeasure':
@@ -468,7 +471,7 @@ interface InkAddress {
   measureIndex: number;
   voiceIndex: number;
   eventIndex: number;
-  containerIndex?: number;
+  containerIndex?: ContainerIndex;
 }
 
 function inkAddresses(doc: MnxStructure): InkAddress[] {
@@ -522,7 +525,7 @@ function memberContainsInk(member: SelectionMember, address: InkAddress): boolea
         member.measureIndex === address.measureIndex &&
         member.voiceIndex === address.voiceIndex &&
         member.eventIndex === address.eventIndex &&
-        member.containerIndex === address.containerIndex
+        sameContainerIndex(member.containerIndex, address.containerIndex)
       );
     case 'voiceMeasure':
       return (
@@ -667,7 +670,7 @@ export function containerCoincidence(
       | undefined;
     const type = item?.type;
     if (type !== 'tuplet' && type !== 'grace' && type !== 'tremolo') continue;
-    const timedChildren = (item?.content ?? []).filter(isTimedEvent).length;
+    const timedChildren = item ? containerEventsWithPaths(item as MnxSequenceItem).length : 0;
     if (children.length === timedChildren && timedChildren > 0) {
       whole.push({
         partIndex: first.partIndex,

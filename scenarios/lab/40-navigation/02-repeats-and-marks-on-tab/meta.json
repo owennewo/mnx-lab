@@ -59,5 +59,6 @@
   "origin": "local",
   "status": "rendered",
   "schema": "proposed",
-  "proposal": "score-text"
+  "proposal": "score-text",
+  "performance": true
 }

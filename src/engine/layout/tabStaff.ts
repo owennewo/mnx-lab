@@ -1,3 +1,4 @@
+import type { ContainerIndex } from '../../model/noteKeys.ts';
 import { MnxEvent, MnxGrace, MnxSequence, MnxTuplet, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import {
   GUITAR_TUNING,
@@ -376,6 +377,8 @@ export function innerColumns(
   accidentalContext: { useAccidentalDisplay: boolean; keyFifths: number }
 ): { event: MnxEvent; x: number; endX: number }[] {
   const events = container.content;
+  // Nested tuplet geometry is not supported; do not invent child coordinates.
+  if (events.some(event => !isTimedEvent(event))) return [];
   const xs: number[] = [];
 
   if (isTuplet(container)) {
@@ -400,7 +403,7 @@ export function innerColumns(
   }
 
   return events.map((event, j) => ({
-    event,
+    event: event as MnxEvent,
     x: xs[j],
     // The last inner event ends where its own column does; there is no next
     // slot to ask, and the bar's end would be a lie for a grace note.
@@ -497,7 +500,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
   const drawEvent = (input: {
     event: MnxEvent;
     eventIndex: number;
-    containerIndex?: number;
+    containerIndex?: ContainerIndex;
     eventX: number;
     eventEndX: number;
     /** Digit size relative to full — < 1 for grace notes. */

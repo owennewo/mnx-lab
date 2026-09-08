@@ -37,7 +37,8 @@ export interface ScenarioMeta {
    * workbench can tell stale (record present, status demoted) from
    * never-seen (no record). Display-only here: the workbench never writes it.
    */
-  verification?: { at: string; primitivesHash?: string; renderHash?: string; bothHash?: string };
+  performance?: boolean;
+  verification?: { performanceHash?: string; performanceAt?: string; at: string; primitivesHash?: string; renderHash?: string; bothHash?: string };
 }
 
 export interface ScenarioEntry {
@@ -57,6 +58,7 @@ export interface ScenarioEntry {
   issueRef: string | null;
   invalidByDesign: boolean;
   hasTab: boolean;
+  performanceAvailable?: boolean;
   loadDocument: () => Promise<unknown>;
   loadNotes: (() => Promise<string>) | null;
 }
@@ -75,6 +77,9 @@ const notesModules = import.meta.glob('../../scenarios/{lab,spec}/**/notes.md', 
   import: 'default'
 }) as Record<string, () => Promise<string>>;
 
+const performanceModules = import.meta.glob('../../scenarios/{lab,spec}/**/expected.performance.json');
+const midiModules = import.meta.glob('../../scenarios/{lab,spec}/**/expected.midi.json');
+
 function buildEntries(): ScenarioEntry[] {
   const entries: ScenarioEntry[] = [];
   for (const metaPath of Object.keys(metaModules).sort()) {
@@ -91,6 +96,7 @@ function buildEntries(): ScenarioEntry[] {
     const notesPath = metaPath.replace(/meta\.json$/, 'notes.md');
     entries.push({
       id: segments.join('/'),
+      performanceAvailable: metaPath.replace('meta.json','expected.performance.json') in performanceModules && metaPath.replace('meta.json','expected.midi.json') in midiModules,
       ns,
       category: ns === 'spec' ? 'spec' : segments.slice(0, -1).join('/'),
       meta,

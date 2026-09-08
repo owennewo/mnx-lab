@@ -1441,6 +1441,7 @@ export function planHorizontal(
                 });
               }
               if (isTuplet(event)) {
+                if (event.content.some(child => !isTimedEvent(child))) issues.push('nested tuplet content — child geometry not rendered');
                 // Inner events get rigid columns with pre-scaled duration
                 // space (tupletColumns); the real metric time is `outer`.
                 onset += tupletDuration(event);

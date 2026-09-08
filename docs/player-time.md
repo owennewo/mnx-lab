@@ -112,6 +112,7 @@ The top-level fields are `formatVersion: 1`, `written`, `sounding`, `tempo`,
 
 - `written`: `id`, `noteKey`, `ordinal`, original `metricOffset`/`metricDuration`,
   expanded `position`/`duration`, and `soundingIds`.
+- `voices`: explicit part/string/kit metadata for channel allocation (item 5).
 - `sounding`: `id`, `voice`, expanded `position`/`duration`, sounded `midi`,
   `velocity`, `curve`, and `writtenIds`. Future expression may supply
   `noReattack` and `timbre` hints. Curve offsets are relative to the sounding event;
@@ -143,3 +144,6 @@ clefs, ottavas and capo; hand-stated natural/artificial harmonic cases include a
 omit `touchingPitch`. Fractional alterations and pitches outside MIDI's export range
 are retained. Harmonic consistency diagnostics and timbre are item 8; bounded export
 is item 5. Neither may rewrite the sounded pitch to make metadata agree.
+
+The compiler and MIDI evidence lifecycle are implemented in
+[player-performance.md](player-performance.md).

@@ -34,6 +34,7 @@ try {
   // 3. Use it the way a consumer would: compute layout headlessly, then emit
   //    SVG with the four DOM calls the emitter needs faked in.
   const consumer = `
+    import { compilePerformance, serializePerformance, parsePerformance, exportMidi } from 'mnx-lab/audio';
     import { ensureSmufl, computePrimitives, renderSvg, fitPxPerSp } from 'mnx-lab/engine';
     import fs from 'node:fs';
     import { createRequire } from 'node:module';
@@ -45,6 +46,11 @@ try {
     const score = ${JSON.stringify(
       fs.readFileSync(path.join(ROOT, 'scenarios/spec/hello-world/document.mnx.json'), 'utf8')
     )};
+    const compiled = compilePerformance(JSON.parse(score));
+    if (!compiled.ok || compiled.performance.sounding.length !== 1) throw new Error('audio compilation failed');
+    const midi = exportMidi(parsePerformance(serializePerformance(compiled.performance)));
+    if (!midi.ok || String.fromCharCode(...midi.bytes.slice(0,4)) !== 'MThd') throw new Error('MIDI export failed');
+    console.log('OK mnx-lab/audio compiled and exported hello-world in Node');
     const prims = computePrimitives(JSON.parse(score), 80);
     if (!prims.notation.primitives.length) throw new Error('no primitives');
 

@@ -164,7 +164,7 @@ run any time before 6.
 | 2 | [Playback context and the iteration cursor](../complete/core-player-pass-cursor.md) | A host-owned playback context (replacing the dormant `PlaybackState` shape) carrying ordinal and iteration; the chip ladder shows `iteration 2 of 3` / *not performed*; changeable; feeds `selected-verse`. The edit session is untouched. | reviewer | conformance tests on the pure resolver; no golden moves | complete |
 | 3 | [Timing and pitch contracts](../complete/core-player-timing-pitch.md) | `audio/time.ts` (rational arithmetic, tempo map, `secondsAt`); the pitch rule as tests over transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata (incl. `duration` hints and cross-part sync) and tie conventions written down with numbers; the performance golden's format. | reviewer | conformance tests | complete |
 | 4 | [Audio backend spike](../complete/core-player-tone-spike.md) | Tone.js **versus a native Web Audio sink**, measured: Node import, browser Offline render, per-voice detune ramps, both embed formats' size, what Tone saves once the transport is ours. Output: a log entry and the `Sink` interface. | both | its findings | complete; native selected |
-| 5 | [Performance compiler and MIDI export](../proposed/core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | proposed |
+| 5 | [Performance compiler and MIDI export](../proposed/core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | implemented; review pending |
 | 6 | [Transport](../proposed/core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | proposed |
 | 7 | [Player element, written view](../proposed/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | proposed |
 | 8 | [Expression and technique](../proposed/core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | proposed |
@@ -341,3 +341,27 @@ The conventions adopted for the compiler (lab choices, not new MNX requirements)
   generation-safe cleanup and durable offline tests; the spike does not implement them.
 - Prototype code and temporary dependency are discarded. No package manifests,
   engraving goldens or approvals change; no verification batch is needed.
+
+### 2026-09-09 — item 5: performance compiler and bounded MIDI evidence
+
+- The canonical note walker now handles recursive container paths; shallow keys
+  remain unchanged. Editor lookups/equality, selection, references and JSON anchors
+  use those paths. Nested geometry diagnoses instead of inventing ink. Existing
+  primitives/SVGs are byte-identical.
+- Compilation separates written occurrences from sounding spans: ties merge after
+  traversal, tremolos emit repeated attacks, partial bars clip content, and grace/
+  fermata insertions shift all parts together. Authored `space` durations are fraction
+  arrays and must be handled before the permissive timed-event classifier.
+- Added `voices[]` metadata to the unapproved v1 format, so MIDI allocation does not
+  parse voice-id strings. Declared strings retain their actual numbers; conflicts
+  preserve pitches on fallback voices, and later string attacks truncate sound.
+- MIDI exports type 1 at PPQ 960, rounds absolute boundaries, preflights channels,
+  composes/quantizes bounded curves and reports lost information. The small byte
+  reader checks structure; it does not replace item 9's independent oracle.
+- 32 opt-in performance/MIDI goldens are registered in
+  [the new-evidence ledger](lab-verify.md#player-performance--2026-09-09). The checker,
+  queue, static review page and approval receipt own the entire lifecycle. New
+  evidence is unseen despite current engraving approval; approval records are kept.
+- The legacy audio approximation is retired. The library exports compiler, exact
+  time and MIDI writer; the [API/conventions](../../docs/player-performance.md) describe
+  resource bounds and limits. No sound/transport or human verification is implied.

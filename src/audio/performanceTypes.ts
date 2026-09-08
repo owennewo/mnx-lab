@@ -44,7 +44,15 @@ export interface PerformanceMeasure<T = Rational> {
 export type SourceSegment<T = Rational> =
   | { kind: 'metric'; ordinal: number; metricOffset: T; metricPosition: T; position: T; duration: T }
   | Insertion<T>;
+export interface PerformanceVoice {
+  id: string;
+  partIndex: number;
+  partId?: string;
+  string?: number;
+  kit?: boolean;
+}
 export interface Performance<T = Rational> {
+  voices: PerformanceVoice[];
   formatVersion: 1;
   written: WrittenOccurrence<T>[];
   sounding: SoundingEvent<T>[];

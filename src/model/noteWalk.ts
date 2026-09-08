@@ -20,9 +20,9 @@
  * the nested key form below, which remains an implementation detail of this
  * file rather than a traversal each consumer has to reproduce.
  */
-import type { MnxEvent, MnxNote, MnxSequence, MnxStructure } from './mnx.ts';
+import type { MnxSequenceItem, MnxEvent, MnxNote, MnxSequence, MnxStructure } from './mnx.ts';
 import { isTimedEvent } from './mnx.ts';
-import { positionalNoteKey } from './noteKeys.ts';
+import { positionalNoteKey, type ContainerIndex } from './noteKeys.ts';
 
 /** Where a note lives, and what names it. */
 export interface NoteAddress {
@@ -43,7 +43,7 @@ export interface NoteAddress {
   eventIndex: number;
   /** Set when the note lives inside a container: its event's index within the
    *  container's own content. */
-  containerIndex?: number;
+  containerIndex?: ContainerIndex;
   noteIndex: number;
   event: MnxEvent;
   sequence: MnxSequence;
@@ -56,7 +56,7 @@ export function noteKeyAt(
   voiceIndex: number,
   eventIndex: number,
   noteIndex: number,
-  containerIndex?: number,
+  containerIndex?: ContainerIndex,
   partIndex = 0,
   staffIndex = 1
 ): string {
@@ -73,17 +73,16 @@ export function noteKeyAt(
 }
 
 /** Is this sequence item a container holding events (tuplet, grace, tremolo)? */
-function containerContent(item: unknown): MnxEvent[] | null {
+export function containerContent(item: unknown): MnxSequenceItem[] | null {
   const record = item as { type?: string; content?: unknown };
   if (!record || typeof record !== 'object') return null;
   if (record.type !== 'tuplet' && record.type !== 'grace' && record.type !== 'tremolo') return null;
-  return Array.isArray(record.content) ? (record.content as MnxEvent[]) : null;
+  return Array.isArray(record.content) ? (record.content as MnxSequenceItem[]) : null;
 }
 
 /**
  * Every addressable note in the document, in document order, with the
- * coordinates that name it. Container content is visited recursively one
- * authored level deep (the schema's tuplet/grace/tremolo content shape).
+ * coordinates that name it. Container content is visited recursively, preserving shallow key spelling.
  */
 export function forEachNoteAddress(
   doc: MnxStructure,
@@ -99,7 +98,7 @@ export function forEachNoteAddress(
       const voice = (voiceByStaff.get(staffIndex) ?? -1) + 1;
       voiceByStaff.set(staffIndex, voice);
       (sequence.content ?? []).forEach((item, eventIndex) => {
-        const emit = (event: MnxEvent, containerIndex?: number) =>
+        const emit = (event: MnxEvent, containerIndex?: ContainerIndex) =>
           (event.notes ?? []).forEach((note, noteIndex) => {
             fn({
               note,
@@ -122,15 +121,13 @@ export function forEachNoteAddress(
         // Container content is enumerated too (campaign item 11b): a tuplet's
         // notes are as much ink as any other, and the nested key form is what
         // lets them be told apart.
-        const inner = containerContent(item);
-        if (inner) {
-          inner.forEach((event, containerIndex) => {
-            if (isTimedEvent(event)) emit(event, containerIndex);
-          });
-          return;
-        }
-        if (!isTimedEvent(item)) return;
-        emit(item as MnxEvent);
+        const walk = (child: MnxSequenceItem, path: number[]) => {
+          if (path.length > 32) throw new RangeError('Container nesting exceeds 32 levels.');
+          const inner = containerContent(child);
+          if (inner) { inner.forEach((value, index) => walk(value, [...path, index])); return; }
+          if (isTimedEvent(child)) emit(child, path.length === 0 ? undefined : path.length === 1 ? path[0] : path);
+        };
+        walk(item, []);
       });
     });
   });
@@ -152,4 +149,24 @@ export function findNoteAddress(doc: MnxStructure, key: string): NoteAddress | n
     if (found === null && address.key === key) found = address;
   });
   return found;
+}
+
+/** Resolve a container path against its top-level sequence item. */
+export function eventAtContainer(item: MnxSequenceItem | undefined, index?: ContainerIndex): MnxEvent | undefined {
+  let child = item;
+  const path = index === undefined ? [] : typeof index === 'number' ? [index] : index;
+  for (const slot of path) child = containerContent(child)?.[slot];
+  return child && isTimedEvent(child) ? child : undefined;
+}
+
+export function containerEventsWithPaths(item: MnxSequenceItem): { event: MnxEvent; containerIndex?: ContainerIndex }[] {
+  const result: { event: MnxEvent; containerIndex?: ContainerIndex }[] = [];
+  const walk = (child: MnxSequenceItem, path: number[]) => {
+    if (path.length > 32) throw new RangeError('Container nesting exceeds 32 levels.');
+    if (isTimedEvent(child)) result.push({ event: child,
+      ...(path.length ? { containerIndex: path.length === 1 ? path[0] : path } : {}) });
+    else containerContent(child)?.forEach((value, index) => walk(value, [...path, index]));
+  };
+  walk(item, []);
+  return result;
 }

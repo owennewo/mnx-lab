@@ -1,3 +1,6 @@
+import { containerEventsWithPaths } from '../model/noteWalk.ts';
+import { containerPath } from '../model/noteKeys.ts';
+import type { ContainerIndex } from '../model/noteKeys.ts';
 /**
  * The element inventory — what the destructibility sweep must try to remove
  * (roadmap/complete/core-element-ops-destruct-sweep.md, campaign item 2).
@@ -611,7 +614,7 @@ function walkContent(
   path: string,
   jsonPath: (string | number)[],
   keyOf:
-    | ((eventIndex: number, noteIndex: number, note: Record<string, unknown>, containerIndex?: number) => string | undefined)
+    | ((eventIndex: number, noteIndex: number, note: Record<string, unknown>, containerIndex?: ContainerIndex) => string | undefined)
     | null,
   /** Where this content lives, so containers can be addressed by position. */
   sequenceIndex = 0,
@@ -632,18 +635,13 @@ function walkContent(
       // Container content is addressable now (campaign item 11b): its notes
       // carry nested keys, so the walker hands them through with a keyOf that
       // knows the container index.
-      (item.content as Record<string, unknown>[] | undefined)?.forEach((inner, containerIndex) => {
-        if (!isTimedEvent(inner as never)) return;
-        walkEvent(
-          out,
-          inner,
-          `${itemPath}/c${containerIndex}`,
-          [...itemJson, 'content', containerIndex],
-          keyOf
-            ? (noteIndex, note) => keyOf(index, noteIndex, note, containerIndex)
-            : null
-        );
-      });
+      for (const {event,containerIndex} of containerEventsWithPaths(raw as never)) {
+        const nested = containerPath(containerIndex);
+        walkEvent(out,event as unknown as Record<string, unknown>,
+          itemPath + nested.map(i => `/c${i}`).join(''),
+          [...itemJson,...nested.flatMap(i => ['content',i])],
+          keyOf ? (noteIndex,note) => keyOf(index,noteIndex,note,containerIndex) : null);
+      }
       return;
     }
     if (!isTimedEvent(raw as never)) return;
@@ -801,11 +799,7 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
           for (const [eventIndex, item] of (sequence.content ?? []).entries()) {
             // A beamed run can start inside a grace container (campaign
             // item 11b made those notes addressable), so look there too.
-            const inner = (item as { content?: unknown[] }).content;
-            const candidates: [unknown, number | undefined][] = Array.isArray(inner)
-              ? inner.map((event, containerIndex) => [event, containerIndex])
-              : [[item, undefined]];
-            for (const [candidate, containerIndex] of candidates) {
+            for (const {event: candidate,containerIndex} of containerEventsWithPaths(item)) {
               if (!isTimedEvent(candidate as never)) continue;
               const event = candidate as { id?: string; notes?: unknown[] };
               if (!event.id || event.id !== beam.events?.[0]) continue;

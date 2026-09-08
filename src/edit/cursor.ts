@@ -1,3 +1,6 @@
+import { eventAtContainer } from '../model/noteWalk.ts';
+import { sameContainerIndex } from '../model/noteKeys.ts';
+import type { ContainerIndex } from '../model/noteKeys.ts';
 // The position cursor — roadmap/complete/core-editor-input-layer.md.
 //
 // The cursor is a RHYTHMIC POSITION plus a VERTICAL LINE, not a note id: an
@@ -55,7 +58,7 @@ export interface NoteSlot {
   voiceIndex: number;
   eventIndex: number;
   /** Inner event index when the note lives in a tuplet/grace/tremolo. */
-  containerIndex?: number;
+  containerIndex?: ContainerIndex;
   noteIndex: number;
 }
 
@@ -64,7 +67,7 @@ export interface NoteSlot {
 export interface EventSlot {
   voiceIndex: number;
   eventIndex: number;
-  containerIndex?: number;
+  containerIndex?: ContainerIndex;
 }
 
 /** One stop on the beat grid. Slots are in VISUAL order, top line first, so
@@ -243,7 +246,7 @@ export function itemSpan(item: MnxSequenceItem): Onset {
 }
 
 /** A container's inner events, or null when the item is not a container. */
-function containerEvents(item: MnxSequenceItem): MnxEvent[] | null {
+function containerEvents(item: MnxSequenceItem): MnxSequenceItem[] | null {
   if (isTuplet(item) || isTremolo(item)) return item.content;
   const grace = item as { type?: string; content?: MnxEvent[] };
   return grace.type === 'grace' ? (grace.content ?? []) : null;
@@ -332,7 +335,7 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
       if (sequenceStaff !== staffIndex) return;
       let onset: Onset = { num: 0, den: 1 };
       sequence.content.forEach((item, eventIndex) => {
-        const push = (event: MnxEvent, at_: Onset, containerIndex?: number) => {
+        const push = (event: MnxEvent, at_: Onset, containerIndex?: ContainerIndex) => {
           const position = at(at_);
           position.voices.add(voiceIndex);
           position.events.push({
@@ -392,16 +395,17 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
           // so they become their own columns. Grace and tremolo content shares
           // the host moment, which is addressable now that the cursor carries a
           // discriminator (core-note-address.md move 2).
-          const inner = containerEvents(item);
-          if (inner) {
-            const scale = tupletScale(item);
-            let innerOnset = onset;
-            inner.forEach((event, containerIndex) => {
-              if (!isTimedEvent(event)) return;
-              push(event, innerOnset, containerIndex);
-              if (scale) innerOnset = addOnsets(innerOnset, scaleOnset(durationSpan(event.duration), scale));
+          const visit = (child: MnxSequenceItem, at_: Onset, scale: Onset, path: number[]) => {
+            if (isTimedEvent(child)) { push(child, at_, path.length === 1 ? path[0] : path); return; }
+            const ownScale = tupletScale(child);
+            const nextScale = ownScale ? scaleOnset(scale, ownScale) : scale;
+            let position = at_;
+            containerEvents(child)?.forEach((inner, index) => {
+              visit(inner, position, nextScale, [...path, index]);
+              if (ownScale) position = addOnsets(position, scaleOnset(itemSpan(inner), nextScale));
             });
-          }
+          };
+          visit(item, onset, { num: 1, den: 1 }, []);
         }
         onset = addOnsets(onset, itemSpan(item));
       });
@@ -544,7 +548,7 @@ export function pinEventSlot(
   const eventSlotIndex = position.events.findIndex(candidate =>
     candidate.voiceIndex === event.voiceIndex &&
     candidate.eventIndex === event.eventIndex &&
-    candidate.containerIndex === event.containerIndex
+    sameContainerIndex(candidate.containerIndex, event.containerIndex)
   );
   return eventSlotIndex < 0 ? cursor : { ...cursor, eventSlotIndex };
 }
@@ -563,8 +567,7 @@ export function eventAtCursor(
   ).filter(sequence => (sequence.staff ?? 1) === (cursor.staffIndex ?? 1));
   const item = sequences[ref.voiceIndex]?.content?.[ref.eventIndex];
   if (!item) return undefined;
-  if (ref.containerIndex === undefined) return isTimedEvent(item) ? item : undefined;
-  return containerEvents(item)?.[ref.containerIndex];
+  return eventAtContainer(item, ref.containerIndex);
 }
 
 /**

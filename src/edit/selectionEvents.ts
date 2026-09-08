@@ -1,3 +1,4 @@
+import { containerEventsWithPaths } from '../model/noteWalk.ts';
 // Every event beneath a resolved selection — the walk Delete's first press
 // needs, and the ink test that decides which press it is.
 //
@@ -14,7 +15,6 @@
 // disagree the moment a part has two staves; taking the raw one addressed
 // another staff's voice.
 import type { MnxEvent, MnxSequenceItem, MnxStructure } from '../model/mnx.ts';
-import { isTimedEvent } from '../model/mnx.ts';
 import type { EventAddress } from './ops.ts';
 import type { SelectionMember } from './selection.ts';
 
@@ -63,11 +63,8 @@ function staffVoices(
 function addressesInVoice(voice: StaffVoice): EventAddress[] {
   const { content, ...base } = voice;
   return content.flatMap((item, eventIndex) => {
-    if (isTimedEvent(item)) return [{ ...base, eventIndex }];
-    const inner = (item as { content?: MnxSequenceItem[] }).content ?? [];
-    return inner.flatMap((child, containerIndex) =>
-      isTimedEvent(child) ? [{ ...base, eventIndex, containerIndex }] : []
-    );
+    return containerEventsWithPaths(item).map(({ containerIndex }) => ({ ...base, eventIndex,
+      ...(containerIndex === undefined ? {} : { containerIndex }) }));
   });
 }
 

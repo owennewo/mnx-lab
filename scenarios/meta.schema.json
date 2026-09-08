@@ -132,19 +132,32 @@
         "renderHash": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{16}$",
-          "description": "Hash of the standalone SVG goldens (expected.svg + expected.tab.svg — this file set is frozen; expected.both.svg hashes separately as bothHash) at approval time — the emitter's own output, which primitivesHash cannot see. Optional: approvals predating the SVG golden carry no renderHash and are NOT treated as stale for lacking one; run --backfill-render to stamp them."
+          "description": "Hash of the standalone SVG goldens (expected.svg + expected.tab.svg \u2014 this file set is frozen; expected.both.svg hashes separately as bothHash) at approval time \u2014 the emitter's own output, which primitivesHash cannot see. Optional: approvals predating the SVG golden carry no renderHash and are NOT treated as stale for lacking one; run --backfill-render to stamp them."
         },
         "bothHash": {
           "type": "string",
           "pattern": "^sha256:[0-9a-f]{16}$",
-          "description": "Hash of expected.both.svg (the combined notation+tab system) at approval time. Optional: approvals predating the both golden carry no bothHash and are NOT stale for lacking one. There is no backfill — the combined system earns its hash only through a real approval."
+          "description": "Hash of expected.both.svg (the combined notation+tab system) at approval time. Optional: approvals predating the both golden carry no bothHash and are NOT stale for lacking one. There is no backfill \u2014 the combined system earns its hash only through a real approval."
+        },
+        "performanceHash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{16}$",
+          "description": "Hash of presented performance tables and MIDI verdict; never grandfathered from engraving approval."
+        },
+        "performanceAt": {
+          "type": "string",
+          "description": "Date of performance evidence approval, independent of engraving approval."
         }
       },
       "required": [
         "at"
       ],
       "additionalProperties": false,
-      "description": "Provenance of the last human approval, written only by verify-scenarios.mjs and deliberately KEPT through demotion — so the approval queue can distinguish 'stale' (verified once, a golden changed since: a hash differs or status was demoted) from 'never seen' (no record). See roadmap/complete/lab-structure-lab.md."
+      "description": "Provenance of the last human approval, written only by verify-scenarios.mjs and deliberately KEPT through demotion \u2014 so the approval queue can distinguish 'stale' (verified once, a golden changed since: a hash differs or status was demoted) from 'never seen' (no record). See roadmap/complete/lab-structure-lab.md."
+    },
+    "performance": {
+      "type": "boolean",
+      "description": "Opt in to rational performance and bounded MIDI evidence. New evidence requires separate human approval."
     }
   },
   "required": [

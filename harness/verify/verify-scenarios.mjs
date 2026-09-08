@@ -1,3 +1,4 @@
+import { performanceHash, performanceState } from './performance-evidence.mjs';
 // Marks scenarios as `verified` — the one status rung that is a human
 // assertion ("I looked at the rendered output / pinned errors and approve").
 // This script enforces eligibility and rewrites meta.json; it is the ONLY
@@ -97,13 +98,22 @@ function writeMeta(scenario, mutate) {
  * ORIGINAL approval date, and no approval that old can have looked at the
  * both view — recording a bothHash there would be false provenance.
  */
-function markVerified(scenario, at, { skipBothHash = false } = {}) {
+export function markVerified(scenario, at, { skipBothHash = false, presentedPerformanceHash, performanceOnly = false } = {}) {
+  const current = performanceHash(scenario);
+  if (presentedPerformanceHash !== undefined && (current === null || presentedPerformanceHash !== current)) throw new Error('Presented performance evidence is missing or changed; present it again before approval.');
   writeMeta(scenario, meta => {
+    if (performanceOnly) {
+      if (!meta.performance || !presentedPerformanceHash) throw new Error('Performance-only approval requires presented current evidence.');
+      if (recordMatches(meta.verification ?? null, primitivesHash(scenario), renderHash(scenario), bothHash(scenario))) meta.status = 'verified';
+      meta.verification = { ...meta.verification, at: meta.verification?.at ?? at, performanceHash: current, performanceAt: at };
+      return;
+    }
     meta.status = 'verified';
     const prims = primitivesHash(scenario);
     const render = renderHash(scenario);
     const both = skipBothHash ? null : bothHash(scenario);
-    const record = { at };
+    const record = { ...meta.verification, at };
+    if (meta.performance && presentedPerformanceHash) { record.performanceHash = current; record.performanceAt = at; }
     if (prims !== null) record.primitivesHash = prims;
     if (render !== null) record.renderHash = render;
     if (both !== null) record.bothHash = both;
@@ -143,7 +153,11 @@ export function buildQueue() {
     const render = renderHash(scenario);
     const both = bothHash(scenario);
     const record = meta.verification ?? null;
+    const evidence = performanceState(meta, performanceHash(scenario));
     const entry = {
+      performanceState: evidence,
+      currentPerformanceHash: performanceHash(scenario),
+      approvedPerformanceHash: record?.performanceHash ?? null,
       id: scenario.id,
       status: meta.status,
       verifiedAt: record?.at ?? null,
@@ -158,6 +172,12 @@ export function buildQueue() {
       queue.blocked.push({ ...entry, reason: 'checker errors', errors: errors.slice(0, 3) });
     } else if (meta.expect.standard === 'valid' && hash === null) {
       queue.blocked.push({ ...entry, reason: 'not rendered (no expected.primitives.json)' });
+    } else if (evidence === 'blocked' || evidence === 'retired-without-review') {
+      queue.blocked.push({ ...entry, reason: 'missing or retired performance evidence' });
+    } else if (evidence === 'stale') {
+      queue.stale.push({ ...entry, reason: 'performance evidence changed' });
+    } else if (evidence === 'unseen') {
+      queue.neverSeen.push({ ...entry, reason: 'unseen performance evidence; engraving approval retained' });
     } else if (meta.status === 'verified' && recordMatches(record, hash, render, both)) {
       // Approvals that predate a golden stay current (see the header) but say
       // which evidence a fresh approval would add to the record.
@@ -219,6 +239,18 @@ function printQueue(queue, asJson) {
 
 function main() {
   const args = process.argv.slice(2);
+  let presented = {};
+  const receiptAt = args.indexOf('--presented');
+  if (receiptAt >= 0) {
+    const file = args[receiptAt + 1];
+    if (!file) throw new Error('--presented requires the review-page receipt file');
+    const receipt = JSON.parse(fs.readFileSync(file,'utf8'));
+    if (receipt.formatVersion !== 1 || !receipt.items) throw new Error('Invalid presentation receipt');
+    presented = receipt.items;
+    args.splice(receiptAt,2);
+  }
+  const performanceOnly = args.includes('--performance-only');
+  if (performanceOnly) args.splice(args.indexOf('--performance-only'),1);
   const corpus = loadCorpus();
   const byId = new Map(corpus.map(s => [s.id, s]));
 
@@ -318,14 +350,14 @@ function main() {
       record !== null &&
       (render === null || record.renderHash !== undefined) &&
       (both === null || record.bothHash !== undefined);
-    if (meta.status === 'verified' && recordMatches(record, hash, render, both) && recordComplete) {
+    if (!performanceOnly && !presented[id] && meta.status === 'verified' && recordMatches(record, hash, render, both) && recordComplete) {
       console.log(`OK   ${id}: already verified and current`);
       continue;
     }
     const adding = [];
     if (record !== null && record.renderHash === undefined && render !== null) adding.push('renderHash');
     if (record !== null && record.bothHash === undefined && both !== null) adding.push('bothHash');
-    markVerified(scenario, new Date().toISOString().slice(0, 10));
+    markVerified(scenario, new Date().toISOString().slice(0, 10), { presentedPerformanceHash: presented[id]?.performanceHash, performanceOnly });
     const detail =
       meta.status === 'verified' && adding.length > 0 && recordMatches(record, hash, render, both)
         ? `re-approved — ${adding.join(' + ')} recorded`
@@ -339,4 +371,11 @@ function main() {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === new URL(import.meta.url).pathname) {
   main();
+}
+
+/** Called by the golden updater only for changed, previously approved evidence. */
+export function invalidatePerformance(scenario) {
+  writeMeta(scenario, meta => {
+    if (meta.status === 'verified' && performanceState(meta, performanceHash(scenario)) === 'stale') meta.status = 'rendered';
+  });
 }

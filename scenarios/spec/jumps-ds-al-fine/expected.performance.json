@@ -1,0 +1,758 @@
+{
+  "formatVersion": 1,
+  "written": [
+    {
+      "id": "w0:@m0.v0.e0.n0",
+      "noteKey": "@m0.v0.e0.n0",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "soundingIds": [
+        "s0"
+      ]
+    },
+    {
+      "id": "w1:@m1.v0.e0.n0",
+      "noteKey": "@m1.v0.e0.n0",
+      "ordinal": 1,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "1",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "soundingIds": [
+        "s1"
+      ]
+    },
+    {
+      "id": "w2:@m2.v0.e0.n0",
+      "noteKey": "@m2.v0.e0.n0",
+      "ordinal": 2,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "soundingIds": [
+        "s2"
+      ]
+    },
+    {
+      "id": "w3:@m3.v0.e0.n0",
+      "noteKey": "@m3.v0.e0.n0",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "3",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "soundingIds": [
+        "s3"
+      ]
+    },
+    {
+      "id": "w4:@m4.v0.e0.n0",
+      "noteKey": "@m4.v0.e0.n0",
+      "ordinal": 4,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "4",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "soundingIds": [
+        "s4"
+      ]
+    },
+    {
+      "id": "w5:@m1.v0.e0.n0",
+      "noteKey": "@m1.v0.e0.n0",
+      "ordinal": 5,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "soundingIds": [
+        "s5"
+      ]
+    },
+    {
+      "id": "w6:@m2.v0.e0.n0",
+      "noteKey": "@m2.v0.e0.n0",
+      "ordinal": 6,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "6",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "soundingIds": [
+        "s6"
+      ]
+    }
+  ],
+  "sounding": [
+    {
+      "id": "s0",
+      "voice": "p0:note:w0:@m0.v0.e0.n0",
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "midi": 72,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:@m0.v0.e0.n0"
+      ]
+    },
+    {
+      "id": "s1",
+      "voice": "p0:note:w1:@m1.v0.e0.n0",
+      "position": {
+        "num": "1",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "midi": 76,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w1:@m1.v0.e0.n0"
+      ]
+    },
+    {
+      "id": "s2",
+      "voice": "p0:note:w2:@m2.v0.e0.n0",
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "midi": 72,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w2:@m2.v0.e0.n0"
+      ]
+    },
+    {
+      "id": "s3",
+      "voice": "p0:note:w3:@m3.v0.e0.n0",
+      "position": {
+        "num": "3",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "midi": 77,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w3:@m3.v0.e0.n0"
+      ]
+    },
+    {
+      "id": "s4",
+      "voice": "p0:note:w4:@m4.v0.e0.n0",
+      "position": {
+        "num": "4",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "midi": 72,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w4:@m4.v0.e0.n0"
+      ]
+    },
+    {
+      "id": "s5",
+      "voice": "p0:note:w5:@m1.v0.e0.n0",
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "midi": 76,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w5:@m1.v0.e0.n0"
+      ]
+    },
+    {
+      "id": "s6",
+      "voice": "p0:note:w6:@m2.v0.e0.n0",
+      "position": {
+        "num": "6",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "midi": 72,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w6:@m2.v0.e0.n0"
+      ]
+    }
+  ],
+  "voices": [
+    {
+      "id": "p0:note:w0:@m0.v0.e0.n0",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w1:@m1.v0.e0.n0",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w2:@m2.v0.e0.n0",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w3:@m3.v0.e0.n0",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w4:@m4.v0.e0.n0",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w5:@m1.v0.e0.n0",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w6:@m2.v0.e0.n0",
+      "partIndex": 0
+    }
+  ],
+  "tempo": [
+    {
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "1",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "3",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "4",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "6",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    }
+  ],
+  "measures": [
+    {
+      "ordinal": 0,
+      "measureIndex": 0,
+      "occurrence": 1,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 1,
+      "measureIndex": 1,
+      "occurrence": 1,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "1",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 2,
+      "measureIndex": 2,
+      "occurrence": 1,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "2",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 3,
+      "measureIndex": 3,
+      "occurrence": 1,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "3",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "3",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 4,
+      "measureIndex": 4,
+      "occurrence": 1,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "4",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "4",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 5,
+      "measureIndex": 1,
+      "occurrence": 2,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "5",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 6,
+      "measureIndex": 2,
+      "occurrence": 2,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "6",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "6",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    }
+  ],
+  "sourceMap": [
+    {
+      "kind": "metric",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "0",
+        "den": "1"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 1,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "1",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 2,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "2",
+        "den": "1"
+      },
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "3",
+        "den": "1"
+      },
+      "position": {
+        "num": "3",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 4,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "4",
+        "den": "1"
+      },
+      "position": {
+        "num": "4",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 5,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "5",
+        "den": "1"
+      },
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 6,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "6",
+        "den": "1"
+      },
+      "position": {
+        "num": "6",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    }
+  ],
+  "diagnostics": []
+}

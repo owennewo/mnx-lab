@@ -30,5 +30,6 @@
   "idRefs": false,
   "source": "hand-written",
   "origin": "local",
-  "status": "rendered"
+  "status": "rendered",
+  "performance": true
 }

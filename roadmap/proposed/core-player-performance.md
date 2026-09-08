@@ -1,6 +1,6 @@
 # The performance compiler and the MIDI export
 
-> **Status: proposed 2026-09-08, revised the same day.** Campaign:
+> **Status: implemented 2026-09-09; landing checks in progress.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 5. Needs items 1 and 3.
 > None of it makes a sound, and it is where the player is won or lost.
 
@@ -106,3 +106,13 @@ retirement. These rules also form item 10's unrolled-evidence precedent.
 - `mnxToAudio.ts` retired; `mnx-lab/audio` exports the compiler, time and writer.
 - The nested-container identity test green over the corpus with no existing key
   changed.
+
+## Implementation and review
+
+The [compiler/API documentation](../../docs/player-performance.md) records the exact
+stages, resource bounds, recursive key compatibility and bounded MIDI conventions.
+32 scenarios opt in to rational performance tables and MIDI byte verdicts. Their
+[new-evidence batch](../inprogress/lab-verify.md#player-performance--2026-09-09) is
+registered; existing engraving keys/goldens and approval records are unchanged.
+`voices[]` adds explicit allocation metadata to the previously unapproved v1 shape.
+No audio dependency, transport, expression implementation or human approval is added.

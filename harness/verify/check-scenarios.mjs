@@ -17,6 +17,8 @@ const SCENARIOS_DIR = path.join(ROOT, 'scenarios');
 
 const ALLOWED_FILES = new Set([
   'meta.json',
+  'expected.performance.json',
+  'expected.midi.json',
   'document.mnx.json',
   'expected.primitives.json',
   // The emitter golden, and its tab/both companions when the part declares
@@ -188,6 +190,16 @@ export function checkScenario(scenario, ctx) {
     fail('missing document.mnx.json');
   } else {
     doc = checkJsonFile(documentPath, 'document.mnx.json', fail);
+  }
+
+  if (meta?.verification?.performanceHash && !meta.performance) fail('approved performance obligation removed; explicit retirement required');
+  for (const name of ['expected.performance.json','expected.midi.json']) {
+    const file = path.join(scenario.dir,name);
+    if (meta?.performance && !fs.existsSync(file)) fail(`performance evidence missing: ${name}`);
+    if (fs.existsSync(file)) {
+      checkJsonFile(file,name,fail);
+      if (!meta?.performance) fail(`${name} exists without performance opt-in`);
+    }
   }
 
   // expected.primitives.json (generated, but still kept canonical)

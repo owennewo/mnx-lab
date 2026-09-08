@@ -1,3 +1,5 @@
+import { sameContainerIndex } from '../model/noteKeys.ts';
+import type { ContainerIndex } from '../model/noteKeys.ts';
 // The editor session: intent + (doc, cursor) → cursor move or EditOp.
 // This is stage 2 of the input layer (roadmap/complete/core-editor-input-layer.md)
 // — DOM-free on purpose, so the workbench mount and the harness replay test
@@ -2788,7 +2790,7 @@ function pasteLandingCursor(
   const matchedSlot = event
     ? voiceSlots.find(candidate =>
         candidate.eventIndex === event.eventIndex &&
-        candidate.containerIndex === event.containerIndex
+        sameContainerIndex(candidate.containerIndex, event.containerIndex)
       ) ?? slot
     : slot;
   if (matchedSlot) {
@@ -2849,7 +2851,7 @@ function eventAddressOf(member: {
   measureIndex: number;
   voiceIndex: number;
   eventIndex: number;
-  containerIndex?: number;
+  containerIndex?: ContainerIndex;
 }): EventAddress {
   return {
     partIndex: member.partIndex,

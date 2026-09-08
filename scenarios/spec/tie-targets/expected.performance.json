@@ -1,0 +1,1673 @@
+{
+  "formatVersion": 1,
+  "written": [
+    {
+      "id": "w0:ev21n1",
+      "noteKey": "ev21n1",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s0"
+      ]
+    },
+    {
+      "id": "w0:ev22n1",
+      "noteKey": "ev22n1",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "1",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "1",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s1"
+      ]
+    },
+    {
+      "id": "w0:ev26n1",
+      "noteKey": "ev26n1",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "1",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "1",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s0"
+      ]
+    },
+    {
+      "id": "w0:ev27n1",
+      "noteKey": "ev27n1",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "3",
+        "den": "8"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "3",
+        "den": "8"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s5"
+      ]
+    },
+    {
+      "id": "w0:ev23n1",
+      "noteKey": "ev23n1",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "1",
+        "den": "2"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "1",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s2"
+      ]
+    },
+    {
+      "id": "w0:ev28n1",
+      "noteKey": "ev28n1",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "1",
+        "den": "2"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "1",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s6"
+      ]
+    },
+    {
+      "id": "w0:ev24n1",
+      "noteKey": "ev24n1",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "3",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "3",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s3"
+      ]
+    },
+    {
+      "id": "w0:ev29n1",
+      "noteKey": "ev29n1",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "3",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "3",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s7"
+      ]
+    },
+    {
+      "id": "w1:ev25n1",
+      "noteKey": "ev25n1",
+      "ordinal": 1,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "1",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s3"
+      ]
+    },
+    {
+      "id": "w1:ev33n1",
+      "noteKey": "ev33n1",
+      "ordinal": 1,
+      "metricOffset": {
+        "num": "5",
+        "den": "8"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "13",
+        "den": "8"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s9"
+      ]
+    },
+    {
+      "id": "w1:ev34n1",
+      "noteKey": "ev34n1",
+      "ordinal": 1,
+      "metricOffset": {
+        "num": "3",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "7",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s10"
+      ]
+    },
+    {
+      "id": "w1:ev35n1",
+      "noteKey": "ev35n1",
+      "ordinal": 1,
+      "metricOffset": {
+        "num": "7",
+        "den": "8"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "15",
+        "den": "8"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s11"
+      ]
+    },
+    {
+      "id": "w2:ev36n1",
+      "noteKey": "ev36n1",
+      "ordinal": 2,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s9"
+      ]
+    },
+    {
+      "id": "w2:ev36n2",
+      "noteKey": "ev36n2",
+      "ordinal": 2,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s10"
+      ]
+    },
+    {
+      "id": "w2:ev36n3",
+      "noteKey": "ev36n3",
+      "ordinal": 2,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s11"
+      ]
+    },
+    {
+      "id": "w3:ev21n1",
+      "noteKey": "ev21n1",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "3",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s15"
+      ]
+    },
+    {
+      "id": "w3:ev22n1",
+      "noteKey": "ev22n1",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "1",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "13",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s16"
+      ]
+    },
+    {
+      "id": "w3:ev26n1",
+      "noteKey": "ev26n1",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "1",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "13",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s15"
+      ]
+    },
+    {
+      "id": "w3:ev27n1",
+      "noteKey": "ev27n1",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "3",
+        "den": "8"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "27",
+        "den": "8"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s20"
+      ]
+    },
+    {
+      "id": "w3:ev23n1",
+      "noteKey": "ev23n1",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "1",
+        "den": "2"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "7",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s17"
+      ]
+    },
+    {
+      "id": "w3:ev28n1",
+      "noteKey": "ev28n1",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "1",
+        "den": "2"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "7",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s21"
+      ]
+    },
+    {
+      "id": "w3:ev24n1",
+      "noteKey": "ev24n1",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "3",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "15",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s18"
+      ]
+    },
+    {
+      "id": "w3:ev29n1",
+      "noteKey": "ev29n1",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "3",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "15",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s22"
+      ]
+    },
+    {
+      "id": "w4:ev25n1",
+      "noteKey": "ev25n1",
+      "ordinal": 4,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "4"
+      },
+      "position": {
+        "num": "4",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "soundingIds": [
+        "s18"
+      ]
+    },
+    {
+      "id": "w4:ev33n1",
+      "noteKey": "ev33n1",
+      "ordinal": 4,
+      "metricOffset": {
+        "num": "5",
+        "den": "8"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "37",
+        "den": "8"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s24"
+      ]
+    },
+    {
+      "id": "w4:ev34n1",
+      "noteKey": "ev34n1",
+      "ordinal": 4,
+      "metricOffset": {
+        "num": "3",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "19",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s25"
+      ]
+    },
+    {
+      "id": "w4:ev35n1",
+      "noteKey": "ev35n1",
+      "ordinal": 4,
+      "metricOffset": {
+        "num": "7",
+        "den": "8"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "39",
+        "den": "8"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s26"
+      ]
+    },
+    {
+      "id": "w5:ev38n1",
+      "noteKey": "ev38n1",
+      "ordinal": 5,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s24"
+      ]
+    },
+    {
+      "id": "w5:ev38n2",
+      "noteKey": "ev38n2",
+      "ordinal": 5,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s25"
+      ]
+    },
+    {
+      "id": "w5:ev38n3",
+      "noteKey": "ev38n3",
+      "ordinal": 5,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s26"
+      ]
+    },
+    {
+      "id": "w6:ev41n1",
+      "noteKey": "ev41n1",
+      "ordinal": 6,
+      "metricOffset": {
+        "num": "1",
+        "den": "4"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "8"
+      },
+      "position": {
+        "num": "25",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "soundingIds": [
+        "s30"
+      ]
+    }
+  ],
+  "sounding": [
+    {
+      "id": "s0",
+      "voice": "p0:note:w0:ev21n1",
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "3",
+        "den": "8"
+      },
+      "midi": 67,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:ev21n1",
+        "w0:ev26n1"
+      ]
+    },
+    {
+      "id": "s1",
+      "voice": "p0:note:w0:ev22n1",
+      "position": {
+        "num": "1",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "midi": 69,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:ev22n1"
+      ]
+    },
+    {
+      "id": "s5",
+      "voice": "p0:note:w0:ev27n1",
+      "position": {
+        "num": "3",
+        "den": "8"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "midi": 66,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:ev27n1"
+      ]
+    },
+    {
+      "id": "s2",
+      "voice": "p0:note:w0:ev23n1",
+      "position": {
+        "num": "1",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "midi": 71,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:ev23n1"
+      ]
+    },
+    {
+      "id": "s6",
+      "voice": "p0:note:w0:ev28n1",
+      "position": {
+        "num": "1",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "midi": 67,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:ev28n1"
+      ]
+    },
+    {
+      "id": "s3",
+      "voice": "p0:note:w0:ev24n1",
+      "position": {
+        "num": "3",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "midi": 72,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:ev24n1",
+        "w1:ev25n1"
+      ]
+    },
+    {
+      "id": "s7",
+      "voice": "p0:note:w0:ev29n1",
+      "position": {
+        "num": "3",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "midi": 60,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:ev29n1"
+      ]
+    },
+    {
+      "id": "s9",
+      "voice": "p0:note:w1:ev33n1",
+      "position": {
+        "num": "13",
+        "den": "8"
+      },
+      "duration": {
+        "num": "7",
+        "den": "8"
+      },
+      "midi": 64,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w1:ev33n1",
+        "w2:ev36n1"
+      ]
+    },
+    {
+      "id": "s10",
+      "voice": "p0:note:w1:ev34n1",
+      "position": {
+        "num": "7",
+        "den": "4"
+      },
+      "duration": {
+        "num": "3",
+        "den": "4"
+      },
+      "midi": 67,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w1:ev34n1",
+        "w2:ev36n2"
+      ]
+    },
+    {
+      "id": "s11",
+      "voice": "p0:note:w1:ev35n1",
+      "position": {
+        "num": "15",
+        "den": "8"
+      },
+      "duration": {
+        "num": "5",
+        "den": "8"
+      },
+      "midi": 72,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w1:ev35n1",
+        "w2:ev36n3"
+      ]
+    },
+    {
+      "id": "s15",
+      "voice": "p0:note:w3:ev21n1",
+      "position": {
+        "num": "3",
+        "den": "1"
+      },
+      "duration": {
+        "num": "3",
+        "den": "8"
+      },
+      "midi": 67,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w3:ev21n1",
+        "w3:ev26n1"
+      ]
+    },
+    {
+      "id": "s16",
+      "voice": "p0:note:w3:ev22n1",
+      "position": {
+        "num": "13",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "midi": 69,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w3:ev22n1"
+      ]
+    },
+    {
+      "id": "s20",
+      "voice": "p0:note:w3:ev27n1",
+      "position": {
+        "num": "27",
+        "den": "8"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "midi": 66,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w3:ev27n1"
+      ]
+    },
+    {
+      "id": "s17",
+      "voice": "p0:note:w3:ev23n1",
+      "position": {
+        "num": "7",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "midi": 71,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w3:ev23n1"
+      ]
+    },
+    {
+      "id": "s21",
+      "voice": "p0:note:w3:ev28n1",
+      "position": {
+        "num": "7",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "4"
+      },
+      "midi": 67,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w3:ev28n1"
+      ]
+    },
+    {
+      "id": "s18",
+      "voice": "p0:note:w3:ev24n1",
+      "position": {
+        "num": "15",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "midi": 72,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w3:ev24n1",
+        "w4:ev25n1"
+      ]
+    },
+    {
+      "id": "s22",
+      "voice": "p0:note:w3:ev29n1",
+      "position": {
+        "num": "15",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "8"
+      },
+      "midi": 60,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w3:ev29n1"
+      ]
+    },
+    {
+      "id": "s24",
+      "voice": "p0:note:w4:ev33n1",
+      "position": {
+        "num": "37",
+        "den": "8"
+      },
+      "duration": {
+        "num": "7",
+        "den": "8"
+      },
+      "midi": 64,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w4:ev33n1",
+        "w5:ev38n1"
+      ]
+    },
+    {
+      "id": "s25",
+      "voice": "p0:note:w4:ev34n1",
+      "position": {
+        "num": "19",
+        "den": "4"
+      },
+      "duration": {
+        "num": "3",
+        "den": "4"
+      },
+      "midi": 67,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w4:ev34n1",
+        "w5:ev38n2"
+      ]
+    },
+    {
+      "id": "s26",
+      "voice": "p0:note:w4:ev35n1",
+      "position": {
+        "num": "39",
+        "den": "8"
+      },
+      "duration": {
+        "num": "5",
+        "den": "8"
+      },
+      "midi": 72,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w4:ev35n1",
+        "w5:ev38n3"
+      ]
+    },
+    {
+      "id": "s30",
+      "voice": "p0:note:w6:ev41n1",
+      "position": {
+        "num": "25",
+        "den": "4"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      },
+      "midi": 79,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w6:ev41n1"
+      ]
+    }
+  ],
+  "voices": [
+    {
+      "id": "p0:note:w0:ev21n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w0:ev22n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w0:ev23n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w0:ev24n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w0:ev27n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w0:ev28n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w0:ev29n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w1:ev33n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w1:ev34n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w1:ev35n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w3:ev21n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w3:ev22n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w3:ev23n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w3:ev24n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w3:ev27n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w3:ev28n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w3:ev29n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w4:ev33n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w4:ev34n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w4:ev35n1",
+      "partIndex": 0,
+      "partId": "P1"
+    },
+    {
+      "id": "p0:note:w6:ev41n1",
+      "partIndex": 0,
+      "partId": "P1"
+    }
+  ],
+  "tempo": [
+    {
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "1",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "3",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "4",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    },
+    {
+      "position": {
+        "num": "6",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    }
+  ],
+  "measures": [
+    {
+      "ordinal": 0,
+      "measureIndex": 0,
+      "occurrence": 1,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 1,
+      "measureIndex": 1,
+      "occurrence": 1,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "1",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 2,
+      "measureIndex": 2,
+      "occurrence": 1,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "2",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 3,
+      "measureIndex": 0,
+      "occurrence": 2,
+      "iteration": 2,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "3",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "3",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 4,
+      "measureIndex": 1,
+      "occurrence": 2,
+      "iteration": 2,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "4",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "4",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 5,
+      "measureIndex": 3,
+      "occurrence": 1,
+      "iteration": 2,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "5",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "ordinal": 6,
+      "measureIndex": 4,
+      "occurrence": 1,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "6",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "6",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    }
+  ],
+  "sourceMap": [
+    {
+      "kind": "metric",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "0",
+        "den": "1"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 1,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "1",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 2,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "2",
+        "den": "1"
+      },
+      "position": {
+        "num": "2",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 3,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "3",
+        "den": "1"
+      },
+      "position": {
+        "num": "3",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 4,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "4",
+        "den": "1"
+      },
+      "position": {
+        "num": "4",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 5,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "5",
+        "den": "1"
+      },
+      "position": {
+        "num": "5",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    },
+    {
+      "kind": "metric",
+      "ordinal": 6,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "6",
+        "den": "1"
+      },
+      "position": {
+        "num": "6",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    }
+  ],
+  "diagnostics": []
+}

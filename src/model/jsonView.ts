@@ -1,5 +1,7 @@
 // Keys come from the canonical walk, not a local restatement of it.
-import { noteKeyAt } from './noteWalk.ts';
+import { forEachNoteAddress } from './noteWalk.ts';
+import { containerPath } from './noteKeys.ts';
+import type { MnxStructure } from './mnx.ts';
 
 /**
  * Renders an MNX document to the exact text `JSON.stringify(doc, null, 2)`
@@ -32,22 +34,6 @@ export interface JsonView {
    * closing brace or bracket.
    */
   spanByPointer: Map<string, [number, number]>;
-}
-
-interface MnxNoteish {
-  id?: string;
-  pitch?: { step?: string; octave?: number; alter?: number };
-}
-
-interface MnxDocish {
-  parts?: {
-    measures?: {
-      sequences?: {
-        staff?: number;
-        content?: { notes?: MnxNoteish[] }[];
-      }[];
-    }[];
-  }[];
 }
 
 export function buildJsonView(doc: unknown): JsonView {
@@ -105,31 +91,15 @@ export function buildJsonView(doc: unknown): JsonView {
 
   emit(doc === undefined ? null : doc, '', '', '');
 
-  // Anchor every note of parts[0], mirroring the layout engines' traversal:
-  // voice index counts only staff-1 (or staff-less) sequences.
+  // Anchor all parts/staves and recursive containers using canonical addresses.
   const noteLineByKey = new Map<string, number>();
   const noteKeyByLine = new Map<number, string>();
-  const parts = (doc as MnxDocish)?.parts ?? [];
-  (parts[0]?.measures ?? []).forEach((measure, m) => {
-    let voiceIndex = -1;
-    (measure?.sequences ?? []).forEach((seq, seqIdx) => {
-      if (!(seq?.staff === 1 || seq?.staff === undefined)) return;
-      voiceIndex++;
-      (seq?.content ?? []).forEach((event, e) => {
-        (event?.notes ?? []).forEach((note, n) => {
-          const key = noteKeyAt(note as never, m, voiceIndex, e, n);
-          const base = `/parts/0/measures/${m}/sequences/${seqIdx}/content/${e}/notes/${n}`;
-          const line =
-            lineByPointer.get(`${base}/id`) ??
-            lineByPointer.get(`${base}/pitch`) ??
-            lineByPointer.get(base);
-          if (line !== undefined && !noteLineByKey.has(key)) {
-            noteLineByKey.set(key, line);
-            noteKeyByLine.set(line, key);
-          }
-        });
-      });
-    });
+  if (doc && typeof doc === 'object') forEachNoteAddress(doc as MnxStructure, address => {
+    const { partIndex, measureIndex, sequenceIndex, eventIndex, noteIndex, key } = address;
+    const nested = containerPath(address.containerIndex).map(index => `/content/${index}`).join('');
+    const base = `/parts/${partIndex}/measures/${measureIndex}/sequences/${sequenceIndex}/content/${eventIndex}${nested}/notes/${noteIndex}`;
+    const line = lineByPointer.get(`${base}/id`) ?? lineByPointer.get(`${base}/pitch`) ?? lineByPointer.get(base);
+    if (line !== undefined && !noteLineByKey.has(key)) { noteLineByKey.set(key,line); noteKeyByLine.set(line,key); }
   });
 
   return {

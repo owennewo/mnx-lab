@@ -1,3 +1,5 @@
+import { containerEventsWithPaths } from '../model/noteWalk.ts';
+import type { ContainerIndex } from '../model/noteKeys.ts';
 // The lyric text surface's format engine (one-surface item 6, phase 2:
 // roadmap/inprogress/workbench-one-surface-lyrics.md).
 //
@@ -54,16 +56,14 @@ export function lyricEventWalk(doc: MnxStructure, partIndex: number): LyricEvent
     for (const note of event.notes ?? [])
       for (const tie of note.ties ?? []) if (tie.target) tieTargets.add(tie.target);
   };
-  const forEachVoiceOneEvent = (fn: (event: MnxEvent, measureIndex: number, eventIndex: number, containerIndex?: number) => void) => {
+  const forEachVoiceOneEvent = (fn: (event: MnxEvent, measureIndex: number, eventIndex: number, containerIndex?: ContainerIndex) => void) => {
     (part.measures ?? []).forEach((measure, measureIndex) => {
       const sequence = (measure.sequences ?? []).find(s => (s.staff ?? 1) === 1);
       (sequence?.content ?? []).forEach((item: MnxSequenceItem, eventIndex) => {
         const record = item as { type?: string; content?: MnxSequenceItem[] };
         if (record.type === 'grace') return;
         if (record.type === 'tuplet' || record.type === 'tremolo') {
-          (record.content ?? []).forEach((child, containerIndex) => {
-            if (isTimedEvent(child)) fn(child as MnxEvent, measureIndex, eventIndex, containerIndex);
-          });
+          for (const {event,containerIndex} of containerEventsWithPaths(item)) fn(event,measureIndex,eventIndex,containerIndex);
           return;
         }
         if (isTimedEvent(item)) fn(item as MnxEvent, measureIndex, eventIndex);

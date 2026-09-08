@@ -75,3 +75,25 @@ file in this flow.
   each item.
 - Never treat a stale item as trivially re-approvable because the diff "looks
   small" — the human decides.
+
+## Performance evidence (player campaign item 5)
+
+An opt-in `performance: true` scenario carries `expected.performance.json` and
+`expected.midi.json`. Missing output is blocked; no `performanceHash` means unseen
+performance evidence even if the engraving is approved. An approved hash mismatch
+is stale. Do not grandfather or remove this obligation.
+
+For these items generate the self-contained page with
+`node harness/verify/performance-review.mjs --output <stable-local-html-path> <ids...>`.
+It includes every committed engraving projection, complete written/sounding tables,
+measure/tempo/source maps, diagnostics and a MIDI download. Include the spec reference
+and a what-changed explanation in the surrounding review where available, as above.
+The companion `.receipt.json` records the exact performance evidence included.
+Inspect/present the page before using its receipt; its existence is not approval.
+
+After the human names the approved items, invoke the configured verification script
+with `--presented <page.receipt.json> <ids...>`. Use `--performance-only` when the
+human approved only those tables: existing engraving hashes and their date survive.
+An engraving-only approval (without the receipt) cannot stamp `performanceHash`.
+If a golden changed after presentation, regenerate and present again. No command in
+this implementation session grants human approval.

@@ -1,3 +1,6 @@
+import { containerEventsWithPaths } from '../model/noteWalk.ts';
+import { sameContainerIndex } from '../model/noteKeys.ts';
+import type { ContainerIndex } from '../model/noteKeys.ts';
 // Pure clipboard paste planning under the landing invariant
 // (roadmap: core-paste-lands.md): **a decodable clip always lands.**
 //
@@ -763,14 +766,11 @@ export function planSelectionPaste(
         event: MnxEvent;
         noteIndex: number | null;
         itemIndex: number;
-        containerIndex?: number;
+        containerIndex?: ContainerIndex;
       }
       const slots: NoteSlot[] = [];
       activeVoiceUnits(after, state).forEach(unit => {
-        const events: { event: MnxEvent; containerIndex?: number }[] = isTimedEvent(unit.item)
-          ? [{ event: unit.item }]
-          : ((unit.item as { content?: MnxEvent[] }).content ?? [])
-              .map((event, containerIndex) => ({ event, containerIndex }));
+        const events = containerEventsWithPaths(unit.item);
         events.forEach(({ event, containerIndex }) => {
           if (event.notes?.length) {
             event.notes.forEach((_, noteIndex) => slots.push({
@@ -797,7 +797,7 @@ export function planSelectionPaste(
         ? slots.findIndex(slot =>
             slot.measureIndex === noteMember.measureIndex &&
             slot.itemIndex === noteMember.eventIndex &&
-            slot.containerIndex === noteMember.containerIndex &&
+            sameContainerIndex(slot.containerIndex, noteMember.containerIndex) &&
             slot.noteIndex === noteMember.noteIndex
           )
         : slots.findIndex(slot =>

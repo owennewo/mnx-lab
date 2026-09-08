@@ -47,5 +47,6 @@
   "verification": {
     "at": "2026-07-17",
     "primitivesHash": "sha256:9b315ab762505fd1"
-  }
+  },
+  "performance": true
 }

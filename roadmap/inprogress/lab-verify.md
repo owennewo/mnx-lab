@@ -653,3 +653,52 @@ Look for: repeat start and mid-bar segno in bar 1; first ending/repeat end in ba
 second ending with Fine at 3/4 in bar 3; D.S. al Fine at 1/2 in bar 4. The hand-stated
 performed order is 1, 2, 1, 3, 4, 1, 3; the return enters bar 1 at 1/4 and exits bar 3
 at 3/4. Approve through `/verify`; no verification record has been written.
+
+## Player performance — 2026-09-09
+
+Cause: [core-player-performance.md](../proposed/core-player-performance.md),
+[player campaign](core-campaign-player.md) item 5. **New performance/MIDI evidence**
+for 32 scenarios; existing engraving output and its approval records are unchanged.
+No performance approval is implied. Use `/verify` and the generated presentation
+receipt; never infer this approval from `status: verified` on the engraving.
+
+Look for: written/sounding reciprocal links; one attack across performed ties;
+repeat/ending/D.S. visits and partial-bar bounds; exact tuplet/grace/tremolo timing;
+shared fermata/make-time shifts; sounded pitch and explicit voice/string ownership;
+MIDI channel fallback and quantization diagnostics. The review page includes all
+engravings and tables plus MIDI downloads. Written identities do not survive MIDI.
+
+Scenario set:
+
+- `lab/articulations/fermata`
+- `lab/articulations/fermatas-on-bars-and-rests`
+- `lab/navigation/ds-final-ending`
+- `lab/navigation/jumps-and-signs`
+- `lab/navigation/numbered-bars`
+- `lab/navigation/repeats-and-marks-on-tab`
+- `lab/navigation/tempo-change-mid-bar`
+- `lab/rhythm/appoggiatura`
+- `lab/rhythm/tuplet-number-hidden`
+- `lab/score-text/chord-symbols`
+- `lab/score-text/labels-on-a-tab-staff`
+- `lab/score-text/labels-with-navigation`
+- `lab/tab-rhythm/grace-on-tab`
+- `lab/tab-rhythm/triplets-on-tab`
+- `lab/tab-rhythm/unplayable-inside-a-tuplet`
+- `spec/beams-inner-grace-notes`
+- `spec/grace-note`
+- `spec/grace-notes-beamed`
+- `spec/jumps-dal-segno`
+- `spec/jumps-ds-al-fine`
+- `spec/organ-layout`
+- `spec/repeats`
+- `spec/repeats-alternate-endings-advanced`
+- `spec/repeats-alternate-endings-simple`
+- `spec/repeats-implied-start-repeat`
+- `spec/repeats-more-once-repeated`
+- `spec/single-note-tremolos`
+- `spec/tempo-markings`
+- `spec/tie-targets`
+- `spec/ties`
+- `spec/tremolos-multi-note`
+- `spec/tuplets`

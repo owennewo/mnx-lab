@@ -1,3 +1,5 @@
+import { containerEventsWithPaths } from '../model/noteWalk.ts';
+import type { ContainerIndex } from '../model/noteKeys.ts';
 // The spanner half of the coincidence rule — core-selection-range-grain.md
 // decision 5, first slice.
 //
@@ -27,7 +29,7 @@ export interface SlurHit {
   measureIndex: number;
   voiceIndex: number;
   eventIndex: number;
-  containerIndex?: number;
+  containerIndex?: ContainerIndex;
   /** Index within the start event's `slurs[]`. */
   slurIndex: number;
   /** The note key `removeSlur` addresses — `startNote` pin, else the start
@@ -61,7 +63,7 @@ interface EventEntry {
   measureIndex: number;
   voiceIndex: number;
   eventIndex: number;
-  containerIndex?: number;
+  containerIndex?: ContainerIndex;
   slurs: { target: string; startNote?: string }[];
   firstNoteId?: string;
 }
@@ -74,7 +76,7 @@ function addressKey(
   measureIndex: number,
   voiceIndex: number,
   eventIndex: number,
-  containerIndex?: number
+  containerIndex?: ContainerIndex
 ): string {
   return [partIndex, staffIndex, measureIndex, voiceIndex, eventIndex, containerIndex ?? ''].join(':');
 }
@@ -88,7 +90,7 @@ function walkEvents(doc: MnxStructure): EventEntry[] {
         const staffIndex = sequence.staff ?? 1;
         const voiceIndex = (voiceByStaff.get(staffIndex) ?? -1) + 1;
         voiceByStaff.set(staffIndex, voiceIndex);
-        const push = (item: MnxSequenceItem, eventIndex: number, containerIndex?: number): void => {
+        const push = (item: MnxSequenceItem, eventIndex: number, containerIndex?: ContainerIndex): void => {
           if (!isTimedEvent(item)) return;
           const event = item as {
             id?: string;
@@ -109,14 +111,7 @@ function walkEvents(doc: MnxStructure): EventEntry[] {
           });
         };
         sequence.content.forEach((item, eventIndex) => {
-          if (isTimedEvent(item)) {
-            push(item, eventIndex);
-            return;
-          }
-          const children = (item as { content?: MnxSequenceItem[] }).content ?? [];
-          children
-            .filter(isTimedEvent)
-            .forEach((child, containerIndex) => push(child, eventIndex, containerIndex));
+          for (const {event,containerIndex} of containerEventsWithPaths(item)) push(event,eventIndex,containerIndex);
         });
       });
     });

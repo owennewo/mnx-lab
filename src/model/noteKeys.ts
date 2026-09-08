@@ -1,3 +1,12 @@
+/** A shallow child keeps its legacy number; deeper children carry the full path. */
+export type ContainerIndex = number | readonly number[];
+export const containerPath = (index?: ContainerIndex): readonly number[] =>
+  index === undefined ? [] : typeof index === 'number' ? [index] : index;
+export const sameContainerIndex = (a?: ContainerIndex, b?: ContainerIndex): boolean =>
+  containerPath(a).join('.') === containerPath(b).join('.');
+export const containerSuffix = (index?: ContainerIndex): string =>
+  containerPath(index).map(i => `.c${i}`).join('');
+
 /**
  * Stable per-note selection keys shared by the layout engines and the
  * document (JSON) pane. A note's own `id` is always preferred; when a
@@ -24,7 +33,7 @@ export function syntheticNoteKey(
  * original form always carried, so keys written before parts and staves became
  * addressable are byte-identical under the new grammar:
  *
- *   `@[p<part>.]m<measure>[.s<staff>].v<voice>.e<event>[.c<container>].n<note>`
+ *   `@[p<part>.]m<measure>[.s<staff>].v<voice>.e<event>[.c<child>…].n<note>`
  *
  * Part 0 and staff 1 stay silent because they were the whole world when the
  * scheme was written (campaign item 13b) — and because a key that changed shape
@@ -36,12 +45,12 @@ export function positionalNoteKey(coords: {
   staffIndex: number;
   voiceIndex: number;
   eventIndex: number;
-  containerIndex?: number;
+  containerIndex?: ContainerIndex;
   noteIndex: number;
 }): string {
   const part = coords.partIndex > 0 ? `p${coords.partIndex}.` : '';
   const staff = coords.staffIndex > 1 ? `.s${coords.staffIndex}` : '';
-  const container = coords.containerIndex === undefined ? '' : `.c${coords.containerIndex}`;
+  const container = containerSuffix(coords.containerIndex);
   return `@${part}m${coords.measureIndex}${staff}.v${coords.voiceIndex}.e${coords.eventIndex}${container}.n${coords.noteIndex}`;
 }
 
@@ -61,7 +70,7 @@ export function kitNoteKey(
 /**
  * An EVENT's own key — the same coordinates with no note segment at all:
  *
- *   `@[p<part>.]m<measure>[.s<staff>].v<voice>.e<event>[.c<container>]`
+ *   `@[p<part>.]m<measure>[.s<staff>].v<voice>.e<event>[.c<child>…]`
  *
  * A rest has no notes, so it had no name, so nothing could point at it: the
  * selection enclosure fell back to interpolating a metric fraction across the
@@ -78,10 +87,10 @@ export function syntheticEventKey(coords: {
   staffIndex?: number;
   voiceIndex: number;
   eventIndex: number;
-  containerIndex?: number;
+  containerIndex?: ContainerIndex;
 }): string {
   const part = (coords.partIndex ?? 0) > 0 ? `p${coords.partIndex}.` : '';
   const staff = (coords.staffIndex ?? 1) > 1 ? `.s${coords.staffIndex}` : '';
-  const container = coords.containerIndex === undefined ? '' : `.c${coords.containerIndex}`;
+  const container = containerSuffix(coords.containerIndex);
   return `@${part}m${coords.measureIndex}${staff}.v${coords.voiceIndex}.e${coords.eventIndex}${container}`;
 }

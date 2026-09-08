@@ -272,9 +272,8 @@ export interface MnxTremolo {
 export interface MnxTuplet {
   type: 'tuplet';
   id?: string;
-  /** Inner events. (Nested containers aren't modelled — they'd render as
-   *  blank columns.) */
-  content: MnxEvent[];
+  /** Tuplets may contain recursively nested sequence items. */
+  content: MnxSequenceItem[];
   inner: {
     duration: { base: MnxNoteValueBase; dots?: number };
     multiple: number;

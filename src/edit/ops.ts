@@ -1,3 +1,6 @@
+import { eventAtContainer, containerContent } from '../model/noteWalk.ts';
+import { containerPath } from '../model/noteKeys.ts';
+import type { ContainerIndex } from '../model/noteKeys.ts';
 // The edit seam — deliberately a placeholder (structure-lab). This is the
 // point the editor UI and the AI loop are intended to CONVERGE on: today the
 // assist loop replaces whole documents; the plan is for it to emit EditOp[]
@@ -935,7 +938,7 @@ export interface EventAddress {
   measureIndex: number;
   voiceIndex: number;
   eventIndex: number;
-  containerIndex?: number;
+  containerIndex?: ContainerIndex;
 }
 
 /** Where each attribute lives on the global measure. `tempo` is the only
@@ -1428,9 +1431,12 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       }
       // Inside a tuplet or a tremolo: the CONTAINER owns its own content, and
       // emptying it is `removeContainer`'s job, not ours.
-      const inner = (seq.content[address.eventIndex] as { content?: MnxSequenceItem[] }).content;
+      const path = containerPath(address.containerIndex);
+      let owner = seq.content[address.eventIndex];
+      for (const index of path.slice(0, -1)) owner = containerContent(owner)?.[index]!;
+      const inner = containerContent(owner);
       if (!inner || inner.length <= 1) return next;
-      inner.splice(address.containerIndex, 1);
+      inner.splice(path[path.length - 1], 1);
       return next;
     }
     case 'clearEvent': {
@@ -2791,10 +2797,7 @@ export function eventAtAddress(doc: MnxStructure, address: EventAddress): MnxEve
   const sequence = sequences.filter(seq => (seq.staff ?? 1) === address.staffIndex)[address.voiceIndex];
   const item = sequence?.content?.[address.eventIndex];
   if (!item) return null;
-  if (address.containerIndex === undefined) return isTimedEvent(item) ? item : null;
-  const content = (item as { content?: unknown[] }).content;
-  const inner = content?.[address.containerIndex] as MnxSequenceItem | undefined;
-  return inner && isTimedEvent(inner) ? inner : null;
+  return eventAtContainer(item, address.containerIndex) ?? null;
 }
 
 function markingEvent(

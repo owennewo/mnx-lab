@@ -1,3 +1,4 @@
+import { performanceCandidate } from '../../harness/verify/performance-evidence.mjs';
 // Mirrors the MNX spec's worked examples into scenarios/spec/.
 //
 // Reads the spec's own sources from the vendor/mnx submodule (see
@@ -132,6 +133,8 @@ function main() {
     const metaPath = path.join(dir, 'meta.json');
     let status = 'valid';
     let verification;
+    let performance;
+    if (fs.existsSync(metaPath)) performance = JSON.parse(fs.readFileSync(metaPath,'utf8')).performance;
     if (documentUnchanged && fs.existsSync(metaPath)) {
       const prev = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
       status = prev.status ?? 'valid';
@@ -156,6 +159,7 @@ function main() {
       // The origin axis: this tree is generated — sync owns it wholesale.
       origin: 'mirrored',
       status,
+      ...(performance ? { performance } : {}),
       ...(verification !== undefined ? { verification } : {})
     };
     fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2) + '\n');
@@ -181,4 +185,14 @@ function main() {
   if (stale.length) process.exitCode = 1;
 }
 
-main();
+// Metadata-only evidence enrollment needs no upstream checkout and never edits
+// the mirrored document, status or approval record.
+if (process.argv.includes('--performance-only')) {
+  for (const entry of fs.readdirSync(SPEC_DIR,{withFileTypes:true}).filter(e=>e.isDirectory())) {
+    const dir=path.join(SPEC_DIR,entry.name),file=path.join(dir,'meta.json');
+    const meta=JSON.parse(fs.readFileSync(file,'utf8'));
+    if (meta.expect.standard==='valid' && performanceCandidate(JSON.parse(fs.readFileSync(path.join(dir,'document.mnx.json'),'utf8')))) {
+      meta.performance=true;fs.writeFileSync(file,JSON.stringify(meta,null,2)+'\n');
+    }
+  }
+} else main();
