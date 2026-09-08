@@ -1,6 +1,6 @@
 # Audio backend spike — Tone.js versus a native Web Audio sink, measured
 
-> **Status: proposed 2026-09-08, revised the same day.** Campaign:
+> **Status: measured 2026-09-08; landing checks in progress.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 4. **Research, not a
 > feature.** Runs any time, lands before item 6. Output: a findings entry in the
 > campaign log, the `Sink` interface, and a backend decision. Any code is thrown away;
@@ -45,3 +45,12 @@ cheaper *for this repo*, and it has to be measured.
   audioTime)`, `bend(voice, cents, audioTime)`, `setRate` not here (rate is the
   transport's), `unlock()`, and `now()` from the audio clock.
 - A recommendation with the one-line reason, for the campaign to adopt in item 6.
+
+## Findings
+
+Adopt **native Web Audio**, bundled into both player embed formats. Both oscillator
+paths pass the offline signal checks; native adds 573/619 gzip bytes (IIFE/ESM),
+Tone adds 57,612/65,184. Tone Sampler exposes no public per-voice detune.
+See [the complete measurement report](../../research/player-backend-spike.md) and
+[the Sink interface](../../src/audio/sink.ts). Prototype code is discarded; no
+runtime dependency is added. Item 6 owns the production backend and durable smoke.

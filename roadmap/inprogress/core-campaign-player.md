@@ -163,7 +163,7 @@ run any time before 6.
 | 1 | [Traversal](../complete/core-player-traversal.md) | **Extend `model/passes.ts`**, keeping its consumers and suite: performed entries with ordinal, occurrence and iteration; partial-measure bounds for mid-bar segno/Fine/D.S.; diagnostics; the D.S.-into-voltas simplification resolved. | reviewer | the existing suite + hand-stated orders for the 14 navigation scenarios + a committed corpus report | complete; new engraving review pending |
 | 2 | [Playback context and the iteration cursor](../complete/core-player-pass-cursor.md) | A host-owned playback context (replacing the dormant `PlaybackState` shape) carrying ordinal and iteration; the chip ladder shows `iteration 2 of 3` / *not performed*; changeable; feeds `selected-verse`. The edit session is untouched. | reviewer | conformance tests on the pure resolver; no golden moves | complete |
 | 3 | [Timing and pitch contracts](../complete/core-player-timing-pitch.md) | `audio/time.ts` (rational arithmetic, tempo map, `secondsAt`); the pitch rule as tests over transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata (incl. `duration` hints and cross-part sync) and tie conventions written down with numbers; the performance golden's format. | reviewer | conformance tests | complete |
-| 4 | [Audio backend spike](../proposed/core-player-tone-spike.md) | Tone.js **versus a native Web Audio sink**, measured: Node import, browser Offline render, per-voice detune ramps, both embed formats' size, what Tone saves once the transport is ours. Output: a log entry and the `Sink` interface. | both | its findings | proposed |
+| 4 | [Audio backend spike](../proposed/core-player-tone-spike.md) | Tone.js **versus a native Web Audio sink**, measured: Node import, browser Offline render, per-voice detune ramps, both embed formats' size, what Tone saves once the transport is ours. Output: a log entry and the `Sink` interface. | both | its findings | measured; native selected |
 | 5 | [Performance compiler and MIDI export](../proposed/core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | proposed |
 | 6 | [Transport](../proposed/core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | proposed |
 | 7 | [Player element, written view](../proposed/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | proposed |
@@ -180,7 +180,7 @@ run any time before 6.
   applies them to the performance golden.
 - **Repeats after a D.S.** Resolved by item 1: no repeats on return; take the final
   declared iteration in strains with endings.
-- **Backend.** Item 4 decides; the campaign has no preference it has not measured.
+- **Backend.** Item 4 measured both and selected native Web Audio; see the log below.
 
 ## Progress + learnings
 
@@ -321,3 +321,23 @@ The conventions adopted for the compiler (lab choices, not new MNX requirements)
   the public position/rest reveal remains that item's responsibility.
 - 21 pure conformance tests cover the navigation corpus and state transitions.
   No golden or verification record changed; no new approval batch is needed.
+
+### 2026-09-08 — item 4: backend measured, native Web Audio selected
+
+- [Full report and versioned measurements](../../research/player-backend-spike.md).
+  Both Node imports pass. Both offline oscillator paths pass C4 rendering,
+  independent +200-cent bends/5 Hz vibrato, re-pitch without attack, scheduled
+  cancellation and isolated release. User-gesture unlock and raw clocks pass.
+- Actual IIFE/ESM builds: native adds 573/619 gzip bytes to the viewer baseline;
+  Tone 15.1.22 adds 57,612/65,184. These are disposable prototype sizes, not a
+  promise for the full player. Select **native Web Audio**, bundled in both faces.
+- Tone supplies envelopes, parameter timelines and Offline/context convenience,
+  but source generations, cancellation and the transport remain ours. Sampler's
+  active sources are private with no public per-voice detune; item 12 will need
+  native sample voices. Default Tone.now() includes lookahead: use raw currentTime.
+- The type-only [Sink contract](../../src/audio/sink.ts) fixes seconds, action order,
+  separate attack/pitch, raw now, unlock, cancellation and disposal. A <=5 ms
+  de-click tail is the lab convention. Item 6 owns crossing-ramp cancellation,
+  generation-safe cleanup and durable offline tests; the spike does not implement them.
+- Prototype code and temporary dependency are discarded. No package manifests,
+  engraving goldens or approvals change; no verification batch is needed.

@@ -63,3 +63,12 @@ these transitions and the end of the final note as well as onset timing.
 The suite green; the fence red if the backend is imported elsewhere;
 `npm run smoke:lib` and `smoke:embed` green — the library and embed faces did not grow
 an `AudioContext` at import time.
+
+## Backend decision from item 4
+
+Use `audio/native/`, with no runtime audio dependency, behind the
+[type-only Sink contract](../../src/audio/sink.ts). The
+[spike report](../../research/player-backend-spike.md) supplies buffer criteria and
+measured bundle baselines. Fence backend imports from pure audio/model/headless code,
+even though there is no third-party package to fence. Re-measure both embed formats
+with the complete implementation and own the permanent offline smoke.
