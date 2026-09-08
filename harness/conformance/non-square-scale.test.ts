@@ -362,7 +362,7 @@ describe('a full row reaches the margin, whatever the staff scale', () => {
 
   const rowWidths = (mnx: MnxStructure, widthSp: number, densityH: number, ink: number) => {
     const l = layoutTab({ mnx, widthSp, densityH, inkRatio: ink });
-    const packing = planHorizontal(mnx, widthSp, { staffKind: 'tab' }).packing;
+    const packing = planHorizontal(mnx, widthSp, { staffKind: 'tab', inkRatio: ink, densityH }).packing;
     const rows = packSystems(packing, densityH);
     return l.rows!.map((b, r) => {
       const xs = [
@@ -392,12 +392,8 @@ describe('a full row reaches the margin, whatever the staff scale', () => {
         for (const row of rowWidths(mnx, widthSp, d, ink)) {
           if (!row.full) continue;
           checked++;
-          // Reaches the margin or overruns it — never falls short. Overrun is
-          // the documented degradation of freezing packing square
-          // (core-ink-priced-columns.md): at a high ink ratio the row holds
-          // bars chosen at ratio 1 whose grown rigid columns no longer fit, so
-          // it draws past the margin rather than colliding. Falling SHORT is
-          // the thing that has no defence, and the thing that was happening.
+          // Full rows reach the margin. A single oversized measure may
+          // still overrun it, but cannot leave a full row short.
           expect(
             row.width,
             `ink ${ink} density ${d}: full row short of the margin`

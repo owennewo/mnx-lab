@@ -171,27 +171,21 @@ describe('ragged last', () => {
 
   it('the ink-priced path applies the same rule', () => {
     initSmufl();
-    // Under an ink ratio the plan re-justifies rows itself (core-ink-priced-
-    // columns.md) rather than reading the packer's numbers — so it must cap
-    // the same way. Read the last row's stretch back off the plan: with no
-    // forward repeat, contentStartX − repeatStartX is the leading spring times
-    // the row stretch, and the leading spring is the same in both plans.
+    // Read each priced row's stretch back from its leading space. The
+    // packing snapshot must describe the same staff size as the drawing.
     const mnx = doc('lab/document/twelve-bar-blues');
     let checked = 0;
     for (const widthSp of [70, 80, 100]) {
-      const square = planHorizontal(mnx, widthSp);
       const priced = planHorizontal(mnx, widthSp, { inkRatio: 1.3 });
-      const rows = packSystems(square.packing, 1);
+      const rows = packSystems(priced.packing, 1);
       if (rows.length < 2) continue;
-      const lead = (plan: typeof square, i: number) =>
+      const lead = (plan: typeof priced, i: number) =>
         plan.measures[i].contentStartX - plan.measures[i].repeatStartX;
-      // Per row: the leading spring from the square plan (lead ÷ its known
-      // stretch), then the priced row's stretch from the priced lead.
       const pricedStretch = rows.map(row => {
-        const i = square.packing.measures[row.measures[0]].index;
-        if (square.measures[i].repeatStart) return null; // lead would include the |: cluster
-        const leadSpring = lead(square, i) / row.stretch;
-        return leadSpring > 0 ? lead(priced, i) / leadSpring : null;
+        const entry = priced.packing.measures[row.measures[0]];
+        const i = entry.index;
+        if (priced.measures[i].repeatStart) return null;
+        return entry.lead > 0 ? lead(priced, i) / entry.lead : null;
       });
       if (pricedStretch.some(s => s === null)) continue;
       const stretches = pricedStretch as number[];

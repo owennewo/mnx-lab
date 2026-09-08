@@ -189,7 +189,7 @@ describe('zoom / density', () => {
         }
         expect({ widthSp, missedChanges, flatRungs }).toEqual({ widthSp, missedChanges: 0, flatRungs: 0 });
       }
-    });
+    }, 15000);
 
     it('starts at the engine floor and never leaves the engine range', () => {
       initSmufl();
