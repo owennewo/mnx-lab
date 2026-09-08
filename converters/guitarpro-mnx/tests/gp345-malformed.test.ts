@@ -60,6 +60,12 @@ describe.each(['3.00', '4.00', '4.06', '5.00', '5.10'])('GP%s damaged input', re
     expect(() => parseGuitarProBinary(Buffer.concat([bytes, Buffer.from([0xff])])))
       .toThrow();
   });
+  if (revision.startsWith('4')) it('accepts exactly one optional zero trailer, not arbitrary padding', () => {
+    expect(parseGuitarProBinary(Buffer.concat([bytes, Buffer.alloc(4)]))).toEqual(parseGuitarProBinary(bytes));
+    for (const tail of [Buffer.alloc(3), Buffer.alloc(5), Buffer.from([1, 0, 0, 0])]) {
+      expect(() => parseGuitarProBinary(Buffer.concat([bytes, tail]))).toThrow();
+    }
+  });
 });
 
 describe.each(['5.00', '5.10'])('GP%s damaged bend counts', revision => {

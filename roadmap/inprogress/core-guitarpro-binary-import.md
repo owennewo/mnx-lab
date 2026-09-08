@@ -1,25 +1,12 @@
 # Clean-room gp3/gp4/gp5 reader — the Ultimate Guitar range
 
-> **Status: IN PROGRESS — UNLANDED WORKTREE HANDOFF (2026-09-08).**
-> The last implementation checkpoint on main is `4bd5d48`; the additional
-> GP3/4 reader, expanded effects/ties, browser integration and public clean-room
-> API switch are checkpointed on the task branch, not main. The fixture-serialization
-> failures are resolved and pre-rebase gates pass; coverage review and landing
-> remain outstanding. See the
-> current handoff below; resume there, not from the historical checklist.
->
-> **Landed baseline (not the current worktree):**
-> Phase 1 (GP5) is partly complete: the docs-first field notes, bounds-checked
-> little-endian cursor, exact GP3/4/5 version dispatch, and GP5 body reader are
-> on `main`. Generated GP5.00/5.10 fixtures cover
-> metadata, measures, tracks, tunings/capo, two voices, notes/rests, dots, tuplets,
-> time/key changes, repeats, double bars, markers, beat-text chords, track-level
-> lyrics, hammer/pull, palm mute, vibrato, slides, and natural/pinch harmonics;
-> both revisions reach EOF and produce MNX exactly equal to AlphaTab. Remaining
-> Phase 1 work is the variable-length effect surface (notably bends and graces),
-> chord diagrams, mix changes, and tied/dead-note behavior. The production
-> `importGuitarPro` entry point remains AlphaTab-backed until the legacy family
-> is broad enough for the explicit follow-up flip.
+> **Status: IN PROGRESS — EXPANDED READER LANDED (2026-09-08, `2d013b4`).**
+> GP3/4/5 import, expanded effects/ties, browser integration and the public
+> clean-room API switch are on main and pushed. AlphaTab is a dev-time oracle
+> only. Post-rebase gates passed: 229 Guitar Pro tests, 107 MusicXML tests,
+> 1,250 root tests, scenario checks, build and unchanged primitives. Package,
+> 83-file worker and 32-score corpus smokes pass. Remaining coverage review
+> continues in the task worktree; the item is not yet complete.
 
 This is the third leg of the clean-room Guitar Pro converter effort. The first
 two are landed and green: the GPIF importer
@@ -40,11 +27,37 @@ and a lyrics/simple-techniques pair in both GP5 revisions.
 
 ## Session handoff
 
+### Requirement audit — 2026-09-08
+
+The implementation is a clean-room reader, not a promise of lossless Guitar
+Pro application-state preservation. The original no-binary-writer, no-GP1/2,
+and no-RSE/page-fidelity fences remain unchanged. Unsupported musical fields
+are reported through `onWarning`; let-ring and dead styling are read and
+reported, not silently claimed as preserved MNX features.
+
+| Original requirement | Evidence in the current task branch |
+| --- | --- |
+| Docs-first field notes and clean-room provenance | `research/gp-binary-field-notes.md` §§1–24; public docs, fixture-writing/model APIs and black-box consumers, no copied reader implementation |
+| GP3.00, GP4.00/4.06, GP5.00/5.10 and strict encoding/bounds | `gp345-binary`, `gp34-parity`, `gp345-fixtures`, `gp345-malformed` tests; exact version dispatch and all three Windows-1252 string forms |
+| Structural/music fixture surface listed in Method §2 | Baselines, Binary-suite, endings/headers, lyrics, bend/grace, harmony, ties, instruments and technique tests across applicable revisions |
+| Shared intermediate, not three mapping forks | One revision-gated `gp345/gp5.ts` body parser plus `song.ts` preamble, `GpifDocument`, and shared `gpifToMnx`; planned `normalize.ts` responsibilities live in this normalization path |
+| Track-level lyric redistribution | `lyrics.ts`, shared lyric mapping and offset/rest/hyphen/space/plus/comment parity fixtures |
+| Real-consumer acceptance before fixture commits | `check-binary-tuxguitar.py`; all authored binary files accepted, with selected raw grace/ending/harmonic fields inspected independently |
+| Differential whole-document proof with explicit oracle-loss masks | Feature tests use the historical AlphaTab importer directly; added comparisons cover grace matrices/chords, percussion graces and harmonic nodes, with asserted oracle errors before masking |
+| Uncommitted ecosystem robustness corpus | `smoke-gp-binary.mjs`: 71 pinned files, including older dialects and five-track demo; alignment, finite pitch and resolved-ID invariants, downloads only in `.gp-corpus/` |
+| Production clean-room flip and runtime dependency removal | Landed `2d013b4`; API/CLI/worker use clean-room, AlphaTab dev-only; packed production install smoke and isolated built-worker smoke |
+| Landing and closeout | **Pending for the follow-ups:** fresh rebase/gates, push, worktree retirement, roadmap move/index update |
+
+Preservation limits are documented in the converter README and field notes;
+consumer acceptance is not visual engraving approval, corpus invariants are
+not universal fidelity proof, and generated-fixture input models are not
+treated as authoritative when their bytes disagree with independent consumers.
+
 ### Current restart point — 2026-09-08
 
 Resume branch `core-guitarpro-binary-import` in
 `/home/williao/dev/mnx-labs-worktrees/core-guitarpro-binary-import`, based on
-`f2e2065`. The user authorized takeover of this existing worktree. Do not
+`2d013b4` (landed and pushed). The user authorized takeover of this existing worktree. Do not
 recreate it or discard its files: source edits, generated binary fixtures
 and tests belong to the task branch's expanded-reader checkpoint. The inherited prototype is preserved in stash
 `1399be56e2681d274c77ce856c32113c90955eda`; only its `Binary-suite` fixtures
@@ -72,12 +85,15 @@ Current worktree coverage (fixture-proven, **not full format support**):
 GP4/5 artificial/tapped/semi harmonic records now parse. Four new fixtures
 cover octave harmonics with capo; GP5 artificial/tapped pitch differences from
 AlphaTab are explicitly asserted and corrected in parity tests (field notes
-§10). This does not prove every node, artificial octave/pitch combination, or
-GP4 discriminator: broaden those fixtures next. GP3 beat-level vibrato and
+§10). Nine additional fixtures now cover the implemented natural/tapped node
+table, all three GP4 artificial discriminators, and GP5 pitch/accidental fields
+with all five octave values (field notes §23). GP3 beat-level vibrato and
 natural/artificial harmonics now have a two-note-per-beat fixture, with an
 explicit correction for the oracle's lost vibrato; other fields match exactly.
-Tie-target ID normalization is implemented; add dedicated rest/voice and
-harmonic-tie fixtures before claiming complete ties.
+Tie-target ID normalization is implemented. Five new `tie-scope` fixtures
+now prove a tie across a rest, same-string independent GP5 voices, and
+natural-harmonic sounding-pitch inheritance with capo. All 20 tie tests pass
+and TuxGuitar accepts the five files. These follow-up tests are not yet landed.
 
 Legacy ending normalization now has ten fixtures covering third endings,
 grouped endings, multi-bar spans and repeat-group resets. Tests explicitly
@@ -91,8 +107,10 @@ one shared-mapper regression cover this. GP3/4 chord fixtures expose a writer
 discrepancy (field notes §15): stored 16th/bend, despite the writer's public
 32nd/hammer round trip. Five separate explicitly authored grace-hammer
 fixtures now prove independent same-string targets in every revision, with
-TuxGuitar confirming the wire fields (field notes §18). Wider grace
-transition/duration fixtures remain needed.
+TuxGuitar confirming the wire fields (field notes §18). Five further
+grace-matrix fixtures cover every duration/transition combination and GP5
+dead/on-beat flags, with explicit assertions for preserved links/placement
+and unrepresented details (field notes §24).
 Percussion grace expansion now retains its stored MIDI key instead of losing
 the pitch through a stringless fret. Five new two-track revision fixtures prove
 C2 grace → D2 principal with no tab data; TuxGuitar independently confirms the
@@ -116,15 +134,25 @@ the optional final GP5 layout byte and orphan ties. AlphaTab's public model
 confirms the failing tie has no cross-voice source; recovery retains its stored
 fret without a link, with an explicit warning and five revision tests.
 See field notes §§13–14 for the pinned source, evidence and test limits.
-**Next:** finish the documented remaining grace/harmonic edge fixtures and
-older-dialect/multi-track wild coverage, then review and land. The recovered
+The expanded smoke now adds 39 pinned binary ecosystem features/demos, including
+GP3/4 and a five-track GP5 arrangement. Its initial 66/71 result exposed a GP4
+zero-integer trailer and GP5 combined-header field ordering; both are corrected
+in the worktree, with seven new regressions and independent consumer checks
+(field notes §21). The corrected reader passes **71/71** corpus files and
+the full converter suite now passes **260/260** tests. Navigation and triplet-feel
+losses now warn explicitly, covered across all revision fields (field notes §22);
+these musical features are not preserved. The sample remains an engineering corpus, not representative
+proof over all Ultimate Guitar uploads.
+**Next:** complete the requirement-by-requirement fidelity audit, then review
+and land the follow-ups. The grace transition/duration matrix is now covered.
+The recovered
 GP5 `Binary-suite` now passes whole-document parity after the already-proven
 grace-duration correction. Every incomplete prefix of the five structural
 fixtures is tested (except the valid GP3 trailer and terminal GP5 layout-byte
 omissions), and extra trailing bytes are rejected. Seven further tests mutate
 every observed labelled structural count and GP5 bend-point count to negative
 and overflowing values, requiring controlled rejection. Broader flag fuzzing
-and corpus coverage remain open.
+remains open; broader corpus evidence is described above.
 
 Runtime-flip progress: the workbench worker uses `importGuitarProWithMetadata`,
 and the root manifest no longer depends on AlphaTab. GPIF container inflate now
@@ -152,21 +180,16 @@ these changes are ID-only. Their four derived XML fixtures were regenerated
 through the MusicXML CLI; comparison against HEAD proves those differ only
 in IDs and encoding dates. No serializer assertions were weakened.
 
-Verification: the full converter run now passes **222/222 tests**, including
-the five grace-source regressions. The converter TypeScript build and
-`git diff --check` pass. Do not interpret
-the historical green counts below as the current result. Root tests now pass
-**1,218/1,218**, `check:scenarios` passes for 121 scenarios, and the root build
-passes **after the final public-facade/fixture switch**. The subsequent
-MusicXML suite now passes **107/107** after regenerating the stale derived XML.
-The chained root tests, scenario check and build all ran and passed again.
-Both converter TypeScript builds pass, the freshly rebuilt browser worker
-passes all 83 fixture imports, and the production-only package smoke passes.
-These are all pre-rebase results; post-rebase gates and landing remain
-outstanding, as do the feature/corpus tasks above.
-Keep this doc in `inprogress/`; retain the worktree because it holds the only
-checkout of the unlanded implementation. The checkpoint is not a completion
-claim; preserve the remaining coverage items and rebase/gate before landing.
+Verification for landed `2d013b4`: **229/229 Guitar Pro tests**, **107/107
+MusicXML tests**, **1,250/1,250 root tests**, scenario check (121 scenarios),
+build and all 116 primitive tests pass after rebasing onto `cc1998d`.
+Regenerated primitives leave `scenarios/` byte-identical. The rebuilt browser
+worker imports all 83 checkpoint fixtures; the production-only package and
+32-score corpus smokes pass. The checkpoint was fast-forwarded and pushed to
+main. The five new tie-scope files increase the upcoming worker set to 88;
+their focused suite passes, but follow-up landing gates remain to run.
+Keep this doc in `inprogress/`; retain the worktree for the active coverage
+follow-ups. The landed checkpoint is not a completion claim.
 
 Restart commands (from that worktree):
 
@@ -183,12 +206,12 @@ node converters/fixtures/tools/smoke-gp-worker.mjs
 git diff --check
 ```
 
-Before landing: review the remaining fidelity/coverage gaps above,
+Before landing further work: review the remaining fidelity/coverage gaps above,
 commit the worktree, fetch/rebase onto current `origin/main`, and run every
 required landing gate in CLAUDE.md (including primitives if the rebase touches
-model/engine/scenarios). Fast-forward and push only once green. Main has moved
-since this branch's `f2e2065` base; do not treat old gate results as landing
-evidence. Keep the item in `inprogress/` until shipped and the worktree retired.
+model/engine/scenarios). Fast-forward and push only once green; do not reuse
+the previous checkpoint's gate results for changed code. Keep the item in
+`inprogress/` until the remaining scope is shipped and the worktree retired.
 
 ### Historical checkpoints — superseded by the restart point above
 

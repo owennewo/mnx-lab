@@ -7,8 +7,44 @@ import { normalizeIds } from './helpers/normalize.js';
 import type { MnxEvent } from '../src/common/types.js';
 import { parseGuitarProBinary } from '../src/gp345/index.js';
 import { gpifToMnx } from '../src/gpif/toMnx.js';
+import { pitchToMidi } from '../src/common/tuning.js';
 
 describe.each(['3.00', '4.00', '4.06', '5.00', '5.10'])('GP%s ties/dead notes', revision => {
+  it('keeps rests, voices and harmonic sounding pitches separate when resolving binary ties', () => {
+    const bytes = readFileSync(resolve(__dirname, `fixtures/gp5/tie-scope-${revision}.gp${revision[0]}`));
+    const warnings: string[] = [];
+    const actual = importGuitarProCleanRoom(bytes, { onWarning: message => warnings.push(message) });
+    const measures = actual.parts[0].measures;
+    const voiceCount = revision.startsWith('5') ? 2 : 1;
+    for (let slot = 0; slot < voiceCount; slot++) {
+      const first = measures[0].sequences![slot].content as MnxEvent[];
+      expect(first[1].rest).toBeDefined();
+      const source = first[0].notes![0];
+      const target = first[2].notes![0];
+      expect(pitchToMidi(source.pitch!)).toBe(66 + slot * 4);
+      expect(target.pitch).toEqual(source.pitch);
+      expect(source.ties).toEqual([{ target: target.id }]);
+      const second = measures[1].sequences![slot].content as MnxEvent[];
+      const harmonic = second[0].notes![0];
+      const harmonicTarget = second[1].notes![0];
+      expect(pitchToMidi(harmonic.pitch!)).toBe(73);
+      expect(harmonicTarget.pitch).toEqual(harmonic.pitch);
+      expect(harmonic.ties).toEqual([{ target: harmonicTarget.id }]);
+    }
+    expect(warnings.filter(message => /tie/.test(message))).toEqual([]);
+    // The historical mapper drops tie links (covered below); compare every
+    // other field to its independent binary import result.
+    const withoutLinks = normalizeIds(actual);
+    for (const measure of withoutLinks.parts[0].measures) {
+      for (const sequence of measure.sequences ?? []) {
+        for (const event of sequence.content as MnxEvent[]) {
+          for (const note of event.notes ?? []) delete note.ties;
+        }
+      }
+    }
+    expect(withoutLinks).toEqual(normalizeIds(importGuitarPro(bytes)));
+  });
+
   it('warns and preserves the stored note for an orphan tie', () => {
     const bytes = readFileSync(resolve(__dirname, `fixtures/gp5/orphan-tie-${revision}.gp${revision[0]}`));
     const warnings: string[] = [];

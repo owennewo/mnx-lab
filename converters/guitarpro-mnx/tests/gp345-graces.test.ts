@@ -4,9 +4,42 @@ import { resolve } from 'node:path';
 import { importGuitarProCleanRoom } from '../src/index.js';
 import { importGuitarPro } from '../src/import/gp.js';
 import { normalizeIds } from './helpers/normalize.js';
-import type { MnxGrace } from '../src/common/types.js';
+import type { MnxGrace, MnxEvent } from '../src/common/types.js';
 import { parseGuitarProBinary } from '../src/gp345/index.js';
 import { gpifToMnx } from '../src/gpif/toMnx.js';
+
+describe.each(['3.00', '4.00', '4.06', '5.00', '5.10'])('GP%s grace wire matrix', revision => {
+  it('preserves supported placement and links while reporting unrepresented grace details', () => {
+    const bytes = readFileSync(resolve(__dirname, `fixtures/gp5/grace-matrix-${revision}.gp${revision[0]}`));
+    const warnings: string[] = [];
+    const actual = importGuitarProCleanRoom(bytes, { onWarning: message => warnings.push(message) });
+    expect(actual.parts[0].measures).toHaveLength(12);
+    actual.parts[0].measures.forEach((measure, index) => {
+      const content = measure.sequences![0].content;
+      const grace = content[0] as MnxGrace;
+      const principal = (content[1] as MnxEvent).notes![0];
+      expect(grace.type).toBe('grace');
+      expect(grace.graceType).toBe(revision.startsWith('5') && (index % 4 & 2) ? 'stealFollowing' : 'stealPrevious');
+      expect(grace.content[0].duration.base).toBe(index >= 8 ? '16th' : '32nd');
+      const note = grace.content[0].notes![0];
+      expect(note._x?.mnxLab?.fret).toBe(index + 2);
+      const technique = note._x?.mnxLab?.tab?.technique;
+      expect(technique?.hammerPull?.target).toBe(index % 4 === 3 ? principal.id : undefined);
+      expect(technique?.slide?.target).toBe(index % 4 === 1 ? principal.id : undefined);
+    });
+    expect(warnings.filter(message => message.includes('24th-note grace duration'))).toHaveLength(4);
+    expect(warnings.filter(message => message.includes('grace bend transition'))).toHaveLength(3);
+    expect(warnings.filter(message => message.includes('dead grace-note'))).toHaveLength(revision.startsWith('5') ? 6 : 0);
+    const oracle = normalizeIds(importGuitarPro(bytes));
+    oracle.parts[0].measures.forEach((measure, index) => {
+      const grace = measure.sequences![0].content[0] as MnxGrace;
+      expect(grace).toMatchObject({ graceType: 'stealPrevious', content: [{ duration: { base: 'eighth' } }] });
+      grace.graceType = revision.startsWith('5') && (index % 4 & 2) ? 'stealFollowing' : 'stealPrevious';
+      grace.content[0].duration.base = index >= 8 ? '16th' : '32nd';
+    });
+    expect(normalizeIds(actual)).toEqual(oracle);
+  });
+});
 
 describe('mixed grace placement normalization', () => {
   it('does not collapse adjacent before/on-beat groups to the first placement', () => {
@@ -36,6 +69,11 @@ describe.each(['3.00', '4.00', '4.06', '5.00', '5.10'])('GP%s grace chord', revi
       { id: 'n3', _x: { mnxLab: { string: 2, fret: 4 } } }
     ] });
     expect(warnings.filter(message => /grace/.test(message))).toEqual([]);
+    const oracle = normalizeIds(importGuitarPro(bytes));
+    const oracleGrace = oracle.parts[0].measures[0].sequences![0].content[0] as MnxGrace;
+    expect(oracleGrace.content.map(event => event.duration.base)).toEqual(['16th', '16th']);
+    oracleGrace.content = [{ duration: { base: '32nd' }, notes: oracleGrace.content.flatMap(event => event.notes ?? []) }];
+    expect(actual).toEqual(oracle);
   });
 
   it('groups simultaneous grace notes and resolves each hammer to its principal', () => {

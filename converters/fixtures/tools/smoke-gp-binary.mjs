@@ -14,10 +14,31 @@ const paths = [
   ...Array.from({ length: 20 }, (_, i) => `brouwer/gp5/brouwer_estudio${i + 1}.gp5`),
   ...Array.from({ length: 12 }, (_, i) => `villa-lobos/gp5/villa-lobos_etude${i + 1}.gp5`)
 ];
+// Ecosystem-authored feature files and demos, not our fixture writer's output.
+// Only binary data is downloaded; no third-party reader implementation is read.
+const ecosystemRepo = 'Perlence/PyGuitarPro';
+const ecosystemRevision = 'b0a74102cf25a316f2c4ae3d03ffec3c03521358';
+const ecosystemFiles = [
+  '001_Funky_Guy.gp5', 'Accent-force.gp3', 'Accent-force.gp4',
+  'Chord Old Format.gp3', 'Chords.gp3', 'Chords.gp4', 'Chords.gp5',
+  'Clef.gp5', 'Demo v5.gp5', 'Directions.gp5', 'Duration.gp3',
+  'Effects.gp3', 'Effects.gp4', 'Effects.gp5',
+  'Harmonics.gp3', 'Harmonics.gp4', 'Harmonics.gp5', 'Key.gp4', 'Key.gp5',
+  'Measure Header.gp3', 'Measure Header.gp4', 'Measure Header.gp5',
+  'No Wah.gp5', 'RSE.gp5', 'Repeat.gp4', 'Repeat.gp5', 'Slides.gp4', 'Slides.gp5',
+  'Strokes.gp4', 'Strokes.gp5', 'Tie.gp5', 'Unknown Chord Extension.gp5',
+  'Unknown-m.gp5', 'Unknown.gp5', 'Vibrato.gp4', 'Voices.gp5',
+  'Wah-m.gp5', 'Wah.gp5', 'chord_without_notes.gp5'
+];
+const samples = [
+  ...paths.map(path => ({ repo, revision, path, cacheName: path.split('/').at(-1) })),
+  ...ecosystemFiles.map(name => ({ repo: ecosystemRepo, revision: ecosystemRevision,
+    path: `tests/${name}`, cacheName: `ecosystem-${name}` }))
+];
 await mkdir(cache, { recursive: true });
 let failed = 0;
-for (const path of paths) {
-  const file = new URL(path.split('/').at(-1), cache);
+for (const { repo, revision, path, cacheName } of samples) {
+  const file = new URL(encodeURIComponent(cacheName), cache);
   if (process.argv.includes('--fetch')) {
     const response = await fetch(`https://raw.githubusercontent.com/${repo}/${revision}/${path}`);
     if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
@@ -51,11 +72,11 @@ for (const path of paths) {
       for (const measure of part.measures) for (const sequence of measure.sequences ?? []) walk(sequence.content);
     }
     for (const target of targets) assert(ids.has(target), `dangling target ${target}`);
-    console.log(`PASS ${path} notes=${ids.size} warnings=${warnings.length} sha256=${hash}`);
+    console.log(`PASS ${path} parts=${doc.parts.length} notes=${ids.size} warnings=${warnings.length} sha256=${hash}`);
   } catch (error) {
     failed++;
     console.log(`FAIL ${path}: ${error.message} sha256=${hash}`);
   }
 }
-console.log(`${paths.length - failed}/${paths.length} passed; cache ${fileURLToPath(cache)}`);
+console.log(`${samples.length - failed}/${samples.length} passed; cache ${fileURLToPath(cache)}`);
 process.exitCode = failed ? 1 : 0;

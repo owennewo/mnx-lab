@@ -186,6 +186,31 @@ def graces_score() -> gp.Song:
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for version, suffix in [((3, 0, 0), '3.00'), ((4, 0, 0), '4.00'), ((4, 0, 6), '4.06'), ((5, 0, 0), '5.00'), ((5, 1, 0), '5.10')]:
+        song = gp.Song(title='Grace wire combinations', tempo=100)
+        for index in range(12):
+            if index:
+                song.newMeasure()
+            voice = song.tracks[0].measures[index].voices[0]
+            beat = gp.Beat(voice, status=gp.BeatStatus.normal, duration=gp.Duration(value=1))
+            beat.notes.append(gp.Note(beat, value=16, string=1, type=gp.NoteType.normal,
+                effect=gp.NoteEffect(grace=gp.GraceEffect(fret=index + 2, duration=32,
+                    transition=gp.GraceEffectTransition.none))))
+            voice.beats.append(beat)
+        grace_path = OUT / f'grace-matrix-{suffix}.gp{version[0]}'
+        guitarpro.write(song, grace_path, version=version)
+        raw = grace_path.read_bytes()
+        # Correct only the explicitly authored grace records; avoid relying on
+        # the public writer's known GP3/4 field order and duration-code mapping.
+        replacements = []
+        for index in range(12):
+            writer_record = bytes([index + 2, 6, 2, 0] if version[0] < 5 else [index + 2, 6, 0, 2, 0])
+            assert raw.count(writer_record) == 1
+            replacements.append((raw.index(writer_record), bytes([index + 2, 6, index % 4, index // 4 + 1]
+                + ([index % 4] if version[0] == 5 else []))))
+        patched = bytearray(raw)
+        for offset, record in replacements:
+            patched[offset:offset + len(record)] = record
+        grace_path.write_bytes(patched)
         song = gp.Song(title='Chord diagrams', tempo=100)
         voice = song.tracks[0].measures[0].voices[0]
         for modern, first_fret in [(False, 0), (False, 1), (True, 1), (True, 5)]:
@@ -235,6 +260,26 @@ def main() -> None:
                 beat.notes.append(gp.Note(beat, value=fret, string=2, type=kind))
                 voice.beats.append(beat)
         guitarpro.write(song, OUT / f'ties-{suffix}.gp{version[0]}', version=version)
+        song = gp.Song(title='Tie source scope', tempo=100)
+        song.tracks[0].offset = 2
+        song.newMeasure()
+        for voice_index in range(2 if version[0] == 5 else 1):
+            voice = song.tracks[0].measures[0].voices[voice_index]
+            for kind, duration in [(gp.NoteType.normal, 4), (None, 4), (gp.NoteType.tie, 2)]:
+                beat = gp.Beat(voice, status=gp.BeatStatus.rest if kind is None else gp.BeatStatus.normal,
+                               duration=gp.Duration(value=duration))
+                if kind is not None:
+                    beat.notes.append(gp.Note(beat, value=5 + 4 * voice_index if kind == gp.NoteType.normal else 0,
+                                              string=2, type=kind))
+                voice.beats.append(beat)
+            voice = song.tracks[0].measures[1].voices[voice_index]
+            for kind in [gp.NoteType.normal, gp.NoteType.tie]:
+                beat = gp.Beat(voice, status=gp.BeatStatus.normal, duration=gp.Duration(value=2))
+                effect = gp.NoteEffect(harmonic=gp.NaturalHarmonic()) if kind == gp.NoteType.normal else gp.NoteEffect()
+                beat.notes.append(gp.Note(beat, value=12 if kind == gp.NoteType.normal else 0,
+                                          string=2, type=kind, effect=effect))
+                voice.beats.append(beat)
+        guitarpro.write(song, OUT / f'tie-scope-{suffix}.gp{version[0]}', version=version)
         song = gp.Song(title='Orphan tie', tempo=100)
         voice = song.tracks[0].measures[0].voices[0]
         beat = gp.Beat(voice, status=gp.BeatStatus.normal, duration=gp.Duration(value=1))
@@ -314,6 +359,38 @@ def main() -> None:
             beat.notes.append(gp.Note(beat, value=measure_index, string=1, type=gp.NoteType.normal))
             voice.beats.append(beat)
         guitarpro.write(song, OUT / f'ending-groups-{suffix}.gp{version[0]}', version=version)
+        song = gp.Song(title='Combined measure header fields', tempo=100)
+        for measure_index in range(2):
+            if measure_index:
+                song.newMeasure()
+            header = song.measureHeaders[measure_index]
+            header.isRepeatOpen = measure_index == 0
+            if measure_index:
+                header.timeSignature.numerator = 3
+                header.timeSignature.denominator.value = 4
+                header.repeatClose = 2
+                header.repeatAlternative = 1
+                header.marker = gp.Marker('Combined')
+                header.keySignature = gp.KeySignature.GMajor
+            voice = song.tracks[0].measures[measure_index].voices[0]
+            beat = gp.Beat(voice, status=gp.BeatStatus.normal,
+                           duration=gp.Duration(value=2 if measure_index else 1, isDotted=bool(measure_index)))
+            beat.notes.append(gp.Note(beat, value=0, string=1, type=gp.NoteType.normal))
+            voice.beats.append(beat)
+        guitarpro.write(song, OUT / f'combined-header-{suffix}.gp{version[0]}', version=version)
+        song = gp.Song(title='Harmonic nodes', tempo=100)
+        song.tracks[0].offset = 2
+        for index, node in enumerate([12, 7, 5, 4, 9, 3, 2]):
+            if index:
+                song.newMeasure()
+            for voice_index in range(2 if version[0] == 5 else 1):
+                voice = song.tracks[0].measures[index].voices[voice_index]
+                beat = gp.Beat(voice, status=gp.BeatStatus.normal, duration=gp.Duration(value=1))
+                effect = gp.NaturalHarmonic() if voice_index == 0 else gp.TappedHarmonic(fret=node + 3)
+                beat.notes.append(gp.Note(beat, value=node if voice_index == 0 else 3, string=1,
+                    type=gp.NoteType.normal, effect=gp.NoteEffect(harmonic=effect)))
+                voice.beats.append(beat)
+        guitarpro.write(song, OUT / f'harmonic-nodes-{suffix}.gp{version[0]}', version=version)
         if version[0] == 3:
             song = gp.Song(title='GP3 beat note effects', tempo=100)
             voice = song.tracks[0].measures[0].voices[0]
@@ -349,6 +426,26 @@ def main() -> None:
                                           effect=gp.NoteEffect(harmonic=effect)))
                 voice.beats.append(beat)
             guitarpro.write(song, OUT / f'harmonics-{suffix}.gp{version[0]}', version=version)
+            song = gp.Song(title='Artificial harmonic register', tempo=100)
+            song.tracks[0].offset = 2
+            variants = [(gp.PitchClass('A'), gp.Octave.quindicesima),
+                        (gp.PitchClass('E'), gp.Octave.ottava),
+                        (gp.PitchClass('A'), gp.Octave.ottava)]
+            if version[0] == 5:
+                variants += [(gp.PitchClass('C'), gp.Octave.ottava),
+                             (gp.PitchClass('F#'), gp.Octave.ottava),
+                             (gp.PitchClass('A'), gp.Octave.none),
+                             (gp.PitchClass('A'), gp.Octave.ottavaBassa),
+                             (gp.PitchClass('A'), gp.Octave.quindicesimaBassa)]
+            for index, (pitch, octave) in enumerate(variants):
+                if index:
+                    song.newMeasure()
+                voice = song.tracks[0].measures[index].voices[0]
+                beat = gp.Beat(voice, status=gp.BeatStatus.normal, duration=gp.Duration(value=1))
+                beat.notes.append(gp.Note(beat, value=5, string=1, type=gp.NoteType.normal,
+                    effect=gp.NoteEffect(harmonic=gp.ArtificialHarmonic(pitch=pitch, octave=octave))))
+                voice.beats.append(beat)
+            guitarpro.write(song, OUT / f'harmonic-register-{suffix}.gp{version[0]}', version=version)
     for version, suffix in [((3, 0, 0), '3.00'), ((4, 0, 0), '4.00'), ((4, 0, 6), '4.06')]:
         song = basic_score()
         for measure in song.tracks[0].measures:

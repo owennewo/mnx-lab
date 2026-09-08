@@ -367,6 +367,93 @@ same mutations cover all point-list counts in both GP5 bend fixtures. These
 seven tests supplement the existing exhaustive-prefix/trailing-byte checks;
 they are not a claim of exhaustive flag fuzzing or resource-exhaustion proof.
 
+## 20. Binary tie source scope (2026-09-08)
+
+Five `tie-scope` fixtures cover a normal note, rest, and tied destination in
+one measure, followed by a natural harmonic and its tied destination with
+capo 2. GP5 adds another voice on the same string at a different stopped fret.
+All five files pass TuxGuitar reader acceptance. MNX tests assert that each
+voice keeps its own source pitch and ID, the rest is retained, and the harmonic
+destination inherits MIDI 73 rather than recomputing the stopped-fret pitch.
+Every non-tie-link field equals the independent AlphaTab-backed import; its
+known loss of MNX tie links is the only excluded field. No parser change was
+needed. This replaces the earlier intermediate-only evidence with actual
+binary coverage for these source-scope cases.
+
+## 21. Broader ecosystem corpus and combined GP5 headers (2026-09-08)
+
+The smoke script now includes 39 binary-only ecosystem test/demo files from
+`Perlence/PyGuitarPro` at `b0a74102cf25a316f2c4ae3d03ffec3c03521358`, in
+addition to the 32 classical GP5 scores. Only GitHub tree metadata and binary
+files were read; no reader implementation was consulted. Downloads remain
+gitignored. The set includes GP3/4 features and a five-track GP5 demo (1,925
+notes), but is not a statistically representative Ultimate Guitar sample.
+
+The initial result was 66/71. Four GP4 files (Chords, Harmonics, Key, Vibrato)
+end with exactly one zero integer, accepted by TuxGuitar. The parser now accepts
+that specific GP4 trailer as it already does for GP3. Regression tests reject
+nonzero, partial and oversized trailers rather than accepting arbitrary padding.
+
+The fifth failure, GP5 Measure Header, combined an ending with a marker/key
+change. GP5's ending mask is **after marker, key and optional four beam bytes**;
+GP3/4 put their ending number before marker/key. The previous shared ordering
+misread the marker length. Five generated combined-header fixtures now pin
+revision-specific traversal and exact AlphaTab parity. TuxGuitar agrees.
+The public writer has another ordering discrepancy: when beams are present,
+it places the requested ending 1 before them, and both consumers see ending 2.
+The fixture deliberately preserves those bytes and asserts their consumer
+meaning; do not use the writer's requested ending as an oracle. This also
+shows why successful EOF traversal alone is insufficient evidence of fidelity.
+
+## 22. Navigation and swing loss reporting (2026-09-08)
+
+The corpus's Directions file exposed silent musical loss: the GP5 navigation
+table was skipped with no warning. Each of its 19 signed-short slots is now
+read under its documented name; a value other than the absent sentinel -1
+reports the stored measure and direction as unrepresented. Likewise, nonzero
+GP3/4 score-level triplet feel and GP5 per-measure triplet feel now warn that
+written durations are retained. This is explicit loss reporting, not navigation
+or swing implementation. Five tests mutate every relevant field separately,
+restore cursor observers before parsing, and assert one specific loss warning
+with unchanged retained notation. The converter has 246 passing tests and the
+expanded 71-file smoke still passes.
+
+## 23. Harmonic register and node coverage (2026-09-08)
+
+Four artificial-register fixtures exercise GP4's three legacy discriminators
+and GP5's explicit pitch class, accidental and all five octave-enum values,
+with stopped fret 5 and capo 2. GP4's writer translates the requested first
+two registers differently from the input model; the clean-room and AlphaTab
+readers agree on stored MIDI values 90, 95, 83. GP5 tests explicitly assert
+the oracle's differing pitches before correcting pitch alone for comparison;
+register resolution uses the explicit pitch class, octave shift and capo once.
+TuxGuitar accepts all four files; its GP5 public harmonic model discards the
+register details, so acceptance is not independent pitch-fidelity proof there.
+
+Five further node fixtures exercise 12, 7, 5, 4, 9, 3 and 2, whose supported
+semitone intervals are 12, 19, 24, 28, 28, 31 and 36. GP5 also carries a second
+voice of tapped harmonics three frets above the open string; the tapped node
+is measured from the stopped fret. Tests assert both sounding pitches and
+unchanged physical fret choices with capo. TuxGuitar accepts these five files.
+These tests cover the implemented node table, not arbitrary fractional nodes
+or every physically possible harmonic.
+
+## 24. Grace duration/transition matrix (2026-09-08)
+
+Five `grace-matrix` fixtures explicitly author all 12 combinations of three
+duration codes and four transition values. GP5 cycles all four dead/on-beat
+flag combinations as well. The generator locates each unique writer record
+before replacing any bytes, then authors only the small documented record;
+this avoids the known writer field-order and duration-code discrepancies.
+TuxGuitar confirms every stored fret, duration and transition in all five files.
+
+MNX tests prove physical fret retention, separate grace/principal events,
+same-string slide/hammer targets, before/on-beat placement, and display bases.
+Each file warns exactly four times for duration code 2's approximation and
+three times for unrepresented bend transitions; GP5 additionally reports six
+dead-grace styling losses. These are tested limitations, not preservation
+claims. No new parser behavior was needed for the valid matrix.
+
 ## Sources
 
 - Arobas Music, *Guitar Pro 4.06 File Format Description* (historical official spec):

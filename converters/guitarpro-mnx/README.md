@@ -14,7 +14,9 @@ a development-only differential-test oracle, not a runtime requirement.
 The legacy reader retains notation, tuning/capo, lyrics, ties and supported
 techniques through the shared GPIF-to-MNX mapping. Unsupported musical effects
 warn; RSE and page-layout data are not preserved. Chord names are retained,
-but chord diagrams and dead-note styling are not. The current coverage and
+but chord diagrams and dead-note styling are not. Navigation directions and
+triplet feel also warn rather than being preserved; written durations remain
+unchanged. The current coverage and
 remaining edge cases are recorded in
 [the binary-reader roadmap](../../roadmap/inprogress/core-guitarpro-binary-import.md).
 

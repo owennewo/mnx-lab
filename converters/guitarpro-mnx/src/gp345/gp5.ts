@@ -77,7 +77,9 @@ export function parseGuitarProBinary(data: Uint8Array, options: GpifImportOption
   const major = version.major;
 
   const warn = options.onWarning ?? (() => {});
-  if (major < 5) reader.readBool('triplet feel');
+  if (major < 5 && reader.readBool('triplet feel')) {
+    warn('Score triplet feel is not represented; written durations are retained.');
+  }
   const lyrics = major >= 4 ? readLyrics(reader) : { trackChoice: 0, lines: [] };
 
   if (major === 5 && version.revision > 0) {
@@ -95,13 +97,22 @@ export function parseGuitarProBinary(data: Uint8Array, options: GpifImportOption
   else if (major === 4) reader.skip(1, 'octave');
   const instruments = readMidiChannels(reader);
   if (major === 5) {
-    reader.skip(19 * 2, 'directions');
+    for (const direction of [
+      'Coda', 'Double Coda', 'Segno', 'Segno Segno', 'Fine', 'Da Capo',
+      'Da Capo al Coda', 'Da Capo al Double Coda', 'Da Capo al Fine',
+      'Da Segno', 'Da Segno al Coda', 'Da Segno al Double Coda', 'Da Segno al Fine',
+      'Da Segno Segno', 'Da Segno Segno al Coda', 'Da Segno Segno al Double Coda',
+      'Da Segno Segno al Fine', 'Da Coda', 'Da Double Coda'
+    ]) {
+      const measure = reader.readInt16(`direction ${direction}`);
+      if (measure !== -1) warn(`Measure ${measure}: navigation direction ${direction} is not represented.`);
+    }
     reader.skip(4, 'master reverb');
   }
 
   const measureCount = checkedCount(reader.readInt32('measure count'), 'measure', 100_000);
   const trackCount = checkedCount(reader.readInt32('track count'), 'track', 1_000);
-  const masterBars = readMeasureHeaders(reader, measureCount, trackCount, initialFifths, major);
+  const masterBars = readMeasureHeaders(reader, measureCount, trackCount, initialFifths, major, warn);
   const tracks = Array.from({ length: trackCount }, (_, index) =>
     readTrack(reader, index, version.revision, major, instruments)
   );
@@ -164,11 +175,11 @@ export function parseGuitarProBinary(data: Uint8Array, options: GpifImportOption
 
   attachLyrics(lyrics, masterBars, primaryVoiceByBar, voices, beats, trackCount, warn);
 
-  // PyGuitarPro's GP3 fixtures append one zero integer after the score.
+  // GP3 fixtures and ecosystem GP4 files append one zero integer after the score.
   // Accept that observed trailer only; arbitrary trailing data still fails.
-  if (major === 3 && reader.remaining === 4) {
-    if (reader.readInt32('GP3 trailing reserved integer') !== 0) {
-      throw new Error('nonzero GP3 trailing reserved integer');
+  if (major < 5 && reader.remaining === 4) {
+    if (reader.readInt32(`GP${major} trailing reserved integer`) !== 0) {
+      throw new Error(`nonzero GP${major} trailing reserved integer`);
     }
   }
 
@@ -295,7 +306,8 @@ function readMeasureHeaders(
   measureCount: number,
   trackCount: number,
   initialFifths: number,
-  major: number
+  major: number,
+  warn: (message: string) => void
 ): GpifMasterBar[] {
   const result: GpifMasterBar[] = [];
   let numerator = 4;
@@ -312,18 +324,12 @@ function readMeasureHeaders(
     const repeatCount = flags & 0x08
       ? reader.readUint8(`measure ${index + 1} repeat count`) + (major < 5 ? 1 : 0)
       : null;
-    const endingValue = flags & 0x10
+    let endingValue = major < 5 && (flags & 0x10)
       ? reader.readUint8(`measure ${index + 1} alternate endings`)
       : 0;
     if (major < 5 && endingValue > 8) {
       throw new Error(`measure ${index + 1}: invalid legacy ending number ${endingValue}`);
     }
-    // GP3/4 store the highest ending number, not GP5's explicit bitmask.
-    // Remove endings already taken at earlier repeat closes in this group.
-    const alternateEndingsMask = major === 5 ? endingValue
-      : ((1 << endingValue) - 1) & ~completedEndings;
-    if (repeatCount !== null) completedEndings |= alternateEndingsMask;
-
     let sectionText: string | null = null;
     if (flags & 0x20) {
       sectionText = reader.readIntByteSizeString(`measure ${index + 1} marker`);
@@ -337,9 +343,17 @@ function readMeasureHeaders(
     }
     if (major === 5) {
       if (flags & 0x03) reader.skip(4, `measure ${index + 1} time-signature beams`);
+      // GP5 moved the ending mask after marker, key and time-signature beams.
+      if (flags & 0x10) endingValue = reader.readUint8(`measure ${index + 1} alternate endings`);
       if (!(flags & 0x10)) reader.skip(1, `measure ${index + 1} alternate-ending padding`);
-      reader.skip(1, `measure ${index + 1} triplet feel`);
+      const tripletFeel = reader.readUint8(`measure ${index + 1} triplet feel`);
+      if (tripletFeel !== 0) warn(`Measure ${index + 1}: triplet feel ${tripletFeel} is not represented; written durations are retained.`);
     }
+    // GP3/4 store the highest ending number, not GP5's explicit bitmask.
+    // Remove endings already taken at earlier repeat closes in this group.
+    const alternateEndingsMask = major === 5 ? endingValue
+      : ((1 << endingValue) - 1) & ~completedEndings;
+    if (repeatCount !== null) completedEndings |= alternateEndingsMask;
 
     result.push({
       barIds: Array.from({ length: trackCount }, (_, track) => index * trackCount + track),

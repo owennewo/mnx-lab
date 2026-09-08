@@ -35,7 +35,7 @@ for path in paths:
         assert song.countMeasureHeaders() > 0, path
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         print(f'{path.name}: tracks={song.countTracks()} measures={song.countMeasureHeaders()} sha256={digest}')
-        if path.name.startswith(('endings-', 'ending-groups-')):
+        if path.name.startswith(('endings-', 'ending-groups-', 'combined-header-')):
             print('  endings=' + str([song.getMeasureHeader(i).getRepeatAlternative()
                                      for i in range(song.countMeasureHeaders())]))
         if path.name.startswith('harmonics-'):
@@ -57,6 +57,17 @@ for path in paths:
                 assert note.getValue() == 4 and grace.getFret() == 2
                 assert grace.getTransition() == 3 and grace.getDuration() == 1
             print('  two principal fret-4 notes, each with fret-2 grace, transition=3 duration=1')
+        if path.name.startswith('harmonic-register-'):
+            for measure in song.getTrack(0).getMeasures():
+                note = measure.getBeats().get(0).getVoice(0).getNotes().get(0)
+                harmonic = note.getEffect().getHarmonic()
+                print(f'  measure={measure.getNumber()} fret={note.getValue()} harmonicType={harmonic.getType()} data={harmonic.getData()}')
+        if path.name.startswith('grace-matrix-'):
+            for index, measure in enumerate(song.getTrack(0).getMeasures()):
+                grace = measure.getBeats().get(0).getVoice(0).getNotes().get(0).getEffect().getGrace()
+                assert grace.getFret() == index + 2
+                assert grace.getTransition() == index % 4 and grace.getDuration() == index // 4 + 1
+            print('  all 12 grace duration/transition records match authored wire values')
     finally:
         stream.close()
 print(f'TuxGuitar accepted {len(paths)} binary fixtures.')
