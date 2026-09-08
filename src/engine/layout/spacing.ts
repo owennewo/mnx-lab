@@ -391,11 +391,7 @@ function bodyStretch(rows: readonly { full: boolean; stretch: number }[]): numbe
  * the rows that were given their bars get the page's texture as a ceiling,
  * then the page-relative last-row rule on top.
  *
- * Exported-shaped (module-internal) because there are two callers and they
- * MUST agree — `packSystems` for the square path, and `planHorizontal`'s
- * ink-ratio re-run, which redoes the same arithmetic over scaled metrics with
- * the same row membership. Two copies of this rule is exactly the drift this
- * module exists to prevent.
+ * Shared by every packing call, including the spacing-control ladder.
  */
 function justifyRows(rows: readonly { full: boolean; stretch: number }[], mode?: 'natural' | 'fill'): number[] {
   // Natural rows retain their springs; only overfull rows need compression.
@@ -1557,7 +1553,7 @@ export function planHorizontal(
       : contentLeftPad + (firstInSystem ? startBarlinePad : 0);
 
   // The prefix's PADS are air; its glyph SLOTS are ink and scale with the ink
-  // ratio (`ink` = 1 for the packing input — packing stays square).
+  // ratio (the packing snapshot is updated after ink pricing).
   const prefixWidth = (m: MeasureMetrics, firstInSystem: boolean, ink = 1) => {
     const showClef = display.clefs !== 'hide' && (firstInSystem || m.clefChanged);
     const showTimeSig = display.timeSignatures !== 'hide' && m.timeSigShow;
@@ -1615,7 +1611,7 @@ export function planHorizontal(
   }
 
   // Ink pricing, applied the same way density is — one pass over the finished
-  // metrics, after the packing input was captured (packing stays square) and
+  // metrics, after the baseline packing input was captured and
   // before placement reads anything. Rigid ink scales; air (springs, pads)
   // and spans (the H-bar, EMPTY_CONTENT_SP) do not.
   const inkRatio = clampInkRatio(options?.inkRatio);
@@ -1651,40 +1647,29 @@ export function planHorizontal(
     }
   }
 
+  // Packing and placement must price the same ink. Keep springs normalized
+  // to density 1 so the zoom ladder can reuse this snapshot at other settings.
+  if (inkRatio !== 1) {
+    for (const entry of packing.measures) {
+      const m = metrics[entry.index];
+      entry.prefixFirst = prefixWidth(m, true, inkRatio);
+      entry.prefixRest = prefixWidth(m, false, inkRatio);
+      entry.rigid = m.rigid;
+      entry.spring = m.spring / densityH;
+      entry.lead = m.leadingSpring / densityH;
+      entry.repeatExtra = m.repeatEnd ? REPEAT_END_EXTRA_SP * inkRatio : 0;
+    }
+  }
+
   // Pass 2 — greedy system packing on natural widths (hidden measures take no
   // slot; forced breaks from a score's `pages.systems` start new rows), plus
   // each row's justification factor. Both live in packSystems, so the density
   // ladder asks the same question of the same code.
   const packed = packSystems(packing, densityH);
-  const widthAt = (row: number) => row === 0 ? lineWidth : widthSp - 2 * marginSp - subsequentLeftInset;
   const rowIndicesOf = (packedRow: PackedRow) =>
     packedRow.measures.map(k => packing.measures[k].index);
 
-  // Row stretches: the packer's square answer, or — under an ink ratio — the
-  // same arithmetic re-run over the scaled metrics with the SAME (square) row
-  // membership, then capped by the same last-row rule the packer applies.
-  // This is where the springs hand width to the grown ink. At ratio 1 the
-  // packer's numbers are reused untouched.
-  let stretches = packed.map(r => r.stretch);
-  if (inkRatio !== 1) {
-    stretches = justifyRows(
-      packed.map((packedRow, row) => {
-        let rowRigid = 0;
-        let rowSpring = 0;
-        rowIndicesOf(packedRow).forEach((i, j) => {
-          const m = metrics[i];
-          rowRigid +=
-            prefixWidth(m, j === 0, inkRatio) + m.rigid + contentRightPad +
-            (m.repeatEnd ? REPEAT_END_EXTRA_SP * inkRatio : 0);
-          rowSpring += m.spring + m.leadingSpring;
-        });
-        // Same rule as the square path, through the same helper — this is the
-        // path where the cap actually bit, since ink pricing below 100% staff
-        // scale shrinks the rigid columns and pushes the needed stretch up.
-        return { full: packedRow.full, stretch: rowStretch(widthAt(row) - rowRigid, rowSpring) };
-      }), options?.spacingMode
-    );
-  }
+  const stretches = packed.map(r => r.stretch);
 
   // Pass 3 — place each row at its justified stretch.
   const measures: MeasurePlan[] = new Array(metrics.length);

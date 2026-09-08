@@ -330,3 +330,8 @@ The workbench exposes this under Settings → Spacing and remembers the choice.
 Zoom readouts include `%`: spacing is a requested multiplier on duration spacing,
 not a measured gap. At 100%, a quarter-note spring is 2.2 staff spaces; symbol
 columns are additional. Fill-width justification can change the drawn allowance.
+
+System packing uses the selected staff size's symbol widths in both spacing
+modes. Staff size and spacing remain independent preferences, but either can
+change line breaks: larger symbols need more room. The spacing ladder and
+navigation use the same ink-priced packing snapshot as the drawing.

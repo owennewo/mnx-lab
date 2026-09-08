@@ -376,22 +376,14 @@ describe('zoom / density', () => {
       expect(barsOnFirstSystem(MAX_DENSITY / 2)).toBe(1);
     });
 
-    it('the two arms together keep the music near the line, which is the reading mode', () => {
+    it('large symbols reflow without requiring a spacing adjustment', () => {
       initSmufl();
-      // Staff scale alone overflows: the horizontal axis stays fitted, so at
-      // 640% a system is far wider than the line and the page scrolls
-      // sideways for every system. Adding density puts one bar on a system,
-      // and the same huge ink then very nearly fits the line again — big
-      // glyphs, one bar at a time, scrolling DOWN. That combination is the
-      // accessible reading mode, and it is why the two ceilings moved together.
       const mnx = doc('lab/document/twelve-bar-blues');
       const widthSp = 90;
-      const inkOnly = layoutTab({ mnx, widthSp, inkRatio: MAX_STAFF_SCALE }).usedWidthSp;
-      const inkAndSpace =
-        layoutTab({ mnx, widthSp, inkRatio: MAX_STAFF_SCALE, densityH: MAX_DENSITY }).usedWidthSp;
-      expect(inkOnly).toBeGreaterThan(widthSp * 2);
-      expect(inkAndSpace).toBeLessThan(inkOnly / 2);
-      expect(inkAndSpace).toBeLessThan(widthSp * 1.25);
+      for (const densityH of [1, MAX_DENSITY]) {
+        const layout = layoutTab({ mnx, widthSp, inkRatio: MAX_STAFF_SCALE, densityH });
+        expect(layout.usedWidthSp).toBeLessThan(widthSp * 1.25);
+      }
     });
   });
 
@@ -431,7 +423,7 @@ describe('zoom / density', () => {
   // VERTICAL scale instead, so the guarantee held at square scale only: under
   // a pinned staff scale the ink outgrew its columns, first visibly as the TAB
   // clef running into the time signature. The plan now prices rigid ink by
-  // the ratio and leaves packing square — these assert both halves.
+  // the ratio for both packing and placement.
   describe('ink-priced columns', () => {
     const blues = () => doc('lab/document/twelve-bar-blues');
     const keys = () => doc('spec/key-signatures');
@@ -467,17 +459,34 @@ describe('zoom / density', () => {
       expect(clampInkRatio(1.4)).toBe(1.4);
     });
 
-    it('packing stays square: row membership is invariant under the ratio', () => {
+    it('packs more bars with smaller symbols and fewer with larger symbols', () => {
       initSmufl();
-      // Ruling 2's substance, asserted rather than assumed: the vertical arm
-      // may re-place a row, never re-break the score.
-      for (const widthSp of [60, 80, 120]) {
-        const notation = rowsOf(planHorizontal(blues(), widthSp));
-        const tab = rowsOf(planHorizontal(blues(), widthSp, { staffKind: 'tab' }));
-        for (const inkRatio of [0.6, 1.4, 1.6, 2.3]) {
-          expect(rowsOf(planHorizontal(blues(), widthSp, { inkRatio }))).toEqual(notation);
-          expect(rowsOf(planHorizontal(blues(), widthSp, { inkRatio, staffKind: 'tab' }))).toEqual(tab);
+      for (const spacingMode of ['natural', 'fill'] as const) {
+        for (const staffKind of ['notation', 'tab'] as const) {
+          const count = (inkRatio: number) => planHorizontal(blues(), 120, {
+            spacingMode, staffKind, inkRatio, densityH: 0.2
+          }).measures.filter(m => m.row === 0 && !m.hidden).length;
+          expect(count(0.6)).toBeGreaterThan(count(1));
+          expect(count(1)).toBeGreaterThan(count(2.3));
         }
+      }
+    });
+
+    it('the packing snapshot agrees with drawn natural widths at the chosen staff size', () => {
+      for (const inkRatio of [0.6, 0.87, 1.4, 2.3]) {
+        const densityH = 0.2;
+        const plan = planHorizontal(blues(), 120, { spacingMode: 'natural', inkRatio, densityH });
+        const rows = packSystems(plan.packing, densityH);
+        for (const row of rows) {
+          for (const [column, index] of row.measures.entries()) {
+            const entry = plan.packing.measures[index];
+            const expectedWidth = (column === 0 ? entry.prefixFirst : entry.prefixRest) +
+              entry.rigid + (entry.spring + entry.lead) * densityH * row.stretch +
+              plan.packing.contentRightPadSp! + entry.repeatExtra;
+            expect(plan.measures[entry.index].width).toBeCloseTo(expectedWidth, 8);
+          }
+        }
+        expect(rows.flatMap((row, r) => row.measures.map(() => r))).toEqual(rowsOf(plan));
       }
     });
 

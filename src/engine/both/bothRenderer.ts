@@ -92,8 +92,8 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
 
   // Rigid columns are ink (core-ink-priced-columns.md): under a non-square
   // scale the plan is re-placed at the ink ratio so glyphs keep their columns.
-  // The fit is NOT redone — the square plan defined it — and packing stays
-  // square inside the plan, so bars never change systems here. One ratio for
+  // The fit is NOT redone — the square plan defined it — and bars are re-packed
+  // using the actual symbol widths. One ratio for
   // both staves is what keeps them column-aligned.
   const inkRatio = pxPerSpY / pxPerSp;
   const layout =
