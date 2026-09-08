@@ -390,7 +390,7 @@ const METRONOME_GLYPH_BY_BASE: Record<string, string> = {
 
 export interface EmitTempoMarkArgs {
   gm: MnxGlobalMeasure;
-  m: { x: number; width: number; showTimeSig: boolean; timeSigCentreX: number; contentStartX: number };
+  m: { x: number; width: number; showTimeSig: boolean; timeSigCentreX: number; contentStartX: number; repeatStart: boolean };
   staffTop: number;
   /** This row's primitives drawn so far (see `EmitScoreLabelsArgs.scan`). */
   scan: readonly Primitive[];

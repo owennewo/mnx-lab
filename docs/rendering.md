@@ -60,3 +60,6 @@ rehearsal mark retains its barline inset. Tuning letters stay beside the strings
 When a system opens with a repeat and no visible clef or signature, the repeat
 starts at the staff's left edge and replaces the separate system-start line.
 Packing and placement both omit the empty prefix padding.
+
+At a forward repeat, the shared section/tempo/capo heading anchor is the music
+content start, clearing the complete repeat cluster including its dots.
