@@ -122,7 +122,7 @@ describe('zoom / density', () => {
 
     it('the floor still BITES, so a control has something to report', () => {
       initSmufl();
-      expect(clampDensity(0.01)).toBe(MIN_DENSITY);
+      expect(clampDensity(0)).toBe(MIN_DENSITY);
       expect(clampDensity(99)).toBe(MAX_DENSITY);
       // Exported so the pad shows the engine's real bound instead of restating
       // a number that could drift out of step with it.
@@ -272,29 +272,12 @@ describe('zoom / density', () => {
       expect(MIN_DENSITY).toBeLessThan(0.5);
     });
 
-    it('the floor is where PACKING bottoms out, which is what chose it', () => {
+    it('uses a stable lower bound rather than a score-dependent packing limit', () => {
       initSmufl();
-      // Probed through packSystems rather than planHorizontal, deliberately:
-      // the plan clamps, so it cannot be asked what a lower value would do,
-      // and "a lower value does nothing more" is exactly the claim.
-      const packing = planHorizontal(twelveBars(), 80).packing;
-      const bars = (densityH: number) => packSystems(packing, densityH).map(r => r.measures.length);
-      // Nothing left to gain below the floor: the line already holds every bar
-      // its rigid notehead columns will fit.
-      expect(bars(MIN_DENSITY)).toEqual(bars(MIN_DENSITY / 4));
-      // And the floor's region really is where the last bar arrives — one
-      // further onto the first system than 0.15 manages. (0.1 until the
-      // onset-aligned column merge raised the multi-voice rigid floor and
-      // pulled this score's bottom-out up to ~0.1 — see the sibling test.)
-      expect(bars(MIN_DENSITY)[0]).toBeGreaterThan(bars(0.15)[0]);
-      // Below the floor NOTHING changes any more on this score — since the
-      // onset-aligned column merge, an extreme squeeze pins the multi-voice
-      // bars at their merged rigid floor and the raggedness that used to
-      // wiggle under it is gone too. The floor now hides literally nothing,
-      // which is the strongest form of the claim that chose it.
-      expect(engraving(twelveBars(), MIN_DENSITY, 80)).toBe(
-        engraving(twelveBars(), MIN_DENSITY + 0.01, 80)
+      expect(engraving(twelveBars(), MIN_DENSITY / 4, 80)).toBe(
+        engraving(twelveBars(), MIN_DENSITY, 80)
       );
+      expect(clampDensity(MIN_DENSITY)).toBe(MIN_DENSITY);
     });
   });
 
@@ -332,7 +315,7 @@ describe('zoom / density', () => {
       // The floors are untouched — this raised a ceiling, it did not re-centre
       // the control.
       expect(MIN_STAFF_SCALE).toBe(0.6);
-      expect(MIN_DENSITY).toBe(0.02);
+      expect(MIN_DENSITY).toBe(0.01);
       expect(clampStaffScale(99)).toBe(MAX_STAFF_SCALE);
       expect(clampDensity(99)).toBe(MAX_DENSITY);
     });
@@ -714,6 +697,15 @@ describe('the fit answers about the score, not about the density knob', () => {
 
 
 describe('natural spacing', () => {
+  it('accepts 1% and draws less space than 2% without changing symbol widths', () => {
+    const mnx = doc('lab/document/twelve-bar-blues');
+    const plan = (densityH: number) => planHorizontal(mnx, 120, { spacingMode: 'natural', densityH });
+    const minimum = plan(0.01);
+    const previous = plan(0.02);
+    expect(clampDensity(0.01)).toBe(0.01);
+    expect(minimum.measures[0].width).toBeLessThan(previous.measures[0].width);
+    expect(minimum.packing.measures.map(m => m.rigid)).toEqual(previous.packing.measures.map(m => m.rigid));
+  });
   it('keeps springs unstretched, including at non-square staff scales', () => {
     const mnx = doc('lab/document/twelve-bar-blues');
     for (const inkRatio of [0.6, 1, 1.5]) {

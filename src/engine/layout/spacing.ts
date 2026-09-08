@@ -140,20 +140,11 @@ export function tupletDuration(t: MnxTuplet): number {
  * of those is a whole page-turn's worth of music, so the old floor was
  * bounding the *control*, not legibility.
  *
- * 0.02 is where PACKING bottoms out, and that is the number this constant is
- * chosen against: springs shrink, rigid columns do not, so a line ends up
- * holding every bar its notehead columns will fit and no lower value adds
- * another. On `twelve-bar-blues` at 80sp that limit is nine bars on the first
- * system, reached at 0.02 and unchanged at a quarter of it — asserted in
- * `zoom-density.test.ts`.
- *
- * Below that the knob is not inert — and this is the honest reason a floor is
- * still needed rather than none at all. What keeps changing is *raggedness*:
- * once a row's springs are this short they can no longer stretch to the right
- * margin within `MAX_STRETCH`, so tightening further just draws the same bars
- * narrower and leaves more white at the end of the system. The density ladder
- * duly reports those values as distinct, because they are — they simply are
- * not worth offering.
+ * The floor is now 0.01 for direct Natural-spacing control. It is a stable
+ * control bound, not a claim that every score has reached its packing limit.
+ * Actual capacity depends on the score, symbol size, and available width.
+ * Natural spacing can continue to shrink visible gaps even when line breaks
+ * remain unchanged; Fill width can absorb that change in justification.
  *
  * The other cost at the bottom is *proportional* notation: springs carry
  * duration, so squeezing them squeezes the difference between a quarter's
@@ -177,7 +168,7 @@ export function tupletDuration(t: MnxTuplet): number {
  * workbench's own line width: the old ceiling of 2 left three bars on a
  * system, and 4 is where it reaches one.
  */
-export const MIN_DENSITY = 0.02;
+export const MIN_DENSITY = 0.01;
 export const MAX_DENSITY = 8;
 
 export function clampDensity(value: number | undefined): number {

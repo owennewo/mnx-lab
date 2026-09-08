@@ -340,6 +340,18 @@ export class ZoomPad extends LitElement {
          covers — the staff lines run up to its edge and read as passing UNDER
          the numbers. One step of ground under the readout is what stops the
          digits reading as ink lying on the music. */
+      .space-input {
+        width: 3.5ch;
+        padding: 0;
+        border: 0;
+        border-bottom: 1px dotted currentColor;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        text-align: right;
+      }
+      .space-input:focus-visible { outline: 1px solid var(--focus-ring); }
+
       .readout {
         box-sizing: border-box;
         width: 72px;
@@ -647,6 +659,7 @@ export class ZoomPad extends LitElement {
    * density has nothing left to move (2026-08-21).
    */
   private ladder(): number[] | null {
+    if (this.spacingMode === 'natural') return null;
     const steps = this.densitySteps?.() ?? null;
     return steps && steps.length > 0 ? steps : null;
   }
@@ -671,6 +684,10 @@ export class ZoomPad extends LitElement {
    * near side, so that direction is unchanged.
    */
   private nextSpace(dir: 1 | -1, from: number): number | null {
+    if (this.spacingMode === 'natural') {
+      const next = clampDensity(Math.round((from + dir * SPACE_STEP) * 100) / 100);
+      return next === from ? null : next;
+    }
     const ladder = this.ladder();
     if (!ladder) {
       const next = clampDensity(snap(from + dir * SPACE_STEP, SPACE_STEP));
@@ -725,6 +742,18 @@ export class ZoomPad extends LitElement {
       })
     );
   }
+
+  private onSpaceInput = (event: Event) => {
+    const input = event.currentTarget as HTMLInputElement;
+    const raw = input.value.trim().replace(/%$/, '').trim();
+    const percent = Number(raw);
+    if (raw !== '' && Number.isFinite(percent)) {
+      const value = clampDensity(Math.round(percent) / 100);
+      this.clamped = null;
+      this.commit({ staffScale: this.staffScale, densityH: value });
+    }
+    input.value = String(Math.round(this.shownSpace * 100));
+  };
 
   private reset() {
     this.clamped = null;
@@ -1008,7 +1037,7 @@ export class ZoomPad extends LitElement {
    */
   private renderHalf(axis: ZoomAxis) {
     const clamp = this.clamped?.axis === axis ? this.clamped : null;
-    if (clamp) {
+    if (clamp && !(axis === 'space' && this.spacingMode === 'natural')) {
       const value = axis === 'staff' ? this.shownStaff : this.shownSpace;
       // MIN/MAX means the ENGINE's wall. The spacing arms can also run out
       // BEFORE it — past the last rung nothing tighter or wider draws anything
@@ -1039,7 +1068,28 @@ export class ZoomPad extends LitElement {
     return html`
       <div class="half" title=${this.spaceTitle()}>
         <div class="lbl">SPACE</div>
-        <div class="val ${this.densityH === null ? '' : 'hot'}">${this.pct(this.shownSpace)}</div>
+        <div class="val ${this.densityH === null ? '' : 'hot'}">${this.spacingMode === 'natural'
+          ? html`<input class="space-input" type="text" inputmode="decimal"
+              aria-label="Natural spacing percentage"
+              title="Enter spacing from 1% to 800%. Arrows adjust by 4 percentage points."
+              .value=${String(Math.round(this.shownSpace * 100))}
+              @pointerdown=${(event: PointerEvent) => event.stopPropagation()}
+              @click=${(event: MouseEvent) => event.stopPropagation()}
+              @change=${this.onSpaceInput}
+              @keydown=${(event: KeyboardEvent) => {
+                event.stopPropagation();
+                const input = event.currentTarget as HTMLInputElement;
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  this.onSpaceInput(event);
+                  input.blur();
+                } else if (event.key === 'Escape') {
+                  event.preventDefault();
+                  input.value = String(Math.round(this.shownSpace * 100));
+                  input.blur();
+                }
+              }} />%`
+          : this.pct(this.shownSpace)}</div>
       </div>
     `;
   }
@@ -1064,7 +1114,9 @@ export class ZoomPad extends LitElement {
         <div
           class="pad ${expanded ? 'expanded' : ''}"
           @pointerenter=${() => (this.open = true)}
-          @pointerleave=${() => (this.open = false)}
+          @pointerleave=${() => {
+            if (!this.shadowRoot?.activeElement?.matches('.space-input')) this.open = false;
+          }}
           @focusin=${() => (this.open = true)}
           @focusout=${() => (this.open = false)}
           @pointerdown=${this.onPadDown}

@@ -335,3 +335,9 @@ System packing uses the selected staff size's symbol widths in both spacing
 modes. Staff size and spacing remain independent preferences, but either can
 change line breaks: larger symbols need more room. The spacing ladder and
 navigation use the same ink-priced packing snapshot as the drawing.
+
+In Natural mode, spacing arrows use fixed four-percentage-point steps, clamped
+at 1% and 800%. The underlined spacing readout accepts a percentage directly;
+Enter or leaving the field applies it, Escape cancels, and invalid text restores
+the previous value. Values round to whole percentages. Natural ignores the
+content-dependent spacing ladder; Fill width retains that stepping behavior.
