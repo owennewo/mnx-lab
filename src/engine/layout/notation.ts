@@ -157,14 +157,17 @@ const INTER_STAFF_GAP_SP = 6; // between staves of a multi-staff part (grand sta
 // twice — once with the provisional constant to find out where the ink goes,
 // once with each gap set to `ink below + ink above + SEPARATION_CLEAR_SP`,
 // floored at `MIN_STAFF_GAP_SP` so two bare staves still stand apart.
-// Separation, not cohesion: a tab staff does NOT belong to the notation staff
-// above it, which is why this constant is three times the text one.
+// A paired notation/tab staff uses a slightly smaller clearance and floor;
+// independent staves retain the full separation.
 // SEPARATION_CLEAR_SP lives in verticalDensity.ts: it is ONE relationship —
 // "these two things do not belong to each other" — and since stage D it sets
 // the distance between two systems as well as between two staves, so it
 // cannot live in the module that only knows about the latter.
 /** Floor on the line-to-line gap between display staves, ink or no ink. */
 export const MIN_STAFF_GAP_SP = 4;
+/** Paired notation/tab views: half a space less air, still measured ink to ink. */
+export const NOTATION_TAB_CLEAR_SP = 2.5;
+export const MIN_NOTATION_TAB_GAP_SP = 3.5;
 export { SEPARATION_CLEAR_SP };
 /** Primitives that span staves by construction (barlines, braces) or ARE the
  *  staff (its lines) — not content, and never measured as ink in a gap. */
@@ -1062,11 +1065,12 @@ function measureDisplayGaps(seg: SegmentResult, padK: number): (number | null)[]
 
   // The pad axis scales the clearances, not the pads (the doc's ruling 2);
   // floored so a pad of 0 still leaves a visible gap, never overlap.
-  const sep = Math.max(1, SEPARATION_CLEAR_SP * padK);
-  const minGap = Math.max(1, MIN_STAFF_GAP_SP * padK);
   return displays.map((bands, r) =>
     bands.map((band, d) => {
       if (!measured(d)) return null;
+      const pairedTab = tabDisplayIndexes.has(d);
+      const sep = Math.max(1, (pairedTab ? NOTATION_TAB_CLEAR_SP : SEPARATION_CLEAR_SP) * padK);
+      const minGap = Math.max(1, (pairedTab ? MIN_NOTATION_TAB_GAP_SP : MIN_STAFF_GAP_SP) * padK);
       const upper = bands[d - 1];
       const upperInk = computeBoundsSp(buckets[r][d - 1]);
       const lowerInk = computeBoundsSp(buckets[r][d]);

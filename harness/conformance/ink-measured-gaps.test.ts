@@ -17,6 +17,8 @@ import { describe, it, expect } from 'vitest';
 import {
   layoutNotation,
   MIN_STAFF_GAP_SP,
+  MIN_NOTATION_TAB_GAP_SP,
+  NOTATION_TAB_CLEAR_SP,
   SEPARATION_CLEAR_SP
 } from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
@@ -258,7 +260,7 @@ describe('ink-measured gaps — stage A, the score-text row', () => {
 
 // Stage B — the display staves of the `both` view. The gap above a tab staff,
 // and above the notation staff that follows one, is no longer a line-to-line
-// constant: it is the ink either side plus SEPARATION_CLEAR_SP, floored. The
+// constant: it is the ink either side plus the applicable clearance, floored. The
 // ink is re-derived here from the primitives — the same bucketing by anchor,
 // the same structural exclusions — so the assembler's measurement and this
 // test can only agree by both being right.
@@ -276,7 +278,7 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
   const SHARED_CLASSES = new Set(['time-sig', 'time-sig-num', 'time-sig-den', 'repeat-dot', 'diagnostic-marker']);
   const withBoth = corpus.filter(s => fs.existsSync(path.join(s.dir, 'expected.both.svg')));
 
-  interface Pair { lineGap: number; inkGap: number; expected: number; measured: boolean }
+  interface Pair { lineGap: number; inkGap: number; expected: number; measured: boolean; clearance: number }
 
   /**
    * Every adjacent display pair of every row of the REAL layout, with the
@@ -324,13 +326,16 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
         const inkBelow = Math.max(0, (up ? up.y + up.h : upper.staffBottom) - upper.staffBottom);
         const inkAbove = Math.max(0, lower.staffTop - (lo ? lo.y : lower.staffTop));
         const heldH = computeBoundsSp(held[r][d])?.h ?? 0;
-        const forHeld = heldH > 0 ? 2 * Math.max(inkBelow, inkAbove) + 2 * SEPARATION_CLEAR_SP + heldH : 0;
+        const clearance = isTab(lower) ? NOTATION_TAB_CLEAR_SP : SEPARATION_CLEAR_SP;
+        const minimum = isTab(lower) ? MIN_NOTATION_TAB_GAP_SP : MIN_STAFF_GAP_SP;
+        const forHeld = heldH > 0 ? 2 * Math.max(inkBelow, inkAbove) + 2 * clearance + heldH : 0;
         const realBands = real.displays![r];
         const lineGap = realBands[d].staffTop - realBands[d - 1].staffBottom;
         out.push({
           lineGap,
           inkGap: lineGap - inkBelow - inkAbove,
-          expected: Math.max(inkBelow + inkAbove + SEPARATION_CLEAR_SP, forHeld, MIN_STAFF_GAP_SP),
+          expected: Math.max(inkBelow + inkAbove + clearance, forHeld, minimum),
+          clearance,
           measured: isTab(upper) || isTab(lower)
         });
       }
@@ -369,7 +374,7 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
         measured++;
         expect(pair.lineGap).toBeCloseTo(pair.expected, 6);
         // Separation really holds — and is met exactly unless the floor won.
-        expect(pair.inkGap).toBeGreaterThanOrEqual(SEPARATION_CLEAR_SP - 1e-6);
+        expect(pair.inkGap).toBeGreaterThanOrEqual(pair.clearance - 1e-6);
         if (pair.lineGap < 6 - 1e-6) narrowed++;
         if (pair.lineGap > 6 + 1e-6) widened++;
       }
@@ -398,7 +403,7 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
       for (const pair of pairsOf(pair2.real, pair2.probe)) {
         pairs++;
         expect(pair.lineGap).toBeCloseTo(pair.expected, 6);
-        expect(pair.inkGap).toBeGreaterThanOrEqual(SEPARATION_CLEAR_SP - 1e-6);
+        expect(pair.inkGap).toBeGreaterThanOrEqual(pair.clearance - 1e-6);
       }
     }
     expect(scenarios).toBeGreaterThan(0);

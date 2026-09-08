@@ -81,6 +81,48 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Tighter paired notation/tab spacing (2026-09-08)
+
+Owner: user-requested spacing trial, branch `core-tighter-tab-gap`; no roadmap doc.
+The [rendering contract](../../docs/rendering.md) now gives paired notation/tab
+staves a 3.5sp minimum line gap and 2.5sp ink clearance, both reduced by 0.5sp.
+The existing whole-system ink measurement still expands for notes, downward
+stems, lyrics, capo advice and other markings. Independent-staff and inter-system
+clearances retain their existing values.
+
+Only `expected.both.svg` changes for these 26 scenarios; standalone notation/tab
+SVGs and primitive snapshots are byte-identical. Review the slightly closer pair,
+especially low-note/down-stem clearance, lyrics, capo advice and technique marks.
+No human approval is asserted or verification provenance edited.
+
+- `lab/00-document/02-empty-tab-canvas`
+- `lab/20-tab-part/01-standard-tuning-both`
+- `lab/21-tab-positions/01-open-strings-chord`
+- `lab/22-tab-derivation/01-bare-melody`
+- `lab/22-tab-derivation/02-bare-chord`
+- `lab/22-tab-derivation/03-string-only`
+- `lab/22-tab-derivation/04-partial-annotation`
+- `lab/22-tab-derivation/05-drop-d`
+- `lab/22-tab-derivation/06-capo`
+- `lab/22-tab-derivation/07-transposition-display-only`
+- `lab/22-tab-derivation/08-out-of-range`
+- `lab/22-tab-derivation/09-fret-mismatch`
+- `lab/23-tab-fingering/01-left-hand-fingers`
+- `lab/23-tab-fingering/02-right-hand-pima`
+- `lab/25-tab-techniques/01-bend-and-release`
+- `lab/25-tab-techniques/02-slides`
+- `lab/25-tab-techniques/03-hammer-pull-chain`
+- `lab/25-tab-techniques/04-vibrato-and-palm-mute`
+- `lab/25-tab-techniques/05-natural-harmonics`
+- `lab/25-tab-techniques/06-bend-shapes`
+- `lab/26-tab-rhythm/01-triplets-on-tab`
+- `lab/26-tab-rhythm/02-grace-on-tab`
+- `lab/26-tab-rhythm/03-unplayable-inside-a-tuplet`
+- `lab/31-score-text/10-labels-on-a-tab-staff`
+- `lab/40-navigation/02-repeats-and-marks-on-tab`
+- `lab/50-lyrics/02-tab-verses`
+
+
 ### Beaming events without IDs (2026-09-08)
 
 Owner: user-reported GPX engraving bug, branch `core-idless-beaming`; no roadmap doc.
