@@ -1,6 +1,6 @@
 # Score display settings
 
-> **Status: proposed (2026-09-08).** Implementation loop: presentation controls
+> **Status: in progress (2026-09-08).** Implementation loop: presentation controls
 > over the existing MNX model, shared by the engine and viewer and exposed in
 > the workbench's settings pad. No spec changes.
 
@@ -161,3 +161,23 @@ This work does not implement repeat counters, verse-to-repeat mapping,
 notation editing, staff-line visibility, new instrument assumptions, a new
 settings framework or a backend. It uses the existing score data and host
 preference architecture.
+
+## Implementation log
+
+- 2026-09-08: isolated worktree `core-display-settings`. Pure option normalization,
+  document-global current verse resolution, lyric filtering before width/row
+  allocation, clef/time-signature suppression in the shared spacing plan, and
+  engraved-title suppression implemented. Focused engine tests pass (18 including
+  the existing viewer-surface suite); regeneration passes 116 golden cases with
+  no scenario diff.
+- Default audit: existing bar labels render **only declared global measure
+  numbers**, which does not match any proposed menu choice. Existing default
+  staff layouts emit **no part names**; explicit score layouts instead honor
+  their labels and labelrefs on each system. Omitted engine label options must
+  retain these historical paths. The host's explicit menu defaults must be
+  documented separately; do not quietly rewrite default goldens.
+- Remaining: bar-number/instrument-name modes (including multipart Tab and
+  score-block boundaries), viewer scalar bindings and invalidation, settings
+  rows/accessibility, validated host persistence and compare propagation,
+  public documentation/exports, expanded acceptance tests and browser checks,
+  full landing gates, landing and worktree retirement.

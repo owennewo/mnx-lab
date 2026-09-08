@@ -6,6 +6,7 @@
 // nothing: its lyrics anchor to the notation staff, which already draws
 // them between the staves.)
 import type { MnxStructure } from '../../model/mnx.ts';
+import type { DisplayOptions } from '../displayOptions.ts';
 import type { Primitive } from '../primitives.ts';
 
 export const LYRIC_FIRST_BASELINE_DROP_SP = 4.5; // first verse baseline below bottom line
@@ -92,4 +93,30 @@ export function emitLyricRuns(runs: Iterable<LyricSyllable[]>, primitives: Primi
       }
     });
   }
+}
+
+/** Traverse event containers without changing the document or its verse IDs. */
+export function documentLyricLineIds(mnx: MnxStructure): string[] {
+  const used = new Set<string>();
+  const visit = (item: unknown): void => {
+    if (!item || typeof item !== 'object') return;
+    const record = item as { content?: unknown[]; lyrics?: { lines?: Record<string, { text?: string }> } };
+    for (const [id, line] of Object.entries(record.lyrics?.lines ?? {})) {
+      if (line.text?.trim()) used.add(id);
+    }
+    for (const child of record.content ?? []) visit(child);
+  };
+  for (const part of mnx.parts ?? []) for (const measure of part.measures ?? []) {
+    for (const sequence of measure.sequences ?? []) visit(sequence);
+  }
+  return orderedLyricLineIds(mnx, used);
+}
+
+/** undefined means preserve all historical rows; [] means allocate none. */
+export function selectedLyricLineIds(mnx: MnxStructure, display: DisplayOptions): string[] | undefined {
+  if (display.lyrics === 'hide') return [];
+  if (display.lyrics !== 'current') return undefined;
+  const used = documentLyricLineIds(mnx);
+  const selected = display.selectedVerse ?? used[0];
+  return selected && used.includes(selected) ? [selected] : [];
 }

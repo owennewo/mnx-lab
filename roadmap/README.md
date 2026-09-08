@@ -44,7 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-display-settings.md](proposed/core-display-settings.md)** — score display controls: lyrics, time signatures, clefs, title, bar numbers and instrument names; shared layout options, viewer bindings and persisted settings, using system terminology. Current verse initially selects the first ordered verse; repeat tracking is deferred.
 - **[core-campaign-player.md](proposed/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
   pass, the performed order as a golden — with studio practice as indexed follow-ups.
@@ -223,6 +222,7 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-display-settings.md](inprogress/core-display-settings.md)** — score display controls: lyrics, time signatures, clefs, title, bar numbers and instrument names; shared layout options, viewer bindings and persisted settings, using system terminology. Current verse initially selects the first ordered verse; repeat tracking is deferred.
 - **[core-musicxml-staves.md](inprogress/core-musicxml-staves.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 12, **built 2026-09-04**:
   multi-staff parts — `<staves>`, a `<clef number>` per staff tracked independently, and

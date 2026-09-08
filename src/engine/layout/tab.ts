@@ -1,3 +1,5 @@
+import { selectedLyricLineIds } from './lyricRuns.ts';
+import { normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import { Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex } from '../primitives.ts';
 import { clampDensity, planHorizontal, staffOneSequences } from './spacing.ts';
@@ -92,6 +94,7 @@ const BARLINE_METRICS: BarlineMetrics = STANDARD_BARLINE_METRICS;
 // ---------- Public API ----------
 
 export interface LayoutTabOptions {
+  display?: DisplayOptions;
   mnx: MnxStructure;
   /** Total available viewport width in staff spaces. */
   widthSp: number;
@@ -120,6 +123,8 @@ export interface LayoutTabOptions {
 
 export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   const { mnx, widthSp } = opts;
+  const display = normalizeDisplayOptions(opts.display, opts.hide);
+  const selectedLyrics = selectedLyricLineIds(mnx, display);
   const activeNoteIds = opts.activeNoteIds ?? [];
   const selectedNoteIds = opts.selectedNoteIds ?? [];
 
@@ -169,6 +174,8 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   // instead, where the tab staff shares a system with a notation staff that
   // does draw one, and must keep agreeing with its columns.
   const planOptions = {
+    display,
+    lyricLineIds: selectedLyrics,
     densityH: opts.densityH,
     densityPad: opts.densityPad,
     inkRatio: opts.inkRatio,
@@ -205,7 +212,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   // syllable widths into these columns, so nothing moves horizontally. Drawn
   // even with no fingerboard: words are not frets.
   const lyricLineIds = (() => {
-    if ((opts.hide ?? []).includes('lyrics')) return [] as string[];
+    if (selectedLyrics) return selectedLyrics;
     const used = new Set<string>();
     for (const pm of part.measures) {
       for (const seq of staffOneSequences(pm.sequences)) {
@@ -277,7 +284,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     }
 
     // Tab clef (the notation clef's slot in the shared plan keeps both views aligned)
-    if (m.firstInSystem) {
+    if (m.firstInSystem && display.clefs !== 'hide') {
       emitTabClef(m.clefX, staffTop, primitives);
     }
 

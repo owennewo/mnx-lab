@@ -1,3 +1,5 @@
+import { normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
+import { selectedLyricLineIds } from './lyricRuns.ts';
 import {
   MnxStructure,
   MnxNote,
@@ -477,7 +479,8 @@ export function densityLadder(packings: readonly PackingInput[]): number[] {
  * `PackedRow.measures` indexes `PackingInput.measures`, which skips hidden and
  * out-of-range bars, so the ordinals it carries are not measure numbers. The
  * selection ladder's measure rung navigates systems (roadmap/inprogress/
- * core-selection-ladder.md), and `src/edit` may import only `src/model` — so
+ * core-selection-ladder.md), and `src/edit` may import { normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
+import only `src/model` — so
  * "the score, wrapped into lines" has to reach the editor as data, from the
  * layer that decided the wrap. Reads `packSystems` rather than restating it,
  * for the reason the density ladder does: two copies of the packing arithmetic
@@ -754,11 +757,12 @@ export function resolveStaffVoices(spec: PlanStaff, measureIndex: number): Resol
 }
 
 /** Column width a syllable needs (the widest of the event's lyric lines). */
-function lyricCoreSp(event: { lyrics?: { lines?: Record<string, { text: string }> } }): number {
+function lyricCoreSp(event: { lyrics?: { lines?: Record<string, { text: string }> } }, selected?: readonly string[]): number {
   const lines = event.lyrics?.lines;
   if (!lines) return 0;
   let w = 0;
-  for (const line of Object.values(lines)) {
+  for (const [id, line] of Object.entries(lines)) {
+    if (selected && !selected.includes(id)) continue;
     w = Math.max(w, line.text.length * LYRIC_CHAR_WIDTH_SP + 2 * LYRIC_SIDE_PAD_SP);
   }
   return w;
@@ -792,6 +796,8 @@ function tryChordMerge(seqs: MnxSequence[]): MnxSequence | null {
 }
 
 export interface PlanOptions {
+  display?: DisplayOptions;
+  lyricLineIds?: readonly string[];
   /** Parts to lay out, stacked top-to-bottom (default: the first part). */
   parts?: MnxPart[];
   /** Explicit staff specs (from a layout) — overrides `parts` expansion. */
@@ -1150,6 +1156,8 @@ export function planHorizontal(
   widthSp: number,
   options?: PlanOptions
 ): HorizontalPlan {
+  const display = normalizeDisplayOptions(options?.display);
+  const lyricLineIds = options?.lyricLineIds ?? selectedLyricLineIds(mnx, display);
   const parts = options?.parts ?? (mnx.parts?.[0] ? [mnx.parts[0]] : []);
 
   // Flattened staves: explicit layout staff specs, or each part contributing
@@ -1366,7 +1374,7 @@ export function planHorizontal(
         staves.push([]);
         continue;
       }
-      const midClefs = clefTimelines[s].slice(1);
+      const midClefs = display.clefs === 'hide' ? [] : clefTimelines[s].slice(1);
       staves.push(
         resolveStaffVoices(planStaves[s], i).map(({ seq }, seqIndex) => {
           let onset = 0; // metric position within the bar, in whole-note fractions
@@ -1459,7 +1467,7 @@ export function planHorizontal(
               // the anchor instead: half into leading, half into core — the
               // same total rigid width, redistributed, so bar widths and
               // wrapping cannot move; only the wide event's own anchor does.
-              const lyricW = lyricCoreSp(event);
+              const lyricW = lyricCoreSp(event, lyricLineIds);
               return withColumnExtras({
                 leading: (accidentals
                   ? accidentals * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP
@@ -1535,8 +1543,8 @@ export function planHorizontal(
   // The prefix's PADS are air; its glyph SLOTS are ink and scale with the ink
   // ratio (`ink` = 1 for the packing input — packing stays square).
   const prefixWidth = (m: MeasureMetrics, firstInSystem: boolean, ink = 1) => {
-    const showClef = firstInSystem || m.clefChanged;
-    const showTimeSig = m.timeSigShow;
+    const showClef = display.clefs !== 'hide' && (firstInSystem || m.clefChanged);
+    const showTimeSig = display.timeSignatures !== 'hide' && m.timeSigShow;
     const keySigCount = keySigGlyphs(m, firstInSystem);
     return (
       contentLeftPad +
@@ -1670,8 +1678,8 @@ export function planHorizontal(
     for (const i of rowIndices) {
       const m = metrics[i];
       const firstInSystem = i === rowIndices[0];
-      const showClef = firstInSystem || m.clefChanged;
-      const showTimeSig = m.timeSigShow;
+      const showClef = display.clefs !== 'hide' && (firstInSystem || m.clefChanged);
+      const showTimeSig = display.timeSignatures !== 'hide' && m.timeSigShow;
       const keySigCount = keySigGlyphs(m, firstInSystem);
 
       const clefX = x + contentLeftPad + (firstInSystem ? startBarlinePad : 0);

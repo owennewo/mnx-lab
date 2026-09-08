@@ -1,3 +1,5 @@
+import { selectedLyricLineIds } from './lyricRuns.ts';
+import { normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
 import { emitMeasureFermata, fermataBelow, fermataGlyph } from './fermata.ts';
@@ -514,6 +516,7 @@ function unionLedgerLines(staffYs: number[]): Set<number> {
 // ---------- Public API ----------
 
 export interface LayoutNotationOptions {
+  display?: DisplayOptions;
   mnx: MnxStructure;
   widthSp: number;
   activeNoteIds?: readonly string[];
@@ -830,6 +833,8 @@ function buildScoreJobs(mnx: MnxStructure): ScoreJob[] {
 
 export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   const { mnx, widthSp } = opts;
+  const display = normalizeDisplayOptions(opts.display, opts.hide);
+  const selectedLyrics = selectedLyricLineIds(mnx, display);
   const activeNoteIds = opts.activeNoteIds ?? [];
   const selectedNoteIds = opts.selectedNoteIds ?? [];
   const selectedEventIds = opts.selectedEventIds ?? [];
@@ -875,7 +880,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         diagnostics,
         includeTabStaves: opts.includeTabStaves === true && (mnx.scores ?? []).length === 0,
         tabSetup: opts.tabSetup,
-        hide: opts.hide ?? [],
+        display,
+        selectedLyrics,
         densityH: opts.densityH,
         densityPad: opts.densityPad,
         inkRatio: opts.inkRatio,
@@ -886,7 +892,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     const jobNatural = rs.some(r => r.naturalWidthSp !== undefined)
       ? Math.max(...rs.map(r => r.naturalWidthSp ?? r.usedWidthSp))
       : undefined;
-    if (job.title !== null) {
+    if (job.title !== null && display.title !== 'hide') {
       cursorY += TITLE_SIZE_SP + 1;
       primitives.push({
         kind: 'text',
@@ -926,9 +932,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     primitives, rows, heightSp: cursorY, padDensity: clampPadDensity(opts.densityPad),
     // Verse blocks hang deep below their staff; without the reservation the
     // midpoint attribution files them with the system below (lyricRuns.ts).
-    reservedBelowSp: (opts.hide ?? []).includes('lyrics')
-      ? 0
-      : lyricBlockSpFor(documentLyricLineCount(mnx))
+    reservedBelowSp: lyricBlockSpFor(selectedLyrics?.length ?? documentLyricLineCount(mnx))
   });
 
   return {
@@ -959,7 +963,8 @@ interface RenderSegmentArgs {
   diagnostics: LayoutDiagnostic[];
   includeTabStaves: boolean;
   tabSetup?: PartTabSetups;
-  hide: readonly HideableFeature[];
+  display: DisplayOptions;
+  selectedLyrics?: string[];
   densityH?: number;
   densityPad?: number;
   inkRatio?: number;
@@ -1084,7 +1089,7 @@ function assembleSegment(
   /** Probe pass: open every gap that will be measured to this width. */
   probeGapSp: number | null
 ): SegmentResult {
-  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, index, diagnostics, includeTabStaves, tabSetup, hide, densityH, densityPad, inkRatio } = args;
+  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, densityH, densityPad, inkRatio } = args;
   const primitives: Primitive[] = [];
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
@@ -1118,6 +1123,8 @@ function assembleSegment(
   // come from the shared plan — layoutTab consumes the same one, which is what
   // keeps notation and tab column-aligned in the "both" view.
   const planOptions = {
+    display,
+    lyricLineIds: selectedLyrics,
     densityH,
     densityPad,
     inkRatio,
@@ -1283,7 +1290,7 @@ function assembleSegment(
   // Hiding lyrics is a LAYOUT concern: an empty id list both skips the draw
   // (each syllable looks its line up in this array) and zeroes the reserved
   // band below, so the system closes up instead of leaving a gap.
-  const lyricLineIds = hide.includes('lyrics') ? [] : collectLyricLineIds(mnx, segment);
+  const lyricLineIds = selectedLyrics ?? collectLyricLineIds(mnx, segment);
   const lyricBlockSp = lyricLineIds.length
     ? LYRIC_FIRST_BASELINE_DROP_SP +
       (lyricLineIds.length - 1) * LYRIC_LINE_SPACING_SP +
@@ -1862,7 +1869,7 @@ function assembleSegment(
       // Setup instructions (capo, non-standard tuning letters) on the FIRST
       // bar only — same emission as the standalone tab view.
       if (i === 0) emitTabSystemHeader(td.ctx, m.x, tabTop, plan.inkRatio, primitives);
-      if (m.firstInSystem) emitTabClef(m.clefX, tabTop, primitives);
+      if (m.firstInSystem && display.clefs !== 'hide') emitTabClef(m.clefX, tabTop, primitives);
       if (m.showTimeSig) emitTabTimeSig(m.timeSig, m.timeSigCentreX, tabTop, primitives);
       {
         const tabMark = (td.part.measures?.[i] as { measureRepeat?: MeasureRepeatMark } | undefined)?.measureRepeat;
