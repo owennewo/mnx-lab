@@ -1,3 +1,4 @@
+import type { DisplayOptions } from '../displayOptions.ts';
 // Arpeggio and non-arpeggio marks (core-measure-attributes-gaps.md, item 8).
 // Both are part-measure objects spanning note ids; the event that carries the
 // span's first note draws them, beside its own accidental column. Bravura's
@@ -129,14 +130,18 @@ const MEASURE_NUMBER_INSET_SP = 0.2;
 
 export function emitMeasureNumber(
   gm: MnxGlobalMeasure,
-  m: { x: number },
+  m: { x: number; firstInSystem?: boolean },
   staffTop: number,
-  primitives: Primitive[]
+  primitives: Primitive[],
+  mode?: DisplayOptions['barNumbers'],
+  displayedNumber?: number
 ): void {
-  if (gm.number === undefined) return;
+  if (mode === 'hide' || (mode === 'every-system' && !m.firstInSystem)) return;
+  const number = mode ? displayedNumber ?? gm.number : gm.number;
+  if (number === undefined) return;
   primitives.push({
     kind: 'text',
-    text: `${gm.number}`,
+    text: `${number}`,
     x: m.x + MEASURE_NUMBER_INSET_SP,
     y: staffTop - MEASURE_NUMBER_RISE_SP,
     font: 'body',

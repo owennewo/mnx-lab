@@ -1,3 +1,5 @@
+import { readDisplayPreferences, writeDisplayPreferences } from './displayPreferences.ts';
+import type { DisplayOptions } from '../engine/displayOptions.ts';
 // One workbench document: either a deep-linked corpus scenario or the shell's
 // transient local file. Scenario-only provenance and compare chrome stay out
 // of the local-file presentation.
@@ -410,6 +412,8 @@ export class ScenarioPage extends LitElement {
    *  preset name from setupGrammar. Presentation only — never written back.
    *  Single-part scores edit entry 0 through the toolbar selector; the HUD's
    *  ensemble table edits any entry. */
+  @state() private displayPreferences = readDisplayPreferences();
+
   @state() private partSetups = new Map<number, PartOverride>();
 
   @state() private doc: MnxDocument | null = null;
@@ -2833,6 +2837,12 @@ export class ScenarioPage extends LitElement {
     const shownDoc = (this.lyricEditorOpen && this.lyricPreviewDoc) || this.doc;
     return html`
       <mnx-document-viewer
+        .lyrics=${this.displayPreferences.lyrics}
+        .timeSignatures=${this.displayPreferences.timeSignatures}
+        .clefs=${this.displayPreferences.clefs}
+        .scoreTitle=${this.displayPreferences.title}
+        .barNumbers=${this.displayPreferences.barNumbers}
+        .instrumentNames=${this.displayPreferences.instrumentNames}
         .mnxDoc=${shownDoc}
         .view=${viewMode}
         .zoom=${this.staffScale}
@@ -2941,6 +2951,10 @@ export class ScenarioPage extends LitElement {
                     @zoom-change=${this.onZoomChange}
               >
                 <mnx-settings-pad
+                  .display=${this.displayPreferences}
+                  @display-change=${(event: CustomEvent<DisplayOptions>) => {
+                    this.displayPreferences = writeDisplayPreferences(event.detail);
+                  }}
                   .view=${view}
                   .views=${views}
                   .hrefFor=${(v: ViewMode) => this.viewHref(entry, v)}

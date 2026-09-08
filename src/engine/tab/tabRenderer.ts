@@ -1,3 +1,4 @@
+import type { DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure } from '../../model/mnx.ts';
 import { PartTabSetups } from './guitarPositions.ts';
 import { layoutTab } from '../layout/tab.ts';
@@ -51,6 +52,7 @@ export interface RenderTabOptions {
   densityPad?: number;
   /** Features the host asked to hide — forwarded to the layout, so
    *  `hide="lyrics"` means the same thing in every view. */
+  display?: DisplayOptions;
   hide?: readonly import('../layout/notation.ts').HideableFeature[];
 }
 
@@ -65,6 +67,7 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
     tabSetup: opts.tabSetup,
     densityH: opts.densityH,
     densityPad: opts.densityPad,
+    display: opts.display,
     hide: opts.hide
   };
   const square = layoutTab(layoutArgs);

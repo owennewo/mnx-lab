@@ -1,5 +1,6 @@
+import { instrumentLabelInset, LABEL_PAD_SP } from './spacing.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
-import { normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
+import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import { Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex } from '../primitives.ts';
 import { clampDensity, planHorizontal, staffOneSequences } from './spacing.ts';
@@ -125,6 +126,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   const { mnx, widthSp } = opts;
   const display = normalizeDisplayOptions(opts.display, opts.hide);
   const selectedLyrics = selectedLyricLineIds(mnx, display);
+  const measureNumbers = displayedMeasureNumbers(mnx);
   const activeNoteIds = opts.activeNoteIds ?? [];
   const selectedNoteIds = opts.selectedNoteIds ?? [];
 
@@ -173,7 +175,10 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
   // clef slot for the tab clef. The `both` view goes through layoutNotation
   // instead, where the tab staff shares a system with a notation staff that
   // does draw one, and must keep agreeing with its columns.
+  const showNames = display.instrumentNames === 'every-system' || display.instrumentNames === 'first-system';
   const planOptions = {
+    leftInsetSp: showNames ? instrumentLabelInset([instrumentName(part, true)]) : 0,
+    subsequentLeftInsetSp: display.instrumentNames === undefined ? undefined : display.instrumentNames === 'every-system' ? instrumentLabelInset([instrumentName(part, false)]) : 0,
     display,
     lyricLineIds: selectedLyrics,
     densityH: opts.densityH,
@@ -259,6 +264,12 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     const staffBottom = staffTop + STAFF_HEIGHT_SP;
 
     emitTabStaffLines(m.x, m.width, staffTop, primitives);
+    if (m.firstInSystem && showNames && (display.instrumentNames === 'every-system' || m.row === 0)) {
+      const name = instrumentName(part, m.row === 0);
+      if (name) primitives.push({ kind: 'text', text: name, x: m.x - LABEL_PAD_SP,
+        y: staffTop + STAFF_HEIGHT_SP / 2 + 0.6, font: 'body', size: 1.6,
+        anchor: 'end', className: 'staff-label' });
+    }
 
     // Setup instructions — capo text and (non-standard) tuning letters,
     // above/beside the FIRST bar only.
@@ -414,7 +425,7 @@ export function layoutTab(opts: LayoutTabOptions): LayoutResult {
     });
     emitNavigationMarkers({ gm, m, stdSequences, staffTop, primitives });
     emitMeasureFermata({ gm, m, staffTop, staffHeight: STAFF_HEIGHT_SP, primitives });
-    emitMeasureNumber(gm, m, staffTop, primitives);
+    emitMeasureNumber(gm, m, staffTop, primitives, display.barNumbers, measureNumbers[i]);
     emitScoreLabels({
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), clearAbove: tempoTop, primitives
     });

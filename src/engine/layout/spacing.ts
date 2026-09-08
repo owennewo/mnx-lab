@@ -227,6 +227,8 @@ export interface MeasurePack {
 export interface PackingInput {
   measures: MeasurePack[];
   lineWidthSp: number;
+  /** Available width after the first system (part-name gutter can change). */
+  subsequentLineWidthSp?: number;
   /** Trailing pad after a measure's content. Carried rather than read from the
    *  module constant because `densityPad` scales it, and the packer must use
    *  the same width the placement pass will. Absent ⇒ the unscaled default,
@@ -262,7 +264,7 @@ export interface PackedRow {
  */
 export function packSystems(packing: PackingInput, densityH: number): PackedRow[] {
   const packs = packing.measures;
-  const lineWidth = packing.lineWidthSp;
+  const widthAt = (row: number) => row === 0 ? packing.lineWidthSp : packing.subsequentLineWidthSp ?? packing.lineWidthSp;
   const contentRightPad = packing.contentRightPadSp ?? CONTENT_RIGHT_PAD_SP;
 
   const rows: { measures: number[]; full: boolean }[] = [];
@@ -274,7 +276,7 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
     const natural = (current.length === 0 ? m.prefixFirst : m.prefixRest) + content;
     // Which of the two reasons ended the row is recorded, not just that one
     // did: only the overflow reason means the row is FULL.
-    const overflows = currentWidth + natural > lineWidth;
+    const overflows = currentWidth + natural > widthAt(rows.length);
     if (current.length > 0 && (overflows || m.forcedBreak)) {
       rows.push({ measures: current, full: overflows });
       current = [];
@@ -287,7 +289,7 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
   // The score simply ran out: the last row holds what was left, not what fits.
   if (current.length > 0) rows.push({ measures: current, full: false });
 
-  const wanted = rows.map(({ measures, full }) => {
+  const wanted = rows.map(({ measures, full }, row) => {
     let rowRigid = 0;
     let rowSpring = 0;
     measures.forEach((k, j) => {
@@ -296,7 +298,7 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
         (j === 0 ? m.prefixFirst : m.prefixRest) + m.rigid + contentRightPad + m.repeatExtra;
       rowSpring += m.spring * densityH + m.lead * densityH;
     });
-    return { measures, full, stretch: rowStretch(lineWidth - rowRigid, rowSpring) };
+    return { measures, full, stretch: rowStretch(widthAt(row) - rowRigid, rowSpring) };
   });
   const capped = justifyRows(wanted);
   return wanted.map((r, i) => ({ measures: r.measures, stretch: capped[i], full: r.full }));
@@ -804,6 +806,7 @@ export interface PlanOptions {
   staves?: PlanStaff[];
   /** Extra left room (staff labels / group brackets), inside the margin. */
   leftInsetSp?: number;
+  subsequentLeftInsetSp?: number;
   /** Multimeasure-rest collapses: `count` measures from `startIndex` shown as
    *  one H-bar measure (the tail measures become hidden stubs). */
   collapse?: { startIndex: number; count: number }[];
@@ -1188,6 +1191,7 @@ export function planHorizontal(
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
   const leftInset = options?.leftInsetSp ?? 0;
+  const subsequentLeftInset = options?.subsequentLeftInsetSp ?? leftInset;
   const padK = clampPadDensity(options?.densityPad);
   const marginSp = Math.max(MIN_PAGE_MARGIN_SP, MARGIN_SP * padK);
   // The prefix's PADS are whitespace and scale with the frame axis; the glyph
@@ -1560,6 +1564,7 @@ export function planHorizontal(
   // density-1 naturals to ask what any other value would draw.
   const packing: PackingInput = {
     lineWidthSp: lineWidth,
+    ...(options?.subsequentLeftInsetSp === undefined ? {} : { subsequentLineWidthSp: widthSp - 2 * marginSp - subsequentLeftInset }),
     contentRightPadSp: contentRightPad,
     measures: metrics.flatMap((m, i) =>
       m.hidden || !inRange(i)
@@ -1639,6 +1644,7 @@ export function planHorizontal(
   // each row's justification factor. Both live in packSystems, so the density
   // ladder asks the same question of the same code.
   const packed = packSystems(packing, densityH);
+  const widthAt = (row: number) => row === 0 ? lineWidth : widthSp - 2 * marginSp - subsequentLeftInset;
   const rowIndicesOf = (packedRow: PackedRow) =>
     packedRow.measures.map(k => packing.measures[k].index);
 
@@ -1650,7 +1656,7 @@ export function planHorizontal(
   let stretches = packed.map(r => r.stretch);
   if (inkRatio !== 1) {
     stretches = justifyRows(
-      packed.map(packedRow => {
+      packed.map((packedRow, row) => {
         let rowRigid = 0;
         let rowSpring = 0;
         rowIndicesOf(packedRow).forEach((i, j) => {
@@ -1663,7 +1669,7 @@ export function planHorizontal(
         // Same rule as the square path, through the same helper — this is the
         // path where the cap actually bit, since ink pricing below 100% staff
         // scale shrinks the rigid columns and pushes the needed stretch up.
-        return { full: packedRow.full, stretch: rowStretch(lineWidth - rowRigid, rowSpring) };
+        return { full: packedRow.full, stretch: rowStretch(widthAt(row) - rowRigid, rowSpring) };
       })
     );
   }
@@ -1674,7 +1680,7 @@ export function planHorizontal(
     const rowIndices = rowIndicesOf(packedRow);
     const stretch = stretches[row];
 
-    let x = startX;
+    let x = row === 0 ? startX : marginSp + subsequentLeftInset;
     for (const i of rowIndices) {
       const m = metrics[i];
       const firstInSystem = i === rowIndices[0];
@@ -1891,3 +1897,12 @@ export function measureLevelGaps(
   void partMeasures;
   return [];
 }
+
+/** Shared text gutter sizing for part names; unnamed parts claim no space. */
+export function instrumentLabelInset(names: readonly (string | null)[]): number {
+  const length = Math.max(0, ...names.map(name => name?.length ?? 0));
+  return length ? length * LABEL_CHAR_SP + LABEL_PAD_SP : 0;
+}
+
+export const LABEL_CHAR_SP = 1.0;
+export const LABEL_PAD_SP = 0.6;

@@ -1,3 +1,4 @@
+import type { DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure } from '../../model/mnx.ts';
 import { PartTabSetups } from '../tab/guitarPositions.ts';
 import { layoutBothSystem } from '../layout/bothSystem.ts';
@@ -51,6 +52,7 @@ export interface RenderBothOptions {
    *  declaration for rendering; never written back. */
   tabSetup?: PartTabSetups;
   /** Features the host hid (docs/core-viewer-surface.md). */
+  display?: DisplayOptions;
   hide?: readonly HideableFeature[];
   /** Horizontal density multiplier (core-render-density-zoom.md). */
   densityH?: number;
@@ -68,6 +70,7 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
     selectedNoteIds: opts.selectedNoteIds,
     selectedEventIds: opts.selectedEventIds,
     tabSetup: opts.tabSetup,
+    display: opts.display,
     hide: opts.hide,
     densityH: opts.densityH,
     densityPad: opts.densityPad

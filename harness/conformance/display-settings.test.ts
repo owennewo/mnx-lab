@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { MnxStructure } from '../../src/model/mnx.ts';
-import { normalizeDisplayOptions } from '../../src/engine/displayOptions.ts';
+import { displayedMeasureNumbers, normalizeDisplayOptions } from '../../src/engine/displayOptions.ts';
 import { selectedLyricLineIds } from '../../src/engine/layout/lyricRuns.ts';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
@@ -77,4 +77,42 @@ describe('score display settings', () => {
     const rendered = layoutNotation({ mnx, widthSp: 500, display: { clefs: 'hide', timeSignatures: 'hide' } });
     expect(rendered.primitives.filter(p => p.className?.includes('clef'))).toHaveLength(0);
   });
+});
+
+
+describe('displayed measure and instrument labels', () => {
+  const score = () => {
+    const doc = fixture('lab/50-lyrics/01-verse-labels');
+    doc.parts[0].name = 'Voice';
+    doc.global.measures = Array.from({ length: 12 }, (_, i) => ({ ...doc.global.measures[0], ...(i === 0 ? { number: 0 } : i === 4 ? { number: 20 } : {}) }));
+    doc.parts[0].measures = Array.from({ length: 12 }, () => structuredClone(doc.parts[0].measures[0]));
+    return doc;
+  };
+  const text = (result: ReturnType<typeof layoutNotation>, className: string) => result.primitives.filter(p => p.kind === 'text' && p.className === className);
+  it('continues declared numbering including pickups and resets', () => {
+    expect(displayedMeasureNumbers(score())).toEqual([0, 1, 2, 3, 20, 21, 22, 23, 24, 25, 26, 27]);
+  });
+  for (const [name, layout] of Object.entries({ notation: layoutNotation, tab: layoutTab, both: layoutBothSystem })) {
+    it(`${name}: bar labels and instrument names follow system breaks`, () => {
+      initSmufl();
+      const mnx = score();
+      for (const widthSp of [45, 90]) {
+        const every = layout({ mnx, widthSp, display: { barNumbers: 'every-bar', instrumentNames: 'every-system' } });
+        expect(text(every, 'measure-number')).toHaveLength(12);
+        expect(text(every, 'staff-label')).toHaveLength(every.rows!.length);
+        const first = layout({ mnx, widthSp, display: { barNumbers: 'every-system', instrumentNames: 'first-system' } });
+        expect(text(first, 'measure-number')).toHaveLength(first.rows!.length);
+        expect(text(first, 'staff-label')).toHaveLength(1);
+        const hidden = layout({ mnx, widthSp, display: { barNumbers: 'hide', instrumentNames: 'hide' } });
+        expect(text(hidden, 'measure-number')).toHaveLength(0);
+        expect(text(hidden, 'staff-label')).toHaveLength(0);
+      }
+    });
+    it(`${name}: unnamed parts remain unlabeled`, () => {
+      initSmufl();
+      const mnx = score();
+      delete mnx.parts[0].name;
+      expect(text(layout({ mnx, widthSp: 60, display: { instrumentNames: 'every-system' } }), 'staff-label')).toHaveLength(0);
+    });
+  }
 });

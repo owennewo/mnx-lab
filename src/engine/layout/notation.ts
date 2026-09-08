@@ -1,5 +1,6 @@
+import { instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
-import { normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
+import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
 import { emitMeasureFermata, fermataBelow, fermataGlyph } from './fermata.ts';
@@ -835,6 +836,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   const { mnx, widthSp } = opts;
   const display = normalizeDisplayOptions(opts.display, opts.hide);
   const selectedLyrics = selectedLyricLineIds(mnx, display);
+  const measureNumbers = displayedMeasureNumbers(mnx);
   const activeNoteIds = opts.activeNoteIds ?? [];
   const selectedNoteIds = opts.selectedNoteIds ?? [];
   const selectedEventIds = opts.selectedEventIds ?? [];
@@ -866,7 +868,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   // them.
   const packings: PackingInput[] = [];
   for (const job of jobs) {
-    const rs = job.segments.map(segment =>
+    const rs = job.segments.map((segment, segmentIndex) =>
       renderSegment({
         mnx,
         segment,
@@ -882,6 +884,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         tabSetup: opts.tabSetup,
         display,
         selectedLyrics,
+        measureNumbers,
+        firstScoreSegment: segmentIndex === 0,
         densityH: opts.densityH,
         densityPad: opts.densityPad,
         inkRatio: opts.inkRatio,
@@ -965,6 +969,8 @@ interface RenderSegmentArgs {
   tabSetup?: PartTabSetups;
   display: DisplayOptions;
   selectedLyrics?: string[];
+  measureNumbers: number[];
+  firstScoreSegment: boolean;
   densityH?: number;
   densityPad?: number;
   inkRatio?: number;
@@ -1078,8 +1084,7 @@ function measureDisplayGaps(seg: SegmentResult, padK: number): (number | null)[]
 const DECOR_BASE_SP = 1.2;
 const DECOR_STEP_SP = 1.6;
 const BRACE_STAFF_GAP_SP = 0.4; // gap between the brace's belly and the staff/start barline
-const LABEL_CHAR_SP = 1.0;
-const LABEL_PAD_SP = 0.6;
+
 
 function assembleSegment(
   args: RenderSegmentArgs,
@@ -1089,7 +1094,18 @@ function assembleSegment(
   /** Probe pass: open every gap that will be measured to this width. */
   probeGapSp: number | null
 ): SegmentResult {
-  const { mnx, segment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, densityH, densityPad, inkRatio } = args;
+  const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio } = args;
+  const segment = display.instrumentNames === undefined ? originalSegment : {
+    ...originalSegment,
+    labels: originalSegment.staves.map((staff, s) => {
+      if (display.instrumentNames === 'hide' || (display.instrumentNames === 'first-system' && !firstScoreSegment)) return null;
+      const parts = staff.sources.map(source => source.part).filter((part, index, parts) =>
+        parts.indexOf(part) === index && !originalSegment.staves.slice(0, s).some(previous => previous.sources.some(source => source.part === part)));
+      return parts.map(part => instrumentName(part, firstScoreSegment)).filter(Boolean).join(' / ') || null;
+    }),
+    sourceLabels: originalSegment.sourceLabels.map(() => null),
+    groups: originalSegment.groups.map(group => ({ ...group, label: null }))
+  };
   const primitives: Primitive[] = [];
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
@@ -1118,6 +1134,9 @@ function assembleSegment(
   const staffLabelW = maxStaffSpan ? maxStaffSpan + LABEL_PAD_SP : 0;
   const groupLabelW = groupLabelLen ? groupLabelLen * LABEL_CHAR_SP + LABEL_PAD_SP : 0;
   const leftInsetSp = decorWidthSp + staffLabelW + groupLabelW;
+  const subsequentLeftInsetSp = display.instrumentNames === undefined ? undefined :
+    decorWidthSp + (display.instrumentNames === 'every-system' ? instrumentLabelInset(segment.staves.map((staff, s) =>
+      segment.labels[s] ? staff.sources.map(source => instrumentName(source.part, false)).filter(Boolean).join(' / ') : null)) : 0);
 
   // All horizontal decisions (system packing, bar widths, event x positions)
   // come from the shared plan — layoutTab consumes the same one, which is what
@@ -1130,6 +1149,7 @@ function assembleSegment(
     inkRatio,
     staves: segment.staves,
     leftInsetSp,
+    subsequentLeftInsetSp,
     collapse,
     forcedBreaks: segment.forcedBreaks,
     measureRange: segment.range ?? undefined,
@@ -1447,7 +1467,10 @@ function assembleSegment(
       // its label left of the source-label stack ("Oboes 1/2").
       const labelX = m.x - decorWidthSp - LABEL_PAD_SP;
       segment.labels.forEach((label, s) => {
-        if (!label) return;
+        if (!label || (display.instrumentNames === 'first-system' && m.row !== 0)) return;
+        if (display.instrumentNames === 'every-system' && (m.row > 0 || !firstScoreSegment)) {
+          label = segment.staves[s].sources.map(source => instrumentName(source.part, false)).filter(Boolean).join(' / ');
+        }
         const srcW = srcLabelW(s);
         primitives.push({
           kind: 'text',
@@ -2029,7 +2052,7 @@ function assembleSegment(
       staffHeight: STAFF_HEIGHT_SP,
       primitives
     });
-    emitMeasureNumber(mnx.global.measures[i] ?? {}, m, staffTop, primitives);
+    emitMeasureNumber(mnx.global.measures[i] ?? {}, m, staffTop, primitives, display.barNumbers, measureNumbers[i]);
     // The tempo mark and the label row are emitted after the loop — they are
     // placed one clearance above the bar's ink, and the beams, voltas and
     // ottava brackets that ink includes are drawn after the loop too.

@@ -1,3 +1,4 @@
+import { normalizeDisplayOptions, type DisplayOptions } from '../engine/displayOptions.ts';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { consume } from '@lit/context';
@@ -161,6 +162,22 @@ export class DocumentViewer extends LitElement {
    * layout's job.
    */
   @property({ type: String, reflect: true }) hide = '';
+  @property({ type: String, attribute: 'lyrics', reflect: true }) lyrics: DisplayOptions['lyrics'] = 'all';
+  @property({ type: String, attribute: 'time-signatures', reflect: true }) timeSignatures: DisplayOptions['timeSignatures'] = 'show';
+  @property({ type: String, attribute: 'clefs', reflect: true }) clefs: DisplayOptions['clefs'] = 'show';
+  @property({ type: String, attribute: 'score-title', reflect: true }) scoreTitle: DisplayOptions['title'] = 'show';
+  @property({ type: String, attribute: 'bar-numbers', reflect: true }) barNumbers: DisplayOptions['barNumbers'] = undefined;
+  @property({ type: String, attribute: 'instrument-names', reflect: true }) instrumentNames: DisplayOptions['instrumentNames'] = undefined;
+  @property({ type: String, attribute: 'selected-verse', reflect: true }) selectedVerse: DisplayOptions['selectedVerse'] = undefined;
+
+  private effectiveDisplay(): DisplayOptions {
+    return normalizeDisplayOptions({
+      lyrics: this.lyrics, timeSignatures: this.timeSignatures, clefs: this.clefs,
+      title: this.scoreTitle, barNumbers: this.barNumbers,
+      instrumentNames: this.instrumentNames, selectedVerse: this.selectedVerse
+    }, this.hiddenFeatures());
+  }
+
   /**
    * Horizontal density — `normal` (default), `compact`, `spacious`
    * (roadmap/complete/core-render-density-zoom.md): how much music fits on a
@@ -685,6 +702,13 @@ export class DocumentViewer extends LitElement {
       changed.has('density') ||
       changed.has('densityH') ||
       changed.has('densityPad') ||
+      changed.has('lyrics') ||
+      changed.has('timeSignatures') ||
+      changed.has('clefs') ||
+      changed.has('scoreTitle') ||
+      changed.has('barNumbers') ||
+      changed.has('instrumentNames') ||
+      changed.has('selectedVerse') ||
       changed.has('hide') ||
       changed.has('zoom') ||
       changed.has('stringsOverride') ||
@@ -757,6 +781,7 @@ export class DocumentViewer extends LitElement {
       onNoteClick,
       // Layout-side hides reach the engine so their space is reclaimed —
       // every view honors them (the tab layout draws lyrics too).
+      display: this.effectiveDisplay(),
       hide: this.hiddenFeatures(),
       // The preset resolves to the engine's multiplier here — the element
       // binds a behavior it does not implement (docs/core-viewer-surface.md).
@@ -1214,12 +1239,12 @@ export class DocumentViewer extends LitElement {
 
     const heading = this.documentHeading();
     return html`
-      <div class="paper">
-        <h1 class="document-heading">
+      <div class="paper" role="region" aria-label=${heading.title}>
+        ${this.effectiveDisplay().title === 'hide' ? nothing : html`<h1 class="document-heading">
           ${heading.artist
             ? html`<span class="document-artist">${heading.artist}</span><span class="document-separator">: </span>`
             : nothing}<span class="document-title">${heading.title}</span>
-        </h1>
+        </h1>`}
         ${this.renderErrors.length
           ? html`
               <div class="state-panel">

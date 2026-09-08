@@ -181,3 +181,17 @@ preference architecture.
   rows/accessibility, validated host persistence and compare propagation,
   public documentation/exports, expanded acceptance tests and browser checks,
   full landing gates, landing and worktree retirement.
+
+- 2026-09-08, second implementation pass: viewer scalar attributes/properties,
+  renderer forwarding, seven-row card, validated host persistence and library
+  exports implemented. Bar modes honor declared-number resets; name modes
+  support first/subsequent system gutters and short names. TypeScript passes;
+  14 display tests plus 116 default golden cases pass. Browser checked dark
+  card layout, selected-state announcements, title hiding, current-verse choice,
+  Escape dismissal and preference reload. Restored the test page's defaults.
+  Compare is a static reference beside the SAME live viewer, not a second viewer.
+- Still required before landing: multipart/grand-staff/score-block acceptance,
+  especially standalone Tab (currently still the historical first-part walk),
+  complete name grouping and empty-lyric cases, narrow/light/focus/compare browser
+  checks, immutability/playback/selection evidence, public face checks and the
+  complete landing sequence. No work has landed on main yet.

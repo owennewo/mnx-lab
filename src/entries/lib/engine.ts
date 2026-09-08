@@ -14,3 +14,5 @@ export { renderSvg, fitPxPerSp, type RenderSvgOptions } from '../../engine/rende
 export { computeBoundsSp, type BoundsSp } from '../../engine/render/bounds.ts';
 export { setSmuflData, loadSmufl, isSmuflLoaded } from '../../engine/smufl/smufl.ts';
 export type { Primitive, LayoutResult } from '../../engine/primitives.ts';
+
+export { normalizeDisplayOptions, DISPLAY_CHOICES, type DisplayOptions } from '../../engine/displayOptions.ts';

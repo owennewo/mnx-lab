@@ -274,3 +274,48 @@ the harness can reach it.
 5. **No options bag.** Named knobs with a written vocabulary; a `config`
    object hides the precedence chain and turns every addition into a silent
    contract change.
+
+
+### Score display preferences
+
+All three layout entry points accept `display: DisplayOptions`, exported with
+`normalizeDisplayOptions` from `mnx-lab/engine`. The viewer binds individual
+scalars; attributes reflect property writes and attribute changes update the
+same property, so the most recent write wins. Invalid values normalize to the
+engine default. Explicit `hide="lyrics"` outranks the lyrics choice; badges
+remain independent.
+
+| Property | Attribute | Values | Omitted engine/viewer behavior |
+| --- | --- | --- | --- |
+| `lyrics` | `lyrics` | `all`, `current`, `hide` | All verses |
+| `timeSignatures` | `time-signatures` | `show`, `hide` | Show |
+| `clefs` | `clefs` | `show`, `hide` | Show |
+| `scoreTitle` | `score-title` | `show`, `hide` | Show |
+| `barNumbers` | `bar-numbers` | `every-bar`, `every-system`, `hide` | Only declared measure numbers (legacy) |
+| `instrumentNames` | `instrument-names` | `every-system`, `first-system`, `hide` | Existing score-layout labels (legacy) |
+| `selectedVerse` | `selected-verse` | Lyric-line ID | First used verse in established order |
+
+`scoreTitle` binds engine `display.title`; it avoids overloading HTML's native
+`title` tooltip. Hide removes the document title/artist heading and engraved
+score-block titles. An accessible named document region remains. Section and
+rehearsal labels are independent.
+
+Current verse resolves one ID for the document using `global.lyrics.lineOrder`,
+then sorted unlisted used IDs. A supplied `selectedVerse` takes precedence;
+missing syllables remain absent rather than borrowing a different verse.
+This is a transient integration input, with no automatic repeat advancement.
+Filtering happens before lyric widths and rows are allocated.
+
+A **system** is one horizontal row of music, including notation and tab together
+in Both. Bar labels follow displayed score order, with declared numbers resetting
+the sequence (including pickup number 0). Clef visibility never changes pitch
+mapping; time-signature visibility never changes duration or playback.
+
+The workbench owns localStorage key `mnx-lab:display`, shared across documents.
+Its explicit menu defaults are All verses, Show time signatures/clefs/title,
+Every system bar numbers, and First system instrument names. These label defaults
+intentionally differ from the no-options engine's historical output. Stored
+values are validated, invalid JSON falls back to defaults, and selected-verse
+context is never stored. The element itself never reads workbench storage.
+The compare panel shares the main live viewer beside a static reference image,
+so the live engraving receives the same preferences and retains its projection.

@@ -1,3 +1,4 @@
+import type { DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation, type HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp, CROP_PAD_SP } from '../render/bounds.ts';
@@ -48,6 +49,7 @@ export interface RenderNotationOptions {
   staffScale?: number;
   /** Features the host hid (docs/core-viewer-surface.md) — layout-side ones
    *  reach the layout so the space they reserved is reclaimed. */
+  display?: DisplayOptions;
   hide?: readonly HideableFeature[];
   /** Horizontal density multiplier (core-render-density-zoom.md). */
   densityH?: number;
@@ -64,6 +66,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds,
     selectedEventIds: opts.selectedEventIds,
+    display: opts.display,
     hide: opts.hide,
     densityH: opts.densityH,
     densityPad: opts.densityPad

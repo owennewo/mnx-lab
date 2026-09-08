@@ -1,3 +1,4 @@
+import { DISPLAY_CHOICES, type DisplayOptions } from '../engine/displayOptions.ts';
 import { LitElement, html, css, svg, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, sharedChrome } from '../elements/tokens.ts';
@@ -6,9 +7,9 @@ import type { ViewMode } from '../elements/DocumentViewer.ts';
 /**
  * The document settings pad — third mark in the score-corner cluster, beside
  * the focus toggle and the zoom pad. A 26px gear that opens a small card of
- * document-display settings; today that card holds one row, SHOW —
- * notation | tab | both — which replaced the page-head view tabs, and it is
- * expected to grow more rows over time.
+ * document-display settings. Its SHOW row —
+ * notation | tab | both — replaced the page-head view tabs. Six additional rows
+ * emit display preferences to the host.
  *
  * **This is chrome, not surface** (docs/core-viewer-surface.md): the pad owns
  * no view state. The current view and the views a document can support come in
@@ -46,7 +47,34 @@ export class SettingsPad extends LitElement {
    *  plain links so deep links, middle-click and history all keep working. */
   @property({ attribute: false }) hrefFor: ((view: ViewMode) => string) | null = null;
 
+  @property({ attribute: false }) display: DisplayOptions = {};
   @state() private open = false;
+
+  private clickAway = (event: PointerEvent) => {
+    if (!event.composedPath().includes(this)) this.open = false;
+  };
+
+  connectedCallback() {
+    super.connectedCallback();
+    document.addEventListener('pointerdown', this.clickAway);
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('pointerdown', this.clickAway);
+    super.disconnectedCallback();
+  }
+
+  private displayRow(key: keyof typeof DISPLAY_CHOICES, label: string, labels: readonly string[]) {
+    return html`<div class="setting" role="group" aria-label=${label}>
+      <span class="lbl">${label}</span>
+      <span class="options">${DISPLAY_CHOICES[key].map((value, i) => html`
+        <button type="button" aria-pressed=${this.display[key] === value}
+          @click=${() => this.dispatchEvent(new CustomEvent('display-change', {
+            detail: { ...this.display, [key]: value }, bubbles: true, composed: true
+          }))}>${labels[i]}</button>`)}
+      </span>
+    </div>`;
+  }
 
   static styles = [
     designTokens,
@@ -112,7 +140,9 @@ export class SettingsPad extends LitElement {
 
       .card {
         box-sizing: border-box;
-        min-width: max-content;
+        width: min(460px, calc(100vw - 24px));
+        max-height: min(540px, calc(100dvh - 100px));
+        overflow: auto;
         background: var(--surface);
         border: var(--rule-w) solid var(--ink);
         border-radius: var(--radius-card);
@@ -122,8 +152,11 @@ export class SettingsPad extends LitElement {
 
       .setting {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
-        gap: 10px;
+        justify-content: space-between;
+        gap: 6px 10px;
+        padding: 3px 0;
       }
 
       .setting .lbl {
@@ -141,7 +174,7 @@ export class SettingsPad extends LitElement {
         align-items: stretch;
       }
 
-      .options a {
+      .options a, .options button {
         font: 600 10px/1 var(--sans);
         letter-spacing: 0.11em;
         text-transform: uppercase;
@@ -151,6 +184,15 @@ export class SettingsPad extends LitElement {
         white-space: nowrap;
       }
 
+      .options button {
+        appearance: none;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+      .help { margin: 8px 0 2px; color: var(--ink-2); font: 11px/1.4 var(--sans); }
+      .options { flex-wrap: wrap; }
       .options a:hover {
         text-decoration: none;
       }
@@ -160,12 +202,12 @@ export class SettingsPad extends LitElement {
         background: var(--bg-context);
       }
 
-      .options a[aria-current='true'] {
+      .options a[aria-current='true'], .options button[aria-pressed='true'] {
         color: var(--accent-fg);
         box-shadow: inset 0 -2px 0 var(--accent);
       }
 
-      .options a:focus-visible {
+      .options a:focus-visible, .options button:focus-visible {
         outline: var(--rule-w) solid var(--focus-ring);
         outline-offset: -2px;
       }
@@ -216,11 +258,20 @@ export class SettingsPad extends LitElement {
     return html`
       <div
         @pointerenter=${() => (this.open = true)}
-        @pointerleave=${() => (this.open = false)}
+        @pointerleave=${() => {
+          if (!this.renderRoot.querySelector('.card')?.contains(this.shadowRoot?.activeElement ?? null)) this.open = false;
+        }}
         @focusin=${() => (this.open = true)}
-        @focusout=${() => (this.open = false)}
+        @focusout=${(e: FocusEvent) => {
+          if (!this.renderRoot.contains(e.relatedTarget as Node | null)) this.open = false;
+        }}
         @keydown=${(e: KeyboardEvent) => {
-          if (e.key === 'Escape') this.open = false;
+          if (e.key === 'Escape' && this.open) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.renderRoot.querySelector<HTMLButtonElement>('.gear')?.focus();
+            this.open = false;
+          }
         }}
       >
         <button
@@ -236,7 +287,7 @@ export class SettingsPad extends LitElement {
           ? html`
               <div class="drop">
                 <div class="card">
-                  <div class="setting">
+                  <div class="setting" role="group" aria-label="Show">
                     <span class="lbl">Show</span>
                     <span class="options">
                       ${ALL_VIEWS.map(v =>
@@ -257,6 +308,14 @@ export class SettingsPad extends LitElement {
                       )}
                     </span>
                   </div>
+                  ${this.displayRow('lyrics', 'Lyrics', ['All verses', 'Current verse', 'Hide'])}
+                  ${this.displayRow('timeSignatures', 'Time signatures', ['Show', 'Hide'])}
+                  ${this.displayRow('clefs', 'Clefs', ['Show', 'Hide'])}
+                  ${this.displayRow('title', 'Title', ['Show', 'Hide'])}
+                  ${this.displayRow('barNumbers', 'Bar numbers', ['Every bar', 'Every system', 'Hide'])}
+                  ${this.displayRow('instrumentNames', 'Instrument names', ['Every system', 'First system', 'Hide'])}
+                  <p class="help">Current verse uses the first used verse in the document’s verse order until playback supplies a selected verse.</p>
+                  <p class="help">A system is one horizontal row of music, including notation and tab together in Both.</p>
                 </div>
               </div>
             `
