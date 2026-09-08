@@ -304,8 +304,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       emitTabSystemHeader(positionContext, m.x, staffTop, plan.inkRatio, primitives, measureHeadingX(m));
     }
 
-    // System-start barline
-    if (m.firstInSystem) {
+    // An opening repeat at the left edge supplies the system-start strokes.
+    if (m.firstInSystem && !(m.repeatStart && m.repeatStartX === m.x)) {
       primitives.push({
         kind: 'line',
         x1: m.x, y1: staffTop, x2: m.x, y2: staffBottom,

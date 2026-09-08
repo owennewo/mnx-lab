@@ -1544,6 +1544,14 @@ export function planHorizontal(
     return Math.abs(m.keyFifths !== 0 ? m.keyFifths : m.cancelledKeyFifths);
   };
 
+  // With no visible prefix, an opening repeat is the system's left edge.
+  // Use the same padding decision in packing and final placement.
+  const prefixLeftPad = (m: MeasureMetrics, firstInSystem: boolean) =>
+    firstInSystem && m.hasRepeatStart && display.clefs === 'hide' &&
+      !(display.timeSignatures !== 'hide' && m.timeSigShow) && keySigGlyphs(m, firstInSystem) === 0
+      ? 0
+      : contentLeftPad + (firstInSystem ? startBarlinePad : 0);
+
   // The prefix's PADS are air; its glyph SLOTS are ink and scale with the ink
   // ratio (`ink` = 1 for the packing input — packing stays square).
   const prefixWidth = (m: MeasureMetrics, firstInSystem: boolean, ink = 1) => {
@@ -1551,8 +1559,7 @@ export function planHorizontal(
     const showTimeSig = display.timeSignatures !== 'hide' && m.timeSigShow;
     const keySigCount = keySigGlyphs(m, firstInSystem);
     return (
-      contentLeftPad +
-      (firstInSystem ? startBarlinePad : 0) +
+      prefixLeftPad(m, firstInSystem) +
       (showClef ? clefWidth * ink : 0) +
       (keySigCount ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP * ink + keySigRightPad : 0) +
       (showTimeSig ? TIME_SIG_WIDTH_SP * ink : 0) +
@@ -1688,7 +1695,7 @@ export function planHorizontal(
       const showTimeSig = display.timeSignatures !== 'hide' && m.timeSigShow;
       const keySigCount = keySigGlyphs(m, firstInSystem);
 
-      const clefX = x + contentLeftPad + (firstInSystem ? startBarlinePad : 0);
+      const clefX = x + prefixLeftPad(m, firstInSystem);
       const keySigX = clefX + (showClef ? clefWidth * inkRatio : 0);
       const keySigWidth = keySigCount
         ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP * inkRatio + keySigRightPad

@@ -1419,7 +1419,7 @@ function assembleSegment(
       // A system-start barline binds MULTIPLE staves into a system; a single
       // staff conventionally has an open left end (as the reference engravings
       // do), so only draw it for grand-staff / multi-part / notation+tab systems.
-      if (displayCount > 1) {
+      if (displayCount > 1 && !(m.repeatStart && m.repeatStartX === m.x)) {
         primitives.push({
           kind: 'line',
           x1: m.x, y1: staffTop, x2: m.x, y2: sysBottom,

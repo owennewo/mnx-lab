@@ -89,6 +89,27 @@ describe('score display settings', () => {
     });
   }
 
+  it('lets an opening repeat form the system edge only when its prefix is hidden', () => {
+    initSmufl();
+    const mnx = fixture('lab/40-navigation/02-repeats-and-marks-on-tab');
+    const display = { clefs: 'hide', timeSignatures: 'hide' } as const;
+    const plan = planHorizontal(mnx, 500, { display });
+    const first = plan.measures[0];
+    expect(first.repeatStart).toBe(true);
+    expect(first.repeatStartX).toBe(first.x);
+    expect(first.contentStartX).toBeGreaterThan(first.repeatStartX);
+    for (const visible of [{ clefs: 'show', timeSignatures: 'hide' }, { clefs: 'hide', timeSignatures: 'show' }] as const) {
+      const start = planHorizontal(mnx, 500, { display: visible }).measures[0];
+      expect(start.repeatStartX).toBeGreaterThan(start.x);
+    }
+    for (const layout of [layoutNotation, layoutTab, layoutBothSystem]) {
+      const rendered = layout({ mnx, widthSp: 500, display });
+      expect(rendered.primitives.filter(p => p.className === 'barline barline-start')).toHaveLength(0);
+      expect(rendered.primitives.some(p => p.className === 'barline repeat-start')).toBe(true);
+      expect(rendered.primitives.some(p => p.className === 'repeat-dot')).toBe(true);
+    }
+  });
+
   it('hides changed clefs while preserving the effective pitch timeline', () => {
     initSmufl();
     const mnx = fixture('spec/clef-changes');

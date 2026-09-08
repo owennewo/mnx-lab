@@ -56,3 +56,7 @@ bindings and the workbench's explicit defaults are documented in
 Section headings and capo advice share the measure-start tempo anchor, including
 when no tempo is printed. Section/rehearsal pairs stay together; a standalone
 rehearsal mark retains its barline inset. Tuning letters stay beside the strings.
+
+When a system opens with a repeat and no visible clef or signature, the repeat
+starts at the staff's left edge and replaces the separate system-start line.
+Packing and placement both omit the empty prefix padding.
