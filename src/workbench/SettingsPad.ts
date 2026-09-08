@@ -266,6 +266,10 @@ export class SettingsPad extends LitElement {
           if (!this.renderRoot.contains(e.relatedTarget as Node | null)) this.open = false;
         }}
         @keydown=${(e: KeyboardEvent) => {
+          // Native button/link keys belong to this card. The page listens on
+          // window; letting Space/Enter bubble would edit the score and cancel
+          // the button's default activation before it can change a preference.
+          e.stopPropagation();
           if (e.key === 'Escape' && this.open) {
             e.preventDefault();
             e.stopPropagation();

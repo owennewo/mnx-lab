@@ -186,9 +186,9 @@ and retirement remain. No corpus verification records were edited.
   `hide="lyrics,badges"` is authoritative and badges remain independent.
   The host validates stored preferences and never stores selected-verse
   context. Compare uses the same live viewer beside its reference image.
-- Harness: 29 focused display tests cover all projections, two widths,
+- Harness: 32 focused display tests cover all projections, two widths,
   multiple verses, missing syllables, nonnumeric ordering, unknown IDs,
-  empty lyrics, clef timelines, multi-part/grand-staff layouts, unnamed
+  empty lyrics, cross-system/current-verse hyphens, clef timelines, multi-part/grand-staff layouts, unnamed
   parts, multiple score blocks, collapsed numbering, serialization, audio
   timing, and selection inputs. The full harness passed 1,241 tests before
   the final collapsed-bar and binding additions; landing gates below must
@@ -210,3 +210,9 @@ and retirement remain. No corpus verification records were edited.
   persistence, and exclusion of transient verse context using isolated
   storage. Library and embed builds passed; final public-face and landing
   checks will be recorded after rebase.
+
+- Final keyboard audit found and fixed Space/Enter bubbling from the card
+  to the window-level score editor. The card now owns its key events while
+  retaining native button/link activation. Rechecked Enter opening,
+  Tab/Space selecting Current verse, Escape returning focus to the gear,
+  and “no ops” in the undo ledger after all keyboard interactions.
