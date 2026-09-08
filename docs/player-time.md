@@ -1,7 +1,7 @@
 # Player timing and performance format
 
 Implementation loop, player campaign item 3:
-[Timing and pitch contracts](../roadmap/inprogress/core-player-timing-pitch.md).
+[Timing and pitch contracts](../roadmap/complete/core-player-timing-pitch.md).
 These are lab performance conventions. The compiler (item 5) applies them to a
 document; the transport (item 6) schedules their result. Neither exists yet.
 

@@ -208,11 +208,7 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
-- **[core-player-timing-pitch.md](inprogress/core-player-timing-pitch.md)** — campaign item 3:
-  `audio/time.ts` rational arithmetic and tempo map; the pitch rule as tests over
-  transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata
-  (incl. `duration: none` and cross-part sync) and tie conventions numbered; the performance
-  golden's format fixed before the compiler exists.
+
 
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
@@ -415,6 +411,12 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-player-timing-pitch.md](complete/core-player-timing-pitch.md)** — campaign item 3:
+  `audio/time.ts` rational arithmetic and tempo map; the pitch rule as tests over
+  transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata
+  (incl. `duration: none` and cross-part sync) and tie conventions numbered; the performance
+  golden's format fixed before the compiler exists.
+
 - **[core-player-traversal.md](complete/core-player-traversal.md)** — campaign item 1:
   **extend `model/passes.ts`**, keeping its consumers and suite unchanged — performed
   entries with ordinal, occurrence and iteration; partial-bar bounds for mid-bar
