@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { importGuitarPro } from '../src/import/gp.js';
+import { importGpifOracle } from './helpers/gpifOracle.js';
 import { exportGuitarPro } from '../src/export/gp.js';
 import { importGuitarProGpif, exportGuitarProGpif } from '../src/gpif/index.js';
 import { MnxStructure } from '../src/common/types.js';
@@ -20,7 +20,7 @@ import { normalizeIds } from './helpers/normalize.js';
  *    survive.
  *
  * So instead of mirroring those losses, the contract is: what this writer
- * puts in a `.gp`, BOTH readers — alphaTab's production GPIF parser and the
+ * puts in a `.gp`, BOTH readers (after removing source-proven phantom voices) — alphaTab's production GPIF parser and the
  * clean-room one — get back out exactly as the committed fixture says, for
  * every `.mnx.json` in the corpus. `collapseTabUnisons: false` keeps the
  * one deliberate export-side normalization (a note written identically in
@@ -45,7 +45,7 @@ describe.each(FIXTURES)('clean-room GPIF writer: %s', name => {
   it('alphaTab reads the clean-room .gp back to the committed document exactly', async () => {
     const mnx = await committed(name);
     const bytes = exportGuitarProGpif(mnx, { collapseTabUnisons: false });
-    expect(normalizeIds(importGuitarPro(bytes))).toEqual(normalizeIds(mnx));
+    expect(normalizeIds(importGpifOracle(bytes))).toEqual(normalizeIds(mnx));
   });
 
   it('the all-clean-room round trip reproduces the committed document', async () => {
@@ -57,7 +57,7 @@ describe.each(FIXTURES)('clean-room GPIF writer: %s', name => {
   it('both readers agree on what a default-options clean-room file says', async () => {
     const bytes = exportGuitarProGpif(await committed(name));
     expect(normalizeIds(importGuitarProGpif(bytes))).toEqual(
-      normalizeIds(importGuitarPro(bytes))
+      normalizeIds(importGpifOracle(bytes))
     );
   });
 
@@ -80,9 +80,9 @@ describe.each(FIXTURES)('clean-room GPIF writer: %s', name => {
       return clone;
     };
     expect(
-      stripKnownGp7ExporterLosses(normalizeIds(importGuitarPro(exportGuitarProGpif(mnx))))
+      stripKnownGp7ExporterLosses(normalizeIds(importGpifOracle(exportGuitarProGpif(mnx))))
     ).toEqual(
-      stripKnownGp7ExporterLosses(normalizeIds(importGuitarPro(exportGuitarPro(mnx))))
+      stripKnownGp7ExporterLosses(normalizeIds(importGpifOracle(exportGuitarPro(mnx))))
     );
   });
 });

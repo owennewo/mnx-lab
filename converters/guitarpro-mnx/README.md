@@ -1,7 +1,11 @@
 # Guitar Pro ↔ MNX
 
 The public library and CLI use the internal clean-room converters. AlphaTab is
-a development-only differential-test oracle, not a runtime requirement.
+a development-only differential-test oracle, not a runtime requirement. Source
+fidelity takes priority over matching that oracle: unused GPIF voice slots are
+omitted, authored pitch spelling is retained when consistent with sounding pitch,
+and chord locations account for tuplets and grace notes exactly. Ambiguous
+unpositioned bend middles report a warning.
 
 ## Format boundary
 

@@ -1,5 +1,5 @@
 import { DOMParser } from '@xmldom/xmldom';
-import { MnxNoteValueBase } from '../common/types.js';
+import { MnxNoteValueBase, MnxPitch, MnxStep } from '../common/types.js';
 
 /**
  * GPIF (`score.gpif`) → typed pools.
@@ -57,8 +57,7 @@ export interface GpifTrack {
 }
 
 export interface GpifBar {
-  /** Voice ids as declared, -1 marking an empty slot — the slot still counts:
-   *  it becomes a one-rest voice, matching observed alphaTab behavior. */
+  /** Voice ids as declared; -1 is an absent voice, not an authored rest. */
   voiceIds: number[];
   clef: string | null;
 }
@@ -114,6 +113,8 @@ export interface GpifNote {
   /** Legacy formats can state a technique whose sounding pitch differs from
    *  its fingerboard position. This wins over the normal pitch arithmetic. */
   soundingMidiOverride?: number | null;
+  /** Authored sounding spelling; GPIF octaves converted to scientific notation. */
+  concertPitch?: MnxPitch;
   /** GP6 pitch alternative. */
   tone: number | null;
   octave: number | null;
@@ -291,6 +292,19 @@ function parseNote(node: Element): GpifNote {
       case 'Fret':
         note.fret = int(text(property, 'Fret'));
         break;
+      case 'ConcertPitch': {
+        const pitch = child(property, 'Pitch');
+        const step = text(pitch, 'Step');
+        const octave = int(text(pitch, 'Octave'));
+        const accidental = text(pitch, 'Accidental') ?? '';
+        const alters: Record<string, number> = { '': 0, '#': 1, b: -1, x: 2, '##': 2, bb: -2 };
+        if (step && /^[A-G]$/.test(step) && octave !== null && Object.hasOwn(alters, accidental)) {
+          const alter = alters[accidental];
+          note.concertPitch = { step: step as MnxStep, octave: octave - 1,
+            ...(alter ? { alter } : {}) };
+        }
+        break;
+      }
       case 'Midi':
         note.midi = int(text(property, 'Number'));
         break;

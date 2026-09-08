@@ -75,11 +75,13 @@ Beat ──────Rhythm ref─▶ Rhythm     durations are SHARED, by refe
 ```
 
 - All ids are non-negative integers; `-1` in a voice list means "no voice in this
-  slot." Text content is routinely CDATA-wrapped. **An empty slot still counts**
-  (CONFIRMED by differential testing 2026-09-01): alphaTab materializes every
-  declared slot as a voice holding a single quarter rest, so a four-slot bar
-  with two `-1`s imports as four MNX sequences — `converters/guitarpro-mnx`'s
-  clean-room reader mirrors this, and the committed fixtures embed it.
+  slot." Text content is routinely CDATA-wrapped. The importer skips absent slots
+  while retaining their numbering, and preserves real beats containing rests.
+  **Correction, 2026-09-08:** the earlier "empty slot still counts" rule reproduced
+  alphaTab's synthetic quarter rests. A Soundslice export with `0 -1 -1 -1` and
+  exactly one voice record exposed that error. Differential tests now remove only
+  source-proven phantom voices from the historical oracle; derived converter
+  fixtures were regenerated from the original Guitar Pro files.
 - `MasterBar/Bars` is the track join: the *n*-th id belongs to the *n*-th `Track`.
   One MasterBar per measure of the piece.
 - `Rhythm` objects are deduplicated — hundreds of beats reference a handful of
@@ -335,9 +337,9 @@ author the feature, unzip, diff.
 Reading GPIF directly isn't only parity — the file holds information alphaTab's model
 never hands over.
 
-- **Author's spelling, not respelled pitch.** Today `import/gp.ts` reconstructs
-  spelling from `realValue` MIDI + key fifths. `ConcertPitch` carries the author's
-  actual `Step/Accidental/Octave` — MNX can preserve it exactly, enharmonics included.
+- **Author's spelling, not respelled pitch (implemented 2026-09-08).** The historical
+  `import/gp.ts` reconstructs spelling from MIDI + key fifths. The clean-room reader
+  retains `ConcertPitch` spelling when consistent with sounding pitch.
 - **Written octave.** `TransposedPitch` states the notation-staff octave explicitly
   instead of assuming the guitar transposition.
 - **Fret is validation for free.** The file states string, fret, capo *and* sounding
@@ -361,3 +363,28 @@ checks run over the parsed XML. alphaTab observed only through
 `converters/guitarpro-mnx/src/import/gp.ts` and the committed fixture round trips —
 its source was not read. Prepared 2026-09-01 for the clean-room Guitar Pro converter
 investigation.
+
+## 11. Source-fidelity audit, 2026-09-08
+
+Production import uses `cleanRoom.ts`, including the workbench worker; alphaTab
+is a development-only comparison reader. Behavioral parity is not a format rule.
+`tests/gpif-source-fidelity.test.ts` uses independently authored GPIF to pin:
+
+- absent slots versus authored rests, preserving source voice numbers;
+- `ConcertPitch` enharmonic spelling when consistent with sounding pitch (including
+  the GPIF octave offset); contradictory spelling warns and retains existing
+  sounding-pitch precedence;
+- exact chord positions under tuplets, dots and grace notes, without rounding to
+  the old dyadic tick grid;
+- positioned bend peaks/holds, and a warning for non-interpolated middle values
+  that lack a position. Their intended timing remains unproven, so the converter
+  does not invent a midpoint. The known linear, unpositioned fixture is unchanged;
+- beat-authored lyrics on rests and in non-primary voices.
+
+Legacy track-level lyric redistribution remains first-voice, pitched-beat based.
+Unlike GPIF beat lyrics, this binary text block carries no explicit per-event
+attachment. No source-authored counterexample established that changing rest or
+voice selection would be more faithful. Guitar Pro's
+[lyrics documentation](https://www.guitar-pro.com/docs/gp8/score/lyrics) explains
+automatic distribution and skipped slots, but does not settle those legacy cases.
+A Guitar Pro-authored legacy example is still needed before changing this behavior.

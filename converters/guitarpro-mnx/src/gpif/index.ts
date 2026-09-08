@@ -20,7 +20,8 @@ export { parseGpif, gpifToMnx, exportGuitarProGpif, mnxToGpifXml };
  * of scope here and throws with a precise reason.
  *
  * `tests/gpif-parity.test.ts` holds this path to output identical to the
- * alphaTab-backed `importGuitarPro` (modulo note-id naming) over every Guitar
+ * historical importer on shared features, with source-proven absent voices
+ * removed from the oracle, over every Guitar
  * Pro fixture.
  */
 export function importGuitarProGpif(

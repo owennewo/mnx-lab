@@ -311,28 +311,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ],
           "clefs": [
@@ -502,28 +480,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -667,28 +623,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -889,28 +823,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -1052,28 +964,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -1272,28 +1162,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -1447,28 +1315,6 @@
                       }
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
                 }
               ]
             }
@@ -1661,28 +1507,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -1842,28 +1666,6 @@
                       }
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
                 }
               ]
             }
@@ -2027,28 +1829,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -2192,28 +1972,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -2414,28 +2172,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -2577,28 +2313,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -2811,28 +2525,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -2986,28 +2678,6 @@
                       }
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
                 }
               ]
             }
@@ -3196,28 +2866,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -3443,28 +3091,6 @@
                   }
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -3660,28 +3286,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -3901,28 +3505,6 @@
                   }
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -4133,28 +3715,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -4372,28 +3932,6 @@
                   }
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -4602,28 +4140,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -4837,28 +4353,6 @@
                   }
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -5054,28 +4548,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -5317,28 +4789,6 @@
                   }
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -5534,28 +4984,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -5775,28 +5203,6 @@
                   }
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -5992,28 +5398,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -6217,28 +5601,6 @@
                       }
                     }
                   }
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
                 }
               ]
             }
@@ -6446,28 +5808,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -6689,28 +6029,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -6941,28 +6259,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -7146,28 +6442,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -7358,28 +6632,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -7547,28 +6799,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -7771,28 +7001,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -8016,28 +7224,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -8283,28 +7469,6 @@
                   }
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -8488,28 +7652,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -8700,28 +7842,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -8905,28 +8025,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -9139,28 +8237,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -9344,28 +8420,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -9556,28 +8610,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -9745,28 +8777,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -9957,28 +8967,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -10140,28 +9128,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -10345,28 +9311,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -10528,28 +9472,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -10735,28 +9657,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -10908,28 +9808,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -11104,28 +9982,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -11277,28 +10133,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -11473,28 +10307,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -11656,28 +10468,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -11877,28 +10667,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -12045,28 +10813,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -12307,28 +11053,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -12479,28 +11203,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -12660,28 +11362,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -12835,28 +11515,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -13029,28 +11687,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -13228,28 +11864,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -13421,28 +12035,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -13599,28 +12191,6 @@
                       }
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
                 }
               ]
             }
@@ -13780,28 +12350,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -13959,28 +12507,6 @@
                       }
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
                 }
               ]
             }
@@ -14160,28 +12686,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -14368,28 +12872,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -14551,28 +13033,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -14716,28 +13176,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -14944,28 +13382,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -15107,28 +13523,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -15303,28 +13697,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -15531,28 +13903,6 @@
                 {
                   "duration": {
                     "base": "eighth"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
                   },
                   "rest": {}
                 }
@@ -15778,28 +14128,6 @@
                   "rest": {}
                 }
               ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -15988,28 +14316,6 @@
                   },
                   "rest": {}
                 },
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
                 {
                   "duration": {
                     "base": "quarter"

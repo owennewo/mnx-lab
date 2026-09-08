@@ -26,8 +26,7 @@ import {
  * (and, transitively, the MusicXML `.xml` derived from them). Regenerate with
  * the CLI when a change is intended; a diff here means the corpus moved.
  *
- * What this cannot cover: gp3/gp4/gp5. Those are alphaTab's binary readers,
- * not ours — see the scope note in roadmap/complete/core-guitar-pro.md.
+ * Legacy GP3–5 has separate clean-room binary-reader suites.
  */
 
 const SCORES = path.resolve(__dirname, '../../fixtures');

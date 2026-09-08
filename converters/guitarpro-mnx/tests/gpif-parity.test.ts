@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { importGuitarProCleanRoom } from '../src/index.js';
-import { importGuitarPro } from '../src/import/gp.js';
+import { importGpifOracle } from './helpers/gpifOracle.js';
 import {
   importGuitarProGpif,
   extractScoreGpif,
@@ -11,24 +11,9 @@ import {
 } from '../src/gpif/index.js';
 import { normalizeIds } from './helpers/normalize.js';
 
-/**
- * The clean-room GPIF importer, held to DIFFERENTIAL PARITY with alphaTab.
- *
- * `src/gpif/` reads `.gp`/`.gpx` without alphaTab — its own container layer,
- * its own GPIF parser, its own MNX mapping (research/gpif-field-notes.md is
- * the reconstruction it was written from). alphaTab remains the production
- * import path until this suite proves the replacement carries everything, so
- * the test is exact structural equality against `importGuitarPro` on the SAME
- * bytes, over every Guitar Pro fixture — five files spanning both containers
- * (BCFS `.gpx`, zip `.gp`) and both gpif dialects (GP6, GP7/8).
- *
- * The one permitted difference is note-id NAMING: alphaTab numbers notes with
- * its own score-global counter, the clean-room path with its own. Ids are
- * structural (technique targets reference them), so both sides are rewritten
- * to sequential ids in traversal order — the renaming is a bijection, so a
- * dangling or crossed target still fails.
- */
-
+/** Historical importer comparison for shared features. Only voices proved
+ * absent by the raw GPIF are removed from the oracle. The source-fidelity suite
+ * independently asserts that authored rests survive and spelling is preserved. */
 const SCORES = path.resolve(__dirname, '../../fixtures');
 const FIXTURES = [
   'House-of-the-Rising-Sun.gpx',
@@ -43,10 +28,10 @@ async function bytes(name: string): Promise<Uint8Array> {
 }
 
 describe.each(FIXTURES)('clean-room GPIF importer parity: %s', name => {
-  it('produces exactly what the alphaTab importer produces', async () => {
+  it('matches shared behavior after removing source-proven phantom voices', async () => {
     const data = await bytes(name);
     const cleanRoom = normalizeIds(importGuitarProGpif(data));
-    const alphaTab = normalizeIds(importGuitarPro(data));
+    const alphaTab = normalizeIds(importGpifOracle(data));
     expect(cleanRoom).toEqual(alphaTab);
     expect(normalizeIds(importGuitarProCleanRoom(data))).toEqual(alphaTab);
   });

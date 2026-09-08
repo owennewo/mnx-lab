@@ -117,39 +117,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v2",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ],
           "clefs": [
@@ -361,39 +328,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "voice": "v2",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -560,39 +494,6 @@
                   }
                 }
               ]
-            },
-            {
-              "voice": "v2",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
             }
           ]
         },
@@ -686,39 +587,6 @@
                       }
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "voice": "v2",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v3",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
-                }
-              ]
-            },
-            {
-              "voice": "v4",
-              "content": [
-                {
-                  "duration": {
-                    "base": "quarter"
-                  },
-                  "rest": {}
                 }
               ]
             }

@@ -16,7 +16,7 @@ import {
 } from '../common/types.js';
 import { parseChordSymbol } from '../common/harmony.js';
 import { mnxDurationToWholes, tupletRatio, wholesToFraction } from '../common/duration.js';
-import { alphaTabTuningToMnx, midiToPitch } from '../common/tuning.js';
+import { alphaTabTuningToMnx, midiToPitch, pitchToMidi } from '../common/tuning.js';
 import {
   GpifDocument,
   GpifBeat,
@@ -27,14 +27,10 @@ import {
 /**
  * GPIF document → MNX, clean-room.
  *
- * This mirrors the mapping semantics of `../import/gp.ts` (the alphaTab-backed
- * importer) deliberately, decision for decision — sections split into
- * rehearsal + section, voltas collapsed from per-bar flags, tuplet groups
- * filled by written duration, grace runs buffered ahead of their principal,
- * harmony deduplicated globally. `tests/gpif-parity.test.ts` holds the two
- * importers to identical output (modulo note-id naming) over every Guitar Pro
- * fixture; where this file makes a judgement the format leaves open, the
- * evidence is research/gpif-field-notes.md.
+ * Source fidelity takes precedence over the historical alphaTab-backed mapper.
+ * Differential tests cover shared behavior; explicit source-based regressions
+ * pin absent voices, authored pitch spelling and rhythmic chord positions.
+ * See research/gpif-field-notes.md for the format evidence and open questions.
  */
 
 export interface GpifImportOptions {
@@ -203,6 +199,13 @@ function collapseAlternateEndings(doc: GpifDocument, measures: MnxGlobalMeasure[
   }
 }
 
+/** Preserve triplet/quintuplet positions exactly, without a dyadic tick grid. */
+function reduceFraction(numerator: number, denominator: number): [number, number] {
+  let a = Math.abs(numerator), b = denominator;
+  while (b) [a, b] = [b, a % b];
+  return [numerator / (a || 1), denominator / (a || 1)];
+}
+
 /**
  * Chord symbols → `global.measures[i]._x.mnxLab.harmonies`. Guitar Pro states
  * a chord as a `Chord` diagram reference or a bare `FreeText`; both are read,
@@ -216,7 +219,7 @@ function applyHarmonies(doc: GpifDocument, measures: MnxGlobalMeasure[]): void {
     for (const [measureIndex, masterBar] of doc.masterBars.entries()) {
       const bar = doc.bars.get(masterBar.barIds[trackIndex] ?? -1);
       for (const voiceId of bar?.voiceIds ?? []) {
-        let onset = 0;
+        let onset: [number, number] = [0, 1];
         for (const beatId of doc.voices.get(voiceId)?.beatIds ?? []) {
           const beat = doc.beats.get(beatId);
           if (!beat) continue;
@@ -226,7 +229,7 @@ function applyHarmonies(doc: GpifDocument, measures: MnxGlobalMeasure[]): void {
           const symbol = chordName?.trim() || beat.freeText?.trim() || '';
           const parsed = symbol ? parseChordSymbol(symbol) : null;
           if (parsed) {
-            const fraction = wholesToFraction(onset);
+            const fraction = onset;
             const key = `${fraction[0]}/${fraction[1]}`;
             const slot = byMeasure.get(measureIndex) ?? new Map<string, MnxHarmony>();
             // First track wins; a later track restating the same chord is the
@@ -235,7 +238,12 @@ function applyHarmonies(doc: GpifDocument, measures: MnxGlobalMeasure[]): void {
             byMeasure.set(measureIndex, slot);
           }
 
-          if (rhythm?.base) onset += mnxDurationToWholes(rhythm.base, rhythm.dots);
+          if (rhythm?.base && beat.graceKind === null) {
+            const [n, d] = wholesToFraction(mnxDurationToWholes(rhythm.base, rhythm.dots));
+            const num = n * rhythm.tupletDenominator;
+            const den = d * rhythm.tupletNumerator;
+            onset = reduceFraction(onset[0] * den + num * onset[1], onset[1] * den);
+          }
         }
       }
     }
@@ -293,17 +301,9 @@ function buildPart(
           : (doc.voices.get(voiceId)?.beatIds ?? [])
               .map(id => doc.beats.get(id))
               .filter((beat): beat is GpifBeat => beat !== undefined);
-      // An empty slot (-1, or a voice with no beats) still occupies its place:
-      // it becomes a voice holding one quarter rest, matching observed
-      // alphaTab behavior — which is why a voice consisting entirely of
-      // authored rests is indistinguishable downstream, and real.
-      if (beats.length === 0) {
-        measure.sequences.push({
-          voice: `v${voiceIndex + 1}`,
-          content: [{ duration: { base: 'quarter' }, rest: {} }]
-        });
-        continue;
-      }
+      // Keep source voice numbers across gaps, but never materialize padding.
+      // A real beat with no notes remains an authored rest in buildSequence.
+      if (beats.length === 0) continue;
 
       if (!lyricContinuation.has(voiceIndex)) lyricContinuation.set(voiceIndex, []);
       if (!voiceRecords.has(voiceIndex)) voiceRecords.set(voiceIndex, []);
@@ -443,7 +443,7 @@ function buildSequence(
     } else {
       event.notes = noteIds.flatMap(id => {
         const note = doc.notes.get(id);
-        return note ? [buildNote(note, id, track, fifths, order, state, voice.records)] : [];
+        return note ? [buildNote(note, id, track, fifths, order, state, voice.records, warn)] : [];
       });
     }
 
@@ -573,13 +573,24 @@ function buildNote(
   fifths: number,
   order: number,
   state: { nextNoteId: number },
-  records: NoteRecord[]
+  records: NoteRecord[],
+  warn: (message: string) => void
 ): MnxNote {
   const id = `n${state.nextNoteId++}`;
-  const mnxNote: MnxNote = {
-    id,
-    pitch: midiToPitch(soundingMidi(gpNote, track), fifths)
-  };
+  const midi = soundingMidi(gpNote, track);
+  const authored = gpNote.concertPitch;
+  const matches = authored && pitchToMidi(authored) === midi;
+  if (authored && !matches) {
+    warn(`note ${sourceId}: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.`);
+  }
+  const mnxNote: MnxNote = { id, pitch: matches ? { ...authored } : midiToPitch(midi, fifths) };
+  const bend = gpNote.bend;
+  if (bend && !bend.points && bend.middleValue !== null &&
+      bend.middleOffset1 === null && bend.middleOffset2 === null &&
+      bend.middleValue !== ((bend.originValue ?? 0) + (bend.destinationValue ?? 0)) / 2) {
+    warn(`note ${sourceId}: bend middle value has no position and is not linear interpolation; ` +
+      'only the positioned curve was imported.');
+  }
 
   const stringCount = track.tuningLowToHigh.length;
   const onFingerboard = gpNote.string !== null && stringCount > 0;
@@ -622,7 +633,7 @@ function buildNote(
 /**
  * Sounding pitch, in preference order: the fingerboard arithmetic the field
  * notes verified on every fixture note (`tuning[string] + fret + capo`), then
- * the stated `Midi`, then GP6's `Tone`/`Octave` pair.
+ * the stated `Midi`, GP6's `Tone`/`Octave` pair, then explicit `ConcertPitch`.
  */
 function soundingMidi(note: GpifNote, track: GpifTrack): number {
   if (note.soundingMidiOverride !== null && note.soundingMidiOverride !== undefined) {
@@ -634,6 +645,7 @@ function soundingMidi(note: GpifNote, track: GpifTrack): number {
   }
   if (note.midi !== null) return note.midi;
   if (note.tone !== null && note.octave !== null) return note.tone + 12 * note.octave - 12;
+  if (note.concertPitch) return pitchToMidi(note.concertPitch);
   return 60;
 }
 
@@ -727,11 +739,9 @@ function buildBend(note: GpifNote): { points: MnxBendPoint[] } | null {
     points.push({ position: bend.originOffset / 100, alter: origin });
   }
   if (bend.middleValue !== null) {
-    // A middle with no explicit offset sits at the default midpoint of a
-    // linear ramp — pure interpolation, carrying nothing the endpoints don't
-    // (fixture evidence: origin 0 / middle 50 / destination 100, no offsets,
-    // observed importing as the two endpoints alone). Only an offset-placed
-    // middle bends the curve.
+    // The fixture-proven unpositioned middle is linear interpolation. Other
+    // unpositioned values are ambiguous: buildNote warns rather than silently
+    // treating them as redundant or inventing a time for the bend peak.
     const middle = bend.middleValue / 50;
     for (const offset of [bend.middleOffset1, bend.middleOffset2]) {
       if (offset !== null) points.push({ position: offset / 100, alter: middle });
