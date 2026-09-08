@@ -391,8 +391,8 @@
         },
         "rest": {
           "verdict": "supported",
-          "carried": 23,
-          "survived": 23
+          "carried": 22,
+          "survived": 22
         },
         "segno": {
           "verdict": "supported",
