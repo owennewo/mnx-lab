@@ -24,13 +24,20 @@
   [core-musicxml-w3c-oracle.md](../inprogress/core-musicxml-w3c-oracle.md) and the
   converter fixtures' `.xml` exports.
 - **Two comparisons, reported separately.**
-  - **Strict**: performed **bar order** and **pitch** — the two things every tool
-    agrees on. Onset within 1/64 quarter after normalising PPQ. Graded `match` /
-    `timing` / `content` like the primitives oracle; a miss here is a bug.
-  - **Interpretive**: grace length, fermata multiplier, articulation shortening,
-    velocity — where tools legitimately differ. Reported as deltas, never graded,
-    so the campaign's conventions can be compared against a peer without pretending
-    the peer is right.
+  - **Strict observable content**: aligned note pitches/attack order and timing in
+    regions without interpretive shifts. Onset tolerance is 1/64 quarter after PPQ
+    normalization. Bar order is asserted only when external provenance or unique
+    musical content identifies it; repeated identical and silent bars are marked
+    **unobservable**, never reconstructed using our own pass model as proof.
+  - **Interpretive**: grace length, fermata holds, articulation shortening, velocity
+    and supported techniques, reported as deltas. Split comparisons at those regions;
+    re-anchor later strict timing using independently matched unambiguous attacks.
+    If there is no such anchor, report timing unobservable rather than letting one
+    different hold make every later onset a failure. Publish excluded spans and
+    coverage counts so reduced observability cannot inflate the match score.
+  A discrepancy is a finding requiring attribution: our compiler/export, the input
+  conversion, the external tool, or an interpretation difference. It is not automatic
+  proof of a bug in our code. Pin attribution with each baseline exception.
 - **Baseline** `harness/reports/midi-oracle.json`, tool and version in the header;
   moving the strict section either way is a red test.
 - **The early experiment**: three scenarios (a volta, a D.S. al Fine, a tuplet) run

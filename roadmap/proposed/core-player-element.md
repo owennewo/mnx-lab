@@ -10,12 +10,13 @@
 - **Pure before audible (§1).** The element holds no musical logic; position
   formatting (`bar 5 · iteration 2 · beat 3`) is a pure helper with its own test.
 - **Identities (§3).** Playback highlight is **separate from selection**: the element
-  provides the playback context (item 2's shape) with `highlight` as written
-  occurrences, and the viewer draws it in its own style beside — never instead of —
-  the selection enclosure. `elements/` does not import `edit/`; click-to-seek is a
+  emits playback-state changes (item 2's live fields) with `highlight` as written
+  occurrences; the common host provides the context. The viewer draws playback in its
+  own style alongside the selection enclosure. `elements/` does not import `edit/`; click-to-seek is a
   `note-selected` event the host turns into `seek(ordinal)` on the element, and the
-  host chooses which occurrence (first on the current iteration; click again for the
-  next). Auto-scroll is a **public** reveal on the viewer taking a written occurrence;
+  host selects from item 2's candidate ordinals relative to the current position;
+  click again cycles candidates, including repeated visits on the same iteration.
+  Auto-scroll is a **public** reveal on the viewer taking a written occurrence;
   the existing `revealSelection` is private and selection-driven, so it is extracted
   into a shared helper rather than reused.
 - **Proof (§4).** `element-census.test.ts` registers it; routing pins
@@ -29,17 +30,30 @@
 ## Design
 
 - **`<mnx-player>`** in `src/elements/`, plain Lit, shadow DOM, `light-dark()`
-  tokens. Inputs: a `Performance`; outputs: the playback context (provided, not
-  dispatched — the viewer already consumes it) and `seek`/`onset`/`bar` events for
-  hosts that want them. Controls: play/pause, stop, position readout, rate
+  tokens. Inputs: a `Performance`; outputs: `playback-state-changed` and
+  `seek`/`onset`/`bar` events. It never provides the shared context itself. The host
+  listens and updates one `ContextProvider` on an ancestor of player and viewer;
+  the viewer keeps consuming the context it already knows. Both embed examples show
+  that plain-DOM wiring and click-to-seek without importing workbench/edit modules.
+  Controls: play/pause, stop, position readout, rate
   (0.5–1.5), volume, and a loop seam item 13 fills. No mute/solo here.
 - **Written view only.** The cursor walks the written score in performed order; on a
-  repeat it goes back, and the iteration chip (item 2) changes with it. That is enough
-  for the reviewer to hear a D.S. return and see where it landed.
+  repeat it goes back, and the live playback iteration changes with it. The
+  inspection chip retains its separate value; Follow controls reveal and verse choice.
+  That is enough for the reviewer to hear a D.S. return and see where it landed.
 - **Where it mounts.** The scenario page (check the five-band frame's tray before
   adding a band, [docs/workbench.md](../../docs/workbench.md)); the `/verify` review
   page; `entries/embed.ts` registers it. Studio consumes it unchanged.
 - **No backend; no persistence** beyond localStorage UI preferences (volume, rate).
+
+## Host lifecycle
+
+Document replacement or editing invalidates ordinals and positional keys. The host stops
+playback, clears the live context and pending reveal requests, compiles the new document,
+and installs the new performance before allowing play. It does not reinterpret an old
+ordinal against a changed score. Disconnect disposes scheduled callbacks and active
+voices. Embed checks cover sibling player/viewer context delivery, inspection during
+playback, document replacement and disposal as well as first play.
 
 ## Done bar
 

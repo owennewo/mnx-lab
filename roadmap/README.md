@@ -67,7 +67,8 @@ proposals that name their campaign.
   a host-owned **playback context** (replacing the dormant `PlaybackState` shape the viewer
   already consumes) carrying ordinal and iteration; the chip reads `iteration 2 of 3` or
   *not performed* — **nothing clamps**; feeds the viewer's `selected-verse`. Edit session
-  and selection untouched; `elements/` never imports `edit/`.
+  and selection untouched; the common host is the sole provider, inspection is separate
+  from playback, and iteration queries retain multiple D.S. candidates.
 - **[core-player-timing-pitch.md](proposed/core-player-timing-pitch.md)** — campaign item 3:
   `audio/time.ts` rational arithmetic and tempo map; the pitch rule as tests over
   transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata
@@ -83,8 +84,8 @@ proposals that name their campaign.
   tuplets (with the `noteWalk.ts` identity change tested first), grace/tremolo/fermata per
   item 3, `pitch` read as sounded. `expected.performance.json` with the **verification path
   owned** (schema, stale rule, writer, review page). **MIDI as a bounded export**: PPQ 960
-  at export only, 16-channel allocation with per-part fallback, ±12 bend range, clips
-  reported.
+  at export only, preflight channel allocation with degraded curves or explicit export refusal, ±12 bend
+  range, collapsed quantized boundaries diagnosed.
 - **[core-player-transport.md](proposed/core-player-transport.md)** — campaign item 6:
   `audio/transport.ts` pure over an injected clock and sink; onsets **timestamped on the
   audio clock**; seek reconstructs sustained notes and controller state; loops across ties;
@@ -95,17 +96,17 @@ proposals that name their campaign.
   host, a public reveal helper, Listen on `/verify`; embed smoke on both formats.
 - **[core-player-expression.md](proposed/core-player-expression.md)** — campaign item 8:
   dynamics, articulations, arpeggio and the guitar techniques as curves and voice flags
-  (`noReattack` on the event type); harmonics from the touching pitch as the one deliberate
-  pitch exception. Every number a recorded convention.
+  (`noReattack` on the event type); tempo-relative vibrato and harmonics that preserve
+  sounded pitch while validating technique metadata. Every number a recorded convention.
 - **[core-player-midi-oracle.md](proposed/core-player-midi-oracle.md)** — campaign item 9:
-  MuseScore or Verovio; **bar order and pitch compared strictly**, interpretive deltas
-  reported separately; a three-scenario experiment as soon as a tool is chosen, so the
+  MuseScore or Verovio; **observable content compared strictly**, ambiguous bar order
+  reported as unobservable and timing aligned around interpretive shifts; a three-scenario experiment as soon as a tool is chosen, so the
   writer is not its own only reader. **Blocked on a dev-environment decision.**
 - **[core-player-unrolled-view.md](proposed/core-player-unrolled-view.md)** — campaign
   item 10, **moved after the player**: an **occurrence-aware layout plan** (`planHorizontal`
   takes performed entries; every dependent index per occurrence; clef/key resolved at the
   jump target; spanners per occurrence pair), still a toggle; opt-in goldens with the path
-  owned; the reached-note set equals what the pass model performs, not the document.
+  owned; visible whole-bar notes distinguished from performed notes inside partial slices.
 - **[core-player-webmidi.md](proposed/core-player-webmidi.md)** — campaign item 11: a second
   sink carrying the export's bounded channel plan on the wire; never the default.
 - **[core-player-sampled-guitar.md](proposed/core-player-sampled-guitar.md)** — campaign

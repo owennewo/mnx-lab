@@ -22,7 +22,10 @@
   opt-in `expected.unrolled.svg` (and `.unrolled.tab.svg` for tab-opting scenarios)
   for the 14 navigation scenarios, hashed as `unrolledHash`; this item adds the flag
   and hash to `meta.schema.json`, the stale rule and writer in `verify-scenarios.mjs`,
-  and the side-by-side on the review page. Registered in
+  and the side-by-side on the review page. New opt-in output without its hash is
+  unseen evidence, even for a scenario whose written engraving is approved; missing
+  required output is blocked. Only presentation and approval of this view stamps its
+  hash, preserving unrelated approvals (item 5's evidence lifecycle tests). Registered in
   [lab-verify.md](../inprogress/lab-verify.md).
 - **Dependencies (§5).** None.
 - **Reviewer gain (§7).** The performed order on the page: a wrong volta is a bar in
@@ -52,6 +55,11 @@
 - Toggle off: `update:primitives` clean. Toggle on: the 14 opt-in goldens generated,
   queued, registered with "look for: bar order equals `traversal.test.ts`'s
   hand-stated entries; clef/key at the segno; labels only on occurrence ≥ 2".
-- `note-keys.test.ts` extended: every unrolled `sourceId` resolves to a written note,
-  and the set of written notes reached equals **the set the pass model performs** —
-  which under a D.S. al Fine is smaller than the document's.
+- `note-keys.test.ts` extended: every visible unrolled `sourceId` resolves to a
+  written note on its entry. Keep **visible** occurrences separate from **performed**
+  occurrences: whole-bar drawing of a partial entry can show notes outside its slice.
+  Those receive an explicit unperformed marker and cannot be seek/highlight targets.
+  For supported note geometry, the performed occurrence set equals the compiler's
+  written occurrences; unsupported geometry is diagnosed separately. Clip crossing
+  spans by the same half-open bounds as the compiler. Under D.S. al Fine, neither
+  assertion requires reaching every note in the document.

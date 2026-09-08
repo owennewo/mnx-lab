@@ -18,9 +18,9 @@ cheaper *for this repo*, and it has to be measured.
 ## Questions, each with a pass/fail
 
 1. **Node import.** Does `import 'tone'` throw under Node? Decides where the
-   dependency-cruiser fence goes and whether `engine/headless.ts` needs a dynamic
-   import guard. (A native sink has no import cost; its fence is `AudioContext` at
-   module top level.)
+   backend entry's import boundary and whether that entry needs lazy initialization.
+   `engine/headless.ts` never imports audio in either case. A native sink must also
+   avoid creating or accessing an AudioContext at module top level.
 2. **Offline rendering.** Can either backend render one scenario to a buffer under
    **browser** `OfflineAudioContext`, driven the way `harness/render/render-png.ts`
    drives `google-chrome`? This is the sink's automated test; "not under Node" is not
@@ -32,7 +32,8 @@ cheaper *for this repo*, and it has to be measured.
 4. **Bundle cost on both embed formats.** Build `build:embed` (IIFE **and** ESM) with
    each backend and report sizes. Vite does not split an IIFE, so the options are:
    audio bundled into the IIFE, a separate optional module the host loads, or the host
-   supplying an audio context. The spike recommends one.
+   supplying the sink implementation. Supplying an AudioContext alone does not
+   remove the backend code from the bundle. The spike recommends one.
 5. **Scheduling.** With the transport ours, confirm each backend accepts absolute
    audio-clock times for `start`/`stop`/`setValueAtTime` and cancels cleanly
    (`cancel(from)` semantics), which is all the transport needs.

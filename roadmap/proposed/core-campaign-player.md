@@ -47,8 +47,9 @@ vocabulary; grace steal timing loose) and record them in the log; filing a
   clef octaves "only affect display"). The renderer and the Guitar Pro importer already
   follow that. Playback reads `pitch` and applies **no** transposition, clef or ottava
   shift.
-- The model's note values run to `4096th`; nested tuplets and grace containers are
-  model objects; `noteWalk.ts` descends **one** container level.
+- The model's note values run to `4096th`; tuplet and grace containers exist, but
+  their content types and `noteWalk.ts` currently support **one** container level.
+  Item 5 owns recursive types, identities and their consumer migration.
 - The layer order reserves the slot: `audio` is a peer of `engine` over `model`;
   `elements` may import `audio` but **never `edit`**.
 - The embed face builds **IIFE and ESM** (`vite.embed.config.ts`), and Vite does not
@@ -65,7 +66,8 @@ vocabulary; grace steal timing loose) and record them in the log; filing a
 ## The shape — decisions as revised 2026-09-08
 
 **1. Musical time is rational; ticks appear only at MIDI export.** Positions and
-durations are exact fractions of a whole note (the model's `Onset {num, den}` idiom),
+durations are exact fractions of a whole note (BigInt arithmetic, canonical decimal
+string numerator/denominator in JSON, with diagnosed resource limits),
 so a septuplet of 4096ths is exact. A tempo map in quarter BPM at rational positions
 turns them into seconds at play time. MIDI export quantises **absolute** boundaries to
 a declared PPQ with stated rounding, so error never accumulates. This replaces the
@@ -87,7 +89,9 @@ pass model already keeps two apart:
   repeat *context* — what an inspection cursor shows, and what selects a verse.
 A second ending sounds once (occurrence 1) on iteration 2. Playback is keyed by
 ordinal; the cursor's repeat index is an iteration; verse resolution goes through
-iteration. A selected iteration stays selectable on a bar it skips — the bar reads
+iteration. An iteration can name multiple visits after D.S.; item 2 returns candidate
+ordinals and selects relative to live playback. Inspection and playback iteration are separate.
+A selected inspection iteration stays selectable on a bar it skips — the bar reads
 *not performed on iteration 2*, which is the reviewer's whole point.
 
 **4. The sound backend is decided by a spike, and the transport is ours either way.**
@@ -100,12 +104,14 @@ wins is a *renderer* behind an injected `Sink`; nothing musical lives in it.
 voice, not the browser's voice model.** A bent note inside a chord needs its own pitch
 control, and a fretted part's authoritative string choice should be audible. So a
 fretted part gets one voice per string. **MIDI channel-per-string is the export's
-allocation, bounded**: 16 channels, kit on 10, overflow policy stated (item 5).
+allocation, bounded**: 16 channels, kit on 10, independent curves disabled on
+fallback parts and export refused if even one melodic channel per part cannot fit.
+Missing string choices get explicit pitch-only voices (item 5).
 
 **Where MIDI runs out.** Timbre semantics — harmonics, palm mute, vibrato — have no
-MIDI meaning; the compiler resolves them into pitch, velocity, duration and bend
-curves. The MIDI file is an **export of a supported subset**, never "the golden in
-another form": written identities, continuous curves beyond the bend range and
+single universal MIDI encoding; the compiler uses velocity, duration, timbre hints
+and bend curves. Harmonic metadata never overrides sounded `note.pitch`. The MIDI file
+is an **export of a supported subset**, never "the golden in another form": written identities, continuous curves beyond the bend range and
 articulation semantics do not survive it, and the writer says so.
 
 ## The shared contract
@@ -123,18 +129,22 @@ proposal opens with, and is reviewed on:
    No golden stores a second or a tick.
 3. **Three identities, and the editor untouched.** Performed ordinal, occurrence and
    iteration are distinct and named as such. The editor cursor stays a written rhythmic
-   position (`edit/cursor.ts`); the playback context is a separate, host-coordinated
-   state, never a write into the edit session or the selection. `elements/` does not
+   position (`edit/cursor.ts`); the playback context is separate
+   state, provided by the common host from player events. Live playback and inspection
+   iteration never overwrite each other; neither writes the edit session or selection. `elements/` does not
    import `edit/`; the host maps between them.
 4. **The proof, named first; the verification path owned.** A new golden hashes
    **separately** (`renderHash`'s file set is frozen), and the item that adds one owns
    the whole path: `meta.schema.json`, `verify-scenarios.mjs` queue detection and
-   stale-approval rules, the approval writer, and the `/verify` review page. "Add a
+   stale-approval rules, the approval writer, and the `/verify` review page. Existing
+   engraving approval does not approve newly added evidence: a missing new hash is
+   unseen evidence in the queue, while the older approval remains intact. "Add a
    hash" is not an item. Moved batches register in
    [lab-verify.md](../inprogress/lab-verify.md).
 5. **The dependency budget.** At most **one** runtime audio dependency, chosen by item
    4's spike, confined to `src/audio/<backend>/` by a dependency-cruiser rule, never
-   reachable from `engine/headless.ts` or the harness. Its cost is measured on **both**
+   reachable from `engine/headless.ts` or Node conformance imports. Browser harness
+   entry points may import the sink to test it. Its cost is measured on **both**
    embed formats before it is admitted. Anything else argues its case here first.
 6. **Spec findings go in the log, not upstream.**
 7. **Reviewer gain, stated.** Items 1–10 serve the reviewer; 11–13 serve practice and
@@ -158,12 +168,12 @@ run any time before 6.
 | 5 | [Performance compiler and MIDI export](core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | proposed |
 | 6 | [Transport](core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | proposed |
 | 7 | [Player element, written view](core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | proposed |
-| 8 | [Expression and technique](core-player-expression.md) | Dynamics, articulations, arpeggio, and the guitar techniques as curves and voice flags (`noReattack` on the event type); harmonics from the touching pitch; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | proposed |
-| 9 | [MIDI oracle](core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; **navigation and pitch compared strictly**, grace/articulation differences reported separately. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | proposed — **needs a dev-environment decision** |
+| 8 | [Expression and technique](core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | proposed |
+| 9 | [MIDI oracle](core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | proposed — **needs a dev-environment decision** |
 | 10 | [Unrolled engraving](core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | proposed — after 7 |
-| 11 | [WebMIDI out](core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | proposed — after 7 |
-| 12 | [Sampled guitar](core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | proposed — after 7 |
-| 13 | [Practice mode](studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after 7 and 8 |
+| 11 | [WebMIDI out](core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | proposed — after reviewer items 1–10 |
+| 12 | [Sampled guitar](core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | proposed — after reviewer items 1–10 |
+| 13 | [Practice mode](studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
 
 ### Decisions still open
 
@@ -211,3 +221,29 @@ Recorded because each is the kind of thing a later item would otherwise rediscov
 
 Also corrected: links to the display-settings doc, which had moved to `complete/`
 while the draft was being written — its `selected-verse` property is what item 2 feeds.
+
+### 2026-09-08 — follow-up review: contracts made executable
+
+The second review retained the architecture and sequencing; this plan-only update
+closes remaining ambiguities. No implementation or scenario approval is implied.
+
+- D.S. can revisit a measure on the same iteration. Candidate ordinals, not a unique
+  `(measure, iteration)` lookup, drive seek; loop selection chooses a concrete start
+  and subsequent end and previews intervening performed bars.
+- The common host is the sole Lit context provider. Player state changes update it;
+  inspection iteration remains separate from playback and Follow controls reveal/verse.
+- Exact arithmetic uses BigInt with a canonical JSON form and resource limits. Grace
+  budgets, shared holds, insertion ordering, source maps and jump-state restoration
+  now have worked examples. Vibrato is tempo-relative; harmonic pitch remains sounded.
+- MIDI preflights all channels, drops independent curves on fallback parts, refuses
+  impossible minimum allocations and diagnoses collapsed quantized boundaries.
+  WebMIDI clears queued messages before reset/reconstruction and converts clock origins.
+- New performance/unrolled evidence is queued as unseen despite older engraving
+  approval. Approval stamps only presented evidence and preserves unrelated provenance.
+- The oracle distinguishes observable results from ambiguous bar order and aligns
+  around interpretive shifts; discrepancies are attributed rather than presumed ours.
+- Recursive container types/consumers, unassigned-string voices and visible versus
+  performed notes in partially drawn measures are explicit implementation obligations.
+
+The backend spike can start independently of musical implementation. The later practice
+items retain the campaign-wide prerequisite that reviewer items 1–10 are verified.

@@ -31,3 +31,8 @@
 
 A `voicePreset` on the sink selects synth or samples per part; palm mute and harmonic
 sample layers only if the set has them, else the compiler's approximation stands.
+
+## Start condition
+
+The dependencies named above are technical prerequisites. Campaign clause 7 additionally
+requires reviewer items 1–10 to be verified before this practice item starts.

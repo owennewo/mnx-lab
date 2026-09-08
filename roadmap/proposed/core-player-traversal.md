@@ -49,6 +49,17 @@ interface PassModel {
 ```
 
 `entries[k].measureIndex === order[k]` always; the test says so for the whole corpus.
+An iteration is local repeat context, not a unique visit: after D.S., the same bar
+can sound again on iteration 1. `(measureIndex, iteration)` therefore resolves to
+an ordered list of candidate ordinals; `(measureIndex, occurrence)` identifies one
+entry. Item 2 owns candidate selection relative to the playback ordinal. Tests include
+the existing plain D.S. case, where bar index 2 occurs twice on iteration 1.
+
+For each written bar, also expose its strain's available iterations for the inspection
+chip, including iterations that skip that bar. Derive this from the repeat structure,
+not `passCounts` or the length of `soundingPasses`; a first ending can sound once in a
+three-iteration strain. Bars outside a strain offer iteration 1. A D.S. visit does not
+invent another verse number.
 
 ## What changes in the walk
 
@@ -64,7 +75,7 @@ interface PassModel {
   `repeatStart` inside an open strain, an ending whose numbers exceed `times`, a jump
   with no segno (today: to the beginning, silently).
 - Unchanged and re-asserted: `times` defaults to 2; an unmatched `:|` repeats from the
-  start or the previous strain's end; a jump fires once; the return takes no repeats;
+  current repeat start (initially the start of the score); a jump fires once; the return takes no repeats;
   only `dsalfine` stops at `fine`; the cap truncates and says so.
 
 Findings the item records: no coda / D.C. vocabulary; nothing in MNX says whether a
