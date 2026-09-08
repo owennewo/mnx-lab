@@ -41,3 +41,10 @@ export function durationValue(d: { base: string; dots?: number } | [number, numb
   }
   return value;
 }
+
+
+/** Strict base lookup for exact playback arithmetic. The forgiving renderer
+ * fallback in durationValue remains unchanged. This is the same single table. */
+export function durationBaseValue(base: string): number | undefined {
+  return Object.hasOwn(DURATION_BASE_VALUE, base) ? DURATION_BASE_VALUE[base] : undefined;
+}

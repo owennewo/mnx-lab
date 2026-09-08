@@ -1,7 +1,7 @@
 # Timing and pitch contracts — the numbers, written down before the compiler
 
-> **Status: proposed 2026-09-08.** Campaign:
-> [core-campaign-player.md](../inprogress/core-campaign-player.md), item 3. Needs nothing;
+> **Status: implemented 2026-09-08; landing checks and worktree retirement in progress.** Campaign:
+> [core-campaign-player.md](core-campaign-player.md), item 3. Needs nothing;
 > item 5 builds on it. Exists because the first draft got both time and pitch wrong
 > on paper, and the cheap place to be wrong is a test file.
 
@@ -104,3 +104,20 @@ modulation contract and is outside this campaign's current event representation.
 Time tests exact for the whole duration table under nested tuplets; pitch tests over
 all named pitch cases; the conventions table copied into the campaign log with the item's
 date.
+
+
+## Implementation — 2026-09-08
+
+The executable contract is split into `audio/time.ts`, `timingConventions.ts`,
+`writtenState.ts`, `pitch.ts` and `performanceTypes.ts`. The full API, numerical
+budgets, insertion edges and JSON field meanings are documented in
+[docs/player-time.md](../../docs/player-time.md). No performance compiler or
+scenario performance golden is introduced; item 5 owns their implementation and
+approval lifecycle.
+
+Conformance tests cover every note value, dots and nested ratios; canonical JSON
+and safe-number adapters; tempo integration/inverse rounding; corpus mid-bar tempo
+and sounded-pitch cases; jump/skipped-ending state; grace budgets and placement;
+shared fermata/make-time insertions, note releases and source lookup; and vibrato's
+rational period. The only model change exposes a strict lookup of the existing
+base-duration table; the forgiving renderer function is unchanged.

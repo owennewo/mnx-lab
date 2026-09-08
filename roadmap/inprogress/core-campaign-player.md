@@ -4,8 +4,7 @@
 > proposals, the shared contract they follow, and the running log of progress and
 > learnings as items land. Indexed items are ordinary `core-*` (and one `studio-*`)
 > proposals that name this campaign. **Opened 2026-09-08; revised the same day on an
-> independent review before anything was built** — see the first log entry. Nothing
-> built yet.
+> independent review before anything was built** — see the first log entry. Items 1 and 3 are implemented; the remaining items are proposed.
 
 ## The goal
 
@@ -163,7 +162,7 @@ run any time before 6.
 |---|------|-------|--------|-------|--------|
 | 1 | [Traversal](../complete/core-player-traversal.md) | **Extend `model/passes.ts`**, keeping its consumers and suite: performed entries with ordinal, occurrence and iteration; partial-measure bounds for mid-bar segno/Fine/D.S.; diagnostics; the D.S.-into-voltas simplification resolved. | reviewer | the existing suite + hand-stated orders for the 14 navigation scenarios + a committed corpus report | complete; new engraving review pending |
 | 2 | [Playback context and the iteration cursor](../proposed/core-player-pass-cursor.md) | A host-owned playback context (replacing the dormant `PlaybackState` shape) carrying ordinal and iteration; the chip ladder shows `iteration 2 of 3` / *not performed*; changeable; feeds `selected-verse`. The edit session is untouched. | reviewer | conformance tests on the pure resolver; no golden moves | proposed |
-| 3 | [Timing and pitch contracts](../proposed/core-player-timing-pitch.md) | `audio/time.ts` (rational arithmetic, tempo map, `secondsAt`); the pitch rule as tests over transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata (incl. `duration` hints and cross-part sync) and tie conventions written down with numbers; the performance golden's format. | reviewer | conformance tests | proposed |
+| 3 | [Timing and pitch contracts](core-player-timing-pitch.md) | `audio/time.ts` (rational arithmetic, tempo map, `secondsAt`); the pitch rule as tests over transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata (incl. `duration` hints and cross-part sync) and tie conventions written down with numbers; the performance golden's format. | reviewer | conformance tests | implemented; landing checks in progress |
 | 4 | [Audio backend spike](../proposed/core-player-tone-spike.md) | Tone.js **versus a native Web Audio sink**, measured: Node import, browser Offline render, per-voice detune ramps, both embed formats' size, what Tone saves once the transport is ours. Output: a log entry and the `Sink` interface. | both | its findings | proposed |
 | 5 | [Performance compiler and MIDI export](../proposed/core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | proposed |
 | 6 | [Transport](../proposed/core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | proposed |
@@ -177,10 +176,10 @@ run any time before 6.
 
 ### Decisions still open
 
-- **Grace and fermata numbers.** Item 3 picks and records them; the golden makes the
-  argument cheap.
-- **Repeats after a D.S.** The existing walk takes none; kept. Whether a D.S. return
-  takes the *final* ending is the simplification item 1 resolves.
+- **Grace and fermata numbers.** Item 3 records executable conventions below; item 5
+  applies them to the performance golden.
+- **Repeats after a D.S.** Resolved by item 1: no repeats on return; take the final
+  declared iteration in strains with endings.
 - **Backend.** Item 4 decides; the campaign has no preference it has not measured.
 
 ## Progress + learnings
@@ -270,3 +269,40 @@ items retain the campaign-wide prerequisite that reviewer items 1–10 are verif
 - Existing engravings are unchanged. The new D.S./mid-bar fixture is queued in
   [lab-verify.md](lab-verify.md#player-traversal--2026-09-08); implementation completion
   does not imply its engraving has human approval or release the practice gate.
+
+
+### 2026-09-08 — item 3: exact timing and sounded-pitch contracts
+
+- Reused the model's single base-duration table; exact BigInt time has a 512-bit
+  reduced-component budget, 1,024-bit intermediates, 32 dots and 32 tuplet levels.
+  Resource exhaustion is a typed diagnostic/failure, never approximate event time.
+- Tempo normalization and integration honor mid-bar marks. Clock inverse rounds
+  half-up to 1/2^20 whole note for display/seek only; transport applies rate once.
+- Independent written-state lanes restore state on every entry, including marks
+  before a mid-bar segno and marks in a skipped ending. The compiler supplies real
+  measure spans, persistent changes and resolved dynamic scopes.
+- Shared insertions combine by maximum, ordered fermata then make-time. Existing
+  releases sustain through a coincident hold but release before make-time; grace
+  uses its own interval. Tempo changes at that point follow the insertions, which
+  therefore retain the earlier tempo. Source lookup keeps the written position.
+- Sounded-pitch tests cover transposition, guitar octave clefs, ottavas, capo and
+  natural/artificial harmonics with/without touchingPitch. No display or technique
+  field transposes the pitch. Vibrato's period is 1/10 whole note, tempo-relative.
+- Version 1 performance types and [the format documentation](../../docs/player-time.md)
+  fix written/sounding lists, their reciprocal links, rational tempo, measure spans
+  and source segments. Item 5 still owns compilation, serialization, opt-in goldens
+  and approval. No scenario evidence/approval or upstream spec proposal was added.
+
+The conventions adopted for the compiler (lab choices, not new MNX requirements):
+
+| Case | Convention | Why |
+|---|---|---|
+| No tempo mark | 120 quarter BPM | chosen campaign default |
+| `tempos[].value` | normalised to quarter BPM; mid-bar `location` honoured | `lab/40-navigation/04` |
+| Grace, `stealPrevious` / `stealFollowing` | group budget = min(1/32 whole note, half the neighbour's performed duration before holds); taken from its end / start, divided among grace events in proportion to their notated durations | bounded, leaves the neighbour positive time |
+| Grace, `makeTime` | insert 1/32 whole note before the principal onset; simultaneous groups share one insertion and each fits within it | one score-wide insertion, not one per part |
+| Fermata, `duration` `auto`/`normal` | × 1.5 on the event; `short`/`veryShort` × 1.25, `long` × 2, `veryLong` × 3, **`none` × 1** | the model already carries the hint |
+| Fermata sync | event requests extra duration `(multiplier − 1) × event span` at its release; barline requests `(multiplier − 1) × 1/4` whole note at the boundary; simultaneous requests combine by **maximum**, not sum | duplicated marks do not multiply the hold |
+| Tie | target extends the source's sounding event; the target keeps its **written occurrence** (the cursor still lands on it) | contract §3 / decision 2 |
+| `lv` tie | rings for one whole note or until the string is re-struck | fretted-instrument convention |
+| Tremolo | subdivided by `marks` within the container's performed value | model semantics |

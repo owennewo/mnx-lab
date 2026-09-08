@@ -50,11 +50,6 @@ proposals that name their campaign.
   *not performed* — **nothing clamps**; feeds the viewer's `selected-verse`. Edit session
   and selection untouched; the common host is the sole provider, inspection is separate
   from playback, and iteration queries retain multiple D.S. candidates.
-- **[core-player-timing-pitch.md](proposed/core-player-timing-pitch.md)** — campaign item 3:
-  `audio/time.ts` rational arithmetic and tempo map; the pitch rule as tests over
-  transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata
-  (incl. `duration: none` and cross-part sync) and tie conventions numbered; the performance
-  golden's format fixed before the compiler exists.
 - **[core-player-tone-spike.md](proposed/core-player-tone-spike.md)** — campaign item 4,
   **research only**: Tone.js **versus a native Web Audio sink** — Node import, browser
   `OfflineAudioContext` render, per-voice detune and re-pitch without re-attack, size on
@@ -213,6 +208,12 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-player-timing-pitch.md](inprogress/core-player-timing-pitch.md)** — campaign item 3:
+  `audio/time.ts` rational arithmetic and tempo map; the pitch rule as tests over
+  transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata
+  (incl. `duration: none` and cross-part sync) and tie conventions numbered; the performance
+  golden's format fixed before the compiler exists.
+
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
   iteration, the performed order as a golden — with studio practice as indexed follow-ups.
