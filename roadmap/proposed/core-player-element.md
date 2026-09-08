@@ -1,48 +1,48 @@
-# The player element — a transport bar that knows where it is
+# The player element over the written score — the first reviewer milestone
 
-> **Status: proposed 2026-09-08.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 7. Needs items 2, 3, 4 and
-> 6. The last reviewer item: after it, a reviewer can listen.
+> **Status: proposed 2026-09-08, revised the same day.** Campaign:
+> [core-campaign-player.md](core-campaign-player.md), item 7. Needs items 2, 5 and
+> 6. Deliberately **not** waiting for the unrolled engraving (item 10): the written
+> score, a performed-order table and sound prove the player with far less layout work.
 
 ## Agreement block (campaign contract)
 
-- **Pure before audible (§1).** The element holds no musical logic: it renders the
-  transport's state and forwards gestures. Position formatting (`m5 · pass 2 · beat 3`)
-  is a pure helper in `audio/` with its own test.
-- **Identity (§3).** Highlight is driven by the transport's `{ noteKey, pass }` through
-  item 3's pass-qualified keys, so in the unrolled view exactly one occurrence lights
-  and in the written view the written note lights with its pass shown on the cursor
-  chip (item 2). Click a note → `seek` to that note's first occurrence on the current
-  pass; click it again → next pass.
-- **Proof (§4).** `element-census.test.ts` registers it; the deep link
-  `#/scenario/<id>?view=…&t=<ordinal>` is pinned by the routing test. No golden.
+- **Pure before audible (§1).** The element holds no musical logic; position
+  formatting (`bar 5 · iteration 2 · beat 3`) is a pure helper with its own test.
+- **Identities (§3).** Playback highlight is **separate from selection**: the element
+  provides the playback context (item 2's shape) with `highlight` as written
+  occurrences, and the viewer draws it in its own style beside — never instead of —
+  the selection enclosure. `elements/` does not import `edit/`; click-to-seek is a
+  `note-selected` event the host turns into `seek(ordinal)` on the element, and the
+  host chooses which occurrence (first on the current iteration; click again for the
+  next). Auto-scroll is a **public** reveal on the viewer taking a written occurrence;
+  the existing `revealSelection` is private and selection-driven, so it is extracted
+  into a shared helper rather than reused.
+- **Proof (§4).** `element-census.test.ts` registers it; routing pins
+  `#/scenario/<id>?view=…&at=<ordinal>`; `smoke:embed` on **both** formats plays one
+  document in the mock host with no workbench code. No golden.
 - **Dependencies (§5).** None beyond item 6's.
-- **Reviewer gain (§7).** The `/verify` review page grows a **Listen** control beside
-  the engraving, so the performance golden (item 4) and the unrolled goldens (item 3)
-  are approved with the sound they describe.
+- **Reviewer gain (§7).** Listen on the `/verify` review page, and the
+  **performed-order table** (item 1's entries, with bar numbers and iterations) as a
+  band beside the engraving — the table the reviewer reads while the cursor walks it.
 
 ## Design
 
-- **`<mnx-player>`** in `src/elements/`, plain Lit, shadow DOM, `light-dark()` theming
-  via the existing tokens. Props: a `Performance`; events: `seek`, `onset`, `bar`.
-  Controls: play/pause, stop, position readout, tempo scalar (0.5–1.5), volume, loop
-  toggle for the current selection when the host supplies one (item 12 makes this a
-  feature; here it is a seam). Mute/solo are **not** in this item.
-- **Cursor sync** goes through `<mnx-document-viewer>`'s existing highlight input and
-  the reveal-scroll helper that selection already uses, so auto-scroll is the same code
-  path as "reveal the cursor". The pass cursor (item 2) is set on every bar boundary,
-  which is what makes the *current verse* follow the music when display settings land.
-- **Where it mounts.** The scenario page's frame gains a band (the five-band frame in
-  [docs/workbench.md](../../docs/workbench.md) — this is a sixth only if none of the
-  existing ones fits; check the tray first); the `/verify` review page; the embed face
-  registers the element in `entries/embed.ts`. Studio consumes it unchanged.
-- **No backend, no persistence** beyond the existing localStorage UI preferences
-  (volume, tempo scalar).
+- **`<mnx-player>`** in `src/elements/`, plain Lit, shadow DOM, `light-dark()`
+  tokens. Inputs: a `Performance`; outputs: the playback context (provided, not
+  dispatched — the viewer already consumes it) and `seek`/`onset`/`bar` events for
+  hosts that want them. Controls: play/pause, stop, position readout, rate
+  (0.5–1.5), volume, and a loop seam item 13 fills. No mute/solo here.
+- **Written view only.** The cursor walks the written score in performed order; on a
+  repeat it goes back, and the iteration chip (item 2) changes with it. That is enough
+  for the reviewer to hear a D.S. return and see where it landed.
+- **Where it mounts.** The scenario page (check the five-band frame's tray before
+  adding a band, [docs/workbench.md](../../docs/workbench.md)); the `/verify` review
+  page; `entries/embed.ts` registers it. Studio consumes it unchanged.
+- **No backend; no persistence** beyond localStorage UI preferences (volume, rate).
 
 ## Done bar
 
-- A reviewer opens any performance-opt-in scenario, presses play, sees the cursor walk
-  the bars in performed order in all three views with the unrolled toggle on or off,
-  and hears the D.S. return.
-- The embed mock host (`apps/viewer-embedded/`) plays the same document with no
-  workbench code present — the embeddability guarantee, exercised.
+A reviewer opens any performance-opt-in scenario, presses play, watches the cursor
+walk the bars in performed order in all three views with the table alongside, and
+hears the D.S. return. The embed mock host does the same on the IIFE and the ESM build.

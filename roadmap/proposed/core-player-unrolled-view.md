@@ -1,55 +1,57 @@
-# The unrolled view — the traversal, engraved
+# The unrolled engraving — an occurrence-aware layout plan
 
-> **Status: proposed 2026-09-08.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 3. Independent of item 2 and
-> of the sound source; needs item 1. **Drafted as a toggle**, not a fourth view mode —
-> see the campaign's open decisions.
+> **Status: proposed 2026-09-08, revised the same day.** Campaign:
+> [core-campaign-player.md](core-campaign-player.md), item 10. Needs items 1, 2 and 7.
+> **Moved after the player** on review: this is a layout-plan change, not an
+> emission-loop change, and the reviewer hears trustworthy playback sooner without
+> it. Still a **toggle**, not a fourth view mode.
 
 ## Agreement block (campaign contract)
 
-- **Pure before audible (§1).** The layout engines take an optional `walk:
-  PerformedMeasure[]`; with none they lay out document order and emit exactly what they
-  emit today. The toggle is presentation state in the viewer, never persisted into a
-  document.
-- **Identity (§3).** A note key now appears once per pass. This item introduces the
-  **pass-qualified key** in `model/noteKeys.ts` — `occurrenceKey(noteKey, pass)` — and
-  the inverse. Primitives carry it in `sourceId` when laid out from a walk; the viewer's
-  highlight set and the note↔JSON cross-highlight (`model/jsonView.ts`, kept in lockstep
-  per [docs/rendering.md](../../docs/rendering.md)) map every occurrence back to the
-  **written** note. Selecting a note selects the written note; all its occurrences light.
-- **Proof (§4).** The toggle defaults off, so **no existing golden moves** — that is the
-  point of a toggle. New goldens are **opt-in**, the way `expected.both.svg` is: the 14
-  navigation scenarios gain `expected.unrolled.svg` (the notation view unrolled; tab-
-  opting ones also `expected.unrolled.tab.svg`), hashed as their own `unrolledHash` in
-  the verification record. The `/verify` review page shows them beside the written
-  engraving. The batch is registered in [lab-verify.md](../inprogress/lab-verify.md).
+- **Pure before audible (§1).** A layout concern: `planHorizontal` (`spacing.ts`)
+  gains `entries?: PerformedEntry[]`; with none it plans document order and emits
+  byte-identically. The toggle is presentation state, never persisted into a document.
+- **Identities (§3).** Each **occurrence** gets its own geometry — its own
+  `MeasurePlan` — because the plan's measure indexes underpin curves, beams, dynamics,
+  lyrics and ottavas, and a repeated bar cannot share one set of them. Primitives carry
+  an occurrence-qualified `sourceId` (`noteKey` + ordinal); the highlight and the
+  note↔JSON cross-highlight (`jsonView.ts`, kept in lockstep per
+  [docs/rendering.md](../../docs/rendering.md)) map every occurrence to its written
+  note. Selecting selects the written note; all its occurrences light.
+- **Proof (§4) — the path owned.** Toggle off: no existing golden moves. Toggle on:
+  opt-in `expected.unrolled.svg` (and `.unrolled.tab.svg` for tab-opting scenarios)
+  for the 14 navigation scenarios, hashed as `unrolledHash`; this item adds the flag
+  and hash to `meta.schema.json`, the stale rule and writer in `verify-scenarios.mjs`,
+  and the side-by-side on the review page. Registered in
+  [lab-verify.md](../inprogress/lab-verify.md).
 - **Dependencies (§5).** None.
-- **Reviewer gain (§7).** The performed order is on the page. A wrong volta rule is a
-  bar drawn in the wrong place, which a reviewer sees in a second and a listener might
-  not hear in ten.
+- **Reviewer gain (§7).** The performed order on the page: a wrong volta is a bar in
+  the wrong place, seen in a second.
 
 ## Design
 
-- **What changes in the walk.** Repeat barlines draw as regular; ending brackets,
-  segno, Fine and D.S. glyphs are omitted (their consequences are what is being drawn);
-  a **pass label** sits above the first beat of any bar on pass ≥ 2 (`2×` small text,
-  scoreText band); the displayed bar number stays the **written** number so the reader
-  can find it. Partial measures (`from`/`until`) are drawn whole with a per-measure
-  badge — the forgiving-render rule; slicing a bar's content is item 4's problem, not
-  layout's.
-- **Where.** `engine/layout/{notation,tab}.ts` and the `both` walk take the sequence
-  from one place — a `measureWalk(doc, walk?)` helper — so the three views cannot
-  disagree about order. Spacing is untouched: `spacing.ts` sees measures, not passes.
-- **Surface.** One toggle in the viewer's view controls, deep-linked as
-  `?view=both&unrolled=1` so a review page link is stable.
-- **What it is not.** Not a new `ViewMode`; not a document transformation; not a
-  spacing change. Multi-measure rests and system breaks from `layouts` follow written
-  order and are ignored when unrolled — badge, not clamp.
+- **Plan extension, not an expanded document.** An expanded document would prototype
+  fast but needs every id, reference (ties, slurs, technique targets, beams) and
+  inherited state rewritten per copy. The plan already resolves clef, key and time
+  **in force** per measure; with entries it resolves them at the **jump target** (the
+  clef in force at the segno, not at the bar before the D.S.), which is the one
+  correctness rule an expanded document would get wrong silently.
+- **Spanners across occurrences.** A tie or slur into a bar that is performed twice is
+  drawn twice, once per occurrence pair; a `crossJump` tie is drawn only on the
+  occurrence pair the traversal actually joins.
+- **Drawn differences.** Repeat barlines regular; ending brackets, segno, Fine, D.S.
+  glyphs omitted; an **occurrence label** (`2×`) above the first beat of any bar on
+  occurrence ≥ 2; written bar numbers kept. Partial measures (`from`/`until`) drawn
+  whole with a badge. Multi-measure-rest collapses and forced breaks from `layouts`
+  are written-order facts and are ignored when unrolled — badge, not clamp.
+- **Surface.** One toggle in the view controls, deep-linked `&unrolled=1`. All three
+  views share the entries through one helper so they cannot disagree about order.
 
 ## Done bar
 
 - Toggle off: `update:primitives` clean. Toggle on: the 14 opt-in goldens generated,
-  queued, and registered in the ledger with "look for: bar order matches the hand-
-  stated order in `traversal.test.ts`; pass labels only on pass ≥ 2".
-- `note-keys.test.ts` extended: every `sourceId` in an unrolled layout resolves to a
-  written note, and the set of written notes reached equals the document's.
+  queued, registered with "look for: bar order equals `traversal.test.ts`'s
+  hand-stated entries; clef/key at the segno; labels only on occurrence ≥ 2".
+- `note-keys.test.ts` extended: every unrolled `sourceId` resolves to a written note,
+  and the set of written notes reached equals **the set the pass model performs** —
+  which under a D.S. al Fine is smaller than the document's.

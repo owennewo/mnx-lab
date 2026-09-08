@@ -46,65 +46,74 @@ proposals that name their campaign.
 ### proposed/
 - **[core-campaign-player.md](proposed/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
-  pass, the performed order as a golden — with studio practice as indexed follow-ups.
-  Opened 2026-09-08 on three decisions: the performance is **MIDI-shaped** (ticks at one
-  PPQ plus a tempo map; seconds derived at play time; the golden serialises losslessly to a
-  `.mid`, which is also the oracle carrier); **Tone.js is a renderer, never the model**
-  (the pre-rebuild controller made Tone's Transport the timeline — linear, browser-only,
-  untestable under the Node harness); and **one voice per string from the start**, because
-  neither Tone's PolySynth nor a MIDI channel can bend one note inside a chord. Seven-clause
-  contract: pure before audible, ticks not seconds, pass-qualified identity with the edit
-  cursor kept written, proof named first, Tone as the one admitted dependency, spec findings
-  logged not filed, reviewer gain stated. Twelve items, traversal first.
+  iteration, the performed order as a golden — with studio practice as indexed follow-ups.
+  Opened 2026-09-08 and **revised the same day on an independent review** that found three
+  errors of fact before a line was written: the traversal already existed
+  (`model/passes.ts`), MNX `pitch` is the *sounded* pitch, and PPQ 960 is not divisible by 7.
+  Decisions as revised: **rational musical time**, ticks only at MIDI export; **written
+  occurrences and sounding events as two linked lists** (ties and tremolos break either
+  alone); **three identities** — performed ordinal, occurrence, iteration — never one
+  "pass"; the backend (Tone.js vs a native Web Audio sink) **decided by a measured spike**
+  with the transport ours either way; independently addressable voices with string
+  ownership, MIDI channel-per-string a **bounded export**. Eight-clause contract, incl.
+  *the cursor follows the audio clock*. Thirteen items; the first reviewer milestone is
+  sound over the **written** score, the unrolled engraving after it.
 - **[core-player-traversal.md](proposed/core-player-traversal.md)** — campaign item 1:
-  `model/traversal.ts`, global measures → performed order with **pass numbers** and
-  partial-measure bounds; repeats, implied starts, voltas, segno/Fine/D.S.; cycle guard.
-  Proved by hand-stated orders for the 14 navigation scenarios plus a committed corpus
-  report. Adopts and records the "no repeats after a D.S." convention MNX does not state.
+  **extend `model/passes.ts`**, keeping its consumers and suite unchanged — performed
+  entries with ordinal, occurrence and iteration; partial-bar bounds for mid-bar
+  segno/Fine/D.S.; diagnostics; its recorded D.S.-into-voltas simplification resolved.
+  Hand-stated entries for the 14 navigation scenarios plus a committed corpus report.
 - **[core-player-pass-cursor.md](proposed/core-player-pass-cursor.md)** — campaign item 2:
-  the session carries a **pass** as a view position layered over the written cursor, never
-  a field on it; a chip reads `pass 2 of 3` or *not performed*; arrow keys stay
-  written-order. Resolves the current-verse hook display-settings deferred.
-- **[core-player-unrolled-view.md](proposed/core-player-unrolled-view.md)** — campaign
-  item 3: a **toggle** on any view that lays out the traversal's order — signs dropped,
-  pass labels drawn, **pass-qualified note keys** with every occurrence mapping back to
-  its written note. Default off so no golden moves; opt-in `expected.unrolled.svg` hashed
-  separately.
-- **[core-player-performance.md](proposed/core-player-performance.md)** — campaign item 4:
-  **the compiler**, `audio/performance.ts` — PPQ 960, tempo map, ties merged after
-  unrolling (cross-jump ties need it), nested tuplets, grace steal modes, tremolo,
-  fermatas, **sounding pitch by inverting `part.transposition`** (MNX pitches are
-  written), plus the SMF writer with a channel per string. Opt-in
-  `expected.performance.json`; retires `mnxToAudio.ts`.
-- **[core-player-tone-spike.md](proposed/core-player-tone-spike.md)** — campaign item 5,
-  **research only**: does `tone` import under Node, can Offline render there, does a mono
-  voice's detune ramp cleanly for bends, our seconds vs Tone's ticks, embed-face cost.
-  Output is a log entry and the sink interface; no product code.
+  a host-owned **playback context** (replacing the dormant `PlaybackState` shape the viewer
+  already consumes) carrying ordinal and iteration; the chip reads `iteration 2 of 3` or
+  *not performed* — **nothing clamps**; feeds the viewer's `selected-verse`. Edit session
+  and selection untouched; `elements/` never imports `edit/`.
+- **[core-player-timing-pitch.md](proposed/core-player-timing-pitch.md)** — campaign item 3:
+  `audio/time.ts` rational arithmetic and tempo map; the pitch rule as tests over
+  transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata
+  (incl. `duration: none` and cross-part sync) and tie conventions numbered; the performance
+  golden's format fixed before the compiler exists.
+- **[core-player-tone-spike.md](proposed/core-player-tone-spike.md)** — campaign item 4,
+  **research only**: Tone.js **versus a native Web Audio sink** — Node import, browser
+  `OfflineAudioContext` render, per-voice detune and re-pitch without re-attack, size on
+  **both** embed formats (the IIFE cannot split), what Tone saves once the transport is
+  ours. Output: a log entry, the `Sink` interface, a recommendation.
+- **[core-player-performance.md](proposed/core-player-performance.md)** — campaign item 5:
+  **the compiler** — two linked lists, rational time, ties merged after unrolling, nested
+  tuplets (with the `noteWalk.ts` identity change tested first), grace/tremolo/fermata per
+  item 3, `pitch` read as sounded. `expected.performance.json` with the **verification path
+  owned** (schema, stale rule, writer, review page). **MIDI as a bounded export**: PPQ 960
+  at export only, 16-channel allocation with per-part fallback, ±12 bend range, clips
+  reported.
 - **[core-player-transport.md](proposed/core-player-transport.md)** — campaign item 6:
-  `audio/transport.ts` pure over an injected clock and sink (the `ChatTransport`
-  precedent), tick↔seconds with a rate scalar, loop, seek by ordinal, fake-clock tests;
-  `audio/tone/` as the only importer of `tone`, six mono voices per fretted part.
-- **[core-player-element.md](proposed/core-player-element.md)** — campaign item 7:
-  `<mnx-player>` in `elements/`, position as measure/pass/beat, cursor sync by
-  pass-qualified key, click-to-seek, **Listen on the `/verify` review page**; the embed
-  mock host plays with no workbench code — the last reviewer item.
+  `audio/transport.ts` pure over an injected clock and sink; onsets **timestamped on the
+  audio clock**; seek reconstructs sustained notes and controller state; loops across ties;
+  rate change as a seek. Independently addressable voices, string-owned for fretted parts.
+- **[core-player-element.md](proposed/core-player-element.md)** — campaign item 7, **the
+  first reviewer milestone**: `<mnx-player>` over the written score with a
+  performed-order table, playback highlight separate from selection, click-to-seek via the
+  host, a public reveal helper, Listen on `/verify`; embed smoke on both formats.
 - **[core-player-expression.md](proposed/core-player-expression.md)** — campaign item 8:
-  dynamics, articulations, arpeggio and the guitar techniques as numbers — bend points to
-  a cents curve, slides, hammer/pull without re-attack, palm mute, vibrato, harmonics from
-  the touching pitch. Every number a recorded convention; the golden makes changing one a
-  one-line diff.
+  dynamics, articulations, arpeggio and the guitar techniques as curves and voice flags
+  (`noReattack` on the event type); harmonics from the touching pitch as the one deliberate
+  pitch exception. Every number a recorded convention.
 - **[core-player-midi-oracle.md](proposed/core-player-midi-oracle.md)** — campaign item 9:
-  MuseScore's CLI or Verovio performing the 27 W3C comparisons, diffed as note tables
-  with tolerance, baseline committed. **Blocked on a dev-environment decision** — neither
-  is installed, and nothing is installed silently.
-- **[core-player-webmidi.md](proposed/core-player-webmidi.md)** — campaign item 10: a
-  second sink to a real instrument, channel per string, never the default.
+  MuseScore or Verovio; **bar order and pitch compared strictly**, interpretive deltas
+  reported separately; a three-scenario experiment as soon as a tool is chosen, so the
+  writer is not its own only reader. **Blocked on a dev-environment decision.**
+- **[core-player-unrolled-view.md](proposed/core-player-unrolled-view.md)** — campaign
+  item 10, **moved after the player**: an **occurrence-aware layout plan** (`planHorizontal`
+  takes performed entries; every dependent index per occurrence; clef/key resolved at the
+  jump target; spanners per occurrence pair), still a toggle; opt-in goldens with the path
+  owned; the reached-note set equals what the pass model performs, not the document.
+- **[core-player-webmidi.md](proposed/core-player-webmidi.md)** — campaign item 11: a second
+  sink carrying the export's bounded channel plan on the wire; never the default.
 - **[core-player-sampled-guitar.md](proposed/core-player-sampled-guitar.md)** — campaign
-  item 11: a sampler per string; the item is the **asset question** (bundled, fetched or
-  user-supplied — no R2), argued before anything is built.
-- **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 12,
-  studio's first player feature built in `elements/`: loop the **selection on its pass**,
-  speed trainer, count-in, metronome, mute/solo, localStorage preferences.
+  item 12: a sampled voice per string, **preconditioned on per-voice pitch control** in the
+  chosen sampler; the asset question (bundled, fetched or user-supplied — no R2) argued first.
+- **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
+  studio's first player feature in `elements/`: loop the selection with the **written-range
+  → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
 - **[core-campaign-musicxml.md](proposed/core-campaign-musicxml.md)** — **campaign**: MusicXML
   with zero runtime dependencies and provable accuracy. Opens on the discovery that
   `vendor/mnx/doctools/data.json` already holds **27 MusicXML 3.1 comparisons** whose slugs

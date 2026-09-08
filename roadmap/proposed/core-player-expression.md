@@ -1,47 +1,45 @@
 # Expression and technique — what the marks mean, as numbers
 
-> **Status: proposed 2026-09-08.** Campaign:
-> [core-campaign-player.md](core-campaign-player.md), item 8. Needs item 4; its bends
-> are only audible after item 6's per-string voices, which is the tab-fidelity
+> **Status: proposed 2026-09-08, revised the same day.** Campaign:
+> [core-campaign-player.md](core-campaign-player.md), item 8. Needs items 5 and 6;
+> bends are audible only through item 6's per-string voices — the tab-fidelity
 > dependency on the sound source the campaign called out.
 
 ## Agreement block (campaign contract)
 
-- **Pure before audible (§1).** All of it is compiler stages in `audio/performance.ts`;
-  the sink only ever sees velocity, duration and a cents curve.
-- **Ticks (§2).** Curves are `{ tick, cents }` breakpoints; the sink interpolates.
+- **Pure before audible (§1).** Compiler stages in `audio/performance.ts`; the sink
+  sees velocity, duration, a cents curve and two voice flags.
+- **Rational time (§2).** Curves are `{ position, cents }` breakpoints in rationals of
+  the event; the sink interpolates in audio time.
+- **Identities (§3).** A hammer-on's target is a sounding event with
+  `noReattack: true` on the **event type** (added here — the first draft named the flag
+  without a field for it); it keeps its written occurrence for the cursor.
 - **Proof (§4).** The performance golden moves for every scenario carrying a mark or
-  technique (~30, incl. `lab/*technique*`, `spec/dynamics*`, `spec/articulations*`);
-  the batch is registered in [lab-verify.md](../inprogress/lab-verify.md) with "look
-  for: velocity column follows the dynamic, bend column shape matches the drawn curve".
-  The MIDI oracle (item 9) sees velocity and pitch bend and nothing else here, so the
-  rest is golden-plus-ear.
-- **Spec findings (§6).** How much a staccato shortens, how loud an accent is, how
-  long a grace is: conventions, each recorded with its number.
-- **Reviewer gain (§7).** A bend scenario **sounds bent**, with the curve the reviewer
-  approved in the SVG. That closes the loop between the two kinds of golden.
+  technique (~30); registered in [lab-verify.md](../inprogress/lab-verify.md) with
+  "look for: velocity column follows the dynamic; bend curve matches the drawn one".
+  Item 9 sees velocity and pitch bend only; the rest is golden-plus-ear.
+- **Spec findings (§6).** Every number below is a convention, recorded on landing.
+- **Reviewer gain (§7).** A bend scenario sounds bent with the curve the reviewer
+  approved in the SVG.
 
 ## The mapping
 
 | Source | Becomes |
 |---|---|
-| `dynamics` (`pp`…`ff`, `sfz`) | velocity from a fixed table, in force until the next; `sfz` a one-event spike |
-| `markings.staccato` / `tenuto` / `accent` | duration × 0.5 / × 1.0 with no gap / velocity + 20 |
-| `arpeggio` | onsets staggered by a fixed tick per note, direction from the mark |
-| `tremolo` | already subdivided in item 4; velocity alternates slightly |
-| `tab.technique.bend.points` | cents curve: `alter` × 100 at `position` × duration, pre-bend as a non-zero first point, release as a falling point |
-| `slide` (`shift`/`legato`, `slideIn`/`slideOut`) | a curve over the last quarter of the note toward the target's pitch; in/out from a fixed offset |
-| `hammerPull.target` | target velocity − 25, and a *no-reattack* flag the string voice honours |
-| `palmMute` | duration × 0.6, velocity − 15 |
-| `vibrato` | a 5 Hz ±30-cent curve from a quarter of the way in |
-| `harmonic` (`natural`, `artificial`, `pinch`, …) | sounding pitch from `touchingPitch` (node arithmetic on the string's open pitch) else written pitch; velocity − 10 |
-| `ties[].lv` | ring to a fixed maximum, already in item 4 |
-
-Every number in that table is a §6 convention; the golden makes changing one a
-one-line diff plus a re-approval, which is the cheapest a musical argument gets.
+| `dynamics` | velocity from a fixed table, in force until the next; `sfz` a one-event spike |
+| `staccato` / `tenuto` / `accent` | duration × 0.5 / full with no gap / velocity + 20 |
+| `arpeggio` | onsets staggered by a 64th per note, direction from the mark |
+| `tremolo` | subdivided in item 5; velocity alternates slightly |
+| `bend.points` | cents = `alter` × 100 at `position` × duration; pre-bend a non-zero first point; release a falling one |
+| `slide` | a curve over the last quarter of the note to the target's pitch; in/out from ±2 semitones |
+| `hammerPull.target` | target velocity − 25 and `noReattack` |
+| `palmMute` | duration × 0.6, velocity − 15, `damped` flag |
+| `vibrato` | ±30 cents at 5 Hz from a quarter of the way in |
+| `harmonic` | sounding pitch from `touchingPitch` (node arithmetic on the string's open pitch) else the written pitch; velocity − 10 — **the one deliberate exception** to item 3's nothing-shifts rule |
+| `lv` | item 3's ring rule |
 
 ## Done bar
 
-The goldens regenerated and registered; the MIDI file carries pitch bend on the
-string's channel and velocity per note; a hammer-on in `lab/*technique*` renders
-without a second attack in the string voice.
+Goldens regenerated and registered; the MIDI export carries pitch bend on the string's
+channel within the ±12 range and reports clips; a hammer-on in `lab/*technique*` shows
+one attack in the sounding list.
