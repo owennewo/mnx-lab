@@ -1,12 +1,21 @@
 # Clean-room gp3/gp4/gp5 reader — the Ultimate Guitar range
 
-> **Status: IN PROGRESS — EXPANDED READER LANDED (2026-09-08, `2d013b4`).**
+> **Status: COMPLETE (2026-09-08, `2d013b4` + `7650303`).**
 > GP3/4/5 import, expanded effects/ties, browser integration and the public
 > clean-room API switch are on main and pushed. AlphaTab is a dev-time oracle
-> only. Post-rebase gates passed: 229 Guitar Pro tests, 107 MusicXML tests,
-> 1,250 root tests, scenario checks, build and unchanged primitives. Package,
-> 83-file worker and 32-score corpus smokes pass. Remaining coverage review
-> continues in the task worktree; the item is not yet complete.
+> only. Final post-rebase gates passed: 260 Guitar Pro tests, 107 MusicXML
+> tests, 1,252 root tests, scenario checks, build and 116 primitive tests with
+> unchanged goldens. All 102 authored binary fixtures pass TuxGuitar acceptance;
+> the worker imports 107 files, the pinned corpus passes 71/71, and a fresh
+> production-only package install works without AlphaTab. The implementation
+> worktree and branch were retired before this document moved to `complete/`.
+
+The shipped boundary is **GP3–5 binary import plus existing GP6–8 GPIF-container
+import, with modern `.gp` export**. There is no legacy binary writer. Navigation,
+swing, RSE/page state and unsupported musical styling are not a lossless export
+promise; the [converter support notes](../../converters/guitarpro-mnx/README.md)
+and field notes distinguish retained notation from warned losses. No scenario
+goldens changed, so no verification-debt batch was created.
 
 This is the third leg of the clean-room Guitar Pro converter effort. The first
 two are landed and green: the GPIF importer
@@ -25,7 +34,7 @@ Implementation evidence lives in `src/gp345/`, `src/cleanRoom.ts`,
 tool only and is not a project dependency. It currently emits a structural pair
 and a lyrics/simple-techniques pair in both GP5 revisions.
 
-## Session handoff
+## Completion evidence
 
 ### Requirement audit — 2026-09-08
 
@@ -46,14 +55,20 @@ reported, not silently claimed as preserved MNX features.
 | Differential whole-document proof with explicit oracle-loss masks | Feature tests use the historical AlphaTab importer directly; added comparisons cover grace matrices/chords, percussion graces and harmonic nodes, with asserted oracle errors before masking |
 | Uncommitted ecosystem robustness corpus | `smoke-gp-binary.mjs`: 71 pinned files, including older dialects and five-track demo; alignment, finite pitch and resolved-ID invariants, downloads only in `.gp-corpus/` |
 | Production clean-room flip and runtime dependency removal | Landed `2d013b4`; API/CLI/worker use clean-room, AlphaTab dev-only; packed production install smoke and isolated built-worker smoke |
-| Landing and closeout | **Pending for the follow-ups:** fresh rebase/gates, push, worktree retirement, roadmap move/index update |
+| Landing and closeout | `7650303` rebased onto `dc24480`, all gates and smokes passed, fast-forwarded and pushed; task worktree/branch removed before this closeout |
 
 Preservation limits are documented in the converter README and field notes;
 consumer acceptance is not visual engraving approval, corpus invariants are
 not universal fidelity proof, and generated-fixture input models are not
 treated as authoritative when their bytes disagree with independent consumers.
 
-### Current restart point — 2026-09-08
+## Historical session handoffs — superseded by completion above
+
+These checkpoints preserve the sequence of discovery. Their next steps,
+unlanded labels, worktree paths and intermediate test counts are historical,
+not the final state or an instruction to recreate the retired worktree.
+
+### Restart point — 2026-09-08
 
 Resume branch `core-guitarpro-binary-import` in
 `/home/williao/dev/mnx-labs-worktrees/core-guitarpro-binary-import`, based on

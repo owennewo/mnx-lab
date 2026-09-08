@@ -356,12 +356,6 @@ back up to `proposed/` the moment it is.
   converter, import and export, while 46 round-trip tests pass over it: a symmetric omission
   is invisible to a round trip, and three guitar fixtures cannot find what guitar music
   lacks. No converter code changed — the instrument is built before the thing it measures.
-- **[core-guitarpro-binary-import.md](inprogress/core-guitarpro-binary-import.md)** — the
-  clean-room gp3/gp4/gp5 reader, now in Phase 1 (GP5). The docs-first field notes,
-  binary cursor/version dispatch, GP5.00/5.10 structural body reader, unified clean-room
-  dispatch, and exact AlphaTab parity are built for metadata, measure/track structure,
-  two voices, notes/rests, dots, tuplets, track lyrics, hammer/pull, palm mute, vibrato,
-  slides and basic harmonics. Variable-length effects remain before GP4/GP3.
 - **[core-selection-range-grain.md](inprogress/core-selection-range-grain.md)** — **decisions 1–4 built 2026-08-30** (section and container rungs retired, staff off
   partMeasure identity; spanner work remains); the
   ladder's rungs re-read as **range grains**, out of a 2026-08-30 rung-by-rung review:
@@ -422,6 +416,13 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-guitarpro-binary-import.md](complete/core-guitarpro-binary-import.md)** — clean-room
+  GP3.00, GP4.00/4.06 and GP5.00/5.10 import, shared GPIF normalization, effect/tie/grace
+  coverage and explicit loss warnings. Public API, CLI and browser worker are internal;
+  AlphaTab is dev-only. Shipped as `2d013b4` + `7650303`: 260 converter tests,
+  102 consumer-accepted binary fixtures, 107 worker imports and 71 corpus files pass.
+  GP3–5 writing remains out of scope; modern `.gp` export is clean-room.
 - **[core-display-settings.md](complete/core-display-settings.md)** — **complete 2026-09-08**. Score display controls: lyrics, time signatures, clefs, title, bar numbers and instrument names; shared layout options, viewer bindings and persisted settings, using system terminology. Current verse initially selects the first ordered verse; repeat tracking is deferred.
 - **[workbench-campaign-one-surface.md](complete/workbench-campaign-one-surface.md)** —
   **campaign**, item 1 built 2026-08-31: retire the ten `Shift+letter` popovers and the

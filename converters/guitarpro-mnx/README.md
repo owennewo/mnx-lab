@@ -18,7 +18,7 @@ but chord diagrams and dead-note styling are not. Navigation directions and
 triplet feel also warn rather than being preserved; written durations remain
 unchanged. The current coverage and
 remaining edge cases are recorded in
-[the binary-reader roadmap](../../roadmap/inprogress/core-guitarpro-binary-import.md).
+[the completed binary-reader roadmap](../../roadmap/complete/core-guitarpro-binary-import.md).
 
 ```js
 import { importGuitarPro, exportGuitarPro } from '@mnx-editor/guitarpro-mnx';

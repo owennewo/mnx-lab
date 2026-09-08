@@ -1,7 +1,7 @@
 # Guitar Pro 3–5 binary field notes
 
 **Research, not roadmap.** This is the docs-first specification for the clean-room
-legacy reader tracked in `roadmap/inprogress/core-guitarpro-binary-import.md`. It records
+legacy reader tracked in `roadmap/complete/core-guitarpro-binary-import.md`. It records
 only claims needed by the implementation and labels their evidence; PyGuitarPro's LGPL
 implementation remains unread.
 
