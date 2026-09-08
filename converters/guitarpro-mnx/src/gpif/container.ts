@@ -1,4 +1,14 @@
-import { inflateRawSync, crc32 } from 'node:zlib';
+import { inflateSync } from 'fflate';
+
+/** ZIP's standard reflected CRC-32, independent of Node's zlib binding. */
+export function crc32(data: Uint8Array): number {
+  let value = 0xffffffff;
+  for (const byte of data) {
+    value ^= byte;
+    for (let bit = 0; bit < 8; bit++) value = (value >>> 1) ^ ((value & 1) ? 0xedb88320 : 0);
+  }
+  return (value ^ 0xffffffff) >>> 0;
+}
 
 /**
  * Guitar Pro GPIF containers, clean-room.
@@ -190,7 +200,7 @@ function readZipEntry(data: Uint8Array, wanted: string): Uint8Array | null {
     const raw = data.subarray(start, start + compressedSize);
 
     if (method === 0) return raw;
-    if (method === 8) return new Uint8Array(inflateRawSync(raw));
+    if (method === 8) return inflateSync(raw);
     throw new Error(`zip entry ${wanted}: unsupported compression method ${method}`);
   }
   return null;

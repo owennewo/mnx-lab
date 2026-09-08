@@ -1,7 +1,7 @@
 export { GpBinaryReader } from './binary.js';
 export { readGpBinaryVersion, sniffGpBinaryVersion } from './version.js';
 export { readGpBinaryPreamble, readGpBinaryPreambleFromReader } from './song.js';
-export { parseGuitarPro5, importGuitarPro5 } from './gp5.js';
+export { parseGuitarPro5, importGuitarPro5, parseGuitarProBinary, importGuitarProBinary } from './gp5.js';
 export type {
   GpBinaryMajorVersion,
   GpBinaryRevision,

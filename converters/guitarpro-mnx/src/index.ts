@@ -1,14 +1,7 @@
-import { importGuitarPro, scoreToMnx, ImportOptions } from './import/gp.js';
-import { exportGuitarPro, buildScore, ExportOptions } from './export/gp.js';
-
-export {
-  importGuitarPro,
-  scoreToMnx,
-  ImportOptions,
-  exportGuitarPro,
-  buildScore,
-  ExportOptions
-};
+export { importGuitarProCleanRoom as importGuitarPro } from './cleanRoom.js';
+export { exportGuitarProGpif as exportGuitarPro } from './gpif/fromMnx.js';
+export type { GpifImportOptions as ImportOptions } from './gpif/toMnx.js';
+export type { GpifExportOptions as ExportOptions } from './gpif/fromMnx.js';
 export * from './gpif/index.js';
 export * from './gp345/index.js';
 export * from './cleanRoom.js';

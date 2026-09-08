@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { importGuitarPro, exportGuitarPro, buildScore } from '../src/index.js';
+import { importGuitarPro, exportGuitarPro } from '../src/index.js';
+import { buildScore } from '../src/export/gp.js';
 import {
   MnxStructure,
   MnxEvent,

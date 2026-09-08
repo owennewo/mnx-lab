@@ -21,8 +21,7 @@ import {
   GpifDocument,
   GpifBeat,
   GpifNote,
-  GpifTrack,
-  GpifRhythm
+  GpifTrack
 } from './document.js';
 
 /**
@@ -70,6 +69,7 @@ const SLIDE_IN_FROM_ABOVE = 0x20;
 
 /** A note instance awaiting a technique target (hammer-on / slide-to). */
 interface NoteRecord {
+  sourceId: number;
   /** Beat ordinal within the voice chain — targets resolve strictly forward. */
   order: number;
   /** GPIF string number (0 = lowest); targets pair on the same string. */
@@ -441,16 +441,17 @@ function buildSequence(
     if (noteIds.length === 0) {
       event.rest = {};
     } else {
-      event.notes = noteIds
-        .map(id => doc.notes.get(id))
-        .filter((note): note is GpifNote => note !== undefined)
-        .map(note => buildNote(note, track, fifths, order, state, voice.records));
+      event.notes = noteIds.flatMap(id => {
+        const note = doc.notes.get(id);
+        return note ? [buildNote(note, id, track, fifths, order, state, voice.records)] : [];
+      });
     }
 
     const lyrics = buildLyrics(beat, voice.lyricContinuation);
     if (lyrics) event.lyrics = lyrics;
 
     if (beat.graceKind !== null) {
+      if (graceKind !== null && graceKind !== beat.graceKind) flushGrace();
       // A grace beat is un-timed: it neither joins a tuplet group nor ends one.
       graceRun.push(event);
       graceKind = graceKind ?? beat.graceKind;
@@ -567,6 +568,7 @@ function buildLyrics(
 
 function buildNote(
   gpNote: GpifNote,
+  sourceId: number,
   track: GpifTrack,
   fifths: number,
   order: number,
@@ -597,7 +599,14 @@ function buildNote(
     mnxNote._x.mnxLab = { ...mnxNote._x.mnxLab, tab: { technique } };
   }
 
+  if (gpNote.tieOrigin !== undefined) {
+    const origin = records.find(record => record.sourceId === gpNote.tieOrigin);
+    if (!origin) throw new Error(`Tie source ${gpNote.tieOrigin} is missing from this voice`);
+    origin.note.ties = [{ target: id }];
+  }
+
   records.push({
+    sourceId,
     order,
     gpString: gpNote.string,
     id,
@@ -702,6 +711,13 @@ function readTechniques(note: GpifNote): {
 function buildBend(note: GpifNote): { points: MnxBendPoint[] } | null {
   const bend = note.bend;
   if (!bend) return null;
+
+  if (bend.points) {
+    const points = bend.points.map(point => ({ ...point }));
+    if (!points.some(point => point.alter !== 0)) return null;
+    if (points.length === 1) points.unshift({ position: 0, alter: 0 });
+    return { points };
+  }
 
   const origin = (bend.originValue ?? 0) / 50;
   const destination = (bend.destinationValue ?? 0) / 50;

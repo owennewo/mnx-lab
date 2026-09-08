@@ -10,3 +10,6 @@ dist/
 # Codex-agent mirrors, untracked by decision (audit-cleanup): .claude/ is canonical
 AGENTS.md
 .agents/
+
+# Downloaded Guitar Pro robustness corpus: never commit transcriptions.
+.gp-corpus/

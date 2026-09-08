@@ -1,12 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import {
-  importGuitarPro,
-  importGuitarPro5,
-  importGuitarProCleanRoom,
-  parseGuitarPro5
-} from '../src/index.js';
+import { importGuitarPro5, importGuitarProCleanRoom, parseGuitarPro5 } from '../src/index.js';
+import { importGuitarPro } from '../src/import/gp.js';
 import { MnxStructure } from '../src/common/types.js';
 import { normalizeIds } from './helpers/normalize.js';
 

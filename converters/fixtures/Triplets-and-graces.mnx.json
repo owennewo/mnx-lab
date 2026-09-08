@@ -42,7 +42,7 @@
                   },
                   "notes": [
                     {
-                      "id": "n25",
+                      "id": "n0",
                       "pitch": {
                         "step": "C",
                         "octave": 3
@@ -62,7 +62,7 @@
                   },
                   "notes": [
                     {
-                      "id": "n26",
+                      "id": "n1",
                       "pitch": {
                         "step": "E",
                         "octave": 3
@@ -82,7 +82,7 @@
                   },
                   "notes": [
                     {
-                      "id": "n27",
+                      "id": "n2",
                       "pitch": {
                         "step": "G",
                         "octave": 3
@@ -102,7 +102,7 @@
                   },
                   "notes": [
                     {
-                      "id": "n28",
+                      "id": "n3",
                       "pitch": {
                         "step": "C",
                         "octave": 4
@@ -175,7 +175,7 @@
                       },
                       "notes": [
                         {
-                          "id": "n29",
+                          "id": "n4",
                           "pitch": {
                             "step": "G",
                             "octave": 3
@@ -195,7 +195,7 @@
                       },
                       "notes": [
                         {
-                          "id": "n30",
+                          "id": "n5",
                           "pitch": {
                             "step": "B",
                             "octave": 3
@@ -215,7 +215,7 @@
                       },
                       "notes": [
                         {
-                          "id": "n31",
+                          "id": "n6",
                           "pitch": {
                             "step": "E",
                             "octave": 4
@@ -252,7 +252,7 @@
                       },
                       "notes": [
                         {
-                          "id": "n32",
+                          "id": "n7",
                           "pitch": {
                             "step": "E",
                             "octave": 4
@@ -272,7 +272,7 @@
                       },
                       "notes": [
                         {
-                          "id": "n33",
+                          "id": "n8",
                           "pitch": {
                             "step": "B",
                             "octave": 3
@@ -292,7 +292,7 @@
                       },
                       "notes": [
                         {
-                          "id": "n34",
+                          "id": "n9",
                           "pitch": {
                             "step": "G",
                             "octave": 3
@@ -326,7 +326,7 @@
                   },
                   "notes": [
                     {
-                      "id": "n35",
+                      "id": "n10",
                       "pitch": {
                         "step": "C",
                         "octave": 4
@@ -346,7 +346,7 @@
                   },
                   "notes": [
                     {
-                      "id": "n36",
+                      "id": "n11",
                       "pitch": {
                         "step": "G",
                         "octave": 3
@@ -411,7 +411,7 @@
                       },
                       "notes": [
                         {
-                          "id": "n37",
+                          "id": "n12",
                           "pitch": {
                             "step": "G",
                             "octave": 3,
@@ -435,7 +435,7 @@
                   },
                   "notes": [
                     {
-                      "id": "n38",
+                      "id": "n13",
                       "pitch": {
                         "step": "A",
                         "octave": 3
@@ -448,7 +448,7 @@
                       }
                     },
                     {
-                      "id": "n39",
+                      "id": "n14",
                       "pitch": {
                         "step": "D",
                         "octave": 4
@@ -468,7 +468,7 @@
                   },
                   "notes": [
                     {
-                      "id": "n40",
+                      "id": "n15",
                       "pitch": {
                         "step": "D",
                         "octave": 3
@@ -491,7 +491,7 @@
                       },
                       "notes": [
                         {
-                          "id": "n41",
+                          "id": "n16",
                           "pitch": {
                             "step": "C",
                             "octave": 3
@@ -511,7 +511,7 @@
                       },
                       "notes": [
                         {
-                          "id": "n42",
+                          "id": "n17",
                           "pitch": {
                             "step": "E",
                             "octave": 3
@@ -531,7 +531,7 @@
                       },
                       "notes": [
                         {
-                          "id": "n43",
+                          "id": "n18",
                           "pitch": {
                             "step": "D",
                             "octave": 3
@@ -607,7 +607,7 @@
                   },
                   "notes": [
                     {
-                      "id": "n44",
+                      "id": "n19",
                       "pitch": {
                         "step": "E",
                         "octave": 2
@@ -620,7 +620,7 @@
                       }
                     },
                     {
-                      "id": "n45",
+                      "id": "n20",
                       "pitch": {
                         "step": "B",
                         "octave": 2
@@ -633,7 +633,7 @@
                       }
                     },
                     {
-                      "id": "n46",
+                      "id": "n21",
                       "pitch": {
                         "step": "E",
                         "octave": 3
@@ -646,7 +646,7 @@
                       }
                     },
                     {
-                      "id": "n47",
+                      "id": "n22",
                       "pitch": {
                         "step": "G",
                         "octave": 3,
@@ -660,7 +660,7 @@
                       }
                     },
                     {
-                      "id": "n48",
+                      "id": "n23",
                       "pitch": {
                         "step": "B",
                         "octave": 3
@@ -673,7 +673,7 @@
                       }
                     },
                     {
-                      "id": "n49",
+                      "id": "n24",
                       "pitch": {
                         "step": "E",
                         "octave": 4

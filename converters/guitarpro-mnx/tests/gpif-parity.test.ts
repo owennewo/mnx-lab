@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { importGuitarPro, importGuitarProCleanRoom } from '../src/index.js';
+import { importGuitarProCleanRoom } from '../src/index.js';
+import { importGuitarPro } from '../src/import/gp.js';
 import {
   importGuitarProGpif,
   extractScoreGpif,

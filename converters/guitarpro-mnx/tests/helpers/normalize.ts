@@ -37,6 +37,9 @@ export function normalizeIds(mnx: MnxStructure): MnxStructure {
       for (const sequence of measure.sequences ?? []) {
         for (const event of events(sequence.content)) {
           for (const note of event.notes ?? []) {
+            for (const tie of note.ties ?? []) {
+              if (tie.target) tie.target = rename.get(tie.target) ?? tie.target;
+            }
             const technique = note._x?.mnxLab?.tab?.technique;
             if (!technique) continue;
             if (technique.hammerPull?.target) {

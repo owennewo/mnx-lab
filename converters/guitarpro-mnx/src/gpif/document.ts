@@ -16,6 +16,7 @@ import { MnxNoteValueBase } from '../common/types.js';
  */
 
 export interface GpifDocument {
+  metadata?: { title: string; artist: string };
   masterBars: GpifMasterBar[];
   tracks: GpifTrack[];
   bars: Map<number, GpifBar>;
@@ -88,6 +89,8 @@ export interface GpifRhythm {
 }
 
 export interface GpifBend {
+  /** Legacy binary curves retain every control point in MNX units. */
+  points?: { position: number; alter: number }[];
   originValue: number | null;
   originOffset: number | null;
   middleValue: number | null;
@@ -98,6 +101,10 @@ export interface GpifBend {
 }
 
 export interface GpifNote {
+  /** Legacy tie destination; joins the preceding note on this voice/string. */
+  tieDestination?: boolean;
+  /** Resolved legacy source ID; avoids accidentally tying to an inserted grace. */
+  tieOrigin?: number;
   /** GPIF string number: 0-based, 0 = lowest string. Null off the fingerboard. */
   string: number | null;
   /** Fret, capo-relative. */
@@ -137,6 +144,7 @@ export function parseGpif(xml: string): GpifDocument {
   if (!root || root.tagName !== 'GPIF') throw new Error('not a GPIF document');
 
   return {
+    metadata: { title: text(child(root, 'Score'), 'Title') ?? '', artist: text(child(root, 'Score'), 'Artist') ?? '' },
     masterBars: children(child(root, 'MasterBars'), 'MasterBar').map(parseMasterBar),
     tracks: children(child(root, 'Tracks'), 'Track').map(parseTrack),
     bars: pool(root, 'Bars', 'Bar', parseBar),
@@ -341,12 +349,16 @@ function parseTempoAutomations(root: Element): Map<number, number[]> {
   for (const automation of children(wrapper, 'Automation')) {
     if (text(automation, 'Type') !== 'Tempo') continue;
     const bar = int(text(automation, 'Bar')) ?? 0;
-    // `<Value>160 2</Value>` — bpm, then a beat-unit token (2 = quarter; the
-    // full enum is an open question in the field notes and unused here).
-    const bpm = float((text(automation, 'Value') ?? '').split(/\s+/)[0]);
+    // The second token is the 1-based beat unit used by tempoReference().
+    // Normalize to quarter BPM without changing playback speed.
+    const values = (text(automation, 'Value') ?? '').trim().split(/\s+/);
+    const bpm = float(values[0]);
     if (bpm === null) continue;
+    const reference = int(values[1]) ?? 2;
+    const multiplier = [0.5, 1, 1.5, 2, 3][reference - 1];
+    if (multiplier === undefined) throw new Error(`unsupported GPIF tempo reference ${reference}`);
     const list = automations.get(bar) ?? [];
-    list.push(bpm);
+    list.push(bpm * multiplier);
     automations.set(bar, list);
   }
   return automations;
