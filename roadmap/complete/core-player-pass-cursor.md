@@ -1,6 +1,6 @@
 # Playback context and the iteration cursor — a position that knows its repeat index
 
-> **Status: implemented 2026-09-08; landing checks in progress.** Campaign:
+> **Status: complete 2026-09-08.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 2. Needs item 1;
 > independent of everything else. **The edit session and the selection are not
 > touched**; this is a separate, host-coordinated playback context.
@@ -76,3 +76,7 @@ tests, including all 14 original navigation scenarios and the D.S. final-ending
 fixture. Browser checks cover chip cycling, skipped endings and the typed inspector
 command. No scenario or engraving changes. Sound and the public rest/position reveal
 API remain item 7 work.
+
+Landing validation: 1,347 tests, scenario police, production build, library smoke
+and embed smoke passed. Regenerated primitives left the scenario tree unchanged.
+Implementation worktree retired before this document moved to complete.
