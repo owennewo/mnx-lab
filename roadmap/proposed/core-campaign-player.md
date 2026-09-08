@@ -41,7 +41,7 @@ filing a `spec/proposals/` topic is a separate human decision.
 - The viewer already emits a note id on click and takes a set of note keys to highlight,
   so cursor sync has its hooks. Keys are per written note (`model/noteKeys.ts`); nothing
   distinguishes pass 1 of a note from pass 2.
-- [core-display-settings.md](core-display-settings.md) defers "current verse" to a
+- [core-display-settings.md](../complete/core-display-settings.md) defers "current verse" to a
   playback/repeat context that does not yet exist. Item 2 is that context.
 
 ## The shape — three decisions, taken 2026-09-08

@@ -222,7 +222,6 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
-- **[core-display-settings.md](inprogress/core-display-settings.md)** — score display controls: lyrics, time signatures, clefs, title, bar numbers and instrument names; shared layout options, viewer bindings and persisted settings, using system terminology. Current verse initially selects the first ordered verse; repeat tracking is deferred.
 - **[core-musicxml-staves.md](inprogress/core-musicxml-staves.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 12, **built 2026-09-04**:
   multi-staff parts — `<staves>`, a `<clef number>` per staff tracked independently, and
@@ -414,6 +413,7 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-display-settings.md](complete/core-display-settings.md)** — **complete 2026-09-08**. Score display controls: lyrics, time signatures, clefs, title, bar numbers and instrument names; shared layout options, viewer bindings and persisted settings, using system terminology. Current verse initially selects the first ordered verse; repeat tracking is deferred.
 - **[workbench-campaign-one-surface.md](complete/workbench-campaign-one-surface.md)** —
   **campaign**, item 1 built 2026-08-31: retire the ten `Shift+letter` popovers and the
   selection tray onto the rung inspector, one surface per item, ordered simplest to

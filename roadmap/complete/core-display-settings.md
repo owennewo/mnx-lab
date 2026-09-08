@@ -1,6 +1,6 @@
 # Score display settings
 
-> **Status: in progress (2026-09-08).** Implementation loop: presentation controls
+> **Status: complete (2026-09-08).** Implementation loop: presentation controls
 > over the existing MNX model, shared by the engine and viewer and exposed in
 > the workbench's settings pad. No spec changes.
 
@@ -164,8 +164,9 @@ preference architecture.
 
 ## Implementation and verification record
 
-Implementation is complete in the `core-display-settings` worktree; landing
-and retirement remain. No corpus verification records were edited.
+Implementation landed on `main` at `4f18d55` and was pushed to origin. The
+`core-display-settings` implementation worktree and branch were removed before
+this document moved to `complete/`. No corpus verification records were edited.
 
 - Pure normalized options are shared by spacing, notation, Tab and Both.
   Current verse resolves a document-global ID; filtering releases horizontal
@@ -190,9 +191,8 @@ and retirement remain. No corpus verification records were edited.
   multiple verses, missing syllables, nonnumeric ordering, unknown IDs,
   empty lyrics, cross-system/current-verse hyphens, clef timelines, multi-part/grand-staff layouts, unnamed
   parts, multiple score blocks, collapsed numbering, serialization, audio
-  timing, and selection inputs. The full harness passed 1,241 tests before
-  the final collapsed-bar and binding additions; landing gates below must
-  supersede this intermediate total.
+  timing, and selection inputs. The final post-rebase harness passed **1,250 tests across 70 files**.
+  `npm run check:scenarios` and `npm run build` passed on the same branch.
 - Default golden regeneration: 116 cases pass with `git diff -- scenarios/`
   empty. No verification-debt batch is required.
 - Browser: actual card checked in dark and light themes, document focus,
@@ -208,8 +208,9 @@ and retirement remain. No corpus verification records were edited.
   time 42. The temporary page was removed from the worktree.
 - Preference recovery was checked against invalid stored JSON/enums, valid
   persistence, and exclusion of transient verse context using isolated
-  storage. Library and embed builds passed; final public-face and landing
-  checks will be recorded after rebase.
+  storage. `npm run smoke:lib` passed the packed-library Node render;
+  `npm run smoke:embed` passed cross-origin rendering, light/dark themes,
+  zero-config Both, and multiple-viewer checks. Both public builds passed.
 
 - Final keyboard audit found and fixed Space/Enter bubbling from the card
   to the window-level score editor. The card now owns its key events while
