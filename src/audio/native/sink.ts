@@ -169,7 +169,10 @@ export class NativeSink implements Sink {
         throw new RangeError('Invalid frequency.');
       if (
         (event.kind === 'attack' || (event.kind === 'pitch' && event.velocity !== undefined)) &&
-        (!Number.isFinite(event.velocity) || event.velocity < 0 || event.velocity > 1)
+        (typeof event.velocity !== 'number' ||
+          !Number.isFinite(event.velocity) ||
+          event.velocity < 0 ||
+          event.velocity > 1)
       )
         throw new RangeError('Invalid velocity.');
       if (event.kind === 'bend' && !Number.isFinite(event.cents))
