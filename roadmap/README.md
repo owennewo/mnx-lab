@@ -173,9 +173,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-player-sampled-guitar.md](inprogress/core-player-sampled-guitar.md)** — item 12: on-demand guitar samples through native independent voices.
-
-
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
   iteration, the performed order as a golden — with studio practice as indexed follow-ups.
@@ -377,6 +374,9 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-player-sampled-guitar.md](complete/core-player-sampled-guitar.md)** — item 12: on-demand CC0 guitar samples, independent voices, host loaders and a player sound choice; human listening pending.
+
 
 - **[core-score-metadata.md](complete/core-score-metadata.md)** — **what the piece is, and
   what wrote the file**, complete 2026-09-09; one approval pending. MNX has no document

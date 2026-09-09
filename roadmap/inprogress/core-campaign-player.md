@@ -4,7 +4,7 @@
 > proposals, the shared contract they follow, and the running log of progress and
 > learnings as items land. Indexed items are ordinary `core-*` (and one `studio-*`)
 > proposals that name this campaign. **Opened 2026-09-08; revised the same day on an
-> independent review before anything was built** — see the first log entry. Items 1–10 are implemented; item 11 is won’t-do, item 12 is in progress and item 13 remains proposed.
+> independent review before anything was built** — see the first log entry. Items 1–10 are implemented; item 11 is won’t-do, item 12 is implemented and item 13 remains proposed.
 
 ## The goal
 
@@ -171,7 +171,7 @@ run any time before 6.
 | 9 | [MIDI oracle](../complete/core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | complete; 22/27 W3C observable strict matches |
 | 10 | [Unrolled engraving](../complete/core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | complete; unrolled engraving review pending |
 | 11 | [WebMIDI out](../rejected/core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | rejected — user chose won’t-do |
-| 12 | [Sampled guitar](core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | in progress — explicitly authorized ahead of review |
+| 12 | [Sampled guitar](../complete/core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | complete; listening review pending |
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
 
 ### Decisions still open
@@ -537,3 +537,8 @@ The shipped viewer entry stays unchanged until item 7 consumes playback.
 - Real recorded buffers pass onset, bend, legato, cancellation/release and seek
   measurements; browser checks cover loading/recovery and cross-origin assets.
   [Human listening](lab-verify.md#sampled-guitar-listening--2026-09-09) remains pending.
+
+- Landed as bd3f6b1; the implementation worktree was retired before item 12 moved
+  to complete. Post-rebase gates: 1,614 tests / 94 files, corpus/build and clean
+  regenerated goldens. Audio, both embed formats, workbench/Listen and installed
+  package smokes passed. Item 13 is the only remaining implementation proposal.

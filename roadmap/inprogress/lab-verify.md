@@ -853,7 +853,7 @@ meter fallback. Written goldens and approval records remain unchanged.
 
 ## Sampled guitar listening — 2026-09-09
 
-Cause: [player campaign item 12](core-player-sampled-guitar.md);
+Cause: [player campaign item 12](../complete/core-player-sampled-guitar.md);
 [pack and behavior](../../docs/player-sampled-guitar.md).
 No scenario golden, status or approval record changed. This is a listening
 obligation for the new timbre, not a request to re-approve unchanged performance
