@@ -363,3 +363,27 @@ it('omits niente from MIDI instead of raising it to an audible velocity', () => 
   expect(midi.ok).toBe(true);
   expect(midi.diagnostics.some((d) => d.code === 'silent-note')).toBe(true);
 });
+it('preserves the converter-resolved Vestapol harmonics at their hand-stated MIDI pitches', () => {
+  const d = JSON.parse(fs.readFileSync('converters/fixtures/Vestapol.mnx.json', 'utf8'));
+  const p = compile(d);
+  for (const [key, midi] of [
+    ['n102', 66],
+    ['n103', 69],
+    ['n104', 74],
+    ['n725', 50],
+    ['n726', 57],
+    ['n727', 62],
+    ['n728', 66],
+    ['n729', 69],
+    ['n730', 74],
+  ] as const) {
+    const occurrences = p.written.filter((w) => w.noteKey === key);
+    expect(occurrences.length, key).toBeGreaterThan(0);
+    for (const w of occurrences)
+      for (const id of w.soundingIds) {
+        const sound = p.sounding.find((s) => s.id === id)!;
+        expect(sound.midi, key).toBe(midi);
+        expect(sound.timbre, key).toContain('harmonic');
+      }
+  }
+});
