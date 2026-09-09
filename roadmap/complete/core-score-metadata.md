@@ -1,8 +1,12 @@
 # Score metadata: what the piece is, and what wrote the file
 
-> **Status: plan, nothing built** (2026-09-09). Worktree `core-score-metadata`.
+> **Status: BUILT and landed 2026-09-09** (`2b77c06`), owing one approval — registered in
+> [roadmap/inprogress/lab-verify.md](../inprogress/lab-verify.md) → *Score metadata*.
 > Serves the implementation loop (extension v6.2 + both converters + the viewer heading)
 > and hands the spec loop a drafted object pair for w3c-cg/mnx#267 and #547.
+>
+> The plan below is as written before the work; what the build actually found is in
+> *Learnings* at the end. Everything planned shipped, plus three fixes the work uncovered.
 
 ## The gap
 
@@ -239,3 +243,67 @@ not approval.
 `npm run update:primitives` with a clean `git diff -- scenarios/` apart from the new
 scenario's own goldens. Landing per CLAUDE.md § Landing the work; worktree removed before
 this doc moves to `complete/`.
+
+## Learnings
+
+### The writer's stamp masked a real loss, and the matrix said so
+
+`_x.mnxLab.encoding` is stamped by whatever writes a file, so the MusicXML importer
+adds one to every document it produces. That made `vendor-extensions` **unloseable**:
+any document at all came back carrying a vendor dict, and the row flipped from `lossy`
+to `supported` the moment the stamp landed. Two scenarios really do lose their own `_x`
+(`00-document/03-navigation-playground` and `04-twelve-bar-blues`, both via `strings`),
+and the coarse def row had stopped being able to see it.
+
+The fix is in the matrix's accounting, not the converter: a block the round trip
+**creates** did not survive it. `withoutWriterStamp` discounts the stamp before scoring,
+and the row is honest again.
+
+This is the same hazard [core-musicxml-staves](core-musicxml-staves.md) recorded from the
+other side — *a flat `lossy` cell can hide a feature that works* — and it turns out to be
+symmetric. A shared def is only as informative as its least specific contributor. The
+per-key `_x.mnxLab.<key>` rows never lost the truth, which is an argument for keeping
+both granularities rather than collapsing to one.
+
+### A timestamp in derived output is a wart, and it had already been paid for
+
+The MusicXML export stamped today's `<encoding-date>` unconditionally. The cost was
+visible in the test suite: the byte-for-byte fixture comparison had to mask the date to
+work at all, with a comment explaining that it was "the one thing in the output that is
+not derived from the document". Making the date opt-in (`--encoding-date`) deleted the
+mask and made that comparison **exact** — a test got stronger by removing a feature.
+
+The general rule, now in CLAUDE.md: derived files are committed here, so anything
+non-reproducible in a converter's output is a diff on every regeneration.
+
+### Recapturing an independent oracle is cheaper than arguing about it
+
+The four `.xml` fixtures changed, which tripped the MIDI oracle's input-hash guard. The
+tempting move was to update the hashes with a note that metadata cannot affect playback.
+Running `npm run capture:midi-oracle` instead took one command and produced **byte-
+identical MIDI** from the new inputs — only the hashes moved. The claim is now evidence
+rather than reasoning, and the guard did exactly its job.
+
+### Neither converter had a CLI test, and the gap was live
+
+A `--encoding-date` helper shipped **undefined** in `musicxml-mnx/src/cli.ts` with all
+123 tests green; the command threw `ReferenceError` on the first real export. Worse, the
+package re-exported its option types in value position, so the CLI could not load under
+`tsx` at all — before its first line ran. Neither is related to metadata; both were
+reachable the whole time because nothing executed the CLIs. Both packages now have one
+end-to-end CLI test.
+
+The corpus rule says `.mnx.json` is derived *via the CLI*, so the CLI is load-bearing
+infrastructure that no test touched.
+
+### What the format survey settled, and what it did not
+
+The three formats agree on far more than expected — title, subtitle, composer/lyricist/
+arranger, copyright, source, encoding provenance — which made the `work` shape close to
+a transcription rather than a design. The two genuine decisions were both about what is
+*not* a creator: `artist` (a performer) and `album` (a release) are the tab world's
+addition, and MusicXML has no home for either.
+
+Left open on purpose: whether a document's own title should print when a score declares
+no name. It is additive and would move no existing golden, but it is an engraving
+decision with its own verify batch, and this item was data plumbing.

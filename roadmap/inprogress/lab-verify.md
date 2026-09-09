@@ -83,7 +83,7 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ### Score metadata — 2026-09-09
 
-Cause: [core-score-metadata](../proposed/core-score-metadata.md). **One new scenario,
+Cause: [core-score-metadata](../complete/core-score-metadata.md). **One new scenario,
 `lab/00-document/05-score-metadata`, at `draft` — no existing golden moved.** That is
 the claim to check first: document metadata is data, and nothing in the layout engine
 reads it, so this batch should be the cheapest kind of review.

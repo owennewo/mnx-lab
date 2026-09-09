@@ -52,18 +52,6 @@ proposals that name their campaign.
   Unrolled checkbox becomes a REPEATS row, and the mark idles bare at 0.28 with the card
   growing around it — the zoom pad's grammar, so the cluster reads as one family. Chrome
   only; verified hands-on over CDP like the pad was.
-- **[core-score-metadata.md](proposed/core-score-metadata.md)** — **what the piece is, and
-  what wrote the file.** MNX has no document metadata at all (root admits `mnx`/`global`/
-  `parts`/`scores`/`layouts`; `score.name` is a layout label), upstream has three open
-  issues and no design (#56, #267, #547), and locally title/artist ride the host wrapper
-  and are dropped on every save. Adds two root-level `_x.mnxLab` blocks drafting the
-  standard objects: `work` (title, subtitle, artist, album, `creators[{role,name}]`,
-  copyright, source, notes — Dublin-Core-mapped) and `encoding` (software, version, date —
-  stamped by the writer, never forwarded). Extension **v6.2**, additive, no upgrade hop.
-  Both converters read and write as far as each format allows (GPIF `<Score>` all eleven
-  fields; MusicXML `<work>`/`<identification>`/`<credit>`), the wrapper fields retire, the
-  viewer heading reads the document. The engine keeps drawing `score.name`; the upstream
-  bundle is a named follow-up.
 - **[core-player-webmidi.md](proposed/core-player-webmidi.md)** — campaign item 11: a second
   sink carrying the export's bounded channel plan on the wire; never the default.
 - **[core-player-sampled-guitar.md](proposed/core-player-sampled-guitar.md)** — campaign
@@ -392,6 +380,21 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-score-metadata.md](complete/core-score-metadata.md)** — **what the piece is, and
+  what wrote the file**, complete 2026-09-09; one approval pending. MNX has no document
+  metadata at all (the root admits `mnx`/`global`/`parts`/`scores`/`layouts`, and
+  `score.name` labels a *layout*), upstream has three open issues and no design
+  ([#56](https://github.com/w3c/mnx/issues/56), [#267](https://github.com/w3c-cg/mnx/issues/267),
+  [#547](https://github.com/w3c-cg/mnx/issues/547)), and locally title/artist rode the host
+  wrapper where every save dropped them. Extension **v6.2** adds a fourth placement point,
+  the document root — `work` (title, subtitle, artist, album, typed `creators[]`,
+  copyright, source, notes, Dublin-Core-mapped) and `encoding` (software, version, date);
+  additive, no upgrade hop. Both converters read and write as far as each format allows.
+  Three findings: the writer's stamp made `vendor-extensions` **unloseable** and masked two
+  real losses until the matrix learned to discount it; making the encoding date opt-in let
+  a byte-for-byte fixture test drop its mask and become exact; and neither converter had a
+  CLI test, which had let a `--encoding-date` helper ship undefined with every unit test
+  green. Recapturing the MuseScore oracle produced byte-identical MIDI, so only hashes moved.
 - **[core-player-unrolled-view.md](complete/core-player-unrolled-view.md)** — campaign item 10: occurrence-aware unrolled engraving, exact-visit playback/selection, and independent SVG evidence. Written goldens unchanged; human unrolled review pending.
 - **[core-player-midi-oracle.md](complete/core-player-midi-oracle.md)** — campaign item 9,
   complete 2026-09-09: independent MuseScore Studio 4.7.5 recordings for 27 W3C pairs
