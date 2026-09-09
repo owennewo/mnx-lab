@@ -87,11 +87,14 @@ A beamed group's primary beam is placed by one shared rule, `placeBeamLine` in
 `src/engine/layout/notation.ts`, used by principal, grace and tuplet beams alike
 ([roadmap/complete/core-beam-geometry.md](../roadmap/complete/core-beam-geometry.md)):
 every stem's ideal tip is the normal length (`STEM_LENGTH_SP`, one octave) from its
-head; the slant follows the two outer heads, capped at `BEAM_MAX_SLANT_SP`; the stem
-that would come out **shortest** is the anchor and lands on a per-level minimum —
-`BEAMED_STEM_MIN_SP` (2.5) under one beam, half a space more per deeper level, never
-longer than normal — so every other stem grows from there rather than the shortest
-being pushed out to the octave; and the beam then nudges **outward only** until it sits
+head; the slant (`beamSlant`) is **flat** when the outer heads match, when the heads form a
+repeating pattern, or when the head nearest the beam is an inner one, and otherwise rises
+`BEAM_SLANT_PER_STEP_SP` (a quarter space) per staff step of the outer interval, capped at
+`BEAM_MAX_SLANT_SP` (0.75); the stem
+that would come out **shortest** is the anchor and lands on `BEAMED_STEM_MIN_SP` (2.5,
+whatever the beam count — `BEAMED_STEM_MIN_STEP_SP` is 0) so every other stem grows from
+there rather than the shortest being pushed out to the octave; and the beam then nudges
+**outward only** until it sits
 on, straddles or hangs from a staff line instead of floating mid-space (at most
 1 − 2 × the shared half-thickness, about 0.37sp; a beam clear of the staff is left
 alone). Flagged stems are untouched. `display.beams: 'flat'` sets the slant cap to zero —

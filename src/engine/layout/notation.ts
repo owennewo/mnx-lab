@@ -209,13 +209,16 @@ const BARLINE_METRICS: BarlineMetrics = STANDARD_BARLINE_METRICS;
 const STEM_LENGTH_SP = 3.5;
 const BEAM_THICKNESS_SP = 0.5;
 const BEAM_GAP_SP = 0.25;          // clear space between beam levels
-const BEAM_MAX_SLANT_SP = 1;       // total rise/fall cap across a group
+// Slant follows the outer heads at a quarter space per staff step of their
+// interval, capped — a gentle rise rather than a beam that chases the leap.
+const BEAM_SLANT_PER_STEP_SP = 0.25;
+const BEAM_MAX_SLANT_SP = 0.75;    // total rise/fall cap across a group
 // Beamed groups may leave their shortest stem short of the octave: 2.5sp
 // under one beam, half a space more per deeper level (the inner beams stack
 // toward the heads), never longer than a normal stem
 // (roadmap/complete/core-beam-geometry.md).
 const BEAMED_STEM_MIN_SP = 2.5;
-const BEAMED_STEM_MIN_STEP_SP = 0.5;
+const BEAMED_STEM_MIN_STEP_SP = 0;  // 0.5 in the proposal; 0 reads lighter and matches the reference
 const BEAM_HOOK_LENGTH_SP = 1;
 const NOTEHEAD_WIDTH_SP = 1.18;
 const LEDGER_OVERHANG_SP = 0.4; // ledger extends this much beyond notehead each side
@@ -2452,7 +2455,7 @@ function placeBeamLine(stems: readonly BeamLineStem[], o: BeamLineOptions): (x: 
   const first = stems[0];
   const last = stems[stems.length - 1];
   const span = last.x - first.x || 1;
-  const slant = Math.max(-o.maxSlant, Math.min(o.maxSlant, idealTip(last) - idealTip(first)));
+  const slant = beamSlant(stems.map(s => s.baseTipY), dir, o.maxSlant);
   const base = (x: number) => idealTip(first) + (slant * (x - first.x)) / span;
   const deltas = stems.map(s => idealTip(s) - base(s.x));
   let anchor = 0;
@@ -2462,6 +2465,41 @@ function placeBeamLine(stems: readonly BeamLineStem[], o: BeamLineOptions): (x: 
   let shift = deltas[anchor] + dir * (o.normal - o.min);
   if (o.snap) shift += beamSnapNudge(base(stems[anchor].x) + shift, dir, o.snap);
   return x => base(x) + shift;
+}
+
+/**
+ * How far the beam rises or falls across the group, in the direction of its
+ * outer heads. Flat when the engraver's rules say so (Gould): the outer heads
+ * are at the same height; the heads form a repeating pattern; or the head
+ * nearest the beam is an inner one, so a slope would only take the beam away
+ * from it. Otherwise a quarter space per staff step of the outer interval,
+ * capped at `maxSlant` (0 for the flat house style).
+ */
+function beamSlant(tipYs: readonly number[], dir: 1 | -1, maxSlant: number): number {
+  if (maxSlant <= 0) return 0;
+  const first = tipYs[0];
+  const last = tipYs[tipYs.length - 1];
+  if (first === last) return 0;
+  if (isRepeatingPattern(tipYs)) return 0;
+  // Nearest the beam: smallest y for up-stems, largest for down-stems.
+  const toward = (y: number) => -dir * y;
+  const outerNearest = Math.max(toward(first), toward(last));
+  if (tipYs.slice(1, -1).some(y => toward(y) >= outerNearest)) return 0;
+  const steps = Math.abs(last - first) / 0.5; // one staff step is half a space
+  const magnitude = Math.min(maxSlant, BEAM_SLANT_PER_STEP_SP * steps);
+  return Math.sign(last - first) * magnitude;
+}
+
+/** True when the sequence is one shorter phrase repeated (E G E G, E G G D E G G D). */
+function isRepeatingPattern(values: readonly number[]): boolean {
+  const n = values.length;
+  for (let period = 1; period <= n / 2; period++) {
+    if (n % period !== 0) continue;
+    let repeats = true;
+    for (let i = period; i < n && repeats; i++) repeats = values[i] === values[i - period];
+    if (repeats) return true;
+  }
+  return false;
 }
 
 /**

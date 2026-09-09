@@ -394,11 +394,13 @@ back up to `proposed/` the moment it is.
   ink and inspection, ordinal links, plain-DOM ESM/IIFE wiring and static `/verify`
   Listen. Lifecycle and D.S. smokes pass; existing performance evidence awaits human review.
 - **[core-beam-geometry.md](complete/core-beam-geometry.md)** — complete 2026-09-09, the
-  day it was proposed: beamed stems ran long because the beam slid out until the
-  *shortest* stem reached the octave. Now the shortest stem lands on a per-level minimum
-  (2.5 / 3 / 3.5sp for one, two, three beams), the beam settles on a staff line
-  (sit / straddle / hang, outward only), and `display.beams: 'flat'` is Soundslice's
-  house style as a pure viewer option — never a document field. One `placeBeamLine`
+  day it was proposed, and amended the same day: beamed stems ran long because the beam
+  slid out until the *shortest* stem reached the octave. Now the shortest stem lands on
+  2.5sp whatever the beam count, the beam is flat by the engraver's three rules (matching
+  outer heads, a repeating pattern, an inner extreme) and otherwise rises a quarter space
+  per step capped at 0.75, it settles on a staff line (sit / straddle / hang, outward
+  only), and `display.beams: 'flat'` is Soundslice's house style as a pure viewer option —
+  never a document field. One `placeBeamLine`
   serves principal, grace and tuplet beams; tremolos turned out not to be a caller.
   Seventeen goldens moved (three verified) plus one new exhibit, registered in
   [lab-verify.md](inprogress/lab-verify.md).

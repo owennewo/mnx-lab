@@ -6,10 +6,12 @@ import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import type { Primitive } from '../../src/engine/primitives.ts';
 
-// The beamed-group geometry rule (roadmap/complete/core-beam-geometry.md):
-// the stem that would come out shortest lands on a per-level minimum, the
-// beam then settles on a staff line, and the flat house style is a display
-// option. Pinned on the lab scenario written for it.
+// The beamed-group geometry rule (roadmap/complete/core-beam-geometry.md, as
+// amended): the stem that would come out shortest lands on the minimum, the
+// beam is flat under the engraver's three conditions and otherwise slants a
+// quarter space per staff step (capped), it then settles on a staff line, and
+// the flat house style is a display option. Pinned on the lab scenario
+// written for it.
 
 beforeAll(initSmufl);
 
@@ -25,24 +27,69 @@ function staffTops(prims: readonly Primitive[]): number[] {
   const ys = [...new Set(lines(prims, 'staff-line').map(l => l.y1))].sort((a, b) => a - b);
   return ys.filter((y, i) => i === 0 || y - ys[i - 1] > 1.5);
 }
-const rowOf = (tops: number[], y: number) => tops.filter(t => t <= y + 6).length - 1;
+/** The staff whose band [top, top + 4] a y coordinate is nearest to. */
+const rowOf = (tops: number[], y: number) => {
+  let best = 0;
+  let bestDist = Infinity;
+  tops.forEach((t, i) => { const d = y < t ? t - y : y > t + 4 ? y - t - 4 : 0; if (d < bestDist) { bestDist = d; best = i; } });
+  return best;
+};
 
 /** The stem's notehead anchor sits 0.168sp inside the head centre, so a stem
  *  drawn L long from the centre measures L - 0.168 between its endpoints. */
 const ANCHOR_OFFSET_SP = 0.168;
 
+/** Beamed groups in document order: each group's primary-span beams and the
+ *  stems standing under them. Secondary beams over a sub-run are dropped;
+ *  a full-span secondary shares its primary's geometry and is kept. */
+function groups(prims: readonly Primitive[]) {
+  const tops = staffTops(prims);
+  const beams = lines(prims, 'beam');
+  const outer = beams.filter(b => !beams.some(o => o !== b && rowOf(tops, o.y1) === rowOf(tops, b.y1) &&
+    o.x1 <= b.x1 + 1e-6 && o.x2 >= b.x2 - 1e-6 && (o.x2 - o.x1) > (b.x2 - b.x1) + 1e-6));
+  const keys = [...new Set(outer.map(b => `${rowOf(tops, b.y1)}:${b.x1.toFixed(3)}:${b.x2.toFixed(3)}`))]
+    .sort((a, b) => { const [ra, xa] = a.split(':').map(Number); const [rb, xb] = b.split(':').map(Number); return ra - rb || xa - xb; });
+  return keys.map(key => {
+    const [row, x1, x2] = key.split(':').map(Number);
+    return {
+      beams: outer.filter(b => rowOf(tops, b.y1) === row && Math.abs(b.x1 - x1) < 1e-3 && Math.abs(b.x2 - x2) < 1e-3),
+      stems: lines(prims, 'stem').filter(s => rowOf(tops, s.y1) === row && s.x1 >= x1 - 0.1 && s.x1 <= x2 + 0.1)
+    };
+  });
+}
+
+/** Expected beam rise per group (y grows downward: negative rises), document order. */
+const EXPECTED_SLANT = [
+  0, 0,             // bar 1: alternating patterns
+  0, 0,             // bar 2: alternating octaves, up- and down-stem
+  0, 0, 0, 0,       // bar 3: patterns
+  0, 0,             // bar 4: patterns
+  -0.75, 0, 0.75, 0.25, // bar 5: rising fifth (capped), inner extreme, falling fourth, falling step
+  -0.75, 0,         // bar 6: rising fourth, inner head level with the nearer outer one
+  0.25              // bar 7: falling step
+];
+
 describe('beamed stem lengths', () => {
-  it('lands the shortest stem of a group on the per-level minimum', () => {
+  it('lands the shortest stem of every group on the 2.5-space minimum, plus at most the snap', () => {
     const prims = computePrimitives(doc()).notation.primitives;
-    const tops = staffTops(prims);
-    expect(tops).toHaveLength(3); // eighths / sixteenths / thirty-seconds, one row each
-    const shortest = [0, 1, 2].map(row =>
-      Math.min(...lines(prims, 'stem').filter(s => rowOf(tops, s.y1) === row).map(s => Math.abs(s.y2 - s.y1)))
-    );
-    // Row 0 carries the octave groups, whose anchor stem needs no snap: exactly 2.5.
-    expect(shortest[0]).toBeCloseTo(2.5 - ANCHOR_OFFSET_SP, 3);
-    expect(shortest[1]).toBeCloseTo(3.0 - ANCHOR_OFFSET_SP, 3);
-    expect(shortest[2]).toBeCloseTo(3.5 - ANCHOR_OFFSET_SP, 3);
+    const all = groups(prims);
+    expect(all).toHaveLength(EXPECTED_SLANT.length);
+    const snapMax = 1 - 2 * (0.5 / 2 + 0.13 / 2);
+    const shortest = all.map(g => Math.min(...g.stems.map(s => Math.abs(s.y2 - s.y1))));
+    for (const len of shortest) {
+      expect(len).toBeGreaterThanOrEqual(2.5 - ANCHOR_OFFSET_SP - 1e-3);
+      expect(len).toBeLessThanOrEqual(2.5 - ANCHOR_OFFSET_SP + snapMax + 1e-3);
+    }
+    // The octave groups need no snap: exactly the minimum, at one, two and three beams.
+    for (const i of [2, 6, 9]) expect(shortest[i]).toBeCloseTo(2.5 - ANCHOR_OFFSET_SP, 3);
+  });
+
+  it('beams flat for matching outer heads, repeating patterns and inner extremes, else a quarter space per step', () => {
+    const prims = computePrimitives(doc()).notation.primitives;
+    const all = groups(prims);
+    all.forEach((g, i) => {
+      for (const beam of g.beams) expect(beam.y2 - beam.y1, `group ${i}`).toBeCloseTo(EXPECTED_SLANT[i], 6);
+    });
   });
 
   it('settles every primary beam on a staff line at its anchor stem, or leaves it clear of the staff', () => {

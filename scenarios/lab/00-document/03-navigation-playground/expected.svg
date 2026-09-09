@@ -186,15 +186,15 @@
 <line x1="940.7152" y1="735.616" x2="940.7152" y2="799.616" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="945.5152" y="735.616" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="440.8752" y1="548.032" x2="440.8752" y2="585.344" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="485.0864" y1="540.032" x2="485.0864" y2="580.0112" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="529.2976" y1="532.032" x2="529.2976" y2="574.6768" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="573.5072" y1="524.032" x2="573.5072" y2="569.344" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="439.9152" y1="585.344" x2="574.4672" y2="569.344" stroke="currentColor" stroke-width="8" class="beam"></line>
-<line x1="617.7184" y1="516.032" x2="617.7184" y2="564.304" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="661.928" y1="524.032" x2="661.928" y2="569.6368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="706.1392" y1="532.032" x2="706.1392" y2="574.9712" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="485.0864" y1="540.032" x2="485.0864" y2="581.344" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="529.2976" y1="532.032" x2="529.2976" y2="577.344" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="573.5072" y1="524.032" x2="573.5072" y2="573.344" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="439.9152" y1="585.344" x2="574.4672" y2="573.344" stroke="currentColor" stroke-width="8" class="beam"></line>
+<line x1="617.7184" y1="516.032" x2="617.7184" y2="568.304" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="661.928" y1="524.032" x2="661.928" y2="572.304" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="706.1392" y1="532.032" x2="706.1392" y2="576.304" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="750.3488" y1="540.032" x2="750.3488" y2="580.304" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="616.7584" y1="564.304" x2="751.3088" y2="580.304" stroke="currentColor" stroke-width="8" class="beam"></line>
+<line x1="616.7584" y1="568.304" x2="751.3088" y2="580.304" stroke="currentColor" stroke-width="8" class="beam"></line>
 <text x="97.6" y="89.728" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Intro</text>
 <text x="1072.2528" y="96" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Verse</text>
 </svg>

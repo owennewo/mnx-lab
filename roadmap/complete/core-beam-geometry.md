@@ -1,6 +1,9 @@
 # Beam geometry — shorter beamed stems, beams that sit on the staff, and a flat-beam style
 
-> **Status: COMPLETE 2026-09-09** — built and landed the day it was proposed, worktree retired. Every
+> **Status: COMPLETE 2026-09-09** — built and landed the day it was proposed, worktree retired.
+> **Amended the same day** on review of the Guitar Pro score that raised it: the per-level
+> step is now **0** (every beamed group bottoms out at 2.5sp), and the default slant leans
+> flat — see *Amendment* below. Every
 > beamed golden moved and the batch is registered in
 > [lab-verify.md](../inprogress/lab-verify.md#beam-geometry--2026-09-09). Three
 > corrections to the proposal as written are recorded in *What building it taught*.
@@ -156,3 +159,41 @@ field or be taught to the assist loop.
   and the reviewer did not raise them.
 - **The tab staff** (`tabStaff.ts`) draws no beams at all — tuplets there are always
   bracketed for that reason — so nothing here touches it.
+
+## Amendment — 2026-09-09, the same day
+
+The reviewer looked at the score that raised this under item 1 and saw half a space of
+difference, which is all the two-beam minimum of 3.0 could give it. Two changes, both
+asked for in the review:
+
+**The per-level step is 0.** `BEAMED_STEM_MIN_STEP_SP` was 0.5 (Gould's half space per
+extra beam); it is now 0, so the shortest stem in *any* beamed group is 2.5sp. The cost is
+the one the proposal named: under three beams the innermost beam's near edge is only
+0.75sp from the anchor head. The 32nd groups in the exhibit show it; it is readable, and
+the knob is one constant if it ever is not.
+
+**"Flat-topped" beams, by the engraver's rules.** `beamSlant` now draws a beam **flat**
+when any of Gould's three conditions holds — the outer heads are at the same height; the
+heads form a repeating pattern (E G E G, or E G G D E G G D); or the head nearest the beam
+is an *inner* one, so a slope would only carry the beam away from it — and otherwise
+slants **a quarter space per staff step** of the outer interval, capped at
+`BEAM_MAX_SLANT_SP`, now **0.75** (was 1). A step rises a quarter, a third a half, a
+fourth or more the cap. `display.beams: 'flat'` still forces the cap to zero.
+
+The exhibit gained three bars to pin this: the first four bars are all alternating
+patterns and beam flat now; bar 5 holds a rising fifth (capped), an inner-extreme group,
+a falling fourth and a falling step; bar 6 a rising fourth and a group whose inner head
+is level with the nearer outer one; bar 7 a falling step in eighths. Writing it caught
+one wrong assumption on the first try — E F E D is *not* a falling-step group, because F
+is its highest head and it sits inside, so the rule correctly flattens it. The
+`harness/conformance/beam-geometry.test.ts` expectations are now a list of exact slants
+per group in document order.
+
+On the reference score (bar 1, first half-bar, G B♭ B♭ D G B♭ B♭ D under two beams) the
+stems went 5.07 / 4.21 / 4.36 / 3.50 → 4.57 / 3.71 / 3.86 / 3.00 with item 1, and now
+**4.5 / 3.5 / 3.5 / 2.5, flat**: the shortest stem at Soundslice's length, and the beam
+horizontal because the inferred half-bar group is a repeating pattern — the flat-topped
+look the review asked for, arrived at by rule rather than by the display option. The verification batch in
+[lab-verify.md](../inprogress/lab-verify.md#beam-geometry--2026-09-09) is updated in
+place; nothing in it had been reviewed yet.
+

@@ -78,13 +78,13 @@
 <text x="286.0144" y="371.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="ev43"></text>
 <line x1="329.3376" y1="339.6" x2="329.3376" y2="403.6" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="334.1376" y="339.6" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="226.808" y1="178.688" x2="226.808" y2="216" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="226.808" y1="178.688" x2="226.808" y2="220" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="290.0912" y1="186.688" x2="290.0912" y2="224" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="225.848" y1="216" x2="291.0512" y2="224" stroke="currentColor" stroke-width="8" class="beam"></line>
-<line x1="718.64" y1="189.312" x2="718.64" y2="128" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="763.5232" y1="173.312" x2="763.5232" y2="120" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="225.848" y1="220" x2="291.0512" y2="224" stroke="currentColor" stroke-width="8" class="beam"></line>
+<line x1="718.64" y1="189.312" x2="718.64" y2="124" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="763.5232" y1="173.312" x2="763.5232" y2="118" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="808.4048" y1="149.312" x2="808.4048" y2="112" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="717.68" y1="128" x2="809.3648" y2="112" stroke="currentColor" stroke-width="8" class="beam"></line>
+<line x1="717.68" y1="124" x2="809.3648" y2="112" stroke="currentColor" stroke-width="8" class="beam"></line>
 <path d="M 184.0832 184.8 C 195.6528 194.99466666666666, 211.0784 194.99466666666666, 222.648 184.8 C 211.0784 192.86133333333333, 195.6528 192.86133333333333, 184.0832 184.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 423.7792 160.8 C 452.4016 173.83626666666666, 490.5648 173.83626666666666, 519.1856 160.8 C 490.5648 171.70293333333333, 452.4016 171.70293333333333, 423.7792 160.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 722.8 200.8 C 768.0192 216.60266666666666, 828.312 216.60266666666666, 873.5312 200.8 C 828.312 214.46933333333334, 768.0192 214.46933333333334, 722.8 200.8 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
