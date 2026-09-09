@@ -81,6 +81,35 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Bends leave from the note — 2026-09-09
+
+Cause: the notation copy of every bend used to rise from the LANE rather than
+from the note (`emitNotationTechnique`), so it drew a shallow arc several
+spaces above the staff, attached to nothing. Two scenarios moved:
+`lab/tab-techniques/bend-and-release` and `lab/tab-techniques/bend-shapes`.
+Both were already `rendered`, so nothing was demoted — but their engraving
+changed and still owes a look.
+
+Look for: on the NOTATION staff, each bend now leaves its notehead and climbs,
+the way the tab copy has always left its fret. `expected.tab.svg` is untouched
+in both scenarios, which is the shape of the change — only the notation
+projection moved, so a tab-side difference would mean something went wrong.
+Check that the arc clears the noteheads it passes and that its label still
+reads clearly above the peak.
+
+Worth knowing while reviewing: the previous behaviour was deliberate and
+commented — a notation staff has no string to watch the pitch climb. It was
+changed because the cost was a gesture a reader could not attribute to any
+note, and because above every system after the first, that lane is the gap
+BETWEEN systems, so the mark read as floating in empty space. Reported from a
+real transcription where every bend in the score was affected.
+
+Scenario set (paths under `scenarios/`):
+
+- `lab/25-tab-techniques/01-bend-and-release`
+- `lab/25-tab-techniques/06-bend-shapes`
+
+
 ### Score metadata — 2026-09-09
 
 Cause: [core-score-metadata](../complete/core-score-metadata.md). **One new scenario,

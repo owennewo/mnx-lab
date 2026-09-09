@@ -741,9 +741,16 @@ export function emitNotationTechnique(input: TechniqueInput): void {
     if (!t) continue;
     const lane = site.laneY;
 
-    // A bend has no pitch of its own on this staff — there is no string to
-    // watch it climb — so it rises from the lane rather than from the note.
-    if (t.bend) emitBend(input, site, lane, t.bend);
+    // Rises from the NOTE, exactly as the tab copy rises from its fret.
+    //
+    // It used to rise from the lane, on the reasoning that a notation staff
+    // has no string to watch the pitch climb. True, but the cost was a gesture
+    // attached to nothing: a shallow arc floating several spaces above the
+    // staff, with no way for a reader to tell which note it described. On the
+    // first system that reads as a stray mark under the title; on every later
+    // one the space above the staff IS the gap between systems, so it reads as
+    // floating in the void — and widening Clearance widens the void around it.
+    if (t.bend) emitBend(input, site, site.y, t.bend);
 
     if (t.vibrato) {
       const startDx = site.halfWidthSp + CLEAR_SP;

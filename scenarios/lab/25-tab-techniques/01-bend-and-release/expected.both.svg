@@ -36,13 +36,13 @@
 <line x1="381.6" y1="298.128" x2="412.4" y2="298.128" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-hold"></line>
 <path d="M 412.4 298.128 C 429.3408 298.128, 443.2 329.7088, 443.2 350.7632" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
 <text x="443.2" y="369.8992" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
-<path d="M 229.04 108.8 C 264.24 108.8, 293.04 103.0016, 293.04 99.136" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
+<path d="M 229.04 144 C 264.24 144, 293.04 117.0816, 293.04 99.136" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
 <text x="293.04" y="99.136" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 <text x="293.04" y="56.864" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">full</text>
-<line x1="385.04" y1="108.8" x2="385.04" y2="99.136" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-prebend"></line>
+<line x1="385.04" y1="144" x2="385.04" y2="99.136" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-prebend"></line>
 <text x="385.04" y="99.136" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 <text x="385.04" y="56.864" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">full</text>
 <line x1="385.04" y1="80" x2="414.12" y2="80" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-hold"></line>
-<path d="M 414.12 80 C 430.1136 80, 443.2 85.7984, 443.2 89.664" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
-<text x="443.2" y="108.8" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
+<path d="M 414.12 80 C 430.1136 80, 443.2 106.9184, 443.2 124.864" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
+<text x="443.2" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
 </svg>
