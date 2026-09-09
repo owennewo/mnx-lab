@@ -87,15 +87,6 @@ proposals that name their campaign.
   Contract clause 2 makes every item declare standard-object-vs-`_x.mnxLab` before code, so
   the "implemented as extension" cell feeds `spec/proposals/` instead of accumulating
   silently.
-- **[core-beam-geometry.md](proposed/core-beam-geometry.md)** — **beamed stems are too
-  long**, and one rule is why: the beam slides outward until the *shortest* stem reaches the
-  octave, so every other stem grows from there (E→D under a two-beam group: 3.5 and 5.5).
-  Three items in a fixed order — a per-level minimum stem (2.5 / 3 / 3.5 spaces for one,
-  two, three beams), snapping the beam to sit/straddle/hang a staff line, and Soundslice's
-  flat-beam house style as a pure display option (`BEAM_MAX_SLANT_SP = 0`, never a document
-  field). Flattening is explicitly *not* the fix: it lengthens stems. Each of the first two
-  moves every beamed golden and registers in
-  [lab-verify.md](inprogress/lab-verify.md).
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
@@ -402,6 +393,15 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-beam-geometry.md](complete/core-beam-geometry.md)** — complete 2026-09-09, the
+  day it was proposed: beamed stems ran long because the beam slid out until the
+  *shortest* stem reached the octave. Now the shortest stem lands on a per-level minimum
+  (2.5 / 3 / 3.5sp for one, two, three beams), the beam settles on a staff line
+  (sit / straddle / hang, outward only), and `display.beams: 'flat'` is Soundslice's
+  house style as a pure viewer option — never a document field. One `placeBeamLine`
+  serves principal, grace and tuplet beams; tremolos turned out not to be a caller.
+  Seventeen goldens moved (three verified) plus one new exhibit, registered in
+  [lab-verify.md](inprogress/lab-verify.md).
 - **[core-player-transport.md](complete/core-player-transport.md)** — player campaign item 6,
   complete 2026-09-09: pure audio-clock transport, seek/rate/loop reconstruction,
   written-span notifications and a lazy native Web Audio sink. Fake-clock tests,

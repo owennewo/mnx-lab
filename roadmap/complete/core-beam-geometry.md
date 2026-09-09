@@ -1,6 +1,6 @@
 # Beam geometry — shorter beamed stems, beams that sit on the staff, and a flat-beam style
 
-> **Status: BUILT 2026-09-09**, all three items, the same day it was proposed. Every
+> **Status: COMPLETE 2026-09-09** — built and landed the day it was proposed, worktree retired. Every
 > beamed golden moved and the batch is registered in
 > [lab-verify.md](../inprogress/lab-verify.md#beam-geometry--2026-09-09). Three
 > corrections to the proposal as written are recorded in *What building it taught*.
@@ -9,8 +9,8 @@
 > against Soundslice's engraving of the same file. Beams themselves are done
 > ([core-musicxml-beams.md](../inprogress/core-musicxml-beams.md); inference by position
 > landed 2026-09-09) — this doc owns the *geometry* of a beamed group, which no doc has
-> owned since [core-render-density-zoom.md](../complete/core-render-density-zoom.md) named
-> a stem-length clamp and [core-vertical-density.md](../complete/core-vertical-density.md)
+> owned since [core-render-density-zoom.md](core-render-density-zoom.md) named
+> a stem-length clamp and [core-vertical-density.md](core-vertical-density.md)
 > found it did not need one. Three items, in a fixed order; the first is the fix, the
 > other two are the polish it makes safe.
 
@@ -89,7 +89,7 @@ nothing to snap to and is left alone.
 ### 3. A flat-beam display option
 
 `BEAM_MAX_SLANT_SP = 0` is the whole mechanism. Expose it as a pure display option
-alongside the ones [core-display-settings.md](../complete/core-display-settings.md)
+alongside the ones [core-display-settings.md](core-display-settings.md)
 defined in `src/engine/displayOptions.ts` — `beams: 'slanted' | 'flat'`, default
 `slanted` — with the same contract that doc set: options are pure, defaults render
 byte-identically, the alternative output is tested option-aware, and the workbench
