@@ -21,9 +21,10 @@ with the keyboard must not move the panel out from under what you were reading.
 **Document focus** is transient workbench composition: `Ctrl+Alt+F` removes the app and
 scenario-page chrome without changing remembered rail/panel preferences, while `F11`
 remains browser-owned (the palette's separate browser-fullscreen action uses the Fullscreen
-API when available). The zoom pad remains over the document surface and carries a permanent
-focus/exit toggle, so the mode never hides both its control and its escape route. It is never
-a property of `<mnx-document-viewer>`.
+API when available). The zoom pad remains over the document surface and carries the
+focus/exit toggle in its footer row; while focus is on, the pad's idle mark draws the exit
+glyph with an ink border in place of the crosshair, so the mode never hides both its control
+and its escape route. It is never a property of `<mnx-document-viewer>`.
 **Theming is `light-dark()`, never an attribute** — the shell resolves `auto|light|dark`
 (remembered per browser, palette-switchable) onto `color-scheme`, and every token
 follows because `color-scheme` is inherited and crosses shadow roots. An
@@ -80,10 +81,15 @@ The real API layer (documents, auth, sync) belongs to **studio**
 (`worker/api/documents|auth` 501 stubs, `storage/cloudRepository.ts`).
 
 
-The score-corner settings card has seven rows: Show, Lyrics, Time signatures,
-Clefs, Title, Bar numbers, and Instrument names. Its six display preferences
+The score-corner settings card has eight rows: Show, Lyrics, Time signatures,
+Clefs, Title, Bar numbers, Instrument names, and Beams. Its display preferences
 are validated and stored under `mnx-lab:display`, across documents; projection
-remains URL-owned. Current verse uses the first used verse in established order
+remains URL-owned. The card holds what changes *what* is drawn; the layout levers
+— staff size, note spacing, the natural/fill spacing mode, clearance and document
+focus — all live on the zoom pad, whose expanded pose adds a 22px footer row under
+the readout and arms: focus toggle · spacing-mode glyph toggle · clearance slider.
+Clearance is labelled only by its tooltip and is stored with the other display
+preferences. Current verse uses the first used verse in established order
 until a host supplies a selected verse. That transient input is not persisted.
 A system means one horizontal row of music, including both staves in Both.
 The card stays available in document focus, supports keyboard navigation and

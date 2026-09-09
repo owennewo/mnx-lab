@@ -5,11 +5,14 @@ import { designTokens, sharedChrome } from '../elements/tokens.ts';
 import type { ViewMode } from '../elements/DocumentViewer.ts';
 
 /**
- * The document settings pad — third mark in the score-corner cluster, beside
- * the focus toggle and the zoom pad. A 26px gear that opens a small card of
- * document-display settings. Its SHOW row —
- * notation | tab | both — replaced the page-head view tabs. Six additional rows
- * emit display preferences to the host.
+ * The document settings pad — the leftmost mark in the score-corner cluster,
+ * beside the zoom pad. A 26px gear that opens a small card of document-display
+ * settings. Its SHOW row — notation | tab | both — replaced the page-head view
+ * tabs. Seven additional rows emit display preferences to the host.
+ *
+ * The card holds what changes WHAT is drawn. Spacing mode and clearance —
+ * how the same score lays out on the same page — moved to the zoom pad's
+ * footer row (2026-09-09), where the other layout levers already were.
  *
  * **This is chrome, not surface** (docs/core-viewer-surface.md): the pad owns
  * no view state. The current view and the views a document can support come in
@@ -48,7 +51,6 @@ export class SettingsPad extends LitElement {
   @property({ attribute: false }) hrefFor: ((view: ViewMode) => string) | null = null;
 
   @property({ attribute: false }) display: DisplayOptions = {};
-  @property() spacingMode: 'natural' | 'fill' = 'fill';
   @state() private open = false;
 
   private clickAway = (event: PointerEvent) => {
@@ -63,12 +65,6 @@ export class SettingsPad extends LitElement {
   disconnectedCallback() {
     document.removeEventListener('pointerdown', this.clickAway);
     super.disconnectedCallback();
-  }
-
-  private setClearance(clearance: number) {
-    this.dispatchEvent(new CustomEvent('display-change', {
-      detail: { ...this.display, clearance }, bubbles: true, composed: true
-    }));
   }
 
   private displayRow(key: keyof typeof DISPLAY_CHOICES, label: string, labels: readonly string[]) {
@@ -200,9 +196,6 @@ export class SettingsPad extends LitElement {
       }
       .help { margin: 8px 0 2px; color: var(--ink-2); font: 11px/1.4 var(--sans); }
       .options { flex-wrap: wrap; }
-      .clearance-options { align-items: center; gap: 6px; }
-      .clearance-options input { width: 150px; max-width: 35vw; accent-color: var(--accent); }
-      .clearance-options output { min-width: 2ch; color: var(--ink); font: 12px/1 var(--sans); }
       .options a:hover {
         text-decoration: none;
       }
@@ -322,28 +315,6 @@ export class SettingsPad extends LitElement {
                       )}
                     </span>
                   </div>
-                  <div class="setting" role="group" aria-label="Spacing">
-                    <span class="lbl">Spacing</span>
-                    <span class="options">
-                      ${(['natural', 'fill'] as const).map(mode => html`
-                        <button aria-pressed=${this.spacingMode === mode}
-                          @click=${() => this.dispatchEvent(new CustomEvent('spacing-mode-change', { detail: mode, bubbles: true, composed: true }))}
-                        >${mode === 'natural' ? 'Natural' : 'Fill width'}</button>
-                      `)}
-                    </span>
-                  </div>
-                  <p class="help">Natural preserves requested spacing. Fill width stretches each full system to the available width.</p>
-                  <div class="setting" role="group" aria-label="Clearance">
-                    <label class="lbl" for="clearance">Clearance</label>
-                    <span class="options clearance-options">
-                      <input id="clearance" type="range" min="0" max="4" step="0.5"
-                        .value=${String(this.display.clearance ?? 2)} aria-describedby="clearance-help"
-                        @input=${(event: Event) => this.setClearance(Number((event.target as HTMLInputElement).value))}>
-                      <output for="clearance">${this.display.clearance ?? 2}</output>
-                      <button type="button" title="Reset clearance to 2" @click=${() => this.setClearance(2)}>Reset</button>
-                    </span>
-                  </div>
-                  <p id="clearance-help" class="help">Breathing room around the music: 0 is tightest safe, 2 is default, 4 is very spacious.</p>
                   ${this.displayRow('lyrics', 'Lyrics', ['All verses', 'Current verse', 'Hide'])}
                   ${this.displayRow('timeSignatures', 'Time signatures', ['Show', 'Hide'])}
                   ${this.displayRow('clefs', 'Clefs', ['Show', 'Hide'])}

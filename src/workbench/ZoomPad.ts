@@ -32,6 +32,13 @@ import {
  *
  * The magnifier where the arms cross resets both.
  *
+ * Under the two, a footer row (2026-09-09, from the design project's
+ * `Zoom Pad Controls` canvas, option C): the document-focus toggle, the
+ * spacing-mode toggle and the clearance slider, each a 22px cell. They used to
+ * be a sibling mark and two rows of the settings card; every one of them
+ * changes how the same score is laid out on the same page, which is what the
+ * pad is for, and the settings card keeps what changes WHAT is drawn.
+ *
  * **This is chrome, not surface.** It composes `<mnx-document-viewer>`'s
  * attributes and implements no presentation behavior of its own — every value
  * it emits is clamped by the engine that owns it (`clampStaffScale`,
@@ -113,6 +120,8 @@ export class ZoomPad extends LitElement {
   /** Spacing multiplier, or null for the preset. Mirrors `density-h`. */
   @property() spacingMode: 'natural' | 'fill' = 'fill';
   @property({ type: Number }) densityH: number | null = null;
+  /** Clearance level, 0–4 in halves; mirrors the viewer's `clearance`. */
+  @property({ type: Number }) clearance = 2;
 
   /**
    * What the last paint actually used, from the viewer's `render-scale`.
@@ -221,7 +230,7 @@ export class ZoomPad extends LitElement {
 
       /* The cluster is the score corner's chrome shelf, not just the zoom
          geometry: the host slots further marks in (today the settings pad),
-         and they sit leftmost — settings, focus, zoom — with the pad's
+         and they sit leftmost — settings, then zoom — with the pad's
          leftward hover-growth pushing the whole row, never covering it. */
       slot {
         display: contents;
@@ -232,64 +241,20 @@ export class ZoomPad extends LitElement {
         flex: none;
       }
 
-      /* A focus mode must carry its own visible way out. This button is a
-         sibling of the zoom geometry rather than part of the viewer: both are
-         workbench chrome composed over ScenarioPage's document surface. */
-      button.focus-toggle {
-        order: -1;
-        flex: none;
-        appearance: none;
-        box-sizing: border-box;
-        width: 26px;
-        height: 26px;
-        margin: 0;
-        padding: 0;
-        border: var(--rule-w) solid var(--line);
-        border-radius: var(--radius-control);
-        display: grid;
-        place-items: center;
-        background: var(--surface);
-        color: var(--ink);
-        opacity: 0.55;
-        cursor: pointer;
-        box-shadow: 0 2px 4px var(--shadow-far);
-        transition:
-          opacity 0.12s ease,
-          color 0.12s ease,
-          border-color 0.12s ease,
-          background-color 0.12s ease;
-      }
-
-      :host([document-focus]) button.focus-toggle {
-        opacity: 1;
-        border-color: var(--ink);
-      }
-
-      button.focus-toggle:hover,
-      button.focus-toggle:focus-visible {
-        opacity: 1;
-        color: var(--accent);
-        background: var(--row-current);
-      }
-
-      button.focus-toggle:focus-visible {
-        outline: var(--rule-w) solid var(--focus-ring);
-        outline-offset: 2px;
-      }
-
-      button.focus-toggle svg {
-        display: block;
-      }
-
       /* ── one pad, two poses ──
          Idle is not a different element: it is this same pad with its chrome
          transparent, its readout labels closed and its grid tracks collapsed
          until the four arms form the 24×24 crosshair. Everything between the
          poses is a transition on tracks, transforms and opacity — that is the
          whole morph. Right edge is the anchor (margin-left: auto), so the pad
-         grows leftward and downward from the mark. */
+         grows leftward and downward from the mark.
+
+         A grid rather than a flex row because the footer spans both columns;
+         the readout and the arms keep their columns, so nothing above the
+         footer moved when it arrived. */
       .pad {
-        display: flex;
+        display: grid;
+        grid-template-columns: max-content max-content;
         width: max-content;
         margin-left: auto;
         box-sizing: border-box;
@@ -352,9 +317,14 @@ export class ZoomPad extends LitElement {
       }
       .space-input:focus-visible { outline: 1px solid var(--focus-ring); }
 
+      /* 54px, not the grid's 72: the numbers are right-aligned, so a square
+         column put 30px of empty ground to their left ("strip the white
+         space"). 54 is the widest thing the column prints — the natural-mode
+         input plus its % sign — with the 9/7px inset, and a fixed width keeps
+         the collapse animatable, which max-content would not. */
       .readout {
         box-sizing: border-box;
-        width: 72px;
+        width: 54px;
         height: 72px;
         display: flex;
         flex-direction: column;
@@ -386,7 +356,7 @@ export class ZoomPad extends LitElement {
         flex-direction: column;
         align-items: flex-end;
         justify-content: center;
-        padding: 0 6px;
+        padding: 0 7px 0 9px;
         white-space: nowrap;
         border-top: 1px solid transparent;
         transition: border-color 0.16s ease;
@@ -463,6 +433,7 @@ export class ZoomPad extends LitElement {
          magnifier — mush at 3px of clear centre — waits for the tracks to
          open. */
       .grid {
+        position: relative;
         display: grid;
         grid-template-columns: repeat(3, 8px);
         grid-template-rows: repeat(3, 8px);
@@ -562,6 +533,174 @@ export class ZoomPad extends LitElement {
         opacity: 0;
       }
 
+      /* ── the footer row ──
+         Three cells at 22px under both columns: focus · spacing mode ·
+         clearance. Collapses with the readout — height, border and opacity
+         only — so the idle pose is still the bare crosshair. */
+      .foot {
+        grid-column: 1 / -1;
+        box-sizing: border-box;
+        display: flex;
+        align-items: stretch;
+        height: 22px;
+        overflow: hidden;
+        /* Spanning both columns, the row's 124px of controls would otherwise
+           size the tracks — and the idle mark is a 24px square precisely
+           because the readout track is 0 wide. inline-size containment keeps
+           the footer's contents out of track sizing entirely; it takes the
+           width the two columns give it, which open is always enough. */
+        contain: inline-size;
+        border-top: var(--rule-w) solid transparent;
+        transition:
+          height 0.16s ease,
+          opacity 0.12s ease,
+          border-color 0.16s ease;
+      }
+
+      .pad.expanded .foot {
+        border-color: var(--ink);
+      }
+
+      .pad:not(.expanded) .foot {
+        height: 0;
+        border-top-width: 0;
+        opacity: 0;
+      }
+
+      .foot button {
+        appearance: none;
+        flex: none;
+        box-sizing: border-box;
+        width: 26px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-right: 1px solid var(--line);
+        border-radius: 0;
+        background: transparent;
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition:
+          background-color 0.12s ease,
+          color 0.12s ease;
+      }
+
+      .foot button svg {
+        display: block;
+      }
+
+      .foot button:hover,
+      .foot button:focus-visible {
+        background: var(--row-current);
+        color: var(--accent);
+      }
+
+      .foot button:focus-visible {
+        outline: var(--rule-w) solid var(--focus-ring);
+        outline-offset: -2px;
+      }
+
+      /* Accent means "you chose this", as in the readout: focus on, or the
+         non-default spacing mode. */
+      .foot button.hot {
+        color: var(--accent);
+      }
+
+      .clearance-cell {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+      }
+
+      /* A 56px track for nine stops. The label is its tooltip: the row is
+         already a slider between a focus glyph and a paragraph glyph, and
+         CLEARANCE at 8px cost more width than the track. */
+      input.clearance {
+        appearance: none;
+        -webkit-appearance: none;
+        flex: none;
+        width: 56px;
+        height: 12px;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+
+      input.clearance::-webkit-slider-runnable-track {
+        height: 2px;
+        background: var(--line-strong);
+      }
+
+      input.clearance::-moz-range-track {
+        height: 2px;
+        background: var(--line-strong);
+      }
+
+      input.clearance::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 10px;
+        height: 10px;
+        margin-top: -4px;
+        border: 0;
+        border-radius: 0;
+        background: var(--accent);
+      }
+
+      input.clearance::-moz-range-thumb {
+        width: 10px;
+        height: 10px;
+        border: 0;
+        border-radius: 0;
+        background: var(--accent);
+      }
+
+      input.clearance:focus-visible {
+        outline: var(--rule-w) solid var(--focus-ring);
+        outline-offset: 2px;
+      }
+
+      /* ── the idle focus badge ──
+         A focus mode must carry its own visible way out, and the toggle now
+         lives in a footer that is closed at rest. So while focus is on, the
+         idle mark IS the way out: the crosshair's 24px square draws the exit
+         glyph with an ink border instead, at full opacity, and hover opens the
+         pad around it as always. Painted over the collapsed arms rather than
+         swapping them, so the open pose still morphs from the same box. */
+      .focus-badge {
+        position: absolute;
+        inset: 0;
+        box-sizing: border-box;
+        display: grid;
+        place-items: center;
+        border: var(--rule-w) solid var(--ink);
+        background: var(--surface);
+        color: var(--ink);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.12s ease;
+      }
+
+      .focus-badge svg {
+        display: block;
+      }
+
+      :host([document-focus]) .pad:not(.expanded) {
+        opacity: 1;
+      }
+
+      :host([document-focus]) .pad:not(.expanded) .focus-badge {
+        opacity: 1;
+      }
+
+      /* The tray's claim beats the badge too — last, at matching weight. */
+      :host([suppressed]) .pad:not(.expanded) {
+        opacity: 0.28;
+      }
+
       @media (prefers-reduced-motion: reduce) {
         .pad,
         .readout,
@@ -571,11 +710,10 @@ export class ZoomPad extends LitElement {
         .grid,
         button.cell,
         .cell svg,
-        .mag svg {
-          transition: none;
-        }
-
-        button.focus-toggle {
+        .mag svg,
+        .foot,
+        .foot button,
+        .focus-badge {
           transition: none;
         }
       }
@@ -973,6 +1111,49 @@ export class ZoomPad extends LitElement {
     `;
   }
 
+  /** The spacing mode as a paragraph: ragged-right for natural, justified
+   *  for fill width — the same picture every word processor uses for the same
+   *  choice. Shows the mode IN FORCE; the click swaps it. */
+  private spacingGlyph() {
+    const path = this.spacingMode === 'fill'
+      ? 'M1 1h12M1 4.33h12M1 7.67h12M1 11h12'
+      : 'M1 1h12M1 4.33h9M1 7.67h12M1 11h7';
+    return svg`
+      <svg width="14" height="12" viewBox="0 0 14 12" aria-hidden="true">
+        <path
+          d=${path}
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="square"
+        ></path>
+      </svg>
+    `;
+  }
+
+  private requestSpacingModeToggle() {
+    const mode = this.spacingMode === 'natural' ? 'fill' : 'natural';
+    this.dispatchEvent(
+      new CustomEvent<'natural' | 'fill'>('spacing-mode-change', {
+        detail: mode,
+        bubbles: true,
+        composed: true
+      })
+    );
+  }
+
+  private onClearanceInput = (event: Event) => {
+    const value = Number((event.currentTarget as HTMLInputElement).value);
+    if (!Number.isFinite(value)) return;
+    this.dispatchEvent(
+      new CustomEvent<number>('clearance-change', {
+        detail: value,
+        bubbles: true,
+        composed: true
+      })
+    );
+  };
+
   private requestDocumentFocusToggle() {
     this.dispatchEvent(
       new CustomEvent('document-focus-request', { bubbles: true, composed: true })
@@ -1115,7 +1296,9 @@ export class ZoomPad extends LitElement {
           class="pad ${expanded ? 'expanded' : ''}"
           @pointerenter=${() => (this.open = true)}
           @pointerleave=${() => {
-            if (!this.shadowRoot?.activeElement?.matches('.space-input')) this.open = false;
+            // A text entry or a slider drag in progress holds the pad open:
+            // collapsing the footer under a thumb mid-drag would drop it.
+            if (!this.shadowRoot?.activeElement?.matches('.space-input, .clearance')) this.open = false;
           }}
           @focusin=${() => (this.open = true)}
           @focusout=${() => (this.open = false)}
@@ -1182,19 +1365,56 @@ export class ZoomPad extends LitElement {
               ${this.arrow('down')}
             </button>
             <div class="gap"></div>
+            <div class="focus-badge" aria-hidden="true">${this.focusGlyph()}</div>
+          </div>
+          <div
+            class="foot"
+            @keydown=${(event: KeyboardEvent) => {
+              // Native button and slider keys belong to these controls; the
+              // page listens on window and would edit the score instead.
+              event.stopPropagation();
+            }}
+          >
+            <button
+              class="focus-toggle ${this.documentFocus ? 'hot' : ''}"
+              title=${this.documentFocus
+                ? 'Exit document focus (Ctrl+Alt+F)'
+                : 'Focus document (Ctrl+Alt+F)'}
+              aria-label=${this.documentFocus ? 'Exit document focus' : 'Focus document'}
+              aria-pressed=${this.documentFocus}
+              @click=${this.requestDocumentFocusToggle}
+            >
+              ${this.focusGlyph()}
+            </button>
+            <button
+              class="spacing-toggle ${this.spacingMode === 'natural' ? 'hot' : ''}"
+              title=${this.spacingMode === 'natural'
+                ? 'Natural spacing — click for fill width'
+                : 'Fill width — click for natural spacing'}
+              aria-label=${this.spacingMode === 'natural'
+                ? 'Natural spacing; switch to fill width'
+                : 'Fill width; switch to natural spacing'}
+              @click=${this.requestSpacingModeToggle}
+            >
+              ${this.spacingGlyph()}
+            </button>
+            <div
+              class="clearance-cell"
+              title="Clearance — breathing room around the music. 0 is tightest, 2 the default, 4 very spacious."
+            >
+              <input
+                class="clearance"
+                type="range"
+                min="0"
+                max="4"
+                step="0.5"
+                aria-label="Clearance"
+                .value=${String(this.clearance)}
+                @input=${this.onClearanceInput}
+              />
+            </div>
           </div>
         </div>
-        <button
-          class="focus-toggle"
-          title=${this.documentFocus
-            ? 'Exit document focus (Ctrl+Alt+F)'
-            : 'Focus document (Ctrl+Alt+F)'}
-          aria-label=${this.documentFocus ? 'Exit document focus' : 'Focus document'}
-          aria-pressed=${this.documentFocus}
-          @click=${this.requestDocumentFocusToggle}
-        >
-          ${this.focusGlyph()}
-        </button>
       </div>
     `;
   }

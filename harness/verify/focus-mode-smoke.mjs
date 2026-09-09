@@ -113,6 +113,8 @@ const DUMP = `(() => {
   const zoomControl = zoomRoot?.querySelector('.pad');
   const zoomReadout = zoomRoot?.querySelector('.readout');
   const zoomFocus = zoomRoot?.querySelector('.focus-toggle');
+  const zoomFoot = zoomRoot?.querySelector('.foot');
+  const zoomBadge = zoomRoot?.querySelector('.focus-badge');
   const rect = element => {
     if (!element) return null;
     const box = element.getBoundingClientRect();
@@ -143,6 +145,9 @@ const DUMP = `(() => {
     zoomReadoutRect: rect(zoomReadout),
     zoomReadoutOpacity: zoomReadout ? Number(getComputedStyle(zoomReadout).opacity) : null,
     zoomFocusRect: rect(zoomFocus),
+    zoomFootHeight: zoomFoot ? zoomFoot.getBoundingClientRect().height : null,
+    zoomBadgeOpacity: zoomBadge ? Number(getComputedStyle(zoomBadge).opacity) : null,
+    zoomControlOpacity: zoomControl ? Number(getComputedStyle(zoomControl).opacity) : null,
     zoomFocusLabel: zoomFocus?.getAttribute('aria-label') ?? null,
     zoomFocusPressed: zoomFocus?.getAttribute('aria-pressed') ?? null,
     inspector: !!pageRoot?.querySelector('mnx-rung-inspector'),
@@ -279,27 +284,18 @@ try {
     state.zoomFocusLabel === 'Exit document focus' && state.zoomFocusPressed === 'true',
     'the zoom pad carries a permanent, state-aware exit from document focus'
   );
-  check(
-    state.zoomFocusRect.x + state.zoomFocusRect.width <= state.zoomControlRect.x,
-    'the document-focus toggle sits to the left of the collapsed zoom mark'
-  );
+  // The focus toggle lives in the pad's footer row (2026-09-09), which is
+  // closed at rest — so the idle mark itself must be the visible way out.
   check(
     near(state.zoomControlRect.width, state.zoomControlRect.height) &&
       state.zoomReadoutRect.width < 1 &&
-      state.zoomReadoutOpacity === 0,
-    'the off-default zoom control idles as a square with no numeric readout'
+      state.zoomReadoutOpacity === 0 &&
+      state.zoomFootHeight < 1,
+    'the off-default zoom control idles as a square with no readout and no footer'
   );
-  const restingFocusRect = state.zoomFocusRect;
-  const restingZoomRect = state.zoomControlRect;
-  await hoverZoomFocus(restingFocusRect);
-  state = await dump();
   check(
-    !state.zoomExpanded &&
-      near(state.zoomFocusRect.x, restingFocusRect.x) &&
-      near(state.zoomFocusRect.y, restingFocusRect.y) &&
-      near(state.zoomControlRect.width, restingZoomRect.width) &&
-      near(state.zoomControlRect.height, restingZoomRect.height),
-    'hovering the focus toggle neither opens zoom nor moves either control'
+    state.zoomBadgeOpacity === 1 && state.zoomControlOpacity === 1,
+    'in focus mode the idle mark draws the exit badge at full opacity'
   );
   await movePointer(
     state.zoomControlRect.x + state.zoomControlRect.width / 2,
@@ -307,15 +303,26 @@ try {
   );
   state = await dump();
   check(
-    state.zoomExpanded && state.zoomReadoutRect.width >= 59 && state.zoomReadoutOpacity === 1,
+    state.zoomExpanded && state.zoomReadoutRect.width >= 50 && state.zoomReadoutOpacity === 1,
     'hovering zoom restores the STAFF and SPACE readout'
   );
+  check(
+    state.zoomFootHeight >= 20 &&
+      state.zoomFocusRect.height >= 20 &&
+      state.zoomFocusRect.y >= state.zoomReadoutRect.y + state.zoomReadoutRect.height - 1 &&
+      state.zoomBadgeOpacity === 0,
+    'the open pad exposes the focus toggle in a footer row under the readout'
+  );
+  await hoverZoomFocus(state.zoomFocusRect);
+  state = await dump();
+  check(state.zoomExpanded, 'hovering the focus toggle keeps the pad open');
   await movePointer(0, 0);
   state = await dump();
   check(
     !state.zoomExpanded &&
       near(state.zoomControlRect.width, state.zoomControlRect.height) &&
-      state.zoomReadoutRect.width < 1,
+      state.zoomReadoutRect.width < 1 &&
+      state.zoomFootHeight < 1,
     'leaving zoom returns it to the numberless square'
   );
   await clickZoomFocus();

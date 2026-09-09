@@ -3068,17 +3068,23 @@ export class ScenarioPage extends LitElement {
                 .staffScale=${this.staffScale}
                 .densityH=${this.densityH}
                 .spacingMode=${this.spacingMode}
+                .clearance=${this.displayPreferences.clearance ?? 2}
                 .densitySteps=${this.densitySteps}
                 .effectiveStaffScale=${this.effectiveStaffScale}
                 .documentFocus=${this.documentFocus}
-                    @zoom-change=${this.onZoomChange}
+                @zoom-change=${this.onZoomChange}
+                @spacing-mode-change=${(event: CustomEvent<'natural' | 'fill'>) => {
+                  this.spacingMode = event.detail;
+                  localStorage.setItem(SPACING_MODE_KEY, this.spacingMode);
+                }}
+                @clearance-change=${(event: CustomEvent<number>) => {
+                  this.displayPreferences = writeDisplayPreferences({
+                    ...this.displayPreferences,
+                    clearance: event.detail
+                  });
+                }}
               >
                 <mnx-settings-pad
-                  .spacingMode=${this.spacingMode}
-                  @spacing-mode-change=${(event: CustomEvent<'natural' | 'fill'>) => {
-                    this.spacingMode = event.detail;
-                    localStorage.setItem(SPACING_MODE_KEY, this.spacingMode);
-                  }}
                   .display=${this.displayPreferences}
                   @display-change=${(event: CustomEvent<DisplayOptions>) => {
                     this.displayPreferences = writeDisplayPreferences(event.detail);
