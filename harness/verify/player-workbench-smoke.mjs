@@ -47,5 +47,5 @@ try{
   console.log('Player workbench/review smoke OK');
 }finally{
   ws?.close();if(chrome && chrome.exitCode===null){const done=new Promise(r=>chrome.once('exit',r));chrome.kill();await done;}
-  server?.server.close();review?.server.close();fs.rmSync(profile,{recursive:true,force:true});
+  server?.server.close();review?.server.close();fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});
 }

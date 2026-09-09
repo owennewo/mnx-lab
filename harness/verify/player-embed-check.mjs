@@ -39,6 +39,18 @@ export async function checkPlayer(cdp, base, format) {
     check(performance.getEntriesByType('resource').some(e=>e.name.startsWith(${JSON.stringify(base + '/samples/')})),
       'Embed did not resolve samples beside its own script');
     check(!player.shadowRoot.querySelector('[role=alert]'),'Sample loading produced an error');
+
+    for (const [preset,folder] of [['guitar2','spanish-guitar-v1'],['guitar3','martin-guitar-v1'],['guitar4','fender-guitar-v1']]) {
+      const before=player.position;
+      check(!performance.getEntriesByType('resource').some(e=>e.name.includes('/'+folder+'/')),
+        'Unselected preset downloaded early: '+preset);
+      sound.value=preset;sound.dispatchEvent(new Event('change'));await player.updateComplete;
+      for(let i=0;i<200 && player.snapshot?.state!=='playing';i++) await delay(50);
+      check(player.snapshot?.state==='playing','Preset did not resume: '+preset);
+      check(performance.getEntriesByType('resource').some(e=>e.name.startsWith(${JSON.stringify(base + '/samples/')}+folder+'/')),
+        'Preset not loaded from artifact origin: '+preset);
+      check(player.position.num*before.den>=before.num*player.position.den,'Preset reset playback position');
+    }
     player.pause();const frozen=player.position;await delay(60);check(player.position.num===frozen.num && player.position.den===frozen.den,'Pause did not freeze');
     const rate=player.shadowRoot.querySelector('select[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('change'));await player.updateComplete;check(player.snapshot.rate===1.5,'Rate control did not reach transport');
     const volume=player.shadowRoot.querySelector('input');volume.value='0';volume.dispatchEvent(new Event('input'));await player.play();

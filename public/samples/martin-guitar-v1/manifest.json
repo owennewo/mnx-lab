@@ -1,0 +1,177 @@
+{
+  "formatVersion": 1,
+  "name": "Martin HD28 steel string",
+  "license": "CC0-1.0",
+  "repository": "https://github.com/sfzinstruments/Discord-SFZ-GM-Bank",
+  "revision": "7a9c478fe331f94f246d33332f0adedb25bbbe27",
+  "sampleRate": 24000,
+  "gain": 0.3697,
+  "conversion": "ffmpeg -i SOURCE -t min(8,duration) -ac 1 -ar 24000 -sample_fmt s16 -af afade=t=out:st=end-0.08:d=0.08 -map_metadata -1 OUTPUT.flac",
+  "samples": [
+    {
+      "file": "40.flac",
+      "midi": 40,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_040__E2_1.wav",
+      "sourceSha256": "3d80eb25aa8cbe8d1d2b5971d42a63df279c5429437df6267422ceef1c75b50f",
+      "sha256": "ae5aae657705cb0ff8c759b0baa55a7c4953e885ce77260375b0b5287e076ed8",
+      "bytes": 69207,
+      "duration": 4.669728
+    },
+    {
+      "file": "43.flac",
+      "midi": 43,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_043__G2_1.wav",
+      "sourceSha256": "574f9b934a6965cfbb9eee1db6918a7bc47ea8577c321ac98ff20872e8da42ed",
+      "sha256": "546f72471c91a00e5aad7f2f8fd60d9f89d9ee41a9114aef6cf3ca27573c4d0c",
+      "bytes": 37766,
+      "duration": 2.013787
+    },
+    {
+      "file": "46.flac",
+      "midi": 46,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_046_Bb2_1.wav",
+      "sourceSha256": "aadf19ca38c73473373a22947f49317dbee0c2b58e040e0115801fe57b76d3e6",
+      "sha256": "1206222df80ba565ba81e4ce6326f73026a8fab0f1f831c5efabcb2427bea600",
+      "bytes": 62656,
+      "duration": 4.487075
+    },
+    {
+      "file": "49.flac",
+      "midi": 49,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_049_Db3_1.wav",
+      "sourceSha256": "bf57a94a18e63c6c7f90c84c6bf08e998a1ea7e0b8bf1a6a09d31bed77e4a2c7",
+      "sha256": "b0b934a01887bc2e1f249428aad216bb64607bd3b1f8cec2acf15d2b3ace4302",
+      "bytes": 46378,
+      "duration": 2.678005
+    },
+    {
+      "file": "52.flac",
+      "midi": 52,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_052__E3_1.wav",
+      "sourceSha256": "e2ee2b611260e25bd6dacf00dbe5b3b8c7e5f69cc2cc252461af98025dd284fe",
+      "sha256": "2fe3218aa38626d0a5055cd90f3364a15f377e9127c4be167782aa4c6bc68380",
+      "bytes": 60439,
+      "duration": 3.684807
+    },
+    {
+      "file": "55.flac",
+      "midi": 55,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_055__G3_1.wav",
+      "sourceSha256": "694679709136628e7b807a8059a10e4264af8123bf5fc819e9761c4e0e563f29",
+      "sha256": "1cc017a878fc326b4d90766e9ec9c7d9fa01dd4c225d7a19c00cffceddf78254",
+      "bytes": 44899,
+      "duration": 2.319751
+    },
+    {
+      "file": "58.flac",
+      "midi": 58,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_058_Bb3_1.wav",
+      "sourceSha256": "cdacb0918cbe4c2e8da3324f559d94b2be11c3614be6c5da0b7654373e842080",
+      "sha256": "b9bc9716c7b2bc498c6d75776dc5e560dc4b152795bcfe76fa462acfed0882f1",
+      "bytes": 59598,
+      "duration": 3.464966
+    },
+    {
+      "file": "61.flac",
+      "midi": 61,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_061_Db4_1.wav",
+      "sourceSha256": "81c1ea3bdd795d7e91b369f47001757ab3e6f82da0aeb4486da9032451cae958",
+      "sha256": "7ccbcc58a0397816cc9e1b72e471f08392f8757fb095b0830ae75c27dd2c3c4d",
+      "bytes": 54633,
+      "duration": 2.935737
+    },
+    {
+      "file": "64.flac",
+      "midi": 64,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_064__E4_1.wav",
+      "sourceSha256": "1ce5ce765892d3f557cd3c47c7fbba9ac866765d10fe342cb03e00b8be0ee412",
+      "sha256": "2aaaceb6d150c8d4b094d35b1727cb20bc9158ba749c3df52ad6bb7435d36b40",
+      "bytes": 43818,
+      "duration": 2.013379
+    },
+    {
+      "file": "68.flac",
+      "midi": 68,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_068_Ab4_1.wav",
+      "sourceSha256": "85595b30c7d2fcca30186a3539ca401c4e551e4ca6506c72c26c291a8d333701",
+      "sha256": "020a611e76b23af799420ca1a41e990e0eb6ca61e7743931b6ee67ee8cef9cb9",
+      "bytes": 42777,
+      "duration": 1.745125
+    },
+    {
+      "file": "71.flac",
+      "midi": 71,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_071__B4_1.wav",
+      "sourceSha256": "5278514d5a99ba1871c2a5035335219740d759cc6553a06eb54d82742ae052f3",
+      "sha256": "0416cc64cb7c321db24ab6a453893e5e2d371b52662c1aeebe205253678b53e3",
+      "bytes": 35375,
+      "duration": 1.293175
+    },
+    {
+      "file": "74.flac",
+      "midi": 74,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_074__D5_1.wav",
+      "sourceSha256": "272f34deb22bc1ddc17f01c65b34016a6bc519bacf912aa57aecad827ff2f0da",
+      "sha256": "9ba1437313466cc5a16468c9f88290dc218ffeef8350c4e9256b7146fa68873f",
+      "bytes": 26713,
+      "duration": 0.945782
+    },
+    {
+      "file": "77.flac",
+      "midi": 77,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_077__F5_1.wav",
+      "sourceSha256": "981d8956ffde9ec5b045a3ddf563d3802957e6845079540cf4958797060c415a",
+      "sha256": "9d465b6e7e333f7c967e6ca786112ddd5b28d59733b7287531c710f8e6479dd1",
+      "bytes": 39884,
+      "duration": 1.559683
+    },
+    {
+      "file": "80.flac",
+      "midi": 80,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_080_Ab5_1.wav",
+      "sourceSha256": "1dfca9cf6adb0f6e4a37ac7ab3818c62c5bab560e6db13373255db7cef23de2e",
+      "sha256": "32ae10eacc82115cb787b75a1c14f01b99fda603b0d5c2c9b63139d68a0faa32",
+      "bytes": 29696,
+      "duration": 1.185261
+    },
+    {
+      "file": "83.flac",
+      "midi": 83,
+      "layer": 4,
+      "take": 1,
+      "source": "Discord GM/Melodic/026-Acoustic Guitar (steel)/MartinGM2_083__B5_1.wav",
+      "sourceSha256": "da4133e56cc7e73f7284f91fd098a0120190deac4c9dbdd59c47f4a08c4a70c5",
+      "sha256": "8dcd196f1880aad048c286b8254cb23cb27c240d9dc3490222626f3d07bfb0fc",
+      "bytes": 23191,
+      "duration": 0.706372
+    }
+  ]
+}

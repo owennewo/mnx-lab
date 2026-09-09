@@ -2,7 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { expect, it } from 'vitest';
-import { selectGuitarSample, type GuitarSample } from '../../src/audio/sampleSelection.ts';
+import {
+  GUITAR_PRESETS,
+  selectGuitarSample,
+  type GuitarSample,
+} from '../../src/audio/sampleSelection.ts';
 
 const pack = path.resolve('public/samples/shinyguitar-v1');
 const manifest = JSON.parse(fs.readFileSync(path.join(pack, 'manifest.json'), 'utf8'));
@@ -50,3 +54,29 @@ it('selects nearby roots and velocity layers while alternating independently add
   expect(selectGuitarSample(samples, hz(24), 0.8, 0).midi).toBe(37);
   expect(selectGuitarSample(samples, hz(96), 0.8, 0).midi).toBe(84);
 });
+
+for (const preset of GUITAR_PRESETS.slice(1)) {
+  it(preset.label + ' pins a distinct CC0 source and every converted sample', () => {
+    const directory = path.resolve('public/samples', preset.directory);
+    const source = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
+    expect(fs.readFileSync(path.join(directory, 'LICENSE'), 'utf8')).toContain('CC0 1.0 Universal');
+    expect(fs.readFileSync(path.join(directory, 'SOURCE.txt'), 'utf8')).toContain('CC0');
+    expect(source.repository).not.toBe(manifest.repository);
+    expect(source.gain).toBeGreaterThan(0);
+    expect(source.samples.length).toBeGreaterThanOrEqual(13);
+    for (const sample of source.samples) {
+      const bytes = fs.readFileSync(path.join(directory, sample.file));
+      expect(createHash('sha256').update(bytes).digest('hex')).toBe(sample.sha256);
+      expect(bytes.length).toBe(sample.bytes);
+      expect(sample.sourceSha256).toMatch(/^[a-f0-9]{64}$/);
+      expect([sample.layer, sample.take]).toEqual([4, 1]);
+    }
+    // A single-layer source still responds to soft notes without inventing recordings.
+    expect(selectGuitarSample(source.samples, 440, 0.1, 5).file).toBe(
+      selectGuitarSample(source.samples, 440, 0.9, 0).file,
+    );
+    expect(source.samples.reduce((n: number, s: { bytes: number }) => n + s.bytes, 0)).toBeLessThan(
+      1_500_000,
+    );
+  });
+}

@@ -867,3 +867,17 @@ holds knowing that the five-second recordings decay rather than loop, and that
 there are no dedicated muted/harmonic/legato recording layers. Source and derived
 hashes are pinned in public/samples/shinyguitar-v1/manifest.json.
 Automated waveform checks passed; no human listening verdict has been recorded.
+
+### Additional guitar sources — 2026-09-09
+
+Follow-up to [item 12](../complete/core-player-sampled-guitar.md). The user's
+listening feedback was that Guitar 1 sounded banjo-like but was much better
+than Synth. This is timbre feedback, not approval of the performance evidence.
+
+Guitar 2 (Spanish nylon), 3 (Martin steel), and 4 (Fender clean electric) now
+provide distinct CC0 recording sources for comparison, using the same notes and
+timing. Listen to the same phrase on all four; compare body, attack, decay and
+level. New packs have one layer/take per root and up to eight-second tails.
+Source/output hashes and declarations are preserved alongside each pack.
+No scenario golden or verification record changed; new presets still need the
+listener's judgement.

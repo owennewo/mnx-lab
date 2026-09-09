@@ -8,7 +8,7 @@ export type { Sink, SinkEvent, SinkVoice } from '../../audio/sink.ts';
 export { Transport, eventsBetween, centsAt, type Clock, type LoopRegion, type TransportSnapshot, type TransportEvent, type TransportOptions } from '../../audio/transport.ts';
 export { NativeSink, nativeClock, type NativeSinkOptions } from '../../audio/native/sink.ts';
 
-export type { VoicePreset, GuitarSample } from '../../audio/sampleSelection.ts';
+export { GUITAR_PRESETS, isGuitarPreset, type VoicePreset, type GuitarPreset, type GuitarSample } from '../../audio/sampleSelection.ts';
 export {
   loadGuitarSamples, setGuitarSampleBase,
   type GuitarSampleBank, type DecodedGuitarSample, type GuitarSampleLoader,

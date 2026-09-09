@@ -82,3 +82,26 @@ package checks passed. Changed audio harness files also pass strict typing.
 The optional whole-harness type-check still reports pre-existing errors in
 unrelated suites/converters; the required application/worker build is green.
 No human listening or scenario approval was inferred.
+
+## Additional-source agreement — 2026-09-09
+
+The user hears the first preset as banjo-like and requests Guitar 2, 3 and 4 from
+different sources. Preserve Guitar 1, then add Spanish classical nylon (FreePats),
+Martin HD28 steel (Jeff Learman), and Fender FSBS clean electric (FreePats), each
+under its source's verified CC0 dedication. Commit licence receipts, mappings and
+source/output hashes. These are distinct recordings, not alternate EQ patches.
+
+Keep transport and musical evidence unchanged. Load only requested presets,
+cache banks separately, and prevent a late load from replacing the chosen voice.
+Use source root pitches; single-layer libraries must not pretend to have extra
+velocity layers/takes. Retain up to eight seconds of natural body/decay without
+SFZ sustain looping. One measured gain per pack supports comparison. Exercise
+real buffers, rapid switches and embed asset resolution, and leave human timbre
+judgement to the listener.
+
+The follow-up ships 15 nylon roots (679,450 bytes), 15 steel roots (677,030 bytes)
+and 13 clean-electric roots (1,305,814 bytes). All 91 samples across the four banks
+pass real-buffer pitch/bend/legato/release checks. Out-of-order load and cache
+reuse checks pass, as do cross-origin switches in both embed formats and package
+asset checks. The workbench check exposed a Chrome profile-cleanup race after
+all assertions passed; bounded removal retries now handle it.

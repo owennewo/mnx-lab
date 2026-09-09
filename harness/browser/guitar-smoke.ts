@@ -1,3 +1,4 @@
+import { GUITAR_PRESETS, type GuitarPreset } from '../../src/audio/sampleSelection.ts';
 import { NativeSink } from '../../src/audio/native/sink.ts';
 import { loadGuitarSamples } from '../../src/audio/native/guitarSamples.ts';
 import { Transport } from '../../src/audio/transport.ts';
@@ -35,14 +36,18 @@ const frequency = (data: Float32Array, from: number, expected: number) => {
   }
   return 48000 / lag;
 };
-export async function runGuitarSmoke() {
+async function checkBank(preset: GuitarPreset) {
   const context = new OfflineAudioContext(1, 48000 * 2.2, 48000);
-  const first = loadGuitarSamples(context);
-  check(first === loadGuitarSamples(context), 'Concurrent sample loads were not shared.');
-  const bank = await first;
-  check(bank.samples.length === 48, 'Incomplete decoded pack.');
+  const first = loadGuitarSamples(context, undefined, preset);
   check(
-    bank.samples.every((s) => s.buffer.duration > 0.5 && s.buffer.duration <= 5.001),
+    first === loadGuitarSamples(context, undefined, preset),
+    'Concurrent sample loads were not shared.',
+  );
+  const bank = await first;
+  const expected = { guitar: 48, guitar2: 15, guitar3: 15, guitar4: 13 };
+  check(bank.samples.length === expected[preset], 'Incomplete decoded pack: ' + preset);
+  check(
+    bank.samples.every((s) => s.buffer.duration > 0.5 && s.buffer.duration <= 8.001),
     'Unexpected sample durations.',
   );
   let attacks = 0;
@@ -51,7 +56,7 @@ export async function runGuitarSmoke() {
     attacks++;
     return create();
   };
-  const sink = new NativeSink({ context, voicePreset: 'guitar' });
+  const sink = new NativeSink({ context, voicePreset: preset });
   await sink.unlock();
   sink.schedule(
     [
@@ -94,6 +99,51 @@ export async function runGuitarSmoke() {
   check(rms(data, 1.91, 2.2) < 1e-7, 'Cancelled generation/replacement leaked.');
   sink.dispose();
 
+  return { bank, measured, attacks };
+}
+export async function runGuitarSmoke() {
+  const results = new Map<GuitarPreset, Awaited<ReturnType<typeof checkBank>>>();
+  for (const p of GUITAR_PRESETS) results.set(p.id, await checkBank(p.id));
+  const { bank, measured, attacks } = results.get('guitar')!;
+  // A slow earlier bank must not become the bank of a later selected preset.
+  const raceContext = new OfflineAudioContext(1, 48000, 48000);
+  const ready = new Map<GuitarPreset, (value: typeof bank) => void>();
+  const requested: GuitarPreset[] = [];
+  const racing = new NativeSink({
+    context: raceContext,
+    voicePreset: 'guitar2',
+    sampleLoader: (_ctx, id) => {
+      requested.push(id);
+      return new Promise((resolve) => ready.set(id, resolve));
+    },
+  });
+  const older = racing.unlock();
+  racing.setVoicePreset('guitar3');
+  const newer = racing.unlock();
+  ready.get('guitar3')!(results.get('guitar3')!.bank);
+  await newer;
+  ready.get('guitar2')!(results.get('guitar2')!.bank);
+  await older;
+  let used: AudioBuffer | null = null;
+  const create = raceContext.createBufferSource.bind(raceContext);
+  raceContext.createBufferSource = () => {
+    const node = create(),
+      start = node.start.bind(node);
+    node.start = (when = 0) => {
+      used = node.buffer;
+      start(when);
+    };
+    return node;
+  };
+  racing.schedule([{ kind: 'attack', voice: 'v', hz: 440, velocity: 0.8, offset: 0.1 }], 0);
+  check(
+    results.get('guitar3')!.bank.samples.some((s) => s.buffer === used),
+    'Late nylon load replaced the selected steel bank.',
+  );
+  racing.setVoicePreset('guitar2');
+  await racing.unlock();
+  check(requested.join(',') === 'guitar2,guitar3', 'Cached bank was downloaded again.');
+  racing.dispose();
   // Compile and seek through a sustained note: transport remains the timeline.
   const doc = {
     mnx: { version: 1 },
@@ -207,6 +257,12 @@ export async function runGuitarSmoke() {
   player.remove();
   check(position.num >= 0n, 'Invalid player position.');
   return {
+    presets: Object.fromEntries(
+      [...results].map(([id, result]) => [
+        id,
+        { samples: result.bank.samples.length, measuredHz: result.measured },
+      ]),
+    ),
     samples: bank.samples.length,
     measuredHz: measured,
     attacks,

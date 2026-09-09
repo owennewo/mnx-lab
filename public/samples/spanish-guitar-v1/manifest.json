@@ -1,0 +1,179 @@
+{
+  "formatVersion": 1,
+  "name": "Spanish classical nylon",
+  "license": "CC0-1.0",
+  "repository": "https://freepats.zenvoid.org/Guitar/acoustic-guitar.html",
+  "revision": "2019-06-18",
+  "sampleRate": 24000,
+  "gain": 0.220283,
+  "conversion": "ffmpeg -i SOURCE -t min(8,duration) -ac 1 -ar 24000 -sample_fmt s16 -af afade=t=out:st=end-0.08:d=0.08 -map_metadata -1 OUTPUT.flac",
+  "samples": [
+    {
+      "file": "36.flac",
+      "midi": 36,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/C2.flac",
+      "sourceSha256": "6997c7134ce02d437717dc3e279af9f390cefa87aa7f11fa2f350e9b9de50810",
+      "sha256": "1c368fa36eece1939a0d4ba1fcf297cfc5040b961b559e5ff64709a44a4d0572",
+      "bytes": 78202,
+      "duration": 8
+    },
+    {
+      "file": "40.flac",
+      "midi": 40,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/E2.flac",
+      "sourceSha256": "18ce73f4243991132901b47efe3affa155c1b934d838cf02a29df5c62c8706a8",
+      "sha256": "31bbf94a4933f788d0d52452fc2df7364863407f16a435c1525592c6f64e0c63",
+      "bytes": 60273,
+      "duration": 4.998503
+    },
+    {
+      "file": "43.flac",
+      "midi": 43,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/G2.flac",
+      "sourceSha256": "71e69e5eff738f668b4e3e2f53f72de7725fd3b7969339bb44aba8e7c1df78d2",
+      "sha256": "f41f2acc25eb97252b0d8ced25ee4d20edd2657c51aa1dad767605a3a1a9b5e0",
+      "bytes": 59615,
+      "duration": 5.23322
+    },
+    {
+      "file": "47.flac",
+      "midi": 47,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/B2.flac",
+      "sourceSha256": "fa2881b3cbeec65770890b16f74bcec8c0295952292b52ab3ffe95d130c0e879",
+      "sha256": "4495b9530ac074bdf4fc38fd2a7e93c96047b6f5251aef4564999e5418c93c8b",
+      "bytes": 47794,
+      "duration": 3.867347
+    },
+    {
+      "file": "50.flac",
+      "midi": 50,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/D3.flac",
+      "sourceSha256": "c4c08268b1147446afcd7c872355aa71d03822c12fb1b56c7f275617ab2b01a1",
+      "sha256": "05fca939dd8c951533ce6358c444cef0f8041a637e167fc8c5f68a7505a45d0d",
+      "bytes": 56472,
+      "duration": 5.285918
+    },
+    {
+      "file": "53.flac",
+      "midi": 53,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/F3.flac",
+      "sourceSha256": "ea752040ff5373601d41eaf55127b294b5e9f3524f23ddbbd21f1b5edbd0e5ea",
+      "sha256": "566fada2ee782d0799e61b831e41d641eb788a9c5b212cb3d9e34e4560d0a1c9",
+      "bytes": 51174,
+      "duration": 4.196916
+    },
+    {
+      "file": "57.flac",
+      "midi": 57,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/A3.flac",
+      "sourceSha256": "08d2e90e80839bdb77342d7dcc8a73e0ec8849607d1a750ce433f9e7f0789e06",
+      "sha256": "652bf9f898398fc1dfb2423033207a06b167b657af94dfb3e88df4ecd5a1f84f",
+      "bytes": 34854,
+      "duration": 2.525374
+    },
+    {
+      "file": "60.flac",
+      "midi": 60,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/C4.flac",
+      "sourceSha256": "e8fcd63c262ebef3e84d1f24242918cc578f8b0db54049ad109815b01d1226f0",
+      "sha256": "db65e68f4e5f5d120873637e915a9e0be05eef012a985df2b06b3c6a96bdbd57",
+      "bytes": 39039,
+      "duration": 2.417846
+    },
+    {
+      "file": "64.flac",
+      "midi": 64,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/E4.flac",
+      "sourceSha256": "b8882fbba2b6a9d0cbae02867be4273aa8f0fddd00bc6f3d993dff6c77997246",
+      "sha256": "c19d7120c198e0224ef0e0a3c7b460057f79266d8eb2f1296af1d26db8c24c29",
+      "bytes": 54533,
+      "duration": 3.749365
+    },
+    {
+      "file": "67.flac",
+      "midi": 67,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/G4.flac",
+      "sourceSha256": "5e3423ab0440fe8cc337ada529c2bb1696914e4465b336d3635630b4ea7b4916",
+      "sha256": "72201cb0fed4a35517b4c743029d2858560f22c1424deb5b3154ec8077740f05",
+      "bytes": 42415,
+      "duration": 2.410091
+    },
+    {
+      "file": "71.flac",
+      "midi": 71,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/B4.flac",
+      "sourceSha256": "ca2b8e768bd7ce5b0037c3645b4c60aeaf077bb128ce3dd8eef98fcd3a36f778",
+      "sha256": "e043327aa3529e0a8d8c044dbd510a6349fbeeae3b467f06e60c030f7834c02a",
+      "bytes": 35659,
+      "duration": 1.900431
+    },
+    {
+      "file": "74.flac",
+      "midi": 74,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/D5.flac",
+      "sourceSha256": "611132fb0b34979c9681a7a4d826a12f36dd678447e83e5689837e4c2e11221d",
+      "sha256": "40262e7a8566fc5d4c40c32727dfc1ca5205b445a76241dd00d291e53f06c1e6",
+      "bytes": 31539,
+      "duration": 1.262494
+    },
+    {
+      "file": "78.flac",
+      "midi": 78,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/F#5.flac",
+      "sourceSha256": "10c4a73031ad13aba597453053382bce13bc7c4beee6ee845e69ab269857b0b6",
+      "sha256": "938113bd0d7c09f6d49ad9ac8eeaf78e61de8232700cf470df56959a7974f1c8",
+      "bytes": 31106,
+      "duration": 1.383401
+    },
+    {
+      "file": "81.flac",
+      "midi": 81,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/A5.flac",
+      "sourceSha256": "a0111ff90a40a7d68155803d0708c3c025cc1db44c3e222270c900d56b845a43",
+      "sha256": "76f826e6d911e0577cf174dcc997209cf8b90026c592f982a63a313e792bfbdf",
+      "bytes": 33116,
+      "duration": 1.63102
+    },
+    {
+      "file": "84.flac",
+      "midi": 84,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/C6.flac",
+      "sourceSha256": "3de4c476b133858e67f701f28caf249598ffd37e25c9aba1301000a345c5293f",
+      "sha256": "8af77de9d61d375ef7a4f2b3826a09a74c6cdbbccd3d00014a9ba5af5b3d6365",
+      "bytes": 23659,
+      "duration": 0.894898
+    }
+  ],
+  "archive": "https://freepats.zenvoid.org/Guitar/SpanishClassicalGuitar/SpanishClassicalGuitar-SFZ%2BFLAC-20190618.7z",
+  "archiveSha256": "903916921a21662d2237ade7f0e98e55de93cb7b86da219e4e10f4ad385b8f5e"
+}

@@ -542,3 +542,17 @@ The shipped viewer entry stays unchanged until item 7 consumes playback.
   to complete. Post-rebase gates: 1,614 tests / 94 files, corpus/build and clean
   regenerated goldens. Audio, both embed formats, workbench/Listen and installed
   package smokes passed. Item 13 is the only remaining implementation proposal.
+
+### Item 12 follow-up — contrasting guitar sources (2026-09-09)
+
+- The user found Guitar 1 banjo-like despite preferring it to Synth. Added
+  Guitar 2 · Nylon (FreePats Spanish classical), Guitar 3 · Steel (Jeff Learman
+  Martin HD28), and Guitar 4 · Clean electric (FreePats Fender FSBS), with verified
+  CC0 declarations and pinned source/output hashes. These are separate recordings.
+- Only the selected bank loads; cached banks remain distinct, and an older load
+  cannot overwrite the current choice. The embed derives all four asset paths
+  from its own script. Host loaders receive the chosen preset id.
+- Three new packs total 2,662,294 bytes across 43 samples; no invented layers,
+  no SFZ loops, and up to eight-second recorded tails. Measured pack-level gain
+  supports comparison. [Listening feedback](lab-verify.md#additional-guitar-sources--2026-09-09)
+  remains separate from scenario approval.

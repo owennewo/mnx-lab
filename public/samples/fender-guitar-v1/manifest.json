@@ -1,0 +1,155 @@
+{
+  "formatVersion": 1,
+  "name": "Fender FSBS clean electric",
+  "license": "CC0-1.0",
+  "repository": "https://github.com/freepats/electric-guitar-FSBS-clean",
+  "revision": "192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91",
+  "sampleRate": 24000,
+  "gain": 0.172295,
+  "conversion": "ffmpeg -i SOURCE -t min(8,duration) -ac 1 -ar 24000 -sample_fmt s16 -af afade=t=out:st=end-0.08:d=0.08 -map_metadata -1 OUTPUT.flac",
+  "samples": [
+    {
+      "file": "36.flac",
+      "midi": 36,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/C2_s1_01.flac",
+      "sourceSha256": "769cef1cb056680d05ad093baf01ee1a3fbca521371290fe9a81cb2706c615ce",
+      "sha256": "a51b39dc7957cd8963c4c12f53ef7eb3ed2dd2bdc2cc179fabe872d88f2dedc0",
+      "bytes": 100785,
+      "duration": 8
+    },
+    {
+      "file": "41.flac",
+      "midi": 41,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/F2_s1_01.flac",
+      "sourceSha256": "1ec869eb4cc3e2f1c1751f6e495c551a2f542122a9d1ef6cf064ad37c2a3a1b5",
+      "sha256": "e8a404c4565b0b81faad25879ac35c06535f11ab44a80f804de6b349de633b88",
+      "bytes": 107672,
+      "duration": 8
+    },
+    {
+      "file": "45.flac",
+      "midi": 45,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/A2_s2_01.flac",
+      "sourceSha256": "c63270dbb8d4600600662abf55d94a63123a68ff26bc04f1f560ae209817c76e",
+      "sha256": "39b3ab856e4267c5af917fd6fc8fbb671632b8620d8f12cfabc80daa343933b7",
+      "bytes": 114235,
+      "duration": 8
+    },
+    {
+      "file": "48.flac",
+      "midi": 48,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/C3_s2_02.flac",
+      "sourceSha256": "4f6a0f6411e6ccf0cbde6bbe6148d916d8e513a16484237245be2095b00c3169",
+      "sha256": "d32c9db249b518801fb61e05cea1944f4c678b710085429fa28a3be24daa96a5",
+      "bytes": 102426,
+      "duration": 8
+    },
+    {
+      "file": "52.flac",
+      "midi": 52,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/E3_s3_01.flac",
+      "sourceSha256": "80f77c9ba5845ac0e827187b8e3b3952b5fb8a818a1a1d2e65cd5d1d690a8213",
+      "sha256": "96dce212cd2f7eb12b3691979119232e108f956ed35e0f5764168149a92cb076",
+      "bytes": 104430,
+      "duration": 7.134263
+    },
+    {
+      "file": "55.flac",
+      "midi": 55,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/G3_s4_01.flac",
+      "sourceSha256": "37cdcff86d3d666dde739d96fe25f64ec864adbbf8adb6d131e2f24ea13dd200",
+      "sha256": "d0bd74624eb419c6f23f3ec956598c13493d7e4edb57adb4e3b8b3ce99d18cf9",
+      "bytes": 134441,
+      "duration": 8
+    },
+    {
+      "file": "59.flac",
+      "midi": 59,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/B3_s5_01.flac",
+      "sourceSha256": "3a02f89dcd9a2431ddd2f91391f2b9f1b39a4fa335a4db09bb387f0a5a8b8b24",
+      "sha256": "1bb23b67dc0f818b7b0fa1206101fa73e361a4feea26d30451d21011e98222c6",
+      "bytes": 126034,
+      "duration": 8
+    },
+    {
+      "file": "64.flac",
+      "midi": 64,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/E4_s6_01.flac",
+      "sourceSha256": "d3797573c4eb28429484c923d3bf12157c7f409a64ad354601061134055d4f9f",
+      "sha256": "7e09956055e144287bdba0e37d441e10c9c7f5c2ab86a7701d73c381527daba2",
+      "bytes": 114148,
+      "duration": 7.047438
+    },
+    {
+      "file": "67.flac",
+      "midi": 67,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/G4_s6_01.flac",
+      "sourceSha256": "33366b0a25842dc439b3be5d1b31b31ba44674d3c39348fa6eff6e39d5bc6314",
+      "sha256": "c8067939f3993d1a8d4be4f59208efaa0252c6f2eb70dd3d7859718f0841b140",
+      "bytes": 100249,
+      "duration": 6.021247
+    },
+    {
+      "file": "71.flac",
+      "midi": 71,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/B4_s6_01.flac",
+      "sourceSha256": "56823645bde6d2d4571d9827800c5e6002bb9729918f63eebbbaa10036a9f78d",
+      "sha256": "5fba6da9763b1bbe3fb806630c206c5c9be08c103edeb9858954f496c3977889",
+      "bytes": 93976,
+      "duration": 5.801927
+    },
+    {
+      "file": "74.flac",
+      "midi": 74,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/D5_s6_01.flac",
+      "sourceSha256": "2c718b0225600266bec188dc9d520d26169338b52e336404ad61eaff49043cce",
+      "sha256": "417849a0e7e8b9abb3a7ce371935fa8391c9e79caeaf91daf6136cb8718b16cf",
+      "bytes": 71266,
+      "duration": 3.811519
+    },
+    {
+      "file": "80.flac",
+      "midi": 80,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/G#5_s6_03.flac",
+      "sourceSha256": "4027b0d7f6cab7df8398d161ed3f86a51cb621bf9a9e01f922455285bd91a4f6",
+      "sha256": "6ee8df3d5e6bca48ab65e15d3c1f692d56de7b8c15950d633d57b10ed15237b5",
+      "bytes": 85079,
+      "duration": 5.258617
+    },
+    {
+      "file": "85.flac",
+      "midi": 85,
+      "layer": 4,
+      "take": 1,
+      "source": "samples/bridge/small/C#6_s6_01.flac",
+      "sourceSha256": "1c4ab2abeb962c8b4e96bc72b67bacdbc803d3c07649f08a88b0bf81500ec143",
+      "sha256": "ef0c435a859f26b2981c785257d1068f06b73f24c52de206b2dbe9dbb713377f",
+      "bytes": 51073,
+      "duration": 2.887574
+    }
+  ]
+}

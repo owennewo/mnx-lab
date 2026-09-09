@@ -1,6 +1,11 @@
 /** Native Web Audio renderer; importing this module never creates a context. */
 import type { Sink, SinkEvent } from '../sink.ts';
-import { selectGuitarSample, type VoicePreset } from '../sampleSelection.ts';
+import {
+  selectGuitarSample,
+  isGuitarPreset,
+  type GuitarPreset,
+  type VoicePreset,
+} from '../sampleSelection.ts';
 import {
   loadGuitarSamples,
   type GuitarSampleBank,
@@ -88,6 +93,9 @@ export interface NativeSinkOptions {
   /** Explicit timbre choice; a callback can choose separately for each part/voice. */
   voicePreset?: VoicePreset | ((voice: string) => VoicePreset);
   sampleBase?: string;
+  sampleBases?: Partial<Record<GuitarPreset, string>>;
+  /** Banks needed by a per-voice preset callback; defaults to legacy Guitar 1. */
+  samplePresets?: readonly GuitarPreset[];
   sampleLoader?: GuitarSampleLoader;
   /** Master amplitude, independent of note velocities; defaults to 1. */
   volume?: number;
@@ -104,8 +112,8 @@ export class NativeSink implements Sink {
   private output?: GainNode;
   private volume = 1;
   private disposed = false;
-  private sampleBank?: GuitarSampleBank;
-  private sampleRequest?: Promise<void>;
+  private sampleBanks = new Map<GuitarPreset, GuitarSampleBank>();
+  private sampleRequests = new Map<GuitarPreset, Promise<void>>();
   private attacks = new Map<string, number>();
   private voices = new Set<Voice>();
   constructor(private options: NativeSinkOptions = {}) {
@@ -115,9 +123,13 @@ export class NativeSink implements Sink {
       throw new Error('Destination must belong to the supplied context.');
   }
   /** The host pauses before switching; subsequent attacks use the new preset. */
-  setVoicePreset(preset: NativeSinkOptions['voicePreset']): void {
+  setVoicePreset(
+    preset: NativeSinkOptions['voicePreset'],
+    samplePresets?: readonly GuitarPreset[],
+  ): void {
     this.live();
     this.options.voicePreset = preset;
+    this.options.samplePresets = samplePresets;
   }
   private live() {
     if (this.disposed) throw new Error('Sink is disposed.');
@@ -138,22 +150,39 @@ export class NativeSink implements Sink {
     )
       await (this.context as AudioContext).resume();
     this.live();
-    if (this.options.voicePreset && this.options.voicePreset !== 'synth' && !this.sampleBank) {
-      this.sampleRequest ??= (async () => {
-        try {
-          const bank = await (this.options.sampleLoader
-            ? this.options.sampleLoader(this.context!)
-            : loadGuitarSamples(this.context!, this.options.sampleBase));
-          this.live();
-          if (!bank.samples.length) throw new Error('The guitar pack contains no samples.');
-          this.sampleBank = bank;
-        } finally {
-          this.sampleRequest = undefined;
-        }
-      })();
-      await this.sampleRequest;
-    }
+    const preset = this.options.voicePreset;
+    const required =
+      typeof preset === 'function'
+        ? (this.options.samplePresets ?? ['guitar' as const])
+        : isGuitarPreset(preset)
+          ? [preset]
+          : [];
+    await Promise.all(required.map((id) => this.prepareSamples(id)));
     this.live();
+  }
+  private prepareSamples(preset: GuitarPreset): Promise<void> {
+    if (this.sampleBanks.has(preset)) return Promise.resolve();
+    const pending = this.sampleRequests.get(preset);
+    if (pending) return pending;
+    const request = (async () => {
+      const bank = await (this.options.sampleLoader
+        ? this.options.sampleLoader(this.context!, preset)
+        : loadGuitarSamples(
+            this.context!,
+            this.options.sampleBases?.[preset] ??
+              (preset === 'guitar' ? this.options.sampleBase : undefined),
+            preset,
+          ));
+      this.live();
+      if (!bank.samples.length) throw new Error('The guitar pack contains no samples.');
+      this.sampleBanks.set(preset, bank);
+    })();
+    this.sampleRequests.set(preset, request);
+    void request.then(
+      () => this.sampleRequests.delete(preset),
+      () => this.sampleRequests.delete(preset),
+    );
+    return request;
   }
   setVolume(volume: number): void {
     this.live();
@@ -198,12 +227,12 @@ export class NativeSink implements Sink {
       )
         throw new RangeError('Offsets must be finite, nonnegative and ordered.');
       previous = event.offset;
-      if (event.kind === 'attack' && !this.sampleBank) {
+      if (event.kind === 'attack') {
         const preset =
           typeof this.options.voicePreset === 'function'
             ? this.options.voicePreset(event.voice)
             : this.options.voicePreset;
-        if (preset === 'guitar')
+        if (isGuitarPreset(preset) && !this.sampleBanks.has(preset))
           throw new Error('Guitar samples are not ready; call unlock first.');
       }
       if (
@@ -244,22 +273,18 @@ export class NativeSink implements Sink {
         let pitchParam: AudioParam;
         let pitchScale = 1;
         let amplitudeScale = 0.2;
-        if (preset === 'guitar') {
-          if (!this.sampleBank) throw new Error('Guitar samples are not ready; call unlock first.');
+        if (isGuitarPreset(preset)) {
+          const bank = this.sampleBanks.get(preset);
+          if (!bank) throw new Error('Guitar samples are not ready; call unlock first.');
           const attack = this.attacks.get(event.voice) ?? 0;
-          const sample = selectGuitarSample(
-            this.sampleBank.samples,
-            event.hz,
-            event.velocity,
-            attack,
-          );
+          const sample = selectGuitarSample(bank.samples, event.hz, event.velocity, attack);
           this.attacks.set(event.voice, attack + 1);
           const bufferSource = context.createBufferSource();
           bufferSource.buffer = sample.buffer;
           // Re-pitch this same source for legato; never restart its attack envelope.
           pitchScale = 1 / (440 * 2 ** ((sample.midi - 69) / 12));
           pitchParam = bufferSource.playbackRate;
-          amplitudeScale = 0.65;
+          amplitudeScale = bank.gain ?? 0.65;
           source = bufferSource;
         } else {
           const oscillator = context.createOscillator();

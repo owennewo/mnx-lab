@@ -1,3 +1,4 @@
+import { GUITAR_PRESETS } from '../audio/sampleSelection.ts';
 // Build face: the embed (dist/embed/mnx-lab.js, IIFE + ESM) — one script tag
 // registers the elements/ custom elements and nothing else. The workbench
 // shell must never be reachable from here (the old embed was the app shell
@@ -51,7 +52,9 @@ function declaredBase(): string | null {
 }
 
 const sampleDirectory = scriptDirectory();
-if (sampleDirectory) setGuitarSampleBase(`${sampleDirectory}/samples/shinyguitar-v1`);
+if (sampleDirectory)
+  for (const preset of GUITAR_PRESETS)
+    setGuitarSampleBase(`${sampleDirectory}/samples/${preset.directory}`, preset.id);
 const base = declaredBase() ?? scriptDirectory();
 if (base) {
   setSmuflBasePath(`${base}/smufl`);

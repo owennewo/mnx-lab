@@ -54,6 +54,10 @@ try {
     if (pack.samples.length !== 48 || typeof loadGuitarSamples !== 'function')
       throw new Error('Sample assets/API missing from installed package');
     fs.accessSync(require.resolve('mnx-lab/samples/shinyguitar-v1/' + pack.samples[0].file));
+    for (const name of ['spanish-guitar-v1', 'martin-guitar-v1', 'fender-guitar-v1']) {
+      const source = JSON.parse(fs.readFileSync(require.resolve('mnx-lab/samples/'+name+'/manifest.json'), 'utf8'));
+      fs.accessSync(require.resolve('mnx-lab/samples/'+name+'/'+source.samples[0].file));
+    }
     const idleSink = new NativeSink({ voicePreset: 'guitar' });
     if (idleSink.now() !== 0 || typeof Transport !== 'function') throw new Error('Lazy audio import failed');
     idleSink.dispose();

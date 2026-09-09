@@ -7,7 +7,12 @@ import {
   type TransportSnapshot,
   type LoopRegion,
 } from '../audio/transport.ts';
-import type { VoicePreset } from '../audio/sampleSelection.ts';
+import {
+  GUITAR_PRESETS,
+  isGuitarPreset,
+  type GuitarPreset,
+  type VoicePreset,
+} from '../audio/sampleSelection.ts';
 import type { GuitarSampleLoader } from '../audio/native/guitarSamples.ts';
 import { NativeSink, nativeClock } from '../audio/native/sink.ts';
 import { formatPlaybackPosition, measureAt } from '../audio/playbackPosition.ts';
@@ -22,6 +27,7 @@ export class Player extends LitElement {
   @property({ type: String }) documentId = '';
   @property({ attribute: 'voice-preset' }) voicePreset: VoicePreset = 'synth';
   @property({ attribute: 'sample-base' }) sampleBase: string | undefined;
+  @property({ attribute: false }) sampleBases: Partial<Record<GuitarPreset, string>> | undefined;
   @property({ attribute: false }) sampleLoader: GuitarSampleLoader | undefined;
   @state() private loading = false;
   @property({ type: Number }) initialOrdinal: number | null = null;
@@ -140,6 +146,7 @@ export class Player extends LitElement {
       changed.has('performance') ||
       changed.has('documentId') ||
       changed.has('sampleBase') ||
+      changed.has('sampleBases') ||
       changed.has('sampleLoader');
     if (reinstall) {
       this.install();
@@ -147,9 +154,9 @@ export class Player extends LitElement {
     } else if (changed.has('initialOrdinal') && this.initialOrdinal !== null)
       this.seek(this.initialOrdinal);
     if (!reinstall && changed.has('voicePreset') && this.sink) {
-      const resume = this.status?.state === 'playing';
+      const resume = this.status?.state === 'playing' || this.loading;
       this.pause();
-      this.sink.setVoicePreset(this.sinkPreset());
+      this.sink.setVoicePreset(this.sinkPreset(), this.requiredSamples());
       this.error = '';
       if (resume) void this.play();
     }
@@ -208,9 +215,13 @@ export class Player extends LitElement {
     this.publish();
   }
   private sinkPreset(): 'synth' | ((voice: string) => VoicePreset) {
-    if (this.voicePreset !== 'guitar') return 'synth';
+    if (!isGuitarPreset(this.voicePreset)) return 'synth';
     const kits = new Set(this.performance?.voices.filter((v) => v.kit).map((v) => v.id));
-    return (voice: string) => (kits.has(voice) ? 'synth' : 'guitar');
+    const preset = this.voicePreset;
+    return (voice: string) => (kits.has(voice) ? 'synth' : preset);
+  }
+  private requiredSamples(): GuitarPreset[] {
+    return isGuitarPreset(this.voicePreset) ? [this.voicePreset] : [];
   }
   private install() {
     this.teardown();
@@ -221,6 +232,8 @@ export class Player extends LitElement {
       volume: this.volume,
       voicePreset: this.sinkPreset(),
       sampleBase: this.sampleBase,
+      sampleBases: this.sampleBases,
+      samplePresets: this.requiredSamples(),
       sampleLoader: this.sampleLoader,
     });
     this.sink = sink;
@@ -332,8 +345,13 @@ export class Player extends LitElement {
               this.voicePreset = (event.target as HTMLSelectElement).value as VoicePreset;
             }}
           >
-            <option value="synth" ?selected=${this.voicePreset !== 'guitar'}>Synth</option>
-            <option value="guitar" ?selected=${this.voicePreset === 'guitar'}>Guitar</option>
+            <option value="synth" ?selected=${this.voicePreset === 'synth'}>Synth</option>
+            ${GUITAR_PRESETS.map(
+              (p) =>
+                html`<option value=${p.id} ?selected=${this.voicePreset === p.id}>
+                  ${p.label}
+                </option>`,
+            )}
           </select></label
         >
         <label
@@ -356,7 +374,7 @@ export class Player extends LitElement {
       </div>
       ${this.loading
         ? html`<p role="status">
-            Preparing ${this.voicePreset === 'guitar' ? 'guitar samples' : 'audio'}…
+            Preparing ${isGuitarPreset(this.voicePreset) ? 'guitar samples' : 'audio'}…
           </p>`
         : nothing}
       ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}

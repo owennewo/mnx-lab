@@ -1,5 +1,15 @@
 /** Pure mapping. Recorded pitches are shared; playback voices retain string ownership. */
-export type VoicePreset = 'synth' | 'guitar';
+export const GUITAR_PRESETS = [
+  { id: 'guitar', label: 'Guitar 1 · Archtop', directory: 'shinyguitar-v1' },
+  { id: 'guitar2', label: 'Guitar 2 · Nylon', directory: 'spanish-guitar-v1' },
+  { id: 'guitar3', label: 'Guitar 3 · Steel', directory: 'martin-guitar-v1' },
+  { id: 'guitar4', label: 'Guitar 4 · Clean electric', directory: 'fender-guitar-v1' },
+] as const;
+export type GuitarPreset = (typeof GUITAR_PRESETS)[number]['id'];
+export type VoicePreset = 'synth' | GuitarPreset;
+export function isGuitarPreset(value: unknown): value is GuitarPreset {
+  return GUITAR_PRESETS.some((preset) => preset.id === value);
+}
 export interface GuitarSample {
   file: string;
   midi: number;
