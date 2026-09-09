@@ -169,7 +169,7 @@ run any time before 6.
 | 7 | [Player element, written view](../complete/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | complete; human review pending |
 | 8 | [Expression and technique](../complete/core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | complete; human performance review pending |
 | 9 | [MIDI oracle](../complete/core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | complete; 22/27 W3C observable strict matches |
-| 10 | [Unrolled engraving](core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | in progress |
+| 10 | [Unrolled engraving](../complete/core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | complete; unrolled engraving review pending |
 | 11 | [WebMIDI out](../proposed/core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | proposed — after reviewer items 1–10 |
 | 12 | [Sampled guitar](../proposed/core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | proposed — after reviewer items 1–10 |
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
@@ -507,3 +507,8 @@ The shipped viewer entry stays unchanged until item 7 consumes playback.
   playback paint without relayout and excluded partial-note activation/reveal.
   The partial browser fixture is isolated from the workbench document provider,
   which correctly replaces ad-hoc changes to its subscribed viewer.
+
+- Landing checks: 1,601 tests / 92 files, corpus/build, clean regenerated goldens,
+  headless browser interaction/review and installed Node package smoke passed.
+  Commit `a0fd152` was pushed and the implementation worktree retired before
+  the item moved to `complete/`.

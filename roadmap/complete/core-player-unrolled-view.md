@@ -1,6 +1,6 @@
 # The unrolled engraving — an occurrence-aware layout plan
 
-> **Status: in progress 2026-09-09.** Campaign:
+> **Status: complete 2026-09-09; unrolled engraving review pending.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 10. Needs items 1, 2 and 7.
 > **Moved after the player** on review: this is a layout-plan change, not an
 > emission-loop change, and the reviewer hears trustworthy playback sooner without
@@ -66,11 +66,18 @@
 
 ## Implementation and review
 
-Implemented in the isolated `core-player-unrolled-view` worktree. The
+Landed as `a0fd152` on `main`; the isolated `core-player-unrolled-view`
+worktree was removed before this document moved to `complete/`. The
 [contract](../../docs/player-unrolled.md) records the public entry/toggle API,
 written/occurrence identity mapping, partial-bar semantics and independent
 approval lifecycle. Sixteen cases cover the original fourteen plus the two
 later traversal regressions; 18 new SVGs are registered in the
-[standing review ledger](lab-verify.md#unrolled-engraving--2026-09-09).
-No human approval has been inferred or written. Landing gates and worktree
-retirement precede closeout.
+[standing review ledger](../inprogress/lab-verify.md#unrolled-engraving--2026-09-09).
+No human approval has been inferred or written. After rebasing, all goldens
+regenerated cleanly; 1,601 tests across 92 files, corpus validation and the
+production build passed. Headless Chrome unrolled interaction/review and the
+installed Node library smoke checks also passed. Existing written goldens and
+approval records are unchanged.
+
+The closeout regression also excludes ID-less notes outside a partial slice from
+slur/tie starts and technique-site collection, preserving visible whole-bar ink.

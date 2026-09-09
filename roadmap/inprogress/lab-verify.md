@@ -786,7 +786,7 @@ Scenario set:
 
 ## Unrolled engraving — 2026-09-09
 
-Cause: [player campaign item 10](core-player-unrolled-view.md),
+Cause: [player campaign item 10](../complete/core-player-unrolled-view.md),
 [implementation contract](../../docs/player-unrolled.md). New performed-order
 SVG evidence; all written primitives/SVGs and prior approval records are unchanged.
 The original fourteen hand-stated cases plus the two later navigation regressions

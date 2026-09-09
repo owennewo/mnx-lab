@@ -171,12 +171,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-player-unrolled-view.md](inprogress/core-player-unrolled-view.md)** — campaign
-  item 10, **moved after the player**: an **occurrence-aware layout plan** (`planHorizontal`
-  takes performed entries; every dependent index per occurrence; clef/key resolved at the
-  jump target; spanners per occurrence pair), still a toggle; opt-in goldens with the path
-  owned; visible whole-bar notes distinguished from performed notes inside partial slices.
-
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
   iteration, the performed order as a golden — with studio practice as indexed follow-ups.
@@ -378,6 +372,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-player-unrolled-view.md](complete/core-player-unrolled-view.md)** — campaign item 10: occurrence-aware unrolled engraving, exact-visit playback/selection, and independent SVG evidence. Written goldens unchanged; human unrolled review pending.
 - **[core-player-midi-oracle.md](complete/core-player-midi-oracle.md)** — campaign item 9,
   complete 2026-09-09: independent MuseScore Studio 4.7.5 recordings for 27 W3C pairs
   and four converter fixtures; 22/27 W3C observable strict matches, nine attributed

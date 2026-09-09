@@ -2620,6 +2620,8 @@ function emitBeamRun(run: BeamRun, primitives: Primitive[], maxSlant: number): v
 
 /** Geometry of one emitted note-carrying event, for curve endpoints. */
 interface EventCurveAnchor {
+  /** Whole-bar ink may include notes excluded from this performed slice. */
+  performedNotes?: boolean[];
   x: number;
   row: number;
   stemDir: 1 | -1;
@@ -2707,7 +2709,7 @@ function emitSlursAndTies(
           if (!isTimedEvent(item)) return;
           const start = anchors.byKey.get(`${mi}:${si}:${vi}:${ei}`);
           if (!start) return;
-          if (pm.entry && item.id && !anchors.byEventId.has(occurrenceKey(item.id, pm.entry.ordinal))) return;
+          if (start.performedNotes?.every(performed => !performed)) return;
 
           for (const slur of item.slurs ?? []) {
             const endKey = occurrenceTarget(plan, mi, slur.target, anchors.byEventId);
@@ -2732,7 +2734,7 @@ function emitSlursAndTies(
           }
 
           (item.notes ?? []).forEach((note, ni) => {
-            if (pm.entry && note.id && !anchors.byNoteId.has(occurrenceKey(note.id, pm.entry.ordinal))) return;
+            if (start.performedNotes?.[ni] === false) return;
             for (const tie of note.ties ?? []) {
               const noteY = start.headYs[ni];
               if (noteY === undefined) continue;
@@ -2846,7 +2848,7 @@ function collectNotationTechnique(
             TECHNIQUE_LANE_RISE_SP;
           (item.notes ?? []).forEach((note, ni) => {
             const y = start.headYs[ni];
-            if (y === undefined) return;
+            if (y === undefined || start.performedNotes?.[ni] === false) return;
             const technique = techniqueOf(note);
             recordSite(collector, {
               ...(pm.entry ? {entryIndex: mi} : {}),
@@ -4147,7 +4149,8 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
     x: eventX,
     row,
     stemDir,
-    headYs: staffYs.map(y => staffTop + y)
+    headYs: staffYs.map(y => staffTop + y),
+    ...(args.performedNoteKeys ? { performedNotes: noteIds.map(id => id !== undefined && args.performedNoteKeys!.has(id)) } : {})
   };
   curveAnchors.byKey.set(curveKey, curveAnchor);
   if (event.id && (!args.performedNoteKeys || noteIds.some(id => id && args.performedNoteKeys!.has(id)))) curveAnchors.byEventId.set(occurrenceKey(event.id, args.occurrenceOrdinal), curveAnchor);

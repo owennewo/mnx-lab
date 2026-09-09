@@ -217,3 +217,16 @@ it('uses the compiler half-open membership for all performance evidence, includi
     expect(actual, scenario.id).toEqual(expected);
   }
 });
+
+
+it('excludes ID-less partial-bar tie sources and technique targets from span geometry', () => {
+  const doc = seed();
+  const a = doc.parts[0].measures[0].sequences[0].content[0] as import('../../src/model/mnx.ts').MnxEvent;
+  delete a.id;
+  delete a.notes![0].id;
+  a.notes![0]._x = {mnxLab:{tab:{technique:{hammerPull:{target:'b1'}}}}};
+  const entries = [{ordinal:0, measureIndex:0, occurrence:1, iteration:1, from:[1,2] as [number,number]}];
+  const rendered = layoutNotation({mnx:doc,widthSp:80,entries});
+  expect(rendered.primitives.some(p => p.className === 'tie' || p.className === 'slur' || p.className?.includes('technique-hammerPull'))).toBe(false);
+  expect(rendered.primitives.find(p => p.sourceId === 'w0:@m0.v0.e0.n0')?.className).toContain('unperformed');
+});
