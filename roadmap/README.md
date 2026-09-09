@@ -175,11 +175,6 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
-- **[core-player-midi-oracle.md](inprogress/core-player-midi-oracle.md)** — campaign item 9:
-  MuseScore or Verovio; **observable content compared strictly**, ambiguous bar order
-  reported as unobservable and timing aligned around interpretive shifts; a three-scenario experiment as soon as a tool is chosen, so the
-  writer is not its own only reader. MuseScore 4.7.5 selected; baseline 22/27 W3C observable strict matches.
-
 
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
@@ -382,6 +377,12 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-player-midi-oracle.md](complete/core-player-midi-oracle.md)** — campaign item 9,
+  complete 2026-09-09: independent MuseScore Studio 4.7.5 recordings for 27 W3C pairs
+  and four converter fixtures; 22/27 W3C observable strict matches, nine attributed
+  discrepancies, explicit timing exclusions and bar observability, and reproducible
+  external capture separate from report generation.
+
 - **[core-player-expression.md](complete/core-player-expression.md)** — campaign item 8, complete 2026-09-09; human performance review pending:
   dynamics, articulations, arpeggio and the guitar techniques as curves and voice flags
   (`noReattack` on the event type); tempo-relative vibrato and harmonics that preserve

@@ -1,6 +1,6 @@
 # The MIDI oracle — someone else's performance of the same score
 
-> **Status: implementation 2026-09-09; validation and landing in progress.** Campaign:
+> **Status: complete 2026-09-09.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 9. **A small experiment
 > as soon as a tool is chosen** — before item 5 is finished, so the writer is not
 > the only reader of its own bytes — and the full baseline after item 5.
@@ -61,3 +61,9 @@ Raw external MIDI and version/input/hash provenance are committed separately fro
 our generated report. Ordinary tests replay independent evidence without installing
 a desktop application; the live command verifies fresh MuseScore output byte-for-byte.
 No scenario goldens or human approval records move.
+
+Validation: **1,506 tests across 89 files**, corpus check and production build
+passed after rebase. New harness modules also pass strict TypeScript checking.
+All 31 MIDI files and five import receipts reproduce byte-for-byte in the live
+MuseScore check. Scenario goldens regenerate unchanged. Implementation landed as
+`52860d8`; its worktree was retired before this document moved to `complete/`.
