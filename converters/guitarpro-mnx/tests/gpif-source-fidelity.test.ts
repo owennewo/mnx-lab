@@ -125,10 +125,18 @@ describe('bend evidence', () => {
       .toEqual([{ position: 0, alter: 0 }, { position: 1, alter: 2 }]);
     expect(warnings).toEqual([]);
   });
-  it('reports an ambiguous unpositioned peak instead of silently calling it interpolation', () => {
+  it('places an unpositioned peak at the midpoint, keeping the bend and release', () => {
+    // Origin and destination both 0 with a raised middle IS a bend and release,
+    // and it is what a real transcription is full of. Declining to position the
+    // peak flattened the curve, and a flat curve is discarded as "no bend" --
+    // so the whole gesture disappeared. Guitar Pro draws the peak at the
+    // midpoint and alphaTab reads it there (offset 30 of 60).
     const warnings: string[] = [];
-    importGuitarPro(bend(''), { onWarning: w => warnings.push(w) });
-    expect(warnings).toEqual([expect.stringContaining('bend middle value has no position')]);
+    const result = importGuitarPro(bend(''), { onWarning: w => warnings.push(w) });
+    const event = result.parts[0].measures[0].sequences![0].content[0] as MnxEvent;
+    expect(event.notes![0]._x!.mnxLab!.tab!.technique!.bend!.points)
+      .toEqual([{ position: 0, alter: 0 }, { position: 0.5, alter: 2 }, { position: 1, alter: 0 }]);
+    expect(warnings).toEqual([]);
   });
 });
 

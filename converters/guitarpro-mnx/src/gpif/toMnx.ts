@@ -592,14 +592,6 @@ function buildNote(
     warn(`note ${sourceId}: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.`);
   }
   const mnxNote: MnxNote = { id, pitch: matches ? { ...authored } : midiToPitch(midi, fifths) };
-  const bend = gpNote.bend;
-  if (bend && !bend.points && bend.middleValue !== null &&
-      bend.middleOffset1 === null && bend.middleOffset2 === null &&
-      bend.middleValue !== ((bend.originValue ?? 0) + (bend.destinationValue ?? 0)) / 2) {
-    warn(`note ${sourceId}: bend middle value has no position and is not linear interpolation; ` +
-      'only the positioned curve was imported.');
-  }
-
   const stringCount = track.tuningLowToHigh.length;
   const onFingerboard = gpNote.string !== null && stringCount > 0;
   if (onFingerboard) {
@@ -747,12 +739,24 @@ function buildBend(note: GpifNote): { points: MnxBendPoint[] } | null {
     points.push({ position: bend.originOffset / 100, alter: origin });
   }
   if (bend.middleValue !== null) {
-    // The fixture-proven unpositioned middle is linear interpolation. Other
-    // unpositioned values are ambiguous: buildNote warns rather than silently
-    // treating them as redundant or inventing a time for the bend peak.
     const middle = bend.middleValue / 50;
-    for (const offset of [bend.middleOffset1, bend.middleOffset2]) {
-      if (offset !== null) points.push({ position: offset / 100, alter: middle });
+    const positioned = [bend.middleOffset1, bend.middleOffset2].filter(
+      (offset): offset is number => offset !== null
+    );
+    if (positioned.length > 0) {
+      for (const offset of positioned) points.push({ position: offset / 100, alter: middle });
+    } else if (middle !== (origin + destination) / 2) {
+      // An unpositioned middle sits at the MIDPOINT. Guitar Pro draws it there
+      // and alphaTab reads it there (offset 30 of 60), so the position is not
+      // actually ambiguous -- and treating it as such was destructive rather
+      // than conservative. A bend and release states origin 0, middle 50,
+      // destination 0: drop its middle and the curve is flat, at which point
+      // "a curve that never leaves zero is no bend" below discards the whole
+      // gesture. Every bend in a real transcription can be lost this way.
+      //
+      // A middle that IS the linear interpolation needs no point: the straight
+      // line already passes through it at 0.5.
+      points.push({ position: 0.5, alter: middle });
     }
   }
   if (bend.destinationOffset !== null && bend.destinationOffset < 100) {
