@@ -76,7 +76,8 @@ outranks any `staffKind`, always.
 | `zoom` | number | *unset* | **staff scale** — a multiplier on `pxPerSp`, so line gap, glyphs, text and stems scale together. Clamped 0.6–1.6. **Unset is not `1`**: with no `pxPerSp` the renderer *fits* a short score to the viewport, and defaulting to `1` would silently retire fit-to-width for every host that never set it. Until 2026-08-15 this prop sized the paper card and never reached the engine. |
 | `density` | `normal` · `compact` · `spacious` | `normal` | **horizontal density** — how much music fits on a line, *without* shrinking glyphs. The engine scales the springs and never the rigid columns, which is what keeps this independent of `zoom` so the two compose. |
 | `density-h` | number | *unset* | the numeric form of the same axis; wins over `density` when set. Clamped by the engine's own `clampDensity` (0.5–2), so a host and a control get the same floor. The floor is **legibility, not collision** — no density can make ink overlap. |
-| `density-pad` | number | *derived* | **frame density** — a multiplier on the whitespace the page *reserves* (the pads above and below each system, the margins either side, and the pads inside a measure's clef/key/time prefix) as opposed to the space between the music. The prefix's glyph **slots** stay rigid — `density-h`'s ruling that a clef occupies the width it occupies applies here too — but the air between them was never covered by that ruling and now follows this axis. Floored per row by the ink that row actually holds, so no value can put one system's stems through the system above. **Unset is neither `1` nor a preset: it is DERIVED from the effective `density-h`** (`padDensityFor`, a square root) — see below. |
+| `clearance` | 0–4 in 0.5 steps | `2` | breathing room around content and structural groups. Level 0 is tightest safe, 2 reproduces the historical layout, and 4 is deliberately generous. It changes margins, staff/system gaps, prefix air and bar-boundary padding without resizing ink or rhythmic springs. |
+| `density-pad` | number | *unset* | legacy frame-density multiplier, retained for host compatibility. When explicitly set it overrides `clearance` wholesale; when absent, Clearance owns these distances. It never follows `density-h` automatically. |
 
 #### How a `hide` member is sorted
 
@@ -147,25 +148,20 @@ and rows move by translation. One implementation serves notation, tab and the
 combined system, and no layout had to make its row arithmetic per-instance.
 [core-vertical-density.md](../roadmap/complete/core-vertical-density.md).
 
-#### Why `density-pad` couples to `density-h` by default
+#### Clearance and legacy `density-pad`
 
-The two axes answer one reader question — *fit more music on the screen* — and
-a control offering them separately asks the reader to solve for something they
-do not think in. So the element couples them: unset, `density-pad` follows the
-effective `density-h`, and a host that only ever writes `density-h` gets a
-tighter *page* rather than the same page with the music squeezed inside it.
+Clearance is a level rather than a staff-space distance. Each relationship has
+its own tight, historical and spacious anchors, interpolated through levels 0,
+2 and 4. This preserves hierarchy: a notation/tab pair remains more cohesive
+than independent staves, and systems remain distinct. All distances resolve in
+staff spaces, so Staff scales the result visually without changing the chosen
+level. Space continues to own rhythmic springs alone.
 
-The coupling lives **here, at the surface, not in the engine**, and that is the
-whole design: the two scalars stay independent below this line, so setting
-`density-pad` explicitly wins and separates them again — the same precedence
-shape as `density-h` over `density`, one level up. Coupling in the control is
-reversible; conflating the scalars in the engine would not be.
-
-It is a square root rather than a copy because the axes buy very different
-amounts per unit. `density-h` runs usefully down to 0.02 before packing bottoms
-out; padding is spent by roughly 0.3, floored by ink. Coupled linearly, the
-pads would hit their floor in the first tenth of a control's travel and sit
-there — which reads as a broken control rather than an exhausted one.
+`density-pad` predates Clearance and remains a public compatibility input. An
+explicit value keeps its old multiplier/floor behavior and wins over Clearance;
+the two are never multiplied together. The old `padDensityFor` helper remains
+available to hosts that deliberately want Space and frame density coupled, but
+the viewer does not call it automatically.
 
 The safety argument differs from `density-h`'s, and the difference matters.
 Horizontal density cannot make ink collide *structurally* — it scales springs
@@ -294,6 +290,7 @@ remain independent.
 | `barNumbers` | `bar-numbers` | `every-bar`, `every-system`, `hide` | Only declared measure numbers (legacy) |
 | `instrumentNames` | `instrument-names` | `every-system`, `first-system`, `hide` | Existing score-layout labels (legacy) |
 | `beams` | `beams` | `slanted`, `flat` | Slanted: beams follow the outer noteheads |
+| `clearance` | `clearance` | 0–4, normalized to 0.5 steps | 2: historical layout |
 | `selectedVerse` | `selected-verse` | Lyric-line ID | First used verse in established order |
 
 `scoreTitle` binds engine `display.title`; it avoids overloading HTML's native
@@ -315,8 +312,8 @@ mapping; time-signature visibility never changes duration or playback.
 
 The workbench owns localStorage key `mnx-lab:display`, shared across documents.
 Its explicit menu defaults are All verses, Show time signatures/clefs/title,
-Every system bar numbers, and First system instrument names. These label defaults
-intentionally differ from the no-options engine's historical output. Stored
+Every system bar numbers, First system instrument names, and Clearance 2.
+These label defaults intentionally differ from the no-options engine's historical output. Stored
 values are validated, invalid JSON falls back to defaults, and selected-verse
 context is never stored. The element itself never reads workbench storage.
 The compare panel shares the main live viewer beside a static reference image,

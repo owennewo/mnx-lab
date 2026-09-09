@@ -2962,6 +2962,7 @@ export class ScenarioPage extends LitElement {
         .barNumbers=${this.displayPreferences.barNumbers}
         .instrumentNames=${this.displayPreferences.instrumentNames}
         .beams=${this.displayPreferences.beams}
+        .clearance=${this.displayPreferences.clearance ?? 2}
         .selectedVerse=${shownDoc ? verseForIteration(documentLyricLineIds(shownDoc.mnxJson), this.playback) : undefined}
         .mnxDoc=${shownDoc}
         .view=${viewMode}

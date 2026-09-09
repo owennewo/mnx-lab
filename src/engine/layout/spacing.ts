@@ -18,7 +18,7 @@ import {
 } from '../../model/mnx.ts';
 import { durationValue } from '../../model/durations.ts';
 import { dynamicWidthSp } from './dynamics.ts';
-import { clampPadDensity } from './verticalDensity.ts';
+import { clearanceSpacing } from '../clearance.ts';
 
 /**
  * Horizontal spacing — the one place bar widths and note spacing are decided.
@@ -43,8 +43,6 @@ import { clampPadDensity } from './verticalDensity.ts';
 
 // ---------- Spacing knobs (all horizontal "feel" lives here) ----------
 
-const MARGIN_SP = 2;               // page margin either side of a system
-const MIN_PAGE_MARGIN_SP = 0.5;    // floor under `densityPad` (core-vertical-density.md)
 const CONTENT_LEFT_PAD_SP = 0.6;
 const CONTENT_RIGHT_PAD_SP = 0.8;
 const START_BARLINE_PAD_SP = 0.5;
@@ -56,9 +54,6 @@ const CLEF_WIDTH_SP = 3;
  * slot leaves its own glyph — the slot is right-sized, not tightened.
  */
 const TAB_CLEF_WIDTH_SP = 2;
-/** Floor under every prefix pad `densityPad` scales — visible clearance
- *  between two glyphs, below which they read as touching. */
-const MIN_GLYPH_CLEAR_SP = 0.2;
 const TIME_SIG_WIDTH_SP = 2.5;
 export const KEY_SIG_GLYPH_ADVANCE_SP = 1.0;
 const KEY_SIG_RIGHT_PAD_SP = 0.5;
@@ -222,7 +217,7 @@ export interface PackingInput {
   /** Available width after the first system (part-name gutter can change). */
   subsequentLineWidthSp?: number;
   /** Trailing pad after a measure's content. Carried rather than read from the
-   *  module constant because `densityPad` scales it, and the packer must use
+   *  module constant because Clearance resolves it, and the packer must use
    *  the same width the placement pass will. Absent ⇒ the unscaled default,
    *  which is what a ladder re-pack at density 1 wants. */
   contentRightPadSp?: number;
@@ -1183,17 +1178,20 @@ export function planHorizontal(
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
   const leftInset = options?.leftInsetSp ?? 0;
   const subsequentLeftInset = options?.subsequentLeftInsetSp ?? leftInset;
-  const padK = clampPadDensity(options?.densityPad);
-  const marginSp = Math.max(MIN_PAGE_MARGIN_SP, MARGIN_SP * padK);
+  const clearance = clearanceSpacing(options?.display?.clearance, options?.densityPad);
+  const marginSp = clearance.horizontalMargin;
   // The prefix's PADS are whitespace and scale with the frame axis; the glyph
   // SLOTS are rigid and do not (core-zoom-density-pad.md ruling 1 — a clef
   // occupies the width it occupies at a given staff size). This is the line
   // between the two, and it is the whole reason the gap before the first note
   // used to ignore the spacing control entirely: every part of it was on the
   // rigid side, including the parts that were only ever air.
-  const pad = (full: number) => Math.max(MIN_GLYPH_CLEAR_SP, full * padK);
+  const pad = clearance.prefixPad;
   const isTabOnly = options?.staffKind === 'tab';
   const clefWidth = isTabOnly ? TAB_CLEF_WIDTH_SP : CLEF_WIDTH_SP;
+  // Keep glyph positions/size fixed and vary only the slot's trailing air.
+  const clefSlot = (ink: number) => clefWidth * ink + clearance.prefixGroupExtra;
+  const timeSlot = (ink: number) => TIME_SIG_WIDTH_SP * ink + clearance.prefixGroupExtra;
   const contentLeftPad = pad(CONTENT_LEFT_PAD_SP);
   const startBarlinePad = pad(START_BARLINE_PAD_SP);
   const keySigRightPad = pad(KEY_SIG_RIGHT_PAD_SP);
@@ -1552,9 +1550,9 @@ export function planHorizontal(
     const keySigCount = keySigGlyphs(m, firstInSystem);
     return (
       prefixLeftPad(m, firstInSystem) +
-      (showClef ? clefWidth * ink : 0) +
+      (showClef ? clefSlot(ink) : 0) +
       (keySigCount ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP * ink + keySigRightPad : 0) +
-      (showTimeSig ? TIME_SIG_WIDTH_SP * ink : 0) +
+      (showTimeSig ? timeSlot(ink) : 0) +
       (m.hasRepeatStart ? REPEAT_START_WIDTH_SP * ink : 0)
     );
   };
@@ -1678,14 +1676,14 @@ export function planHorizontal(
       const keySigCount = keySigGlyphs(m, firstInSystem);
 
       const clefX = x + prefixLeftPad(m, firstInSystem);
-      const keySigX = clefX + (showClef ? clefWidth * inkRatio : 0);
+      const keySigX = clefX + (showClef ? clefSlot(inkRatio) : 0);
       const keySigWidth = keySigCount
         ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP * inkRatio + keySigRightPad
         : 0;
       const timeSigCentreX = keySigX + keySigWidth + (TIME_SIG_WIDTH_SP * inkRatio) / 2;
       // A forward repeat (|:) sits between the prefix glyphs and the content.
       const repeatStartX =
-        keySigX + keySigWidth + (showTimeSig ? TIME_SIG_WIDTH_SP * inkRatio : 0);
+        keySigX + keySigWidth + (showTimeSig ? timeSlot(inkRatio) : 0);
       // Events start after the stretched leading spring — the same justified
       // breathing room every other gap in the bar gets.
       const contentStartX =

@@ -1,9 +1,10 @@
+import { clearanceSpacing } from '../clearance.ts';
 import type { DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure } from '../../model/mnx.ts';
 import { PartTabSetups } from '../tab/guitarPositions.ts';
 import { layoutBothSystem } from '../layout/bothSystem.ts';
 import type { HideableFeature } from '../layout/notation.ts';
-import { computeBoundsSp, CROP_PAD_SP } from '../render/bounds.ts';
+import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
 import {
   projectionForSourceClass,
@@ -102,7 +103,7 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
   const widthSp = fitted && opts.spacingMode !== 'natural' ? layout.usedWidthSp : layout.widthSp;
   // Crop the rows' fixed headroom to the content's real vertical extent.
   // y only — the x window stays the full plan width (see the other renderers).
-  const bounds = computeBoundsSp(layout.primitives, CROP_PAD_SP);
+  const bounds = computeBoundsSp(layout.primitives, clearanceSpacing(opts.display?.clearance, opts.densityPad).cropMargin);
   const viewBoxSp = bounds ? { x: 0, y: bounds.y, w: widthSp, h: bounds.h } : undefined;
 
   renderSvg({

@@ -81,6 +81,16 @@ between systems retain their existing clearance.
 The affected Both-view engravings are recorded in the
 [verification ledger](../roadmap/inprogress/lab-verify.md#tighter-paired-notationtab-spacing-2026-09-08).
 
+`DisplayOptions.clearance` coordinates discretionary whitespace on a nine-level
+0–4 scale. Level 2 preserves those historical values and all default goldens;
+0 is the tightest collision-safe layout and 4 is deliberately generous. The
+policy covers notation/tab and independent staff gaps, inter-system gaps,
+horizontal and vertical score margins, air after clef/signature groups, and
+bar-boundary padding. It does not resize glyphs, change staff-line spacing, or
+scale rhythmic springs. Every relationship has its own anchors so paired
+staves remain paired and independent systems remain distinct. An explicitly
+supplied legacy `densityPad` overrides the clearance policy wholesale.
+
 ## Beam geometry
 
 A beamed group's primary beam is placed by one shared rule, `placeBeamLine` in
@@ -101,4 +111,3 @@ alone). Flagged stems are untouched. `display.beams: 'flat'` sets the slant cap 
 a viewer's house-style choice, never a document field and never taught to the assist loop.
 Multi-note tremolos are not beamed groups: their stems are flagged stems of normal
 length with the tremolo bars floating between them.
-

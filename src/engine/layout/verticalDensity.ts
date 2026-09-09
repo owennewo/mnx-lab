@@ -1,3 +1,4 @@
+import { clearanceSpacing, clampPadDensity } from '../clearance.ts';
 import { Primitive, RowBandSp, translatePrimitiveY } from '../primitives.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 
@@ -26,7 +27,7 @@ import { computeBoundsSp } from '../render/bounds.ts';
  * than toward zero. **Since stage D of core-ink-measured-gaps.md the pads are
  * not consulted at all**: each gap between systems is
  *
- *     ink below + ink above + SEPARATION_CLEAR_SP * padDensity
+ *     ink below + ink above + resolved system clearance
  *
  * The pads were a prediction of the worst case a row might hold; this is a
  * measurement of what it does hold, and the two are only ever the same by
@@ -36,8 +37,8 @@ import { computeBoundsSp } from '../render/bounds.ts';
  * and it is what makes an unlabelled row sit closer than a labelled one
  * without anybody encoding "unlabelled rows are closer".
  *
- * `padDensity` now scales the CLEARANCE rather than a reservation, which is
- * what keeps the knob meaning "how much air" once the air is derived.
+ * Clearance selects relationship-specific anchors. The legacy `padDensity`
+ * input can still scale the same distances when a host explicitly supplies it.
  *
  * It runs as a POST-PASS over a finished `LayoutResult`, which is why it needs
  * no knowledge of any layout's row arithmetic: `rows[]` says where each system
@@ -55,24 +56,6 @@ import { computeBoundsSp } from '../render/bounds.ts';
  */
 export const SEPARATION_CLEAR_SP = 3;
 
-/**
- * Clear space left between one system's lowest ink and the next's highest —
- * and, since stage D, the whole of what decides an inter-system gap.
- *
- * 1 → `SEPARATION_CLEAR_SP` (3) on 2026-08-21. Two systems do not belong to
- * each other, so the distance between them is the SAME separation clearance
- * that stage C put between two staves of one system
- * (core-ink-measured-gaps.md); one number for one relationship, rather than a
- * page whose between-staff and between-system air were set by different
- * constants for no reason a reader could see.
- */
-const MIN_CLEAR_SP = SEPARATION_CLEAR_SP;
-/** Floor on the page margin above the first system and below the last. */
-const MIN_PAGE_MARGIN_SP = 0.5;
-/** Floor under the scaled inter-system clearance, so `padDensity: 0` closes
- *  systems up without letting them touch. */
-const MIN_INTER_SYSTEM_CLEAR_SP = 1;
-
 export const MIN_PAD_DENSITY = 0;
 export const MAX_PAD_DENSITY = 2;
 
@@ -80,32 +63,13 @@ export const MAX_PAD_DENSITY = 2;
  * Bounded like `clampDensity`, and for the same reason: a bad value should
  * degrade to something drawable rather than throw. The floor can be 0 because
  * the ink-derived clearance above does the safety work — asking for zero
- * padding gets you `MIN_INTER_SYSTEM_CLEAR_SP` between one system's ink and
+ * padding gets you 1sp between one system's ink and
  * the next's, not overlap.
  */
-export function clampPadDensity(value: number | undefined | null): number {
-  if (value === undefined || value === null || !Number.isFinite(value)) return 1;
-  return Math.min(MAX_PAD_DENSITY, Math.max(MIN_PAD_DENSITY, value));
-}
+export { clampPadDensity } from '../clearance.ts';
 
-/**
- * The coupling: one reader-facing intent ("fit more music") over two engine
- * scalars. `densityH` decides how much music fits on a line, this decides how
- * many lines fit on a screen, and a control that offered them separately would
- * be asking the reader to solve for something they don't think in.
- *
- * Square root rather than linear, because the two axes buy very different
- * amounts per unit. Horizontal density runs to 0.02 before packing bottoms
- * out (`MIN_DENSITY`'s retune note); padding is spent by ~0.3. Coupling them
- * linearly would have padding hit its ink floor in the first tenth of the
- * arm's travel and sit there for the rest of it, which reads as a broken
- * control rather than an exhausted one.
- *
- * Held in the ENGINE as a mapping and applied by the SURFACE (`DocumentViewer`
- * derives `densityPad` from the effective `densityH` only when the host has
- * not set one). core-vertical-density.md's own ruling: coupling in the control
- * is reversible, conflating the scalars in the engine would not be.
- */
+/** Optional legacy coupling helper for hosts. The viewer keeps Space and
+ * Clearance independent and never calls this automatically. */
 export const PAD_COUPLING_EXPONENT = 0.5;
 
 export function padDensityFor(densityH: number): number {
@@ -119,7 +83,11 @@ export interface TightenRowsArgs {
   rows: readonly RowBandSp[];
   /** The finished total height. */
   heightSp: number;
-  padDensity: number;
+  padDensity?: number;
+  clearance?: number;
+  /** Internal fixed-point pass: retain the outer margins chosen on pass one
+   *  while re-measuring content ownership inside the page. */
+  preserveOuterMargins?: boolean;
   /** Below-staff space each row RESERVES for content that belongs to it — a
    *  lyric verse block. Row attribution is by the gap's midpoint, which
    *  mis-files a deep verse row with the system BELOW (it then translates
@@ -135,7 +103,7 @@ export interface TightenedRows {
 }
 
 /**
- * Re-places a finished layout's systems at `padDensity`, translating each
+ * Re-places a finished layout's systems at the resolved clearance, translating each
  * row's primitives. Returns null — and touches nothing — when no row needs to
  * move.
  *
@@ -149,7 +117,8 @@ export interface TightenedRows {
  * rather than assumed from the density, which is the stronger guarantee.
  */
 export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
-  const { primitives, rows, heightSp, padDensity } = args;
+  const { primitives, rows, heightSp } = args;
+  const clearance = clearanceSpacing(args.clearance, args.padDensity);
   if (rows.length === 0) return null;
 
   // Which row each primitive belongs to: the bands are ordered and disjoint,
@@ -186,10 +155,9 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
   // Each gap tightens toward the ink either side of it, never past it. The
   // page's own top and bottom margins tighten the same way against a floor.
   const topGap = rows[0].staffTop;
-  const newTopGap = Math.max(
-    (rows[0].staffTop - inkTop[0]) + MIN_PAGE_MARGIN_SP,
-    topGap * padDensity
-  );
+  const newTopGap = args.preserveOuterMargins
+    ? topGap
+    : clearance.verticalMargin(topGap, rows[0].staffTop - inkTop[0]);
 
   const offsets: number[] = [newTopGap - topGap];
   for (let r = 0; r + 1 < rows.length; r++) {
@@ -200,22 +168,20 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
     // measurement of what each row actually holds, so a system under a section
     // label gets room for it and a bare one directly below closes up.
     //
-    // `padDensity` scales the CLEARANCE, not a pad, which is what keeps the
-    // knob meaning "how much air" now that the air is derived. Floored so a
-    // pad of 0 still leaves a visible line between systems rather than overlap.
+    // Clearance changes the discretionary air after actual ink is measured.
+    // Its tight anchor remains positive, so systems never touch or overlap.
     const ink =
       (inkBottom[r] - rows[r].staffBottom) +
       (rows[r + 1].staffTop - inkTop[r + 1]) +
-      Math.max(MIN_INTER_SYSTEM_CLEAR_SP, MIN_CLEAR_SP * padDensity);
+      clearance.systemInk;
     offsets.push(offsets[r] + (ink - gap));
   }
 
   const last = rows.length - 1;
   const bottomGap = heightSp - rows[last].staffBottom;
-  const newBottomGap = Math.max(
-    (inkBottom[last] - rows[last].staffBottom) + MIN_PAGE_MARGIN_SP,
-    bottomGap * padDensity
-  );
+  const newBottomGap = args.preserveOuterMargins
+    ? bottomGap
+    : clearance.verticalMargin(bottomGap, inkBottom[last] - rows[last].staffBottom);
 
   // Nothing moved and nothing grew: the layout is already the answer. Return
   // null so callers keep their own objects — byte-identical by measurement.
@@ -234,6 +200,32 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
       staffBottom: b.staffBottom + offsets[r]
     }))
   };
+}
+
+/**
+ * Re-measures after each move until row ownership settles. At aggressive
+ * clearance levels an overhanging primitive can cross the midpoint used to
+ * attribute content to rows; the next pass then sees its true demand.
+ */
+export function fitRowsToClearance(args: TightenRowsArgs): TightenedRows | null {
+  let rows = args.rows;
+  let heightSp = args.heightSp;
+  let final: TightenedRows | null = null;
+  // A primitive can cross at most one ordered boundary per pass. The extra
+  // pass proves the fixed point; the cap protects malformed input.
+  for (let pass = 0; pass <= args.rows.length; pass++) {
+    const next = tightenRows({
+      ...args,
+      rows,
+      heightSp,
+      preserveOuterMargins: pass > 0
+    });
+    if (!next) return final;
+    final = next;
+    rows = next.rows;
+    heightSp = next.heightSp;
+  }
+  return final;
 }
 
 /**

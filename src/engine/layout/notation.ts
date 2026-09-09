@@ -1,3 +1,4 @@
+import { clearanceSpacing, type ClearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
 import { measureHeadingX, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
@@ -77,7 +78,7 @@ import {
 } from './barlines.ts';
 import {
   anchorY,
-  clampPadDensity,
+  fitRowsToClearance,
   tightenRows,
   SEPARATION_CLEAR_SP
 } from './verticalDensity.ts';
@@ -948,8 +949,11 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   // the ink they hold rather than the headroom they reserved. At density 1 the
   // pass returns null and nothing moves — which is what keeps the goldens
   // byte-identical by construction rather than by arithmetic.
-  const tightened = tightenRows({
-    primitives, rows, heightSp: cursorY, padDensity: clampPadDensity(opts.densityPad),
+  const fitRows = opts.densityPad === undefined && display.clearance !== 2
+    ? fitRowsToClearance
+    : tightenRows;
+  const tightened = fitRows({
+    primitives, rows, heightSp: cursorY, padDensity: opts.densityPad, clearance: display.clearance,
     // Verse blocks hang deep below their staff; without the reservation the
     // midpoint attribution files them with the system below (lyricRuns.ts).
     reservedBelowSp: lyricBlockSpFor(selectedLyrics?.length ?? documentLyricLineCount(mnx))
@@ -1026,7 +1030,7 @@ function renderSegment(args: RenderSegmentArgs): SegmentResult {
   // The probe opens only the gaps that will be measured; a segment with none
   // (a single staff) lays out at its provisional gaps and returns.
   const probe = assembleSegment(args, null, PROBE_GAP_SP);
-  const overrides = measureDisplayGaps(probe, clampPadDensity(args.densityPad));
+  const overrides = measureDisplayGaps(probe, clearanceSpacing(args.display.clearance, args.densityPad));
   return overrides ? assembleSegment(args, overrides, null) : probe;
 }
 
@@ -1041,7 +1045,7 @@ function renderSegment(args: RenderSegmentArgs): SegmentResult {
  * the staff lines — are not ink. Ownership only matters for something that
  * straddles a boundary, and those are exactly the structural ones.
  */
-function measureDisplayGaps(seg: SegmentResult, padK: number): (number | null)[][] | null {
+function measureDisplayGaps(seg: SegmentResult, clearance: ClearanceSpacing): (number | null)[][] | null {
   const { primitives, rows, displays, tabDisplayIndexes } = seg;
   const displayCount = displays[0]?.length ?? 0;
   const measured = (d: number) => isMeasuredGap(d, tabDisplayIndexes);
@@ -1081,8 +1085,8 @@ function measureDisplayGaps(seg: SegmentResult, padK: number): (number | null)[]
     bands.map((band, d) => {
       if (!measured(d)) return null;
       const pairedTab = tabDisplayIndexes.has(d);
-      const sep = Math.max(1, (pairedTab ? NOTATION_TAB_CLEAR_SP : SEPARATION_CLEAR_SP) * padK);
-      const minGap = Math.max(1, (pairedTab ? MIN_NOTATION_TAB_GAP_SP : MIN_STAFF_GAP_SP) * padK);
+      const sep = pairedTab ? clearance.pairedInk : clearance.staffInk;
+      const minGap = pairedTab ? clearance.pairedLines : clearance.staffLines;
       const upper = bands[d - 1];
       const upperInk = computeBoundsSp(buckets[r][d - 1]);
       const lowerInk = computeBoundsSp(buckets[r][d]);

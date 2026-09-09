@@ -65,6 +65,12 @@ export class SettingsPad extends LitElement {
     super.disconnectedCallback();
   }
 
+  private setClearance(clearance: number) {
+    this.dispatchEvent(new CustomEvent('display-change', {
+      detail: { ...this.display, clearance }, bubbles: true, composed: true
+    }));
+  }
+
   private displayRow(key: keyof typeof DISPLAY_CHOICES, label: string, labels: readonly string[]) {
     return html`<div class="setting" role="group" aria-label=${label}>
       <span class="lbl">${label}</span>
@@ -194,6 +200,9 @@ export class SettingsPad extends LitElement {
       }
       .help { margin: 8px 0 2px; color: var(--ink-2); font: 11px/1.4 var(--sans); }
       .options { flex-wrap: wrap; }
+      .clearance-options { align-items: center; gap: 6px; }
+      .clearance-options input { width: 150px; max-width: 35vw; accent-color: var(--accent); }
+      .clearance-options output { min-width: 2ch; color: var(--ink); font: 12px/1 var(--sans); }
       .options a:hover {
         text-decoration: none;
       }
@@ -324,6 +333,17 @@ export class SettingsPad extends LitElement {
                     </span>
                   </div>
                   <p class="help">Natural preserves requested spacing. Fill width stretches each full system to the available width.</p>
+                  <div class="setting" role="group" aria-label="Clearance">
+                    <label class="lbl" for="clearance">Clearance</label>
+                    <span class="options clearance-options">
+                      <input id="clearance" type="range" min="0" max="4" step="0.5"
+                        .value=${String(this.display.clearance ?? 2)} aria-describedby="clearance-help"
+                        @input=${(event: Event) => this.setClearance(Number((event.target as HTMLInputElement).value))}>
+                      <output for="clearance">${this.display.clearance ?? 2}</output>
+                      <button type="button" title="Reset clearance to 2" @click=${() => this.setClearance(2)}>Reset</button>
+                    </span>
+                  </div>
+                  <p id="clearance-help" class="help">Breathing room around the music: 0 is tightest safe, 2 is default, 4 is very spacious.</p>
                   ${this.displayRow('lyrics', 'Lyrics', ['All verses', 'Current verse', 'Hide'])}
                   ${this.displayRow('timeSignatures', 'Time signatures', ['Show', 'Hide'])}
                   ${this.displayRow('clefs', 'Clefs', ['Show', 'Hide'])}

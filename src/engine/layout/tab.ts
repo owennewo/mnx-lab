@@ -1,3 +1,4 @@
+import { clearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
 import type { MnxPart } from '../../model/mnx.ts';
 import type { HorizontalPlan, PlanOptions } from './spacing.ts';
@@ -51,7 +52,7 @@ import {
 import { emitHarmonies, emitNavigationMarkers, emitScoreLabels, emitTempoMark, measureOnsetXs } from './scoreText.ts';
 import { emitMeasureFermata } from './fermata.ts';
 import { emitMeasureNumber } from './arpeggio.ts';
-import { clampPadDensity, ensureTopMargin, tightenRows } from './verticalDensity.ts';
+import { ensureTopMargin, fitRowsToClearance, tightenRows } from './verticalDensity.ts';
 import { validateDocument } from './validate.ts';
 import {
   createTechniqueCollector,
@@ -534,8 +535,11 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   const heightSp = fitted?.heightSp ?? baseHeightSp;
   const rows = fitted?.rows ?? baseRows;
 
-  const tightened = tightenRows({
-    primitives, rows, heightSp, padDensity: clampPadDensity(opts.densityPad),
+  const fitRows = opts.densityPad === undefined && display.clearance !== 2
+    ? fitRowsToClearance
+    : tightenRows;
+  const tightened = fitRows({
+    primitives, rows, heightSp, padDensity: opts.densityPad, clearance: display.clearance,
     // The verse block belongs to the row it hangs from — without this the
     // midpoint attribution files a deep verse row with the system below.
     reservedBelowSp: lyricBlockSp
@@ -561,7 +565,8 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
   const rows: RowBandSp[] = [];
   const displays: RowBandSp[][] = [];
   const packings: NonNullable<LayoutResult['packings']> = [];
-  let cursorY = MARGIN_SP;
+  const clearance = clearanceSpacing(display.clearance, opts.densityPad);
+  let cursorY = clearance.tabOuterMargin(MARGIN_SP);
   let usedWidthSp = 0;
   let naturalWidthSp: number | undefined;
   for (const job of buildScoreJobs(mnx)) {
@@ -628,13 +633,14 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
             primitives.push(primitive);
           }
           system.push({ staffTop: band.staffTop + dy, staffBottom: band.staffBottom + dy });
-          cursorY += bottom - top + Math.max(1, 3 * clampPadDensity(opts.densityPad));
+          cursorY += bottom - top + clearance.staffInk;
         }
+        cursorY += clearance.systemInk - clearance.staffInk;
         displays.push(system);
         rows.push({ staffTop: system[0].staffTop, staffBottom: system[system.length - 1].staffBottom });
       }
     });
   }
   return { primitives, index, diagnostics, rows, displays, packings,
-    widthSp, usedWidthSp, naturalWidthSp, heightSp: cursorY + MARGIN_SP };
+    widthSp, usedWidthSp, naturalWidthSp, heightSp: cursorY + (opts.densityPad !== undefined || display.clearance === 2 ? MARGIN_SP : clearance.tabOuterMargin(MARGIN_SP + 3) - clearance.systemInk) };
 }

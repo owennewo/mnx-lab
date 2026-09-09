@@ -171,11 +171,14 @@ export class DocumentViewer extends LitElement {
   @property({ type: String, attribute: 'beams', reflect: true }) beams: DisplayOptions['beams'] = undefined;
   @property({ type: String, attribute: 'selected-verse', reflect: true }) selectedVerse: DisplayOptions['selectedVerse'] = undefined;
 
+  /** Global breathing room; the engine normalizes to half steps in [0, 4]. */
+  @property({ type: Number, reflect: true }) clearance = 2;
+
   private effectiveDisplay(): DisplayOptions {
     return normalizeDisplayOptions({
       lyrics: this.lyrics, timeSignatures: this.timeSignatures, clefs: this.clefs,
       title: this.scoreTitle, barNumbers: this.barNumbers,
-      instrumentNames: this.instrumentNames, beams: this.beams, selectedVerse: this.selectedVerse
+      clearance: this.clearance, instrumentNames: this.instrumentNames, beams: this.beams, selectedVerse: this.selectedVerse
     }, this.hiddenFeatures());
   }
 
@@ -205,23 +208,8 @@ export class DocumentViewer extends LitElement {
   @property({ attribute: 'spacing-mode' }) spacingMode: 'natural' | 'fill' = 'fill';
 
   @property({ type: Number, attribute: 'density-h' }) densityH: number | null = null;
-  /**
-   * Vertical/frame density (roadmap/complete/core-vertical-density.md): a
-   * multiplier on the whitespace a page RESERVES — the pads above and below
-   * each system, and the margins either side — as opposed to `density-h`,
-   * which spaces the music itself. Floored per row by the ink that row
-   * actually holds, so tightening it can never put one system's stems through
-   * the system above.
-   *
-   * **Unset is 1, and it is NOT coupled to `density-h`.** It used to be
-   * derived from it (`padDensityFor`, √density-h — core-vertical-density.md's
-   * "one intent over two scalars"), kept at the surface precisely so it stayed
-   * reversible; reversed 2026-08-21 (see that doc's appendix). Vertical
-   * distance is a function of vertical zoom, and staff scale already supplies
-   * that by multiplying staff spaces — a horizontal value must never move a
-   * vertical gap. A host that wants the coupling can still apply
-   * `padDensityFor` itself and set this.
-   */
+  /** Legacy whitespace multiplier. Explicit values override Clearance wholesale;
+   * unset uses Clearance (default 2). Neither control follows density-h. */
   @property({ type: Number, attribute: 'density-pad' }) densityPad: number | null = null;
   /**
    * The selection overlay is showing where the cursor WAS, but keystrokes
@@ -712,6 +700,7 @@ export class DocumentViewer extends LitElement {
       changed.has('densityH') ||
       changed.has('spacingMode') ||
       changed.has('densityPad') ||
+      changed.has('clearance') ||
       changed.has('lyrics') ||
       changed.has('timeSignatures') ||
       changed.has('clefs') ||
@@ -760,9 +749,8 @@ export class DocumentViewer extends LitElement {
     // re-pack at the value THIS paint used, not at whatever the properties say
     // when it is asked.
     const densityH = this.densityH ?? DENSITY_H[this.density] ?? 1;
-    // Unset is 1: the vertical axis does not follow the horizontal one (see
-    // the property's doc). Explicit wins, as `density-h` does over `density`.
-    const densityPad = this.densityPad ?? 1;
+    // Preserve absence so the engine can choose Clearance or the legacy override.
+    const densityPad = this.densityPad ?? undefined;
     // Whichever pane actually drew: `both` is one render, and in the split
     // views notation and tab derive the same factor from the shared plan, so
     // there is never a second, disagreeing answer to report.

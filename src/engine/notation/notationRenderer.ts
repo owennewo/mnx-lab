@@ -1,7 +1,8 @@
+import { clearanceSpacing } from '../clearance.ts';
 import type { DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation, type HideableFeature } from '../layout/notation.ts';
-import { computeBoundsSp, CROP_PAD_SP } from '../render/bounds.ts';
+import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
 import type { RenderedProjection } from '../render/projection.ts';
 import {
@@ -104,7 +105,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
   // Crop the row's fixed ledger/stem headroom to the content's real vertical
   // extent. y only — the x window stays the full plan width so notation and
   // tab keep their shared left edge and column alignment in the `both` view.
-  const bounds = computeBoundsSp(layout.primitives, CROP_PAD_SP);
+  const bounds = computeBoundsSp(layout.primitives, clearanceSpacing(opts.display?.clearance, opts.densityPad).cropMargin);
   const viewBoxSp = bounds ? { x: 0, y: bounds.y, w: widthSp, h: bounds.h } : undefined;
 
   renderSvg({
