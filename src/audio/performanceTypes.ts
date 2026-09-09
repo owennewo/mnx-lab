@@ -50,6 +50,11 @@ export type SourceSegment<T = Rational> =
       metricPosition: T;
       position: T;
       duration: T;
+      /** Played length ÷ written length over this segment, present only when
+       *  it is not 1 — i.e. only under swing. A segment is straight by
+       *  construction, so a consumer reads a position back to a written
+       *  offset as `metricOffset + (position − segment.position) / scale`. */
+      scale?: T;
     }
   | Insertion<T>;
 export interface PerformanceVoice {

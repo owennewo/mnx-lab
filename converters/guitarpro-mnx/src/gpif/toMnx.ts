@@ -16,6 +16,7 @@ import {
 } from '../common/types.js';
 import { parseChordSymbol } from '../common/harmony.js';
 import { gpScoreInfoToWork, rootExtension } from '../common/scoreMetadata.js';
+import { swingFromTripletFeel } from '../common/swing.js';
 import { mnxDurationToWholes, tupletRatio, wholesToFraction } from '../common/duration.js';
 import { alphaTabTuningToMnx, midiToPitch, pitchToMidi } from '../common/tuning.js';
 import {
@@ -143,6 +144,11 @@ function buildGlobalMeasures(
   // MNX declares attributes change-only; track what has been emitted.
   let lastTime = '';
   let lastFifths: number | null = null;
+  // Guitar Pro stamps `TripletFeel` on every bar; a swing declaration persists
+  // until another bar changes it, so only the changes are stated. A file that
+  // is swung throughout ends up with one declaration on bar 1 — which is also
+  // the one bar an engraver prints the marking over.
+  let lastFeel = 'NoTripletFeel';
 
   for (const [barIndex, masterBar] of doc.masterBars.entries()) {
     const measure: MnxGlobalMeasure = {};
@@ -172,6 +178,14 @@ function buildGlobalMeasures(
     const sectionText = masterBar.sectionText?.trim();
     if (marker) measure.rehearsal = { label: marker };
     if (sectionText) measure.section = { label: sectionText };
+
+    const feel = (masterBar.tripletFeel ?? 'NoTripletFeel').trim() || 'NoTripletFeel';
+    if (feel !== lastFeel) {
+      // A return to straight is a declaration too: it cancels what is in force.
+      if (barIndex > 0 || feel !== 'NoTripletFeel')
+        measure._x = { mnxLab: { ...measure._x?.mnxLab, swing: swingFromTripletFeel(feel) } };
+      lastFeel = feel;
+    }
 
     for (const bpm of doc.tempoAutomations.get(barIndex) ?? []) {
       measure.tempos = measure.tempos ?? [];

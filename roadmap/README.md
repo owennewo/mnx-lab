@@ -428,6 +428,17 @@ back up to `proposed/` the moment it is.
   complete 2026-09-09: `<mnx-player>` controls, performed-order table, separate playback
   ink and inspection, ordinal links, plain-DOM ESM/IIFE wiring and static `/verify`
   Listen. Lifecycle and D.S. smokes pass; existing performance evidence awaits human review.
+- **[core-swing-feel.md](complete/core-swing-feel.md)** — complete 2026-09-09, the day it
+  was raised from Guitar Pro's engraving of *Anji*: `_x.mnxLab.swing` carries the feel as a
+  **ratio on a unit** (MusicXML 3.1's model, not any application's named-feel menu — the
+  seven names Guitar Pro and Soundslice offer are six ratios at two units), on the global
+  measure, persisting until another bar changes it. The compiler warps the metric axis
+  bar-locally and duration-preservingly, so transport, MIDI and cursor inherit it with no
+  code of their own; the engraver draws the rhythmic equation over exactly the bars that
+  change the feel. Both Guitar Pro paths now read and write it — two loss warnings became
+  data. One new scenario, no moved golden, registered in
+  [lab-verify.md](inprogress/lab-verify.md#swing-feel--2026-09-09). MusicXML's own
+  `<sound><swing>` is not wired yet.
 - **[core-beam-geometry.md](complete/core-beam-geometry.md)** — complete 2026-09-09, the
   day it was proposed, and amended the same day: beamed stems ran long because the beam
   slid out until the *shortest* stem reached the octave. Now the shortest stem lands on

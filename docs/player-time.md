@@ -80,6 +80,52 @@ MNX grace type before calling it. `placeStealingGrace` returns both grace spans 
 the shortened neighbouring span. Resolving ties, tremolo containers, string ownership,
 and which timed neighbour is adjacent remains item 5's document work.
 
+## Swing
+
+`_x.mnxLab.swing` states a **ratio** on a unit (see
+[mnx-extensions.md](mnx-extensions.md#swing-is-a-ratio-not-an-enum)), and
+`src/audio/swing.ts` turns it into a warp of the metric axis rather than a
+rewrite of notes. The pair `[0, 2u)` becomes `[0, 2u·a/(a+b))` and the
+remainder, counted **from the barline**; a bar whose length leaves half a pair
+over plays that remainder straight.
+
+The warp is therefore **bar-local and duration-preserving**, and that is what
+lets it sit under the rest of the compiler untouched. Bar starts are fixed
+points, so measure spans, the tempo map and the fermata/make-time insertion map
+all still see the axis they were written against; only offsets *inside* a bar
+move. Everything downstream of `compilePerformance` — the transport, the native
+sink, the MIDI writer, the playback cursor — inherits the feel with no code of
+its own, because each consumes the compiled positions.
+
+Order matters at one point only: the warp is applied where visits are built,
+**before** grace stealing and hold insertion, so a grace note steals from the
+duration its neighbour actually plays and a fermata is measured against the
+swung release. A mid-bar tempo change moves with its offset, through the
+written-state lane's `advance`.
+
+| Case | Convention | Reason |
+|---|---|---|
+| Written identity | `metricOffset`/`metricDuration` stay written | A feel is how notes are played, never what they are |
+| Bar length | Unchanged | The pair is a closed rearrangement; a whole bar sums to itself |
+| Odd remainder | Played straight | Half a pair has no partner to trade with |
+| Note across a pair | Unmoved | `2u` is a fixed point, so a quarter over a swung pair stays on the beat |
+| Note inside a half | Warped proportionally | MusicXML leaves this undefined; a continuous warp puts it where a player would |
+| Overfull bar | Straight past the declared length | The layouts already badge it; inventing a grid would move visible notes |
+
+The played durations agree with Guitar Pro's: alphaTab renders `Triplet8th` as
+a quarter-triplet plus an eighth-triplet (2:1 → `1/6` + `1/12`), `Dotted8th` as
+a dotted eighth plus a sixteenth (3:1), and `Scottish8th` as the same pair
+reversed (1:3). That is an independent oracle for the arithmetic, not a shared
+implementation.
+
+**Source-map consequence.** A source segment must be straight for a consumer to
+read a played position back to a written offset by proportion, so swing cuts
+each measure's segments at every run edge and each carries an optional
+`scale` — played length ÷ written length, present only when it is not 1. The
+reader is `metricOffset + (position − segment.position) / scale`. A document
+that declares no swing emits no `scale` and its evidence is byte-identical to
+what it was before swing existed.
+
 ## Source map and insertion order
 
 Written metric offsets, unrolled metric positions and expanded performance positions

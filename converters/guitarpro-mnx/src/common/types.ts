@@ -124,8 +124,18 @@ export interface MnxDirection {
   color?: string;
 }
 
+/** The performed feel of a pair of equal note values, as a ratio on a unit.
+ *  See `src/model/mnx.ts` — and `common/swing.ts` for the Guitar Pro table. */
+export interface MnxLabSwing {
+  ratio: [number, number];
+  unit: MnxNoteValue;
+  style?: string;
+  text?: string;
+}
+
 export interface MnxGlobalMeasureExtension {
   harmonies?: MnxHarmony[];
+  swing?: MnxLabSwing;
 }
 
 export interface MnxTabNoteExtension {

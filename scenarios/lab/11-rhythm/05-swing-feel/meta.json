@@ -1,0 +1,34 @@
+{
+  "title": "Swing feel — a ratio on the global measure",
+  "description": "The same line of eight eighth notes in every bar, played four different ways. Bar 1 declares `_x.mnxLab.swing` 2:1 on the eighth (the triplet feel Guitar Pro writes as `Triplet8th`) and prints the marking; bar 2 declares nothing and inherits it, printing nothing — a feel persists until another bar changes it; bar 3 declares 3:1 and prints the dotted realisation; bar 4 declares 1:1 and prints `Straight`, which is how a swing is cancelled. Nothing in the written notation moves: the whole difference lives in the performance evidence, where the first eighth of each pair takes 2/3, then 3/4, then half of its pair. Pins the engraved marking in all three views and the compiled warp.",
+  "bars": 4,
+  "tags": [
+    "rhythm",
+    "swing",
+    "tab",
+    "performance"
+  ],
+  "coversDefs": [
+    "event",
+    "global",
+    "measure-global",
+    "note",
+    "note-value",
+    "pitch",
+    "sequence",
+    "tempo",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view"
+  ],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "draft",
+  "performance": true
+}

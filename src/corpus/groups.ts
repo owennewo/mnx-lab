@@ -45,7 +45,7 @@ export const SCENARIO_GROUPS: readonly ScenarioGroup[] = [
   { name: 'Edge cases & spec gaps', match: /edge-case|mismatch|spec-gap/ },
   { name: 'Pitch & accidentals', match: /accidental|key-signature|ottava/ },
   // Anchored: a bare /space/ would also claim a future "spacing-*".
-  { name: 'Rhythm & rests', match: /time-signature|dotted-note|tuplet|rest|duration|(^|[/-])space([/-]|$)/ },
+  { name: 'Rhythm & rests', match: /time-signature|dotted-note|tuplet|rest|duration|swing|(^|[/-])space([/-]|$)/ },
   { name: 'Beams', match: /beam/ },
   // Anchored: a bare /tie/ would also claim a future "properties" or "quantities".
   { name: 'Slurs & ties', match: /slur|(^|[/-])ties?([/-]|$)/ },

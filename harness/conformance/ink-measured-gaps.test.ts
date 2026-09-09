@@ -46,7 +46,9 @@ function readDoc(dir: string): MnxStructure {
 }
 
 const hasScoreText = (mnx: MnxStructure) =>
-  (mnx.global.measures ?? []).some(gm => gm.rehearsal || gm.section || (gm.tempos ?? []).length);
+  (mnx.global.measures ?? []).some(
+    gm => gm.rehearsal || gm.section || (gm.tempos ?? []).length || gm._x?.mnxLab?.swing
+  );
 
 const cls = (p: Primitive) => p.className.split(' ')[0];
 const LABEL_CLASSES = new Set(['rehearsal-label', 'section-label', 'rehearsal-box']);
@@ -57,6 +59,11 @@ const NAV_CLASSES = new Set(['segno', 'fine', 'jump']);
 const isLabel = (p: Primitive) => LABEL_CLASSES.has(cls(p));
 const isTempo = (p: Primitive) => cls(p) === 'tempo';
 const isNav = (p: Primitive) => NAV_CLASSES.has(cls(p));
+// The swing marking is placed AFTER the tempo mark and stacks above it, so the
+// tempo does not clear it — the same relationship the labels have to both.
+const isSwing = (p: Primitive) => cls(p) === 'swing';
+/** `measureHeadingX`'s lead: how far left of its content a heading mark starts. */
+const HEADING_LEAD_SP = 1.5;
 
 /** The text's own bottom ink: a baseline for text, the rect bottom for the
  *  rehearsal box, the glyph's bbox bottom for a metronome note. */
@@ -131,24 +138,30 @@ function rowPrims(layout: LayoutResult, row: number): Primitive[] {
   });
 }
 
-interface Checked { labels: number; tempos: number; clear: number; atMinRise: number }
+interface Checked { labels: number; tempos: number; swings: number; clear: number; atMinRise: number }
 
 /** Every bar of every row: assert the clearance for each text group found. */
 function checkLayout(layout: LayoutResult): Checked {
-  const out: Checked = { labels: 0, tempos: 0, clear: 0, atMinRise: 0 };
+  const out: Checked = { labels: 0, tempos: 0, swings: 0, clear: 0, atMinRise: 0 };
   layout.rows.forEach((band, row) => {
     const staffTop = band.staffTop;
     const prims = rowPrims(layout, row);
     const floor = -Infinity;
     for (const [x0, x1] of barsOf(layout, row)) {
+      // A heading mark deliberately LEADS its bar — `measureHeadingX` starts it
+      // 1.5sp left of the content, which for a bar mid-system is left of its own
+      // barline. Shift the whole window by that lead rather than testing raw x,
+      // or a mark straddling the barline is split between two bars.
       const inBar = (p: Primitive) => {
         const px = (p as { x?: number }).x;
         const py = (p as { y?: number }).y;
         return px !== undefined && py !== undefined &&
-          px >= x0 - 1e-6 && px <= x1 + 1e-6 && py < staffTop;
+          px >= x0 - HEADING_LEAD_SP - 1e-6 && px <= x1 - HEADING_LEAD_SP + 1e-6 &&
+          py < staffTop;
       };
       const labels = prims.filter(p => isLabel(p) && inBar(p));
       const tempos = prims.filter(p => isTempo(p) && inBar(p));
+      const swings = prims.filter(p => isSwing(p) && inBar(p));
 
       const assertGroup = (group: Primitive[], others: Primitive[]) => {
         const bottom = Math.max(...group.map(bottomInkOf));
@@ -172,7 +185,14 @@ function checkLayout(layout: LayoutResult): Checked {
       }
       if (tempos.length) {
         out.tempos++;
-        assertGroup(tempos, prims.filter(p => !isTempo(p) && !isLabel(p) && !isNav(p)));
+        assertGroup(
+          tempos,
+          prims.filter(p => !isTempo(p) && !isLabel(p) && !isNav(p) && !isSwing(p))
+        );
+      }
+      if (swings.length) {
+        out.swings++;
+        assertGroup(swings, prims.filter(p => !isSwing(p) && !isLabel(p) && !isNav(p)));
       }
     }
   });
@@ -192,7 +212,7 @@ describe('ink-measured gaps — stage A, the score-text row', () => {
 
   it('on the tab staff, every label and tempo mark sits one clearance above the ink', () => {
     initSmufl();
-    const total: Checked = { labels: 0, tempos: 0, clear: 0, atMinRise: 0 };
+    const total: Checked = { labels: 0, tempos: 0, swings: 0, clear: 0, atMinRise: 0 };
     for (const s of withText) {
       let layout: LayoutResult;
       try {
@@ -211,7 +231,7 @@ describe('ink-measured gaps — stage A, the score-text row', () => {
 
   it('on the notation staff, every label and tempo mark sits one clearance above the ink', () => {
     initSmufl();
-    const total: Checked = { labels: 0, tempos: 0, clear: 0, atMinRise: 0 };
+    const total: Checked = { labels: 0, tempos: 0, swings: 0, clear: 0, atMinRise: 0 };
     for (const s of withText) {
       let layout: LayoutResult;
       try {

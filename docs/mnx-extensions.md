@@ -1,4 +1,4 @@
-# MNX Lab extensions (`_x.mnxLab`) — v6.2
+# MNX Lab extensions (`_x.mnxLab`) — v6.3
 
 Everything this project carries that **W3C MNX v19 cannot express**, in one
 place: what it is, why standard MNX has no field for it, which CG issue it
@@ -21,6 +21,7 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 | `tab.technique.palmMute` | nothing; MusicXML smuggles it through generic elements | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
 | `fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
 | `harmonies` | **no harmony concept anywhere** — no `root`, no `kind`, no chord | [#109](https://github.com/w3c-cg/mnx/issues/109) | ✅ both converters | ✅ |
+| `swing` | nothing; the reference reserves `struct-swing-*` for 1.0 and implements none of it | [notationref](https://github.com/w3c-cg/mnx) `struct-swing-ratio` | ✅ Guitar Pro (⚠️ MusicXML) | ✅ marking + playback |
 | `work` | **no document metadata at all** — no title, composer, rights or performer anywhere in 193 `$defs` | [#267](https://github.com/w3c-cg/mnx/issues/267), [#56](https://github.com/w3c/mnx/issues/56) | ✅ both converters | n/a — never printed |
 | `encoding` | nothing says what wrote the file | [#547](https://github.com/w3c-cg/mnx/issues/547) | ✅ both converters | n/a |
 
@@ -232,6 +233,58 @@ only the first two; the other four are Guitar Pro's.
   }
 }
 ```
+
+### `swing` is a ratio, not an enum
+
+```jsonc
+{
+  "_x": {
+    "mnxLab": {
+      "swing": {
+        "ratio": [2, 1],            // first : second, smallest integers
+        "unit":  { "base": "eighth" }, // which pair swings
+        "style": "laid back",       // optional, free text
+        "text":  "Swing"            // optional printed override
+      }
+    }
+  }
+}
+```
+
+Written evenly, played unevenly. It sits on the **global** measure beside
+`tempos` for the same reason `harmonies` does: two parts cannot legitimately
+swing differently.
+
+**Why a ratio.** Every application offers a menu of named feels, and every menu
+is a different list of the same underlying thing. Guitar Pro's `TripletFeel` has
+seven values (`Triplet8th`, `Dotted16th`, `Scottish8th`, …); Soundslice offers
+the same seven; MusicXML 3.1 settled the question in the other direction, and
+`<sound><swing>` stores `<first>`/`<second>` positive integers with an optional
+`<swing-type>` of `eighth` or `16th`. The two are the same space, and alphaTab's
+own MusicXML importer is the proof: it maps 2:1 → *triplet*, 3:1 → *dotted*,
+1:3 → *Scottish*, at either unit. Storing the name would store an opinion about
+the ratio; storing the ratio also admits feels no menu names (a 5:3 shuffle),
+which is what the standard should be able to do. MNX's notation reference
+reserves `struct-swing-ratio` alongside `struct-swing-triplet-feel` for 1.0 and
+implements neither, so this drafts the ratio form.
+
+`unit` is an MNX `note-value` rather than MusicXML's two-value enum — the same
+shape as `tempo.value`, and it admits units the enum cannot name.
+
+**It persists.** A declaration holds until another measure declares one, so a
+document states a feel where it *changes* — and `[1, 1]` is how a feel is
+cancelled. Guitar Pro stamps `TripletFeel` on every bar and prints it once; the
+importer collapses that to one declaration (Anji: 72 stamped bars, one
+declaration), and the engraver prints the marking at exactly the bars that
+declare a change. That is one rule doing both jobs.
+
+**What it means to play.** The pair `[0, 2u)` becomes `[0, 2u·a/(a+b))` and the
+rest, counted from the **barline**; a bar whose length leaves half a pair over
+plays that remainder straight. The transform is therefore bar-local and
+duration-preserving, so barlines and beats are fixed points and a quarter note
+lying across a swung pair does not move. See
+[player-time.md](player-time.md#swing) for how the compiler applies it, and
+[rendering.md](rendering.md) for the drawn marking.
 
 ### `rehearsal` and `section` left in v4
 

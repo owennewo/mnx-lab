@@ -47,6 +47,9 @@ export interface GpifMasterBar {
   sectionText: string | null;
   /** Volta numbers as a bitmask (bit 0 = ending 1), 0 when none. */
   alternateEndingsMask: number;
+  /** `TripletFeel` — the played feel of this bar's pairs, verbatim. Guitar Pro
+   *  stamps it on EVERY bar; `toMnx` states it only where it changes. */
+  tripletFeel: string | null;
 }
 
 export interface GpifTrack {
@@ -207,7 +210,8 @@ function parseMasterBar(node: Element): GpifMasterBar {
     doubleBar: child(node, 'DoubleBar') !== null,
     sectionLetter: section ? (text(section, 'Letter') ?? null) : null,
     sectionText: section ? (text(section, 'Text') ?? null) : null,
-    alternateEndingsMask: mask
+    alternateEndingsMask: mask,
+    tripletFeel: text(node, 'TripletFeel') ?? null
   };
 }
 

@@ -19,6 +19,7 @@ import {
 } from '../common/exportPlan.js';
 import { mnxDurationToWholes, tupletFlags, wholesToFraction } from '../common/duration.js';
 import { mnxTuningToAlphaTab, pitchToMidi, choosePosition } from '../common/tuning.js';
+import { describeSwing, tripletFeelFromSwing, type GpTripletFeel } from '../common/swing.js';
 import { writeGpContainer } from './container.js';
 import { documentWork, workToGpScoreInfo } from '../common/scoreMetadata.js';
 
@@ -133,6 +134,9 @@ interface WriterMasterBar {
   doubleBar: boolean;
   endingNumbers: number[];
   barIds: number[];
+  /** The feel in force in this bar. Guitar Pro stamps every bar, so the
+   *  writer carries the value forward the way it carries key and meter. */
+  tripletFeel: GpTripletFeel | null;
 }
 
 interface WriterTrack {
@@ -188,6 +192,7 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
   let numerator = 4;
   let denominator = 4;
   let fifths = 0;
+  let tripletFeel: GpTripletFeel | null = null;
 
   // MNX states a volta once with a span; Guitar Pro flags every bar of it.
   const endingMaskByMeasure = new Map<number, number>();
@@ -214,6 +219,17 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
     const endingNumbers: number[] = [];
     for (let bit = 0; bit < 8; bit++) if (mask & (1 << bit)) endingNumbers.push(bit + 1);
 
+    const declared = global._x?.mnxLab?.swing;
+    if (declared) {
+      const token = tripletFeelFromSwing(declared);
+      if (token === null)
+        warn(
+          `Measure ${index + 1}: swing ${describeSwing(declared)} has no Guitar Pro equivalent; ` +
+            'written durations are retained and the feel is dropped.'
+        );
+      tripletFeel = token === 'NoTripletFeel' ? null : token;
+    }
+
     masterBars.push({
       timeNumerator: numerator,
       timeDenominator: denominator,
@@ -224,7 +240,8 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
       repeatCount: global.repeatEnd ? Math.max(2, global.repeatEnd.times ?? 2) : null,
       doubleBar: global.barline?.type === 'double',
       endingNumbers,
-      barIds: []
+      barIds: [],
+      tripletFeel
     });
 
     for (const tempo of global.tempos ?? []) {
@@ -836,6 +853,9 @@ function serialize(
       );
     }
     push(`<Bars>${masterBar.barIds.join(' ')}</Bars>`);
+    // Guitar Pro's own files stamp the feel on every bar, after `<Bars>`.
+    // Straight bars omit it: absence is what Guitar Pro reads as no feel.
+    if (masterBar.tripletFeel) push(`<TripletFeel>${masterBar.tripletFeel}</TripletFeel>`);
     push('</MasterBar>');
   }
   push('</MasterBars>');

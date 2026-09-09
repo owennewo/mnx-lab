@@ -40,6 +40,7 @@ export type ElementKind =
   // global-measure level
   | 'time-signature' | 'key-signature' | 'barline' | 'repeat-start' | 'repeat-end'
   | 'ending' | 'segno' | 'fine' | 'jump' | 'tempo' | 'rehearsal' | 'section' | 'harmony'
+  | 'swing'
   | 'measure-number'
   // part level
   | 'part-name' | 'strings' | 'capo' | 'staff-kind' | 'kit-component' | 'staves'
@@ -295,6 +296,10 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     note: 'A metronome mark.',
     construct: ['setMeasureAttribute'],
     remove: ['removeMeasureAttribute']
+  },
+  swing: {
+    classes: ['swing'],
+    note: 'The performed feel of a pair (`_x.mnxLab.swing`), drawn as a rhythmic equation. No op reaches it yet.'
   },
   rehearsal: {
     classes: ['rehearsal-box', 'rehearsal-label'],
@@ -690,6 +695,8 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
     at('section', 'section');
     for (const [tempoIndex] of (measure.tempos ?? []).entries())
       pushAtMeasure(out, 'tempo', `${path}/tempo${tempoIndex}`, [...json, 'tempos', tempoIndex], measureIndex);
+    if (measure._x?.mnxLab?.swing)
+      push(out, 'swing', `${path}/swing`, [...json, '_x', 'mnxLab', 'swing']);
     for (const [harmonyIndex] of (measure._x?.mnxLab?.harmonies ?? []).entries())
       push(out, 'harmony', `${path}/harmony${harmonyIndex}`, [
         ...json, '_x', 'mnxLab', 'harmonies', harmonyIndex

@@ -91,6 +91,35 @@ scale rhythmic springs. Every relationship has its own anchors so paired
 staves remain paired and independent systems remain distinct. An explicitly
 supplied legacy `densityPad` overrides the clearance policy wholesale.
 
+## The swing marking
+
+`emitSwingMark` in `src/engine/layout/scoreText.ts` draws `_x.mnxLab.swing` in
+the tempo band, above the metronome mark, on **every** staff kind — notation,
+standalone tab and the `both` walk all call it, because a feel describes the bar
+and not a notation staff.
+
+A feel is a rhythmic equation, so the mark draws one rather than naming it: the
+written pair, an `=`, and the realisation the ratio implies, under a tuplet
+bracket when the realisation needs one. The pair spans two units and is
+redivided into `first + second` parts, so the parts are notatable exactly when
+that total is **3** (a triplet — the parts are units, bracketed `3`) or **4**
+(dyadic — the parts are half-units, and three of them is a dotted unit). 2:1 on
+the eighth therefore draws `♪♪ = ⌐3¬ ♩♪`, which is what Guitar Pro prints; 3:1
+draws a dotted eighth and a sixteenth with no bracket. A ratio with no rhythmic
+spelling (5:3 is a real feel) prints its ratio as words instead of a wrong
+rhythm, and a declaration's own `text` overrides the equation entirely.
+
+It prints only where the feel **changes** — `resolveSwingTimeline` in
+`src/model/swing.ts` makes that decision once and both layouts read it, so the
+engraver and the performance compiler cannot disagree about where a feel starts.
+A bar restating what it inherited draws nothing, which is why a Guitar Pro
+import that stamps all 72 bars still engraves the marking once. A cancellation
+(`[1, 1]`) is still a marking: it prints `Straight`.
+
+Known polish: the written pair is drawn as two adjacent `met*` glyphs rather
+than a beamed pair — SMuFL has no beamed-pair glyph and faking the beam off
+glyph bounding boxes is not worth the fragility.
+
 ## Beam geometry
 
 A beamed group's primary beam is placed by one shared rule, `placeBeamLine` in

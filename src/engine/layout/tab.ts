@@ -51,7 +51,8 @@ import {
   STANDARD_BARLINE_METRICS,
   type BarlineMetrics
 } from './barlines.ts';
-import { emitHarmonies, emitNavigationMarkers, emitScoreLabels, emitTempoMark, measureOnsetXs } from './scoreText.ts';
+import { emitHarmonies, emitNavigationMarkers, emitScoreLabels, emitSwingMark, emitTempoMark, measureOnsetXs } from './scoreText.ts';
+import { resolveSwingTimeline } from '../../model/swing.ts';
 import { emitMeasureFermata } from './fermata.ts';
 import { emitMeasureNumber } from './arpeggio.ts';
 import { ensureTopMargin, fitRowsToClearance, tightenRows } from './verticalDensity.ts';
@@ -279,6 +280,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // Where each row's primitives begin — rows are emitted in order, so a row's
   // primitives are exactly the slice from its first measure onward.
   const rowStart: number[] = [];
+  // Which bars declare a feel, and which of those are a change worth printing.
+  const swingTimeline = resolveSwingTimeline(mnx.global.measures ?? []);
   for (let i = 0; i < numMeasures; i++) {
     const partMeasure = part.measures[writtenIndex(plan, i)] ?? { sequences: [] };
     const m = plan.measures[i];
@@ -466,12 +469,17 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), primitives,
       onsetXs: measureOnsetXs(stdSequences[0], m.voices[0] ?? [])
     });
+    const swingTop = emitSwingMark({
+      swing: swingTimeline[writtenIndex(plan, i)], m, staffTop,
+      scan: primitives.slice(rowStart[m.row]), clearAbove: tempoTop, primitives
+    });
     if (!m.entry) emitNavigationMarkers({ gm, m, stdSequences, staffTop, primitives });
     emitMeasureFermata({ gm, m, staffTop, staffHeight: STAFF_HEIGHT_SP, primitives });
     emitOccurrenceLabel(m, staffTop, primitives);
     emitMeasureNumber(gm, m, staffTop, primitives, display.barNumbers, measureNumbers[writtenIndex(plan, i)]);
     emitScoreLabels({
-      gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), clearAbove: tempoTop, primitives
+      gm, m, staffTop, scan: primitives.slice(rowStart[m.row]),
+      clearAbove: swingTop ?? tempoTop, primitives
     });
 
     }

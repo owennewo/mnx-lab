@@ -18,9 +18,13 @@ unpositioned bend middles report a warning.
 The legacy reader retains notation, tuning/capo, lyrics, ties and supported
 techniques through the shared GPIF-to-MNX mapping. Unsupported musical effects
 warn; RSE and page-layout data are not preserved. Chord names are retained,
-but chord diagrams and dead-note styling are not. Navigation directions and
-triplet feel also warn rather than being preserved; written durations remain
-unchanged. The current coverage and
+but chord diagrams and dead-note styling are not. Navigation directions warn
+rather than being preserved. **Triplet feel is preserved**: GP3/4's one
+score-level flag and GP5's per-measure byte both become `_x.mnxLab.swing`, the
+same ratio the GPIF `<TripletFeel>` reader produces (`common/swing.ts` holds the
+seven-name table). Guitar Pro stamps every bar; MNX states the feel where it
+changes, and the writer stamps every bar again on the way out. A ratio with no
+Guitar Pro name warns on export. The current coverage and
 remaining edge cases are recorded in
 [the completed binary-reader roadmap](../../roadmap/complete/core-guitarpro-binary-import.md).
 

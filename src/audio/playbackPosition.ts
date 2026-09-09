@@ -1,6 +1,6 @@
 import type { Performance, PerformanceMeasure } from './performanceTypes.ts';
 import type { MnxStructure } from '../model/mnx.ts';
-import { ZERO, add, subtract, multiply, rational, compare, type Rational } from './time.ts';
+import { ZERO, add, subtract, multiply, divide, rational, compare, type Rational } from './time.ts';
 export function measureAt(
   performance: Performance,
   position: Rational,
@@ -19,9 +19,16 @@ export function formatPlaybackPosition(
   const segment = performance.sourceMap.find(
     (s) => compare(position, s.position) >= 0 && compare(position, add(s.position, s.duration)) < 0,
   );
+  // A swung segment plays at `scale` times its written length, so the distance
+  // travelled inside it divides back out to reach the written beat.
   const offset =
     segment?.kind === 'metric'
-      ? add(segment.metricOffset, subtract(position, segment.position))
+      ? add(
+          segment.metricOffset,
+          segment.scale
+            ? divide(subtract(position, segment.position), segment.scale)
+            : subtract(position, segment.position),
+        )
       : (segment?.sources.find((s) => s.ordinal === measure.ordinal)?.metricOffset ?? measure.from);
   let unit = 4;
   for (let i = 0; i <= measure.measureIndex; i++)

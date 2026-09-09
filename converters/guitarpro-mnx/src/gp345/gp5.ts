@@ -77,9 +77,10 @@ export function parseGuitarProBinary(data: Uint8Array, options: GpifImportOption
   const major = version.major;
 
   const warn = options.onWarning ?? (() => {});
-  if (major < 5 && reader.readBool('triplet feel')) {
-    warn('Score triplet feel is not represented; written durations are retained.');
-  }
+  // GP3/4 carry ONE score-level flag and it means eighth-note triplet feel;
+  // GP5 moved it onto each measure header. Both now land on the same
+  // `_x.mnxLab.swing` the modern reader produces, so nothing is lost here.
+  const globalTripletFeel = major < 5 && reader.readBool('triplet feel') ? 'Triplet8th' : null;
   const lyrics = major >= 4 ? readLyrics(reader) : { trackChoice: 0, lines: [] };
 
   if (major === 5 && version.revision > 0) {
@@ -112,7 +113,7 @@ export function parseGuitarProBinary(data: Uint8Array, options: GpifImportOption
 
   const measureCount = checkedCount(reader.readInt32('measure count'), 'measure', 100_000);
   const trackCount = checkedCount(reader.readInt32('track count'), 'track', 1_000);
-  const masterBars = readMeasureHeaders(reader, measureCount, trackCount, initialFifths, major, warn);
+  const masterBars = readMeasureHeaders(reader, measureCount, trackCount, initialFifths, major, warn, globalTripletFeel);
   const tracks = Array.from({ length: trackCount }, (_, index) =>
     readTrack(reader, index, version.revision, major, instruments)
   );
@@ -320,7 +321,9 @@ function readMeasureHeaders(
   trackCount: number,
   initialFifths: number,
   major: number,
-  warn: (message: string) => void
+  warn: (message: string) => void,
+  /** GP3/4's one score-level feel, which every bar inherits. */
+  globalTripletFeel: string | null
 ): GpifMasterBar[] {
   const result: GpifMasterBar[] = [];
   let numerator = 4;
@@ -329,6 +332,7 @@ function readMeasureHeaders(
   let completedEndings = 0;
 
   for (let index = 0; index < measureCount; index++) {
+    let measureTripletFeel = globalTripletFeel;
     if (major === 5 && index > 0) reader.skip(1, `measure ${index + 1} leading padding`);
     const flags = reader.readUint8(`measure ${index + 1} flags`);
     if (flags & 0x04) completedEndings = 0;
@@ -359,8 +363,11 @@ function readMeasureHeaders(
       // GP5 moved the ending mask after marker, key and time-signature beams.
       if (flags & 0x10) endingValue = reader.readUint8(`measure ${index + 1} alternate endings`);
       if (!(flags & 0x10)) reader.skip(1, `measure ${index + 1} alternate-ending padding`);
-      const tripletFeel = reader.readUint8(`measure ${index + 1} triplet feel`);
-      if (tripletFeel !== 0) warn(`Measure ${index + 1}: triplet feel ${tripletFeel} is not represented; written durations are retained.`);
+      // 1 and 2 are the only values GP5 writes; anything else is unknown and
+      // plays straight rather than guessing a ratio.
+      const value = reader.readUint8(`measure ${index + 1} triplet feel`);
+      measureTripletFeel = value === 1 ? 'Triplet8th' : value === 2 ? 'Triplet16th' : null;
+      if (value > 2) warn(`Measure ${index + 1}: unknown triplet feel ${value}; played straight.`);
     }
     // GP3/4 store the highest ending number, not GP5's explicit bitmask.
     // Remove endings already taken at earlier repeat closes in this group.
@@ -378,7 +385,8 @@ function readMeasureHeaders(
       doubleBar: Boolean(flags & 0x80),
       sectionLetter: null,
       sectionText,
-      alternateEndingsMask
+      alternateEndingsMask,
+      tripletFeel: measureTripletFeel
     });
   }
 

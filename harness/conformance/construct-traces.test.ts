@@ -273,6 +273,10 @@ const DEFERRED_KINDS: Record<string, string> = {
   // `layout`, `score` and `multimeasure-rest` retired from this list on
   // 2026-08-24: core-layout-authoring.md built their construct verbs, so they
   // are covered kinds now, not owed ones.
+  // Swing is a global-measure field with no editing verb: the grammar would
+  // have to learn a ratio and a unit, which is a design the feel's own doc
+  // names as not-done rather than something the element-ops campaign owes.
+  swing: 'roadmap/complete/core-swing-feel.md',
   'kit-component': 'roadmap/proposed/low-priority/core-percussion-kit.md',
   'kit-note': 'roadmap/proposed/low-priority/core-percussion-kit.md',
   sound: 'roadmap/proposed/low-priority/core-percussion-kit.md'

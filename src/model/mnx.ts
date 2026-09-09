@@ -106,6 +106,43 @@ export interface MnxHarmony {
   color?: string;
 }
 
+/**
+ * The performed feel of a pair of equal note values: written evenly, played
+ * unevenly. A property OF the measure, on the GLOBAL timeline beside `tempos`,
+ * because two parts cannot legitimately swing differently — the same test that
+ * put key/time/tempo there.
+ *
+ * A **ratio**, not an enum. MusicXML settled this in 3.1 with
+ * `<sound><swing>`: `<first>`/`<second>` positive integers plus an optional
+ * `<swing-type>` (eighth or 16th). Every named feel a UI offers is a point in
+ * that space — 2:1 "triplet", 3:1 "dotted", 1:3 the Scotch snap — so storing
+ * the name would store an opinion about the ratio instead of the ratio.
+ * MNX's own reference reserves `struct-swing-ratio` beside
+ * `struct-swing-triplet-feel` for 1.0 but implements neither yet, so this
+ * drafts the ratio form.
+ *
+ * The value **persists** until another measure declares one: a document states
+ * a feel where it changes, not on every bar. `[1, 1]` is straight and is how a
+ * swing is cancelled.
+ */
+export interface MnxLabSwing {
+  /** `[first, second]` — the played proportions of the pair, in the smallest
+   *  integers that express them. `[2, 1]` swings the first note twice as long
+   *  as the second; `[1, 1]` is straight. */
+  ratio: [number, number];
+  /** Which pair swings, as an MNX `note-value`. Pairs are taken from the
+   *  START OF THE BAR, two units at a time; a bar whose length leaves a
+   *  half-pair over plays that remainder straight. */
+  unit: { base: string; dots?: number };
+  /** MusicXML's `<swing-style>`: a free-text performance qualifier ("heavy",
+   *  "laid back") that names a nuance the ratio does not carry. Round-trips
+   *  verbatim; nothing reads it. */
+  style?: string;
+  /** Printed marking override. Absent, the engraver draws the rhythmic
+   *  equation the ratio implies; `"Swing"` prints that word instead. */
+  text?: string;
+}
+
 /** A label on a global measure: `rehearsal` is an index into the score ("A"),
  *  `section` names a formal unit of the piece ("Verse 1"). A property OF the
  *  measure, like `key` and `time` — not positioned within it, because a
@@ -702,12 +739,13 @@ export interface MnxGlobalMeasure {
    *  next one. Separate from `rehearsal` because it states what the music *is*
    *  rather than indexing it. **Proposed, not adopted** — see `rehearsal`. */
   section?: MnxMeasureLabel;
-  /** Vendor extensions. `harmonies` are chord symbols; standard MNX has no
-   *  harmony concept at all. `_x` is declared in the schema's `global-attrs`.
-   *  See docs/mnx-extensions.md. */
+  /** Vendor extensions. `harmonies` are chord symbols and `swing` is the
+   *  performed feel; standard MNX has neither concept. `_x` is declared in
+   *  the schema's `global-attrs`. See docs/mnx-extensions.md. */
   _x?: {
     mnxLab?: {
       harmonies?: MnxHarmony[];
+      swing?: MnxLabSwing;
     };
   };
 }

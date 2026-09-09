@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mnx-lab.totai.uk/schemas/mnx-lab-extensions.schema.json/v6",
-  "title": "MNX Lab vendor extensions (`_x.mnxLab`) — v6.2",
-  "description": "Everything MNX Lab carries that W3C MNX v19 cannot express: fretted-instrument tablature, chord symbols, and document metadata (what the piece is, and what wrote the file). All of it lives under the single vendor key `_x.mnxLab`, which is how the MNX spec says extensions are namespaced (w3c-cg/mnx#63/#429: the `_x` key identifies an agent, vendor or community). Documents using these extensions remain fully valid against the official MNX schema. Each block is shaped like the standard MNX object it is a draft of, so adopting any of them upstream means deleting the `_x.mnxLab` wrapper rather than rewriting the data. Rationale and the proposals these draft: docs/mnx-extensions.md.",
+  "title": "MNX Lab vendor extensions (`_x.mnxLab`) — v6.3",
+  "description": "Everything MNX Lab carries that W3C MNX v19 cannot express: fretted-instrument tablature, chord symbols, swing feel, and document metadata (what the piece is, and what wrote the file). All of it lives under the single vendor key `_x.mnxLab`, which is how the MNX spec says extensions are namespaced (w3c-cg/mnx#63/#429: the `_x` key identifies an agent, vendor or community). Documents using these extensions remain fully valid against the official MNX schema. Each block is shaped like the standard MNX object it is a draft of, so adopting any of them upstream means deleting the `_x.mnxLab` wrapper rather than rewriting the data. Rationale and the proposals these draft: docs/mnx-extensions.md.",
   "type": "object",
   "$defs": {
     "pitch": {
@@ -554,7 +554,7 @@
     },
     "global-measure-ext": {
       "type": "object",
-      "description": "The whole vendor dict at global.measures[i]._x.mnxLab. Harmony lives here — on the GLOBAL timeline beside `key` and `tempos` — because two parts cannot legitimately disagree about the chord on a beat, which is the test that put dynamics and ottavas in the part measure and key/time/tempo in the global one. `rehearsal` and `section` were here in v3; v4 removed them in favour of the standard MNX objects proposed in roadmap/proposed/low-priority/spec-score-text.md — an extension should be a draft of the standard object, so once drafted it stops being an extension.",
+      "description": "The whole vendor dict at global.measures[i]._x.mnxLab. Harmony and swing live here — on the GLOBAL timeline beside `key` and `tempos` — because two parts cannot legitimately disagree about the chord on a beat, which is the test that put dynamics and ottavas in the part measure and key/time/tempo in the global one. `rehearsal` and `section` were here in v3; v4 removed them in favour of the standard MNX objects proposed in roadmap/proposed/low-priority/spec-score-text.md — an extension should be a draft of the standard object, so once drafted it stops being an extension.",
       "properties": {
         "harmonies": {
           "type": "array",
@@ -563,6 +563,9 @@
           },
           "minItems": 1,
           "description": "Every chord symbol starting in this measure, in `location` order. An array parallel to `tempos` — the other repeatable, metrically-positioned global object."
+        },
+        "swing": {
+          "$ref": "#/$defs/swing"
         }
       },
       "additionalProperties": false
@@ -578,6 +581,66 @@
           "$ref": "#/$defs/encoding"
         }
       },
+      "additionalProperties": false
+    },
+    "swing": {
+      "type": "object",
+      "description": "The performed feel of a pair of equal note values: written evenly, played unevenly. A RATIO, not an enum — MusicXML settled that in 3.1 with `<sound><swing>`, whose `<first>`/`<second>` positive integers and optional `<swing-type>` this mirrors. Every named feel a user interface offers is a point in that space (2:1 \"triplet\", 3:1 \"dotted\", 1:3 the Scotch snap), so storing the name would store an opinion about the ratio instead of the ratio. MNX's own notation reference reserves `struct-swing-ratio` beside `struct-swing-triplet-feel` for 1.0 and implements neither yet, so this drafts the ratio form. Pairs are counted from the START OF THE BAR; a bar whose length leaves half a pair over plays that remainder straight. The value persists until another measure declares one, so a document states a feel where it CHANGES — which is also the only place an engraver prints the marking.",
+      "properties": {
+        "ratio": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "`[first, second]` — the played proportions of the pair, in the smallest integers that express them. `[2, 1]` plays the first note twice as long as the second; `[1, 1]` is straight, and is how a swing already in force is cancelled."
+        },
+        "unit": {
+          "$ref": "#/$defs/note-value",
+          "description": "Which pair swings, as an MNX `note-value`. `{\"base\": \"eighth\"}` is MusicXML's `<swing-type>eighth</swing-type>`; the note-value form also admits units MusicXML's two-value enum cannot name."
+        },
+        "style": {
+          "type": "string",
+          "description": "MusicXML's `<swing-style>`: a free-text qualifier (\"heavy\", \"laid back\") naming a nuance the ratio does not carry. Round-trips verbatim; nothing reads it."
+        },
+        "text": {
+          "type": "string",
+          "description": "Printed marking override. Absent, an engraver draws the rhythmic equation the ratio implies; `\"Swing\"` prints that word instead."
+        }
+      },
+      "required": [
+        "ratio",
+        "unit"
+      ],
+      "additionalProperties": false
+    },
+    "note-value": {
+      "type": "object",
+      "description": "MNX `note-value`: a note duration as a base value plus dots. Same shape as `tempo.value`.",
+      "properties": {
+        "base": {
+          "enum": [
+            "breve",
+            "whole",
+            "half",
+            "quarter",
+            "eighth",
+            "16th",
+            "32nd",
+            "64th",
+            "128th"
+          ]
+        },
+        "dots": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "base"
+      ],
       "additionalProperties": false
     }
   }

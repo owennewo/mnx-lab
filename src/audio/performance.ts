@@ -18,6 +18,7 @@ import {
   add,
   subtract,
   multiply,
+  divide,
   compare,
   min,
   max,
@@ -39,6 +40,8 @@ import {
   type InsertionRequest,
 } from './timingConventions.ts';
 import { performedTempoChanges } from './writtenState.ts';
+import { createSwingMap, type SwingMap } from './swing.ts';
+import { resolveSwingTimeline } from '../model/swing.ts';
 import type {
   Performance,
   PerformanceResult,
@@ -257,6 +260,17 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
   lengths.forEach((value, i) => {
     if (value.num === 0n) lengths[i] = meters[i] ?? meters.at(-1) ?? ONE;
   });
+  // Swing warps the metric axis the way a tuplet does: written note values are
+  // untouched, the time they occupy is not. One warp per WRITTEN bar, built
+  // from the actual bar length (so a pickup swings its own pairs), and applied
+  // before anything else reads a position — grace, fermata, tempo and the
+  // source map all then see one axis. `audio/swing.ts` explains the shape.
+  const swingTimeline = resolveSwingTimeline(doc.global?.measures ?? []);
+  const swingMaps: SwingMap[] = lengths.map((length, i) =>
+    createSwingMap(swingTimeline[i]?.swing ?? null, length),
+  );
+  const swung = (measureIndex: number, offset: Rational) =>
+    swingMaps[measureIndex]?.at(offset) ?? offset;
   const measures: Performance['measures'] = [];
   let position = ZERO;
   for (const entry of passes.entries) {
@@ -269,7 +283,13 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
       compare(until, lengths[entry.measureIndex]) > 0
     )
       throw new RangeError('Traversal slice is outside its written measure.');
-    const duration = subtract(until, from);
+    // `from`/`until` stay WRITTEN — they are the slice a reader sees. The
+    // unrolled span is what that slice plays for, which swing can change when
+    // the slice starts or ends inside a pair.
+    const duration = subtract(
+      swung(entry.measureIndex, until),
+      swung(entry.measureIndex, from),
+    );
     measures.push({
       ordinal: entry.ordinal,
       measureIndex: entry.measureIndex,
@@ -299,8 +319,16 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
           : compare(until, from) <= 0
       )
         continue;
-      const metricPosition = add(measure.metricPosition, subtract(from, measure.from));
+      const metricPosition = add(
+        measure.metricPosition,
+        subtract(swung(measure.measureIndex, from), swung(measure.measureIndex, measure.from)),
+      );
+      // `metricDuration` is the WRITTEN span the golden records; the played
+      // span is the same notes over the warped axis.
       const duration = event.grace ? ZERO : subtract(until, from);
+      const played = event.grace
+        ? ZERO
+        : subtract(swung(measure.measureIndex, until), swung(measure.measureIndex, from));
       visits.push({
         ...event,
         ordinal: measure.ordinal,
@@ -308,7 +336,7 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
         metricPosition,
         metricDuration: duration,
         position: metricPosition,
-        playedDuration: duration,
+        playedDuration: played,
       });
       if (visits.length > LIMIT) limit();
     }
@@ -688,6 +716,10 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
       until: m.until,
       position: m.metricPosition,
     })),
+    // A mid-bar tempo change sits at a written offset; under swing it lands
+    // where that offset is PLAYED, like every other mark in the bar.
+    (entry, offset) =>
+      subtract(swung(entry.measureIndex, offset), swung(entry.measureIndex, entry.metricOffset)),
   );
   const tempo = createTempoMap(
     projected.map((t) => ({
@@ -697,25 +729,49 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
   ).changes;
   const sourceMap: Performance['sourceMap'] = [...insertions.insertions];
   for (const m of measures) {
-    let start = m.metricPosition;
-    const finish = add(start, m.metricDuration);
-    const cuts = [
-      ...insertions.insertions
-        .map((i) => i.metricPosition)
-        .filter((p) => compare(p, start) > 0 && compare(p, finish) < 0),
-      finish,
-    ].sort(compare);
-    for (const stop of cuts) {
-      if (compare(stop, start) > 0)
-        sourceMap.push({
-          kind: 'metric',
-          ordinal: m.ordinal,
-          metricOffset: add(m.from, subtract(start, m.metricPosition)),
-          metricPosition: start,
-          position: insertions.toPerformance(start),
-          duration: subtract(stop, start),
-        });
-      start = stop;
+    const map = swingMaps[m.measureIndex];
+    const origin = map.at(m.from);
+    const unrolled = (written: Rational) =>
+      add(m.metricPosition, subtract(map.at(written), origin));
+    // A segment must stay STRAIGHT so a consumer can read a position back to a
+    // written offset by proportion. Swing bends the axis at every run edge, so
+    // those edges cut the slice before the insertions do; a straight bar has
+    // one run and this collapses to the single segment it always was.
+    const edges = [
+      m.from,
+      ...map.runs
+        .map((run) => run.from)
+        .filter((p) => compare(p, m.from) > 0 && compare(p, m.until) < 0),
+      m.until,
+    ];
+    for (let i = 0; i + 1 < edges.length; i++) {
+      const written = edges[i];
+      const scale =
+        map.runs.find(
+          (run) => compare(written, run.from) >= 0 && compare(written, run.until) < 0,
+        )?.scale ?? ONE;
+      const runStart = unrolled(written);
+      let start = runStart;
+      const finish = unrolled(edges[i + 1]);
+      const cuts = [
+        ...insertions.insertions
+          .map((x) => x.metricPosition)
+          .filter((p) => compare(p, start) > 0 && compare(p, finish) < 0),
+        finish,
+      ].sort(compare);
+      for (const stop of cuts) {
+        if (compare(stop, start) > 0)
+          sourceMap.push({
+            kind: 'metric',
+            ordinal: m.ordinal,
+            metricOffset: add(written, divide(subtract(start, runStart), scale)),
+            metricPosition: start,
+            position: insertions.toPerformance(start),
+            duration: subtract(stop, start),
+            ...(scale.num === scale.den ? {} : { scale }),
+          });
+        start = stop;
+      }
     }
   }
   sourceMap.sort((a, b) => compare(a.position, b.position));

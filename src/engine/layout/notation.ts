@@ -1,4 +1,5 @@
 import { qualifyMeasure, qualifyTechniques, occurrenceTarget, performedSpans, performedKeys, occurrenceKey, writtenIndex, emitOccurrenceLabel } from './unrolled.ts';
+import { resolveSwingTimeline } from '../../model/swing.ts';
 import type { PerformedEntry } from '../../model/passes.ts';
 import { clearanceSpacing, type ClearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
@@ -90,6 +91,7 @@ import {
   emitHarmonies,
   emitNavigationMarkers,
   emitScoreLabels,
+  emitSwingMark,
   emitTempoMark,
   measureOnsetXs,
   type OnsetX
@@ -2156,6 +2158,8 @@ function assembleSegment(
     postLoopByRow[r].push(p);
   }
   const rowTextStart: number[] = [];
+  // Which bars declare a feel, and which of those are a change worth printing.
+  const swingTimeline = resolveSwingTimeline(mnx.global.measures ?? []);
   for (let i = 0; i < numMeasures; i++) {
     const m = plan.measures[i];
     if (m.hidden) continue;
@@ -2176,7 +2180,13 @@ function assembleSegment(
       gm, m, staffTop, scan: scan(), primitives,
       onsetXs: measureOnsetXs(topSequence, m.voices[0] ?? [])
     });
-    emitScoreLabels({ gm, m, staffTop, scan: scan(), clearAbove: tempoTop, primitives });
+    const swingTop = emitSwingMark({
+      swing: swingTimeline[writtenIndex(plan, i)], m, staffTop, scan: scan(),
+      clearAbove: tempoTop, primitives
+    });
+    emitScoreLabels({
+      gm, m, staffTop, scan: scan(), clearAbove: swingTop ?? tempoTop, primitives
+    });
     emitOccurrenceLabel(m, staffTop, primitives);
   }
 

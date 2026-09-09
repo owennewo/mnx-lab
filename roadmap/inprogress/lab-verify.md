@@ -909,3 +909,27 @@ level. New packs have one layer/take per root and up to eight-second tails.
 Source/output hashes and declarations are preserved alongside each pack.
 No scenario golden or verification record changed; new presets still need the
 listener's judgement.
+
+## Swing feel — 2026-09-09
+
+Owner: [core-swing-feel.md](../complete/core-swing-feel.md). One **never-seen**
+scenario, `lab/11-rhythm/05-swing-feel`, and no moved golden — swing is opt-in
+per document, so every existing engraving and every existing
+`expected.performance.json` is byte-identical (the whole corpus regenerates
+clean, which is itself the check that the metric-axis warp is inert without a
+declaration).
+
+**What a reviewer should look for.** The same eight eighth notes in all four
+bars — nothing in the written notation may differ between them. Over bar 1, in
+all three views, the equation `♪♪ = ⌐3¬ ♩♪` sitting **above** the `♩ = 120`
+metronome mark and clear of it. Over bar 2, **nothing**: it inherits bar 1's
+feel and a restatement is not a marking. Over bar 3, `♪♪ = ♪. ♪` — a dotted
+eighth and a sixteenth, no bracket. Over bar 4, the word `Straight`.
+
+In the performance evidence: every bar exactly one whole note long, every
+downbeat on its quarter, and the offbeats at `1/6`/`5/12`/`2/3`/`11/12` in bar
+1, at `3/16` past each beat in bar 3, and evenly in bar 4. `written[]`
+`metricOffset`/`metricDuration` must be identical in all four bars — a feel
+changes how notes are played, never what they are. Bar 1's numbers are
+independently checkable against Guitar Pro: alphaTab plays `Triplet8th` as a
+quarter-triplet plus an eighth-triplet.

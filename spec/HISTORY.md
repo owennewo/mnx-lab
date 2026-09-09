@@ -110,12 +110,20 @@ The downloaded schema enforces the core concepts of the MNX format:
 
 ## Extension schema
 
-`mnx-lab-extensions.schema.json` (**v6**) holds everything this project carries that MNX cannot
+`mnx-lab-extensions.schema.json` (**v6.3**) holds everything this project carries that MNX cannot
 express, under the single vendor key `_x.mnxLab`. It is a `$defs` library, not a document schema:
 `spec/tools/compile-validator.mjs` compiles three sub-validators from it (`note-ext`, `part-ext`,
 `global-measure-ext`) and consumers walk the document. Register + rationale:
 [docs/mnx-extensions.md](../docs/mnx-extensions.md).
 
+- **v6.3 (2026-09-09)** — additive: `swing` on the global measure, plus the `note-value` def
+  it needs. A ratio (`[first, second]`) on a unit, mirroring MusicXML 3.1's `<sound><swing>`
+  rather than any application's named-feel enum — the seven names Guitar Pro and Soundslice
+  offer are six ratios at two units, and alphaTab's MusicXML importer maps between them the
+  same way. Persists until another measure declares one; `[1, 1]` cancels. No migration:
+  older documents simply declare nothing. `$id` stays `/v6`.
+- **v6.2 (2026-09-09)** — `work` and `encoding` at the document root (backfilled: the schema
+  carried the version, this log did not).
 - **v6.1 (2026-08-31)** — additive: `harmony.color` (the standard's `simple-color` shape).
   The renderer honored the field before the schema admitted it. `$id` stays `/v6`.
 - **v6 (2026-08-30)** — `technique.hammerOn`/`pullOff` re-merged into ONE `hammerPull`

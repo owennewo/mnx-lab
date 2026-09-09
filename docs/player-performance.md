@@ -28,6 +28,10 @@ items and missing kit sounds diagnose silence. The compiler is DOM-free.
   preserve written offsets. Nested tuplets multiply ratios recursively; a mismatch
   between child span and declared outer span diagnoses. The outer span determines
   where the following item starts.
+- [Swing](player-time.md#swing) warps the metric axis before anything else reads a
+  position, bar-locally and without changing bar length, so the transport, the MIDI
+  writer and the cursor inherit the feel with no code of their own. A swung source
+  segment carries a `scale`; a straight document emits none.
 - [Timing conventions](player-time.md) remain the source for grace budgets and holds.
   Default grace is stealFollowing. Stealing requires an adjacent pitched/kit event
   in the same performed voice; a rest-only gap or unrelated jump cannot supply it.

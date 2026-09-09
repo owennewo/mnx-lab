@@ -11,6 +11,7 @@ import { glyphBBox } from '../smufl/smufl.ts';
 import { computeBoundsSp, type BoundsSp } from '../render/bounds.ts';
 import { durationValue, tremoloDuration, tupletDuration, measureHeadingX } from './spacing.ts';
 import { chordSymbolDisplay } from '../../model/harmony.ts';
+import type { ResolvedSwing, SwingTimelineEntry } from '../../model/swing.ts';
 
 // ---------- Ink-measured placement (core-ink-measured-gaps.md, stage A) ----------
 
@@ -523,4 +524,190 @@ export function emitHarmonies(args: EmitHarmoniesArgs): void {
     });
     placeTextRun(primitives, firstNew, 0, staffTop, [...scan, ...primitives.slice(before, firstNew)], null);
   }
+}
+
+// ---------- Swing marking (`_x.mnxLab.swing`) ----------
+//
+// A feel is a rhythmic equation — "written like this, played like that" — so
+// the mark draws it rather than naming it: the written pair, an `=`, and the
+// realisation the ratio implies, under a tuplet bracket when the realisation
+// needs one. Naming it ("Swing") is available through the declaration's own
+// `text`, because the word is a convention and the ratio is the fact.
+//
+// It sits in the tempo band, ABOVE the metronome mark, and prints only where
+// the feel CHANGES (`model/swing.ts` decides that). A bar restating the feel
+// it inherited draws nothing, which is why a Guitar Pro import that stamps
+// every bar still engraves the marking once.
+const SWING_GLYPH_SCALE = TEMPO_GLYPH_SCALE;
+const SWING_TEXT_SIZE_SP = TEMPO_TEXT_SIZE_SP;
+const SWING_PAIR_GAP_SP = 0.16; // between the two notes of a group
+const SWING_GROUP_GAP_SP = 0.3; // around the "="
+const SWING_DOT_ADVANCE_SP = 0.45; // at scale 1, as the tempo mark's dots
+const SWING_BRACKET_RISE_SP = 0.3; // bracket over the tallest stem in its group
+const SWING_BRACKET_THICKNESS_SP = 0.12;
+const SWING_BRACKET_TICK_SP = 0.4;
+const SWING_TUPLET_SIZE_SP = 1.0;
+
+/** Note values, coarse to fine — stepping this list is how a realisation
+ *  halves or doubles a written value. */
+const SWING_NOTE_ORDER = [
+  'breve', 'whole', 'half', 'quarter', 'eighth', '16th', '32nd', '64th', '128th'
+];
+const stepValue = (base: string, by: number): string | null =>
+  SWING_NOTE_ORDER[SWING_NOTE_ORDER.indexOf(base) + by] ?? null;
+
+interface SwingMarkNote {
+  base: string;
+  dots: number;
+}
+interface SwingRealisation {
+  /** What is written: the pair, twice the unit. */
+  written: [SwingMarkNote, SwingMarkNote];
+  /** What is played. */
+  played: [SwingMarkNote, SwingMarkNote];
+  /** Tuplet number over the played group, when the realisation is one. */
+  tuplet: number | null;
+}
+
+/**
+ * The rhythm the ratio realises, or null when no ordinary notation says it.
+ *
+ * The pair spans two units and is redivided into `first + second` parts, so
+ * the parts are notatable exactly when that total is 3 (a triplet: the parts
+ * are units, bracketed) or 4 (dyadic: the parts are half-units, and three of
+ * them is a dotted unit). 5:3 and its like are real feels with no rhythmic
+ * spelling — those print their ratio as words instead of a wrong rhythm.
+ */
+function swingRealisation(swing: ResolvedSwing): SwingRealisation | null {
+  const base = swing.source.unit?.base ?? '';
+  if ((swing.source.unit?.dots ?? 0) !== 0) return null;
+  if (SWING_NOTE_ORDER.indexOf(base) < 0) return null;
+  const written: [SwingMarkNote, SwingMarkNote] = [
+    { base, dots: 0 },
+    { base, dots: 0 }
+  ];
+  const total = swing.first + swing.second;
+  if (total === 3n) {
+    const double = stepValue(base, -1);
+    if (!double) return null;
+    const part = (share: bigint): SwingMarkNote =>
+      share === 2n ? { base: double, dots: 0 } : { base, dots: 0 };
+    return { written, played: [part(swing.first), part(swing.second)], tuplet: 3 };
+  }
+  if (total === 4n) {
+    const half = stepValue(base, 1);
+    if (!half) return null;
+    const part = (share: bigint): SwingMarkNote =>
+      share === 3n ? { base, dots: 1 } : { base: half, dots: 0 };
+    return { written, played: [part(swing.first), part(swing.second)], tuplet: null };
+  }
+  return null;
+}
+
+/** Draws one note of the equation at `x`, returning the cursor past its ink. */
+function emitSwingNote(note: SwingMarkNote, x: number, y: number, primitives: Primitive[]): number {
+  const glyph = METRONOME_GLYPH_BY_BASE[note.base] ?? 'metNoteQuarterUp';
+  primitives.push({ kind: 'glyph', glyph, x, y, scale: SWING_GLYPH_SCALE, className: 'swing' });
+  let cursor = x + (glyphBBox(glyph)?.w ?? 1.33) * SWING_GLYPH_SCALE;
+  for (let d = 0; d < note.dots; d++) {
+    cursor += SWING_DOT_ADVANCE_SP * SWING_GLYPH_SCALE * 0.4;
+    primitives.push({
+      kind: 'glyph', glyph: 'metAugmentationDot', x: cursor, y,
+      scale: SWING_GLYPH_SCALE, className: 'swing'
+    });
+    cursor += SWING_DOT_ADVANCE_SP * SWING_GLYPH_SCALE;
+  }
+  return cursor;
+}
+
+/** How far a note's ink reaches above (negative) and below the baseline. */
+function swingNoteExtent(note: SwingMarkNote): { top: number; bottom: number } {
+  const bb = glyphBBox(METRONOME_GLYPH_BY_BASE[note.base] ?? 'metNoteQuarterUp');
+  if (!bb) return { top: -2, bottom: 0.5 };
+  return { top: -(bb.y + bb.h) * SWING_GLYPH_SCALE, bottom: -bb.y * SWING_GLYPH_SCALE };
+}
+
+export interface EmitSwingMarkArgs {
+  /** This measure's entry from `resolveSwingTimeline`. */
+  swing: SwingTimelineEntry | undefined;
+  m: EmitTempoMarkArgs['m'];
+  staffTop: number;
+  scan: readonly Primitive[];
+  primitives: Primitive[];
+  /** The metronome mark's box, so the feel stacks above it rather than
+   *  through it — both marks start at the bar's heading. */
+  clearAbove: BoundsSp | null | undefined;
+}
+
+/**
+ * The feel over the bar that declares it. Returns the box of the ink it drew
+ * (null when this bar declares nothing new), for the label pass to clear.
+ */
+export function emitSwingMark(args: EmitSwingMarkArgs): BoundsSp | null {
+  const { swing, m, staffTop, scan, primitives, clearAbove } = args;
+  if (!swing?.prints) return null;
+  const firstNew = primitives.length;
+  const x0 = measureHeadingX(m);
+  const y = 0;
+  const words = (text: string): BoundsSp | null => {
+    primitives.push({
+      kind: 'text', text, x: x0, y, font: 'body', size: SWING_TEXT_SIZE_SP,
+      weight: TEMPO_TEXT_WEIGHT, className: 'swing'
+    });
+    return placeTextRun(primitives, firstNew, 0, staffTop, scan, clearAbove);
+  };
+  // A cancellation resolves to nothing to play, but it is still a marking:
+  // the bar where a swing stops has to say so.
+  if (!swing.swing) return words(swing.declared?.text ?? 'Straight');
+  if (swing.swing.source.text) return words(swing.swing.source.text);
+  const realisation = swingRealisation(swing.swing);
+  if (!realisation) return words(`Swing ${swing.swing.first}:${swing.swing.second}`);
+
+  const notes = [...realisation.written, ...realisation.played];
+  const bottom = Math.max(...notes.map(n => swingNoteExtent(n).bottom), 0);
+  let cursor = emitSwingNote(realisation.written[0], x0, y, primitives);
+  cursor = emitSwingNote(realisation.written[1], cursor + SWING_PAIR_GAP_SP, y, primitives);
+  primitives.push({
+    kind: 'text', text: '=', x: cursor + SWING_GROUP_GAP_SP, y, font: 'body',
+    size: SWING_TEXT_SIZE_SP, weight: TEMPO_TEXT_WEIGHT, className: 'swing'
+  });
+  cursor += SWING_GROUP_GAP_SP + SWING_TEXT_SIZE_SP * 0.6 + SWING_GROUP_GAP_SP;
+  const playedFrom = cursor;
+  cursor = emitSwingNote(realisation.played[0], cursor, y, primitives);
+  cursor = emitSwingNote(realisation.played[1], cursor + SWING_PAIR_GAP_SP, y, primitives);
+  if (realisation.tuplet !== null)
+    emitSwingBracket(realisation, playedFrom, cursor, realisation.tuplet, primitives);
+  return placeTextRun(primitives, firstNew, bottom, staffTop, scan, clearAbove);
+}
+
+/** The `⌐3¬` over the played group: two rules with the number between them,
+ *  ticked down at both ends, clear of the stems it spans. */
+function emitSwingBracket(
+  realisation: SwingRealisation,
+  from: number,
+  to: number,
+  tuplet: number,
+  primitives: Primitive[]
+) {
+  const top = Math.min(...realisation.played.map(n => swingNoteExtent(n).top));
+  const line = top - SWING_BRACKET_RISE_SP;
+  const middle = (from + to) / 2;
+  const half = SWING_TUPLET_SIZE_SP * 0.45;
+  const rule = (x1: number, x2: number) =>
+    primitives.push({
+      kind: 'line', x1, y1: line, x2, y2: line,
+      thickness: SWING_BRACKET_THICKNESS_SP, className: 'swing'
+    });
+  rule(from, middle - half);
+  rule(middle + half, to);
+  for (const x of [from, to])
+    primitives.push({
+      kind: 'line', x1: x, y1: line, x2: x, y2: line + SWING_BRACKET_TICK_SP,
+      thickness: SWING_BRACKET_THICKNESS_SP, className: 'swing'
+    });
+  primitives.push({
+    kind: 'text', text: String(tuplet), x: middle, y: line + SWING_TUPLET_SIZE_SP * 0.35,
+    font: 'body', size: SWING_TUPLET_SIZE_SP, weight: TEMPO_TEXT_WEIGHT,
+    anchor: 'middle', className: 'swing'
+  });
 }
