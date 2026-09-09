@@ -52,6 +52,18 @@ proposals that name their campaign.
   Unrolled checkbox becomes a REPEATS row, and the mark idles bare at 0.28 with the card
   growing around it — the zoom pad's grammar, so the cluster reads as one family. Chrome
   only; verified hands-on over CDP like the pad was.
+- **[core-score-metadata.md](proposed/core-score-metadata.md)** — **what the piece is, and
+  what wrote the file.** MNX has no document metadata at all (root admits `mnx`/`global`/
+  `parts`/`scores`/`layouts`; `score.name` is a layout label), upstream has three open
+  issues and no design (#56, #267, #547), and locally title/artist ride the host wrapper
+  and are dropped on every save. Adds two root-level `_x.mnxLab` blocks drafting the
+  standard objects: `work` (title, subtitle, artist, album, `creators[{role,name}]`,
+  copyright, source, notes — Dublin-Core-mapped) and `encoding` (software, version, date —
+  stamped by the writer, never forwarded). Extension **v6.2**, additive, no upgrade hop.
+  Both converters read and write as far as each format allows (GPIF `<Score>` all eleven
+  fields; MusicXML `<work>`/`<identification>`/`<credit>`), the wrapper fields retire, the
+  viewer heading reads the document. The engine keeps drawing `score.name`; the upstream
+  bundle is a named follow-up.
 - **[core-player-webmidi.md](proposed/core-player-webmidi.md)** — campaign item 11: a second
   sink carrying the export's bounded channel plan on the wire; never the default.
 - **[core-player-sampled-guitar.md](proposed/core-player-sampled-guitar.md)** — campaign
