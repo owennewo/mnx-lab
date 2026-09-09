@@ -44,6 +44,10 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
+- **[core-score-clearance.md](proposed/core-score-clearance.md)** — global Clearance
+  display setting, 0–4 in half steps with today’s layout preserved at default 2;
+  seven structural padding/margin locations, independent of Staff and Space,
+  calibrated from tightest safe to deliberately generous.
 - **[core-player-element.md](proposed/core-player-element.md)** — campaign item 7, **the
   first reviewer milestone**: `<mnx-player>` over the written score with a
   performed-order table, playback highlight separate from selection, click-to-seek via the
