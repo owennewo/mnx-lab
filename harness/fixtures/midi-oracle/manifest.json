@@ -1,0 +1,277 @@
+{
+  "formatVersion": 1,
+  "tool": {
+    "name": "MuseScore Studio",
+    "version": "4.7.5",
+    "build": "3654226",
+    "platform": "Linux x86_64",
+    "release": "https://github.com/musescore/MuseScore/releases/tag/v4.7.5",
+    "appImageSha256": "a31b2da2dbcc2191bcc98beb7be5c15f2f517bedb3444def96fe3088b74d3a1e",
+    "arguments": [
+      "-o",
+      "OUTPUT.mid",
+      "INPUT.musicxml"
+    ],
+    "environment": "QT_QPA_PLATFORM=offscreen; fresh XDG config/data/cache per capture"
+  },
+  "cases": [
+    {
+      "id": "w3c/accidentals",
+      "xml": "converters/fixtures/w3c-comparisons/accidentals.musicxml",
+      "mnx": "scenarios/spec/accidentals/document.mnx.json",
+      "inputSha256": "dfc1474ed3a0ffeecf05d6df25be9aa0c6ebdd66ff512f2353eaa84ec94aa7a6",
+      "midi": "w3c--accidentals.mid",
+      "midiSha256": "8eb76d1b7985c7eccf64c5ecdb0dd905b90016db36b0f5cef1506030ef24e3c5"
+    },
+    {
+      "id": "w3c/beam-hooks",
+      "xml": "converters/fixtures/w3c-comparisons/beam-hooks.musicxml",
+      "mnx": "scenarios/spec/beam-hooks/document.mnx.json",
+      "inputSha256": "3b1610e8cd2dd23c08894fc8d4e53197bd7295f1a8e9ebed67c3b99eeb752025",
+      "midi": "w3c--beam-hooks.mid",
+      "midiSha256": "b453f32c96b060ab2a6f939f44c0e7b3311aa3081da589daab0d6c9b0004fbe1"
+    },
+    {
+      "id": "w3c/beams-across-barlines",
+      "xml": "converters/fixtures/w3c-comparisons/beams-across-barlines.musicxml",
+      "mnx": "scenarios/spec/beams-across-barlines/document.mnx.json",
+      "inputSha256": "3ab8746b4a92b06c91fc1cf55fded1099e511e8b89c01fe9575a6e80223d5fc8",
+      "midi": "w3c--beams-across-barlines.mid",
+      "midiSha256": "f16783f69e6dd08ee54a4e41120061abd98f2e94207dd3867ce7973159b88330"
+    },
+    {
+      "id": "w3c/beams-inner-grace-notes",
+      "xml": "converters/fixtures/w3c-comparisons/beams-inner-grace-notes.musicxml",
+      "mnx": "scenarios/spec/beams-inner-grace-notes/document.mnx.json",
+      "inputSha256": "793d4e125ce35e41a87f504e245aa0294756079e280504649ec1aaeaa5312c35",
+      "midi": "w3c--beams-inner-grace-notes.mid",
+      "midiSha256": "b75a370d0304f2aa047d9bcfebe859509eb5579f602915f950278ebae5405e2e",
+      "importedEvidence": "w3c--beams-inner-grace-notes.import.json",
+      "importedSha256": "8ed3414953a2b4cd1e256ec11a31b4243b02176c28c43b82680517a180227a29"
+    },
+    {
+      "id": "w3c/beams-secondary-beam-breaks",
+      "xml": "converters/fixtures/w3c-comparisons/beams-secondary-beam-breaks.musicxml",
+      "mnx": "scenarios/spec/beams-secondary-beam-breaks/document.mnx.json",
+      "inputSha256": "83a95be623a436ad994bac4b9fceb4427ac67d875e953ee5f92f6b847dfa2743",
+      "midi": "w3c--beams-secondary-beam-breaks.mid",
+      "midiSha256": "45ae18d5f3ed98b888e9d69c15622341eadff12058a823683269c27cc60c1dc8"
+    },
+    {
+      "id": "w3c/beams",
+      "xml": "converters/fixtures/w3c-comparisons/beams.musicxml",
+      "mnx": "scenarios/spec/beams/document.mnx.json",
+      "inputSha256": "253f87790b21065f344171a53aed9edb02fba3a6ddc4f2b56c0bcc785de82b0f",
+      "midi": "w3c--beams.mid",
+      "midiSha256": "53df03547bc2e8eff9c7f08b7d01d31668a4a0a86827055d71509458d8f1ceb3"
+    },
+    {
+      "id": "w3c/dotted-notes",
+      "xml": "converters/fixtures/w3c-comparisons/dotted-notes.musicxml",
+      "mnx": "scenarios/spec/dotted-notes/document.mnx.json",
+      "inputSha256": "629525a9bdaec2b679520526732c3b5612b13a984188aa572bb7ab31342cfee7",
+      "midi": "w3c--dotted-notes.mid",
+      "midiSha256": "ec8e5a4fe48a433df98783c4dfdaf304059a9d436c121b2ba91954935442b521"
+    },
+    {
+      "id": "w3c/hello-world",
+      "xml": "converters/fixtures/w3c-comparisons/hello-world.musicxml",
+      "mnx": "scenarios/spec/hello-world/document.mnx.json",
+      "inputSha256": "82790f1a6a79cbec68e66f9ae3c15fc528994120b4366f7774a068e2f2aff453",
+      "midi": "w3c--hello-world.mid",
+      "midiSha256": "2aa60acff1f85a42f5a0bc7abd4ae0aacfae58e4d5776acb99ccee10c4f98ece"
+    },
+    {
+      "id": "w3c/jumps-dal-segno",
+      "xml": "converters/fixtures/w3c-comparisons/jumps-dal-segno.musicxml",
+      "mnx": "scenarios/spec/jumps-dal-segno/document.mnx.json",
+      "inputSha256": "27ec36123cb5f0c9dcbb9c3c78b56bcea18bad55dbd92db91aff595da31dda38",
+      "midi": "w3c--jumps-dal-segno.mid",
+      "midiSha256": "3aba58689016853edb9c37002d30c1bf996ddaf7d365abdedf5688d35e28718b",
+      "importedEvidence": "w3c--jumps-dal-segno.import.json",
+      "importedSha256": "9ba51cafa4f0608f96cb422319966a1fbd274534af40380b24fab44a31637a7a"
+    },
+    {
+      "id": "w3c/jumps-ds-al-fine",
+      "xml": "converters/fixtures/w3c-comparisons/jumps-ds-al-fine.musicxml",
+      "mnx": "scenarios/spec/jumps-ds-al-fine/document.mnx.json",
+      "inputSha256": "91f400e308e7cddbd0f947263780b09f044009aaba42f6737ecbadd970d05ce8",
+      "midi": "w3c--jumps-ds-al-fine.mid",
+      "midiSha256": "3aba58689016853edb9c37002d30c1bf996ddaf7d365abdedf5688d35e28718b",
+      "importedEvidence": "w3c--jumps-ds-al-fine.import.json",
+      "importedSha256": "9ba51cafa4f0608f96cb422319966a1fbd274534af40380b24fab44a31637a7a"
+    },
+    {
+      "id": "w3c/key-signatures",
+      "xml": "converters/fixtures/w3c-comparisons/key-signatures.musicxml",
+      "mnx": "scenarios/spec/key-signatures/document.mnx.json",
+      "inputSha256": "d1d301822e893bd50497af6e553bb300cb3660097e80488a24c57fe9f5ecbc63",
+      "midi": "w3c--key-signatures.mid",
+      "midiSha256": "33c1079694d3ce149483624ae206b08504406f590e93fd569152d0d2328a38a5"
+    },
+    {
+      "id": "w3c/multiple-voices",
+      "xml": "converters/fixtures/w3c-comparisons/multiple-voices.musicxml",
+      "mnx": "scenarios/spec/multiple-voices/document.mnx.json",
+      "inputSha256": "4adcbf38f09ba0854b98aa1cca996833bc1497b1db0041440e6d9de6441233d4",
+      "midi": "w3c--multiple-voices.mid",
+      "midiSha256": "b4e2e4f4550bb076da9611c5d1abb37703aba348d32f9066ef34e6c69c431422"
+    },
+    {
+      "id": "w3c/ottavas-8va",
+      "xml": "converters/fixtures/w3c-comparisons/ottavas-8va.musicxml",
+      "mnx": "scenarios/spec/ottavas-8va/document.mnx.json",
+      "inputSha256": "c75ebcdbab72ffda01a597ec031c098cfb0947eb1c9487f5aa8ea638b6c26dea",
+      "midi": "w3c--ottavas-8va.mid",
+      "midiSha256": "77042366209978c377d5d06817b914a742006d8ee199c2374bca791ffbe5d2a7"
+    },
+    {
+      "id": "w3c/parts",
+      "xml": "converters/fixtures/w3c-comparisons/parts.musicxml",
+      "mnx": "scenarios/spec/parts/document.mnx.json",
+      "inputSha256": "bdaa1873cb9d17b3ccc000aa6483a8afa95e74a5b2655a062e870a0592a89829",
+      "midi": "w3c--parts.mid",
+      "midiSha256": "53d6f41fd56acf7ddc602ca08db46157889ef8fcecb3fe55c2f059062d7728e7"
+    },
+    {
+      "id": "w3c/repeats-alternate-endings-advanced",
+      "xml": "converters/fixtures/w3c-comparisons/repeats-alternate-endings-advanced.musicxml",
+      "mnx": "scenarios/spec/repeats-alternate-endings-advanced/document.mnx.json",
+      "inputSha256": "f48e36f3fe44f1fe84546f361cc9c13cc090b92d318c13cbfb8d06dc87d872ce",
+      "midi": "w3c--repeats-alternate-endings-advanced.mid",
+      "midiSha256": "408c55f95ad539708d044479e71db0ee215b2f0e3e4560d9eb05c4fda302e017",
+      "importedEvidence": "w3c--repeats-alternate-endings-advanced.import.json",
+      "importedSha256": "a34d37068b67b0d87b808681656a3b124434945ff9fc56a1bf4037209dac3822"
+    },
+    {
+      "id": "w3c/repeats-alternate-endings-simple",
+      "xml": "converters/fixtures/w3c-comparisons/repeats-alternate-endings-simple.musicxml",
+      "mnx": "scenarios/spec/repeats-alternate-endings-simple/document.mnx.json",
+      "inputSha256": "748ff7de9fc8a8dbfc2bb4fb1185043b838a0c270014d9476c705c39f6646c01",
+      "midi": "w3c--repeats-alternate-endings-simple.mid",
+      "midiSha256": "fb36dd3bb148398e52c27502deef1b924038bc25bbe9e2631465daa3ecbe895d",
+      "importedEvidence": "w3c--repeats-alternate-endings-simple.import.json",
+      "importedSha256": "a35e9ebce5e9cf2211acab89c110dde0790fba26e7c65c18bd693a2bf2272d5f"
+    },
+    {
+      "id": "w3c/repeats-implied-start-repeat",
+      "xml": "converters/fixtures/w3c-comparisons/repeats-implied-start-repeat.musicxml",
+      "mnx": "scenarios/spec/repeats-implied-start-repeat/document.mnx.json",
+      "inputSha256": "e91eae0c6bd0c31047f4f7cf093d4d997eb4146e2440917f424260ceaf62f98f",
+      "midi": "w3c--repeats-implied-start-repeat.mid",
+      "midiSha256": "c478db1aa2fd7717da4ec748efb3b4141791768d22658ea83ea5a125b4cbb808"
+    },
+    {
+      "id": "w3c/repeats-more-once-repeated",
+      "xml": "converters/fixtures/w3c-comparisons/repeats-more-once-repeated.musicxml",
+      "mnx": "scenarios/spec/repeats-more-once-repeated/document.mnx.json",
+      "inputSha256": "9ccdc58bfa3cd4fc8903dc6ae21c4b24c4e914de795c53524dad208ddc1b32ef",
+      "midi": "w3c--repeats-more-once-repeated.mid",
+      "midiSha256": "6d5c98fea6e9e7dc2b085eea266535c5e03dc928da6e39f04a9723e91dd71a2b"
+    },
+    {
+      "id": "w3c/repeats",
+      "xml": "converters/fixtures/w3c-comparisons/repeats.musicxml",
+      "mnx": "scenarios/spec/repeats/document.mnx.json",
+      "inputSha256": "4c7e60aa8a48841cac60f327e2f6f6ebcb71ebe969b2ccac1a11eae0857dd174",
+      "midi": "w3c--repeats.mid",
+      "midiSha256": "c478db1aa2fd7717da4ec748efb3b4141791768d22658ea83ea5a125b4cbb808"
+    },
+    {
+      "id": "w3c/slurs-chords",
+      "xml": "converters/fixtures/w3c-comparisons/slurs-chords.musicxml",
+      "mnx": "scenarios/spec/slurs-chords/document.mnx.json",
+      "inputSha256": "1d4f4d73b622891617405157c7b9b54dea53b3403423bc6f61c185666b7c5ace",
+      "midi": "w3c--slurs-chords.mid",
+      "midiSha256": "ce3ba9c88613c8437d040eb8e648c13eb922697e41cdc318bbf82b59710f9216"
+    },
+    {
+      "id": "w3c/slurs-targeting-specific-notes",
+      "xml": "converters/fixtures/w3c-comparisons/slurs-targeting-specific-notes.musicxml",
+      "mnx": "scenarios/spec/slurs-targeting-specific-notes/document.mnx.json",
+      "inputSha256": "98fbecd9761fb40e80d9c041399e6ca2a887d607f0a168c40e6c2cf36aa2bed6",
+      "midi": "w3c--slurs-targeting-specific-notes.mid",
+      "midiSha256": "8ce12b137ea96a1704af38306a75c270da6ad944cc773605d87fae99e32c0170"
+    },
+    {
+      "id": "w3c/slurs",
+      "xml": "converters/fixtures/w3c-comparisons/slurs.musicxml",
+      "mnx": "scenarios/spec/slurs/document.mnx.json",
+      "inputSha256": "92c722a539641d1a2f43eca6af9fc01d3a3645a243bf24affb48907a5c23eb9a",
+      "midi": "w3c--slurs.mid",
+      "midiSha256": "bfeec4ac0a59ce9421442304eb333bdb47447095680a3514f690b1dc6498ef7a"
+    },
+    {
+      "id": "w3c/three-note-chord-and-half-rest",
+      "xml": "converters/fixtures/w3c-comparisons/three-note-chord-and-half-rest.musicxml",
+      "mnx": "scenarios/spec/three-note-chord-and-half-rest/document.mnx.json",
+      "inputSha256": "49051ca01dbf355ca67222daec16b92876b9f4ac5d1168e0eb6237d11f400810",
+      "midi": "w3c--three-note-chord-and-half-rest.mid",
+      "midiSha256": "278ddfef869e9de3b076576b4f46dba8c2659325addf18ae7339e79211cc8b8a"
+    },
+    {
+      "id": "w3c/ties",
+      "xml": "converters/fixtures/w3c-comparisons/ties.musicxml",
+      "mnx": "scenarios/spec/ties/document.mnx.json",
+      "inputSha256": "d9d6535e7740e1cf585d09b9f963fd370f74c7d050761895c5b160298b602acc",
+      "midi": "w3c--ties.mid",
+      "midiSha256": "b04a8704d8e5cf1304d92c80b8b36a98f38e022a3470bc4a06e8b8eff0c511cd"
+    },
+    {
+      "id": "w3c/time-signatures",
+      "xml": "converters/fixtures/w3c-comparisons/time-signatures.musicxml",
+      "mnx": "scenarios/spec/time-signatures/document.mnx.json",
+      "inputSha256": "bfa89e35d63abf7e84bc9de8d667825f7eca3cac9325628de274600ba6ae6b7b",
+      "midi": "w3c--time-signatures.mid",
+      "midiSha256": "925da2274282964fb96f66e3d3d5549c26496d472d36ba23a8e553cb116ab376"
+    },
+    {
+      "id": "w3c/tuplets",
+      "xml": "converters/fixtures/w3c-comparisons/tuplets.musicxml",
+      "mnx": "scenarios/spec/tuplets/document.mnx.json",
+      "inputSha256": "dae375674c4c044759c0d2759fb3edb692effd73545eb734f1b3ff7972691ac6",
+      "midi": "w3c--tuplets.mid",
+      "midiSha256": "67dde08fc9a36b8492cffc29330568038b93624b999c3d26d9d72ef5e9a8cc22"
+    },
+    {
+      "id": "w3c/two-bar-c-major-scale",
+      "xml": "converters/fixtures/w3c-comparisons/two-bar-c-major-scale.musicxml",
+      "mnx": "scenarios/spec/two-bar-c-major-scale/document.mnx.json",
+      "inputSha256": "2ee5a4b9b9f136a8428bfeeb19581322cbd729c5c49ba9836ef47b15937da074",
+      "midi": "w3c--two-bar-c-major-scale.mid",
+      "midiSha256": "69e978050ad5dde7e34307853b3d0876fba533639ed3ce734fdc6ec01b369701"
+    },
+    {
+      "id": "converter/House-of-the-Rising-Sun",
+      "xml": "converters/fixtures/House-of-the-Rising-Sun.xml",
+      "mnx": "converters/fixtures/House-of-the-Rising-Sun.mnx.json",
+      "inputSha256": "c815cc01b3cc53dc60f12a4510411b1cbc4fd13d41d58fc544436b2e1b8a8e99",
+      "midi": "converter--House-of-the-Rising-Sun.mid",
+      "midiSha256": "7099a16f4ee19fe7b166d769e6f4ba3626fbb703e46c28a42771032c166acbdf"
+    },
+    {
+      "id": "converter/Sun-did-glide",
+      "xml": "converters/fixtures/Sun-did-glide.xml",
+      "mnx": "converters/fixtures/Sun-did-glide.mnx.json",
+      "inputSha256": "350d4e50f161810dd32a173a45224f63ea4ffa6d65cf73c28144f0efc2203d94",
+      "midi": "converter--Sun-did-glide.mid",
+      "midiSha256": "eea12132eef909ea4f2b2f945d52bdd2c9d7a24db3717acbf211d26cc02c8c1b"
+    },
+    {
+      "id": "converter/Triplets-and-graces",
+      "xml": "converters/fixtures/Triplets-and-graces.xml",
+      "mnx": "converters/fixtures/Triplets-and-graces.mnx.json",
+      "inputSha256": "c1c6f27dc5882a114437dac96e112db72b6ad4c22da22285af9458ddfae4de6e",
+      "midi": "converter--Triplets-and-graces.mid",
+      "midiSha256": "6d2f857a12c60640699ec807ece8b5c2508b6a19ed644c7f5b0a0eae702bfa90"
+    },
+    {
+      "id": "converter/Vestapol",
+      "xml": "converters/fixtures/Vestapol.xml",
+      "mnx": "converters/fixtures/Vestapol.mnx.json",
+      "inputSha256": "b3534d09cce3315f4f2fd09e1aa225be6742cb0d98c0214585862895fd7f0fe6",
+      "midi": "converter--Vestapol.mid",
+      "midiSha256": "ba42bd3de62e3634dc9386035871d2f46a5a0df045056b1fe073eca84142049f"
+    }
+  ]
+}

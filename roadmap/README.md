@@ -44,10 +44,7 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-player-midi-oracle.md](proposed/core-player-midi-oracle.md)** — campaign item 9:
-  MuseScore or Verovio; **observable content compared strictly**, ambiguous bar order
-  reported as unobservable and timing aligned around interpretive shifts; a three-scenario experiment as soon as a tool is chosen, so the
-  writer is not its own only reader. **Blocked on a dev-environment decision.**
+
 - **[core-player-unrolled-view.md](proposed/core-player-unrolled-view.md)** — campaign
   item 10, **moved after the player**: an **occurrence-aware layout plan** (`planHorizontal`
   takes performed entries; every dependent index per occurrence; clef/key resolved at the
@@ -178,6 +175,11 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-player-midi-oracle.md](inprogress/core-player-midi-oracle.md)** — campaign item 9:
+  MuseScore or Verovio; **observable content compared strictly**, ambiguous bar order
+  reported as unobservable and timing aligned around interpretive shifts; a three-scenario experiment as soon as a tool is chosen, so the
+  writer is not its own only reader. MuseScore 4.7.5 selected; baseline 22/27 W3C observable strict matches.
+
 
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat

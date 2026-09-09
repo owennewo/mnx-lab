@@ -1,0 +1,47 @@
+{
+  "w3c/beams-inner-grace-notes": {
+    "owner": "external-tool",
+    "finding": "MuseScore imports B4 as an appoggiatura but writes a zero-length playback Event for it. Its MIDI omits pitch 71; MNX Lab plays the written grace. This is not accepted as a pitch match.",
+    "evidence": "The captured MuseScore import receipt includes zeroLengthPlaybackNotes:[71]. Grace timing is separately excluded; the missing pitch remains strict."
+  },
+  "w3c/jumps-dal-segno": {
+    "owner": "external-tool",
+    "finding": "The MusicXML contains sound segno/dalsegno directions, but the default MuseScore import has no Jump or Marker objects. MIDI plays the first five bars only; MNX Lab includes the D.S. return.",
+    "evidence": "Original MusicXML sound attributes and captured MuseScore import receipt with empty jumps/markers."
+  },
+  "w3c/jumps-ds-al-fine": {
+    "owner": "external-tool",
+    "finding": "The source contains segno, fine and dalsegno sound attributes; MuseScore imports the D.S. al Fine words without a playback Jump. Its MIDI omits the two return attacks.",
+    "evidence": "Original MusicXML navigation attributes and captured MuseScore import receipt with empty jumps/markers."
+  },
+  "w3c/repeats-alternate-endings-simple": {
+    "owner": "interpretation-difference",
+    "finding": "Three numbered endings with default repeat counts produce MuseScore pitches 72,76,72,67,72,72 versus MNX Lab 72,76,72,67. Both source encodings have uncounted backward repeats. MNX Lab's campaign contract uses two total visits; MuseScore follows a different ending/repeat interpretation.",
+    "evidence": "Three imported volta endings and two endRepeat values of 2; the raw MIDI and paired MNX retain the disagreement. No convention change is inferred solely from tool output."
+  },
+  "w3c/repeats-alternate-endings-advanced": {
+    "owner": "external-tool",
+    "finding": "After the default two-pass repeat and skipped third ending, MuseScore MIDI omits the final E5 that exists in its imported score. MNX Lab reaches that final bar. The loss is localized to MuseScore playback/export around the open ending; its internal cause is not yet established.",
+    "evidence": "Imported notePitches ends in 76 and repeatCounts is [2]; external MIDI stops after eight attacks while MNX Lab has nine."
+  },
+  "converter/House-of-the-Rising-Sun": {
+    "owner": "input-conversion-and-external-interpretation",
+    "finding": "The derived MusicXML serializes notation and TAB as separate sounding parts. MuseScore plays duplicate written pitches and realizes harmony symbols as additional accompaniment. MNX is a single-source score, so these extra notes are not normalized away.",
+    "evidence": "Two MusicXML parts, one with a TAB clef, repeated note pitches, harmony elements, and additional simultaneous MIDI pitches. Derived XML is not an independent authoring oracle."
+  },
+  "converter/Sun-did-glide": {
+    "owner": "input-conversion",
+    "finding": "The derived MusicXML contains separate notation and TAB parts and MuseScore plays both, duplicating attacks. The MNX compiler plays the single-source score. No blanket pitch deduplication is applied.",
+    "evidence": "MusicXML notation/TAB part split and raw MIDI duplicate pitch multiplicities."
+  },
+  "converter/Triplets-and-graces": {
+    "owner": "input-conversion",
+    "finding": "The exported notation and TAB parts both sound in MuseScore, so pitch multisets differ from the single-source MNX. This blocks direct grace/tuplet technique attribution for the full fixture until the input duplication is addressed.",
+    "evidence": "Two MusicXML parts, TAB clef, and doubled MIDI note attacks. Unmatched groups are counted as failures, not excluded."
+  },
+  "converter/Vestapol": {
+    "owner": "input-conversion-and-external-interpretation",
+    "finding": "MuseScore performs both notation and TAB parts of the derived XML and realizes its harmony symbols. The single-source MNX performance therefore differs in pitch multiplicity and added accompaniment. Harmonic and other technique comparisons are not independently attributable through this mismatched input.",
+    "evidence": "MusicXML part split and harmony elements, with duplicate/additional pitches retained in raw MIDI."
+  }
+}

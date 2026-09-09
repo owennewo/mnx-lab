@@ -1,0 +1,22 @@
+{
+  "notePitches": [
+    72,
+    76,
+    76,
+    74,
+    79,
+    79,
+    77,
+    76
+  ],
+  "zeroLengthPlaybackNotes": [],
+  "jumps": [],
+  "markers": [],
+  "repeatCounts": [
+    2
+  ],
+  "voltaEndings": [
+    "1,2",
+    "3"
+  ]
+}

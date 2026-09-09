@@ -168,7 +168,7 @@ run any time before 6.
 | 6 | [Transport](../complete/core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | complete |
 | 7 | [Player element, written view](../complete/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | complete; human review pending |
 | 8 | [Expression and technique](../complete/core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | complete; human performance review pending |
-| 9 | [MIDI oracle](../proposed/core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | proposed — **needs a dev-environment decision** |
+| 9 | [MIDI oracle](core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | implemented; validation and landing in progress |
 | 10 | [Unrolled engraving](../proposed/core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | proposed — after 7 |
 | 11 | [WebMIDI out](../proposed/core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | proposed — after reviewer items 1–10 |
 | 12 | [Sampled guitar](../proposed/core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | proposed — after reviewer items 1–10 |
@@ -453,3 +453,31 @@ The shipped viewer entry stays unchanged until item 7 consumes playback.
   workbench/review Listen, offline audio and Node package smoke passed. Goldens
   reproduced byte-identically after rebase; the implementation worktree was
   retired before the item moved to `complete/`.
+
+### Item 9 — independent MuseScore MIDI oracle (2026-09-09)
+
+- The user selected MuseScore CLI. Official Studio 4.7.5 is installed user-locally,
+  with its AppImage digest pinned. No runtime audio or npm dependency was added.
+- The three-score experiment preceded the full baseline: tuplets matched at
+  480 PPQ, simple voltas produced six versus four attacks, and D.S. al Fine
+  produced five versus seven. MuseScore import receipts locate missing jump
+  objects and zero-length grace playback. External behavior is evidence, not
+  automatic authority to change a convention.
+- The baseline is **22/27 W3C observable strict matches**, beside the engraving
+  oracle's 24/27; **0/4 converter fixture matches**. The latter exposes separate
+  sounding notation/TAB parts and, in two fixtures, chord accompaniment. These
+  extra attacks are retained as input/interpretation discrepancies. All nine
+  mismatches have pinned attribution; the advanced-volta internal cause remains
+  unresolved after localization to external playback/export.
+- Strict timing uses 1/64 quarter tolerance. Interpretive measures and alignment
+  gaps split timing; only independently unique matching content can re-anchor.
+  Bar fingerprints must also be unique inside other bars. Identical/silent bars
+  stay unobservable, and coverage counts expose exclusions and unmatched notes.
+- Independent raw MIDI and five imported-score receipts carry version/input/hash
+  provenance. Normal tests replay those recordings and fail on report movement
+  in either direction; the explicit live check re-runs the actual executable.
+- No item-3 convention changed: ordinary external gates end one tick early, while
+  our full gate remains intentional. No noncentral pitch bends were exported,
+  so no guitar-curve agreement is claimed. The [contract](../../docs/player-midi-oracle.md)
+  records unsupported coverage and the experiment's later-than-proposed timing.
+  No scenario golden or human approval changed.
