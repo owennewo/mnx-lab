@@ -48,7 +48,8 @@
     "refresh:catalog": "REFRESH_CATALOG=1 UPDATE_ROSTER=1 vitest run harness/conformance/roster.test.ts",
     "test": "vitest run",
     "deploy": "npm run build && wrangler deploy",
-    "update:traversal": "UPDATE_TRAVERSAL=1 vitest run harness/conformance/traversal.test.ts"
+    "update:traversal": "UPDATE_TRAVERSAL=1 vitest run harness/conformance/traversal.test.ts",
+    "smoke:audio": "node harness/verify/audio-smoke.mjs"
   },
   "dependencies": {
     "@fontsource/archivo": "^5.3.0",

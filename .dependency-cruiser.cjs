@@ -30,6 +30,12 @@ function layerRule(name, from, allowed) {
 
 module.exports = {
   forbidden: [
+    {
+      name: 'native-audio-only-at-browser-boundary',
+      severity: 'error',
+      from: { path: '^(src|worker|harness)/', pathNot: '^src/(audio/native|elements|entries)/|^harness/browser/' },
+      to: { path: '^src/audio/native/' }
+    },
     layerRule('model-is-the-floor', 'src/model', []),
     layerRule('engine-over-model', 'src/engine', ['src/model']),
     layerRule('audio-over-model', 'src/audio', ['src/model']),

@@ -165,7 +165,7 @@ run any time before 6.
 | 3 | [Timing and pitch contracts](../complete/core-player-timing-pitch.md) | `audio/time.ts` (rational arithmetic, tempo map, `secondsAt`); the pitch rule as tests over transposing parts, guitar clefs, ottavas and capo (**nothing shifts**); grace, fermata (incl. `duration` hints and cross-part sync) and tie conventions written down with numbers; the performance golden's format. | reviewer | conformance tests | complete |
 | 4 | [Audio backend spike](../complete/core-player-tone-spike.md) | Tone.js **versus a native Web Audio sink**, measured: Node import, browser Offline render, per-voice detune ramps, both embed formats' size, what Tone saves once the transport is ours. Output: a log entry and the `Sink` interface. | both | its findings | complete; native selected |
 | 5 | [Performance compiler and MIDI export](../complete/core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | complete; performance review pending |
-| 6 | [Transport](../proposed/core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | proposed |
+| 6 | [Transport](../proposed/core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | implemented; landing checks |
 | 7 | [Player element, written view](../proposed/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | proposed |
 | 8 | [Expression and technique](../proposed/core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | proposed |
 | 9 | [MIDI oracle](../proposed/core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | proposed — **needs a dev-environment decision** |
@@ -365,3 +365,37 @@ The conventions adopted for the compiler (lab choices, not new MNX requirements)
 - The legacy audio approximation is retired. The library exports compiler, exact
   time and MIDI writer; the [API/conventions](../../docs/player-performance.md) describe
   resource bounds and limits. No sound/transport or human verification is implied.
+
+### Item 6 — transport and native sink (2026-09-09)
+
+- Built the pure injected-clock transport and lazy native sine sink. The
+  [API/limits](../../docs/player-transport.md) document pause/resume, seek through
+  sustained/tied notes, rate-as-seek, loop re-strikes, written highlight lifetimes,
+  source-map snapshots and logical pitch transitions. The player UI remains item 7.
+- Exact rational anchors must survive a seek unchanged. The inverse clock's display
+  grid must not stop playback a fraction before the final release; completion uses
+  audio time. Delayed scheduler callbacks reconstruct current state rather than
+  replaying attacks missed while the tab was suspended.
+- Cancelling a future attack leaves its physical cleanup pending, but it must cease
+  to be a logical voice boundary immediately. Otherwise a replacement source ends
+  at the cancelled attack's old time. The offline smoke pins this regression, along
+  with preserving the already-scheduled portion of a ramp before cancellation.
+- Offline contexts also have `resume()`, but it cannot be used before rendering.
+  Unlock explicitly distinguishes them from live contexts. A supplied context is
+  host-owned; idle imports/construction are Node-safe. No runtime audio dependency.
+- The native fence is tested with actual dependency-cruiser rejection/admission.
+  Fake-clock conformance and the permanent `smoke:audio` buffer tests own the proof.
+  No scenario goldens or verification records changed; item 5's review debt remains.
+
+Measured on `8f40315` plus item 6, using the real embed configuration, retained
+exports and default Node gzip. Reproduce with `audio-bundle-cost.mjs`. Bytes:
+
+| Variant | IIFE raw | IIFE gzip | ESM raw | ESM gzip |
+|---|---:|---:|---:|---:|
+| Viewer baseline | 196,718 | 64,030 | 254,420 | 72,684 |
+| Viewer + complete native sink | 201,368 | 65,570 | 260,093 | 74,349 |
+| Viewer + compiler, transport, sink | 229,601 | 74,839 | 296,242 | 84,849 |
+
+The sink increment is 1,540/1,665 gzip bytes (IIFE/ESM); complete playback adds
+10,809/12,165. Both are bundled comparison variants, with no lazy-IIFE claim.
+The shipped viewer entry stays unchanged until item 7 consumes playback.

@@ -1,6 +1,6 @@
 # Transport — play, pause, seek and loop, with the cursor on the audio clock
 
-> **Status: proposed 2026-09-08, revised the same day.** Campaign:
+> **Status: implemented 2026-09-09; landing checks in progress.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 6. Needs items 4 and 5.
 
 ## Agreement block (campaign contract)
@@ -72,3 +72,10 @@ Use `audio/native/`, with no runtime audio dependency, behind the
 measured bundle baselines. Fence backend imports from pure audio/model/headless code,
 even though there is no third-party package to fence. Re-measure both embed formats
 with the complete implementation and own the permanent offline smoke.
+
+## Implementation
+
+The [transport and sink documentation](../../docs/player-transport.md) records the public
+API, resource bounds, generation cancellation, exact seek anchors, native ownership
+and permanent offline smoke. No runtime dependency or scenario evidence change.
+The complete sink and compiler/transport bundle costs are recorded in the campaign log.
