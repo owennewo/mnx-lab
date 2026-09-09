@@ -44,10 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-player-transport.md](proposed/core-player-transport.md)** — campaign item 6:
-  `audio/transport.ts` pure over an injected clock and sink; onsets **timestamped on the
-  audio clock**; seek reconstructs sustained notes and controller state; loops across ties;
-  rate change as a seek. Independently addressable voices, string-owned for fretted parts.
 - **[core-player-element.md](proposed/core-player-element.md)** — campaign item 7, **the
   first reviewer milestone**: `<mnx-player>` over the written score with a
   performed-order table, playback highlight separate from selection, click-to-seek via the
@@ -402,6 +398,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-player-transport.md](complete/core-player-transport.md)** — player campaign item 6,
+  complete 2026-09-09: pure audio-clock transport, seek/rate/loop reconstruction,
+  written-span notifications and a lazy native Web Audio sink. Fake-clock tests,
+  offline signal checks, backend fence and measured costs in both embed formats;
+  no runtime dependency. Player controls remain item 7.
 - **[core-player-performance.md](complete/core-player-performance.md)** — player campaign item 5,
   complete 2026-09-09: exact performance compiler, recursive note identities, bounded
   MIDI export and the full evidence review path. 32 performance/MIDI baselines await

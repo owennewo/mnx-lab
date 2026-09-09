@@ -1,6 +1,6 @@
 # Transport — play, pause, seek and loop, with the cursor on the audio clock
 
-> **Status: implemented 2026-09-09; landing checks in progress.** Campaign:
+> **Status: complete 2026-09-09.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 6. Needs items 4 and 5.
 
 ## Agreement block (campaign contract)
@@ -79,3 +79,8 @@ The [transport and sink documentation](../../docs/player-transport.md) records t
 API, resource bounds, generation cancellation, exact seek anchors, native ownership
 and permanent offline smoke. No runtime dependency or scenario evidence change.
 The complete sink and compiler/transport bundle costs are recorded in the campaign log.
+
+Implementation landed as `10189f9`; its worktree was retired before this completion
+move. Post-rebase checks: 1,427 tests, scenario checks, production build and offline
+audio smoke passed; goldens regenerated without changes. Library and embed smokes
+also passed. No human listening or performance-evidence approval is implied.
