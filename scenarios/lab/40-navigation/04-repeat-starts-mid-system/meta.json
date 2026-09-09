@@ -1,0 +1,38 @@
+{
+  "title": "Forward repeats that open a bar mid-system",
+  "description": "Two forward repeats that are not the first bar of a system, which no other scenario had. Bar 3 opens a repeat at an ordinary boundary: the `|:` IS that barline, so its thick stroke stands exactly where the plain barline would and no plain barline is drawn under it. Bar 5 opens a repeat immediately after bar 4's backward repeat — the `:||:` case, where both clusters are real ink and keep their own room. Pins the boundary the layout used to get wrong: the `|:` was placed after the content pad, which triples across the clearance ladder, so at wide clearance the cluster peeled away from the barline it was supposed to be, with a plain barline still drawn behind it.",
+  "bars": 6,
+  "tags": [
+    "navigation",
+    "repeats",
+    "barlines"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/repeat-start/"
+  ],
+  "coversDefs": [
+    "barline",
+    "barline-type",
+    "clef",
+    "clef-sign",
+    "event",
+    "global",
+    "measure-global",
+    "note",
+    "pitch",
+    "repeat-end",
+    "repeat-start",
+    "sequence",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "draft",
+  "unrolled": true
+}

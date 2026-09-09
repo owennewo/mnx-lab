@@ -3,7 +3,7 @@ import { resolveSwingTimeline } from '../../model/swing.ts';
 import type { PerformedEntry } from '../../model/passes.ts';
 import { clearanceSpacing, type ClearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
-import { measureHeadingX, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
+import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
@@ -1959,9 +1959,11 @@ function assembleSegment(
         if (m.repeatEnd) {
           // Backward repeat :| — dots + thin + thick (doubles as a final barline).
           emitRepeatEndStrokes(barX, gTop, gBottom, REPEAT_METRICS, primitives);
-        } else {
+        } else if (!repeatStartSuppliesBarline(plan.measures, i)) {
           // The GLOBAL measure owns the barline style; `isLast` only supplies
-          // the spec's default when the document is silent about it.
+          // the spec's default when the document is silent about it. A
+          // following `|:` at this boundary IS this barline, so it is not
+          // drawn twice.
           emitEndBarline({
             type: resolveBarlineType(mnx.global.measures[writtenIndex(plan, i)]?.barline, isLast),
             x: barX,

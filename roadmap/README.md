@@ -428,6 +428,17 @@ back up to `proposed/` the moment it is.
   complete 2026-09-09: `<mnx-player>` controls, performed-order table, separate playback
   ink and inspection, ordinal links, plain-DOM ESM/IIFE wiring and static `/verify`
   Listen. Lifecycle and D.S. smokes pass; existing performance evidence awaits human review.
+- **[core-repeat-start-barline.md](complete/core-repeat-start-barline.md)** — complete
+  2026-09-09, the day it was reported: a forward repeat was placed after the prefix's
+  *content pad*, which triples across the clearance ladder, so at wide clearance a
+  mid-piece `|:` peeled away from the barline it belongs to — with a plain barline still
+  drawn behind it. `|:` opens with a thick stroke standing where the ordinary barline
+  goes, so when its bar draws no prefix glyph the repeat IS that barline and the plain
+  one is suppressed; `:||:` and a declared double bar keep both clusters and their room.
+  No golden moved — all five corpus repeats opened a system with a clef and time
+  signature, which is why the bug survived — and one scenario now covers both arms,
+  registered in
+  [lab-verify.md](inprogress/lab-verify.md#a-forward-repeat-is-a-barline--2026-09-09).
 - **[core-heading-anchor.md](complete/core-heading-anchor.md)** — complete 2026-09-09, the
   day it was reported: every mark a bar prints above its own start (tempo, section,
   rehearsal, swing, tab capo) shares one anchor, and that anchor led `contentStartX` —

@@ -71,9 +71,18 @@ heading mark cannot precede its own barline whatever the geometry.
 `harness/conformance/heading-marks.test.ts` asserts both arms over the corpus
 under every combination of the two display switches.
 
-When a system opens with a repeat and no visible clef or signature, the repeat
-starts at the staff's left edge and replaces the separate system-start line.
-Packing and placement both omit the empty prefix padding.
+**A forward repeat is a barline.** `|:` opens with a thick stroke standing
+exactly where the ordinary barline goes, so when its bar draws no prefix glyph
+the repeat IS that barline: it sits at the bar's left edge and the plain barline
+is not drawn under it (`repeatStartSuppliesBarline`). That holds for a system
+opening — where it also replaces the separate system-start line — and for any
+bar mid-system. Packing and placement both omit the empty prefix padding.
+
+The exception is a boundary that already carries ink of its own: `:||:`, or a
+declared double or final bar before the repeat. Both clusters are real, so both
+keep their room and the pad stays. Left padded in the ordinary case, the cluster
+peeled away from its barline as clearance grew — the content pad triples across
+the ladder — and a plain barline was still drawn behind it.
 
 At a forward repeat, the shared section/tempo/capo heading anchor is the music
 content start, clearing the complete repeat cluster including its dots.

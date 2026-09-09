@@ -8,7 +8,7 @@ import { buildScoreJobs, layoutNotation } from './notation.ts';
 import { translatePrimitiveY } from '../primitives.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { anchorY, rowBoundariesSp } from './verticalDensity.ts';
-import { measureHeadingX, instrumentLabelInset, LABEL_PAD_SP } from './spacing.ts';
+import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP } from './spacing.ts';
 import { documentLyricLineIds, selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
@@ -494,7 +494,9 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       emitRepeatEndStrokes(barX, staffTop, staffBottom, REPEAT_METRICS, primitives);
       emitRepeatDots(barX, repeatEndDotDx(REPEAT_METRICS), staffTop, TAB_REPEAT_DOT_YS, primitives);
       emitRepeatTimes(m.repeatEnd.times, barX, staffTop, primitives);
-    } else {
+    } else if (!repeatStartSuppliesBarline(plan.measures, i)) {
+      // A following `|:` stands exactly here and opens with a thick stroke, so
+      // it IS this barline — drawing both doubles the ink.
       emitEndBarline({
         type: resolveBarlineType(gm.barline, isLast),
         x: m.x + m.width,

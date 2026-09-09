@@ -903,6 +903,8 @@ interface MeasureMetrics {
   clefTimelines: ClefAt[][];
   hasRepeatStart: boolean;
   repeatEnd: { times?: number } | null;
+  /** The measure's declared end-barline type, for the `:||:` question below. */
+  barlineType: string | undefined;
   hidden: boolean;
   multiRest: number | null;
   issues: string[];
@@ -1524,6 +1526,7 @@ export function planHorizontal(
       staves, rigid, spring, leadingSpring, clefTimelines,
       hasRepeatStart: !!globalMeasure.repeatStart,
       repeatEnd: globalMeasure.repeatEnd ?? null,
+      barlineType: globalMeasure.barline?.type,
       hidden: collapsed,
       multiRest,
       issues
@@ -1560,22 +1563,46 @@ export function planHorizontal(
     return Math.abs(m.keyFifths !== 0 ? m.keyFifths : m.cancelledKeyFifths);
   };
 
-  // With no visible prefix, an opening repeat is the system's left edge.
+  // A FORWARD REPEAT IS A BARLINE. When its bar draws no prefix glyph, the
+  // `|:` opens the bar and there is nothing for the content pad to hold it off
+  // — an ordinary barline is what it replaces, not something it follows. Left
+  // padded, the cluster peeled away from the barline as clearance grew (the
+  // pad triples across the ladder), which read as a repeat belonging to
+  // neither bar.
+  const bareRepeat = (m: MeasureMetrics, firstInSystem: boolean) =>
+    m.hasRepeatStart &&
+    !(display.clefs !== 'hide' && (firstInSystem || m.clefChanged)) &&
+    !(display.timeSignatures !== 'hide' && m.timeSigShow) &&
+    keySigGlyphs(m, firstInSystem) === 0;
+
+  /** Ink the PREVIOUS bar closes with that a `|:` cannot stand in for: another
+   *  repeat (`:||:`) or a declared barline that means something (a double bar
+   *  at a section end). Both clusters draw, so both need their own room. */
+  const previousClosesWithInk = (index: number): boolean => {
+    const previous = metrics[index - 1];
+    if (!previous) return false;
+    return (
+      previous.repeatEnd !== null ||
+      (previous.barlineType !== undefined && previous.barlineType !== 'regular')
+    );
+  };
+
   // Use the same padding decision in packing and final placement.
-  const prefixLeftPad = (m: MeasureMetrics, firstInSystem: boolean) =>
-    firstInSystem && m.hasRepeatStart && display.clefs === 'hide' &&
-      !(display.timeSignatures !== 'hide' && m.timeSigShow) && keySigGlyphs(m, firstInSystem) === 0
+  const prefixLeftPad = (m: MeasureMetrics, firstInSystem: boolean, index: number) =>
+    // A bar opening a system has the previous bar's barline a row away, so
+    // only a mid-system neighbour can contest the space.
+    bareRepeat(m, firstInSystem) && (firstInSystem || !previousClosesWithInk(index))
       ? 0
       : contentLeftPad + (firstInSystem ? startBarlinePad : 0);
 
   // The prefix's PADS are air; its glyph SLOTS are ink and scale with the ink
   // ratio (the packing snapshot is updated after ink pricing).
-  const prefixWidth = (m: MeasureMetrics, firstInSystem: boolean, ink = 1) => {
+  const prefixWidth = (m: MeasureMetrics, firstInSystem: boolean, index: number, ink = 1) => {
     const showClef = display.clefs !== 'hide' && (firstInSystem || m.clefChanged);
     const showTimeSig = display.timeSignatures !== 'hide' && m.timeSigShow;
     const keySigCount = keySigGlyphs(m, firstInSystem);
     return (
-      prefixLeftPad(m, firstInSystem) +
+      prefixLeftPad(m, firstInSystem, index) +
       (showClef ? clefSlot(ink) : 0) +
       (keySigCount ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP * ink + keySigRightPad : 0) +
       (showTimeSig ? timeSlot(ink) : 0) +
@@ -1595,8 +1622,8 @@ export function planHorizontal(
         ? []
         : [{
             index: i,
-            prefixFirst: prefixWidth(m, true),
-            prefixRest: prefixWidth(m, false),
+            prefixFirst: prefixWidth(m, true, i),
+            prefixRest: prefixWidth(m, false, i),
             rigid: m.rigid,
             spring: m.spring,
             lead: m.leadingSpring,
@@ -1668,8 +1695,8 @@ export function planHorizontal(
   if (inkRatio !== 1) {
     for (const entry of packing.measures) {
       const m = metrics[entry.index];
-      entry.prefixFirst = prefixWidth(m, true, inkRatio);
-      entry.prefixRest = prefixWidth(m, false, inkRatio);
+      entry.prefixFirst = prefixWidth(m, true, entry.index, inkRatio);
+      entry.prefixRest = prefixWidth(m, false, entry.index, inkRatio);
       entry.rigid = m.rigid;
       entry.spring = m.spring / densityH;
       entry.lead = m.leadingSpring / densityH;
@@ -1701,7 +1728,7 @@ export function planHorizontal(
       const showTimeSig = display.timeSignatures !== 'hide' && m.timeSigShow;
       const keySigCount = keySigGlyphs(m, firstInSystem);
 
-      const clefX = x + prefixLeftPad(m, firstInSystem);
+      const clefX = x + prefixLeftPad(m, firstInSystem, i);
       const keySigX = clefX + (showClef ? clefSlot(inkRatio) : 0);
       const keySigWidth = keySigCount
         ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP * inkRatio + keySigRightPad
@@ -1959,6 +1986,26 @@ const HEADING_TIME_SIG_LEAD_SP = 1.25;
  * `m.x` is a floor, never a placement: a heading mark cannot precede its own
  * barline whatever the geometry.
  */
+/**
+ * True when the NEXT measure's forward repeat supplies THIS measure's end
+ * barline. `|:` opens with a thick stroke standing exactly where the ordinary
+ * barline would go, so drawing both doubles the ink at the boundary — and a
+ * repeat that follows its own barline is not what a repeat looks like.
+ *
+ * Keyed on the rendered neighbour, so performed order (where a bar's successor
+ * is whatever the traversal reached next) asks the same question as written.
+ */
+export function repeatStartSuppliesBarline(
+  measures: readonly MeasurePlan[],
+  index: number
+): boolean {
+  const measure = measures[index];
+  const next = measures[index + 1];
+  if (!measure || !next || next.hidden) return false;
+  if (next.row !== measure.row) return false; // a row away is not a boundary
+  return Boolean(next.repeatStart) && next.repeatStartX === next.x;
+}
+
 export function measureHeadingX(m: MeasureHeading): number {
   // The content anchor already clears the complete repeat cluster and its dots.
   if (m.repeatStart) return m.contentStartX;

@@ -994,3 +994,25 @@ signature may have moved at all; if one did, the prefix arm of the rule was
 touched and should not have been. The check that matters most is the barline: no
 mark may begin left of the barline of the bar it names, in any view, at any
 display setting.
+
+## A forward repeat is a barline — 2026-09-09
+
+Owner: [core-repeat-start-barline.md](../complete/core-repeat-start-barline.md).
+One **never-seen** scenario, `lab/navigation/repeat-starts-mid-system`, and **no
+moved golden** — every forward repeat in the corpus opened a system with a clef
+and a time signature, which is the arm that was already right. That absence is
+what let the bug live: nothing rendered a mid-system repeat start at all.
+
+**What a reviewer should look for.** Six whole notes, six bars, one system.
+Bar 3 opens a repeat at an ordinary boundary: exactly ONE cluster there —
+thick stroke, thin stroke, two dots — with **no plain barline behind the thick
+stroke**, and the thick stroke standing where bar 2's barline would have been,
+not a gap to its right. Bars 4|5 are the other arm, `:||:`: bar 4's backward
+repeat (dots, thin, thick) and bar 5's forward repeat (thick, thin, dots) as two
+separate clusters with clear air between them — they must NOT be merged or
+overlapping. Bar 1 is the unchanged case: its `|:` follows the clef and the time
+signature, as it always did. Bar 6 closes with a final barline.
+
+Worth flipping the clearance control while reviewing: the bar-3 cluster must stay
+welded to its barline at every level, which is the whole point — at wide
+clearance it used to drift up to 1.8sp clear of it.
