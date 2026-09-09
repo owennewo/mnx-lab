@@ -1,6 +1,11 @@
 # Beam geometry — shorter beamed stems, beams that sit on the staff, and a flat-beam style
 
-> **Status: proposed (2026-09-09).** Raised from a side-by-side of a Guitar Pro score
+> **Status: BUILT 2026-09-09**, all three items, the same day it was proposed. Every
+> beamed golden moved and the batch is registered in
+> [lab-verify.md](../inprogress/lab-verify.md#beam-geometry--2026-09-09). Three
+> corrections to the proposal as written are recorded in *What building it taught*.
+>
+> Raised from a side-by-side of a Guitar Pro score
 > against Soundslice's engraving of the same file. Beams themselves are done
 > ([core-musicxml-beams.md](../inprogress/core-musicxml-beams.md); inference by position
 > landed 2026-09-09) — this doc owns the *geometry* of a beamed group, which no doc has
@@ -64,8 +69,8 @@ Constraints the change has to keep:
   not the primary. That is why the minimum rises with the level count.
 - **Cross-staff and mixed-direction groups** keep the current direction choice; only
   length changes.
-- **Grace beams** scale the same minimum by `GRACE_SCALE`; **tremolo bars** between two
-  written notes keep their own thickness and gap and take the same minimum rule.
+- **Grace beams** scale the same minimum by `GRACE_SCALE`. (Tremolo bars were listed
+  here in the proposal; see *What building it taught* for why they are not a caller.)
 - Flagged stems are untouched — `STEM_LENGTH_SP` stays the normal length everywhere else.
 
 This moves every golden with a beam in it. That is the point, and it is why the item is
@@ -118,6 +123,30 @@ field or be taught to the assist loop.
 - Item 3 changes no golden at its default and adds one option-aware harness test per
   view.
 - The three items land in order. Item 3 may not ship before item 1.
+
+## What building it taught
+
+- **One placement, three callers.** The three copies of the slant-and-slide code
+  (principal, grace, tuplet) collapsed into `placeBeamLine`, which takes the stems, the
+  normal and minimum lengths, the slant cap and an optional staff to settle on. Grace
+  beams pass everything at `GRACE_SCALE`. The tuplet's inner beam is drawn one level deep
+  whatever its durations, so it takes the one-beam minimum.
+- **Tremolos are not beamed groups.** The proposal listed tremolo bars as a fourth
+  caller. They are not: a multi-note tremolo's stems are flagged stems of normal length
+  with the bars floating between them, and nothing about a shortest stem applies. Left
+  alone.
+- **The snap nudge is up to 0.37sp, not a quarter.** A beam centre is settled when it
+  is within half a beam plus half a staff line of a line's centre (0.315sp); the widest
+  mid-space gap is therefore 1 − 2 × 0.315. The nudge is outward only, and only for
+  beams whose centre lies within that margin of the staff — everything else has nothing
+  to settle on. Only the anchor end is settled; the slant carries the far end.
+- **The scenario, as evidence.** `lab/rhythm/beamed-stem-lengths` pins the rule by
+  numbers, not by eye: `harness/conformance/beam-geometry.test.ts` asserts the shortest
+  stem per row is exactly 2.5 / 3 / 3.5 spaces from the head, that every primary beam
+  has at least one settled stem, that `beams: 'flat'` draws every beam horizontal on
+  principal, grace, tuplet and Both beams, and that the default is byte-identical to the
+  omitted option. Seventeen existing scenarios moved, three of them `verified`, all with
+  beam membership unchanged.
 
 ## Not this
 

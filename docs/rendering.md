@@ -80,3 +80,22 @@ a system share the resulting staff position. Gaps to other instruments and
 between systems retain their existing clearance.
 The affected Both-view engravings are recorded in the
 [verification ledger](../roadmap/inprogress/lab-verify.md#tighter-paired-notationtab-spacing-2026-09-08).
+
+## Beam geometry
+
+A beamed group's primary beam is placed by one shared rule, `placeBeamLine` in
+`src/engine/layout/notation.ts`, used by principal, grace and tuplet beams alike
+([roadmap/complete/core-beam-geometry.md](../roadmap/complete/core-beam-geometry.md)):
+every stem's ideal tip is the normal length (`STEM_LENGTH_SP`, one octave) from its
+head; the slant follows the two outer heads, capped at `BEAM_MAX_SLANT_SP`; the stem
+that would come out **shortest** is the anchor and lands on a per-level minimum —
+`BEAMED_STEM_MIN_SP` (2.5) under one beam, half a space more per deeper level, never
+longer than normal — so every other stem grows from there rather than the shortest
+being pushed out to the octave; and the beam then nudges **outward only** until it sits
+on, straddles or hangs from a staff line instead of floating mid-space (at most
+1 − 2 × the shared half-thickness, about 0.37sp; a beam clear of the staff is left
+alone). Flagged stems are untouched. `display.beams: 'flat'` sets the slant cap to zero —
+a viewer's house-style choice, never a document field and never taught to the assist loop.
+Multi-note tremolos are not beamed groups: their stems are flagged stems of normal
+length with the tremolo bars floating between them.
+

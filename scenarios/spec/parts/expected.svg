@@ -58,9 +58,9 @@
 <rect x="1174.8" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="1170" y1="288.384" x2="1170" y2="352.384" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1174.8" y="288.384" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="430.16" y1="315.072" x2="430.16" y2="368.384" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="498.16" y1="307.072" x2="498.16" y2="365.7168" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="566.16" y1="299.072" x2="566.16" y2="363.0512" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="634.16" y1="307.072" x2="634.16" y2="360.384" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="429.2" y1="368.384" x2="635.12" y2="360.384" stroke="currentColor" stroke-width="8" class="beam"></line>
+<line x1="430.16" y1="315.072" x2="430.16" y2="352.384" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="498.16" y1="307.072" x2="498.16" y2="349.7168" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="566.16" y1="299.072" x2="566.16" y2="347.0512" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="634.16" y1="307.072" x2="634.16" y2="344.384" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="429.2" y1="352.384" x2="635.12" y2="344.384" stroke="currentColor" stroke-width="8" class="beam"></line>
 </svg>

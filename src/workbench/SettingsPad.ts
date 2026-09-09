@@ -330,6 +330,7 @@ export class SettingsPad extends LitElement {
                   ${this.displayRow('title', 'Title', ['Show', 'Hide'])}
                   ${this.displayRow('barNumbers', 'Bar numbers', ['Every bar', 'Every system', 'Hide'])}
                   ${this.displayRow('instrumentNames', 'Instrument names', ['Every system', 'First system', 'Hide'])}
+                  ${this.displayRow('beams', 'Beams', ['Slanted', 'Flat'])}
                   <p class="help">Current verse uses the first used verse in the document’s verse order until playback supplies a selected verse.</p>
                   <p class="help">A system is one horizontal row of music, including notation and tab together in Both.</p>
                 </div>

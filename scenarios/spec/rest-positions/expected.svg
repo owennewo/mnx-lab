@@ -25,7 +25,7 @@
 <line x1="544.16" y1="210.688" x2="544.16" y2="264" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="609.6" y1="128" x2="609.6" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="614.4" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="427.04" y1="125.312" x2="427.04" y2="72" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="495.04" y1="133.312" x2="495.04" y2="80" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="426.08" y1="72" x2="496" y2="80" stroke="currentColor" stroke-width="8" class="beam"></line>
+<line x1="427.04" y1="125.312" x2="427.04" y2="88" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="495.04" y1="133.312" x2="495.04" y2="96" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="426.08" y1="88" x2="496" y2="96" stroke="currentColor" stroke-width="8" class="beam"></line>
 </svg>

@@ -18,9 +18,9 @@
 <text x="472.4" y="160" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m0.v0.e5"></text>
 <line x1="550.4" y1="128" x2="550.4" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="555.2" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="162.16" y1="154.688" x2="162.16" y2="208" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="258.96" y1="146.688" x2="258.96" y2="201.3472" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="326.96" y1="138.688" x2="326.96" y2="196.6736" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="394.96" y1="130.688" x2="394.96" y2="192" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="161.2" y1="208" x2="395.92" y2="192" stroke="currentColor" stroke-width="8" class="beam"></line>
+<line x1="162.16" y1="154.688" x2="162.16" y2="192" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="258.96" y1="146.688" x2="258.96" y2="185.3472" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="326.96" y1="138.688" x2="326.96" y2="180.6736" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="394.96" y1="130.688" x2="394.96" y2="176" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="161.2" y1="192" x2="395.92" y2="176" stroke="currentColor" stroke-width="8" class="beam"></line>
 </svg>

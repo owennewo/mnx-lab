@@ -544,9 +544,9 @@
 <rect x="1209.7248" y="1014.24" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="1204.9248" y1="1248.16" x2="1204.9248" y2="1312.16" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1209.7248" y="1248.16" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="435.5488" y1="573.632" x2="435.5488" y2="520.32" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="478.8944" y1="565.632" x2="478.8944" y2="512.32" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="434.5888" y1="520.32" x2="479.8544" y2="512.32" stroke="currentColor" stroke-width="8" class="beam"></line>
+<line x1="435.5488" y1="573.632" x2="435.5488" y2="536.32" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="478.8944" y1="565.632" x2="478.8944" y2="528.32" stroke="currentColor" stroke-width="1.92" class="stem"></line>
+<line x1="434.5888" y1="536.32" x2="479.8544" y2="528.32" stroke="currentColor" stroke-width="8" class="beam"></line>
 <text x="121.6" y="104" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Head</text>
 <text x="117.0496" y="949.28" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Turnaround</text>
 </svg>

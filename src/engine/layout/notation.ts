@@ -210,6 +210,12 @@ const STEM_LENGTH_SP = 3.5;
 const BEAM_THICKNESS_SP = 0.5;
 const BEAM_GAP_SP = 0.25;          // clear space between beam levels
 const BEAM_MAX_SLANT_SP = 1;       // total rise/fall cap across a group
+// Beamed groups may leave their shortest stem short of the octave: 2.5sp
+// under one beam, half a space more per deeper level (the inner beams stack
+// toward the heads), never longer than a normal stem
+// (roadmap/complete/core-beam-geometry.md).
+const BEAMED_STEM_MIN_SP = 2.5;
+const BEAMED_STEM_MIN_STEP_SP = 0.5;
 const BEAM_HOOK_LENGTH_SP = 1;
 const NOTEHEAD_WIDTH_SP = 1.18;
 const LEDGER_OVERHANG_SP = 0.4; // ledger extends this much beyond notehead each side
@@ -1107,6 +1113,9 @@ function assembleSegment(
   const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio, spacingMode } = args;
   const labelParts = originalSegment.staves.map((staff, s) => staff.sources.map(source => source.part).filter((part, index, parts) =>
     parts.indexOf(part) === index && !originalSegment.staves.slice(0, s).some(previous => previous.sources.some(source => source.part === part))));
+  // Beams slant with the outer heads by default; the flat house style is a
+  // pure display choice, never a document fact.
+  const beamSlantSp = display.beams === 'flat' ? 0 : BEAM_MAX_SLANT_SP;
   const segment = display.instrumentNames === undefined ? originalSegment : {
     ...originalSegment,
     labels: originalSegment.staves.map((_, s) => {
@@ -1720,6 +1729,7 @@ function assembleSegment(
           try {
             if (isGrace(event)) {
               emitGraceGroup({
+                beamSlantSp,
                 grace: event,
                 firstX: slot.x,
                 ink: plan.inkRatio,
@@ -1778,6 +1788,7 @@ function assembleSegment(
             }
             if (isTuplet(event)) {
               emitTupletGroup({
+                beamSlantSp,
                 tuplet: event,
                 firstX: slot.x,
                 ink: plan.inkRatio,
@@ -2059,7 +2070,7 @@ function assembleSegment(
 
   const loopEnd = primitives.length;
 
-  for (const run of beams.runs) emitBeamRun(run, primitives);
+  for (const run of beams.runs) emitBeamRun(run, primitives, beamSlantSp);
 
   emitSlursAndTies(segment, plan, curveAnchors, primitives);
 
@@ -2166,6 +2177,8 @@ function assembleSegment(
 /** Deferred stem of a beamed event, recorded during emission. */
 interface BeamedStem {
   stemX: number;
+  /** Top line of the staff the stem stands on, for beam snapping. */
+  staffTop: number;
   /** Notehead end of the stem (absolute y, anchor-corrected). */
   attachY: number;
   /** Extreme notehead centre on the tip side — the ideal tip extends from here. */
@@ -2394,28 +2407,97 @@ function buildBeamRuns(
 }
 
 
-function emitBeamRun(run: BeamRun, primitives: Primitive[]): void {
+/** Shortest stem a group `levels` beams deep may leave, at `scale`. */
+function beamedStemMin(levels: number, normal: number, scale = 1): number {
+  return Math.min(normal, (BEAMED_STEM_MIN_SP + BEAMED_STEM_MIN_STEP_SP * (levels - 1)) * scale);
+}
+
+interface BeamLineStem {
+  x: number;
+  /** Extreme notehead centre on the tip side — the ideal tip extends from here. */
+  baseTipY: number;
+}
+
+interface BeamLineOptions {
+  dir: 1 | -1;
+  /** Normal stem length — the outer stems target it and the slant follows them. */
+  normal: number;
+  /** The shortest stem the group may leave (`beamedStemMin`). */
+  min: number;
+  /** Total rise/fall cap across the group; 0 draws every beam flat. */
+  maxSlant: number;
+  /** Snap the primary beam to sit on, straddle or hang from a staff line
+   *  (top line at `staffTop`, one space per line). Omitted for beams that
+   *  have no staff to settle on. */
+  snap?: { staffTop: number; beamThickness: number };
+}
+
+/**
+ * Where a beamed group's primary beam runs, shared by principal, grace and
+ * tuplet beams (roadmap/complete/core-beam-geometry.md):
+ *
+ *   1. every stem's ideal tip is `normal` from its head;
+ *   2. the slant follows the two outer heads, capped at `maxSlant`;
+ *   3. the stem that would come out shortest is the anchor — it lands on
+ *      `min`, and every other stem grows from there. (The old rule let the
+ *      shortest stem reach `normal`, which is why beamed stems ran long.)
+ *   4. the beam then nudges outward, never inward, until it sits on,
+ *      straddles or hangs from a staff line rather than floating mid-space.
+ *
+ * Returns the beam line's centre y as a function of x.
+ */
+function placeBeamLine(stems: readonly BeamLineStem[], o: BeamLineOptions): (x: number) => number {
+  const { dir } = o;
+  const idealTip = (s: BeamLineStem) => s.baseTipY - dir * o.normal;
+  const first = stems[0];
+  const last = stems[stems.length - 1];
+  const span = last.x - first.x || 1;
+  const slant = Math.max(-o.maxSlant, Math.min(o.maxSlant, idealTip(last) - idealTip(first)));
+  const base = (x: number) => idealTip(first) + (slant * (x - first.x)) / span;
+  const deltas = stems.map(s => idealTip(s) - base(s.x));
+  let anchor = 0;
+  for (let i = 1; i < deltas.length; i++) {
+    if (dir === 1 ? deltas[i] < deltas[anchor] : deltas[i] > deltas[anchor]) anchor = i;
+  }
+  let shift = deltas[anchor] + dir * (o.normal - o.min);
+  if (o.snap) shift += beamSnapNudge(base(stems[anchor].x) + shift, dir, o.snap);
+  return x => base(x) + shift;
+}
+
+/**
+ * The outward nudge that takes a beam centre out of the middle of a staff
+ * space. A beam whose centre lies within `edge` of a line already sits on,
+ * straddles or hangs from it; one further in leaves a white sliver between
+ * itself and the line, and moves away from the heads to the nearer of the
+ * two settled positions. Beams clear of the staff have nothing to settle on.
+ */
+function beamSnapNudge(y: number, dir: 1 | -1, snap: { staffTop: number; beamThickness: number }): number {
+  const edge = snap.beamThickness / 2 + STAFF_LINE_THICKNESS_SP / 2;
+  const r = y - snap.staffTop;
+  if (r < -edge || r > STAFF_HEIGHT_SP + edge) return 0;
+  const frac = r - Math.floor(r);
+  const eps = 1e-9;
+  if (frac <= edge + eps || frac >= 1 - edge - eps) return 0;
+  return dir === 1 ? edge - frac : 1 - edge - frac;
+}
+
+function emitBeamRun(run: BeamRun, primitives: Primitive[], maxSlant: number): void {
   const stems = run.memberIds
     .map(id => run.stems.get(id))
     .filter((s): s is BeamedStem => s !== undefined);
   if (stems.length < 2) return;
 
   const dir = run.dir;
-  const idealTip = (s: BeamedStem) => s.baseTipY - dir * STEM_LENGTH_SP;
+  const levels = Math.max(1, ...run.segments.map(s => s.level), ...run.hooks.map(h => h.level));
+  const lineY = placeBeamLine(stems.map(s => ({ x: s.stemX, baseTipY: s.baseTipY })), {
+    dir,
+    normal: STEM_LENGTH_SP,
+    min: beamedStemMin(levels, STEM_LENGTH_SP),
+    maxSlant,
+    snap: { staffTop: stems[0].staffTop, beamThickness: BEAM_THICKNESS_SP }
+  });
   const first = stems[0];
   const last = stems[stems.length - 1];
-  const span = last.stemX - first.stemX || 1;
-
-  // Beam line: slant follows the outer noteheads (capped), then slides
-  // outward until every stem reaches at least full length.
-  const slant = Math.max(
-    -BEAM_MAX_SLANT_SP,
-    Math.min(BEAM_MAX_SLANT_SP, idealTip(last) - idealTip(first))
-  );
-  const base = (x: number) => idealTip(first) + (slant * (x - first.stemX)) / span;
-  const deltas = stems.map(s => idealTip(s) - base(s.stemX));
-  const shift = dir === 1 ? Math.min(...deltas) : Math.max(...deltas);
-  const lineY = (x: number) => base(x) + shift;
   // Deeper levels stack toward the noteheads.
   const levelY = (x: number, level: number) =>
     lineY(x) + dir * (level - 1) * (BEAM_THICKNESS_SP + BEAM_GAP_SP);
@@ -3217,6 +3299,8 @@ interface EmitGraceGroupArgs {
    *  note index) — container content is addressable now (campaign item 11b),
    *  and the RAW index is what `model/noteWalk.ts` counts. */
   keyFor?: (containerIndex: number, noteIndex: number) => string | undefined;
+  /** Total beam rise/fall cap across the group; 0 draws it flat. */
+  beamSlantSp: number;
 }
 
 /**
@@ -3229,7 +3313,7 @@ interface EmitGraceGroupArgs {
  * principal.
  */
 function emitGraceGroup(args: EmitGraceGroupArgs): void {
-  const { grace, firstX, ink, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
+  const { grace, firstX, ink, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor, beamSlantSp } = args;
   const rawIndex = new Map<MnxEvent, number>(grace.content.map((e, i) => [e, i]));
   const inner = grace.content.filter(e => !e.rest && (e.notes?.length ?? 0) > 0);
   if (inner.length === 0) return;
@@ -3346,18 +3430,18 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
 
   if (!beamed || stems.length < 2) return;
 
-  // Mini beam for the group — same shape as emitBeamRun, in the group's dir.
-  const idealTip = (s: GraceStem) => s.tipBaseY - dir * GRACE_STEM_LENGTH_SP;
+  // Mini beam for the group — placed by the shared rule, at grace scale.
   const first = stems[0];
   const last = stems[stems.length - 1];
-  const span = last.x - first.x || 1;
-  const maxSlant = BEAM_MAX_SLANT_SP * GRACE_SCALE;
-  const slant = Math.max(-maxSlant, Math.min(maxSlant, idealTip(last) - idealTip(first)));
-  const base = (x: number) => idealTip(first) + (slant * (x - first.x)) / span;
-  const deltas = stems.map(s => idealTip(s) - base(s.x));
-  const shift = dir === 1 ? Math.min(...deltas) : Math.max(...deltas);
-  const lineY = (x: number) => base(x) + shift;
+  const maxLevels = Math.max(...stems.map(s => s.levels));
   const beamThickness = BEAM_THICKNESS_SP * GRACE_SCALE;
+  const lineY = placeBeamLine(stems.map(s => ({ x: s.x, baseTipY: s.tipBaseY })), {
+    dir,
+    normal: GRACE_STEM_LENGTH_SP,
+    min: beamedStemMin(maxLevels, GRACE_STEM_LENGTH_SP, GRACE_SCALE),
+    maxSlant: beamSlantSp * GRACE_SCALE,
+    snap: { staffTop, beamThickness }
+  });
   const levelY = (x: number, level: number) =>
     lineY(x) + dir * (level - 1) * (beamThickness + BEAM_GAP_SP * GRACE_SCALE);
 
@@ -3381,7 +3465,6 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
     });
   };
   bar(first.x, last.x, 1);
-  const maxLevels = Math.max(...stems.map(s => s.levels));
   for (let level = 2; level <= maxLevels; level++) {
     for (let j = 0; j < stems.length - 1; j++) {
       if (stems[j].levels >= level && stems[j + 1].levels >= level) {
@@ -3566,6 +3649,8 @@ interface EmitTupletGroupArgs {
    *  note index) — container content is addressable now (campaign item 11b),
    *  and the RAW index is what `model/noteWalk.ts` counts. */
   keyFor?: (containerIndex: number, noteIndex: number) => string | undefined;
+  /** Total beam rise/fall cap across a beamed group; 0 draws it flat. */
+  beamSlantSp: number;
 }
 
 /**
@@ -3576,7 +3661,7 @@ interface EmitTupletGroupArgs {
  * `inner.multiple` number in a gap, as in the spec's reference engraving.
  */
 function emitTupletGroup(args: EmitTupletGroupArgs): void {
-  const { tuplet, firstX, ink, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
+  const { tuplet, firstX, ink, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor, beamSlantSp } = args;
   const cols = tupletColumns(tuplet, useAccidentalDisplay, keyFifths);
   const events = tuplet.content;
   if (events.length === 0) return;
@@ -3715,18 +3800,16 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
   // beam and no bracket draws (the beam plays that role).
   if (fullyBeamed && beamStems.length >= 2) {
     const dir = groupDir;
-    const idealTip = (st: InnerStem) => st.baseTipY - dir * STEM_LENGTH_SP;
     const first = beamStems[0];
     const last = beamStems[beamStems.length - 1];
-    const span = last.x - first.x || 1;
-    const slant = Math.max(
-      -BEAM_MAX_SLANT_SP,
-      Math.min(BEAM_MAX_SLANT_SP, idealTip(last) - idealTip(first))
-    );
-    const base = (x: number) => idealTip(first) + (slant * (x - first.x)) / span;
-    const deltas = beamStems.map(st => idealTip(st) - base(st.x));
-    const shift = dir === 1 ? Math.min(...deltas) : Math.max(...deltas);
-    const lineY = (x: number) => base(x) + shift;
+    // One beam draws whatever the inner durations, so one level's minimum.
+    const lineY = placeBeamLine(beamStems, {
+      dir,
+      normal: STEM_LENGTH_SP,
+      min: beamedStemMin(1, STEM_LENGTH_SP),
+      maxSlant: beamSlantSp,
+      snap: { staffTop, beamThickness: BEAM_THICKNESS_SP }
+    });
     for (const st of beamStems) {
       primitives.push({
         kind: 'line',
@@ -4090,7 +4173,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
 
     if (beamDir !== null) {
       // Beamed: the run draws the stem out to the shared beam line.
-      deferredStem = { stemX, attachY, baseTipY, fill, colorClass };
+      deferredStem = { stemX, staffTop, attachY, baseTipY, fill, colorClass };
     } else {
       primitives.push({
         kind: 'line',

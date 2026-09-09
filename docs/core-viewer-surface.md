@@ -293,6 +293,7 @@ remain independent.
 | `scoreTitle` | `score-title` | `show`, `hide` | Show |
 | `barNumbers` | `bar-numbers` | `every-bar`, `every-system`, `hide` | Only declared measure numbers (legacy) |
 | `instrumentNames` | `instrument-names` | `every-system`, `first-system`, `hide` | Existing score-layout labels (legacy) |
+| `beams` | `beams` | `slanted`, `flat` | Slanted: beams follow the outer noteheads |
 | `selectedVerse` | `selected-verse` | Lyric-line ID | First used verse in established order |
 
 `scoreTitle` binds engine `display.title`; it avoids overloading HTML's native

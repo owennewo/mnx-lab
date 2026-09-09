@@ -1,0 +1,30 @@
+{
+  "title": "Beamed stem lengths — the shortest stem per level",
+  "description": "Beamed groups whose outer heads span a third, a fifth and an octave, one, two and three beams deep, with one down-stem octave at each of the first two depths. Pins the beam-geometry rule (roadmap: core-beam-geometry): the stem that would come out shortest lands on the per-level minimum — 2.5 spaces under one beam, 3 under two, 3.5 under three — and every other stem grows from there; the slant follows the outer heads within its cap; and the primary beam then nudges outward until it sits on, straddles or hangs from a staff line. Bar 1: eighths, a third then a fifth. Bar 2: eighths, an octave up-stem then an octave down-stem. Bar 3: sixteenths, third / fifth / octave / octave down-stem, one group per beat. Bar 4: thirty-seconds, a third then an octave, then a half rest.",
+  "bars": 4,
+  "tags": [
+    "rhythm",
+    "beams",
+    "stems"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/beam/"
+  ],
+  "coversDefs": [
+    "beam",
+    "beam-list",
+    "event",
+    "note",
+    "pitch",
+    "rest"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "n/a"
+  },
+  "requires": [],
+  "idRefs": true,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

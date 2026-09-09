@@ -702,3 +702,42 @@ Scenario set:
 - `spec/ties`
 - `spec/tremolos-multi-note`
 - `spec/tuplets`
+
+## Beam geometry — 2026-09-09
+
+Cause: [core-beam-geometry.md](../complete/core-beam-geometry.md). Beamed groups now
+land their shortest stem on a per-level minimum (2.5sp under one beam, 3 under two, 3.5
+under three) instead of pushing it out to the octave, and the primary beam nudges
+outward to sit on, straddle or hang from a staff line. Every scenario with a beamed
+group moved; beam membership, level counts, hooks and slant direction are unchanged
+(`harness/conformance/beaming.test.ts` still passes untouched). Three of the moved
+scenarios were `verified` and are demoted; the rest were already awaiting review. One
+new scenario, written for this rule.
+
+Look for: the shortest stem in each group at the minimum for its beam count, the
+others growing from it; beams that touch a staff line rather than leaving a white
+sliver beside one; slant direction and cap unchanged; no beam or stem crossing a
+notehead; grace mini-beams and the tuplet's single beam following the same rule.
+The reference is the Soundslice engraving of the Guitar Pro score that raised this.
+
+Scenario set:
+
+- `lab/rhythm/beamed-stem-lengths` — **new**, the rule's own exhibit
+- `lab/document/navigation-playground`
+- `lab/document/twelve-bar-blues`
+- `lab/rhythm/tuplet-number-hidden`
+- `lab/tab-rhythm/triplets-on-tab`
+- `lab/tab-rhythm/grace-on-tab`
+- `lab/tab-rhythm/unplayable-inside-a-tuplet`
+- `spec/beam-hooks` — was verified
+- `spec/beams`
+- `spec/beams-across-barlines`
+- `spec/beams-inner-grace-notes`
+- `spec/grace-notes-beamed` — was verified
+- `spec/grand-staff`
+- `spec/organ-layout`
+- `spec/parts`
+- `spec/rest-positions`
+- `spec/tie-targets`
+- `spec/tuplets` — was verified
+

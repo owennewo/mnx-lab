@@ -168,13 +168,14 @@ export class DocumentViewer extends LitElement {
   @property({ type: String, attribute: 'score-title', reflect: true }) scoreTitle: DisplayOptions['title'] = 'show';
   @property({ type: String, attribute: 'bar-numbers', reflect: true }) barNumbers: DisplayOptions['barNumbers'] = undefined;
   @property({ type: String, attribute: 'instrument-names', reflect: true }) instrumentNames: DisplayOptions['instrumentNames'] = undefined;
+  @property({ type: String, attribute: 'beams', reflect: true }) beams: DisplayOptions['beams'] = undefined;
   @property({ type: String, attribute: 'selected-verse', reflect: true }) selectedVerse: DisplayOptions['selectedVerse'] = undefined;
 
   private effectiveDisplay(): DisplayOptions {
     return normalizeDisplayOptions({
       lyrics: this.lyrics, timeSignatures: this.timeSignatures, clefs: this.clefs,
       title: this.scoreTitle, barNumbers: this.barNumbers,
-      instrumentNames: this.instrumentNames, selectedVerse: this.selectedVerse
+      instrumentNames: this.instrumentNames, beams: this.beams, selectedVerse: this.selectedVerse
     }, this.hiddenFeatures());
   }
 
@@ -712,6 +713,7 @@ export class DocumentViewer extends LitElement {
       changed.has('scoreTitle') ||
       changed.has('barNumbers') ||
       changed.has('instrumentNames') ||
+      changed.has('beams') ||
       changed.has('selectedVerse') ||
       changed.has('hide') ||
       changed.has('zoom') ||

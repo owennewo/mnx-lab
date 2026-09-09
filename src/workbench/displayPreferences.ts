@@ -4,7 +4,7 @@ export const DISPLAY_PREFERENCES_KEY = 'mnx-lab:display';
 /** Host defaults are explicit; omitted engine options retain legacy labels. */
 export const DEFAULT_DISPLAY_PREFERENCES: Readonly<DisplayOptions> = {
   lyrics: 'all', timeSignatures: 'show', clefs: 'show', title: 'show',
-  barNumbers: 'every-system', instrumentNames: 'first-system'
+  barNumbers: 'every-system', instrumentNames: 'first-system', beams: 'slanted'
 };
 export function displayPreferences(input: unknown): DisplayOptions {
   const { selectedVerse: _transient, ...validated } = normalizeDisplayOptions(input);
