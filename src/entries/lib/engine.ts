@@ -18,3 +18,5 @@ export type { Primitive, LayoutResult } from '../../engine/primitives.ts';
 export { normalizeDisplayOptions, DISPLAY_CHOICES, type DisplayOptions } from '../../engine/displayOptions.ts';
 
 export { normalizeClearance, DEFAULT_CLEARANCE } from '../../engine/clearance.ts';
+
+export { engravingEntries } from '../../engine/layout/unrolled.ts';

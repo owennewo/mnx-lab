@@ -1,3 +1,5 @@
+import { engravingEntries } from '../engine/layout/unrolled.ts';
+import { occurrenceKey, parseOccurrenceKey } from '../model/noteKeys.ts';
 import { normalizeDisplayOptions, type DisplayOptions } from '../engine/displayOptions.ts';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -66,6 +68,7 @@ import type { HideableFeature } from '../engine/layout/notation.ts';
  */
 @customElement('mnx-document-viewer')
 export class DocumentViewer extends LitElement {
+  @property({ type: Boolean }) unrolled = false;
   @consume({ context: mnxDocumentContext, subscribe: true })
   @property({ attribute: false })
   mnxDoc!: MnxDocument | null;
@@ -532,6 +535,7 @@ export class DocumentViewer extends LitElement {
         fill: color-mix(in oklab, var(--accent), var(--paper-ink) 65%) !important;
       }
 
+      :host #projection-container svg .unperformed { opacity: 0.3; cursor: default; }
       :host #projection-container svg [data-source-id].playback-ink,
       :host([selection-inactive]) #projection-container svg [data-source-id].playback-ink {
         fill: var(--mnx-playback, light-dark(#245daa, #8ebcff)) !important;
@@ -695,7 +699,7 @@ export class DocumentViewer extends LitElement {
     if (
       changed.has('mnxDoc') ||
       changed.has('selection') ||
-      changed.has('view') ||
+      changed.has('view') || changed.has('unrolled') ||
       changed.has('density') ||
       changed.has('densityH') ||
       changed.has('spacingMode') ||
@@ -762,9 +766,11 @@ export class DocumentViewer extends LitElement {
       noteIdx: number,
       projection: RenderedProjection
     ) => {
+      const occurrence = this.unrolled ? parseOccurrenceKey(noteId) : null;
+      if (occurrence) noteId = occurrence.noteKey;
       this.dispatchEvent(
         new CustomEvent('note-selected', {
-          detail: { noteId, measureIdx, noteIdx, projection },
+          detail: { noteId, measureIdx, noteIdx, projection, ...(occurrence ? { ordinal: occurrence.ordinal } : {}) },
           bubbles: true,
           composed: true
         })
@@ -773,6 +779,7 @@ export class DocumentViewer extends LitElement {
 
     const commonOpts = {
       mnx: this.mnxDoc.mnxJson,
+      entries: engravingEntries(this.mnxDoc.mnxJson, this.unrolled),
       width,
       activeNoteIds: [], // Playback is a paint overlay, independent of layout and selection.
       selectedNoteIds: this.selection?.selectedNoteIds ?? [],
@@ -884,6 +891,7 @@ export class DocumentViewer extends LitElement {
       if (preview && svg) {
         drawEnclosure(svg, preview.enclosure, {
           preview: true,
+          entries: commonOpts.entries,
           noteIds: preview.noteIds,
           primaryProjection
         });
@@ -892,6 +900,7 @@ export class DocumentViewer extends LitElement {
       }
       if (kind && svg) {
         drawEnclosure(svg, kind, {
+          entries: commonOpts.entries,
           noteIds: this.selection?.selectedNoteIds,
           eventIds: this.selection?.selectedEventIds,
           span: this.selection?.span,
@@ -1123,9 +1132,9 @@ export class DocumentViewer extends LitElement {
 
   /** Follow the live ink without touching the selection or editor cursor. */
   private paintPlayback(){
-    const keys=new Set(this.playbackState?.highlight.map(w=>w.noteKey)??[]);
+    const keys=new Set(this.playbackState?.highlight.map(w=>occurrenceKey(w.noteKey,this.unrolled?w.ordinal:undefined))??[]);
     for(const ink of this.container?.querySelectorAll<SVGElement>('[data-source-id]')??[])
-      ink.classList.toggle('playback-ink',keys.has(ink.dataset.sourceId??''));
+      ink.classList.toggle('playback-ink',!ink.classList.contains('unperformed') && keys.has(ink.dataset.sourceId??''));
   }
   private revealPlayback() {
     const occurrence=this.playbackState?.highlight[0];
@@ -1134,7 +1143,7 @@ export class DocumentViewer extends LitElement {
   /** Public written-occurrence reveal. It never mutates selection or inspection. */
   revealOccurrence(occurrence: PlaybackOccurrence): boolean {
     const ink=[...(this.container?.querySelectorAll<SVGElement>('[data-source-id]')??[])]
-      .find(node=>node.getAttribute('data-source-id')===occurrence.noteKey);
+      .find(node=>!node.classList.contains('unperformed') && node.getAttribute('data-source-id')===occurrenceKey(occurrence.noteKey,this.unrolled?occurrence.ordinal:undefined));
     if(!ink)return false;
     this.revealBox(ink.getBoundingClientRect(),'auto');return true;
   }

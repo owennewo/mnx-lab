@@ -1,3 +1,5 @@
+import { qualifyMeasure, qualifyTechniques, performedKeys, writtenIndex, emitOccurrenceLabel } from './unrolled.ts';
+import type { PerformedEntry } from '../../model/passes.ts';
 import { clearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
 import type { MnxPart } from '../../model/mnx.ts';
@@ -103,6 +105,7 @@ const BARLINE_METRICS: BarlineMetrics = STANDARD_BARLINE_METRICS;
 // ---------- Public API ----------
 
 export interface LayoutTabOptions {
+  entries?: PerformedEntry[];
   display?: DisplayOptions;
   mnx: MnxStructure;
   /** Total available viewport width in staff spaces. */
@@ -189,7 +192,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     };
   }
 
-  const numMeasures = context?.plan.measures.length ?? part.measures.length;
+  const numMeasures = context?.plan.measures.length ?? opts.entries?.length ?? part.measures.length;
   // Effective string set (document declaration, unless the viewer overrides;
   // capo applied) — one context for every fret this layout derives. Null when
   // no strings are known ANYWHERE: no instrument is assumed, so the staff
@@ -205,6 +208,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // does draw one, and must keep agreeing with its columns.
   const showNames = display.instrumentNames === 'every-system' || display.instrumentNames === 'first-system';
   const planOptions = {
+    entries: opts.entries,
     leftInsetSp: showNames ? instrumentLabelInset([instrumentName(part, true)]) : 0,
     subsequentLeftInsetSp: display.instrumentNames === undefined ? undefined : display.instrumentNames === 'every-system' ? instrumentLabelInset([instrumentName(part, false)]) : 0,
     display,
@@ -276,14 +280,15 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // primitives are exactly the slice from its first measure onward.
   const rowStart: number[] = [];
   for (let i = 0; i < numMeasures; i++) {
-    const partMeasure = part.measures[i] ?? { sequences: [] };
+    const partMeasure = part.measures[writtenIndex(plan, i)] ?? { sequences: [] };
     const m = plan.measures[i];
     if (m.hidden) continue;
+    const measurePrimitiveStart = primitives.length;
     if (rowStart[m.row] === undefined) {
       rowStart[m.row] = primitives.length;
       // This row's voltas first, so the labels placed below scan them as ink
       // and stack above (core-measure-attributes-gaps.md, item 5).
-      if (!context || context.globalLabels) emitEndings(mnx, plan, row => MARGIN_SP + row * rowHeightSp + ROW_PAD_TOP_SP, primitives, m.row);
+      if (!m.entry && (!context || context.globalLabels)) emitEndings(mnx, plan, row => MARGIN_SP + row * rowHeightSp + ROW_PAD_TOP_SP, primitives, m.row);
     }
     const edges = rowEdges.get(m.row);
     rowEdges.set(m.row, {
@@ -390,7 +395,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     // plus anything an individual event throws (forgiving render) — one bad
     // event must not take down the bar. Issues attributable to one event draw
     // UNDER that event's column; the rest stack in the bar corner.
-    const fromValidation = validationByMeasure.get(i) ?? [];
+    const fromValidation = validationByMeasure.get(writtenIndex(plan, i)) ?? [];
     const anchored = fromValidation.filter(
       v => v.at && m.voices[v.at.voiceIndex]?.[v.at.eventIndex]
     );
@@ -405,7 +410,10 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
         slots: m.voices,
         staffTop,
         ink: plan.inkRatio,
-        measureIndex: i,
+        measureIndex: writtenIndex(plan, i),
+        entryIndex: m.entry ? i : undefined,
+        occurrenceOrdinal: m.entry?.ordinal,
+        performedNoteKeys: m.entry ? performedKeys(mnx, m.entry) : undefined,
         activeNoteIds,
         selectedNoteIds,
         // This layout IS the staff-1-of-first-part traversal jsonView mirrors.
@@ -450,7 +458,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     //
     // Same order as the notation layout, and the order matters: labels scan
     // what already sits over this measure and stack above it.
-    const gm = mnx.global.measures[i] ?? {};
+    const gm = mnx.global.measures[writtenIndex(plan, i)] ?? {};
     // The text clears THIS ROW's ink only; the row above is tightenRows' job.
     if (!context || context.globalLabels) {
     emitHarmonies({ gm, m, stdSequences, staffTop, scan: primitives.slice(rowStart[m.row]), primitives });
@@ -458,9 +466,10 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), primitives,
       onsetXs: measureOnsetXs(stdSequences[0], m.voices[0] ?? [])
     });
-    emitNavigationMarkers({ gm, m, stdSequences, staffTop, primitives });
+    if (!m.entry) emitNavigationMarkers({ gm, m, stdSequences, staffTop, primitives });
     emitMeasureFermata({ gm, m, staffTop, staffHeight: STAFF_HEIGHT_SP, primitives });
-    emitMeasureNumber(gm, m, staffTop, primitives, display.barNumbers, measureNumbers[i]);
+    emitOccurrenceLabel(m, staffTop, primitives);
+    emitMeasureNumber(gm, m, staffTop, primitives, display.barNumbers, measureNumbers[writtenIndex(plan, i)]);
     emitScoreLabels({
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), clearAbove: tempoTop, primitives
     });
@@ -499,12 +508,13 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       for (const [key, list] of bySlot) {
         emitPositionedDiagnostics(key / 1e4, staffBottom, list, primitives);
       }
-      for (const { at: _at, ...issue } of anchored) diagnostics.push({ measureIndex: i, ...issue });
+      for (const { at: _at, ...issue } of anchored) diagnostics.push({ measureIndex: writtenIndex(plan, i), ...issue });
     }
     if (measureIssues.length) {
       emitMeasureDiagnostics(m.x, staffBottom, measureIssues, primitives);
-      for (const issue of measureIssues) diagnostics.push({ measureIndex: i, ...issue });
+      for (const issue of measureIssues) diagnostics.push({ measureIndex: writtenIndex(plan, i), ...issue });
     }
+    qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, selectedNoteIds);
   }
 
   // Verse rows flush before the frame is fitted, for the same reason as the
@@ -515,6 +525,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // `ensureTopMargin` and `tightenRows` measure ink to decide how much room a
   // row actually needs. Emitted after, a bend arrow would hang off the page.
   if (hasTechniqueSites(technique)) {
+    qualifyTechniques(technique, plan);
     emitTabTechnique({
       sites: technique.sites,
       byNoteId: technique.byNoteId,
@@ -576,7 +587,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
         font: 'body', size: 2.4, anchor: 'middle', className: 'score-title' });
       cursorY += 3;
     }
-    job.segments.forEach((segment, segmentIndex) => {
+    (opts.entries ? job.segments.slice(0, 1) : job.segments).forEach((segment, segmentIndex) => {
       const sources = segment.staves.flatMap(staff => staff.sources).filter(source => tabPositionContext(source.part, opts.tabSetup) !== null).filter((source, i, all) =>
         all.findIndex(candidate => candidate.part === source.part && candidate.staff === source.staff) === i);
       if (!sources.length) return;
@@ -584,6 +595,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
       const first = segmentIndex === 0;
       const names = display.instrumentNames === 'every-system' || (display.instrumentNames === 'first-system' && first);
       const planOptions: PlanOptions = {
+        entries: opts.entries,
         staves: sources.map(source => ({ sources: [source] })),
         staffKind: 'tab', display, lyricLineIds: selectedLyricLineIds(mnx, display),
         spacingMode: opts.spacingMode,

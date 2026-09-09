@@ -1,6 +1,6 @@
 # The unrolled engraving — an occurrence-aware layout plan
 
-> **Status: proposed 2026-09-08, revised the same day.** Campaign:
+> **Status: in progress 2026-09-09.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 10. Needs items 1, 2 and 7.
 > **Moved after the player** on review: this is a layout-plan change, not an
 > emission-loop change, and the reviewer hears trustworthy playback sooner without
@@ -63,3 +63,14 @@
   written occurrences; unsupported geometry is diagnosed separately. Clip crossing
   spans by the same half-open bounds as the compiler. Under D.S. al Fine, neither
   assertion requires reaching every note in the document.
+
+## Implementation and review
+
+Implemented in the isolated `core-player-unrolled-view` worktree. The
+[contract](../../docs/player-unrolled.md) records the public entry/toggle API,
+written/occurrence identity mapping, partial-bar semantics and independent
+approval lifecycle. Sixteen cases cover the original fourteen plus the two
+later traversal regressions; 18 new SVGs are registered in the
+[standing review ledger](lab-verify.md#unrolled-engraving--2026-09-09).
+No human approval has been inferred or written. Landing gates and worktree
+retirement precede closeout.

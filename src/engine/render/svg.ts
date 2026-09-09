@@ -125,7 +125,9 @@ export function renderSvg(opts: RenderSvgOptions): SVGSVGElement {
   if (className) svg.setAttribute('class', className);
 
   for (const p of primitives) {
-    svg.appendChild(emitPrimitive(p, pxPerSp, pxPerSpY));
+    const node = emitPrimitive(p, pxPerSp, pxPerSpY);
+    if (p.opacity !== undefined) node.setAttribute('opacity', String(p.opacity));
+    svg.appendChild(node);
   }
 
   if (onSourceActivate) {
@@ -211,6 +213,7 @@ function emitGlyph(p: GlyphPrim, kx: number, ky: number): SVGElement {
   });
   if (p.className) node.setAttribute('class', p.className);
   if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
+  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
   node.textContent = glyphCodepoint(p.glyph);
   return node;
 }
@@ -227,6 +230,7 @@ function emitLine(p: LinePrim, kx: number, ky: number): SVGElement {
   if (p.dash) node.setAttribute('stroke-dasharray', `${p.dash * ky},${p.dash * ky}`);
   if (p.className) node.setAttribute('class', p.className);
   if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
+  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
   return node;
 }
 
@@ -247,6 +251,7 @@ function emitCurve(p: CurvePrim, kx: number, ky: number): SVGElement {
     });
     if (p.className) node.setAttribute('class', p.className);
     if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
+  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
     return node;
   }
 
@@ -277,6 +282,7 @@ function emitCurve(p: CurvePrim, kx: number, ky: number): SVGElement {
   });
   if (p.className) node.setAttribute('class', p.className);
   if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
+  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
   return node;
 }
 
@@ -295,6 +301,7 @@ function emitText(p: TextPrim, kx: number, ky: number): SVGElement {
   if (p.weight !== undefined) node.setAttribute('font-weight', String(p.weight));
   if (p.className) node.setAttribute('class', p.className);
   if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
+  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
   node.textContent = p.text;
   return node;
 }
@@ -320,6 +327,7 @@ function emitRect(p: RectPrim, kx: number, ky: number): SVGElement {
   const node = el('rect', attrs);
   if (p.className) node.setAttribute('class', p.className);
   if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
+  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
   return node;
 }
 

@@ -63,6 +63,10 @@ export interface PrimitiveBase {
   className?: string;
   /** MNX id of the source element, surfaced as `data-source-id` on the DOM node. */
   sourceId?: string;
+  /** Written identity behind occurrence geometry; absent in written order. */
+  writtenSourceId?: string;
+  /** Explicit visual distinction for ink outside a performed slice. */
+  opacity?: number;
   /** Plain-text tooltip, emitted as an SVG `<title>` child (native hover). */
   title?: string;
 }

@@ -1,3 +1,4 @@
+import { unrolledFiles, UNROLLED_FILES } from './unrolled-evidence.mjs';
 // Corpus police for scenarios/ (see roadmap/complete/lab-04-scenario-library.md).
 // Checks, per scenario: metadata validates against meta.schema.json, JSON files
 // are canonically formatted, actual validation verdicts (standard MNX + _x.mnxLab
@@ -17,6 +18,7 @@ const SCENARIOS_DIR = path.join(ROOT, 'scenarios');
 
 const ALLOWED_FILES = new Set([
   'meta.json',
+  ...UNROLLED_FILES,
   'expected.performance.json',
   'expected.midi.json',
   'document.mnx.json',
@@ -190,6 +192,16 @@ export function checkScenario(scenario, ctx) {
     fail('missing document.mnx.json');
   } else {
     doc = checkJsonFile(documentPath, 'document.mnx.json', fail);
+  }
+
+  if (meta?.verification?.unrolledHash && !meta.unrolled) fail('approved unrolled obligation removed; explicit retirement required');
+  if (doc) {
+    const required = unrolledFiles(scenario);
+    for (const name of UNROLLED_FILES) {
+      const exists = fs.existsSync(path.join(scenario.dir, name));
+      if (meta?.unrolled && required.includes(name) && !exists) fail(`unrolled evidence missing: ${name}`);
+      if (exists && (!meta?.unrolled || !required.includes(name))) fail(`${name} exists without matching unrolled opt-in`);
+    }
   }
 
   if (meta?.verification?.performanceHash && !meta.performance) fail('approved performance obligation removed; explicit retirement required');

@@ -35,6 +35,7 @@ const ALL_VIEWS: readonly ViewMode[] = ['notation', 'tab', 'both'];
 
 @customElement('mnx-settings-pad')
 export class SettingsPad extends LitElement {
+  @property({ type: Boolean }) unrolled = false;
   /** The view the score is drawing now. */
   @property({ type: String }) view: ViewMode = 'notation';
 
@@ -314,6 +315,17 @@ export class SettingsPad extends LitElement {
                             `
                       )}
                     </span>
+                  </div>
+                  <div class="setting">
+                    <label>
+                      <input type="checkbox" .checked=${this.unrolled}
+                        @change=${(event: Event) => this.dispatchEvent(new CustomEvent('unrolled-change', {
+                          detail: (event.target as HTMLInputElement).checked,
+                          bubbles: true,
+                          composed: true
+                        }))}>
+                      Unrolled
+                    </label>
                   </div>
                   ${this.displayRow('lyrics', 'Lyrics', ['All verses', 'Current verse', 'Hide'])}
                   ${this.displayRow('timeSignatures', 'Time signatures', ['Show', 'Hide'])}

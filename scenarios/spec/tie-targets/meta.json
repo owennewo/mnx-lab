@@ -59,5 +59,6 @@
     "at": "2026-07-17",
     "primitivesHash": "sha256:35b8e976187a3015"
   },
-  "performance": true
+  "performance": true,
+  "unrolled": true
 }

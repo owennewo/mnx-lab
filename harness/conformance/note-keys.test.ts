@@ -71,3 +71,26 @@ describe('note-key agreement (the walk vs the renderer)', () => {
     expect(offenders).toEqual([]);
   });
 });
+
+it('resolves every unrolled note occurrence to the written JSON line on its entry', async () => {
+  const { buildJsonView } = await import('../../src/model/jsonView.ts');
+  const { linearizePasses } = await import('../../src/model/passes.ts');
+  const { parseOccurrenceKey } = await import('../../src/model/noteKeys.ts');
+  const { layoutNotation } = await import('../../src/engine/layout/notation.ts');
+  const { initSmufl } = await import('../helpers/corpusPrimitives.ts');
+  initSmufl();
+  for (const scenario of corpus) {
+    const meta = JSON.parse(fs.readFileSync(path.join(scenario.dir, 'meta.json'), 'utf8'));
+    if (!meta.unrolled) continue;
+    const doc = JSON.parse(fs.readFileSync(path.join(scenario.dir, 'document.mnx.json'), 'utf8'));
+    const entries = linearizePasses(doc).entries;
+    const json = buildJsonView(doc, entries);
+    for (const p of layoutNotation({mnx:doc,widthSp:80,entries}).primitives) {
+      if (!p.sourceId || !p.className?.includes('notehead')) continue;
+      const identity = parseOccurrenceKey(p.sourceId)!;
+      expect(json.noteLineByKey.has(p.sourceId), `${scenario.id} ${p.sourceId}`).toBe(true);
+      expect(json.noteLineByKey.get(p.sourceId)).toBe(json.noteLineByKey.get(identity.noteKey));
+      expect(p.writtenSourceId).toBe(identity.noteKey);
+    }
+  }
+});

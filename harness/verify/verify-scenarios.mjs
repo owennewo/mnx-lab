@@ -1,3 +1,4 @@
+import { unrolledHash, unrolledState } from './unrolled-evidence.mjs';
 import { performanceHash, performanceState } from './performance-evidence.mjs';
 // Marks scenarios as `verified` — the one status rung that is a human
 // assertion ("I looked at the rendered output / pinned errors and approve").
@@ -98,10 +99,19 @@ function writeMeta(scenario, mutate) {
  * ORIGINAL approval date, and no approval that old can have looked at the
  * both view — recording a bothHash there would be false provenance.
  */
-export function markVerified(scenario, at, { skipBothHash = false, presentedPerformanceHash, performanceOnly = false } = {}) {
+export function markVerified(scenario, at, { skipBothHash = false, presentedPerformanceHash, performanceOnly = false, presentedUnrolledHash, unrolledOnly = false } = {}) {
+  if (performanceOnly && unrolledOnly) throw new Error('Choose one evidence-only approval scope.');
+  const currentUnrolled = unrolledHash(scenario);
+  if (presentedUnrolledHash !== undefined && (currentUnrolled === null || presentedUnrolledHash !== currentUnrolled)) throw new Error('Presented unrolled evidence is missing or changed; present it again before approval.');
   const current = performanceHash(scenario);
   if (presentedPerformanceHash !== undefined && (current === null || presentedPerformanceHash !== current)) throw new Error('Presented performance evidence is missing or changed; present it again before approval.');
   writeMeta(scenario, meta => {
+    if (unrolledOnly) {
+      if (!meta.unrolled || !presentedUnrolledHash) throw new Error('Unrolled-only approval requires presented current evidence.');
+      if (recordMatches(meta.verification ?? null, primitivesHash(scenario), renderHash(scenario), bothHash(scenario))) meta.status = 'verified';
+      meta.verification = { ...meta.verification, at: meta.verification?.at ?? at, unrolledHash: currentUnrolled, unrolledAt: at };
+      return;
+    }
     if (performanceOnly) {
       if (!meta.performance || !presentedPerformanceHash) throw new Error('Performance-only approval requires presented current evidence.');
       if (recordMatches(meta.verification ?? null, primitivesHash(scenario), renderHash(scenario), bothHash(scenario))) meta.status = 'verified';
@@ -113,6 +123,7 @@ export function markVerified(scenario, at, { skipBothHash = false, presentedPerf
     const render = renderHash(scenario);
     const both = skipBothHash ? null : bothHash(scenario);
     const record = { ...meta.verification, at };
+    if (meta.unrolled && presentedUnrolledHash) { record.unrolledHash = currentUnrolled; record.unrolledAt = at; }
     if (meta.performance && presentedPerformanceHash) { record.performanceHash = current; record.performanceAt = at; }
     if (prims !== null) record.primitivesHash = prims;
     if (render !== null) record.renderHash = render;
@@ -154,7 +165,11 @@ export function buildQueue() {
     const both = bothHash(scenario);
     const record = meta.verification ?? null;
     const evidence = performanceState(meta, performanceHash(scenario));
+    const unrolledEvidence = unrolledState(meta, unrolledHash(scenario));
     const entry = {
+      unrolledState: unrolledEvidence,
+      currentUnrolledHash: unrolledHash(scenario),
+      approvedUnrolledHash: record?.unrolledHash ?? null,
       performanceState: evidence,
       currentPerformanceHash: performanceHash(scenario),
       approvedPerformanceHash: record?.performanceHash ?? null,
@@ -172,6 +187,12 @@ export function buildQueue() {
       queue.blocked.push({ ...entry, reason: 'checker errors', errors: errors.slice(0, 3) });
     } else if (meta.expect.standard === 'valid' && hash === null) {
       queue.blocked.push({ ...entry, reason: 'not rendered (no expected.primitives.json)' });
+    } else if (unrolledEvidence === 'blocked' || unrolledEvidence === 'retired-without-review') {
+      queue.blocked.push({ ...entry, reason: 'missing or retired unrolled evidence' });
+    } else if (unrolledEvidence === 'stale') {
+      queue.stale.push({ ...entry, reason: 'unrolled evidence changed' });
+    } else if (unrolledEvidence === 'unseen') {
+      queue.neverSeen.push({ ...entry, reason: 'unseen unrolled evidence; written approval retained' });
     } else if (evidence === 'blocked' || evidence === 'retired-without-review') {
       queue.blocked.push({ ...entry, reason: 'missing or retired performance evidence' });
     } else if (evidence === 'stale') {
@@ -249,6 +270,8 @@ function main() {
     presented = receipt.items;
     args.splice(receiptAt,2);
   }
+  const unrolledOnly = args.includes('--unrolled-only');
+  if (unrolledOnly) args.splice(args.indexOf('--unrolled-only'),1);
   const performanceOnly = args.includes('--performance-only');
   if (performanceOnly) args.splice(args.indexOf('--performance-only'),1);
   const corpus = loadCorpus();
@@ -350,14 +373,14 @@ function main() {
       record !== null &&
       (render === null || record.renderHash !== undefined) &&
       (both === null || record.bothHash !== undefined);
-    if (!performanceOnly && !presented[id] && meta.status === 'verified' && recordMatches(record, hash, render, both) && recordComplete) {
+    if (!performanceOnly && !unrolledOnly && !presented[id] && meta.status === 'verified' && recordMatches(record, hash, render, both) && recordComplete) {
       console.log(`OK   ${id}: already verified and current`);
       continue;
     }
     const adding = [];
     if (record !== null && record.renderHash === undefined && render !== null) adding.push('renderHash');
     if (record !== null && record.bothHash === undefined && both !== null) adding.push('bothHash');
-    markVerified(scenario, new Date().toISOString().slice(0, 10), { presentedPerformanceHash: presented[id]?.performanceHash, performanceOnly });
+    markVerified(scenario, new Date().toISOString().slice(0, 10), { presentedPerformanceHash: presented[id]?.performanceHash, performanceOnly, presentedUnrolledHash: presented[id]?.unrolledHash, unrolledOnly });
     const detail =
       meta.status === 'verified' && adding.length > 0 && recordMatches(record, hash, render, both)
         ? `re-approved — ${adding.join(' + ')} recorded`
@@ -377,5 +400,12 @@ if (process.argv[1] && path.resolve(process.argv[1]) === new URL(import.meta.url
 export function invalidatePerformance(scenario) {
   writeMeta(scenario, meta => {
     if (meta.status === 'verified' && performanceState(meta, performanceHash(scenario)) === 'stale') meta.status = 'rendered';
+  });
+}
+
+/** Unrolled evidence is independent; no new output grants or erases an approval. */
+export function invalidateUnrolled(scenario) {
+  writeMeta(scenario, meta => {
+    if (meta.status === 'verified' && unrolledState(meta, unrolledHash(scenario)) === 'stale') meta.status = 'rendered';
   });
 }

@@ -44,13 +44,13 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     publish();
   };
   const select = (event: Event) => {
-    const detail = (event as CustomEvent<{ noteId?: string }>).detail,
+    const detail = (event as CustomEvent<{ noteId?: string; ordinal?: number }>).detail,
       key = detail.noteId;
     if (!key || !player.performance) return;
     const candidates = player.performance.written
       .filter((w) => w.noteKey === key)
       .map((w) => w.ordinal);
-    const ordinal = chooseOrdinal(candidates, state.ordinal, {
+    const ordinal = detail.ordinal ?? chooseOrdinal(candidates, state.ordinal, {
       explicitSeek: true,
       cycle: lastKey === key,
     });

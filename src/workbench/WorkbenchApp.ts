@@ -35,6 +35,7 @@ export interface Route {
   id?: string;
   view?: string;
   at?: number;
+  unrolled?: boolean;
   /** The schema object on #/objects/<def>; absent on the index itself. */
   def?: string;
 }
@@ -42,24 +43,26 @@ export interface Route {
 export function parseHash(hash: string): Route {
   const scenario = /^#\/scenario\/([^?]+)(?:\?(.*))?$/.exec(hash);
   if (scenario) {const params=new URLSearchParams(scenario[2]??'');const at=params.get('at');
-    try{return {page:'scenario',id:decodeURIComponent(scenario[1]),view:params.get('view')??undefined,
+    try{return {page:'scenario',id:decodeURIComponent(scenario[1]),view:params.get('view')??undefined, unrolled:params.get('unrolled')==='1',
       at:at!==null && /^(0|[1-9][0-9]*)$/.test(at) && Number.isSafeInteger(Number(at))?Number(at):undefined};}catch{return {page:'home'};}}
 
-  const document = /^#\/document(?:\?view=([a-z-]+))?$/.exec(hash);
-  if (document) return { page: 'document', view: document[1] };
+  const document = /^#\/document(?:\?(.*))?$/.exec(hash);
+  if (document) { const params = new URLSearchParams(document[1] ?? ''); return { page: 'document', view: params.get('view') ?? undefined, unrolled: params.get('unrolled') === '1' }; }
   const objects = /^#\/objects(?:\/([a-z0-9-]+))?$/.exec(hash);
   if (objects) return { page: 'objects', def: objects[1] };
   if (/^#\/converters$/.test(hash)) return { page: 'converters' };
   return { page: 'home' };
 }
 
-export function scenarioHref(id: string, view?: string, at?: number): string {
+export function scenarioHref(id: string, view?: string, at?: number, unrolled = false): string {
   const params=new URLSearchParams();if(view)params.set('view',view);if(at!==undefined && Number.isSafeInteger(at) && at>=0)params.set('at',String(at));
+  if (unrolled) params.set('unrolled', '1');
   return `#/scenario/${encodeURIComponent(id).replace(/%2F/g, '/')}${params.size?'?'+params:''}`;
 }
 
-export function documentHref(view?: string): string {
-  return `#/document${view ? `?view=${view}` : ''}`;
+export function documentHref(view?: string, unrolled = false): string {
+  const params = new URLSearchParams(); if (view) params.set('view', view); if (unrolled) params.set('unrolled', '1');
+  return `#/document${params.size ? '?' + params : ''}`;
 }
 
 export function objectsHref(def?: string): string {
@@ -1180,6 +1183,7 @@ export class WorkbenchApp extends LitElement {
               .scenarioId=${this.route.id ?? ''}
               .at=${this.route.at??null}
               .view=${this.route.view ?? ''}
+              .unrolled=${this.route.unrolled ?? false}
               .documentFocus=${this.documentFocus}
               .panelHidden=${this.panelHidden}
               .selectionClipboard=${this.selectionClipboard}
@@ -1190,6 +1194,7 @@ export class WorkbenchApp extends LitElement {
               ? html`<mnx-scenario-page
                   .scenarioId=${this.localDocument.id}
                   .view=${this.route.view ?? ''}
+                  .unrolled=${this.route.unrolled ?? false}
                   .localDocument=${this.localDocument}
                   .documentFocus=${this.documentFocus}
                   .panelHidden=${this.panelHidden}

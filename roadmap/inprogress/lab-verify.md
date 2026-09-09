@@ -783,3 +783,37 @@ Scenario set:
 - `spec/tie-targets`
 - `spec/tuplets` — was verified
 
+
+## Unrolled engraving — 2026-09-09
+
+Cause: [player campaign item 10](core-player-unrolled-view.md),
+[implementation contract](../../docs/player-unrolled.md). New performed-order
+SVG evidence; all written primitives/SVGs and prior approval records are unchanged.
+The original fourteen hand-stated cases plus the two later navigation regressions
+produce **16 notation and 2 tab engravings**. No `unrolledHash` is stamped.
+
+Look for: bar order equals `traversal.test.ts`'s hand-stated entries; clef/key at
+the segno; occurrence labels only on occurrence ≥2 (not iteration); written bar
+numbers; no repeat/ending/navigation signs. Partial entries show the whole bar
+with a badge; crossing notes remain performed, excluded notes fade and cannot
+seek or highlight. Layout constraints that cannot carry into performed order
+are diagnosed. The page places written and unrolled engravings side by side.
+
+Scenario set (new evidence only):
+
+- `spec/repeats`
+- `spec/repeats-implied-start-repeat`
+- `spec/repeats-more-once-repeated`
+- `spec/repeats-alternate-endings-advanced`
+- `spec/repeats-alternate-endings-simple`
+- `spec/jumps-dal-segno`
+- `spec/jumps-ds-al-fine`
+- `spec/tie-targets`
+- `lab/navigation/jumps-and-signs`
+- `lab/navigation/repeats-and-marks-on-tab` — includes tab
+- `lab/navigation/numbered-bars`
+- `lab/navigation/tempo-change-mid-bar`
+- `lab/score-text/labels-with-navigation`
+- `lab/score-text/labels-on-a-tab-staff` — includes tab
+- `lab/layout/coloured-marks-and-clef-forms`
+- `lab/navigation/ds-final-ending`

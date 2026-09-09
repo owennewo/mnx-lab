@@ -1,3 +1,4 @@
+import { occurrenceKey } from '../../model/noteKeys.ts';
 import type { ContainerIndex } from '../../model/noteKeys.ts';
 import { MnxEvent, MnxGrace, MnxSequence, MnxTuplet, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import {
@@ -302,6 +303,9 @@ export interface EmitTabVoicesArgs {
    */
   ink: number;
   measureIndex: number;
+  entryIndex?: number;
+  occurrenceOrdinal?: number;
+  performedNoteKeys?: Set<string>;
   activeNoteIds: readonly string[];
   selectedNoteIds: readonly string[];
   /**
@@ -565,7 +569,8 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       // name it as its destination. A grace takes no ordinal, so it records
       // no site: it is never a technique's origin or destination beat.
       if (ordinal >= 0) {
-        recordSite(techniqueSites, {
+        if (!args.performedNoteKeys || (noteId && args.performedNoteKeys.has(noteId))) recordSite(techniqueSites, {
+          ...(args.entryIndex === undefined ? {} : {entryIndex: args.entryIndex}),
           x: eventX,
           endX: eventEndX,
           y: stringY,
@@ -575,7 +580,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
           voiceKey,
           ordinal,
           fret: pos.fret,
-          ...(note?.id !== undefined ? { noteId: note.id } : {}),
+          ...(note?.id !== undefined ? { noteId: occurrenceKey(note.id, args.occurrenceOrdinal) } : {}),
           ...(technique ? { technique } : {})
         });
       }

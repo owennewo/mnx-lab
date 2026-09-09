@@ -3,7 +3,7 @@ export * from '../../model/mnx.ts';
 export * from '../../model/passes.ts';
 export * from '../../model/playback.ts';
 export { upgradeTabExtension } from '../../model/upgradeTabExtension.ts';
-export { syntheticNoteKey } from '../../model/noteKeys.ts';
+export { syntheticNoteKey, occurrenceKey, parseOccurrenceKey } from '../../model/noteKeys.ts';
 
 /**
  * Validates a document against the published MNX schema (the precompiled

@@ -1,3 +1,4 @@
+import type { PerformedEntry } from '../../model/passes.ts';
 import { normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
 import {
@@ -632,6 +633,8 @@ export interface ClefAt {
 }
 
 export interface MeasurePlan {
+  /** Present only in performed order; array position is geometry, this is written identity. */
+  entry?: PerformedEntry;
   row: number;
   firstInSystem: boolean;
   /** Left edge of the measure; the end barline sits at x + width. */
@@ -783,6 +786,7 @@ function tryChordMerge(seqs: MnxSequence[]): MnxSequence | null {
 }
 
 export interface PlanOptions {
+  entries?: PerformedEntry[];
   display?: DisplayOptions;
   lyricLineIds?: readonly string[];
   /** Parts to lay out, stacked top-to-bottom (default: the first part). */
@@ -1198,18 +1202,18 @@ export function planHorizontal(
   const contentRightPad = pad(CONTENT_RIGHT_PAD_SP);
   const startX = marginSp + leftInset;
   const lineWidth = widthSp - 2 * marginSp - leftInset;
-  const forcedBreaks = options?.forcedBreaks ?? new Set<number>();
+  const forcedBreaks = options?.entries ? new Set<number>() : options?.forcedBreaks ?? new Set<number>();
 
   // Multimeasure-rest collapses: the start measure becomes an H-bar stand-in,
   // the tail measures hidden stubs.
   const multiRestAt = new Map<number, number>();
   const hiddenIdx = new Set<number>();
-  for (const c of options?.collapse ?? []) {
+  for (const c of (options?.entries ? [] : options?.collapse) ?? []) {
     if (c.count < 2) continue;
     multiRestAt.set(c.startIndex, c.count);
     for (let k = c.startIndex + 1; k < c.startIndex + c.count; k++) hiddenIdx.add(k);
   }
-  const range = options?.measureRange;
+  const range = options?.entries ? undefined : options?.measureRange;
   const inRange = (i: number) => !range || (i >= range.from && i <= range.to);
 
   const sourceParts = [...new Set(planStaves.flatMap(st => st.sources.map(src => src.part)))];
@@ -1241,7 +1245,7 @@ export function planHorizontal(
   let timeSig: { count: number; unit: number; display?: 'common' | 'cut' } = { count: 4, unit: 4 };
   let timeDeclared = false;
   let keyFifths = 0;
-  const metrics: MeasureMetrics[] = Array.from({ length: numMeasures }, (_, i) => {
+  const writtenMetrics: MeasureMetrics[] = Array.from({ length: numMeasures }, (_, i) => {
     const globalMeasure = mnx.global.measures[i] ?? {};
 
     let clefChanged = false;
@@ -1524,6 +1528,27 @@ export function planHorizontal(
       issues
     };
   });
+
+  // Resolve inheritance in written order first, then price each visit independently.
+  // These are layout metrics, never copied or rewritten MNX measures/references.
+  const metrics = options?.entries ? options.entries.map((entry, index) => {
+    const source = writtenMetrics[entry.measureIndex];
+    if (!source) throw new RangeError(`Unknown performed measure ${entry.measureIndex}`);
+    const m = structuredClone(source);
+    const previous = index ? writtenMetrics[options.entries![index - 1].measureIndex] : undefined;
+    m.clefChanged = !!previous && m.clefTimelines.some((timeline, staff) =>
+      JSON.stringify(timeline[0].clef) !== JSON.stringify(previous.clefTimelines[staff].at(-1)?.clef));
+    m.timeSigShow = previous ? JSON.stringify(m.timeSig) !== JSON.stringify(previous.timeSig)
+      : mnx.global.measures.slice(0, entry.measureIndex + 1).some(gm => !!gm.time);
+    m.keyChanged = !!previous && m.keyFifths !== previous.keyFifths;
+    m.cancelledKeyFifths = m.keyChanged ? previous!.keyFifths : 0;
+    m.hasRepeatStart = false;
+    m.repeatEnd = null;
+    if (entry.from || entry.until) m.issues.push('partial performed entry — whole written bar shown; unperformed notes marked');
+    if (options.collapse?.length) m.issues.push('unrolled view ignores written multi-measure-rest collapse');
+    if (options.forcedBreaks?.size || options.measureRange) m.issues.push('unrolled view ignores written layout breaks');
+    return m;
+  }) : writtenMetrics;
 
   // How many key-signature glyphs this measure's prefix draws — none ever, on
   // a standalone tab staff.
@@ -1854,6 +1879,8 @@ export function planHorizontal(
       issues: []
     };
   }
+
+  if (options?.entries) measures.forEach((measure, i) => { measure.entry = options.entries![i]; });
 
   const usedWidthSp = measures.length
     ? Math.max(...measures.map(m => m.x + m.width)) + marginSp

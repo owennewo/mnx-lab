@@ -1,6 +1,7 @@
+import type { PerformedEntry } from './passes.ts';
 // Keys come from the canonical walk, not a local restatement of it.
 import { forEachNoteAddress } from './noteWalk.ts';
-import { containerPath } from './noteKeys.ts';
+import { containerPath, occurrenceKey } from './noteKeys.ts';
 import type { MnxStructure } from './mnx.ts';
 
 /**
@@ -36,7 +37,7 @@ export interface JsonView {
   spanByPointer: Map<string, [number, number]>;
 }
 
-export function buildJsonView(doc: unknown): JsonView {
+export function buildJsonView(doc: unknown, entries?: readonly PerformedEntry[]): JsonView {
   const lines: string[] = [];
   const lineByPointer = new Map<string, number>();
   const spanByPointer = new Map<string, [number, number]>();
@@ -102,6 +103,12 @@ export function buildJsonView(doc: unknown): JsonView {
     if (line !== undefined && !noteLineByKey.has(key)) { noteLineByKey.set(key,line); noteKeyByLine.set(line,key); }
   });
 
+  if (entries) forEachNoteAddress(doc as MnxStructure, address => {
+    const line = noteLineByKey.get(address.key);
+    if (line === undefined) return;
+    for (const entry of entries) if (entry.measureIndex === address.measureIndex)
+      noteLineByKey.set(occurrenceKey(address.key, entry.ordinal), line);
+  });
   return {
     text: lines.join('\n'),
     lines,

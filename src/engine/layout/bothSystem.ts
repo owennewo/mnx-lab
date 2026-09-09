@@ -1,3 +1,4 @@
+import type { PerformedEntry } from '../../model/passes.ts';
 import type { DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation, type HideableFeature } from './notation.ts';
@@ -19,6 +20,7 @@ import { PartTabSetups } from '../tab/guitarPositions.ts';
  */
 
 export interface LayoutBothOptions {
+  entries?: PerformedEntry[];
   display?: DisplayOptions;
   mnx: MnxStructure;
   widthSp: number;

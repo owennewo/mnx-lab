@@ -94,3 +94,13 @@ export function syntheticEventKey(coords: {
   const container = containerSuffix(coords.containerIndex);
   return `@${part}m${coords.measureIndex}${staff}.v${coords.voiceIndex}.e${coords.eventIndex}${container}`;
 }
+
+/** Performed geometry identity. Decoding is opt-in: written IDs remain opaque. */
+export function occurrenceKey(noteKey: string, ordinal?: number): string {
+  return ordinal === undefined ? noteKey : `w${ordinal}:${noteKey}`;
+}
+export function parseOccurrenceKey(key: string): { noteKey: string; ordinal: number } | null {
+  const match = /^w(0|[1-9][0-9]*):(.*)$/s.exec(key);
+  return match && Number.isSafeInteger(Number(match[1]))
+    ? { noteKey: match[2], ordinal: Number(match[1]) } : null;
+}

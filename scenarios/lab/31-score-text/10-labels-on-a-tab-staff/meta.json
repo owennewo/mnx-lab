@@ -55,5 +55,6 @@
   "source": "hand-written",
   "origin": "local",
   "status": "rendered",
-  "performance": true
+  "performance": true,
+  "unrolled": true
 }

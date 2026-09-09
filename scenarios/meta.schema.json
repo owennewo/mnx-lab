@@ -147,6 +147,15 @@
         "performanceAt": {
           "type": "string",
           "description": "Date of performance evidence approval, independent of engraving approval."
+        },
+        "unrolledHash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{16}$",
+          "description": "Hash of explicitly presented unrolled engravings; never grandfathered from written engraving approval."
+        },
+        "unrolledAt": {
+          "type": "string",
+          "description": "Date of unrolled evidence approval, independent of written and performance approvals."
         }
       },
       "required": [
@@ -158,6 +167,10 @@
     "performance": {
       "type": "boolean",
       "description": "Opt in to rational performance and bounded MIDI evidence. New evidence requires separate human approval."
+    },
+    "unrolled": {
+      "type": "boolean",
+      "description": "Opt in to performed-order SVG evidence; requires separate human approval."
     }
   },
   "required": [

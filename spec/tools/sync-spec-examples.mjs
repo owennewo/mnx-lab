@@ -1,3 +1,4 @@
+import { UNROLLED_SCENARIOS } from '../../harness/verify/unrolled-evidence.mjs';
 import { performanceCandidate } from '../../harness/verify/performance-evidence.mjs';
 // Mirrors the MNX spec's worked examples into scenarios/spec/.
 //
@@ -133,6 +134,8 @@ function main() {
     const metaPath = path.join(dir, 'meta.json');
     let status = 'valid';
     let verification;
+    let unrolled;
+    if (fs.existsSync(metaPath)) unrolled = JSON.parse(fs.readFileSync(metaPath,'utf8')).unrolled;
     let performance;
     if (fs.existsSync(metaPath)) performance = JSON.parse(fs.readFileSync(metaPath,'utf8')).performance;
     if (documentUnchanged && fs.existsSync(metaPath)) {
@@ -160,6 +163,7 @@ function main() {
       origin: 'mirrored',
       status,
       ...(performance ? { performance } : {}),
+      ...(unrolled ? { unrolled } : {}),
       ...(verification !== undefined ? { verification } : {})
     };
     fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2) + '\n');
@@ -187,7 +191,14 @@ function main() {
 
 // Metadata-only evidence enrollment needs no upstream checkout and never edits
 // the mirrored document, status or approval record.
-if (process.argv.includes('--performance-only')) {
+if (process.argv.includes('--unrolled-only')) {
+  for (const id of UNROLLED_SCENARIOS.filter(id => id.startsWith('spec/'))) {
+    const file = path.join(SPEC_DIR, id.slice(5), 'meta.json');
+    const meta = JSON.parse(fs.readFileSync(file, 'utf8'));
+    meta.unrolled = true;
+    fs.writeFileSync(file, JSON.stringify(meta, null, 2) + '\n');
+  }
+} else if (process.argv.includes('--performance-only')) {
   for (const entry of fs.readdirSync(SPEC_DIR,{withFileTypes:true}).filter(e=>e.isDirectory())) {
     const dir=path.join(SPEC_DIR,entry.name),file=path.join(dir,'meta.json');
     const meta=JSON.parse(fs.readFileSync(file,'utf8'));

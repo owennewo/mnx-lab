@@ -111,3 +111,11 @@ alone). Flagged stems are untouched. `display.beams: 'flat'` sets the slant cap 
 a viewer's house-style choice, never a document field and never taught to the assist loop.
 Multi-note tremolos are not beamed groups: their stems are flagged stems of normal
 length with the tremolo bars floating between them.
+
+
+## Performed-order presentation
+
+The [unrolled engraving](player-unrolled.md) adds optional performed entries to
+the shared horizontal plan. Written measure indexes remain document addresses;
+plan indexes address occurrence geometry. Its SVG source IDs and JSON-line
+mapping carry both identities. Omission is the byte-identical written path.

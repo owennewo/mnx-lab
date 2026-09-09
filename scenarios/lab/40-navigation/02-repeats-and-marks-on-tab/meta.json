@@ -60,5 +60,6 @@
   "status": "rendered",
   "schema": "proposed",
   "proposal": "score-text",
-  "performance": true
+  "performance": true,
+  "unrolled": true
 }

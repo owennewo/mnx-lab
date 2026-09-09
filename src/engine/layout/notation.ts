@@ -1,3 +1,5 @@
+import { qualifyMeasure, qualifyTechniques, occurrenceTarget, performedSpans, performedKeys, occurrenceKey, writtenIndex, emitOccurrenceLabel } from './unrolled.ts';
+import type { PerformedEntry } from '../../model/passes.ts';
 import { clearanceSpacing, type ClearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
 import { measureHeadingX, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
@@ -531,6 +533,7 @@ function unionLedgerLines(staffYs: number[]): Set<number> {
 // ---------- Public API ----------
 
 export interface LayoutNotationOptions {
+  entries?: PerformedEntry[];
   display?: DisplayOptions;
   mnx: MnxStructure;
   widthSp: number;
@@ -861,6 +864,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   const diagnostics: LayoutDiagnostic[] = [];
 
   const jobs = buildScoreJobs(mnx);
+  if (opts.entries) for (const job of jobs) job.segments = job.segments.slice(0, 1);
   if (jobs.length === 0) {
     const staffTop = MARGIN_SP + ROW_PAD_TOP_SP;
     return {
@@ -886,6 +890,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     const rs = job.segments.map((segment, segmentIndex) =>
       renderSegment({
         mnx,
+        entries: opts.entries,
         segment,
         collapse: job.collapse,
         drawValidation: job.drawValidation,
@@ -975,6 +980,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
 }
 
 interface RenderSegmentArgs {
+  entries?: PerformedEntry[];
   mnx: MnxStructure;
   segment: JobSegment;
   collapse: { startIndex: number; count: number }[];
@@ -1167,6 +1173,7 @@ function assembleSegment(
   // come from the shared plan — layoutTab consumes the same one, which is what
   // keeps notation and tab column-aligned in the "both" view.
   const planOptions = {
+    entries: args.entries,
     display,
     lyricLineIds: selectedLyrics,
     spacingMode,
@@ -1418,6 +1425,8 @@ function assembleSegment(
   for (let i = 0; i < numMeasures; i++) {
     const m = plan.measures[i];
     if (m.hidden) continue;
+    const measurePrimitiveStart = primitives.length;
+    const playableKeys = m.entry ? performedKeys(mnx, m.entry) : undefined;
     if (rowLoopStart[m.row] === undefined) rowLoopStart[m.row] = primitives.length;
     const staffTops = Array.from({ length: numStaves }, (_, s) => staffTopOf(m.row, s));
     const staffBottoms = staffTops.map(t => t + STAFF_HEIGHT_SP);
@@ -1619,7 +1628,7 @@ function assembleSegment(
 
     if (m.showKeySig) {
       // The colour of the key in force — declared on this bar or inherited.
-      const keyColor = keyColorAt(mnx, i);
+      const keyColor = keyColorAt(mnx, writtenIndex(plan, i));
       for (let s = 0; s < numStaves; s++) {
         const clefShift = KEY_SIG_CLEF_OFFSET[m.clefTimelines[s][0].clef.sign];
         keySignatureGlyphs(m.keyFifths, m.cancelledKeyFifths).forEach((g, idx) => {
@@ -1685,7 +1694,7 @@ function assembleSegment(
     // Voices per staff — the SAME resolution the plan used (multi-source
     // staves merge/split here too). Multimeasure-rest stand-ins carry none.
     const resolvedByStaff: ResolvedVoice[][] = segment.staves.map(spec =>
-      m.multiRest ? [] : resolveStaffVoices(spec, i)
+      m.multiRest ? [] : resolveStaffVoices(spec, writtenIndex(plan, i))
     );
     const stdSequences = resolvedByStaff[0].map(v => v.seq);
 
@@ -1698,7 +1707,7 @@ function assembleSegment(
     // event must not take down the bar. Fingerboard issues attributable to one
     // event draw UNDER that event's column on the (part-0) tab staff; the rest
     // stack in the bar corner.
-    const fromValidation = validationByMeasure.get(i) ?? [];
+    const fromValidation = validationByMeasure.get(writtenIndex(plan, i)) ?? [];
     const tabAnchorTd = tabDisplays.find(td => td.part === mnx.parts?.[0]);
     const anchoredTabIssues = tabAnchorTd
       ? fromValidation.filter(
@@ -1728,7 +1737,7 @@ function assembleSegment(
           // Notes under an ottava are written `value` octaves off their sounding
           // pitch. Fold that into a positioning-only clef (the drawn clef glyph
           // is untouched); the bracket itself is drawn by emitOttavas.
-          const ottavaShift = ottavaSpans.length ? ottavaShiftAt(ottavaSpans, s, i, onset) : 0;
+          const ottavaShift = ottavaSpans.length ? ottavaShiftAt(ottavaSpans, s, writtenIndex(plan, i), onset) : 0;
           const posClef = ottavaShift
             ? { ...eventClef, octave: eventClef.octave + ottavaShift }
             : eventClef;
@@ -1754,7 +1763,7 @@ function assembleSegment(
                         const note = inner?.notes?.[noteIndex];
                         return note
                           ? noteKeyAt(
-                              note, i, voiceIndex, eventIndex, noteIndex, containerIndex,
+                              note, writtenIndex(plan, i), voiceIndex, eventIndex, noteIndex, containerIndex,
                               synthesizePartForStaff[s]!.partIndex,
                               synthesizePartForStaff[s]!.staffIndex
                             )
@@ -1783,7 +1792,7 @@ function assembleSegment(
                         const note = inner?.notes?.[noteIndex];
                         return note
                           ? noteKeyAt(
-                              note, i, voiceIndex, eventIndex, noteIndex, containerIndex,
+                              note, writtenIndex(plan, i), voiceIndex, eventIndex, noteIndex, containerIndex,
                               synthesizePartForStaff[s]!.partIndex,
                               synthesizePartForStaff[s]!.staffIndex
                             )
@@ -1813,7 +1822,7 @@ function assembleSegment(
                         const note = inner?.notes?.[noteIndex];
                         return note
                           ? noteKeyAt(
-                              note, i, voiceIndex, eventIndex, noteIndex, containerIndex,
+                              note, writtenIndex(plan, i), voiceIndex, eventIndex, noteIndex, containerIndex,
                               synthesizePartForStaff[s]!.partIndex,
                               synthesizePartForStaff[s]!.staffIndex
                             )
@@ -1840,10 +1849,12 @@ function assembleSegment(
               selectedEventIds,
               primitives,
               index,
-              measureIndex: i,
+              measureIndex: writtenIndex(plan, i),
               voiceIndex,
               eventIndex,
               row: m.row,
+              occurrenceOrdinal: m.entry?.ordinal,
+              performedNoteKeys: playableKeys,
               curveKey: `${i}:${s}:${voiceIndex}:${eventIndex}`,
               curveAnchors,
               // Synthetic keys encode the staff-1 traversal that jsonView
@@ -1890,7 +1901,7 @@ function assembleSegment(
       if (m.firstInSystem && display.clefs !== 'hide') emitTabClef(m.clefX, tabTop, primitives);
       if (m.showTimeSig) emitTabTimeSig(m.timeSig, m.timeSigCentreX, tabTop, primitives);
       {
-        const tabMark = (td.part.measures?.[i] as { measureRepeat?: MeasureRepeatMark } | undefined)?.measureRepeat;
+        const tabMark = (td.part.measures?.[writtenIndex(plan, i)] as { measureRepeat?: MeasureRepeatMark } | undefined)?.measureRepeat;
         if (tabMark) {
           const spanEnd = plan.measures[i + Math.max(1, tabMark.number) - 1];
           emitMeasureRepeat({
@@ -1910,7 +1921,10 @@ function assembleSegment(
           slots: m.staves[td.planStaff] ?? [],
           staffTop: tabTop,
           ink: plan.inkRatio,
-          measureIndex: i,
+          measureIndex: writtenIndex(plan, i),
+          entryIndex: m.entry ? i : undefined,
+          occurrenceOrdinal: m.entry?.ordinal,
+          performedNoteKeys: playableKeys,
           activeNoteIds,
           selectedNoteIds,
           // Synthetic keys encode the staff-1-of-first-part traversal jsonView
@@ -1946,7 +1960,7 @@ function assembleSegment(
           // The GLOBAL measure owns the barline style; `isLast` only supplies
           // the spec's default when the document is silent about it.
           emitEndBarline({
-            type: resolveBarlineType(mnx.global.measures[i]?.barline, isLast),
+            type: resolveBarlineType(mnx.global.measures[writtenIndex(plan, i)]?.barline, isLast),
             x: barX,
             top: gTop,
             bottom: gBottom,
@@ -1992,7 +2006,7 @@ function assembleSegment(
     // one, labels (span number, counter) once per bar on its first staff.
     segment.staves.forEach((planStaff, s) => {
       const part = planStaff.sources[planStaff.sources.length - 1]?.part;
-      const mark = (part?.measures?.[i] as { measureRepeat?: MeasureRepeatMark } | undefined)?.measureRepeat;
+      const mark = (part?.measures?.[writtenIndex(plan, i)] as { measureRepeat?: MeasureRepeatMark } | undefined)?.measureRepeat;
       if (!mark) return;
       const first = segment.staves.findIndex(st => st.sources.some(src => src.part === part));
       const spanEnd = plan.measures[i + Math.max(1, mark.number) - 1];
@@ -2017,7 +2031,7 @@ function assembleSegment(
     // Dynamics, per group (anchored via the group's lead part).
     if (!m.multiRest) {
       for (const g of segment.groups) {
-        const pm = segment.staves[g.start].sources[0].part.measures[i];
+        const pm = segment.staves[g.start].sources[0].part.measures[writtenIndex(plan, i)];
         if (!pm) continue;
         const groupArgs = {
           partMeasure: pm,
@@ -2035,21 +2049,21 @@ function assembleSegment(
         });
       }
     }
-    emitNavigationMarkers({
-      gm: mnx.global.measures[i] ?? {},
+    if (!m.entry) emitNavigationMarkers({
+      gm: mnx.global.measures[writtenIndex(plan, i)] ?? {},
       m,
       stdSequences,
       staffTop,
       primitives
     });
     emitMeasureFermata({
-      gm: mnx.global.measures[i] ?? {},
+      gm: mnx.global.measures[writtenIndex(plan, i)] ?? {},
       m,
       staffTop,
       staffHeight: STAFF_HEIGHT_SP,
       primitives
     });
-    emitMeasureNumber(mnx.global.measures[i] ?? {}, m, staffTop, primitives, display.barNumbers, measureNumbers[i]);
+    emitMeasureNumber(mnx.global.measures[writtenIndex(plan, i)] ?? {}, m, staffTop, primitives, display.barNumbers, measureNumbers[writtenIndex(plan, i)]);
     // The tempo mark and the label row are emitted after the loop — they are
     // placed one clearance above the bar's ink, and the beams, voltas and
     // ottava brackets that ink includes are drawn after the loop too.
@@ -2066,13 +2080,14 @@ function assembleSegment(
         emitPositionedDiagnostics(key / 1e4, tabBottom, list, primitives);
       }
       for (const { at: _at, scope: _scope, ...issue } of anchoredTabIssues) {
-        diagnostics.push({ measureIndex: i, ...issue });
+        diagnostics.push({ measureIndex: writtenIndex(plan, i), ...issue });
       }
     }
     if (measureIssues.length) {
       emitMeasureDiagnostics(m.x, sysBottom, measureIssues, primitives);
-      for (const issue of measureIssues) diagnostics.push({ measureIndex: i, ...issue });
+      for (const issue of measureIssues) diagnostics.push({ measureIndex: writtenIndex(plan, i), ...issue });
     }
+    qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, [...selectedNoteIds, ...selectedEventIds]);
   }
 
   const loopEnd = primitives.length;
@@ -2089,6 +2104,7 @@ function assembleSegment(
   const techniqueRowEdges = rowEdgesOf(plan);
   for (const td of tabDisplays) {
     if (!hasTechniqueSites(td.technique)) continue;
+    qualifyTechniques(td.technique, plan);
     emitTabTechnique({
       sites: td.technique.sites,
       byNoteId: td.technique.byNoteId,
@@ -2099,6 +2115,7 @@ function assembleSegment(
   }
   const notationTechnique = collectNotationTechnique(segment, plan, curveAnchors, staffTopOf);
   if (hasTechniqueSites(notationTechnique)) {
+    qualifyTechniques(notationTechnique, plan);
     emitNotationTechnique({
       sites: notationTechnique.sites,
       byNoteId: notationTechnique.byNoteId,
@@ -2112,9 +2129,9 @@ function assembleSegment(
   // their columns, hyphens joining start/middle syllables on the same row.
   emitLyricRuns(lyricRuns.values(), primitives);
 
-  emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives);
-  if (ottavaOnsets && ottavaSpans.length) emitOttavas(ottavaSpans, plan, staffTopOf, ottavaOnsets, primitives);
-  if (ottavaOnsets && hairpinSpans.length) emitHairpins(hairpinSpans, plan, staffTopOf, ottavaOnsets, primitives);
+  if (!args.entries) emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives);
+  if (ottavaOnsets && ottavaSpans.length) emitOttavas(performedSpans(ottavaSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
+  if (ottavaOnsets && hairpinSpans.length) emitHairpins(performedSpans(hairpinSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
 
   // The score-wide text row, last of all (core-ink-measured-gaps.md, stage A):
   // a tempo mark and then the labels sit one cohesion clearance above
@@ -2142,7 +2159,7 @@ function assembleSegment(
     const m = plan.measures[i];
     if (m.hidden) continue;
     if (rowTextStart[m.row] === undefined) rowTextStart[m.row] = primitives.length;
-    const gm = mnx.global.measures[i] ?? {};
+    const gm = mnx.global.measures[writtenIndex(plan, i)] ?? {};
     const staffTop = staffTopOf(m.row, 0);
     const scan = () => [
       ...primitives.slice(rowLoopStart[m.row] ?? loopEnd, rowLoopStart[m.row + 1] ?? loopEnd),
@@ -2150,7 +2167,7 @@ function assembleSegment(
       ...primitives.slice(rowTextStart[m.row])
     ];
     const topSource = segment.staves[0]?.sources[segment.staves[0].sources.length - 1];
-    const topSequence = (topSource?.part.measures?.[i]?.sequences ?? []).find(
+    const topSequence = (topSource?.part.measures?.[writtenIndex(plan, i)]?.sequences ?? []).find(
       seq => (seq.staff ?? 1) === (topSource?.staff ?? 1)
     );
     emitHarmonies({ gm, m, stdSequences: topSequence ? [topSequence] : [], staffTop, scan: scan(), primitives });
@@ -2159,6 +2176,7 @@ function assembleSegment(
       onsetXs: measureOnsetXs(topSequence, m.voices[0] ?? [])
     });
     emitScoreLabels({ gm, m, staffTop, scan: scan(), clearAbove: tempoTop, primitives });
+    emitOccurrenceLabel(m, staffTop, primitives);
   }
 
   const heightSp = 2 * MARGIN_SP + systemHeightByRow.reduce((a, b) => a + b, 0);
@@ -2229,6 +2247,7 @@ function buildBeamRuns(
   const locByKey = new Map<string, Loc>();
   const info = new Map<string, BeamEventInfo>();
   const keyById = new Map<string, string>();
+  const occurrenceKeysById = new Map<string, string[]>();
   const infoById = new Map<string, BeamEventInfo>();
   const inferenceVoices: { mi: number; si: number; vi: number; seq: MnxSequence }[] = [];
   const partsSeen = new Set<MnxPart>();
@@ -2237,9 +2256,9 @@ function buildBeamRuns(
     for (let mi = 0; mi < plan.measures.length; mi++) {
       const pm = plan.measures[mi];
       if (!pm || pm.hidden || pm.multiRest) continue;
-      const voices = resolveStaffVoices(spec, mi);
+      const voices = resolveStaffVoices(spec, writtenIndex(plan, mi));
       const defaultStems = rankVoiceStems(voices, pm.clefTimelines[si][0].clef);
-      const sourceMeasures = spec.sources.map(src => src.part.measures[mi]);
+      const sourceMeasures = spec.sources.map(src => src.part.measures[writtenIndex(plan, mi)]);
       voices.forEach((rv, vi) => {
         // Unmerged voices retain their source sequence. A chord-merged voice
         // has a fresh sequence and must respect explicit beams from its sources.
@@ -2260,6 +2279,7 @@ function buildBeamRuns(
           info.set(key, eventInfo);
           if (event.id) {
             keyById.set(event.id, key);
+            occurrenceKeysById.set(event.id, [...(occurrenceKeysById.get(event.id) ?? []), key]);
             infoById.set(event.id, eventInfo);
           }
         });
@@ -2268,17 +2288,31 @@ function buildBeamRuns(
   });
 
   const groups: BeamGroupSpec[] = [];
-  const keysOf = (ids: string[]) => ids.flatMap(id => {
-    const key = keyById.get(id);
-    return key === undefined ? [] : [key];
-  });
+  const keysOf = (ids: string[], first?: string) => {
+    if (!first) return ids.flatMap(id => { const key = keyById.get(id); return key ? [key] : []; });
+    const firstMeasure = locByKey.get(first)!.mi;
+    return ids.flatMap(id => {
+      const candidates = occurrenceKeysById.get(id) ?? [];
+      const key = candidates.find(key => {
+        const mi = locByKey.get(key)!.mi;
+        if (mi < firstMeasure) return false;
+        for (let i = firstMeasure + 1; i <= mi; i++) {
+          if (writtenIndex(plan, i) !== writtenIndex(plan, i - 1) + 1) return false;
+        }
+        return true;
+      });
+      return key ? [key] : [];
+    });
+  };
   for (const part of partsSeen) {
     for (const group of resolveBeamGroups(part.measures, infoById)) {
-      groups.push({
-        eventIds: keysOf(group.eventIds),
-        segments: group.segments.map(segment => ({ ...segment, eventIds: keysOf(segment.eventIds) })),
+      const starts = plan.measures.some(m => m.entry)
+        ? occurrenceKeysById.get(group.eventIds[0]) ?? [] : [undefined];
+      for (const first of starts) groups.push({
+        eventIds: keysOf(group.eventIds, first),
+        segments: group.segments.map(segment => ({ ...segment, eventIds: keysOf(segment.eventIds, first) })),
         hooks: group.hooks.flatMap(hook => {
-          const key = keyById.get(hook.eventId);
+          const key = keysOf([hook.eventId], first)[0];
           return key === undefined ? [] : [{ ...hook, eventId: key }];
         })
       });
@@ -2668,14 +2702,16 @@ function emitSlursAndTies(
     for (let mi = 0; mi < plan.measures.length; mi++) {
       const pm = plan.measures[mi];
       if (!pm || pm.hidden || pm.multiRest) continue;
-      resolveStaffVoices(spec, mi).forEach((rv, vi) => {
+      resolveStaffVoices(spec, writtenIndex(plan, mi)).forEach((rv, vi) => {
         rv.seq.content.forEach((item, ei) => {
           if (!isTimedEvent(item)) return;
           const start = anchors.byKey.get(`${mi}:${si}:${vi}:${ei}`);
           if (!start) return;
+          if (pm.entry && item.id && !anchors.byEventId.has(occurrenceKey(item.id, pm.entry.ordinal))) return;
 
           for (const slur of item.slurs ?? []) {
-            const end = anchors.byEventId.get(slur.target);
+            const endKey = occurrenceTarget(plan, mi, slur.target, anchors.byEventId);
+            const end = endKey ? anchors.byEventId.get(endKey) : undefined;
             if (!end) continue;
             const side: 'up' | 'down' = slur.side ?? (start.stemDir === 1 ? 'down' : 'up');
             const dir = side === 'up' ? -1 : 1;
@@ -2683,7 +2719,8 @@ function emitSlursAndTies(
             // A pinned endpoint (startNote/endNote) anchors at that chord
             // member; otherwise at the outermost notehead on the curve side.
             const headY = (a: EventCurveAnchor, noteId?: string) => {
-              const pinned = noteId ? anchors.byNoteId.get(noteId) : undefined;
+              const pinKey = noteId ? (pm.entry ? occurrenceKey(noteId, a === start ? pm.entry.ordinal : Number(endKey!.match(/^w(\d+):/)?.[1])) : noteId) : undefined;
+              const pinned = pinKey ? anchors.byNoteId.get(pinKey) : undefined;
               if (pinned) return pinned.anchor.headYs[pinned.noteIndex];
               return side === 'up' ? Math.min(...a.headYs) : Math.max(...a.headYs);
             };
@@ -2695,6 +2732,7 @@ function emitSlursAndTies(
           }
 
           (item.notes ?? []).forEach((note, ni) => {
+            if (pm.entry && note.id && !anchors.byNoteId.has(occurrenceKey(note.id, pm.entry.ordinal))) return;
             for (const tie of note.ties ?? []) {
               const noteY = start.headYs[ni];
               if (noteY === undefined) continue;
@@ -2708,7 +2746,9 @@ function emitSlursAndTies(
                 }
                 continue;
               }
-              const target = anchors.byNoteId.get(tie.target);
+              const targetKey = occurrenceTarget(plan, mi, tie.target, anchors.byNoteId, tie.targetType === 'crossJump');
+              const target = targetKey ? anchors.byNoteId.get(targetKey) : undefined;
+              if (pm.entry && !target) continue;
               if (!target) {
                 // The tie is encoded but its target isn't renderable (e.g.
                 // organ-layout's pedal tie into a never-encoded next bar) —
@@ -2718,7 +2758,7 @@ function emitSlursAndTies(
                 continue;
               }
               const targetY = target.anchor.headYs[target.noteIndex] + pad;
-              if (tie.targetType === 'crossJump') {
+              if (tie.targetType === 'crossJump' && !pm.entry) {
                 // A tie across a jump (e.g. into a second ending) draws only
                 // the incoming stub at its target — drawing the full curve
                 // would span the music skipped by the jump, and the source
@@ -2786,7 +2826,7 @@ function collectNotationTechnique(
     for (let mi = 0; mi < plan.measures.length; mi++) {
       const pm = plan.measures[mi];
       if (!pm || pm.hidden || pm.multiRest) continue;
-      resolveStaffVoices(spec, mi).forEach((rv, vi) => {
+      resolveStaffVoices(spec, writtenIndex(plan, mi)).forEach((rv, vi) => {
         const voiceKey = `${si}:${vi}`;
         rv.seq.content.forEach((item, ei) => {
           if (!isTimedEvent(item)) return;
@@ -2809,6 +2849,7 @@ function collectNotationTechnique(
             if (y === undefined) return;
             const technique = techniqueOf(note);
             recordSite(collector, {
+              ...(pm.entry ? {entryIndex: mi} : {}),
               x: start.x,
               endX,
               y,
@@ -2818,7 +2859,7 @@ function collectNotationTechnique(
               voiceKey,
               ordinal,
               stemDir: start.stemDir,
-              ...(note.id !== undefined ? { noteId: note.id } : {}),
+              ...(note.id !== undefined ? { noteId: occurrenceKey(note.id, pm.entry?.ordinal) } : {}),
               ...(technique ? { technique } : {})
             });
           });
@@ -3961,6 +4002,8 @@ interface EmitEventArgs {
   /** This event's key in the curve-anchor registry. */
   curveKey: string;
   curveAnchors: CurveAnchors;
+  occurrenceOrdinal?: number;
+  performedNoteKeys?: Set<string>;
   /** Staff-1 events synthesize positional note keys (the walk in
    *  model/noteWalk.ts); other staves use real note ids only. */
   synthesizeKeys: boolean;
@@ -4107,9 +4150,9 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
     headYs: staffYs.map(y => staffTop + y)
   };
   curveAnchors.byKey.set(curveKey, curveAnchor);
-  if (event.id) curveAnchors.byEventId.set(event.id, curveAnchor);
+  if (event.id && (!args.performedNoteKeys || noteIds.some(id => id && args.performedNoteKeys!.has(id)))) curveAnchors.byEventId.set(occurrenceKey(event.id, args.occurrenceOrdinal), curveAnchor);
   notes.forEach((n, idx) => {
-    if (n.id) curveAnchors.byNoteId.set(n.id, { anchor: curveAnchor, noteIndex: idx });
+    if (n.id && (!args.performedNoteKeys || args.performedNoteKeys.has(n.id))) curveAnchors.byNoteId.set(occurrenceKey(n.id, args.occurrenceOrdinal), { anchor: curveAnchor, noteIndex: idx });
   });
 
   // Ledger lines

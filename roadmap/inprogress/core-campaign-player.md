@@ -169,7 +169,7 @@ run any time before 6.
 | 7 | [Player element, written view](../complete/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | complete; human review pending |
 | 8 | [Expression and technique](../complete/core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | complete; human performance review pending |
 | 9 | [MIDI oracle](../complete/core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | complete; 22/27 W3C observable strict matches |
-| 10 | [Unrolled engraving](../proposed/core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | proposed — after 7 |
+| 10 | [Unrolled engraving](core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | in progress |
 | 11 | [WebMIDI out](../proposed/core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | proposed — after reviewer items 1–10 |
 | 12 | [Sampled guitar](../proposed/core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | proposed — after reviewer items 1–10 |
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
@@ -485,3 +485,25 @@ The shipped viewer entry stays unchanged until item 7 consumes playback.
 - Landing checks: 1,506 tests / 89 files, corpus/build, strict harness typing, and
   reproducible live MuseScore capture all passed. Scenario goldens are unchanged;
   the implementation worktree was retired before closing the roadmap item.
+
+### Item 10 — unrolled engraving (2026-09-09)
+
+- Written state is resolved before traversal metrics are copied; every visit has
+  independent geometry without expanding or rewriting MNX. Repeated unchanged
+  time signatures are not restated. Reference resolution uses actual contiguous
+  visits, including the one adjacent pair that a cross-jump tie can join.
+- Occurrence `sourceId`s carry a separate written identity. Playback and clicks
+  address the exact visit; JSON and editor selection still address the written
+  note. Visual inspection caught a selection hull spanning repeated bars: each
+  occurrence now earns its own enclosure.
+- Partial-bar membership uses exact arithmetic promoted to the model floor,
+  retaining the audio export. Pickup lengths, crossing notes and end-of-bar
+  steal-previous graces must agree with the compiler's half-open clipping.
+- The original 14 cases plus two later navigation regressions carry 18 new SVGs
+  with an independent approval lifecycle and side-by-side presentation receipt.
+  [Review debt](lab-verify.md#unrolled-engraving--2026-09-09) remains human-owned;
+  existing written goldens and approval records are unchanged.
+- Browser checks cover route/toggle state, exact visit seeking, all-copy selection,
+  playback paint without relayout and excluded partial-note activation/reveal.
+  The partial browser fixture is isolated from the workbench document provider,
+  which correctly replaces ad-hoc changes to its subscribed viewer.

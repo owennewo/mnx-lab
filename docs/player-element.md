@@ -100,3 +100,12 @@ MIDI downloads retain the original evidence contract; sound is not an approval.
   the existing onset/pitch/cancellation checks. `smoke:lib` remains Node-safe.
 - Existing engraving and performance goldens remain unchanged. The 32-scenario
   performance/MIDI batch still awaits human review in the standing verification ledger.
+
+
+## Unrolled presentation
+
+The viewer now accepts `unrolled` independently of its notation/tab/both view.
+Occurrence click events add `ordinal` while retaining the written `noteId`;
+the host seeks that exact visit. `revealOccurrence` and playback paint address
+only that occurrence when unrolled, and reject excluded partial-bar ink.
+See [the unrolled contract](player-unrolled.md).

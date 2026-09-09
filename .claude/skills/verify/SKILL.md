@@ -102,3 +102,17 @@ The performance review page now includes **Listen** over the exact presented JSO
 with performed-order visits and playback highlighting on the committed SVGs. Present
 these controls with the engraving/tables; a successful smoke or audible output is
 not a human approval and does not change the receipt requirement above.
+
+### Unrolled engravings
+
+An `unrolled: true` scenario separately earns `verification.unrolledHash` over
+`expected.unrolled.svg` and, for tab-opting scores, `expected.unrolled.tab.svg`.
+No hash means unseen; missing output blocks approval; a changed hash is stale.
+Generate the side-by-side written/performed page with
+`node harness/verify/unrolled-review.mjs --output <stable-local-html-path> <ids...>`.
+Present it before accepting an unrolled verdict. Check bar order against the
+hand-stated traversal, jump-target clef/key, 2× labels, and faded unperformed notes
+in partial entries. The companion receipt contains only the unrolled evidence
+actually presented. After explicit human approval, use the existing writer with
+`--unrolled-only --presented <page.receipt.json> <ids...>`; it preserves written and
+performance provenance. An ordinary written engraving approval cannot stamp this hash.

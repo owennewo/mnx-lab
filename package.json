@@ -37,7 +37,7 @@
     "sync:spec": "node spec/tools/sync-spec-examples.mjs",
     "sync:musicxml-comparisons": "node spec/tools/sync-musicxml-comparisons.mjs",
     "push:proposal": "node spec/tools/push-proposal.mjs",
-    "update:primitives": "UPDATE_PRIMITIVES=1 vitest run harness/conformance/primitives.test.ts harness/conformance/performance-goldens.test.ts",
+    "update:primitives": "UPDATE_PRIMITIVES=1 vitest run harness/conformance/primitives.test.ts harness/conformance/performance-goldens.test.ts harness/conformance/unrolled-goldens.test.ts",
     "update:musicxml-oracle": "UPDATE_MUSICXML_ORACLE=1 vitest run harness/conformance/musicxml-oracle.test.ts",
     "update:converter-matrix": "UPDATE_CONVERTER_MATRIX=1 vitest run harness/conformance/converter-matrix.test.ts",
     "update:edit-traces": "UPDATE_EDIT_TRACES=1 vitest run harness/conformance/edit-traces.test.ts",
@@ -53,7 +53,8 @@
     "smoke:player": "npm run build && node harness/verify/performance-review.mjs && node harness/verify/player-workbench-smoke.mjs",
     "capture:midi-oracle": "node harness/verify/capture-midi-oracle.mjs",
     "check:midi-oracle-live": "node harness/verify/capture-midi-oracle.mjs --check",
-    "update:midi-oracle": "UPDATE_MIDI_ORACLE=1 vitest run harness/conformance/midi-oracle.test.ts"
+    "update:midi-oracle": "UPDATE_MIDI_ORACLE=1 vitest run harness/conformance/midi-oracle.test.ts",
+    "smoke:unrolled": "npm run build && node harness/verify/unrolled-review.mjs && node harness/verify/unrolled-smoke.mjs"
   },
   "dependencies": {
     "@fontsource/archivo": "^5.3.0",

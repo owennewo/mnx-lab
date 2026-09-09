@@ -38,7 +38,8 @@ export interface ScenarioMeta {
    * never-seen (no record). Display-only here: the workbench never writes it.
    */
   performance?: boolean;
-  verification?: { performanceHash?: string; performanceAt?: string; at: string; primitivesHash?: string; renderHash?: string; bothHash?: string };
+  unrolled?: boolean;
+  verification?: { unrolledHash?: string; unrolledAt?: string; performanceHash?: string; performanceAt?: string; at: string; primitivesHash?: string; renderHash?: string; bothHash?: string };
 }
 
 export interface ScenarioEntry {
@@ -59,6 +60,7 @@ export interface ScenarioEntry {
   invalidByDesign: boolean;
   hasTab: boolean;
   performanceAvailable?: boolean;
+  unrolledAvailable?: boolean;
   loadDocument: () => Promise<unknown>;
   loadNotes: (() => Promise<string>) | null;
 }
@@ -77,6 +79,8 @@ const notesModules = import.meta.glob('../../scenarios/{lab,spec}/**/notes.md', 
   import: 'default'
 }) as Record<string, () => Promise<string>>;
 
+const unrolledModules = import.meta.glob('../../scenarios/{lab,spec}/**/expected.unrolled*.svg', {query:'?raw',import:'default'});
+const writtenTabModules = import.meta.glob('../../scenarios/{lab,spec}/**/expected.tab.svg', {query:'?raw',import:'default'});
 const performanceModules = import.meta.glob('../../scenarios/{lab,spec}/**/expected.performance.json');
 const midiModules = import.meta.glob('../../scenarios/{lab,spec}/**/expected.midi.json');
 
@@ -96,6 +100,7 @@ function buildEntries(): ScenarioEntry[] {
     const notesPath = metaPath.replace(/meta\.json$/, 'notes.md');
     entries.push({
       id: segments.join('/'),
+      unrolledAvailable: metaPath.replace('meta.json','expected.unrolled.svg') in unrolledModules && (!(metaPath.replace('meta.json','expected.tab.svg') in writtenTabModules) || metaPath.replace('meta.json','expected.unrolled.tab.svg') in unrolledModules),
       performanceAvailable: metaPath.replace('meta.json','expected.performance.json') in performanceModules && metaPath.replace('meta.json','expected.midi.json') in midiModules,
       ns,
       category: ns === 'spec' ? 'spec' : segments.slice(0, -1).join('/'),

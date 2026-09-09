@@ -45,11 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-player-unrolled-view.md](proposed/core-player-unrolled-view.md)** — campaign
-  item 10, **moved after the player**: an **occurrence-aware layout plan** (`planHorizontal`
-  takes performed entries; every dependent index per occurrence; clef/key resolved at the
-  jump target; spanners per occurrence pair), still a toggle; opt-in goldens with the path
-  owned; visible whole-bar notes distinguished from performed notes inside partial slices.
 - **[core-player-webmidi.md](proposed/core-player-webmidi.md)** — campaign item 11: a second
   sink carrying the export's bounded channel plan on the wire; never the default.
 - **[core-player-sampled-guitar.md](proposed/core-player-sampled-guitar.md)** — campaign
@@ -175,6 +170,12 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+
+- **[core-player-unrolled-view.md](inprogress/core-player-unrolled-view.md)** — campaign
+  item 10, **moved after the player**: an **occurrence-aware layout plan** (`planHorizontal`
+  takes performed entries; every dependent index per occurrence; clef/key resolved at the
+  jump target; spanners per occurrence pair), still a toggle; opt-in goldens with the path
+  owned; visible whole-bar notes distinguished from performed notes inside partial slices.
 
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat

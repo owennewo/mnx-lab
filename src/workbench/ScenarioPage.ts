@@ -407,6 +407,7 @@ function presentationSpan(
 export class ScenarioPage extends LitElement {
   @property({ type: String }) scenarioId = '';
   @property({ type: String }) view = '';
+  @property({type:Boolean}) unrolled = false;
   @property({attribute:false}) at: number | null=null;
   @state() private performance: Performance | null=null;
   private clickedPlaybackKey='';
@@ -2116,12 +2117,12 @@ export class ScenarioPage extends LitElement {
    * spatial input. Note membership is still model state and therefore does
    * not fork: switching projection remaps the existing selection in place. */
   private onNoteSelected = (
-    event: CustomEvent<{ projection?: 'notation' | 'tab'; noteId?: string }>
+    event: CustomEvent<{ projection?: 'notation' | 'tab'; noteId?: string; ordinal?: number }>
   ) => {
     const key=event.detail.noteId;
     if(key && this.performance){
       const candidates=this.performance.written.filter(w=>w.noteKey===key).map(w=>w.ordinal);
-      const ordinal=chooseOrdinal(candidates,this.playback.ordinal,{explicitSeek:true,cycle:this.clickedPlaybackKey===key});
+      const ordinal=event.detail.ordinal ?? chooseOrdinal(candidates,this.playback.ordinal,{explicitSeek:true,cycle:this.clickedPlaybackKey===key});
       this.clickedPlaybackKey=key;if(ordinal!==null)this.renderRoot.querySelector<Player>('mnx-player')?.seek(ordinal);
     }
     const projection = event.detail.projection;
@@ -2911,7 +2912,7 @@ export class ScenarioPage extends LitElement {
   }
 
   private viewHref(entry: ScenarioEntry, view: ViewMode): string {
-    return this.isLocalDocument() ? documentHref(view) : scenarioHref(entry.id, view);
+    return this.isLocalDocument() ? documentHref(view, this.unrolled) : scenarioHref(entry.id, view, this.at ?? undefined, this.unrolled);
   }
 
   /** The document's preferred view when the URL names none: its `staffKind`
@@ -2966,6 +2967,7 @@ export class ScenarioPage extends LitElement {
         .selectedVerse=${shownDoc ? verseForIteration(documentLyricLineIds(shownDoc.mnxJson), this.playback) : undefined}
         .mnxDoc=${shownDoc}
         .view=${viewMode}
+        .unrolled=${this.unrolled}
         .zoom=${this.staffScale}
         .densityH=${this.densityH}
         .spacingMode=${this.spacingMode}
@@ -3091,6 +3093,12 @@ export class ScenarioPage extends LitElement {
                   }}
                   .view=${view}
                   .views=${views}
+                  .unrolled=${this.unrolled}
+                  @unrolled-change=${(event: CustomEvent<boolean>) => {
+                    const params = new URLSearchParams(location.hash.split('?')[1] ?? '');
+                    if (event.detail) params.set('unrolled', '1'); else params.delete('unrolled');
+                    location.hash = location.hash.split('?')[0] + (params.size ? '?' + params : '');
+                  }}
                   .hrefFor=${(v: ViewMode) => this.viewHref(entry, v)}
                 ></mnx-settings-pad>
               </mnx-zoom-pad>`

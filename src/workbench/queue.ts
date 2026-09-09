@@ -37,6 +37,9 @@ export function classify(entry: ScenarioEntry): QueueItem {
           : 'not rendered yet'
     };
   }
+  if (entry.meta.unrolled && !entry.unrolledAvailable) return { entry, state: 'blocked', detail: 'Unrolled evidence has not been generated.' };
+  if (verification?.unrolledHash && !entry.meta.unrolled) return { entry, state: 'blocked', detail: 'Approved unrolled obligation was removed.' };
+  if (entry.meta.unrolled && !verification?.unrolledHash) return { entry, state: 'never-seen', detail: 'Unseen unrolled evidence; written approval retained.' };
   if (entry.meta.performance && !entry.performanceAvailable) return { entry, state: 'blocked', detail: 'Performance evidence has not been generated.' };
   if (verification?.performanceHash && !entry.meta.performance) return { entry, state: 'blocked', detail: 'Approved performance obligation was removed.' };
   if (entry.meta.performance && !verification?.performanceHash) return { entry, state: 'never-seen', detail: 'Unseen performance evidence; engraving approval retained.' };

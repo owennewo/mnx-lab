@@ -51,6 +51,8 @@ export function techniqueOf(note: MnxNote): MnxTabTechnique | undefined {
  * the primitive list has forgotten which note was which.
  */
 export interface TechniqueSite {
+  /** Performed plan position, separate from the voice event ordinal. */
+  entryIndex?: number;
   /** The event's column centre — a musical POSITION (see `PrimitiveBase`). */
   x: number;
   /**

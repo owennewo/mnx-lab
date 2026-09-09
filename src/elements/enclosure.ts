@@ -1,3 +1,5 @@
+import type { PerformedEntry } from '../model/passes.ts';
+import { occurrenceKey } from '../model/noteKeys.ts';
 // The selection enclosure overlay — roadmap/complete/core-selection-ladder.md.
 //
 // One visual vocabulary for every selection level: an enclosure whose extent
@@ -270,6 +272,7 @@ function measureBoundaries(
  * as `data-source-id`, so the overlay can find its own footprint.
  */
 export interface EnclosureOptions {
+  entries?: readonly PerformedEntry[];
   /** Draw as a dashed candidate into its own layer, not the live selection. */
   preview?: boolean;
   /** The footprint, when it is not the rendered `.selected` set. */
@@ -445,6 +448,33 @@ export function drawEnclosure(
 ): void {
   const preview = options.preview === true;
   const layer = preview ? 'enclosure-preview' : 'enclosure';
+  if (options.entries && kind !== 'frame') {
+    // A written selection may have several disjoint copies on one system.
+    // Run the existing enclosure geometry per visit, then combine its SVG
+    // layers for the normal tween; never hull the space between repeated bars.
+    const combined = document.createElementNS(SVG_NS, 'g');
+    combined.setAttribute('class', `${layer} enc-${kind}`);
+    const labels = document.createElementNS(SVG_NS, 'g');
+    labels.setAttribute('class', 'enclosure-label');
+    options.entries.forEach((entry, index) => {
+      const units = options.span?.units.filter(unit => unit.measureIndex === entry.measureIndex)
+        .map(unit => ({...unit, measureIndex: index}));
+      const ids = (values?: readonly string[]) => values?.map(key => occurrenceKey(key, entry.ordinal));
+      drawEnclosure(svg, kind, {...options, entries: undefined,
+        noteIds: ids(options.noteIds), eventIds: ids(options.eventIds),
+        span: options.span ? {...options.span, units: units ?? []} : undefined});
+      const drawn = svg.querySelector(`:scope > g.${layer}`);
+      if (drawn) { while (drawn.firstChild) combined.appendChild(drawn.firstChild); drawn.remove(); }
+      if (!preview) {
+        const drawnLabels = svg.querySelector(':scope > g.enclosure-label');
+        if (drawnLabels) { while (drawnLabels.firstChild) labels.appendChild(drawnLabels.firstChild); drawnLabels.remove(); }
+      }
+    });
+    if (combined.childElementCount) svg.insertBefore(combined, svg.firstChild);
+    if (labels.childElementCount) svg.insertBefore(labels, svg.firstChild);
+    return;
+  }
+
   svg.querySelector(`:scope > g.${layer}`)?.remove();
   // The live pass owns the label chips: a rung that does not claim them must
   // clear the ones the previous rung lit, on every early return below.
@@ -982,7 +1012,7 @@ function previewGlyphs(
 ): SVGGraphicsElement[] {
   const wanted = new Set(noteIds);
   return [...svg.querySelectorAll<SVGGraphicsElement>('[data-source-id]')].filter(el => {
-    if (!wanted.has(el.getAttribute('data-source-id') ?? '')) return false;
+    if (!wanted.has(el.getAttribute('data-source-id') ?? '') && !wanted.has(el.getAttribute('data-written-source-id') ?? '')) return false;
     // Mirrors the `.selected` selector's split: a cell is a position mark on
     // the notehead itself, a run hugs the noteheads' contour, wider rungs
     // take whatever ink they cover.
@@ -1116,7 +1146,7 @@ export function drawCursorGhost(
   let x: number | null = null;
   for (const key of ghost.anchorKeys) {
     const candidates = [
-      ...svg.querySelectorAll<SVGGraphicsElement>(`[data-source-id="${CSS.escape(key)}"]`)
+      ...svg.querySelectorAll<SVGGraphicsElement>(`[data-source-id="${CSS.escape(key)}"], [data-written-source-id="${CSS.escape(key)}"]`)
     ];
     // A REST anchors a column as well as a notehead does — it is the whole of
     // that event's ink. The tab staff draws no rest of its own (rests there

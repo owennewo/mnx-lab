@@ -1,3 +1,4 @@
+import type { PerformedEntry } from '../../model/passes.ts';
 import { clearanceSpacing } from '../clearance.ts';
 import type { DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure } from '../../model/mnx.ts';
@@ -24,6 +25,7 @@ const DEFAULT_PX_PER_SP = 10;
 
 
 export interface RenderTabOptions {
+  entries?: PerformedEntry[];
   container: HTMLElement;
   mnx: MnxStructure;
   /** Total viewport width in pixels. */
@@ -63,6 +65,7 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
 
   const layoutArgs = {
     mnx: opts.mnx,
+    entries: opts.entries,
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
     selectedNoteIds: opts.selectedNoteIds,
