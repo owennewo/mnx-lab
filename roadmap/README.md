@@ -48,10 +48,6 @@ proposals that name their campaign.
   display setting, 0–4 in half steps with today’s layout preserved at default 2;
   seven structural padding/margin locations, independent of Staff and Space,
   calibrated from tightest safe to deliberately generous.
-- **[core-player-element.md](proposed/core-player-element.md)** — campaign item 7, **the
-  first reviewer milestone**: `<mnx-player>` over the written score with a
-  performed-order table, playback highlight separate from selection, click-to-seek via the
-  host, a public reveal helper, Listen on `/verify`; embed smoke on both formats.
 - **[core-player-expression.md](proposed/core-player-expression.md)** — campaign item 8:
   dynamics, articulations, arpeggio and the guitar techniques as curves and voice flags
   (`noReattack` on the event type); tempo-relative vibrato and harmonics that preserve
@@ -393,6 +389,10 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-player-element.md](complete/core-player-element.md)** — player campaign item 7,
+  complete 2026-09-09: `<mnx-player>` controls, performed-order table, separate playback
+  ink and inspection, ordinal links, plain-DOM ESM/IIFE wiring and static `/verify`
+  Listen. Lifecycle and D.S. smokes pass; existing performance evidence awaits human review.
 - **[core-beam-geometry.md](complete/core-beam-geometry.md)** — complete 2026-09-09, the
   day it was proposed: beamed stems ran long because the beam slid out until the
   *shortest* stem reached the octave. Now the shortest stem lands on a per-level minimum

@@ -1,6 +1,6 @@
 # The player element over the written score — the first reviewer milestone
 
-> **Status: implemented 2026-09-09; landing checks in progress.** Campaign:
+> **Status: complete 2026-09-09.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 7. Needs items 2, 5 and
 > 6. Deliberately **not** waiting for the unrolled engraving (item 10): the written
 > score, a performed-order table and sound prove the player with far less layout work.
@@ -67,3 +67,9 @@ hears the D.S. return. The embed mock host does the same on the IIFE and the ESM
 static Listen, ordinal routing, reveal and paint overlays. Both embed formats have
 permanent playback/lifecycle smokes; the workbench smoke covers edits and D.S. return.
 No goldens or verification records changed; the standing performance review debt remains.
+
+Implementation landed as `71bc49b`; its worktree was retired before this completion
+move. Post-rebase validation: 1,437 tests, scenario checks, production build and
+packaged-library smoke passed; goldens regenerated without changes. ESM/IIFE player,
+workbench/D.S./review Listen and offline audio/volume smokes also passed.
+The existing 32 performance/MIDI baselines still await human review.
