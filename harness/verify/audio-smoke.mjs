@@ -30,6 +30,7 @@ try {
       '--headless=new',
       '--remote-debugging-port=0',
       '--disable-gpu',
+      '--autoplay-policy=no-user-gesture-required',
       '--no-sandbox',
       `--user-data-dir=${profile}`,
       'about:blank',

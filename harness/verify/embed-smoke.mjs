@@ -125,7 +125,10 @@ try {
   const metadataHeading = await cdp.evaluate(`
     (async () => {
       const v = document.getElementById('viewer');
-      v.mnxDoc = { ...v.mnxDoc, artist: 'Example Artist', title: 'Example Title' };
+      const mnxJson = structuredClone(v.mnxDoc.mnxJson);
+      mnxJson._x ??= {}; mnxJson._x.mnxLab ??= {};
+      mnxJson._x.mnxLab.work = { title: 'Example Title', artist: 'Example Artist' };
+      v.mnxDoc = { ...v.mnxDoc, mnxJson };
       await v.updateComplete;
       return v.shadowRoot.querySelector('.document-heading')?.textContent.trim();
     })()

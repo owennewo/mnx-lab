@@ -15,6 +15,7 @@
 // So this face derives its asset base from ITS OWN script URL and registers
 // the font itself. A host may still override with the `smufl-base` attribute
 // on the script tag (assets mirrored elsewhere, or split to a CDN).
+import { setGuitarSampleBase } from '../audio/native/guitarSamples.ts';
 import { setSmuflBasePath } from '../engine/smufl/smufl.ts';
 import '../elements/DocumentViewer.ts';
 
@@ -49,6 +50,8 @@ function declaredBase(): string | null {
   return attr ? attr.replace(/\/+$/, '') : null;
 }
 
+const sampleDirectory = scriptDirectory();
+if (sampleDirectory) setGuitarSampleBase(`${sampleDirectory}/samples/shinyguitar-v1`);
 const base = declaredBase() ?? scriptDirectory();
 if (base) {
   setSmuflBasePath(`${base}/smufl`);

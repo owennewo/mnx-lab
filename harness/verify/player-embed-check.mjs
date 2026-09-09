@@ -29,8 +29,18 @@ export async function checkPlayer(cdp, base, format) {
     for(const view of ['notation','tab','both']){viewer.view=view;await viewer.updateComplete;check(!!viewer.shadowRoot.querySelector('.playback-ink'),'Highlight missing in '+view);}
     binding.follow();check(viewer.playbackState.inspectionIteration===2 && viewer.playbackState.followPlayback,'Follow erased inspection');
     check(viewer.revealOccurrence({noteKey:key,ordinal:0}),'Public reveal missed known ink');
+
+    check(!performance.getEntriesByType('resource').some(e=>e.name.includes('/samples/')),
+      'Samples downloaded before selecting Guitar');
+    const sound=player.shadowRoot.querySelector('select[aria-label="Playback sound"]');
+    sound.value='guitar';sound.dispatchEvent(new Event('change'));await player.updateComplete;
+    for(let i=0;i<200 && player.snapshot?.state!=='playing';i++) await delay(50);
+    check(player.snapshot?.state==='playing','Guitar selection did not resume playback');
+    check(performance.getEntriesByType('resource').some(e=>e.name.startsWith(${JSON.stringify(base + '/samples/')})),
+      'Embed did not resolve samples beside its own script');
+    check(!player.shadowRoot.querySelector('[role=alert]'),'Sample loading produced an error');
     player.pause();const frozen=player.position;await delay(60);check(player.position.num===frozen.num && player.position.den===frozen.den,'Pause did not freeze');
-    const rate=player.shadowRoot.querySelector('select');rate.value='1.5';rate.dispatchEvent(new Event('change'));await player.updateComplete;check(player.snapshot.rate===1.5,'Rate control did not reach transport');
+    const rate=player.shadowRoot.querySelector('select[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('change'));await player.updateComplete;check(player.snapshot.rate===1.5,'Rate control did not reach transport');
     const volume=player.shadowRoot.querySelector('input');volume.value='0';volume.dispatchEvent(new Event('input'));await player.play();
     const replaced=structuredClone(doc);replaced.id='replacement';binding.setDocument(replaced);await player.updateComplete;await delay(80);
     check(player.documentId==='replacement' && !viewer.playbackState.highlight.length && player.snapshot?.state!=='playing','Document replacement retained playback');

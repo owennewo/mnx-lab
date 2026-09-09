@@ -1,8 +1,9 @@
+import { runGuitarSmoke } from './guitar-smoke.ts';
 // Browser-only buffer assertions. No listening approval and no performance goldens.
 import { NativeSink } from '../../src/audio/native/sink.ts';
 import { Transport, type Clock } from '../../src/audio/transport.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
-import type { MnxDocument } from '../../src/model/mnx.ts';
+import type { MnxStructure } from '../../src/model/mnx.ts';
 const check = (value: boolean, message: string) => {
   if (!value) throw new Error(message);
 };
@@ -24,7 +25,7 @@ export async function runAudioSmoke() {
   const result: Record<string, number | boolean> = {};
   const doc = (await (
     await fetch('/scenarios/spec/hello-world/document.mnx.json')
-  ).json()) as MnxDocument;
+  ).json()) as MnxStructure;
   const compiled = compilePerformance(doc);
   if (!compiled.ok) throw new Error('Scenario failed compilation.');
   const context = new OfflineAudioContext(1, 48000 * 2.4, 48000),
@@ -49,7 +50,7 @@ export async function runAudioSmoke() {
 
   // End-to-end expression: a compiled bend reaches its target, then a hammer
   // changes the base pitch without retaining the previous bend or restarting.
-  const expressionDoc: MnxDocument = {
+  const expressionDoc: MnxStructure = {
     mnx: { version: 1 },
     global: { measures: [{ time: { count: 4, unit: 4 } }] },
     parts: [
@@ -284,5 +285,5 @@ export async function runAudioSmoke() {
     'Master volume did not reach the output.',
   );
   quiet.dispose();
-  return result;
+  return { ...result, guitar: await runGuitarSmoke() };
 }

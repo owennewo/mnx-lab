@@ -34,7 +34,7 @@ try {
   // 3. Use it the way a consumer would: compute layout headlessly, then emit
   //    SVG with the four DOM calls the emitter needs faked in.
   const consumer = `
-    import { compilePerformance, serializePerformance, parsePerformance, exportMidi, NativeSink, Transport } from 'mnx-lab/audio';
+    import { compilePerformance, serializePerformance, parsePerformance, exportMidi, NativeSink, Transport, loadGuitarSamples } from 'mnx-lab/audio';
     import { ensureSmufl, computePrimitives, renderSvg, fitPxPerSp } from 'mnx-lab/engine';
     import fs from 'node:fs';
     import { createRequire } from 'node:module';
@@ -50,7 +50,11 @@ try {
     if (!compiled.ok || compiled.performance.sounding.length !== 1) throw new Error('audio compilation failed');
     const midi = exportMidi(parsePerformance(serializePerformance(compiled.performance)));
     if (!midi.ok || String.fromCharCode(...midi.bytes.slice(0,4)) !== 'MThd') throw new Error('MIDI export failed');
-    const idleSink = new NativeSink();
+    const pack = JSON.parse(fs.readFileSync(require.resolve('mnx-lab/samples/shinyguitar-v1/manifest.json'), 'utf8'));
+    if (pack.samples.length !== 48 || typeof loadGuitarSamples !== 'function')
+      throw new Error('Sample assets/API missing from installed package');
+    fs.accessSync(require.resolve('mnx-lab/samples/shinyguitar-v1/' + pack.samples[0].file));
+    const idleSink = new NativeSink({ voicePreset: 'guitar' });
     if (idleSink.now() !== 0 || typeof Transport !== 'function') throw new Error('Lazy audio import failed');
     idleSink.dispose();
     console.log('OK mnx-lab/audio imported lazy native sink and compiled/exported hello-world in Node');

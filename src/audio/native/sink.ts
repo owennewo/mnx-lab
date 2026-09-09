@@ -1,5 +1,11 @@
 /** Native Web Audio renderer; importing this module never creates a context. */
 import type { Sink, SinkEvent } from '../sink.ts';
+import { selectGuitarSample, type VoicePreset } from '../sampleSelection.ts';
+import {
+  loadGuitarSamples,
+  type GuitarSampleBank,
+  type GuitarSampleLoader,
+} from './guitarSamples.ts';
 import type { Clock } from '../transport.ts';
 
 const TAIL = 0.005;
@@ -70,13 +76,19 @@ interface Voice {
   id: string;
   start: number;
   end: number;
-  oscillator: OscillatorNode;
+  source: OscillatorNode | AudioBufferSourceNode;
+  pitchScale: number;
+  amplitudeScale: number;
   gain: GainNode;
   amplitude: Automation;
   pitch: Automation;
   detune: Automation;
 }
 export interface NativeSinkOptions {
+  /** Explicit timbre choice; a callback can choose separately for each part/voice. */
+  voicePreset?: VoicePreset | ((voice: string) => VoicePreset);
+  sampleBase?: string;
+  sampleLoader?: GuitarSampleLoader;
   /** Master amplitude, independent of note velocities; defaults to 1. */
   volume?: number;
   /** A host-owned live or offline context. It is never closed by the sink. */
@@ -92,12 +104,20 @@ export class NativeSink implements Sink {
   private output?: GainNode;
   private volume = 1;
   private disposed = false;
+  private sampleBank?: GuitarSampleBank;
+  private sampleRequest?: Promise<void>;
+  private attacks = new Map<string, number>();
   private voices = new Set<Voice>();
   constructor(private options: NativeSinkOptions = {}) {
     this.context = options.context;
     this.setVolume(options.volume ?? 1);
     if (options.destination && options.context !== options.destination.context)
       throw new Error('Destination must belong to the supplied context.');
+  }
+  /** The host pauses before switching; subsequent attacks use the new preset. */
+  setVoicePreset(preset: NativeSinkOptions['voicePreset']): void {
+    this.live();
+    this.options.voicePreset = preset;
   }
   private live() {
     if (this.disposed) throw new Error('Sink is disposed.');
@@ -117,6 +137,22 @@ export class NativeSink implements Sink {
       this.context.state !== 'running'
     )
       await (this.context as AudioContext).resume();
+    this.live();
+    if (this.options.voicePreset && this.options.voicePreset !== 'synth' && !this.sampleBank) {
+      this.sampleRequest ??= (async () => {
+        try {
+          const bank = await (this.options.sampleLoader
+            ? this.options.sampleLoader(this.context!)
+            : loadGuitarSamples(this.context!, this.options.sampleBase));
+          this.live();
+          if (!bank.samples.length) throw new Error('The guitar pack contains no samples.');
+          this.sampleBank = bank;
+        } finally {
+          this.sampleRequest = undefined;
+        }
+      })();
+      await this.sampleRequest;
+    }
     this.live();
   }
   setVolume(volume: number): void {
@@ -146,7 +182,7 @@ export class NativeSink implements Sink {
     v.detune.hold(time);
     v.amplitude.hold(time);
     v.amplitude.set(time, 0, TAIL);
-    v.oscillator.stop(time + TAIL);
+    v.source.stop(time + TAIL);
   }
   schedule(events: readonly SinkEvent[], audioTime: number): void {
     this.live();
@@ -162,6 +198,14 @@ export class NativeSink implements Sink {
       )
         throw new RangeError('Offsets must be finite, nonnegative and ordered.');
       previous = event.offset;
+      if (event.kind === 'attack' && !this.sampleBank) {
+        const preset =
+          typeof this.options.voicePreset === 'function'
+            ? this.options.voicePreset(event.voice)
+            : this.options.voicePreset;
+        if (preset === 'guitar')
+          throw new Error('Guitar samples are not ready; call unlock first.');
+      }
       if (
         (event.kind === 'attack' || event.kind === 'pitch') &&
         (!Number.isFinite(event.hz) || event.hz <= 0)
@@ -192,43 +236,78 @@ export class NativeSink implements Sink {
       let voice = this.voiceAt(event.voice, time);
       if (event.kind === 'attack') {
         if (voice) this.releaseVoice(voice, time);
-        const oscillator = context.createOscillator(),
-          gain = context.createGain();
-        oscillator.type = event.timbre?.includes('harmonic') ? 'triangle' : 'sine';
-        oscillator.connect(gain);
+        const preset =
+          typeof this.options.voicePreset === 'function'
+            ? this.options.voicePreset(event.voice)
+            : this.options.voicePreset;
+        let source: OscillatorNode | AudioBufferSourceNode;
+        let pitchParam: AudioParam;
+        let pitchScale = 1;
+        let amplitudeScale = 0.2;
+        if (preset === 'guitar') {
+          if (!this.sampleBank) throw new Error('Guitar samples are not ready; call unlock first.');
+          const attack = this.attacks.get(event.voice) ?? 0;
+          const sample = selectGuitarSample(
+            this.sampleBank.samples,
+            event.hz,
+            event.velocity,
+            attack,
+          );
+          this.attacks.set(event.voice, attack + 1);
+          const bufferSource = context.createBufferSource();
+          bufferSource.buffer = sample.buffer;
+          // Re-pitch this same source for legato; never restart its attack envelope.
+          pitchScale = 1 / (440 * 2 ** ((sample.midi - 69) / 12));
+          pitchParam = bufferSource.playbackRate;
+          amplitudeScale = 0.65;
+          source = bufferSource;
+        } else {
+          const oscillator = context.createOscillator();
+          oscillator.type = event.timbre?.includes('harmonic') ? 'triangle' : 'sine';
+          pitchParam = oscillator.frequency;
+          source = oscillator;
+        }
+        const gain = context.createGain();
+        source.connect(gain);
         gain.connect(this.destination());
         voice = {
           id: event.voice,
           start: time,
           end: Infinity,
-          oscillator,
+          source,
+          pitchScale,
+          amplitudeScale,
           gain,
           amplitude: new Automation(gain.gain, 0, context),
-          pitch: new Automation(oscillator.frequency, event.hz, context),
-          detune: new Automation(oscillator.detune, 0, context),
+          pitch: new Automation(pitchParam, event.hz * pitchScale, context),
+          detune: new Automation(source.detune, 0, context),
         };
         const next = [...this.voices]
           .filter((v) => v.id === event.voice && v.start > time && v.end > v.start)
           .sort((a, b) => a.start - b.start)[0];
         this.voices.add(voice);
-        voice.pitch.set(time, event.hz);
+        voice.pitch.set(time, event.hz * pitchScale);
         voice.detune.set(time, 0);
-        voice.amplitude.set(time, event.velocity * 0.2, TAIL);
+        voice.amplitude.set(time, event.velocity * voice.amplitudeScale, TAIL);
         const ownedVoice = voice;
-        oscillator.onended = () => {
-          oscillator.disconnect();
+        source.onended = () => {
+          source.disconnect();
           gain.disconnect();
           this.voices.delete(ownedVoice);
         };
-        oscillator.start(time);
+        source.start(time);
         if (next) this.releaseVoice(voice, next.start);
       } else if (voice) {
         if (event.kind === 'release') this.releaseVoice(voice, time);
         else if (event.kind === 'pitch') {
-          voice.pitch.set(time, event.hz, Math.min(event.rampSeconds ?? 0, voice.end - time));
-          if (event.velocity !== undefined) voice.amplitude.set(time, event.velocity * 0.2, TAIL);
-          // Oscillator type is not schedulable. Preserve the attack's patch
-          // across legato; changing it here would also change earlier audio.
+          voice.pitch.set(
+            time,
+            event.hz * voice.pitchScale,
+            Math.min(event.rampSeconds ?? 0, voice.end - time),
+          );
+          if (event.velocity !== undefined)
+            voice.amplitude.set(time, event.velocity * voice.amplitudeScale, TAIL);
+          // Preserve the attack's patch/sample across legato.
         } else
           voice.detune.set(time, event.cents, Math.min(event.rampSeconds ?? 0, voice.end - time));
       }
@@ -246,7 +325,7 @@ export class NativeSink implements Sink {
         voice.pitch.hold(time);
         voice.detune.hold(time);
         voice.end = time;
-        voice.oscillator.stop(time);
+        voice.source.stop(time);
       } else this.releaseVoice(voice, time);
     }
   }
@@ -261,10 +340,10 @@ export class NativeSink implements Sink {
     this.cancel(this.now());
     this.disposed = true;
     for (const v of this.voices) {
-      v.oscillator.stop(this.now());
-      v.oscillator.disconnect();
+      v.source.stop(this.now());
+      v.source.disconnect();
       v.gain.disconnect();
-      v.oscillator.onended = null;
+      v.source.onended = null;
     }
     this.voices.clear();
     this.output?.disconnect();

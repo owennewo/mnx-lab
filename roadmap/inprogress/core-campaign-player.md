@@ -4,7 +4,7 @@
 > proposals, the shared contract they follow, and the running log of progress and
 > learnings as items land. Indexed items are ordinary `core-*` (and one `studio-*`)
 > proposals that name this campaign. **Opened 2026-09-08; revised the same day on an
-> independent review before anything was built** — see the first log entry. Items 1–9 are implemented; the remaining items are proposed.
+> independent review before anything was built** — see the first log entry. Items 1–10 are implemented; item 11 is won’t-do, item 12 is in progress and item 13 remains proposed.
 
 ## The goal
 
@@ -170,8 +170,8 @@ run any time before 6.
 | 8 | [Expression and technique](../complete/core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | complete; human performance review pending |
 | 9 | [MIDI oracle](../complete/core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | complete; 22/27 W3C observable strict matches |
 | 10 | [Unrolled engraving](../complete/core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | complete; unrolled engraving review pending |
-| 11 | [WebMIDI out](../proposed/core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | proposed — after reviewer items 1–10 |
-| 12 | [Sampled guitar](../proposed/core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | proposed — after reviewer items 1–10 |
+| 11 | [WebMIDI out](../rejected/core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | rejected — user chose won’t-do |
+| 12 | [Sampled guitar](core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | in progress — explicitly authorized ahead of review |
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
 
 ### Decisions still open
@@ -518,3 +518,22 @@ The shipped viewer entry stays unchanged until item 7 consumes playback.
   must compare those bounds with actual written duration, using the same exact
   timing as note membership. Three unrolled SVGs changed; see the
   [review ledger](lab-verify.md#unrolled-engraving--2026-09-09).
+
+### Item 12 — sampled guitar (2026-09-09)
+
+- The user chose item 11 as won't-do and explicitly authorized item 12 ahead of
+  the reviewer verification gate. Existing review debt remains owed.
+- Karoryfer Shinyguitar microphone recordings, pinned at
+  57243cca85277dbcc120ce17c6178032f93c80f3 under CC0: 48 FLAC files, 3,575,730 bytes,
+  12 roots × two velocity layers × two alternating takes. Source and output hashes
+  are committed. Fetch/decode happens only on Guitar play, without a runtime dependency.
+- Independent native buffer voices retain string ownership; upstream recordings
+  have no string identity. PlaybackRate and detune preserve per-voice legato/bends.
+  Natural decay is retained, with no synthetic looping or claimed technique layers.
+- The Sound selector preserves position on changes; stop and switching to Synth
+  invalidate pending starts and stale errors. Both embed formats derive the sample
+  base from their own script; hosts can supply a URL or loader. Installed packages
+  serve public assets once, rather than copying the whole pack into dist/lib too.
+- Real recorded buffers pass onset, bend, legato, cancellation/release and seek
+  measurements; browser checks cover loading/recovery and cross-origin assets.
+  [Human listening](lab-verify.md#sampled-guitar-listening--2026-09-09) remains pending.

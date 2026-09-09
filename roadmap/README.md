@@ -52,11 +52,6 @@ proposals that name their campaign.
   Unrolled checkbox becomes a REPEATS row, and the mark idles bare at 0.28 with the card
   growing around it — the zoom pad's grammar, so the cluster reads as one family. Chrome
   only; verified hands-on over CDP like the pad was.
-- **[core-player-webmidi.md](proposed/core-player-webmidi.md)** — campaign item 11: a second
-  sink carrying the export's bounded channel plan on the wire; never the default.
-- **[core-player-sampled-guitar.md](proposed/core-player-sampled-guitar.md)** — campaign
-  item 12: a sampled voice per string, **preconditioned on per-voice pitch control** in the
-  chosen sampler; the asset question (bundled, fetched or user-supplied — no R2) argued first.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -177,6 +172,9 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+
+- **[core-player-sampled-guitar.md](inprogress/core-player-sampled-guitar.md)** — item 12: on-demand guitar samples through native independent voices.
+
 
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
@@ -1632,6 +1630,9 @@ back up to `proposed/` the moment it is.
   stage. Do not build from this document.
 
 ### rejected/
+
+- **[core-player-webmidi.md](rejected/core-player-webmidi.md)** — item 11: user chose won’t-do on 2026-09-09.
+
 - **[core-density-ladder-ink.md](rejected/core-density-ladder-ink.md)** — the density
   ladder deliberately re-packs a square `PackingInput`, so its rungs become approximate
   once ink pricing diverges from square packing at extreme staff scales. The mismatch is

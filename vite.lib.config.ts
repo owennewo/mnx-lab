@@ -3,6 +3,9 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  // Package exports serve public/smufl and public/samples directly; copying them
+  // into dist/lib would ship every recording twice.
+  publicDir: false,
   build: {
     target: 'es2022',
     outDir: 'dist/lib',

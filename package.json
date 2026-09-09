@@ -8,7 +8,8 @@
   ],
   "files": [
     "dist/lib",
-    "public/smufl"
+    "public/smufl",
+    "public/samples"
   ],
   "exports": {
     ".": "./dist/lib/index.js",
@@ -16,7 +17,8 @@
     "./engine": "./dist/lib/engine.js",
     "./audio": "./dist/lib/audio.js",
     "./elements": "./dist/lib/elements.js",
-    "./smufl/*": "./public/smufl/*"
+    "./smufl/*": "./public/smufl/*",
+    "./samples/*": "./public/samples/*"
   },
   "scripts": {
     "dev": "NODE_OPTIONS=--disable-warning=DEP0040 vite",

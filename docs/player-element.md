@@ -109,3 +109,7 @@ Occurrence click events add `ordinal` while retaining the written `noteId`;
 the host seeks that exact visit. `revealOccurrence` and playback paint address
 only that occurrence when unrolled, and reject excluded partial-bar ink.
 See [the unrolled contract](player-unrolled.md).
+
+The Sound selector adds an explicit Guitar preset with lazy static samples.
+See [sampled guitar](player-sampled-guitar.md) for the pack, host loader/base URL,
+loading/error behavior and recorded-articulation limits.

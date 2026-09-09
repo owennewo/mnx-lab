@@ -7,6 +7,8 @@ import {
   type TransportSnapshot,
   type LoopRegion,
 } from '../audio/transport.ts';
+import type { VoicePreset } from '../audio/sampleSelection.ts';
+import type { GuitarSampleLoader } from '../audio/native/guitarSamples.ts';
 import { NativeSink, nativeClock } from '../audio/native/sink.ts';
 import { formatPlaybackPosition, measureAt } from '../audio/playbackPosition.ts';
 import { ZERO, compare, type Rational } from '../audio/time.ts';
@@ -18,6 +20,10 @@ export class Player extends LitElement {
   @property({ attribute: false }) performance: Performance | null = null;
   @property({ attribute: false }) document: MnxStructure | undefined;
   @property({ type: String }) documentId = '';
+  @property({ attribute: 'voice-preset' }) voicePreset: VoicePreset = 'synth';
+  @property({ attribute: 'sample-base' }) sampleBase: string | undefined;
+  @property({ attribute: false }) sampleLoader: GuitarSampleLoader | undefined;
+  @state() private loading = false;
   @property({ type: Number }) initialOrdinal: number | null = null;
   @state() private status: TransportSnapshot | undefined;
   @state() private error = '';
@@ -26,6 +32,7 @@ export class Player extends LitElement {
   private transport?: Transport;
   private sink?: NativeSink;
   private revision = 0;
+  private playRequest = 0;
   private lastUpdate = '';
   private lastOrdinal: number | null = null;
   static styles = css`
@@ -129,11 +136,23 @@ export class Player extends LitElement {
     super.disconnectedCallback();
   }
   protected updated(changed: Map<PropertyKey, unknown>) {
-    if (changed.has('performance') || changed.has('documentId')) {
+    const reinstall =
+      changed.has('performance') ||
+      changed.has('documentId') ||
+      changed.has('sampleBase') ||
+      changed.has('sampleLoader');
+    if (reinstall) {
       this.install();
       if (this.initialOrdinal !== null) this.seek(this.initialOrdinal);
     } else if (changed.has('initialOrdinal') && this.initialOrdinal !== null)
       this.seek(this.initialOrdinal);
+    if (!reinstall && changed.has('voicePreset') && this.sink) {
+      const resume = this.status?.state === 'playing';
+      this.pause();
+      this.sink.setVoicePreset(this.sinkPreset());
+      this.error = '';
+      if (resume) void this.play();
+    }
     if (changed.has('status')) {
       const row = this.renderRoot.querySelector<HTMLElement>('tr[aria-current=true]'),
         table = this.renderRoot.querySelector<HTMLElement>('.table');
@@ -184,15 +203,26 @@ export class Player extends LitElement {
     this.sink?.dispose();
     this.sink = undefined;
     this.status = undefined;
+    this.loading = false;
     this.lastOrdinal = null;
     this.publish();
+  }
+  private sinkPreset(): 'synth' | ((voice: string) => VoicePreset) {
+    if (this.voicePreset !== 'guitar') return 'synth';
+    const kits = new Set(this.performance?.voices.filter((v) => v.kit).map((v) => v.id));
+    return (voice: string) => (kits.has(voice) ? 'synth' : 'guitar');
   }
   private install() {
     this.teardown();
     this.error = '';
     if (!this.performance || !this.isConnected) return;
     const revision = this.revision;
-    const sink = new NativeSink({ volume: this.volume });
+    const sink = new NativeSink({
+      volume: this.volume,
+      voicePreset: this.sinkPreset(),
+      sampleBase: this.sampleBase,
+      sampleLoader: this.sampleLoader,
+    });
     this.sink = sink;
     this.transport = new Transport(this.performance, nativeClock(sink), sink, {
       onEvent: (event: TransportEvent) => {
@@ -223,21 +253,31 @@ export class Player extends LitElement {
   async play() {
     if (!this.transport) return;
     const revision = this.revision;
+    const request = ++this.playRequest;
     if (
       this.status?.state === 'stopped' &&
       compare(this.status.position, this.transport.duration) >= 0
     )
       this.transport.seek(ZERO);
+    this.error = '';
+    this.loading = true;
     try {
       await this.transport.play();
     } catch (e) {
-      if (revision === this.revision) this.error = e instanceof Error ? e.message : String(e);
+      if (revision === this.revision && request === this.playRequest)
+        this.error = e instanceof Error ? e.message : String(e);
+    } finally {
+      if (revision === this.revision && request === this.playRequest) this.loading = false;
     }
   }
   pause() {
+    this.playRequest++;
+    this.loading = false;
     this.transport?.pause();
   }
   stop() {
+    this.playRequest++;
+    this.loading = false;
     this.transport?.stop();
   }
   seek(ordinal: number) {
@@ -274,15 +314,27 @@ export class Player extends LitElement {
     const playing = this.status?.state === 'playing';
     return html` <div class="controls">
         <button
-          ?disabled=${!this.performance}
+          ?disabled=${!this.performance || this.loading}
           @click=${() => (playing ? this.pause() : void this.play())}
         >
-          ${playing ? 'Pause' : 'Play'}</button
+          ${this.loading ? 'Loading…' : playing ? 'Pause' : 'Play'}</button
         ><button ?disabled=${!this.performance} @click=${() => this.stop()}>Stop</button>
         <output aria-live="off"
           >${this.performance
             ? formatPlaybackPosition(this.performance, this.position, this.document)
             : 'No performance available'}</output
+        >
+        <label
+          >Sound<select
+            aria-label="Playback sound"
+            .value=${this.voicePreset}
+            @change=${(event: Event) => {
+              this.voicePreset = (event.target as HTMLSelectElement).value as VoicePreset;
+            }}
+          >
+            <option value="synth" ?selected=${this.voicePreset !== 'guitar'}>Synth</option>
+            <option value="guitar" ?selected=${this.voicePreset === 'guitar'}>Guitar</option>
+          </select></label
         >
         <label
           >Rate<select aria-label="Playback rate" @change=${this.changeRate}>
@@ -302,6 +354,11 @@ export class Player extends LitElement {
             @input=${this.changeVolume}
         /></label>
       </div>
+      ${this.loading
+        ? html`<p role="status">
+            Preparing ${this.voicePreset === 'guitar' ? 'guitar samples' : 'audio'}…
+          </p>`
+        : nothing}
       ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}
       ${this.performance
         ? html`<details open>

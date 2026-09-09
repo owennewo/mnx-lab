@@ -1,0 +1,491 @@
+{
+  "formatVersion": 1,
+  "name": "Shinyguitar \u00b7 microphone",
+  "license": "CC0-1.0",
+  "repository": "https://github.com/sfzinstruments/karoryfer.shinyguitar",
+  "revision": "57243cca85277dbcc120ce17c6178032f93c80f3",
+  "sampleRate": 24000,
+  "conversion": "ffmpeg -i SOURCE -t 5 -ac 1 -ar 24000 -sample_fmt s16 -af afade=t=out:st=4.9:d=0.1 -map_metadata -1 OUTPUT.flac",
+  "samples": [
+    {
+      "file": "37-2-1.flac",
+      "midi": 37,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/db2_vl2_rr1_1.wav",
+      "sourceSha256": "0b1f528c6239f55acbab08da6e4995f5d63ab6760f2071c0a242b72fd4998f4a",
+      "sha256": "525df2ca24e716fe3f43b82e543799f8b10dc31030ad999a97977a2cd80da29d",
+      "bytes": 75019
+    },
+    {
+      "file": "37-2-2.flac",
+      "midi": 37,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/db2_vl2_rr2_1.wav",
+      "sourceSha256": "9992b8528f4311682f1bc41ed015bab32a39c2e656ccbcd1f76cb9440eae6468",
+      "sha256": "ee1d7d6c78a5bfce3f5675df78480766ac484a286ec927333965ab9c861f96f5",
+      "bytes": 72243
+    },
+    {
+      "file": "37-4-1.flac",
+      "midi": 37,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/db2_vl4_rr1_1.wav",
+      "sourceSha256": "9fb5c2773fa21c39a9c6f7367349c628a50a515fe1d47030f0db37a38951a871",
+      "sha256": "7472ab861810b695c32ab907f38f7674506762d7b1f4e226405a30652eda81b9",
+      "bytes": 83954
+    },
+    {
+      "file": "37-4-2.flac",
+      "midi": 37,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/db2_vl4_rr2_1.wav",
+      "sourceSha256": "4bf6c6beee659d7f1f7e1a348a96d44e4d878a94294e082817b6fa53d6ce0c42",
+      "sha256": "eec193fb5a77bca03ee2418aaef99d6e40710e22b6f501182b641d49aff40803",
+      "bytes": 85658
+    },
+    {
+      "file": "40-2-1.flac",
+      "midi": 40,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/e2_vl2_rr1_1.wav",
+      "sourceSha256": "b354f29d6813e5cb3b3e35b5643b0dce22ae984109aafe821a0e04847747c7a2",
+      "sha256": "0d03f62b36f296467642d764302aad88762a63b51275e64a5b3dd71060b8745e",
+      "bytes": 58412
+    },
+    {
+      "file": "40-2-2.flac",
+      "midi": 40,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/e2_vl2_rr2_1.wav",
+      "sourceSha256": "8afc87c7a73b9eb23e99b077cc01e7802b91c4a751e842c1ee9534ee3c95a9ef",
+      "sha256": "756400a9e0d6ee54c61e6d38397cc8500484bc5945c4d115fa5276f57df0233f",
+      "bytes": 57777
+    },
+    {
+      "file": "40-4-1.flac",
+      "midi": 40,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/e2_vl4_rr1_1.wav",
+      "sourceSha256": "49e491307f5c9fde6629766d37b6e926e43f149053193dd0ea8b675a1d00ab64",
+      "sha256": "820567024d2994d70c3d40268fe8b08fd20ab7b2c99d1f3b8cfcb335e8a8c8f5",
+      "bytes": 67222
+    },
+    {
+      "file": "40-4-2.flac",
+      "midi": 40,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/e2_vl4_rr2_1.wav",
+      "sourceSha256": "e53f3a1fec3f804dee191808310d25ecfc7fd18ccfc709315268e0bb8c481c13",
+      "sha256": "e36f3c6ac052c2cdee6bc8b97e5ff78b53f522424dde8fbb86bccb1dff5f27d0",
+      "bytes": 67876
+    },
+    {
+      "file": "45-2-1.flac",
+      "midi": 45,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/a2_vl2_rr1_1.wav",
+      "sourceSha256": "3c4ab62e46dd49ecac42367019d1d32b87db7a77864ba9ef50f43e723cf4d38c",
+      "sha256": "070d856b6986bdc96c1b96abf12192f48fac39f51f20f7ed8217b76461a3d2a8",
+      "bytes": 68858
+    },
+    {
+      "file": "45-2-2.flac",
+      "midi": 45,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/a2_vl2_rr2_1.wav",
+      "sourceSha256": "6fa23fc1d018101228fd0bd3d72dea5e4b8bb04b04e0dca064afc4168ff1c6a9",
+      "sha256": "f04265ccd4a0be760a70b281c7c381b0eda534131591a29410f16f84b20c2086",
+      "bytes": 70618
+    },
+    {
+      "file": "45-4-1.flac",
+      "midi": 45,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/a2_vl4_rr1_1.wav",
+      "sourceSha256": "9c99ffc7051083d40141ed1b677f1b387329e98f2be646ea21918b162c10b3bb",
+      "sha256": "a24a032e3456a27f4629dcdf1a55028ac8832f31ae342d1701919bea71de902e",
+      "bytes": 74815
+    },
+    {
+      "file": "45-4-2.flac",
+      "midi": 45,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/a2_vl4_rr2_1.wav",
+      "sourceSha256": "368051421e2dc87453e574a6aad814d64b9999539db09e22c8b2728dc0da748c",
+      "sha256": "445721990c2953e541fb730d7bfb7db3d4f03aa6974c222d481a1d109021abb6",
+      "bytes": 74473
+    },
+    {
+      "file": "48-2-1.flac",
+      "midi": 48,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/c3_vl2_rr1_1.wav",
+      "sourceSha256": "8cd5e5abce0542de03502f58e987281b94151e638f96b66be69c28ad8a83a9dc",
+      "sha256": "85882b7ce1425ffabf3b81815baf20de925e351a654b40cba78056e59fd096a6",
+      "bytes": 69683
+    },
+    {
+      "file": "48-2-2.flac",
+      "midi": 48,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/c3_vl2_rr2_1.wav",
+      "sourceSha256": "22f21d680e22b6c6a2fe116b96d9a67ef6e47653f02c4d737559a5a42c646fd2",
+      "sha256": "fe291c9966e7962f6cb566cf753866927d5013d70be0004ed015a92347678b98",
+      "bytes": 69447
+    },
+    {
+      "file": "48-4-1.flac",
+      "midi": 48,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/c3_vl4_rr1_1.wav",
+      "sourceSha256": "e8a8b01b6d9fb465f32cbfa4627383bc870f89111537a2bd7370796453c30b51",
+      "sha256": "59ce37ca86d784f8dd65e4ae216e502f8edae0e25957a25a95fd65d18eb6dbb7",
+      "bytes": 74213
+    },
+    {
+      "file": "48-4-2.flac",
+      "midi": 48,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/c3_vl4_rr2_1.wav",
+      "sourceSha256": "4a45b15dc242c64e2301f4776a0cee9a074ecc014901b0894e5e052738fca01e",
+      "sha256": "56036e3e3dc39d70ca1a6b17bc577be7adadef7a4ba579689dc3cc7b6f67eb54",
+      "bytes": 75131
+    },
+    {
+      "file": "54-2-1.flac",
+      "midi": 54,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/gb3_vl2_rr1_1.wav",
+      "sourceSha256": "43194873c7eddc291b93e2c15453996cc27994bd7b2a68181dabea08812d6193",
+      "sha256": "f7fd043022dcb7b51318bcaec1923f49cc66610ae49e69b31d9b094577cf4cdd",
+      "bytes": 67383
+    },
+    {
+      "file": "54-2-2.flac",
+      "midi": 54,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/gb3_vl2_rr2_1.wav",
+      "sourceSha256": "3ff0487142f3d6fed26ed38f2c0ed6f93189059a96cac3a5728a04c9149623c9",
+      "sha256": "2d054966089cab336695147407f57350bce754beb87ff0abc5dcfc48f025d607",
+      "bytes": 66006
+    },
+    {
+      "file": "54-4-1.flac",
+      "midi": 54,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/gb3_vl4_rr1_1.wav",
+      "sourceSha256": "1895a1d27b5144868b8cb305fe68cdbef057e38d599e9d2e64d6672d3648423b",
+      "sha256": "02182e9967c1988bc9fab796c762bd5e8b0decee0193ada49e4b6fd997fae94e",
+      "bytes": 71916
+    },
+    {
+      "file": "54-4-2.flac",
+      "midi": 54,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/gb3_vl4_rr2_1.wav",
+      "sourceSha256": "1c8f996f3872cd9b71a504628ddbd998c5d1d218e58312095ade1f75eefd8061",
+      "sha256": "66462a95ae6d42c3126eb8e90833725a42c6904c26484196a5f6e55169a4765d",
+      "bytes": 72207
+    },
+    {
+      "file": "60-2-1.flac",
+      "midi": 60,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/c4_vl2_rr1_1.wav",
+      "sourceSha256": "6b3d07ff68144d4f5d5ac42350e5c4250f625c4a2e909fc19ae9d4e944d80eb1",
+      "sha256": "c89ae9494798da8abd5985dd2ae05d9f5f9de7fe5cbc5f9f5cf9f8ce2377aba5",
+      "bytes": 72161
+    },
+    {
+      "file": "60-2-2.flac",
+      "midi": 60,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/c4_vl2_rr2_1.wav",
+      "sourceSha256": "ded240d243450450d654d1f1f54abc2dd20f2f51a5d770b2794c09a3702498ec",
+      "sha256": "3533bab83c4acc782cbca8ce16e0005af5dc2c4cf88bedb72ff599ad92bc8cac",
+      "bytes": 72996
+    },
+    {
+      "file": "60-4-1.flac",
+      "midi": 60,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/c4_vl4_rr1_1.wav",
+      "sourceSha256": "713db2d000c5adb612b6e7898112f1f1f83f961842f01fe4382fef9810d36c8d",
+      "sha256": "818431d58bc1ba21eda3c84be270d82ffa7997aa86a9e532ba1f7debac659844",
+      "bytes": 81848
+    },
+    {
+      "file": "60-4-2.flac",
+      "midi": 60,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/c4_vl4_rr2_1.wav",
+      "sourceSha256": "d10028bd2c293837a873db56fe25ff7ef858871987c2ffc005d75e50768c32b3",
+      "sha256": "92b990b92b4d7d0d8723ed14993317b08b23a81e55cd6d9c6a7c1b31c3484e0a",
+      "bytes": 82738
+    },
+    {
+      "file": "66-2-1.flac",
+      "midi": 66,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/gb4_vl2_rr1_1.wav",
+      "sourceSha256": "55b558cf9f2a29a7a48ba4d93c98000dab4f7af8168940942bf811c92eb39195",
+      "sha256": "fb6d1d9ca966eb77420122672ed9e5d6d45283c93ed5ea6eef7066e9950a9dce",
+      "bytes": 80520
+    },
+    {
+      "file": "66-2-2.flac",
+      "midi": 66,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/gb4_vl2_rr2_1.wav",
+      "sourceSha256": "478086039090a8b1a24153b546d650b9f9698d51b0a6b5ab2d1b44a4043bc6d6",
+      "sha256": "8dfc1aa7fb2bbda00e091b9028fb6e7499c83e3d13dcb09142db7e322c51f103",
+      "bytes": 81375
+    },
+    {
+      "file": "66-4-1.flac",
+      "midi": 66,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/gb4_vl4_rr1_1.wav",
+      "sourceSha256": "8888486aeb89d2ac0a92d6a8184a837fd5b48b10f0cd8ff9e0b8b1c3fc7c7803",
+      "sha256": "48571cb814ce62c625ea74f4084a8cb21254f8e8be1dfb4633226c4571e8266d",
+      "bytes": 85677
+    },
+    {
+      "file": "66-4-2.flac",
+      "midi": 66,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/gb4_vl4_rr2_1.wav",
+      "sourceSha256": "331d9cf1764df9443ee883cb3e218b6d54bc02ddce2c40452240ca1247d72f68",
+      "sha256": "23933a3b847e64750c81ba0fd69025847b1758b7fa22297657728d284d6f6e65",
+      "bytes": 86997
+    },
+    {
+      "file": "69-2-1.flac",
+      "midi": 69,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/a4_vl2_rr1_1.wav",
+      "sourceSha256": "d6303b4169046808deb79a311372a267246547abeee1f8546da77d6be605664a",
+      "sha256": "39e2459e396fa5a60d187967de9b5b394f6369b8baf49ddbe2252f9748b77621",
+      "bytes": 79075
+    },
+    {
+      "file": "69-2-2.flac",
+      "midi": 69,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/a4_vl2_rr2_1.wav",
+      "sourceSha256": "54e6703c25a5d7ffa12cb121a6cd33969556b63c81b6ba9c0c34484439ece812",
+      "sha256": "df7b935f73085f08e8ef8d9c4f785f2ef364bdb79843ea98a3b8296f5882ccc2",
+      "bytes": 79845
+    },
+    {
+      "file": "69-4-1.flac",
+      "midi": 69,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/a4_vl4_rr1_1.wav",
+      "sourceSha256": "75f3e9b262b2cd1de4123cff88314c31cd752dab5ef2e166c1376387dfba016d",
+      "sha256": "a779c1387d4e2392f2bb7e3803c181917152f9854158fede4eba87f90fcc7f29",
+      "bytes": 84468
+    },
+    {
+      "file": "69-4-2.flac",
+      "midi": 69,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/a4_vl4_rr2_1.wav",
+      "sourceSha256": "b373f8e649deeebd88e985f59e4b9c40512a0c15830d21268740c828851be320",
+      "sha256": "01e9f40a23fca30fb94436a352909dead7d73cbbbf05cd129d249e5d0abded5f",
+      "bytes": 82191
+    },
+    {
+      "file": "72-2-1.flac",
+      "midi": 72,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/c5_vl2_rr1_1.wav",
+      "sourceSha256": "84051ad0042396b83a72f2341c58238f46ba2c28b9ea4ec1cd8db45e1e132a53",
+      "sha256": "1cf1ddafbfbd22d49d42819e8e9753711d33ea15d946ebfb99dee5b8b0a63a3d",
+      "bytes": 74683
+    },
+    {
+      "file": "72-2-2.flac",
+      "midi": 72,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/c5_vl2_rr2_1.wav",
+      "sourceSha256": "3e9c39cb2a58cc5e40ad7a754ce883adaa4d58562d33e2fece6635cb9a6b74f3",
+      "sha256": "32db1aab08248bbea516133c9be9abac4aa24a2020501d771358e044cc85daa3",
+      "bytes": 74107
+    },
+    {
+      "file": "72-4-1.flac",
+      "midi": 72,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/c5_vl4_rr1_1.wav",
+      "sourceSha256": "6865f50da674c7ca0fabf04c26ff4f5358fa17e6fcef8878dbe416e9cae3fd5f",
+      "sha256": "148e522829f3d06dc57a5708b292eef1973926750d69d413cf9c454de91afa5e",
+      "bytes": 78486
+    },
+    {
+      "file": "72-4-2.flac",
+      "midi": 72,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/c5_vl4_rr2_1.wav",
+      "sourceSha256": "ce90b89b41fc488bfd674797466b758667ef63bc4cd0d7d8fcc4ed7670414a31",
+      "sha256": "3a11a23ff9e96baba54535129f8cef1b4dd16d735158a3196bbdb8411422b895",
+      "bytes": 78637
+    },
+    {
+      "file": "75-2-1.flac",
+      "midi": 75,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/eb5_vl2_rr1_1.wav",
+      "sourceSha256": "22e442f6203bb326c22748f2332d0ac41dcade554ad4b2916cdfc9c7c529b456",
+      "sha256": "1127243015f591131cad57fa9cbf635dc8efa1c3ed74cf7b0f6b7aca96a9019d",
+      "bytes": 82945
+    },
+    {
+      "file": "75-2-2.flac",
+      "midi": 75,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/eb5_vl2_rr2_1.wav",
+      "sourceSha256": "14f50c3849fdab5d56efe175ac006cdd60dc13a540bb27cf1aa2d65971c94609",
+      "sha256": "93aadbd828ca1c09cd8bb1234c9e2147cab923824791a6dbf32938a11dba0e21",
+      "bytes": 83113
+    },
+    {
+      "file": "75-4-1.flac",
+      "midi": 75,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/eb5_vl4_rr1_1.wav",
+      "sourceSha256": "e8becce8a87abef591baed4f8e07379e40ee6f0c4fee8361fe298f54c1ccaada",
+      "sha256": "e06d410b6c98797a8a4d0141f4b94d0f230292887872cad3ede1f6ec2a4a5544",
+      "bytes": 84393
+    },
+    {
+      "file": "75-4-2.flac",
+      "midi": 75,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/eb5_vl4_rr2_1.wav",
+      "sourceSha256": "e9596852a67b2c0982194016cb4c50713b1f07d7300c2e96f4060c207e221abc",
+      "sha256": "e3fc3fd670e46969388558da61a1dfaed7bc17cb14ed98725b8f32d43d3d0694",
+      "bytes": 85802
+    },
+    {
+      "file": "78-2-1.flac",
+      "midi": 78,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/gb5_vl2_rr1_1.wav",
+      "sourceSha256": "476739ec0bef18f293e428d8839666cd9300df251d3b8925dd9d12fda2532bd9",
+      "sha256": "4636555e6c7dc2577afdad2ac908bc8d1f2dceb0059c84bee525a9bf55375d3f",
+      "bytes": 74832
+    },
+    {
+      "file": "78-2-2.flac",
+      "midi": 78,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/gb5_vl2_rr2_1.wav",
+      "sourceSha256": "24ba2cf701dd1044c65c9e54df8b447d190a78b05d450e8516988358e5cf02bb",
+      "sha256": "03a7cf57d81225dd4fe5a30bd3c3bcea869c84f3254aae25ab527bff1c6db0b3",
+      "bytes": 75943
+    },
+    {
+      "file": "78-4-1.flac",
+      "midi": 78,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/gb5_vl4_rr1_1.wav",
+      "sourceSha256": "bd9ecf9b46b13ae9ccabfb4e5ed0c3ee89cd919a16cbfe2ff8cf828bbbc38b0c",
+      "sha256": "1ff693071888638e63482394a316b84352e941930edbedc1cb7af2ae62ef8785",
+      "bytes": 79418
+    },
+    {
+      "file": "78-4-2.flac",
+      "midi": 78,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/gb5_vl4_rr2_1.wav",
+      "sourceSha256": "916ea2838442b1755b1d6aba5c15d32f9e17eddddd09140a87bf751375b52e0c",
+      "sha256": "75f132f7412b6c83dff03aa54742739b313a0b8789ca7bb230fd2dc1f4c94c2b",
+      "bytes": 81965
+    },
+    {
+      "file": "84-2-1.flac",
+      "midi": 84,
+      "layer": 2,
+      "take": 1,
+      "source": "Samples/acoustic/c6_vl2_rr1_1.wav",
+      "sourceSha256": "c6742d02a90cbc3f51672dd46a5f1e32fd52725a8887dcdb6f050975963c174c",
+      "sha256": "d2570c3750c3c1410cffcbb20b01cae56d0f676a1cd7849078065afece01c9a8",
+      "bytes": 54813
+    },
+    {
+      "file": "84-2-2.flac",
+      "midi": 84,
+      "layer": 2,
+      "take": 2,
+      "source": "Samples/acoustic/c6_vl2_rr2_1.wav",
+      "sourceSha256": "d20043cff3f3c9c1d303ff0ddb48cab0ebed93595ec92bed25651a77c6780e13",
+      "sha256": "4de376ac4ec9c38273881c57f32e4a76d9ce55847adebe04fbbb895026de0c2e",
+      "bytes": 54063
+    },
+    {
+      "file": "84-4-1.flac",
+      "midi": 84,
+      "layer": 4,
+      "take": 1,
+      "source": "Samples/acoustic/c6_vl4_rr1_1.wav",
+      "sourceSha256": "a6b4553b1080c2dd3a5d3d15858d4aa24df7341afa6b2fff3451d639b49360fb",
+      "sha256": "7505f6dc38a2c85bf59d2af4bd2fdf27c1bbce753b7e0d89f667aac6a1309d42",
+      "bytes": 59354
+    },
+    {
+      "file": "84-4-2.flac",
+      "midi": 84,
+      "layer": 4,
+      "take": 2,
+      "source": "Samples/acoustic/c6_vl4_rr2_1.wav",
+      "sourceSha256": "1e4465a7bc895ca524306f9954f3bb744abd5aceb36085292dd2105ad7862127",
+      "sha256": "bd6d45474f56d521ca1225e033fda061ec0da1a2e09efd0a9af343f2b2e349ca",
+      "bytes": 60374
+    }
+  ]
+}

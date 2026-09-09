@@ -1,3 +1,5 @@
+> Rejected 2026-09-09: the user explicitly chose won't-do. Retained for history.
+
 # WebMIDI out — the export's channel plan, on the wire
 
 > **Status: proposed 2026-09-08, revised the same day.** Campaign:

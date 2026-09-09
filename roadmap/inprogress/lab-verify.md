@@ -850,3 +850,20 @@ a whole bar no longer show a partial-entry badge; genuine mid-bar cuts still do.
 The [item 10 follow-up](../complete/core-player-unrolled-view.md) shares the exact
 written duration calculation with note membership, including pickups and empty-bar
 meter fallback. Written goldens and approval records remain unchanged.
+
+## Sampled guitar listening — 2026-09-09
+
+Cause: [player campaign item 12](core-player-sampled-guitar.md);
+[pack and behavior](../../docs/player-sampled-guitar.md).
+No scenario golden, status or approval record changed. This is a listening
+obligation for the new timbre, not a request to re-approve unchanged performance
+JSON. The user explicitly authorized implementation ahead of reviewer approvals.
+
+Listen with Sound → Guitar on the embed twelve-bar blues, the open-strings chord,
+and the guitar-technique scenarios: attacks should read as guitar, adjacent
+repeated notes should vary, chords should retain independent bends, and legato
+should not insert a fresh pluck. Judge volume balance against Synth. Check long
+holds knowing that the five-second recordings decay rather than loop, and that
+there are no dedicated muted/harmonic/legato recording layers. Source and derived
+hashes are pinned in public/samples/shinyguitar-v1/manifest.json.
+Automated waveform checks passed; no human listening verdict has been recorded.
