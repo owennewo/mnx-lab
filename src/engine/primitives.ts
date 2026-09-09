@@ -225,6 +225,17 @@ export interface RowBandSp {
 
 export interface LayoutResult {
   primitives: Primitive[];
+  /**
+   * Vertical ink extent of each row, as the vertical pass measured it.
+   *
+   * Reported because it can no longer be recovered from the output: ownership
+   * is settled from the geometry BEFORE rows move, so ink that reaches well
+   * past its own staff — a flag on an up-stem — can finish nearer a neighbour
+   * than the row that owns it. Bucketing by a midpoint after the fact would
+   * file that flag with the wrong row. Absent when no row moved, where a
+   * midpoint and the true owner agree by construction.
+   */
+  rowInkSp?: { top: number; bottom: number }[];
   /** Total layout width in staff spaces. */
   widthSp: number;
   /** Total layout height in staff spaces. */

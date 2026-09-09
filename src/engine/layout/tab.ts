@@ -560,6 +560,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     primitives, widthSp, heightSp: tightened?.heightSp ?? heightSp,
     usedWidthSp: plan.usedWidthSp, naturalWidthSp,
     index, diagnostics, rows: tightened?.rows ?? rows,
+    ...(tightened ? { rowInkSp: tightened.ink } : {}),
     packings: [plan.packing]
   };
 }

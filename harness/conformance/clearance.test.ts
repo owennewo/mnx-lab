@@ -19,7 +19,17 @@ const blues = load('lab/00-document/04-twelve-bar-blues');
 const layouts = { notation: layoutNotation, tab: layoutTab, both: layoutBothSystem };
 
 // Keep stable content extents and measure the result independently of its policy.
+//
+// Buckets by the layout's OWN ownership when it reports any. Re-deriving it
+// from a midpoint would measure the wrong thing: ownership is settled before
+// rows move, so ink that reaches past its own staff can finish nearer a
+// neighbour, and filing it there would score a row's own flag as the row
+// above's overhang. The midpoint remains the fallback for a layout that moved
+// no row, where the two agree by construction.
 function rowInk(result: ReturnType<typeof layoutNotation>) {
+  if (result.rowInkSp) {
+    return result.rowInkSp.map(({ top, bottom }) => ({ y: top, h: bottom - top }));
+  }
   const boundaries = result.rows.slice(0, -1).map((row, index) =>
     (row.staffBottom + result.rows[index + 1].staffTop) / 2
   );
@@ -163,4 +173,33 @@ it('does not add prefix padding to a hidden system-opening repeat', () => {
     const plan = planHorizontal(doc, 80, { display: { clearance, clefs: 'hide', timeSignatures: 'hide' } });
     expect(plan.measures[0].repeatStartX).toBe(plan.measures[0].x);
   }
+});
+
+it('keeps every flag on its stem at every clearance level', () => {
+  // Row attribution is geometric, and `fitRowsToClearance` used to re-derive it
+  // after each pass had already moved the rows. A flag on an up-stem anchors at
+  // the stem TIP, well above its own staff, so once a pass closed the gaps the
+  // midpoint boundary rose past it and the next pass carried it off with the
+  // row above while its stem stayed. Only ever below the default, because only
+  // there do rows close up. spec/tie-targets reproduced it on three levels.
+  const doc = load('spec/tie-targets');
+  let checked = 0;
+  // Tab staves carry no flags, so only the layouts that draw them are examined.
+  for (const [name, layout] of Object.entries(layouts)) {
+    for (const clearance of levels) {
+      const result = layout({ mnx: doc, widthSp: 80, display: normalizeDisplayOptions({ clearance }) });
+      const stems = result.primitives.filter(p => String(p.className ?? '').startsWith('stem'));
+      const flags = result.primitives.filter(p => String(p.className ?? '').startsWith('flag'));
+      checked += flags.length;
+      for (const flag of flags as { x: number; y: number }[]) {
+        const onAStem = stems.some(stem => {
+          const s = stem as { x1: number; y1: number; y2: number };
+          return Math.abs(s.x1 - flag.x) < 1e-6 &&
+            (Math.abs(s.y1 - flag.y) < 1e-6 || Math.abs(s.y2 - flag.y) < 1e-6);
+        });
+        expect(onAStem, `${name} @ clearance ${clearance}: flag at (${flag.x}, ${flag.y}) has no stem`).toBe(true);
+      }
+    }
+  }
+  expect(checked, 'the scenario stopped carrying flags').toBeGreaterThan(0);
 });

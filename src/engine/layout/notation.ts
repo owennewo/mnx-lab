@@ -967,6 +967,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   return {
     primitives, widthSp, heightSp: tightened?.heightSp ?? cursorY, usedWidthSp, naturalWidthSp,
     index, diagnostics,
+    ...(tightened ? { rowInkSp: tightened.ink } : {}),
     rows: tightened?.rows ?? rows,
     // Display bands ride with their rows when the density pass moves them.
     displays: tightened

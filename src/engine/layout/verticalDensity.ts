@@ -95,11 +95,28 @@ export interface TightenRowsArgs {
    *  block. Uniform per layout; thread per-row data if a layout ever needs
    *  to mix reserved and unreserved rows. */
   reservedBelowSp?: number;
+  /** Ownership decided by an earlier pass, reused instead of re-derived.
+   *
+   *  Attribution is geometric, so it is only trustworthy against the geometry
+   *  it was measured on. Once a pass has moved the rows, asking again where a
+   *  primitive falls asks about a page that no longer exists — and a flag
+   *  sitting high above its staff is exactly the ink that changes side when rows
+   *  close up. Which row emitted a primitive is a fact, not a measurement, so
+   *  the fixed-point loop settles it once and carries it. */
+  owners?: ReadonlyMap<Primitive, number>;
 }
 
-export interface TightenedRows {
+/** A layout whose rows have moved. */
+export interface TranslatedRows {
   heightSp: number;
   rows: RowBandSp[];
+}
+
+export interface TightenedRows extends TranslatedRows {
+  /** The attribution this pass used, for the next pass to reuse. */
+  owners: ReadonlyMap<Primitive, number>;
+  /** Ink extent per row after the move, measured against that attribution. */
+  ink: { top: number; bottom: number }[];
 }
 
 /**
@@ -142,7 +159,11 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
   const buckets: Primitive[][] = rows.map(() => []);
   const owner = new Map<Primitive, number>();
   for (const p of primitives) {
-    const r = rowOf(anchorY(p));
+    // A caller mid-fixed-point already knows the answer from the geometry the
+    // attribution was actually valid for; re-deriving it here would re-file
+    // ink against rows this loop has since moved.
+    const prior = args.owners?.get(p);
+    const r = prior !== undefined && prior < rows.length ? prior : rowOf(anchorY(p));
     owner.set(p, r);
     buckets[r].push(p);
   }
@@ -194,6 +215,8 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
   }
 
   return {
+    owners: owner,
+    ink: rows.map((_, r) => ({ top: inkTop[r] + offsets[r], bottom: inkBottom[r] + offsets[r] })),
     heightSp: rows[last].staffBottom + offsets[last] + newBottomGap,
     rows: rows.map((b, r) => ({
       staffTop: b.staffTop + offsets[r],
@@ -203,25 +226,40 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
 }
 
 /**
- * Re-measures after each move until row ownership settles. At aggressive
- * clearance levels an overhanging primitive can cross the midpoint used to
- * attribute content to rows; the next pass then sees its true demand.
+ * Re-measures the gaps after each move, until the row bands settle.
+ *
+ * Ownership is NOT re-measured. Pass one decides which row emitted each
+ * primitive, on the only geometry where that question has a geometric answer,
+ * and every later pass reuses it. Re-deriving it was the bug: closing the gaps
+ * moves the midpoint boundary past any ink that reaches well beyond its own
+ * staff, and the next pass then carries that ink away with the neighbouring
+ * row.
  */
 export function fitRowsToClearance(args: TightenRowsArgs): TightenedRows | null {
   let rows = args.rows;
   let heightSp = args.heightSp;
   let final: TightenedRows | null = null;
+  // Ownership is settled on the FIRST pass and carried, never re-measured.
+  // Re-deriving it each pass was the bug: pass one closes the gaps, and a flag
+  // on an up-stem — anchored at the stem tip, well above its own staff — then
+  // falls on the far side of the risen boundary. Pass two duly translates it
+  // with the row above while its stem goes with the row below, and the two
+  // separate for good. It only ever bit when rows CLOSE UP, which is why the
+  // tight half of the clearance range showed it and the spacious half did not.
+  let owners: ReadonlyMap<Primitive, number> | undefined = args.owners;
   // A primitive can cross at most one ordered boundary per pass. The extra
   // pass proves the fixed point; the cap protects malformed input.
   for (let pass = 0; pass <= args.rows.length; pass++) {
     const next = tightenRows({
       ...args,
+      owners,
       rows,
       heightSp,
       preserveOuterMargins: pass > 0
     });
     if (!next) return final;
     final = next;
+    owners = next.owners;
     rows = next.rows;
     heightSp = next.heightSp;
   }
@@ -244,13 +282,16 @@ export function fitRowsToClearance(args: TightenRowsArgs): TightenedRows | null 
  * this one runs at every density — a label that would be clipped is not a
  * density question — but it is a no-op whenever the reservation was already
  * enough, which is every scenario in the corpus that has no labels.
+ *
+ * It reports no ownership: every primitive moves by the same `dy`, so nothing
+ * changes row and there is no attribution to carry.
  */
 export function ensureTopMargin(
   primitives: Primitive[],
   rows: readonly RowBandSp[],
   heightSp: number,
   marginSp: number
-): TightenedRows | null {
+): TranslatedRows | null {
   const bounds = computeBoundsSp(primitives);
   if (!bounds || bounds.y >= marginSp) return null;
 
