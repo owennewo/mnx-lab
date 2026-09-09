@@ -4,7 +4,7 @@
 > proposals, the shared contract they follow, and the running log of progress and
 > learnings as items land. Indexed items are ordinary `core-*` (and one `studio-*`)
 > proposals that name this campaign. **Opened 2026-09-08; revised the same day on an
-> independent review before anything was built** — see the first log entry. Items 1–7 are implemented; the remaining items are proposed.
+> independent review before anything was built** — see the first log entry. Items 1–8 are implemented; the remaining items are proposed.
 
 ## The goal
 
@@ -167,7 +167,7 @@ run any time before 6.
 | 5 | [Performance compiler and MIDI export](../complete/core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | complete; performance review pending |
 | 6 | [Transport](../complete/core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | complete |
 | 7 | [Player element, written view](../complete/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | complete; human review pending |
-| 8 | [Expression and technique](core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | implemented; validation and landing in progress |
+| 8 | [Expression and technique](../complete/core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | complete; human performance review pending |
 | 9 | [MIDI oracle](../proposed/core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | proposed — **needs a dev-environment decision** |
 | 10 | [Unrolled engraving](../proposed/core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | proposed — after 7 |
 | 11 | [WebMIDI out](../proposed/core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | proposed — after reviewer items 1–10 |
@@ -448,3 +448,8 @@ The shipped viewer entry stays unchanged until item 7 consumes playback.
   four changed existing baselines. Engraving output and provenance are unchanged;
   automated buffer checks are not listening approval. Item 9 remains the
   independent MIDI oracle obligation.
+
+- Landing checks: 1,496 tests across 87 files, corpus/build, both embed formats,
+  workbench/review Listen, offline audio and Node package smoke passed. Goldens
+  reproduced byte-identically after rebase; the implementation worktree was
+  retired before the item moved to `complete/`.

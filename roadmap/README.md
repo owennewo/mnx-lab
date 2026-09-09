@@ -178,11 +178,6 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
-- **[core-player-expression.md](inprogress/core-player-expression.md)** — campaign item 8:
-  dynamics, articulations, arpeggio and the guitar techniques as curves and voice flags
-  (`noReattack` on the event type); tempo-relative vibrato and harmonics that preserve
-  sounded pitch while validating technique metadata. Every number a recorded convention.
-
 
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
@@ -385,6 +380,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-player-expression.md](complete/core-player-expression.md)** — campaign item 8, complete 2026-09-09; human performance review pending:
+  dynamics, articulations, arpeggio and the guitar techniques as curves and voice flags
+  (`noReattack` on the event type); tempo-relative vibrato and harmonics that preserve
+  sounded pitch while validating technique metadata. Every number a recorded convention.
+
 - **[core-score-clearance.md](complete/core-score-clearance.md)** — complete
   2026-09-09: global Clearance display setting, 0–4 in half steps with the historical
   layout byte-identical at default 2. Seven structural padding/margin relationships

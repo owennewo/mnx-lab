@@ -83,7 +83,7 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ### Player expression — 2026-09-09
 
-Cause: [core-player-expression](core-player-expression.md), campaign item 8.
+Cause: [core-player-expression](../complete/core-player-expression.md), campaign item 8.
 Sixteen newly enrolled scenarios plus four changed existing performances (20 total)
 need review of `expected.performance.json` and `expected.midi.json`. Existing SVGs,
 primitives, statuses and approval provenance are unchanged. Registration is not approval.
