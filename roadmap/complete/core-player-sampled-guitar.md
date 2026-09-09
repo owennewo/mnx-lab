@@ -60,7 +60,7 @@ switching, failures and both embed formats. Musical evidence remains byte-identi
 
 ## Implementation
 
-The [public contract](../../docs/player-sampled-guitar.md) records the 3.6 MB CC0
+The [public contract](../../docs/player-sample-packs.md) records the 3.6 MB CC0
 microphone pack, static delivery, host overrides, per-voice automation and decay/
 articulation limits. Synth remains available through the Sound selector.
 The [listening obligation](../inprogress/lab-verify.md#sampled-guitar-listening--2026-09-09) is

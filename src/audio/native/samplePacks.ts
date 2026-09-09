@@ -1,32 +1,32 @@
-import { GUITAR_PRESETS, type GuitarPreset, type GuitarSample } from '../sampleSelection.ts';
+import { SAMPLE_PRESETS, type SamplePreset, type InstrumentSample } from '../sampleSelection.ts';
 
-export interface DecodedGuitarSample extends GuitarSample {
+export interface DecodedSample extends InstrumentSample {
   buffer: AudioBuffer;
 }
-export interface GuitarSampleBank {
-  samples: readonly DecodedGuitarSample[];
+export interface SamplePackBank {
+  samples: readonly DecodedSample[];
   /** Per-pack level matching; defaults to the original 0.65 gain. */
   gain?: number;
 }
-export type GuitarSampleLoader = (
+export type SamplePackLoader = (
   context: BaseAudioContext,
-  preset: GuitarPreset,
-) => Promise<GuitarSampleBank>;
+  preset: SamplePreset,
+) => Promise<SamplePackBank>;
 const defaultBases = Object.fromEntries(
-  GUITAR_PRESETS.map((p) => [p.id, '/samples/' + p.directory]),
-) as Record<GuitarPreset, string>;
+  SAMPLE_PRESETS.map((p) => [p.id, '/samples/' + p.directory]),
+) as Record<SamplePreset, string>;
 /** Set before constructing players. Embed faces resolve this alongside their script. */
-export function setGuitarSampleBase(base: string, preset: GuitarPreset = 'guitar'): void {
+export function setSampleBase(base: string, preset: SamplePreset = 'guitar'): void {
   defaultBases[preset] = base.replace(/\/+$/, '');
 }
-const banks = new WeakMap<BaseAudioContext, Map<string, Promise<GuitarSampleBank>>>();
+const banks = new WeakMap<BaseAudioContext, Map<string, Promise<SamplePackBank>>>();
 
 /** No fetch or browser context until called. Failed loads can be retried. */
-export function loadGuitarSamples(
+export function loadSamplePack(
   context: BaseAudioContext,
   base: string | undefined = undefined,
-  preset: GuitarPreset = 'guitar',
-): Promise<GuitarSampleBank> {
+  preset: SamplePreset = 'guitar',
+): Promise<SamplePackBank> {
   base = (base ?? defaultBases[preset]).replace(/\/+$/, '');
   let cache = banks.get(context);
   if (!cache) banks.set(context, (cache = new Map()));
@@ -46,13 +46,13 @@ export function loadGuitarSamples(
     const gain = manifest.gain ?? 0.65;
     if (!Number.isFinite(gain) || gain <= 0 || gain > 8)
       throw new Error('Invalid guitar sample gain.');
-    const samples: DecodedGuitarSample[] = [];
+    const samples: DecodedSample[] = [];
     // Bounded download/decode concurrency; don't block the clock with asset work.
     let cursor = 0;
     await Promise.all(
       Array.from({ length: Math.min(4, manifest.samples.length) }, async () => {
         while (cursor < manifest.samples.length) {
-          const s = manifest.samples[cursor++] as GuitarSample;
+          const s = manifest.samples[cursor++] as InstrumentSample;
           if (
             !/^[a-zA-Z0-9_.-]+\.(flac|wav)$/.test(s.file) ||
             !Number.isInteger(s.midi) ||

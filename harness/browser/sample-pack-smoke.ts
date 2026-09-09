@@ -1,6 +1,6 @@
-import { GUITAR_PRESETS, type GuitarPreset } from '../../src/audio/sampleSelection.ts';
+import { SAMPLE_PRESETS, type SamplePreset } from '../../src/audio/sampleSelection.ts';
 import { NativeSink } from '../../src/audio/native/sink.ts';
-import { loadGuitarSamples } from '../../src/audio/native/guitarSamples.ts';
+import { loadSamplePack } from '../../src/audio/native/samplePacks.ts';
 import { Transport } from '../../src/audio/transport.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
 import '../../src/elements/Player.ts';
@@ -36,15 +36,15 @@ const frequency = (data: Float32Array, from: number, expected: number) => {
   }
   return 48000 / lag;
 };
-async function checkBank(preset: GuitarPreset) {
+async function checkBank(preset: SamplePreset) {
   const context = new OfflineAudioContext(1, 48000 * 2.2, 48000);
-  const first = loadGuitarSamples(context, undefined, preset);
+  const first = loadSamplePack(context, undefined, preset);
   check(
-    first === loadGuitarSamples(context, undefined, preset),
+    first === loadSamplePack(context, undefined, preset),
     'Concurrent sample loads were not shared.',
   );
   const bank = await first;
-  const expected = { guitar: 48, guitar2: 15, guitar3: 15, guitar4: 13 };
+  const expected = { piano: 26, guitar: 48, guitar2: 15, guitar3: 15, guitar4: 13 };
   check(bank.samples.length === expected[preset], 'Incomplete decoded pack: ' + preset);
   check(
     bank.samples.every((s) => s.buffer.duration > 0.5 && s.buffer.duration <= 8.001),
@@ -101,14 +101,14 @@ async function checkBank(preset: GuitarPreset) {
 
   return { bank, measured, attacks };
 }
-export async function runGuitarSmoke() {
-  const results = new Map<GuitarPreset, Awaited<ReturnType<typeof checkBank>>>();
-  for (const p of GUITAR_PRESETS) results.set(p.id, await checkBank(p.id));
+export async function runSamplePackSmoke() {
+  const results = new Map<SamplePreset, Awaited<ReturnType<typeof checkBank>>>();
+  for (const p of SAMPLE_PRESETS) results.set(p.id, await checkBank(p.id));
   const { bank, measured, attacks } = results.get('guitar')!;
   // A slow earlier bank must not become the bank of a later selected preset.
   const raceContext = new OfflineAudioContext(1, 48000, 48000);
-  const ready = new Map<GuitarPreset, (value: typeof bank) => void>();
-  const requested: GuitarPreset[] = [];
+  const ready = new Map<SamplePreset, (value: typeof bank) => void>();
+  const requested: SamplePreset[] = [];
   const racing = new NativeSink({
     context: raceContext,
     voicePreset: 'guitar2',

@@ -1,9 +1,56 @@
-# Sampled guitar
+# Sample packs and the synth voice
 
-Choose a guitar from the **Sound** menu, then Play. Synth remains the default.
+Choose an instrument from the **Sound** menu, then Play. Synth remains the default.
 Changing sound during playback pauses at the current position, prepares the new
 preset and resumes there. Stop cancels that pending start. A load error is visible;
 retry Play or choose Synth. No samples are downloaded for ordinary synth playback.
+
+## The synth voice
+
+The default, the offline fallback, and where a failed pack load lands — so it
+carries no download and has to be worth hearing on its own.
+
+It is an `OscillatorNode` per voice through a per-voice lowpass filter. The
+waveform is a `PeriodicWave` of sixteen partials falling as `1/n^1.6` with the
+even partials halved, which places pitch and lets simultaneous notes separate;
+a single sine cannot do either. The filter opens at `14 × f0` and falls to
+`5 × f0` over 250 ms, bounded to 400 Hz–16 kHz, which is the bright-then-dull
+onset every struck or plucked instrument shares. Level is tilted against pitch
+by `(440/f0)^0.32`, clamped to 0.7–2, because a small speaker reproduces almost
+nothing below ~200 Hz and a spectrum-poor tone gives it nothing to imply the
+missing fundamental with. A4 is the anchor, so the tilt redistributes rather
+than raising everything.
+
+**Amplitude over time is deliberately unchanged**: a 5 ms attack, a level hold,
+a 5 ms release. Two measured contracts depend on it — a released voice is silent
+within 5 ms, and a hammer-on's velocity is read as a plain RMS ratio between two
+windows, which equals the velocity ratio only while the envelope is flat. A
+decaying envelope was tried and moved that ratio from 0.69 to 0.90, because the
+two windows then sit at different phases of their own envelopes. The struck
+character comes from the filter instead, which costs no amplitude contract at
+all. A harmonic keeps its triangle: a thin pure partial is what a flageolet is.
+
+## Piano: the pack that spans the staff
+
+`upright-piano-v1` is derived from the FreePats **Upright Piano KW**, a Kawai
+upright recorded in a living room by Gonzalo and Roberto in January 2017 on a
+Zoom H1, published CC0:
+<https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html>. The small
+SFZ+FLAC distribution (`2019-07-03`) is the source; its archive SHA-256 is
+pinned in the manifest beside the per-sample receipts.
+
+**26 FLAC files, 1,500,324 bytes.** Roots run **MIDI 24–107**, against the
+guitars' 36–85 — it is the only pack that covers the staff at both ends, which
+is why a keyboard or vocal score no longer transposes to the edge of a guitar's
+compass. One recorded velocity layer, one take, as with the other FreePats
+packs. The upstream SFZ's bass sustain loops are not implemented; the recording
+is taken as-is to at most eight seconds with an 80 ms final fade, the same
+conversion the additional guitar packs record. Measured gain **0.205504**, set so
+the shared register MIDI 55–67 sits at the mean of the four guitar packs.
+
+The two grand pianos on the same FreePats page (YDP and Salamander) are CC-BY
+3.0, not CC0, so they were not used: every pack here is CC0 and the LICENSE file
+in each directory is the whole of that dedication.
 
 ## Guitar 1: source and delivery
 
@@ -33,6 +80,7 @@ Closing a player releases its context; browser HTTP caching may reuse downloaded
 
 | Sound menu | Recording source | Converted pack |
 |---|---|---|
+| Piano · Upright | [FreePats Upright Piano KW](https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html), Gonzalo and Roberto, 2019-07-03 | 26 roots · 1.50 MB |
 | Guitar 1 · Archtop | Karoryfer Shinyguitar microphone | 48 samples · 3.58 MB |
 | Guitar 2 · Nylon | [FreePats Spanish classical guitar](https://freepats.zenvoid.org/Guitar/acoustic-guitar.html), Roberto, 2019-06-18 | 15 roots · 0.68 MB |
 | Guitar 3 · Steel | Jeff Learman's 2017 Martin HD28 Vintage Series, [Discord SFZ GM instrument](https://github.com/sfzinstruments/Discord-SFZ-GM-Bank/blob/7a9c478fe331f94f246d33332f0adedb25bbbe27/Discord%20GM/Melodic/026-Acoustic%20Guitar%20(steel).sfz) | 15 roots · 0.68 MB |
@@ -87,7 +135,7 @@ The ESM and IIFE embeds derive the default sample directory from their own scrip
 URL, independently of any SMuFL override. A host serving assets on another origin
 must permit CORS and allow it in the host's connect-src policy.
 
-Elements accept `voice-preset="guitar"`, `guitar2`, `guitar3`, or `guitar4`, and
+Elements accept `voice-preset="piano"`, `guitar`, `guitar2`, `guitar3`, or `guitar4`, and
 `sample-base="https://example.test/samples/shinyguitar-v1"`.
 The legacy sample-base overrides Guitar 1. The sampleBases property accepts a
 map from preset ids to pack URLs. The sampleLoader property can instead supply
@@ -104,10 +152,18 @@ const sink = new NativeSink({
 await sink.unlock();
 ```
 
-`GuitarSampleLoader` receives the sink's context and selected preset id and returns a bank containing
-`{ file, midi, layer, take, buffer }` samples. `loadGuitarSamples(context, base?, preset?)`
-provides the standard cached loader; `setGuitarSampleBase(base, preset?)` changes that preset's
-default for future loads. Both preset arguments default to Guitar 1. A native
+`SamplePackLoader` receives the sink's context and selected preset id and returns a bank containing
+`{ file, midi, layer, take, buffer }` samples. `loadSamplePack(context, base?, preset?)`
+provides the standard cached loader; `setSampleBase(base, preset?)` changes that preset's
+default for future loads. Both preset arguments default to Guitar 1.
+
+**The `guitar…` spellings were renamed on 2026-09-09**, when the piano arrived and
+made them wrong: `SAMPLE_PRESETS`, `isSamplePreset`, `SamplePreset`,
+`InstrumentSample`, `loadSamplePack`, `setSampleBase`, `SamplePackBank`,
+`DecodedSample` and `SamplePackLoader`. Every old name is still exported from
+`mnx-lab/audio` as a deprecated alias of the new one, and `smoke:lib` asserts the
+two are the same binding rather than merely both present. Nothing inside `src/`
+uses the old names. A native
 voicePreset callback requires samplePresets to name its needed banks before
 unlock (legacy default: ['guitar']). The npm package exports files through
 `mnx-lab/samples/<pack-directory>/*`; hosts copy/serve them or supply their own loader.
@@ -115,14 +171,19 @@ Bare Node imports and idle construction perform no fetch or context creation.
 
 ## Evidence
 
-`guitar-samples.test.ts` pins asset integrity, provenance, complete layers/takes,
-nearest-root selection and the download budget. `smoke:audio` decodes all 91 real
-samples across the four banks and measures onsets, +200-cent bend, legato without
+`sample-packs.test.ts` pins asset integrity, provenance, complete layers/takes,
+nearest-root selection, a per-sample weight cap and the whole tree's deploy
+budget. It selects packs by id rather than by list position, which is what let
+the piano join the list at its head without silently changing which pack the
+detailed archtop assertions covered. `smoke:audio` decodes all 117 real
+samples across the five banks and measures onsets, +200-cent bend, legato without
 re-attack, independent voice pitch, cancellation and release. Sustained-note seek
 reconstruction is also checked on Guitar 1. It also
 checks player stop-during-load, out-of-order bank loading, cache reuse and visible
-failure/recovery. Existing oscillator
-checks run unchanged. Both embed-format smokes load Guitar from the artifact's
+failure/recovery. The oscillator checks run unchanged except one:
+master volume is now measured as the RATIO between two volumes instead of against
+`0.2 × 0.25 ÷ √2`, an absolute that had quietly made the synth's waveform part of
+a contract about `setVolume`. Both embed-format smokes load Guitar from the artifact's
 origin and prove zero sample requests before selection; the package smoke checks
 the installed assets and lazy API.
 

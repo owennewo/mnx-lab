@@ -368,6 +368,15 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-player-piano-synth.md](complete/core-player-piano-synth.md)** — item 14: a CC0
+  upright piano (26 roots, MIDI 24–107 — the first pack that spans the staff at both ends)
+  and a rebuilt oscillator: harmonic spectrum, a filter that opens then closes, level tilted
+  against register so the bass survives a laptop speaker. Amplitude over time left alone on
+  purpose — a decay was built and measured against the hammer-on velocity contract, which it
+  broke. The sampled-instrument vocabulary stops saying `guitar`, with every old name kept as
+  a deprecated alias on the library face. Listening review pending.
+
+
 - **[workbench-settings-card.md](complete/workbench-settings-card.md)** — the score-corner
   settings card re-cut from the [Settings Card](https://claude.ai/code/artifact/45c8488d-08d4-4971-bdaa-577fe553b627)
   canvas, complete 2026-09-09. SHOW became **STAFF**; every row is one same-width field

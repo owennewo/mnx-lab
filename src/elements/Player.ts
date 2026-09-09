@@ -8,12 +8,12 @@ import {
   type LoopRegion,
 } from '../audio/transport.ts';
 import {
-  GUITAR_PRESETS,
-  isGuitarPreset,
-  type GuitarPreset,
+  SAMPLE_PRESETS,
+  isSamplePreset,
+  type SamplePreset,
   type VoicePreset,
 } from '../audio/sampleSelection.ts';
-import type { GuitarSampleLoader } from '../audio/native/guitarSamples.ts';
+import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
 import { NativeSink, nativeClock } from '../audio/native/sink.ts';
 import { formatPlaybackPosition, measureAt } from '../audio/playbackPosition.ts';
 import { ZERO, compare, type Rational } from '../audio/time.ts';
@@ -27,8 +27,8 @@ export class Player extends LitElement {
   @property({ type: String }) documentId = '';
   @property({ attribute: 'voice-preset' }) voicePreset: VoicePreset = 'synth';
   @property({ attribute: 'sample-base' }) sampleBase: string | undefined;
-  @property({ attribute: false }) sampleBases: Partial<Record<GuitarPreset, string>> | undefined;
-  @property({ attribute: false }) sampleLoader: GuitarSampleLoader | undefined;
+  @property({ attribute: false }) sampleBases: Partial<Record<SamplePreset, string>> | undefined;
+  @property({ attribute: false }) sampleLoader: SamplePackLoader | undefined;
   @state() private loading = false;
   @property({ type: Number }) initialOrdinal: number | null = null;
   @state() private status: TransportSnapshot | undefined;
@@ -215,13 +215,13 @@ export class Player extends LitElement {
     this.publish();
   }
   private sinkPreset(): 'synth' | ((voice: string) => VoicePreset) {
-    if (!isGuitarPreset(this.voicePreset)) return 'synth';
+    if (!isSamplePreset(this.voicePreset)) return 'synth';
     const kits = new Set(this.performance?.voices.filter((v) => v.kit).map((v) => v.id));
     const preset = this.voicePreset;
     return (voice: string) => (kits.has(voice) ? 'synth' : preset);
   }
-  private requiredSamples(): GuitarPreset[] {
-    return isGuitarPreset(this.voicePreset) ? [this.voicePreset] : [];
+  private requiredSamples(): SamplePreset[] {
+    return isSamplePreset(this.voicePreset) ? [this.voicePreset] : [];
   }
   private install() {
     this.teardown();
@@ -346,7 +346,7 @@ export class Player extends LitElement {
             }}
           >
             <option value="synth" ?selected=${this.voicePreset === 'synth'}>Synth</option>
-            ${GUITAR_PRESETS.map(
+            ${SAMPLE_PRESETS.map(
               (p) =>
                 html`<option value=${p.id} ?selected=${this.voicePreset === p.id}>
                   ${p.label}
@@ -374,7 +374,7 @@ export class Player extends LitElement {
       </div>
       ${this.loading
         ? html`<p role="status">
-            Preparing ${isGuitarPreset(this.voicePreset) ? 'guitar samples' : 'audio'}…
+            Preparing ${isSamplePreset(this.voicePreset) ? 'guitar samples' : 'audio'}…
           </p>`
         : nothing}
       ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}

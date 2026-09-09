@@ -1,16 +1,16 @@
 /** Native Web Audio renderer; importing this module never creates a context. */
 import type { Sink, SinkEvent } from '../sink.ts';
 import {
-  selectGuitarSample,
-  isGuitarPreset,
-  type GuitarPreset,
+  selectSample,
+  isSamplePreset,
+  type SamplePreset,
   type VoicePreset,
 } from '../sampleSelection.ts';
 import {
-  loadGuitarSamples,
-  type GuitarSampleBank,
-  type GuitarSampleLoader,
-} from './guitarSamples.ts';
+  loadSamplePack,
+  type SamplePackBank,
+  type SamplePackLoader,
+} from './samplePacks.ts';
 import type { Clock } from '../transport.ts';
 
 const TAIL = 0.005;
@@ -77,11 +77,73 @@ class Automation {
       }
   }
 }
+/* ── the oscillator voice ────────────────────────────────────────────────
+   This is the sound with NO download behind it, so it has to be decent on its
+   own — it is the default, the offline fallback, and what a failed pack load
+   lands on. It was a bare sine with a 5 ms gate at one fixed level, which is a
+   test tone: one partial, so chords beat into mush instead of separating; no
+   decay, so a repeated pitch has no boundary; and one level for every register,
+   which on a laptop speaker makes the bass inaudible, because a sine has no
+   harmonics to imply a fundamental the speaker cannot reproduce.
+
+   What is NOT changed here is AMPLITUDE OVER TIME. The attack and release stay
+   TAIL, and a held note stays level. Two contracts say so, and both are worth
+   more than the change they forbid: the offline smoke pins a released voice
+   silent within 5 ms, and it reads a hammer-on's velocity as a plain RMS ratio
+   between two windows — which is only equal to the velocity ratio while the
+   envelope is flat. A decaying envelope was tried and measured that assertion
+   from 0.69 to 0.90, because the two windows then sit at different phases of
+   their own envelopes.
+
+   The struck character comes from the FILTER instead, which costs no amplitude
+   contract at all: a note that is bright for a moment and then dull reads as
+   struck even at a constant level. Repeated notes were never the argument for a
+   decay anyway — the gate already closes between them. */
+
+/** Struck-string partials: 1/n^1.6 with the evens pulled back, so the tone has
+ *  body without the nasal edge an untouched saw has. Sixteen is enough to place
+ *  the pitch and cheap to build. */
+const SYNTH_PARTIALS = 16;
+/** Peak level for the oscillator before register compensation. */
+const SYNTH_LEVEL = 0.2;
+/** How long the tone takes to lose its opening brightness. */
+const FILTER_FALL = 0.25;
+const waves = new WeakMap<BaseAudioContext, PeriodicWave>();
+/** One wave per context: a PeriodicWave is immutable and rebuilding it per note
+ *  would allocate on the audio thread's critical path for no gain. */
+function synthWave(context: BaseAudioContext): PeriodicWave {
+  let wave = waves.get(context);
+  if (!wave) {
+    const real = new Float32Array(SYNTH_PARTIALS + 1);
+    const imag = new Float32Array(SYNTH_PARTIALS + 1);
+    for (let n = 1; n <= SYNTH_PARTIALS; n++)
+      imag[n] = (n % 2 === 0 ? 0.5 : 1) / n ** 1.6;
+    // Normalized, so the peak stays comparable to the sine this replaced and
+    // SYNTH_LEVEL keeps meaning what it meant.
+    wave = context.createPeriodicWave(real, imag, { disableNormalization: false });
+    waves.set(context, wave);
+  }
+  return wave;
+}
+
+/**
+ * Small speakers reproduce almost nothing below ~200 Hz, and a spectrum-poor
+ * tone gives them nothing to imply the missing fundamental with, so low notes
+ * vanish while high ones pierce. Tilt the level against pitch to put the
+ * registers back in the same room. Mid-register is left alone (≈1 at A4), so
+ * this redistributes rather than turning everything up.
+ */
+function registerGain(hz: number): number {
+  return Math.min(2, Math.max(0.7, (440 / Math.max(20, hz)) ** 0.32));
+}
+
 interface Voice {
   id: string;
   start: number;
   end: number;
   source: OscillatorNode | AudioBufferSourceNode;
+  /** Synth voices only — the tone filter between source and gain. */
+  filter?: BiquadFilterNode;
   pitchScale: number;
   amplitudeScale: number;
   gain: GainNode;
@@ -93,10 +155,10 @@ export interface NativeSinkOptions {
   /** Explicit timbre choice; a callback can choose separately for each part/voice. */
   voicePreset?: VoicePreset | ((voice: string) => VoicePreset);
   sampleBase?: string;
-  sampleBases?: Partial<Record<GuitarPreset, string>>;
+  sampleBases?: Partial<Record<SamplePreset, string>>;
   /** Banks needed by a per-voice preset callback; defaults to legacy Guitar 1. */
-  samplePresets?: readonly GuitarPreset[];
-  sampleLoader?: GuitarSampleLoader;
+  samplePresets?: readonly SamplePreset[];
+  sampleLoader?: SamplePackLoader;
   /** Master amplitude, independent of note velocities; defaults to 1. */
   volume?: number;
   /** A host-owned live or offline context. It is never closed by the sink. */
@@ -112,8 +174,8 @@ export class NativeSink implements Sink {
   private output?: GainNode;
   private volume = 1;
   private disposed = false;
-  private sampleBanks = new Map<GuitarPreset, GuitarSampleBank>();
-  private sampleRequests = new Map<GuitarPreset, Promise<void>>();
+  private sampleBanks = new Map<SamplePreset, SamplePackBank>();
+  private sampleRequests = new Map<SamplePreset, Promise<void>>();
   private attacks = new Map<string, number>();
   private voices = new Set<Voice>();
   constructor(private options: NativeSinkOptions = {}) {
@@ -125,7 +187,7 @@ export class NativeSink implements Sink {
   /** The host pauses before switching; subsequent attacks use the new preset. */
   setVoicePreset(
     preset: NativeSinkOptions['voicePreset'],
-    samplePresets?: readonly GuitarPreset[],
+    samplePresets?: readonly SamplePreset[],
   ): void {
     this.live();
     this.options.voicePreset = preset;
@@ -154,20 +216,20 @@ export class NativeSink implements Sink {
     const required =
       typeof preset === 'function'
         ? (this.options.samplePresets ?? ['guitar' as const])
-        : isGuitarPreset(preset)
+        : isSamplePreset(preset)
           ? [preset]
           : [];
     await Promise.all(required.map((id) => this.prepareSamples(id)));
     this.live();
   }
-  private prepareSamples(preset: GuitarPreset): Promise<void> {
+  private prepareSamples(preset: SamplePreset): Promise<void> {
     if (this.sampleBanks.has(preset)) return Promise.resolve();
     const pending = this.sampleRequests.get(preset);
     if (pending) return pending;
     const request = (async () => {
       const bank = await (this.options.sampleLoader
         ? this.options.sampleLoader(this.context!, preset)
-        : loadGuitarSamples(
+        : loadSamplePack(
             this.context!,
             this.options.sampleBases?.[preset] ??
               (preset === 'guitar' ? this.options.sampleBase : undefined),
@@ -232,7 +294,7 @@ export class NativeSink implements Sink {
           typeof this.options.voicePreset === 'function'
             ? this.options.voicePreset(event.voice)
             : this.options.voicePreset;
-        if (isGuitarPreset(preset) && !this.sampleBanks.has(preset))
+        if (isSamplePreset(preset) && !this.sampleBanks.has(preset))
           throw new Error('Guitar samples are not ready; call unlock first.');
       }
       if (
@@ -270,14 +332,16 @@ export class NativeSink implements Sink {
             ? this.options.voicePreset(event.voice)
             : this.options.voicePreset;
         let source: OscillatorNode | AudioBufferSourceNode;
+        /** Present on synth voices only; its presence IS "this is the oscillator". */
+        let filter: BiquadFilterNode | undefined;
         let pitchParam: AudioParam;
         let pitchScale = 1;
         let amplitudeScale = 0.2;
-        if (isGuitarPreset(preset)) {
+        if (isSamplePreset(preset)) {
           const bank = this.sampleBanks.get(preset);
           if (!bank) throw new Error('Guitar samples are not ready; call unlock first.');
           const attack = this.attacks.get(event.voice) ?? 0;
-          const sample = selectGuitarSample(bank.samples, event.hz, event.velocity, attack);
+          const sample = selectSample(bank.samples, event.hz, event.velocity, attack);
           this.attacks.set(event.voice, attack + 1);
           const bufferSource = context.createBufferSource();
           bufferSource.buffer = sample.buffer;
@@ -288,18 +352,40 @@ export class NativeSink implements Sink {
           source = bufferSource;
         } else {
           const oscillator = context.createOscillator();
-          oscillator.type = event.timbre?.includes('harmonic') ? 'triangle' : 'sine';
+          // A harmonic reads as a thin, pure partial, which is what the flageolet
+          // IS; everything else gets the struck-string spectrum.
+          if (event.timbre?.includes('harmonic')) oscillator.type = 'triangle';
+          else oscillator.setPeriodicWave(synthWave(context));
           pitchParam = oscillator.frequency;
           source = oscillator;
+          filter = context.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.Q.value = 0.7;
+          // Bright at the onset, dull a quarter-second later — the one gesture
+          // every struck or plucked instrument shares, and the reason a fixed
+          // waveform still sounds like a machine. Scaled to the fundamental so
+          // the timbre is the same instrument at both ends of the keyboard,
+          // and bounded so the bass keeps some edge and the treble cannot ring
+          // near Nyquist.
+          const ceiling = Math.min(16000, context.sampleRate * 0.45);
+          const open = Math.min(ceiling, Math.max(700, event.hz * 14));
+          const settled = Math.min(ceiling, Math.max(400, event.hz * 5));
+          filter.frequency.setValueAtTime(open, time);
+          filter.frequency.exponentialRampToValueAtTime(settled, time + FILTER_FALL);
+          amplitudeScale = SYNTH_LEVEL * registerGain(event.hz);
         }
         const gain = context.createGain();
-        source.connect(gain);
+        if (filter) {
+          source.connect(filter);
+          filter.connect(gain);
+        } else source.connect(gain);
         gain.connect(this.destination());
         voice = {
           id: event.voice,
           start: time,
           end: Infinity,
           source,
+          filter,
           pitchScale,
           amplitudeScale,
           gain,
@@ -317,6 +403,7 @@ export class NativeSink implements Sink {
         const ownedVoice = voice;
         source.onended = () => {
           source.disconnect();
+          filter?.disconnect();
           gain.disconnect();
           this.voices.delete(ownedVoice);
         };

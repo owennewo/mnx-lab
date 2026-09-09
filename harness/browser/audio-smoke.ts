@@ -1,4 +1,4 @@
-import { runGuitarSmoke } from './guitar-smoke.ts';
+import { runSamplePackSmoke } from './sample-pack-smoke.ts';
 // Browser-only buffer assertions. No listening approval and no performance goldens.
 import { NativeSink } from '../../src/audio/native/sink.ts';
 import { Transport, type Clock } from '../../src/audio/transport.ts';
@@ -268,22 +268,33 @@ export async function runAudioSmoke() {
   }
   check(refused, 'Disposed sink accepted scheduling.');
   result.disposalRefused = refused;
-  const quietContext = new OfflineAudioContext(1, 48000, 48000),
-    quiet = new NativeSink({ context: quietContext, volume: 0.5 });
-  quiet.schedule(
-    [
-      { kind: 'attack', voice: 'v', hz: 440, velocity: 1, offset: 0.1 },
-      { kind: 'release', voice: 'v', offset: 0.5 },
-    ],
-    0,
-  );
-  quiet.setVolume(0.25);
-  const quietData = (await quietContext.startRendering()).getChannelData(0);
-  result.volumeRms = rms(quietData, 0.2, 0.4);
+  // Measured as a RATIO between two master volumes, not against an absolute
+  // level. This asserted `0.2 * 0.25 / sqrt(2)` — amplitude times volume over a
+  // SINE's crest factor — which quietly made the synth's waveform part of the
+  // contract; it failed the moment the oscillator stopped being a sine, though
+  // master volume was still reaching the output perfectly. The subject here is
+  // setVolume, so measure only what setVolume does.
+  const renderAt = async (volume: number) => {
+    const context = new OfflineAudioContext(1, 48000, 48000);
+    const sink = new NativeSink({ context, volume: 0.5 });
+    sink.schedule(
+      [
+        { kind: 'attack', voice: 'v', hz: 440, velocity: 1, offset: 0.1 },
+        { kind: 'release', voice: 'v', offset: 0.5 },
+      ],
+      0,
+    );
+    sink.setVolume(volume);
+    const data = (await context.startRendering()).getChannelData(0);
+    sink.dispose();
+    return rms(data, 0.2, 0.4);
+  };
+  result.volumeRms = await renderAt(0.25);
+  const louder = await renderAt(0.5);
+  check(result.volumeRms > 1e-4, 'Master volume did not reach the output.');
   check(
-    Math.abs(result.volumeRms - (0.2 * 0.25) / Math.sqrt(2)) < 0.001,
-    'Master volume did not reach the output.',
+    Math.abs(louder / result.volumeRms - 2) < 0.02,
+    `Master volume was not linear: ${louder / result.volumeRms}.`,
   );
-  quiet.dispose();
-  return { ...result, guitar: await runGuitarSmoke() };
+  return { ...result, guitar: await runSamplePackSmoke() };
 }

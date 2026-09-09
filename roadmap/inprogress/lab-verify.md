@@ -851,10 +851,38 @@ The [item 10 follow-up](../complete/core-player-unrolled-view.md) shares the exa
 written duration calculation with note membership, including pickups and empty-bar
 meter fallback. Written goldens and approval records remain unchanged.
 
+## Piano pack and rebuilt synth listening — 2026-09-09
+
+Cause: [player campaign item 14](../complete/core-player-piano-synth.md);
+[packs and the synth voice](../../docs/player-sample-packs.md).
+No scenario golden, status or approval record changed. A listening obligation for
+two new timbres, not a request to re-approve unchanged performance JSON.
+
+**The synth.** Compare against the sine it replaced on the same phrase. It should
+now place pitch in the bass rather than disappearing on a laptop speaker, and
+chords should separate instead of beating. Its onset should read as struck: bright
+for a moment, then dull. A held note is deliberately LEVEL — the decay was built,
+measured against the hammer-on velocity contract, and removed; if a held note
+sounds like a drone, that trade is the thing to reopen, not a bug. The knobs are
+the partial rolloff `1/n^1.6`, the register exponent `0.32`, and the filter's
+`14 × f0` → `5 × f0` over 250 ms.
+
+**The piano.** `Sound → Piano · Upright` on a keyboard or vocal scenario, and on
+the same phrase used for the guitars. Judge its level against all four guitars:
+its gain (0.205504) was set by matching energy over the shared register MIDI
+55–67, which is arithmetic, not loudness. Roots run MIDI 24–107 with one velocity
+layer, so soft and loud notes differ only in gain; the upstream bass sustain loops
+are not implemented, so long low notes decay rather than hold. Source and derived
+hashes are pinned in `public/samples/upright-piano-v1/manifest.json`.
+
+Automated checks passed: 117 samples decode across five banks, the piano's roots
+exceed every guitar's at both ends, and the velocity ratio, bend and release
+timings are unchanged. No human listening verdict has been recorded.
+
 ## Sampled guitar listening — 2026-09-09
 
 Cause: [player campaign item 12](../complete/core-player-sampled-guitar.md);
-[pack and behavior](../../docs/player-sampled-guitar.md).
+[pack and behavior](../../docs/player-sample-packs.md).
 No scenario golden, status or approval record changed. This is a listening
 obligation for the new timbre, not a request to re-approve unchanged performance
 JSON. The user explicitly authorized implementation ahead of reviewer approvals.

@@ -172,6 +172,7 @@ run any time before 6.
 | 10 | [Unrolled engraving](../complete/core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | complete; unrolled engraving review pending |
 | 11 | [WebMIDI out](../rejected/core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | rejected — user chose won’t-do |
 | 12 | [Sampled guitar](../complete/core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | complete; listening review pending |
+| 14 | [Piano pack and the synth voice](../complete/core-player-piano-synth.md) | A CC0 upright piano — the first pack that spans the staff at both ends — and an oscillator worth defaulting to: harmonic spectrum, a filter that opens and closes, register-tilted level. Amplitude over time deliberately untouched, because two measured contracts depend on it. | reviewer | ear | **complete 2026-09-09; listening review pending** |
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
 
 ### Decisions still open
@@ -183,6 +184,42 @@ run any time before 6.
 - **Backend.** Item 4 measured both and selected native Web Audio; see the log below.
 
 ## Progress + learnings
+
+### 2026-09-09 — item 14: a piano, and what a "sounds bad" complaint actually contained
+
+Opened by *"the synth sounds super bad"*, which turned out to be four separable faults in
+one sine oscillator, not one vague quality problem. Naming them separately is what let
+three be fixed and the fourth be consciously declined.
+
+- **A test can pin more than its subject, and you find out by breaking it.** Two did.
+  `smoke:audio` asserted master volume against `0.2 × 0.25 ÷ √2` — amplitude times volume
+  over a *sine's* crest factor — so a check about `setVolume` failed the moment the
+  waveform changed, while `setVolume` still worked perfectly. And `sample-packs.test.ts`
+  capped each pack at 1.5 MB, which read as a size budget but was really a root-count cap;
+  it broke on a pack spanning 84 semitones rather than 49. Both were rewritten to measure
+  their actual subject — a volume RATIO, and a per-*sample* weight — which made them
+  better tests, not looser ones. **A test that fails on a change it should not care about
+  is over-specified; fix the assertion, not the change.**
+- **The fourth fault was declined on evidence, not taste.** An amplitude decay was built.
+  `smoke:audio` reads a hammer-on's velocity as a plain RMS ratio between two fixed
+  windows, and that equals the velocity ratio *only while the envelope is flat*: measured,
+  the decay moved it 0.687 → 0.905, because the windows then sit at different phases of
+  their own envelopes. The decay was removed rather than the contract redefined. The
+  struck character came from a filter envelope instead, which costs no amplitude contract
+  at all. **When an improvement collides with a measured contract, look for the version of
+  the improvement that does not touch it.**
+- **Positional selection breaks silently when a list is reordered.**
+  `SAMPLE_PRESETS.slice(1)` meant "every pack except the archtop". Putting the piano at
+  the head changed *which* pack was skipped, and the failure surfaced as a missing
+  `SOURCE.txt` — a file that was never missing. Later items: select by id.
+- **The vocabulary was load-bearing on the published face.** Nine `guitar…` names were
+  exported from `mnx-lab/audio`. Renaming them honestly meant keeping every old name as a
+  deprecated alias, and the alias test that matters asserts the old name is the **same
+  binding** as the new one, not that both exist — only that catches an alias that drifts.
+- **Licence uniformity is worth a better recording.** The two grand pianos on the same
+  FreePats page are CC-BY 3.0. They were rejected for a CC0 upright, because every pack
+  here is CC0 and each ships the whole dedication beside it; one CC-BY pack would make
+  that a per-pack question forever.
 
 ### 2026-09-08 — the plan reviewed before a line was written
 

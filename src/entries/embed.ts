@@ -1,4 +1,4 @@
-import { GUITAR_PRESETS } from '../audio/sampleSelection.ts';
+import { SAMPLE_PRESETS } from '../audio/sampleSelection.ts';
 // Build face: the embed (dist/embed/mnx-lab.js, IIFE + ESM) — one script tag
 // registers the elements/ custom elements and nothing else. The workbench
 // shell must never be reachable from here (the old embed was the app shell
@@ -16,7 +16,7 @@ import { GUITAR_PRESETS } from '../audio/sampleSelection.ts';
 // So this face derives its asset base from ITS OWN script URL and registers
 // the font itself. A host may still override with the `smufl-base` attribute
 // on the script tag (assets mirrored elsewhere, or split to a CDN).
-import { setGuitarSampleBase } from '../audio/native/guitarSamples.ts';
+import { setSampleBase } from '../audio/native/samplePacks.ts';
 import { setSmuflBasePath } from '../engine/smufl/smufl.ts';
 import '../elements/DocumentViewer.ts';
 
@@ -53,8 +53,8 @@ function declaredBase(): string | null {
 
 const sampleDirectory = scriptDirectory();
 if (sampleDirectory)
-  for (const preset of GUITAR_PRESETS)
-    setGuitarSampleBase(`${sampleDirectory}/samples/${preset.directory}`, preset.id);
+  for (const preset of SAMPLE_PRESETS)
+    setSampleBase(`${sampleDirectory}/samples/${preset.directory}`, preset.id);
 const base = declaredBase() ?? scriptDirectory();
 if (base) {
   setSmuflBasePath(`${base}/smufl`);

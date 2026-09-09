@@ -122,6 +122,6 @@ has added player UI or changed the viewer payload. Results are recorded in the
 No scenario golden or human verification record changes in this item. Item 5's
 performance/MIDI review batch remains pending in the standing ledger.
 
-The same NativeSink also supports [sampled guitar](player-sampled-guitar.md) through
+The same NativeSink also supports [sample packs](player-sample-packs.md) through
 independent buffer sources. Pitch automation and cancellation remain shared with
 the oscillator backend; the compiler and transport timeline are unchanged.
