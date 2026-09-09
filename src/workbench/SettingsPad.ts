@@ -385,7 +385,20 @@ export class SettingsPad extends LitElement {
               role="menuitem"
               href=${choice.href}
               aria-current=${on}
-              @click=${() => this.close()}
+              @click=${() => {
+                // Exactly what a display row does when its list is used: drop
+                // the list, keep the card, hand focus back to the trigger —
+                // and in that order, for the focusout reason below. STAFF used
+                // to close the whole card, which made the one row whose
+                // options are LINKS behave unlike its eight neighbours: every
+                // other setting can be changed and then reconsidered without
+                // the card vanishing underneath. Changing the view does not
+                // rebuild the pad — ScenarioPage resets loadState only when
+                // the SOURCE changes — so the open card survives the
+                // navigation the link performs.
+                this.focusField(key);
+                this.openList = null;
+              }}
               >${SettingsPad.glyph(key, choice.value)}<span class="word">${choice.word}</span></a
             >`;
           }
