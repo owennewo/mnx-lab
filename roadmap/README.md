@@ -44,10 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-score-clearance.md](proposed/core-score-clearance.md)** — global Clearance
-  display setting, 0–4 in half steps with today’s layout preserved at default 2;
-  seven structural padding/margin locations, independent of Staff and Space,
-  calibrated from tightest safe to deliberately generous.
 - **[core-player-expression.md](proposed/core-player-expression.md)** — campaign item 8:
   dynamics, articulations, arpeggio and the guitar techniques as curves and voice flags
   (`noReattack` on the event type); tempo-relative vibrato and harmonics that preserve
@@ -389,6 +385,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+- **[core-score-clearance.md](complete/core-score-clearance.md)** — complete
+  2026-09-09: global Clearance display setting, 0–4 in half steps with the historical
+  layout byte-identical at default 2. Seven structural padding/margin relationships
+  respond through separate anchors, independently of Staff and Space; level 0 remains
+  ink-safe, level 4 is deliberately generous, and explicit legacy `densityPad` wins.
 - **[core-player-element.md](complete/core-player-element.md)** — player campaign item 7,
   complete 2026-09-09: `<mnx-player>` controls, performed-order table, separate playback
   ink and inspection, ordinal links, plain-DOM ESM/IIFE wiring and static `/verify`

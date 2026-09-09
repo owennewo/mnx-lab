@@ -1,6 +1,6 @@
 # Score clearance
 
-Status: proposed (2026-09-09).
+Status: complete (2026-09-09).
 Serves: implementation loop — shared engine and display surface.
 
 ## Requirement
@@ -153,6 +153,24 @@ that every collision case is handled. A safety gap may remain even at zero.
   `npm run build`. Update rendering and viewer-surface documentation with the final
   setting and compatibility contract.
 
-This plan records the agreed direction. Implementation and visual calibration have
-not started; exact per-location endpoint distances remain implementation decisions
-supported by the review evidence above.
+## Outcome
+
+Completed in `2074dbb`. A shared clearance policy now calibrates the seven agreed
+relationships through tight, historical and spacious anchors. The workbench exposes
+and persists the nine-level slider; the viewer and library surface accept the same
+display option. Explicit `densityPad` retains its historical behavior and takes
+precedence without compounding.
+
+The collision pass required one implementation refinement: at aggressive levels,
+moving rows can cause overhanging ink to cross the midpoint used for row ownership.
+Nondefault clearance therefore re-measures until ownership stabilizes while keeping
+the first pass's outer-margin target fixed. This gives level 0 a measured 1.5sp
+inter-system request and at least 0.5sp observed ink separation in the stress corpus.
+
+All nine levels were inspected in Notation, Tab and Both; 0 is deliberately cramped
+and 4 deliberately generous. The new regression suite covers normalization,
+monotonic response, stable row ownership, actual staff gaps, packing consistency,
+lyrics/markings, hidden prefixes, Natural/Fill and Staff/Space extremes. The complete
+suite passed (1,453 tests after the final rebase), as did corpus and build gates.
+`update:primitives` produced no scenario diff: omitted Clearance and level 2 remain
+byte-identical, so there is no verification debt to register.
