@@ -3,7 +3,13 @@ import { importMusicXML, ImportOptions } from './import/musicxml.js';
 import { exportMusicXML, ExportOptions } from './export/mnx.js';
 import { readMxl, writeMxl, isZip } from './common/mxl.js';
 
-export { importMusicXML, ImportOptions, exportMusicXML, ExportOptions };
+export { importMusicXML, exportMusicXML };
+// `export type` for the option interfaces, as guitarpro-mnx already does: a
+// value-position re-export of a type makes the module unloadable by any runtime
+// that strips types without checking them (tsx, ts-node/esm), which is how the
+// CLI is run outside a build. It threw `does not provide an export named
+// 'ExportOptions'` before the first line of it ran.
+export type { ImportOptions, ExportOptions };
 
 /**
  * Reads a `.mxl` (compressed MusicXML), or a plain one handed over as bytes.

@@ -81,6 +81,31 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Score metadata — 2026-09-09
+
+Cause: [core-score-metadata](../proposed/core-score-metadata.md). **One new scenario,
+`lab/00-document/05-score-metadata`, at `draft` — no existing golden moved.** That is
+the claim to check first: document metadata is data, and nothing in the layout engine
+reads it, so this batch should be the cheapest kind of review.
+
+Look for: the engraving is deliberately **indistinguishable from an untitled one-note
+document**. The printed title comes from `scores[].name`, which labels a layout, and a
+[conformance test](../../harness/conformance/score-metadata.test.ts) pins the primitives
+as byte-identical with the `_x.mnxLab.work` block and without it. So a reviewer is
+approving that the page shows a single whole-note E with a 4/4 signature and **no
+heading at all**, while the JSON beside it states a title, subtitle, artist, album, four
+credits, copyright, source and notes. If any of that text has reached the page, the
+approval is wrong and the engine has started reading `work`.
+
+Worth knowing while reviewing: whether a document's own title *should* print when a
+score declares no name is a live question, deliberately left open. Approving this
+scenario is not a vote on it.
+
+Scenario set (paths under `scenarios/`):
+
+- `lab/00-document/05-score-metadata`
+
+
 ### Player expression — 2026-09-09
 
 Cause: [core-player-expression](../complete/core-player-expression.md), campaign item 8.

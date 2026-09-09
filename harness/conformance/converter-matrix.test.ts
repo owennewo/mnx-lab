@@ -59,11 +59,32 @@ interface Lane {
   roundTrip: (document: unknown) => unknown;
 }
 
+/**
+ * Removes `_x.mnxLab.encoding` from a ROUND-TRIPPED document.
+ *
+ * That block says what wrote the file, so every importer stamps its own — it is
+ * created BY the round trip, not carried through it. Counting it would make the
+ * `vendor-extensions` def unloseable: any document at all would come back
+ * carrying a vendor dict, and the two scenarios that really do lose their own
+ * `_x` (00-document/03-navigation-playground and 04-twelve-bar-blues, both via
+ * `strings`) would score as supported. Measured, not assumed: the row flipped
+ * from lossy to supported the moment the stamp landed.
+ */
+function withoutWriterStamp(document: unknown): unknown {
+  const doc = document as { _x?: { mnxLab?: Record<string, unknown> } };
+  if (!doc?._x?.mnxLab?.encoding) return document;
+  const clone = JSON.parse(JSON.stringify(doc));
+  delete clone._x.mnxLab.encoding;
+  if (Object.keys(clone._x.mnxLab).length === 0) delete clone._x.mnxLab;
+  if (Object.keys(clone._x).length === 0) delete clone._x;
+  return clone;
+}
+
 const LANES: Lane[] = [
   {
     key: 'musicxml',
     label: 'MusicXML',
-    roundTrip: document => importMusicXML(exportMusicXML(document as never))
+    roundTrip: document => withoutWriterStamp(importMusicXML(exportMusicXML(document as never)))
   }
 ];
 

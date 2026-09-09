@@ -9,3 +9,4 @@ type SubValidator = ((data: unknown) => boolean) & {
 export declare const validateNoteExt: SubValidator;
 export declare const validatePartExt: SubValidator;
 export declare const validateGlobalMeasureExt: SubValidator;
+export declare const validateRootExt: SubValidator;

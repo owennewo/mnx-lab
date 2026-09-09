@@ -10,7 +10,14 @@ import {
   selectionContext
 } from './mnxContext.ts';
 import type { PlaybackState, PlaybackOccurrence, SelectionContext } from './mnxContext.ts';
-import { MnxDocument, MnxPart, MnxTuningEntry, declaredStaffKind } from '../model/mnx.ts';
+import {
+  MnxDocument,
+  MnxPart,
+  MnxTuningEntry,
+  declaredStaffKind,
+  documentArtist,
+  documentTitle
+} from '../model/mnx.ts';
 import {
   resolveTabSetup,
   tabPositionContext,
@@ -1226,15 +1233,16 @@ export class DocumentViewer extends LitElement {
       .filter((name): name is HideableFeature => name === 'lyrics' || name === 'badges');
   }
 
-  /** MNX v27 deliberately has no document title/composer fields yet. The
-   *  wrapper carries importer/host metadata and a required source-name
-   *  fallback, keeping speculative properties out of the MNX payload. */
+  /** The piece's own identity, from `_x.mnxLab.work` in the document (MNX v27
+   *  still has no standard field — w3c-cg/mnx#267). The wrapper's `name` is a
+   *  host-owned fallback only: a scenario name, a filename, a library title. */
   private documentHeading(): { title: string; artist: string | null } {
     const clean = (value: string | undefined) => value?.trim() || null;
-    const title = clean(this.mnxDoc?.title) ?? clean(this.mnxDoc?.name) ?? clean(this.mnxDoc?.id);
+    const title =
+      documentTitle(this.mnxDoc?.mnxJson) ?? clean(this.mnxDoc?.name) ?? clean(this.mnxDoc?.id);
     return {
       title: title ?? 'Untitled document',
-      artist: clean(this.mnxDoc?.artist)
+      artist: documentArtist(this.mnxDoc?.mnxJson)
     };
   }
 

@@ -34,7 +34,9 @@ export interface ScenarioGroup {
 export const FALLBACK_GROUP = 'Other';
 
 export const SCENARIO_GROUPS: readonly ScenarioGroup[] = [
-  { name: 'Getting started', match: /hello-world|c-major-scale|chord-and-half-rest|minimal-single-note|empty-tab-canvas/ },
+  // `score-metadata` joins its 00-document siblings rather than 'Text & lyrics':
+  // it carries text, but none of it is ever engraved.
+  { name: 'Getting started', match: /hello-world|c-major-scale|chord-and-half-rest|minimal-single-note|empty-tab-canvas|score-metadata/ },
   // The selection-ladder review instruments (roadmap/inprogress/selection-
   // ladder.md): the synthetic matrix-coverage bed and the playable blues.
   // Before 'Repeats & navigation', whose /navigation/ would claim the first.

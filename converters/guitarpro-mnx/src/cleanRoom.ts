@@ -9,24 +9,17 @@ import { parseGpif } from './gpif/document.js';
  *
  * GP6–8 and the fixture-proven GP3–5 subset are implemented.
  * This also backs the production `importGuitarPro` API and workbench worker.
+ *
+ * The score header travels IN the document, as `_x.mnxLab.work` — an earlier
+ * `importGuitarProWithMetadata` handed title and artist back beside it for the
+ * host to hold, which meant every save dropped them.
  */
 export function importGuitarProCleanRoom(
   data: Uint8Array,
   options: GpifImportOptions = {}
 ): MnxStructure {
-  return importGuitarProWithMetadata(data, options).document;
-}
-
-/** One parse for both notation and the host's document heading. */
-export function importGuitarProWithMetadata(data: Uint8Array, options: GpifImportOptions = {}): {
-  document: MnxStructure; title: string; artist: string;
-} {
   const parsed = sniffContainer(data) === 'gp345-binary'
     ? parseGuitarProBinary(data, options)
     : parseGpif(extractScoreGpif(data));
-  return {
-    document: gpifToMnx(parsed, options),
-    title: parsed.metadata?.title.trim() ?? '',
-    artist: parsed.metadata?.artist.trim() ?? ''
-  };
+  return gpifToMnx(parsed, options);
 }

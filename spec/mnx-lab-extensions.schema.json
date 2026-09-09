@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mnx-lab.totai.uk/schemas/mnx-lab-extensions.schema.json/v6",
-  "title": "MNX Lab vendor extensions (`_x.mnxLab`) — v6",
-  "description": "Everything MNX Lab carries that W3C MNX v19 cannot express: fretted-instrument tablature, section/rehearsal labels, and chord symbols. All of it lives under the single vendor key `_x.mnxLab`, which is how the MNX spec says extensions are namespaced (w3c-cg/mnx#63/#429: the `_x` key identifies an agent, vendor or community). Documents using these extensions remain fully valid against the official MNX schema. Each block is shaped like the standard MNX object it is a draft of, so adopting any of them upstream means deleting the `_x.mnxLab` wrapper rather than rewriting the data. Rationale and the proposals these draft: docs/mnx-extensions.md.",
+  "title": "MNX Lab vendor extensions (`_x.mnxLab`) — v6.2",
+  "description": "Everything MNX Lab carries that W3C MNX v19 cannot express: fretted-instrument tablature, chord symbols, and document metadata (what the piece is, and what wrote the file). All of it lives under the single vendor key `_x.mnxLab`, which is how the MNX spec says extensions are namespaced (w3c-cg/mnx#63/#429: the `_x` key identifies an agent, vendor or community). Documents using these extensions remain fully valid against the official MNX schema. Each block is shaped like the standard MNX object it is a draft of, so adopting any of them upstream means deleting the `_x.mnxLab` wrapper rather than rewriting the data. Rationale and the proposals these draft: docs/mnx-extensions.md.",
   "type": "object",
   "$defs": {
     "pitch": {
@@ -420,6 +420,90 @@
       ],
       "additionalProperties": false
     },
+    "creator": {
+      "type": "object",
+      "description": "One person or body credited with making the work. Drafts MusicXML's `<creator type=\"…\">` and maps to Dublin Core `dc:creator`. A performing `artist` is deliberately NOT a role here — see `work.artist`.",
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What they did. Recommended values, matching MusicXML's open `creator type` and MuseScore's metaTags: `composer`, `lyricist`, `arranger`, `transcriber` (Guitar Pro's \"Tabber\"), `translator`, `editor`, `publisher`. The list is a recommendation, not an enum: an unfamiliar role from another application round-trips verbatim rather than failing validation."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The name as the source states it. No normalization, no authority linking (w3c/mnx#56 raises both as open questions for the standard object)."
+        }
+      },
+      "required": [
+        "role",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "work": {
+      "type": "object",
+      "description": "What the piece IS — the metadata every notation format carries and MNX v27 has nowhere for (w3c-cg/mnx#267, w3c/mnx#56). Drafts a standard root-level `work` object, so adoption means deleting the `_x.mnxLab` wrapper. Every field is optional and every value is a plain string: MNX has no formatted text, and printed placement is a layout concern (MusicXML's `<credit>`), never document metadata. Dublin Core mapping is given per field so the standard object can reuse an existing vocabulary rather than invent one.",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The piece's title (`dc:title`). MusicXML `<work-title>`, MuseScore `workTitle`, Guitar Pro `<Title>`."
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "A secondary title line. MusicXML `<credit credit-type=\"subtitle\">` (or `<movement-title>` when there is no separate work title), MuseScore `subtitle`, Guitar Pro `<SubTitle>`."
+        },
+        "artist": {
+          "type": "string",
+          "description": "The performer this transcription is of (`dc:contributor`) — Guitar Pro's `<Artist>`, the field a tab lists first. Flat rather than a `creators` role because a performer is not a creator of the work; MusicXML has no native home for it and round-trips it as `<creator type=\"artist\">`."
+        },
+        "album": {
+          "type": "string",
+          "description": "The release the performance is from. Guitar Pro `<Album>`; MusicXML carries it as a `<miscellaneous-field name=\"album\">`."
+        },
+        "creators": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/creator"
+          },
+          "minItems": 1,
+          "description": "Who made the work, in source order (`dc:creator`). An array of typed entries rather than one field per role, so an application with a role MNX did not enumerate still has somewhere to put it."
+        },
+        "copyright": {
+          "type": "string",
+          "description": "Rights statement as printed (`dc:rights`). MusicXML `<rights>`, MuseScore `copyright`, Guitar Pro `<Copyright>`."
+        },
+        "source": {
+          "type": "string",
+          "description": "Where this encoding came from — a URL, a publication, a recording (`dc:source`). MusicXML `<source>`."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Free editorial text about the score: performance instructions, provenance, anything the other fields do not name. Guitar Pro `<Instructions>` (with `<Notices>` lines appended); MusicXML `<miscellaneous-field name=\"notes\">`."
+        }
+      },
+      "additionalProperties": false
+    },
+    "encoding": {
+      "type": "object",
+      "description": "What wrote THIS file — the gap w3c-cg/mnx#547 reports from shipping a converter, whose own interim workaround is a vendor `_x` block exactly like this one. Drafts a standard root-level `encoding` object. It describes the MNX file in hand and is stamped by whatever writes it, so it is never copied forward from a source document: an importer replaces it with its own, the way MusicXML's `<encoding>` describes the MusicXML file rather than the file it came from.",
+      "properties": {
+        "software": {
+          "type": "string",
+          "description": "The program that wrote this MNX file. MusicXML `<encoding><software>`, MuseScore `platform`/`programVersion`."
+        },
+        "version": {
+          "type": "string",
+          "description": "That program's version, stated separately so a consumer can compare versions without parsing a display string."
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "The date it was written, `YYYY-MM-DD` (`dc:date`). MusicXML `<encoding-date>`. Stated as a `pattern` rather than `format: date` because the precompiled validators load no format vocabulary."
+        }
+      },
+      "additionalProperties": false
+    },
     "note-ext": {
       "type": "object",
       "description": "The whole vendor dict at note._x.mnxLab. `string`, `fret` and `fingering` sit flat — peers of the note's own `pitch`/`staff` in the shape they draft — because nesting them under `tab` would make universal fields (fingering is piano's whole interest) fretboard-scoped by construction. A note may carry any subset: `string` alone derives its fret; `fret` alone is meaningless and therefore requires `string`.",
@@ -479,6 +563,19 @@
           },
           "minItems": 1,
           "description": "Every chord symbol starting in this measure, in `location` order. An array parallel to `tempos` — the other repeatable, metrically-positioned global object."
+        }
+      },
+      "additionalProperties": false
+    },
+    "root-ext": {
+      "type": "object",
+      "description": "The whole vendor dict at the DOCUMENT root — `_x.mnxLab` beside `mnx`, `global` and `parts`. Document metadata lives here, not on a part or a measure, because it is a fact about the whole file: two parts cannot disagree about the title, which is the same test that put key and tempo on the global measure and dynamics on the part measure. `scores[].name` is not this — it names a LAYOUT (\"Full score\", \"Guitar part\") and several may exist in one document.",
+      "properties": {
+        "work": {
+          "$ref": "#/$defs/work"
+        },
+        "encoding": {
+          "$ref": "#/$defs/encoding"
         }
       },
       "additionalProperties": false

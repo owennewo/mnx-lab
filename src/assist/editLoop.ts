@@ -60,6 +60,7 @@ export interface EditValidators {
   validateNoteExt: ((data: unknown) => boolean) & { errors: any[] | null };
   validatePartExt: ((data: unknown) => boolean) & { errors: any[] | null };
   validateGlobalMeasureExt: ((data: unknown) => boolean) & { errors: any[] | null };
+  validateRootExt: ((data: unknown) => boolean) & { errors: any[] | null };
 }
 
 let validatorsPromise: Promise<EditValidators> | null = null;
@@ -74,7 +75,8 @@ export function loadEditValidators(): Promise<EditValidators> {
       validateMnx: mnx.default as EditValidators['validateMnx'],
       validateNoteExt: ext.validateNoteExt as EditValidators['validateNoteExt'],
       validatePartExt: ext.validatePartExt as EditValidators['validatePartExt'],
-      validateGlobalMeasureExt: ext.validateGlobalMeasureExt as EditValidators['validateGlobalMeasureExt']
+      validateGlobalMeasureExt: ext.validateGlobalMeasureExt as EditValidators['validateGlobalMeasureExt'],
+      validateRootExt: ext.validateRootExt as EditValidators['validateRootExt']
     };
   })();
   return validatorsPromise;
@@ -157,6 +159,10 @@ export function validateLabExtensions(doc: any, v: EditValidators): string[] {
       errors.push(`MNX Lab extension: path "${path}${err.instancePath}" ${err.message}.`);
     }
   };
+
+  if (doc?._x?.mnxLab !== undefined && !v.validateRootExt(doc._x.mnxLab)) {
+    report('/_x/mnxLab', v.validateRootExt.errors);
+  }
 
   (doc?.global?.measures ?? []).forEach((measure: any, mIdx: number) => {
     if (measure?._x?.mnxLab !== undefined && !v.validateGlobalMeasureExt(measure._x.mnxLab)) {

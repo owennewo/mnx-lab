@@ -22,6 +22,7 @@ import {
   tupletFlags,
   wholesToFraction
 } from '../common/duration.js';
+import { documentWork, workToGpScoreInfo } from '../common/scoreMetadata.js';
 import {
   mnxStringToAlphaTab,
   mnxTuningToAlphaTab,
@@ -94,6 +95,22 @@ export function buildScore(
   options: ExportOptions = {}
 ): alphaTab.model.Score {
   const score = new M.Score();
+
+  // The header Guitar Pro prints above the music. alphaTab has no combined
+  // words-and-music field, so a name credited with both is written into `words`
+  // and `music` — which is exactly how its own GPIF reader unpacks that
+  // element, so the two writers stay comparable.
+  const scoreInfo = workToGpScoreInfo(documentWork(mnx), warn);
+  score.title = scoreInfo.title;
+  score.subTitle = scoreInfo.subtitle;
+  score.artist = scoreInfo.artist;
+  score.album = scoreInfo.album;
+  score.words = scoreInfo.words || scoreInfo.wordsAndMusic;
+  score.music = scoreInfo.music || scoreInfo.wordsAndMusic;
+  score.copyright = scoreInfo.copyright;
+  score.tab = scoreInfo.tabber;
+  score.instructions = scoreInfo.instructions;
+  score.notices = scoreInfo.notices.join('\n');
 
   const globalMeasures = mnx.global?.measures ?? [];
   const measureCount = Math.max(

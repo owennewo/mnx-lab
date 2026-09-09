@@ -2,6 +2,7 @@ import { parseXML, type Element, type Document } from '../common/xml.js';
 import { MnxStructure, MnxGlobalMeasure, MnxPart, MnxPitch } from '../common/types.js';
 import { walkSequenceEvents } from '../common/utils.js';
 import { Aligner } from './aligner.js';
+import { readWork, rootExtension } from '../common/scoreMetadata.js';
 
 // Helper functions for XML DOM parsing
 export function findDirectChild(parent: Element, tagName: string): Element | null {
@@ -49,6 +50,11 @@ export interface ImportOptions {
    * may not faithfully represent the input.
    */
   onWarning?: (message: string) => void;
+  /**
+   * `YYYY-MM-DD` stamped into `_x.mnxLab.encoding.date`. Omitted by default so
+   * derived output stays reproducible; the CLI opts in with `--encoding-date`.
+   */
+  encodingDate?: string;
 }
 
 export function importMusicXML(
@@ -62,20 +68,10 @@ export function importMusicXML(
     throw new Error('Invalid MusicXML: Missing <score-partwise> root.');
   }
 
-  // 1. Parse Metadata
-  const metadata: any = {};
-  const identificationEl = doc.getElementsByTagName('identification')[0];
-  if (identificationEl) {
-    const encodingEl = identificationEl.getElementsByTagName('encoding')[0];
-    if (encodingEl) {
-      const software = getChildText(encodingEl, 'software');
-      const date = getChildText(encodingEl, 'encoding-date');
-      metadata.encoding = {
-        ...(software ? { software } : {}),
-        ...(date ? { date } : {})
-      };
-    }
-  }
+  // 1. Score metadata → `_x.mnxLab.work`. The source's own `<encoding>` is
+  //    deliberately NOT read: it describes the MusicXML file, not the MNX
+  //    derived from it, and the importer stamps its own below.
+  const work = readWork(doc);
 
   // 2. Parse Part Definitions
   const partListEl = scoreEl.getElementsByTagName('part-list')[0];
@@ -176,6 +172,7 @@ export function importMusicXML(
         ? { lyrics: { lineOrder: [...aligner.lyricLines] } }
         : {})
     },
-    parts: finalParts
+    parts: finalParts,
+    _x: rootExtension(work, options.encodingDate)
   };
 }

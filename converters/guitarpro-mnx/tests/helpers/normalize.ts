@@ -1,6 +1,27 @@
 import { MnxStructure, MnxSequenceItem, MnxEvent } from '../../src/common/types.js';
 
 /**
+ * Drops the document's `_x.mnxLab` metadata block for comparisons AGAINST THE
+ * ALPHATAB ORACLE — never for comparisons between our own readers.
+ *
+ * Two measured divergences make the header untestable across the two
+ * importers, and neither is about the music:
+ *
+ *  - alphaTab's GP3-5 binary reader mis-decodes Windows-1252 text, so the
+ *    fixture's "Legacy café" comes back with a replacement character; the
+ *    clean-room reader decodes it correctly.
+ *  - alphaTab exposes Guitar Pro's three authorship fields as two, so a
+ *    credit our reader types as a composer can arrive as a lyricist alone.
+ *
+ * Comparing the block would therefore measure alphaTab's charset handling
+ * rather than our mapping, which `tests/metadata.test.ts` covers directly.
+ */
+export function withoutRootMetadata(mnx: MnxStructure): MnxStructure {
+  const { _x, ...rest } = mnx;
+  return rest as MnxStructure;
+}
+
+/**
  * Rewrites note ids to `n0..nN` in traversal order, technique targets
  * included, so two importers (or two round trips) can be compared with
  * `toEqual` even though each numbers notes with its own counter. The renaming

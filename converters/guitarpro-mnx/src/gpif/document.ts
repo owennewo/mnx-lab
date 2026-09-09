@@ -1,5 +1,6 @@
 import { DOMParser } from '@xmldom/xmldom';
 import { MnxNoteValueBase, MnxPitch, MnxStep } from '../common/types.js';
+import { GpScoreInfo } from '../common/scoreMetadata.js';
 
 /**
  * GPIF (`score.gpif`) → typed pools.
@@ -16,7 +17,8 @@ import { MnxNoteValueBase, MnxPitch, MnxStep } from '../common/types.js';
  */
 
 export interface GpifDocument {
-  metadata?: { title: string; artist: string };
+  /** The `<Score>` header, verbatim. Mapped to `_x.mnxLab.work` by `toMnx`. */
+  metadata?: GpScoreInfo;
   masterBars: GpifMasterBar[];
   tracks: GpifTrack[];
   bars: Map<number, GpifBar>;
@@ -145,7 +147,7 @@ export function parseGpif(xml: string): GpifDocument {
   if (!root || root.tagName !== 'GPIF') throw new Error('not a GPIF document');
 
   return {
-    metadata: { title: text(child(root, 'Score'), 'Title') ?? '', artist: text(child(root, 'Score'), 'Artist') ?? '' },
+    metadata: parseScoreInfo(child(root, 'Score')),
     masterBars: children(child(root, 'MasterBars'), 'MasterBar').map(parseMasterBar),
     tracks: children(child(root, 'Tracks'), 'Track').map(parseTrack),
     bars: pool(root, 'Bars', 'Bar', parseBar),
@@ -154,6 +156,29 @@ export function parseGpif(xml: string): GpifDocument {
     notes: pool(root, 'Notes', 'Note', parseNote),
     rhythms: pool(root, 'Rhythms', 'Rhythm', parseRhythm),
     tempoAutomations: parseTempoAutomations(root)
+  };
+}
+
+/**
+ * `<Score>` → the dialect-independent header. Every child is plain text (GPIF
+ * wraps some in CDATA, which `textContent` already resolves); `<Notices>` is
+ * one element whose text may hold several lines.
+ */
+function parseScoreInfo(node: Element | null): GpScoreInfo {
+  const read = (name: string): string => (text(node, name) ?? '').trim();
+  const notices = read('Notices');
+  return {
+    title: read('Title'),
+    subtitle: read('SubTitle'),
+    artist: read('Artist'),
+    album: read('Album'),
+    words: read('Words'),
+    music: read('Music'),
+    wordsAndMusic: read('WordsAndMusic'),
+    copyright: read('Copyright'),
+    tabber: read('Tabber'),
+    instructions: read('Instructions'),
+    notices: notices ? notices.split(/\r?\n/).map(line => line.trim()).filter(Boolean) : []
   };
 }
 

@@ -1,4 +1,4 @@
-# MNX Lab extensions (`_x.mnxLab`) — v6
+# MNX Lab extensions (`_x.mnxLab`) — v6.2
 
 Everything this project carries that **W3C MNX v19 cannot express**, in one
 place: what it is, why standard MNX has no field for it, which CG issue it
@@ -21,6 +21,8 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 | `tab.technique.palmMute` | nothing; MusicXML smuggles it through generic elements | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
 | `fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
 | `harmonies` | **no harmony concept anywhere** — no `root`, no `kind`, no chord | [#109](https://github.com/w3c-cg/mnx/issues/109) | ✅ both converters | ✅ |
+| `work` | **no document metadata at all** — no title, composer, rights or performer anywhere in 193 `$defs` | [#267](https://github.com/w3c-cg/mnx/issues/267), [#56](https://github.com/w3c/mnx/issues/56) | ✅ both converters | n/a — never printed |
+| `encoding` | nothing says what wrote the file | [#547](https://github.com/w3c-cg/mnx/issues/547) | ✅ both converters | n/a |
 
 **Graduated out of `_x` in v4:** `rehearsal` and `section`. They are no longer
 extensions — they are written as the *standard* MNX objects proposed in
@@ -262,6 +264,88 @@ until the next one.
 the source's literal spelling differs from what a consumer would render from the
 structure, so most chords carry none.
 
+## Document root: `_x.mnxLab`
+
+Two blocks, beside `mnx`/`global`/`parts`, drafting two standard root-level
+objects. They are separate because the questions upstream are separate:
+[#267](https://github.com/w3c-cg/mnx/issues/267) asks for the piece's identity,
+[#547](https://github.com/w3c-cg/mnx/issues/547) for the file's provenance.
+
+```jsonc
+"_x": { "mnxLab": {
+  "work": {
+    "title": "House of the Rising Sun",
+    "subtitle": "…",
+    "artist": "The Animals",          // the PERFORMER — Guitar Pro leads with it
+    "album": "…",
+    "creators": [                      // typed, open role vocabulary
+      { "role": "composer", "name": "Traditional" },
+      { "role": "lyricist", "name": "Traditional" },
+      { "role": "arranger", "name": "Alan Price" },
+      { "role": "transcriber", "name": "MNX Lab" }   // Guitar Pro's "Tabber"
+    ],
+    "copyright": "Public domain",
+    "source": "…",
+    "notes": "…"
+  },
+  "encoding": { "software": "guitarpro-mnx", "version": "0.1.0", "date": "2026-09-09" }
+}}
+```
+
+### Why the root, and not a part or a score
+
+Because two parts cannot disagree about the title — the same test that put key
+and tempo on the global measure and dynamics on the part measure. And
+`scores[].name` is **not** this: it names a *layout* ("Full score", "Guitar
+part"), one document may declare several, and it is what the engine actually
+prints. Nothing in the layout engine reads `work`; a
+[conformance test](../harness/conformance/score-metadata.test.ts) pins the
+primitives as byte-identical with the block and without it. Whether a document's
+own title should be printed when a score declares no name is a live engraving
+question, deliberately not settled here.
+
+### `role` is open, and `artist` is not one
+
+`creators[].role` is a plain string with a recommended set — `composer`,
+`lyricist`, `arranger`, `transcriber`, `translator`, `editor`, `publisher` —
+mirroring MusicXML's `<creator type>`, which is documented as open with
+"composer, lyricist and arranger" merely typical. An application with a role MNX
+never enumerated keeps it rather than failing validation.
+
+`artist` and `album` sit **flat**, not as creator roles. A performer is not a
+creator of the work (Dublin Core would call them a `contributor`), and they are
+the fields a tab leads with — making the most common one in this domain the odd
+case would be backwards. MusicXML has no performer element at all, so the round
+trip parks it in `<creator type="artist">` and lifts it back out.
+
+### Dublin Core, rather than a new vocabulary
+
+[#56](https://github.com/w3c/mnx/issues/56) asks for an existing vocabulary
+instead of an invented one, so each field names its mapping in the schema:
+`title` → `dc:title`, `creators` → `dc:creator`, `copyright` → `dc:rights`,
+`source` → `dc:source`, `encoding.date` → `dc:date`.
+
+### `encoding` describes the file in hand, and is never forwarded
+
+It says what wrote *this* MNX document. An importer therefore stamps its own and
+drops the source's: MusicXML's `<encoding>` describes the MusicXML file, not the
+MNX derived from it. Two consequences worth stating, because both look like bugs
+from outside:
+
+- A round trip **replaces** the block. The converter matrix scores
+  `_x.mnxLab.encoding` as **lossy**, and that verdict is correct.
+- The matrix discounts the stamp when scoring anything else. Without that, the
+  `vendor-extensions` def became unloseable — every document came back carrying
+  a vendor dict — and the two scenarios that really do lose their own `_x`
+  scored as supported. The row flipped from `lossy` to `supported` the moment
+  the stamp landed, which is how the masking was found.
+
+The **date** is opt-in (`--encoding-date`) rather than stamped by default,
+because derived files are committed here: a timestamp would make every
+regeneration of `converters/fixtures/` a diff. The MusicXML export used to carry
+exactly that wart, and its byte-for-byte fixture test had to mask the date to
+work around it; both are gone.
+
 ## Format mapping
 
 | MusicXML | Guitar Pro (alphaTab) | This extension |
@@ -280,6 +364,16 @@ structure, so most chords carry none.
 | `<direction-type><rehearsal>` | `MasterBar.section.marker` | `rehearsal.label` (standard, proposed) |
 | `<direction-type><words>` | `MasterBar.section.text` | `section.label` (standard, proposed) |
 | `<harmony>` | `Beat.text` / `Beat.chord.name` | `harmonies[]` |
+| `<work-title>` | `<Title>` | `work.title` |
+| `<movement-title>` / `<credit credit-type="subtitle">` | `<SubTitle>` | `work.subtitle` |
+| `<creator type="artist">` (no native element) | `<Artist>` | `work.artist` |
+| `<miscellaneous-field name="album">` | `<Album>` | `work.album` |
+| `<creator type="composer\|lyricist\|arranger">` | `<Music>` / `<Words>` / `<WordsAndMusic>` | `work.creators[]` |
+| `<creator type="transcriber">` | `<Tabber>` | `work.creators[]` with `role: "transcriber"` |
+| `<rights>` | `<Copyright>` | `work.copyright` |
+| `<source>` | — | `work.source` |
+| `<miscellaneous-field name="notes">` | `<Instructions>` + `<Notices>` | `work.notes` |
+| `<encoding>` | `<Encoding>` | `encoding` — **stamped, never forwarded** |
 
 Spanner-like techniques reference their destination by **note id** — the idiom
 MNX uses for ties and slurs — instead of MusicXML's fragile paired `start`/`stop`
@@ -296,7 +390,15 @@ corpus and tested as such. Three caveats worth knowing:
 2. **MusicXML cannot carry bend-point timing.** It has no way to say when a
    point in a curve falls, so points come back evenly spaced. The sequence of
    `alter` values is exact; the positions are normalised.
-3. **MusicXML cannot carry a display override that contradicts the structure.**
+3. **Score metadata round-trips semantically, not byte-for-byte.** Guitar Pro
+   splits authorship across three fields where MNX carries typed creators, so a
+   name credited in both `Music` and `Words` comes back in `WordsAndMusic` —
+   the same fact, spelled the way the format spells it. `Notices` folds into
+   `work.notes` beside `Instructions` (MNX drafts one free-text field, not two),
+   so a `.gp → MNX → .gp` trip moves those lines into `Instructions`. Guitar Pro
+   has no field for an `arranger` credit or for `source`; the export **warns**
+   rather than filing them under a role that means something else.
+4. **MusicXML cannot carry a display override that contradicts the structure.**
    `<kind text>` holds only the *suffix* (`m7` in `Am7`), so a literal like
    `c/G` — a lowercase root, which is how one chord in House of the Rising Sun
    is actually spelled — comes back as `C/G`. The structure is preserved
@@ -310,9 +412,9 @@ Two independent verdicts, reported separately:
    These extensions never affect it: `_x` content is unconstrained there by
    design.
 2. **Extension validity** — every `_x.mnxLab` dict against this extension's
-   schema, at each of its three placement points (note, part, global measure).
-   Validating the whole dict rather than each feature block also catches a
-   misspelled sibling key.
+   schema, at each of its four placement points (note, part, global measure,
+   document root). Validating the whole dict rather than each feature block also
+   catches a misspelled sibling key.
 
 The validators are precompiled by
 [`spec/tools/compile-validator.mjs`](../spec/tools/compile-validator.mjs) because
@@ -345,7 +447,17 @@ Cloudflare Workers cannot run `ajv.compile()`.
 
 ## History
 
-- **v6.1** (2026-08-31): additive — `harmony.color` (the standard's
+- **v6.2** (2026-09-09): additive — **document metadata** at the root:
+  `work` (title, subtitle, artist, album, typed `creators[]`, copyright, source,
+  notes) and `encoding` (software, version, date), drafting the standard
+  root-level objects asked for in
+  [#267](https://github.com/w3c-cg/mnx/issues/267),
+  [#547](https://github.com/w3c-cg/mnx/issues/547) and
+  [#56](https://github.com/w3c/mnx/issues/56). A fourth placement point, and the
+  first one that is not inside the music. No upgrade hop and no migration: every
+  existing document validates unchanged, and the fields it replaces
+  (`MnxDocument.title`/`artist`) lived only in memory on the host, where every
+  save dropped them. `$id` stays at `/v6`, the v6.1 precedent for point releases. additive — `harmony.color` (the standard's
   `simple-color` shape). The renderer honored the field before the schema
   admitted it; the schema catches up. `$id` stays at `/v6`, the v5.1
   precedent for point releases.

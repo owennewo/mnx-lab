@@ -15,6 +15,7 @@ import {
   MnxHarmonicType
 } from '../common/types.js';
 import { parseChordSymbol } from '../common/harmony.js';
+import { GpScoreInfo, gpScoreInfoToWork, rootExtension } from '../common/scoreMetadata.js';
 import {
   alphaTabDurationToMnx,
   mnxDurationToWholes,
@@ -33,6 +34,32 @@ function noteId(note: alphaTab.model.Note): string {
 export interface ImportOptions {
   /** Called for anything in the source this converter cannot represent. */
   onWarning?: (message: string) => void;
+  /** `YYYY-MM-DD` for `_x.mnxLab.encoding.date`; omitted by default. */
+  encodingDate?: string;
+}
+
+/**
+ * alphaTab's `Score` header → the dialect-independent shape the clean-room
+ * reader also produces, so both importers map metadata through one function.
+ *
+ * alphaTab has no `wordsAndMusic` field: its GPIF reader copies that element
+ * into BOTH `words` and `music`, which lands on the same pair of creators our
+ * own reader derives from the combined field.
+ */
+function scoreInfoOf(score: alphaTab.model.Score): GpScoreInfo {
+  return {
+    title: score.title ?? '',
+    subtitle: score.subTitle ?? '',
+    artist: score.artist ?? '',
+    album: score.album ?? '',
+    words: score.words ?? '',
+    music: score.music ?? '',
+    wordsAndMusic: '',
+    copyright: score.copyright ?? '',
+    tabber: score.tab ?? '',
+    instructions: score.instructions ?? '',
+    notices: (score.notices ?? '').split(/\r?\n/).map(line => line.trim()).filter(Boolean)
+  };
 }
 
 /** alphaTab Clef → MNX clef sign + staff position. */
@@ -102,7 +129,8 @@ export function scoreToMnx(
       measures: globalMeasures,
       ...(lineOrder.length > 0 ? { lyrics: { lineOrder } } : {})
     },
-    parts
+    parts,
+    _x: rootExtension(gpScoreInfoToWork(scoreInfoOf(score)), options.encodingDate)
   };
 }
 

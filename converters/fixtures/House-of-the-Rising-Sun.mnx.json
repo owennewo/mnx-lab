@@ -7795,5 +7795,13 @@
         }
       }
     }
-  ]
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "guitarpro-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
 }

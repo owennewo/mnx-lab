@@ -1,0 +1,79 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "name": "Guitar",
+      "measures": [
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 4
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "work": {
+        "title": "The House of the Rising Sun",
+        "subtitle": "Traditional, arranged for solo guitar",
+        "artist": "The Animals",
+        "album": "The Animals",
+        "creators": [
+          {
+            "role": "composer",
+            "name": "Traditional"
+          },
+          {
+            "role": "lyricist",
+            "name": "Traditional"
+          },
+          {
+            "role": "arranger",
+            "name": "Alan Price"
+          },
+          {
+            "role": "transcriber",
+            "name": "MNX Lab"
+          }
+        ],
+        "copyright": "Public domain",
+        "source": "https://mnx-lab.totai.uk/scenarios/lab/00-document/05-score-metadata",
+        "notes": "Every field of `work` at once, so a consumer that reads any of them has a document to read it from."
+      },
+      "encoding": {
+        "software": "mnx-lab",
+        "version": "0.1.0",
+        "date": "2026-09-09"
+      }
+    }
+  }
+}

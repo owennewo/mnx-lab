@@ -76,7 +76,8 @@ export function createContext() {
     validateMeta: ajv.compile(metaSchema),
     validateNoteExt: ajv.getSchema(`${extSchema.$id}#/$defs/note-ext`),
     validatePartExt: ajv.getSchema(`${extSchema.$id}#/$defs/part-ext`),
-    validateGlobalMeasureExt: ajv.getSchema(`${extSchema.$id}#/$defs/global-measure-ext`)
+    validateGlobalMeasureExt: ajv.getSchema(`${extSchema.$id}#/$defs/global-measure-ext`),
+    validateRootExt: ajv.getSchema(`${extSchema.$id}#/$defs/root-ext`)
   };
 }
 
@@ -133,6 +134,7 @@ export function computeExtensionVerdict(doc, ctx) {
     if (!validator(value)) errors.push(...(validator.errors ?? []).map(formatError));
   };
 
+  if (doc?._x?.mnxLab !== undefined) check(ctx.validateRootExt, doc._x.mnxLab);
   for (const measure of doc?.global?.measures ?? []) {
     if (measure?._x?.mnxLab !== undefined) {
       check(ctx.validateGlobalMeasureExt, measure._x.mnxLab);

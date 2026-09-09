@@ -225,9 +225,8 @@ describe.each(FIXTURES)('schema conformance: %s', name => {
     // validator passing is the signal that the proposal has landed.
     const validate = (await import('../../../worker/generated/validate-mnx-proposed.mjs'))
       .default;
-    const { validateNoteExt, validatePartExt, validateGlobalMeasureExt } = await import(
-      '../../../worker/generated/validate-extensions.mjs'
-    );
+    const { validateNoteExt, validatePartExt, validateGlobalMeasureExt, validateRootExt } =
+      await import('../../../worker/generated/validate-extensions.mjs');
 
     const original: MnxStructure = JSON.parse(
       await fs.readFile(path.join(SCORES, `${name}.mnx.json`), 'utf-8')
@@ -241,6 +240,8 @@ describe.each(FIXTURES)('schema conformance: %s', name => {
         .map((e: { instancePath: string; message: string }) => `${e.instancePath} ${e.message}`);
       expect.fail(`MNX schema errors (${validate.errors?.length}): ${errors.join(' ; ')}`);
     }
+
+    if (back._x?.mnxLab) expect(validateRootExt(back._x.mnxLab)).toBe(true);
 
     for (const measure of back.global.measures) {
       if (measure._x?.mnxLab) {

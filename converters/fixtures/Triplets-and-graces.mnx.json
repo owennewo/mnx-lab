@@ -645,5 +645,16 @@
         }
       }
     }
-  ]
+  ],
+  "_x": {
+    "mnxLab": {
+      "work": {
+        "title": "Triplets and graces"
+      },
+      "encoding": {
+        "software": "guitarpro-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
 }

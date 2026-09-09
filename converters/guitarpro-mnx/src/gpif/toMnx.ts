@@ -15,6 +15,7 @@ import {
   MnxBendPoint
 } from '../common/types.js';
 import { parseChordSymbol } from '../common/harmony.js';
+import { gpScoreInfoToWork, rootExtension } from '../common/scoreMetadata.js';
 import { mnxDurationToWholes, tupletRatio, wholesToFraction } from '../common/duration.js';
 import { alphaTabTuningToMnx, midiToPitch, pitchToMidi } from '../common/tuning.js';
 import {
@@ -36,6 +37,12 @@ import {
 export interface GpifImportOptions {
   /** Called for anything in the source this converter cannot represent. */
   onWarning?: (message: string) => void;
+  /**
+   * `YYYY-MM-DD` stamped into `_x.mnxLab.encoding.date`. Omitted by default so
+   * a library caller's output is deterministic and diffable; the CLI, which
+   * writes a file for a person, passes today's date.
+   */
+  encodingDate?: string;
 }
 
 /** GPIF `Clef` strings → MNX clef signs. Defaults to treble, like the source. */
@@ -111,7 +118,8 @@ export function gpifToMnx(doc: GpifDocument, options: GpifImportOptions = {}): M
       measures: globalMeasures,
       ...(lineOrder.length > 0 ? { lyrics: { lineOrder } } : {})
     },
-    parts
+    parts,
+    _x: rootExtension(gpScoreInfoToWork(doc.metadata), options.encodingDate)
   };
 }
 

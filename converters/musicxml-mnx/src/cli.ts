@@ -22,6 +22,8 @@ function usage() {
   console.error(`  musicxml-mnx --import ${inputArg.import.padEnd(width)} [--output <output${MNX_EXTENSION}>]`);
   console.error(`  musicxml-mnx --export ${inputArg.export.padEnd(width)} [--output <output.xml>]`);
   console.error('');
+  console.error('  --encoding-date   stamp today into the encoding block on either direction');
+  console.error('');
   console.error('--output is optional: it defaults to the input name with the target');
   console.error(`extension. MNX is written as "${MNX_EXTENSION}"; MNX input may also be`);
   console.error(`${MNX_READ_EXTENSIONS.slice(1).join(' or ')}.`);
@@ -33,6 +35,20 @@ function usage() {
  * silently overwrite the MusicXML the document was imported from. An explicit
  * `--output` is always obeyed; this only applies when we chose the name.
  */
+/**
+ * `--encoding-date` stamps today into the encoding block, in either direction.
+ *
+ * Opt-in because derived files are committed here (converters/fixtures/,
+ * scenarios/): a timestamp in the output would make every regeneration a diff.
+ * The export used to stamp one unconditionally, which is exactly the wart the
+ * byte-for-byte fixture test had to mask.
+ */
+function encodingDateOption(args: string[]): { encodingDate?: string } {
+  return args.includes('--encoding-date')
+    ? { encodingDate: new Date().toISOString().slice(0, 10) }
+    : {};
+}
+
 async function assertDerivedOutputIsSafe(outputPath: string) {
   try {
     await fs.access(outputPath);
@@ -67,7 +83,8 @@ async function main() {
     // files that are perfectly readable (and accept ones that are not).
     const bytes = new Uint8Array(await fs.readFile(inputPath));
     const mnx = await importMxl(bytes, {
-      onWarning: msg => console.warn(`  warning: ${msg}`)
+      onWarning: msg => console.warn(`  warning: ${msg}`),
+      ...encodingDateOption(args)
     });
     // Trailing newline: the corpus police's canonical form (check-scenarios),
     // so CLI output can land in scenarios/ unmodified.
@@ -85,9 +102,12 @@ async function main() {
     // `--output something.mxl` asks for the container; anything else is plain.
     if (outputPath.toLowerCase().endsWith('.mxl')) {
       const name = `${path.basename(outputPath, path.extname(outputPath))}.musicxml`;
-      await fs.writeFile(outputPath, exportMxl(mnx, { scoreName: name }));
+      await fs.writeFile(
+        outputPath,
+        exportMxl(mnx, { scoreName: name, ...encodingDateOption(args) })
+      );
     } else {
-      await fs.writeFile(outputPath, exportMusicXML(mnx), 'utf-8');
+      await fs.writeFile(outputPath, exportMusicXML(mnx, encodingDateOption(args)), 'utf-8');
     }
     console.log(`Conversion complete. Written to MusicXML: ${outputPath}`);
   } else {

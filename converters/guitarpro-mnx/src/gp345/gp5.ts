@@ -188,7 +188,20 @@ export function parseGuitarProBinary(data: Uint8Array, options: GpifImportOption
   }
 
   return {
-    metadata: { title: scoreInfo.title, artist: scoreInfo.artist },
+    metadata: {
+      title: scoreInfo.title,
+      subtitle: scoreInfo.subtitle,
+      artist: scoreInfo.artist,
+      album: scoreInfo.album,
+      words: scoreInfo.words,
+      music: scoreInfo.music,
+      // GP3-5 has no combined words-and-music field; GPIF's is left empty.
+      wordsAndMusic: '',
+      copyright: scoreInfo.copyright,
+      tabber: scoreInfo.tab,
+      instructions: scoreInfo.instructions,
+      notices: scoreInfo.notice
+    },
     masterBars,
     tracks: tracks.map(track => track.gpif),
     bars,

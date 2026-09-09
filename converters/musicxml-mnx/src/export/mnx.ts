@@ -11,6 +11,7 @@ import {
   MnxPitch,
   MnxStructure
 } from '../common/types.js';
+import { writeMetadata } from '../common/scoreMetadata.js';
 import {
   renderChordSymbol,
   stepToText,
@@ -74,6 +75,9 @@ function transposePitchToWritten(
 export interface ExportOptions {
   splitNotationAndTab?: boolean;
   divisions?: number;
+  /** `YYYY-MM-DD` for `<encoding-date>`; omitted by default so derived output
+   *  stays reproducible. The CLI opts in with `--encoding-date`. */
+  encodingDate?: string;
 }
 
 export function exportMusicXML(
@@ -271,17 +275,10 @@ export function exportMusicXML(
   );
   const scoreEl = doc.documentElement!;
 
-  // 1. Add Identification/Metadata
-  const identificationEl = doc.createElement('identification');
-  const encodingEl = doc.createElement('encoding');
-  const softwareEl = doc.createElement('software');
-  softwareEl.textContent = 'mnx-editor converter';
-  const dateEl = doc.createElement('encoding-date');
-  dateEl.textContent = new Date().toISOString().split('T')[0];
-  encodingEl.appendChild(softwareEl);
-  encodingEl.appendChild(dateEl);
-  identificationEl.appendChild(encodingEl);
-  scoreEl.appendChild(identificationEl);
+  // 1. Score metadata: <work>, <identification> (creators, rights, encoding,
+  //    source, miscellaneous) and the printed <credit> blocks — in the order
+  //    the MusicXML 4.0 XSD requires, all of it before <part-list> below.
+  writeMetadata(doc, scoreEl, mnxJson, options.encodingDate);
 
   // 2. Determine Parts (split standard & TAB if requested)
   const finalParts: MnxPart[] = [];

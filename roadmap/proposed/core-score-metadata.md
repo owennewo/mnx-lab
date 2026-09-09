@@ -223,6 +223,15 @@ next reader knows they were chosen, not forgotten. Rows for
   MNX document ever arrives, `work.movement` is where it goes.
 - **No MusicXML `<credit>` positions or styling**, in or out.
 
+## Verification debt
+
+The one new scenario, `lab/00-document/05-score-metadata`, lands at `draft` and is
+registered in the standing ledger
+([roadmap/inprogress/lab-verify.md](../inprogress/lab-verify.md) → *Score metadata —
+2026-09-09*). No existing golden moved, which is itself the thing to check: the
+engraving must be indistinguishable from an untitled one-note document. Registration is
+not approval.
+
 ## Gates
 
 `npm test` (harness incl. converter matrix), `npm -w @mnx-editor/guitarpro-mnx test`,

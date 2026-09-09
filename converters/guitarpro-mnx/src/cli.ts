@@ -21,6 +21,8 @@ function usage() {
   console.error(`  guitarpro-mnx --import ${importArg.padEnd(width)} [--output <output${MNX_EXTENSION}>]`);
   console.error(`  guitarpro-mnx --export ${exportArg.padEnd(width)} [--output <output${GP_WRITE_EXTENSION}>]`);
   console.error('');
+  console.error('  --encoding-date   stamp today into _x.mnxLab.encoding.date on import');
+  console.error('');
   console.error(`Reads ${GP_READ_EXTENSIONS.join(', ')}; writes ${GP_WRITE_EXTENSION} only`);
   console.error('(no maintained tool can write gp3/gp4/gp5).');
   console.error(`MNX is written as "${MNX_EXTENSION}"; ${MNX_READ_EXTENSIONS.slice(1).join(' and ')} are also read.`);
@@ -58,7 +60,13 @@ async function main() {
     console.log(`Importing Guitar Pro: ${inputPath}...`);
     const data = await fs.readFile(inputPath);
     const mnx = importGuitarPro(new Uint8Array(data), {
-      onWarning: msg => console.warn(`  warning: ${msg}`)
+      onWarning: msg => console.warn(`  warning: ${msg}`),
+      // `_x.mnxLab.encoding` always names this converter and its version. The
+      // DATE is opt-in: derived files are committed here (converters/fixtures,
+      // scenarios/), and a timestamp would make every regeneration a diff.
+      ...(args.includes('--encoding-date')
+        ? { encodingDate: new Date().toISOString().slice(0, 10) }
+        : {})
     });
     // Trailing newline: the corpus police's canonical form (check-scenarios),
     // so CLI output can land in scenarios/ unmodified.

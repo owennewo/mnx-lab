@@ -239,7 +239,7 @@ or any notation library.
 The `both` single-system walk, the fret/string derivation ladder, diagnostic severities
 and the note↔JSON cross-highlight: [docs/rendering.md](docs/rendering.md).
 
-## MNX types and `_x.mnxLab` (v6)
+## MNX types and `_x.mnxLab` (v6.2)
 
 Types: `src/model/mnx.ts`. **Documents are written as `.mnx.json`** (`.json`/`.mnx`
 accepted on read; helpers in `converters/musicxml-mnx/src/common/mnxFile.ts`).
@@ -247,15 +247,19 @@ Everything MNX v19 can't express lives under the one vendor key **`_x.mnxLab`** 
 `_x` sub-key names a vendor, not a feature). **Extend `_x.mnxLab` and its schema — never
 standard MNX fields.**
 
-The v6 invariants: note-level **flat** `string`/`fret`/`fingering`, where the **string is
+The invariants: note-level **flat** `string`/`fret`/`fingering`, where the **string is
 the authoritative choice** and `fret` is optional and non-authoritative (validation only);
 part-level flat `strings[]`/`capo`; **single-source** — no TAB clefs, no duplicated
 staves; only `tab.technique` and `tab.staffKind` stay under the `tab` sub-namespace.
+**Four placement points** — note, part, global measure, and the **document root**, where
+v6.2 put `work` (what the piece is) and `encoding` (what wrote the file). Document
+metadata is read from the DOCUMENT, never from a host wrapper, and **nothing in the
+layout engine reads `work`** — the printed title is `scores[].name`, a layout label.
 Blocks are shaped like the standard objects they draft (camelCase, `rhythmic-position`,
 note-id references) so adoption deletes the wrapper. Saved documents upgrade v1→…→v6 on
 load via `src/model/upgradeTabExtension.ts`.
 
-Schema: `spec/mnx-lab-extensions.schema.json`. The full v6 shape, the register and the
+Schema: `spec/mnx-lab-extensions.schema.json`. The full shape, the register and the
 rationale: [docs/mnx-extensions.md](docs/mnx-extensions.md).
 
 ## The spec loop: sync down, push up
@@ -282,7 +286,7 @@ doctools/`uv` setup: [docs/mnx-spec-submodule.md](docs/mnx-spec-submodule.md).
 confined to `converters/guitarpro-mnx` and must never reach `src/`.** Shared fixtures in
 `converters/fixtures/` — **authored as Guitar Pro** (`.gpx` sources; `.mnx.json` derived
 via `guitarpro-mnx --import`, `.xml` via `musicxml-mnx --export`). Both round trips are
-lossless and tested. Four traps, all of which have bitten:
+lossless and tested. Five traps, all of which have bitten:
 
 - Note ids are legitimately rewritten by the MusicXML split — compare technique targets
   by **resolution, not string equality**.
@@ -292,8 +296,12 @@ lossless and tested. Four traps, all of which have bitten:
 - Tuplets and grace notes are **containers in MNX, per-beat/per-note flags in both file
   formats**, so each direction collapses or expands a run — the same asymmetry as voltas,
   solved the same way ([roadmap/complete/core-tuplets-grace-notes.md](roadmap/complete/core-tuplets-grace-notes.md)).
+- **`_x.mnxLab.encoding` is stamped by whoever writes the file, never forwarded** — so a
+  round trip replaces it, and comparisons of a committed document against a re-import
+  must discount it. Its **date is opt-in** (`--encoding-date`): derived files are
+  committed, and a timestamp makes every regeneration a diff.
 
-CLI: `npx musicxml-mnx|guitarpro-mnx --import|--export <file> [--output out]` (derived
+CLI: `npx musicxml-mnx|guitarpro-mnx --import|--export <file> [--output out] [--encoding-date]` (derived
 output names refuse to overwrite).
 
 ## Conventions

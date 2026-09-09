@@ -20,6 +20,7 @@ import {
 import { mnxDurationToWholes, tupletFlags, wholesToFraction } from '../common/duration.js';
 import { mnxTuningToAlphaTab, pitchToMidi, choosePosition } from '../common/tuning.js';
 import { writeGpContainer } from './container.js';
+import { documentWork, workToGpScoreInfo } from '../common/scoreMetadata.js';
 
 /**
  * MNX → GPIF (`.gp`), clean-room.
@@ -274,7 +275,7 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
     if (poolId !== undefined) pools.notes[poolId].hopoDestination = true;
   }
 
-  return serialize(masterBars, tracks, tempoAutomations, pools);
+  return serialize(masterBars, tracks, tempoAutomations, pools, scoreInfoXml(mnx, warn));
 }
 
 function buildTrackBars(
@@ -687,11 +688,41 @@ function floatProperty(name: string, value: number | null): string {
   return value === null ? '' : `<Property name="${name}"><Float>${value}</Float></Property>`;
 }
 
+/**
+ * `<Score>` — the header Guitar Pro shows above the music, from
+ * `_x.mnxLab.work`. Every child element is written even when empty: Guitar Pro
+ * writes the full set, and an importer that reads by element name (ours does)
+ * is unaffected by the empties.
+ */
+function scoreInfoXml(mnx: MnxStructure, warn: (message: string) => void): string {
+  const info = workToGpScoreInfo(documentWork(mnx), warn);
+  const field = (name: string, value: string): string =>
+    value ? `<${name}>${cdata(value)}</${name}>` : `<${name}/>`;
+  return (
+    '<Score>' +
+    field('Title', info.title) +
+    field('SubTitle', info.subtitle) +
+    field('Artist', info.artist) +
+    field('Album', info.album) +
+    field('Words', info.words) +
+    field('Music', info.music) +
+    field('WordsAndMusic', info.wordsAndMusic) +
+    field('Copyright', info.copyright) +
+    field('Tabber', info.tabber) +
+    field('Instructions', info.instructions) +
+    field('Notices', info.notices.join('\n')) +
+    '<ScoreSystemsDefaultLayout>3</ScoreSystemsDefaultLayout><ScoreSystemsLayout/>' +
+    '<ScoreZoomPolicy>Value</ScoreZoomPolicy><ScoreZoom>1</ScoreZoom>' +
+    '<MultiVoice>0</MultiVoice></Score>'
+  );
+}
+
 function serialize(
   masterBars: WriterMasterBar[],
   tracks: WriterTrack[],
   tempoAutomations: { bar: number; bpm: number; reference: number }[],
-  pools: Pools
+  pools: Pools,
+  scoreXml: string
 ): string {
   const lines: string[] = [];
   const push = (text: string) => lines.push(text);
@@ -701,13 +732,7 @@ function serialize(
   push('<GPVersion>8.1.3</GPVersion>');
   push('<GPRevision required="12024" recommended="13000">13007</GPRevision>');
   push('<Encoding><EncodingDescription>GP8</EncodingDescription></Encoding>');
-  push(
-    '<Score><Title/><SubTitle/><Artist/><Album/><Words/><Music/><WordsAndMusic/>' +
-      '<Copyright/><Tabber/><Instructions/><Notices/>' +
-      '<ScoreSystemsDefaultLayout>3</ScoreSystemsDefaultLayout><ScoreSystemsLayout/>' +
-      '<ScoreZoomPolicy>Value</ScoreZoomPolicy><ScoreZoom>1</ScoreZoom>' +
-      '<MultiVoice>0</MultiVoice></Score>'
-  );
+  push(scoreXml);
 
   // MasterTrack
   push('<MasterTrack>');

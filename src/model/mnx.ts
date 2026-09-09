@@ -560,6 +560,58 @@ export interface MnxPartExtension {
   tab?: MnxTabPartExtension;
 }
 
+/**
+ * One person or body credited with making the work — a draft of MusicXML's
+ * `<creator type="…">`, mapping to Dublin Core `dc:creator`. A performing
+ * artist is NOT a role here: see `MnxLabWork.artist`.
+ */
+export interface MnxLabCreator {
+  /** Recommended: composer, lyricist, arranger, transcriber, translator,
+   *  editor, publisher. Open on purpose — an unfamiliar role from another
+   *  application round-trips verbatim rather than failing validation. */
+  role: string;
+  name: string;
+}
+
+/**
+ * What the piece IS. MNX v27 has no document metadata at all (w3c-cg/mnx#267,
+ * w3c/mnx#56), so this drafts a standard root-level `work` object. Plain
+ * strings only — MNX has no formatted text, and printed placement is a layout
+ * concern (MusicXML's `<credit>`), never document metadata.
+ */
+export interface MnxLabWork {
+  title?: string;
+  subtitle?: string;
+  /** The performer this transcription is of — Guitar Pro's `<Artist>`. Flat
+   *  rather than a `creators` role because a performer is not a creator. */
+  artist?: string;
+  album?: string;
+  creators?: MnxLabCreator[];
+  copyright?: string;
+  source?: string;
+  /** Free editorial text: performance instructions, provenance, anything the
+   *  named fields do not cover. */
+  notes?: string;
+}
+
+/**
+ * What wrote THIS file (w3c-cg/mnx#547). It describes the MNX document in
+ * hand, so it is stamped by whatever writes the file and never copied forward
+ * from a source document — an importer replaces it with its own.
+ */
+export interface MnxLabEncoding {
+  software?: string;
+  version?: string;
+  /** `YYYY-MM-DD`. */
+  date?: string;
+}
+
+/** The vendor dict at the document root, beside `mnx`/`global`/`parts`. */
+export interface MnxRootExtension {
+  work?: MnxLabWork;
+  encoding?: MnxLabEncoding;
+}
+
 export interface MnxPart {
   // Optional per the MNX schema — `part` requires only `measures`.
   id?: string;
@@ -743,16 +795,48 @@ export interface MnxStructure {
   layouts?: MnxLayout[];
   scores?: MnxScore[];
   parts: MnxPart[];
+  _x?: {
+    mnxLab?: MnxRootExtension;
+  };
 }
 
 export interface MnxDocument {
   id: string;
-  /** Host/importer presentation metadata. MNX v27 has no document-title or
-   *  artist fields yet, so these belong to the wrapper rather than mnxJson. */
-  title?: string;
-  artist?: string;
-  /** Host-owned fallback label: scenario name, filename, or library title. */
+  /** Host-owned fallback label: scenario name, filename, or library title. Used
+   *  when the document states no `work.title` of its own. */
   name: string;
   lastUpdated: number;
   mnxJson: MnxStructure;
+}
+
+/**
+ * Document metadata: what the piece is (`work`) and what wrote the file
+ * (`encoding`). Both are read from the DOCUMENT, never from a host wrapper —
+ * an earlier shape carried title/artist beside `mnxJson`, which meant every
+ * save and every round trip silently dropped them.
+ */
+export function documentWork(doc: MnxStructure | undefined): MnxLabWork | undefined {
+  return doc?._x?.mnxLab?.work;
+}
+
+/**
+ * The document's title, or null when it states none. Deliberately not the same
+ * as `scores[].name`, which labels a LAYOUT ("Full score", "Guitar part") and
+ * is what the engine prints — a document may have several, or none.
+ */
+export function documentTitle(doc: MnxStructure | undefined): string | null {
+  return documentWork(doc)?.title?.trim() || null;
+}
+
+/** The performer this transcription is of, or null. */
+export function documentArtist(doc: MnxStructure | undefined): string | null {
+  return documentWork(doc)?.artist?.trim() || null;
+}
+
+/** Creators with the given role, in document order (`composer`, `lyricist`, …). */
+export function creatorsWithRole(
+  doc: MnxStructure | undefined,
+  role: string
+): MnxLabCreator[] {
+  return (documentWork(doc)?.creators ?? []).filter(entry => entry.role === role);
 }

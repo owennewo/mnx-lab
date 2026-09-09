@@ -2919,6 +2919,34 @@
       ]
     ]
   },
+  "lab/document/score-metadata": {
+    "order": [
+      0
+    ],
+    "passCounts": [
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ]
+    ]
+  },
   "lab/pitches/parenthesized-accidental": {
     "order": [
       0

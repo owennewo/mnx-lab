@@ -88,12 +88,12 @@ describe('the committed fixtures', () => {
         await fs.readFile(path.join(FIXTURES, `${name}.mnx.json`), 'utf-8')
       ) as MnxStructure;
       const committed = await fs.readFile(path.join(FIXTURES, `${name}.xml`), 'utf-8');
-      // The encoding date is stamped at export time and is the one thing in the
-      // output that is not derived from the document.
-      const undated = (xml: string) =>
-        xml.replace(/<encoding-date>[^<]*<\/encoding-date>/, '<encoding-date/>');
+      // Every byte of the output is now derived from the document: the export
+      // used to stamp today's `<encoding-date>`, which this test had to mask
+      // and which made every regeneration of these fixtures a diff. The date is
+      // opt-in (`--encoding-date`), so the comparison can be exact.
       // The committed files carry no trailing newline.
-      expect(undated(exportMusicXML(mnx))).toBe(undated(committed));
+      expect(exportMusicXML(mnx)).toBe(committed);
     }
   );
 });

@@ -1,0 +1,37 @@
+{
+  "title": "Score metadata: what the piece is, and what wrote the file",
+  "description": "One note, and every document-metadata field the lab carries: `_x.mnxLab.work` (title, subtitle, artist, album, four typed creators, copyright, source, notes) and `_x.mnxLab.encoding` (software, version, date). MNX v27 has no document metadata at all — no title, no composer, no rights, no encoding provenance — so these are drafts of the standard root-level objects asked for in w3c-cg/mnx#267 and #547 (see docs/mnx-extensions.md). The engraving is deliberately identical to an untitled document: the printed title is `scores[].name`, which labels a LAYOUT, and nothing in the layout engine reads `work`. This scenario exists so the schema, both converters and the viewer heading have one document that states everything.",
+  "bars": 1,
+  "tags": [
+    "minimal",
+    "metadata",
+    "extension"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/267",
+    "https://github.com/w3c-cg/mnx/issues/547"
+  ],
+  "coversDefs": [
+    "root",
+    "mnx",
+    "global",
+    "part",
+    "part-measure",
+    "sequence",
+    "event",
+    "note",
+    "pitch",
+    "note-value",
+    "vendor-extensions",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [],
+  "idRefs": false,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "draft"
+}

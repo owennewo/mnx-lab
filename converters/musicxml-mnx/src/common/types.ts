@@ -381,6 +381,42 @@ export interface MnxGlobalMeasure {
   };
 }
 
+/**
+ * Document metadata — extension v6.2, at the DOCUMENT root. `work` is what the
+ * piece is (w3c-cg/mnx#267), `encoding` is what wrote the file (w3c-cg/mnx#547).
+ * Mirrors src/model/mnx.ts by hand, like every other type in this file.
+ */
+export interface MnxLabCreator {
+  /** composer | lyricist | arranger | transcriber | … — open, not an enum, so
+   *  MusicXML's equally open `<creator type>` round-trips whatever it states. */
+  role: string;
+  name: string;
+}
+
+export interface MnxLabWork {
+  title?: string;
+  subtitle?: string;
+  /** The performer, not a creator. MusicXML has no native home for it. */
+  artist?: string;
+  album?: string;
+  creators?: MnxLabCreator[];
+  copyright?: string;
+  source?: string;
+  notes?: string;
+}
+
+export interface MnxLabEncoding {
+  software?: string;
+  version?: string;
+  /** `YYYY-MM-DD`. */
+  date?: string;
+}
+
+export interface MnxRootExtension {
+  work?: MnxLabWork;
+  encoding?: MnxLabEncoding;
+}
+
 export interface MnxStructure {
   mnx: {
     version: number;
@@ -408,4 +444,5 @@ export interface MnxStructure {
     };
   };
   parts: MnxPart[];
+  _x?: { mnxLab?: MnxRootExtension };
 }
