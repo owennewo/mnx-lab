@@ -87,6 +87,15 @@ proposals that name their campaign.
   Contract clause 2 makes every item declare standard-object-vs-`_x.mnxLab` before code, so
   the "implemented as extension" cell feeds `spec/proposals/` instead of accumulating
   silently.
+- **[core-beam-geometry.md](proposed/core-beam-geometry.md)** — **beamed stems are too
+  long**, and one rule is why: the beam slides outward until the *shortest* stem reaches the
+  octave, so every other stem grows from there (E→D under a two-beam group: 3.5 and 5.5).
+  Three items in a fixed order — a per-level minimum stem (2.5 / 3 / 3.5 spaces for one,
+  two, three beams), snapping the beam to sit/straddle/hang a staff line, and Soundslice's
+  flat-beam house style as a pure display option (`BEAM_MAX_SLANT_SP = 0`, never a document
+  field). Flattening is explicitly *not* the fix: it lengthens stems. Each of the first two
+  moves every beamed golden and registers in
+  [lab-verify.md](inprogress/lab-verify.md).
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
