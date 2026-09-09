@@ -45,6 +45,13 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[workbench-settings-card.md](proposed/workbench-settings-card.md)** — the score-corner
+  settings card re-cut from the [Settings Card](https://claude.ai/code/artifact/45c8488d-08d4-4971-bdaa-577fe553b627)
+  canvas: SHOW becomes **STAFF**, every row is one same-width field (glyph · value in
+  force · swap arrows on a two-way row, chevron and a list on a three-way one), the
+  Unrolled checkbox becomes a REPEATS row, and the mark idles bare at 0.28 with the card
+  growing around it — the zoom pad's grammar, so the cluster reads as one family. Chrome
+  only; verified hands-on over CDP like the pad was.
 - **[core-player-webmidi.md](proposed/core-player-webmidi.md)** — campaign item 11: a second
   sink carrying the export's bounded channel plan on the wire; never the default.
 - **[core-player-sampled-guitar.md](proposed/core-player-sampled-guitar.md)** — campaign
