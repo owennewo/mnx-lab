@@ -9,7 +9,7 @@ import {
 import { Primitive, translatePrimitiveY } from '../primitives.ts';
 import { glyphBBox } from '../smufl/smufl.ts';
 import { computeBoundsSp, type BoundsSp } from '../render/bounds.ts';
-import { durationValue, tremoloDuration, tupletDuration, measureHeadingX } from './spacing.ts';
+import { durationValue, tremoloDuration, tupletDuration, measureHeadingX, type MeasureHeading } from './spacing.ts';
 import { chordSymbolDisplay } from '../../model/harmony.ts';
 import type { ResolvedSwing, SwingTimelineEntry } from '../../model/swing.ts';
 
@@ -403,7 +403,7 @@ const TEMPO_DOT_ADVANCE_SP = 0.45; // at scale 1
 
 export interface EmitTempoMarkArgs {
   gm: MnxGlobalMeasure;
-  m: { x: number; width: number; showTimeSig: boolean; timeSigCentreX: number; contentStartX: number; repeatStart: boolean };
+  m: MeasureHeading & { width: number };
   staffTop: number;
   /** This row's primitives drawn so far (see `EmitScoreLabelsArgs.scan`). */
   scan: readonly Primitive[];

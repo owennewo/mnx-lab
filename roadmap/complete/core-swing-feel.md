@@ -108,6 +108,11 @@ feel describes the bar and not a notation staff.
   decision; it turned out to answer the engraving question too. `resolveSwingTimeline` in
   `model/` is the single place that decides, and both the layouts and the compiler read it,
   so they cannot disagree about where a feel starts.
+- **It found a placement bug.** The swing marking on a mid-system bar was being
+  attributed to the bar before it, because the shared heading anchor led the content
+  spring rather than the bar's first ink —
+  [core-heading-anchor.md](core-heading-anchor.md), fixed the same day. This
+  scenario's goldens moved with that fix, so review it against the newer placement.
 - **Two warnings became data.** The binary reader's GP3/4 score-level flag and GP5
   per-measure byte now land on the same extension as the GPIF path, so the loss list in the
   converter README got shorter rather than longer.

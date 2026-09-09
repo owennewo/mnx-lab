@@ -196,5 +196,5 @@
 <line x1="750.3488" y1="540.032" x2="750.3488" y2="580.304" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="616.7584" y1="568.304" x2="751.3088" y2="580.304" stroke="currentColor" stroke-width="8" class="beam"></line>
 <text x="97.6" y="89.728" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Intro</text>
-<text x="1072.2528" y="96" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Verse</text>
+<text x="1084.2528" y="94.72" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Verse</text>
 </svg>

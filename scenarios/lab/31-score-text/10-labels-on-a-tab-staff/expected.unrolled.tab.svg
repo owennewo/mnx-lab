@@ -34,9 +34,9 @@
 <line x1="524.8" y1="226.1456" x2="731.2" y2="226.1456" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <rect x="628.4" y="199.6768" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="w2:@m2.v0.e0.n0" data-written-source-id="@m2.v0.e0.n0"></rect>
 <text x="634.4" y="207.8592" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="w2:@m2.v0.e0.n0" data-written-source-id="@m2.v0.e0.n0">0</text>
-<rect x="590.4" y="77.1808" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="598.4" y="104.3168" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">B</text>
-<text x="632.256" y="104.3168" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Solo</text>
+<rect x="602.4" y="77.1808" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="610.4" y="104.3168" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">B</text>
+<text x="644.256" y="104.3168" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Solo</text>
 <line x1="731.2" y1="134.7168" x2="731.2" y2="226.1456" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="731.2" y1="134.7168" x2="937.6" y2="134.7168" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="731.2" y1="153.0032" x2="937.6" y2="153.0032" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>

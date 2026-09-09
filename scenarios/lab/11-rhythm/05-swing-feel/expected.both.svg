@@ -206,11 +206,11 @@
 <line x1="159.7632" y1="14.4" x2="159.7632" y2="20.8" stroke="currentColor" stroke-width="1.92" class="swing"></line>
 <line x1="192.7712" y1="14.4" x2="192.7712" y2="20.8" stroke="currentColor" stroke-width="1.92" class="swing"></line>
 <text x="176.2672" y="20" font-family="var(--font-family-sans)" font-size="16" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" font-weight="600" class="swing">3</text>
-<text x="870.2" y="103.152" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="swing"></text>
-<text x="891.5216" y="103.152" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="swing"></text>
-<text x="915.0832" y="103.152" font-family="var(--font-family-sans)" font-size="20.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="600" class="swing">=</text>
-<text x="932.3632" y="103.152" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="swing"></text>
-<text x="952.7088" y="103.152" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="swing"></text>
-<text x="959.2288" y="103.152" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="swing"></text>
+<text x="882.2" y="103.152" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="swing"></text>
+<text x="903.5216" y="103.152" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="swing"></text>
+<text x="927.0832" y="103.152" font-family="var(--font-family-sans)" font-size="20.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="600" class="swing">=</text>
+<text x="944.3632" y="103.152" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="swing"></text>
+<text x="964.7088" y="103.152" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="swing"></text>
+<text x="971.2288" y="103.152" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="swing"></text>
 <text x="83.5328" y="440.4928" font-family="var(--font-family-sans)" font-size="20.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="600" class="swing">Straight</text>
 </svg>

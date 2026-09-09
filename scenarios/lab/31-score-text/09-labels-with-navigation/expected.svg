@@ -39,7 +39,7 @@
 <rect x="89.6" y="8" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
 <text x="97.6" y="35.136" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">A</text>
 <text x="131.456" y="35.136" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Intro</text>
-<rect x="606.4" y="37.376" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="614.4" y="64.512" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">B</text>
-<text x="648.256" y="64.512" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Coda</text>
+<rect x="618.4" y="37.376" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="626.4" y="64.512" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">B</text>
+<text x="660.256" y="64.512" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Coda</text>
 </svg>

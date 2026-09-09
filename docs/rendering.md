@@ -53,9 +53,23 @@ first-part Tab path and the corpus's byte-identical default output. Public
 bindings and the workbench's explicit defaults are documented in
 [core-viewer-surface.md](core-viewer-surface.md#score-display-preferences).
 
-Section headings and capo advice share the measure-start tempo anchor, including
-when no tempo is printed. Section/rehearsal pairs stay together; a standalone
-rehearsal mark retains its barline inset. Tuning letters stay beside the strings.
+Section headings, the swing marking and capo advice share the measure-start tempo
+anchor, including when no tempo is printed. Section/rehearsal pairs stay together;
+a standalone rehearsal mark retains its barline inset. Tuning letters stay beside
+the strings.
+
+`measureHeadingX` places that shared anchor, and what it leads depends on what the
+bar actually draws. A time signature: lead its centre, since the numerals are the
+widest thing in the prefix. A clef or key signature: lead the content, which is
+just past them. **Nothing at all** — the prefix hidden by `display`, or simply
+absent as in every mid-piece bar — lead the **first onset**. That last arm is the
+one that used to be wrong: it led `contentStartX`, which is the start of the
+stretched leading spring rather than the first ink, so the mark floated in the
+empty left of the bar, and where the spring was short it crossed the barline and
+read as belonging to the bar before. `m.x` is a floor, never a placement: a
+heading mark cannot precede its own barline whatever the geometry.
+`harness/conformance/heading-marks.test.ts` asserts both arms over the corpus
+under every combination of the two display switches.
 
 When a system opens with a repeat and no visible clef or signature, the repeat
 starts at the staff's left edge and replaces the separate system-start line.

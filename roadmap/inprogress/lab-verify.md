@@ -962,3 +962,35 @@ downbeat on its quarter, and the offbeats at `1/6`/`5/12`/`2/3`/`11/12` in bar
 changes how notes are played, never what they are. Bar 1's numbers are
 independently checkable against Guitar Pro: alphaTab plays `Triplet8th` as a
 quarter-triplet plus an eighth-triplet.
+
+## Heading marks lead the bar's opening ink — 2026-09-09
+
+Owner: [core-heading-anchor.md](../complete/core-heading-anchor.md). **8 goldens
+moved, all already `rendered`** — no `verified` approval was invalidated, so this
+note records an additional cause a reviewer will see on scenarios already owed to
+earlier batches.
+
+`measureHeadingX` led `contentStartX`, the start of a bar's stretched leading
+spring, rather than its first ink. With a clef and a time signature that reads
+correctly, because the prefix glyphs sit between the mark and the music; with the
+prefix hidden or absent the mark floated in the empty left of the bar, and where
+the spring was short it crossed the barline into the previous bar. Raised from the
+tab view of `lab/tab-derivation/capo` with clef and time signature hidden, where
+`Capo 2` hung over blank staff. A bare bar now leads its **first onset**, and
+`m.x` is a hard floor.
+
+Moved: `lab/document/navigation-playground`, `lab/score-text/sections`,
+`lab/score-text/sections-with-rehearsal-marks`, `lab/score-text/labels-with-navigation`,
+`lab/score-text/labels-on-a-tab-staff`, `lab/score-text/one-bar-sections`,
+`lab/navigation/numbered-bars`, and `lab/rhythm/swing-feel` (which was never-seen
+already — see [Swing feel](#swing-feel--2026-09-09), and review it against this
+placement rather than the one it was generated with).
+
+**What a reviewer should look for.** Every moved mark went RIGHT, by under a staff
+space in most bars — a section name, rehearsal mark or tempo mark that opens a bar
+with no clef, key or time signature now begins 1.5sp before its first note instead
+of 1.5sp before the invisible content anchor. Nothing whose bar shows a clef or a
+signature may have moved at all; if one did, the prefix arm of the rule was
+touched and should not have been. The check that matters most is the barline: no
+mark may begin left of the barline of the bar it names, in any view, at any
+display setting.

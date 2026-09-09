@@ -36,9 +36,9 @@
 <rect x="628.4" y="205.696" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e0.n0"></rect>
 <text x="634.4" y="213.8784" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m2.v0.e0.n0">0</text>
 <text x="634.4" y="100.736" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" font-style="italic" class="fine">fine</text>
-<rect x="590.4" y="32" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="598.4" y="59.136" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">B</text>
-<text x="632.256" y="59.136" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Solo</text>
+<rect x="602.4" y="32" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="610.4" y="59.136" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">B</text>
+<text x="644.256" y="59.136" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Solo</text>
 <line x1="731.2" y1="140.736" x2="731.2" y2="232.1648" stroke="currentColor" stroke-width="2.56" class="barline"></line>
 <line x1="731.2" y1="140.736" x2="937.6" y2="140.736" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
 <line x1="731.2" y1="159.0224" x2="937.6" y2="159.0224" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>

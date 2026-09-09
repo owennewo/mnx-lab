@@ -428,6 +428,16 @@ back up to `proposed/` the moment it is.
   complete 2026-09-09: `<mnx-player>` controls, performed-order table, separate playback
   ink and inspection, ordinal links, plain-DOM ESM/IIFE wiring and static `/verify`
   Listen. Lifecycle and D.S. smokes pass; existing performance evidence awaits human review.
+- **[core-heading-anchor.md](complete/core-heading-anchor.md)** — complete 2026-09-09, the
+  day it was reported: every mark a bar prints above its own start (tempo, section,
+  rehearsal, swing, tab capo) shares one anchor, and that anchor led `contentStartX` —
+  the end of the stretched leading spring, not the bar's first ink. With a clef and time
+  signature on show it read right; with the prefix hidden the mark floated in blank
+  staff, and where the spring was short it crossed the barline into the previous bar
+  (live in the default view, not only under the display switches). A bare bar now leads
+  its first onset, and the barline is a hard floor. Eight goldens moved, all already
+  `rendered`, registered in
+  [lab-verify.md](inprogress/lab-verify.md#heading-marks-lead-the-bars-opening-ink--2026-09-09).
 - **[core-swing-feel.md](complete/core-swing-feel.md)** — complete 2026-09-09, the day it
   was raised from Guitar Pro's engraving of *Anji*: `_x.mnxLab.swing` carries the feel as a
   **ratio on a unit** (MusicXML 3.1's model, not any application's named-feel menu — the

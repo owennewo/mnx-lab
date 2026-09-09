@@ -1923,8 +1923,49 @@ export const LABEL_CHAR_SP = 1.0;
 export const LABEL_PAD_SP = 0.6;
 
 /** Shared left edge for the measure's tempo, section and capo headings. */
-export function measureHeadingX(m: Pick<MeasurePlan, 'showTimeSig' | 'timeSigCentreX' | 'contentStartX' | 'repeatStart'>): number {
+/** What a heading mark's placement needs to know about its bar. */
+export type MeasureHeading = Pick<
+  MeasurePlan,
+  'showTimeSig' | 'timeSigCentreX' | 'contentStartX' | 'repeatStart' | 'x' | 'showClef' | 'showKeySig' | 'voices'
+>;
+
+/** How far a heading mark leads the ink it belongs to. */
+const HEADING_LEAD_SP = 1.5;
+/** The same lead measured against a time signature's CENTRE rather than an edge. */
+const HEADING_TIME_SIG_LEAD_SP = 1.25;
+
+/**
+ * Where a bar's heading marks start — the metronome mark, the swing marking,
+ * the section/rehearsal labels, the tab capo line.
+ *
+ * All of them lead the bar's OPENING INK, and which ink that is depends on
+ * what the bar actually draws:
+ *
+ *   - a forward repeat: the content anchor already clears the whole `|:`
+ *     cluster and its dots, so it is the answer;
+ *   - a time signature: lead its centre — the numerals are the widest thing in
+ *     the prefix and the mark reads as sitting over them;
+ *   - a clef or a key signature: lead the content, which is just past them;
+ *   - **nothing at all**: lead the FIRST ONSET.
+ *
+ * That last case is the one that used to be wrong. With the prefix hidden (or
+ * simply absent, as in every mid-piece bar) `contentStartX` is a stretched
+ * leading spring away from the first note, so a mark leading IT floated in the
+ * empty left of the bar — and on a mid-system bar, where the spring is short,
+ * it crossed the barline and read as belonging to the bar before. Leading the
+ * first onset instead puts the mark where it does in every other case: just
+ * before the first thing the bar draws.
+ *
+ * `m.x` is a floor, never a placement: a heading mark cannot precede its own
+ * barline whatever the geometry.
+ */
+export function measureHeadingX(m: MeasureHeading): number {
   // The content anchor already clears the complete repeat cluster and its dots.
   if (m.repeatStart) return m.contentStartX;
-  return m.showTimeSig ? m.timeSigCentreX - 1.25 : m.contentStartX - 1.5;
+  if (m.showTimeSig) return Math.max(m.x, m.timeSigCentreX - HEADING_TIME_SIG_LEAD_SP);
+  if (m.showClef || m.showKeySig) return Math.max(m.x, m.contentStartX - HEADING_LEAD_SP);
+  const onsets = (m.voices ?? []).map(voice => voice[0]?.x).filter((x): x is number => x !== undefined);
+  // An empty bar draws no onset to lead, so the content anchor stands in.
+  const lead = onsets.length ? Math.min(...onsets) : m.contentStartX;
+  return Math.max(m.x, lead - HEADING_LEAD_SP);
 }

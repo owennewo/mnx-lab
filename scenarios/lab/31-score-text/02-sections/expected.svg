@@ -33,5 +33,5 @@
 <line x1="940.8" y1="128" x2="940.8" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="945.6" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <text x="97.6" y="89.728" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Intro</text>
-<text x="614.4" y="104" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Verse</text>
+<text x="626.4" y="104" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Verse</text>
 </svg>

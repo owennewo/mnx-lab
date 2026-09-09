@@ -985,7 +985,7 @@
       {
         "kind": "glyph",
         "glyph": "metNote8thUp",
-        "x": 54.3875,
+        "x": 55.1375,
         "y": 6.447,
         "scale": 0.55,
         "className": "swing"
@@ -993,7 +993,7 @@
       {
         "kind": "glyph",
         "glyph": "metNote8thUp",
-        "x": 55.7201,
+        "x": 56.4701,
         "y": 6.447,
         "scale": 0.55,
         "className": "swing"
@@ -1001,7 +1001,7 @@
       {
         "kind": "text",
         "text": "=",
-        "x": 57.1927,
+        "x": 57.9427,
         "y": 6.447,
         "font": "body",
         "size": 1.3,
@@ -1011,7 +1011,7 @@
       {
         "kind": "glyph",
         "glyph": "metNote8thUp",
-        "x": 58.2727,
+        "x": 59.0227,
         "y": 6.447,
         "scale": 0.55,
         "className": "swing"
@@ -1019,7 +1019,7 @@
       {
         "kind": "glyph",
         "glyph": "metAugmentationDot",
-        "x": 59.5443,
+        "x": 60.2943,
         "y": 6.447,
         "scale": 0.55,
         "className": "swing"
@@ -1027,7 +1027,7 @@
       {
         "kind": "glyph",
         "glyph": "metNote16thUp",
-        "x": 59.9518,
+        "x": 60.7018,
         "y": 6.447,
         "scale": 0.55,
         "className": "swing"
@@ -1922,7 +1922,7 @@
       {
         "kind": "glyph",
         "glyph": "metNote8thUp",
-        "x": 54.075,
+        "x": 54.825,
         "y": 7.055,
         "scale": 0.55,
         "className": "swing"
@@ -1930,7 +1930,7 @@
       {
         "kind": "glyph",
         "glyph": "metNote8thUp",
-        "x": 55.4076,
+        "x": 56.1576,
         "y": 7.055,
         "scale": 0.55,
         "className": "swing"
@@ -1938,7 +1938,7 @@
       {
         "kind": "text",
         "text": "=",
-        "x": 56.8802,
+        "x": 57.6302,
         "y": 7.055,
         "font": "body",
         "size": 1.3,
@@ -1948,7 +1948,7 @@
       {
         "kind": "glyph",
         "glyph": "metNote8thUp",
-        "x": 57.9602,
+        "x": 58.7102,
         "y": 7.055,
         "scale": 0.55,
         "className": "swing"
@@ -1956,7 +1956,7 @@
       {
         "kind": "glyph",
         "glyph": "metAugmentationDot",
-        "x": 59.2318,
+        "x": 59.9818,
         "y": 7.055,
         "scale": 0.55,
         "className": "swing"
@@ -1964,7 +1964,7 @@
       {
         "kind": "glyph",
         "glyph": "metNote16thUp",
-        "x": 59.6393,
+        "x": 60.3893,
         "y": 7.055,
         "scale": 0.55,
         "className": "swing"

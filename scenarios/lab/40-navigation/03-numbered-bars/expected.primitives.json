@@ -325,7 +325,7 @@
       {
         "kind": "glyph",
         "glyph": "metNoteQuarterUp",
-        "x": 38.4,
+        "x": 39.15,
         "y": 6.1898,
         "scale": 0.55,
         "className": "tempo"
@@ -333,7 +333,7 @@
       {
         "kind": "text",
         "text": "= 96",
-        "x": 39.3304,
+        "x": 40.0804,
         "y": 6.1898,
         "font": "body",
         "size": 1.3,
