@@ -174,3 +174,7 @@ lyrics/markings, hidden prefixes, Natural/Fill and Staff/Space extremes. The com
 suite passed (1,453 tests after the final rebase), as did corpus and build gates.
 `update:primitives` produced no scenario diff: omitted Clearance and level 2 remain
 byte-identical, so there is no verification debt to register.
+
+Amended later on 2026-09-09: level 0's outer score margins were halved from
+0.2sp to 0.1sp. Staff and system safety gaps, intermediate anchors, and the
+byte-identical level 2 default are unchanged.

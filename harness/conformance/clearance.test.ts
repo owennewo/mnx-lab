@@ -56,6 +56,12 @@ describe('clearance levels', () => {
       expect(responses[i].prefixPad(0.6)).toBeGreaterThan(responses[i - 1].prefixPad(0.6));
       expect(responses[i].verticalMargin(6, 2)).toBeGreaterThan(responses[i - 1].verticalMargin(6, 2));
     }
+    expect(clearanceSpacing(0)).toMatchObject({
+      horizontalMargin: 0.1,
+      cropMargin: 0.1
+    });
+    expect(clearanceSpacing(0).verticalMargin(6, 2)).toBe(2.1);
+    expect(clearanceSpacing(0).tabOuterMargin(2)).toBe(0.1);
     expect(clearanceSpacing(2)).toMatchObject({ pairedInk: 2, pairedLines: 3, staffInk: 3, staffLines: 4, horizontalMargin: 2, cropMargin: 0.5 });
   });
 
@@ -67,9 +73,9 @@ describe('clearance levels', () => {
     const result = tightenRows({ primitives, rows: [{ staffTop: 6, staffBottom: 10 }, { staffTop: 26, staffBottom: 30 }], heightSp: 40, clearance: 0 })!;
     const first = computeBoundsSp([primitives[0]])!;
     const second = computeBoundsSp([primitives[1]])!;
-    expect(first.y).toBeCloseTo(0.2);
+    expect(first.y).toBeCloseTo(0.1);
     expect(second.y - first.y - first.h).toBeCloseTo(1.5);
-    expect(result.heightSp - second.y - second.h).toBeCloseTo(0.2);
+    expect(result.heightSp - second.y - second.h).toBeCloseTo(0.1);
   });
 });
 
