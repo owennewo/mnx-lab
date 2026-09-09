@@ -45,13 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[workbench-settings-card.md](proposed/workbench-settings-card.md)** — the score-corner
-  settings card re-cut from the [Settings Card](https://claude.ai/code/artifact/45c8488d-08d4-4971-bdaa-577fe553b627)
-  canvas: SHOW becomes **STAFF**, every row is one same-width field (glyph · value in
-  force · swap arrows on a two-way row, chevron and a list on a three-way one), the
-  Unrolled checkbox becomes a REPEATS row, and the mark idles bare at 0.28 with the card
-  growing around it — the zoom pad's grammar, so the cluster reads as one family. Chrome
-  only; verified hands-on over CDP like the pad was.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -374,6 +367,18 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[workbench-settings-card.md](complete/workbench-settings-card.md)** — the score-corner
+  settings card re-cut from the [Settings Card](https://claude.ai/code/artifact/45c8488d-08d4-4971-bdaa-577fe553b627)
+  canvas, complete 2026-09-09. SHOW became **STAFF**; every row is one same-width field
+  (glyph · the value in force · swap arrows on a two-way row, chevron and a list on a
+  three-way one); the Unrolled checkbox became a REPEATS row; and the mark idles bare at
+  0.28 with the card growing around it — the zoom pad's grammar, so the cluster reads as
+  one family. Chrome only, `ScenarioPage` unchanged. Verified hands-on over CDP, 38
+  assertions, both themes; four things the plan could not have known are recorded in the
+  doc, the sharpest being that handing focus back to the trigger must happen **before**
+  the list is dropped, or every selection closes the card.
+
 
 - **[core-player-sampled-guitar.md](complete/core-player-sampled-guitar.md)** — item 12: on-demand CC0 guitar samples, independent voices, host loaders and a player sound choice; human listening pending.
 

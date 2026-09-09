@@ -1,6 +1,23 @@
 # The settings card, re-cut — glyphs, one control column, hover parity with the zoom pad
 
-> **Status: proposed 2026-09-09.** Workbench chrome only: `src/workbench/SettingsPad.ts`
+> **Status: BUILT 2026-09-09.** All five stages landed in one commit —
+> `src/workbench/SettingsPad.ts` rewritten, `harness/verify/unrolled-smoke.mjs` moved
+> onto the new REPEATS field. `ScenarioPage` needed no change at all: the pad's
+> property and event surface is unchanged, which is the clearest evidence the re-cut
+> stayed inside the component. 1614 tests pass, `check:scenarios` OK, `npm run build`
+> green, and `git diff -- scenarios/` clean after `update:primitives`.
+>
+> **Verified hands-on over CDP in a real browser, 38 assertions, both themes.** The
+> mark measures **24×24 in a 44×46 hit area** and sits level with the crosshair; the
+> header cell lands **exactly** on it (935,76 both) and the card's ink edge where the
+> zoom pad's is (both y=74); all nine controls share **one width, 131.3px**; a list
+> matches its field's box and keeps the card open under it; Escape closes the list,
+> then the card; preferences survive a reload; REPEATS writes and clears `?unrolled=1`;
+> a stringless document greys TAB and BOTH with the reason in the tooltip; the dark
+> half resolves with no baked-in colour, the TAB glyph's knock-out included. No
+> console errors.
+>
+> Workbench chrome only: `src/workbench/SettingsPad.ts`
 > and the one line in `ScenarioPage` that mounts it. No engine, no model, no goldens,
 > nothing the embed face ships. **Design canvas:**
 > [Settings Card](https://claude.ai/code/artifact/45c8488d-08d4-4971-bdaa-577fe553b627)
@@ -13,6 +30,36 @@
 > layout levers). Follows the shared contract of
 > [core-campaign-modernist.md](../complete/core-campaign-modernist.md), whose item 9 is
 > the zoom pad this card is being brought into line with; not indexed there.
+
+## What the build changed about the plan
+
+Four corrections, each of which the plan could not have known:
+
+1. **The `renderedExpanded` touch gate was not owed.** Stage 3 planned to copy it from
+   the zoom pad. That gate exists because the pad's arms are in the DOM in *both* poses,
+   so a first touch can operate a control the reader cannot see. This card renders no
+   fields until it opens, so first contact has nothing else to hit. Not copied, and the
+   component says why.
+2. **A bare mark flush to the cluster's top edge rides two pixels high.** The crosshair
+   beside it sits INSIDE the zoom pad's 2px border, so its 24px glyph box starts two
+   pixels down. The plan's "the mark stays in flow as a 24×24 cell" would have left the
+   two neighbours misaligned by exactly that border — measured, not guessed, and only
+   visible because the marks are 5px apart. The mark takes the offset and the card takes
+   it back in its own `top`/`right`, so its border lands where the zoom pad's does.
+3. **Handing focus back to the trigger has to happen BEFORE the list is dropped.**
+   Closing first destroys the focused item, which fires `focusout` with a null
+   `relatedTarget` — and the existing focus-out rule then takes the whole card down.
+   Every list selection would have closed the card.
+4. **`sharedChrome`'s `row-current` tint loses to a `background` declared here.** Same
+   specificity, and the component's block is composed after it, so `background:
+   transparent` on the list item silently won and the chosen value was marked by its
+   accent bar alone. The primitive is reused by NOT declaring the property.
+
+A fifth correction is about the plan's own reading of the code: `data-off` compares
+against `DEFAULT_DISPLAY_PREFERENCES`, not against `normalizeDisplayOptions({})`. The
+host supplies defaults for `barNumbers` and `instrumentNames` — the plan's "which have
+no default" was true of the engine's normalizer and false of the preference store the
+card is actually handed.
 
 ## The five decisions, taken at the design pass
 
@@ -163,7 +210,14 @@ stroke 1.8), so the pair reads as one drawing and its negation.
 | Instrument names | two systems each with a name stub · only the first named · slashed |
 | Beams | two beamed stems, beam slanted · beam flat |
 
-Rendered at 12px inside the field and the list; the header gear at 16px as today.
+Rendered at **14px**, not the 12 the canvas used, and the STAFF family redrawn at 4/5/3+3
+lines rather than the honest 5/6/5+6: at this size a 24-unit box gives 0.58px per unit,
+so a real staff's 3.5-unit gaps close into one grey block and all three views draw the
+same smudge. The count was never what told them apart — the gap, the fret block and the
+two groups are. Checked at 6× on the open list, which is the one place all three are
+seen together. The mark itself is drawn at **24px**, not the 16 it used inside its
+retired border: without that box the glyph IS the mark, and it has to carry the same
+presence as the 24px crosshair.
 
 ### Stage 5 — the repeats row
 
@@ -178,7 +232,7 @@ same commit — it is the one automated check the card has, and it must stay gre
 
 The workbench has no unit tests by rule, and the card owns no state worth one. The
 recipe is the zoom pad's: **hands-on over CDP in a real browser, both themes**, recorded
-in this doc's status block on landing. The checklist:
+in this doc's status block above. The checklist, all of it green:
 
 - Idle: the gear measures 24×24 inside a 44×44 hit area, no border, opacity 0.28; the
   crosshair beside it has not moved by a pixel from today's position.
@@ -196,6 +250,13 @@ in this doc's status block on landing. The checklist:
 Gates as always: `npm test`, `npm run check:scenarios`, `npm run build`, and a clean
 `git diff -- scenarios/` after `update:primitives`, trivially — nothing under `engine/`
 moves.
+
+**Left undone, deliberately:** the CDP pass was driven by a throwaway script, not a
+committed one. `harness/verify/unrolled-smoke.mjs` already opens the card and clicks the
+REPEATS field, so the row's behaviour has committed cover; the geometry the pass
+measured — the 24×24 mark level with the crosshair, the header cell on the mark, one
+control width — does not. A `settings-card-smoke.mjs` in that directory is the obvious
+home if this alignment ever regresses.
 
 ## Out of scope, named so it is not done by accident
 
