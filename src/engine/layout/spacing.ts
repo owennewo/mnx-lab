@@ -1,3 +1,4 @@
+import { isPartialEntry } from './unrolled.ts';
 import type { PerformedEntry } from '../../model/passes.ts';
 import { normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
@@ -1544,7 +1545,7 @@ export function planHorizontal(
     m.cancelledKeyFifths = m.keyChanged ? previous!.keyFifths : 0;
     m.hasRepeatStart = false;
     m.repeatEnd = null;
-    if (entry.from || entry.until) m.issues.push('partial performed entry — whole written bar shown; unperformed notes marked');
+    if (isPartialEntry(mnx, entry)) m.issues.push('partial performed entry — whole written bar shown; unperformed notes marked');
     if (options.collapse?.length) m.issues.push('unrolled view ignores written multi-measure-rest collapse');
     if (options.forcedBreaks?.size || options.measureRange) m.issues.push('unrolled view ignores written layout breaks');
     return m;

@@ -81,3 +81,11 @@ approval records are unchanged.
 
 The closeout regression also excludes ID-less notes outside a partial slice from
 slur/tie starts and technique-site collection, preserving visible whole-bar ink.
+
+Boundary-warning follow-up (2026-09-09): explicit `from: [0,1]` and an `until`
+equal to the actual written duration cover a whole bar and no longer warn.
+Diagnostics share exact bar-duration calculation with performed-note membership,
+including pickups, longest part/voice and empty-bar meter fallback. Dal Segno is
+covered in notation, tab and combined layouts; genuine partial slices still warn.
+Three changed unrolled engravings are registered in the
+[standing ledger](../inprogress/lab-verify.md#unrolled-engraving--2026-09-09).

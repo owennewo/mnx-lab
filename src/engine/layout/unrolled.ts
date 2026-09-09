@@ -37,16 +37,14 @@ export const writtenIndex = (plan: HorizontalPlan, index: number): number =>
 const fraction = (value: [number, number]) => fromSafeFraction({ num: value[0], den: value[1] });
 const integer = (value: number) => fromSafeFraction({ num: value, den: 1 });
 
-/** Whole-bar geometry and half-open playback membership are different sets.
- * Exact comparisons also keep a tuplet crossing a slice boundary selectable. */
-export function performedKeys(
+/** Shared exact written extent for slice diagnostics and note membership. */
+function writtenMeasureContent(
   doc: MnxStructure,
-  entry: PerformedEntry,
-  includeEvents = false,
-): Set<string> {
-  const result = new Set<string>();
+  measureIndex: number,
+  includeEvents: boolean,
+) {
   let meter = fraction([4, 4]);
-  for (let i = 0; i <= entry.measureIndex; i++) {
+  for (let i = 0; i <= measureIndex; i++) {
     const time = doc.global.measures[i]?.time;
     if (time) meter = fraction([time.count, time.unit]);
   }
@@ -60,7 +58,7 @@ export function performedKeys(
   }[] = [];
   doc.parts?.forEach((part, pi) => {
     const voices = new Map<number, number>();
-    part.measures[entry.measureIndex]?.sequences?.forEach((seq) => {
+    part.measures[measureIndex]?.sequences?.forEach((seq) => {
       const staff = seq.staff ?? 1;
       const voice = (voices.get(staff) ?? -1) + 1;
       voices.set(staff, voice);
@@ -87,7 +85,7 @@ export function performedKeys(
                 event.id ??
                 syntheticEventKey({
                   partIndex: pi,
-                  measureIndex: entry.measureIndex,
+                  measureIndex,
                   staffIndex: staff,
                   voiceIndex: voice,
                   eventIndex: ei,
@@ -102,7 +100,7 @@ export function performedKeys(
             spans.push({
               key: noteKeyAt(
                 note,
-                entry.measureIndex,
+                measureIndex,
                 voice,
                 ei,
                 ni,
@@ -173,6 +171,26 @@ export function performedKeys(
     });
   });
   if (compare(length, ZERO) === 0) length = meter;
+  return { length, spans };
+}
+
+/** Explicit zero/start and full-length/end boundaries do not truncate a bar. */
+export function isPartialEntry(doc: MnxStructure, entry: PerformedEntry): boolean {
+  if (entry.from && compare(fraction(entry.from), ZERO) > 0) return true;
+  if (!entry.until) return false;
+  const { length } = writtenMeasureContent(doc, entry.measureIndex, false);
+  return compare(fraction(entry.until), length) < 0;
+}
+
+/** Whole-bar geometry and half-open playback membership are different sets.
+ * Exact comparisons also keep a tuplet crossing a slice boundary selectable. */
+export function performedKeys(
+  doc: MnxStructure,
+  entry: PerformedEntry,
+  includeEvents = false,
+): Set<string> {
+  const result = new Set<string>();
+  const { length, spans } = writtenMeasureContent(doc, entry.measureIndex, includeEvents);
   const from = entry.from ? fraction(entry.from) : ZERO;
   const until = entry.until ? fraction(entry.until) : length;
   for (const span of spans) {

@@ -512,3 +512,9 @@ The shipped viewer entry stays unchanged until item 7 consumes playback.
   headless browser interaction/review and installed Node package smoke passed.
   Commit `a0fd152` was pushed and the implementation worktree retired before
   the item moved to `complete/`.
+
+- Item 10 boundary-warning follow-up (2026-09-09): traversal preserves explicit
+  start/end jump bounds even when they cover a whole bar. Renderer diagnostics
+  must compare those bounds with actual written duration, using the same exact
+  timing as note membership. Three unrolled SVGs changed; see the
+  [review ledger](lab-verify.md#unrolled-engraving--2026-09-09).

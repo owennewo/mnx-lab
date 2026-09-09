@@ -817,3 +817,11 @@ Scenario set (new evidence only):
 - `lab/score-text/labels-on-a-tab-staff` — includes tab
 - `lab/layout/coloured-marks-and-clef-forms`
 - `lab/navigation/ds-final-ending`
+
+Follow-up boundary-warning fix (2026-09-09): regenerated unrolled SVGs for
+`spec/jumps-dal-segno`, `spec/jumps-ds-al-fine`, and
+`lab/navigation/jumps-and-signs`. Check that explicit start/end boundaries covering
+a whole bar no longer show a partial-entry badge; genuine mid-bar cuts still do.
+The [item 10 follow-up](../complete/core-player-unrolled-view.md) shares the exact
+written duration calculation with note membership, including pickups and empty-bar
+meter fallback. Written goldens and approval records remain unchanged.

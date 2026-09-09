@@ -6,7 +6,7 @@ import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { planHorizontal } from '../../src/engine/layout/spacing.ts';
-import { engravingEntries, performedKeys } from '../../src/engine/layout/unrolled.ts';
+import { engravingEntries, performedKeys, isPartialEntry } from '../../src/engine/layout/unrolled.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
 import { findNoteAddress } from '../../src/model/noteWalk.ts';
 import { parseOccurrenceKey, occurrenceKey } from '../../src/model/noteKeys.ts';
@@ -229,4 +229,38 @@ it('excludes ID-less partial-bar tie sources and technique targets from span geo
   const rendered = layoutNotation({mnx:doc,widthSp:80,entries});
   expect(rendered.primitives.some(p => p.className === 'tie' || p.className === 'slur' || p.className?.includes('technique-hammerPull'))).toBe(false);
   expect(rendered.primitives.find(p => p.sourceId === 'w0:@m0.v0.e0.n0')?.className).toContain('unperformed');
+});
+
+it('does not warn for Dal Segno boundaries at the start or end of a whole bar', () => {
+  const doc: MnxStructure = JSON.parse(
+    fs.readFileSync('scenarios/spec/jumps-dal-segno/document.mnx.json', 'utf8'),
+  );
+  const entries = engravingEntries(doc, true)!;
+  expect(entries.some((e) => e.from)).toBe(true);
+  expect(entries.some((e) => e.until)).toBe(true);
+  for (const layout of [layoutNotation, layoutTab, layoutBothSystem]) {
+    const rendered = layout({ mnx: doc, widthSp: 80, entries });
+    expect(rendered.diagnostics.filter((d) => d.message.includes('partial performed entry')))
+      .toEqual([]);
+  }
+});
+
+it('compares slice bounds with actual content length, including pickups and empty bars', () => {
+  const doc = seed();
+  const entry = { ordinal: 0, measureIndex: 0, occurrence: 1, iteration: 1 };
+  const partial = (from: [number, number], until: [number, number]) =>
+    isPartialEntry(doc, { ...entry, from, until });
+  expect(partial([0, 1], [2, 2])).toBe(false);
+  expect(partial([1, 4], [1, 1])).toBe(true);
+  expect(partial([0, 1], [3, 4])).toBe(true);
+  doc.parts[0].measures[0].sequences![0].content.pop();
+  expect(partial([0, 1], [1, 2])).toBe(false);
+  expect(partial([0, 1], [1, 4])).toBe(true);
+  // The longest part/voice determines extent, rather than the first sequence.
+  doc.parts.push(structuredClone(seed().parts[0]));
+  expect(partial([0, 1], [1, 2])).toBe(true);
+  doc.parts = [];
+  doc.global.measures[0].time = { count: 3, unit: 4 };
+  expect(partial([0, 1], [3, 4])).toBe(false);
+  expect(partial([0, 1], [1, 2])).toBe(true);
 });
