@@ -22,6 +22,9 @@ import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { serveStatic } from './staticServer.mjs';
+import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { checkPlayer } from './player-embed-check.mjs';
+const format=process.env.MNX_EMBED_FORMAT??'esm';
 
 const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
 const ARTIFACT_DIR = path.join(ROOT, 'dist/embed');
@@ -31,73 +34,6 @@ const fail = message => {
   console.error(`embed smoke FAILED: ${message}`);
   process.exitCode = 1;
 };
-
-// ── CDP plumbing (no puppeteer: Node's global WebSocket is enough) ──────────
-/** Chrome writes the port it actually bound to into the profile directory —
- *  read it rather than guessing, so a busy port can never flake the test. */
-async function devtoolsPort(profileDir) {
-  const portFile = path.join(profileDir, 'DevToolsActivePort');
-  for (let attempt = 0; attempt < 60; attempt++) {
-    if (fs.existsSync(portFile)) {
-      const [port] = fs.readFileSync(portFile, 'utf8').split('\n');
-      if (port) return Number(port);
-    }
-    await new Promise(r => setTimeout(r, 250));
-  }
-  throw new Error('Chrome never reported a DevTools port (is CHROME_BIN correct?)');
-}
-
-async function connect(port) {
-  for (let attempt = 0; attempt < 40; attempt++) {
-    try {
-      const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-      const page = targets.find(t => t.type === 'page');
-      if (page) return page.webSocketDebuggerUrl;
-    } catch {
-      /* chrome still starting */
-    }
-    await new Promise(r => setTimeout(r, 250));
-  }
-  throw new Error('could not reach Chrome DevTools');
-}
-
-function client(ws) {
-  let id = 0;
-  const pending = new Map();
-  const logs = [];
-  ws.addEventListener('message', event => {
-    const message = JSON.parse(event.data);
-    if (message.id && pending.has(message.id)) {
-      pending.get(message.id)(message);
-      pending.delete(message.id);
-    }
-    // Console errors and uncaught exceptions are failures: a host page that
-    // has to tolerate red console noise has not really been served.
-    if (message.method === 'Runtime.consoleAPICalled' && message.params.type === 'error') {
-      logs.push(message.params.args.map(a => a.value ?? a.description).join(' '));
-    }
-    if (message.method === 'Runtime.exceptionThrown') {
-      logs.push(message.params.exceptionDetails.exception?.description ?? 'exception');
-    }
-  });
-  const send = (method, params = {}) =>
-    new Promise(resolve => {
-      const messageId = ++id;
-      pending.set(messageId, resolve);
-      ws.send(JSON.stringify({ id: messageId, method, params }));
-    });
-  const evaluate = async expression => {
-    const result = await send('Runtime.evaluate', {
-      expression,
-      awaitPromise: true,
-      returnByValue: true
-    });
-    const details = result.result?.exceptionDetails;
-    if (details) throw new Error(details.exception?.description ?? 'evaluate threw');
-    return result.result?.result?.value;
-  };
-  return { send, evaluate, logs };
-}
 
 // ── The test ────────────────────────────────────────────────────────────────
 const chromeBin = process.env.CHROME_BIN ?? 'google-chrome';
@@ -119,7 +55,7 @@ try {
   artifact = await serveStatic(ARTIFACT_DIR);
   host = await serveStatic(APP_DIR);
   const artifactBase = `http://127.0.0.1:${artifact.port}`;
-  const pageUrl = `http://127.0.0.1:${host.port}/index.html?base=${encodeURIComponent(artifactBase)}`;
+  const pageUrl = `http://127.0.0.1:${host.port}/index.html?base=${encodeURIComponent(artifactBase)}&format=${format}`;
   console.log(`artifact origin ${artifactBase} · host origin http://127.0.0.1:${host.port}`);
 
   const profile = fs.mkdtempSync('/tmp/mnx-embed-smoke-');
@@ -315,6 +251,8 @@ try {
   `);
   if (!second?.rendered) fail('a second viewer on the same page did not render');
   if (second && second.fonts > 1) fail(`Bravura registered ${second.fonts} times — registration is not idempotent`);
+
+  await checkPlayer(cdp,artifactBase,format);
 
   // 5. No console errors anywhere in the run.
   if (cdp.logs.length > 0) fail(`console errors: ${cdp.logs.slice(0, 3).join(' | ')}`);

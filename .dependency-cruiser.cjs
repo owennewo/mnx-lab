@@ -70,9 +70,9 @@ module.exports = {
     },
     {
       name: 'harness-not-into-shells',
-      comment: 'The harness exercises machinery headlessly, never the app shells.',
+      comment: 'Node conformance stays headless; browser harnesses may exercise elements.',
       severity: 'error',
-      from: { path: '^harness/' },
+      from: { path: '^harness/', pathNot: '^harness/browser/' },
       to: { path: '^src/(workbench|entries|elements)/' }
     },
     {

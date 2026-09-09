@@ -51,30 +51,17 @@
       </div>
     </main>
     <script type="module">
-      import '/src/entries/embed.ts';
-      import { ContextProvider } from '@lit/context';
-      import { playbackStateContext, initialPlaybackState } from '/src/elements/mnxContext.ts';
-      import { linearizePasses } from '/src/model/passes.ts';
-      import { inspectIteration, nextInspectionIteration, verseForIteration } from '/src/model/playback.ts';
-      import { documentLyricLineIds } from '/src/engine/layout/lyricRuns.ts';
+      import { bindPlayback } from '/src/entries/embed.ts';
       import score from '/scenarios/spec/repeats-alternate-endings-simple/document.mnx.json';
-      const viewer = document.querySelector('mnx-document-viewer');
-      // The common host provides context; a sibling player cannot provide to this viewer.
-      const host = document.querySelector('.card');
-      let state = initialPlaybackState();
-      const provider = new ContextProvider(host, { context: playbackStateContext, initialValue: state });
-      provider.hostConnected(); // plain DOM has no Lit controller lifecycle
-      const passes = linearizePasses(score);
-      const button = document.createElement('button');
-      button.textContent = 'Inspection iteration 1';
-      button.addEventListener('click', () => {
-        state = inspectIteration(state, nextInspectionIteration(passes, 0, state.inspectionIteration));
-        provider.setValue(state);
-        viewer.selectedVerse = verseForIteration(documentLyricLineIds(score), state);
-        button.textContent = `Inspection iteration ${state.inspectionIteration}`;
-      });
-      host.prepend(button);
-      viewer.mnxDoc = { id: 'embed-demo', name: 'Repeats', lastUpdated: 0, mnxJson: score };
+      const host=document.querySelector('.card'),viewer=host.querySelector('mnx-document-viewer');
+      const player=document.createElement('mnx-player');host.prepend(player);
+      const playback=bindPlayback(host,viewer,player);
+      playback.setDocument({id:'embed-demo',name:'Repeats',lastUpdated:0,mnxJson:score});
+      const inspect=document.createElement('button'),follow=document.createElement('button');
+      inspect.textContent='Inspection iteration 1';follow.textContent='Follow';
+      inspect.onclick=()=>{playback.inspect(playback.state.inspectionIteration===1?2:1);inspect.textContent=`Inspection iteration ${playback.state.inspectionIteration}`;};
+      follow.onclick=()=>playback.follow();host.prepend(inspect,follow);
+      window.addEventListener('pagehide',()=>playback.dispose(),{once:true});
     </script>
   </body>
 </html>

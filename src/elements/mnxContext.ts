@@ -14,6 +14,7 @@ export interface PlaybackState extends PlaybackPositionState {
 }
 /** Item 7 emits this from the player. Its common ancestor owns the provider. */
 export interface PlaybackUpdate {
+  playing?: boolean;
   documentId: string;
   ordinal: number | null;
   highlight: PlaybackOccurrence[];

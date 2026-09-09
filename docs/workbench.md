@@ -88,3 +88,8 @@ until a host supplies a selected verse. That transient input is not persisted.
 A system means one horizontal row of music, including both staves in Both.
 The card stays available in document focus, supports keyboard navigation and
 Escape/focus return, dismisses on click-away, and scrolls on short screens.
+
+**Playback** lives at the top of the existing side panel: controls and a performed-order
+table alongside the written score. The host keeps playback context separate from editor
+selection, stops/recompiles on edits, and accepts an optional zero-based `at=` ordinal
+in scenario links. [Player element and lifecycle](player-element.md).

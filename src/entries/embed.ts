@@ -75,3 +75,6 @@ function registerBravura(url: string): void {
     // FontFace construction can throw on a malformed URL — never fatal.
   }
 }
+
+export { Player } from '../elements/Player.ts';
+export { bindPlayback } from '../elements/playbackHost.ts';

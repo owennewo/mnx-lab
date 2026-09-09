@@ -3,7 +3,7 @@
 Implementation loop; player campaign item 5. `mnx-lab/audio` exports
 `compilePerformance`, `serializePerformance`, `parsePerformance`, exact time helpers,
 performance types and `exportMidi`. The former `mnxToAudioEvents` approximation is
-retired. The [transport and native sink](player-transport.md) consume this result; player UI is item 7.
+retired. The [transport and native sink](player-transport.md) consume this result; the [player element](player-element.md) provides controls and written-score review.
 
 `compilePerformance(document, passModel?)` returns `{ ok: true, performance }` or
 `{ ok: false, diagnostics }`. It uses the existing traversal by default. Fatal

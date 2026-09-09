@@ -166,7 +166,7 @@ run any time before 6.
 | 4 | [Audio backend spike](../complete/core-player-tone-spike.md) | Tone.js **versus a native Web Audio sink**, measured: Node import, browser Offline render, per-voice detune ramps, both embed formats' size, what Tone saves once the transport is ours. Output: a log entry and the `Sink` interface. | both | its findings | complete; native selected |
 | 5 | [Performance compiler and MIDI export](../complete/core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | complete; performance review pending |
 | 6 | [Transport](../complete/core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | complete |
-| 7 | [Player element, written view](../proposed/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | proposed |
+| 7 | [Player element, written view](../proposed/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | implemented; landing checks |
 | 8 | [Expression and technique](../proposed/core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | proposed |
 | 9 | [MIDI oracle](../proposed/core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | proposed — **needs a dev-environment decision** |
 | 10 | [Unrolled engraving](../proposed/core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | proposed — after 7 |
@@ -399,3 +399,28 @@ exports and default Node gzip. Reproduce with `audio-bundle-cost.mjs`. Bytes:
 The sink increment is 1,540/1,665 gzip bytes (IIFE/ESM); complete playback adds
 10,809/12,165. Both are bundled comparison variants, with no lazy-IIFE claim.
 The shipped viewer entry stays unchanged until item 7 consumes playback.
+
+### Item 7 — the written-score player (2026-09-09)
+
+- `<mnx-player>` now supplies controls, a performed-order table and timed events;
+  [public API and wiring](../../docs/player-element.md). The existing scenario side
+  panel houses it beside the engraving. Both plain-DOM embed examples use a common
+  ancestor provider; the player does not provide context to its sibling viewer.
+- Context updates must be about changed live state, not every clock poll. Playback
+  ink is a paint overlay, so a highlight never rebuilds the engraved SVG. Its blue
+  survives the selection's higher-specificity accent rules; tests cover coincident
+  playback/selection and all three views. Reveal shares scroll math, not selection.
+- Plain-DOM hosts may install a provider after the viewer's first context request.
+  The host helper uses a public provider subscription for that already-connected case
+  and removes its listeners/subscriptions on disposal. Inspection/Follow remain separate.
+- Document edits stop sound before recompilation and invalidate live ordinals. The
+  smoke sends an actual edit key and requires a new document plus cleared playback.
+  Route `at` is a one-shot seek, never autoplay or a standing instruction to reinterpret
+  an old visit after an edit. A D.S. return is checked on the newly mounted viewer.
+- Static `/verify` Listen plays the exact presented performance and highlights its
+  committed SVGs. JSON is escaped in inert script blocks; the player bundle is inline,
+  retaining self-contained review and the existing receipt hashes. No approvals granted.
+- Volume remains native-backend work: the sink owns its master gain and lazy context;
+  the element only requests a level. The offline smoke measures attenuation.
+  Both ESM/IIFE smokes prove playback, context, seek cycling, inspection, replacement
+  and disposal. Existing scenario goldens and verification records are unchanged.

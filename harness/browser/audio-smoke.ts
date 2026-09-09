@@ -137,5 +137,22 @@ export async function runAudioSmoke() {
   }
   check(refused, 'Disposed sink accepted scheduling.');
   result.disposalRefused = refused;
+  const quietContext = new OfflineAudioContext(1, 48000, 48000),
+    quiet = new NativeSink({ context: quietContext, volume: 0.5 });
+  quiet.schedule(
+    [
+      { kind: 'attack', voice: 'v', hz: 440, velocity: 1, offset: 0.1 },
+      { kind: 'release', voice: 'v', offset: 0.5 },
+    ],
+    0,
+  );
+  quiet.setVolume(0.25);
+  const quietData = (await quietContext.startRendering()).getChannelData(0);
+  result.volumeRms = rms(quietData, 0.2, 0.4);
+  check(
+    Math.abs(result.volumeRms - (0.2 * 0.25) / Math.sqrt(2)) < 0.001,
+    'Master volume did not reach the output.',
+  );
+  quiet.dispose();
   return result;
 }

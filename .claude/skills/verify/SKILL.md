@@ -97,3 +97,8 @@ human approved only those tables: existing engraving hashes and their date survi
 An engraving-only approval (without the receipt) cannot stamp `performanceHash`.
 If a golden changed after presentation, regenerate and present again. No command in
 this implementation session grants human approval.
+
+The performance review page now includes **Listen** over the exact presented JSON,
+with performed-order visits and playback highlighting on the committed SVGs. Present
+these controls with the engraving/tables; a successful smoke or audible output is
+not a human approval and does not change the receipt requirement above.

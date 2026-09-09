@@ -32,6 +32,9 @@ const DOCUMENTS = [
 ];
 
 const viewer = document.getElementById('viewer');
+const player = document.getElementById('player');
+let playback;
+let loadRevision=0;
 const nav = document.getElementById('documents');
 const status = document.getElementById('status');
 
@@ -41,6 +44,7 @@ function setStatus(text, ok = true) {
 }
 
 async function show(entry) {
+  const revision=++loadRevision;player.stop?.();
   for (const button of nav.children) {
     button.setAttribute('aria-current', String(button.dataset.id === entry.id));
   }
@@ -48,13 +52,14 @@ async function show(entry) {
     const response = await fetch(entry.file);
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
     const mnxJson = await response.json();
+    if(revision!==loadRevision)return;
     // The host supplies the document and nothing else. `view` stays unset, so the
     // element resolves the author's own `staffKind` hint — the tab documents come
     // up as tab, the rest as notation, with no host JavaScript deciding.
     // This used to be two lines of homework here, including a string-search of
     // the document JSON for '"strings"' (docs/core-viewer-surface.md: derived
     // data a host must compute is a defect in the surface, not in the host).
-    viewer.mnxDoc = { id: entry.id, name: entry.label, lastUpdated: 0, mnxJson };
+    playback.setDocument({ id: entry.id, name: entry.label, lastUpdated: 0, mnxJson });
     setStatus(`${entry.label} — rendered by the embed artifact at ${base}`);
   } catch (error) {
     setStatus(`could not load ${entry.file}: ${error.message}`, false);
@@ -120,8 +125,15 @@ if (!base) {
   );
 } else {
   setStatus('loading the embed artifact…');
-  import(/* @vite-ignore */ `${base}/mnx-lab.esm.js`)
-    .then(() => customElements.whenDefined('mnx-document-viewer'))
-    .then(() => show(DOCUMENTS[0]))
-    .catch(error => setStatus(`could not load the embed artifact: ${error.message}`, false));
+  const load = params.get('format')==='iife' ? new Promise((resolve,reject)=>{
+    const script=document.createElement('script');script.src=`${base}/mnx-lab.js`;script.onload=()=>resolve(window.MnxLab);script.onerror=reject;document.head.append(script);
+  }) : import(/* @vite-ignore */ `${base}/mnx-lab.esm.js`);
+  load.then(api=>{
+    playback=api.bindPlayback(document.querySelector('.frame'),viewer,player);
+    const inspect=document.getElementById('inspect-iteration'),follow=document.getElementById('follow-playback');
+    inspect.onclick=()=>{const iterations=[...new Set(player.performance?.measures.map(m=>m.iteration)??[1])];const i=iterations.indexOf(playback.state.inspectionIteration);playback.inspect(iterations[(i+1)%iterations.length]);inspect.textContent=`Inspection iteration ${playback.state.inspectionIteration}`;follow.setAttribute('aria-pressed','false');};
+    follow.onclick=()=>{playback.follow();follow.setAttribute('aria-pressed','true');};
+    window.addEventListener('pagehide',()=>playback.dispose(),{once:true});
+    return show(DOCUMENTS[0]);
+  }).catch(error=>setStatus(`could not load the embed artifact: ${error.message}`,false));
 }

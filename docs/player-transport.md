@@ -2,7 +2,7 @@
 
 Implementation loop, player campaign item 6. The public `mnx-lab/audio` entry exports
 `Transport`, `eventsBetween`, `centsAt`, `NativeSink`, `nativeClock`, and their types.
-The player element and controls arrive in item 7. The viewer embed entry is unchanged.
+The [player element](player-element.md) supplies the controls and host wiring.
 
 ```ts
 import { compilePerformance, Transport, NativeSink, nativeClock } from 'mnx-lab/audio';

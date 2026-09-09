@@ -1,6 +1,6 @@
 # The player element over the written score — the first reviewer milestone
 
-> **Status: proposed 2026-09-08, revised the same day.** Campaign:
+> **Status: implemented 2026-09-09; landing checks in progress.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 7. Needs items 2, 5 and
 > 6. Deliberately **not** waiting for the unrolled engraving (item 10): the written
 > score, a performed-order table and sound prove the player with far less layout work.
@@ -60,3 +60,10 @@ playback, document replacement and disposal as well as first play.
 A reviewer opens any performance-opt-in scenario, presses play, watches the cursor
 walk the bars in performed order in all three views with the table alongside, and
 hears the D.S. return. The embed mock host does the same on the IIFE and the ESM build.
+
+## Implementation
+
+[Player element/API documentation](../../docs/player-element.md) records the host lifecycle,
+static Listen, ordinal routing, reveal and paint overlays. Both embed formats have
+permanent playback/lifecycle smokes; the workbench smoke covers edits and D.S. return.
+No goldens or verification records changed; the standing performance review debt remains.

@@ -96,3 +96,12 @@ describe('ink census (element-ops campaign)', () => {
     }
   });
 });
+
+// Public custom-element registration also belongs to the item 7 census.
+it('registers the player on both public element build faces', () => {
+  expect(fs.readFileSync('src/elements/Player.ts', 'utf8')).toContain(
+    "@customElement('mnx-player')",
+  );
+  for (const file of ['src/entries/embed.ts', 'src/entries/lib/elements.ts'])
+    expect(fs.readFileSync(file, 'utf8')).toContain('Player.ts');
+});

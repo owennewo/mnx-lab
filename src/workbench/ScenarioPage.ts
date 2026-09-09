@@ -1,3 +1,8 @@
+import '../elements/Player.ts';
+import type { Player } from '../elements/Player.ts';
+import { compilePerformance } from '../audio/performance.ts';
+import type { Performance } from '../audio/performanceTypes.ts';
+import { chooseOrdinal } from '../model/playback.ts';
 import { ContextProvider } from '@lit/context';
 import { playbackStateContext, initialPlaybackState, type PlaybackState, type PlaybackUpdate } from '../elements/mnxContext.ts';
 import { linearizePasses, hasRepeatStructure, type PassModel } from '../model/passes.ts';
@@ -402,6 +407,11 @@ function presentationSpan(
 export class ScenarioPage extends LitElement {
   @property({ type: String }) scenarioId = '';
   @property({ type: String }) view = '';
+  @property({attribute:false}) at: number | null=null;
+  @state() private performance: Performance | null=null;
+  private clickedPlaybackKey='';
+  private performanceError='';
+  private routeSeekConsumed=false;
   /** A one-shot local file supplied by the shell. It is never persisted and
    *  never becomes a corpus scenario. */
   @property({ attribute: false }) localDocument: LocalDocumentSource | null = null;
@@ -461,8 +471,13 @@ export class ScenarioPage extends LitElement {
   }
   private refreshPassModel(document: MnxStructure) {
     if (this.passDocument === document) return;
+    this.renderRoot.querySelector<Player>('mnx-player')?.stop();
+    this.performance=null;this.clickedPlaybackKey='';
     this.passDocument = document;
     this.passModel = linearizePasses(document);
+    const compiled=compilePerformance(document,this.passModel);
+    this.performance=compiled.ok?compiled.performance:null;
+    this.performanceError=compiled.ok?'':compiled.diagnostics.map(d=>d.message).join('; ');
     // Ordinals belong to one document revision. Inspection is a preference,
     // retained through edits; live playback must be recompiled by item 7.
     this.setPlayback({ ...withPlaybackOrdinal(this.playback, this.passModel, null), highlight: [] });
@@ -1839,6 +1854,7 @@ export class ScenarioPage extends LitElement {
   }
 
   willUpdate(changed: Map<string, unknown>) {
+    if(changed.has('at'))this.routeSeekConsumed=false;
     const sourceChanged = changed.has('scenarioId') || changed.has('localDocument');
     if (changed.has('view') || sourceChanged) this.flushPendingFret();
     // Legacy ?view=compare|json deep links (the documented contract) open
@@ -1869,6 +1885,8 @@ export class ScenarioPage extends LitElement {
       this.jsonFind = '';
       this.session = null;
       this.selection = null;
+      this.renderRoot.querySelector<Player>('mnx-player')?.stop();
+      this.performance=null;this.routeSeekConsumed=false;
       this.passDocument = null;
       this.passModel = null;
       this.setPlayback(initialPlaybackState());
@@ -1897,7 +1915,7 @@ export class ScenarioPage extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener('playback-state-change', this.onPlaybackUpdate);
+    this.addEventListener('playback-state-changed', this.onPlaybackUpdate);
     window.addEventListener('assist-credentials-change', this.onCredentialsChange);
     void this.refreshFingerprint();
     const landing = takeLanding();
@@ -1929,7 +1947,7 @@ export class ScenarioPage extends LitElement {
   disconnectedCallback() {
     this.flushPendingFret();
     super.disconnectedCallback();
-    this.removeEventListener('playback-state-change', this.onPlaybackUpdate);
+    this.removeEventListener('playback-state-changed', this.onPlaybackUpdate);
     window.removeEventListener('assist-credentials-change', this.onCredentialsChange);
     this.chatAbort?.abort();
     this.showClipboardNotice(null);
@@ -2098,8 +2116,14 @@ export class ScenarioPage extends LitElement {
    * spatial input. Note membership is still model state and therefore does
    * not fork: switching projection remaps the existing selection in place. */
   private onNoteSelected = (
-    event: CustomEvent<{ projection?: 'notation' | 'tab' }>
+    event: CustomEvent<{ projection?: 'notation' | 'tab'; noteId?: string }>
   ) => {
+    const key=event.detail.noteId;
+    if(key && this.performance){
+      const candidates=this.performance.written.filter(w=>w.noteKey===key).map(w=>w.ordinal);
+      const ordinal=chooseOrdinal(candidates,this.playback.ordinal,{explicitSeek:true,cycle:this.clickedPlaybackKey===key});
+      this.clickedPlaybackKey=key;if(ordinal!==null)this.renderRoot.querySelector<Player>('mnx-player')?.seek(ordinal);
+    }
     const projection = event.detail.projection;
     if (!this.session || !projection || projection === this.session.projection) return;
     this.flushPendingFret();
@@ -3141,6 +3165,10 @@ export class ScenarioPage extends LitElement {
           title="drag to resize"
           @pointerdown=${this.onPanelDrag}
         ></div>
+        <mnx-player .performance=${this.performance} .document=${this.session?.doc}
+          .documentId=${this.scenarioId} .initialOrdinal=${this.routeSeekConsumed?null:this.at}
+          @seek=${()=>{this.routeSeekConsumed=true;}}></mnx-player>
+        ${this.performanceError?html`<p role="alert">${this.performanceError}</p>`:nothing}
         <div class="panel-tabs">
           ${tabs.map(
             t => html`

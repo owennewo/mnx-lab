@@ -7,7 +7,7 @@ import {
   playbackStateContext,
   selectionContext
 } from './mnxContext.ts';
-import type { PlaybackState, SelectionContext } from './mnxContext.ts';
+import type { PlaybackState, PlaybackOccurrence, SelectionContext } from './mnxContext.ts';
 import { MnxDocument, MnxPart, MnxTuningEntry, declaredStaffKind } from '../model/mnx.ts';
 import {
   resolveTabSetup,
@@ -544,6 +544,11 @@ export class DocumentViewer extends LitElement {
         fill: color-mix(in oklab, var(--accent), var(--paper-ink) 65%) !important;
       }
 
+      :host #projection-container svg [data-source-id].playback-ink,
+      :host([selection-inactive]) #projection-container svg [data-source-id].playback-ink {
+        fill: var(--mnx-playback, light-dark(#245daa, #8ebcff)) !important;
+      }
+
       /* Emit-side hide (docs/core-viewer-surface.md): diagnostic badges sit
          in the margin and reclaim no space, so CSS is the honest tool. A
          layout-side feature must never be hidden this way — it would leave a
@@ -697,10 +702,10 @@ export class DocumentViewer extends LitElement {
   }
 
   updated(changed: Map<string | number | symbol, unknown>) {
+    if(changed.has('playbackState')){this.paintPlayback();if(this.playbackState?.followPlayback)this.revealPlayback();}
     this.toggleAttribute('data-hide-badges', this.hiddenFeatures().includes('badges'));
     if (
       changed.has('mnxDoc') ||
-      changed.has('playbackState') ||
       changed.has('selection') ||
       changed.has('view') ||
       changed.has('density') ||
@@ -781,7 +786,7 @@ export class DocumentViewer extends LitElement {
     const commonOpts = {
       mnx: this.mnxDoc.mnxJson,
       width,
-      activeNoteIds: this.playbackState?.highlight.map(occurrence => occurrence.noteKey) ?? [],
+      activeNoteIds: [], // Playback is a paint overlay, independent of layout and selection.
       selectedNoteIds: this.selection?.selectedNoteIds ?? [],
       selectedEventIds: this.selection?.selectedEventIds ?? [],
       onNoteClick,
@@ -995,6 +1000,7 @@ export class DocumentViewer extends LitElement {
       );
     }
 
+    this.paintPlayback();
     if (this.playbackState?.followPlayback && this.playbackState.ordinal !== null) this.revealPlayback();
     this.emitSelectionAnchor();
     if (this.followQueued) {
@@ -1128,16 +1134,26 @@ export class DocumentViewer extends LitElement {
   private followQueued = false;
 
   /** Follow the live ink without touching the selection or editor cursor. */
+  private paintPlayback(){
+    const keys=new Set(this.playbackState?.highlight.map(w=>w.noteKey)??[]);
+    for(const ink of this.container?.querySelectorAll<SVGElement>('[data-source-id]')??[])
+      ink.classList.toggle('playback-ink',keys.has(ink.dataset.sourceId??''));
+  }
   private revealPlayback() {
-    const keys = new Set(this.playbackState?.highlight.map(occurrence => occurrence.noteKey) ?? []);
-    const ink = [...(this.container?.querySelectorAll<SVGElement>('[data-source-id]') ?? [])]
-      .find(node => keys.has(node.getAttribute('data-source-id') ?? ''));
-    if (!ink) return;
-    const box = ink.getBoundingClientRect();
-    const view = this.getBoundingClientRect();
-    const top = revealScrollDelta({ start: box.top, end: box.bottom },
-      { start: view.top, end: view.bottom }, DocumentViewer.REVEAL_PAD_PX);
-    if (Math.abs(top) >= 1) this.scrollBy({ top, behavior: 'auto' });
+    const occurrence=this.playbackState?.highlight[0];
+    if(occurrence)this.revealOccurrence(occurrence);
+  }
+  /** Public written-occurrence reveal. It never mutates selection or inspection. */
+  revealOccurrence(occurrence: PlaybackOccurrence): boolean {
+    const ink=[...(this.container?.querySelectorAll<SVGElement>('[data-source-id]')??[])]
+      .find(node=>node.getAttribute('data-source-id')===occurrence.noteKey);
+    if(!ink)return false;
+    this.revealBox(ink.getBoundingClientRect(),'auto');return true;
+  }
+  private revealBox(box: DOMRect, behavior: ScrollBehavior) {
+    const view=this.getBoundingClientRect();
+    const top=revealScrollDelta({start:box.top,end:box.bottom},{start:view.top,end:view.bottom},DocumentViewer.REVEAL_PAD_PX);
+    if(Math.abs(top)>=1)this.scrollBy({top,behavior});
   }
 
   /**
@@ -1161,20 +1177,7 @@ export class DocumentViewer extends LitElement {
       svg?.querySelector<SVGGElement>(':scope > g.cursor-ghost');
     const box = this.enclosureRect(settled ?? null);
     if (!box) return;
-    const view = this.getBoundingClientRect();
-    const delta = revealScrollDelta(
-      { start: box.top, end: box.bottom },
-      { start: view.top, end: view.bottom },
-      DocumentViewer.REVEAL_PAD_PX
-    );
-    // Sub-pixel deltas are rounding, not a selection off screen.
-    if (Math.abs(delta) < 1) return;
-    this.scrollBy({
-      top: delta,
-      behavior: globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-        ? 'auto'
-        : 'smooth'
-    });
+    this.revealBox(box,globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth');
   }
 
   private anchorScrollQueued = false;

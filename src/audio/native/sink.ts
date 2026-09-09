@@ -67,6 +67,8 @@ interface Voice {
   detune: Automation;
 }
 export interface NativeSinkOptions {
+  /** Master amplitude, independent of note velocities; defaults to 1. */
+  volume?: number;
   /** A host-owned live or offline context. It is never closed by the sink. */
   context?: BaseAudioContext;
   /** Optional host routing, from the same context. */
@@ -77,10 +79,13 @@ export interface NativeSinkOptions {
 export class NativeSink implements Sink {
   private context: BaseAudioContext | undefined;
   private owned = false;
+  private output?: GainNode;
+  private volume = 1;
   private disposed = false;
   private voices = new Set<Voice>();
   constructor(private options: NativeSinkOptions = {}) {
     this.context = options.context;
+    this.setVolume(options.volume ?? 1);
     if (options.destination && options.context !== options.destination.context)
       throw new Error('Destination must belong to the supplied context.');
   }
@@ -103,6 +108,21 @@ export class NativeSink implements Sink {
     )
       await (this.context as AudioContext).resume();
     this.live();
+  }
+  setVolume(volume: number): void {
+    this.live();
+    if (!Number.isFinite(volume) || volume < 0 || volume > 1)
+      throw new RangeError('Volume must be within [0, 1].');
+    this.volume = volume;
+    this.output?.gain.setTargetAtTime(volume, this.now(), 0.005);
+  }
+  private destination(): AudioNode {
+    if (!this.output) {
+      this.output = this.context!.createGain();
+      this.output.gain.value = this.volume;
+      this.output.connect(this.options.destination ?? this.context!.destination);
+    }
+    return this.output;
   }
   private voiceAt(id: string, time: number): Voice | undefined {
     return [...this.voices]
@@ -162,7 +182,7 @@ export class NativeSink implements Sink {
         const oscillator = context.createOscillator(),
           gain = context.createGain();
         oscillator.connect(gain);
-        gain.connect(this.options.destination ?? context.destination);
+        gain.connect(this.destination());
         voice = {
           id: event.voice,
           start: time,
@@ -230,6 +250,8 @@ export class NativeSink implements Sink {
       v.oscillator.onended = null;
     }
     this.voices.clear();
+    this.output?.disconnect();
+    this.output = undefined;
     if (this.owned && this.context && 'close' in this.context)
       void (this.context as AudioContext).close();
   }

@@ -34,13 +34,17 @@ export interface Route {
   page: 'home' | 'scenario' | 'document' | 'objects' | 'converters';
   id?: string;
   view?: string;
+  at?: number;
   /** The schema object on #/objects/<def>; absent on the index itself. */
   def?: string;
 }
 
 export function parseHash(hash: string): Route {
-  const scenario = /^#\/scenario\/([^?]+)(?:\?view=([a-z-]+))?$/.exec(hash);
-  if (scenario) return { page: 'scenario', id: decodeURIComponent(scenario[1]), view: scenario[2] };
+  const scenario = /^#\/scenario\/([^?]+)(?:\?(.*))?$/.exec(hash);
+  if (scenario) {const params=new URLSearchParams(scenario[2]??'');const at=params.get('at');
+    try{return {page:'scenario',id:decodeURIComponent(scenario[1]),view:params.get('view')??undefined,
+      at:at!==null && /^(0|[1-9][0-9]*)$/.test(at) && Number.isSafeInteger(Number(at))?Number(at):undefined};}catch{return {page:'home'};}}
+
   const document = /^#\/document(?:\?view=([a-z-]+))?$/.exec(hash);
   if (document) return { page: 'document', view: document[1] };
   const objects = /^#\/objects(?:\/([a-z0-9-]+))?$/.exec(hash);
@@ -49,8 +53,9 @@ export function parseHash(hash: string): Route {
   return { page: 'home' };
 }
 
-export function scenarioHref(id: string, view?: string): string {
-  return `#/scenario/${encodeURIComponent(id).replace(/%2F/g, '/')}${view ? `?view=${view}` : ''}`;
+export function scenarioHref(id: string, view?: string, at?: number): string {
+  const params=new URLSearchParams();if(view)params.set('view',view);if(at!==undefined && Number.isSafeInteger(at) && at>=0)params.set('at',String(at));
+  return `#/scenario/${encodeURIComponent(id).replace(/%2F/g, '/')}${params.size?'?'+params:''}`;
 }
 
 export function documentHref(view?: string): string {
@@ -1173,6 +1178,7 @@ export class WorkbenchApp extends LitElement {
         ${this.route.page === 'scenario'
           ? html`<mnx-scenario-page
               .scenarioId=${this.route.id ?? ''}
+              .at=${this.route.at??null}
               .view=${this.route.view ?? ''}
               .documentFocus=${this.documentFocus}
               .panelHidden=${this.panelHidden}

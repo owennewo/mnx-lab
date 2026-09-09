@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { createServer } from 'vite';
+import { createServer, build } from 'vite';
 import { loadCorpus } from './check-scenarios.mjs';
 import { buildQueue } from './verify-scenarios.mjs';
 import { performanceHash } from './performance-evidence.mjs';
@@ -31,10 +31,14 @@ const wanted = args.length
   : new Set([...queue.blocked, ...queue.stale, ...queue.neverSeen].map((e) => e.id));
 const server = await createServer({
   configFile: false,
+  optimizeDeps: { noDiscovery: true, include: [] },
   server: { middlewareMode: true },
   appType: 'custom',
 });
 try {
+  const bundle=await build({configFile:false,logLevel:'error',build:{write:false,copyPublicDir:false,target:'es2022',lib:{entry:'harness/browser/performance-listen.ts',name:'PerformanceListen',formats:['iife']}}});
+  const listenCode=(Array.isArray(bundle)?bundle[0]:bundle).output.find(item=>item.type==='chunk').code.replaceAll('</script','<\\/script');
+  const safeJson=value=>JSON.stringify(value).replaceAll('<','\\u003c');
   const { parsePerformance } = await server.ssrLoadModule('/src/audio/performance.ts');
   const { exportMidi } = await server.ssrLoadModule('/src/audio/midiFile.ts');
   const receipt = { formatVersion: 1, items: {} };
@@ -74,12 +78,12 @@ try {
       (e) => e.id === scenario.id,
     );
     sections.push(
-      `<section id="${escape(scenario.id)}"><h2>${escape(meta.title)}</h2><p>${escape(scenario.id)} · ${escape(entry?.performanceState ?? 'unknown')} · ${hash}</p><p>${escape(meta.description)}</p>${engraving}<p>${midiLink} · MIDI is a bounded export; written identities do not survive.</p><div class="pair">${table('Written occurrences', performance.written)}${table('Sounding events', performance.sounding)}</div>${table('Voices', performance.voices)}${table('Performed measures', performance.measures)}${table('Tempo (quarter BPM)', performance.tempo)}${table('Source map', performance.sourceMap)}${table('Compiler diagnostics', performance.diagnostics)}${table('MIDI diagnostics', verdict.diagnostics)}${table('MIDI channel allocation', verdict.allocation ?? [])}</section>`,
+      `<section data-listen id="${escape(scenario.id)}"><h2>${escape(meta.title)}</h2><p>${escape(scenario.id)} · ${escape(entry?.performanceState ?? 'unknown')} · ${hash}</p><p>${escape(meta.description)}</p><div class="listen"><h3>Listen</h3><label><input class="listen-follow" type="checkbox" checked> Follow playback</label><mnx-player></mnx-player></div><script type="application/json" class="performance-data">${safeJson(performance)}</script><script type="application/json" class="document-data">${safeJson(JSON.parse(fs.readFileSync(path.join(scenario.dir,'document.mnx.json'),'utf8')))}</script>${engraving}<p>${midiLink} · MIDI is a bounded export; written identities do not survive.</p><div class="pair">${table('Written occurrences', performance.written)}${table('Sounding events', performance.sounding)}</div>${table('Voices', performance.voices)}${table('Performed measures', performance.measures)}${table('Tempo (quarter BPM)', performance.tempo)}${table('Source map', performance.sourceMap)}${table('Compiler diagnostics', performance.diagnostics)}${table('MIDI diagnostics', verdict.diagnostics)}${table('MIDI channel allocation', verdict.allocation ?? [])}</section>`,
     );
     receipt.items[scenario.id] = { performanceHash: hash };
   }
   const font = fs.readFileSync('public/smufl/Bravura.woff2').toString('base64');
-  const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Performance evidence review</title><style>@font-face{font-family:Bravura;src:url(data:font/woff2;base64,${font}) format("woff2")}body{font:15px system-ui;margin:24px;color:#202020;background:#faf9f6}section{border-top:2px solid #888;margin-top:40px;padding-top:16px}h2{margin-bottom:8px}h3{margin-top:24px}.scroll{overflow:auto;max-height:560px;border:1px solid #ccc}table{border-collapse:collapse;font:12px monospace;white-space:nowrap;width:100%}th,td{padding:7px 10px;border-bottom:1px solid #ddd;text-align:left}th{position:sticky;top:0;background:#eee}figure{overflow:auto;background:white;padding:12px}figure svg{max-width:100%;height:auto}figcaption{font-size:12px;color:#555}.pair{display:grid;grid-template-columns:1fr;gap:8px}a{color:#154daa}</style><h1>Performance evidence review</h1><p>${sections.length} scenarios. Time values are exact whole-note fractions; ordinals are zero-based. Review the engraving and both linked tables. This page does not approve anything.</p>${sections.join('\n')}</html>`;
+  const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Performance evidence review</title><style>@font-face{font-family:Bravura;src:url(data:font/woff2;base64,${font}) format("woff2")}body{font:15px system-ui;margin:24px;color:#202020;background:#faf9f6}section{border-top:2px solid #888;margin-top:40px;padding-top:16px}h2{margin-bottom:8px}h3{margin-top:24px}.scroll{overflow:auto;max-height:560px;border:1px solid #ccc}table{border-collapse:collapse;font:12px monospace;white-space:nowrap;width:100%}th,td{padding:7px 10px;border-bottom:1px solid #ddd;text-align:left}th{position:sticky;top:0;background:#eee}figure{overflow:auto;background:white;padding:12px}figure svg{max-width:100%;height:auto}figcaption{font-size:12px;color:#555}.pair{display:grid;grid-template-columns:1fr;gap:8px}a{color:#154daa}.playing{fill:#175eb5!important;stroke:#175eb5!important}.listen{position:sticky;top:0;background:#faf9f6;z-index:2;max-width:700px}[data-source-id]{cursor:pointer}</style><h1>Performance evidence review</h1><p>${sections.length} scenarios. Time values are exact whole-note fractions; ordinals are zero-based. Review the engraving and both linked tables. This page does not approve anything.</p>${sections.join('\n')}<script>${listenCode}</script></html>`;
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, html);
   fs.writeFileSync(`${output}.receipt.json`, JSON.stringify(receipt, null, 2) + '\n');
