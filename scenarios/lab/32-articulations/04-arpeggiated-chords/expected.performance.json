@@ -1,0 +1,352 @@
+{
+  "formatVersion": 1,
+  "written": [
+    {
+      "id": "w0:a1",
+      "noteKey": "a1",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s0"
+      ]
+    },
+    {
+      "id": "w0:a2",
+      "noteKey": "a2",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s1"
+      ]
+    },
+    {
+      "id": "w0:a3",
+      "noteKey": "a3",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s2"
+      ]
+    },
+    {
+      "id": "w0:b1",
+      "noteKey": "b1",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "1",
+        "den": "2"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "1",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s3"
+      ]
+    },
+    {
+      "id": "w0:b2",
+      "noteKey": "b2",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "1",
+        "den": "2"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "1",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s4"
+      ]
+    },
+    {
+      "id": "w0:b3",
+      "noteKey": "b3",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "1",
+        "den": "2"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "2"
+      },
+      "position": {
+        "num": "1",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "soundingIds": [
+        "s5"
+      ]
+    }
+  ],
+  "sounding": [
+    {
+      "id": "s0",
+      "voice": "p0:note:w0:a1",
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "midi": 60,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:a1"
+      ]
+    },
+    {
+      "id": "s1",
+      "voice": "p0:note:w0:a2",
+      "position": {
+        "num": "1",
+        "den": "64"
+      },
+      "duration": {
+        "num": "31",
+        "den": "64"
+      },
+      "midi": 64,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:a2"
+      ]
+    },
+    {
+      "id": "s2",
+      "voice": "p0:note:w0:a3",
+      "position": {
+        "num": "1",
+        "den": "32"
+      },
+      "duration": {
+        "num": "15",
+        "den": "32"
+      },
+      "midi": 67,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:a3"
+      ]
+    },
+    {
+      "id": "s3",
+      "voice": "p0:note:w0:b1",
+      "position": {
+        "num": "1",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "midi": 62,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:b1"
+      ]
+    },
+    {
+      "id": "s4",
+      "voice": "p0:note:w0:b2",
+      "position": {
+        "num": "1",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "midi": 65,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:b2"
+      ]
+    },
+    {
+      "id": "s5",
+      "voice": "p0:note:w0:b3",
+      "position": {
+        "num": "1",
+        "den": "2"
+      },
+      "duration": {
+        "num": "1",
+        "den": "2"
+      },
+      "midi": 69,
+      "velocity": 80,
+      "curve": [],
+      "writtenIds": [
+        "w0:b3"
+      ]
+    }
+  ],
+  "voices": [
+    {
+      "id": "p0:note:w0:a1",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w0:a2",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w0:a3",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w0:b1",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w0:b2",
+      "partIndex": 0
+    },
+    {
+      "id": "p0:note:w0:b3",
+      "partIndex": 0
+    }
+  ],
+  "tempo": [
+    {
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "quarterBpm": {
+        "num": "120",
+        "den": "1"
+      }
+    }
+  ],
+  "measures": [
+    {
+      "ordinal": 0,
+      "measureIndex": 0,
+      "occurrence": 1,
+      "iteration": 1,
+      "from": {
+        "num": "0",
+        "den": "1"
+      },
+      "until": {
+        "num": "1",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricDuration": {
+        "num": "1",
+        "den": "1"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    }
+  ],
+  "sourceMap": [
+    {
+      "kind": "metric",
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      },
+      "metricPosition": {
+        "num": "0",
+        "den": "1"
+      },
+      "position": {
+        "num": "0",
+        "den": "1"
+      },
+      "duration": {
+        "num": "1",
+        "den": "1"
+      }
+    }
+  ],
+  "diagnostics": []
+}

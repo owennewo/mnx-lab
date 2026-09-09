@@ -14,7 +14,12 @@ export interface MidiAllocation {
   independent: boolean;
 }
 export type MidiResult =
-  | { ok: true; bytes: Uint8Array; diagnostics: MidiDiagnostic[]; allocation: MidiAllocation[] }
+  | {
+      ok: true;
+      bytes: Uint8Array;
+      diagnostics: MidiDiagnostic[];
+      allocation: MidiAllocation[];
+    }
   | { ok: false; diagnostics: MidiDiagnostic[] };
 export function quantizeTick(time: Rational): number {
   if (time.num < 0n) throw new RangeError('MIDI positions must be nonnegative.');
@@ -189,6 +194,21 @@ export function exportMidi(performance: Performance): MidiResult {
         });
         continue;
       }
+      if (s.velocity <= 0) {
+        diagnostics.push({
+          code: 'silent-note',
+          soundingId: s.id,
+          message: 'Zero-velocity sounding event is silent and omitted from MIDI.',
+        });
+        continue;
+      }
+      if (s.noReattack || s.timbre?.length || s.damped)
+        diagnostics.push({
+          code: 'omitted-voice-expression',
+          soundingId: s.id,
+          message:
+            'MIDI retriggers logical legato transitions and omits harmonic/damped timbre hints; numeric pitch, velocity and duration remain.',
+        });
       const pitch = Math.round(s.midi),
         fractional = (s.midi - pitch) * 100;
       if (!initialized.has(channel)) {
@@ -310,7 +330,12 @@ export function exportMidi(performance: Performance): MidiResult {
     ];
     for (const [, events] of [...tracks.entries()].sort((a, b) => a[0] - b[0]))
       data.push(...track(events));
-    return { ok: true, bytes: new Uint8Array(data), diagnostics, allocation: allocations };
+    return {
+      ok: true,
+      bytes: new Uint8Array(data),
+      diagnostics,
+      allocation: allocations,
+    };
   } catch (error) {
     if (error instanceof RangeError)
       return {

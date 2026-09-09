@@ -9,13 +9,33 @@ export type SinkVoice = string;
  * execute in array order. All numeric values must be finite, offsets/rampSeconds
  * nonnegative, hz positive, and velocity within [0, 1].
  */
-export type SinkEvent = { readonly offset: number; readonly voice: SinkVoice } & (
-  | { readonly kind: 'attack'; readonly hz: number; readonly velocity: number }
+export type SinkEvent = {
+  readonly offset: number;
+  readonly voice: SinkVoice;
+} & (
+  | {
+      readonly kind: 'attack';
+      readonly hz: number;
+      readonly velocity: number;
+      readonly damped?: boolean;
+      readonly timbre?: readonly string[];
+    }
   | { readonly kind: 'release' }
   /** Preserve oscillator/sample phase and envelope; retain the current bend. */
-  | { readonly kind: 'pitch'; readonly hz: number; readonly rampSeconds?: number }
+  | {
+      readonly kind: 'pitch';
+      readonly hz: number;
+      readonly rampSeconds?: number;
+      readonly velocity?: number;
+      readonly damped?: boolean;
+      readonly timbre?: readonly string[];
+    }
   /** Absolute cents from the base pitch, not an accumulated delta. */
-  | { readonly kind: 'bend'; readonly cents: number; readonly rampSeconds?: number }
+  | {
+      readonly kind: 'bend';
+      readonly cents: number;
+      readonly rampSeconds?: number;
+    }
 );
 
 export interface Sink {

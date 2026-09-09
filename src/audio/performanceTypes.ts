@@ -26,6 +26,7 @@ export interface SoundingEvent<T = Rational> {
   curve: PitchCurve<T>[];
   writtenIds: string[];
   noReattack?: boolean;
+  damped?: boolean;
   timbre?: string[];
 }
 export interface PerformanceMeasure<T = Rational> {
@@ -42,7 +43,14 @@ export interface PerformanceMeasure<T = Rational> {
   duration: T;
 }
 export type SourceSegment<T = Rational> =
-  | { kind: 'metric'; ordinal: number; metricOffset: T; metricPosition: T; position: T; duration: T }
+  | {
+      kind: 'metric';
+      ordinal: number;
+      metricOffset: T;
+      metricPosition: T;
+      position: T;
+      duration: T;
+    }
   | Insertion<T>;
 export interface PerformanceVoice {
   id: string;
@@ -59,7 +67,12 @@ export interface Performance<T = Rational> {
   tempo: TempoChange<T>[];
   measures: PerformanceMeasure<T>[];
   sourceMap: SourceSegment<T>[];
-  diagnostics: { code: string; message: string; ordinal?: number; noteKey?: string }[];
+  diagnostics: {
+    code: string;
+    message: string;
+    ordinal?: number;
+    noteKey?: string;
+  }[];
 }
 export type PerformanceJSON = Performance<RationalJSON>;
 /** Resource errors stop the whole affected compilation; no partial success. */

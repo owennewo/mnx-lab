@@ -44,10 +44,6 @@ proposals that name their campaign.
 ## Contents
 
 ### proposed/
-- **[core-player-expression.md](proposed/core-player-expression.md)** — campaign item 8:
-  dynamics, articulations, arpeggio and the guitar techniques as curves and voice flags
-  (`noReattack` on the event type); tempo-relative vibrato and harmonics that preserve
-  sounded pitch while validating technique metadata. Every number a recorded convention.
 - **[core-player-midi-oracle.md](proposed/core-player-midi-oracle.md)** — campaign item 9:
   MuseScore or Verovio; **observable content compared strictly**, ambiguous bar order
   reported as unobservable and timing aligned around interpretive shifts; a three-scenario experiment as soon as a tool is chosen, so the
@@ -182,6 +178,10 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+- **[core-player-expression.md](inprogress/core-player-expression.md)** — campaign item 8:
+  dynamics, articulations, arpeggio and the guitar techniques as curves and voice flags
+  (`noReattack` on the event type); tempo-relative vibrato and harmonics that preserve
+  sounded pitch while validating technique metadata. Every number a recorded convention.
 
 
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,

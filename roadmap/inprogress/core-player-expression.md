@@ -1,6 +1,6 @@
 # Expression and technique — what the marks mean, as numbers
 
-> **Status: proposed 2026-09-08, revised the same day.** Campaign:
+> **Status: implemented 2026-09-09; validation and landing in progress.** Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 8. Needs items 5 and 6;
 > bends are audible only through item 6's per-string voices — the tab-fidelity
 > dependency on the sound source the campaign called out.
@@ -61,3 +61,14 @@ a source attack followed by a target `noReattack` transition in the sounding
 list: two written occurrences, one envelope attack. The target changes pitch while
 retaining voice continuity; a standalone seek into the target reconstructs an audible
 voice instead of applying `noReattack` to silence.
+
+## Implementation
+
+The conventions and supported limitations are numbered in
+[docs/player-expression.md](../../docs/player-expression.md). Expression is a pure
+compiler stage; the native sink consumes numeric pitch/velocity and timbre hints.
+The existing player and `/verify` Listen use it without new UI controls.
+
+Review debt: [player-expression — 2026-09-09](lab-verify.md#player-expression--2026-09-09).
+The batch introduces 16 expression baselines and updates four existing baselines;
+engraving goldens and approval provenance remain unchanged.

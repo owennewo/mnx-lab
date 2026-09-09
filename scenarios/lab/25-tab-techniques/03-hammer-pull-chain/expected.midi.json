@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "sha256": "bee7a5465e9bd3e2e7218339df1b1e0aade1a31217bfcf6f73b54ec988239e71",
+  "allocation": [
+    {
+      "partIndex": 0,
+      "channels": [
+        0
+      ],
+      "independent": true
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": "omitted-voice-expression",
+      "soundingId": "s1",
+      "message": "MIDI retriggers logical legato transitions and omits harmonic/damped timbre hints; numeric pitch, velocity and duration remain."
+    },
+    {
+      "code": "omitted-voice-expression",
+      "soundingId": "s2",
+      "message": "MIDI retriggers logical legato transitions and omits harmonic/damped timbre hints; numeric pitch, velocity and duration remain."
+    },
+    {
+      "code": "omitted-voice-expression",
+      "soundingId": "s3",
+      "message": "MIDI retriggers logical legato transitions and omits harmonic/damped timbre hints; numeric pitch, velocity and duration remain."
+    }
+  ]
+}

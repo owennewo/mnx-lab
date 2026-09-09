@@ -81,6 +81,44 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Player expression — 2026-09-09
+
+Cause: [core-player-expression](core-player-expression.md), campaign item 8.
+Sixteen newly enrolled scenarios plus four changed existing performances (20 total)
+need review of `expected.performance.json` and `expected.midi.json`. Existing SVGs,
+primitives, statuses and approval provenance are unchanged. Registration is not approval.
+
+Look for: velocity follows scoped dynamics, sfz does not persist, staccato/palm mute
+shorten sound without shortening cursor spans, arpeggios follow their arrows, bend
+curves agree with the drawing, hammer chains have logical `noReattack` targets,
+vibrato follows tempo, and harmonics preserve sounded pitch. Listen through the
+review page; MIDI's legato/timbre omissions and unsupported-mark diagnostics are
+explicit. Missing-end hairpins and unsupported harmonic validation need attention.
+
+Scenario set (paths under `scenarios/`):
+
+- `lab/25-tab-techniques/01-bend-and-release`
+- `lab/25-tab-techniques/02-slides`
+- `lab/25-tab-techniques/03-hammer-pull-chain`
+- `lab/25-tab-techniques/04-vibrato-and-palm-mute`
+- `lab/25-tab-techniques/05-natural-harmonics`
+- `lab/25-tab-techniques/06-bend-shapes`
+- `lab/30-dynamics/01-all-dynamic-marks`
+- `lab/30-dynamics/02-accent-prefix-suffix`
+- `lab/30-dynamics/03-hairpin-and-relative`
+- `lab/30-dynamics/04-diminuendo-across-bars`
+- `lab/32-articulations/01-rare-articulations`
+- `lab/32-articulations/02-unrendered-marks`
+- `lab/32-articulations/04-arpeggiated-chords`
+- `lab/32-articulations/05-fermatas-on-bars-and-rests`
+- `lab/40-navigation/02-repeats-and-marks-on-tab`
+- `spec/articulations`
+- `spec/dynamic-accents`
+- `spec/dynamics`
+- `spec/single-note-tremolos`
+- `spec/tremolos-multi-note`
+
+
 ### Tighter paired notation/tab spacing (2026-09-08)
 
 Owner: user-requested spacing trial, branch `core-tighter-tab-gap`; no roadmap doc.

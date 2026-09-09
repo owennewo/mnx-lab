@@ -421,7 +421,8 @@ export interface MnxDynamic {
   /** Hairpin direction; paired with `end`. Renderer gap: not drawn yet. */
   wedgeType?: 'increasing' | 'decreasing';
   end?: {
-    fraction: [number, number];
+    measure: string;
+    position: { fraction: [number, number] };
   };
   relativeValue?: 'louder' | 'softer';
   /** The dynamic held *after* the accent's attack — only valid for

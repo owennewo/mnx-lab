@@ -87,7 +87,7 @@
         "den": "8"
       },
       "midi": 72,
-      "velocity": 80,
+      "velocity": 100,
       "curve": [],
       "writtenIds": [
         "w0:@m0.v0.e0.n0"

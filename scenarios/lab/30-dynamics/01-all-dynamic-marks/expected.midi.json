@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "sha256": "3ba179b19d961618d1a047cb21480734ba95d62e95d97e6bfc538d0b00088e0e",
+  "allocation": [
+    {
+      "partIndex": 0,
+      "channels": [
+        0
+      ],
+      "independent": true
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": "silent-note",
+      "soundingId": "s25",
+      "message": "Zero-velocity sounding event is silent and omitted from MIDI."
+    },
+    {
+      "code": "silent-note",
+      "soundingId": "s26",
+      "message": "Zero-velocity sounding event is silent and omitted from MIDI."
+    },
+    {
+      "code": "silent-note",
+      "soundingId": "s27",
+      "message": "Zero-velocity sounding event is silent and omitted from MIDI."
+    }
+  ]
+}

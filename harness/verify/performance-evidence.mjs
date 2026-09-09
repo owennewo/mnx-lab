@@ -26,7 +26,19 @@ export function performanceCandidate(doc) {
     if (!value || typeof value !== 'object') return;
     if (
       ['tuplet', 'grace', 'tremolo'].includes(value.type) ||
-      ['ties', 'tempos', 'repeatStart', 'repeatEnd', 'jump', 'fermata', 'tremolo'].some((key) => key in value)
+      [
+        'ties',
+        'tempos',
+        'repeatStart',
+        'repeatEnd',
+        'jump',
+        'fermata',
+        'tremolo',
+        'dynamics',
+        'arpeggios',
+        'markings',
+        'technique',
+      ].some((key) => key in value)
     )
       found = true;
     Object.values(value).forEach(walk);

@@ -35,7 +35,12 @@ export interface TransportSnapshot {
   source: SourceSegment | undefined;
 }
 export type TransportEvent =
-  | { kind: 'onset' | 'end'; writtenId: string; ordinal: number; audioTime: number }
+  | {
+      kind: 'onset' | 'end';
+      writtenId: string;
+      ordinal: number;
+      audioTime: number;
+    }
   | { kind: 'state'; snapshot: TransportSnapshot };
 export interface TransportOptions {
   lookaheadSeconds?: number;
@@ -153,12 +158,21 @@ export class Transport {
         sounding: e,
         event:
           e.noReattack && previous
-            ? { kind: 'pitch', voice: e.voice, hz: 440 * 2 ** ((e.midi - 69) / 12) }
+            ? {
+                kind: 'pitch',
+                voice: e.voice,
+                hz: 440 * 2 ** ((e.midi - 69) / 12),
+                velocity: e.velocity / 127,
+                ...(e.damped ? { damped: true } : {}),
+                ...(e.timbre ? { timbre: e.timbre } : {}),
+              }
             : {
                 kind: 'attack',
                 voice: e.voice,
                 hz: 440 * 2 ** ((e.midi - 69) / 12),
                 velocity: e.velocity / 127,
+                ...(e.damped ? { damped: true } : {}),
+                ...(e.timbre ? { timbre: e.timbre } : {}),
               },
       } as Action);
       if (!next)
@@ -362,6 +376,8 @@ export class Transport {
         voice: event.voice,
         hz: event.hz,
         velocity: action.sounding.velocity / 127,
+        ...(action.sounding.damped ? { damped: true } : {}),
+        ...(action.sounding.timbre ? { timbre: action.sounding.timbre } : {}),
         offset: 0,
       };
     if (action.until && event.kind === 'bend')
@@ -385,9 +401,16 @@ export class Transport {
             voice: e.voice,
             hz: 440 * 2 ** ((e.midi - 69) / 12),
             velocity: e.velocity / 127,
+            ...(e.damped ? { damped: true } : {}),
+            ...(e.timbre ? { timbre: e.timbre } : {}),
             offset: 0,
           },
-          { kind: 'bend', voice: e.voice, cents: centsAt(e, offset), offset: 0 },
+          {
+            kind: 'bend',
+            voice: e.voice,
+            cents: centsAt(e, offset),
+            offset: 0,
+          },
         ],
         v.audio,
       );
@@ -446,7 +469,11 @@ export class Transport {
       }
       if (v.endAudio >= horizon) break;
       this.sink.schedule(
-        this.performance.voices.map((voice) => ({ kind: 'release', voice: voice.id, offset: 0 })),
+        this.performance.voices.map((voice) => ({
+          kind: 'release',
+          voice: voice.id,
+          offset: 0,
+        })),
         v.endAudio,
       );
       if (!this.loop) {

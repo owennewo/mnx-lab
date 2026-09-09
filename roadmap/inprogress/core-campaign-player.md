@@ -167,7 +167,7 @@ run any time before 6.
 | 5 | [Performance compiler and MIDI export](../complete/core-player-performance.md) | `audio/performance.ts`: two linked lists (written occurrences, sounding events), rational time, ties merged after unrolling, nested tuplets (with the identity change `noteWalk.ts` needs), grace, tremolo, fermatas, `pitch` read as sounded. `expected.performance.json` with the verification path owned. **MIDI as a bounded export** with channel allocation, overflow, bend range and quantisation stated. | reviewer | the golden; item 9 where it can see | complete; performance review pending |
 | 6 | [Transport](../complete/core-player-transport.md) | `audio/transport.ts` pure over an injected clock and sink, fake-clock tests: audio-clock-timestamped onsets, seek into sustained notes, cancel and voice release, controller reconstruction on rate change, loops across ties. `audio/<backend>/` with independently addressable voices and per-string ownership for fretted parts. | reviewer | fake-clock suite; a browser Offline smoke for the sink | complete |
 | 7 | [Player element, written view](../complete/core-player-element.md) | `<mnx-player>` over the written score: transport bar, position as bar/iteration/beat, **performed-order table**, playback highlight separate from selection, click-to-seek, Listen on `/verify`. **The first reviewer milestone.** | reviewer | element census; embed smoke on both formats | complete; human review pending |
-| 8 | [Expression and technique](../proposed/core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | proposed |
+| 8 | [Expression and technique](core-player-expression.md) | Dynamics, articulations, arpeggio, guitar curves and voice flags; tempo-relative vibrato; harmonics preserve sounded pitch with technique validation; conventions numbered. | reviewer | performance golden; ear for what MIDI cannot see | implemented; validation and landing in progress |
 | 9 | [MIDI oracle](../proposed/core-player-midi-oracle.md) | MuseScore or Verovio performing the W3C comparisons; observable pitch/navigation compared strictly; ambiguous bar order marked unobservable; timing aligned around interpretive regions. A small experiment as soon as a tool is chosen, the full baseline after item 5. | reviewer | itself | proposed — **needs a dev-environment decision** |
 | 10 | [Unrolled engraving](../proposed/core-player-unrolled-view.md) | An **occurrence-aware layout plan**: `planHorizontal` takes performed entries, every dependent index (curves, beams, lyrics, ottavas, dynamics) resolved per occurrence, inherited clef/key state correct at jump targets. Opt-in goldens, path owned. | reviewer | opt-in `expected.unrolled.svg` through `/verify` | proposed — after 7 |
 | 11 | [WebMIDI out](../proposed/core-player-webmidi.md) | A second sink; the export's channel plan on the wire; never the default. | practice | the writer's tests | proposed — after reviewer items 1–10 |
@@ -424,3 +424,27 @@ The shipped viewer entry stays unchanged until item 7 consumes playback.
   the element only requests a level. The offline smoke measures attenuation.
   Both ESM/IIFE smokes prove playback, context, seek cycling, inspection, replacement
   and disposal. Existing scenario goldens and verification records are unchanged.
+
+### Item 8 — expression and technique (2026-09-09)
+
+- Pure interpretation in `audio/expression.ts`, after ties and before string
+  re-strikes. The [numbered conventions](../../docs/player-expression.md) cover
+  scoped dynamics, hairpins, articulation, arpeggio, tremolo intensity, guitar
+  curves and harmonic validation. Written occurrence spans remain unchanged.
+- `damped` joins the sounding flags; pitch transitions carry target velocity to
+  the sink. Native harmonic hints use a triangle patch with the same fundamental.
+  MIDI explicitly reports retriggered legato and omitted timbre semantics.
+- The committed schema's dynamic end is a measure id plus rhythmic position; the
+  old TypeScript shape was stale. Cross-bar interpolation now uses compiler
+  lengths. Missing hairpin ends remain diagnosed, not guessed.
+- Harmonic touching metadata is checked only for known natural nodes; artificial
+  harmonics cannot use open-string arithmetic. Sounded pitch is never rewritten.
+- Offline rendering exposed a native automation discontinuity: scheduling a bend
+  reset and the following ramp could erase the source's incoming ramp endpoint.
+  Preserve the left-hand endpoint and separate it from the step by one sample.
+  The compiled bend and hammer now both measure 493.883 Hz, with target attenuation
+  55/80 and harmonic third-partial ratio 1/9.
+- [Review debt](lab-verify.md#player-expression--2026-09-09): 16 new baselines and
+  four changed existing baselines. Engraving output and provenance are unchanged;
+  automated buffer checks are not listening approval. Item 9 remains the
+  independent MIDI oracle obligation.

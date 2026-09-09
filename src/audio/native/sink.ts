@@ -29,10 +29,13 @@ class Automation {
   }
   set(time: number, value: number, ramp = 0) {
     const held = this.at(time);
-    const crossing = this.points.find((p) => p.time >= time)?.linear ?? false;
+    const incoming = this.points.find((p) => p.time >= time);
+    const crossing = incoming?.linear ?? false;
+    const left = incoming?.time === time && incoming.linear ? incoming.value : held;
     this.points = this.points.filter((p) => p.time < time || p.time > time + ramp);
-    if (crossing) this.points.push({ time, value: held, linear: true });
-    if (!crossing || !ramp) this.points.push({ time, value: ramp ? held : value, linear: false });
+    if (crossing) this.points.push({ time, value: left, linear: true });
+    if (!crossing || !ramp || left !== held)
+      this.points.push({ time, value: ramp ? held : value, linear: false });
     if (ramp) this.points.push({ time: time + ramp, value, linear: true });
     this.points.sort((a, b) => a.time - b.time);
     this.render();
@@ -49,9 +52,16 @@ class Automation {
     const value = this.at(now);
     this.param.cancelScheduledValues(now);
     this.param.setValueAtTime(value, now);
-    for (const point of this.points)
+    for (const [index, point] of this.points.entries())
       if (point.time > now) {
-        if (point.linear) this.param.linearRampToValueAtTime(point.value, point.time);
+        const next = this.points[index + 1];
+        // Web Audio collapses a ramp endpoint followed by a same-time step.
+        // End the incoming ramp one sample before the discontinuity so a
+        // legato bend reset cannot pull the preceding note's curve downward.
+        if (point.linear && next?.time === point.time && !next.linear) {
+          const before = Math.max(now, point.time - 1 / this.context.sampleRate);
+          this.param.linearRampToValueAtTime(this.at(before), before);
+        } else if (point.linear) this.param.linearRampToValueAtTime(point.value, point.time);
         else this.param.setValueAtTime(point.value, point.time);
       }
   }
@@ -158,7 +168,7 @@ export class NativeSink implements Sink {
       )
         throw new RangeError('Invalid frequency.');
       if (
-        event.kind === 'attack' &&
+        (event.kind === 'attack' || (event.kind === 'pitch' && event.velocity !== undefined)) &&
         (!Number.isFinite(event.velocity) || event.velocity < 0 || event.velocity > 1)
       )
         throw new RangeError('Invalid velocity.');
@@ -181,6 +191,7 @@ export class NativeSink implements Sink {
         if (voice) this.releaseVoice(voice, time);
         const oscillator = context.createOscillator(),
           gain = context.createGain();
+        oscillator.type = event.timbre?.includes('harmonic') ? 'triangle' : 'sine';
         oscillator.connect(gain);
         gain.connect(this.destination());
         voice = {
@@ -210,9 +221,12 @@ export class NativeSink implements Sink {
         if (next) this.releaseVoice(voice, next.start);
       } else if (voice) {
         if (event.kind === 'release') this.releaseVoice(voice, time);
-        else if (event.kind === 'pitch')
+        else if (event.kind === 'pitch') {
           voice.pitch.set(time, event.hz, Math.min(event.rampSeconds ?? 0, voice.end - time));
-        else
+          if (event.velocity !== undefined) voice.amplitude.set(time, event.velocity * 0.2, TAIL);
+          // Oscillator type is not schedulable. Preserve the attack's patch
+          // across legato; changing it here would also change earlier audio.
+        } else
           voice.detune.set(time, event.cents, Math.min(event.rampSeconds ?? 0, voice.end - time));
       }
     }

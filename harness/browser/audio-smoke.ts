@@ -29,8 +29,14 @@ export async function runAudioSmoke() {
   if (!compiled.ok) throw new Error('Scenario failed compilation.');
   const context = new OfflineAudioContext(1, 48000 * 2.4, 48000),
     sink = new NativeSink({ context });
-  const clock: Clock = { now: () => 0.1, setTimeout: () => 0, clearTimeout: () => {} };
-  const transport = new Transport(compiled.performance, clock, sink, { lookaheadSeconds: 3 });
+  const clock: Clock = {
+    now: () => 0.1,
+    setTimeout: () => 0,
+    clearTimeout: () => {},
+  };
+  const transport = new Transport(compiled.performance, clock, sink, {
+    lookaheadSeconds: 3,
+  });
   await transport.play();
   const data = (await context.startRendering()).getChannelData(0);
   result.scenarioHz = frequency(data, 0.15, 0.4);
@@ -40,6 +46,130 @@ export async function runAudioSmoke() {
   check(rms(data, 2.12, 2.4) < 1e-7, 'Scenario release leaked.');
   transport.dispose();
   sink.dispose();
+
+  // End-to-end expression: a compiled bend reaches its target, then a hammer
+  // changes the base pitch without retaining the previous bend or restarting.
+  const expressionDoc: MnxDocument = {
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }] },
+    parts: [
+      {
+        _x: {
+          mnxLab: { strings: [{ string: 1, pitch: { step: 'E', octave: 4 } }] },
+        },
+        measures: [
+          {
+            sequences: [
+              {
+                content: [
+                  {
+                    duration: { base: 'quarter' },
+                    notes: [
+                      {
+                        id: 'a',
+                        pitch: { step: 'A', octave: 4 },
+                        _x: {
+                          mnxLab: {
+                            string: 1,
+                            tab: {
+                              technique: {
+                                bend: {
+                                  points: [
+                                    { position: 0, alter: 0 },
+                                    { position: 0.5, alter: 2 },
+                                    { position: 1, alter: 2 },
+                                  ],
+                                },
+                                hammerPull: { target: 'b' },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    duration: { base: 'quarter' },
+                    notes: [
+                      {
+                        id: 'b',
+                        pitch: { step: 'B', octave: 4 },
+                        _x: { mnxLab: { string: 1 } },
+                      },
+                    ],
+                  },
+                  {
+                    duration: { base: 'quarter' },
+                    notes: [
+                      {
+                        id: 'c',
+                        pitch: { step: 'A', octave: 4 },
+                        _x: {
+                          mnxLab: {
+                            string: 1,
+                            tab: {
+                              technique: {
+                                palmMute: true,
+                                harmonic: { type: 'artificial' },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+  const expression = compilePerformance(expressionDoc);
+  if (!expression.ok) throw Error('Expression compilation failed.');
+  const expressionContext = new OfflineAudioContext(1, 48000 * 2, 48000);
+  const expressionSink = new NativeSink({ context: expressionContext });
+  const expressionTransport = new Transport(expression.performance, clock, expressionSink, {
+    lookaheadSeconds: 3,
+  });
+  await expressionTransport.play();
+  const expressed = (await expressionContext.startRendering()).getChannelData(0);
+  result.compiledBendHz = frequency(expressed, 0.4, 0.55);
+  result.compiledHammerHz = frequency(expressed, 0.65, 0.85);
+  check(
+    Math.abs(result.compiledBendHz - 493.8833) < 1,
+    `Compiled bend missed its cents target: ${result.compiledBendHz}.`,
+  );
+  check(
+    Math.abs(result.compiledHammerHz - 493.8833) < 1,
+    'Hammer retained source bend or changed sounded pitch.',
+  );
+  result.hammerVolumeRatio = rms(expressed, 0.7, 0.85) / rms(expressed, 0.4, 0.55);
+  check(
+    Math.abs(result.hammerVolumeRatio - 55 / 80) < 0.04,
+    'Hammer velocity was not applied without reattack.',
+  );
+  check(rms(expressed, 1.42, 1.9) < 1e-7, 'Palm mute did not shorten the gate.');
+  // Triangle harmonic patch keeps its fundamental and adds a measurable third partial.
+  const partial = (hz: number) => {
+    let re = 0,
+      im = 0;
+    const from = 1.15,
+      to = 1.35;
+    for (let i = Math.ceil(from * 48000); i < to * 48000; i++) {
+      re += expressed[i] * Math.cos((2 * Math.PI * hz * i) / 48000);
+      im += expressed[i] * Math.sin((2 * Math.PI * hz * i) / 48000);
+    }
+    return Math.hypot(re, im);
+  };
+  result.harmonicThirdRatio = partial(1320) / partial(440);
+  check(
+    result.harmonicThirdRatio > 0.09 && result.harmonicThirdRatio < 0.13,
+    'Harmonic timbre hint did not reach the native patch.',
+  );
+  expressionTransport.dispose();
+  expressionSink.dispose();
 
   const ctx = new OfflineAudioContext(2, 48000 * 1.5, 48000);
   const left = ctx.createStereoPanner(),

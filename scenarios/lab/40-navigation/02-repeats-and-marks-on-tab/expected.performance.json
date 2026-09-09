@@ -399,7 +399,7 @@
         "den": "2"
       },
       "midi": 64,
-      "velocity": 80,
+      "velocity": 96,
       "curve": [],
       "writtenIds": [
         "w4:@m3.v0.e0.n0"
@@ -417,7 +417,7 @@
         "den": "2"
       },
       "midi": 59,
-      "velocity": 80,
+      "velocity": 96,
       "curve": [],
       "writtenIds": [
         "w4:@m3.v0.e1.n0"

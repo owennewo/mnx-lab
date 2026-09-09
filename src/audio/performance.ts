@@ -47,6 +47,8 @@ import type {
   PerformanceVoice,
 } from './performanceTypes.ts';
 
+import { applyExpression, type ExpressionSource } from './expression.ts';
+
 interface EventSpan {
   event: MnxEvent;
   part: number;
@@ -93,7 +95,10 @@ export function compilePerformance(
   } catch (error) {
     if (error instanceof TimingError) return { ok: false, diagnostics: [error.diagnostic] };
     if (error instanceof RangeError)
-      return { ok: false, diagnostics: [{ code: 'invalid-time', message: error.message }] };
+      return {
+        ok: false,
+        diagnostics: [{ code: 'invalid-time', message: error.message }],
+      };
     throw error;
   }
 }
@@ -433,10 +438,14 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
   const sounding: SoundingEvent[] = [];
   const voices = new Map<string, PerformanceVoice>();
   const notes = new Map<string, MnxNote>();
+  const expressionSources = new Map<string, ExpressionSource>();
   for (const visit of visits) {
-    const pitched: { note?: MnxNote; key: string; midi?: number; kit: boolean }[] = (
-      visit.event.notes ?? []
-    ).map((note, ni) => ({
+    const pitched: {
+      note?: MnxNote;
+      key: string;
+      midi?: number;
+      kit: boolean;
+    }[] = (visit.event.notes ?? []).map((note, ni) => ({
       note,
       key: noteKeyAt(
         note,
@@ -454,10 +463,15 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
     const kitNotes =
       (visit.event as { kitNotes?: { id?: string; kitComponent?: string }[] }).kitNotes ?? [];
     kitNotes.forEach((note, i) => {
-      const part = doc.parts[visit.part] as unknown as { kit?: Record<string, { sound?: string }> };
+      const part = doc.parts[visit.part] as unknown as {
+        kit?: Record<string, { sound?: string }>;
+      };
       const sound = part.kit?.[note.kitComponent ?? '']?.sound;
-      const midi = (doc.global as unknown as { sounds?: Record<string, { midiNumber?: number }> })
-        .sounds?.[sound ?? '']?.midiNumber;
+      const midi = (
+        doc.global as unknown as {
+          sounds?: Record<string, { midiNumber?: number }>;
+        }
+      ).sounds?.[sound ?? '']?.midiNumber;
       if (midi === undefined)
         diagnostic(
           'missing-kit-sound',
@@ -486,6 +500,12 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
         soundingIds: [],
       };
       written.push(w);
+      expressionSources.set(id, {
+        ...visit,
+        offset: visit.metricOffset,
+        note,
+        tremoloIndex: visit.tremolo?.index,
+      });
       if (note) notes.set(id, note);
       if (visit.playedDuration.num === 0n || midi === undefined) continue;
       const string = note?._x?.mnxLab?.string,
@@ -501,7 +521,7 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
       if (!validString && note?._x?.mnxLab?.tab?.technique)
         diagnostic(
           'unassigned-string-technique',
-          'String-specific technique cannot be honored without a valid assigned string.',
+          'String continuity cannot be honored without a valid assigned string; pitch-local expression remains available.',
           visit.ordinal,
           key,
         );
@@ -517,7 +537,7 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
         ...(validString ? { string } : {}),
         ...(kit ? { kit: true } : {}),
       });
-      const emit = (position: Rational, duration: Rational) => {
+      const emit = (position: Rational, duration: Rational, tremoloIndex?: number) => {
         if (duration.num === 0n) return;
         if (sounding.length >= LIMIT) limit();
         const s: SoundingEvent = {
@@ -530,6 +550,10 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
           curve: [],
           writtenIds: [id],
         };
+        expressionSources.set(s.id, {
+          ...expressionSources.get(id)!,
+          tremoloIndex,
+        });
         sounding.push(s);
         w.soundingIds.push(s.id);
       };
@@ -553,7 +577,7 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
               subtract(a, measures[visit.ordinal].from),
             );
             const mapped = insertions.mapSpan(metric, subtract(b, a));
-            emit(mapped.position, mapped.duration);
+            emit(mapped.position, mapped.duration, n);
           }
           cursor = add(cursor, t.step);
           n++;
@@ -613,6 +637,7 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
   const result = [...bySound.values()].sort(
     (a, b) => compare(a.position, b.position) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
   );
+  applyExpression(doc, written, result, expressionSources, lengths, diagnostics);
   // Simultaneous string conflicts keep every pitch, on explicit fallback voices.
   const conflict = new Map<string, SoundingEvent[]>();
   for (const s of result)
@@ -665,7 +690,10 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
     })),
   );
   const tempo = createTempoMap(
-    projected.map((t) => ({ ...t, position: insertions.toPerformance(t.position) })),
+    projected.map((t) => ({
+      ...t,
+      position: insertions.toPerformance(t.position),
+    })),
   ).changes;
   const sourceMap: Performance['sourceMap'] = [...insertions.insertions];
   for (const m of measures) {

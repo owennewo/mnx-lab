@@ -25,8 +25,8 @@ for (const scenario of loadCorpus()) {
       expect(decoded.format).toBe(1);
       expect(decoded.ppq).toBe(960);
       expect(decoded.tracks.flat().filter((e) => e.status >> 4 === 9)).toHaveLength(
-        result.performance.sounding.filter((s) => s.midi >= 0 && s.midi <= 127).length -
-          midi.diagnostics.filter((d) => d.code === 'collapsed-note').length,
+        result.performance.sounding.filter((s) => s.midi >= 0 && s.midi <= 127 && s.velocity > 0)
+          .length - midi.diagnostics.filter((d) => d.code === 'collapsed-note').length,
       );
     }
     const verdict = midi.ok

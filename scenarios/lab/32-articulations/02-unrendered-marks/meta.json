@@ -33,5 +33,6 @@
     "at": "2026-08-14",
     "primitivesHash": "sha256:d63b5817b605ed2e",
     "renderHash": "sha256:0cc722b6539f327f"
-  }
+  },
+  "performance": true
 }
