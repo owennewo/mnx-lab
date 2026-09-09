@@ -68,7 +68,9 @@ try {
     const selected=[...viewer.shadowRoot.querySelectorAll('.notehead.selected')];
     check(selected.length===2,'Written selection did not light both visits');
     const settings=page.shadowRoot.querySelector('mnx-settings-pad');settings.open=true;await settings.updateComplete;
-    const toggle=[...settings.shadowRoot.querySelectorAll('input[type=checkbox]')][0];toggle.click();await delay(100);
+    // The REPEATS row is a two-way field now, not a checkbox: one click
+    // flips it (roadmap/proposed/workbench-settings-card.md).
+    const toggle=settings.shadowRoot.querySelector('.field[data-row="repeats"]');toggle.click();await delay(100);
     check(!location.hash.includes('unrolled=1') && !viewer.unrolled,'Toggle did not update route and viewer');
     check(location.hash.includes('at=2'),'Toggle erased ordinal route');
     location.hash='#/scenario/lab/navigation/ds-final-ending?view=notation&unrolled=1';
