@@ -21,6 +21,7 @@ import { parseXML, serializeXML, type Element, type Document } from '../common/x
 import { splitPart, hasTabContent } from './splitter.js';
 import { flattenSequences, FlatXmlNode } from './flattener.js';
 import { divisionsFor, getXmlNoteType } from '../common/utils.js';
+import { dynamicToXml, type XmlDynamicOut } from '../common/dynamics.js';
 
 // Chromatic semitone offsets for each diatonic step (C=0)
 const STEP_SEMITONES_EXP: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -72,18 +73,115 @@ function transposePitchToWritten(
   };
 }
 
+/** One dynamics or hairpin `<direction>`, written at the head of its measure. */
+interface DynamicDirection {
+  /** Divisions from the head of the measure. */
+  offset: number;
+  placement: 'above' | 'below';
+  staff?: number;
+  children?: XmlDynamicOut[];
+  wedge?: { type: 'crescendo' | 'diminuendo' | 'stop'; number: number };
+}
+
+/**
+ * A part's dynamics → `<direction>`s per measure index.
+ *
+ * Written at the head of the measure with an `<offset>`, the convention the
+ * ottavas and jumps already use and what the importer reads back (cursor 0
+ * plus offset). MNX states a hairpin once, with an `end` naming a measure;
+ * MusicXML writes a `<wedge>` at each end and numbers them so overlapping
+ * hairpins pair up again — the smallest number not held by one still open.
+ */
+function planDynamics(
+  part: MnxPart,
+  measureIndexById: Map<string, number>,
+  offsetOf: (fraction: [number, number]) => number,
+  measureEndOffset: (index: number) => number,
+  warn: (message: string) => void
+): Map<number, DynamicDirection[]> {
+  const byMeasure = new Map<number, DynamicDirection[]>();
+  const add = (index: number, direction: DynamicDirection): void => {
+    const list = byMeasure.get(index) ?? [];
+    list.push(direction);
+    byMeasure.set(index, list);
+  };
+  /** Hairpins still open, each with where it stops: [measure index, offset]. */
+  const open: { number: number; end: [number, number] }[] = [];
+
+  part.measures.forEach((measure, index) => {
+    for (const dyn of measure.dynamics ?? []) {
+      const where = `measure ${index + 1}`;
+      const offset = offsetOf(dyn.position.fraction);
+      const common = {
+        placement: dyn.orient === 'above' ? ('above' as const) : ('below' as const),
+        ...(dyn.staff !== undefined ? { staff: dyn.staff } : {})
+      };
+      const unwritten = (['prefix', 'suffix', 'visuallyContinues', 'staffEnd', 'voice'] as const)
+        .filter(key => dyn[key] !== undefined);
+      if (unwritten.length) {
+        warn(`${where}: a dynamic's ${unwritten.join(', ')} has no MusicXML equivalent here and was not written.`);
+      }
+
+      if (dyn.type === 'relative') {
+        warn(
+          `${where}: a relative dynamic (${dyn.relativeValue ?? 'unstated'}) has no MusicXML ` +
+            'equivalent and was not written.'
+        );
+        continue;
+      }
+
+      if (dyn.type === 'gradual') {
+        if (!dyn.wedgeType) {
+          warn(`${where}: a gradual dynamic with no wedgeType has no MusicXML equivalent and was not written.`);
+          continue;
+        }
+        const endIndex = dyn.end ? measureIndexById.get(dyn.end.measure) : undefined;
+        if (!dyn.end) {
+          warn(`${where}: a hairpin with no end was closed at the end of its measure.`);
+        } else if (endIndex === undefined) {
+          warn(
+            `${where}: a hairpin ends at unknown measure "${dyn.end.measure}"; it was closed ` +
+              'at the end of its own measure.'
+          );
+        }
+        const end: [number, number] =
+          dyn.end && endIndex !== undefined
+            ? [endIndex, offsetOf(dyn.end.position.fraction)]
+            : [index, measureEndOffset(index)];
+        const finished = (at: [number, number]) => at[0] < index || (at[0] === index && at[1] <= offset);
+        for (let i = open.length - 1; i >= 0; i--) if (finished(open[i].end)) open.splice(i, 1);
+        let number = 1;
+        while (open.some(held => held.number === number)) number++;
+        open.push({ number, end });
+        const type = dyn.wedgeType === 'increasing' ? 'crescendo' : 'diminuendo';
+        add(index, { offset, ...common, wedge: { type, number } });
+        add(end[0], { offset: end[1], ...common, wedge: { type: 'stop', number } });
+        continue;
+      }
+
+      const { children, problem } = dynamicToXml(dyn);
+      if (problem) warn(`${where}: ${problem}.`);
+      if (children.length) add(index, { offset, ...common, children });
+    }
+  });
+  return byMeasure;
+}
+
 export interface ExportOptions {
   splitNotationAndTab?: boolean;
   divisions?: number;
   /** `YYYY-MM-DD` for `<encoding-date>`; omitted by default so derived output
    *  stays reproducible. The CLI opts in with `--encoding-date`. */
   encodingDate?: string;
+  /** Called for anything in the document MusicXML (or this writer) cannot say. */
+  onWarning?: (message: string) => void;
 }
 
 export function exportMusicXML(
   mnxJson: MnxStructure,
   options: ExportOptions = {}
 ): string {
+  const warn = options.onWarning ?? (() => {});
   const splitNotationAndTab = options.splitNotationAndTab !== false; // default true
   // Raised where the document needs it: a triplet's `<duration>` is a third of
   // a written value, and only a divisions count divisible by 3 can state it.
@@ -166,6 +264,17 @@ export function exportMusicXML(
       }
     });
   }
+
+  // Where each measure ends, in divisions from its head — where a hairpin MNX
+  // leaves open is closed. Meter is stated change-only, so carry it forward.
+  const quartersByMeasure: number[] = [];
+  let quartersInForce = 4;
+  for (const measure of mnxJson.global?.measures ?? []) {
+    if (measure.time) quartersInForce = (measure.time.count * 4) / measure.time.unit;
+    quartersByMeasure.push(quartersInForce);
+  }
+  const measureEndOffset = (index: number): number =>
+    Math.round((quartersByMeasure[Math.min(index, quartersByMeasure.length - 1)] ?? 4) * divisions);
 
   // MusicXML `<beam>` flags per event id, flattened from MNX's nested groups.
   //
@@ -283,6 +392,10 @@ export function exportMusicXML(
   // 2. Determine Parts (split standard & TAB if requested)
   const finalParts: MnxPart[] = [];
   const partMap = new Map<string, string>(); // partId -> partName
+  // The part whose dynamics each written part carries. A notation+TAB split
+  // writes them once, on the notation half: the importer's merge keeps that
+  // half's measures, and a TAB staff does not print dynamics of its own.
+  const dynamicsSource = new Map<MnxPart, MnxPart>();
 
   // `id` and `name` are both OPTIONAL on an MNX part, and plenty of documents
   // carry neither — the corpus alone has two. MusicXML needs an id to reference
@@ -298,10 +411,12 @@ export function exportMusicXML(
     if (splitNotationAndTab && hasTabContent(part)) {
       const { standardPart, tabPart } = splitPart(part);
       finalParts.push(standardPart, tabPart);
+      dynamicsSource.set(standardPart, part);
       partMap.set(standardPart.id, part.name);
       partMap.set(tabPart.id, part.name ? `${part.name} (TAB)` : 'TAB');
     } else {
       finalParts.push(part);
+      dynamicsSource.set(part, part);
       partMap.set(part.id, part.name);
     }
   });
@@ -330,6 +445,10 @@ export function exportMusicXML(
     let activeClefSign: string | null = null;
     /** Clef in force per staff, so a grand staff's two change independently. */
     const activeClefByStaff = new Map<number, string>();
+    const source = dynamicsSource.get(part);
+    const dynamicDirections = source
+      ? planDynamics(source, measureIndexById, offsetOf, measureEndOffset, warn)
+      : new Map<number, DynamicDirection[]>();
 
     const numMeasures = part.measures.length;
 
@@ -586,6 +705,44 @@ export function exportMusicXML(
           const offsetEl = doc.createElement('offset');
           offsetEl.textContent = `${shift.offset}`;
           directionEl.appendChild(offsetEl);
+        }
+        measureEl.appendChild(directionEl);
+      }
+
+      for (const direction of dynamicDirections.get(m) ?? []) {
+        const directionEl = doc.createElement('direction');
+        directionEl.setAttribute('placement', direction.placement);
+        const typeEl = doc.createElement('direction-type');
+        if (direction.wedge) {
+          const wedgeEl = doc.createElement('wedge');
+          wedgeEl.setAttribute('type', direction.wedge.type);
+          wedgeEl.setAttribute('number', `${direction.wedge.number}`);
+          typeEl.appendChild(wedgeEl);
+        } else {
+          const dynamicsEl = doc.createElement('dynamics');
+          for (const child of direction.children ?? []) {
+            if ('element' in child) {
+              dynamicsEl.appendChild(doc.createElement(child.element));
+              continue;
+            }
+            const otherEl = doc.createElement('other-dynamics');
+            if (child.other.smufl) otherEl.setAttribute('smufl', child.other.smufl);
+            if (child.other.text) otherEl.textContent = child.other.text;
+            dynamicsEl.appendChild(otherEl);
+          }
+          typeEl.appendChild(dynamicsEl);
+        }
+        directionEl.appendChild(typeEl);
+        // `<offset>` before `<staff>`: MusicXML's fixed order inside `<direction>`.
+        if (direction.offset !== 0) {
+          const offsetEl = doc.createElement('offset');
+          offsetEl.textContent = `${direction.offset}`;
+          directionEl.appendChild(offsetEl);
+        }
+        if (direction.staff !== undefined) {
+          const staffEl = doc.createElement('staff');
+          staffEl.textContent = `${direction.staff}`;
+          directionEl.appendChild(staffEl);
         }
         measureEl.appendChild(directionEl);
       }

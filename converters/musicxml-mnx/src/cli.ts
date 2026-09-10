@@ -99,15 +99,20 @@ async function main() {
     console.log(`Exporting MNX: ${inputPath}...`);
     const mnxContent = await fs.readFile(inputPath, 'utf-8');
     const mnx = JSON.parse(mnxContent);
+    const onWarning = (msg: string) => console.warn(`  warning: ${msg}`);
     // `--output something.mxl` asks for the container; anything else is plain.
     if (outputPath.toLowerCase().endsWith('.mxl')) {
       const name = `${path.basename(outputPath, path.extname(outputPath))}.musicxml`;
       await fs.writeFile(
         outputPath,
-        exportMxl(mnx, { scoreName: name, ...encodingDateOption(args) })
+        exportMxl(mnx, { scoreName: name, onWarning, ...encodingDateOption(args) })
       );
     } else {
-      await fs.writeFile(outputPath, exportMusicXML(mnx, encodingDateOption(args)), 'utf-8');
+      await fs.writeFile(
+        outputPath,
+        exportMusicXML(mnx, { onWarning, ...encodingDateOption(args) }),
+        'utf-8'
+      );
     }
     console.log(`Conversion complete. Written to MusicXML: ${outputPath}`);
   } else {

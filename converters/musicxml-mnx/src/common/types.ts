@@ -258,9 +258,44 @@ export interface MnxOttava {
   end: { measure: string; position: MnxRhythmicPosition };
 }
 
+/** Standard dynamic values (MNX `dynamic-value`, a closed enum). Marks outside
+ *  it (fp, fz, pf, z, …) travel in `glyphs`, and the sforzando family is
+ *  spelled structurally as `type: 'accent'` with `accentPrefix`/`accentSuffix`. */
+export type MnxDynamicValue =
+  | 'pppppp' | 'ppppp' | 'pppp' | 'ppp' | 'pp' | 'p' | 'mp'
+  | 'mf' | 'f' | 'ff' | 'fff' | 'ffff' | 'fffff' | 'ffffff' | 'n';
+
+/** A dynamic marking (MNX `dynamic-group`) at a metric position. A plain
+ *  dynamic carries a `value` and/or `glyphs` (SMuFL names, for marks outside
+ *  the enum); `wedgeType` + `end` describe a hairpin. An accent group's parts
+ *  concatenate to its mnemonic: s+f+z = "sfz", ""+f+""+p = "fp"; the spec
+ *  defaults an absent prefix to `s` and suffix to `z`. */
+export interface MnxDynamic {
+  position: MnxRhythmicPosition;
+  type: 'immediate' | 'gradual' | 'relative' | 'accent';
+  value?: MnxDynamicValue;
+  glyphs?: string[];
+  wedgeType?: 'increasing' | 'decreasing';
+  end?: { measure: string; position: MnxRhythmicPosition };
+  relativeValue?: 'louder' | 'softer';
+  /** The dynamic held after an accent's attack — `type: 'accent'` only. */
+  residualValue?: MnxDynamicValue;
+  accentPrefix?: 's' | 'r' | '';
+  accentSuffix?: 'z' | '';
+  visuallyContinues?: string;
+  staffEnd?: number;
+  prefix?: string;
+  suffix?: string;
+  orient?: 'above' | 'auto' | 'below' | 'between';
+  staff?: number;
+  voice?: string;
+}
+
 export interface MnxPartMeasure {
   /** Beam groups starting in this measure. */
   beams?: MnxBeam[];
+  /** Dynamics and hairpins, each stated on the measure it starts in. */
+  dynamics?: MnxDynamic[];
   /** Octave brackets starting in this measure. */
   ottavas?: MnxOttava[];
   /** Free-text/symbolic instructions for this part. **Proposed**, not adopted. */

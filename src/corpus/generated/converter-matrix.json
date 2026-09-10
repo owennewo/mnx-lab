@@ -7,8 +7,8 @@
       "key": "musicxml",
       "label": "MusicXML",
       "counts": {
-        "supported": 36,
-        "lossy": 72,
+        "supported": 42,
+        "lossy": 66,
         "extension": 7,
         "error": 0,
         "untested": 3
@@ -98,34 +98,29 @@
           "evidence": "lab/24-tab-spec-gaps/01-tab-clef-rejected"
         },
         "dynamic-group": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 7,
-          "survived": 0,
-          "evidence": "lab/30-dynamics/01-all-dynamic-marks"
+          "survived": 7
         },
         "dynamic-group-type": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 7,
-          "survived": 0,
-          "evidence": "lab/30-dynamics/01-all-dynamic-marks"
+          "survived": 7
         },
         "dynamic-prefix": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 2,
-          "survived": 0,
-          "evidence": "lab/30-dynamics/02-accent-prefix-suffix"
+          "survived": 2
         },
         "dynamic-suffix": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 2,
-          "survived": 0,
-          "evidence": "lab/30-dynamics/02-accent-prefix-suffix"
+          "survived": 2
         },
         "dynamic-value": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 6,
-          "survived": 0,
-          "evidence": "lab/30-dynamics/01-all-dynamic-marks"
+          "survived": 6
         },
         "ending": {
           "verdict": "supported",
@@ -297,8 +292,8 @@
         "measure-rhythmic-position": {
           "verdict": "lossy",
           "carried": 4,
-          "survived": 1,
-          "evidence": "lab/30-dynamics/04-diminuendo-across-bars"
+          "survived": 2,
+          "evidence": "spec/multiple-layouts"
         },
         "multi-note-tremolo": {
           "verdict": "lossy",
@@ -420,8 +415,8 @@
         "smufl-glyph": {
           "verdict": "lossy",
           "carried": 4,
-          "survived": 0,
-          "evidence": "lab/30-dynamics/01-all-dynamic-marks"
+          "survived": 1,
+          "evidence": "lab/40-navigation/01-jumps-and-signs"
         },
         "soft-accent": {
           "verdict": "lossy",
@@ -612,10 +607,9 @@
           "evidence": "lab/00-document/03-navigation-playground"
         },
         "wedge-type": {
-          "verdict": "lossy",
+          "verdict": "supported",
           "carried": 2,
-          "survived": 0,
-          "evidence": "lab/30-dynamics/03-hairpin-and-relative"
+          "survived": 2
         },
         "_x.mnxLab.capo": {
           "verdict": "extension",

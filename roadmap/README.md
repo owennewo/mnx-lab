@@ -182,6 +182,13 @@ back up to `proposed/` the moment it is.
   sound over the **written** score, the unrolled engraving after it.
 
 
+- **[core-musicxml-dynamics.md](inprogress/core-musicxml-dynamics.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 17, **built 2026-09-10**:
+  `<dynamics>` and `<wedge>` both directions — the converter held the word `dynamic` only
+  in comments, and no converter fixture contains one. Enum values → `value`, the sforzando
+  family → MNX's accent structure (whose parts concatenate to the MusicXML element name, so
+  one table serves both directions), the rest → SMuFL `glyphs`; hairpins pair by wedge
+  number. **Matrix supported 36 → 42.** Relative dynamics have no MusicXML element and warn.
 - **[core-musicxml-staves.md](inprogress/core-musicxml-staves.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 12, **built 2026-09-04**:
   multi-staff parts — `<staves>`, a `<clef number>` per staff tracked independently, and

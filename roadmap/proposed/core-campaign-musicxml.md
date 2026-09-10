@@ -143,6 +143,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 14 | Differential oracle | music21 as a dev-only subprocess emitting a note table, diffed against the same table from our MNX — the one tier that is genuinely independent of us. | accuracy | itself | **not started — music21 is not installed here**; needs a deliberate dev-environment decision, not a silent `pip install` |
 | 15 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document. | accuracy | itself | **not started — no `xmllint` available**, and it would need a new dev dependency for what this campaign already calls *a floor, not an accuracy tier* |
 | 16 | Browser import surface | MusicXML file import in the workbench, parallel to the Guitar Pro worker. The converter is now platform-independent; nothing in the shell calls it. | zero-dep | `smoke:csp` | **not started — BLOCKED**: `src/workbench/localFile.ts` and `guitarProImporter.worker.ts` are held uncommitted by another session, and these are exactly the files it touches |
+| 17 | [Dynamics](../inprogress/core-musicxml-dynamics.md) | `<dynamics>` and `<wedge>`, both directions. The enum values map to `value`; the sforzando family to MNX's accent structure, whose parts concatenate to exactly the MusicXML element name (s+f+z = `sfz`), so one table serves both directions; the rest to SMuFL `glyphs`. Hairpins pair by wedge `number`, item 2's shape again. Relative dynamics have no MusicXML element and warn. | accuracy | the corpus's dynamics scenarios + round trip (no W3C comparison carries a dynamic) | **built 2026-09-10** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -209,6 +210,28 @@ is the parallel-work contract doing its job rather than an obstacle.
   the platform independence just won). Both cost minutes because something scored them.
 - **A green round trip is not evidence of support**, and this campaign has the receipts:
   `tied` appeared zero times in the converter while 46 round-trip tests passed over it.
+
+
+### 2026-09-10 — item 17: dynamics, found from outside the campaign
+
+**Matrix supported 36 → 42**, the first *Feature parity* row
+([core-musicxml-dynamics.md](../inprogress/core-musicxml-dynamics.md)).
+
+- **The matrix had the finding and nobody was reading it for this.** `dynamic-group` sat at
+  7 carried / 0 surviving from the first run; what prompted the work was an audit of the
+  Guitar Pro importer, which dropped a forte the same way. A lossy cell is a queue entry
+  only if someone works the queue — **the instrument is necessary, not sufficient.**
+- **Where two encodings share a spelling, make the table the spelling.** MNX's accent
+  structure concatenates to exactly the MusicXML element name (s+f+z = `sfz`), so import and
+  export are one table read two ways rather than two mappings kept in agreement by hand.
+  The spec's defaults (`s`, `z`) are the trap: every part is written explicitly, or `fz`
+  reads back as `sfz`.
+- **The oracle is blind here, and the item says so.** None of the 27 comparisons carries a
+  dynamic, so item 1 cannot score this; the evidence is the corpus's own five dynamics
+  scenarios, three of them deep-equal through the round trip. An item whose primary oracle
+  cannot see it states which one it used instead.
+- **Item 2's spanner shape a fourth time.** A hairpin is stated once in MNX and twice,
+  numbered, in MusicXML — the same pair-and-resolve as ties, slurs and ottavas.
 
 
 ### 2026-09-04 — item 12: multi-staff parts, and a limit of the matrix worth more than the feature

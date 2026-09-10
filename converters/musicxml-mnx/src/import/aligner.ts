@@ -1,6 +1,7 @@
 import {
   MnxBeam,
   MnxBendPoint,
+  MnxDynamic,
   MnxEvent,
   MnxEventLyricLine,
   MnxEventLyrics,
@@ -33,6 +34,7 @@ import {
   walkSequenceEvents
 } from '../common/utils.js';
 import { findDirectChild, findDirectChildren, getChildText, getChildInt } from './musicxml.js';
+import { dynamicFromXml, type DynamicMark } from '../common/dynamics.js';
 
 /** `getChildFloat` restricted to a direct child (the shared helper searches deep). */
 function getChildFloatOf(parent: Element, tagName: string): number | null {
@@ -362,6 +364,18 @@ export class Aligner {
     value: number | null;
   }[] = [];
 
+  /** `<dynamics>` marks and `<wedge>` ends, in document order, with their place
+   *  in the part. */
+  private dynamicMarks: {
+    measureIndex: number;
+    position: number;
+    divisions: number;
+    staff?: number;
+    above: boolean;
+    dynamic?: DynamicMark;
+    wedge?: { type: string; number: string };
+  }[] = [];
+
   private harmonyMarks: {
     measureIndex: number;
     /** Position within the measure, in MusicXML divisions (per quarter note). */
@@ -541,6 +555,137 @@ export class Aligner {
       open = null;
     }
     this.ottavaMarks = [];
+  }
+
+  /**
+   * `<dynamics>` and `<wedge>` inside a `<direction>`, at `position` divisions
+   * into the measure. `<staff>` is kept only where there is more than one staff
+   * to tell apart, as for clefs.
+   */
+  private collectDirectionDynamics(
+    directionEl: Element,
+    measureIndex: number,
+    position: number,
+    state: AttributeState
+  ): void {
+    const staff = state.staves > 1 ? (getChildInt(directionEl, 'staff') ?? undefined) : undefined;
+    const above = directionEl.getAttribute('placement') === 'above';
+    for (const typeEl of findDirectChildren(directionEl, 'direction-type')) {
+      for (const dynamicsEl of findDirectChildren(typeEl, 'dynamics')) {
+        this.collectDynamics(dynamicsEl, measureIndex, position, state.divisions, staff, above);
+      }
+      for (const wedgeEl of findDirectChildren(typeEl, 'wedge')) {
+        this.dynamicMarks.push({
+          measureIndex,
+          position,
+          divisions: state.divisions,
+          staff,
+          above,
+          wedge: { type: wedgeEl.getAttribute('type') ?? '', number: wedgeEl.getAttribute('number') ?? '1' }
+        });
+        if (wedgeEl.getAttribute('niente') === 'yes') {
+          this.warnings.push(`measure ${measureIndex + 1}: a hairpin's niente circle is not represented.`);
+        }
+      }
+    }
+  }
+
+  /** One `<dynamics>` element — from a `<direction>` or a note's `<notations>`. */
+  private collectDynamics(
+    dynamicsEl: Element,
+    measureIndex: number,
+    position: number,
+    divisions: number,
+    staff: number | undefined,
+    above: boolean
+  ): void {
+    const children = Array.from(dynamicsEl.childNodes)
+      .filter(node => node.nodeType === 1)
+      .map(node => {
+        const el = node as Element;
+        return { element: el.tagName, smufl: el.getAttribute('smufl'), text: el.textContent ?? '' };
+      });
+    if (children.length === 0) return;
+    const dynamic = dynamicFromXml(children);
+    if (!dynamic) {
+      const spelled = children.map(c => (c.element === 'other-dynamics' ? c.text.trim() : c.element));
+      this.warnings.push(
+        `measure ${measureIndex + 1}: dynamic "${spelled.join(' ')}" has no MNX equivalent and was not imported.`
+      );
+      return;
+    }
+    this.dynamicMarks.push({
+      measureIndex,
+      position,
+      divisions,
+      staff,
+      above: above || dynamicsEl.getAttribute('placement') === 'above',
+      dynamic
+    });
+  }
+
+  /**
+   * Dynamics and hairpins → `dynamics` on the part measure.
+   *
+   * A dynamic is a point and is filed where it sits. A hairpin is a spanner:
+   * MusicXML writes a `<wedge>` at each end, numbered so overlapping ones pair
+   * up, and MNX states it once on the measure it starts in with an `end`
+   * naming the measure it stops in — an id minted on demand, as for ottavas.
+   * A start with no stop keeps its shape and loses only the `end`, which MNX
+   * allows; a stop with no start carries nothing to keep.
+   */
+  private resolveDynamics(measures: MnxPartMeasure[], globalMeasures: MnxGlobalMeasure[]): void {
+    const fractionOf = (mark: { position: number; divisions: number }): [number, number] =>
+      reduceFraction(mark.position, mark.divisions * 4);
+    const file = (measureIndex: number, group: MnxDynamic): void => {
+      const measure = measures[measureIndex];
+      if (measure) (measure.dynamics ??= []).push(group);
+    };
+
+    const open = new Map<string, { group: MnxDynamic; measureIndex: number }>();
+    for (const mark of this.dynamicMarks) {
+      const placement = {
+        ...(mark.staff ? { staff: mark.staff } : {}),
+        // Dynamics sit below the staff unless told otherwise, so only the
+        // exception is worth stating.
+        ...(mark.above ? { orient: 'above' as const } : {})
+      };
+      if (mark.dynamic) {
+        file(mark.measureIndex, { position: { fraction: fractionOf(mark) }, ...mark.dynamic, ...placement });
+        continue;
+      }
+      const { type, number } = mark.wedge!;
+      if (type === 'crescendo' || type === 'diminuendo') {
+        const unclosed = open.get(number);
+        if (unclosed) {
+          this.warnings.push(
+            `measure ${unclosed.measureIndex + 1}: a hairpin with no stop was imported without an end.`
+          );
+        }
+        const group: MnxDynamic = {
+          position: { fraction: fractionOf(mark) },
+          type: 'gradual',
+          wedgeType: type === 'crescendo' ? 'increasing' : 'decreasing',
+          ...placement
+        };
+        open.set(number, { group, measureIndex: mark.measureIndex });
+        file(mark.measureIndex, group);
+      } else if (type === 'stop') {
+        const start = open.get(number);
+        if (!start) continue;
+        open.delete(number);
+        const endMeasure = globalMeasures[mark.measureIndex] ?? (globalMeasures[mark.measureIndex] = {});
+        endMeasure.id ??= `m${mark.measureIndex + 1}`;
+        start.group.end = { measure: endMeasure.id, position: { fraction: fractionOf(mark) } };
+      }
+    }
+    for (const { measureIndex } of open.values()) {
+      this.warnings.push(`measure ${measureIndex + 1}: a hairpin with no stop was imported without an end.`);
+    }
+
+    const at = (group: MnxDynamic) => group.position.fraction[0] / group.position.fraction[1];
+    for (const measure of measures) measure.dynamics?.sort((a, b) => at(a) - at(b));
+    this.dynamicMarks = [];
   }
 
   /**
@@ -1407,6 +1552,7 @@ export class Aligner {
     this.resolveHarmonies(globalMeasures);
     this.resolveJumps(globalMeasures);
     this.resolveOttavas(measures, globalMeasures);
+    this.resolveDynamics(measures, globalMeasures);
 
     const labExtension: any = {};
     if (state.tuning) {
@@ -1524,6 +1670,12 @@ export class Aligner {
             value
           });
         }
+        this.collectDirectionDynamics(
+          el,
+          measureIdx,
+          currentTime + (getChildInt(el, 'offset') || 0),
+          state
+        );
         const kind = this.classifyJumpDirection(el);
         if (kind) {
           this.jumpMarks.push({
@@ -1647,6 +1799,18 @@ export class Aligner {
               }
             }
             technique = this.parseTechnique(notationsEl, techEl);
+            // A dynamic may also hang off the note itself, and then it sits at
+            // the note's onset — for a chord member, the chord's.
+            for (const dynamicsEl of findDirectChildren(notationsEl, 'dynamics')) {
+              this.collectDynamics(
+                dynamicsEl,
+                measureIdx,
+                isChord ? lastEventOnset : currentTime,
+                state.divisions,
+                state.staves > 1 ? (getChildInt(el, 'staff') ?? undefined) : undefined,
+                false
+              );
+            }
           }
 
           // `<accidental>` is a child of `<note>`, not of `<notations>` — and
@@ -1960,6 +2124,12 @@ export class Aligner {
       // Assign matching IDs to notes aligned at the same chronological onset
       // time, copying each TAB note's position onto the standard note.
       this.alignNoteIds(standardPart.measures[m].sequences, tabPart.measures[m].sequences, m);
+      // The notation half's measures are kept, so a dynamic written only under
+      // the TAB staff would be discarded with it — carry it across instead.
+      const tabDynamics = tabPart.measures[m].dynamics;
+      if (tabDynamics?.length && !standardPart.measures[m].dynamics?.length) {
+        standardPart.measures[m].dynamics = tabDynamics;
+      }
     }
 
     return {
