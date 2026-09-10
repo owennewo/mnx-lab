@@ -624,19 +624,13 @@
                         }
                       }
                     }
-                  ],
-                  "slurs": [
-                    {
-                      "target": "e1"
-                    }
                   ]
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e1"
+                  "rest": {}
                 }
               ]
             }
@@ -815,7 +809,7 @@
                   ],
                   "slurs": [
                     {
-                      "target": "e2"
+                      "target": "e1"
                     }
                   ]
                 },
@@ -838,7 +832,7 @@
                       }
                     }
                   ],
-                  "id": "e2"
+                  "id": "e1"
                 }
               ]
             }
@@ -977,19 +971,13 @@
                         }
                       }
                     }
-                  ],
-                  "slurs": [
-                    {
-                      "target": "e3"
-                    }
                   ]
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e3"
+                  "rest": {}
                 }
               ]
             }
@@ -1833,7 +1821,7 @@
                   ],
                   "slurs": [
                     {
-                      "target": "e4"
+                      "target": "e2"
                     }
                   ]
                 },
@@ -1856,7 +1844,7 @@
                       }
                     }
                   ],
-                  "id": "e4"
+                  "id": "e2"
                 }
               ]
             }
@@ -1997,19 +1985,13 @@
                         }
                       }
                     }
-                  ],
-                  "slurs": [
-                    {
-                      "target": "e5"
-                    }
                   ]
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e5"
+                  "rest": {}
                 }
               ]
             }
@@ -2188,7 +2170,7 @@
                   ],
                   "slurs": [
                     {
-                      "target": "e6"
+                      "target": "e3"
                     }
                   ]
                 },
@@ -2211,7 +2193,7 @@
                       }
                     }
                   ],
-                  "id": "e6"
+                  "id": "e3"
                 }
               ]
             }
@@ -2350,19 +2332,13 @@
                         }
                       }
                     }
-                  ],
-                  "slurs": [
-                    {
-                      "target": "e7"
-                    }
                   ]
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e7"
+                  "rest": {}
                 }
               ]
             }
@@ -3329,19 +3305,13 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "slurs": [
-                    {
-                      "target": "e8"
-                    }
-                  ]
+                  }
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e8"
+                  "rest": {}
                 }
               ]
             }
@@ -3534,12 +3504,7 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "slurs": [
-                    {
-                      "target": "e9"
-                    }
-                  ]
+                  }
                 },
                 {
                   "duration": {
@@ -3561,8 +3526,7 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "id": "e9"
+                  }
                 }
               ]
             }
@@ -3770,19 +3734,13 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "slurs": [
-                    {
-                      "target": "e10"
-                    }
-                  ]
+                  }
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e10"
+                  "rest": {}
                 }
               ]
             }
@@ -3973,12 +3931,7 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "slurs": [
-                    {
-                      "target": "e11"
-                    }
-                  ]
+                  }
                 },
                 {
                   "duration": {
@@ -4000,8 +3953,7 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "id": "e11"
+                  }
                 }
               ]
             }
@@ -4492,19 +4444,13 @@
                         }
                       }
                     }
-                  ],
-                  "slurs": [
-                    {
-                      "target": "e12"
-                    }
                   ]
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e12"
+                  "rest": {}
                 },
                 {
                   "duration": {
@@ -4820,12 +4766,7 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "slurs": [
-                    {
-                      "target": "e13"
-                    }
-                  ]
+                  }
                 },
                 {
                   "duration": {
@@ -4847,8 +4788,7 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "id": "e13"
+                  }
                 },
                 {
                   "duration": {
@@ -5063,19 +5003,13 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "slurs": [
-                    {
-                      "target": "e14"
-                    }
-                  ]
+                  }
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e14"
+                  "rest": {}
                 }
               ]
             }
@@ -5268,12 +5202,7 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "slurs": [
-                    {
-                      "target": "e15"
-                    }
-                  ]
+                  }
                 },
                 {
                   "duration": {
@@ -5295,8 +5224,7 @@
                         "type": "whole"
                       }
                     }
-                  },
-                  "id": "e15"
+                  }
                 }
               ]
             }
@@ -5489,19 +5417,13 @@
                         "type": "end"
                       }
                     }
-                  },
-                  "slurs": [
-                    {
-                      "target": "e16"
-                    }
-                  ]
+                  }
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e16"
+                  "rest": {}
                 }
               ]
             }
@@ -6202,19 +6124,13 @@
                         }
                       }
                     }
-                  ],
-                  "slurs": [
-                    {
-                      "target": "e17"
-                    }
                   ]
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e17"
+                  "rest": {}
                 },
                 {
                   "duration": {
@@ -7403,19 +7319,13 @@
                         }
                       }
                     }
-                  ],
-                  "slurs": [
-                    {
-                      "target": "e18"
-                    }
                   ]
                 },
                 {
                   "duration": {
                     "base": "eighth"
                   },
-                  "rest": {},
-                  "id": "e18"
+                  "rest": {}
                 },
                 {
                   "duration": {

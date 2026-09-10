@@ -602,8 +602,15 @@ function buildSequence(
     // first event to the last, which must then have an id to be named by.
     if (voice.slur.from) {
       if (!beat.legatoOrigin) {
-        event.id = `e${state.nextEventId++}`;
-        voice.slur.from.slurs = [{ target: event.id }];
+        // Guitar Pro will flag a rest as the destination (Sun-did-glide.gpx
+        // does, 15 times, last note of a bar into the rest after it), but a
+        // slur joins notes: one ending on a rest is named, not drawn.
+        if (event.notes?.length) {
+          event.id = `e${state.nextEventId++}`;
+          voice.slur.from.slurs = [{ target: event.id }];
+        } else {
+          state.report('beat <Legato> slurring into a rest', measureIndex);
+        }
         voice.slur.from = null;
       }
     } else if (beat.legatoOrigin) {

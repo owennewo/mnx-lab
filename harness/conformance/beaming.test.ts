@@ -165,8 +165,12 @@ describe('converter imports without event IDs', () => {
     const doc: MnxStructure = { mnx: imported.mnx,
       global: { measures: imported.global.measures.slice(0, 8) },
       parts: [{ ...imported.parts[0], measures: imported.parts[0].measures.slice(0, 8) }] };
-    expect(doc.parts[0].measures.flatMap(m => m.sequences!.flatMap(s => s.content))
-      .every(e => !('id' in e))).toBe(true);
+    // Guitar Pro, like MusicXML below, gives an event an id only when a slur
+    // names it; every other event reaches the beamer without one.
+    const items = doc.parts[0].measures.flatMap(m => m.sequences!.flatMap(s => s.content)) as MnxEvent[];
+    const slurTargets = new Set(items.flatMap(e => (e.slurs ?? []).map(slur => slur.target)));
+    expect(items.filter(e => 'id' in e).every(e => slurTargets.has(e.id!))).toBe(true);
+    expect(items.some(e => !('id' in e))).toBe(true);
     expectIdIndependent(doc);
   });
 

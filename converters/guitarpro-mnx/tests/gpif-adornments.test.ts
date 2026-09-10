@@ -199,6 +199,15 @@ describe('slurs', () => {
     expect(second.mnx).toEqual(first.mnx);
     expect(second.warnings).toEqual([]);
   });
+
+  it('names a slur that ends on a rest instead of drawing it', () => {
+    const { events, warnings } = load(score([[beat('0'), beat('1'), beat('2', from), beat('', into)]], notes));
+    expect(events(0)[2].slurs).toBeUndefined();
+    expect(events(0)[3].id).toBeUndefined();
+    expect(warnings).toEqual([
+      'measure 1: beat <Legato> slurring into a rest is not represented (1 in the file).'
+    ]);
+  });
 });
 
 describe('the tripwire', () => {
