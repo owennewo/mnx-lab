@@ -245,7 +245,7 @@
       "id": "converter/House-of-the-Rising-Sun",
       "xml": "converters/fixtures/House-of-the-Rising-Sun.xml",
       "mnx": "converters/fixtures/House-of-the-Rising-Sun.mnx.json",
-      "inputSha256": "882da2e21fc0dc51571949d7dfb963fafcbd04038b3450643b9c50292a187d56",
+      "inputSha256": "9247eddab593315e113dbf7b7c2c264a11aee235a72e3253fc50e3857885a465",
       "midi": "converter--House-of-the-Rising-Sun.mid",
       "midiSha256": "7099a16f4ee19fe7b166d769e6f4ba3626fbb703e46c28a42771032c166acbdf"
     },
@@ -253,7 +253,7 @@
       "id": "converter/Sun-did-glide",
       "xml": "converters/fixtures/Sun-did-glide.xml",
       "mnx": "converters/fixtures/Sun-did-glide.mnx.json",
-      "inputSha256": "1d4d4d81071fd3436e01b6bc4dd6695120a2d356dbdceaf57cef9a8f1a429d19",
+      "inputSha256": "bd5113ea9288ecd0ddbe74429fa4680bc09d678476c689cafd41d57f67b2e63b",
       "midi": "converter--Sun-did-glide.mid",
       "midiSha256": "eea12132eef909ea4f2b2f945d52bdd2c9d7a24db3717acbf211d26cc02c8c1b"
     },
@@ -261,7 +261,7 @@
       "id": "converter/Triplets-and-graces",
       "xml": "converters/fixtures/Triplets-and-graces.xml",
       "mnx": "converters/fixtures/Triplets-and-graces.mnx.json",
-      "inputSha256": "4881f0edbf30fcb658f876f210bc75091847d15854729415cefef2dbc4bb26ba",
+      "inputSha256": "7e8e64df97b7fd841d72df4902972cffb0785ea1a155cc7cffd4c128b3cd7423",
       "midi": "converter--Triplets-and-graces.mid",
       "midiSha256": "6d2f857a12c60640699ec807ece8b5c2508b6a19ed644c7f5b0a0eae702bfa90"
     },
@@ -269,7 +269,7 @@
       "id": "converter/Vestapol",
       "xml": "converters/fixtures/Vestapol.xml",
       "mnx": "converters/fixtures/Vestapol.mnx.json",
-      "inputSha256": "cc130deb8fc059f1272b61ef4858962610b12094f00307bda782e81aedf4bbec",
+      "inputSha256": "be29e7454782dbd79c4e75b2958a6d9ed5af3b9bd8b416cf92e64f4f1890c405",
       "midi": "converter--Vestapol.mid",
       "midiSha256": "04e34ce782389180b94d7a8b65a19a81441eed35c05ae593342ee4ad457e2ca5"
     }

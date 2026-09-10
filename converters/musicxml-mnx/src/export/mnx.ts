@@ -527,16 +527,17 @@ export function exportMusicXML(
 
       // Transposition. MusicXML's <transpose> is what must be ADDED to a written pitch
       // to get the sounding one; MNX's interval runs sounding → written. Negate.
+      // Children in schema order: <diatonic>?, <chromatic>, <octave-change>?, <double>?.
       if (m === 0 && part.transposition) {
         const transposeEl = doc.createElement('transpose');
-        const chromaticEl = doc.createElement('chromatic');
-        chromaticEl.textContent = `${-part.transposition.interval.halfSteps}`;
-        transposeEl.appendChild(chromaticEl);
         if (part.transposition.interval.staffDistance !== undefined) {
           const diatonicEl = doc.createElement('diatonic');
           diatonicEl.textContent = `${-part.transposition.interval.staffDistance}`;
           transposeEl.appendChild(diatonicEl);
         }
+        const chromaticEl = doc.createElement('chromatic');
+        chromaticEl.textContent = `${-part.transposition.interval.halfSteps}`;
+        transposeEl.appendChild(chromaticEl);
         attributesEl.appendChild(transposeEl);
         attributesChanged = true;
       }
