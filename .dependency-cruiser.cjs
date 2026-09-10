@@ -78,14 +78,12 @@ module.exports = {
     {
       name: 'alphatab-only-in-file-codecs',
       comment:
-        'alphaTab is a file-format codec confined to converters/guitarpro-mnx and the ' +
-        'workbench\'s lazy Guitar Pro import worker. It must never enter rendering or the ' +
-        'initial client bundle.',
+        'alphaTab is a devDependency of converters/guitarpro-mnx, kept only as the ' +
+        'differential-parity oracle for its tests. Nothing the app, the Worker or the ' +
+        'harness loads may import it — the workbench reads Guitar Pro through the ' +
+        'clean-room importer.',
       severity: 'error',
-      from: {
-        path: '^(src|worker|harness)/',
-        pathNot: '^src/workbench/guitarProImporter\\.worker\\.ts$'
-      },
+      from: { path: '^(src|worker|harness)/' },
       to: { path: 'alphatab' }
     }
   ],
