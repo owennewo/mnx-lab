@@ -19,6 +19,7 @@ import {
   type MnxPartMeasure
 } from '../../model/mnx.ts';
 import { durationValue } from '../../model/durations.ts';
+import { containerContent } from '../../model/noteWalk.ts';
 import { dynamicWidthSp } from './dynamics.ts';
 import { clearanceSpacing } from '../clearance.ts';
 
@@ -539,14 +540,14 @@ function alterGlyph(alter: number): string | null {
 }
 
 /**
- * Decides whether one note shows an accidental, honoring MNX's explicit
- * visibility model: `accidentalDisplay.show` always wins (`true` prints the
- * glyph for the note's alter — a natural when there is none), and a document
- * that declares `support.useAccidentalDisplay` has opted out of renderer
- * inference entirely, so unmarked notes show nothing. The inference fallback
- * shows an accidental iff the alter departs from the key signature (a natural
- * when the key alters the step but the note is unaltered). Within-measure
- * accidental carryover is not modeled yet.
+ * Decides whether one note shows an accidental when judged ALONE — against the
+ * key signature, with nothing carried from earlier in the bar. Honors MNX's
+ * explicit visibility model: `accidentalDisplay.show` always wins (`true`
+ * prints the glyph for the note's alter — a natural when there is none), and a
+ * document that declares `support.useAccidentalDisplay` has opted out of
+ * renderer inference entirely, so unmarked notes show nothing. Layouts ask the
+ * measure's `AccidentalResolver` instead; this is its fallback for a note the
+ * resolver never walked.
  */
 export function noteAccidentalGlyph(
   note: MnxNote,
@@ -559,6 +560,120 @@ export function noteAccidentalGlyph(
   if (useAccidentalDisplay) return null;
   const alter = note.pitch.alter ?? 0;
   return alter === keyAlterForStep(note.pitch.step, keyFifths) ? null : alterGlyph(alter);
+}
+
+/** Which accidental glyph (if any) a note of one measure prints. */
+export type AccidentalResolver = (note: MnxNote) => string | null;
+
+/**
+ * The accidentals one measure prints, decided ONCE for every layout that reads
+ * them: spacing prices the columns, notation draws the glyphs and the tab walk
+ * steps over the same widths, so all three must get the same answer.
+ *
+ * `accidentalDisplay` and `support.useAccidentalDisplay` behave as in
+ * `noteAccidentalGlyph`. Otherwise the common-practice rule:
+ *   - an accidental holds to the barline at its staff position (step + octave,
+ *     on that staff of that part, across voices), so a note prints one iff its alter differs
+ *     from what is in force there — the last alter written, else the key's;
+ *   - a tie continuation never restates its accidental and puts nothing in
+ *     force: across a barline it carries the tied alteration, and a later
+ *     untied note at that position must state it again.
+ * Notes are judged in onset order, a grace group just ahead of its onset.
+ * Ottavas and mid-bar clef changes are not modeled: the position is the
+ * sounding step + octave.
+ */
+export function measureAccidentals(
+  partMeasures: readonly (MnxPartMeasure | undefined)[],
+  keyFifths: number,
+  useAccidentalDisplay: boolean,
+  tieTargets: ReadonlySet<string>
+): AccidentalResolver {
+  const entries: { note: MnxNote; staff: string; onset: number; grace: boolean; order: number }[] = [];
+  const add = (notes: MnxNote[] | undefined, staff: string, onset: number, grace: boolean) => {
+    for (const note of notes ?? []) entries.push({ note, staff, onset, grace, order: entries.length });
+  };
+  partMeasures.forEach((pm, part) => {
+    for (const seq of pm?.sequences ?? []) {
+      const staff = `${part}:${seq.staff ?? 1}`; // parts never share a staff
+      let onset = 0;
+      for (const item of seq.content ?? []) {
+        if (isGrace(item)) {
+          for (const e of item.content) if (isTimedEvent(e)) add(e.notes, staff, onset, true);
+        } else if (isTremolo(item)) {
+          for (const e of item.content) if (isTimedEvent(e)) add(e.notes, staff, onset, false);
+          onset += tremoloDuration(item);
+        } else if (isTuplet(item)) {
+          const innerSum = item.content.reduce(
+            (sum, e) => sum + (isTimedEvent(e) ? durationValue(e.duration) : 0),
+            0
+          );
+          const scale = innerSum > 0 ? tupletDuration(item) / innerSum : 1;
+          let at = onset;
+          for (const e of item.content) {
+            if (!isTimedEvent(e)) continue;
+            add(e.notes, staff, at, false);
+            at += durationValue(e.duration) * scale;
+          }
+          onset += tupletDuration(item);
+        } else if (isTimedEvent(item)) {
+          add(item.notes, staff, onset, false);
+          onset += durationValue(item.duration);
+        } else {
+          onset += 0.25; // the layouts' placeholder quarter
+        }
+      }
+    }
+  });
+  entries.sort((a, b) =>
+    Math.abs(a.onset - b.onset) > ONSET_EPS
+      ? a.onset - b.onset
+      : Number(b.grace) - Number(a.grace) || a.order - b.order
+  );
+
+  const inForce = new Map<string, number>();
+  const glyphs = new Map<MnxNote, string | null>();
+  for (const { note, staff } of entries) {
+    const alter = note.pitch.alter ?? 0;
+    const position = `${staff}:${note.pitch.step.toUpperCase()}${note.pitch.octave}`;
+    const tiedInto = note.id !== undefined && tieTargets.has(note.id);
+    const show = note.accidentalDisplay?.show;
+    let glyph: string | null;
+    if (show === true) glyph = alterGlyph(alter);
+    else if (show === false || useAccidentalDisplay || tiedInto) glyph = null;
+    else {
+      const expected = inForce.get(position) ?? keyAlterForStep(note.pitch.step, keyFifths);
+      glyph = alter === expected ? null : alterGlyph(alter);
+    }
+    glyphs.set(note, glyph);
+    if (!tiedInto) inForce.set(position, alter);
+  }
+  return note =>
+    glyphs.has(note) ? glyphs.get(note) ?? null : noteAccidentalGlyph(note, useAccidentalDisplay, keyFifths);
+}
+
+/** Ids of every note a tie lands on — continuations, which never restate an accidental. */
+export function tieTargetIds(mnx: MnxStructure): Set<string> {
+  const targets = new Set<string>();
+  const walk = (items: readonly MnxSequenceItem[] | undefined, depth: number) => {
+    if (depth > 32) return;
+    for (const item of items ?? []) {
+      const inner = containerContent(item);
+      if (inner) {
+        walk(inner, depth + 1);
+        continue;
+      }
+      if (!isTimedEvent(item)) continue;
+      for (const note of item.notes ?? []) {
+        for (const tie of note.ties ?? []) if (tie.target) targets.add(tie.target);
+      }
+    }
+  };
+  for (const part of mnx.parts ?? []) {
+    for (const measure of part.measures ?? []) {
+      for (const seq of measure.sequences ?? []) walk(seq.content, 0);
+    }
+  }
+  return targets;
 }
 
 // ---------- Tuplet columns (shared with the notation renderer) ----------
@@ -576,11 +691,7 @@ export interface TupletColumn {
  * room than its eighths). The renderer places inner notes with the same
  * columns; keep the two in lockstep by computing them only here.
  */
-export function tupletColumns(
-  t: MnxTuplet,
-  useAccidentalDisplay: boolean,
-  keyFifths: number
-): TupletColumn[] {
+export function tupletColumns(t: MnxTuplet, accidentalOf: AccidentalResolver): TupletColumn[] {
   const innerSum = t.content.reduce(
     (sum, e) => sum + (isTimedEvent(e) ? durationValue(e.duration) : 0),
     0
@@ -589,7 +700,7 @@ export function tupletColumns(
   return t.content.map(e => {
     if (!isTimedEvent(e)) return { leading: 0, advance: CORE_SP };
     const accidentals = (e.notes ?? []).filter(
-      n => noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths) !== null
+      n => accidentalOf(n) !== null
     ).length;
     const leading = accidentals
       ? accidentals * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP
@@ -1183,6 +1294,7 @@ export function planHorizontal(
   }
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
+  const tieTargets = tieTargetIds(mnx);
   const leftInset = options?.leftInsetSp ?? 0;
   const subsequentLeftInset = options?.subsequentLeftInsetSp ?? leftInset;
   const clearance = clearanceSpacing(options?.display?.clearance, options?.densityPad);
@@ -1334,6 +1446,15 @@ export function planHorizontal(
       keyFifths = globalMeasure.key.fifths;
     }
 
+    // Spacing prices the accidental columns with this; notation and tab build the
+    // same resolver for the same measure (measureAccidentals is deterministic).
+    const accidentalOf = measureAccidentals(
+      uniquePartsOf(planStaves).map(part => part.measures?.[i]),
+      keyFifths,
+      useAccidentalDisplay,
+      tieTargets
+    );
+
     const issues: string[] = [];
     // Measure-level attributes this renderer does not draw yet say so on the
     // bar — the amber badge the rendering contract promises for a gap. Until
@@ -1426,7 +1547,7 @@ export function planHorizontal(
                 onset += dur;
                 const accidentals = event.content
                   .flatMap(e => e.notes ?? [])
-                  .filter(n => noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths) !== null)
+                  .filter(n => accidentalOf(n) !== null)
                   .length;
                 return withColumnExtras({
                   leading: accidentals
@@ -1443,7 +1564,7 @@ export function planHorizontal(
                 onset += tupletDuration(event);
                 return withColumnExtras({
                   leading: 0,
-                  core: tupletColumns(event, useAccidentalDisplay, keyFifths)
+                  core: tupletColumns(event, accidentalOf)
                     .reduce((sum, c) => sum + c.advance, 0),
                   spring: 0
                 });
@@ -1458,7 +1579,7 @@ export function planHorizontal(
               }
               onset += durationValue(event.duration);
               const accidentals = (event.notes ?? []).filter(
-                n => noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths) !== null
+                n => accidentalOf(n) !== null
               ).length;
               // A syllable is CENTRED on the note, but the anchor sits a
               // fixed half-core from the column start — so lyric width added

@@ -81,6 +81,36 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Accidentals carry to the barline — 2026-09-10
+
+Owner: user-reported rendering fix (a Soundslice comparison: one G♭ restated on every
+beat of a bar), landed directly on `main`; no roadmap doc. The renderer judged every
+note against the key signature alone, so a repeated altered note restated its
+accidental each time — and, worse, an unaltered note after an altered one in the same
+bar printed no natural, which reads as the wrong pitch. `measureAccidentals`
+(`src/engine/layout/spacing.ts`) now applies the common-practice rule: an accidental
+holds to the barline at its staff position (step + octave, per staff of each part,
+across voices, in onset order, grace notes included); a tie continuation never
+restates and puts nothing in force. Explicit `accidentalDisplay` and
+`support.useAccidentalDisplay` still win. Spacing, notation and the tab walk each
+build the resolver from the same inputs. Pinned by
+`harness/conformance/accidental-carryover.test.ts`.
+
+One scenario moved, all four goldens (`expected.primitives.json`, `expected.svg`,
+`expected.tab.svg`, `expected.both.svg`). It was `rendered`, not `verified`, so nothing
+was demoted.
+
+Look for: the last chord's G now carries a natural. The bar opens with a G♯ grace note,
+which puts G♯ in force at G3 for the rest of the bar — an accidental on a grace note
+holds to the barline like any other — so the chord's plain G has to cancel it. The
+natural should sit left of the G notehead, clear of the other chord members, and the
+chord's column widens by one accidental slot on both staves: the tab digits must stay
+in column with the notation above. Nothing else in the bar gains or loses an accidental.
+
+Scenario set (paths under `scenarios/`):
+
+- `lab/26-tab-rhythm/02-grace-on-tab`
+
 ### Only stacked ink spaces a tab staff from its notation — 2026-09-10
 
 Owner: user-reported spacing fix, landed directly on `main`; no roadmap doc. At the

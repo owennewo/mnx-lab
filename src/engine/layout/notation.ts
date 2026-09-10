@@ -43,7 +43,9 @@ import {
   PlanStaff,
   StaffSource,
   ResolvedVoice,
-  noteAccidentalGlyph,
+  type AccidentalResolver,
+  measureAccidentals,
+  tieTargetIds,
   durationValue,
   ActiveClef,
   ClefAt,
@@ -1193,6 +1195,7 @@ function assembleSegment(
   const primitives: Primitive[] = [];
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
+  const tieTargets = tieTargetIds(mnx);
   // Staff/source labels, group labels and (nested) group decorations sit left
   // of the system inside an extra inset, so the music shifts right for them.
   // Per staff, source labels ("1"/"2") stack right-aligned at the label edge
@@ -1759,6 +1762,13 @@ function assembleSegment(
     // event must not take down the bar. Fingerboard issues attributable to one
     // event draw UNDER that event's column on the (part-0) tab staff; the rest
     // stack in the bar corner.
+    // The same accidentals spacing priced this measure's columns with.
+    const accidentalOf = measureAccidentals(
+      (mnx.parts ?? []).map(part => part.measures?.[writtenIndex(plan, i)]),
+      m.keyFifths,
+      useAccidentalDisplay,
+      tieTargets
+    );
     const fromValidation = validationByMeasure.get(writtenIndex(plan, i)) ?? [];
     const tabAnchorTd = tabDisplays.find(td => td.part === mnx.parts?.[0]);
     const anchoredTabIssues = tabAnchorTd
@@ -1803,8 +1813,7 @@ function assembleSegment(
                 ink: plan.inkRatio,
                 staffTop: staffTops[s],
                 clef: posClef,
-                useAccidentalDisplay,
-                keyFifths: m.keyFifths,
+                accidentalOf,
                 primitives,
                 keyFor:
                   synthesizePartForStaff[s] !== null
@@ -1832,8 +1841,7 @@ function assembleSegment(
                 ink: plan.inkRatio,
                 staffTop: staffTops[s],
                 clef: posClef,
-                useAccidentalDisplay,
-                keyFifths: m.keyFifths,
+                accidentalOf,
                 primitives,
                 keyFor:
                   synthesizePartForStaff[s] !== null
@@ -1862,8 +1870,7 @@ function assembleSegment(
                 ink: plan.inkRatio,
                 staffTop: staffTops[s],
                 clef: posClef,
-                useAccidentalDisplay,
-                keyFifths: m.keyFifths,
+                accidentalOf,
                 primitives,
                 keyFor:
                   synthesizePartForStaff[s] !== null
@@ -1894,8 +1901,7 @@ function assembleSegment(
               clef: posClef,
               stemOverride,
               beamDir: beamRun?.dir ?? null,
-              useAccidentalDisplay,
-              keyFifths: m.keyFifths,
+              accidentalOf,
               activeNoteIds,
               selectedNoteIds,
               selectedEventIds,
@@ -1994,7 +2000,7 @@ function assembleSegment(
           technique: td.technique,
           // The notation staff above draws the bracket over the same columns.
           showTupletBrackets: false,
-          accidentalContext: { useAccidentalDisplay, keyFifths: m.keyFifths }
+          accidentalOf
         });
       }
     }
@@ -3457,8 +3463,8 @@ interface EmitGraceGroupArgs {
   ink: number;
   staffTop: number;
   clef: ActiveClef;
-  useAccidentalDisplay: boolean;
-  keyFifths: number;
+  /** The measure's accidental resolver — spacing.ts decides carryover once. */
+  accidentalOf: AccidentalResolver;
   primitives: Primitive[];
   /** Selection key for the note at (raw index in the container's content,
    *  note index) — container content is addressable now (campaign item 11b),
@@ -3478,7 +3484,7 @@ interface EmitGraceGroupArgs {
  * principal.
  */
 function emitGraceGroup(args: EmitGraceGroupArgs): void {
-  const { grace, firstX, ink, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor, beamSlantSp } = args;
+  const { grace, firstX, ink, staffTop, clef, accidentalOf, primitives, keyFor, beamSlantSp } = args;
   const rawIndex = new Map<MnxEvent, number>(grace.content.map((e, i) => [e, i]));
   const inner = grace.content.filter(e => !e.rest && (e.notes?.length ?? 0) > 0);
   if (inner.length === 0) return;
@@ -3521,7 +3527,7 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
     }
 
     notes.forEach((n, idx) => {
-      const accGlyph = noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths);
+      const accGlyph = accidentalOf(n);
       if (accGlyph) {
         primitives.push({
           kind: 'glyph',
@@ -3664,8 +3670,8 @@ interface EmitTremoloGroupArgs {
   ink: number;
   staffTop: number;
   clef: ActiveClef;
-  useAccidentalDisplay: boolean;
-  keyFifths: number;
+  /** The measure's accidental resolver — spacing.ts decides carryover once. */
+  accidentalOf: AccidentalResolver;
   primitives: Primitive[];
   /** Selection key for the note at (raw index in the container's content,
    *  note index) — container content is addressable now (campaign item 11b),
@@ -3680,7 +3686,7 @@ interface EmitTremoloGroupArgs {
  * whole notes. Stem direction follows the pair's combined pitches.
  */
 function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
-  const { tremolo, firstX, ink, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor } = args;
+  const { tremolo, firstX, ink, staffTop, clef, accidentalOf, primitives, keyFor } = args;
   const rawIndex = new Map<MnxEvent, number>(tremolo.content.map((e, i) => [e, i]));
   const inner = tremolo.content.filter(e => (e.notes?.length ?? 0) > 0).slice(0, 2);
   if (inner.length === 0) return;
@@ -3720,7 +3726,7 @@ function emitTremoloGroup(args: EmitTremoloGroupArgs): void {
 
     notes.forEach((n, idx) => {
       const tremoloKey = keyFor?.(rawIndex.get(event) ?? 0, idx);
-      const accGlyph = noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths);
+      const accGlyph = accidentalOf(n);
       if (accGlyph) {
         primitives.push({
           kind: 'glyph',
@@ -3807,8 +3813,8 @@ interface EmitTupletGroupArgs {
   ink: number;
   staffTop: number;
   clef: ActiveClef;
-  useAccidentalDisplay: boolean;
-  keyFifths: number;
+  /** The measure's accidental resolver — spacing.ts decides carryover once. */
+  accidentalOf: AccidentalResolver;
   primitives: Primitive[];
   /** Selection key for the note at (raw index in the container's content,
    *  note index) — container content is addressable now (campaign item 11b),
@@ -3826,8 +3832,8 @@ interface EmitTupletGroupArgs {
  * `inner.multiple` number in a gap, as in the spec's reference engraving.
  */
 function emitTupletGroup(args: EmitTupletGroupArgs): void {
-  const { tuplet, firstX, ink, staffTop, clef, useAccidentalDisplay, keyFifths, primitives, keyFor, beamSlantSp } = args;
-  const cols = tupletColumns(tuplet, useAccidentalDisplay, keyFifths);
+  const { tuplet, firstX, ink, staffTop, clef, accidentalOf, primitives, keyFor, beamSlantSp } = args;
+  const cols = tupletColumns(tuplet, accidentalOf);
   const events = tuplet.content;
   if (events.length === 0) return;
 
@@ -3901,7 +3907,7 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
       });
     }
     notes.forEach((n, idx) => {
-      const accGlyph = noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths);
+      const accGlyph = accidentalOf(n);
       if (accGlyph) {
         primitives.push({
           kind: 'glyph',
@@ -4067,8 +4073,8 @@ interface EmitEventArgs {
   /** Set when the event is in a beam run: forces stem direction and defers
    *  the stem (returned, not emitted) so it can be drawn to the beam line. */
   beamDir: 1 | -1 | null;
-  useAccidentalDisplay: boolean;
-  keyFifths: number;
+  /** The measure's accidental resolver — spacing.ts decides carryover once. */
+  accidentalOf: AccidentalResolver;
   activeNoteIds: readonly string[];
   selectedNoteIds: readonly string[];
   /** Events lit by the selection — how a REST is selected, since it has no
@@ -4100,7 +4106,7 @@ interface EmitEventArgs {
 /** Returns the deferred stem when the event is beamed, else null. */
 function emitEvent(args: EmitEventArgs): BeamedStem | null {
   const {
-    event, eventX, ink, staffTop, clef, stemOverride, beamDir, useAccidentalDisplay, keyFifths,
+    event, eventX, ink, staffTop, clef, stemOverride, beamDir, accidentalOf,
     activeNoteIds, selectedNoteIds, selectedEventIds,
     primitives, index, measureIndex, voiceIndex, eventIndex,
     row, curveKey, curveAnchors, synthesizeKeys, keyPartIndex, keyStaffIndex
@@ -4256,7 +4262,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   // Accidentals (left of the notehead column)
   const accidentalEntries = notes
     .map((n, idx) => ({
-      glyph: noteAccidentalGlyph(n, useAccidentalDisplay, keyFifths),
+      glyph: accidentalOf(n),
       staffY: staffYs[idx],
       noteIdx: idx
     }))
