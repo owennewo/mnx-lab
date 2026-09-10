@@ -75,7 +75,7 @@ viewer reveal and verse choice; inspection retains its separate value.
 
 The scenario page mounts controls/table at the top of its existing side panel,
 beside the engraving. It does not add an editor tray command or overlay the score.
-`#/scenario/<id>?view=notation|tab|both&at=<ordinal>` seeks without autoplay; query
+`#/scenario/<id>?at=<ordinal>` seeks without autoplay; query
 parameter order does not matter. An explicit later `at` navigation seeks again;
 edits do not reuse an already-consumed old route ordinal.
 

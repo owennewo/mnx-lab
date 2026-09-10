@@ -166,8 +166,11 @@ try {
   const cdp = client(ws);
   await cdp.send('Runtime.enable');
   await cdp.send('Page.enable');
+  await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
+    source: "localStorage.setItem('mnx-lab.view','both');"
+  });
 
-  const url = `http://127.0.0.1:${site.port}/#/scenario/lab/document/twelve-bar-blues?view=both`;
+  const url = `http://127.0.0.1:${site.port}/#/scenario/lab/document/twelve-bar-blues`;
   await cdp.send('Page.navigate', { url });
   await new Promise(r => setTimeout(r, 7000));
 

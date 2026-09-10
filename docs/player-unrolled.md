@@ -1,8 +1,9 @@
 # Unrolled engraving
 
 Implementation loop, player campaign item 10. The **Unrolled** checkbox in the
-score settings shows performed order in notation, tab or both. The URL carries
-`unrolled=1`, independently of `view` and the initial playback `at` ordinal. It is
+score settings shows performed order in notation, tab or both. It is a
+per-browser preference (localStorage `mnx-lab.unrolled`), independent of the staff
+view and of the URL's initial playback `at` ordinal. It is
 presentation state: the document and its written IDs never change.
 
 `<mnx-document-viewer unrolled>` exposes the same behavior to embed hosts. All SVG

@@ -193,8 +193,9 @@ recipe for verifying renderer features.
 
 ## The workbench (`src/workbench/`) — review-first, no backend
 
-Home is the **attention queue**; every scenario + view has a stable deep link
-(`#/scenario/<id>?view=notation|tab|both`); `#/objects` is the coverage map. Tab views
+Home is the **attention queue**; every scenario has a stable deep link
+(`#/scenario/<id>`; the staff view and repeats mode are per-browser localStorage
+preferences, not link state); `#/objects` is the coverage map. Tab views
 exist only when the strings are KNOWN — **no instrument is ever assumed**. Theming is
 `light-dark()`, never an attribute.
 

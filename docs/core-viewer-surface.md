@@ -16,7 +16,7 @@ engine RenderOptions        pure, Node-safe — the behavior ground truth
    ↑ bound by
 element props/attributes    <mnx-document-viewer> — a BINDING, not a second implementation
    ↑ composed by
-workbench chrome            toolbar, URL ?view=, palette — explicitly NOT the surface
+workbench chrome            toolbar, stored view, palette — explicitly NOT the surface
 ```
 
 **Every element knob corresponds to an engine option.** The element never

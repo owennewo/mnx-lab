@@ -179,7 +179,10 @@ try {
   // A two-voice guitar part beside a bass part, in the combined view — the
   // shape that exposed all three bugs, because its voices stop sharing columns
   // the moment one of them gains an event.
-  const url = `http://127.0.0.1:${site.port}/#/scenario/lab/document/twelve-bar-blues?view=both`;
+  await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
+    source: "localStorage.setItem('mnx-lab.view','both');"
+  });
+  const url = `http://127.0.0.1:${site.port}/#/scenario/lab/document/twelve-bar-blues`;
   await cdp.send('Page.navigate', { url });
   await new Promise(r => setTimeout(r, 7000));
 

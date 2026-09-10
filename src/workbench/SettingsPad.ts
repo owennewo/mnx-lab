@@ -13,9 +13,8 @@ import type { ViewMode } from '../elements/DocumentViewer.ts';
  *
  * **This is chrome, not surface** (docs/core-viewer-surface.md): the pad owns
  * no view state. The current view and the views a document can support come in
- * as properties, and each view option is a real `<a>` to the href the host
- * computes (`hrefFor`), so the URL stays the single writer of the view —
- * exactly the contract the retired head tabs had, moved over the score. Living
+ * as properties, and choosing one emits `view-change` for the shell to store —
+ * a per-browser preference like the zoom, not part of the URL. Living
  * in the cluster rather than the page head also keeps view switching reachable
  * in document focus, which the head tabs never were (the head is removed there).
  *
@@ -23,8 +22,8 @@ import type { ViewMode } from '../elements/DocumentViewer.ts';
  * (roadmap/proposed/workbench-settings-card.md), five decisions deep:
  *
  *   1. The first row is **STAFF**, not SHOW. It chooses which staff kinds are
- *      drawn; *show* named the verb the whole card performs, and *view* is the
- *      URL's word for the same choice — the URL keeps it.
+ *      drawn; *show* named the verb the whole card performs, and *view* stays
+ *      the code's word for the same choice.
  *   2. **A glyph beside each value word** — a small picture of the RESULT, the
  *      word kept for the reader who does not trust the picture. Glyphs on the
  *      row title name the thing rather than the choice; glyphs INSTEAD of the
@@ -55,8 +54,6 @@ const ALL_VIEWS: readonly ViewMode[] = ['notation', 'tab', 'both'];
 interface Choice {
   value: string;
   word: string;
-  /** Set on the STAFF row only: the option is a link, and the URL writes it. */
-  href?: string;
   /** Set when this document cannot offer the value — greyed, reason in tooltip. */
   unavailable?: string;
 }
@@ -73,7 +70,7 @@ const NO_STRINGS =
 @customElement('mnx-settings-pad')
 export class SettingsPad extends LitElement {
   /** Repeats drawn as written, or unrolled into their performed order. Owned
-   *  by the route, like the view: the pad asks, the host writes `?unrolled=1`. */
+   *  by the shell, like the view: the pad asks, the shell stores it. */
   @property({ type: Boolean }) unrolled = false;
 
   /** The view the score is drawing now. */
@@ -86,10 +83,6 @@ export class SettingsPad extends LitElement {
    *  option reads as a broken control rather than as "this document has no
    *  fingerboard" — the fact the grey options exist to teach. */
   @property({ attribute: false }) views: ViewMode[] = ['notation'];
-
-  /** Href for a view option, from whoever owns the routing. Options render as
-   *  plain links so deep links, middle-click and history all keep working. */
-  @property({ attribute: false }) hrefFor: ((view: ViewMode) => string) | null = null;
 
   @property({ attribute: false }) display: DisplayOptions = {};
 
@@ -146,6 +139,14 @@ export class SettingsPad extends LitElement {
   private emitDisplay(key: keyof typeof DISPLAY_CHOICES, value: string) {
     this.dispatchEvent(new CustomEvent('display-change', {
       detail: { ...this.display, [key]: value },
+      bubbles: true,
+      composed: true
+    }));
+  }
+
+  private emitView(value: ViewMode) {
+    this.dispatchEvent(new CustomEvent('view-change', {
+      detail: value,
       bubbles: true,
       composed: true
     }));
@@ -353,10 +354,6 @@ export class SettingsPad extends LitElement {
    * The list, in the card's own DOM — which is what keeps the card open beneath
    * it. `pointerleave` fires on the outer element and the list is a descendant,
    * so no holding logic is owed here at all.
-   *
-   * A menu rather than a listbox because the STAFF row's items must stay real
-   * links (deep links, middle-click, history), and a link is a legitimate
-   * menuitem while it is an awkward option.
    */
   private list(
     key: string,
@@ -377,29 +374,6 @@ export class SettingsPad extends LitElement {
           if (choice.unavailable) {
             return html`<span class="item off" title=${choice.unavailable} aria-disabled="true"
               >${SettingsPad.glyph(key, choice.value)}<span class="word">${choice.word}</span></span
-            >`;
-          }
-          if (choice.href !== undefined) {
-            return html`<a
-              class="item row-state ${on ? 'row-current' : ''}"
-              role="menuitem"
-              href=${choice.href}
-              aria-current=${on}
-              @click=${() => {
-                // Exactly what a display row does when its list is used: drop
-                // the list, keep the card, hand focus back to the trigger —
-                // and in that order, for the focusout reason below. STAFF used
-                // to close the whole card, which made the one row whose
-                // options are LINKS behave unlike its eight neighbours: every
-                // other setting can be changed and then reconsidered without
-                // the card vanishing underneath. Changing the view does not
-                // rebuild the pad — ScenarioPage resets loadState only when
-                // the SOURCE changes — so the open card survives the
-                // navigation the link performs.
-                this.focusField(key);
-                this.openList = null;
-              }}
-              >${SettingsPad.glyph(key, choice.value)}<span class="word">${choice.word}</span></a
             >`;
           }
           return html`<button
@@ -472,11 +446,9 @@ export class SettingsPad extends LitElement {
     const choices: Choice[] = ALL_VIEWS.map(view => ({
       value: view,
       word: VIEW_WORDS[view],
-      href: this.views.includes(view) ? (this.hrefFor?.(view) ?? '#') : undefined,
       unavailable: this.views.includes(view) ? undefined : NO_STRINGS
     }));
-    // No `select`: every live option is a link, and the URL is the only writer.
-    return this.row('view', 'Staff', choices, this.view, () => {});
+    return this.row('view', 'Staff', choices, this.view, value => this.emitView(value as ViewMode));
   }
 
   private repeatsRow() {

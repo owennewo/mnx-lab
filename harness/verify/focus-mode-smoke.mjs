@@ -199,11 +199,12 @@ try {
     source:
       "localStorage.setItem('mnx-lab.rail-hidden','1');" +
       "localStorage.setItem('mnx-lab.panel-hidden','1');" +
-      "localStorage.setItem('mnx-lab.staff-scale','1.2');"
+      "localStorage.setItem('mnx-lab.staff-scale','1.2');" +
+      "localStorage.setItem('mnx-lab.view','both');"
   });
 
   const url =
-    `http://127.0.0.1:${site.port}/#/scenario/lab/document/twelve-bar-blues?view=both`;
+    `http://127.0.0.1:${site.port}/#/scenario/lab/document/twelve-bar-blues`;
   await cdp.send('Page.navigate', { url });
   await new Promise(resolve => setTimeout(resolve, 6500));
 
@@ -420,7 +421,7 @@ try {
 
   await focusKey();
   await cdp.evaluate(
-    "location.hash='#/scenario/lab/document/navigation-playground?view=notation'"
+    "location.hash='#/scenario/lab/document/navigation-playground'"
   );
   await new Promise(resolve => setTimeout(resolve, 1200));
   state = await dump();

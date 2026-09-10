@@ -131,7 +131,7 @@ export class QueueHome extends LitElement {
         <div class="rows">
           ${items.map(
             i => html`
-              <a class="row" href=${scenarioHref(i.entry.id, 'compare')}>
+              <a class="row" href=${scenarioHref(i.entry.id, { panel: 'compare' })}>
                 <span class="id">${i.entry.id}</span>
                 <span class="why">${i.detail}</span>
               </a>

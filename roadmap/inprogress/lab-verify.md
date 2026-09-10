@@ -495,7 +495,7 @@ invalidated; this note records the additional cause a reviewer will see.
 
 **What a reviewer should look for.** In the standalone TAB view only: barlines,
 final barlines and repeat strokes are slightly HEAVIER than before and now match
-the `both` view's tab staff exactly — flip between `?view=tab` and `?view=both` on
+the `both` view's tab staff exactly — flip STAFF between Tab and Both on
 any tab scenario and the stroke weights should agree. Everything else (columns,
 digits, spacing) is unchanged; any horizontal movement beyond the final barline's
 thick stroke growing inward is a failure.

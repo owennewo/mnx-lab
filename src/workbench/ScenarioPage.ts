@@ -23,7 +23,7 @@ import { corpus, type ScenarioEntry } from '../corpus/corpus.ts';
 import { groupScenarios } from '../corpus/groups.ts';
 import { classify } from './queue.ts';
 import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
-import { scenarioHref, documentHref, objectsHref } from './WorkbenchApp.ts';
+import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
 import type { DocumentViewer, ViewMode } from '../elements/DocumentViewer.ts';
@@ -406,8 +406,12 @@ function presentationSpan(
 @customElement('mnx-scenario-page')
 export class ScenarioPage extends LitElement {
   @property({ type: String }) scenarioId = '';
+  /** The stored staff-view preference ('' = unset ⇒ the document's hint) and
+   *  repeats mode. Shell-owned: the settings pad's changes bubble up to it. */
   @property({ type: String }) view = '';
   @property({type:Boolean}) unrolled = false;
+  /** The side-panel tab a link asked for (`?panel=compare|json`). */
+  @property({ type: String }) panel = '';
   @property({attribute:false}) at: number | null=null;
   @state() private performance: Performance | null=null;
   private clickedPlaybackKey='';
@@ -1858,10 +1862,10 @@ export class ScenarioPage extends LitElement {
     if(changed.has('at'))this.routeSeekConsumed=false;
     const sourceChanged = changed.has('scenarioId') || changed.has('localDocument');
     if (changed.has('view') || sourceChanged) this.flushPendingFret();
-    // Legacy ?view=compare|json deep links (the documented contract) open
-    // the matching panel tab — the main pane keeps the default score view.
-    if (changed.has('view') || sourceChanged) {
-      if (this.view === 'compare' || this.view === 'json') this.panelTab = this.view;
+    // ?panel=compare|json links (the queue's rows) open the matching panel
+    // tab — the main pane keeps the stored score view.
+    if (changed.has('panel') || sourceChanged) {
+      if (this.panel === 'compare' || this.panel === 'json') this.panelTab = this.panel;
     }
     if (sourceChanged) {
       // A PKCE landing brought us here to show its verdict: the assist tab
@@ -1869,7 +1873,7 @@ export class ScenarioPage extends LitElement {
       if (this.landingFocus) {
         this.panelTab = 'assist';
         this.landingFocus = false;
-      } else if (this.view !== 'compare' && this.view !== 'json') {
+      } else if (this.panel !== 'compare' && this.panel !== 'json') {
         this.panelTab = 'hud';
       }
       this.doc = null;
@@ -2371,7 +2375,7 @@ export class ScenarioPage extends LitElement {
     // rather than a one-shot. Set only on a step that really happens: at the
     // end of the collection nothing moves, so nothing should be carried.
     this.railRung = this.session?.selectionLevel ?? null;
-    location.hash = scenarioHref(next.id, this.view || undefined);
+    location.hash = scenarioHref(next.id);
   }
 
 
@@ -2905,16 +2909,12 @@ export class ScenarioPage extends LitElement {
   private activeView(_entry: ScenarioEntry): ViewMode {
     const allowed = this.availableViews();
     if (allowed.includes(this.view as ViewMode)) return this.view as ViewMode;
-    // Unspecified (or no-longer-available, or legacy compare/json) view:
-    // the document's own hint.
+    // Unset (or unavailable for this document) view: the document's own
+    // hint. The stored preference is left alone for the next document.
     return this.defaultView();
   }
 
-  private viewHref(entry: ScenarioEntry, view: ViewMode): string {
-    return this.isLocalDocument() ? documentHref(view, this.unrolled) : scenarioHref(entry.id, view, this.at ?? undefined, this.unrolled);
-  }
-
-  /** The document's preferred view when the URL names none: its `staffKind`
+  /** The document's preferred view when no view is stored: its `staffKind`
    *  hint when tab is possible, else notation. */
   private defaultView(): ViewMode {
     if (!this.tabCapable()) return 'notation';
@@ -3093,12 +3093,6 @@ export class ScenarioPage extends LitElement {
                   .view=${view}
                   .views=${views}
                   .unrolled=${this.unrolled}
-                  @unrolled-change=${(event: CustomEvent<boolean>) => {
-                    const params = new URLSearchParams(location.hash.split('?')[1] ?? '');
-                    if (event.detail) params.set('unrolled', '1'); else params.delete('unrolled');
-                    location.hash = location.hash.split('?')[0] + (params.size ? '?' + params : '');
-                  }}
-                  .hrefFor=${(v: ViewMode) => this.viewHref(entry, v)}
                 ></mnx-settings-pad>
               </mnx-zoom-pad>`
             : nothing}

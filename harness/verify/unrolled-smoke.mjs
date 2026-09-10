@@ -32,8 +32,12 @@ try {
     deviceScaleFactor: 1,
     mobile: false,
   });
+  // The staff view and repeats mode are stored preferences, not URL state.
+  await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
+    source: "localStorage.setItem('mnx-lab.view','notation');localStorage.setItem('mnx-lab.unrolled','1');",
+  });
   await cdp.send('Page.navigate', {
-    url: `http://127.0.0.1:${server.port}/#/scenario/spec/repeats-alternate-endings-simple?unrolled=1&view=notation&at=2`,
+    url: `http://127.0.0.1:${server.port}/#/scenario/spec/repeats-alternate-endings-simple?at=2`,
   });
   let ready = false;
   for (let i = 0; i < 100; i++) {
@@ -71,9 +75,11 @@ try {
     // The REPEATS row is a two-way field now, not a checkbox: one click
     // flips it (roadmap/proposed/workbench-settings-card.md).
     const toggle=settings.shadowRoot.querySelector('.field[data-row="repeats"]');toggle.click();await delay(100);
-    check(!location.hash.includes('unrolled=1') && !viewer.unrolled,'Toggle did not update route and viewer');
+    check(localStorage.getItem('mnx-lab.unrolled')==='0' && !viewer.unrolled,'Toggle did not update preference and viewer');
     check(location.hash.includes('at=2'),'Toggle erased ordinal route');
-    location.hash='#/scenario/lab/navigation/ds-final-ending?view=notation&unrolled=1';
+    toggle.click();await delay(100);
+    check(localStorage.getItem('mnx-lab.unrolled')==='1' && viewer.unrolled,'Toggle did not restore unrolled');
+    location.hash='#/scenario/lab/navigation/ds-final-ending';
     for(let i=0;i<100 && player.documentId!=='lab/navigation/ds-final-ending';i++)await delay(50);
     await delay(100);viewer=page.shadowRoot.querySelector('mnx-document-viewer');
     // The corpus probe uses whole notes crossing each slice. Split its first

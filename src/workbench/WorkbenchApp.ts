@@ -1,6 +1,7 @@
 // The workbench shell — a clean-room, review-first rebuild (structure-lab).
-// Home is the attention queue; every scenario + view mode has a stable
-// deep-linkable URL (#/scenario/<id>?view=…). The shell is a leaf: it
+// Home is the attention queue; every scenario has a stable deep-linkable URL
+// (#/scenario/<id>). The staff view and repeats mode are per-browser
+// preferences like the zoom, not part of the link. The shell is a leaf: it
 // consumes corpus/ and elements/, and nothing imports it.
 //
 // The workbench has NO backend: corpus content is committed JSON served
@@ -13,6 +14,7 @@ import { corpus, corpusManifest, coverage, type ScenarioEntry } from '../corpus/
 import { groupScenarios } from '../corpus/groups.ts';
 import { buildQueue, classify } from './queue.ts';
 import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
+import type { ViewMode } from '../elements/DocumentViewer.ts';
 import { resolveShellAction, strokeOf } from '../edit/keymap.ts';
 import { keyIsOurs } from './keyScope.ts';
 import type { EditorIntent } from '../edit/intents.ts';
@@ -30,39 +32,40 @@ import {
   type LocalDocumentSource
 } from './localFile.ts';
 
+/** A scenario-page side-panel tab a link may open (the queue's rows open
+ *  `compare`). The staff view is NOT a link parameter — it is a stored
+ *  preference, like the zoom. */
+export type PanelLink = 'compare' | 'json';
+
 export interface Route {
   page: 'home' | 'scenario' | 'document' | 'objects' | 'converters';
   id?: string;
-  view?: string;
   at?: number;
-  unrolled?: boolean;
+  panel?: PanelLink;
   /** The schema object on #/objects/<def>; absent on the index itself. */
   def?: string;
 }
 
 export function parseHash(hash: string): Route {
   const scenario = /^#\/scenario\/([^?]+)(?:\?(.*))?$/.exec(hash);
-  if (scenario) {const params=new URLSearchParams(scenario[2]??'');const at=params.get('at');
-    try{return {page:'scenario',id:decodeURIComponent(scenario[1]),view:params.get('view')??undefined, unrolled:params.get('unrolled')==='1',
+  if (scenario) {const params=new URLSearchParams(scenario[2]??'');const at=params.get('at');const panel=params.get('panel');
+    try{return {page:'scenario',id:decodeURIComponent(scenario[1]),panel:panel==='compare'||panel==='json'?panel:undefined,
       at:at!==null && /^(0|[1-9][0-9]*)$/.test(at) && Number.isSafeInteger(Number(at))?Number(at):undefined};}catch{return {page:'home'};}}
 
-  const document = /^#\/document(?:\?(.*))?$/.exec(hash);
-  if (document) { const params = new URLSearchParams(document[1] ?? ''); return { page: 'document', view: params.get('view') ?? undefined, unrolled: params.get('unrolled') === '1' }; }
+  if (/^#\/document(?:\?.*)?$/.test(hash)) return { page: 'document' };
   const objects = /^#\/objects(?:\/([a-z0-9-]+))?$/.exec(hash);
   if (objects) return { page: 'objects', def: objects[1] };
   if (/^#\/converters$/.test(hash)) return { page: 'converters' };
   return { page: 'home' };
 }
 
-export function scenarioHref(id: string, view?: string, at?: number, unrolled = false): string {
-  const params=new URLSearchParams();if(view)params.set('view',view);if(at!==undefined && Number.isSafeInteger(at) && at>=0)params.set('at',String(at));
-  if (unrolled) params.set('unrolled', '1');
+export function scenarioHref(id: string, { at, panel }: { at?: number; panel?: PanelLink } = {}): string {
+  const params=new URLSearchParams();if(panel)params.set('panel',panel);if(at!==undefined && Number.isSafeInteger(at) && at>=0)params.set('at',String(at));
   return `#/scenario/${encodeURIComponent(id).replace(/%2F/g, '/')}${params.size?'?'+params:''}`;
 }
 
-export function documentHref(view?: string, unrolled = false): string {
-  const params = new URLSearchParams(); if (view) params.set('view', view); if (unrolled) params.set('unrolled', '1');
-  return `#/document${params.size ? '?' + params : ''}`;
+export function documentHref(): string {
+  return '#/document';
 }
 
 export function objectsHref(def?: string): string {
@@ -102,6 +105,17 @@ const RAIL_HIDDEN_KEY = 'mnx-lab.rail-hidden';
  *  state down to the scenario page. */
 const PANEL_HIDDEN_KEY = 'mnx-lab.panel-hidden';
 const THEME_KEY = 'mnx-lab.theme';
+/** The staff view and repeats mode — how you like to read, not what the score
+ *  is, so localStorage beside the zoom rather than the URL. The view stores
+ *  "unset" by ABSENCE: unset means the document's own staffKind hint, which no
+ *  stored view can express. */
+const STAFF_VIEW_KEY = 'mnx-lab.view';
+const UNROLLED_KEY = 'mnx-lab.unrolled';
+
+function readStaffView(): ViewMode | '' {
+  const v = localStorage.getItem(STAFF_VIEW_KEY);
+  return v === 'notation' || v === 'tab' || v === 'both' ? v : '';
+}
 
 function readTheme(): ThemeSetting {
   const v = localStorage.getItem(THEME_KEY);
@@ -130,6 +144,23 @@ export class WorkbenchApp extends LitElement {
   /** Document-panel visibility (Ctrl+Alt+B / the header's right chevron) —
    *  the rail's mirror on the other side of the page. */
   @state() private panelHidden = localStorage.getItem(PANEL_HIDDEN_KEY) === '1';
+  /** The staff view and repeats mode, shell-owned so the palette and the
+   *  settings pad write one value; the page resolves an unavailable view. */
+  @state() private staffView = readStaffView();
+  @state() private unrolled = localStorage.getItem(UNROLLED_KEY) === '1';
+
+  private setStaffView(view: ViewMode) {
+    this.staffView = view;
+    localStorage.setItem(STAFF_VIEW_KEY, view);
+  }
+
+  private setUnrolled(unrolled: boolean) {
+    this.unrolled = unrolled;
+    localStorage.setItem(UNROLLED_KEY, unrolled ? '1' : '0');
+  }
+
+  private onViewChange = (event: CustomEvent<ViewMode>) => this.setStaffView(event.detail);
+  private onUnrolledChange = (event: CustomEvent<boolean>) => this.setUnrolled(event.detail);
   /** Transient shell composition: no storage and no URL representation. */
   @state() private documentFocus = false;
   @state() private focusHint = false;
@@ -926,12 +957,13 @@ export class WorkbenchApp extends LitElement {
       this.route.page === 'scenario' ? corpus.find(e => e.id === this.route.id) : undefined;
     if (entry) {
       // Tab/both require known strings; the palette can't see the loaded doc,
-      // so it uses the extension-data approximation. A tab link that turns
+      // so it uses the extension-data approximation. A stored view that turns
       // out unavailable falls back to the document's default view.
-      const views = entry.hasTab
-        ? ['notation', 'tab', 'both', 'compare', 'json']
-        : ['notation', 'compare', 'json'];
-      for (const v of views) items.push(nav(`view: ${v}`, scenarioHref(entry.id, v)));
+      const views: ViewMode[] = entry.hasTab ? ['notation', 'tab', 'both'] : ['notation'];
+      for (const v of views) items.push({ label: `view: ${v}`, run: () => this.setStaffView(v) });
+      for (const panel of ['compare', 'json'] as const) {
+        items.push(nav(`view: ${panel}`, scenarioHref(entry.id, { panel })));
+      }
       items.push(
         intent('edit: undo', { type: 'undo' }, 'Ctrl+Z'),
         intent('edit: redo', { type: 'redo' }, 'Ctrl+Y'),
@@ -1182,24 +1214,29 @@ export class WorkbenchApp extends LitElement {
           ? html`<mnx-scenario-page
               .scenarioId=${this.route.id ?? ''}
               .at=${this.route.at??null}
-              .view=${this.route.view ?? ''}
-              .unrolled=${this.route.unrolled ?? false}
+              .panel=${this.route.panel ?? ''}
+              .view=${this.staffView}
+              .unrolled=${this.unrolled}
               .documentFocus=${this.documentFocus}
               .panelHidden=${this.panelHidden}
               .selectionClipboard=${this.selectionClipboard}
               @document-focus-request=${this.requestDocumentFocus}
+              @view-change=${this.onViewChange}
+              @unrolled-change=${this.onUnrolledChange}
             ></mnx-scenario-page>`
           : this.route.page === 'document'
             ? this.localDocument
               ? html`<mnx-scenario-page
                   .scenarioId=${this.localDocument.id}
-                  .view=${this.route.view ?? ''}
-                  .unrolled=${this.route.unrolled ?? false}
+                  .view=${this.staffView}
+                  .unrolled=${this.unrolled}
                   .localDocument=${this.localDocument}
                   .documentFocus=${this.documentFocus}
                   .panelHidden=${this.panelHidden}
                   .selectionClipboard=${this.selectionClipboard}
                   @document-focus-request=${this.requestDocumentFocus}
+                  @view-change=${this.onViewChange}
+                  @unrolled-change=${this.onUnrolledChange}
                 ></mnx-scenario-page>`
               : html`<section class="local-empty">
                   <h1>Open a local document</h1>

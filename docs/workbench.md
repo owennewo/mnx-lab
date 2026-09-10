@@ -4,9 +4,11 @@
 # The workbench (`src/workbench/`) — review-first, no backend
 
 Home is the **attention queue** (blocked → stale → never-seen; current counted, not
-shown), derived from committed provenance in `src/workbench/queue.ts`. Every scenario + view
-has a stable deep link: `#/scenario/<id>?view=notation|tab|both` (unspecified ⇒ the
-document's `tab.staffKind` hint); legacy `?view=compare|json` links are honored and
+shown), derived from committed provenance in `src/workbench/queue.ts`. Every scenario
+has a stable deep link: `#/scenario/<id>`. The staff view (notation | tab | both) and
+the repeats mode are per-browser localStorage preferences like the zoom, not link
+state: with no view stored — or one this document cannot draw — the document's
+`tab.staffKind` hint decides. `?panel=compare|json` links (the queue's rows)
 open the matching tab of the scenario page's **side panel** (description | ops | hud |
 assist | compare | json — roadmap/complete/core-score-hud.md created it;
 roadmap/complete/workbench-score-panel.md cut it down and gave every tab

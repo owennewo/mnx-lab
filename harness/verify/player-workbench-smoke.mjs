@@ -11,7 +11,8 @@ try{
   chrome=spawn(process.env.CHROME_BIN??'google-chrome',['--headless=new','--remote-debugging-port=0','--no-sandbox','--disable-gpu',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
   ws=new WebSocket(await connect(await devtoolsPort(profile)));await new Promise(r=>ws.addEventListener('open',r,{once:true}));const cdp=client(ws);
   await cdp.send('Runtime.enable');await cdp.send('Page.enable');
-  await cdp.send('Page.navigate',{url:`http://127.0.0.1:${server.port}/#/scenario/spec/repeats-alternate-endings-simple?view=notation&at=2`});
+  await cdp.send('Page.addScriptToEvaluateOnNewDocument',{source:"localStorage.setItem('mnx-lab.view','notation');"});
+  await cdp.send('Page.navigate',{url:`http://127.0.0.1:${server.port}/#/scenario/spec/repeats-alternate-endings-simple?at=2`});
   let ready=false;for(let i=0;i<100;i++){ready=await cdp.evaluate(`!!document.querySelector('mnx-workbench')?.shadowRoot?.querySelector('mnx-scenario-page')?.shadowRoot?.querySelector('mnx-player')?.performance`);if(ready)break;await new Promise(r=>setTimeout(r,100));}
   if(!ready)throw new Error('Workbench player did not load');
   console.log('workbench player',await cdp.evaluate(`(async()=>{
@@ -21,12 +22,12 @@ try{
     check(viewer.playbackState.ordinal===2 && viewer.playbackState.inspectionIteration===1,'Ordinal route did not preserve separate inspection');
     const selection=JSON.stringify(viewer.selection);await player.play();await delay(100);
     check(player.snapshot.state==='playing','Workbench did not play');check(JSON.stringify(viewer.selection)===selection,'Playback changed editor selection');
-    location.hash='#/scenario/spec/repeats-alternate-endings-simple?at=1&view=notation';await delay(120);
+    location.hash='#/scenario/spec/repeats-alternate-endings-simple?at=1';await delay(120);
     check(viewer.playbackState.ordinal===1,'Same-score route update did not seek');
     const beforeEdit=viewer.mnxDoc.mnxJson;await player.play();viewer.focus();viewer.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',code:'ArrowUp',altKey:true,bubbles:true,composed:true}));await delay(100);
     check(viewer.mnxDoc.mnxJson!==beforeEdit,'Edit input did not change the document');
     check(player.snapshot?.state!=='playing' && !viewer.playbackState.highlight.length,'An edit retained positional playback highlights');
-    location.hash='#/scenario/spec/jumps-dal-segno?view=notation';
+    location.hash='#/scenario/spec/jumps-dal-segno';
     for(let i=0;i<100 && player.documentId!=='spec/jumps-dal-segno';i++)await delay(50);
     for(let i=0;i<100 && !player.performance;i++)await delay(50);
     const measures=player.performance.measures,back=measures.findIndex((m,i)=>i>0 && m.measureIndex<measures[i-1].measureIndex);
