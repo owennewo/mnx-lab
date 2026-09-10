@@ -282,8 +282,14 @@ doctools/`uv` setup: [docs/mnx-spec-submodule.md](docs/mnx-spec-submodule.md).
 
 ## Converters
 
-`converters/*` are npm workspaces, Node-only, never in the app build. **alphaTab is
-confined to `converters/guitarpro-mnx` and must never reach `src/`.** Shared fixtures in
+`converters/*` are npm workspaces; their CLIs are Node-only. **Home-grown importers may
+enter the app build** — the workbench opens `.gp`/`.gpx`/`.gp3-5` by running
+`guitarpro-mnx`'s clean-room importer (`src/cleanRoom.ts` → `gpif/`, `gp345/`) in a lazy
+web worker (`src/workbench/guitarProImporter.worker.ts`). **Third-party codecs may not:
+alphaTab is a devDependency of `converters/guitarpro-mnx`, kept only as the
+differential-parity oracle for its tests (`src/import/gp.ts`, `src/export/gp.ts` — the
+live paths are `cleanRoom.ts` and `gpif/fromMnx.ts`), and must never reach `src/` or any
+bundle.** Shared fixtures in
 `converters/fixtures/` — **authored as Guitar Pro** (`.gpx` sources; `.mnx.json` derived
 via `guitarpro-mnx --import`, `.xml` via `musicxml-mnx --export`). Both round trips are
 lossless and tested. Five traps, all of which have bitten:
