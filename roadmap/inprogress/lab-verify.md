@@ -81,6 +81,39 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Lyrics drawn at the fret digit's size — 2026-09-10
+
+Owner: user-requested rendering change, landed directly on `main`; no roadmap doc.
+Lyric syllables and hyphens were 1.7sp against the fret digit's 1.25sp, so the words
+under a tab staff read a third larger than the digits above them. `LYRIC_SIZE_SP`
+(`src/engine/layout/lyricRuns.ts`) is now the fret size itself, read from the leaf
+`src/engine/layout/textSizes.ts` that `tabStaff.ts` also reads, so the two cannot
+drift. Both are staff-space text emitted at `size × pxPerSpY`, and the lyric column
+width is ink-priced with the rest of the rigid column (`spacing.ts`), so a staff-zoom
+change grows them together, as it always did. `LYRIC_CHAR_WIDTH_SP` became an em
+ratio of the lyric size (0.56, the old 0.95 ÷ 1.7), so a syllable's column shrinks
+with its text. The verse baseline drop and line spacing are unchanged. The
+no-overlap check in `harness/conformance/lyric-spacing.test.ts` still passes.
+
+Five scenarios moved: the notation golden in all five, primitives in all five, and
+tab + both for `tab-verses`. None was `verified`, so nothing was demoted.
+
+Look for: lyric text the same height as the fret digits in the tab and both views
+(both emit at 20px in the goldens). Words sit closer together where a syllable
+sets its column's width, and never touch a neighbour, a hyphen included. Where
+lyric columns set a bar's width, bars narrow and systems can re-wrap: at 14px/sp
+`tab-verses` now fits three bars on its first system where it fitted two. Glyph
+sizes and the verse rows' vertical positions are unchanged. In the workbench, step the staff zoom up and down on
+`tab-verses`: the words and the digits should grow and shrink together.
+
+Scenario set (paths under `scenarios/`):
+
+- `spec/lyrics-basic`
+- `spec/lyrics-multi-line`
+- `spec/lyric-line-metadata`
+- `lab/50-lyrics/01-verse-labels`
+- `lab/50-lyrics/02-tab-verses`
+
 ### Accidentals carry to the barline — 2026-09-10
 
 Owner: user-reported rendering fix (a Soundslice comparison: one G♭ restated on every

@@ -10,6 +10,7 @@ import {
 import { Primitive, SpatialIndex } from '../primitives.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
 import { type AccidentalResolver, CORE_SP, EventSlot, GRACE_NOTE_ADVANCE_SP, tupletColumns } from './spacing.ts';
+import { FRET_FONT_SIZE_SP } from './textSizes.ts';
 import {
   harmonicFretText,
   nextOrdinal,
@@ -58,8 +59,6 @@ export const TAB_STRING_SPACING_SP =
 export const TAB_STAFF_HEIGHT_SP = (TAB_STAFF_LINES - 1) * TAB_STRING_SPACING_SP;
 
 export const TAB_STAFF_LINE_THICKNESS_SP = 0.1;
-
-const FRET_FONT_SIZE_SP = 1.25;
 
 /**
  * Fret digits are the tab staff's ONLY musical content — the reader's eye goes

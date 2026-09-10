@@ -1,7 +1,7 @@
 import { isPartialEntry } from './unrolled.ts';
 import type { PerformedEntry } from '../../model/passes.ts';
 import { normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
-import { selectedLyricLineIds } from './lyricRuns.ts';
+import { LYRIC_SIZE_SP, selectedLyricLineIds } from './lyricRuns.ts';
 import {
   MnxStructure,
   MnxNote,
@@ -75,7 +75,9 @@ const DYNAMIC_SIDE_PAD_SP = 0.3;   // clearance either side of a dynamic mark
 export const REPEAT_START_WIDTH_SP = 2.0; // |: cluster after the prefix glyphs
 export const REPEAT_END_EXTRA_SP = 1.4;   // room for the :| dots before the end barline
 const MULTIREST_WIDTH_SP = 10;     // content width of a collapsed H-bar measure
-const LYRIC_CHAR_WIDTH_SP = 0.95;  // syllable width estimate per character
+// Syllable width estimate per character, as a fraction of the lyric em — so
+// the column tracks the drawn text when the lyric size moves.
+const LYRIC_CHAR_WIDTH_SP = LYRIC_SIZE_SP * 0.56;
 const LYRIC_SIDE_PAD_SP = 0.35;    // clearance either side of a syllable
 const ONSET_EPS = 1e-6;            // float tolerance for metric positions
 /** Ideal space after a quarter note, in staff spaces, at density 1 — the unit

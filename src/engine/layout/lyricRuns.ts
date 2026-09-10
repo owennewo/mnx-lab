@@ -8,10 +8,13 @@
 import type { MnxStructure } from '../../model/mnx.ts';
 import type { DisplayOptions } from '../displayOptions.ts';
 import type { Primitive } from '../primitives.ts';
+import { FRET_FONT_SIZE_SP } from './textSizes.ts';
 
 export const LYRIC_FIRST_BASELINE_DROP_SP = 4.5; // first verse baseline below bottom line
 export const LYRIC_LINE_SPACING_SP = 2.2;
-export const LYRIC_SIZE_SP = 1.7;
+// The fret digit's size: words and digits read at one weight, and both are
+// staff spaces, so a staff-scale change grows them together.
+export const LYRIC_SIZE_SP = FRET_FONT_SIZE_SP;
 export const LYRIC_DESCENDER_PAD_SP = 0.8;
 // Air between the last verse row's descenders and a native tab staff below it
 // (the both view's content-driven inter-staff gap).
