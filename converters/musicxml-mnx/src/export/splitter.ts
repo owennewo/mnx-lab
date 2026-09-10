@@ -35,11 +35,13 @@ export function splitPart(part: MnxPart): { standardPart: MnxPart; tabPart: MnxP
     });
   }
 
-  // Carry transposition from the source part. If absent, fall back to guitar standard (-12 chromatic, -7 diatonic).
+  // Carry transposition from the source part. If absent, fall back to the guitar standard:
+  // written an octave above sounding. MNX intervals run sounding → written, so +12/+7
+  // (MusicXML's <transpose> states the same thing as -12/-7).
   const transposition = part.transposition ?? {
     interval: {
-      halfSteps: -12,
-      staffDistance: -7
+      halfSteps: 12,
+      staffDistance: 7
     }
   };
 

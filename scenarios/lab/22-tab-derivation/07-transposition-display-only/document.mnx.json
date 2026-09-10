@@ -18,8 +18,8 @@
       "name": "Guitar",
       "transposition": {
         "interval": {
-          "halfSteps": -12,
-          "staffDistance": -7
+          "halfSteps": 12,
+          "staffDistance": 7
         }
       },
       "_x": {

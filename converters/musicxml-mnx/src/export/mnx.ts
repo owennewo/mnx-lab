@@ -28,9 +28,11 @@ const STEP_SEMITONES_EXP: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 
 const STEP_NAMES_EXP = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
 
 /**
- * Converts a sounding pitch (as stored in MNX) back to a written pitch (as required by MusicXML).
- * Applies the INVERSE of the transposition interval:
- *   written = sounding - transposition
+ * Converts a sounding pitch (as stored in MNX) to a written pitch (as required by MusicXML).
+ * MNX's `part.transposition.interval` is the interval that transforms a sounding pitch
+ * into a written one — the opposite direction to MusicXML's `<transpose>` — so it applies
+ * as-is:
+ *   written = sounding + transposition
  */
 function transposePitchToWritten(
   pitch: MnxPitch,
@@ -40,19 +42,15 @@ function transposePitchToWritten(
   const diatonic = transposition.interval.staffDistance ?? 0;
   if (chromatic === 0 && diatonic === 0) return pitch;
 
-  // Invert: written = sounding - transposition
-  const invChromatic = -chromatic;
-  const invDiatonic = -diatonic;
-
   const srcStepIdx = STEP_NAMES_EXP.indexOf(pitch.step as any);
   const srcAlter = pitch.alter || 0;
 
   // Absolute sounding semitone from C0
   const srcAbsSemitone = pitch.octave * 12 + STEP_SEMITONES_EXP[pitch.step] + srcAlter;
-  const writtenAbsSemitone = srcAbsSemitone + invChromatic;
+  const writtenAbsSemitone = srcAbsSemitone + chromatic;
 
   // Apply diatonic step shift
-  const newStepRaw = srcStepIdx + invDiatonic;
+  const newStepRaw = srcStepIdx + diatonic;
   const newStepIdx = ((newStepRaw % 7) + 7) % 7;
   const newStep = STEP_NAMES_EXP[newStepIdx];
 
@@ -527,15 +525,16 @@ export function exportMusicXML(
         attributesChanged = true;
       }
 
-      // Transposition
+      // Transposition. MusicXML's <transpose> is what must be ADDED to a written pitch
+      // to get the sounding one; MNX's interval runs sounding → written. Negate.
       if (m === 0 && part.transposition) {
         const transposeEl = doc.createElement('transpose');
         const chromaticEl = doc.createElement('chromatic');
-        chromaticEl.textContent = `${part.transposition.interval.halfSteps}`;
+        chromaticEl.textContent = `${-part.transposition.interval.halfSteps}`;
         transposeEl.appendChild(chromaticEl);
         if (part.transposition.interval.staffDistance !== undefined) {
           const diatonicEl = doc.createElement('diatonic');
-          diatonicEl.textContent = `${part.transposition.interval.staffDistance}`;
+          diatonicEl.textContent = `${-part.transposition.interval.staffDistance}`;
           transposeEl.appendChild(diatonicEl);
         }
         attributesEl.appendChild(transposeEl);

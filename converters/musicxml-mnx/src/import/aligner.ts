@@ -1580,13 +1580,15 @@ export class Aligner {
       }
     }
 
-    // Build W3C MNX transposition metadata block (top-level on the part, not in _x)
+    // Build W3C MNX transposition metadata block (top-level on the part, not in _x).
+    // MusicXML's <transpose> runs written → sounding; MNX's interval runs sounding →
+    // written, so the values are negated (a guitar's -12/-7 becomes +12/+7).
     const transpositionBlock = (state.transposeChromatic !== 0 || state.transposeDiatonic !== 0)
       ? {
           transposition: {
             interval: {
-              halfSteps: state.transposeChromatic,
-              staffDistance: state.transposeDiatonic
+              halfSteps: -state.transposeChromatic || 0,
+              staffDistance: -state.transposeDiatonic || 0
             }
           }
         }

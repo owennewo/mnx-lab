@@ -350,6 +350,8 @@ export interface MnxPart {
   name: string;
   staves?: number;
   measures: MnxPartMeasure[];
+  /** The interval that transforms a SOUNDING pitch into a WRITTEN one — the opposite
+   *  direction to MusicXML's `<transpose>` (guitar: +12/+7 here, -12/-7 there). */
   transposition?: {
     interval: {
       halfSteps: number;
