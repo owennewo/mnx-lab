@@ -81,6 +81,41 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Lyrics hang from their own system — 2026-09-10
+
+Owner: user-reported rendering fix, landed directly on `main`; no roadmap doc. A verse
+hung a fixed 4.5sp below its staff whatever was there: at the tight end of the
+clearance control the words sat nearer the NEXT system than their own (3sp of air
+above them on a bare tab staff, 1.5sp below), and in the notation view down-stems
+reached 2sp past them. `emitLyricRuns` (`src/engine/layout/lyricRuns.ts`) now places
+each staff's verses, per system, under the deepest ink that staff carries — stems,
+ledger lines, dynamics, hairpins, slurs, an octave clef's figure — with the clearance
+control's new `lyricInk` between (`src/engine/clearance.ts`: 0.2sp at the minimum,
+1sp at the default, 3sp at the most spacious), one level baseline per system. Verses
+are emitted last, and the row fit takes their system as fact (`owners`), so a deep
+verse is never filed with the system below. Pinned by
+`harness/conformance/lyric-placement.test.ts`. This supersedes the "verse rows'
+vertical positions are unchanged" sentence of the *Lyrics drawn at the fret digit's
+size* batch below — the same five scenarios, so review both batches in one pass.
+
+The notation golden and primitives moved in all five, plus tab + both for
+`tab-verses`. None was `verified`, so nothing was demoted.
+
+Look for: the first verse sits 1sp (the default clearance the goldens use) below the
+lowest ink its staff carries in that system, or 1sp below the bottom line where
+nothing hangs lower — much closer to its staff than before, and never through a
+stem. Every verse in a system shares one baseline; later verses keep their 2.2sp
+pitch. In the workbench, set clearance to its minimum on `tab-verses`: the words
+should all but touch their own system and stand clearly apart from the next.
+
+Scenario set (paths under `scenarios/`):
+
+- `spec/lyrics-basic`
+- `spec/lyrics-multi-line`
+- `spec/lyric-line-metadata`
+- `lab/50-lyrics/01-verse-labels`
+- `lab/50-lyrics/02-tab-verses`
+
 ### Lyrics drawn at the fret digit's size — 2026-09-10
 
 Owner: user-requested rendering change, landed directly on `main`; no roadmap doc.

@@ -14,9 +14,9 @@
 <line x1="451.44" y1="144" x2="451.44" y2="197.312" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="547.2" y1="128" x2="547.2" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="552" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="237.2" y="264" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Shine</text>
-<text x="442" y="264" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">bright</text>
-<text x="237.2" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Morn</text>
-<text x="339.6" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="442" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ing</text>
+<text x="237.2" y="249.112" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Shine</text>
+<text x="442" y="249.112" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">bright</text>
+<text x="237.2" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Morn</text>
+<text x="339.6" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="442" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ing</text>
 </svg>

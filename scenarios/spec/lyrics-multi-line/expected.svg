@@ -17,14 +17,14 @@
 <line x1="620.96" y1="154.688" x2="620.96" y2="208" stroke="currentColor" stroke-width="1.92" class="stem"></line>
 <line x1="702.4" y1="128" x2="702.4" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="707.2" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="204" y="264" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Are</text>
-<text x="336.8" y="264" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">you</text>
-<text x="480.8" y="264" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">sleep</text>
-<text x="555.6" y="264" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="630.4" y="264" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ing?</text>
-<text x="204" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Am</text>
-<text x="336.8" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">I</text>
-<text x="480.8" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">sleep</text>
-<text x="555.6" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="630.4" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ing?</text>
+<text x="204" y="249.112" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Are</text>
+<text x="336.8" y="249.112" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">you</text>
+<text x="480.8" y="249.112" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">sleep</text>
+<text x="555.6" y="249.112" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="630.4" y="249.112" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ing?</text>
+<text x="204" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Am</text>
+<text x="336.8" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">I</text>
+<text x="480.8" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">sleep</text>
+<text x="555.6" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="630.4" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ing?</text>
 </svg>

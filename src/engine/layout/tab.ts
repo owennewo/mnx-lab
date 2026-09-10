@@ -9,7 +9,7 @@ import { translatePrimitiveY } from '../primitives.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { anchorY, rowBoundariesSp } from './verticalDensity.ts';
 import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP, measureAccidentals, tieTargetIds } from './spacing.ts';
-import { documentLyricLineIds, selectedLyricLineIds } from './lyricRuns.ts';
+import { selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import { Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex } from '../primitives.ts';
@@ -25,9 +25,8 @@ import {
   innerColumns
 } from './tabStaff.ts';
 import {
-  LYRIC_FIRST_BASELINE_DROP_SP,
-  LYRIC_LINE_SPACING_SP,
   emitLyricRuns,
+  lyricReachBelowRows,
   lyricBlockSpFor,
   orderedLyricLineIds,
   type LyricSyllable
@@ -271,6 +270,10 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // row height, so the system below starts clear of the words.
   const lyricBlockSp = lyricBlockSpFor(lyricLineIds.length);
   rowHeightSp += Math.max(0, lyricBlockSp - ROW_PAD_BOTTOM_SP);
+  // How far below its staff a row's own ink can reach, for placing its verses:
+  // halfway to the next system.
+  const lyricBandBottom = (row: number): number =>
+    row + 1 < plan.rowCount ? (rowBand(row).staffBottom + rowBand(row + 1).staffTop) / 2 : Infinity;
 
   // Playing technique is drawn AFTER the measure walk: a hammer-on names its
   // destination by note id, and that note may be measures away — so the marks
@@ -375,7 +378,11 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
           const run = lyricRuns.get(lineId) ?? [];
           run.push({
             x,
-            y: staffBottom + LYRIC_FIRST_BASELINE_DROP_SP + verse * LYRIC_LINE_SPACING_SP,
+            verse,
+            row: m.row,
+            staffTop,
+            staffBottom,
+            bandBottom: lyricBandBottom(m.row),
             text: line.text,
             continues: line.type === 'start' || line.type === 'middle'
           });
@@ -529,10 +536,6 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     qualifyMeasure(mnx, m, primitives, measurePrimitiveStart, index, selectedNoteIds);
   }
 
-  // Verse rows flush before the frame is fitted, for the same reason as the
-  // technique marks below: they are ink, and the fit passes measure ink.
-  emitLyricRuns(lyricRuns.values(), primitives);
-
   // Before the frame is fitted: the marks are ink like any other, and both
   // `ensureTopMargin` and `tightenRows` measure ink to decide how much room a
   // row actually needs. Emitted after, a bend arrow would hang off the page.
@@ -546,6 +549,11 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       primitives
     });
   }
+
+  // Verse rows last, still before the frame is fitted: they are ink the fit
+  // measures, and they sit under everything their staff hangs below itself,
+  // technique lines included (lyricRuns.ts).
+  const lyricOwners = emitLyricRuns(lyricRuns.values(), primitives, clearanceSpacing(display.clearance, opts.densityPad).lyricInk);
 
   const baseHeightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * rowHeightSp;
   const baseRows = Array.from({ length: Math.max(1, plan.rowCount) }, (_, r) => rowBand(r));
@@ -563,8 +571,10 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     : tightenRows;
   const tightened = fitRows({
     primitives, rows, heightSp, padDensity: opts.densityPad, clearance: display.clearance,
-    // The verse block belongs to the row it hangs from — without this the
-    // midpoint attribution files a deep verse row with the system below.
+    // Verses belong to the row they hang from — by fact, not by midpoint: one
+    // can hang deeper than the frame reserved (lyricRuns.ts).
+    owners: lyricOwners,
+    // The frame's reservation still files everything else as it always has.
     reservedBelowSp: lyricBlockSp
   });
 
@@ -635,8 +645,8 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
           if (!diagnostics.some(existing => existing.measureIndex === diagnostic.measureIndex && existing.message === diagnostic.message)) diagnostics.push(diagnostic);
         }
         const bands = result.rows ?? [];
-        const lyricCount = selectedLyricLineIds(mnx, display)?.length ?? documentLyricLineIds(mnx).length;
-        const boundaries = rowBoundariesSp(bands, lyricBlockSpFor(lyricCount));
+        // Each verse stays with the row it hangs from: the measured reach.
+        const boundaries = rowBoundariesSp(bands, lyricReachBelowRows(result.primitives, bands));
         const bins: Primitive[][] = bands.map(() => []);
         for (const primitive of result.primitives) {
           let row = 0;

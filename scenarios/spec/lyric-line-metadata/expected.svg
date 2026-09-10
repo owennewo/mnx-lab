@@ -20,17 +20,17 @@
 <text x="621.696" y="152" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
 <line x1="756.8" y1="128" x2="756.8" y2="192" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="761.6" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="226" y="264" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">I</text>
-<text x="402.8" y="264" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">am</text>
-<text x="635.2" y="264" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">John!</text>
-<text x="226" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Ik</text>
-<text x="402.8" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ben</text>
-<text x="635.2" y="299.2" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Jan!</text>
-<text x="226" y="334.4" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Я</text>
-<text x="402.8" y="334.4" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">І</text>
-<text x="519" y="334.4" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
-<text x="635.2" y="334.4" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ван!</text>
-<text x="226" y="369.6" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">¡Yo</text>
-<text x="402.8" y="369.6" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">soy</text>
-<text x="635.2" y="369.6" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Juan!</text>
+<text x="226" y="249.112" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">I</text>
+<text x="402.8" y="249.112" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">am</text>
+<text x="635.2" y="249.112" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">John!</text>
+<text x="226" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Ik</text>
+<text x="402.8" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ben</text>
+<text x="635.2" y="284.312" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Jan!</text>
+<text x="226" y="319.512" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Я</text>
+<text x="402.8" y="319.512" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">І</text>
+<text x="519" y="319.512" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric-hyphen">-</text>
+<text x="635.2" y="319.512" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">ван!</text>
+<text x="226" y="354.712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">¡Yo</text>
+<text x="402.8" y="354.712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">soy</text>
+<text x="635.2" y="354.712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="lyric">Juan!</text>
 </svg>

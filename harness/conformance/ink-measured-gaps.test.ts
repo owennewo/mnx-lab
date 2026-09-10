@@ -25,7 +25,7 @@ import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { TAB_STAFF_HEIGHT_SP } from '../../src/engine/layout/tabStaff.ts';
 import { anchorY, rowBoundariesSp } from '../../src/engine/layout/verticalDensity.ts';
-import { documentLyricLineCount, lyricBlockSpFor } from '../../src/engine/layout/lyricRuns.ts';
+import { lyricReachBelowRows } from '../../src/engine/layout/lyricRuns.ts';
 import {
   COHESION_CLEAR_SP,
   TEXT_MIN_RISE_SP,
@@ -569,8 +569,9 @@ describe('ink-measured gaps — stage D, between systems', () => {
       let reservedBelowSp = 0;
       try {
         const doc = readDoc(s.dir);
-        reservedBelowSp = lyricBlockSpFor(documentLyricLineCount(doc));
         layout = layoutNotation({ mnx: doc, widthSp: WIDTH_SP });
+        // The layout's own reservation: how deep its verses actually hang.
+        reservedBelowSp = lyricReachBelowRows(layout.primitives, layout.rows ?? []);
       } catch {
         continue;
       }

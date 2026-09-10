@@ -44,6 +44,10 @@ export function clearanceSpacing(level?: number, densityPad?: number | null) {
     // that hangs into a gap. A 1.5sp request therefore leaves at least 0.5sp
     // between independently measured row ink at the tight endpoint.
     systemInk: gap(3, 1.5, 1, 10),
+    /** Air between a verse's ink top and the deepest ink of the staff it hangs
+     *  from. The tight end all but touches: a verse must read as its own
+     *  system's, never the next one's. */
+    lyricInk: gap(1, 0.2, 0.5, 3),
     /** Preserve the old reserved margin at 2; remove only its spare air at 0. */
     verticalMargin(reserved: number, inkReach: number): number {
       const normal = Math.max(inkReach + 0.5, reserved);

@@ -885,6 +885,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   let usedWidthSp = 0;
   let naturalWidthSp: number | undefined;
   const rows: RowBandSp[] = [];
+  const lyricOwners = new Map<Primitive, number>();
   const displays: RowBandSp[][] = [];
   // One per laid-out segment: a score with per-system layouts packs each range
   // separately, and a density value is only degenerate when it changes NONE of
@@ -942,6 +943,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         for (const p of r.primitives) translatePrimitiveY(p, cursorY);
       }
       primitives.push(...r.primitives);
+      for (const [p, row] of r.lyricOwners ?? []) lyricOwners.set(p, rows.length + row);
       for (const band of r.rows) {
         rows.push({ staffTop: band.staffTop + cursorY, staffBottom: band.staffBottom + cursorY });
       }
@@ -963,8 +965,10 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     : tightenRows;
   const tightened = fitRows({
     primitives, rows, heightSp: cursorY, padDensity: opts.densityPad, clearance: display.clearance,
-    // Verse blocks hang deep below their staff; without the reservation the
-    // midpoint attribution files them with the system below (lyricRuns.ts).
+    // Verses belong to the row they hang from — by fact, not by midpoint: one
+    // can hang deeper than the frame reserved (lyricRuns.ts).
+    owners: lyricOwners,
+    // The frame's reservation still files everything else as it always has.
     reservedBelowSp: lyricBlockSpFor(selectedLyrics?.length ?? documentLyricLineCount(mnx))
   });
 
@@ -1026,6 +1030,8 @@ interface SegmentResult {
   packing: PackingInput;
   /** This segment's width at density 1 — see `LayoutResult.naturalWidthSp`. */
   naturalWidthSp?: number;
+  /** Local system row of each verse primitive — the row fit's ownership. */
+  lyricOwners?: ReadonlyMap<Primitive, number>;
 }
 
 /**
@@ -1456,6 +1462,14 @@ function assembleSegment(
   // Lyric syllables collected per (staff, line) in document order; hyphens
   // join start/middle syllables to their successor after the loop.
   const lyricRuns = new Map<string, LyricSyllable[]>();
+  // How far below a staff its own ink can reach, for placing its verses:
+  // halfway to the next display staff of the system, or to the next system.
+  const lyricBandBottom = (row: number, s: number): number => {
+    const d = displayOfPlan[s];
+    const bottom = displayTopOf(row, d) + displayHeights[d];
+    if (d + 1 < displayCount) return (bottom + displayTopOf(row, d + 1)) / 2;
+    return row + 1 < rowCount ? (bottom + displayTopOf(row + 1, 0)) / 2 : Infinity;
+  };
 
   // Ottava lines are a post-pass (they cross measures/system breaks), but their
   // endpoints anchor to note columns — so capture each measure's onset→x maps
@@ -1932,7 +1946,11 @@ function assembleSegment(
                 const run = lyricRuns.get(key) ?? [];
                 run.push({
                   x: slot.x,
-                  y: staffBottoms[s] + LYRIC_FIRST_BASELINE_DROP_SP + verse * LYRIC_LINE_SPACING_SP,
+                  verse,
+                  row: m.row,
+                  staffTop: staffTops[s],
+                  staffBottom: staffBottoms[s],
+                  bandBottom: lyricBandBottom(m.row, s),
                   text: line.text,
                   continues: line.type === 'start' || line.type === 'middle'
                 });
@@ -2185,10 +2203,6 @@ function assembleSegment(
     });
   }
 
-  // Lyrics: the shared emitter (lyricRuns.ts) — syllables centred under
-  // their columns, hyphens joining start/middle syllables on the same row.
-  emitLyricRuns(lyricRuns.values(), primitives);
-
   if (!args.entries) emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives);
   if (ottavaOnsets && ottavaSpans.length) emitOttavas(performedSpans(ottavaSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
   if (ottavaOnsets && hairpinSpans.length) emitHairpins(performedSpans(hairpinSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
@@ -2199,7 +2213,7 @@ function assembleSegment(
   // voltas and ottava brackets included, which is why this runs here rather
   // than inside the measure loop. Tempo first, so the labels stack over it.
   // Each row's scan: its slice of the measure loop, the post-loop passes'
-  // primitives (beams, curves, lyrics, voltas, ottavas) that its band owns by
+  // primitives (beams, curves, voltas, ottavas) that its band owns by
   // anchor — those sit near their staff, so the midpoint rule is safe for
   // them — and the text this pass has already placed on the row. Never the
   // row above: clearing it is tightenRows' job.
@@ -2247,6 +2261,12 @@ function assembleSegment(
     emitOccurrenceLabel(m, staffTop, primitives);
   }
 
+  // Lyrics last of all (lyricRuns.ts): a verse sits under everything its staff
+  // hangs below itself — hairpins and ottava brackets included — and after the
+  // score-text pass, whose midpoint scan must never mistake a deep verse for
+  // the next system's ink. The fit takes their rows as fact.
+  const lyricOwners = emitLyricRuns(lyricRuns.values(), primitives, clearanceSpacing(args.display.clearance, args.densityPad).lyricInk);
+
   const heightSp = 2 * MARGIN_SP + systemHeightByRow.reduce((a, b) => a + b, 0);
   const rows = Array.from({ length: rowCount }, (_, r): RowBandSp => ({
     staffTop: displayTopOf(r, 0),
@@ -2261,7 +2281,7 @@ function assembleSegment(
 
   return {
     primitives, heightSp, usedWidthSp: plan.usedWidthSp, naturalWidthSp,
-    rows, displays, tabDisplayIndexes, packing: plan.packing
+    rows, displays, tabDisplayIndexes, packing: plan.packing, lyricOwners
   };
 }
 
