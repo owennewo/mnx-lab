@@ -253,7 +253,7 @@
       "id": "converter/Sun-did-glide",
       "xml": "converters/fixtures/Sun-did-glide.xml",
       "mnx": "converters/fixtures/Sun-did-glide.mnx.json",
-      "inputSha256": "5d7643f43d8f9244df1150c5eaafa51ca0cdfcfc2900240d2093c76c155016b5",
+      "inputSha256": "1d4d4d81071fd3436e01b6bc4dd6695120a2d356dbdceaf57cef9a8f1a429d19",
       "midi": "converter--Sun-did-glide.mid",
       "midiSha256": "eea12132eef909ea4f2b2f945d52bdd2c9d7a24db3717acbf211d26cc02c8c1b"
     },
@@ -269,9 +269,9 @@
       "id": "converter/Vestapol",
       "xml": "converters/fixtures/Vestapol.xml",
       "mnx": "converters/fixtures/Vestapol.mnx.json",
-      "inputSha256": "c29a1917321bb6aecd1236f38152f31238a18c6ceda965a4d4f2d4f9ac7fa612",
+      "inputSha256": "cc130deb8fc059f1272b61ef4858962610b12094f00307bda782e81aedf4bbec",
       "midi": "converter--Vestapol.mid",
-      "midiSha256": "ba42bd3de62e3634dc9386035871d2f46a5a0df045056b1fe073eca84142049f"
+      "midiSha256": "04e34ce782389180b94d7a8b65a19a81441eed35c05ae593342ee4ad457e2ca5"
     }
   ]
 }

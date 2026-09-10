@@ -20,7 +20,7 @@ import {
 import { parseXML, serializeXML, type Element, type Document } from '../common/xml.js';
 import { splitPart, hasTabContent } from './splitter.js';
 import { flattenSequences, FlatXmlNode } from './flattener.js';
-import { divisionsFor, getXmlNoteType } from '../common/utils.js';
+import { divisionsFor, getXmlNoteType, stripIdSuffix } from '../common/utils.js';
 import { dynamicToXml, type XmlDynamicOut } from '../common/dynamics.js';
 
 // Chromatic semitone offsets for each diatonic step (C=0)
@@ -1193,7 +1193,11 @@ function buildXmlNode(
   // `<duration>` and before `<voice>`, per MusicXML's fixed child order; its
   // notated twin `<tied>` goes in `<notations>` below. Writing both is what
   // the spec's own examples do, and readers differ on which one they trust.
-  const marks = node.note?.id ? spannerMarks.get(node.note.id) : undefined;
+  // The marks are keyed by the SOURCE note ids; a notation+TAB split has
+  // suffixed each copy (`n12_std`, `n12_tab`) since. Looking the copy up by its
+  // own id missed every tie and slur on a tab-bearing part — which is every
+  // Guitar Pro import — so both staves now find their source note's marks.
+  const marks = node.note?.id ? spannerMarks.get(stripIdSuffix(node.note.id).originalId) : undefined;
   if (marks?.tieStop) {
     const tieEl = doc.createElement('tie');
     tieEl.setAttribute('type', 'stop');

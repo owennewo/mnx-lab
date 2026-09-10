@@ -44,9 +44,9 @@
         },
         "arpeggio": {
           "verdict": "lossy",
-          "carried": 1,
+          "carried": 2,
           "survived": 0,
-          "evidence": "lab/32-articulations/04-arpeggiated-chords"
+          "evidence": "fixtures/Sun-did-glide"
         },
         "barline": {
           "verdict": "supported",
@@ -155,9 +155,9 @@
         },
         "event-markings": {
           "verdict": "lossy",
-          "carried": 5,
+          "carried": 6,
           "survived": 0,
-          "evidence": "lab/32-articulations/01-rare-articulations"
+          "evidence": "fixtures/Vestapol"
         },
         "fermata": {
           "verdict": "lossy",
@@ -396,8 +396,8 @@
         },
         "slur": {
           "verdict": "lossy",
-          "carried": 3,
-          "survived": 1,
+          "carried": 4,
+          "survived": 2,
           "evidence": "spec/slurs"
         },
         "slur-side": {
@@ -450,9 +450,9 @@
         },
         "staccato": {
           "verdict": "lossy",
-          "carried": 1,
+          "carried": 2,
           "survived": 0,
-          "evidence": "spec/articulations"
+          "evidence": "fixtures/Vestapol"
         },
         "staff": {
           "verdict": "lossy",
@@ -556,8 +556,8 @@
         },
         "tie": {
           "verdict": "lossy",
-          "carried": 3,
-          "survived": 2,
+          "carried": 4,
+          "survived": 3,
           "evidence": "spec/organ-layout"
         },
         "tie-target-type": {
