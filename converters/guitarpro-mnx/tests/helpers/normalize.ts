@@ -77,5 +77,46 @@ export function normalizeIds(mnx: MnxStructure): MnxStructure {
     }
   }
 
+  for (const part of clone.parts) {
+    for (const measure of part.measures) {
+      for (const arpeggio of measure.arpeggios ?? []) {
+        arpeggio.span.start = rename.get(arpeggio.span.start) ?? arpeggio.span.start;
+        arpeggio.span.end = rename.get(arpeggio.span.end) ?? arpeggio.span.end;
+      }
+    }
+  }
+
+  return clone;
+}
+
+/**
+ * Removes what the clean-room reader carries and the historical alphaTab
+ * mapper never mapped — dynamics, arpeggios, articulations, tie links, slurs
+ * and the event ids only a slur gives an event — for
+ * comparisons AGAINST THE ALPHATAB ORACLE only. The oracle's silence there is
+ * a gap in the mapper, not evidence about the file; `gpif-adornments.test.ts`
+ * holds the clean-room reading of each to hand-authored sources instead.
+ */
+export function withoutOracleBlindSpots(mnx: MnxStructure): MnxStructure {
+  const clone: MnxStructure = JSON.parse(JSON.stringify(mnx));
+  for (const part of clone.parts) {
+    for (const measure of part.measures) {
+      delete measure.dynamics;
+      delete measure.arpeggios;
+      for (const sequence of measure.sequences ?? []) {
+        for (const item of sequence.content ?? []) {
+          const events = 'type' in item && (item.type === 'tuplet' || item.type === 'grace')
+            ? item.content
+            : [item as MnxEvent];
+          for (const event of events) {
+            delete event.markings;
+            delete event.slurs;
+            delete event.id;
+            for (const note of event.notes ?? []) delete note.ties;
+          }
+        }
+      }
+    }
+  }
   return clone;
 }

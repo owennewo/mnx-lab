@@ -9,7 +9,7 @@ import {
   sniffContainer,
   decompressBcfz
 } from '../src/gpif/index.js';
-import { normalizeIds } from './helpers/normalize.js';
+import { normalizeIds, withoutOracleBlindSpots } from './helpers/normalize.js';
 
 /** Historical importer comparison for shared features. Only voices proved
  * absent by the raw GPIF are removed from the oracle. The source-fidelity suite
@@ -30,11 +30,20 @@ async function bytes(name: string): Promise<Uint8Array> {
 describe.each(FIXTURES)('clean-room GPIF importer parity: %s', name => {
   it('matches shared behavior after removing source-proven phantom voices', async () => {
     const data = await bytes(name);
-    const cleanRoom = normalizeIds(importGuitarProGpif(data));
+    const cleanRoom = withoutOracleBlindSpots(normalizeIds(importGuitarProGpif(data)));
     const alphaTab = normalizeIds(importGpifOracle(data));
     expect(cleanRoom).toEqual(alphaTab);
-    expect(normalizeIds(importGuitarProCleanRoom(data))).toEqual(alphaTab);
+    expect(withoutOracleBlindSpots(normalizeIds(importGuitarProCleanRoom(data)))).toEqual(alphaTab);
   });
+});
+
+// A blind spot the fixtures exercise: the machine-written Sun-did-glide.gp
+// stamps `F` — alphaTab's model default — on all 979 beats, where the authored
+// .gpx says MF. The mapper above never read either; the forte is stated once.
+it('reads the forte Sun-did-glide.gp is stamped with', async () => {
+  const measures = importGuitarProGpif(await bytes('Sun-did-glide.gp')).parts[0].measures;
+  expect(measures[0].dynamics).toEqual([{ position: { fraction: [0, 1] }, type: 'immediate', value: 'f' }]);
+  expect(measures.slice(1).filter(measure => measure.dynamics)).toEqual([]);
 });
 
 describe('GPIF container layer', () => {

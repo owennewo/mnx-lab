@@ -6,6 +6,9 @@ import {
   MnxPitch,
   MnxNoteValueBase,
   MnxBendPoint,
+  MnxDynamic,
+  MnxArpeggio,
+  MnxSequence,
   isGrace,
   isTimedEvent,
   isTuplet
@@ -85,6 +88,23 @@ const SLIDE_FLAGS = {
   inFromAbove: 0x20
 };
 
+/** MNX `dynamic-value` → GPIF `Dynamic`. Guitar Pro's ladder stops at PPP/FFF. */
+const DYNAMICS: Partial<Record<string, string>> = {
+  ppp: 'PPP', pp: 'PP', p: 'P', mp: 'MP', mf: 'MF', f: 'F', ff: 'FF', fff: 'FFF'
+};
+
+/** What a Guitar Pro beat says when nothing is marked — and what our reader
+ *  reads as unmarked. */
+const UNMARKED_DYNAMIC = 'MF';
+
+/** MNX event markings → GPIF `<Accent>` bits: the reader's table, inverted. */
+const ACCENT_BITS: Partial<Record<string, number>> = {
+  staccato: 0x01,
+  strongAccent: 0x04,
+  accent: 0x08,
+  tenuto: 0x10
+};
+
 interface WriterBend {
   originValue: number;
   originOffset: number | null;
@@ -112,6 +132,13 @@ interface WriterNote {
    *  mis-pitches a harmonic that lacks it; MNX carries no touch fret, so the
    *  played fret stands in — exactly what GP itself writes for naturals. */
   harmonicFret: number | null;
+  /** `<Accent>` bitmask, 0 for none. */
+  accentFlags: number;
+  tieOrigin: boolean;
+  tieDestination: boolean;
+  /** MNX id of the note this one ties into — resolved to `tieDestination`
+   *  once every track is built, like the hammer-on targets. */
+  tieTarget: string | null;
 }
 
 interface WriterBeat {
@@ -121,6 +148,28 @@ interface WriterBeat {
   graceKind: 'BeforeBeat' | 'OnBeat' | null;
   freeText: string | null;
   lyricSlots: string[] | null;
+  /** GPIF `Dynamic` in force at this beat — Guitar Pro stamps every beat. */
+  dynamic: string;
+  arpeggio: 'Up' | 'Down' | null;
+  /** `<Legato>`: slurred into the next beat / slurred into from the last. */
+  legatoOrigin: boolean;
+  legatoDestination: boolean;
+}
+
+/** Per-measure facts a beat looks up from its part measure. */
+interface BeatContext {
+  /** The GPIF dynamic in force at an onset (in wholes from the barline). */
+  dynamicAt: (onset: number) => string;
+  /** Each arpeggio, by the id of either end note of its span. */
+  arpeggios: Map<string, MnxArpeggio>;
+  /** This voice's slur in progress, carried across barlines. */
+  slur: VoiceSlur;
+}
+
+/** A voice's open slur: the event id it runs to, and the ids it may reach. */
+interface VoiceSlur {
+  open: string | null;
+  eventIds: Set<string>;
 }
 
 interface WriterMasterBar {
@@ -292,6 +341,19 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
     if (poolId !== undefined) pools.notes[poolId].hopoDestination = true;
   }
 
+  // Ties likewise: MNX links origin → target, Guitar Pro flags both ends — and
+  // readers key on the DESTINATION flag, so an unwritten target loses the tie.
+  for (const note of pools.notes) {
+    if (note.tieTarget === null) continue;
+    const poolId = noteIdsByMnxId.get(note.tieTarget);
+    if (poolId === undefined) {
+      note.tieOrigin = false;
+      warn(`a tie into note "${note.tieTarget}" has no written destination; the tie was dropped.`);
+    } else {
+      pools.notes[poolId].tieDestination = true;
+    }
+  }
+
   return serialize(masterBars, tracks, tempoAutomations, pools, scoreInfoXml(mnx, warn));
 }
 
@@ -311,10 +373,41 @@ function buildTrackBars(
   options: GpifExportOptions
 ): void {
   let clef = 'G2';
+  // MNX states a dynamic where it changes; Guitar Pro stamps every beat with
+  // the level in force, rests included, so the level carries across barlines.
+  let carried = UNMARKED_DYNAMIC;
+
+  // Guitar Pro can only slur along one voice's beats, so a slur is written
+  // only when its target is an event of the same voice.
+  const slurs = new Map<string, VoiceSlur>();
+  const voiceKey = (sequence: MnxSequence, voiceIndex: number) => sequence.voice ?? `v${voiceIndex + 1}`;
+  for (const measure of part.measures) {
+    for (const [voiceIndex, sequence] of (measure.sequences ?? []).entries()) {
+      const key = voiceKey(sequence, voiceIndex);
+      if (!slurs.has(key)) slurs.set(key, { open: null, eventIds: new Set() });
+      for (const item of sequence.content ?? []) {
+        for (const event of isGrace(item) || isTuplet(item) ? item.content : [item as MnxEvent]) {
+          if (event.id) slurs.get(key)!.eventIds.add(event.id);
+        }
+      }
+    }
+  }
 
   for (let index = 0; index < measureCount; index++) {
     const measure = part.measures[index];
     if (measure?.clefs?.length) clef = CLEFS[measure.clefs[0].clef.sign ?? 'G'] ?? 'G2';
+
+    const marks = dynamicMarks(measure?.dynamics, index, warn);
+    const entering = carried;
+    if (marks.length) carried = marks[marks.length - 1].value;
+    const measureContext = {
+      dynamicAt: (onset: number) => {
+        let value = entering;
+        for (const mark of marks) if (mark.at <= onset + 1e-9) value = mark.value;
+        return value;
+      },
+      arpeggios: arpeggiosByEnd(measure?.arpeggios)
+    };
 
     const barId = pools.bars.length;
     const bar = { clef, voiceIds: [] as number[] };
@@ -324,7 +417,7 @@ function buildTrackBars(
     const sequences = measure?.sequences ?? [];
     if (sequences.length === 0) {
       // Guitar Pro has no concept of an absent bar — emit a silent one.
-      bar.voiceIds.push(makeRestVoice(pools, 'Quarter'));
+      bar.voiceIds.push(makeRestVoice(pools, 'Quarter', entering));
       continue;
     }
 
@@ -354,7 +447,7 @@ function buildTrackBars(
       bar.voiceIds.push(voiceId);
 
       if (sequence.fullMeasure) {
-        voice.beatIds.push(makeRestBeat(pools, 'Whole'));
+        voice.beatIds.push(makeRestBeat(pools, 'Whole', entering));
         continue;
       }
 
@@ -370,30 +463,122 @@ function buildTrackBars(
         voiceIndex === 0 ? harmonyText : undefined,
         noteIdsByMnxId,
         hammerTargets,
-        warn
+        warn,
+        { ...measureContext, slur: slurs.get(voiceKey(sequence, voiceIndex))! }
       );
 
-      if (voice.beatIds.length === 0) voice.beatIds.push(makeRestBeat(pools, 'Whole'));
+      if (voice.beatIds.length === 0) voice.beatIds.push(makeRestBeat(pools, 'Whole', entering));
+    }
+  }
+
+  for (const [key, slur] of slurs) {
+    if (slur.open !== null) {
+      warn(`voice ${key}: a slur into event "${slur.open}" never reached it; Guitar Pro will run it to the end.`);
     }
   }
 }
 
-function makeRestBeat(pools: Pools, value: string): number {
+function makeRestBeat(pools: Pools, value: string, dynamic: string): number {
   const id = pools.beats.length;
   pools.beats.push({
     rhythmId: pools.rhythm(value, 0, 1, 1),
     noteIds: null,
     graceKind: null,
     freeText: null,
-    lyricSlots: null
+    lyricSlots: null,
+    dynamic,
+    arpeggio: null,
+    legatoOrigin: false,
+    legatoDestination: false
   });
   return id;
 }
 
-function makeRestVoice(pools: Pools, value: string): number {
+function makeRestVoice(pools: Pools, value: string, dynamic: string): number {
   const id = pools.voices.length;
-  pools.voices.push({ beatIds: [makeRestBeat(pools, value)] });
+  pools.voices.push({ beatIds: [makeRestBeat(pools, value, dynamic)] });
   return id;
+}
+
+/**
+ * A part measure's dynamics as GPIF levels at onsets (wholes from the
+ * barline), in time order. Guitar Pro has a beat level and nothing else, so
+ * only `immediate` groups with a `value` travel; the rest are named.
+ */
+function dynamicMarks(
+  dynamics: MnxDynamic[] | undefined,
+  measureIndex: number,
+  warn: (message: string) => void
+): { at: number; value: string }[] {
+  const marks: { at: number; value: string }[] = [];
+  for (const dynamic of dynamics ?? []) {
+    const where = `measure ${measureIndex + 1}`;
+    if (dynamic.type !== 'immediate' || !dynamic.value) {
+      warn(`${where}: a dynamic of type "${dynamic.type}" has no Guitar Pro equivalent; it was not written.`);
+      continue;
+    }
+    let token = DYNAMICS[dynamic.value];
+    if (!token) {
+      token = /^p+$/.test(dynamic.value) ? 'PPP' : /^f+$/.test(dynamic.value) ? 'FFF' : undefined;
+      if (!token) {
+        warn(`${where}: dynamic "${dynamic.value}" has no Guitar Pro equivalent; it was not written.`);
+        continue;
+      }
+      warn(`${where}: dynamic "${dynamic.value}" is beyond Guitar Pro's range; written as ${token}.`);
+    }
+    const [numerator, denominator] = dynamic.position.fraction;
+    marks.push({ at: numerator / denominator, value: token });
+  }
+  return marks.sort((a, b) => a.at - b.at);
+}
+
+/**
+ * Guitar Pro's `<Legato>` for one beat. MNX states a slur once, origin →
+ * target; Guitar Pro flags every beat under it — all but the last as an origin
+ * (slurred into the next beat), all but the first as a destination.
+ */
+function applySlur(
+  event: MnxEvent,
+  beatId: number,
+  slur: VoiceSlur,
+  pools: Pools,
+  measureIndex: number,
+  warn: (message: string) => void
+): void {
+  const beat = pools.beats[beatId];
+  let closedHere = false;
+  if (slur.open !== null) {
+    beat.legatoDestination = true;
+    if (event.id === slur.open) {
+      slur.open = null;
+      closedHere = true;
+    } else {
+      beat.legatoOrigin = true;
+    }
+  }
+  for (const { target } of event.slurs ?? []) {
+    const where = `measure ${measureIndex + 1}`;
+    if (slur.open !== null) {
+      warn(`${where}: a slur overlapping another in the same voice has no Guitar Pro equivalent; it was not written.`);
+    } else if (!slur.eventIds.has(target)) {
+      warn(`${where}: a slur into another voice has no Guitar Pro equivalent; it was not written.`);
+    } else {
+      if (closedHere) {
+        warn(`${where}: two slurs meeting on one note are one slur in Guitar Pro; they were joined.`);
+      }
+      beat.legatoOrigin = true;
+      slur.open = target;
+    }
+  }
+}
+
+function arpeggiosByEnd(arpeggios: MnxArpeggio[] | undefined): Map<string, MnxArpeggio> {
+  const byEnd = new Map<string, MnxArpeggio>();
+  for (const arpeggio of arpeggios ?? []) {
+    byEnd.set(arpeggio.span.start, arpeggio);
+    byEnd.set(arpeggio.span.end, arpeggio);
+  }
+  return byEnd;
 }
 
 function buildVoiceBeats(
@@ -408,7 +593,8 @@ function buildVoiceBeats(
   harmonyText: Map<string, string> | undefined,
   noteIdsByMnxId: Map<string, number>,
   hammerTargets: string[],
-  warn: (message: string) => void
+  warn: (message: string) => void,
+  context: BeatContext
 ): void {
   let onset = 0;
 
@@ -428,9 +614,12 @@ function buildVoiceBeats(
       suppressed,
       noteIdsByMnxId,
       hammerTargets,
-      warn
+      warn,
+      context.dynamicAt(onset),
+      context.arpeggios
     );
     if (beatId === null) return;
+    applySlur(event, beatId, context.slur, pools, measureIndex, warn);
     const [n, d] = wholesToFraction(onset);
     const chord = harmonyText?.get(`${n}/${d}`);
     if (chord) pools.beats[beatId].freeText = chord;
@@ -455,9 +644,14 @@ function buildVoiceBeats(
           suppressed,
           noteIdsByMnxId,
           hammerTargets,
-          warn
+          warn,
+          context.dynamicAt(onset),
+          context.arpeggios
         );
-        if (beatId !== null) beatIds.push(beatId);
+        if (beatId !== null) {
+          applySlur(inner, beatId, context.slur, pools, measureIndex, warn);
+          beatIds.push(beatId);
+        }
       }
       continue;
     }
@@ -507,7 +701,9 @@ function buildBeat(
   suppressed: Set<MnxNote>,
   noteIdsByMnxId: Map<string, number>,
   hammerTargets: string[],
-  warn: (message: string) => void
+  warn: (message: string) => void,
+  dynamic: string,
+  arpeggios: Map<string, MnxArpeggio>
 ): number | null {
   const value = NOTE_VALUES[event.duration.base];
   if (value === undefined) {
@@ -528,12 +724,44 @@ function buildBeat(
     noteIds: null,
     graceKind,
     freeText: null,
-    lyricSlots: lyricSlots(event, lyricLineOrder)
+    lyricSlots: lyricSlots(event, lyricLineOrder),
+    dynamic,
+    arpeggio: null,
+    legatoOrigin: false,
+    legatoDestination: false
   };
   const beatId = pools.beats.length;
   pools.beats.push(beat);
 
   if (event.rest || !event.notes?.length) return beatId;
+
+  // Guitar Pro marks articulations per note; MNX marks the event, so every
+  // note of the beat carries the event's bits.
+  let accentFlags = 0;
+  for (const [name, marking] of Object.entries(event.markings ?? {})) {
+    if (marking === undefined) continue;
+    const bit = ACCENT_BITS[name];
+    if (bit) accentFlags |= bit;
+    else {
+      warn(
+        `measure ${measureIndex + 1}: the ${name} marking has no Guitar Pro ` +
+          `equivalent; it was not written.`
+      );
+    }
+  }
+
+  const arpeggio = event.notes
+    .map(note => (note.id ? arpeggios.get(note.id) : undefined))
+    .find(found => found !== undefined);
+  if (arpeggio) {
+    if (arpeggio.direction !== 'up' && arpeggio.direction !== 'down') {
+      warn(
+        `measure ${measureIndex + 1}: an arpeggio without a direction was written ` +
+          `as Guitar Pro's upward roll.`
+      );
+    }
+    beat.arpeggio = arpeggio.direction === 'down' ? 'Down' : 'Up';
+  }
 
   const stringCount = tuningsHighToLow.length;
   const noteIds: number[] = [];
@@ -574,8 +802,23 @@ function buildBeat(
       slideFlags: slideFlagsOf(technique?.slide),
       bend: bendOf(technique?.bend?.points, measureIndex, warn),
       harmonicType: technique?.harmonic ? (HARMONIC_TYPES[technique.harmonic.type] ?? null) : null,
-      harmonicFret: technique?.harmonic ? position.fret : null
+      harmonicFret: technique?.harmonic ? position.fret : null,
+      accentFlags,
+      tieOrigin: false,
+      tieDestination: false,
+      tieTarget: null
     };
+    for (const tie of note.ties ?? []) {
+      if (tie.lv || !tie.target) {
+        warn(
+          `measure ${measureIndex + 1}: a tie with no target note (let-ring) has no ` +
+            `Guitar Pro tie equivalent; it was not written.`
+        );
+      } else {
+        writerNote.tieOrigin = true;
+        writerNote.tieTarget = tie.target;
+      }
+    }
 
     const poolId = pools.notes.length;
     pools.notes.push(writerNote);
@@ -882,10 +1125,14 @@ function serialize(
   push('<Beats>');
   for (const [id, beat] of pools.beats.entries()) {
     push(`<Beat id="${id}">`);
-    push('<Dynamic>MF</Dynamic>');
+    push(`<Dynamic>${beat.dynamic}</Dynamic>`);
     push(`<Rhythm ref="${beat.rhythmId}"/>`);
     if (beat.graceKind) push(`<GraceNotes>${beat.graceKind}</GraceNotes>`);
     if (beat.freeText !== null) push(`<FreeText>${cdata(beat.freeText)}</FreeText>`);
+    if (beat.arpeggio) push(`<Arpeggio>${beat.arpeggio}</Arpeggio>`);
+    if (beat.legatoOrigin || beat.legatoDestination) {
+      push(`<Legato origin="${beat.legatoOrigin}" destination="${beat.legatoDestination}"/>`);
+    }
     push('<ConcertPitchStemOrientation>Undefined</ConcertPitchStemOrientation>');
     if (beat.noteIds?.length) push(`<Notes>${beat.noteIds.join(' ')}</Notes>`);
     push('<Properties/><XProperties/>');
@@ -933,6 +1180,11 @@ function serialize(
       push(floatProperty('BendDestinationOffset', note.bend.destinationOffset));
     }
     push('</Properties>');
+    // Guitar Pro's own order after the properties: Accent, Tie, Vibrato.
+    if (note.accentFlags) push(`<Accent>${note.accentFlags}</Accent>`);
+    if (note.tieOrigin || note.tieDestination) {
+      push(`<Tie origin="${note.tieOrigin}" destination="${note.tieDestination}"/>`);
+    }
     if (note.vibrato) push('<Vibrato>Slight</Vibrato>');
     push('<InstrumentArticulation>0</InstrumentArticulation>');
     push('</Note>');

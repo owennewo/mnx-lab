@@ -12,7 +12,11 @@ import {
   MnxEventLyricLine,
   MnxHarmony,
   MnxHarmonicType,
-  MnxBendPoint
+  MnxBendPoint,
+  MnxDynamic,
+  MnxDynamicValue,
+  MnxArpeggio,
+  MnxEventMarkings
 } from '../common/types.js';
 import { parseChordSymbol } from '../common/harmony.js';
 import { gpScoreInfoToWork, rootExtension } from '../common/scoreMetadata.js';
@@ -23,6 +27,7 @@ import {
   GpifDocument,
   GpifBeat,
   GpifNote,
+  GpifRhythm,
   GpifTrack
 } from './document.js';
 
@@ -71,6 +76,19 @@ const SLIDE_OUT_UP = 0x08;
 const SLIDE_IN_FROM_BELOW = 0x10;
 const SLIDE_IN_FROM_ABOVE = 0x20;
 
+/** GPIF beat `Dynamic` → MNX `dynamic-value`. */
+const DYNAMICS: Record<string, MnxDynamicValue> = {
+  PPP: 'ppp', PP: 'pp', P: 'p', MP: 'mp', MF: 'mf', F: 'f', FF: 'ff', FFF: 'fff'
+};
+
+/** GPIF `<Accent>` bits → MNX event markings (field notes §9 #1). */
+const ACCENT_MARKINGS: [number, keyof MnxEventMarkings][] = [
+  [0x01, 'staccato'],
+  [0x04, 'strongAccent'],
+  [0x08, 'accent'],
+  [0x10, 'tenuto']
+];
+
 /** A note instance awaiting a technique target (hammer-on / slide-to). */
 interface NoteRecord {
   sourceId: number;
@@ -83,16 +101,35 @@ interface NoteRecord {
   note: MnxNote;
   wantsHammerTarget: boolean;
   wantsSlideTarget: boolean;
+  /** Grace notes are never a tie's origin: a tie joins principal notes. */
+  grace: boolean;
+}
+
+interface ImportState {
+  nextNoteId: number;
+  /** Events are given ids only when a slur targets them. */
+  nextEventId: number;
+  /** Notes something in the source this converter cannot carry. */
+  report: (label: string, measureIndex: number) => void;
 }
 
 export function gpifToMnx(doc: GpifDocument, options: GpifImportOptions = {}): MnxStructure {
   const warn = options.onWarning ?? (() => {});
 
+  // Everything met but not represented, reported once per kind at the end — a
+  // file with 40 let-rings wants one line, not 40.
+  const unrepresented = new Map<string, { count: number; firstMeasure: number }>();
+  const report = (label: string, measureIndex: number) => {
+    const seen = unrepresented.get(label);
+    if (seen) seen.count++;
+    else unrepresented.set(label, { count: 1, firstMeasure: measureIndex });
+  };
+
   const fifthsByMeasure = resolveFifths(doc);
-  const globalMeasures = buildGlobalMeasures(doc, fifthsByMeasure);
+  const globalMeasures = buildGlobalMeasures(doc, fifthsByMeasure, report);
   applyHarmonies(doc, globalMeasures);
 
-  const state = { nextNoteId: 0 };
+  const state: ImportState = { nextNoteId: 0, nextEventId: 0, report };
   const parts = doc.tracks.map((track, trackIndex) =>
     buildPart(doc, track, trackIndex, fifthsByMeasure, state, warn)
   );
@@ -112,6 +149,10 @@ export function gpifToMnx(doc: GpifDocument, options: GpifImportOptions = {}): M
     }
   }
   const lineOrder = [...usedVerses].sort((a, b) => a - b).map(i => `${i + 1}`);
+
+  for (const [label, { count, firstMeasure }] of unrepresented) {
+    warn(`measure ${firstMeasure + 1}: ${label} is not represented (${count} in the file).`);
+  }
 
   return {
     mnx: { version: 1 },
@@ -137,7 +178,8 @@ function resolveFifths(doc: GpifDocument): number[] {
 
 function buildGlobalMeasures(
   doc: GpifDocument,
-  fifthsByMeasure: number[]
+  fifthsByMeasure: number[],
+  report: ImportState['report']
 ): MnxGlobalMeasure[] {
   const measures: MnxGlobalMeasure[] = [];
 
@@ -152,6 +194,7 @@ function buildGlobalMeasures(
 
   for (const [barIndex, masterBar] of doc.masterBars.entries()) {
     const measure: MnxGlobalMeasure = {};
+    for (const tag of masterBar.unrecognized ?? []) report(`master bar ${tag}`, barIndex);
 
     const fifths = fifthsByMeasure[barIndex] ?? 0;
     if (fifths !== lastFifths) {
@@ -228,6 +271,14 @@ function reduceFraction(numerator: number, denominator: number): [number, number
   return [numerator / (a || 1), denominator / (a || 1)];
 }
 
+/** `onset` moved past one beat of `rhythm`, tuplet ratio applied. */
+function advance(onset: [number, number], rhythm: GpifRhythm): [number, number] {
+  const [n, d] = wholesToFraction(mnxDurationToWholes(rhythm.base!, rhythm.dots));
+  const num = n * rhythm.tupletDenominator;
+  const den = d * rhythm.tupletNumerator;
+  return reduceFraction(onset[0] * den + num * onset[1], onset[1] * den);
+}
+
 /**
  * Chord symbols → `global.measures[i]._x.mnxLab.harmonies`. Guitar Pro states
  * a chord as a `Chord` diagram reference or a bare `FreeText`; both are read,
@@ -260,12 +311,7 @@ function applyHarmonies(doc: GpifDocument, measures: MnxGlobalMeasure[]): void {
             byMeasure.set(measureIndex, slot);
           }
 
-          if (rhythm?.base && beat.graceKind === null) {
-            const [n, d] = wholesToFraction(mnxDurationToWholes(rhythm.base, rhythm.dots));
-            const num = n * rhythm.tupletDenominator;
-            const den = d * rhythm.tupletNumerator;
-            onset = reduceFraction(onset[0] * den + num * onset[1], onset[1] * den);
-          }
+          if (rhythm?.base && beat.graceKind === null) onset = advance(onset, rhythm);
         }
       }
     }
@@ -288,7 +334,7 @@ function buildPart(
   track: GpifTrack,
   trackIndex: number,
   fifthsByMeasure: number[],
-  state: { nextNoteId: number },
+  state: ImportState,
   warn: (message: string) => void
 ): MnxPart {
   const tuning = track.tuningLowToHigh;
@@ -301,10 +347,18 @@ function buildPart(
   const lyricContinuation = new Map<number, boolean[]>();
   const voiceRecords = new Map<number, NoteRecord[]>();
   const voiceOrder = new Map<number, number>();
+  // Guitar Pro stamps a dynamic on every beat; MNX states the changes. The
+  // part tracks what it last stated, each voice what it last played — so a
+  // voice that first appears mid-piece inherits the part's level instead of
+  // restating it.
+  const voiceDynamics = new Map<number, { last: string | null }>();
+  const partDynamic = { current: doc.unmarkedDynamic ?? 'MF' };
+  const voiceSlurs = new Map<number, SlurState>();
 
   for (const [measureIndex, masterBar] of doc.masterBars.entries()) {
     const fifths = fifthsByMeasure[measureIndex] ?? 0;
     const measure: MnxPartMeasure = { sequences: [] };
+    const marks: MeasureMarks = { dynamics: [], arpeggios: [] };
 
     const bar = doc.bars.get(masterBar.barIds[trackIndex] ?? -1);
 
@@ -329,6 +383,8 @@ function buildPart(
 
       if (!lyricContinuation.has(voiceIndex)) lyricContinuation.set(voiceIndex, []);
       if (!voiceRecords.has(voiceIndex)) voiceRecords.set(voiceIndex, []);
+      if (!voiceDynamics.has(voiceIndex)) voiceDynamics.set(voiceIndex, { last: null });
+      if (!voiceSlurs.has(voiceIndex)) voiceSlurs.set(voiceIndex, { from: null, measureIndex: 0 });
 
       measure.sequences.push(
         buildSequence(doc, beats, voiceIndex, track, fifths, measureIndex, state, warn, {
@@ -338,7 +394,11 @@ function buildPart(
             const value = voiceOrder.get(voiceIndex) ?? 0;
             voiceOrder.set(voiceIndex, value + 1);
             return value;
-          }
+          },
+          dynamic: voiceDynamics.get(voiceIndex)!,
+          partDynamic,
+          marks,
+          slur: voiceSlurs.get(voiceIndex)!
         })
       );
     }
@@ -347,10 +407,19 @@ function buildPart(
       measure.sequences.push({ voice: 'v1', content: [], fullMeasure: {} });
     }
 
+    const byPosition = (a: { position: { fraction: [number, number] } },
+      b: { position: { fraction: [number, number] } }) =>
+      a.position.fraction[0] / a.position.fraction[1] - b.position.fraction[0] / b.position.fraction[1];
+    if (marks.dynamics.length) measure.dynamics = marks.dynamics.sort(byPosition);
+    if (marks.arpeggios.length) measure.arpeggios = marks.arpeggios.sort(byPosition);
+
     measures.push(measure);
   }
 
   for (const records of voiceRecords.values()) resolveTargets(records);
+  for (const slur of voiceSlurs.values()) {
+    if (slur.from) state.report('beat <Legato> slurring into nothing', slur.measureIndex);
+  }
 
   const part: MnxPart = {
     id: `P${trackIndex + 1}`,
@@ -378,6 +447,24 @@ interface VoiceState {
   lyricContinuation: boolean[];
   records: NoteRecord[];
   nextOrder: () => number;
+  /** The GPIF dynamic this voice last played; null before its first note. */
+  dynamic: { last: string | null };
+  /** The GPIF dynamic the part last stated. */
+  partDynamic: { current: string };
+  marks: MeasureMarks;
+  slur: SlurState;
+}
+
+/** A voice's open legato chain: the event it started on, and where. */
+interface SlurState {
+  from: MnxEvent | null;
+  measureIndex: number;
+}
+
+/** Part-measure objects the voices of one measure contribute to. */
+interface MeasureMarks {
+  dynamics: MnxDynamic[];
+  arpeggios: MnxArpeggio[];
 }
 
 function buildSequence(
@@ -387,12 +474,13 @@ function buildSequence(
   track: GpifTrack,
   fifths: number,
   measureIndex: number,
-  state: { nextNoteId: number },
+  state: ImportState,
   warn: (message: string) => void,
   voice: VoiceState
 ): MnxSequence {
   const content: MnxSequenceItem[] = [];
   const groups = groupTuplets(doc, beats);
+  let onset: [number, number] = [0, 1];
 
   // Grace beats and tuplet beats are both RUNS in Guitar Pro — a per-beat flag
   // repeated across neighbours — and both are single CONTAINERS in MNX, so the
@@ -454,6 +542,11 @@ function buildSequence(
       continue;
     }
     const dots = rhythm?.dots ?? 0;
+    const grace = beat.graceKind !== null;
+    const at = onset;
+    if (!grace) onset = advance(onset, rhythm!);
+    for (const tag of rhythm?.unrecognized ?? []) state.report(`rhythm ${tag}`, measureIndex);
+    for (const tag of beat.unrecognized ?? []) state.report(`beat ${tag}`, measureIndex);
 
     const event: MnxEvent = {
       duration: dots > 0 ? { base, dots } : { base }
@@ -463,14 +556,60 @@ function buildSequence(
     if (noteIds.length === 0) {
       event.rest = {};
     } else {
+      const markings = markingsOf(noteIds, doc, measureIndex, state);
+      if (markings) event.markings = markings;
       event.notes = noteIds.flatMap(id => {
         const note = doc.notes.get(id);
-        return note ? [buildNote(note, id, track, fifths, order, state, voice.records, warn)] : [];
+        return note
+          ? [buildNote(note, id, track, fifths, order, state, voice.records, warn, measureIndex, grace)]
+          : [];
       });
+    }
+
+    // Only a sounding principal beat states a level: Guitar Pro stamps rests
+    // and graces too, and a rest's stamp is nothing a listener hears.
+    if (!grace && noteIds.length > 0 && beat.dynamic) {
+      const last = voice.dynamic.last ?? voice.partDynamic.current;
+      if (beat.dynamic !== last && beat.dynamic !== voice.partDynamic.current) {
+        const value = DYNAMICS[beat.dynamic];
+        if (value) voice.marks.dynamics.push({ position: { fraction: at }, type: 'immediate', value });
+        else state.report(`beat <Dynamic>${beat.dynamic}</Dynamic>`, measureIndex);
+        voice.partDynamic.current = beat.dynamic;
+      }
+      voice.dynamic.last = beat.dynamic;
+    }
+
+    if (beat.arpeggio && event.notes && event.notes.length > 1) {
+      const direction = beat.arpeggio === 'Up' ? 'up' : beat.arpeggio === 'Down' ? 'down' : null;
+      if (!direction || grace) {
+        state.report(`beat <Arpeggio>${beat.arpeggio}</Arpeggio>${grace ? ' on a grace note' : ''}`, measureIndex);
+      } else {
+        // The span runs bottom to top by pitch, whatever way the roll goes.
+        const byPitch = [...event.notes].sort((a, b) => pitchToMidi(a.pitch) - pitchToMidi(b.pitch));
+        voice.marks.arpeggios.push({
+          position: { fraction: at },
+          span: { start: byPitch[0].id!, end: byPitch[byPitch.length - 1].id! },
+          direction
+        });
+      }
     }
 
     const lyrics = buildLyrics(beat, voice.lyricContinuation);
     if (lyrics) event.lyrics = lyrics;
+
+    // Guitar Pro slurs a beat into the next one, and chains: every beat of a
+    // slur but the last carries the origin flag. MNX states one slur, from the
+    // first event to the last, which must then have an id to be named by.
+    if (voice.slur.from) {
+      if (!beat.legatoOrigin) {
+        event.id = `e${state.nextEventId++}`;
+        voice.slur.from.slurs = [{ target: event.id }];
+        voice.slur.from = null;
+      }
+    } else if (beat.legatoOrigin) {
+      voice.slur.from = event;
+      voice.slur.measureIndex = measureIndex;
+    }
 
     if (beat.graceKind !== null) {
       if (graceKind !== null && graceKind !== beat.graceKind) flushGrace();
@@ -588,15 +727,44 @@ function buildLyrics(
   return Object.keys(lines).length > 0 ? { lines } : undefined;
 }
 
+/**
+ * A beat's articulations from its notes' `<Accent>` bitmasks. Guitar Pro
+ * marks notes; MNX marks the event — so a marking on any note of a chord marks
+ * the chord, which is also where an engraver draws it.
+ */
+function markingsOf(
+  noteIds: number[],
+  doc: GpifDocument,
+  measureIndex: number,
+  state: ImportState
+): MnxEventMarkings | undefined {
+  let flags = 0;
+  for (const id of noteIds) flags |= doc.notes.get(id)?.accentFlags ?? 0;
+  if (!flags) return undefined;
+
+  const markings: MnxEventMarkings = {};
+  let known = 0;
+  for (const [bit, name] of ACCENT_MARKINGS) {
+    known |= bit;
+    if (flags & bit) (markings as Record<string, object>)[name] = {};
+  }
+  if (flags & ~known) {
+    state.report(`note <Accent> bits 0x${(flags & ~known).toString(16)}`, measureIndex);
+  }
+  return Object.keys(markings).length ? markings : undefined;
+}
+
 function buildNote(
   gpNote: GpifNote,
   sourceId: number,
   track: GpifTrack,
   fifths: number,
   order: number,
-  state: { nextNoteId: number },
+  state: ImportState,
   records: NoteRecord[],
-  warn: (message: string) => void
+  warn: (message: string) => void,
+  measureIndex: number,
+  grace: boolean
 ): MnxNote {
   const id = `n${state.nextNoteId++}`;
   const midi = soundingMidi(gpNote, track);
@@ -628,7 +796,36 @@ function buildNote(
     const origin = records.find(record => record.sourceId === gpNote.tieOrigin);
     if (!origin) throw new Error(`Tie source ${gpNote.tieOrigin} is missing from this voice`);
     origin.note.ties = [{ target: id }];
+  } else if (gpNote.tieDestination) {
+    // GPIF flags the tied-INTO note and names no origin: it is the latest
+    // earlier principal note in this voice on the same string (on the same
+    // pitch, off the fingerboard).
+    let origin: NoteRecord | undefined;
+    for (let index = records.length - 1; index >= 0 && !origin; index--) {
+      const record = records[index];
+      if (record.order >= order || record.grace) continue;
+      const sameSeat = gpNote.string !== null
+        ? record.gpString === gpNote.string
+        : record.gpString === null && pitchToMidi(record.note.pitch) === midi;
+      if (sameSeat) origin = record;
+    }
+    if (origin) {
+      origin.note.ties = [{ target: id }];
+      // A tie holds one pitch: the destination sounds what the origin does.
+      mnxNote.pitch = { ...origin.note.pitch };
+      const originFret = origin.note._x?.mnxLab?.fret;
+      if (mnxNote._x?.mnxLab && originFret !== undefined) mnxNote._x.mnxLab.fret = originFret;
+    } else {
+      warn(
+        `measure ${measureIndex + 1}: note ${sourceId} is tied from nothing — no earlier ` +
+          `note on its string in this voice; it was kept without a tie.`
+      );
+    }
   }
+
+  if (gpNote.dead) state.report('dead-note styling (Property Muted)', measureIndex);
+  if (gpNote.ghost) state.report('ghost-note styling (<AntiAccent>)', measureIndex);
+  for (const tag of gpNote.unrecognized ?? []) state.report(`note ${tag}`, measureIndex);
 
   records.push({
     sourceId,
@@ -638,7 +835,8 @@ function buildNote(
     technique,
     note: mnxNote,
     wantsHammerTarget,
-    wantsSlideTarget
+    wantsSlideTarget,
+    grace
   });
 
   return mnxNote;

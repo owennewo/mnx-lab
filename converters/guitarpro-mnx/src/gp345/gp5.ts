@@ -36,7 +36,12 @@ interface BinaryGrace {
 
 interface ParsedNote extends GpifNote {
   grace?: BinaryGrace | null;
+  /** The note's dynamics byte as a GPIF `Dynamic` token; the beat takes it. */
+  dynamic?: string;
 }
+
+/** The binary dynamics byte, 1–8, as GPIF `Dynamic` tokens. */
+const BINARY_DYNAMICS = ['PPP', 'PP', 'P', 'MP', 'MF', 'F', 'FF', 'FFF'];
 
 interface LegacyLyricLine {
   startingMeasure: number;
@@ -210,7 +215,9 @@ export function parseGuitarProBinary(data: Uint8Array, options: GpifImportOption
     beats,
     notes,
     rhythms,
-    tempoAutomations
+    tempoAutomations,
+    // A note with no dynamics byte plays forte in the binary formats.
+    unmarkedDynamic: 'F'
   };
 }
 
@@ -490,6 +497,9 @@ function readBeat(
 
   const playedStrings = reader.readUint8(`${where} played strings`);
   const noteIds: number[] = [];
+  // Dynamics are per NOTE here and per beat in GPIF; like alphaTab, the last
+  // note that states one speaks for the beat, and unstated means forte.
+  let beatDynamic = 'F';
   const graceBeatIds: number[] = [];
   const graceGroups = new Map<string, number>();
   for (let sourceString = 1; sourceString <= 7; sourceString++) {
@@ -500,6 +510,8 @@ function readBeat(
     }
     const noteId = ids.note++;
     const note = readNote(reader, track, sourceString, where, warn, major);
+    if (note.dynamic) beatDynamic = note.dynamic;
+    delete note.dynamic;
     if (beatEffects?.vibrato) note.vibrato = true;
     if (beatEffects?.harmonicType) {
       note.harmonicType = beatEffects.harmonicType;
@@ -586,7 +598,8 @@ function readBeat(
     graceKind: null,
     freeText,
     chordId,
-    lyricLines: null
+    lyricLines: null,
+    dynamic: beatDynamic
   });
   return [...graceBeatIds, beatId];
 }
@@ -606,7 +619,12 @@ function readNote(
     type = reader.readUint8(`${where} string ${sourceString} note type`);
   }
   if (major < 5 && (flags & 0x01)) reader.skip(2, `${where} note duration`);
-  if (flags & 0x10) reader.skip(1, `${where} string ${sourceString} dynamics`);
+  let dynamic: string | undefined;
+  if (flags & 0x10) {
+    const value = reader.readInt8(`${where} string ${sourceString} dynamics`);
+    dynamic = BINARY_DYNAMICS[value - 1];
+    if (!dynamic) warn(`${where} string ${sourceString}: unknown dynamics value ${value}; ignored.`);
+  }
   if (flags & 0x20) fret = reader.readInt8(`${where} string ${sourceString} fret`);
   if (flags & 0x80) reader.skip(2, `${where} string ${sourceString} fingering`);
   if (major === 5) {
@@ -647,7 +665,8 @@ function readNote(
     slideFlags: effects.slideFlags,
     bend: effects.bend,
     harmonicType: effects.harmonicType,
-    grace: effects.grace
+    grace: effects.grace,
+    ...(dynamic ? { dynamic } : {})
   };
 }
 

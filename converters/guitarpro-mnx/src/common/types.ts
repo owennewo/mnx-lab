@@ -227,6 +227,7 @@ export interface MnxRest {
 export interface MnxEventMarkings {
   accent?: object;
   staccato?: object;
+  strongAccent?: object;
   tenuto?: object;
   tremolo?: { marks?: number };
 }
@@ -236,13 +237,25 @@ export interface MnxEventLyricLine {
   type?: 'start' | 'middle' | 'end' | 'whole';
 }
 
+/** A slur from this event to `target` (an event id). */
+export interface MnxSlur {
+  target: string;
+  side?: 'up' | 'down';
+  sideEnd?: 'up' | 'down';
+  startNote?: string;
+  endNote?: string;
+  lineType?: string;
+}
+
 export interface MnxEvent {
+  /** Referenced by slurs. */
   id?: string;
   duration: MnxNoteValue;
   lyrics?: { lines?: Record<string, MnxEventLyricLine> };
   markings?: MnxEventMarkings;
   notes?: MnxNote[];
   rest?: MnxRest;
+  slurs?: MnxSlur[];
 }
 
 export interface MnxTuplet {
@@ -287,7 +300,41 @@ export interface MnxSequence {
   voice?: string;
 }
 
+/** Standard dynamic values (MNX `dynamic-value`, a closed enum). */
+export type MnxDynamicValue =
+  | 'pppppp' | 'ppppp' | 'pppp' | 'ppp' | 'pp' | 'p' | 'mp'
+  | 'mf' | 'f' | 'ff' | 'fff' | 'ffff' | 'fffff' | 'ffffff' | 'n';
+
+/** A dynamic marking (MNX `dynamic-group`) at a metric position in a part
+ *  measure. The converter reads and writes only `immediate` groups with a
+ *  `value`; the rest of the shape is mirrored so a document carrying it types. */
+export interface MnxDynamic {
+  position: { fraction: [number, number] };
+  type: 'immediate' | 'gradual' | 'relative' | 'accent';
+  value?: MnxDynamicValue;
+  glyphs?: string[];
+  wedgeType?: 'increasing' | 'decreasing';
+  end?: { measure: string; position: { fraction: [number, number] } };
+  relativeValue?: 'louder' | 'softer';
+  residualValue?: MnxDynamicValue;
+  orient?: 'above' | 'auto' | 'below' | 'between';
+  staff?: number;
+  voice?: string;
+}
+
+/** MNX `arpeggio`: a chord rolled from `span.start` to `span.end` (note ids,
+ *  bottom to top), at a rhythmic position in the part measure. */
+export interface MnxArpeggio {
+  position: { fraction: [number, number] };
+  span: { start: string; end: string };
+  direction?: 'up' | 'down' | 'auto';
+  arrow?: boolean;
+  color?: string;
+}
+
 export interface MnxPartMeasure {
+  arpeggios?: MnxArpeggio[];
+  dynamics?: MnxDynamic[];
   /** Free-text/symbolic instructions for this part. **Proposed**, not adopted. */
   directions?: MnxDirection[];
   clefs?: {

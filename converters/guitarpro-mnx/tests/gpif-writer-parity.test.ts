@@ -5,7 +5,7 @@ import { importGpifOracle } from './helpers/gpifOracle.js';
 import { exportGuitarPro } from '../src/export/gp.js';
 import { importGuitarProGpif, exportGuitarProGpif } from '../src/gpif/index.js';
 import { MnxStructure } from '../src/common/types.js';
-import { normalizeIds } from './helpers/normalize.js';
+import { normalizeIds, withoutOracleBlindSpots } from './helpers/normalize.js';
 
 /**
  * The clean-room GPIF writer, held to LOSSLESSNESS through a production
@@ -45,7 +45,9 @@ describe.each(FIXTURES)('clean-room GPIF writer: %s', name => {
   it('alphaTab reads the clean-room .gp back to the committed document exactly', async () => {
     const mnx = await committed(name);
     const bytes = exportGuitarProGpif(mnx, { collapseTabUnisons: false });
-    expect(normalizeIds(importGpifOracle(bytes))).toEqual(normalizeIds(mnx));
+    // What the historical mapper never maps cannot be asked of it; the
+    // all-clean-room round trip below holds those fields in full.
+    expect(normalizeIds(importGpifOracle(bytes))).toEqual(withoutOracleBlindSpots(normalizeIds(mnx)));
   });
 
   it('the all-clean-room round trip reproduces the committed document', async () => {
@@ -56,7 +58,7 @@ describe.each(FIXTURES)('clean-room GPIF writer: %s', name => {
 
   it('both readers agree on what a default-options clean-room file says', async () => {
     const bytes = exportGuitarProGpif(await committed(name));
-    expect(normalizeIds(importGuitarProGpif(bytes))).toEqual(
+    expect(withoutOracleBlindSpots(normalizeIds(importGuitarProGpif(bytes)))).toEqual(
       normalizeIds(importGpifOracle(bytes))
     );
   });

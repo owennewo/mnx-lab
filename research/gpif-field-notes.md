@@ -223,8 +223,20 @@ until changed (scorelib carries velocity forward across beats). Beat-level
 `Slapped`/`Popped` (presence of `Enable`), `Rasgueado`, and the whammy-bar family —
 `WhammyBar` enable + `Origin/Middle/Destination` × `Value/Offset` floats, same unit
 system as bends (§8). `<Fadding>FadeIn</Fadding>` (sic — the misspelling is the
-format's), `<Tremolo>n/d</Tremolo>` for tremolo picking. None of these are in the MNX
-subset yet except via future technique extensions.
+format's), `<Tremolo>n/d</Tremolo>` for tremolo picking. None of the beat properties
+are in the MNX subset yet; the reader names each one it meets in a warning.
+
+**Dynamics are imported (2026-09-10).** Guitar Pro writes `<Dynamic>` on every beat,
+rests included, and `MF` is what an unmarked beat says — so an all-`MF` file (every
+Soundslice export seen) is unmarked, and a `<Dynamic>` becomes an MNX part-measure
+`dynamic-group` only where a sounding beat departs from the level in force. The
+writer inverts it: every beat stamped with the level at its onset.
+
+**Arpeggio and legato (2026-09-10).** `<Arpeggio>Up|Down</Arpeggio>` rolls the beat's
+chord (MNX `arpeggio`, span bottom to top by pitch). `<Legato origin="true"/>` slurs
+the beat into the NEXT beat of the voice — alphaTab reads only `origin`; `destination`
+restates the next beat — and chains: every beat of a slur but the last carries the
+origin flag. MNX states one `slur`, first event to last.
 
 ## 8. Note: pitch, techniques, bends
 
@@ -256,10 +268,11 @@ as `Tone`/`Octave` properties instead, and percussion as `Element`/`Variation`
 |---|---|---|
 | `<Vibrato/>` | direct child, presence | `technique.vibrato` |
 | `Property PalmMuted` | `<Enable/>` presence | `technique.palmMute` |
-| `Property Muted` | `<Enable/>` — dead/ghost-fret note | not yet modeled |
-| `Property Tapped` | `<Enable/>` | not yet modeled |
-| `<LetRing/>` · `<AntiAccent>` · `<Accent>` | children; Accent int is DIVERGENT (§9) | not yet modeled |
-| `<Tie origin="…" destination="…"/>` | boolean attrs; destination marks the tied-into note | MNX `ties` (pair by same string, next note) |
+| `Property Muted` | `<Enable/>` — dead (x) note | not yet modeled — warns |
+| `Property Tapped` | `<Enable/>` | not yet modeled — warns |
+| `<Accent>` | bitmask: 1 staccato, 4 heavy, 8 accent, 16 tenuto (§9 #1) | event `markings` |
+| `<AntiAccent>` · `<LetRing/>` | ghost note · let ring | not yet modeled — warn |
+| `<Tie origin="…" destination="…"/>` | boolean attrs; `destination` is authoritative | MNX `ties` from the previous note on the same string in the voice |
 | `<Trill>midi</Trill>` + XProperty `688062467` | trill-with pitch + duration in 480-per-quarter ticks | not yet modeled |
 
 **Hammer-on / pull-off (AGREED).** `Property HopoOrigin` (`<Enable/>`) marks the
@@ -322,7 +335,7 @@ author the feature, unzip, diff.
 
 | # | Question | What the sources say |
 |---|---|---|
-| 1 | **Accent encoding** (DIVERGENT) | ruxguitar tests equality (1 = staccato, 4 = heavy, 8 = accent); scorelib treats it as a bitmask and also maps `0x02`. Author staccato + accent together and read the int. |
+| 1 | **Accent encoding** (SETTLED 2026-09-10: bitmask) | ruxguitar tests equality (1 = staccato, 4 = heavy, 8 = accent); scorelib treats it as a bitmask and also maps `0x02`. alphaTab's GPIF reader AND writer both treat it as a bitmask — 1 staccato, 4 heavy, 8 accent, 16 tenuto — and Soundslice writes `<Accent>1</Accent>` for staccato (17 in its "Anji" export). `0x02` stays unexplained and warns. |
 | 2 | **Bend middle-offset 12 sentinel** (OPEN, narrowed) | TuxGuitar lineage skips `MiddleOffset == 12`; scorelib ignores middles entirely. Differential testing against alphaTab (2026-09-01, Vestapol note 388: origin 0 / middle 50 / destination 100, no offsets) established one rule: **a middle value with no explicit offset is dropped** — it sits at the default midpoint of a linear ramp and carries nothing. Whether an offset of literal `12` is additionally a sentinel remains open. |
 | 3 | **Tempo unit enum** (OPEN) | `2` = quarter is confirmed. Author eighth-, dotted-quarter- and half-based tempos to fill the table. |
 | 4 | **Slide bits ≥ 0x40** (OPEN) | Neither reader handles pick slides. Author one. |

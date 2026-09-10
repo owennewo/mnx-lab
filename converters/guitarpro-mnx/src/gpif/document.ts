@@ -28,7 +28,19 @@ export interface GpifDocument {
   rhythms: Map<number, GpifRhythm>;
   /** Tempo automations: 0-based master-bar index → bpm values in file order. */
   tempoAutomations: Map<number, number[]>;
+  /** The beat dynamic a file states when nobody marked one — `MF` in GPIF,
+   *  `F` in the gp3–5 binaries. Guitar Pro writes a dynamic on EVERY beat, so
+   *  the format cannot tell "unmarked" from this value; `toMnx` treats it as
+   *  unmarked until the music departs from it. Absent ⇒ `MF`. */
+  unmarkedDynamic?: string;
 }
+
+/**
+ * Children and properties a parser met but does not read, as display labels
+ * (`<LetRing>`, `Property Tapped`). `toMnx` reports each kind once, with a
+ * count — the tripwire that turns a silent drop into a warning.
+ */
+export type Unrecognized = string[];
 
 export interface GpifMasterBar {
   /** One bar id per track, in track order. */
@@ -50,6 +62,7 @@ export interface GpifMasterBar {
   /** `TripletFeel` — the played feel of this bar's pairs, verbatim. Guitar Pro
    *  stamps it on EVERY bar; `toMnx` states it only where it changes. */
   tripletFeel: string | null;
+  unrecognized?: Unrecognized;
 }
 
 export interface GpifTrack {
@@ -83,6 +96,14 @@ export interface GpifBeat {
   chordId: number | null;
   /** `Lyrics/Line` texts, one per verse in declaration order; null when absent. */
   lyricLines: string[] | null;
+  /** `Dynamic` verbatim (`PPP` … `FFF`); absent when the beat states none. */
+  dynamic?: string;
+  /** `Arpeggio` — `Up` | `Down`: the chord is rolled in that direction. */
+  arpeggio?: string;
+  /** `<Legato origin="true">` — slurred into the NEXT beat of the voice.
+   *  alphaTab reads only this flag; `destination` restates the next beat. */
+  legatoOrigin?: boolean;
+  unrecognized?: Unrecognized;
 }
 
 export interface GpifRhythm {
@@ -90,6 +111,7 @@ export interface GpifRhythm {
   dots: number;
   tupletNumerator: number;
   tupletDenominator: number;
+  unrecognized?: Unrecognized;
 }
 
 export interface GpifBend {
@@ -105,7 +127,8 @@ export interface GpifBend {
 }
 
 export interface GpifNote {
-  /** Legacy tie destination; joins the preceding note on this voice/string. */
+  /** Tie destination: joins the preceding note on this voice/string. GPIF
+   *  states it as `<Tie destination="true">`; the binaries as note type 2. */
   tieDestination?: boolean;
   /** Resolved legacy source ID; avoids accidentally tying to an inserted grace. */
   tieOrigin?: number;
@@ -131,7 +154,44 @@ export interface GpifNote {
   bend: GpifBend | null;
   /** `HarmonicType/HType` string, e.g. "Natural". */
   harmonicType: string | null;
+  /** `<Accent>` bitmask: 1 staccato, 4 heavy accent, 8 accent, 16 tenuto
+   *  (field notes §9 #1, settled by alphaTab's reader and writer). */
+  accentFlags?: number;
+  /** `Property Muted` — a dead (x) note. */
+  dead?: boolean;
+  /** `<AntiAccent>` — a ghost note. */
+  ghost?: boolean;
+  unrecognized?: Unrecognized;
 }
+
+/**
+ * What each parser reads, plus what it may skip because it carries no music:
+ * layout (`…StemOrientation`), display-only duplicates (`TransposedPitch`,
+ * `HopoDestination` — the origin carries the pairing), GP's own extension
+ * bags (`XProperties`) and values folded into another field (`HarmonicFret`
+ * is the touch fret `HarmonicType` implies). Anything else is reported.
+ */
+const MASTER_BAR_CHILDREN = new Set([
+  'Key', 'Time', 'Bars', 'Repeat', 'AlternateEndings', 'DoubleBar', 'Section',
+  'TripletFeel', 'XProperties'
+]);
+const BEAT_CHILDREN = new Set([
+  'Rhythm', 'Notes', 'GraceNotes', 'FreeText', 'Chord', 'Lyrics', 'Dynamic', 'Arpeggio', 'Legato',
+  'Properties', 'XProperties', 'ConcertPitchStemOrientation',
+  'TransposedPitchStemOrientation', 'UserTransposedPitchStemOrientation', 'Timer'
+]);
+const RHYTHM_CHILDREN = new Set(['NoteValue', 'AugmentationDot', 'PrimaryTuplet']);
+const NOTE_CHILDREN = new Set([
+  'Properties', 'Vibrato', 'Tie', 'Accent', 'AntiAccent', 'Accidental',
+  'InstrumentArticulation', 'XProperties'
+]);
+const NOTE_PROPERTIES = new Set([
+  'String', 'Fret', 'ConcertPitch', 'TransposedPitch', 'Midi', 'Tone', 'Octave',
+  'PalmMuted', 'Muted', 'HopoOrigin', 'HopoDestination', 'Slide', 'Bended',
+  'BendOriginValue', 'BendOriginOffset', 'BendMiddleValue', 'BendMiddleOffset1',
+  'BendMiddleOffset2', 'BendDestinationValue', 'BendDestinationOffset',
+  'HarmonicType', 'HarmonicFret', 'ShowStringNumber'
+]);
 
 /** GPIF `NoteValue` strings → MNX duration bases. */
 const NOTE_VALUES: Record<string, MnxNoteValueBase> = {
@@ -211,7 +271,8 @@ function parseMasterBar(node: Element): GpifMasterBar {
     sectionLetter: section ? (text(section, 'Letter') ?? null) : null,
     sectionText: section ? (text(section, 'Text') ?? null) : null,
     alternateEndingsMask: mask,
-    tripletFeel: text(node, 'TripletFeel') ?? null
+    tripletFeel: text(node, 'TripletFeel') ?? null,
+    ...unrecognizedOf(node, MASTER_BAR_CHILDREN)
   };
 }
 
@@ -267,13 +328,27 @@ function parseVoice(node: Element): GpifVoice {
 function parseBeat(node: Element): GpifBeat {
   const notesText = text(node, 'Notes');
   const lyrics = child(node, 'Lyrics');
+  const dynamic = text(node, 'Dynamic')?.trim();
+  const arpeggio = text(node, 'Arpeggio')?.trim();
+  // No beat property is read yet (Brush, PickStroke, Slapped, WhammyBar, …),
+  // so every one present is reported.
+  const properties = children(child(node, 'Properties'), 'Property').map(
+    property => `Property ${property.getAttribute('name') ?? '(unnamed)'}`
+  );
+  const unrecognized = [...(unrecognizedOf(node, BEAT_CHILDREN).unrecognized ?? []), ...properties];
   return {
     rhythmRef: int(child(node, 'Rhythm')?.getAttribute('ref')) ?? 0,
     noteIds: notesText === undefined ? null : intList(notesText),
     graceKind: text(node, 'GraceNotes') ?? null,
     freeText: text(node, 'FreeText') ?? null,
     chordId: int(text(node, 'Chord')),
-    lyricLines: lyrics ? children(lyrics, 'Line').map(line => line.textContent ?? '') : null
+    lyricLines: lyrics ? children(lyrics, 'Line').map(line => line.textContent ?? '') : null,
+    ...(dynamic ? { dynamic } : {}),
+    ...(arpeggio ? { arpeggio } : {}),
+    ...(child(node, 'Legato')?.getAttribute('origin')?.toLowerCase() === 'true'
+      ? { legatoOrigin: true }
+      : {}),
+    ...(unrecognized.length ? { unrecognized } : {})
   };
 }
 
@@ -283,7 +358,8 @@ function parseRhythm(node: Element): GpifRhythm {
     base: NOTE_VALUES[text(node, 'NoteValue') ?? ''] ?? null,
     dots: int(child(node, 'AugmentationDot')?.getAttribute('count')) ?? 0,
     tupletNumerator: int(tuplet?.getAttribute('num')) ?? 1,
-    tupletDenominator: int(tuplet?.getAttribute('den')) ?? 1
+    tupletDenominator: int(tuplet?.getAttribute('den')) ?? 1,
+    ...unrecognizedOf(node, RHYTHM_CHILDREN)
   };
 }
 
@@ -379,8 +455,29 @@ function parseNote(node: Element): GpifNote {
       case 'HarmonicType':
         note.harmonicType = text(property, 'HType') ?? null;
         break;
+      case 'Muted':
+        if (child(property, 'Enable') !== null) note.dead = true;
+        break;
     }
   }
+
+  // The DESTINATION flag is authoritative — alphaTab reads only it, and the
+  // origin is implied: the preceding note on this string in this voice.
+  if (child(node, 'Tie')?.getAttribute('destination')?.toLowerCase() === 'true') {
+    note.tieDestination = true;
+  }
+  const accentFlags = int(text(node, 'Accent'));
+  if (accentFlags) note.accentFlags = accentFlags;
+  if (child(node, 'AntiAccent') !== null) note.ghost = true;
+
+  const unrecognized = [
+    ...(unrecognizedOf(node, NOTE_CHILDREN).unrecognized ?? []),
+    ...children(child(node, 'Properties'), 'Property')
+      .map(property => property.getAttribute('name') ?? '(unnamed)')
+      .filter(name => !NOTE_PROPERTIES.has(name))
+      .map(name => `Property ${name}`)
+  ];
+  if (unrecognized.length) note.unrecognized = unrecognized;
 
   if (bendEnabled) note.bend = bend;
   return note;
@@ -426,6 +523,17 @@ function children(node: Element | null | undefined, name: string): Element[] {
     if (el.nodeType === 1 && (el as Element).tagName === name) out.push(el as Element);
   }
   return out;
+}
+
+/** Element children whose tag is not in `known`, as `<Tag>` labels. */
+function unrecognizedOf(node: Element, known: Set<string>): { unrecognized?: Unrecognized } {
+  const unrecognized: Unrecognized = [];
+  for (let el = node.firstChild; el; el = el.nextSibling) {
+    if (el.nodeType !== 1) continue;
+    const tag = (el as Element).tagName;
+    if (!known.has(tag)) unrecognized.push(`<${tag}>`);
+  }
+  return unrecognized.length ? { unrecognized } : {};
 }
 
 /** Text content of the first child element `name`; undefined when absent. */

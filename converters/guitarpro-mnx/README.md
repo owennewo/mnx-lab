@@ -15,6 +15,17 @@ unpositioned bend middles report a warning.
 - GP1/2 `.gtp` is not supported. Container acceptance does not imply preservation
   of every application-specific feature; use `onWarning` to collect losses.
 
+Both directions carry **ties, dynamics, articulations, arpeggios and slurs**:
+GPIF `<Tie>`, `<Dynamic>`, the `<Accent>` bitmask (staccato, accent, heavy
+accent, tenuto), `<Arpeggio>` and `<Legato>` chains map to MNX `ties`,
+part-measure `dynamics`, event `markings`, `arpeggios` and `slurs`. Guitar Pro
+stamps a dynamic on every beat and cannot tell unmarked from its default (MF in
+GPIF, F in GP3–5), so import states a level only where the music departs from
+it; the binary readers' per-note dynamics byte feeds the same path. Anything
+else the GPIF reader meets but does not read — let-ring, brush strokes, dead
+and ghost notes, fermatas — warns once per kind with a count, rather than
+disappearing.
+
 The legacy reader retains notation, tuning/capo, lyrics, ties and supported
 techniques through the shared GPIF-to-MNX mapping. Unsupported musical effects
 warn; RSE and page-layout data are not preserved. Chord names are retained,
