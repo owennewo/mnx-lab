@@ -81,6 +81,51 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Only stacked ink spaces a tab staff from its notation — 2026-09-10
+
+Owner: user-reported spacing fix, landed directly on `main`; no roadmap doc. At the
+tightest clearance the first system of a capo'd score stood visibly wider between
+its notation and tab staves than every later system. The gap summed the whole
+system's deepest ink under the notation staff (the octave `8` under the clef) and
+its tallest ink over the tab staff (the `Capo N` line) although the two are far
+apart along the staff. `measureDisplayGaps` (`src/engine/layout/notation.ts`) now
+adds reaches for the gap above a tab staff only between items within the paired
+clearance of each other horizontally — the same clearance they keep vertically.
+Every other display gap keeps the whole-system sum. This supersedes the
+"whole-system ink measurement" sentence of the *Tighter paired notation/tab
+spacing* batch below. Pinned by `harness/conformance/ink-measured-gaps.test.ts`
+(stage B re-derives the pairing; a capo regression case).
+
+Only `expected.both.svg` moved, in 13 scenarios; notation, tab, primitives and every
+status are byte-identical. None was `verified`, so nothing was demoted.
+`lab/11-rhythm/05-swing-feel` is still `draft`.
+
+Look for: in the both view the notation→tab gap closes up wherever the deepest
+ink under the notation staff and the tallest ink over the tab staff sit in
+different columns — a low note at one end of a system no longer holds the gap open
+for a capo line, label or bend at the other. What must still hold: nothing under
+the notation staff comes within 2sp of anything over the tab staff in the same
+columns (stems, ledger lines, lyrics, bend arrows, technique marks). Worth flipping
+the clearance control to 0 on a scenario with a capo: the first system should match
+the later ones.
+
+Scenario set (paths under `scenarios/`):
+
+- `lab/11-rhythm/05-swing-feel`
+- `lab/20-tab-part/01-standard-tuning-both`
+- `lab/22-tab-derivation/02-bare-chord`
+- `lab/22-tab-derivation/04-partial-annotation`
+- `lab/22-tab-derivation/05-drop-d`
+- `lab/22-tab-derivation/08-out-of-range`
+- `lab/23-tab-fingering/02-right-hand-pima`
+- `lab/25-tab-techniques/01-bend-and-release`
+- `lab/25-tab-techniques/02-slides`
+- `lab/25-tab-techniques/06-bend-shapes`
+- `lab/31-score-text/10-labels-on-a-tab-staff`
+- `lab/40-navigation/02-repeats-and-marks-on-tab`
+- `lab/50-lyrics/02-tab-verses`
+
+
 ### Bends leave from the note — 2026-09-09
 
 Cause: the notation copy of every bend used to rise from the LANE rather than

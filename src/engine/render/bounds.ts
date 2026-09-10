@@ -17,11 +17,74 @@ export interface BoundsSp {
   h: number;
 }
 
+/** One primitive's ink, as edges rather than a box — what `computeBoundsSp`
+ *  unions, and what a caller needs when it matters WHERE along the staff the
+ *  ink sits, not only how far it reaches. */
+export interface InkEdgesSp {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 /** Em-relative fallbacks for text (and glyphs missing a bbox entry). */
 const TEXT_ASCENT = 0.75;
 const TEXT_DESCENT = 0.25;
 const TEXT_ADVANCE = 0.6;
 const GLYPH_FONT_SP = 4; // glyph font-size in sp at scale 1 (mirrors svg.ts)
+
+export function inkEdgesSp(p: Primitive): InkEdgesSp {
+  switch (p.kind) {
+    case 'glyph': {
+      const s = p.scale ?? 1;
+      // Bounds are SQUARE sp — the currency both `x` and `dx` share at
+      // ratio 1 — so an ink offset simply adds. (The emitter is where the
+      // two part company; see PrimitiveBase.)
+      const px = p.x + (p.dx ?? 0);
+      const bb = glyphBBox(p.glyph);
+      if (bb) {
+        // SMuFL bboxes are y-up around the glyph origin; staff coords are y-down.
+        const left =
+          p.anchor === 'middle' ? px - (bb.w * s) / 2
+          : p.anchor === 'end' ? px - (bb.x + bb.w) * s
+          : px + bb.x * s;
+        return { left, top: p.y - (bb.y + bb.h) * s, right: left + bb.w * s, bottom: p.y - bb.y * s };
+      }
+      const em = GLYPH_FONT_SP * s;
+      return { left: px - em / 2, top: p.y - em * TEXT_ASCENT, right: px + em / 2, bottom: p.y + em * TEXT_DESCENT };
+    }
+    case 'line': {
+      const r = p.thickness / 2;
+      const a = p.x1 + (p.dx1 ?? 0);
+      const b = p.x2 + (p.dx2 ?? 0);
+      return {
+        left: Math.min(a, b) - r,
+        top: Math.min(p.y1, p.y2) - r,
+        right: Math.max(a, b) + r,
+        bottom: Math.max(p.y1, p.y2) + r
+      };
+    }
+    case 'curve': {
+      // Control-point hull contains the bézier — fine for a padded crop.
+      const xs = p.points.map(pt => pt.x);
+      const ys = p.points.map(pt => pt.y);
+      const r = p.thickness / 2;
+      return { left: Math.min(...xs) - r, top: Math.min(...ys) - r, right: Math.max(...xs) + r, bottom: Math.max(...ys) + r };
+    }
+    case 'text': {
+      const w = p.text.length * p.size * TEXT_ADVANCE;
+      const tx = p.x + (p.dx ?? 0);
+      const left = p.anchor === 'middle' ? tx - w / 2 : p.anchor === 'end' ? tx - w : tx;
+      const top =
+        p.baseline === 'middle' ? p.y - p.size / 2
+        : p.baseline === 'hanging' ? p.y
+        : p.y - p.size * TEXT_ASCENT;
+      return { left, top, right: left + w, bottom: top + p.size };
+    }
+    case 'rect':
+      return { left: p.x + (p.dx ?? 0), top: p.y, right: p.x + (p.dx ?? 0) + p.w, bottom: p.y + p.h };
+  }
+}
 
 export function computeBoundsSp(
   primitives: readonly Primitive[],
@@ -31,70 +94,13 @@ export function computeBoundsSp(
   let minY = Infinity;
   let maxX = -Infinity;
   let maxY = -Infinity;
-  const grow = (x0: number, y0: number, x1: number, y1: number) => {
-    minX = Math.min(minX, x0);
-    minY = Math.min(minY, y0);
-    maxX = Math.max(maxX, x1);
-    maxY = Math.max(maxY, y1);
-  };
 
   for (const p of primitives) {
-    switch (p.kind) {
-      case 'glyph': {
-        const s = p.scale ?? 1;
-        // Bounds are SQUARE sp — the currency both `x` and `dx` share at
-        // ratio 1 — so an ink offset simply adds. (The emitter is where the
-        // two part company; see PrimitiveBase.)
-        const px = p.x + (p.dx ?? 0);
-        const bb = glyphBBox(p.glyph);
-        if (bb) {
-          // SMuFL bboxes are y-up around the glyph origin; staff coords are y-down.
-          const left =
-            p.anchor === 'middle' ? px - (bb.w * s) / 2
-            : p.anchor === 'end' ? px - (bb.x + bb.w) * s
-            : px + bb.x * s;
-          grow(left, p.y - (bb.y + bb.h) * s, left + bb.w * s, p.y - bb.y * s);
-        } else {
-          const em = GLYPH_FONT_SP * s;
-          grow(px - em / 2, p.y - em * TEXT_ASCENT, px + em / 2, p.y + em * TEXT_DESCENT);
-        }
-        break;
-      }
-      case 'line': {
-        const r = p.thickness / 2;
-        const a = p.x1 + (p.dx1 ?? 0);
-        const b = p.x2 + (p.dx2 ?? 0);
-        grow(
-          Math.min(a, b) - r,
-          Math.min(p.y1, p.y2) - r,
-          Math.max(a, b) + r,
-          Math.max(p.y1, p.y2) + r
-        );
-        break;
-      }
-      case 'curve': {
-        // Control-point hull contains the bézier — fine for a padded crop.
-        const xs = p.points.map(pt => pt.x);
-        const ys = p.points.map(pt => pt.y);
-        const r = p.thickness / 2;
-        grow(Math.min(...xs) - r, Math.min(...ys) - r, Math.max(...xs) + r, Math.max(...ys) + r);
-        break;
-      }
-      case 'text': {
-        const w = p.text.length * p.size * TEXT_ADVANCE;
-        const tx = p.x + (p.dx ?? 0);
-        const left = p.anchor === 'middle' ? tx - w / 2 : p.anchor === 'end' ? tx - w : tx;
-        const top =
-          p.baseline === 'middle' ? p.y - p.size / 2
-          : p.baseline === 'hanging' ? p.y
-          : p.y - p.size * TEXT_ASCENT;
-        grow(left, top, left + w, top + p.size);
-        break;
-      }
-      case 'rect':
-        grow(p.x + (p.dx ?? 0), p.y, p.x + (p.dx ?? 0) + p.w, p.y + p.h);
-        break;
-    }
+    const e = inkEdgesSp(p);
+    minX = Math.min(minX, e.left);
+    minY = Math.min(minY, e.top);
+    maxX = Math.max(maxX, e.right);
+    maxY = Math.max(maxY, e.bottom);
   }
 
   if (minX === Infinity) return null;

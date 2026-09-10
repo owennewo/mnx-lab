@@ -97,10 +97,14 @@ them when needed. The initial correction's two engraving changes are registered 
 
 The paired notation-to-tab gap has a 3sp line-to-line minimum and keeps 2sp
 clear between content on either side (one space tighter than independent
-staves). The existing per-system ink measurement still expands the gap for low
-notes, downward stems, lyrics, capo advice and other markings. All measures in
-a system share the resulting staff position. Gaps to other instruments and
-between systems retain their existing clearance.
+staves). The ink measurement expands the gap for low notes, downward stems,
+lyrics, capo advice and other markings — but only for ink that STACKS: an item
+under the notation staff adds to one over the tab staff only where the two come
+within that clearance of each other along the staff, so a clef's octave `8` and
+a capo line at the other end of the bar no longer sum. All measures in a system
+share the resulting staff position. Gaps to other instruments and between
+systems retain their existing whole-system clearance
+([ledger](../roadmap/inprogress/lab-verify.md#only-stacked-ink-spaces-a-tab-staff-from-its-notation--2026-09-10)).
 The affected Both-view engravings are recorded in the
 [verification ledger](../roadmap/inprogress/lab-verify.md#tighter-paired-notationtab-spacing-2026-09-08).
 

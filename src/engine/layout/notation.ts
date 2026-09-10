@@ -85,7 +85,7 @@ import {
   tightenRows,
   SEPARATION_CLEAR_SP
 } from './verticalDensity.ts';
-import { computeBoundsSp } from '../render/bounds.ts';
+import { computeBoundsSp, inkEdgesSp, type InkEdgesSp } from '../render/bounds.ts';
 import {
   anchorAt,
   emitHarmonies,
@@ -1106,9 +1106,58 @@ function measureDisplayGaps(seg: SegmentResult, clearance: ClearanceSpacing): (n
       // height, with a clearance on each side.
       const held = computeBoundsSp(gapContent[r][d])?.h ?? 0;
       const forContent = held > 0 ? 2 * Math.max(inkBelow, inkAbove) + 2 * sep + held : 0;
-      return Math.max(inkBelow + inkAbove + sep, forContent, minGap);
+      // A tab staff is read column by column against the notation staff it
+      // hangs from, so only ink that STACKS is a demand on the gap between
+      // them. The octave "8" under a clef and a capo line well to its right
+      // never meet, yet summing the whole system's reaches added them — which
+      // opened the first system of every capo'd score wider than the rest.
+      // Two items stack when they come within `sep` of each other along the
+      // staff: the same clearance they keep vertically, so any two inks are
+      // `sep` apart in one direction or the other. Every other gap keeps the
+      // whole-system sum.
+      const stacked = pairedTab
+        ? stackedReach(
+            inkReaches(buckets[r][d - 1], e => e.bottom - upper.staffBottom),
+            inkReaches(buckets[r][d], e => band.staffTop - e.top),
+            sep
+          )
+        : inkBelow + inkAbove;
+      return Math.max(stacked + sep, forContent, minGap);
     })
   );
+}
+
+/** One item's reach past a staff's lines, with its extent along the staff. */
+interface InkReach {
+  left: number;
+  right: number;
+  reach: number;
+}
+
+function inkReaches(prims: readonly Primitive[], reach: (e: InkEdgesSp) => number): InkReach[] {
+  const out: InkReach[] = [];
+  for (const p of prims) {
+    const e = inkEdgesSp(p);
+    const r = reach(e);
+    if (r > 0) out.push({ left: e.left, right: e.right, reach: r });
+  }
+  return out;
+}
+
+/** The deepest stack of ink in a gap: an item's reach below the upper staff
+ *  plus the largest reach above the lower staff among the items within `side`
+ *  of it along the staff. An item nothing stacks with stands off the other
+ *  staff's lines alone. */
+function stackedReach(below: readonly InkReach[], above: readonly InkReach[], side: number): number {
+  let stack = above.reduce((m, b) => Math.max(m, b.reach), 0);
+  for (const a of below) {
+    let over = 0;
+    for (const b of above) {
+      if (b.left < a.right + side && a.left < b.right + side) over = Math.max(over, b.reach);
+    }
+    stack = Math.max(stack, a.reach + over);
+  }
+  return stack;
 }
 
 // Left-of-system geometry: nested decorations step left of their parents,

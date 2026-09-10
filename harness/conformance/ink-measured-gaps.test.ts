@@ -337,6 +337,12 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
       buckets[r][d].push(p);
     }
     const out: Pair[] = [];
+    // Each item's reach past its own staff's lines, with its span along the staff.
+    const reachesOf = (prims: Primitive[], reach: (b: { x: number; y: number; w: number; h: number }) => number) =>
+      prims
+        .map(p => computeBoundsSp([p])!)
+        .map(b => ({ x0: b.x, x1: b.x + b.w, reach: reach(b) }))
+        .filter(i => i.reach > 0);
     displays.forEach((bands, r) => {
       for (let d = 1; d < bands.length; d++) {
         const upper = bands[d - 1];
@@ -349,12 +355,26 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
         const clearance = isTab(lower) ? NOTATION_TAB_CLEAR_SP : SEPARATION_CLEAR_SP;
         const minimum = isTab(lower) ? MIN_NOTATION_TAB_GAP_SP : MIN_STAFF_GAP_SP;
         const forHeld = heldH > 0 ? 2 * Math.max(inkBelow, inkAbove) + 2 * clearance + heldH : 0;
+        // Over a tab staff only ink that STACKS adds up: an item under the
+        // notation staff meets one over the tab staff only where the two come
+        // within a clearance of each other along the staff. Elsewhere — and in
+        // every other gap — the deepest reach either side adds, stacked or not.
+        let stack = inkBelow + inkAbove;
+        if (isTab(lower)) {
+          const below = reachesOf(buckets[r][d - 1], b => b.y + b.h - upper.staffBottom);
+          const above = reachesOf(buckets[r][d], b => lower.staffTop - b.y);
+          stack = Math.max(0, ...above.map(b => b.reach));
+          for (const a of below) {
+            const under = above.filter(b => b.x0 < a.x1 + clearance && a.x0 < b.x1 + clearance);
+            stack = Math.max(stack, a.reach + Math.max(0, ...under.map(b => b.reach)));
+          }
+        }
         const realBands = real.displays![r];
         const lineGap = realBands[d].staffTop - realBands[d - 1].staffBottom;
         out.push({
           lineGap,
-          inkGap: lineGap - inkBelow - inkAbove,
-          expected: Math.max(inkBelow + inkAbove + clearance, forHeld, minimum),
+          inkGap: lineGap - stack,
+          expected: Math.max(stack + clearance, forHeld, minimum),
           clearance,
           measured: isTab(upper) || isTab(lower)
         });
@@ -404,6 +424,40 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
     // down-stems above one push it away. Neither alone would be the rule.
     expect(narrowed).toBeGreaterThan(0);
     expect(widened).toBeGreaterThan(0);
+  });
+
+  it('a capo line does not stack with an octave clef it does not stand under', () => {
+    initSmufl();
+    // The screenshot: at the tightest clearance the first system of a capo'd
+    // score stood wider than every later one, because the clef's octave "8"
+    // and the capo line — far apart along the staff — had their reaches
+    // summed. As in the screenshot the bar opens with a forward repeat, which
+    // carries the capo line past the `|:` — without one it starts a fraction
+    // of a space from the clef, and there the two DO stack. With every note
+    // kept on the staff nothing in the notation stands over the capo line, so
+    // the capo must cost the gap nothing.
+    const source = readDoc(corpus.find(c => c.dir.endsWith(path.join('22-tab-derivation', '06-capo')))!.dir);
+    (source.global.measures[0] as { repeatStart?: object }).repeatStart = {};
+    const onStaff = (node: unknown): void => {
+      if (!node || typeof node !== 'object') return;
+      const o = node as Record<string, unknown>;
+      // A4: the second space, stem up — no ink below the staff at all.
+      if (o.pitch && typeof o.pitch === 'object') o.pitch = { step: 'A', octave: 4 };
+      for (const v of Object.values(o)) onStaff(v);
+    };
+    const gapAboveTab = (capo: number) => {
+      const mnx = JSON.parse(JSON.stringify(source)) as MnxStructure;
+      onStaff(mnx.parts[0].measures); // the notes only, never the tuning
+      (mnx.parts[0]._x!.mnxLab as { capo?: number }).capo = capo;
+      const layout = layoutBothSystem({ mnx, widthSp: WIDTH_SP, display: { clearance: 0 } });
+      const bands = layout.displays![0];
+      return { gap: bands[1].staffTop - bands[0].staffBottom, capoLines: layout.primitives.filter(p => cls(p) === 'tab-capo').length };
+    };
+    const withCapo = gapAboveTab(2);
+    const without = gapAboveTab(0);
+    expect(withCapo.capoLines).toBe(1);
+    expect(without.capoLines).toBe(0);
+    expect(withCapo.gap).toBeCloseTo(without.gap, 6);
   });
 
   // Stage C — the same rule between notation staves (grand staff, ensemble).
