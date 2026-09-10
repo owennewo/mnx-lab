@@ -123,6 +123,20 @@ it('breaks inferred runs at rests and keeps isolated notes flagged', () => {
   expect(ink(rendered(doc), ['flag'])).toHaveLength(1);
 });
 
+it('beams a half-bar only for plain eighths; 16ths are beamed beat by beat', () => {
+  const doc = score();
+  const template = (doc.parts[0].measures[0].sequences![0].content as MnxEvent[])[0];
+  const bases = ['eighth', '16th', '16th', '16th', '16th', 'eighth',
+    '16th', '16th', '16th', '16th', 'eighth', 'eighth'] as const;
+  doc.parts[0].measures[0].sequences![0].content = bases.map((base, i) => ({
+    duration: { base }, notes: [{ ...structuredClone(template.notes![0]), id: `m${i}` }] }));
+  expectIdIndependent(doc);
+  // Four beat groups — 8·16·16 | 16·16·8 | 16×4 | 8·8 — each with its own primary
+  // beam, plus one secondary per 16th run: 4 + 3 = 7 (half-bar grouping drew 5).
+  expect(ink(rendered(doc), ['beam'])).toHaveLength(7);
+  expect(ink(rendered(doc), ['flag'])).toHaveLength(0);
+});
+
 it('honors support.useBeams for ID-less documents', () => {
   const doc = score();
   doc.mnx.support = { useBeams: true };

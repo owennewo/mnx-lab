@@ -95,6 +95,13 @@ never writes IDs back into the document; reference-creating editor operations mi
 them when needed. The initial correction's two engraving changes are registered in
 [the verification ledger](../roadmap/inprogress/lab-verify.md#beaming-events-without-ids-2026-09-08).
 
+An inferred run beams within the metric unit — the half-bar in even simple meters,
+the bar in simple triple, the beat in odd meters, the dotted quarter in compound
+time — but only while it holds plain eighths. A run carrying a 16th or shorter is
+beamed beat by beat (`8 16 16 | 16 16 8`, not one half-bar group), the convention
+in Gould and in the notation programs' defaults, because the beat groups are how a
+reader finds the beat.
+
 The paired notation-to-tab gap has a 3sp line-to-line minimum and keeps 2sp
 clear between content on either side (one space tighter than independent
 staves). The ink measurement expands the gap for low notes, downward stems,

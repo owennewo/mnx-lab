@@ -2385,21 +2385,39 @@ function buildBeamRuns(
   // renderer: consecutive beamable note events of a sequence beam together
   // within the conventional metric unit — the half-bar in even simple meters,
   // the whole bar in simple triple, the beat in odd meters, and the dotted
-  // quarter in compound time. Explicit beam membership always wins.
+  // quarter in compound time. That unit is for plain eighths only: a run that
+  // carries a 16th or shorter is beamed beat by beat, so the beat reads at a
+  // glance. Explicit beam membership always wins.
   if (mnx.mnx?.support?.useBeams !== true) {
     const explicitKeys = new Set(groups.flatMap(g => g.eventIds));
     for (const { mi, si, vi, seq } of inferenceVoices) {
       const ts = plan.measures[mi]?.timeSig ?? { count: 4, unit: 4 };
-      const beatTicks =
-        ts.unit === 8 && ts.count % 3 === 0
-          ? (3 * WHOLE_NOTE_TICKS) / 8
-          : ts.count % 3 === 0
-          ? ts.count * (WHOLE_NOTE_TICKS / ts.unit)
-          : (WHOLE_NOTE_TICKS / ts.unit) * (ts.count % 2 === 0 ? 2 : 1);
+      const compound = ts.unit === 8 && ts.count % 3 === 0;
+      const beatTicks = compound ? (3 * WHOLE_NOTE_TICKS) / 8 : WHOLE_NOTE_TICKS / ts.unit;
+      const unitTicks = compound
+        ? beatTicks
+        : ts.count % 3 === 0
+        ? ts.count * beatTicks
+        : beatTicks * (ts.count % 2 === 0 ? 2 : 1);
       let t = 0;
-      let run: string[] = [];
+      let run: { key: string; onset: number }[] = [];
+      const emit = (keys: string[]) => {
+        if (keys.length >= 2) groups.push(impliedBeamGroup(keys, info));
+      };
       const flush = () => {
-        if (run.length >= 2) groups.push(impliedBeamGroup(run, info));
+        if (run.some(e => (info.get(e.key)?.levels ?? 0) >= 2)) {
+          let beat: string[] = [];
+          for (const e of run) {
+            if (beat.length > 0 && e.onset % beatTicks === 0) {
+              emit(beat);
+              beat = [];
+            }
+            beat.push(e.key);
+          }
+          emit(beat);
+        } else {
+          emit(run.map(e => e.key));
+        }
         run = [];
       };
       seq.content.forEach((item, ei) => {
@@ -2424,8 +2442,8 @@ function buildBeamRuns(
         if (!beamable) {
           flush();
         } else {
-          if (run.length > 0 && t % beatTicks === 0) flush();
-          run.push(key);
+          if (run.length > 0 && t % unitTicks === 0) flush();
+          run.push({ key, onset: t });
         }
         t += Math.round(durationValue(item.duration) * WHOLE_NOTE_TICKS);
       });
