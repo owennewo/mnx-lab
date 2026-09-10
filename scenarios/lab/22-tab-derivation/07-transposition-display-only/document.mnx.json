@@ -20,7 +20,8 @@
         "interval": {
           "halfSteps": 12,
           "staffDistance": 7
-        }
+        },
+        "prefersWrittenPitches": true
       },
       "_x": {
         "mnxLab": {
@@ -79,8 +80,7 @@
             {
               "clef": {
                 "sign": "G",
-                "staffPosition": -2,
-                "octave": -1
+                "staffPosition": -2
               }
             }
           ],

@@ -331,7 +331,7 @@
         },
         "ottava-amount-or-zero": {
           "verdict": "lossy",
-          "carried": 26,
+          "carried": 25,
           "survived": 0,
           "evidence": "lab/00-document/03-navigation-playground"
         },
