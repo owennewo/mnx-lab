@@ -153,6 +153,14 @@ CREATE TABLE tag_aliases (
   canonical_value TEXT NOT NULL,
   PRIMARY KEY (owner, dimension, raw_value)
 );
+
+-- A writer supplies expected_revision + 1. A stale writer aborts the whole batch.
+CREATE TRIGGER pieces_revision_cas
+BEFORE UPDATE OF revision ON pieces
+WHEN NEW.revision != OLD.revision + 1
+BEGIN
+  SELECT RAISE(ABORT, 'library_revision_conflict');
+END;
 ```
 
 Notes on the choices:
@@ -160,7 +168,7 @@ Notes on the choices:
 - **Pieces and renditions reference each other.** Insert the piece with a null canonical,
   insert the renditions, then set the pointer. D1 enforces foreign keys; the column stays
   nullable. The same-piece rule — the canonical pointer and every `derived_from` name a
-  rendition of *this* piece — is a cross-row check SQLite cannot express, so the Worker
+  rendition of *this* piece — is a cross-row check a simple foreign key cannot express, so the Worker
   library module enforces it on every write.
 - **No uniqueness on `(piece_id, sha256)`.** Blobs deduplicate by themselves because the R2
   key is the hash; rows are cheap and carry the history. A re-derive that produces the same
@@ -185,6 +193,44 @@ Notes on the choices:
 - **`revision` on pieces** is a compare-and-set token: a writer sends the revision it read
   and the write fails if the piece has moved. It stops a stale ingest run from overwriting a
   newer canonical choice today, and it is the same mechanism studio's saves will need.
+
+## Worker library API (item 2)
+
+`worker/library/index.ts` exports `Library(db, bucket, converterVersions)`. Callers
+supply the authenticated owner on every operation; this module exposes no HTTP routes.
+Item 3 must authenticate its write route before supplying that owner. `getPiece` reads
+one consistent snapshot; `findPiece` resolves upstream identity; `listPieces`,
+`readRendition`, `readCanonicalMnx` and the alias methods are owner-scoped.
+
+`writePiece(owner, input)` is the only piece mutation entry. Caller-supplied ids are
+stable across retries. `expected_revision: null` creates a piece at revision 0; existing
+pieces require their current revision. The first update statement sets the requested
+next revision; `pieces_revision_cas` rejects anything other than `OLD.revision + 1`,
+so a competing writer aborts the entire batch. A no-op retains its revision and times.
+Rendition bytes, lineage and producer identity cannot change under an existing id;
+filename, fetch time and provenance may be corrected. New ids may share one hash key.
+Recording inputs upsert by source id and retain the stored row id. Missing companions
+are retained. `canonical.mode: initialize` preserves any existing pointer; `replace`
+is the explicit owner-edit operation. Imports use only `initialize`.
+
+The caller maps producer names to the converter versions in use. A non-MNX canonical
+resolves to its matching MNX child, newest by `(created_at, id)` if several history rows
+match. No children means no derived tags yet; existing children without a matching
+current version cause an error, never a silent clearing or fallback to an older version.
+Every piece write re-derives from that selected path. The library validates standard MNX
+and the root/part metadata it reads, and checks blob hashes before deriving from stored
+MNX. It does not convert formats or use a host wrapper's title.
+
+Derived dimensions are the scalar `work` fields (`title`, `subtitle`, `artist`, `album`,
+`copyright`, `source`, `notes`), `creator.<role>`, `tuning` and `capo`. Tuning is explicit
+pitches ordered by descending string number, space-separated; nonzero alterations are
+signed brackets before the octave, e.g. `F[+1]2`. There are no inferred tuning names or
+implicit capo values. The whole `creator.` namespace is reserved for derived tags.
+Aliases are display mappings and never modify stored music or raw derived tags.
+
+The module accepts buffered blob bytes; the ingest route owns request-size limits and
+upload transport. Storage does not expose an unauthenticated route or a direct-upload
+credential. Missing write tokens must fail closed when that route is added in item 3.
 
 ## R2 key layout
 

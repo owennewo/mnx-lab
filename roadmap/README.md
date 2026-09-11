@@ -156,6 +156,8 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-storage-schema.md](inprogress/studio-storage-schema.md)** — storage campaign item 2: five-table migration and invariant-enforcing Worker library module, tested on local D1/R2.
+
 - **[studio-campaign-storage.md](inprogress/studio-campaign-storage.md)** — **campaign**: songs
   in Cloudflare, every format kept. One *piece* per item of music with immutable **renditions**
   in every notation format it has (uploaded `.gp5`, Soundslice `.gp` and MusicXML, our derived
