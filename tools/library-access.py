@@ -29,6 +29,8 @@ def private_read(path):
 
 class API:
     def __init__(self, token):
+        if not isinstance(token, str) or not re.fullmatch(r'[!-~]{16,8192}', token):
+            raise ValueError('Invalid API credential format')
         self.token = token
 
     def call(self, path, method='GET', body=None):

@@ -55,7 +55,7 @@ trust in ignored `.dev.vars` and signed eight-hour test sessions in the ignored 
 then insert a local user (`operator`, `local@example.test`, active 1, creation timestamp)
 in local D1. For the built browser smoke start `npx wrangler dev --config wrangler.jsonc --assets dist/client --port 8791 --local-upstream localhost`. Wrangler otherwise rewrites the request hostname to the production route, which correctly rejects local identities. A browser test can set its loopback-only
 `CF_Authorization` cookie from the file's `browser` field; a local ingest request sends
-its `machine` field as `Cf-Access-Jwt-Assertion` alongside the local write token. Local
+its `machine` field as `Cf-Access-Jwt-Assertion` alongside the local write token (the ingest CLI supports `--local-session-file .secrets/local-library-session.json --endpoint http://localhost:8791`). Local
 trust requires both the special configured issuer and a loopback URL; it cannot be used
 against deployed hostnames. No development identity header is trusted.
 

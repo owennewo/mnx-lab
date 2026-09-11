@@ -1,6 +1,6 @@
 // Local signed identities only. Produces no production credential or public route.
 import { generateKeyPair, exportJWK, SignJWT } from 'jose';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, chmod } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const root = new URL('../', import.meta.url);
 const { privateKey, publicKey } = await generateKeyPair('RS256');
@@ -14,4 +14,7 @@ const sign = machine => new SignJWT({ type: 'app', ...(machine ? { common_name: 
   .setProtectedHeader({ alg: 'RS256', kid: 'local' }).setIssuer(vars.LIBRARY_ACCESS_ISSUER).setAudience(machine ? vars.LIBRARY_INGEST_AUD : vars.LIBRARY_ACCESS_AUD).setSubject(machine ? '' : 'local-user').setIssuedAt().setExpirationTime('8h').sign(privateKey);
 await mkdir(new URL('.secrets/', root), { mode: 0o700, recursive: true });
 await writeFile(new URL('.secrets/local-library-session.json', root), JSON.stringify({ browser: await sign(false), machine: await sign(true) }), { mode: 0o600 });
+await chmod(new URL('.dev.vars', root), 0o600);
+await chmod(new URL('.secrets/', root), 0o700);
+await chmod(new URL('.secrets/local-library-session.json', root), 0o600);
 console.log(`Local test sessions saved under ${fileURLToPath(new URL('.secrets/', root))}; seed local@example.test in LOCAL D1 only. Restart dev after regenerating.`);

@@ -177,6 +177,7 @@ async function main(args) {
   } else if (process.env.CF_ACCESS_CLIENT_ID || process.env.CF_ACCESS_CLIENT_SECRET) {
     access = { 'CF-Access-Client-Id': required(process.env.CF_ACCESS_CLIENT_ID, 'CF_ACCESS_CLIENT_ID'), 'CF-Access-Client-Secret': required(process.env.CF_ACCESS_CLIENT_SECRET, 'CF_ACCESS_CLIENT_SECRET') };
   }
+  if (Object.values(access).some(value => typeof value !== 'string' || !/^[!-~]{1,16384}$/.test(value))) throw new Error('Invalid Access credential format');
   if (new URL(endpoint).protocol === 'https:' && !Object.keys(access).length) throw new Error('Production ingest requires --access-token-file or CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET');
   for (const p of plans) {
     const result = await uploadPlan(p, endpoint, token, fetch, access);
