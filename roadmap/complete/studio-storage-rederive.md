@@ -41,3 +41,21 @@ paths (up to 40), evidence additions and revisions. A failed piece makes the com
 exit nonzero after reporting the remaining pieces; no automatic stale-write retries.
 A run visits the operator's pieces in id order; pieces added behind the cursor during a
 run are picked up on the next run. Reports may be redirected to a private local file.
+
+
+## Completion — 2026-09-11
+
+Landed and pushed through `f2c789d`; the task worktree and branch were removed before
+this record. Deployed Worker version `b75960cf-2cf4-46dd-ae24-d732d6f5b04d`.
+All 1,736 tests, scenario checks and build passed after rebase. Eleven sweep tests cover
+version evidence, encoding-only reuse, changes, corrupt blobs, rejected writes, owner
+isolation, suspension, canonical MNX tag repair, cursor traversal and credential handling.
+
+Local Wrangler with D1/R2 ingested both real bundles, then ran dry-run, apply and replay.
+Production repeated all three: two pieces, five source renditions (three Guitar Pro and
+two MusicXML), no differences, no added renditions and no failures. Complete production
+snapshots before/after were identical: both revisions remain 0, all ten renditions and
+four recording rows are preserved, as are tags and canonical pointers. Anonymous sweep
+reads return 403; public workbench and capabilities remain available. All 52 public
+reference engravings were preserved on deployment. User dependency upgrades remain
+uncommitted and unchanged.

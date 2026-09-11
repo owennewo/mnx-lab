@@ -1,7 +1,7 @@
 # Studio storage: provision
 
 **Built and deployed 2026-09-11.** Item 1 of the
-[studio storage campaign](../inprogress/studio-campaign-storage.md), inheriting its
+[studio storage campaign](../complete/studio-campaign-storage.md), inheriting its
 whole contract and the [storage design](../../docs/studio-storage.md).
 
 ## Created

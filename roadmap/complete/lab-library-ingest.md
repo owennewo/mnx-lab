@@ -1,6 +1,6 @@
 # Personal library ingest
 
-Item 3 of the [studio storage campaign](../inprogress/studio-campaign-storage.md), inheriting its
+Item 3 of the [studio storage campaign](../complete/studio-campaign-storage.md), inheriting its
 contract and [storage design](../../docs/studio-storage.md). Implementation loop.
 **Built 2026-09-11.**
 

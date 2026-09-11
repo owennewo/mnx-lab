@@ -156,23 +156,10 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[studio-storage-rederive.md](inprogress/studio-storage-rederive.md)** — storage item 5: authenticated converter sweep, change reports and canonical tag rebuild.
 
 
 
 
-- **[studio-campaign-storage.md](inprogress/studio-campaign-storage.md)** — **campaign**: songs
-  in Cloudflare, every format kept. One *piece* per item of music with immutable **renditions**
-  in every notation format it has (uploaded `.gp5`, Soundslice `.gp` and MusicXML, our derived
-  MNX from each), recordings with performed-bar syncpoints, and `dimension:value` tags (derived
-  from the canonical MNX, asserted by the owner). D1 index + R2 blobs, no Durable Object until a
-  document has two writers. Five items: provision (wrangler bootstrap, not Terraform — with the
-  trigger to revisit recorded), schema + Worker library module, a personal `soundslice-cli` →
-  Cloudflare ingest script (a lab tool, not studio code), a read-route + workbench Load item
-  using **Access email codes, 30-day sessions and pre-provisioned users**, and the re-derive-and-diff sweep that makes a converter regression a
-  report line. The schema lives in [docs/studio-storage.md](../docs/studio-storage.md), refocused
-  2026-09-11 from the former `studio-storage-sync` proposal (sync engine and sharing ladder
-  remain in that file's git history).
 
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
@@ -382,6 +369,9 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[studio-campaign-storage.md](complete/studio-campaign-storage.md)** — **campaign complete 2026-09-11**: all five items built; private D1/R2 library, operator ingest, Access login and Load, and converter regression sweep.
+- **[studio-storage-rederive.md](complete/studio-storage-rederive.md)** — storage item 5, **built 2026-09-11**: authenticated stored-source sweep, encoding-aware diffs and canonical tag rebuild; five real sources unchanged, production replay a no-op.
 
 - **[studio-storage-read.md](complete/studio-storage-read.md)** — storage campaign item 4, **built 2026-09-11**: Access email login, 30-day sessions, active-user enforcement, private owner-scoped reads and optional Load; both real pieces verified.
 

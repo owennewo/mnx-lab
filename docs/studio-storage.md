@@ -5,7 +5,7 @@ each part of it, the D1 schema, the R2 key layout, and the rules that keep the w
 honest (immutable renditions, one canonical pointer, tags as a projection). Sync protocol,
 sharing tiers and the editing authority are named only where they constrain the storage
 shape; they get their own documents when they start. The implementation order is the
-[studio storage campaign](../roadmap/inprogress/studio-campaign-storage.md).
+[studio storage campaign](../roadmap/complete/studio-campaign-storage.md).
 
 History: this began as the roadmap proposal *studio-storage-sync* (2026-08-11, design only),
 which also carried the op-log sync engine and the sharing ladder. It was refocused into this
@@ -397,7 +397,7 @@ to make deliberately when the DO starts, in studio's own backend rules.
 ## User login boundary (item 4)
 
 The owner selected **Cloudflare Access email codes + 30-day sessions + a users-table
-check** on 2026-09-11. The [campaign's item 4 decision](../roadmap/inprogress/studio-campaign-storage.md#item-4-authentication-decision--2026-09-11)
+check** on 2026-09-11. The [campaign's item 4 decision](../roadmap/complete/studio-campaign-storage.md#item-4-authentication-decision--2026-09-11)
 is the implementation contract. The Worker validates the Access JWT, matches its signed
 email to a pre-provisioned active user, and uses the stable user id as storage owner.
 There is no public registration or automatic user creation during login. Check user

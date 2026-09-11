@@ -3,7 +3,7 @@
 > **A campaign** (see CLAUDE.md → Roadmap-driven development): this doc is an index over
 > normal proposals sharing one goal, the shared contract they follow, and the running log
 > of progress and learnings as items land. Indexed items are ordinary `studio-*` proposals
-> that name this campaign. **Opened 2026-09-11.** Items 1–4 are built; item 5 remains. The design it
+> that name this campaign. **Opened 2026-09-11.** **Closed 2026-09-11: all five items are built.** The design it
 > implements is [docs/studio-storage.md](../../docs/studio-storage.md); this doc owns the
 > order and the contract, that doc owns the shape.
 
@@ -121,7 +121,7 @@ Ordered; each item is a normal proposal doc written when it is picked up, not be
 | 2 | [studio-storage-schema](../complete/studio-storage-schema.md) | built | The D1 migrations for the design doc's five tables (`migrations/`, applied with `wrangler d1 migrations apply`, local and remote), the R2 key layout, and a DOM-free `worker/library/` module: typed reads and writes that enforce the invariants (insert rendition → immutable; set canonical → one pointer; write MNX → re-derive tags). A harness test runs the module against local D1 via `wrangler dev`/Miniflare so the schema is exercised before any real data touches it. |
 | 3 | [lab-library-ingest](../complete/lab-library-ingest.md) | **built 2026-09-11** | A personal operator script, `tools/library-ingest.mjs` run as `npm run ingest:library -- <dir>` (`lab-` because it serves the repo's owner, not a shell). Reads a `soundslice-cli` `gp/files/` directory, builds one piece per slice (renditions from every notation file with role, producer — the cached `.gp` is `soundslice-cli`, header-injected, with the raw export's sha256 in `provenance` — filename and fetch time; recordings with syncpoints keyed by Soundslice recording id; asserted tags from `lists.json` as `unknown:<path>` with the list id as `source_ref`), derives MNX from the `.gp` **and** from the MusicXML with the converters built from the checkout (recording package version, git sha and flags as `producer_version`/`producer_options`), and pushes everything through the Worker's ingest route with the write token. `--dry-run` prints the plan; re-runs are no-ops by sha256 (contract 7). Done when both exported slices are in the real library and `Blues Run The Game` resolves through its canonical pointer to an MNX with title, artist and capo 3. |
 | 4 | [studio-storage-read](../complete/studio-storage-read.md) | built | Cloudflare Access email codes, 30-day sessions and pre-provisioned users; see the decision below. Add authenticated owner-scoped piece/tag/rendition reads and canonical MNX resolution, plus the workbench Load button with tag completion. No self-registration. The workbench remains usable without login; only its optional library access is protected. |
-| 5 | [studio-storage-rederive](studio-storage-rederive.md) | in progress | The payoff for keeping every format. A sweep (an ingest-script subcommand or a Worker cron) that, for every piece, derives a fresh MNX child from each source rendition with the converters at their current versions, stores it as a new rendition when its bytes differ from the previous child (with `_x.mnxLab.encoding` discounted in the comparison; new converter versions still retain evidence rows per the design), rebuilds derived tags from the canonical path, and reports the differences per piece and per converter. A converter regression is then a line in that report rather than a bug someone happens to notice. Also the home of the alias table's "apply to documents" action once editing exists — not before. |
+| 5 | [studio-storage-rederive](studio-storage-rederive.md) | built | The payoff for keeping every format. A sweep (an ingest-script subcommand or a Worker cron) that, for every piece, derives a fresh MNX child from each source rendition with the converters at their current versions, stores it as a new rendition when its bytes differ from the previous child (with `_x.mnxLab.encoding` discounted in the comparison; new converter versions still retain evidence rows per the design), rebuilds derived tags from the canonical path, and reports the differences per piece and per converter. A converter regression is then a line in that report rather than a bug someone happens to notice. Also the home of the alias table's "apply to documents" action once editing exists — not before. |
 
 ## Item 4 authentication decision — 2026-09-11
 
@@ -426,3 +426,29 @@ changes and derive matching immutable children before expecting Load to succeed.
 owner scoping, canonical pointers, machine authentication and unchanged replay behavior;
 no read performs conversion or writes storage. The two real pieces remain the regression
 fixture, with ten renditions and four recording rows.
+
+
+### 2026-09-11 — item 5 built; campaign complete
+
+[studio-storage-rederive](studio-storage-rederive.md) landed through `f2c789d` and deployed
+as `b75960cf-2cf4-46dd-ae24-d732d6f5b04d`; its worktree is retired. The operator command
+reads stored sources, builds both Node converters, reports per-source/per-converter
+changes and applies immutable children plus canonical tag rebuilds through the existing
+authenticated, revision-checked Worker path. No new account resources or permissions.
+
+The five real source renditions reproduced their stored MNX exactly. Local and production
+dry-run, apply and replay passed; both complete production snapshots remained identical
+at revision 0. The library still has ten renditions and four recordings. All 1,736 tests,
+scenario checks and build passed, including eleven sweep-specific tests.
+
+Learnings: unchanged music at a new converter version still needs an evidence row for
+current-version resolution; equal bytes reuse R2 storage. Same-version encoding-only
+churn reuses existing evidence. Reports discount only root encoding and object-key order,
+retain array order, and include bounded JSON-path diffs. A failed source prevents that
+piece's write; other pieces continue and the run exits nonzero. Dry-run performs reads
+but no tag writes; apply reports whether the canonical tag projection changed.
+
+All five storage items are built. Future converter changes must update the deployed
+version manifest and run this sweep; missing current conversions fail explicitly.
+Studio editing, sharing, sync and alias application to documents remain outside this
+campaign. Originals and canonical ownership remain protected for those later efforts.

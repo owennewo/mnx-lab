@@ -1,6 +1,6 @@
 # Studio storage read — private library Load
 
-Implementation loop. Item 4 of [studio storage](../inprogress/studio-campaign-storage.md), inheriting
+Implementation loop. Item 4 of [studio storage](../complete/studio-campaign-storage.md), inheriting
 its full contract and [storage design](../../docs/studio-storage.md).
 
 Create owner-scoped piece, tag-completion, rendition and canonical-MNX read routes,

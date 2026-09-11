@@ -1,6 +1,6 @@
 # Studio storage: schema and library module
 
-Item 2 of the [storage campaign](../inprogress/studio-campaign-storage.md); inherits its contract
+Item 2 of the [storage campaign](../complete/studio-campaign-storage.md); inherits its contract
 and [storage design](../../docs/studio-storage.md). **Built 2026-09-11.**
 
 Build the five-table D1 migration, content-addressed R2 writes, and a DOM-free
