@@ -31,6 +31,8 @@ D1/R2; browser smoke covers sign-in prompt, completion/filtering and MNX Load. B
 checks idempotence, drift refusal and empty-user denial without account calls. See
 [operations](../../docs/library-access.md).
 
-Production is not changed. The owner configured the global Access session to one month manually; bootstrap no longer requires organization access. A scoped API credential for applications/policies, identity providers and service tokens is still required. Application
-audiences remain empty until bootstrap records real IDs. Do not deploy this configuration
-or mark built before provisioning, live browser sign-in and machine replay checks.
+The owner configured the global Access session to one month manually, verified in the
+dashboard. The scoped API token is saved outside this worktree in the primary checkout's
+ignored secrets directory. Browser and machine applications, OTP provider and policies
+are provisioned; real audiences are committed in Wrangler config. Bootstrap rerun passed.
+Deployment, live browser sign-in and ingest replay checks remain before completion.

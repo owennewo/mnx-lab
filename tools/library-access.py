@@ -43,7 +43,7 @@ class API:
             with urllib.request.urlopen(request, timeout=30) as response:
                 data = json.load(response)
         except urllib.error.HTTPError as error:
-            raise RuntimeError(f'Cloudflare {method} failed: HTTP {error.code}; response withheld') from None
+            raise RuntimeError(f'Cloudflare {method} {path.split(chr(63))[0]} failed: HTTP {error.code}; response withheld') from None
         if not data.get('success'):
             raise RuntimeError('Cloudflare operation failed; response withheld')
         return data['result']
@@ -148,7 +148,7 @@ def bootstrap(api, db, inventory, service_file):
     common = {'type': 'self_hosted', 'app_launcher_visible': False, 'options_preflight_bypass': False}
     machine = resource(api, inventory, 'machine', 'access/apps', {
         **common, 'name': 'MNX library ingest', 'domain': DOMAIN + '/api/library/ingest',
-        'session_duration': '1h', 'service_auth_401_redirect': False})
+        'session_duration': '1h'})
     machine_policy = {'name': 'MNX ingest service only', 'decision': 'non_identity', 'precedence': 1,
                       'include': [{'service_token': {'token_id': credential['id']}}], 'exclude': [], 'require': []}
     machine_policies = api.listing(f"access/apps/{machine['id']}/policies")
