@@ -57,8 +57,13 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     lastKey = key;
     if (ordinal !== null) player.seek(ordinal);
   };
+  // The viewer must not know about the player: it reports a two-finger tap and
+  // the host decides what that means, exactly as `note-selected` becomes a seek
+  // above. With no player bound the gesture is a no-op, never an error.
+  const toggle = () => player.toggle();
   player.addEventListener('playback-state-changed', update);
   viewer.addEventListener('note-selected', select);
+  viewer.addEventListener('transport-toggle', toggle);
   return {
     get state() {
       return state;
@@ -98,6 +103,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       publish();
       player.removeEventListener('playback-state-changed', update);
       viewer.removeEventListener('note-selected', select);
+      viewer.removeEventListener('transport-toggle', toggle);
       provider.clearCallbacks();
       host.removeEventListener('context-request', provider.onContextRequest);
       host.removeEventListener('context-provider', provider.onProviderRequest);

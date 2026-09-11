@@ -162,6 +162,27 @@ back up to `proposed/` the moment it is.
   sort control, Zoom and Settings hosting the promoted pads) and the player's tray. One
   `<mnx-score-frame>` element in `elements/`, mounted by studio's piece page and the
   workbench's scenario page; a tap on the score stays navigation. Five phases, pads first.
+- **[core-touch-gestures.md](inprogress/core-touch-gestures.md)** — **built 2026-09-12**,
+  awaiting the device checks: the **minimal three** touch gestures on
+  `<mnx-document-viewer>` — double tap resets zoom to fitted, double-tap-and-drag drives
+  staff × space (a diagonal drives both), two-finger tap toggles play/pause. Opened from a
+  conversation that started at pinch and narrowed once the costs were counted, and
+  **pinch is out**: a trackpad pinch is a single scalar, so the motivating diagonal is
+  unrepresentable on half the input devices, and pinch alone fails WCAG 2.5.1 — while a
+  one-finger drag is the required single-pointer path *and* reuses `ZoomPad.ts`'s tuned
+  rate constants unchanged. The planned item-0 spike was **deliberately skipped**, because
+  it needs a real touchscreen no agent has: it was always going to be a human testing
+  something, so the optimistic branch shipped instead — `touch-action: pan-y` plus a
+  non-passive `preventDefault()` armed only on the second tap — with the fallback recorded
+  (take `touch-action: none` and hand-write the scroller, or move 2D zoom onto a pinch,
+  which does not compete with one finger at all). The first **two-consumer zoom feature**,
+  so the viewer applies each gesture to itself *and* announces it as `zoom-change` shaped
+  like `ZoomPadChange`: applying locally is what makes a bare viewer zoomable with no host
+  JavaScript, announcing is what stops the workbench overwriting it on the next render.
+  Studio gains zoom state for the first time, deliberately transient. Also corrects the
+  plan's claim that nothing declared `touch-action` (`ScenarioPage.ts:1093`,
+  `ZoomPad.ts:222` both do), and carries four gaps forward by name — the pad's duplicate
+  ladder walk, no anchor-preserving zoom, no keyboard play/pause, no tests.
 - **[studio-library-navigation.md](inprogress/studio-library-navigation.md)** — **built 2026-09-11**, awaiting the deployed checks: the library made
   navigable: **Option A** from the design canvas — a rail where every dimension reads
   `Artist: All` until opened, values with counts, sort as one click (Recent · Title · Artist),

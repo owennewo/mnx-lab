@@ -386,6 +386,13 @@ export class Player extends LitElement {
     this.loading = false;
     this.transport?.stop();
   }
+  /** Play/pause as ONE verb, for callers that have no view of the state — the
+   *  two-finger tap gesture, and any host key binding. The button in `render()`
+   *  keeps its own branch because it also prints which it is about to do. */
+  toggle() {
+    if (this.status?.state === 'playing') this.pause();
+    else void this.play();
+  }
   seek(ordinal: number) {
     const measure = this.performance?.measures.find((m) => m.ordinal === ordinal);
     if (!measure || !this.transport) return false;

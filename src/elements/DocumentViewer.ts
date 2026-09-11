@@ -34,6 +34,7 @@ import {
   type RenderScale
 } from '../engine/render/scale.ts';
 import { densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
+import { ScoreGestures, type GestureTargets } from './gestures.ts';
 import { SCORE_LABEL_SIZE_SP } from '../engine/layout/scoreText.ts';
 import { revealScrollDelta } from '../engine/render/revealScroll.ts';
 import {
@@ -233,10 +234,26 @@ export class DocumentViewer extends LitElement {
   @property({ type: Boolean, reflect: true, attribute: 'selection-inactive' })
   selectionInactive = false;
 
+  /**
+   * Opt OUT of the touch gestures (roadmap/inprogress/core-touch-gestures.md).
+   *
+   * Default-on, because a score you cannot zoom on a phone is the defect and a
+   * host should not have to know the feature exists to get it. The escape hatch
+   * is here for a host that owns these gestures itself — an embed inside a
+   * page-level pan/zoom surface, where two recognisers would fight.
+   */
+  @property({ type: Boolean, reflect: true, attribute: 'no-gestures' })
+  noGestures = false;
+
   @query('#projection-container')
   container!: HTMLElement;
 
   @state() private renderErrors: { pane: string; message: string }[] = [];
+
+  /** The gesture readout, while a drag is showing one. */
+  @state() private gestureHud: string | null = null;
+
+  private gestures: ScoreGestures | null = null;
 
   private resizeHandler = () => this.renderProjection();
 
@@ -273,6 +290,13 @@ export class DocumentViewer extends LitElement {
   private ladder: { of: PackingInput[]; steps: number[] } | null = null;
   /** The density that packing was laid out at — `systemRows()`'s input. */
   private lastDensityH = 1;
+  /** The staff scale the last paint actually used, in ENGINE space (before the
+   *  pane's shrink). A gesture must continue from what is on screen, and while
+   *  `zoom` is null — fitted — this is the only answer to what that is. Not the
+   *  shrunk figure `render-scale` reports: the drag moves the `zoom` property,
+   *  which is the engine's request, and feeding back the post-shrink number
+   *  would make every drag fight the fit. */
+  private lastStaffScale = 1;
 
   static styles = [
     // The viewer carries its own tokens (core-viewer-embedded-app.md): on a
@@ -290,6 +314,17 @@ export class DocumentViewer extends LitElement {
         padding: 5px;
         min-width: 0;
         background: var(--bg);
+        /* pan-y, not none: the browser keeps one-finger vertical scrolling —
+           which on a score is most of what a reader does — and the gesture
+           layer claims the second tap of a double-tap-drag by preventDefault on
+           a non-passive touchstart (gestures.ts). Taking none here would mean
+           hand-writing pan, momentum and rubber-banding, over the whole page in
+           studio, where the score IS the page. */
+        touch-action: pan-y;
+        /* A mouse double-click-drag selects text by word, which is exactly the
+           gesture's shape. */
+        user-select: none;
+        -webkit-user-select: none;
       }
 
       /* The explicit theme override. Declaring color-scheme is the whole
@@ -570,6 +605,30 @@ export class DocumentViewer extends LitElement {
         font-size: 13px;
       }
 
+      /* The gesture readout. It exists because the CONTROL does not: the zoom
+         pad prints these numbers on screen, and on touch there is no pad — an
+         invisible continuous control with no feedback is unlearnable. Fixed to
+         the viewport rather than the scroller, because which element scrolls
+         differs between the two shells. */
+      .gesture-hud {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%);
+        z-index: 2;
+        padding: 6px 12px;
+        border-radius: var(--radius-control);
+        background: var(--surface);
+        border: 1px solid var(--ink);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        pointer-events: none;
+        box-shadow: 0 2px 4px var(--shadow-far), 0 12px 30px var(--shadow-far);
+      }
+
       /* ── state panels (on paper — warm fixed colors, never themed) ── */
       .state-panel {
         max-width: 60ch;
@@ -676,6 +735,7 @@ export class DocumentViewer extends LitElement {
     if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0');
     window.addEventListener('resize', this.resizeHandler);
     this.addEventListener('scroll', this.onAnchorScroll);
+    this.syncGestures();
   }
 
   disconnectedCallback() {
@@ -686,6 +746,75 @@ export class DocumentViewer extends LitElement {
     this.containerObserver = null;
     this.cancelEnclosureTween?.();
     this.cancelEnclosureTween = null;
+    this.gestures?.detach();
+    this.gestures = null;
+  }
+
+  /** Attach or drop the recogniser to match `no-gestures`. Called from
+   *  `connectedCallback` and again on the property, because a property BINDING
+   *  (`.noGestures=${…}`) is not guaranteed to have landed by the time the
+   *  element connects — only an attribute is. */
+  private syncGestures() {
+    const want = this.isConnected && !this.noGestures;
+    if (want && !this.gestures) {
+      this.gestures = new ScoreGestures(this, this.gestureTargets());
+      this.gestures.attach();
+    } else if (!want && this.gestures) {
+      this.gestures.detach();
+      this.gestures = null;
+    }
+  }
+
+  private gestureTargets(): GestureTargets {
+    return {
+      // Resolved, never null: a drag continues from what is on screen. On a
+      // fitted score that is the last paint's scale, not 1.
+      effective: () => ({
+        staffScale: this.zoom ?? this.lastStaffScale,
+        densityH: this.densityH ?? DENSITY_H[this.density] ?? 1
+      }),
+      // `natural` spacing has no ladder to walk — the same rule the pad
+      // follows, so a gesture and a click agree on what a step is.
+      ladder: () => (this.spacingMode === 'natural' ? null : this.densitySteps()),
+      commit: next => {
+        if (next.staffScale !== null) this.zoom = next.staffScale;
+        if (next.densityH !== null) this.densityH = next.densityH;
+        this.announceZoom();
+      },
+      reset: () => {
+        // Both defaults — and the staff default is FITTED, not 100%.
+        this.zoom = null;
+        this.densityH = null;
+        this.announceZoom();
+      },
+      toggleTransport: () =>
+        this.dispatchEvent(
+          new CustomEvent('transport-toggle', { bubbles: true, composed: true })
+        ),
+      hud: text => {
+        this.gestureHud = text;
+      }
+    };
+  }
+
+  /**
+   * The element applies the gesture to ITSELF and then says so.
+   *
+   * Both halves are load-bearing. Applying locally is what makes a bare
+   * `<mnx-document-viewer>` — the embed face, studio — zoomable with no host
+   * JavaScript at all. Announcing is what keeps a host that owns this state
+   * (the workbench, where `<mnx-zoom-pad>` holds it) from overwriting the
+   * gesture on its next render. The detail is shaped exactly like the pad's
+   * `ZoomPadChange`, so the workbench binds the handler it already had.
+   */
+  private announceZoom() {
+    this.dispatchEvent(
+      new CustomEvent('zoom-change', {
+        detail: { staffScale: this.zoom, densityH: this.densityH },
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 
   firstUpdated() {
@@ -702,6 +831,7 @@ export class DocumentViewer extends LitElement {
 
   updated(changed: Map<string | number | symbol, unknown>) {
     if(changed.has('playbackState')){this.paintPlayback();if(this.playbackState?.followPlayback)this.revealPlayback();}
+    if (changed.has('noGestures')) this.syncGestures();
     this.toggleAttribute('data-hide-badges', this.hiddenFeatures().includes('badges'));
     if (
       changed.has('mnxDoc') ||
@@ -987,6 +1117,7 @@ export class DocumentViewer extends LitElement {
       // host wants the answer ("which values do something?"), not the input.
       this.lastPackings = drawn.packings;
       this.lastDensityH = densityH;
+      this.lastStaffScale = used;
       const shrink = this.shrinkToPane();
       // A section label is 1.8sp in the SVG. The heading lives in ordinary
       // DOM above it, so give it the same em converted through the EXACT
@@ -1298,6 +1429,9 @@ export class DocumentViewer extends LitElement {
           : nothing}
         <div id="projection-container"></div>
       </div>
+      ${this.gestureHud
+        ? html`<div class="gesture-hud" role="status">${this.gestureHud}</div>`
+        : nothing}
     `;
   }
 

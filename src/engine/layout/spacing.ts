@@ -188,6 +188,76 @@ export function clampInkRatio(value: number | undefined): number {
   return value;
 }
 
+/**
+ * The design's spacing step, as a MINIMUM rather than the step: with a ladder
+ * supplied the walk lands on the first rung at least this far away, so a step
+ * never does nothing and never does less than the design asked.
+ *
+ * Mirrors `SPACE_STEP` in `src/workbench/ZoomPad.ts`, which still carries its
+ * own copy of this walk. The pad is a tuned, untested control and moving it was
+ * not worth the blast radius of a first cut, so the duplication is deliberate
+ * and temporary — adopting these functions there is the follow-up recorded in
+ * roadmap/inprogress/core-touch-gestures.md.
+ */
+export const DENSITY_STEP = 0.04;
+
+/** Float slack when comparing against ladder rungs (they are 1% grid values). */
+const RUNG_EPS = 1e-6;
+
+/**
+ * The next spacing value in `dir` — the next value that DRAWS something
+ * different — or null when this direction has nothing left to reach.
+ *
+ * A rung is the low edge of its run, so any value between two rungs engraves
+ * what the lower one engraves; stepping to it would be exactly the invisible
+ * step this walk exists to skip. Going DOWN, the rung itself is the wrong place
+ * to land: a run can be very wide, and its low edge is the far side of it, so
+ * landing on the rung turns one step of "a bit tighter" into a collapse. The
+ * walk lands on the near side instead. Going up, the rung IS the near side.
+ *
+ * With no ladder (`null`) it steps a flat percentage — the caller stays usable
+ * when there is nobody to ask.
+ */
+export function nextDensity(from: number, dir: 1 | -1, ladder: number[] | null): number | null {
+  if (!ladder || ladder.length === 0) {
+    const next = clampDensity(Math.round((from + dir * DENSITY_STEP) * 100) / 100);
+    return next === from ? null : next;
+  }
+  let cur = -1;
+  while (cur + 1 < ladder.length && ladder[cur + 1] <= from + RUNG_EPS) cur++;
+  if (dir > 0) {
+    const ahead = ladder.slice(cur + 1);
+    if (ahead.length === 0) return null;
+    return ahead.find(v => v - from >= DENSITY_STEP - RUNG_EPS) ?? ahead[0];
+  }
+  const below = ladder.slice(0, Math.max(0, cur));
+  if (below.length === 0) return null;
+  const rung =
+    [...below].reverse().find(v => from - v >= DENSITY_STEP - RUNG_EPS) ?? below[below.length - 1];
+  const index = ladder.indexOf(rung);
+  // The top of that run: one grid step under the next rung up. There is always
+  // a next one — `rung` came from strictly below the current run.
+  const top = Math.round((ladder[index + 1] - DENSITY_GRID) * 100) / 100;
+  return Math.max(rung, Math.min(top, Math.round((from - DENSITY_STEP) * 100) / 100));
+}
+
+/** `steps` rungs from `from`, stopping where the walk runs out. Absolute from a
+ *  starting value, so a drag out and back returns to where it started. */
+export function walkDensity(
+  from: number,
+  steps: number,
+  dir: 1 | -1,
+  ladder: number[] | null
+): { value: number; exhausted: boolean } {
+  let value = from;
+  for (let i = 0; i < steps; i++) {
+    const next = nextDensity(value, dir, ladder);
+    if (next === null) return { value, exhausted: true };
+    value = next;
+  }
+  return { value, exhausted: false };
+}
+
 // ---------- System packing (shared with the density ladder) ----------
 
 /**

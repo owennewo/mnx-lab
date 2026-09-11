@@ -2978,6 +2978,9 @@ export class ScenarioPage extends LitElement {
         @note-selected=${this.onNoteSelected}
         @selection-anchored=${this.onSelectionAnchored}
         @render-scale=${this.onRenderScale}
+        @zoom-change=${this.onZoomChange}
+        @transport-toggle=${() =>
+          this.renderRoot.querySelector<Player>('mnx-player')?.toggle()}
       ></mnx-document-viewer>
     `;
   }
