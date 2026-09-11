@@ -41,6 +41,13 @@ class ResourceTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(len(api.writes), 1)
         self.assertEqual(json.loads(module.INVENTORY.read_text()), inventory)
+    def test_otp_derived_callback_is_not_configuration_drift(self):
+        api = FakeAPI()
+        expected = {'name': 'email', 'type': 'onetimepin', 'config': {}}
+        api.rows['access/identity_providers'] = [dict(expected, id='otp', config={'redirect_url': 'https://' + module.TEAM + '/cdn-cgi/access/callback'})]
+        module.resource(api, {'otp': 'otp'}, 'otp', 'access/identity_providers', expected)
+        self.assertEqual(api.writes, [])
+
     def test_missing_committed_resource_never_recreated(self):
         api = FakeAPI()
         with self.assertRaises(ValueError):

@@ -22,9 +22,9 @@
   ],
   "vars": {
     "LIBRARY_ACCESS_ISSUER": "https://mnx-labs-team.cloudflareaccess.com",
-    "LIBRARY_ACCESS_AUD": "",
-    "LIBRARY_INGEST_AUD": "",
-    "LIBRARY_INGEST_CLIENT_ID": ""
+    "LIBRARY_ACCESS_AUD": "bf30cd5c725ba9e6250b5a9c392e4d14a6ee374d071f785ec35ae153b226d560",
+    "LIBRARY_INGEST_AUD": "4455aeeb0864177e3fde4a05fffed462d0e8b7b91750cf6f82b014e4c4645314",
+    "LIBRARY_INGEST_CLIENT_ID": "8bc9495e528f4071ccdb31026df87123.access"
   },
   "compatibility_date": "2026-06-01",
   // Static assets (the Vite client build) are served in front of the Worker:

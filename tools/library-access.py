@@ -90,7 +90,11 @@ def resource(api, inventory, key, path, expected):
         raise ValueError(f'{key}: missing or ambiguous recorded resource; refusing replacement')
     if candidates:
         row = candidates[0]
-        if not same(row, expected):
+        comparison = dict(row)
+        # Cloudflare adds its derived callback URL to an otherwise empty OTP config.
+        if expected.get('type') == 'onetimepin' and comparison.get('config') == {'redirect_url': 'https://' + TEAM + '/cdn-cgi/access/callback'}:
+            comparison['config'] = {}
+        if not same(comparison, expected):
             raise ValueError(f'{key}: resource differs from declared configuration; review drift manually')
     else:
         row = api.call(path, 'POST', expected)
