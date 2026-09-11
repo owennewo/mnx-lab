@@ -92,7 +92,9 @@ library.post('/ingest', async c => {
   const source = object(manifest.source);
   if (source.kind !== 'soundslice') invalid('Only Soundslice operator imports are supported');
   const sourceId = text(source.id);
-  if (!/^[a-zA-Z0-9]+$/.test(sourceId)) invalid('Invalid slice id');
+  // A Soundslice slice id is a URL path segment and real ids carry hyphens
+  // ("gn-8c", "-RBHc"); the tool's check is the same shape.
+  if (!/^[A-Za-z0-9_-]+$/.test(sourceId)) invalid('Invalid slice id');
   // The service names the piece; the manifest cannot (an `id` field is refused above).
   const id = await pieceIdFor('soundslice', sourceId);
   const revision = manifest.expected_revision;

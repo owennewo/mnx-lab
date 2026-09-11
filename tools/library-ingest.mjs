@@ -333,16 +333,30 @@ async function main(args) {
     return;
   }
   const { token, access } = await operatorCredentials({ endpoint, tokenFile, accessFile, localSessionFile });
+  // One slice's refusal is that slice's verdict, not the run's: a 400 on the
+  // sixth of ninety (2026-09-12, a slice id the deployed Worker would not take)
+  // used to abandon the other eighty-four. Each failure is printed as its own
+  // row and counted; the run continues and exits nonzero at the end.
+  const failed = [];
   for (const p of plans) {
-    const result = await uploadPlan(p, endpoint, token, fetch, access, { converters, force });
-    show(p.manifest.source.id, result.validation);
+    const slice = p.manifest.source.id;
+    let result;
+    try { result = await uploadPlan(p, endpoint, token, fetch, access, { converters, force }); }
+    catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      failed.push(slice);
+      console.log(JSON.stringify({ slice, status: 'failed', error: message }));
+      continue;
+    }
+    show(slice, result.validation);
     const pointer = result.snapshot.renditions.find(r => r.id === result.snapshot.piece.canonical_rendition_id);
-    console.log(JSON.stringify({ slice: p.manifest.source.id, status: result.status, revision: result.snapshot.piece.revision,
+    console.log(JSON.stringify({ slice, status: result.status, revision: result.snapshot.piece.revision,
       canonical: pointer ? { rendition_id: pointer.id, format: pointer.format } : null,
       derived: result.snapshot.tags.filter(t => t.origin === 'derived').map(t => `${t.dimension}:${t.value}`) }));
   }
   // Forgiving ingest, strict validator: everything above was stored regardless.
   if (invalid) { console.error(`${invalid} conversion(s) did not validate; the sources were stored, no tags were projected from them.`); process.exitCode = 1; }
+  if (failed.length) { console.error(`${failed.length} slice(s) were not stored: ${failed.join(', ')}`); process.exitCode = 1; }
 }
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) main(process.argv.slice(2)).catch(error => {
   console.error(error.message); process.exitCode = 1;

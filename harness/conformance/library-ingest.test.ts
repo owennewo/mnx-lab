@@ -151,6 +151,15 @@ it('drops a companion recording the request cannot carry and keeps the score', a
     expect(second.snapshot.recordings).toHaveLength(2);
   } finally { console.error = error; }
 });
+it('accepts a hyphenated Soundslice slice id in the tool and the Worker', async () => {
+  const p = await plan();
+  p.manifest.source.id = '-gn-8c'; p.manifest.source.url = 'https://www.soundslice.com/slices/-gn-8c/';
+  const first = await upload(p);
+  expect(first.status).toBe('stored');
+  expect(first.snapshot.piece.source_id).toBe('-gn-8c');
+  const again = await upload(p);
+  expect(again.status).toBe('skipped');
+});
 it('never lets request metadata choose an owner or replace canonical', async () => {
   const p = await plan();
   for (const extra of [{ owner: 'victim' }, { canonical: { mode: 'replace', rendition_id: p.manifest.canonical.rendition_id } }]) {
