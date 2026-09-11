@@ -122,6 +122,11 @@ Ordered; each item is a normal proposal doc written when it is picked up, not be
 Later, outside this campaign: the sync engine and Durable Object (the design doc's *When
 the Durable Object arrives*), sharing tiers, studio's front end.
 
+The provisioned Worker, D1 database and R2 bucket share the resource tags
+`project=mnx-studio` and `environment=production` (owner decision, 2026-09-11).
+Tagging uses the account API and preserves unrelated tags; any account-access blocker
+is recorded in item 1. Names and `wrangler.jsonc` remain the binding inventory.
+
 ### Why not Terraform (yet)
 
 Terraform is the right tool when there are many resources, several environments, and

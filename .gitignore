@@ -2,6 +2,9 @@ node_modules/
 dist/
 .env
 .dev.vars
+.dev.vars.*
+!.dev.vars.example
+.secrets/
 .wrangler/
 *.log
 .DS_Store
