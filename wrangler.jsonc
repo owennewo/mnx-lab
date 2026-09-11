@@ -27,11 +27,11 @@
     "LIBRARY_INGEST_CLIENT_ID": "8bc9495e528f4071ccdb31026df87123.access"
   },
   "compatibility_date": "2026-06-01",
-  // Static assets (the Vite client build) are served in front of the Worker:
-  // any request not matching an asset file invokes the Worker (/api/*), and
-  // unknown non-asset paths fall back to index.html (SPA mode).
+  // API navigations (including the Access login callback) must reach the Worker.
+  // Other navigation paths fall back to the static SPA.
   "assets": {
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
   },
   "routes": [
     {
