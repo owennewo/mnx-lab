@@ -82,12 +82,16 @@ export class Library {
     const shown = (dimension: string) => `(SELECT value FROM (${EFFECTIVE_TAGS}) e WHERE e.owner=p.owner AND e.piece_id=p.id AND e.dimension='${dimension}' ORDER BY value LIMIT 1)`;
     const order = sort === 'title' ? 'title IS NULL, title COLLATE NOCASE, p.id' : sort === 'artist' ? 'artist IS NULL, artist COLLATE NOCASE, title COLLATE NOCASE, p.id'
       : 'opened_at IS NULL, opened_at DESC, p.updated_at DESC, p.id';
+    // The row's chips: the shown values a person scans a list by.
+    const chips = `(SELECT json_group_array(json_array(e.dimension, e.value)) FROM (${EFFECTIVE_TAGS}) e WHERE e.owner=p.owner AND e.piece_id=p.id AND e.dimension IN ('tuning-name','capo','list'))`;
     const rows = (await this.statement(`SELECT p.*, ${shown('title')} AS title, ${shown('artist')} AS artist,
       (SELECT opened_at FROM piece_views v WHERE v.owner=p.owner AND v.piece_id=p.id) AS opened_at,
-      EXISTS (SELECT 1 FROM tags t WHERE t.owner=p.owner AND t.piece_id=p.id AND t.dimension='favourite' AND t.value='yes') AS favourite
+      EXISTS (SELECT 1 FROM tags t WHERE t.owner=p.owner AND t.piece_id=p.id AND t.dimension='favourite' AND t.value='yes') AS favourite,
+      ${chips} AS chips
       FROM pieces p WHERE ${where} ORDER BY ${order} LIMIT ${PAGE + 1} OFFSET ?`, ...values, offset)
-      .all<Piece & { title: string | null; artist: string | null; opened_at: string | null; favourite: number }>()).results;
-    const page = rows.slice(0, PAGE).map(r => ({ ...r, favourite: r.favourite === 1 }));
+      .all<Piece & { title: string | null; artist: string | null; opened_at: string | null; favourite: number; chips: string }>()).results;
+    const page = rows.slice(0, PAGE).map(r => ({ ...r, favourite: r.favourite === 1,
+      chips: (JSON.parse(r.chips) as [string, string][]).map(([dimension, value]) => ({ dimension, value })).sort((a, b) => a.dimension.localeCompare(b.dimension) || a.value.localeCompare(b.value)) }));
     return { pieces: page, next: rows.length > PAGE ? String(offset + PAGE) : null };
   }
 

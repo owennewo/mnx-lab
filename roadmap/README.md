@@ -156,7 +156,7 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[studio-library-navigation.md](inprogress/studio-library-navigation.md)** — **backend built 2026-09-11, shell pending**: the library made
+- **[studio-library-navigation.md](inprogress/studio-library-navigation.md)** — **built 2026-09-11**, awaiting the deployed checks: the library made
   navigable: **Option A** from the design canvas — a rail where every dimension reads
   `Artist: All` until opened, values with counts, sort as one click (Recent · Title · Artist),
   a Tags sheet on the piece page and an alias page. Decisions locked 2026-09-11: recently

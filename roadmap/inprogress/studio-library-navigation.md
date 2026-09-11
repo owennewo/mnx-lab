@@ -1,6 +1,6 @@
 # The library, navigable — a rail of dimensions, tags you can edit, aliases that apply
 
-> **Status: backend built 2026-09-11; shell pending** (build record at the end). Studio's
+> **Status: built 2026-09-11, in `inprogress/` until the deployed checks pass** (build record at the end). Studio's
 > second item, on the shell [studio-shell.md](studio-shell.md) built the same day and the
 > source-only library of [studio-storage-source-canonical.md](studio-storage-source-canonical.md).
 > Design: the canvas at <https://claude.ai/code/artifact/38c5c7a0-964e-444c-b221-6fe47da09397>,
@@ -144,7 +144,38 @@ mnx-studio-library --remote` (the views table), deploy, and rename the nine stor
 `UPDATE tags SET dimension='list' WHERE dimension='unknown'` — after which the ingest's
 replay is still a no-op.
 
-### Shell — pending
+### Shell — 2026-09-11
 
-The rail, the sort control, the Tags sheet, the alias page, and the piece page posting
-`opened`. Option A as drawn.
+Option A as drawn, in `apps/studio/src/`: `LibraryPage` (the rail — Favourites, then one
+line per dimension the facets know, `Artist: All` closed, values with counts open, the
+chosen value held on the line with an ×; the search that takes words or a
+`dimension:value`; the one-click sort; rows with title, artist, chips for tuning name,
+capo and lists, the star, and last opened), `TagsSheet` (one input with suggestions and
+counts, *Yours* with removes and quick-add, *From the music* read-only with the pencil
+that opens the alias editor in place), `AliasesPage` at `#/aliases`, and `labels.ts` (the
+dimension names, rail order, relative time). The piece page posts `opened` on load, holds
+the snapshot, hosts the sheet, and renames itself from the shown title and artist when an
+alias lands. The bar gains `Tags · n`. One backend addition rode along: browse returns each
+row's chips (shown values in tuning-name, capo and list) so the list needs no per-row
+fetch.
+
+Departures from the canvas: the rail hides `tuning` (the pitches — the name says it) and
+`title` (the row itself); the row's chips are clickable filters, borrowed from Option C
+because they cost nothing. Plain-word search filters the loaded pages client-side and
+keeps loading while more exist, which is right at this library's size and is the first
+thing to revisit if it ever is not.
+
+Verified: `tsc`, boundaries, the library suites, and the studio smoke end to end against a
+local Worker — open a piece, add a tag in the sheet, alias the artist and see the title
+and the sheet change, back to the library where the rail shows the alias, the opened piece
+is the top row with its chips, a list value narrows the rail and the list, the star
+favourites and the Favourites line counts it, sort by title, the alias page lists and
+removes the alias.
+
+**Still open — the deployed checks**, then this doc moves to `complete/`:
+
+- [ ] Deploy; in `/studio/`, the rail shows Artist, Tuning, Capo and List with the nine
+      pieces' real counts; choosing a tuning narrows the list.
+- [ ] Open a piece, add a tag, correct an artist with an alias; the library shows both.
+- [ ] Star two pieces; Favourites in the rail reads 2 and filters to them.
+- [ ] Sort by Recent puts the piece just opened first, on a second device too.

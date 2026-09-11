@@ -257,6 +257,7 @@ it('browses by shown values: aliases apply to titles, artists, filters, facets a
   await library.setAlias('alice', 'artist', 'Jackson Browne (Ole Kirkeng)', 'Jackson Browne');
   const byArtist = await library.browsePieces('alice', [], '', 'artist');
   expect(byArtist.pieces.map(p => `${p.artist}|${p.favourite}`)).toEqual(['A-Ha|true', 'Bananarama|false', 'Jackson Browne|false']);
+  expect(byArtist.pieces[2].chips).toEqual([{ dimension: 'list', value: 'Ole' }, { dimension: 'tuning-name', value: 'standard' }]);
   expect((await library.browsePieces('alice', ['artist:Jackson Browne'], '')).pieces.map(p => p.id)).toEqual(['a']);
   expect((await library.browsePieces('alice', ['artist:Jackson Browne (Ole Kirkeng)'], '')).pieces).toEqual([]);
   const { total, facets } = await library.facets('alice', ['tuning-name:standard']);

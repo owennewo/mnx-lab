@@ -12,6 +12,9 @@ import { openLocalFile } from '../../../src/importers/localFile.ts';
 import { bindPlayback } from '../../../src/elements/playbackHost.ts';
 import type { DocumentViewer, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import type { Player } from '../../../src/elements/Player.ts';
+import { LibraryClient as Client } from '../../../src/storage/libraryClient.ts';
+import './TagsSheet.ts';
+import type { TagsSnapshot } from './TagsSheet.ts';
 
 @customElement('mnx-studio-piece')
 export class PiecePage extends LitElement {
@@ -19,6 +22,8 @@ export class PiecePage extends LitElement {
   @property({ type: String }) pieceId = '';
   @property({ attribute: false }) player: Player | undefined;
   @property({ type: String }) view: ViewSetting = 'auto';
+  @property({ type: Boolean }) tagsOpen = false;
+  @state() private snapshot: TagsSnapshot | null = null;
   @state() private doc: MnxDocument | null = null;
   @state() private error = '';
   @state() private loading = true;
@@ -32,6 +37,13 @@ export class PiecePage extends LitElement {
       min-height: 100%;
       /* Room under the top bar and above the transport dock. */
       padding: 48px 0 160px;
+    }
+    mnx-studio-tags {
+      position: fixed;
+      top: 40px;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
     }
     mnx-document-viewer {
       display: block;
@@ -81,13 +93,17 @@ export class PiecePage extends LitElement {
     this.loading = true;
     this.announce('');
     try {
-      const [{ bytes, filename }, named] = await Promise.all([
+      const [{ bytes, filename }, snapshot] = await Promise.all([
         this.client.canonical(this.pieceId),
-        // The library's own name for the piece (its title/artist tags) outranks the file's header.
-        this.client.piece(this.pieceId).then(r => r.snapshot.tags, () => []),
+        // The library's own name for the piece (its title/artist tags, as shown) outranks the file's header.
+        this.client.piece(this.pieceId).then(r => r.snapshot as TagsSnapshot, () => null),
       ]);
       if (generation !== this.generation) return;
-      const tag = (dimension: string) => named.find(t => t.dimension === dimension)?.value ?? null;
+      this.snapshot = snapshot;
+      this.announceTags();
+      // The library remembers what was opened; the recent sort reads it. Never blocking.
+      void this.client.opened(this.pieceId).catch(() => {});
+      const tag = (dimension: string) => snapshot?.tags.find(t => t.dimension === dimension)?.shown ?? null;
       const opened = await openLocalFile(new File([bytes], filename));
       if (generation !== this.generation) return;
       const mnxJson = opened.document;
@@ -118,6 +134,15 @@ export class PiecePage extends LitElement {
   private announce(title: string) {
     this.dispatchEvent(new CustomEvent('piece-title', { detail: title, bubbles: true, composed: true }));
   }
+  private announceTags() {
+    this.dispatchEvent(new CustomEvent('piece-tags', { detail: this.snapshot?.tags.length ?? 0, bubbles: true, composed: true }));
+  }
+  private async refreshSnapshot() {
+    try { this.snapshot = (await this.client.piece(this.pieceId)).snapshot as TagsSnapshot; } catch { /* keep what we have */ }
+    this.announceTags();
+    const tag = (dimension: string) => this.snapshot?.tags.find(t => t.dimension === dimension)?.shown ?? null;
+    if (this.doc) { const title = tag('title') ?? this.doc.name; const artist = tag('artist'); this.announce(artist ? `${title} — ${artist}` : title); }
+  }
 
   render() {
     return html`
@@ -131,6 +156,10 @@ export class PiecePage extends LitElement {
         : nothing}
       ${this.doc && this.error ? html`<p class="notice" role="alert">${this.error}</p>` : nothing}
       <mnx-document-viewer ?hidden=${!this.doc} .view=${this.view}></mnx-document-viewer>
+      ${this.tagsOpen ? html`<mnx-studio-tags .client=${this.client as Client} .snapshot=${this.snapshot}
+        @tags-changed=${(e: CustomEvent<TagsSnapshot>) => { this.snapshot = e.detail; void this.refreshSnapshot(); }}
+        @aliases-changed=${() => this.refreshSnapshot()}
+        @close=${() => this.dispatchEvent(new CustomEvent('tags-close', { bubbles: true, composed: true }))}></mnx-studio-tags>` : nothing}
     `;
   }
 }

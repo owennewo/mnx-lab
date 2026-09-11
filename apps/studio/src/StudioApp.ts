@@ -16,20 +16,24 @@ import type { ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import { loadSession, signIn, type Session } from './session.ts';
 import './LibraryPage.ts';
 import './PiecePage.ts';
+import './AliasesPage.ts';
 
 export type Route =
   | { page: 'library' }
   | { page: 'piece'; id: string }
+  | { page: 'aliases' }
   | { page: 'not-permitted' };
 
 export function parseHash(hash: string): Route {
   const piece = /^#\/piece\/([^/?#]+)$/.exec(hash);
   if (piece) return { page: 'piece', id: decodeURIComponent(piece[1]) };
   if (hash === '#/not-permitted') return { page: 'not-permitted' };
+  if (hash === '#/aliases') return { page: 'aliases' };
   return { page: 'library' };
 }
 
 export const libraryHref = '#/';
+export const aliasesHref = '#/aliases';
 export const pieceHref = (id: string): string => `#/piece/${encodeURIComponent(id)}`;
 
 const VIEW_KEY = 'mnx-studio.view';
@@ -53,6 +57,8 @@ export class StudioApp extends LitElement {
   @state() private pieceTitle = '';
   @state() private view: ViewSetting = storedView();
   @state() private idle = false;
+  @state() private tagsOpen = false;
+  @state() private tagCount = 0;
   @query('mnx-player') private player!: Player;
   private idleTimer = 0;
 
@@ -184,7 +190,7 @@ export class StudioApp extends LitElement {
 
   private readonly onHashChange = () => {
     this.route = parseHash(location.hash);
-    if (this.route.page !== 'piece') this.pieceTitle = '';
+    if (this.route.page !== 'piece') { this.pieceTitle = ''; this.tagsOpen = false; this.tagCount = 0; }
     this.wake();
   };
 
@@ -245,7 +251,9 @@ export class StudioApp extends LitElement {
               ${VIEWS.map(v => html`<option value=${v} ?selected=${v === this.view}>${v === 'auto' ? 'auto view' : v}</option>`)}
             </select>`
           : nothing}
+        ${onPiece ? html`<button aria-pressed=${this.tagsOpen} @click=${() => (this.tagsOpen = !this.tagsOpen)}>Tags · ${this.tagCount}</button>` : nothing}
         ${onPiece ? html`<a class="button" href=${libraryHref}>Library</a>` : nothing}
+        ${this.route.page === 'aliases' ? html`<a class="button" href=${libraryHref}>Library</a>` : nothing}
         ${email ? html`<span class="who">${email}</span>` : nothing}
         ${email || this.session?.kind === 'not-permitted'
           ? html`<button @click=${this.signOut}>Sign out</button>`
@@ -283,8 +291,12 @@ export class StudioApp extends LitElement {
         .pieceId=${this.route.id}
         .player=${this.player}
         .view=${this.view}
+        .tagsOpen=${this.tagsOpen}
         @piece-title=${(e: CustomEvent<string>) => (this.pieceTitle = e.detail)}
+        @piece-tags=${(e: CustomEvent<number>) => (this.tagCount = e.detail)}
+        @tags-close=${() => (this.tagsOpen = false)}
       ></mnx-studio-piece>`;
+    if (this.route.page === 'aliases') return html`<mnx-studio-aliases .client=${this.client}></mnx-studio-aliases>`;
     return html`<mnx-studio-library .client=${this.client}></mnx-studio-library>`;
   }
 }

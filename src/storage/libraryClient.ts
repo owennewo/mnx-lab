@@ -1,5 +1,5 @@
 // Optional same-origin library access. No credentials or private documents are persisted.
-export interface LibraryPiece { id: string; title: string | null; artist: string | null; favourite: boolean; opened_at: string | null }
+export interface LibraryPiece { id: string; revision: number; title: string | null; artist: string | null; favourite: boolean; opened_at: string | null; chips: { dimension: string; value: string }[] }
 export interface LibraryFacet { dimension: string; value: string; pieces: number }
 export interface LibraryAlias { dimension: string; raw_value: string; canonical_value: string; pieces: number }
 export interface ShownTag { dimension: string; value: string; shown: string; origin: 'derived' | 'asserted'; source_ref: string | null }
