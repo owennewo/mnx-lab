@@ -54,6 +54,14 @@ touch it — so the block was re-checked against `git status` rather than truste
   `import/aligner.ts` and `import/musicxml.ts` — two imports, a type, a local
   `measureNum`, and a whole private method (`getEventDivisionDuration`) nothing called.
   All dead; removing them is behaviour-neutral and the converter suite and oracle agree.
+- **A converter commit is now a library event, even a behaviour-neutral one.**
+  `tools/library-converter-versions.mjs` (a `build` gate since the storage campaign)
+  stamps each converter as `version+git.<last commit touching it>`, so the cleanup above
+  moved `musicxml-mnx`'s stamp in `worker/library/converter-versions.json`. The deployed
+  read path selects MNX children by that stamp and fails explicitly without one, so **the
+  first deploy after this lands needs `npm run rederive:library`** before
+  MusicXML-canonical pieces read again — equal music, new evidence rows, by design
+  ([docs/library-access.md](../../docs/library-access.md)).
 - **"Platform-independent" was true of the modules, not the package entry.** Items 10
   and 11 made every import-path module DOM- and Node-free; `index.ts` still re-exports
   `mnxFile` for the CLI. The Guitar Pro worker reached past its index to `cleanRoom.ts`
