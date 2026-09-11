@@ -64,7 +64,7 @@ it('separates browser and machine authority and fails closed on storage/config e
 });
 it('only redirects authenticated login to the fixed workbench landing', async () => {
   const r = await request('/login?return=https://attacker.test'); expect(r.status).toBe(303); expect(r.headers.get('location')).toBe('/workbench/?library=1');
-  // The root is nobody's page: the Worker sends it to the shell's directory (workbench-path-prefix).
-  const root = await app.request('http://localhost/', {}, env); expect(root.status).toBe(302); expect(root.headers.get('location')).toBe('/workbench/');
+  // The root is studio's; the workbench keeps its own directory (workbench-path-prefix, studio-shell).
+  const root = await app.request('http://localhost/', {}, env); expect(root.status).toBe(302); expect(root.headers.get('location')).toBe('/studio/');
   expect((await app.request('https://mnx-lab.totai.uk/api/library/me', { headers: { 'Cf-Access-Jwt-Assertion': jwt } }, env)).status).toBe(503);
 });

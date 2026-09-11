@@ -10,6 +10,7 @@
 //   elements → workbench                    (workbench shell — leaf)
 //   workbench · elements → entries          (build faces)
 //   worker: model + assist only             (sibling ceiling; DOM-free)
+//   apps/studio: model · engine · audio · elements · storage   (the consumer shell — leaf)
 //   harness: anything except the shells     (exercises the machinery headlessly)
 
 /** Allow a layer to depend only on the listed layers (plus itself and node_modules). */
@@ -60,13 +61,26 @@ module.exports = {
     ]),
     layerRule('worker-model-and-assist-only', 'worker', ['src/model', 'src/assist']),
     {
+      name: 'studio-consumes-neutral-surfaces',
+      comment:
+        'apps/studio is the consumer product (apps/studio/README.md). It reads elements/ ' +
+        'and below plus the typed library client — never the workbench, never assist ' +
+        'or edit until the editor is promoted (roadmap: core-editor-element-promotion).',
+      severity: 'error',
+      from: { path: '^apps/studio/' },
+      to: {
+        path: '^(src|worker)/',
+        pathNot: '^src/(model|engine|audio|elements|storage)/|^worker/generated/'
+      }
+    },
+    {
       name: 'nothing-imports-the-shells',
       comment:
-        'workbench/ and entries/ are leaves: anything two consumers want must first be ' +
-        'promoted down into elements/ or below — a deliberate, reviewed move.',
+        'workbench/, entries/ and apps/studio/ are leaves: anything two consumers want ' +
+        'must first be promoted down into elements/ or below — a deliberate, reviewed move.',
       severity: 'error',
-      from: { path: '^(src|worker|harness)/', pathNot: '^src/(workbench|entries)/' },
-      to: { path: '^src/(workbench|entries)/' }
+      from: { path: '^(src|worker|harness|apps)/', pathNot: '^src/(workbench|entries)/|^apps/studio/' },
+      to: { path: '^src/(workbench|entries)/|^apps/studio/' }
     },
     {
       name: 'harness-not-into-shells',

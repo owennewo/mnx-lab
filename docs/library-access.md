@@ -6,12 +6,21 @@ Every `/api/library` route authenticates before storage; reads use the signed em
 active D1 user id. Browser login never inserts users. Static hosting omits Load.
 
 Access is configured for `mnx-labs-team.cloudflareaccess.com`. Browser application:
-`mnx-lab.totai.uk/api/library`, OTP provider only, 720h application sessions and an operator-configured one-month global session,
+`mnx-lab.totai.uk/api/library` **and** `mnx-lab.totai.uk/studio` (one application, one
+audience, one cookie — the studio page and its library fetches are one session; an
+anonymous visit to `/studio/` meets the OTP prompt before any HTML), OTP provider only, 720h application sessions and an operator-configured one-month global session,
 policy duration inherited. Machine application: the more-specific `/api/library/ingest`,
 Service Auth only, separate audience and 1h token lifetime. Requests also require the
 Worker write token and active D1 `operator`. Neither credential grants browser reads.
 JWTs are verified by `jose` against the fixed issuer's JWKS, RS256, audience and expiry;
-D1 membership is checked on every request. Logout uses `/cdn-cgi/access/logout`.
+D1 membership is checked on every request. Logout uses `/cdn-cgi/access/logout`. Studio
+(`/studio/`) has no login route of its own: sign-in is the edge redirect, and the shell
+learns the address from `/api/library/me` at boot — a 403 there (Access admitted the
+address, D1 has it inactive) shows its not-permitted page with a sign-out link.
+Adding the `/studio` path to an already-provisioned browser application is the one
+change `bootstrap` applies in place (a PUT of the declared configuration); every other
+difference still refuses as drift. Re-run `bootstrap` after deploying the studio face and
+confirm the browser policy is still attached (the same run's `sync` step checks it).
 
 ## Bootstrap and membership
 
@@ -60,6 +69,9 @@ trust requires both the special configured issuer and a loopback URL; it cannot 
 against deployed hostnames. No development identity header is trusted.
 
 Local logout clears the test cookie manually; production logout is handled by Access.
+`node harness/verify/studio-smoke.mjs` drives the built studio face against the same local
+setup (root redirect, signed-out page, library list and filter, piece view with player,
+missing piece), the studio counterpart of `library-smoke.mjs`.
 Never deploy `.dev.vars` or `LIBRARY_LOCAL_JWKS`. Do not copy private scores into public
 assets for testing. The harness uses synthetic scores with local D1/R2 and signed keys.
 

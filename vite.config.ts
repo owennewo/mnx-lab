@@ -111,6 +111,8 @@ export default defineConfig({
         rollupOptions: {
           input: {
             main: 'workbench/index.html',
+            // Studio — the consumer product, served at /studio/ (apps/studio/).
+            studio: 'studio/index.html',
             // The embeddability demo (a mock third-party host page).
             embed: 'embed.html'
           }

@@ -1,0 +1,30 @@
+/* Document-level base styles for the studio face — only what cannot live inside
+   a shadow root: the SMuFL font face and the host page reset. Everything else
+   is on <mnx-studio>'s :host. Kept in step with src/entries/workbench.css on
+   purpose: the two faces share one origin, one font, one ground. */
+
+@font-face {
+  font-family: 'Bravura';
+  src: url('/smufl/Bravura.woff2') format('woff2');
+  font-display: block;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  overflow: hidden;
+  background: light-dark(oklch(0.962 0.002 60), oklch(0.185 0.004 60));
+}

@@ -45,17 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[studio-shell.md](proposed/studio-shell.md)** — **studio starts**: a Lit shell in
-  `apps/studio/` at `/studio/` on the same Worker, consuming `elements/` + `storage/` only
-  (a new dependency-cruiser leaf). Three hash routes — the tag-filtered library, one piece
-  fullscreen with `<mnx-document-viewer>` + `<mnx-player>`, and not-permitted. **Auth is
-  Cloudflare Access at the edge and nothing else**: `/studio` is added as a second path on
-  the existing browser application so one audience and one cookie cover the page and its
-  `/api/library` fetches; anonymous visits hit the OTP prompt before any HTML; the Worker's
-  JWT + D1 double gate is unchanged; sign-out is Access's logout; `worker/api/auth.ts`
-  stays a 501. Settles the README's three open decisions (Lit, same origin, shared-origin
-  auth). **Pulls trigger 2** of core-editor-element-promotion.md — studio is the real
-  second consumer — so editing is phase two, in memory only; persistence is the next item.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -167,6 +156,16 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-shell.md](inprogress/studio-shell.md)** — **studio started, built 2026-09-11**,
+  awaiting the deployed checks: a Lit shell in `apps/studio/` at `/studio/` on the same
+  Worker (a new dependency-cruiser leaf over `elements/` + `storage/`), the root redirected
+  there. Three hash routes — the tag-filtered library, one piece fullscreen with
+  `<mnx-document-viewer>` + `<mnx-player>` in the overlay bar, and not-permitted. **Auth is
+  Cloudflare Access at the edge and nothing else**: `/studio` becomes a second path on the
+  browser application (the bootstrap script reconciles that one key in place), the Worker's
+  JWT + D1 double gate is unchanged, sign-out is Access's logout, `worker/api/auth.ts` stays
+  a 501. Settled Lit, same origin, shared-origin auth. **Pulls trigger 2** of
+  core-editor-element-promotion.md; editing is phase two, in memory only.
 - **[workbench-path-prefix.md](inprogress/workbench-path-prefix.md)** — **built 2026-09-11**,
   awaiting the deployed checks: the workbench serves at **`/workbench/`**
   (`workbench/index.html`), the Worker 302s the root there until studio takes it, the SPA

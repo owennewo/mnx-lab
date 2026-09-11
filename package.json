@@ -35,7 +35,7 @@
     "preview": "vite preview",
     "compile-validator": "node spec/tools/compile-validator.mjs",
     "check:scenarios": "node harness/verify/check-scenarios.mjs",
-    "check:boundaries": "depcruise src worker harness --config .dependency-cruiser.cjs",
+    "check:boundaries": "depcruise src worker harness apps --config .dependency-cruiser.cjs",
     "sync:spec": "node spec/tools/sync-spec-examples.mjs",
     "sync:musicxml-comparisons": "node spec/tools/sync-musicxml-comparisons.mjs",
     "push:proposal": "node spec/tools/push-proposal.mjs",

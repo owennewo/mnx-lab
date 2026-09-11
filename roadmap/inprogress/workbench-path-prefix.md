@@ -124,7 +124,8 @@ green after rebase.
 
 **Still open — the deployed checks**, which need the owner's `npm run deploy`:
 
-- [ ] `https://mnx-lab.totai.uk/` → 302 → `/workbench/`; `/workbench` → `/workbench/`.
+- [ ] `https://mnx-lab.totai.uk/workbench` → `/workbench/` and the page loads. (The root now
+      302s to `/studio/` — studio-shell.md took the redirect, as planned.)
 - [ ] Library Load round trip: sign-in button → Access OTP → `/workbench/?library=1` →
       dialog open and signed in; sign out returns it to the prompt.
 - [ ] PKCE connect returns to `/workbench/#<route>`.

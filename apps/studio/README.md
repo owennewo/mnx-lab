@@ -1,7 +1,8 @@
-# MNX Studio — reserved
+# MNX Studio
 
-**There is no code here, deliberately.** This README is the only studio artifact until
-the product starts (roadmap/complete/lab-structure-lab.md).
+**Started 2026-09-11** ([roadmap/inprogress/studio-shell.md](../../roadmap/inprogress/studio-shell.md)).
+Until then this directory was a README and a set of reserved seams
+(roadmap/complete/lab-structure-lab.md); the seams are now in use.
 
 ## What it is
 
@@ -11,63 +12,62 @@ slowdown, backing tracks). A **different product for different users** than the
 workbench (`src/workbench/`), which is the lab's internal review instrument. The two must
 never bleed together; that guard is structural, not vigilance.
 
-## The framework-neutrality contract
+Today it is the first cut: sign in, see your library, open a piece, and it fills the
+screen with the score and the player. Nothing is edited or persisted yet.
 
-Studio's framework is **deliberately undecided** — React, Svelte, Lit, or whatever is
-right *when it starts*. That choice stays open because studio may consume only
-framework-neutral surfaces:
+## Shape
 
-- the **`elements/`** custom elements (today `<mnx-document-viewer>`; more as they are promoted) via the embed
-  artifact or the `mnx-lab` package's subpath exports;
-- the **`mnx-lab` library** (`mnx-lab/model`, `mnx-lab/engine`, `mnx-lab/audio`);
-- the **Worker origin's** reserved API seams.
+```
+studio/index.html        the face's HTML — Vite emits it at /studio/ (top-level HTML = URL map)
+apps/studio/
+  studio.css             document-level only: the SMuFL face and the page reset
+  src/main.ts            registers the shell and the elements it mounts
+  src/StudioApp.ts       <mnx-studio> — hash router, fullscreen frame, the overlay bar
+  src/LibraryPage.ts     #/              the tag-filtered browse over the library client
+  src/PiecePage.ts       #/piece/<id>    <mnx-document-viewer> + <mnx-player>, one binding
+  src/session.ts         /api/library/me at boot; sign-in is re-entering the page
+```
 
-It must not import `src/workbench/` (the workbench shell is a leaf; dependency-cruiser makes
-that a red build), and nothing may import studio. Anything both shells want is first
-*promoted* into `elements/` or below — a deliberate, reviewed move.
+`#/not-permitted` is the third route: Access admitted the address but D1 has it inactive.
+Piece URLs carry the library's piece id. The staff view (auto / notation / tab / both) is a
+per-browser localStorage preference, the one persistence a shell may own without a
+backend decision.
 
-## Storage
+## The decisions that starting settled
 
-How a piece of music is stored — D1 index, R2 renditions and recordings, tags, one canonical
-pointer — is designed in [docs/studio-storage.md](../../docs/studio-storage.md) and built by
-the [studio storage campaign](../../roadmap/inprogress/studio-campaign-storage.md). Studio
-*reads* that library; filling it is a personal lab script outside this directory, so the
-campaign puts no code here.
+- **Framework: Lit.** The only surfaces studio consumes are Lit custom elements, the
+  decorator configuration already exists, and the editor will arrive as a Lit element.
+- **Hosting: the same Worker, a path prefix.** D1 and R2 already bind to the `mnx-lab`
+  Worker (storage campaign, contract clause 2); studio's pages sit beside them at
+  `/studio/`, and the Worker redirects `/` there. One config, one deploy, one hostname.
+- **Auth: Cloudflare Access at the edge, and nothing else.** `/studio` is a second path
+  on the same browser Access application as `/api/library`, so a page load and its
+  fetches share one audience and one cookie. An anonymous visit meets the OTP prompt
+  before any HTML is served; there is no login page in studio. The Worker still checks
+  the JWT and active D1 membership on every library call. Sign out is Access's own
+  logout. `worker/api/auth.ts` stays a 501 seam — it is for a public sign-up, a
+  different product decision. Operations: [docs/library-access.md](../../docs/library-access.md).
 
-## Reserved seams, already in place
+## The boundary (machine-enforced)
 
-| Seam | Where | Today |
-| --- | --- | --- |
-| Document sync API | `worker/api/documents.ts` | 501 stub, no bindings |
-| Auth API | `worker/api/auth.ts` | 501 stub, no bindings |
-| Typed sync client | `src/storage/cloudRepository.ts` | stub over the 501 route |
-| Local persistence | `src/storage/indexedDbRepository.ts` | working (the workbench uses it) |
-| Embeddable viewer | `entries/embed.ts` → `dist/embed/` | working |
-| Self-correcting edit loop | `src/assist/editLoop.ts` | working, transport-injected — the same loop runs in a browser or a Worker |
+`apps/studio/` may import only `src/model`, `src/engine`, `src/audio`, `src/elements` and
+`src/storage` (the typed library client). It must not import `src/workbench/`, `src/edit/`
+or `src/assist/`; nothing may import `apps/studio/`. `.dependency-cruiser.cjs` makes any of
+those a red build. Anything both shells want is first *promoted* into `elements/` or
+below — a deliberate, reviewed move.
 
-## Assist credentials — a promotion waiting for a second consumer
+## Editing — the trigger this pulled
 
-Studio will want the same BYOK flow the workbench has (core-assist-byok.md): PKCE or a
-pasted OpenRouter key, held in the browser, spent browser-direct. The pieces are already
-split along the line that makes that possible — `src/assist/openrouter.ts` is pure over
-`fetch`/`crypto` and touches no storage, so **studio can consume it today**; only
-`src/workbench/assistCredentials.ts` (localStorage, the PKCE redirect round trip) is
-shell-specific, and studio must not import it — the workbench is a leaf, and
-dependency-cruiser makes trying a red build.
+[roadmap/proposed/core-editor-element-promotion.md](../../roadmap/proposed/core-editor-element-promotion.md)
+was parked behind "a real second consumer asking for editing". Studio is that consumer.
+When the promotion lands, the piece page mounts the editor element and edits **in memory
+only**; the storage design already says the first saved edit becomes a new MNX rendition
+that takes the canonical pointer, and that write path is the next studio item.
 
-It is **not** promoted into a shared layer yet, on purpose. The repo's rule is that a
-shared surface graduates when a real second consumer needs it, and studio does not exist.
-When it starts, the move is small and known: lift `assistCredentials.ts` down to a layer
-both shells may import, leaving the storage keys and the callback-URL derivation as its
-only decisions. Writing it now would be guessing at studio's routing and its session
-model — the two things the module actually depends on.
+## Assist credentials — still a promotion waiting
 
-The real backend (accounts, storage bindings, sync protocol) is **studio's to build**
-on those seams — the workbench keeps no backend at all, by rule.
-
-## When it starts
-
-It starts greenfield in this directory with its own build, consuming the artifacts
-above. First decisions then, not now: framework, hosting shape (same Worker origin vs
-its own), and whether auth pages share the origin (the one known forcing point that
-could pull the framework decision earlier).
+Studio will want the workbench's BYOK flow (core-assist-byok.md). `src/assist/openrouter.ts`
+is pure and could be consumed today; `src/workbench/assistCredentials.ts` (localStorage,
+the PKCE round trip) is shell-specific and stays behind the boundary until studio actually
+asks for assist — then it lifts to a layer both shells may import, with the storage keys
+and the callback-URL derivation as its only decisions.

@@ -59,6 +59,16 @@ class ResourceTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 module.resource(api, {}, 'browser', 'access/apps', {'name': 'library', 'domain': 'expected'})
             self.assertEqual(api.writes, [])
+    def test_reconcilable_key_is_updated_in_place_and_nothing_else(self):
+        api = FakeAPI(); api.rows['access/apps'] = [{'name': 'library', 'id': 'one', 'domain': 'd', 'self_hosted_domains': ['d']}]
+        expected = {'name': 'library', 'domain': 'd', 'self_hosted_domains': ['d', 'd/studio']}
+        row = module.resource(api, {'browser': 'one'}, 'browser', 'access/apps', expected, reconcile=('self_hosted_domains',))
+        self.assertEqual(api.writes, [('access/apps/one', 'PUT', expected)])
+        self.assertEqual(row['self_hosted_domains'], ['d', 'd/studio'])
+        api = FakeAPI(); api.rows['access/apps'] = [{'name': 'library', 'id': 'one', 'domain': 'wrong', 'self_hosted_domains': ['d']}]
+        with self.assertRaises(ValueError):
+            module.resource(api, {'browser': 'one'}, 'browser', 'access/apps', expected, reconcile=('self_hosted_domains',))
+        self.assertEqual(api.writes, [])
     def test_empty_users_policy_denies_everyone(self):
         api = FakeAPI()
         with patch.object(module, 'query', return_value=[]):

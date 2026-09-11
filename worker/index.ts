@@ -17,11 +17,11 @@ import type { Env } from './env.ts';
 
 const app = new Hono<{ Bindings: Env }>();
 
-// The root is nobody's page: each shell lives in its own directory
-// (/workbench/ today; studio takes /studio/ and this redirect with it —
-// roadmap/proposed/studio-shell.md). No asset answers `/`, so the request
-// falls through to the Worker; 302 because the target is about to change.
-app.get('/', c => c.redirect('/workbench/', 302));
+// The root is studio's (apps/studio/, served at /studio/); the workbench, the
+// lab's own instrument, lives at /workbench/. No asset answers `/`, so the
+// request falls through to the Worker. Access gates /studio at the edge, so
+// an anonymous visitor lands on the OTP prompt from here.
+app.get('/', c => c.redirect('/studio/', 302));
 
 app.route('/api/edit-notation', editNotation);
 app.route('/api/models', modelsRoute);

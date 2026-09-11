@@ -83,7 +83,7 @@ def save_inventory(inventory):
     INVENTORY.write_text(json.dumps(inventory, indent=2) + '\n')
 
 
-def resource(api, inventory, key, path, expected):
+def resource(api, inventory, key, path, expected, reconcile=()):
     rows = api.listing(path)
     candidates = [row for row in rows if row.get('id') == inventory.get(key)] if inventory.get(key) else [row for row in rows if row.get('name') == expected['name']]
     if len(candidates) > 1 or (inventory.get(key) and not candidates):
@@ -95,7 +95,12 @@ def resource(api, inventory, key, path, expected):
         if expected.get('type') == 'onetimepin' and comparison.get('config') == {'redirect_url': 'https://' + TEAM + '/cdn-cgi/access/callback'}:
             comparison['config'] = {}
         if not same(comparison, expected):
-            raise ValueError(f'{key}: resource differs from declared configuration; review drift manually')
+            # Only keys this call names as reconcilable are brought into line in place
+            # (the browser application's path list); any other difference is drift.
+            drift = {k for k, v in expected.items() if comparison.get(k) != v}
+            if not drift or not drift <= set(reconcile):
+                raise ValueError(f'{key}: resource differs from declared configuration; review drift manually')
+            row = api.call(f"{path}/{row['id']}", 'PUT', expected)
     else:
         row = api.call(path, 'POST', expected)
     inventory[key] = row['id']
@@ -155,9 +160,12 @@ def bootstrap(api, db, inventory, service_file):
     if any(p['name'] != machine_policy['name'] for p in machine_policies):
         raise ValueError('Unexpected machine policy; refusing mixed authentication')
     resource(api, inventory, 'machine_policy', f"access/apps/{machine['id']}/policies", machine_policy)
+    # One browser application, two paths: the studio pages and the library API share an
+    # audience and a cookie, so a page load and its fetches are one session (studio-shell).
     browser = resource(api, inventory, 'browser', 'access/apps', {
-        **common, 'name': 'MNX library browser', 'domain': DOMAIN + '/api/library', 'session_duration': '720h',
-        'allowed_idps': [otp['id']], 'auto_redirect_to_identity': True})
+        **common, 'name': 'MNX library browser', 'domain': DOMAIN + '/api/library',
+        'self_hosted_domains': [DOMAIN + '/api/library', DOMAIN + '/studio'], 'session_duration': '720h',
+        'allowed_idps': [otp['id']], 'auto_redirect_to_identity': True}, reconcile=('self_hosted_domains',))
     sync_users(api, db, inventory)
     variables = {'LIBRARY_ACCESS_ISSUER': 'https://' + TEAM, 'LIBRARY_ACCESS_AUD': browser['aud'],
                  'LIBRARY_INGEST_AUD': machine['aud'], 'LIBRARY_INGEST_CLIENT_ID': credential['client_id']}

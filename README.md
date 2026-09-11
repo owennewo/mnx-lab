@@ -1,7 +1,8 @@
 # MNX Lab
 
 A test bench for the developing [W3C MNX](https://w3c-cg.github.io/mnx/) music-notation
-format, with emphasis on guitar tab — live at **[mnx-lab.totai.uk](https://mnx-lab.totai.uk)**.
+format, with emphasis on guitar tab — live at **[mnx-lab.totai.uk](https://mnx-lab.totai.uk)** (studio, behind Cloudflare Access; the
+workbench is public at [/workbench/](https://mnx-lab.totai.uk/workbench/)).
 
 - **A scenario corpus** (`scenarios/`) of small MNX documents — the spec's own worked
   examples mirrored from the pinned submodule, plus our local scenarios — each with a

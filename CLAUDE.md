@@ -121,7 +121,7 @@ worker/              Hono; a DEMO for visitors with no key of their own, plus re
                      501 seams. generated/ is schema DATA precompiled from spec/,
                      importable from any layer
 converters/          npm-workspace sub-packages + fixtures/ (the three scores)
-apps/studio/         README only — the future consumer product's reserved seam
+apps/studio/         the consumer product — a Lit shell over elements/ + storage/, at /studio/
 apps/viewer-embedded/ a mock host page for the embed face (smoke:embed / dev:embed-app)
 roadmap/ docs/ research/ vendor/mnx    unchanged at root
 ```
@@ -151,6 +151,7 @@ deliberately undecided.
 | Face | Entry | Artifact |
 |---|---|---|
 | Workbench | `workbench/index.html` → `src/entries/main.ts` | `/workbench/` on the deployed site + Worker |
+| Studio | `studio/index.html` → `apps/studio/src/main.ts` | `/studio/` — the root redirects here; Cloudflare Access at the edge |
 | Embed | `src/entries/embed.ts` (`embed.html` = mock host demo) | `dist/embed/mnx-lab.js` (IIFE+ESM) — registers `elements/` only |
 | Library | `src/entries/lib.ts` via `build:lib` | `mnx-lab` with subpath exports `mnx-lab/{model,engine,audio,elements}` + `mnx-lab/smufl/*` |
 

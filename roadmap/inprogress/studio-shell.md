@@ -1,11 +1,12 @@
 # Studio first cut — browse, load, play, behind Access
 
-> **Status: proposed 2026-09-11.** Studio starts. Depends on
-> [workbench-path-prefix.md](../inprogress/workbench-path-prefix.md) (the workbench leaves the root
+> **Status: built 2026-09-11, in `inprogress/` until the deployed checks pass** (build
+> record at the end). Studio starts. Depends on
+> [workbench-path-prefix.md](workbench-path-prefix.md) (the workbench leaves the root
 > first) and on the built [studio storage campaign](../complete/studio-campaign-storage.md)
 > (the library it reads). Its editing phase is the **second consumer** that
-> [core-editor-element-promotion.md](core-editor-element-promotion.md) has been parked
-> behind. Implementation loop.
+> [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md) has been
+> parked behind. Implementation loop.
 
 ## The goal
 
@@ -17,7 +18,7 @@ unchanged.
 Not in scope, each its own later item: saving an edit (the storage design already says
 what that is — a new MNX rendition that takes the canonical pointer), sharing, sync,
 recordings and syncpoints in the player, practice tools
-([studio-player-practice.md](studio-player-practice.md)), the BYOK assist flow
+([studio-player-practice.md](../proposed/studio-player-practice.md)), the BYOK assist flow
 ([apps/studio/README.md](../../apps/studio/README.md) records the promotion it needs).
 
 ## Decisions this doc makes
@@ -130,7 +131,7 @@ fails; the not-permitted page is the honest result and is how the page gets exer
 ## Editing — phase two, and the trigger it pulls
 
 The editor mount lives in `src/workbench/`, a leaf; studio cannot import it and must not.
-[core-editor-element-promotion.md](core-editor-element-promotion.md) recorded on
+[core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md) recorded on
 2026-08-14 that trigger 1 (a stable intent vocabulary) is met and trigger 2 — **a real
 second consumer asking for editing** — is the sole blocker. This item is that consumer
 asking. When phase one is deployed, that doc moves to `inprogress/` and runs to its own
@@ -165,3 +166,44 @@ is the next studio item, not a stretch goal of this one.
   Default to the ulid unless the first week of use says otherwise.
 - The overlay bar's exact contents once the player element's tray (mute/solo, rate)
   exists — item 13 of the player campaign decides that, not this doc.
+
+## Build record — 2026-09-11
+
+Built as designed, with two departures worth recording:
+
+- **The transport is a bottom dock, not part of the top bar.** `<mnx-player>` carries its
+  whole tray — transport, sound, rate, volume, the iteration table — which is a dock's
+  worth of controls, not a bar's; in the bar it squashed the title and covered the score.
+  Two thin overlays now, both fading when the pointer is idle over a score: the top bar
+  (title, staff view, Library, address, Sign out) and the bottom dock (the player).
+  A compact player mode would be a change to the public `elements/` surface and is not
+  this item's to make.
+- **The Access change is reconciled in place.** `tools/library-access.py` declares the
+  browser application with `self_hosted_domains` `[/api/library, /studio]` and `resource()`
+  gained a `reconcile=` list of keys it may bring into line with a PUT; every other
+  difference still refuses as drift. Covered by a unit test beside the drift-refusal one.
+
+What is here: `studio/index.html` → `apps/studio/src/` (Lit; `StudioApp`, `LibraryPage`,
+`PiecePage`, `session`), a `studio-consumes-neutral-surfaces` rule and `apps/studio` as a
+leaf in `.dependency-cruiser.cjs` (`check:boundaries` cruises `apps` too; `tsc` includes
+it), the Worker's root redirect flipped to `/studio/` (test updated),
+`harness/verify/studio-smoke.mjs`, the rewritten `apps/studio/README.md`, the operations
+doc. Verified locally: build green with the boundary rule, the Python operator tests, and
+the studio smoke against `wrangler dev` with local D1/R2 and a signed local session — root
+redirect, signed-out page, library list and filter, piece opened with the viewer drawn and
+the player wired, back to the library, a missing piece as a page, no private localStorage,
+no console errors. The not-permitted page is exercised by hand (disable the local user in
+D1); the smoke has only one signed identity to work with.
+
+**Still open — the owner's steps**, then this doc moves to `complete/`:
+
+- [ ] `python3 tools/library-access.py bootstrap …` re-run with the owner's token file, so
+      the browser application gains the `/studio` path; confirm the browser policy is
+      still attached and the more-specific `/api/library/ingest` application still wins.
+- [ ] `npm run deploy`; `https://mnx-lab.totai.uk/` → `/studio/` → OTP prompt → library.
+- [ ] Both ingested pieces open and play; `capo:3` filters to one.
+- [ ] Sign out forces a fresh OTP (else switch to the team-domain logout URL); note
+      whether `returnTo` is honoured. Record the answer in `docs/library-access.md`.
+- [ ] A D1-disabled address that Access admits sees the not-permitted page
+      (`tools/library-access.py disable`, then `enable`).
+- [ ] `core-editor-element-promotion.md` moves to `inprogress/` — its trigger is pulled.
