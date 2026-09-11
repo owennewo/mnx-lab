@@ -163,7 +163,7 @@ export async function planIngest(inputDirectory) {
     for (const [dimension, value] of [['title', meta.title], ['artist', meta.artist]]) {
       if (typeof value === 'string' && value.trim()) sidecarTags.push({ dimension, value: value.trim(), source_ref: 'sidecar' });
     }
-    const manifest = { id: `soundslice:${sourceId}`, expected_revision: null, source: { kind: 'soundslice', id: sourceId },
+    const manifest = { expected_revision: null, source: { kind: 'soundslice', id: sourceId },
       renditions, recordings, tags: (lists?.lists ?? []).map(l => ({ dimension: 'unknown', value: required(l.path, 'list path'), source_ref: required(l.id, 'list id') })),
       canonical: { mode: 'initialize', rendition_id: canonical.id } };
     const bytes = [...files.values()].reduce((n,b) => n + b.byteLength, 0) + Buffer.byteLength(JSON.stringify(manifest));

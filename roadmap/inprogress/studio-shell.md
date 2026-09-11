@@ -161,9 +161,10 @@ is the next studio item, not a stretch goal of this one.
 
 ## Open questions, deliberately left
 
-- Whether `#/piece/<id>` uses the library's ulid or the `soundslice:<sliceId>` source
-  identity in the URL. The ulid is the stable one; the source id is the readable one.
-  Default to the ulid unless the first week of use says otherwise.
+- ~~Whether `#/piece/<id>` uses the library's ulid or the `soundslice:<sliceId>` source
+  identity in the URL.~~ Settled 2026-09-11 after the first look at a live URL: the
+  service derives an opaque, URL-safe id from the source identity; the source never
+  reaches a reader's URL.
 - The overlay bar's exact contents once the player element's tray (mute/solo, rate)
   exists — item 13 of the player campaign decides that, not this doc.
 

@@ -51,7 +51,8 @@ Bootstrap enables edge protection immediately. Deploy the matching Worker config
 next; until then requests can fail closed during this operator-controlled cutover.
 Verify the global/app durations, the exact policies, anonymous redirects, authenticated
 studio's library page, and a machine ingest replay before marking rollout complete. Keep the
-original private write-token file. Ingest now also takes
+original private write-token file. The ingest manifest carries no piece id: the Worker derives one from the source identity
+(`pieceIdFor` in `worker/library/index.ts`), opaque and URL-safe. Ingest now also takes
 `--access-token-file /private/.secrets/library-access-service.json`, or the paired
 `CF_ACCESS_CLIENT_ID`/`CF_ACCESS_CLIENT_SECRET` environment variables. No redirects are
 followed by the ingest client. A service token initially expires after one year; renew it

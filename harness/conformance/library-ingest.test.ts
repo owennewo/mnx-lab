@@ -11,6 +11,7 @@ const app = { request: (url: string, init?: RequestInit, bindings?: unknown) => 
 import { Library } from '../../worker/library/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { INGEST_OWNER, MAX_INGEST_BYTES } from '../../worker/api/library.ts';
+import { pieceIdFor } from '../../worker/library/index.ts';
 // Operator scripts are deliberately JavaScript and excluded from the app build.
 // @ts-expect-error No declaration file for the Node operator tool.
 import { planIngest, uploadPlan, endpointURL, validateConversion } from '../../tools/library-ingest.mjs';
@@ -69,6 +70,11 @@ it('fails closed when the server secret is absent', async () => {
 it('stores the sources only, projects tags from the sidecar and a validated conversion, and skips a replay', async () => {
   const p = await plan(); const first = await upload(p);
   expect(first.status).toBe('stored'); expect(first.snapshot.piece.owner).toBe(INGEST_OWNER);
+  // The id is the service's, opaque and URL-safe, never the source identity; the source lives in its own columns.
+  expect(first.snapshot.piece.id).toMatch(/^[0-9a-f]{16}$/); expect(first.snapshot.piece.id).toBe(await pieceIdFor('soundslice', 'ABC'));
+  expect(first.snapshot.piece).toMatchObject({ source_kind: 'soundslice', source_id: 'ABC' });
+  const named = await app.request('/api/library/ingest', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: await form({ ...p.manifest, id: 'chosen' }, p.files) }, env);
+  expect(named.status).toBe(400);
   // Nothing derived is stored: the .gp and the MusicXML, no MNX.
   expect(first.snapshot.renditions.map((r: {format: string}) => r.format).sort()).toEqual(['gp', 'musicxml']);
   expect(first.snapshot.recordings).toHaveLength(2);
@@ -106,17 +112,17 @@ it('refuses a canonical that is not the Soundslice .gp, in the tool and in the W
   const p = await plan(); const first = await upload(p);
   const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
   const xml = first.snapshot.renditions.find((r: {format: string}) => r.format === 'musicxml');
-  await lib.writePiece(INGEST_OWNER, { id: p.manifest.id, expected_revision: 0, canonical: { mode: 'replace', rendition_id: xml.id } });
+  await lib.writePiece(INGEST_OWNER, { id: first.snapshot.piece.id, expected_revision: 0, canonical: { mode: 'replace', rendition_id: xml.id } });
   await expect(upload(await plan())).rejects.toThrow('not the Soundslice .gp');
   const fresh = await plan(); fresh.manifest.canonical.rendition_id = fresh.manifest.renditions.find((r: {format: string}) => r.format === 'musicxml').id;
-  fresh.manifest.id = 'soundslice:XYZ'; fresh.manifest.source = { kind: 'soundslice', id: 'XYZ' };
+  fresh.manifest.source = { kind: 'soundslice', id: 'XYZ' };
   const response = await app.request('/api/library/ingest', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: await form(fresh.manifest, fresh.files) }, env);
   expect(response.status).toBe(409);
 });
 it('preserves renamed lists and missing recordings across a replay', async () => {
-  const p = await plan(); await upload(p);
+  const p = await plan(); const first = await upload(p);
   const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
-  await lib.writePiece(INGEST_OWNER, { id: p.manifest.id, expected_revision: 0,
+  await lib.writePiece(INGEST_OWNER, { id: first.snapshot.piece.id, expected_revision: 0,
     rename_tags: [{ dimension: 'unknown', value: 'Folder / List', to_dimension: 'collection', to_value: 'Renamed' }] });
   await rm(join(directory,'Song_ABC.mp3'));
   const second = await upload(await plan());
@@ -145,7 +151,7 @@ it('rejects stale revisions and tampered uploads without partial rows', async ()
   p.manifest.expected_revision = 0; p.manifest.renditions[0].sha256 = '0'.repeat(64);
   const bad = await app.request('/api/library/ingest', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: await form(p.manifest, p.files) }, env);
   expect(bad.status).toBe(400);
-  expect((await new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET).getPiece(INGEST_OWNER, p.manifest.id))?.piece.revision).toBe(0);
+  expect((await new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET).getPiece(INGEST_OWNER, await pieceIdFor('soundslice', 'ABC')))?.piece.revision).toBe(0);
 });
 it('bounds request bodies and rejects malformed manifests', async () => {
   const response = await app.request('/api/library/ingest', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data; boundary=x', 'Content-Length': String(MAX_INGEST_BYTES+1) }, body: 'x' }, env);

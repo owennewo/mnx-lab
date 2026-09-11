@@ -2,7 +2,7 @@
 import type { FormData as MultipartFormData } from '@cloudflare/workers-types/2023-07-01';
 import { Hono } from 'hono';
 import type { Env } from '../env.ts';
-import { Library, LibraryError, type Json, type PieceWrite, type RenditionInput, type RecordingInput, type DerivedTag } from '../library/index.ts';
+import { Library, LibraryError, pieceIdFor, type Json, type PieceWrite, type RenditionInput, type RecordingInput, type DerivedTag } from '../library/index.ts';
 import { accessIdentity, AccessError, type LibraryUser } from '../library/access.ts';
 
 export const INGEST_OWNER = 'operator';
@@ -83,14 +83,14 @@ library.get('/ingest/:sourceId', async c => {
 });
 library.post('/ingest', async c => {
   const { form, manifest } = await multipart(c.req.raw);
-  const allowed = ['id','expected_revision','source','renditions','recordings','tags','derived_tags','canonical'];
+  const allowed = ['expected_revision','source','renditions','recordings','tags','derived_tags','canonical'];
   if (Object.keys(manifest).some(k => !allowed.includes(k))) invalid('Unsupported manifest field');
   const source = object(manifest.source);
   if (source.kind !== 'soundslice') invalid('Only Soundslice operator imports are supported');
   const sourceId = text(source.id);
   if (!/^[a-zA-Z0-9]+$/.test(sourceId)) invalid('Invalid slice id');
-  const id = text(manifest.id);
-  if (id !== `soundslice:${sourceId}`) invalid('Piece id must match source identity');
+  // The service names the piece; the manifest cannot (an `id` field is refused above).
+  const id = await pieceIdFor('soundslice', sourceId);
   const revision = manifest.expected_revision;
   if (revision !== null && (!Number.isSafeInteger(revision) || Number(revision) < 0)) invalid('Invalid revision');
   const readBlob = async (row: Record<string, unknown>) => {

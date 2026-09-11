@@ -8,6 +8,15 @@ import {
 } from './types.ts';
 export * from './types.ts';
 
+/** A piece's id, derived by the SERVICE from its source identity: opaque and
+ *  URL-safe (a reader's `#/piece/<id>` never names the source system), yet
+ *  deterministic, so a replayed import lands on the same row. The source
+ *  itself lives in `source_kind`/`source_id`, unique per owner. */
+export async function pieceIdFor(sourceKind: string, sourceId: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${sourceKind}\u0000${sourceId}`));
+  return [...new Uint8Array(digest)].slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 const same = (a: unknown, b: unknown) => json(a as Json) === json(b as Json);
 const tagKey = (t: { dimension: string; value: string }) => JSON.stringify([t.dimension, t.value]);
 function asserted(dimension: string, value: string) {

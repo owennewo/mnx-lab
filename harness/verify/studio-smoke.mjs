@@ -18,10 +18,11 @@ const sha256 = Buffer.from(await crypto.subtle.digest('SHA-256', bytes)).toStrin
 const headers = { Authorization: 'Bearer local-development-only', 'Cf-Access-Jwt-Assertion': session.machine };
 const before = await fetch(origin + '/api/library/ingest/StudioSmoke', { headers }); assert.equal(before.status,200);
 const { snapshot } = await before.json();
-const manifest = { id: 'soundslice:StudioSmoke', expected_revision: snapshot?.piece.revision ?? null,
+const manifest = { expected_revision: snapshot?.piece.revision ?? null,
   source: { kind: 'soundslice', id: 'StudioSmoke' }, renditions: [{ id: 'StudioSmoke-gp', format: 'gp', role: 'export', producer: 'soundslice-cli', producer_version: null, producer_options: null, filename: 'Sun-did-glide.gp', sha256, file: 'score' }], recordings: [], tags: [{ dimension: 'unknown', value: 'Studio collection', source_ref: 'test' }], canonical: { mode: 'initialize', rendition_id: 'StudioSmoke-gp' }, derived_tags: [{ dimension: 'title', value: 'Studio smoke piece', source_ref: 'sidecar' }, { dimension: 'artist', value: 'Synthetic fixture', source_ref: 'sidecar' }] };
 const form = new FormData(); form.set('manifest',JSON.stringify(manifest)); form.set('score',new Blob([bytes]),'Sun-did-glide.gp');
-assert.equal((await fetch(origin+'/api/library/ingest',{method:'POST',headers,body:form})).status,200);
+const stored = await fetch(origin+'/api/library/ingest',{method:'POST',headers,body:form}); assert.equal(stored.status,200);
+const pieceId = (await stored.json()).snapshot.piece.id; assert.match(pieceId, /^[0-9a-f]{16}$/);
 // The root is studio's.
 const rootResponse = await fetch(origin + '/', { redirect: 'manual' });
 assert.equal(rootResponse.status, 302); assert.equal(rootResponse.headers.get('location'), '/studio/');
@@ -52,7 +53,7 @@ try {
   await wait(`${library}.querySelector('li a')?.textContent.includes('Studio smoke piece') && !${library}.querySelector('[role=status]')`);
   // Open it: the viewer draws, the player is wired, the bar names the piece.
   await c.evaluate(`${library}.querySelector('li a').click()`);
-  await wait(`location.hash==='#/piece/soundslice%3AStudioSmoke'`);
+  await wait(`location.hash==='#/piece/${pieceId}'`);
   await wait(`!!${piece}?.querySelector('mnx-document-viewer')?.shadowRoot?.querySelector('svg')`);
   await wait(`${app}.querySelector('.title').textContent.includes('Studio smoke piece')`);
   assert.equal(await c.evaluate(`${app}.querySelector('footer').hidden`), false);

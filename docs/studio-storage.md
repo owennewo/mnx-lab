@@ -56,6 +56,12 @@ from a conversion it ran in *validation mode* and threw away — and sent with t
 the Worker accepts them and derives nothing itself. Changing the canonical pointer is a row
 update. (Rows of derived MNX stored before this decision remain, immutable and unused.)
 
+**Piece ids are the service's.** The Worker derives a piece's id from its source identity
+(the first 16 hex digits of a SHA-256 over kind and source id): opaque and URL-safe, so a
+reader's `#/piece/<id>` never names the source system, yet deterministic, so a replayed
+import lands on the same row. The source itself lives in `source_kind`/`source_id`. The
+schema's `-- ulid` comment predates this and is left as the migration wrote it.
+
 **The pointer is set explicitly and then belongs to the owner.** An import sets canonical
 only when the piece has none — for a Soundslice slice, to the Soundslice `.gp`, the most
 complete rendition on hand — and never moves it afterwards. A later import adds renditions;
