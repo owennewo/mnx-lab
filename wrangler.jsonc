@@ -3,12 +3,12 @@
   "name": "mnx-lab",
   "main": "worker/index.ts",
   "account_id": "e95cec11beeb0167dcd9f5c034f564ec",
-  // Studio storage: local in dev; bootstrap:storage records the real D1 UUID.
+  // Studio storage: local in dev; tools/bootstrap-storage.mjs records the real D1 UUID.
   "d1_databases": [
     {
       "binding": "LIBRARY_DB",
       "database_name": "mnx-studio-library",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "2e76025c-80d7-40b8-a2dd-c80f051b1867",
       "migrations_dir": "migrations",
       "remote": false
     }

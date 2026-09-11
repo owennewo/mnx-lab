@@ -56,7 +56,7 @@ export function bootstrap(configPath, run) {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
-    if (process.argv.length !== 2) throw new Error('Usage: npm run bootstrap:storage');
+    if (process.argv.length !== 2) throw new Error('Usage: node tools/bootstrap-storage.mjs');
     const configPath = resolve(root, 'wrangler.jsonc');
     const result = bootstrap(configPath, (args, accountId) => {
       console.log(`wrangler ${args.join(' ')}`);
