@@ -45,15 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[studio-library-navigation.md](proposed/studio-library-navigation.md)** — the library made
-  navigable: **Option A** from the design canvas — a rail where every dimension reads
-  `Artist: All` until opened, values with counts, sort as one click (Recent · Title · Artist),
-  a Tags sheet on the piece page and an alias page. Decisions locked 2026-09-11: recently
-  opened is a server-side `piece_views` table; favourites are the tag `favourite: yes`;
-  Soundslice lists ingest under `list`; aliases stay one-dimensional and become real
-  (applied by every read), cross-dimension aliases **rejected**. Backend is the browser's
-  first write routes, a facets query, sort, `remove_tags`, alias routes and an effective-tags
-  query threaded through the reads.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -165,6 +156,15 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-library-navigation.md](inprogress/studio-library-navigation.md)** — **backend built 2026-09-11, shell pending**: the library made
+  navigable: **Option A** from the design canvas — a rail where every dimension reads
+  `Artist: All` until opened, values with counts, sort as one click (Recent · Title · Artist),
+  a Tags sheet on the piece page and an alias page. Decisions locked 2026-09-11: recently
+  opened is a server-side `piece_views` table; favourites are the tag `favourite: yes`;
+  Soundslice lists ingest under `list`; aliases stay one-dimensional and become real
+  (applied by every read), cross-dimension aliases **rejected**. Backend is the browser's
+  first write routes, a facets query, sort, `remove_tags`, alias routes and an effective-tags
+  query threaded through the reads.
 - **[studio-storage-source-canonical.md](inprogress/studio-storage-source-canonical.md)** —
   **built 2026-09-11**, awaiting the deploy: **MNX is not yet a storage format.** The service
   holds what Soundslice exported and nothing derived; the ingest stores bytes only, asserts

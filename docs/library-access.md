@@ -77,11 +77,24 @@ missing piece), the studio counterpart of `library-smoke.mjs`.
 Never deploy `.dev.vars` or `LIBRARY_LOCAL_JWKS`. Do not copy private scores into public
 assets for testing. The harness uses synthetic scores with local D1/R2 and signed keys.
 
+## Browser writes
+
+The signed-in person's own pieces only, JSON bodies only (a non-JSON write is 415 — a
+cross-site form cannot send one). `POST /pieces/:id/opened` records the view.
+`PATCH /pieces/:id/tags` takes `expected_revision` plus `add`, `remove` and `rename` of
+asserted tags (a derived dimension is refused; a stale revision is 409). `GET /aliases`,
+`PUT /aliases` `{dimension, raw_value, canonical_value}` and `DELETE /aliases`
+`{dimension, raw_value}` manage how a value read from the music is shown; each alias
+reports the pieces it touches. Imported Soundslice lists carry the `list` dimension.
+
 ## Canonical reads
 
-`GET /pieces` accepts up to twelve repeated `tag=dimension:value` filters (AND), and
-an `after` cursor; pages contain at most fifty pieces. `GET /tags?q=prefix` completes
-literal tag prefixes. `GET /pieces/:id` returns an owner-scoped snapshot;
+`GET /pieces` accepts up to twelve repeated `tag=dimension:value` filters (AND), a `sort`
+(`recent` default, `title`, `artist`) and an `after` offset; pages contain at most fifty
+pieces, each with its shown title and artist, favourite flag and last-opened time.
+`GET /facets` returns every shown dimension:value among the matching pieces with counts.
+`GET /tags?q=prefix[&dimension=d]` completes literal tag prefixes, with counts. Filters,
+facets, completion and the shown title/artist all see aliases applied. `GET /pieces/:id` returns an owner-scoped snapshot;
 `GET /pieces/:id/canonical` streams the canonical file; `GET /renditions/:id` streams an
 owner-scoped attachment. All responses are private/no-store. Missing and other-owner
 objects are indistinguishable. No client selects an owner or raw R2 key.

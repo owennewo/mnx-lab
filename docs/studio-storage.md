@@ -205,6 +205,21 @@ Notes on the choices:
   and the write fails if the piece has moved. It stops a stale ingest run from overwriting a
   newer canonical choice today, and it is the same mechanism studio's saves will need.
 
+## Recently opened — `piece_views` (studio-library-navigation, 2026-09-11)
+
+One row per owner and piece, upserted when a piece page opens, read by the library's
+`recent` sort. Server-side rather than per browser so the order holds across devices and
+survives a cleared browser. Migration `0003_piece_views.sql`:
+
+```sql
+CREATE TABLE piece_views (
+  owner     TEXT NOT NULL,
+  piece_id  TEXT NOT NULL REFERENCES pieces(id),
+  opened_at TEXT NOT NULL,
+  PRIMARY KEY (owner, piece_id)
+);
+```
+
 ## Worker library API (item 2)
 
 `worker/library/index.ts` exports `Library(db, bucket)`. Callers
@@ -214,7 +229,18 @@ one consistent snapshot; `findPiece` resolves upstream identity; `listPieces`,
 `readRendition`, `readCanonical` (the canonical rendition's bytes, any format) and the
 alias methods are owner-scoped. `writePiece` accepts `derived_tags`, the projection: when
 present it replaces the piece's derived tags wholesale, when absent they are retained;
-only derived dimensions are accepted, each with a `source_ref`.
+only derived dimensions are accepted, each with a `source_ref`. `remove_tags` drops
+asserted tags (a missing one is a no-op, so a toggle is idempotent); derived tags are never
+removed that way.
+
+**Aliases apply on read.** Every read a person sees — `browsePieces` (with `sort`
+`recent` | `title` | `artist` and offset paging), the tag filters, `facets` (every shown
+dimension:value among the matching pieces, with counts) and `completeTags` (with counts,
+optionally within one dimension) — goes through one *effective tags* query: the stored tag
+left-joined to `tag_aliases` on owner, dimension and value, the canonical value winning.
+`Library.shown()` applies the same in code to a snapshot's tags so a piece page can draw
+the stored value and how it is shown. `recordView` upserts `piece_views`; `deleteAlias`
+removes one alias; `listAliases` reports how many pieces each currently corrects.
 
 `writePiece(owner, input)` is the only piece mutation entry. Caller-supplied ids are
 stable across retries. `expected_revision: null` creates a piece at revision 0; existing

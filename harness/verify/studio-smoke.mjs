@@ -19,7 +19,7 @@ const headers = { Authorization: 'Bearer local-development-only', 'Cf-Access-Jwt
 const before = await fetch(origin + '/api/library/ingest/StudioSmoke', { headers }); assert.equal(before.status,200);
 const { snapshot } = await before.json();
 const manifest = { expected_revision: snapshot?.piece.revision ?? null,
-  source: { kind: 'soundslice', id: 'StudioSmoke' }, renditions: [{ id: 'StudioSmoke-gp', format: 'gp', role: 'export', producer: 'soundslice-cli', producer_version: null, producer_options: null, filename: 'Sun-did-glide.gp', sha256, file: 'score' }], recordings: [], tags: [{ dimension: 'unknown', value: 'Studio collection', source_ref: 'test' }], canonical: { mode: 'initialize', rendition_id: 'StudioSmoke-gp' }, derived_tags: [{ dimension: 'title', value: 'Studio smoke piece', source_ref: 'sidecar' }, { dimension: 'artist', value: 'Synthetic fixture', source_ref: 'sidecar' }] };
+  source: { kind: 'soundslice', id: 'StudioSmoke' }, renditions: [{ id: 'StudioSmoke-gp', format: 'gp', role: 'export', producer: 'soundslice-cli', producer_version: null, producer_options: null, filename: 'Sun-did-glide.gp', sha256, file: 'score' }], recordings: [], tags: [{ dimension: 'list', value: 'Studio collection', source_ref: 'test' }], canonical: { mode: 'initialize', rendition_id: 'StudioSmoke-gp' }, derived_tags: [{ dimension: 'title', value: 'Studio smoke piece', source_ref: 'sidecar' }, { dimension: 'artist', value: 'Synthetic fixture', source_ref: 'sidecar' }] };
 const form = new FormData(); form.set('manifest',JSON.stringify(manifest)); form.set('score',new Blob([bytes]),'Sun-did-glide.gp');
 const stored = await fetch(origin+'/api/library/ingest',{method:'POST',headers,body:form}); assert.equal(stored.status,200);
 const pieceId = (await stored.json()).snapshot.piece.id; assert.match(pieceId, /^[0-9a-f]{16}$/);
@@ -46,10 +46,10 @@ try {
   await c.send('Page.navigate',{url:origin+'/studio/#/'}); await c.send('Page.reload');
   await wait(`${app}?.querySelector('.who')?.textContent === 'local@example.test'`);
   await wait(`${library}?.textContent.includes('Studio smoke piece')`);
-  await c.evaluate(`${library}.querySelector('input').value='unknown:Studio collection'; ${library}.querySelector('input').dispatchEvent(new Event('input'));`);
-  await wait(`${library}.querySelector('datalist option')?.value==='unknown:Studio collection'`);
+  await c.evaluate(`${library}.querySelector('input').value='list:Studio collection'; ${library}.querySelector('input').dispatchEvent(new Event('input'));`);
+  await wait(`${library}.querySelector('datalist option')?.value==='list:Studio collection'`);
   await c.evaluate(`${library}.querySelector('form').dispatchEvent(new Event('submit',{cancelable:true}));`);
-  await wait(`${library}.querySelector('.chips button')?.textContent.includes('unknown:Studio collection')`);
+  await wait(`${library}.querySelector('.chips button')?.textContent.includes('list:Studio collection')`);
   await wait(`${library}.querySelector('li a')?.textContent.includes('Studio smoke piece') && !${library}.querySelector('[role=status]')`);
   // Open it: the viewer draws, the player is wired, the bar names the piece.
   await c.evaluate(`${library}.querySelector('li a').click()`);

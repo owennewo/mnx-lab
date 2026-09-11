@@ -23,6 +23,11 @@ export interface Tag {
   origin: 'derived' | 'asserted'; sort_key: number | null; source_ref: string | null;
 }
 export interface Alias { owner: string; dimension: string; raw_value: string; canonical_value: string }
+/** An alias with the number of pieces whose stored tag it currently corrects. */
+export interface AliasReport extends Alias { pieces: number }
+/** A facet: one effective dimension:value and how many pieces (under the current filters) carry it. */
+export interface Facet { dimension: string; value: string; pieces: number }
+export type PieceSort = 'recent' | 'title' | 'artist';
 export interface Snapshot { piece: Piece; renditions: Rendition[]; recordings: Recording[]; tags: Tag[] }
 export interface BlobInput { content: ArrayBuffer; sha256?: string }
 export interface RenditionInput extends BlobInput {
@@ -52,6 +57,8 @@ export interface PieceWrite {
   /** When present, REPLACES the piece's derived projection wholesale; when
    *  absent, the previous projection is retained. Rebuildable, so replaceable. */
   derived_tags?: DerivedTag[];
+  /** Asserted tags to drop; a tag that is not there is a no-op, so a toggle is idempotent. */
+  remove_tags?: { dimension: string; value: string }[];
   canonical?: { mode: 'initialize' | 'replace'; rendition_id: string };
   rename_tags?: { dimension: string; value: string; to_dimension: string; to_value: string }[];
 }

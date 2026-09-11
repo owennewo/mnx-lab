@@ -2,7 +2,7 @@
 import type { FormData as MultipartFormData } from '@cloudflare/workers-types/2023-07-01';
 import { Hono } from 'hono';
 import type { Env } from '../env.ts';
-import { Library, LibraryError, pieceIdFor, type Json, type PieceWrite, type RenditionInput, type RecordingInput, type DerivedTag } from '../library/index.ts';
+import { Library, LibraryError, pieceIdFor, type Json, type PieceWrite, type PieceSort, type RenditionInput, type RecordingInput, type DerivedTag } from '../library/index.ts';
 import { accessIdentity, AccessError, type LibraryUser } from '../library/access.ts';
 
 export const INGEST_OWNER = 'operator';
@@ -67,6 +67,10 @@ library.use('*', async (c, next) => {
   catch (error) {
     const status = error instanceof AccessError ? error.status : 503;
     return c.json({ error: status === 403 ? 'User is not permitted' : 'Authentication required' }, status);
+  }
+  // A browser write is a same-origin fetch with a JSON body; a cross-site form cannot say that.
+  if (!machine && c.req.method !== 'GET' && !(c.req.header('Content-Type') ?? '').startsWith('application/json')) {
+    return c.json({ error: 'Writes are JSON' }, 415);
   }
   await next();
 });
@@ -138,29 +142,80 @@ library.post('/ingest', async c => {
     source: { kind: 'soundslice', id: sourceId, url: `https://www.soundslice.com/slices/${sourceId}/` }, renditions, recordings,
     canonical: { mode: 'initialize', rendition_id: canonicalId },
     tags: array(manifest.tags).map(value => { const t = object(value);
-      if (t.dimension !== 'unknown') invalid('Imported lists use the unknown dimension');
-      return { dimension: 'unknown', value: text(t.value), source_ref: text(t.source_ref) };
+      if (t.dimension !== 'list') invalid('Imported lists use the list dimension');
+      return { dimension: 'list', value: text(t.value), source_ref: text(t.source_ref) };
     }), ...(derived ? { derived_tags: derived } : {}) };
   return c.json({ snapshot: await lib.writePiece(INGEST_OWNER, input) });
 });
 
 function reader(c: { env: Env }) { return new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET); }
 library.get('/me', c => c.json({ user: c.get('libraryUser') }));
-library.get('/pieces', async c => {
+function filtersOf(c: { req: { queries(name: string): string[] | undefined } }) {
   const filters = c.req.queries('tag') ?? [];
-  if (filters.length > 12 || filters.some(t => t.length > 512 || !t.includes(':'))) return c.json({ error: 'Invalid tag filters' }, 400);
+  if (filters.length > 12 || filters.some(t => t.length > 512 || !t.includes(':'))) invalid('Invalid tag filters');
+  return filters;
+}
+async function body(c: { req: { json(): Promise<unknown> } }): Promise<Record<string, unknown>> {
+  try { return object(await c.req.json()); } catch { invalid('Expected a JSON object'); }
+}
+const SORTS: PieceSort[] = ['recent', 'title', 'artist'];
+library.get('/pieces', async c => {
   const after = c.req.query('after') ?? '';
-  if (after.length > 512) return c.json({ error: 'Invalid cursor' }, 400);
-  return c.json(await reader(c).browsePieces(c.get('libraryUser').id, filters, after));
+  if (after.length > 32) invalid('Invalid cursor');
+  const sort = c.req.query('sort') ?? 'recent';
+  if (!SORTS.includes(sort as PieceSort)) invalid('Invalid sort');
+  return c.json(await reader(c).browsePieces(c.get('libraryUser').id, filtersOf(c), after, sort as PieceSort));
 });
+// The rail: every shown dimension:value among the matching pieces, with counts.
+library.get('/facets', async c => c.json(await reader(c).facets(c.get('libraryUser').id, filtersOf(c))));
 library.get('/tags', async c => {
   const prefix = c.req.query('q') ?? '';
-  if (prefix.length > 512) return c.json({ error: 'Invalid prefix' }, 400);
-  return c.json({ tags: await reader(c).completeTags(c.get('libraryUser').id, prefix) });
+  const dimension = c.req.query('dimension');
+  if (prefix.length > 512 || (dimension !== undefined && (!dimension || dimension.length > 128))) invalid('Invalid prefix');
+  return c.json({ tags: await reader(c).completeTags(c.get('libraryUser').id, prefix, dimension) });
 });
 library.get('/pieces/:id', async c => {
-  const snapshot = await reader(c).getPiece(c.get('libraryUser').id, c.req.param('id'));
-  return snapshot ? c.json({ snapshot }) : c.json({ error: 'Piece not found' }, 404);
+  const lib = reader(c); const owner = c.get('libraryUser').id;
+  const snapshot = await lib.getPiece(owner, c.req.param('id'));
+  if (!snapshot) return c.json({ error: 'Piece not found' }, 404);
+  // Tags carry the stored value and how it is shown, so the sheet can draw both.
+  return c.json({ snapshot: { ...snapshot, tags: Library.shown(snapshot.tags, await lib.listAliases(owner)) } });
+});
+// The piece page says it opened; the recent sort reads it.
+library.post('/pieces/:id/opened', async c => {
+  await reader(c).recordView(c.get('libraryUser').id, c.req.param('id'));
+  return c.body(null, 204);
+});
+// Your own tags: add, remove, rename — never a derived one (the module refuses).
+library.patch('/pieces/:id/tags', async c => {
+  const owner = c.get('libraryUser').id; const id = c.req.param('id');
+  const change = await body(c);
+  if (Object.keys(change).some(k => !['expected_revision', 'add', 'remove', 'rename'].includes(k))) invalid('Unsupported field');
+  if (!Number.isSafeInteger(change.expected_revision) || Number(change.expected_revision) < 0) invalid('Expected the piece revision');
+  const pair = (v: unknown) => { const t = object(v); return { dimension: text(t.dimension), value: text(t.value) }; };
+  const input: PieceWrite = { id, expected_revision: change.expected_revision as number,
+    tags: change.add === undefined ? [] : array(change.add).map(pair),
+    remove_tags: change.remove === undefined ? [] : array(change.remove).map(pair),
+    rename_tags: change.rename === undefined ? [] : array(change.rename).map(v => { const r = object(v);
+      return { ...pair(r.from), to_dimension: text(object(r.to).dimension), to_value: text(object(r.to).value) }; }) };
+  const lib = reader(c);
+  if (!await lib.getPiece(owner, id)) return c.json({ error: 'Piece not found' }, 404);
+  const snapshot = await lib.writePiece(owner, input);
+  return c.json({ snapshot: { ...snapshot, tags: Library.shown(snapshot.tags, await lib.listAliases(owner)) } });
+});
+// Aliases: how a value read from the music is shown, library-wide.
+library.get('/aliases', async c => c.json({ aliases: await reader(c).listAliases(c.get('libraryUser').id) }));
+library.put('/aliases', async c => {
+  const a = await body(c);
+  if (Object.keys(a).some(k => !['dimension', 'raw_value', 'canonical_value'].includes(k))) invalid('Unsupported field');
+  await reader(c).setAlias(c.get('libraryUser').id, text(a.dimension), text(a.raw_value), text(a.canonical_value));
+  return c.json({ aliases: await reader(c).listAliases(c.get('libraryUser').id) });
+});
+library.delete('/aliases', async c => {
+  const a = await body(c);
+  if (Object.keys(a).some(k => !['dimension', 'raw_value'].includes(k))) invalid('Unsupported field');
+  await reader(c).deleteAlias(c.get('libraryUser').id, text(a.dimension), text(a.raw_value));
+  return c.json({ aliases: await reader(c).listAliases(c.get('libraryUser').id) });
 });
 // The canonical file, as stored, in whatever format the owner regards as the
 // source. The reader converts; the service never does.

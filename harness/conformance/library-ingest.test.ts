@@ -48,8 +48,10 @@ beforeEach(async () => {
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: token };
   const identity = await testIdentity(); Object.assign(env, identity.config); assertion = await identity.sign({}, true);
   await env.LIBRARY_DB.exec("CREATE TABLE users(id TEXT PRIMARY KEY,email TEXT,active INTEGER); INSERT INTO users VALUES('operator','owner@example.test',1)");
-  const sql = await readFile(new URL('../../migrations/0001_library.sql', import.meta.url),'utf8');
-  await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=CREATE\b)/).map(s => env.LIBRARY_DB.prepare(s)));
+  for (const name of ['0001_library.sql', '0003_piece_views.sql']) {
+    const sql = await readFile(new URL(`../../migrations/${name}`, import.meta.url),'utf8');
+    await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=CREATE\b)/).map(s => env.LIBRARY_DB.prepare(s)));
+  }
 }, 15000);
 afterEach(async () => { await mf?.dispose(); await rm(directory, { recursive: true, force: true }); });
 
@@ -81,7 +83,7 @@ it('stores the sources only, projects tags from the sidecar and a validated conv
   expect(first.snapshot.renditions.find((r: {id: string}) => r.id === first.snapshot.piece.canonical_rendition_id).format).toBe('gp');
   expect(first.validation.report.map((e: {valid: boolean}) => e.valid)).toEqual([true, true]);
   expect(first.snapshot.tags.map((t: {dimension: string; value: string; origin: string; source_ref: string}) => `${t.dimension}:${t.value}:${t.origin}:${t.source_ref}`)).toEqual([
-    'artist:Sidecar artist:derived:sidecar', 'capo:3:derived:guitarpro-mnx@test-version', 'title:Sidecar song:derived:sidecar', 'unknown:Folder / List:asserted:L1']);
+    'artist:Sidecar artist:derived:sidecar', 'capo:3:derived:guitarpro-mnx@test-version', 'list:Folder / List:asserted:L1', 'title:Sidecar song:derived:sidecar']);
   let posts = 0;
   const second = await uploadPlan(p, 'http://localhost', token, (input, init) => { if (init?.method === 'POST') posts++; return fetcher(input, init); }, {}, { converters });
   expect(second.status).toBe('skipped'); expect(posts).toBe(0); expect(second.snapshot).toEqual(first.snapshot);
@@ -105,7 +107,7 @@ it('stores a slice whose conversion does not validate, reports it, and projects 
   expect(result.status).toBe('stored');
   expect(result.validation.report.every((e: {valid: boolean}) => !e.valid)).toBe(true);
   expect(result.validation.report[0].errors.join(' ')).toContain('duration');
-  expect(result.snapshot.tags.map((t: {dimension: string}) => t.dimension).sort()).toEqual(['artist', 'title', 'unknown']);
+  expect(result.snapshot.tags.map((t: {dimension: string}) => t.dimension).sort()).toEqual(['artist', 'list', 'title']);
   expect(validateConversion(score)).toEqual([]);
 });
 it('refuses a canonical that is not the Soundslice .gp, in the tool and in the Worker', async () => {
@@ -123,7 +125,7 @@ it('preserves renamed lists and missing recordings across a replay', async () =>
   const p = await plan(); const first = await upload(p);
   const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
   await lib.writePiece(INGEST_OWNER, { id: first.snapshot.piece.id, expected_revision: 0,
-    rename_tags: [{ dimension: 'unknown', value: 'Folder / List', to_dimension: 'collection', to_value: 'Renamed' }] });
+    rename_tags: [{ dimension: 'list', value: 'Folder / List', to_dimension: 'collection', to_value: 'Renamed' }] });
   await rm(join(directory,'Song_ABC.mp3'));
   const second = await upload(await plan());
   expect(second.status).toBe('skipped');

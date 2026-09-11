@@ -1,8 +1,8 @@
 # The library, navigable — a rail of dimensions, tags you can edit, aliases that apply
 
-> **Status: proposed 2026-09-11.** Studio's second item, on the shell
-> [studio-shell.md](../inprogress/studio-shell.md) built the same day and the source-only
-> library of [studio-storage-source-canonical.md](../inprogress/studio-storage-source-canonical.md).
+> **Status: backend built 2026-09-11; shell pending** (build record at the end). Studio's
+> second item, on the shell [studio-shell.md](studio-shell.md) built the same day and the
+> source-only library of [studio-storage-source-canonical.md](studio-storage-source-canonical.md).
 > Design: the canvas at <https://claude.ai/code/artifact/38c5c7a0-964e-444c-b221-6fe47da09397>,
 > **Option A** chosen from four directions, plus the *Piece — Tags sheet* and *Tag aliases*
 > boards, which pair with it unchanged. Implementation loop.
@@ -113,3 +113,38 @@ validation. No converter is involved anywhere.
 
 Cross-dimension aliases (rejected above), editing the music, sharing, sync, and any
 change to the workbench.
+
+## Build record
+
+### Backend — 2026-09-11
+
+Built as listed, in one worktree, with two small choices worth recording:
+
+- **Paging is by offset now.** The browse cursor was the piece id, which works only when
+  the list is ordered by id — and the id is an opaque hash. With `sort` the cursor is the
+  number of rows already seen (`after=50`), opaque to the client as before.
+- **The snapshot's tags carry both values.** `GET /pieces/:id` returns each tag with its
+  stored `value` and how it is `shown`, applied in code from the alias list; the browse,
+  filter, facet and completion reads apply the same aliases in SQL through one
+  *effective tags* query. A tag filter therefore matches the shown value, never the stored
+  one — filtering by an artist's uncorrected spelling finds nothing once an alias exists.
+
+What is here: migration `0003_piece_views.sql`; `Library` gains `facets`, `recordView`,
+`deleteAlias`, `Library.shown`, counts on `listAliases` and `completeTags`, `sort` and
+offset paging on `browsePieces`, and `remove_tags` on `writePiece`; routes `GET /facets`,
+`GET /pieces?sort=`, `GET /tags?dimension=`, `POST /pieces/:id/opened`,
+`PATCH /pieces/:id/tags`, `GET|PUT|DELETE /aliases`, with a JSON-only guard on every
+browser write; the ingest names lists `list`; the typed client has a method for each.
+Covered by the library and access suites (owner isolation on every new route, the 415
+guard, the 409 on a stale revision, aliases applied across browse/filters/facets/
+completion, recent-sort ordering, idempotent remove). Docs updated.
+
+**Owner's steps before the shell lands**: `npx wrangler d1 migrations apply
+mnx-studio-library --remote` (the views table), deploy, and rename the nine stored lists:
+`UPDATE tags SET dimension='list' WHERE dimension='unknown'` — after which the ingest's
+replay is still a no-op.
+
+### Shell — pending
+
+The rail, the sort control, the Tags sheet, the alias page, and the piece page posting
+`opened`. Option A as drawn.

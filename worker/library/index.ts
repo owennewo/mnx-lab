@@ -3,7 +3,7 @@ import type { D1Database, D1PreparedStatement, R2Bucket } from '@cloudflare/work
 import { describeBlob, storeBlob, type PreparedBlob } from './blobs.ts';
 import { isDerivedDimension, parseMnx } from './tags.ts';
 import {
-  LibraryError, json, requireText, type Alias, type Json, type Piece, type PieceWrite,
+  LibraryError, json, requireText, type Alias, type AliasReport, type Facet, type Json, type Piece, type PieceSort, type PieceWrite,
   type Recording, type Rendition, type Snapshot, type Tag
 } from './types.ts';
 export * from './types.ts';
@@ -18,6 +18,15 @@ export async function pieceIdFor(sourceKind: string, sourceId: string): Promise<
 }
 
 const same = (a: unknown, b: unknown) => json(a as Json) === json(b as Json);
+/** Tags as they are SHOWN: an alias on (owner, dimension, stored value) wins. Every
+ *  read that a person sees goes through this — browse, filters, facets, completion —
+ *  so an alias set once applies everywhere, and the stored tag never changes. */
+const EFFECTIVE_TAGS = `SELECT t.owner, t.piece_id, t.dimension, t.value AS raw_value, COALESCE(a.canonical_value, t.value) AS value, t.origin, t.source_ref
+  FROM tags t LEFT JOIN tag_aliases a ON a.owner=t.owner AND a.dimension=t.dimension AND a.raw_value=t.value`;
+const PAGE = 50;
+export function parseFilters(filters: string[]): [string, string][] {
+  return filters.map(t => { const colon = t.indexOf(':'); if (colon <= 0) throw new LibraryError('invalid', 'A filter is dimension:value'); return [t.slice(0, colon), t.slice(colon + 1)]; });
+}
 const tagKey = (t: { dimension: string; value: string }) => JSON.stringify([t.dimension, t.value]);
 function asserted(dimension: string, value: string) {
   requireText(dimension, 'dimension'); requireText(value, 'value');
@@ -56,20 +65,60 @@ export class Library {
     return (await this.statement('SELECT * FROM pieces WHERE owner=? ORDER BY id', owner).all<Piece>()).results;
   }
 
-  async browsePieces(owner: string, filters: string[], after: string) {
-    const clauses = filters.map(() => `EXISTS (SELECT 1 FROM tags t WHERE t.owner=p.owner AND t.piece_id=p.id AND t.dimension=? AND t.value=?)`);
-    const values = filters.flatMap(t => { const colon = t.indexOf(':'); return [t.slice(0, colon), t.slice(colon + 1)]; });
-    const rows = (await this.statement(`SELECT p.*,
-      (SELECT value FROM tags WHERE owner=p.owner AND piece_id=p.id AND dimension='title' ORDER BY value LIMIT 1) AS title,
-      (SELECT value FROM tags WHERE owner=p.owner AND piece_id=p.id AND dimension='artist' ORDER BY value LIMIT 1) AS artist
-      FROM pieces p WHERE p.owner=? AND p.id>? ${clauses.length ? 'AND ' + clauses.join(' AND ') : ''} ORDER BY p.id LIMIT 51`, owner, after, ...values).all<Piece & { title: string | null; artist: string | null }>()).results;
-    return { pieces: rows.slice(0, 50), next: rows.length > 50 ? rows[49].id : null };
+  /** The WHERE for "pieces matching every filter", over effective (aliased) values. */
+  private filtered(owner: string, filters: string[]) {
+    const pairs = parseFilters(filters);
+    const clauses = pairs.map(() => `EXISTS (SELECT 1 FROM (${EFFECTIVE_TAGS}) e WHERE e.owner=p.owner AND e.piece_id=p.id AND e.dimension=? AND e.value=?)`);
+    return { where: `p.owner=? ${clauses.length ? 'AND ' + clauses.join(' AND ') : ''}`, values: [owner, ...pairs.flat()] };
   }
 
-  async completeTags(owner: string, prefix: string) {
-    // substr equality treats SQL wildcard characters literally.
-    return (await this.statement(`SELECT DISTINCT dimension,value FROM tags WHERE owner=?
-      AND substr(dimension || ':' || value,1,length(?))=? ORDER BY dimension,value LIMIT 50`, owner, prefix, prefix).all<{ dimension: string; value: string }>()).results;
+  /** One page of pieces with their shown title and artist, their favourite flag and
+   *  when they were last opened. `after` is the number of rows already seen; the
+   *  sort decides the order, so an id cursor would not do. */
+  async browsePieces(owner: string, filters: string[], after: string, sort: PieceSort = 'recent') {
+    const offset = after === '' ? 0 : Number(after);
+    if (!Number.isSafeInteger(offset) || offset < 0) throw new LibraryError('invalid', 'Invalid cursor');
+    const { where, values } = this.filtered(owner, filters);
+    const shown = (dimension: string) => `(SELECT value FROM (${EFFECTIVE_TAGS}) e WHERE e.owner=p.owner AND e.piece_id=p.id AND e.dimension='${dimension}' ORDER BY value LIMIT 1)`;
+    const order = sort === 'title' ? 'title IS NULL, title COLLATE NOCASE, p.id' : sort === 'artist' ? 'artist IS NULL, artist COLLATE NOCASE, title COLLATE NOCASE, p.id'
+      : 'opened_at IS NULL, opened_at DESC, p.updated_at DESC, p.id';
+    const rows = (await this.statement(`SELECT p.*, ${shown('title')} AS title, ${shown('artist')} AS artist,
+      (SELECT opened_at FROM piece_views v WHERE v.owner=p.owner AND v.piece_id=p.id) AS opened_at,
+      EXISTS (SELECT 1 FROM tags t WHERE t.owner=p.owner AND t.piece_id=p.id AND t.dimension='favourite' AND t.value='yes') AS favourite
+      FROM pieces p WHERE ${where} ORDER BY ${order} LIMIT ${PAGE + 1} OFFSET ?`, ...values, offset)
+      .all<Piece & { title: string | null; artist: string | null; opened_at: string | null; favourite: number }>()).results;
+    const page = rows.slice(0, PAGE).map(r => ({ ...r, favourite: r.favourite === 1 }));
+    return { pieces: page, next: rows.length > PAGE ? String(offset + PAGE) : null };
+  }
+
+  /** Every shown dimension:value among the pieces matching the filters, with counts —
+   *  the rail's lines, its opened lists, and the "n of m" summary. */
+  async facets(owner: string, filters: string[]): Promise<{ total: number; facets: Facet[] }> {
+    const { where, values } = this.filtered(owner, filters);
+    const [count, rows] = await this.db.batch([
+      this.statement(`SELECT count(*) AS n FROM pieces p WHERE ${where}`, ...values),
+      this.statement(`SELECT e.dimension, e.value, count(DISTINCT e.piece_id) AS pieces FROM (${EFFECTIVE_TAGS}) e
+        WHERE e.piece_id IN (SELECT p.id FROM pieces p WHERE ${where}) AND e.owner=?
+        GROUP BY e.dimension, e.value ORDER BY e.dimension, pieces DESC, e.value COLLATE NOCASE`, ...values, owner)
+    ]);
+    return { total: Number((count.results[0] as { n: number }).n), facets: rows.results as Facet[] };
+  }
+
+  /** Completion for the search box and the Tags sheet: shown values, with counts,
+   *  optionally within one dimension. substr equality treats SQL wildcards literally. */
+  async completeTags(owner: string, prefix: string, dimension?: string): Promise<Facet[]> {
+    return (await this.statement(`SELECT e.dimension, e.value, count(DISTINCT e.piece_id) AS pieces FROM (${EFFECTIVE_TAGS}) e WHERE e.owner=?
+      ${dimension === undefined ? '' : 'AND e.dimension=? '}AND substr(e.dimension || ':' || e.value,1,length(?))=?
+      GROUP BY e.dimension, e.value ORDER BY e.dimension, e.value COLLATE NOCASE LIMIT 50`, owner, ...(dimension === undefined ? [] : [dimension]), prefix, prefix).all<Facet>()).results;
+  }
+
+  /** A piece was opened by this owner, now. The piece must be theirs. */
+  async recordView(owner: string, pieceId: string, now = new Date().toISOString()) {
+    requireText(owner, 'owner'); requireText(pieceId, 'piece id');
+    const piece = await this.statement('SELECT id FROM pieces WHERE owner=? AND id=?', owner, pieceId).first();
+    if (!piece) throw new LibraryError('not_found', 'Piece not found');
+    await this.statement(`INSERT INTO piece_views (owner,piece_id,opened_at) VALUES (?,?,?)
+      ON CONFLICT(owner,piece_id) DO UPDATE SET opened_at=excluded.opened_at`, owner, pieceId, now).run();
   }
 
   async readRendition(owner: string, id: string) {
@@ -91,9 +140,22 @@ export class Library {
     return { rendition, object, revision: snapshot.piece.revision };
   }
 
-  async listAliases(owner: string): Promise<Alias[]> {
+  async listAliases(owner: string): Promise<AliasReport[]> {
     requireText(owner, 'owner');
-    return (await this.statement('SELECT * FROM tag_aliases WHERE owner=? ORDER BY dimension,raw_value', owner).all<Alias>()).results;
+    return (await this.statement(`SELECT a.*, (SELECT count(DISTINCT t.piece_id) FROM tags t WHERE t.owner=a.owner AND t.dimension=a.dimension AND t.value=a.raw_value) AS pieces
+      FROM tag_aliases a WHERE a.owner=? ORDER BY a.dimension, a.raw_value`, owner).all<AliasReport>()).results;
+  }
+
+  async deleteAlias(owner: string, dimension: string, raw: string) {
+    requireText(owner, 'owner'); requireText(dimension, 'dimension'); requireText(raw, 'raw value');
+    await this.statement('DELETE FROM tag_aliases WHERE owner=? AND dimension=? AND raw_value=?', owner, dimension, raw).run();
+  }
+
+  /** Aliases applied in code, for a snapshot's tags: the stored value stays in
+   *  `value`; `shown` is what a person sees. */
+  static shown<T extends { dimension: string; value: string }>(tags: T[], aliases: Alias[]): (T & { shown: string })[] {
+    const map = new Map(aliases.map(a => [`${a.dimension}\u0000${a.raw_value}`, a.canonical_value]));
+    return tags.map(t => ({ ...t, shown: map.get(`${t.dimension}\u0000${t.value}`) ?? t.value }));
   }
 
   async setAlias(owner: string, dimension: string, raw: string, canonical: string) {
@@ -225,6 +287,10 @@ export class Library {
       const target = { ...old, dimension: rename.to_dimension, value: rename.to_value };
       if (tagKey(target) !== key && tags.has(tagKey(target))) throw new LibraryError('conflict', 'Tag rename collides with an existing tag');
       tags.delete(key); tags.set(tagKey(target), target);
+    }
+    for (const t of input.remove_tags ?? []) {
+      asserted(t.dimension, t.value);
+      tags.delete(tagKey(t));
     }
     for (const t of input.tags ?? []) {
       asserted(t.dimension, t.value);

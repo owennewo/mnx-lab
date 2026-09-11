@@ -164,7 +164,7 @@ export async function planIngest(inputDirectory) {
       if (typeof value === 'string' && value.trim()) sidecarTags.push({ dimension, value: value.trim(), source_ref: 'sidecar' });
     }
     const manifest = { expected_revision: null, source: { kind: 'soundslice', id: sourceId },
-      renditions, recordings, tags: (lists?.lists ?? []).map(l => ({ dimension: 'unknown', value: required(l.path, 'list path'), source_ref: required(l.id, 'list id') })),
+      renditions, recordings, tags: (lists?.lists ?? []).map(l => ({ dimension: 'list', value: required(l.path, 'list path'), source_ref: required(l.id, 'list id') })),
       canonical: { mode: 'initialize', rendition_id: canonical.id } };
     const bytes = [...files.values()].reduce((n,b) => n + b.byteLength, 0) + Buffer.byteLength(JSON.stringify(manifest));
     if (bytes > maxBytes - 65536) throw new Error(`Bundle ${sourceId} exceeds the 24 MiB request limit`);

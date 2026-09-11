@@ -1,5 +1,10 @@
 // Optional same-origin library access. No credentials or private documents are persisted.
-export interface LibraryPiece { id: string; title: string | null; artist: string | null }
+export interface LibraryPiece { id: string; title: string | null; artist: string | null; favourite: boolean; opened_at: string | null }
+export interface LibraryFacet { dimension: string; value: string; pieces: number }
+export interface LibraryAlias { dimension: string; raw_value: string; canonical_value: string; pieces: number }
+export interface ShownTag { dimension: string; value: string; shown: string; origin: 'derived' | 'asserted'; source_ref: string | null }
+export type LibrarySort = 'recent' | 'title' | 'artist';
+export interface TagChange { add?: { dimension: string; value: string }[]; remove?: { dimension: string; value: string }[]; rename?: { from: { dimension: string; value: string }; to: { dimension: string; value: string } }[] }
 export interface LibraryTag { dimension: string; value: string }
 export interface CanonicalFile { bytes: ArrayBuffer; format: string; filename: string; revision: number }
 export class LibraryRequestError extends Error {
@@ -20,10 +25,26 @@ export class LibraryClient {
     if (!r.headers.get('content-type')?.includes('application/json')) throw new LibraryRequestError(0);
     return r.json();
   }
+  private async send<T>(method: 'POST' | 'PATCH' | 'PUT' | 'DELETE', path: string, payload: unknown): Promise<T> {
+    let r: Response;
+    try { r = await this.transport(`/api/library${path}`, { method, body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', redirect: 'manual', signal: AbortSignal.timeout(15000) }); }
+    catch { throw new LibraryRequestError(0); }
+    if (r.type === 'opaqueredirect' || (r.status >= 300 && r.status < 400)) throw new LibraryRequestError(401);
+    if (!r.ok) throw new LibraryRequestError(r.status);
+    if (r.status === 204) return undefined as T;
+    if (!r.headers.get('content-type')?.includes('application/json')) throw new LibraryRequestError(0);
+    return r.json();
+  }
   me() { return this.get<{ user: { id: string; email: string } }>('/me'); }
-  piece(id: string) { return this.get<{ snapshot: { piece: { id: string; revision: number }; tags: { dimension: string; value: string }[] } }>(`/pieces/${encodeURIComponent(id)}`); }
-  pieces(tags: string[], after = '') { const q = new URLSearchParams({ after }); tags.forEach(t => q.append('tag', t)); return this.get<{ pieces: LibraryPiece[]; next: string | null }>(`/pieces?${q}`); }
-  tags(prefix: string) { return this.get<{ tags: LibraryTag[] }>(`/tags?${new URLSearchParams({ q: prefix })}`); }
+  facets(tags: string[]) { const q = new URLSearchParams(); tags.forEach(t => q.append('tag', t)); return this.get<{ total: number; facets: LibraryFacet[] }>(`/facets?${q}`); }
+  opened(id: string) { return this.send<void>('POST', `/pieces/${encodeURIComponent(id)}/opened`, {}); }
+  changeTags(id: string, revision: number, change: TagChange) { return this.send<{ snapshot: { piece: { id: string; revision: number }; tags: ShownTag[] } }>('PATCH', `/pieces/${encodeURIComponent(id)}/tags`, { expected_revision: revision, ...change }); }
+  aliases() { return this.get<{ aliases: LibraryAlias[] }>('/aliases'); }
+  setAlias(dimension: string, raw: string, canonical: string) { return this.send<{ aliases: LibraryAlias[] }>('PUT', '/aliases', { dimension, raw_value: raw, canonical_value: canonical }); }
+  deleteAlias(dimension: string, raw: string) { return this.send<{ aliases: LibraryAlias[] }>('DELETE', '/aliases', { dimension, raw_value: raw }); }
+  piece(id: string) { return this.get<{ snapshot: { piece: { id: string; revision: number }; tags: ShownTag[] } }>(`/pieces/${encodeURIComponent(id)}`); }
+  pieces(tags: string[], after = '', sort: LibrarySort = 'recent') { const q = new URLSearchParams({ after, sort }); tags.forEach(t => q.append('tag', t)); return this.get<{ pieces: LibraryPiece[]; next: string | null }>(`/pieces?${q}`); }
+  tags(prefix: string, dimension?: string) { const q = new URLSearchParams({ q: prefix }); if (dimension) q.set('dimension', dimension); return this.get<{ tags: LibraryFacet[] }>(`/tags?${q}`); }
   /** The canonical file as stored — a .gp for a Soundslice piece. The caller
    *  converts (src/importers); the service never does. */
   async canonical(id: string): Promise<CanonicalFile> {

@@ -12,6 +12,7 @@ let db: D1Database;
 let bucket: R2Bucket;
 let library: Library;
 const migration = readFileSync(new URL('../../migrations/0001_library.sql', import.meta.url), 'utf8');
+const views = readFileSync(new URL('../../migrations/0003_piece_views.sql', import.meta.url), 'utf8');
 const bytes = (text: string) => new TextEncoder().encode(text).buffer;
 function mnx(id: string, title = 'Title', extras: Partial<RenditionInput> = {}): RenditionInput {
   const doc = structuredClone(score);
@@ -32,7 +33,7 @@ beforeEach(async () => {
   db = await mf.getD1Database('DB');
   bucket = await mf.getR2Bucket('BUCKET');
   // Split only between this migration's CREATE statements, preserving the trigger body.
-  await db.batch(migration.replace(/--[^\n]*/g, '').trim().split(/;\s*(?=CREATE\b)/).map(sql => db.prepare(sql)));
+  await db.batch([migration, views].map(m => m.replace(/--[^\n]*/g, '').trim().split(/;\s*(?=CREATE\b)/).map(sql => db.prepare(sql))).flat());
   library = new Library(db, bucket);
 }, 15000);
 afterEach(async () => { await mf?.dispose(); });
@@ -41,7 +42,9 @@ it('keeps the migration equal to the documented five-table schema', async () => 
   const design = readFileSync(new URL('../../docs/studio-storage.md', import.meta.url), 'utf8').split('```sql\n')[1].split('```')[0];
   expect(migration.slice(migration.indexOf('\n') + 1)).toBe(design);
   const tables = await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_cf_%' ORDER BY name").all();
-  expect(tables.results.map(r => r.name)).toEqual(['pieces','recordings','renditions','tag_aliases','tags']);
+  expect(tables.results.map(r => r.name)).toEqual(['piece_views','pieces','recordings','renditions','tag_aliases','tags']);
+  const viewsDesign = readFileSync(new URL('../../docs/studio-storage.md', import.meta.url), 'utf8').split('```sql\n').slice(1).map(b => b.split('```')[0]).find(b => b.includes('piece_views'));
+  expect(views.slice(views.indexOf('CREATE'))).toBe(viewsDesign);
 });
 
 it('writes blobs and rows, stores the projected tags, and returns a true no-op on replay', async () => {
@@ -234,4 +237,49 @@ it.each(['root', 'part'])('rejects explicit null %s vendor metadata', async loca
   Object.assign(location==='root' ? doc : doc.parts[0], {_x:{mnxLab:null}});
   await expect(library.writePiece('alice',{...create(),renditions:[{...mnx('invalid'),content:bytes(JSON.stringify(doc))}]})).rejects.toMatchObject({code:'invalid'});
   expect(await library.listPieces('alice')).toEqual([]);
+});
+
+it('removes asserted tags idempotently, never derived ones', async () => {
+  await library.writePiece('alice', { ...create(), tags: [{ dimension: 'favourite', value: 'yes' }, { dimension: 'genre', value: 'Blues' }], derived_tags: [{ dimension: 'title', value: 'T', source_ref: 'sidecar' }] });
+  const once = await library.writePiece('alice', { id: 'piece', expected_revision: 0, remove_tags: [{ dimension: 'favourite', value: 'yes' }] });
+  expect(once.tags.map(t => `${t.dimension}:${t.value}`)).toEqual(['genre:Blues', 'title:T']);
+  const again = await library.writePiece('alice', { id: 'piece', expected_revision: 1, remove_tags: [{ dimension: 'favourite', value: 'yes' }] });
+  expect(again.piece.revision).toBe(1);
+  await expect(library.writePiece('alice', { id: 'piece', expected_revision: 1, remove_tags: [{ dimension: 'title', value: 'T' }] })).rejects.toMatchObject({ code: 'invalid' });
+});
+
+it('browses by shown values: aliases apply to titles, artists, filters, facets and completion', async () => {
+  const titled = (id: string, title: string, artist: string, extra: { dimension: string; value: string }[] = []) => library.writePiece('alice', { ...create(id), tags: extra,
+    derived_tags: [{ dimension: 'title', value: title, source_ref: 'sidecar' }, { dimension: 'artist', value: artist, source_ref: 'sidecar' }, { dimension: 'tuning-name', value: 'standard', source_ref: 'gp@1' }] });
+  await titled('a', 'These Days', 'Jackson Browne (Ole Kirkeng)', [{ dimension: 'list', value: 'Ole' }]);
+  await titled('b', 'Cruel Summer', 'Bananarama');
+  await titled('c', 'Take on me', 'A-Ha', [{ dimension: 'favourite', value: 'yes' }]);
+  await library.setAlias('alice', 'artist', 'Jackson Browne (Ole Kirkeng)', 'Jackson Browne');
+  const byArtist = await library.browsePieces('alice', [], '', 'artist');
+  expect(byArtist.pieces.map(p => `${p.artist}|${p.favourite}`)).toEqual(['A-Ha|true', 'Bananarama|false', 'Jackson Browne|false']);
+  expect((await library.browsePieces('alice', ['artist:Jackson Browne'], '')).pieces.map(p => p.id)).toEqual(['a']);
+  expect((await library.browsePieces('alice', ['artist:Jackson Browne (Ole Kirkeng)'], '')).pieces).toEqual([]);
+  const { total, facets } = await library.facets('alice', ['tuning-name:standard']);
+  expect(total).toBe(3);
+  expect(facets.filter(f => f.dimension === 'artist').map(f => `${f.value}:${f.pieces}`)).toEqual(['A-Ha:1', 'Bananarama:1', 'Jackson Browne:1']);
+  expect(facets.find(f => f.dimension === 'tuning-name')).toEqual({ dimension: 'tuning-name', value: 'standard', pieces: 3 });
+  expect(await library.completeTags('alice', 'artist:Ja')).toEqual([{ dimension: 'artist', value: 'Jackson Browne', pieces: 1 }]);
+  expect((await library.completeTags('alice', '', 'list')).map(f => f.value)).toEqual(['Ole']);
+  expect((await library.listAliases('alice'))[0]).toMatchObject({ raw_value: 'Jackson Browne (Ole Kirkeng)', canonical_value: 'Jackson Browne', pieces: 1 });
+  expect(Library.shown((await library.getPiece('alice', 'a'))!.tags, await library.listAliases('alice')).find(t => t.dimension === 'artist')).toMatchObject({ value: 'Jackson Browne (Ole Kirkeng)', shown: 'Jackson Browne' });
+  await library.deleteAlias('alice', 'artist', 'Jackson Browne (Ole Kirkeng)');
+  expect((await library.browsePieces('alice', [], '', 'artist')).pieces[2].artist).toBe('Jackson Browne (Ole Kirkeng)');
+  await expect(library.browsePieces('alice', ['nocolon'], '')).rejects.toMatchObject({ code: 'invalid' });
+});
+
+it('sorts by recently opened, most recent first, unopened last, and pages by offset', async () => {
+  for (const id of ['a', 'b', 'c']) await library.writePiece('alice', { ...create(id), derived_tags: [{ dimension: 'title', value: id.toUpperCase(), source_ref: 'sidecar' }] });
+  await library.recordView('alice', 'b', '2026-09-11T10:00:00Z');
+  await library.recordView('alice', 'a', '2026-09-11T11:00:00Z');
+  await library.recordView('alice', 'b', '2026-09-11T12:00:00Z');
+  expect((await library.browsePieces('alice', [], '')).pieces.map(p => `${p.id}:${p.opened_at ?? '-'}`)).toEqual(['b:2026-09-11T12:00:00Z', 'a:2026-09-11T11:00:00Z', 'c:-']);
+  expect((await library.browsePieces('alice', [], '', 'title')).pieces.map(p => p.id)).toEqual(['a', 'b', 'c']);
+  await expect(library.recordView('bob', 'a')).rejects.toMatchObject({ code: 'not_found' });
+  await expect(library.browsePieces('alice', [], '-1')).rejects.toMatchObject({ code: 'invalid' });
+  expect((await library.browsePieces('alice', [], '2')).pieces.map(p => p.id)).toEqual(['c']);
 });
