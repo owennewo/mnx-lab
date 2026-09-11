@@ -271,11 +271,11 @@ function collapseAlternateEndings(
     const numbers: number[] = [];
     for (let bit = 0; bit < 8; bit++) if (mask & (1 << bit)) numbers.push(bit + 1);
 
+    // The schema requires `duration` on every ending — a one-bar volta is
+    // `duration: 1`, not an omission. Found by the library's storage check on
+    // the first real score with a one-bar third ending (studio storage, 2026-09-11).
     const duration = last - index + 1;
-    measures[index].ending = {
-      numbers,
-      ...(duration > 1 ? { duration } : {})
-    };
+    measures[index].ending = { numbers, duration };
   }
 }
 

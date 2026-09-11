@@ -561,7 +561,7 @@ describe('repeats and alternate endings', () => {
           { time: { count: 4, unit: 4 }, repeatStart: {} },
           { ending: { numbers: [1, 2], duration: 2 } },
           {},
-          { ending: { numbers: [3] }, repeatEnd: { times: 4 } }
+          { ending: { numbers: [3], duration: 1 }, repeatEnd: { times: 4 } }
         ]
       },
       parts: [

@@ -402,7 +402,7 @@ describe('repeats and alternate endings', () => {
     // Bracket 1 spans bars 2-3 (start ... stop), bracket 2 is one open bar.
     expect(global[1].ending).toEqual({ numbers: [1], duration: 2 });
     expect(global[2].repeatEnd).toEqual({});
-    expect(global[3].ending).toEqual({ numbers: [2], open: true });
+    expect(global[3].ending).toEqual({ numbers: [2], duration: 1, open: true });
   });
 
   it('round-trips repeats and the volta back to MusicXML', async () => {

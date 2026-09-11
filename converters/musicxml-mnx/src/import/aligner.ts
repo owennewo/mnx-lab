@@ -437,10 +437,12 @@ export class Aligner {
       for (let i = startIndex; i <= last; i++) consumed.add(i);
 
       if (!globalMeasures[startIndex]) globalMeasures[startIndex] = {};
+      // The schema requires `duration` on every ending — a one-bar volta is
+      // `duration: 1`, not an omission (found by the library's storage check).
       const duration = last - startIndex + 1;
       globalMeasures[startIndex].ending = {
         ...(numbers.length > 0 ? { numbers } : {}),
-        ...(duration > 1 ? { duration } : {}),
+        duration,
         ...(discontinued.has(last) ? { open: true } : {})
       };
     }

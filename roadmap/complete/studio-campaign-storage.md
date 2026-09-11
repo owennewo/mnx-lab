@@ -452,3 +452,27 @@ All five storage items are built. Future converter changes must update the deplo
 version manifest and run this sweep; missing current conversions fail explicitly.
 Studio editing, sharing, sync and alias application to documents remain outside this
 campaign. Originals and canonical ownership remain protected for those later efforts.
+
+### 2026-09-11 — the detector fires: one-bar endings had no `duration`
+
+The first full sync of the Soundslice cache (nine slices) stopped at the sixth,
+*These Days* (Ole Kirkeng): the Worker's storage-schema check refused **both** derived
+MNX renditions with `/global/measures/24/ending must have required property 'duration'`.
+Bar 25 is a one-bar third ending, and both converters — the clean-room Guitar Pro
+importer, its alphaTab differential oracle, and the MusicXML aligner alike — omitted
+`duration` whenever it would have been 1, as if it were a default. The published schema
+requires it on every ending. Fixed in all three emit sites; the converter tests that had
+encoded the omission now expect `duration: 1`, and one round-trip test's hand-written
+input document was itself schema-invalid in the same way.
+
+No committed fixture or scenario carried a one-bar ending, which is exactly why the
+tests never saw it and the first real library did. The cascade the campaign predicted
+then runs: re-stamp `worker/library/converter-versions.json`, deploy, `rederive:library`
+so the eight stored pieces gain children at the new version, and only then does the
+ninth piece's canonical read resolve.
+
+Learnings: a schema-required field with an obvious "default" is a trap for every
+emitter at once, and the storage check is the only place all of them are judged by the
+same rule; the ingest route trusts the manifest's own converter versions, so a fixed
+converter can store before the Worker is redeployed, but the piece is unreadable until
+the pin and the sweep catch up.

@@ -14,7 +14,7 @@ describe.each(['3.00', '4.00', '4.06', '5.00', '5.10'])('GP%s repeat endings', r
     const actual = normalizeIds(importGuitarProCleanRoom(bytes));
     const oracle = normalizeIds(importGuitarPro(bytes));
     if (!revision.startsWith('5')) {
-      expect(oracle.global.measures[4].ending).toEqual({ numbers: [1] });
+      expect(oracle.global.measures[4].ending).toEqual({ numbers: [1], duration: 1 });
       oracle.global.measures[4].ending = { numbers: [1], duration: 2 };
     }
     expect(actual.global.measures[4].ending).toEqual({ numbers: [1], duration: 2 });
@@ -27,10 +27,11 @@ describe.each(['3.00', '4.00', '4.06', '5.00', '5.10'])('GP%s repeat endings', r
     const actual = normalizeIds(importGuitarProCleanRoom(bytes));
     const oracle = normalizeIds(importGuitarPro(bytes));
     if (!revision.startsWith('5')) {
-      expect(oracle.global.measures[3].ending).toEqual({ numbers: [1, 3] });
-      oracle.global.measures[3].ending = { numbers: [3] };
+      expect(oracle.global.measures[3].ending).toEqual({ numbers: [1, 3], duration: 1 });
+      oracle.global.measures[3].ending = { numbers: [3], duration: 1 };
     }
-    expect(actual.global.measures[3].ending).toEqual({ numbers: [3] });
+    // A one-bar ending still states its duration: the schema requires it.
+    expect(actual.global.measures[3].ending).toEqual({ numbers: [3], duration: 1 });
     expect(actual).toEqual(oracle);
   });
 });
