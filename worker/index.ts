@@ -21,6 +21,8 @@ app.route('/api/edit-notation', editNotation);
 app.route('/api/models', modelsRoute);
 app.route('/api/documents', documents);
 app.route('/api/auth', auth);
+// Public capability flag contains no library/account data; static hosting returns no flag.
+app.get('/api/capabilities', c => c.json({ library: Boolean(c.env.LIBRARY_ACCESS_ISSUER && c.env.LIBRARY_ACCESS_AUD) }, 200, { 'Cache-Control': 'no-store' }));
 app.route('/api/library', library);
 
 export default app;

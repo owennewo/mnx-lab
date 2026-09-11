@@ -221,7 +221,7 @@ Three rules that outlive the details: **never restore a hardcoded `fetch` to the
 (the injected `ChatTransport` is what makes it testable); **the loop uses the published
 schema only** — never teach the LLM proposed-schema fields; and **`worker/models.json`
 is generated** — hand-editing the roster is a red test (`npm run update:roster`).
-`workbench/` may reach the Worker only through `assist/`.
+`workbench/` may reach the Worker only through `assist/` and `storage/` (optional library reads).
 
 The self-correction loop, the validator/CSP/model-selection machinery and the
 `anyOf` error filtering: [docs/assist-loop.md](docs/assist-loop.md).

@@ -4,7 +4,10 @@ import { mkdtemp, writeFile, rm, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Miniflare } from 'miniflare';
-import app from '../../worker/index.ts';
+import realApp from '../../worker/index.ts';
+import { testIdentity } from '../helpers/libraryIdentity.ts';
+let assertion = '';
+const app = { request: (url: string, init?: RequestInit, bindings?: unknown) => realApp.request(url, { ...init, headers: { ...Object.fromEntries(new Headers(init?.headers)), 'Cf-Access-Jwt-Assertion': assertion } }, bindings) };
 import { Library } from '../../worker/library/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { INGEST_OWNER, MAX_INGEST_BYTES } from '../../worker/api/library.ts';
@@ -41,6 +44,8 @@ beforeEach(async () => {
   await writeFile(join(directory,'Song_ABC.lists.json'), JSON.stringify({ id: 'ABC', score_file: 'Song_ABC.gp', lists: [{ id: 'L1', path: 'Folder / List' }] }));
   mf = new Miniflare({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] });
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: token };
+  const identity = await testIdentity(); Object.assign(env, identity.config); assertion = await identity.sign({}, true);
+  await env.LIBRARY_DB.exec("CREATE TABLE users(id TEXT PRIMARY KEY,email TEXT,active INTEGER); INSERT INTO users VALUES('operator','owner@example.test',1)");
   const sql = await readFile(new URL('../../migrations/0001_library.sql', import.meta.url),'utf8');
   await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=CREATE\b)/).map(s => env.LIBRARY_DB.prepare(s)));
 }, 15000);
@@ -49,7 +54,7 @@ afterEach(async () => { await mf?.dispose(); await rm(directory, { recursive: tr
 it('rejects unauthenticated reads, writes and unknown library routes before storage', async () => {
   for (const path of ['/api/library','/api/library/','/api/library/ingest/ABC','/api/library/pieces','/api/library/renditions/private']) {
     for (const method of ['GET','POST']) {
-      const response = await app.request(path, { method }, { LIBRARY_WRITE_TOKEN: token });
+      const response = await app.request(path, { method }, { ...env, LIBRARY_WRITE_TOKEN: token });
       expect(response.status).toBe(401); expect(response.headers.get('cache-control')).toContain('no-store');
     }
   }

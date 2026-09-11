@@ -20,6 +20,12 @@
       "remote": false
     }
   ],
+  "vars": {
+    "LIBRARY_ACCESS_ISSUER": "https://mnx-labs-team.cloudflareaccess.com",
+    "LIBRARY_ACCESS_AUD": "",
+    "LIBRARY_INGEST_AUD": "",
+    "LIBRARY_INGEST_CLIENT_ID": ""
+  },
   "compatibility_date": "2026-06-01",
   // Static assets (the Vite client build) are served in front of the Worker:
   // any request not matching an asset file invokes the Worker (/api/*), and

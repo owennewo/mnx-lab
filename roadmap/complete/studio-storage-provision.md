@@ -54,3 +54,9 @@ never printed or committed. `.dev.vars` uses a separate development-only value.
   `46fbe9393067221ee83ef08de209cb3c4edf0d8d`, staged as temporary public assets for deployment.
 - Fast-forward merged and pushed; worktree and branch removed before this completion record.
   Unrelated primary-checkout package edits were preserved.
+
+
+Item 4 revisited Terraform after choosing Access: retain a checked-in idempotent API
+bootstrap for this single-account application pair. Keep resource IDs in config and
+credentials in ignored owner-only files; reconsider Terraform for multiple environments
+or broader DNS/network management. See studio-storage-read for the implementation.

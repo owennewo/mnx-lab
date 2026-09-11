@@ -51,6 +51,22 @@ export class Library {
     return (await this.statement('SELECT * FROM pieces WHERE owner=? ORDER BY id', owner).all<Piece>()).results;
   }
 
+  async browsePieces(owner: string, filters: string[], after: string) {
+    const clauses = filters.map(() => `EXISTS (SELECT 1 FROM tags t WHERE t.owner=p.owner AND t.piece_id=p.id AND t.dimension=? AND t.value=?)`);
+    const values = filters.flatMap(t => { const colon = t.indexOf(':'); return [t.slice(0, colon), t.slice(colon + 1)]; });
+    const rows = (await this.statement(`SELECT p.*,
+      (SELECT value FROM tags WHERE owner=p.owner AND piece_id=p.id AND dimension='title' ORDER BY value LIMIT 1) AS title,
+      (SELECT value FROM tags WHERE owner=p.owner AND piece_id=p.id AND dimension='artist' ORDER BY value LIMIT 1) AS artist
+      FROM pieces p WHERE p.owner=? AND p.id>? ${clauses.length ? 'AND ' + clauses.join(' AND ') : ''} ORDER BY p.id LIMIT 51`, owner, after, ...values).all<Piece & { title: string | null; artist: string | null }>()).results;
+    return { pieces: rows.slice(0, 50), next: rows.length > 50 ? rows[49].id : null };
+  }
+
+  async completeTags(owner: string, prefix: string) {
+    // substr equality treats SQL wildcard characters literally.
+    return (await this.statement(`SELECT DISTINCT dimension,value FROM tags WHERE owner=?
+      AND substr(dimension || ':' || value,1,length(?))=? ORDER BY dimension,value LIMIT 50`, owner, prefix, prefix).all<{ dimension: string; value: string }>()).results;
+  }
+
   async readRendition(owner: string, id: string) {
     requireText(owner, 'owner');
     const row = await this.statement('SELECT r.* FROM renditions r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND r.id=?', owner, id).first<Rendition>();

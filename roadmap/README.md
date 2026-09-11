@@ -156,6 +156,8 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-storage-read.md](inprogress/studio-storage-read.md)** — item 4: Access authentication, owner-scoped library reads and optional Load dialog.
+
 
 
 - **[studio-campaign-storage.md](inprogress/studio-campaign-storage.md)** — **campaign**: songs

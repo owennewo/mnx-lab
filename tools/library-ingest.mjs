@@ -117,10 +117,10 @@ export function endpointURL(value) {
   if (url.protocol !== 'https:' && !(url.protocol === 'http:' && ['localhost','127.0.0.1','[::1]'].includes(url.hostname))) throw new Error('Use HTTPS, or HTTP on loopback for local development');
   return url.origin;
 }
-export async function uploadPlan(plan, endpoint, token, fetcher = fetch) {
+export async function uploadPlan(plan, endpoint, token, fetcher = fetch, access = {}) {
   const origin = endpointURL(endpoint);
   const request = async (path, options = {}) => {
-    const response = await fetcher(`${origin}/api/library${path}`, { ...options, headers: { Authorization: `Bearer ${token}` }, redirect: 'error' });
+    const response = await fetcher(`${origin}/api/library${path}`, { ...options, headers: { Authorization: `Bearer ${token}`, ...access }, redirect: 'error' });
     if (!response.ok) throw new Error(`Library request failed (${response.status}); no credentials or response body logged`);
     return response.json();
   };
@@ -141,13 +141,15 @@ export async function uploadPlan(plan, endpoint, token, fetcher = fetch) {
   return { ...result, unchanged: snapshot?.piece.revision === result.snapshot.piece.revision };
 }
 async function main(args) {
-  let directory; let dryRun = false; let endpoint = 'https://mnx-lab.totai.uk'; let tokenFile;
+  let directory; let dryRun = false; let endpoint = 'https://mnx-lab.totai.uk'; let tokenFile; let accessFile; let localSessionFile;
   for (let i=0; i<args.length; i++) {
     const a = args[i];
     if (a === '--dry-run') dryRun = true;
     else if (a === '--endpoint') endpoint = required(args[++i], 'endpoint');
+    else if (a === '--local-session-file') localSessionFile = required(args[++i], 'local session file');
+    else if (a === '--access-token-file') accessFile = required(args[++i], 'Access token file');
     else if (a === '--token-file') tokenFile = required(args[++i], 'token file');
-    else if (a.startsWith('-') || directory) throw new Error('Usage: npm run ingest:library -- <dir> [--dry-run] [--endpoint <origin>] [--token-file <path>]');
+    else if (a.startsWith('-') || directory) throw new Error('Usage: npm run ingest:library -- <dir> [--dry-run] [--endpoint <origin>] [--token-file <path>] [--access-token-file <path> | --local-session-file <path>]');
     else directory = a;
   }
   required(directory, 'cache directory'); endpointURL(endpoint);
@@ -163,8 +165,21 @@ async function main(args) {
   }
   required(token, 'LIBRARY_WRITE_TOKEN or --token-file');
   if (/\s/.test(token)) throw new Error('Invalid token format');
+  let access = {};
+  if (localSessionFile) {
+    if (!['localhost', '127.0.0.1', '[::1]'].includes(new URL(endpoint).hostname) || accessFile) throw new Error('Local sessions require a loopback endpoint and no Access service file');
+    if ((await stat(localSessionFile)).mode & 0o077) throw new Error('Local session file must be owner-only (chmod 600)');
+    access = { 'Cf-Access-Jwt-Assertion': required(JSON.parse(await readFile(localSessionFile, 'utf8')).machine, 'local machine session') };
+  } else if (accessFile) {
+    if ((await stat(accessFile)).mode & 0o077) throw new Error('Access token file must be owner-only (chmod 600)');
+    const credentials = JSON.parse(await readFile(accessFile, 'utf8'));
+    access = { 'CF-Access-Client-Id': required(credentials.client_id, 'client_id'), 'CF-Access-Client-Secret': required(credentials.client_secret, 'client_secret') };
+  } else if (process.env.CF_ACCESS_CLIENT_ID || process.env.CF_ACCESS_CLIENT_SECRET) {
+    access = { 'CF-Access-Client-Id': required(process.env.CF_ACCESS_CLIENT_ID, 'CF_ACCESS_CLIENT_ID'), 'CF-Access-Client-Secret': required(process.env.CF_ACCESS_CLIENT_SECRET, 'CF_ACCESS_CLIENT_SECRET') };
+  }
+  if (new URL(endpoint).protocol === 'https:' && !Object.keys(access).length) throw new Error('Production ingest requires --access-token-file or CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET');
   for (const p of plans) {
-    const result = await uploadPlan(p, endpoint, token);
+    const result = await uploadPlan(p, endpoint, token, fetch, access);
     console.log(JSON.stringify({ slice: p.manifest.source.id, status: result.unchanged ? 'unchanged' : 'stored', revision: result.snapshot.piece.revision, canonical: result.canonical }));
   }
 }

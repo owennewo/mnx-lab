@@ -3,6 +3,8 @@ import type { FormData as MultipartFormData } from '@cloudflare/workers-types/20
 import { Hono } from 'hono';
 import type { Env } from '../env.ts';
 import { Library, LibraryError, type Json, type PieceWrite, type RenditionInput, type RecordingInput } from '../library/index.ts';
+import { accessIdentity, AccessError, type LibraryUser } from '../library/access.ts';
+import converterVersions from '../library/converter-versions.json';
 import { documentWork } from '../../src/model/mnx.ts';
 
 export const INGEST_OWNER = 'operator';
@@ -42,16 +44,20 @@ async function bounded(request: Request): Promise<ArrayBuffer> {
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
   return bytes.buffer;
 }
-export const library = new Hono<{ Bindings: Env }>();
+export const library = new Hono<{ Bindings: Env; Variables: { libraryUser: LibraryUser } }>();
 library.use('*', async (c, next) => {
   c.header('Cache-Control', 'private, no-store');
-  const secret = c.env.LIBRARY_WRITE_TOKEN;
-  if (!secret?.trim()) return c.json({ error: 'Library authentication is not configured' }, 503);
-  const header = c.req.header('Authorization') ?? '';
-  const match = /^Bearer ([^\s]{1,4096})$/.exec(header);
-  if (!match || !await authentic(match[1], secret)) {
-    c.header('WWW-Authenticate', 'Bearer');
-    return c.json({ error: 'Authentication required' }, 401);
+  const machine = /^\/api\/library\/ingest(?:\/|$)/.test(c.req.path);
+  if (machine) {
+    const secret = c.env.LIBRARY_WRITE_TOKEN;
+    if (!secret?.trim()) return c.json({ error: 'Library authentication is not configured' }, 503);
+    const match = /^Bearer ([^\s]{1,4096})$/.exec(c.req.header('Authorization') ?? '');
+    if (!match || !await authentic(match[1], secret)) return c.json({ error: 'Authentication required' }, 401);
+  }
+  try { c.set('libraryUser', await accessIdentity(c.req.raw, c.env, machine)); }
+  catch (error) {
+    const status = error instanceof AccessError ? error.status : 503;
+    return c.json({ error: status === 403 ? 'User is not permitted' : 'Authentication required' }, status);
   }
   await next();
 });
@@ -125,4 +131,37 @@ library.post('/ingest', async c => {
   const canonicalMnx = await lib.readCanonicalMnx(INGEST_OWNER, id);
   return c.json({ snapshot, canonical: canonicalMnx ? { rendition_id: canonicalMnx.rendition.id,
     work: documentWork(canonicalMnx.document), capos: canonicalMnx.document.parts.map(p => p._x?.mnxLab?.capo ?? null) } : null });
+});
+
+function reader(c: { env: Env }) { return new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET, converterVersions); }
+library.get('/me', c => c.json({ user: c.get('libraryUser') }));
+library.get('/login', c => c.redirect('/?library=1', 303));
+library.get('/pieces', async c => {
+  const filters = c.req.queries('tag') ?? [];
+  if (filters.length > 12 || filters.some(t => t.length > 512 || !t.includes(':'))) return c.json({ error: 'Invalid tag filters' }, 400);
+  const after = c.req.query('after') ?? '';
+  if (after.length > 512) return c.json({ error: 'Invalid cursor' }, 400);
+  return c.json(await reader(c).browsePieces(c.get('libraryUser').id, filters, after));
+});
+library.get('/tags', async c => {
+  const prefix = c.req.query('q') ?? '';
+  if (prefix.length > 512) return c.json({ error: 'Invalid prefix' }, 400);
+  return c.json({ tags: await reader(c).completeTags(c.get('libraryUser').id, prefix) });
+});
+library.get('/pieces/:id', async c => {
+  const snapshot = await reader(c).getPiece(c.get('libraryUser').id, c.req.param('id'));
+  return snapshot ? c.json({ snapshot }) : c.json({ error: 'Piece not found' }, 404);
+});
+library.get('/pieces/:id/mnx', async c => {
+  let canonical;
+  try { canonical = await reader(c).readCanonicalMnx(c.get('libraryUser').id, c.req.param('id')); }
+  catch (error) { if (error instanceof LibraryError && error.code === 'invalid') return c.json({ error: 'Current MNX conversion unavailable' }, 409); throw error; }
+  return canonical ? c.json(canonical) : c.json({ error: 'Current MNX conversion unavailable' }, 409);
+});
+library.get('/renditions/:id', async c => {
+  const { object, rendition } = await reader(c).readRendition(c.get('libraryUser').id, c.req.param('id'));
+  c.header('Content-Type', 'application/octet-stream');
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(rendition.filename ?? 'rendition')}`);
+  return c.body(object.body);
 });

@@ -428,3 +428,9 @@ operator API still uses its private token until that integration is deployed.
 Access manages browser sessions; no separate studio session store is initially planned.
 The private ingest token remains a machine credential, with a scoped Access service
 credential planned to keep the operator script working after the edge gate is enabled.
+
+
+Item 4 implementation and operator commands: [library-access.md](library-access.md).
+The Worker derives every browser read owner from a verified Access identity and active
+D1 user. Browser and machine audiences are separate; the machine also requires the
+write token and active operator. Account rollout verification is tracked in the item.
