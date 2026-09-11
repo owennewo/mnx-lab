@@ -8,7 +8,7 @@ import { buildScoreJobs, layoutNotation } from './notation.ts';
 import { translatePrimitiveY } from '../primitives.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { anchorY, rowBoundariesSp } from './verticalDensity.ts';
-import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP, measureAccidentals, tieTargetIds } from './spacing.ts';
+import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_PAD_SP, measureAccidentals, tieTargetIds, tieOrigins } from './spacing.ts';
 import { selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
@@ -171,6 +171,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // plan gave (spacing.ts builds the same resolver from the same inputs).
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
   const tieTargets = tieTargetIds(mnx);
+  const ties = { originOf: tieOrigins(mnx), rowOf: new Map<string, number>() };
 
   // The row height this DOCUMENT needs: the frame constant, plus the verse
   // block when lyrics exist — the reservation is explicit, exactly as the
@@ -443,7 +444,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
         showTupletBrackets: true,
         // The plan priced this measure's tuplet columns with this; the walk
         // over them has to agree term for term.
-        accidentalOf
+        accidentalOf,
+        ties
       });
     }
 

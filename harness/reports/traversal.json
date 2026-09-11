@@ -4347,6 +4347,104 @@
       ]
     ]
   },
+  "lab/tab-rhythm/tied-notes-on-tab": {
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "passCounts": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 2,
+        "measureIndex": 2,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 3,
+        "measureIndex": 3,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 4,
+        "measureIndex": 4,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 5,
+        "measureIndex": 5,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
   "lab/dynamics/all-dynamic-marks": {
     "order": [
       0,

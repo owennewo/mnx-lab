@@ -46,6 +46,13 @@ that states no transposition falls back to its name: one called *guitar* gets a
 treble-8vb clef. Both converters write the block — Guitar Pro from `<Transpose>` /
 `<PartSounding>` (GP3–5 from the MIDI program), MusicXML from `<transpose>`.
 
+**Ties on tab.** A tie continuation is still ringing, so the tab staff leaves its digit
+out — the notation staff carries the arc. The one exception is a continuation whose
+origin was drawn on an earlier system: it draws in parentheses, `(3)`, so a line never
+opens on a silent string. `TabTies` in `src/engine/layout/tabStaff.ts` carries the
+origins (`tieOrigins` in `spacing.ts`) and the row each note was drawn on; a hidden
+continuation still records its technique site and never claims a fingerboard slot.
+
 
 Score display controls enter each layout as `display: DisplayOptions` and
 are normalized in `src/engine/displayOptions.ts`. Lyrics are filtered before

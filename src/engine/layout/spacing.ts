@@ -654,9 +654,12 @@ export function measureAccidentals(
     glyphs.has(note) ? glyphs.get(note) ?? null : noteAccidentalGlyph(note, useAccidentalDisplay, keyFifths);
 }
 
-/** Ids of every note a tie lands on — continuations, which never restate an accidental. */
-export function tieTargetIds(mnx: MnxStructure): Set<string> {
-  const targets = new Set<string>();
+/** Every tie that lands on a note: its target id, and the id of the note it
+ *  leaves when that note has one. */
+function forEachTieTarget(
+  mnx: MnxStructure,
+  visit: (target: string, origin: string | undefined) => void
+): void {
   const walk = (items: readonly MnxSequenceItem[] | undefined, depth: number) => {
     if (depth > 32) return;
     for (const item of items ?? []) {
@@ -667,7 +670,7 @@ export function tieTargetIds(mnx: MnxStructure): Set<string> {
       }
       if (!isTimedEvent(item)) continue;
       for (const note of item.notes ?? []) {
-        for (const tie of note.ties ?? []) if (tie.target) targets.add(tie.target);
+        for (const tie of note.ties ?? []) if (tie.target) visit(tie.target, note.id);
       }
     }
   };
@@ -676,7 +679,23 @@ export function tieTargetIds(mnx: MnxStructure): Set<string> {
       for (const seq of measure.sequences ?? []) walk(seq.content, 0);
     }
   }
+}
+
+/** Ids of every note a tie lands on — continuations, which never restate an accidental. */
+export function tieTargetIds(mnx: MnxStructure): Set<string> {
+  const targets = new Set<string>();
+  forEachTieTarget(mnx, target => targets.add(target));
   return targets;
+}
+
+/** Each tie continuation's origin: target id → the id of the note it continues.
+ *  A tab staff leaves a continuation's digit out (`tabStaff.ts`). */
+export function tieOrigins(mnx: MnxStructure): Map<string, string> {
+  const origins = new Map<string, string>();
+  forEachTieTarget(mnx, (target, origin) => {
+    if (origin !== undefined) origins.set(target, origin);
+  });
+  return origins;
 }
 
 // ---------- Tuplet columns (shared with the notation renderer) ----------

@@ -1,0 +1,32 @@
+{
+  "title": "Tied notes on tab: a continuation keeps ringing",
+  "description": "A G chord built over a tied bass, the shape Guitar Pro and Soundslice exports are full of. A tie continuation is still ringing — the string was struck once — so the tab leaves its digit out: the bass G on beat 2 and the D on beat 3 draw nothing, while the notation staff carries the tie arcs. Bars 2–6 repeat an eighth-note figure whose last G is tied into the next bar, so every barline carries a tie: within a system each continuation is silent, and at the line break the continuation that opens the new system is drawn in parentheses, (0), so a line never opens on a silent string. A fresh strike still draws beside a continuation.",
+  "bars": 6,
+  "tags": [
+    "tab",
+    "tab:rhythm",
+    "ties"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/examples/ties/"
+  ],
+  "coversDefs": [
+    "tie",
+    "event",
+    "note",
+    "vendor-extensions",
+    "part-transposition",
+    "interval"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view"
+  ],
+  "idRefs": true,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}

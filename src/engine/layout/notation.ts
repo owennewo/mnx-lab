@@ -46,6 +46,7 @@ import {
   type AccidentalResolver,
   measureAccidentals,
   tieTargetIds,
+  tieOrigins,
   durationValue,
   ActiveClef,
   ClefAt,
@@ -1203,6 +1204,7 @@ function assembleSegment(
 
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
   const tieTargets = tieTargetIds(mnx);
+  const tabTies = { originOf: tieOrigins(mnx), rowOf: new Map<string, number>() };
   // Staff/source labels, group labels and (nested) group decorations sit left
   // of the system inside an extra inset, so the music shifts right for them.
   // Per staff, source labels ("1"/"2") stack right-aligned at the label edge
@@ -2019,7 +2021,8 @@ function assembleSegment(
           technique: td.technique,
           // The notation staff above draws the bracket over the same columns.
           showTupletBrackets: false,
-          accidentalOf
+          accidentalOf,
+          ties: tabTies
         });
       }
     }

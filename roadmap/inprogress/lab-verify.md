@@ -1175,3 +1175,19 @@ where the golden used to show the treble-8vb glyph. The two half notes (sounding
 and E3) sit exactly where they did, written C4 on a ledger line and E4 on the
 bottom line, and the tab still reads (5,3) then (4,2): the transposition is display
 metadata, so a moved fret would mean it leaked into derivation.
+
+## Tied notes leave the tab — 2026-09-11
+
+Owner: no roadmap doc — a direct fix: an imported Guitar Pro bar redrew every tied
+note's fret, so the tab read as re-strikes that are never played (Soundslice, and tab
+convention, leave them out). One **never-seen** scenario,
+`lab/26-tab-rhythm/04-tied-notes-on-tab`, and **no moved golden** — nothing in the
+corpus had put a tie on a fingerboard, which is how the bug lived.
+
+**What a reviewer should look for.** In the tab and `both` views: bar 1 shows the
+bass 3 once — beat 2 draws only its new strikes (D and B, both 0) with nothing on
+string 6, and beat 3 draws only the G, nothing on the D string. Bars 2–6 open with a G
+tied from the bar before: no digit there within a system. The second system opens
+with **(0)** in parentheses on string 3 — a tie carried over the line break is shown,
+so the line never begins on a silent string. The notation staff is unchanged: every
+tie keeps its arc.

@@ -352,6 +352,20 @@ export interface EmitTabVoicesArgs {
    * the notation staff above.
    */
   accidentalOf: AccidentalResolver;
+  /** Tie continuations, shared by every measure the layout walks. */
+  ties: TabTies;
+}
+
+/**
+ * A tied note is still ringing, so tab leaves its digit out: the string has
+ * already been struck. Only a continuation whose origin sits on an EARLIER
+ * system draws, in parentheses — a line must not open on a silent string.
+ */
+export interface TabTies {
+  /** Continuation id → the id of the note it continues (`spacing.ts` `tieOrigins`). */
+  originOf: ReadonlyMap<string, string>;
+  /** The system row each note id was drawn on, filled in as the layout walks. */
+  rowOf: Map<string, number>;
 }
 
 /**
@@ -474,7 +488,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
   const {
     voices, slots, staffTop, ink, measureIndex, positionContext,
     activeNoteIds, selectedNoteIds, synthesizeKeys, primitives, index, onIssue,
-    row, measureEndX, technique: techniqueSites, showTupletBrackets, accidentalOf
+    row, measureEndX, technique: techniqueSites, showTupletBrackets, accidentalOf, ties
   } = args;
   const laneY = tabTechniqueLaneY(staffTop);
 
@@ -542,20 +556,31 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       const isSelected = noteId !== undefined && selectedNoteIds.includes(noteId);
       const fretFill = isActive ? ACTIVE_COLOR : isSelected ? SELECTED_COLOR : undefined;
 
+      // A tie continuation keeps ringing: no digit, unless its origin was
+      // drawn on an earlier system (`TabTies`). It never claims the slot, so
+      // a real attack at the same fingerboard position still draws.
+      const note = event.notes[k];
+      const origin = note?.id !== undefined ? ties.originOf.get(note.id) : undefined;
+      if (note?.id !== undefined) ties.rowOf.set(note.id, row);
+      const continued = origin !== undefined && ties.rowOf.get(origin) === row;
+      const carried = origin !== undefined && !continued;
+
       const fretSlot = `${Math.round(eventX * 1e4)}:${pos.str}:${pos.fret}`;
-      if (drawnFrets.has(fretSlot)) continue;
-      drawnFrets.add(fretSlot);
+      if (!continued) {
+        if (drawnFrets.has(fretSlot)) continue;
+        drawnFrets.add(fretSlot);
+      }
 
       const stringY = staffTop + (pos.str - 1) * TAB_STRING_SPACING_SP;
       // A harmonic is the one technique that changes the DIGIT rather than
       // adding a mark beside it: `<12>` is how a tab reader is told the
       // fret is a node to touch, not a note to stop. Drawn here, with the
       // digit, so one mask still covers exactly one text.
-      const note = event.notes[k];
       const technique = note ? techniqueOf(note) : undefined;
-      const fretStr = technique?.harmonic
+      const digits = technique?.harmonic
         ? harmonicFretText(String(pos.fret))
         : String(pos.fret);
+      const fretStr = carried ? `(${digits})` : digits;
       const charWidthSp = fontSize * 0.6 * Math.max(1, fretStr.length);
 
       // The geometry the technique post-pass draws against — recorded even
@@ -578,6 +603,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
           ...(technique ? { technique } : {})
         });
       }
+      if (continued) continue;
 
       // Background rect obscures the staff line under the digit. Its width
       // is drawn on the ink scale, so its left edge is placed on it too —
