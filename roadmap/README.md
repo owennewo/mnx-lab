@@ -156,6 +156,8 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[lab-library-ingest.md](inprogress/lab-library-ingest.md)** — storage campaign item 3: authenticated personal cache ingest, converter provenance and repeatable uploads.
+
 
 - **[studio-campaign-storage.md](inprogress/studio-campaign-storage.md)** — **campaign**: songs
   in Cloudflare, every format kept. One *piece* per item of music with immutable **renditions**

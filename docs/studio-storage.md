@@ -228,6 +228,15 @@ signed brackets before the octave, e.g. `F[+1]2`. There are no inferred tuning n
 implicit capo values. The whole `creator.` namespace is reserved for derived tags.
 Aliases are display mappings and never modify stored music or raw derived tags.
 
+Stored MNX uses the published schema plus the narrowly validated global `section` and
+`rehearsal` labels already emitted by both converters (the score-text proposal). The
+storage parser validates those label objects separately and validates the remaining
+structure against published MNX, returning the original document unchanged. It does not
+accept the full experimental schema. The AI edit route remains published-only. Label
+validation is generated from the existing proposal definition; on adoption it can use
+the published definition. This preserves source/derived bytes rather than stripping text
+to satisfy a narrower validator.
+
 The module accepts buffered blob bytes; the ingest route owns request-size limits and
 upload transport. Storage does not expose an unauthenticated route or a direct-upload
 credential. Missing write tokens must fail closed when that route is added in item 3.

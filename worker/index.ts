@@ -5,12 +5,13 @@
 // The Worker is NOT the workbench's backend — it is the DEMO for a visitor
 // with no OpenRouter key of their own (core-assist-byok: with a key the whole
 // edit loop runs in the browser), plus two reserved 501 seams for the future
-// studio product. Every done frame it produces is stamped demoMode/mockMode.
+// studio product, plus authenticated personal library ingest. Every done frame it produces is stamped demoMode/mockMode.
 // The workbench must stay fully functional from static build output alone.
 import { Hono } from 'hono';
 import { editNotation } from './api/editNotation.ts';
 import { modelsRoute } from './api/models.ts';
 import { documents } from './api/documents.ts';
+import { library } from './api/library.ts';
 import { auth } from './api/auth.ts';
 import type { Env } from './env.ts';
 
@@ -20,5 +21,6 @@ app.route('/api/edit-notation', editNotation);
 app.route('/api/models', modelsRoute);
 app.route('/api/documents', documents);
 app.route('/api/auth', auth);
+app.route('/api/library', library);
 
 export default app;

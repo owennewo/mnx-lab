@@ -1,0 +1,54 @@
+# Personal library ingest
+
+Item 3 of the [studio storage campaign](studio-campaign-storage.md), inheriting its
+contract and [storage design](../../docs/studio-storage.md). Implementation loop.
+Started 2026-09-11.
+
+Create `tools/library-ingest.mjs` and a mandatory-auth Worker ingest route. Build the
+checkout converters before deriving MNX; keep every source rendition, upstream metadata,
+recording and list identity. Dry-run is local only; repeat imports preserve revisions,
+canonical choices and renamed tags. The private bearer token maps server-side to owner
+`operator`; clients cannot choose an owner. All `/api/library` requests fail closed
+without authentication, including the operator metadata reads required for retries.
+Browser read access remains item 4's auth discussion.
+
+Done: local route tests prove authentication, ownership, additive import and no-op replay;
+both cached slices are ingested through the deployed Worker; Blues Run The Game resolves
+to canonical MNX with title, artist and capo 3. Run the repository landing gates, push,
+retire the worktree, then record the campaign handoff.
+
+## Operator use
+
+Node 22.13+ is required (`node:sqlite` reads the optional cache index read-only).
+The index supplies exact fetch times, checksums and the injected GP's raw-export hash;
+without it, sidecars still work and unavailable provenance is explicitly null.
+The input cache is never modified. The tool builds both converters from clean committed
+source and stamps package version, last converter-source git commit and import flags.
+Unrelated repository commits therefore do not create false converter versions.
+
+```bash
+npm run ingest:library -- ~/dev/soundslice-cli/gp/files --dry-run
+npm run ingest:library -- ~/dev/soundslice-cli/gp/files \
+  --token-file /home/williao/dev/mnx-lab/.secrets/library-write-token
+```
+
+Use `--endpoint http://localhost:8787` and a development-only `LIBRARY_WRITE_TOKEN`
+for local work. Production defaults to `https://mnx-lab.totai.uk`. Tokens are read from
+an owner-only file or the environment, never a CLI value, URL, client bundle or log.
+HTTPS is mandatory except on loopback, and redirects are refused.
+
+`GET /api/library/ingest/:sourceId` returns the operator's snapshot for revision checks;
+`POST /api/library/ingest` accepts a multipart manifest plus content-addressed files.
+Both require the token. The POST can initialize, but cannot replace, the canonical
+pointer or rename tags. It returns the snapshot and canonical work/capo summary so the
+operator can verify the import without adding a general read API. All library paths
+return private/no-store responses. Missing server secret returns 503; missing/invalid
+credentials return 401 before body parsing or storage access.
+
+One piece per request, capped at 24 MiB including multipart overhead, with at most 100
+entries per collection and a 1 MiB manifest. Larger libraries can contain many pieces;
+a larger single piece needs a separate staged-upload design. Replays currently upload
+bytes again but immutable R2 objects and unchanged D1 rows are not rewritten. Conflicts
+return 409; rerun to read the current revision. Missing companions are retained, never
+deleted. If the selected converter version has no child for an older canonical source,
+the import fails explicitly; item 5 owns re-deriving retained sources.

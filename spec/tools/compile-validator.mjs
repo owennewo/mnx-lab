@@ -79,3 +79,18 @@ function writeModule(rel, code) {
     })
   );
 }
+
+// Storage preserves the two label objects already emitted by our converters. Do not
+// import the whole proposed schema into the Worker or widen the AI-edit validator.
+// This tiny validator plus the published validator covers the stored converter dialect.
+{
+  const published = loadSchema('mnx-schema.json');
+  const proposed = fs.existsSync(path.join(root, 'spec', 'mnx-schema.proposed.json'))
+    ? loadSchema('mnx-schema.proposed.json') : published;
+  const ajv = new Ajv2020.default({ allErrors: true, code: { source: true, esm: true } });
+  const validate = ajv.compile({
+    $defs: { ...published.$defs, section: proposed.$defs.section ?? false },
+    $ref: '#/$defs/section'
+  });
+  writeModule('validate-library-label.mjs', standaloneCode.default(ajv, validate));
+}

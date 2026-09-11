@@ -49,6 +49,7 @@
     "update:roster": "UPDATE_ROSTER=1 vitest run harness/conformance/roster.test.ts",
     "refresh:catalog": "REFRESH_CATALOG=1 UPDATE_ROSTER=1 vitest run harness/conformance/roster.test.ts",
     "test": "vitest run",
+    "ingest:library": "node tools/library-ingest.mjs",
     "deploy": "npm run build && wrangler deploy",
     "update:traversal": "UPDATE_TRAVERSAL=1 vitest run harness/conformance/traversal.test.ts",
     "smoke:audio": "node harness/verify/audio-smoke.mjs",

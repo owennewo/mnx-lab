@@ -1,5 +1,6 @@
 import { documentWork, type MnxStructure } from '../../src/model/mnx.ts';
 import validateMnx from '../generated/validate-mnx.mjs';
+import validateLabel from '../generated/validate-library-label.mjs';
 import { validatePartExt, validateRootExt } from '../generated/validate-extensions.mjs';
 import { LibraryError, type Rendition } from './types.ts';
 
@@ -11,9 +12,19 @@ export function parseMnx(content: ArrayBuffer): MnxStructure {
   let doc: MnxStructure;
   try { doc = JSON.parse(new TextDecoder('utf-8', { fatal: true, ignoreBOM: false }).decode(content)); }
   catch { throw new LibraryError('invalid', 'Invalid MNX JSON'); }
-  if (!validateMnx(doc) || (doc._x?.mnxLab !== undefined && !validateRootExt(doc._x.mnxLab)) ||
+  // The converters retain proposed section/rehearsal labels. Validate those narrowly,
+  // and the remainder against published MNX; never rewrite stored bytes or admit all
+  // fields from the experimental proposal schema. The AI path does not use this parser.
+  const standard = structuredClone(doc);
+  if (Array.isArray(standard?.global?.measures)) for (const measure of standard.global.measures) {
+    for (const field of ['section', 'rehearsal'] as const) if (measure?.[field] !== undefined) {
+      if (!validateLabel(measure[field])) throw new LibraryError('invalid', 'Invalid section/rehearsal label');
+      delete measure[field];
+    }
+  }
+  if (!validateMnx(standard) || (doc._x?.mnxLab !== undefined && !validateRootExt(doc._x.mnxLab)) ||
       doc.parts.some(p => p._x?.mnxLab !== undefined && !validatePartExt(p._x.mnxLab))) {
-    throw new LibraryError('invalid', 'MNX or its metadata does not match the published schema');
+    throw new LibraryError('invalid', 'MNX or its metadata does not match the storage schema');
   }
   return doc;
 }
