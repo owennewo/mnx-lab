@@ -117,7 +117,9 @@ export async function planIngest(inputDirectory) {
     const sidecar = async kind => { const b = await cacheFile(directory, `${stem}.${kind}.json`); return b ? JSON.parse(b) : null; };
     const sync = await sidecar('sync'); const lists = await sidecar('lists'); const meta = sync ?? lists;
     const sourceId = required(meta.id, 'slice id');
-    if (!/^[a-zA-Z0-9]+$/.test(sourceId) || seen.has(sourceId)) throw new Error('Invalid or duplicate slice identity');
+    // A Soundslice slice id is a URL path segment; hyphens occur in real ids
+    // ("gn-8c", "-RBHc", "--YJc"), so the shape is [A-Za-z0-9_-], not alphanumerics.
+    if (!/^[A-Za-z0-9_-]+$/.test(sourceId) || seen.has(sourceId)) throw new Error(`Invalid or duplicate slice identity ${JSON.stringify(sourceId)} in ${stem}`);
     seen.add(sourceId);
     if (sync && lists && (sync.id !== lists.id || sync.score_file !== lists.score_file)) throw new Error('Sidecar identities disagree');
     if (meta.score_file !== `${stem}.gp`) throw new Error('Sidecar score filename disagrees with bundle');
@@ -166,8 +168,24 @@ export async function planIngest(inputDirectory) {
     const manifest = { expected_revision: null, source: { kind: 'soundslice', id: sourceId },
       renditions, recordings, tags: (lists?.lists ?? []).map(l => ({ dimension: 'list', value: required(l.path, 'list path'), source_ref: required(l.id, 'list id') })),
       canonical: { mode: 'initialize', rendition_id: canonical.id } };
-    const bytes = [...files.values()].reduce((n,b) => n + b.byteLength, 0) + Buffer.byteLength(JSON.stringify(manifest));
-    if (bytes > maxBytes - 65536) throw new Error(`Bundle ${sourceId} exceeds the 24 MiB request limit`);
+    // One request per slice, and a companion recording can be larger than the
+    // request allows (a 45 MiB video was the first): drop the largest media
+    // recordings until the bundle fits, saying so each time — the score is
+    // what the library is for, and a recording the service already holds is
+    // retained when the manifest omits it. Only the SOURCES exceeding the
+    // limit is an error, and it is not one this tool can route around.
+    const budget = maxBytes - 65536;
+    const size = () => [...files.values()].reduce((n,b) => n + b.byteLength, 0) + Buffer.byteLength(JSON.stringify(manifest));
+    let bytes = size();
+    while (bytes > budget) {
+      const media = manifest.recordings.map((r, at) => ({ r, at })).filter(({ r }) => r.file);
+      if (!media.length) throw new Error(`Bundle ${sourceId} exceeds the 24 MiB request limit`);
+      const largest = media.reduce((a, b) => (files.get(b.r.file).byteLength > files.get(a.r.file).byteLength ? b : a));
+      const dropped = manifest.recordings.splice(largest.at, 1)[0];
+      if (!manifest.recordings.some(r => r.file === dropped.file) && !renditions.some(r => r.file === dropped.file)) files.delete(dropped.file);
+      console.error(`Skipping recording ${dropped.source_id} of ${sourceId} (${(bytes / 1048576).toFixed(1)} MiB bundle exceeds the 24 MiB request); existing recording is retained`);
+      bytes = size();
+    }
     plans.push({ manifest, files, bytes, sources, sidecarTags, canonicalId: canonical.id });
   }
   return plans;

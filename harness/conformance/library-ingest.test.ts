@@ -132,6 +132,25 @@ it('preserves renamed lists and missing recordings across a replay', async () =>
   expect(second.snapshot.tags.some((t: {value: string}) => t.value === 'Renamed')).toBe(true);
   expect(second.snapshot.recordings).toHaveLength(2);
 });
+it('drops a companion recording the request cannot carry and keeps the score', async () => {
+  // A 45 MiB Soundslice video was the first bundle over the 24 MiB request:
+  // the recording goes with a warning, the slice still ingests, and a
+  // recording the service already holds is retained (the missing-companion rule).
+  const p0 = await plan(); const first = await upload(p0);
+  expect(first.snapshot.recordings).toHaveLength(2);
+  await writeFile(join(directory,'Song_ABC.mp3'), new Uint8Array(25 * 1024 * 1024));
+  const warnings: string[] = []; const error = console.error;
+  console.error = (message: string) => { warnings.push(String(message)); };
+  try {
+    const p = await plan();
+    expect(p.manifest.recordings.map((r: { source_id: string }) => r.source_id)).toEqual(['1']);
+    expect([...p.files.keys()].every(k => p.manifest.renditions.some((r: { file: string }) => r.file === k))).toBe(true);
+    expect(p.bytes).toBeLessThan(24 * 1024 * 1024);
+    expect(warnings.some(w => w.includes('Skipping recording 2 of ABC') && w.includes('existing recording is retained'))).toBe(true);
+    const second = await upload(p);
+    expect(second.snapshot.recordings).toHaveLength(2);
+  } finally { console.error = error; }
+});
 it('never lets request metadata choose an owner or replace canonical', async () => {
   const p = await plan();
   for (const extra of [{ owner: 'victim' }, { canonical: { mode: 'replace', rendition_id: p.manifest.canonical.rendition_id } }]) {

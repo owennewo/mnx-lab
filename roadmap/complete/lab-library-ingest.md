@@ -47,7 +47,13 @@ credentials return 401 before body parsing or storage access.
 
 One piece per request, capped at 24 MiB including multipart overhead, with at most 100
 entries per collection and a 1 MiB manifest. Larger libraries can contain many pieces;
-a larger single piece needs a separate staged-upload design. Replays currently upload
+a larger single piece needs a separate staged-upload design. **A companion recording the
+request cannot carry is dropped, not fatal** (2026-09-12, after a 45 MiB Soundslice video
+stopped a 90-slice run): the tool drops the largest media recordings until the bundle fits,
+prints one warning per drop, and the slice still ingests — a recording the service already
+holds is retained, as for any missing companion. Only the sources themselves exceeding the
+limit is an error. Slice ids are URL path segments, `[A-Za-z0-9_-]` — real ids carry
+hyphens, which the first cut's alphanumeric check refused. Replays currently upload
 bytes again but immutable R2 objects and unchanged D1 rows are not rewritten. Conflicts
 return 409; rerun to read the current revision. Missing companions are retained, never
 deleted. If the selected converter version has no child for an older canonical source,
