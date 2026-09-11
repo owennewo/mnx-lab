@@ -11,8 +11,8 @@ export function parseMnx(content: ArrayBuffer): MnxStructure {
   let doc: MnxStructure;
   try { doc = JSON.parse(new TextDecoder('utf-8', { fatal: true, ignoreBOM: false }).decode(content)); }
   catch { throw new LibraryError('invalid', 'Invalid MNX JSON'); }
-  if (!validateMnx(doc) || (doc._x?.mnxLab && !validateRootExt(doc._x.mnxLab)) ||
-      doc.parts.some(p => p._x?.mnxLab && !validatePartExt(p._x.mnxLab))) {
+  if (!validateMnx(doc) || (doc._x?.mnxLab !== undefined && !validateRootExt(doc._x.mnxLab)) ||
+      doc.parts.some(p => p._x?.mnxLab !== undefined && !validatePartExt(p._x.mnxLab))) {
     throw new LibraryError('invalid', 'MNX or its metadata does not match the published schema');
   }
   return doc;

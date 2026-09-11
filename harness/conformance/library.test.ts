@@ -224,3 +224,10 @@ it('rechecks ownership inside the mutation transaction', async () => {
   expect((await library.getPiece('bob','piece'))?.renditions).toEqual([]);
   expect((await library.getPiece('bob','piece'))?.piece.revision).toBe(0);
 });
+
+it.each(['root', 'part'])('rejects explicit null %s vendor metadata', async location => {
+  const doc=structuredClone(score);
+  Object.assign(location==='root' ? doc : doc.parts[0], {_x:{mnxLab:null}});
+  await expect(library.writePiece('alice',{...create(),renditions:[{...mnx('invalid'),content:bytes(JSON.stringify(doc))}]})).rejects.toMatchObject({code:'invalid'});
+  expect(await library.listPieces('alice')).toEqual([]);
+});

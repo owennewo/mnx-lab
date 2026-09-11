@@ -23,7 +23,7 @@ trigger rejecting stale next revisions. Library reads are owner-scoped snapshots
 revision and ownership are checked again inside the write transaction. Content-addressed
 R2 puts use an absent-object condition plus checksum/size verification.
 
-Seventeen local Miniflare tests cover graph validation, canonical version selection,
+Nineteen local Miniflare tests cover graph validation, canonical version selection,
 metadata projection, immutable rendition history, recording upserts, renamed list
 tags, owner isolation, no-op retries, corruption, late SQL failure, and competing SQL
 and R2 writers. Wrangler applied the migration locally successfully. Production
