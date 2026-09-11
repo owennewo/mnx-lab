@@ -20,7 +20,7 @@ import {
   MnxTuplet,
   STANDARD_GUITAR_STRINGS
 } from '../common/types.js';
-import type { Element, Document } from '../common/xml.js';
+import type { Element } from '../common/xml.js';
 import {
   renderChordSymbol,
   stepToText,
@@ -28,7 +28,6 @@ import {
 } from '../common/harmony.js';
 import {
   calculateMnxDuration,
-  createPitchKey,
   noteValueInQuarters,
   reduceFraction,
   walkSequenceEvents
@@ -1313,7 +1312,6 @@ export class Aligner {
 
     for (let mIdx = 0; mIdx < measureEls.length; mIdx++) {
       const mEl = measureEls[mIdx];
-      const measureNum = parseInt(mEl.getAttribute('number') || `${mIdx + 1}`, 10);
 
       // 1. Process Attributes if present
       const attributesEl = findDirectChild(mEl, 'attributes');
@@ -2085,22 +2083,6 @@ export class Aligner {
       octave: newOctave,
       alter: newAlter !== 0 ? newAlter : undefined
     };
-  }
-
-  private getEventDivisionDuration(event: MnxEvent, divisions: number): number {
-    const base = event.duration.base;
-    const dots = event.duration.dots || 0;
-    
-    let baseRatio = 1.0; // quarter
-    if (base === 'whole') baseRatio = 4.0;
-    else if (base === 'half') baseRatio = 2.0;
-    else if (base === 'eighth') baseRatio = 0.5;
-    else if (base === '16th' || base === 'sixteenth') baseRatio = 0.25;
-    else if (base === '32nd' || base === 'thirty-second') baseRatio = 0.125;
-    else if (base === '64th') baseRatio = 0.0625;
-    
-    const multiplier = 2 - Math.pow(2, -dots);
-    return Math.round(baseRatio * multiplier * divisions);
   }
 
   /**

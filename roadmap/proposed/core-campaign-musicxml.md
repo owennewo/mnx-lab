@@ -142,7 +142,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 13 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite` (~100 categorised files, Kainhofer's, originally for LilyPond). Widens what the matrix can score. | accuracy | itself | **not started — license unverified**, and vendoring third-party fixtures without checking is the one thing item 1 says not to do |
 | 14 | Differential oracle | music21 as a dev-only subprocess emitting a note table, diffed against the same table from our MNX — the one tier that is genuinely independent of us. | accuracy | itself | **not started — music21 is not installed here**; needs a deliberate dev-environment decision, not a silent `pip install` |
 | 15 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document. | accuracy | itself | **not started — no `xmllint` available**, and it would need a new dev dependency for what this campaign already calls *a floor, not an accuracy tier* |
-| 16 | Browser import surface | MusicXML file import in the workbench, parallel to the Guitar Pro worker. The converter is now platform-independent; nothing in the shell calls it. | zero-dep | `smoke:csp` | **not started — BLOCKED**: `src/workbench/localFile.ts` and `guitarProImporter.worker.ts` are held uncommitted by another session, and these are exactly the files it touches |
+| 16 | [Browser import surface](../inprogress/core-musicxml-browser-import.md) | MusicXML file import in the workbench, parallel to the Guitar Pro worker: `.musicxml`/`.mxl`/`.xml` through **Open…**, in a lazy worker of its own that imports the converter's core modules directly (the package index re-exports Node-only `fs`). The worker protocol is now format-neutral. | zero-dep | `smoke:csp`, extended to open a `.musicxml`, a deflated `.mxl` and a `.gpx` through the real file input under the deployed CSP | **built 2026-09-11** |
 | 17 | [Dynamics](../inprogress/core-musicxml-dynamics.md) | `<dynamics>` and `<wedge>`, both directions. The enum values map to `value`; the sforzando family to MNX's accent structure, whose parts concatenate to exactly the MusicXML element name (s+f+z = `sfz`), so one table serves both directions; the rest to SMuFL `glyphs`. Hairpins pair by wedge `number`, item 2's shape again. Relative dynamics have no MusicXML element and warn. | accuracy | the corpus's dynamics scenarios + round trip (no W3C comparison carries a dynamic) | **built 2026-09-10** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
@@ -211,6 +211,25 @@ is the parallel-work contract doing its job rather than an obstacle.
 - **A green round trip is not evidence of support**, and this campaign has the receipts:
   `tied` appeared zero times in the converter while 46 round-trip tests passed over it.
 
+
+### 2026-09-11 — item 16: the browser surface, and the app's compiler as a new reviewer
+
+MusicXML opens in the workbench
+([core-musicxml-browser-import.md](../inprogress/core-musicxml-browser-import.md)),
+prompted by a real Soundslice export being refused.
+
+- **A block is a fact about a moment.** The row said BLOCKED on a live collision; by the
+  time anyone asked, the file was clean on `main`. Re-check the collision, not the row.
+- **The app build is a stricter reader than the package's own.** Pulling the import path
+  into `src/`'s `tsc` subjected it to `noUnusedLocals` for the first time: six dead
+  symbols, one a whole private method. A converter entering a new build inherits that
+  build's rules — worth running before assuming the campaign's code is clean.
+- **Module-level independence is not package-level.** Items 10 and 11 made the modules
+  platform-free, but `index.ts` still re-exports the CLI's `fs` helpers, so the worker
+  imports past it — the move the Guitar Pro worker already makes with `cleanRoom.ts`.
+- **The oracle a surface needs is the surface itself.** `smoke:csp` only booted the app;
+  neither import worker had ever been loaded under the deployed policy by any test. It now
+  opens one file per path through the real input.
 
 ### 2026-09-10 — item 17: dynamics, found from outside the campaign
 

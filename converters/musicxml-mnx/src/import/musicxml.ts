@@ -1,5 +1,5 @@
-import { parseXML, type Element, type Document } from '../common/xml.js';
-import { MnxStructure, MnxGlobalMeasure, MnxPart, MnxPitch } from '../common/types.js';
+import { parseXML, type Element } from '../common/xml.js';
+import { MnxStructure, MnxGlobalMeasure, MnxPart } from '../common/types.js';
 import { walkSequenceEvents } from '../common/utils.js';
 import { Aligner } from './aligner.js';
 import { readWork, rootExtension } from '../common/scoreMetadata.js';

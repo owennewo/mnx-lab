@@ -286,7 +286,10 @@ doctools/`uv` setup: [docs/mnx-spec-submodule.md](docs/mnx-spec-submodule.md).
 `converters/*` are npm workspaces; their CLIs are Node-only. **Home-grown importers may
 enter the app build** — the workbench opens `.gp`/`.gpx`/`.gp3-5` by running
 `guitarpro-mnx`'s clean-room importer (`src/cleanRoom.ts` → `gpif/`, `gp345/`) in a lazy
-web worker (`src/workbench/guitarProImporter.worker.ts`). **Third-party codecs may not:
+web worker (`src/workbench/guitarProImporter.worker.ts`), and `.musicxml`/`.mxl`/`.xml`
+through `musicxml-mnx` in its own (`musicXmlImporter.worker.ts`, which imports
+`import/musicxml.ts` + `common/mxl.ts` directly — the package index drags in Node-only
+`fs`). **Third-party codecs may not:
 alphaTab is a devDependency of `converters/guitarpro-mnx`, kept only as the
 differential-parity oracle for its tests (`src/import/gp.ts`, `src/export/gp.ts` — the
 live paths are `cleanRoom.ts` and `gpif/fromMnx.ts`), and must never reach `src/` or any

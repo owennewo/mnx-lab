@@ -177,6 +177,14 @@ back up to `proposed/` the moment it is.
   sound over the **written** score, the unrolled engraving after it.
 
 
+- **[core-musicxml-browser-import.md](inprogress/core-musicxml-browser-import.md)** —
+  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 16, **built 2026-09-11**:
+  **Open…** takes `.musicxml`/`.mxl`/`.xml`, converted in a lazy worker of its own beside
+  Guitar Pro's (protocol now format-neutral). The worker imports the converter's core
+  modules directly because the package index re-exports Node-only `fs`; entering the app's
+  `tsc` surfaced six dead symbols the converter's own config never flagged. `smoke:csp`
+  now opens a `.musicxml`, a deflated `.mxl` and a `.gpx` through the real input under the
+  deployed CSP — neither worker had been loaded under it by any test before.
 - **[core-musicxml-dynamics.md](inprogress/core-musicxml-dynamics.md)** —
   [MusicXML campaign](proposed/core-campaign-musicxml.md) item 17, **built 2026-09-10**:
   `<dynamics>` and `<wedge>` both directions — the converter held the word `dynamic` only

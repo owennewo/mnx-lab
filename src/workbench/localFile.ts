@@ -1,15 +1,17 @@
 import type { MnxStructure } from '../model/mnx.ts';
 import { upgradeTabExtension } from '../model/upgradeTabExtension.ts';
 import {
-  GUITAR_PRO_IMPORT_COMMAND,
-  GUITAR_PRO_IMPORT_RESULT,
-  type GuitarProWorkerReply,
-  type GuitarProWorkerRequest
-} from './guitarProImporterProtocol.ts';
+  FILE_IMPORT_COMMAND,
+  FILE_IMPORT_RESULT,
+  type FileImportReply,
+  type FileImportRequest
+} from './fileImporterProtocol.ts';
 
-export const LOCAL_FILE_ACCEPT = '.mnx.json,.mnx,.json,.gp,.gpx,.gp3,.gp4,.gp5';
+export const LOCAL_FILE_ACCEPT =
+  '.mnx.json,.mnx,.json,.musicxml,.mxl,.xml,.gp,.gpx,.gp3,.gp4,.gp5';
 
 const MNX_EXTENSIONS = ['.mnx.json', '.mnx', '.json'] as const;
+const MUSICXML_EXTENSIONS = ['.musicxml', '.mxl', '.xml'] as const;
 const GUITAR_PRO_EXTENSIONS = ['.gp', '.gpx', '.gp5', '.gp4', '.gp3'] as const;
 
 export interface LocalDocumentSource {
@@ -19,7 +21,7 @@ export interface LocalDocumentSource {
   /** Filename fallback. The piece's own title lives in the document, under
    *  `_x.mnxLab.work` — read it with `documentTitle()`. */
   name: string;
-  format: 'MNX' | 'Guitar Pro';
+  format: 'MNX' | 'MusicXML' | 'Guitar Pro';
   document: MnxStructure;
   warnings: string[];
 }
@@ -31,7 +33,7 @@ function extensionIn(name: string, extensions: readonly string[]): boolean {
 
 function withoutKnownExtension(name: string): string {
   const lower = name.toLowerCase();
-  for (const extension of [...MNX_EXTENSIONS, ...GUITAR_PRO_EXTENSIONS]) {
+  for (const extension of [...MNX_EXTENSIONS, ...MUSICXML_EXTENSIONS, ...GUITAR_PRO_EXTENSIONS]) {
     if (lower.endsWith(extension)) return name.slice(0, -extension.length);
   }
   return name;
@@ -47,30 +49,41 @@ function assertDocumentShape(value: unknown): asserts value is MnxStructure {
   }
 }
 
-function importGuitarPro(buffer: ArrayBuffer): Promise<{
+// `new Worker(new URL(…, import.meta.url))` has to be written out literally for
+// Vite to find and bundle the worker, so each format keeps its own spawn line.
+const IMPORTERS = {
+  MusicXML: () =>
+    new Worker(new URL('./musicXmlImporter.worker.ts', import.meta.url), { type: 'module' }),
+  'Guitar Pro': () =>
+    new Worker(new URL('./guitarProImporter.worker.ts', import.meta.url), { type: 'module' })
+} satisfies Record<string, () => Worker>;
+
+/** Convert a file off the main thread, in its format's clean-room import worker. */
+function importInWorker(
+  format: keyof typeof IMPORTERS,
+  buffer: ArrayBuffer
+): Promise<{
   document: MnxStructure;
   warnings: string[];
 }> {
   return new Promise((resolve, reject) => {
-    const worker = new Worker(new URL('./guitarProImporter.worker.ts', import.meta.url), {
-      type: 'module'
-    });
-    worker.onmessage = (event: MessageEvent<GuitarProWorkerReply>) => {
+    const worker = IMPORTERS[format]();
+    worker.onmessage = (event: MessageEvent<FileImportReply>) => {
       const reply = event.data;
-      if (reply?.cmd !== GUITAR_PRO_IMPORT_RESULT) return;
+      if (reply?.cmd !== FILE_IMPORT_RESULT) return;
       worker.terminate();
       if (!reply.ok || !reply.document) {
-        reject(new Error(reply.error || 'Guitar Pro conversion failed.'));
+        reject(new Error(reply.error || `${format} conversion failed.`));
         return;
       }
       resolve({ document: reply.document, warnings: reply.warnings ?? [] });
     };
     worker.onerror = event => {
       worker.terminate();
-      reject(new Error(event.message || 'The Guitar Pro converter could not start.'));
+      reject(new Error(event.message || `The ${format} converter could not start.`));
     };
-    const request: GuitarProWorkerRequest = {
-      cmd: GUITAR_PRO_IMPORT_COMMAND,
+    const request: FileImportRequest = {
+      cmd: FILE_IMPORT_COMMAND,
       buffer
     };
     worker.postMessage(request, [buffer]);
@@ -94,13 +107,18 @@ export async function openLocalFile(file: File): Promise<LocalDocumentSource> {
     }
     assertDocumentShape(parsed);
     document = parsed;
+  } else if (extensionIn(file.name, MUSICXML_EXTENSIONS)) {
+    format = 'MusicXML';
+    ({ document, warnings } = await importInWorker(format, await file.arrayBuffer()));
+    assertDocumentShape(document);
   } else if (extensionIn(file.name, GUITAR_PRO_EXTENSIONS)) {
     format = 'Guitar Pro';
-    ({ document, warnings } = await importGuitarPro(await file.arrayBuffer()));
+    ({ document, warnings } = await importInWorker(format, await file.arrayBuffer()));
     assertDocumentShape(document);
   } else {
     throw new Error(
-      `Unsupported file type for ${file.name}. Open MNX JSON or a GP, GPX, GP3, GP4, or GP5 file.`
+      `Unsupported file type for ${file.name}. Open MNX JSON, MusicXML (MUSICXML, MXL, XML), ` +
+        'or a GP, GPX, GP3, GP4, or GP5 file.'
     );
   }
 
