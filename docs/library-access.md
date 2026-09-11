@@ -29,7 +29,7 @@ python3 tools/library-access.py sync --token-file /private/.secrets/cloudflare-a
 ```
 
 Bootstrap records resource IDs in `tools/library-access-resources.json`, audiences and
-issuer in `wrangler.jsonc`; service secrets are written once to a 0600 file. A rerun
+issuer in `wrangler.jsonc`; service secrets are written once to a 0600 file. The default service file lives in the primary checkout’s ignored `.secrets/`, so retiring a task worktree cannot delete it. A rerun
 reads existing resources, refuses configuration drift and missing recorded resources,
 and updates only a changed allowlist/session setting. Existing service credentials are
 never silently rotated. A missing local service secret requires deliberate recovery or

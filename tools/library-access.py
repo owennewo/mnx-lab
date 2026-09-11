@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import tomllib
 import urllib.request
 import urllib.error
@@ -176,14 +177,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=['bootstrap', 'sync', 'add', 'disable', 'enable'])
     parser.add_argument('--token-file', required=True)
-    parser.add_argument('--service-file', default=str(ROOT / '.secrets/library-access-service.json'))
+    parser.add_argument('--service-file', help='Persistent owner-only service credential file (defaults to primary checkout .secrets)')
     parser.add_argument('--id')
     parser.add_argument('--email')
     args = parser.parse_args()
     api, db = API(private_read(args.token_file)), d1_api()
     inventory = json.loads(INVENTORY.read_text()) if INVENTORY.exists() else {}
     if args.action == 'bootstrap':
-        bootstrap(api, db, inventory, args.service_file)
+        common = Path(subprocess.check_output(['git', 'rev-parse', '--path-format=absolute', '--git-common-dir'], cwd=ROOT, text=True).strip())
+        service_file = args.service_file or str(common.parent / '.secrets/library-access-service.json')
+        bootstrap(api, db, inventory, service_file)
         return
     if args.action in ['add', 'disable', 'enable']:
         if not args.id or not re.fullmatch(r'[A-Za-z0-9_-]{1,100}', args.id):
