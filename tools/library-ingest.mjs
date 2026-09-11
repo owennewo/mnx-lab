@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Personal operator tool. Cache bytes and credentials never enter a build face.
-import { readFile, readdir, realpath, stat } from 'node:fs/promises';
+import { readFile, readdir, realpath, stat, lstat } from 'node:fs/promises';
 import { resolve, dirname, basename, extname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -140,6 +140,36 @@ export async function uploadPlan(plan, endpoint, token, fetcher = fetch, access 
   const result = await request('/ingest', { method: 'POST', body: form });
   return { ...result, unchanged: snapshot?.piece.revision === result.snapshot.piece.revision };
 }
+async function privateCredentialFile(path, label, asJson = false) {
+  const info = await lstat(path);
+  if (!info.isFile() || (info.mode & 0o077)) throw new Error(`${label} must be an owner-only regular file (chmod 600)`);
+  if (info.size > 65536) throw new Error(`${label} is too large`);
+  const value = await readFile(path, 'utf8');
+  if (!asJson) return value.trim();
+  try { return JSON.parse(value); } catch { throw new Error(`${label} contains invalid JSON`); }
+}
+export async function operatorCredentials({ endpoint, tokenFile, accessFile, localSessionFile }) {
+  endpointURL(endpoint);
+  let token = process.env.LIBRARY_WRITE_TOKEN;
+  if (tokenFile) {
+    token = await privateCredentialFile(tokenFile, 'Token file');
+  }
+  required(token, 'LIBRARY_WRITE_TOKEN or --token-file');
+  if (!/^[!-~]{1,4096}$/.test(token)) throw new Error('Invalid token format');
+  let access = {};
+  if (localSessionFile) {
+    if (!['localhost', '127.0.0.1', '[::1]'].includes(new URL(endpoint).hostname) || accessFile) throw new Error('Local sessions require a loopback endpoint and no Access service file');
+    access = { 'Cf-Access-Jwt-Assertion': required((await privateCredentialFile(localSessionFile, 'Local session file', true))?.machine, 'local machine session') };
+  } else if (accessFile) {
+    const credentials = await privateCredentialFile(accessFile, 'Access token file', true);
+    access = { 'CF-Access-Client-Id': required(credentials?.client_id, 'client_id'), 'CF-Access-Client-Secret': required(credentials?.client_secret, 'client_secret') };
+  } else if (process.env.CF_ACCESS_CLIENT_ID || process.env.CF_ACCESS_CLIENT_SECRET) {
+    access = { 'CF-Access-Client-Id': required(process.env.CF_ACCESS_CLIENT_ID, 'CF_ACCESS_CLIENT_ID'), 'CF-Access-Client-Secret': required(process.env.CF_ACCESS_CLIENT_SECRET, 'CF_ACCESS_CLIENT_SECRET') };
+  }
+  if (Object.values(access).some(value => typeof value !== 'string' || !/^[!-~]{1,16384}$/.test(value))) throw new Error('Invalid Access credential format');
+  if (new URL(endpoint).protocol === 'https:' && !Object.keys(access).length) throw new Error('Production ingest requires --access-token-file or CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET');
+  return { token, access };
+}
 async function main(args) {
   let directory; let dryRun = false; let endpoint = 'https://mnx-lab.totai.uk'; let tokenFile; let accessFile; let localSessionFile;
   for (let i=0; i<args.length; i++) {
@@ -158,27 +188,7 @@ async function main(args) {
   for (const p of plans) console.log(JSON.stringify({ slice: p.manifest.source.id, renditions: p.manifest.renditions.length,
     recordings: p.manifest.recordings.length, tags: p.manifest.tags.length, bytes: p.bytes, converters: p.manifest.converter_versions }));
   if (dryRun) { console.log('Dry run: no network requests or storage writes.'); return; }
-  let token = process.env.LIBRARY_WRITE_TOKEN;
-  if (tokenFile) {
-    if ((await stat(tokenFile)).mode & 0o077) throw new Error('Token file must be readable only by its owner (chmod 600)');
-    token = (await readFile(tokenFile, 'utf8')).trim();
-  }
-  required(token, 'LIBRARY_WRITE_TOKEN or --token-file');
-  if (/\s/.test(token)) throw new Error('Invalid token format');
-  let access = {};
-  if (localSessionFile) {
-    if (!['localhost', '127.0.0.1', '[::1]'].includes(new URL(endpoint).hostname) || accessFile) throw new Error('Local sessions require a loopback endpoint and no Access service file');
-    if ((await stat(localSessionFile)).mode & 0o077) throw new Error('Local session file must be owner-only (chmod 600)');
-    access = { 'Cf-Access-Jwt-Assertion': required(JSON.parse(await readFile(localSessionFile, 'utf8')).machine, 'local machine session') };
-  } else if (accessFile) {
-    if ((await stat(accessFile)).mode & 0o077) throw new Error('Access token file must be owner-only (chmod 600)');
-    const credentials = JSON.parse(await readFile(accessFile, 'utf8'));
-    access = { 'CF-Access-Client-Id': required(credentials.client_id, 'client_id'), 'CF-Access-Client-Secret': required(credentials.client_secret, 'client_secret') };
-  } else if (process.env.CF_ACCESS_CLIENT_ID || process.env.CF_ACCESS_CLIENT_SECRET) {
-    access = { 'CF-Access-Client-Id': required(process.env.CF_ACCESS_CLIENT_ID, 'CF_ACCESS_CLIENT_ID'), 'CF-Access-Client-Secret': required(process.env.CF_ACCESS_CLIENT_SECRET, 'CF_ACCESS_CLIENT_SECRET') };
-  }
-  if (Object.values(access).some(value => typeof value !== 'string' || !/^[!-~]{1,16384}$/.test(value))) throw new Error('Invalid Access credential format');
-  if (new URL(endpoint).protocol === 'https:' && !Object.keys(access).length) throw new Error('Production ingest requires --access-token-file or CF_ACCESS_CLIENT_ID and CF_ACCESS_CLIENT_SECRET');
+  const { token, access } = await operatorCredentials({ endpoint, tokenFile, accessFile, localSessionFile });
   for (const p of plans) {
     const result = await uploadPlan(p, endpoint, token, fetch, access);
     console.log(JSON.stringify({ slice: p.manifest.source.id, status: result.unchanged ? 'unchanged' : 'stored', revision: result.snapshot.piece.revision, canonical: result.canonical }));

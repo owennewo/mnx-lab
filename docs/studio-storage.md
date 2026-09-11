@@ -434,3 +434,28 @@ Item 4 implementation and operator commands: [library-access.md](library-access.
 The Worker derives every browser read owner from a verified Access identity and active
 D1 user. Browser and machine audiences are separate; the machine also requires the
 write token and active operator. Account rollout verification is tracked in the item.
+
+
+## Re-derivation sweep (item 5)
+
+`npm run rederive:library` reads stored non-MNX renditions through the authenticated
+operator API, builds the checkout's Node converters and submits new MNX children through
+`Library.writePiece`. It does not depend on the local Soundslice cache. The deployed
+converter-version manifest must match the command; a mismatch stops before writes.
+The sweep is limited to the active operator's pieces, with paginated reads and bounded
+24 MiB uploads/responses. Each piece commits atomically under its observed revision;
+a failure is reported and other pieces continue. A rerun reads fresh revisions.
+
+Comparison removes only root `_x.mnxLab.encoding` and ignores object-key order. Changed
+JSON paths are reported with counts and a bounded path sample, without copying score
+content into logs. Encoding/serialization-only differences are separate from document
+changes. New producer versions still add evidence rows even for equal music, as required
+above; the fresh bytes retain the encoding stamp of the converter that produced them.
+Identical bytes share an R2 key. Existing matching version/options rows with equivalent documents are reused,
+and unchanged rows/tags do not bump revisions. No schema migration is needed.
+
+Every apply rebuilds derived tags from the canonical path, including pieces already
+canonical to MNX; asserted tags, recordings, aliases and pointers are untouched. Dry-run
+performs authenticated reads and conversion but no writes (tag changes are reported on
+apply). Alias application to documents is deferred until studio's editing authority
+exists; this sweep never rewrites originals or edits the canonical document.

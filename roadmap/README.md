@@ -156,6 +156,8 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-storage-rederive.md](inprogress/studio-storage-rederive.md)** — storage item 5: authenticated converter sweep, change reports and canonical tag rebuild.
+
 
 
 

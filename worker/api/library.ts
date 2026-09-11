@@ -44,6 +44,18 @@ async function bounded(request: Request): Promise<ArrayBuffer> {
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
   return bytes.buffer;
 }
+async function multipart(request: Request) {
+  const contentType = request.headers.get('Content-Type') ?? '';
+  if (!contentType.startsWith('multipart/form-data;')) invalid('Expected multipart/form-data');
+  let form: MultipartFormData; let manifest: Record<string, unknown>;
+  const body = await bounded(request);
+  try {
+    form = await new Response(body, { headers: { 'Content-Type': contentType } }).formData() as MultipartFormData;
+    const raw = form.get('manifest'); if (typeof raw !== 'string' || raw.length > 1024 * 1024) invalid('Invalid manifest');
+    manifest = object(JSON.parse(raw));
+  } catch { invalid('Invalid multipart manifest'); }
+  return { form, manifest };
+}
 export const library = new Hono<{ Bindings: Env; Variables: { libraryUser: LibraryUser } }>();
 library.use('*', async (c, next) => {
   c.header('Cache-Control', 'private, no-store');
@@ -67,21 +79,61 @@ library.onError((error, c) => {
   // Do not log request bodies, credentials or private score data.
   return c.json({ error: 'Library operation failed' }, 500);
 });
+// Operator sweep routes stay within the existing machine Access application's path.
+library.get('/ingest/rederive/pieces', async c => {
+  const after = c.req.query('after') ?? '';
+  if (after.length > 512) invalid('Invalid cursor');
+  return c.json({ ...await reader(c).browsePieces(INGEST_OWNER, [], after), converter_versions: converterVersions });
+});
+library.get('/ingest/rederive/pieces/:id', async c => {
+  const snapshot = await reader(c).getPiece(INGEST_OWNER, c.req.param('id'));
+  return snapshot ? c.json({ snapshot }) : c.json({ error: 'Piece not found' }, 404);
+});
+library.get('/ingest/rederive/renditions/:id', async c => {
+  const { object, rendition } = await reader(c).readRendition(INGEST_OWNER, c.req.param('id'));
+  c.header('Content-Type', 'application/octet-stream');
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('Content-Length', String(rendition.bytes));
+  return c.body(object.body);
+});
+library.post('/ingest/rederive', async c => {
+  const { form, manifest } = await multipart(c.req.raw);
+  if (Object.keys(manifest).some(k => !['id','expected_revision','renditions','converter_versions'].includes(k))) invalid('Unsupported rederive field');
+  const requested = versions(manifest.converter_versions);
+  if (JSON.stringify(Object.entries(requested).sort()) !== JSON.stringify(Object.entries(converterVersions).sort())) {
+    throw new LibraryError('conflict', 'Deploy matching converter versions before rederiving');
+  }
+  const lib = reader(c); const id = text(manifest.id);
+  const before = await lib.getPiece(INGEST_OWNER, id);
+  if (!before) throw new LibraryError('not_found', 'Piece not found');
+  if (manifest.expected_revision !== before.piece.revision) throw new LibraryError('conflict', 'Piece revision changed; read it again');
+  const renditions: RenditionInput[] = [];
+  for (const value of array(manifest.renditions)) {
+    const r = object(value);
+    if (Object.keys(r).some(k => !['id','derived_from','producer','producer_version','producer_options','sha256','file'].includes(k))) invalid('Unsupported derived rendition field');
+    const parent = before.renditions.find(p => p.id === text(r.derived_from));
+    if (!parent || parent.format === 'mnx') invalid('Expected a non-MNX source in this piece');
+    const producer = parent.format === 'musicxml' ? 'musicxml-mnx' : 'guitarpro-mnx';
+    if (r.producer !== producer || r.producer_version !== requested[producer]) invalid('Converter identity does not match source');
+    const file = form.get(text(r.file));
+    if (!file || typeof file === 'string') invalid('Missing derived MNX upload');
+    // This route cannot alter existing rendition metadata or choose a canonical pointer.
+    if (before.renditions.some(old => old.id === text(r.id))) invalid('Rederive accepts new rendition ids only');
+    renditions.push({ id: text(r.id), format: 'mnx', role: 'derived', producer,
+      producer_version: text(r.producer_version), producer_options: (r.producer_options ?? null) as Json,
+      derived_from: parent.id, filename: `${parent.filename ?? parent.id}.mnx.json`,
+      provenance: { source_sha256: parent.sha256 }, content: await file.arrayBuffer(), sha256: text(r.sha256) });
+  }
+  const snapshot = await lib.writePiece(INGEST_OWNER, { id, expected_revision: before.piece.revision, renditions });
+  return c.json({ snapshot, unchanged: snapshot.piece.revision === before.piece.revision });
+});
 library.get('/ingest/:sourceId', async c => {
   const lib = new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET);
   const piece = await lib.findPiece(INGEST_OWNER, 'soundslice', c.req.param('sourceId'));
   return c.json({ snapshot: piece ? await lib.getPiece(INGEST_OWNER, piece.id) : null });
 });
 library.post('/ingest', async c => {
-  const contentType = c.req.header('Content-Type') ?? '';
-  if (!contentType.startsWith('multipart/form-data;')) return c.json({ error: 'Expected multipart/form-data' }, 415);
-  let form: MultipartFormData; let manifest: Record<string, unknown>;
-  const body = await bounded(c.req.raw);
-  try {
-    form = await new Response(body, { headers: { 'Content-Type': contentType } }).formData() as MultipartFormData;
-    const raw = form.get('manifest'); if (typeof raw !== 'string' || raw.length > 1024 * 1024) invalid('Invalid manifest');
-    manifest = object(JSON.parse(raw));
-  } catch { invalid('Invalid multipart manifest'); }
+  const { form, manifest } = await multipart(c.req.raw);
   const allowed = ['id','expected_revision','source','renditions','recordings','tags','canonical','converter_versions'];
   if (Object.keys(manifest).some(k => !allowed.includes(k))) invalid('Unsupported manifest field');
   const source = object(manifest.source);
