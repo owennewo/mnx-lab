@@ -73,7 +73,11 @@ later campaign; this one lays the storage they all stand on.
    derived tags are materialised, and it is the same code path an edit will use later. Local
    development runs against `wrangler dev`'s local D1 and R2, so nothing needs the account
    to test.
-4. **Conversion stays in Node.** Deriving MNX from `.gp`/MusicXML happens in the ingest script
+4. **Conversion stays in Node.** *(Reversed 2026-09-11 by
+   [studio-storage-source-canonical.md](../proposed/studio-storage-source-canonical.md): MNX is
+   not yet a storage format; the ingest stores the Soundslice sources only and validates
+   conversions without storing them, and item 5's sweep retires with it.)*
+   Deriving MNX from `.gp`/MusicXML happens in the ingest script
    with the converters as they are. The Worker reads `_x.mnxLab.work` and part-level
    `strings`/`capo` out of MNX JSON to derive tags; no converter enters the Worker bundle.
    The layer ceiling `worker: model + assist only` is unchanged.

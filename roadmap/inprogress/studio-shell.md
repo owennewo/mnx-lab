@@ -207,3 +207,7 @@ D1); the smoke has only one signed identity to work with.
 - [ ] A D1-disabled address that Access admits sees the not-permitted page
       (`tools/library-access.py disable`, then `enable`).
 - [ ] `core-editor-element-promotion.md` moves to `inprogress/` — its trigger is pulled.
+- [ ] The piece page moves from the `mnx` read route to the canonical `.gp` plus browser-side
+      conversion when [studio-storage-source-canonical.md](../proposed/studio-storage-source-canonical.md)
+      lands; until then a piece reads only while a derived MNX at the deployed converter
+      version exists.
